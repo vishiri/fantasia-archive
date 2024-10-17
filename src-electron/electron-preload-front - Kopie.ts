@@ -28,16 +28,16 @@
  * }
  */
 
-import { contextBridge } from 'electron'
+import { faWindowControlAPI } from '../../../src-electron/customContentBridgeAPIs/faWindowControlAPI'
+import { extraEnvVariablesAPI } from '../../../src-electron/customContentBridgeAPIs/extraEnvVariablesAPI'
+import { faDevToolsControlAPI } from '../../../src-electron/customContentBridgeAPIs/faDevToolsControlAPI'
+import { faExternalLinksManagerAPI } from '../../../src-electron/customContentBridgeAPIs/faExternalLinksManagerAPI'
 
-import { faWindowControlAPI } from 'src-electron/customContentBridgeAPIs/faWindowControlAPI'
-import { extraEnvVariablesAPI } from 'src-electron/customContentBridgeAPIs/extraEnvVariablesAPI'
-import { faDevToolsControlAPI } from 'src-electron/customContentBridgeAPIs/faDevToolsControlAPI'
-import { faExternalLinksManagerAPI } from 'app/src-electron/customContentBridgeAPIs/faExternalLinksManagerAPI'
-import { faServerControlAPI } from 'src-electron/customContentBridgeAPIs/faServerControlAPI'
+declare global{
+    interface Window { faWindowControlAPI: object; faDevToolsControlAPI: object; faExternalLinksManagerAPI: object; extraEnvVariablesAPI: object; }
+}
 
-contextBridge.exposeInMainWorld('faWindowControlAPI', faWindowControlAPI)
-contextBridge.exposeInMainWorld('faDevToolsControlAPI', faDevToolsControlAPI)
-contextBridge.exposeInMainWorld('faExternalLinksManagerAPI', faExternalLinksManagerAPI)
-contextBridge.exposeInMainWorld('extraEnvVariables', extraEnvVariablesAPI)
-contextBridge.exposeInMainWorld('faServerControl', faServerControlAPI)
+window.faWindowControl = faWindowControlAPI
+window.faDevToolsControl = faDevToolsControlAPI
+window.faExternalLinksManager = faExternalLinksManagerAPI
+window.extraEnvVariables = extraEnvVariablesAPI
