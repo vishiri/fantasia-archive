@@ -10,6 +10,7 @@
 
 const { configure } = require('quasar/wrappers')
 const path = require('path')
+const nodePolyfills = require('vite-plugin-node-polyfills').nodePolyfills
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -74,6 +75,17 @@ module.exports = configure(function (/* ctx */) {
       // viteVuePluginOptions: {},
 
       vitePlugins: [
+	    // executes the injection of the webpolyfills
+        {
+          name: 'preload-server-build',
+          buildStart: (options) => {
+            if (process.argv.indexOf('--no-serverBuild') > 0) return
+            console.log('\nRunning serverBuild\t to deactivate: --no-serverBuild')
+            require('./serverBuild.ts')
+            console.log()
+          }
+        },
+        nodePolyfills(),
         [
           '@intlify/vite-plugin-vue-i18n',
           {
