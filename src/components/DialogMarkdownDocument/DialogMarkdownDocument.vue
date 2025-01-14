@@ -113,6 +113,10 @@ onMounted(() => {
     width: 680px;
   }
 
+  &.changeLog .q-markdown {
+    width: 100%;
+  }
+
   &.changeLog .q-card {
     width: 1100px;
   }
