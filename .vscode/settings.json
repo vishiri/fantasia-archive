@@ -18,6 +18,11 @@
   },
   "todo-tree.tree.scanMode": "workspace",
   "[vue]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  }
+    "editor.defaultFormatter": "Jota0222.multi-formatter",
+    "editor.formatOnSave": true,
+    "multiFormatter.formatterList": [
+      "dbaeumer.vscode-eslint",
+      "stylelint.vscode-stylelint"
+    ]
+  },
 }
