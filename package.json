@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "A worldbuilding database manager",
   "productName": "Fantasia Archive",
-  "author": "Elvanos <elvanos66@gmail.com>",
+  "author": "Vishiri <vishiri.rilgatan@gmail.com>",
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
