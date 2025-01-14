@@ -2,23 +2,12 @@
   <!-- Dialog wrapper -->
   <q-dialog
     v-model="dialogModel"
-    :class="['dialogMarkdownDocument', `${documentName}`]"
+    :class="['dialogComponent', `${documentName}`]"
   >
     <q-card>
       <!-- Dialog contents wrapper -->
-      <q-card-section :class="['dialogMarkdownDocument__content', `${documentName}`, 'q-mt-xl', 'q-mb-lg', 'q-mr-lg', 'q-ml-xl', 'q-pt-none']">
-        <div
-          class="flex justify-center"
-          data-test="dialogMarkdownDocument-markdown-wrapper"
-        >
-          <!-- Dialog markdown -->
-          <q-markdown
-            no-heading-anchor-links
-            data-test="dialogMarkdownDocument-markdown-content"
-            :class="[`${documentName}`, 'dialogMarkdownDocument']"
-            :src="$t(`documents.${documentName}`)"
-          />
-        </div>
+      <q-card-section :class="['dialogComponent__content', `${documentName}`, 'q-mt-xl', 'q-mb-lg', 'q-mr-lg', 'q-ml-xl', 'q-pt-none']">
+        TOPKEK ABOUT FANTASIA ARCHIVE
       </q-card-section>
 
       <!-- Card actions wrapper -->
@@ -32,7 +21,7 @@
           flat
           label="Close"
           color="accent"
-          data-test="dialogMarkdownDocument-button-close"
+          data-test="dialogComponent-button-close"
         />
       </q-card-actions>
     </q-card>
@@ -40,10 +29,8 @@
 </template>
 
 <script setup lang="ts">
-import { QMarkdown } from '@quasar/quasar-ui-qmarkdown'
-import '@quasar/quasar-ui-qmarkdown/dist/index.css'
-import { T_documentList } from 'app/interfaces/T_documentList'
-import { S_DialogMarkdown } from 'src/stores/S_Dialog'
+import { T_dialogList } from 'app/interfaces/T_dialogList'
+import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { onMounted, ref, watch } from 'vue'
 
 /**
@@ -53,7 +40,7 @@ const props = defineProps<{
   /**
    * Custom input directly fed to the component in case it doesn't get triggered from the global store
    */
-  directInput?: T_documentList
+  directInput?: T_dialogList
 }>()
 
 /**
@@ -69,7 +56,7 @@ const documentName = ref('')
 /**
  * Opens the popup dialog via direct input-feed
  */
-const openDialog = (input: T_documentList) => {
+const openDialog = (input: T_dialogList) => {
   documentName.value = input
   dialogModel.value = true
 }
@@ -77,8 +64,10 @@ const openDialog = (input: T_documentList) => {
 /**
  * Trigger dialog popup via reaction to store update
  */
-watch(() => S_DialogMarkdown.dialogUUID, () => {
-  openDialog(S_DialogMarkdown.documentToOpen)
+watch(() => S_DialogComponent.dialogUUID, () => {
+  if (S_DialogComponent.dialogToOpen === 'AboutFantasiaArchive') {
+    openDialog(S_DialogComponent.dialogToOpen)
+  }
 })
 
 /**
@@ -86,7 +75,9 @@ watch(() => S_DialogMarkdown.dialogUUID, () => {
  */
 watch(() => props.directInput, () => {
   if (props.directInput !== undefined && props.directInput !== '') {
-    openDialog(props.directInput)
+    if (props.directInput === 'AboutFantasiaArchive') {
+      openDialog(props.directInput)
+    }
   }
 })
 
@@ -104,7 +95,7 @@ onMounted(() => {
 
 <style lang="scss">
 
-.dialogMarkdownDocument {
+.dialogComponent {
   .q-card {
     max-width: calc(100vw - 100px) !important;
   }

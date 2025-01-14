@@ -45,6 +45,7 @@
 
     <!-- Dialog Popups -->
     <DialogMarkdownDocument />
+    <DialogAboutFantasiaArchive />
   </div>
 </template>
 
@@ -59,6 +60,7 @@ import { helpInfo } from 'app/src/components/AppControlMenus/_data/helpInfo'
 
 import AppControlSingleMenu from 'app/src/components/AppControlMenus/AppControlSingleMenu/AppControlSingleMenu.vue'
 import DialogMarkdownDocument from 'app/src/components/DialogMarkdownDocument/DialogMarkdownDocument.vue'
+import DialogAboutFantasiaArchive from 'app/src/components/DialogAboutFantasiaArchive/DialogAboutFantasiaArchive.vue'
 
 /**
  * Testing type currently possibly happening
