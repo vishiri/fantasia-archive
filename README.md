@@ -35,10 +35,12 @@ quasar build -m electron
 ### Testing:
 
 #### Component test - via Playwright
+> The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 ```
 test:component
 ```
 #### E2E test - via Playwright
+> The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 ```
 test:e2e
 ```
