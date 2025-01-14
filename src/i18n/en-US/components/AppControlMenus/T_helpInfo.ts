@@ -5,7 +5,7 @@ export default {
     advancedSearchGuide: 'Advanced search guide',
     tipsTricksTrivia: 'Tips, Tricks & Trivia',
     changelog: 'Changelog',
-    aboutFantsiaArchive: 'About Fantasia Archive',
+    aboutFantasiaArchive: 'About Fantasia Archive',
     license: 'License',
     toggleDeveloperTools: 'Toggle developer tools'
   }
