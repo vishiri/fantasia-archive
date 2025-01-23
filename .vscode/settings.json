@@ -1,8 +1,8 @@
 {
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": true,
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "editor.formatOnSave": false,
+  "editor.defaultFormatter": null,
   "editor.codeActionsOnSave": [
     "source.fixAll.eslint"
   ],
