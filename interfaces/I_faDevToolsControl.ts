@@ -3,7 +3,7 @@ export interface I_faDevToolsControl {
   /**
    * Check the current state of the DevTools in the opened FA instance
    */
-  checkDecToolsStatus: () => boolean
+  checkDevToolsStatus: () => boolean
 
   /**
    * Toggles the dev tools

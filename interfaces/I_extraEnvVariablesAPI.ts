@@ -1,6 +1,11 @@
 export interface I_extraEnvVariablesAPI {
 
   /**
+   * Version of the project as stated in package.json
+   */
+  PROJECT_VERSION: string
+
+  /**
    * Full path to "electron-main.js" file in the dist, unpackaged form
    */
   ELECTRON_MAIN_FILEPATH: string

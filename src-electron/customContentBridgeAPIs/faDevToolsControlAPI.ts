@@ -3,7 +3,7 @@ import { I_faDevToolsControl } from 'app/interfaces/I_faDevToolsControl'
 
 export const faDevToolsControlAPI: I_faDevToolsControl = {
 
-  checkDecToolsStatus () {
+  checkDevToolsStatus () {
     const currentWindow = BrowserWindow.getFocusedWindow()
     if (currentWindow !== null) {
       return currentWindow.webContents.isDevToolsOpened()

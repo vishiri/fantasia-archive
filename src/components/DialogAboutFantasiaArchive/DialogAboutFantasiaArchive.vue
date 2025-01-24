@@ -7,9 +7,22 @@
     <q-card>
       <!-- Dialog contents wrapper -->
       <q-card-section :class="['dialogComponent__content', `${documentName}`, 'q-mt-xl', 'q-mb-lg', 'q-mr-lg', 'q-ml-xl', 'q-pt-none']">
-        TOPKEK ABOUT FANTASIA ARCHIVE
-      </q-card-section>
+        <h6>
+          {{ $t('Dialogs.aboutFantasiaArchive.title') }}
+        </h6>
 
+        <div>
+          {{ $t('Dialogs.aboutFantasiaArchive.versionTitle') }} <span class="text-bold text-primary-bright">{{ appVersion }}</span>
+        </div>
+
+        <q-separator
+          color="primary"
+          horizonatal
+          dark
+          class="q-my-lg q-mx-auto"
+          style="opacity: 0.5; width: 400px;"
+        />
+      </q-card-section>
       <!-- Card actions wrapper -->
       <q-card-actions
         align="around"
@@ -54,6 +67,12 @@ const dialogModel = ref(false)
 const documentName = ref('')
 
 /**
+   * Current app version
+   * NOTE: Show Electon version in DEV mode instead of NPM package version
+   */
+const appVersion = window.extraEnvVariables.PROJECT_VERSION
+
+/**
  * Opens the popup dialog via direct input-feed
  */
 const openDialog = (input: T_dialogList) => {
@@ -89,53 +108,18 @@ onMounted(() => {
   if (props.directInput !== undefined && props.directInput !== '') {
     openDialog(props.directInput)
   }
+  console.log(window.extraEnvVariables)
 })
 
 </script>
 
 <style lang="scss">
 
-.dialogComponent {
-  .q-card {
-    max-width: calc(100vw - 100px) !important;
-  }
-
-  &.license .q-card {
-    width: 680px;
-  }
-
-  &.changeLog .q-markdown {
-    width: 100%;
-  }
-
-  &.changeLog .q-card {
-    width: 1100px;
-  }
-
-  &.advancedSearchGuide .q-card {
-    width: 1100px;
-  }
-
-  &.tipsTricksTrivia .q-card {
-    width: 1100px;
-  }
-
-  &__content {
+.AboutFantasiaArchive {
+  .dialogComponent__content {
+    text-align: center;
     overflow: auto;
     max-height: calc(100vh - 235px);
-    min-height: 650px;
-
-    &.tipsTricksTrivia {
-      padding-right: 40px;
-    }
-
-    &.changeLog {
-      padding-right: 40px;
-    }
-
-    &.advancedSearchGuide {
-      padding-right: 40px;
-    }
   }
 }
 
