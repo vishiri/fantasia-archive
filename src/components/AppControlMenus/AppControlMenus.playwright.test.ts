@@ -42,7 +42,7 @@ test('Load "Test Title" menu button sub-component', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const testMenu = await appWindow.$(`[data-test-test-menu="${selectorList.testMenu}"]`)
+  const testMenu = await appWindow.locator(`[data-test-test-menu="${selectorList.testMenu}"]`)
 
   // Check if the tested element exists
   if (testMenu !== null) {

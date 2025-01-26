@@ -43,7 +43,7 @@ test('Check if the wrapper contains "IMG" element', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const imageElement = await appWindow.$(`[data-test="${selectorList.image}"]`)
+  const imageElement = await appWindow.locator(`[data-test="${selectorList.image}"]`)
 
   // Check if the tested element exists
   if (imageElement !== null) {
@@ -75,7 +75,7 @@ test('Visually check "width" prop', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const imageElement = await appWindow.$(`[data-test="${selectorList.image}"]`)
+  const imageElement = await appWindow.locator(`[data-test="${selectorList.image}"]`)
 
   // Check if the tested element exists
   if (imageElement !== null) {
@@ -116,7 +116,7 @@ test('Visually check "height" prop', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const imageElement = await appWindow.$(`[data-test="${selectorList.image}"]`)
+  const imageElement = await appWindow.locator(`[data-test="${selectorList.image}"]`)
 
   // Check if the tested element exists
   if (imageElement !== null) {
@@ -153,7 +153,7 @@ test('Check if the image is random: YES', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const imageElement = await appWindow.$(`[data-test="${selectorList.image}"]`)
+  const imageElement = await appWindow.locator(`[data-test="${selectorList.image}"]`)
 
   // Check if the tested element exists
   if (imageElement !== null) {
@@ -185,7 +185,7 @@ test('Check if the image is random: NO', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const imageElement = await appWindow.$(`[data-test="${selectorList.image}"]`)
+  const imageElement = await appWindow.locator(`[data-test="${selectorList.image}"]`)
 
   // Check if the tested element exists
   if (imageElement !== null) {

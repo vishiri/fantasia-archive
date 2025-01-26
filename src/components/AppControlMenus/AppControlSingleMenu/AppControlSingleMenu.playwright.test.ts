@@ -51,7 +51,7 @@ test('Test if the component managed to load the test data', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const menuWrapperElement = await appWindow.$(`[data-test="${selectorList.menuWrapper}"]`)
+  const menuWrapperElement = await appWindow.locator(`[data-test="${selectorList.menuWrapper}"]`)
 
   // Check if the tested element exists
   if (menuWrapperElement !== null) {
@@ -77,7 +77,7 @@ test('Check if the "Menu title" element is properly loaded and has proper conten
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const menuTitleElement = await appWindow.$(`[data-test="${selectorList.menuTitle}"]`)
+  const menuTitleElement = await appWindow.locator(`[data-test="${selectorList.menuTitle}"]`)
   const menuTitleElementText = (menuTitleElement !== null) ? await menuTitleElement.textContent() : ''
 
   // Check if the tested element exists and has proper title content
@@ -102,7 +102,7 @@ test('Check if the main menu has a wrapper, click and check if all menu elements
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const menuWrapper = await appWindow.$(`[data-test="${selectorList.menuWrapper}"]`)
+  const menuWrapper = await appWindow.locator(`[data-test="${selectorList.menuWrapper}"]`)
 
   // Check if wrapper exists for clicking and if so, click it
   if (menuWrapper !== null) {
@@ -132,19 +132,19 @@ test('Check if the first main menu item has proper text and icon', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const menuWrapper = await appWindow.$(`[data-test="${selectorList.menuWrapper}"]`)
+  const menuWrapper = await appWindow.locator(`[data-test="${selectorList.menuWrapper}"]`)
 
   // Check if wrapper exists for clicking and if so, click it
   if (menuWrapper !== null) {
     await menuWrapper.click()
 
-    const firstMenuItem = await appWindow.$(`[data-test="${selectorList.menuItem}"]`)
+    const firstMenuItem = await appWindow.locator(`[data-test="${selectorList.menuItem}"]`)
     const firstDataItem = testData.data.filter(item => item.mode === 'item')[0]
 
     // Check if the item wrapper exists
     if (firstMenuItem !== null) {
-      const firstMenuItemTextElement = await firstMenuItem.$(`[data-test="${selectorList.menuItemText}"]`)
-      const firstMenuItemIconElement = await firstMenuItem.$(`[data-test="${selectorList.menuItemIcon}"]`)
+      const firstMenuItemTextElement = await firstMenuItem.locator(`[data-test="${selectorList.menuItemText}"]`)
+      const firstMenuItemIconElement = await firstMenuItem.locator(`[data-test="${selectorList.menuItemIcon}"]`)
 
       // Check if the icon and text wrappers exist
       if (firstMenuItemTextElement !== null && firstMenuItemIconElement !== null) {
@@ -186,13 +186,13 @@ test('Check if text color class applied properly to any main menu item: Secondar
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const menuWrapper = await appWindow.$(`[data-test="${selectorList.menuWrapper}"]`)
+  const menuWrapper = await appWindow.locator(`[data-test="${selectorList.menuWrapper}"]`)
 
   // Check if wrapper exists for clicking and if so, click it
   if (menuWrapper !== null) {
     await menuWrapper.click()
 
-    const colorMenuItem = await appWindow.$(`.text-${testColorString}[data-test="${selectorList.menuItem}"]`)
+    const colorMenuItem = await appWindow.locator(`.text-${testColorString}[data-test="${selectorList.menuItem}"]`)
 
     // Check if the item wrapper exists
     if (colorMenuItem !== null) {
@@ -224,7 +224,7 @@ test('Check if the sub-menu opens properly on click of the main menu item and al
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const menuWrapper = await appWindow.$(`[data-test="${selectorList.menuWrapper}"]`)
+  const menuWrapper = await appWindow.locator(`[data-test="${selectorList.menuWrapper}"]`)
 
   // Check if main menu wrapper exists for clicking and if so, click it
   if (menuWrapper !== null) {
@@ -246,7 +246,7 @@ test('Check if the sub-menu opens properly on click of the main menu item and al
       test.fail()
     }
 
-    const subMenuWrapper = await appWindow.$(`[data-test="${selectorList.menuItemSubMenu}"]`)
+    const subMenuWrapper = await appWindow.locator(`[data-test="${selectorList.menuItemSubMenu}"]`)
 
     // Check if submenu wrapper doesn't exist
     if (subMenuWrapper === null) {
@@ -279,7 +279,7 @@ test('Check if the first sub-menu item has proper text and icon', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const menuWrapper = await appWindow.$(`[data-test="${selectorList.menuWrapper}"]`)
+  const menuWrapper = await appWindow.locator(`[data-test="${selectorList.menuWrapper}"]`)
 
   // Check if main menu wrapper exists for clicking and if so, click it
   if (menuWrapper !== null) {
@@ -301,20 +301,20 @@ test('Check if the first sub-menu item has proper text and icon', async () => {
       test.fail()
     }
 
-    const subMenuWrapper = await appWindow.$(`[data-test="${selectorList.menuItemSubMenu}"]`)
+    const subMenuWrapper = await appWindow.locator(`[data-test="${selectorList.menuItemSubMenu}"]`)
 
     // Check if submenu wrapper doesn't exist
     if (subMenuWrapper === null) {
       test.fail()
     }
 
-    const firstSubMenuItem = await appWindow.$(`[data-test="${selectorList.menuItemSubMenuItem}"]`)
+    const firstSubMenuItem = await appWindow.locator(`[data-test="${selectorList.menuItemSubMenuItem}"]`)
     const firstDataSubmenuItem = (dataElement?.submenu !== undefined) ? dataElement.submenu.filter(item => item.mode === 'item')[0] : false
 
     // Check if the sub-menu item wrapper exists and if the first data-item isn't false
     if (firstSubMenuItem !== null && firstDataSubmenuItem) {
-      const firstSubmenuItemTextElement = await firstSubMenuItem.$(`[data-test="${selectorList.menuItemSubMenuItemText}"]`)
-      const firstSubmenuItemIconElement = await firstSubMenuItem.$(`[data-test="${selectorList.menuItemSubMenuItemIcon}"]`)
+      const firstSubmenuItemTextElement = await firstSubMenuItem.locator(`[data-test="${selectorList.menuItemSubMenuItemText}"]`)
+      const firstSubmenuItemIconElement = await firstSubMenuItem.locator(`[data-test="${selectorList.menuItemSubMenuItemIcon}"]`)
 
       // Check if the icon and text wrappers exist
       if (firstSubmenuItemTextElement !== null && firstSubmenuItemIconElement !== null) {
@@ -358,7 +358,7 @@ test('Check if text color class applied properly to any sub-main menu item: Seco
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const menuWrapper = await appWindow.$(`[data-test="${selectorList.menuWrapper}"]`)
+  const menuWrapper = await appWindow.locator(`[data-test="${selectorList.menuWrapper}"]`)
 
   // Check if main menu wrapper exists for clicking and if so, click it
   if (menuWrapper !== null) {
@@ -379,14 +379,14 @@ test('Check if text color class applied properly to any sub-main menu item: Seco
       test.fail()
     }
 
-    const subMenuWrapper = await appWindow.$(`[data-test="${selectorList.menuItemSubMenu}"]`)
+    const subMenuWrapper = await appWindow.locator(`[data-test="${selectorList.menuItemSubMenu}"]`)
 
     // Check if submenu wrapper doesn't exist
     if (subMenuWrapper === null) {
       test.fail()
     }
 
-    const colorSubMenuItem = await appWindow.$(`.text-${testColorString}[data-test="${selectorList.menuItemSubMenuItem}"]`)
+    const colorSubMenuItem = await appWindow.locator(`.text-${testColorString}[data-test="${selectorList.menuItemSubMenuItem}"]`)
 
     // Check if the colored sub-menu item wrapper exists
     if (colorSubMenuItem !== null) {

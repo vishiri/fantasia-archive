@@ -48,9 +48,9 @@ test('Open test "license" dialog with all elements in it', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const closeButton = await appWindow.$(`[data-test="${selectorList.closeButton}"]`)
-  const markdownWrapper = await appWindow.$(`[data-test="${selectorList.markdownWrapper}"]`)
-  const markdownContent = await appWindow.$(`[data-test="${selectorList.markdownContent}"]`)
+  const closeButton = await appWindow.locator(`[data-test="${selectorList.closeButton}"]`)
+  const markdownWrapper = await appWindow.locator(`[data-test="${selectorList.markdownWrapper}"]`)
+  const markdownContent = await appWindow.locator(`[data-test="${selectorList.markdownContent}"]`)
 
   // Check if the tested elements exists
   if (closeButton !== null && markdownWrapper !== null && markdownContent !== null) {
@@ -77,8 +77,8 @@ test('Open test "license" dialog and try closing it', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const closeButton = await appWindow.$(`[data-test="${selectorList.closeButton}"]`)
-  const markdownContent = await appWindow.$(`[data-test="${selectorList.markdownContent}"]`)
+  const closeButton = await appWindow.locator(`[data-test="${selectorList.closeButton}"]`)
+  const markdownContent = await appWindow.locator(`[data-test="${selectorList.markdownContent}"]`)
 
   // Check if the close button exists
   if (closeButton !== null && markdownContent !== null) {

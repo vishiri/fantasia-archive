@@ -41,7 +41,7 @@ test('Splash screen works properly', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const wrapperElement = await appWindow.$(`[data-test="${selectorList.wrapper}"]`)
+  const wrapperElement = await appWindow.locator(`[data-test="${selectorList.wrapper}"]`)
 
   // Check if the tested element exists
   if (wrapperElement !== null) {
@@ -84,7 +84,7 @@ test('Splash screen has proper colors', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const wrapperElement = await appWindow.$(`[data-test="${selectorList.wrapper}"]`)
+  const wrapperElement = await appWindow.locator(`[data-test="${selectorList.wrapper}"]`)
 
   // Check if the tested element exists
   if (wrapperElement !== null) {
@@ -123,7 +123,7 @@ test('Splash screen has proper sizings', async () => {
 
   const appWindow = await electronApp.firstWindow()
 
-  const iconElement = await appWindow.$(`[data-test="${selectorList.wrapper}"] svg`)
+  const iconElement = await appWindow.locator(`[data-test="${selectorList.wrapper}"] svg`)
 
   // Check if the tested element exists
   if (iconElement !== null) {

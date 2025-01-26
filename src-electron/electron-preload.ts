@@ -34,8 +34,10 @@ import { faWindowControlAPI } from 'src-electron/customContentBridgeAPIs/faWindo
 import { extraEnvVariablesAPI } from 'src-electron/customContentBridgeAPIs/extraEnvVariablesAPI'
 import { faDevToolsControlAPI } from 'src-electron/customContentBridgeAPIs/faDevToolsControlAPI'
 import { faExternalLinksManagerAPI } from 'app/src-electron/customContentBridgeAPIs/faExternalLinksManagerAPI'
+import { appDetailsAPI } from './customContentBridgeAPIs/appDetailsAPI'
 
 contextBridge.exposeInMainWorld('faWindowControlAPI', faWindowControlAPI)
 contextBridge.exposeInMainWorld('faDevToolsControlAPI', faDevToolsControlAPI)
 contextBridge.exposeInMainWorld('faExternalLinksManagerAPI', faExternalLinksManagerAPI)
 contextBridge.exposeInMainWorld('extraEnvVariables', extraEnvVariablesAPI)
+contextBridge.exposeInMainWorld('appDetails', appDetailsAPI)

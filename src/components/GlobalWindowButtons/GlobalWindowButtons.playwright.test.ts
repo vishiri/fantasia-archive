@@ -46,9 +46,9 @@ test('Wrapper should contain three specific buttons', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const resizeButton = await appWindow.$(`[data-test="${selectorList.buttonResize}"]`)
-  const minimizeButton = await appWindow.$(`[data-test="${selectorList.buttonMinimize}"]`)
-  const closeButton = await appWindow.$(`[data-test="${selectorList.buttonClose}"]`)
+  const resizeButton = await appWindow.locator(`[data-test="${selectorList.buttonResize}"]`)
+  const minimizeButton = await appWindow.locator(`[data-test="${selectorList.buttonMinimize}"]`)
+  const closeButton = await appWindow.locator(`[data-test="${selectorList.buttonClose}"]`)
 
   // Check if the tested elements exists
   if (resizeButton !== null && minimizeButton !== null && closeButton !== null) {
@@ -74,7 +74,7 @@ test('Click resize button - "smallify"', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const resizeButton = await appWindow.$(`[data-test="${selectorList.buttonResize}"]`)
+  const resizeButton = await appWindow.locator(`[data-test="${selectorList.buttonResize}"]`)
 
   // Check if the tested element exists
   if (resizeButton !== null) {
@@ -104,7 +104,7 @@ test('Click resize button - "maximize"', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const resizeButton = await appWindow.$(`[data-test="${selectorList.buttonResize}"]`)
+  const resizeButton = await appWindow.locator(`[data-test="${selectorList.buttonResize}"]`)
 
   // Check if the tested element exists
   if (resizeButton !== null) {
@@ -147,7 +147,7 @@ test('Click minimize button', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const minimizeButton = await appWindow.$(`[data-test="${selectorList.buttonMinimize}"]`)
+  const minimizeButton = await appWindow.locator(`[data-test="${selectorList.buttonMinimize}"]`)
 
   // Check if the tested element exists
   if (minimizeButton !== null) {
@@ -178,7 +178,7 @@ test('Click close button', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const closeButton = await appWindow.$(`[data-test="${selectorList.buttonClose}"]`)
+  const closeButton = await appWindow.locator(`[data-test="${selectorList.buttonClose}"]`)
 
   // Check if the tested element exists
   if (closeButton !== null) {

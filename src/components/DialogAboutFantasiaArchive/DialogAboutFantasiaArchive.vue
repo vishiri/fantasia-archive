@@ -70,7 +70,7 @@ const documentName = ref('')
    * Current app version
    * NOTE: Show Electon version in DEV mode instead of NPM package version
    */
-const appVersion = window.extraEnvVariables.PROJECT_VERSION
+let appVersion = ''
 
 /**
  * Opens the popup dialog via direct input-feed
@@ -78,6 +78,7 @@ const appVersion = window.extraEnvVariables.PROJECT_VERSION
 const openDialog = (input: T_dialogList) => {
   documentName.value = input
   dialogModel.value = true
+  appVersion = window.appDetails.PROJECT_VERSION
 }
 
 /**
@@ -108,7 +109,6 @@ onMounted(() => {
   if (props.directInput !== undefined && props.directInput !== '') {
     openDialog(props.directInput)
   }
-  console.log(window.extraEnvVariables)
 })
 
 </script>
