@@ -6,7 +6,7 @@
       flat
       class="appControlMenus__inner"
     >
-      <!-- Test data menu - FOR COMPOENT TEST PURPOSES ONLY -->
+      <!-- Test data menu - FOR COMPONENT TEST PURPOSES ONLY -->
       <AppControlSingleMenu
         v-if="testingType === 'components'"
         :data-input="testData"

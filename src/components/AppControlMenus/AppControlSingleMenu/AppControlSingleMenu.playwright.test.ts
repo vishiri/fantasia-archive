@@ -143,8 +143,8 @@ test('Check if the first main menu item has proper text and icon', async () => {
 
     // Check if the item wrapper exists
     if (firstMenuItem !== null) {
-      const firstMenuItemTextElement = await firstMenuItem.locator(`[data-test="${selectorList.menuItemText}"]`)
-      const firstMenuItemIconElement = await firstMenuItem.locator(`[data-test="${selectorList.menuItemIcon}"]`)
+      const firstMenuItemTextElement = await firstMenuItem.locator(`[data-test="${selectorList.menuItemText}"]`).nth(0)
+      const firstMenuItemIconElement = await firstMenuItem.locator(`[data-test="${selectorList.menuItemIcon}"]`).nth(0)
 
       // Check if the icon and text wrappers exist
       if (firstMenuItemTextElement !== null && firstMenuItemIconElement !== null) {
@@ -313,8 +313,8 @@ test('Check if the first sub-menu item has proper text and icon', async () => {
 
     // Check if the sub-menu item wrapper exists and if the first data-item isn't false
     if (firstSubMenuItem !== null && firstDataSubmenuItem) {
-      const firstSubmenuItemTextElement = await firstSubMenuItem.locator(`[data-test="${selectorList.menuItemSubMenuItemText}"]`)
-      const firstSubmenuItemIconElement = await firstSubMenuItem.locator(`[data-test="${selectorList.menuItemSubMenuItemIcon}"]`)
+      const firstSubmenuItemTextElement = await firstSubMenuItem.locator(`[data-test="${selectorList.menuItemSubMenuItemText}"]`).nth(0)
+      const firstSubmenuItemIconElement = await firstSubMenuItem.locator(`[data-test="${selectorList.menuItemSubMenuItemIcon}"]`).nth(0)
 
       // Check if the icon and text wrappers exist
       if (firstSubmenuItemTextElement !== null && firstSubmenuItemIconElement !== null) {
