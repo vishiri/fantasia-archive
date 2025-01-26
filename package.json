@@ -10,6 +10,7 @@
     "dev:electron": "quasar dev -m electron",
     "build": "quasar build -m electron --publish never",
     "test:component": "node \"node_modules/@playwright/test/cli.js\" test src/components",
+    "test:componentSingle": "node \"node_modules/@playwright/test/cli.js\" test src/components/%npm_config_component%",
     "test:e2e": "node \"node_modules/@playwright/test/cli.js\" test test/playwright-e2e/"
   },
   "dependencies": {
