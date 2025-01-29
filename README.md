@@ -4,7 +4,7 @@ A worldbuilding database manager
 
 Use Yarn 1.22.19 or stuff is gonna bug out.
 
-Make sure you are running this with Node v16.17.0 ("nvm" is great for these older versions)
+Make sure you are running this with Node v18.20.6 ("nvm" is great for these older versions)
 
 > Playwright tests run from built, live version of FA. Therefore, to run them, you need to localy build the app on your machine first - Both on first time using them and every time something is changed in the source code.
 

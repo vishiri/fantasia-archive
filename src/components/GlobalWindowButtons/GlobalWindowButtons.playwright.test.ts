@@ -197,4 +197,6 @@ test('Click close button', async () => {
     // Element doesn't exist
     test.fail()
   }
+
+  await electronApp.close()
 })

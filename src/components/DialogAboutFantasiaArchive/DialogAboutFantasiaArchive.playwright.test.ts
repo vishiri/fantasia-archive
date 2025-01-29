@@ -59,6 +59,8 @@ test('Open test "license" dialog with all elements in it', async () => {
     // Elements don't exist
     test.fail()
   }
+
+  await electronApp.close()
 })
 
 /**
@@ -92,4 +94,6 @@ test('Open test "license" dialog and try closing it', async () => {
     // Close button doesn't exist
     test.fail()
   }
+
+  await electronApp.close()
 })

@@ -52,6 +52,8 @@ test('Load "Test Title" menu button sub-component', async () => {
     // Element doesn't exist
     test.fail()
   }
+
+  await electronApp.close()
 })
 
 /**
@@ -76,4 +78,6 @@ test('Check if we have exactly one testing menu loaded', async () => {
     // No menus/too many menus
     test.fail()
   }
+
+  await electronApp.close()
 })
