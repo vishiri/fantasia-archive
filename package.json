@@ -12,7 +12,7 @@
     "test:unit": "vitest",
     "test:component": "node \"node_modules/@playwright/test/cli.js\" test src/components",
     "test:componentSingle": "node \"node_modules/@playwright/test/cli.js\" test src/components/%npm_config_component%",
-    "test:e2e": "node \"node_modules/@playwright/test/cli.js\" test test/playwright-e2e/"
+    "test:e2e": "node \"node_modules/@playwright/test/cli.js\" test e2e-tests/"
   },
   "dependencies": {
     "@electron/remote": "^2.0.10",
