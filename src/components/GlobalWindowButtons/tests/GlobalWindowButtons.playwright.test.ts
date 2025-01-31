@@ -167,7 +167,6 @@ test('Click minimize button', async () => {
 
 /**
  * Attempt to click the close button
- * - This test can VERY occasionally fail when the window takes too long to close on weaker PCs. Simply rerunning the tests generally fixes this.
  */
 test('Click close button', async () => {
   const electronApp = await electron.launch({

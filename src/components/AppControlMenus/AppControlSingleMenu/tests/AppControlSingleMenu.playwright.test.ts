@@ -1,7 +1,7 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/customContentBridgeAPIs/extraEnvVariablesAPI'
-import { testData } from '../_testData/test.fixed.component'
+import { testData } from './_testData'
 import { rgbToHex } from 'src/scripts/_utilities/colorFormatConvertors'
 
 /**

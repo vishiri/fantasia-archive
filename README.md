@@ -34,6 +34,12 @@ quasar build -m electron
 
 ### Testing:
 
+#### Unit test - via Vitest
+
+```
+test:unit
+```
+
 #### Component test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 ```
