@@ -1,5 +1,5 @@
 import { BrowserWindow } from '@electron/remote'
-import { I_faDevToolsControl } from 'app/interfaces/I_faDevToolsControl'
+import { I_faDevToolsControl } from 'app/types/I_faDevToolsControl'
 
 export const faDevToolsControlAPI: I_faDevToolsControl = {
 

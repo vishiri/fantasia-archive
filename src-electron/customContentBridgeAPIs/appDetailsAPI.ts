@@ -1,4 +1,4 @@
-import { I_appDetailsAPI } from './../../interfaces/I_appDetailsAPI'
+import { I_appDetailsAPI } from '../../types/I_appDetailsAPI'
 
 import { app } from '@electron/remote'
 

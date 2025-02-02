@@ -1,5 +1,5 @@
 import { BrowserWindow } from '@electron/remote'
-import { I_faWindowControlAPI } from 'app/interfaces/I_faWindowControlAPI'
+import { I_faWindowControlAPI } from 'app/types/I_faWindowControlAPI'
 
 export const faWindowControlAPI: I_faWindowControlAPI = {
 

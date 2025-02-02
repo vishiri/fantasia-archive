@@ -1,5 +1,5 @@
-import { T_dialogList } from 'app/interfaces/T_dialogList'
-import { T_documentList } from 'app/interfaces/T_documentList'
+import { T_dialogList } from 'app/types/T_dialogList'
+import { T_documentList } from 'app/types/T_documentList'
 
 import { S_DialogMarkdown, S_DialogComponent } from 'app/src/stores/S_Dialog'
 

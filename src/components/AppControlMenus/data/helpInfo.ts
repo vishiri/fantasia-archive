@@ -1,6 +1,6 @@
 import { i18n } from 'app/src/i18n/externalFileLoader'
 
-import { I_appMenusDataList } from 'app/interfaces/I_appMenusDataList'
+import { I_appMenusDataList } from 'app/types/I_appMenusDataList'
 
 // TODO - add functionality for all buttons and conditions
 import { toggleDevTools } from 'app/src/scripts/appInfo/toggleDevTools'

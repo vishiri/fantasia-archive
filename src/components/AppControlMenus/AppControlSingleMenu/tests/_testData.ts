@@ -1,4 +1,4 @@
-import { I_appMenusDataList } from 'app/interfaces/I_appMenusDataList'
+import { I_appMenusDataList } from 'app/types/I_appMenusDataList'
 
 export const testData:I_appMenusDataList = {
   title: 'Test Title',

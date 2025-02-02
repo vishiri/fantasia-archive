@@ -1,4 +1,4 @@
-import { I_extraEnvVariablesAPI } from 'app/interfaces/I_extraEnvVariablesAPI'
+import { I_extraEnvVariablesAPI } from 'app/types/I_extraEnvVariablesAPI'
 import appRoot from 'app-root-path'
 
 export const extraEnvVariablesAPI: I_extraEnvVariablesAPI = {

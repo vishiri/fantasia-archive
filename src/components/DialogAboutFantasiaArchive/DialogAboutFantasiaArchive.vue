@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { T_dialogList } from 'app/interfaces/T_dialogList'
+import { T_dialogList } from 'app/types/T_dialogList'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { onMounted, ref, watch } from 'vue'
 
