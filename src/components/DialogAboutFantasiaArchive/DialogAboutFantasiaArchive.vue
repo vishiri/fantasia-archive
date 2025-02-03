@@ -23,6 +23,7 @@
           style="opacity: 0.5; width: 400px;"
         />
       </q-card-section>
+
       <!-- Card actions wrapper -->
       <q-card-actions
         align="around"
@@ -67,9 +68,9 @@ const dialogModel = ref(false)
 const documentName = ref('')
 
 /**
-   * Current app version
-   * NOTE: Show Electon version in DEV mode instead of NPM package version
-   */
+  * Current app version
+  * NOTE: This shows Electron version in DEV mode instead of NPM package version. This is a well known issue with Electron.
+  */
 let appVersion = ''
 
 /**
@@ -78,7 +79,7 @@ let appVersion = ''
 const openDialog = (input: T_dialogList) => {
   documentName.value = input
   dialogModel.value = true
-  appVersion = window.appDetails.PROJECT_VERSION
+  appVersion = window.faContentBridgeAPIs.appDetails.PROJECT_VERSION
 }
 
 /**

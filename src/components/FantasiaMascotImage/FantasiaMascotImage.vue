@@ -24,13 +24,7 @@ import { fantasiaImageList, determineCurrentImage } from 'app/src/scripts/appInf
 const props = defineProps({
   /**
     * Name of the object key from the list to render. Leave empty in order to generate random image.
-    * Available ones:
-    * - didYouKnow
-    * - flop
-    * - hug
-    * - reading
-    * - cooking
-    * - error
+    * @see fantasiaImageList
     */
   fantasiaImage: {
     type: String,

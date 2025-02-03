@@ -1,3 +1,8 @@
+/**
+ * Converts a RGB string to hex color string
+ * @param color - RGB string
+ * @returns Hex color string
+ */
 export function rgbToHex (color: string) {
   const colorStringRegexMatch = color.match(/\d+/g)
   if (colorStringRegexMatch !== null) {
@@ -10,6 +15,11 @@ export function rgbToHex (color: string) {
   return false
 }
 
+/**
+ * Converts a hex color string to RGB string
+ * @param color - Hex color string
+ * @returns RGB string
+ */
 export function hexToRgb (hex: string) {
   const bigint = parseInt(hex, 16)
   const r = (bigint >> 16) & 255

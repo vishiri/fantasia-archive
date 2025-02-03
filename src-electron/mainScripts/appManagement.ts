@@ -2,16 +2,12 @@ import { initialize } from '@electron/remote/main'
 import { mainWindowCreation } from 'app/src-electron/mainScripts/mainWindowCreation'
 import { app } from 'electron'
 
-/**
-  * Starts the app's Electron instance
-  */
+// Starts the app's Electron instance
 export const startApp = () => {
   initialize()
 }
 
-/**
-  * Opens the singular app's window and make sure it is the only one
-  */
+// Opens the singular app's window and make sure it is the only one
 export const openAppWindowManager = () => {
   // Create the app window in the normal way
   app.whenReady().then(mainWindowCreation)
@@ -22,9 +18,7 @@ export const openAppWindowManager = () => {
   })
 }
 
-/**
-  * Closes the app's Electron instance when all windows are closed
-  */
+// Closes the app's Electron instance when all windows are closed
 export const closeAppManager = (platform: string) => {
   // Close app if we are on anything that isn't Mac
   app.on('window-all-closed', () => {

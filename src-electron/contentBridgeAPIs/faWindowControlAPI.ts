@@ -3,6 +3,7 @@ import { I_faWindowControlAPI } from 'app/types/I_faWindowControlAPI'
 
 export const faWindowControlAPI: I_faWindowControlAPI = {
 
+  // Check if the current window is maximized
   checkWindowMaximized () {
     const currentWindow = BrowserWindow.getFocusedWindow()
     if (currentWindow !== null) {
@@ -11,6 +12,7 @@ export const faWindowControlAPI: I_faWindowControlAPI = {
     return false
   },
 
+  // Minimizes the current window
   minimizeWindow () {
     const currentWindow = BrowserWindow.getFocusedWindow()
 
@@ -19,6 +21,7 @@ export const faWindowControlAPI: I_faWindowControlAPI = {
     }
   },
 
+  // Maximizes the current window
   maximizeWindow () {
     const currentWindow = BrowserWindow.getFocusedWindow()
 
@@ -27,6 +30,7 @@ export const faWindowControlAPI: I_faWindowControlAPI = {
     }
   },
 
+  // Resizes the current window
   resizeWindow () {
     const currentWindow = BrowserWindow.getFocusedWindow()
 
@@ -39,6 +43,7 @@ export const faWindowControlAPI: I_faWindowControlAPI = {
     }
   },
 
+  // Closes the current window
   closeWindow () {
     const currentWindow = BrowserWindow.getFocusedWindow()
     if (currentWindow !== null) {

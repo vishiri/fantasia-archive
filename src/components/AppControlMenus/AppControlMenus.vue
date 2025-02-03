@@ -63,9 +63,9 @@ import DialogMarkdownDocument from 'app/src/components/DialogMarkdownDocument/Di
 import DialogAboutFantasiaArchive from 'app/src/components/DialogAboutFantasiaArchive/DialogAboutFantasiaArchive.vue'
 
 /**
- * Testing type currently possibly happening
+ * Testing type that might be happening right now
  */
-const testingType = window.extraEnvVariables.TEST_ENV
+const testingType = window.faContentBridgeAPIs.extraEnvVariables.TEST_ENV
 
 </script>
 

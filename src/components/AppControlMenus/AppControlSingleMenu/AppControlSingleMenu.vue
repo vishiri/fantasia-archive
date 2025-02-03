@@ -144,8 +144,12 @@ const props = defineProps<{
 /**
  * Testing type currently possibly happening
  */
-const testingType = window.extraEnvVariables.TEST_ENV
+const testingType = window.faContentBridgeAPIs.extraEnvVariables.TEST_ENV
 
+/**
+  * Data input for the component
+  * - If testing type is "components", use test data, otherwise use prop data
+  */
 const componentData = computed(() => {
   if (testingType === 'components') {
     return testData

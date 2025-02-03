@@ -26,14 +26,14 @@ export default boot(() => {
         /**
          * Determines if the URL is extenal or not
          */
-        const isExternal = window.faExternalLinksManagerAPI.checkIfExternal(linkURL)
+        const isExternal = window.faContentBridgeAPIs.faExternalLinksManagerAPI.checkIfExternal(linkURL)
 
         if (isExternal) {
           /**
            * If the URL is external, prevent default and open the URL via the electron API functionality
            */
           e.preventDefault()
-          window.faExternalLinksManagerAPI.openExternal(linkURL)
+          window.faContentBridgeAPIs.faExternalLinksManagerAPI.openExternal(linkURL)
         }
       }
     }

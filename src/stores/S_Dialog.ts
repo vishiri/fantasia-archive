@@ -7,6 +7,9 @@ import { v4 as uuidv4 } from 'uuid'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
+/**
+ * This store manages the state of the markdown document dialogs in the application.
+ */
 export const S_DialogMarkdown = defineStore('S_DialogMarkdown', () => {
   const documentToOpen: Ref<T_documentList> = ref('license')
 
@@ -18,6 +21,10 @@ export const S_DialogMarkdown = defineStore('S_DialogMarkdown', () => {
 
   return { documentToOpen, dialogUUID, generateDialogUUID }
 })()
+
+/**
+ * This store manages the state of the component dialogs in the application.
+ */
 export const S_DialogComponent = defineStore('S_DialogComponent', () => {
   const dialogToOpen: Ref<T_dialogList> = ref('AboutFantasiaArchive')
 

@@ -6,10 +6,12 @@ import { I_appDetailsAPI } from 'app/types/I_appDetailsAPI'
 
 declare global{
   interface Window {
-    faWindowControlAPI: I_faWindowControlAPI,
-    faDevToolsControlAPI: I_faDevToolsControl,
-    faExternalLinksManagerAPI: I_faExternalLinksManagerAPI,
-    extraEnvVariables: I_extraEnvVariablesAPI
-    appDetails: I_appDetailsAPI
+    faContentBridgeAPIs: {
+      faWindowControl: I_faWindowControlAPI,
+      faDevToolsControl: I_faDevToolsControl,
+      faExternalLinksManager: I_faExternalLinksManagerAPI,
+      extraEnvVariables: I_extraEnvVariablesAPI
+      appDetails: I_appDetailsAPI
+    }
   }
 }

@@ -3,10 +3,8 @@ import { windowsDevToolsExtensionsFix } from 'src-electron/mainScripts/windowsDe
 import { startApp, openAppWindowManager, closeAppManager } from 'app/src-electron/mainScripts/appManagement'
 import { tweakMenuRemover, tweakRetriveOS } from 'src-electron/mainScripts/tweaks'
 
-/**
- * Determines what platform the app is running on
- * - Needed in case process is undefined under Linux
- */
+// Determines what platform the app is running on
+// - Needed in case process is undefined under Linux (Linux bug?)
 const platform = tweakRetriveOS()
 
 // Fix app name and connected pathing to it
@@ -18,7 +16,7 @@ windowsDevToolsExtensionsFix(platform)
 // Start a singular app instance
 startApp()
 
-// Performance improvement tweak
+// Remove normal app menu
 tweakMenuRemover()
 
 // Set up manager for opening a singular app window
@@ -26,6 +24,19 @@ openAppWindowManager()
 
 // Set up manager for closing app instance
 closeAppManager(platform)
+
+/*
+--------------------------------------------
+*/
+
+/*
+DB TESTING MANAGEMENT
+TODO: ADJUST THIS WHEN SETTING UP `sqlite3`
+*/
+
+/*
+--------------------------------------------
+*/
 
 import * as sqlite3 from 'sqlite3'
 import { app } from 'electron'

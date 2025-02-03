@@ -14,7 +14,9 @@ import { useRoute } from 'vue-router'
 /**
  * Passed prop list from the test through Electron backend. If somehow nothing get passed (somehow), set to a blank object just to be on the safe side.
  */
-const propList = (window.extraEnvVariables.COMPONENT_PROPS) ? window.extraEnvVariables.COMPONENT_PROPS : {}
+const propList = (window.faContentBridgeAPIs.extraEnvVariables.COMPONENT_PROPS)
+  ? window.faContentBridgeAPIs.extraEnvVariables.COMPONENT_PROPS
+  : {}
 
 /**
  * Current route

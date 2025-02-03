@@ -1,6 +1,6 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
-import { extraEnvVariablesAPI } from 'app/src-electron/customContentBridgeAPIs/extraEnvVariablesAPI'
+import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import { T_documentList } from 'app/types/T_documentList'
 
 /**
