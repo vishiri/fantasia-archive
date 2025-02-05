@@ -2,8 +2,10 @@ import { BrowserWindow, app, screen } from 'electron'
 import { enable } from '@electron/remote/main'
 import path from 'path'
 
-// Prevents app from launching a secondary instance
-const preventSecondaryAppInstance = (appWindow: BrowserWindow | undefined) => {
+/**
+ * Prevents app from launching a secondary instance
+ */
+export const preventSecondaryAppInstance = (appWindow: BrowserWindow | undefined) => {
   // Do not limit the window amount if we are in auto-test mode
   if (process.env.TEST_ENV && (process.env.TEST_ENV === 'components' || process.env.TEST_ENV === 'e2e')) {
     return

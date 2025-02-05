@@ -80,7 +80,7 @@ test('Click resize button - "smallify"', async () => {
   if (resizeButton !== null) {
     await resizeButton.click()
 
-    const isMaximized = await appWindow.evaluate(() => window.faWindowControlAPI.checkWindowMaximized())
+    const isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
 
     await expect(isMaximized).toBe(false)
     await electronApp.close()
@@ -108,7 +108,7 @@ test('Click resize button - "maximize"', async () => {
 
   // Check if the tested element exists
   if (resizeButton !== null) {
-    let isMaximized = await appWindow.evaluate(() => window.faWindowControlAPI.checkWindowMaximized())
+    let isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
 
     // Check if the window if maximized of not, react accordingly
     if (isMaximized) {
@@ -123,7 +123,7 @@ test('Click resize button - "maximize"', async () => {
     }
 
     await appWindow.waitForTimeout(1500)
-    isMaximized = await appWindow.evaluate(() => window.faWindowControlAPI.checkWindowMaximized())
+    isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
 
     await expect(isMaximized).toBe(true)
     await electronApp.close()
@@ -153,7 +153,7 @@ test('Click minimize button', async () => {
   if (minimizeButton !== null) {
     await minimizeButton.click()
 
-    const isMaximized = await appWindow.evaluate(() => window.faWindowControlAPI.checkWindowMaximized())
+    const isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
 
     await expect(isMaximized).toBe(false)
     await electronApp.close()

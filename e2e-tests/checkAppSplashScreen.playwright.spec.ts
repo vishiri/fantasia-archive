@@ -41,31 +41,38 @@ test('Splash screen works properly', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const wrapperElement = await appWindow.locator(`[data-test="${selectorList.wrapper}"]`)
+  // Prepare the wrapper element locator
+  const wrapperElement = appWindow.locator(`[data-test="${selectorList.wrapper}"]`)
 
   // Check if the tested element exists
-  if (wrapperElement !== null) {
-    // Check if the splash screen is visible on innitial load
-    const elementOpacityFirstRender = await appWindow.evaluate((selectorList) => {
-      const element = document.querySelector(`[data-test="${selectorList.wrapper}"]`)
-      if (element !== null) return window.getComputedStyle(element).opacity
-    }, selectorList)
-    expect(elementOpacityFirstRender).toBe('1')
+  if (await wrapperElement.count() === 0) { test.fail(); await electronApp.close(); return }
 
-    // Wait until the splash screen is supposed to fade away
-    await appWindow.waitForTimeout(testSplashscreenTimeout)
+  // Check if the splash screen is visible on innitial load
+  const elementOpacityFirstRender = await appWindow.evaluate((selectorList) => {
+    const element = document.querySelector(`[data-test="${selectorList.wrapper}"]`)
+    if (element !== null) {
+      return window.getComputedStyle(element).opacity
+    } else {
+      return false
+    }
+  }, selectorList)
+  expect(elementOpacityFirstRender).toBe('1')
 
-    // Check if the splash screen is hidden after the app contents load
-    const elementOpacityAfterAppLoad = await appWindow.evaluate((selectorList) => {
-      const element = document.querySelector(`[data-test="${selectorList.wrapper}"]`)
-      if (element !== null) return window.getComputedStyle(element).opacity
-    }, selectorList)
-    expect(elementOpacityAfterAppLoad).toBe('0')
-  } else {
-    // Element doesn't exist
-    test.fail()
-  }
+  // Wait until the splash screen is supposed to fade away
+  await appWindow.waitForTimeout(testSplashscreenTimeout)
 
+  // Check if the splash screen is hidden after the app contents load
+  const elementOpacityAfterAppLoad = await appWindow.evaluate((selectorList) => {
+    const element = document.querySelector(`[data-test="${selectorList.wrapper}"]`)
+    if (element !== null) {
+      return window.getComputedStyle(element).opacity
+    } else {
+      return false
+    }
+  }, selectorList)
+  expect(elementOpacityAfterAppLoad).toBe('0')
+
+  // Close the app
   await electronApp.close()
 })
 
@@ -84,28 +91,27 @@ test('Splash screen has proper colors', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const wrapperElement = await appWindow.locator(`[data-test="${selectorList.wrapper}"]`)
+  // Prepare the wrapper element locator
+  const wrapperElement = appWindow.locator(`[data-test="${selectorList.wrapper}"]`)
 
   // Check if the tested element exists
-  if (wrapperElement !== null) {
-    // Check if the background color is correct
-    const elementBackgroundColor = await appWindow.evaluate((selectorList) => {
-      const element = document.querySelector(`[data-test="${selectorList.wrapper}"]`)
-      if (element !== null) return window.getComputedStyle(element).backgroundColor
-    }, selectorList)
-    expect(elementBackgroundColor).toBe(testStringBackgroundColorRGB)
+  if (await wrapperElement.count() === 0) { test.fail(); await electronApp.close(); return }
 
-    // Check if the fill color of the svg path is correct
-    const elementPathFillColor = await appWindow.evaluate((selectorList) => {
-      const element = document.querySelector(`[data-test="${selectorList.wrapper}"] path`)
-      if (element !== null) return window.getComputedStyle(element).fill
-    }, selectorList)
-    expect(elementPathFillColor).toBe(testStringPathFillColorRGB)
-  } else {
-    // Element doesn't exist
-    test.fail()
-  }
+  // Check if the background color is correct
+  const elementBackgroundColor = await appWindow.evaluate((selectorList) => {
+    const element = document.querySelector(`[data-test="${selectorList.wrapper}"]`)
+    if (element !== null) return window.getComputedStyle(element).backgroundColor
+  }, selectorList)
+  expect(elementBackgroundColor).toBe(testStringBackgroundColorRGB)
 
+  // Check if the fill color of the svg path is correct
+  const elementPathFillColor = await appWindow.evaluate((selectorList) => {
+    const element = document.querySelector(`[data-test="${selectorList.wrapper}"] path`)
+    if (element !== null) return window.getComputedStyle(element).fill
+  }, selectorList)
+  expect(elementPathFillColor).toBe(testStringPathFillColorRGB)
+
+  // Close the app
   await electronApp.close()
 })
 
@@ -123,33 +129,30 @@ test('Splash screen has proper sizings', async () => {
 
   const appWindow = await electronApp.firstWindow()
 
-  const iconElement = await appWindow.locator(`[data-test="${selectorList.wrapper}"] svg`)
+  // Prepare the icon element locator
+  const iconElement = appWindow.locator(`[data-test="${selectorList.wrapper}"] svg`)
 
   // Check if the tested element exists
-  if (iconElement !== null) {
-    const iconBoxData = await iconElement.boundingBox()
+  if (await iconElement.count() === 0) { test.fail(); await electronApp.close(); return }
 
-    // Test if the tested element isn't invisisble for some reason
-    if (iconBoxData !== null) {
-      // Test for proper width
-      const roundedFirstValueWidth = Math.round(iconBoxData.width)
-      const roundedSecondValueWidth = Math.round(parseInt(testStringWidth))
+  // Prepare the icon element locator
+  const iconBoxData = await iconElement.boundingBox()
 
-      expect(roundedFirstValueWidth).toBe(roundedSecondValueWidth)
+  // Check if the tested element isn't invisisble for whatever reason
+  if (iconBoxData === null) { test.fail(); await electronApp.close(); return }
 
-      // Test for proper height
-      const roundedFirstValueHeight = Math.round(iconBoxData.height)
-      const roundedSecondValueHeight = Math.round(parseInt(testStringHeight))
+  // Test for proper width
+  const roundedFirstValueWidth = Math.round(iconBoxData.width)
+  const roundedSecondValueWidth = Math.round(parseInt(testStringWidth))
 
-      expect(roundedFirstValueHeight).toBe(roundedSecondValueHeight)
-    } else {
-      // Element is invisible
-      test.fail()
-    }
-  } else {
-    // Element doesn't exist
-    test.fail()
-  }
+  expect(roundedFirstValueWidth).toBe(roundedSecondValueWidth)
 
+  // Test for proper height
+  const roundedFirstValueHeight = Math.round(iconBoxData.height)
+  const roundedSecondValueHeight = Math.round(parseInt(testStringHeight))
+
+  expect(roundedFirstValueHeight).toBe(roundedSecondValueHeight)
+
+  // Close the app
   await electronApp.close()
 })

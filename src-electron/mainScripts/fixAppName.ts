@@ -5,7 +5,7 @@ import packageJSON from '../../package.json' assert {type: 'json'}
 /**
  * Determines if the app name will have "-dev" affix at the end for the appData.
  */
-const determineAppName = () => {
+export const determineAppName = () => {
   if (process.env.DEBUGGING) {
     return `${packageJSON.name}-dev`
   }
