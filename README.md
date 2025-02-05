@@ -58,5 +58,11 @@ test:component --component=COMPONENT_FOLDER_NAME
 test:e2e
 ```
 
+#### E2E single test - via Playwright
+> The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
+```
+test:e2e --spec=SPEC_FILE_NAME
+```
+
 ### Customize the configuration
 See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
