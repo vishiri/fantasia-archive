@@ -9,11 +9,12 @@
     "lint": "eslint --ext .js,.ts,.vue ./",
     "dev:electron": "quasar dev -m electron",
     "build": "quasar build -m electron --publish never",
-    "test:unit": "vitest",
+    "test:unit": "vitest run",
     "test:component": "node \"node_modules/@playwright/test/cli.js\" test src/components",
     "test:componentSingle": "node \"node_modules/@playwright/test/cli.js\" test src/components/%npm_config_component%",
     "test:e2e": "node \"node_modules/@playwright/test/cli.js\" test e2e-tests/",
-    "test:e2eSingle": "node \"node_modules/@playwright/test/cli.js\" test e2e-tests/%npm_config_spec%.playwright.spec.ts"
+    "test:e2eSingle": "node \"node_modules/@playwright/test/cli.js\" test e2e-tests/%npm_config_spec%.playwright.spec.ts",
+    "test:full": "concurrently \"vitest run\" \"node \"node_modules/@playwright/test/cli.js\" test"
   },
   "dependencies": {
     "@electron/remote": "^2.0.10",
@@ -41,6 +42,7 @@
     "@typescript-eslint/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^5.10.0",
     "autoprefixer": "^10.4.2",
+    "concurrently": "^9.1.2",
     "electron": "^25.5.0",
     "electron-builder": "^24.3.0",
     "eslint": "^8.10.0",
