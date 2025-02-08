@@ -46,6 +46,14 @@ test:unit
 test:component
 ```
 
+#### Component list test - via Playwright
+> The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
+
+> Summons a CLI prompt list of available components tests
+```
+test:componentList
+```
+
 #### Component single test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 ```
@@ -56,6 +64,14 @@ test:component --component=COMPONENT_FOLDER_NAME
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 ```
 test:e2e
+```
+
+#### E2E list test - via Playwright
+> The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
+
+> Summons a CLI prompt list of available E2E tests
+```
+test:e2eList
 ```
 
 #### E2E single test - via Playwright

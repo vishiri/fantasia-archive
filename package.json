@@ -12,8 +12,12 @@
     "test:unit": "vitest run",
     "test:component": "node \"node_modules/@playwright/test/cli.js\" test src/components",
     "test:componentSingle": "node \"node_modules/@playwright/test/cli.js\" test src/components/%npm_config_component%",
+    "test:componentSingleAuto": "node \"node_modules/@playwright/test/cli.js\" test %npm_config_component%",
+    "test:componentList": "node testRunner_component.mjs",
     "test:e2e": "node \"node_modules/@playwright/test/cli.js\" test e2e-tests/",
     "test:e2eSingle": "node \"node_modules/@playwright/test/cli.js\" test e2e-tests/%npm_config_spec%.playwright.spec.ts",
+    "test:e2eSingleAuto": "node \"node_modules/@playwright/test/cli.js\" test e2e-tests/%npm_config_spec%",
+    "test:e2eList": "node testRunner_e2e.mjs",
     "test:full": "concurrently \"vitest run\" \"node \"node_modules/@playwright/test/cli.js\" test"
   },
   "dependencies": {
@@ -36,8 +40,10 @@
     "@playwright/test": "^1.37.1",
     "@quasar/app-vite": "^1.3.0",
     "@quasar/quasar-app-extension-qmarkdown": "^2.0.0-beta.10",
+    "@tmaize/prompts": "^2.4.3",
     "@types/lodash-es": "^4.17.10",
     "@types/node": "^16.18.0",
+    "@types/prompts": "^2.4.9",
     "@types/uuid": "^9.0.5",
     "@typescript-eslint/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^5.10.0",
