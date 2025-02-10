@@ -1,7 +1,7 @@
 # Changelog
 ----------
 
-## 0.2.0 - The Big Rewrite
+## 2.0.0 - The Big Rewrite
 
 ### New features
 - A whole plethora since this is a full rewrite!
