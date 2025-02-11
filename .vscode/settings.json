@@ -16,6 +16,14 @@
   "[javascript]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": true,
+    "multiFormatter.formatterList": [
+      "dbaeumer.vscode-eslint"
+    ]
+  },
   "todo-tree.tree.scanMode": "workspace",
   "[vue]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint",
