@@ -4,8 +4,9 @@ export default defineConfig({
   workers: 1,
   fullyParallel: false,
   testMatch: '**/*playwright.@(spec|test).?(c|m)[jt]s?(x)',
+  expect: { timeout: 3_000 },
   reporter: [
     ['list'],
-    ['json', { outputFile: 'test-results/test-results-playwright.json' }]
+    ['html', { outputFolder: 'test-results/playwright-report', open: 'never' }]
   ]
 })
