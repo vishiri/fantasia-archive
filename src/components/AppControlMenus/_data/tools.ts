@@ -58,7 +58,6 @@ export const tools: I_appMenusDataList = {
       conditions: true,
       specialColor: undefined
     },
-
     {
       mode: 'separator'
     },

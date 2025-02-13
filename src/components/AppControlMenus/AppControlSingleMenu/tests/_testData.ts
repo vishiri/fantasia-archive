@@ -55,7 +55,6 @@ export const testData:I_appMenusDataList = {
       conditions: true,
       specialColor: undefined
     },
-
     {
       mode: 'separator'
     },
@@ -87,7 +86,6 @@ export const testData:I_appMenusDataList = {
           specialColor: 'secondary'
         }
       ]
-
     }
   ]
 }

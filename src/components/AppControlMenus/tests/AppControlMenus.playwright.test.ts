@@ -42,17 +42,13 @@ test('Load "Test Title" menu button sub-component', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const testMenu = await appWindow.locator(`[data-test-test-menu="${selectorList.testMenu}"]`)
+  // Prepare the menu locator
+  const testMenu = appWindow.locator(`[data-test-test-menu="${selectorList.testMenu}"]`)
 
   // Check if the tested element exists
-  if (testMenu !== null) {
-    await expect(true).toBe(true)
-    await electronApp.close()
-  } else {
-    // Element doesn't exist
-    test.fail()
-  }
+  await expect(testMenu).toHaveCount(1)
 
+  // Close the app
   await electronApp.close()
 })
 
@@ -68,16 +64,12 @@ test('Check if we have exactly one testing menu loaded', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const anyMenus = await appWindow.$$(`[data-test-any-menu="${selectorList.anyMenu}"]`)
+  // Prepare the menus locator
+  const anyMenus = appWindow.locator(`[data-test-any-menu="${selectorList.anyMenu}"]`)
 
-  // Check for example one testing menu
-  if (anyMenus.length === 1) {
-    await expect(true).toBe(true)
-    await electronApp.close()
-  } else {
-    // No menus/too many menus
-    test.fail()
-  }
+  // Check if the tested element exists
+  await expect(anyMenus).toHaveCount(1)
 
+  // Close the app
   await electronApp.close()
 })
