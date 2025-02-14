@@ -43,29 +43,30 @@ test('Check if the wrapper contains "IMG" element', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const imageElement = await appWindow.locator(`[data-test="${selectorList.image}"]`)
+  // Prepare the selector for the tested element
+  const imageElement = appWindow.locator(`[data-test="${selectorList.image}"]`)
 
   // Check if the tested element exists
-  if (imageElement !== null) {
-    const elementType = await imageElement.evaluate(el => el.tagName)
+  expect(imageElement).toHaveCount(1)
 
-    await expect(elementType).toBe(testString)
-    await electronApp.close()
-  } else {
-    // Element doesn't exist
-    test.fail()
-  }
+  // Get the element's tag name
+  const elementType = await imageElement.evaluate(el => el.tagName)
 
+  // Check if the tested element is an 'IMG' element
+  expect(elementType).toBe(testString)
+
+  // Close the app
   await electronApp.close()
 })
 
 /**
- * Attempt to pass "width" prop to the component and check the result
+ * Attempt to pass "width" and "height" prop to the component and check the results
  */
-test('Visually check "width" prop', async () => {
-  const testString = '300px'
+test('Visually check for proper sizing of the icon', async () => {
+  const testStringWidth = '300px'
+  const testStringHeight = '300px'
 
-  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ width: testString })
+  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ width: testStringWidth, height: testStringHeight })
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,
@@ -75,69 +76,28 @@ test('Visually check "width" prop', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const imageElement = await appWindow.locator(`[data-test="${selectorList.image}"]`)
+  // Prepare the selector for the tested element
+  const imageElement = appWindow.locator(`[data-test="${selectorList.image}"]`)
 
   // Check if the tested element exists
-  if (imageElement !== null) {
-    const imageBoxData = await imageElement.boundingBox()
+  expect(imageElement).toHaveCount(1)
 
-    // Test if the tested element isn't invisisble for some reason
-    if (imageBoxData !== null) {
-      const roundedFirstValue = Math.round(imageBoxData.width)
-      const roundedSecondValue = Math.round(parseInt(testString))
+  const imageBoxData = await imageElement.boundingBox() as unknown as { width: number, height: number }
 
-      await expect(roundedFirstValue).toBe(roundedSecondValue)
-      await electronApp.close()
-    } else {
-      // Element is invisible
-      test.fail()
-    }
-  } else {
-    // Element doesn't exist
-    test.fail()
-  }
+  // Test if the tested element isn't invisisble for some reason
+  expect(imageBoxData).not.toBe(null)
 
-  await electronApp.close()
-})
+  // Test for proper width
+  const roundedImageWidth = Math.round(imageBoxData.width)
+  const roundedTestStringWidth = Math.round(parseInt(testStringWidth))
+  expect(roundedImageWidth).toBe(roundedTestStringWidth)
 
-/**
- * Attempt to pass "height" prop to the component and check the result
- */
-test('Visually check "height" prop', async () => {
-  const testString = '300px'
+  // Test for proper height
+  const roundedImageHeight = Math.round(imageBoxData.height)
+  const roundedTestStringHeight = Math.round(parseInt(testStringHeight))
+  expect(roundedImageHeight).toBe(roundedTestStringHeight)
 
-  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ height: testString })
-
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath]
-  })
-
-  const appWindow = await electronApp.firstWindow()
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
-
-  const imageElement = await appWindow.locator(`[data-test="${selectorList.image}"]`)
-
-  // Check if the tested element exists
-  if (imageElement !== null) {
-    const imageBoxData = await imageElement.boundingBox()
-
-    // Test if the tested element isn't invisisble for some reason
-    if (imageBoxData !== null) {
-      const roundedFirstValue = Math.round(imageBoxData.height)
-      const roundedSecondValue = Math.round(parseInt(testString))
-
-      await expect(roundedFirstValue).toBe(roundedSecondValue)
-      await electronApp.close()
-    } else {
-      // Element is invisible
-      test.fail()
-    }
-  } else {
-    // Element doesn't exist
-    test.fail()
-  }
-
+  // Close the app
   await electronApp.close()
 })
 
@@ -153,19 +113,17 @@ test('Check if the image is random: YES', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const imageElement = await appWindow.locator(`[data-test="${selectorList.image}"]`)
+  // Prepare the selector for the tested element
+  const imageElement = appWindow.locator(`[data-test="${selectorList.image}"]`)
 
   // Check if the tested element exists
-  if (imageElement !== null) {
-    const isRandom = await imageElement.evaluate(el => el.dataset.testIsRandom)
+  expect(imageElement).toHaveCount(1)
 
-    await expect(isRandom).toBe('true')
-    await electronApp.close()
-  } else {
-    // Element doesn't exist
-    test.fail()
-  }
+  // Check if the tested element is random
+  const isRandom = await imageElement.evaluate(el => el.dataset.testIsRandom)
+  expect(isRandom).toBe('true')
 
+  // Close the app
   await electronApp.close()
 })
 
@@ -185,20 +143,20 @@ test('Check if the image is random: NO', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const imageElement = await appWindow.locator(`[data-test="${selectorList.image}"]`)
+  // Prepare the selector for the tested element
+  const imageElement = appWindow.locator(`[data-test="${selectorList.image}"]`)
 
   // Check if the tested element exists
-  if (imageElement !== null) {
-    const isRandom = await imageElement.evaluate(el => el.dataset.testIsRandom)
-    const imageString = await imageElement.evaluate(el => el.dataset.testImage)
+  expect(imageElement).toHaveCount(1)
 
-    await expect.soft(imageString).toBe(testString)
-    await expect(isRandom).toBe('false')
-    await electronApp.close()
-  } else {
-    // Element doesn't exist
-    test.fail()
-  }
+  // Check if the tested element is not random
+  const isRandom = await imageElement.evaluate(el => el.dataset.testIsRandom)
+  expect(isRandom).toBe('false')
 
+  // Check if the tested element has the correct image
+  const imageString = await imageElement.evaluate(el => el.dataset.testImage)
+  expect(imageString).toBe(testString)
+
+  // Close the app
   await electronApp.close()
 })

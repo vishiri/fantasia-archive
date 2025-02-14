@@ -53,31 +53,45 @@ test('Dev tools toggle properly', async () => {
   // Prepare the menu button locator
   const menuButton = appWindow.getByText(selectorList.menuItemButton)
 
-  // Toggle dev tools - ON
-  await appWindow.waitForTimeout(menuAnimationTimer)
-  if (await menuWrapper.count() === 0) { test.fail(); await electronApp.close(); return }
+  // --- Toggle dev tools - ON---
+
+  // Open the menu
+  await expect(menuWrapper).toHaveCount(1)
   await menuWrapper.click()
 
-  await appWindow.waitForTimeout(menuAnimationTimer)
-  if (await menuButton.count() === 0) { test.fail(); await electronApp.close(); return }
-  await menuButton.click()
+  // Wait for the menu animation to finish
   await appWindow.waitForTimeout(menuAnimationTimer)
 
+  // Click on the dev tools menu button
+  await expect(menuButton).toHaveCount(1)
+  await menuButton.click()
+
+  // Wait for the menu animation to finish
+  await appWindow.waitForTimeout(menuAnimationTimer)
+
+  // Check if dev tools are open
   devToolsStatus = await appWindow.evaluate(async () => {
     return window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()
   })
   expect(devToolsStatus).toBe(true)
 
-  // Toggle dev tools - OFF
-  await appWindow.waitForTimeout(menuAnimationTimer)
-  if (await menuWrapper.count() === 0) { test.fail(); await electronApp.close(); return }
+  // --- Toggle dev tools - OFF ---
+
+  // Open the menu
+  await expect(menuWrapper).toHaveCount(1)
   await menuWrapper.click()
 
+  // Wait for the menu animation to finish
   await appWindow.waitForTimeout(menuAnimationTimer)
-  if (await menuButton.count() === 0) { test.fail(); await electronApp.close(); return }
+
+  // Click on the dev tools menu button
+  await expect(menuButton).toHaveCount(1)
   await menuButton.click()
 
+  // Wait for the menu animation to finish
   await appWindow.waitForTimeout(menuAnimationTimer)
+
+  // Check if dev tools are closed
   devToolsStatus = await appWindow.evaluate(async () => {
     return window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()
   })

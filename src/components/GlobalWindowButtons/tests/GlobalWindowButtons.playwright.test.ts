@@ -46,19 +46,17 @@ test('Wrapper should contain three specific buttons', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const resizeButton = await appWindow.locator(`[data-test="${selectorList.buttonResize}"]`)
-  const minimizeButton = await appWindow.locator(`[data-test="${selectorList.buttonMinimize}"]`)
-  const closeButton = await appWindow.locator(`[data-test="${selectorList.buttonClose}"]`)
+  // Prepare the selectors for the buttons
+  const resizeButton = appWindow.locator(`[data-test="${selectorList.buttonResize}"]`)
+  const minimizeButton = appWindow.locator(`[data-test="${selectorList.buttonMinimize}"]`)
+  const closeButton = appWindow.locator(`[data-test="${selectorList.buttonClose}"]`)
 
   // Check if the tested elements exists
-  if (resizeButton !== null && minimizeButton !== null && closeButton !== null) {
-    await expect(true).toBe(true)
-    await electronApp.close()
-  } else {
-    // At least one of the tested elements doesn't exist
-    test.fail()
-  }
+  await expect(resizeButton).toHaveCount(1)
+  await expect(minimizeButton).toHaveCount(1)
+  await expect(closeButton).toHaveCount(1)
 
+  // Close the app
   await electronApp.close()
 })
 
@@ -74,21 +72,21 @@ test('Click resize button - "smallify"', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const resizeButton = await appWindow.locator(`[data-test="${selectorList.buttonResize}"]`)
+  // Prepare the selector for the button
+  const resizeButton = appWindow.locator(`[data-test="${selectorList.buttonResize}"]`)
 
-  // Check if the tested element exists
-  if (resizeButton !== null) {
-    await resizeButton.click()
+  // Check if the tested element exists and if so, click it
+  await expect(resizeButton).toHaveCount(1)
+  await resizeButton.click()
 
-    const isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
+  // Wait for the window to resize
+  await appWindow.waitForTimeout(600)
 
-    await expect(isMaximized).toBe(false)
-    await electronApp.close()
-  } else {
-    // Element doesn't exist
-    test.fail()
-  }
+  // Check if the window is maximized or not
+  const isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
+  expect(isMaximized).toBe(false)
 
+  // Close the app
   await electronApp.close()
 })
 
@@ -104,34 +102,38 @@ test('Click resize button - "maximize"', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const resizeButton = await appWindow.locator(`[data-test="${selectorList.buttonResize}"]`)
+  // Prepare the selector for the button
+  const resizeButton = appWindow.locator(`[data-test="${selectorList.buttonResize}"]`)
 
   // Check if the tested element exists
-  if (resizeButton !== null) {
-    let isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
+  await expect(resizeButton).toHaveCount(1)
 
-    // Check if the window if maximized of not, react accordingly
-    if (isMaximized) {
-      // Click twice
-      await resizeButton.click()
+  // In order to avoid situations where the window somehow opens in non-maximized state, we first check if it is maximized or not and react accordingly
+  let isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
 
-      await appWindow.waitForTimeout(1500)
+  // Check if the window if maximized of not, react accordingly
+  if (isMaximized) {
+    // Minimize first
+    await resizeButton.click()
 
-      await resizeButton.click()
-    } else {
-      await resizeButton.click()
-    }
+    // Wait for the window to minimize
+    await appWindow.waitForTimeout(600)
 
-    await appWindow.waitForTimeout(1500)
-    isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
-
-    await expect(isMaximized).toBe(true)
-    await electronApp.close()
+    // Maximize again
+    await resizeButton.click()
   } else {
-    // Element doesn't exist
-    test.fail()
+    // Maximize to begin with
+    await resizeButton.click()
   }
 
+  // Wait for the window to maximize
+  await appWindow.waitForTimeout(600)
+
+  // Check if the window is maximized
+  isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
+  expect(isMaximized).toBe(true)
+
+  // Close the app
   await electronApp.close()
 })
 
@@ -147,21 +149,21 @@ test('Click minimize button', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const minimizeButton = await appWindow.locator(`[data-test="${selectorList.buttonMinimize}"]`)
+  // Prepare the selector for the button
+  const minimizeButton = appWindow.locator(`[data-test="${selectorList.buttonMinimize}"]`)
 
-  // Check if the tested element exists
-  if (minimizeButton !== null) {
-    await minimizeButton.click()
+  // Check if the tested element exists, and if so, click it
+  await expect(minimizeButton).toHaveCount(1)
+  await minimizeButton.click()
 
-    const isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
+  // Wait for the window to minimize
+  await appWindow.waitForTimeout(600)
 
-    await expect(isMaximized).toBe(false)
-    await electronApp.close()
-  } else {
-    // Element doesn't exist
-    test.fail()
-  }
+  // Check if the window is minimized
+  const isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
+  expect(isMaximized).toBe(false)
 
+  // Close the app
   await electronApp.close()
 })
 
@@ -177,25 +179,24 @@ test('Click close button', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const closeButton = await appWindow.locator(`[data-test="${selectorList.buttonClose}"]`)
+  // Prepare the selector for the button
+  const closeButton = appWindow.locator(`[data-test="${selectorList.buttonClose}"]`)
 
   // Check if the tested element exists
-  if (closeButton !== null) {
-    let windowIsClosed = false
+  await expect(closeButton).toHaveCount(1)
 
-    // Listen to window close event
-    appWindow.on('close', () => {
-      windowIsClosed = true
-    })
+  // Prapere the variable and listen to window close event
+  let windowIsClosed = false
+  appWindow.on('close', () => {
+    windowIsClosed = true
+  })
 
-    await closeButton.click()
+  // Click the close button
+  await closeButton.click()
 
-    await expect(windowIsClosed).toBe(true)
-    await electronApp.close()
-  } else {
-    // Element doesn't exist
-    test.fail()
-  }
+  // Check if the window is closed
+  expect(windowIsClosed).toBe(true)
 
+  // Close the app
   await electronApp.close()
 })

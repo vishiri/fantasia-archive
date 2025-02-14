@@ -95,7 +95,7 @@ test('Splash screen has proper colors', async () => {
   const wrapperElement = appWindow.locator(`[data-test="${selectorList.wrapper}"]`)
 
   // Check if the tested element exists
-  if (await wrapperElement.count() === 0) { test.fail(); await electronApp.close(); return }
+  await expect(wrapperElement).toHaveCount(1)
 
   // Check if the background color is correct
   const elementBackgroundColor = await appWindow.evaluate((selectorList) => {
@@ -133,25 +133,23 @@ test('Splash screen has proper sizings', async () => {
   const iconElement = appWindow.locator(`[data-test="${selectorList.wrapper}"] svg`)
 
   // Check if the tested element exists
-  if (await iconElement.count() === 0) { test.fail(); await electronApp.close(); return }
+  expect(iconElement).toHaveCount(1)
 
   // Prepare the icon element locator
-  const iconBoxData = await iconElement.boundingBox()
+  const iconBoxData = await iconElement.boundingBox() as unknown as { width: number, height: number }
 
   // Check if the tested element isn't invisisble for whatever reason
-  if (iconBoxData === null) { test.fail(); await electronApp.close(); return }
+  expect(iconBoxData).not.toBe(null)
 
   // Test for proper width
-  const roundedFirstValueWidth = Math.round(iconBoxData.width)
-  const roundedSecondValueWidth = Math.round(parseInt(testStringWidth))
-
-  expect(roundedFirstValueWidth).toBe(roundedSecondValueWidth)
+  const roundedIconWidth = Math.round(iconBoxData.width)
+  const roundedTestStringWidth = Math.round(parseInt(testStringWidth))
+  expect(roundedIconWidth).toBe(roundedTestStringWidth)
 
   // Test for proper height
-  const roundedFirstValueHeight = Math.round(iconBoxData.height)
-  const roundedSecondValueHeight = Math.round(parseInt(testStringHeight))
-
-  expect(roundedFirstValueHeight).toBe(roundedSecondValueHeight)
+  const roundedIconHeight = Math.round(iconBoxData.height)
+  const roundedTestStringHeight = Math.round(parseInt(testStringHeight))
+  expect(roundedIconHeight).toBe(roundedTestStringHeight)
 
   // Close the app
   await electronApp.close()

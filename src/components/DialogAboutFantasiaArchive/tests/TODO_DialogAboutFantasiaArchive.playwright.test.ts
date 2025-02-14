@@ -3,6 +3,8 @@ import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import { T_documentList } from 'app/types/T_documentList'
 
+// TODO: REDO THIS DOCUMENT
+
 /**
  * Extra env settings to trigger component testing via Playwright
  */
@@ -48,18 +50,17 @@ test('Open test "license" dialog with all elements in it', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const closeButton = await appWindow.locator(`[data-test="${selectorList.closeButton}"]`)
-  const markdownWrapper = await appWindow.locator(`[data-test="${selectorList.markdownWrapper}"]`)
-  const markdownContent = await appWindow.locator(`[data-test="${selectorList.markdownContent}"]`)
+  // Prepare the selectors for the elements to check
+  const closeButton = appWindow.locator(`[data-test="${selectorList.closeButton}"]`)
+  const markdownWrapper = appWindow.locator(`[data-test="${selectorList.markdownWrapper}"]`)
+  const markdownContent = appWindow.locator(`[data-test="${selectorList.markdownContent}"]`)
 
-  // Check if the tested elements exists
-  if (closeButton !== null && markdownWrapper !== null && markdownContent !== null) {
-    expect(true).toBe(true)
-  } else {
-    // Elements don't exist
-    test.fail()
-  }
+  // Check if all tested elements exist
+  await expect(closeButton).toHaveCount(1)
+  await expect(markdownWrapper).toHaveCount(1)
+  await expect(markdownContent).toHaveCount(1)
 
+  // Close the app
   await electronApp.close()
 })
 
@@ -79,21 +80,21 @@ test('Open test "license" dialog and try closing it', async () => {
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  const closeButton = await appWindow.locator(`[data-test="${selectorList.closeButton}"]`)
-  const markdownContent = await appWindow.locator(`[data-test="${selectorList.markdownContent}"]`)
+  // Prepare the selectors for the elements to check
+  const closeButton = appWindow.locator(`[data-test="${selectorList.closeButton}"]`)
+  const markdownContent = appWindow.locator(`[data-test="${selectorList.markdownContent}"]`)
 
-  // Check if the close button exists
-  if (closeButton !== null && markdownContent !== null) {
-    await closeButton.click()
-    await appWindow.waitForTimeout(1500)
+  // Check if the markdown concent and close button exist and click it if it does
+  await expect(markdownContent).toHaveCount(1)
+  await expect(closeButton).toHaveCount(1)
+  await closeButton.click()
 
-    // Check if the content is properly hidden after closing the popup
-    await expect(await markdownContent.isHidden()).toBe(true)
-    await electronApp.close()
-  } else {
-    // Close button doesn't exist
-    test.fail()
-  }
+  // Wait for the popup to close
+  await appWindow.waitForTimeout(1500)
 
+  // Check if the content is properly hidden after closing the popup
+  expect(await markdownContent.isHidden()).toBe(true)
+
+  // Close the app
   await electronApp.close()
 })
