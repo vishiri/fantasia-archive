@@ -13,6 +13,8 @@ import T_documents from './components/AppControlMenus/T_documents'
 
 import T_aboutFantasiaArchive from './dialogs/T_aboutFantasiaArchive'
 
+import T_socialContactButtons from './components/SocialContactButtons/T_socialContactButtons'
+
 export default {
   // GLOBAL - DOCUMENTS
   documents: {
@@ -41,6 +43,11 @@ export default {
     didYouKnow: 'Did you know?'
   },
 
+  // DIALOGS
+  Dialogs: {
+    aboutFantasiaArchive: T_aboutFantasiaArchive
+  },
+
   // COMPONENT - GLOBAL WINDOW BUTTONS
   GlobalWindowButtons: {
     minimizeButton: 'Minimize',
@@ -57,9 +64,7 @@ export default {
     helpInfo: T_helpInfo
   },
 
-  // DIALOGS
-  Dialogs: {
-    aboutFantasiaArchive: T_aboutFantasiaArchive
-  }
+  // COMPONENT - APP CONTROL MENUS
+  SocialContactButtons: T_socialContactButtons
 
 }

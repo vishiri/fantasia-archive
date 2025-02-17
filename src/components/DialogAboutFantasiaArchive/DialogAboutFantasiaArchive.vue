@@ -24,6 +24,8 @@
         />
       </q-card-section>
 
+      <SocialContactButtons />
+
       <!-- Card actions wrapper -->
       <q-card-actions
         align="around"
@@ -46,6 +48,7 @@
 import { T_dialogList } from 'app/types/T_dialogList'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { onMounted, ref, watch } from 'vue'
+import SocialContactButtons from '../SocialContactButtons/SocialContactButtons.vue'
 
 /**
  * All component props
