@@ -1,4 +1,4 @@
-import { BrowserWindow, app, screen, MenuItem, Menu, shell } from 'electron'
+import { BrowserWindow, app, screen } from 'electron'
 import { enable } from '@electron/remote/main'
 import path from 'path'
 import { setupSpellChecker } from 'src-electron/mainScripts/spellChecker'
