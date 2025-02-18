@@ -3,35 +3,35 @@ import { i18n } from 'app/src/i18n/externalFileLoader'
 
 export const buttonList: I_socialContactButtons = {
   buttonPatreon: {
-    title: i18n.global.t('socialContactButtons.buttonPatreon.title'),
-    label: i18n.global.t('socialContactButtons.buttonPatreon.label'),
+    title: i18n.global.t('SocialContactButtons.buttonPatreon.title'),
+    label: i18n.global.t('SocialContactButtons.buttonPatreon.label'),
     url: 'https://www.patreon.com/c/vishiri',
     icon: 'patreon_logo.png',
-    width: 140,
-    height: 100,
+    width: 26,
+    height: 26,
     cssClass: 'patreon'
   },
   buttonKofi: {
-    title: i18n.global.t('socialContactButtons.buttonKofi.title'),
-    label: i18n.global.t('socialContactButtons.buttonKofi.label'),
+    title: i18n.global.t('SocialContactButtons.buttonKofi.title'),
+    label: i18n.global.t('SocialContactButtons.buttonKofi.label'),
     url: 'https://ko-fi.com/vishiri',
     icon: 'kofi_logo.png',
-    width: 140,
-    height: 100,
+    width: 30,
+    height: 26,
     cssClass: 'kofi'
   },
   buttonWebsite: {
-    title: i18n.global.t('socialContactButtons.buttonWebsite.title'),
-    label: i18n.global.t('socialContactButtons.buttonWebsite.label'),
+    title: i18n.global.t('SocialContactButtons.buttonWebsite.title'),
+    label: i18n.global.t('SocialContactButtons.buttonWebsite.label'),
     url: 'https://fantasiaarchive.com',
-    icon: 'gh_logo_dark.png',
+    icon: 'fa_logo.png',
     width: 140,
     height: 100,
     cssClass: 'website'
   },
   buttonGitHub: {
-    title: i18n.global.t('socialContactButtons.buttonGitHub.title'),
-    label: i18n.global.t('socialContactButtons.buttonGitHub.label'),
+    title: i18n.global.t('SocialContactButtons.buttonGitHub.title'),
+    label: i18n.global.t('SocialContactButtons.buttonGitHub.label'),
     url: 'https://github.com/vishiri/fantasia-archive',
     icon: 'gh_logo_dark.png',
     width: 140,
@@ -39,8 +39,8 @@ export const buttonList: I_socialContactButtons = {
     cssClass: 'github'
   },
   buttonDiscord: {
-    title: i18n.global.t('socialContactButtons.buttonDiscord.title'),
-    label: i18n.global.t('socialContactButtons.buttonDiscord.label'),
+    title: i18n.global.t('SocialContactButtons.buttonDiscord.title'),
+    label: i18n.global.t('SocialContactButtons.buttonDiscord.label'),
     url: 'https://discord.gg/JQDBvsN9Te',
     icon: 'discord_logo.png',
     width: 140,
@@ -48,8 +48,8 @@ export const buttonList: I_socialContactButtons = {
     cssClass: 'discord'
   },
   buttonReddit: {
-    title: i18n.global.t('socialContactButtons.buttonReddit.title'),
-    label: i18n.global.t('socialContactButtons.buttonReddit.label'),
+    title: i18n.global.t('SocialContactButtons.buttonReddit.title'),
+    label: i18n.global.t('SocialContactButtons.buttonReddit.label'),
     url: 'https://www.reddit.com/r/FantasiaArchive',
     icon: 'reddit_logo.png',
     width: 140,
@@ -57,8 +57,8 @@ export const buttonList: I_socialContactButtons = {
     cssClass: 'reddit'
   },
   buttonTwitter: {
-    title: i18n.global.t('socialContactButtons.buttonTwitter.title'),
-    label: i18n.global.t('socialContactButtons.buttonTwitter.label'),
+    title: i18n.global.t('SocialContactButtons.buttonTwitter.title'),
+    label: i18n.global.t('SocialContactButtons.buttonTwitter.label'),
     url: 'https://x.com/VishiriRilgatan',
     icon: 'twitter_logo.png',
     width: 140,

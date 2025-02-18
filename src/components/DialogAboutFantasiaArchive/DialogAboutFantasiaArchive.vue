@@ -2,9 +2,12 @@
   <!-- Dialog wrapper -->
   <q-dialog
     v-model="dialogModel"
+    style="width: 700px; max-width: 80vw;"
     :class="['dialogComponent', `${documentName}`]"
   >
-    <q-card>
+    <q-card
+      :class="['dialogComponent__wrapper', `${documentName}`]"
+    >
       <!-- Dialog contents wrapper -->
       <q-card-section :class="['dialogComponent__content', `${documentName}`, 'q-mt-xl', 'q-mb-lg', 'q-mr-lg', 'q-ml-xl', 'q-pt-none']">
         <h6>
@@ -22,9 +25,9 @@
           class="q-my-lg q-mx-auto"
           style="opacity: 0.5; width: 400px;"
         />
-      </q-card-section>
 
-      <SocialContactButtons />
+        <SocialContactButtons />
+      </q-card-section>
 
       <!-- Card actions wrapper -->
       <q-card-actions
@@ -120,6 +123,11 @@ onMounted(() => {
 <style lang="scss">
 
 .AboutFantasiaArchive {
+  .dialogComponent__wrapper {
+    width: 700px;
+    max-width: 80vw;
+  }
+
   .dialogComponent__content {
     text-align: center;
     overflow: auto;

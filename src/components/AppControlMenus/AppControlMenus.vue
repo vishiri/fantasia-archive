@@ -53,10 +53,10 @@
 
 import { testData } from './tests/_testData'
 
-import { project } from 'src/components/AppControlMenus/_data/project'
-import { documents } from 'src/components/AppControlMenus/_data/documents'
-import { tools } from 'src/components/AppControlMenus/_data/tools'
-import { helpInfo } from 'src/components/AppControlMenus/_data/helpInfo'
+import { project } from 'app/src/components/AppControlMenus/_data/project'
+import { documents } from 'app/src/components/AppControlMenus/_data/documents'
+import { tools } from 'app/src/components/AppControlMenus/_data/tools'
+import { helpInfo } from 'app/src/components/AppControlMenus/_data/helpInfo'
 
 import AppControlSingleMenu from 'app/src/components/AppControlMenus/AppControlSingleMenu/AppControlSingleMenu.vue'
 import DialogMarkdownDocument from 'app/src/components/DialogMarkdownDocument/DialogMarkdownDocument.vue'

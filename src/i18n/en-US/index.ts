@@ -64,7 +64,7 @@ export default {
     helpInfo: T_helpInfo
   },
 
-  // COMPONENT - APP CONTROL MENUS
+  // COMPONENT - SOCIAL CONTACT BUTTONS
   SocialContactButtons: T_socialContactButtons
 
 }
