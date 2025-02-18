@@ -1,6 +1,9 @@
 import { BrowserWindow, app, screen, MenuItem, Menu, shell } from 'electron'
 import { enable } from '@electron/remote/main'
 import path from 'path'
+import { setupSpellChecker } from 'src-electron/mainScripts/spellChecker'
+
+export let appWindow: BrowserWindow | undefined
 
 /**
  * Prevents app from launching a secondary instance
@@ -39,7 +42,7 @@ export const mainWindowCreation = () => {
   const displaySizes = screen.getPrimaryDisplay().workAreaSize
 
   // Initial window options
-  let appWindow: BrowserWindow | undefined = new BrowserWindow({
+  appWindow = new BrowserWindow({
     width: displaySizes.width,
     height: displaySizes.height,
     useContentSize: true,
@@ -92,30 +95,6 @@ export const mainWindowCreation = () => {
   // Check if we are on the primary or secondary instance of the app
   preventSecondaryAppInstance(appWindow)
 
-  appWindow.webContents.on('context-menu', (_, params) => {
-    if (appWindow === undefined) { return }
-    const menu = new Menu()
-    const webContents = appWindow.webContents
-
-    // Add each spelling suggestion
-    for (const suggestion of params.dictionarySuggestions) {
-      menu.append(new MenuItem({
-        label: suggestion,
-        click: () => webContents.replaceMisspelling(suggestion)
-      }))
-    }
-
-    // Allow users to add the misspelled word to the dictionary
-    if (params.misspelledWord) {
-      menu.append(
-        new MenuItem({
-          label: 'Add to dictionary',
-          click: () => webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord)
-        })
-      )
-    }
-    if ((params.dictionarySuggestions && params.dictionarySuggestions.length) || params.misspelledWord) {
-      menu.popup()
-    }
-  })
+  // Hook up spellchecker
+  setupSpellChecker(appWindow)
 }
