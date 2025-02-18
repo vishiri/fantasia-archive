@@ -4,10 +4,10 @@
     :title="buttonData.title"
     :href="buttonData.url"
     no-caps
-    push
   >
     <div class="row items-center no-wrap">
       <q-img
+        spinner-size="0"
         :src="`images/socialContactButtons/${buttonData.icon}`"
         fit="contain"
         :width="`${buttonData.width}px`"
@@ -57,7 +57,7 @@ const buttonData = componentData.value
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 
 .socialContactSingleButton {
   &__text {
@@ -88,12 +88,76 @@ const buttonData = componentData.value
   }
 
   &.patreon {
-    background-color: #ff424d;
+    background-color: $socialContactButtons-backgroundColor-patreon;
+
+    .q-focus-helper {
+      background-color: $socialContactButtons-hoverColor-patreon !important;
+    }
   }
 
   &.kofi {
-    background-color: #000;
+    background-color: $socialContactButtons-backgroundColor-kofi;
   }
+
+  &.website,
+  &.github {
+    font-size: 15px !important;
+  }
+
+  &.website {
+    border: 3px solid $socialContactButtons-hoverColor-webpage;
+
+    .socialContactSingleButton__text {
+      color: $socialContactButtons-textColor-webpage !important;
+    }
+
+    .q-focus-helper {
+      background-color: $socialContactButtons-hoverColor-webpage !important;
+    }
+
+    &:focus {
+      .q-focus-helper {
+        opacity: 1 !important;
+      }
+    }
+  }
+
+  &.github {
+    background-color: $socialContactButtons-backgroundColor-github;
+
+    .socialContactSingleButton__text {
+      color: $socialContactButtons-textColor-github;
+    }
+
+    .q-focus-helper {
+      background-color: $socialContactButtons-hoverColor-github !important;
+    }
+  }
+
+  &.discord {
+    background-color: $socialContactButtons-backgroundColor-discord;
+
+    .q-focus-helper {
+      background-color: $socialContactButtons-hoverColor-discord !important;
+    }
+  }
+
+  &.reddit {
+    background-color: $socialContactButtons-backgroundColor-reddit;
+
+    .q-focus-helper {
+      background-color: $socialContactButtons-hoverColor-reddit !important;
+    }
+  }
+
+  &.twitter {
+    background-color: $socialContactButtons-backgroundColor-twitter;
+
+    .socialContactSingleButton__text {
+      color: $socialContactButtons-textColor-twitter !important;
+    }
+  }
+
 }
 
 </style>

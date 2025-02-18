@@ -2,7 +2,6 @@
   <!-- Dialog wrapper -->
   <q-dialog
     v-model="dialogModel"
-    style="width: 700px; max-width: 80vw;"
     :class="['dialogComponent', `${documentName}`]"
   >
     <q-card
@@ -23,7 +22,7 @@
           horizonatal
           dark
           class="q-my-lg q-mx-auto"
-          style="opacity: 0.5; width: 400px;"
+          style="width: 400px;"
         />
 
         <SocialContactButtons />
