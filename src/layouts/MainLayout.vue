@@ -26,6 +26,8 @@
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <AppServerControl />
   </q-layout>
 </template>
 
@@ -33,6 +35,7 @@
 import GlobalWindowButtons from 'components/GlobalWindowButtons/GlobalWindowButtons.vue'
 import AppControlMenus from 'components/AppControlMenus/AppControlMenus.vue'
 
+import AppServerControl from 'components/AppServerControl/AppServerControl.vue'
 </script>
 
 <style lang="scss" scoped>
