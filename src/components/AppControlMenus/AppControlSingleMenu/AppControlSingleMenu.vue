@@ -127,8 +127,8 @@
 <script setup lang="ts">
 // TODO - ADD TESTS
 
-import { I_appMenusDataList } from 'app/interfaces/I_appMenusDataList'
-import { testData } from '../_testData/test.raw.component'
+import { I_appMenusDataList } from 'app/types/I_appMenusDataList'
+import { testData } from '../tests/_testData'
 import { computed } from 'vue'
 
 /**
@@ -144,8 +144,12 @@ const props = defineProps<{
 /**
  * Testing type currently possibly happening
  */
-const testingType = window.extraEnvVariables.TEST_ENV
+const testingType = window.faContentBridgeAPIs.extraEnvVariables.TEST_ENV
 
+/**
+  * Data input for the component
+  * - If testing type is "components", use test data, otherwise use prop data
+  */
 const componentData = computed(() => {
   if (testingType === 'components') {
     return testData

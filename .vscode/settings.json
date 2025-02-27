@@ -1,10 +1,10 @@
 {
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": true,
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "editor.formatOnSave": false,
+  "editor.defaultFormatter": null,
   "editor.codeActionsOnSave": [
-    "source.fixAll.eslint"
+
   ],
   "eslint.validate": [
     "javascript",
@@ -14,10 +14,24 @@
   ],
   "typescript.tsdk": "node_modules/typescript/lib",
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": true,
+    "multiFormatter.formatterList": [
+      "dbaeumer.vscode-eslint"
+    ]
   },
   "todo-tree.tree.scanMode": "workspace",
   "[vue]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  }
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": true,
+    "multiFormatter.formatterList": [
+      "dbaeumer.vscode-eslint",
+      "stylelint.vscode-stylelint"
+    ]
+  },
 }

@@ -8,9 +8,7 @@ import minimatch from 'minimatch'
 import { WebSocketServer } from 'ws'
 import * as ipc from 'app/src-electron/electron-ipc'
 
-/**
-  * Starts the app's Electron instance
-  */
+// Starts the app's Electron instance
 export const startApp = () => {
   initialize()
 }
@@ -22,22 +20,22 @@ const PORT = 8000
   */
 export const openAppWindowManager = () => {
   // Create the app window in the normal way
-  app.whenReady().then(mainWindowCreation)
+  app.whenReady().then(() => mainWindowCreation())
   //
   // Ready the server #1
   app.whenReady().then(() => {
     const http = require('http')
     const crypto = require('crypto')
-    let webContents = null
+    //let webContents = null
     const server = http.createServer(function (req, res) {
-      if (!req.url || req.url === '/') {
+      /*if (!req.url || req.url === '/') {
         const port = crypto.randomBytes(16).toString('hex')
         ipc.once(port, function (ev, body, status = 200, head = {}) {
           res.writeHead(status, head)
           res.end(body)
         })
         webContents.send('request', port)
-      } else {
+      } else {*/
         const midfix = process.env.DEV ? '../../public' : ''
         const midfix2 = process.env.DEV ? '../../node_modules' : ''
         let Path = path.join(__dirname, midfix, req.url)
@@ -54,7 +52,7 @@ export const openAppWindowManager = () => {
         }
         res.writeHead(200, { 'Content-Length': fs.statSync(Path).size, 'Content-Type': mime.lookup(Path) })
         fs.createReadStream(Path).pipe(res)
-      }
+      //}
     })
     const wws = new WebSocketServer({ noServer: true })
     server.on('upgrade', function upgrade (request, socket, head) {
@@ -70,7 +68,7 @@ export const openAppWindowManager = () => {
       if (!state) {
         server.close()
       } else {
-        webContents = ev.sender
+        //webContents = ev.sender
         console.log('http://localhost:' + PORT)
         server.listen(PORT)
       }
@@ -99,9 +97,7 @@ export const openAppWindowManager = () => {
   })
 }
 
-/**
-  * Closes the app's Electron instance when all windows are closed
-  */
+// Closes the app's Electron instance when all windows are closed
 export const closeAppManager = (platform: string) => {
   // Close app if we are on anything that isn't Mac
   app.on('window-all-closed', () => {

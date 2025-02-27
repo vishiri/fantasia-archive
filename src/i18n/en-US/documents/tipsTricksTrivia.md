@@ -1,3 +1,6 @@
+# Tips, Tricks & Trivia
+----------
+
 - Typing `@` symbol while editing big text editor fields will allow you to link to other documents directly inside the text-editor!
 - `CTRL+SHIFT` will bring up a full-page search in case you are hunting for that particular word in the current document!
 - Any field in the document editing mode with the small dropdown arrow allows for custom values! Just close the menu of predefined values with ESC, type your desired value and confirm with `ENTER`.

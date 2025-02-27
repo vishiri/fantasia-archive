@@ -1,3 +1,6 @@
+/**
+  * Toggles the dev tools of the current window.
+  */
 export const toggleDevTools = () => {
-  window.faDevToolsControlAPI.toggleDevTools()
+  window.faContentBridgeAPIs.faDevToolsControl.toggleDevTools()
 }

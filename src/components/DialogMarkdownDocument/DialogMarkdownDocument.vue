@@ -42,8 +42,8 @@
 <script setup lang="ts">
 import { QMarkdown } from '@quasar/quasar-ui-qmarkdown'
 import '@quasar/quasar-ui-qmarkdown/dist/index.css'
-import { T_documentList } from 'app/interfaces/T_documentList'
-import { S_DialogMarkdown } from 'src/stores/S_DialogMarkdown'
+import { T_documentList } from 'app/types/T_documentList'
+import { S_DialogMarkdown } from 'src/stores/S_Dialog'
 import { onMounted, ref, watch } from 'vue'
 
 /**
@@ -111,6 +111,10 @@ onMounted(() => {
 
   &.license .q-card {
     width: 680px;
+  }
+
+  &.changeLog .q-markdown {
+    width: 100%;
   }
 
   &.changeLog .q-card {

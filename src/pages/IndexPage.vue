@@ -5,6 +5,7 @@
       <router-link to="/testeee">
         test
       </router-link>
+      <textarea />
     </div>
     <div>
       <div

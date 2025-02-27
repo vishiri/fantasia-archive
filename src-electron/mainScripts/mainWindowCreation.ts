@@ -1,28 +1,28 @@
 import { BrowserWindow, app, screen } from 'electron'
 import { enable } from '@electron/remote/main'
 import path from 'path'
+import { setupSpellChecker } from 'src-electron/mainScripts/spellChecker'
+
+export let appWindow: BrowserWindow | undefined
+
 /**
- * Prevent app to launch a secondary instance
+ * Prevents app from launching a secondary instance
  */
-const preventSecondaryAppInstance = (appWindow: BrowserWindow | undefined) => {
+export const preventSecondaryAppInstance = (appWindow: BrowserWindow | undefined) => {
   // Do not limit the window amount if we are in auto-test mode
   if (process.env.TEST_ENV && (process.env.TEST_ENV === 'components' || process.env.TEST_ENV === 'e2e')) {
     return
   }
-  /**
-   * Determines if the app is the primary instance
-   * - This exists as a variable due to the app bugging out if used directly from "app"
-   */
+
+  // Determines if the app is the primary instance
+  // - This exists as a variable due to the app bugging out if used directly from "app" (Electron bug?)
   const isPrimaryInstance = app.requestSingleInstanceLock()
 
   // Check this is NOT the primary app instance
   if (!isPrimaryInstance) {
     app.quit()
   } else {
-    /*
-      Someone tried to start a second instance. That one is closed already.
-      Our instance here (the first instance) maximizes it's own window and refocuses it.
-    */
+    // Maximize the primary app window and refocus it
     app.on('second-instance', () => {
       if (appWindow) {
         if (appWindow.isMinimized()) {
@@ -38,15 +38,11 @@ const preventSecondaryAppInstance = (appWindow: BrowserWindow | undefined) => {
   * Creates the main app window
   */
 export const mainWindowCreation = () => {
-  /**
-   * Retrieve actual display size to stop flicker/debounce that happens with "maximize" function at first
-   */
+  // Retrieve actual display size to stop flicker/debounce that happens with "maximize" function at first
   const displaySizes = screen.getPrimaryDisplay().workAreaSize
 
-  /**
-   * Initial window options
-   */
-  let appWindow: BrowserWindow | undefined = new BrowserWindow({
+  // Initial window options
+  appWindow = new BrowserWindow({
     width: displaySizes.width,
     height: displaySizes.height,
     useContentSize: true,
@@ -98,4 +94,7 @@ export const mainWindowCreation = () => {
 
   // Check if we are on the primary or secondary instance of the app
   preventSecondaryAppInstance(appWindow)
+
+  // Hook up spellchecker
+  setupSpellChecker(appWindow)
 }

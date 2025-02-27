@@ -6,7 +6,7 @@
       flat
       class="appControlMenus__inner"
     >
-      <!-- Test data menu - FOR COMPOENT TEST PURPOSES ONLY -->
+      <!-- Test data menu - FOR COMPONENT TEST PURPOSES ONLY -->
       <AppControlSingleMenu
         v-if="testingType === 'components'"
         :data-input="testData"
@@ -45,12 +45,13 @@
 
     <!-- Dialog Popups -->
     <DialogMarkdownDocument />
+    <DialogAboutFantasiaArchive />
   </div>
 </template>
 
 <script setup lang="ts">
 
-import { testData } from 'app/src/components/AppControlMenus/_testData/test.raw.component'
+import { testData } from './tests/_testData'
 
 import { project } from 'app/src/components/AppControlMenus/_data/project'
 import { documents } from 'app/src/components/AppControlMenus/_data/documents'
@@ -59,11 +60,12 @@ import { helpInfo } from 'app/src/components/AppControlMenus/_data/helpInfo'
 
 import AppControlSingleMenu from 'app/src/components/AppControlMenus/AppControlSingleMenu/AppControlSingleMenu.vue'
 import DialogMarkdownDocument from 'app/src/components/DialogMarkdownDocument/DialogMarkdownDocument.vue'
+import DialogAboutFantasiaArchive from 'app/src/components/DialogAboutFantasiaArchive/DialogAboutFantasiaArchive.vue'
 
 /**
- * Testing type currently possibly happening
+ * Testing type that might be happening right now
  */
-const testingType = window.extraEnvVariables.TEST_ENV
+const testingType = window.faContentBridgeAPIs.extraEnvVariables.TEST_ENV
 
 </script>
 

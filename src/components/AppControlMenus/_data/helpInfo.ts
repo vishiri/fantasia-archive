@@ -1,10 +1,10 @@
 import { i18n } from 'app/src/i18n/externalFileLoader'
 
-import { I_appMenusDataList } from 'app/interfaces/I_appMenusDataList'
+import { I_appMenusDataList } from 'app/types/I_appMenusDataList'
 
 // TODO - add functionality for all buttons and conditions
 import { toggleDevTools } from 'app/src/scripts/appInfo/toggleDevTools'
-import { openDialogMarkdownDocument } from 'app/src/scripts/appInfo/openDialogMarkdownDocument'
+import { openDialogComponent, openDialogMarkdownDocument } from 'app/src/scripts/appInfo/openDialogMarkdownDocument'
 
 export const helpInfo: I_appMenusDataList = {
   title: i18n.global.t('AppControlMenus.helpInfo.title'),
@@ -14,7 +14,8 @@ export const helpInfo: I_appMenusDataList = {
       text: i18n.global.t('AppControlMenus.helpInfo.items.showKeybindsCheatsheet'),
       icon: 'mdi-keyboard-settings',
       submenu: undefined,
-      trigger: undefined,
+      trigger: openDialogComponent,
+      triggerArguments: [''],
       conditions: true,
       specialColor: undefined
     },
@@ -52,10 +53,11 @@ export const helpInfo: I_appMenusDataList = {
     },
     {
       mode: 'item',
-      text: i18n.global.t('AppControlMenus.helpInfo.items.aboutFantsiaArchive'),
+      text: i18n.global.t('AppControlMenus.helpInfo.items.aboutFantasiaArchive'),
       icon: 'mdi-information-variant',
       submenu: undefined,
-      trigger: undefined,
+      trigger: openDialogComponent,
+      triggerArguments: ['AboutFantasiaArchive'],
       conditions: true,
       specialColor: undefined
     },

@@ -1,11 +1,12 @@
 import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
-  workers: 3,
+  workers: 1,
   fullyParallel: false,
   testMatch: '**/*playwright.@(spec|test).?(c|m)[jt]s?(x)',
+  expect: { timeout: 3_000 },
   reporter: [
     ['list'],
-    ['json', { outputFile: 'test-results/test-results.json' }]
+    ['html', { outputFolder: 'test-results/playwright-report', open: 'never' }]
   ]
 })
