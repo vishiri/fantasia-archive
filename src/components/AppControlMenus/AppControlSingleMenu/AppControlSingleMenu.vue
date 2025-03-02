@@ -128,7 +128,7 @@
 // TODO - ADD TESTS
 
 import { I_appMenusDataList } from 'app/types/I_appMenusDataList'
-import { testData } from '../tests/_testData'
+import { testData } from './tests/_testData'
 import { computed } from 'vue'
 
 /**
