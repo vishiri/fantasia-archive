@@ -3,6 +3,7 @@
     :class="['socialContactSingleButton', buttonData.cssClass]"
     :title="buttonData.title"
     :href="buttonData.url"
+    data-test="socialContactSingleButton"
     no-caps
   >
     <div class="row items-center no-wrap">
@@ -12,8 +13,12 @@
         fit="contain"
         :width="`${buttonData.width}px`"
         :height="`${buttonData.height}px`"
+        data-test="socialContactSingleButton-image"
       />
-      <div class="text-no-wrap socialContactSingleButton__text">
+      <div
+        class="text-no-wrap socialContactSingleButton__text"
+        data-test="socialContactSingleButton-text"
+      >
         {{ buttonData.label }}
       </div>
     </div>
@@ -22,6 +27,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { testData } from './tests/_testData'
 
 import { I_socialContactButton } from 'app/types/I_socialContactButtons'
 
@@ -41,13 +47,17 @@ const props = defineProps<{
 const testingType = window.faContentBridgeAPIs.extraEnvVariables.TEST_ENV
 
 /**
+ * Testing component name currently being tested
+ */
+const testingComponent = window.faContentBridgeAPIs.extraEnvVariables.COMPONENT_NAME
+
+/**
   * Data input for the component
   * - If testing type is "components", use test data, otherwise use prop data
   */
 const componentData = computed(() => {
-  if (testingType === 'components') {
-    // TODO FIX THIS
-    return props.dataInput
+  if (testingType === 'components' && testingComponent === 'SocialContactSingleButton') {
+    return testData
   } else {
     return props.dataInput
   }
@@ -157,7 +167,5 @@ const buttonData = componentData.value
       color: $socialContactButtons-textColor-twitter !important;
     }
   }
-
 }
-
 </style>

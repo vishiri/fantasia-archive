@@ -7,7 +7,7 @@ import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEn
  */
 const extraEnvSettings = {
   TEST_ENV: 'components',
-  COMPONENT_NAME: 'FantasiaMascotImage',
+  COMPONENT_NAME: 'SocialContactButtons',
   COMPONENT_PROPS: JSON.stringify({})
 }
 
@@ -26,15 +26,16 @@ const faFrontendRenderTimer:number = extraEnvVariablesAPI.FA_FRONTEND_RENDER_TIM
  * Object of string data selectors for the component
  */
 const selectorList = {
-  image: 'fantasiaMascotImage-image'
+  buttonListWrapper: 'socialContactButtons',
+  singleButton: 'socialContactSingleButton',
+  singleButtonImage: 'socialContactSingleButton-image',
+  singleButtonText: 'socialContactSingleButton-text'
 }
 
 /**
- * Check if the wrapper contains 'IMG' element
+ * Check if the wrapper for all of the buttons exists
  */
-test('Check if the wrapper contains "IMG" element', async () => {
-  const testString = 'IMG'
-
+test('Check if the main button wrapper exists', async () => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
     args: [electronMainFilePath]
@@ -44,30 +45,19 @@ test('Check if the wrapper contains "IMG" element', async () => {
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the selector for the tested element
-  const imageElement = appWindow.locator(`[data-test="${selectorList.image}"]`)
+  const buttonWrapperLocator = appWindow.locator(`[data-test="${selectorList.buttonListWrapper}"]`)
 
   // Check if the tested element exists
-  expect(imageElement).toHaveCount(1)
-
-  // Get the element's tag name
-  const elementType = await imageElement.evaluate(el => el.tagName)
-
-  // Check if the tested element is an 'IMG' element
-  expect(elementType).toBe(testString)
+  await expect(buttonWrapperLocator).toHaveCount(1)
 
   // Close the app
   await electronApp.close()
 })
 
 /**
- * Attempt to pass "width" and "height" prop to the component and check the results
+ * Check if we have the proper amount of buttons on the page
  */
-test('Visually check for proper sizing of the icon', async () => {
-  const testStringWidth = '300px'
-  const testStringHeight = '300px'
-
-  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ width: testStringWidth, height: testStringHeight })
-
+test('Check if we have the proper amount of buttons on the page', async () => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
     args: [electronMainFilePath]
@@ -77,34 +67,29 @@ test('Visually check for proper sizing of the icon', async () => {
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the selector for the tested element
-  const imageElement = appWindow.locator(`[data-test="${selectorList.image}"]`)
+  const buttonWrapperLocator = appWindow.locator(`[data-test="${selectorList.buttonListWrapper}"]`)
 
   // Check if the tested element exists
-  expect(imageElement).toHaveCount(1)
+  await expect(buttonWrapperLocator).toHaveCount(1)
 
-  const imageBoxData = await imageElement.boundingBox() as unknown as { width: number, height: number }
+  // Prepare the expected amount of buttons
+  const expectedButtonCountData = await buttonWrapperLocator.evaluate(el => el.dataset.testButtonNumber)
+  const expectedButtonCount = parseInt(expectedButtonCountData || '0')
 
-  // Test if the tested element isn't invisisble for some reason
-  expect(imageBoxData).not.toBe(null)
+  // Prepare the selector for the tested elements
+  const buttonsSelectorLocator = appWindow.locator(`[data-test="${selectorList.singleButton}"]`)
 
-  // Test for proper width
-  const roundedImageWidth = Math.round(imageBoxData.width)
-  const roundedTestStringWidth = Math.round(parseInt(testStringWidth))
-  expect(roundedImageWidth).toBe(roundedTestStringWidth)
-
-  // Test for proper height
-  const roundedImageHeight = Math.round(imageBoxData.height)
-  const roundedTestStringHeight = Math.round(parseInt(testStringHeight))
-  expect(roundedImageHeight).toBe(roundedTestStringHeight)
+  // Check if the tested element exists
+  await expect(buttonsSelectorLocator).toHaveCount(expectedButtonCount)
 
   // Close the app
   await electronApp.close()
 })
 
 /**
- * Test if the component properly determines if the image will be random - YES
+ * Check if each button is unique (class comparing)
  */
-test('Check if the image is random: YES', async () => {
+test('Check if each button is unique', async () => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
     args: [electronMainFilePath]
@@ -114,48 +99,27 @@ test('Check if the image is random: YES', async () => {
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the selector for the tested element
-  const imageElement = appWindow.locator(`[data-test="${selectorList.image}"]`)
+  const buttonWrapperLocator = appWindow.locator(`[data-test="${selectorList.buttonListWrapper}"]`)
 
   // Check if the tested element exists
-  expect(imageElement).toHaveCount(1)
+  await expect(buttonWrapperLocator).toHaveCount(1)
 
-  // Check if the tested element is random
-  const isRandom = await imageElement.evaluate(el => el.dataset.testIsRandom)
-  expect(isRandom).toBe('true')
+  // Prepare an emptyu list of stringified button classes
+  const buttonClassList: string[] = []
 
-  // Close the app
-  await electronApp.close()
-})
+  // Prepare the expected list of buttons
+  const buttonList = await appWindow.locator(`[data-test="${selectorList.singleButton}"]`)
 
-/**
- * Test if the component properly determines if the image will be random - NO
- */
-test('Check if the image is random: NO', async () => {
-  const testString = 'flop'
+  // Assign stringified button classes to the list
+  for (let i = 0; i < await buttonList.count(); i++) {
+    buttonClassList.push(await buttonList.nth(i).evaluate(el => el.classList.toString()))
+  }
 
-  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ fantasiaImage: testString })
+  // Check if any of the buttons has a duplicate class
+  const hasDuplicateClass = new Set(buttonClassList).size !== buttonClassList.length
 
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath]
-  })
-
-  const appWindow = await electronApp.firstWindow()
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
-
-  // Prepare the selector for the tested element
-  const imageElement = appWindow.locator(`[data-test="${selectorList.image}"]`)
-
-  // Check if the tested element exists
-  expect(imageElement).toHaveCount(1)
-
-  // Check if the tested element is not random
-  const isRandom = await imageElement.evaluate(el => el.dataset.testIsRandom)
-  expect(isRandom).toBe('false')
-
-  // Check if the tested element has the correct image
-  const imageString = await imageElement.evaluate(el => el.dataset.testImage)
-  expect(imageString).toBe(testString)
+  // Check if the ducplicate class test passed or failed
+  expect(hasDuplicateClass).not.toBeTruthy()
 
   // Close the app
   await electronApp.close()

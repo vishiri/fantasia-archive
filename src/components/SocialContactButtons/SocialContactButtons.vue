@@ -1,6 +1,10 @@
 <template>
   <!-- Outer wrapper of the social contact buttons -->
-  <div class="socialContactButtons">
+  <div
+    class="socialContactButtons"
+    data-test="socialContactButtons"
+    :data-test-button-number="buttonListLength"
+  >
     <div class="row justify-center">
       <div class="q-gutter-x-lg q-mt-lg">
         <SocialContactSingleButton :data-input="buttonList.buttonPatreon" />
@@ -29,6 +33,8 @@
 import { buttonList } from './_data/buttons'
 
 import SocialContactSingleButton from 'app/src/components/SocialContactButtons/SocialContactSingleButton/SocialContactSingleButton.vue'
+
+const buttonListLength = Object.keys(buttonList).length
 
 </script>
 
