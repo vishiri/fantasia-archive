@@ -4,6 +4,7 @@
   "description": "A worldbuilding database manager",
   "productName": "Fantasia Archive",
   "author": "Vishiri <vishiri.rilgatan@gmail.com>",
+  "license": "GPL-3.0",
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
