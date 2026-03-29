@@ -1,0 +1,38 @@
+---
+description: BEM class names and scoped SCSS in Vue single-file components
+globs: "**/*.vue"
+alwaysApply: false
+---
+
+# Vue SFC — BEM and scoped SCSS
+
+This rule covers **CSS class naming** and **`<style lang="scss">`** only. It does not cover `data-test` attributes (see [vue-template-test-hooks.mdc](vue-template-test-hooks.mdc)) or `<script setup>` structure (see [vue-quasar.mdc](vue-quasar.mdc)).
+
+## Block and element classes (template)
+
+Follow components such as [GlobalWindowButtons.vue](src/components/GlobalWindowButtons/GlobalWindowButtons.vue) and [AppControlMenus.vue](src/components/AppControlMenus/AppControlMenus.vue):
+
+- **Block**: one root class per component, lowerCamelCase (e.g. `globalWindowButtons`, `appControlMenus`).
+- **Elements**: `blockName__element` (double underscore), e.g. `globalWindowButtons__button`, `globalWindowButtons__minimize`, `appControlMenus__inner`.
+- **Quasar / utilities**: keep existing Quasar props and utility classes (`flat`, `bg-dark`, etc.) on the same nodes when the codebase already combines them with BEM classes.
+
+Use **HTML comments** in the template to group sections (buttons, tooltips, regions) the way existing components do.
+
+## Scoped SCSS
+
+- Prefer `<style lang="scss" scoped>` unless unscoped styles are intentional for that file (match neighboring components in the feature).
+- Nest element rules under the block with the parent selector:
+
+```scss
+.appControlMenus {
+  &__inner {
+    -webkit-app-region: no-drag;
+  }
+}
+```
+
+- Avoid deep nesting; prefer extra element classes over long compound selectors.
+
+## Global / shared styles
+
+Cross-app SCSS lives under [src/css](src/css) — see [project-scss.mdc](project-scss.mdc). Component-specific BEM stays in the SFC.

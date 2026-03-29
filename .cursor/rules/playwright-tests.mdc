@@ -1,0 +1,80 @@
+---
+description: Playwright component and E2E test structure matching Fantasia Archive conventions
+globs: "**/*playwright*.ts"
+alwaysApply: false
+---
+
+# Playwright tests (`*.playwright.test.ts` / `*.playwright.spec.ts`)
+
+## Preconditions
+
+- Run against a **production Electron build** after relevant source changes (`yarn build` / `quasar build -m electron`). See [README.md](README.md).
+- [playwright.config.ts](playwright.config.ts): `workers: 1`, `fullyParallel: false`, `testMatch` includes both `*.playwright.test.ts` and `*.playwright.spec.ts`.
+
+## Vue templates (hooks for locators)
+
+Attributes such as `data-test` and the menu-specific `data-test-test-menu` / `data-test-any-menu` are defined in **`.vue` files** — follow [vue-template-test-hooks.mdc](vue-template-test-hooks.mdc) when adding or renaming them. This rule covers the **TypeScript test files** only.
+
+## File locations
+
+| Kind | Path pattern |
+|------|----------------|
+| Component | `src/components/<Component>/tests/*.playwright.test.ts` (or nested component folder + `tests/`) |
+| E2E | `e2e-tests/*.playwright.spec.ts` |
+
+## Import order (top of file)
+
+1. `import { _electron as electron } from 'playwright'`
+2. `import { test, expect } from '@playwright/test'`
+3. `import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'`
+4. Optional: `./_testData`, types from `app/types/...`, shared helpers from `src/scripts/_utilities/...` (e.g. [AppControlSingleMenu.playwright.test.ts](src/components/AppControlMenus/AppControlSingleMenu/tests/AppControlSingleMenu.playwright.test.ts))
+
+## File header — documented constants
+
+Repeat this structure in **every** Playwright file (see [GlobalWindowButtons.playwright.test.ts](src/components/GlobalWindowButtons/tests/GlobalWindowButtons.playwright.test.ts), [checkAppSplashScreen.playwright.spec.ts](e2e-tests/checkAppSplashScreen.playwright.spec.ts)):
+
+1. **`extraEnvSettings`** — JSDoc: `Extra env settings to trigger component testing via Playwright` **or** `...E2E...` for e2e.
+   - **Component**: `TEST_ENV: 'components'`, `COMPONENT_NAME: '<Name>'` (must match the component the harness loads), `COMPONENT_PROPS: JSON.stringify({})` or updated per test.
+   - **E2E**: `TEST_ENV: 'e2e'` only ([checkAppSplashScreen.playwright.spec.ts](e2e-tests/checkAppSplashScreen.playwright.spec.ts)).
+
+2. **`electronMainFilePath`** — JSDoc `Electron main filepath`; type `string`; value `extraEnvVariablesAPI.ELECTRON_MAIN_FILEPATH`.
+
+3. **`faFrontendRenderTimer`** — JSDoc explaining render buffer; usually `extraEnvVariablesAPI.FA_FRONTEND_RENDER_TIMER` for components; e2e files may use a **numeric literal** (e.g. `0` or `1000`) when documented in that file.
+
+4. **`selectorList`** — JSDoc `Object of string data selectors` (component) or `...for the e2e` (e2e). Keys are camelCase; values are the exact `data-test` strings, visible labels for `getByText`, etc.
+
+5. **Extra timers** — Only when needed (e.g. [checkDevToolsFunctionality.playwright.spec.ts](e2e-tests/checkDevToolsFunctionality.playwright.spec.ts) `menuAnimationTimer = 600`; splash screen timeout local `testSplashscreenTimeout` in test).
+
+## Each `test(...)`
+
+- Precede with a **JSDoc block** describing behavior (one summary paragraph), matching existing tone.
+- **Title**: readable sentence (often starts with `Check if ...`, `Test if ...`, `Click ...`, `Open ...`).
+- **Body pattern**:
+  1. Optionally mutate `extraEnvSettings` (e.g. `COMPONENT_PROPS`) before launch — [FantasiaMascotImage.playwright.test.ts](src/components/FantasiaMascotImage/tests/FantasiaMascotImage.playwright.test.ts).
+  2. `const electronApp = await electron.launch({ env: extraEnvSettings, args: [electronMainFilePath] })`
+  3. `const appWindow = await electronApp.firstWindow()`
+  4. `await appWindow.waitForTimeout(faFrontendRenderTimer)` (or 0 / other agreed wait)
+  5. `// Prepare the ... locator` — use `appWindow.locator` with a template string and `selectorList` values (same pattern as [GlobalWindowButtons.playwright.test.ts](src/components/GlobalWindowButtons/tests/GlobalWindowButtons.playwright.test.ts)), or `getByText` with `selectorList` entries ([checkDevToolsFunctionality.playwright.spec.ts](e2e-tests/checkDevToolsFunctionality.playwright.spec.ts))
+  6. `// Check if ...` — `await expect(...).toHaveCount(1)` or equivalent
+  7. Interactions, `waitForTimeout` for animations (often `600` ms for menus), `appWindow.evaluate` for `window.faContentBridgeAPIs...` when needed
+  8. `// Close the app` then `await electronApp.close()` — **always** close the app at the end of the test (including early returns after failure paths if the file already uses that pattern — [checkAppSplashScreen.playwright.spec.ts](e2e-tests/checkAppSplashScreen.playwright.spec.ts))
+
+## Locators
+
+- **Default**: `[data-test="${selectorList.key}"]` for stable hooks aligned with Vue `data-test` attributes.
+- **Special attributes**: use exactly what the component sets, e.g. `[data-test-test-menu="..."]` ([AppControlMenus.playwright.test.ts](src/components/AppControlMenus/tests/AppControlMenus.playwright.test.ts)).
+- **E2E by label**: `getByText` with strings from `selectorList` when testing real menu copy ([checkDevToolsFunctionality.playwright.spec.ts](e2e-tests/checkDevToolsFunctionality.playwright.spec.ts)).
+
+## Shared test data
+
+- Colocate **`_testData.ts`** next to the Playwright file when feeding structured props (typed, e.g. `I_appMenusDataList`) — [AppControlSingleMenu/tests/_testData.ts](src/components/AppControlMenus/AppControlSingleMenu/tests/_testData.ts).
+
+## Assertions
+
+- Prefer `await expect(locator).toHaveCount(1)` before clicks.
+- Use `expect` (non-async) for plain values from `evaluate` when the codebase does ([GlobalWindowButtons.playwright.test.ts](src/components/GlobalWindowButtons/tests/GlobalWindowButtons.playwright.test.ts) — note existing mix of `await expect` vs `expect` on locators; **follow the immediate surrounding file** for new tests in that folder).
+
+## Do not
+
+- Do not introduce `test.describe` groups unless you migrate the whole suite — **existing files use flat `test` only**.
+- Do not change `COMPONENT_NAME` / env contract without updating the component testing harness and docs.

@@ -1,0 +1,55 @@
+---
+description: Vitest file layout, documentation, and test style for Fantasia Archive
+globs: "**/*.vitest.test.ts"
+alwaysApply: false
+---
+
+# Vitest tests (`*.vitest.test.ts`)
+
+## Placement and discovery
+
+- Files must match [vitest.config.mts](vitest.config.mts): `**/*vitest.@(spec|test).?(c|m)[jt]s?(x)` — this repo uses **`*.vitest.test.ts`**.
+- Co-locate tests under a **`tests/`** directory next to the code under test, e.g. [src-electron/contentBridgeAPIs/tests](src-electron/contentBridgeAPIs/tests), [src-electron/mainScripts/tests](src-electron/mainScripts/tests).
+
+## Imports
+
+- From `vitest`: import only what you need — `test`, `expect`, `vi`, `expectTypeOf` (see [tweaks.vitest.test.ts](src-electron/mainScripts/tests/tweaks.vitest.test.ts), [fixAppName.vitest.test.ts](src-electron/mainScripts/tests/fixAppName.vitest.test.ts)).
+- **SUT** (system under test): relative import from the parent folder, e.g. `import { appDetailsAPI } from '../appDetailsAPI'`.
+- **JSON**: `import packageJSON from '../../../package.json' assert { type: 'json' }` when comparing to package metadata ([fixAppName.vitest.test.ts](src-electron/mainScripts/tests/fixAppName.vitest.test.ts)).
+- **Node / app paths**: e.g. `import os from 'os'` only when the test mirrors runtime behavior.
+
+## Documenting each test block
+
+Use a **JSDoc comment immediately above** `test` or `test.skip`:
+
+1. **First line**: name of the function, API export, or concern (e.g. `determineAppName`, `checkIfExternal`, `startApp`).
+2. **Following lines**: scenario, expected behavior, or why the test is skipped.
+
+Examples in the codebase:
+
+- Runnable case: [faExternalLinksManagerAPI.vitest.test.ts](src-electron/contentBridgeAPIs/tests/faExternalLinksManagerAPI.vitest.test.ts) — each `test(...)` is preceded by `checkIfExternal` and a short scenario line.
+- Skipped Electron-only: [appManagement.vitest.test.ts](src-electron/mainScripts/tests/appManagement.vitest.test.ts) — `test.skip('...')` with JSDoc explaining that Electron must be running.
+
+## `test` titles
+
+- Use a single **sentence-style string** starting with `Test ...` / `Test if ...` / `Test that ...` / `Test for ...`, matching existing files.
+
+## Runnable tests
+
+- Use `expect(...)`, `expect(...).toBeTypeOf('string')`, `toContain`, etc., as in [appDetailsAPI.vitest.test.ts](src-electron/contentBridgeAPIs/tests/appDetailsAPI.vitest.test.ts) and [extraEnvVariables.vitest.test.ts](src-electron/contentBridgeAPIs/tests/extraEnvVariables.vitest.test.ts).
+- Use `vi.stubEnv` for environment-dependent behavior ([fixAppName.vitest.test.ts](src-electron/mainScripts/tests/fixAppName.vitest.test.ts)).
+- Use `vi.mock(...)` when mocking modules (same files as above).
+- Use `expectTypeOf` when asserting type-level consistency ([tweaks.vitest.test.ts](src-electron/mainScripts/tests/tweaks.vitest.test.ts)).
+
+## Skipped tests (`test.skip`)
+
+- When behavior **requires a live Electron app** or is explicitly deemed untestable in Vitest, use `test.skip` with the same JSDoc pattern and a clear title (see [faWindowControlAPI.vitest.test.ts](src-electron/contentBridgeAPIs/tests/faWindowControlAPI.vitest.test.ts), [spellChecker.vitest.test.ts](src-electron/mainScripts/tests/spellChecker.vitest.test.ts), [windowsDevToolsExtensionsFix.vitest.test.ts](src-electron/mainScripts/tests/windowsDevToolsExtensionsFix.vitest.test.ts)).
+
+## File-level notes
+
+- Optional **multi-line block comment** at the top of a file for scope notes (e.g. "Nothing else to test here") — see [extraEnvVariables.vitest.test.ts](src-electron/contentBridgeAPIs/tests/extraEnvVariables.vitest.test.ts).
+
+## Do not
+
+- Do not switch to `describe()` blocks unless the rest of the suite starts using them — **current suites use flat `test` / `test.skip` only**.
+- Do not rename `*.vitest.test.ts` — Vitest discovery depends on it.

@@ -1,0 +1,23 @@
+---
+description: Conventional commit messages and logical multi-commit workflow when working with Git
+alwaysApply: true
+---
+
+# Git — conventional commits
+
+- **Format**: `type: imperative subject` — lowercase type, **space after colon**, no period at end of subject; body optional for context.
+- **Allowed types** (use the narrowest fit): `feat`, `fix`, `test`, `chore`, `refactor`, `style`, `docs`.
+- **Split commits** by logical concern (feature vs tests vs tooling vs docs vs style-only). Do not mix unrelated changes in one commit.
+- When the user asks for **staged commits** or **approval per commit**: follow the full workflow in [git-conventional-commits skill](../skills/git-conventional-commits/SKILL.md) — propose each commit, wait for explicit approval, then run `git add` + `git commit` for that chunk only.
+
+## Type cheat sheet
+
+| Type | Use for |
+|------|---------|
+| `feat` | New user-facing behavior or capability |
+| `fix` | Bug fixes |
+| `test` | Tests only (Vitest, Playwright, test harness) |
+| `chore` | Tooling, deps, config, housekeeping without product behavior change |
+| `refactor` | Behavior-preserving code structure changes |
+| `style` | Formatting, whitespace, lint autofix — no logic change |
+| `docs` | README, comments meant as documentation, AGENTS/rules/skills text |

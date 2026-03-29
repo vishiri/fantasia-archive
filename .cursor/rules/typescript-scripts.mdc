@@ -1,0 +1,29 @@
+---
+description: Structure and extraction for shared TypeScript under src/scripts and related app utilities
+globs: "src/scripts/**/*.ts"
+alwaysApply: false
+---
+
+# `src/scripts` — modules and extraction
+
+Vue SFCs import from here when extracting **pure helpers**; see when to split script logic in [vue-quasar.mdc](vue-quasar.mdc). **Colocated component `_data/`** is not under `src/scripts/` — keep typed menu/config blobs next to the feature (vue-quasar).
+
+## Layout
+
+- **`_utilities/`** — small, pure helpers (format conversion, parsing) with **JSDoc on each exported function** (`@param` / `@returns` where helpful), e.g. [colorFormatConvertors.ts](src/scripts/_utilities/colorFormatConvertors.ts).
+- **Feature folders** (e.g. `appInfo/`) — behavior tied to app features; keep files focused on one area.
+- Leading underscore on folder names like `_utilities` signals shared non-feature helpers.
+
+## When to split a file
+
+If a single `.ts` file grows hard to scan (long functions, many exports, or mixed abstraction levels):
+
+1. **Group by domain** — e.g. color helpers vs list/array helpers; avoid one mega `utils.ts`.
+2. **Move reusable pure functions** into `_utilities/` with clear names.
+3. **Keep Electron/renderer boundaries clear** — code that assumes `window` or `faContentBridgeAPIs` belongs next to the feature that uses it, not in generic utilities unless already established.
+
+## Style
+
+- Match existing import style (`app/...` alias where the repo already uses it).
+- Prefer explicit return types on public exports when surrounding code does.
+- No test files in `src/scripts/`; tests live next to consumers or under `src-electron/**/tests/` / Playwright paths per project rules.

@@ -1,0 +1,18 @@
+---
+description: Global and Quasar SCSS partials under src/css
+globs: "src/css/**/*.scss"
+alwaysApply: false
+---
+
+# Project-level SCSS (`src/css`)
+
+## Entry and variables
+
+- [app.scss](src/css/app.scss) pulls in Quasar extras and [globals](src/css/globals/) partials; keep new global rules in an appropriate file under `globals/` rather than inflating `app.scss`.
+- [quasar.variables.scss](src/css/quasar.variables.scss) is the place for Quasar theme variables; prefer variables over hard-coded colors in partials when aligning with Quasar.
+
+## Conventions
+
+- **Partials** in `globals/` are focused: scrollbar, html tweaks, component adjustments, custom colors — follow that separation when adding new cross-app styling.
+- Prefer **low-specificity** selectors and avoid deep nesting unless mirroring an existing pattern in the same file.
+- Component-specific BEM and scoped styles belong in **Vue SFCs** ([vue-bem-scss.mdc](vue-bem-scss.mdc)), not in `src/css/`, unless the team already uses a global override file for that concern.

@@ -1,0 +1,12 @@
+---
+description: Electron main/preload boundaries and content bridge APIs for Fantasia Archive
+globs: "src-electron/**/*.ts"
+alwaysApply: false
+---
+
+# Electron preload and main
+
+- Expose renderer-facing capabilities only through `contextBridge` in `electron-preload.ts` as properties of `window.faContentBridgeAPIs`.
+- Implement API objects in `src-electron/contentBridgeAPIs/` and extend `src/globals.d.ts` plus `types/I_*.ts` when adding or changing shapes.
+- Do not widen renderer `nodeIntegration` or expose raw `require`/`ipcRenderer` wholesale to fix shortcuts.
+- Prefer narrow, typed methods; add Vitest tests under `contentBridgeAPIs/tests/` when behavior is non-trivial.

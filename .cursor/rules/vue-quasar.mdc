@@ -1,0 +1,36 @@
+---
+description: Vue 3 Composition API, Quasar UI, i18n, and script organization in SFCs
+globs: "**/*.vue"
+alwaysApply: false
+---
+
+# Vue and Quasar
+
+## UI and framework
+
+- Use Vue 3 **Composition API** (`<script setup>`) consistent with existing components.
+- Prefer **Quasar** (`q-*`) components and spacing/typography patterns from sibling files in the same area.
+- Keep **user-visible copy** in i18n (`src/i18n`) when keys already exist — extend locale modules rather than hardcoding strings in templates.
+
+## After UI changes
+
+- Run `yarn lint`; add or update **Playwright** component tests where the project already tests similar UI (see [fantasia-testing](../skills/fantasia-testing/SKILL.md) skill).
+
+## `<script setup>` — documentation and size
+
+- Add a short **JSDoc block** above each significant function (`/** ... */`), as in [GlobalWindowButtons.vue](src/components/GlobalWindowButtons/GlobalWindowButtons.vue).
+
+### When the script section grows
+
+1. **Static structured data** (menus, config-shaped objects): colocate under the feature in a **`_data/`** folder (e.g. [AppControlMenus/_data](src/components/AppControlMenus/_data/)) and import into the SFC.
+2. **Pure, reusable helpers** (no Vue instance, no template-specific state): move to **`src/scripts/`** and follow [typescript-scripts.mdc](typescript-scripts.mdc) (JSDoc, single responsibility per file).
+3. **Composable-style or feature-specific logic**: keep a dedicated module under `src/scripts/<feature>/` or next to the feature if that matches existing patterns; avoid unrelated exports in one file.
+
+## Related rules (by concern)
+
+| Concern | Rule |
+|--------|------|
+| BEM classes, scoped SCSS | [vue-bem-scss.mdc](vue-bem-scss.mdc) |
+| `data-test` / test hooks on elements | [vue-template-test-hooks.mdc](vue-template-test-hooks.mdc) |
+| Global SCSS, Quasar variables | [project-scss.mdc](project-scss.mdc) |
+| Playwright test **files** | [playwright-tests.mdc](playwright-tests.mdc) |
