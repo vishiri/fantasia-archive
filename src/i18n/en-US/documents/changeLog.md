@@ -1,6 +1,12 @@
 # Changelog
 ----------
 
+## 2.1.0 - Tooling and AI-assisted development
+
+### New features
+- Cursor project rules and skills for Vue/Quasar, BEM and scoped SCSS, Playwright and Vitest, Electron preload, global SCSS, conventional Git commits, and en-US changelog upkeep tied to the app version.
+- AGENTS.md as the project entry point for AI-assisted development.
+
 ## 2.0.0 - The Big Rewrite
 
 ### New features
