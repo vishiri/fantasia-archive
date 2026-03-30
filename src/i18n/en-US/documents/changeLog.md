@@ -11,6 +11,8 @@
 - Fixed trigger callback typing mismatches in help menu data by wrapping typed handlers in zero-argument callbacks compatible with generic menu trigger signatures.
 - Normalized typo-prone comments and wording across component tests, E2E tests, and selected source files for consistent naming and grammar.
 - Updated README test command examples to match actual script names and usage patterns in `package.json`.
+- Separated Playwright artifact output from the HTML report folder in `playwright.config.ts` to remove reporter output-directory clash warnings.
+- Re-aligned testing guidance to keep `yarn test:unit` as the baseline unit-test workflow in project docs and Cursor guidance files.
 
 ## 2.2.0 - Testing and agent tooling
 

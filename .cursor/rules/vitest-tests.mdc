@@ -6,6 +6,11 @@ alwaysApply: false
 
 # Vitest tests (`*.vitest.test.ts`)
 
+## Running and reports
+
+- Baseline verification command: `yarn test:unit` (required for commit flows).
+- JSON report output is written to `test-results/vitest-report/test-results-vitest.json` for machine-readable tooling.
+
 ## Placement and discovery
 
 - Files must match [vitest.config.mts](vitest.config.mts): `**/*vitest.@(spec|test).?(c|m)[jt]s?(x)` — this repo uses **`*.vitest.test.ts`**.

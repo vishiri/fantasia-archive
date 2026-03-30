@@ -62,7 +62,7 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 
 ## Testing expectations
 
-- **Vitest** for unit coverage (including many `src-electron` modules). Follow [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc) so new files match existing `*.vitest.test.ts` style.
+- **Vitest** for unit coverage (including many `src-electron` modules). Use `yarn test:unit` for baseline verification. Follow [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc) so new files match existing `*.vitest.test.ts` style.
 - **Playwright** requires a **production build** before runs when source affecting the app has changed. Follow [playwright-tests.mdc](.cursor/rules/playwright-tests.mdc) for test sources; use [vue-template-test-hooks.mdc](.cursor/rules/vue-template-test-hooks.mdc) when changing locators in `.vue` templates. See `.cursor/skills/fantasia-testing/SKILL.md` and `README.md`.
 
 ## Suggested Cursor agent profiles (manual presets)
