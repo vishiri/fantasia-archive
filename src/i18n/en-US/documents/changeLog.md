@@ -6,6 +6,11 @@
 ### New features
 - Refactored shared menu and dialog/document type declarations into clearer singular and collection naming while preserving the `I_` / `T_` prefix conventions.
 - Added reusable menu item and submenu type building blocks to keep menu configuration typing easier to maintain.
+- Expanded renderer-side Vitest coverage under `src/` for scripts and store state transitions using deterministic mocks.
+- Added a tracked renderer test-strategy inventory under `.cursor/plans/` to map `src/` TS/Vue targets across Vitest and Playwright responsibilities.
+- Split Vitest into a Node/core config and a jsdom components config with shared setup so `yarn test:unit` covers boot, i18n, scripts, stores, and colocated smoke tests for every `src/components/*.vue`.
+- Colocated `AppControlSingleMenu` and `SocialContactSingleButton` as top-level components (paths and imports updated).
+- Routed initial navigation through a dedicated `appStartupRouting` helper consumed from `App.vue`.
 
 ### Bugfixes & Optimizations
 - Fixed trigger callback typing mismatches in help menu data by wrapping typed handlers in zero-argument callbacks compatible with generic menu trigger signatures.
@@ -13,6 +18,9 @@
 - Updated README test command examples to match actual script names and usage patterns in `package.json`.
 - Separated Playwright artifact output from the HTML report folder in `playwright.config.ts` to remove reporter output-directory clash warnings.
 - Re-aligned testing guidance to keep `yarn test:unit` as the baseline unit-test workflow in project docs and Cursor guidance files.
+- Clarified AGENTS/rules/skills guidance so Vitest explicitly treats both `src/` and `src-electron/` as first-class unit-testing surfaces while keeping Playwright as the integration/runtime layer.
+- Clarified test-data rules: automated-test fixtures stay inline in each `*.vitest.test.ts` / `*.playwright.test.ts`, component-testing payloads use `COMPONENT_PROPS` where possible, and embedded component-mode menu data stays inline in `AppControlMenus` for dialog triggers.
+- Resolved ESLint findings in boot external-link Vitest mocks (`Event` listener typing and padded blocks).
 
 ## 2.2.0 - Testing and agent tooling
 
