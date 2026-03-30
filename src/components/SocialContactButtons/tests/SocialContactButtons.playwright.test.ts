@@ -1,6 +1,23 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
+import type { I_socialContactButtonSet } from 'app/types/I_socialContactButtons'
+
+/**
+ * Keys exported in `_data/buttons.ts` — keep this list in sync when adding a button.
+ * Listed here (not by importing `buttons.ts`) so Playwright’s Node loader stays light.
+ */
+const socialContactButtonSetKeys: readonly (keyof I_socialContactButtonSet)[] = [
+  'buttonPatreon',
+  'buttonKofi',
+  'buttonWebsite',
+  'buttonGitHub',
+  'buttonDiscord',
+  'buttonReddit',
+  'buttonTwitter'
+]
+
+const expectedSingleButtonCount = socialContactButtonSetKeys.length
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -72,15 +89,16 @@ test('Check if we have the proper amount of buttons on the page', async () => {
   // Check if the tested element exists
   await expect(buttonWrapperLocator).toHaveCount(1)
 
-  // Prepare the expected amount of buttons
+  // Prepare the expected amount of buttons (DOM attribute must match production button list)
   const expectedButtonCountData = await buttonWrapperLocator.evaluate(el => el.dataset.testButtonNumber)
   const expectedButtonCount = parseInt(expectedButtonCountData || '0')
+  expect(expectedButtonCount).toBe(expectedSingleButtonCount)
 
   // Prepare the selector for the tested elements
   const buttonsSelectorLocator = appWindow.locator(`[data-test="${selectorList.singleButton}"]`)
 
   // Check if the tested element exists
-  await expect(buttonsSelectorLocator).toHaveCount(expectedButtonCount)
+  await expect(buttonsSelectorLocator).toHaveCount(expectedSingleButtonCount)
 
   // Close the app
   await electronApp.close()

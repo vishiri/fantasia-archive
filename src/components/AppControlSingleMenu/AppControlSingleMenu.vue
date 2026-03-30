@@ -128,7 +128,6 @@
 // TODO - ADD TESTS
 
 import { I_appMenuList } from 'app/types/I_appMenusDataList'
-import { testData } from './tests/_testData'
 import { computed } from 'vue'
 
 /**
@@ -142,21 +141,9 @@ const props = defineProps<{
 }>()
 
 /**
- * Testing type currently possibly happening
+ * Data input for the component (Playwright component mode passes `dataInput` via `COMPONENT_PROPS`.)
  */
-const testingType = window.faContentBridgeAPIs.extraEnvVariables.TEST_ENV
-
-/**
-  * Data input for the component
-  * - If testing type is "components", use test data, otherwise use prop data
-  */
-const componentData = computed(() => {
-  if (testingType === 'components') {
-    return testData
-  } else {
-    return props.dataInput
-  }
-})
+const componentData = computed(() => props.dataInput)
 
 /**
  * Determines if the input has "proper" data in it

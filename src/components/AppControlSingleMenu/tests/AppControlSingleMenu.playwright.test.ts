@@ -1,8 +1,101 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
-import { testData } from './_testData'
+import type { I_appMenuList } from 'app/types/I_appMenusDataList'
 import { rgbToHex } from 'src/scripts/_utilities/colorFormatConvertors'
+
+/**
+ * Menu payload for this spec — must match what the app receives via `COMPONENT_PROPS.dataInput`.
+ */
+const testData: I_appMenuList = {
+  title: 'Test Title',
+  data: [
+    {
+      mode: 'item',
+      text: 'Test Button 1 - Open Dialog with Markdown document',
+      icon: 'mdi-text-box-plus-outline',
+      submenu: undefined,
+      trigger: undefined,
+      triggerArguments: ['changeLog'],
+      conditions: true,
+      specialColor: undefined
+    },
+    {
+      mode: 'item',
+      text: 'Test Button 2',
+      icon: 'mdi-database-search',
+      submenu: undefined,
+      trigger: undefined,
+      conditions: true,
+      specialColor: undefined
+    },
+    {
+      mode: 'separator'
+    },
+    {
+      mode: 'item',
+      text: 'Test Button 3 - Secondary',
+      icon: 'mdi-text-box-remove-outline',
+      submenu: undefined,
+      trigger: undefined,
+      conditions: true,
+      specialColor: 'secondary'
+    },
+    {
+      mode: 'separator'
+    },
+    {
+      mode: 'item',
+      text: 'Test Button 4',
+      icon: 'mdi-page-layout-sidebar-left',
+      submenu: undefined,
+      trigger: undefined,
+      conditions: true,
+      specialColor: undefined
+    },
+    {
+      mode: 'item',
+      text: 'Test Button 5',
+      icon: 'mdi-clipboard-text-outline',
+      submenu: undefined,
+      trigger: undefined,
+      conditions: true,
+      specialColor: undefined
+    },
+    {
+      mode: 'separator'
+    },
+    {
+      mode: 'item',
+      text: 'Test Button 6 - Grey, Submenu',
+      icon: 'keyboard_arrow_right',
+      trigger: undefined,
+      conditions: true,
+      specialColor: 'grey',
+      submenu: [
+        {
+          mode: 'item',
+          text: 'Submenu-Test Button 1',
+          icon: 'mdi-folder-plus-outline',
+          trigger: undefined,
+          conditions: true,
+          specialColor: undefined
+        },
+        {
+          mode: 'separator'
+        },
+        {
+          mode: 'item',
+          text: 'Submenu-Test Button 2 - Secondary',
+          icon: 'mdi-wrench',
+          trigger: undefined,
+          conditions: true,
+          specialColor: 'secondary'
+        }
+      ]
+    }
+  ]
+}
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -10,7 +103,7 @@ import { rgbToHex } from 'src/scripts/_utilities/colorFormatConvertors'
 const extraEnvSettings = {
   TEST_ENV: 'components',
   COMPONENT_NAME: 'AppControlSingleMenu',
-  COMPONENT_PROPS: JSON.stringify({})
+  COMPONENT_PROPS: JSON.stringify({ dataInput: testData })
 }
 
 /**

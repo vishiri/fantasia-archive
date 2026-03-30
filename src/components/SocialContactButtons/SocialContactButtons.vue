@@ -32,7 +32,7 @@
 <script setup lang="ts">
 import { buttonList } from './_data/buttons'
 
-import SocialContactSingleButton from 'app/src/components/SocialContactButtons/SocialContactSingleButton/SocialContactSingleButton.vue'
+import SocialContactSingleButton from 'app/src/components/SocialContactSingleButton/SocialContactSingleButton.vue'
 
 const buttonListLength = Object.keys(buttonList).length
 

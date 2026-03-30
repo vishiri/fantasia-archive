@@ -1,7 +1,20 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
-import { testData } from './_testData'
+import type { I_socialContactButton } from 'app/types/I_socialContactButtons'
+
+/**
+ * Button payload for this spec — must match what the app receives via `COMPONENT_PROPS.dataInput`.
+ */
+const testData: I_socialContactButton = {
+  title: 'Patreon - Title',
+  label: 'Patreon - Label',
+  url: 'https://www.patreon.com/c/vishiri',
+  icon: 'patreon_logo.png',
+  width: 26,
+  height: 26,
+  cssClass: 'patreon'
+}
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -9,7 +22,7 @@ import { testData } from './_testData'
 const extraEnvSettings = {
   TEST_ENV: 'components',
   COMPONENT_NAME: 'SocialContactSingleButton',
-  COMPONENT_PROPS: JSON.stringify({})
+  COMPONENT_PROPS: JSON.stringify({ dataInput: testData })
 }
 
 /**

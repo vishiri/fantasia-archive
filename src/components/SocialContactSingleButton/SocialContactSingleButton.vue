@@ -27,7 +27,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { testData } from './tests/_testData'
 
 import { I_socialContactButton } from 'app/types/I_socialContactButtons'
 
@@ -42,28 +41,9 @@ const props = defineProps<{
 }>()
 
 /**
- * Testing type currently possibly happening
+ * Data input for the component (Playwright component mode passes `dataInput` via `COMPONENT_PROPS`.)
  */
-const testingType = window.faContentBridgeAPIs.extraEnvVariables.TEST_ENV
-
-/**
- * Testing component name currently being tested
- */
-const testingComponent = window.faContentBridgeAPIs.extraEnvVariables.COMPONENT_NAME
-
-/**
-  * Data input for the component
-  * - If testing type is "components", use test data, otherwise use prop data
-  */
-const componentData = computed(() => {
-  if (testingType === 'components' && testingComponent === 'SocialContactSingleButton') {
-    return testData
-  } else {
-    return props.dataInput
-  }
-})
-
-const buttonData = componentData.value
+const buttonData = computed(() => props.dataInput)
 
 </script>
 
