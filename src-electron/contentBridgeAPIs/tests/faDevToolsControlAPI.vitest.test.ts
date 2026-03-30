@@ -1,25 +1,82 @@
-import { test } from 'vitest'
+import { test, expect, vi, beforeEach } from 'vitest'
+import { faDevToolsControlAPI } from '../faDevToolsControlAPI'
+
+const { getFocusedWindowMock } = vi.hoisted(() => {
+  return {
+    getFocusedWindowMock: vi.fn()
+  }
+})
+
+vi.mock('@electron/remote', () => {
+  return {
+    BrowserWindow: {
+      getFocusedWindow: getFocusedWindowMock
+    }
+  }
+})
+
+beforeEach(() => {
+  getFocusedWindowMock.mockReset()
+})
 
 /**
  * checkDevToolsStatus
- * We cannot test this function as it requires Electron to be running.
+ * Test for no focused window.
  */
-test.skip('Test that the electron app properly starts')
+test('Test that checkDevToolsStatus returns false if no window is focused', () => {
+  getFocusedWindowMock.mockReturnValue(null)
+  expect(faDevToolsControlAPI.checkDevToolsStatus()).toBe(false)
+})
+
+/**
+ * checkDevToolsStatus
+ * Test for focused window with opened dev tools.
+ */
+test('Test that checkDevToolsStatus returns true when dev tools are open', () => {
+  const isDevToolsOpened = vi.fn(() => true)
+  getFocusedWindowMock.mockReturnValue({
+    webContents: {
+      isDevToolsOpened
+    }
+  })
+  expect(faDevToolsControlAPI.checkDevToolsStatus()).toBe(true)
+})
 
 /**
  * toggleDevTools
- * We cannot test this function as it requires Electron to be running.
+ * Test that toggling closes opened dev tools.
  */
-test.skip('Test that the electron app window opens properly after start-up')
+test('Test that toggleDevTools closes already opened dev tools', () => {
+  const closeDevTools = vi.fn()
+  getFocusedWindowMock.mockReturnValue({
+    webContents: {
+      isDevToolsOpened: () => true,
+      closeDevTools,
+      openDevTools: vi.fn()
+    }
+  })
+  faDevToolsControlAPI.toggleDevTools()
+  expect(closeDevTools).toHaveBeenCalledOnce()
+})
 
 /**
- * openDevTools
- * We cannot test this function as it requires Electron to be running.
+ * openDevTools and closeDevTools
+ * Test that explicit open and close methods call the focused window APIs.
  */
-test.skip('Test that the electron app properly closes')
+test('Test that openDevTools and closeDevTools call webContents APIs', () => {
+  const openDevTools = vi.fn()
+  const closeDevTools = vi.fn()
+  getFocusedWindowMock.mockReturnValue({
+    webContents: {
+      isDevToolsOpened: () => false,
+      closeDevTools,
+      openDevTools
+    }
+  })
 
-/**
- * closeDevTools
- * We cannot test this function as it requires Electron to be running.
- */
-test.skip('Test that the electron app properly closes')
+  faDevToolsControlAPI.openDevTools()
+  faDevToolsControlAPI.closeDevTools()
+
+  expect(openDevTools).toHaveBeenCalledOnce()
+  expect(closeDevTools).toHaveBeenCalledOnce()
+})

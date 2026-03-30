@@ -1,5 +1,19 @@
-import { test, expect } from 'vitest'
+import { test, expect, vi } from 'vitest'
 import { faExternalLinksManagerAPI } from '../faExternalLinksManagerAPI'
+
+const { openExternalMock } = vi.hoisted(() => {
+  return {
+    openExternalMock: vi.fn()
+  }
+})
+
+vi.mock('electron', () => {
+  return {
+    shell: {
+      openExternal: openExternalMock
+    }
+  }
+})
 
 /**
  * checkIfExternal
@@ -30,6 +44,10 @@ test('Test for internal link with "localhost" input', () => {
 
 /**
  * openExternal
- * We cannot test this function as it requires Electron to be running.
+ * Test if opening external links calls electron shell API.
  */
-test.skip('Test if opening external links works')
+test('Test if opening external links works', () => {
+  const testInput = 'https://www.google.com'
+  faExternalLinksManagerAPI.openExternal(testInput)
+  expect(openExternalMock).toHaveBeenCalledWith(testInput)
+})
