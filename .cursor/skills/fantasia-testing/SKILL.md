@@ -22,6 +22,7 @@ Match **existing** tests to the letter when adding or editing:
 - **Command**: `yarn test:unit` (alias: `vitest run`).
 - **Scope**: Logic in `src/` and `src-electron/` (including main-process modules) with `*.vitest.test.ts` co-located under `tests/` folders where present.
 - **Style**: Flat `test` / `test.skip` only (no `describe`), JSDoc above each test naming the function under test, titles like `Test that ...` — see `src-electron/**/tests/*.vitest.test.ts` and the vitest rule above.
+- **Typing**: Avoid `any` in test code and fixtures; use concrete interfaces, inferred literals, or `unknown` narrowed before assertion/use.
 
 ## Playwright (component + E2E)
 
@@ -35,6 +36,7 @@ Match **existing** tests to the letter when adding or editing:
 ### Component tests
 
 - **Structure**: Match imports, header constants (`extraEnvSettings`, `electronMainFilePath`, `faFrontendRenderTimer`, `selectorList`), JSDoc per test, inline `// Prepare` / `// Check` / `// Close the app` comments, and `electron.launch` / `electronApp.close()` flow — see [`.cursor/rules/playwright-tests.mdc`](../../rules/playwright-tests.mdc) and any existing test beside the component.
+- **Typing**: Keep selectors, props payloads, and helper arguments strongly typed; avoid `any`.
 
 - **Command**: `yarn test:component`
 - **Location**: Under `src/components/`, files ending in `.playwright.test.ts` (often in a `tests/` subfolder next to the component).

@@ -40,6 +40,7 @@ Examples in the codebase:
 - Use `vi.stubEnv` for environment-dependent behavior ([fixAppName.vitest.test.ts](src-electron/mainScripts/tests/fixAppName.vitest.test.ts)).
 - Use `vi.mock(...)` when mocking modules (same files as above).
 - Use `expectTypeOf` when asserting type-level consistency ([tweaks.vitest.test.ts](src-electron/mainScripts/tests/tweaks.vitest.test.ts)).
+- Avoid `any` in tests and test data; prefer concrete fixture types, generic helpers, or `unknown` with narrowing when values are dynamic.
 
 ## Skipped tests (`test.skip`)
 

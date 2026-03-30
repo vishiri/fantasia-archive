@@ -19,6 +19,7 @@ alwaysApply: false
 ## `<script setup>` — documentation and size
 
 - Add a short **JSDoc block** above each significant function (`/** ... */`), as in [GlobalWindowButtons.vue](src/components/GlobalWindowButtons/GlobalWindowButtons.vue).
+- Keep types strict in `<script setup lang="ts">`: avoid `any`; prefer explicit interfaces, generics, unions, `unknown`, or utility types.
 
 ### When the script section grows
 

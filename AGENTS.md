@@ -47,6 +47,8 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 
 - Messages: `**feat` | `fix` | `test` | `chore` | `refactor` | `style` | `docs**`, then `**:**` and an imperative subject (e.g. `fix: close window on menu exit`).
 - To split work into several commits with **confirmation before each**: ask the agent to follow [git-conventional-commits skill](.cursor/skills/git-conventional-commits/SKILL.md).
+- Before any commit, run unit tests with `yarn test:unit`; only commit when they pass.
+- If unit tests fail, stop the commit flow, do not create a commit, and report a concise summary of what failed and where (failing suites/tests, file paths, and key error locations/messages).
 
 ## Changelog (in-app)
 

@@ -8,6 +8,10 @@
 - Playwright component tests for DialogAboutFantasiaArchive (replaces the previous TODO placeholder file).
 - Cursor rule and skill for local plan documents in `.cursor/plans/` (gitignored), plus changelog guidance to read version-matching plan files for release context.
 
+### Bugfixes & Optimizations
+- Replaced remaining TypeScript `any` annotations in shared type declarations with `unknown` to keep menu trigger and Vue component typing stricter.
+- Added explicit anti-`any` guidance to Vue, TypeScript scripts, Vitest, and Playwright rules/skills to keep future code strongly typed.
+
 ## 2.1.0 - Tooling and AI-assisted development
 
 ### New features

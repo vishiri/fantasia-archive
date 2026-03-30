@@ -73,6 +73,7 @@ Repeat this structure in **every** Playwright file (see [GlobalWindowButtons.pla
 
 - Prefer `await expect(locator).toHaveCount(1)` before clicks.
 - Use `expect` (non-async) for plain values from `evaluate` when the codebase does ([GlobalWindowButtons.playwright.test.ts](src/components/GlobalWindowButtons/tests/GlobalWindowButtons.playwright.test.ts) — note existing mix of `await expect` vs `expect` on locators; **follow the immediate surrounding file** for new tests in that folder).
+- Avoid `any` in selector maps, test fixtures, and helper signatures; prefer explicit interfaces/types and `unknown` plus narrowing for untyped Playwright values.
 
 ## Do not
 
