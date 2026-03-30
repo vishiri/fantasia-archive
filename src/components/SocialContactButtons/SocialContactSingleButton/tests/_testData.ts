@@ -1,6 +1,6 @@
-import { I_socialContactButton } from 'app/types//I_socialContactButtons'
+import { I_socialContactButton } from 'app/types/I_socialContactButtons'
 
-export const testData:I_socialContactButton = {
+export const testData: I_socialContactButton = {
   title: 'Patreon - Title',
   label: 'Patreon - Label',
   url: 'https://www.patreon.com/c/vishiri',

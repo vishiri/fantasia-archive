@@ -43,6 +43,12 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 
 Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-electron/electron-preload.ts`) and typed in `src/globals.d.ts`. New surface area: implement in `src-electron/contentBridgeAPIs/`, register in preload, update types, add tests under `contentBridgeAPIs/tests/`. Details: `.cursor/skills/fantasia-electron-preload/SKILL.md`.
 
+## Type naming conventions
+
+- Keep the existing prefix strategy: `I_` for interfaces and `T_` for type aliases.
+- Favor singular names for single-item shapes (`I_appMenuItem`, `T_documentName`) and collection-oriented names for grouped structures (`I_appMenuList`, `I_socialContactButtonSet`).
+- Keep unions and function signatures consistently spaced (for example, `string | false`, `(...args: unknown[]) => unknown | void`).
+
 ## Git commits
 
 - Messages: `**feat` | `fix` | `test` | `chore` | `refactor` | `style` | `docs**`, then `**:**` and an imperative subject (e.g. `fix: close window on menu exit`).

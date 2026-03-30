@@ -23,6 +23,7 @@ description: >-
 
 - Prefer Quasar components (`q-*`) and existing spacing/typography patterns in sibling components.
 - Boot files in `src/boot/` run at app init (e.g. axios, external links).
+- When importing shared project types, keep `I_` / `T_` prefixes and use descriptive singular/collection naming (e.g. `T_documentName`, `I_appMenuList`).
 
 ## Cursor rules for `.vue` files (split by topic)
 

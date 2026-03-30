@@ -42,7 +42,7 @@
 <script setup lang="ts">
 import { QMarkdown } from '@quasar/quasar-ui-qmarkdown'
 import '@quasar/quasar-ui-qmarkdown/dist/index.css'
-import { T_documentList } from 'app/types/T_documentList'
+import { T_documentName } from 'app/types/T_documentList'
 import { S_DialogMarkdown } from 'src/stores/S_Dialog'
 import { onMounted, ref, watch } from 'vue'
 
@@ -53,7 +53,7 @@ const props = defineProps<{
   /**
    * Custom input directly fed to the component in case it doesn't get triggered from the global store
    */
-  directInput?: T_documentList
+  directInput?: T_documentName
 }>()
 
 /**
@@ -69,7 +69,7 @@ const documentName = ref('')
 /**
  * Opens the popup dialog via direct input-feed
  */
-const openDialog = (input: T_documentList) => {
+const openDialog = (input: T_documentName) => {
   documentName.value = input
   dialogModel.value = true
 }
@@ -92,7 +92,7 @@ watch(() => props.directInput, () => {
 
 /**
  * Checks the prop feed-status on the first mount and open the dialog if the prop is properly fed in
- * This exist mostly due to component tests being flaky otherwise
+ * This exists mostly due to component tests being flaky otherwise
  */
 onMounted(() => {
   if (props.directInput !== undefined && props.directInput !== '') {

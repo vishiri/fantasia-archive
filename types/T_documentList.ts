@@ -1,1 +1,8 @@
-export type T_documentList = 'advancedSearchCheatSheet'| 'advancedSearchGuide'| 'changeLog'| 'license' | 'test' | ''
+export type T_documentName =
+  | 'advancedSearchCheatSheet'
+  | 'advancedSearchGuide'
+  | 'changeLog'
+  | 'license'
+  | 'tipsTricksTrivia'
+  | 'test'
+  | ''

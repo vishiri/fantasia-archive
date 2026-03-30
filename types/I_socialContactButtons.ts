@@ -37,7 +37,7 @@ export interface I_socialContactButton {
 
 }
 
-export interface I_socialContactButtons {
+export interface I_socialContactButtonSet {
   buttonPatreon: I_socialContactButton
   buttonKofi: I_socialContactButton
 

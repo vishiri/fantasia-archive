@@ -1,6 +1,17 @@
 # Changelog
 ----------
 
+## 2.2.1 - Type naming and consistency sweep
+
+### New features
+- Refactored shared menu and dialog/document type declarations into clearer singular and collection naming while preserving the `I_` / `T_` prefix conventions.
+- Added reusable menu item and submenu type building blocks to keep menu configuration typing easier to maintain.
+
+### Bugfixes & Optimizations
+- Fixed trigger callback typing mismatches in help menu data by wrapping typed handlers in zero-argument callbacks compatible with generic menu trigger signatures.
+- Normalized typo-prone comments and wording across component tests, E2E tests, and selected source files for consistent naming and grammar.
+- Updated README test command examples to match actual script names and usage patterns in `package.json`.
+
 ## 2.2.0 - Testing and agent tooling
 
 ### New features

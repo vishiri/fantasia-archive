@@ -1,7 +1,7 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
-import { T_dialogList } from 'app/types/T_dialogList'
+import { T_dialogName } from 'app/types/T_dialogList'
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -18,7 +18,7 @@ const extraEnvSettings = {
 const electronMainFilePath:string = extraEnvVariablesAPI.ELECTRON_MAIN_FILEPATH
 
 /**
- * Extra rended timer buffer for tests to start after loading the app
+ * Extra render timer buffer for tests to start after loading the app
  * - Change here in order manually adjust this component's wait times
  */
 const faFrontendRenderTimer = extraEnvVariablesAPI.FA_FRONTEND_RENDER_TIMER
@@ -35,7 +35,7 @@ const selectorList = {
  * Feed "AboutFantasiaArchive" input and check if all key dialog elements open.
  */
 test('Open test "AboutFantasiaArchive" dialog with all elements in it', async () => {
-  const testString: T_dialogList = 'AboutFantasiaArchive'
+  const testString: T_dialogName = 'AboutFantasiaArchive'
   extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
 
   const electronApp = await electron.launch({
@@ -62,7 +62,7 @@ test('Open test "AboutFantasiaArchive" dialog with all elements in it', async ()
  * Feed "AboutFantasiaArchive" input and check if dialog closes after button click.
  */
 test('Open test "AboutFantasiaArchive" dialog and try closing it', async () => {
-  const testString: T_dialogList = 'AboutFantasiaArchive'
+  const testString: T_dialogName = 'AboutFantasiaArchive'
   extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
 
   const electronApp = await electron.launch({

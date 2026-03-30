@@ -67,7 +67,7 @@ Repeat this structure in **every** Playwright file (see [GlobalWindowButtons.pla
 
 ## Shared test data
 
-- Colocate **`_testData.ts`** next to the Playwright file when feeding structured props (typed, e.g. `I_appMenusDataList`) — [AppControlSingleMenu/tests/_testData.ts](src/components/AppControlMenus/AppControlSingleMenu/tests/_testData.ts).
+- Colocate **`_testData.ts`** next to the Playwright file when feeding structured props (typed, e.g. `I_appMenuList`) — [AppControlSingleMenu/tests/_testData.ts](src/components/AppControlMenus/AppControlSingleMenu/tests/_testData.ts).
 
 ## Assertions
 

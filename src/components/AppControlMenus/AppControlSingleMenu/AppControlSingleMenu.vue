@@ -121,13 +121,13 @@
     </q-menu>
     <!-- Main menu end - Content -->
   </q-btn>
-  <!-- Main menu end - Wrappper -->
+  <!-- Main menu end - Wrapper -->
 </template>
 
 <script setup lang="ts">
 // TODO - ADD TESTS
 
-import { I_appMenusDataList } from 'app/types/I_appMenusDataList'
+import { I_appMenuList } from 'app/types/I_appMenusDataList'
 import { testData } from './tests/_testData'
 import { computed } from 'vue'
 
@@ -138,7 +138,7 @@ const props = defineProps<{
   /**
    * Data input for the component
    */
-  dataInput: I_appMenusDataList
+  dataInput: I_appMenuList
 }>()
 
 /**
@@ -202,7 +202,7 @@ const menuData = componentData.value.data
       color: $appControlMenus_singleHover;
     }
 
-    /* Text legibitility fix: Red and green blend too much into each other without a little shadow */
+    /* Text legibility fix: red and green blend too much into each other without a little shadow */
     &.text-secondary {
       text-shadow: 0 0 3px black;
     }

@@ -1,4 +1,87 @@
-export interface I_appMenusDataList {
+export type T_menuItemMode = 'separator' | 'item'
+
+export type T_menuItemTrigger = (...args: unknown[]) => unknown | void
+
+export interface I_appMenuSubItem {
+  /**
+   * Determines whether the item is a separator or a regular menu item.
+   */
+  mode: T_menuItemMode
+
+  /**
+   * Title of the submenu item.
+   */
+  text?: string
+
+  /**
+   * Icon/avatar of the submenu item.
+   */
+  icon?: string
+
+  /**
+   * Trigger function for the submenu item click.
+   */
+  trigger?: T_menuItemTrigger
+
+  /**
+   * Extra arguments for the trigger, if needed.
+   */
+  triggerArguments?: unknown[]
+
+  /**
+   * Condition to show the submenu item as active.
+   */
+  conditions?: boolean
+
+  /**
+   * Special color class for the submenu item.
+   */
+  specialColor?: string
+}
+
+export interface I_appMenuItem {
+  /**
+   * Determines whether the item is a separator or a regular menu item.
+   */
+  mode: T_menuItemMode
+
+  /**
+   * Title of the menu item.
+   */
+  text?: string
+
+  /**
+   * Icon/avatar of the menu item.
+   */
+  icon?: string
+
+  /**
+   * Trigger function for the item click.
+   */
+  trigger?: T_menuItemTrigger
+
+  /**
+   * Extra arguments for the trigger, if needed.
+   */
+  triggerArguments?: unknown[]
+
+  /**
+   * Condition to show the menu item as active.
+   */
+  conditions?: boolean
+
+  /**
+   * Special color class for the menu item.
+   */
+  specialColor?: string
+
+  /**
+   * Optional submenu items.
+   */
+  submenu?: I_appMenuSubItem[]
+}
+
+export interface I_appMenuList {
 
   /**
    * Title of the main menu button
@@ -6,56 +89,7 @@ export interface I_appMenusDataList {
   title: string
 
   /**
-   * Data contents of the menu dropdown
+   * Data contents of the menu dropdown.
    */
-  data:{
-   /**
-    * Determines if the item shows as a separator or full-fledged menu item
-    */
-    mode: 'separator' | 'item'
-
-   /**
-    * Title of the menu item
-    */
-    text?: string
-
-   /**
-    * Icon/Avatar of the menu item
-    */
-    icon?: string
-
-   /**
-    * Trigger functionality of the item on click
-    */
-    trigger?: ((...args: unknown[]) => unknown|void)
-
-    /**
-     * Extra arguments for the trigger if need be
-     */
-    triggerArguments?: unknown[]
-
-   /**
-    * Conditions to show the menu item as active
-    */
-    conditions?: boolean
-
-   /**
-    *Special color class for the item
-    */
-    specialColor?: string
-
-   /**
-    * Determined if the item contains a submenu and its inner data
-    */
-    submenu?: {
-      mode: 'separator' | 'item'
-      text?: string
-      icon?: string
-      trigger?: ((...args: unknown[]) => unknown|void)
-      triggerArguments?: []
-      conditions?: boolean
-      specialColor?: string
-    }[]
-
-  }[]
+  data: I_appMenuItem[]
 }

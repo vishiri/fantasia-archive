@@ -1,7 +1,7 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
-import { T_documentList } from 'app/types/T_documentList'
+import { T_documentName } from 'app/types/T_documentList'
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -18,7 +18,7 @@ const extraEnvSettings = {
 const electronMainFilePath:string = extraEnvVariablesAPI.ELECTRON_MAIN_FILEPATH
 
 /**
- * Extra rended timer buffer for tests to start after loading the app
+ * Extra render timer buffer for tests to start after loading the app
  * - Change here in order manually adjust this component's wait times
  */
 const faFrontendRenderTimer = extraEnvVariablesAPI.FA_FRONTEND_RENDER_TIMER
@@ -33,10 +33,10 @@ const selectorList = {
 }
 
 /**
- * Feed 'license' input as the file to open and check if the opened dialog afterwars has all the needed elements in it
+ * Feed 'license' input as the file to open and check if the opened dialog afterwards has all the needed elements in it.
  */
 test('Open test "license" dialog with all elements in it', async () => {
-  const testString: T_documentList = 'license'
+  const testString: T_documentName = 'license'
 
   extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
 
@@ -63,10 +63,10 @@ test('Open test "license" dialog with all elements in it', async () => {
 })
 
 /**
- * Feed 'license' input as the file to open and check if the opened dialog afterwars has all the needed elements in it
+ * Feed 'license' input as the file to open and check if the opened dialog afterwards has all the needed elements in it.
  */
 test('Open test "license" dialog and try closing it', async () => {
-  const testString: T_documentList = 'license'
+  const testString: T_documentName = 'license'
 
   extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
 
@@ -82,7 +82,7 @@ test('Open test "license" dialog and try closing it', async () => {
   const closeButton = appWindow.locator(`[data-test="${selectorList.closeButton}"]`)
   const markdownContent = appWindow.locator(`[data-test="${selectorList.markdownContent}"]`)
 
-  // Check if the markdown concent and close button exist and click it if it does
+  // Check if the markdown content and close button exist and click it if they do
   await expect(markdownContent).toHaveCount(1)
   await expect(closeButton).toHaveCount(1)
   await closeButton.click()
