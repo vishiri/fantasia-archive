@@ -14,6 +14,7 @@ description: >-
 
 - **Changelog (Markdown)**: [changeLog.md](src/i18n/en-US/documents/changeLog.md) — shown in-app via i18n `documents.changeLog`.
 - **Canonical semver**: [package.json](package.json) field **`version`** (e.g. `2.1.0`).
+- **Planning context**: local `.cursor/plans/` files, especially those matching the current package version in filename or metadata.
 
 Only this English document exists today; if other locales add a changelog later, mirror the same structure.
 
@@ -26,6 +27,15 @@ After **substantive** work that users or operators should know about, for exampl
 - Notable `test` / tooling only if it affects how to run or verify the app (`chore` / `refactor` / `style` usually **omit** unless the user asks)
 
 Skip trivial-only edits (typo in a comment, pure format) unless the user wants everything logged.
+
+## Plan-context check (required before drafting notes)
+
+1. Read current `package.json.version` (`pkg`).
+2. Inspect `.cursor/plans/` for plan documents with matching version context:
+   - filename contains `v{pkg}` or `{pkg}`
+   - file body contains `Project version: {pkg}`
+3. Use matching plans only as supporting context for release notes and change grouping.
+4. If no matching plan files exist, continue with code and git diff context only.
 
 ## Version to use for a **new** top section
 

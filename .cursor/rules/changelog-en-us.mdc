@@ -6,6 +6,7 @@ alwaysApply: true
 # Changelog discipline
 
 - After **substantive** product or user-visible changes, update [changeLog.md](src/i18n/en-US/documents/changeLog.md) and reconcile **semver** with [package.json](package.json) `version` per [fantasia-changelog-en-us skill](../skills/fantasia-changelog-en-us/SKILL.md).
+- When preparing changelog updates, also inspect `.cursor/plans/` for plan files that match the current `package.json.version` to gather release-context notes for what changed.
 - **Patch bump** when adding a **new** top release section while the latest heading already matches `package.json.version`: `major.minor.patch` → `major.minor.(patch+1)`, then set `package.json` `version` to match (unless the user specifies minor/major instead).
 - **Append** under the existing top `## version` block when still shipping notes for the **same** release without a new patch.
 - **Omit** any `###` category (`New features`, `Known issues`, `Bugfixes & Optimizations`, etc.) when there is nothing to list — no empty sections and no “none” placeholder bullets.

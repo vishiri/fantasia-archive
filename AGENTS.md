@@ -22,6 +22,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | [project-scss.mdc](.cursor/rules/project-scss.mdc)                         | `src/css/**/*.scss` — globals, Quasar variables                           |
 | [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc) | Always — `type: subject` commits; see skill for split + approval workflow |
 | [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc)                   | Always — en-US `changeLog.md` vs `package.json` version (see skill)       |
+| [plan-documents.mdc](.cursor/rules/plan-documents.mdc)                     | Always — plan files in `.cursor/plans` with timestamp + version metadata  |
 
 
 ## Stack (short)
@@ -82,5 +83,6 @@ Use different instructions or @-references when starting a task:
 | `fantasia-release-build`        | Production build and packaging                                      |
 | `git-conventional-commits`      | Logical commits, conventional `type:` messages, per-commit approval |
 | `fantasia-changelog-en-us`      | `changeLog.md`, `package.json` version, patch bumps                 |
+| `fantasia-plan-documents`       | `.cursor/plans` filename and metadata format for plan files         |
 
 

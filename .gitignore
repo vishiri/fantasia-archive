@@ -39,5 +39,8 @@ yarn-error.log*
 # Local Playwright test results folder
 /test-results
 
+# Local agent planning documents (temporary)
+/.cursor/plans/
+
 .nyc_output
 coverage/

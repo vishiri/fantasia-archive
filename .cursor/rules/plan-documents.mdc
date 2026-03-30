@@ -1,0 +1,16 @@
+---
+description: Standardize generated plan documents in .cursor/plans with timestamp and version metadata
+alwaysApply: true
+---
+
+# Plan document discipline
+
+- For every generated plan document, store it under `.cursor/plans/`.
+- If `.cursor/plans/` does not exist, create it.
+- Plan filenames must include both:
+  - current `package.json` version
+  - creation timestamp in `YYYY-MM-DD-HH-mm-ss` format
+- Each plan document body must include:
+  - `Created at: YYYY-MM-DD-HH-mm-ss`
+  - `Project version: <package.json version>`
+- Treat `.cursor/plans/` as local temporary planning context (not for repository sync).
