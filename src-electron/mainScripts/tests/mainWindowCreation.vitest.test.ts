@@ -1,5 +1,6 @@
 import { test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { appWindow, mainWindowCreation, preventSecondaryAppInstance } from '../mainWindowCreation'
+import { BrowserWindow } from 'electron'
 
 const {
   BrowserWindowMock,
@@ -83,20 +84,47 @@ test('Test that app window does not start if another instance is already running
   }
 
   vi.stubEnv('TEST_ENV', 'components')
-  preventSecondaryAppInstance(appWindowMock as any)
+  preventSecondaryAppInstance(appWindowMock as unknown as BrowserWindow)
   expect(appMock.requestSingleInstanceLock).not.toHaveBeenCalled()
 
   vi.unstubAllEnvs()
   appMock.requestSingleInstanceLock.mockReturnValueOnce(false)
-  preventSecondaryAppInstance(appWindowMock as any)
+  preventSecondaryAppInstance(appWindowMock as unknown as BrowserWindow)
   expect(appMock.quit).toHaveBeenCalledOnce()
 
   appMock.requestSingleInstanceLock.mockReturnValueOnce(true)
-  preventSecondaryAppInstance(appWindowMock as any)
+  preventSecondaryAppInstance(appWindowMock as unknown as BrowserWindow)
   expect(appEventHandlers['second-instance']).toBeTypeOf('function')
 
   appEventHandlers['second-instance']()
   expect(appWindowMock.restore).toHaveBeenCalledOnce()
+  expect(appWindowMock.focus).toHaveBeenCalledOnce()
+})
+
+/**
+ * preventSecondaryAppInstance
+ * e2e TEST_ENV skips single-instance lock like components mode.
+ */
+test('Test that preventSecondaryAppInstance skips lock when TEST_ENV is e2e', () => {
+  vi.stubEnv('TEST_ENV', 'e2e')
+  preventSecondaryAppInstance({} as unknown as BrowserWindow)
+  expect(appMock.requestSingleInstanceLock).not.toHaveBeenCalled()
+})
+
+/**
+ * preventSecondaryAppInstance
+ * second-instance handler restores only when minimized; always focuses.
+ */
+test('Test that second-instance focuses without restore when window is not minimized', () => {
+  const appWindowMock = {
+    isMinimized: vi.fn(() => false),
+    restore: vi.fn(),
+    focus: vi.fn()
+  }
+  preventSecondaryAppInstance(appWindowMock as unknown as BrowserWindow)
+  expect(appEventHandlers['second-instance']).toBeTypeOf('function')
+  appEventHandlers['second-instance']()
+  expect(appWindowMock.restore).not.toHaveBeenCalled()
   expect(appWindowMock.focus).toHaveBeenCalledOnce()
 })
 
@@ -123,7 +151,7 @@ test('Test that the main window is created successfully', () => {
     focus: vi.fn(),
     maximize: vi.fn()
   }
-  BrowserWindowMock.mockImplementation(() => browserWindowInstance as any)
+  BrowserWindowMock.mockImplementation(() => browserWindowInstance as unknown as BrowserWindow)
 
   vi.stubEnv('APP_URL', 'http://localhost:9000')
   vi.stubEnv('QUASAR_ELECTRON_PRELOAD', 'electron-preload.js')
@@ -155,4 +183,35 @@ test('Test that the main window is created successfully', () => {
 
   onHandlers.closed()
   expect(appWindow).toBeUndefined()
+})
+
+/**
+ * mainWindowCreation
+ * DevTools are not opened when DEBUGGING is unset.
+ */
+test('Test that main window creation does not open DevTools when DEBUGGING is unset', () => {
+  const onceHandlers: Record<string, () => void> = {}
+  const browserWindowInstance = {
+    webContents: {
+      openDevTools: vi.fn()
+    },
+    once: vi.fn((eventName: string, handler: () => void) => {
+      onceHandlers[eventName] = handler
+    }),
+    on: vi.fn(),
+    setMenu: vi.fn(),
+    loadURL: vi.fn(),
+    show: vi.fn(),
+    focus: vi.fn(),
+    maximize: vi.fn()
+  }
+  BrowserWindowMock.mockImplementation(() => browserWindowInstance as unknown as BrowserWindow)
+
+  vi.stubEnv('APP_URL', 'http://localhost:9000')
+  vi.stubEnv('QUASAR_ELECTRON_PRELOAD', 'electron-preload.js')
+  vi.stubEnv('DEBUGGING', undefined)
+
+  mainWindowCreation()
+
+  expect(browserWindowInstance.webContents.openDevTools).not.toHaveBeenCalled()
 })

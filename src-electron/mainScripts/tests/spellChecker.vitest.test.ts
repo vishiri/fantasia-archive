@@ -1,5 +1,6 @@
 import { test, expect, vi, beforeEach } from 'vitest'
 import { setupSpellChecker } from '../spellChecker'
+import { BrowserWindow } from 'electron'
 
 const { MenuMock, MenuItemMock, menuInstances } = vi.hoisted(() => {
   const instances: Array<{ append: ReturnType<typeof vi.fn>, popup: ReturnType<typeof vi.fn> }> = []
@@ -49,7 +50,7 @@ test('Test that spellChecker works correctly', () => {
     }
   }
 
-  setupSpellChecker(appWindow as any)
+  setupSpellChecker(appWindow as unknown as BrowserWindow)
   expect(onMock).toHaveBeenCalledOnce()
 
   const contextMenuHandler = onMock.mock.calls[0][1]
@@ -67,4 +68,86 @@ test('Test that spellChecker works correctly', () => {
   const addWordItem = MenuItemMock.mock.calls[2][0]
   addWordItem.click()
   expect(addWordToSpellCheckerDictionary).toHaveBeenCalledWith('helo')
+})
+
+/**
+ * setupSpellChecker
+ * Undefined window returns immediately (no listener registration).
+ */
+test('Test that setupSpellChecker with undefined appWindow returns without throwing', () => {
+  expect(() => setupSpellChecker(undefined)).not.toThrow()
+})
+
+/**
+ * setupSpellChecker
+ * Suggestions only still opens the context menu popup.
+ */
+test('Test that spellChecker shows popup with suggestions only', () => {
+  const onMock = vi.fn()
+  const appWindow = {
+    webContents: {
+      on: onMock,
+      replaceMisspelling: vi.fn(),
+      session: {
+        addWordToSpellCheckerDictionary: vi.fn()
+      }
+    }
+  }
+  setupSpellChecker(appWindow as unknown as BrowserWindow)
+  const contextMenuHandler = onMock.mock.calls[0][1]
+  menuInstances.length = 0
+  contextMenuHandler({}, { dictionarySuggestions: ['fix'], misspelledWord: '' })
+
+  const activeMenu = menuInstances[0]
+  expect(activeMenu.popup).toHaveBeenCalledOnce()
+  expect(MenuItemMock.mock.calls.length).toBe(1)
+})
+
+/**
+ * setupSpellChecker
+ * Misspelled word only adds dictionary entry and still pops up.
+ */
+test('Test that spellChecker shows popup with misspelled word only', () => {
+  const onMock = vi.fn()
+  const appWindow = {
+    webContents: {
+      on: onMock,
+      replaceMisspelling: vi.fn(),
+      session: {
+        addWordToSpellCheckerDictionary: vi.fn()
+      }
+    }
+  }
+  setupSpellChecker(appWindow as unknown as BrowserWindow)
+  const contextMenuHandler = onMock.mock.calls[0][1]
+  menuInstances.length = 0
+  contextMenuHandler({}, { dictionarySuggestions: [], misspelledWord: 'typo' })
+
+  const activeMenu = menuInstances[0]
+  expect(activeMenu.popup).toHaveBeenCalledOnce()
+  expect(MenuItemMock.mock.calls.length).toBe(1)
+})
+
+/**
+ * setupSpellChecker
+ * No suggestions and no misspelled word does not call popup.
+ */
+test('Test that spellChecker does not popup when there is nothing to show', () => {
+  const onMock = vi.fn()
+  const appWindow = {
+    webContents: {
+      on: onMock,
+      replaceMisspelling: vi.fn(),
+      session: {
+        addWordToSpellCheckerDictionary: vi.fn()
+      }
+    }
+  }
+  setupSpellChecker(appWindow as unknown as BrowserWindow)
+  const contextMenuHandler = onMock.mock.calls[0][1]
+  menuInstances.length = 0
+  contextMenuHandler({}, { dictionarySuggestions: [], misspelledWord: '' })
+
+  const activeMenu = menuInstances[0]
+  expect(activeMenu.popup).not.toHaveBeenCalled()
 })

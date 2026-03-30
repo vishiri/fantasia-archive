@@ -59,6 +59,22 @@ test('Test fixing app name properly', () => {
   expect(appMock.getPath).toHaveBeenCalledWith('appData')
   expect(appMock.setPath).toHaveBeenCalledWith(
     'userData',
-    path.join('C:/Users/test/AppData/Roaming', 'fantasia-archive-dev')
+    path.join('C:/Users/test/AppData/Roaming', `${packageJSON.name}-dev`)
+  )
+})
+
+/**
+ * fixAppName
+ * Debugging off uses package name without -dev for setName and userData folder.
+ */
+test('Test that fixAppName uses package name without dev suffix when debugging is off', () => {
+  vi.stubEnv('DEBUGGING', undefined)
+  fixAppName()
+
+  expect(appMock.setName).toHaveBeenCalledWith(packageJSON.name)
+  expect(appMock.getPath).toHaveBeenCalledWith('appData')
+  expect(appMock.setPath).toHaveBeenCalledWith(
+    'userData',
+    path.join('C:/Users/test/AppData/Roaming', packageJSON.name)
   )
 })

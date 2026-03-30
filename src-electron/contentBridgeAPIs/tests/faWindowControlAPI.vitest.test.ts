@@ -29,6 +29,28 @@ test('Test if the electron is maximized', () => {
 })
 
 /**
+ * checkWindowMaximized
+ * Focused window reports maximized state from isMaximized().
+ */
+test('Test that checkWindowMaximized returns true when focused window is maximized', () => {
+  getFocusedWindowMock.mockReturnValue({
+    isMaximized: () => true
+  })
+  expect(faWindowControlAPI.checkWindowMaximized()).toBe(true)
+})
+
+/**
+ * checkWindowMaximized
+ * Focused window reports not maximized when isMaximized is false.
+ */
+test('Test that checkWindowMaximized returns false when focused window is not maximized', () => {
+  getFocusedWindowMock.mockReturnValue({
+    isMaximized: () => false
+  })
+  expect(faWindowControlAPI.checkWindowMaximized()).toBe(false)
+})
+
+/**
  * minimizeWindow
  * Test minimizing the focused window.
  */
@@ -84,4 +106,40 @@ test('Test that closing of the electron window works', () => {
   getFocusedWindowMock.mockReturnValue({ close })
   faWindowControlAPI.closeWindow()
   expect(close).toHaveBeenCalledOnce()
+})
+
+/**
+ * minimizeWindow
+ * No-op when there is no focused window.
+ */
+test('Test that minimizeWindow does nothing when no focused window', () => {
+  getFocusedWindowMock.mockReturnValue(null)
+  expect(() => faWindowControlAPI.minimizeWindow()).not.toThrow()
+})
+
+/**
+ * maximizeWindow
+ * No-op when there is no focused window.
+ */
+test('Test that maximizeWindow does nothing when no focused window', () => {
+  getFocusedWindowMock.mockReturnValue(null)
+  expect(() => faWindowControlAPI.maximizeWindow()).not.toThrow()
+})
+
+/**
+ * resizeWindow
+ * No-op when there is no focused window.
+ */
+test('Test that resizeWindow does nothing when no focused window', () => {
+  getFocusedWindowMock.mockReturnValue(null)
+  expect(() => faWindowControlAPI.resizeWindow()).not.toThrow()
+})
+
+/**
+ * closeWindow
+ * No-op when there is no focused window.
+ */
+test('Test that closeWindow does nothing when no focused window', () => {
+  getFocusedWindowMock.mockReturnValue(null)
+  expect(() => faWindowControlAPI.closeWindow()).not.toThrow()
 })

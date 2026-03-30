@@ -60,6 +60,50 @@ test('Test that toggleDevTools closes already opened dev tools', () => {
 })
 
 /**
+ * toggleDevTools
+ * Opens dev tools when they are currently closed.
+ */
+test('Test that toggleDevTools opens dev tools when they are closed', () => {
+  const openDevTools = vi.fn()
+  getFocusedWindowMock.mockReturnValue({
+    webContents: {
+      isDevToolsOpened: () => false,
+      closeDevTools: vi.fn(),
+      openDevTools
+    }
+  })
+  faDevToolsControlAPI.toggleDevTools()
+  expect(openDevTools).toHaveBeenCalledOnce()
+})
+
+/**
+ * toggleDevTools
+ * No-op when there is no focused window.
+ */
+test('Test that toggleDevTools does nothing when no focused window', () => {
+  getFocusedWindowMock.mockReturnValue(null)
+  expect(() => faDevToolsControlAPI.toggleDevTools()).not.toThrow()
+})
+
+/**
+ * openDevTools
+ * No-op when there is no focused window.
+ */
+test('Test that openDevTools does nothing when no focused window', () => {
+  getFocusedWindowMock.mockReturnValue(null)
+  expect(() => faDevToolsControlAPI.openDevTools()).not.toThrow()
+})
+
+/**
+ * closeDevTools
+ * No-op when there is no focused window.
+ */
+test('Test that closeDevTools does nothing when no focused window', () => {
+  getFocusedWindowMock.mockReturnValue(null)
+  expect(() => faDevToolsControlAPI.closeDevTools()).not.toThrow()
+})
+
+/**
  * openDevTools and closeDevTools
  * Test that explicit open and close methods call the focused window APIs.
  */
