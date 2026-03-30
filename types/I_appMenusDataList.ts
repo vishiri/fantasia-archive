@@ -27,7 +27,7 @@ export interface I_appMenusDataList {
    /**
     * Trigger functionality of the item on click
     */
-    trigger?: ((...args: any[]) => unknown|void)
+    trigger?: ((...args: unknown[]) => unknown|void)
 
     /**
      * Extra arguments for the trigger if need be
@@ -51,7 +51,7 @@ export interface I_appMenusDataList {
       mode: 'separator' | 'item'
       text?: string
       icon?: string
-      trigger?: ((...args: any[]) => unknown|void)
+      trigger?: ((...args: unknown[]) => unknown|void)
       triggerArguments?: []
       conditions?: boolean
       specialColor?: string
