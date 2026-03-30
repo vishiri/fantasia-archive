@@ -36,12 +36,16 @@ quasar build -m electron
 
 #### Unit test - via Vitest
 
+Use Vitest for deterministic unit logic in both app layers: renderer code under `src/` (helpers, store/composable logic, extracted component-facing transforms), Electron/runtime code under `src-electron/`, and shallow-mounted `.vue` files under `src/components/` (second Vitest config; see `vitest.components.config.mts`).
+
 ```
 yarn test:unit
 ```
 
 #### Component test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
+
+Use Playwright component/E2E tests for rendered behavior and integration flows that rely on the built app runtime.
 ```
 yarn test:component
 ```

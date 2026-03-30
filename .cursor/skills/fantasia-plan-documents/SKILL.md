@@ -10,11 +10,13 @@ description: >-
 ## Scope
 
 Use this skill whenever creating or updating a planning document.
+This includes rollout inventories, implementation checklists, migration trackers, and other planning artifacts.
 
 ## Required location
 
 - Store plans in `.cursor/plans/`.
 - If the folder does not exist, create it.
+- Do not create top-level `docs/` (or other new documentation roots) for planning artifacts unless the user explicitly requests a different location.
 
 ## Required filename format
 
@@ -37,3 +39,4 @@ At the top of each plan document, include:
 ## Notes
 
 - `.cursor/plans` is a local temporary workspace and may be gitignored.
+- If a planning artifact is initially drafted elsewhere, move it into `.cursor/plans/` and normalize filename/body metadata to this skill's format.

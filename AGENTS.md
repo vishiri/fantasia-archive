@@ -62,7 +62,8 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 
 ## Testing expectations
 
-- **Vitest** for unit coverage (including many `src-electron` modules). Use `yarn test:unit` for baseline verification. Follow [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc) so new files match existing `*.vitest.test.ts` style.
+- **Vitest** for unit coverage: `yarn test:unit` runs the **core** config (`src-electron`, `src/scripts`, `src/boot`, `src/stores`, `src/i18n`) then the **components** config (`src/components/**` Vue SFC mounts). Use [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc) for style and layout.
+- **`_data/` holds production structured feeds** (menus, lists, etc.). **Vitest** and **Playwright** fixture objects live **inside** their own `*.vitest.test.ts` / `*.playwright.test.ts` files (inline `const` / literals), not in `_data/` and **not** in extra `tests/*.ts` files whose only role is fixture storage. **Never** add `tests/_data/`. Do **not** add tests whose **only** system-under-test is a file under `_data/`; exercise production data indirectly (components, boot, scripts).
 - **Playwright** requires a **production build** before runs when source affecting the app has changed. Follow [playwright-tests.mdc](.cursor/rules/playwright-tests.mdc) for test sources; use [vue-template-test-hooks.mdc](.cursor/rules/vue-template-test-hooks.mdc) when changing locators in `.vue` templates. See `.cursor/skills/fantasia-testing/SKILL.md` and `README.md`.
 
 ## Suggested Cursor agent profiles (manual presets)
@@ -70,8 +71,8 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 Use different instructions or @-references when starting a task:
 
 1. **Electron and preload** — Focus on `src-electron/`, bridge security, `globals.d.ts`, Vitest for bridge modules.
-2. **Tests** — Vitest vs Playwright, build order, `e2e-tests/` vs `src/components/**/tests/`.
-3. **Feature / UI** — `src/` Vue + Quasar, Pinia, router, `ComponentTesting` page, i18n strings.
+2. **Tests** — Vitest unit coverage in `src/` + `src-electron/`, Playwright integration flows, build order, `e2e-tests/` vs `src/components/**/tests/`.
+3. **Feature / UI** — `src/` Vue + Quasar, Pinia, router, `ComponentTesting` page, i18n strings. For **large production menu/config data**, split across **`src/components/<Feature>/_data/*.ts`** (multiple named files as needed). Rare **embedded** component-mode-only payloads may live as **`const` inside the `.vue`**; Playwright passes isolated props via **`COMPONENT_PROPS`** defined inline in each spec. Details: [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc).
 4. **Data / SQLite** — Main-process storage, `userData` paths, migrations, exposing data via narrow preload APIs only.
 
 ## Skill index

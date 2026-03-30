@@ -14,3 +14,5 @@ alwaysApply: true
   - `Created at: YYYY-MM-DD-HH-mm-ss`
   - `Project version: <package.json version>`
 - Treat `.cursor/plans/` as local temporary planning context (not for repository sync).
+- Do not create top-level `docs/` (or other new doc roots) for planning artifacts unless the user explicitly asks for that location.
+- For planning artifacts (plans, rollout checklists, inventories, implementation trackers), invoke and follow `.cursor/skills/fantasia-plan-documents/SKILL.md` before creating files.
