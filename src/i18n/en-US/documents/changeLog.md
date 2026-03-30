@@ -1,6 +1,13 @@
 # Changelog
 ----------
 
+## 2.2.0 - Testing and agent tooling
+
+### New features
+- Expanded Vitest coverage for Electron preload bridge modules and main-process scripts (window controls, devtools, external links, app management, spell checker, and main window creation) using deterministic mocks.
+- Playwright component tests for DialogAboutFantasiaArchive (replaces the previous TODO placeholder file).
+- Cursor rule and skill for local plan documents in `.cursor/plans/` (gitignored), plus changelog guidance to read version-matching plan files for release context.
+
 ## 2.1.0 - Tooling and AI-assisted development
 
 ### New features
