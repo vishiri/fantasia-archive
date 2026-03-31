@@ -10,6 +10,7 @@ alwaysApply: true
 - **Split commits** by logical concern (feature vs tests vs tooling vs docs vs style-only). Do not mix unrelated changes in one commit.
 - When the user asks for **staged commits** or **approval per commit**: follow the full workflow in [git-conventional-commits skill](../skills/git-conventional-commits/SKILL.md) — propose each commit, wait for explicit approval, then run `git add` + `git commit` for that chunk only.
 - **Before any commit**: run unit tests with `yarn test:unit` and only proceed when they pass.
+- **Before any commit**: review `src/i18n/en-US/documents/changeLog.md` against the staged change scope and update it when user-visible work is missing from release notes (follow changelog rules/skill for semver behavior).
 - If unit tests fail, **stop the commit flow**, do not run `git commit`, and inform the user with a concise summary that includes what failed (failing suites/tests) and where it failed (file paths and key error locations/messages).
 
 ## Type cheat sheet

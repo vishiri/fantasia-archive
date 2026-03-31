@@ -31,13 +31,14 @@ Examples: `feat: add splash screen fade-out`, `test: cover devtools menu toggle`
 ## Workflow (default when user wants multiple commits)
 
 1. **Inspect**: Run `git status` and review `git diff` (and `git diff --staged` if anything is already staged).
-2. **Plan**: Propose an **ordered list** of commits. Each item: **type + subject**, bullet list of **paths** (or path patterns) to include. Order so dependencies make sense (e.g. chore before feat if needed).
-3. **Approval loop** (mandatory when user asked for per-commit approval or “step through” commits):
+2. **Changelog gate (always before commit)**: Review `src/i18n/en-US/documents/changeLog.md` and reconcile whether staged user-visible work needs a changelog update before committing. Follow project changelog/version rules when adjusting release notes.
+3. **Plan**: Propose an **ordered list** of commits. Each item: **type + subject**, bullet list of **paths** (or path patterns) to include. Order so dependencies make sense (e.g. chore before feat if needed).
+4. **Approval loop** (mandatory when user asked for per-commit approval or “step through” commits):
    - Present **only the next** commit: message + exact paths.
    - **Stop and wait** for explicit user confirmation (e.g. “yes”, “go ahead”, “approved”) for that commit.
    - Then run `git add` with **only** those paths and `git commit -m "type: subject"`.
    - Repeat until the list is done or the user stops.
-4. If the user asked for a **single** commit or did not ask for step-by-step approval, still use a valid `type:` message; you may commit in one shot after listing what will be included.
+5. If the user asked for a **single** commit or did not ask for step-by-step approval, still use a valid `type:` message; you may commit in one shot after listing what will be included.
 
 ## Rules
 
@@ -45,6 +46,7 @@ Examples: `feat: add splash screen fade-out`, `test: cover devtools menu toggle`
 - **Never** mix unrelated concerns in one commit (e.g. don’t combine `docs:` rule edits with `feat:` app code unless the user explicitly overrides).
 - Prefer **small, reviewable** chunks over one huge commit when splitting.
 - If unsure between `chore` and `refactor`, prefer **`refactor`** for production code moves/renames and **`chore`** for repo/meta/tooling.
+- Do not skip changelog review before committing; missing release-note updates should be handled before `git commit`, not in a follow-up commit.
 
 ## Related
 
