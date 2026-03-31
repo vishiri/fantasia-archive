@@ -63,7 +63,9 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 ## Testing expectations
 
 - **Vitest** for unit coverage: `yarn test:unit` runs the **core** config (`src-electron`, `src/scripts`, `src/boot`, `src/stores`, `src/i18n`) then the **components** config (`src/components/**` Vue SFC mounts). Use [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc) for style and layout.
+- For `src/components/**`, keep a **1:1 Vitest presence baseline**: each component `.vue` has a colocated `tests/<ComponentName>.vitest.test.ts` file. Add/rename/remove component + Vitest counterpart together.
 - **`_data/` holds production structured feeds** (menus, lists, etc.). **Vitest** and **Playwright** fixture objects live **inside** their own `*.vitest.test.ts` / `*.playwright.test.ts` files (inline `const` / literals), not in `_data/` and **not** in extra `tests/*.ts` files whose only role is fixture storage. **Never** add `tests/_data/`. Do **not** add tests whose **only** system-under-test is a file under `_data/`; exercise production data indirectly (components, boot, scripts).
+- Treat 1:1 component-test parity as **coverage presence**, not exhaustive line/branch percentage coverage.
 - **Playwright** requires a **production build** before runs when source affecting the app has changed. Follow [playwright-tests.mdc](.cursor/rules/playwright-tests.mdc) for test sources; use [vue-template-test-hooks.mdc](.cursor/rules/vue-template-test-hooks.mdc) when changing locators in `.vue` templates. See `.cursor/skills/fantasia-testing/SKILL.md` and `README.md`.
 
 ## Suggested Cursor agent profiles (manual presets)

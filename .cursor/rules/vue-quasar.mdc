@@ -15,6 +15,7 @@ alwaysApply: false
 ## After UI changes
 
 - Run `yarn lint`; add or update **Playwright** component tests where the project already tests similar UI (see [fantasia-testing](../skills/fantasia-testing/SKILL.md) skill).
+- For components under `src/components/**`, keep Vitest parity: each `.vue` should retain a matching `tests/<ComponentName>.vitest.test.ts` suite (presence baseline, not exhaustive coverage metric).
 
 ## `<script setup>` — documentation and size
 

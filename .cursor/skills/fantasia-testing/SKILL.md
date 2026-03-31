@@ -22,11 +22,13 @@ Match **existing** tests to the letter when adding or editing:
 - **Command**: `yarn test:unit` runs [vitest.config.mts](../../vitest.config.mts) then [vitest.components.config.mts](../../vitest.components.config.mts) (Vue SFC tests under `src/components/**`).
 - **Machine-readable reports**: `test-results/vitest-report/test-results-vitest.json` (core) and `test-results-vitest-components.json` (components).
 - **Scope**: Logic in `src/` and `src-electron/` (including main-process modules) with `*.vitest.test.ts` co-located under `tests/` folders; component mounting tests use `@vue/test-utils` + shared [vitest.setup.ts](../../vitest.setup.ts).
+- **Component baseline**: under `src/components/**`, maintain one colocated `tests/<ComponentName>.vitest.test.ts` per `.vue` component (add/rename/remove both together).
 - **Renderer examples**: `src/scripts/**` helpers, store/composable state transitions, and other deterministic `src/` logic that does not require full Electron runtime wiring.
 - **`_data/` is for production feeds** (not automated-test fixture blobs): do **not** add Vitest suites aimed **only** at `_data/` paths; validate production data indirectly via components or scripts. **Vitest fixtures** and **Playwright fixture objects** (props payloads, key lists, gold values) stay **inside** the respective `*.vitest.test.ts` / `*.playwright.test.ts` files as inline `const` data — **no** extra `tests/*.ts` files used only as fixture dumps. Do **not** use `tests/_data/`.
 - **Style**: Flat `test` / `test.skip` only (no `describe`), JSDoc above each test naming the function under test, titles like `Test that ...` — see `src-electron/**/tests/*.vitest.test.ts` and the vitest rule above.
 - **Typing**: Avoid `any` in test code and fixtures; use concrete interfaces, inferred literals, or `unknown` narrowed before assertion/use.
 - **Shared type naming**: Preserve project naming conventions for imported types (`I_` interfaces, `T_` aliases) and prefer descriptive names such as `I_appMenuList` / `T_dialogName`.
+- **Coverage semantics**: 1:1 component-to-suite parity means coverage **presence**; it does not imply exhaustive line/branch percentages.
 
 ## Playwright (component + E2E)
 

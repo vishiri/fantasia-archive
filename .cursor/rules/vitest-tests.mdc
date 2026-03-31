@@ -18,12 +18,14 @@ alwaysApply: false
 - Files must match `**/*vitest.@(spec|test).?(c|m)[jt]s?(x)` — this repo uses **`*.vitest.test.ts`**.
 - Co-locate tests under a **`tests/`** directory next to the code under test, e.g. [src/scripts/_utilities/tests](src/scripts/_utilities/tests), [src/stores/tests](src/stores/tests), [src-electron/contentBridgeAPIs/tests](src-electron/contentBridgeAPIs/tests), [src-electron/mainScripts/tests](src-electron/mainScripts/tests), [src/components/FantasiaMascotImage/tests](src/components/FantasiaMascotImage/tests).
 - Treat `src/`, `src-electron/`, and **Vue components under `src/components/`** as Vitest unit-testing surfaces when mounting is appropriate; full UI flows remain in Playwright.
+- For `src/components/**`, keep a **1:1 baseline**: every component `.vue` should have a colocated `tests/<ComponentName>.vitest.test.ts`. When adding, renaming, or removing a component, update its matching Vitest file in the same change.
 
 ## Vue and renderer test boundaries
 
 - Use Vitest for deterministic renderer logic in `src/` (helpers, stores/composables, serializable transforms, and simple component-facing logic extracted into TS modules).
 - If Vue SFC behavior can be validated without fragile DOM coupling, prefer focused unit tests around the extracted logic path.
 - Keep full interaction/visual/integration checks in Playwright component or E2E tests (`*.playwright.test.ts` / `*.playwright.spec.ts`).
+- Treat this 1:1 mapping as **coverage presence**, not exhaustive line/branch coverage metrics.
 - **`_data/` is for production feeds only** (menus, button lists, locale-backed blobs the app ships). Do **not** put **Vitest fixtures** there.
 - **All Vitest fixture data** (sample props, mock objects, expected literals) must live **inside** the same `*.vitest.test.ts` file: inline **`const`** / object literals at module scope next to imports or immediately above the test that uses them. Do **not** add sibling `tests/*.ts` files whose only purpose is to hold data for Vitest. Do **not** use `tests/_data/`.
 - **No automated tests for `_data/` modules**: do **not** add Vitest (or Playwright specs) aimed **only** at **any** file under **`_data/`** (e.g. `src/components/**/_data/**`). Cover production `_data` **indirectly** through components or scripts that import it—not with dedicated tests whose SUT is a `_data/` path.

@@ -46,6 +46,7 @@ description: >-
 - `yarn lint` (ESLint + Vue plugin; project uses `standard`-style config).
 - Stylelint is configured for Vue/SCSS when touching styles significantly.
 - Keep TypeScript strict in Vue code: avoid `any`; prefer explicit prop/emits/interfaces, `unknown`, and narrowing.
+- Keep component test parity in `src/components/**`: each `.vue` should have a colocated `tests/<ComponentName>.vitest.test.ts` (presence baseline; not a claim of exhaustive line/branch coverage).
 
 ## Related
 
