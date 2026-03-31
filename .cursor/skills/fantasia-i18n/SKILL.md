@@ -19,6 +19,12 @@ description: >-
 - **Component/dialog strings**: Prefer dedicated `T_<feature>.ts` files under `en-US/components/...` or `en-US/dialogs/...` and import them into `index.ts` for a clear tree.
 - **Markdown documents**: Live under `en-US/documents/` as `.md` files; imported in `index.ts` and often passed through `specialCharacterFixer` from `src/i18n/specialCharactersFixer.ts`.
 
+## Storybook integration
+
+- For Storybook mocks/loaders, import focused non-markdown `T_*` modules directly (for example `en-US/components/.../T_*.ts`) instead of importing `en-US/index.ts`.
+- Reason: full locale entrypoints pull markdown `documents/*.md`, which can break Storybook/Vite import analysis unless extra markdown handling is configured.
+- If Storybook stories need document content (`documents.*`), provide explicit placeholder strings (for example lorem ipsum) in `.storybook/preview.ts` rather than importing markdown files.
+
 ## Adding strings
 
 1. Choose the right namespace (global vs component-specific `T_*` module).

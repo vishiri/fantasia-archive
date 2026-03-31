@@ -36,6 +36,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | i18n           | vue-i18n (`src/i18n/`)                                           |
 | Unit tests     | Vitest (`yarn test:unit`)                                        |
 | UI / E2E tests | Playwright (`yarn test:component`, `yarn test:e2e`)              |
+| Component docs | Storybook 8 (`yarn storybook`, `yarn build-storybook`)           |
 | DB (evolving)  | `sqlite3` in main process (`src-electron/electron-main.ts` stub) |
 
 
@@ -67,6 +68,13 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 - **`_data/` holds production structured feeds** (menus, lists, etc.). **Vitest** and **Playwright** fixture objects live **inside** their own `*.vitest.test.ts` / `*.playwright.test.ts` files (inline `const` / literals), not in `_data/` and **not** in extra `tests/*.ts` files whose only role is fixture storage. **Never** add `tests/_data/`. Do **not** add tests whose **only** system-under-test is a file under `_data/`; exercise production data indirectly (components, boot, scripts).
 - Treat 1:1 component-test parity as **coverage presence**, not exhaustive line/branch percentage coverage.
 - **Playwright** requires a **production build** before runs when source affecting the app has changed. Follow [playwright-tests.mdc](.cursor/rules/playwright-tests.mdc) for test sources; use [vue-template-test-hooks.mdc](.cursor/rules/vue-template-test-hooks.mdc) when changing locators in `.vue` templates. See `.cursor/skills/fantasia-testing/SKILL.md` and `README.md`.
+
+## Storybook expectations
+
+- Story files are colocated with components as `src/components/**/<Component>.stories.ts`.
+- Prefer Storybook for isolated component authoring/editing feedback; use `yarn storybook` for dev and `yarn build-storybook` for static output.
+- Do **not** import the full `src/i18n/en-US/index.ts` (or `src/i18n/index.ts`) in Storybook helpers/mocks; these pull markdown `documents/*.md` and can break Vite import analysis.
+- For Storybook-only i18n mocks, import non-markdown `T_*` locale modules directly and provide placeholder lorem ipsum strings for `documents.*` markdown keys.
 
 ## Suggested Cursor agent profiles (manual presets)
 

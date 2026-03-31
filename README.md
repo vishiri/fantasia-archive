@@ -32,6 +32,22 @@ quasar dev -m electron
 quasar build -m electron
 ```
 
+### Storybook (Vue components)
+
+Use Storybook to develop/document renderer components in isolation.
+
+```
+yarn storybook
+```
+
+Build static Storybook output:
+
+```
+yarn build-storybook
+```
+
+Stories live next to components as `*.stories.ts` under `src/components/**`.
+
 ### Testing
 
 #### Unit test - via Vitest

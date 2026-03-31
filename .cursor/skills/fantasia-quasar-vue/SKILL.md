@@ -18,6 +18,7 @@ description: >-
 
 - Default app chrome: `src/layouts/MainLayout.vue` and routes in `src/router/routes.ts`.
 - **Component playground**: `src/pages/ComponentTesting.vue` with `src/layouts/ComponentTestingLayout.vue` — use for isolated UI experiments before wiring into main flows.
+- **Storybook**: `src/components/**/<Component>.stories.ts` with project bootstrap under `.storybook/` for isolated component development outside Electron runtime.
 
 ## Quasar patterns
 
@@ -52,3 +53,8 @@ description: >-
 
 - [fantasia-i18n](../fantasia-i18n/SKILL.md) for user-visible strings.
 - [fantasia-testing](../fantasia-testing/SKILL.md) for component Playwright tests next to components.
+
+## Storybook i18n caution
+
+- In Storybook-specific loaders/mocks, avoid importing full locale entrypoints (`src/i18n/index.ts` or `src/i18n/en-US/index.ts`) because they import markdown `documents/*.md`.
+- Prefer importing focused non-markdown `T_*` modules (for example menu/button translation modules) and provide explicit placeholder copy for markdown-backed `documents.*` keys used by dialogs.

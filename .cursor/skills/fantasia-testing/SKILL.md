@@ -73,3 +73,9 @@ Match **existing** tests to the letter when adding or editing:
 
 - Prefer Vitest when validating pure/data/state behavior in `src/` and keep assertions deterministic.
 - Prefer Playwright when validating user-facing interaction flow, full component rendering behavior, or anything relying on the built Electron app runtime.
+
+## Storybook smoke checks (component authoring support)
+
+- Storybook commands: `yarn storybook` (interactive) and `yarn storybook --smoke-test --ci` (startup verification).
+- Keep Storybook stories colocated as `src/components/**/<Component>.stories.ts`.
+- When components rely on i18n-backed markdown docs, avoid importing full locale roots in Storybook mocks; use focused `T_*` translation module imports plus placeholder `documents.*` strings to prevent markdown import-analysis failures.
