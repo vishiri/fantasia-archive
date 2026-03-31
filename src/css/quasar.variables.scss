@@ -20,6 +20,9 @@ $negative  : #c10015;
 $info      : lighten(#d7ac47, 35);
 $warning   : #f2c037;
 
+/* GLOBALS - CUSTOM COLORS */
+$gold-muted-border: scale-color($primary, $saturation: -35%, $lightness: 14%);
+
 /* GLOBALS - HTML ELEMENTS */
 $aLinkColor: $primary-bright;
 
@@ -66,14 +69,21 @@ $appControlMenus_singleHover: $primary-bright;
 
 /* COMPONENT - MARKDOWN */
 $qMarkdown-color: $grey;
+$qMarkdown-blockquote-borderColor: $gold-muted-border;
+$qMarkdown-blockquote-textStyle: italic;
+$qMarkdown-table-borderColor: $gold-muted-border;
+$qMarkdown-table-borderRadius: 3px;
 $qMarkdown-code-textColor: $dark;
-$qMarkdown-code-blackgroundColor: $accent;
-$qMarkdown-code-borderColor: $accent;
+$qMarkdown-code-blackgroundColor: $grey;
+$qMarkdown-code-borderColor: $grey;
+$qMarkdown-code-borderRadius: 3px;
+$qMarkdown-code-padding: 10px;
 
 /* COMPONENT - SOCIAL CONTACT BUTTONS */
 $socialContactButtons-backgroundColor-patreon: #ff424d;
 $socialContactButtons-hoverColor-patreon: #000;
 $socialContactButtons-backgroundColor-kofi: #000;
+$socialContactButtons-backgroundColor-webpage: $qCard-background;
 $socialContactButtons-hoverColor-webpage: $primary-bright;
 $socialContactButtons-textColor-webpage: $primary-bright;
 $socialContactButtons-backgroundColor-github: #fff;

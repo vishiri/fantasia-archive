@@ -26,14 +26,119 @@
 .q-markdown {
   color: $qMarkdown-color !important;
   line-height: 1.75;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .q-markdown--heading,
+  .q-markdown--heading-h1,
+  .q-markdown--heading-h2,
+  .q-markdown--heading-h3,
+  .q-markdown--heading-h4,
+  .q-markdown--heading-h5,
+  .q-markdown--heading-h6,
+  p,
+  li,
+  th,
+  td,
+  strong,
+  em,
+  span,
+  blockquote {
+    color: $qMarkdown-color !important;
+    opacity: 1 !important;
+  }
 
   a {
     border-bottom: 1px dotted $aLinkColor;
   }
 
+  blockquote {
+    border-top: 1px solid $qMarkdown-blockquote-borderColor !important;
+    border-bottom: 1px solid $qMarkdown-blockquote-borderColor !important;
+    border-left: 8px solid $qMarkdown-blockquote-borderColor !important;
+    border-right: 8px solid $qMarkdown-blockquote-borderColor !important;
+    border-radius: $qMarkdown-table-borderRadius !important;
+    padding: 5px 14px !important;
+  }
+
+  blockquote,
+  blockquote p {
+    font-style: $qMarkdown-blockquote-textStyle !important;
+  }
+
+  table {
+    border: 1px solid $qMarkdown-table-borderColor;
+    border-radius: $qMarkdown-table-borderRadius;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+
+    th,
+    td {
+      border-right: 1px solid $qMarkdown-table-borderColor;
+      border-bottom: 1px solid $qMarkdown-table-borderColor;
+      border-top: 0;
+      border-left: 0;
+    }
+
+    th:last-child,
+    td:last-child {
+      border-right: 0;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    tr:first-child th:first-child {
+      border-top-left-radius: $qMarkdown-table-borderRadius;
+    }
+
+    tr:first-child th:last-child {
+      border-top-right-radius: $qMarkdown-table-borderRadius;
+    }
+
+    tr:last-child td:first-child {
+      border-bottom-left-radius: $qMarkdown-table-borderRadius;
+    }
+
+    tr:last-child td:last-child {
+      border-bottom-right-radius: $qMarkdown-table-borderRadius;
+    }
+  }
+
   pre {
-    padding: 16px 5px !important;
+    padding: $qMarkdown-code-padding !important;
     margin: 0 0 16px !important;
+    border-radius: $qMarkdown-code-borderRadius;
+  }
+
+  pre.line-numbers {
+    padding-left: calc(3.2em + #{$qMarkdown-code-padding}) !important;
+  }
+
+  pre.line-numbers code {
+    display: block;
+    line-height: 1.75 !important;
+  }
+
+  pre.line-numbers .line-numbers-rows {
+    top: 0 !important;
+    padding-top: $qMarkdown-code-padding;
+  }
+
+  pre.line-numbers .line-numbers-rows > span {
+    line-height: 1.75 !important;
+  }
+
+  pre.line-numbers .line-numbers-rows > span::before {
+    line-height: 1.75 !important;
   }
 
   .q-markdown--token {
@@ -42,7 +147,44 @@
     background-color: $qMarkdown-code-blackgroundColor !important;
     color: $qMarkdown-code-textColor !important;
     border-color: $qMarkdown-code-borderColor !important;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
+
+  code {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  pre > code {
+    display: block;
+    line-height: 1.75 !important;
+  }
+
+  .q-markdown--line-numbers {
+    padding: 10px 0 10px 10px;
+  }
+}
+
+/* Force high-contrast markdown text in dark mode over QMarkdown defaults */
+.body--dark .q-markdown,
+.body--dark .q-markdown p,
+.body--dark .q-markdown li,
+.body--dark .q-markdown th,
+.body--dark .q-markdown td,
+.body--dark .q-markdown .q-markdown--heading,
+.body--dark .q-markdown .q-markdown--heading-h1,
+.body--dark .q-markdown .q-markdown--heading-h2,
+.body--dark .q-markdown .q-markdown--heading-h3,
+.body--dark .q-markdown .q-markdown--heading-h4,
+.body--dark .q-markdown .q-markdown--heading-h5,
+.body--dark .q-markdown .q-markdown--heading-h6,
+.body--dark .q-markdown .q-markdown--line-numbers-wrapper,
+.body--dark .q-markdown .q-markdown--code {
+  color: $qMarkdown-color !important;
+  opacity: 1 !important;
 }
 
 .q-menu {

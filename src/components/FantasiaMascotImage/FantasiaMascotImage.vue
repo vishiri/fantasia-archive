@@ -6,6 +6,8 @@
     <!-- Inner image of the chosen Fantasia Mascot -->
     <img
       :src="currentMascotImage"
+      :alt="`${$t('FantasiaMascotImage.label')} - ${mascotVariantName}`"
+      :title="`${$t('FantasiaMascotImage.label')} - ${mascotVariantName}`"
       class="fantasiaMascotImage__inner"
       data-test="fantasiaMascotImage-image"
       :data-test-image="fantasiaImage"
@@ -17,6 +19,7 @@
 <script setup lang="ts">
 
 import { fantasiaImageList, determineCurrentImage } from 'app/src/scripts/appInfo/fantasiaMascotImageManager'
+import { computed } from 'vue'
 
 /**
  * All component props
@@ -52,6 +55,8 @@ const props = defineProps({
  * Determines if the image URL will be generating randomly or if it is set via the prop.
  */
 const isRandom = ((imageUrl: string) => (imageUrl === ''))(props.fantasiaImage)
+
+const mascotVariantName = computed(() => props.fantasiaImage || 'random')
 
 /**
  * Currently selected image URL for rendering

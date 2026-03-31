@@ -3,6 +3,7 @@
   <q-dialog
     v-model="dialogModel"
     :class="['dialogMarkdownDocument', `${documentName}`]"
+    :aria-label="dialogAriaLabel"
   >
     <q-card>
       <!-- Dialog contents wrapper -->
@@ -44,7 +45,7 @@ import { QMarkdown } from '@quasar/quasar-ui-qmarkdown'
 import '@quasar/quasar-ui-qmarkdown/dist/index.css'
 import { T_documentName } from 'app/types/T_documentList'
 import { S_DialogMarkdown } from 'src/stores/S_Dialog'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 /**
  * All component props
@@ -65,6 +66,23 @@ const dialogModel = ref(false)
  * Name of the document shown inside the dialog
  */
 const documentName = ref('')
+
+const dialogAriaLabel = computed(() => {
+  switch (documentName.value) {
+    case 'advancedSearchCheatSheet':
+      return 'Advanced Search Cheat Sheet'
+    case 'advancedSearchGuide':
+      return 'Advanced Search Guide'
+    case 'changeLog':
+      return 'Changelog'
+    case 'license':
+      return 'License'
+    case 'tipsTricksTrivia':
+      return 'Tips, Tricks and Trivia'
+    default:
+      return 'Markdown document dialog'
+  }
+})
 
 /**
  * Opens the popup dialog via direct input-feed
@@ -105,6 +123,25 @@ onMounted(() => {
 <style lang="scss">
 
 .dialogMarkdownDocument {
+  .q-markdown,
+  .q-markdown * {
+    color: $qMarkdown-color !important;
+    opacity: 1 !important;
+  }
+
+  .q-markdown a {
+    color: $aLinkColor !important;
+  }
+
+  .q-markdown .q-markdown--token,
+  .q-markdown code.q-markdown--token {
+    color: $qMarkdown-code-textColor !important;
+  }
+
+  .q-markdown pre code {
+    color: $qMarkdown-color !important;
+  }
+
   .q-card {
     max-width: calc(100vw - 100px) !important;
   }

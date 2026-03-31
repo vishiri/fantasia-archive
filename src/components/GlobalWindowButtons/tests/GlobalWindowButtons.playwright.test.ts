@@ -79,12 +79,8 @@ test('Click resize button - "smallify"', async () => {
   await expect(resizeButton).toHaveCount(1)
   await resizeButton.click()
 
-  // Wait for the window to resize
-  await appWindow.waitForTimeout(600)
-
-  // Check if the window is maximized or not
-  const isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
-  expect(isMaximized).toBe(false)
+  // Wait for the window to resize and report non-maximized state
+  await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === false)
 
   // Close the app
   await electronApp.close()
@@ -116,8 +112,8 @@ test('Click resize button - "maximize"', async () => {
     // Minimize first
     await resizeButton.click()
 
-    // Wait for the window to minimize
-    await appWindow.waitForTimeout(600)
+    // Wait for the window to minimize before clicking again
+    await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === false)
 
     // Maximize again
     await resizeButton.click()
@@ -126,12 +122,8 @@ test('Click resize button - "maximize"', async () => {
     await resizeButton.click()
   }
 
-  // Wait for the window to maximize
-  await appWindow.waitForTimeout(600)
-
-  // Check if the window is maximized
-  isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
-  expect(isMaximized).toBe(true)
+  // Wait for the window to maximize and report maximized state
+  await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === true)
 
   // Close the app
   await electronApp.close()
@@ -156,12 +148,8 @@ test('Click minimize button', async () => {
   await expect(minimizeButton).toHaveCount(1)
   await minimizeButton.click()
 
-  // Wait for the window to minimize
-  await appWindow.waitForTimeout(600)
-
-  // Check if the window is minimized
-  const isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
-  expect(isMaximized).toBe(false)
+  // Wait for the window to minimize and report non-maximized state
+  await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === false)
 
   // Close the app
   await electronApp.close()
@@ -185,17 +173,14 @@ test('Click close button', async () => {
   // Check if the tested element exists
   await expect(closeButton).toHaveCount(1)
 
-  // Prapere the variable and listen to window close event
-  let windowIsClosed = false
-  appWindow.on('close', () => {
-    windowIsClosed = true
-  })
+  // Prepare a close-event promise before clicking
+  const windowCloseEvent = appWindow.waitForEvent('close')
 
   // Click the close button
   await closeButton.click()
 
-  // Check if the window is closed
-  expect(windowIsClosed).toBe(true)
+  // Check if the window was closed
+  await windowCloseEvent
 
   // Close the app
   await electronApp.close()

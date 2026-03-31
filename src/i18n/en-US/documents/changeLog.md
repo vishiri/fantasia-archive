@@ -1,6 +1,18 @@
 # Changelog
 ----------
 
+## 2.3.0 - Storybook workspace and desktop polish
+
+### New features
+- Moved Storybook into a nested `.storybook-workspace` package with its own toolchain, removed the root `.storybook` tree, and refreshed colocated stories (menus, dialogs, mascot, window controls, and social buttons) for stable addons, `public/` assets, and authoring workflows.
+- Tuned global Quasar variable tokens and shared component SCSS adjustments for more consistent window chrome, controls, and markdown/dialog surfaces.
+- Added Fantasia mascot image label strings for en-US and German locales to support accessible naming.
+- Documented Storybook, Electron `file://`, and Playwright rebuild expectations for contributors in `AGENTS.md`, `README.md`, and Cursor skills/rules (including a dedicated Storybook stories rule).
+
+### Bugfixes & Optimizations
+- Fixed social contact button icons not loading in packaged Electron builds by resolving `public/` images with a relative base when `import.meta.env.BASE_URL` is `/` or empty, instead of root-relative URLs under `file://`.
+- Updated Playwright component coverage for window controls to match current markup and accessibility labels.
+
 ## 2.2.1 - Type naming and consistency sweep
 
 ### New features

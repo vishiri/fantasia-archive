@@ -11,6 +11,7 @@ alwaysApply: false
 - Use Vue 3 **Composition API** (`<script setup>`) consistent with existing components.
 - Prefer **Quasar** (`q-*`) components and spacing/typography patterns from sibling files in the same area.
 - Keep **user-visible copy** in i18n (`src/i18n`) when keys already exist — extend locale modules rather than hardcoding strings in templates.
+- For SFC translations, use template `$t('...')` directly; do **not** import `useI18n` only to call `t(...)`.
 
 ## After UI changes
 

@@ -23,12 +23,14 @@
       anchor="bottom left"
       square
       dark
+      role="menu"
       transition-show="jump-down"
       transition-hide="jump-up"
     >
       <q-list
         class="appControlSingleMenu__list"
         dark
+        role="none"
       >
         <template
           v-for="(menuItem,index) in menuData"
@@ -38,12 +40,14 @@
             v-if="menuItem.mode === 'separator'"
             class="appControlSingleMenu__separator"
             dark
+            role="separator"
           />
 
           <q-item
             v-if="menuItem.mode === 'item'"
             v-close-popup="menuItem.submenu === undefined ? true : false"
             clickable
+            role="menuitem"
             data-test="AppControlSingleMenu-menuItem"
             :class="['appControlSingleMenu__item', `text-${menuItem.specialColor}`, 'non-selectable']"
             :disable="(!menuItem.conditions)"
@@ -71,6 +75,7 @@
               self="top start"
               square
               dark
+              role="menu"
               transition-show="jump-right"
               transition-hide="jump-left"
               class="-subMenu"
@@ -79,6 +84,7 @@
               <q-list
                 class="appControlSingleMenu__list"
                 dark
+                role="none"
               >
                 <template
                   v-for="(submenuItem,subIndex) in menuItem.submenu"
@@ -88,11 +94,13 @@
                     v-if="submenuItem.mode === 'separator'"
                     class="appControlSingleMenu__separator"
                     dark
+                    role="separator"
                   />
                   <q-item
                     v-if="submenuItem.mode === 'item'"
                     v-close-popup
                     clickable
+                    role="menuitem"
                     :class="['appControlSingleMenu__item', `text-${submenuItem.specialColor}`, 'non-selectable']"
                     :disable="(!submenuItem.conditions)"
                     data-test="AppControlSingleMenu-menuItem-subMenu-item"

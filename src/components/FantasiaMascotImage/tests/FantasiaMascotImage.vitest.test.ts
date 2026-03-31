@@ -11,7 +11,14 @@ import FantasiaMascotImage from '../FantasiaMascotImage.vue'
  */
 test('Test that FantasiaMascotImage renders list image and disables random mode when prop is set', () => {
   const w = mount(FantasiaMascotImage, {
-    props: { fantasiaImage: 'error', width: '10px', height: '10px' }
+    props: { fantasiaImage: 'error', width: '10px', height: '10px' },
+    global: {
+      config: {
+        globalProperties: {
+          $t: (key: string) => key
+        }
+      }
+    }
   })
 
   const img = w.get('[data-test="fantasiaMascotImage-image"]')
@@ -27,7 +34,14 @@ test('Test that FantasiaMascotImage renders list image and disables random mode 
 test('Test that FantasiaMascotImage enables random mode when fantasiaImage prop is empty', () => {
   vi.spyOn(Math, 'random').mockReturnValue(0.25)
   const w = mount(FantasiaMascotImage, {
-    props: { fantasiaImage: '', width: '10px', height: '10px' }
+    props: { fantasiaImage: '', width: '10px', height: '10px' },
+    global: {
+      config: {
+        globalProperties: {
+          $t: (key: string) => key
+        }
+      }
+    }
   })
 
   const img = w.get('[data-test="fantasiaMascotImage-image"]')

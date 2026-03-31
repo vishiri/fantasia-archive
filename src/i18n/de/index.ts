@@ -10,5 +10,10 @@ export default {
     resizeButton: 'Resize Down',
     maximizeButton: 'Maximize',
     close: 'Close'
+  },
+
+  // COMPONENT - FANTASIA MASCOT IMAGE
+  FantasiaMascotImage: {
+    label: 'Fantasia Maskottchen'
   }
 }

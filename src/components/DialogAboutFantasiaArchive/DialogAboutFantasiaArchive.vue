@@ -3,13 +3,14 @@
   <q-dialog
     v-model="dialogModel"
     :class="['dialogComponent', `${documentName}`]"
+    aria-labelledby="dialogAboutFantasiaArchive-title"
   >
     <q-card
       :class="['dialogComponent__wrapper', `${documentName}`]"
     >
       <!-- Dialog contents wrapper -->
       <q-card-section :class="['dialogComponent__content', `${documentName}`, 'q-mt-xl', 'q-mb-lg', 'q-mr-lg', 'q-ml-xl', 'q-pt-none']">
-        <h6>
+        <h6 id="dialogAboutFantasiaArchive-title">
           {{ $t('Dialogs.aboutFantasiaArchive.title') }}
         </h6>
 

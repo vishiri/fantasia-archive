@@ -43,9 +43,9 @@
       />
     </q-btn-group>
 
-    <!-- Dialog Popups -->
-    <DialogMarkdownDocument />
-    <DialogAboutFantasiaArchive />
+    <!-- Dialog Popups (optional so mounted surfaces like Storybook can preview the menu bar only) -->
+    <DialogMarkdownDocument v-if="embedDialogs" />
+    <DialogAboutFantasiaArchive v-if="embedDialogs" />
   </div>
 </template>
 
@@ -62,6 +62,18 @@ import { helpInfo } from 'app/src/components/AppControlMenus/_data/helpInfo'
 import AppControlSingleMenu from 'app/src/components/AppControlSingleMenu/AppControlSingleMenu.vue'
 import DialogMarkdownDocument from 'app/src/components/DialogMarkdownDocument/DialogMarkdownDocument.vue'
 import DialogAboutFantasiaArchive from 'app/src/components/DialogAboutFantasiaArchive/DialogAboutFantasiaArchive.vue'
+
+withDefaults(
+  defineProps<{
+    /**
+     * When true (default), mounts dialogs reached from Help / menu actions. Set false in Storybook to avoid shared Pinia dialog state painting unrelated overlays on the canvas.
+     */
+    embedDialogs?: boolean
+  }>(),
+  {
+    embedDialogs: true
+  }
+)
 
 /**
  * Testing type that might be happening right now

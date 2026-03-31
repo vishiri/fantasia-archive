@@ -18,13 +18,19 @@ description: >-
 
 - Default app chrome: `src/layouts/MainLayout.vue` and routes in `src/router/routes.ts`.
 - **Component playground**: `src/pages/ComponentTesting.vue` with `src/layouts/ComponentTestingLayout.vue` — use for isolated UI experiments before wiring into main flows.
-- **Storybook**: `src/components/**/<Component>.stories.ts` with project bootstrap under `.storybook/` for isolated component development outside Electron runtime.
+- **Storybook**: `src/components/**/<Component>.stories.ts`; Storybook runs from [`.storybook-workspace/`](../../../.storybook-workspace/) (config under `.storybook-workspace/.storybook/`) so `staticDirs` and Vite can mirror the Quasar app’s `public/` layout. Root scripts: `yarn storybook`, `yarn build-storybook`.
 
 ## Quasar patterns
 
 - Prefer Quasar components (`q-*`) and existing spacing/typography patterns in sibling components.
 - Boot files in `src/boot/` run at app init (e.g. axios, external links).
 - When importing shared project types, keep `I_` / `T_` prefixes and use descriptive singular/collection naming (e.g. `T_documentName`, `I_appMenuList`).
+- In `.vue` SFCs, prefer template `$t('...')` translation calls; avoid importing `useI18n` only for `t(...)` when a template binding can express the same text.
+
+## `public/` assets and Electron (`file://`)
+
+- Quasar + Vite often expose `import.meta.env.BASE_URL` as `'/'` or `''` for the Electron renderer. URLs such as `/images/foo.png` then resolve to the **filesystem root** under `file://`, not next to `index.html`, and images or other `public/` files may fail to load in packaged builds (and break Playwright assertions that expect a loaded `<img>`).
+- For anything served from `public/`, build href/src with a **relative** base when `BASE_URL` is `'/'` or empty (e.g. `./images/...`). Example: [`SocialContactSingleButton.vue`](../../../src/components/SocialContactSingleButton/SocialContactSingleButton.vue).
 
 ## Component `_data/` (production structured payloads)
 
@@ -58,3 +64,5 @@ description: >-
 
 - In Storybook-specific loaders/mocks, avoid importing full locale entrypoints (`src/i18n/index.ts` or `src/i18n/en-US/index.ts`) because they import markdown `documents/*.md`.
 - Prefer importing focused non-markdown `T_*` modules (for example menu/button translation modules) and provide explicit placeholder copy for markdown-backed `documents.*` keys used by dialogs.
+- Do **not** create Storybook stories under the `A11y/*` category for this project.
+- Do **not** create Storybook stories that only exercise `TEST_ENV === 'components'` branches; validate those paths in Playwright/component-test harnesses instead.

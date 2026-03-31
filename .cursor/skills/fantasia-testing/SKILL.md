@@ -34,6 +34,12 @@ Match **existing** tests to the letter when adding or editing:
 
 **Critical**: Playwright targets a **built, production** Electron app. After **any** source change affecting what tests exercise, run `quasar build -m electron` (or `yarn build`) before Playwright.
 
+### Cross-toolchain alignment (Storybook + Electron + same repo)
+
+- **Storybook** — Runs from [`.storybook-workspace/`](../../../.storybook-workspace/); config must keep `staticDirs` (and related Vite `public/` wiring) in sync with the Quasar app so public assets resolve the same way in Storybook dev and `yarn build-storybook` output. See [`.storybook-workspace/.storybook/main.ts`](../../../.storybook-workspace/.storybook/main.ts).
+- **Electron `file://`** — Packaged renderer paths are not a web origin at `/`. If `import.meta.env.BASE_URL` is `'/'` or empty, building `public/` URLs as `/images/...` can fail loading; use a relative prefix (e.g. `./`) for those assets (see `SocialContactSingleButton.vue`).
+- **Playwright** — Same rebuild rule as above: **`yarn build` before `yarn test:component` / `yarn test:e2e`** when exercised sources changed; flaky UI in tests after a green Storybook pass often means a stale build or a `file://` URL mismatch.
+
 ### Config highlights (`playwright.config.ts`)
 
 - `testMatch`: `**/*playwright.@(spec|test).?(c|m)[jt]s?(x)`

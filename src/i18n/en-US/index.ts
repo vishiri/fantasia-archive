@@ -65,6 +65,11 @@ export default {
   },
 
   // COMPONENT - SOCIAL CONTACT BUTTONS
-  SocialContactButtons: T_socialContactButtons
+  SocialContactButtons: T_socialContactButtons,
+
+  // COMPONENT - FANTASIA MASCOT IMAGE
+  FantasiaMascotImage: {
+    label: 'Fantasia Mascot'
+  }
 
 }

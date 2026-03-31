@@ -48,6 +48,59 @@ yarn build-storybook
 
 Stories live next to components as `*.stories.ts` under `src/components/**`.
 
+#### Integration gotchas (Storybook + Electron + Playwright)
+
+- **Storybook** — Runs from [`.storybook-workspace/`](.storybook-workspace/) (nested Yarn project). Config keeps `staticDirs` pointed at the repo [`public/`](public/) folder (and related Vite wiring) so asset paths match the Quasar app.
+- **Electron** — The packaged renderer loads from `file://`. Root-relative `public/` URLs built from `import.meta.env.BASE_URL === '/'` can fail; prefer **relative** paths (e.g. `./images/...`) for those assets unless you control a real HTTP base.
+- **Playwright** — Component and E2E tests drive the **built** app. Run `yarn build` before `yarn test:component` / `yarn test:e2e` when you change sources those tests cover.
+
+#### Storybook workflow charter
+
+Storybook is the first-stop UI quality gate for renderer components in this repo:
+
+- Component development: iterate props/states quickly without full Electron boot.
+- QA pre-check: validate visual/behavior regressions before Playwright/E2E runs.
+- UX review: verify interaction and content edge-cases (including localization stress) in isolated stories.
+
+#### Story naming taxonomy
+
+Use the same story naming style across components for discoverability:
+
+- `Default` for baseline rendering.
+- `States/*` for deterministic state matrices (loading, empty, error, mode/flag variations).
+- `Interactions/*` for `play`-driven interaction checks.
+- `I18nStress/*` for localization expansion and markdown-heavy text pressure tests.
+
+#### Story change policy
+
+When a user-facing component changes, update its story variants in the same change scope:
+
+- Keep `Default` aligned with the current baseline behavior.
+- Add/update `States/*` when logic, data contracts, or conditional rendering changes.
+- Add/update `Interactions/*` whenever controls, keyboard flow, or user actions change.
+
+#### Storybook maintenance checklist
+
+Run this checklist periodically (or before larger releases):
+
+- Addons still load and match Storybook major/minor versions.
+- Global decorators still provide valid Pinia/i18n/content-bridge mocks.
+- Stories render with no broken controls/actions/docs panels.
+- Localized stress stories still reflect realistic long/markdown-heavy content.
+
+#### Story depth coverage tracking
+
+Track story depth manually to prioritize upgrades:
+
+| Coverage tier | Meaning | Priority |
+| --- | --- | --- |
+| Baseline | `Default` only | Upgrade next |
+| Matrix | `Default` + `States/*` | Medium |
+| Quality | Includes `Interactions/*` | High |
+| Stress-tested | Includes `I18nStress/*` where applicable | Maintain |
+
+Review this table against `src/components/**` stories each iteration and move highest-risk user-facing components toward at least **Quality** coverage.
+
 ### Testing
 
 #### Unit test - via Vitest

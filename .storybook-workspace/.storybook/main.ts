@@ -2,11 +2,28 @@ import path from 'path'
 import vue from '@vitejs/plugin-vue'
 import type { StorybookConfig } from '@storybook/vue3-vite'
 
-const quasarVariablesPath = path.resolve(__dirname, '../src/css/quasar.variables.scss').replaceAll('\\', '/')
+import { vitePluginServeRepoPublic } from './vitePluginServeRepoPublic'
+
+const repoRoot = path.resolve(__dirname, '../..')
+const quasarVariablesPath = path.resolve(repoRoot, 'src/css/quasar.variables.scss').replaceAll('\\', '/')
 const externalFileLoaderMockPath = path.resolve(__dirname, './mocks/externalFileLoader.ts')
+/** Same as Quasar app: `public/` is served at `/` so `images/socialContactButtons/*.png` resolves. */
+const publicDirPath = path.resolve(repoRoot, 'public')
 
 const config: StorybookConfig = {
-  stories: ['../src/components/**/*.stories.ts'],
+  stories: ['../../src/components/**/*.stories.ts'],
+  /**
+   * Relative to `configDir` only — Windows absolute paths break Storybook's `staticDirs` parser (`C:` / `to:` split).
+   * Dev-time asset requests are also served by `vitePluginServeRepoPublic` (see `viteFinal`).
+   */
+  staticDirs: ['../../public'],
+  addons: [
+    '@storybook/addon-essentials',
+    '@storybook/addon-interactions'
+  ],
+  docs: {
+    autodocs: 'tag'
+  },
   framework: {
     name: '@storybook/vue3-vite',
     options: {}
@@ -14,7 +31,9 @@ const config: StorybookConfig = {
   async viteFinal (viteConfig) {
     return {
       ...viteConfig,
+      publicDir: publicDirPath,
       plugins: [
+        vitePluginServeRepoPublic(publicDirPath),
         ...(viteConfig.plugins ?? []),
         vue()
       ],
@@ -40,10 +59,10 @@ const config: StorybookConfig = {
           ...(viteConfig.resolve?.alias ?? {}),
           'src/i18n/externalFileLoader': externalFileLoaderMockPath,
           'app/src/i18n/externalFileLoader': externalFileLoaderMockPath,
-          app: path.resolve(__dirname, '..'),
-          src: path.resolve(__dirname, '../src'),
-          components: path.resolve(__dirname, '../src/components'),
-          'src-electron': path.resolve(__dirname, '../src-electron')
+          app: repoRoot,
+          src: path.resolve(repoRoot, 'src'),
+          components: path.resolve(repoRoot, 'src/components'),
+          'src-electron': path.resolve(repoRoot, 'src-electron')
         }
       },
       define: {

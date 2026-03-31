@@ -12,6 +12,12 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
+export const Default: Story = {
+  args: {
+    dataInput: buttonList.buttonWebsite
+  }
+}
+
 export const Patreon: Story = {
   args: {
     dataInput: buttonList.buttonPatreon

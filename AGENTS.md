@@ -18,6 +18,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc)                             | `**/*.vue` — Composition API, Quasar, i18n, script size and extraction    |
 | [vue-bem-scss.mdc](.cursor/rules/vue-bem-scss.mdc)                         | `**/*.vue` — BEM class names and scoped SCSS only                         |
 | [vue-template-test-hooks.mdc](.cursor/rules/vue-template-test-hooks.mdc)   | `**/*.vue` — `data-test` and other Playwright-facing template attributes  |
+| [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc)               | `**/*.stories.ts` — Story scope and `TEST_ENV` restrictions               |
 | [typescript-scripts.mdc](.cursor/rules/typescript-scripts.mdc)             | `src/scripts/**/*.ts` — `_utilities`, splitting modules                   |
 | [project-scss.mdc](.cursor/rules/project-scss.mdc)                         | `src/css/**/*.scss` — globals, Quasar variables                           |
 | [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc) | Always — `type: subject` commits; see skill for split + approval workflow |
@@ -50,6 +51,11 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 - Favor singular names for single-item shapes (`I_appMenuItem`, `T_documentName`) and collection-oriented names for grouped structures (`I_appMenuList`, `I_socialContactButtonSet`).
 - Keep unions and function signatures consistently spaced (for example, `string | false`, `(...args: unknown[]) => unknown | void`).
 
+## i18n convention
+
+- In Vue templates, use `$t('...')` for translations.
+- Do **not** import `useI18n` just to call `t(...)` inside SFC scripts when template `$t(...)` can be used.
+
 ## Git commits
 
 - Messages: `**feat` | `fix` | `test` | `chore` | `refactor` | `style` | `docs**`, then `**:**` and an imperative subject (e.g. `fix: close window on menu exit`).
@@ -80,6 +86,16 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 - Prefer Storybook for isolated component authoring/editing feedback; use `yarn storybook` for dev and `yarn build-storybook` for static output.
 - Do **not** import the full `src/i18n/en-US/index.ts` (or `src/i18n/index.ts`) in Storybook helpers/mocks; these pull markdown `documents/*.md` and can break Vite import analysis.
 - For Storybook-only i18n mocks, import non-markdown `T_*` locale modules directly and provide placeholder lorem ipsum strings for `documents.*` markdown keys.
+- Do **not** add Storybook stories named `A11y/*` in this project.
+- Do **not** create stories that only verify `TEST_ENV === 'components'`; keep those checks in Playwright/component-test flows.
+
+## Cross-toolchain reminders (Storybook + Electron + Playwright)
+
+The same Vue UI runs under **dev server**, **Storybook**, **packaged Electron (`file://`)**, and **Playwright-driven Electron**. When something passes in one runner and fails in another, check these first:
+
+- **Storybook** — CLI and config live under [`.storybook-workspace/`](.storybook-workspace/) (see `.storybook-workspace/.storybook/`). Root `yarn storybook` / `yarn build-storybook` delegate there. Keep [`staticDirs`](.storybook-workspace/.storybook/main.ts) and repo `public/` serving (including any Vite middleware for dev) aligned so assets such as `/images/...` match the Quasar app.
+- **Electron packaged renderer** — Root-relative URLs like `/images/...` (common when `import.meta.env.BASE_URL` is `'/'` or empty) do **not** resolve next to `index.html` under `file://`. For files in `public/`, prefer a **relative** base (e.g. `./images/...`) when normalizing `BASE_URL`, unless the app is always served over HTTP with a matching absolute base.
+- **Playwright** — Component and E2E suites use the **production** Electron build. After changes to code those tests exercise, run `yarn build` before `yarn test:component` / `yarn test:e2e`. See [fantasia-testing skill](.cursor/skills/fantasia-testing/SKILL.md).
 
 ## Suggested Cursor agent profiles (manual presets)
 

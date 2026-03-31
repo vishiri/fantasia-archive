@@ -1,10 +1,12 @@
 .DS_Store
 .thumbs.db
 node_modules
+/.storybook-workspace/node_modules
 
 # Quasar core related directories
 .quasar
 /dist
+/storybook-static
 /quasar.config.*.temporary.compiled*
 
 # Cordova related directories and files
