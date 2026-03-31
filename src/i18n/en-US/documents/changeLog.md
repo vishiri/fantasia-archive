@@ -1,15 +1,11 @@
 # Changelog
 ----------
 
-## 2.3.0 - Component test parity baseline
+## 2.2.1 - Type naming and consistency sweep
 
 ### New features
 - Added explicit component test-governance guidance across AGENTS/rules/skills: each `src/components/**` Vue component keeps a colocated `*.vitest.test.ts` suite, with parity treated as coverage presence (not exhaustive branch/line percentages).
 - Standardized fixture placement policy for future test authoring: Vitest and Playwright fixtures stay inline in their respective test files, while `_data/` remains production-only.
-
-## 2.2.1 - Type naming and consistency sweep
-
-### New features
 - Refactored shared menu and dialog/document type declarations into clearer singular and collection naming while preserving the `I_` / `T_` prefix conventions.
 - Added reusable menu item and submenu type building blocks to keep menu configuration typing easier to maintain.
 - Expanded renderer-side Vitest coverage under `src/` for scripts and store state transitions using deterministic mocks.
