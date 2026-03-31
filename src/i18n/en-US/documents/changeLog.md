@@ -1,6 +1,12 @@
 # Changelog
 ----------
 
+## 2.3.0 - Component test parity baseline
+
+### New features
+- Added explicit component test-governance guidance across AGENTS/rules/skills: each `src/components/**` Vue component keeps a colocated `*.vitest.test.ts` suite, with parity treated as coverage presence (not exhaustive branch/line percentages).
+- Standardized fixture placement policy for future test authoring: Vitest and Playwright fixtures stay inline in their respective test files, while `_data/` remains production-only.
+
 ## 2.2.1 - Type naming and consistency sweep
 
 ### New features
