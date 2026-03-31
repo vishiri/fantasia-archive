@@ -54,12 +54,17 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 
 - Messages: `**feat` | `fix` | `test` | `chore` | `refactor` | `style` | `docs**`, then `**:**` and an imperative subject (e.g. `fix: close window on menu exit`).
 - To split work into several commits with **confirmation before each**: ask the agent to follow [git-conventional-commits skill](.cursor/skills/git-conventional-commits/SKILL.md).
-- Before any commit, run unit tests with `yarn test:unit`; only commit when they pass.
+- Before any commit (or changelog edit for new work), follow this order:
+  1. Run unit tests with `yarn test:unit`.
+  2. If tests pass, verify Storybook coverage/updates for affected user-facing components (`*.stories.ts`, Storybook mocks/placeholders as needed).
+  3. If Storybook is aligned, update changelog if required.
+  4. Commit.
 - If unit tests fail, stop the commit flow, do not create a commit, and report a concise summary of what failed and where (failing suites/tests, file paths, and key error locations/messages).
 
 ## Changelog (in-app)
 
 - English changelog: [src/i18n/en-US/documents/changeLog.md](src/i18n/en-US/documents/changeLog.md). **Version** in [package.json](package.json) is the semver source of truth; when a new top section would duplicate that version, **patch-bump** both per [fantasia-changelog-en-us skill](.cursor/skills/fantasia-changelog-en-us/SKILL.md). Do not add empty `###` sections or “none” placeholder bullets.
+- For changelog updates tied to fresh work, ensure Storybook updates/checks for affected UI are completed before editing the changelog entry.
 
 ## Testing expectations
 

@@ -28,6 +28,14 @@ After **substantive** work that users or operators should know about, for exampl
 
 Skip trivial-only edits (typo in a comment, pure format) unless the user wants everything logged.
 
+## Pre-changelog workflow gate (required)
+
+Before editing `changeLog.md` for new work, keep this order:
+
+1. Run `yarn test:unit` and ensure it passes.
+2. For affected user-facing components, verify Storybook updates are complete (`*.stories.ts`, relevant mocks/placeholders) and Storybook starts cleanly.
+3. Then draft/update changelog entries.
+
 ## Plan-context check (required before drafting notes)
 
 1. Read current `package.json.version` (`pkg`).
