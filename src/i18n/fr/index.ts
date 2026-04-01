@@ -1,10 +1,10 @@
 import { specialCharacterFixer } from '../specialCharactersFixer'
 
-import advancedSearchCheatSheet from './documents/advancedSearchCheatSheet.md'
-import advancedSearchGuide from './documents/advancedSearchGuide.md'
-import changeLog from './documents/changeLog.md'
-import license from './documents/license.md'
-import tipsTricksTrivia from './documents/tipsTricksTrivia.md'
+import advancedSearchCheatSheet from './documents/advancedSearchCheatSheet.md?raw'
+import advancedSearchGuide from './documents/advancedSearchGuide.md?raw'
+import changeLog from './documents/changeLog.md?raw'
+import license from './documents/license.md?raw'
+import tipsTricksTrivia from './documents/tipsTricksTrivia.md?raw'
 
 import T_helpInfo from './components/AppControlMenus/T_helpInfo'
 import T_project from './components/AppControlMenus/T_project'

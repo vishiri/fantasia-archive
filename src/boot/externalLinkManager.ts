@@ -1,4 +1,4 @@
-import { boot } from 'quasar/wrappers'
+import { defineBoot } from '#q-app/wrappers'
 
 const handleMouseClicks = (event: MouseEvent) => {
   /**
@@ -51,7 +51,7 @@ const handleMouseClicks = (event: MouseEvent) => {
   }
 }
 
-export default boot(() => {
+export default defineBoot(() => {
   document.addEventListener('click', handleMouseClicks)
 
   document.addEventListener('auxclick', handleMouseClicks)

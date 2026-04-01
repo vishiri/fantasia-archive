@@ -85,7 +85,7 @@ import type { Ref } from 'vue'
  * Triggers minimize of the window by the minimize button click
  */
 const minimizeWindow = () => {
-  if (process.env.MODE === 'electron') {
+  if (process.env.MODE === 'electron' && window.faContentBridgeAPIs?.faWindowControl) {
     window.faContentBridgeAPIs.faWindowControl.minimizeWindow()
   }
 }
@@ -94,7 +94,7 @@ const minimizeWindow = () => {
  * Triggers resize of the window by the min/max button click
  */
 const resizeWindow = () => {
-  if (process.env.MODE === 'electron') {
+  if (process.env.MODE === 'electron' && window.faContentBridgeAPIs?.faWindowControl) {
     window.faContentBridgeAPIs.faWindowControl.resizeWindow()
   }
 }
@@ -111,7 +111,7 @@ const resizeWindow = () => {
  */
 const tryCloseWindow = () => {
   // TODO add project close checking
-  if (process.env.MODE === 'electron') {
+  if (process.env.MODE === 'electron' && window.faContentBridgeAPIs?.faWindowControl) {
     window.faContentBridgeAPIs.faWindowControl.closeWindow()
   }
 }
@@ -120,7 +120,7 @@ const tryCloseWindow = () => {
 Checks if the window is maximized and sets local variable accordingly
 */
 const checkIfWindowMaximized = () => {
-  if (process.env.MODE === 'electron') {
+  if (process.env.MODE === 'electron' && window.faContentBridgeAPIs?.faWindowControl) {
     isMaximized.value = window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized()
   }
 }

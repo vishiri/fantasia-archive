@@ -15,9 +15,9 @@ const {
   }
 })
 
-vi.mock('quasar/wrappers', () => {
+vi.mock('#q-app/wrappers', () => {
   return {
-    boot: bootMock
+    defineBoot: bootMock
   }
 })
 

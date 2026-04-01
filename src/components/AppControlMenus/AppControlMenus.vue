@@ -78,7 +78,7 @@ withDefaults(
 /**
  * Testing type that might be happening right now
  */
-const testingType = window.faContentBridgeAPIs.extraEnvVariables.TEST_ENV
+const testingType = window.faContentBridgeAPIs?.extraEnvVariables?.TEST_ENV ?? ''
 
 /**
  * Menu payload for `TEST_ENV === 'components'` embed only — mirrors Playwright scenarios for AppControlMenus.

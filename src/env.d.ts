@@ -1,5 +1,7 @@
 /* eslint-disable */
 
+/// <reference path="../.quasar/shims-vue.d.ts" />
+
 declare namespace NodeJS {
   interface ProcessEnv {
     NODE_ENV: string;
