@@ -10,6 +10,7 @@ description: >-
 
 ## Stack
 
+- **Node.js 22.22.0 or newer** for local dev and CLI (`package.json` `engines.node`).
 - **Vue 3** with **Quasar** (`quasar` v2, `@quasar/app-vite`).
 - **Pinia** for state (`src/stores/`); router in `src/router/`.
 - **TypeScript** throughout; path alias `app/` maps to project root (see imports like `app/types/...`).
@@ -50,8 +51,10 @@ description: >-
 
 ## Quality gates
 
-- `yarn lint` (ESLint + Vue plugin; project uses `standard`-style config).
-- Stylelint is configured for Vue/SCSS when touching styles significantly.
+- `yarn lint` (ESLint + `@typescript-eslint` v8 + Vue; `standard`-style config) and **`yarn lint:types`** (`tsc -p tsconfig.json`) — see [eslint-typescript.mdc](../../rules/eslint-typescript.mdc). **TSLint** is not used.
+- `yarn lint:style` when changing scoped Vue/SCSS significantly.
+- **`quasar.config.ts`**: match Quasar typings (e.g. PWA `workboxMode: 'GenerateSW' | 'InjectManifest'`; `bex` uses `QuasarBexConfiguration`, not legacy `contentScripts`). Duplicate **Vite** `Plugin` types vs `@quasar/app-vite` may require a documented **`@ts-expect-error`** on `defineConfig`.
+- **`src/boot/i18n.ts`**: vue-i18n module augmentation may use **`@ts-expect-error` (TS2665)** because the package `module` entry targets the ESM bundle under `tsc`.
 - Keep TypeScript strict in Vue code: avoid `any`; prefer explicit prop/emits/interfaces, `unknown`, and narrowing.
 - Keep component test parity in `src/components/**`: each `.vue` should have a colocated `tests/<ComponentName>.vitest.test.ts` (presence baseline; not a claim of exhaustive line/branch coverage).
 

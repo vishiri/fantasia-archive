@@ -10,10 +10,11 @@ alwaysApply: true
 - **Split commits** by logical concern (feature vs tests vs tooling vs docs vs style-only). Do not mix unrelated changes in one commit.
 - When the user asks for **staged commits** or **approval per commit**: follow the full workflow in [git-conventional-commits skill](../skills/git-conventional-commits/SKILL.md) — propose each commit, wait for explicit approval, then run `git add` + `git commit` for that chunk only.
 - **Before any commit OR changelog edit**, enforce this gate order:
-  1. Run unit tests with `yarn test:unit` (must pass).
-  2. Verify Storybook coverage/health for changed user-facing **`src/components/**`** and add/update missing `*.stories.ts` and mocks/placeholders as needed. Layout/page Storybook previews (`src/layouts/**`, `src/pages/**`) stay canvas-only without Docs — see [storybook-stories.mdc](storybook-stories.mdc).
-  3. Update `src/i18n/en-US/documents/changeLog.md` for user-visible changes (follow changelog rules/skill for semver behavior).
-  4. Commit.
+  1. Run `yarn lint` and `yarn lint:types` (must pass) when the change touches lint-covered sources (TypeScript, Vue, Electron TS, configs under the `lint` script, etc.) — see [eslint-typescript.mdc](eslint-typescript.mdc).
+  2. Run unit tests with `yarn test:unit` (must pass).
+  3. Verify Storybook coverage/health for changed user-facing **`src/components/**`** and add/update missing `*.stories.ts` and mocks/placeholders as needed. Layout/page Storybook previews (`src/layouts/**`, `src/pages/**`) stay canvas-only without Docs — see [storybook-stories.mdc](storybook-stories.mdc).
+  4. Update `src/i18n/en-US/documents/changeLog.md` for user-visible changes (follow changelog rules/skill for semver behavior).
+  5. Commit.
 - If unit tests fail, **stop the commit flow**, do not run `git commit`, and inform the user with a concise summary that includes what failed (failing suites/tests) and where it failed (file paths and key error locations/messages).
 
 ## Type cheat sheet

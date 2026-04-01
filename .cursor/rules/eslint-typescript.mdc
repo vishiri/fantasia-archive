@@ -1,0 +1,57 @@
+---
+description: ESLint, TypeScript compiler checks, and alignment with Vitest/Quasar tooling
+alwaysApply: true
+---
+
+# ESLint and TypeScript static checks
+
+## What this project uses (not TSLint)
+
+- **TSLint** is deprecated and **not** used. TypeScript style and many type-aware checks come from **ESLint** with **`@typescript-eslint`** (v8.x, aligned with **TypeScript ~5.6** in `package.json`).
+- **Standalone typecheck**: `yarn lint:types` runs **`tsc -p tsconfig.json --pretty`** (no emit). Use it in CI, before commits, and whenever you change configs or broad typings.
+
+## Commands
+
+| Command | Role |
+|--------|------|
+| `yarn lint` | ESLint over `src/`, `src-electron/`, `e2e-tests/`, `types/`, Quasar/Vitest/Playwright configs, and `.storybook-workspace/.storybook/` — see `package.json` `lint` script. |
+| `yarn lint:types` | Full **`tsc`** project check (Vue shim + Quasar paths via `tsconfig.json` → `.quasar/tsconfig.json`). |
+| `yarn lint:style` | Stylelint on `src/**/*.vue` and `src/**/*.scss`. |
+
+**Dev server**: `vite-plugin-checker` runs ESLint during `quasar dev`; keep `@typescript-eslint` major in sync with TypeScript so you do not see unsupported-TS-version warnings from `typescript-estree`.
+
+## `tsconfig` and `.vue` / Quasar
+
+- Root **`tsconfig.json`** extends **`.quasar/tsconfig.json`** and excludes the whole **`.quasar`** tree (generated output). **`src/env.d.ts`** therefore references **`.quasar/shims-vue.d.ts`** so **`tsc`** still resolves **`*.vue`** modules.
+- Do **not** add a top-level `compilerOptions.paths` override in `tsconfig.json` unless you merge with Quasar’s `paths`; replacing `paths` breaks `app/`, `src/`, `#q-app/*`, etc.
+
+## `quasar.config.ts` typing notes
+
+- **PWA**: `pwa.workboxMode` must match Quasar types (**`GenerateSW`** | **`InjectManifest`**, PascalCase), not legacy lowercase strings.
+- **BEX**: use **`QuasarBexConfiguration`** fields (e.g. `extraScripts`); do not use removed placeholders like `contentScripts` in `bex`.
+- **Vite plugins**: the repo may carry a **`@ts-expect-error`** on `defineConfig` when **hoisted `vite`** and **`@quasar/app-vite`’s nested `vite`** disagree on `Plugin` types; the config is still valid at runtime.
+
+## vue-i18n boot augmentation (`src/boot/i18n.ts`)
+
+- **`declare module 'vue-i18n'`** for `DefineLocaleMessage` / formats can trigger **TS2665** under `tsc` because the package **`module`** entry resolves to an ESM bundle. The boot file uses **`@ts-expect-error`** with a short comment; keep **`eslint-disable @typescript-eslint/no-empty-object-type`** on that augmentation block (rule name in **typescript-eslint v8**).
+
+## Vitest env stubs
+
+- **Vitest 3+**: `vi.stubEnv(name, value)` types **`DEV`**, **`PROD`**, and **`SSR`** as **boolean**; other keys use **`string | undefined`**. Use **`vi.stubEnv('DEV', true)`** / **`false`**, not **`'true'`** / **`''`**, so `tsc` and runtime stubs stay correct.
+
+## Electron / monorepo-style imports in tests
+
+- Prefer **`app/src-electron/...`** (and other **`app/`**-root paths) in Vitest files when the same import must satisfy **`tsc`** and Vitest **`resolve.alias`**, e.g. [`tweaks.vitest.test.ts`](../../src-electron/mainScripts/tests/tweaks.vitest.test.ts).
+
+## Dependency hygiene
+
+- **`npm install --ignore-scripts`** skips **`electron`’s postinstall** and breaks **`yarn dev:electron`** until Electron is reinstalled (see [fantasia-dev-setup skill](../skills/fantasia-dev-setup/SKILL.md)).
+
+## Node.js version
+
+- **22.22.0+** required (`package.json` `engines.node`). GitHub Actions builds use **`22.22`** (`.github/workflows/build.yml`). Match locally with `nvm` / `fnm` when debugging CI-only issues.
+
+## Related
+
+- [fantasia-dev-setup skill](../skills/fantasia-dev-setup/SKILL.md) — install, dev, troubleshooting.
+- [vitest-tests.mdc](vitest-tests.mdc) — `vi.stubEnv` and test import patterns.

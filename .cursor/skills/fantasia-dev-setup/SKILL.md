@@ -1,8 +1,8 @@
 ---
 name: fantasia-dev-setup
 description: >-
-  Sets up and runs Fantasia Archive locally using Yarn, Node 18, and Quasar
-  Electron mode. Use when installing dependencies, choosing dev vs production
+  Sets up and runs Fantasia Archive locally using Yarn, Node.js 22.22 or newer,
+  and Quasar Electron mode. Use when installing dependencies, choosing dev vs production
   build commands, or when the user mentions environment setup, CLI, or first
   run.
 ---
@@ -12,7 +12,7 @@ description: >-
 ## Toolchain
 
 - **Package manager**: Yarn 1.x (README: use Yarn 1.22.19; avoid npm-only workflows for day-to-day work).
-- **Node**: v18.x (README references 18.20.6; `nvm` helps pin versions).
+- **Node.js**: **22.22.0 or newer** (`package.json` `engines.node` is `>=22.22.0`; Quasar `@quasar/app-vite` v2 aligns with this). Use `nvm` / `fnm` to pin (e.g. `nvm use 22.22`).
 - **Quasar CLI** (recommended): `yarn global add @quasar/cli` — ensure the global Yarn bin is on `PATH`.
 
 ## Install
@@ -31,6 +31,24 @@ quasar dev -m electron
 
 (`package.json` also exposes `yarn dev:electron`.)
 
+## Troubleshooting
+
+### `Electron failed to install correctly` (missing `node_modules/electron/dist`)
+
+The `electron` package downloads its binary in a **postinstall** step. **`npm install --ignore-scripts`** (or any install that skips lifecycle scripts) leaves `path.txt` / `dist/` missing and Quasar will crash when spawning Electron.
+
+**Fix:** remove the broken folder and reinstall **with scripts enabled** (close running Electron/Quasar first if Windows reports `EBUSY`):
+
+```bash
+rm -rf node_modules/electron   # PowerShell: Remove-Item -Recurse -Force node_modules/electron
+yarn install
+# or: node node_modules/electron/install.js
+```
+
+### DevTools `Autofill.enable` / `Autofill.setAddresses` in the terminal
+
+Bundled DevTools call Chrome CDP domains that Electron does not implement; Chromium logs harmless failures to stderr. The app filters those specific lines in the Electron **main** process so the dev terminal stays readable (they can still appear inside the DevTools console itself).
+
 ## Production build
 
 Required for packaged app behavior and **before Playwright** component/e2e runs:
@@ -45,9 +63,11 @@ quasar build -m electron
 
 | Goal | Command |
 |------|---------|
-| Lint | `yarn lint` |
+| ESLint | `yarn lint` |
+| TypeScript (`tsc`, no emit) | `yarn lint:types` |
+| Stylelint (Vue + SCSS) | `yarn lint:style` |
 | Unit tests | `yarn test:unit` |
 | Component tests (Playwright) | `yarn test:component` (after production build) |
 | E2E tests (Playwright) | `yarn test:e2e` (after production build) |
 
-See [fantasia-testing](../fantasia-testing/SKILL.md) for test details.
+See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) for ESLint vs TSLint, `tsconfig` / `tsc`, and Vitest env typing. See [fantasia-testing](../fantasia-testing/SKILL.md) for test details.

@@ -15,7 +15,8 @@ description: >-
 
 ## Tooling
 
-- **electron-builder** is a devDependency; Quasar/Electron mode drives the overall pipeline (see `quasar.config.js` and Quasar docs for Electron targets).
+- **Node.js**: **22.22.0 or newer** per `package.json` `engines.node` (same floor as Quasar CLI v2 / CI `setup-node` **22.22**).
+- **electron-builder** is a devDependency; Quasar/Electron mode drives the overall pipeline (see `quasar.config.ts` and Quasar docs for Electron targets).
 
 ## Checklist before a release candidate
 

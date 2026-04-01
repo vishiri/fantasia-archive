@@ -1,6 +1,22 @@
 # Changelog
 ----------
 
+## 2.4.0 - Quasar CLI Vite v2 and Node 22 toolchain
+
+### Bugfixes & Optimizations
+- Upgraded the desktop app toolchain to `@quasar/app-vite` v2 (Vite 8), ESM `quasar.config.ts`, TypeScript 5.6, and ESLint feedback via `vite-plugin-checker` during dev/build.
+- Standardized contributor and CI Node.js on **22.22.0 or newer** (required by the current Quasar CLI), refreshed GitHub Actions `setup-node`, and documented native-module rebuild expectations for `sqlite3` after Electron/Node bumps.
+- Replaced the QMarkdown app extension with direct `@quasar/quasar-ui-qmarkdown` registration, Vite-native `*.md?raw` locale imports, and Vue template `isPreTag` handling so markdown dialogs stay stable without the extension’s Vite plugin.
+- Migrated vue-i18n bundling to `@intlify/unplugin-vue-i18n`, bumped Electron and electron-builder for ESM main-process output, and aligned Sass with the Storybook subproject; Storybook remains on Vite 6 until its supported peer range includes Vite 8.
+- Bumped **`@electron/remote`** to 2.1.x so Electron 33 keeps a working preload (avoids removed Chromium feature probes that previously broke preload load and the bridge APIs).
+- Fixed **Playwright component-testing** routing: `ComponentTesting` now globs `../components/**/*.vue` from `src/pages`, so production Electron runs mount the requested SFC instead of an empty harness.
+- Raised **`@typescript-eslint`** to v8 for TypeScript 5.6, added **`yarn lint:types`** (full-project `tsc`), and expanded AGENTS/Cursor guidance for ESLint and typecheck gates (TSLint is not used).
+- Reduced noisy **DevTools Autofill** CDP stderr lines in development by filtering those specific messages in the Electron main process (harmless protocol mismatches only).
+- Hardened renderer code paths that call **`window.faContentBridgeAPIs`** when the preload bridge is missing, and aligned Vitest **`vi.stubEnv`** usage with Vitest 3 boolean rules for `DEV` / `PROD` / `SSR`.
+- Tuned **Quasar/electron-builder** config for stricter typings and packaging: PWA `workboxMode` casing (`GenerateSW`), empty **`bex`** block matching current Quasar types, Linux **`desktop.entry`** for electron-builder 26, plus TypeScript project glue (`env.d.ts` Vue shim reference, vue-i18n augmentation handling) so `lint:types` stays reliable.
+- Addressed **Dart Sass 2** deprecation noise in shared SCSS via `sass:color` in Quasar variables and scrollbar styles (replacing legacy color helpers).
+- **Install reminder:** the **`electron`** package needs its **postinstall** download; skipping lifecycle scripts (for example `npm install --ignore-scripts`) can leave a broken binary until you reinstall or run `node node_modules/electron/install.js`.
+
 ## 2.3.2 - Storybook layouts, pages, and contributor tooling
 
 ### New features

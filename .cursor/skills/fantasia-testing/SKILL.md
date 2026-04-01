@@ -32,7 +32,7 @@ Match **existing** tests to the letter when adding or editing:
 
 ## Playwright (component + E2E)
 
-**Critical**: Playwright targets a **built, production** Electron app. After **any** source change affecting what tests exercise, run `quasar build -m electron` (or `yarn build`) before Playwright.
+**Critical**: Playwright targets a **built, production** Electron app. After **any** source change affecting what tests exercise, run `quasar build -m electron` (or `yarn build`) before Playwright. Use **Node.js 22.22.0+** locally (`package.json` `engines`) so Electron / native steps match CI.
 
 ### Cross-toolchain alignment (Storybook + Electron + same repo)
 
@@ -70,7 +70,7 @@ Match **existing** tests to the letter when adding or editing:
 
 ## Checklist when changing UI or Electron shell
 
-1. `yarn lint` (and fix ESLint/Vue issues).
+1. `yarn lint` and `yarn lint:types` (ESLint + full `tsc`); fix issues per [eslint-typescript.mdc](../../rules/eslint-typescript.mdc).
 2. `yarn test:unit` for covered logic.
 3. Rebuild: `yarn build` (or `quasar build -m electron`).
 4. `yarn test:component` / `yarn test:e2e` as needed.

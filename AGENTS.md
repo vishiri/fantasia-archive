@@ -1,6 +1,6 @@
 # AI and agent notes — Fantasia Archive
 
-This repository is **Fantasia Archive**: a **worldbuilding database manager** shipped as a **Quasar + Vue 3 + Electron** desktop app (GPL-3.0). Use **Yarn 1.x** and **Node 18** for local work (see `README.md`).
+This repository is **Fantasia Archive**: a **worldbuilding database manager** shipped as a **Quasar + Vue 3 + Electron** desktop app (GPL-3.0). Use **Yarn 1.x** and **Node.js 22.22.0 or newer** for local work (see `README.md` and `package.json` `engines.node`; Quasar `@quasar/app-vite` v2 enforces this minimum). CI uses **22.22** (see `.github/workflows/build.yml`).
 
 ## Where project AI guidance lives
 
@@ -21,6 +21,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc)               | `**/*.stories.ts` — Story scope, layout/page canvas-only (no Docs), `TEST_ENV` restrictions |
 | [typescript-scripts.mdc](.cursor/rules/typescript-scripts.mdc)             | `src/scripts/**/*.ts` — `_utilities`, splitting modules                   |
 | [project-scss.mdc](.cursor/rules/project-scss.mdc)                         | `src/css/**/*.scss` — globals, Quasar variables                           |
+| [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc)             | Always — ESLint, `tsc` (`yarn lint:types`), Quasar/tsconfig/Vitest alignment |
 | [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc) | Always — `type: subject` commits; see skill for split + approval workflow |
 | [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc)                   | Always — en-US `changeLog.md` vs `package.json` version (see skill)       |
 | [plan-documents.mdc](.cursor/rules/plan-documents.mdc)                     | Always — plan files in `.cursor/plans` with timestamp + version metadata  |
@@ -35,6 +36,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | Desktop        | Electron, Quasar Electron mode                                   |
 | State / routes | Pinia, Vue Router                                                |
 | i18n           | vue-i18n (`src/i18n/`)                                           |
+| Lint / types   | ESLint (`yarn lint`), `tsc` (`yarn lint:types`), Stylelint (`yarn lint:style`) — see [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc) |
 | Unit tests     | Vitest (`yarn test:unit`)                                        |
 | UI / E2E tests | Playwright (`yarn test:component`, `yarn test:e2e`)              |
 | Component docs | Storybook 8 (`yarn storybook`, `yarn build-storybook`)           |
@@ -56,15 +58,23 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 - In Vue templates, use `$t('...')` for translations.
 - Do **not** import `useI18n` just to call `t(...)` inside SFC scripts when template `$t(...)` can be used.
 
+## Linting and static analysis
+
+- **No TSLint** — use **ESLint** (`.eslintrc.cjs`, `plugin:@typescript-eslint/recommended`, Vue presets, `standard`) plus **`yarn lint:types`** for **`tsc -p tsconfig.json`**. Details: [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc).
+- **`@typescript-eslint` v8** is pinned for **TypeScript ~5.6**; keep them in step to avoid `typescript-estree` unsupported-version warnings (including from **vite-plugin-checker** in dev).
+- **`src/env.d.ts`** references **`.quasar/shims-vue.d.ts`** so `tsc` resolves `*.vue` while `tsconfig` excludes generated `.quasar` output.
+- Before commits that touch lint-covered sources, run **`yarn lint`** and **`yarn lint:types`** (see commit gate in [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc)).
+
 ## Git commits
 
 - Messages: `**feat` | `fix` | `test` | `chore` | `refactor` | `style` | `docs**`, then `**:**` and an imperative subject (e.g. `fix: close window on menu exit`).
 - To split work into several commits with **confirmation before each**: ask the agent to follow [git-conventional-commits skill](.cursor/skills/git-conventional-commits/SKILL.md).
 - Before any commit (or changelog edit for new work), follow this order:
-  1. Run unit tests with `yarn test:unit`.
-  2. If tests pass, verify Storybook coverage/updates for affected user-facing **`src/components/**`** (`*.stories.ts`, mocks/placeholders as needed). Layout/page Storybook previews are canvas-only (no Docs requirement); see [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc).
-  3. If Storybook is aligned for touched components, update changelog if required.
-  4. Commit.
+  1. Run `yarn lint` and `yarn lint:types` (must pass) when the change affects TypeScript, Vue, Electron TS, or other lint-scoped files — see [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc).
+  2. Run unit tests with `yarn test:unit`.
+  3. If tests pass, verify Storybook coverage/updates for affected user-facing **`src/components/**`** (`*.stories.ts`, mocks/placeholders as needed). Layout/page Storybook previews are canvas-only (no Docs requirement); see [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc).
+  4. If Storybook is aligned for touched components, update changelog if required.
+  5. Commit.
 - If unit tests fail, stop the commit flow, do not create a commit, and report a concise summary of what failed and where (failing suites/tests, file paths, and key error locations/messages).
 
 ## Changelog (in-app)
@@ -112,7 +122,7 @@ Use different instructions or @-references when starting a task:
 
 | Skill                           | Role                                                                |
 | ------------------------------- | ------------------------------------------------------------------- |
-| `fantasia-dev-setup`            | Yarn, Node, Quasar dev/build commands                               |
+| `fantasia-dev-setup`            | Yarn, Node.js 22.22+, Quasar dev/build commands                     |
 | `fantasia-testing`              | Vitest and Playwright workflows                                     |
 | `fantasia-electron-preload`     | `faContentBridgeAPIs` and preload                                   |
 | `fantasia-electron-main`        | Main process lifecycle and `mainScripts/`                           |

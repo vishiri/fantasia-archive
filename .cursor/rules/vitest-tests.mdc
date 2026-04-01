@@ -56,7 +56,8 @@ Examples in the codebase:
 ## Runnable tests
 
 - Use `expect(...)`, `expect(...).toBeTypeOf('string')`, `toContain`, etc., as in [appDetailsAPI.vitest.test.ts](src-electron/contentBridgeAPIs/tests/appDetailsAPI.vitest.test.ts) and [extraEnvVariables.vitest.test.ts](src-electron/contentBridgeAPIs/tests/extraEnvVariables.vitest.test.ts).
-- Use `vi.stubEnv` for environment-dependent behavior ([fixAppName.vitest.test.ts](src-electron/mainScripts/tests/fixAppName.vitest.test.ts)).
+- Use `vi.stubEnv` for environment-dependent behavior ([fixAppName.vitest.test.ts](../../src-electron/mainScripts/tests/fixAppName.vitest.test.ts)). **Vitest 3+**: for env keys **`DEV`**, **`PROD`**, and **`SSR`**, pass a **boolean** (e.g. `vi.stubEnv('DEV', true)`); other keys use **`string | undefined`**.
+- When a test imports **`src-electron`** (or other repo-root) modules and must typecheck under **`tsc`**, prefer the **`app/...`** alias (e.g. `app/src-electron/mainScripts/tweaks`) — see [eslint-typescript.mdc](eslint-typescript.mdc).
 - Use `vi.mock(...)` when mocking modules (same files as above).
 - Use `expectTypeOf` when asserting type-level consistency ([tweaks.vitest.test.ts](src-electron/mainScripts/tests/tweaks.vitest.test.ts)).
 - Avoid `any` in tests and test data; prefer concrete fixture types, generic helpers, or `unknown` with narrowing when values are dynamic.

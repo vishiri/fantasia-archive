@@ -12,6 +12,7 @@ description: >-
 
 - **Plugin**: `vue-i18n` v9.
 - **Locale registry**: `src/i18n/index.ts` exports locale keys (e.g. `en-US`, `de`) and merges each locale module.
+- **TypeScript**: global message schema augmentation lives in **`src/boot/i18n.ts`** (`declare module 'vue-i18n'`). Under **`yarn lint:types`**, **`tsc`** may report **TS2665** against the ESM `module` resolution; the boot file documents a **`@ts-expect-error`** for that line. Keep **`eslint-disable @typescript-eslint/no-empty-object-type`** on the augmentation block (typescript-eslint v8 rule name). See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc).
 
 ## English structure (`src/i18n/en-US/`)
 

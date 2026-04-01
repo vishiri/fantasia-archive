@@ -4,7 +4,7 @@ A worldbuilding database manager
 
 Use Yarn 1.22.19, or things may become unstable.
 
-Make sure you are running this with Node v18.20.6 (`nvm` is great for these older versions).
+Use **Node.js 22.22.0 or newer** (`package.json` `engines.node`: `>=22.22.0`; Quasar `@quasar/app-vite` v2 enforces this minimum). `nvm` / `fnm` work well to pin the version (for example **22.22** to match CI in `.github/workflows/build.yml`).
 
 > Playwright tests run from a built, live version of FA. Therefore, to run them, you need to locally build the app on your machine first - both the first time you use them and every time something is changed in the source code.
 
@@ -50,7 +50,7 @@ Stories live next to components as `*.stories.ts` under `src/components/**`.
 
 #### Integration gotchas (Storybook + Electron + Playwright)
 
-- **Storybook** — Runs from [`.storybook-workspace/`](.storybook-workspace/) (nested Yarn project). Config keeps `staticDirs` pointed at the repo [`public/`](public/) folder (and related Vite wiring) so asset paths match the Quasar app.
+- **Storybook** — Runs from [`.storybook-workspace/`](.storybook-workspace/) (nested Yarn project). It uses its own **Vite 6** toolchain while the root Quasar app uses **Vite 8** via `@quasar/app-vite` v2; this split is intentional until Storybook’s supported Vite range catches up. Config keeps `staticDirs` pointed at the repo [`public/`](public/) folder (and related Vite wiring) so asset paths match the Quasar app.
 - **Electron** — The packaged renderer loads from `file://`. Root-relative `public/` URLs built from `import.meta.env.BASE_URL === '/'` can fail; prefer **relative** paths (e.g. `./images/...`) for those assets unless you control a real HTTP base.
 - **Playwright** — Component and E2E tests drive the **built** app. Run `yarn build` before `yarn test:component` / `yarn test:e2e` when you change sources those tests cover.
 
@@ -154,4 +154,10 @@ yarn test:e2eSingle --spec=SPEC_FILE_NAME
 ```
 
 ### Customize the configuration
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
+See [The quasar.config file](https://quasar.dev/quasar-cli-vite/quasar-config-file) (this repo uses `quasar.config.ts`).
+
+The repo tracks a minimal [`.quasar/tsconfig.json`](.quasar/tsconfig.json) so TypeScript and Vitest can resolve Quasar path aliases before your first `quasar dev` / `quasar prepare`. Those commands regenerate `.quasar` contents; if the file changes locally, prefer the generated output from your machine’s Quasar version.
+
+### Native modules (sqlite3)
+
+After changing **Electron** or **Node** versions, run a clean `yarn install` on your machine. If `sqlite3` fails to load in the packaged app, rebuild native addons for your Electron version (for example `npx electron-rebuild` in the project root) and retry `yarn build`.
