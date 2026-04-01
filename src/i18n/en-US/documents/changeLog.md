@@ -1,6 +1,20 @@
 # Changelog
 ----------
 
+## 2.3.2 - Storybook layouts, pages, and contributor tooling
+
+### New features
+- Added canvas-only Storybook previews for main layouts and representative app pages using a shared in-memory router (`StoryRouterShell`), a single `STORYBOOK_APP_ROUTES` table, and colocated `src/layouts/**` and `src/pages/**` stories.
+- Wired a Storybook-only Vite transform that rewrites `import.meta.globEager` to eager `import.meta.glob` so the component-testing page loads under the Storybook workspace toolchain.
+- Extended Storybook i18n mocks so the not-found page shows real copy instead of raw translation keys; simplified index and single-component story labels (dropped the redundant index-only preview).
+- Documented layout and page Storybook expectations in `AGENTS.md` and Cursor rules/skills, including canvas-only previews and changelog ordering alongside component stories.
+
+### Bugfixes & Optimizations
+- Pointed root ESLint at intentional source and config paths instead of the whole repository; added `yarn lint:style` with Stylelint for `src` Vue and SCSS plus a root Stylelint config.
+- Enabled TypeScript `skipLibCheck` and excluded build artifacts, Storybook static output, the Vitest components config, and colocated `*.stories.ts` from the root `tsconfig` project for cleaner checks.
+- Removed an empty scoped style block from `SocialContactButtons` surfaced by style linting.
+- Refreshed Vitest and Playwright coverage (external link manager, mascot image, window controls) to match current behavior and selectors.
+
 ## 2.3.1 - Electron packaging icon and favicon coverage
 
 ### Bugfixes & Optimizations
