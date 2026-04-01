@@ -32,7 +32,7 @@ Examples: `feat: add splash screen fade-out`, `test: cover devtools menu toggle`
 
 1. **Inspect**: Run `git status` and review `git diff` (and `git diff --staged` if anything is already staged).
 2. **Unit test gate (always first)**: Run `yarn test:unit`; stop immediately if failing.
-3. **Storybook gate (before changelog/commit for UI work)**: For changed user-facing components, verify Storybook coverage/health and add/update missing `src/components/**/<Component>.stories.ts` plus required Storybook mocks/placeholders.
+3. **Storybook gate (before changelog/commit for UI work)**: For changed user-facing **`src/components/**`**, verify Storybook coverage/health and add/update missing `<Component>.stories.ts` plus required mocks/placeholders. Touching only **`src/layouts/**` or `src/pages/**` Storybook previews** does not require Docs/autodocs (canvas-only); see [storybook-stories.mdc](../../rules/storybook-stories.mdc).
 4. **Changelog gate (before commit)**: Review `src/i18n/en-US/documents/changeLog.md` and reconcile whether staged user-visible work needs a changelog update. Follow project changelog/version rules when adjusting release notes.
 5. **Plan**: Propose an **ordered list** of commits. Each item: **type + subject**, bullet list of **paths** (or path patterns) to include. Order so dependencies make sense (e.g. chore before feat if needed).
 6. **Approval loop** (mandatory when user asked for per-commit approval or “step through” commits):
@@ -49,7 +49,7 @@ Examples: `feat: add splash screen fade-out`, `test: cover devtools menu toggle`
 - Prefer **small, reviewable** chunks over one huge commit when splitting.
 - If unsure between `chore` and `refactor`, prefer **`refactor`** for production code moves/renames and **`chore`** for repo/meta/tooling.
 - Do not skip changelog review before committing; missing release-note updates should be handled before `git commit`, not in a follow-up commit.
-- Do not skip Storybook review for changed user-facing components before changelog/commit updates.
+- Do not skip Storybook review for changed user-facing **`src/components/**`** before changelog/commit updates.
 
 ## Related
 

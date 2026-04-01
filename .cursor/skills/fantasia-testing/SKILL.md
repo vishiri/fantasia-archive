@@ -82,6 +82,7 @@ Match **existing** tests to the letter when adding or editing:
 
 ## Storybook smoke checks (component authoring support)
 
-- Storybook commands: `yarn storybook` (interactive) and `yarn storybook --smoke-test --ci` (startup verification).
-- Keep Storybook stories colocated as `src/components/**/<Component>.stories.ts`.
+- Storybook commands: `yarn storybook` (interactive) and `yarn storybook:smoke` / `storybook dev --smoke-test --ci` (startup verification).
+- Keep **component** Storybook stories colocated as `src/components/**/<Component>.stories.ts`.
+- **`src/layouts/**` and `src/pages/**` stories** (if present) are canvas-only previews; do **not** expect or add Storybook Docs/autodocs for them (see [`storybook-stories.mdc`](../../rules/storybook-stories.mdc)).
 - When components rely on i18n-backed markdown docs, avoid importing full locale roots in Storybook mocks; use focused `T_*` translation module imports plus placeholder `documents.*` strings to prevent markdown import-analysis failures.

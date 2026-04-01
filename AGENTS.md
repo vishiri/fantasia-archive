@@ -18,7 +18,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc)                             | `**/*.vue` — Composition API, Quasar, i18n, script size and extraction    |
 | [vue-bem-scss.mdc](.cursor/rules/vue-bem-scss.mdc)                         | `**/*.vue` — BEM class names and scoped SCSS only                         |
 | [vue-template-test-hooks.mdc](.cursor/rules/vue-template-test-hooks.mdc)   | `**/*.vue` — `data-test` and other Playwright-facing template attributes  |
-| [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc)               | `**/*.stories.ts` — Story scope and `TEST_ENV` restrictions               |
+| [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc)               | `**/*.stories.ts` — Story scope, layout/page canvas-only (no Docs), `TEST_ENV` restrictions |
 | [typescript-scripts.mdc](.cursor/rules/typescript-scripts.mdc)             | `src/scripts/**/*.ts` — `_utilities`, splitting modules                   |
 | [project-scss.mdc](.cursor/rules/project-scss.mdc)                         | `src/css/**/*.scss` — globals, Quasar variables                           |
 | [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc) | Always — `type: subject` commits; see skill for split + approval workflow |
@@ -62,15 +62,15 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 - To split work into several commits with **confirmation before each**: ask the agent to follow [git-conventional-commits skill](.cursor/skills/git-conventional-commits/SKILL.md).
 - Before any commit (or changelog edit for new work), follow this order:
   1. Run unit tests with `yarn test:unit`.
-  2. If tests pass, verify Storybook coverage/updates for affected user-facing components (`*.stories.ts`, Storybook mocks/placeholders as needed).
-  3. If Storybook is aligned, update changelog if required.
+  2. If tests pass, verify Storybook coverage/updates for affected user-facing **`src/components/**`** (`*.stories.ts`, mocks/placeholders as needed). Layout/page Storybook previews are canvas-only (no Docs requirement); see [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc).
+  3. If Storybook is aligned for touched components, update changelog if required.
   4. Commit.
 - If unit tests fail, stop the commit flow, do not create a commit, and report a concise summary of what failed and where (failing suites/tests, file paths, and key error locations/messages).
 
 ## Changelog (in-app)
 
 - English changelog: [src/i18n/en-US/documents/changeLog.md](src/i18n/en-US/documents/changeLog.md). **Version** in [package.json](package.json) is the semver source of truth; when a new top section would duplicate that version, **patch-bump** both per [fantasia-changelog-en-us skill](.cursor/skills/fantasia-changelog-en-us/SKILL.md). Do not add empty `###` sections or “none” placeholder bullets.
-- For changelog updates tied to fresh work, ensure Storybook updates/checks for affected UI are completed before editing the changelog entry.
+- For changelog updates tied to fresh work, ensure Storybook updates/checks for affected **`src/components/**`** UI are completed before editing the changelog entry.
 
 ## Testing expectations
 
@@ -83,7 +83,8 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 ## Storybook expectations
 
 - Story files are colocated with components as `src/components/**/<Component>.stories.ts`.
-- Prefer Storybook for isolated component authoring/editing feedback; use `yarn storybook` for dev and `yarn build-storybook` for static output.
+- **Layouts and pages** may have `src/layouts/**/*.stories.ts` and `src/pages/**/*.stories.ts` for **canvas-only** previews (router shells, smoke checks). Do **not** add Storybook **Docs** (no `autodocs` tag, no `parameters.docs.description`, keep `parameters.docs.disable: true`). Agents should not generate or expand documentation pages for layouts/pages in Storybook.
+- Prefer Storybook for isolated **component** authoring/editing feedback; use `yarn storybook` for dev and `yarn build-storybook` for static output.
 - Do **not** import the full `src/i18n/en-US/index.ts` (or `src/i18n/index.ts`) in Storybook helpers/mocks; these pull markdown `documents/*.md` and can break Vite import analysis.
 - For Storybook-only i18n mocks, import non-markdown `T_*` locale modules directly and provide placeholder lorem ipsum strings for `documents.*` markdown keys.
 - Do **not** add Storybook stories named `A11y/*` in this project.

@@ -33,7 +33,7 @@ Skip trivial-only edits (typo in a comment, pure format) unless the user wants e
 Before editing `changeLog.md` for new work, keep this order:
 
 1. Run `yarn test:unit` and ensure it passes.
-2. For affected user-facing components, verify Storybook updates are complete (`*.stories.ts`, relevant mocks/placeholders) and Storybook starts cleanly.
+2. For affected user-facing **`src/components/**`**, verify Storybook updates are complete (`*.stories.ts`, relevant mocks/placeholders) and Storybook starts cleanly. Layout/page Storybook previews do not require Docs/autodocs ([`storybook-stories.mdc`](../../rules/storybook-stories.mdc)).
 3. Then draft/update changelog entries.
 
 ## Plan-context check (required before drafting notes)

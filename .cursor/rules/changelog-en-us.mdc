@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Changelog discipline
 
-- Before **any changelog edit** tied to new product/docs/test work, confirm workflow order: (1) `yarn test:unit` passes, (2) Storybook updates/checks are complete for affected UI/components, then (3) changelog update.
+- Before **any changelog edit** tied to new product/docs/test work, confirm workflow order: (1) `yarn test:unit` passes, (2) Storybook updates/checks are complete for affected **`src/components/**`** UI (layout/page Storybook previews do not require Docs/autodocs), then (3) changelog update.
 - After **substantive** product or user-visible changes, update [changeLog.md](src/i18n/en-US/documents/changeLog.md) and reconcile **semver** with [package.json](package.json) `version` per [fantasia-changelog-en-us skill](../skills/fantasia-changelog-en-us/SKILL.md).
 - When preparing changelog updates, also inspect `.cursor/plans/` for plan files that match the current `package.json.version` to gather release-context notes for what changed.
 - **Patch bump** when adding a **new** top release section while the latest heading already matches `package.json.version`: `major.minor.patch` → `major.minor.(patch+1)`, then set `package.json` `version` to match (unless the user specifies minor/major instead).
