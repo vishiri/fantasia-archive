@@ -37,11 +37,3 @@ import SocialContactSingleButton from 'app/src/components/SocialContactSingleBut
 const buttonListLength = Object.keys(buttonList).length
 
 </script>
-
-<style lang="scss" scoped>
-
-.socialContactButtons {
-
-}
-
-</style>
