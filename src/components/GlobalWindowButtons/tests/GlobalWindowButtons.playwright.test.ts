@@ -105,7 +105,7 @@ test('Click resize button - "maximize"', async () => {
   await expect(resizeButton).toHaveCount(1)
 
   // In order to avoid situations where the window somehow opens in non-maximized state, we first check if it is maximized or not and react accordingly
-  let isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
+  const isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
 
   // Check if the window if maximized of not, react accordingly
   if (isMaximized) {

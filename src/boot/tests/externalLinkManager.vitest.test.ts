@@ -5,7 +5,7 @@ const {
   checkIfExternalMock,
   openExternalMock
 } = vi.hoisted(() => {
-  const bootImplementation = vi.fn((callback: unknown) => callback)
+  const bootImplementation = vi.fn((callback: () => void) => callback)
 
   return {
     bootMock: bootImplementation,
@@ -20,7 +20,36 @@ vi.mock('quasar/wrappers', () => {
   }
 })
 
-import externalLinkManagerBootFunction from '../externalLinkManager'
+import externalLinkManagerBoot from '../externalLinkManager'
+
+function runExternalLinkBoot (): void {
+  const run = externalLinkManagerBoot as () => void
+  run()
+}
+
+function setDocumentAddListenerMock (addEventListenerMock: ReturnType<typeof vi.fn>): void {
+  Object.defineProperty(globalThis, 'document', {
+    configurable: true,
+    writable: true,
+    value: { addEventListener: addEventListenerMock } as unknown as Document
+  })
+}
+
+function setWindowLinksStub (): void {
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    writable: true,
+    value: {
+      faContentBridgeAPIs: {
+        faExternalLinksManager: {
+          checkIfExternal: checkIfExternalMock,
+          openExternal: openExternalMock
+        }
+      },
+      location: { href: '' }
+    } as unknown as Window & typeof globalThis
+  })
+}
 
 /**
  * externalLinkManager boot file
@@ -28,11 +57,9 @@ import externalLinkManagerBootFunction from '../externalLinkManager'
  */
 test('Test that externalLinkManager boot registers click handlers', () => {
   const addEventListenerMock = vi.fn()
-  ;(globalThis as typeof globalThis & { document: { addEventListener: typeof addEventListenerMock } }).document = {
-    addEventListener: addEventListenerMock
-  }
+  setDocumentAddListenerMock(addEventListenerMock)
 
-  externalLinkManagerBootFunction()
+  runExternalLinkBoot()
 
   expect(addEventListenerMock).toHaveBeenCalledWith('click', expect.any(Function))
   expect(addEventListenerMock).toHaveBeenCalledWith('auxclick', expect.any(Function))
@@ -47,11 +74,9 @@ test('Test that click handler opens external links via faExternalLinksManager', 
   const addEventListenerMock = vi.fn((type: string, listener: unknown) => {
     eventHandlers[type] = listener as (ev: Event) => void
   })
-  ;(globalThis as typeof globalThis & { document: { addEventListener: typeof addEventListenerMock } }).document = {
-    addEventListener: addEventListenerMock
-  }
+  setDocumentAddListenerMock(addEventListenerMock)
 
-  externalLinkManagerBootFunction()
+  runExternalLinkBoot()
 
   const targetAnchor = {
     tagName: 'A',
@@ -66,25 +91,7 @@ test('Test that click handler opens external links via faExternalLinksManager', 
   const preventDefaultMock = vi.fn()
   checkIfExternalMock.mockReturnValueOnce(true)
 
-  ;(globalThis as typeof globalThis & {
-    window: {
-      faContentBridgeAPIs: {
-        faExternalLinksManager: {
-          checkIfExternal: typeof checkIfExternalMock
-          openExternal: typeof openExternalMock
-        }
-      }
-      location: { href: string }
-    }
-  }).window = {
-    faContentBridgeAPIs: {
-      faExternalLinksManager: {
-        checkIfExternal: checkIfExternalMock,
-        openExternal: openExternalMock
-      }
-    },
-    location: { href: '' }
-  }
+  setWindowLinksStub()
 
   eventHandlers.click({
     target: targetAnchor,
@@ -106,11 +113,9 @@ test('Test that auxclick prevents default behavior', () => {
   const addEventListenerMock = vi.fn((type: string, listener: unknown) => {
     eventHandlers[type] = listener as (ev: Event) => void
   })
-  ;(globalThis as typeof globalThis & { document: { addEventListener: typeof addEventListenerMock } }).document = {
-    addEventListener: addEventListenerMock
-  }
+  setDocumentAddListenerMock(addEventListenerMock)
 
-  externalLinkManagerBootFunction()
+  runExternalLinkBoot()
 
   const targetAnchor = {
     tagName: 'A',
@@ -125,25 +130,7 @@ test('Test that auxclick prevents default behavior', () => {
   const preventDefaultMock = vi.fn()
   checkIfExternalMock.mockReturnValueOnce(true)
 
-  ;(globalThis as typeof globalThis & {
-    window: {
-      faContentBridgeAPIs: {
-        faExternalLinksManager: {
-          checkIfExternal: typeof checkIfExternalMock
-          openExternal: typeof openExternalMock
-        }
-      }
-      location: { href: string }
-    }
-  }).window = {
-    faContentBridgeAPIs: {
-      faExternalLinksManager: {
-        checkIfExternal: checkIfExternalMock,
-        openExternal: openExternalMock
-      }
-    },
-    location: { href: '' }
-  }
+  setWindowLinksStub()
 
   eventHandlers.auxclick({
     target: targetAnchor,

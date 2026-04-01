@@ -13,10 +13,8 @@ test('Test that FantasiaMascotImage renders list image and disables random mode 
   const w = mount(FantasiaMascotImage, {
     props: { fantasiaImage: 'error', width: '10px', height: '10px' },
     global: {
-      config: {
-        globalProperties: {
-          $t: (key: string) => key
-        }
+      mocks: {
+        $t: (key: string) => key
       }
     }
   })
@@ -36,10 +34,8 @@ test('Test that FantasiaMascotImage enables random mode when fantasiaImage prop 
   const w = mount(FantasiaMascotImage, {
     props: { fantasiaImage: '', width: '10px', height: '10px' },
     global: {
-      config: {
-        globalProperties: {
-          $t: (key: string) => key
-        }
+      mocks: {
+        $t: (key: string) => key
       }
     }
   })
