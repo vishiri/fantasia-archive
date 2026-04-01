@@ -1,0 +1,91 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "esnext",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    "module": "preserve",
+    "noEmit": true,
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable"
+    ],
+    "paths": {
+      "src": [
+        "./../src"
+      ],
+      "src/*": [
+        "./../src/*"
+      ],
+      "app": [
+        "./.."
+      ],
+      "app/*": [
+        "./../*"
+      ],
+      "components": [
+        "./../src/components"
+      ],
+      "components/*": [
+        "./../src/components/*"
+      ],
+      "layouts": [
+        "./../src/layouts"
+      ],
+      "layouts/*": [
+        "./../src/layouts/*"
+      ],
+      "pages": [
+        "./../src/pages"
+      ],
+      "pages/*": [
+        "./../src/pages/*"
+      ],
+      "assets": [
+        "./../src/assets"
+      ],
+      "boot": [
+        "./../src/boot"
+      ],
+      "boot/*": [
+        "./../src/boot/*"
+      ],
+      "stores": [
+        "./../src/stores"
+      ],
+      "stores/*": [
+        "./../src/stores/*"
+      ],
+      "#q-app": [
+        "./../node_modules/@quasar/app-vite/types/index.d.ts"
+      ],
+      "#q-app/wrappers": [
+        "./../node_modules/@quasar/app-vite/types/app-wrappers.d.ts"
+      ],
+      "#q-app/bex/background": [
+        "./../node_modules/@quasar/app-vite/types/bex/entrypoints/background.d.ts"
+      ],
+      "#q-app/bex/content": [
+        "./../node_modules/@quasar/app-vite/types/bex/entrypoints/content.d.ts"
+      ],
+      "#q-app/bex/private/bex-bridge": [
+        "./../node_modules/@quasar/app-vite/types/bex/bex-bridge.d.ts"
+      ]
+    }
+  },
+  "include": [
+    "./**/*.d.ts",
+    "./../**/*"
+  ],
+  "exclude": [
+    "./../dist",
+    "./../node_modules",
+    "./../src-capacitor",
+    "./../src-cordova",
+    "./../quasar.config.*.temporary.compiled*"
+  ]
+}

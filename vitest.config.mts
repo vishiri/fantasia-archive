@@ -11,6 +11,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export default defineConfig({
   resolve: {
     alias: {
+      '#q-app/wrappers': path.resolve(
+        __dirname,
+        'node_modules/@quasar/app-vite/exports/wrappers/wrappers.js'
+      ),
       app: path.resolve(__dirname, '.'),
       src: path.resolve(__dirname, 'src'),
       'src-electron': path.resolve(__dirname, 'src-electron')

@@ -19,14 +19,16 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        node: [16]
+        node: ['22.22']
 
     steps:
     - name: Check out the code
-      uses: actions/checkout@v2.3.4
+      uses: actions/checkout@v4
 
     - name: Setup Node.js environment
-      uses: actions/setup-node@v2.1.5
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node }}
 
     - name: quasar install and build
       run: |
@@ -37,7 +39,7 @@ jobs:
 
     - name: Upload Linux Artifact
       if: ${{ matrix.os == 'ubuntu-latest' }}
-      uses: actions/upload-artifact@v2.2.3
+      uses: actions/upload-artifact@v4
       with:
         # Artifact name
         name: Linux_FA ${{ github.event.inputs.version }}
@@ -47,7 +49,7 @@ jobs:
 
     - name: Upload MacOS Artifact
       if: ${{ matrix.os == 'macOS-latest' }}
-      uses: actions/upload-artifact@v2.2.3
+      uses: actions/upload-artifact@v4
       with:
         # Artifact name
         name: Mac_FA ${{ github.event.inputs.version }}
@@ -55,7 +57,7 @@ jobs:
 
     - name: Upload Windows Artifact
       if: ${{ matrix.os == 'windows-latest' }}
-      uses: actions/upload-artifact@v2.2.3
+      uses: actions/upload-artifact@v4
       with:
         # Artifact name
         name: Windows_FA ${{ github.event.inputs.version }}

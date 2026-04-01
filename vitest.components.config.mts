@@ -20,6 +20,10 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      '#q-app/wrappers': path.resolve(
+        __dirname,
+        'node_modules/@quasar/app-vite/exports/wrappers/wrappers.js'
+      ),
       app: path.resolve(__dirname, '.'),
       src: path.resolve(__dirname, 'src'),
       components: path.resolve(__dirname, 'src/components'),

@@ -1,10 +1,12 @@
 .DS_Store
 .thumbs.db
+/package-lock.json
 node_modules
 /.storybook-workspace/node_modules
 
-# Quasar core related directories
-.quasar
+# Quasar core related directories (keep tsconfig so editors/tests work before first `quasar dev` / `quasar prepare`)
+.quasar/**
+!.quasar/tsconfig.json
 /dist
 /storybook-static
 /quasar.config.*.temporary.compiled*
