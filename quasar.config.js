@@ -203,8 +203,26 @@ module.exports = configure(function (/* ctx */) {
         // https://www.electron.build/configuration/configuration
 
         appId: 'fantasia-archive',
+        productName: 'Fantasia Archive',
         win: {
           icon: 'src-electron/icons/icon.ico'
+        },
+        mac: {
+          icon: 'src-electron/icons/icon.icns'
+        },
+        linux: {
+          target: ['AppImage', 'deb', 'rpm'],
+          category: 'Utility',
+          synopsis: 'A worldbuilding database manager',
+          description: 'A worldbuilding database manager',
+          icon: 'src-electron/icons',
+          desktop: {
+            Name: 'Fantasia Archive',
+            Comment: 'A worldbuilding database manager',
+            StartupNotify: 'true',
+            Terminal: 'false',
+            StartupWMClass: 'fantasia-archive'
+          }
         }
       }
     },

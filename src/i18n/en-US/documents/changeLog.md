@@ -1,6 +1,13 @@
 # Changelog
 ----------
 
+## 2.3.1 - Electron packaging icon and favicon coverage
+
+### Bugfixes & Optimizations
+- Added explicit Electron Builder icon configuration for Windows, macOS, and Linux, including Linux desktop-entry metadata and Linux target setup.
+- Linked all generated favicon sizes in `index.html` so renderer icon declarations cover the full `public/icons/` set.
+- Updated changelog markdown wording to avoid build-time parsing failures in the qmarkdown/Vite pipeline during Electron production builds.
+
 ## 2.3.0 - Storybook workspace and desktop polish
 
 ### New features
@@ -10,7 +17,7 @@
 - Documented Storybook, Electron `file://`, and Playwright rebuild expectations for contributors in `AGENTS.md`, `README.md`, and Cursor skills/rules (including a dedicated Storybook stories rule).
 
 ### Bugfixes & Optimizations
-- Fixed social contact button icons not loading in packaged Electron builds by resolving `public/` images with a relative base when `import.meta.env.BASE_URL` is `/` or empty, instead of root-relative URLs under `file://`.
+- Fixed social contact button icons not loading in packaged Electron builds by resolving public image URLs with a relative base when the app base URL is "/" or empty, instead of root-relative URLs under file://.
 - Updated Playwright component coverage for window controls to match current markup and accessibility labels.
 
 ## 2.2.1 - Type naming and consistency sweep
