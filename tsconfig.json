@@ -3,6 +3,15 @@
   "compilerOptions": {
     "baseUrl": ".",
     "types": ["node"],
-    "typeRoots": ["node_modules/@types"]
-  }
+    "typeRoots": ["node_modules/@types"],
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "dist",
+    ".quasar",
+    "node_modules",
+    "storybook-static",
+    "**/*.stories.ts",
+    "vitest.components.config.mts"
+  ]
 }
