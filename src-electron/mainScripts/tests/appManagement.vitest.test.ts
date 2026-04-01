@@ -17,7 +17,7 @@ const { initializeMock, mainWindowCreationMock, appMock, appOnHandlers } = vi.ho
   }
 })
 
-vi.mock('@electron/remote/main', () => {
+vi.mock('@electron/remote/main/index.js', () => {
   return {
     initialize: initializeMock
   }

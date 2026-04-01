@@ -1,5 +1,5 @@
 import os from 'os'
-import { tweakRetriveOS } from 'src-electron/mainScripts/tweaks'
+import { tweakRetriveOS } from 'app/src-electron/mainScripts/tweaks'
 import { expectTypeOf, test, expect, vi } from 'vitest'
 import { tweakMenuRemover } from '../tweaks'
 

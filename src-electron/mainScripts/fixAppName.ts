@@ -1,6 +1,6 @@
 import { app } from 'electron'
 import path from 'path'
-import packageJSON from '../../package.json' assert {type: 'json'}
+import packageJSON from '../../package.json' with { type: 'json' }
 
 /**
  * Determines if the app name will have "-dev" affix at the end for the appData.

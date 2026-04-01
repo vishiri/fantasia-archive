@@ -1,9 +1,12 @@
+import { enable } from '@electron/remote/main/index.js'
 import { BrowserWindow, app, screen } from 'electron'
-import { enable } from '@electron/remote/main'
 import path from 'path'
-import { setupSpellChecker } from 'src-electron/mainScripts/spellChecker'
+import { fileURLToPath } from 'url'
+import { setupSpellChecker } from 'app/src-electron/mainScripts/spellChecker'
 
 export let appWindow: BrowserWindow | undefined
+
+const currentDir = fileURLToPath(new URL('.', import.meta.url))
 
 /**
  * Prevents app from launching a secondary instance
@@ -34,10 +37,19 @@ export const preventSecondaryAppInstance = (appWindow: BrowserWindow | undefined
   }
 }
 
+function resolvePreloadPath (): string {
+  const folder = process.env.QUASAR_ELECTRON_PRELOAD_FOLDER ?? '..'
+  const ext = process.env.QUASAR_ELECTRON_PRELOAD_EXTENSION ?? '.js'
+  return path.resolve(
+    currentDir,
+    path.join(folder, `electron-preload${ext}`)
+  )
+}
+
 /**
   * Creates the main app window
   */
-export const mainWindowCreation = () => {
+export const mainWindowCreation = async () => {
   // Retrieve actual display size to stop flicker/debounce that happens with "maximize" function at first
   const displaySizes = screen.getPrimaryDisplay().workAreaSize
 
@@ -49,11 +61,11 @@ export const mainWindowCreation = () => {
     frame: false,
     show: false,
     center: true,
-    icon: path.resolve(__dirname, '../icons/icon.png'),
+    icon: path.resolve(currentDir, '../icons/icon.png'),
     webPreferences: {
       sandbox: false,
       contextIsolation: true,
-      preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD)
+      preload: resolvePreloadPath()
     }
   })
 
@@ -79,8 +91,12 @@ export const mainWindowCreation = () => {
   // Set the current window's menu as empty
   appWindow.setMenu(null)
 
-  // Load the basic app URL
-  appWindow.loadURL(process.env.APP_URL)
+  // Load the basic app URL (dev server) or packaged index.html
+  if (process.env.DEV) {
+    await appWindow.loadURL(process.env.APP_URL)
+  } else {
+    await appWindow.loadFile('index.html')
+  }
 
   // Open DevTools by default if the app is running in Dev mode or Production with debug enabled
   if (process.env.DEBUGGING) {

@@ -42,7 +42,7 @@ vi.mock('electron', () => {
   }
 })
 
-vi.mock('@electron/remote/main', () => {
+vi.mock('@electron/remote/main/index.js', () => {
   return {
     enable: enableMock
   }
@@ -132,7 +132,7 @@ test('Test that second-instance focuses without restore when window is not minim
  * mainWindowCreation
  * Test BrowserWindow construction, event handlers, and delayed maximize flow.
  */
-test('Test that the main window is created successfully', () => {
+test('Test that the main window is created successfully', async () => {
   const onceHandlers: Record<string, () => void> = {}
   const onHandlers: Record<string, () => void> = {}
   const browserWindowInstance = {
@@ -146,7 +146,8 @@ test('Test that the main window is created successfully', () => {
       onHandlers[eventName] = handler
     }),
     setMenu: vi.fn(),
-    loadURL: vi.fn(),
+    loadURL: vi.fn(() => Promise.resolve()),
+    loadFile: vi.fn(() => Promise.resolve()),
     show: vi.fn(),
     focus: vi.fn(),
     maximize: vi.fn()
@@ -154,11 +155,13 @@ test('Test that the main window is created successfully', () => {
   BrowserWindowMock.mockImplementation(() => browserWindowInstance as unknown as BrowserWindow)
 
   vi.stubEnv('APP_URL', 'http://localhost:9000')
-  vi.stubEnv('QUASAR_ELECTRON_PRELOAD', 'electron-preload.js')
+  vi.stubEnv('DEV', true)
+  vi.stubEnv('QUASAR_ELECTRON_PRELOAD_FOLDER', '.')
+  vi.stubEnv('QUASAR_ELECTRON_PRELOAD_EXTENSION', '.js')
   vi.stubEnv('DEBUGGING', 'DEBUGGING')
   vi.useFakeTimers()
 
-  mainWindowCreation()
+  await mainWindowCreation()
 
   expect(BrowserWindowMock).toHaveBeenCalledOnce()
   expect(BrowserWindowMock.mock.calls[0][0]).toMatchObject({
@@ -189,7 +192,7 @@ test('Test that the main window is created successfully', () => {
  * mainWindowCreation
  * DevTools are not opened when DEBUGGING is unset.
  */
-test('Test that main window creation does not open DevTools when DEBUGGING is unset', () => {
+test('Test that main window creation does not open DevTools when DEBUGGING is unset', async () => {
   const onceHandlers: Record<string, () => void> = {}
   const browserWindowInstance = {
     webContents: {
@@ -200,7 +203,8 @@ test('Test that main window creation does not open DevTools when DEBUGGING is un
     }),
     on: vi.fn(),
     setMenu: vi.fn(),
-    loadURL: vi.fn(),
+    loadURL: vi.fn(() => Promise.resolve()),
+    loadFile: vi.fn(() => Promise.resolve()),
     show: vi.fn(),
     focus: vi.fn(),
     maximize: vi.fn()
@@ -208,10 +212,42 @@ test('Test that main window creation does not open DevTools when DEBUGGING is un
   BrowserWindowMock.mockImplementation(() => browserWindowInstance as unknown as BrowserWindow)
 
   vi.stubEnv('APP_URL', 'http://localhost:9000')
-  vi.stubEnv('QUASAR_ELECTRON_PRELOAD', 'electron-preload.js')
+  vi.stubEnv('DEV', true)
+  vi.stubEnv('QUASAR_ELECTRON_PRELOAD_FOLDER', '.')
+  vi.stubEnv('QUASAR_ELECTRON_PRELOAD_EXTENSION', '.js')
   vi.stubEnv('DEBUGGING', undefined)
 
-  mainWindowCreation()
+  await mainWindowCreation()
 
   expect(browserWindowInstance.webContents.openDevTools).not.toHaveBeenCalled()
+})
+
+/**
+ * mainWindowCreation
+ * Production build loads index.html from the packaged app.
+ */
+test('Test that production window uses loadFile for index.html', async () => {
+  const browserWindowInstance = {
+    webContents: {
+      openDevTools: vi.fn()
+    },
+    once: vi.fn(),
+    on: vi.fn(),
+    setMenu: vi.fn(),
+    loadURL: vi.fn(() => Promise.resolve()),
+    loadFile: vi.fn(() => Promise.resolve()),
+    show: vi.fn(),
+    focus: vi.fn(),
+    maximize: vi.fn()
+  }
+  BrowserWindowMock.mockImplementation(() => browserWindowInstance as unknown as BrowserWindow)
+
+  vi.stubEnv('DEV', false)
+  vi.stubEnv('QUASAR_ELECTRON_PRELOAD_FOLDER', '.')
+  vi.stubEnv('QUASAR_ELECTRON_PRELOAD_EXTENSION', '.js')
+
+  await mainWindowCreation()
+
+  expect(browserWindowInstance.loadFile).toHaveBeenCalledWith('index.html')
+  expect(browserWindowInstance.loadURL).not.toHaveBeenCalled()
 })

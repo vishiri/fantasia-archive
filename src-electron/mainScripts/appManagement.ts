@@ -1,4 +1,4 @@
-import { initialize } from '@electron/remote/main'
+import { initialize } from '@electron/remote/main/index.js'
 import { mainWindowCreation } from 'app/src-electron/mainScripts/mainWindowCreation'
 import { app } from 'electron'
 
@@ -10,17 +10,19 @@ export const startApp = () => {
 // Opens the singular app's window and make sure it is the only one
 export const openAppWindowManager = () => {
   // Create the app window in the normal way
-  app.whenReady().then(() => mainWindowCreation())
+  app.whenReady().then(() => {
+    void mainWindowCreation()
+  })
 
   // Create the app window, if it still doesn't exist yet
   app.on('activate', () => {
-    mainWindowCreation()
+    void mainWindowCreation()
   })
 }
 
 // Closes the app's Electron instance when all windows are closed
 export const closeAppManager = (platform: string) => {
-  // Close app if we are on anything that isn't Mac
+  // Close the app if we are on anything that isn't Mac
   app.on('window-all-closed', () => {
     if (platform !== 'darwin') {
       app.quit()
