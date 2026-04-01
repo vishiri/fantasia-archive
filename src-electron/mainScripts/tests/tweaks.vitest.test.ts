@@ -1,6 +1,21 @@
 import os from 'os'
 import { tweakRetriveOS } from 'src-electron/mainScripts/tweaks'
-import { expectTypeOf, test } from 'vitest'
+import { expectTypeOf, test, expect, vi } from 'vitest'
+import { tweakMenuRemover } from '../tweaks'
+
+const { setApplicationMenuMock } = vi.hoisted(() => {
+  return {
+    setApplicationMenuMock: vi.fn()
+  }
+})
+
+vi.mock('electron', () => {
+  return {
+    Menu: {
+      setApplicationMenu: setApplicationMenuMock
+    }
+  }
+})
 
 /**
  * tweakRetriveOS
@@ -11,6 +26,9 @@ test('Test that platform detection works', () => {
 
 /**
  * tweakMenuRemover
- * We cannot test this function as it requires Electron to be running.
+ * Test menu removal call.
  */
-test.skip('Test that app window menu removing works')
+test('Test that app window menu removing works', () => {
+  tweakMenuRemover()
+  expect(setApplicationMenuMock).toHaveBeenCalledWith(null)
+})

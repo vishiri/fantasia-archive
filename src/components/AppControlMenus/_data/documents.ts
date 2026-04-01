@@ -1,10 +1,10 @@
 import { i18n } from 'app/src/i18n/externalFileLoader'
 
-import { I_appMenusDataList } from 'app/types/I_appMenusDataList'
+import { I_appMenuList } from 'app/types/I_appMenusDataList'
 
 // TODO - add functionality for all buttons and conditions
 
-export const documents: I_appMenusDataList = {
+export const documents: I_appMenuList = {
   title: i18n.global.t('AppControlMenus.documents.title'),
   data: [
     {

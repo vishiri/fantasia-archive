@@ -17,7 +17,7 @@ const extraEnvSettings = {
 const electronMainFilePath:string = extraEnvVariablesAPI.ELECTRON_MAIN_FILEPATH
 
 /**
- * Extra rended timer buffer for tests to start after loading the app
+ * Extra render timer buffer for tests to start after loading the app
  * - Change here in order manually adjust this component's wait times
  */
 const faFrontendRenderTimer = extraEnvVariablesAPI.FA_FRONTEND_RENDER_TIMER

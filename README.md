@@ -2,16 +2,16 @@
 
 A worldbuilding database manager
 
-Use Yarn 1.22.19 or stuff is gonna bug out.
+Use Yarn 1.22.19, or things may become unstable.
 
-Make sure you are running this with Node v18.20.6 ("nvm" is great for these older versions)
+Make sure you are running this with Node v18.20.6 (`nvm` is great for these older versions).
 
-> Playwright tests run from built, live version of FA. Therefore, to run them, you need to localy build the app on your machine first - Both on first time using them and every time something is changed in the source code.
+> Playwright tests run from a built, live version of FA. Therefore, to run them, you need to locally build the app on your machine first - both the first time you use them and every time something is changed in the source code.
 
 ## Install Quasar CLI for smoothest experience
 ##### Details found here: https://quasar.dev/start/quasar-cli
 
-##### Ensure that the Yarn global install location is in your PATH after install. (details in article linked above)
+##### Ensure that the Yarn global install location is in your PATH after installation (details in the article linked above).
 
 ```
 yarn global add @quasar/cli
@@ -32,52 +32,125 @@ quasar dev -m electron
 quasar build -m electron
 ```
 
-### Testing:
+### Storybook (Vue components)
+
+Use Storybook to develop/document renderer components in isolation.
+
+```
+yarn storybook
+```
+
+Build static Storybook output:
+
+```
+yarn build-storybook
+```
+
+Stories live next to components as `*.stories.ts` under `src/components/**`.
+
+#### Integration gotchas (Storybook + Electron + Playwright)
+
+- **Storybook** — Runs from [`.storybook-workspace/`](.storybook-workspace/) (nested Yarn project). Config keeps `staticDirs` pointed at the repo [`public/`](public/) folder (and related Vite wiring) so asset paths match the Quasar app.
+- **Electron** — The packaged renderer loads from `file://`. Root-relative `public/` URLs built from `import.meta.env.BASE_URL === '/'` can fail; prefer **relative** paths (e.g. `./images/...`) for those assets unless you control a real HTTP base.
+- **Playwright** — Component and E2E tests drive the **built** app. Run `yarn build` before `yarn test:component` / `yarn test:e2e` when you change sources those tests cover.
+
+#### Storybook workflow charter
+
+Storybook is the first-stop UI quality gate for renderer components in this repo:
+
+- Component development: iterate props/states quickly without full Electron boot.
+- QA pre-check: validate visual/behavior regressions before Playwright/E2E runs.
+- UX review: verify interaction and content edge-cases (including localization stress) in isolated stories.
+
+#### Story naming taxonomy
+
+Use the same story naming style across components for discoverability:
+
+- `Default` for baseline rendering.
+- `States/*` for deterministic state matrices (loading, empty, error, mode/flag variations).
+- `Interactions/*` for `play`-driven interaction checks.
+- `I18nStress/*` for localization expansion and markdown-heavy text pressure tests.
+
+#### Story change policy
+
+When a user-facing component changes, update its story variants in the same change scope:
+
+- Keep `Default` aligned with the current baseline behavior.
+- Add/update `States/*` when logic, data contracts, or conditional rendering changes.
+- Add/update `Interactions/*` whenever controls, keyboard flow, or user actions change.
+
+#### Storybook maintenance checklist
+
+Run this checklist periodically (or before larger releases):
+
+- Addons still load and match Storybook major/minor versions.
+- Global decorators still provide valid Pinia/i18n/content-bridge mocks.
+- Stories render with no broken controls/actions/docs panels.
+- Localized stress stories still reflect realistic long/markdown-heavy content.
+
+#### Story depth coverage tracking
+
+Track story depth manually to prioritize upgrades:
+
+| Coverage tier | Meaning | Priority |
+| --- | --- | --- |
+| Baseline | `Default` only | Upgrade next |
+| Matrix | `Default` + `States/*` | Medium |
+| Quality | Includes `Interactions/*` | High |
+| Stress-tested | Includes `I18nStress/*` where applicable | Maintain |
+
+Review this table against `src/components/**` stories each iteration and move highest-risk user-facing components toward at least **Quality** coverage.
+
+### Testing
 
 #### Unit test - via Vitest
 
+Use Vitest for deterministic unit logic in both app layers: renderer code under `src/` (helpers, store/composable logic, extracted component-facing transforms), Electron/runtime code under `src-electron/`, and shallow-mounted `.vue` files under `src/components/` (second Vitest config; see `vitest.components.config.mts`).
+
 ```
-test:unit
+yarn test:unit
 ```
 
 #### Component test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
+
+Use Playwright component/E2E tests for rendered behavior and integration flows that rely on the built app runtime.
 ```
-test:component
+yarn test:component
 ```
 
 #### Component list test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 
-> Summons a CLI prompt list of available components tests
+> Opens a CLI prompt listing available component tests.
 ```
-test:componentList
+yarn test:componentList
 ```
 
 #### Component single test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 ```
-test:component --component=COMPONENT_FOLDER_NAME
+yarn test:componentSingle --component=COMPONENT_FOLDER_NAME
 ```
 
 #### E2E test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 ```
-test:e2e
+yarn test:e2e
 ```
 
 #### E2E list test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 
-> Summons a CLI prompt list of available E2E tests
+> Opens a CLI prompt listing available E2E tests.
 ```
-test:e2eList
+yarn test:e2eList
 ```
 
 #### E2E single test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 ```
-test:e2e --spec=SPEC_FILE_NAME
+yarn test:e2eSingle --spec=SPEC_FILE_NAME
 ```
 
 ### Customize the configuration

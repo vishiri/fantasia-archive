@@ -3,13 +3,14 @@
   <q-dialog
     v-model="dialogModel"
     :class="['dialogComponent', `${documentName}`]"
+    aria-labelledby="dialogAboutFantasiaArchive-title"
   >
     <q-card
       :class="['dialogComponent__wrapper', `${documentName}`]"
     >
       <!-- Dialog contents wrapper -->
       <q-card-section :class="['dialogComponent__content', `${documentName}`, 'q-mt-xl', 'q-mb-lg', 'q-mr-lg', 'q-ml-xl', 'q-pt-none']">
-        <h6>
+        <h6 id="dialogAboutFantasiaArchive-title">
           {{ $t('Dialogs.aboutFantasiaArchive.title') }}
         </h6>
 
@@ -19,7 +20,7 @@
 
         <q-separator
           color="primary"
-          horizonatal
+          horizontal
           dark
           class="q-my-lg q-mx-auto"
           style="width: 400px;"
@@ -47,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { T_dialogList } from 'app/types/T_dialogList'
+import { T_dialogName } from 'app/types/T_dialogList'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { onMounted, ref, watch } from 'vue'
 import SocialContactButtons from '../SocialContactButtons/SocialContactButtons.vue'
@@ -59,7 +60,7 @@ const props = defineProps<{
   /**
    * Custom input directly fed to the component in case it doesn't get triggered from the global store
    */
-  directInput?: T_dialogList
+  directInput?: T_dialogName
 }>()
 
 /**
@@ -81,7 +82,7 @@ let appVersion = ''
 /**
  * Opens the popup dialog via direct input-feed
  */
-const openDialog = (input: T_dialogList) => {
+const openDialog = (input: T_dialogName) => {
   documentName.value = input
   dialogModel.value = true
   appVersion = window.faContentBridgeAPIs.appDetails.PROJECT_VERSION
@@ -109,7 +110,7 @@ watch(() => props.directInput, () => {
 
 /**
  * Checks the prop feed-status on the first mount and open the dialog if the prop is properly fed in
- * This exist mostly due to component tests being flaky otherwise
+ * This exists mostly due to component tests being flaky otherwise
  */
 onMounted(() => {
   if (props.directInput !== undefined && props.directInput !== '') {

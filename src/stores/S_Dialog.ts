@@ -1,6 +1,6 @@
 import type { Ref } from 'vue'
-import { T_documentList } from 'app/types/T_documentList'
-import { T_dialogList } from 'app/types/T_dialogList'
+import { T_documentName } from 'app/types/T_documentList'
+import { T_dialogName } from 'app/types/T_dialogList'
 
 import { v4 as uuidv4 } from 'uuid'
 
@@ -11,7 +11,7 @@ import { ref } from 'vue'
  * This store manages the state of the markdown document dialogs in the application.
  */
 export const S_DialogMarkdown = defineStore('S_DialogMarkdown', () => {
-  const documentToOpen: Ref<T_documentList> = ref('license')
+  const documentToOpen: Ref<T_documentName> = ref('license')
 
   const dialogUUID: Ref<string> = ref('')
 
@@ -26,7 +26,7 @@ export const S_DialogMarkdown = defineStore('S_DialogMarkdown', () => {
  * This store manages the state of the component dialogs in the application.
  */
 export const S_DialogComponent = defineStore('S_DialogComponent', () => {
-  const dialogToOpen: Ref<T_dialogList> = ref('AboutFantasiaArchive')
+  const dialogToOpen: Ref<T_dialogName> = ref('AboutFantasiaArchive')
 
   const dialogUUID: Ref<string> = ref('')
 

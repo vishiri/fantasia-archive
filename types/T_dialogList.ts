@@ -1,1 +1,1 @@
-export type T_dialogList = 'AboutFantasiaArchive' | ''
+export type T_dialogName = 'AboutFantasiaArchive' | ''

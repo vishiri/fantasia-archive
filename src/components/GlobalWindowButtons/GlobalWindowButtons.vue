@@ -10,6 +10,8 @@
       dark
       size="xs"
       class="globalWindowButtons__button globalWindowButtons__minimize"
+      :aria-label="$t('GlobalWindowButtons.minimizeButton')"
+      :title="$t('GlobalWindowButtons.minimizeButton')"
       data-test="globalWindowButtons-button-minimize"
       @click="minimizeWindow()"
     >
@@ -31,6 +33,8 @@
       dark
       size="xs"
       class="globalWindowButtons__button globalWindowButtons__resize"
+      :aria-label="isMaximized ? $t('GlobalWindowButtons.resizeButton') : $t('GlobalWindowButtons.maximizeButton')"
+      :title="isMaximized ? $t('GlobalWindowButtons.resizeButton') : $t('GlobalWindowButtons.maximizeButton')"
       data-test="globalWindowButtons-button-resize"
       @click="[resizeWindow(),checkIfWindowMaximized()]"
     >
@@ -54,6 +58,8 @@
       dark
       size="xs"
       class="globalWindowButtons__button globalWindowButtons__close"
+      :aria-label="$t('GlobalWindowButtons.close')"
+      :title="$t('GlobalWindowButtons.close')"
       data-test="globalWindowButtons-button-close"
       @click="tryCloseWindow()"
     >

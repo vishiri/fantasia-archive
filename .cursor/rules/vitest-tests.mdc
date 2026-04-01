@@ -1,0 +1,75 @@
+---
+description: Vitest file layout, documentation, and test style for Fantasia Archive
+globs: "**/*.vitest.test.ts"
+alwaysApply: false
+---
+
+# Vitest tests (`*.vitest.test.ts`)
+
+## Running and reports
+
+- Baseline verification command: `yarn test:unit` (required for commit flows). This runs **two** Vitest configs in sequence:
+  1. [vitest.config.mts](vitest.config.mts) — Node environment: `src-electron/**`, `src/scripts/**`, `src/boot/**`, `src/stores/**`, `src/i18n/**` `*.vitest.test.ts`.
+  2. [vitest.components.config.mts](vitest.components.config.mts) — `jsdom` + Vue SFC: `src/components/**` `*.vitest.test.ts`, with [vitest.setup.ts](vitest.setup.ts) (Pinia, `window.faContentBridgeAPIs`, i18n loader mock, Quasar `q-*` custom elements).
+- JSON reports: `test-results/vitest-report/test-results-vitest.json` (core) and `test-results/vitest-report/test-results-vitest-components.json` (components).
+
+## Placement and discovery
+
+- Files must match `**/*vitest.@(spec|test).?(c|m)[jt]s?(x)` — this repo uses **`*.vitest.test.ts`**.
+- Co-locate tests under a **`tests/`** directory next to the code under test, e.g. [src/scripts/_utilities/tests](src/scripts/_utilities/tests), [src/stores/tests](src/stores/tests), [src-electron/contentBridgeAPIs/tests](src-electron/contentBridgeAPIs/tests), [src-electron/mainScripts/tests](src-electron/mainScripts/tests), [src/components/FantasiaMascotImage/tests](src/components/FantasiaMascotImage/tests).
+- Treat `src/`, `src-electron/`, and **Vue components under `src/components/`** as Vitest unit-testing surfaces when mounting is appropriate; full UI flows remain in Playwright.
+- For `src/components/**`, keep a **1:1 baseline**: every component `.vue` should have a colocated `tests/<ComponentName>.vitest.test.ts`. When adding, renaming, or removing a component, update its matching Vitest file in the same change.
+
+## Vue and renderer test boundaries
+
+- Use Vitest for deterministic renderer logic in `src/` (helpers, stores/composables, serializable transforms, and simple component-facing logic extracted into TS modules).
+- If Vue SFC behavior can be validated without fragile DOM coupling, prefer focused unit tests around the extracted logic path.
+- Keep full interaction/visual/integration checks in Playwright component or E2E tests (`*.playwright.test.ts` / `*.playwright.spec.ts`).
+- Treat this 1:1 mapping as **coverage presence**, not exhaustive line/branch coverage metrics.
+- **`_data/` is for production feeds only** (menus, button lists, locale-backed blobs the app ships). Do **not** put **Vitest fixtures** there.
+- **All Vitest fixture data** (sample props, mock objects, expected literals) must live **inside** the same `*.vitest.test.ts` file: inline **`const`** / object literals at module scope next to imports or immediately above the test that uses them. Do **not** add sibling `tests/*.ts` files whose only purpose is to hold data for Vitest. Do **not** use `tests/_data/`.
+- **No automated tests for `_data/` modules**: do **not** add Vitest (or Playwright specs) aimed **only** at **any** file under **`_data/`** (e.g. `src/components/**/_data/**`). Cover production `_data` **indirectly** through components or scripts that import it—not with dedicated tests whose SUT is a `_data/` path.
+
+## Imports
+
+- From `vitest`: import only what you need — `test`, `expect`, `vi`, `expectTypeOf` (see [tweaks.vitest.test.ts](src-electron/mainScripts/tests/tweaks.vitest.test.ts), [fixAppName.vitest.test.ts](src-electron/mainScripts/tests/fixAppName.vitest.test.ts)).
+- **SUT** (system under test): relative import from the parent folder, e.g. `import { appDetailsAPI } from '../appDetailsAPI'`.
+- **JSON**: `import packageJSON from '../../../package.json' assert { type: 'json' }` when comparing to package metadata ([fixAppName.vitest.test.ts](src-electron/mainScripts/tests/fixAppName.vitest.test.ts)).
+- **Node / app paths**: e.g. `import os from 'os'` only when the test mirrors runtime behavior.
+
+## Documenting each test block
+
+Use a **JSDoc comment immediately above** `test` or `test.skip`:
+
+1. **First line**: name of the function, API export, or concern (e.g. `determineAppName`, `checkIfExternal`, `startApp`).
+2. **Following lines**: scenario, expected behavior, or why the test is skipped.
+
+Examples in the codebase:
+
+- Runnable case: [faExternalLinksManagerAPI.vitest.test.ts](src-electron/contentBridgeAPIs/tests/faExternalLinksManagerAPI.vitest.test.ts) — each `test(...)` is preceded by `checkIfExternal` and a short scenario line.
+- Skipped Electron-only: [appManagement.vitest.test.ts](src-electron/mainScripts/tests/appManagement.vitest.test.ts) — `test.skip('...')` with JSDoc explaining that Electron must be running.
+
+## `test` titles
+
+- Use a single **sentence-style string** starting with `Test ...` / `Test if ...` / `Test that ...` / `Test for ...`, matching existing files.
+
+## Runnable tests
+
+- Use `expect(...)`, `expect(...).toBeTypeOf('string')`, `toContain`, etc., as in [appDetailsAPI.vitest.test.ts](src-electron/contentBridgeAPIs/tests/appDetailsAPI.vitest.test.ts) and [extraEnvVariables.vitest.test.ts](src-electron/contentBridgeAPIs/tests/extraEnvVariables.vitest.test.ts).
+- Use `vi.stubEnv` for environment-dependent behavior ([fixAppName.vitest.test.ts](src-electron/mainScripts/tests/fixAppName.vitest.test.ts)).
+- Use `vi.mock(...)` when mocking modules (same files as above).
+- Use `expectTypeOf` when asserting type-level consistency ([tweaks.vitest.test.ts](src-electron/mainScripts/tests/tweaks.vitest.test.ts)).
+- Avoid `any` in tests and test data; prefer concrete fixture types, generic helpers, or `unknown` with narrowing when values are dynamic.
+
+## Skipped tests (`test.skip`)
+
+- When behavior is explicitly deemed untestable in Vitest, use `test.skip` with the same JSDoc pattern and a clear title.
+
+## File-level notes
+
+- Optional **multi-line block comment** at the top of a file for scope notes (e.g. "Nothing else to test here") — see [extraEnvVariables.vitest.test.ts](src-electron/contentBridgeAPIs/tests/extraEnvVariables.vitest.test.ts).
+
+## Do not
+
+- Do not switch to `describe()` blocks unless the rest of the suite starts using them — **current suites use flat `test` / `test.skip` only**.
+- Do not rename `*.vitest.test.ts` — Vitest discovery depends on it.

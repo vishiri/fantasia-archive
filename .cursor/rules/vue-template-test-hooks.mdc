@@ -1,0 +1,32 @@
+---
+description: data-test and test-only template attributes for Playwright (Vue templates)
+globs: "**/*.vue"
+alwaysApply: false
+---
+
+# Vue template — test hooks (`data-test`, etc.)
+
+Use this rule when adding or changing **attributes the UI tests locate**. It pairs with [playwright-tests.mdc](playwright-tests.mdc), which defines how `selectorList` and locators are written in `*.playwright.*.ts` files.
+
+## What belongs here
+
+- `data-test` values used by `appWindow.locator(\`[data-test="..."]\`)`.
+- Special attributes used in this repo for menus, e.g. `data-test-test-menu` and `data-test-any-menu` on [AppControlMenus.vue](src/components/AppControlMenus/AppControlMenus.vue) (see [AppControlMenus.playwright.test.ts](src/components/AppControlMenus/tests/AppControlMenus.playwright.test.ts)).
+- Optional `data-*` hooks asserted via `dataset` (e.g. `data-test-is-random` → `dataset.testIsRandom` in [FantasiaMascotImage.playwright.test.ts](src/components/FantasiaMascotImage/tests/FantasiaMascotImage.playwright.test.ts)).
+
+## Naming
+
+- Typically **lowerCamelCase block** plus hyphen-separated segments, e.g. `globalWindowButtons-button-minimize`, `dialogMarkdownDocument-markdown-wrapper`.
+- Child components may use shorter or compound names consistent with that subtree (e.g. `socialContactSingleButton-image`).
+- **Stay consistent** within the component and with the existing `selectorList` in its `tests/*.playwright.test.ts` file.
+
+## Workflow
+
+1. Add or update hooks on the template.
+2. Update the component’s Playwright `selectorList` and tests to match ([playwright-tests.mdc](playwright-tests.mdc)).
+3. Rebuild before running Playwright ([README.md](README.md)).
+
+## Not in this rule
+
+- BEM **classes** for styling → [vue-bem-scss.mdc](vue-bem-scss.mdc).
+- Quasar / Composition API / script extraction → [vue-quasar.mdc](vue-quasar.mdc).

@@ -3,6 +3,7 @@
   <q-dialog
     v-model="dialogModel"
     :class="['dialogMarkdownDocument', `${documentName}`]"
+    :aria-label="dialogAriaLabel"
   >
     <q-card>
       <!-- Dialog contents wrapper -->
@@ -42,9 +43,9 @@
 <script setup lang="ts">
 import { QMarkdown } from '@quasar/quasar-ui-qmarkdown'
 import '@quasar/quasar-ui-qmarkdown/dist/index.css'
-import { T_documentList } from 'app/types/T_documentList'
+import { T_documentName } from 'app/types/T_documentList'
 import { S_DialogMarkdown } from 'src/stores/S_Dialog'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 /**
  * All component props
@@ -53,7 +54,7 @@ const props = defineProps<{
   /**
    * Custom input directly fed to the component in case it doesn't get triggered from the global store
    */
-  directInput?: T_documentList
+  directInput?: T_documentName
 }>()
 
 /**
@@ -66,10 +67,27 @@ const dialogModel = ref(false)
  */
 const documentName = ref('')
 
+const dialogAriaLabel = computed(() => {
+  switch (documentName.value) {
+    case 'advancedSearchCheatSheet':
+      return 'Advanced Search Cheat Sheet'
+    case 'advancedSearchGuide':
+      return 'Advanced Search Guide'
+    case 'changeLog':
+      return 'Changelog'
+    case 'license':
+      return 'License'
+    case 'tipsTricksTrivia':
+      return 'Tips, Tricks and Trivia'
+    default:
+      return 'Markdown document dialog'
+  }
+})
+
 /**
  * Opens the popup dialog via direct input-feed
  */
-const openDialog = (input: T_documentList) => {
+const openDialog = (input: T_documentName) => {
   documentName.value = input
   dialogModel.value = true
 }
@@ -92,7 +110,7 @@ watch(() => props.directInput, () => {
 
 /**
  * Checks the prop feed-status on the first mount and open the dialog if the prop is properly fed in
- * This exist mostly due to component tests being flaky otherwise
+ * This exists mostly due to component tests being flaky otherwise
  */
 onMounted(() => {
   if (props.directInput !== undefined && props.directInput !== '') {
@@ -105,6 +123,25 @@ onMounted(() => {
 <style lang="scss">
 
 .dialogMarkdownDocument {
+  .q-markdown,
+  .q-markdown * {
+    color: $qMarkdown-color !important;
+    opacity: 1 !important;
+  }
+
+  .q-markdown a {
+    color: $aLinkColor !important;
+  }
+
+  .q-markdown .q-markdown--token,
+  .q-markdown code.q-markdown--token {
+    color: $qMarkdown-code-textColor !important;
+  }
+
+  .q-markdown pre code {
+    color: $qMarkdown-color !important;
+  }
+
   .q-card {
     max-width: calc(100vw - 100px) !important;
   }

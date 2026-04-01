@@ -17,7 +17,7 @@ const extraEnvSettings = {
 const electronMainFilePath:string = extraEnvVariablesAPI.ELECTRON_MAIN_FILEPATH
 
 /**
- * Extra rended timer buffer for tests to start after loading the app
+ * Extra render timer buffer for tests to start after loading the app
  * - Change here in order manually adjust this component's wait times
  */
 const faFrontendRenderTimer:number = extraEnvVariablesAPI.FA_FRONTEND_RENDER_TIMER
@@ -47,7 +47,7 @@ test('Check if the wrapper contains "IMG" element', async () => {
   const imageElement = appWindow.locator(`[data-test="${selectorList.image}"]`)
 
   // Check if the tested element exists
-  expect(imageElement).toHaveCount(1)
+  await expect(imageElement).toHaveCount(1)
 
   // Get the element's tag name
   const elementType = await imageElement.evaluate(el => el.tagName)
@@ -80,7 +80,7 @@ test('Visually check for proper sizing of the icon', async () => {
   const imageElement = appWindow.locator(`[data-test="${selectorList.image}"]`)
 
   // Check if the tested element exists
-  expect(imageElement).toHaveCount(1)
+  await expect(imageElement).toHaveCount(1)
 
   const imageBoxData = await imageElement.boundingBox() as unknown as { width: number, height: number }
 
@@ -117,7 +117,7 @@ test('Check if the image is random: YES', async () => {
   const imageElement = appWindow.locator(`[data-test="${selectorList.image}"]`)
 
   // Check if the tested element exists
-  expect(imageElement).toHaveCount(1)
+  await expect(imageElement).toHaveCount(1)
 
   // Check if the tested element is random
   const isRandom = await imageElement.evaluate(el => el.dataset.testIsRandom)
@@ -147,7 +147,7 @@ test('Check if the image is random: NO', async () => {
   const imageElement = appWindow.locator(`[data-test="${selectorList.image}"]`)
 
   // Check if the tested element exists
-  expect(imageElement).toHaveCount(1)
+  await expect(imageElement).toHaveCount(1)
 
   // Check if the tested element is not random
   const isRandom = await imageElement.evaluate(el => el.dataset.testIsRandom)

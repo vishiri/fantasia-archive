@@ -1,7 +1,7 @@
-import { I_socialContactButtons } from 'app/types/I_socialContactButtons'
+import { I_socialContactButtonSet } from 'app/types/I_socialContactButtons'
 import { i18n } from 'app/src/i18n/externalFileLoader'
 
-export const buttonList: I_socialContactButtons = {
+export const buttonList: I_socialContactButtonSet = {
   buttonPatreon: {
     title: i18n.global.t('SocialContactButtons.buttonPatreon.title'),
     label: i18n.global.t('SocialContactButtons.buttonPatreon.label'),
