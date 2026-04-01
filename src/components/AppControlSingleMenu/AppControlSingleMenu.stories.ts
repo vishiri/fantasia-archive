@@ -115,8 +115,8 @@ export const InteractionsOpensMenuOnClick: Story = {
     await expect(wrapperButton).toBeTruthy()
     await userEvent.click(wrapperButton as HTMLElement)
     await waitFor(async () => {
-      const menuItemNode = canvasElement.querySelector('[data-test="AppControlSingleMenu-menuItem"]')
-        ?? document.body.querySelector('[data-test="AppControlSingleMenu-menuItem"]')
+      const menuItemNode = canvasElement.querySelector('[data-test="AppControlSingleMenu-menuItem"]') ??
+        document.body.querySelector('[data-test="AppControlSingleMenu-menuItem"]')
       await expect(menuItemNode).toBeTruthy()
     })
   }

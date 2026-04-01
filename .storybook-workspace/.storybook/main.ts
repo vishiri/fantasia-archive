@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import type { StorybookConfig } from '@storybook/vue3-vite'
 
 import { vitePluginServeRepoPublic } from './vitePluginServeRepoPublic'
+import { vitePluginRewriteGlobEagerForStorybook } from './vitePluginRewriteGlobEager'
 
 const repoRoot = path.resolve(__dirname, '../..')
 const quasarVariablesPath = path.resolve(repoRoot, 'src/css/quasar.variables.scss').replaceAll('\\', '/')
@@ -11,7 +12,11 @@ const externalFileLoaderMockPath = path.resolve(__dirname, './mocks/externalFile
 const publicDirPath = path.resolve(repoRoot, 'public')
 
 const config: StorybookConfig = {
-  stories: ['../../src/components/**/*.stories.ts'],
+  stories: [
+    '../../src/components/**/*.stories.ts',
+    '../../src/layouts/**/*.stories.ts',
+    '../../src/pages/**/*.stories.ts'
+  ],
   /**
    * Relative to `configDir` only — Windows absolute paths break Storybook's `staticDirs` parser (`C:` / `to:` split).
    * Dev-time asset requests are also served by `vitePluginServeRepoPublic` (see `viteFinal`).
@@ -34,6 +39,7 @@ const config: StorybookConfig = {
       publicDir: publicDirPath,
       plugins: [
         vitePluginServeRepoPublic(publicDirPath),
+        vitePluginRewriteGlobEagerForStorybook(),
         ...(viteConfig.plugins ?? []),
         vue()
       ],

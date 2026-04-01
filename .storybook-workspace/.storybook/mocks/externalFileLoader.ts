@@ -7,6 +7,12 @@ import T_socialContactButtons from 'src/i18n/en-US/components/SocialContactButto
 type T_i18nScenario = 'default' | 'longStrings' | 'markdownHeavy'
 
 const defaultMessages: Record<string, unknown> = {
+  ErrorNotFound: {
+    title: 'ERROR/NOT FOUND',
+    subTitleFirst: 'Something broke horribly somewhere',
+    subTitleSecond: 'Fantasia is trying her best to fix it!',
+    ctaText: 'Return to app start screen'
+  },
   Dialogs: {
     aboutFantasiaArchive: {
       title: 'About Fantasia Archive',
