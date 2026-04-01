@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 /* Quasar SCSS (& Sass) Variables */
 
 /* GENERAL COLORS */
@@ -17,11 +19,11 @@ $dark-lighter: #234655;
 
 $positive  : #35a14e;
 $negative  : #c10015;
-$info      : lighten(#d7ac47, 35);
+$info      : color.adjust(#d7ac47, $lightness: 35%);
 $warning   : #f2c037;
 
 /* GLOBALS - CUSTOM COLORS */
-$gold-muted-border: scale-color($primary, $saturation: -35%, $lightness: 14%);
+$gold-muted-border: color.scale($primary, $saturation: -35%, $lightness: 14%);
 
 /* GLOBALS - HTML ELEMENTS */
 $aLinkColor: $primary-bright;

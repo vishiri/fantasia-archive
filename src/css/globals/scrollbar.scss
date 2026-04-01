@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 * {
 
   /* Scrollbar sizing */
@@ -13,12 +15,12 @@
 
   /* Handle button */
   ::-webkit-scrollbar-thumb {
-    background: lighten($dark, 40);
+    background: color.adjust($dark, $lightness: 40%);
     border-radius: 5px;
   }
 
   /* Handle button - Hover */
   ::-webkit-scrollbar-thumb:hover {
-    background: lighten($dark, 60);
+    background: color.adjust($dark, $lightness: 60%);
   }
 }
