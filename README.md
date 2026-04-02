@@ -50,7 +50,7 @@ Stories live next to components as `*.stories.ts` under `src/components/**`.
 
 #### Integration gotchas (Storybook + Electron + Playwright)
 
-- **Storybook** — Runs from [`.storybook-workspace/`](.storybook-workspace/) (nested Yarn project). It uses its own **Vite 6** toolchain while the root Quasar app uses **Vite 8** via `@quasar/app-vite` v2; this split is intentional until Storybook’s supported Vite range catches up. Config keeps `staticDirs` pointed at the repo [`public/`](public/) folder (and related Vite wiring) so asset paths match the Quasar app.
+- **Storybook** — Runs from [`.storybook-workspace/`](.storybook-workspace/) (nested Yarn project) on **Storybook 10** with **Vite 8**, aligned with the root Quasar app’s **`@quasar/app-vite`** v2 line. Config keeps `staticDirs` pointed at the repo [`public/`](public/) folder (and related Vite wiring) so asset paths match the Quasar app.
 - **Electron** — The packaged renderer loads from `file://`. Root-relative `public/` URLs built from `import.meta.env.BASE_URL === '/'` can fail; prefer **relative** paths (e.g. `./images/...`) for those assets unless you control a real HTTP base.
 - **Playwright** — Component and E2E tests drive the **built** app. Run `yarn build` before `yarn test:component` / `yarn test:e2e` when you change sources those tests cover.
 

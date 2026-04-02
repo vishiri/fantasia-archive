@@ -5,6 +5,8 @@
 
 ### Bugfixes & Optimizations
 - Upgraded **`.storybook-workspace`** to **Storybook 10** and **Vite 8** so component previews run on the same major bundler line as the desktop app (**`@quasar/app-vite`**), refreshed the nested **Yarn** lockfile for reproducible installs (including **CI** frozen installs), and aligned root **Storybook** / **`eslint-plugin-storybook`** versions with that release family.
+- Refreshed **root** and **`.storybook-workspace`** lockfiles with **`yarn upgrade`** within existing semver ranges (notably **Quasar**, **Vue**, **vue-i18n**, **Playwright**, **Sass**, and related tooling); kept **`@types/node`** on the **22.x** typings line for the **Node 22** engine. Updated **README** and **AGENTS** so contributors see **Storybook 10** on **Vite 8** instead of the old split-Vite wording.
+- Added **`debug-storybook.log*`** to **`.gitignore`** so local Storybook diagnostic logs are not picked up as untracked files.
 
 ## 2.4.6 - Window chrome, Storybook, Stylelint, and DevTools
 

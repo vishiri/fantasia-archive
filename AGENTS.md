@@ -40,7 +40,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | Lint / types   | ESLint (`yarn lint`), `tsc` (`yarn lint:types`), Stylelint (`yarn lint:style`) — see [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc) |
 | Unit tests     | Vitest (`yarn test:unit`)                                        |
 | UI / E2E tests | Playwright (`yarn test:component`, `yarn test:e2e`)              |
-| Component docs | Storybook 8 (`yarn storybook`, `yarn build-storybook`)           |
+| Component docs | Storybook 10 (`yarn storybook`, `yarn build-storybook`)        |
 | DB (evolving)  | `sqlite3` in main process (`src-electron/electron-main.ts` stub) |
 
 
