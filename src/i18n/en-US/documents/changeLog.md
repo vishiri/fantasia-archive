@@ -1,15 +1,20 @@
 # Changelog
 ----------
 
-## 2.4.2 - Dependency refresh and i18n/runtime compatibility
+## 2.4.3 - Additional dependency updates and improved testing workflow
+
+### Bugfixes & Optimizations
+- Upgraded `vitest` to v4 and adjusted Electron main-process unit-test mocks to constructor-compatible implementations so `BrowserWindow`, `Menu`, and `MenuItem` mocking remains stable under the newer runner.
+- Refreshed additional low-risk dependencies (`sqlite3`, `lodash-es`, `stylelint`, `stylelint-config-standard-scss`, and `eslint-plugin-promise`) and revalidated the complete lint/test/build pipeline after the updates.
+- Added persistent agent/testing guidance to run each validation command in an isolated terminal invocation to keep long test outputs readable and easier to audit.
+- Aligned the `2.4.3` changelog block with the canonical `package.json` version and strengthened contributor guidance so changelog edits always re-read live `package.json` first, avoiding section/version drift.
+
+## 2.4.2 - Core dependency refresh and Quasar/Vite workflow validation
 
 ### Bugfixes & Optimizations
 - Upgraded `vue-i18n` to v11 and removed legacy TypeScript suppression in i18n bootstrapping now that current typings compile cleanly.
 - Refreshed core app and tooling dependencies (including Quasar extras/qmarkdown, Axios, Pinia, Vue Router, Vitest, and selected ESLint plugins) to reduce maintenance risk while staying within the current project architecture.
 - Applied a follow-up tooling refresh for the Quasar/Vite workflow (`@quasar/app-vite`, `@intlify/unplugin-vue-i18n`, `vite-plugin-checker`, `eslint-plugin-vue`, and `@types/node`) with full lint, typecheck, unit, component, E2E, and build validation.
-- Upgraded `vitest` to v4 and adjusted Electron main-process unit-test mocks to constructor-compatible implementations so `BrowserWindow`, `Menu`, and `MenuItem` mocking remains stable under the newer runner.
-- Refreshed additional low-risk dependencies (`sqlite3`, `lodash-es`, `stylelint`, `stylelint-config-standard-scss`, and `eslint-plugin-promise`) and revalidated the complete lint/test/build pipeline after the updates.
-- Added persistent agent/testing guidance to run each validation command in an isolated terminal invocation to keep long test outputs readable and easier to audit.
 - Revalidated quality gates after upgrades with lint, typecheck, stylelint, unit tests, Playwright component tests, Playwright E2E tests, and Electron production build all passing.
 
 ## 2.4.1 - Changelog policy lock and component test stability

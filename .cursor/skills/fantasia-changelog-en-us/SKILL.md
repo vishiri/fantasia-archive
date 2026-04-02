@@ -46,7 +46,7 @@ Before editing `changeLog.md` for new work, keep this order:
 
 ## Version policy (strict)
 
-1. Read **`version`** from `package.json` → call it `pkg`.
+1. Immediately before editing changelog text, re-read **`version`** from `package.json` (fresh file read, no cached value) → call it `pkg`.
 2. Parse the **topmost** changelog heading: first line matching `## X.Y.Z` (semver) below the file title, e.g. `## 2.1.0 - Tooling and AI-assisted development` → `2.1.0`.
 3. **NEVER, EVER, UNDER ANY CIRCUMSTANCES** auto-bump or infer a new version.
 4. Changelog heading versions must follow `package.json` exactly unless the user explicitly requests a manual version change.
