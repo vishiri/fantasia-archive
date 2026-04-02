@@ -1,6 +1,13 @@
 # Changelog
 ----------
 
+## 2.4.1 - Changelog policy lock and component test stability
+
+### Bugfixes & Optimizations
+- Fixed Playwright component-test discovery for `DialogAboutFantasiaArchive` by avoiding full i18n loader imports that pull markdown documents into Node-side test loading.
+- Updated the dialog social-button assertions to compare rendered labels, matching current UI output and keeping component tests stable.
+- Locked project guidance to **never auto-bump versions**; changelog sections now strictly follow the existing `package.json` version unless a manual change is explicitly requested.
+
 ## 2.4.0 - Quasar CLI Vite v2 and Node 22 toolchain
 
 ### Bugfixes & Optimizations

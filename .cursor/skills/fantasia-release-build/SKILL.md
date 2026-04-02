@@ -26,5 +26,6 @@ description: >-
 
 ## Versioning
 
-- Bump `package.json` `version` and any in-app version strings exposed via `appDetails` / i18n as required for the release.
-- Gather this version by inspecting the `changeLog.md` for the newest version present in it.
+- **NEVER** auto-bump any version during release/build workflows.
+- Treat `package.json` `version` as the source of truth and keep changelog headings aligned to it.
+- Change any version values only when the user explicitly requests a manual version update.

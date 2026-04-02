@@ -2,10 +2,9 @@
 name: fantasia-changelog-en-us
 description: >-
   Maintains the English in-app changelog at src/i18n/en-US/documents/changeLog.md
-  in sync with package.json version and semver patch bumps when the latest
-  changelog heading duplicates the package version. Use after substantive app,
-  UX, test, or docs changes, or when the user asks for release notes or version
-  bumps.
+  in strict sync with package.json version, without any automatic version
+  bumping. Use after substantive app, UX, test, or docs changes, or when the
+  user asks for release notes.
 ---
 
 # Changelog and version (`changeLog.md` + `package.json`)
@@ -45,10 +44,12 @@ Before editing `changeLog.md` for new work, keep this order:
 3. Use matching plans only as supporting context for release notes and change grouping.
 4. If no matching plan files exist, continue with code and git diff context only.
 
-## Version to use for a **new** top section
+## Version policy (strict)
 
 1. Read **`version`** from `package.json` → call it `pkg`.
 2. Parse the **topmost** changelog heading: first line matching `## X.Y.Z` (semver) below the file title, e.g. `## 2.1.0 - Tooling and AI-assisted development` → `2.1.0`.
+3. **NEVER, EVER, UNDER ANY CIRCUMSTANCES** auto-bump or infer a new version.
+4. Changelog heading versions must follow `package.json` exactly unless the user explicitly requests a manual version change.
 
 ### If there is **no** semver heading yet
 
@@ -56,16 +57,7 @@ Before editing `changeLog.md` for new work, keep this order:
 
 ### If top heading version **equals** `pkg`
 
-The same version is already the **current** release section. Two cases:
-
-- **Same release, more notes**: Append bullets under the right `###` subsection only if that category has real items to add (see **Section headings** below). **Do not** bump version.
-- **New patch release** (distinct batch of shipped work, or user asks to bump, or policy is “one top-level section per patch”): apply a **patch bump** to semver: **`major.minor.patch` → `major.minor.(patch+1)`** (this repo interprets “`X.X+1.0`” as **increment the last segment**; not minor `X.(Y+1).0` unless the user explicitly asks for minor/major).
-
-  Then:
-
-  1. Set `package.json` **`version`** to the new value.
-  2. Insert a **new** `## {newVersion} - Short title` block **immediately below** the `----------` divider (above older `##` sections).
-  3. Put new bullets only under `###` headings that have at least one entry (see **Section headings** below).
+Append bullets under the right `###` subsection only if that category has real items to add (see **Section headings** below). **Do not** bump version.
 
 ### If top heading version **is lower than** `pkg` (semver)
 
@@ -73,7 +65,7 @@ The same version is already the **current** release section. Two cases:
 
 ### If top heading version **is higher than** `pkg`
 
-- **Do not** silently downgrade. Align with the user: either raise `package.json` to match the changelog or fix the changelog; default is to treat `package.json` as source of truth and ask.
+- Treat `package.json` as source of truth. Fix changelog headings/content to align with `pkg`, and do not change `package.json` unless the user explicitly requests it.
 
 ## Section headings (`###`)
 

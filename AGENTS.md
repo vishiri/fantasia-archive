@@ -79,7 +79,7 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 
 ## Changelog (in-app)
 
-- English changelog: [src/i18n/en-US/documents/changeLog.md](src/i18n/en-US/documents/changeLog.md). **Version** in [package.json](package.json) is the semver source of truth; when a new top section would duplicate that version, **patch-bump** both per [fantasia-changelog-en-us skill](.cursor/skills/fantasia-changelog-en-us/SKILL.md). Do not add empty `###` sections or “none” placeholder bullets.
+- English changelog: [src/i18n/en-US/documents/changeLog.md](src/i18n/en-US/documents/changeLog.md). **Version** in [package.json](package.json) is the only source of truth. **NEVER, EVER, UNDER ANY CIRCUMSTANCES** auto-bump any version in changelog or `package.json`; update changelog entries under the existing package version unless the user explicitly requests a manual version change. Do not add empty `###` sections or “none” placeholder bullets.
 - For changelog updates tied to fresh work, ensure Storybook updates/checks for affected **`src/components/**`** UI are completed before editing the changelog entry.
 
 ## Testing expectations
@@ -133,7 +133,7 @@ Use different instructions or @-references when starting a task:
 | `fantasia-markdown-dialogs`     | QMarkdown dialogs and document markdown                             |
 | `fantasia-release-build`        | Production build and packaging                                      |
 | `git-conventional-commits`      | Logical commits, conventional `type:` messages, per-commit approval |
-| `fantasia-changelog-en-us`      | `changeLog.md`, `package.json` version, patch bumps                 |
+| `fantasia-changelog-en-us`      | `changeLog.md` strictly aligned to existing `package.json` version  |
 | `fantasia-plan-documents`       | `.cursor/plans` filename and metadata format for plan files         |
 
 

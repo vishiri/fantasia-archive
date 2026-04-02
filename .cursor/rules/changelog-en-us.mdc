@@ -1,13 +1,13 @@
 ---
-description: Keep en-US changeLog.md aligned with package.json version after substantive changes
+description: Keep en-US changeLog.md strictly aligned with package.json version without any automatic version bumping
 alwaysApply: true
 ---
 
 # Changelog discipline
 
 - Before **any changelog edit** tied to new product/docs/test work, confirm workflow order: (1) `yarn lint` and `yarn lint:types` pass when product or test sources changed (see [eslint-typescript.mdc](eslint-typescript.mdc)), (2) `yarn test:unit` passes, (3) Storybook updates/checks are complete for affected **`src/components/**`** UI (layout/page Storybook previews do not require Docs/autodocs), then (4) changelog update.
-- After **substantive** product or user-visible changes, update [changeLog.md](src/i18n/en-US/documents/changeLog.md) and reconcile **semver** with [package.json](package.json) `version` per [fantasia-changelog-en-us skill](../skills/fantasia-changelog-en-us/SKILL.md).
+- After **substantive** product or user-visible changes, update [changeLog.md](src/i18n/en-US/documents/changeLog.md) using the existing [package.json](package.json) `version` as the only version source per [fantasia-changelog-en-us skill](../skills/fantasia-changelog-en-us/SKILL.md).
 - When preparing changelog updates, also inspect `.cursor/plans/` for plan files that match the current `package.json.version` to gather release-context notes for what changed.
-- **Patch bump** when adding a **new** top release section while the latest heading already matches `package.json.version`: `major.minor.patch` → `major.minor.(patch+1)`, then set `package.json` `version` to match (unless the user specifies minor/major instead).
-- **Append** under the existing top `## version` block when still shipping notes for the **same** release without a new patch.
+- **NEVER, EVER, UNDER ANY CIRCUMSTANCES** auto-bump, infer, or mutate any version value in `package.json` or changelog headings.
+- **Always** append or edit changelog content under the section that matches the current `package.json.version`, unless the user explicitly asks for a manual version change.
 - **Omit** any `###` category (`New features`, `Known issues`, `Bugfixes & Optimizations`, etc.) when there is nothing to list — no empty sections and no “none” placeholder bullets.
