@@ -61,8 +61,8 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 
 ## Linting and static analysis
 
-- **No TSLint** — use **ESLint** (`.eslintrc.cjs`, `plugin:@typescript-eslint/recommended`, Vue presets, `standard`) plus **`yarn lint:types`** for **`tsc -p tsconfig.json`**. Details: [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc).
-- **`@typescript-eslint` v8** is pinned for **TypeScript ~5.6**; keep them in step to avoid `typescript-estree` unsupported-version warnings (including from **vite-plugin-checker** in dev).
+- **No TSLint** — use **ESLint** (**`eslint.config.mjs`**, **neostandard**, **typescript-eslint**, **eslint-plugin-vue**) plus **`yarn lint:types`** for **`tsc -p tsconfig.json`**. Details: [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc).
+- **`@typescript-eslint` v8** / **typescript-eslint** should stay aligned with **TypeScript ~6.0** in `package.json` to avoid `typescript-estree` unsupported-version warnings (including from **vite-plugin-checker** in dev).
 - **`src/env.d.ts`** references **`.quasar/shims-vue.d.ts`** so `tsc` resolves `*.vue` while `tsconfig` excludes generated `.quasar` output.
 - Before commits that touch lint-covered sources, run **`yarn lint`** and **`yarn lint:types`** (see commit gate in [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc)).
 

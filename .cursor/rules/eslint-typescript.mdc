@@ -7,7 +7,7 @@ alwaysApply: true
 
 ## What this project uses (not TSLint)
 
-- **TSLint** is deprecated and **not** used. TypeScript style and many type-aware checks come from **ESLint** with **`@typescript-eslint`** (v8.x, aligned with **TypeScript ~5.6** in `package.json`).
+- **TSLint** is deprecated and **not** used. TypeScript style and many type-aware checks come from **ESLint** (**flat config** via root **`eslint.config.mjs`**) with **neostandard**, **typescript-eslint** (v8.x), **eslint-plugin-vue** (v10), and **`@typescript-eslint`**, aligned with **TypeScript ~6.0** in `package.json`.
 - **Standalone typecheck**: `yarn lint:types` runs **`tsc -p tsconfig.json --pretty`** (no emit). Use it in CI, before commits, and whenever you change configs or broad typings.
 
 ## Commands
