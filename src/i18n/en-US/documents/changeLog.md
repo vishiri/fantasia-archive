@@ -1,6 +1,11 @@
 # Changelog
 ----------
 
+## 2.4.4 - Lockfile semver refresh
+
+### Bugfixes & Optimizations
+- Refreshed the dependency lockfile with `yarn upgrade` under the existing semver ranges so installs resolve to the latest compatible releases (including Quasar, Vue, `vue-i18n`, Sass, Playwright, and the Vite tooling pulled in by Quasar), then revalidated ESLint, TypeScript, Stylelint, and Vitest.
+
 ## 2.4.3 - Additional dependency updates and improved testing workflow
 
 ### Bugfixes & Optimizations
