@@ -9,7 +9,6 @@ export type MessageSchema = typeof messages['en-US'];
 
 // See https://vue-i18n.intlify.dev/guide/advanced/typescript.html#global-resource-schema-type-definition
 /* eslint-disable @typescript-eslint/no-empty-object-type -- vue-i18n module augmentation schema */
-// @ts-expect-error TS2665 — package `module` resolves to ESM bundle; augmentation targets the declared types entry
 declare module 'vue-i18n' {
   // define the locale messages schema
   export interface DefineLocaleMessage extends MessageSchema {}
