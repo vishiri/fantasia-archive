@@ -20,6 +20,7 @@ Match **existing** tests to the letter when adding or editing:
 ## Unit tests (Vitest)
 
 - **Command**: `yarn test:unit` runs [vitest.config.mts](../../vitest.config.mts) then [vitest.components.config.mts](../../vitest.components.config.mts) (Vue SFC tests under `src/components/**`).
+- **Execution policy**: run this command in its own terminal invocation (do not chain with lint/build/Playwright commands in a single shell line).
 - **Machine-readable reports**: `test-results/vitest-report/test-results-vitest.json` (core) and `test-results-vitest-components.json` (components).
 - **Scope**: Logic in `src/` and `src-electron/` (including main-process modules) with `*.vitest.test.ts` co-located under `tests/` folders; component mounting tests use `@vue/test-utils` + shared [vitest.setup.ts](../../vitest.setup.ts).
 - **Component baseline**: under `src/components/**`, maintain one colocated `tests/<ComponentName>.vitest.test.ts` per `.vue` component (add/rename/remove both together).
@@ -51,6 +52,7 @@ Match **existing** tests to the letter when adding or editing:
 - **Typing**: Keep selectors, props payloads, and helper arguments strongly typed; avoid `any`.
 
 - **Command**: `yarn test:component`
+- **Execution policy**: run this command in its own terminal invocation; never combine it with other verification commands in one chained shell command.
 - **Location**: Under `src/components/`, files ending in `.playwright.test.ts` (often in a `tests/` subfolder next to the component).
 - **Single test**: `yarn test:componentSingle --component=FOLDER_NAME` (see `package.json` for Windows `%npm_config_*%` variants).
 - **Interactive picker**: `yarn test:componentList` → runs `testRunner_component.mjs` (discovers `*.playwright.test.ts` under `src/components/`).
@@ -60,6 +62,7 @@ Match **existing** tests to the letter when adding or editing:
 - **Structure**: Same Playwright rule as components; e2e files use `TEST_ENV: 'e2e'`, may use numeric `faFrontendRenderTimer`, and sometimes `getByText` with visible labels — see `e2e-tests/*.playwright.spec.ts` in the repo.
 
 - **Command**: `yarn test:e2e`
+- **Execution policy**: run this command in its own terminal invocation; keep E2E output isolated from other command logs.
 - **Location**: `e2e-tests/*.playwright.spec.ts`
 - **Single spec**: `yarn test:e2eSingle --spec=SPEC_FILE_NAME` (see `package.json`).
 - **Interactive picker**: `yarn test:e2eList` → `testRunner_e2e.mjs`
@@ -74,6 +77,7 @@ Match **existing** tests to the letter when adding or editing:
 2. `yarn test:unit` for covered logic.
 3. Rebuild: `yarn build` (or `quasar build -m electron`).
 4. `yarn test:component` / `yarn test:e2e` as needed.
+5. Run each checklist command as a separate terminal invocation; do not chain checklist steps with `&&`.
 
 ## Choosing Vitest vs Playwright in renderer work
 

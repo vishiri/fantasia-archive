@@ -25,6 +25,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc) | Always — `type: subject` commits; see skill for split + approval workflow |
 | [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc)                   | Always — en-US `changeLog.md` vs `package.json` version (see skill)       |
 | [plan-documents.mdc](.cursor/rules/plan-documents.mdc)                     | Always — plan files in `.cursor/plans` with timestamp + version metadata  |
+| [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) | Always — run each lint/test/build command in its own terminal invocation |
 
 
 ## Stack (short)
@@ -89,6 +90,7 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 - **`_data/` holds production structured feeds** (menus, lists, etc.). **Vitest** and **Playwright** fixture objects live **inside** their own `*.vitest.test.ts` / `*.playwright.test.ts` files (inline `const` / literals), not in `_data/` and **not** in extra `tests/*.ts` files whose only role is fixture storage. **Never** add `tests/_data/`. Do **not** add tests whose **only** system-under-test is a file under `_data/`; exercise production data indirectly (components, boot, scripts).
 - Treat 1:1 component-test parity as **coverage presence**, not exhaustive line/branch percentage coverage.
 - **Playwright** requires a **production build** before runs when source affecting the app has changed. Follow [playwright-tests.mdc](.cursor/rules/playwright-tests.mdc) for test sources; use [vue-template-test-hooks.mdc](.cursor/rules/vue-template-test-hooks.mdc) when changing locators in `.vue` templates. See `.cursor/skills/fantasia-testing/SKILL.md` and `README.md`.
+- **Terminal readability**: run each verification command in a separate terminal invocation. Never chain full verification commands (for example, avoid `yarn lint && yarn test:unit && yarn build`). Run and report each command on its own (`yarn lint`, `yarn lint:types`, `yarn lint:style`, `yarn test:unit`, `yarn build`, `yarn test:component`, `yarn test:e2e`).
 
 ## Storybook expectations
 

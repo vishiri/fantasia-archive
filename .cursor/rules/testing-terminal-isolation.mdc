@@ -1,0 +1,11 @@
+---
+description: Keep lint, test, and build logs isolated per command
+alwaysApply: true
+---
+
+# Testing Terminal Isolation
+
+- Run each verification command in its own terminal invocation.
+- Do not chain verification commands with `&&` or `;` (for example `yarn lint && yarn test:unit` is not allowed).
+- Keep these commands isolated for readable logs: `yarn lint`, `yarn lint:types`, `yarn lint:style`, `yarn test:unit`, `yarn build`, `yarn test:component`, `yarn test:e2e`.
+- When reporting progress, list results per command in execution order.
