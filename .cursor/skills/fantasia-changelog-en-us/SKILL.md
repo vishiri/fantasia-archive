@@ -3,8 +3,9 @@ name: fantasia-changelog-en-us
 description: >-
   Maintains the English in-app changelog at src/i18n/en-US/documents/changeLog.md
   in strict sync with package.json version, without any automatic version
-  bumping. Use after substantive app, UX, test, or docs changes, or when the
-  user asks for release notes.
+  bumping. Changelog text must be user- or release-relevant only—never
+  internal QA (lint/build/test runs, “all gates passed”). Use after substantive
+  app, UX, or user-facing docs changes, or when the user asks for release notes.
 ---
 
 # Changelog and version (`changeLog.md` + `package.json`)
@@ -23,9 +24,21 @@ After **substantive** work that users or operators should know about, for exampl
 
 - `feat` / user-visible behavior, UI, Electron flows, i18n copy
 - `fix` / bugs, regressions, crashes
-- Notable `test` / tooling only if it affects how to run or verify the app (`chore` / `refactor` / `style` usually **omit** unless the user asks)
+- Notable dependency or tooling updates **when they matter to the product** (e.g. upgraded stack that ships with the app), described as the change itself — not as a test report
+- Notable `test` / tooling only if it **changes how users or contributors run the app or the repo** (e.g. new required command, broken/renamed script). Routine `chore` / `refactor` / `style` usually **omit** unless the user asks
 
 Skip trivial-only edits (typo in a comment, pure format) unless the user wants everything logged.
+
+### What must **not** go into `changeLog.md`
+
+The English changelog is shown **in the app** to end users. **Do not** add bullets that only record internal verification or maintainer QA, for example:
+
+- Re-running `yarn lint`, `yarn lint:types`, `yarn lint:style`, `yarn test:unit`, `yarn build`, `yarn test:component`, or `yarn test:e2e`
+- Phrases like “revalidated the pipeline”, “all tests passed”, “Playwright/E2E/component suite green”, “full quality gates”, or “packaging succeeded after QA”
+
+Those steps may be **required before** you edit the changelog (see repo rules), but they are **not** changelog content. Put verification detail in commit messages or PR descriptions instead.
+
+When you **do** document a dependency refresh, describe **what** was refreshed (ranges, notable packages), not the full test matrix you ran afterward.
 
 ## Pre-changelog workflow gate (required)
 
@@ -78,6 +91,7 @@ Append bullets under the right `###` subsection only if that category has real i
 
 - One line per item, `- ` prefix, imperative or past tense consistent with existing entries.
 - Add a `###` heading only when you are adding one or more bullets under it.
+- Prefer **product-facing** wording; avoid appending “and then we ran …” verification clauses unless the user explicitly asks for that style.
 
 ## Related
 
