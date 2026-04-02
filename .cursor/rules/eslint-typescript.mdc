@@ -20,11 +20,9 @@ alwaysApply: true
 
 ## Pre-commit / pre-changelog quality gate
 
-Before commits or changelog edits tied to product or test work, run the four checks **in order** as **one chained command** (see [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) and [git-conventional-commits.mdc](git-conventional-commits.mdc)):
+Before commits or changelog edits tied to product or test work, run the four checks **in order** in **one** terminal via **`yarn verify`** (see [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) and [git-conventional-commits.mdc](git-conventional-commits.mdc)).
 
-`yarn lint && yarn lint:types && yarn lint:style && yarn test:unit`
-
-Run steps individually only while debugging a specific failure.
+Run `yarn lint`, `yarn lint:types`, `yarn lint:style`, or `yarn test:unit` individually only while debugging a specific failure.
 
 **Dev server**: `vite-plugin-checker` runs ESLint during `quasar dev`; keep `@typescript-eslint` major in sync with TypeScript so you do not see unsupported-TS-version warnings from `typescript-estree`.
 

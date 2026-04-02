@@ -30,12 +30,17 @@ jobs:
       with:
         node-version: ${{ matrix.node }}
 
-    - name: quasar install and build
+    - name: Install dependencies
       run: |
         npm install --global yarn@1.22.19
         yarn global add @quasar/cli
         yarn install
-        yarn build
+
+    - name: Quality gate (lint, types, style, unit tests)
+      run: yarn verify
+
+    - name: Production Electron build
+      run: yarn build
 
     - name: Upload Linux Artifact
       if: ${{ matrix.os == 'ubuntu-latest' }}

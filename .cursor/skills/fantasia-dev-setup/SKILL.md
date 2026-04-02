@@ -63,11 +63,13 @@ quasar build -m electron
 
 | Goal | Command |
 |------|---------|
+| **Quality gate** (lint + `tsc` + style + unit tests, one terminal) | `yarn verify` |
 | ESLint | `yarn lint` |
 | TypeScript (`tsc`, no emit) | `yarn lint:types` |
 | Stylelint (Vue + SCSS) | `yarn lint:style` |
 | Unit tests | `yarn test:unit` |
+| Unit + Playwright (component + E2E paths, sequential) | `yarn test:full` (after production build when relevant sources changed) |
 | Component tests (Playwright) | `yarn test:component` (after production build) |
 | E2E tests (Playwright) | `yarn test:e2e` (after production build) |
 
-See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) for ESLint vs TSLint, `tsconfig` / `tsc`, and Vitest env typing. See [fantasia-testing](../fantasia-testing/SKILL.md) for test details.
+See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) for ESLint vs TSLint, `tsconfig` / `tsc`, and Vitest env typing. See [fantasia-testing](../fantasia-testing/SKILL.md) for test details. **Yarn 1.x** reserves `yarn check` for dependency verification — use **`yarn verify`** for the lint/types/style/unit gate ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).

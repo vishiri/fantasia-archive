@@ -101,6 +101,18 @@ Track story depth manually to prioritize upgrades:
 
 Review this table against `src/components/**` stories each iteration and move highest-risk user-facing components toward at least **Quality** coverage.
 
+### Quality gate (before commit or release)
+
+Run ESLint, the TypeScript project check (`tsc`), Stylelint, and Vitest unit tests in one shot (stops on the first failure):
+
+```
+yarn verify
+```
+
+For debugging a single step, run `yarn lint`, `yarn lint:types`, `yarn lint:style`, or `yarn test:unit` on its own, then run `yarn verify` again before committing. Do not append `yarn build` or Playwright commands to the same shell line as `yarn verify`.
+
+On **Yarn 1.x**, `yarn check` is a different built-in (dependency-tree validation); use **`yarn verify`** for this gate.
+
 ### Testing
 
 #### Unit test - via Vitest
@@ -151,6 +163,14 @@ yarn test:e2eList
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 ```
 yarn test:e2eSingle --spec=SPEC_FILE_NAME
+```
+
+#### Full test pass (unit + Playwright component and E2E)
+
+Runs `yarn test:unit`, then Playwright over `src/components` and `e2e-tests/` in one invocation. Requires a **production build** (`yarn build`) when sources those tests cover have changed.
+
+```
+yarn test:full
 ```
 
 ### Customize the configuration

@@ -33,7 +33,7 @@ Skip trivial-only edits (typo in a comment, pure format) unless the user wants e
 
 The English changelog is shown **in the app** to end users. **Do not** add bullets that only record internal verification or maintainer QA, for example:
 
-- Re-running `yarn lint`, `yarn lint:types`, `yarn lint:style`, `yarn test:unit`, `yarn build`, `yarn test:component`, or `yarn test:e2e`
+- Re-running `yarn verify`, `yarn lint`, `yarn lint:types`, `yarn lint:style`, `yarn test:unit`, `yarn build`, `yarn test:component`, `yarn test:e2e`, or `yarn test:full`
 - Phrases like “revalidated the pipeline”, “all tests passed”, “Playwright/E2E/component suite green”, “full quality gates”, or “packaging succeeded after QA”
 
 Those steps may be **required before** you edit the changelog (see repo rules), but they are **not** changelog content. Put verification detail in commit messages or PR descriptions instead.
@@ -44,7 +44,7 @@ When you **do** document a dependency refresh, describe **what** was refreshed (
 
 Before editing `changeLog.md` for new work, keep this order ([`testing-terminal-isolation.mdc`](../../rules/testing-terminal-isolation.mdc)):
 
-1. Run the **quality gate** in one terminal: `yarn lint && yarn lint:types && yarn lint:style && yarn test:unit` (run steps individually only while debugging a failure).
+1. Run the **quality gate** in one terminal: `yarn verify` (run `yarn lint`, `yarn lint:types`, `yarn lint:style`, or `yarn test:unit` individually only while debugging a failure).
 2. For affected user-facing **`src/components/**`**, verify Storybook updates are complete (`*.stories.ts`, relevant mocks/placeholders) and Storybook starts cleanly. Layout/page Storybook previews do not require Docs/autodocs ([`storybook-stories.mdc`](../../rules/storybook-stories.mdc)).
 3. Then draft/update changelog entries.
 

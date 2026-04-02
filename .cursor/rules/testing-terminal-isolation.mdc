@@ -7,9 +7,13 @@ alwaysApply: true
 
 ## Quality gate (the **only** chained verification)
 
-When running the full **quality gate** — ESLint, TypeScript check, Stylelint, and unit tests — use **one** terminal invocation with a single chained command so the shell stops on the first failure and you avoid extra round-trips:
+When running the full **quality gate** — ESLint, TypeScript check, Stylelint, and unit tests — use **one** terminal invocation. Prefer the **`yarn verify`** script in `package.json` (same steps, stops on the first failure):
 
-`yarn lint && yarn lint:types && yarn lint:style && yarn test:unit`
+`yarn verify`
+
+**Yarn 1.x**: do **not** use `yarn check` for this — it is a built-in that validates the dependency tree, not this script.
+
+Equivalent explicit chain (for context or copy-paste without the script): `yarn lint && yarn lint:types && yarn lint:style && yarn test:unit`
 
 **Exception**: if you are **debugging** a specific failing step, run that command **alone** (and any narrower follow-ups) until it passes, then re-run the full chained gate before commit or changelog edits.
 

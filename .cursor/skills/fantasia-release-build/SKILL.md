@@ -20,7 +20,7 @@ description: >-
 
 ## Checklist before a release candidate
 
-1. **Quality gate** in one terminal: `yarn lint && yarn lint:types && yarn lint:style && yarn test:unit` ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
+1. **Quality gate** in one terminal: `yarn verify` ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
 2. `yarn build` (separate terminal); smoke-test the packaged app on target OS(es).
 3. Run Playwright suites that matter after the same build (`yarn test:component`, `yarn test:e2e`) — see [fantasia-testing](../fantasia-testing/SKILL.md).
 
