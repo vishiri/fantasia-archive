@@ -8,6 +8,9 @@
 - Fixed **`yarn test:full`** so it runs unit tests then Playwright over component and E2E paths (removed the broken `concurrently` invocation and dropped the unused **`concurrently`** dependency).
 - Cleared the French locale changelog markdown so release notes are not maintained per locale until translations return.
 - Upgraded **`@intlify/unplugin-vue-i18n`** to v11 for the Quasar/Vite locale pipeline, **`uuid`** to v11 (built-in TypeScript types; removed **`@types/uuid`**), and **`sqlite3`** to v6 for the Electron main-process dependency line.
+- Added a **GitHub Actions** workflow that runs **`yarn verify`** on **push** and **pull request** to **`master`** / **`main`** (including installing the Storybook workspace so ESLint can resolve `.storybook-workspace/.storybook`).
+- Refreshed **root** and **`.storybook-workspace`** lockfiles with **`yarn upgrade`** within existing semver ranges (notably newer **Playwright**, **Quasar**, **Vue**, **vue-i18n**, **Sass**, and related tooling where ranges allowed).
+- Made **DevTools** bridge helpers use **`getCurrentWindow()`** instead of **`BrowserWindow.getFocusedWindow()`** so **toggle / status** stay tied to the app window when menus or DevTools change OS focus, stabilizing the DevTools **E2E** check.
 
 ## 2.4.4 - Dependencies and dev tooling
 

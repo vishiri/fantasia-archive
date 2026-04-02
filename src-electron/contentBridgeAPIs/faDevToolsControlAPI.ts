@@ -1,11 +1,23 @@
-import { BrowserWindow } from '@electron/remote'
+import { getCurrentWindow } from '@electron/remote'
 import { I_faDevToolsControl } from 'app/types/I_faDevToolsControl'
+
+/**
+ * Use the window that owns this renderer. `BrowserWindow.getFocusedWindow()` is unreliable
+ * after native menus / DevTools steal OS focus and made Playwright E2E checks flaky.
+ */
+function appWindow () {
+  try {
+    return getCurrentWindow()
+  } catch {
+    return null
+  }
+}
 
 export const faDevToolsControlAPI: I_faDevToolsControl = {
 
   // Checks if the dev tools are open for the current window
   checkDevToolsStatus () {
-    const currentWindow = BrowserWindow.getFocusedWindow()
+    const currentWindow = appWindow()
     if (currentWindow !== null) {
       return currentWindow.webContents.isDevToolsOpened()
     }
@@ -14,7 +26,7 @@ export const faDevToolsControlAPI: I_faDevToolsControl = {
 
   // Toggles the dev tools for the current window
   toggleDevTools () {
-    const currentWindow = BrowserWindow.getFocusedWindow()
+    const currentWindow = appWindow()
 
     if (currentWindow !== null) {
       const devToolsOpened = currentWindow.webContents.isDevToolsOpened()
@@ -28,7 +40,7 @@ export const faDevToolsControlAPI: I_faDevToolsControl = {
 
   // Opens the dev tools for the current window
   openDevTools () {
-    const currentWindow = BrowserWindow.getFocusedWindow()
+    const currentWindow = appWindow()
 
     if (currentWindow !== null) {
       currentWindow.webContents.openDevTools()
@@ -37,7 +49,7 @@ export const faDevToolsControlAPI: I_faDevToolsControl = {
 
   // Closes the dev tools for the current window
   closeDevTools () {
-    const currentWindow = BrowserWindow.getFocusedWindow()
+    const currentWindow = appWindow()
 
     if (currentWindow !== null) {
       currentWindow.webContents.closeDevTools()

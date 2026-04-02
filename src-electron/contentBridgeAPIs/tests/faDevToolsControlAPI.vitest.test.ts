@@ -1,40 +1,40 @@
 import { test, expect, vi, beforeEach } from 'vitest'
 import { faDevToolsControlAPI } from '../faDevToolsControlAPI'
 
-const { getFocusedWindowMock } = vi.hoisted(() => {
+const { getCurrentWindowMock } = vi.hoisted(() => {
   return {
-    getFocusedWindowMock: vi.fn()
+    getCurrentWindowMock: vi.fn()
   }
 })
 
 vi.mock('@electron/remote', () => {
   return {
-    BrowserWindow: {
-      getFocusedWindow: getFocusedWindowMock
-    }
+    getCurrentWindow: getCurrentWindowMock
   }
 })
 
 beforeEach(() => {
-  getFocusedWindowMock.mockReset()
+  getCurrentWindowMock.mockReset()
 })
 
 /**
  * checkDevToolsStatus
- * Test for no focused window.
+ * Test for no current window.
  */
-test('Test that checkDevToolsStatus returns false if no window is focused', () => {
-  getFocusedWindowMock.mockReturnValue(null)
+test('Test that checkDevToolsStatus returns false if getCurrentWindow is unavailable', () => {
+  getCurrentWindowMock.mockImplementation(() => {
+    throw new Error('no remote')
+  })
   expect(faDevToolsControlAPI.checkDevToolsStatus()).toBe(false)
 })
 
 /**
  * checkDevToolsStatus
- * Test for focused window with opened dev tools.
+ * Test for current window with opened dev tools.
  */
 test('Test that checkDevToolsStatus returns true when dev tools are open', () => {
   const isDevToolsOpened = vi.fn(() => true)
-  getFocusedWindowMock.mockReturnValue({
+  getCurrentWindowMock.mockReturnValue({
     webContents: {
       isDevToolsOpened
     }
@@ -48,7 +48,7 @@ test('Test that checkDevToolsStatus returns true when dev tools are open', () =>
  */
 test('Test that toggleDevTools closes already opened dev tools', () => {
   const closeDevTools = vi.fn()
-  getFocusedWindowMock.mockReturnValue({
+  getCurrentWindowMock.mockReturnValue({
     webContents: {
       isDevToolsOpened: () => true,
       closeDevTools,
@@ -65,7 +65,7 @@ test('Test that toggleDevTools closes already opened dev tools', () => {
  */
 test('Test that toggleDevTools opens dev tools when they are closed', () => {
   const openDevTools = vi.fn()
-  getFocusedWindowMock.mockReturnValue({
+  getCurrentWindowMock.mockReturnValue({
     webContents: {
       isDevToolsOpened: () => false,
       closeDevTools: vi.fn(),
@@ -78,39 +78,45 @@ test('Test that toggleDevTools opens dev tools when they are closed', () => {
 
 /**
  * toggleDevTools
- * No-op when there is no focused window.
+ * No-op when there is no current window.
  */
-test('Test that toggleDevTools does nothing when no focused window', () => {
-  getFocusedWindowMock.mockReturnValue(null)
+test('Test that toggleDevTools does nothing when getCurrentWindow throws', () => {
+  getCurrentWindowMock.mockImplementation(() => {
+    throw new Error('no remote')
+  })
   expect(() => faDevToolsControlAPI.toggleDevTools()).not.toThrow()
 })
 
 /**
  * openDevTools
- * No-op when there is no focused window.
+ * No-op when there is no current window.
  */
-test('Test that openDevTools does nothing when no focused window', () => {
-  getFocusedWindowMock.mockReturnValue(null)
+test('Test that openDevTools does nothing when getCurrentWindow throws', () => {
+  getCurrentWindowMock.mockImplementation(() => {
+    throw new Error('no remote')
+  })
   expect(() => faDevToolsControlAPI.openDevTools()).not.toThrow()
 })
 
 /**
  * closeDevTools
- * No-op when there is no focused window.
+ * No-op when there is no current window.
  */
-test('Test that closeDevTools does nothing when no focused window', () => {
-  getFocusedWindowMock.mockReturnValue(null)
+test('Test that closeDevTools does nothing when getCurrentWindow throws', () => {
+  getCurrentWindowMock.mockImplementation(() => {
+    throw new Error('no remote')
+  })
   expect(() => faDevToolsControlAPI.closeDevTools()).not.toThrow()
 })
 
 /**
  * openDevTools and closeDevTools
- * Test that explicit open and close methods call the focused window APIs.
+ * Test that explicit open and close methods call the current window APIs.
  */
 test('Test that openDevTools and closeDevTools call webContents APIs', () => {
   const openDevTools = vi.fn()
   const closeDevTools = vi.fn()
-  getFocusedWindowMock.mockReturnValue({
+  getCurrentWindowMock.mockReturnValue({
     webContents: {
       isDevToolsOpened: () => false,
       closeDevTools,
