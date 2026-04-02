@@ -5,7 +5,6 @@
 
 ### Bugfixes & Optimizations
 - Refreshed the dependency lockfile with `yarn upgrade` under the existing semver ranges so installs resolve to the latest compatible releases (including Quasar, Vue, `vue-i18n`, Sass, Playwright, and the Vite tooling pulled in by Quasar), then revalidated ESLint, TypeScript, Stylelint, and Vitest.
-- Re-ran the production Electron build and the Playwright component and E2E suites against that refreshed toolchain; packaging and all browser-driven tests completed successfully.
 
 ## 2.4.3 - Additional dependency updates and improved testing workflow
 
