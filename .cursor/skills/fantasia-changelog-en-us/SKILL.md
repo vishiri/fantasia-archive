@@ -42,14 +42,11 @@ When you **do** document a dependency refresh, describe **what** was refreshed (
 
 ## Pre-changelog workflow gate (required)
 
-Before editing `changeLog.md` for new work, keep this order (each command in its own terminal — [`testing-terminal-isolation.mdc`](../../rules/testing-terminal-isolation.mdc)):
+Before editing `changeLog.md` for new work, keep this order ([`testing-terminal-isolation.mdc`](../../rules/testing-terminal-isolation.mdc)):
 
-1. Run `yarn lint` and ensure it passes.
-2. Run `yarn lint:types` and ensure it passes.
-3. Run `yarn lint:style` and ensure it passes.
-4. Run `yarn test:unit` and ensure it passes.
-5. For affected user-facing **`src/components/**`**, verify Storybook updates are complete (`*.stories.ts`, relevant mocks/placeholders) and Storybook starts cleanly. Layout/page Storybook previews do not require Docs/autodocs ([`storybook-stories.mdc`](../../rules/storybook-stories.mdc)).
-6. Then draft/update changelog entries.
+1. Run the **quality gate** in one terminal: `yarn lint && yarn lint:types && yarn lint:style && yarn test:unit` (run steps individually only while debugging a failure).
+2. For affected user-facing **`src/components/**`**, verify Storybook updates are complete (`*.stories.ts`, relevant mocks/placeholders) and Storybook starts cleanly. Layout/page Storybook previews do not require Docs/autodocs ([`storybook-stories.mdc`](../../rules/storybook-stories.mdc)).
+3. Then draft/update changelog entries.
 
 ## Plan-context check (required before drafting notes)
 

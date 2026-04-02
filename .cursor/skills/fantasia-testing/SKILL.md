@@ -20,7 +20,7 @@ Match **existing** tests to the letter when adding or editing:
 ## Unit tests (Vitest)
 
 - **Command**: `yarn test:unit` runs [vitest.config.mts](../../vitest.config.mts) then [vitest.components.config.mts](../../vitest.components.config.mts) (Vue SFC tests under `src/components/**`).
-- **Execution policy**: run this command in its own terminal invocation (do not chain with lint/build/Playwright commands in a single shell line).
+- **Execution policy**: in the standard pre-commit flow, `yarn test:unit` is the last segment of the chained **quality gate** (`yarn lint && yarn lint:types && yarn lint:style && yarn test:unit` — [testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)). When iterating on tests alone or debugging after a failed gate, run `yarn test:unit` by itself. Do not chain it with `yarn build` or Playwright in one shell line.
 - **Machine-readable reports**: `test-results/vitest-report/test-results-vitest.json` (core) and `test-results-vitest-components.json` (components).
 - **Scope**: Logic in `src/` and `src-electron/` (including main-process modules) with `*.vitest.test.ts` co-located under `tests/` folders; component mounting tests use `@vue/test-utils` + shared [vitest.setup.ts](../../vitest.setup.ts).
 - **Component baseline**: under `src/components/**`, maintain one colocated `tests/<ComponentName>.vitest.test.ts` per `.vue` component (add/rename/remove both together).
@@ -73,11 +73,9 @@ Match **existing** tests to the letter when adding or editing:
 
 ## Checklist when changing UI or Electron shell
 
-1. `yarn lint`, `yarn lint:types`, and `yarn lint:style` (ESLint + full `tsc` + Stylelint); fix issues per [eslint-typescript.mdc](../../rules/eslint-typescript.mdc).
-2. `yarn test:unit` for covered logic.
-3. Rebuild: `yarn build` (or `quasar build -m electron`).
-4. `yarn test:component` / `yarn test:e2e` as needed.
-5. Run each checklist command as a separate terminal invocation; do not chain checklist steps with `&&`.
+1. **Quality gate** in one terminal: `yarn lint && yarn lint:types && yarn lint:style && yarn test:unit` — fix issues per [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
+2. Rebuild: `yarn build` (or `quasar build -m electron`) — its own terminal.
+3. `yarn test:component` / `yarn test:e2e` as needed — each in its own terminal; do not chain with `yarn build` or with each other in one line.
 
 ## Choosing Vitest vs Playwright in renderer work
 

@@ -1,11 +1,30 @@
 ---
-description: Keep lint, test, and build logs isolated per command
+description: Quality gate (lint + types + style + unit tests) in one terminal; heavier steps stay isolated
 alwaysApply: true
 ---
 
-# Testing Terminal Isolation
+# Testing and verification — terminal use
 
-- Run each verification command in its own terminal invocation.
-- Do not chain verification commands with `&&` or `;` (for example `yarn lint && yarn test:unit` is not allowed).
-- Keep these commands isolated for readable logs: `yarn lint`, `yarn lint:types`, `yarn lint:style`, `yarn test:unit`, `yarn build`, `yarn test:component`, `yarn test:e2e`.
-- When reporting progress, list results per command in execution order.
+## Quality gate (the **only** chained verification)
+
+When running the full **quality gate** — ESLint, TypeScript check, Stylelint, and unit tests — use **one** terminal invocation with a single chained command so the shell stops on the first failure and you avoid extra round-trips:
+
+`yarn lint && yarn lint:types && yarn lint:style && yarn test:unit`
+
+**Exception**: if you are **debugging** a specific failing step, run that command **alone** (and any narrower follow-ups) until it passes, then re-run the full chained gate before commit or changelog edits.
+
+This quartet is the **only** case where these four Yarn scripts may be combined in one shell line. Do not extend this chain with `yarn build`, Playwright, or Storybook.
+
+## Everything else — one command per terminal
+
+Run each of these in its **own** terminal invocation (do not chain them with each other or with the quality gate in the same line):
+
+- `yarn build`
+- `yarn test:component`
+- `yarn test:e2e`
+
+Keep logs isolated for readability and easier failure triage.
+
+## Reporting
+
+When reporting progress, list results in execution order (for the quality gate, you may report one combined pass/fail, or break out the first failing step if the chain stopped early).

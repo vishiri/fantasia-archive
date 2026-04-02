@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Changelog discipline
 
-- Before **any changelog edit** tied to new product/docs/test work, confirm workflow order (each command in its own terminal — [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc)): (1) `yarn lint` passes, (2) `yarn lint:types` passes, (3) `yarn lint:style` passes, (4) `yarn test:unit` passes when product or test sources changed (see [eslint-typescript.mdc](eslint-typescript.mdc)), (5) Storybook updates/checks are complete for affected **`src/components/**`** UI (layout/page Storybook previews do not require Docs/autodocs), then (6) changelog update.
+- Before **any changelog edit** tied to new product/docs/test work, confirm workflow order: run the **quality gate** in one terminal — [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) — `yarn lint && yarn lint:types && yarn lint:style && yarn test:unit` when product or test sources changed (see [eslint-typescript.mdc](eslint-typescript.mdc)); then Storybook updates/checks for affected **`src/components/**`** UI (layout/page Storybook previews do not require Docs/autodocs); then changelog update.
 - After **substantive** product or user-visible changes, update [changeLog.md](src/i18n/en-US/documents/changeLog.md) using the existing [package.json](package.json) `version` as the only version source per [fantasia-changelog-en-us skill](../skills/fantasia-changelog-en-us/SKILL.md).
 - Immediately before editing changelog content, re-read [package.json](package.json) and use that live `version` value; do not rely on previously cached values.
 - When preparing changelog updates, also inspect `.cursor/plans/` for plan files that match the current `package.json.version` to gather release-context notes for what changed.

@@ -18,14 +18,13 @@ alwaysApply: true
 | `yarn lint:types` | Full **`tsc`** project check (Vue shim + Quasar paths via `tsconfig.json` → `.quasar/tsconfig.json`). |
 | `yarn lint:style` | Stylelint on `src/**/*.vue` and `src/**/*.scss`. |
 
-## Pre-commit / pre-changelog static gate
+## Pre-commit / pre-changelog quality gate
 
-Before commits or changelog edits tied to product or test work, run these **in order**, **one command per terminal** (see [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) and [git-conventional-commits.mdc](git-conventional-commits.mdc)):
+Before commits or changelog edits tied to product or test work, run the four checks **in order** as **one chained command** (see [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) and [git-conventional-commits.mdc](git-conventional-commits.mdc)):
 
-1. `yarn lint`
-2. `yarn lint:types`
-3. `yarn lint:style`
-4. `yarn test:unit`
+`yarn lint && yarn lint:types && yarn lint:style && yarn test:unit`
+
+Run steps individually only while debugging a specific failure.
 
 **Dev server**: `vite-plugin-checker` runs ESLint during `quasar dev`; keep `@typescript-eslint` major in sync with TypeScript so you do not see unsupported-TS-version warnings from `typescript-estree`.
 

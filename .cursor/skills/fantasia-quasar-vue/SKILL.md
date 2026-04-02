@@ -51,7 +51,7 @@ description: >-
 
 ## Quality gates
 
-- Before commits or substantial UI refactors, run **`yarn lint`**, **`yarn lint:types`**, **`yarn lint:style`**, and **`yarn test:unit`** in order (each in its own terminal — [testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)) — see [eslint-typescript.mdc](../../rules/eslint-typescript.mdc). **TSLint** is not used.
+- Before commits or substantial UI refactors, run the **quality gate** in one terminal: `yarn lint && yarn lint:types && yarn lint:style && yarn test:unit` ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)) — see [eslint-typescript.mdc](../../rules/eslint-typescript.mdc). **TSLint** is not used.
 - Give **`yarn lint:style`** extra attention when changing Vue `<style>` blocks or `src/**/*.scss`.
 - **`quasar.config.ts`**: match Quasar typings (e.g. PWA `workboxMode: 'GenerateSW' | 'InjectManifest'`; `bex` uses `QuasarBexConfiguration`, not legacy `contentScripts`). Duplicate **Vite** `Plugin` types vs `@quasar/app-vite` may require a documented **`@ts-expect-error`** on `defineConfig`.
 - **`src/boot/i18n.ts`**: vue-i18n module augmentation may use **`@ts-expect-error` (TS2665)** because the package `module` entry targets the ESM bundle under `tsc`.
