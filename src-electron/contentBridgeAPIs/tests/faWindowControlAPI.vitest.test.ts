@@ -1,39 +1,39 @@
 import { test, expect, vi, beforeEach } from 'vitest'
 import { faWindowControlAPI } from '../faWindowControlAPI'
 
-const { getFocusedWindowMock } = vi.hoisted(() => {
+const { getCurrentWindowMock } = vi.hoisted(() => {
   return {
-    getFocusedWindowMock: vi.fn()
+    getCurrentWindowMock: vi.fn()
   }
 })
 
 vi.mock('@electron/remote', () => {
   return {
-    BrowserWindow: {
-      getFocusedWindow: getFocusedWindowMock
-    }
+    getCurrentWindow: getCurrentWindowMock
   }
 })
 
 beforeEach(() => {
-  getFocusedWindowMock.mockReset()
+  getCurrentWindowMock.mockReset()
 })
 
 /**
  * checkWindowMaximized
- * Test for no focused window.
+ * Test when getCurrentWindow is unavailable.
  */
 test('Test if the electron is maximized', () => {
-  getFocusedWindowMock.mockReturnValue(null)
+  getCurrentWindowMock.mockImplementation(() => {
+    throw new Error('no remote')
+  })
   expect(faWindowControlAPI.checkWindowMaximized()).toBe(false)
 })
 
 /**
  * checkWindowMaximized
- * Focused window reports maximized state from isMaximized().
+ * Current window reports maximized state from isMaximized().
  */
 test('Test that checkWindowMaximized returns true when focused window is maximized', () => {
-  getFocusedWindowMock.mockReturnValue({
+  getCurrentWindowMock.mockReturnValue({
     isMaximized: () => true
   })
   expect(faWindowControlAPI.checkWindowMaximized()).toBe(true)
@@ -41,10 +41,10 @@ test('Test that checkWindowMaximized returns true when focused window is maximiz
 
 /**
  * checkWindowMaximized
- * Focused window reports not maximized when isMaximized is false.
+ * Current window reports not maximized when isMaximized is false.
  */
 test('Test that checkWindowMaximized returns false when focused window is not maximized', () => {
-  getFocusedWindowMock.mockReturnValue({
+  getCurrentWindowMock.mockReturnValue({
     isMaximized: () => false
   })
   expect(faWindowControlAPI.checkWindowMaximized()).toBe(false)
@@ -52,22 +52,22 @@ test('Test that checkWindowMaximized returns false when focused window is not ma
 
 /**
  * minimizeWindow
- * Test minimizing the focused window.
+ * Test minimizing the current window.
  */
 test('Test that minimizing of the electron window works', () => {
   const minimize = vi.fn()
-  getFocusedWindowMock.mockReturnValue({ minimize })
+  getCurrentWindowMock.mockReturnValue({ minimize })
   faWindowControlAPI.minimizeWindow()
   expect(minimize).toHaveBeenCalledOnce()
 })
 
 /**
  * maximizeWindow
- * Test maximizing the focused window.
+ * Test maximizing the current window.
  */
 test('Test that maximizing of the electron window works', () => {
   const maximize = vi.fn()
-  getFocusedWindowMock.mockReturnValue({ maximize })
+  getCurrentWindowMock.mockReturnValue({ maximize })
   faWindowControlAPI.maximizeWindow()
   expect(maximize).toHaveBeenCalledOnce()
 })
@@ -79,18 +79,18 @@ test('Test that maximizing of the electron window works', () => {
 test('Test that resizing of the electron window works', () => {
   const maximize = vi.fn()
   const unmaximize = vi.fn()
-  getFocusedWindowMock.mockReturnValue({
-    isMaximized: () => false,
-    maximize,
-    unmaximize
-  })
+  getCurrentWindowMock
+    .mockReturnValueOnce({
+      isMaximized: () => false,
+      maximize,
+      unmaximize
+    })
+    .mockReturnValueOnce({
+      isMaximized: () => true,
+      maximize,
+      unmaximize
+    })
   faWindowControlAPI.resizeWindow()
-
-  getFocusedWindowMock.mockReturnValue({
-    isMaximized: () => true,
-    maximize,
-    unmaximize
-  })
   faWindowControlAPI.resizeWindow()
 
   expect(maximize).toHaveBeenCalledOnce()
@@ -99,47 +99,55 @@ test('Test that resizing of the electron window works', () => {
 
 /**
  * closeWindow
- * Test closing the focused window.
+ * Test closing the current window.
  */
 test('Test that closing of the electron window works', () => {
   const close = vi.fn()
-  getFocusedWindowMock.mockReturnValue({ close })
+  getCurrentWindowMock.mockReturnValue({ close })
   faWindowControlAPI.closeWindow()
   expect(close).toHaveBeenCalledOnce()
 })
 
 /**
  * minimizeWindow
- * No-op when there is no focused window.
+ * No-op when there is no current window.
  */
-test('Test that minimizeWindow does nothing when no focused window', () => {
-  getFocusedWindowMock.mockReturnValue(null)
+test('Test that minimizeWindow does nothing when getCurrentWindow throws', () => {
+  getCurrentWindowMock.mockImplementation(() => {
+    throw new Error('no remote')
+  })
   expect(() => faWindowControlAPI.minimizeWindow()).not.toThrow()
 })
 
 /**
  * maximizeWindow
- * No-op when there is no focused window.
+ * No-op when there is no current window.
  */
-test('Test that maximizeWindow does nothing when no focused window', () => {
-  getFocusedWindowMock.mockReturnValue(null)
+test('Test that maximizeWindow does nothing when getCurrentWindow throws', () => {
+  getCurrentWindowMock.mockImplementation(() => {
+    throw new Error('no remote')
+  })
   expect(() => faWindowControlAPI.maximizeWindow()).not.toThrow()
 })
 
 /**
  * resizeWindow
- * No-op when there is no focused window.
+ * No-op when there is no current window.
  */
-test('Test that resizeWindow does nothing when no focused window', () => {
-  getFocusedWindowMock.mockReturnValue(null)
+test('Test that resizeWindow does nothing when getCurrentWindow throws', () => {
+  getCurrentWindowMock.mockImplementation(() => {
+    throw new Error('no remote')
+  })
   expect(() => faWindowControlAPI.resizeWindow()).not.toThrow()
 })
 
 /**
  * closeWindow
- * No-op when there is no focused window.
+ * No-op when there is no current window.
  */
-test('Test that closeWindow does nothing when no focused window', () => {
-  getFocusedWindowMock.mockReturnValue(null)
+test('Test that closeWindow does nothing when getCurrentWindow throws', () => {
+  getCurrentWindowMock.mockImplementation(() => {
+    throw new Error('no remote')
+  })
   expect(() => faWindowControlAPI.closeWindow()).not.toThrow()
 })

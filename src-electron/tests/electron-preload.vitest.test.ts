@@ -22,6 +22,7 @@ vi.mock('@electron/remote', () => {
     app: {
       getVersion: () => '0.0.0-preload-test'
     },
+    getCurrentWindow: () => null,
     BrowserWindow: {
       getFocusedWindow: () => null
     }

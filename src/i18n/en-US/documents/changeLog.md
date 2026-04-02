@@ -1,6 +1,12 @@
 # Changelog
 ----------
 
+## 2.4.6 - Window chrome and Storybook workspace
+
+### Bugfixes & Optimizations
+- Applied **`getCurrentWindow()`** from **`@electron/remote`** to **window chrome** bridge helpers (**minimize**, **maximize**, **resize**, **close**, **maximized state**) so controls stay tied to the app window when OS focus moves to menus or other surfaces.
+- Aligned **`.storybook-workspace`** with the main app on **Vue 3.5**, **vue-i18n 11**, **Quasar 2.16+**, **Pinia 2.3+**, and **@quasar/extras 1.17**; removed stray **`package-lock.json`** there so only **Yarn** lockfiles are used.
+
 ## 2.4.5 - Contributor workflow and CI
 
 ### Bugfixes & Optimizations

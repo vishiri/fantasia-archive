@@ -1,11 +1,23 @@
-import { BrowserWindow } from '@electron/remote'
+import { getCurrentWindow } from '@electron/remote'
 import { I_faWindowControlAPI } from 'app/types/I_faWindowControlAPI'
+
+/**
+ * Use the window that owns this renderer. `BrowserWindow.getFocusedWindow()` is unreliable
+ * when native menus or other windows steal OS focus (same class of issue as DevTools controls).
+ */
+function appWindow () {
+  try {
+    return getCurrentWindow()
+  } catch {
+    return null
+  }
+}
 
 export const faWindowControlAPI: I_faWindowControlAPI = {
 
   // Check if the current window is maximized
   checkWindowMaximized () {
-    const currentWindow = BrowserWindow.getFocusedWindow()
+    const currentWindow = appWindow()
     if (currentWindow !== null) {
       return currentWindow.isMaximized()
     }
@@ -14,7 +26,7 @@ export const faWindowControlAPI: I_faWindowControlAPI = {
 
   // Minimizes the current window
   minimizeWindow () {
-    const currentWindow = BrowserWindow.getFocusedWindow()
+    const currentWindow = appWindow()
 
     if (currentWindow !== null) {
       currentWindow.minimize()
@@ -23,7 +35,7 @@ export const faWindowControlAPI: I_faWindowControlAPI = {
 
   // Maximizes the current window
   maximizeWindow () {
-    const currentWindow = BrowserWindow.getFocusedWindow()
+    const currentWindow = appWindow()
 
     if (currentWindow !== null) {
       currentWindow.maximize()
@@ -32,7 +44,7 @@ export const faWindowControlAPI: I_faWindowControlAPI = {
 
   // Resizes the current window
   resizeWindow () {
-    const currentWindow = BrowserWindow.getFocusedWindow()
+    const currentWindow = appWindow()
 
     if (currentWindow !== null) {
       if (currentWindow.isMaximized()) {
@@ -45,7 +57,7 @@ export const faWindowControlAPI: I_faWindowControlAPI = {
 
   // Closes the current window
   closeWindow () {
-    const currentWindow = BrowserWindow.getFocusedWindow()
+    const currentWindow = appWindow()
     if (currentWindow !== null) {
       currentWindow.close()
     }
