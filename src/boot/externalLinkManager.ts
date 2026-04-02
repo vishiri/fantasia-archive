@@ -11,12 +11,12 @@ const handleMouseClicks = (event: MouseEvent) => {
   /**
    * Prepare the actual link target variable
    */
-  let targetLink: HTMLAnchorElement|false = (clickTarget.tagName === 'a')
+  let targetLink: HTMLAnchorElement | false = (clickTarget.tagName === 'a')
     ? clickTarget
     : false
 
   if (targetLink === false) {
-    const parentLink: HTMLAnchorElement|null = clickTarget.closest('a')
+    const parentLink: HTMLAnchorElement | null = clickTarget.closest('a')
     targetLink = (parentLink !== null)
       ? parentLink
       : false

@@ -9,14 +9,16 @@ module.exports = {
   rules: {
     'selector-class-pattern': null,
     'custom-property-pattern': null,
-    // Quasar / legacy SCSS conventions (kebab rules fight `$primary`, `lighten()`, partial @import paths).
-    'scss/at-import-partial-extension': null,
+    // Quasar / legacy SCSS conventions (kebab rules fight `$primary`, `lighten()`, explicit `.scss` @import paths).
+    'scss/load-partial-extension': null,
     'scss/dollar-variable-colon-space-before': null,
     'scss/dollar-variable-empty-line-before': null,
     'scss/dollar-variable-pattern': null,
     'scss/no-global-function-names': null,
     'color-function-notation': null,
+    'color-function-alias-notation': null,
     'alpha-value-notation': null,
+    'declaration-property-value-keyword-no-deprecated': null,
     'block-no-empty': null,
     'property-no-vendor-prefix': null,
     'shorthand-property-no-redundant-values': null,

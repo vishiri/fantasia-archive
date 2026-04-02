@@ -1,6 +1,6 @@
-/* eslint-disable */
-
 /// <reference path="../.quasar/shims-vue.d.ts" />
+
+declare module '@quasar/quasar-ui-qmarkdown/dist/index.css'
 
 declare namespace NodeJS {
   interface ProcessEnv {

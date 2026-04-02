@@ -396,7 +396,7 @@ test('Check if the first sub-menu item has proper text and icon', async () => {
 
   // Prepare the first sub-menu item locator and first data sub-menu item
   const firstSubMenuItem = appWindow.locator(`[data-test="${selectorList.menuItemSubMenuItem}"]`).nth(0)
-  const firstDataSubmenuItem = (dataElement?.submenu !== undefined) ? dataElement.submenu.filter(item => item.mode === 'item')[0] : false as unknown as {icon: string, text: string}
+  const firstDataSubmenuItem = (dataElement?.submenu !== undefined) ? dataElement.submenu.filter(item => item.mode === 'item')[0] : false as unknown as { icon: string, text: string }
 
   // Check if the sub-menu item wrapper exists and if the first data-item isn't false
   expect(firstSubMenuItem).toHaveCount(1)

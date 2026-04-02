@@ -59,9 +59,8 @@ export default defineConfig((ctx) => {
         }),
         checker({
           eslint: {
-            useFlatConfig: false,
-            lintCommand:
-              'eslint -c .eslintrc.cjs --ext .js,.ts,.vue src src-electron quasar.config.ts'
+            useFlatConfig: true,
+            lintCommand: 'eslint src src-electron quasar.config.ts'
           }
         })
       ]

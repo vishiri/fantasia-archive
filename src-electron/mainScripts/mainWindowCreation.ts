@@ -93,7 +93,11 @@ export const mainWindowCreation = async () => {
 
   // Load the basic app URL (dev server) or packaged index.html
   if (process.env.DEV) {
-    await appWindow.loadURL(process.env.APP_URL)
+    const devUrl = process.env.APP_URL
+    if (devUrl === undefined) {
+      throw new Error('APP_URL must be set when DEV is set')
+    }
+    await appWindow.loadURL(devUrl)
   } else {
     await appWindow.loadFile('index.html')
   }
