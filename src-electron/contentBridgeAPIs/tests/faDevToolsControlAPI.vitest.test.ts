@@ -1,29 +1,32 @@
 import { test, expect, vi, beforeEach } from 'vitest'
+import { FA_DEVTOOLS_IPC } from 'app/src-electron/devToolsIpcChannels'
 import { faDevToolsControlAPI } from '../faDevToolsControlAPI'
 
-const { getCurrentWindowMock } = vi.hoisted(() => {
+const { ipcRendererSendSyncMock } = vi.hoisted(() => {
   return {
-    getCurrentWindowMock: vi.fn()
+    ipcRendererSendSyncMock: vi.fn()
   }
 })
 
-vi.mock('@electron/remote', () => {
+vi.mock('electron', () => {
   return {
-    getCurrentWindow: getCurrentWindowMock
+    ipcRenderer: {
+      sendSync: ipcRendererSendSyncMock
+    }
   }
 })
 
 beforeEach(() => {
-  getCurrentWindowMock.mockReset()
+  ipcRendererSendSyncMock.mockReset()
 })
 
 /**
  * checkDevToolsStatus
- * Test for no current window.
+ * Test for IPC failure.
  */
-test('Test that checkDevToolsStatus returns false if getCurrentWindow is unavailable', () => {
-  getCurrentWindowMock.mockImplementation(() => {
-    throw new Error('no remote')
+test('Test that checkDevToolsStatus returns false if sendSync throws', () => {
+  ipcRendererSendSyncMock.mockImplementation(() => {
+    throw new Error('no ipc')
   })
   expect(faDevToolsControlAPI.checkDevToolsStatus()).toBe(false)
 })
@@ -32,101 +35,65 @@ test('Test that checkDevToolsStatus returns false if getCurrentWindow is unavail
  * checkDevToolsStatus
  * Test for current window with opened dev tools.
  */
-test('Test that checkDevToolsStatus returns true when dev tools are open', () => {
-  const isDevToolsOpened = vi.fn(() => true)
-  getCurrentWindowMock.mockReturnValue({
-    webContents: {
-      isDevToolsOpened
-    }
-  })
+test('Test that checkDevToolsStatus returns true when IPC reports dev tools are open', () => {
+  ipcRendererSendSyncMock.mockReturnValue(true)
   expect(faDevToolsControlAPI.checkDevToolsStatus()).toBe(true)
+  expect(ipcRendererSendSyncMock).toHaveBeenCalledWith(FA_DEVTOOLS_IPC.statusSync)
 })
 
 /**
  * toggleDevTools
- * Test that toggling closes opened dev tools.
+ * Test that toggling invokes the toggle channel.
  */
-test('Test that toggleDevTools closes already opened dev tools', () => {
-  const closeDevTools = vi.fn()
-  getCurrentWindowMock.mockReturnValue({
-    webContents: {
-      isDevToolsOpened: () => true,
-      closeDevTools,
-      openDevTools: vi.fn()
-    }
-  })
+test('Test that toggleDevTools calls IPC toggle channel', () => {
+  ipcRendererSendSyncMock.mockReturnValue(true)
   faDevToolsControlAPI.toggleDevTools()
-  expect(closeDevTools).toHaveBeenCalledOnce()
+  expect(ipcRendererSendSyncMock).toHaveBeenCalledWith(FA_DEVTOOLS_IPC.toggleSync)
 })
 
 /**
  * toggleDevTools
- * Opens dev tools when they are currently closed.
+ * No-op when sendSync throws.
  */
-test('Test that toggleDevTools opens dev tools when they are closed', () => {
-  const openDevTools = vi.fn()
-  getCurrentWindowMock.mockReturnValue({
-    webContents: {
-      isDevToolsOpened: () => false,
-      closeDevTools: vi.fn(),
-      openDevTools
-    }
-  })
-  faDevToolsControlAPI.toggleDevTools()
-  expect(openDevTools).toHaveBeenCalledOnce()
-})
-
-/**
- * toggleDevTools
- * No-op when there is no current window.
- */
-test('Test that toggleDevTools does nothing when getCurrentWindow throws', () => {
-  getCurrentWindowMock.mockImplementation(() => {
-    throw new Error('no remote')
+test('Test that toggleDevTools does not throw when sendSync throws', () => {
+  ipcRendererSendSyncMock.mockImplementation(() => {
+    throw new Error('no ipc')
   })
   expect(() => faDevToolsControlAPI.toggleDevTools()).not.toThrow()
 })
 
 /**
  * openDevTools
- * No-op when there is no current window.
+ * No-op when sendSync throws.
  */
-test('Test that openDevTools does nothing when getCurrentWindow throws', () => {
-  getCurrentWindowMock.mockImplementation(() => {
-    throw new Error('no remote')
+test('Test that openDevTools does not throw when sendSync throws', () => {
+  ipcRendererSendSyncMock.mockImplementation(() => {
+    throw new Error('no ipc')
   })
   expect(() => faDevToolsControlAPI.openDevTools()).not.toThrow()
 })
 
 /**
  * closeDevTools
- * No-op when there is no current window.
+ * No-op when sendSync throws.
  */
-test('Test that closeDevTools does nothing when getCurrentWindow throws', () => {
-  getCurrentWindowMock.mockImplementation(() => {
-    throw new Error('no remote')
+test('Test that closeDevTools does not throw when sendSync throws', () => {
+  ipcRendererSendSyncMock.mockImplementation(() => {
+    throw new Error('no ipc')
   })
   expect(() => faDevToolsControlAPI.closeDevTools()).not.toThrow()
 })
 
 /**
  * openDevTools and closeDevTools
- * Test that explicit open and close methods call the current window APIs.
+ * Test that explicit open and close methods call the expected IPC channels.
  */
-test('Test that openDevTools and closeDevTools call webContents APIs', () => {
-  const openDevTools = vi.fn()
-  const closeDevTools = vi.fn()
-  getCurrentWindowMock.mockReturnValue({
-    webContents: {
-      isDevToolsOpened: () => false,
-      closeDevTools,
-      openDevTools
-    }
-  })
+test('Test that openDevTools and closeDevTools call IPC channels', () => {
+  ipcRendererSendSyncMock.mockReturnValue(true)
 
   faDevToolsControlAPI.openDevTools()
   faDevToolsControlAPI.closeDevTools()
 
-  expect(openDevTools).toHaveBeenCalledOnce()
-  expect(closeDevTools).toHaveBeenCalledOnce()
+  expect(ipcRendererSendSyncMock).toHaveBeenCalledWith(FA_DEVTOOLS_IPC.openSync)
+  expect(ipcRendererSendSyncMock).toHaveBeenCalledWith(FA_DEVTOOLS_IPC.closeSync)
 })

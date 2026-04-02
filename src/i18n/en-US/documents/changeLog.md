@@ -1,11 +1,19 @@
 # Changelog
 ----------
 
-## 2.4.6 - Window chrome and Storybook workspace
+## 2.4.6 - Window chrome, Storybook, Stylelint, and DevTools
 
 ### Bugfixes & Optimizations
 - Applied **`getCurrentWindow()`** from **`@electron/remote`** to **window chrome** bridge helpers (**minimize**, **maximize**, **resize**, **close**, **maximized state**) so controls stay tied to the app window when OS focus moves to menus or other surfaces.
 - Aligned **`.storybook-workspace`** with the main app on **Vue 3.5**, **vue-i18n 11**, **Quasar 2.16+**, **Pinia 2.3+**, and **@quasar/extras 1.17**; removed stray **`package-lock.json`** there so only **Yarn** lockfiles are used.
+- Refreshed **root** and **`.storybook-workspace`** lockfiles with **`yarn upgrade`** within existing semver ranges; pinned root **Storybook** addons to **8.6.18** so they match **`@storybook/vue3-vite`** and the nested workspace (notably newer **Playwright**, **Sass**, and other compatible tooling).
+- Migrated **`src/css/app.scss`** and **`globals/*.scss`** to Sass **`@use`** with explicit **`quasar.variables.scss`** imports in partials, replacing deprecated **`@import`** chains for app-owned global styles ahead of Dart Sass 3.
+- Storybook’s Vite **`additionalData`** prepends **`quasar.variables.scss`** for project **`.vue` / `.scss`** (via **`file://`** URLs so Windows paths with spaces resolve). For **`quasar/src/css/index.sass`** it uses **`@import`** (not **`@use`**) ahead of Quasar’s own imports—the same effective ordering as **`@quasar/vite-plugin`’s `sassVariables`** transform—so **`!default`** theme entries resolve to your palette and framework CSS variables (**`--q-dark`**, **`--q-primary`**, and related tokens) match the desktop app; other **`node_modules`** Sass stays untouched.
+- Extended the root **Stylelint** setup with **`@stylistic/stylelint-config`** so stylistic rules dropped from **Stylelint 17**’s core keep enforcing familiar CSS/SCSS formatting; updated **`.vscode`** recommendations and settings so the Stylelint extension can use the project config, **fix on save**, and format standalone **`.scss`** files consistently.
+- Routed **DevTools** control (**toggle**, **open**, **close**, and **status**) through small **main-process IPC** handlers instead of **`@electron/remote`** **`getCurrentWindow()`**, so **Help → Toggle developer tools** stays reliable in packaged **Electron** builds; the **E2E** check now waits until DevTools finish attaching instead of asserting immediately after the menu closes.
+- Updated **GitHub Actions** on **`verify`** and manual **build** workflows (**`actions/checkout`**, **`actions/setup-node`**, **`actions/upload-artifact`**) to current major versions.
+- Noted in **`quasar.config.ts`** that **`@electron/remote`**’s **`electron`** peer is expected to show as unmet during UnPackaged **`yarn install --production`**; packaging still succeeds because the app runs on the bundled Electron runtime.
+- Storybook preview registers Quasar’s **`Dark`** plugin, the **`@quasar/quasar-ui-qmarkdown`** app plugin (after Quasar, matching boot order), **Roboto (latin-ext)**, and **`preview-body.html`** / **`Dark.set(true)`** so **`body--dark`** stays aligned with the app; Sass **`additionalData`** skips **`app.scss`** to avoid double-loading variables. **Dialog** and **top-menu** component Docs use **`parameters.docs.story.inline: false`** again so Autodocs does not mount every story in one document (each **`q-dialog`** auto-opens on mount, which stacked modals when **`inline: true`**); each nested Docs iframe still loads the same preview CSS stack.
 
 ## 2.4.5 - Contributor workflow and CI
 

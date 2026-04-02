@@ -7,6 +7,7 @@
     "smoke-storybook": "storybook dev -p 6006 -c .storybook --smoke-test --ci --disable-telemetry"
   },
   "devDependencies": {
+    "@quasar/quasar-ui-qmarkdown": "^2.0.5",
     "@quasar/extras": "^1.17.0",
     "@storybook/addon-essentials": "8.6.18",
     "@storybook/addon-interactions": "8.6.18",

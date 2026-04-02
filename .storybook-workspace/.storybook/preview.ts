@@ -1,14 +1,18 @@
 import 'quasar/src/css/index.sass'
+import '@quasar/extras/roboto-font-latin-ext/roboto-font-latin-ext.css'
 import '@quasar/extras/material-icons/material-icons.css'
 import '@quasar/extras/mdi-v5/mdi-v5.css'
 import '@quasar/extras/fontawesome-v6/fontawesome-v6.css'
+import '@quasar/quasar-ui-qmarkdown/dist/index.css'
 import 'src/css/app.scss'
 
 import { setup } from '@storybook/vue3'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
+import type { Plugin } from 'vue'
 import * as QuasarAll from 'quasar'
-import { ClosePopup, Dialog, Notify, Quasar, Ripple } from 'quasar'
+import { ClosePopup, Dark, Dialog, Notify, Quasar, Ripple } from 'quasar'
+import QMarkdownPlugin from '@quasar/quasar-ui-qmarkdown'
 
 import type { Preview } from '@storybook/vue3'
 import type { QuasarPluginOptions } from 'quasar'
@@ -110,6 +114,7 @@ setup((app) => {
 
   app.use(storybookPinia)
   app.use(storybookI18n)
+  // Match Quasar CLI order: framework first, then QMarkdown boot-equivalent plugin.
   app.use(Quasar, {
     components: quasarComponentsForStorybook(),
     directives: {
@@ -117,6 +122,7 @@ setup((app) => {
       Ripple
     },
     plugins: {
+      Dark,
       Dialog,
       Notify
     },
@@ -125,6 +131,12 @@ setup((app) => {
       dark: true
     }
   })
+  app.use(QMarkdownPlugin as unknown as Plugin)
+
+  if (typeof document !== 'undefined') {
+    document.body.classList.add('body--dark')
+    Dark.set(true)
+  }
 })
 
 if (typeof document !== 'undefined') {
@@ -173,6 +185,11 @@ const preview: Preview = {
   decorators: [
     (story, context) => {
       ensureStorybookScrollFix()
+
+      if (typeof document !== 'undefined') {
+        document.body.classList.add('body--dark')
+        Dark.set(true)
+      }
 
       setContentBridgeScenario(
         context.parameters.contentBridgeScenario ?? 'default',

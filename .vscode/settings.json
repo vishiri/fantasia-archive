@@ -1,11 +1,16 @@
 {
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "stylelint.validate": ["css", "scss", "vue"],
+  "stylelint.packageManager": "yarn",
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": true,
   "editor.formatOnSave": false,
   "editor.defaultFormatter": null,
-  "editor.codeActionsOnSave": [
-
-  ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.stylelint": "explicit"
+  },
   "eslint.validate": [
     "javascript",
     "javascriptreact",
@@ -33,5 +38,9 @@
       "dbaeumer.vscode-eslint",
       "stylelint.vscode-stylelint"
     ]
+  },
+  "[scss]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "stylelint.vscode-stylelint"
   },
 }

@@ -110,6 +110,7 @@ export default defineConfig((ctx) => {
 
     // https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/configuring-electron
     electron: {
+      // @electron/remote lists `electron` as a peer; UnPackaged `yarn install --production` omits it, so Yarn may warn and electron-builder's dependency collector may stderr — packaging still succeeds and the runtime ships with Electron.
       inspectPort: 5858,
 
       bundler: 'builder',

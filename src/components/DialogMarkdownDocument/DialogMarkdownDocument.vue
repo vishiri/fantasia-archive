@@ -121,7 +121,6 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-
 .dialogMarkdownDocument {
   .q-markdown,
   .q-markdown * {

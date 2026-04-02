@@ -1,58 +1,39 @@
-import { getCurrentWindow } from '@electron/remote'
-import { I_faDevToolsControl } from 'app/types/I_faDevToolsControl'
+import { ipcRenderer } from 'electron'
 
-/**
- * Use the window that owns this renderer. `BrowserWindow.getFocusedWindow()` is unreliable
- * after native menus / DevTools steal OS focus and made Playwright E2E checks flaky.
- */
-function appWindow () {
-  try {
-    return getCurrentWindow()
-  } catch {
-    return null
-  }
-}
+import { FA_DEVTOOLS_IPC } from 'app/src-electron/devToolsIpcChannels'
+import { I_faDevToolsControl } from 'app/types/I_faDevToolsControl'
 
 export const faDevToolsControlAPI: I_faDevToolsControl = {
 
-  // Checks if the dev tools are open for the current window
   checkDevToolsStatus () {
-    const currentWindow = appWindow()
-    if (currentWindow !== null) {
-      return currentWindow.webContents.isDevToolsOpened()
+    try {
+      return ipcRenderer.sendSync(FA_DEVTOOLS_IPC.statusSync) === true
+    } catch {
+      return false
     }
-    return false
   },
 
-  // Toggles the dev tools for the current window
   toggleDevTools () {
-    const currentWindow = appWindow()
-
-    if (currentWindow !== null) {
-      const devToolsOpened = currentWindow.webContents.isDevToolsOpened()
-      if (devToolsOpened) {
-        currentWindow.webContents.closeDevTools()
-      } else {
-        currentWindow.webContents.openDevTools()
-      }
+    try {
+      ipcRenderer.sendSync(FA_DEVTOOLS_IPC.toggleSync)
+    } catch {
+      // no-op (e.g. running outside Electron)
     }
   },
 
-  // Opens the dev tools for the current window
   openDevTools () {
-    const currentWindow = appWindow()
-
-    if (currentWindow !== null) {
-      currentWindow.webContents.openDevTools()
+    try {
+      ipcRenderer.sendSync(FA_DEVTOOLS_IPC.openSync)
+    } catch {
+      // no-op
     }
   },
 
-  // Closes the dev tools for the current window
   closeDevTools () {
-    const currentWindow = appWindow()
-
-    if (currentWindow !== null) {
-      currentWindow.webContents.closeDevTools()
+    try {
+      ipcRenderer.sendSync(FA_DEVTOOLS_IPC.closeSync)
+    } catch {
+      // no-op
     }
   }
 }

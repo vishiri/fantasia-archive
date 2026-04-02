@@ -42,8 +42,6 @@ test('Dev tools toggle properly', async () => {
     args: [electronMainFilePath]
   })
 
-  let devToolsStatus
-
   const appWindow = await electronApp.firstWindow()
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
@@ -69,11 +67,12 @@ test('Dev tools toggle properly', async () => {
   // Wait for the menu animation to finish
   await appWindow.waitForTimeout(menuAnimationTimer)
 
-  // Check if dev tools are open
-  devToolsStatus = await appWindow.evaluate(async () => {
-    return window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()
-  })
-  expect(devToolsStatus).toBe(true)
+  // Check if dev tools are open (allow time for DevTools to attach after the menu closes; can lag on Windows)
+  await expect.poll(async () => {
+    return await appWindow.evaluate(() => {
+      return window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()
+    })
+  }, { timeout: 15_000 }).toBe(true)
 
   // --- Toggle dev tools - OFF ---
 
@@ -92,10 +91,11 @@ test('Dev tools toggle properly', async () => {
   await appWindow.waitForTimeout(menuAnimationTimer)
 
   // Check if dev tools are closed
-  devToolsStatus = await appWindow.evaluate(async () => {
-    return window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()
-  })
-  expect(devToolsStatus).toBe(false)
+  await expect.poll(async () => {
+    return await appWindow.evaluate(() => {
+      return window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()
+    })
+  }, { timeout: 15_000 }).toBe(false)
 
   // Close the app
   await electronApp.close()

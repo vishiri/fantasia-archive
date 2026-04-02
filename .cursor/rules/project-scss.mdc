@@ -8,7 +8,7 @@ alwaysApply: false
 
 ## Entry and variables
 
-- [app.scss](src/css/app.scss) pulls in Quasar extras and [globals](src/css/globals/) partials; keep new global rules in an appropriate file under `globals/` rather than inflating `app.scss`.
+- [app.scss](src/css/app.scss) pulls in [globals](src/css/globals/) partials via **`@use`** (Dart Sass module system); keep new global rules in an appropriate file under `globals/` rather than inflating `app.scss`. Partials that need theme tokens should **`@use '../quasar.variables.scss' as *`** (or a narrower import) instead of relying on deprecated **`@import`** chains.
 - [quasar.variables.scss](src/css/quasar.variables.scss) is the place for Quasar theme variables; prefer variables over hard-coded colors in partials when aligning with Quasar.
 
 ## Conventions

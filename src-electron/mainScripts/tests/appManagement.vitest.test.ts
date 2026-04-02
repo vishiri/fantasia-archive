@@ -1,11 +1,12 @@
 import { test, expect, vi, beforeEach } from 'vitest'
 import { closeAppManager, openAppWindowManager, startApp } from '../appManagement'
 
-const { initializeMock, mainWindowCreationMock, appMock, appOnHandlers } = vi.hoisted(() => {
+const { initializeMock, mainWindowCreationMock, registerFaDevToolsIpcMock, appMock, appOnHandlers } = vi.hoisted(() => {
   const handlers: Record<string, () => void> = {}
   return {
     initializeMock: vi.fn(),
     mainWindowCreationMock: vi.fn(),
+    registerFaDevToolsIpcMock: vi.fn(),
     appOnHandlers: handlers,
     appMock: {
       whenReady: vi.fn(() => Promise.resolve()),
@@ -29,6 +30,12 @@ vi.mock('app/src-electron/mainScripts/mainWindowCreation', () => {
   }
 })
 
+vi.mock('app/src-electron/mainScripts/registerFaDevToolsIpc', () => {
+  return {
+    registerFaDevToolsIpc: registerFaDevToolsIpcMock
+  }
+})
+
 vi.mock('electron', () => {
   return {
     app: appMock
@@ -38,6 +45,7 @@ vi.mock('electron', () => {
 beforeEach(() => {
   initializeMock.mockReset()
   mainWindowCreationMock.mockReset()
+  registerFaDevToolsIpcMock.mockReset()
   appMock.whenReady.mockClear()
   appMock.on.mockClear()
   appMock.quit.mockReset()
@@ -53,6 +61,7 @@ beforeEach(() => {
 test('Test that the electron app properly starts', () => {
   startApp()
   expect(initializeMock).toHaveBeenCalledOnce()
+  expect(registerFaDevToolsIpcMock).toHaveBeenCalledOnce()
 })
 
 /**

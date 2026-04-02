@@ -8,6 +8,10 @@ const meta = {
   tags: ['autodocs'],
   parameters: {
     docs: {
+      /**
+       * One Docs page renders every story; `inline: true` mounts them all at once and each opens
+       * `q-dialog` on mount → overlapping modals. A per-story iframe isolates a single instance.
+       */
       story: {
         inline: false,
         iframeHeight: '760px'

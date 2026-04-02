@@ -1,4 +1,5 @@
 import path from 'path'
+import { pathToFileURL } from 'node:url'
 import vue from '@vitejs/plugin-vue'
 import type { StorybookConfig } from '@storybook/vue3-vite'
 
@@ -6,10 +7,44 @@ import { vitePluginServeRepoPublic } from './vitePluginServeRepoPublic'
 import { vitePluginRewriteGlobEagerForStorybook } from './vitePluginRewriteGlobEager'
 
 const repoRoot = path.resolve(__dirname, '../..')
-const quasarVariablesPath = path.resolve(repoRoot, 'src/css/quasar.variables.scss').replaceAll('\\', '/')
+const quasarScssDir = path.resolve(repoRoot, 'src/css')
+const quasarVariablesUseUrl = pathToFileURL(
+  path.join(quasarScssDir, 'quasar.variables.scss')
+).href
+const quasarVariablesImportPath = path
+  .join(quasarScssDir, 'quasar.variables.scss')
+  .replaceAll('\\', '/')
+
+/**
+ * Prepend theme variables so Quasar components render with the project palette.
+ *
+ * For Quasar's own `index.sass` we must use `@import` (not `@use`) so that
+ * `$dark`, `$primary`, etc. land in the same global scope before `variables.sass`
+ * evaluates its `!default` assignments.  This matches `@quasar/vite-plugin`'s
+ * `scss-transform.js` behavior that Quasar CLI relies on.
+ *
+ * For project SCSS/Sass (Vue SFCs, standalone files) we keep `@use ... as *` so
+ * variables are available without polluting the global scope.
+ */
+function quasarVariablesAdditionalData (source: string, filepath: string): string {
+  const norm = filepath.replaceAll('\\', '/')
+  if (norm.includes('/node_modules/quasar/src/css/index.sass')) {
+    return `@import '${quasarVariablesImportPath}'\n${source}`
+  }
+  if (norm.includes('/node_modules/')) {
+    return source
+  }
+  if (norm.endsWith('/src/css/app.scss')) {
+    return source
+  }
+  return `@use "${quasarVariablesUseUrl}" as *;\n${source}`
+}
 const externalFileLoaderMockPath = path.resolve(__dirname, './mocks/externalFileLoader.ts')
 /** Same as Quasar app: `public/` is served at `/` so `images/socialContactButtons/*.png` resolves. */
 const publicDirPath = path.resolve(repoRoot, 'public')
+
+/** Align with `@quasar/app-vite`: Quasar's `index.sass` still uses `@import`; silence until upstream migrates. */
+const sassSilenceDeprecations = ['import', 'global-builtin'] as const
 
 const config: StorybookConfig = {
   stories: [
@@ -49,13 +84,19 @@ const config: StorybookConfig = {
           ...(viteConfig.css?.preprocessorOptions ?? {}),
           scss: {
             ...(viteConfig.css?.preprocessorOptions?.scss ?? {}),
-            api: 'legacy',
-            additionalData: `@import "${quasarVariablesPath}";\n`
+            silenceDeprecations: [
+              ...sassSilenceDeprecations,
+              ...(viteConfig.css?.preprocessorOptions?.scss?.silenceDeprecations ?? [])
+            ],
+            additionalData: quasarVariablesAdditionalData
           },
           sass: {
             ...(viteConfig.css?.preprocessorOptions?.sass ?? {}),
-            api: 'legacy',
-            additionalData: `@import "${quasarVariablesPath}"\n`
+            silenceDeprecations: [
+              ...sassSilenceDeprecations,
+              ...(viteConfig.css?.preprocessorOptions?.sass?.silenceDeprecations ?? [])
+            ],
+            additionalData: quasarVariablesAdditionalData
           }
         }
       },

@@ -161,7 +161,6 @@ onUnmounted(async () => {
 </script>
 
 <style lang="scss" scoped>
-
 .globalWindowButtons {
   position: fixed;
   z-index: 99999999;

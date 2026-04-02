@@ -1,10 +1,12 @@
 import { initialize } from '@electron/remote/main/index.js'
 import { mainWindowCreation } from 'app/src-electron/mainScripts/mainWindowCreation'
+import { registerFaDevToolsIpc } from 'app/src-electron/mainScripts/registerFaDevToolsIpc'
 import { app } from 'electron'
 
 // Starts the app's Electron instance
 export const startApp = () => {
   initialize()
+  registerFaDevToolsIpc()
 }
 
 // Opens the singular app's window and make sure it is the only one

@@ -66,7 +66,6 @@ const iconSrc = computed(() => {
 </script>
 
 <style lang="scss">
-
 .socialContactSingleButton {
   &__text {
     margin-left: 10px;

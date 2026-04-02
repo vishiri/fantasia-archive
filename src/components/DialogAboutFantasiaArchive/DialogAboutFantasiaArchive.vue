@@ -121,7 +121,6 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-
 .AboutFantasiaArchive {
   .dialogComponent__wrapper {
     width: 700px;

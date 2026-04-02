@@ -40,7 +40,7 @@ import FantasiaMascotImage from 'src/components/FantasiaMascotImage/FantasiaMasc
 </script>
 
 <style lang="scss" scoped>
-.errorPage-card{
+.errorPage-card {
   border-radius: $qCard-errorPage-border-radius;
   box-shadow: none;
   border: $qCard-errorPage-border-size solid $qCard-errorPage-border-color;

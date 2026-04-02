@@ -66,7 +66,6 @@ const currentMascotImage = determineCurrentImage(fantasiaImageList, isRandom, pr
 </script>
 
 <style lang="scss" scoped>
-
 .fantasiaMascotImage {
   &__inner {
     height: v-bind(height);

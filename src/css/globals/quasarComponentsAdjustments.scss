@@ -1,3 +1,5 @@
+@use '../quasar.variables.scss' as *;
+
 .fullscreen {
 
   /* Tweak for top bar and other element with z-index between 6000 to 7000 */

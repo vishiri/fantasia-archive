@@ -11,6 +11,9 @@ vi.mock('electron', () => {
     contextBridge: {
       exposeInMainWorld: exposeInMainWorldMock
     },
+    ipcRenderer: {
+      sendSync: vi.fn()
+    },
     shell: {
       openExternal: vi.fn()
     }

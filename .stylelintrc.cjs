@@ -5,11 +5,14 @@
  * BEM-style class names (e.g. `socialContactSingleButton__text`) are allowed.
  */
 module.exports = {
-  extends: ['stylelint-config-standard-scss', 'stylelint-config-standard-vue/scss'],
+  extends: [
+    'stylelint-config-standard-scss',
+    'stylelint-config-standard-vue/scss',
+    '@stylistic/stylelint-config'
+  ],
   rules: {
     'selector-class-pattern': null,
     'custom-property-pattern': null,
-    // Quasar / legacy SCSS conventions (kebab rules fight `$primary`, `lighten()`, explicit `.scss` @import paths).
     'scss/load-partial-extension': null,
     'scss/dollar-variable-colon-space-before': null,
     'scss/dollar-variable-empty-line-before': null,
@@ -24,7 +27,9 @@ module.exports = {
     'shorthand-property-no-redundant-values': null,
     'no-descending-specificity': null,
     'comment-empty-line-before': null,
-    'selector-no-vendor-prefix': null
+    'selector-no-vendor-prefix': null,
+    '@stylistic/max-line-length': null,
+    '@stylistic/string-quotes': null
   },
   ignoreFiles: ['**/node_modules/**', '**/dist/**', '**/.quasar/**', '**/storybook-static/**']
 }
