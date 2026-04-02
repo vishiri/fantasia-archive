@@ -51,8 +51,8 @@ description: >-
 
 ## Quality gates
 
-- `yarn lint` (ESLint + `@typescript-eslint` v8 + Vue; `standard`-style config) and **`yarn lint:types`** (`tsc -p tsconfig.json`) — see [eslint-typescript.mdc](../../rules/eslint-typescript.mdc). **TSLint** is not used.
-- `yarn lint:style` when changing scoped Vue/SCSS significantly.
+- Before commits or substantial UI refactors, run **`yarn lint`**, **`yarn lint:types`**, **`yarn lint:style`**, and **`yarn test:unit`** in order (each in its own terminal — [testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)) — see [eslint-typescript.mdc](../../rules/eslint-typescript.mdc). **TSLint** is not used.
+- Give **`yarn lint:style`** extra attention when changing Vue `<style>` blocks or `src/**/*.scss`.
 - **`quasar.config.ts`**: match Quasar typings (e.g. PWA `workboxMode: 'GenerateSW' | 'InjectManifest'`; `bex` uses `QuasarBexConfiguration`, not legacy `contentScripts`). Duplicate **Vite** `Plugin` types vs `@quasar/app-vite` may require a documented **`@ts-expect-error`** on `defineConfig`.
 - **`src/boot/i18n.ts`**: vue-i18n module augmentation may use **`@ts-expect-error` (TS2665)** because the package `module` entry targets the ESM bundle under `tsc`.
 - Keep TypeScript strict in Vue code: avoid `any`; prefer explicit prop/emits/interfaces, `unknown`, and narrowing.

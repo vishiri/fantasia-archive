@@ -16,7 +16,7 @@ description: >-
 ## Testing
 
 - Vitest tests live under `src-electron/mainScripts/tests/` and `src-electron/contentBridgeAPIs/tests/` for bridge modules.
-- After main-process changes, run **`yarn test:unit`**, plus **`yarn lint`** and **`yarn lint:types`** when TypeScript files changed — see [eslint-typescript.mdc](../../rules/eslint-typescript.mdc).
+- After main-process changes, run **`yarn lint`**, **`yarn lint:types`**, **`yarn lint:style`**, and **`yarn test:unit`** (each in its own terminal) when TypeScript or related sources changed — see [eslint-typescript.mdc](../../rules/eslint-typescript.mdc).
 
 ## Remote and windows
 

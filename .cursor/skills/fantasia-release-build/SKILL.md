@@ -20,7 +20,7 @@ description: >-
 
 ## Checklist before a release candidate
 
-1. `yarn lint` and `yarn test:unit`.
+1. `yarn lint`, `yarn lint:types`, `yarn lint:style`, and `yarn test:unit` (each in its own terminal — [testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
 2. `yarn build`; smoke-test the packaged app on target OS(es).
 3. Run Playwright suites that matter after the same build (`yarn test:component`, `yarn test:e2e`) — see [fantasia-testing](../fantasia-testing/SKILL.md).
 

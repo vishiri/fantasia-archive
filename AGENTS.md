@@ -61,27 +61,29 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 
 ## Linting and static analysis
 
-- **No TSLint** — use **ESLint** (**`eslint.config.mjs`**, **neostandard**, **typescript-eslint**, **eslint-plugin-vue**) plus **`yarn lint:types`** for **`tsc -p tsconfig.json`**. Details: [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc).
+- **No TSLint** — use **ESLint** (**`eslint.config.mjs`**, **neostandard**, **typescript-eslint**, **eslint-plugin-vue**), **`yarn lint:types`** for **`tsc -p tsconfig.json`**, and **`yarn lint:style`** for Vue/SCSS. Details: [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc).
 - **`@typescript-eslint` v8** / **typescript-eslint** should stay aligned with **TypeScript ~6.0** in `package.json` to avoid `typescript-estree` unsupported-version warnings (including from **vite-plugin-checker** in dev).
 - **`src/env.d.ts`** references **`.quasar/shims-vue.d.ts`** so `tsc` resolves `*.vue` while `tsconfig` excludes generated `.quasar` output.
-- Before commits that touch lint-covered sources, run **`yarn lint`** and **`yarn lint:types`** (see commit gate in [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc)).
+- Before commits that touch lint-covered sources, run **`yarn lint`**, **`yarn lint:types`**, **`yarn lint:style`**, and **`yarn test:unit`** (each in its own terminal; see commit gate in [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc)).
 
 ## Git commits
 
 - Messages: `**feat` | `fix` | `test` | `chore` | `refactor` | `style` | `docs**`, then `**:**` and an imperative subject (e.g. `fix: close window on menu exit`).
 - To split work into several commits with **confirmation before each**: ask the agent to follow [git-conventional-commits skill](.cursor/skills/git-conventional-commits/SKILL.md).
-- Before any commit (or changelog edit for new work), follow this order:
-  1. Run `yarn lint` and `yarn lint:types` (must pass) when the change affects TypeScript, Vue, Electron TS, or other lint-scoped files — see [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc).
-  2. Run unit tests with `yarn test:unit`.
-  3. If tests pass, verify Storybook coverage/updates for affected user-facing **`src/components/**`** (`*.stories.ts`, mocks/placeholders as needed). Layout/page Storybook previews are canvas-only (no Docs requirement); see [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc).
-  4. If Storybook is aligned for touched components, update changelog if required.
-  5. Commit.
-- If unit tests fail, stop the commit flow, do not create a commit, and report a concise summary of what failed and where (failing suites/tests, file paths, and key error locations/messages).
+- Before any commit (or changelog edit for new work), follow this order (each verification command in its own terminal — [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc)):
+  1. Run `yarn lint` (must pass) when the change affects TypeScript, Vue, Electron TS, or other lint-scoped files — see [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc).
+  2. Run `yarn lint:types` (must pass).
+  3. Run `yarn lint:style` (must pass).
+  4. Run `yarn test:unit` (must pass).
+  5. Verify Storybook coverage/updates for affected user-facing **`src/components/**`** (`*.stories.ts`, mocks/placeholders as needed). Layout/page Storybook previews are canvas-only (no Docs requirement); see [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc).
+  6. If Storybook is aligned for touched components, update changelog if required.
+  7. Commit.
+- If any gate fails (lint, types, stylelint, or unit tests), stop the commit flow, do not create a commit, and report a concise summary of what failed and where (failing suites/tests, file paths, and key error locations/messages).
 
 ## Changelog (in-app)
 
 - English changelog: [src/i18n/en-US/documents/changeLog.md](src/i18n/en-US/documents/changeLog.md). **Version** in [package.json](package.json) is the only source of truth. **NEVER, EVER, UNDER ANY CIRCUMSTANCES** auto-bump any version in changelog or `package.json`; update changelog entries under the existing package version unless the user explicitly requests a manual version change. Do not add empty `###` sections or “none” placeholder bullets.
-- Changelog bullets are for **user- or release-relevant changes** (features, fixes, meaningful dependency refreshes, etc.). **Do not** log internal QA as changelog text: omit lines that only say the team re-ran lint, typecheck, unit tests, production builds, Playwright component tests, E2E, or that “all gates passed”. Follow [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc) and [fantasia-changelog-en-us skill](.cursor/skills/fantasia-changelog-en-us/SKILL.md).
+- Changelog bullets are for **user- or release-relevant changes** (features, fixes, meaningful dependency refreshes, etc.). **Do not** log internal QA as changelog text: omit lines that only say the team re-ran `yarn lint`, `yarn lint:types`, `yarn lint:style`, `yarn test:unit`, production builds, Playwright component tests, E2E, or that “all gates passed”. Follow [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc) and [fantasia-changelog-en-us skill](.cursor/skills/fantasia-changelog-en-us/SKILL.md).
 - Changelog-edit guard: always re-open [package.json](package.json) immediately before updating changelog content and use that live `version` value for section targeting.
 - For changelog updates tied to fresh work, ensure Storybook updates/checks for affected **`src/components/**`** UI are completed before editing the changelog entry.
 

@@ -73,7 +73,7 @@ Match **existing** tests to the letter when adding or editing:
 
 ## Checklist when changing UI or Electron shell
 
-1. `yarn lint` and `yarn lint:types` (ESLint + full `tsc`); fix issues per [eslint-typescript.mdc](../../rules/eslint-typescript.mdc).
+1. `yarn lint`, `yarn lint:types`, and `yarn lint:style` (ESLint + full `tsc` + Stylelint); fix issues per [eslint-typescript.mdc](../../rules/eslint-typescript.mdc).
 2. `yarn test:unit` for covered logic.
 3. Rebuild: `yarn build` (or `quasar build -m electron`).
 4. `yarn test:component` / `yarn test:e2e` as needed.

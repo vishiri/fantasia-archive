@@ -31,7 +31,7 @@ Examples: `feat: add splash screen fade-out`, `test: cover devtools menu toggle`
 ## Workflow (default when user wants multiple commits)
 
 1. **Inspect**: Run `git status` and review `git diff` (and `git diff --staged` if anything is already staged).
-2. **Unit test gate (always first)**: Run `yarn test:unit`; stop immediately if failing.
+2. **Static analysis + unit gate** (always run **each** command in its own terminal — [testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc); stop on first failure): `yarn lint`, then `yarn lint:types`, then `yarn lint:style`, then `yarn test:unit`. See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) for what each covers.
 3. **Storybook gate (before changelog/commit for UI work)**: For changed user-facing **`src/components/**`**, verify Storybook coverage/health and add/update missing `<Component>.stories.ts` plus required mocks/placeholders. Touching only **`src/layouts/**` or `src/pages/**` Storybook previews** does not require Docs/autodocs (canvas-only); see [storybook-stories.mdc](../../rules/storybook-stories.mdc).
 4. **Changelog gate (before commit)**: Review `src/i18n/en-US/documents/changeLog.md` and reconcile whether staged user-visible work needs a changelog update. Follow project changelog/version rules when adjusting release notes.
 5. **Plan**: Propose an **ordered list** of commits. Each item: **type + subject**, bullet list of **paths** (or path patterns) to include. Order so dependencies make sense (e.g. chore before feat if needed).
@@ -40,7 +40,7 @@ Examples: `feat: add splash screen fade-out`, `test: cover devtools menu toggle`
    - **Stop and wait** for explicit user confirmation (e.g. “yes”, “go ahead”, “approved”) for that commit.
    - Then run `git add` with **only** those paths and `git commit -m "type: subject"`.
    - Repeat until the list is done or the user stops.
-7. If the user asked for a **single** commit or did not ask for step-by-step approval, still use a valid `type:` message; you may commit in one shot after listing what will be included.
+7. If the user asked for a **single** commit or did not ask for step-by-step approval, still use a valid `type:` message; you may commit in one shot after listing what will be included (still after the gates in step 2).
 
 ## Rules
 
