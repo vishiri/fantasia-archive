@@ -7,6 +7,7 @@
 - Added **`yarn verify`** to run ESLint, TypeScript (`tsc`), Stylelint, and unit tests in one command (named **`verify`** because Yarn 1 reserves **`yarn check`** for dependency verification); documented it in the README and dev-setup guidance, aligned Cursor rules/skills, and run it in the manual GitHub Actions build workflow before the production Electron build.
 - Fixed **`yarn test:full`** so it runs unit tests then Playwright over component and E2E paths (removed the broken `concurrently` invocation and dropped the unused **`concurrently`** dependency).
 - Cleared the French locale changelog markdown so release notes are not maintained per locale until translations return.
+- Upgraded **`@intlify/unplugin-vue-i18n`** to v11 for the Quasar/Vite locale pipeline, **`uuid`** to v11 (built-in TypeScript types; removed **`@types/uuid`**), and **`sqlite3`** to v6 for the Electron main-process dependency line.
 
 ## 2.4.4 - Dependencies and dev tooling
 
