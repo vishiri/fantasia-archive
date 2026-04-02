@@ -1,9 +1,10 @@
 import type { Plugin } from 'vite'
 
 /**
- * `import.meta.globEager` was removed in Vite 5+ (Storybook 8’s bundler). The Quasar app
- * still uses Vite 2.9, which supports `globEager` in source. Rewrite only under Storybook so
- * `ComponentTesting.vue` keeps working in production without upgrading the app Vite major yet.
+ * Vite 5+ removed import.meta.globEager in favor of eager import.meta.glob. Production
+ * ComponentTesting.vue already uses the supported API on Vite 8 (Quasar app-vite v2). This
+ * Storybook-only transform remains so legacy globEager usage in that page still previews in the
+ * nested workspace if it is reintroduced.
  */
 export function vitePluginRewriteGlobEagerForStorybook (): Plugin {
   return {

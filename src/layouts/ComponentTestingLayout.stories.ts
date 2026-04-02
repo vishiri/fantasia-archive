@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3'
+import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import { buttonList } from '../components/SocialContactButtons/_data/buttons'
 import StoryRouterShell from '../../.storybook-workspace/.storybook/components/StoryRouterShell.vue'

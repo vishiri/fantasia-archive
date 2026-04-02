@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/vue3'
+import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import type { I_appMenuList } from 'app/types/I_appMenusDataList'
-import { expect, userEvent, waitFor } from '@storybook/test'
+import { expect, userEvent, waitFor } from 'storybook/test'
 
 import AppControlSingleMenu from './AppControlSingleMenu.vue'
 

@@ -6,7 +6,7 @@ import '@quasar/extras/fontawesome-v6/fontawesome-v6.css'
 import '@quasar/quasar-ui-qmarkdown/dist/index.css'
 import 'src/css/app.scss'
 
-import { setup } from '@storybook/vue3'
+import { setup } from '@storybook/vue3-vite'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import type { Plugin } from 'vue'
@@ -14,7 +14,7 @@ import * as QuasarAll from 'quasar'
 import { ClosePopup, Dark, Dialog, Notify, Quasar, Ripple } from 'quasar'
 import QMarkdownPlugin from '@quasar/quasar-ui-qmarkdown'
 
-import type { Preview } from '@storybook/vue3'
+import type { Preview } from '@storybook/vue3-vite'
 import type { QuasarPluginOptions } from 'quasar'
 import { setContentBridgeScenario } from './mocks/contentBridge'
 import { getStorybookI18nMessages, setI18nScenario } from './mocks/externalFileLoader'
@@ -157,15 +157,12 @@ const preview: Preview = {
       argTypesRegex: '^on[A-Z].*'
     },
     backgrounds: {
-      default: 'dark app',
-      values: [
-        { name: 'dark app', value: '#121212' },
-        { name: 'paper', value: '#f4f4f4' }
-      ]
+      options: {
+        dark_app: { name: 'dark app', value: '#121212' },
+        paper: { name: 'paper', value: '#f4f4f4' }
+      }
     },
-    viewport: {
-      defaultViewport: 'desktop'
-    },
+    viewport: {},
     a11y: {
       config: {
         rules: [
@@ -182,6 +179,7 @@ const preview: Preview = {
       }
     }
   },
+
   decorators: [
     (story, context) => {
       ensureStorybookScrollFix()
@@ -203,7 +201,18 @@ const preview: Preview = {
         template: '<story />'
       }
     }
-  ]
+  ],
+
+  initialGlobals: {
+    viewport: {
+      value: 'desktop',
+      isRotated: false
+    },
+
+    backgrounds: {
+      value: 'dark_app'
+    }
+  }
 }
 
 export default preview

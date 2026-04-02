@@ -1,23 +1,23 @@
 {
   "name": "fantasia-archive-storybook-workspace",
   "private": true,
+  "type": "module",
   "scripts": {
     "storybook": "storybook dev -p 6006 -c .storybook --disable-telemetry",
     "build-storybook": "storybook build -c .storybook -o ../storybook-static --disable-telemetry",
     "smoke-storybook": "storybook dev -p 6006 -c .storybook --smoke-test --ci --disable-telemetry"
   },
   "devDependencies": {
-    "@quasar/quasar-ui-qmarkdown": "^2.0.5",
     "@quasar/extras": "^1.17.0",
-    "@storybook/addon-essentials": "8.6.18",
-    "@storybook/addon-interactions": "8.6.18",
-    "@storybook/vue3-vite": "8.6.18",
-    "@vitejs/plugin-vue": "^5.2.4",
+    "@quasar/quasar-ui-qmarkdown": "^2.0.5",
+    "@storybook/addon-docs": "10.3.4",
+    "@storybook/vue3-vite": "10.3.4",
+    "@vitejs/plugin-vue": "^6.0.5",
     "pinia": "^2.3.1",
     "quasar": "^2.16.0",
     "sass": "^1.78.0",
-    "storybook": "8.6.18",
-    "vite": "^6.4.1",
+    "storybook": "10.3.4",
+    "vite": "^8.0.3",
     "vue": "^3.5.0",
     "vue-i18n": "^11.0.0"
   }

@@ -1,6 +1,11 @@
 # Changelog
 ----------
 
+## 2.4.7 - Storybook 10 and Vite 8 alignment
+
+### Bugfixes & Optimizations
+- Upgraded **`.storybook-workspace`** to **Storybook 10** and **Vite 8** so component previews run on the same major bundler line as the desktop app (**`@quasar/app-vite`**), refreshed the nested **Yarn** lockfile for reproducible installs (including **CI** frozen installs), and aligned root **Storybook** / **`eslint-plugin-storybook`** versions with that release family.
+
 ## 2.4.6 - Window chrome, Storybook, Stylelint, and DevTools
 
 ### Bugfixes & Optimizations

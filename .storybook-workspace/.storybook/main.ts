@@ -1,10 +1,15 @@
+// This file has been automatically migrated to valid ESM format by Storybook.
 import path from 'path'
-import { pathToFileURL } from 'node:url'
+import { dirname } from 'path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import vue from '@vitejs/plugin-vue'
 import type { StorybookConfig } from '@storybook/vue3-vite'
 
-import { vitePluginServeRepoPublic } from './vitePluginServeRepoPublic'
-import { vitePluginRewriteGlobEagerForStorybook } from './vitePluginRewriteGlobEager'
+import { vitePluginServeRepoPublic } from './vitePluginServeRepoPublic.ts'
+import { vitePluginRewriteGlobEagerForStorybook } from './vitePluginRewriteGlobEager.ts'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const repoRoot = path.resolve(__dirname, '../..')
 const quasarScssDir = path.resolve(repoRoot, 'src/css')
@@ -52,22 +57,20 @@ const config: StorybookConfig = {
     '../../src/layouts/**/*.stories.ts',
     '../../src/pages/**/*.stories.ts'
   ],
+
   /**
    * Relative to `configDir` only — Windows absolute paths break Storybook's `staticDirs` parser (`C:` / `to:` split).
    * Dev-time asset requests are also served by `vitePluginServeRepoPublic` (see `viteFinal`).
    */
   staticDirs: ['../../public'],
-  addons: [
-    '@storybook/addon-essentials',
-    '@storybook/addon-interactions'
-  ],
-  docs: {
-    autodocs: 'tag'
-  },
+
+  addons: ['@storybook/addon-docs'],
+
   framework: {
     name: '@storybook/vue3-vite',
     options: {}
   },
+
   async viteFinal (viteConfig) {
     return {
       ...viteConfig,
