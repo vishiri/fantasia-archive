@@ -4,6 +4,7 @@
 ## 2.4.8 - Pinia 3 and Vue Router 5
 
 ### Bugfixes & Optimizations
+- Refreshed **Sass** to **1.99.x** under **`^1.78.0`** in **root** and **`.storybook-workspace`** lockfiles so the desktop app and **Storybook** use the same resolved Dart Sass line for styles.
 - Upgraded **Pinia** to **v3** and **Vue Router** to **v5** for the desktop app and **`.storybook-workspace`** (explicit **`vue-router`** there for **`StoryRouterShell`**); did not add optional **`@pinia/colada`**. Refreshed **root** and **`.storybook-workspace`** lockfiles with **`yarn upgrade`** within existing semver ranges (**Storybook** remains pinned at **10.3.4** on that line).
 - Upgraded **`uuid`** to **v13** for markdown and component dialog UUIDs (**`S_Dialog`**) and **`@quasar/cli`** to **v3** for the **`quasar`** CLI used with **`@quasar/app-vite`** v2.
 - Upgraded **Electron** to **41.x** (from **33.x**); **`electron-builder`** still runs **`@electron/rebuild`** so **`sqlite3`** matches the bundled runtime. **`@electron/remote`** **2.1.x** and the known UnPackaged production-install peer warning for **`electron`** are unchanged.
