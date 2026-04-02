@@ -6,6 +6,7 @@
 ### Bugfixes & Optimizations
 - Upgraded `vue-i18n` to v11 and removed legacy TypeScript suppression in i18n bootstrapping now that current typings compile cleanly.
 - Refreshed core app and tooling dependencies (including Quasar extras/qmarkdown, Axios, Pinia, Vue Router, Vitest, and selected ESLint plugins) to reduce maintenance risk while staying within the current project architecture.
+- Applied a follow-up tooling refresh for the Quasar/Vite workflow (`@quasar/app-vite`, `@intlify/unplugin-vue-i18n`, `vite-plugin-checker`, `eslint-plugin-vue`, and `@types/node`) with full lint, typecheck, unit, component, E2E, and build validation.
 - Revalidated quality gates after upgrades with lint, typecheck, stylelint, unit tests, Playwright component tests, Playwright E2E tests, and Electron production build all passing.
 
 ## 2.4.1 - Changelog policy lock and component test stability
