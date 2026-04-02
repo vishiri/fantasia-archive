@@ -2,6 +2,7 @@ import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import { T_dialogName } from 'app/types/T_dialogList'
+import T_socialContactButtons from 'app/src/i18n/en-US/components/SocialContactButtons/T_socialContactButtons'
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -87,6 +88,42 @@ test('Open test "AboutFantasiaArchive" dialog and try closing it', async () => {
 
   // Check if the content is properly hidden after closing the popup
   expect(await socialButtonsWrapper.isHidden()).toBe(true)
+
+  // Close the app
+  await electronApp.close()
+})
+
+test('Check correct amount and content of social buttons in AboutFantasiaArchive dialog', async () => {
+  const testString: T_dialogName = 'AboutFantasiaArchive'
+  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
+
+  const electronApp = await electron.launch({
+    env: extraEnvSettings,
+    args: [electronMainFilePath]
+  })
+
+  const appWindow = await electronApp.firstWindow()
+  await appWindow.waitForTimeout(faFrontendRenderTimer)
+
+  // Select all social buttons
+  const socialButtonsWrapper = appWindow.locator(`[data-test="${selectorList.socialButtonsWrapper}"]`)
+  const socialButtons = socialButtonsWrapper.locator('[data-test="socialContactSingleButton"]')
+  await expect(socialButtons).toHaveCount(7)
+
+  // Check the specific text content for each button
+  const expectedButtonLabels = [
+    T_socialContactButtons.buttonPatreon.label,
+    T_socialContactButtons.buttonKofi.label,
+    T_socialContactButtons.buttonWebsite.label,
+    T_socialContactButtons.buttonGitHub.label,
+    T_socialContactButtons.buttonDiscord.label,
+    T_socialContactButtons.buttonReddit.label,
+    T_socialContactButtons.buttonTwitter.label
+  ]
+
+  for (let i = 0; i < expectedButtonLabels.length; i++) {
+    await expect(socialButtons.nth(i)).toHaveText(expectedButtonLabels[i])
+  }
 
   // Close the app
   await electronApp.close()
