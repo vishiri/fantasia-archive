@@ -6,7 +6,7 @@ const { MenuMock, MenuItemMock, menuInstances } = vi.hoisted(() => {
   const instances: Array<{ append: ReturnType<typeof vi.fn>, popup: ReturnType<typeof vi.fn> }> = []
   return {
     menuInstances: instances,
-    MenuMock: vi.fn(() => {
+    MenuMock: vi.fn(function () {
       const instance = {
         append: vi.fn(),
         popup: vi.fn()
@@ -14,7 +14,9 @@ const { MenuMock, MenuItemMock, menuInstances } = vi.hoisted(() => {
       instances.push(instance)
       return instance
     }),
-    MenuItemMock: vi.fn((item) => item)
+    MenuItemMock: vi.fn(function (item) {
+      return item
+    })
   }
 })
 

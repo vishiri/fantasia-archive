@@ -152,7 +152,9 @@ test('Test that the main window is created successfully', async () => {
     focus: vi.fn(),
     maximize: vi.fn()
   }
-  BrowserWindowMock.mockImplementation(() => browserWindowInstance as unknown as BrowserWindow)
+  BrowserWindowMock.mockImplementation(function () {
+    return browserWindowInstance as unknown as BrowserWindow
+  })
 
   vi.stubEnv('APP_URL', 'http://localhost:9000')
   vi.stubEnv('DEV', true)
@@ -209,7 +211,9 @@ test('Test that main window creation does not open DevTools when DEBUGGING is un
     focus: vi.fn(),
     maximize: vi.fn()
   }
-  BrowserWindowMock.mockImplementation(() => browserWindowInstance as unknown as BrowserWindow)
+  BrowserWindowMock.mockImplementation(function () {
+    return browserWindowInstance as unknown as BrowserWindow
+  })
 
   vi.stubEnv('APP_URL', 'http://localhost:9000')
   vi.stubEnv('DEV', true)
@@ -240,7 +244,9 @@ test('Test that production window uses loadFile for index.html', async () => {
     focus: vi.fn(),
     maximize: vi.fn()
   }
-  BrowserWindowMock.mockImplementation(() => browserWindowInstance as unknown as BrowserWindow)
+  BrowserWindowMock.mockImplementation(function () {
+    return browserWindowInstance as unknown as BrowserWindow
+  })
 
   vi.stubEnv('DEV', false)
   vi.stubEnv('QUASAR_ELECTRON_PRELOAD_FOLDER', '.')
