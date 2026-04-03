@@ -1,6 +1,6 @@
 import type { Ref } from 'vue'
-import { T_documentName } from 'app/types/T_documentList'
-import { T_dialogName } from 'app/types/T_dialogList'
+import type { T_documentName } from 'app/types/T_documentList'
+import type { T_dialogName } from 'app/types/T_dialogList'
 
 import { v4 as uuidv4 } from 'uuid'
 

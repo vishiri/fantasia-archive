@@ -1,6 +1,8 @@
 import { config } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, vi } from 'vitest'
+import { afterEach, beforeEach, vi } from 'vitest'
+
+const originalConsoleWarn = console.warn.bind(console)
 
 config.global.config = {
   compilerOptions: {
@@ -34,6 +36,18 @@ vi.mock('@quasar/quasar-ui-qmarkdown/dist/index.css', () => ({}))
  * Minimal `window.faContentBridgeAPIs` for Vitest runs that mount `.vue` components.
  */
 beforeEach(() => {
+  vi.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+    const [firstArg] = args
+    const message = typeof firstArg === 'string' ? firstArg : ''
+    if (
+      !message.includes('[Vue warn]: Failed to resolve component: q-') &&
+      !message.includes('[Vue warn]: Failed to resolve directive: close-popup') &&
+      !message.includes('[Vue warn]: injection "_q_" not found.')
+    ) {
+      originalConsoleWarn(...args)
+    }
+  })
+
   setActivePinia(createPinia())
 
   window.faContentBridgeAPIs = {
@@ -65,4 +79,8 @@ beforeEach(() => {
       PROJECT_VERSION: '0.0.0-unit-test'
     }
   }
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
 })

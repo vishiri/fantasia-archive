@@ -40,6 +40,7 @@ Match **existing** tests to the letter when adding or editing:
 - **Storybook** — Runs from [`.storybook-workspace/`](../../../.storybook-workspace/); config must keep `staticDirs` (and related Vite `public/` wiring) in sync with the Quasar app so public assets resolve the same way in Storybook dev and `yarn build-storybook` output. See [`.storybook-workspace/.storybook/main.ts`](../../../.storybook-workspace/.storybook/main.ts).
 - **Electron `file://`** — Packaged renderer paths are not a web origin at `/`. If `import.meta.env.BASE_URL` is `'/'` or empty, building `public/` URLs as `/images/...` can fail loading; use a relative prefix (e.g. `./`) for those assets (see `SocialContactSingleButton.vue`).
 - **Playwright** — Same rebuild rule as above: **`yarn build` before `yarn test:component` / `yarn test:e2e`** when exercised sources changed; flaky UI in tests after a green Storybook pass often means a stale build or a `file://` URL mismatch.
+- **One-shot full suite** — `yarn ensure` runs `yarn verify` + `yarn build` + `yarn test:component` + `yarn test:e2e` in sequence for a complete project gate.
 
 ### Config highlights (`playwright.config.ts`)
 
@@ -70,12 +71,13 @@ Match **existing** tests to the letter when adding or editing:
 ### Full suite
 
 - `yarn test:full` runs **`yarn test:unit`** then a single Playwright run over **`src/components`** and **`e2e-tests/`** (still run **`yarn build`** first when sources those tests cover have changed).
+- `yarn ensure` runs the full gate: **lint + types + style + unit + production build + Playwright component + Playwright E2E**.
 
 ## Checklist when changing UI or Electron shell
 
 1. **Quality gate** in one terminal: `yarn verify` — fix issues per [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
 2. Rebuild: `yarn build` (or `quasar build -m electron`) — its own terminal.
-3. `yarn test:component` / `yarn test:e2e` as needed — each in its own terminal; do not chain with `yarn build` or with each other in one line.
+3. `yarn test:component` / `yarn test:e2e` as needed — each in its own terminal; do not chain with `yarn build` or with each other in one line, unless you intentionally run `yarn ensure`.
 
 ## Choosing Vitest vs Playwright in renderer work
 

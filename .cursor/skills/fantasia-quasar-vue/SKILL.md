@@ -26,6 +26,7 @@ description: >-
 - Prefer Quasar components (`q-*`) and existing spacing/typography patterns in sibling components.
 - Boot files in `src/boot/` run at app init (e.g. axios, external links).
 - When importing shared project types, keep `I_` / `T_` prefixes and use descriptive singular/collection naming (e.g. `T_documentName`, `I_appMenuList`).
+- In TypeScript and Vue SFC TS scripts, use `import type` for type-only imports.
 - In `.vue` SFCs, prefer template `$t('...')` translation calls; avoid importing `useI18n` only for `t(...)` when a template binding can express the same text.
 
 ## `public/` assets and Electron (`file://`)

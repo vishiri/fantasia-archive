@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { T_dialogName } from 'app/types/T_dialogList'
+import type { T_dialogName } from 'app/types/T_dialogList'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { onMounted, ref, watch } from 'vue'
 import SocialContactButtons from '../SocialContactButtons/SocialContactButtons.vue'

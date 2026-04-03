@@ -1,5 +1,5 @@
-import { T_dialogName } from 'app/types/T_dialogList'
-import { T_documentName } from 'app/types/T_documentList'
+import type { T_dialogName } from 'app/types/T_dialogList'
+import type { T_documentName } from 'app/types/T_documentList'
 
 import { S_DialogMarkdown, S_DialogComponent } from 'app/src/stores/S_Dialog'
 

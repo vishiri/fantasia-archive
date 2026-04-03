@@ -1,7 +1,7 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
-import { T_dialogName } from 'app/types/T_dialogList'
+import type { T_dialogName } from 'app/types/T_dialogList'
 import T_socialContactButtons from 'app/src/i18n/en-US/components/SocialContactButtons/T_socialContactButtons'
 
 /**

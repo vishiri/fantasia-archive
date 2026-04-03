@@ -1,6 +1,6 @@
 import { test, expect, vi, beforeEach } from 'vitest'
 import { setupSpellChecker } from '../spellChecker'
-import { BrowserWindow } from 'electron'
+import type { BrowserWindow } from 'electron'
 
 const { MenuMock, MenuItemMock, menuInstances } = vi.hoisted(() => {
   const instances: Array<{ append: ReturnType<typeof vi.fn>, popup: ReturnType<typeof vi.fn> }> = []

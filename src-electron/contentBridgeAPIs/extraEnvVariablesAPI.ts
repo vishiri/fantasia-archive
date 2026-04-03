@@ -1,4 +1,4 @@
-import { I_extraEnvVariablesAPI } from 'app/types/I_extraEnvVariablesAPI'
+import type { I_extraEnvVariablesAPI } from 'app/types/I_extraEnvVariablesAPI'
 import appRoot from 'app-root-path'
 
 // Extra variables for the app window (mostly used by component/E2E testing)

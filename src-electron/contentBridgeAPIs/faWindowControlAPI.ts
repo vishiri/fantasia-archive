@@ -1,5 +1,5 @@
 import { getCurrentWindow } from '@electron/remote'
-import { I_faWindowControlAPI } from 'app/types/I_faWindowControlAPI'
+import type { I_faWindowControlAPI } from 'app/types/I_faWindowControlAPI'
 
 /**
  * Use the window that owns this renderer. `BrowserWindow.getFocusedWindow()` is unreliable

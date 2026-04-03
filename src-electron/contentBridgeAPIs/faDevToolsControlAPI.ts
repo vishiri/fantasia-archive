@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron'
 
 import { FA_DEVTOOLS_IPC } from 'app/src-electron/devToolsIpcChannels'
-import { I_faDevToolsControl } from 'app/types/I_faDevToolsControl'
+import type { I_faDevToolsControl } from 'app/types/I_faDevToolsControl'
 
 export const faDevToolsControlAPI: I_faDevToolsControl = {
 

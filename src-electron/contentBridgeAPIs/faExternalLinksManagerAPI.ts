@@ -1,6 +1,6 @@
 import { shell } from 'electron'
 
-import { I_faExternalLinksManagerAPI } from 'app/types/I_faExternalLinksManagerAPI'
+import type { I_faExternalLinksManagerAPI } from 'app/types/I_faExternalLinksManagerAPI'
 
 export const faExternalLinksManagerAPI: I_faExternalLinksManagerAPI = {
 

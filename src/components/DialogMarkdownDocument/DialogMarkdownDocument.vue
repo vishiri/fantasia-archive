@@ -43,7 +43,7 @@
 <script setup lang="ts">
 import { QMarkdown } from '@quasar/quasar-ui-qmarkdown'
 import '@quasar/quasar-ui-qmarkdown/dist/index.css'
-import { T_documentName } from 'app/types/T_documentList'
+import type { T_documentName } from 'app/types/T_documentList'
 import { S_DialogMarkdown } from 'src/stores/S_Dialog'
 import { computed, onMounted, ref, watch } from 'vue'
 

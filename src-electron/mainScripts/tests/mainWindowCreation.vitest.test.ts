@@ -1,6 +1,6 @@
 import { test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { appWindow, mainWindowCreation, preventSecondaryAppInstance } from '../mainWindowCreation'
-import { BrowserWindow } from 'electron'
+import type { BrowserWindow } from 'electron'
 
 const {
   BrowserWindowMock,

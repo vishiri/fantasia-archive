@@ -22,6 +22,15 @@ yarn global add @quasar/cli
 yarn
 ```
 
+## Architecture (quick reference)
+
+- **UI**: Vue 3 + Quasar 2 (`src/`)
+- **Desktop shell**: Electron (`src-electron/`)
+- **State and routing**: Pinia + Vue Router
+- **i18n**: vue-i18n (`src/i18n/`)
+- **Tests**: Vitest (unit) + Playwright (component and E2E)
+- **Component docs**: Storybook 10 (in `.storybook-workspace/`)
+
 ### Start the app in Quasar development mode (hot-code reloading, error reporting, etc.)
 ```
 quasar dev -m electron
@@ -29,7 +38,7 @@ quasar dev -m electron
 
 ### Build the app for production
 ```
-quasar build -m electron
+yarn build
 ```
 
 ### Storybook (Vue components)
@@ -113,6 +122,14 @@ For debugging a single step, run `yarn lint`, `yarn lint:types`, `yarn lint:styl
 
 On **Yarn 1.x**, `yarn check` is a different built-in (dependency-tree validation); use **`yarn verify`** for this gate.
 
+### Full suite gate (everything)
+
+Run verify + production build + Playwright component + Playwright E2E in sequence:
+
+```
+yarn ensure
+```
+
 ### Testing
 
 #### Unit test - via Vitest
@@ -172,6 +189,31 @@ Runs `yarn test:unit`, then Playwright over `src/components` and `e2e-tests/` in
 ```
 yarn test:full
 ```
+
+### Scripts reference (`package.json`)
+
+| Script | Purpose |
+| --- | --- |
+| `yarn dev:electron` | Run the app in Quasar Electron development mode. |
+| `yarn build` | Build/package the Electron app (`--publish never`). |
+| `yarn lint` | Run ESLint on project source/config paths. |
+| `yarn lint:types` | Run TypeScript project check (`tsc`, no emit). |
+| `yarn lint:style` | Run Stylelint for Vue/SCSS styles. |
+| `yarn verify` | Quick gate: lint + typecheck + stylelint + unit tests. |
+| `yarn ensure` | Full gate: `verify` + build + Playwright component + Playwright E2E. |
+| `yarn test:unit` | Run Vitest core then component unit suites. |
+| `yarn test:component` | Run all Playwright component tests. |
+| `yarn test:componentSingle --component=...` | Run a single component Playwright test by folder path. |
+| `yarn test:componentSingleAuto --component=...` | Run a single component Playwright test by direct path. |
+| `yarn test:componentList` | Open interactive picker for component Playwright tests. |
+| `yarn test:e2e` | Run all Playwright E2E tests. |
+| `yarn test:e2eSingle --spec=...` | Run one E2E spec by spec file name. |
+| `yarn test:e2eSingleAuto --spec=...` | Run one E2E spec by direct path. |
+| `yarn test:e2eList` | Open interactive picker for E2E tests. |
+| `yarn test:full` | Run `test:unit` then one Playwright run over components + E2E paths. |
+| `yarn storybook` | Start Storybook from `.storybook-workspace`. |
+| `yarn build-storybook` | Build static Storybook output. |
+| `yarn storybook:smoke` | Run Storybook smoke check in CI-friendly mode. |
 
 ### Customize the configuration
 See [The quasar.config file](https://quasar.dev/quasar-cli-vite/quasar-config-file) (this repo uses `quasar.config.ts`).

@@ -1,7 +1,7 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
-import { T_documentName } from 'app/types/T_documentList'
+import type { T_documentName } from 'app/types/T_documentList'
 
 /**
  * Extra env settings to trigger component testing via Playwright

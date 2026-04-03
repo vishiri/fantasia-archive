@@ -8,6 +8,9 @@
 - Upgraded **Pinia** to **v3** and **Vue Router** to **v5** for the desktop app and **`.storybook-workspace`** (explicit **`vue-router`** there for **`StoryRouterShell`**); did not add optional **`@pinia/colada`**. Refreshed **root** and **`.storybook-workspace`** lockfiles with **`yarn upgrade`** within existing semver ranges (**Storybook** remains pinned at **10.3.4** on that line).
 - Upgraded **`uuid`** to **v13** for markdown and component dialog UUIDs (**`S_Dialog`**) and **`@quasar/cli`** to **v3** for the **`quasar`** CLI used with **`@quasar/app-vite`** v2.
 - Upgraded **Electron** to **41.x** (from **33.x**); **`electron-builder`** still runs **`@electron/rebuild`** so **`sqlite3`** matches the bundled runtime. **`@electron/remote`** **2.1.x** and the known UnPackaged production-install peer warning for **`electron`** are unchanged.
+- Standardized type-only imports across the TypeScript and Vue codebase (`import type`) to align with strict linting and keep runtime bundles free of type-only import noise.
+- Added a new `yarn ensure` command for full-project validation (`verify` + production build + Playwright component + Playwright E2E) and aligned contributor guidance in **README**, **AGENTS**, and Cursor rules/skills to document the quick gate vs full gate workflow clearly.
+- Reduced non-actionable Vue warning noise in component Vitest output by filtering known Quasar-resolution and test-only injection warnings in shared test setup, keeping signal focused on actionable failures.
 
 ## 2.4.7 - Storybook 10 and Vite 8 alignment
 

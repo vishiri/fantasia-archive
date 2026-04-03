@@ -1,8 +1,8 @@
-import { I_extraEnvVariablesAPI } from 'app/types/I_extraEnvVariablesAPI'
-import { I_faWindowControlAPI } from 'app/types/I_faWindowControlAPI'
-import { I_faExternalLinksManagerAPI } from 'app/types/I_faExternalLinksManagerAPI'
-import { I_faDevToolsControl } from 'app/types/I_faDevToolsControl'
-import { I_appDetailsAPI } from 'app/types/I_appDetailsAPI'
+import type { I_extraEnvVariablesAPI } from 'app/types/I_extraEnvVariablesAPI'
+import type { I_faWindowControlAPI } from 'app/types/I_faWindowControlAPI'
+import type { I_faExternalLinksManagerAPI } from 'app/types/I_faExternalLinksManagerAPI'
+import type { I_faDevToolsControl } from 'app/types/I_faDevToolsControl'
+import type { I_appDetailsAPI } from 'app/types/I_appDetailsAPI'
 
 declare global{
   interface Window {

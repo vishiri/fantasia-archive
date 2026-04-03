@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Testing and verification — terminal use
 
-## Quality gate (the **only** chained verification)
+## Quality gate (the **default** chained verification)
 
 When running the full **quality gate** — ESLint, TypeScript check, Stylelint, and unit tests — use **one** terminal invocation. Prefer the **`yarn verify`** script in `package.json` (same steps, stops on the first failure):
 
@@ -17,11 +17,19 @@ Equivalent explicit chain (for context or copy-paste without the script): `yarn 
 
 **Exception**: if you are **debugging** a specific failing step, run that command **alone** (and any narrower follow-ups) until it passes, then re-run the full chained gate before commit or changelog edits.
 
-This quartet is the **only** case where these four Yarn scripts may be combined in one shell line. Do not extend this chain with `yarn build`, Playwright, or Storybook.
+By default, do not extend this chain with `yarn build`, Playwright, or Storybook.
+
+## Full-suite gate (`ensure`)
+
+When you explicitly need the full project gate in one command, use:
+
+`yarn ensure`
+
+`ensure` runs `verify` plus production build, Playwright component tests, and Playwright E2E tests in sequence. Treat this as the intentional exception to the isolation rule.
 
 ## Everything else — one command per terminal
 
-Run each of these in its **own** terminal invocation (do not chain them with each other or with the quality gate in the same line):
+Run each of these in its **own** terminal invocation (do not chain them with each other or with the quality gate in the same line) unless you are intentionally running `yarn ensure`:
 
 - `yarn build`
 - `yarn test:component`

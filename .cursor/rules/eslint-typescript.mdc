@@ -9,6 +9,8 @@ alwaysApply: true
 
 - **TSLint** is deprecated and **not** used. TypeScript style and many type-aware checks come from **ESLint** (**flat config** via root **`eslint.config.mjs`**) with **neostandard**, **typescript-eslint** (v8.x), **eslint-plugin-vue** (v10), and **`@typescript-eslint`**, aligned with **TypeScript ~6.0** in `package.json`.
 - **Standalone typecheck**: `yarn lint:types` runs **`tsc -p tsconfig.json --pretty`** (no emit). Use it in CI, before commits, and whenever you change configs or broad typings.
+- Use **`import type`** for type-only imports in `.ts` and Vue `<script lang="ts">` blocks; do not keep value imports that are only used as types.
+- Prefer explicit type imports over inline `typeof import('...')` type annotations when a named type import can express the same intent.
 
 ## Commands
 

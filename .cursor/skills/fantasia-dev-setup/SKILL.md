@@ -64,6 +64,7 @@ quasar build -m electron
 | Goal | Command |
 |------|---------|
 | **Quality gate** (lint + `tsc` + style + unit tests, one terminal) | `yarn verify` |
+| **Full project gate** (verify + build + Playwright component + Playwright E2E) | `yarn ensure` |
 | ESLint | `yarn lint` |
 | TypeScript (`tsc`, no emit) | `yarn lint:types` |
 | Stylelint (Vue + SCSS) | `yarn lint:style` |

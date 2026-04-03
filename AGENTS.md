@@ -62,6 +62,7 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 ## Linting and static analysis
 
 - **No TSLint** — use **ESLint** (**`eslint.config.mjs`**, **neostandard**, **typescript-eslint**, **eslint-plugin-vue**), **`yarn lint:types`** for **`tsc -p tsconfig.json`**, and **`yarn lint:style`** for Vue/SCSS. Details: [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc).
+- In TypeScript code (including Vue `<script lang="ts">`), use `import type` for type-only imports.
 - **`@typescript-eslint` v8** / **typescript-eslint** should stay aligned with **TypeScript ~6.0** in `package.json` to avoid `typescript-estree` unsupported-version warnings (including from **vite-plugin-checker** in dev).
 - **`src/env.d.ts`** references **`.quasar/shims-vue.d.ts`** so `tsc` resolves `*.vue` while `tsconfig` excludes generated `.quasar` output.
 - Before commits that touch lint-covered sources, run the **quality gate** in one terminal: **`yarn verify`** (see [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) and commit gate in [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc)).
@@ -92,6 +93,7 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 - Treat 1:1 component-test parity as **coverage presence**, not exhaustive line/branch percentage coverage.
 - **Playwright** requires a **production build** before runs when source affecting the app has changed. Follow [playwright-tests.mdc](.cursor/rules/playwright-tests.mdc) for test sources; use [vue-template-test-hooks.mdc](.cursor/rules/vue-template-test-hooks.mdc) when changing locators in `.vue` templates. See `.cursor/skills/fantasia-testing/SKILL.md` and `README.md`.
 - **Terminal use**: run the **quality gate** with **`yarn verify`** unless debugging a single step ([testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc)). Run **`yarn build`**, **`yarn test:component`**, and **`yarn test:e2e`** each in its own terminal; do not chain those with each other or append them to the quality gate in one line.
+- **Full-suite one-shot**: use **`yarn ensure`** when you intentionally want one command to run `verify` + production build + Playwright component + Playwright E2E in sequence.
 
 ## Storybook expectations
 

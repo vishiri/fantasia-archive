@@ -12,6 +12,7 @@
     "lint:types": "tsc -p tsconfig.json --pretty",
     "lint:style": "stylelint \"src/**/*.{vue,scss}\"",
     "verify": "yarn lint && yarn lint:types && yarn lint:style && yarn test:unit",
+    "ensure": "yarn verify && yarn build && yarn test:component && yarn test:e2e",
     "dev:electron": "quasar dev -m electron",
     "build": "quasar build -m electron --publish never",
     "storybook": "yarn --cwd .storybook-workspace storybook",

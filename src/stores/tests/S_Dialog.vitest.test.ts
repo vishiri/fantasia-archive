@@ -1,5 +1,6 @@
 import { beforeEach, expect, test, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
+import type * as S_DialogStores from '../S_Dialog'
 
 const { uuidMock } = vi.hoisted(() => {
   return {
@@ -13,8 +14,8 @@ vi.mock('uuid', () => {
   }
 })
 
-let S_DialogMarkdown: Awaited<typeof import('../S_Dialog')>['S_DialogMarkdown']
-let S_DialogComponent: Awaited<typeof import('../S_Dialog')>['S_DialogComponent']
+let S_DialogMarkdown: typeof S_DialogStores.S_DialogMarkdown
+let S_DialogComponent: typeof S_DialogStores.S_DialogComponent
 
 beforeEach(async () => {
   setActivePinia(createPinia())

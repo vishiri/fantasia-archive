@@ -1,4 +1,4 @@
-import { I_socialContactButtonSet } from 'app/types/I_socialContactButtons'
+import type { I_socialContactButtonSet } from 'app/types/I_socialContactButtons'
 import { i18n } from 'app/src/i18n/externalFileLoader'
 
 export const buttonList: I_socialContactButtonSet = {

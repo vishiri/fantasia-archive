@@ -1,4 +1,5 @@
-import { BrowserWindow, MenuItem, Menu } from 'electron'
+import type { BrowserWindow } from 'electron'
+import { MenuItem, Menu } from 'electron'
 
 export const setupSpellChecker = (appWindow: BrowserWindow | undefined) => {
   if (!appWindow) return

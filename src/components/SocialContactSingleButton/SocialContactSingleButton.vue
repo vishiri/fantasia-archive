@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { I_socialContactButton } from 'app/types/I_socialContactButtons'
+import type { I_socialContactButton } from 'app/types/I_socialContactButtons'
 
 /**
  * All component props
