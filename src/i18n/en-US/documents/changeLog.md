@@ -5,7 +5,7 @@
 
 ### Bugfixes & Optimizations
 - Added explicit least-privilege `permissions` (`contents: read`) to both GitHub Actions workflows (`verify` and manual `build`) so CodeQL no longer flags missing workflow permission scoping.
-- Added dedicated security automation workflows for pull requests and repository hygiene: **Dependency Review** (blocks newly introduced high-severity vulnerable dependencies and now also runs on `push` plus manual dispatch), **OSV Scanner** (switched to Google reusable OSV workflows with `push`/`pull_request`/`merge_group` + weekly scheduled scanning on `master`), and **Gitleaks** (secret-leak detection on push/PR).
+- Added dedicated security automation workflows for pull requests and repository hygiene: **Dependency Review** (blocks newly introduced high-severity vulnerable dependencies on pull requests), **OSV Scanner** (switched to Google reusable OSV workflows with `push`/`pull_request`/`merge_group` + weekly scheduled scanning on `master`), and **Gitleaks** (secret-leak detection on push/PR).
 
 ## 2.4.8 - Pinia 3 and Vue Router 5
 
