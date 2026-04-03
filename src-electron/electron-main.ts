@@ -35,5 +35,5 @@ closeAppManager(platform)
 
 /*
 DB TESTING MANAGEMENT
-TODO: ADJUST THIS WHEN SETTING UP `sqlite3`
+TODO: ADJUST THIS WHEN SETTING UP `better-sqlite3`
 */

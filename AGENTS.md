@@ -41,7 +41,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | Unit tests     | Vitest (`yarn test:unit`)                                        |
 | UI / E2E tests | Playwright (`yarn test:components`, `yarn test:e2e`)              |
 | Component docs | Storybook 10 (`yarn storybook:run`, `yarn storybook:build`)        |
-| DB (evolving)  | `sqlite3` in main process (`src-electron/electron-main.ts` stub) |
+| DB (evolving)  | `better-sqlite3` in main process (`src-electron/electron-main.ts` stub) |
 
 
 ## Extending Electron APIs

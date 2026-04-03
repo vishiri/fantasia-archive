@@ -272,6 +272,6 @@ See [The quasar.config file](https://quasar.dev/quasar-cli-vite/quasar-config-fi
 
 The repo tracks a minimal [`.quasar/tsconfig.json`](.quasar/tsconfig.json) so TypeScript and Vitest can resolve Quasar path aliases before your first `quasar dev` / `quasar prepare`. Those commands regenerate `.quasar` contents; if the file changes locally, prefer the generated output from your machine’s Quasar version.
 
-### Native modules (sqlite3)
+### Native modules (better-sqlite3)
 
-After changing **Electron** or **Node** versions, run a clean `yarn install` on your machine. If `sqlite3` fails to load in the packaged app, rebuild native addons for your Electron version (for example `npx electron-rebuild` in the project root) and retry `yarn quasar:build:electron`.
+After changing **Electron** or **Node** versions, run a clean `yarn install` on your machine. If `better-sqlite3` fails to load in the packaged app, rebuild native addons for your Electron version (for example `npx electron-rebuild` in the project root) and retry `yarn quasar:build:electron`.
