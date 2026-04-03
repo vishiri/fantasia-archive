@@ -10,6 +10,9 @@ on:
         description: 'The version of the application being built'
         required: true
 
+permissions:
+  contents: read
+
 jobs:
 
   # Builds all major OS versions of FA

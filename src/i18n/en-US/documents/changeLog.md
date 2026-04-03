@@ -1,6 +1,11 @@
 # Changelog
 ----------
 
+## 2.4.9 - GitHub Actions permissions hardening
+
+### Bugfixes & Optimizations
+- Added explicit least-privilege `permissions` (`contents: read`) to both GitHub Actions workflows (`verify` and manual `build`) so CodeQL no longer flags missing workflow permission scoping.
+
 ## 2.4.8 - Pinia 3 and Vue Router 5
 
 ### Bugfixes & Optimizations
