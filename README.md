@@ -66,25 +66,25 @@ Stories live next to components as `*.stories.ts` under `src/components/**`.
 Visual regression checks with Playwright snapshots against Storybook:
 
 ```
-yarn visual:storybook:test
+yarn test:storybook:visual
 ```
 
 Run with visible browser (non-headless):
 
 ```
-yarn visual:storybook:test:headed
+yarn test:storybook:visual:headed
 ```
 
 Approve/update the current visual baseline snapshots:
 
 ```
-yarn visual:storybook:update
+yarn test:storybook:visual:update
 ```
 
 Update snapshots with visible browser:
 
 ```
-yarn visual:storybook:update:headed
+yarn test:storybook:visual:update:headed
 ```
 
 #### Integration gotchas (Storybook + Electron + Playwright)
@@ -142,10 +142,10 @@ Review this table against `src/components/**` stories each iteration and move hi
 
 #### Storybook visual baseline policy
 
-- Storybook **static build** output and **Playwright** visual config live in [`.storybook-workspace/`](.storybook-workspace/): `storybook-static/` (from `yarn storybook:build`) and [`playwright.storybook-visual.config.ts`](.storybook-workspace/playwright.storybook-visual.config.ts). Root `yarn visual:storybook:*` runs the build then delegates to `yarn --cwd .storybook-workspace storybook:visual:*`.
+- Storybook **static build** output and **Playwright** visual config live in [`.storybook-workspace/`](.storybook-workspace/): `storybook-static/` (from `yarn storybook:build`) and [`playwright.storybook-visual.config.ts`](.storybook-workspace/playwright.storybook-visual.config.ts). Root `yarn test:storybook:visual*` runs the build then delegates to `yarn --cwd .storybook-workspace test:storybook:visual*`.
 - Baselines live in [`.storybook-workspace/visual-tests/`](.storybook-workspace/visual-tests/) under `*.visual.playwright.test.ts-snapshots/`.
-- Use `yarn visual:storybook:update` only when UI changes are intentional and approved.
-- In pull requests, reviewers should inspect visual diff artifacts before accepting baseline changes.
+- Use `yarn test:storybook:visual:update` only when UI changes are intentional and approved.
+- When snapshots change in a pull request, reviewers should inspect the committed image diffs (and local **`yarn test:storybook:visual`** / HTML report under **`test-results/storybook-visual-*`**) before accepting baseline updates.
 - Keep snapshot updates scoped to affected stories/components; avoid broad regenerate-all updates unless there is a framework/theme-wide reason.
 - First-time local setup: install nested workspace deps (`yarn --cwd .storybook-workspace install` — CI does this too), then browser binaries (for example `yarn playwright install chromium` from the **repo root** for Electron Playwright; the same cache is used for Storybook VRT).
 - The following Storybook utility previews are intentionally excluded from visual snapshots because they are Playwright harness routes and do not represent meaningful visual-regression targets: `layouts-componenttestinglayout--with-social-contact-single-button`, `pages-componenttesting--social-contact-single-button`.
@@ -158,16 +158,28 @@ Run ESLint, the TypeScript project check (`tsc`), Stylelint, and Vitest unit tes
 yarn testbatch:verify
 ```
 
-For debugging a single step, run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, or `yarn test:unit` on its own, then run `yarn testbatch:verify` again before committing. Do not append `yarn quasar:build:electron` or Playwright commands to the same shell line as `yarn testbatch:verify`.
+For debugging a single step, run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, or `yarn test:unit` on its own, then run `yarn testbatch:verify` again before committing. Do not append `yarn quasar:build:electron`, Playwright, or Storybook smoke/visual commands to the same shell line as `yarn testbatch:verify` unless you intentionally run **`yarn testbatch:ensure:nochange`** or **`yarn testbatch:ensure:change`**.
 
 On **Yarn 1.x**, `yarn check` is a different built-in (dependency-tree validation); use **`yarn testbatch:verify`** for this gate.
 
-### Full suite gate (everything)
+#### GitHub Actions vs local full gate
 
-Run `testbatch:verify` + production build + Playwright component + Playwright E2E in sequence:
+The **Verify** workflow (`.github/workflows/verify.yml`) runs **`yarn testbatch:verify`** only (lint, types, stylelint, unit tests). It installs **`.storybook-workspace`** dependencies so ESLint can resolve that tree. It does **not** run **`yarn quasar:build:electron`**, Playwright component/E2E, **`yarn test:storybook:smoke`**, or **`yarn test:storybook:visual`**. For Storybook VRT and the full chained gate, run **`yarn test:storybook:visual`** / **`yarn testbatch:ensure:nochange`** locally (or the individual commands in separate terminals per [testing-terminal-isolation](.cursor/rules/testing-terminal-isolation.mdc)).
+
+### Full suite gates (everything + Storybook)
+
+Run **`yarn testbatch:verify`**, production Electron build, Playwright component + E2E, Storybook smoke, then Storybook visual regression — in one chain:
+
+**Compare against committed Storybook VRT snapshots** (default full gate; fails if snapshots drift):
 
 ```
-yarn testbatch:ensure
+yarn testbatch:ensure:nochange
+```
+
+**Refresh Storybook VRT baselines** after approved UI changes (writes new snapshots; review and commit diffs):
+
+```
+yarn testbatch:ensure:change
 ```
 
 ### Testing
@@ -224,7 +236,7 @@ yarn test:e2e:single --spec=SPEC_FILE_NAME
 
 #### One-shot verification (full project gate)
 
-**`yarn testbatch:ensure`** runs **`yarn testbatch:verify`**, a production Electron build, then **`yarn test:components`** and **`yarn test:e2e`** in sequence—the intentional way to chain lint, unit tests, build, and both Playwright suites. For lighter checks, run **`yarn test:unit`** and the Playwright commands separately in their own terminals (see [testing-terminal-isolation](.cursor/rules/testing-terminal-isolation.mdc) in this repo).
+**`yarn testbatch:ensure:nochange`** runs **`yarn testbatch:verify`**, a production Electron build, **`yarn test:components`**, **`yarn test:e2e`**, **`yarn test:storybook:smoke`**, and **`yarn test:storybook:visual`** in sequence—the intentional way to chain lint, unit tests, build, both Playwright suites, and Storybook smoke plus snapshot compare. **`yarn testbatch:ensure:change`** is the same through smoke, then **`yarn test:storybook:visual:update`** instead of compare; use only when you mean to regenerate baselines. For lighter checks, run **`yarn test:unit`** and individual commands in their own terminals (see [testing-terminal-isolation](.cursor/rules/testing-terminal-isolation.mdc) in this repo).
 
 ### Scripts reference (`package.json`)
 
@@ -236,7 +248,8 @@ yarn test:e2e:single --spec=SPEC_FILE_NAME
 | `yarn lint:stylelint` | Run Stylelint for Vue/SCSS styles. |
 | `yarn lint:typescript` | Run TypeScript project check (`tsc`, no emit). |
 | `yarn testbatch:verify` | Quick gate: lint + typecheck + stylelint + unit tests. |
-| `yarn testbatch:ensure` | Full gate: `testbatch:verify` + `quasar:build:electron` + Playwright component + Playwright E2E. |
+| `yarn testbatch:ensure:nochange` | Full gate: `testbatch:verify` + `quasar:build:electron` + Playwright component + E2E + Storybook smoke + `test:storybook:visual` (snapshot compare). |
+| `yarn testbatch:ensure:change` | Same through smoke, then `test:storybook:visual:update` (refresh VRT baselines; use only when intentional). |
 | `yarn test:unit` | Run Vitest core then component unit suites. |
 | `yarn test:components` | Run all Playwright component tests. |
 | `yarn test:components:single --component=...` | Run a single component Playwright test by folder path. |
@@ -246,15 +259,13 @@ yarn test:e2e:single --spec=SPEC_FILE_NAME
 | `yarn test:e2e:single --spec=...` | Run one E2E spec by spec file name. |
 | `yarn test:e2e:single:ci --spec=...` | Run one E2E spec by direct path. |
 | `yarn test:e2e:list` | Open interactive picker for E2E tests. |
+| `yarn test:storybook:smoke` | Run Storybook smoke check in CI-friendly mode. |
+| `yarn test:storybook:visual` | Compare Storybook stories with committed Playwright visual snapshots. |
+| `yarn test:storybook:visual:headed` | Run visual comparisons with a visible browser window. |
+| `yarn test:storybook:visual:update` | Refresh Storybook visual snapshots after approved UI changes. |
+| `yarn test:storybook:visual:update:headed` | Update visual snapshots with a visible browser window. |
 | `yarn storybook:run` | Start Storybook from `.storybook-workspace`. |
 | `yarn storybook:build` | Build static Storybook output into `.storybook-workspace/storybook-static/`. |
-| `yarn storybook:smoke` | Run Storybook smoke check in CI-friendly mode. |
-| `yarn visual:storybook:test` | Compare Storybook stories with committed Playwright visual snapshots. |
-| `yarn visual:storybook:update` | Refresh Storybook visual snapshots after approved UI changes. |
-| `yarn visual:storybook:test:headed` | Run visual comparisons with a visible browser window. |
-| `yarn visual:storybook:update:headed` | Update visual snapshots with a visible browser window. |
-| `yarn visual:storybook:test:local` | Headed local run without rebuilding Storybook first (faster iteration). |
-| `yarn visual:storybook:update:local` | Headed local snapshot update without rebuilding Storybook first. |
 
 ### Customize the configuration
 See [The quasar.config file](https://quasar.dev/quasar-cli-vite/quasar-config-file) (this repo uses `quasar.config.ts`).

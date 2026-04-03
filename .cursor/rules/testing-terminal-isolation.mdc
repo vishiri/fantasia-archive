@@ -19,21 +19,26 @@ Equivalent explicit chain (for context or copy-paste without the script): `yarn 
 
 By default, do not extend this chain with `yarn quasar:build:electron`, Playwright, or Storybook.
 
-## Full-suite gate (`testbatch:ensure`)
+## Full-suite gates (`testbatch:ensure:nochange` / `testbatch:ensure:change`)
 
-When you explicitly need the full project gate in one command, use:
+When you explicitly need the full project gate in one command, use one of:
 
-`yarn testbatch:ensure`
+- **`yarn testbatch:ensure:nochange`** — `testbatch:verify`, production Electron build, Playwright component + E2E, **`yarn test:storybook:smoke`**, then **`yarn test:storybook:visual`** (compare committed Storybook VRT snapshots; fails on drift).
+- **`yarn testbatch:ensure:change`** — same chain through E2E and smoke, then **`yarn test:storybook:visual:update`** to refresh Storybook VRT baselines. Use only when intentional UI changes are approved and you will commit the updated snapshots.
 
-`testbatch:ensure` runs `testbatch:verify` plus production build, Playwright component tests, and Playwright E2E tests in sequence. Treat this as the intentional exception to the isolation rule.
+Treat these as the intentional exception to the isolation rule. **Do not** run **`testbatch:ensure:change`** in CI or to validate an unchanged baseline.
+
+The default **GitHub Actions** **Verify** workflow (`.github/workflows/verify.yml`) runs **`yarn testbatch:verify`** only — not Storybook smoke/visual, Electron production build, or Playwright component/E2E. Run **`yarn test:storybook:visual`** / **`yarn testbatch:ensure:nochange`** locally when you need VRT.
 
 ## Everything else — one command per terminal
 
-Run each of these in its **own** terminal invocation (do not chain them with each other or with the quality gate in the same line) unless you are intentionally running `yarn testbatch:ensure`:
+Run each of these in its **own** terminal invocation (do not chain them with each other or with the quality gate in the same line) unless you are intentionally running **`yarn testbatch:ensure:nochange`** or **`yarn testbatch:ensure:change`**:
 
 - `yarn quasar:build:electron`
 - `yarn test:components`
 - `yarn test:e2e`
+- `yarn test:storybook:smoke`
+- `yarn test:storybook:visual` / `yarn test:storybook:visual:update` (and other `test:storybook:visual*` variants)
 
 Keep logs isolated for readability and easier failure triage.
 

@@ -37,11 +37,11 @@ Match **existing** tests to the letter when adding or editing:
 
 ### Cross-toolchain alignment (Storybook + Electron + same repo)
 
-- **Storybook** — Runs from [`.storybook-workspace/`](../../../.storybook-workspace/); config must keep `staticDirs` (and related Vite `public/` wiring) in sync with the Quasar app so public assets resolve the same way in Storybook dev and `yarn storybook:build` output. See [`.storybook-workspace/.storybook/main.ts`](../../../.storybook-workspace/.storybook/main.ts). **Static build** lands in `.storybook-workspace/storybook-static/`. **Storybook VRT** uses [`.storybook-workspace/playwright.storybook-visual.config.ts`](../../../.storybook-workspace/playwright.storybook-visual.config.ts) and `.storybook-workspace/visual-tests/`; root `yarn visual:storybook:*` chains `yarn storybook:build` with `yarn --cwd .storybook-workspace storybook:visual:*`. `@playwright/test`, `playwright`, and `http-server` for that flow are **devDependencies of `.storybook-workspace`** (install with `yarn --cwd .storybook-workspace install`).
+- **Storybook** — Runs from [`.storybook-workspace/`](../../../.storybook-workspace/); config must keep `staticDirs` (and related Vite `public/` wiring) in sync with the Quasar app so public assets resolve the same way in Storybook dev and `yarn storybook:build` output. See [`.storybook-workspace/.storybook/main.ts`](../../../.storybook-workspace/.storybook/main.ts). **Static build** lands in `.storybook-workspace/storybook-static/`. **Storybook VRT** uses [`.storybook-workspace/playwright.storybook-visual.config.ts`](../../../.storybook-workspace/playwright.storybook-visual.config.ts) and `.storybook-workspace/visual-tests/`; root `yarn test:storybook:visual*` chains `yarn storybook:build` with `yarn --cwd .storybook-workspace test:storybook:visual*`. `@playwright/test`, `playwright`, and `http-server` for that flow are **devDependencies of `.storybook-workspace`** (install with `yarn --cwd .storybook-workspace install`).
 - **Electron `file://`** — Packaged renderer paths are not a web origin at `/`. If `import.meta.env.BASE_URL` is `'/'` or empty, building `public/` URLs as `/images/...` can fail loading; use a relative prefix (e.g. `./`) for those assets (see `SocialContactSingleButton.vue`).
 - **Playwright** — Same rebuild rule as above: **`yarn quasar:build:electron` before `yarn test:components` / `yarn test:e2e`** when exercised sources changed; flaky UI in tests after a green Storybook pass often means a stale build or a `file://` URL mismatch.
 - **Storybook visual snapshots** — Keep `layouts-componenttestinglayout--with-social-contact-single-button` and `pages-componenttesting--social-contact-single-button` excluded from snapshot collection; they are Playwright harness utility previews and are not meaningful VRT surfaces.
-- **One-shot full suite** — `yarn testbatch:ensure` runs `yarn testbatch:verify` + `yarn quasar:build:electron` + `yarn test:components` + `yarn test:e2e` in sequence for a complete project gate.
+- **One-shot full suite** — **`yarn testbatch:ensure:nochange`** runs **`yarn testbatch:verify`** + **`yarn quasar:build:electron`** + **`yarn test:components`** + **`yarn test:e2e`** + **`yarn test:storybook:smoke`** + **`yarn test:storybook:visual`** (committed snapshot compare). **`yarn testbatch:ensure:change`** is the same through smoke, then **`yarn test:storybook:visual:update`** for intentional baseline refresh only.
 
 ### Config highlights (`playwright.config.ts`)
 
@@ -71,13 +71,14 @@ Match **existing** tests to the letter when adding or editing:
 
 ### Full project gate
 
-- `yarn testbatch:ensure` runs **lint + types + style + unit + production build + Playwright component + Playwright E2E** in one chain (see **[testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)** for when to split commands across terminals instead).
+- **`yarn testbatch:ensure:nochange`** runs **lint + types + style + unit + production build + Playwright component + Playwright E2E + Storybook smoke + Storybook visual compare** in one chain. **`yarn testbatch:ensure:change`** ends with **Storybook visual snapshot update** instead of compare — use only when baselines should change (see **[testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)** for when to split commands across terminals instead).
 
 ## Checklist when changing UI or Electron shell
 
 1. **Quality gate** in one terminal: `yarn testbatch:verify` — fix issues per [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
 2. Rebuild: `yarn quasar:build:electron` (or `quasar build -m electron`) — its own terminal.
-3. `yarn test:components` / `yarn test:e2e` as needed — each in its own terminal; do not chain with `yarn quasar:build:electron` or with each other in one line, unless you intentionally run `yarn testbatch:ensure`.
+3. `yarn test:components` / `yarn test:e2e` as needed — each in its own terminal; do not chain with `yarn quasar:build:electron` or with each other in one line, unless you intentionally run **`yarn testbatch:ensure:nochange`** or **`yarn testbatch:ensure:change`**.
+4. When Storybook-backed UI or VRT snapshots are in scope: run **`yarn test:storybook:smoke`** and **`yarn test:storybook:visual`** (or use **`yarn testbatch:ensure:nochange`** to cover verify + build + Playwright + Storybook in one shot). Use **`yarn testbatch:ensure:change`** only when deliberately updating committed Storybook snapshots.
 
 ## Choosing Vitest vs Playwright in renderer work
 
@@ -86,8 +87,8 @@ Match **existing** tests to the letter when adding or editing:
 
 ## Storybook smoke checks (component authoring support)
 
-- Storybook commands: `yarn storybook:run` (interactive) and `yarn storybook:smoke` / `storybook dev --smoke-test --ci` (startup verification).
-- **Visual regression (Playwright + static Storybook)**: after `yarn storybook:build`, run `yarn visual:storybook:test` from the repo root, or `yarn --cwd .storybook-workspace storybook:visual:test` if `storybook-static/` is already present. Update baselines with `yarn visual:storybook:update` (or workspace `storybook:visual:update`). HTML/report output stays under repo-root `test-results/storybook-visual-*` for CI artifacts.
+- Storybook commands: `yarn storybook:run` (interactive) and `yarn test:storybook:smoke` / `storybook dev --smoke-test --ci` (startup verification).
+- **Visual regression (Playwright + static Storybook)**: after `yarn storybook:build`, run `yarn test:storybook:visual` from the repo root, or `yarn --cwd .storybook-workspace test:storybook:visual` if `storybook-static/` is already present. Update baselines with `yarn test:storybook:visual:update` (or workspace `test:storybook:visual:update`). HTML/report output and artifacts stay under repo-root **`test-results/storybook-visual-*`** locally (not run in **GitHub Actions**; use **`yarn testbatch:ensure:nochange`** or the individual scripts when you need the full gate).
 - Keep **component** Storybook stories colocated as `src/components/**/<Component>.stories.ts`.
 - **`src/layouts/**` and `src/pages/**` stories** (if present) are canvas-only previews; do **not** expect or add Storybook Docs/autodocs for them (see [`storybook-stories.mdc`](../../rules/storybook-stories.mdc)).
 - When components rely on i18n-backed markdown docs, avoid importing full locale roots in Storybook mocks; use focused `T_*` translation module imports plus placeholder `documents.*` strings to prevent markdown import-analysis failures.

@@ -23,6 +23,7 @@ description: >-
 1. **Quality gate** in one terminal: `yarn testbatch:verify` ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
 2. `yarn quasar:build:electron` (separate terminal); smoke-test the packaged app on target OS(es).
 3. Run Playwright suites that matter after the same build (`yarn test:components`, `yarn test:e2e`) — see [fantasia-testing](../fantasia-testing/SKILL.md).
+4. For Storybook smoke + visual snapshot compare in one chain with the steps above, use **`yarn testbatch:ensure:nochange`** instead of piecing commands manually (or run **`yarn test:storybook:smoke`** and **`yarn test:storybook:visual`** separately after the build steps as needed).
 
 ## Versioning
 

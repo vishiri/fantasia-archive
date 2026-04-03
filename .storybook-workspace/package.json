@@ -3,15 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "smoke-storybook": "storybook dev -p 6006 -c .storybook --smoke-test --ci --disable-telemetry",
     "storybook:build": "storybook build -c .storybook -o storybook-static --disable-telemetry",
     "storybook:run": "storybook dev -p 6006 -c .storybook --disable-telemetry",
-    "storybook:visual:test": "playwright test --config playwright.storybook-visual.config.ts",
-    "storybook:visual:test:headed": "playwright test --config playwright.storybook-visual.config.ts --headed",
-    "storybook:visual:test:local": "playwright test --config playwright.storybook-visual.config.ts --headed",
-    "storybook:visual:update": "playwright test --config playwright.storybook-visual.config.ts --update-snapshots",
-    "storybook:visual:update:headed": "playwright test --config playwright.storybook-visual.config.ts --update-snapshots --headed",
-    "storybook:visual:update:local": "playwright test --config playwright.storybook-visual.config.ts --update-snapshots --headed"
+    "test:storybook:smoke": "storybook dev -p 6006 -c .storybook --smoke-test --ci --disable-telemetry",
+    "test:storybook:visual": "playwright test --config playwright.storybook-visual.config.ts",
+    "test:storybook:visual:headed": "playwright test --config playwright.storybook-visual.config.ts --headed",
+    "test:storybook:visual:update": "playwright test --config playwright.storybook-visual.config.ts --update-snapshots",
+    "test:storybook:visual:update:headed": "playwright test --config playwright.storybook-visual.config.ts --update-snapshots --headed"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.1",

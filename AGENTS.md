@@ -1,6 +1,6 @@
 # AI and agent notes — Fantasia Archive
 
-This repository is **Fantasia Archive**: a **worldbuilding database manager** shipped as a **Quasar + Vue 3 + Electron** desktop app (GPL-3.0). Use **Yarn 1.x** and **Node.js 22.22.0 or newer** for local work (see `README.md` and `package.json` `engines.node`; Quasar `@quasar/app-vite` v2 enforces this minimum). CI uses **22.22** (see `.github/workflows/build.yml`).
+This repository is **Fantasia Archive**: a **worldbuilding database manager** shipped as a **Quasar + Vue 3 + Electron** desktop app (GPL-3.0). Use **Yarn 1.x** and **Node.js 22.22.0 or newer** for local work (see `README.md` and `package.json` `engines.node`; Quasar `@quasar/app-vite` v2 enforces this minimum). CI uses **22.22** on push/PR (**`.github/workflows/verify.yml`** runs **`yarn testbatch:verify`** only) and on manual release builds (**`.github/workflows/build.yml`**).
 
 ## Where project AI guidance lives
 
@@ -25,7 +25,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc) | Always — `type: subject` commits; see skill for split + approval workflow |
 | [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc)                   | Always — en-US `changeLog.md` vs `package.json` version (see skill)       |
 | [plan-documents.mdc](.cursor/rules/plan-documents.mdc)                     | Always — plan files in `.cursor/plans` with timestamp + version metadata  |
-| [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) | Always — **quality gate** via `yarn testbatch:verify`; `yarn quasar:build:electron` / Playwright each in their own terminal |
+| [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) | Always — **quality gate** via `yarn testbatch:verify`; `yarn quasar:build:electron`, Playwright, and Storybook test/VRT each in their own terminal unless using **`yarn testbatch:ensure:nochange`** / **`yarn testbatch:ensure:change`** |
 
 
 ## Stack (short)
@@ -81,7 +81,7 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 ## Changelog (in-app)
 
 - English changelog: [src/i18n/en-US/documents/changeLog.md](src/i18n/en-US/documents/changeLog.md). **Version** in [package.json](package.json) is the only source of truth. **NEVER, EVER, UNDER ANY CIRCUMSTANCES** auto-bump any version in changelog or `package.json`; update changelog entries under the existing package version unless the user explicitly requests a manual version change. Do not add empty `###` sections or “none” placeholder bullets.
-- Changelog bullets are for **user- or release-relevant changes** (features, fixes, meaningful dependency refreshes, etc.). **Do not** log internal QA as changelog text: omit lines that only say the team re-ran `yarn testbatch:verify`, `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, production builds, Playwright component tests, E2E, or that “all gates passed”. Follow [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc) and [fantasia-changelog-en-us skill](.cursor/skills/fantasia-changelog-en-us/SKILL.md).
+- Changelog bullets are for **user- or release-relevant changes** (features, fixes, meaningful dependency refreshes, etc.). **Do not** log internal QA as changelog text: omit lines that only say the team re-ran `yarn testbatch:verify`, `yarn testbatch:ensure:nochange`, `yarn testbatch:ensure:change`, `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, production builds, Playwright component tests, E2E, Storybook smoke/visual runs, or that “all gates passed”. Follow [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc) and [fantasia-changelog-en-us skill](.cursor/skills/fantasia-changelog-en-us/SKILL.md).
 - Changelog-edit guard: always re-open [package.json](package.json) immediately before updating changelog content and use that live `version` value for section targeting.
 - For changelog updates tied to fresh work, ensure Storybook updates/checks for affected **`src/components/**`** UI are completed before editing the changelog entry.
 
@@ -93,8 +93,8 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 - Treat 1:1 component-test parity as **coverage presence**, not exhaustive line/branch percentage coverage.
 - **Playwright** requires a **production build** before runs when source affecting the app has changed. Follow [playwright-tests.mdc](.cursor/rules/playwright-tests.mdc) for test sources; use [vue-template-test-hooks.mdc](.cursor/rules/vue-template-test-hooks.mdc) when changing locators in `.vue` templates. See `.cursor/skills/fantasia-testing/SKILL.md` and `README.md`.
 - Storybook visual snapshots intentionally ignore these Playwright-harness-only utility stories (not meaningful VRT targets): `layouts-componenttestinglayout--with-social-contact-single-button`, `pages-componenttesting--social-contact-single-button`.
-- **Terminal use**: run the **quality gate** with **`yarn testbatch:verify`** unless debugging a single step ([testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc)). Run **`yarn quasar:build:electron`**, **`yarn test:components`**, and **`yarn test:e2e`** each in its own terminal; do not chain those with each other or append them to the quality gate in one line.
-- **Full-suite one-shot**: use **`yarn testbatch:ensure`** when you intentionally want one command to run `testbatch:verify` + `quasar:build:electron` + Playwright component + Playwright E2E in sequence.
+- **Terminal use**: run the **quality gate** with **`yarn testbatch:verify`** unless debugging a single step ([testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc)). Run **`yarn quasar:build:electron`**, **`yarn test:components`**, **`yarn test:e2e`**, **`yarn test:storybook:smoke`**, and **`yarn test:storybook:visual`** (or **`:update`**) each in its own terminal; do not chain those with each other or append them to the quality gate in one line unless you intentionally run **`yarn testbatch:ensure:nochange`** or **`yarn testbatch:ensure:change`**.
+- **Full-suite one-shot**: use **`yarn testbatch:ensure:nochange`** when you want one command to run `testbatch:verify` + `quasar:build:electron` + Playwright component + Playwright E2E + **`yarn test:storybook:smoke`** + **`yarn test:storybook:visual`** (snapshot compare). Use **`yarn testbatch:ensure:change`** only when deliberately refreshing Storybook VRT baselines (ends with **`yarn test:storybook:visual:update`**); commit the resulting snapshot diffs with care. See [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc).
 
 ## Storybook expectations
 
@@ -110,7 +110,7 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 
 The same Vue UI runs under **dev server**, **Storybook**, **packaged Electron (`file://`)**, and **Playwright-driven Electron**. When something passes in one runner and fails in another, check these first:
 
-- **Storybook** — CLI, Vite/Storybook config, **static build output** (`storybook-static/`), **Playwright** visual-regression config, and **`visual-tests/`** all live under [`.storybook-workspace/`](.storybook-workspace/) (see `.storybook-workspace/.storybook/`). Root `yarn storybook:run` / `yarn storybook:build` / `yarn visual:storybook:*` delegate there. Keep [`staticDirs`](.storybook-workspace/.storybook/main.ts) and repo `public/` serving (including any Vite middleware for dev) aligned so assets such as `/images/...` match the Quasar app.
+- **Storybook** — CLI, Vite/Storybook config, **static build output** (`storybook-static/`), **Playwright** visual-regression config, and **`visual-tests/`** all live under [`.storybook-workspace/`](.storybook-workspace/) (see `.storybook-workspace/.storybook/`). Root `yarn storybook:run` / `yarn storybook:build` / `yarn test:storybook:visual*` delegate there. **GitHub Actions** does not run Storybook VRT; use local **`yarn test:storybook:visual`** or **`yarn testbatch:ensure:nochange`**. Keep [`staticDirs`](.storybook-workspace/.storybook/main.ts) and repo `public/` serving (including any Vite middleware for dev) aligned so assets such as `/images/...` match the Quasar app.
 - **Electron packaged renderer** — Root-relative URLs like `/images/...` (common when `import.meta.env.BASE_URL` is `'/'` or empty) do **not** resolve next to `index.html` under `file://`. For files in `public/`, prefer a **relative** base (e.g. `./images/...`) when normalizing `BASE_URL`, unless the app is always served over HTTP with a matching absolute base.
 - **Playwright** — Component and E2E suites use the **production** Electron build. After changes to code those tests exercise, run `yarn quasar:build:electron` before `yarn test:components` / `yarn test:e2e`. See [fantasia-testing skill](.cursor/skills/fantasia-testing/SKILL.md).
 

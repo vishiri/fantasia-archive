@@ -1,3 +1,5 @@
+# PR/push: quality gate only. Storybook VRT (`yarn test:storybook:visual*`) runs locally or via
+# `yarn testbatch:ensure:nochange` — not in CI.
 name: Verify
 
 on:
@@ -36,44 +38,3 @@ jobs:
 
       - name: Quality gate
         run: yarn testbatch:verify
-
-  visual-regression-storybook-playwright:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - name: Check out the code
-        uses: actions/checkout@v5
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: '22.22'
-          cache: yarn
-          cache-dependency-path: |
-            yarn.lock
-            .storybook-workspace/yarn.lock
-
-      - name: Install Yarn 1.x
-        run: npm install -g yarn@1.22.19
-
-      - name: Install root dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Install Storybook workspace dependencies
-        run: yarn --cwd .storybook-workspace install --frozen-lockfile
-
-      - name: Install Playwright Chromium
-        run: yarn playwright install --with-deps chromium
-
-      - name: Run Storybook visual regression (informational)
-        run: yarn visual:storybook:test
-
-      - name: Upload Storybook visual diff artifacts
-        if: failure()
-        uses: actions/upload-artifact@v5
-        with:
-          name: storybook-visual-artifacts
-          path: |
-            test-results/storybook-visual-artifacts
-            test-results/storybook-visual-report
-          if-no-files-found: ignore

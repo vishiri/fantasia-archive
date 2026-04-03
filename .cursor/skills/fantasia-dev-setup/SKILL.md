@@ -14,6 +14,7 @@ description: >-
 - **Package manager**: Yarn 1.x (README: use Yarn 1.22.19; avoid npm-only workflows for day-to-day work).
 - **Node.js**: **22.22.0 or newer** (`package.json` `engines.node` is `>=22.22.0`; Quasar `@quasar/app-vite` v2 aligns with this). Use `nvm` / `fnm` to pin (e.g. `nvm use 22.22`).
 - **Quasar CLI** (recommended): `yarn global add @quasar/cli` — ensure the global Yarn bin is on `PATH`.
+- **CI (push/PR)**: [`.github/workflows/verify.yml`](../../../.github/workflows/verify.yml) runs **`yarn testbatch:verify`** only (installs **`.storybook-workspace`** for ESLint). **Storybook** VRT (`yarn test:storybook:visual*`) is **not** run in **GitHub Actions** — use **`yarn testbatch:ensure:nochange`** or the individual scripts locally.
 
 ## Install
 
@@ -64,7 +65,8 @@ quasar build -m electron
 | Goal | Command |
 |------|---------|
 | **Quality gate** (lint + `tsc` + style + unit tests, one terminal) | `yarn testbatch:verify` |
-| **Full project gate** (`testbatch:verify` + `quasar:build:electron` + Playwright component + Playwright E2E) | `yarn testbatch:ensure` |
+| **Full project gate** (verify + Electron build + Playwright component + E2E + Storybook smoke + VRT compare) | `yarn testbatch:ensure:nochange` |
+| **Full project gate — refresh Storybook VRT baselines** (same through smoke, then snapshot update) | `yarn testbatch:ensure:change` |
 | ESLint | `yarn lint:eslint` |
 | TypeScript (`tsc`, no emit) | `yarn lint:typescript` |
 | Stylelint (Vue + SCSS) | `yarn lint:stylelint` |
@@ -72,6 +74,6 @@ quasar build -m electron
 | Component tests (Playwright) | `yarn test:components` (after production build) |
 | E2E tests (Playwright) | `yarn test:e2e` (after production build) |
 
-**Storybook** nested package: run **`yarn`** at the repo root, then **`yarn --cwd .storybook-workspace install`** so **`yarn storybook:run`** / **`yarn storybook:build`** / **`yarn visual:storybook:*`** (Playwright VRT) resolve their dependencies.
+**Storybook** nested package: run **`yarn`** at the repo root, then **`yarn --cwd .storybook-workspace install`** so **`yarn storybook:run`** / **`yarn storybook:build`** / **`yarn test:storybook:visual*`** (Playwright VRT) resolve their dependencies.
 
 See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) for ESLint vs TSLint, `tsconfig` / `tsc`, and Vitest env typing. See [fantasia-testing](../fantasia-testing/SKILL.md) for test details. **Yarn 1.x** reserves `yarn check` for dependency verification — use **`yarn testbatch:verify`** for the lint/types/style/unit gate ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).

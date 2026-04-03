@@ -33,7 +33,7 @@ Skip trivial-only edits (typo in a comment, pure format) unless the user wants e
 
 The English changelog is shown **in the app** to end users. **Do not** add bullets that only record internal verification or maintainer QA, for example:
 
-- Re-running `yarn testbatch:verify`, `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, `yarn quasar:build:electron`, `yarn test:components`, or `yarn test:e2e`
+- Re-running `yarn testbatch:verify`, `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, `yarn quasar:build:electron`, `yarn test:components`, `yarn test:e2e`, `yarn testbatch:ensure:nochange`, `yarn testbatch:ensure:change`, `yarn test:storybook:smoke`, or `yarn test:storybook:visual` / **`:update`**
 - Phrases like “revalidated the pipeline”, “all tests passed”, “Playwright/E2E/component suite green”, “full quality gates”, or “packaging succeeded after QA”
 
 Those steps may be **required before** you edit the changelog (see repo rules), but they are **not** changelog content. Put verification detail in commit messages or PR descriptions instead.
