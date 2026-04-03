@@ -11,6 +11,7 @@
 - Standardized type-only imports across the TypeScript and Vue codebase (`import type`) to align with strict linting and keep runtime bundles free of type-only import noise.
 - Added a new `yarn ensure` command for full-project validation (`verify` + production build + Playwright component + Playwright E2E) and aligned contributor guidance in **README**, **AGENTS**, and Cursor rules/skills to document the quick gate vs full gate workflow clearly.
 - Reduced non-actionable Vue warning noise in component Vitest output by filtering known Quasar-resolution and test-only injection warnings in shared test setup, keeping signal focused on actionable failures.
+- Fixed CI TypeScript resolution for Vue SFC imports by replacing the generated `.quasar` shim reference in `src/env.d.ts` with an in-repo `declare module '*.vue'` declaration, so `yarn verify` succeeds on clean GitHub runners without requiring local/generated `.quasar` shim files.
 
 ## 2.4.7 - Storybook 10 and Vite 8 alignment
 
