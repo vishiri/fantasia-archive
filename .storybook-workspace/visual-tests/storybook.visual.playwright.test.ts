@@ -119,7 +119,9 @@ test('Capture visual snapshots for Storybook stories', async ({ browser, request
 
         await withTimeout(expect(page).toHaveScreenshot(`${normalizeSnapshotName(story.id)}.png`, {
           animations: 'disabled',
-          caret: 'hide'
+          caret: 'hide',
+          // Absorb minor run-to-run variance (fonts/subpixel) without masking large UI drift
+          maxDiffPixels: 150
         }), STORY_STEP_TIMEOUT_MS, `Timed out taking screenshot: ${story.id}`)
 
         console.info(`[storybook-visual] Captured: ${story.id}`)

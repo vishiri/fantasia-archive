@@ -1,12 +1,13 @@
 # Changelog
 ----------
 
-## 2.4.10 - Contributor test scripts and verify workflow
+## 2.4.10 - Contributor test scripts, verify CI, and dependency refresh
 
 ### Bugfixes & Optimizations
 - Renamed Storybook-related **Yarn** scripts under **`test:storybook:*`**: **`yarn test:storybook:visual`** (with **`:headed`**, **`:update`**, **`:update:headed`**) replaces **`yarn visual:storybook:*`**; **`yarn test:storybook:smoke`** replaces **`yarn storybook:smoke`**. **`.storybook-workspace`** script keys match. Updated **README**, **AGENTS**, Cursor rules/skills, and plan notes.
 - Split the full-project gate: **`yarn testbatch:ensure:nochange`** runs **`testbatch:verify`**, production **Electron** build, **Playwright** component + **E2E**, **`yarn test:storybook:smoke`**, and **`yarn test:storybook:visual`** (snapshot compare). **`yarn testbatch:ensure:change`** is the same through smoke, then **`yarn test:storybook:visual:update`** for intentional baseline refresh. Removed **`yarn testbatch:ensure`**. Updated **README**, **AGENTS**, **testing-terminal-isolation**, **fantasia-testing**, **fantasia-dev-setup**, **fantasia-release-build**, and **changelog-en-us** guidance.
 - Removed the **GitHub Actions** Storybook visual-regression job from **`.github/workflows/verify.yml`** and renamed the workflow to **Verify** (push/PR runs **`yarn testbatch:verify`** only; **`.storybook-workspace`** install kept for ESLint). Storybook VRT stays **local** or via **`yarn testbatch:ensure:nochange`**. Updated **README**, **AGENTS**, **testing-terminal-isolation**, **fantasia-testing**, **fantasia-dev-setup**, and **fantasia-changelog-en-us** (omit-list wording).
+- Bumped **Vue** to **`^3.5.32`** (root and **`.storybook-workspace`**), **`@types/node`** to **`^22.19.17`**, refreshed **root** and **`.storybook-workspace`** lockfiles with **`yarn upgrade`**, and set Storybook VRT **`toHaveScreenshot`** **`maxDiffPixels: 150`** so compare runs stay stable across rebuilds. Refreshed one **Win32** chromium snapshot affected by the toolchain bump.
 
 ## 2.4.9 - Contributor tooling, Pinia dialogs, and CI hardening
 
