@@ -8,7 +8,7 @@ alwaysApply: true
 ## What this project uses (not TSLint)
 
 - **TSLint** is deprecated and **not** used. TypeScript style and many type-aware checks come from **ESLint** (**flat config** via root **`eslint.config.mjs`**) with **neostandard**, **typescript-eslint** (v8.x), **eslint-plugin-vue** (v10), and **`@typescript-eslint`**, aligned with **TypeScript ~6.0** in `package.json`.
-- **Standalone typecheck**: `yarn lint:types` runs **`tsc -p tsconfig.json --pretty`** (no emit). Use it in CI, before commits, and whenever you change configs or broad typings.
+- **Standalone typecheck**: `yarn lint:typescript` runs **`tsc -p tsconfig.json --pretty`** (no emit). Use it in CI, before commits, and whenever you change configs or broad typings.
 - Use **`import type`** for type-only imports in `.ts` and Vue `<script lang="ts">` blocks; do not keep value imports that are only used as types.
 - Prefer explicit type imports over inline `typeof import('...')` type annotations when a named type import can express the same intent.
 
@@ -16,15 +16,15 @@ alwaysApply: true
 
 | Command | Role |
 |--------|------|
-| `yarn lint` | ESLint over `src/`, `src-electron/`, `e2e-tests/`, `types/`, Quasar/Vitest/Playwright configs, and `.storybook-workspace/.storybook/` — see `package.json` `lint` script. |
-| `yarn lint:types` | Full **`tsc`** project check (Vue shim + Quasar paths via `tsconfig.json` → `.quasar/tsconfig.json`). |
-| `yarn lint:style` | Stylelint on `src/**/*.vue` and `src/**/*.scss`. |
+| `yarn lint:eslint` | ESLint over `src/`, `src-electron/`, `e2e-tests/`, `types/`, Quasar/Vitest/Playwright configs, and `.storybook-workspace/.storybook/` — see `package.json` `lint:eslint` script. |
+| `yarn lint:stylelint` | Stylelint on `src/**/*.vue` and `src/**/*.scss`. |
+| `yarn lint:typescript` | Full **`tsc`** project check (Vue shim + Quasar paths via `tsconfig.json` → `.quasar/tsconfig.json`). |
 
 ## Pre-commit / pre-changelog quality gate
 
-Before commits or changelog edits tied to product or test work, run the four checks **in order** in **one** terminal via **`yarn verify`** (see [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) and [git-conventional-commits.mdc](git-conventional-commits.mdc)).
+Before commits or changelog edits tied to product or test work, run the four checks **in order** in **one** terminal via **`yarn testbatch:verify`** (see [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) and [git-conventional-commits.mdc](git-conventional-commits.mdc)).
 
-Run `yarn lint`, `yarn lint:types`, `yarn lint:style`, or `yarn test:unit` individually only while debugging a specific failure.
+Run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, or `yarn test:unit` individually only while debugging a specific failure.
 
 **Dev server**: `vite-plugin-checker` runs ESLint during `quasar dev`; keep `@typescript-eslint` major in sync with TypeScript so you do not see unsupported-TS-version warnings from `typescript-estree`.
 
@@ -53,7 +53,7 @@ Run `yarn lint`, `yarn lint:types`, `yarn lint:style`, or `yarn test:unit` indiv
 
 ## Dependency hygiene
 
-- **`npm install --ignore-scripts`** skips **`electron`’s postinstall** and breaks **`yarn dev:electron`** until Electron is reinstalled (see [fantasia-dev-setup skill](../skills/fantasia-dev-setup/SKILL.md)).
+- **`npm install --ignore-scripts`** skips **`electron`’s postinstall** and breaks **`yarn quasar:dev:electron`** until Electron is reinstalled (see [fantasia-dev-setup skill](../skills/fantasia-dev-setup/SKILL.md)).
 
 ## Node.js version
 

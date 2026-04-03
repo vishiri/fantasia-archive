@@ -29,7 +29,7 @@ Hot reload and Electron debugging:
 quasar dev -m electron
 ```
 
-(`package.json` also exposes `yarn dev:electron`.)
+(`package.json` also exposes `yarn quasar:dev:electron`.)
 
 ## Troubleshooting
 
@@ -57,20 +57,21 @@ Required for packaged app behavior and **before Playwright** component/e2e runs:
 quasar build -m electron
 ```
 
-(`yarn build` maps to `quasar build -m electron --publish never`.)
+(`yarn quasar:build:electron` maps to `quasar build -m electron --publish never`.)
 
 ## Quick reference
 
 | Goal | Command |
 |------|---------|
-| **Quality gate** (lint + `tsc` + style + unit tests, one terminal) | `yarn verify` |
-| **Full project gate** (verify + build + Playwright component + Playwright E2E) | `yarn ensure` |
-| ESLint | `yarn lint` |
-| TypeScript (`tsc`, no emit) | `yarn lint:types` |
-| Stylelint (Vue + SCSS) | `yarn lint:style` |
+| **Quality gate** (lint + `tsc` + style + unit tests, one terminal) | `yarn testbatch:verify` |
+| **Full project gate** (`testbatch:verify` + `quasar:build:electron` + Playwright component + Playwright E2E) | `yarn testbatch:ensure` |
+| ESLint | `yarn lint:eslint` |
+| TypeScript (`tsc`, no emit) | `yarn lint:typescript` |
+| Stylelint (Vue + SCSS) | `yarn lint:stylelint` |
 | Unit tests | `yarn test:unit` |
-| Unit + Playwright (component + E2E paths, sequential) | `yarn test:full` (after production build when relevant sources changed) |
-| Component tests (Playwright) | `yarn test:component` (after production build) |
+| Component tests (Playwright) | `yarn test:components` (after production build) |
 | E2E tests (Playwright) | `yarn test:e2e` (after production build) |
 
-See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) for ESLint vs TSLint, `tsconfig` / `tsc`, and Vitest env typing. See [fantasia-testing](../fantasia-testing/SKILL.md) for test details. **Yarn 1.x** reserves `yarn check` for dependency verification — use **`yarn verify`** for the lint/types/style/unit gate ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
+**Storybook** nested package: run **`yarn`** at the repo root, then **`yarn --cwd .storybook-workspace install`** so **`yarn storybook:run`** / **`yarn storybook:build`** / **`yarn visual:storybook:*`** (Playwright VRT) resolve their dependencies.
+
+See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) for ESLint vs TSLint, `tsconfig` / `tsc`, and Vitest env typing. See [fantasia-testing](../fantasia-testing/SKILL.md) for test details. **Yarn 1.x** reserves `yarn check` for dependency verification — use **`yarn testbatch:verify`** for the lint/types/style/unit gate ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).

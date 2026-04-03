@@ -36,9 +36,15 @@ yarn
 quasar dev -m electron
 ```
 
+Or via `package.json`:
+
+```
+yarn quasar:dev:electron
+```
+
 ### Build the app for production
 ```
-yarn build
+yarn quasar:build:electron
 ```
 
 ### Storybook (Vue components)
@@ -46,22 +52,46 @@ yarn build
 Use Storybook to develop/document renderer components in isolation.
 
 ```
-yarn storybook
+yarn storybook:run
 ```
 
 Build static Storybook output:
 
 ```
-yarn build-storybook
+yarn storybook:build
 ```
 
 Stories live next to components as `*.stories.ts` under `src/components/**`.
+
+Visual regression checks with Playwright snapshots against Storybook:
+
+```
+yarn visual:storybook:test
+```
+
+Run with visible browser (non-headless):
+
+```
+yarn visual:storybook:test:headed
+```
+
+Approve/update the current visual baseline snapshots:
+
+```
+yarn visual:storybook:update
+```
+
+Update snapshots with visible browser:
+
+```
+yarn visual:storybook:update:headed
+```
 
 #### Integration gotchas (Storybook + Electron + Playwright)
 
 - **Storybook** — Runs from [`.storybook-workspace/`](.storybook-workspace/) (nested Yarn project) on **Storybook 10** with **Vite 8**, aligned with the root Quasar app’s **`@quasar/app-vite`** v2 line. Config keeps `staticDirs` pointed at the repo [`public/`](public/) folder (and related Vite wiring) so asset paths match the Quasar app.
 - **Electron** — The packaged renderer loads from `file://`. Root-relative `public/` URLs built from `import.meta.env.BASE_URL === '/'` can fail; prefer **relative** paths (e.g. `./images/...`) for those assets unless you control a real HTTP base.
-- **Playwright** — Component and E2E tests drive the **built** app. Run `yarn build` before `yarn test:component` / `yarn test:e2e` when you change sources those tests cover.
+- **Playwright** — Component and E2E tests drive the **built** app. Run `yarn quasar:build:electron` before `yarn test:components` / `yarn test:e2e` when you change sources those tests cover.
 
 #### Storybook workflow charter
 
@@ -110,24 +140,34 @@ Track story depth manually to prioritize upgrades:
 
 Review this table against `src/components/**` stories each iteration and move highest-risk user-facing components toward at least **Quality** coverage.
 
+#### Storybook visual baseline policy
+
+- Storybook **static build** output and **Playwright** visual config live in [`.storybook-workspace/`](.storybook-workspace/): `storybook-static/` (from `yarn storybook:build`) and [`playwright.storybook-visual.config.ts`](.storybook-workspace/playwright.storybook-visual.config.ts). Root `yarn visual:storybook:*` runs the build then delegates to `yarn --cwd .storybook-workspace storybook:visual:*`.
+- Baselines live in [`.storybook-workspace/visual-tests/`](.storybook-workspace/visual-tests/) under `*.visual.playwright.test.ts-snapshots/`.
+- Use `yarn visual:storybook:update` only when UI changes are intentional and approved.
+- In pull requests, reviewers should inspect visual diff artifacts before accepting baseline changes.
+- Keep snapshot updates scoped to affected stories/components; avoid broad regenerate-all updates unless there is a framework/theme-wide reason.
+- First-time local setup: install nested workspace deps (`yarn --cwd .storybook-workspace install` — CI does this too), then browser binaries (for example `yarn playwright install chromium` from the **repo root** for Electron Playwright; the same cache is used for Storybook VRT).
+- The following Storybook utility previews are intentionally excluded from visual snapshots because they are Playwright harness routes and do not represent meaningful visual-regression targets: `layouts-componenttestinglayout--with-social-contact-single-button`, `pages-componenttesting--social-contact-single-button`.
+
 ### Quality gate (before commit or release)
 
 Run ESLint, the TypeScript project check (`tsc`), Stylelint, and Vitest unit tests in one shot (stops on the first failure):
 
 ```
-yarn verify
+yarn testbatch:verify
 ```
 
-For debugging a single step, run `yarn lint`, `yarn lint:types`, `yarn lint:style`, or `yarn test:unit` on its own, then run `yarn verify` again before committing. Do not append `yarn build` or Playwright commands to the same shell line as `yarn verify`.
+For debugging a single step, run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, or `yarn test:unit` on its own, then run `yarn testbatch:verify` again before committing. Do not append `yarn quasar:build:electron` or Playwright commands to the same shell line as `yarn testbatch:verify`.
 
-On **Yarn 1.x**, `yarn check` is a different built-in (dependency-tree validation); use **`yarn verify`** for this gate.
+On **Yarn 1.x**, `yarn check` is a different built-in (dependency-tree validation); use **`yarn testbatch:verify`** for this gate.
 
 ### Full suite gate (everything)
 
-Run verify + production build + Playwright component + Playwright E2E in sequence:
+Run `testbatch:verify` + production build + Playwright component + Playwright E2E in sequence:
 
 ```
-yarn ensure
+yarn testbatch:ensure
 ```
 
 ### Testing
@@ -145,7 +185,7 @@ yarn test:unit
 
 Use Playwright component/E2E tests for rendered behavior and integration flows that rely on the built app runtime.
 ```
-yarn test:component
+yarn test:components
 ```
 
 #### Component list test - via Playwright
@@ -153,13 +193,13 @@ yarn test:component
 
 > Opens a CLI prompt listing available component tests.
 ```
-yarn test:componentList
+yarn test:components:list
 ```
 
 #### Component single test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 ```
-yarn test:componentSingle --component=COMPONENT_FOLDER_NAME
+yarn test:components:single --component=COMPONENT_FOLDER_NAME
 ```
 
 #### E2E test - via Playwright
@@ -173,47 +213,48 @@ yarn test:e2e
 
 > Opens a CLI prompt listing available E2E tests.
 ```
-yarn test:e2eList
+yarn test:e2e:list
 ```
 
 #### E2E single test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 ```
-yarn test:e2eSingle --spec=SPEC_FILE_NAME
+yarn test:e2e:single --spec=SPEC_FILE_NAME
 ```
 
-#### Full test pass (unit + Playwright component and E2E)
+#### One-shot verification (full project gate)
 
-Runs `yarn test:unit`, then Playwright over `src/components` and `e2e-tests/` in one invocation. Requires a **production build** (`yarn build`) when sources those tests cover have changed.
-
-```
-yarn test:full
-```
+**`yarn testbatch:ensure`** runs **`yarn testbatch:verify`**, a production Electron build, then **`yarn test:components`** and **`yarn test:e2e`** in sequence—the intentional way to chain lint, unit tests, build, and both Playwright suites. For lighter checks, run **`yarn test:unit`** and the Playwright commands separately in their own terminals (see [testing-terminal-isolation](.cursor/rules/testing-terminal-isolation.mdc) in this repo).
 
 ### Scripts reference (`package.json`)
 
 | Script | Purpose |
 | --- | --- |
-| `yarn dev:electron` | Run the app in Quasar Electron development mode. |
-| `yarn build` | Build/package the Electron app (`--publish never`). |
-| `yarn lint` | Run ESLint on project source/config paths. |
-| `yarn lint:types` | Run TypeScript project check (`tsc`, no emit). |
-| `yarn lint:style` | Run Stylelint for Vue/SCSS styles. |
-| `yarn verify` | Quick gate: lint + typecheck + stylelint + unit tests. |
-| `yarn ensure` | Full gate: `verify` + build + Playwright component + Playwright E2E. |
+| `yarn quasar:build:electron` | Build/package the Electron app (`--publish never`). |
+| `yarn quasar:dev:electron` | Run the app in Quasar Electron development mode. |
+| `yarn lint:eslint` | Run ESLint on project source/config paths. |
+| `yarn lint:stylelint` | Run Stylelint for Vue/SCSS styles. |
+| `yarn lint:typescript` | Run TypeScript project check (`tsc`, no emit). |
+| `yarn testbatch:verify` | Quick gate: lint + typecheck + stylelint + unit tests. |
+| `yarn testbatch:ensure` | Full gate: `testbatch:verify` + `quasar:build:electron` + Playwright component + Playwright E2E. |
 | `yarn test:unit` | Run Vitest core then component unit suites. |
-| `yarn test:component` | Run all Playwright component tests. |
-| `yarn test:componentSingle --component=...` | Run a single component Playwright test by folder path. |
-| `yarn test:componentSingleAuto --component=...` | Run a single component Playwright test by direct path. |
-| `yarn test:componentList` | Open interactive picker for component Playwright tests. |
+| `yarn test:components` | Run all Playwright component tests. |
+| `yarn test:components:single --component=...` | Run a single component Playwright test by folder path. |
+| `yarn test:components:single:ci --component=...` | Run a single component Playwright test by direct path. |
+| `yarn test:components:list` | Open interactive picker for component Playwright tests. |
 | `yarn test:e2e` | Run all Playwright E2E tests. |
-| `yarn test:e2eSingle --spec=...` | Run one E2E spec by spec file name. |
-| `yarn test:e2eSingleAuto --spec=...` | Run one E2E spec by direct path. |
-| `yarn test:e2eList` | Open interactive picker for E2E tests. |
-| `yarn test:full` | Run `test:unit` then one Playwright run over components + E2E paths. |
-| `yarn storybook` | Start Storybook from `.storybook-workspace`. |
-| `yarn build-storybook` | Build static Storybook output. |
+| `yarn test:e2e:single --spec=...` | Run one E2E spec by spec file name. |
+| `yarn test:e2e:single:ci --spec=...` | Run one E2E spec by direct path. |
+| `yarn test:e2e:list` | Open interactive picker for E2E tests. |
+| `yarn storybook:run` | Start Storybook from `.storybook-workspace`. |
+| `yarn storybook:build` | Build static Storybook output into `.storybook-workspace/storybook-static/`. |
 | `yarn storybook:smoke` | Run Storybook smoke check in CI-friendly mode. |
+| `yarn visual:storybook:test` | Compare Storybook stories with committed Playwright visual snapshots. |
+| `yarn visual:storybook:update` | Refresh Storybook visual snapshots after approved UI changes. |
+| `yarn visual:storybook:test:headed` | Run visual comparisons with a visible browser window. |
+| `yarn visual:storybook:update:headed` | Update visual snapshots with a visible browser window. |
+| `yarn visual:storybook:test:local` | Headed local run without rebuilding Storybook first (faster iteration). |
+| `yarn visual:storybook:update:local` | Headed local snapshot update without rebuilding Storybook first. |
 
 ### Customize the configuration
 See [The quasar.config file](https://quasar.dev/quasar-cli-vite/quasar-config-file) (this repo uses `quasar.config.ts`).
@@ -222,4 +263,4 @@ The repo tracks a minimal [`.quasar/tsconfig.json`](.quasar/tsconfig.json) so Ty
 
 ### Native modules (sqlite3)
 
-After changing **Electron** or **Node** versions, run a clean `yarn install` on your machine. If `sqlite3` fails to load in the packaged app, rebuild native addons for your Electron version (for example `npx electron-rebuild` in the project root) and retry `yarn build`.
+After changing **Electron** or **Node** versions, run a clean `yarn install` on your machine. If `sqlite3` fails to load in the packaged app, rebuild native addons for your Electron version (for example `npx electron-rebuild` in the project root) and retry `yarn quasar:build:electron`.

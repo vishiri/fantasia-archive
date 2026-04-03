@@ -10,8 +10,8 @@ description: >-
 
 ## Scripts (`package.json`)
 
-- **`yarn build`**: `quasar build -m electron --publish never` — local/production artifact without publishing step from Quasar’s perspective.
-- **`dev:electron`**: Development mode with hot reload.
+- **`yarn quasar:build:electron`**: `quasar build -m electron --publish never` — local/production artifact without publishing step from Quasar’s perspective.
+- **`yarn quasar:dev:electron`**: Development mode with hot reload.
 
 ## Tooling
 
@@ -20,9 +20,9 @@ description: >-
 
 ## Checklist before a release candidate
 
-1. **Quality gate** in one terminal: `yarn verify` ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
-2. `yarn build` (separate terminal); smoke-test the packaged app on target OS(es).
-3. Run Playwright suites that matter after the same build (`yarn test:component`, `yarn test:e2e`) — see [fantasia-testing](../fantasia-testing/SKILL.md).
+1. **Quality gate** in one terminal: `yarn testbatch:verify` ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
+2. `yarn quasar:build:electron` (separate terminal); smoke-test the packaged app on target OS(es).
+3. Run Playwright suites that matter after the same build (`yarn test:components`, `yarn test:e2e`) — see [fantasia-testing](../fantasia-testing/SKILL.md).
 
 ## Versioning
 

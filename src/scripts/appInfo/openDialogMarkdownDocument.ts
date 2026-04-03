@@ -8,8 +8,9 @@ import { S_DialogMarkdown, S_DialogComponent } from 'app/src/stores/S_Dialog'
  * @param inputDocumentName - The name of the document to open.
  */
 export const openDialogMarkdownDocument = (inputDocumentName: T_documentName) => {
-  S_DialogMarkdown.documentToOpen = inputDocumentName
-  S_DialogMarkdown.generateDialogUUID()
+  const markdownDialogStore = S_DialogMarkdown()
+  markdownDialogStore.documentToOpen = inputDocumentName
+  markdownDialogStore.generateDialogUUID()
 }
 
 /**
@@ -17,6 +18,7 @@ export const openDialogMarkdownDocument = (inputDocumentName: T_documentName) =>
   * @param inputDialogName - The name of the dialog component to open.
   */
 export const openDialogComponent = (inputDialogName: T_dialogName) => {
-  S_DialogComponent.dialogToOpen = inputDialogName
-  S_DialogComponent.generateDialogUUID()
+  const componentDialogStore = S_DialogComponent()
+  componentDialogStore.dialogToOpen = inputDialogName
+  componentDialogStore.generateDialogUUID()
 }

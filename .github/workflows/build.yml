@@ -40,10 +40,10 @@ jobs:
         yarn install
 
     - name: Quality gate (lint, types, style, unit tests)
-      run: yarn verify
+      run: yarn testbatch:verify
 
     - name: Production Electron build
-      run: yarn build
+      run: yarn quasar:build:electron
 
     - name: Upload Linux Artifact
       if: ${{ matrix.os == 'ubuntu-latest' }}

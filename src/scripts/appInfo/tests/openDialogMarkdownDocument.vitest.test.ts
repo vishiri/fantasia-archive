@@ -25,8 +25,8 @@ const {
 
 vi.mock('app/src/stores/S_Dialog', () => {
   return {
-    S_DialogMarkdown: markdownStoreMock,
-    S_DialogComponent: componentStoreMock
+    S_DialogMarkdown: () => markdownStoreMock,
+    S_DialogComponent: () => componentStoreMock
   }
 })
 

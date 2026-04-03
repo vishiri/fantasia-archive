@@ -16,7 +16,7 @@ description: >-
 ## Content source
 
 - Long-form markdown files live under `src/i18n/en-US/documents/` (and parallel locales) and are registered on the `documents` key in `src/i18n/en-US/index.ts` (often through `specialCharacterFixer`).
-- Storybook-specific runs should not import those markdown files through full locale entrypoints by default; provide placeholder `documents.*` strings in `.storybook/preview.ts` unless Storybook markdown loader support is explicitly configured.
+- Storybook-specific runs should not import those markdown files through full locale entrypoints by default; provide placeholder `documents.*` strings in [`.storybook-workspace/.storybook/preview.ts`](../../../.storybook-workspace/.storybook/preview.ts) unless Storybook markdown loader support is explicitly configured.
 
 ## Conventions
 

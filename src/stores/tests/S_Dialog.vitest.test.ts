@@ -14,15 +14,15 @@ vi.mock('uuid', () => {
   }
 })
 
-let S_DialogMarkdown: typeof S_DialogStores.S_DialogMarkdown
-let S_DialogComponent: typeof S_DialogStores.S_DialogComponent
+let S_DialogMarkdown: ReturnType<typeof S_DialogStores.S_DialogMarkdown>
+let S_DialogComponent: ReturnType<typeof S_DialogStores.S_DialogComponent>
 
 beforeEach(async () => {
   setActivePinia(createPinia())
   vi.resetModules()
   const stores = await import('../S_Dialog')
-  S_DialogMarkdown = stores.S_DialogMarkdown
-  S_DialogComponent = stores.S_DialogComponent
+  S_DialogMarkdown = stores.S_DialogMarkdown()
+  S_DialogComponent = stores.S_DialogComponent()
   S_DialogMarkdown.documentToOpen = 'license'
   S_DialogMarkdown.dialogUUID = ''
   S_DialogComponent.dialogToOpen = 'AboutFantasiaArchive'

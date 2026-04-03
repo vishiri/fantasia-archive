@@ -15,7 +15,7 @@ alwaysApply: false
 
 ## After UI changes
 
-- Run the **quality gate** — `yarn verify` — unless debugging one step ([testing-terminal-isolation.mdc](testing-terminal-isolation.mdc)); add or update **Playwright** component tests where the project already tests similar UI (see [fantasia-testing](../skills/fantasia-testing/SKILL.md) skill).
+- Run the **quality gate** — `yarn testbatch:verify` — unless debugging one step ([testing-terminal-isolation.mdc](testing-terminal-isolation.mdc)); add or update **Playwright** component tests where the project already tests similar UI (see [fantasia-testing](../skills/fantasia-testing/SKILL.md) skill).
 - For components under `src/components/**`, keep Vitest parity: each `.vue` should retain a matching `tests/<ComponentName>.vitest.test.ts` suite (presence baseline, not exhaustive coverage metric).
 - When adding or editing Storybook stories for `src/components/**`, colocate `*.stories.ts` beside each component and keep Storybook support wiring in `.storybook-workspace/.storybook` aligned (Quasar, Pinia, i18n mocks). Optional `src/layouts/**` and `src/pages/**` stories are **canvas-only** (no Docs/autodocs); see [storybook-stories.mdc](storybook-stories.mdc).
 - Storybook i18n note: avoid importing full locale roots (`src/i18n/index.ts`, `src/i18n/en-US/index.ts`) inside Storybook mocks/helpers because markdown document imports (`documents/*.md`) can fail Vite import analysis; import specific non-markdown `T_*` modules instead and use placeholder strings for document keys.

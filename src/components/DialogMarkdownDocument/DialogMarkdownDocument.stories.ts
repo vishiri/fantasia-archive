@@ -66,7 +66,7 @@ export const I18nStressLongStrings: Story = {
 export const I18nStressMarkdownHeavy: Story = {
   name: 'I18nStress/MarkdownHeavy',
   args: {
-    directInput: 'tipsTricksTrivia'
+    directInput: 'test'
   },
   parameters: {
     i18nScenario: 'markdownHeavy'

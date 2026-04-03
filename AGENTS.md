@@ -21,11 +21,11 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc)               | `**/*.stories.ts` — Story scope, layout/page canvas-only (no Docs), `TEST_ENV` restrictions |
 | [typescript-scripts.mdc](.cursor/rules/typescript-scripts.mdc)             | `src/scripts/**/*.ts` — `_utilities`, splitting modules                   |
 | [project-scss.mdc](.cursor/rules/project-scss.mdc)                         | `src/css/**/*.scss` — globals, Quasar variables                           |
-| [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc)             | Always — ESLint, `tsc` (`yarn lint:types`), Quasar/tsconfig/Vitest alignment |
+| [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc)             | Always — ESLint, `tsc` (`yarn lint:typescript`), Quasar/tsconfig/Vitest alignment |
 | [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc) | Always — `type: subject` commits; see skill for split + approval workflow |
 | [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc)                   | Always — en-US `changeLog.md` vs `package.json` version (see skill)       |
 | [plan-documents.mdc](.cursor/rules/plan-documents.mdc)                     | Always — plan files in `.cursor/plans` with timestamp + version metadata  |
-| [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) | Always — **quality gate** via `yarn verify`; `yarn build` / Playwright each in their own terminal |
+| [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) | Always — **quality gate** via `yarn testbatch:verify`; `yarn quasar:build:electron` / Playwright each in their own terminal |
 
 
 ## Stack (short)
@@ -37,10 +37,10 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | Desktop        | Electron, Quasar Electron mode                                   |
 | State / routes | Pinia, Vue Router                                                |
 | i18n           | vue-i18n (`src/i18n/`)                                           |
-| Lint / types   | ESLint (`yarn lint`), `tsc` (`yarn lint:types`), Stylelint (`yarn lint:style`) — see [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc) |
+| Lint / types   | ESLint (`yarn lint:eslint`), `tsc` (`yarn lint:typescript`), Stylelint (`yarn lint:stylelint`) — see [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc) |
 | Unit tests     | Vitest (`yarn test:unit`)                                        |
-| UI / E2E tests | Playwright (`yarn test:component`, `yarn test:e2e`)              |
-| Component docs | Storybook 10 (`yarn storybook`, `yarn build-storybook`)        |
+| UI / E2E tests | Playwright (`yarn test:components`, `yarn test:e2e`)              |
+| Component docs | Storybook 10 (`yarn storybook:run`, `yarn storybook:build`)        |
 | DB (evolving)  | `sqlite3` in main process (`src-electron/electron-main.ts` stub) |
 
 
@@ -61,18 +61,18 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 
 ## Linting and static analysis
 
-- **No TSLint** — use **ESLint** (**`eslint.config.mjs`**, **neostandard**, **typescript-eslint**, **eslint-plugin-vue**), **`yarn lint:types`** for **`tsc -p tsconfig.json`**, and **`yarn lint:style`** for Vue/SCSS. Details: [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc).
+- **No TSLint** — use **ESLint** (**`eslint.config.mjs`**, **neostandard**, **typescript-eslint**, **eslint-plugin-vue**), **`yarn lint:typescript`** for **`tsc -p tsconfig.json`**, and **`yarn lint:stylelint`** for Vue/SCSS. Details: [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc).
 - In TypeScript code (including Vue `<script lang="ts">`), use `import type` for type-only imports.
 - **`@typescript-eslint` v8** / **typescript-eslint** should stay aligned with **TypeScript ~6.0** in `package.json` to avoid `typescript-estree` unsupported-version warnings (including from **vite-plugin-checker** in dev).
 - **`src/env.d.ts`** references **`.quasar/shims-vue.d.ts`** so `tsc` resolves `*.vue` while `tsconfig` excludes generated `.quasar` output.
-- Before commits that touch lint-covered sources, run the **quality gate** in one terminal: **`yarn verify`** (see [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) and commit gate in [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc)).
+- Before commits that touch lint-covered sources, run the **quality gate** in one terminal: **`yarn testbatch:verify`** (see [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) and commit gate in [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc)).
 
 ## Git commits
 
 - Messages: `**feat` | `fix` | `test` | `chore` | `refactor` | `style` | `docs**`, then `**:**` and an imperative subject (e.g. `fix: close window on menu exit`).
 - To split work into several commits with **confirmation before each**: ask the agent to follow [git-conventional-commits skill](.cursor/skills/git-conventional-commits/SKILL.md).
 - Before any commit (or changelog edit for new work), follow this order ([testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc)):
-  1. Run the **quality gate** in one terminal: `yarn verify` (must pass; run `yarn lint`, `yarn lint:types`, `yarn lint:style`, or `yarn test:unit` individually only while debugging). When the change affects TypeScript, Vue, Electron TS, or other lint-scoped files, ESLint is required — see [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc).
+  1. Run the **quality gate** in one terminal: `yarn testbatch:verify` (must pass; run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, or `yarn test:unit` individually only while debugging). When the change affects TypeScript, Vue, Electron TS, or other lint-scoped files, ESLint is required — see [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc).
   2. Verify Storybook coverage/updates for affected user-facing **`src/components/**`** (`*.stories.ts`, mocks/placeholders as needed). Layout/page Storybook previews are canvas-only (no Docs requirement); see [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc).
   3. If Storybook is aligned for touched components, update changelog if required.
   4. Commit.
@@ -81,7 +81,7 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 ## Changelog (in-app)
 
 - English changelog: [src/i18n/en-US/documents/changeLog.md](src/i18n/en-US/documents/changeLog.md). **Version** in [package.json](package.json) is the only source of truth. **NEVER, EVER, UNDER ANY CIRCUMSTANCES** auto-bump any version in changelog or `package.json`; update changelog entries under the existing package version unless the user explicitly requests a manual version change. Do not add empty `###` sections or “none” placeholder bullets.
-- Changelog bullets are for **user- or release-relevant changes** (features, fixes, meaningful dependency refreshes, etc.). **Do not** log internal QA as changelog text: omit lines that only say the team re-ran `yarn verify`, `yarn lint`, `yarn lint:types`, `yarn lint:style`, `yarn test:unit`, production builds, Playwright component tests, E2E, `yarn test:full`, or that “all gates passed”. Follow [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc) and [fantasia-changelog-en-us skill](.cursor/skills/fantasia-changelog-en-us/SKILL.md).
+- Changelog bullets are for **user- or release-relevant changes** (features, fixes, meaningful dependency refreshes, etc.). **Do not** log internal QA as changelog text: omit lines that only say the team re-ran `yarn testbatch:verify`, `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, production builds, Playwright component tests, E2E, or that “all gates passed”. Follow [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc) and [fantasia-changelog-en-us skill](.cursor/skills/fantasia-changelog-en-us/SKILL.md).
 - Changelog-edit guard: always re-open [package.json](package.json) immediately before updating changelog content and use that live `version` value for section targeting.
 - For changelog updates tied to fresh work, ensure Storybook updates/checks for affected **`src/components/**`** UI are completed before editing the changelog entry.
 
@@ -92,14 +92,15 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 - **`_data/` holds production structured feeds** (menus, lists, etc.). **Vitest** and **Playwright** fixture objects live **inside** their own `*.vitest.test.ts` / `*.playwright.test.ts` files (inline `const` / literals), not in `_data/` and **not** in extra `tests/*.ts` files whose only role is fixture storage. **Never** add `tests/_data/`. Do **not** add tests whose **only** system-under-test is a file under `_data/`; exercise production data indirectly (components, boot, scripts).
 - Treat 1:1 component-test parity as **coverage presence**, not exhaustive line/branch percentage coverage.
 - **Playwright** requires a **production build** before runs when source affecting the app has changed. Follow [playwright-tests.mdc](.cursor/rules/playwright-tests.mdc) for test sources; use [vue-template-test-hooks.mdc](.cursor/rules/vue-template-test-hooks.mdc) when changing locators in `.vue` templates. See `.cursor/skills/fantasia-testing/SKILL.md` and `README.md`.
-- **Terminal use**: run the **quality gate** with **`yarn verify`** unless debugging a single step ([testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc)). Run **`yarn build`**, **`yarn test:component`**, and **`yarn test:e2e`** each in its own terminal; do not chain those with each other or append them to the quality gate in one line.
-- **Full-suite one-shot**: use **`yarn ensure`** when you intentionally want one command to run `verify` + production build + Playwright component + Playwright E2E in sequence.
+- Storybook visual snapshots intentionally ignore these Playwright-harness-only utility stories (not meaningful VRT targets): `layouts-componenttestinglayout--with-social-contact-single-button`, `pages-componenttesting--social-contact-single-button`.
+- **Terminal use**: run the **quality gate** with **`yarn testbatch:verify`** unless debugging a single step ([testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc)). Run **`yarn quasar:build:electron`**, **`yarn test:components`**, and **`yarn test:e2e`** each in its own terminal; do not chain those with each other or append them to the quality gate in one line.
+- **Full-suite one-shot**: use **`yarn testbatch:ensure`** when you intentionally want one command to run `testbatch:verify` + `quasar:build:electron` + Playwright component + Playwright E2E in sequence.
 
 ## Storybook expectations
 
 - Story files are colocated with components as `src/components/**/<Component>.stories.ts`.
 - **Layouts and pages** may have `src/layouts/**/*.stories.ts` and `src/pages/**/*.stories.ts` for **canvas-only** previews (router shells, smoke checks). Do **not** add Storybook **Docs** (no `autodocs` tag, no `parameters.docs.description`, keep `parameters.docs.disable: true`). Agents should not generate or expand documentation pages for layouts/pages in Storybook.
-- Prefer Storybook for isolated **component** authoring/editing feedback; use `yarn storybook` for dev and `yarn build-storybook` for static output.
+- Prefer Storybook for isolated **component** authoring/editing feedback; use `yarn storybook:run` for dev and `yarn storybook:build` for static output.
 - Do **not** import the full `src/i18n/en-US/index.ts` (or `src/i18n/index.ts`) in Storybook helpers/mocks; these pull markdown `documents/*.md` and can break Vite import analysis.
 - For Storybook-only i18n mocks, import non-markdown `T_*` locale modules directly and provide placeholder lorem ipsum strings for `documents.*` markdown keys.
 - Do **not** add Storybook stories named `A11y/*` in this project.
@@ -109,9 +110,9 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 
 The same Vue UI runs under **dev server**, **Storybook**, **packaged Electron (`file://`)**, and **Playwright-driven Electron**. When something passes in one runner and fails in another, check these first:
 
-- **Storybook** — CLI and config live under [`.storybook-workspace/`](.storybook-workspace/) (see `.storybook-workspace/.storybook/`). Root `yarn storybook` / `yarn build-storybook` delegate there. Keep [`staticDirs`](.storybook-workspace/.storybook/main.ts) and repo `public/` serving (including any Vite middleware for dev) aligned so assets such as `/images/...` match the Quasar app.
+- **Storybook** — CLI, Vite/Storybook config, **static build output** (`storybook-static/`), **Playwright** visual-regression config, and **`visual-tests/`** all live under [`.storybook-workspace/`](.storybook-workspace/) (see `.storybook-workspace/.storybook/`). Root `yarn storybook:run` / `yarn storybook:build` / `yarn visual:storybook:*` delegate there. Keep [`staticDirs`](.storybook-workspace/.storybook/main.ts) and repo `public/` serving (including any Vite middleware for dev) aligned so assets such as `/images/...` match the Quasar app.
 - **Electron packaged renderer** — Root-relative URLs like `/images/...` (common when `import.meta.env.BASE_URL` is `'/'` or empty) do **not** resolve next to `index.html` under `file://`. For files in `public/`, prefer a **relative** base (e.g. `./images/...`) when normalizing `BASE_URL`, unless the app is always served over HTTP with a matching absolute base.
-- **Playwright** — Component and E2E suites use the **production** Electron build. After changes to code those tests exercise, run `yarn build` before `yarn test:component` / `yarn test:e2e`. See [fantasia-testing skill](.cursor/skills/fantasia-testing/SKILL.md).
+- **Playwright** — Component and E2E suites use the **production** Electron build. After changes to code those tests exercise, run `yarn quasar:build:electron` before `yarn test:components` / `yarn test:e2e`. See [fantasia-testing skill](.cursor/skills/fantasia-testing/SKILL.md).
 
 ## Suggested Cursor agent profiles (manual presets)
 

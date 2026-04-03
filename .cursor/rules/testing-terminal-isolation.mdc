@@ -7,32 +7,32 @@ alwaysApply: true
 
 ## Quality gate (the **default** chained verification)
 
-When running the full **quality gate** — ESLint, TypeScript check, Stylelint, and unit tests — use **one** terminal invocation. Prefer the **`yarn verify`** script in `package.json` (same steps, stops on the first failure):
+When running the full **quality gate** — ESLint, TypeScript check, Stylelint, and unit tests — use **one** terminal invocation. Prefer the **`yarn testbatch:verify`** script in `package.json` (same steps, stops on the first failure):
 
-`yarn verify`
+`yarn testbatch:verify`
 
 **Yarn 1.x**: do **not** use `yarn check` for this — it is a built-in that validates the dependency tree, not this script.
 
-Equivalent explicit chain (for context or copy-paste without the script): `yarn lint && yarn lint:types && yarn lint:style && yarn test:unit`
+Equivalent explicit chain (for context or copy-paste without the script): `yarn lint:eslint && yarn lint:typescript && yarn lint:stylelint && yarn test:unit`
 
 **Exception**: if you are **debugging** a specific failing step, run that command **alone** (and any narrower follow-ups) until it passes, then re-run the full chained gate before commit or changelog edits.
 
-By default, do not extend this chain with `yarn build`, Playwright, or Storybook.
+By default, do not extend this chain with `yarn quasar:build:electron`, Playwright, or Storybook.
 
-## Full-suite gate (`ensure`)
+## Full-suite gate (`testbatch:ensure`)
 
 When you explicitly need the full project gate in one command, use:
 
-`yarn ensure`
+`yarn testbatch:ensure`
 
-`ensure` runs `verify` plus production build, Playwright component tests, and Playwright E2E tests in sequence. Treat this as the intentional exception to the isolation rule.
+`testbatch:ensure` runs `testbatch:verify` plus production build, Playwright component tests, and Playwright E2E tests in sequence. Treat this as the intentional exception to the isolation rule.
 
 ## Everything else — one command per terminal
 
-Run each of these in its **own** terminal invocation (do not chain them with each other or with the quality gate in the same line) unless you are intentionally running `yarn ensure`:
+Run each of these in its **own** terminal invocation (do not chain them with each other or with the quality gate in the same line) unless you are intentionally running `yarn testbatch:ensure`:
 
-- `yarn build`
-- `yarn test:component`
+- `yarn quasar:build:electron`
+- `yarn test:components`
 - `yarn test:e2e`
 
 Keep logs isolated for readability and easier failure triage.

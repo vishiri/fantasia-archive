@@ -2,6 +2,7 @@
   <q-page class="row items-center justify-evenly">
     <component
       :is="currentComponent"
+      v-if="currentComponent !== null"
       v-bind="propList"
     />
   </q-page>
@@ -27,34 +28,26 @@ const route = useRoute()
  * Currently tested component's name based on the last part of the route
  * (must match SFC `__name`, i.e. the file basename without `.vue`).
  */
-const componentNameParam = route.params.componentName
+const componentNameParam = route?.params?.componentName
 const componentName = Array.isArray(componentNameParam)
   ? componentNameParam[0]
-  : componentNameParam
+  : (componentNameParam ?? '')
 
 /**
  * Resolve all Vue SFCs under src/components from this file (src/pages).
  * A bare "components/" glob is relative to this folder and would wrongly target src/pages/components.
  */
-const componentList = import.meta.glob('../components/**/*.vue', { eager: true })
+const componentList = (import.meta as ImportMeta & {
+  glob: (pattern: string, options: { eager: true }) => Record<string, { default: Component & { __name?: string } }>
+}).glob('../components/**/*.vue', { eager: true })
 
 /**
  * Placeholder variable for the matched component
  */
-let currentComponent: Component
+let currentComponent: Component | null = null
 
-/**
- * Loops through the component list
- */
 for (const loopPath in componentList) {
-  /**
-   * Current component from the loop
-   */
-  const loopComponent = (componentList[loopPath] as { default: Component }).default
-
-  /**
-   * If the route-component-name matches the name of component in the loop, load it as the curently displayed one
-   */
+  const loopComponent = componentList[loopPath].default
   if (loopComponent.__name === componentName) {
     currentComponent = loopComponent
   }

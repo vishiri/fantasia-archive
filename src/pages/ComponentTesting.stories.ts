@@ -25,5 +25,5 @@ type Story = StoryObj<typeof meta>
 
 export const SocialContactSingleButton: Story = {
   name: 'Single Component Test',
-  args: { initialPath: '/componentTesting/AppControlMenus' }
+  args: { initialPath: '/componentTesting/SocialContactSingleButton' }
 }

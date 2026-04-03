@@ -20,7 +20,7 @@ export const S_DialogMarkdown = defineStore('S_DialogMarkdown', () => {
   }
 
   return { documentToOpen, dialogUUID, generateDialogUUID }
-})()
+})
 
 /**
  * This store manages the state of the component dialogs in the application.
@@ -35,4 +35,4 @@ export const S_DialogComponent = defineStore('S_DialogComponent', () => {
   }
 
   return { dialogToOpen, dialogUUID, generateDialogUUID }
-})()
+})

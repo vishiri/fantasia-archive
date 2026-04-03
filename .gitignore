@@ -8,7 +8,12 @@ node_modules
 .quasar/**
 !.quasar/tsconfig.json
 /dist
+/.storybook-workspace/storybook-static
+# Legacy root output from older Storybook build paths (ignored; use `.storybook-workspace/storybook-static` only)
 /storybook-static
+
+# Loki visual regression output (deprecated; Storybook VRT uses Playwright)
+**/.loki/
 /quasar.config.*.temporary.compiled*
 
 # Cordova related directories and files

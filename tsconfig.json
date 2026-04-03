@@ -4,7 +4,7 @@
     "dist",
     ".quasar",
     "node_modules",
-    "storybook-static",
+    ".storybook-workspace/storybook-static",
     "**/*.stories.ts",
     "vitest.components.config.mts"
   ]

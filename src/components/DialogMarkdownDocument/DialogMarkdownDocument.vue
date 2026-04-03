@@ -46,6 +46,15 @@ import '@quasar/quasar-ui-qmarkdown/dist/index.css'
 import type { T_documentName } from 'app/types/T_documentList'
 import { S_DialogMarkdown } from 'src/stores/S_Dialog'
 import { computed, onMounted, ref, watch } from 'vue'
+import type { StoreGeneric } from 'pinia'
+
+const resolveDialogMarkdownStore = (): StoreGeneric | null => {
+  try {
+    return S_DialogMarkdown()
+  } catch {
+    return null
+  }
+}
 
 /**
  * All component props
@@ -95,8 +104,11 @@ const openDialog = (input: T_documentName) => {
 /**
  * Trigger dialog popup via reaction to store update
  */
-watch(() => S_DialogMarkdown.dialogUUID, () => {
-  openDialog(S_DialogMarkdown.documentToOpen)
+watch(() => resolveDialogMarkdownStore()?.dialogUUID, () => {
+  const dialogMarkdownStore = resolveDialogMarkdownStore()
+  if (typeof dialogMarkdownStore?.documentToOpen === 'string' && dialogMarkdownStore.documentToOpen !== '') {
+    openDialog(dialogMarkdownStore.documentToOpen as T_documentName)
+  }
 })
 
 /**

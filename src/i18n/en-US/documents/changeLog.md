@@ -1,11 +1,14 @@
 # Changelog
 ----------
 
-## 2.4.9 - GitHub Actions permissions hardening
+## 2.4.9 - Contributor tooling, Pinia dialogs, and CI hardening
 
 ### Bugfixes & Optimizations
-- Added explicit least-privilege `permissions` (`contents: read`) to both GitHub Actions workflows (`verify` and manual `build`) so CodeQL no longer flags missing workflow permission scoping.
-- Added dedicated security automation workflows for pull requests and repository hygiene: **Dependency Review** (blocks newly introduced high-severity vulnerable dependencies on pull requests), **OSV Scanner** (switched to Google reusable OSV workflows with `push`/`pull_request`/`merge_group` + weekly scheduled scanning on `master`), and **Gitleaks** (secret-leak detection on push/PR).
+- Fixed **Pinia 3** dialog flow: **`S_DialogMarkdown`** and **`S_DialogComponent`** are now standard setup stores (call **`S_DialogMarkdown()`** / **`S_DialogComponent()`** at use sites). **`openDialogMarkdownDocument`**, **`DialogMarkdownDocument`**, and **`DialogAboutFantasiaArchive`** use guarded watchers when a store is not active (e.g. **Storybook**). **`ComponentTesting`** handles missing **`componentName`** routes safely and renders the harness only after a matching SFC is resolved.
+- Simplified the **Index** preview page by removing the extra **Fantasia Mascot** block from the default **`IndexPage`** route (keeps the route as a lightweight shell for local links/testing).
+- Renamed and grouped **Yarn** contributor scripts for clarity: quality gates **`yarn testbatch:verify`** / **`yarn testbatch:ensure`**; lint **`yarn lint:eslint`**, **`yarn lint:typescript`**, **`yarn lint:stylelint`**; Quasar Electron **`yarn quasar:build:electron`** / **`yarn quasar:dev:electron`**; Playwright **`yarn test:components`** and colon-suffixed **`test:components:*`**, **`test:e2e:*`**; Storybook dev **`yarn storybook:run`** and static **`yarn storybook:build`** (formerly **`build-storybook`**). Removed obsolete **`yarn test:full`** and duplicate **`yarn visual:storybook:ci`**; **GitHub Actions** call **`yarn visual:storybook:test`** directly. Updated **README**, **AGENTS**, Cursor rules/skills, **`package.json`**, **`testRunner_*.mjs`**, and workflows.
+- Colocated Storybook **static output** (**`.storybook-workspace/storybook-static/`**), **Playwright** visual-regression config, **`visual-tests/`** (including committed snapshots), workspace **`storybook:visual:*`** scripts, and VRT devDependencies (**`http-server`**, **`@playwright/test`**) under **`.storybook-workspace/`**; root **`yarn visual:storybook:*`** delegates with **`yarn --cwd .storybook-workspace`**. Updated **`.gitignore`**, **`tsconfig.json`**, and **`lint:eslint`** paths.
+- Set explicit least-privilege **`permissions`** (`contents: read`) on **`verify`** and manual **`build`** **GitHub Actions** workflows; added **Dependency Review**, **OSV Scanner** (reusable workflows + weekly schedule on **`master`**), and **Gitleaks** for PR/push hygiene.
 
 ## 2.4.8 - Pinia 3 and Vue Router 5
 
@@ -44,7 +47,7 @@
 
 ### Bugfixes & Optimizations
 - Added **`yarn verify`** to run ESLint, TypeScript (`tsc`), Stylelint, and unit tests in one command (named **`verify`** because Yarn 1 reserves **`yarn check`** for dependency verification); documented it in the README and dev-setup guidance, aligned Cursor rules/skills, and run it in the manual GitHub Actions build workflow before the production Electron build.
-- Fixed **`yarn test:full`** so it runs unit tests then Playwright over component and E2E paths (removed the broken `concurrently` invocation and dropped the unused **`concurrently`** dependency).
+- Fixed the combined unit-then-Playwright helper so it runs unit tests then Playwright over component and E2E paths (removed the broken `concurrently` invocation and dropped the unused **`concurrently`** dependency).
 - Cleared the French locale changelog markdown so release notes are not maintained per locale until translations return.
 - Upgraded **`@intlify/unplugin-vue-i18n`** to v11 for the Quasar/Vite locale pipeline, **`uuid`** to v11 (built-in TypeScript types; removed **`@types/uuid`**), and **`sqlite3`** to v6 for the Electron main-process dependency line.
 - Added a **GitHub Actions** workflow that runs **`yarn verify`** on **push** and **pull request** to **`master`** / **`main`** (including installing the Storybook workspace so ESLint can resolve `.storybook-workspace/.storybook`).

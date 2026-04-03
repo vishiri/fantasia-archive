@@ -8,7 +8,7 @@ alwaysApply: false
 
 ## Preconditions
 
-- Run against a **production Electron build** after relevant source changes (`yarn build` / `quasar build -m electron`). See [README.md](README.md).
+- Run against a **production Electron build** after relevant source changes (`yarn quasar:build:electron` / `quasar build -m electron`). See [README.md](README.md).
 - [playwright.config.ts](playwright.config.ts): `workers: 1`, `fullyParallel: false`, `testMatch` includes both `*.playwright.test.ts` and `*.playwright.spec.ts`.
 
 ## Vue templates (hooks for locators)
@@ -84,3 +84,4 @@ Repeat this structure in **every** Playwright file (see [GlobalWindowButtons.pla
 - Do not introduce `test.describe` groups unless you migrate the whole suite — **existing files use flat `test` only**.
 - Do not change `COMPONENT_NAME` / env contract without updating the component testing harness and docs.
 - Do not add Playwright (or other) tests whose **system under test** is a file under any **`_data/`** folder; assert behavior through `.vue` or other non-surface that uses that data.
+- For Storybook visual snapshot runs (`.storybook-workspace/visual-tests/storybook.visual.playwright.test.ts`), keep these utility Playwright-harness stories excluded because they are not meaningful visual-regression targets: `layouts-componenttestinglayout--with-social-contact-single-button`, `pages-componenttesting--social-contact-single-button`.

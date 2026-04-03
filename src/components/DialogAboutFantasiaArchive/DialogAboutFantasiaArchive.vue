@@ -52,6 +52,15 @@ import type { T_dialogName } from 'app/types/T_dialogList'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { onMounted, ref, watch } from 'vue'
 import SocialContactButtons from '../SocialContactButtons/SocialContactButtons.vue'
+import type { StoreGeneric } from 'pinia'
+
+const resolveDialogComponentStore = (): StoreGeneric | null => {
+  try {
+    return S_DialogComponent()
+  } catch {
+    return null
+  }
+}
 
 /**
  * All component props
@@ -91,9 +100,10 @@ const openDialog = (input: T_dialogName) => {
 /**
  * Trigger dialog popup via reaction to store update
  */
-watch(() => S_DialogComponent.dialogUUID, () => {
-  if (S_DialogComponent.dialogToOpen === 'AboutFantasiaArchive') {
-    openDialog(S_DialogComponent.dialogToOpen)
+watch(() => resolveDialogComponentStore()?.dialogUUID, () => {
+  const dialogComponentStore = resolveDialogComponentStore()
+  if (dialogComponentStore?.dialogToOpen === 'AboutFantasiaArchive') {
+    openDialog(dialogComponentStore.dialogToOpen as T_dialogName)
   }
 })
 

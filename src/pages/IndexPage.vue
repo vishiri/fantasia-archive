@@ -1,6 +1,5 @@
 <template>
   <q-page class="row">
-    <FantasiaMascotImage width="400px" />
     <div>
       <router-link to="/testeee">
         test
@@ -19,5 +18,4 @@
 </template>
 
 <script lang="ts" setup>
-import FantasiaMascotImage from 'src/components/FantasiaMascotImage/FantasiaMascotImage.vue'
 </script>

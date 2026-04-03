@@ -8,7 +8,7 @@ alwaysApply: false
 
 ## Running and reports
 
-- Baseline verification command: `yarn test:unit` (last step of **`yarn verify`** alongside ESLint, `tsc`, and Stylelint — see [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) and [git-conventional-commits.mdc](git-conventional-commits.mdc)). This runs **two** Vitest configs in sequence:
+- Baseline verification command: `yarn test:unit` (last step of **`yarn testbatch:verify`** alongside ESLint, `tsc`, and Stylelint — see [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) and [git-conventional-commits.mdc](git-conventional-commits.mdc)). This runs **two** Vitest configs in sequence:
   1. [vitest.config.mts](vitest.config.mts) — Node environment: `src-electron/**`, `src/scripts/**`, `src/boot/**`, `src/stores/**`, `src/i18n/**` `*.vitest.test.ts`.
   2. [vitest.components.config.mts](vitest.components.config.mts) — `jsdom` + Vue SFC: `src/components/**` `*.vitest.test.ts`, with [vitest.setup.ts](vitest.setup.ts) (Pinia, `window.faContentBridgeAPIs`, i18n loader mock, Quasar `q-*` custom elements).
 - JSON reports: `test-results/vitest-report/test-results-vitest.json` (core) and `test-results/vitest-report/test-results-vitest-components.json` (components).
