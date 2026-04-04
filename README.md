@@ -26,6 +26,7 @@ yarn
 
 - **UI**: Vue 3 + Quasar 2 (`src/`)
 - **Desktop shell**: Electron (`src-electron/`)
+- **Main ↔ preload IPC**: Channel name strings are defined once in [`src-electron/electron-ipc-bridge.ts`](src-electron/electron-ipc-bridge.ts) (grouped `export const` objects). Preload helpers under `contentBridgeAPIs/` and main-process registration under `mainScripts/register*Ipc.ts` import from that module so `ipcRenderer` calls and `ipcMain` handlers stay aligned.
 - **State and routing**: Pinia + Vue Router
 - **i18n**: vue-i18n (`src/i18n/`)
 - **Tests**: Vitest (unit) + Playwright (component and E2E)

@@ -2,7 +2,8 @@
 name: fantasia-electron-main
 description: >-
   Works on Fantasia Archive Electron main process: app lifecycle, window
-  management, platform tweaks, and native integrations. Use when editing
+  management, platform tweaks, native integrations, and ipcMain registration
+  (register*Ipc + electron-ipc-bridge channel names). Use when editing
   electron-main.ts, src-electron/mainScripts/, or main-side tests.
 ---
 
@@ -12,6 +13,7 @@ description: >-
 
 - **Entry**: `src-electron/electron-main.ts` orchestrates startup: `fixAppName`, Windows DevTools tweaks, `startApp`, menu tweaks, `openAppWindowManager`, `closeAppManager`.
 - **Modular logic**: Prefer `src-electron/mainScripts/` (e.g. `appManagement.ts`, `mainWindowCreation.ts`, `tweaks.ts`, `fixAppName.ts`) over growing `electron-main.ts` indefinitely.
+- **IPC registration**: Shared channel strings live in `src-electron/electron-ipc-bridge.ts`. Main-process `ipcMain` handlers for preload-invoked channels belong in `mainScripts/register*Ipc.ts` (e.g. `registerFaDevToolsIpc.ts`, `registerFaUserSettingsIpc.ts`). Call those registrars from app startup (`startApp()` in `appManagement.ts` today) so preload and main always use the same names.
 
 ## Testing
 
