@@ -6,8 +6,8 @@
     <!-- Inner image of the chosen Fantasia Mascot -->
     <img
       :src="currentMascotImage"
-      :alt="`${$t('FantasiaMascotImage.label')} - ${mascotVariantName}`"
-      :title="`${$t('FantasiaMascotImage.label')} - ${mascotVariantName}`"
+      :alt="`${$t('fantasiaMascotImage.label')} - ${mascotVariantName}`"
+      :title="`${$t('fantasiaMascotImage.label')} - ${mascotVariantName}`"
       class="fantasiaMascotImage__inner"
       data-test="fantasiaMascotImage-image"
       :data-test-image="fantasiaImage"

@@ -5,11 +5,11 @@ import type { I_appMenuList } from 'app/types/I_appMenusDataList'
 // TODO - add functionality for all buttons and conditions
 
 export const tools: I_appMenuList = {
-  title: i18n.global.t('AppControlMenus.tools.title'),
+  title: i18n.global.t('appControlMenus.tools.title'),
   data: [
     {
       mode: 'item',
-      text: i18n.global.t('AppControlMenus.tools.items.quickAddNewDocument'),
+      text: i18n.global.t('appControlMenus.tools.items.quickAddNewDocument'),
       icon: 'mdi-text-box-plus-outline',
       submenu: undefined,
       trigger: undefined,
@@ -18,7 +18,7 @@ export const tools: I_appMenuList = {
     },
     {
       mode: 'item',
-      text: i18n.global.t('AppControlMenus.tools.items.quickSearchDocument'),
+      text: i18n.global.t('appControlMenus.tools.items.quickSearchDocument'),
       icon: 'mdi-database-search',
       submenu: undefined,
       trigger: undefined,
@@ -30,7 +30,7 @@ export const tools: I_appMenuList = {
     },
     {
       mode: 'item',
-      text: i18n.global.t('AppControlMenus.tools.items.massDeleteDocument'),
+      text: i18n.global.t('appControlMenus.tools.items.massDeleteDocument'),
       icon: 'mdi-text-box-remove-outline',
       submenu: undefined,
       trigger: undefined,
@@ -42,7 +42,7 @@ export const tools: I_appMenuList = {
     },
     {
       mode: 'item',
-      text: i18n.global.t('AppControlMenus.tools.items.toggleTree'),
+      text: i18n.global.t('appControlMenus.tools.items.toggleTree'),
       icon: 'mdi-page-layout-sidebar-left',
       submenu: undefined,
       trigger: undefined,
@@ -51,7 +51,7 @@ export const tools: I_appMenuList = {
     },
     {
       mode: 'item',
-      text: i18n.global.t('AppControlMenus.tools.items.showNoteBoard'),
+      text: i18n.global.t('appControlMenus.tools.items.showNoteBoard'),
       icon: 'mdi-clipboard-text-outline',
       submenu: undefined,
       trigger: undefined,
@@ -63,7 +63,7 @@ export const tools: I_appMenuList = {
     },
     {
       mode: 'item',
-      text: i18n.global.t('AppControlMenus.tools.items.programSettings'),
+      text: i18n.global.t('appControlMenus.tools.items.programSettings'),
       icon: 'mdi-tune',
       submenu: undefined,
       trigger: undefined,

@@ -11,11 +11,11 @@
       <!-- Dialog contents wrapper -->
       <q-card-section :class="['dialogComponent__content', `${documentName}`, 'q-mt-xl', 'q-mb-lg', 'q-mr-lg', 'q-ml-xl', 'q-pt-none']">
         <h6 id="dialogAboutFantasiaArchive-title">
-          {{ $t('Dialogs.aboutFantasiaArchive.title') }}
+          {{ $t('dialogs.aboutFantasiaArchive.title') }}
         </h6>
 
         <div>
-          {{ $t('Dialogs.aboutFantasiaArchive.versionTitle') }} <span class="text-bold text-primary-bright">{{ appVersion }}</span>
+          {{ $t('dialogs.aboutFantasiaArchive.versionTitle') }} <span class="text-bold text-primary-bright">{{ appVersion }}</span>
         </div>
 
         <q-separator

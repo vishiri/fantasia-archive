@@ -16,7 +16,7 @@ export const tipsTricksTriviaNotification = (hideMascot: boolean) => {
     timeout: 15000,
     icon: (hideMascot) ? 'mdi-help' : undefined,
     color: 'info',
-    message: i18n.global.t('QuasarNotify.didYouKnow'),
+    message: i18n.global.t('globalFunctionality.unsortedAppTexts.didYouKnow'),
     avatar: (!hideMascot) ? determineCurrentImage(fantasiaImageList, true, '') : undefined,
     caption: randomMessage,
     actions: [{ icon: 'mdi-close', color: 'white' }]

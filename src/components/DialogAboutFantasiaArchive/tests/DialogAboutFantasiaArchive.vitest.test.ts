@@ -23,6 +23,6 @@ test('Test that DialogAboutFantasiaArchive renders about dialog shell for AboutF
   const html = w.html()
   expect(html).toContain('dialogComponent')
   expect(html).toContain('AboutFantasiaArchive')
-  expect(w.text()).toContain('Dialogs.aboutFantasiaArchive.title')
+  expect(w.text()).toContain('dialogs.aboutFantasiaArchive.title')
   w.unmount()
 })

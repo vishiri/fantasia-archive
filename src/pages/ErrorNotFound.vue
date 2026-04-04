@@ -6,12 +6,12 @@
     >
       <q-card-section>
         <h2 class="text-negative">
-          {{ $t('ErrorNotFound.title') }}
+          {{ $t('errorNotFound.title') }}
         </h2>
         <h6>
-          {{ $t('ErrorNotFound.subTitleFirst') }}
+          {{ $t('errorNotFound.subTitleFirst') }}
           <br>
-          {{ $t('ErrorNotFound.subTitleSecond') }}
+          {{ $t('errorNotFound.subTitleSecond') }}
         </h6>
         <FantasiaMascotImage
           fantasia-image="error"
@@ -28,7 +28,7 @@
         size="xl"
         to="/"
       >
-        {{ $t('ErrorNotFound.ctaText') }}
+        {{ $t('errorNotFound.ctaText') }}
       </q-btn>
     </div>
   </div>

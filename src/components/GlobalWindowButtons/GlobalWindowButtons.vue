@@ -10,8 +10,8 @@
       dark
       size="xs"
       class="globalWindowButtons__button globalWindowButtons__minimize"
-      :aria-label="$t('GlobalWindowButtons.minimizeButton')"
-      :title="$t('GlobalWindowButtons.minimizeButton')"
+      :aria-label="$t('globalWindowButtons.minimizeButton')"
+      :title="$t('globalWindowButtons.minimizeButton')"
       data-test="globalWindowButtons-button-minimize"
       @click="minimizeWindow()"
     >
@@ -19,7 +19,7 @@
         :delay="1000"
         :offset="[0, 5]"
       >
-        {{ $t('GlobalWindowButtons.minimizeButton') }}
+        {{ $t('globalWindowButtons.minimizeButton') }}
       </q-tooltip>
       <q-icon
         size="16px"
@@ -33,8 +33,8 @@
       dark
       size="xs"
       class="globalWindowButtons__button globalWindowButtons__resize"
-      :aria-label="isMaximized ? $t('GlobalWindowButtons.resizeButton') : $t('GlobalWindowButtons.maximizeButton')"
-      :title="isMaximized ? $t('GlobalWindowButtons.resizeButton') : $t('GlobalWindowButtons.maximizeButton')"
+      :aria-label="isMaximized ? $t('globalWindowButtons.resizeButton') : $t('globalWindowButtons.maximizeButton')"
+      :title="isMaximized ? $t('globalWindowButtons.resizeButton') : $t('globalWindowButtons.maximizeButton')"
       data-test="globalWindowButtons-button-resize"
       @click="[resizeWindow(),checkIfWindowMaximized()]"
     >
@@ -42,7 +42,7 @@
         :delay="1000"
         :offset="[0, 5]"
       >
-        {{ isMaximized ? $t('GlobalWindowButtons.resizeButton') : $t('GlobalWindowButtons.maximizeButton') }}
+        {{ isMaximized ? $t('globalWindowButtons.resizeButton') : $t('globalWindowButtons.maximizeButton') }}
       </q-tooltip>
       <q-icon
         size="16px"
@@ -58,8 +58,8 @@
       dark
       size="xs"
       class="globalWindowButtons__button globalWindowButtons__close"
-      :aria-label="$t('GlobalWindowButtons.close')"
-      :title="$t('GlobalWindowButtons.close')"
+      :aria-label="$t('globalWindowButtons.close')"
+      :title="$t('globalWindowButtons.close')"
       data-test="globalWindowButtons-button-close"
       @click="tryCloseWindow()"
     >
@@ -67,7 +67,7 @@
         :delay="1000"
         :offset="[0, 5]"
       >
-        {{ $t('GlobalWindowButtons.close') }}
+        {{ $t('globalWindowButtons.close') }}
       </q-tooltip>
       <q-icon
         size="16px"

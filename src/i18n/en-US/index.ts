@@ -11,9 +11,16 @@ import T_project from './components/AppControlMenus/T_project'
 import T_tools from './components/AppControlMenus/T_tools'
 import T_documents from './components/AppControlMenus/T_documents'
 
+import T_GlobalWindowButtons from './components/GlobalWindowButtons/T_GlobalWindowButtons'
+import T_FantasiaMascotImage from './components/FantasiaMascotImage/T_FantasiaMascotImage'
+import T_socialContactButtons from './components/SocialContactButtons/T_socialContactButtons'
+
 import T_aboutFantasiaArchive from './dialogs/T_aboutFantasiaArchive'
 
-import T_socialContactButtons from './components/SocialContactButtons/T_socialContactButtons'
+import T_faUserSettings from './globalFunctionality/T_faUserSettings'
+import T_unsortedAppTexts from './globalFunctionality/T_unsortedAppTexts'
+
+import T_ErrorNotFound from './pages/T_ErrorNotFound'
 
 export default {
   // GLOBAL - DOCUMENTS
@@ -25,39 +32,19 @@ export default {
     tipsTricksTrivia: specialCharacterFixer(tipsTricksTrivia)
   },
 
-  // GLOBAL - APP TEXTS
-  app: {
-    name: 'FA - but in English!'
-  },
-
   // PAGE - ERROR NOT FOUND
-  ErrorNotFound: {
-    title: 'ERROR/NOT FOUND',
-    subTitleFirst: 'Something broke horribly somewhere',
-    subTitleSecond: 'Fantasia is trying her best to fix it!',
-    ctaText: 'Return to app start screen'
-  },
-
-  // QUASAR COMPONENT - NOTIFY
-  QuasarNotify: {
-    didYouKnow: 'Did you know?'
-  },
+  errorNotFound: T_ErrorNotFound,
 
   // DIALOGS
-  Dialogs: {
+  dialogs: {
     aboutFantasiaArchive: T_aboutFantasiaArchive
   },
 
   // COMPONENT - GLOBAL WINDOW BUTTONS
-  GlobalWindowButtons: {
-    minimizeButton: 'Minimize',
-    resizeButton: 'Resize Down',
-    maximizeButton: 'Maximize',
-    close: 'Close'
-  },
+  globalWindowButtons: T_GlobalWindowButtons,
 
   // COMPONENT - APP CONTROL MENUS
-  AppControlMenus: {
+  appControlMenus: {
     project: T_project,
     tools: T_tools,
     documents: T_documents,
@@ -65,11 +52,15 @@ export default {
   },
 
   // COMPONENT - SOCIAL CONTACT BUTTONS
-  SocialContactButtons: T_socialContactButtons,
+  socialContactButtons: T_socialContactButtons,
 
   // COMPONENT - FANTASIA MASCOT IMAGE
-  FantasiaMascotImage: {
-    label: 'Fantasia Mascot'
+  fantasiaMascotImage: T_FantasiaMascotImage,
+
+  // GLOBAL FUNCTIONALITY
+  globalFunctionality: {
+    faUserSettings: T_faUserSettings,
+    unsortedAppTexts: T_unsortedAppTexts
   }
 
 }
