@@ -3,6 +3,7 @@
 /package-lock.json
 node_modules
 /.storybook-workspace/node_modules
+_temp
 
 # Quasar core related directories (keep tsconfig so editors/tests work before first `quasar dev` / `quasar prepare`)
 .quasar/**
