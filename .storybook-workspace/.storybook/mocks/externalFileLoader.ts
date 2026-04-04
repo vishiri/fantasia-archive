@@ -1,39 +1,34 @@
 import T_documents from 'src/i18n/en-US/components/AppControlMenus/T_documents'
+import T_FantasiaMascotImage from 'src/i18n/en-US/components/FantasiaMascotImage/T_FantasiaMascotImage'
+import T_GlobalWindowButtons from 'src/i18n/en-US/components/GlobalWindowButtons/T_GlobalWindowButtons'
 import T_helpInfo from 'src/i18n/en-US/components/AppControlMenus/T_helpInfo'
 import T_project from 'src/i18n/en-US/components/AppControlMenus/T_project'
 import T_tools from 'src/i18n/en-US/components/AppControlMenus/T_tools'
 import T_socialContactButtons from 'src/i18n/en-US/components/SocialContactButtons/T_socialContactButtons'
+import T_aboutFantasiaArchive from 'src/i18n/en-US/dialogs/T_aboutFantasiaArchive'
+import T_faUserSettings from 'src/i18n/en-US/globalFunctionality/T_faUserSettings'
+import T_unsortedAppTexts from 'src/i18n/en-US/globalFunctionality/T_unsortedAppTexts'
+import T_ErrorNotFound from 'src/i18n/en-US/pages/T_ErrorNotFound'
 
 type T_i18nScenario = 'default' | 'longStrings' | 'markdownHeavy'
 
 const defaultMessages: Record<string, unknown> = {
-  ErrorNotFound: {
-    title: 'ERROR/NOT FOUND',
-    subTitleFirst: 'Something broke horribly somewhere',
-    subTitleSecond: 'Fantasia is trying her best to fix it!',
-    ctaText: 'Return to app start screen'
+  errorNotFound: T_ErrorNotFound,
+  dialogs: {
+    aboutFantasiaArchive: T_aboutFantasiaArchive
   },
-  Dialogs: {
-    aboutFantasiaArchive: {
-      title: 'About Fantasia Archive',
-      versionTitle: 'Currently running Fantasia Archive version:'
-    }
-  },
-  GlobalWindowButtons: {
-    minimizeButton: 'Minimize',
-    resizeButton: 'Restore',
-    maximizeButton: 'Maximize',
-    close: 'Close'
-  },
-  AppControlMenus: {
+  globalWindowButtons: T_GlobalWindowButtons,
+  appControlMenus: {
     project: T_project,
     documents: T_documents,
     tools: T_tools,
     helpInfo: T_helpInfo
   },
-  SocialContactButtons: T_socialContactButtons,
-  FantasiaMascotImage: {
-    label: 'Fantasia Mascot'
+  socialContactButtons: T_socialContactButtons,
+  fantasiaMascotImage: T_FantasiaMascotImage,
+  globalFunctionality: {
+    faUserSettings: T_faUserSettings,
+    unsortedAppTexts: T_unsortedAppTexts
   },
   documents: {
     advancedSearchCheatSheet: '# Advanced Search Cheat Sheet\n\nIn the moonlit stacks beneath **Aurelion Citadel**, archivists index stories by sigil, era, and oath. Queries can chain together concepts like *kingdom*, *bloodline*, and *artifact* to narrow thousands of records into a single credible trail. Use precise terms first, then broaden with synonyms when the trail goes cold.\n\n> Lore note: most "missing" entries are filed under their pre-coronation names.\n\n## Quick patterns\n\n- `type:character AND faction:"Sunforged Court"`\n- `region:"North Reach" AND status:active`\n- `artifact:"Glass Compass" OR artifact:"Mirror Needle"`\n\n```text\ntitle:"Ashen Treaty" AND NOT status:archived\n```\n\n| Field | Use |\n| --- | --- |\n| `type` | Entity category |\n| `region` | Geographic filter |\n| `status` | Active/archived state |',
