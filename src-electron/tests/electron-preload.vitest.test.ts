@@ -12,6 +12,7 @@ vi.mock('electron', () => {
       exposeInMainWorld: exposeInMainWorldMock
     },
     ipcRenderer: {
+      invoke: vi.fn(),
       sendSync: vi.fn()
     },
     shell: {
@@ -55,6 +56,7 @@ test('Test that electron preload exposes faContentBridgeAPIs with expected API k
       'extraEnvVariables',
       'faDevToolsControl',
       'faExternalLinksManager',
+      'faUserSettings',
       'faWindowControl'
     ].sort()
   )

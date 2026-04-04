@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron'
 
-import { FA_DEVTOOLS_IPC } from 'app/src-electron/devToolsIpcChannels'
+import { FA_DEVTOOLS_IPC } from 'app/src-electron/electron-ipc-bridge'
 
 let registered = false
 
@@ -13,9 +13,9 @@ function mainAppBrowserWindow (): BrowserWindow | undefined {
 }
 
 /**
- * Wires synchronous IPC handlers so preload can toggle/query DevTools without `@electron/remote`
- * `getCurrentWindow()` (unreliable from isolated preload). Resolves the window at call time via
- * `BrowserWindow` so bundled main code never relies on a possibly stale `appWindow` re-export.
+ * Wires synchronous IPC handlers so preload can toggle/query DevTools without '@electron/remote'
+ * 'getCurrentWindow()' (unreliable from isolated preload). Resolves the window at call time via
+ * 'BrowserWindow' so bundled main code never relies on a possibly stale 'appWindow' re-export.
  */
 export function registerFaDevToolsIpc (): void {
   if (registered) {

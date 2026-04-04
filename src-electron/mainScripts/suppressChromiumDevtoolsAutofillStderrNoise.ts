@@ -1,5 +1,5 @@
 /**
- * Chrome DevTools (bundled with Electron) calls CDP methods such as `Autofill.enable`
+ * Chrome DevTools (bundled with Electron) calls CDP methods such as 'Autofill.enable'
  * that Electron's debug target does not implement. Chromium logs those failures to
  * stderr; they are harmless for app behavior.
  * @see https://github.com/electron/electron/issues/41614

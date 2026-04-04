@@ -13,7 +13,7 @@ config.global.config = {
 }
 
 /**
- * `_data` modules and dialogs import Pinia stores at module load; provide an active Pinia
+ * '_data' modules and dialogs import Pinia stores at module load; provide an active Pinia
  * before component Vitest files import those dependency chains.
  */
 setActivePinia(createPinia())
@@ -33,7 +33,7 @@ vi.mock('app/src/i18n/externalFileLoader', () => {
 vi.mock('@quasar/quasar-ui-qmarkdown/dist/index.css', () => ({}))
 
 /**
- * Minimal `window.faContentBridgeAPIs` for Vitest runs that mount `.vue` components.
+ * Minimal 'window.faContentBridgeAPIs' for Vitest runs that mount '.vue' components.
  */
 beforeEach(() => {
   vi.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
@@ -77,6 +77,10 @@ beforeEach(() => {
     },
     appDetails: {
       PROJECT_VERSION: '0.0.0-unit-test'
+    },
+    faUserSettings: {
+      getSettings: vi.fn(async () => ({ theme: 'light' as const })),
+      setSettings: vi.fn(async () => {})
     }
   }
 })

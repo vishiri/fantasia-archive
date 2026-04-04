@@ -1,5 +1,5 @@
 import { test, expect, vi, beforeEach } from 'vitest'
-import { FA_DEVTOOLS_IPC } from 'app/src-electron/devToolsIpcChannels'
+import { FA_DEVTOOLS_IPC } from 'app/src-electron/electron-ipc-bridge'
 import { faDevToolsControlAPI } from '../faDevToolsControlAPI'
 
 const { ipcRendererSendSyncMock } = vi.hoisted(() => {
