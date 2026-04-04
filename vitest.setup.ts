@@ -2,6 +2,8 @@ import { config } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, vi } from 'vitest'
 
+import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/faUserSettingsDefaults'
+
 const originalConsoleWarn = console.warn.bind(console)
 
 config.global.config = {
@@ -79,7 +81,7 @@ beforeEach(() => {
       PROJECT_VERSION: '0.0.0-unit-test'
     },
     faUserSettings: {
-      getSettings: vi.fn(async () => ({ theme: 'light' as const })),
+      getSettings: vi.fn(async () => ({ ...FA_USER_SETTINGS_DEFAULTS })),
       setSettings: vi.fn(async () => {})
     }
   }

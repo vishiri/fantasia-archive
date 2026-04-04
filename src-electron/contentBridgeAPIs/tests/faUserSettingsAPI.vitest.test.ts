@@ -15,6 +15,8 @@ vi.mock('electron', () => {
 })
 
 import { FA_USER_SETTINGS_IPC } from 'app/src-electron/electron-ipc-bridge'
+import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/faUserSettingsDefaults'
+
 import { faUserSettingsAPI } from '../faUserSettingsAPI'
 
 beforeEach(() => {
@@ -26,8 +28,9 @@ beforeEach(() => {
  * 'getSettings' delegates to 'ipcRenderer.invoke' with the get channel.
  */
 test('faUserSettingsAPI getSettings invokes IPC get channel', async () => {
-  invokeMock.mockResolvedValueOnce({ theme: 'dark' })
-  await expect(faUserSettingsAPI.getSettings()).resolves.toEqual({ theme: 'dark' })
+  const snapshot = { ...FA_USER_SETTINGS_DEFAULTS, darkMode: true }
+  invokeMock.mockResolvedValueOnce(snapshot)
+  await expect(faUserSettingsAPI.getSettings()).resolves.toEqual(snapshot)
   expect(invokeMock).toHaveBeenCalledWith(FA_USER_SETTINGS_IPC.getAsync)
 })
 
@@ -37,6 +40,6 @@ test('faUserSettingsAPI getSettings invokes IPC get channel', async () => {
  */
 test('faUserSettingsAPI setSettings invokes IPC set channel with patch', async () => {
   invokeMock.mockResolvedValueOnce(undefined)
-  await faUserSettingsAPI.setSettings({ theme: 'light' })
-  expect(invokeMock).toHaveBeenCalledWith(FA_USER_SETTINGS_IPC.setAsync, { theme: 'light' })
+  await faUserSettingsAPI.setSettings({ darkMode: false })
+  expect(invokeMock).toHaveBeenCalledWith(FA_USER_SETTINGS_IPC.setAsync, { darkMode: false })
 })

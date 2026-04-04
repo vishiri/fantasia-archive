@@ -1,3 +1,45 @@
 export interface I_faUserSettings {
-  theme: 'light' | 'dark'
+  agressiveRelationshipFilter: boolean
+  allowQuickPopupSameKeyClose: boolean
+  allowWiderScrollbars: boolean
+  compactDocumentCount: boolean
+  compactTags: boolean
+  darkMode: boolean
+  disableCloseAftertSelectQuickSearch: boolean
+  disableDocumentControlBar: boolean
+  disableDocumentControlBarGuides: boolean
+  disableDocumentCounts: boolean
+  disableDocumentToolTips: boolean
+  disableQuickSearchCategoryPrecheck: boolean
+  disableSpellCheck: boolean
+  doNotcollaseTreeOptions: boolean
+  doubleDashDocCount: boolean
+  hideAdvSearchCheatsheetButton: boolean
+  hideDeadCrossThrough: boolean
+  hideDocumentTitles: boolean
+  hideEmptyFields: boolean
+  hideHierarchyTree: boolean
+  hidePlushes: boolean
+  hideTooltipsProject: boolean
+  hideTooltipsStart: boolean
+  hideTreeExtraIcons: boolean
+  hideTreeIconAddUnder: boolean
+  hideTreeIconEdit: boolean
+  hideTreeIconView: boolean
+  hideTreeOrderNumbers: boolean
+  hideWelcomeScreenSocials: boolean
+  invertCategoryPosition: boolean
+  invertTreeSorting: boolean
+  limitEditorHeight: boolean
+  noProjectName: boolean
+  noTags: boolean
+  preventAutoScroll: boolean
+  preventFilledNoteBoardPopup: boolean
+  preventPreviewsDocuments: boolean
+  preventPreviewsPopups: boolean
+  preventPreviewsTabs: boolean
+  preventPreviewsTree: boolean
+  showDocumentID: boolean
+  tagsAtTop: boolean
+  textShadow: boolean
 }

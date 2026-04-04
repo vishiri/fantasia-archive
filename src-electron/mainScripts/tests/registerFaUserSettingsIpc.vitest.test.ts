@@ -3,6 +3,8 @@ import { vi, expect, test, beforeEach } from 'vitest'
 import { FA_USER_SETTINGS_IPC } from 'app/src-electron/electron-ipc-bridge'
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 
+import { FA_USER_SETTINGS_DEFAULTS } from '../faUserSettingsDefaults'
+
 const { ipcMainHandleMock, getFaUserSettingsMock, storeSetMock } = vi.hoisted(() => {
   return {
     ipcMainHandleMock: vi.fn(),
@@ -43,7 +45,11 @@ function handlerFor (channel: string): (...args: unknown[]) => unknown {
  * Get handler returns a shallow snapshot of the full 'electron-store' object, not a manual key list.
  */
 test('Test that user settings get handler returns all keys from the backing store', async () => {
-  const store: I_faUserSettings & Record<string, string> = { theme: 'dark', futureKey: 'kept' }
+  const store = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    darkMode: true,
+    futureKey: true
+  } as I_faUserSettings & Record<string, boolean>
   getFaUserSettingsMock.mockReturnValue({
     store,
     set: storeSetMock
@@ -65,7 +71,7 @@ test('Test that user settings get handler returns all keys from the backing stor
  */
 test('Test that user settings set handler writes merged store state', async () => {
   getFaUserSettingsMock.mockReturnValue({
-    store: { theme: 'dark' },
+    store: { ...FA_USER_SETTINGS_DEFAULTS, darkMode: true },
     set: storeSetMock
   })
 
@@ -73,10 +79,13 @@ test('Test that user settings set handler writes merged store state', async () =
   registerFaUserSettingsIpc()
 
   const setHandler = handlerFor(FA_USER_SETTINGS_IPC.setAsync)
-  setHandler({}, { theme: 'light' })
+  setHandler({}, { darkMode: false })
 
   expect(storeSetMock).toHaveBeenCalledOnce()
-  expect(storeSetMock).toHaveBeenCalledWith({ theme: 'light' })
+  expect(storeSetMock).toHaveBeenCalledWith({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    darkMode: false
+  })
 })
 
 /**
@@ -85,7 +94,7 @@ test('Test that user settings set handler writes merged store state', async () =
  */
 test('Test that registerFaUserSettingsIpc only wires handlers once', async () => {
   getFaUserSettingsMock.mockReturnValue({
-    store: { theme: 'light' },
+    store: { ...FA_USER_SETTINGS_DEFAULTS },
     set: storeSetMock
   })
 
