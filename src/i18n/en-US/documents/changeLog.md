@@ -5,9 +5,11 @@
 
 ### New features
 - Added persistent **user settings** in the **Electron** main process (**electron-store** under app **userData**), starting with a **theme** preference (**light** or **dark**, default **light**), exposed to the renderer as **`window.faContentBridgeAPIs.faUserSettings`** (**get** / **set**).
+- Added **`S_FaUserSettings`** Pinia store for managing user settings state in the renderer: loads the full settings set once on app start via the IPC bridge, accepts patch-based updates, and shows a **Quasar** success or failure notification after each save attempt.
 
 ### Bugfixes & Optimizations
 - Added a startup cleanup pass for the persisted **user settings** store so legacy or unknown keys that no longer exist in **`src-electron/mainScripts/faUserSettingsDefaults.ts`** are removed and the sanitized config is auto-saved.
+- Extracted all hardcoded **en-US** locale strings from `src/i18n/en-US/index.ts` into dedicated `T_*.ts` modules per component, dialog, page, and global feature; normalized all top-level and sub-level i18n keys to **camelCase** with a lowercase first letter across the app.
 - Centralized **main ↔ preload** **IPC** channel names in **`src-electron/electron-ipc-bridge.ts`** (including **DevTools** sync channels) so **Electron** handlers and **preload** helpers cannot drift to mismatched strings; removed the older **DevTools**-only channel module.
 - Documented **`electron-ipc-bridge.ts`**, **`mainScripts/register*Ipc.ts`**, and **IPC** registration during **`startApp()`** (**`mainScripts/appManagement.ts`**) in **README**, **AGENTS**, and Cursor **`electron-preload`** / **`fantasia-electron-preload`** / **`fantasia-electron-main`** / **`fantasia-sqlite-main`** guidance so contributors and agents follow one end-to-end pattern.
 - Added **`src/vue-i18n-shim.d.ts`** so **vue-i18n** injected globals (**`$t`**, **`$d`**, **`$n`**, and related **`$*`** helpers) are declared on **`@vue/runtime-core`**, aligning **Vue** SFC template typing with **`tsc`** and clearing spurious missing-**`$t`** diagnostics in editors that resolve **`ComponentCustomProperties`** through the runtime-core path.
