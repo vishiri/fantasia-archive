@@ -8,7 +8,7 @@ Use **Node.js 22.22.0 or newer** (`package.json` `engines.node`: `>=22.22.0`; Qu
 
 > Playwright tests run from a built, live version of FA. Therefore, to run them, you need to locally build the app on your machine first - both the first time you use them and every time something is changed in the source code.
 
-## Install Quasar CLI for smoothest experience
+## Install Quasar CLI for the smoothest experience
 ##### Details found here: https://quasar.dev/start/quasar-cli
 
 ##### Ensure that the Yarn global install location is in your PATH after installation (details in the article linked above).

@@ -27,7 +27,7 @@ export default {
 
   // GLOBAL - APP TEXTS
   app: {
-    name: 'FA - but in english!'
+    name: 'FA - but in English!'
   },
 
   // PAGE - ERROR NOT FOUND

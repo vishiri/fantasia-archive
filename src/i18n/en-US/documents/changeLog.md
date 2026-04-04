@@ -17,6 +17,7 @@
 - Set **`actions/upload-artifact@v5`** on the manual **Build** workflow (**`.github/workflows/build.yml`**) for **Linux**, **macOS**, and **Windows** release artifacts, alongside **`actions/checkout@v5`** and **`actions/setup-node@v5`**, so artifact uploads stay on supported **GitHub Actions** runtimes.
 - Bumped **Vue** to **`^3.5.32`** (root and **`.storybook-workspace`**), **`@types/node`** to **`^22.19.17`**, refreshed **root** and **`.storybook-workspace`** lockfiles with **`yarn upgrade`**, and set Storybook VRT **`toHaveScreenshot`** **`maxDiffPixels: 150`** so compare runs stay stable across rebuilds. Refreshed one **Win32** chromium snapshot affected by the toolchain bump.
 - Renamed the markdown bullet-list helper to **`mdListArrayConverter`** (standard spelling) and normalized loop variable naming in **`specialCharacterFixer`**; **tips, tricks, and trivia** notifications and markdown document escaping are unchanged in behavior.
+- Polished **en-US** copy in the **Advanced search guide**, **Tips, Tricks & Trivia**, and the **en-US** app name string for grammar, spelling, and clarity; fixed a missing article in the **README** Quasar CLI heading.
 
 ## 2.4.9 - Contributor tooling, Pinia dialogs, and CI hardening
 

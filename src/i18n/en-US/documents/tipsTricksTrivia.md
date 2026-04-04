@@ -20,5 +20,5 @@
 - This software is actually a local website pretending to be a desktop application! Technology is crazy!
 - If you ever need a good, offline map-making software, look at Wonderdraft and Dungeondraft by Megasploot!
 - The adorable little arcane dragon you might have seen while using the app is called Fantasia and she is the official mascot of FA!
-- If you ever feel like sponsoring the development, there is Patreon. If you can't/don't want to; that is perfectly fine too - just have fun with the app and build something cool with it!
+- If you ever feel like sponsoring the development, there is Patreon. If you can't or don't want to, that's perfectly fine too—just have fun with the app and build something cool with it!
 - DISCLAIMER: No magical creatures were harmed during the making of this software.
