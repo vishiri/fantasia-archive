@@ -10,8 +10,12 @@ alwaysApply: false
 
 - Use Vue 3 **Composition API** (`<script setup>`) consistent with existing components.
 - Prefer **Quasar** (`q-*`) components and spacing/typography patterns from sibling files in the same area.
-- Keep **user-visible copy** in i18n (`src/i18n`) when keys already exist — extend locale modules rather than hardcoding strings in templates.
-- For SFC translations, use template `$t('...')` directly; do **not** import `useI18n` only to call `t(...)`.
+- Keep **user-visible copy** in i18n (`src/i18n`) — never hardcode prose strings in templates, `_data/` files, or scripts.
+- For SFC translations, use template `$t('camelCaseKey.subKey')` directly; do **not** import `useI18n` only to call `t(...)`.
+- All top-level i18n keys use **camelCase with a lowercase first letter** (e.g. `globalWindowButtons`, `dialogs`, `errorNotFound`). Sub-keys follow the same convention.
+- To add new strings: place them in a `T_*.ts` file under the matching folder (`components/<ComponentName>/`, `dialogs/`, `pages/`, or `globalFunctionality/`), import it in `src/i18n/en-US/index.ts`, and assign it to a camelCase top-level key. Do not add hardcoded strings inline to `index.ts`. Uncategorised app-wide strings belong in `globalFunctionality/T_unsortedAppTexts.ts` under `globalFunctionality.unsortedAppTexts`.
+- In TypeScript scripts and Pinia stores (outside Vue templates), import `{ i18n } from 'app/src/i18n/externalFileLoader'` and call `i18n.global.t('camelCaseKey.subKey')`.
+- Storybook mocks: import specific non-markdown `T_*` modules directly — never the full `en-US/index.ts` — and provide placeholder strings for `documents.*` keys. See [fantasia-i18n skill](../skills/fantasia-i18n/SKILL.md).
 
 ## After UI changes
 

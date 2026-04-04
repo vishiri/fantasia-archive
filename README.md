@@ -32,6 +32,28 @@ yarn
 - **Tests**: Vitest (unit) + Playwright (component and E2E)
 - **Component docs**: Storybook 10 (in `.storybook-workspace/`)
 
+### i18n (localisation)
+
+Locale strings live under `src/i18n/en-US/` in a fixed folder hierarchy:
+
+| Folder | Purpose |
+| --- | --- |
+| `documents/` | Markdown source files (`.md`, imported with `?raw`, passed through `specialCharacterFixer`) |
+| `components/<ComponentName>/` | One `T_<ComponentName>.ts` per component with user-visible strings |
+| `dialogs/` | One `T_<DialogName>.ts` per dialog |
+| `pages/` | One `T_<PageName>.ts` per page |
+| `globalFunctionality/` | One `T_<feature>.ts` per app-wide, non-component concern (e.g. Pinia store notifications) |
+
+`src/i18n/en-US/index.ts` composes the full locale tree; it contains only imports and the export object — no hardcoded strings.
+
+**Key naming**: all top-level keys use camelCase with a lowercase first letter (e.g. `globalWindowButtons`, `appControlMenus`, `dialogs`, `errorNotFound`). Sub-keys follow the same rule.
+
+**Using strings**:
+- Vue templates: `$t('topLevelKey.subKey')`.
+- TypeScript scripts and Pinia stores: `import { i18n } from 'app/src/i18n/externalFileLoader'` then `i18n.global.t('topLevelKey.subKey')`.
+
+**Adding new strings**: create or update the appropriate `T_*.ts` file, then import and register it in `index.ts` under a camelCase key. Never add hardcoded prose inline to `index.ts`.
+
 ### Start the app in Quasar development mode (hot-code reloading, error reporting, etc.)
 ```
 quasar dev -m electron

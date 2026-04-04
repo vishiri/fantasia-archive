@@ -14,23 +14,53 @@ description: >-
 - **Locale registry**: `src/i18n/index.ts` exports locale keys (e.g. `en-US`, `de`) and merges each locale module.
 - **TypeScript**: global message schema augmentation lives in **`src/boot/i18n.ts`** (`declare module 'vue-i18n'`). Under **`yarn lint:typescript`**, **`tsc`** may report **TS2665** against the ESM `module` resolution; the boot file documents a **`@ts-expect-error`** for that line. Keep **`eslint-disable @typescript-eslint/no-empty-object-type`** on the augmentation block (typescript-eslint v8 rule name). See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc).
 
-## English structure (`src/i18n/en-US/`)
+## Folder structure (`src/i18n/en-US/`)
 
-- **`index.ts`**: Composes the default export — global `documents` (imported `.md` strings), `app`, page keys (`ErrorNotFound`, …), and nested `T_*` modules for menus, dialogs, and components.
-- **Component/dialog strings**: Prefer dedicated `T_<feature>.ts` files under `en-US/components/...` or `en-US/dialogs/...` and import them into `index.ts` for a clear tree.
-- **Markdown documents**: Live under `en-US/documents/` as `.md` files; imported in `index.ts` and often passed through `specialCharacterFixer` from `src/i18n/specialCharactersFixer.ts`.
+```
+src/i18n/en-US/
+  index.ts                            — composes the full locale tree; no hardcoded strings (see rules below)
+  documents/                          — Markdown source files (.md); imported via ?raw and passed through specialCharacterFixer
+  components/<ComponentName>/         — one T_<ComponentName>.ts per component that has user-visible strings
+  dialogs/                            — one T_<DialogName>.ts per dialog
+  pages/                              — one T_<PageName>.ts per page
+  globalFunctionality/                — one T_<feature>.ts per app-wide, non-component concern (e.g. store notifications)
+```
+
+Do not place locale files in any other location. If no folder fits, use `globalFunctionality/`.
+
+## Key naming rules
+
+- All top-level keys exported from `index.ts` use **camelCase with a lowercase first letter** (e.g. `globalWindowButtons`, `appControlMenus`, `dialogs`, `errorNotFound`, `globalFunctionality`).
+- Sub-keys within `T_*.ts` modules also use camelCase with a lowercase first letter.
+- `index.ts` must contain no hardcoded user-visible strings; every string lives in a dedicated `T_*.ts` file.
+- The `documents` section holds processed markdown strings, not static text — it is the only section that calls `specialCharacterFixer`; do not add plain string keys there.
+- App-wide strings that do not belong to a specific component, dialog, or page go in `globalFunctionality/`. Uncategorised strings live in `globalFunctionality/T_unsortedAppTexts.ts` under the `globalFunctionality.unsortedAppTexts` key.
+
+## index.ts rules
+
+- `index.ts` must contain **only imports and the composed export object**. No hardcoded user-visible strings.
+- Every new section maps a camelCase top-level key to its imported `T_*` module (or, for `documents`, to its `specialCharacterFixer(...)` call).
+- Import ordering in `index.ts`: markdown document imports first, then component `T_*` imports grouped by folder (`components/`, then `dialogs/`, then `globalFunctionality/`, then `pages/`).
+
+## Using strings in code
+
+- **Vue templates**: `$t('camelCaseKey.subKey')` — do not import `useI18n` just to call `t(...)` when `$t` is available in the template.
+- **TypeScript scripts and Pinia stores**: `import { i18n } from 'app/src/i18n/externalFileLoader'` then `i18n.global.t('camelCaseKey.subKey')`.
+- Never hardcode user-visible prose directly in `.vue` templates, `_data/` files, or scripts; always route through an i18n key.
+
+## Adding new strings — step by step
+
+1. Identify the right folder (`components/<ComponentName>/`, `dialogs/`, `pages/`, or `globalFunctionality/`).
+2. Create or open `T_<name>.ts` in that folder and add the new keys (camelCase, lowercase first letter).
+3. If the file is new, import it in `index.ts` and assign it to a new camelCase top-level key.
+4. Use the full dot-path in templates (`$t('topLevelKey.subKey')`) or scripts (`i18n.global.t('topLevelKey.subKey')`).
+5. Mirror the structure in other active locales (`de`, etc.) when those are maintained.
 
 ## Storybook integration
 
-- For Storybook mocks/loaders, import focused non-markdown `T_*` modules directly (for example `en-US/components/.../T_*.ts`) instead of importing `en-US/index.ts`.
-- Reason: full locale entrypoints pull markdown `documents/*.md`, which can break Storybook/Vite import analysis unless extra markdown handling is configured.
+- For Storybook mocks/loaders, import focused non-markdown `T_*` modules directly (for example `en-US/components/GlobalWindowButtons/T_GlobalWindowButtons.ts`) instead of importing `en-US/index.ts`.
+- Reason: the full locale entrypoint pulls markdown `documents/*.md`, which can break Storybook/Vite import analysis.
 - If Storybook stories need document content (`documents.*`), provide explicit placeholder strings (for example lorem ipsum) in `.storybook/preview.ts` rather than importing markdown files.
-
-## Adding strings
-
-1. Choose the right namespace (global vs component-specific `T_*` module).
-2. Add keys in TypeScript modules or inline in `index.ts` for small additions.
-3. Mirror structure in other active locales (`de`, etc.) when those are maintained.
 
 ## Related
 

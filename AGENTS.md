@@ -63,10 +63,38 @@ When writing comments in source files (not in user-facing Markdown documents suc
 - Favor singular names for single-item shapes (`I_appMenuItem`, `T_documentName`) and collection-oriented names for grouped structures (`I_appMenuList`, `I_socialContactButtonSet`).
 - Keep unions and function signatures consistently spaced (for example, `string | false`, `(...args: unknown[]) => unknown | void`).
 
-## i18n convention
+## i18n conventions
 
-- In Vue templates, use `$t('...')` for translations.
-- Do **not** import `useI18n` just to call `t(...)` inside SFC scripts when template `$t(...)` can be used.
+### File structure (`src/i18n/en-US/`)
+
+Locale strings live under `src/i18n/en-US/` in a fixed folder hierarchy:
+
+- `documents/` — Markdown source files (`.md`, imported with `?raw` and passed through `specialCharacterFixer`).
+- `components/<ComponentName>/` — one `T_<ComponentName>.ts` per component with user-visible strings.
+- `dialogs/` — one `T_<DialogName>.ts` per dialog.
+- `pages/` — one `T_<PageName>.ts` per page.
+- `globalFunctionality/` — one `T_<feature>.ts` per app-wide, non-component concern (e.g. store notifications).
+
+`index.ts` composes the full locale tree. It must contain **only imports and the composed export object** — no hardcoded user-visible strings. The only intentionally inline section is `quasarNotify` (a single, stable key).
+
+### Key naming
+
+- All top-level keys in `index.ts` use **camelCase with a lowercase first letter** (e.g. `globalWindowButtons`, `appControlMenus`, `dialogs`, `errorNotFound`, `globalFunctionality`).
+- Sub-keys within `T_*.ts` modules also use camelCase with a lowercase first letter.
+- `index.ts` must contain no hardcoded user-visible strings; every string lives in a dedicated `T_*.ts` file.
+- The `documents` section is the only one that uses `specialCharacterFixer`; do not add plain string keys there.
+- App-wide strings that do not belong to a specific component, dialog, or page go in `globalFunctionality/`. Uncategorised strings live in `globalFunctionality/T_unsortedAppTexts.ts` under the `globalFunctionality.unsortedAppTexts` key.
+
+### Usage
+
+- In Vue templates, use `$t('camelCaseKey.subKey')` for translations. Do **not** import `useI18n` just to call `t(...)` inside SFC scripts when template `$t(...)` can be used.
+- In TypeScript scripts and Pinia stores, import `{ i18n } from 'app/src/i18n/externalFileLoader'` and call `i18n.global.t('camelCaseKey.subKey')`.
+- Never hardcode user-visible prose in `.vue` templates, `_data/` files, or scripts; always route through an i18n key.
+
+### Storybook i18n
+
+- Do **not** import the full `src/i18n/en-US/index.ts` (or `src/i18n/index.ts`) in Storybook helpers/mocks — markdown `documents/*.md` imports can break Vite import analysis.
+- For Storybook-only i18n mocks, import non-markdown `T_*` locale modules directly and provide placeholder lorem ipsum strings for `documents.*` markdown keys.
 
 ## Linting and static analysis
 
@@ -110,8 +138,7 @@ When writing comments in source files (not in user-facing Markdown documents suc
 - Story files are colocated with components as `src/components/**/<Component>.stories.ts`.
 - **Layouts and pages** may have `src/layouts/**/*.stories.ts` and `src/pages/**/*.stories.ts` for **canvas-only** previews (router shells, smoke checks). Do **not** add Storybook **Docs** (no `autodocs` tag, no `parameters.docs.description`, keep `parameters.docs.disable: true`). Agents should not generate or expand documentation pages for layouts/pages in Storybook.
 - Prefer Storybook for isolated **component** authoring/editing feedback; use `yarn storybook:run` for dev and `yarn storybook:build` for static output.
-- Do **not** import the full `src/i18n/en-US/index.ts` (or `src/i18n/index.ts`) in Storybook helpers/mocks; these pull markdown `documents/*.md` and can break Vite import analysis.
-- For Storybook-only i18n mocks, import non-markdown `T_*` locale modules directly and provide placeholder lorem ipsum strings for `documents.*` markdown keys.
+- Do **not** import the full `src/i18n/en-US/index.ts` (or `src/i18n/index.ts`) in Storybook helpers/mocks — see i18n conventions above.
 - Do **not** add Storybook stories named `A11y/*` in this project.
 - Do **not** create stories that only verify `TEST_ENV === 'components'`; keep those checks in Playwright/component-test flows.
 
