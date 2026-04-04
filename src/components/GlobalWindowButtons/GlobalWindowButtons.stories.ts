@@ -4,7 +4,7 @@ import { expect, waitFor, within } from 'storybook/test'
 import GlobalWindowButtons from './GlobalWindowButtons.vue'
 
 /**
- * `GlobalWindowButtons` is `position: fixed`, so it does not expand the story root.
+ * 'GlobalWindowButtons' is 'position: fixed', so it does not expand the story root.
  * Give the canvas a minimum height and bottom padding so Docs/Canvas previews are not visually cramped.
  * For the devtools bridge scenario, show an honest note — this component does not read devtools state.
  */
@@ -51,11 +51,11 @@ const meta = {
     docs: {
       description: {
         component: `
-Window control cluster that reads \`window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized()\` (with \`process.env.MODE === 'electron'\` in Storybook) to swap the middle control between **maximize** and **restore** icons and labels.
+Window control cluster that reads window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() (with process.env.MODE === 'electron' in Storybook) to swap the middle control between maximize and restore icons and labels.
 
-**Maximized vs default** can be validated visually and with interactions in isolation.
+Maximized vs default can be validated visually and with interactions in isolation.
 
-**Devtools open** is not reflected in this component — nothing in the template calls \`faDevToolsControl\`. The devtools mock story exists so the bridge scenario stays available for other stories or Playwright/e2e; use the note in that story’s canvas to avoid confusion.
+Devtools open is not reflected in this component — nothing in the template calls faDevToolsControl. The devtools mock story exists so the bridge scenario stays available for other stories or Playwright/e2e; use the note in that story’s canvas to avoid confusion.
 `.trim()
       }
     }
@@ -94,7 +94,7 @@ export const StatesDevToolsOpen: Story = {
     contentBridgeScenario: 'devToolsOpen',
     docs: {
       description: {
-        story: 'Bridge mock only: `checkDevToolsStatus` returns true. This component has no devtools-specific UI—expect the same look as Default.'
+        story: 'Bridge mock only: checkDevToolsStatus returns true. This component has no devtools-specific UI—expect the same look as Default.'
       }
     }
   },

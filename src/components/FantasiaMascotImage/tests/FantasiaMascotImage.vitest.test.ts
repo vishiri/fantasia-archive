@@ -7,7 +7,7 @@ import FantasiaMascotImage from '../FantasiaMascotImage.vue'
 
 /**
  * FantasiaMascotImage
- * Fixed `fantasiaImage` prop should bind a deterministic list URL and not random mode.
+ * Fixed 'fantasiaImage' prop should bind a deterministic list URL and not random mode.
  */
 test('Test that FantasiaMascotImage renders list image and disables random mode when prop is set', () => {
   const w = mount(FantasiaMascotImage, {

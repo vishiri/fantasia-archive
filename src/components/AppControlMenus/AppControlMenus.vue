@@ -81,7 +81,7 @@ withDefaults(
 const testingType = window.faContentBridgeAPIs?.extraEnvVariables?.TEST_ENV ?? ''
 
 /**
- * Menu payload for `TEST_ENV === 'components'` embed only — mirrors Playwright scenarios for AppControlMenus.
+ * Menu payload for TEST_ENV === 'components' embed only — mirrors Playwright scenarios for AppControlMenus.
  */
 const componentTestingMenuList: I_appMenuList = {
   title: 'Test Title',

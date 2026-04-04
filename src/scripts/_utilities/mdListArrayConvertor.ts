@@ -12,7 +12,7 @@ export function mdListArrayConvertor (mdString: string) {
   // Remove leading "- "
   mdString = mdString.replaceAll('\n- ', '\n')
 
-  // Cleaned up ` characters and replace them with "
+  // Cleaned up grave-accent characters and replace them with double-quote characters
   mdString = mdString.replaceAll('`', '"')
 
   // Split the list by leading newline characters and remove the last empty line (if present)

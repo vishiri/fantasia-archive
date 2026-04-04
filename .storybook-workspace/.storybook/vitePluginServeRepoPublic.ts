@@ -30,9 +30,9 @@ const isPathInsideDir = (filePath: string, dirPath: string): boolean => {
 }
 
 /**
- * Storybook's `staticDirs` parser mishandles Windows absolute paths (`C:` vs `:` segment split).
- * Requests like `/images/socialContactButtons/*.png` then 404. This middleware mirrors Vite's
- * `public/` serving for the real Quasar `public` folder during `storybook dev`.
+ * Storybook 'staticDirs' parser mishandles Windows absolute paths ('C:' vs ':' segment split).
+ * Requests like '/images/socialContactButtons/*.png' then 404. This middleware mirrors Vite
+ * 'public/' serving for the real Quasar 'public' folder during 'storybook dev'.
  */
 export const vitePluginServeRepoPublic = (absolutePublicDir: string): Plugin => ({
   name: 'fantasia-archive-serve-repo-public',
@@ -92,8 +92,8 @@ export const vitePluginServeRepoPublic = (absolutePublicDir: string): Plugin => 
     }
 
     /**
-     * Run before Vite's own `publicDir` static handler so a mis-merged config cannot 404 first.
-     * `stack` is connect internals; Vite's dev server uses it (see vitejs/vite#8320).
+     * Run before Vite's own 'publicDir' static handler so a mis-merged config cannot 404 first.
+     * 'stack' is connect internals; Vite's dev server uses it (see vitejs/vite#8320).
      */
     const stack = (server.middlewares as Connect.Server).stack
 

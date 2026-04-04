@@ -7,7 +7,7 @@ import { defineConfig } from 'vitest/config'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 /**
- * Vue component unit tests (`src/components/**`) — jsdom + SFC transforms only.
+ * Vue component unit tests (src/components tree) — jsdom + SFC transforms only.
  */
 export default defineConfig({
   plugins: [vue()],

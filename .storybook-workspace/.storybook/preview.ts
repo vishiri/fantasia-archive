@@ -24,8 +24,8 @@ setActivePinia(storybookPinia)
 const STORYBOOK_SCROLL_FIX_ID = 'fa-storybook-scroll-fix'
 
 /**
- * Quasar only auto-registers components when `components` is passed to `app.use(Quasar, opts)`.
- * Without it, tags like `q-btn` stay unresolved and slot trees (e.g. `q-menu` / `q-list`) flatten into raw text in the canvas.
+ * Quasar only auto-registers components when 'components' is passed to 'app.use(Quasar, opts)'.
+ * Without it, tags like 'q-btn' stay unresolved and slot trees (e.g. 'q-menu' / 'q-list') flatten into raw text in the canvas.
  */
 const quasarComponentsForStorybook = (): QuasarPluginOptions['components'] => {
   const out: Record<string, unknown> = {}
@@ -52,7 +52,7 @@ const SCROLL_FIX_CLASS = 'fa-storybook-scroll-override'
 
 const ensureStorybookScrollFix = () => {
   /**
-   * Project `htmlAdjustments.scss` sets `html, body { overflow: hidden !important; }` for Electron.
+   * Project 'htmlAdjustments.scss' sets 'html, body { overflow: hidden !important; }' for Electron.
    * Storybook Docs needs a higher-specificity, end-of-head override so long doc pages scroll.
    * Re-append on each run so we stay after Vite-injected CSS order/HMR.
    */

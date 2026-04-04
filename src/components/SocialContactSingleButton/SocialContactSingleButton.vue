@@ -42,18 +42,18 @@ const props = defineProps<{
 }>()
 
 /**
- * Data input for the component (Playwright component mode passes `dataInput` via `COMPONENT_PROPS`.)
+ * Data input for the component (Playwright component mode passes 'dataInput' via 'COMPONENT_PROPS'.)
  */
 const buttonData = computed(() => props.dataInput)
 
 /**
- * Public-folder assets (Vite `public/` / Storybook `staticDirs`) must be rooted with `BASE_URL`
- * so paths resolve in the Storybook iframe and under custom app `base` if ever set.
+ * Public-folder assets (Vite 'public/' / Storybook 'staticDirs') must be rooted with 'BASE_URL'
+ * so paths resolve in the Storybook iframe and under custom app 'base' if ever set.
  */
 const iconSrc = computed(() => {
   const rawBase = import.meta.env.BASE_URL
-  // Quasar Electron uses an empty Vite `base` that becomes `'/'` for `import.meta.env.BASE_URL`.
-  // Root-relative `/images/...` breaks under `file://` (packaged app); use a relative base instead.
+  // Quasar Electron uses an empty Vite 'base' that becomes '/' for import.meta.env.BASE_URL.
+  // Root-relative '/images/...' breaks under file:// (packaged app); use a relative base instead.
   const base =
     rawBase === '' || rawBase === undefined || rawBase === '/'
       ? './'

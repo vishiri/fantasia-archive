@@ -23,7 +23,7 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-/** Mirrors `/componentTesting/:componentName` with `SocialContactSingleButton` + sample `dataInput`. */
+/** Mirrors '/componentTesting/:componentName' with 'SocialContactSingleButton' + sample 'dataInput'. */
 export const WithSocialContactSingleButton: Story = {
   name: 'With Single Component Test',
   args: { initialPath: '/componentTesting/SocialContactSingleButton' }

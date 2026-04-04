@@ -9,15 +9,15 @@ const meta = {
   parameters: {
     docs: {
       /**
-       * One Docs page renders every story; `inline: true` mounts them all at once and each opens
-       * `q-dialog` on mount → overlapping modals. A per-story iframe isolates a single instance.
+       * One Docs page renders every story; 'inline: true' mounts them all at once and each opens
+       * 'q-dialog' on mount → overlapping modals. A per-story iframe isolates a single instance.
        */
       story: {
         inline: false,
         iframeHeight: '760px'
       },
       description: {
-        component: 'Markdown-backed dialog for in-app documents. Data contract: `directInput` must be one of the documented `T_documentName` keys.'
+        component: 'Markdown-backed dialog for in-app documents. Data contract: directInput must be one of the documented T_documentName keys.'
       }
     }
   }

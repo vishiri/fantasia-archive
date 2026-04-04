@@ -17,7 +17,7 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-/** Same page as production home, inside `MainLayout`. */
+/** Same page as production home, inside 'MainLayout'. */
 export const WithinMainLayout: Story = {
   args: { initialPath: '/' }
 }

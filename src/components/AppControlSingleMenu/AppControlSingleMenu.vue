@@ -149,7 +149,7 @@ const props = defineProps<{
 }>()
 
 /**
- * Data input for the component (Playwright component mode passes `dataInput` via `COMPONENT_PROPS`.)
+ * Data input for the component (Playwright component mode passes 'dataInput' via 'COMPONENT_PROPS'.)
  */
 const componentData = computed(() => props.dataInput)
 

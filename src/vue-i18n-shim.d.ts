@@ -1,6 +1,6 @@
 /**
- * vue-i18n v11 augments `declare module 'vue'` with $t / $d / $n / etc.
- * The CLI `tsc` picks that up, but the Volar IDE template-checker resolves
+ * vue-i18n v11 augments declare module 'vue' with $t / $d / $n / etc.
+ * The CLI 'tsc' picks that up, but the Volar IDE template-checker resolves
  * ComponentCustomProperties through @vue/runtime-core.  Re-declare the same
  * properties here so both code-paths agree.
  *

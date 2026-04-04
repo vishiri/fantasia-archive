@@ -23,12 +23,12 @@ const quasarVariablesImportPath = path
 /**
  * Prepend theme variables so Quasar components render with the project palette.
  *
- * For Quasar's own `index.sass` we must use `@import` (not `@use`) so that
- * `$dark`, `$primary`, etc. land in the same global scope before `variables.sass`
- * evaluates its `!default` assignments.  This matches `@quasar/vite-plugin`'s
- * `scss-transform.js` behavior that Quasar CLI relies on.
+ * For Quasar's own 'index.sass' we must use '@import' (not '@use') so that
+ * '$dark', '$primary', etc. land in the same global scope before 'variables.sass'
+ * evaluates its '!default' assignments. This matches '@quasar/vite-plugin'
+ * 'scss-transform.js' behavior that Quasar CLI relies on.
  *
- * For project SCSS/Sass (Vue SFCs, standalone files) we keep `@use ... as *` so
+ * For project SCSS/Sass (Vue SFCs, standalone files) we keep '@use ... as *' so
  * variables are available without polluting the global scope.
  */
 function quasarVariablesAdditionalData (source: string, filepath: string): string {
@@ -45,10 +45,10 @@ function quasarVariablesAdditionalData (source: string, filepath: string): strin
   return `@use "${quasarVariablesUseUrl}" as *;\n${source}`
 }
 const externalFileLoaderMockPath = path.resolve(__dirname, './mocks/externalFileLoader.ts')
-/** Same as Quasar app: `public/` is served at `/` so `images/socialContactButtons/*.png` resolves. */
+/** Same as Quasar app: 'public/' is served at '/' so 'images/socialContactButtons/*.png' resolves. */
 const publicDirPath = path.resolve(repoRoot, 'public')
 
-/** Align with `@quasar/app-vite`: Quasar's `index.sass` still uses `@import`; silence until upstream migrates. */
+/** Align with '@quasar/app-vite': Quasar 'index.sass' still uses '@import'; silence until upstream migrates. */
 const sassSilenceDeprecations = ['import', 'global-builtin'] as const
 
 const config: StorybookConfig = {
@@ -59,8 +59,8 @@ const config: StorybookConfig = {
   ],
 
   /**
-   * Relative to `configDir` only — Windows absolute paths break Storybook's `staticDirs` parser (`C:` / `to:` split).
-   * Dev-time asset requests are also served by `vitePluginServeRepoPublic` (see `viteFinal`).
+   * Relative to 'configDir' only — Windows absolute paths break Storybook 'staticDirs' parser ('C:' / 'to:' split).
+   * Dev-time asset requests are also served by 'vitePluginServeRepoPublic' (see 'viteFinal').
    */
   staticDirs: ['../../public'],
 

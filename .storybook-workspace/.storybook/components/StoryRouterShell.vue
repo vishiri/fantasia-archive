@@ -10,7 +10,7 @@ import { STORYBOOK_APP_ROUTES } from '../storybookAppRoutes'
 
 const props = withDefaults(
   defineProps<{
-    /** Must match a path registered in `STORYBOOK_APP_ROUTES`. */
+    /** Must match a path registered in 'STORYBOOK_APP_ROUTES'. */
     initialPath?: string
   }>(),
   { initialPath: '/' }

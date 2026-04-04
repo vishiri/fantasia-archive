@@ -5,7 +5,7 @@ import type { I_appMenuList } from 'app/types/I_appMenusDataList'
 import { rgbToHex } from 'src/scripts/_utilities/colorFormatConvertors'
 
 /**
- * Menu payload for this spec — must match what the app receives via `COMPONENT_PROPS.dataInput`.
+ * Menu payload for this spec — must match what the app receives via 'COMPONENT_PROPS.dataInput'.
  */
 const testData: I_appMenuList = {
   title: 'Test Title',

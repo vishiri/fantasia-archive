@@ -4,8 +4,8 @@ import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEn
 import type { I_socialContactButtonSet } from 'app/types/I_socialContactButtons'
 
 /**
- * Keys exported in `_data/buttons.ts` — keep this list in sync when adding a button.
- * Listed here (not by importing `buttons.ts`) so Playwright’s Node loader stays light.
+ * Keys exported in '_data/buttons.ts' — keep this list in sync when adding a button.
+ * Listed here (not by importing 'buttons.ts') so Playwright’s Node loader stays light.
  */
 const socialContactButtonSetKeys: readonly (keyof I_socialContactButtonSet)[] = [
   'buttonPatreon',

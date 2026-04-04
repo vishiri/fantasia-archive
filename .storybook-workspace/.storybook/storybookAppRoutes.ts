@@ -8,7 +8,7 @@ import ErrorNotFound from '../../src/pages/ErrorNotFound.vue'
 import IndexPage from '../../src/pages/IndexPage.vue'
 
 /**
- * Minimal outlet so `MainLayout` can be previewed without loading the full index page.
+ * Minimal outlet so 'MainLayout' can be previewed without loading the full index page.
  */
 export const StoryEmptyOutlet = defineComponent({
   name: 'StoryEmptyOutlet',
@@ -23,7 +23,7 @@ export const StoryEmptyOutlet = defineComponent({
 })
 
 /**
- * Single route table for all layout/page previews. Stories switch view via `initialPath` + `router.replace`.
+ * Single route table for all layout/page previews. Stories switch view via 'initialPath' + 'router.replace'.
  */
 export const STORYBOOK_APP_ROUTES: RouteRecordRaw[] = [
   {

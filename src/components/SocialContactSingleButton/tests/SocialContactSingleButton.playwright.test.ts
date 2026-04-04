@@ -4,7 +4,7 @@ import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEn
 import type { I_socialContactButton } from 'app/types/I_socialContactButtons'
 
 /**
- * Button payload for this spec — must match what the app receives via `COMPONENT_PROPS.dataInput`.
+ * Button payload for this spec — must match what the app receives via 'COMPONENT_PROPS.dataInput'.
  */
 const testData: I_socialContactButton = {
   title: 'Patreon - Title',

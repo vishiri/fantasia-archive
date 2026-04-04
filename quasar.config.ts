@@ -6,7 +6,7 @@ import { checker } from 'vite-plugin-checker'
 
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
-// Vite `Plugin` types differ between the hoisted `vite` package and `@quasar/app-vite`'s nested copy; the config is valid at runtime.
+// Vite 'Plugin' types differ between the hoisted 'vite' package and '@quasar/app-vite' nested copy; the config is valid at runtime.
 // @ts-expect-error TS2345 — duplicate Vite type graphs (see vite-plugin-checker + Quasar)
 export default defineConfig((ctx) => {
   return {
@@ -110,7 +110,7 @@ export default defineConfig((ctx) => {
 
     // https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/configuring-electron
     electron: {
-      // @electron/remote lists `electron` as a peer; UnPackaged `yarn install --production` omits it, so Yarn may warn and electron-builder's dependency collector may stderr — packaging still succeeds and the runtime ships with Electron.
+      // '@electron/remote' lists 'electron' as a peer; UnPackaged 'yarn install --production' omits it, so Yarn may warn and electron-builder's dependency collector may stderr — packaging still succeeds and the runtime ships with Electron.
       inspectPort: 5858,
 
       bundler: 'builder',
@@ -132,7 +132,7 @@ export default defineConfig((ctx) => {
           synopsis: 'A worldbuilding database manager',
           description: 'A worldbuilding database manager',
           icon: 'src-electron/icons',
-          // electron-builder 26+: desktop fields live under `entry` (LinuxDesktopFile)
+          // electron-builder 26+: desktop fields live under 'entry' (LinuxDesktopFile)
           desktop: {
             entry: {
               Name: 'Fantasia Archive',

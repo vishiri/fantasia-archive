@@ -14,9 +14,9 @@ export const openDialogMarkdownDocument = (inputDocumentName: T_documentName) =>
 }
 
 /**
-  * Opens the particular dialog component based on the input dialog name.
-  * @param inputDialogName - The name of the dialog component to open.
-  */
+ * Opens the particular dialog component based on the input dialog name.
+ * @param inputDialogName - The name of the dialog component to open.
+ */
 export const openDialogComponent = (inputDialogName: T_dialogName) => {
   const componentDialogStore = S_DialogComponent()
   componentDialogStore.dialogToOpen = inputDialogName

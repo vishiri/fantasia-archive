@@ -26,7 +26,7 @@ const route = useRoute()
 
 /**
  * Currently tested component's name based on the last part of the route
- * (must match SFC `__name`, i.e. the file basename without `.vue`).
+ * (must match SFC __name, i.e. the file basename without '.vue').
  */
 const componentNameParam = route?.params?.componentName
 const componentName = Array.isArray(componentNameParam)

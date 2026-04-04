@@ -17,7 +17,7 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-/** Home route: `IndexPage` inside the main chrome. */
+/** Home route: 'IndexPage' inside the main chrome. */
 export const WithIndexPage: Story = {
   args: { initialPath: '/' }
 }
