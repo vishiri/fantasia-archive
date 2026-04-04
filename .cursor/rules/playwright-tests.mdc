@@ -6,6 +6,8 @@ alwaysApply: false
 
 # Playwright tests (`*.playwright.test.ts` / `*.playwright.spec.ts`)
 
+JSDoc above tests and line comments in these files: follow AGENTS.md code-comment rules (plain text, no Markdown bold/italic; single quotes instead of grave accents for inline references).
+
 ## Preconditions
 
 - Run against a **production Electron build** after relevant source changes (`yarn quasar:build:electron` / `quasar build -m electron`). See [README.md](README.md).

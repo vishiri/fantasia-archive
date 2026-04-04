@@ -3,7 +3,11 @@
 
 ## 2.4.10 - Contributor test scripts, verify CI, and dependency refresh
 
+### New features
+- Added persistent **user settings** in the **Electron** main process (**electron-store** under app **userData**), starting with a **theme** preference (**light** or **dark**, default **light**), exposed to the renderer as **`window.faContentBridgeAPIs.faUserSettings`** (**get** / **set**).
+
 ### Bugfixes & Optimizations
+- Centralized **main ↔ preload** **IPC** channel names in **`src-electron/electron-ipc-bridge.ts`** (including **DevTools** sync channels) so **Electron** handlers and **preload** helpers cannot drift to mismatched strings; removed the older **DevTools**-only channel module.
 - Added **`src/vue-i18n-shim.d.ts`** so **vue-i18n** injected globals (**`$t`**, **`$d`**, **`$n`**, and related **`$*`** helpers) are declared on **`@vue/runtime-core`**, aligning **Vue** SFC template typing with **`tsc`** and clearing spurious missing-**`$t`** diagnostics in editors that resolve **`ComponentCustomProperties`** through the runtime-core path.
 - Replaced the main-process **`sqlite3`** dependency with **`better-sqlite3`** (synchronous **SQLite** bindings for the planned database layer; still a native addon—rebuild after **Electron**/**Node** bumps as documented in **README**). **AGENTS**, **`fantasia-sqlite-main`**, and the **`electron-main`** stub comment now refer to **`better-sqlite3`**.
 - Renamed Storybook-related **Yarn** scripts under **`test:storybook:*`**: **`yarn test:storybook:visual`** (with **`:headed`**, **`:update`**, **`:update:headed`**) replaces **`yarn visual:storybook:*`**; **`yarn test:storybook:smoke`** replaces **`yarn storybook:smoke`**. **`.storybook-workspace`** script keys match. Updated **README**, **AGENTS**, Cursor rules/skills, and plan notes.

@@ -10,3 +10,4 @@ alwaysApply: false
 - Implement API objects in `src-electron/contentBridgeAPIs/` and extend `src/globals.d.ts` plus `types/I_*.ts` when adding or changing shapes.
 - Do not widen renderer `nodeIntegration` or expose raw `require`/`ipcRenderer` wholesale to fix shortcuts.
 - Prefer narrow, typed methods; add Vitest tests under `contentBridgeAPIs/tests/` when behavior is non-trivial.
+- In line comments and JSDoc inside src-electron/, follow the code-comment rules in AGENTS.md (no Markdown emphasis; use single quotes for inline symbol/path references instead of grave accents).

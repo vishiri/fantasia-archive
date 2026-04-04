@@ -12,6 +12,10 @@ alwaysApply: true
 - Use **`import type`** for type-only imports in `.ts` and Vue `<script lang="ts">` blocks; do not keep value imports that are only used as types.
 - Prefer explicit type imports over inline `typeof import('...')` type annotations when a named type import can express the same intent.
 
+## Code comments
+
+In line comments, block comments, and JSDoc above APIs and tests: do not use Markdown double-asterisk bold or asterisk italic; use plain wording. For inline references to symbols, paths, or commands, prefer single-quoted text (for example 'yarn test:unit') instead of grave accents (backticks).
+
 ## Commands
 
 | Command | Role |

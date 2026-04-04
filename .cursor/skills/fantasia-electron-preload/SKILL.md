@@ -11,6 +11,7 @@ description: >-
 
 ## Architecture
 
+- In JSDoc and line comments under src-electron/, follow AGENTS.md code-comment rules (no Markdown emphasis in comments; use single quotes for inline references instead of grave accents).
 - **Preload**: `src-electron/electron-preload.ts` builds `apiObject` and calls `contextBridge.exposeInMainWorld('faContentBridgeAPIs', apiObject)`.
 - **Renderer access**: `window.faContentBridgeAPIs` — typed in `src/globals.d.ts`.
 - **Implementations**: One module per API under `src-electron/contentBridgeAPIs/` (e.g. `faWindowControlAPI.ts`, `appDetailsAPI.ts`).

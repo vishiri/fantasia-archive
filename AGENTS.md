@@ -48,6 +48,13 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 
 Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-electron/electron-preload.ts`) and typed in `src/globals.d.ts`. New surface area: implement in `src-electron/contentBridgeAPIs/`, register in preload, update types, add tests under `contentBridgeAPIs/tests/`. Details: `.cursor/skills/fantasia-electron-preload/SKILL.md`.
 
+## Code comments (JSDoc, line comments, block comments)
+
+When writing comments in source files (not in user-facing Markdown documents such as the in-app changelog):
+
+- Do not use Markdown emphasis in comments (double-asterisk bold or asterisk-wrapped italic); it clutters plain text in editors and diffs.
+- Use single quotes for inline code or identifier references (for example 'ipcMain.handle', 'src/components/') instead of grave accents (backticks).
+
 ## Type naming conventions
 
 - Keep the existing prefix strategy: `I_` for interfaces and `T_` for type aliases.

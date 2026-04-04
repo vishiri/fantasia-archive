@@ -39,7 +39,7 @@ alwaysApply: false
 
 ## Documenting each test block
 
-Use a **JSDoc comment immediately above** `test` or `test.skip`:
+Use a JSDoc comment immediately above `test` or `test.skip` (same style rules as [eslint-typescript.mdc](eslint-typescript.mdc) code comments: no Markdown emphasis in comment text; use single quotes instead of grave accents for inline references):
 
 1. **First line**: name of the function, API export, or concern (e.g. `determineAppName`, `checkIfExternal`, `startApp`).
 2. **Following lines**: scenario, expected behavior, or why the test is skipped.
