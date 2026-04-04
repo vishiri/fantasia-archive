@@ -4,8 +4,8 @@ export const specialCharacterFixer = (inputString: string) => {
     '|'
   ]
 
-  specialCharacterList.forEach(Character => {
-    inputString = inputString.replaceAll(Character, `{'${Character}'}`)
+  specialCharacterList.forEach(character => {
+    inputString = inputString.replaceAll(character, `{'${character}'}`)
   })
 
   return inputString

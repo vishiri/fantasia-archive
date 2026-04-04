@@ -16,6 +16,7 @@
 - Removed the **GitHub Actions** Storybook visual-regression job from **`.github/workflows/verify.yml`** and renamed the workflow to **Verify** (push/PR runs **`yarn testbatch:verify`** only; **`.storybook-workspace`** install kept for ESLint). Storybook VRT stays **local** or via **`yarn testbatch:ensure:nochange`**. Updated **README**, **AGENTS**, **testing-terminal-isolation**, **fantasia-testing**, **fantasia-dev-setup**, and **fantasia-changelog-en-us** (omit-list wording).
 - Set **`actions/upload-artifact@v5`** on the manual **Build** workflow (**`.github/workflows/build.yml`**) for **Linux**, **macOS**, and **Windows** release artifacts, alongside **`actions/checkout@v5`** and **`actions/setup-node@v5`**, so artifact uploads stay on supported **GitHub Actions** runtimes.
 - Bumped **Vue** to **`^3.5.32`** (root and **`.storybook-workspace`**), **`@types/node`** to **`^22.19.17`**, refreshed **root** and **`.storybook-workspace`** lockfiles with **`yarn upgrade`**, and set Storybook VRT **`toHaveScreenshot`** **`maxDiffPixels: 150`** so compare runs stay stable across rebuilds. Refreshed one **Win32** chromium snapshot affected by the toolchain bump.
+- Renamed the markdown bullet-list helper to **`mdListArrayConverter`** (standard spelling) and normalized loop variable naming in **`specialCharacterFixer`**; **tips, tricks, and trivia** notifications and markdown document escaping are unchanged in behavior.
 
 ## 2.4.9 - Contributor tooling, Pinia dialogs, and CI hardening
 

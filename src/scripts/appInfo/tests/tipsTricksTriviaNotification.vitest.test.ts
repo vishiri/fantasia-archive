@@ -3,13 +3,13 @@ import { expect, test, vi } from 'vitest'
 const {
   notifyCreateMock,
   tMock,
-  mdListArrayConvertorMock,
+  mdListArrayConverterMock,
   determineCurrentImageMock
 } = vi.hoisted(() => {
   return {
     notifyCreateMock: vi.fn(),
     tMock: vi.fn((value: string) => value),
-    mdListArrayConvertorMock: vi.fn(() => ['Tip one', 'Tip two']),
+    mdListArrayConverterMock: vi.fn(() => ['Tip one', 'Tip two']),
     determineCurrentImageMock: vi.fn(() => 'image://mascot')
   }
 })
@@ -32,9 +32,9 @@ vi.mock('app/src/i18n/externalFileLoader', () => {
   }
 })
 
-vi.mock('../../_utilities/mdListArrayConvertor', () => {
+vi.mock('../../_utilities/mdListArrayConverter', () => {
   return {
-    mdListArrayConvertor: mdListArrayConvertorMock
+    mdListArrayConverter: mdListArrayConverterMock
   }
 })
 

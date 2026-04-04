@@ -1,11 +1,11 @@
 import { expect, test } from 'vitest'
-import { mdListArrayConvertor } from '../mdListArrayConvertor'
+import { mdListArrayConverter } from '../mdListArrayConverter'
 
 /**
- * mdListArrayConvertor
+ * mdListArrayConverter
  * Test markdown bullet extraction and cleanup.
  */
-test('Test that mdListArrayConvertor extracts only markdown list items', () => {
+test('Test that mdListArrayConverter extracts only markdown list items', () => {
   const input = [
     'Intro text that should be removed',
     '- first entry',
@@ -13,7 +13,7 @@ test('Test that mdListArrayConvertor extracts only markdown list items', () => {
     'Another line to remove'
   ].join('\n')
 
-  expect(mdListArrayConvertor(input)).toEqual([
+  expect(mdListArrayConverter(input)).toEqual([
     '- first entry',
     'second "quoted" entry'
   ])
