@@ -65,3 +65,8 @@ Do not place locale files in any other location. If no folder fits, use `globalF
 ## Related
 
 - [fantasia-markdown-dialogs](../fantasia-markdown-dialogs/SKILL.md) for rendering markdown in dialogs.
+
+## Local types extraction rule
+
+- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

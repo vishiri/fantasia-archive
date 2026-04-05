@@ -87,3 +87,8 @@ Repeat this structure in **every** Playwright file (see [GlobalWindowButtons.pla
 - Do not change `COMPONENT_NAME` / env contract without updating the component testing harness and docs.
 - Do not add Playwright (or other) tests whose **system under test** is a file under any **`_data/`** folder; assert behavior through `.vue` or other non-surface that uses that data.
 - For Storybook visual snapshot runs (`.storybook-workspace/visual-tests/storybook.visual.playwright.test.ts`), keep these utility Playwright-harness stories excluded because they are not meaningful visual-regression targets: `layouts-componenttestinglayout--with-social-contact-single-button`, `pages-componenttesting--social-contact-single-button`.
+
+## Local types extraction rule
+
+- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

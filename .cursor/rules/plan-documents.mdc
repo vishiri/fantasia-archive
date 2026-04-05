@@ -16,3 +16,8 @@ alwaysApply: true
 - Treat `.cursor/plans/` as local temporary planning context (not for repository sync).
 - Do not create top-level `docs/` (or other new doc roots) for planning artifacts unless the user explicitly asks for that location.
 - For planning artifacts (plans, rollout checklists, inventories, implementation trackers), invoke and follow `.cursor/skills/fantasia-plan-documents/SKILL.md` before creating files.
+
+## Local types extraction rule
+
+- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

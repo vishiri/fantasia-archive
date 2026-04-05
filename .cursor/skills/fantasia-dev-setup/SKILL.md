@@ -77,3 +77,8 @@ quasar build -m electron
 **Storybook** nested package: run **`yarn`** at the repo root, then **`yarn --cwd .storybook-workspace install`** so **`yarn storybook:run`** / **`yarn storybook:build`** / **`yarn test:storybook:visual*`** (Playwright VRT) resolve their dependencies.
 
 See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) for ESLint vs TSLint, `tsconfig` / `tsc`, and Vitest env typing. See [fantasia-testing](../fantasia-testing/SKILL.md) for test details. **Yarn 1.x** reserves `yarn check` for dependency verification — use **`yarn testbatch:verify`** for the lint/types/style/unit gate ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
+
+## Local types extraction rule
+
+- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

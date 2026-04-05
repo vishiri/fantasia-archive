@@ -32,7 +32,7 @@ Examples: `feat: add splash screen fade-out`, `test: cover devtools menu toggle`
 
 1. **Inspect**: Run `git status` and review `git diff` (and `git diff --staged` if anything is already staged).
 2. **Quality gate** ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)): in **one** terminal, `yarn testbatch:verify` (stop on first failure; run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, or `yarn test:unit` individually only while debugging). See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) for what each covers.
-3. **Storybook gate (before changelog/commit for UI work)**: For changed user-facing **`src/components/**`**, verify Storybook coverage/health and add/update missing `<Component>.stories.ts` plus required mocks/placeholders. Touching only **`src/layouts/**` or `src/pages/**` Storybook previews** does not require Docs/autodocs (canvas-only); see [storybook-stories.mdc](../../rules/storybook-stories.mdc).
+3. **Storybook gate (before changelog/commit for UI work)**: For changed user-facing **`src/components/**`**, verify Storybook coverage/health and add/update missing `tests/<Component>.stories.ts` plus required mocks/placeholders. Touching only **`src/layouts/**/tests` or `src/pages/**/tests` Storybook previews** does not require Docs/autodocs (canvas-only); see [storybook-stories.mdc](../../rules/storybook-stories.mdc).
 4. **Changelog gate (before commit)**: Review `src/i18n/en-US/documents/changeLog.md` and reconcile whether staged user-visible work needs a changelog update. Follow project changelog/version rules when adjusting release notes.
 5. **Plan**: Propose an **ordered list** of commits. Each item: **type + subject**, bullet list of **paths** (or path patterns) to include. Order so dependencies make sense (e.g. chore before feat if needed).
 6. **Approval loop** (mandatory when user asked for per-commit approval or “step through” commits):
@@ -54,3 +54,8 @@ Examples: `feat: add splash screen fade-out`, `test: cover devtools menu toggle`
 ## Related
 
 - Short reminder rule: `.cursor/rules/git-conventional-commits.mdc` (always on).
+
+## Local types extraction rule
+
+- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

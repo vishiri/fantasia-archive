@@ -19,7 +19,7 @@ description: >-
 
 - Default app chrome: `src/layouts/MainLayout.vue` and routes in `src/router/routes.ts`.
 - **Component playground**: `src/pages/ComponentTesting.vue` with `src/layouts/ComponentTestingLayout.vue` — use for isolated UI experiments before wiring into main flows.
-- **Storybook**: primary stories live under `src/components/**/<Component>.stories.ts`. Optional **canvas-only** stories may exist for `src/layouts/**/*.stories.ts` and `src/pages/**/*.stories.ts` (router previews); for those, **do not** add autodocs, Docs tab content, or `parameters.docs.description` — keep `parameters.docs.disable: true` (see [`storybook-stories.mdc`](../../rules/storybook-stories.mdc)). Storybook runs from [`.storybook-workspace/`](../../../.storybook-workspace/) (config under `.storybook-workspace/.storybook/`, static build `storybook-static/`, VRT under `visual-tests/` + `playwright.storybook-visual.config.ts`) so `staticDirs` and Vite can mirror the Quasar app’s `public/` layout. Root scripts: `yarn storybook:run`, `yarn storybook:build`, `yarn test:storybook:visual*`.
+- **Storybook**: primary stories live under `src/components/**/tests/<Component>.stories.ts`. Optional **canvas-only** stories may exist for `src/layouts/**/tests/*.stories.ts` and `src/pages/**/tests/*.stories.ts` (router previews); for those, **do not** add autodocs, Docs tab content, or `parameters.docs.description` — keep `parameters.docs.disable: true` (see [`storybook-stories.mdc`](../../rules/storybook-stories.mdc)). Storybook runs from [`.storybook-workspace/`](../../../.storybook-workspace/) (config under `.storybook-workspace/.storybook/`, static build `storybook-static/`, VRT under `visual-tests/` + `playwright.storybook-visual.config.ts`) so `staticDirs` and Vite can mirror the Quasar app’s `public/` layout. Root scripts: `yarn storybook:run`, `yarn storybook:build`, `yarn test:storybook:visual*`.
 
 ## Quasar patterns
 
@@ -70,3 +70,8 @@ description: >-
 - Prefer importing focused non-markdown `T_*` modules (for example menu/button translation modules) and provide explicit placeholder copy for markdown-backed `documents.*` keys used by dialogs.
 - Do **not** create Storybook stories under the `A11y/*` category for this project.
 - Do **not** create Storybook stories that only exercise `TEST_ENV === 'components'` branches; validate those paths in Playwright/component-test harnesses instead.
+
+## Local types extraction rule
+
+- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

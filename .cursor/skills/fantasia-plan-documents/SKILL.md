@@ -40,3 +40,8 @@ At the top of each plan document, include:
 
 - `.cursor/plans` is a local temporary workspace and may be gitignored.
 - If a planning artifact is initially drafted elsewhere, move it into `.cursor/plans/` and normalize filename/body metadata to this skill's format.
+
+## Local types extraction rule
+
+- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

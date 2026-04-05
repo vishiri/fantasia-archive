@@ -30,3 +30,8 @@ description: >-
 - **NEVER** auto-bump any version during release/build workflows.
 - Treat `package.json` `version` as the source of truth and keep changelog headings aligned to it.
 - Change any version values only when the user explicitly requests a manual version update.
+
+## Local types extraction rule
+
+- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

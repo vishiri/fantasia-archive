@@ -29,3 +29,8 @@ If a single `.ts` file grows hard to scan (long functions, many exports, or mixe
 - Avoid `any` in function signatures, object shapes, and casts; use precise types (`unknown` if needed) and narrow at usage sites.
 - Unit tests are allowed and encouraged for `src/scripts/**` modules when colocated in neighboring `tests/` folders (for example `src/scripts/_utilities/tests/` and `src/scripts/appInfo/tests/`) using `*.vitest.test.ts`.
 - Keep Playwright for UI integration flows; do not move renderer interaction coverage out of existing Playwright suites when those checks depend on built app behavior.
+
+## Local types extraction rule
+
+- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

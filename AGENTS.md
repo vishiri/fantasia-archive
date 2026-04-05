@@ -18,7 +18,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc)                             | `**/*.vue` — Composition API, Quasar, i18n, script size and extraction    |
 | [vue-bem-scss.mdc](.cursor/rules/vue-bem-scss.mdc)                         | `**/*.vue` — BEM class names and scoped SCSS only                         |
 | [vue-template-test-hooks.mdc](.cursor/rules/vue-template-test-hooks.mdc)   | `**/*.vue` — `data-test` and other Playwright-facing template attributes  |
-| [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc)               | `**/*.stories.ts` — Story scope, layout/page canvas-only (no Docs), `TEST_ENV` restrictions |
+| [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc)               | `**/tests/*.stories.ts` — Story scope, layout/page canvas-only (no Docs), `TEST_ENV` restrictions |
 | [typescript-scripts.mdc](.cursor/rules/typescript-scripts.mdc)             | `src/scripts/**/*.ts` — `_utilities`, splitting modules                   |
 | [project-scss.mdc](.cursor/rules/project-scss.mdc)                         | `src/css/**/*.scss` — globals, Quasar variables                           |
 | [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc)             | Always — ESLint, `tsc` (`yarn lint:typescript`), Quasar/tsconfig/Vitest alignment |
@@ -110,7 +110,7 @@ Locale strings live under `src/i18n/en-US/` in a fixed folder hierarchy:
 - To split work into several commits with **confirmation before each**: ask the agent to follow [git-conventional-commits skill](.cursor/skills/git-conventional-commits/SKILL.md).
 - Before any commit (or changelog edit for new work), follow this order ([testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc)):
   1. Run the **quality gate** in one terminal: `yarn testbatch:verify` (must pass; run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, or `yarn test:unit` individually only while debugging). When the change affects TypeScript, Vue, Electron TS, or other lint-scoped files, ESLint is required — see [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc).
-  2. Verify Storybook coverage/updates for affected user-facing **`src/components/**`** (`*.stories.ts`, mocks/placeholders as needed). Layout/page Storybook previews are canvas-only (no Docs requirement); see [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc).
+  2. Verify Storybook coverage/updates for affected user-facing **`src/components/**`** (`tests/*.stories.ts`, mocks/placeholders as needed). Layout/page Storybook previews are canvas-only (no Docs requirement); see [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc).
   3. If Storybook is aligned for touched components, update changelog if required.
   4. Commit.
 - If any gate fails (lint, types, stylelint, or unit tests), stop the commit flow, do not create a commit, and report a concise summary of what failed and where (failing suites/tests, file paths, and key error locations/messages).
@@ -135,8 +135,8 @@ Locale strings live under `src/i18n/en-US/` in a fixed folder hierarchy:
 
 ## Storybook expectations
 
-- Story files are colocated with components as `src/components/**/<Component>.stories.ts`.
-- **Layouts and pages** may have `src/layouts/**/*.stories.ts` and `src/pages/**/*.stories.ts` for **canvas-only** previews (router shells, smoke checks). Do **not** add Storybook **Docs** (no `autodocs` tag, no `parameters.docs.description`, keep `parameters.docs.disable: true`). Agents should not generate or expand documentation pages for layouts/pages in Storybook.
+- Story files are stored in `tests/` subfolders (for example `src/components/**/tests/<Component>.stories.ts`).
+- **Layouts and pages** may have `src/layouts/**/tests/*.stories.ts` and `src/pages/**/tests/*.stories.ts` for **canvas-only** previews (router shells, smoke checks). Do **not** add Storybook **Docs** (no `autodocs` tag, no `parameters.docs.description`, keep `parameters.docs.disable: true`). Agents should not generate or expand documentation pages for layouts/pages in Storybook.
 - Prefer Storybook for isolated **component** authoring/editing feedback; use `yarn storybook:run` for dev and `yarn storybook:build` for static output.
 - Do **not** import the full `src/i18n/en-US/index.ts` (or `src/i18n/index.ts`) in Storybook helpers/mocks — see i18n conventions above.
 - Do **not** add Storybook stories named `A11y/*` in this project.
@@ -179,3 +179,7 @@ Use different instructions or @-references when starting a task:
 | `fantasia-plan-documents`       | `.cursor/plans` filename and metadata format for plan files         |
 
 
+## Local types extraction rule
+
+- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

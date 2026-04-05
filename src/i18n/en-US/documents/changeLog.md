@@ -4,10 +4,13 @@
 ## 2.4.10 - Contributor test scripts, verify CI, and dependency refresh
 
 ### New features
+- **Tools → Program settings** opens the **Program settings** dialog (persistent until **Close**; **Save** is reserved for later wiring).
+- **Program settings** renders every persisted boolean user setting as nested **category → subcategory → toggle** rows: titles, descriptions, and optional per-setting **note** lines are driven by **en-US** / **fr** locale strings; categories, subcategories, and toggles are sorted alphabetically, except **Developer settings**, which is always listed last—**Show document IDs** lives under **Developer settings → Document body**.
 - Added persistent **user settings** in the **Electron** main process (**electron-store** under app **userData**), starting with a **theme** preference (**light** or **dark**, default **light**), exposed to the renderer as **`window.faContentBridgeAPIs.faUserSettings`** (**get** / **set**).
 - Added **`S_FaUserSettings`** Pinia store for managing user settings state in the renderer: loads the full settings set once on app start via the IPC bridge, accepts patch-based updates, and shows a **Quasar** success or failure notification after each save attempt.
 
 ### Bugfixes & Optimizations
+- Stopped optional **program settings** **note** strings from triggering **vue-i18n** missing-key warnings when no **note** key exists for a setting (resolve notes only after a key-existence check).
 - Added a startup cleanup pass for the persisted **user settings** store so legacy or unknown keys that no longer exist in **`src-electron/mainScripts/faUserSettingsDefaults.ts`** are removed and the sanitized config is auto-saved.
 - Extracted all hardcoded **en-US** locale strings from `src/i18n/en-US/index.ts` into dedicated `T_*.ts` modules per component, dialog, page, and global feature; normalized all top-level and sub-level i18n keys to **camelCase** with a lowercase first letter across the app.
 - Aligned **Storybook**'s **`externalFileLoader`** mock (**`.storybook-workspace/.storybook/mocks/externalFileLoader.ts`**) with that **camelCase** message tree (including **`globalFunctionality`**) and wired non-markdown copy through the same **`T_*`** modules the app uses, so component and layout previews—and local **`yarn test:storybook:visual`**—render real strings instead of raw translation key paths.
@@ -22,6 +25,9 @@
 - Bumped **Vue** to **`^3.5.32`** (root and **`.storybook-workspace`**), **`@types/node`** to **`^22.19.17`**, refreshed **root** and **`.storybook-workspace`** lockfiles with **`yarn upgrade`**, and set Storybook VRT **`toHaveScreenshot`** **`maxDiffPixels: 150`** so compare runs stay stable across rebuilds. Refreshed one **Win32** chromium snapshot affected by the toolchain bump.
 - Renamed the markdown bullet-list helper to **`mdListArrayConverter`** (standard spelling) and normalized loop variable naming in **`specialCharacterFixer`**; **tips, tricks, and trivia** notifications and markdown document escaping are unchanged in behavior.
 - Polished **en-US** copy in the **Advanced search guide**, **Tips, Tricks & Trivia**, and the **en-US** app name string for grammar, spelling, and clarity; fixed a missing article in the **README** Quasar CLI heading.
+- Relocated every **`*.stories.ts`** file under the matching feature **`tests/`** tree (**`src/components/**/tests`**, **`src/layouts/**/tests`**, **`src/pages/**/tests`**) and pointed **`.storybook-workspace/.storybook/main.ts`** story globs at those paths so **Storybook** sits beside **Vitest** and **Playwright**; refreshed **Storybook** VRT snapshots (including **DialogProgramSettings** default and **DialogMarkdownDocument** previews).
+- Enforced expanded multi-line object literals project-wide via **ESLint** (**`object-curly-newline`**, **`object-property-newline`**) for **JavaScript**, **TypeScript**, **Vue**, and **JSON**, with **`yarn lint:eslint`** running **`eslint .`** from the repo root.
+- Extracted small file-local interfaces and type aliases from **Vue** and **TypeScript** sources into colocated **`<filename>.types.ts`** modules where applicable (renderer boot, Pinia typings, **Electron** tests, **Storybook** mocks) and recorded the convention in **README**, **AGENTS**, and Cursor rules/skills.
 
 ## 2.4.9 - Contributor tooling, Pinia dialogs, and CI hardening
 

@@ -84,7 +84,7 @@ Build static Storybook output:
 yarn storybook:build
 ```
 
-Stories live next to components as `*.stories.ts` under `src/components/**`.
+Stories live under `tests/` subfolders as `*.stories.ts` (for example `src/components/**/tests/*.stories.ts`, plus `src/layouts/**/tests/*.stories.ts` and `src/pages/**/tests/*.stories.ts` for canvas-only previews).
 
 Visual regression checks with Playwright snapshots against Storybook:
 
@@ -298,3 +298,7 @@ The repo tracks a minimal [`.quasar/tsconfig.json`](.quasar/tsconfig.json) so Ty
 ### Native modules (better-sqlite3)
 
 After changing **Electron** or **Node** versions, run a clean `yarn install` on your machine. If `better-sqlite3` fails to load in the packaged app, rebuild native addons for your Electron version (for example `npx electron-rebuild` in the project root) and retry `yarn quasar:build:electron`.
+
+## Local types extraction rule
+
+- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.

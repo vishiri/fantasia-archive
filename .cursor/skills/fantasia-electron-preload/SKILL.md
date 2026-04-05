@@ -41,3 +41,8 @@ description: >-
 
 - [fantasia-electron-main](../fantasia-electron-main/SKILL.md) for main-process lifecycle and windows.
 - [fantasia-sqlite-main](../fantasia-sqlite-main/SKILL.md) for database access from main.
+
+## Local types extraction rule
+
+- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

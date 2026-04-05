@@ -16,3 +16,8 @@ alwaysApply: false
 - **Partials** in `globals/` are focused: scrollbar, html tweaks, component adjustments, custom colors — follow that separation when adding new cross-app styling.
 - Prefer **low-specificity** selectors and avoid deep nesting unless mirroring an existing pattern in the same file.
 - Component-specific BEM and scoped styles belong in **Vue SFCs** ([vue-bem-scss.mdc](vue-bem-scss.mdc)), not in `src/css/`, unless the team already uses a global override file for that concern.
+
+## Local types extraction rule
+
+- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
