@@ -2,7 +2,7 @@ import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import type { T_dialogName } from 'app/types/T_dialogList'
-import T_socialContactButtons from 'app/src/i18n/en-US/components/SocialContactButtons/T_socialContactButtons'
+import T_socialContactButtons from 'app/src/i18n/en-US/components/other/SocialContactButtons/T_socialContactButtons'
 
 /**
  * Extra env settings to trigger component testing via Playwright

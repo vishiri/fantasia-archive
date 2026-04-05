@@ -3,12 +3,22 @@
 /**
  * SCSS in `src/css/**` plus `<style lang="scss">` blocks in Vue SFCs.
  * BEM-style class names (e.g. `socialContactSingleButton__text`) are allowed.
+ *
+ * Declaration order: `stylelint-order` enforces alphabetical properties (with
+ * shorthand/prefix exceptions per rule docs). Autofix: `yarn lint:stylelint:fix`.
  */
 module.exports = {
   extends: [
     'stylelint-config-standard-scss',
     'stylelint-config-standard-vue/scss',
     '@stylistic/stylelint-config'
+  ],
+  plugins: ['stylelint-order'],
+  overrides: [
+    {
+      customSyntax: 'postcss-sass',
+      files: ['**/*.sass']
+    }
   ],
   rules: {
     'selector-class-pattern': null,
@@ -29,7 +39,15 @@ module.exports = {
     'comment-empty-line-before': null,
     'selector-no-vendor-prefix': null,
     '@stylistic/max-line-length': null,
-    '@stylistic/string-quotes': null
+    '@stylistic/string-quotes': null,
+    'order/custom-properties-alphabetical-order': true,
+    'order/properties-alphabetical-order': true
   },
-  ignoreFiles: ['**/node_modules/**', '**/dist/**', '**/.quasar/**', '**/storybook-static/**']
+  ignoreFiles: [
+    '**/node_modules/**',
+    '**/dist/**',
+    '**/.quasar/**',
+    '**/storybook-static/**',
+    '.storybook-workspace/storybook-static/**'
+  ]
 }

@@ -30,8 +30,8 @@
 </template>
 
 <script lang="ts" setup>
-import GlobalWindowButtons from 'components/GlobalWindowButtons/GlobalWindowButtons.vue'
-import AppControlMenus from 'components/AppControlMenus/AppControlMenus.vue'
+import GlobalWindowButtons from 'components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
+import AppControlMenus from 'components/globals/AppControlMenus/AppControlMenus.vue'
 
 </script>
 

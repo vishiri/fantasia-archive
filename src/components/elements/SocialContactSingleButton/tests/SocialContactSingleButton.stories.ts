@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import { buttonList } from '../../SocialContactButtons/_data/buttons'
+import { buttonList } from '../../../other/SocialContactButtons/_data/buttons'
 import SocialContactSingleButton from '../SocialContactSingleButton.vue'
 
 const meta = {

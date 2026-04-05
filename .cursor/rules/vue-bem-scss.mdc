@@ -10,7 +10,7 @@ This rule covers **CSS class naming** and **`<style lang="scss">`** only. It doe
 
 ## Block and element classes (template)
 
-Follow components such as [GlobalWindowButtons.vue](src/components/GlobalWindowButtons/GlobalWindowButtons.vue) and [AppControlMenus.vue](src/components/AppControlMenus/AppControlMenus.vue):
+Follow components such as [GlobalWindowButtons.vue](src/components/globals/GlobalWindowButtons/GlobalWindowButtons.vue) and [AppControlMenus.vue](src/components/globals/AppControlMenus/AppControlMenus.vue):
 
 - **Block**: one root class per component, lowerCamelCase (e.g. `globalWindowButtons`, `appControlMenus`).
 - **Elements**: `blockName__element` (double underscore), e.g. `globalWindowButtons__button`, `globalWindowButtons__minimize`, `appControlMenus__inner`.

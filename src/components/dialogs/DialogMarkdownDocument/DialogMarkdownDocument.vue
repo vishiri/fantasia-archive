@@ -179,9 +179,9 @@ onMounted(() => {
   }
 
   &__content {
-    overflow: auto;
     max-height: calc(100vh - 235px);
     min-height: 650px;
+    overflow: auto;
 
     &.tipsTricksTrivia {
       padding-right: 40px;

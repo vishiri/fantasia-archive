@@ -35,16 +35,16 @@
 </template>
 
 <script lang="ts" setup>
-import GlobalWindowButtons from 'src/components/GlobalWindowButtons/GlobalWindowButtons.vue'
-import FantasiaMascotImage from 'src/components/FantasiaMascotImage/FantasiaMascotImage.vue'
+import GlobalWindowButtons from 'src/components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
+import FantasiaMascotImage from 'src/components/elements/FantasiaMascotImage/FantasiaMascotImage.vue'
 </script>
 
 <style lang="scss" scoped>
 .errorPage-card {
+  background-color: $qCard-errorPage-background;
+  border: $qCard-errorPage-border-size solid $qCard-errorPage-border-color;
   border-radius: $qCard-errorPage-border-radius;
   box-shadow: none;
-  border: $qCard-errorPage-border-size solid $qCard-errorPage-border-color;
-  background-color: $qCard-errorPage-background;
   color: $qCard-errorPage-text;
 }
 </style>

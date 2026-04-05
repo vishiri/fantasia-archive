@@ -15,6 +15,15 @@ description: >-
 - **Pinia** for state (`src/stores/`); router in `src/router/`.
 - **TypeScript** throughout; path alias `app/` maps to project root (see imports like `app/types/...`).
 
+## Component folders (`src/components/`)
+
+- **`dialogs/`** — `Dialog*` modal SFCs.
+- **`globals/`** — app chrome (`GlobalWindowButtons`, `AppControlMenus`, `AppControlSingleMenu`).
+- **`elements/`** — small reusable widgets (`FantasiaMascotImage`, `SocialContactSingleButton`).
+- **`other/`** — other composites (`SocialContactButtons`).
+
+Locale `T_*` paths under `src/i18n/<locale>/components/` use the same bucket names. See [README](../../../README.md) and [AGENTS.md](../../../AGENTS.md).
+
 ## Layout and pages
 
 - Default app chrome: `src/layouts/MainLayout.vue` and routes in `src/router/routes.ts`.
@@ -32,14 +41,20 @@ description: >-
 ## `public/` assets and Electron (`file://`)
 
 - Quasar + Vite often expose `import.meta.env.BASE_URL` as `'/'` or `''` for the Electron renderer. URLs such as `/images/foo.png` then resolve to the **filesystem root** under `file://`, not next to `index.html`, and images or other `public/` files may fail to load in packaged builds (and break Playwright assertions that expect a loaded `<img>`).
-- For anything served from `public/`, build href/src with a **relative** base when `BASE_URL` is `'/'` or empty (e.g. `./images/...`). Example: [`SocialContactSingleButton.vue`](../../../src/components/SocialContactSingleButton/SocialContactSingleButton.vue).
+- For anything served from `public/`, build href/src with a **relative** base when `BASE_URL` is `'/'` or empty (e.g. `./images/...`). Example: [`SocialContactSingleButton.vue`](../../../src/components/elements/SocialContactSingleButton/SocialContactSingleButton.vue).
 
 ## Component `_data/` (production structured payloads)
 
 - When a `.vue` file would hold a **large production data object** (menus, multi-part configs, long lists), move pieces under **`src/components/<Feature>/_data/`**.
-- Use **several locally named `.ts` files** inside `_data/` instead of one giant file when it aids navigation (mirror [AppControlMenus/_data](src/components/AppControlMenus/_data/)).
+- Use **several locally named `.ts` files** inside `_data/` instead of one giant file when it aids navigation (mirror [AppControlMenus/_data](src/components/globals/AppControlMenus/_data/)).
 - Those files may still use **translations** (`i18n`), **imported copy helpers**, and **functions** on items (e.g. `trigger` handlers); they are not limited to string literals.
 - **Automated-test fixture data** does **not** live in `_data/` or in **`tests/<fixture>.ts`** modules: Vitest keeps it inside `*.vitest.test.ts`; Playwright keeps mount payloads inline in `*.playwright.test.ts` and passes them via `COMPONENT_PROPS`. If a parent SFC must embed a component-mode-only blob, keep it as a **`const` inside that `.vue`**. See [vue-quasar.mdc](../../rules/vue-quasar.mdc) for split vs `src/scripts/` boundaries.
+
+## Component `scripts/` (user-requested SFC extraction)
+
+- **Do not** extract large `<script setup>` functions into separate files unless the **user explicitly asks** for that refactor (no proactive “cleanup” splits).
+- When they do ask, new modules **always** live under **`src/components/<bucket>/<Feature>/scripts/`** (`.ts` files), imported back into the feature `.vue`. Do not park these extractions next to the `.vue` at the feature root.
+- Distinct from **`_data/`** (production structured payloads) and from **`src/scripts/`** (shared app-wide helpers). See [vue-quasar.mdc](../../rules/vue-quasar.mdc).
 
 ## Cursor rules for `.vue` files (split by topic)
 

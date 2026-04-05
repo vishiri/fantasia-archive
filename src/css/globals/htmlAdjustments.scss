@@ -19,14 +19,14 @@ body {
 
     /* WebKit/Blink Browsers */
     ::selection {
-      color: $selectTextColor_lightMode;
       background: $selectBackgroundColor_lightMode;
+      color: $selectTextColor_lightMode;
     }
 
     /* Gecko Browsers */
     ::-moz-selection {
-      color: $selectTextColor_lightMode;
       background: $selectBackgroundColor_lightMode;
+      color: $selectTextColor_lightMode;
     }
   }
 
@@ -34,14 +34,14 @@ body {
 
     /* WebKit/Blink Browsers */
     ::selection {
-      color: $selectTextColor_darkMode;
       background: $selectBackgroundColor_darkMode;
+      color: $selectTextColor_darkMode;
     }
 
     /* Gecko Browsers */
     ::-moz-selection {
-      color: $selectTextColor_darkMode;
       background: $selectBackgroundColor_darkMode;
+      color: $selectTextColor_darkMode;
     }
   }
 }

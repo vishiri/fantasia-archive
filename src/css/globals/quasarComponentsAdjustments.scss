@@ -61,11 +61,11 @@
   }
 
   blockquote {
-    border-top: 1px solid $qMarkdown-blockquote-borderColor !important;
     border-bottom: 1px solid $qMarkdown-blockquote-borderColor !important;
     border-left: 8px solid $qMarkdown-blockquote-borderColor !important;
-    border-right: 8px solid $qMarkdown-blockquote-borderColor !important;
     border-radius: $qMarkdown-table-borderRadius !important;
+    border-right: 8px solid $qMarkdown-blockquote-borderColor !important;
+    border-top: 1px solid $qMarkdown-blockquote-borderColor !important;
     padding: 5px 14px !important;
   }
 
@@ -76,17 +76,17 @@
 
   table {
     border: 1px solid $qMarkdown-table-borderColor;
-    border-radius: $qMarkdown-table-borderRadius;
     border-collapse: separate;
+    border-radius: $qMarkdown-table-borderRadius;
     border-spacing: 0;
     overflow: hidden;
 
     th,
     td {
-      border-right: 1px solid $qMarkdown-table-borderColor;
       border-bottom: 1px solid $qMarkdown-table-borderColor;
-      border-top: 0;
       border-left: 0;
+      border-right: 1px solid $qMarkdown-table-borderColor;
+      border-top: 0;
     }
 
     th:last-child,
@@ -116,9 +116,9 @@
   }
 
   pre {
-    padding: $qMarkdown-code-padding !important;
-    margin: 0 0 16px !important;
     border-radius: $qMarkdown-code-borderRadius;
+    margin: 0 0 16px !important;
+    padding: $qMarkdown-code-padding !important;
   }
 
   pre.line-numbers {
@@ -131,8 +131,8 @@
   }
 
   pre.line-numbers .line-numbers-rows {
-    top: 0 !important;
     padding-top: $qMarkdown-code-padding;
+    top: 0 !important;
   }
 
   pre.line-numbers .line-numbers-rows > span {
@@ -144,19 +144,19 @@
   }
 
   .q-markdown--token {
-    font-weight: 600;
-    padding: 0 5px;
     background-color: $qMarkdown-code-blackgroundColor !important;
-    color: $qMarkdown-code-textColor !important;
     border-color: $qMarkdown-code-borderColor !important;
-    white-space: pre-wrap;
+    color: $qMarkdown-code-textColor !important;
+    font-weight: 600;
     overflow-wrap: anywhere;
+    padding: 0 5px;
+    white-space: pre-wrap;
     word-break: break-word;
   }
 
   code {
-    white-space: pre-wrap;
     overflow-wrap: anywhere;
+    white-space: pre-wrap;
     word-break: break-word;
   }
 
@@ -254,17 +254,17 @@ body.desktop .q-focusable:focus > .q-focus-helper {
 .q-transition--rotate-leave-active,
 .q-transition--flip-enter-active,
 .q-transition--flip-leave-active {
+  pointer-events: none;
 
   /* Transitions glitches with user input/select fix */
   user-select: none;
-  pointer-events: none;
 }
 
 .q-notification {
   &.bg-info {
-    max-width: 550px;
     border: 2px solid $qNotify-bgColor;
     color: $qNotify-color;
+    max-width: 550px;
 
     i {
       color: $qNotify-icon-color;
@@ -281,18 +281,18 @@ body.desktop .q-focusable:focus > .q-focus-helper {
   }
 
   &__avatar {
-    height: 135px;
-    width: 135px;
-    margin-right: 30px;
-    flex-shrink: 0;
     border-radius: 0;
-    margin-top: 15px;
+    flex-shrink: 0;
+    height: 135px;
     margin-bottom: 15px;
+    margin-right: 30px;
+    margin-top: 15px;
+    width: 135px;
 
     img {
-      object-fit: contain;
-      max-width: 100%;
       max-height: 100%;
+      max-width: 100%;
+      object-fit: contain;
     }
   }
 }

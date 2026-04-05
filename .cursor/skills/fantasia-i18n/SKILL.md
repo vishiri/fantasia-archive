@@ -20,8 +20,8 @@ description: >-
 src/i18n/en-US/
   index.ts                            — composes the full locale tree; no hardcoded strings (see rules below)
   documents/                          — Markdown source files (.md); imported via ?raw and passed through specialCharacterFixer
-  components/<ComponentName>/         — one T_<ComponentName>.ts per component that has user-visible strings
-  dialogs/                            — one T_<DialogName>.ts per dialog
+  components/<bucket>/<ComponentName>/ — mirrors src/components/: globals, elements, other; T_*.ts modules per component
+  dialogs/                            — one T_<DialogName>.ts per dialog (dialog copy; not the same as components/dialogs/)
   pages/                              — one T_<PageName>.ts per page
   globalFunctionality/                — one T_<feature>.ts per app-wide, non-component concern (e.g. store notifications)
 ```
@@ -50,7 +50,7 @@ Do not place locale files in any other location. If no folder fits, use `globalF
 
 ## Adding new strings — step by step
 
-1. Identify the right folder (`components/<ComponentName>/`, `dialogs/`, `pages/`, or `globalFunctionality/`).
+1. Identify the right folder (`components/<bucket>/<ComponentName>/`, `dialogs/`, `pages/`, or `globalFunctionality/`).
 2. Create or open `T_<name>.ts` in that folder and add the new keys (camelCase, lowercase first letter).
 3. If the file is new, import it in `index.ts` and assign it to a new camelCase top-level key.
 4. Use the full dot-path in templates (`$t('topLevelKey.subKey')`) or scripts (`i18n.global.t('topLevelKey.subKey')`).
@@ -58,7 +58,7 @@ Do not place locale files in any other location. If no folder fits, use `globalF
 
 ## Storybook integration
 
-- For Storybook mocks/loaders, import focused non-markdown `T_*` modules directly (for example `en-US/components/GlobalWindowButtons/T_GlobalWindowButtons.ts`) instead of importing `en-US/index.ts`.
+- For Storybook mocks/loaders, import focused non-markdown `T_*` modules directly (for example `en-US/components/globals/GlobalWindowButtons/T_GlobalWindowButtons.ts`) instead of importing `en-US/index.ts`.
 - Reason: the full locale entrypoint pulls markdown `documents/*.md`, which can break Storybook/Vite import analysis.
 - If Storybook stories need document content (`documents.*`), provide explicit placeholder strings (for example lorem ipsum) in `.storybook/preview.ts` rather than importing markdown files.
 

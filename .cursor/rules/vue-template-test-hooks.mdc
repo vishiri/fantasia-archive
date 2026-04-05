@@ -11,8 +11,8 @@ Use this rule when adding or changing **attributes the UI tests locate**. It pai
 ## What belongs here
 
 - `data-test` values used by `appWindow.locator(\`[data-test="..."]\`)`.
-- Special attributes used in this repo for menus, e.g. `data-test-test-menu` and `data-test-any-menu` on [AppControlMenus.vue](src/components/AppControlMenus/AppControlMenus.vue) (see [AppControlMenus.playwright.test.ts](src/components/AppControlMenus/tests/AppControlMenus.playwright.test.ts)).
-- Optional `data-*` hooks asserted via `dataset` (e.g. `data-test-is-random` → `dataset.testIsRandom` in [FantasiaMascotImage.playwright.test.ts](src/components/FantasiaMascotImage/tests/FantasiaMascotImage.playwright.test.ts)).
+- Special attributes used in this repo for menus, e.g. `data-test-test-menu` and `data-test-any-menu` on [AppControlMenus.vue](src/components/globals/AppControlMenus/AppControlMenus.vue) (see [AppControlMenus.playwright.test.ts](src/components/globals/AppControlMenus/tests/AppControlMenus.playwright.test.ts)).
+- Optional `data-*` hooks asserted via `dataset` (e.g. `data-test-is-random` → `dataset.testIsRandom` in [FantasiaMascotImage.playwright.test.ts](src/components/elements/FantasiaMascotImage/tests/FantasiaMascotImage.playwright.test.ts)).
 
 ## Naming
 

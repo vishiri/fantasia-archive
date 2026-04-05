@@ -76,9 +76,13 @@ const iconSrc = computed(() => {
     align-items: center;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    background-repeat: no-repeat;
+    border-radius: 9999px;
     box-sizing: border-box;
+    color: #fff !important;
     cursor: pointer;
     display: inline-flex;
+    font-size: 16px !important;
     font-weight: 500;
     justify-content: center;
     padding: 12.5px 24px 12.5px 24px;
@@ -88,10 +92,6 @@ const iconSrc = computed(() => {
     -webkit-user-select: none;
     user-select: none;
     width: unset;
-    color: #fff !important;
-    font-size: 16px !important;
-    background-repeat: no-repeat;
-    border-radius: 9999px;
   }
 
   &.patreon {

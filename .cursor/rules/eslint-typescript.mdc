@@ -21,7 +21,7 @@ In line comments, block comments, and JSDoc above APIs and tests: do not use Mar
 | Command | Role |
 |--------|------|
 | `yarn lint:eslint` | ESLint over `src/`, `src-electron/`, `e2e-tests/`, `types/`, Quasar/Vitest/Playwright configs, and `.storybook-workspace/.storybook/` — see `package.json` `lint:eslint` script. |
-| `yarn lint:stylelint` | Stylelint on `src/**/*.vue` and `src/**/*.scss`. |
+| `yarn lint:stylelint` | Stylelint on `src/**/*.{vue,css,scss,sass}` and `.storybook-workspace/.storybook/**/*.{vue,css,scss,sass}` (declaration blocks sorted alphabetically via `stylelint-order`; use `yarn lint:stylelint:fix` to autofix). |
 | `yarn lint:typescript` | Full **`tsc`** project check (Vue shim + Quasar paths via `tsconfig.json` → `.quasar/tsconfig.json`). |
 
 ## Pre-commit / pre-changelog quality gate

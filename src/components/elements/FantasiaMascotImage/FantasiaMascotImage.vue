@@ -69,8 +69,8 @@ const currentMascotImage = determineCurrentImage(fantasiaImageList, isRandom, pr
 .fantasiaMascotImage {
   &__inner {
     height: v-bind(height);
-    width: v-bind(width);
     user-select: none;
+    width: v-bind(width);
   }
 }
 

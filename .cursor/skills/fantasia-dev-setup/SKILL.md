@@ -69,7 +69,7 @@ quasar build -m electron
 | **Full project gate — refresh Storybook VRT baselines** (same through smoke, then snapshot update) | `yarn testbatch:ensure:change` |
 | ESLint | `yarn lint:eslint` |
 | TypeScript (`tsc`, no emit) | `yarn lint:typescript` |
-| Stylelint (Vue + SCSS) | `yarn lint:stylelint` |
+| Stylelint (Vue/CSS/SCSS/Sass + Storybook `.storybook` sources) | `yarn lint:stylelint` (autofix: `yarn lint:stylelint:fix`) |
 | Unit tests | `yarn test:unit` |
 | Component tests (Playwright) | `yarn test:components` (after production build) |
 | E2E tests (Playwright) | `yarn test:e2e` (after production build) |

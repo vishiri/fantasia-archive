@@ -6,7 +6,7 @@ alwaysApply: false
 
 # `src/scripts` — modules and extraction
 
-Vue SFCs import from here when extracting **pure helpers**; see when to split script logic in [vue-quasar.mdc](vue-quasar.mdc). **Colocated component `_data/`** and **automated-test fixtures** (inline in `*.vitest.test.ts` / `*.playwright.test.ts`, not separate `tests/*.ts` dump modules) are not under `src/scripts/` — follow vue-quasar and the Vitest/Playwright rules.
+Vue SFCs import from here when extracting **pure helpers**; see when to split script logic in [vue-quasar.mdc](vue-quasar.mdc). **Large blocks of component-owned script logic** moved out on **explicit user request** belong under **`src/components/<Feature>/scripts/`**, not under `src/scripts/` — see vue-quasar.mdc. **Colocated component `_data/`** and **automated-test fixtures** (inline in `*.vitest.test.ts` / `*.playwright.test.ts`, not separate `tests/*.ts` dump modules) are not under `src/scripts/` — follow vue-quasar and the Vitest/Playwright rules.
 
 ## Layout
 

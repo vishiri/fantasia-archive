@@ -2,7 +2,7 @@
   "css.validate": false,
   "less.validate": false,
   "scss.validate": false,
-  "stylelint.validate": ["css", "scss", "vue"],
+  "stylelint.validate": ["css", "scss", "sass", "vue"],
   "stylelint.packageManager": "yarn",
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": true,
@@ -43,4 +43,12 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "stylelint.vscode-stylelint"
   },
+  "[sass]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "stylelint.vscode-stylelint"
+  },
+  "[css]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "stylelint.vscode-stylelint"
+  }
 }

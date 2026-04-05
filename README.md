@@ -31,6 +31,18 @@ yarn
 - **i18n**: vue-i18n (`src/i18n/`)
 - **Tests**: Vitest (unit) + Playwright (component and E2E)
 - **Component docs**: Storybook 10 (in `.storybook-workspace/`)
+- **Component `scripts/`** (only when a maintainer asks): bulky logic extracted from a feature `.vue` lives under `src/components/<Feature>/scripts/*.ts` — not beside the `.vue` at the feature root. Agents should not perform this split unless requested; see [AGENTS.md](AGENTS.md) and [.cursor/rules/vue-quasar.mdc](.cursor/rules/vue-quasar.mdc).
+
+### Renderer components (`src/components/`)
+
+Features are grouped for navigation (each still has colocated `tests/`, optional `_data/`, and optional `scripts/`):
+
+| Subfolder | Contents |
+| --- | --- |
+| `dialogs/` | Modal dialog SFCs (`Dialog*` components). |
+| `globals/` | App-chrome pieces reused across layouts (`GlobalWindowButtons`, `AppControlMenus`, `AppControlSingleMenu`). |
+| `elements/` | Small reusable leaf widgets (`FantasiaMascotImage`, `SocialContactSingleButton`). |
+| `other/` | Other composite or miscellaneous features (`SocialContactButtons`). |
 
 ### i18n (localisation)
 
@@ -39,7 +51,7 @@ Locale strings live under `src/i18n/en-US/` in a fixed folder hierarchy:
 | Folder | Purpose |
 | --- | --- |
 | `documents/` | Markdown source files (`.md`, imported with `?raw`, passed through `specialCharacterFixer`) |
-| `components/<ComponentName>/` | One `T_<ComponentName>.ts` per component with user-visible strings |
+| `components/<bucket>/<ComponentName>/` | Same bucket names as `src/components/` (`globals`, `elements`, `other`); one or more `T_*.ts` modules per component |
 | `dialogs/` | One `T_<DialogName>.ts` per dialog |
 | `pages/` | One `T_<PageName>.ts` per page |
 | `globalFunctionality/` | One `T_<feature>.ts` per app-wide, non-component concern (e.g. Pinia store notifications) |
@@ -268,7 +280,8 @@ yarn test:e2e:single --spec=SPEC_FILE_NAME
 | `yarn quasar:build:electron` | Build/package the Electron app (`--publish never`). |
 | `yarn quasar:dev:electron` | Run the app in Quasar Electron development mode. |
 | `yarn lint:eslint` | Run ESLint on project source/config paths. |
-| `yarn lint:stylelint` | Run Stylelint for Vue/SCSS styles. |
+| `yarn lint:stylelint` | Run Stylelint on Vue/CSS/SCSS/Sass under `src/` and Storybook config under `.storybook-workspace/.storybook/`. |
+| `yarn lint:stylelint:fix` | Same paths as `lint:stylelint` with `--fix` (alphabetical declarations, including inside Vue `<style>` blocks). |
 | `yarn lint:typescript` | Run TypeScript project check (`tsc`, no emit). |
 | `yarn testbatch:verify` | Quick gate: lint + typecheck + stylelint + unit tests. |
 | `yarn testbatch:ensure:nochange` | Full gate: `testbatch:verify` + `quasar:build:electron` + Playwright component + E2E + Storybook smoke + `test:storybook:visual` (snapshot compare). |

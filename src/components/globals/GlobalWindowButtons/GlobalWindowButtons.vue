@@ -162,14 +162,14 @@ onUnmounted(async () => {
 
 <style lang="scss" scoped>
 .globalWindowButtons {
+  -webkit-app-region: no-drag;
+  border-radius: 0;
+  color: $globalWindowButtons_color;
+  height: $globalWindowButtons_height;
   position: fixed;
-  z-index: 99999999;
   right: 0;
   top: 0;
-  border-radius: 0;
-  height: $globalWindowButtons_height;
-  color: $globalWindowButtons_color;
-  -webkit-app-region: no-drag;
+  z-index: 99999999;
 
   &__button {
     &:hover,

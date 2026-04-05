@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import { buttonList } from '../../components/SocialContactButtons/_data/buttons'
+import { buttonList } from '../../components/other/SocialContactButtons/_data/buttons'
 import StoryRouterShell from '../../../.storybook-workspace/.storybook/components/StoryRouterShell.vue'
 
 const meta = {

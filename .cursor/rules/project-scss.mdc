@@ -13,6 +13,7 @@ alwaysApply: false
 
 ## Conventions
 
+- **Stylelint** sorts **declaration** properties alphabetically project-wide (`order/properties-alphabetical-order` and `order/custom-properties-alphabetical-order` via `stylelint-order`), with autofix from **`yarn lint:stylelint:fix`**. Shorthand-before-longhand and vendor-prefix ordering follow the rule’s documented exceptions.
 - **Partials** in `globals/` are focused: scrollbar, html tweaks, component adjustments, custom colors — follow that separation when adding new cross-app styling.
 - Prefer **low-specificity** selectors and avoid deep nesting unless mirroring an existing pattern in the same file.
 - Component-specific BEM and scoped styles belong in **Vue SFCs** ([vue-bem-scss.mdc](vue-bem-scss.mdc)), not in `src/css/`, unless the team already uses a global override file for that concern.

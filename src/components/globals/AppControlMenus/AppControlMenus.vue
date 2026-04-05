@@ -55,15 +55,15 @@
 import type { I_appMenuList } from 'app/types/I_appMenusDataList'
 import { openDialogMarkdownDocument } from 'src/scripts/appInfo/openDialogMarkdownDocument'
 
-import { project } from 'app/src/components/AppControlMenus/_data/project'
-import { documents } from 'app/src/components/AppControlMenus/_data/documents'
-import { tools } from 'app/src/components/AppControlMenus/_data/tools'
-import { helpInfo } from 'app/src/components/AppControlMenus/_data/helpInfo'
+import { project } from 'app/src/components/globals/AppControlMenus/_data/project'
+import { documents } from 'app/src/components/globals/AppControlMenus/_data/documents'
+import { tools } from 'app/src/components/globals/AppControlMenus/_data/tools'
+import { helpInfo } from 'app/src/components/globals/AppControlMenus/_data/helpInfo'
 
-import AppControlSingleMenu from 'app/src/components/AppControlSingleMenu/AppControlSingleMenu.vue'
-import DialogMarkdownDocument from 'app/src/components/DialogMarkdownDocument/DialogMarkdownDocument.vue'
-import DialogAboutFantasiaArchive from 'app/src/components/DialogAboutFantasiaArchive/DialogAboutFantasiaArchive.vue'
-import DialogProgramSettings from 'app/src/components/DialogProgramSettings/DialogProgramSettings.vue'
+import AppControlSingleMenu from 'app/src/components/globals/AppControlSingleMenu/AppControlSingleMenu.vue'
+import DialogMarkdownDocument from 'app/src/components/dialogs/DialogMarkdownDocument/DialogMarkdownDocument.vue'
+import DialogAboutFantasiaArchive from 'app/src/components/dialogs/DialogAboutFantasiaArchive/DialogAboutFantasiaArchive.vue'
+import DialogProgramSettings from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.vue'
 
 withDefaults(
   defineProps<{

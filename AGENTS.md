@@ -63,6 +63,15 @@ When writing comments in source files (not in user-facing Markdown documents suc
 - Favor singular names for single-item shapes (`I_appMenuItem`, `T_documentName`) and collection-oriented names for grouped structures (`I_appMenuList`, `I_socialContactButtonSet`).
 - Keep unions and function signatures consistently spaced (for example, `string | false`, `(...args: unknown[]) => unknown | void`).
 
+## Renderer components (`src/components/`)
+
+Group new SFCs under one bucket (each feature folder still owns `tests/`, optional `_data/`, optional `scripts/`):
+
+- **`dialogs/`** — modal `Dialog*` components.
+- **`globals/`** — shared app chrome (`GlobalWindowButtons`, `AppControlMenus`, `AppControlSingleMenu`).
+- **`elements/`** — small reusable widgets (`FantasiaMascotImage`, `SocialContactSingleButton`).
+- **`other/`** — other composites (`SocialContactButtons`).
+
 ## i18n conventions
 
 ### File structure (`src/i18n/en-US/`)
@@ -70,7 +79,7 @@ When writing comments in source files (not in user-facing Markdown documents suc
 Locale strings live under `src/i18n/en-US/` in a fixed folder hierarchy:
 
 - `documents/` — Markdown source files (`.md`, imported with `?raw` and passed through `specialCharacterFixer`).
-- `components/<ComponentName>/` — one `T_<ComponentName>.ts` per component with user-visible strings.
+- `components/<bucket>/<ComponentName>/` — same buckets as `src/components/` (`globals`, `elements`, `other`); one or more `T_*.ts` modules per component with user-visible strings.
 - `dialogs/` — one `T_<DialogName>.ts` per dialog.
 - `pages/` — one `T_<PageName>.ts` per page.
 - `globalFunctionality/` — one `T_<feature>.ts` per app-wide, non-component concern (e.g. store notifications).
@@ -98,7 +107,7 @@ Locale strings live under `src/i18n/en-US/` in a fixed folder hierarchy:
 
 ## Linting and static analysis
 
-- **No TSLint** — use **ESLint** (**`eslint.config.mjs`**, **neostandard**, **typescript-eslint**, **eslint-plugin-vue**), **`yarn lint:typescript`** for **`tsc -p tsconfig.json`**, and **`yarn lint:stylelint`** for Vue/SCSS. Details: [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc).
+- **No TSLint** — use **ESLint** (**`eslint.config.mjs`**, **neostandard**, **typescript-eslint**, **eslint-plugin-vue**), **`yarn lint:typescript`** for **`tsc -p tsconfig.json`**, and **`yarn lint:stylelint`** for Vue/CSS/SCSS/Sass (see [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc)).
 - In TypeScript code (including Vue `<script lang="ts">`), use `import type` for type-only imports.
 - **`@typescript-eslint` v8** / **typescript-eslint** should stay aligned with **TypeScript ~6.0** in `package.json` to avoid `typescript-estree` unsupported-version warnings (including from **vite-plugin-checker** in dev).
 - **`src/env.d.ts`** references **`.quasar/shims-vue.d.ts`** so `tsc` resolves `*.vue` while `tsconfig` excludes generated `.quasar` output.
@@ -156,7 +165,7 @@ Use different instructions or @-references when starting a task:
 
 1. **Electron and preload** — Focus on `src-electron/`, bridge security, `globals.d.ts`, `electron-ipc-bridge.ts` for IPC channel names, Vitest for bridge and `register*Ipc` modules.
 2. **Tests** — Vitest unit coverage in `src/` + `src-electron/`, Playwright integration flows, build order, `e2e-tests/` vs `src/components/**/tests/`.
-3. **Feature / UI** — `src/` Vue + Quasar, Pinia, router, `ComponentTesting` page, i18n strings. For **large production menu/config data**, split across **`src/components/<Feature>/_data/*.ts`** (multiple named files as needed). Rare **embedded** component-mode-only payloads may live as **`const` inside the `.vue`**; Playwright passes isolated props via **`COMPONENT_PROPS`** defined inline in each spec. Details: [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc).
+3. **Feature / UI** — `src/` Vue + Quasar, Pinia, router, `ComponentTesting` page, i18n strings. Place SFCs under **`src/components/dialogs/`**, **`globals/`**, **`elements/`**, or **`other/`** per [README](README.md) and this file. For **large production menu/config data**, split across **`src/components/<bucket>/<Feature>/_data/*.ts`**. When the **user explicitly requests** moving bulky **SFC script** logic out of a `.vue`, place those modules **only** under **`src/components/<bucket>/<Feature>/scripts/*.ts`**. Rare **embedded** component-mode-only payloads may live as **`const` inside the `.vue`**; Playwright passes isolated props via **`COMPONENT_PROPS`** defined inline in each spec. Details: [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc).
 4. **Data / SQLite** — Main-process storage, `userData` paths, migrations, exposing data via narrow preload APIs only.
 
 ## Skill index

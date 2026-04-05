@@ -16,7 +16,7 @@ alwaysApply: false
 ## Placement and discovery
 
 - Files must match `**/*vitest.@(spec|test).?(c|m)[jt]s?(x)` — this repo uses **`*.vitest.test.ts`**.
-- Co-locate tests under a **`tests/`** directory next to the code under test, e.g. [src/scripts/_utilities/tests](src/scripts/_utilities/tests), [src/stores/tests](src/stores/tests), [src-electron/contentBridgeAPIs/tests](src-electron/contentBridgeAPIs/tests), [src-electron/mainScripts/tests](src-electron/mainScripts/tests), [src/components/FantasiaMascotImage/tests](src/components/FantasiaMascotImage/tests).
+- Co-locate tests under a **`tests/`** directory next to the code under test, e.g. [src/scripts/_utilities/tests](src/scripts/_utilities/tests), [src/stores/tests](src/stores/tests), [src-electron/contentBridgeAPIs/tests](src-electron/contentBridgeAPIs/tests), [src-electron/mainScripts/tests](src-electron/mainScripts/tests), [src/components/elements/FantasiaMascotImage/tests](src/components/elements/FantasiaMascotImage/tests).
 - Treat `src/`, `src-electron/`, and **Vue components under `src/components/`** as Vitest unit-testing surfaces when mounting is appropriate; full UI flows remain in Playwright.
 - For `src/components/**`, keep a **1:1 baseline**: every component `.vue` should have a colocated `tests/<ComponentName>.vitest.test.ts`. When adding, renaming, or removing a component, update its matching Vitest file in the same change.
 

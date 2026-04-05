@@ -51,7 +51,7 @@
 import type { T_dialogName } from 'app/types/T_dialogList'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { onMounted, ref, watch } from 'vue'
-import SocialContactButtons from '../SocialContactButtons/SocialContactButtons.vue'
+import SocialContactButtons from '../../other/SocialContactButtons/SocialContactButtons.vue'
 import type { StoreGeneric } from 'pinia'
 
 const resolveDialogComponentStore = (): StoreGeneric | null => {
@@ -133,14 +133,14 @@ onMounted(() => {
 <style lang="scss">
 .AboutFantasiaArchive {
   .dialogComponent__wrapper {
-    width: 700px;
     max-width: 80vw;
+    width: 700px;
   }
 
   .dialogComponent__content {
-    text-align: center;
-    overflow: auto;
     max-height: calc(100vh - 235px);
+    overflow: auto;
+    text-align: center;
   }
 }
 

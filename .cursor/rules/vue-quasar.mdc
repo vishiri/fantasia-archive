@@ -26,18 +26,19 @@ alwaysApply: false
 
 ## `<script setup>` — documentation and size
 
-- Add a short **JSDoc block** above each significant function (`/** ... */`), as in [GlobalWindowButtons.vue](src/components/GlobalWindowButtons/GlobalWindowButtons.vue).
+- Add a short **JSDoc block** above each significant function (`/** ... */`), as in [GlobalWindowButtons.vue](src/components/globals/GlobalWindowButtons/GlobalWindowButtons.vue).
 - Keep types strict in `<script setup lang="ts">`: avoid `any`; prefer explicit interfaces, generics, unions, `unknown`, or utility types.
 
 ### When the script section grows
 
-1. **Structured production data** (menus, button sets, large config-shaped objects the app ships): colocate under the feature in a **`_data/`** folder (e.g. [AppControlMenus/_data](src/components/AppControlMenus/_data/)) and import into the SFC.
+1. **Structured production data** (menus, button sets, large config-shaped objects the app ships): colocate under the feature in a **`_data/`** folder (e.g. [globals/AppControlMenus/_data](src/components/globals/AppControlMenus/_data/)) and import into the SFC.
    - **Split big blobs across several TS files** inside `_data/` (one concern or surface per file — name files by what they define, e.g. `project.ts`, `tools.ts`, `buttons.ts`). A single “aggregator” file that re-exports or composes smaller pieces is fine when it keeps the SFC’s imports simple.
    - **`_data/` modules are normal TypeScript**: they may call **`i18n.global.t('...')`** (or your existing locale loader pattern), import shared helpers from **`src/scripts/`**, and attach **functions** (e.g. menu `trigger` callbacks) where the shape requires dynamic behavior. Keep user-visible strings in **`src/i18n`** via keys, not hardcoded prose, unless the project already uses a local exception for that spot.
    - **Vitest fixtures** do **not** belong in `_data/` — keep them **inside** `*.vitest.test.ts` only (see [vitest-tests.mdc](vitest-tests.mdc)). **Component-testing** props for isolated SFCs should be supplied via **`COMPONENT_PROPS`** from Playwright (inline payloads in each `*.playwright.test.ts`). **Embedded** component-mode-only data that a parent SFC must own (e.g. a menu injected only when `TEST_ENV === 'components'`) may live as a **`const` in that `.vue` file** — not in a `tests/*.ts` fixture module — see [playwright-tests.mdc](playwright-tests.mdc).
    - **Do not add dedicated tests whose only SUT is a `_data/` file**; cover production `_data` through `.vue` or other consumers.
 2. **Pure, reusable helpers** (no Vue instance, no template-specific state): move to **`src/scripts/`** and follow [typescript-scripts.mdc](typescript-scripts.mdc) (JSDoc, single responsibility per file).
 3. **Composable-style or feature-specific logic**: keep a dedicated module under `src/scripts/<feature>/` or next to the feature if that matches existing patterns; avoid unrelated exports in one file.
+4. **Large SFC script blocks split out on request** — **Do not** move bulky functions or long procedural logic out of a `<script setup>` into separate files unless the **user explicitly requests** that extraction (agents must not do this refactor proactively). When the user **does** ask for it, place the new modules **only** under **`src/components/<bucket>/<Feature>/scripts/`** (one or more `.ts` files) and import them into the SFC — **not** beside the `.vue` at the feature root. Buckets are **`dialogs/`**, **`globals/`**, **`elements/`**, **`other/`** (see [README](../../README.md)). This folder is for component-owned script logic; it is **not** a substitute for **`_data/`** (structured production payloads) or **`src/scripts/`** (shared app-wide helpers).
 
 ## Related rules (by concern)
 
