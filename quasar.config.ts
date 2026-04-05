@@ -74,7 +74,7 @@ export default defineConfig((ctx) => {
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
       config: {
-        ripple: false,
+        ripple: true,
         dark: true
       },
 

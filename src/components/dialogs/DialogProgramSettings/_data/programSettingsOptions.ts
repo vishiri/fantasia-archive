@@ -11,7 +11,7 @@ export const PROGRAM_SETTINGS_OPTIONS: Record<keyof I_faUserSettings, I_programS
     subcategory: 'universalDialogSettings'
   },
   allowWiderScrollbars: {
-    category: 'visualAccessibility',
+    category: 'accessibility',
     subcategory: 'accessibility'
   },
   compactDocumentCount: {
@@ -59,7 +59,7 @@ export const PROGRAM_SETTINGS_OPTIONS: Record<keyof I_faUserSettings, I_programS
     subcategory: 'treeBehavior'
   },
   doubleDashDocCount: {
-    category: 'visualAccessibility',
+    category: 'accessibility',
     subcategory: 'accessibility'
   },
   hideAdvSearchCheatsheetButton: {
@@ -67,7 +67,7 @@ export const PROGRAM_SETTINGS_OPTIONS: Record<keyof I_faUserSettings, I_programS
     subcategory: 'visualsAppwideFunctionality'
   },
   hideDeadCrossThrough: {
-    category: 'visualAccessibility',
+    category: 'accessibility',
     subcategory: 'accessibility'
   },
   hideDocumentTitles: {
@@ -171,7 +171,7 @@ export const PROGRAM_SETTINGS_OPTIONS: Record<keyof I_faUserSettings, I_programS
     subcategory: 'tagSettings'
   },
   textShadow: {
-    category: 'visualAccessibility',
+    category: 'accessibility',
     subcategory: 'accessibility'
   }
 }

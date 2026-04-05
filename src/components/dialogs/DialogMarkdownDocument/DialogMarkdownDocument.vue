@@ -179,7 +179,7 @@ onMounted(() => {
   }
 
   &__content {
-    max-height: calc(100vh - 235px);
+    max-height: calc(100vh - 273px);
     min-height: 650px;
     overflow: auto;
 

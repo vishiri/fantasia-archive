@@ -10,29 +10,26 @@
       :class="['dialogComponent__wrapper', 'dialogProgramSettings', `${documentName}`]"
     >
       <!-- Title: fixed, does not scroll with tab content -->
-      <q-card-section class="dialogProgramSettings__titleSection q-pt-lg q-px-lg q-pb-sm">
-        <h4
-          id="dialogProgramSettings-title"
-          class="dialogProgramSettings__title text-center q-my-none"
-        >
-          {{ $t('dialogs.programSettings.title') }}
-        </h4>
-      </q-card-section>
+      <h4
+        id="dialogProgramSettings-title"
+        class="dialogProgramSettings__title text-center"
+      >
+        {{ $t('dialogs.programSettings.title') }}
+      </h4>
 
       <!-- Body: vertical tabs + scrollable tab panels only -->
-      <q-card-section class="dialogProgramSettings__body row no-wrap q-pa-none q-px-sm q-pb-none">
+      <q-card-section class="dialogProgramSettings__body row no-wrap q-pa-none">
         <q-tabs
           v-model="selectedCategoryTab"
           vertical
-          dense
-          no-caps
-          class="dialogProgramSettings__tabs q-pa-sm"
+          class="dialogProgramSettings__tabs"
           active-color="primary-bright"
           indicator-color="primary-bright"
         >
           <q-tab
             v-for="(category, categoryKey) in programSettingsTree"
             :key="categoryKey"
+            class="text-grey-5"
             :name="categoryKey"
             :label="category.title"
             :data-test="`dialogProgramSettings-tab-${categoryKey}`"
@@ -45,8 +42,8 @@
           v-model="selectedCategoryTab"
           animated
           vertical
-          transition-prev="slide-down"
-          transition-next="slide-up"
+          transition-prev="jump-up"
+          transition-next="jump-down"
           class="dialogProgramSettings__tabPanelsRoot col q-pa-none"
         >
           <q-tab-panel
@@ -55,44 +52,77 @@
             :name="categoryKey"
             class="dialogProgramSettings__tabPanel q-pa-none"
           >
-            <q-scrollarea class="dialogProgramSettings__scrollArea">
-              <div class="dialogProgramSettings__scrollInner q-px-md q-py-md q-pr-lg">
+            <div class="dialogProgramSettings__panelScroll">
+              <div class="dialogProgramSettings__panelScrollInner q-py-sm">
                 <div
                   class="dialogProgramSettings__category"
                   :data-test="`dialogProgramSettings-category-${categoryKey}`"
                 >
+                  <h5 class="dialogProgramSettings__categoryTitle text-bold q-my-none text-h6">
+                    {{ category.title }}
+                  </h5>
+
                   <div
-                    v-for="(subCategory, subCategoryKey) in category.subCategories"
+                    v-for="(subCategory, subCategoryKey, subCategoryIndex) in category.subCategories"
                     :key="subCategoryKey"
-                    class="dialogProgramSettings__subCategory q-mb-md"
+                    class="dialogProgramSettings__subCategory"
                     :data-test="`dialogProgramSettings-subcategory-${categoryKey}-${subCategoryKey}`"
                   >
-                    <h6 class="dialogProgramSettings__subCategoryTitle text-subtitle2 q-mb-sm q-mt-none">
+                    <h6 class="dialogProgramSettings__subCategoryTitle text-bold q-mb-none text-subtitle1 text-primary-bright">
                       {{ subCategory.title }}
                     </h6>
 
-                    <div
-                      v-for="(setting, settingKey) in subCategory.settingsList"
-                      :key="settingKey"
-                      class="dialogProgramSettings__setting q-mb-sm"
-                    >
-                      <q-toggle
-                        color="primary-bright"
-                        :model-value="setting.value"
-                        :label="setting.title"
-                        @update:model-value="(value) => updateLocalSetting(settingKey, value)"
-                      />
-                      <p
-                        v-if="setting.note !== undefined && setting.note !== ''"
-                        class="dialogProgramSettings__settingNote text-caption q-ml-xl q-mt-xs q-mb-none"
+                    <div class="row q-col-gutter-md">
+                      <div
+                        v-for="(setting, settingKey) in subCategory.settingsList"
+                        :key="settingKey"
+                        class="col-12 col-sm-6 col-lg-4"
                       >
-                        {{ setting.note }}
-                      </p>
+                        <div
+                          class="dialogProgramSettings__setting"
+                          :data-test="`dialogProgramSettings-setting-${settingKey}`"
+                        >
+                          <div class="row items-center no-wrap q-mb-xs">
+                            <div class="dialogProgramSettings__settingTitle">
+                              <span class="dialogProgramSettings__settingLabel text-grey-3 text-weight-regular text-body2">{{ setting.title }}</span>
+                              <q-icon
+                                name="mdi-help-circle"
+                                size="16px"
+                                class="dialogProgramSettings__settingHelpIcon q-ml-md"
+                              >
+                                <q-tooltip
+                                  :delay="500"
+                                >
+                                  {{ setting.description }}
+                                </q-tooltip>
+                              </q-icon>
+                            </div>
+                          </div>
+                          <q-toggle
+                            color="primary-bright"
+                            :model-value="setting.value"
+                            @update:model-value="(value) => updateLocalSetting(settingKey, value)"
+                          />
+                          <p
+                            v-if="setting.note !== undefined && setting.note !== ''"
+                            class="dialogProgramSettings__settingNote text-caption q-mt-xs q-mb-none text-red-12"
+                          >
+                            {{ setting.note }}
+                          </p>
+                        </div>
+                      </div>
                     </div>
+
+                    <q-separator
+                      v-if="showNonLastSeparator(category.subCategories, subCategoryIndex)"
+                      horizontal
+                      class="q-mt-md"
+                      color="primary"
+                    />
                   </div>
                 </div>
               </div>
-            </q-scrollarea>
+            </div>
           </q-tab-panel>
         </q-tab-panels>
       </q-card-section>
@@ -124,17 +154,20 @@
 </template>
 
 <script setup lang="ts">
-import type { T_dialogName } from 'app/types/T_dialogList'
-import { S_DialogComponent } from 'src/stores/S_Dialog'
-import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
-import { onMounted, ref, toRaw, watch } from 'vue'
-import type { StoreGeneric } from 'pinia'
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
-import type { T_programSettingsRenderTree } from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
+import type { T_dialogName } from 'app/types/T_dialogList'
+import type {
+  I_programSubCategoryRenderItem,
+  T_programSettingsRenderTree
+} from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
+import type { StoreGeneric } from 'pinia'
 import {
   syncLocalProgramSettingsFromStore,
   updateLocalProgramSetting
 } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsLocalSettingsManagement'
+import { S_DialogComponent } from 'src/stores/S_Dialog'
+import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
+import { onMounted, ref, toRaw, watch } from 'vue'
 
 const resolveDialogComponentStore = (): StoreGeneric | null => {
   try {
@@ -150,6 +183,13 @@ const resolveFaUserSettingsStore = (): ReturnType<typeof S_FaUserSettings> | nul
   } catch {
     return null
   }
+}
+
+const showNonLastSeparator = (
+  subCategories: Record<string, I_programSubCategoryRenderItem>,
+  index: number
+): boolean => {
+  return index < Object.keys(subCategories).length - 1
 }
 
 /**
@@ -176,40 +216,16 @@ const documentName = ref('')
  * Local editable snapshot of user settings.
  */
 const localSettings = ref<I_faUserSettings | null>(null)
+
+/**
+ * Program settings tree
+ */
 const programSettingsTree = ref<T_programSettingsRenderTree>({})
+
+/**
+ * Selected category tab
+ */
 const selectedCategoryTab = ref<string>('')
-
-watch(
-  programSettingsTree,
-  (tree) => {
-    const keys = Object.keys(tree)
-    if (keys.length === 0) {
-      selectedCategoryTab.value = ''
-      return
-    }
-    if (selectedCategoryTab.value === '' || !keys.includes(selectedCategoryTab.value)) {
-      selectedCategoryTab.value = keys[0] as string
-    }
-  },
-  {
-    deep: true,
-    immediate: true
-  }
-)
-
-/**
- * Updates the local setting value
- */
-const updateLocalSetting = (settingKey: string, updatedValue: boolean): void => {
-  updateLocalProgramSetting(localSettings, programSettingsTree, settingKey, updatedValue)
-}
-
-/**
- * Syncs the local settings from the store
- */
-const syncLocalSettingsFromStore = async (): Promise<void> => {
-  await syncLocalProgramSettingsFromStore(resolveFaUserSettingsStore, localSettings, programSettingsTree)
-}
 
 /**
  * Opens the popup dialog via direct input-feed
@@ -232,6 +248,41 @@ const saveAndCloseDialog = async (): Promise<void> => {
 
   dialogModel.value = false
 }
+
+/**
+ * Syncs the local settings from the store
+ */
+const syncLocalSettingsFromStore = async (): Promise<void> => {
+  await syncLocalProgramSettingsFromStore(resolveFaUserSettingsStore, localSettings, programSettingsTree)
+}
+
+/**
+ * Updates the local setting value
+ */
+const updateLocalSetting = (settingKey: string, updatedValue: boolean): void => {
+  updateLocalProgramSetting(localSettings, programSettingsTree, settingKey, updatedValue)
+}
+
+/**
+ * Watches the program settings tree and updates the selected category tab
+ */
+watch(
+  programSettingsTree,
+  (tree) => {
+    const keys = Object.keys(tree)
+    if (keys.length === 0) {
+      selectedCategoryTab.value = ''
+      return
+    }
+    if (selectedCategoryTab.value === '' || !keys.includes(selectedCategoryTab.value)) {
+      selectedCategoryTab.value = keys[0] as string
+    }
+  },
+  {
+    deep: true,
+    immediate: true
+  }
+)
 
 /**
  * Trigger dialog popup via reaction to store update
@@ -288,26 +339,6 @@ onMounted(() => {
     overflow: hidden;
   }
 
-  .dialogProgramSettings__tabs {
-    align-self: stretch;
-    flex: 0 0 auto;
-
-    .q-tab__label {
-      font-size: 0.7rem;
-      letter-spacing: 0.06em;
-      text-align: left;
-      text-transform: uppercase;
-      white-space: normal;
-    }
-
-    .q-tab {
-      justify-content: flex-start;
-      min-height: 2.75rem;
-      padding-left: 0.5rem;
-      padding-right: 1rem;
-    }
-  }
-
   .dialogProgramSettings__tabPanelsRoot {
     background: transparent;
     display: flex;
@@ -327,14 +358,48 @@ onMounted(() => {
     padding: 0;
   }
 
-  .dialogProgramSettings__scrollArea {
+  .dialogProgramSettings__panelScroll {
     flex: 1 1 auto;
     height: 100%;
     min-height: 0;
+    overflow: hidden auto;
   }
 
-  .dialogProgramSettings__scrollInner {
-    min-height: 120px;
+  .q-tabs--vertical .q-tab {
+    padding: 0 16px;
+  }
+
+  .dialogProgramSettings__tabs {
+  }
+
+  .dialogProgramSettings__category {
+    padding: 0 40px;
+  }
+
+  .dialogProgramSettings__settingTitle {
+    align-items: center;
+    display: flex;
+    font-weight: 500;
+    justify-content: flex-start;
+    margin-bottom: 8px;
+    margin-left: 10px;
+    margin-top: 16px;
+    width: calc(100% - 45px);
+  }
+
+  .dialogProgramSettings__settingLabel {
+  }
+
+  .dialogProgramSettings__settingHelpIcon {
+    margin-top: 2px;
+  }
+
+  .dialogProgramSettings__settingHelp {
+  }
+
+  .dialogProgramSettings__settingNote {
+    margin-left: 10px;
+    text-shadow: 0 0 2px black;
   }
 }
 </style>

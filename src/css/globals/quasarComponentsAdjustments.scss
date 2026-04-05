@@ -1,9 +1,67 @@
 @use '../quasar.variables.scss' as *;
 
+/* Native element selectors first (alphabetical), then class-based rules (alphabetical). */
+
+body.desktop .q-focusable:focus > .q-focus-helper {
+
+  /* Replacement of the overlay (before/after) elements via simple background-color opacity */
+  opacity: 0.15 !important;
+
+  &::before,
+  &::after {
+
+    /* Fix for color-disrupting overlay elements of buttons/links */
+    opacity: 0 !important;
+  }
+}
+
+body.desktop .q-hoverable:hover > .q-focus-helper,
+body.desktop .q-manual-focusable--focused > .q-focus-helper {
+
+  /* Replacement of the overlay (before/after) elements via simple background-color opacity */
+  opacity: 0.075 !important;
+
+  &::before,
+  &::after {
+
+    /* Fix for color-disrupting overlay elements of buttons/links */
+    opacity: 0 !important;
+  }
+}
+
+.body--dark .q-markdown,
+.body--dark .q-markdown p,
+.body--dark .q-markdown li,
+.body--dark .q-markdown th,
+.body--dark .q-markdown td,
+.body--dark .q-markdown .q-markdown--heading,
+.body--dark .q-markdown .q-markdown--heading-h1,
+.body--dark .q-markdown .q-markdown--heading-h2,
+.body--dark .q-markdown .q-markdown--heading-h3,
+.body--dark .q-markdown .q-markdown--heading-h4,
+.body--dark .q-markdown .q-markdown--heading-h5,
+.body--dark .q-markdown .q-markdown--heading-h6,
+.body--dark .q-markdown .q-markdown--line-numbers-wrapper,
+.body--dark .q-markdown .q-markdown--code {
+
+  /* Force high-contrast markdown text in dark mode over QMarkdown defaults */
+  color: $qMarkdown-color !important;
+  opacity: 1 !important;
+}
+
 .fullscreen {
 
   /* Tweak for top bar and other element with z-index between 6000 to 7000 */
   z-index: 7001;
+}
+
+.q-card {
+  box-shadow: $qCard-boxShadow;
+}
+
+.q-dialog > .q-dialog__inner > .q-card {
+  max-height: calc(100vh - 125px);
+  max-width: 1400px;
 }
 
 .q-layout {
@@ -12,17 +70,6 @@
     /* Tweak for default light shadow rendering in the dark-mode variation of the element */
     box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.24) !important;
   }
-}
-
-.q-page {
-
-  /* Max-height of the window minus the height of the top bar */
-  max-height: calc(100vh - 50px);
-  overflow: auto;
-}
-
-.q-card {
-  box-shadow: $qCard-boxShadow;
 }
 
 .q-markdown {
@@ -170,25 +217,6 @@
   }
 }
 
-/* Force high-contrast markdown text in dark mode over QMarkdown defaults */
-.body--dark .q-markdown,
-.body--dark .q-markdown p,
-.body--dark .q-markdown li,
-.body--dark .q-markdown th,
-.body--dark .q-markdown td,
-.body--dark .q-markdown .q-markdown--heading,
-.body--dark .q-markdown .q-markdown--heading-h1,
-.body--dark .q-markdown .q-markdown--heading-h2,
-.body--dark .q-markdown .q-markdown--heading-h3,
-.body--dark .q-markdown .q-markdown--heading-h4,
-.body--dark .q-markdown .q-markdown--heading-h5,
-.body--dark .q-markdown .q-markdown--heading-h6,
-.body--dark .q-markdown .q-markdown--line-numbers-wrapper,
-.body--dark .q-markdown .q-markdown--code {
-  color: $qMarkdown-color !important;
-  opacity: 1 !important;
-}
-
 .q-menu {
   &--dark {
 
@@ -201,63 +229,6 @@
     /* Submenu having 1 lower z-index than normal menu for fancier looking animation of sliding underneath the parent */
     z-index: 5999;
   }
-}
-
-body.desktop .q-hoverable:hover > .q-focus-helper,
-body.desktop .q-manual-focusable--focused > .q-focus-helper {
-
-  /* Replacement of the overlay (before/after) elements via simple background-color opacity */
-  opacity: 0.075 !important;
-
-  &::before,
-  &::after {
-
-    /* Fix for color-disrupting overlay elements of buttons/links */
-    opacity: 0 !important;
-  }
-}
-
-body.desktop .q-focusable:focus > .q-focus-helper {
-
-  /* Replacement of the overlay (before/after) elements via simple background-color opacity */
-  opacity: 0.15 !important;
-
-  &::before,
-  &::after {
-
-    /* Fix for color-disrupting overlay elements of buttons/links */
-    opacity: 0 !important;
-  }
-}
-
-.q-transition--slide-right-enter-active,
-.q-transition--slide-right-leave-active,
-.q-transition--slide-left-enter-active,
-.q-transition--slide-left-leave-active,
-.q-transition--slide-up-enter-active,
-.q-transition--slide-up-leave-active,
-.q-transition--slide-down-enter-active,
-.q-transition--slide-down-leave-active,
-.q-transition--jump-right-enter-active,
-.q-transition--jump-right-leave-active,
-.q-transition--jump-left-enter-active,
-.q-transition--jump-left-leave-active,
-.q-transition--jump-up-enter-active,
-.q-transition--jump-up-leave-active,
-.q-transition--jump-down-enter-active,
-.q-transition--jump-down-leave-active,
-.q-transition--fade-enter-active,
-.q-transition--fade-leave-active,
-.q-transition--scale-enter-active,
-.q-transition--scale-leave-active,
-.q-transition--rotate-enter-active,
-.q-transition--rotate-leave-active,
-.q-transition--flip-enter-active,
-.q-transition--flip-leave-active {
-  pointer-events: none;
-
-  /* Transitions glitches with user input/select fix */
-  user-select: none;
 }
 
 .q-notification {
@@ -295,4 +266,71 @@ body.desktop .q-focusable:focus > .q-focus-helper {
       object-fit: contain;
     }
   }
+}
+
+.q-page {
+
+  /* Max-height of the window minus the height of the top bar */
+  max-height: calc(100vh - 50px);
+  overflow: auto;
+}
+
+.q-tab {
+  min-height: 48px;
+}
+
+.q-tooltip {
+  background-color: $accent;
+  color: $dark;
+  font-size: 13px;
+  font-weight: 600;
+  max-width: 600px;
+  z-index: 999999999 !important;
+}
+
+.q-toggle {
+  width: 100%;
+}
+
+.q-toggle__inner {
+  max-width: 150px;
+  width: 100%;
+}
+
+.q-toggle__inner--truthy .q-toggle__thumb {
+  left: calc(100% - 30px);
+}
+
+.q-toggle__thumb {
+  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.q-transition--fade-enter-active,
+.q-transition--fade-leave-active,
+.q-transition--flip-enter-active,
+.q-transition--flip-leave-active,
+.q-transition--jump-down-enter-active,
+.q-transition--jump-down-leave-active,
+.q-transition--jump-left-enter-active,
+.q-transition--jump-left-leave-active,
+.q-transition--jump-right-enter-active,
+.q-transition--jump-right-leave-active,
+.q-transition--jump-up-enter-active,
+.q-transition--jump-up-leave-active,
+.q-transition--rotate-enter-active,
+.q-transition--rotate-leave-active,
+.q-transition--scale-enter-active,
+.q-transition--scale-leave-active,
+.q-transition--slide-down-enter-active,
+.q-transition--slide-down-leave-active,
+.q-transition--slide-left-enter-active,
+.q-transition--slide-left-leave-active,
+.q-transition--slide-right-enter-active,
+.q-transition--slide-right-leave-active,
+.q-transition--slide-up-enter-active,
+.q-transition--slide-up-leave-active {
+  pointer-events: none;
+
+  /* Transitions glitches with user input/select fix */
+  user-select: none;
 }

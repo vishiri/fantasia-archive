@@ -22,6 +22,7 @@ description: >-
 
 - Prefer updating `.md` assets and i18n wiring over hardcoding large markdown in `.vue` files.
 - Keep headings and structure readable in a modal/dialog viewport; test in the actual dialog component.
+- Markdown under **`src/i18n/*/documents/`** is compiled as **vue-i18n** message text: **do not** use stray **`{...}`** (for example glob **`.*.{ext1,ext2}`**) unless you follow vue-i18n placeholder rules — invalid groups break the changelog and other document dialogs at runtime. See [fantasia-changelog-en-us](../fantasia-changelog-en-us/SKILL.md) for changelog-specific wording.
 
 ## Related
 

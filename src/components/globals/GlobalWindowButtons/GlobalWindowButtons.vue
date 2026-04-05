@@ -9,6 +9,7 @@
       flat
       dark
       size="xs"
+      :ripple="false"
       class="globalWindowButtons__button globalWindowButtons__minimize"
       :aria-label="$t('globalWindowButtons.minimizeButton')"
       :title="$t('globalWindowButtons.minimizeButton')"
@@ -32,6 +33,7 @@
       flat
       dark
       size="xs"
+      :ripple="false"
       class="globalWindowButtons__button globalWindowButtons__resize"
       :aria-label="isMaximized ? $t('globalWindowButtons.resizeButton') : $t('globalWindowButtons.maximizeButton')"
       :title="isMaximized ? $t('globalWindowButtons.resizeButton') : $t('globalWindowButtons.maximizeButton')"
@@ -57,6 +59,7 @@
       flat
       dark
       size="xs"
+      :ripple="false"
       class="globalWindowButtons__button globalWindowButtons__close"
       :aria-label="$t('globalWindowButtons.close')"
       :title="$t('globalWindowButtons.close')"

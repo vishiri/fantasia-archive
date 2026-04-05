@@ -7,6 +7,7 @@
     dark
     size="md"
     no-caps
+    :ripple="false"
     data-test="AppControlSingleMenu-wrapper"
     :data-test-has-proper-data-input="hasProperDataInput"
   >

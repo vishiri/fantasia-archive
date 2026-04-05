@@ -93,6 +93,14 @@ Append bullets under the right `###` subsection only if that category has real i
 - Add a `###` heading only when you are adding one or more bullets under it.
 - Prefer **product-facing** wording; avoid appending “and then we ran …” verification clauses unless the user explicitly asks for that style.
 
+## vue-i18n and `changeLog.md` (required)
+
+`changeLog.md` is loaded as a **vue-i18n message string**, not plain static text. The compiler treats **`{` … `}`** as **message placeholders** (interpolation). Content like shell glob brace expansion (**`*.{vue,css}`**), lone **`{foo}`**, or **`@:`**-style escapes can trigger **`Message compilation error`** at runtime when the changelog opens.
+
+- **Do not** put literal **`{...}`** groups in changelog prose unless they are valid vue-i18n placeholder syntax you intend to use (you almost never should in this file).
+- Describe file globs in **words** or list extensions (**`vue`**, **`css`**, **`scss`**, **`sass`**) without curly-brace grouping.
+- If you must mention braces for documentation reasons, spell them out (for example “open brace … close brace”) or use phrasing that avoids the characters.
+
 ## Related
 
 - Commit messages: [git-conventional-commits](../git-conventional-commits/SKILL.md) (e.g. `docs:` for changelog-only edits).

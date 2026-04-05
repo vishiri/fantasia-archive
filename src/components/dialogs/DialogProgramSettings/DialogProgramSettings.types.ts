@@ -1,5 +1,6 @@
 export interface I_programSettingRenderItem {
   title: string
+  description: string
   value: boolean
   tags: string
   note?: string

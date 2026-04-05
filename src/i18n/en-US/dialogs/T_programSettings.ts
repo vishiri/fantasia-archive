@@ -3,6 +3,14 @@ export default {
   saveButton: 'Save settings',
   closeButton: 'Close without saving',
   appOptionsCategories: {
+    accessibility: {
+      title: 'Accessibility',
+      tags: 'a11y, readability, visibility, assistive',
+      accessibility: {
+        subtitle: 'Accessibility',
+        tags: 'a11y, readability, visibility, assistive'
+      }
+    },
     developerSettings: {
       title: 'Developer settings',
       tags: 'developer, debug, diagnostics, internal',
@@ -72,12 +80,8 @@ export default {
       }
     },
     visualAccessibility: {
-      title: 'Visuals, App-wide functionality & Accessibility',
+      title: 'Visuals & App-wide functionality',
       tags: 'appearance, interface, global, ui, look and feel',
-      accessibility: {
-        subtitle: 'Accessibility',
-        tags: 'a11y, readability, visibility, assistive'
-      },
       applicationExtras: {
         subtitle: 'Application extras',
         tags: 'welcome screen, startup, tips, social, mascot'
@@ -100,7 +104,7 @@ export default {
       tags: 'toggle shortcut, same hotkey, quick add, dismiss popup'
     },
     allowWiderScrollbars: {
-      title: 'Accessibility - Wider scrollbars',
+      title: 'Wider scrollbars',
       description: 'This setting makes FA\'s scrollbars wider and therefore allows manual click-scrolling directly on them for devices that do not support standard scrolling (for example mice without a scroll wheel).',
       tags: 'scrollbar width, click scroll, mouse without wheel, trackball, touch'
     },
@@ -153,7 +157,7 @@ export default {
       title: 'Disable spellcheck',
       description: 'Disables spell-, grammar-, and word-checking in document edit mode.',
       tags: 'spelling, grammar, proofing, red underline, writing, dictionary',
-      note: 'Please note that this option needs a FULL app restart to consistently take effect!'
+      note: 'Needs a full app restart to take effect!'
     },
     doNotcollaseTreeOptions: {
       title: 'Prevent sublevel collapse in the tree',
@@ -161,8 +165,8 @@ export default {
       tags: 'remember expanded, nested open, accordion, collapse children'
     },
     doubleDashDocCount: {
-      title: 'Accessibility - Pronounced count divider',
-      description: 'This setting adds another | character between the category and document count in the hierarchical tree.',
+      title: 'Pronounced count divider',
+      description: 'This setting adds another \\| character between the category and document count in the hierarchical tree.',
       tags: 'pipe, delimiter, separator, count format, tree counts'
     },
     hideAdvSearchCheatsheetButton: {
@@ -171,7 +175,7 @@ export default {
       tags: 'relationship field, cheatsheet, help icon, link picker, advanced search'
     },
     hideDeadCrossThrough: {
-      title: 'Accessibility - Hide strike-through',
+      title: 'Hide strike-through',
       description: 'This setting hides the strike-through effect on dead, gone, or destroyed documents in order to increase visibility.',
       tags: 'strikethrough, deceased, destroyed, gone, document status, crossed out'
     },
@@ -286,12 +290,13 @@ export default {
       tags: 'tab hover, tab strip preview, title bar peek'
     },
     preventPreviewsTree: {
-      title: 'Performance — heavy\nPrevent document previews',
+      title: 'Prevent document previews on hover',
       description: 'Controls whether quick-previews on hover are shown in the hierarchical tree. Turning this setting off (so previews stay enabled) can have a major impact on app performance.',
-      tags: 'tree hover, lag, slow, fps, performance, sidebar preview'
+      tags: 'tree hover, lag, slow, fps, performance, sidebar preview',
+      note: 'Can have a major impact on app performance!'
     },
     showDocumentID: {
-      title: 'DEVELOPMENT - Show document IDs',
+      title: 'Show document IDs',
       description: 'If this is enabled, the document body will also show the internal document ID value.',
       tags: 'debug, internal id, identifier, dev tools, troubleshooting'
     },
@@ -301,7 +306,7 @@ export default {
       tags: 'tag order, tags first, above categories'
     },
     textShadow: {
-      title: 'Accessibility - Text shadow',
+      title: 'Text shadow',
       description: 'This setting toggles text shadows in the hierarchical tree, relationship search popups, and tabs, allowing for a more standout look for text against the background.',
       tags: 'contrast, legibility, shadow, outline, readability, text clarity'
     }

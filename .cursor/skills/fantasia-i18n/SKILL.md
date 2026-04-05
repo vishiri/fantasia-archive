@@ -33,7 +33,8 @@ Do not place locale files in any other location. If no folder fits, use `globalF
 - All top-level keys exported from `index.ts` use **camelCase with a lowercase first letter** (e.g. `globalWindowButtons`, `appControlMenus`, `dialogs`, `errorNotFound`, `globalFunctionality`).
 - Sub-keys within `T_*.ts` modules also use camelCase with a lowercase first letter.
 - `index.ts` must contain no hardcoded user-visible strings; every string lives in a dedicated `T_*.ts` file.
-- The `documents` section holds processed markdown strings, not static text — it is the only section that calls `specialCharacterFixer`; do not add plain string keys there.
+- The `documents` section holds processed markdown strings, not static text — it is the only section that calls `specialCharacterFixer`; do not add plain string keys there. Those strings are still compiled as **vue-i18n** messages: avoid literal **`{...}`** in Markdown (for example glob **`.*.{vue,css}`**) or the in-app changelog and other document dialogs can throw **message compilation** errors — see [fantasia-changelog-en-us](../fantasia-changelog-en-us/SKILL.md).
+- **vue-i18n** (Intlify) message syntax treats **`|`** as special (plural / list). To show a literal vertical bar in user-visible text, write **`\\|`** in the TypeScript string (backslash + pipe in the source so the runtime message contains **`\|`**, which compiles to a single **`|`**). The same escape style applies to **`@`**, **`{`**, **`}`**, and **`\`** where you need them literally; see Intlify message syntax docs.
 - App-wide strings that do not belong to a specific component, dialog, or page go in `globalFunctionality/`. Uncategorised strings live in `globalFunctionality/T_unsortedAppTexts.ts` under the `globalFunctionality.unsortedAppTexts` key.
 
 ## index.ts rules
