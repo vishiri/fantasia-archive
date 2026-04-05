@@ -16,8 +16,11 @@ import T_FantasiaMascotImage from './components/FantasiaMascotImage/T_FantasiaMa
 import T_socialContactButtons from './components/SocialContactButtons/T_socialContactButtons'
 
 import T_aboutFantasiaArchive from './dialogs/T_aboutFantasiaArchive'
+import T_markdownDocument from './dialogs/T_markdownDocument'
+import T_programSettings from './dialogs/T_programSettings'
 
 import T_faUserSettings from './globalFunctionality/T_faUserSettings'
+import T_spellChecker from './globalFunctionality/T_spellChecker'
 import T_unsortedAppTexts from './globalFunctionality/T_unsortedAppTexts'
 
 import T_ErrorNotFound from './pages/T_ErrorNotFound'
@@ -37,7 +40,9 @@ export default {
 
   // DIALOGS
   dialogs: {
-    aboutFantasiaArchive: T_aboutFantasiaArchive
+    aboutFantasiaArchive: T_aboutFantasiaArchive,
+    markdownDocument: T_markdownDocument,
+    programSettings: T_programSettings
   },
 
   // COMPONENT - GLOBAL WINDOW BUTTONS
@@ -60,6 +65,7 @@ export default {
   // GLOBAL FUNCTIONALITY
   globalFunctionality: {
     faUserSettings: T_faUserSettings,
+    spellChecker: T_spellChecker,
     unsortedAppTexts: T_unsortedAppTexts
   }
 

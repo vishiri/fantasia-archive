@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import type { I_appMenuList } from 'app/types/I_appMenusDataList'
 import { expect, userEvent, waitFor } from 'storybook/test'
 
-import AppControlSingleMenu from './AppControlSingleMenu.vue'
+import AppControlSingleMenu from '../AppControlSingleMenu.vue'
 
 const dataInput: I_appMenuList = {
   title: 'Storybook Menu',
@@ -97,18 +97,16 @@ const meta = {
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+export const Default: StoryObj<typeof meta> = {}
 
-export const Default: Story = {}
-
-export const StatesWithSubmenu: Story = {
+export const StatesWithSubmenu: StoryObj<typeof meta> = {
   name: 'States/WithSubmenu',
   args: {
     dataInput: dataWithSubmenu
   }
 }
 
-export const InteractionsOpensMenuOnClick: Story = {
+export const InteractionsOpensMenuOnClick: StoryObj<typeof meta> = {
   name: 'Interactions/OpensMenuOnClick',
   play: async ({ canvasElement }) => {
     const wrapperButton = canvasElement.querySelector('[data-test="AppControlSingleMenu-wrapper"]')
@@ -122,7 +120,7 @@ export const InteractionsOpensMenuOnClick: Story = {
   }
 }
 
-export const I18nStressLongLabels: Story = {
+export const I18nStressLongLabels: StoryObj<typeof meta> = {
   name: 'I18nStress/LongLabels',
   args: {
     dataInput: longLabelsDataInput

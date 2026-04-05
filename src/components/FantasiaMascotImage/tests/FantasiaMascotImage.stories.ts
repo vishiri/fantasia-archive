@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import FantasiaMascotImage from './FantasiaMascotImage.vue'
+import FantasiaMascotImage from '../FantasiaMascotImage.vue'
 
 const meta = {
   title: 'Components/FantasiaMascotImage',
@@ -17,21 +17,19 @@ const meta = {
 
 export default meta
 
-type Story = StoryObj<typeof meta>
-
-export const Default: Story = {
+export const Default: StoryObj<typeof meta> = {
   args: {
     height: '120px'
   }
 }
 
-export const Random: Story = {
+export const Random: StoryObj<typeof meta> = {
   args: {
     height: '120px'
   }
 }
 
-export const Reading: Story = {
+export const Reading: StoryObj<typeof meta> = {
   args: {
     fantasiaImage: 'reading',
     height: '120px'

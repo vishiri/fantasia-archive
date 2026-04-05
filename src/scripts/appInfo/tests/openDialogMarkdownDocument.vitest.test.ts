@@ -51,3 +51,9 @@ test('Test that openDialogComponent updates component dialog store', () => {
   expect(componentStoreMock.dialogToOpen).toBe('AboutFantasiaArchive')
   expect(generateDialogUUIDComponentMock).toHaveBeenCalledOnce()
 })
+
+test('Test that openDialogComponent accepts ProgramSettings dialog name', () => {
+  openDialogComponent('ProgramSettings')
+  expect(componentStoreMock.dialogToOpen).toBe('ProgramSettings')
+  expect(generateDialogUUIDComponentMock).toHaveBeenCalled()
+})

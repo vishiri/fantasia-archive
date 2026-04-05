@@ -1,5 +1,13 @@
 import type { BrowserWindow } from 'electron'
-import { MenuItem, Menu } from 'electron'
+import { MenuItem, Menu, app } from 'electron'
+import T_spellChecker_enUS from 'app/src/i18n/en-US/globalFunctionality/T_spellChecker'
+import T_spellChecker_fr from 'app/src/i18n/fr/globalFunctionality/T_spellChecker'
+
+const resolveAddToDictionaryLabel = () => {
+  const appLocale = app.getLocale().toLowerCase()
+  if (appLocale.startsWith('fr')) return T_spellChecker_fr.addToDictionary
+  return T_spellChecker_enUS.addToDictionary
+}
 
 export const setupSpellChecker = (appWindow: BrowserWindow | undefined) => {
   if (!appWindow) return
@@ -20,7 +28,7 @@ export const setupSpellChecker = (appWindow: BrowserWindow | undefined) => {
     if (params.misspelledWord) {
       menu.append(
         new MenuItem({
-          label: 'Add to dictionary',
+          label: resolveAddToDictionaryLabel(),
           click: () => webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord)
         })
       )

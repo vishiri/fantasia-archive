@@ -1,16 +1,5 @@
 import { test, expect } from '@playwright/test'
-
-interface I_storybookEntry {
-  id: string
-  title: string
-  name: string
-  type: string
-  tags?: string[]
-}
-
-interface I_storybookIndex {
-  entries: Record<string, I_storybookEntry>
-}
+import type { I_storybookIndex } from './storybook.visual.playwright.types'
 
 const normalizeSnapshotName = (storyId: string): string => storyId.replaceAll(/[^a-zA-Z0-9_-]/g, '_')
 const STORY_RENDER_TIMEOUT_MS = 15_000
@@ -56,7 +45,10 @@ test('Capture visual snapshots for Storybook stories', async ({ browser, request
     console.info(`[storybook-visual] (${index + 1}/${storyList.length}) ${story.id}`)
     await test.step(`${story.title} / ${story.name}`, async () => {
       const context = await browser.newContext({
-        viewport: { width: 1920, height: 1080 },
+        viewport: {
+          width: 1920,
+          height: 1080
+        },
         colorScheme: 'dark',
         locale: 'en-US',
         timezoneId: 'UTC'

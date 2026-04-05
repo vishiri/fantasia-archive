@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import DialogAboutFantasiaArchive from './DialogAboutFantasiaArchive.vue'
+import DialogAboutFantasiaArchive from '../DialogAboutFantasiaArchive.vue'
 
 const meta = {
   title: 'Components/DialogAboutFantasiaArchive',
@@ -21,9 +21,7 @@ const meta = {
 
 export default meta
 
-type Story = StoryObj<typeof meta>
-
-export const Default: Story = {
+export const Default: StoryObj<typeof meta> = {
   args: {
     directInput: 'AboutFantasiaArchive'
   }

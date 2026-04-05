@@ -71,7 +71,10 @@ test('Test that user settings get handler returns all keys from the backing stor
  */
 test('Test that user settings set handler writes merged store state', async () => {
   getFaUserSettingsMock.mockReturnValue({
-    store: { ...FA_USER_SETTINGS_DEFAULTS, darkMode: true },
+    store: {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      darkMode: true
+    },
     set: storeSetMock
   })
 

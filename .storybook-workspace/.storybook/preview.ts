@@ -158,8 +158,14 @@ const preview: Preview = {
     },
     backgrounds: {
       options: {
-        dark_app: { name: 'dark app', value: '#121212' },
-        paper: { name: 'paper', value: '#f4f4f4' }
+        dark_app: {
+          name: 'dark app',
+          value: '#121212'
+        },
+        paper: {
+          name: 'paper',
+          value: '#f4f4f4'
+        }
       }
     },
     viewport: {},

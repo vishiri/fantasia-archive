@@ -23,7 +23,10 @@ const { MenuMock, MenuItemMock, menuInstances } = vi.hoisted(() => {
 vi.mock('electron', () => {
   return {
     Menu: MenuMock,
-    MenuItem: MenuItemMock
+    MenuItem: MenuItemMock,
+    app: {
+      getLocale: vi.fn(() => 'en-US')
+    }
   }
 })
 
@@ -56,7 +59,10 @@ test('Test that spellChecker works correctly', () => {
   expect(onMock).toHaveBeenCalledOnce()
 
   const contextMenuHandler = onMock.mock.calls[0][1]
-  contextMenuHandler({}, { dictionarySuggestions: ['hello', 'world'], misspelledWord: 'helo' })
+  contextMenuHandler({}, {
+    dictionarySuggestions: ['hello', 'world'],
+    misspelledWord: 'helo'
+  })
 
   const activeMenu = menuInstances[0]
   expect(MenuItemMock).toHaveBeenCalledTimes(3)
@@ -98,7 +104,10 @@ test('Test that spellChecker shows popup with suggestions only', () => {
   setupSpellChecker(appWindow as unknown as BrowserWindow)
   const contextMenuHandler = onMock.mock.calls[0][1]
   menuInstances.length = 0
-  contextMenuHandler({}, { dictionarySuggestions: ['fix'], misspelledWord: '' })
+  contextMenuHandler({}, {
+    dictionarySuggestions: ['fix'],
+    misspelledWord: ''
+  })
 
   const activeMenu = menuInstances[0]
   expect(activeMenu.popup).toHaveBeenCalledOnce()
@@ -123,7 +132,10 @@ test('Test that spellChecker shows popup with misspelled word only', () => {
   setupSpellChecker(appWindow as unknown as BrowserWindow)
   const contextMenuHandler = onMock.mock.calls[0][1]
   menuInstances.length = 0
-  contextMenuHandler({}, { dictionarySuggestions: [], misspelledWord: 'typo' })
+  contextMenuHandler({}, {
+    dictionarySuggestions: [],
+    misspelledWord: 'typo'
+  })
 
   const activeMenu = menuInstances[0]
   expect(activeMenu.popup).toHaveBeenCalledOnce()
@@ -148,7 +160,10 @@ test('Test that spellChecker does not popup when there is nothing to show', () =
   setupSpellChecker(appWindow as unknown as BrowserWindow)
   const contextMenuHandler = onMock.mock.calls[0][1]
   menuInstances.length = 0
-  contextMenuHandler({}, { dictionarySuggestions: [], misspelledWord: '' })
+  contextMenuHandler({}, {
+    dictionarySuggestions: [],
+    misspelledWord: ''
+  })
 
   const activeMenu = menuInstances[0]
   expect(activeMenu.popup).not.toHaveBeenCalled()

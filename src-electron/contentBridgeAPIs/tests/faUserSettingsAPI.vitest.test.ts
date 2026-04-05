@@ -28,7 +28,10 @@ beforeEach(() => {
  * 'getSettings' delegates to 'ipcRenderer.invoke' with the get channel.
  */
 test('faUserSettingsAPI getSettings invokes IPC get channel', async () => {
-  const snapshot = { ...FA_USER_SETTINGS_DEFAULTS, darkMode: true }
+  const snapshot = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    darkMode: true
+  }
   invokeMock.mockResolvedValueOnce(snapshot)
   await expect(faUserSettingsAPI.getSettings()).resolves.toEqual(snapshot)
   expect(invokeMock).toHaveBeenCalledWith(FA_USER_SETTINGS_IPC.getAsync)

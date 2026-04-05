@@ -1,8 +1,5 @@
 import { tipsTricksTriviaNotification } from './tipsTricksTriviaNotification'
-
-export interface I_appStartupRouter {
-  push: (payload: { path: string }) => unknown | void
-}
+import type { I_appStartupRouter } from './appStartupRouting.types'
 
 /**
  * Determines if component testing route should be used.

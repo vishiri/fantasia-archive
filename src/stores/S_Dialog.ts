@@ -19,7 +19,11 @@ export const S_DialogMarkdown = defineStore('S_DialogMarkdown', () => {
     dialogUUID.value = uuidv4()
   }
 
-  return { documentToOpen, dialogUUID, generateDialogUUID }
+  return {
+    documentToOpen,
+    dialogUUID,
+    generateDialogUUID
+  }
 })
 
 /**
@@ -34,5 +38,9 @@ export const S_DialogComponent = defineStore('S_DialogComponent', () => {
     dialogUUID.value = uuidv4()
   }
 
-  return { dialogToOpen, dialogUUID, generateDialogUUID }
+  return {
+    dialogToOpen,
+    dialogUUID,
+    generateDialogUUID
+  }
 })

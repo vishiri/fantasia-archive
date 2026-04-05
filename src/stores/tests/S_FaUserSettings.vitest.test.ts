@@ -59,7 +59,10 @@ beforeEach(async () => {
  * Populates 'settings' from the bridge every time it is called.
  */
 test('Test that refreshSettings populates settings from the IPC bridge', async () => {
-  const snapshot = { ...FA_USER_SETTINGS_DEFAULTS, darkMode: true }
+  const snapshot = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    darkMode: true
+  }
   getSettingsMock.mockResolvedValueOnce(snapshot)
 
   expect(store.settings).toBeNull()
@@ -75,7 +78,10 @@ test('Test that refreshSettings populates settings from the IPC bridge', async (
  */
 test('Test that updateSettings shows positive notify when saved values match the update object', async () => {
   const updateObject = { darkMode: true }
-  getSettingsMock.mockResolvedValueOnce({ ...FA_USER_SETTINGS_DEFAULTS, darkMode: true })
+  getSettingsMock.mockResolvedValueOnce({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    darkMode: true
+  })
 
   await store.updateSettings(updateObject)
 
@@ -95,7 +101,10 @@ test('Test that updateSettings shows positive notify when saved values match the
  */
 test('Test that updateSettings shows negative notify when saved values do not match the update object', async () => {
   const updateObject = { darkMode: true }
-  getSettingsMock.mockResolvedValueOnce({ ...FA_USER_SETTINGS_DEFAULTS, darkMode: false })
+  getSettingsMock.mockResolvedValueOnce({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    darkMode: false
+  })
 
   const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
   await store.updateSettings(updateObject)
@@ -104,6 +113,7 @@ test('Test that updateSettings shows negative notify when saved values do not ma
   expect(notifyCreateMock).toHaveBeenCalledWith({
     group: false,
     type: 'negative',
+    timeout: 0,
     message: 'globalFunctionality.faUserSettings.saveError'
   })
   expect(consoleErrorSpy).toHaveBeenCalledOnce()
@@ -116,7 +126,10 @@ test('Test that updateSettings shows negative notify when saved values do not ma
  * 'settings' is always updated to the retrieved value regardless of update success.
  */
 test('Test that updateSettings always replaces settings with the retrieved value from the bridge', async () => {
-  const retrievedSettings = { ...FA_USER_SETTINGS_DEFAULTS, darkMode: false }
+  const retrievedSettings = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    darkMode: false
+  }
   getSettingsMock.mockResolvedValueOnce(retrievedSettings)
 
   const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})

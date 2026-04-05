@@ -34,14 +34,22 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
         message: i18n.global.t('globalFunctionality.faUserSettings.saveSuccess')
       })
     } else {
-      console.error(`[S_FaUserSettings] ${i18n.global.t('globalFunctionality.faUserSettings.saveMismatchLog')}`, { patch: updateObject, retrievedSettings })
+      console.error(`[S_FaUserSettings] ${i18n.global.t('globalFunctionality.faUserSettings.saveMismatchLog')}`, {
+        updateObject,
+        retrievedSettings
+      })
       Notify.create({
         group: false,
         type: 'negative',
+        timeout: 0,
         message: i18n.global.t('globalFunctionality.faUserSettings.saveError')
       })
     }
   }
 
-  return { settings, refreshSettings, updateSettings }
+  return {
+    settings,
+    refreshSettings,
+    updateSettings
+  }
 })

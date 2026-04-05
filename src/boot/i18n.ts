@@ -2,22 +2,9 @@ import { defineBoot } from '#q-app/wrappers'
 import { createI18n } from 'vue-i18n'
 
 import messages from 'src/i18n'
+import type { MessageLanguages, MessageSchema } from './i18n.types'
 
-export type MessageLanguages = keyof typeof messages
-// Type-define 'en-US' as the master schema for the resource
-export type MessageSchema = typeof messages['en-US']
-
-// See https://vue-i18n.intlify.dev/guide/advanced/typescript.html#global-resource-schema-type-definition
-declare module 'vue-i18n' {
-  // define the locale messages schema
-  export interface DefineLocaleMessage extends MessageSchema {}
-
-  // define the datetime format schema
-  export interface DefineDateTimeFormat {}
-
-  // define the number format schema
-  export interface DefineNumberFormat {}
-}
+export type { MessageLanguages, MessageSchema }
 
 export default defineBoot(({ app }) => {
   const i18n = createI18n({

@@ -66,7 +66,10 @@ test('Test if extraEnvVariablesAPI parses COMPONENT_PROPS when JSON is valid', a
   vi.resetModules()
   vi.stubEnv('COMPONENT_PROPS', '{"a":1,"b":"two"}')
   const { extraEnvVariablesAPI: api } = await import('../extraEnvVariablesAPI')
-  expect(api.COMPONENT_PROPS).toEqual({ a: 1, b: 'two' })
+  expect(api.COMPONENT_PROPS).toEqual({
+    a: 1,
+    b: 'two'
+  })
 })
 
 /**

@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import { buttonList } from '../components/SocialContactButtons/_data/buttons'
-import StoryRouterShell from '../../.storybook-workspace/.storybook/components/StoryRouterShell.vue'
+import { buttonList } from '../../components/SocialContactButtons/_data/buttons'
+import StoryRouterShell from '../../../.storybook-workspace/.storybook/components/StoryRouterShell.vue'
 
 const meta = {
-  title: 'Layouts/ComponentTestingLayout',
+  title: 'Pages/ComponentTesting',
   component: StoryRouterShell,
   parameters: {
     docs: { disable: true },
@@ -21,10 +21,7 @@ const meta = {
 
 export default meta
 
-type Story = StoryObj<typeof meta>
-
-/** Mirrors '/componentTesting/:componentName' with 'SocialContactSingleButton' + sample 'dataInput'. */
-export const WithSocialContactSingleButton: Story = {
-  name: 'With Single Component Test',
+export const SocialContactSingleButton: StoryObj<typeof meta> = {
+  name: 'Single Component Test',
   args: { initialPath: '/componentTesting/SocialContactSingleButton' }
 }

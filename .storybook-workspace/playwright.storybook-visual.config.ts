@@ -9,11 +9,17 @@ export default defineConfig({
   outputDir: '../test-results/storybook-visual-artifacts',
   reporter: [
     ['list'],
-    ['html', { outputFolder: '../test-results/storybook-visual-report', open: 'never' }]
+    ['html', {
+      outputFolder: '../test-results/storybook-visual-report',
+      open: 'never'
+    }]
   ],
   use: {
     baseURL: 'http://127.0.0.1:6006',
-    viewport: { width: 1920, height: 1080 },
+    viewport: {
+      width: 1920,
+      height: 1080
+    },
     colorScheme: 'dark',
     timezoneId: 'UTC',
     locale: 'en-US'

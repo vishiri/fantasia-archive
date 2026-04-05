@@ -29,17 +29,29 @@ export const STORYBOOK_APP_ROUTES: RouteRecordRaw[] = [
   {
     path: '/',
     component: MainLayout,
-    children: [{ path: '', name: 'storybook-home', component: IndexPage }]
+    children: [{
+      path: '',
+      name: 'storybook-home',
+      component: IndexPage
+    }]
   },
   {
     path: '/main-empty',
     component: MainLayout,
-    children: [{ path: '', name: 'storybook-main-empty', component: StoryEmptyOutlet }]
+    children: [{
+      path: '',
+      name: 'storybook-main-empty',
+      component: StoryEmptyOutlet
+    }]
   },
   {
     path: '/componentTesting/:componentName',
     component: ComponentTestingLayout,
-    children: [{ path: '', name: 'storybook-component-testing', component: ComponentTesting }]
+    children: [{
+      path: '',
+      name: 'storybook-component-testing',
+      component: ComponentTesting
+    }]
   },
   {
     path: '/error-not-found',

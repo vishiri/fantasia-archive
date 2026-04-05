@@ -12,6 +12,9 @@ import T_tools from './components/AppControlMenus/T_tools'
 import T_documents from './components/AppControlMenus/T_documents'
 
 import T_aboutFantasiaArchive from './dialogs/T_aboutFantasiaArchive'
+import T_markdownDocument from './dialogs/T_markdownDocument'
+import T_programSettings from './dialogs/T_programSettings'
+import T_spellChecker from './globalFunctionality/T_spellChecker'
 
 import T_socialContactButtons from './components/SocialContactButtons/T_socialContactButtons'
 
@@ -45,7 +48,16 @@ export default {
 
   // DIALOGS
   Dialogs: {
-    aboutFantasiaArchive: T_aboutFantasiaArchive
+    aboutFantasiaArchive: T_aboutFantasiaArchive,
+    markdownDocument: T_markdownDocument,
+    programSettings: T_programSettings
+  },
+
+  // DIALOGS (lowercase key path parity)
+  dialogs: {
+    aboutFantasiaArchive: T_aboutFantasiaArchive,
+    markdownDocument: T_markdownDocument,
+    programSettings: T_programSettings
   },
 
   // COMPONENT - GLOBAL WINDOW BUTTONS
@@ -65,6 +77,11 @@ export default {
   },
 
   // COMPONENT - SOCIAL CONTACT BUTTONS
-  SocialContactButtons: T_socialContactButtons
+  SocialContactButtons: T_socialContactButtons,
+
+  // GLOBAL FUNCTIONALITY (lowercase key path parity)
+  globalFunctionality: {
+    spellChecker: T_spellChecker
+  }
 
 }

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import StoryRouterShell from '../../.storybook-workspace/.storybook/components/StoryRouterShell.vue'
+import StoryRouterShell from '../../../.storybook-workspace/.storybook/components/StoryRouterShell.vue'
 
 const meta = {
   title: 'Pages/ErrorNotFound',
@@ -15,8 +15,6 @@ const meta = {
 
 export default meta
 
-type Story = StoryObj<typeof meta>
-
-export const Default: Story = {
+export const Default: StoryObj<typeof meta> = {
   args: { initialPath: '/error-not-found' }
 }

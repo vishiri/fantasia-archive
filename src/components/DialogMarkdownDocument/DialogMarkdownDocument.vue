@@ -31,7 +31,7 @@
         <q-btn
           v-close-popup
           flat
-          label="Close"
+          :label="$t('dialogs.markdownDocument.closeButton')"
           color="accent"
           data-test="dialogMarkdownDocument-button-close"
         />
@@ -44,6 +44,7 @@
 import { QMarkdown } from '@quasar/quasar-ui-qmarkdown'
 import '@quasar/quasar-ui-qmarkdown/dist/index.css'
 import type { T_documentName } from 'app/types/T_documentList'
+import { i18n } from 'app/src/i18n/externalFileLoader'
 import { S_DialogMarkdown } from 'src/stores/S_Dialog'
 import { computed, onMounted, ref, watch } from 'vue'
 import type { StoreGeneric } from 'pinia'
@@ -79,17 +80,17 @@ const documentName = ref('')
 const dialogAriaLabel = computed(() => {
   switch (documentName.value) {
     case 'advancedSearchCheatSheet':
-      return 'Advanced Search Cheat Sheet'
+      return i18n.global.t('dialogs.markdownDocument.ariaLabels.advancedSearchCheatSheet')
     case 'advancedSearchGuide':
-      return 'Advanced Search Guide'
+      return i18n.global.t('dialogs.markdownDocument.ariaLabels.advancedSearchGuide')
     case 'changeLog':
-      return 'Changelog'
+      return i18n.global.t('dialogs.markdownDocument.ariaLabels.changeLog')
     case 'license':
-      return 'License'
+      return i18n.global.t('dialogs.markdownDocument.ariaLabels.license')
     case 'tipsTricksTrivia':
-      return 'Tips, Tricks and Trivia'
+      return i18n.global.t('dialogs.markdownDocument.ariaLabels.tipsTricksTrivia')
     default:
-      return 'Markdown document dialog'
+      return i18n.global.t('dialogs.markdownDocument.ariaLabels.fallback')
   }
 })
 

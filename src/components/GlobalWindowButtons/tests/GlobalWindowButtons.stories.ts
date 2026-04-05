@@ -1,7 +1,7 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect, waitFor, within } from 'storybook/test'
 
-import GlobalWindowButtons from './GlobalWindowButtons.vue'
+import GlobalWindowButtons from '../GlobalWindowButtons.vue'
 
 /**
  * 'GlobalWindowButtons' is 'position: fixed', so it does not expand the story root.
@@ -64,9 +64,7 @@ Devtools open is not reflected in this component — nothing in the template cal
 
 export default meta
 
-type Story = StoryObj<typeof meta>
-
-export const Default: Story = {
+export const Default: StoryObj<typeof meta> = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await waitFor(() => {
@@ -75,7 +73,7 @@ export const Default: Story = {
   }
 }
 
-export const StatesWindowMaximized: Story = {
+export const StatesWindowMaximized: StoryObj<typeof meta> = {
   name: 'States/WindowMaximized',
   parameters: {
     contentBridgeScenario: 'windowMaximized'
@@ -88,7 +86,7 @@ export const StatesWindowMaximized: Story = {
   }
 }
 
-export const StatesDevToolsOpen: Story = {
+export const StatesDevToolsOpen: StoryObj<typeof meta> = {
   name: 'States/DevToolsOpen',
   parameters: {
     contentBridgeScenario: 'devToolsOpen',

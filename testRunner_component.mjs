@@ -20,7 +20,10 @@ async function runSpecificTest () {
     }
   })
 
-  spawn('npm', ['run', 'test:components:single:ci', response.value], { stdio: 'inherit', shell: true })
+  spawn('npm', ['run', 'test:components:single:ci', response.value], {
+    stdio: 'inherit',
+    shell: true
+  })
 }
 
 async function getTestList () {

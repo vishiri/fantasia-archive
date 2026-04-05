@@ -8,7 +8,10 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/IndexPage.vue') }]
+    children: [{
+      path: '',
+      component: () => import('pages/IndexPage.vue')
+    }]
   },
 
   /**
@@ -19,7 +22,10 @@ const routes: RouteRecordRaw[] = [
     path: '/componentTesting/:componentName',
     component: () => import('layouts/ComponentTestingLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/ComponentTesting.vue') }
+      {
+        path: '',
+        component: () => import('pages/ComponentTesting.vue')
+      }
     ]
   },
 

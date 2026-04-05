@@ -6,16 +6,17 @@ import T_project from 'src/i18n/en-US/components/AppControlMenus/T_project'
 import T_tools from 'src/i18n/en-US/components/AppControlMenus/T_tools'
 import T_socialContactButtons from 'src/i18n/en-US/components/SocialContactButtons/T_socialContactButtons'
 import T_aboutFantasiaArchive from 'src/i18n/en-US/dialogs/T_aboutFantasiaArchive'
+import T_programSettings from 'src/i18n/en-US/dialogs/T_programSettings'
 import T_faUserSettings from 'src/i18n/en-US/globalFunctionality/T_faUserSettings'
 import T_unsortedAppTexts from 'src/i18n/en-US/globalFunctionality/T_unsortedAppTexts'
 import T_ErrorNotFound from 'src/i18n/en-US/pages/T_ErrorNotFound'
-
-type T_i18nScenario = 'default' | 'longStrings' | 'markdownHeavy'
+import type { T_i18nScenario } from './externalFileLoader.types'
 
 const defaultMessages: Record<string, unknown> = {
   errorNotFound: T_ErrorNotFound,
   dialogs: {
-    aboutFantasiaArchive: T_aboutFantasiaArchive
+    aboutFantasiaArchive: T_aboutFantasiaArchive,
+    programSettings: T_programSettings
   },
   globalWindowButtons: T_GlobalWindowButtons,
   appControlMenus: {

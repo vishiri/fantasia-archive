@@ -8,7 +8,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "lint:eslint": "eslint src src-electron e2e-tests types quasar.config.ts playwright.config.ts vitest.config.mts vitest.components.config.mts vitest.setup.ts testRunner_component.mjs testRunner_e2e.mjs .storybook-workspace/.storybook .storybook-workspace/playwright.storybook-visual.config.ts",
+    "lint:eslint": "eslint .",
     "lint:stylelint": "stylelint \"src/**/*.{vue,scss}\"",
     "lint:typescript": "tsc -p tsconfig.json --pretty",
     "quasar:build:electron": "quasar build -m electron --publish never",

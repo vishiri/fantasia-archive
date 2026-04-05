@@ -1,7 +1,8 @@
 // For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
-import storybook from "eslint-plugin-storybook";
+import storybook from 'eslint-plugin-storybook'
 
 import importPlugin from 'eslint-plugin-import'
+import jsoncParser from 'jsonc-eslint-parser'
 import neostandard from 'neostandard'
 import pluginVue from 'eslint-plugin-vue'
 import vueParser from 'vue-eslint-parser'
@@ -70,6 +71,33 @@ export default [...neostandard({
     '@stylistic/quote-props': 'off',
     quotes: ['warn', 'single', { avoidEscape: true }],
     '@typescript-eslint/no-explicit-any': ['error', { ignoreRestArgs: true }],
-    '@typescript-eslint/no-require-imports': 'off'
+    '@typescript-eslint/no-require-imports': 'off',
+    'object-curly-newline': ['error', {
+      ObjectExpression: {
+        minProperties: 2,
+        multiline: true,
+        consistent: true
+      }
+    }],
+    'object-property-newline': ['error', {
+      allowAllPropertiesOnSameLine: false
+    }]
   }
-}, ...storybook.configs["flat/recommended"]];
+}, {
+  files: ['**/*.json', '**/*.jsonc', '**/*.json5'],
+  languageOptions: {
+    parser: jsoncParser
+  },
+  rules: {
+    'object-curly-newline': ['error', {
+      ObjectExpression: {
+        minProperties: 2,
+        multiline: true,
+        consistent: true
+      }
+    }],
+    'object-property-newline': ['error', {
+      allowAllPropertiesOnSameLine: false
+    }]
+  }
+}, ...storybook.configs['flat/recommended']]

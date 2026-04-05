@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect, within } from 'storybook/test'
 
-import AppControlMenus from './AppControlMenus.vue'
+import AppControlMenus from '../AppControlMenus.vue'
 
 const meta = {
   title: 'Components/AppControlMenus',
@@ -25,11 +25,9 @@ const meta = {
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+export const Default: StoryObj<typeof meta> = {}
 
-export const Default: Story = {}
-
-export const CompositionProductionMenuContract: Story = {
+export const CompositionProductionMenuContract: StoryObj<typeof meta> = {
   name: 'States/CompositionProductionMenuContract',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)

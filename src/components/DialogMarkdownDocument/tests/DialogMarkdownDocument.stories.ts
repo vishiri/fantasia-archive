@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import DialogMarkdownDocument from './DialogMarkdownDocument.vue'
+import DialogMarkdownDocument from '../DialogMarkdownDocument.vue'
 
 const meta = {
   title: 'Components/DialogMarkdownDocument',
@@ -25,35 +25,33 @@ const meta = {
 
 export default meta
 
-type Story = StoryObj<typeof meta>
-
-export const Default: Story = {
+export const Default: StoryObj<typeof meta> = {
   args: {
     directInput: 'changeLog'
   }
 }
 
-export const StatesLicense: Story = {
+export const StatesLicense: StoryObj<typeof meta> = {
   name: 'States/License',
   args: {
     directInput: 'license'
   }
 }
 
-export const StatesTipsTricksTrivia: Story = {
+export const StatesTipsTricksTrivia: StoryObj<typeof meta> = {
   name: 'States/TipsTricksTrivia',
   args: {
     directInput: 'tipsTricksTrivia'
   }
 }
 
-export const StatesAdvancedSearchGuide: Story = {
+export const StatesAdvancedSearchGuide: StoryObj<typeof meta> = {
   name: 'States/AdvancedSearchGuide',
   args: {
     directInput: 'advancedSearchGuide'
   }
 }
-export const I18nStressLongStrings: Story = {
+export const I18nStressLongStrings: StoryObj<typeof meta> = {
   name: 'I18nStress/LongStrings',
   args: {
     directInput: 'advancedSearchGuide'
@@ -63,7 +61,7 @@ export const I18nStressLongStrings: Story = {
   }
 }
 
-export const I18nStressMarkdownHeavy: Story = {
+export const I18nStressMarkdownHeavy: StoryObj<typeof meta> = {
   name: 'I18nStress/MarkdownHeavy',
   args: {
     directInput: 'test'

@@ -1,8 +1,4 @@
-type T_contentBridgeScenario =
-  | 'default'
-  | 'windowMaximized'
-  | 'devToolsOpen'
-  | 'externalLinkFailure'
+import type { T_contentBridgeScenario } from './contentBridge.types'
 
 const baseBridge = () => ({
   faWindowControl: {

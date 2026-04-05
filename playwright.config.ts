@@ -8,6 +8,9 @@ export default defineConfig({
   expect: { timeout: 3_000 },
   reporter: [
     ['list'],
-    ['html', { outputFolder: 'test-results/playwright-report', open: 'never' }]
+    ['html', {
+      outputFolder: 'test-results/playwright-report',
+      open: 'never'
+    }]
   ]
 })

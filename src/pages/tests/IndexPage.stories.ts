@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import StoryRouterShell from '../../.storybook-workspace/.storybook/components/StoryRouterShell.vue'
+import StoryRouterShell from '../../../.storybook-workspace/.storybook/components/StoryRouterShell.vue'
 
 const meta = {
   title: 'Pages/IndexPage',
@@ -15,9 +15,7 @@ const meta = {
 
 export default meta
 
-type Story = StoryObj<typeof meta>
-
 /** Same page as production home, inside 'MainLayout'. */
-export const WithinMainLayout: Story = {
+export const WithinMainLayout: StoryObj<typeof meta> = {
   args: { initialPath: '/' }
 }

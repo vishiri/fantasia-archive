@@ -66,7 +66,10 @@ test('Visually check for proper sizing of the icon', async () => {
   const testStringWidth = '300px'
   const testStringHeight = '300px'
 
-  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ width: testStringWidth, height: testStringHeight })
+  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({
+    width: testStringWidth,
+    height: testStringHeight
+  })
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,

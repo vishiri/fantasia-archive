@@ -1,13 +1,9 @@
 import { vi, expect, test, beforeEach } from 'vitest'
 
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
+import type { T_storeConstructorOptions } from './userSettingsStore.vitest.types'
 
 import { FA_USER_SETTINGS_DEFAULTS } from '../faUserSettingsDefaults'
-
-type T_storeConstructorOptions = {
-  name: string
-  defaults: I_faUserSettings
-}
 
 const constructCalls: T_storeConstructorOptions[] = []
 const { ElectronStoreMock, persistedStoreExtras, storeReplacementCalls } = vi.hoisted(() => {
@@ -84,7 +80,10 @@ test('Test that getFaUserSettings removes unknown persisted keys during startup 
   const store = getFaUserSettings()
 
   expect(storeReplacementCalls).toEqual([
-    { ...FA_USER_SETTINGS_DEFAULTS, darkMode: true }
+    {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      darkMode: true
+    }
   ])
   expect((store.store as I_faUserSettings & Record<string, boolean>).futureKey).toBeUndefined()
 })

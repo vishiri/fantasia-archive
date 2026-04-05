@@ -1,4 +1,5 @@
 import { i18n } from 'app/src/i18n/externalFileLoader'
+import { openDialogComponent } from 'app/src/scripts/appInfo/openDialogMarkdownDocument'
 
 import type { I_appMenuList } from 'app/types/I_appMenusDataList'
 
@@ -66,7 +67,7 @@ export const tools: I_appMenuList = {
       text: i18n.global.t('appControlMenus.tools.items.programSettings'),
       icon: 'mdi-tune',
       submenu: undefined,
-      trigger: undefined,
+      trigger: () => openDialogComponent('ProgramSettings'),
       conditions: true,
       specialColor: undefined
     }

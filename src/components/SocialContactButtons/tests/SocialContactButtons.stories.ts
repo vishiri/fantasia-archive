@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect } from 'storybook/test'
 
-import SocialContactButtons from './SocialContactButtons.vue'
+import SocialContactButtons from '../SocialContactButtons.vue'
 
 const meta = {
   title: 'Components/SocialContactButtons',
@@ -18,11 +18,9 @@ const meta = {
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+export const Default: StoryObj<typeof meta> = {}
 
-export const Default: Story = {}
-
-export const StatesCompositionContract: Story = {
+export const StatesCompositionContract: StoryObj<typeof meta> = {
   name: 'States/CompositionContract',
   play: async ({ canvasElement }) => {
     await expect(canvasElement.querySelectorAll('[data-test="socialContactSingleButton"]').length).toBe(7)

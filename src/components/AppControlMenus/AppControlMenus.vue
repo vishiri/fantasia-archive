@@ -46,6 +46,7 @@
     <!-- Dialog Popups (optional so mounted surfaces like Storybook can preview the menu bar only) -->
     <DialogMarkdownDocument v-if="embedDialogs" />
     <DialogAboutFantasiaArchive v-if="embedDialogs" />
+    <DialogProgramSettings v-if="embedDialogs" />
   </div>
 </template>
 
@@ -62,6 +63,7 @@ import { helpInfo } from 'app/src/components/AppControlMenus/_data/helpInfo'
 import AppControlSingleMenu from 'app/src/components/AppControlSingleMenu/AppControlSingleMenu.vue'
 import DialogMarkdownDocument from 'app/src/components/DialogMarkdownDocument/DialogMarkdownDocument.vue'
 import DialogAboutFantasiaArchive from 'app/src/components/DialogAboutFantasiaArchive/DialogAboutFantasiaArchive.vue'
+import DialogProgramSettings from 'app/src/components/DialogProgramSettings/DialogProgramSettings.vue'
 
 withDefaults(
   defineProps<{

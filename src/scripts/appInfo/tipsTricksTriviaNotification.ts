@@ -19,6 +19,9 @@ export const tipsTricksTriviaNotification = (hideMascot: boolean) => {
     message: i18n.global.t('globalFunctionality.unsortedAppTexts.didYouKnow'),
     avatar: (!hideMascot) ? determineCurrentImage(fantasiaImageList, true, '') : undefined,
     caption: randomMessage,
-    actions: [{ icon: 'mdi-close', color: 'white' }]
+    actions: [{
+      icon: 'mdi-close',
+      color: 'white'
+    }]
   })
 }

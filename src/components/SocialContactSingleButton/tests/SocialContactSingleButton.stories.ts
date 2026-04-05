@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import { buttonList } from '../SocialContactButtons/_data/buttons'
-import SocialContactSingleButton from './SocialContactSingleButton.vue'
+import { buttonList } from '../../SocialContactButtons/_data/buttons'
+import SocialContactSingleButton from '../SocialContactSingleButton.vue'
 
 const meta = {
   title: 'Components/SocialContactSingleButton',
@@ -22,47 +22,45 @@ const meta = {
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+export const Default: StoryObj<typeof meta> = {}
 
-export const Default: Story = {}
-
-export const Patreon: Story = {
+export const Patreon: StoryObj<typeof meta> = {
   args: {
     dataInput: buttonList.buttonPatreon
   }
 }
 
-export const GitHub: Story = {
+export const GitHub: StoryObj<typeof meta> = {
   args: {
     dataInput: buttonList.buttonGitHub
   }
 }
 
-export const Kofi: Story = {
+export const Kofi: StoryObj<typeof meta> = {
   args: {
     dataInput: buttonList.buttonKofi
   }
 }
 
-export const Website: Story = {
+export const Website: StoryObj<typeof meta> = {
   args: {
     dataInput: buttonList.buttonWebsite
   }
 }
 
-export const Discord: Story = {
+export const Discord: StoryObj<typeof meta> = {
   args: {
     dataInput: buttonList.buttonDiscord
   }
 }
 
-export const Reddit: Story = {
+export const Reddit: StoryObj<typeof meta> = {
   args: {
     dataInput: buttonList.buttonReddit
   }
 }
 
-export const Twitter: Story = {
+export const Twitter: StoryObj<typeof meta> = {
   args: {
     dataInput: buttonList.buttonTwitter
   }

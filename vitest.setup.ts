@@ -26,7 +26,8 @@ vi.mock('app/src/i18n/externalFileLoader', () => {
       global: {
         t: (key: string) => {
           return key
-        }
+        },
+        te: () => false
       }
     }
   }

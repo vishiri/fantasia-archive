@@ -38,7 +38,7 @@
         <q-btn
           v-close-popup
           flat
-          label="Close"
+          :label="$t('dialogs.aboutFantasiaArchive.closeButton')"
           color="accent"
           data-test="dialogComponent-button-close"
         />
