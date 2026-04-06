@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "storybook:build": "storybook build -c .storybook -o storybook-static --disable-telemetry",
+    "storybook:build": "storybook build -c .storybook -o storybook-static --disable-telemetry --quiet --loglevel warn",
     "storybook:run": "storybook dev -p 6006 -c .storybook --disable-telemetry",
-    "test:storybook:smoke": "storybook dev -p 6006 -c .storybook --smoke-test --ci --disable-telemetry",
+    "test:storybook:smoke": "storybook dev -p 6006 -c .storybook --smoke-test --ci --disable-telemetry --quiet --loglevel warn",
     "test:storybook:visual": "playwright test --config playwright.storybook-visual.config.ts",
     "test:storybook:visual:headed": "playwright test --config playwright.storybook-visual.config.ts --headed",
     "test:storybook:visual:update": "playwright test --config playwright.storybook-visual.config.ts --update-snapshots",

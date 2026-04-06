@@ -5,8 +5,10 @@ import { defineConfig } from 'vitest/config'
 
 import {
   vitestCoverageBaseExclude,
+  vitestCoverageSkipFull,
   vitestCoverageStrictThresholds
 } from './vitest.coverage.shared'
+import { vitestTerminalReporters } from './vitest.reporters.shared'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
@@ -36,10 +38,11 @@ export default defineConfig({
       'src/stores/**/*.vitest.test.ts',
       'src/i18n/**/*.vitest.test.ts'
     ],
-    reporters: ['default', 'json'],
+    reporters: [...vitestTerminalReporters],
     outputFile: 'test-results/vitest-report/test-results-vitest-src-renderer.json',
     coverage: {
       provider: 'v8',
+      skipFull: vitestCoverageSkipFull,
       include: [
         'src/boot/**/*.ts',
         'src/scripts/**/*.ts',

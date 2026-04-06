@@ -5,8 +5,10 @@ import { defineConfig } from 'vitest/config'
 
 import {
   vitestCoverageBaseExclude,
+  vitestCoverageSkipFull,
   vitestCoverageStrictThresholds
 } from './vitest.coverage.shared'
+import { vitestTerminalReporters } from './vitest.reporters.shared'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
@@ -32,10 +34,11 @@ export default defineConfig({
     name: 'unit-helpers',
     environment: 'node',
     include: ['helpers/**/*.vitest.test.ts'],
-    reporters: ['default', 'json'],
+    reporters: [...vitestTerminalReporters],
     outputFile: 'test-results/vitest-report/test-results-vitest-helpers.json',
     coverage: {
       provider: 'v8',
+      skipFull: vitestCoverageSkipFull,
       include: ['helpers/**/*.ts'],
       exclude: [
         ...vitestCoverageBaseExclude,

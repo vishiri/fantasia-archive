@@ -75,9 +75,28 @@ const config: StorybookConfig = {
     options: {}
   },
 
-  async viteFinal (viteConfig) {
+  async viteFinal (viteConfig, { configType }) {
+    const productionPreview = configType === 'PRODUCTION'
+
     return {
       ...viteConfig,
+      ...(productionPreview
+        ? {
+            logLevel: 'warn' as const,
+            build: {
+              ...(viteConfig.build ?? {}),
+              reportCompressedSize: false,
+              chunkSizeWarningLimit: 5000,
+              rolldownOptions: {
+                ...(viteConfig.build?.rolldownOptions ?? {}),
+                checks: {
+                  ...(viteConfig.build?.rolldownOptions?.checks ?? {}),
+                  pluginTimings: false
+                }
+              }
+            }
+          }
+        : {}),
       publicDir: publicDirPath,
       plugins: [
         vitePluginServeRepoPublic(publicDirPath),

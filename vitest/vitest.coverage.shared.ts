@@ -4,6 +4,11 @@
  */
 
 /**
+ * When true, the text coverage table omits per-file rows where statements, branches, and functions are all 100%.
+ */
+export const vitestCoverageSkipFull = true
+
+/**
  * Enforced when Vitest runs with '--coverage' on unit-electron, unit-helpers, unit-src-renderer,
  * and on **.ts** files under unit-components (see vitest.*.config.mts in this folder).
  */

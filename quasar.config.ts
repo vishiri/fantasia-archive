@@ -63,7 +63,27 @@ export default defineConfig((ctx) => {
             lintCommand: 'eslint src src-electron quasar.config.ts'
           }
         })
-      ]
+      ],
+
+      extendViteConf (viteConf) {
+        if (ctx.dev) {
+          return
+        }
+
+        viteConf.logLevel = 'warn'
+
+        viteConf.build ??= {}
+        viteConf.build.reportCompressedSize = false
+
+        const rolldownOpts = viteConf.build.rolldownOptions ?? {}
+        viteConf.build.rolldownOptions = {
+          ...rolldownOpts,
+          checks: {
+            ...rolldownOpts.checks,
+            pluginTimings: false
+          }
+        }
+      }
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer

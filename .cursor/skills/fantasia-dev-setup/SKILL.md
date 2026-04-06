@@ -60,6 +60,8 @@ quasar build -m electron
 
 (`yarn quasar:build:electron` maps to `quasar build -m electron --publish never`.)
 
+**Quieter / chained runs:** **`yarn quasar:build:electron:summarized`** runs the same build via **`scripts/quasarBuildElectronSummarized.mjs`**: one success line, full log under **`test-results/quasar-build-electron-last.log`** (printed on failure). **`yarn testbatch:ensure:nochange`** and **`yarn testbatch:ensure:change`** use this script.
+
 **Playwright `userData`:** With **`TEST_ENV`** **`components`** or **`e2e`**, Electron **`userData`** is **`%APPDATA%/<package.json name>/playwright-user-data`** (here: **`Roaming\fantasia-archive\playwright-user-data`**), **not** **`fantasia-archive-dev`** (that folder is for **`quasar dev`** when **`DEBUGGING`** is set). See [`fixAppName.ts`](../../../src-electron/mainScripts/fixAppName.ts) for main-process wiring and [`playwrightIsolatedUserDataDirName.ts`](../../../src-electron/mainScripts/playwrightIsolatedUserDataDirName.ts) for the shared folder-name constant (Electron-free, used by **`playwrightUserDataReset`**). Each Playwright file calls **`resetFaPlaywrightIsolatedUserData()`** in **`test.beforeEach`** ([`helpers/playwrightHelpers/playwrightUserDataReset.ts`](../../../helpers/playwrightHelpers/playwrightUserDataReset.ts)) so that profile is wiped before every test. Shared Playwright helpers live under **`helpers/playwrightHelpers/`**; add future harness packages as siblings under **`helpers/`**; keep the repo root for config, **`README`**, lockfiles, and **`scripts/`**, not new loose harness **`.ts`** files. Rebuild the production Electron app after changing **`fixAppName`** path logic or **`playwrightIsolatedUserDataDirName`**.
 
 ## Quick reference
@@ -67,7 +69,7 @@ quasar build -m electron
 | Goal | Command |
 |------|---------|
 | **Quality gate** (lint + `vue-tsc` + style + Vitest coverage: 100% `src-electron` + `helpers`; `src` `.ts` per `vitest/`; `vue` SFCs watermarks only; one terminal) | `yarn testbatch:verify` |
-| **Full project gate** (verify + Electron build + Playwright component + E2E + Storybook smoke + VRT compare) | `yarn testbatch:ensure:nochange` |
+| **Full project gate** (verify + summarized Electron build + Playwright component + E2E + Storybook smoke + VRT compare) | `yarn testbatch:ensure:nochange` |
 | **Full project gate — refresh Storybook VRT baselines** (same through smoke, then snapshot update) | `yarn testbatch:ensure:change` |
 | ESLint | `yarn lint:eslint` |
 | TypeScript (`vue-tsc`, no emit; includes `.vue` SFCs) | `yarn lint:typescript` |

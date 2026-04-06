@@ -10,7 +10,8 @@ description: >-
 
 ## Scripts (`package.json`)
 
-- **`yarn quasar:build:electron`**: `quasar build -m electron --publish never` — local/production artifact without publishing step from Quasar’s perspective.
+- **`yarn quasar:build:electron`**: `quasar build -m electron --publish never` — local/production artifact without publishing step from Quasar’s perspective (full log stream).
+- **`yarn quasar:build:electron:summarized`**: same build via **`scripts/quasarBuildElectronSummarized.mjs`** — minimal terminal noise; full log in **`test-results/quasar-build-electron-last.log`** on failure. Used by **`yarn testbatch:ensure:*`**.
 - **`yarn quasar:dev:electron`**: Development mode with hot reload.
 
 ## Tooling

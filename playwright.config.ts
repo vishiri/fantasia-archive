@@ -14,7 +14,8 @@ export default defineConfig({
   ],
   expect: { timeout: 3_000 },
   reporter: [
-    ['list'],
+    // 'line' avoids listing every passing test (like Vitest 'agent'); failures still print in full.
+    ['line'],
     ['html', {
       outputFolder: 'test-results/playwright-report',
       open: 'never'

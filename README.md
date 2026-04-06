@@ -84,6 +84,8 @@ yarn quasar:dev:electron
 yarn quasar:build:electron
 ```
 
+For a **quieter** run (one success line; full stdout/stderr captured to **`test-results/quasar-build-electron-last.log`**, printed on failure), use **`yarn quasar:build:electron:summarized`**. The **`yarn testbatch:ensure:*`** scripts use the summarized build so long chained runs stay readable.
+
 ### Storybook (Vue components)
 
 Use Storybook to develop/document renderer components in isolation.
@@ -92,7 +94,7 @@ Use Storybook to develop/document renderer components in isolation.
 yarn storybook:run
 ```
 
-Build static Storybook output:
+Build static Storybook output (**`--quiet --loglevel warn`** in the workspace script; interactive **`yarn storybook:run`** stays verbose):
 
 ```
 yarn storybook:build
@@ -128,7 +130,7 @@ yarn test:storybook:visual:update:headed
 
 - **Storybook** — Runs from [`.storybook-workspace/`](.storybook-workspace/) (nested Yarn project) on **Storybook 10** with **Vite 8**, aligned with the root Quasar app’s **`@quasar/app-vite`** v2 line. Config keeps `staticDirs` pointed at the repo [`public/`](public/) folder (and related Vite wiring) so asset paths match the Quasar app.
 - **Electron** — The packaged renderer loads from `file://`. Root-relative `public/` URLs built from `import.meta.env.BASE_URL === '/'` can fail; prefer **relative** paths (e.g. `./images/...`) for those assets unless you control a real HTTP base.
-- **Playwright** — Component and E2E tests drive the **built** app. Run `yarn quasar:build:electron` before `yarn test:components` / `yarn test:e2e` when you change sources those tests cover. Their Electron **`userData`** lives under **`%APPDATA%/<package.json name>/playwright-user-data`** (here **`Roaming\fantasia-archive\playwright-user-data`**, not **`fantasia-archive-dev`**); specs clear that folder in **`test.beforeEach`** via **`helpers/playwrightHelpers/playwrightUserDataReset.ts`** before each launch. See **Electron `userData` isolation** under **Testing**. Screen recordings attach per test in **`test-results/playwright-report/index.html`** (see **Playwright HTML report and screen recordings** under **Testing**); each run replaces that report folder.
+- **Playwright** — Component and E2E tests drive the **built** app. Run `yarn quasar:build:electron` before `yarn test:components` / `yarn test:e2e` when you change sources those tests cover. Root **`playwright.config.ts`** uses the **`line`** terminal reporter (concise progress; failures in full). Their Electron **`userData`** lives under **`%APPDATA%/<package.json name>/playwright-user-data`** (here **`Roaming\fantasia-archive\playwright-user-data`**, not **`fantasia-archive-dev`**); specs clear that folder in **`test.beforeEach`** via **`helpers/playwrightHelpers/playwrightUserDataReset.ts`** before each launch. See **Electron `userData` isolation** under **Testing**. Screen recordings attach per test in **`test-results/playwright-report/index.html`** (see **Playwright HTML report and screen recordings** under **Testing**); each run replaces that report folder.
 
 #### Storybook workflow charter
 
@@ -179,7 +181,7 @@ Review this table against `src/components/**` stories each iteration and move hi
 
 #### Storybook visual baseline policy
 
-- Storybook **static build** output and **Playwright** visual config live in [`.storybook-workspace/`](.storybook-workspace/): `storybook-static/` (from `yarn storybook:build`) and [`playwright.storybook-visual.config.ts`](.storybook-workspace/playwright.storybook-visual.config.ts). Root `yarn test:storybook:visual*` runs the build then delegates to `yarn --cwd .storybook-workspace test:storybook:visual*`.
+- Storybook **static build** output and **Playwright** visual config live in [`.storybook-workspace/`](.storybook-workspace/): `storybook-static/` (from `yarn storybook:build`) and [`playwright.storybook-visual.config.ts`](.storybook-workspace/playwright.storybook-visual.config.ts). Root `yarn test:storybook:visual*` runs the build then delegates to `yarn --cwd .storybook-workspace test:storybook:visual*`. Set **`FA_STORYBOOK_VISUAL_VERBOSE=1`** if you need per-story **`[storybook-visual]`** progress lines in the terminal (default is quiet aside from warnings/errors).
 - Baselines live in [`.storybook-workspace/visual-tests/`](.storybook-workspace/visual-tests/) under `*.visual.playwright.test.ts-snapshots/`.
 - Use `yarn test:storybook:visual:update` only when UI changes are intentional and approved.
 - When snapshots change in a pull request, reviewers should inspect the committed image diffs (and local **`yarn test:storybook:visual`** / HTML report under **`test-results/storybook-visual-*`**) before accepting baseline updates.
@@ -189,7 +191,7 @@ Review this table against `src/components/**` stories each iteration and move hi
 
 ### Quality gate (before commit or release)
 
-Run ESLint, the TypeScript project check (`vue-tsc`, includes `.vue` SFCs), Stylelint, and Vitest with coverage in one shot (stops on the first failure). **Coverage tiers:** **100%** on all four v8 metrics for **`src-electron`** and for **`helpers/**/*.ts`** helper packages; **100%** on all four metrics for renderer **`.ts`** under **`src/boot`**, **`src/scripts`**, **`src/stores`**, and **`src/i18n/specialCharactersFixer.ts`**; **100%** statements, functions, and lines for other **`src/**/*.ts`** files collected under **`unit-components`** (branch totals are printed but do not fail CI for that slice—**v8** can count structural branch edges oddly on some loops). **`.vue`** SFCs have **no** failing threshold; reports use **watermarks** with a **60%** lower band—treat line or statement totals **below 60%** as a signal to investigate and add tests when it makes sense. See **`yarn test:coverage:src`** and [vitest/](vitest/) configs.
+Run ESLint, the TypeScript project check (`vue-tsc`, includes `.vue` SFCs), Stylelint, and Vitest with coverage in one shot (stops on the first failure). **Coverage tiers:** **100%** on all four v8 metrics for **`src-electron`** and for **`helpers/**/*.ts`** helper packages; **100%** on all four metrics for renderer **`.ts`** under **`src/boot`**, **`src/scripts`**, **`src/stores`**, and **`src/i18n/specialCharactersFixer.ts`**; **100%** statements, functions, and lines for other **`src/**/*.ts`** files collected under **`unit-components`** (branch totals are printed but do not fail CI for that slice—**v8** can count structural branch edges oddly on some loops). **`.vue`** SFCs have **no** failing threshold; reports use **watermarks** with a **60%** lower band—treat line or statement totals **below 60%** as a signal to investigate and add tests when it makes sense. See **`yarn test:coverage:src`** and [vitest/](vitest/) configs. Vitest coverage runs use the **`agent`** terminal reporter (see [vitest/vitest.reporters.shared.ts](vitest/vitest.reporters.shared.ts)) so passing tests do not flood the log; JSON reports still write under **`test-results/vitest-report/`** (for example **`test-results-vitest-electron.json`**).
 
 ```
 yarn testbatch:verify
@@ -205,7 +207,7 @@ The **Verify** workflow (`.github/workflows/verify.yml`) runs **`yarn testbatch:
 
 ### Full suite gates (everything + Storybook)
 
-Run **`yarn testbatch:verify`**, production Electron build, Playwright component + E2E, Storybook smoke, then Storybook visual regression — in one chain:
+Run **`yarn testbatch:verify`**, **`yarn quasar:build:electron:summarized`**, Playwright component + E2E, Storybook smoke, then Storybook visual regression — in one chain:
 
 **Compare against committed Storybook VRT snapshots** (default full gate; fails if snapshots drift):
 
@@ -291,20 +293,21 @@ Set environment variable **`FA_PLAYWRIGHT_NO_VIDEO`** to **`1`** or **`true`** t
 
 #### One-shot verification (full project gate)
 
-**`yarn testbatch:ensure:nochange`** runs **`yarn testbatch:verify`**, a production Electron build, **`yarn test:components`**, **`yarn test:e2e`**, **`yarn test:storybook:smoke`**, and **`yarn test:storybook:visual`** in sequence—the intentional way to chain lint, unit tests, build, both Playwright suites, and Storybook smoke plus snapshot compare. **`yarn testbatch:ensure:change`** is the same through smoke, then **`yarn test:storybook:visual:update`** instead of compare; use only when you mean to regenerate baselines. For lighter checks, run **`yarn test:unit`** and individual commands in their own terminals (see [testing-terminal-isolation](.cursor/rules/testing-terminal-isolation.mdc) in this repo).
+**`yarn testbatch:ensure:nochange`** runs **`yarn testbatch:verify`**, **`yarn quasar:build:electron:summarized`**, **`yarn test:components`**, **`yarn test:e2e`**, **`yarn test:storybook:smoke`**, and **`yarn test:storybook:visual`** in sequence—the intentional way to chain lint, unit tests, build, both Playwright suites, and Storybook smoke plus snapshot compare. **`yarn testbatch:ensure:change`** is the same through smoke, then **`yarn test:storybook:visual:update`** instead of compare; use only when you mean to regenerate baselines. For lighter checks, run **`yarn test:unit`** and individual commands in their own terminals (see [testing-terminal-isolation](.cursor/rules/testing-terminal-isolation.mdc) in this repo).
 
 ### Scripts reference (`package.json`)
 
 | Script | Purpose |
 | --- | --- |
-| `yarn quasar:build:electron` | Build/package the Electron app (`--publish never`). |
+| `yarn quasar:build:electron` | Build/package the Electron app (`--publish never`; full log stream). |
+| `yarn quasar:build:electron:summarized` | Same build via **`scripts/quasarBuildElectronSummarized.mjs`**: quiet success line; full log in **`test-results/quasar-build-electron-last.log`** (dumped on failure). |
 | `yarn quasar:dev:electron` | Run the app in Quasar Electron development mode. |
 | `yarn lint:eslint` | Run ESLint on project source/config paths. |
 | `yarn lint:stylelint` | Run Stylelint on Vue/CSS/SCSS/Sass under `src/` and Storybook config under `.storybook-workspace/.storybook/`. |
 | `yarn lint:stylelint:fix` | Same paths as `lint:stylelint` with `--fix` (alphabetical declarations, including inside Vue `<style>` blocks). |
 | `yarn lint:typescript` | Run TypeScript project check (`vue-tsc`, no emit; covers `<script setup>` in SFCs). |
 | `yarn testbatch:verify` | Quick gate: lint + typecheck + stylelint + Vitest coverage (**100%** on **`src-electron`** and **`helpers`**; **`src`** **`.ts`** per [vitest/](vitest/) rules; **`.vue`** watermarks only). |
-| `yarn testbatch:ensure:nochange` | Full gate: `testbatch:verify` + `quasar:build:electron` + Playwright component + E2E + Storybook smoke + `test:storybook:visual` (snapshot compare). |
+| `yarn testbatch:ensure:nochange` | Full gate: `testbatch:verify` + `quasar:build:electron:summarized` + Playwright component + E2E + Storybook smoke + `test:storybook:visual` (snapshot compare). |
 | `yarn testbatch:ensure:change` | Same through smoke, then `test:storybook:visual:update` (refresh VRT baselines; use only when intentional). |
 | `yarn test:unit` | Run Vitest workspace (no coverage): **unit-electron**, **unit-src-renderer**, **unit-helpers**, **unit-components**. |
 | `yarn test:coverage:verify` | Same coverage sequence as **`testbatch:verify`**: electron, helpers, then **`src`** renderer **`.ts`** (strict) + components (**`.ts`** strict on statements/functions/lines; **`.vue`** reported with **60%** watermarks). |

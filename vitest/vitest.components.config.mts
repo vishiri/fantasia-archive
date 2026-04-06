@@ -2,12 +2,15 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 import vue from '@vitejs/plugin-vue'
+import type { UserConfig } from 'vite'
 import { defineConfig } from 'vitest/config'
 
 import {
   vitestCoverageBaseExclude,
+  vitestCoverageSkipFull,
   vitestCoverageStrictThresholds
 } from './vitest.coverage.shared'
+import { vitestTerminalReporters } from './vitest.reporters.shared'
 
 /** 100% lines/statements/functions for **.ts; branches omitted (v8 counts iterator/comparator edges oddly on some loops). */
 const vitestSrcTsStrictThresholdsNoBranches = {
@@ -20,6 +23,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
 
 /**
+ * Vite's published SassPreprocessorOptions omit the sass compiler 'api' field; vite and sass-embedded still read it at runtime.
+ */
+type T_vitestComponentsScssOpts = NonNullable<
+  NonNullable<NonNullable<UserConfig['css']>['preprocessorOptions']>['scss']
+>
+
+/**
  * Vue SFC unit tests — jsdom + SFC transforms: components, layouts, and pages.
  * **.ts** files under those trees use 100% statements/functions/lines thresholds (branches omitted for this slice—v8 over-counts some iterator edges).
  * **.vue** files have no failing threshold; watermarks use a 60% lower bound so HTML/text reports flag weak Vue coverage for human review.
@@ -30,7 +40,7 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         api: 'legacy'
-      }
+      } as T_vitestComponentsScssOpts
     }
   },
   resolve: {
@@ -56,12 +66,13 @@ export default defineConfig({
       'src/layouts/**/*.vitest.test.ts',
       'src/pages/**/*.vitest.test.ts'
     ],
-    reporters: ['default', 'json'],
+    reporters: [...vitestTerminalReporters],
     outputFile: 'test-results/vitest-report/test-results-vitest-components.json',
     clearMocks: true,
     pool: 'forks',
     coverage: {
       provider: 'v8',
+      skipFull: vitestCoverageSkipFull,
       include: [
         'src/components/**/*.vue',
         'src/components/**/*.ts',

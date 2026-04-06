@@ -1,6 +1,19 @@
 import { test, expect } from '@playwright/test'
 import type { I_storybookIndex } from './storybook.visual.playwright.types'
 
+/**
+ * Set FA_STORYBOOK_VISUAL_VERBOSE=1 (or 'true') to print per-story progress (Story count, Captured, Done).
+ * Warnings and errors always print.
+ */
+const verboseStorybookVisualLog = process.env.FA_STORYBOOK_VISUAL_VERBOSE === '1' ||
+  process.env.FA_STORYBOOK_VISUAL_VERBOSE === 'true'
+
+const vlog = (...args: unknown[]): void => {
+  if (verboseStorybookVisualLog) {
+    console.info(...args)
+  }
+}
+
 const normalizeSnapshotName = (storyId: string): string => storyId.replaceAll(/[^a-zA-Z0-9_-]/g, '_')
 const STORY_RENDER_TIMEOUT_MS = 15_000
 const STORY_STEP_TIMEOUT_MS = 30_000
@@ -38,11 +51,11 @@ test('Capture visual snapshots for Storybook stories', async ({ browser, request
     .filter((entry) => entry.type === 'story' && !(entry.tags ?? []).includes('skip-visual') && !EXCLUDED_STORY_IDS.has(entry.id))
     .sort((a, b) => a.id.localeCompare(b.id))
 
-  console.info(`[storybook-visual] Story count: ${storyList.length}`)
+  vlog(`[storybook-visual] Story count: ${storyList.length}`)
   const failedStories: string[] = []
 
   for (const [index, story] of storyList.entries()) {
-    console.info(`[storybook-visual] (${index + 1}/${storyList.length}) ${story.id}`)
+    vlog(`[storybook-visual] (${index + 1}/${storyList.length}) ${story.id}`)
     await test.step(`${story.title} / ${story.name}`, async () => {
       const context = await browser.newContext({
         viewport: {
@@ -116,14 +129,14 @@ test('Capture visual snapshots for Storybook stories', async ({ browser, request
           maxDiffPixels: 150
         }), STORY_STEP_TIMEOUT_MS, `Timed out taking screenshot: ${story.id}`)
 
-        console.info(`[storybook-visual] Captured: ${story.id}`)
+        vlog(`[storybook-visual] Captured: ${story.id}`)
       } catch (error) {
         console.warn(`[storybook-visual] Skipped (error): ${story.id}`)
         console.warn(error)
         failedStories.push(story.id)
       } finally {
         await context.close().catch(() => {})
-        console.info(`[storybook-visual] Done: ${story.id}`)
+        vlog(`[storybook-visual] Done: ${story.id}`)
       }
     })
   }

@@ -5,8 +5,10 @@ import { defineConfig } from 'vitest/config'
 
 import {
   vitestCoverageBaseExclude,
+  vitestCoverageSkipFull,
   vitestCoverageStrictThresholds
 } from './vitest.coverage.shared'
+import { vitestTerminalReporters } from './vitest.reporters.shared'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
@@ -30,10 +32,11 @@ export default defineConfig({
     name: 'unit-electron',
     environment: 'node',
     include: ['src-electron/**/*.vitest.test.ts'],
-    reporters: ['default', 'json'],
+    reporters: [...vitestTerminalReporters],
     outputFile: 'test-results/vitest-report/test-results-vitest-electron.json',
     coverage: {
       provider: 'v8',
+      skipFull: vitestCoverageSkipFull,
       include: ['src-electron/**/*.ts'],
       exclude: [
         ...vitestCoverageBaseExclude,

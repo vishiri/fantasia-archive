@@ -5,7 +5,6 @@
     ".quasar",
     "node_modules",
     ".storybook-workspace/storybook-static",
-    "**/*.stories.ts",
-    "vitest/vitest.components.config.mts"
+    "**/*.stories.ts"
   ]
 }

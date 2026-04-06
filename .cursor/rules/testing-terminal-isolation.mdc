@@ -25,7 +25,7 @@ By default, do not extend this chain with `yarn quasar:build:electron`, Playwrig
 
 When you explicitly need the full project gate in one command, use one of:
 
-- **`yarn testbatch:ensure:nochange`** — `testbatch:verify`, production Electron build, Playwright component + E2E, **`yarn test:storybook:smoke`**, then **`yarn test:storybook:visual`** (compare committed Storybook VRT snapshots; fails on drift).
+- **`yarn testbatch:ensure:nochange`** — `testbatch:verify`, **`yarn quasar:build:electron:summarized`** (captures Quasar/electron-builder output; on success prints one line; on failure dumps the full log—by default written under **`test-results/quasar-build-electron-last.log`**, gitignored with **`test-results/`**), Playwright component + E2E, **`yarn test:storybook:smoke`**, then **`yarn test:storybook:visual`** (compare committed Storybook VRT snapshots; fails on drift).
 - **`yarn testbatch:ensure:change`** — same chain through E2E and smoke, then **`yarn test:storybook:visual:update`** to refresh Storybook VRT baselines. Use only when intentional UI changes are approved and you will commit the updated snapshots.
 
 Treat these as the intentional exception to the isolation rule. **Do not** run **`testbatch:ensure:change`** in CI or to validate an unchanged baseline.
@@ -36,7 +36,7 @@ The default **GitHub Actions** **Verify** workflow (`.github/workflows/verify.ym
 
 Run each of these in its **own** terminal invocation (do not chain them with each other or with the quality gate in the same line) unless you are intentionally running **`yarn testbatch:ensure:nochange`** or **`yarn testbatch:ensure:change`**:
 
-- `yarn quasar:build:electron`
+- `yarn quasar:build:electron` (full build log to the terminal; use when you want streaming output)
 - `yarn test:components`
 - `yarn test:e2e`
 - `yarn test:storybook:smoke`
