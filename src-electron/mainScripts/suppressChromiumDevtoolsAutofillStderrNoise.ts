@@ -1,7 +1,5 @@
 /**
- * Chrome DevTools (bundled with Electron) calls CDP methods such as 'Autofill.enable'
- * that Electron's debug target does not implement. Chromium logs those failures to
- * stderr; they are harmless for app behavior.
+ * Chrome DevTools (bundled with Electron) calls CDP methods such as 'Autofill.enable' that Electron's debug target does not implement; Chromium logs those failures to stderr, which is harmless for app behavior.
  * @see https://github.com/electron/electron/issues/41614
  */
 export function suppressChromiumDevtoolsAutofillStderrNoise (): void {

@@ -23,7 +23,7 @@ test('Test that FantasiaMascotImage renders list image and disables random mode 
     }
   })
 
-  const img = w.get('[data-test="fantasiaMascotImage-image"]')
+  const img = w.get('[data-test-locator="fantasiaMascotImage-image"]')
   expect(img.attributes('data-test-is-random')).toBe('false')
   expect(img.attributes('src')).toBe(fantasiaImageList.error)
   w.unmount()
@@ -48,7 +48,7 @@ test('Test that FantasiaMascotImage enables random mode when fantasiaImage prop 
     }
   })
 
-  const img = w.get('[data-test="fantasiaMascotImage-image"]')
+  const img = w.get('[data-test-locator="fantasiaMascotImage-image"]')
   expect(img.attributes('data-test-is-random')).toBe('true')
   expect(img.attributes('src')).toBeTruthy()
   w.unmount()

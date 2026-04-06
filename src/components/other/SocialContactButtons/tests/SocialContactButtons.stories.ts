@@ -23,7 +23,7 @@ export const Default: StoryObj<typeof meta> = {}
 export const StatesCompositionContract: StoryObj<typeof meta> = {
   name: 'States/CompositionContract',
   play: async ({ canvasElement }) => {
-    await expect(canvasElement.querySelectorAll('[data-test="socialContactSingleButton"]').length).toBe(7)
+    await expect(canvasElement.querySelectorAll('[data-test-locator="socialContactSingleButton"]').length).toBe(7)
     await expect(canvasElement.querySelector('[data-test-button-number="7"]')).toBeTruthy()
   }
 }

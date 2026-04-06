@@ -1,11 +1,7 @@
 /**
- * vue-i18n v11 augments declare module 'vue' with $t / $d / $n / etc.
- * The CLI 'tsc' picks that up, but the Volar IDE template-checker resolves
- * ComponentCustomProperties through @vue/runtime-core.  Re-declare the same
- * properties here so both code-paths agree.
+ * vue-i18n v11 augments declare module 'vue' with $t / $d / $n / etc.; 'tsc' picks that up, but the Volar IDE template-checker resolves ComponentCustomProperties through @vue/runtime-core, so the same properties are re-declared here for both code paths.
  *
- * Types are pulled from Composer (the Composition-API surface of vue-i18n)
- * because it is a proper top-level export of the package.
+ * Types are pulled from Composer (the Composition-API surface of vue-i18n) because it is a proper top-level export of the package.
  */
 import type { Composer, ExportedGlobalComposer } from 'vue-i18n'
 

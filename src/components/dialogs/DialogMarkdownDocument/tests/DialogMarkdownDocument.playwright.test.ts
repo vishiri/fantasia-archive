@@ -3,9 +3,15 @@ import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
-  getFaPlaywrightElectronRecordVideoPartial
-} from 'app/playwrightElectronRecordVideo'
+  getFaPlaywrightElectronRecordVideoPartial,
+  installFaPlaywrightCursorMarkerIfVideoEnabled
+} from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
+import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
 import type { T_documentName } from 'app/types/T_documentList'
+
+test.beforeEach(() => {
+  resetFaPlaywrightIsolatedUserData()
+})
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -22,8 +28,8 @@ const extraEnvSettings = {
 const electronMainFilePath:string = extraEnvVariablesAPI.ELECTRON_MAIN_FILEPATH
 
 /**
- * Extra render timer buffer for tests to start after loading the app
- * - Change here in order manually adjust this component's wait times
+ * Buffer before assertions so the component-testing shell finishes rendering.
+ * - Tune this constant only when this spec needs a different wait.
  */
 const faFrontendRenderTimer = extraEnvVariablesAPI.FA_FRONTEND_RENDER_TIMER
 
@@ -51,12 +57,13 @@ test('Open test "license" dialog with all elements in it', async ({}, testInfo) 
   })
 
   const appWindow = await electronApp.firstWindow()
+  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the selectors for the elements to check
-  const closeButton = appWindow.locator(`[data-test="${selectorList.closeButton}"]`)
-  const markdownWrapper = appWindow.locator(`[data-test="${selectorList.markdownWrapper}"]`)
-  const markdownContent = appWindow.locator(`[data-test="${selectorList.markdownContent}"]`)
+  const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
+  const markdownWrapper = appWindow.locator(`[data-test-locator="${selectorList.markdownWrapper}"]`)
+  const markdownContent = appWindow.locator(`[data-test-locator="${selectorList.markdownContent}"]`)
 
   // Check if all tested elements exist
   await expect(closeButton).toHaveCount(1)
@@ -82,11 +89,12 @@ test('Open test "license" dialog and try closing it', async ({}, testInfo) => {
   })
 
   const appWindow = await electronApp.firstWindow()
+  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the selectors for the elements to check
-  const closeButton = appWindow.locator(`[data-test="${selectorList.closeButton}"]`)
-  const markdownContent = appWindow.locator(`[data-test="${selectorList.markdownContent}"]`)
+  const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
+  const markdownContent = appWindow.locator(`[data-test-locator="${selectorList.markdownContent}"]`)
 
   // Check if the markdown content and close button exist and click it if they do
   await expect(markdownContent).toHaveCount(1)

@@ -39,7 +39,7 @@ const componentName = Array.isArray(componentNameParam)
  */
 const componentList = (import.meta as ImportMeta & {
   glob: (pattern: string, options: { eager: true }) => Record<string, { default: Component & { __name?: string } }>
-}).glob('../components/**/*.vue', { eager: true })
+}).glob('../components/**/*.vue', { eager: true }) as Record<string, { default: Component & { __name?: string } }>
 
 /**
  * Placeholder variable for the matched component

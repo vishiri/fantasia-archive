@@ -109,12 +109,12 @@ export const StatesWithSubmenu: StoryObj<typeof meta> = {
 export const InteractionsOpensMenuOnClick: StoryObj<typeof meta> = {
   name: 'Interactions/OpensMenuOnClick',
   play: async ({ canvasElement }) => {
-    const wrapperButton = canvasElement.querySelector('[data-test="AppControlSingleMenu-wrapper"]')
+    const wrapperButton = canvasElement.querySelector('[data-test-locator="AppControlSingleMenu-wrapper"]')
     await expect(wrapperButton).toBeTruthy()
     await userEvent.click(wrapperButton as HTMLElement)
     await waitFor(async () => {
-      const menuItemNode = canvasElement.querySelector('[data-test="AppControlSingleMenu-menuItem"]') ??
-        document.body.querySelector('[data-test="AppControlSingleMenu-menuItem"]')
+      const menuItemNode = canvasElement.querySelector('[data-test-locator="AppControlSingleMenu-menuItem"]') ??
+        document.body.querySelector('[data-test-locator="AppControlSingleMenu-menuItem"]')
       await expect(menuItemNode).toBeTruthy()
     })
   }

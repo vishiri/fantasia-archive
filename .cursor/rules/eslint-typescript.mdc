@@ -8,13 +8,13 @@ alwaysApply: true
 ## What this project uses (not TSLint)
 
 - **TSLint** is deprecated and **not** used. TypeScript style and many type-aware checks come from **ESLint** (**flat config** via root **`eslint.config.mjs`**) with **neostandard**, **typescript-eslint** (v8.x), **eslint-plugin-vue** (v10), and **`@typescript-eslint`**, aligned with **TypeScript ~6.0** in `package.json`.
-- **Standalone typecheck**: `yarn lint:typescript` runs **`tsc -p tsconfig.json --pretty`** (no emit). Use it in CI, before commits, and whenever you change configs or broad typings.
+- **Standalone typecheck**: `yarn lint:typescript` runs **`vue-tsc -p tsconfig.json --noEmit`**, which type-checks **`.vue` SFCs** and all TypeScript in the same project as **`tsc`**. Plain **`tsc`** alone does not load `<script setup>` blocks from SFCs, so it must not be the only check for renderer Vue code. Use `yarn lint:typescript` in CI, before commits, and whenever you change configs or broad typings.
 - Use **`import type`** for type-only imports in `.ts` and Vue `<script lang="ts">` blocks; do not keep value imports that are only used as types.
 - Prefer explicit type imports over inline `typeof import('...')` type annotations when a named type import can express the same intent.
 
 ## Code comments
 
-In line comments, block comments, and JSDoc above APIs and tests: do not use Markdown double-asterisk bold or asterisk italic; use plain wording. For inline references to symbols, paths, or commands, prefer single-quoted text (for example 'yarn test:unit') instead of grave accents (backticks).
+In line comments, block comments, and JSDoc above APIs and tests: do not use Markdown double-asterisk bold or asterisk italic; use plain wording. For inline references to symbols, paths, or commands, prefer single-quoted text (for example 'yarn test:unit') instead of grave accents (backticks). Do not break sentences mid-clause across ` * ` JSDoc lines for stylistic wrapping; use full lines or a baseline sentence plus ` * - ` bullets (see [AGENTS.md](../../AGENTS.md) code comments).
 
 ## Commands
 
@@ -22,7 +22,7 @@ In line comments, block comments, and JSDoc above APIs and tests: do not use Mar
 |--------|------|
 | `yarn lint:eslint` | ESLint over `src/`, `src-electron/`, `e2e-tests/`, `types/`, Quasar/Vitest/Playwright configs, and `.storybook-workspace/.storybook/` — see `package.json` `lint:eslint` script. |
 | `yarn lint:stylelint` | Stylelint on `src/**/*.{vue,css,scss,sass}` and `.storybook-workspace/.storybook/**/*.{vue,css,scss,sass}` (declaration blocks sorted alphabetically via `stylelint-order`; use `yarn lint:stylelint:fix` to autofix). |
-| `yarn lint:typescript` | Full **`tsc`** project check (Vue shim + Quasar paths via `tsconfig.json` → `.quasar/tsconfig.json`). |
+| `yarn lint:typescript` | Full **`vue-tsc`** project check (Vue SFCs + `.ts`; Quasar paths via `tsconfig.json` → `.quasar/tsconfig.json`). |
 
 ## Pre-commit / pre-changelog quality gate
 
@@ -34,7 +34,7 @@ Run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, or `yarn 
 
 ## `tsconfig` and `.vue` / Quasar
 
-- Root **`tsconfig.json`** extends **`.quasar/tsconfig.json`** and excludes the whole **`.quasar`** tree (generated output). **`src/env.d.ts`** therefore references **`.quasar/shims-vue.d.ts`** so **`tsc`** still resolves **`*.vue`** modules.
+- Root **`tsconfig.json`** extends **`.quasar/tsconfig.json`** and excludes the whole **`.quasar`** tree (generated output). **`src/env.d.ts`** declares **`*.vue`** modules and includes **`/// <reference types="vite/client" />`** so **`import.meta.env`** and other Vite typings resolve in the IDE and in **`vue-tsc`** (generated **`.quasar/quasar.d.ts`** also references **`vite/client`**, but **`src/env.d.ts`** keeps SFC scripts consistent when tooling does not load `.quasar` types first).
 - Do **not** add a top-level `compilerOptions.paths` override in `tsconfig.json` unless you merge with Quasar’s `paths`; replacing `paths` breaks `app/`, `src/`, `#q-app/*`, etc.
 
 ## `quasar.config.ts` typing notes

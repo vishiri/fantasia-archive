@@ -62,7 +62,7 @@ Locale `T_*` paths under `src/i18n/<locale>/components/` use the same bucket nam
 |-------|------|
 | Quasar, Composition API, i18n, script size / extraction | [`vue-quasar.mdc`](../../rules/vue-quasar.mdc) |
 | BEM classes and scoped SCSS only | [`vue-bem-scss.mdc`](../../rules/vue-bem-scss.mdc) |
-| `data-test` and other Playwright template hooks | [`vue-template-test-hooks.mdc`](../../rules/vue-template-test-hooks.mdc) |
+| `data-test-locator` and other Playwright `data-test-*` template hooks | [`vue-template-test-hooks.mdc`](../../rules/vue-template-test-hooks.mdc) |
 | Global SCSS / `src/css` | [`project-scss.mdc`](../../rules/project-scss.mdc) |
 
 ## Quality gates

@@ -60,15 +60,17 @@ quasar build -m electron
 
 (`yarn quasar:build:electron` maps to `quasar build -m electron --publish never`.)
 
+**Playwright `userData`:** With **`TEST_ENV`** **`components`** or **`e2e`**, Electron **`userData`** is **`%APPDATA%/<package.json name>/playwright-user-data`** (here: **`Roaming\fantasia-archive\playwright-user-data`**), **not** **`fantasia-archive-dev`** (that folder is for **`quasar dev`** when **`DEBUGGING`** is set). See [`fixAppName.ts`](../../../src-electron/mainScripts/fixAppName.ts) for main-process wiring and [`playwrightIsolatedUserDataDirName.ts`](../../../src-electron/mainScripts/playwrightIsolatedUserDataDirName.ts) for the shared folder-name constant (Electron-free, used by **`playwrightUserDataReset`**). Each Playwright file calls **`resetFaPlaywrightIsolatedUserData()`** in **`test.beforeEach`** ([`helpers/playwrightHelpers/playwrightUserDataReset.ts`](../../../helpers/playwrightHelpers/playwrightUserDataReset.ts)) so that profile is wiped before every test. Shared Playwright helpers live under **`helpers/playwrightHelpers/`**; add future harness packages as siblings under **`helpers/`**; keep the repo root for config, **`README`**, lockfiles, and **`scripts/`**, not new loose harness **`.ts`** files. Rebuild the production Electron app after changing **`fixAppName`** path logic or **`playwrightIsolatedUserDataDirName`**.
+
 ## Quick reference
 
 | Goal | Command |
 |------|---------|
-| **Quality gate** (lint + `tsc` + style + unit tests, one terminal) | `yarn testbatch:verify` |
+| **Quality gate** (lint + `vue-tsc` + style + unit tests, one terminal) | `yarn testbatch:verify` |
 | **Full project gate** (verify + Electron build + Playwright component + E2E + Storybook smoke + VRT compare) | `yarn testbatch:ensure:nochange` |
 | **Full project gate — refresh Storybook VRT baselines** (same through smoke, then snapshot update) | `yarn testbatch:ensure:change` |
 | ESLint | `yarn lint:eslint` |
-| TypeScript (`tsc`, no emit) | `yarn lint:typescript` |
+| TypeScript (`vue-tsc`, no emit; includes `.vue` SFCs) | `yarn lint:typescript` |
 | Stylelint (Vue/CSS/SCSS/Sass + Storybook `.storybook` sources) | `yarn lint:stylelint` (autofix: `yarn lint:stylelint:fix`) |
 | Unit tests | `yarn test:unit` |
 | Component tests (Playwright) | `yarn test:components` (after production build) |
@@ -76,7 +78,7 @@ quasar build -m electron
 
 **Storybook** nested package: run **`yarn`** at the repo root, then **`yarn --cwd .storybook-workspace install`** so **`yarn storybook:run`** / **`yarn storybook:build`** / **`yarn test:storybook:visual*`** (Playwright VRT) resolve their dependencies.
 
-See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) for ESLint vs TSLint, `tsconfig` / `tsc`, and Vitest env typing. See [fantasia-testing](../fantasia-testing/SKILL.md) for test details. **Yarn 1.x** reserves `yarn check` for dependency verification — use **`yarn testbatch:verify`** for the lint/types/style/unit gate ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
+See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) for ESLint vs TSLint, `tsconfig` / `vue-tsc`, and Vitest env typing. See [fantasia-testing](../fantasia-testing/SKILL.md) for test details. **Yarn 1.x** reserves `yarn check` for dependency verification — use **`yarn testbatch:verify`** for the lint/types/style/unit gate ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
 
 ## Local types extraction rule
 

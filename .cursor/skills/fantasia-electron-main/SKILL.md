@@ -12,6 +12,7 @@ description: >-
 ## Entry and flow
 
 - **Entry**: `src-electron/electron-main.ts` orchestrates startup: `fixAppName`, Windows DevTools tweaks, `startApp`, menu tweaks, `openAppWindowManager`, `closeAppManager`.
+- **`userData`**: `fixAppName()` sets `app.setPath('userData', …)`. When `process.env.TEST_ENV` is `components` or `e2e`, `userData` is **`%APPDATA%/<package.json name>/playwright-user-data`** (stable; not under the `*-dev` folder used by `quasar dev` with `DEBUGGING`). The folder segment is `PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME` in `playwrightIsolatedUserDataDirName.ts` (re-exported from `fixAppName.ts` for Electron callers).
 - **Modular logic**: Prefer `src-electron/mainScripts/` (e.g. `appManagement.ts`, `mainWindowCreation.ts`, `tweaks.ts`, `fixAppName.ts`) over growing `electron-main.ts` indefinitely.
 - **IPC registration**: Shared channel strings live in `src-electron/electron-ipc-bridge.ts`. Main-process `ipcMain` handlers for preload-invoked channels belong in `mainScripts/register*Ipc.ts` (e.g. `registerFaDevToolsIpc.ts`, `registerFaUserSettingsIpc.ts`). Call those registrars from app startup (`startApp()` in `appManagement.ts` today) so preload and main always use the same names.
 

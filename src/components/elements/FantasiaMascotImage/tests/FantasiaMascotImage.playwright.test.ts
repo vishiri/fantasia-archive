@@ -3,8 +3,14 @@ import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
-  getFaPlaywrightElectronRecordVideoPartial
-} from 'app/playwrightElectronRecordVideo'
+  getFaPlaywrightElectronRecordVideoPartial,
+  installFaPlaywrightCursorMarkerIfVideoEnabled
+} from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
+import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
+
+test.beforeEach(() => {
+  resetFaPlaywrightIsolatedUserData()
+})
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -21,8 +27,8 @@ const extraEnvSettings = {
 const electronMainFilePath:string = extraEnvVariablesAPI.ELECTRON_MAIN_FILEPATH
 
 /**
- * Extra render timer buffer for tests to start after loading the app
- * - Change here in order manually adjust this component's wait times
+ * Buffer before assertions so the component-testing shell finishes rendering.
+ * - Tune this constant only when this spec needs a different wait.
  */
 const faFrontendRenderTimer:number = extraEnvVariablesAPI.FA_FRONTEND_RENDER_TIMER
 
@@ -46,10 +52,11 @@ test('Check if the wrapper contains "IMG" element', async ({}, testInfo) => {
   })
 
   const appWindow = await electronApp.firstWindow()
+  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the selector for the tested element
-  const imageElement = appWindow.locator(`[data-test="${selectorList.image}"]`)
+  const imageElement = appWindow.locator(`[data-test-locator="${selectorList.image}"]`)
 
   // Check if the tested element exists
   await expect(imageElement).toHaveCount(1)
@@ -83,10 +90,11 @@ test('Visually check for proper sizing of the icon', async ({}, testInfo) => {
   })
 
   const appWindow = await electronApp.firstWindow()
+  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the selector for the tested element
-  const imageElement = appWindow.locator(`[data-test="${selectorList.image}"]`)
+  const imageElement = appWindow.locator(`[data-test-locator="${selectorList.image}"]`)
 
   // Check if the tested element exists
   await expect(imageElement).toHaveCount(1)
@@ -121,10 +129,11 @@ test('Check if the image is random: YES', async ({}, testInfo) => {
   })
 
   const appWindow = await electronApp.firstWindow()
+  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the selector for the tested element
-  const imageElement = appWindow.locator(`[data-test="${selectorList.image}"]`)
+  const imageElement = appWindow.locator(`[data-test-locator="${selectorList.image}"]`)
 
   // Check if the tested element exists
   await expect(imageElement).toHaveCount(1)
@@ -152,10 +161,11 @@ test('Check if the image is random: NO', async ({}, testInfo) => {
   })
 
   const appWindow = await electronApp.firstWindow()
+  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the selector for the tested element
-  const imageElement = appWindow.locator(`[data-test="${selectorList.image}"]`)
+  const imageElement = appWindow.locator(`[data-test-locator="${selectorList.image}"]`)
 
   // Check if the tested element exists
   await expect(imageElement).toHaveCount(1)

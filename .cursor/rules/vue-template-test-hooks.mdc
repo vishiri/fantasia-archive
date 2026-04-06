@@ -1,29 +1,38 @@
 ---
-description: data-test and test-only template attributes for Playwright (Vue templates)
+description: data-test-* and test-only template attributes for Playwright (Vue templates)
 globs: "**/*.vue"
 alwaysApply: false
 ---
 
-# Vue template — test hooks (`data-test`, etc.)
+# Vue template — test hooks (`data-test-*`)
 
-Use this rule when adding or changing **attributes the UI tests locate**. It pairs with [playwright-tests.mdc](playwright-tests.mdc), which defines how `selectorList` and locators are written in `*.playwright.*.ts` files.
+Use this rule when adding or changing **attributes the UI tests locate**. It pairs with [playwright-tests.mdc](playwright-tests.mdc), which defines how `selectorList` and locators are written in `*.playwright.*.ts` files (including rare **full** selector strings in `selectorList` for portaled nodes that cannot carry project hooks, such as `'[role="tooltip"]'` for Quasar tooltips).
 
-## What belongs here
+## Do not use bare `data-test`
 
-- `data-test` values used by `appWindow.locator(\`[data-test="..."]\`)`.
-- Special attributes used in this repo for menus, e.g. `data-test-test-menu` and `data-test-any-menu` on [AppControlMenus.vue](src/components/globals/AppControlMenus/AppControlMenus.vue) (see [AppControlMenus.playwright.test.ts](src/components/globals/AppControlMenus/tests/AppControlMenus.playwright.test.ts)).
-- Optional `data-*` hooks asserted via `dataset` (e.g. `data-test-is-random` → `dataset.testIsRandom` in [FantasiaMascotImage.playwright.test.ts](src/components/elements/FantasiaMascotImage/tests/FantasiaMascotImage.playwright.test.ts)).
+- **Never** add `data-test="..."` on production templates. Use **`data-test-locator="..."`** (or `:data-test-locator`) for the primary stable id Playwright/Vitest select with `[data-test-locator="..."]`.
+- Add **additional** hyphenated attributes only when tests need extra semantics (examples below).
+
+## Primary locator
+
+- **`data-test-locator`** — stable string id per node (often `componentName-role-suffix`, e.g. `dialogProgramSettings-title`, `globalWindowButtons-button-minimize`). Tests store these values in `selectorList` and build locators as `appWindow.locator(\`[data-test-locator="${selectorList.someKey}"]\`)`.
+
+## Other `data-test-*` hooks in this repo
+
+- **`data-test-setting-id`**, **`data-test-tags`**, **`data-test-tooltip-text`** on Program Settings rows and help icons ([DialogProgramSettings.vue](src/components/dialogs/DialogProgramSettings/DialogProgramSettings.vue)).
+- **Menu bar**: **`data-test-menu-test`** and **`data-test-menu-any`** on [AppControlMenus.vue](src/components/globals/AppControlMenus/AppControlMenus.vue) (see [AppControlMenus.playwright.test.ts](src/components/globals/AppControlMenus/tests/AppControlMenus.playwright.test.ts)); Playwright uses `[data-test-menu-test="..."]` / `[data-test-menu-any="..."]`.
+- **Metadata / flags** asserted via attributes or `dataset`: e.g. **`data-test-image`**, **`data-test-is-random`** ([FantasiaMascotImage.vue](src/components/elements/FantasiaMascotImage/FantasiaMascotImage.vue)), **`data-test-button-number`** ([SocialContactButtons.vue](src/components/other/SocialContactButtons/SocialContactButtons.vue)), **`data-test-has-proper-data-input`** ([AppControlSingleMenu.vue](src/components/globals/AppControlSingleMenu/AppControlSingleMenu.vue)).
 
 ## Naming
 
-- Typically **lowerCamelCase block** plus hyphen-separated segments, e.g. `globalWindowButtons-button-minimize`, `dialogMarkdownDocument-markdown-wrapper`.
+- Typically **lowerCamelCase block** plus hyphen-separated segments in the **value** of `data-test-locator`, e.g. `globalWindowButtons-button-minimize`, `dialogMarkdownDocument-markdown-wrapper`.
 - Child components may use shorter or compound names consistent with that subtree (e.g. `socialContactSingleButton-image`).
 - **Stay consistent** within the component and with the existing `selectorList` in its `tests/*.playwright.test.ts` file.
 
 ## Workflow
 
-1. Add or update hooks on the template.
-2. Update the component’s Playwright `selectorList` and tests to match ([playwright-tests.mdc](playwright-tests.mdc)).
+1. Add or update hooks on the template (`data-test-locator` plus any extra `data-test-*` needed).
+2. Update the component’s Playwright `selectorList` and tests to match ([playwright-tests.mdc](playwright-tests.mdc)); Vitest/Storybook queries use the same attribute names.
 3. Rebuild before running Playwright ([README.md](README.md)).
 
 ## Not in this rule

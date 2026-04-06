@@ -3,8 +3,14 @@ import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
-  getFaPlaywrightElectronRecordVideoPartial
-} from 'app/playwrightElectronRecordVideo'
+  getFaPlaywrightElectronRecordVideoPartial,
+  installFaPlaywrightCursorMarkerIfVideoEnabled
+} from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
+import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
+
+test.beforeEach(() => {
+  resetFaPlaywrightIsolatedUserData()
+})
 
 /**
  * Extra env settings to trigger testing via Playwright
@@ -19,8 +25,8 @@ const extraEnvSettings = {
 const electronMainFilePath:string = extraEnvVariablesAPI.ELECTRON_MAIN_FILEPATH
 
 /**
- * Extra render timer buffer for tests to start after loading the app
- * - Change here in order manually adjust this component's wait times
+ * Buffer before assertions so the window is ready (e2e uses 0 here).
+ * - Tune this constant when this spec needs a different wait.
  */
 const faFrontendRenderTimer = 0
 
@@ -44,10 +50,11 @@ test('Splash screen works properly', async ({}, testInfo) => {
   })
 
   const appWindow = await electronApp.firstWindow()
+  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the wrapper element locator
-  const wrapperElement = appWindow.locator(`[data-test="${selectorList.wrapper}"]`)
+  const wrapperElement = appWindow.locator(`[data-test-locator="${selectorList.wrapper}"]`)
 
   // Check if the tested element exists
   if (await wrapperElement.count() === 0) {
@@ -56,9 +63,9 @@ test('Splash screen works properly', async ({}, testInfo) => {
     return
   }
 
-  // Check if the splash screen is visible on innitial load
+  // Check if the splash screen is visible on initial load
   const elementOpacityFirstRender = await appWindow.evaluate((selectorList) => {
-    const element = document.querySelector(`[data-test="${selectorList.wrapper}"]`)
+    const element = document.querySelector(`[data-test-locator="${selectorList.wrapper}"]`)
     if (element !== null) {
       return window.getComputedStyle(element).opacity
     } else {
@@ -72,7 +79,7 @@ test('Splash screen works properly', async ({}, testInfo) => {
 
   // Check if the splash screen is hidden after the app contents load
   const elementOpacityAfterAppLoad = await appWindow.evaluate((selectorList) => {
-    const element = document.querySelector(`[data-test="${selectorList.wrapper}"]`)
+    const element = document.querySelector(`[data-test-locator="${selectorList.wrapper}"]`)
     if (element !== null) {
       return window.getComputedStyle(element).opacity
     } else {
@@ -99,24 +106,25 @@ test('Splash screen has proper colors', async ({}, testInfo) => {
   })
 
   const appWindow = await electronApp.firstWindow()
+  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the wrapper element locator
-  const wrapperElement = appWindow.locator(`[data-test="${selectorList.wrapper}"]`)
+  const wrapperElement = appWindow.locator(`[data-test-locator="${selectorList.wrapper}"]`)
 
   // Check if the tested element exists
   await expect(wrapperElement).toHaveCount(1)
 
   // Check if the background color is correct
   const elementBackgroundColor = await appWindow.evaluate((selectorList) => {
-    const element = document.querySelector(`[data-test="${selectorList.wrapper}"]`)
+    const element = document.querySelector(`[data-test-locator="${selectorList.wrapper}"]`)
     if (element !== null) return window.getComputedStyle(element).backgroundColor
   }, selectorList)
   expect(elementBackgroundColor).toBe(testStringBackgroundColorRGB)
 
   // Check if the fill color of the svg path is correct
   const elementPathFillColor = await appWindow.evaluate((selectorList) => {
-    const element = document.querySelector(`[data-test="${selectorList.wrapper}"] path`)
+    const element = document.querySelector(`[data-test-locator="${selectorList.wrapper}"] path`)
     if (element !== null) return window.getComputedStyle(element).fill
   }, selectorList)
   expect(elementPathFillColor).toBe(testStringPathFillColorRGB)
@@ -139,9 +147,10 @@ test('Splash screen has proper sizings', async ({}, testInfo) => {
   })
 
   const appWindow = await electronApp.firstWindow()
+  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
 
   // Prepare the icon element locator
-  const iconElement = appWindow.locator(`[data-test="${selectorList.wrapper}"] svg`)
+  const iconElement = appWindow.locator(`[data-test-locator="${selectorList.wrapper}"] svg`)
 
   // Check if the tested element exists
   expect(iconElement).toHaveCount(1)

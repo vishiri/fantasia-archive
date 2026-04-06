@@ -13,7 +13,7 @@ test('Test that DialogAboutFantasiaArchive renders about dialog shell for AboutF
     global: {
       mocks: { $t: (k: string) => k },
       stubs: {
-        SocialContactButtons: { template: '<div data-test="stub-social-contact-buttons" />' }
+        SocialContactButtons: { template: '<div data-test-locator="stub-social-contact-buttons" />' }
       }
     }
   })

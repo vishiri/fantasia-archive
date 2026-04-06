@@ -3,7 +3,7 @@
     :class="['socialContactSingleButton', buttonData.cssClass]"
     :title="buttonData.title"
     :href="buttonData.url"
-    data-test="socialContactSingleButton"
+    data-test-locator="socialContactSingleButton"
     no-caps
   >
     <div class="row items-center no-wrap">
@@ -14,11 +14,11 @@
         fit="contain"
         :width="`${buttonData.width}px`"
         :height="`${buttonData.height}px`"
-        data-test="socialContactSingleButton-image"
+        data-test-locator="socialContactSingleButton-image"
       />
       <div
         class="text-no-wrap socialContactSingleButton__text"
-        data-test="socialContactSingleButton-text"
+        data-test-locator="socialContactSingleButton-text"
       >
         {{ buttonData.label }}
       </div>
@@ -47,13 +47,11 @@ const props = defineProps<{
 const buttonData = computed(() => props.dataInput)
 
 /**
- * Public-folder assets (Vite 'public/' / Storybook 'staticDirs') must be rooted with 'BASE_URL'
- * so paths resolve in the Storybook iframe and under custom app 'base' if ever set.
+ * Public-folder assets (Vite public/ and Storybook staticDirs) must be rooted with BASE_URL so paths resolve in the Storybook iframe and when the app base path is customized.
  */
 const iconSrc = computed(() => {
   const rawBase = import.meta.env.BASE_URL
-  // Quasar Electron uses an empty Vite 'base' that becomes '/' for import.meta.env.BASE_URL.
-  // Root-relative '/images/...' breaks under file:// (packaged app); use a relative base instead.
+  // Quasar Electron maps an empty Vite base to '/' on import.meta.env.BASE_URL; root-relative /images/... fails under file:// in packaged builds, so normalize to a relative base.
   const base =
     rawBase === '' || rawBase === undefined || rawBase === '/'
       ? './'

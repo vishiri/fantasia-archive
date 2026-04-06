@@ -2,8 +2,7 @@ import { getCurrentWindow } from '@electron/remote'
 import type { I_faWindowControlAPI } from 'app/types/I_faWindowControlAPI'
 
 /**
- * Use the window that owns this renderer. 'BrowserWindow.getFocusedWindow()' is unreliable
- * when native menus or other windows steal OS focus (same class of issue as DevTools controls).
+ * Use the window that owns this renderer; 'BrowserWindow.getFocusedWindow()' is unreliable when native menus or other windows steal OS focus (same class of issue as DevTools controls).
  */
 function appWindow () {
   try {

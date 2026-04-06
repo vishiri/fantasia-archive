@@ -2,7 +2,7 @@
   <!-- Outer wrapper of the social contact buttons -->
   <div
     class="socialContactButtons"
-    data-test="socialContactButtons"
+    data-test-locator="socialContactButtons"
     :data-test-button-number="buttonListLength"
   >
     <div class="row justify-center">

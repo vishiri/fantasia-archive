@@ -45,7 +45,7 @@ alwaysApply: false
 | Concern | Rule |
 |--------|------|
 | BEM classes, scoped SCSS | [vue-bem-scss.mdc](vue-bem-scss.mdc) |
-| `data-test` / test hooks on elements | [vue-template-test-hooks.mdc](vue-template-test-hooks.mdc) |
+| `data-test-locator` / other `data-test-*` test hooks on elements | [vue-template-test-hooks.mdc](vue-template-test-hooks.mdc) |
 | Global SCSS, Quasar variables | [project-scss.mdc](project-scss.mdc) |
 | Playwright test **files** | [playwright-tests.mdc](playwright-tests.mdc) |
 

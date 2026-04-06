@@ -13,6 +13,7 @@
       <h4
         id="dialogProgramSettings-title"
         class="dialogProgramSettings__title text-center"
+        data-test-locator="dialogProgramSettings-title"
       >
         {{ $t('dialogs.programSettings.title') }}
       </h4>
@@ -32,7 +33,7 @@
             class="text-grey-5"
             :name="categoryKey"
             :label="category.title"
-            :data-test="`dialogProgramSettings-tab-${categoryKey}`"
+            :data-test-locator="`dialogProgramSettings-tab-${categoryKey}`"
           />
         </q-tabs>
 
@@ -56,9 +57,12 @@
               <div class="dialogProgramSettings__panelScrollInner q-py-sm">
                 <div
                   class="dialogProgramSettings__category"
-                  :data-test="`dialogProgramSettings-category-${categoryKey}`"
+                  :data-test-locator="`dialogProgramSettings-category-${categoryKey}`"
                 >
-                  <h5 class="dialogProgramSettings__categoryTitle text-bold q-my-none text-h6">
+                  <h5
+                    class="dialogProgramSettings__categoryTitle text-bold q-my-none text-h6"
+                    data-test-locator="dialogProgramSettings-categoryTitle"
+                  >
                     {{ category.title }}
                   </h5>
 
@@ -66,9 +70,12 @@
                     v-for="(subCategory, subCategoryKey, subCategoryIndex) in category.subCategories"
                     :key="subCategoryKey"
                     class="dialogProgramSettings__subCategory"
-                    :data-test="`dialogProgramSettings-subcategory-${categoryKey}-${subCategoryKey}`"
+                    :data-test-locator="`dialogProgramSettings-subcategory-${categoryKey}-${subCategoryKey}`"
                   >
-                    <h6 class="dialogProgramSettings__subCategoryTitle text-bold q-mb-none text-subtitle1 text-primary-bright">
+                    <h6
+                      class="dialogProgramSettings__subCategoryTitle text-bold q-mb-none text-subtitle1 text-primary-bright"
+                      data-test-locator="dialogProgramSettings-subcategoryTitle"
+                    >
                       {{ subCategory.title }}
                     </h6>
 
@@ -80,15 +87,21 @@
                       >
                         <div
                           class="dialogProgramSettings__setting"
-                          :data-test="`dialogProgramSettings-setting-${settingKey}`"
+                          :data-test-locator="`dialogProgramSettings-setting-${settingKey}`"
+                          :data-test-setting-id="String(settingKey)"
+                          :data-test-tags="setting.tags"
                         >
                           <div class="row items-center no-wrap q-mb-xs">
                             <div class="dialogProgramSettings__settingTitle">
-                              <span class="dialogProgramSettings__settingLabel text-grey-3 text-weight-regular text-body2">{{ setting.title }}</span>
+                              <span
+                                class="dialogProgramSettings__settingLabel text-grey-3 text-weight-regular text-body2"
+                                data-test-locator="dialogProgramSettings-settingLabel"
+                              >{{ setting.title }}</span>
                               <q-icon
                                 name="mdi-help-circle"
                                 size="16px"
                                 class="dialogProgramSettings__settingHelpIcon q-ml-md"
+                                :data-test-tooltip-text="setting.description"
                               >
                                 <q-tooltip
                                   :delay="500"
@@ -106,6 +119,7 @@
                           <p
                             v-if="setting.note !== undefined && setting.note !== ''"
                             class="dialogProgramSettings__settingNote text-caption q-mt-xs q-mb-none text-red-12"
+                            data-test-locator="dialogProgramSettings-settingNote"
                           >
                             {{ setting.note }}
                           </p>
@@ -138,14 +152,14 @@
           :label="$t('dialogs.programSettings.closeButton')"
           class="q-mr-xl"
           color="accent"
-          data-test="dialogProgramSettings-button-close"
+          data-test-locator="dialogProgramSettings-button-close"
         />
 
         <q-btn
           outline
           :label="$t('dialogs.programSettings.saveButton')"
           color="primary-bright"
-          data-test="dialogProgramSettings-button-save"
+          data-test-locator="dialogProgramSettings-button-save"
           @click="saveAndCloseDialog"
         />
       </q-card-actions>
@@ -306,8 +320,7 @@ watch(() => props.directInput, () => {
 })
 
 /**
- * Checks the prop feed-status on the first mount and open the dialog if the prop is properly fed in
- * This exists mostly due to component tests being flaky otherwise
+ * On first mount, opens the dialog when 'directInput' is already set (stabilizes component tests that feed props before mount).
  */
 onMounted(() => {
   if (props.directInput === 'ProgramSettings') {

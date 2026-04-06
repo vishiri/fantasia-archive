@@ -32,6 +32,6 @@ export const CompositionProductionMenuContract: StoryObj<typeof meta> = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getAllByRole('button').length).toBeGreaterThan(0)
-    await expect(canvasElement.querySelectorAll('[data-test-any-menu="appControlMenus-anyMenu"]').length).toBe(4)
+    await expect(canvasElement.querySelectorAll('[data-test-menu-any="appControlMenus-anyMenu"]').length).toBe(4)
   }
 }

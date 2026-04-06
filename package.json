@@ -11,7 +11,7 @@
     "lint:eslint": "eslint .",
     "lint:stylelint": "stylelint \"src/**/*.{vue,css,scss,sass}\" \".storybook-workspace/.storybook/**/*.{vue,css,scss,sass}\"",
     "lint:stylelint:fix": "stylelint \"src/**/*.{vue,css,scss,sass}\" \".storybook-workspace/.storybook/**/*.{vue,css,scss,sass}\" --fix",
-    "lint:typescript": "tsc -p tsconfig.json --pretty",
+    "lint:typescript": "vue-tsc -p tsconfig.json --noEmit",
     "quasar:build:electron": "quasar build -m electron --publish never",
     "quasar:dev:electron": "quasar dev -m electron",
     "storybook:build": "yarn --cwd .storybook-workspace storybook:build",
@@ -29,7 +29,7 @@
     "test:storybook:visual:headed": "yarn storybook:build && yarn --cwd .storybook-workspace test:storybook:visual:headed",
     "test:storybook:visual:update": "yarn storybook:build && yarn --cwd .storybook-workspace test:storybook:visual:update",
     "test:storybook:visual:update:headed": "yarn storybook:build && yarn --cwd .storybook-workspace test:storybook:visual:update:headed",
-    "test:unit": "vitest run && vitest run --config vitest.components.config.mts",
+    "test:unit": "vitest run && vitest run --config vitest.helpers.config.mts && vitest run --config vitest.components.config.mts",
     "testbatch:ensure:change": "yarn testbatch:verify && yarn quasar:build:electron && yarn test:components && yarn test:e2e && yarn test:storybook:smoke && yarn test:storybook:visual:update",
     "testbatch:ensure:nochange": "yarn testbatch:verify && yarn quasar:build:electron && yarn test:components && yarn test:e2e && yarn test:storybook:smoke && yarn test:storybook:visual",
     "testbatch:verify": "yarn lint:eslint && yarn lint:typescript && yarn lint:stylelint && yarn test:unit"
@@ -89,7 +89,8 @@
     "typescript-eslint": "^8.58.0",
     "vite-plugin-checker": "^0.12.0",
     "vitest": "^4.1.2",
-    "vue-eslint-parser": "^10.0.0"
+    "vue-eslint-parser": "^10.0.0",
+    "vue-tsc": "^2.2.0"
   },
   "engines": {
     "node": ">=22.22.0",

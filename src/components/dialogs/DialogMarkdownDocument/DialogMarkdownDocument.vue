@@ -10,12 +10,12 @@
       <q-card-section :class="['dialogMarkdownDocument__content', `${documentName}`, 'q-mt-xl', 'q-mb-lg', 'q-mr-lg', 'q-ml-xl', 'q-pt-none']">
         <div
           class="flex justify-center"
-          data-test="dialogMarkdownDocument-markdown-wrapper"
+          data-test-locator="dialogMarkdownDocument-markdown-wrapper"
         >
           <!-- Dialog markdown -->
           <q-markdown
             no-heading-anchor-links
-            data-test="dialogMarkdownDocument-markdown-content"
+            data-test-locator="dialogMarkdownDocument-markdown-content"
             :class="[`${documentName}`, 'dialogMarkdownDocument']"
             :src="$t(`documents.${documentName}`)"
           />
@@ -33,7 +33,7 @@
           flat
           :label="$t('dialogs.markdownDocument.closeButton')"
           color="accent"
-          data-test="dialogMarkdownDocument-button-close"
+          data-test-locator="dialogMarkdownDocument-button-close"
         />
       </q-card-actions>
     </q-card>

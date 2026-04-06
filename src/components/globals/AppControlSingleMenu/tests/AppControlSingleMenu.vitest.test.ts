@@ -27,6 +27,6 @@ test('Test that AppControlSingleMenu renders menu title and first item text from
     global: { mocks: { $t: (k: string) => k } }
   })
 
-  expect(w.get('[data-test="AppControlSingleMenu-title"]').text()).toBe('Unit menu')
+  expect(w.get('[data-test-locator="AppControlSingleMenu-title"]').text()).toBe('Unit menu')
   w.unmount()
 })

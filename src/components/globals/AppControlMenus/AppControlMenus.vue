@@ -10,36 +10,36 @@
       <AppControlSingleMenu
         v-if="testingType === 'components'"
         :data-input="componentTestingMenuList"
-        data-test-test-menu="appControlMenus-testMenu"
-        data-test-any-menu="appControlMenus-anyMenu"
+        data-test-menu-test="appControlMenus-testMenu"
+        data-test-menu-any="appControlMenus-anyMenu"
       />
 
       <!-- Project menu -->
       <AppControlSingleMenu
         v-if="testingType !== 'components'"
         :data-input="project"
-        data-test-any-menu="appControlMenus-anyMenu"
+        data-test-menu-any="appControlMenus-anyMenu"
       />
 
       <!-- Documents menu -->
       <AppControlSingleMenu
         v-if="testingType !== 'components'"
         :data-input="documents"
-        data-test-any-menu="appControlMenus-anyMenu"
+        data-test-menu-any="appControlMenus-anyMenu"
       />
 
       <!-- Tools menu -->
       <AppControlSingleMenu
         v-if="testingType !== 'components'"
         :data-input="tools"
-        data-test-any-menu="appControlMenus-anyMenu"
+        data-test-menu-any="appControlMenus-anyMenu"
       />
 
       <!-- Help & Info Menu -->
       <AppControlSingleMenu
         v-if="testingType !== 'components'"
         :data-input="helpInfo"
-        data-test-any-menu="appControlMenus-anyMenu"
+        data-test-menu-any="appControlMenus-anyMenu"
       />
     </q-btn-group>
 

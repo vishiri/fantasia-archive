@@ -32,6 +32,8 @@ yarn
 - **Tests**: Vitest (unit) + Playwright (component and E2E)
 - **Component docs**: Storybook 10 (in `.storybook-workspace/`)
 - **Component `scripts/`** (only when a maintainer asks): bulky logic extracted from a feature `.vue` lives under `src/components/<Feature>/scripts/*.ts` — not beside the `.vue` at the feature root. Agents should not perform this split unless requested; see [AGENTS.md](AGENTS.md) and [.cursor/rules/vue-quasar.mdc](.cursor/rules/vue-quasar.mdc).
+- **Harness helpers (`helpers/`)**: Cross-cutting modules used by Playwright (and similar runners) live under top-level **`helpers/`** in named packages (today: [`helpers/playwrightHelpers/`](helpers/playwrightHelpers/)). Colocate **`tests/*.vitest.test.ts`** next to that code; **`yarn test:unit`** runs them as Vitest project **`unit-helpers`** via **`helpers/**/*.vitest.test.ts`** in **`vitest.helpers.config.mts`** (no manual include list per file). Add or update those Vitest files whenever you add or materially change helper logic. Specs import helpers with the **`app`** alias (for example **`app/helpers/playwrightHelpers/playwrightElectronRecordVideo`**). Strings or constants helpers must share with Electron main belong in **Electron-free** modules (for example **`src-electron/mainScripts/playwrightIsolatedUserDataDirName.ts`**) so Node-side loading never pulls in **`import`** from **`electron`** (see **Electron `userData` isolation** below). Do **not** put Playwright-only harness packages under **`src/`**; keep them under repo-root **`helpers/`** so **`unit-helpers`** stays scoped and **`src/`** stays app code.
+- **Repository root**: Keep the repo root for configuration (**`package.json`**, **Quasar** / **Vite** / **TypeScript** / **ESLint** configs, **`playwright.config.ts`**, **`index.html`**), **`README`**, lockfiles, and the existing **`scripts/`** automation folder. Avoid adding new standalone functional **`.ts`** modules at the root; add new harness packages as subfolders under **`helpers/`** (same pattern as **`helpers/playwrightHelpers/`**).
 
 ### Renderer components (`src/components/`)
 
@@ -126,7 +128,7 @@ yarn test:storybook:visual:update:headed
 
 - **Storybook** — Runs from [`.storybook-workspace/`](.storybook-workspace/) (nested Yarn project) on **Storybook 10** with **Vite 8**, aligned with the root Quasar app’s **`@quasar/app-vite`** v2 line. Config keeps `staticDirs` pointed at the repo [`public/`](public/) folder (and related Vite wiring) so asset paths match the Quasar app.
 - **Electron** — The packaged renderer loads from `file://`. Root-relative `public/` URLs built from `import.meta.env.BASE_URL === '/'` can fail; prefer **relative** paths (e.g. `./images/...`) for those assets unless you control a real HTTP base.
-- **Playwright** — Component and E2E tests drive the **built** app. Run `yarn quasar:build:electron` before `yarn test:components` / `yarn test:e2e` when you change sources those tests cover. Screen recordings attach per test in **`test-results/playwright-report/index.html`** (see **Playwright HTML report and screen recordings** under **Testing**); each run replaces that report folder.
+- **Playwright** — Component and E2E tests drive the **built** app. Run `yarn quasar:build:electron` before `yarn test:components` / `yarn test:e2e` when you change sources those tests cover. Their Electron **`userData`** lives under **`%APPDATA%/<package.json name>/playwright-user-data`** (here **`Roaming\fantasia-archive\playwright-user-data`**, not **`fantasia-archive-dev`**); specs clear that folder in **`test.beforeEach`** via **`helpers/playwrightHelpers/playwrightUserDataReset.ts`** before each launch. See **Electron `userData` isolation** under **Testing**. Screen recordings attach per test in **`test-results/playwright-report/index.html`** (see **Playwright HTML report and screen recordings** under **Testing**); each run replaces that report folder.
 
 #### Storybook workflow charter
 
@@ -187,7 +189,7 @@ Review this table against `src/components/**` stories each iteration and move hi
 
 ### Quality gate (before commit or release)
 
-Run ESLint, the TypeScript project check (`tsc`), Stylelint, and Vitest unit tests in one shot (stops on the first failure):
+Run ESLint, the TypeScript project check (`vue-tsc`, includes `.vue` SFCs), Stylelint, and Vitest unit tests in one shot (stops on the first failure):
 
 ```
 yarn testbatch:verify
@@ -231,9 +233,13 @@ yarn test:unit
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 
 Use Playwright component/E2E tests for rendered behavior and integration flows that rely on the built app runtime.
+
+**Electron `userData` isolation:** Specs set **`TEST_ENV`** to **`components`** or **`e2e`**. The main process then uses **`userData`** under **`%APPDATA%/<package.json name>/playwright-user-data`** (for this repo: **`…\Roaming\fantasia-archive\playwright-user-data`**, not inside **`fantasia-archive-dev`**). The folder name is **`PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME`** in **`src-electron/mainScripts/playwrightIsolatedUserDataDirName.ts`** (shared with **`fixAppName.ts`**, which applies it in Electron). **`electron-store`** and other persisted **`userData`** files from tests live there so they do not overlap **`quasar dev`** (which uses **`…\fantasia-archive-dev`** when **`DEBUGGING`** is set) or a normal packaged run. Each spec calls **`resetFaPlaywrightIsolatedUserData()`** from **`helpers/playwrightHelpers/playwrightUserDataReset.ts`** in **`test.beforeEach`**, which removes that whole folder before **`electron.launch`**, so **`faUserSettings.json`** and the Chromium profile start fresh every test. Rebuild Electron after changing **`fixAppName`** so Playwright picks up the main-process logic.
 ```
 yarn test:components
 ```
+
+**Locators (component and E2E specs):** Prefer stable hooks from `.vue` templates — **`data-test-locator`** for primary ids plus any other `data-test-*` attributes the component defines — and centralize values in each spec’s `selectorList` (see `.cursor/rules/playwright-tests.mdc`). Do **not** use bare `data-test`. Rare exceptions (for example Quasar portaled tooltips with no project hook on the overlay) still use a **named `selectorList` entry whose value is the full locator string** (such as `quasarTooltip: '[role="tooltip"]'`), not an inline literal in the test. For many identical tooltips, duplicate the tooltip string on the trigger (for example `data-test-tooltip-text` on a help icon) for fast assertions, and keep at least one hover-based tooltip check per suite so real display stays verified.
 
 #### Component list test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
@@ -277,6 +283,8 @@ Each Electron component and E2E Playwright test can record a **WebM** screen cap
 
 Set environment variable **`FA_PLAYWRIGHT_NO_VIDEO`** to **`1`** or **`true`** to skip recording and attachment scanning (faster local iterations).
 
+**Synthetic cursor in videos:** Specs call **`installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)`** (from **`helpers/playwrightHelpers/playwrightElectronRecordVideo.ts`**) right after **`electronApp.firstWindow()`** so WebM captures include a high-contrast dot that tracks Playwright-driven pointer position (the real OS cursor is often missing from window-buffer video). Set **`FA_PLAYWRIGHT_CURSOR_MARKER`** to **`0`** or **`false`** to turn that overlay off while keeping **`recordVideo`** enabled.
+
 **Note for tooling and assistants:** Automated models generally **cannot reliably “watch”** binary video the way a human does in a browser; treat **`test-results/playwright-report/index.html`** as the human-facing index of per-test recordings, and point people (or specialized video-aware tools) there rather than expecting inference from raw **`.webm`** bytes alone.
 
 #### One-shot verification (full project gate)
@@ -292,11 +300,11 @@ Set environment variable **`FA_PLAYWRIGHT_NO_VIDEO`** to **`1`** or **`true`** t
 | `yarn lint:eslint` | Run ESLint on project source/config paths. |
 | `yarn lint:stylelint` | Run Stylelint on Vue/CSS/SCSS/Sass under `src/` and Storybook config under `.storybook-workspace/.storybook/`. |
 | `yarn lint:stylelint:fix` | Same paths as `lint:stylelint` with `--fix` (alphabetical declarations, including inside Vue `<style>` blocks). |
-| `yarn lint:typescript` | Run TypeScript project check (`tsc`, no emit). |
+| `yarn lint:typescript` | Run TypeScript project check (`vue-tsc`, no emit; covers `<script setup>` in SFCs). |
 | `yarn testbatch:verify` | Quick gate: lint + typecheck + stylelint + unit tests. |
 | `yarn testbatch:ensure:nochange` | Full gate: `testbatch:verify` + `quasar:build:electron` + Playwright component + E2E + Storybook smoke + `test:storybook:visual` (snapshot compare). |
 | `yarn testbatch:ensure:change` | Same through smoke, then `test:storybook:visual:update` (refresh VRT baselines; use only when intentional). |
-| `yarn test:unit` | Run Vitest core then component unit suites. |
+| `yarn test:unit` | Run Vitest **unit-core**, **unit-helpers** (**`helpers/**/*.vitest.test.ts`**), then **unit-components**. |
 | `yarn test:components` | Run all Playwright component tests (via `scripts/playwrightWithArtifactTrim.mjs`; see **Playwright HTML report and screen recordings** above). |
 | `yarn test:components:single --component=...` | Run a single component Playwright test by folder path (same wrapper as `test:components`). |
 | `yarn test:components:single:ci --component=...` | Run a single component Playwright test by direct path (same wrapper). |

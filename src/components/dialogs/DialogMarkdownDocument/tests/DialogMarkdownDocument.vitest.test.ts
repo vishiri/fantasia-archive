@@ -18,6 +18,6 @@ test('Test that DialogMarkdownDocument activates license layout when directInput
   const html = w.html()
   expect(html).toContain('dialogMarkdownDocument')
   expect(html).toContain('license')
-  expect(w.find('[data-test="dialogMarkdownDocument-markdown-wrapper"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="dialogMarkdownDocument-markdown-wrapper"]').exists()).toBe(true)
   w.unmount()
 })

@@ -13,7 +13,7 @@
       class="globalWindowButtons__button globalWindowButtons__minimize"
       :aria-label="$t('globalWindowButtons.minimizeButton')"
       :title="$t('globalWindowButtons.minimizeButton')"
-      data-test="globalWindowButtons-button-minimize"
+      data-test-locator="globalWindowButtons-button-minimize"
       @click="minimizeWindow()"
     >
       <q-tooltip
@@ -37,7 +37,7 @@
       class="globalWindowButtons__button globalWindowButtons__resize"
       :aria-label="isMaximized ? $t('globalWindowButtons.resizeButton') : $t('globalWindowButtons.maximizeButton')"
       :title="isMaximized ? $t('globalWindowButtons.resizeButton') : $t('globalWindowButtons.maximizeButton')"
-      data-test="globalWindowButtons-button-resize"
+      data-test-locator="globalWindowButtons-button-resize"
       @click="[resizeWindow(),checkIfWindowMaximized()]"
     >
       <q-tooltip
@@ -63,7 +63,7 @@
       class="globalWindowButtons__button globalWindowButtons__close"
       :aria-label="$t('globalWindowButtons.close')"
       :title="$t('globalWindowButtons.close')"
-      data-test="globalWindowButtons-button-close"
+      data-test-locator="globalWindowButtons-button-close"
       @click="tryCloseWindow()"
     >
       <q-tooltip

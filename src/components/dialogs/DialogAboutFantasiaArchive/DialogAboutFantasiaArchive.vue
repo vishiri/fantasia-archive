@@ -40,7 +40,7 @@
           flat
           :label="$t('dialogs.aboutFantasiaArchive.closeButton')"
           color="accent"
-          data-test="dialogComponent-button-close"
+          data-test-locator="dialogComponent-button-close"
         />
       </q-card-actions>
     </q-card>

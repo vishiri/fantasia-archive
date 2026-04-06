@@ -12,7 +12,7 @@ test('Test that SocialContactButtons reports child button count on root dataset'
     global: { mocks: { $t: (k: string) => k } }
   })
 
-  const root = w.get('[data-test="socialContactButtons"]')
+  const root = w.get('[data-test-locator="socialContactButtons"]')
   expect(root.attributes('data-test-button-number')).toBe('7')
   w.unmount()
 })

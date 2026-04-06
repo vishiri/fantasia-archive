@@ -3,9 +3,15 @@ import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
-  getFaPlaywrightElectronRecordVideoPartial
-} from 'app/playwrightElectronRecordVideo'
+  getFaPlaywrightElectronRecordVideoPartial,
+  installFaPlaywrightCursorMarkerIfVideoEnabled
+} from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
+import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
 import type { I_socialContactButton } from 'app/types/I_socialContactButtons'
+
+test.beforeEach(() => {
+  resetFaPlaywrightIsolatedUserData()
+})
 
 /**
  * Button payload for this spec — must match what the app receives via 'COMPONENT_PROPS.dataInput'.
@@ -35,8 +41,8 @@ const extraEnvSettings = {
 const electronMainFilePath:string = extraEnvVariablesAPI.ELECTRON_MAIN_FILEPATH
 
 /**
- * Extra render timer buffer for tests to start after loading the app
- * - Change here in order manually adjust this component's wait times
+ * Buffer before assertions so the component-testing shell finishes rendering.
+ * - Tune this constant only when this spec needs a different wait.
  */
 const faFrontendRenderTimer:number = extraEnvVariablesAPI.FA_FRONTEND_RENDER_TIMER
 
@@ -61,10 +67,11 @@ test('Test if the component exists', async ({}, testInfo) => {
   })
 
   const appWindow = await electronApp.firstWindow()
+  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the menu locator
-  const buttonElement = appWindow.locator(`[data-test="${selectorList.singleButton}"]`)
+  const buttonElement = appWindow.locator(`[data-test-locator="${selectorList.singleButton}"]`)
 
   // Check if the tested element exists
   await expect(buttonElement).toHaveCount(1)
@@ -84,10 +91,11 @@ test('Check if the component has proper title, url and classes', async ({}, test
   })
 
   const appWindow = await electronApp.firstWindow()
+  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the menu locator
-  const buttonElement = appWindow.locator(`[data-test="${selectorList.singleButton}"]`)
+  const buttonElement = appWindow.locator(`[data-test-locator="${selectorList.singleButton}"]`)
 
   // Check if the tested element exists
   await expect(buttonElement).toHaveCount(1)
@@ -112,6 +120,7 @@ test('Check if the component icon has proper src, height and width', async ({}, 
   })
 
   const appWindow = await electronApp.firstWindow()
+  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the menu locator
@@ -156,10 +165,11 @@ test('Check if the component has proper text content', async ({}, testInfo) => {
   })
 
   const appWindow = await electronApp.firstWindow()
+  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the menu locator
-  const buttonIconText = appWindow.locator(`[data-test="${selectorList.singleButtonText}"]`)
+  const buttonIconText = appWindow.locator(`[data-test-locator="${selectorList.singleButtonText}"]`)
 
   // Check if the tested element exists
   await expect(buttonIconText).toHaveCount(1)

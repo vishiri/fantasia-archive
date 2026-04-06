@@ -32,7 +32,7 @@ const stageDecorator: Decorator = (story, context) => {
         </p>
         <div
           class="fa-storybook-globalWindowButtons-stage"
-          data-test="globalWindowButtons-storybook-stage"
+          data-test-locator="globalWindowButtons-storybook-stage"
           style="box-sizing: border-box; min-height: 140px; padding-bottom: 56px;"
         >
           <story />

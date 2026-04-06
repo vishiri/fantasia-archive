@@ -13,7 +13,7 @@ test('Test that GlobalWindowButtons minimize invokes faWindowControl in electron
     global: { mocks: { $t: (k: string) => k } }
   })
 
-  await w.get('[data-test="globalWindowButtons-button-minimize"]').trigger('click')
+  await w.get('[data-test-locator="globalWindowButtons-button-minimize"]').trigger('click')
   expect(window.faContentBridgeAPIs.faWindowControl.minimizeWindow).toHaveBeenCalled()
   w.unmount()
   vi.unstubAllEnvs()
@@ -28,8 +28,8 @@ test('Test that GlobalWindowButtons exposes minimize, resize, and close controls
     global: { mocks: { $t: (k: string) => k } }
   })
 
-  expect(w.find('[data-test="globalWindowButtons-button-minimize"]').exists()).toBe(true)
-  expect(w.find('[data-test="globalWindowButtons-button-resize"]').exists()).toBe(true)
-  expect(w.find('[data-test="globalWindowButtons-button-close"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="globalWindowButtons-button-minimize"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="globalWindowButtons-button-resize"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="globalWindowButtons-button-close"]').exists()).toBe(true)
   w.unmount()
 })

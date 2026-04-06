@@ -3,10 +3,16 @@ import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
-  getFaPlaywrightElectronRecordVideoPartial
-} from 'app/playwrightElectronRecordVideo'
-import type { T_dialogName } from 'app/types/T_dialogList'
+  getFaPlaywrightElectronRecordVideoPartial,
+  installFaPlaywrightCursorMarkerIfVideoEnabled
+} from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import T_socialContactButtons from 'app/src/i18n/en-US/components/other/SocialContactButtons/T_socialContactButtons'
+import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
+import type { T_dialogName } from 'app/types/T_dialogList'
+
+test.beforeEach(() => {
+  resetFaPlaywrightIsolatedUserData()
+})
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -23,8 +29,8 @@ const extraEnvSettings = {
 const electronMainFilePath:string = extraEnvVariablesAPI.ELECTRON_MAIN_FILEPATH
 
 /**
- * Extra render timer buffer for tests to start after loading the app
- * - Change here in order manually adjust this component's wait times
+ * Buffer before assertions so the component-testing shell finishes rendering.
+ * - Tune this constant only when this spec needs a different wait.
  */
 const faFrontendRenderTimer = extraEnvVariablesAPI.FA_FRONTEND_RENDER_TIMER
 
@@ -50,11 +56,12 @@ test('Open test "AboutFantasiaArchive" dialog with all elements in it', async ({
   })
 
   const appWindow = await electronApp.firstWindow()
+  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the selectors for the elements to check
-  const closeButton = appWindow.locator(`[data-test="${selectorList.closeButton}"]`)
-  const socialButtonsWrapper = appWindow.locator(`[data-test="${selectorList.socialButtonsWrapper}"]`)
+  const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
+  const socialButtonsWrapper = appWindow.locator(`[data-test-locator="${selectorList.socialButtonsWrapper}"]`)
 
   // Check if all tested elements exist
   await expect(closeButton).toHaveCount(1)
@@ -78,11 +85,12 @@ test('Open test "AboutFantasiaArchive" dialog and try closing it', async ({}, te
   })
 
   const appWindow = await electronApp.firstWindow()
+  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Prepare the selectors for the elements to check
-  const closeButton = appWindow.locator(`[data-test="${selectorList.closeButton}"]`)
-  const socialButtonsWrapper = appWindow.locator(`[data-test="${selectorList.socialButtonsWrapper}"]`)
+  const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
+  const socialButtonsWrapper = appWindow.locator(`[data-test-locator="${selectorList.socialButtonsWrapper}"]`)
 
   // Check if wrapper exists before closing and then close the dialog
   await expect(socialButtonsWrapper).toHaveCount(1)
@@ -110,11 +118,12 @@ test('Check correct amount and content of social buttons in AboutFantasiaArchive
   })
 
   const appWindow = await electronApp.firstWindow()
+  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
   // Select all social buttons
-  const socialButtonsWrapper = appWindow.locator(`[data-test="${selectorList.socialButtonsWrapper}"]`)
-  const socialButtons = socialButtonsWrapper.locator('[data-test="socialContactSingleButton"]')
+  const socialButtonsWrapper = appWindow.locator(`[data-test-locator="${selectorList.socialButtonsWrapper}"]`)
+  const socialButtons = socialButtonsWrapper.locator('[data-test-locator="socialContactSingleButton"]')
   await expect(socialButtons).toHaveCount(7)
 
   // Check the specific text content for each button

@@ -15,7 +15,7 @@ const stubSetting = (title: string): I_programSettingRenderItem => ({
 
 /**
  * compareProgramSettingsCategoryOrder
- * Puts **developerSettings** last and **accessibility** immediately before it; others sort alphabetically among themselves.
+ * Puts 'developerSettings' last and 'accessibility' immediately before it; others sort alphabetically among themselves.
  */
 test('Test that compareProgramSettingsCategoryOrder orders accessibility before developer and both after ordinary keys', () => {
   const keys = ['developerSettings', 'documentViewEdit', 'accessibility', 'hierarchicalTree']

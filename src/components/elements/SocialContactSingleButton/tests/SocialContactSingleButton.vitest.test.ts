@@ -26,6 +26,6 @@ test('Test that SocialContactSingleButton renders dataInput for default env wiri
   })
 
   expect(w.attributes('title')).toBe(sampleInput.title)
-  expect(w.get('[data-test="socialContactSingleButton-text"]').text()).toBe(sampleInput.label)
+  expect(w.get('[data-test-locator="socialContactSingleButton-text"]').text()).toBe(sampleInput.label)
   w.unmount()
 })

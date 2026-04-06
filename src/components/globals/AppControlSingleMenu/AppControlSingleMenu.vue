@@ -8,13 +8,13 @@
     size="md"
     no-caps
     :ripple="false"
-    data-test="AppControlSingleMenu-wrapper"
+    data-test-locator="AppControlSingleMenu-wrapper"
     :data-test-has-proper-data-input="hasProperDataInput"
   >
     <!-- Main menu - Title -->
     <span
       v-if="menuTitle"
-      data-test="AppControlSingleMenu-title"
+      data-test-locator="AppControlSingleMenu-title"
     >
       {{ menuTitle }}
     </span>
@@ -49,7 +49,7 @@
             v-close-popup="menuItem.submenu === undefined ? true : false"
             clickable
             role="menuitem"
-            data-test="AppControlSingleMenu-menuItem"
+            data-test-locator="AppControlSingleMenu-menuItem"
             :class="['appControlSingleMenu__item', `text-${menuItem.specialColor}`, 'non-selectable']"
             :disable="(!menuItem.conditions)"
             @click="(menuItem.trigger)
@@ -58,14 +58,14 @@
                 : menuItem.trigger()
               : false"
           >
-            <q-item-section data-test="AppControlSingleMenu-menuItem-text">
+            <q-item-section data-test-locator="AppControlSingleMenu-menuItem-text">
               {{ menuItem.text }}
             </q-item-section>
             <q-item-section avatar>
               <q-icon
                 class="appControlSingleMenu__icon"
                 :name="menuItem.icon"
-                data-test="AppControlSingleMenu-menuItem-icon"
+                data-test-locator="AppControlSingleMenu-menuItem-icon"
               />
             </q-item-section>
 
@@ -80,7 +80,7 @@
               transition-show="jump-right"
               transition-hide="jump-left"
               class="-subMenu"
-              data-test="AppControlSingleMenu-menuItem-subMenu"
+              data-test-locator="AppControlSingleMenu-menuItem-subMenu"
             >
               <q-list
                 class="appControlSingleMenu__list"
@@ -104,18 +104,18 @@
                     role="menuitem"
                     :class="['appControlSingleMenu__item', `text-${submenuItem.specialColor}`, 'non-selectable']"
                     :disable="(!submenuItem.conditions)"
-                    data-test="AppControlSingleMenu-menuItem-subMenu-item"
+                    data-test-locator="AppControlSingleMenu-menuItem-subMenu-item"
                     @click="(submenuItem.trigger) ? submenuItem.trigger() : false"
                   >
                     <q-item-section
-                      data-test="AppControlSingleMenu-menuItem-subMenu-item-text"
+                      data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-text"
                     >
                       {{ submenuItem.text }}
                     </q-item-section>
                     <q-item-section avatar>
                       <q-icon
                         class="appControlSingleMenu__icon"
-                        data-test="AppControlSingleMenu-menuItem-subMenu-item-icon"
+                        data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-icon"
                         :name="submenuItem.icon"
                       />
                     </q-item-section>

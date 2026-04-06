@@ -2,12 +2,7 @@ import { defineStore as defineQuasarStore } from '#q-app/wrappers'
 import { createPinia } from 'pinia'
 
 /*
- * If not building with SSR mode, you can
- * directly export the Store instantiation;
- *
- * The function below can be async too; either use
- * async/await or return a Promise which resolves
- * with the Store instance.
+ * Without SSR you may export the Pinia instance directly from this factory. The factory may be async (use async/await or return a Promise that resolves with the configured Pinia instance).
  */
 
 export default defineQuasarStore((/* { ssrContext } */) => {

@@ -1,5 +1,9 @@
 import { test, expect, vi, beforeEach, afterEach } from 'vitest'
-import { determineAppName, fixAppName } from '../fixAppName'
+import {
+  determineAppName,
+  fixAppName,
+  PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME
+} from '../fixAppName'
 import packageJSON from '../../../package.json' with { type: 'json' }
 import path from 'path'
 
@@ -76,5 +80,63 @@ test('Test that fixAppName uses package name without dev suffix when debugging i
   expect(appMock.setPath).toHaveBeenCalledWith(
     'userData',
     path.join('C:/Users/test/AppData/Roaming', packageJSON.name)
+  )
+})
+
+/**
+ * fixAppName
+ * Playwright component mode nests userData so electron-store does not touch the normal profile.
+ */
+test('Test that fixAppName nests userData when TEST_ENV is components', () => {
+  vi.stubEnv('DEBUGGING', undefined)
+  vi.stubEnv('TEST_ENV', 'components')
+  fixAppName()
+
+  expect(appMock.setPath).toHaveBeenCalledWith(
+    'userData',
+    path.join(
+      'C:/Users/test/AppData/Roaming',
+      packageJSON.name,
+      PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME
+    )
+  )
+})
+
+/**
+ * fixAppName
+ * Playwright E2E uses the same isolated userData root as component tests.
+ */
+test('Test that fixAppName nests userData when TEST_ENV is e2e', () => {
+  vi.stubEnv('DEBUGGING', undefined)
+  vi.stubEnv('TEST_ENV', 'e2e')
+  fixAppName()
+
+  expect(appMock.setPath).toHaveBeenCalledWith(
+    'userData',
+    path.join(
+      'C:/Users/test/AppData/Roaming',
+      packageJSON.name,
+      PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME
+    )
+  )
+})
+
+/**
+ * fixAppName
+ * Playwright isolation parents userData on package name even when DEBUGGING would use *-dev for normal dev.
+ */
+test('Test that fixAppName uses package name as Playwright userData root when DEBUGGING and TEST_ENV are both set', () => {
+  vi.stubEnv('DEBUGGING', 'DEBUGGING')
+  vi.stubEnv('TEST_ENV', 'e2e')
+  fixAppName()
+
+  expect(appMock.setName).toHaveBeenCalledWith(`${packageJSON.name}-dev`)
+  expect(appMock.setPath).toHaveBeenCalledWith(
+    'userData',
+    path.join(
+      'C:/Users/test/AppData/Roaming',
+      packageJSON.name,
+      PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME
+    )
   )
 })

@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Vue SFC — BEM and scoped SCSS
 
-This rule covers **CSS class naming** and **`<style lang="scss">`** only. It does not cover `data-test` attributes (see [vue-template-test-hooks.mdc](vue-template-test-hooks.mdc)) or `<script setup>` structure (see [vue-quasar.mdc](vue-quasar.mdc)).
+This rule covers **CSS class naming** and **`<style lang="scss">`** only. It does not cover `data-test-*` template hooks (see [vue-template-test-hooks.mdc](vue-template-test-hooks.mdc)) or `<script setup>` structure (see [vue-quasar.mdc](vue-quasar.mdc)).
 
 ## Block and element classes (template)
 

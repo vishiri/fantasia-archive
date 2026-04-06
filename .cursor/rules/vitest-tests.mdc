@@ -8,17 +8,19 @@ alwaysApply: false
 
 ## Running and reports
 
-- Baseline verification command: `yarn test:unit` (last step of **`yarn testbatch:verify`** alongside ESLint, `tsc`, and Stylelint — see [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) and [git-conventional-commits.mdc](git-conventional-commits.mdc)). This runs **two** Vitest configs in sequence:
-  1. [vitest.config.mts](vitest.config.mts) — Node environment: `src-electron/**`, `src/scripts/**`, `src/boot/**`, `src/stores/**`, `src/i18n/**` `*.vitest.test.ts`.
-  2. [vitest.components.config.mts](vitest.components.config.mts) — `jsdom` + Vue SFC: `src/components/**` `*.vitest.test.ts`, with [vitest.setup.ts](vitest.setup.ts) (Pinia, `window.faContentBridgeAPIs`, i18n loader mock, Quasar `q-*` custom elements).
-- JSON reports: `test-results/vitest-report/test-results-vitest.json` (core) and `test-results/vitest-report/test-results-vitest-components.json` (components).
+- Baseline verification command: `yarn test:unit` (last step of **`yarn testbatch:verify`** alongside ESLint, `tsc`, and Stylelint — see [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) and [git-conventional-commits.mdc](git-conventional-commits.mdc)). This runs **three** Vitest configs in sequence:
+  1. [vitest.config.mts](vitest.config.mts) — project name **`unit-core`**, Node: `src-electron/**`, `src/scripts/**`, `src/boot/**`, `src/stores/**`, `src/i18n/**` `*.vitest.test.ts`.
+  2. [vitest.helpers.config.mts](vitest.helpers.config.mts) — project name **`unit-helpers`**, Node: **`helpers/**/*.vitest.test.ts`** (every **`*.vitest.test.ts`** under **`helpers/`**, e.g. **`helpers/playwrightHelpers/tests/`**).
+  3. [vitest.components.config.mts](vitest.components.config.mts) — project name **`unit-components`**, `jsdom` + Vue SFC: `src/components/**` `*.vitest.test.ts`, with [vitest.setup.ts](vitest.setup.ts) (Pinia, `window.faContentBridgeAPIs`, i18n loader mock, Quasar `q-*` custom elements).
+- JSON reports: `test-results/vitest-report/test-results-vitest.json` (core), `test-results-vitest-helpers.json` (helpers), and `test-results-vitest-components.json` (components).
 
 ## Placement and discovery
 
 - Files must match `**/*vitest.@(spec|test).?(c|m)[jt]s?(x)` — this repo uses **`*.vitest.test.ts`**.
-- Co-locate tests under a **`tests/`** directory next to the code under test, e.g. [src/scripts/_utilities/tests](src/scripts/_utilities/tests), [src/stores/tests](src/stores/tests), [src-electron/contentBridgeAPIs/tests](src-electron/contentBridgeAPIs/tests), [src-electron/mainScripts/tests](src-electron/mainScripts/tests), [src/components/elements/FantasiaMascotImage/tests](src/components/elements/FantasiaMascotImage/tests).
+- Co-locate tests under a **`tests/`** directory next to the code under test, e.g. [src/scripts/_utilities/tests](src/scripts/_utilities/tests), [src/stores/tests](src/stores/tests), [src-electron/contentBridgeAPIs/tests](src-electron/contentBridgeAPIs/tests), [src-electron/mainScripts/tests](src-electron/mainScripts/tests), [helpers/playwrightHelpers/tests](helpers/playwrightHelpers/tests) and future **`helpers/<package>/tests/`** trees (Vitest project **`unit-helpers`**), [src/components/elements/FantasiaMascotImage/tests](src/components/elements/FantasiaMascotImage/tests), [src/components/dialogs/DialogProgramSettings/scripts/tests](src/components/dialogs/DialogProgramSettings/scripts/tests) (logic extracted next to an SFC).
+- When you add a new package under **`helpers/`** (sibling of **`helpers/playwrightHelpers/`**) or new **`.ts`** modules inside an existing helper package, add or extend **`*.vitest.test.ts`** under that package’s **`tests/`** tree in the **same change** whenever the code contains non-trivial branching, I/O, or public API surface (same expectation as **`src-electron`** and **`src/scripts`** helpers).
 - Treat `src/`, `src-electron/`, and **Vue components under `src/components/`** as Vitest unit-testing surfaces when mounting is appropriate; full UI flows remain in Playwright.
-- For `src/components/**`, keep a **1:1 baseline**: every component `.vue` should have a colocated `tests/<ComponentName>.vitest.test.ts`. When adding, renaming, or removing a component, update its matching Vitest file in the same change.
+- For `src/components/**`, keep a **1:1 baseline**: every component `.vue` should have a colocated `tests/<ComponentName>.vitest.test.ts`. When adding, renaming, or removing a component, update its matching Vitest file in the same change. **Extracted `scripts/*.ts`** beside that component should carry **focused `scripts/tests/*.vitest.test.ts`** when they introduce testable logic (stores, transforms, toggles)—not every one-line wrapper, but anything you would regret breaking silently.
 
 ## Vue and renderer test boundaries
 
@@ -29,6 +31,7 @@ alwaysApply: false
 - **`_data/` is for production feeds only** (menus, button lists, locale-backed blobs the app ships). Do **not** put **Vitest fixtures** there.
 - **All Vitest fixture data** (sample props, mock objects, expected literals) must live **inside** the same `*.vitest.test.ts` file: inline **`const`** / object literals at module scope next to imports or immediately above the test that uses them. Do **not** add sibling `tests/*.ts` files whose only purpose is to hold data for Vitest. Do **not** use `tests/_data/`.
 - **No automated tests for `_data/` modules**: do **not** add Vitest (or Playwright specs) aimed **only** at **any** file under **`_data/`** (e.g. `src/components/**/_data/**`). Cover production `_data` **indirectly** through components or scripts that import it—not with dedicated tests whose SUT is a `_data/` path.
+- When selecting mounted DOM in component Vitest files, use the same **`data-test-locator`** / `data-test-*` attribute names as production templates and Playwright (for example `w.get('[data-test-locator="…"]')`); do **not** query bare `data-test`.
 
 ## Imports
 
@@ -39,10 +42,10 @@ alwaysApply: false
 
 ## Documenting each test block
 
-Use a JSDoc comment immediately above `test` or `test.skip` (same style rules as [eslint-typescript.mdc](eslint-typescript.mdc) code comments: no Markdown emphasis in comment text; use single quotes instead of grave accents for inline references):
+Use a JSDoc comment immediately above `test` or `test.skip` (same style rules as [eslint-typescript.mdc](eslint-typescript.mdc) code comments: no Markdown emphasis in comment text; use single quotes instead of grave accents for inline references). Do not split a single sentence across ` * ` lines for wrapping; use full lines or ` * - ` bullets (see [AGENTS.md](../../AGENTS.md) code comments).
 
 1. **First line**: name of the function, API export, or concern (e.g. `determineAppName`, `checkIfExternal`, `startApp`).
-2. **Following lines**: scenario, expected behavior, or why the test is skipped.
+2. **Following lines**: scenario, expected behavior, or why the test is skipped — each as a complete line or bullet, not a wrapped continuation of the first line mid-clause.
 
 Examples in the codebase:
 
