@@ -53,7 +53,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 
 Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-electron/electron-preload.ts`) and typed in `src/globals.d.ts`. New surface area: implement in `src-electron/contentBridgeAPIs/`, register in preload, update types, add tests under `contentBridgeAPIs/tests/`. Details: `.cursor/skills/fantasia-electron-preload/SKILL.md`.
 
-**Main ↔ preload IPC**: Any feature that uses `ipcRenderer` from preload and `ipcMain` in main must share channel strings from `src-electron/electron-ipc-bridge.ts` (add a new `export const` group there). Wire main-side handlers in `src-electron/mainScripts/ipcManagement/register*Ipc.ts` (see existing `registerFaDevToolsIpc` / `registerFaUserSettingsIpc`), invoke those registrars during app startup (`startApp()` in `mainScripts/appManagement.ts`, which `electron-main.ts` calls), and use the same constants from the matching `contentBridgeAPIs/` module.
+**Main ↔ preload IPC**: Any feature that uses `ipcRenderer` from preload and `ipcMain` in main must share channel strings from `src-electron/electron-ipc-bridge.ts` (add a new `export const` group there). Wire main-side handlers in `src-electron/mainScripts/ipcManagement/register*Ipc.ts` (see existing `registerFaDevToolsIpc` / `registerFaUserSettingsIpc`), invoke those registrars during app startup (`startApp()` in `mainScripts/appManagement.ts`, which `electron-main.ts` calls), and use the same constants from the matching `contentBridgeAPIs/` module. Persisted user settings in main live under `src-electron/mainScripts/userSettings/` (`userSettingsStore.ts`, `faUserSettingsDefaults.ts`); `registerFaUserSettingsIpc` imports the store from there.
 
 ## Code comments (JSDoc, line comments, block comments)
 
@@ -171,7 +171,7 @@ The same Vue UI runs under **dev server**, **Storybook**, **packaged Electron (`
 
 Use different instructions or @-references when starting a task:
 
-1. **Electron and preload** — Focus on `src-electron/`, bridge security, `globals.d.ts`, `electron-ipc-bridge.ts` for IPC channel names, Vitest for bridge and `mainScripts/ipcManagement/register*Ipc` modules.
+1. **Electron and preload** — Focus on `src-electron/`, bridge security, `globals.d.ts`, `electron-ipc-bridge.ts` for IPC channel names, Vitest for `contentBridgeAPIs`, `mainScripts/ipcManagement/register*Ipc`, and other `mainScripts/<area>/` modules (see **Architecture** in `README.md`).
 2. **Tests** — Vitest unit coverage in `src/` (including **`src/components/**`**, **`src/layouts/**`**, **`src/pages/**`**) + `src-electron/`, Playwright integration flows, build order, `e2e-tests/` vs `src/components/**/tests/`.
 3. **Feature / UI** — `src/` Vue + Quasar, Pinia, router, `ComponentTesting` page, i18n strings. Place SFCs under **`src/components/dialogs/`**, **`globals/`**, **`elements/`**, or **`other/`** per [README](README.md) and this file. For **large production menu/config data**, split across **`src/components/<bucket>/<Feature>/_data/*.ts`**. When the **user explicitly requests** moving bulky **SFC script** logic out of a `.vue`, place those modules **only** under **`src/components/<bucket>/<Feature>/scripts/*.ts`**. Rare **embedded** component-mode-only payloads may live as **`const` inside the `.vue`**; Playwright passes isolated props via **`COMPONENT_PROPS`** defined inline in each spec. Details: [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc).
 4. **Data / SQLite** — Main-process storage, `userData` paths, migrations, exposing data via narrow preload APIs only.
@@ -184,7 +184,7 @@ Use different instructions or @-references when starting a task:
 | `fantasia-dev-setup`            | Yarn, Node.js 22.22+, Quasar dev/build commands                     |
 | `fantasia-testing`              | Vitest and Playwright workflows                                     |
 | `fantasia-electron-preload`     | `faContentBridgeAPIs`, preload, and `electron-ipc-bridge.ts` IPC names |
-| `fantasia-electron-main`        | Main process lifecycle, `mainScripts/`, and `ipcManagement/register*Ipc` handlers   |
+| `fantasia-electron-main`        | Main process lifecycle, `mainScripts/` feature folders (`appIdentity`, `windowManagement`, `chromiumFixes`, `userSettings`, `nativeShell`, `ipcManagement`), and `appManagement.ts`   |
 | `fantasia-quasar-vue`           | Vue/Quasar app structure                                            |
 | `fantasia-i18n`                 | Locales and `T_`* message modules                                   |
 | `fantasia-sqlite-main`          | SQLite in main process                                              |

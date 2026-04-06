@@ -24,6 +24,7 @@ description: >-
 ## Remote and windows
 
 - `@electron/remote` is a dependency; bridge APIs may use it from preload-side modules. When refactoring window control, keep renderer exposure minimal and typed.
+- **Preload path** (`windowManagement/mainWindowCreation.ts`): Resolve `electron-preload` and the window icon with `path.resolve(currentDir, …)` where `currentDir` is `dirname(fileURLToPath(import.meta.url))` for the **bundled main-process chunk** (Quasar emits one main bundle; nested source folders like `windowManagement/` do not appear in that path). Do **not** add an extra parent `..` assuming `currentDir` is a subfolder of `mainScripts/` — that breaks preload loading, skips `contextBridge`, and leaves `window.faContentBridgeAPIs` undefined (component tests fall back to `/` instead of `/componentTesting/...`).
 
 ## SQLite and files
 
