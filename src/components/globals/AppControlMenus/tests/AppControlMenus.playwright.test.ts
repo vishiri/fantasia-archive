@@ -1,6 +1,10 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
+import {
+  closeFaElectronAppWithRecordedVideoAttachments,
+  getFaPlaywrightElectronRecordVideoPartial
+} from 'app/playwrightElectronRecordVideo'
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -33,10 +37,11 @@ const selectorList = {
 /**
  * Load a custom "Test Title" menu button in the menu and check if it loaded
  */
-test('Load "Test Title" menu button sub-component', async () => {
+test('Load "Test Title" menu button sub-component', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -49,16 +54,17 @@ test('Load "Test Title" menu button sub-component', async () => {
   await expect(testMenu).toHaveCount(1)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Check if we have exactly one testing menu loaded
  */
-test('Check if we have exactly one testing menu loaded', async () => {
+test('Check if we have exactly one testing menu loaded', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -71,5 +77,5 @@ test('Check if we have exactly one testing menu loaded', async () => {
   await expect(anyMenus).toHaveCount(1)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })

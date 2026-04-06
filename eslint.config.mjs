@@ -100,4 +100,10 @@ export default [...neostandard({
       allowAllPropertiesOnSameLine: false
     }]
   }
+}, {
+  files: ['**/*playwright*.ts'],
+  rules: {
+    // Playwright requires object destructuring on the first test callback argument; '{}' is valid when no fixtures are used.
+    'no-empty-pattern': 'off'
+  }
 }, ...storybook.configs['flat/recommended']]

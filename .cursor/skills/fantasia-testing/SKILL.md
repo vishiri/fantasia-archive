@@ -45,12 +45,19 @@ Match **existing** tests to the letter when adding or editing:
 
 ### Config highlights (`playwright.config.ts`)
 
-- `testMatch`: `**/*playwright.@(spec|test).?(c|m)[jt]s?(x)`
+- Single **`outputDir`**: `test-results/playwright-artifacts` (per-test subfolders; Playwright copies `testInfo.attach` path-based files into each test's `attachments/`). **`testMatch`** limits runs to `src/components/**` and `e2e-tests/**`. HTML report: **`test-results/playwright-report`** (attachment bytes are duplicated into `playwright-report/data/`). **`yarn test:components`** / **`yarn test:e2e`** (and single-spec variants) run via **`scripts/playwrightWithArtifactTrim.mjs`**, which deletes **`test-results/playwright-artifacts`** after the run so only the HTML report tree (including `data/*.webm`) remains. Raw `recordVideo` output uses an OS temp dir and is removed after attach ([`playwrightElectronRecordVideo.ts`](../../../playwrightElectronRecordVideo.ts)).
 - `workers: 1`, `fullyParallel: false` — assume sequential, single-worker runs unless you change config.
+- Electron component and E2E specs use `getFaPlaywrightElectronRecordVideoPartial(testInfo)` in `electron.launch` and `closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)` instead of raw `electronApp.close()`. Recordings use **1920×1080** via `recordVideo.size`. Set env `FA_PLAYWRIGHT_NO_VIDEO` to `'1'` or `'true'` to skip recording and attachment scan.
+
+### Videos and HTML report (human review and agents)
+
+- Each Electron Playwright test can produce a **usable WebM** recording attached to that test in the **HTML report**. After **`yarn test:components`**, **`yarn test:e2e`**, or the **`:single`** / **`:single:ci`** variants, open **`test-results/playwright-report/index.html`** in a browser, drill into a test, and use **Attachments** to play or save the video. Files the UI plays from live under **`test-results/playwright-report/data/`** (content-addressed names).
+- **Report and scratch output are ephemeral across runs:** every Playwright invocation **regenerates** **`test-results/playwright-report/`**. Running a **different** suite (component vs E2E) or **re-running** the same suite **replaces** the previous report—nothing is accumulated there. The yarn Playwright scripts also remove **`test-results/playwright-artifacts`** after each run via **`scripts/playwrightWithArtifactTrim.mjs`** so duplicate on-disk copies are not kept beside the report.
+- **LLMs / agents:** do not assume you can meaningfully “analyze” full motion video from repo context alone. Prefer telling the user to open **`test-results/playwright-report/index.html`** (or to share a screenshot or textual failure) rather than treating raw **`.webm`** blobs as inspectable prose.
 
 ### Component tests
 
-- **Structure**: Match imports, header constants (`extraEnvSettings`, `electronMainFilePath`, `faFrontendRenderTimer`, `selectorList`), JSDoc per test, inline `// Prepare` / `// Check` / `// Close the app` comments, and `electron.launch` / `electronApp.close()` flow — see [`.cursor/rules/playwright-tests.mdc`](../../rules/playwright-tests.mdc) and any existing test beside the component.
+- **Structure**: Match imports, header constants (`extraEnvSettings`, `electronMainFilePath`, `faFrontendRenderTimer`, `selectorList`), JSDoc per test, inline `// Prepare` / `// Check` / `// Close the app` comments, and `electron.launch` / `closeFaElectronAppWithRecordedVideoAttachments` flow — see [`.cursor/rules/playwright-tests.mdc`](../../rules/playwright-tests.mdc) and any existing test beside the component.
 - **Typing**: Keep selectors, props payloads, and helper arguments strongly typed; avoid `any`.
 
 - **Command**: `yarn test:components`

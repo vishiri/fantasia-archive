@@ -126,7 +126,7 @@ yarn test:storybook:visual:update:headed
 
 - **Storybook** — Runs from [`.storybook-workspace/`](.storybook-workspace/) (nested Yarn project) on **Storybook 10** with **Vite 8**, aligned with the root Quasar app’s **`@quasar/app-vite`** v2 line. Config keeps `staticDirs` pointed at the repo [`public/`](public/) folder (and related Vite wiring) so asset paths match the Quasar app.
 - **Electron** — The packaged renderer loads from `file://`. Root-relative `public/` URLs built from `import.meta.env.BASE_URL === '/'` can fail; prefer **relative** paths (e.g. `./images/...`) for those assets unless you control a real HTTP base.
-- **Playwright** — Component and E2E tests drive the **built** app. Run `yarn quasar:build:electron` before `yarn test:components` / `yarn test:e2e` when you change sources those tests cover.
+- **Playwright** — Component and E2E tests drive the **built** app. Run `yarn quasar:build:electron` before `yarn test:components` / `yarn test:e2e` when you change sources those tests cover. Screen recordings attach per test in **`test-results/playwright-report/index.html`** (see **Playwright HTML report and screen recordings** under **Testing**); each run replaces that report folder.
 
 #### Storybook workflow charter
 
@@ -269,6 +269,16 @@ yarn test:e2e:list
 yarn test:e2e:single --spec=SPEC_FILE_NAME
 ```
 
+#### Playwright HTML report and screen recordings (Electron component + E2E)
+
+Each Electron component and E2E Playwright test can record a **WebM** screen capture (full HD by default) and attach it to that test’s result. After **`yarn test:components`**, **`yarn test:e2e`**, or the matching **`:single`** / **`:single:ci`** scripts, open **`test-results/playwright-report/index.html`** in a browser, open a test, and use the **Attachments** section to play or download the video. The report bundles playable files under **`test-results/playwright-report/data/`** (hashed names).
+
+**Lifecycle:** Every Playwright run **regenerates** **`test-results/playwright-report/`** (and its **`data/`** tree). Running component tests and then E2E tests (or the reverse, or the same suite again) **replaces** the previous report—there is no merge of old and new runs. The **`yarn test:components`** and **`yarn test:e2e`** scripts run through **`scripts/playwrightWithArtifactTrim.mjs`**, which deletes **`test-results/playwright-artifacts`** after the run so intermediate attachment copies are not kept on disk; only the HTML report folder remains useful for videos. If you invoke **`playwright test`** directly without that wrapper, **`test-results/playwright-artifacts`** may persist until you remove it.
+
+Set environment variable **`FA_PLAYWRIGHT_NO_VIDEO`** to **`1`** or **`true`** to skip recording and attachment scanning (faster local iterations).
+
+**Note for tooling and assistants:** Automated models generally **cannot reliably “watch”** binary video the way a human does in a browser; treat **`test-results/playwright-report/index.html`** as the human-facing index of per-test recordings, and point people (or specialized video-aware tools) there rather than expecting inference from raw **`.webm`** bytes alone.
+
 #### One-shot verification (full project gate)
 
 **`yarn testbatch:ensure:nochange`** runs **`yarn testbatch:verify`**, a production Electron build, **`yarn test:components`**, **`yarn test:e2e`**, **`yarn test:storybook:smoke`**, and **`yarn test:storybook:visual`** in sequence—the intentional way to chain lint, unit tests, build, both Playwright suites, and Storybook smoke plus snapshot compare. **`yarn testbatch:ensure:change`** is the same through smoke, then **`yarn test:storybook:visual:update`** instead of compare; use only when you mean to regenerate baselines. For lighter checks, run **`yarn test:unit`** and individual commands in their own terminals (see [testing-terminal-isolation](.cursor/rules/testing-terminal-isolation.mdc) in this repo).
@@ -287,13 +297,13 @@ yarn test:e2e:single --spec=SPEC_FILE_NAME
 | `yarn testbatch:ensure:nochange` | Full gate: `testbatch:verify` + `quasar:build:electron` + Playwright component + E2E + Storybook smoke + `test:storybook:visual` (snapshot compare). |
 | `yarn testbatch:ensure:change` | Same through smoke, then `test:storybook:visual:update` (refresh VRT baselines; use only when intentional). |
 | `yarn test:unit` | Run Vitest core then component unit suites. |
-| `yarn test:components` | Run all Playwright component tests. |
-| `yarn test:components:single --component=...` | Run a single component Playwright test by folder path. |
-| `yarn test:components:single:ci --component=...` | Run a single component Playwright test by direct path. |
+| `yarn test:components` | Run all Playwright component tests (via `scripts/playwrightWithArtifactTrim.mjs`; see **Playwright HTML report and screen recordings** above). |
+| `yarn test:components:single --component=...` | Run a single component Playwright test by folder path (same wrapper as `test:components`). |
+| `yarn test:components:single:ci --component=...` | Run a single component Playwright test by direct path (same wrapper). |
 | `yarn test:components:list` | Open interactive picker for component Playwright tests. |
-| `yarn test:e2e` | Run all Playwright E2E tests. |
-| `yarn test:e2e:single --spec=...` | Run one E2E spec by spec file name. |
-| `yarn test:e2e:single:ci --spec=...` | Run one E2E spec by direct path. |
+| `yarn test:e2e` | Run all Playwright E2E tests (same wrapper and report lifecycle as `test:components`). |
+| `yarn test:e2e:single --spec=...` | Run one E2E spec by spec file name (same wrapper). |
+| `yarn test:e2e:single:ci --spec=...` | Run one E2E spec by direct path (same wrapper). |
 | `yarn test:e2e:list` | Open interactive picker for E2E tests. |
 | `yarn test:storybook:smoke` | Run Storybook smoke check in CI-friendly mode. |
 | `yarn test:storybook:visual` | Compare Storybook stories with committed Playwright visual snapshots. |

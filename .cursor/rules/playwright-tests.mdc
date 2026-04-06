@@ -11,7 +11,14 @@ JSDoc above tests and line comments in these files: follow AGENTS.md code-commen
 ## Preconditions
 
 - Run against a **production Electron build** after relevant source changes (`yarn quasar:build:electron` / `quasar build -m electron`). See [README.md](README.md).
-- [playwright.config.ts](playwright.config.ts): `workers: 1`, `fullyParallel: false`, `testMatch` includes both `*.playwright.test.ts` and `*.playwright.spec.ts`.
+- [playwright.config.ts](playwright.config.ts): `workers: 1`, `fullyParallel: false`, unified `outputDir` `test-results/playwright-artifacts`, and `testMatch` covering `src/components/**` and `e2e-tests/**` Playwright files. HTML report: `test-results/playwright-report` (sibling folder to avoid reporter vs artifact path overlap).
+
+## HTML report and screen recordings
+
+- Each Electron test attaches **WebM** screen video (see [playwrightElectronRecordVideo.ts](playwrightElectronRecordVideo.ts)) unless `FA_PLAYWRIGHT_NO_VIDEO` is set. Open **`test-results/playwright-report/index.html`** after a run, open a test, and use **Attachments** to play or download; playable files are under **`test-results/playwright-report/data/`**.
+- **Every** Playwright run **replaces** the HTML report folder. Running component tests, then E2E (or the reverse, or a repeat of either) **overwrites** the prior report—there is no merge across runs.
+- Root **`yarn test:components`** / **`yarn test:e2e`** (and **`:single`** / **`:single:ci`**) use **`scripts/playwrightWithArtifactTrim.mjs`**, which deletes **`test-results/playwright-artifacts`** after the run. Raw `recordVideo` output uses a temp dir under the OS temp folder, then is attached and trimmed (see `playwrightElectronRecordVideo.ts`).
+- For agents: point humans to **`test-results/playwright-report/index.html`** for per-test videos; do not assume reliable analysis of raw **`.webm`** bytes without specialized tooling.
 
 ## Vue templates (hooks for locators)
 
@@ -29,7 +36,8 @@ Attributes such as `data-test` and the menu-specific `data-test-test-menu` / `da
 1. `import { _electron as electron } from 'playwright'`
 2. `import { test, expect } from '@playwright/test'`
 3. `import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'`
-4. Optional: types from `app/types/...`, production **`_data/`** when the spec must stay aligned with runtime (prefer a small parallel module over importing heavy feeds), shared helpers from `src/scripts/_utilities/...` (e.g. [AppControlSingleMenu.playwright.test.ts](src/components/globals/AppControlSingleMenu/tests/AppControlSingleMenu.playwright.test.ts))
+4. `closeFaElectronAppWithRecordedVideoAttachments` and `getFaPlaywrightElectronRecordVideoPartial` from `'app/playwrightElectronRecordVideo'` (after `extraEnvVariablesAPI`)
+5. Optional: types from `app/types/...`, production **`_data/`** when the spec must stay aligned with runtime (prefer a small parallel module over importing heavy feeds), shared helpers from `src/scripts/_utilities/...` (e.g. [AppControlSingleMenu.playwright.test.ts](src/components/globals/AppControlSingleMenu/tests/AppControlSingleMenu.playwright.test.ts))
 
 ## File header — documented constants
 
@@ -55,13 +63,13 @@ Repeat this structure in **every** Playwright file (see [GlobalWindowButtons.pla
 - **Title**: readable sentence (often starts with `Check if ...`, `Test if ...`, `Click ...`, `Open ...`).
 - **Body pattern**:
   1. Optionally mutate `extraEnvSettings` (e.g. `COMPONENT_PROPS`) before launch — [FantasiaMascotImage.playwright.test.ts](src/components/elements/FantasiaMascotImage/tests/FantasiaMascotImage.playwright.test.ts).
-  2. `const electronApp = await electron.launch({ env: extraEnvSettings, args: [electronMainFilePath] })`
+  2. Top-level `test(...)` callback must take `({}, testInfo)` (object destructuring is required by Playwright) so recordings can use `testInfo`. `const electronApp = await electron.launch({ env: extraEnvSettings, args: [electronMainFilePath], ...getFaPlaywrightElectronRecordVideoPartial(testInfo) })` — import `getFaPlaywrightElectronRecordVideoPartial` from `'app/playwrightElectronRecordVideo'` (after `extraEnvVariablesAPI`); raw `recordVideo` files are written under an OS temp dir, then `closeFaElectronAppWithRecordedVideoAttachments` attaches them (Playwright copies into `test-results/playwright-artifacts/.../attachments/`) and deletes the temp dir. The HTML reporter then copies bytes into `test-results/playwright-report/data/`; root `package.json` Playwright scripts run `scripts/playwrightWithArtifactTrim.mjs` afterward to remove `test-results/playwright-artifacts` so only report `data/` remains on disk. **1920×1080** (`recordVideo.size`) unless `FA_PLAYWRIGHT_NO_VIDEO` is `'1'` or `'true'`. Each `electron.launch` must use its own `getFaPlaywrightElectronRecordVideoPartial(testInfo)` call (optional second argument is reserved, unused). Nested callbacks (e.g. `expect.poll`) keep `async () => { ... }` — do not add `testInfo` there.
   3. `const appWindow = await electronApp.firstWindow()`
   4. `await appWindow.waitForTimeout(faFrontendRenderTimer)` (or 0 / other agreed wait)
   5. `// Prepare the ... locator` — use `appWindow.locator` with a template string and `selectorList` values (same pattern as [GlobalWindowButtons.playwright.test.ts](src/components/globals/GlobalWindowButtons/tests/GlobalWindowButtons.playwright.test.ts)), or `getByText` with `selectorList` entries ([checkDevToolsFunctionality.playwright.spec.ts](e2e-tests/checkDevToolsFunctionality.playwright.spec.ts))
   6. `// Check if ...` — `await expect(...).toHaveCount(1)` or equivalent
   7. Interactions, `waitForTimeout` for animations (often `600` ms for menus), `appWindow.evaluate` for `window.faContentBridgeAPIs...` when needed
-  8. `// Close the app` then `await electronApp.close()` — **always** close the app at the end of the test (including early returns after failure paths if the file already uses that pattern — [checkAppSplashScreen.playwright.spec.ts](e2e-tests/checkAppSplashScreen.playwright.spec.ts))
+  8. `// Close the app` then `await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)` — closes Electron, then attaches `.webm` files under `testInfo.outputDir` so the HTML report shows video links (including early returns after failure paths — [checkAppSplashScreen.playwright.spec.ts](e2e-tests/checkAppSplashScreen.playwright.spec.ts))
 
 ## Locators
 

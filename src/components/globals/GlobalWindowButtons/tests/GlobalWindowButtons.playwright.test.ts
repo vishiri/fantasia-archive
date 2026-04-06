@@ -1,6 +1,10 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
+import {
+  closeFaElectronAppWithRecordedVideoAttachments,
+  getFaPlaywrightElectronRecordVideoPartial
+} from 'app/playwrightElectronRecordVideo'
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -37,10 +41,11 @@ const selectorList = {
  * - Resize button
  * - Close button
  */
-test('Wrapper should contain three specific buttons', async () => {
+test('Wrapper should contain three specific buttons', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -57,16 +62,17 @@ test('Wrapper should contain three specific buttons', async () => {
   await expect(closeButton).toHaveCount(1)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Attempt to click the resize button
  */
-test('Click resize button - "smallify"', async () => {
+test('Click resize button - "smallify"', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -83,16 +89,17 @@ test('Click resize button - "smallify"', async () => {
   await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === false)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Attempt to click the resize button, twice
  */
-test('Click resize button - "maximize"', async () => {
+test('Click resize button - "maximize"', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -126,16 +133,17 @@ test('Click resize button - "maximize"', async () => {
   await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === true)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Attempt to click the minimize button
  */
-test('Click minimize button', async () => {
+test('Click minimize button', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -152,16 +160,17 @@ test('Click minimize button', async () => {
   await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === false)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Attempt to click the close button
  */
-test('Click close button', async () => {
+test('Click close button', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -183,5 +192,5 @@ test('Click close button', async () => {
   await windowCloseEvent
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })

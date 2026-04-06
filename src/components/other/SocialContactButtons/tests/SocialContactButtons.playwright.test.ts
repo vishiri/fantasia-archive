@@ -1,6 +1,10 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
+import {
+  closeFaElectronAppWithRecordedVideoAttachments,
+  getFaPlaywrightElectronRecordVideoPartial
+} from 'app/playwrightElectronRecordVideo'
 import type { I_socialContactButtonSet } from 'app/types/I_socialContactButtons'
 
 /**
@@ -52,10 +56,11 @@ const selectorList = {
 /**
  * Check if the wrapper for all of the buttons exists
  */
-test('Check if the main button wrapper exists', async () => {
+test('Check if the main button wrapper exists', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -68,16 +73,17 @@ test('Check if the main button wrapper exists', async () => {
   await expect(buttonWrapperLocator).toHaveCount(1)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Check if we have the proper amount of buttons on the page
  */
-test('Check if we have the proper amount of buttons on the page', async () => {
+test('Check if we have the proper amount of buttons on the page', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -101,16 +107,17 @@ test('Check if we have the proper amount of buttons on the page', async () => {
   await expect(buttonsSelectorLocator).toHaveCount(expectedSingleButtonCount)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Check if each button is unique (class comparing)
  */
-test('Check if each button is unique', async () => {
+test('Check if each button is unique', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -140,5 +147,5 @@ test('Check if each button is unique', async () => {
   expect(hasDuplicateClass).not.toBeTruthy()
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })

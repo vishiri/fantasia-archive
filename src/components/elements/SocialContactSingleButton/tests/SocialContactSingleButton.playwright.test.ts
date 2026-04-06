@@ -1,6 +1,10 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
+import {
+  closeFaElectronAppWithRecordedVideoAttachments,
+  getFaPlaywrightElectronRecordVideoPartial
+} from 'app/playwrightElectronRecordVideo'
 import type { I_socialContactButton } from 'app/types/I_socialContactButtons'
 
 /**
@@ -49,10 +53,11 @@ const selectorList = {
 /**
  * Test if the component exists
  */
-test('Test if the component exists', async () => {
+test('Test if the component exists', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -65,16 +70,17 @@ test('Test if the component exists', async () => {
   await expect(buttonElement).toHaveCount(1)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Check if the component has proper title, url and classes
  */
-test('Check if the component has proper title, url and classes', async () => {
+test('Check if the component has proper title, url and classes', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -92,16 +98,17 @@ test('Check if the component has proper title, url and classes', async () => {
   expect(buttonTitle).toBe(dataTitle)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Check if the component icon has proper src, height and width
  */
-test('Check if the component icon has proper src, height and width', async () => {
+test('Check if the component icon has proper src, height and width', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -135,16 +142,17 @@ test('Check if the component icon has proper src, height and width', async () =>
   expect(roundedImageHeight).toBe(roundedTestHeight)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Check if the component has proper text content
  */
-test('Check if the component has proper text content', async () => {
+test('Check if the component has proper text content', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -162,5 +170,5 @@ test('Check if the component has proper text content', async () => {
   expect(buttonText).toBe(dataText)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })

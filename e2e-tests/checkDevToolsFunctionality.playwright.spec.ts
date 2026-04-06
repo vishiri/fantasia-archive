@@ -1,6 +1,10 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
+import {
+  closeFaElectronAppWithRecordedVideoAttachments,
+  getFaPlaywrightElectronRecordVideoPartial
+} from 'app/playwrightElectronRecordVideo'
 
 /**
  * Extra env settings to trigger testing via Playwright
@@ -36,10 +40,11 @@ const selectorList = {
 /**
  * Check if dev tools toggle properly on and off using the menu button
  */
-test('Dev tools toggle properly', async () => {
+test('Dev tools toggle properly', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -98,5 +103,5 @@ test('Dev tools toggle properly', async () => {
   }, { timeout: 15_000 }).toBe(false)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })

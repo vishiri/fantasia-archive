@@ -1,6 +1,10 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
+import {
+  closeFaElectronAppWithRecordedVideoAttachments,
+  getFaPlaywrightElectronRecordVideoPartial
+} from 'app/playwrightElectronRecordVideo'
 
 /**
  * Extra env settings to trigger testing via Playwright
@@ -30,12 +34,13 @@ const selectorList = {
 /**
  * Check if the splash screen displays properly on load of the app
  */
-test('Splash screen works properly', async () => {
+test('Splash screen works properly', async ({}, testInfo) => {
   const testSplashscreenTimeout = 3000
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -45,7 +50,11 @@ test('Splash screen works properly', async () => {
   const wrapperElement = appWindow.locator(`[data-test="${selectorList.wrapper}"]`)
 
   // Check if the tested element exists
-  if (await wrapperElement.count() === 0) { test.fail(); await electronApp.close(); return }
+  if (await wrapperElement.count() === 0) {
+    test.fail()
+    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
+    return
+  }
 
   // Check if the splash screen is visible on innitial load
   const elementOpacityFirstRender = await appWindow.evaluate((selectorList) => {
@@ -73,19 +82,20 @@ test('Splash screen works properly', async () => {
   expect(elementOpacityAfterAppLoad).toBe('0')
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Check if the splash screen has proper colors in RGB format
  */
-test('Splash screen has proper colors', async () => {
+test('Splash screen has proper colors', async ({}, testInfo) => {
   const testStringBackgroundColorRGB = 'rgb(24, 48, 58)'
   const testStringPathFillColorRGB = 'rgb(215, 172, 71)'
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -112,19 +122,20 @@ test('Splash screen has proper colors', async () => {
   expect(elementPathFillColor).toBe(testStringPathFillColorRGB)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Check if the splash screen has proper sizings
  */
-test('Splash screen has proper sizings', async () => {
+test('Splash screen has proper sizings', async ({}, testInfo) => {
   const testStringWidth = '350px'
   const testStringHeight = '350px'
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -152,5 +163,5 @@ test('Splash screen has proper sizings', async () => {
   expect(roundedIconHeight).toBe(roundedTestStringHeight)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })

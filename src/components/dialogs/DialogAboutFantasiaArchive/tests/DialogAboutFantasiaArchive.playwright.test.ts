@@ -1,6 +1,10 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
+import {
+  closeFaElectronAppWithRecordedVideoAttachments,
+  getFaPlaywrightElectronRecordVideoPartial
+} from 'app/playwrightElectronRecordVideo'
 import type { T_dialogName } from 'app/types/T_dialogList'
 import T_socialContactButtons from 'app/src/i18n/en-US/components/other/SocialContactButtons/T_socialContactButtons'
 
@@ -35,13 +39,14 @@ const selectorList = {
 /**
  * Feed "AboutFantasiaArchive" input and check if all key dialog elements open.
  */
-test('Open test "AboutFantasiaArchive" dialog with all elements in it', async () => {
+test('Open test "AboutFantasiaArchive" dialog with all elements in it', async ({}, testInfo) => {
   const testString: T_dialogName = 'AboutFantasiaArchive'
   extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -56,19 +61,20 @@ test('Open test "AboutFantasiaArchive" dialog with all elements in it', async ()
   await expect(socialButtonsWrapper).toHaveCount(1)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Feed "AboutFantasiaArchive" input and check if dialog closes after button click.
  */
-test('Open test "AboutFantasiaArchive" dialog and try closing it', async () => {
+test('Open test "AboutFantasiaArchive" dialog and try closing it', async ({}, testInfo) => {
   const testString: T_dialogName = 'AboutFantasiaArchive'
   extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -90,16 +96,17 @@ test('Open test "AboutFantasiaArchive" dialog and try closing it', async () => {
   expect(await socialButtonsWrapper.isHidden()).toBe(true)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
-test('Check correct amount and content of social buttons in AboutFantasiaArchive dialog', async () => {
+test('Check correct amount and content of social buttons in AboutFantasiaArchive dialog', async ({}, testInfo) => {
   const testString: T_dialogName = 'AboutFantasiaArchive'
   extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -126,5 +133,5 @@ test('Check correct amount and content of social buttons in AboutFantasiaArchive
   }
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })

@@ -1,6 +1,10 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
+import {
+  closeFaElectronAppWithRecordedVideoAttachments,
+  getFaPlaywrightElectronRecordVideoPartial
+} from 'app/playwrightElectronRecordVideo'
 import type { I_appMenuList } from 'app/types/I_appMenusDataList'
 import { rgbToHex } from 'src/scripts/_utilities/colorFormatConvertors'
 
@@ -135,10 +139,11 @@ const selectorList = {
 /**
  * Test if the component managed to load the test data
  */
-test('Test if the component managed to load the test data', async () => {
+test('Test if the component managed to load the test data', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -155,16 +160,17 @@ test('Test if the component managed to load the test data', async () => {
   expect(hasProperInput).toBe(true)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Load a custom "Test Title" menu button in the menu and check if it loaded
  */
-test('Check if the "Menu title" element is properly loaded and has proper text content in it', async () => {
+test('Check if the "Menu title" element is properly loaded and has proper text content in it', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -183,16 +189,17 @@ test('Check if the "Menu title" element is properly loaded and has proper text c
   expect(menuTitleElementText).toEqual(testData.title)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Check if the main menu has a wrapper, click and check if all menu elements loaded properly
  */
-test('Check if the main menu has a wrapper, click and check if all menu elements loaded properly', async () => {
+test('Check if the main menu has a wrapper, click and check if all menu elements loaded properly', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -211,16 +218,17 @@ test('Check if the main menu has a wrapper, click and check if all menu elements
   expect(menuItems).toHaveCount(dataItems.length)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Check if the first main menu item has proper text and icon
  */
-test('Check if the first main menu item has proper text and icon', async () => {
+test('Check if the first main menu item has proper text and icon', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -258,19 +266,20 @@ test('Check if the first main menu item has proper text and icon', async () => {
   expect(firstMenuItemIconClassList.includes(firstDataItemIcon)).toBe(true)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Check if text color class applied properly to any main menu item: Secondary
  */
-test('Check if text color class applied properly to any main menu item: Secondary', async () => {
+test('Check if text color class applied properly to any main menu item: Secondary', async ({}, testInfo) => {
   const testColorName = 'secondary'
   const testColorHex = '#f75746'
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -295,16 +304,17 @@ test('Check if text color class applied properly to any main menu item: Secondar
   expect(colorMenuHex).toBe(testColorHex)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Check if the sub-menu opens properly on click of the main menu item and all parts are loaded properly
  */
-test('Check if the sub-menu opens properly on click of the main menu item and all parts are loaded properly', async () => {
+test('Check if the sub-menu opens properly on click of the main menu item and all parts are loaded properly', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -350,16 +360,17 @@ test('Check if the sub-menu opens properly on click of the main menu item and al
   expect(subMenuItems).toHaveCount(dataSubmenuItemsCount)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Check if the first sub-menu item has proper text and icon
  */
-test('Check if the first sub-menu item has proper text and icon', async () => {
+test('Check if the first sub-menu item has proper text and icon', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -421,19 +432,20 @@ test('Check if the first sub-menu item has proper text and icon', async () => {
   expect(firstSubmenuItemIconClassList.includes(firstDataItemIcon)).toBe(true)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Check if text color class applied properly to any sub-main menu item: Secondary
  */
-test('Check if text color class applied properly to any sub-main menu item: Secondary', async () => {
+test('Check if text color class applied properly to any sub-main menu item: Secondary', async ({}, testInfo) => {
   const testColorString = 'secondary'
   const testColorHexString = '#f75746'
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -481,5 +493,5 @@ test('Check if text color class applied properly to any sub-main menu item: Seco
   expect(colorMenuHex).toBe(testColorHexString)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })

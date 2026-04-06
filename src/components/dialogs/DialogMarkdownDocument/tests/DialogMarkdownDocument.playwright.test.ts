@@ -1,6 +1,10 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
+import {
+  closeFaElectronAppWithRecordedVideoAttachments,
+  getFaPlaywrightElectronRecordVideoPartial
+} from 'app/playwrightElectronRecordVideo'
 import type { T_documentName } from 'app/types/T_documentList'
 
 /**
@@ -35,14 +39,15 @@ const selectorList = {
 /**
  * Feed 'license' input as the file to open and check if the opened dialog afterwards has all the needed elements in it.
  */
-test('Open test "license" dialog with all elements in it', async () => {
+test('Open test "license" dialog with all elements in it', async ({}, testInfo) => {
   const testString: T_documentName = 'license'
 
   extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -59,20 +64,21 @@ test('Open test "license" dialog with all elements in it', async () => {
   await expect(markdownContent).toHaveCount(1)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Feed 'license' input as the file to open and check if the opened dialog afterwards has all the needed elements in it.
  */
-test('Open test "license" dialog and try closing it', async () => {
+test('Open test "license" dialog and try closing it', async ({}, testInfo) => {
   const testString: T_documentName = 'license'
 
   extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -94,5 +100,5 @@ test('Open test "license" dialog and try closing it', async () => {
   expect(await markdownContent.isHidden()).toBe(true)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })

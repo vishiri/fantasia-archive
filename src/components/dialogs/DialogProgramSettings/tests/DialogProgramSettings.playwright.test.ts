@@ -1,6 +1,10 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
+import {
+  closeFaElectronAppWithRecordedVideoAttachments,
+  getFaPlaywrightElectronRecordVideoPartial
+} from 'app/playwrightElectronRecordVideo'
 import type { T_dialogName } from 'app/types/T_dialogList'
 
 /**
@@ -34,13 +38,14 @@ const selectorList = {
 /**
  * Feed "ProgramSettings" input and check if key dialog chrome opens.
  */
-test('Open test "ProgramSettings" dialog with title and actions', async () => {
+test('Open test "ProgramSettings" dialog with title and actions', async ({}, testInfo) => {
   const testString: T_dialogName = 'ProgramSettings'
   extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -52,19 +57,20 @@ test('Open test "ProgramSettings" dialog with title and actions', async () => {
   await expect(closeButton).toHaveCount(1)
   await expect(title).toHaveCount(1)
 
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Feed "ProgramSettings" input and check if dialog closes after Close click.
  */
-test('Open test "ProgramSettings" dialog and close it', async () => {
+test('Open test "ProgramSettings" dialog and close it', async ({}, testInfo) => {
   const testString: T_dialogName = 'ProgramSettings'
   extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -81,5 +87,5 @@ test('Open test "ProgramSettings" dialog and close it', async () => {
 
   expect(await title.isHidden()).toBe(true)
 
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })

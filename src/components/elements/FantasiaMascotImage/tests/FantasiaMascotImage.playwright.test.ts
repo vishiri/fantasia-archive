@@ -1,6 +1,10 @@
 import { _electron as electron } from 'playwright'
 import { test, expect } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
+import {
+  closeFaElectronAppWithRecordedVideoAttachments,
+  getFaPlaywrightElectronRecordVideoPartial
+} from 'app/playwrightElectronRecordVideo'
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -32,12 +36,13 @@ const selectorList = {
 /**
  * Check if the wrapper contains 'IMG' element
  */
-test('Check if the wrapper contains "IMG" element', async () => {
+test('Check if the wrapper contains "IMG" element', async ({}, testInfo) => {
   const testString = 'IMG'
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -56,13 +61,13 @@ test('Check if the wrapper contains "IMG" element', async () => {
   expect(elementType).toBe(testString)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Attempt to pass "width" and "height" prop to the component and check the results
  */
-test('Visually check for proper sizing of the icon', async () => {
+test('Visually check for proper sizing of the icon', async ({}, testInfo) => {
   const testStringWidth = '300px'
   const testStringHeight = '300px'
 
@@ -73,7 +78,8 @@ test('Visually check for proper sizing of the icon', async () => {
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -101,16 +107,17 @@ test('Visually check for proper sizing of the icon', async () => {
   expect(roundedImageHeight).toBe(roundedTestStringHeight)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Test if the component properly determines if the image will be random - YES
  */
-test('Check if the image is random: YES', async () => {
+test('Check if the image is random: YES', async ({}, testInfo) => {
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -127,20 +134,21 @@ test('Check if the image is random: YES', async () => {
   expect(isRandom).toBe('true')
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
 
 /**
  * Test if the component properly determines if the image will be random - NO
  */
-test('Check if the image is random: NO', async () => {
+test('Check if the image is random: NO', async ({}, testInfo) => {
   const testString = 'flop'
 
   extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ fantasiaImage: testString })
 
   const electronApp = await electron.launch({
     env: extraEnvSettings,
-    args: [electronMainFilePath]
+    args: [electronMainFilePath],
+    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
   const appWindow = await electronApp.firstWindow()
@@ -161,5 +169,5 @@ test('Check if the image is random: NO', async () => {
   expect(imageString).toBe(testString)
 
   // Close the app
-  await electronApp.close()
+  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
 })
