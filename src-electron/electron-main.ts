@@ -1,11 +1,11 @@
-import { suppressChromiumDevtoolsAutofillStderrNoise } from 'app/src-electron/mainScripts/suppressChromiumDevtoolsAutofillStderrNoise'
+import { suppressChromiumDevtoolsAutofillStderrNoise } from 'app/src-electron/mainScripts/chromiumFixes/suppressChromiumDevtoolsAutofillStderrNoise'
 
 suppressChromiumDevtoolsAutofillStderrNoise()
 
-import { fixAppName } from 'app/src-electron/mainScripts/fixAppName'
-import { windowsDevToolsExtensionsFix } from 'app/src-electron/mainScripts/windowsDevToolsExtensionsFix'
+import { fixAppName } from 'app/src-electron/mainScripts/appIdentity/fixAppName'
+import { windowsDevToolsExtensionsFix } from 'app/src-electron/mainScripts/chromiumFixes/windowsDevToolsExtensionsFix'
 import { startApp, openAppWindowManager, closeAppManager } from 'app/src-electron/mainScripts/appManagement'
-import { tweakMenuRemover, tweakRetriveOS } from 'app/src-electron/mainScripts/tweaks'
+import { tweakMenuRemover, tweakRetriveOS } from 'app/src-electron/mainScripts/nativeShell/tweaks'
 
 // Determines what platform the app is running on
 // - Needed in case process is undefined under Linux (Linux bug?)

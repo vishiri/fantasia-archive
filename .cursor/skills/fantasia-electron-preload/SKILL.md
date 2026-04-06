@@ -19,17 +19,17 @@ description: >-
 ## Main ↔ preload IPC (electron-ipc-bridge)
 
 - **Registry**: `src-electron/electron-ipc-bridge.ts` holds canonical channel strings (`export const` objects, e.g. `FA_DEVTOOLS_IPC`, `FA_USER_SETTINGS_IPC`). Preload-side code that uses `ipcRenderer.invoke` / `sendSync` and main-side `ipcMain.handle` / `on` must use these constants — never duplicate string literals across files.
-- **Main registration**: Add or extend a `mainScripts/register*Ipc.ts` module that wires `ipcMain` with the same constants, and ensure startup invokes that registrar (today `startApp()` in `mainScripts/appManagement.ts` calls the existing registrars).
+- **Main registration**: Add or extend a `mainScripts/ipcManagement/register*Ipc.ts` module that wires `ipcMain` with the same constants, and ensure startup invokes that registrar (today `startApp()` in `mainScripts/appManagement.ts` calls the existing registrars).
 - **Preload usage**: Import the matching constant object in the relevant `contentBridgeAPIs/*.ts` module and pass those strings to `ipcRenderer`.
 
 ## Adding a new API surface
 
 1. Define the contract in `types/I_<Name>.ts` (or extend an existing interface).
-2. If the API talks to main over IPC, add channel names to `electron-ipc-bridge.ts`, implement `mainScripts/register*Ipc.ts` (or extend an existing registrar), and invoke it from app startup (today `startApp()` in `mainScripts/appManagement.ts`).
+2. If the API talks to main over IPC, add channel names to `electron-ipc-bridge.ts`, implement `mainScripts/ipcManagement/register*Ipc.ts` (or extend an existing registrar), and invoke it from app startup (today `startApp()` in `mainScripts/appManagement.ts`).
 3. Implement functions in `src-electron/contentBridgeAPIs/<name>.ts` exporting a plain object matching that interface.
 4. Import the implementation in `electron-preload.ts` and add it to `apiObject` with a stable key (camelCase, consistent with existing keys).
 5. Extend `Window['faContentBridgeAPIs']` in `src/globals.d.ts` with the new key and interface.
-6. Add Vitest coverage under `src-electron/contentBridgeAPIs/tests/` (and `mainScripts/tests/` for new IPC registrars) following existing `*.vitest.test.ts` patterns. **`yarn testbatch:verify`** enforces **100%** v8 coverage on **`src-electron`** ([vitest-tests.mdc](../../rules/vitest-tests.mdc), [vitest/vitest.electron.config.mts](../../../vitest/vitest.electron.config.mts)).
+6. Add Vitest coverage under `src-electron/contentBridgeAPIs/tests/` (and `mainScripts/ipcManagement/tests/` for new IPC registrars) following existing `*.vitest.test.ts` patterns. **`yarn testbatch:verify`** enforces **100%** v8 coverage on **`src-electron`** ([vitest-tests.mdc](../../rules/vitest-tests.mdc), [vitest/vitest.electron.config.mts](../../../vitest/vitest.electron.config.mts)).
 
 ## Security and boundaries
 

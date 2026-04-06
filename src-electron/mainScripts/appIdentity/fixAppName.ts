@@ -1,6 +1,6 @@
 import { app } from 'electron'
 import path from 'path'
-import packageJSON from '../../package.json' with { type: 'json' }
+import packageJSON from '../../../package.json' with { type: 'json' }
 
 import { PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME } from './playwrightIsolatedUserDataDirName'
 

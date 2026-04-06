@@ -4,7 +4,7 @@ import {
   fixAppName,
   PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME
 } from '../fixAppName'
-import packageJSON from '../../../package.json' with { type: 'json' }
+import packageJSON from '../../../../package.json' with { type: 'json' }
 import path from 'path'
 
 const { appMock } = vi.hoisted(() => {

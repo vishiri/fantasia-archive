@@ -11,14 +11,14 @@ description: >-
 
 ## Entry and flow
 
-- **Entry**: `src-electron/electron-main.ts` orchestrates startup: `fixAppName`, Windows DevTools tweaks, `startApp`, menu tweaks, `openAppWindowManager`, `closeAppManager`.
-- **`userData`**: `fixAppName()` sets `app.setPath('userData', …)`. When `process.env.TEST_ENV` is `components` or `e2e`, `userData` is **`%APPDATA%/<package.json name>/playwright-user-data`** (stable; not under the `*-dev` folder used by `quasar dev` with `DEBUGGING`). The folder segment is `PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME` in `playwrightIsolatedUserDataDirName.ts` (re-exported from `fixAppName.ts` for Electron callers).
-- **Modular logic**: Prefer `src-electron/mainScripts/` (e.g. `appManagement.ts`, `mainWindowCreation.ts`, `tweaks.ts`, `fixAppName.ts`) over growing `electron-main.ts` indefinitely.
-- **IPC registration**: Shared channel strings live in `src-electron/electron-ipc-bridge.ts`. Main-process `ipcMain` handlers for preload-invoked channels belong in `mainScripts/register*Ipc.ts` (e.g. `registerFaDevToolsIpc.ts`, `registerFaUserSettingsIpc.ts`). Call those registrars from app startup (`startApp()` in `appManagement.ts` today) so preload and main always use the same names.
+- **Entry**: `src-electron/electron-main.ts` orchestrates startup in order: Chromium stderr filter (`chromiumFixes/suppressChromiumDevtoolsAutofillStderrNoise`), app name and `userData` (`appIdentity/fixAppName`), Windows DevTools workaround (`chromiumFixes/windowsDevToolsExtensionsFix`), `startApp` (IPC + `@electron/remote` init), `nativeShell/tweaks` menu removal, then `openAppWindowManager` / `closeAppManager` from `appManagement.ts`.
+- **`userData`**: `fixAppName()` in `appIdentity/fixAppName.ts` sets `app.setPath('userData', …)`. When `process.env.TEST_ENV` is `components` or `e2e`, `userData` is **`%APPDATA%/<package.json name>/playwright-user-data`** (stable; not under the `*-dev` folder used by `quasar dev` with `DEBUGGING`). The folder segment is `PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME` in `appIdentity/playwrightIsolatedUserDataDirName.ts` (re-exported from `fixAppName.ts` for Electron callers).
+- **Modular logic**: Prefer `src-electron/mainScripts/` feature folders — `appIdentity/`, `windowManagement/`, `chromiumFixes/`, `userSettings/`, `nativeShell/`, `ipcManagement/` — plus root `appManagement.ts`, over growing `electron-main.ts` indefinitely.
+- **IPC registration**: Shared channel strings live in `src-electron/electron-ipc-bridge.ts`. Main-process `ipcMain` handlers for preload-invoked channels belong in `mainScripts/ipcManagement/register*Ipc.ts` (e.g. `registerFaDevToolsIpc.ts`, `registerFaUserSettingsIpc.ts`). Call those registrars from app startup (`startApp()` in `appManagement.ts` today) so preload and main always use the same names.
 
 ## Testing
 
-- Vitest tests live under `src-electron/mainScripts/tests/` and `src-electron/contentBridgeAPIs/tests/` for bridge modules.
+- Vitest tests live under `src-electron/mainScripts/tests/` (e.g. `appManagement`), each `mainScripts/<area>/tests/` (`appIdentity`, `windowManagement`, `chromiumFixes`, `userSettings`, `nativeShell`, `ipcManagement`), and `src-electron/contentBridgeAPIs/tests/` for bridge modules.
 - After main-process changes, run the **quality gate** when TypeScript or related sources changed: `yarn testbatch:verify` ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)) — see [eslint-typescript.mdc](../../rules/eslint-typescript.mdc).
 
 ## Remote and windows

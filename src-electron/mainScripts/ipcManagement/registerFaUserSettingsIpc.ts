@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron'
 
 import { FA_USER_SETTINGS_IPC } from 'app/src-electron/electron-ipc-bridge'
-import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettingsStore'
+import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 
 let registered = false

@@ -14,7 +14,7 @@ vi.mock('electron', () => {
   }
 })
 
-vi.mock('../../../package.json', () => {
+vi.mock('../../../../package.json', () => {
   return {
     default: {
       name: ''

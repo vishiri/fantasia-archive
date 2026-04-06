@@ -2,7 +2,7 @@ import { enable } from '@electron/remote/main/index.js'
 import { BrowserWindow, app, screen } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { setupSpellChecker } from 'app/src-electron/mainScripts/spellChecker'
+import { setupSpellChecker } from 'app/src-electron/mainScripts/windowManagement/spellChecker'
 
 export let appWindow: BrowserWindow | undefined
 
@@ -13,6 +13,13 @@ export function assignAppWindowRefForTesting (next: BrowserWindow | undefined): 
   appWindow = next
 }
 
+/**
+ * Directory of the compiled main-process bundle file (or this module's output folder).
+ * Do not walk up an extra level for preload/icon paths: after bundling, 'import.meta.url'
+ * points at the shared electron main chunk (e.g. dist/electron/electron-main.js), not at
+ * the original 'windowManagement/' source folder — an extra '..' would miss 'electron-preload'
+ * and break 'contextBridge' ('window.faContentBridgeAPIs'), so component tests stay on '/'.
+ */
 const currentDir = fileURLToPath(new URL('.', import.meta.url))
 
 /**

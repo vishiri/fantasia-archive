@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { expect, test } from 'vitest'
 
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
-import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/faUserSettingsDefaults'
+import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import type { T_programSettingsRenderTree } from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
 import {
   syncLocalProgramSettingsFromStore,

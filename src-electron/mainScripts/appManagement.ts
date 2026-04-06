@@ -1,8 +1,8 @@
 import { initialize } from '@electron/remote/main/index.js'
-import { mainWindowCreation } from 'app/src-electron/mainScripts/mainWindowCreation'
-import { registerFaDevToolsIpc } from 'app/src-electron/mainScripts/registerFaDevToolsIpc'
-import { registerFaUserSettingsIpc } from 'app/src-electron/mainScripts/registerFaUserSettingsIpc'
-import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettingsStore'
+import { mainWindowCreation } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
+import { registerFaDevToolsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaDevToolsIpc'
+import { registerFaUserSettingsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaUserSettingsIpc'
+import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
 import { app } from 'electron'
 
 // Starts the app's Electron instance

@@ -25,19 +25,19 @@ vi.mock('@electron/remote/main/index.js', () => {
   }
 })
 
-vi.mock('app/src-electron/mainScripts/mainWindowCreation', () => {
+vi.mock('app/src-electron/mainScripts/windowManagement/mainWindowCreation', () => {
   return {
     mainWindowCreation: mainWindowCreationMock
   }
 })
 
-vi.mock('app/src-electron/mainScripts/registerFaDevToolsIpc', () => {
+vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaDevToolsIpc', () => {
   return {
     registerFaDevToolsIpc: registerFaDevToolsIpcMock
   }
 })
 
-vi.mock('app/src-electron/mainScripts/registerFaUserSettingsIpc', () => {
+vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaUserSettingsIpc', () => {
   return {
     registerFaUserSettingsIpc: registerFaUserSettingsIpcMock
   }

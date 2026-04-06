@@ -16,7 +16,7 @@ vi.mock('app/src/i18n/externalFileLoader', () => {
   }
 })
 
-import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/faUserSettingsDefaults'
+import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 import type { I_programSettingRenderItem } from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
 import { buildProgramSettingsRenderTree } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsTreeManagement'

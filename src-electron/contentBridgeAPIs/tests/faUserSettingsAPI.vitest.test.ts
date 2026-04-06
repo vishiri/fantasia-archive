@@ -15,7 +15,7 @@ vi.mock('electron', () => {
 })
 
 import { FA_USER_SETTINGS_IPC } from 'app/src-electron/electron-ipc-bridge'
-import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/faUserSettingsDefaults'
+import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 
 import { faUserSettingsAPI } from '../faUserSettingsAPI'
 

@@ -6,7 +6,7 @@ import { expect, test, vi } from 'vitest'
 import * as playwrightUserDataReset from '../playwrightUserDataReset'
 
 import packageJSON from '../../../package.json' with { type: 'json' }
-import { PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME } from '../../../src-electron/mainScripts/playwrightIsolatedUserDataDirName'
+import { PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME } from '../../../src-electron/mainScripts/appIdentity/playwrightIsolatedUserDataDirName'
 import { resolveFaPlaywrightIsolatedUserDataDir } from '../playwrightUserDataReset'
 
 /**

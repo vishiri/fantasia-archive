@@ -1,6 +1,6 @@
 /**
  * Canonical main ↔ preload IPC channel registry for Fantasia Archive.
- * - Preload (contentBridgeAPIs) and main (mainScripts/register*Ipc) import from this module so channel strings stay aligned.
+ * - Preload (contentBridgeAPIs) and main (mainScripts/ipcManagement/register*Ipc) import from this module so channel strings stay aligned.
  * - Add new channel groups here as 'export const' objects.
  */
 

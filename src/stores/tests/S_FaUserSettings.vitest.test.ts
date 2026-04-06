@@ -1,7 +1,7 @@
 import { beforeEach, expect, test, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 
-import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/faUserSettingsDefaults'
+import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import type * as S_FaUserSettingsStore from '../S_FaUserSettings'
 
 const { notifyCreateMock, tMock, getSettingsMock, setSettingsMock } = vi.hoisted(() => {

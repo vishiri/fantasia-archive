@@ -54,7 +54,7 @@ vi.mock('@electron/remote/main/index.js', () => {
   }
 })
 
-vi.mock('src-electron/mainScripts/spellChecker', () => {
+vi.mock('src-electron/mainScripts/windowManagement/spellChecker', () => {
   return {
     setupSpellChecker: setupSpellCheckerMock
   }

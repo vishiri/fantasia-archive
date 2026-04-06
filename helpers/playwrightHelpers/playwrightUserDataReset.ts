@@ -3,7 +3,7 @@ import os from 'node:os'
 import path from 'node:path'
 
 import packageJSON from '../../package.json' with { type: 'json' }
-import { PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME } from '../../src-electron/mainScripts/playwrightIsolatedUserDataDirName'
+import { PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME } from '../../src-electron/mainScripts/appIdentity/playwrightIsolatedUserDataDirName'
 
 export type T_faPlaywrightUserDataPathInput = {
   /** Subset of process.env; only APPDATA / XDG_CONFIG_HOME are read. */

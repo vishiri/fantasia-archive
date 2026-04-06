@@ -3,7 +3,7 @@ import { vi, expect, test, beforeEach } from 'vitest'
 import { FA_USER_SETTINGS_IPC } from 'app/src-electron/electron-ipc-bridge'
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 
-import { FA_USER_SETTINGS_DEFAULTS } from '../faUserSettingsDefaults'
+import { FA_USER_SETTINGS_DEFAULTS } from '../../userSettings/faUserSettingsDefaults'
 
 const { ipcMainHandleMock, getFaUserSettingsMock, storeSetMock } = vi.hoisted(() => {
   return {
@@ -21,7 +21,7 @@ vi.mock('electron', () => {
   }
 })
 
-vi.mock('app/src-electron/mainScripts/userSettingsStore', () => {
+vi.mock('app/src-electron/mainScripts/userSettings/userSettingsStore', () => {
   return {
     getFaUserSettings: getFaUserSettingsMock
   }

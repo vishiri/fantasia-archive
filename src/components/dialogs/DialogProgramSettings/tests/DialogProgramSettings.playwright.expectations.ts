@@ -9,7 +9,7 @@ import {
   toSortedRecord
 } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsTreeSorting'
 import programSettingsMessages from 'app/src/i18n/en-US/dialogs/T_programSettings'
-import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/faUserSettingsDefaults'
+import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 
 type T_programSettingOptionBlock = {

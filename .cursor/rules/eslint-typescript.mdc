@@ -53,7 +53,7 @@ Run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn tes
 
 ## Electron / monorepo-style imports in tests
 
-- Prefer **`app/src-electron/...`** (and other **`app/`**-root paths) in Vitest files when the same import must satisfy **`tsc`** and Vitest **`resolve.alias`**, e.g. [`tweaks.vitest.test.ts`](../../src-electron/mainScripts/tests/tweaks.vitest.test.ts).
+- Prefer **`app/src-electron/...`** (and other **`app/`**-root paths) in Vitest files when the same import must satisfy **`tsc`** and Vitest **`resolve.alias`**, e.g. [`tweaks.vitest.test.ts`](../../src-electron/mainScripts/nativeShell/tests/tweaks.vitest.test.ts).
 
 ## Dependency hygiene
 
