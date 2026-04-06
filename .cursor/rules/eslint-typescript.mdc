@@ -26,9 +26,9 @@ In line comments, block comments, and JSDoc above APIs and tests: do not use Mar
 
 ## Pre-commit / pre-changelog quality gate
 
-Before commits or changelog edits tied to product or test work, run the four checks **in order** in **one** terminal via **`yarn testbatch:verify`** (see [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) and [git-conventional-commits.mdc](git-conventional-commits.mdc)).
+Before commits or changelog edits tied to product or test work, run the four checks **in order** in **one** terminal via **`yarn testbatch:verify`** (see [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) and [git-conventional-commits.mdc](git-conventional-commits.mdc)). That script’s Vitest step enforces layered coverage: **`src-electron`** and **`helpers`** at **100%** on statements, branches, functions, and lines; **`src`** renderer **`.ts`** in **`unit-src-renderer`** at **100%** on all four; **`.ts`** under **`src/components`**, **`src/layouts`**, and **`src/pages`** in **`unit-components`** at **100%** statements, functions, and lines; **`.vue`** files have no failing threshold. The **`unit-components`** **`.ts`** slice omits a branch gate while keeping statements, functions, and lines at **100%** ([vitest-tests.mdc](vitest-tests.mdc), **Vitest coverage tiers (CI)**).
 
-Run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, or `yarn test:unit` individually only while debugging a specific failure.
+Run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, or `yarn test:coverage:verify` individually only while debugging a specific failure.
 
 **Dev server**: `vite-plugin-checker` runs ESLint during `quasar dev`; keep `@typescript-eslint` major in sync with TypeScript so you do not see unsupported-TS-version warnings from `typescript-estree`.
 

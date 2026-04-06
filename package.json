@@ -29,10 +29,15 @@
     "test:storybook:visual:headed": "yarn storybook:build && yarn --cwd .storybook-workspace test:storybook:visual:headed",
     "test:storybook:visual:update": "yarn storybook:build && yarn --cwd .storybook-workspace test:storybook:visual:update",
     "test:storybook:visual:update:headed": "yarn storybook:build && yarn --cwd .storybook-workspace test:storybook:visual:update:headed",
-    "test:unit": "vitest run && vitest run --config vitest.helpers.config.mts && vitest run --config vitest.components.config.mts",
+    "test:unit": "vitest run",
+    "test:coverage:electron": "vitest run --coverage --config vitest/vitest.electron.config.mts",
+    "test:coverage:helpers": "vitest run --coverage --config vitest/vitest.helpers.config.mts",
+    "test:coverage:src": "vitest run --coverage --config vitest/vitest.src-renderer.config.mts && vitest run --coverage --config vitest/vitest.components.config.mts",
+    "test:coverage:verify": "yarn test:coverage:electron && yarn test:coverage:helpers && yarn test:coverage:src",
+    "test:unit:coverage": "yarn test:coverage:verify",
+    "testbatch:verify": "yarn lint:eslint && yarn lint:typescript && yarn lint:stylelint && yarn test:coverage:verify",
     "testbatch:ensure:change": "yarn testbatch:verify && yarn quasar:build:electron && yarn test:components && yarn test:e2e && yarn test:storybook:smoke && yarn test:storybook:visual:update",
-    "testbatch:ensure:nochange": "yarn testbatch:verify && yarn quasar:build:electron && yarn test:components && yarn test:e2e && yarn test:storybook:smoke && yarn test:storybook:visual",
-    "testbatch:verify": "yarn lint:eslint && yarn lint:typescript && yarn lint:stylelint && yarn test:unit"
+    "testbatch:ensure:nochange": "yarn testbatch:verify && yarn quasar:build:electron && yarn test:components && yarn test:e2e && yarn test:storybook:smoke && yarn test:storybook:visual"
   },
   "dependencies": {
     "@electron/remote": "^2.1.3",
@@ -62,6 +67,7 @@
     "@types/node": "^22.19.17",
     "@types/prompts": "^2.4.9",
     "@vitejs/plugin-vue": "^6.0.5",
+    "@vitest/coverage-v8": "4.1.2",
     "@vue/test-utils": "^2.4.6",
     "autoprefixer": "^10.4.27",
     "electron": "^41.1.1",

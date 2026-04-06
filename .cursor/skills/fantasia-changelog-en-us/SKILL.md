@@ -44,7 +44,7 @@ When you **do** document a dependency refresh, describe **what** was refreshed (
 
 Before editing `changeLog.md` for new work, keep this order ([`testing-terminal-isolation.mdc`](../../rules/testing-terminal-isolation.mdc)):
 
-1. Run the **quality gate** in one terminal: `yarn testbatch:verify` (run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, or `yarn test:unit` individually only while debugging a failure).
+1. Run the **quality gate** in one terminal: `yarn testbatch:verify` (run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, or `yarn test:coverage:verify` / per-slice `yarn test:coverage:*` scripts individually only while debugging a failure). Layered Vitest coverage rules: [vitest-tests.mdc](../../rules/vitest-tests.mdc).
 2. For affected user-facing **`src/components/**`**, verify Storybook updates are complete (`tests/*.stories.ts`, relevant mocks/placeholders) and Storybook starts cleanly (**`yarn storybook:run`**). Layout/page Storybook previews do not require Docs/autodocs ([`storybook-stories.mdc`](../../rules/storybook-stories.mdc)).
 3. Then draft/update changelog entries.
 

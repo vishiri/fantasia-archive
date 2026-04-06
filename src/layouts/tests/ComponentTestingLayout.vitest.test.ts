@@ -1,0 +1,47 @@
+import { flushPromises, mount } from '@vue/test-utils'
+import { expect, test } from 'vitest'
+import { createMemoryHistory, createRouter } from 'vue-router'
+
+import ComponentTestingLayout from '../ComponentTestingLayout.vue'
+
+/**
+ * ComponentTestingLayout
+ * Nested default child renders inside the layout router-view when the router is on a component-testing route.
+ */
+test('Test that ComponentTestingLayout renders nested default route inside router-view', async () => {
+  const Child = {
+    name: 'LayoutChildStub',
+    template: '<div data-test-layout-child>child-route</div>'
+  }
+
+  const router = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      {
+        path: '/componentTesting/:componentName',
+        component: ComponentTestingLayout,
+        children: [
+          {
+            path: '',
+            component: Child
+          }
+        ]
+      }
+    ]
+  })
+
+  await router.push('/componentTesting/Example')
+  await router.isReady()
+
+  const w = mount(ComponentTestingLayout, {
+    global: {
+      plugins: [router]
+    }
+  })
+
+  await flushPromises()
+
+  expect(w.find('[data-test-layout-child]').exists()).toBe(true)
+  expect(w.find('[data-test-layout-child]').text()).toContain('child-route')
+  w.unmount()
+})

@@ -21,6 +21,7 @@ export default [...neostandard({
     '**/src-cordova/**',
     '**/src-ssr/**',
     '**/test-results/**',
+    '**/coverage/**',
     'quasar.config.*.temporary.compiled*'
   ],
   globals: {

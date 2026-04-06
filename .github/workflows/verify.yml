@@ -1,4 +1,5 @@
-# PR/push: quality gate only. Storybook VRT (`yarn test:storybook:visual*`) runs locally or via
+# PR/push: quality gate only (lint, types, stylelint, Vitest coverage: 100% src-electron + helpers;
+# src .ts thresholds per vitest/ — Vue SFCs watermarks only). Storybook VRT (`yarn test:storybook:visual*`) runs locally or via
 # `yarn testbatch:ensure:nochange` — not in CI.
 name: Verify
 

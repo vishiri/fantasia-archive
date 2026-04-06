@@ -1,6 +1,9 @@
-import { test, expect, vi, beforeEach } from 'vitest'
-import { setupSpellChecker } from '../spellChecker'
 import type { BrowserWindow } from 'electron'
+import { beforeEach, expect, test, vi } from 'vitest'
+
+import T_spellChecker_fr from 'app/src/i18n/fr/globalFunctionality/T_spellChecker'
+
+import { setupSpellChecker } from '../spellChecker'
 
 const { MenuMock, MenuItemMock, menuInstances } = vi.hoisted(() => {
   const instances: Array<{ append: ReturnType<typeof vi.fn>, popup: ReturnType<typeof vi.fn> }> = []
@@ -20,12 +23,16 @@ const { MenuMock, MenuItemMock, menuInstances } = vi.hoisted(() => {
   }
 })
 
+const getLocaleMock = vi.hoisted(() => {
+  return vi.fn(() => 'en-US')
+})
+
 vi.mock('electron', () => {
   return {
     Menu: MenuMock,
     MenuItem: MenuItemMock,
     app: {
-      getLocale: vi.fn(() => 'en-US')
+      getLocale: getLocaleMock
     }
   }
 })
@@ -34,6 +41,7 @@ beforeEach(() => {
   MenuMock.mockClear()
   MenuItemMock.mockClear()
   menuInstances.length = 0
+  getLocaleMock.mockReturnValue('en-US')
 })
 
 /**
@@ -167,4 +175,35 @@ test('Test that spellChecker does not popup when there is nothing to show', () =
 
   const activeMenu = menuInstances[0]
   expect(activeMenu.popup).not.toHaveBeenCalled()
+})
+
+/**
+ * setupSpellChecker
+ * French locale uses the fr spell-checker strings for the add-to-dictionary menu label.
+ */
+test('Test that spellChecker uses French add-to-dictionary label when app locale starts with fr', () => {
+  getLocaleMock.mockReturnValue('fr-FR')
+
+  const onMock = vi.fn()
+  const appWindow = {
+    webContents: {
+      on: onMock,
+      replaceMisspelling: vi.fn(),
+      session: {
+        addWordToSpellCheckerDictionary: vi.fn()
+      }
+    }
+  }
+  setupSpellChecker(appWindow as unknown as BrowserWindow)
+  const contextMenuHandler = onMock.mock.calls[0][1]
+  menuInstances.length = 0
+  MenuItemMock.mockClear()
+
+  contextMenuHandler({}, {
+    dictionarySuggestions: [],
+    misspelledWord: 'mot'
+  })
+
+  const addWordItem = MenuItemMock.mock.calls[0][0]
+  expect(addWordItem.label).toBe(T_spellChecker_fr.addToDictionary)
 })

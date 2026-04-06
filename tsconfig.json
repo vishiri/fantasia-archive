@@ -6,6 +6,6 @@
     "node_modules",
     ".storybook-workspace/storybook-static",
     "**/*.stories.ts",
-    "vitest.components.config.mts"
+    "vitest/vitest.components.config.mts"
   ]
 }

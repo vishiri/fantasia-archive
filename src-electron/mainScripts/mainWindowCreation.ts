@@ -6,6 +6,13 @@ import { setupSpellChecker } from 'app/src-electron/mainScripts/spellChecker'
 
 export let appWindow: BrowserWindow | undefined
 
+/**
+ * Assigns the module-level main window reference (Vitest only; production startup uses mainWindowCreation).
+ */
+export function assignAppWindowRefForTesting (next: BrowserWindow | undefined): void {
+  appWindow = next
+}
+
 const currentDir = fileURLToPath(new URL('.', import.meta.url))
 
 /**

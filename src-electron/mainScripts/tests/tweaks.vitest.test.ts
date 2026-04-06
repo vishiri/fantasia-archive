@@ -25,6 +25,25 @@ test('Test that platform detection works', () => {
 })
 
 /**
+ * tweakRetriveOS
+ * When process.platform is an empty string, os.platform() supplies the identifier.
+ */
+test('Test that tweakRetriveOS uses os.platform when process.platform is empty', () => {
+  const original = process.platform
+  Object.defineProperty(process, 'platform', {
+    configurable: true,
+    value: ''
+  })
+
+  expect(tweakRetriveOS()).toBe(os.platform())
+
+  Object.defineProperty(process, 'platform', {
+    configurable: true,
+    value: original
+  })
+})
+
+/**
  * tweakMenuRemover
  * Test menu removal call.
  */

@@ -72,7 +72,7 @@ Locale `T_*` paths under `src/i18n/<locale>/components/` use the same bucket nam
 - **`quasar.config.ts`**: match Quasar typings (e.g. PWA `workboxMode: 'GenerateSW' | 'InjectManifest'`; `bex` uses `QuasarBexConfiguration`, not legacy `contentScripts`). Duplicate **Vite** `Plugin` types vs `@quasar/app-vite` may require a documented **`@ts-expect-error`** on `defineConfig`.
 - **`src/boot/i18n.ts`**: vue-i18n module augmentation may use **`@ts-expect-error` (TS2665)** because the package `module` entry targets the ESM bundle under `tsc`.
 - Keep TypeScript strict in Vue code: avoid `any`; prefer explicit prop/emits/interfaces, `unknown`, and narrowing.
-- Keep component test parity in `src/components/**`: each `.vue` should have a colocated `tests/<ComponentName>.vitest.test.ts` (presence baseline; not a claim of exhaustive line/branch coverage).
+- Keep Vitest SFC parity in **`src/components/**`**, **`src/layouts/**`**, and **`src/pages/**`**: each feature `.vue` should have a colocated **`tests/<Name>.vitest.test.ts`** (presence baseline; not a claim of exhaustive line/branch coverage).
 
 ## Related
 

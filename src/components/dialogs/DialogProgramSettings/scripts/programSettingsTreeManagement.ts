@@ -1,18 +1,13 @@
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 import { PROGRAM_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogProgramSettings/_data/programSettingsOptions'
 import type {
+  I_programSettingRenderItem,
   I_programSubCategoryRenderItem,
   T_programSettingsRenderTree
 } from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
 import { i18n } from 'app/src/i18n/externalFileLoader'
 
 import {
-  compareProgramSettingsCategoryOrder,
-  sortSettingsListByTranslatedTitle,
-  toSortedRecord
-} from './programSettingsTreeSorting'
-
-export {
   compareProgramSettingsCategoryOrder,
   sortSettingsListByTranslatedTitle,
   toSortedRecord
@@ -45,13 +40,18 @@ export function buildProgramSettingsRenderTree (settingsSnapshot: I_faUserSettin
     const noteTranslationPath = `dialogs.programSettings.appOptions.${settingKey}.note`
     const noteValue = i18n.global.te(noteTranslationPath) ? i18n.global.t(noteTranslationPath) : undefined
 
-    unsortedTree[categoryKey].subCategories[subCategoryKey].settingsList[settingKey] = {
+    const leaf: I_programSettingRenderItem = {
       title: i18n.global.t(`dialogs.programSettings.appOptions.${settingKey}.title`),
       description: i18n.global.t(`dialogs.programSettings.appOptions.${settingKey}.description`),
       value: settingsSnapshot[normalizedSettingKey],
-      tags: i18n.global.t(`dialogs.programSettings.appOptions.${settingKey}.tags`),
-      ...(noteValue !== undefined ? { note: noteValue } : {})
+      tags: i18n.global.t(`dialogs.programSettings.appOptions.${settingKey}.tags`)
     }
+
+    if (noteValue !== undefined) {
+      leaf.note = noteValue
+    }
+
+    unsortedTree[categoryKey].subCategories[subCategoryKey].settingsList[settingKey] = leaf
   }
 
   const sortedCategoryEntries = Object.entries(unsortedTree).sort(([categoryA], [categoryB]) =>

@@ -194,7 +194,7 @@ async function attachWebmFilesUnderDir (
     if (ent.isDirectory()) {
       await attachWebmFilesUnderDir(testInfo, full, `${namePrefix}${ent.name}/`)
     } else if (ent.name.endsWith('.webm')) {
-      const attachName = `${namePrefix}${ent.name}`.replace(/^\/+/, '') || ent.name
+      const attachName = `${namePrefix}${ent.name}`.replace(/^\/+/, '')
       await testInfo.attach(attachName, {
         contentType: 'video/webm',
         path: full

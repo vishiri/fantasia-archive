@@ -15,7 +15,7 @@ JSDoc above tests and line comments in these files: follow AGENTS.md code-commen
 
 ## Vitest for `helpers/` harness packages
 
-- Node-only harness code under **`helpers/`** (e.g. **`helpers/playwrightHelpers/`**, and future sibling packages) is covered by **`*.vitest.test.ts`** in each package’s **`tests/`** tree; **`yarn test:unit`** runs them as Vitest **`unit-helpers`** ([vitest.helpers.config.mts](vitest.helpers.config.mts)). Add or extend those Vitest files when you change helper logic (env switches, temp dirs, IPC-adjacent helpers). Follow [vitest-tests.mdc](vitest-tests.mdc) for structure and comments.
+- Node-only harness code under **`helpers/`** (e.g. **`helpers/playwrightHelpers/`**, and future sibling packages) is covered by **`*.vitest.test.ts`** in each package’s **`tests/`** tree; **`yarn test:unit`** runs them as Vitest **`unit-helpers`** via [vitest.helpers.config.mts](vitest/vitest.helpers.config.mts) (file lives in repo-root **`vitest/`**, not inside **`helpers/`**). Add or extend those Vitest files when you change helper logic (env switches, temp dirs, IPC-adjacent helpers). Follow [vitest-tests.mdc](vitest-tests.mdc) for structure, comments, and **100%** **`helpers`** coverage expectations.
 
 ## Isolated `userData` reset (every spec)
 

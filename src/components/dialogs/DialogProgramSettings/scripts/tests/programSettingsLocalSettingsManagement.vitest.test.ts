@@ -59,6 +59,45 @@ test('updateLocalProgramSetting writes localSettings and programSettingsTree for
 })
 
 /**
+ * updateLocalProgramSetting
+ * No-ops when the render tree is missing the category bucket for the setting key.
+ */
+test('updateLocalProgramSetting returns early when programSettingsTree lacks the category', () => {
+  const localSettings = ref<I_faUserSettings | null>({
+    ...FA_USER_SETTINGS_DEFAULTS
+  })
+  const programSettingsTree = ref<T_programSettingsRenderTree>({})
+
+  updateLocalProgramSetting(localSettings, programSettingsTree, 'showDocumentID', true)
+
+  expect(localSettings.value?.showDocumentID).toBe(true)
+  expect(Object.keys(programSettingsTree.value)).toHaveLength(0)
+})
+
+/**
+ * updateLocalProgramSetting
+ * No-ops when the subcategory or setting leaf is missing from the tree.
+ */
+test('updateLocalProgramSetting returns early when programSettingsTree lacks the subcategory or setting', () => {
+  const localSettings = ref<I_faUserSettings | null>({
+    ...FA_USER_SETTINGS_DEFAULTS
+  })
+  const programSettingsTree = ref<T_programSettingsRenderTree>({
+    developerSettings: {
+      subCategories: {},
+      title: 'Developer'
+    }
+  })
+
+  updateLocalProgramSetting(localSettings, programSettingsTree, 'showDocumentID', true)
+
+  expect(localSettings.value?.showDocumentID).toBe(true)
+  expect(
+    programSettingsTree.value.developerSettings?.subCategories.documentBody
+  ).toBeUndefined()
+})
+
+/**
  * syncLocalProgramSettingsFromStore
  * Returns immediately when no Pinia store is available from the resolver.
  */

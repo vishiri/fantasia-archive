@@ -7,13 +7,15 @@ alwaysApply: true
 
 ## Quality gate (the **default** chained verification)
 
-When running the full **quality gate** — ESLint, TypeScript check, Stylelint, and unit tests — use **one** terminal invocation. Prefer the **`yarn testbatch:verify`** script in `package.json` (same steps, stops on the first failure):
+When running the full **quality gate** — ESLint, TypeScript check, Stylelint, and Vitest with coverage (**100%** on all four v8 metrics for **`src-electron`** and **`helpers`**, **100%** on all four for renderer **`src`** **`.ts`** in **`unit-src-renderer`**, **100%** statements, functions, and lines for **`.ts`** under **`src/components`**, **`src/layouts`**, and **`src/pages`** in **`unit-components`**, **`.vue`** SFCs reported with **60%** watermarks only) — use **one** terminal invocation. Prefer the **`yarn testbatch:verify`** script in `package.json` (same steps, stops on the first failure):
 
 `yarn testbatch:verify`
 
 **Yarn 1.x**: do **not** use `yarn check` for this — it is a built-in that validates the dependency tree, not this script.
 
-Equivalent explicit chain (for context or copy-paste without the script): `yarn lint:eslint && yarn lint:typescript && yarn lint:stylelint && yarn test:unit`
+Equivalent explicit chain (for context or copy-paste without the script): `yarn lint:eslint && yarn lint:typescript && yarn lint:stylelint && yarn test:coverage:verify`
+
+For a **faster** unit pass without coverage instrumentation, run **`yarn test:unit`** (Vitest workspace: electron, **`src`** TS, helpers, components) while iterating; finish with **`yarn testbatch:verify`** before commits.
 
 **Exception**: if you are **debugging** a specific failing step, run that command **alone** (and any narrower follow-ups) until it passes, then re-run the full chained gate before commit or changelog edits.
 

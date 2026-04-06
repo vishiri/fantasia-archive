@@ -29,11 +29,11 @@ yarn
 - **Main ↔ preload IPC**: Channel name strings are defined once in [`src-electron/electron-ipc-bridge.ts`](src-electron/electron-ipc-bridge.ts) (grouped `export const` objects). Preload helpers under `contentBridgeAPIs/` and main-process registration under `mainScripts/register*Ipc.ts` import from that module so `ipcRenderer` calls and `ipcMain` handlers stay aligned.
 - **State and routing**: Pinia + Vue Router
 - **i18n**: vue-i18n (`src/i18n/`)
-- **Tests**: Vitest (unit) + Playwright (component and E2E)
+- **Tests**: Vitest (unit) + Playwright (component and E2E). Vitest workspace entry is [`vitest.config.mts`](vitest.config.mts); per-project configs, shared coverage defaults, and [`vitest/vitest.setup.ts`](vitest/vitest.setup.ts) live under [`vitest/`](vitest/) (not under **`helpers/`**). **Coverage tiers** for **`src-electron`**, **`helpers`**, **`src`** **`.ts`**, and **`.vue`** SFCs are summarized under **Quality gate** and **Scripts reference** below.
 - **Component docs**: Storybook 10 (in `.storybook-workspace/`)
 - **Component `scripts/`** (only when a maintainer asks): bulky logic extracted from a feature `.vue` lives under `src/components/<Feature>/scripts/*.ts` — not beside the `.vue` at the feature root. Agents should not perform this split unless requested; see [AGENTS.md](AGENTS.md) and [.cursor/rules/vue-quasar.mdc](.cursor/rules/vue-quasar.mdc).
-- **Harness helpers (`helpers/`)**: Cross-cutting modules used by Playwright (and similar runners) live under top-level **`helpers/`** in named packages (today: [`helpers/playwrightHelpers/`](helpers/playwrightHelpers/)). Colocate **`tests/*.vitest.test.ts`** next to that code; **`yarn test:unit`** runs them as Vitest project **`unit-helpers`** via **`helpers/**/*.vitest.test.ts`** in **`vitest.helpers.config.mts`** (no manual include list per file). Add or update those Vitest files whenever you add or materially change helper logic. Specs import helpers with the **`app`** alias (for example **`app/helpers/playwrightHelpers/playwrightElectronRecordVideo`**). Strings or constants helpers must share with Electron main belong in **Electron-free** modules (for example **`src-electron/mainScripts/playwrightIsolatedUserDataDirName.ts`**) so Node-side loading never pulls in **`import`** from **`electron`** (see **Electron `userData` isolation** below). Do **not** put Playwright-only harness packages under **`src/`**; keep them under repo-root **`helpers/`** so **`unit-helpers`** stays scoped and **`src/`** stays app code.
-- **Repository root**: Keep the repo root for configuration (**`package.json`**, **Quasar** / **Vite** / **TypeScript** / **ESLint** configs, **`playwright.config.ts`**, **`index.html`**), **`README`**, lockfiles, and the existing **`scripts/`** automation folder. Avoid adding new standalone functional **`.ts`** modules at the root; add new harness packages as subfolders under **`helpers/`** (same pattern as **`helpers/playwrightHelpers/`**).
+- **Harness helpers (`helpers/`)**: Cross-cutting modules used by Playwright (and similar runners) live under top-level **`helpers/`** in named packages (today: [`helpers/playwrightHelpers/`](helpers/playwrightHelpers/)). Colocate **`tests/*.vitest.test.ts`** next to that code; **`yarn test:unit`** runs them as Vitest project **`unit-helpers`** via **`helpers/**/*.vitest.test.ts`** in **`vitest/vitest.helpers.config.mts`** (no manual include list per file). Shared Vitest workspace configs and **`vitest.setup.ts`** live under repo-root **`vitest/`** so they are not part of the strict **`helpers/**/*.ts`** coverage gate; the repo root keeps **`vitest.config.mts`** as the multi-project entry. Add or update those Vitest files whenever you add or materially change helper logic. Specs import helpers with the **`app`** alias (for example **`app/helpers/playwrightHelpers/playwrightElectronRecordVideo`**). Strings or constants helpers must share with Electron main belong in **Electron-free** modules (for example **`src-electron/mainScripts/playwrightIsolatedUserDataDirName.ts`**) so Node-side loading never pulls in **`import`** from **`electron`** (see **Electron `userData` isolation** below). Do **not** put Playwright-only harness packages under **`src/`**; keep them under repo-root **`helpers/`** so **`unit-helpers`** stays scoped and **`src/`** stays app code.
+- **Repository root**: Keep the repo root for configuration (**`package.json`**, **Quasar** / **Vite** / **TypeScript** / **ESLint** configs, **`vitest.config.mts`**, **`playwright.config.ts`**, **`index.html`**), the **`vitest/`** Vitest workspace folder, **`README`**, lockfiles, and the existing **`scripts/`** automation folder. Avoid adding new standalone functional **`.ts`** modules at the root; add new harness packages as subfolders under **`helpers/`** (same pattern as **`helpers/playwrightHelpers/`**).
 
 ### Renderer components (`src/components/`)
 
@@ -189,19 +189,19 @@ Review this table against `src/components/**` stories each iteration and move hi
 
 ### Quality gate (before commit or release)
 
-Run ESLint, the TypeScript project check (`vue-tsc`, includes `.vue` SFCs), Stylelint, and Vitest unit tests in one shot (stops on the first failure):
+Run ESLint, the TypeScript project check (`vue-tsc`, includes `.vue` SFCs), Stylelint, and Vitest with coverage in one shot (stops on the first failure). **Coverage tiers:** **100%** on all four v8 metrics for **`src-electron`** and for **`helpers/**/*.ts`** helper packages; **100%** on all four metrics for renderer **`.ts`** under **`src/boot`**, **`src/scripts`**, **`src/stores`**, and **`src/i18n/specialCharactersFixer.ts`**; **100%** statements, functions, and lines for other **`src/**/*.ts`** files collected under **`unit-components`** (branch totals are printed but do not fail CI for that slice—**v8** can count structural branch edges oddly on some loops). **`.vue`** SFCs have **no** failing threshold; reports use **watermarks** with a **60%** lower band—treat line or statement totals **below 60%** as a signal to investigate and add tests when it makes sense. See **`yarn test:coverage:src`** and [vitest/](vitest/) configs.
 
 ```
 yarn testbatch:verify
 ```
 
-For debugging a single step, run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, or `yarn test:unit` on its own, then run `yarn testbatch:verify` again before committing. Do not append `yarn quasar:build:electron`, Playwright, or Storybook smoke/visual commands to the same shell line as `yarn testbatch:verify` unless you intentionally run **`yarn testbatch:ensure:nochange`** or **`yarn testbatch:ensure:change`**.
+For debugging a single step, run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit` (no coverage), or `yarn test:coverage:verify` / `yarn test:coverage:electron` / `yarn test:coverage:helpers` / `yarn test:coverage:src` on its own, then run `yarn testbatch:verify` again before committing. Do not append `yarn quasar:build:electron`, Playwright, or Storybook smoke/visual commands to the same shell line as `yarn testbatch:verify` unless you intentionally run **`yarn testbatch:ensure:nochange`** or **`yarn testbatch:ensure:change`**.
 
 On **Yarn 1.x**, `yarn check` is a different built-in (dependency-tree validation); use **`yarn testbatch:verify`** for this gate.
 
 #### GitHub Actions vs local full gate
 
-The **Verify** workflow (`.github/workflows/verify.yml`) runs **`yarn testbatch:verify`** only (lint, types, stylelint, unit tests). It installs **`.storybook-workspace`** dependencies so ESLint can resolve that tree. It does **not** run **`yarn quasar:build:electron`**, Playwright component/E2E, **`yarn test:storybook:smoke`**, or **`yarn test:storybook:visual`**. For Storybook VRT and the full chained gate, run **`yarn test:storybook:visual`** / **`yarn testbatch:ensure:nochange`** locally (or the individual commands in separate terminals per [testing-terminal-isolation](.cursor/rules/testing-terminal-isolation.mdc)).
+The **Verify** workflow (`.github/workflows/verify.yml`) runs **`yarn testbatch:verify`** only (lint, types, stylelint, Vitest coverage with the full **`src-electron`**, **`helpers`**, and **`src`** TypeScript gates described above—**Vue** SFCs still have no failing threshold). It installs **`.storybook-workspace`** dependencies so ESLint can resolve that tree. It does **not** run **`yarn quasar:build:electron`**, Playwright component/E2E, **`yarn test:storybook:smoke`**, or **`yarn test:storybook:visual`**. For Storybook VRT and the full chained gate, run **`yarn test:storybook:visual`** / **`yarn testbatch:ensure:nochange`** locally (or the individual commands in separate terminals per [testing-terminal-isolation](.cursor/rules/testing-terminal-isolation.mdc)).
 
 ### Full suite gates (everything + Storybook)
 
@@ -223,11 +223,13 @@ yarn testbatch:ensure:change
 
 #### Unit test - via Vitest
 
-Use Vitest for deterministic unit logic in both app layers: renderer code under `src/` (helpers, store/composable logic, extracted component-facing transforms), Electron/runtime code under `src-electron/`, and shallow-mounted `.vue` files under `src/components/` (second Vitest config; see `vitest.components.config.mts`).
+Use Vitest for deterministic unit logic in both app layers: renderer code under `src/` (boot, scripts, stores, i18n helpers, extracted component **`.ts`** and shallow-mounted **`.vue`** files), Electron/runtime code under `src-electron/`, and Playwright harness code under **`helpers/`**. The default [vitest.config.mts](vitest.config.mts) sets the repo **`root`** and lists four projects that each **`extends`** a file under [vitest/](vitest/): [vitest.electron.config.mts](vitest/vitest.electron.config.mts) (**unit-electron**), [vitest.src-renderer.config.mts](vitest/vitest.src-renderer.config.mts) (**unit-src-renderer**), [vitest.helpers.config.mts](vitest/vitest.helpers.config.mts) (**unit-helpers**), [vitest.components.config.mts](vitest/vitest.components.config.mts) (**unit-components**). See [AGENTS.md](AGENTS.md) and [.cursor/rules/vitest-tests.mdc](.cursor/rules/vitest-tests.mdc) for the same **coverage tier** rules the CI gate enforces.
 
 ```
 yarn test:unit
 ```
+
+Coverage mirrors CI when you run **`yarn test:coverage:verify`** (same chain as the end of **`yarn testbatch:verify`**). Scan the **`unit-components`** table for **`.vue`** rows under **60%** lines or statements when you touch those SFCs; **`unit-src-renderer`** and **`unit-components`** **`.ts`** rows should stay at **100%** on the enforced metrics.
 
 #### Component test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
@@ -301,10 +303,15 @@ Set environment variable **`FA_PLAYWRIGHT_NO_VIDEO`** to **`1`** or **`true`** t
 | `yarn lint:stylelint` | Run Stylelint on Vue/CSS/SCSS/Sass under `src/` and Storybook config under `.storybook-workspace/.storybook/`. |
 | `yarn lint:stylelint:fix` | Same paths as `lint:stylelint` with `--fix` (alphabetical declarations, including inside Vue `<style>` blocks). |
 | `yarn lint:typescript` | Run TypeScript project check (`vue-tsc`, no emit; covers `<script setup>` in SFCs). |
-| `yarn testbatch:verify` | Quick gate: lint + typecheck + stylelint + unit tests. |
+| `yarn testbatch:verify` | Quick gate: lint + typecheck + stylelint + Vitest coverage (**100%** on **`src-electron`** and **`helpers`**; **`src`** **`.ts`** per [vitest/](vitest/) rules; **`.vue`** watermarks only). |
 | `yarn testbatch:ensure:nochange` | Full gate: `testbatch:verify` + `quasar:build:electron` + Playwright component + E2E + Storybook smoke + `test:storybook:visual` (snapshot compare). |
 | `yarn testbatch:ensure:change` | Same through smoke, then `test:storybook:visual:update` (refresh VRT baselines; use only when intentional). |
-| `yarn test:unit` | Run Vitest **unit-core**, **unit-helpers** (**`helpers/**/*.vitest.test.ts`**), then **unit-components**. |
+| `yarn test:unit` | Run Vitest workspace (no coverage): **unit-electron**, **unit-src-renderer**, **unit-helpers**, **unit-components**. |
+| `yarn test:coverage:verify` | Same coverage sequence as **`testbatch:verify`**: electron, helpers, then **`src`** renderer **`.ts`** (strict) + components (**`.ts`** strict on statements/functions/lines; **`.vue`** reported with **60%** watermarks). |
+| `yarn test:coverage:electron` | Vitest coverage for **`src-electron`** only (100% on statements, branches, functions, lines). |
+| `yarn test:coverage:helpers` | Vitest coverage for **`helpers/`** packages only (100% on all four metrics). |
+| `yarn test:coverage:src` | Vitest **`unit-src-renderer`** then **`unit-components`**: enforced **`src`** **`.ts`** thresholds; **`.vue`** without failing gate. |
+| `yarn test:unit:coverage` | Alias for **`yarn test:coverage:verify`**. |
 | `yarn test:components` | Run all Playwright component tests (via `scripts/playwrightWithArtifactTrim.mjs`; see **Playwright HTML report and screen recordings** above). |
 | `yarn test:components:single --component=...` | Run a single component Playwright test by folder path (same wrapper as `test:components`). |
 | `yarn test:components:single:ci --component=...` | Run a single component Playwright test by direct path (same wrapper). |

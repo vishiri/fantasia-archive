@@ -66,7 +66,7 @@ quasar build -m electron
 
 | Goal | Command |
 |------|---------|
-| **Quality gate** (lint + `vue-tsc` + style + unit tests, one terminal) | `yarn testbatch:verify` |
+| **Quality gate** (lint + `vue-tsc` + style + Vitest coverage: 100% `src-electron` + `helpers`; `src` `.ts` per `vitest/`; `vue` SFCs watermarks only; one terminal) | `yarn testbatch:verify` |
 | **Full project gate** (verify + Electron build + Playwright component + E2E + Storybook smoke + VRT compare) | `yarn testbatch:ensure:nochange` |
 | **Full project gate — refresh Storybook VRT baselines** (same through smoke, then snapshot update) | `yarn testbatch:ensure:change` |
 | ESLint | `yarn lint:eslint` |
@@ -78,7 +78,7 @@ quasar build -m electron
 
 **Storybook** nested package: run **`yarn`** at the repo root, then **`yarn --cwd .storybook-workspace install`** so **`yarn storybook:run`** / **`yarn storybook:build`** / **`yarn test:storybook:visual*`** (Playwright VRT) resolve their dependencies.
 
-See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) for ESLint vs TSLint, `tsconfig` / `vue-tsc`, and Vitest env typing. See [fantasia-testing](../fantasia-testing/SKILL.md) for test details. **Yarn 1.x** reserves `yarn check` for dependency verification — use **`yarn testbatch:verify`** for the lint/types/style/unit gate ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
+See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) for ESLint vs TSLint, `tsconfig` / `vue-tsc`, and Vitest env typing. See [fantasia-testing](../fantasia-testing/SKILL.md) and [vitest-tests.mdc](../../rules/vitest-tests.mdc) for Playwright rebuild rules and **layered Vitest coverage**. **Yarn 1.x** reserves `yarn check` for dependency verification — use **`yarn testbatch:verify`** for the lint, types, stylelint, and Vitest-coverage gate ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
 
 ## Local types extraction rule
 

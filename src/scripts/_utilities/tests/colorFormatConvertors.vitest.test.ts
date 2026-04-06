@@ -11,6 +11,14 @@ test('Test that rgbToHex converts rgb-like numbers to hex', () => {
 
 /**
  * rgbToHex
+ * Single-digit channel hex values receive a leading zero when building the hex string.
+ */
+test('Test that rgbToHex pads hex nibbles shorter than two characters', () => {
+  expect(rgbToHex('rgb(5, 6, 7)')).toBe('#050607')
+})
+
+/**
+ * rgbToHex
  * Test that invalid values return false.
  */
 test('Test that rgbToHex returns false for invalid values', () => {

@@ -140,3 +140,161 @@ test('Test that auxclick prevents default behavior', () => {
 
   expect(preventDefaultMock).toHaveBeenCalledTimes(2)
 })
+
+/**
+ * externalLinkManager auxclick handler
+ * Internal links assign location.href after preventing default so middle-click follows in-window navigation.
+ */
+test('Test that auxclick on internal link sets location href when not external', () => {
+  const eventHandlers: Record<string, (ev: Event) => void> = {}
+  const addEventListenerMock = vi.fn((type: string, listener: unknown) => {
+    eventHandlers[type] = listener as (ev: Event) => void
+  })
+  setDocumentAddListenerMock(addEventListenerMock)
+
+  runExternalLinkBoot()
+
+  const locationHref = { current: 'app://start' }
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    writable: true,
+    value: {
+      faContentBridgeAPIs: {
+        faExternalLinksManager: {
+          checkIfExternal: checkIfExternalMock,
+          openExternal: openExternalMock
+        }
+      },
+      location: {
+        set href (v: string) {
+          locationHref.current = v
+        },
+        get href () {
+          return locationHref.current
+        }
+      }
+    } as unknown as Window & typeof globalThis
+  })
+
+  checkIfExternalMock.mockReset()
+  checkIfExternalMock.mockReturnValue(false)
+  openExternalMock.mockReset()
+
+  const targetAnchor = {
+    tagName: 'a',
+    href: 'app://internal/doc',
+    closest: vi.fn(() => null)
+  }
+
+  const preventDefaultMock = vi.fn()
+
+  eventHandlers.auxclick({
+    target: targetAnchor,
+    type: 'auxclick',
+    preventDefault: preventDefaultMock
+  } as unknown as Event)
+
+  expect(preventDefaultMock).toHaveBeenCalledTimes(1)
+  expect(openExternalMock).not.toHaveBeenCalled()
+  expect(locationHref.current).toBe('app://internal/doc')
+})
+
+/**
+ * externalLinkManager click handler
+ * Ignores events whose target is null so shadow roots or detached nodes do not throw.
+ */
+test('Test that click handler returns early when event target is null', () => {
+  const eventHandlers: Record<string, (ev: Event) => void> = {}
+  const addEventListenerMock = vi.fn((type: string, listener: unknown) => {
+    eventHandlers[type] = listener as (ev: Event) => void
+  })
+  setDocumentAddListenerMock(addEventListenerMock)
+
+  runExternalLinkBoot()
+
+  setWindowLinksStub()
+  checkIfExternalMock.mockReset()
+  checkIfExternalMock.mockReturnValue(false)
+
+  const preventDefaultMock = vi.fn()
+
+  eventHandlers.click({
+    target: null,
+    type: 'click',
+    preventDefault: preventDefaultMock
+  } as unknown as Event)
+
+  expect(preventDefaultMock).not.toHaveBeenCalled()
+  expect(checkIfExternalMock).not.toHaveBeenCalled()
+})
+
+/**
+ * externalLinkManager click handler
+ * Resolves the anchor via closest when the direct target is not an anchor element.
+ */
+test('Test that click handler uses closest anchor when target is a nested element', () => {
+  const eventHandlers: Record<string, (ev: Event) => void> = {}
+  const addEventListenerMock = vi.fn((type: string, listener: unknown) => {
+    eventHandlers[type] = listener as (ev: Event) => void
+  })
+  setDocumentAddListenerMock(addEventListenerMock)
+
+  runExternalLinkBoot()
+
+  const parentAnchor = {
+    href: 'https://nested.example/page',
+    tagName: 'A'
+  }
+  const innerSpan = {
+    closest: vi.fn(() => parentAnchor),
+    tagName: 'SPAN'
+  }
+
+  checkIfExternalMock.mockReset()
+  checkIfExternalMock.mockReturnValue(true)
+  openExternalMock.mockReset()
+  setWindowLinksStub()
+
+  const preventDefaultMock = vi.fn()
+
+  eventHandlers.click({
+    target: innerSpan,
+    type: 'click',
+    preventDefault: preventDefaultMock
+  } as unknown as Event)
+
+  expect(innerSpan.closest).toHaveBeenCalledWith('a')
+  expect(checkIfExternalMock).toHaveBeenCalledWith('https://nested.example/page')
+  expect(openExternalMock).toHaveBeenCalledWith('https://nested.example/page')
+})
+
+/**
+ * externalLinkManager click handler
+ * Returns when closest does not find an enclosing anchor so non-link clicks are ignored.
+ */
+test('Test that click handler returns when nested target has no anchor ancestor', () => {
+  const eventHandlers: Record<string, (ev: Event) => void> = {}
+  const addEventListenerMock = vi.fn((type: string, listener: unknown) => {
+    eventHandlers[type] = listener as (ev: Event) => void
+  })
+  setDocumentAddListenerMock(addEventListenerMock)
+
+  runExternalLinkBoot()
+
+  const orphanSpan = {
+    closest: vi.fn(() => null),
+    tagName: 'SPAN'
+  }
+
+  checkIfExternalMock.mockReset()
+  setWindowLinksStub()
+
+  eventHandlers.click({
+    target: orphanSpan,
+    type: 'click',
+    preventDefault: vi.fn()
+  } as unknown as Event)
+
+  expect(orphanSpan.closest).toHaveBeenCalledWith('a')
+  expect(checkIfExternalMock).not.toHaveBeenCalled()
+})
