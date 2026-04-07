@@ -15,6 +15,7 @@ alwaysApply: false
 
 - **Stylelint** sorts **declaration** properties alphabetically project-wide (`order/properties-alphabetical-order` and `order/custom-properties-alphabetical-order` via `stylelint-order`), with autofix from **`yarn lint:stylelint:fix`**. Shorthand-before-longhand and vendor-prefix ordering follow the rule’s documented exceptions.
 - **Partials** in `globals/` are focused: scrollbar, html tweaks, component adjustments, custom colors — follow that separation when adding new cross-app styling.
+- **`hasScrollbar` (global class)**: defined in [scrollbar.scss](src/css/globals/scrollbar.scss). Add this class to the **scroll container** (the element with `overflow: auto` / `scroll` or that will show a scrollbar when content overflows) when that area **may intermittently** show or hide a vertical scrollbar. It sets `scrollbar-gutter: stable` so the layout keeps a consistent gutter and avoids **unwanted horizontal shifts** in edge cases. Use on dialogs, panels, lists, or any region where scrollbar presence is content-dependent.
 - Prefer **low-specificity** selectors and avoid deep nesting unless mirroring an existing pattern in the same file.
 - Component-specific BEM and scoped styles belong in **Vue SFCs** ([vue-bem-scss.mdc](vue-bem-scss.mdc)), not in `src/css/`, unless the team already uses a global override file for that concern.
 

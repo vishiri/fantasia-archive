@@ -25,3 +25,8 @@
     background: color.adjust($dark, $lightness: 60%);
   }
 }
+
+/* Global utility: add to scrollable containers when content may gain/lose a vertical scrollbar, to avoid horizontal layout shift (see README, AGENTS.md, project-scss.mdc, vue-quasar.mdc, fantasia-quasar-vue skill). */
+.hasScrollbar {
+  scrollbar-gutter: stable;
+}

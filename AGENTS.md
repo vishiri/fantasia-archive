@@ -79,6 +79,10 @@ Group new SFCs under one bucket (each feature folder still owns `tests/`, option
 - **`elements/`** — small reusable widgets (`FantasiaMascotImage`, `SocialContactSingleButton`).
 - **`other/`** — other composites (`SocialContactButtons`).
 
+## Global CSS: `hasScrollbar`
+
+The app defines a global class **`hasScrollbar`** in [`src/css/globals/scrollbar.scss`](src/css/globals/scrollbar.scss). Add it to elements that **act as scroll containers** (or will when content overflows) when a vertical scrollbar may **appear or disappear** depending on content or viewport, so **`scrollbar-gutter: stable`** reserves space and avoids **horizontal layout shift**. Use for dialogs, side panels, long lists, or similar. Details: [project-scss.mdc](.cursor/rules/project-scss.mdc), [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc), [fantasia-quasar-vue skill](.cursor/skills/fantasia-quasar-vue/SKILL.md).
+
 ## i18n conventions
 
 ### File structure (`i18n/en-US/`)

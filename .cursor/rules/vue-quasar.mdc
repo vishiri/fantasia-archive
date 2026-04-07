@@ -10,6 +10,7 @@ alwaysApply: false
 
 - Use Vue 3 **Composition API** (`<script setup>`) consistent with existing components.
 - Prefer **Quasar** (`q-*`) components and spacing/typography patterns from sibling files in the same area.
+- **Scrollable regions**: when a template root or wrapper is the element that **may show a vertical scrollbar** (overflow scroll/auto) and scrollbar presence can change with content, add the global class **`hasScrollbar`** so `scrollbar-gutter: stable` prevents layout shift. See [scrollbar.scss](../../src/css/globals/scrollbar.scss) and [project-scss.mdc](project-scss.mdc).
 - Keep **user-visible copy** in repo-root **i18n/** — never hardcode prose strings in templates, `_data/` files, or scripts.
 - For SFC translations, use template `$t('camelCaseKey.subKey')` directly; do **not** import `useI18n` only to call `t(...)`.
 - All top-level i18n keys use **camelCase with a lowercase first letter** (e.g. `globalWindowButtons`, `dialogs`, `errorNotFound`). Sub-keys follow the same convention.

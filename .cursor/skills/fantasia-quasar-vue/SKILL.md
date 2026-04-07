@@ -33,6 +33,7 @@ Locale `L_*` paths under `i18n/<locale>/components/` use the same bucket names a
 ## Quasar patterns
 
 - Prefer Quasar components (`q-*`) and existing spacing/typography patterns in sibling components.
+- **Scrollable areas**: use the global class **`hasScrollbar`** on the scroll container when content may sometimes overflow and show a vertical scrollbar (and sometimes not), so **`scrollbar-gutter: stable`** prevents horizontal layout jitter. Defined in [`src/css/globals/scrollbar.scss`](../../../src/css/globals/scrollbar.scss); see [project-scss.mdc](../../rules/project-scss.mdc) and [AGENTS.md](../../../AGENTS.md).
 - Boot files in `src/boot/` run at app init (e.g. axios, external links).
 - When importing shared project types, keep `I_` / `T_` prefixes and use descriptive singular/collection naming (e.g. `T_documentName`, `I_appMenuList`).
 - In TypeScript and Vue SFC TS scripts, use `import type` for type-only imports.
