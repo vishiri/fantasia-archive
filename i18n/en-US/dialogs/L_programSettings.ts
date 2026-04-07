@@ -2,6 +2,7 @@ export default {
   title: 'Fantasia Archive Settings',
   saveButton: 'Save settings',
   closeButton: 'Close without saving',
+  settingsSearchPlaceholder: 'Search the settings...',
   appOptionsCategories: {
     accessibility: {
       title: 'Accessibility',

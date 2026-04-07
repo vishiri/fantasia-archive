@@ -18,8 +18,34 @@
         {{ $t('dialogs.programSettings.title') }}
       </h4>
 
+      <Transition
+        enter-active-class="animated fadeIn"
+        leave-active-class="animated fadeOut"
+      >
+        <div
+          v-if="hasActiveSearchQuery"
+          class="dialogProgramSettings__tabsSearchOverlay"
+          data-test-locator="dialogProgramSettings-tabsSearchOverlay"
+        />
+      </Transition>
+
       <!-- Body: vertical tabs + scrollable tab panels only -->
       <q-card-section class="dialogProgramSettings__body row no-wrap q-pa-none">
+        <div class="dialogProgramSettings__settingsSearchWrapper">
+          <q-input
+            v-model="searchSettingsQuery"
+            :placeholder="$t('dialogs.programSettings.settingsSearchPlaceholder')"
+            clearable
+            dense
+            dark
+            debounce="300"
+            class="dialogProgramSettings__settingsSearchInput"
+          >
+            <template #prepend>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </div>
         <q-tabs
           v-model="selectedCategoryTab"
           vertical
@@ -144,7 +170,7 @@
       <!-- Card actions wrapper -->
       <q-card-actions
         align="right"
-        class="q-mb-lg q-px-md q-gutter-sm"
+        class="q-mb-lg q-px-md q-gutter-sm dialogProgramSettings__cardActions"
       >
         <q-btn
           v-close-popup
@@ -181,7 +207,7 @@ import {
 } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsLocalSettingsManagement'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
-import { onMounted, ref, toRaw, watch } from 'vue'
+import { computed, onMounted, ref, toRaw, watch } from 'vue'
 
 const resolveDialogComponentStore = (): StoreGeneric | null => {
   try {
@@ -242,11 +268,22 @@ const programSettingsTree = ref<T_programSettingsRenderTree>({})
 const selectedCategoryTab = ref<string>('')
 
 /**
+ * Settings search / filter field (bound to the header q-input).
+ */
+const searchSettingsQuery = ref('')
+
+/**
+ * True when the search field has non-whitespace text (drives the tabs dimming overlay).
+ */
+const hasActiveSearchQuery = computed(() => searchSettingsQuery.value.trim() !== '')
+
+/**
  * Opens the popup dialog via direct input-feed
  */
 const openDialog = (input: T_dialogName) => {
   documentName.value = input
   dialogModel.value = true
+  searchSettingsQuery.value = ''
   void syncLocalProgramSettingsFromStore(localSettings, programSettingsTree)
 }
 
@@ -335,6 +372,10 @@ onMounted(() => {
     width: 1400px;
   }
 
+  .dialogProgramSettings__title {
+    z-index: 10;
+  }
+
   .dialogProgramSettings__titleSection {
     flex-shrink: 0;
   }
@@ -376,10 +417,29 @@ onMounted(() => {
   }
 
   .dialogProgramSettings__tabs {
+    position: relative;
+  }
+
+  .dialogProgramSettings__tabsSearchOverlay {
+    background: rgba(0, 0, 0, 0.3);
+    inset: 0 0 0 0;
+    position: absolute;
+    z-index: 10;
   }
 
   .dialogProgramSettings__category {
-    padding: 0 40px;
+    padding: 30px 40px 0;
+  }
+
+  .dialogProgramSettings__categoryTitle {
+    background: $dark;
+    left: 40px;
+    padding-bottom: 8px;
+    padding-top: 8px;
+    position: absolute;
+    right: 40px;
+    top: 0;
+    z-index: 5;
   }
 
   .dialogProgramSettings__settingTitle {
@@ -407,6 +467,23 @@ onMounted(() => {
   .dialogProgramSettings__settingNote {
     margin-left: 10px;
     text-shadow: 0 0 2px black;
+  }
+
+  /* Fixed width so clearable append slot does not widen the field when it mounts. */
+  .dialogProgramSettings__settingsSearchInput {
+    width: 100%;
+  }
+
+  .dialogProgramSettings__settingsSearchWrapper {
+    position: absolute;
+    right: 45px;
+    top: 4px;
+    width: min(220px, calc(100vw - 120px));
+    z-index: 10;
+  }
+
+  .dialogProgramSettings__cardActions {
+    z-index: 10;
   }
 }
 </style>
