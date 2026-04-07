@@ -15,14 +15,14 @@ description: >-
 
 ## Content source
 
-- Long-form markdown files live under `src/i18n/en-US/documents/` (and parallel locales) and are registered on the `documents` key in `src/i18n/en-US/index.ts` (often through `specialCharacterFixer`).
+- Long-form markdown files live under `i18n/en-US/documents/` (and parallel locales) and are registered on the `documents` key in `i18n/en-US/index.ts` (often through `specialCharacterFixer`).
 - Storybook-specific runs should not import those markdown files through full locale entrypoints by default; provide placeholder `documents.*` strings in [`.storybook-workspace/.storybook/preview.ts`](../../../.storybook-workspace/.storybook/preview.ts) unless Storybook markdown loader support is explicitly configured.
 
 ## Conventions
 
 - Prefer updating `.md` assets and i18n wiring over hardcoding large markdown in `.vue` files.
 - Keep headings and structure readable in a modal/dialog viewport; test in the actual dialog component.
-- Markdown under **`src/i18n/*/documents/`** is compiled as **vue-i18n** message text: **do not** use stray **`{...}`** (for example glob **`.*.{ext1,ext2}`**) unless you follow vue-i18n placeholder rules — invalid groups break the changelog and other document dialogs at runtime. See [fantasia-changelog-en-us](../fantasia-changelog-en-us/SKILL.md) for changelog-specific wording.
+- Markdown under **`i18n/*/documents/`** is compiled as **vue-i18n** message text: **do not** use stray **`{...}`** (for example glob **`.*.{ext1,ext2}`**) unless you follow vue-i18n placeholder rules — invalid groups break the changelog and other document dialogs at runtime. See [fantasia-changelog-en-us](../fantasia-changelog-en-us/SKILL.md) for changelog-specific wording.
 
 ## Related
 

@@ -23,6 +23,9 @@ export default defineConfig({
         extends: './vitest/vitest.helpers.config.mts'
       },
       {
+        extends: './vitest/vitest.i18n.config.mts'
+      },
+      {
         extends: './vitest/vitest.components.config.mts'
       }
     ]

@@ -14,8 +14,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
 
 /**
- * Renderer-side TypeScript under src/ (boot, scripts, stores, i18n) — no Vue SFCs.
- * 100% v8 thresholds apply to the scoped include list (see test:coverage:src in package.json).
+ * Renderer-side TypeScript under src/ (boot, scripts, stores) — no Vue SFCs.
+ * Locale logic lives in repo-root **i18n/** (**unit-i18n**). 100% v8 thresholds apply to the scoped include list (see **test:coverage:src** in package.json).
  */
 export default defineConfig({
   resolve: {
@@ -35,8 +35,7 @@ export default defineConfig({
     include: [
       'src/scripts/**/*.vitest.test.ts',
       'src/boot/**/*.vitest.test.ts',
-      'src/stores/**/*.vitest.test.ts',
-      'src/i18n/**/*.vitest.test.ts'
+      'src/stores/**/*.vitest.test.ts'
     ],
     reporters: [...vitestTerminalReporters],
     outputFile: 'test-results/vitest-report/test-results-vitest-src-renderer.json',
@@ -46,15 +45,13 @@ export default defineConfig({
       include: [
         'src/boot/**/*.ts',
         'src/scripts/**/*.ts',
-        'src/stores/**/*.ts',
-        'src/i18n/specialCharactersFixer.ts'
+        'src/stores/**/*.ts'
       ],
       exclude: [
         ...vitestCoverageBaseExclude,
         'src/boot/**/tests/**',
         'src/scripts/**/tests/**',
-        'src/stores/**/tests/**',
-        'src/i18n/**/tests/**'
+        'src/stores/**/tests/**'
       ],
       thresholds: { ...vitestCoverageStrictThresholds }
     }

@@ -1,6 +1,6 @@
 # AI and agent notes — Fantasia Archive
 
-This repository is **Fantasia Archive**: a **worldbuilding database manager** shipped as a **Quasar + Vue 3 + Electron** desktop app (GPL-3.0). Use **Yarn 1.x** and **Node.js 22.22.0 or newer** for local work (see `README.md` and `package.json` `engines.node`; Quasar `@quasar/app-vite` v2 enforces this minimum). CI uses **22.22** on push/PR (**`.github/workflows/verify.yml`** runs **`yarn testbatch:verify`** only: lint, types, stylelint, then Vitest with coverage — see **Testing expectations** for the **`src-electron`**, **`helpers`**, and **`src`** TypeScript vs **Vue** SFC rules) and on manual release builds (**`.github/workflows/build.yml`**).
+This repository is **Fantasia Archive**: a **worldbuilding database manager** shipped as a **Quasar + Vue 3 + Electron** desktop app (GPL-3.0). Use **Yarn 1.x** and **Node.js 22.22.0 or newer** for local work (see `README.md` and `package.json` `engines.node`; Quasar `@quasar/app-vite` v2 enforces this minimum). CI uses **22.22** on push/PR (**`.github/workflows/verify.yml`** runs **`yarn testbatch:verify`** only: lint, types, stylelint, then Vitest with coverage — see **Testing expectations** for **`src-electron`**, **`helpers`**, repo-root **`i18n/`**, **`src`** TypeScript vs **Vue** SFC rules) and on manual release builds (**`.github/workflows/build.yml`**).
 
 ## Where project AI guidance lives
 
@@ -10,6 +10,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 ## Repository layout (repo root)
 
 - The **repository root** is for project **configuration** (**`package.json`**, **Quasar** / **Vite** / **TypeScript** / **ESLint** / **Playwright** config files, **`index.html`**), **`README`**, lockfiles, and the existing **`scripts/`** folder for small automation (including **`quasarBuildElectronSummarized.mjs`** for **`yarn quasar:build:electron:summarized`** / **`yarn testbatch:ensure:*`**). Do **not** add new loose functional **`.ts`** modules at the root.
+- **vue-i18n** locale trees (**`i18n/`** — registry **`index.ts`**, **`externalFileLoader.ts`**, **`specialCharactersFixer.ts`**, and per-locale **`en-US/`**, **`fr/`**, **`de/`**, etc.) live at the **repository root** next to **`src/`**, not under **`src/i18n/`**. Import the registry with **`app/i18n`** or **`app/i18n/...`** (the **`app`** alias resolves to the repo root).
 - **Cross-cutting harness or tooling** (for example Playwright-only helpers) belongs under top-level **`helpers/`** in a dedicated package folder (today: **`helpers/playwrightHelpers/`**). Vitest project configs, shared coverage defaults, and **`vitest.setup.ts`** live under repo-root **`vitest/`** (not inside **`helpers/`**) so the **`unit-helpers`** 100% coverage gate applies only to real helper packages; the repo root keeps **`vitest.config.mts`** as the multi-project entry only. Keep implementation **`.ts`** modules and colocated **`tests/*.vitest.test.ts`** files inside each **`helpers/<package>/`** tree; import from specs with the **`app`** alias (for example **`app/helpers/playwrightHelpers/playwrightUserDataReset`**). **`yarn test:unit`** runs those suites under the Vitest project **`unit-helpers`** via the glob **`helpers/**/*.vitest.test.ts`** in [vitest.helpers.config.mts](vitest/vitest.helpers.config.mts), so new helper packages are picked up **automatically** once they live under **`helpers/`** and use the **`*.vitest.test.ts`** suffix—**add matching Vitest coverage whenever you add or materially change helper logic** (same discipline as **`src-electron`** and **`src/scripts`**). Do **not** create parallel harness-only **`helpers/`** trees under **`src/`**; keep those packages at the repo root under **`helpers/`**. Shared constants those helpers need from main-process code must stay in **Electron-free** modules (for example **`mainScripts/appIdentity/playwrightIsolatedUserDataDirName.ts`** next to **`mainScripts/appIdentity/fixAppName.ts`**) so Node-side Playwright never imports files that **`import`** from **`electron`**.
 
 ## Rule files (`.mdc`)
@@ -41,7 +42,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | UI             | Vue 3, Quasar 2, TypeScript                                      |
 | Desktop        | Electron, Quasar Electron mode                                   |
 | State / routes | Pinia, Vue Router                                                |
-| i18n           | vue-i18n (`src/i18n/`)                                           |
+| i18n           | vue-i18n (repo-root **`i18n/`**)                                 |
 | Lint / types   | ESLint (`yarn lint:eslint`), `vue-tsc` (`yarn lint:typescript`), Stylelint (`yarn lint:stylelint`) — see [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc) |
 | Unit tests     | Vitest — **`yarn test:unit`** (no coverage); **`yarn testbatch:verify`** runs **`yarn test:coverage:verify`** with layered gates (**`src-electron`**, **`helpers`**, **`src`** **`.ts`** vs **`.vue`** watermarks) — [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc), [vitest/](vitest/) |
 | UI / E2E tests | Playwright (`yarn test:components`, `yarn test:e2e`)              |
@@ -65,7 +66,7 @@ When writing comments in source files (not in user-facing Markdown documents suc
 
 ## Type naming conventions
 
-- Keep the existing prefix strategy: `I_` for interfaces and `T_` for type aliases.
+- Keep the existing prefix strategy: `I_` for interfaces and `T_` for TypeScript type aliases (do not use `T_` for locale files; those use `L_` — see i18n conventions).
 - Favor singular names for single-item shapes (`I_appMenuItem`, `T_documentName`) and collection-oriented names for grouped structures (`I_appMenuList`, `I_socialContactButtonSet`).
 - Keep unions and function signatures consistently spaced (for example, `string | false`, `(...args: unknown[]) => unknown | void`).
 
@@ -80,36 +81,36 @@ Group new SFCs under one bucket (each feature folder still owns `tests/`, option
 
 ## i18n conventions
 
-### File structure (`src/i18n/en-US/`)
+### File structure (`i18n/en-US/`)
 
-Locale strings live under `src/i18n/en-US/` in a fixed folder hierarchy:
+Locale strings live under `i18n/en-US/` in a fixed folder hierarchy:
 
 - `documents/` — Markdown source files (`.md`, imported with `?raw` and passed through `specialCharacterFixer`).
-- `components/<bucket>/<ComponentName>/` — same buckets as `src/components/` (`globals`, `elements`, `other`); one or more `T_*.ts` modules per component with user-visible strings.
-- `dialogs/` — one `T_<DialogName>.ts` per dialog.
-- `pages/` — one `T_<PageName>.ts` per page.
-- `globalFunctionality/` — one `T_<feature>.ts` per app-wide, non-component concern (e.g. store notifications).
+- `components/<bucket>/<ComponentName>/` — same buckets as `src/components/` (`globals`, `elements`, `other`); one or more `L_*.ts` locale modules per component with user-visible strings.
+- `dialogs/` — one `L_<DialogName>.ts` per dialog.
+- `pages/` — one `L_<PageName>.ts` per page.
+- `globalFunctionality/` — one `L_<feature>.ts` per app-wide, non-component concern (e.g. store notifications).
 
 `index.ts` composes the full locale tree. It must contain **only imports and the composed export object** — no hardcoded user-visible strings. The only intentionally inline section is `quasarNotify` (a single, stable key).
 
 ### Key naming
 
 - All top-level keys in `index.ts` use **camelCase with a lowercase first letter** (e.g. `globalWindowButtons`, `appControlMenus`, `dialogs`, `errorNotFound`, `globalFunctionality`).
-- Sub-keys within `T_*.ts` modules also use camelCase with a lowercase first letter.
-- `index.ts` must contain no hardcoded user-visible strings; every string lives in a dedicated `T_*.ts` file.
+- Sub-keys within `L_*.ts` locale modules also use camelCase with a lowercase first letter.
+- `index.ts` must contain no hardcoded user-visible strings; every string lives in a dedicated `L_*.ts` file.
 - The `documents` section is the only one that uses `specialCharacterFixer`; do not add plain string keys there.
-- App-wide strings that do not belong to a specific component, dialog, or page go in `globalFunctionality/`. Uncategorised strings live in `globalFunctionality/T_unsortedAppTexts.ts` under the `globalFunctionality.unsortedAppTexts` key.
+- App-wide strings that do not belong to a specific component, dialog, or page go in `globalFunctionality/`. Uncategorised strings live in `globalFunctionality/L_unsortedAppTexts.ts` under the `globalFunctionality.unsortedAppTexts` key.
 
 ### Usage
 
 - In Vue templates, use `$t('camelCaseKey.subKey')` for translations. Do **not** import `useI18n` just to call `t(...)` inside SFC scripts when template `$t(...)` can be used.
-- In TypeScript scripts and Pinia stores, import `{ i18n } from 'app/src/i18n/externalFileLoader'` and call `i18n.global.t('camelCaseKey.subKey')`.
+- In TypeScript scripts and Pinia stores, import `{ i18n } from 'app/i18n/externalFileLoader'` and call `i18n.global.t('camelCaseKey.subKey')`.
 - Never hardcode user-visible prose in `.vue` templates, `_data/` files, or scripts; always route through an i18n key.
 
 ### Storybook i18n
 
-- Do **not** import the full `src/i18n/en-US/index.ts` (or `src/i18n/index.ts`) in Storybook helpers/mocks — markdown `documents/*.md` imports can break Vite import analysis.
-- For Storybook-only i18n mocks, import non-markdown `T_*` locale modules directly and provide placeholder lorem ipsum strings for `documents.*` markdown keys.
+- Do **not** import the full `i18n/en-US/index.ts` (or `i18n/index.ts`) in Storybook helpers/mocks — markdown `documents/*.md` imports can break Vite import analysis.
+- For Storybook-only i18n mocks, import non-markdown `L_*` locale modules directly and provide placeholder lorem ipsum strings for `documents.*` markdown keys.
 
 ## Linting and static analysis
 
@@ -132,14 +133,14 @@ Locale strings live under `src/i18n/en-US/` in a fixed folder hierarchy:
 
 ## Changelog (in-app)
 
-- English changelog: [src/i18n/en-US/documents/changeLog.md](src/i18n/en-US/documents/changeLog.md). **Version** in [package.json](package.json) is the only source of truth. **NEVER, EVER, UNDER ANY CIRCUMSTANCES** auto-bump any version in changelog or `package.json`; update changelog entries under the existing package version unless the user explicitly requests a manual version change. Do not add empty `###` sections or “none” placeholder bullets. Changelog Markdown is compiled as a **vue-i18n** message: **do not** use stray **`{...}`** (for example shell glob **`.*.{vue,css}`**) — invalid placeholders crash the in-app changelog; see [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc) and [fantasia-changelog-en-us skill](.cursor/skills/fantasia-changelog-en-us/SKILL.md).
+- English changelog: [i18n/en-US/documents/changeLog.md](i18n/en-US/documents/changeLog.md). **Version** in [package.json](package.json) is the only source of truth. **NEVER, EVER, UNDER ANY CIRCUMSTANCES** auto-bump any version in changelog or `package.json`; update changelog entries under the existing package version unless the user explicitly requests a manual version change. Do not add empty `###` sections or “none” placeholder bullets. Changelog Markdown is compiled as a **vue-i18n** message: **do not** use stray **`{...}`** (for example shell glob **`.*.{vue,css}`**) — invalid placeholders crash the in-app changelog; see [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc) and [fantasia-changelog-en-us skill](.cursor/skills/fantasia-changelog-en-us/SKILL.md).
 - Changelog bullets are for **user- or release-relevant changes** (features, fixes, meaningful dependency refreshes, etc.). **Do not** log internal QA as changelog text: omit lines that only say the team re-ran `yarn testbatch:verify`, `yarn testbatch:ensure:nochange`, `yarn testbatch:ensure:change`, `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, production builds, Playwright component tests, E2E, Storybook smoke/visual runs, or that “all gates passed”. Follow [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc) and [fantasia-changelog-en-us skill](.cursor/skills/fantasia-changelog-en-us/SKILL.md).
 - Changelog-edit guard: always re-open [package.json](package.json) immediately before updating changelog content and use that live `version` value for section targeting.
 - For changelog updates tied to fresh work, ensure Storybook updates/checks for affected **`src/components/**`** UI are completed before editing the changelog entry.
 
 ## Testing expectations
 
-- **Vitest**: **`yarn test:unit`** runs the workspace (**`unit-electron`**, **`unit-src-renderer`**, **`unit-helpers`**, **`unit-components`**) without coverage. **`yarn testbatch:verify`** runs **`yarn test:coverage:verify`**: **100%** v8 thresholds on all four metrics for **`src-electron`** and for **`helpers/**/*.ts`** packages; **100%** on all four metrics for renderer **`.ts`** in **`src/boot`**, **`src/scripts`**, **`src/stores`**, and **`src/i18n/specialCharactersFixer.ts`** (**`unit-src-renderer`**); **100%** statements, functions, and lines (branch totals reported but not gated) for **`.ts`** under **`src/components`**, **`src/layouts`**, and **`src/pages`** in **`unit-components`** coverage — see [vitest/](vitest/) configs. **`.vue`** SFCs have **no** CI threshold; **`unit-components`** uses **watermarks** (~**60%** lower band)—totals **below ~60%** lines or statements should trigger review. Add or extend **`tests/*.vitest.test.ts`** when you change **`helpers/`** or any covered **`src`** surface. Coverage projects use the **`agent`** terminal reporter plus **`json`** (see **`vitest/vitest.reporters.shared.ts`**) so passing tests do not spam the terminal. [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc) covers **`*.vitest.test.ts`** style and the **Vitest coverage tiers (CI)** section lists the same gates in order.
+- **Vitest**: **`yarn test:unit`** runs the workspace (**`unit-electron`**, **`unit-src-renderer`**, **`unit-helpers`**, **`unit-i18n`**, **`unit-components`**) without coverage. **`yarn testbatch:verify`** runs **`yarn test:coverage:verify`**: **100%** v8 thresholds on all four metrics for **`src-electron`**, for **`helpers/**/*.ts`** packages (**`unit-helpers`**), and for scoped **`i18n/`** entry modules (**`unit-i18n`** — see [vitest.i18n.config.mts](vitest/vitest.i18n.config.mts)); **100%** on all four metrics for renderer **`.ts`** in **`src/boot`**, **`src/scripts`**, and **`src/stores`** (**`unit-src-renderer`**); **100%** statements, functions, and lines (branch totals reported but not gated) for **`.ts`** under **`src/components`**, **`src/layouts`**, and **`src/pages`** in **`unit-components`** coverage — see [vitest/](vitest/) configs. **`.vue`** SFCs have **no** CI threshold; **`unit-components`** uses **watermarks** (~**60%** lower band)—totals **below ~60%** lines or statements should trigger review. Add or extend **`tests/*.vitest.test.ts`** when you change **`helpers/`**, **`i18n/`**, or any covered **`src`** surface. Coverage projects use the **`agent`** terminal reporter plus **`json`** (see **`vitest/vitest.reporters.shared.ts`**) so passing tests do not spam the terminal. [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc) covers **`*.vitest.test.ts`** style and the **Vitest coverage tiers (CI)** section lists the same gates in order.
 - For **`src/components/**`**, **`src/layouts/**`**, and **`src/pages/**`**, keep a **1:1 Vitest presence baseline**: each feature **`.vue`** has a colocated **`tests/<Name>.vitest.test.ts`** (same **`tests/`** tree pattern as Storybook previews for layouts and pages). Add/rename/remove SFC + Vitest counterpart together. **Extracted `scripts/*.ts`** beside a component must stay within enforced **`.ts`** metrics when those files are in the **`unit-components`** coverage **`include`** list; add **`scripts/tests/*.vitest.test.ts`** when they contain non-trivial logic (Pinia sync, tree updates, etc.).
 - **`_data/` holds production structured feeds** (menus, lists, etc.). **Vitest** and **Playwright** fixture objects live **inside** their own `*.vitest.test.ts` / `*.playwright.test.ts` files (inline `const` / literals), not in `_data/` and **not** in extra `tests/*.ts` files whose only role is fixture storage. **Never** add `tests/_data/`. Do **not** add tests whose **only** system-under-test is a file under `_data/`; exercise production data indirectly (components, boot, scripts).
 - Treat 1:1 component-test parity as **coverage presence** for **`.vue`** files (no CI percentage gate); still treat colocated **`.ts`** logic as subject to the strict **`.ts`** metrics above when it appears in the **`unit-components`** coverage **`include`** list.
@@ -155,7 +156,7 @@ Locale strings live under `src/i18n/en-US/` in a fixed folder hierarchy:
 - Story files are stored in `tests/` subfolders (for example `src/components/**/tests/<Component>.stories.ts`).
 - **Layouts and pages** may have `src/layouts/**/tests/*.stories.ts` and `src/pages/**/tests/*.stories.ts` for **canvas-only** previews (router shells, smoke checks). Do **not** add Storybook **Docs** (no `autodocs` tag, no `parameters.docs.description`, keep `parameters.docs.disable: true`). Agents should not generate or expand documentation pages for layouts/pages in Storybook.
 - Prefer Storybook for isolated **component** authoring/editing feedback; use `yarn storybook:run` for dev and `yarn storybook:build` for static output.
-- Do **not** import the full `src/i18n/en-US/index.ts` (or `src/i18n/index.ts`) in Storybook helpers/mocks — see i18n conventions above.
+- Do **not** import the full `i18n/en-US/index.ts` (or `i18n/index.ts`) in Storybook helpers/mocks — see i18n conventions above.
 - Do **not** add Storybook stories named `A11y/*` in this project.
 - Do **not** create stories that only verify `TEST_ENV === 'components'`; keep those checks in Playwright/component-test flows.
 
@@ -186,7 +187,7 @@ Use different instructions or @-references when starting a task:
 | `fantasia-electron-preload`     | `faContentBridgeAPIs`, preload, and `electron-ipc-bridge.ts` IPC names |
 | `fantasia-electron-main`        | Main process lifecycle, `mainScripts/` feature folders (`appIdentity`, `windowManagement`, `chromiumFixes`, `userSettings`, `nativeShell`, `ipcManagement`), and `appManagement.ts`   |
 | `fantasia-quasar-vue`           | Vue/Quasar app structure                                            |
-| `fantasia-i18n`                 | Locales and `T_`* message modules                                   |
+| `fantasia-i18n`                 | Repo-root **`i18n/`** and **`L_`* locale modules                    |
 | `fantasia-sqlite-main`          | SQLite in main process                                              |
 | `fantasia-worldbuilding-domain` | Product vocabulary and scope                                        |
 | `fantasia-markdown-dialogs`     | QMarkdown dialogs and document markdown                             |

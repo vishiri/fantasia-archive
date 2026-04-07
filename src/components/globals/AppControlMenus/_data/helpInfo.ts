@@ -1,4 +1,4 @@
-import { i18n } from 'app/src/i18n/externalFileLoader'
+import { i18n } from 'app/i18n/externalFileLoader'
 
 import type { I_appMenuList } from 'app/types/I_appMenusDataList'
 

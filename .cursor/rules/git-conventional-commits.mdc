@@ -12,7 +12,7 @@ alwaysApply: true
 - **Before any commit OR changelog edit**, enforce this order:
   1. Run the **quality gate** in **one** terminal (see [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc)): `yarn testbatch:verify` (must pass; run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, or `yarn test:coverage:verify` / slice scripts individually only while debugging a failure). When the change touches lint-covered sources, ESLint is required — see [eslint-typescript.mdc](eslint-typescript.mdc).
   2. Verify Storybook coverage/health for changed user-facing **`src/components/**`** and add/update missing `tests/*.stories.ts` plus mocks/placeholders as needed. Layout/page Storybook previews (`src/layouts/**/tests`, `src/pages/**/tests`) stay canvas-only without Docs — see [storybook-stories.mdc](storybook-stories.mdc).
-  3. Update `src/i18n/en-US/documents/changeLog.md` for user-visible changes (follow changelog rules/skill and NEVER auto-bump versions; changelog version must follow existing `package.json` version only).
+  3. Update `i18n/en-US/documents/changeLog.md` for user-visible changes (follow changelog rules/skill and NEVER auto-bump versions; changelog version must follow existing `package.json` version only).
   4. Commit.
 - If **any** gate fails (lint, types, stylelint, or Vitest coverage), **stop the commit flow**, do not run `git commit`, and inform the user with a concise summary that includes what failed and where (file paths and key error locations/messages).
 

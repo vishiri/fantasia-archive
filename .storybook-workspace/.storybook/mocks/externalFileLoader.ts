@@ -1,35 +1,35 @@
-import T_documents from 'src/i18n/en-US/components/globals/AppControlMenus/T_documents'
-import T_FantasiaMascotImage from 'src/i18n/en-US/components/elements/FantasiaMascotImage/T_FantasiaMascotImage'
-import T_GlobalWindowButtons from 'src/i18n/en-US/components/globals/GlobalWindowButtons/T_GlobalWindowButtons'
-import T_helpInfo from 'src/i18n/en-US/components/globals/AppControlMenus/T_helpInfo'
-import T_project from 'src/i18n/en-US/components/globals/AppControlMenus/T_project'
-import T_tools from 'src/i18n/en-US/components/globals/AppControlMenus/T_tools'
-import T_socialContactButtons from 'src/i18n/en-US/components/other/SocialContactButtons/T_socialContactButtons'
-import T_aboutFantasiaArchive from 'src/i18n/en-US/dialogs/T_aboutFantasiaArchive'
-import T_programSettings from 'src/i18n/en-US/dialogs/T_programSettings'
-import T_faUserSettings from 'src/i18n/en-US/globalFunctionality/T_faUserSettings'
-import T_unsortedAppTexts from 'src/i18n/en-US/globalFunctionality/T_unsortedAppTexts'
-import T_ErrorNotFound from 'src/i18n/en-US/pages/T_ErrorNotFound'
+import L_documents from 'app/i18n/en-US/components/globals/AppControlMenus/L_documents'
+import L_FantasiaMascotImage from 'app/i18n/en-US/components/elements/FantasiaMascotImage/L_FantasiaMascotImage'
+import L_GlobalWindowButtons from 'app/i18n/en-US/components/globals/GlobalWindowButtons/L_GlobalWindowButtons'
+import L_helpInfo from 'app/i18n/en-US/components/globals/AppControlMenus/L_helpInfo'
+import L_project from 'app/i18n/en-US/components/globals/AppControlMenus/L_project'
+import L_tools from 'app/i18n/en-US/components/globals/AppControlMenus/L_tools'
+import L_socialContactButtons from 'app/i18n/en-US/components/other/SocialContactButtons/L_socialContactButtons'
+import L_aboutFantasiaArchive from 'app/i18n/en-US/dialogs/L_aboutFantasiaArchive'
+import L_programSettings from 'app/i18n/en-US/dialogs/L_programSettings'
+import L_faUserSettings from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
+import L_unsortedAppTexts from 'app/i18n/en-US/globalFunctionality/L_unsortedAppTexts'
+import L_ErrorNotFound from 'app/i18n/en-US/pages/L_ErrorNotFound'
 import type { T_i18nScenario } from './externalFileLoader.types'
 
 const defaultMessages: Record<string, unknown> = {
-  errorNotFound: T_ErrorNotFound,
+  errorNotFound: L_ErrorNotFound,
   dialogs: {
-    aboutFantasiaArchive: T_aboutFantasiaArchive,
-    programSettings: T_programSettings
+    aboutFantasiaArchive: L_aboutFantasiaArchive,
+    programSettings: L_programSettings
   },
-  globalWindowButtons: T_GlobalWindowButtons,
+  globalWindowButtons: L_GlobalWindowButtons,
   appControlMenus: {
-    project: T_project,
-    documents: T_documents,
-    tools: T_tools,
-    helpInfo: T_helpInfo
+    project: L_project,
+    documents: L_documents,
+    tools: L_tools,
+    helpInfo: L_helpInfo
   },
-  socialContactButtons: T_socialContactButtons,
-  fantasiaMascotImage: T_FantasiaMascotImage,
+  socialContactButtons: L_socialContactButtons,
+  fantasiaMascotImage: L_FantasiaMascotImage,
   globalFunctionality: {
-    faUserSettings: T_faUserSettings,
-    unsortedAppTexts: T_unsortedAppTexts
+    faUserSettings: L_faUserSettings,
+    unsortedAppTexts: L_unsortedAppTexts
   },
   documents: {
     advancedSearchCheatSheet: '# Advanced Search Cheat Sheet\n\nIn the moonlit stacks beneath **Aurelion Citadel**, archivists index stories by sigil, era, and oath. Queries can chain together concepts like *kingdom*, *bloodline*, and *artifact* to narrow thousands of records into a single credible trail. Use precise terms first, then broaden with synonyms when the trail goes cold.\n\n> Lore note: most "missing" entries are filed under their pre-coronation names.\n\n## Quick patterns\n\n- `type:character AND faction:"Sunforged Court"`\n- `region:"North Reach" AND status:active`\n- `artifact:"Glass Compass" OR artifact:"Mirror Needle"`\n\n```text\ntitle:"Ashen Treaty" AND NOT status:archived\n```\n\n| Field | Use |\n| --- | --- |\n| `type` | Entity category |\n| `region` | Geographic filter |\n| `status` | Active/archived state |',

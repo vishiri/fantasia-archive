@@ -1,7 +1,7 @@
 import type { BrowserWindow } from 'electron'
 import { beforeEach, expect, test, vi } from 'vitest'
 
-import T_spellChecker_fr from 'app/src/i18n/fr/globalFunctionality/T_spellChecker'
+import L_spellChecker_fr from 'app/i18n/fr/globalFunctionality/L_spellChecker'
 
 import { setupSpellChecker } from '../spellChecker'
 
@@ -205,5 +205,5 @@ test('Test that spellChecker uses French add-to-dictionary label when app locale
   })
 
   const addWordItem = MenuItemMock.mock.calls[0][0]
-  expect(addWordItem.label).toBe(T_spellChecker_fr.addToDictionary)
+  expect(addWordItem.label).toBe(L_spellChecker_fr.addToDictionary)
 })

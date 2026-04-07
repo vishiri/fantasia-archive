@@ -1,12 +1,12 @@
 import type { BrowserWindow } from 'electron'
 import { MenuItem, Menu, app } from 'electron'
-import T_spellChecker_enUS from 'app/src/i18n/en-US/globalFunctionality/T_spellChecker'
-import T_spellChecker_fr from 'app/src/i18n/fr/globalFunctionality/T_spellChecker'
+import L_spellChecker_enUS from 'app/i18n/en-US/globalFunctionality/L_spellChecker'
+import L_spellChecker_fr from 'app/i18n/fr/globalFunctionality/L_spellChecker'
 
 const resolveAddToDictionaryLabel = () => {
   const appLocale = app.getLocale().toLowerCase()
-  if (appLocale.startsWith('fr')) return T_spellChecker_fr.addToDictionary
-  return T_spellChecker_enUS.addToDictionary
+  if (appLocale.startsWith('fr')) return L_spellChecker_fr.addToDictionary
+  return L_spellChecker_enUS.addToDictionary
 }
 
 export const setupSpellChecker = (appWindow: BrowserWindow | undefined) => {

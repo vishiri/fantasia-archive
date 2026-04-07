@@ -53,14 +53,14 @@ export default defineConfig((ctx) => {
 
       vitePlugins: [
         VueI18nPlugin({
-          include: [fileURLToPath(new URL('./src/i18n', import.meta.url))],
+          include: [fileURLToPath(new URL('./i18n', import.meta.url))],
           runtimeOnly: false,
           ssr: ctx.modeName === 'ssr'
         }),
         checker({
           eslint: {
             useFlatConfig: true,
-            lintCommand: 'eslint src src-electron quasar.config.ts'
+            lintCommand: 'eslint src i18n src-electron quasar.config.ts'
           }
         })
       ],

@@ -247,7 +247,7 @@ const selectedCategoryTab = ref<string>('')
 const openDialog = (input: T_dialogName) => {
   documentName.value = input
   dialogModel.value = true
-  void syncLocalSettingsFromStore()
+  void syncLocalProgramSettingsFromStore(localSettings, programSettingsTree)
 }
 
 /**
@@ -261,13 +261,6 @@ const saveAndCloseDialog = async (): Promise<void> => {
   }
 
   dialogModel.value = false
-}
-
-/**
- * Syncs the local settings from the store
- */
-const syncLocalSettingsFromStore = async (): Promise<void> => {
-  await syncLocalProgramSettingsFromStore(resolveFaUserSettingsStore, localSettings, programSettingsTree)
 }
 
 /**
@@ -404,7 +397,8 @@ onMounted(() => {
   }
 
   .dialogProgramSettings__settingHelpIcon {
-    margin-top: 2px;
+    align-self: flex-start;
+    margin-top: 3px;
   }
 
   .dialogProgramSettings__settingHelp {

@@ -1,5 +1,5 @@
 import { Notify } from 'quasar'
-import { i18n } from 'app/src/i18n/externalFileLoader'
+import { i18n } from 'app/i18n/externalFileLoader'
 import { fantasiaImageList, determineCurrentImage } from 'app/src/scripts/appInfo/fantasiaMascotImageManager'
 import { mdListArrayConverter } from '../_utilities/mdListArrayConverter'
 

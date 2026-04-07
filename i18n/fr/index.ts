@@ -6,17 +6,17 @@ import changeLog from './documents/changeLog.md?raw'
 import license from './documents/license.md?raw'
 import tipsTricksTrivia from './documents/tipsTricksTrivia.md?raw'
 
-import T_helpInfo from './components/globals/AppControlMenus/T_helpInfo'
-import T_project from './components/globals/AppControlMenus/T_project'
-import T_tools from './components/globals/AppControlMenus/T_tools'
-import T_documents from './components/globals/AppControlMenus/T_documents'
+import L_helpInfo from './components/globals/AppControlMenus/L_helpInfo'
+import L_project from './components/globals/AppControlMenus/L_project'
+import L_tools from './components/globals/AppControlMenus/L_tools'
+import L_documents from './components/globals/AppControlMenus/L_documents'
 
-import T_aboutFantasiaArchive from './dialogs/T_aboutFantasiaArchive'
-import T_markdownDocument from './dialogs/T_markdownDocument'
-import T_programSettings from './dialogs/T_programSettings'
-import T_spellChecker from './globalFunctionality/T_spellChecker'
+import L_aboutFantasiaArchive from './dialogs/L_aboutFantasiaArchive'
+import L_markdownDocument from './dialogs/L_markdownDocument'
+import L_programSettings from './dialogs/L_programSettings'
+import L_spellChecker from './globalFunctionality/L_spellChecker'
 
-import T_socialContactButtons from './components/other/SocialContactButtons/T_socialContactButtons'
+import L_socialContactButtons from './components/other/SocialContactButtons/L_socialContactButtons'
 
 export default {
   // GLOBAL - DOCUMENTS
@@ -48,16 +48,16 @@ export default {
 
   // DIALOGS
   Dialogs: {
-    aboutFantasiaArchive: T_aboutFantasiaArchive,
-    markdownDocument: T_markdownDocument,
-    programSettings: T_programSettings
+    aboutFantasiaArchive: L_aboutFantasiaArchive,
+    markdownDocument: L_markdownDocument,
+    programSettings: L_programSettings
   },
 
   // DIALOGS (lowercase key path parity)
   dialogs: {
-    aboutFantasiaArchive: T_aboutFantasiaArchive,
-    markdownDocument: T_markdownDocument,
-    programSettings: T_programSettings
+    aboutFantasiaArchive: L_aboutFantasiaArchive,
+    markdownDocument: L_markdownDocument,
+    programSettings: L_programSettings
   },
 
   // COMPONENT - GLOBAL WINDOW BUTTONS
@@ -70,18 +70,18 @@ export default {
 
   // COMPONENT - APP CONTROL MENUS
   AppControlMenus: {
-    project: T_project,
-    tools: T_tools,
-    documents: T_documents,
-    helpInfo: T_helpInfo
+    project: L_project,
+    tools: L_tools,
+    documents: L_documents,
+    helpInfo: L_helpInfo
   },
 
   // COMPONENT - SOCIAL CONTACT BUTTONS
-  SocialContactButtons: T_socialContactButtons,
+  SocialContactButtons: L_socialContactButtons,
 
   // GLOBAL FUNCTIONALITY (lowercase key path parity)
   globalFunctionality: {
-    spellChecker: T_spellChecker
+    spellChecker: L_spellChecker
   }
 
 }

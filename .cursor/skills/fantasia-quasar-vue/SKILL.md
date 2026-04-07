@@ -22,7 +22,7 @@ description: >-
 - **`elements/`** — small reusable widgets (`FantasiaMascotImage`, `SocialContactSingleButton`).
 - **`other/`** — other composites (`SocialContactButtons`).
 
-Locale `T_*` paths under `src/i18n/<locale>/components/` use the same bucket names. See [README](../../../README.md) and [AGENTS.md](../../../AGENTS.md).
+Locale `L_*` paths under `i18n/<locale>/components/` use the same bucket names as `src/components/`. See [README](../../../README.md) and [AGENTS.md](../../../AGENTS.md).
 
 ## Layout and pages
 
@@ -81,8 +81,8 @@ Locale `T_*` paths under `src/i18n/<locale>/components/` use the same bucket nam
 
 ## Storybook i18n caution
 
-- In Storybook-specific loaders/mocks, avoid importing full locale entrypoints (`src/i18n/index.ts` or `src/i18n/en-US/index.ts`) because they import markdown `documents/*.md`.
-- Prefer importing focused non-markdown `T_*` modules (for example menu/button translation modules) and provide explicit placeholder copy for markdown-backed `documents.*` keys used by dialogs.
+- In Storybook-specific loaders/mocks, avoid importing full locale entrypoints (`i18n/index.ts` or `i18n/en-US/index.ts`) because they import markdown `documents/*.md`.
+- Prefer importing focused non-markdown `L_*` locale modules (for example menu/button translation modules) and provide explicit placeholder copy for markdown-backed `documents.*` keys used by dialogs.
 - Do **not** create Storybook stories under the `A11y/*` category for this project.
 - Do **not** create Storybook stories that only exercise `TEST_ENV === 'components'` branches; validate those paths in Playwright/component-test harnesses instead.
 

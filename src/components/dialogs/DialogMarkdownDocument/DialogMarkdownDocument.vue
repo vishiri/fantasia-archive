@@ -44,7 +44,7 @@
 import { QMarkdown } from '@quasar/quasar-ui-qmarkdown'
 import '@quasar/quasar-ui-qmarkdown/dist/index.css'
 import type { T_documentName } from 'app/types/T_documentList'
-import { i18n } from 'app/src/i18n/externalFileLoader'
+import { i18n } from 'app/i18n/externalFileLoader'
 import { S_DialogMarkdown } from 'src/stores/S_Dialog'
 import { computed, onMounted, ref, watch } from 'vue'
 import type { StoreGeneric } from 'pinia'

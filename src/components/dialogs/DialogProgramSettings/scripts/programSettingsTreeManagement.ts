@@ -5,7 +5,7 @@ import type {
   I_programSubCategoryRenderItem,
   T_programSettingsRenderTree
 } from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
-import { i18n } from 'app/src/i18n/externalFileLoader'
+import { i18n } from 'app/i18n/externalFileLoader'
 
 import {
   compareProgramSettingsCategoryOrder,

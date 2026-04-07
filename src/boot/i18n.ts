@@ -1,7 +1,7 @@
 import { defineBoot } from '#q-app/wrappers'
 import { createI18n } from 'vue-i18n'
 
-import messages from 'src/i18n'
+import messages from 'app/i18n'
 import type { MessageLanguages, MessageSchema } from './i18n.types'
 
 export type { MessageLanguages, MessageSchema }

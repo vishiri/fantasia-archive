@@ -6,7 +6,7 @@ import {
   getFaPlaywrightElectronRecordVideoPartial,
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
-import T_socialContactButtons from 'app/src/i18n/en-US/components/other/SocialContactButtons/T_socialContactButtons'
+import L_socialContactButtons from 'app/i18n/en-US/components/other/SocialContactButtons/L_socialContactButtons'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
 import type { T_dialogName } from 'app/types/T_dialogList'
 
@@ -128,13 +128,13 @@ test('Check correct amount and content of social buttons in AboutFantasiaArchive
 
   // Check the specific text content for each button
   const expectedButtonLabels = [
-    T_socialContactButtons.buttonPatreon.label,
-    T_socialContactButtons.buttonKofi.label,
-    T_socialContactButtons.buttonWebsite.label,
-    T_socialContactButtons.buttonGitHub.label,
-    T_socialContactButtons.buttonDiscord.label,
-    T_socialContactButtons.buttonReddit.label,
-    T_socialContactButtons.buttonTwitter.label
+    L_socialContactButtons.buttonPatreon.label,
+    L_socialContactButtons.buttonKofi.label,
+    L_socialContactButtons.buttonWebsite.label,
+    L_socialContactButtons.buttonGitHub.label,
+    L_socialContactButtons.buttonDiscord.label,
+    L_socialContactButtons.buttonReddit.label,
+    L_socialContactButtons.buttonTwitter.label
   ]
 
   for (let i = 0; i < expectedButtonLabels.length; i++) {

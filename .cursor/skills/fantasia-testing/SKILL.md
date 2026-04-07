@@ -106,7 +106,7 @@ Same rules as [vitest-tests.mdc](../../rules/vitest-tests.mdc) (**Vitest coverag
 - **Visual regression (Playwright + static Storybook)**: after `yarn storybook:build`, run `yarn test:storybook:visual` from the repo root, or `yarn --cwd .storybook-workspace test:storybook:visual` if `storybook-static/` is already present. Update baselines with `yarn test:storybook:visual:update` (or workspace `test:storybook:visual:update`). HTML/report output and artifacts stay under repo-root **`test-results/storybook-visual-*`** locally (not run in **GitHub Actions**; use **`yarn testbatch:ensure:nochange`** or the individual scripts when you need the full gate).
 - Keep **component** Storybook stories in `tests/` subfolders as `src/components/**/tests/<Component>.stories.ts`.
 - **`src/layouts/**` and `src/pages/**` stories** (if present) live in `tests/` subfolders (`src/layouts/**/tests/*.stories.ts`, `src/pages/**/tests/*.stories.ts`) and are canvas-only previews; do **not** expect or add Storybook Docs/autodocs for them (see [`storybook-stories.mdc`](../../rules/storybook-stories.mdc)).
-- When components rely on i18n-backed markdown docs, avoid importing full locale roots in Storybook mocks; use focused `T_*` translation module imports plus placeholder `documents.*` strings to prevent markdown import-analysis failures.
+- When components rely on i18n-backed markdown docs, avoid importing full locale roots in Storybook mocks; use focused `L_*` locale module imports plus placeholder `documents.*` strings to prevent markdown import-analysis failures.
 
 ## Local types extraction rule
 

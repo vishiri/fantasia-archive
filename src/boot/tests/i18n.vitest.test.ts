@@ -27,7 +27,7 @@ vi.mock('vue-i18n', () => {
   }
 })
 
-vi.mock('src/i18n', () => {
+vi.mock('app/i18n', () => {
   return {
     default: {
       'en-US': {

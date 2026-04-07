@@ -150,7 +150,7 @@ test('Open test "ProgramSettings" dialog and close it', async ({}, testInfo) => 
  * - Asserts titles, optional notes, tags, and help copy duplicated on data-test-tooltip-text.
  * - Hovers the first help icon once and asserts the live overlay with selectorList.quasarTooltip (retries hover + dismiss with expect().toPass because Quasar portaled tooltips are timing-sensitive under Electron); other rows skip hover.
  * - After each tab switch, unions data-test-setting-id from the active panel so the combined set matches I_faUserSettings keys exactly (Quasar mounts one panel at a time here).
- * - globalFunctionality.T_faUserSettings only covers save toasts, not these labels.
+ * - globalFunctionality.faUserSettings only covers save toasts, not these labels.
  */
 test('Program settings dialog matches en-US category, subcategory, and setting copy on every tab', async ({}, testInfo) => {
   test.setTimeout(120_000)

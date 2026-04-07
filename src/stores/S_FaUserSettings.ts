@@ -5,7 +5,7 @@ import { ref } from 'vue'
 import { Notify } from 'quasar'
 
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
-import { i18n } from 'app/src/i18n/externalFileLoader'
+import { i18n } from 'app/i18n/externalFileLoader'
 
 /**
  * Manages user settings state sourced from the Electron main process via the IPC bridge.

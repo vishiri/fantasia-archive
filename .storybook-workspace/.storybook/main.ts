@@ -130,8 +130,7 @@ const config: StorybookConfig = {
         ...(viteConfig.resolve ?? {}),
         alias: {
           ...(viteConfig.resolve?.alias ?? {}),
-          'src/i18n/externalFileLoader': externalFileLoaderMockPath,
-          'app/src/i18n/externalFileLoader': externalFileLoaderMockPath,
+          'app/i18n/externalFileLoader': externalFileLoaderMockPath,
           app: repoRoot,
           src: path.resolve(repoRoot, 'src'),
           components: path.resolve(repoRoot, 'src/components'),

@@ -4,6 +4,7 @@ import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 import { PROGRAM_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogProgramSettings/_data/programSettingsOptions'
 import type { T_programSettingsRenderTree } from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
 import { buildProgramSettingsRenderTree } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsTreeManagement'
+import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
 /**
  * Pinia store surface used when hydrating the dialog from persisted settings.
@@ -11,6 +12,14 @@ import { buildProgramSettingsRenderTree } from 'app/src/components/dialogs/Dialo
 export type T_programSettingsFaUserSettingsStoreForSync = {
   settings: I_faUserSettings | null
   refreshSettings: () => Promise<void>
+}
+
+function tryResolveFaUserSettingsStoreForSync (): T_programSettingsFaUserSettingsStoreForSync | null {
+  try {
+    return S_FaUserSettings()
+  } catch {
+    return null
+  }
 }
 
 /**
@@ -47,11 +56,10 @@ export function updateLocalProgramSetting (
  * Pulls the latest settings from the store into the local editable copy.
  */
 export async function syncLocalProgramSettingsFromStore (
-  resolveFaUserSettingsStore: () => T_programSettingsFaUserSettingsStoreForSync | null,
   localSettings: Ref<I_faUserSettings | null>,
   programSettingsTree: Ref<T_programSettingsRenderTree>
 ): Promise<void> {
-  const faUserSettingsStore = resolveFaUserSettingsStore()
+  const faUserSettingsStore = tryResolveFaUserSettingsStoreForSync()
   if (faUserSettingsStore === null) {
     return
   }

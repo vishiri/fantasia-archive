@@ -1,13 +1,23 @@
 import { ref } from 'vue'
-import { expect, test } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import type { T_programSettingsRenderTree } from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
 import {
   syncLocalProgramSettingsFromStore,
-  updateLocalProgramSetting
+  updateLocalProgramSetting,
+  type T_programSettingsFaUserSettingsStoreForSync
 } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsLocalSettingsManagement'
+import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
+
+vi.mock('src/stores/S_FaUserSettings', () => ({
+  S_FaUserSettings: vi.fn()
+}))
+
+beforeEach(() => {
+  vi.mocked(S_FaUserSettings).mockReset()
+})
 
 /**
  * updateLocalProgramSetting
@@ -99,18 +109,65 @@ test('updateLocalProgramSetting returns early when programSettingsTree lacks the
 
 /**
  * syncLocalProgramSettingsFromStore
- * Returns immediately when no Pinia store is available from the resolver.
+ * Returns immediately when Pinia has no active instance (S_FaUserSettings throws).
  */
-test('syncLocalProgramSettingsFromStore returns when resolveFaUserSettingsStore yields null', async () => {
+test('syncLocalProgramSettingsFromStore returns when S_FaUserSettings cannot be resolved', async () => {
+  vi.mocked(S_FaUserSettings).mockImplementation(() => {
+    throw new Error('no active pinia')
+  })
+
   const localSettings = ref<I_faUserSettings | null>(null)
   const programSettingsTree = ref<T_programSettingsRenderTree>({})
 
-  await syncLocalProgramSettingsFromStore(
-    () => null,
-    localSettings,
-    programSettingsTree
-  )
+  await syncLocalProgramSettingsFromStore(localSettings, programSettingsTree)
 
   expect(localSettings.value).toBe(null)
   expect(Object.keys(programSettingsTree.value)).toHaveLength(0)
+})
+
+/**
+ * syncLocalProgramSettingsFromStore
+ * Calls refreshSettings when the store has not loaded settings yet, then hydrates refs.
+ */
+test('syncLocalProgramSettingsFromStore refreshes then hydrates when store settings are null', async () => {
+  const store: T_programSettingsFaUserSettingsStoreForSync = {
+    settings: null,
+    refreshSettings: async () => {
+      store.settings = { ...FA_USER_SETTINGS_DEFAULTS }
+    }
+  }
+  vi.mocked(S_FaUserSettings).mockReturnValue(
+    store as unknown as ReturnType<typeof S_FaUserSettings>
+  )
+
+  const localSettings = ref<I_faUserSettings | null>(null)
+  const programSettingsTree = ref<T_programSettingsRenderTree>({})
+
+  await syncLocalProgramSettingsFromStore(localSettings, programSettingsTree)
+
+  expect(localSettings.value).toEqual(FA_USER_SETTINGS_DEFAULTS)
+  expect(Object.keys(programSettingsTree.value).length).toBeGreaterThan(0)
+})
+
+/**
+ * syncLocalProgramSettingsFromStore
+ * Skips refresh when the store already holds settings.
+ */
+test('syncLocalProgramSettingsFromStore does not call refreshSettings when settings are already present', async () => {
+  const refreshSettings = vi.fn()
+  const store: T_programSettingsFaUserSettingsStoreForSync = {
+    settings: { ...FA_USER_SETTINGS_DEFAULTS },
+    refreshSettings
+  }
+  vi.mocked(S_FaUserSettings).mockReturnValue(
+    store as unknown as ReturnType<typeof S_FaUserSettings>
+  )
+
+  const localSettings = ref<I_faUserSettings | null>(null)
+  const programSettingsTree = ref<T_programSettingsRenderTree>({})
+
+  await syncLocalProgramSettingsFromStore(localSettings, programSettingsTree)
+
+  expect(refreshSettings).not.toHaveBeenCalled()
+  expect(localSettings.value).toEqual(FA_USER_SETTINGS_DEFAULTS)
 })

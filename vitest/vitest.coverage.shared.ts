@@ -9,7 +9,7 @@
 export const vitestCoverageSkipFull = true
 
 /**
- * Enforced when Vitest runs with '--coverage' on unit-electron, unit-helpers, unit-src-renderer,
+ * Enforced when Vitest runs with '--coverage' on unit-electron, unit-helpers, unit-i18n, unit-src-renderer,
  * and on **.ts** files under unit-components (see vitest.*.config.mts in this folder).
  */
 export const vitestCoverageStrictThresholds = {

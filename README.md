@@ -29,7 +29,7 @@ yarn
 - **Main ↔ preload IPC**: Channel name strings are defined once in [`src-electron/electron-ipc-bridge.ts`](src-electron/electron-ipc-bridge.ts) (grouped `export const` objects). Preload helpers under `contentBridgeAPIs/` and main-process registration under [`mainScripts/ipcManagement/register*Ipc.ts`](src-electron/mainScripts/ipcManagement/) import from that module so `ipcRenderer` calls and `ipcMain` handlers stay aligned.
 - **Main process (`mainScripts/`)**: Logic is grouped under **`appIdentity/`** (app name and Playwright-isolated `userData`), **`windowManagement/`** (main `BrowserWindow`, spell checker, and **`electron-preload` path** resolved from the **bundled** main chunk — required for `contextBridge` / `window.faContentBridgeAPIs`), **`chromiumFixes/`** (Chromium/DevTools workarounds), **`userSettings/`** (defaults + `electron-store`), **`nativeShell/`** (menu/OS tweaks), and **`ipcManagement/`** (preload channel handlers). [`appManagement.ts`](src-electron/mainScripts/appManagement.ts) composes startup; [`electron-main.ts`](src-electron/electron-main.ts) wires the ordered bootstrap.
 - **State and routing**: Pinia + Vue Router
-- **i18n**: vue-i18n (`src/i18n/`)
+- **i18n**: vue-i18n (repo-root **`i18n/`**)
 - **Tests**: Vitest (unit) + Playwright (component and E2E). Vitest workspace entry is [`vitest.config.mts`](vitest.config.mts); per-project configs, shared coverage defaults, and [`vitest/vitest.setup.ts`](vitest/vitest.setup.ts) live under [`vitest/`](vitest/) (not under **`helpers/`**). **Coverage tiers** for **`src-electron`**, **`helpers`**, **`src`** **`.ts`**, and **`.vue`** SFCs are summarized under **Quality gate** and **Scripts reference** below.
 - **Component docs**: Storybook 10 (in `.storybook-workspace/`)
 - **Component `scripts/`** (only when a maintainer asks): bulky logic extracted from a feature `.vue` lives under `src/components/<Feature>/scripts/*.ts` — not beside the `.vue` at the feature root. Agents should not perform this split unless requested; see [AGENTS.md](AGENTS.md) and [.cursor/rules/vue-quasar.mdc](.cursor/rules/vue-quasar.mdc).
@@ -49,25 +49,25 @@ Features are grouped for navigation (each still has colocated `tests/`, optional
 
 ### i18n (localisation)
 
-Locale strings live under `src/i18n/en-US/` in a fixed folder hierarchy:
+Locale strings live under `i18n/en-US/` in a fixed folder hierarchy:
 
 | Folder | Purpose |
 | --- | --- |
 | `documents/` | Markdown source files (`.md`, imported with `?raw`, passed through `specialCharacterFixer`) |
-| `components/<bucket>/<ComponentName>/` | Same bucket names as `src/components/` (`globals`, `elements`, `other`); one or more `T_*.ts` modules per component |
-| `dialogs/` | One `T_<DialogName>.ts` per dialog |
-| `pages/` | One `T_<PageName>.ts` per page |
-| `globalFunctionality/` | One `T_<feature>.ts` per app-wide, non-component concern (e.g. Pinia store notifications) |
+| `components/<bucket>/<ComponentName>/` | Same bucket names as `src/components/` (`globals`, `elements`, `other`); one or more `L_*.ts` locale modules per component |
+| `dialogs/` | One `L_<DialogName>.ts` per dialog |
+| `pages/` | One `L_<PageName>.ts` per page |
+| `globalFunctionality/` | One `L_<feature>.ts` per app-wide, non-component concern (e.g. Pinia store notifications) |
 
-`src/i18n/en-US/index.ts` composes the full locale tree; it contains only imports and the export object — no hardcoded strings.
+`i18n/en-US/index.ts` composes the full locale tree; it contains only imports and the export object — no hardcoded strings.
 
 **Key naming**: all top-level keys use camelCase with a lowercase first letter (e.g. `globalWindowButtons`, `appControlMenus`, `dialogs`, `errorNotFound`). Sub-keys follow the same rule.
 
 **Using strings**:
 - Vue templates: `$t('topLevelKey.subKey')`.
-- TypeScript scripts and Pinia stores: `import { i18n } from 'app/src/i18n/externalFileLoader'` then `i18n.global.t('topLevelKey.subKey')`.
+- TypeScript scripts and Pinia stores: `import { i18n } from 'app/i18n/externalFileLoader'` then `i18n.global.t('topLevelKey.subKey')`.
 
-**Adding new strings**: create or update the appropriate `T_*.ts` file, then import and register it in `index.ts` under a camelCase key. Never add hardcoded prose inline to `index.ts`.
+**Adding new strings**: create or update the appropriate `L_*.ts` locale file, then import and register it in `index.ts` under a camelCase key. Never add hardcoded prose inline to `index.ts`. (TypeScript type aliases keep the separate `T_` prefix in code; `L_` is only for vue-i18n message modules.)
 
 ### Start the app in Quasar development mode (hot-code reloading, error reporting, etc.)
 ```
@@ -192,19 +192,19 @@ Review this table against `src/components/**` stories each iteration and move hi
 
 ### Quality gate (before commit or release)
 
-Run ESLint, the TypeScript project check (`vue-tsc`, includes `.vue` SFCs), Stylelint, and Vitest with coverage in one shot (stops on the first failure). **Coverage tiers:** **100%** on all four v8 metrics for **`src-electron`** and for **`helpers/**/*.ts`** helper packages; **100%** on all four metrics for renderer **`.ts`** under **`src/boot`**, **`src/scripts`**, **`src/stores`**, and **`src/i18n/specialCharactersFixer.ts`**; **100%** statements, functions, and lines for other **`src/**/*.ts`** files collected under **`unit-components`** (branch totals are printed but do not fail CI for that slice—**v8** can count structural branch edges oddly on some loops). **`.vue`** SFCs have **no** failing threshold; reports use **watermarks** with a **60%** lower band—treat line or statement totals **below 60%** as a signal to investigate and add tests when it makes sense. See **`yarn test:coverage:src`** and [vitest/](vitest/) configs. Vitest coverage runs use the **`agent`** terminal reporter (see [vitest/vitest.reporters.shared.ts](vitest/vitest.reporters.shared.ts)) so passing tests do not flood the log; JSON reports still write under **`test-results/vitest-report/`** (for example **`test-results-vitest-electron.json`**).
+Run ESLint, the TypeScript project check (`vue-tsc`, includes `.vue` SFCs), Stylelint, and Vitest with coverage in one shot (stops on the first failure). **Coverage tiers:** **100%** on all four v8 metrics for **`src-electron`**, for **`helpers/**/*.ts`**, and for scoped **`i18n/`** sources (**`yarn test:coverage:i18n`** / **`unit-i18n`**); **100%** on all four metrics for renderer **`.ts`** under **`src/boot`**, **`src/scripts`**, and **`src/stores`**; **100%** statements, functions, and lines for other **`src/**/*.ts`** files collected under **`unit-components`** (branch totals are printed but do not fail CI for that slice—**v8** can count structural branch edges oddly on some loops). **`.vue`** SFCs have **no** failing threshold; reports use **watermarks** with a **60%** lower band—treat line or statement totals **below 60%** as a signal to investigate and add tests when it makes sense. See **`yarn test:coverage:verify`**, **`yarn test:coverage:i18n`**, and [vitest/](vitest/) configs. Vitest coverage runs use the **`agent`** terminal reporter (see [vitest/vitest.reporters.shared.ts](vitest/vitest.reporters.shared.ts)) so passing tests do not flood the log; JSON reports still write under **`test-results/vitest-report/`** (for example **`test-results-vitest-electron.json`**).
 
 ```
 yarn testbatch:verify
 ```
 
-For debugging a single step, run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit` (no coverage), or `yarn test:coverage:verify` / `yarn test:coverage:electron` / `yarn test:coverage:helpers` / `yarn test:coverage:src` on its own, then run `yarn testbatch:verify` again before committing. Do not append `yarn quasar:build:electron`, Playwright, or Storybook smoke/visual commands to the same shell line as `yarn testbatch:verify` unless you intentionally run **`yarn testbatch:ensure:nochange`** or **`yarn testbatch:ensure:change`**.
+For debugging a single step, run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit` (no coverage), or `yarn test:coverage:verify` / `yarn test:coverage:electron` / `yarn test:coverage:helpers` / `yarn test:coverage:i18n` / `yarn test:coverage:src` on its own, then run `yarn testbatch:verify` again before committing. Do not append `yarn quasar:build:electron`, Playwright, or Storybook smoke/visual commands to the same shell line as `yarn testbatch:verify` unless you intentionally run **`yarn testbatch:ensure:nochange`** or **`yarn testbatch:ensure:change`**.
 
 On **Yarn 1.x**, `yarn check` is a different built-in (dependency-tree validation); use **`yarn testbatch:verify`** for this gate.
 
 #### GitHub Actions vs local full gate
 
-The **Verify** workflow (`.github/workflows/verify.yml`) runs **`yarn testbatch:verify`** only (lint, types, stylelint, Vitest coverage with the full **`src-electron`**, **`helpers`**, and **`src`** TypeScript gates described above—**Vue** SFCs still have no failing threshold). It installs **`.storybook-workspace`** dependencies so ESLint can resolve that tree. It does **not** run **`yarn quasar:build:electron`**, Playwright component/E2E, **`yarn test:storybook:smoke`**, or **`yarn test:storybook:visual`**. For Storybook VRT and the full chained gate, run **`yarn test:storybook:visual`** / **`yarn testbatch:ensure:nochange`** locally (or the individual commands in separate terminals per [testing-terminal-isolation](.cursor/rules/testing-terminal-isolation.mdc)).
+The **Verify** workflow (`.github/workflows/verify.yml`) runs **`yarn testbatch:verify`** only (lint, types, stylelint, Vitest coverage with the full **`src-electron`**, **`helpers`**, **`i18n/`**, and **`src`** TypeScript gates described above—**Vue** SFCs still have no failing threshold). It installs **`.storybook-workspace`** dependencies so ESLint can resolve that tree. It does **not** run **`yarn quasar:build:electron`**, Playwright component/E2E, **`yarn test:storybook:smoke`**, or **`yarn test:storybook:visual`**. For Storybook VRT and the full chained gate, run **`yarn test:storybook:visual`** / **`yarn testbatch:ensure:nochange`** locally (or the individual commands in separate terminals per [testing-terminal-isolation](.cursor/rules/testing-terminal-isolation.mdc)).
 
 ### Full suite gates (everything + Storybook)
 
@@ -226,13 +226,13 @@ yarn testbatch:ensure:change
 
 #### Unit test - via Vitest
 
-Use Vitest for deterministic unit logic in both app layers: renderer code under `src/` (boot, scripts, stores, i18n helpers, extracted component **`.ts`** and shallow-mounted **`.vue`** files), Electron/runtime code under `src-electron/`, and Playwright harness code under **`helpers/`**. The default [vitest.config.mts](vitest.config.mts) sets the repo **`root`** and lists four projects that each **`extends`** a file under [vitest/](vitest/): [vitest.electron.config.mts](vitest/vitest.electron.config.mts) (**unit-electron**), [vitest.src-renderer.config.mts](vitest/vitest.src-renderer.config.mts) (**unit-src-renderer**), [vitest.helpers.config.mts](vitest/vitest.helpers.config.mts) (**unit-helpers**), [vitest.components.config.mts](vitest/vitest.components.config.mts) (**unit-components**). See [AGENTS.md](AGENTS.md) and [.cursor/rules/vitest-tests.mdc](.cursor/rules/vitest-tests.mdc) for the same **coverage tier** rules the CI gate enforces.
+Use Vitest for deterministic unit logic in both app layers: renderer code under `src/` (boot, scripts, stores, extracted component **`.ts`** and shallow-mounted **`.vue`** files), repo-root **`i18n/`** (vue-i18n registry and helpers), Electron/runtime code under `src-electron/`, and Playwright harness code under **`helpers/`**. The default [vitest.config.mts](vitest.config.mts) sets the repo **`root`** and lists five projects that each **`extends`** a file under [vitest/](vitest/): [vitest.electron.config.mts](vitest/vitest.electron.config.mts) (**unit-electron**), [vitest.src-renderer.config.mts](vitest/vitest.src-renderer.config.mts) (**unit-src-renderer**), [vitest.helpers.config.mts](vitest/vitest.helpers.config.mts) (**unit-helpers**), [vitest.i18n.config.mts](vitest/vitest.i18n.config.mts) (**unit-i18n**), [vitest.components.config.mts](vitest/vitest.components.config.mts) (**unit-components**). See [AGENTS.md](AGENTS.md) and [.cursor/rules/vitest-tests.mdc](.cursor/rules/vitest-tests.mdc) for the same **coverage tier** rules the CI gate enforces.
 
 ```
 yarn test:unit
 ```
 
-Coverage mirrors CI when you run **`yarn test:coverage:verify`** (same chain as the end of **`yarn testbatch:verify`**). Scan the **`unit-components`** table for **`.vue`** rows under **60%** lines or statements when you touch those SFCs; **`unit-src-renderer`** and **`unit-components`** **`.ts`** rows should stay at **100%** on the enforced metrics.
+Coverage mirrors CI when you run **`yarn test:coverage:verify`** (same chain as the end of **`yarn testbatch:verify`**). Scan the **`unit-components`** table for **`.vue`** rows under **60%** lines or statements when you touch those SFCs; **`unit-src-renderer`**, **`unit-i18n`**, and **`unit-components`** **`.ts`** rows should stay at **100%** on the enforced metrics.
 
 #### Component test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.

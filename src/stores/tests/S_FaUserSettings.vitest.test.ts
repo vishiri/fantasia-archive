@@ -19,7 +19,7 @@ vi.mock('quasar', () => {
   }
 })
 
-vi.mock('app/src/i18n/externalFileLoader', () => {
+vi.mock('app/i18n/externalFileLoader', () => {
   return {
     i18n: { global: { t: tMock } }
   }

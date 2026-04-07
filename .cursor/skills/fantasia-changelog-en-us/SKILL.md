@@ -1,7 +1,7 @@
 ---
 name: fantasia-changelog-en-us
 description: >-
-  Maintains the English in-app changelog at src/i18n/en-US/documents/changeLog.md
+  Maintains the English in-app changelog at i18n/en-US/documents/changeLog.md
   in strict sync with package.json version, without any automatic version
   bumping. Changelog text must be user- or release-relevant only—never
   internal QA (lint/build/test runs, “all gates passed”). Use after substantive
@@ -12,7 +12,7 @@ description: >-
 
 ## Files
 
-- **Changelog (Markdown)**: [changeLog.md](src/i18n/en-US/documents/changeLog.md) — shown in-app via i18n `documents.changeLog`.
+- **Changelog (Markdown)**: [changeLog.md](i18n/en-US/documents/changeLog.md) — shown in-app via i18n `documents.changeLog`.
 - **Canonical semver**: [package.json](package.json) field **`version`** (e.g. `2.1.0`).
 - **Planning context**: local `.cursor/plans/` files, especially those matching the current package version in filename or metadata.
 
