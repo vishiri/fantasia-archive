@@ -251,7 +251,7 @@ yarn test:components
 #### Component list test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 
-> Opens a CLI prompt listing available component tests.
+> Opens a CLI prompt listing available component tests (labels **`dialogs/…`**, **`elements/…`**, **`globals/…`**, **`other/…`** — same buckets as **`src/components/`**).
 ```
 yarn test:components:list
 ```
@@ -259,8 +259,10 @@ yarn test:components:list
 #### Component single test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 ```
-yarn test:components:single --component=COMPONENT_FOLDER_NAME
+yarn test:components:single --component=dialogs/DialogProgramSettings
 ```
+
+> **`--component`** is the path under **`src/components/`** to the feature folder: **`<bucket>/<ComponentName>`** (for example **`elements/ErrorCard`**), matching the Storybook **`meta.title`** segment after **`Components/`** ( **`Components/<bucket>/<ComponentName>`** ).
 
 #### E2E test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
@@ -319,7 +321,7 @@ Set environment variable **`FA_PLAYWRIGHT_NO_VIDEO`** to **`1`** or **`true`** t
 | `yarn test:coverage:src` | Vitest **`unit-src-renderer`** then **`unit-components`**: enforced **`src`** **`.ts`** thresholds; **`.vue`** without failing gate. |
 | `yarn test:unit:coverage` | Alias for **`yarn test:coverage:verify`**. |
 | `yarn test:components` | Run all Playwright component tests (via `scripts/playwrightWithArtifactTrim.mjs`; see **Playwright HTML report and screen recordings** above). |
-| `yarn test:components:single --component=...` | Run a single component Playwright test by folder path (same wrapper as `test:components`). |
+| `yarn test:components:single --component=...` | Run a single component Playwright test by path under **`src/components/`** (**`dialogs/`**, **`elements/`**, **`globals/`**, or **`other/`** plus the feature folder; example **`elements/ErrorCard`**; same wrapper as `test:components`). |
 | `yarn test:components:single:ci --component=...` | Run a single component Playwright test by direct path (same wrapper). |
 | `yarn test:components:list` | Open interactive picker for component Playwright tests. |
 | `yarn test:e2e` | Run all Playwright E2E tests (same wrapper and report lifecycle as `test:components`). |

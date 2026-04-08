@@ -71,8 +71,8 @@ Same rules as [vitest-tests.mdc](../../rules/vitest-tests.mdc) (**Vitest coverag
 - **Command**: `yarn test:components`
 - **Execution policy**: run this command in its own terminal invocation; never combine it with other verification commands in one chained shell command.
 - **Location**: Under `src/components/`, files ending in `.playwright.test.ts` (often in a `tests/` subfolder next to the component).
-- **Single test**: `yarn test:components:single --component=FOLDER_NAME` (see `package.json` for Windows `%npm_config_*%` variants).
-- **Interactive picker**: `yarn test:components:list` → runs `testRunner_component.mjs` (discovers `*.playwright.test.ts` under `src/components/`).
+- **Single test**: `yarn test:components:single --component=<bucket>/<ComponentName>` (for example `dialogs/DialogProgramSettings`, `elements/ErrorCard`; see `package.json` for Windows `%npm_config_*%` variants).
+- **Interactive picker**: `yarn test:components:list` → runs `testRunner_component.mjs` (discovers `*.playwright.test.ts` under `src/components/`, lists choices as **`bucket/ComponentFolder`** matching the repo tree).
 
 ### E2E tests
 
@@ -104,7 +104,7 @@ Same rules as [vitest-tests.mdc](../../rules/vitest-tests.mdc) (**Vitest coverag
 
 - Storybook commands: `yarn storybook:run` (interactive) and `yarn test:storybook:smoke` / `storybook dev --smoke-test --ci` (startup verification).
 - **Visual regression (Playwright + static Storybook)**: after `yarn storybook:build`, run `yarn test:storybook:visual` from the repo root, or `yarn --cwd .storybook-workspace test:storybook:visual` if `storybook-static/` is already present. Update baselines with `yarn test:storybook:visual:update` (or workspace `test:storybook:visual:update`). HTML/report output and artifacts stay under repo-root **`test-results/storybook-visual-*`** locally (not run in **GitHub Actions**; use **`yarn testbatch:ensure:nochange`** or the individual scripts when you need the full gate).
-- Keep **component** Storybook stories in `tests/` subfolders as `src/components/**/tests/<Component>.stories.ts`.
+- Keep **component** Storybook stories in `tests/` subfolders as `src/components/**/tests/<Component>.stories.ts`, with **`meta.title`** **`Components/<bucket>/<ComponentName>`** (same **`dialogs` / `elements` / `globals` / `other`** buckets as **`src/components/`**).
 - **`src/layouts/**` and `src/pages/**` stories** (if present) live in `tests/` subfolders (`src/layouts/**/tests/*.stories.ts`, `src/pages/**/tests/*.stories.ts`) and are canvas-only previews; do **not** expect or add Storybook Docs/autodocs for them (see [`storybook-stories.mdc`](../../rules/storybook-stories.mdc)).
 - When components rely on i18n-backed markdown docs, avoid importing full locale roots in Storybook mocks; use focused `L_*` locale module imports plus placeholder `documents.*` strings to prevent markdown import-analysis failures.
 

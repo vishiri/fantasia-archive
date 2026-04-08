@@ -161,7 +161,7 @@ Locale strings live under `i18n/en-US/` in a fixed folder hierarchy:
 
 ## Storybook expectations
 
-- Story files are stored in `tests/` subfolders (for example `src/components/**/tests/<Component>.stories.ts`).
+- Story files are stored in `tests/` subfolders (for example `src/components/**/tests/<Component>.stories.ts`). For **`src/components/**`**, set **`meta.title`** to **`Components/<bucket>/<ComponentName>`** where **`<bucket>`** is **`dialogs`**, **`elements`**, **`globals`**, or **`other`** (the parent folder under **`src/components/`**). **`Layouts/...`** and **`Pages/...`** titles stay at those roots only.
 - **Layouts and pages** may have `src/layouts/**/tests/*.stories.ts` and `src/pages/**/tests/*.stories.ts` for **canvas-only** previews (router shells, smoke checks). Do **not** add Storybook **Docs** (no `autodocs` tag, no `parameters.docs.description`, keep `parameters.docs.disable: true`). Agents should not generate or expand documentation pages for layouts/pages in Storybook.
 - Prefer Storybook for isolated **component** authoring/editing feedback; use `yarn storybook:run` for dev and `yarn storybook:build` for static output.
 - Do **not** import the full `i18n/en-US/index.ts` (or `i18n/index.ts`) in Storybook helpers/mocks — see i18n conventions above.
