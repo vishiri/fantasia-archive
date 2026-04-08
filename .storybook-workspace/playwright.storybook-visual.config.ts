@@ -1,5 +1,10 @@
 import { defineConfig, devices } from '@playwright/test'
 
+import {
+  FANTASIA_STORYBOOK_VIEWPORT_HEIGHTS,
+  FANTASIA_STORYBOOK_VIEWPORT_WIDTHS
+} from './.storybook/viewportBreakpoints'
+
 export default defineConfig({
   testDir: 'visual-tests',
   testMatch: '**/*.visual.playwright.test.ts',
@@ -17,8 +22,8 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:6006',
     viewport: {
-      width: 1920,
-      height: 1080
+      height: FANTASIA_STORYBOOK_VIEWPORT_HEIGHTS.desktop,
+      width: FANTASIA_STORYBOOK_VIEWPORT_WIDTHS.desktop
     },
     colorScheme: 'dark',
     timezoneId: 'UTC',

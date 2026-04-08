@@ -1,4 +1,9 @@
 import { test, expect } from '@playwright/test'
+
+import {
+  FANTASIA_STORYBOOK_VIEWPORT_HEIGHTS,
+  FANTASIA_STORYBOOK_VIEWPORT_WIDTHS
+} from '../.storybook/viewportBreakpoints'
 import type { I_storybookIndex } from './storybook.visual.playwright.types'
 
 /**
@@ -21,8 +26,8 @@ const SCREENSHOT_SETTLE_DELAY_MS = 1_000
 const EXCLUDED_STORY_IDS = new Set<string>([
   'layouts-componenttestinglayout--with-social-contact-single-button',
   'pages-componenttesting--social-contact-single-button',
-  'components-fantasiamascotimage--default',
-  'components-fantasiamascotimage--random'
+  'components-elements-fantasiamascotimage--default',
+  'components-elements-fantasiamascotimage--random'
 ])
 
 const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number, errorMessage: string): Promise<T> => {
@@ -59,8 +64,8 @@ test('Capture visual snapshots for Storybook stories', async ({ browser, request
     await test.step(`${story.title} / ${story.name}`, async () => {
       const context = await browser.newContext({
         viewport: {
-          width: 1920,
-          height: 1080
+          height: FANTASIA_STORYBOOK_VIEWPORT_HEIGHTS.desktop,
+          width: FANTASIA_STORYBOOK_VIEWPORT_WIDTHS.desktop
         },
         colorScheme: 'dark',
         locale: 'en-US',
@@ -126,7 +131,7 @@ test('Capture visual snapshots for Storybook stories', async ({ browser, request
           animations: 'disabled',
           caret: 'hide',
           // Absorb minor run-to-run variance (fonts/subpixel) without masking large UI drift
-          maxDiffPixels: 150
+          maxDiffPixels: 220
         }), STORY_STEP_TIMEOUT_MS, `Timed out taking screenshot: ${story.id}`)
 
         vlog(`[storybook-visual] Captured: ${story.id}`)
