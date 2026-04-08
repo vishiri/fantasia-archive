@@ -185,9 +185,32 @@
               data-test-locator="dialogProgramSettings-searchAllSettingsPanel"
             >
               <div class="dialogProgramSettings__panelScroll hasScrollbar">
-                <div class="dialogProgramSettings__panelScrollInner q-py-sm">
+                <div
+                  v-show="hasSearchNoMatchingSettings"
+                  class="dialogProgramSettings__searchEmpty flex flex-center"
+                  data-test-locator="dialogProgramSettings-searchNoResults"
+                >
+                  <q-card
+                    class="dialogProgramSettings__searchEmptyCard q-pl-xl q-pr-xl q-pb-xl q-pt-md"
+                  >
+                    <q-card-section class="text-center">
+                      <h6 class="text-negative q-my-none">
+                        {{ $t('dialogs.programSettings.searchNoResultsMessage') }}
+                      </h6>
+                      <FantasiaMascotImage
+                        class="q-mt-md"
+                        fantasia-image="reading"
+                        width="300px"
+                      />
+                    </q-card-section>
+                  </q-card>
+                </div>
+                <div
+                  v-show="!hasSearchNoMatchingSettings"
+                  class="dialogProgramSettings__panelScrollInner q-py-sm"
+                >
                   <template
-                    v-for="(category, categoryKey, categoryIndex) in programSettingsTree"
+                    v-for="(category, categoryKey, categoryIndex) in searchFilteredProgramSettingsTree"
                     :key="categoryKey"
                   >
                     <div
@@ -271,7 +294,7 @@
                       </div>
 
                       <q-separator
-                        v-if="showNonLastTopCategorySeparator(programSettingsTree, categoryIndex)"
+                        v-if="showNonLastTopCategorySeparator(searchFilteredProgramSettingsTree, categoryIndex)"
                         horizontal
                         class="q-my-lg"
                         color="primary"
@@ -324,6 +347,8 @@ import {
   showNonLastSeparator,
   showNonLastTopCategorySeparator
 } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsHelpers'
+import { filterProgramSettingsTreeForSearch } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsSearching'
+import FantasiaMascotImage from 'src/components/elements/FantasiaMascotImage/FantasiaMascotImage.vue'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 import { computed, onMounted, ref, toRaw, watch } from 'vue'
@@ -390,6 +415,26 @@ const searchSettingsQuery = ref<string | null>('')
  */
 const hasActiveSearchQuery = computed(
   () => (searchSettingsQuery.value ?? '').trim() !== ''
+)
+
+/**
+ * Search overlay list: same tree shape as programSettingsTree but only settings matching the query.
+ */
+const searchFilteredProgramSettingsTree = computed((): T_programSettingsRenderTree => {
+  if (!hasActiveSearchQuery.value) {
+    return {}
+  }
+
+  return filterProgramSettingsTreeForSearch(programSettingsTree.value, searchSettingsQuery.value)
+})
+
+/**
+ * True when search is active but no setting matches (drives empty-state UI in the search panel).
+ */
+const hasSearchNoMatchingSettings = computed(
+  () =>
+    hasActiveSearchQuery.value &&
+    Object.keys(searchFilteredProgramSettingsTree.value).length === 0
 )
 
 /**
@@ -677,6 +722,23 @@ onMounted(() => {
       margin-top: -37px;
       position: static;
     }
+  }
+
+  .dialogProgramSettings__searchEmpty {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 100%;
+    padding: 32px 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .dialogProgramSettings__searchEmptyCard {
+    background-color: #f7eeda;
+    border-radius: 10px;
+    box-shadow: none;
+    max-width: 600px;
   }
 
   .dialogProgramSettings__cardActions {
