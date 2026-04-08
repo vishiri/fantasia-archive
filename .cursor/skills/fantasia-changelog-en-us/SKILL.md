@@ -95,10 +95,12 @@ Append bullets under the right `###` subsection only if that category has real i
 
 ## vue-i18n and `changeLog.md` (required)
 
-`changeLog.md` is loaded as a **vue-i18n message string**, not plain static text. The compiler treats **`{` … `}`** as **message placeholders** (interpolation). Content like shell glob brace expansion (**`*.{vue,css}`**), lone **`{foo}`**, or **`@:`**-style escapes can trigger **`Message compilation error`** at runtime when the changelog opens.
+`changeLog.md` is loaded as a **vue-i18n message string**, not plain static text. The compiler treats **`{` … `}`** as **message placeholders** (interpolation). Anything inside a pair of braces is parsed as placeholder syntax; invalid tokens (for example a **colon** in something meant to look like an object property) produce runtime errors such as **`Message compilation error: Invalid token in placeholder`** when the changelog opens.
 
 - **Do not** put literal **`{...}`** groups in changelog prose unless they are valid vue-i18n placeholder syntax you intend to use (you almost never should in this file).
+- **Avoid code-shaped snippets that use braces**, including **JavaScript / TypeScript object literals** and **API option objects**. Bad: **`locator.hover({ force: true })`** (breaks compilation). Good: describe the call in words (**`locator.hover`** with the **`force`** option enabled) or omit the snippet.
 - Describe file globs in **words** or list extensions (**`vue`**, **`css`**, **`scss`**, **`sass`**) without curly-brace grouping.
+- A bare **pipe** **`|`** is also special in message format; use the **vue-i18n** documented escape when you need a literal pipe in locale copy (see existing **Program settings** tooltip notes in the codebase).
 - If you must mention braces for documentation reasons, spell them out (for example “open brace … close brace”) or use phrasing that avoids the characters.
 
 ## Related
