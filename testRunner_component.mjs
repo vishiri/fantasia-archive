@@ -30,15 +30,12 @@ async function getTestList () {
   const testFolder = appRoot + '/src/components/'
   const testFileList = await readDirectory(testFolder, '.playwright.test.ts')
   const remappedFileList = remapFilePaths(testFileList)
-  const remappedNameList = remapFileNames(remappedFileList)
-  const testList = []
+  const testList = remappedFileList.map((file) => ({
+    title: componentTestPickerLabel(file),
+    value: file
+  }))
 
-  for (let i = 0; i < remappedFileList.length; i++) {
-    testList.push({
-      title: remappedNameList[i],
-      value: remappedFileList[i]
-    })
-  }
+  testList.sort((a, b) => a.title.localeCompare(b.title, 'en'))
 
   return testList
 }
@@ -66,10 +63,25 @@ function remapFilePaths (inputList) {
     })
 }
 
-function remapFileNames (inputList) {
-  return inputList.map(file => {
-    return path.basename(file)
-  })
+/**
+ * '/src/components/dialogs/DialogFoo/tests/DialogFoo.playwright.test.ts' → 'dialogs/DialogFoo'
+ * (mirrors src/components bucket folders: dialogs, elements, globals, other).
+ */
+function componentTestPickerLabel (repoRelativeSrcPath) {
+  const norm = repoRelativeSrcPath.replaceAll('\\', '/')
+  const marker = '/src/components/'
+  const idx = norm.indexOf(marker)
+  if (idx === -1) {
+    return path.basename(repoRelativeSrcPath)
+  }
+  const tail = norm.slice(idx + marker.length)
+  const segments = tail.split('/')
+  if (segments.length >= 2) {
+    const bucket = segments[0]
+    const componentFolder = segments[1]
+    return `${bucket}/${componentFolder}`
+  }
+  return path.basename(repoRelativeSrcPath)
 }
 
 runSpecificTest()

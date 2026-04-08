@@ -27,7 +27,8 @@ vi.mock('app/i18n/externalFileLoader', () => {
         t: (key: string) => {
           return key
         },
-        te: () => false
+        te: () => false,
+        mergeLocaleMessage: vi.fn()
       }
     }
   }
