@@ -190,20 +190,11 @@
                   class="dialogProgramSettings__searchEmpty flex flex-center"
                   data-test-locator="dialogProgramSettings-searchNoResults"
                 >
-                  <q-card
-                    class="dialogProgramSettings__searchEmptyCard q-pl-xl q-pr-xl q-pb-xl q-pt-md"
-                  >
-                    <q-card-section class="text-center">
-                      <h6 class="text-negative q-my-none">
-                        {{ $t('dialogs.programSettings.searchNoResultsMessage') }}
-                      </h6>
-                      <FantasiaMascotImage
-                        class="q-mt-md"
-                        fantasia-image="reading"
-                        width="300px"
-                      />
-                    </q-card-section>
-                  </q-card>
+                  <ErrorCard
+                    :title="$t('dialogs.programSettings.searchNoResultsMessage')"
+                    image-name="reading"
+                    :width="650"
+                  />
                 </div>
                 <div
                   v-show="!hasSearchNoMatchingSettings"
@@ -348,7 +339,7 @@ import {
   showNonLastTopCategorySeparator
 } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsHelpers'
 import { filterProgramSettingsTreeForSearch } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsSearching'
-import FantasiaMascotImage from 'src/components/elements/FantasiaMascotImage/FantasiaMascotImage.vue'
+import ErrorCard from 'src/components/elements/ErrorCard/ErrorCard.vue'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 import { computed, onMounted, ref, toRaw, watch } from 'vue'
@@ -526,15 +517,15 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     height: 100%;
-    max-height: calc(100vh - 48px);
-    max-width: calc(100vw - 100px);
+    max-height: calc(100vh - #{$dialogProgramSettings-card-maxHeightSubtract});
+    max-width: calc(100vw - #{$dialogProgramSettings-card-maxWidthViewportSubtract});
     overflow: hidden;
     position: relative;
-    width: 1400px;
+    width: $dialogProgramSettings-card-width;
   }
 
   .dialogProgramSettings__title {
-    z-index: 11;
+    z-index: $dialogProgramSettings-title-zIndex;
   }
 
   .dialogProgramSettings__titleSection {
@@ -566,12 +557,12 @@ onMounted(() => {
     min-height: 0;
     overflow: hidden;
     position: absolute;
-    z-index: 10;
+    z-index: $dialogProgramSettings-searchPanel-zIndex;
 
     &::before {
-      background: linear-gradient(360deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 100%);
+      background: $dialogProgramSettings-gradientTop;
       content: '';
-      height: 10px;
+      height: $dialogProgramSettings-gradientBar-height;
       left: 0;
       position: absolute;
       right: 0;
@@ -580,10 +571,10 @@ onMounted(() => {
     }
 
     &::after {
-      background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 100%);
+      background: $dialogProgramSettings-gradientBottom;
       bottom: 0;
       content: '';
-      height: 10px;
+      height: $dialogProgramSettings-gradientBar-height;
       left: 0;
       position: absolute;
       right: 0;
@@ -618,7 +609,7 @@ onMounted(() => {
   }
 
   .q-tabs--vertical .q-tab {
-    padding: 0 16px;
+    padding: 0 $dialogProgramSettings-verticalTab-paddingX;
   }
 
   .dialogProgramSettings__tabs {
@@ -626,11 +617,11 @@ onMounted(() => {
   }
 
   .dialogProgramSettings__tabsSearchOverlay {
-    background: rgba(0, 0, 0, 0.3);
+    background: $dialogProgramSettings-scrimDark;
     inset: 0 0 0 0;
     pointer-events: none;
     position: absolute;
-    z-index: 10;
+    z-index: $dialogProgramSettings-tabsSearchOverlay-zIndex;
   }
 
   .dialogProgramSettings__tabs--nonInteractive {
@@ -638,18 +629,18 @@ onMounted(() => {
   }
 
   .dialogProgramSettings__category {
-    padding: 30px 40px 0;
+    padding: $dialogProgramSettings-category-paddingTop $dialogProgramSettings-category-paddingX 0;
   }
 
   .dialogProgramSettings__categoryTitle {
     background: $dark;
-    left: 40px;
-    padding-bottom: 8px;
-    padding-top: 8px;
+    left: $dialogProgramSettings-categoryTitle-left;
+    padding-bottom: $dialogProgramSettings-categoryTitle-paddingBottom;
+    padding-top: $dialogProgramSettings-categoryTitle-paddingTop;
     position: absolute;
-    right: 40px;
+    right: $dialogProgramSettings-categoryTitle-right;
     top: 0;
-    z-index: 5;
+    z-index: $dialogProgramSettings-categoryTitle-zIndex;
   }
 
   .dialogProgramSettings__settingTitle {
@@ -657,10 +648,10 @@ onMounted(() => {
     display: flex;
     font-weight: 500;
     justify-content: flex-start;
-    margin-bottom: 8px;
-    margin-left: 10px;
-    margin-top: 16px;
-    width: calc(100% - 45px);
+    margin-bottom: $dialogProgramSettings-settingTitle-marginBottom;
+    margin-left: $dialogProgramSettings-settingTitle-marginLeft;
+    margin-top: $dialogProgramSettings-settingTitle-marginTop;
+    width: calc(100% - #{$dialogProgramSettings-settingTitle-widthSubtract});
   }
 
   .dialogProgramSettings__settingLabel {
@@ -668,15 +659,15 @@ onMounted(() => {
 
   .dialogProgramSettings__settingHelpIcon {
     align-self: flex-start;
-    margin-top: 3px;
+    margin-top: $dialogProgramSettings-settingHelpIcon-marginTop;
   }
 
   .dialogProgramSettings__settingHelp {
   }
 
   .dialogProgramSettings__settingNote {
-    margin-left: 10px;
-    text-shadow: 0 0 2px black;
+    margin-left: $dialogProgramSettings-settingTitle-marginLeft;
+    text-shadow: $dialogProgramSettings-settingNote-textShadow;
   }
 
   /* Fixed width so clearable append slot does not widen the field when it mounts. */
@@ -688,38 +679,42 @@ onMounted(() => {
     background-color: $dark;
     pointer-events: auto;
     position: absolute;
-    right: 45px;
-    top: 4px;
-    width: min(220px, calc(100vw - 120px));
-    z-index: 11;
+    right: $dialogProgramSettings-settingsSearchWrapper-right;
+    top: $dialogProgramSettings-settingsSearchWrapper-top;
+    width:
+      min(
+        #{$dialogProgramSettings-settingsSearchWrapper-widthMax},
+        calc(100vw - #{$dialogProgramSettings-settingsSearchWrapper-widthViewportSubtract})
+      );
+    z-index: $dialogProgramSettings-settingsSearchWrapper-zIndex;
 
     &::before {
-      border-bottom-left-radius: 5px;
-      box-shadow: -5px 5px 7px rgba(0, 0, 0, 0.1);
+      border-bottom-left-radius: $dialogProgramSettings-settingsSearchWrapper-before-borderBottomLeftRadius;
+      box-shadow: $dialogProgramSettings-settingsSearchWrapper-before-boxShadow;
       content: "";
-      inset: -5px -35px -5px -10px;
+      inset: $dialogProgramSettings-settingsSearchWrapper-before-inset;
       opacity: 0;
       position: absolute;
-      transition: opacity 0.1s ease;
+      transition: $dialogProgramSettings-settingsSearchWrapper-transition;
       z-index: 0;
     }
 
     &::after {
       content: "";
-      height: 10px;
-      left: -10px;
+      height: $dialogProgramSettings-settingsSearchWrapper-after-height;
+      left: $dialogProgramSettings-settingsSearchWrapper-after-left;
       opacity: 0;
       position: absolute;
-      right: -35px;
-      top: -4px;
-      transition: opacity 0.1s ease;
+      right: $dialogProgramSettings-settingsSearchWrapper-after-right;
+      top: $dialogProgramSettings-settingsSearchWrapper-after-top;
+      transition: $dialogProgramSettings-settingsSearchWrapper-transition;
     }
   }
 
   .dialogProgramSettings__searchAllSettingsPanel {
     .dialogProgramSettings__categoryTitle {
-      margin-bottom: -11px;
-      margin-top: -37px;
+      margin-bottom: $dialogProgramSettings-searchPanel-categoryTitle-marginBottom;
+      margin-top: $dialogProgramSettings-searchPanel-categoryTitle-marginTop;
       position: static;
     }
   }
@@ -729,26 +724,19 @@ onMounted(() => {
     flex: 1 1 auto;
     flex-direction: column;
     min-height: 100%;
-    padding: 32px 40px;
+    padding: $dialogProgramSettings-searchEmpty-padding;
     position: relative;
     z-index: 1;
   }
 
-  .dialogProgramSettings__searchEmptyCard {
-    background-color: #f7eeda;
-    border-radius: 10px;
-    box-shadow: none;
-    max-width: 600px;
-  }
-
   .dialogProgramSettings__cardActions {
-    z-index: 10;
+    z-index: $dialogProgramSettings-searchPanel-zIndex;
   }
 
   &.hasActiveSearchQuery {
     .dialogProgramSettings__settingsSearchWrapper {
       &::after {
-        background: linear-gradient(360deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 100%);
+        background: $dialogProgramSettings-gradientTop;
         content: "";
         opacity: 1;
       }

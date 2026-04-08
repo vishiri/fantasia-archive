@@ -66,7 +66,7 @@ const iconSrc = computed(() => {
 <style lang="scss">
 .socialContactSingleButton {
   &__text {
-    margin-left: 10px;
+    margin-left: $socialContactSingleButton-text-marginLeft;
   }
 
   &.patreon,
@@ -75,18 +75,18 @@ const iconSrc = computed(() => {
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     background-repeat: no-repeat;
-    border-radius: 9999px;
+    border-radius: $socialContactSingleButton-chip-borderRadius;
     box-sizing: border-box;
-    color: #fff !important;
+    color: $socialContactSingleButton-chip-color !important;
     cursor: pointer;
     display: inline-flex;
-    font-size: 16px !important;
-    font-weight: 500;
+    font-size: $socialContactSingleButton-chip-fontSize !important;
+    font-weight: $socialContactSingleButton-chip-fontWeight;
     justify-content: center;
-    padding: 12.5px 24px 12.5px 24px;
+    padding: $socialContactSingleButton-chip-padding;
     position: relative;
     text-align: center;
-    transition: all 300ms cubic-bezier(0.19, 1, 0.22, 1) 0s;
+    transition: $socialContactSingleButton-chip-transition;
     -webkit-user-select: none;
     user-select: none;
     width: unset;
@@ -106,12 +106,12 @@ const iconSrc = computed(() => {
 
   &.website,
   &.github {
-    font-size: 15px !important;
+    font-size: $socialContactSingleButton-variant-fontSize-compact !important;
   }
 
   &.website {
     background-color: $socialContactButtons-backgroundColor-webpage;
-    border: 3px solid $socialContactButtons-hoverColor-webpage;
+    border: $socialContactSingleButton-website-borderWidth solid $socialContactButtons-hoverColor-webpage;
 
     .socialContactSingleButton__text {
       color: $socialContactButtons-textColor-webpage !important;

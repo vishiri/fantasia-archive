@@ -133,12 +133,12 @@ onMounted(() => {
 <style lang="scss">
 .AboutFantasiaArchive {
   .dialogComponent__wrapper {
-    max-width: 80vw;
-    width: 700px;
+    max-width: $dialogAboutFantasiaArchive-wrapper-maxWidth;
+    width: $dialogAboutFantasiaArchive-wrapper-width;
   }
 
   .dialogComponent__content {
-    max-height: calc(100vh - 235px);
+    max-height: calc(100vh - #{$dialogAboutFantasiaArchive-content-maxHeightSubtract});
     overflow: auto;
     text-align: center;
   }

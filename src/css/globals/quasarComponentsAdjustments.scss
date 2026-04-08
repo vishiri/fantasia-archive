@@ -5,7 +5,7 @@
 body.desktop .q-focusable:focus > .q-focus-helper {
 
   /* Replacement of the overlay (before/after) elements via simple background-color opacity */
-  opacity: 0.15 !important;
+  opacity: $qFocusable-focusHelper-opacity !important;
 
   &::before,
   &::after {
@@ -19,7 +19,7 @@ body.desktop .q-hoverable:hover > .q-focus-helper,
 body.desktop .q-manual-focusable--focused > .q-focus-helper {
 
   /* Replacement of the overlay (before/after) elements via simple background-color opacity */
-  opacity: 0.075 !important;
+  opacity: $qFocusable-hoverHelper-opacity !important;
 
   &::before,
   &::after {
@@ -52,7 +52,7 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 .fullscreen {
 
   /* Tweak for top bar and other element with z-index between 6000 to 7000 */
-  z-index: 7001;
+  z-index: $qFullscreen-zIndex;
 }
 
 .q-card {
@@ -60,21 +60,21 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 }
 
 .q-dialog > .q-dialog__inner > .q-card {
-  max-height: calc(100vh - 125px);
-  max-width: 1400px;
+  max-height: calc(100vh - #{$qDialog-card-maxHeightSubtract});
+  max-width: $qDialog-card-maxWidth;
 }
 
 .q-layout {
   &__shadow::after {
 
     /* Tweak for default light shadow rendering in the dark-mode variation of the element */
-    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.24) !important;
+    box-shadow: $qLayout-shadowAfter-boxShadow !important;
   }
 }
 
 .q-markdown {
   color: $qMarkdown-color !important;
-  line-height: 1.75;
+  line-height: $qMarkdown-lineHeight;
   overflow-wrap: anywhere;
   word-break: break-word;
 
@@ -104,16 +104,16 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
   }
 
   a {
-    border-bottom: 1px dotted $aLinkColor;
+    border-bottom: $qMarkdown-link-borderBottomWidth $qMarkdown-link-borderBottomStyle $aLinkColor;
   }
 
   blockquote {
-    border-bottom: 1px solid $qMarkdown-blockquote-borderColor !important;
-    border-left: 8px solid $qMarkdown-blockquote-borderColor !important;
+    border-bottom: $qMarkdown-blockquote-borderWidthVertical solid $qMarkdown-blockquote-borderColor !important;
+    border-left: $qMarkdown-blockquote-borderWidthSide solid $qMarkdown-blockquote-borderColor !important;
     border-radius: $qMarkdown-table-borderRadius !important;
-    border-right: 8px solid $qMarkdown-blockquote-borderColor !important;
-    border-top: 1px solid $qMarkdown-blockquote-borderColor !important;
-    padding: 5px 14px !important;
+    border-right: $qMarkdown-blockquote-borderWidthSide solid $qMarkdown-blockquote-borderColor !important;
+    border-top: $qMarkdown-blockquote-borderWidthVertical solid $qMarkdown-blockquote-borderColor !important;
+    padding: $qMarkdown-blockquote-padding !important;
   }
 
   blockquote,
@@ -122,7 +122,7 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
   }
 
   table {
-    border: 1px solid $qMarkdown-table-borderColor;
+    border: $qMarkdown-table-borderWidth solid $qMarkdown-table-borderColor;
     border-collapse: separate;
     border-radius: $qMarkdown-table-borderRadius;
     border-spacing: 0;
@@ -130,9 +130,9 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 
     th,
     td {
-      border-bottom: 1px solid $qMarkdown-table-borderColor;
+      border-bottom: $qMarkdown-table-borderWidth solid $qMarkdown-table-borderColor;
       border-left: 0;
-      border-right: 1px solid $qMarkdown-table-borderColor;
+      border-right: $qMarkdown-table-borderWidth solid $qMarkdown-table-borderColor;
       border-top: 0;
     }
 
@@ -164,17 +164,17 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 
   pre {
     border-radius: $qMarkdown-code-borderRadius;
-    margin: 0 0 16px !important;
+    margin: 0 0 $qMarkdown-pre-marginBottom !important;
     padding: $qMarkdown-code-padding !important;
   }
 
   pre.line-numbers {
-    padding-left: calc(3.2em + #{$qMarkdown-code-padding}) !important;
+    padding-left: calc(#{$qMarkdown-lineNumbers-gutterEm} + #{$qMarkdown-code-padding}) !important;
   }
 
   pre.line-numbers code {
     display: block;
-    line-height: 1.75 !important;
+    line-height: $qMarkdown-code-lineHeight !important;
   }
 
   pre.line-numbers .line-numbers-rows {
@@ -183,20 +183,20 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
   }
 
   pre.line-numbers .line-numbers-rows > span {
-    line-height: 1.75 !important;
+    line-height: $qMarkdown-code-lineHeight !important;
   }
 
   pre.line-numbers .line-numbers-rows > span::before {
-    line-height: 1.75 !important;
+    line-height: $qMarkdown-code-lineHeight !important;
   }
 
   .q-markdown--token {
-    background-color: $qMarkdown-code-blackgroundColor !important;
+    background-color: $qMarkdown-code-backgroundColor !important;
     border-color: $qMarkdown-code-borderColor !important;
     color: $qMarkdown-code-textColor !important;
-    font-weight: 600;
+    font-weight: $qMarkdown-token-fontWeight;
     overflow-wrap: anywhere;
-    padding: 0 5px;
+    padding: 0 $qMarkdown-token-paddingX;
     white-space: pre-wrap;
     word-break: break-word;
   }
@@ -209,11 +209,11 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 
   pre > code {
     display: block;
-    line-height: 1.75 !important;
+    line-height: $qMarkdown-code-lineHeight !important;
   }
 
   .q-markdown--line-numbers {
-    padding: 10px 0 10px 10px;
+    padding: $qMarkdown-lineNumbers-padding;
   }
 }
 
@@ -221,21 +221,21 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
   &--dark {
 
     /* Tweak for default light shadow rendering in the dark-mode variation of the element */
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12) !important;
+    box-shadow: $qCard-boxShadow !important;
   }
 
   &.-subMenu {
 
     /* Submenu having 1 lower z-index than normal menu for fancier looking animation of sliding underneath the parent */
-    z-index: 5999;
+    z-index: $qMenu-subMenu-zIndex;
   }
 }
 
 .q-notification {
   &.bg-info {
-    border: 2px solid $qNotify-bgColor;
+    border: $qNotification-bgInfo-borderWidth solid $qNotify-bgColor;
     color: $qNotify-color;
-    max-width: 550px;
+    max-width: $qNotification-bgInfo-maxWidth;
 
     i {
       color: $qNotify-icon-color;
@@ -243,8 +243,8 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
   }
 
   &__message {
-    font-size: 16px;
-    font-weight: 500;
+    font-size: $qNotification-message-fontSize;
+    font-weight: $qNotification-message-fontWeight;
   }
 
   &__caption {
@@ -254,11 +254,11 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
   &__avatar {
     border-radius: 0;
     flex-shrink: 0;
-    height: 135px;
-    margin-bottom: 15px;
-    margin-right: 30px;
-    margin-top: 15px;
-    width: 135px;
+    height: $qNotification-avatar-height;
+    margin-bottom: $qNotification-avatar-marginBottom;
+    margin-right: $qNotification-avatar-marginRight;
+    margin-top: $qNotification-avatar-marginTop;
+    width: $qNotification-avatar-width;
 
     img {
       max-height: 100%;
@@ -271,38 +271,38 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 .q-page {
 
   /* Max-height of the window minus the height of the top bar */
-  max-height: calc(100vh - 50px);
+  max-height: calc(100vh - #{$qPage-maxHeightSubtract});
   overflow: auto;
 }
 
 .q-tab {
-  min-height: 48px;
+  min-height: $qTab-minHeight;
 }
 
 .q-tooltip {
   background-color: $accent;
   color: $dark;
-  font-size: 13px;
-  font-weight: 600;
-  max-width: 600px;
-  z-index: 999999999 !important;
+  font-size: $qTooltip-fontSize;
+  font-weight: $qTooltip-fontWeight;
+  max-width: $qTooltip-maxWidth;
+  z-index: $qTooltip-zIndex !important;
 }
 
 .q-toggle {
-  width: 100%;
+  width: $qToggle-width;
 }
 
 .q-toggle__inner {
-  max-width: 150px;
-  width: 100%;
+  max-width: $qToggle-inner-maxWidth;
+  width: $qToggle-width;
 }
 
 .q-toggle__inner--truthy .q-toggle__thumb {
-  left: calc(100% - 30px);
+  left: calc(100% - #{$qToggle-thumb-leftCalcSubtract});
 }
 
 .q-toggle__thumb {
-  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: $qToggle-thumb-transition;
 }
 
 .q-transition--fade-enter-active,

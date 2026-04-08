@@ -155,11 +155,11 @@ onMounted(() => {
   }
 
   .q-card {
-    max-width: calc(100vw - 100px) !important;
+    max-width: calc(100vw - #{$dialogMarkdownDocument-card-maxWidthViewportSubtract}) !important;
   }
 
   &.license .q-card {
-    width: 680px;
+    width: $dialogMarkdownDocument-license-card-width;
   }
 
   &.changeLog .q-markdown {
@@ -167,32 +167,32 @@ onMounted(() => {
   }
 
   &.changeLog .q-card {
-    width: 1100px;
+    width: $dialogMarkdownDocument-changeLog-card-width;
   }
 
   &.advancedSearchGuide .q-card {
-    width: 1100px;
+    width: $dialogMarkdownDocument-changeLog-card-width;
   }
 
   &.tipsTricksTrivia .q-card {
-    width: 1100px;
+    width: $dialogMarkdownDocument-changeLog-card-width;
   }
 
   &__content {
-    max-height: calc(100vh - 273px);
-    min-height: 650px;
+    max-height: calc(100vh - #{$dialogMarkdownDocument-content-maxHeightSubtract});
+    min-height: $dialogMarkdownDocument-content-minHeight;
     overflow: auto;
 
     &.tipsTricksTrivia {
-      padding-right: 40px;
+      padding-right: $dialogMarkdownDocument-content-paddingRight;
     }
 
     &.changeLog {
-      padding-right: 40px;
+      padding-right: $dialogMarkdownDocument-content-paddingRight;
     }
 
     &.advancedSearchGuide {
-      padding-right: 40px;
+      padding-right: $dialogMarkdownDocument-content-paddingRight;
     }
   }
 }

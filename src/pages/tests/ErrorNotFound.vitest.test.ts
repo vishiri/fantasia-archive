@@ -17,6 +17,9 @@ test('Test that ErrorNotFound renders error title keys and mascot image hook', (
   })
 
   expect(w.text()).toContain('errorNotFound.title')
+  expect(w.text()).toContain('errorNotFound.subTitleFirst')
+  expect(w.text()).toContain('errorNotFound.subTitleSecond')
   expect(w.find('[data-test-locator="fantasiaMascotImage-image"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="errorCard"]').exists()).toBe(true)
   w.unmount()
 })

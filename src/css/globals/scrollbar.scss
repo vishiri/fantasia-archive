@@ -1,28 +1,27 @@
-@use 'sass:color';
 @use '../quasar.variables.scss' as *;
 
 * {
 
   /* Scrollbar sizing */
   ::-webkit-scrollbar {
-    height: 5px;
-    width: 5px;
+    height: $globals-scrollbar-height;
+    width: $globals-scrollbar-width;
   }
 
   /* Whole scrollbar track */
   ::-webkit-scrollbar-track {
-    background: $dark;
+    background: $globals-scrollbar-trackBackground;
   }
 
   /* Handle button */
   ::-webkit-scrollbar-thumb {
-    background: color.adjust($dark, $lightness: 40%);
-    border-radius: 5px;
+    background: $globals-scrollbar-thumbBackground;
+    border-radius: $globals-scrollbar-thumb-borderRadius;
   }
 
   /* Handle button - Hover */
   ::-webkit-scrollbar-thumb:hover {
-    background: color.adjust($dark, $lightness: 60%);
+    background: $globals-scrollbar-thumbHoverBackground;
   }
 }
 

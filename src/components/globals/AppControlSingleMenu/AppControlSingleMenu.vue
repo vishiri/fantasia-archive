@@ -176,7 +176,7 @@ const menuData = componentData.value.data
 .appControlSingleMenu {
   &:hover,
   &:focus {
-    color: $appControlMenus_singleHover;
+    color: $appControlMenus-singleHover;
   }
 
   &__icon {
@@ -184,27 +184,27 @@ const menuData = componentData.value.data
   }
 
   &__list {
-    background-color: $appControlMenus_bgColor;
-    color: $appControlMenus_color;
+    background-color: $appControlMenus-bgColor;
+    color: $appControlMenus-color;
   }
 
   &__item {
-    min-height: 42px;
+    min-height: $appControlSingleMenu-item-minHeight;
 
     &:hover,
     &:focus {
-      color: $appControlMenus_singleHover;
+      color: $appControlMenus-singleHover;
     }
 
     /* Text legibility fix: red and green blend too much into each other without a little shadow */
     &.text-secondary {
-      text-shadow: 0 0 3px black;
+      text-shadow: $appControlSingleMenu-item-secondary-textShadow;
     }
   }
 
   &__separator {
-    background-color: $appControlMenus_separatorColor;
-    height: 0.5px !important;
+    background-color: $appControlMenus-separatorColor;
+    height: $appControlSingleMenu-separator-height !important;
   }
 }
 </style>

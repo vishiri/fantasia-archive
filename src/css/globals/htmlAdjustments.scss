@@ -1,7 +1,7 @@
 @use '../quasar.variables.scss' as *;
 
 * {
-  letter-spacing: 0.025em;
+  letter-spacing: $globals-letterSpacing;
 
   &::before,
   &::after {
@@ -19,14 +19,14 @@ body {
 
     /* WebKit/Blink Browsers */
     ::selection {
-      background: $selectBackgroundColor_lightMode;
-      color: $selectTextColor_lightMode;
+      background: $selectBackgroundColor-lightMode;
+      color: $selectTextColor-lightMode;
     }
 
     /* Gecko Browsers */
     ::-moz-selection {
-      background: $selectBackgroundColor_lightMode;
-      color: $selectTextColor_lightMode;
+      background: $selectBackgroundColor-lightMode;
+      color: $selectTextColor-lightMode;
     }
   }
 
@@ -34,14 +34,14 @@ body {
 
     /* WebKit/Blink Browsers */
     ::selection {
-      background: $selectBackgroundColor_darkMode;
-      color: $selectTextColor_darkMode;
+      background: $selectBackgroundColor-darkMode;
+      color: $selectTextColor-darkMode;
     }
 
     /* Gecko Browsers */
     ::-moz-selection {
-      background: $selectBackgroundColor_darkMode;
-      color: $selectTextColor_darkMode;
+      background: $selectBackgroundColor-darkMode;
+      color: $selectTextColor-darkMode;
     }
   }
 }
@@ -51,5 +51,5 @@ a {
 }
 
 p {
-  margin: 0 0 16px;
+  margin: $globals-paragraph-margin;
 }

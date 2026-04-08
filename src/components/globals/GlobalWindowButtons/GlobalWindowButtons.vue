@@ -167,24 +167,24 @@ onUnmounted(async () => {
 .globalWindowButtons {
   -webkit-app-region: no-drag;
   border-radius: 0;
-  color: $globalWindowButtons_color;
-  height: $globalWindowButtons_height;
+  color: $globalWindowButtons-color;
+  height: $globalWindowButtons-height;
   position: fixed;
   right: 0;
   top: 0;
-  z-index: 99999999;
+  z-index: $globalWindowButtons-zIndex;
 
   &__button {
     &:hover,
     &:focus {
-      color: $globalWindowButtons_hoverColor;
+      color: $globalWindowButtons-hoverColor;
     }
   }
 
   &__close {
     &:hover,
     &:focus {
-      color: $globalWindowButtons_close_hoverColor;
+      color: $globalWindowButtons-close-hoverColor;
     }
   }
 }

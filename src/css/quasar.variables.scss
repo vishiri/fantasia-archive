@@ -1,99 +1,246 @@
 @use 'sass:color';
 
-/* Quasar SCSS (& Sass) Variables */
+/* Quasar SCSS (& Sass) variables — single theme catalogue (see project-scss.mdc). */
 
-/* GENERAL COLORS */
+/* === 1. QUASAR COLORS === */
 
-$primary   : #d7ac47;
-$primary-bright: #ffd673;
-$secondary : #f75746;
-$accent    : #f5f5f5;
-
-$white     : #fff;
-$grey      : #d4d0c9;
-
-$dark      : #1b333e;
-$dark-page : #303742;
-
+/* QUASAR COLORS - GENERAL */
+$accent: #f5f5f5;
+$dark: #1b333e;
 $dark-lighter: #234655;
+$dark-page: #303742;
+$grey: #d4d0c9;
+$info: color.adjust(#d7ac47, $lightness: 35%);
+$negative: #c10015;
+$positive: #35a14e;
+$primary: #d7ac47;
+$primary-bright: #ffd673;
+$secondary: #f75746;
+$warning: #f2c037;
+$white: #fff;
 
-$positive  : #35a14e;
-$negative  : #c10015;
-$info      : color.adjust(#d7ac47, $lightness: 35%);
-$warning   : #f2c037;
+/* === 2. GLOBALS === */
 
 /* GLOBALS - CUSTOM COLORS */
 $gold-muted-border: color.scale($primary, $saturation: -35%, $lightness: 14%);
 
-/* GLOBALS - HTML ELEMENTS */
-$aLinkColor: $primary-bright;
-
-/* GLOBALS - GENERAL SELECT */
-$selectTextColor_darkMode: #eedbb0;
-$selectBackgroundColor_darkMode: #bb3b32;
-$selectTextColor_lightMode: #eedbb0;
-$selectBackgroundColor_lightMode: #aa2a21;
-
 /* GLOBALS - GENERAL ICONS */
 $iconSize: 21px;
 
+/* GLOBALS - GENERAL SELECT */
+$selectBackgroundColor-darkMode: #bb3b32;
+$selectBackgroundColor-lightMode: #aa2a21;
+$selectTextColor-darkMode: #eedbb0;
+$selectTextColor-lightMode: #eedbb0;
+
+/* GLOBALS - HTML ELEMENTS */
+$aLinkColor: $primary-bright;
+$globals-letterSpacing: 0.025em;
+$globals-paragraph-margin: 0 0 16px;
+
+/* GLOBALS - SCROLLBAR */
+$globals-scrollbar-height: 5px;
+$globals-scrollbar-thumb-borderRadius: 5px;
+$globals-scrollbar-thumbBackground: color.adjust($dark, $lightness: 40%);
+$globals-scrollbar-thumbHoverBackground: color.adjust($dark, $lightness: 60%);
+$globals-scrollbar-trackBackground: $dark;
+$globals-scrollbar-width: 5px;
+
+/* === 3. QUASAR COMPONENTS === */
+
 /* QUASAR COMPONENT - Q-CARD */
 $qCard-background: $dark;
-$qCard-text: $white;
 $qCard-border-color: $dark;
-$qCard-border-size: 0;
 $qCard-border-radius: 5px;
+$qCard-border-size: 0;
 $qCard-boxShadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
+$qCard-text: $white;
 
-/* QUASAR COMPONENT - Q-CARD - Error page special */
-$qCard-errorPage-background: #f7eeda;
-$qCard-errorPage-text: $dark;
-$qCard-errorPage-border-color: $dark;
-$qCard-errorPage-border-size: 2px;
-$qCard-errorPage-border-radius: 5px;
+/* QUASAR COMPONENT - Q-DIALOG */
+$qDialog-card-maxHeightSubtract: 125px;
+$qDialog-card-maxWidth: 1400px;
 
-/* QUASAR COMPONENT - NOTIFY */
+/* QUASAR COMPONENT - Q-FOCUSABLE */
+$qFocusable-focusHelper-opacity: 0.15;
+$qFocusable-hoverHelper-opacity: 0.075;
+
+/* QUASAR COMPONENT - Q-FULLSCREEN */
+$qFullscreen-zIndex: 7001;
+
+/* QUASAR COMPONENT - Q-LAYOUT */
+$qLayout-shadowAfter-boxShadow: 0 0 10px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.24);
+
+/* QUASAR COMPONENT - Q-MARKDOWN */
+$qMarkdown-blockquote-borderColor: $gold-muted-border;
+$qMarkdown-blockquote-borderWidthSide: 8px;
+$qMarkdown-blockquote-borderWidthVertical: 1px;
+$qMarkdown-blockquote-padding: 5px 14px;
+$qMarkdown-blockquote-textStyle: italic;
+$qMarkdown-code-backgroundColor: $grey;
+$qMarkdown-code-borderColor: $grey;
+$qMarkdown-code-borderRadius: 3px;
+$qMarkdown-code-lineHeight: 1.75;
+$qMarkdown-code-padding: 10px;
+$qMarkdown-code-textColor: $dark;
+$qMarkdown-color: $grey;
+$qMarkdown-lineHeight: 1.75;
+$qMarkdown-lineNumbers-gutterEm: 3.2em;
+$qMarkdown-lineNumbers-padding: 10px 0 10px 10px;
+$qMarkdown-link-borderBottomStyle: dotted;
+$qMarkdown-link-borderBottomWidth: 1px;
+$qMarkdown-pre-marginBottom: 16px;
+$qMarkdown-table-borderColor: $gold-muted-border;
+$qMarkdown-table-borderRadius: 3px;
+$qMarkdown-table-borderWidth: 1px;
+$qMarkdown-token-fontWeight: 600;
+$qMarkdown-token-paddingX: 5px;
+
+/* QUASAR COMPONENT - Q-MENU */
+$qMenu-subMenu-zIndex: 5999;
+
+/* QUASAR COMPONENT - Q-NOTIFICATION */
+$qNotification-avatar-height: 135px;
+$qNotification-avatar-marginBottom: 15px;
+$qNotification-avatar-marginRight: 30px;
+$qNotification-avatar-marginTop: 15px;
+$qNotification-avatar-width: 135px;
+$qNotification-bgInfo-borderWidth: 2px;
+$qNotification-bgInfo-maxWidth: 550px;
+$qNotification-message-fontSize: 16px;
+$qNotification-message-fontWeight: 500;
+
+/* QUASAR COMPONENT - Q-NOTIFY (THEME) */
 $qNotify-bgColor: $dark;
 $qNotify-color: $dark;
 $qNotify-icon-color: $dark;
 
-/* COMPONENT - GLOBAL WINDOW BUTTONS */
-$globalWindowButtons_height: 35px;
-$globalWindowButtons_color: $accent;
-$globalWindowButtons_hoverColor: $primary-bright;
-$globalWindowButtons_close_hoverColor: $secondary;
+/* QUASAR COMPONENT - Q-PAGE */
+$qPage-maxHeightSubtract: 50px;
+
+/* QUASAR COMPONENT - Q-TAB */
+$qTab-minHeight: 48px;
+
+/* QUASAR COMPONENT - Q-TOGGLE */
+$qToggle-inner-maxWidth: 150px;
+$qToggle-thumb-leftCalcSubtract: 30px;
+$qToggle-thumb-transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+$qToggle-width: 100%;
+
+/* QUASAR COMPONENT - Q-TOOLTIP */
+$qTooltip-fontSize: 13px;
+$qTooltip-fontWeight: 600;
+$qTooltip-maxWidth: 600px;
+$qTooltip-zIndex: 999999999;
+
+/* === 4. CUSTOM COMPONENTS / PAGES / LAYOUTS === */
 
 /* COMPONENT - APP CONTROL MENUS */
-$appControlMenus_bgColor: $dark-lighter;
-$appControlMenus_color: $accent;
-$appControlMenus_separatorColor: $primary-bright;
-$appControlMenus_singleHover: $primary-bright;
+$appControlMenus-bgColor: $dark-lighter;
+$appControlMenus-color: $accent;
+$appControlMenus-separatorColor: $primary-bright;
+$appControlMenus-singleHover: $primary-bright;
 
-/* COMPONENT - MARKDOWN */
-$qMarkdown-color: $grey;
-$qMarkdown-blockquote-borderColor: $gold-muted-border;
-$qMarkdown-blockquote-textStyle: italic;
-$qMarkdown-table-borderColor: $gold-muted-border;
-$qMarkdown-table-borderRadius: 3px;
-$qMarkdown-code-textColor: $dark;
-$qMarkdown-code-blackgroundColor: $grey;
-$qMarkdown-code-borderColor: $grey;
-$qMarkdown-code-borderRadius: 3px;
-$qMarkdown-code-padding: 10px;
+/* COMPONENT - APP CONTROL SINGLE MENU */
+$appControlSingleMenu-item-minHeight: 42px;
+$appControlSingleMenu-item-secondary-textShadow: 0 0 3px #000;
+$appControlSingleMenu-separator-height: 0.5px;
+
+/* COMPONENT - DIALOG ABOUT FANTASIA ARCHIVE */
+$dialogAboutFantasiaArchive-content-maxHeightSubtract: 235px;
+$dialogAboutFantasiaArchive-wrapper-maxWidth: 80vw;
+$dialogAboutFantasiaArchive-wrapper-width: 700px;
+
+/* COMPONENT - DIALOG MARKDOWN DOCUMENT */
+$dialogMarkdownDocument-card-maxWidthViewportSubtract: 100px;
+$dialogMarkdownDocument-changeLog-card-width: 1100px;
+$dialogMarkdownDocument-content-maxHeightSubtract: 273px;
+$dialogMarkdownDocument-content-minHeight: 650px;
+$dialogMarkdownDocument-content-paddingRight: 40px;
+$dialogMarkdownDocument-license-card-width: 680px;
+
+/* COMPONENT - DIALOG PROGRAM SETTINGS */
+$dialogProgramSettings-card-maxHeightSubtract: 48px;
+$dialogProgramSettings-card-maxWidthViewportSubtract: 100px;
+$dialogProgramSettings-card-width: 1400px;
+$dialogProgramSettings-category-paddingTop: 30px;
+$dialogProgramSettings-category-paddingX: 40px;
+$dialogProgramSettings-categoryTitle-left: 40px;
+$dialogProgramSettings-categoryTitle-paddingBottom: 8px;
+$dialogProgramSettings-categoryTitle-paddingTop: 8px;
+$dialogProgramSettings-categoryTitle-right: 40px;
+$dialogProgramSettings-categoryTitle-zIndex: 5;
+$dialogProgramSettings-gradientBar-height: 10px;
+$dialogProgramSettings-gradientBottom: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 100%);
+$dialogProgramSettings-gradientTop: linear-gradient(360deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 100%);
+$dialogProgramSettings-scrimDark: rgba(0, 0, 0, 0.3);
+$dialogProgramSettings-searchEmpty-padding: 32px 40px;
+$dialogProgramSettings-searchPanel-categoryTitle-marginBottom: -11px;
+$dialogProgramSettings-searchPanel-categoryTitle-marginTop: -37px;
+$dialogProgramSettings-searchPanel-zIndex: 10;
+$dialogProgramSettings-settingsSearchWrapper-after-height: 10px;
+$dialogProgramSettings-settingsSearchWrapper-after-left: -10px;
+$dialogProgramSettings-settingsSearchWrapper-after-right: -35px;
+$dialogProgramSettings-settingsSearchWrapper-after-top: -4px;
+$dialogProgramSettings-settingsSearchWrapper-before-borderBottomLeftRadius: 5px;
+$dialogProgramSettings-settingsSearchWrapper-before-boxShadow: -5px 5px 7px rgba(0, 0, 0, 0.1);
+$dialogProgramSettings-settingsSearchWrapper-before-inset: -5px -35px -5px -10px;
+$dialogProgramSettings-settingsSearchWrapper-right: 45px;
+$dialogProgramSettings-settingsSearchWrapper-top: 4px;
+$dialogProgramSettings-settingsSearchWrapper-transition: opacity 0.1s ease;
+$dialogProgramSettings-settingsSearchWrapper-widthMax: 220px;
+$dialogProgramSettings-settingsSearchWrapper-widthViewportSubtract: 120px;
+$dialogProgramSettings-settingsSearchWrapper-zIndex: 11;
+$dialogProgramSettings-settingHelpIcon-marginTop: 3px;
+$dialogProgramSettings-settingNote-textShadow: 0 0 2px #000;
+$dialogProgramSettings-settingTitle-marginBottom: 8px;
+$dialogProgramSettings-settingTitle-marginLeft: 10px;
+$dialogProgramSettings-settingTitle-marginTop: 16px;
+$dialogProgramSettings-settingTitle-widthSubtract: 45px;
+$dialogProgramSettings-tabsSearchOverlay-zIndex: 10;
+$dialogProgramSettings-title-zIndex: 11;
+$dialogProgramSettings-verticalTab-paddingX: 16px;
+
+/* COMPONENT - ERROR CARD */
+$errorCard-background: #f7eeda;
+$errorCard-border-color: $dark;
+$errorCard-border-radius: 10px;
+$errorCard-border-size: 2px;
+$errorCard-text: $dark;
+
+/* COMPONENT - GLOBAL WINDOW BUTTONS */
+$globalWindowButtons-close-hoverColor: $secondary;
+$globalWindowButtons-color: $accent;
+$globalWindowButtons-height: 35px;
+$globalWindowButtons-hoverColor: $primary-bright;
+$globalWindowButtons-zIndex: 99999999;
 
 /* COMPONENT - SOCIAL CONTACT BUTTONS */
-$socialContactButtons-backgroundColor-patreon: #ff424d;
-$socialContactButtons-hoverColor-patreon: #000;
-$socialContactButtons-backgroundColor-kofi: #000;
-$socialContactButtons-backgroundColor-webpage: $dark;
-$socialContactButtons-hoverColor-webpage: $primary-bright;
-$socialContactButtons-textColor-webpage: $primary-bright;
-$socialContactButtons-backgroundColor-github: #fff;
-$socialContactButtons-textColor-github: #000;
-$socialContactButtons-hoverColor-github: #000;
 $socialContactButtons-backgroundColor-discord: #7289da;
-$socialContactButtons-hoverColor-discord: #000;
+$socialContactButtons-backgroundColor-github: #fff;
+$socialContactButtons-backgroundColor-kofi: #000;
+$socialContactButtons-backgroundColor-patreon: #ff424d;
 $socialContactButtons-backgroundColor-reddit: #ff4500;
-$socialContactButtons-hoverColor-reddit: #000;
 $socialContactButtons-backgroundColor-twitter: #000;
+$socialContactButtons-backgroundColor-webpage: $dark;
+$socialContactButtons-hoverColor-discord: #000;
+$socialContactButtons-hoverColor-github: #000;
+$socialContactButtons-hoverColor-patreon: #000;
+$socialContactButtons-hoverColor-reddit: #000;
+$socialContactButtons-hoverColor-webpage: $primary-bright;
+$socialContactButtons-textColor-github: #000;
 $socialContactButtons-textColor-twitter: #fff;
+$socialContactButtons-textColor-webpage: $primary-bright;
+
+/* COMPONENT - SOCIAL CONTACT SINGLE BUTTON */
+$socialContactSingleButton-chip-borderRadius: 9999px;
+$socialContactSingleButton-chip-color: $white;
+$socialContactSingleButton-chip-fontSize: 16px;
+$socialContactSingleButton-chip-fontWeight: 500;
+$socialContactSingleButton-chip-padding: 12.5px 24px 12.5px 24px;
+$socialContactSingleButton-chip-transition: all 300ms cubic-bezier(0.19, 1, 0.22, 1) 0s;
+$socialContactSingleButton-text-marginLeft: 10px;
+$socialContactSingleButton-variant-fontSize-compact: 15px;
+$socialContactSingleButton-website-borderWidth: 3px;
+
+/* LAYOUT - MAIN LAYOUT */
+$mainLayout-appHeader-zIndex: 7000;

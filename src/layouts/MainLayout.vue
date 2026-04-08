@@ -40,6 +40,6 @@ import AppControlMenus from 'components/globals/AppControlMenus/AppControlMenus.
   -webkit-app-region: drag;
 
   // Tweak, so the menus will slide nicely behind/from behind the top bar
-  z-index: 7000;
+  z-index: $mainLayout-appHeader-zIndex;
 }
 </style>

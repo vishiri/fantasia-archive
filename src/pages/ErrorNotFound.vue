@@ -1,24 +1,11 @@
 <template>
   <div class="fullscreen bg-dark text-primary text-center q-pa-md flex column flex-center">
     <GlobalWindowButtons />
-    <q-card
-      class="q-pl-xl q-pr-xl q-pb-xl errorPage-card"
-    >
-      <q-card-section>
-        <h2 class="text-negative">
-          {{ $t('errorNotFound.title') }}
-        </h2>
-        <h6>
-          {{ $t('errorNotFound.subTitleFirst') }}
-          <br>
-          {{ $t('errorNotFound.subTitleSecond') }}
-        </h6>
-        <FantasiaMascotImage
-          fantasia-image="error"
-          width="300px"
-        />
-      </q-card-section>
-    </q-card>
+    <ErrorCard
+      :title="$t('errorNotFound.title')"
+      :details="errorCardDetails"
+      image-name="error"
+    />
 
     <div>
       <q-btn
@@ -35,16 +22,13 @@
 </template>
 
 <script lang="ts" setup>
-import GlobalWindowButtons from 'src/components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
-import FantasiaMascotImage from 'src/components/elements/FantasiaMascotImage/FantasiaMascotImage.vue'
-</script>
+import { computed } from 'vue'
 
-<style lang="scss" scoped>
-.errorPage-card {
-  background-color: $qCard-errorPage-background;
-  border: $qCard-errorPage-border-size solid $qCard-errorPage-border-color;
-  border-radius: $qCard-errorPage-border-radius;
-  box-shadow: none;
-  color: $qCard-errorPage-text;
-}
-</style>
+import { i18n } from 'app/i18n/externalFileLoader'
+import ErrorCard from 'src/components/elements/ErrorCard/ErrorCard.vue'
+import GlobalWindowButtons from 'src/components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
+
+const errorCardDetails = computed(() =>
+  `${i18n.global.t('errorNotFound.subTitleFirst')}\n${i18n.global.t('errorNotFound.subTitleSecond')}`
+)
+</script>
