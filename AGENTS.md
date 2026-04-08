@@ -203,6 +203,7 @@ Use different instructions or @-references when starting a task:
 | `git-conventional-commits`      | Logical commits, conventional `type:` messages, per-commit approval |
 | `fantasia-changelog-en-us`      | `changeLog.md` strictly aligned to existing `package.json` version  |
 | `fantasia-plan-documents`       | `.cursor/plans` filename and metadata format for plan files         |
+| `horse-around`                  | Parallel AI sessions coordinated with file-based orders and answers |
 
 
 ## Local types extraction rule
