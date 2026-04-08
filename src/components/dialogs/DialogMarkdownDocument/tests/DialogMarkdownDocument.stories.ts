@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import DialogMarkdownDocument from '../DialogMarkdownDocument.vue'
 
 const meta = {
-  title: 'Components/DialogMarkdownDocument',
+  title: 'Components/dialogs/DialogMarkdownDocument',
   component: DialogMarkdownDocument,
   tags: ['autodocs'],
   parameters: {

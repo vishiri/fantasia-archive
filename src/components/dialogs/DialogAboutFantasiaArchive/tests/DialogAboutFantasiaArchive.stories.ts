@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import DialogAboutFantasiaArchive from '../DialogAboutFantasiaArchive.vue'
 
 const meta = {
-  title: 'Components/DialogAboutFantasiaArchive',
+  title: 'Components/dialogs/DialogAboutFantasiaArchive',
   component: DialogAboutFantasiaArchive,
   tags: ['autodocs'],
   parameters: {

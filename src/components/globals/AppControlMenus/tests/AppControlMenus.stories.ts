@@ -4,7 +4,7 @@ import { expect, within } from 'storybook/test'
 import AppControlMenus from '../AppControlMenus.vue'
 
 const meta = {
-  title: 'Components/AppControlMenus',
+  title: 'Components/globals/AppControlMenus',
   component: AppControlMenus,
   tags: ['autodocs'],
   args: {

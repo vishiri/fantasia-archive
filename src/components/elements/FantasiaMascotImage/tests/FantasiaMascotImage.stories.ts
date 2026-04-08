@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import FantasiaMascotImage from '../FantasiaMascotImage.vue'
 
 const meta = {
-  title: 'Components/FantasiaMascotImage',
+  title: 'Components/elements/FantasiaMascotImage',
   component: FantasiaMascotImage,
   tags: ['autodocs'],
   parameters: {

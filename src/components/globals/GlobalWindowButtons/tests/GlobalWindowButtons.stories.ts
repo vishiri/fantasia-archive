@@ -43,7 +43,7 @@ const stageDecorator: Decorator = (story, context) => {
 }
 
 const meta = {
-  title: 'Components/GlobalWindowButtons',
+  title: 'Components/globals/GlobalWindowButtons',
   component: GlobalWindowButtons,
   tags: ['autodocs'],
   decorators: [stageDecorator],

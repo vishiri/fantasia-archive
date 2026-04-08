@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import ErrorCard from '../ErrorCard.vue'
 
 const meta = {
-  title: 'Components/ErrorCard',
+  title: 'Components/elements/ErrorCard',
   component: ErrorCard,
   decorators: [
     (story) => ({

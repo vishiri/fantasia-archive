@@ -80,7 +80,7 @@ const longLabelsDataInput: I_appMenuList = {
 }
 
 const meta = {
-  title: 'Components/AppControlSingleMenu',
+  title: 'Components/globals/AppControlSingleMenu',
   component: AppControlSingleMenu,
   tags: ['autodocs'],
   parameters: {

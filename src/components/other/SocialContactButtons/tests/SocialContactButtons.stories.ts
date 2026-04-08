@@ -4,7 +4,7 @@ import { expect } from 'storybook/test'
 import SocialContactButtons from '../SocialContactButtons.vue'
 
 const meta = {
-  title: 'Components/SocialContactButtons',
+  title: 'Components/other/SocialContactButtons',
   component: SocialContactButtons,
   tags: ['autodocs'],
   parameters: {

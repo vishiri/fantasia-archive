@@ -4,7 +4,7 @@ import { buttonList } from '../../../other/SocialContactButtons/_data/buttons'
 import SocialContactSingleButton from '../SocialContactSingleButton.vue'
 
 const meta = {
-  title: 'Components/SocialContactSingleButton',
+  title: 'Components/elements/SocialContactSingleButton',
   component: SocialContactSingleButton,
   tags: ['autodocs'],
   parameters: {
