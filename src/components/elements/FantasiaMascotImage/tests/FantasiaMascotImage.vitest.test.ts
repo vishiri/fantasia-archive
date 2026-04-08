@@ -23,9 +23,9 @@ test('Test that FantasiaMascotImage renders list image and disables random mode 
     }
   })
 
-  const img = w.get('[data-test-locator="fantasiaMascotImage-image"]')
-  expect(img.attributes('data-test-is-random')).toBe('false')
-  expect(img.attributes('src')).toBe(fantasiaImageList.error)
+  const root = w.get('[data-test-locator="fantasiaMascotImage-image"]')
+  expect(root.attributes('data-test-is-random')).toBe('false')
+  expect(root.attributes('src')).toBe(fantasiaImageList.error)
   w.unmount()
 })
 
@@ -48,8 +48,105 @@ test('Test that FantasiaMascotImage enables random mode when fantasiaImage prop 
     }
   })
 
-  const img = w.get('[data-test-locator="fantasiaMascotImage-image"]')
-  expect(img.attributes('data-test-is-random')).toBe('true')
-  expect(img.attributes('src')).toBeTruthy()
+  const root = w.get('[data-test-locator="fantasiaMascotImage-image"]')
+  expect(root.attributes('data-test-is-random')).toBe('true')
+  expect(root.attributes('src')).toBe(fantasiaImageList.flop)
+  w.unmount()
+})
+
+/**
+ * FantasiaMascotImage
+ * The reading variant matches production usage in program settings search empty state.
+ */
+test('Test that FantasiaMascotImage binds reading prop to the reading list URL', () => {
+  const w = mount(FantasiaMascotImage, {
+    props: {
+      fantasiaImage: 'reading',
+      width: '10px',
+      height: '10px'
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  const root = w.get('[data-test-locator="fantasiaMascotImage-image"]')
+  expect(root.attributes('src')).toBe(fantasiaImageList.reading)
+  w.unmount()
+})
+
+/**
+ * FantasiaMascotImage
+ * Unknown keys fall through determineCurrentImage to an undefined list lookup; q-img still renders.
+ */
+test('Test that FantasiaMascotImage leaves src undefined when fantasiaImage key is not in the list', () => {
+  const w = mount(FantasiaMascotImage, {
+    props: {
+      fantasiaImage: 'notARegisteredMascotKey',
+      width: '10px',
+      height: '10px'
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  const root = w.get('[data-test-locator="fantasiaMascotImage-image"]')
+  expect(root.attributes('src')).toBeUndefined()
+  w.unmount()
+})
+
+/**
+ * FantasiaMascotImage
+ * Alt text combines the shared label message and the resolved variant name for accessibility.
+ */
+test('Test that FantasiaMascotImage alt combines i18n label and variant name for a fixed prop', () => {
+  const w = mount(FantasiaMascotImage, {
+    props: {
+      fantasiaImage: 'error',
+      width: '10px',
+      height: '10px'
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  const root = w.get('[data-test-locator="fantasiaMascotImage-image"]')
+  expect(root.attributes('alt')).toBe('fantasiaMascotImage.label - error')
+  w.unmount()
+})
+
+/**
+ * FantasiaMascotImage
+ * Image URL and random flag are resolved once at setup; later prop changes do not re-resolve (callers should key-remount if needed).
+ */
+test('Test that FantasiaMascotImage keeps the initial src when fantasiaImage prop changes after mount', async () => {
+  const w = mount(FantasiaMascotImage, {
+    props: {
+      fantasiaImage: 'error',
+      width: '10px',
+      height: '10px'
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  await w.setProps({
+    fantasiaImage: 'reading'
+  })
+
+  const root = w.get('[data-test-locator="fantasiaMascotImage-image"]')
+  expect(root.attributes('src')).toBe(fantasiaImageList.error)
+  expect(root.attributes('data-test-image')).toBe('reading')
   w.unmount()
 })

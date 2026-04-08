@@ -55,16 +55,13 @@ test('Check if the wrapper contains "IMG" element', async ({}, testInfo) => {
   await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
   await appWindow.waitForTimeout(faFrontendRenderTimer)
 
-  // Prepare the selector for the tested element
-  const imageElement = appWindow.locator(`[data-test-locator="${selectorList.image}"]`)
+  const root = appWindow.locator(`[data-test-locator="${selectorList.image}"]`)
+  await expect(root).toHaveCount(1)
 
-  // Check if the tested element exists
-  await expect(imageElement).toHaveCount(1)
+  const nativeImg = root.locator('img')
+  await expect(nativeImg).toHaveCount(1)
 
-  // Get the element's tag name
-  const elementType = await imageElement.evaluate(el => el.tagName)
-
-  // Check if the tested element is an 'IMG' element
+  const elementType = await nativeImg.evaluate(el => el.tagName)
   expect(elementType).toBe(testString)
 
   // Close the app

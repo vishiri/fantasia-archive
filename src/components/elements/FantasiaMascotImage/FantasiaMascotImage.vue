@@ -3,16 +3,21 @@
   <div
     class="fantasiaMascotImage"
   >
-    <!-- Inner image of the chosen Fantasia Mascot -->
-    <img
-      :src="currentMascotImage"
+    <!-- Inner image of the chosen Fantasia Mascot (q-img keeps loading/spinner API; tests target root + inner img). -->
+    <q-img
+      no-spinner
+      spinner-size="0"
       :alt="`${$t('fantasiaMascotImage.label')} - ${mascotVariantName}`"
-      :title="`${$t('fantasiaMascotImage.label')} - ${mascotVariantName}`"
       class="fantasiaMascotImage__inner"
       data-test-locator="fantasiaMascotImage-image"
+      fit="contain"
       :data-test-image="fantasiaImage"
       :data-test-is-random="isRandom"
-    >
+      :height="height"
+      :src="currentMascotImage"
+      :width="width"
+      img-class="fantasiaMascotImage__img"
+    />
   </div>
 </template>
 
@@ -71,6 +76,10 @@ const currentMascotImage = determineCurrentImage(fantasiaImageList, isRandom, pr
     height: v-bind(height);
     user-select: none;
     width: v-bind(width);
+  }
+
+  :deep(.fantasiaMascotImage__img) {
+    user-select: none;
   }
 }
 
