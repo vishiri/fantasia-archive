@@ -1,3 +1,5 @@
+import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
+
 import type { T_contentBridgeScenario } from './contentBridge.types'
 
 const baseBridge = () => ({
@@ -27,6 +29,10 @@ const baseBridge = () => ({
   },
   appDetails: {
     PROJECT_VERSION: '0.0.0-storybook'
+  },
+  faUserSettings: {
+    getSettings: async () => ({ ...FA_USER_SETTINGS_DEFAULTS }),
+    setSettings: async () => undefined
   }
 })
 
@@ -74,6 +80,10 @@ export const setContentBridgeScenario = (
     appDetails: {
       ...nextBridge.appDetails,
       ...(overrides.appDetails ?? {})
+    },
+    faUserSettings: {
+      ...nextBridge.faUserSettings,
+      ...(overrides.faUserSettings ?? {})
     }
   }
 }

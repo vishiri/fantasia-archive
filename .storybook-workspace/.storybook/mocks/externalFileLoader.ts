@@ -79,6 +79,26 @@ export const setI18nScenario = (scenario: T_i18nScenario = 'default') => {
 
 export const getStorybookI18nMessages = (): Record<string, unknown> => scenarioMessages[activeScenario]
 
+const deepMergeLocaleTree = (target: Record<string, unknown>, source: Record<string, unknown>): void => {
+  for (const key of Object.keys(source)) {
+    const sourceValue = source[key]
+    const targetValue = target[key]
+
+    if (
+      sourceValue !== null &&
+      typeof sourceValue === 'object' &&
+      !Array.isArray(sourceValue) &&
+      targetValue !== null &&
+      typeof targetValue === 'object' &&
+      !Array.isArray(targetValue)
+    ) {
+      deepMergeLocaleTree(targetValue as Record<string, unknown>, sourceValue as Record<string, unknown>)
+    } else {
+      target[key] = sourceValue
+    }
+  }
+}
+
 const resolveTranslation = (key: string): string => {
   const fragments = key.split('.')
   let current: unknown = storybookI18nMessages
@@ -105,6 +125,28 @@ const storybookI18nMessages = new Proxy(defaultMessages, {
 
 export const i18n = {
   global: {
-    t: (key: string): string => resolveTranslation(key)
+    t: (key: string): string => resolveTranslation(key),
+    te: (key: string): boolean => {
+      const fragments = key.split('.')
+      let current: unknown = storybookI18nMessages
+
+      for (const fragment of fragments) {
+        if (typeof current !== 'object' || current === null || !(fragment in current)) {
+          return false
+        }
+
+        current = (current as Record<string, unknown>)[fragment]
+      }
+
+      return typeof current === 'string'
+    },
+    mergeLocaleMessage: (locale: string, message: Record<string, unknown>): void => {
+      if (locale !== 'en-US') {
+        return
+      }
+
+      const root = scenarioMessages[activeScenario] as Record<string, unknown>
+      deepMergeLocaleTree(root, message)
+    }
   }
 }
