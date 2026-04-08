@@ -134,8 +134,6 @@
 </template>
 
 <script setup lang="ts">
-// TODO - ADD TESTS
-
 import type { I_appMenuList } from 'app/types/I_appMenusDataList'
 import { computed } from 'vue'
 

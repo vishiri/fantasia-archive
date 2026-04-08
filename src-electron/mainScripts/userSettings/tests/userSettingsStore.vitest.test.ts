@@ -1,5 +1,6 @@
 import { vi, expect, test, beforeEach } from 'vitest'
 
+import type ElectronStore from 'electron-store'
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 import type { T_storeConstructorOptions } from './userSettingsStore.vitest.types'
 
@@ -100,4 +101,48 @@ test('Test that getFaUserSettings does not rewrite a clean persisted settings st
 
   expect(storeReplacementCalls).toEqual([])
   expect(store.store.darkMode).toBe(true)
+})
+
+/**
+ * cleanupFaUserSettings
+ * Nullish 'store.store' is treated as an empty object, and missing keys are filled from defaults without rewriting when no unknown keys exist.
+ */
+test('Test that cleanupFaUserSettings fills missing keys when persisted store snapshot is nullish', async () => {
+  const { cleanupFaUserSettings } = await import('../userSettingsStore')
+  let persisted: I_faUserSettings | undefined | null
+  const fakeStore = {
+    get store () {
+      return persisted as I_faUserSettings
+    },
+    set store (value: I_faUserSettings) {
+      persisted = value
+    }
+  } as ElectronStore<I_faUserSettings>
+
+  cleanupFaUserSettings(fakeStore)
+
+  expect(persisted).toBeUndefined()
+})
+
+/**
+ * cleanupFaUserSettings
+ * Partial persisted objects still merge each known key via nullish coalescing to defaults.
+ */
+test('Test that cleanupFaUserSettings backfills omitted default keys from a partial persisted object', async () => {
+  const { cleanupFaUserSettings } = await import('../userSettingsStore')
+  const partial = {
+    darkMode: true
+  } as Partial<I_faUserSettings> & Record<string, boolean | undefined>
+  const fakeStore = {
+    get store () {
+      return partial as I_faUserSettings
+    },
+    set store (_value: I_faUserSettings) {
+      // Partial cleanup path has no unknown keys; file should not be rewritten.
+    }
+  } as ElectronStore<I_faUserSettings>
+
+  cleanupFaUserSettings(fakeStore)
+
+  expect(partial.darkMode).toBe(true)
 })

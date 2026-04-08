@@ -1,5 +1,14 @@
-import { expect, test, vi } from 'vitest'
+import { afterEach, expect, test, vi } from 'vitest'
 import { toggleDevTools } from '../toggleDevTools'
+
+const originalWindow = globalThis.window
+
+afterEach(() => {
+  Object.defineProperty(globalThis, 'window', {
+    value: originalWindow,
+    configurable: true
+  })
+})
 
 /**
  * toggleDevTools
@@ -7,7 +16,6 @@ import { toggleDevTools } from '../toggleDevTools'
  */
 test('Test that toggleDevTools calls window faContentBridgeAPIs bridge', () => {
   const toggleDevToolsMock = vi.fn()
-  const originalWindow = globalThis.window
 
   Object.defineProperty(globalThis, 'window', {
     value: {
@@ -22,9 +30,55 @@ test('Test that toggleDevTools calls window faContentBridgeAPIs bridge', () => {
 
   toggleDevTools()
   expect(toggleDevToolsMock).toHaveBeenCalledOnce()
+})
 
+/**
+ * toggleDevTools
+ * Missing bridge objects do not throw when optional chaining short-circuits.
+ */
+test('Test that toggleDevTools does not throw when faContentBridgeAPIs is missing', () => {
   Object.defineProperty(globalThis, 'window', {
-    value: originalWindow,
+    value: {},
     configurable: true
   })
+
+  expect(() => {
+    toggleDevTools()
+  }).not.toThrow()
+})
+
+/**
+ * toggleDevTools
+ * Missing faDevToolsControl does not throw when optional chaining short-circuits.
+ */
+test('Test that toggleDevTools does not throw when faDevToolsControl is missing', () => {
+  Object.defineProperty(globalThis, 'window', {
+    value: {
+      faContentBridgeAPIs: {}
+    },
+    configurable: true
+  })
+
+  expect(() => {
+    toggleDevTools()
+  }).not.toThrow()
+})
+
+/**
+ * toggleDevTools
+ * Missing toggleDevTools callback does not throw when optional chaining short-circuits.
+ */
+test('Test that toggleDevTools does not throw when toggleDevTools callback is missing', () => {
+  Object.defineProperty(globalThis, 'window', {
+    value: {
+      faContentBridgeAPIs: {
+        faDevToolsControl: {}
+      }
+    },
+    configurable: true
+  })
+
+  expect(() => {
+    toggleDevTools()
+  }).not.toThrow()
 })

@@ -1,9 +1,10 @@
 import { test, expect, vi, beforeEach } from 'vitest'
 import { closeAppManager, openAppWindowManager, startApp } from '../appManagement'
 
-const { initializeMock, mainWindowCreationMock, registerFaDevToolsIpcMock, registerFaUserSettingsIpcMock, appMock, appOnHandlers } = vi.hoisted(() => {
+const { getFaUserSettingsMock, initializeMock, mainWindowCreationMock, registerFaDevToolsIpcMock, registerFaUserSettingsIpcMock, appMock, appOnHandlers } = vi.hoisted(() => {
   const handlers: Record<string, () => void> = {}
   return {
+    getFaUserSettingsMock: vi.fn(),
     initializeMock: vi.fn(),
     mainWindowCreationMock: vi.fn(),
     registerFaDevToolsIpcMock: vi.fn(),
@@ -43,6 +44,12 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaUserSettingsIpc', 
   }
 })
 
+vi.mock('app/src-electron/mainScripts/userSettings/userSettingsStore', () => {
+  return {
+    getFaUserSettings: getFaUserSettingsMock
+  }
+})
+
 vi.mock('electron', () => {
   return {
     app: appMock
@@ -54,6 +61,7 @@ vi.mock('electron-store', () => ({
 }))
 
 beforeEach(() => {
+  getFaUserSettingsMock.mockReset()
   initializeMock.mockReset()
   mainWindowCreationMock.mockReset()
   registerFaDevToolsIpcMock.mockReset()
@@ -86,6 +94,7 @@ test('Test that the electron app window opens properly after start-up', async ()
   await Promise.resolve()
 
   expect(appMock.whenReady).toHaveBeenCalledOnce()
+  expect(getFaUserSettingsMock).toHaveBeenCalledOnce()
   expect(mainWindowCreationMock).toHaveBeenCalledTimes(1)
   expect(appOnHandlers.activate).toBeTypeOf('function')
 

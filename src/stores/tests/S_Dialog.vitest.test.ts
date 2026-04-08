@@ -52,3 +52,33 @@ test('Test that S_DialogComponent has defaults and updates UUID', () => {
   S_DialogComponent.generateDialogUUID()
   expect(S_DialogComponent.dialogUUID).toBe('uuid-1')
 })
+
+/**
+ * S_DialogMarkdown
+ * Store fields accept new document keys like production open flows.
+ */
+test('Test that S_DialogMarkdown documentToOpen accepts a new document key', () => {
+  S_DialogMarkdown.documentToOpen = 'changeLog'
+  expect(S_DialogMarkdown.documentToOpen).toBe('changeLog')
+})
+
+/**
+ * S_DialogComponent
+ * Store fields accept new dialog keys like production open flows.
+ */
+test('Test that S_DialogComponent dialogToOpen accepts a new dialog key', () => {
+  S_DialogComponent.dialogToOpen = 'ProgramSettings'
+  expect(S_DialogComponent.dialogToOpen).toBe('ProgramSettings')
+})
+
+/**
+ * S_DialogMarkdown
+ * Repeated UUID generation overwrites dialogUUID with the latest v4 value.
+ */
+test('Test that S_DialogMarkdown generateDialogUUID overwrites dialogUUID on each call', () => {
+  uuidMock.mockReturnValueOnce('uuid-first').mockReturnValueOnce('uuid-second')
+  S_DialogMarkdown.generateDialogUUID()
+  expect(S_DialogMarkdown.dialogUUID).toBe('uuid-first')
+  S_DialogMarkdown.generateDialogUUID()
+  expect(S_DialogMarkdown.dialogUUID).toBe('uuid-second')
+})

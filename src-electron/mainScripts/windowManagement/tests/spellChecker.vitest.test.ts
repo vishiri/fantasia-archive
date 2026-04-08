@@ -1,6 +1,7 @@
 import type { BrowserWindow } from 'electron'
 import { beforeEach, expect, test, vi } from 'vitest'
 
+import L_spellChecker_enUS from 'app/i18n/en-US/globalFunctionality/L_spellChecker'
 import L_spellChecker_fr from 'app/i18n/fr/globalFunctionality/L_spellChecker'
 
 import { setupSpellChecker } from '../spellChecker'
@@ -175,6 +176,37 @@ test('Test that spellChecker does not popup when there is nothing to show', () =
 
   const activeMenu = menuInstances[0]
   expect(activeMenu.popup).not.toHaveBeenCalled()
+})
+
+/**
+ * setupSpellChecker
+ * Default English locale uses the en-US spell-checker string for the add-to-dictionary menu label.
+ */
+test('Test that spellChecker uses English add-to-dictionary label when app locale is en-US', () => {
+  getLocaleMock.mockReturnValue('en-US')
+
+  const onMock = vi.fn()
+  const appWindow = {
+    webContents: {
+      on: onMock,
+      replaceMisspelling: vi.fn(),
+      session: {
+        addWordToSpellCheckerDictionary: vi.fn()
+      }
+    }
+  }
+  setupSpellChecker(appWindow as unknown as BrowserWindow)
+  const contextMenuHandler = onMock.mock.calls[0][1]
+  menuInstances.length = 0
+  MenuItemMock.mockClear()
+
+  contextMenuHandler({}, {
+    dictionarySuggestions: [],
+    misspelledWord: 'typo'
+  })
+
+  const addWordItem = MenuItemMock.mock.calls[0][0]
+  expect(addWordItem.label).toBe(L_spellChecker_enUS.addToDictionary)
 })
 
 /**

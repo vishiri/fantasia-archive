@@ -60,4 +60,9 @@ test('Test that electron preload exposes faContentBridgeAPIs with expected API k
       'faWindowControl'
     ].sort()
   )
+
+  for (const key of Object.keys(apiObject) as Array<keyof typeof apiObject>) {
+    expect(apiObject[key]).toBeTypeOf('object')
+    expect(apiObject[key]).not.toBeNull()
+  }
 })

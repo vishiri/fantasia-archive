@@ -1,4 +1,4 @@
-import { expect, test, vi } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 
 const {
   bootMock,
@@ -21,6 +21,11 @@ vi.mock('#q-app/wrappers', () => {
 })
 
 import externalLinkManagerBoot from '../externalLinkManager'
+
+beforeEach(() => {
+  checkIfExternalMock.mockReset()
+  openExternalMock.mockReset()
+})
 
 function runExternalLinkBoot (): void {
   const run = externalLinkManagerBoot as () => void
@@ -102,6 +107,41 @@ test('Test that click handler opens external links via faExternalLinksManager', 
   expect(checkIfExternalMock).toHaveBeenCalledWith('https://example.com/')
   expect(preventDefaultMock).toHaveBeenCalledOnce()
   expect(openExternalMock).toHaveBeenCalledWith('https://example.com/')
+})
+
+/**
+ * handleMouseClicks
+ * Primary click on an internal link does not prevent default or delegate to openExternal.
+ */
+test('Test that click handler leaves internal links to normal navigation', () => {
+  const eventHandlers: Record<string, (ev: Event) => void> = {}
+  const addEventListenerMock = vi.fn((type: string, listener: unknown) => {
+    eventHandlers[type] = listener as (ev: Event) => void
+  })
+  setDocumentAddListenerMock(addEventListenerMock)
+
+  runExternalLinkBoot()
+
+  const targetAnchor = {
+    tagName: 'a',
+    href: 'app://internal/page',
+    closest: vi.fn(() => null)
+  }
+
+  const preventDefaultMock = vi.fn()
+  checkIfExternalMock.mockReturnValue(false)
+
+  setWindowLinksStub()
+
+  eventHandlers.click({
+    target: targetAnchor,
+    type: 'click',
+    preventDefault: preventDefaultMock
+  } as unknown as Event)
+
+  expect(checkIfExternalMock).toHaveBeenCalledWith('app://internal/page')
+  expect(preventDefaultMock).not.toHaveBeenCalled()
+  expect(openExternalMock).not.toHaveBeenCalled()
 })
 
 /**

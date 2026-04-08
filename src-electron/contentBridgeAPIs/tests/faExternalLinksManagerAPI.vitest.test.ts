@@ -17,7 +17,15 @@ vi.mock('electron', () => {
 
 /**
  * checkIfExternal
- * Test for external link with "htts" input
+ * Uppercase HTTP scheme does not match the lowercase substring check (documents current behavior).
+ */
+test('Test that uppercase HTTP scheme is not treated as external', () => {
+  expect(faExternalLinksManagerAPI.checkIfExternal('HTTP://example.com/')).toBe(false)
+})
+
+/**
+ * checkIfExternal
+ * Test for external link with http input
  */
 test('Test for external link with "http" input', () => {
   const testInput = 'http://www.google.com'

@@ -1,3 +1,5 @@
+import path from 'path'
+
 import { afterEach, expect, test, vi } from 'vitest'
 
 const appMock = vi.hoisted(() => {
@@ -38,4 +40,20 @@ test('Test that fixAppName skips setName and setPath when package name resolves 
 
   expect(appMock.setName).not.toHaveBeenCalled()
   expect(appMock.setPath).not.toHaveBeenCalled()
+})
+
+/**
+ * fixAppName
+ * DEBUGGING suffix still produces a truthy app name ('-dev') when package name is empty, so paths are applied.
+ */
+test('Test that fixAppName uses -dev name and userData when package name is empty but DEBUGGING is set', () => {
+  vi.stubEnv('DEBUGGING', 'DEBUGGING')
+  fixAppName()
+
+  expect(appMock.setName).toHaveBeenCalledWith('-dev')
+  expect(appMock.getPath).toHaveBeenCalledWith('appData')
+  expect(appMock.setPath).toHaveBeenCalledWith(
+    'userData',
+    path.join('C:/mock/AppData/Roaming', '-dev')
+  )
 })

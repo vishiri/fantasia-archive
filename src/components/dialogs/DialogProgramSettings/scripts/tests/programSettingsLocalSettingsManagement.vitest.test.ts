@@ -171,3 +171,27 @@ test('syncLocalProgramSettingsFromStore does not call refreshSettings when setti
   expect(refreshSettings).not.toHaveBeenCalled()
   expect(localSettings.value).toEqual(FA_USER_SETTINGS_DEFAULTS)
 })
+
+/**
+ * syncLocalProgramSettingsFromStore
+ * When refreshSettings runs but the store still exposes null settings, refs stay untouched.
+ */
+test('syncLocalProgramSettingsFromStore leaves refs unchanged when settings stay null after refresh', async () => {
+  const store: T_programSettingsFaUserSettingsStoreForSync = {
+    settings: null,
+    refreshSettings: async () => {
+      /* store.settings intentionally remains null */
+    }
+  }
+  vi.mocked(S_FaUserSettings).mockReturnValue(
+    store as unknown as ReturnType<typeof S_FaUserSettings>
+  )
+
+  const localSettings = ref<I_faUserSettings | null>(null)
+  const programSettingsTree = ref<T_programSettingsRenderTree>({})
+
+  await syncLocalProgramSettingsFromStore(localSettings, programSettingsTree)
+
+  expect(localSettings.value).toBe(null)
+  expect(Object.keys(programSettingsTree.value)).toHaveLength(0)
+})

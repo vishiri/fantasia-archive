@@ -57,3 +57,27 @@ test('Test that openDialogComponent accepts ProgramSettings dialog name', () => 
   expect(componentStoreMock.dialogToOpen).toBe('ProgramSettings')
   expect(generateDialogUUIDComponentMock).toHaveBeenCalled()
 })
+
+/**
+ * openDialogMarkdownDocument
+ * Each open refreshes the document key and triggers a new UUID cycle.
+ */
+test('Test that openDialogMarkdownDocument calls generateDialogUUID on each open', () => {
+  generateDialogUUIDMarkdownMock.mockClear()
+  openDialogMarkdownDocument('changeLog')
+  openDialogMarkdownDocument('license')
+  expect(generateDialogUUIDMarkdownMock).toHaveBeenCalledTimes(2)
+  expect(markdownStoreMock.documentToOpen).toBe('license')
+})
+
+/**
+ * openDialogComponent
+ * Each open refreshes the dialog key and triggers a new UUID cycle.
+ */
+test('Test that openDialogComponent calls generateDialogUUID on each open', () => {
+  generateDialogUUIDComponentMock.mockClear()
+  openDialogComponent('ProgramSettings')
+  openDialogComponent('AboutFantasiaArchive')
+  expect(generateDialogUUIDComponentMock).toHaveBeenCalledTimes(2)
+  expect(componentStoreMock.dialogToOpen).toBe('AboutFantasiaArchive')
+})

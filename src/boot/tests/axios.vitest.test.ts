@@ -45,6 +45,9 @@ test('Test that axios boot assigns $axios and $api to app global properties', ()
   axiosBootFunction({ app: appMock } as never)
 
   expect(createMock).toHaveBeenCalledOnce()
+  expect(createMock).toHaveBeenCalledWith({
+    baseURL: 'https://api.example.com'
+  })
   expect(api).toBe(axiosInstanceMock)
   expect(appMock.config.globalProperties).toMatchObject({
     $axios: {

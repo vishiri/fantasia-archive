@@ -60,6 +60,30 @@ test('Test if extraEnvVariablesAPI reads TEST_ENV and COMPONENT_NAME when set', 
 
 /**
  * extraEnvVariablesAPI
+ * Empty TEST_ENV and COMPONENT_NAME are falsy and map to false after re-import.
+ */
+test('Test if extraEnvVariablesAPI treats empty TEST_ENV and COMPONENT_NAME as false', async () => {
+  vi.resetModules()
+  vi.stubEnv('TEST_ENV', '')
+  vi.stubEnv('COMPONENT_NAME', '')
+  const { extraEnvVariablesAPI: api } = await import('../extraEnvVariablesAPI')
+  expect(api.TEST_ENV).toBe(false)
+  expect(api.COMPONENT_NAME).toBe(false)
+})
+
+/**
+ * extraEnvVariablesAPI
+ * Empty COMPONENT_PROPS skips JSON.parse and yields false.
+ */
+test('Test if extraEnvVariablesAPI treats empty COMPONENT_PROPS as false', async () => {
+  vi.resetModules()
+  vi.stubEnv('COMPONENT_PROPS', '')
+  const { extraEnvVariablesAPI: api } = await import('../extraEnvVariablesAPI')
+  expect(api.COMPONENT_PROPS).toBe(false)
+})
+
+/**
+ * extraEnvVariablesAPI
  * COMPONENT_PROPS parses valid JSON from env.
  */
 test('Test if extraEnvVariablesAPI parses COMPONENT_PROPS when JSON is valid', async () => {

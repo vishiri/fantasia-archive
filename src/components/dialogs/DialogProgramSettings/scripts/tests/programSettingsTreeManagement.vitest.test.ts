@@ -117,6 +117,14 @@ test('Test that toSortedRecord returns entries sorted by key', () => {
 })
 
 /**
+ * toSortedRecord
+ * Empty input should yield an empty record without throwing.
+ */
+test('Test that toSortedRecord returns empty object for empty input', () => {
+  expect(toSortedRecord({})).toEqual({})
+})
+
+/**
  * buildProgramSettingsRenderTree
  * Category tabs end with accessibility then developerSettings after ordinary keys.
  */

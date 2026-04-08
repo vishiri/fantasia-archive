@@ -16,6 +16,33 @@ const mocks = vi.hoisted(() => {
     isVisible: () => true,
     webContents
   }
+
+  const secondaryIsDevToolsOpenedMock = vi.fn(() => false)
+  const secondaryOpenDevToolsMock = vi.fn()
+  const secondaryCloseDevToolsMock = vi.fn()
+  const secondaryWebContents = {
+    closeDevTools: secondaryCloseDevToolsMock,
+    isDevToolsOpened: secondaryIsDevToolsOpenedMock,
+    openDevTools: secondaryOpenDevToolsMock
+  }
+  const winSecondary = {
+    isVisible: () => true,
+    webContents: secondaryWebContents
+  }
+
+  const hiddenIsDevToolsOpenedMock = vi.fn(() => false)
+  const hiddenOpenDevToolsMock = vi.fn()
+  const hiddenCloseDevToolsMock = vi.fn()
+  const hiddenWebContents = {
+    closeDevTools: hiddenCloseDevToolsMock,
+    isDevToolsOpened: hiddenIsDevToolsOpenedMock,
+    openDevTools: hiddenOpenDevToolsMock
+  }
+  const winHidden = {
+    isVisible: () => false,
+    webContents: hiddenWebContents
+  }
+
   const browserWindowState: {
     allWindows: unknown[]
     focused: typeof win | undefined
@@ -27,11 +54,21 @@ const mocks = vi.hoisted(() => {
   return {
     browserWindowState,
     closeDevToolsMock,
+    hiddenCloseDevToolsMock,
+    hiddenIsDevToolsOpenedMock,
+    hiddenOpenDevToolsMock,
+    hiddenWebContents,
     ipcMainOnMock,
     isDevToolsOpenedMock,
     openDevToolsMock,
+    secondaryCloseDevToolsMock,
+    secondaryIsDevToolsOpenedMock,
+    secondaryOpenDevToolsMock,
+    secondaryWebContents,
     webContents,
-    win
+    win,
+    winHidden,
+    winSecondary
   }
 })
 
@@ -53,7 +90,15 @@ beforeEach(async () => {
   mocks.isDevToolsOpenedMock.mockReset()
   mocks.openDevToolsMock.mockReset()
   mocks.closeDevToolsMock.mockReset()
+  mocks.secondaryIsDevToolsOpenedMock.mockReset()
+  mocks.secondaryOpenDevToolsMock.mockReset()
+  mocks.secondaryCloseDevToolsMock.mockReset()
+  mocks.hiddenIsDevToolsOpenedMock.mockReset()
+  mocks.hiddenOpenDevToolsMock.mockReset()
+  mocks.hiddenCloseDevToolsMock.mockReset()
   mocks.isDevToolsOpenedMock.mockReturnValue(false)
+  mocks.secondaryIsDevToolsOpenedMock.mockReturnValue(false)
+  mocks.hiddenIsDevToolsOpenedMock.mockReturnValue(false)
   mocks.browserWindowState.focused = undefined
   mocks.browserWindowState.allWindows = [mocks.win]
 })
@@ -106,6 +151,62 @@ test('Test that registerFaDevToolsIpc statusSync returns false without any Brows
   handlerFor(FA_DEVTOOLS_IPC.statusSync)(event)
 
   expect(event.returnValue).toBe(false)
+})
+
+/**
+ * registerFaDevToolsIpc
+ * statusSync prefers BrowserWindow.getFocusedWindow over other visible windows.
+ */
+test('Test that registerFaDevToolsIpc statusSync reads focused window webContents first', async () => {
+  mocks.browserWindowState.focused = mocks.winSecondary
+  mocks.browserWindowState.allWindows = [mocks.win, mocks.winSecondary]
+  mocks.isDevToolsOpenedMock.mockReturnValue(true)
+  mocks.secondaryIsDevToolsOpenedMock.mockReturnValue(false)
+
+  const { registerFaDevToolsIpc } = await import('../registerFaDevToolsIpc')
+  registerFaDevToolsIpc()
+
+  const event: { returnValue?: boolean } = {}
+  handlerFor(FA_DEVTOOLS_IPC.statusSync)(event)
+
+  expect(event.returnValue).toBe(false)
+})
+
+/**
+ * registerFaDevToolsIpc
+ * When no window is focused, statusSync uses the first visible window in getAllWindows order.
+ */
+test('Test that registerFaDevToolsIpc statusSync uses first visible window when nothing is focused', async () => {
+  mocks.browserWindowState.focused = undefined
+  mocks.browserWindowState.allWindows = [mocks.win, mocks.winSecondary]
+  mocks.isDevToolsOpenedMock.mockReturnValue(true)
+  mocks.secondaryIsDevToolsOpenedMock.mockReturnValue(false)
+
+  const { registerFaDevToolsIpc } = await import('../registerFaDevToolsIpc')
+  registerFaDevToolsIpc()
+
+  const event: { returnValue?: boolean } = {}
+  handlerFor(FA_DEVTOOLS_IPC.statusSync)(event)
+
+  expect(event.returnValue).toBe(true)
+})
+
+/**
+ * registerFaDevToolsIpc
+ * When every window is hidden, statusSync falls back to getAllWindows()[0].
+ */
+test('Test that registerFaDevToolsIpc statusSync falls back to first window when none are visible', async () => {
+  mocks.browserWindowState.focused = undefined
+  mocks.browserWindowState.allWindows = [mocks.winHidden]
+  mocks.hiddenIsDevToolsOpenedMock.mockReturnValue(true)
+
+  const { registerFaDevToolsIpc } = await import('../registerFaDevToolsIpc')
+  registerFaDevToolsIpc()
+
+  const event: { returnValue?: boolean } = {}
+  handlerFor(FA_DEVTOOLS_IPC.statusSync)(event)
+
+  expect(event.returnValue).toBe(true)
 })
 
 /**

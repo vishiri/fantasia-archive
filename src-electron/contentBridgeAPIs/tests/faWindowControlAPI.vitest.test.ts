@@ -51,6 +51,15 @@ test('Test that checkWindowMaximized returns false when focused window is not ma
 })
 
 /**
+ * checkWindowMaximized
+ * Null window (no throw) is treated like missing remote.
+ */
+test('Test that checkWindowMaximized returns false when getCurrentWindow returns null', () => {
+  getCurrentWindowMock.mockReturnValue(null)
+  expect(faWindowControlAPI.checkWindowMaximized()).toBe(false)
+})
+
+/**
  * minimizeWindow
  * Test minimizing the current window.
  */

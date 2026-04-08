@@ -42,6 +42,33 @@ test('Test that checkDevToolsStatus returns true when IPC reports dev tools are 
 })
 
 /**
+ * checkDevToolsStatus
+ * sendSync must return strict true; false means closed.
+ */
+test('Test that checkDevToolsStatus returns false when IPC reports dev tools are closed', () => {
+  ipcRendererSendSyncMock.mockReturnValue(false)
+  expect(faDevToolsControlAPI.checkDevToolsStatus()).toBe(false)
+})
+
+/**
+ * checkDevToolsStatus
+ * Undefined IPC payload is not strict true.
+ */
+test('Test that checkDevToolsStatus returns false when sendSync returns undefined', () => {
+  ipcRendererSendSyncMock.mockReturnValue(undefined)
+  expect(faDevToolsControlAPI.checkDevToolsStatus()).toBe(false)
+})
+
+/**
+ * checkDevToolsStatus
+ * Truthy non-boolean values still yield false (strict equality to true).
+ */
+test('Test that checkDevToolsStatus returns false when sendSync returns a truthy string', () => {
+  ipcRendererSendSyncMock.mockReturnValue('yes')
+  expect(faDevToolsControlAPI.checkDevToolsStatus()).toBe(false)
+})
+
+/**
  * toggleDevTools
  * Test that toggling invokes the toggle channel.
  */

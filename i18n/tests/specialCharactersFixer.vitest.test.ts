@@ -16,3 +16,11 @@ test('Test that specialCharacterFixer replaces configured characters', () => {
 test('Test that specialCharacterFixer keeps regular strings unchanged', () => {
   expect(specialCharacterFixer('plain-text')).toBe('plain-text')
 })
+
+/**
+ * specialCharacterFixer
+ * Empty string stays empty.
+ */
+test('Test that specialCharacterFixer keeps an empty string unchanged', () => {
+  expect(specialCharacterFixer('')).toBe('')
+})

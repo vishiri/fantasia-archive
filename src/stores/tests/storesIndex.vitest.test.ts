@@ -13,3 +13,14 @@ test('Test that stores index factory returns a Pinia instance with install', () 
   expect(pinia).toBeDefined()
   expect(typeof pinia.install).toBe('function')
 })
+
+/**
+ * Pinia store factory (Quasar store wrapper)
+ * Each invocation returns a distinct root instance for isolation.
+ */
+test('Test that stores index factory returns a fresh Pinia instance on each call', () => {
+  const first = piniaStoreFactory({} as never) as Pinia
+  const second = piniaStoreFactory({} as never) as Pinia
+
+  expect(first).not.toBe(second)
+})

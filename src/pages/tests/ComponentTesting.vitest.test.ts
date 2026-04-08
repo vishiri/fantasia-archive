@@ -36,3 +36,37 @@ test('Test that ComponentTesting mounts FantasiaMascotImage when componentName m
   expect(w.find('[data-test-locator="fantasiaMascotImage-image"]').exists()).toBe(true)
   w.unmount()
 })
+
+/**
+ * ComponentTesting
+ * Unknown route param values do not resolve to a component, so the dynamic component slot stays empty.
+ */
+test('Test that ComponentTesting renders no matched component when componentName does not exist', async () => {
+  const router = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      {
+        path: '/componentTesting/:componentName',
+        component: ComponentTesting
+      }
+    ]
+  })
+
+  await router.push('/componentTesting/ZzzNonexistentComponentXxx')
+  await router.isReady()
+
+  const w = mount(ComponentTesting, {
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      },
+      plugins: [router]
+    }
+  })
+
+  await flushPromises()
+
+  expect(w.find('[data-test-locator="fantasiaMascotImage-image"]').exists()).toBe(false)
+  expect(w.find('q-page').exists()).toBe(true)
+  w.unmount()
+})

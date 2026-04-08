@@ -73,6 +73,28 @@ test('Test that refreshSettings populates settings from the IPC bridge', async (
 })
 
 /**
+ * S_FaUserSettings / refreshSettings
+ * Each refresh replaces settings with the latest bridge payload.
+ */
+test('Test that refreshSettings replaces settings on each call', async () => {
+  const firstSnapshot = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    darkMode: true
+  }
+  const secondSnapshot = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    darkMode: false
+  }
+  getSettingsMock.mockResolvedValueOnce(firstSnapshot).mockResolvedValueOnce(secondSnapshot)
+
+  await store.refreshSettings()
+  expect(store.settings).toEqual(firstSnapshot)
+  await store.refreshSettings()
+  expect(store.settings).toEqual(secondSnapshot)
+  expect(getSettingsMock).toHaveBeenCalledTimes(2)
+})
+
+/**
  * S_FaUserSettings / updateSettings
  * On a successful save the retrieved settings match the update object, positive notify fires.
  */
@@ -137,4 +159,52 @@ test('Test that updateSettings always replaces settings with the retrieved value
   consoleErrorSpy.mockRestore()
 
   expect(store.settings).toEqual(retrievedSettings)
+})
+
+/**
+ * S_FaUserSettings / updateSettings
+ * Empty patch uses vacuous key equality so a positive notify still fires after set and get.
+ */
+test('Test that updateSettings with an empty object shows positive notify and still calls the bridge', async () => {
+  getSettingsMock.mockResolvedValueOnce({ ...FA_USER_SETTINGS_DEFAULTS })
+
+  await store.updateSettings({})
+
+  expect(setSettingsMock).toHaveBeenCalledWith({})
+  expect(notifyCreateMock).toHaveBeenCalledOnce()
+  expect(notifyCreateMock).toHaveBeenCalledWith({
+    group: false,
+    type: 'positive',
+    message: 'globalFunctionality.faUserSettings.saveSuccess'
+  })
+  expect(store.settings).toEqual({ ...FA_USER_SETTINGS_DEFAULTS })
+})
+
+/**
+ * S_FaUserSettings / updateSettings
+ * Mismatch on any updated key triggers the negative path even when other keys match.
+ */
+test('Test that updateSettings shows negative notify when one of several keys mismatches', async () => {
+  const updateObject = {
+    darkMode: true,
+    compactTags: true
+  }
+  getSettingsMock.mockResolvedValueOnce({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    darkMode: true,
+    compactTags: false
+  })
+
+  const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  await store.updateSettings(updateObject)
+  consoleErrorSpy.mockRestore()
+
+  expect(setSettingsMock).toHaveBeenCalledWith(updateObject)
+  expect(notifyCreateMock).toHaveBeenCalledOnce()
+  expect(notifyCreateMock).toHaveBeenCalledWith({
+    group: false,
+    type: 'negative',
+    timeout: 0,
+    message: 'globalFunctionality.faUserSettings.saveError'
+  })
 })

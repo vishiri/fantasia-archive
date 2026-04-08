@@ -24,5 +24,7 @@ test('Test that DialogAboutFantasiaArchive renders about dialog shell for AboutF
   expect(html).toContain('dialogComponent')
   expect(html).toContain('AboutFantasiaArchive')
   expect(w.text()).toContain('dialogs.aboutFantasiaArchive.title')
+  expect(w.text()).toContain('dialogs.aboutFantasiaArchive.versionTitle')
+  expect(w.text()).toContain('0.0.0-unit-test')
   w.unmount()
 })

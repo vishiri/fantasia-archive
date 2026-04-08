@@ -1,14 +1,16 @@
 /**
- * Converts a RGB string to hex color string
- * @param color - RGB string
+ * Converts an rgb() or rgba()-style color string to a hex color string.
+ * Only the first three numeric channels are used so alpha segments from rgba() are ignored.
+ * @param color - RGB or RGBA string (for example a value from 'getComputedStyle().color')
  * @returns Hex color string
  */
 export function rgbToHex (color: string) {
   const colorStringRegexMatch = color.match(/\d+/g)
-  if (colorStringRegexMatch !== null) {
-    const colorString = colorStringRegexMatch.map(function (x) {
-      x = parseInt(x).toString(16)
-      return (x.length === 1) ? '0' + x : x
+  if (colorStringRegexMatch !== null && colorStringRegexMatch.length >= 3) {
+    const rgbChannels = colorStringRegexMatch.slice(0, 3)
+    const colorString = rgbChannels.map(function (x) {
+      const hex = parseInt(x, 10).toString(16)
+      return (hex.length === 1) ? '0' + hex : hex
     }).join('')
     return '#' + colorString
   }
@@ -21,7 +23,8 @@ export function rgbToHex (color: string) {
  * @returns RGB string
  */
 export function hexToRgb (hex: string) {
-  const bigint = parseInt(hex, 16)
+  const normalized = hex.trim().replace(/^#/, '')
+  const bigint = parseInt(normalized, 16)
   const r = (bigint >> 16) & 255
   const g = (bigint >> 8) & 255
   const b = bigint & 255

@@ -35,6 +35,22 @@ test('Test that determineTestingComponentName returns false outside component te
 })
 
 /**
+ * determineTestingComponentName
+ * Component test mode still requires a non-empty component name string.
+ */
+test('Test that determineTestingComponentName returns false when component name is empty in component mode', () => {
+  expect(determineTestingComponentName('components', '')).toBe(false)
+})
+
+/**
+ * determineTestingComponentName
+ * A component name without the component test environment does not enable the testing route.
+ */
+test('Test that determineTestingComponentName returns false when testing type is undefined', () => {
+  expect(determineTestingComponentName(undefined, 'DialogAboutFantasiaArchive')).toBe(false)
+})
+
+/**
  * runAppStartupRouting
  * Test routing toward component testing path.
  */
@@ -62,6 +78,23 @@ test('Test that runAppStartupRouting defaults to home route and triggers trivia 
     { push: routerPushMock },
     undefined,
     undefined
+  )
+
+  expect(routerPushMock).toHaveBeenCalledWith({ path: '/' })
+  expect(tipsTricksTriviaNotificationMock).toHaveBeenCalledWith(false)
+})
+
+/**
+ * runAppStartupRouting
+ * Component mode with a missing component name falls through to the home route and trivia notification.
+ */
+test('Test that runAppStartupRouting uses home route when component mode has no component name', () => {
+  const routerPushMock = vi.fn()
+
+  runAppStartupRouting(
+    { push: routerPushMock },
+    'components',
+    ''
   )
 
   expect(routerPushMock).toHaveBeenCalledWith({ path: '/' })

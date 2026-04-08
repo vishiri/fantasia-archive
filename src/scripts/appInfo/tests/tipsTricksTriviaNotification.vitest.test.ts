@@ -1,4 +1,4 @@
-import { expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 const {
   notifyCreateMock,
@@ -47,6 +47,15 @@ vi.mock('../fantasiaMascotImageManager', () => {
 
 import { tipsTricksTriviaNotification } from '../tipsTricksTriviaNotification'
 
+beforeEach(() => {
+  notifyCreateMock.mockClear()
+  mdListArrayConverterMock.mockImplementation(() => ['Tip one', 'Tip two'])
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
+})
+
 /**
  * tipsTricksTriviaNotification
  * Test payload when mascot is shown.
@@ -71,9 +80,25 @@ test('Test that tipsTricksTriviaNotification uses icon payload when mascot is hi
   vi.spyOn(Math, 'random').mockReturnValueOnce(0.75)
   tipsTricksTriviaNotification(true)
 
-  expect(notifyCreateMock.mock.calls[1][0]).toMatchObject({
+  expect(notifyCreateMock).toHaveBeenCalledOnce()
+  expect(notifyCreateMock.mock.calls[0][0]).toMatchObject({
     icon: 'mdi-help',
     avatar: undefined,
     caption: 'Tip two'
+  })
+})
+
+/**
+ * tipsTricksTriviaNotification
+ * When the markdown list is empty the notify still runs with an undefined caption.
+ */
+test('Test that tipsTricksTriviaNotification invokes Notify when the tip list is empty', () => {
+  mdListArrayConverterMock.mockReturnValueOnce([])
+  vi.spyOn(Math, 'random').mockReturnValueOnce(0)
+  tipsTricksTriviaNotification(false)
+
+  expect(notifyCreateMock).toHaveBeenCalledOnce()
+  expect(notifyCreateMock.mock.calls[0][0]).toMatchObject({
+    caption: undefined
   })
 })

@@ -140,6 +140,29 @@ test('resolveFaPlaywrightIsolatedUserDataDir uses XDG_CONFIG_HOME on linux when 
 
 /**
  * resolveFaPlaywrightIsolatedUserDataDir
+ * Linux falls back to ~/.config when XDG_CONFIG_HOME is an empty string.
+ */
+test('resolveFaPlaywrightIsolatedUserDataDir uses ~/.config on linux when XDG_CONFIG_HOME is empty', () => {
+  expect(
+    resolveFaPlaywrightIsolatedUserDataDir({
+      env: {
+        XDG_CONFIG_HOME: ''
+      },
+      homedir: '/home/tester',
+      platform: 'linux'
+    })
+  ).toBe(
+    path.join(
+      '/home/tester',
+      '.config',
+      packageJSON.name,
+      PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME
+    )
+  )
+})
+
+/**
+ * resolveFaPlaywrightIsolatedUserDataDir
  * Linux falls back to ~/.config when XDG_CONFIG_HOME is unset.
  */
 test('resolveFaPlaywrightIsolatedUserDataDir uses ~/.config on linux without XDG_CONFIG_HOME', () => {

@@ -46,3 +46,21 @@ test('faUserSettingsAPI setSettings invokes IPC set channel with patch', async (
   await faUserSettingsAPI.setSettings({ darkMode: false })
   expect(invokeMock).toHaveBeenCalledWith(FA_USER_SETTINGS_IPC.setAsync, { darkMode: false })
 })
+
+/**
+ * faUserSettingsAPI
+ * getSettings propagates ipcRenderer.invoke rejection.
+ */
+test('faUserSettingsAPI getSettings rejects when invoke rejects', async () => {
+  invokeMock.mockRejectedValueOnce(new Error('ipc failed'))
+  await expect(faUserSettingsAPI.getSettings()).rejects.toThrow('ipc failed')
+})
+
+/**
+ * faUserSettingsAPI
+ * setSettings propagates ipcRenderer.invoke rejection.
+ */
+test('faUserSettingsAPI setSettings rejects when invoke rejects', async () => {
+  invokeMock.mockRejectedValueOnce(new Error('ipc failed'))
+  await expect(faUserSettingsAPI.setSettings({})).rejects.toThrow('ipc failed')
+})
