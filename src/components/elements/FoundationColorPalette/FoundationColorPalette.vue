@@ -114,10 +114,12 @@ const materialGroups = buildQuasarMaterialGroups()
 
 <style lang="scss" scoped>
 .foundationColorPalette {
-  background-color: $dark-page;
+  /* Transparent root so Storybook backgrounds toolbar (paper / dark app) paints the canvas. */
+  background-color: transparent;
   box-sizing: border-box;
   color: $grey;
   min-height: 100vh;
+  width: 100%;
 
   &__title,
   &__sectionTitle {

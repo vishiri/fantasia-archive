@@ -1,4 +1,7 @@
-import type { Viewport } from 'storybook/viewport'
+import {
+  responsiveViewport,
+  type Viewport
+} from 'storybook/viewport'
 
 /**
  * Canonical Storybook iframe widths (px). Toolbar labels use the same caps as product breakpoints.
@@ -27,14 +30,25 @@ export const FANTASIA_STORYBOOK_VIEWPORT_HEIGHTS = {
 
 const px = (value: number): string => `${value}px`
 
-/** Default toolbar selection; must match a key of FANTASIA_STORYBOOK_VIEWPORT_OPTIONS. */
-export const FANTASIA_STORYBOOK_DEFAULT_VIEWPORT: T_fantasiaStorybookViewportKey = 'desktop'
+/**
+ * Storybook built-in full-canvas preset (100% iframe width and height).
+ * Use with story-level globals.viewport.value so the preview is not locked to a pixel width.
+ */
+export const FANTASIA_STORYBOOK_RESPONSIVE_VIEWPORT_KEY = 'responsive' as const
+
+/**
+ * Initial Storybook viewport (Storybook 'Reset viewport', 100% iframe).
+ * Must match a key of FANTASIA_STORYBOOK_VIEWPORT_OPTIONS; fixed-width presets stay in the toolbar.
+ */
+export const FANTASIA_STORYBOOK_DEFAULT_VIEWPORT =
+  FANTASIA_STORYBOOK_RESPONSIVE_VIEWPORT_KEY
 
 /**
  * Global Storybook viewport toolbar entries (parameters.viewport.options).
  * Wired once from preview so components, layouts, and pages share the same presets.
  */
 export const FANTASIA_STORYBOOK_VIEWPORT_OPTIONS: Record<string, Viewport> = {
+  [FANTASIA_STORYBOOK_RESPONSIVE_VIEWPORT_KEY]: responsiveViewport,
   phone: {
     name: 'Phone (375px max)',
     type: 'mobile',

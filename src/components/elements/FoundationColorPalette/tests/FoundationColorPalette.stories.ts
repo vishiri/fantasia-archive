@@ -4,19 +4,24 @@ import FoundationColorPalette from '../FoundationColorPalette.vue'
 
 const meta = {
   component: FoundationColorPalette,
+  globals: {
+    /**
+     * Project preview defaults to a fixed desktop width; override with Storybook's responsive
+     * preset (see FANTASIA_STORYBOOK_RESPONSIVE_VIEWPORT_KEY in viewportBreakpoints.ts).
+     * Globals lock the viewport so the toolbar cannot snap this story back to 1920px.
+     */
+    viewport: {
+      isRotated: false,
+      value: 'responsive'
+    }
+  },
   parameters: {
     docs: {
-      description: {
-        component:
-          'Design reference: Fantasia QUASAR COLORS - GENERAL tokens from quasar.variables.scss, plus the default Quasar material palette class stems (bg-* / text-*). Not used in the shipped app UI.'
-      },
-      story: {
-        inline: false
-      }
+      disable: true
     },
     layout: 'fullscreen'
   },
-  tags: ['autodocs', 'skip-visual'],
+  tags: ['skip-visual'],
   title: 'Foundation/Color palette'
 } satisfies Meta<typeof FoundationColorPalette>
 
