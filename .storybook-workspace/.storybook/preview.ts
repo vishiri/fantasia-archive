@@ -18,6 +18,10 @@ import type { Preview } from '@storybook/vue3-vite'
 import type { QuasarPluginOptions } from 'quasar'
 import { setContentBridgeScenario } from './mocks/contentBridge'
 import { getStorybookI18nMessages, setI18nScenario } from './mocks/externalFileLoader'
+import {
+  FANTASIA_STORYBOOK_DEFAULT_VIEWPORT,
+  FANTASIA_STORYBOOK_VIEWPORT_OPTIONS
+} from './viewportBreakpoints'
 
 const storybookPinia = createPinia()
 setActivePinia(storybookPinia)
@@ -168,7 +172,9 @@ const preview: Preview = {
         }
       }
     },
-    viewport: {},
+    viewport: {
+      options: FANTASIA_STORYBOOK_VIEWPORT_OPTIONS
+    },
     a11y: {
       config: {
         rules: [
@@ -211,7 +217,7 @@ const preview: Preview = {
 
   initialGlobals: {
     viewport: {
-      value: 'desktop',
+      value: FANTASIA_STORYBOOK_DEFAULT_VIEWPORT,
       isRotated: false
     },
 
