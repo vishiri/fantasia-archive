@@ -330,6 +330,7 @@ import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 import type { T_dialogName } from 'app/types/T_dialogList'
 import type { T_programSettingsRenderTree } from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
 import type { StoreGeneric } from 'pinia'
+import { buildProgramSettingsRenderTree } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsTreeManagement'
 import {
   syncLocalProgramSettingsFromStore,
   updateLocalProgramSetting
@@ -368,6 +369,10 @@ const props = defineProps<{
    * Custom input directly fed to the component in case it doesn't get triggered from the global store
    */
   directInput?: T_dialogName
+  /**
+   * When set (for example in Storybook), builds the toggle tree from this snapshot instead of calling the user-settings bridge.
+   */
+  directSettingsSnapshot?: I_faUserSettings
 }>()
 
 /**
@@ -435,6 +440,12 @@ const openDialog = (input: T_dialogName) => {
   documentName.value = input
   dialogModel.value = true
   searchSettingsQuery.value = ''
+  if (props.directSettingsSnapshot !== undefined) {
+    localSettings.value = { ...props.directSettingsSnapshot }
+    programSettingsTree.value = buildProgramSettingsRenderTree(localSettings.value)
+    return
+  }
+
   void syncLocalProgramSettingsFromStore(localSettings, programSettingsTree)
 }
 

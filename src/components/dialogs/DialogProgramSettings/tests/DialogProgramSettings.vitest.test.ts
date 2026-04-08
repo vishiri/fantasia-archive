@@ -1,7 +1,9 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import type { PropType } from 'vue'
 import { defineComponent } from 'vue'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
+
+import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 
 import DialogProgramSettings from '../DialogProgramSettings.vue'
 
@@ -93,6 +95,36 @@ test('Test that DialogProgramSettings renders dialog shell for ProgramSettings i
   expect(html).toContain('dialogComponent')
   expect(html).toContain('ProgramSettings')
   expect(w.text()).toContain('dialogs.programSettings.title')
+  w.unmount()
+})
+
+/**
+ * DialogProgramSettings
+ * directSettingsSnapshot should hydrate the tree without calling the user-settings bridge.
+ */
+test('Test that DialogProgramSettings hydrates from directSettingsSnapshot without faUserSettings.getSettings', async () => {
+  const getSettings = vi.fn(async () => ({ ...FA_USER_SETTINGS_DEFAULTS }))
+
+  window.faContentBridgeAPIs.faUserSettings = {
+    getSettings,
+    setSettings: vi.fn(async () => undefined)
+  }
+
+  const w = mount(DialogProgramSettings, {
+    props: {
+      directInput: 'ProgramSettings',
+      directSettingsSnapshot: {
+        ...FA_USER_SETTINGS_DEFAULTS,
+        darkMode: true
+      }
+    },
+    ...programSettingsDialogMountOptions
+  })
+
+  await flushPromises()
+
+  expect(getSettings).not.toHaveBeenCalled()
+  expect(w.find('[data-test-setting-id="darkMode"]').exists()).toBe(true)
   w.unmount()
 })
 
