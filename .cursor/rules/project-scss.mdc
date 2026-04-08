@@ -9,7 +9,50 @@ alwaysApply: false
 ## Entry and variables
 
 - [app.scss](src/css/app.scss) pulls in [globals](src/css/globals/) partials via **`@use`** (Dart Sass module system); keep new global rules in an appropriate file under `globals/` rather than inflating `app.scss`. Partials that need theme tokens should **`@use '../quasar.variables.scss' as *`** (or a narrower import) instead of relying on deprecated **`@import`** chains.
-- [quasar.variables.scss](src/css/quasar.variables.scss) is the place for Quasar theme variables; prefer variables over hard-coded colors in partials when aligning with Quasar.
+- [quasar.variables.scss](src/css/quasar.variables.scss) is the **single catalogue** for theme tokens: Quasar palette, globals, Quasar component overrides, and custom component/page/layout tokens. Prefer variables over literals in `src/css/**/*.scss` and in Vue `<style lang="scss">` blocks under `src/` (see [vue-bem-scss.mdc](vue-bem-scss.mdc)). Do **not** move template attributes, `:style`, or prop strings (e.g. `width="300px"`) into this file unless project policy explicitly expands scope.
+
+## Theme token catalogue (`quasar.variables.scss`)
+
+### Top-level group order
+
+The file is organized into **four** groups, in this order (each group contains one or more comment-headed sections):
+
+1. **Quasar colors** — framework palette (`$primary`, `$dark`, …) and Quasar-facing semantic colors only. Section banners use **`/* QUASAR COLORS - … */`** (e.g. **`/* QUASAR COLORS - GENERAL */`**).
+2. **Globals** — HTML/body/selection, cross-app tokens (`$aLinkColor`, `$iconSize`), derived colors under **`/* GLOBALS - CUSTOM COLORS */`**, and other non-feature-specific tokens. Section banners use **`/* GLOBALS - … */`**.
+3. **Quasar components** — tokens consumed by global Quasar overrides in [quasarComponentsAdjustments.scss](src/css/globals/quasarComponentsAdjustments.scss) or Quasar Sass integration. Section banners use **`/* QUASAR COMPONENT - Q-… */`** (e.g. **`/* QUASAR COMPONENT - Q-DIALOG */`**).
+4. **Custom components / pages / layouts** — one section per feature. Banners use **`/* COMPONENT - … */`**, **`/* PAGE - … */`**, or **`/* LAYOUT - … */`** with the feature name in **ALL CAPS**.
+
+Place a token in **Globals** when it is shared by multiple unrelated selectors; otherwise prefer the **Quasar components** or **custom** section that owns the primary consumer.
+
+### Section banners and ordering inside a section
+
+- Each section starts with a banner: **`/* <KIND> - <NAME IN ALL CAPS> */`** where `<KIND>` is one of `QUASAR COLORS`, `GLOBALS`, `QUASAR COMPONENT`, `COMPONENT`, `PAGE`, `LAYOUT`.
+- **Within each section**, keep **`$variable` declarations sorted alphabetically** by the full identifier. Stylelint sorts CSS declaration properties in rules; it does not order SCSS variables, so maintain this by hand when adding tokens.
+
+### Variable naming
+
+- Shape: **`$<blockCamelCase>-[<areaOrElement>-]<semanticOrProperty>[-<modifier>]`** using **hyphens (`-`) only** between segments after the leading camelCase block (e.g. `$errorCard`, `$qMarkdown`). **Do not use underscores (`_`)** in theme variable names; BEM class names in templates may still use `__` for elements—that is unrelated to Sass `$` identifiers.
+- Examples: `$qCard-boxShadow`, `$globalWindowButtons-close-hoverColor`, `$qMarkdown-code-borderRadius`.
+- Use **one variable** for a multi-token value when it expresses a single design decision (e.g. a full `box-shadow` stack).
+
+### Colors
+
+- Reuse **`/* QUASAR COLORS - GENERAL */`** and **`/* GLOBALS - CUSTOM COLORS */`** variables before adding new hex/rgb literals.
+- Third-party brand colors may stay as literals on the **right-hand side** of a named semantic variable (e.g. `$socialContactButtons-backgroundColor-patreon: #ff424d`).
+
+### What to extract into the catalogue
+
+Apply to **`src/css/**/*.scss`** and **`<style lang="scss">` in `src/**/*.vue`** only:
+
+- Lengths with units: `px`, `rem`, `em`, `%`, `vh`, `vw`, and similar.
+- Colors: hex, `rgb`/`rgba`, `hsl`/`hsla` (Sass `color.adjust` / `color.scale` may remain on the RHS of variables).
+- Design tokens: meaningful **`z-index`**, **`opacity`** on focused layers, **`letter-spacing`**, repeated **`line-height`** scales, **`border-radius`** / **`border-width`** when not `0`.
+- Prefer variables inside **`calc(...)`** for magic numbers; the whole `calc(...)` may be assigned to one variable or composed with interpolation.
+
+### Exceptions (leave inline)
+
+- **`0`**, **`none`**, **`inherit`**, **`auto`**, **`transparent`** when they do not encode a shared scale.
+- Keyframes or one-off animation strings unless you intentionally tokenize repeated durations/easings.
 
 ## Conventions
 

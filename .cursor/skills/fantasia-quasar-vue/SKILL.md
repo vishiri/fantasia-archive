@@ -33,6 +33,7 @@ Locale `L_*` paths under `i18n/<locale>/components/` use the same bucket names a
 ## Quasar patterns
 
 - Prefer Quasar components (`q-*`) and existing spacing/typography patterns in sibling components.
+- **Theme tokens**: add or reuse variables in [`src/css/quasar.variables.scss`](../../../src/css/quasar.variables.scss) for colors and sized units in Vue `<style lang="scss">` (not template props). Use hyphens between segments in every **`$` name** (e.g. `$globalWindowButtons-zIndex`), never underscores. Group order, section banners, and naming are specified in [project-scss.mdc](../../rules/project-scss.mdc).
 - **Scrollable areas**: use the global class **`hasScrollbar`** on the scroll container when content may sometimes overflow and show a vertical scrollbar (and sometimes not), so **`scrollbar-gutter: stable`** prevents horizontal layout jitter. Defined in [`src/css/globals/scrollbar.scss`](../../../src/css/globals/scrollbar.scss); see [project-scss.mdc](../../rules/project-scss.mdc) and [AGENTS.md](../../../AGENTS.md).
 - Boot files in `src/boot/` run at app init (e.g. axios, external links).
 - When importing shared project types, keep `I_` / `T_` prefixes and use descriptive singular/collection naming (e.g. `T_documentName`, `I_appMenuList`).

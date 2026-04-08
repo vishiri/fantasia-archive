@@ -21,6 +21,7 @@ Use **HTML comments** in the template to group sections (buttons, tooltips, regi
 ## Scoped SCSS
 
 - Prefer `<style lang="scss" scoped>` unless unscoped styles are intentional for that file (match neighboring components in the feature).
+- Do **not** introduce new raw **colors** or **sized units** (`px`, `rem`, `vh`, etc.) in component SCSS when they belong in the shared catalogue. Add or reuse variables in [quasar.variables.scss](src/css/quasar.variables.scss) under the correct section (see [project-scss.mdc](project-scss.mdc)). Catalogue variables use **hyphens** between name segments (never underscores in `$` identifiers). This rule applies to `<style>` blocks only, not to template attributes or prop strings unless policy expands.
 - Nest element rules under the block with the parent selector:
 
 ```scss
