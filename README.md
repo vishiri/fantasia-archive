@@ -97,6 +97,8 @@ Use Storybook to develop/document renderer components in isolation.
 yarn storybook:run
 ```
 
+To run **Electron** dev and **Storybook** together in **one** terminal (prefixed logs; if either process exits, the other is stopped), use **`yarn app:dev`**. You can still run **`yarn quasar:dev:electron`** and **`yarn storybook:run`** in two terminals instead if you prefer separate windows.
+
 Build static Storybook output (**`--quiet --loglevel warn`** in the workspace script; interactive **`yarn storybook:run`** stays verbose):
 
 ```
@@ -307,6 +309,7 @@ Set environment variable **`FA_PLAYWRIGHT_NO_VIDEO`** to **`1`** or **`true`** t
 | `yarn quasar:build:electron` | Build/package the Electron app (`--publish never`; full log stream). |
 | `yarn quasar:build:electron:summarized` | Same build via **`scripts/quasarBuildElectronSummarized.mjs`**: quiet success line; full log in **`test-results/quasar-build-electron-last.log`** (dumped on failure). |
 | `yarn quasar:dev:electron` | Run the app in Quasar Electron development mode. |
+| `yarn app:dev` | Run **`quasar:dev:electron`** and **`storybook:run`** in parallel via **`concurrently`** (one terminal, labeled streams; **`-k`** stops both if one exits). |
 | `yarn lint:eslint` | Run ESLint on project source/config paths. |
 | `yarn lint:stylelint` | Run Stylelint on Vue/CSS/SCSS/Sass under `src/` and Storybook config under `.storybook-workspace/.storybook/`. |
 | `yarn lint:stylelint:fix` | Same paths as `lint:stylelint` with `--fix` (alphabetical declarations, including inside Vue `<style>` blocks). |

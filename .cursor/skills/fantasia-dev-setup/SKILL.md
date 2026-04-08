@@ -32,6 +32,8 @@ quasar dev -m electron
 
 (`package.json` also exposes `yarn quasar:dev:electron`.)
 
+To run **Electron** dev and **Storybook** together in one terminal, use **`yarn app:dev`** (**`concurrently`**: prefixed logs; stopping one process stops both when **`-k`** applies).
+
 ## Troubleshooting
 
 ### `Electron failed to install correctly` (missing `node_modules/electron/dist`)
