@@ -314,15 +314,16 @@
 <script setup lang="ts">
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 import type { T_dialogName } from 'app/types/T_dialogList'
-import type {
-  I_programSubCategoryRenderItem,
-  T_programSettingsRenderTree
-} from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
+import type { T_programSettingsRenderTree } from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
 import type { StoreGeneric } from 'pinia'
 import {
   syncLocalProgramSettingsFromStore,
   updateLocalProgramSetting
 } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsLocalSettingsManagement'
+import {
+  showNonLastSeparator,
+  showNonLastTopCategorySeparator
+} from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsHelpers'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 import { computed, onMounted, ref, toRaw, watch } from 'vue'
@@ -341,20 +342,6 @@ const resolveFaUserSettingsStore = (): ReturnType<typeof S_FaUserSettings> | nul
   } catch {
     return null
   }
-}
-
-const showNonLastSeparator = (
-  subCategories: Record<string, I_programSubCategoryRenderItem>,
-  index: number
-): boolean => {
-  return index < Object.keys(subCategories).length - 1
-}
-
-const showNonLastTopCategorySeparator = (
-  tree: T_programSettingsRenderTree,
-  index: number
-): boolean => {
-  return index < Object.keys(tree).length - 1
 }
 
 /**
