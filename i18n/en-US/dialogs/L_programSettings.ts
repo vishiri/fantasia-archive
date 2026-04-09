@@ -96,7 +96,7 @@ export default {
     }
   },
   appOptions: {
-    agressiveRelationshipFilter: {
+    aggressiveRelationshipFilter: {
       title: 'TODO  - Aggressive relationships selection',
       description: 'Turns on the aggressive autosuggest mode for all relationship searches across the app in document edit mode. Without this turned on, after filtering, the first item in the list does not get automatically selected. Turning this on adds this functionality—allowing for much more convenient selection of existing documents while sacrificing a bit of convenience when creating new ones on the fly.',
       tags: 'autosuggest, autocomplete, first match, filter list, pick existing, relationship search'
@@ -126,7 +126,7 @@ export default {
       description: 'Switch between light and dark mode for the app.',
       tags: 'dark, light, theme, theming, color, colors'
     },
-    disableCloseAftertSelectQuickSearch: {
+    disableCloseAfterSelectQuickSearch: {
       title: 'TODO  - Stop closing after selection',
       description: 'Normally the quick-search closes after an item is selected from it. Turning this feature on prevents that behavior, allowing you to open multiple search results one after the other.',
       tags: 'keep open, multiple results, batch open, quick search stays open'
@@ -162,7 +162,7 @@ export default {
       tags: 'spelling, grammar, proofing, red underline, writing, dictionary',
       note: 'Needs a full app restart to take effect!'
     },
-    doNotcollaseTreeOptions: {
+    doNotCollapseTreeOptions: {
       title: 'TODO  - Prevent sublevel collapse in the tree',
       description: 'Prevents subcategories in the hierarchical tree from closing when a parent category is closed.',
       tags: 'remember expanded, nested open, accordion, collapse children'

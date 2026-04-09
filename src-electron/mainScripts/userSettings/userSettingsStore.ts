@@ -36,7 +36,7 @@ export const cleanupFaUserSettings = (store: ElectronStore<I_faUserSettings>): v
  * (or from within that callback) so Electron 'userData' paths resolve.
  */
 export const getFaUserSettings = (): ElectronStore<I_faUserSettings> => {
-  // If the store is not yet created, create it and cleanup the settings for legacy and unexpected keys
+  // If the store is not yet created, create it and cleanup the settings for unexpected keys
   if (faUserSettings === null) {
     faUserSettings = new ElectronStore<I_faUserSettings>({
       name: 'faUserSettings',

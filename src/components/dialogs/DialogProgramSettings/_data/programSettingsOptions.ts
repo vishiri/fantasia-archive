@@ -2,7 +2,7 @@ import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 import type { I_programSettingOption } from './programSettingsOptions.types'
 
 export const PROGRAM_SETTINGS_OPTIONS: Record<keyof I_faUserSettings, I_programSettingOption> = {
-  agressiveRelationshipFilter: {
+  aggressiveRelationshipFilter: {
     category: 'visualAccessibility',
     subcategory: 'visualsAppwideFunctionality'
   },
@@ -26,7 +26,7 @@ export const PROGRAM_SETTINGS_OPTIONS: Record<keyof I_faUserSettings, I_programS
     category: 'visualAccessibility',
     subcategory: 'visualsAppwideFunctionality'
   },
-  disableCloseAftertSelectQuickSearch: {
+  disableCloseAfterSelectQuickSearch: {
     category: 'popupsFloatingWindows',
     subcategory: 'quickSearchDialog'
   },
@@ -54,7 +54,7 @@ export const PROGRAM_SETTINGS_OPTIONS: Record<keyof I_faUserSettings, I_programS
     category: 'visualAccessibility',
     subcategory: 'visualsAppwideFunctionality'
   },
-  doNotcollaseTreeOptions: {
+  doNotCollapseTreeOptions: {
     category: 'hierarchicalTree',
     subcategory: 'treeBehavior'
   },

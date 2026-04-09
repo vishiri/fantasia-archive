@@ -1,20 +1,20 @@
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 
 export const FA_USER_SETTINGS_DEFAULTS: I_faUserSettings = {
-  agressiveRelationshipFilter: false,
+  aggressiveRelationshipFilter: false,
   allowQuickPopupSameKeyClose: false,
   allowWiderScrollbars: false,
   compactDocumentCount: false,
   compactTags: false,
   darkMode: false,
-  disableCloseAftertSelectQuickSearch: false,
+  disableCloseAfterSelectQuickSearch: false,
   disableDocumentControlBar: false,
   disableDocumentControlBarGuides: false,
   disableDocumentCounts: false,
   disableDocumentToolTips: false,
   disableQuickSearchCategoryPrecheck: false,
   disableSpellCheck: false,
-  doNotcollaseTreeOptions: false,
+  doNotCollapseTreeOptions: false,
   doubleDashDocCount: false,
   hideAdvSearchCheatsheetButton: false,
   hideDeadCrossThrough: false,

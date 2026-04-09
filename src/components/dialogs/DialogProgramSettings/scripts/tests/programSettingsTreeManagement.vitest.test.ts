@@ -65,7 +65,7 @@ test('Test that compareProgramSettingsCategoryOrder orders accessibility before 
 test('Test that sortSettingsListByTranslatedTitle orders by translated title then key', () => {
   const input: Record<string, I_programSettingRenderItem> = {
     noProjectName: stubSetting('Hide project name in tree'),
-    doNotcollaseTreeOptions: stubSetting('Prevent sublevel collapse in the tree'),
+    doNotCollapseTreeOptions: stubSetting('Prevent sublevel collapse in the tree'),
     invertTreeSorting: stubSetting('Invert tree custom order sorting')
   }
 
@@ -74,7 +74,7 @@ test('Test that sortSettingsListByTranslatedTitle orders by translated title the
   expect(orderedKeys).toEqual([
     'noProjectName',
     'invertTreeSorting',
-    'doNotcollaseTreeOptions'
+    'doNotCollapseTreeOptions'
   ])
 })
 

@@ -1,18 +1,18 @@
 export interface I_faUserSettings {
-  agressiveRelationshipFilter: boolean
+  aggressiveRelationshipFilter: boolean
   allowQuickPopupSameKeyClose: boolean
   allowWiderScrollbars: boolean
   compactDocumentCount: boolean
   compactTags: boolean
   darkMode: boolean
-  disableCloseAftertSelectQuickSearch: boolean
+  disableCloseAfterSelectQuickSearch: boolean
   disableDocumentControlBar: boolean
   disableDocumentControlBarGuides: boolean
   disableDocumentCounts: boolean
   disableDocumentToolTips: boolean
   disableQuickSearchCategoryPrecheck: boolean
   disableSpellCheck: boolean
-  doNotcollaseTreeOptions: boolean
+  doNotCollapseTreeOptions: boolean
   doubleDashDocCount: boolean
   hideAdvSearchCheatsheetButton: boolean
   hideDeadCrossThrough: boolean
