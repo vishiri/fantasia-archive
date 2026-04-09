@@ -1,15 +1,17 @@
-import { initialize } from '@electron/remote/main/index.js'
 import { mainWindowCreation } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
+import { registerFaAppDetailsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaAppDetailsIpc'
 import { registerFaDevToolsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaDevToolsIpc'
 import { registerFaUserSettingsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaUserSettingsIpc'
+import { registerFaWindowControlIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
 import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
 import { app } from 'electron'
 
 // Starts the app's Electron instance
 export const startApp = () => {
-  initialize()
   registerFaDevToolsIpc()
   registerFaUserSettingsIpc()
+  registerFaWindowControlIpc()
+  registerFaAppDetailsIpc()
 }
 
 // Opens the singular app's window and make sure it is the only one

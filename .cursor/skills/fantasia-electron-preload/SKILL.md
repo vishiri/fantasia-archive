@@ -18,7 +18,7 @@ description: >-
 
 ## Main ↔ preload IPC (electron-ipc-bridge)
 
-- **Registry**: `src-electron/electron-ipc-bridge.ts` holds canonical channel strings (`export const` objects, e.g. `FA_DEVTOOLS_IPC`, `FA_USER_SETTINGS_IPC`). Preload-side code that uses `ipcRenderer.invoke` / `sendSync` and main-side `ipcMain.handle` / `on` must use these constants — never duplicate string literals across files.
+- **Registry**: `src-electron/electron-ipc-bridge.ts` holds canonical channel strings (`export const` objects, e.g. `FA_DEVTOOLS_IPC`, `FA_USER_SETTINGS_IPC`, `FA_WINDOW_CONTROL_IPC`, `FA_APP_DETAILS_IPC`). Preload-side code that uses `ipcRenderer.invoke` / `sendSync` and main-side `ipcMain.handle` / `on` must use these constants — never duplicate string literals across files.
 - **Main registration**: Add or extend a `mainScripts/ipcManagement/register*Ipc.ts` module that wires `ipcMain` with the same constants, and ensure startup invokes that registrar (today `startApp()` in `mainScripts/appManagement.ts` calls the existing registrars).
 - **Preload usage**: Import the matching constant object in the relevant `contentBridgeAPIs/*.ts` module and pass those strings to `ipcRenderer`.
 
@@ -35,7 +35,7 @@ description: >-
 
 - Prefer **narrow, explicit** methods on the bridge object over passing raw Node/Electron objects to the renderer.
 - Do not enable broad `nodeIntegration` in the renderer to “just make it work”; keep privileged code in main or preload as appropriate.
-- Some APIs use `@electron/remote` (e.g. `BrowserWindow` in `faWindowControlAPI`); when changing that pattern, consider security and testability implications.
+- Privileged window and app-metadata calls go through sync IPC (`faWindowControlAPI`, `appDetailsAPI`); do not reintroduce `@electron/remote` without a documented reason.
 
 ## Related skills
 

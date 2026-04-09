@@ -1,8 +1,17 @@
+import { ipcRenderer } from 'electron'
+
+import { FA_APP_DETAILS_IPC } from 'app/src-electron/electron-ipc-bridge'
 import type { I_appDetailsAPI } from '../../types/I_appDetailsAPI'
 
-import { app } from '@electron/remote'
+function readProjectVersion (): string {
+  try {
+    const v = ipcRenderer.sendSync(FA_APP_DETAILS_IPC.getVersionSync)
+    return typeof v === 'string' ? v : ''
+  } catch {
+    return ''
+  }
+}
 
-// App details global variable used by the app window
 export const appDetailsAPI: I_appDetailsAPI = {
-  PROJECT_VERSION: app.getVersion()
+  PROJECT_VERSION: readProjectVersion()
 }

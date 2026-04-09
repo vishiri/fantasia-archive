@@ -1,4 +1,3 @@
-import { enable } from '@electron/remote/main/index.js'
 import { BrowserWindow, app, screen } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -82,9 +81,6 @@ export const mainWindowCreation = async () => {
       preload: resolvePreloadPath()
     }
   })
-
-  // Enable actual webContents inside the created window
-  enable(appWindow.webContents)
 
   // Show the windows once electron is ready to show the actual HTML content
   appWindow.once('ready-to-show', () => {

@@ -1,162 +1,142 @@
 import { test, expect, vi, beforeEach } from 'vitest'
+
+import { FA_WINDOW_CONTROL_IPC } from 'app/src-electron/electron-ipc-bridge'
+
+const { sendSyncMock } = vi.hoisted(() => {
+  return {
+    sendSyncMock: vi.fn()
+  }
+})
+
+vi.mock('electron', () => {
+  return {
+    ipcRenderer: {
+      sendSync: sendSyncMock
+    }
+  }
+})
+
 import { faWindowControlAPI } from '../faWindowControlAPI'
 
-const { getCurrentWindowMock } = vi.hoisted(() => {
-  return {
-    getCurrentWindowMock: vi.fn()
-  }
-})
-
-vi.mock('@electron/remote', () => {
-  return {
-    getCurrentWindow: getCurrentWindowMock
-  }
-})
-
 beforeEach(() => {
-  getCurrentWindowMock.mockReset()
+  sendSyncMock.mockReset()
 })
 
 /**
  * checkWindowMaximized
- * Test when getCurrentWindow is unavailable.
+ * Returns false when sendSync throws.
  */
-test('Test if the electron is maximized', () => {
-  getCurrentWindowMock.mockImplementation(() => {
-    throw new Error('no remote')
+test('Test if checkWindowMaximized returns false when sendSync throws', () => {
+  sendSyncMock.mockImplementation(() => {
+    throw new Error('no ipc')
   })
   expect(faWindowControlAPI.checkWindowMaximized()).toBe(false)
 })
 
 /**
  * checkWindowMaximized
- * Current window reports maximized state from isMaximized().
+ * Returns true only when sendSync returns strict true.
  */
-test('Test that checkWindowMaximized returns true when focused window is maximized', () => {
-  getCurrentWindowMock.mockReturnValue({
-    isMaximized: () => true
-  })
+test('Test that checkWindowMaximized returns true when sendSync returns true', () => {
+  sendSyncMock.mockReturnValue(true)
   expect(faWindowControlAPI.checkWindowMaximized()).toBe(true)
+  expect(sendSyncMock).toHaveBeenCalledWith(FA_WINDOW_CONTROL_IPC.checkMaximizedSync)
 })
 
 /**
  * checkWindowMaximized
- * Current window reports not maximized when isMaximized is false.
+ * Returns false when sendSync returns a non-boolean truthy value.
  */
-test('Test that checkWindowMaximized returns false when focused window is not maximized', () => {
-  getCurrentWindowMock.mockReturnValue({
-    isMaximized: () => false
-  })
+test('Test that checkWindowMaximized returns false when sendSync returns non-true', () => {
+  sendSyncMock.mockReturnValue('yes')
   expect(faWindowControlAPI.checkWindowMaximized()).toBe(false)
 })
 
 /**
  * checkWindowMaximized
- * Null window (no throw) is treated like missing remote.
+ * Returns false when sendSync returns false.
  */
-test('Test that checkWindowMaximized returns false when getCurrentWindow returns null', () => {
-  getCurrentWindowMock.mockReturnValue(null)
+test('Test that checkWindowMaximized returns false when sendSync returns false', () => {
+  sendSyncMock.mockReturnValue(false)
   expect(faWindowControlAPI.checkWindowMaximized()).toBe(false)
 })
 
 /**
  * minimizeWindow
- * Test minimizing the current window.
+ * Invokes minimize sync channel.
  */
-test('Test that minimizing of the electron window works', () => {
-  const minimize = vi.fn()
-  getCurrentWindowMock.mockReturnValue({ minimize })
+test('Test that minimizeWindow calls sendSync with minimize channel', () => {
   faWindowControlAPI.minimizeWindow()
-  expect(minimize).toHaveBeenCalledOnce()
-})
-
-/**
- * maximizeWindow
- * Test maximizing the current window.
- */
-test('Test that maximizing of the electron window works', () => {
-  const maximize = vi.fn()
-  getCurrentWindowMock.mockReturnValue({ maximize })
-  faWindowControlAPI.maximizeWindow()
-  expect(maximize).toHaveBeenCalledOnce()
-})
-
-/**
- * resizeWindow
- * Test resizing toggles maximize state.
- */
-test('Test that resizing of the electron window works', () => {
-  const maximize = vi.fn()
-  const unmaximize = vi.fn()
-  getCurrentWindowMock
-    .mockReturnValueOnce({
-      isMaximized: () => false,
-      maximize,
-      unmaximize
-    })
-    .mockReturnValueOnce({
-      isMaximized: () => true,
-      maximize,
-      unmaximize
-    })
-  faWindowControlAPI.resizeWindow()
-  faWindowControlAPI.resizeWindow()
-
-  expect(maximize).toHaveBeenCalledOnce()
-  expect(unmaximize).toHaveBeenCalledOnce()
-})
-
-/**
- * closeWindow
- * Test closing the current window.
- */
-test('Test that closing of the electron window works', () => {
-  const close = vi.fn()
-  getCurrentWindowMock.mockReturnValue({ close })
-  faWindowControlAPI.closeWindow()
-  expect(close).toHaveBeenCalledOnce()
+  expect(sendSyncMock).toHaveBeenCalledWith(FA_WINDOW_CONTROL_IPC.minimizeSync)
 })
 
 /**
  * minimizeWindow
- * No-op when there is no current window.
+ * No-op when sendSync throws.
  */
-test('Test that minimizeWindow does nothing when getCurrentWindow throws', () => {
-  getCurrentWindowMock.mockImplementation(() => {
-    throw new Error('no remote')
+test('Test that minimizeWindow does not throw when sendSync throws', () => {
+  sendSyncMock.mockImplementation(() => {
+    throw new Error('no ipc')
   })
   expect(() => faWindowControlAPI.minimizeWindow()).not.toThrow()
 })
 
 /**
  * maximizeWindow
- * No-op when there is no current window.
+ * Invokes maximize sync channel.
  */
-test('Test that maximizeWindow does nothing when getCurrentWindow throws', () => {
-  getCurrentWindowMock.mockImplementation(() => {
-    throw new Error('no remote')
+test('Test that maximizeWindow calls sendSync with maximize channel', () => {
+  faWindowControlAPI.maximizeWindow()
+  expect(sendSyncMock).toHaveBeenCalledWith(FA_WINDOW_CONTROL_IPC.maximizeSync)
+})
+
+/**
+ * maximizeWindow
+ * No-op when sendSync throws.
+ */
+test('Test that maximizeWindow does not throw when sendSync throws', () => {
+  sendSyncMock.mockImplementation(() => {
+    throw new Error('no ipc')
   })
   expect(() => faWindowControlAPI.maximizeWindow()).not.toThrow()
 })
 
 /**
  * resizeWindow
- * No-op when there is no current window.
+ * Invokes resize toggle sync channel.
  */
-test('Test that resizeWindow does nothing when getCurrentWindow throws', () => {
-  getCurrentWindowMock.mockImplementation(() => {
-    throw new Error('no remote')
+test('Test that resizeWindow calls sendSync with resize toggle channel', () => {
+  faWindowControlAPI.resizeWindow()
+  expect(sendSyncMock).toHaveBeenCalledWith(FA_WINDOW_CONTROL_IPC.resizeToggleSync)
+})
+
+/**
+ * resizeWindow
+ * No-op when sendSync throws.
+ */
+test('Test that resizeWindow does not throw when sendSync throws', () => {
+  sendSyncMock.mockImplementation(() => {
+    throw new Error('no ipc')
   })
   expect(() => faWindowControlAPI.resizeWindow()).not.toThrow()
 })
 
 /**
  * closeWindow
- * No-op when there is no current window.
+ * Invokes close sync channel.
  */
-test('Test that closeWindow does nothing when getCurrentWindow throws', () => {
-  getCurrentWindowMock.mockImplementation(() => {
-    throw new Error('no remote')
+test('Test that closeWindow calls sendSync with close channel', () => {
+  faWindowControlAPI.closeWindow()
+  expect(sendSyncMock).toHaveBeenCalledWith(FA_WINDOW_CONTROL_IPC.closeSync)
+})
+
+/**
+ * closeWindow
+ * No-op when sendSync throws.
+ */
+test('Test that closeWindow does not throw when sendSync throws', () => {
+  sendSyncMock.mockImplementation(() => {
+    throw new Error('no ipc')
   })
   expect(() => faWindowControlAPI.closeWindow()).not.toThrow()
 })

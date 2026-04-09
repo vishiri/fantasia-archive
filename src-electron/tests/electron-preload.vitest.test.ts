@@ -21,18 +21,6 @@ vi.mock('electron', () => {
   }
 })
 
-vi.mock('@electron/remote', () => {
-  return {
-    app: {
-      getVersion: () => '0.0.0-preload-test'
-    },
-    getCurrentWindow: () => null,
-    BrowserWindow: {
-      getFocusedWindow: () => null
-    }
-  }
-})
-
 vi.mock('app-root-path', () => {
   return {
     default: '/electron-preload-test-root'

@@ -12,7 +12,6 @@ const {
   BrowserWindowMock,
   appMock,
   getPrimaryDisplayMock,
-  enableMock,
   setupSpellCheckerMock,
   appEventHandlers
 } = vi.hoisted(() => {
@@ -33,7 +32,6 @@ const {
         height: 1080
       }
     })),
-    enableMock: vi.fn(),
     setupSpellCheckerMock: vi.fn()
   }
 })
@@ -45,12 +43,6 @@ vi.mock('electron', () => {
     screen: {
       getPrimaryDisplay: getPrimaryDisplayMock
     }
-  }
-})
-
-vi.mock('@electron/remote/main/index.js', () => {
-  return {
-    enable: enableMock
   }
 })
 
@@ -66,7 +58,6 @@ beforeEach(() => {
   appMock.requestSingleInstanceLock.mockReturnValue(true)
   appMock.quit.mockReset()
   appMock.on.mockClear()
-  enableMock.mockReset()
   setupSpellCheckerMock.mockReset()
   for (const key of Object.keys(appEventHandlers)) {
     delete appEventHandlers[key]
@@ -188,7 +179,6 @@ test('Test that the main window is created successfully', async () => {
     frame: false,
     show: false
   })
-  expect(enableMock).toHaveBeenCalledWith(browserWindowInstance.webContents)
   expect(browserWindowInstance.setMenu).toHaveBeenCalledWith(null)
   expect(browserWindowInstance.loadURL).toHaveBeenCalledWith('http://localhost:9000')
   expect(browserWindowInstance.webContents.openDevTools).toHaveBeenCalledOnce()

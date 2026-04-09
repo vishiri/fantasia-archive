@@ -1,14 +1,24 @@
 import { test, expect, vi, beforeEach } from 'vitest'
 import { closeAppManager, openAppWindowManager, startApp } from '../appManagement'
 
-const { getFaUserSettingsMock, initializeMock, mainWindowCreationMock, registerFaDevToolsIpcMock, registerFaUserSettingsIpcMock, appMock, appOnHandlers } = vi.hoisted(() => {
+const {
+  getFaUserSettingsMock,
+  mainWindowCreationMock,
+  registerFaAppDetailsIpcMock,
+  registerFaDevToolsIpcMock,
+  registerFaUserSettingsIpcMock,
+  registerFaWindowControlIpcMock,
+  appMock,
+  appOnHandlers
+} = vi.hoisted(() => {
   const handlers: Record<string, () => void> = {}
   return {
     getFaUserSettingsMock: vi.fn(),
-    initializeMock: vi.fn(),
     mainWindowCreationMock: vi.fn(),
+    registerFaAppDetailsIpcMock: vi.fn(),
     registerFaDevToolsIpcMock: vi.fn(),
     registerFaUserSettingsIpcMock: vi.fn(),
+    registerFaWindowControlIpcMock: vi.fn(),
     appOnHandlers: handlers,
     appMock: {
       whenReady: vi.fn(() => Promise.resolve()),
@@ -17,12 +27,6 @@ const { getFaUserSettingsMock, initializeMock, mainWindowCreationMock, registerF
       }),
       quit: vi.fn()
     }
-  }
-})
-
-vi.mock('@electron/remote/main/index.js', () => {
-  return {
-    initialize: initializeMock
   }
 })
 
@@ -44,6 +48,18 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaUserSettingsIpc', 
   }
 })
 
+vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc', () => {
+  return {
+    registerFaWindowControlIpc: registerFaWindowControlIpcMock
+  }
+})
+
+vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaAppDetailsIpc', () => {
+  return {
+    registerFaAppDetailsIpc: registerFaAppDetailsIpcMock
+  }
+})
+
 vi.mock('app/src-electron/mainScripts/userSettings/userSettingsStore', () => {
   return {
     getFaUserSettings: getFaUserSettingsMock
@@ -62,10 +78,11 @@ vi.mock('electron-store', () => ({
 
 beforeEach(() => {
   getFaUserSettingsMock.mockReset()
-  initializeMock.mockReset()
   mainWindowCreationMock.mockReset()
+  registerFaAppDetailsIpcMock.mockReset()
   registerFaDevToolsIpcMock.mockReset()
   registerFaUserSettingsIpcMock.mockReset()
+  registerFaWindowControlIpcMock.mockReset()
   appMock.whenReady.mockClear()
   appMock.on.mockClear()
   appMock.quit.mockReset()
@@ -76,13 +93,14 @@ beforeEach(() => {
 
 /**
  * startApp
- * Test remote main initialization call.
+ * Registers IPC handlers without legacy remote initialization.
  */
 test('Test that the electron app properly starts', () => {
   startApp()
-  expect(initializeMock).toHaveBeenCalledOnce()
   expect(registerFaDevToolsIpcMock).toHaveBeenCalledOnce()
   expect(registerFaUserSettingsIpcMock).toHaveBeenCalledOnce()
+  expect(registerFaWindowControlIpcMock).toHaveBeenCalledOnce()
+  expect(registerFaAppDetailsIpcMock).toHaveBeenCalledOnce()
 })
 
 /**

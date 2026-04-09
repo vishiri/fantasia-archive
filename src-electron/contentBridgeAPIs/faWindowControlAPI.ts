@@ -1,64 +1,47 @@
-import { getCurrentWindow } from '@electron/remote'
-import type { I_faWindowControlAPI } from 'app/types/I_faWindowControlAPI'
+import { ipcRenderer } from 'electron'
 
-/**
- * Use the window that owns this renderer; 'BrowserWindow.getFocusedWindow()' is unreliable when native menus or other windows steal OS focus (same class of issue as DevTools controls).
- */
-function appWindow () {
-  try {
-    return getCurrentWindow()
-  } catch {
-    return null
-  }
-}
+import { FA_WINDOW_CONTROL_IPC } from 'app/src-electron/electron-ipc-bridge'
+import type { I_faWindowControlAPI } from 'app/types/I_faWindowControlAPI'
 
 export const faWindowControlAPI: I_faWindowControlAPI = {
 
-  // Check if the current window is maximized
   checkWindowMaximized () {
-    const currentWindow = appWindow()
-    if (currentWindow !== null) {
-      return currentWindow.isMaximized()
+    try {
+      return ipcRenderer.sendSync(FA_WINDOW_CONTROL_IPC.checkMaximizedSync) === true
+    } catch {
+      return false
     }
-    return false
   },
 
-  // Minimizes the current window
   minimizeWindow () {
-    const currentWindow = appWindow()
-
-    if (currentWindow !== null) {
-      currentWindow.minimize()
+    try {
+      ipcRenderer.sendSync(FA_WINDOW_CONTROL_IPC.minimizeSync)
+    } catch {
+      // no-op (e.g. running outside Electron)
     }
   },
 
-  // Maximizes the current window
   maximizeWindow () {
-    const currentWindow = appWindow()
-
-    if (currentWindow !== null) {
-      currentWindow.maximize()
+    try {
+      ipcRenderer.sendSync(FA_WINDOW_CONTROL_IPC.maximizeSync)
+    } catch {
+      // no-op
     }
   },
 
-  // Resizes the current window
   resizeWindow () {
-    const currentWindow = appWindow()
-
-    if (currentWindow !== null) {
-      if (currentWindow.isMaximized()) {
-        currentWindow.unmaximize()
-      } else {
-        currentWindow.maximize()
-      }
+    try {
+      ipcRenderer.sendSync(FA_WINDOW_CONTROL_IPC.resizeToggleSync)
+    } catch {
+      // no-op
     }
   },
 
-  // Closes the current window
   closeWindow () {
-    const currentWindow = appWindow()
-    if (currentWindow !== null) {
-      currentWindow.close()
+    try {
+      ipcRenderer.sendSync(FA_WINDOW_CONTROL_IPC.closeSync)
+    } catch {
+      // no-op
     }
   }
 }
