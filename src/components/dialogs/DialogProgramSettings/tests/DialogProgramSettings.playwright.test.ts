@@ -14,6 +14,7 @@ import type { T_dialogName } from 'app/types/T_dialogList'
 
 import { buildExpectedProgramSettingsTreeFromEnUsMessages } from './DialogProgramSettings.playwright.expectations'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
+import programSettingsMessages from 'app/i18n/en-US/dialogs/L_programSettings'
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -74,6 +75,13 @@ const programSettingsSelector = {
 } as const
 
 /**
+ * data-test-locator roots for the global search overlay (distinct from per-tab panel locators).
+ */
+const programSettingsSearchSelector = {
+  setting: (settingKey: string) => `dialogProgramSettings-search-setting-${settingKey}`
+} as const
+
+/**
  * Keys persisted as I_faUserSettings; dialog rows must expose exactly this set on data-test-setting-id.
  */
 const expectedFaUserSettingKeysSorted = (
@@ -83,7 +91,31 @@ const expectedFaUserSettingKeysSorted = (
 const programSettingsDirectInput: T_dialogName = 'ProgramSettings'
 
 /**
- * One Electron session: chrome and copy walk run while the dialog stays open; the close test runs last so earlier tests still see an open dialog.
+ * q-input debounce is 300ms; allow slack for Electron paint after the model updates.
+ */
+const programSettingsSearchDebounceWaitMs = 400
+
+const expectedProgramSettingsSearchNoResultsMessage = programSettingsMessages.searchNoResultsMessage
+
+/**
+ * Types into the header settings search field and waits for the debounced filter to apply.
+ */
+const fillProgramSettingsSearch = async (page: Page, query: string): Promise<void> => {
+  const searchInput = page.locator('.dialogProgramSettings__settingsSearchWrapper input').first()
+  await searchInput.click()
+  await searchInput.fill(query)
+  await page.waitForTimeout(programSettingsSearchDebounceWaitMs)
+}
+
+/**
+ * Clears the settings search field and waits for the normal tab panels to return.
+ */
+const clearProgramSettingsSearch = async (page: Page): Promise<void> => {
+  await fillProgramSettingsSearch(page, '')
+}
+
+/**
+ * One Electron session: chrome, copy walk, and settings search run while the dialog stays open; the close test runs last so earlier tests still see an open dialog.
  */
 test.describe.serial('Program settings dialog', () => {
   let electronApp: ElectronApplication
@@ -245,6 +277,97 @@ test.describe.serial('Program settings dialog', () => {
     expect(settingIdsSeenSorted).toEqual(
       expectedFaUserSettingKeysSorted.map((key) => String(key))
     )
+  })
+
+  /**
+   * Settings search overlay: title, tag, and description needles; empty state ErrorCard. Clearing the query restores tab interaction before the suite closes the dialog.
+   */
+  test('Program settings search finds Hide project name in tree by title match', async () => {
+    const searchPanel = appWindow.locator('[data-test-locator="dialogProgramSettings-searchAllSettingsPanel"]')
+    await expect(searchPanel).toHaveCount(0)
+
+    await fillProgramSettingsSearch(appWindow, 'Hide project name in tree')
+
+    await expect(searchPanel).toHaveCount(1)
+    await expect(searchPanel).toBeVisible()
+
+    const matchRoots = appWindow.locator('[data-test-locator^="dialogProgramSettings-search-setting-"]')
+    await expect(matchRoots).toHaveCount(1)
+
+    const projectNameRow = appWindow.locator(
+      `[data-test-locator="${programSettingsSearchSelector.setting('noProjectName')}"]`
+    )
+    await expect(projectNameRow).toBeVisible()
+    await expect(projectNameRow).toHaveAttribute('data-test-setting-id', 'noProjectName')
+
+    await expect(
+      appWindow.locator('[data-test-locator="dialogProgramSettings-searchNoResults"]')
+    ).toBeHidden()
+
+    await clearProgramSettingsSearch(appWindow)
+    await expect(searchPanel).toHaveCount(0)
+  })
+
+  test('Program settings search finds dark mode by tag substring theme', async () => {
+    await fillProgramSettingsSearch(appWindow, 'theme')
+
+    const matchRoots = appWindow.locator('[data-test-locator^="dialogProgramSettings-search-setting-"]')
+    await expect(matchRoots).toHaveCount(1)
+
+    const darkModeRow = appWindow.locator(
+      `[data-test-locator="${programSettingsSearchSelector.setting('darkMode')}"]`
+    )
+    await expect(darkModeRow).toBeVisible()
+    await expect(darkModeRow).toHaveAttribute('data-test-setting-id', 'darkMode')
+    await expect(darkModeRow).toHaveAttribute('data-test-tags', /theme/)
+
+    await clearProgramSettingsSearch(appWindow)
+  })
+
+  test('Program settings search finds hide empty fields by description substring hides fields', async () => {
+    await fillProgramSettingsSearch(appWindow, 'hides fields')
+
+    const matchRoots = appWindow.locator('[data-test-locator^="dialogProgramSettings-search-setting-"]')
+    await expect(matchRoots).toHaveCount(1)
+
+    const hideEmptyFieldsRow = appWindow.locator(
+      `[data-test-locator="${programSettingsSearchSelector.setting('hideEmptyFields')}"]`
+    )
+    await expect(hideEmptyFieldsRow).toBeVisible()
+    await expect(hideEmptyFieldsRow).toHaveAttribute('data-test-setting-id', 'hideEmptyFields')
+
+    await clearProgramSettingsSearch(appWindow)
+  })
+
+  test('Program settings search shows reading ErrorCard when query matches nothing', async () => {
+    await fillProgramSettingsSearch(appWindow, 'no-exist-text-test')
+
+    const noResults = appWindow.locator('[data-test-locator="dialogProgramSettings-searchNoResults"]')
+    await expect(noResults).toBeVisible()
+
+    const errorCard = appWindow.locator('[data-test-locator="errorCard"]')
+    await expect(errorCard).toBeVisible()
+    await expect(errorCard).toHaveAttribute('data-test-error-card-width', '650')
+
+    const mascot = appWindow.locator('[data-test-locator="fantasiaMascotImage-image"]')
+    await expect(mascot).toHaveCount(1)
+    await expect(mascot).toHaveAttribute('data-test-image', 'reading')
+
+    const titleHeading = appWindow.getByRole('heading', {
+      level: 2,
+      name: expectedProgramSettingsSearchNoResultsMessage
+    })
+    await expect(titleHeading).toHaveCount(1)
+    await expect(titleHeading).toBeVisible()
+
+    const cardBox = await errorCard.boundingBox() as unknown as {
+      height: number
+      width: number
+    }
+    expect(cardBox).not.toBe(null)
+    expect(Math.round(cardBox.width)).toBe(650)
+
+    await clearProgramSettingsSearch(appWindow)
   })
 
   /**
