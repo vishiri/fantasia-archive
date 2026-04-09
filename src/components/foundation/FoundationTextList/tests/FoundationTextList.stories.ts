@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import FoundationColorPalette from '../FoundationColorPalette.vue'
+import FoundationTextList from '../FoundationTextList.vue'
 
 const meta = {
-  component: FoundationColorPalette,
+  component: FoundationTextList,
   globals: {
     /**
      * Project preview defaults to a fixed desktop width; override with Storybook's responsive
@@ -22,8 +22,8 @@ const meta = {
     layout: 'fullscreen'
   },
   tags: ['skip-visual'],
-  title: 'Foundation/Color palette'
-} satisfies Meta<typeof FoundationColorPalette>
+  title: 'Components/foundation/FoundationTextList'
+} satisfies Meta<typeof FoundationTextList>
 
 export default meta
 
