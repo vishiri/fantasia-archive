@@ -1,0 +1,88 @@
+# Full integration gate when the PR is labeled novisualchange only (Storybook VRT must not drift).
+# Requires repo labels: novisualchange, visualchange (exact names). Invalid combinations are auto-closed; see .github/scripts/pr-label-guard.sh
+# Fork PRs: GITHUB_TOKEN may be read-only; label enforcement or close can fail on public fork workflows — prefer same-repo branches.
+name: PR full suite (ensure nochange)
+
+on:
+  pull_request:
+    branches:
+      - master
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
+
+concurrency:
+  group: pr-full-nochange-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    outputs:
+      run_heavy: ${{ steps.guard.outputs.run_heavy }}
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v5
+
+      - name: Validate PR labels
+        id: guard
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/pr-label-guard.sh nochange
+
+  full-suite:
+    needs: guard
+    if: needs.guard.result == 'success' && needs.guard.outputs.run_heavy == 'true'
+    # Playwright screenshot baselines in-repo use the win32 suffix (chromium-win32); use Windows to match.
+    runs-on: windows-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22.22'
+          cache: yarn
+          cache-dependency-path: |
+            yarn.lock
+            .storybook-workspace/yarn.lock
+
+      - name: Install Yarn 1.x
+        run: npm install -g yarn@1.22.19
+
+      - name: Install root dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install Storybook workspace dependencies
+        run: yarn --cwd .storybook-workspace install --frozen-lockfile
+
+      - name: Install Playwright Chromium (Electron component and E2E tests)
+        run: yarn playwright install chromium --with-deps
+
+      - name: Full ensure nochange (verify, build, Playwright, Storybook smoke and visual compare)
+        run: yarn testbatch:ensure:nochange
+
+      - name: Upload Playwright HTML report on failure
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-report-pr-${{ github.event.pull_request.number }}-nochange
+          path: test-results/playwright-report
+          if-no-files-found: ignore
