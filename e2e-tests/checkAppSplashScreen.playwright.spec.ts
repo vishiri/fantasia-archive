@@ -1,5 +1,7 @@
 import { _electron as electron } from 'playwright'
+import type { ElectronApplication, Page } from 'playwright'
 import { test, expect } from '@playwright/test'
+import type { TestInfo } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
@@ -7,10 +9,6 @@ import {
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
-
-test.beforeEach(() => {
-  resetFaPlaywrightIsolatedUserData()
-})
 
 /**
  * Extra env settings to trigger testing via Playwright
@@ -37,140 +35,109 @@ const selectorList = {
   wrapper: 'appSplashScreen-wrapper'
 }
 
-/**
- * Check if the splash screen displays properly on load of the app
- */
-test('Splash screen works properly', async ({}, testInfo) => {
-  const testSplashscreenTimeout = 3000
+test.describe.serial('App splash screen', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
 
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    resetFaPlaywrightIsolatedUserData()
+    electronApp = await electron.launch({
+      env: extraEnvSettings,
+      args: [electronMainFilePath],
+      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    })
+    appWindow = await electronApp.firstWindow()
+    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
+    await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+  })
 
-  // Prepare the wrapper element locator
-  const wrapperElement = appWindow.locator(`[data-test-locator="${selectorList.wrapper}"]`)
+  /**
+   * Check if the splash screen displays properly on load of the app
+   */
+  test('Splash screen works properly', async () => {
+    const testSplashscreenTimeout = 3000
 
-  // Check if the tested element exists
-  if (await wrapperElement.count() === 0) {
-    test.fail()
-    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-    return
-  }
+    const wrapperElement = appWindow.locator(`[data-test-locator="${selectorList.wrapper}"]`)
 
-  // Check if the splash screen is visible on initial load
-  const elementOpacityFirstRender = await appWindow.evaluate((selectorList) => {
-    const element = document.querySelector(`[data-test-locator="${selectorList.wrapper}"]`)
-    if (element !== null) {
-      return window.getComputedStyle(element).opacity
-    } else {
-      return false
+    if (await wrapperElement.count() === 0) {
+      test.fail()
+      return
     }
-  }, selectorList)
-  expect(elementOpacityFirstRender).toBe('1')
 
-  // Wait until the splash screen is supposed to fade away
-  await appWindow.waitForTimeout(testSplashscreenTimeout)
+    const elementOpacityFirstRender = await appWindow.evaluate((selectorListArg) => {
+      const element = document.querySelector(`[data-test-locator="${selectorListArg.wrapper}"]`)
+      if (element !== null) {
+        return window.getComputedStyle(element).opacity
+      } else {
+        return false
+      }
+    }, selectorList)
+    expect(elementOpacityFirstRender).toBe('1')
 
-  // Check if the splash screen is hidden after the app contents load
-  const elementOpacityAfterAppLoad = await appWindow.evaluate((selectorList) => {
-    const element = document.querySelector(`[data-test-locator="${selectorList.wrapper}"]`)
-    if (element !== null) {
-      return window.getComputedStyle(element).opacity
-    } else {
-      return false
-    }
-  }, selectorList)
-  expect(elementOpacityAfterAppLoad).toBe('0')
+    await appWindow.waitForTimeout(testSplashscreenTimeout)
 
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
-
-/**
- * Check if the splash screen has proper colors in RGB format
- */
-test('Splash screen has proper colors', async ({}, testInfo) => {
-  const testStringBackgroundColorRGB = 'rgb(24, 48, 58)'
-  const testStringPathFillColorRGB = 'rgb(215, 172, 71)'
-
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    const elementOpacityAfterAppLoad = await appWindow.evaluate((selectorListArg) => {
+      const element = document.querySelector(`[data-test-locator="${selectorListArg.wrapper}"]`)
+      if (element !== null) {
+        return window.getComputedStyle(element).opacity
+      } else {
+        return false
+      }
+    }, selectorList)
+    expect(elementOpacityAfterAppLoad).toBe('0')
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
+  /**
+   * Check if the splash screen has proper colors in RGB format
+   */
+  test('Splash screen has proper colors', async () => {
+    const testStringBackgroundColorRGB = 'rgb(24, 48, 58)'
+    const testStringPathFillColorRGB = 'rgb(215, 172, 71)'
 
-  // Prepare the wrapper element locator
-  const wrapperElement = appWindow.locator(`[data-test-locator="${selectorList.wrapper}"]`)
+    const wrapperElement = appWindow.locator(`[data-test-locator="${selectorList.wrapper}"]`)
 
-  // Check if the tested element exists
-  await expect(wrapperElement).toHaveCount(1)
+    await expect(wrapperElement).toHaveCount(1)
 
-  // Check if the background color is correct
-  const elementBackgroundColor = await appWindow.evaluate((selectorList) => {
-    const element = document.querySelector(`[data-test-locator="${selectorList.wrapper}"]`)
-    if (element !== null) return window.getComputedStyle(element).backgroundColor
-  }, selectorList)
-  expect(elementBackgroundColor).toBe(testStringBackgroundColorRGB)
+    const elementBackgroundColor = await appWindow.evaluate((selectorListArg) => {
+      const element = document.querySelector(`[data-test-locator="${selectorListArg.wrapper}"]`)
+      if (element !== null) return window.getComputedStyle(element).backgroundColor
+    }, selectorList)
+    expect(elementBackgroundColor).toBe(testStringBackgroundColorRGB)
 
-  // Check if the fill color of the svg path is correct
-  const elementPathFillColor = await appWindow.evaluate((selectorList) => {
-    const element = document.querySelector(`[data-test-locator="${selectorList.wrapper}"] path`)
-    if (element !== null) return window.getComputedStyle(element).fill
-  }, selectorList)
-  expect(elementPathFillColor).toBe(testStringPathFillColorRGB)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
-
-/**
- * Check if the splash screen has proper sizings
- */
-test('Splash screen has proper sizings', async ({}, testInfo) => {
-  const testStringWidth = '350px'
-  const testStringHeight = '350px'
-
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    const elementPathFillColor = await appWindow.evaluate((selectorListArg) => {
+      const element = document.querySelector(`[data-test-locator="${selectorListArg.wrapper}"] path`)
+      if (element !== null) return window.getComputedStyle(element).fill
+    }, selectorList)
+    expect(elementPathFillColor).toBe(testStringPathFillColorRGB)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
+  /**
+   * Check if the splash screen has proper sizings
+   */
+  test('Splash screen has proper sizings', async () => {
+    const testStringWidth = '350px'
+    const testStringHeight = '350px'
 
-  // Prepare the icon element locator
-  const iconElement = appWindow.locator(`[data-test-locator="${selectorList.wrapper}"] svg`)
+    const iconElement = appWindow.locator(`[data-test-locator="${selectorList.wrapper}"] svg`)
 
-  // Check if the tested element exists
-  expect(iconElement).toHaveCount(1)
+    await expect(iconElement).toHaveCount(1)
 
-  // Prepare the icon element locator
-  const iconBoxData = await iconElement.boundingBox() as unknown as { width: number, height: number }
+    const iconBoxData = await iconElement.boundingBox() as unknown as { width: number, height: number }
 
-  // Check if the tested element isn't invisisble for whatever reason
-  expect(iconBoxData).not.toBe(null)
+    expect(iconBoxData).not.toBe(null)
 
-  // Test for proper width
-  const roundedIconWidth = Math.round(iconBoxData.width)
-  const roundedTestStringWidth = Math.round(parseInt(testStringWidth))
-  expect(roundedIconWidth).toBe(roundedTestStringWidth)
+    const roundedIconWidth = Math.round(iconBoxData.width)
+    const roundedTestStringWidth = Math.round(parseInt(testStringWidth))
+    expect(roundedIconWidth).toBe(roundedTestStringWidth)
 
-  // Test for proper height
-  const roundedIconHeight = Math.round(iconBoxData.height)
-  const roundedTestStringHeight = Math.round(parseInt(testStringHeight))
-  expect(roundedIconHeight).toBe(roundedTestStringHeight)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
+    const roundedIconHeight = Math.round(iconBoxData.height)
+    const roundedTestStringHeight = Math.round(parseInt(testStringHeight))
+    expect(roundedIconHeight).toBe(roundedTestStringHeight)
+  })
 })

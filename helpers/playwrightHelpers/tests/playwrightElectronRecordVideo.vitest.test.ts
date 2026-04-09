@@ -267,6 +267,32 @@ test('closeFaElectronAppWithRecordedVideoAttachments uses one queued record dir 
 
 /**
  * closeFaElectronAppWithRecordedVideoAttachments
+ * Optional third argument routes HTML report attachments away from the beforeAll queue TestInfo (multi-test serial suites).
+ */
+test('closeFaElectronAppWithRecordedVideoAttachments attaches via htmlReportAttachTestInfo when provided', async () => {
+  const attachQueue = vi.fn().mockResolvedValue(undefined)
+  const attachReport = vi.fn().mockResolvedValue(undefined)
+  const queueTestInfo = {
+    attach: attachQueue
+  } as unknown as TestInfo
+  const reportTestInfo = {
+    attach: attachReport
+  } as unknown as TestInfo
+  const partial = getFaPlaywrightElectronRecordVideoPartial(queueTestInfo)
+  const dir = partial.recordVideo!.dir
+  fs.writeFileSync(path.join(dir, 'clip.webm'), Buffer.from('wm'))
+
+  await closeFaElectronAppWithRecordedVideoAttachments({
+    close: vi.fn().mockResolvedValue(undefined)
+  } as never, queueTestInfo, reportTestInfo)
+
+  expect(attachQueue).not.toHaveBeenCalled()
+  expect(attachReport).toHaveBeenCalled()
+  expect(fs.existsSync(dir)).toBe(false)
+})
+
+/**
+ * closeFaElectronAppWithRecordedVideoAttachments
  * Recursively discovers WebM files under subfolders and uses path-prefixed attachment names.
  */
 test('closeFaElectronAppWithRecordedVideoAttachments attaches nested webm paths with directory prefixes', async () => {

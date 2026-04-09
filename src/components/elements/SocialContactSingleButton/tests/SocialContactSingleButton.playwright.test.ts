@@ -1,5 +1,7 @@
 import { _electron as electron } from 'playwright'
+import type { ElectronApplication, Page } from 'playwright'
 import { test, expect } from '@playwright/test'
+import type { TestInfo } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
@@ -8,10 +10,6 @@ import {
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
 import type { I_socialContactButton } from 'app/types/I_socialContactButtons'
-
-test.beforeEach(() => {
-  resetFaPlaywrightIsolatedUserData()
-})
 
 /**
  * Button payload for this spec — must match what the app receives via 'COMPONENT_PROPS.dataInput'.
@@ -56,129 +54,86 @@ const selectorList = {
   singleButtonText: 'socialContactSingleButton-text'
 }
 
-/**
- * Test if the component exists
- */
-test('Test if the component exists', async ({}, testInfo) => {
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+test.describe.serial('Social contact single button', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
+
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ dataInput: testData })
+    resetFaPlaywrightIsolatedUserData()
+    electronApp = await electron.launch({
+      env: extraEnvSettings,
+      args: [electronMainFilePath],
+      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    })
+    appWindow = await electronApp.firstWindow()
+    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
+    await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
-
-  // Prepare the menu locator
-  const buttonElement = appWindow.locator(`[data-test-locator="${selectorList.singleButton}"]`)
-
-  // Check if the tested element exists
-  await expect(buttonElement).toHaveCount(1)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
-
-/**
- * Check if the component has proper title, url and classes
- */
-test('Check if the component has proper title, url and classes', async ({}, testInfo) => {
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
+  /**
+   * Test if the component exists
+   */
+  test('Test if the component exists', async () => {
+    const buttonElement = appWindow.locator(`[data-test-locator="${selectorList.singleButton}"]`)
 
-  // Prepare the menu locator
-  const buttonElement = appWindow.locator(`[data-test-locator="${selectorList.singleButton}"]`)
-
-  // Check if the tested element exists
-  await expect(buttonElement).toHaveCount(1)
-
-  // Check if the first menu item has text equal to the first data item
-  const buttonTitle = await buttonElement.evaluate((el: HTMLElement) => el.title)
-  const dataTitle = testData.title
-  expect(buttonTitle).toBe(dataTitle)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
-
-/**
- * Check if the component icon has proper src, height and width
- */
-test('Check if the component icon has proper src, height and width', async ({}, testInfo) => {
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    await expect(buttonElement).toHaveCount(1)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
+  /**
+   * Check if the component has proper title, url and classes
+   */
+  test('Check if the component has proper title, url and classes', async () => {
+    const buttonElement = appWindow.locator(`[data-test-locator="${selectorList.singleButton}"]`)
 
-  // Prepare the menu locator
-  const buttonIconQuasarElement = appWindow.locator(selectorList.singleButtonImageQuasarElement)
+    await expect(buttonElement).toHaveCount(1)
 
-  // Check if the tested element exists
-  await expect(buttonIconQuasarElement).toHaveCount(1)
-
-  // Check if the icon on the button is the same as the data icon
-  const buttonIcon = await buttonIconQuasarElement.evaluate((el: HTMLImageElement) => el.src)
-  const dataIcon = testData.icon
-  expect(buttonIcon).toContain(dataIcon)
-
-  // Get the button element's bounding box
-  const buttonBoxData = await buttonIconQuasarElement.boundingBox() as unknown as { width: number, height: number }
-
-  // Test if the tested element isn't invisisble for some reason
-  expect(buttonBoxData).not.toBe(null)
-
-  // Test for proper width
-  const roundedImageWidth = Math.round(buttonBoxData.width)
-  const roundedTestWidth = Math.round(testData.width)
-  expect(roundedImageWidth).toBe(roundedTestWidth)
-
-  // Test for proper height
-  const roundedImageHeight = Math.round(buttonBoxData.height)
-  const roundedTestHeight = Math.round(testData.height)
-  expect(roundedImageHeight).toBe(roundedTestHeight)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
-
-/**
- * Check if the component has proper text content
- */
-test('Check if the component has proper text content', async ({}, testInfo) => {
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    const buttonTitle = await buttonElement.evaluate((el: HTMLElement) => el.title)
+    const dataTitle = testData.title
+    expect(buttonTitle).toBe(dataTitle)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
+  /**
+   * Check if the component icon has proper src, height and width
+   */
+  test('Check if the component icon has proper src, height and width', async () => {
+    const buttonIconQuasarElement = appWindow.locator(selectorList.singleButtonImageQuasarElement)
 
-  // Prepare the menu locator
-  const buttonIconText = appWindow.locator(`[data-test-locator="${selectorList.singleButtonText}"]`)
+    await expect(buttonIconQuasarElement).toHaveCount(1)
 
-  // Check if the tested element exists
-  await expect(buttonIconText).toHaveCount(1)
+    const buttonIcon = await buttonIconQuasarElement.evaluate((el: HTMLImageElement) => el.src)
+    const dataIcon = testData.icon
+    expect(buttonIcon).toContain(dataIcon)
 
-  // Check if the text on the button is the same as the data text
-  const buttonText = await buttonIconText.textContent()
-  const dataText = testData.label
-  expect(buttonText).toBe(dataText)
+    const buttonBoxData = await buttonIconQuasarElement.boundingBox() as unknown as { width: number, height: number }
 
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
+    expect(buttonBoxData).not.toBe(null)
+
+    const roundedImageWidth = Math.round(buttonBoxData.width)
+    const roundedTestWidth = Math.round(testData.width)
+    expect(roundedImageWidth).toBe(roundedTestWidth)
+
+    const roundedImageHeight = Math.round(buttonBoxData.height)
+    const roundedTestHeight = Math.round(testData.height)
+    expect(roundedImageHeight).toBe(roundedTestHeight)
+  })
+
+  /**
+   * Check if the component has proper text content
+   */
+  test('Check if the component has proper text content', async () => {
+    const buttonIconText = appWindow.locator(`[data-test-locator="${selectorList.singleButtonText}"]`)
+
+    await expect(buttonIconText).toHaveCount(1)
+
+    const buttonText = await buttonIconText.textContent()
+    const dataText = testData.label
+    expect(buttonText).toBe(dataText)
+  })
 })

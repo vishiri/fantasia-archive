@@ -1,5 +1,7 @@
 import { _electron as electron } from 'playwright'
+import type { ElectronApplication, Page } from 'playwright'
 import { test, expect } from '@playwright/test'
+import type { TestInfo } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
@@ -8,10 +10,6 @@ import {
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
 import type { T_documentName } from 'app/types/T_documentList'
-
-test.beforeEach(() => {
-  resetFaPlaywrightIsolatedUserData()
-})
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -42,71 +40,57 @@ const selectorList = {
   closeButton: 'dialogMarkdownDocument-button-close'
 }
 
-/**
- * Feed 'license' input as the file to open and check if the opened dialog afterwards has all the needed elements in it.
- */
-test('Open test "license" dialog with all elements in it', async ({}, testInfo) => {
-  const testString: T_documentName = 'license'
+const licenseDocumentDirectInput: T_documentName = 'license'
 
-  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
+test.describe.serial('Dialog markdown document (license)', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
 
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: licenseDocumentDirectInput })
+    resetFaPlaywrightIsolatedUserData()
+    electronApp = await electron.launch({
+      env: extraEnvSettings,
+      args: [electronMainFilePath],
+      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    })
+    appWindow = await electronApp.firstWindow()
+    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
+    await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
-
-  // Prepare the selectors for the elements to check
-  const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
-  const markdownWrapper = appWindow.locator(`[data-test-locator="${selectorList.markdownWrapper}"]`)
-  const markdownContent = appWindow.locator(`[data-test-locator="${selectorList.markdownContent}"]`)
-
-  // Check if all tested elements exist
-  await expect(closeButton).toHaveCount(1)
-  await expect(markdownWrapper).toHaveCount(1)
-  await expect(markdownContent).toHaveCount(1)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
-
-/**
- * Feed 'license' input as the file to open and check if the opened dialog afterwards has all the needed elements in it.
- */
-test('Open test "license" dialog and try closing it', async ({}, testInfo) => {
-  const testString: T_documentName = 'license'
-
-  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
-
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
+  /**
+   * Feed 'license' input as the file to open and check if the opened dialog afterwards has all the needed elements in it.
+   */
+  test('Open test "license" dialog with all elements in it', async () => {
+    const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
+    const markdownWrapper = appWindow.locator(`[data-test-locator="${selectorList.markdownWrapper}"]`)
+    const markdownContent = appWindow.locator(`[data-test-locator="${selectorList.markdownContent}"]`)
 
-  // Prepare the selectors for the elements to check
-  const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
-  const markdownContent = appWindow.locator(`[data-test-locator="${selectorList.markdownContent}"]`)
+    await expect(closeButton).toHaveCount(1)
+    await expect(markdownWrapper).toHaveCount(1)
+    await expect(markdownContent).toHaveCount(1)
+  })
 
-  // Check if the markdown content and close button exist and click it if they do
-  await expect(markdownContent).toHaveCount(1)
-  await expect(closeButton).toHaveCount(1)
-  await closeButton.click()
+  /**
+   * Feed 'license' input as the file to open and check if the opened dialog afterwards has all the needed elements in it.
+   */
+  test('Open test "license" dialog and try closing it', async () => {
+    const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
+    const markdownContent = appWindow.locator(`[data-test-locator="${selectorList.markdownContent}"]`)
 
-  // Wait for the popup to close
-  await appWindow.waitForTimeout(1500)
+    await expect(markdownContent).toHaveCount(1)
+    await expect(closeButton).toHaveCount(1)
+    await closeButton.click()
 
-  // Check if the content is properly hidden after closing the popup
-  expect(await markdownContent.isHidden()).toBe(true)
+    await appWindow.waitForTimeout(1500)
 
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
+    expect(await markdownContent.isHidden()).toBe(true)
+  })
 })

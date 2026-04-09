@@ -1,5 +1,7 @@
 import { _electron as electron } from 'playwright'
+import type { ElectronApplication, Page } from 'playwright'
 import { test, expect } from '@playwright/test'
+import type { TestInfo } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
@@ -7,10 +9,6 @@ import {
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
-
-test.beforeEach(() => {
-  resetFaPlaywrightIsolatedUserData()
-})
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -40,141 +38,157 @@ const selectorList = {
 }
 
 /**
- * Check if the wrapper contains 'IMG' element
+ * Default 'COMPONENT_PROPS': IMG tag and random-image flag share one launch.
  */
-test('Check if the wrapper contains "IMG" element', async ({}, testInfo) => {
-  const testString = 'IMG'
+test.describe.serial('Fantasia mascot image (default props)', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
 
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    extraEnvSettings.COMPONENT_PROPS = JSON.stringify({})
+    resetFaPlaywrightIsolatedUserData()
+    electronApp = await electron.launch({
+      env: extraEnvSettings,
+      args: [electronMainFilePath],
+      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    })
+    appWindow = await electronApp.firstWindow()
+    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
+    await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+  })
 
-  const root = appWindow.locator(`[data-test-locator="${selectorList.image}"]`)
-  await expect(root).toHaveCount(1)
+  /**
+   * Check if the wrapper contains 'IMG' element
+   */
+  test('Check if the wrapper contains "IMG" element', async () => {
+    const testString = 'IMG'
 
-  const nativeImg = root.locator('img')
-  await expect(nativeImg).toHaveCount(1)
+    const root = appWindow.locator(`[data-test-locator="${selectorList.image}"]`)
+    await expect(root).toHaveCount(1)
 
-  const elementType = await nativeImg.evaluate(el => el.tagName)
-  expect(elementType).toBe(testString)
+    const nativeImg = root.locator('img')
+    await expect(nativeImg).toHaveCount(1)
 
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
+    const elementType = await nativeImg.evaluate(el => el.tagName)
+    expect(elementType).toBe(testString)
+  })
+
+  /**
+   * Test if the component properly determines if the image will be random - YES
+   */
+  test('Check if the image is random: YES', async () => {
+    const imageElement = appWindow.locator(`[data-test-locator="${selectorList.image}"]`)
+
+    await expect(imageElement).toHaveCount(1)
+
+    const isRandom = await imageElement.evaluate(el => el.dataset.testIsRandom)
+    expect(isRandom).toBe('true')
+  })
 })
 
 /**
- * Attempt to pass "width" and "height" prop to the component and check the results
+ * Fixed width and height require their own launch env snapshot.
  */
-test('Visually check for proper sizing of the icon', async ({}, testInfo) => {
-  const testStringWidth = '300px'
-  const testStringHeight = '300px'
+test.describe.serial('Fantasia mascot image (explicit dimensions)', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
 
-  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({
-    width: testStringWidth,
-    height: testStringHeight
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    const testStringWidth = '300px'
+    const testStringHeight = '300px'
+    extraEnvSettings.COMPONENT_PROPS = JSON.stringify({
+      width: testStringWidth,
+      height: testStringHeight
+    })
+    resetFaPlaywrightIsolatedUserData()
+    electronApp = await electron.launch({
+      env: extraEnvSettings,
+      args: [electronMainFilePath],
+      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    })
+    appWindow = await electronApp.firstWindow()
+    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
+    await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
 
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
+  /**
+   * Attempt to pass "width" and "height" prop to the component and check the results
+   */
+  test('Visually check for proper sizing of the icon', async () => {
+    const testStringWidth = '300px'
+    const testStringHeight = '300px'
 
-  // Prepare the selector for the tested element
-  const imageElement = appWindow.locator(`[data-test-locator="${selectorList.image}"]`)
+    const imageElement = appWindow.locator(`[data-test-locator="${selectorList.image}"]`)
 
-  // Check if the tested element exists
-  await expect(imageElement).toHaveCount(1)
+    await expect(imageElement).toHaveCount(1)
 
-  const imageBoxData = await imageElement.boundingBox() as unknown as { width: number, height: number }
+    const imageBoxData = await imageElement.boundingBox() as unknown as { width: number, height: number }
 
-  // Test if the tested element isn't invisisble for some reason
-  expect(imageBoxData).not.toBe(null)
+    expect(imageBoxData).not.toBe(null)
 
-  // Test for proper width
-  const roundedImageWidth = Math.round(imageBoxData.width)
-  const roundedTestStringWidth = Math.round(parseInt(testStringWidth))
-  expect(roundedImageWidth).toBe(roundedTestStringWidth)
+    const roundedImageWidth = Math.round(imageBoxData.width)
+    const roundedTestStringWidth = Math.round(parseInt(testStringWidth))
+    expect(roundedImageWidth).toBe(roundedTestStringWidth)
 
-  // Test for proper height
-  const roundedImageHeight = Math.round(imageBoxData.height)
-  const roundedTestStringHeight = Math.round(parseInt(testStringHeight))
-  expect(roundedImageHeight).toBe(roundedTestStringHeight)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
+    const roundedImageHeight = Math.round(imageBoxData.height)
+    const roundedTestStringHeight = Math.round(parseInt(testStringHeight))
+    expect(roundedImageHeight).toBe(roundedTestStringHeight)
+  })
 })
 
 /**
- * Test if the component properly determines if the image will be random - YES
+ * Fixed 'fantasiaImage' id requires its own launch env snapshot.
  */
-test('Check if the image is random: YES', async ({}, testInfo) => {
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+test.describe.serial('Fantasia mascot image (fixed fantasiaImage id)', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
+
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    const testString = 'flop'
+    extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ fantasiaImage: testString })
+    resetFaPlaywrightIsolatedUserData()
+    electronApp = await electron.launch({
+      env: extraEnvSettings,
+      args: [electronMainFilePath],
+      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    })
+    appWindow = await electronApp.firstWindow()
+    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
+    await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
-
-  // Prepare the selector for the tested element
-  const imageElement = appWindow.locator(`[data-test-locator="${selectorList.image}"]`)
-
-  // Check if the tested element exists
-  await expect(imageElement).toHaveCount(1)
-
-  // Check if the tested element is random
-  const isRandom = await imageElement.evaluate(el => el.dataset.testIsRandom)
-  expect(isRandom).toBe('true')
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
-
-/**
- * Test if the component properly determines if the image will be random - NO
- */
-test('Check if the image is random: NO', async ({}, testInfo) => {
-  const testString = 'flop'
-
-  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ fantasiaImage: testString })
-
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
+  /**
+   * Test if the component properly determines if the image will be random - NO
+   */
+  test('Check if the image is random: NO', async () => {
+    const testString = 'flop'
 
-  // Prepare the selector for the tested element
-  const imageElement = appWindow.locator(`[data-test-locator="${selectorList.image}"]`)
+    const imageElement = appWindow.locator(`[data-test-locator="${selectorList.image}"]`)
 
-  // Check if the tested element exists
-  await expect(imageElement).toHaveCount(1)
+    await expect(imageElement).toHaveCount(1)
 
-  // Check if the tested element is not random
-  const isRandom = await imageElement.evaluate(el => el.dataset.testIsRandom)
-  expect(isRandom).toBe('false')
+    const isRandom = await imageElement.evaluate(el => el.dataset.testIsRandom)
+    expect(isRandom).toBe('false')
 
-  // Check if the tested element has the correct image
-  const imageString = await imageElement.evaluate(el => el.dataset.testImage)
-  expect(imageString).toBe(testString)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
+    const imageString = await imageElement.evaluate(el => el.dataset.testImage)
+    expect(imageString).toBe(testString)
+  })
 })

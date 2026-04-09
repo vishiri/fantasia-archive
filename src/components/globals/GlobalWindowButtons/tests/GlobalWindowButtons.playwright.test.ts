@@ -1,5 +1,7 @@
 import { _electron as electron } from 'playwright'
+import type { ElectronApplication, Page } from 'playwright'
 import { test, expect } from '@playwright/test'
+import type { TestInfo } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
@@ -7,10 +9,6 @@ import {
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
-
-test.beforeEach(() => {
-  resetFaPlaywrightIsolatedUserData()
-})
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -41,167 +39,103 @@ const selectorList = {
   buttonClose: 'globalWindowButtons-button-close'
 }
 
-/**
- * Test if the component has three specific HTML element buttons properly mounted in it:
- * - Minimize button
- * - Resize button
- * - Close button
- */
-test('Wrapper should contain three specific buttons', async ({}, testInfo) => {
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+test.describe.serial('Global window buttons', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
+
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    resetFaPlaywrightIsolatedUserData()
+    electronApp = await electron.launch({
+      env: extraEnvSettings,
+      args: [electronMainFilePath],
+      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    })
+    appWindow = await electronApp.firstWindow()
+    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
+    await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
-
-  // Prepare the selectors for the buttons
-  const resizeButton = appWindow.locator(`[data-test-locator="${selectorList.buttonResize}"]`)
-  const minimizeButton = appWindow.locator(`[data-test-locator="${selectorList.buttonMinimize}"]`)
-  const closeButton = appWindow.locator(`[data-test-locator="${selectorList.buttonClose}"]`)
-
-  // Check if the tested elements exists
-  await expect(resizeButton).toHaveCount(1)
-  await expect(minimizeButton).toHaveCount(1)
-  await expect(closeButton).toHaveCount(1)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
-
-/**
- * Attempt to click the resize button
- */
-test('Click resize button - "smallify"', async ({}, testInfo) => {
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
+  /**
+   * Test if the component has three specific HTML element buttons properly mounted in it:
+   * - Minimize button
+   * - Resize button
+   * - Close button
+   */
+  test('Wrapper should contain three specific buttons', async () => {
+    const resizeButton = appWindow.locator(`[data-test-locator="${selectorList.buttonResize}"]`)
+    const minimizeButton = appWindow.locator(`[data-test-locator="${selectorList.buttonMinimize}"]`)
+    const closeButton = appWindow.locator(`[data-test-locator="${selectorList.buttonClose}"]`)
 
-  // Prepare the selector for the button
-  const resizeButton = appWindow.locator(`[data-test-locator="${selectorList.buttonResize}"]`)
-
-  // Check if the tested element exists and if so, click it
-  await expect(resizeButton).toHaveCount(1)
-  await resizeButton.click()
-
-  // Wait for the window to resize and report non-maximized state
-  await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === false)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
-
-/**
- * Attempt to click the resize button, twice
- */
-test('Click resize button - "maximize"', async ({}, testInfo) => {
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    await expect(resizeButton).toHaveCount(1)
+    await expect(minimizeButton).toHaveCount(1)
+    await expect(closeButton).toHaveCount(1)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
+  /**
+   * Attempt to click the resize button
+   */
+  test('Click resize button - "smallify"', async () => {
+    const resizeButton = appWindow.locator(`[data-test-locator="${selectorList.buttonResize}"]`)
 
-  // Prepare the selector for the button
-  const resizeButton = appWindow.locator(`[data-test-locator="${selectorList.buttonResize}"]`)
-
-  // Check if the tested element exists
-  await expect(resizeButton).toHaveCount(1)
-
-  // In order to avoid situations where the window somehow opens in non-maximized state, we first check if it is maximized or not and react accordingly
-  const isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
-
-  // Check if the window if maximized of not, react accordingly
-  if (isMaximized) {
-    // Minimize first
+    await expect(resizeButton).toHaveCount(1)
     await resizeButton.click()
 
-    // Wait for the window to minimize before clicking again
     await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === false)
-
-    // Maximize again
-    await resizeButton.click()
-  } else {
-    // Maximize to begin with
-    await resizeButton.click()
-  }
-
-  // Wait for the window to maximize and report maximized state
-  await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === true)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
-
-/**
- * Attempt to click the minimize button
- */
-test('Click minimize button', async ({}, testInfo) => {
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
+  /**
+   * Attempt to click the resize button, second time
+   */
+  test('Click resize button - "maximize"', async () => {
+    const resizeButton = appWindow.locator(`[data-test-locator="${selectorList.buttonResize}"]`)
 
-  // Prepare the selector for the button
-  const minimizeButton = appWindow.locator(`[data-test-locator="${selectorList.buttonMinimize}"]`)
+    await expect(resizeButton).toHaveCount(1)
 
-  // Check if the tested element exists, and if so, click it
-  await expect(minimizeButton).toHaveCount(1)
-  await minimizeButton.click()
+    const isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
 
-  // Wait for the window to minimize and report non-maximized state
-  await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === false)
+    if (isMaximized) {
+      await resizeButton.click()
 
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
+      await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === false)
 
-/**
- * Attempt to click the close button
- */
-test('Click close button', async ({}, testInfo) => {
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+      await resizeButton.click()
+    } else {
+      await resizeButton.click()
+    }
+
+    await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === true)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
+  /**
+   * Attempt to click the minimize button
+   */
+  test('Click minimize button', async () => {
+    const minimizeButton = appWindow.locator(`[data-test-locator="${selectorList.buttonMinimize}"]`)
 
-  // Prepare the selector for the button
-  const closeButton = appWindow.locator(`[data-test-locator="${selectorList.buttonClose}"]`)
+    await expect(minimizeButton).toHaveCount(1)
+    await minimizeButton.click()
 
-  // Check if the tested element exists
-  await expect(closeButton).toHaveCount(1)
+    await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === false)
+  })
 
-  // Prepare a close-event promise before clicking
-  const windowCloseEvent = appWindow.waitForEvent('close')
+  /**
+   * Attempt to click the close button
+   */
+  test('Click close button', async () => {
+    const closeButton = appWindow.locator(`[data-test-locator="${selectorList.buttonClose}"]`)
 
-  // Click the close button
-  await closeButton.click()
+    await expect(closeButton).toHaveCount(1)
 
-  // Check if the window was closed
-  await windowCloseEvent
+    const windowCloseEvent = appWindow.waitForEvent('close')
 
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
+    await closeButton.click()
+
+    await windowCloseEvent
+  })
 })

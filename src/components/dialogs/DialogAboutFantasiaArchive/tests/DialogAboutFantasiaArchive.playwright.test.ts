@@ -1,5 +1,7 @@
 import { _electron as electron } from 'playwright'
+import type { ElectronApplication, Page } from 'playwright'
 import { test, expect } from '@playwright/test'
+import type { TestInfo } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
@@ -9,10 +11,6 @@ import {
 import L_socialContactButtons from 'app/i18n/en-US/components/other/SocialContactButtons/L_socialContactButtons'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
 import type { T_dialogName } from 'app/types/T_dialogList'
-
-test.beforeEach(() => {
-  resetFaPlaywrightIsolatedUserData()
-})
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -42,105 +40,78 @@ const selectorList = {
   socialButtonsWrapper: 'socialContactButtons'
 }
 
-/**
- * Feed "AboutFantasiaArchive" input and check if all key dialog elements open.
- */
-test('Open test "AboutFantasiaArchive" dialog with all elements in it', async ({}, testInfo) => {
-  const testString: T_dialogName = 'AboutFantasiaArchive'
-  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
-
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
-  })
-
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
-
-  // Prepare the selectors for the elements to check
-  const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
-  const socialButtonsWrapper = appWindow.locator(`[data-test-locator="${selectorList.socialButtonsWrapper}"]`)
-
-  // Check if all tested elements exist
-  await expect(closeButton).toHaveCount(1)
-  await expect(socialButtonsWrapper).toHaveCount(1)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
+const aboutDialogDirectInput: T_dialogName = 'AboutFantasiaArchive'
 
 /**
- * Feed "AboutFantasiaArchive" input and check if dialog closes after button click.
+ * Close runs last so social-button copy is asserted while the dialog is still open.
  */
-test('Open test "AboutFantasiaArchive" dialog and try closing it', async ({}, testInfo) => {
-  const testString: T_dialogName = 'AboutFantasiaArchive'
-  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
+test.describe.serial('About Fantasia Archive dialog', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
 
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: aboutDialogDirectInput })
+    resetFaPlaywrightIsolatedUserData()
+    electronApp = await electron.launch({
+      env: extraEnvSettings,
+      args: [electronMainFilePath],
+      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    })
+    appWindow = await electronApp.firstWindow()
+    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
+    await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
-
-  // Prepare the selectors for the elements to check
-  const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
-  const socialButtonsWrapper = appWindow.locator(`[data-test-locator="${selectorList.socialButtonsWrapper}"]`)
-
-  // Check if wrapper exists before closing and then close the dialog
-  await expect(socialButtonsWrapper).toHaveCount(1)
-  await expect(closeButton).toHaveCount(1)
-  await closeButton.click()
-
-  // Wait for the popup to close
-  await appWindow.waitForTimeout(1500)
-
-  // Check if the content is properly hidden after closing the popup
-  expect(await socialButtonsWrapper.isHidden()).toBe(true)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
-
-test('Check correct amount and content of social buttons in AboutFantasiaArchive dialog', async ({}, testInfo) => {
-  const testString: T_dialogName = 'AboutFantasiaArchive'
-  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
-
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
+  /**
+   * Feed "AboutFantasiaArchive" input and check if all key dialog elements open.
+   */
+  test('Open test "AboutFantasiaArchive" dialog with all elements in it', async () => {
+    const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
+    const socialButtonsWrapper = appWindow.locator(`[data-test-locator="${selectorList.socialButtonsWrapper}"]`)
 
-  // Select all social buttons
-  const socialButtonsWrapper = appWindow.locator(`[data-test-locator="${selectorList.socialButtonsWrapper}"]`)
-  const socialButtons = socialButtonsWrapper.locator('[data-test-locator="socialContactSingleButton"]')
-  await expect(socialButtons).toHaveCount(7)
+    await expect(closeButton).toHaveCount(1)
+    await expect(socialButtonsWrapper).toHaveCount(1)
+  })
 
-  // Check the specific text content for each button
-  const expectedButtonLabels = [
-    L_socialContactButtons.buttonPatreon.label,
-    L_socialContactButtons.buttonKofi.label,
-    L_socialContactButtons.buttonWebsite.label,
-    L_socialContactButtons.buttonGitHub.label,
-    L_socialContactButtons.buttonDiscord.label,
-    L_socialContactButtons.buttonReddit.label,
-    L_socialContactButtons.buttonTwitter.label
-  ]
+  test('Check correct amount and content of social buttons in AboutFantasiaArchive dialog', async () => {
+    const socialButtonsWrapper = appWindow.locator(`[data-test-locator="${selectorList.socialButtonsWrapper}"]`)
+    const socialButtons = socialButtonsWrapper.locator('[data-test-locator="socialContactSingleButton"]')
+    await expect(socialButtons).toHaveCount(7)
 
-  for (let i = 0; i < expectedButtonLabels.length; i++) {
-    await expect(socialButtons.nth(i)).toHaveText(expectedButtonLabels[i])
-  }
+    const expectedButtonLabels = [
+      L_socialContactButtons.buttonPatreon.label,
+      L_socialContactButtons.buttonKofi.label,
+      L_socialContactButtons.buttonWebsite.label,
+      L_socialContactButtons.buttonGitHub.label,
+      L_socialContactButtons.buttonDiscord.label,
+      L_socialContactButtons.buttonReddit.label,
+      L_socialContactButtons.buttonTwitter.label
+    ]
 
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
+    for (let i = 0; i < expectedButtonLabels.length; i++) {
+      await expect(socialButtons.nth(i)).toHaveText(expectedButtonLabels[i])
+    }
+  })
+
+  /**
+   * Feed "AboutFantasiaArchive" input and check if dialog closes after button click.
+   */
+  test('Open test "AboutFantasiaArchive" dialog and try closing it', async () => {
+    const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
+    const socialButtonsWrapper = appWindow.locator(`[data-test-locator="${selectorList.socialButtonsWrapper}"]`)
+
+    await expect(socialButtonsWrapper).toHaveCount(1)
+    await expect(closeButton).toHaveCount(1)
+    await closeButton.click()
+
+    await appWindow.waitForTimeout(1500)
+
+    expect(await socialButtonsWrapper.isHidden()).toBe(true)
+  })
 })

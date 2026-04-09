@@ -72,7 +72,7 @@ async function removeRecordVideoTempDirBestEffort (dir: string): Promise<void> {
  * Individual files may still be named 'page@<id>.webm' by Playwright.
  * Set env 'FA_PLAYWRIGHT_NO_VIDEO' to '1' or 'true' to skip recording (faster local runs).
  *
- * @param testInfo - Current test's 'TestInfo' from the test callback's second argument.
+ * @param testInfo - Pass the same 'TestInfo' you will use as the queue key in 'closeFaElectronAppWithRecordedVideoAttachments' (typically 'test.beforeAll''s second argument). Queues the temp 'recordVideo' directory for that object.
  * @param _launchSegment - Reserved for future path disambiguation; each call still gets its own temp dir.
  */
 /**
@@ -206,10 +206,14 @@ async function attachWebmFilesUnderDir (
 /**
  * Close the Electron app (finalizes 'recordVideo' files), then register videos as test attachments for the HTML reporter.
  * Removes the temp 'recordVideo' directory after attaching. Skips attachment scan when 'FA_PLAYWRIGHT_NO_VIDEO' is set.
+ *
+ * For 'test.describe.serial' groups with more than one test, pass 'test.afterAll''s 'TestInfo' as 'htmlReportAttachTestInfo'.
+ * Playwright's HTML report does not show attachments registered on 'beforeAll''s 'TestInfo' on each test's page; 'afterAll''s 'TestInfo' is attributed to the last test and shows the Videos section there.
  */
 export async function closeFaElectronAppWithRecordedVideoAttachments (
   electronApp: ElectronApplication,
-  testInfo: TestInfo
+  recordVideoQueueTestInfo: TestInfo,
+  htmlReportAttachTestInfo?: TestInfo
 ): Promise<void> {
   await electronApp.close()
 
@@ -220,10 +224,11 @@ export async function closeFaElectronAppWithRecordedVideoAttachments (
     return
   }
 
-  const tempDir = takeNextRecordVideoTempDir(testInfo)
+  const attachTarget = htmlReportAttachTestInfo ?? recordVideoQueueTestInfo
+  const tempDir = takeNextRecordVideoTempDir(recordVideoQueueTestInfo)
   if (tempDir !== undefined) {
     try {
-      await attachWebmFilesUnderDir(testInfo, tempDir, '')
+      await attachWebmFilesUnderDir(attachTarget, tempDir, '')
     } finally {
       await removeRecordVideoTempDirBestEffort(tempDir)
     }

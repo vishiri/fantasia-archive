@@ -1,5 +1,7 @@
 import { _electron as electron } from 'playwright'
+import type { ElectronApplication, Page } from 'playwright'
 import { test, expect } from '@playwright/test'
+import type { TestInfo } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
@@ -7,10 +9,6 @@ import {
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
-
-test.beforeEach(() => {
-  resetFaPlaywrightIsolatedUserData()
-})
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -40,50 +38,43 @@ const selectorList = {
   anyMenu: 'appControlMenus-anyMenu'
 }
 
-/**
- * Load a custom "Test Title" menu button in the menu and check if it loaded
- */
-test('Load "Test Title" menu button sub-component', async ({}, testInfo) => {
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+test.describe.serial('App control menus', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
+
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    resetFaPlaywrightIsolatedUserData()
+    electronApp = await electron.launch({
+      env: extraEnvSettings,
+      args: [electronMainFilePath],
+      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    })
+    appWindow = await electronApp.firstWindow()
+    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
+    await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
-
-  // Prepare the menu locator
-  const testMenu = appWindow.locator(`[data-test-menu-test="${selectorList.testMenu}"]`)
-
-  // Check if the tested element exists
-  await expect(testMenu).toHaveCount(1)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
-
-/**
- * Check if we have exactly one testing menu loaded
- */
-test('Check if we have exactly one testing menu loaded', async ({}, testInfo) => {
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
+  /**
+   * Load a custom "Test Title" menu button in the menu and check if it loaded
+   */
+  test('Load "Test Title" menu button sub-component', async () => {
+    const testMenu = appWindow.locator(`[data-test-menu-test="${selectorList.testMenu}"]`)
 
-  // Prepare the menus locator
-  const anyMenus = appWindow.locator(`[data-test-menu-any="${selectorList.anyMenu}"]`)
+    await expect(testMenu).toHaveCount(1)
+  })
 
-  // Check if the tested element exists
-  await expect(anyMenus).toHaveCount(1)
+  /**
+   * Check if we have exactly one testing menu loaded
+   */
+  test('Check if we have exactly one testing menu loaded', async () => {
+    const anyMenus = appWindow.locator(`[data-test-menu-any="${selectorList.anyMenu}"]`)
 
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
+    await expect(anyMenus).toHaveCount(1)
+  })
 })

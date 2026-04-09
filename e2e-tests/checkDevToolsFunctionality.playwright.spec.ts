@@ -1,5 +1,7 @@
 import { _electron as electron } from 'playwright'
+import type { ElectronApplication, Page } from 'playwright'
 import { test, expect } from '@playwright/test'
+import type { TestInfo } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
@@ -7,10 +9,6 @@ import {
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
-
-test.beforeEach(() => {
-  resetFaPlaywrightIsolatedUserData()
-})
 
 /**
  * Extra env settings to trigger testing via Playwright
@@ -43,72 +41,66 @@ const selectorList = {
   menuItemButton: 'Toggle developer tools'
 }
 
-/**
- * Check if dev tools toggle properly on and off using the menu button
- */
-test('Dev tools toggle properly', async ({}, testInfo) => {
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+test.describe.serial('Developer tools menu', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
+
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    resetFaPlaywrightIsolatedUserData()
+    electronApp = await electron.launch({
+      env: extraEnvSettings,
+      args: [electronMainFilePath],
+      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    })
+    appWindow = await electronApp.firstWindow()
+    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
+    await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
 
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+  })
 
-  // Prepare the menu wrapper locator
-  const menuWrapper = appWindow.getByText(selectorList.menuButton)
+  /**
+   * Check if dev tools toggle properly on and off using the menu button
+   */
+  test('Dev tools toggle properly', async () => {
+    const menuWrapper = appWindow.getByText(selectorList.menuButton)
 
-  // Prepare the menu button locator
-  const menuButton = appWindow.getByText(selectorList.menuItemButton)
+    const menuButton = appWindow.getByText(selectorList.menuItemButton)
 
-  // --- Toggle dev tools - ON---
+    await expect(menuWrapper).toHaveCount(1)
+    await menuWrapper.click()
 
-  // Open the menu
-  await expect(menuWrapper).toHaveCount(1)
-  await menuWrapper.click()
+    await appWindow.waitForTimeout(menuAnimationTimer)
 
-  // Wait for the menu animation to finish
-  await appWindow.waitForTimeout(menuAnimationTimer)
+    await expect(menuButton).toHaveCount(1)
+    await menuButton.click()
 
-  // Click on the dev tools menu button
-  await expect(menuButton).toHaveCount(1)
-  await menuButton.click()
+    await appWindow.waitForTimeout(menuAnimationTimer)
 
-  // Wait for the menu animation to finish
-  await appWindow.waitForTimeout(menuAnimationTimer)
+    await expect.poll(async () => {
+      return await appWindow.evaluate(() => {
+        return window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()
+      })
+    }, { timeout: 15_000 }).toBe(true)
 
-  // Check if dev tools are open (allow time for DevTools to attach after the menu closes; can lag on Windows)
-  await expect.poll(async () => {
-    return await appWindow.evaluate(() => {
-      return window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()
-    })
-  }, { timeout: 15_000 }).toBe(true)
+    await expect(menuWrapper).toHaveCount(1)
+    await menuWrapper.click()
 
-  // --- Toggle dev tools - OFF ---
+    await appWindow.waitForTimeout(menuAnimationTimer)
 
-  // Open the menu
-  await expect(menuWrapper).toHaveCount(1)
-  await menuWrapper.click()
+    await expect(menuButton).toHaveCount(1)
+    await menuButton.click()
 
-  // Wait for the menu animation to finish
-  await appWindow.waitForTimeout(menuAnimationTimer)
+    await appWindow.waitForTimeout(menuAnimationTimer)
 
-  // Click on the dev tools menu button
-  await expect(menuButton).toHaveCount(1)
-  await menuButton.click()
-
-  // Wait for the menu animation to finish
-  await appWindow.waitForTimeout(menuAnimationTimer)
-
-  // Check if dev tools are closed
-  await expect.poll(async () => {
-    return await appWindow.evaluate(() => {
-      return window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()
-    })
-  }, { timeout: 15_000 }).toBe(false)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
+    await expect.poll(async () => {
+      return await appWindow.evaluate(() => {
+        return window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()
+      })
+    }, { timeout: 15_000 }).toBe(false)
+  })
 })

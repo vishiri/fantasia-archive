@@ -1,5 +1,7 @@
 import { _electron as electron } from 'playwright'
+import type { ElectronApplication, Page } from 'playwright'
 import { test, expect } from '@playwright/test'
+import type { TestInfo } from '@playwright/test'
 import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
@@ -12,10 +14,6 @@ import type { T_dialogName } from 'app/types/T_dialogList'
 
 import { buildExpectedProgramSettingsTreeFromEnUsMessages } from './DialogProgramSettings.playwright.expectations'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
-
-test.beforeEach(() => {
-  resetFaPlaywrightIsolatedUserData()
-})
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -82,239 +80,223 @@ const expectedFaUserSettingKeysSorted = (
   Object.keys(FA_USER_SETTINGS_DEFAULTS) as (keyof I_faUserSettings)[]
 ).slice().sort((keyA, keyB) => String(keyA).localeCompare(String(keyB)))
 
-/**
- * Feed "ProgramSettings" input and check if key dialog chrome opens.
- */
-test('Open test "ProgramSettings" dialog with title and actions', async ({}, testInfo) => {
-  const testString: T_dialogName = 'ProgramSettings'
-  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
-
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
-  })
-
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
-
-  // Prepare the close button and title locators
-  const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
-  const title = appWindow.locator(`[data-test-locator="${selectorList.title}"]`)
-
-  // Check if the tested elements exist
-  await expect(closeButton).toHaveCount(1)
-  await expect(title).toHaveCount(1)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
+const programSettingsDirectInput: T_dialogName = 'ProgramSettings'
 
 /**
- * Feed "ProgramSettings" input and check if dialog closes after Close click.
+ * One Electron session: chrome and copy walk run while the dialog stays open; the close test runs last so earlier tests still see an open dialog.
  */
-test('Open test "ProgramSettings" dialog and close it', async ({}, testInfo) => {
-  const testString: T_dialogName = 'ProgramSettings'
-  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
+test.describe.serial('Program settings dialog', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
 
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
-  })
-
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
-
-  // Prepare the close button and title locators
-  const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
-  const title = appWindow.locator(`[data-test-locator="${selectorList.title}"]`)
-
-  await expect(title).toHaveCount(1)
-  await expect(closeButton).toHaveCount(1)
-  await closeButton.click()
-
-  await appWindow.waitForTimeout(1500)
-
-  expect(await title.isHidden()).toBe(true)
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
-
-/**
- * Program Settings copy matches en-US dialogs.programSettings (via buildExpectedProgramSettingsTreeFromEnUsMessages).
- * - Visits every vertical tab, category, subcategory, and setting row.
- * - Asserts titles, optional notes, tags, and help copy duplicated on data-test-tooltip-text.
- * - Hovers the first help icon once and asserts the live overlay with selectorList.quasarTooltip (retries hover + dismiss with expect().toPass because Quasar portaled tooltips are timing-sensitive under Electron); other rows skip hover.
- * - After each tab switch, unions data-test-setting-id from the active panel so the combined set matches I_faUserSettings keys exactly (Quasar mounts one panel at a time here).
- * - globalFunctionality.faUserSettings only covers save toasts, not these labels.
- */
-test('Program settings dialog matches en-US category, subcategory, and setting copy on every tab', async ({}, testInfo) => {
-  test.setTimeout(120_000)
-
-  const testString: T_dialogName = 'ProgramSettings'
-  extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
-  const expectedTree = buildExpectedProgramSettingsTreeFromEnUsMessages()
-
-  const electronApp = await electron.launch({
-    env: extraEnvSettings,
-    args: [electronMainFilePath],
-    ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
-  })
-
-  const appWindow = await electronApp.firstWindow()
-  await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-  await appWindow.waitForTimeout(faFrontendRenderTimer)
-
-  const title = appWindow.locator(`[data-test-locator="${selectorList.title}"]`)
-  await expect(title).toHaveCount(1)
-
-  const dialogRoot = appWindow.locator(`.${selectorList.dialogProgramSettingsRootClass}`)
-
-  /**
-   * Flag to track if the first setting tooltip has been verified via hover
-   */
-  let verifiedFirstSettingTooltipViaHover = false
-
-  const settingIdsSeenAcrossTabs = new Set<string>()
-
-  for (const categoryKey of Object.keys(expectedTree)) {
-    const category = expectedTree[categoryKey]
-    const tab = appWindow.locator(`[data-test-locator="${programSettingsSelector.tab(categoryKey)}"]`)
-    await expect(tab).toHaveCount(1)
-    await tab.click()
-    await appWindow.waitForTimeout(550)
-
-    const batchIdsRaw = await dialogRoot.locator(`[${selectorList.settingIdAttribute}]`).evaluateAll(
-      (elements: HTMLElement[], attributeName: string) =>
-        elements.map((element) => element.getAttribute(attributeName)),
-      selectorList.settingIdAttribute
-    )
-    for (const rawId of batchIdsRaw) {
-      if (rawId !== null && rawId !== '') {
-        settingIdsSeenAcrossTabs.add(rawId)
-      }
-    }
-
-    const categorySection = appWindow.locator(
-      `[data-test-locator="${programSettingsSelector.category(categoryKey)}"]`
-    )
-    await expect(categorySection).toBeVisible()
-    await expect(
-      categorySection.locator(`[data-test-locator="${selectorList.categoryTitle}"]`)
-    ).toHaveText(category.title)
-
-    for (const [subCategoryKey, subCategory] of Object.entries(category.subCategories)) {
-      const subSection = categorySection.locator(
-        `[data-test-locator="${programSettingsSelector.subcategory(categoryKey, subCategoryKey)}"]`
-      )
-      await expect(
-        subSection.locator(`[data-test-locator="${selectorList.subcategoryTitle}"]`)
-      ).toHaveText(subCategory.title)
-
-      for (const [settingKey, setting] of Object.entries(subCategory.settingsList)) {
-        const settingRoot = appWindow.locator(
-          `[data-test-locator="${programSettingsSelector.setting(settingKey)}"]`
-        )
-        await expect(settingRoot).toHaveCount(1)
-        await expect(settingRoot).toHaveAttribute(selectorList.settingIdAttribute, settingKey)
-        await expect(settingRoot).toHaveAttribute('data-test-tags', setting.tags)
-        await expect(
-          settingRoot.locator(`[data-test-locator="${selectorList.settingLabel}"]`)
-        ).toHaveText(setting.title)
-
-        if (setting.note !== undefined && setting.note !== '') {
-          await expect(
-            settingRoot.locator(`[data-test-locator="${selectorList.settingNote}"]`)
-          ).toHaveText(setting.note)
-        } else {
-          await expect(
-            settingRoot.locator(`[data-test-locator="${selectorList.settingNote}"]`)
-          ).toHaveCount(0)
-        }
-
-        const helpIcon = settingRoot.locator(`[${selectorList.settingHelpTooltipTextHook}]`)
-        await expect(helpIcon).toHaveCount(1)
-        await expect(helpIcon).toHaveAttribute(
-          selectorList.settingHelpTooltipTextHook,
-          setting.description
-        )
-
-        if (!verifiedFirstSettingTooltipViaHover) {
-          verifiedFirstSettingTooltipViaHover = true
-          await expect(async () => {
-            await appWindow.mouse.move(12, 12)
-            await appWindow.waitForTimeout(280)
-            await helpIcon.scrollIntoViewIfNeeded()
-            await helpIcon.hover({
-              force: true,
-              timeout: 10_000
-            })
-            await appWindow.waitForTimeout(programSettingsTooltipOpenDelayMs)
-            const liveTooltip = appWindow
-              .locator(selectorList.quasarTooltip)
-              .filter({ hasText: setting.description })
-              .last()
-            await expect(liveTooltip).toBeVisible({
-              timeout: 4000
-            })
-            await expect(liveTooltip).toHaveText(setting.description)
-          }).toPass({
-            timeout: programSettingsTooltipVisibleTimeoutMs
-          })
-        }
-
-        await categorySection.locator(`[data-test-locator="${selectorList.categoryTitle}"]`).hover({
-          force: true
-        })
-        await appWindow.waitForTimeout(200)
-      }
-    }
-  }
-
-  expect(settingIdsSeenAcrossTabs.size).toBe(expectedFaUserSettingKeysSorted.length)
-  const settingIdsSeenSorted = [...settingIdsSeenAcrossTabs].sort((keyA, keyB) =>
-    keyA.localeCompare(keyB)
-  )
-  expect(settingIdsSeenSorted).toEqual(
-    expectedFaUserSettingKeysSorted.map((key) => String(key))
-  )
-
-  // Close the app
-  await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
-})
-
-/**
- * showDocumentID: under category developerSettings (Developer Settings tab).
- * Serial block: first test persists true via Save + IPC; second assumes a fresh Playwright userData profile after resetFaPlaywrightIsolatedUserData in test.beforeEach.
- */
-test.describe.serial('Program settings showDocumentID persistence and userData reset isolation', () => {
-  const developerSettingsCategoryKey = 'developerSettings'
-  const showDocumentIDSettingKey = 'showDocumentID'
-  const postSaveSettingsWaitMs = 500
-  const tabSwitchSettleMs = 550
-
-  /**
-   * showDocumentID
-   * - Opens Developer Settings, asserts the toggle is off, turns it on, saves, waits, then reads persisted value through faUserSettings.getSettings() in the renderer.
-   */
-  test('showDocumentID persists after Save; getSettings returns true over the IPC bridge', async ({}, testInfo) => {
-    const testString: T_dialogName = 'ProgramSettings'
-    extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
-
-    const electronApp = await electron.launch({
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: programSettingsDirectInput })
+    resetFaPlaywrightIsolatedUserData()
+    electronApp = await electron.launch({
       env: extraEnvSettings,
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
-
-    const appWindow = await electronApp.firstWindow()
+    appWindow = await electronApp.firstWindow()
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
+  })
 
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+  })
+
+  /**
+   * Feed "ProgramSettings" input and check if key dialog chrome opens.
+   */
+  test('Open test "ProgramSettings" dialog with title and actions', async () => {
+    const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
+    const title = appWindow.locator(`[data-test-locator="${selectorList.title}"]`)
+
+    await expect(closeButton).toHaveCount(1)
+    await expect(title).toHaveCount(1)
+  })
+
+  /**
+   * Program Settings copy matches en-US dialogs.programSettings (via buildExpectedProgramSettingsTreeFromEnUsMessages).
+   * - Visits every vertical tab, category, subcategory, and setting row.
+   * - Asserts titles, optional notes, tags, and help copy duplicated on data-test-tooltip-text.
+   * - Hovers the first help icon once and asserts the live overlay with selectorList.quasarTooltip (retries hover + dismiss with expect().toPass because Quasar portaled tooltips are timing-sensitive under Electron); other rows skip hover.
+   * - After each tab switch, unions data-test-setting-id from the active panel so the combined set matches I_faUserSettings keys exactly (Quasar mounts one panel at a time here).
+   * - globalFunctionality.faUserSettings only covers save toasts, not these labels.
+   */
+  test('Program settings dialog matches en-US category, subcategory, and setting copy on every tab', async () => {
+    test.setTimeout(120_000)
+
+    const expectedTree = buildExpectedProgramSettingsTreeFromEnUsMessages()
+
+    const title = appWindow.locator(`[data-test-locator="${selectorList.title}"]`)
+    await expect(title).toHaveCount(1)
+
+    const dialogRoot = appWindow.locator(`.${selectorList.dialogProgramSettingsRootClass}`)
+
+    /**
+     * Flag to track if the first setting tooltip has been verified via hover
+     */
+    let verifiedFirstSettingTooltipViaHover = false
+
+    const settingIdsSeenAcrossTabs = new Set<string>()
+
+    for (const categoryKey of Object.keys(expectedTree)) {
+      const category = expectedTree[categoryKey]
+      const tab = appWindow.locator(`[data-test-locator="${programSettingsSelector.tab(categoryKey)}"]`)
+      await expect(tab).toHaveCount(1)
+      await tab.click()
+      await appWindow.waitForTimeout(550)
+
+      const batchIdsRaw = await dialogRoot.locator(`[${selectorList.settingIdAttribute}]`).evaluateAll(
+        (elements: HTMLElement[], attributeName: string) =>
+          elements.map((element) => element.getAttribute(attributeName)),
+        selectorList.settingIdAttribute
+      )
+      for (const rawId of batchIdsRaw) {
+        if (rawId !== null && rawId !== '') {
+          settingIdsSeenAcrossTabs.add(rawId)
+        }
+      }
+
+      const categorySection = appWindow.locator(
+        `[data-test-locator="${programSettingsSelector.category(categoryKey)}"]`
+      )
+      await expect(categorySection).toBeVisible()
+      await expect(
+        categorySection.locator(`[data-test-locator="${selectorList.categoryTitle}"]`)
+      ).toHaveText(category.title)
+
+      for (const [subCategoryKey, subCategory] of Object.entries(category.subCategories)) {
+        const subSection = categorySection.locator(
+          `[data-test-locator="${programSettingsSelector.subcategory(categoryKey, subCategoryKey)}"]`
+        )
+        await expect(
+          subSection.locator(`[data-test-locator="${selectorList.subcategoryTitle}"]`)
+        ).toHaveText(subCategory.title)
+
+        for (const [settingKey, setting] of Object.entries(subCategory.settingsList)) {
+          const settingRoot = appWindow.locator(
+            `[data-test-locator="${programSettingsSelector.setting(settingKey)}"]`
+          )
+          await expect(settingRoot).toHaveCount(1)
+          await expect(settingRoot).toHaveAttribute(selectorList.settingIdAttribute, settingKey)
+          await expect(settingRoot).toHaveAttribute('data-test-tags', setting.tags)
+          await expect(
+            settingRoot.locator(`[data-test-locator="${selectorList.settingLabel}"]`)
+          ).toHaveText(setting.title)
+
+          if (setting.note !== undefined && setting.note !== '') {
+            await expect(
+              settingRoot.locator(`[data-test-locator="${selectorList.settingNote}"]`)
+            ).toHaveText(setting.note)
+          } else {
+            await expect(
+              settingRoot.locator(`[data-test-locator="${selectorList.settingNote}"]`)
+            ).toHaveCount(0)
+          }
+
+          const helpIcon = settingRoot.locator(`[${selectorList.settingHelpTooltipTextHook}]`)
+          await expect(helpIcon).toHaveCount(1)
+          await expect(helpIcon).toHaveAttribute(
+            selectorList.settingHelpTooltipTextHook,
+            setting.description
+          )
+
+          if (!verifiedFirstSettingTooltipViaHover) {
+            verifiedFirstSettingTooltipViaHover = true
+            await expect(async () => {
+              await appWindow.mouse.move(12, 12)
+              await appWindow.waitForTimeout(280)
+              await helpIcon.scrollIntoViewIfNeeded()
+              await helpIcon.hover({
+                force: true,
+                timeout: 10_000
+              })
+              await appWindow.waitForTimeout(programSettingsTooltipOpenDelayMs)
+              const liveTooltip = appWindow
+                .locator(selectorList.quasarTooltip)
+                .filter({ hasText: setting.description })
+                .last()
+              await expect(liveTooltip).toBeVisible({
+                timeout: 4000
+              })
+              await expect(liveTooltip).toHaveText(setting.description)
+            }).toPass({
+              timeout: programSettingsTooltipVisibleTimeoutMs
+            })
+          }
+
+          await categorySection.locator(`[data-test-locator="${selectorList.categoryTitle}"]`).hover({
+            force: true
+          })
+          await appWindow.waitForTimeout(200)
+        }
+      }
+    }
+
+    expect(settingIdsSeenAcrossTabs.size).toBe(expectedFaUserSettingKeysSorted.length)
+    const settingIdsSeenSorted = [...settingIdsSeenAcrossTabs].sort((keyA, keyB) =>
+      keyA.localeCompare(keyB)
+    )
+    expect(settingIdsSeenSorted).toEqual(
+      expectedFaUserSettingKeysSorted.map((key) => String(key))
+    )
+  })
+
+  /**
+   * Feed "ProgramSettings" input and check if dialog closes after Close click.
+   */
+  test('Open test "ProgramSettings" dialog and close it', async () => {
+    const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
+    const title = appWindow.locator(`[data-test-locator="${selectorList.title}"]`)
+
+    await expect(title).toHaveCount(1)
+    await expect(closeButton).toHaveCount(1)
+    await closeButton.click()
+
+    await appWindow.waitForTimeout(1500)
+
+    expect(await title.isHidden()).toBe(true)
+  })
+})
+
+const developerSettingsCategoryKey = 'developerSettings'
+const showDocumentIDSettingKey = 'showDocumentID'
+const postSaveSettingsWaitMs = 500
+const tabSwitchSettleMs = 550
+
+/**
+ * showDocumentID
+ * - Opens Developer Settings, asserts the toggle is off, turns it on, saves, waits, then reads persisted value through faUserSettings.getSettings() in the renderer.
+ */
+test.describe.serial('Program settings showDocumentID persists after Save', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
+
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: programSettingsDirectInput })
+    resetFaPlaywrightIsolatedUserData()
+    electronApp = await electron.launch({
+      env: extraEnvSettings,
+      args: [electronMainFilePath],
+      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    })
+    appWindow = await electronApp.firstWindow()
+    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
+    await appWindow.waitForTimeout(faFrontendRenderTimer)
+  })
+
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+  })
+
+  test('showDocumentID persists after Save; getSettings returns true over the IPC bridge', async () => {
     const devTab = appWindow.locator(
       `[data-test-locator="${programSettingsSelector.tab(developerSettingsCategoryKey)}"]`
     )
@@ -348,28 +330,37 @@ test.describe.serial('Program settings showDocumentID persistence and userData r
       return await window.faContentBridgeAPIs.faUserSettings.getSettings()
     })
     expect(settings.showDocumentID).toBe(true)
-
-    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
   })
+})
 
-  /**
-   * showDocumentID
-   * - After the prior test saved true to disk, test.beforeEach reset removes playwright-user-data so this run starts from defaults; Developer Settings toggle must be off.
-   */
-  test('showDocumentID toggle is off on a fresh profile after Playwright userData reset', async ({}, testInfo) => {
-    const testString: T_dialogName = 'ProgramSettings'
-    extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: testString })
+/**
+ * showDocumentID
+ * - After resetFaPlaywrightIsolatedUserData before launch, Developer Settings toggle must match defaults (off).
+ */
+test.describe.serial('Program settings showDocumentID defaults on fresh userData', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
 
-    const electronApp = await electron.launch({
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: programSettingsDirectInput })
+    resetFaPlaywrightIsolatedUserData()
+    electronApp = await electron.launch({
       env: extraEnvSettings,
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
-
-    const appWindow = await electronApp.firstWindow()
+    appWindow = await electronApp.firstWindow()
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
+  })
 
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+  })
+
+  test('showDocumentID toggle is off on a fresh profile after Playwright userData reset', async () => {
     const devTab = appWindow.locator(
       `[data-test-locator="${programSettingsSelector.tab(developerSettingsCategoryKey)}"]`
     )
@@ -385,7 +376,5 @@ test.describe.serial('Program settings showDocumentID persistence and userData r
     const toggle = settingRoot.getByRole('switch')
     await expect(toggle).toBeVisible()
     await expect(toggle).toHaveAttribute('aria-checked', 'false')
-
-    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)
   })
 })
