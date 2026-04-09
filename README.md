@@ -202,6 +202,8 @@ Run ESLint, the TypeScript project check (`vue-tsc`, includes `.vue` SFCs), Styl
 yarn testbatch:verify
 ```
 
+**Changelog-only commits:** If you are committing **only** edits to per-locale in-app changelog files **`i18n/*/documents/changeLog.md`** (for example **`i18n/en-US/documents/changeLog.md`** and **`i18n/fr/documents/changeLog.md`**) **after** you already ran **`yarn testbatch:verify`** successfully on the substantive work and nothing else is dirty, you may skip running the gate again right before that commit. If the situation is **uncertain** (mixed files, unclear history), run **`yarn testbatch:verify`** anyway. See [`.cursor/rules/testing-terminal-isolation.mdc`](.cursor/rules/testing-terminal-isolation.mdc) and [`.cursor/rules/git-conventional-commits.mdc`](.cursor/rules/git-conventional-commits.mdc).
+
 For debugging a single step, run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit` (no coverage), or `yarn test:coverage:verify` / `yarn test:coverage:electron` / `yarn test:coverage:helpers` / `yarn test:coverage:i18n` / `yarn test:coverage:src` on its own, then run `yarn testbatch:verify` again before committing. Do not append `yarn quasar:build:electron`, Playwright, or Storybook smoke/visual commands to the same shell line as `yarn testbatch:verify` unless you intentionally run **`yarn testbatch:ensure:nochange`** or **`yarn testbatch:ensure:change`**.
 
 On **Yarn 1.x**, `yarn check` is a different built-in (dependency-tree validation); use **`yarn testbatch:verify`** for this gate.

@@ -17,7 +17,9 @@ Equivalent explicit chain (for context or copy-paste without the script): `yarn 
 
 For a **faster** unit pass without coverage instrumentation, run **`yarn test:unit`** (Vitest workspace: electron, **`src`** TS, helpers, **`i18n`**, components) while iterating; finish with **`yarn testbatch:verify`** before commits.
 
-**Exception**: if you are **debugging** a specific failing step, run that command **alone** (and any narrower follow-ups) until it passes, then re-run the full chained gate before commit or changelog edits.
+**Changelog-only exception**: If the **only** files you are about to commit are locale changelog Markdown under **`i18n/*/documents/changeLog.md`** (for example **`i18n/en-US/documents/changeLog.md`** and **`i18n/fr/documents/changeLog.md`**) and **`yarn testbatch:verify` already passed** after your last substantive code or product edits with **no other uncommitted changes** since then, you may **skip** running **`yarn testbatch:verify`** again immediately before that changelog commit. If anything is **uncertain** (mixed edits, parallel work, or you are not sure the gate ran on the current tree), run **`yarn testbatch:verify`** anyway.
+
+**Exception**: if you are **debugging** a specific failing step, run that command **alone** (and any narrower follow-ups) until it passes, then re-run the full chained gate before commit or changelog edits (unless the **changelog-only** exception above applies).
 
 By default, do not extend this chain with `yarn quasar:build:electron`, Playwright, or Storybook.
 

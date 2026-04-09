@@ -13,10 +13,9 @@ description: >-
 ## Files
 
 - **Changelog (Markdown)**: [changeLog.md](i18n/en-US/documents/changeLog.md) — shown in-app via i18n `documents.changeLog`.
+- **Translations**: other locales may ship the same document path (for example [i18n/fr/documents/changeLog.md](i18n/fr/documents/changeLog.md)); mirror structure and version headings with the active locale’s prose.
 - **Canonical semver**: [package.json](package.json) field **`version`** (e.g. `2.1.0`).
 - **Planning context**: local `.cursor/plans/` files, especially those matching the current package version in filename or metadata.
-
-Only this English document exists today; if other locales add a changelog later, mirror the same structure.
 
 ## When to update
 
@@ -44,8 +43,8 @@ When you **do** document a dependency refresh, describe **what** was refreshed (
 
 Before editing `changeLog.md` for new work, keep this order ([`testing-terminal-isolation.mdc`](../../rules/testing-terminal-isolation.mdc)):
 
-1. Run the **quality gate** in one terminal: `yarn testbatch:verify` (run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, or `yarn test:coverage:verify` / per-slice `yarn test:coverage:*` scripts individually only while debugging a failure). Layered Vitest coverage rules: [vitest-tests.mdc](../../rules/vitest-tests.mdc).
-2. For affected user-facing **`src/components/**`**, verify Storybook updates are complete (`tests/*.stories.ts`, relevant mocks/placeholders) and Storybook starts cleanly (**`yarn storybook:run`**). Layout/page Storybook previews do not require Docs/autodocs ([`storybook-stories.mdc`](../../rules/storybook-stories.mdc)).
+1. Run the **quality gate** in one terminal: `yarn testbatch:verify` (run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, or `yarn test:coverage:verify` / per-slice `yarn test:coverage:*` scripts individually only while debugging a failure). Layered Vitest coverage rules: [vitest-tests.mdc](../../rules/vitest-tests.mdc). **Follow-up commit that touches only** **`i18n/*/documents/changeLog.md`**: you may **skip** re-running **`yarn testbatch:verify`** if it **already passed** after the substantive edits and the working tree is otherwise unchanged; if **uncertain**, run the gate anyway.
+2. For affected user-facing **`src/components/**`**, verify Storybook updates are complete (`tests/*.stories.ts`, relevant mocks/placeholders) and Storybook starts cleanly (**`yarn storybook:run`**). Layout/page Storybook previews do not require Docs/autodocs ([`storybook-stories.mdc`](../../rules/storybook-stories.mdc)). **Skip** when you are only adjusting **`documents/changeLog.md`** files after prior verified work, as in step 1.
 3. Then draft/update changelog entries.
 
 ## Plan-context check (required before drafting notes)
