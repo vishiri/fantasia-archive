@@ -2,7 +2,10 @@ import { _electron as electron } from 'playwright'
 import type { ElectronApplication, Page } from 'playwright'
 import { test, expect } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
-import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
+import {
+  FA_ELECTRON_MAIN_JS_PATH,
+  FA_FRONTEND_RENDER_TIMER
+} from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
   getFaPlaywrightElectronRecordVideoPartial,
@@ -24,13 +27,13 @@ const extraEnvSettings = {
 /**
  * Electron main filepath
  */
-const electronMainFilePath:string = extraEnvVariablesAPI.ELECTRON_MAIN_FILEPATH
+const electronMainFilePath:string = FA_ELECTRON_MAIN_JS_PATH
 
 /**
  * Buffer before assertions so the component-testing shell finishes rendering.
  * - Tune this constant only when this spec needs a different wait.
  */
-const faFrontendRenderTimer = extraEnvVariablesAPI.FA_FRONTEND_RENDER_TIMER
+const faFrontendRenderTimer = FA_FRONTEND_RENDER_TIMER
 
 /**
  * Object of string data selectors for the component

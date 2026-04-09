@@ -1,6 +1,8 @@
 import { mainWindowCreation } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
 import { registerFaAppDetailsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaAppDetailsIpc'
 import { registerFaDevToolsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaDevToolsIpc'
+import { registerFaExtraEnvIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaExtraEnvIpc'
+import { registerFaExternalLinksIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaExternalLinksIpc'
 import { registerFaUserSettingsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaUserSettingsIpc'
 import { registerFaWindowControlIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
 import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
@@ -9,6 +11,8 @@ import { app } from 'electron'
 // Starts the app's Electron instance
 export const startApp = () => {
   registerFaDevToolsIpc()
+  registerFaExtraEnvIpc()
+  registerFaExternalLinksIpc()
   registerFaUserSettingsIpc()
   registerFaWindowControlIpc()
   registerFaAppDetailsIpc()

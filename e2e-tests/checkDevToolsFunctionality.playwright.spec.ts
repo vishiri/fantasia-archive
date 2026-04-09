@@ -2,7 +2,7 @@ import { _electron as electron } from 'playwright'
 import type { ElectronApplication, Page } from 'playwright'
 import { test, expect } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
-import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
+import { FA_ELECTRON_MAIN_JS_PATH } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
   getFaPlaywrightElectronRecordVideoPartial,
@@ -20,7 +20,7 @@ const extraEnvSettings = {
 /**
  * Electron main filepath
  */
-const electronMainFilePath:string = extraEnvVariablesAPI.ELECTRON_MAIN_FILEPATH
+const electronMainFilePath:string = FA_ELECTRON_MAIN_JS_PATH
 
 /**
  * Buffer before assertions so the window and menus are ready.

@@ -6,6 +6,8 @@ const {
   mainWindowCreationMock,
   registerFaAppDetailsIpcMock,
   registerFaDevToolsIpcMock,
+  registerFaExtraEnvIpcMock,
+  registerFaExternalLinksIpcMock,
   registerFaUserSettingsIpcMock,
   registerFaWindowControlIpcMock,
   appMock,
@@ -17,6 +19,8 @@ const {
     mainWindowCreationMock: vi.fn(),
     registerFaAppDetailsIpcMock: vi.fn(),
     registerFaDevToolsIpcMock: vi.fn(),
+    registerFaExtraEnvIpcMock: vi.fn(),
+    registerFaExternalLinksIpcMock: vi.fn(),
     registerFaUserSettingsIpcMock: vi.fn(),
     registerFaWindowControlIpcMock: vi.fn(),
     appOnHandlers: handlers,
@@ -39,6 +43,18 @@ vi.mock('app/src-electron/mainScripts/windowManagement/mainWindowCreation', () =
 vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaDevToolsIpc', () => {
   return {
     registerFaDevToolsIpc: registerFaDevToolsIpcMock
+  }
+})
+
+vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaExtraEnvIpc', () => {
+  return {
+    registerFaExtraEnvIpc: registerFaExtraEnvIpcMock
+  }
+})
+
+vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaExternalLinksIpc', () => {
+  return {
+    registerFaExternalLinksIpc: registerFaExternalLinksIpcMock
   }
 })
 
@@ -81,6 +97,8 @@ beforeEach(() => {
   mainWindowCreationMock.mockReset()
   registerFaAppDetailsIpcMock.mockReset()
   registerFaDevToolsIpcMock.mockReset()
+  registerFaExtraEnvIpcMock.mockReset()
+  registerFaExternalLinksIpcMock.mockReset()
   registerFaUserSettingsIpcMock.mockReset()
   registerFaWindowControlIpcMock.mockReset()
   appMock.whenReady.mockClear()
@@ -98,6 +116,8 @@ beforeEach(() => {
 test('Test that the electron app properly starts', () => {
   startApp()
   expect(registerFaDevToolsIpcMock).toHaveBeenCalledOnce()
+  expect(registerFaExtraEnvIpcMock).toHaveBeenCalledOnce()
+  expect(registerFaExternalLinksIpcMock).toHaveBeenCalledOnce()
   expect(registerFaUserSettingsIpcMock).toHaveBeenCalledOnce()
   expect(registerFaWindowControlIpcMock).toHaveBeenCalledOnce()
   expect(registerFaAppDetailsIpcMock).toHaveBeenCalledOnce()

@@ -31,3 +31,13 @@ export const FA_WINDOW_CONTROL_IPC = {
 export const FA_APP_DETAILS_IPC = {
   getVersionSync: 'fa-app-details-get-version-sync'
 } as const
+
+/** Harness and path snapshot (sync): preload uses 'ipcRenderer.sendSync'; main uses 'ipcMain.on' with 'returnValue'. */
+export const FA_EXTRA_ENV_IPC = {
+  snapshotSync: 'fa-extra-env-snapshot-sync'
+} as const
+
+/** Open external URLs in the system browser (async): preload uses 'ipcRenderer.invoke'; main uses 'ipcMain.handle'. */
+export const FA_EXTERNAL_LINKS_IPC = {
+  openExternalAsync: 'fa-external-links-open-external-async'
+} as const

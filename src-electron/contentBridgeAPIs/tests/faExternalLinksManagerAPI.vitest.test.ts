@@ -1,16 +1,19 @@
 import { test, expect, vi } from 'vitest'
+
+import { FA_EXTERNAL_LINKS_IPC } from 'app/src-electron/electron-ipc-bridge'
+
 import { faExternalLinksManagerAPI } from '../faExternalLinksManagerAPI'
 
-const { openExternalMock } = vi.hoisted(() => {
+const { invokeMock } = vi.hoisted(() => {
   return {
-    openExternalMock: vi.fn()
+    invokeMock: vi.fn(() => Promise.resolve())
   }
 })
 
 vi.mock('electron', () => {
   return {
-    shell: {
-      openExternal: openExternalMock
+    ipcRenderer: {
+      invoke: invokeMock
     }
   }
 })
@@ -92,10 +95,26 @@ test('Test that empty string is not treated as external', () => {
 
 /**
  * openExternal
- * Test if opening external links calls electron shell API.
+ * Delegates to ipcRenderer.invoke with external-links channel.
  */
-test('Test if opening external links works', () => {
+test('Test if opening external links invokes main IPC', async () => {
   const testInput = 'https://www.google.com'
   faExternalLinksManagerAPI.openExternal(testInput)
-  expect(openExternalMock).toHaveBeenCalledWith(testInput)
+
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_EXTERNAL_LINKS_IPC.openExternalAsync,
+    testInput
+  )
+})
+
+/**
+ * openExternal
+ * Swallows invoke rejection so the renderer never sees an unhandled rejection.
+ */
+test('Test that openExternal ignores invoke rejection', async () => {
+  invokeMock.mockRejectedValueOnce(new Error('ipc failed'))
+  faExternalLinksManagerAPI.openExternal('https://www.example.com/')
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(invokeMock).toHaveBeenCalled()
 })

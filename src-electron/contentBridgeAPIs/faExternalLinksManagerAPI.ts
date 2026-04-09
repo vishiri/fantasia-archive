@@ -1,20 +1,17 @@
-import { shell } from 'electron'
+import { ipcRenderer } from 'electron'
 
+import { FA_EXTERNAL_LINKS_IPC } from 'app/src-electron/electron-ipc-bridge'
+import { checkIfExternalUrl } from 'app/src-electron/shared/faExternalUrlPredicate'
 import type { I_faExternalLinksManagerAPI } from 'app/types/I_faExternalLinksManagerAPI'
 
 export const faExternalLinksManagerAPI: I_faExternalLinksManagerAPI = {
 
-  // Check if the URL is external
   checkIfExternal (url: string) {
-    return (
-      (url.includes('http://') || url.includes('https://')) &&
-      !url.includes('localhost')
-    )
+    return checkIfExternalUrl(url)
   },
 
-  // Open the external URL in the default browser of the user
   openExternal (url: string) {
-    shell.openExternal(url)
+    void ipcRenderer.invoke(FA_EXTERNAL_LINKS_IPC.openExternalAsync, url).catch(() => {})
   }
 
 }

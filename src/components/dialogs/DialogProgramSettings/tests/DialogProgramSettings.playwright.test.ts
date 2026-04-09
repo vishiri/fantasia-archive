@@ -2,7 +2,10 @@ import { _electron as electron } from 'playwright'
 import type { ElectronApplication, Page } from 'playwright'
 import { test, expect } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
-import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'
+import {
+  FA_ELECTRON_MAIN_JS_PATH,
+  FA_FRONTEND_RENDER_TIMER
+} from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
   getFaPlaywrightElectronRecordVideoPartial,
@@ -28,13 +31,13 @@ const extraEnvSettings = {
 /**
  * Electron main filepath
  */
-const electronMainFilePath:string = extraEnvVariablesAPI.ELECTRON_MAIN_FILEPATH
+const electronMainFilePath:string = FA_ELECTRON_MAIN_JS_PATH
 
 /**
  * Buffer so the component-testing shell finishes rendering before assertions.
  * - Tune this constant only when this spec needs a different wait.
  */
-const faFrontendRenderTimer:number = extraEnvVariablesAPI.FA_FRONTEND_RENDER_TIMER
+const faFrontendRenderTimer:number = FA_FRONTEND_RENDER_TIMER
 
 /**
  * q-tooltip open delay on the help icon is 500ms; allow extra slack for Electron, dialog layout, and tab-panel paint.

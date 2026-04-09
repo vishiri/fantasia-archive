@@ -35,6 +35,7 @@ description: >-
 
 - Prefer **narrow, explicit** methods on the bridge object over passing raw Node/Electron objects to the renderer.
 - Do not enable broad `nodeIntegration` in the renderer to “just make it work”; keep privileged code in main or preload as appropriate.
+- Sandboxed preload cannot rely on arbitrary Node modules or `electron` APIs such as `shell`; use IPC to main (`registerFaExtraEnvIpc`, `registerFaExternalLinksIpc`, and the existing sync groups) instead of importing packages like `app-root-path` in `contentBridgeAPIs/`.
 - Privileged window and app-metadata calls go through sync IPC (`faWindowControlAPI`, `appDetailsAPI`); do not reintroduce `@electron/remote` without a documented reason.
 
 ## Related skills

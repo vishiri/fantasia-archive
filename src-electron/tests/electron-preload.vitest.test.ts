@@ -1,8 +1,16 @@
 import { vi, expect, test } from 'vitest'
 
-const { exposeInMainWorldMock } = vi.hoisted(() => {
+const { exposeInMainWorldMock, sendSyncMock, invokeMock } = vi.hoisted(() => {
   return {
-    exposeInMainWorldMock: vi.fn()
+    exposeInMainWorldMock: vi.fn(),
+    invokeMock: vi.fn(() => Promise.resolve()),
+    sendSyncMock: vi.fn(() => ({
+      COMPONENT_NAME: false,
+      COMPONENT_PROPS: false,
+      ELECTRON_MAIN_FILEPATH: '/preload-test/electron-main.js',
+      FA_FRONTEND_RENDER_TIMER: 3000,
+      TEST_ENV: false
+    }))
   }
 })
 
@@ -12,18 +20,9 @@ vi.mock('electron', () => {
       exposeInMainWorld: exposeInMainWorldMock
     },
     ipcRenderer: {
-      invoke: vi.fn(),
-      sendSync: vi.fn()
-    },
-    shell: {
-      openExternal: vi.fn()
+      invoke: invokeMock,
+      sendSync: sendSyncMock
     }
-  }
-})
-
-vi.mock('app-root-path', () => {
-  return {
-    default: '/electron-preload-test-root'
   }
 })
 

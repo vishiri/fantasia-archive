@@ -75,10 +75,16 @@ export const mainWindowCreation = async () => {
     show: false,
     center: true,
     icon: path.resolve(currentDir, '../icons/icon.png'),
+    /*
+     * Chromium OS sandbox is on; privileged work stays in main. Preload uses only 'ipcRenderer' and
+     * 'contextBridge' (see 'contentBridgeAPIs/'); paths and 'shell.openExternal' use IPC from
+     * 'registerFaExtraEnvIpc' and 'registerFaExternalLinksIpc'.
+     */
     webPreferences: {
-      sandbox: false,
       contextIsolation: true,
-      preload: resolvePreloadPath()
+      nodeIntegration: false,
+      preload: resolvePreloadPath(),
+      sandbox: true
     }
   })
 

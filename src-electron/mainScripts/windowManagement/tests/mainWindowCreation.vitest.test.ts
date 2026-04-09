@@ -174,10 +174,18 @@ test('Test that the main window is created successfully', async () => {
 
   expect(BrowserWindowMock).toHaveBeenCalledOnce()
   expect(BrowserWindowMock.mock.calls[0][0]).toMatchObject({
-    width: 1920,
-    height: 1080,
     frame: false,
-    show: false
+    height: 1080,
+    show: false,
+    width: 1920
+  })
+  expect(
+    (BrowserWindowMock.mock.calls[0][0] as { webPreferences: Record<string, unknown> })
+      .webPreferences
+  ).toMatchObject({
+    contextIsolation: true,
+    nodeIntegration: false,
+    sandbox: true
   })
   expect(browserWindowInstance.setMenu).toHaveBeenCalledWith(null)
   expect(browserWindowInstance.loadURL).toHaveBeenCalledWith('http://localhost:9000')

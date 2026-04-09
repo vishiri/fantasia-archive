@@ -27,8 +27,8 @@ export interface I_extraEnvVariablesAPI {
   COMPONENT_NAME?: string | false
 
   /**
-   * Component props, assuming they have any.
+   * Component props, assuming they have any (parsed JSON from COMPONENT_PROPS env in main).
    */
-  COMPONENT_PROPS?: string | false
+  COMPONENT_PROPS?: Record<string, unknown> | false
 
 }
