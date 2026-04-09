@@ -18,9 +18,11 @@ JSDoc above tests and line comments in these files: follow AGENTS.md code-commen
 
 - Node-only harness code under **`helpers/`** (e.g. **`helpers/playwrightHelpers/`**, and future sibling packages) is covered by **`*.vitest.test.ts`** in each package’s **`tests/`** tree; **`yarn test:unit`** runs them as Vitest **`unit-helpers`** via [vitest.helpers.config.mts](vitest/vitest.helpers.config.mts) (file lives in repo-root **`vitest/`**, not inside **`helpers/`**). Add or extend those Vitest files when you change helper logic (env switches, temp dirs, IPC-adjacent helpers). Follow [vitest-tests.mdc](vitest-tests.mdc) for structure, comments, and **100%** **`helpers`** coverage expectations.
 
-## Isolated `userData` reset (every spec)
+## Isolated `userData` reset (per serial suite)
 
-- After the standard imports (see below), import **`resetFaPlaywrightIsolatedUserData`** from **`app/helpers/playwrightHelpers/playwrightUserDataReset`** and register **`test.beforeEach(() => { resetFaPlaywrightIsolatedUserData() })`** once per file. That removes the entire **`playwright-user-data`** directory (including **`faUserSettings.json`** and Chromium profile files) before each test so **`electron.launch`** always starts from a clean persisted profile. Path resolution matches **`appIdentity/fixAppName`** / Electron **`app.getPath('appData')`**; the folder segment is **`PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME`** in [playwrightIsolatedUserDataDirName.ts](src-electron/mainScripts/appIdentity/playwrightIsolatedUserDataDirName.ts). **Do not** import **`fixAppName`** from Node-side Playwright helpers—it imports **`electron`** and breaks test discovery; see [helpers/playwrightHelpers/playwrightUserDataReset.ts](helpers/playwrightHelpers/playwrightUserDataReset.ts). Shared Playwright harness modules live under **`helpers/playwrightHelpers/`**; add new cross-cutting helper packages as siblings under **`helpers/`**—keep the repo root for config, **`README`**, lockfiles, and **`scripts/`**.
+- Import **`resetFaPlaywrightIsolatedUserData`** from **`app/helpers/playwrightHelpers/playwrightUserDataReset`**. Call it in **`test.beforeAll`** for each **`test.describe.serial`** group **before** **`electron.launch`**, not in **`test.beforeEach`**, when that group shares one **`ElectronApplication`** for the whole describe: **`beforeEach`** would wipe **`playwright-user-data`** on disk while Electron still holds the old profile and the process would diverge from disk.
+- When a file needs **multiple** serial groups (different **`COMPONENT_PROPS`** or separate sessions), each group’s **`beforeAll`** runs **`resetFaPlaywrightIsolatedUserData()`** then launches; **`afterAll`** closes with **`closeFaElectronAppWithRecordedVideoAttachments`**.
+- Path resolution matches **`appIdentity/fixAppName`** / Electron **`app.getPath('appData')`**; the folder segment is **`PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME`** in [playwrightIsolatedUserDataDirName.ts](src-electron/mainScripts/appIdentity/playwrightIsolatedUserDataDirName.ts). **Do not** import **`fixAppName`** from Node-side Playwright helpers—it imports **`electron`** and breaks test discovery; see [helpers/playwrightHelpers/playwrightUserDataReset.ts](helpers/playwrightHelpers/playwrightUserDataReset.ts). Shared Playwright harness modules live under **`helpers/playwrightHelpers/`**; add new cross-cutting helper packages as siblings under **`helpers/`**—keep the repo root for config, **`README`**, lockfiles, and **`scripts/`**.
 
 ## HTML report and screen recordings
 
@@ -43,11 +45,13 @@ Primary locators use **`data-test-locator`**; additional hooks (for example `dat
 ## Import order (top of file)
 
 1. `import { _electron as electron } from 'playwright'`
-2. `import { test, expect } from '@playwright/test'`
-3. `import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'`
-4. `closeFaElectronAppWithRecordedVideoAttachments` and `getFaPlaywrightElectronRecordVideoPartial` from `'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'` (after `extraEnvVariablesAPI`)
-5. `import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'` then **`test.beforeEach(() => { resetFaPlaywrightIsolatedUserData() })`** (see **Isolated `userData` reset** above); keep **`resetFaPlaywrightIsolatedUserData`** next to other **`app/`** imports (ESLint may reorder `import type` lines after value imports).
-6. Optional: types from `app/types/...`, production **`_data/`** when the spec must stay aligned with runtime (prefer a small parallel module over importing heavy feeds), shared helpers from `src/scripts/_utilities/...` (e.g. [AppControlSingleMenu.playwright.test.ts](src/components/globals/AppControlSingleMenu/tests/AppControlSingleMenu.playwright.test.ts))
+2. `import type { ElectronApplication, Page } from 'playwright'` when the spec uses suite-scoped **`let electronApp`** / **`let appWindow`**
+3. `import { test, expect } from '@playwright/test'`
+4. `import type { TestInfo } from '@playwright/test'` when **`test.beforeAll(async ({}, testInfo) => { ... })`** stores suite **`TestInfo`** for video teardown
+5. `import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEnvVariablesAPI'`
+6. `closeFaElectronAppWithRecordedVideoAttachments` and `getFaPlaywrightElectronRecordVideoPartial` from `'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'` (after `extraEnvVariablesAPI`)
+7. `import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'` (use inside **`beforeAll`** per serial group; see **Isolated `userData` reset** above); keep next to other **`app/`** imports (ESLint may reorder `import type` lines after value imports).
+8. Optional: types from `app/types/...`, production **`_data/`** when the spec must stay aligned with runtime (prefer a small parallel module over importing heavy feeds), shared helpers from `src/scripts/_utilities/...` (e.g. [AppControlSingleMenu.playwright.test.ts](src/components/globals/AppControlSingleMenu/tests/AppControlSingleMenu.playwright.test.ts))
 
 ## File header — documented constants
 
@@ -67,19 +71,25 @@ Repeat this structure in **every** Playwright file (see [GlobalWindowButtons.pla
 
 6. **Inline fixture objects** (when needed) — typed `const` payloads (menus, props, key lists) used in assertions and in `JSON.stringify` for `COMPONENT_PROPS`, declared **in the same Playwright file** before `extraEnvSettings` or beside the test that mutates props.
 
-## Each `test(...)`
+## Serial suites (`test.describe.serial`) and each `test(...)`
+
+- Group related cases under **`test.describe.serial(...)`** so **one** **`electron.launch`** per group runs in **`test.beforeAll`**, **`firstWindow`**, **`installFaPlaywrightCursorMarkerIfVideoEnabled`**, and **`waitForTimeout(faFrontendRenderTimer)`** once. Store **`let electronApp: ElectronApplication`**, **`let appWindow: Page`**, **`let suiteTestInfo: TestInfo`**; in **`beforeAll`**, assign **`suiteTestInfo = testInfo`**, call **`resetFaPlaywrightIsolatedUserData()`**, then launch with **`...getFaPlaywrightElectronRecordVideoPartial(testInfo)`**. In **`afterAll`**, use **`test.afterAll(async ({}, afterAllTestInfo) => { await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo) })`** so WebM attachments show under the suite’s **last** test in the HTML report when the group has **more than one** test. Individual tests use **`async () => { ... }`** and the shared **`appWindow`** (no per-test **`testInfo`** unless you attach something test-scoped).
+- **Video**: Pass **`suiteTestInfo`** ( **`beforeAll`** ) as the queue key and **`afterAll`’s** **`TestInfo`** as the third argument so **`recordVideo`** temp dirs dequeue correctly and **`testInfo.attach`** targets a reporter-visible scope (see [playwrightElectronRecordVideo.ts](helpers/playwrightHelpers/playwrightElectronRecordVideo.ts)).
+- **Do not** use **`test.describe.parallel`** for root **`playwright.config.ts`** Electron specs unless the user explicitly requests it. Config already sets **`workers: 1`** and **`fullyParallel: false`**.
+- **`test.describe.serial.only`** is for **temporary local focus** only; **do not commit** **`.only`** to the default branch.
+- **Multiple env snapshots** (e.g. different **`COMPONENT_PROPS`** per [FantasiaMascotImage.playwright.test.ts](src/components/elements/FantasiaMascotImage/tests/FantasiaMascotImage.playwright.test.ts)): use **separate** top-level **`test.describe.serial`** blocks, each with its own **`beforeAll` / `afterAll`**.
+- **UI state between tests**: Order tests so later steps match app state (e.g. dialog **close** last if later tests need an **open** dialog). For Quasar menus that toggle on repeated wrapper clicks, dismiss open panels between tests if needed (see **`dismissOpenMenus`** in [AppControlSingleMenu.playwright.test.ts](src/components/globals/AppControlSingleMenu/tests/AppControlSingleMenu.playwright.test.ts)).
+
+Each **`test(...)`** inside a serial suite:
 
 - Precede with a **JSDoc block** describing behavior: a short baseline line (full sentence), then optional ` * - ` detail bullets. Do not wrap one long paragraph across lines mid-sentence; there is no comment line-length limit (see [AGENTS.md](../../AGENTS.md) code comments).
 - **Title**: readable sentence (often starts with `Check if ...`, `Test if ...`, `Click ...`, `Open ...`).
-- **Body pattern**:
-  1. Optionally mutate `extraEnvSettings` (e.g. `COMPONENT_PROPS`) before launch — [FantasiaMascotImage.playwright.test.ts](src/components/elements/FantasiaMascotImage/tests/FantasiaMascotImage.playwright.test.ts).
-  2. Top-level `test(...)` callback must take `({}, testInfo)` (object destructuring is required by Playwright) so recordings can use `testInfo`. `const electronApp = await electron.launch({ env: extraEnvSettings, args: [electronMainFilePath], ...getFaPlaywrightElectronRecordVideoPartial(testInfo) })` — import `getFaPlaywrightElectronRecordVideoPartial` from `'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'` (after `extraEnvVariablesAPI`); raw `recordVideo` files are written under an OS temp dir, then `closeFaElectronAppWithRecordedVideoAttachments` attaches them (Playwright copies into `test-results/playwright-artifacts/.../attachments/`) and deletes the temp dir. The HTML reporter then copies bytes into `test-results/playwright-report/data/`; root `package.json` Playwright scripts run `scripts/playwrightWithArtifactTrim.mjs` afterward to remove `test-results/playwright-artifacts` so only report `data/` remains on disk. **1920×1080** (`recordVideo.size`) unless `FA_PLAYWRIGHT_NO_VIDEO` is `'1'` or `'true'`. Each `electron.launch` must use its own `getFaPlaywrightElectronRecordVideoPartial(testInfo)` call (optional second argument is reserved, unused). Nested callbacks (e.g. `expect.poll`) keep `async () => { ... }` — do not add `testInfo` there.
-  3. `const appWindow = await electronApp.firstWindow()` then `await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)` (from [helpers/playwrightHelpers/playwrightElectronRecordVideo.ts](helpers/playwrightHelpers/playwrightElectronRecordVideo.ts); no-op when video is off)
-  4. `await appWindow.waitForTimeout(faFrontendRenderTimer)` (or 0 / other agreed wait)
-  5. `// Prepare the ... locator` — use `appWindow.locator` with a template string and `selectorList` values (same pattern as [GlobalWindowButtons.playwright.test.ts](src/components/globals/GlobalWindowButtons/tests/GlobalWindowButtons.playwright.test.ts)), or `getByText` with `selectorList` entries ([checkDevToolsFunctionality.playwright.spec.ts](e2e-tests/checkDevToolsFunctionality.playwright.spec.ts))
-  6. `// Check if ...` — `await expect(...).toHaveCount(1)` or equivalent
-  7. Interactions, `waitForTimeout` for animations (often `600` ms for menus), `appWindow.evaluate` for `window.faContentBridgeAPIs...` when needed
-  8. `// Close the app` then `await closeFaElectronAppWithRecordedVideoAttachments(electronApp, testInfo)` — closes Electron, then attaches `.webm` files under `testInfo.outputDir` so the HTML report shows video links (including early returns after failure paths — [checkAppSplashScreen.playwright.spec.ts](e2e-tests/checkAppSplashScreen.playwright.spec.ts))
+- **Body pattern** (inside the suite, using shared **`appWindow`**):
+  1. `// Prepare the ... locator` — use `appWindow.locator` with a template string and `selectorList` values (same pattern as [GlobalWindowButtons.playwright.test.ts](src/components/globals/GlobalWindowButtons/tests/GlobalWindowButtons.playwright.test.ts)), or `getByText` with `selectorList` entries ([checkDevToolsFunctionality.playwright.spec.ts](e2e-tests/checkDevToolsFunctionality.playwright.spec.ts))
+  2. `// Check if ...` — `await expect(...).toHaveCount(1)` or equivalent
+  3. Interactions, `waitForTimeout` for animations (often `600` ms for menus), `appWindow.evaluate` for `window.faContentBridgeAPIs...` when needed
+- Nested callbacks (e.g. `expect.poll`) keep `async () => { ... }` — do not add `testInfo` there unless the callback is a Playwright hook that receives it.
+- **1920×1080** (`recordVideo.size`) unless `FA_PLAYWRIGHT_NO_VIDEO` is `'1'` or `'true'`. One **`getFaPlaywrightElectronRecordVideoPartial`** call per **`electron.launch`** (each serial group’s **`beforeAll`**).
 
 ## Locators
 
@@ -101,9 +111,17 @@ Repeat this structure in **every** Playwright file (see [GlobalWindowButtons.pla
 - Use `expect` (non-async) for plain values from `evaluate` when the codebase does ([GlobalWindowButtons.playwright.test.ts](src/components/globals/GlobalWindowButtons/tests/GlobalWindowButtons.playwright.test.ts) — note existing mix of `await expect` vs `expect` on locators; **follow the immediate surrounding file** for new tests in that folder).
 - Avoid `any` in selector maps, test fixtures, and helper signatures; prefer explicit interfaces/types and `unknown` plus narrowing for untyped Playwright values.
 
+## Layout size (width and height)
+
+- **Rendered box**: When a spec checks how wide or tall an element actually is, use **`await locator.boundingBox()`**, assert the value is not **`null`**, then compare **`Math.round(box.width)`** and/or **`Math.round(box.height)`** to the expected CSS pixel integers (from inline fixture constants or parsed prop strings). This matches what users see and what layout/CSS produced.
+- **Do not** use Playwright to assert dimensions by reading mirrored **`data-test-*`** width/height attributes, raw inline **`style`** width/height strings, or HTML **`width`/`height`** attributes alone as proof of size — those can repeat inputs without proving layout. Vitest or other harnesses may still use **`data-test-*`** mirrors for non-layout contracts; Playwright layout checks stay on **`boundingBox()`**.
+- **Reference specs**: [FantasiaMascotImage.playwright.test.ts](src/components/elements/FantasiaMascotImage/tests/FantasiaMascotImage.playwright.test.ts) (**explicit dimensions** group), [SocialContactSingleButton.playwright.test.ts](src/components/elements/SocialContactSingleButton/tests/SocialContactSingleButton.playwright.test.ts) (icon box), [ErrorCard.playwright.test.ts](src/components/elements/ErrorCard/tests/ErrorCard.playwright.test.ts) (card width cap), [checkAppSplashScreen.playwright.spec.ts](e2e-tests/checkAppSplashScreen.playwright.spec.ts) (splash icon).
+- **Caps and percentages**: Rules like **`max-width`**, **`min(100%, …)`**, or percentage widths can make the laid-out box **smaller** than a numeric **`width`** prop when the viewport or parent is narrow. Prefer asserting an exact cap only when the Electron harness guarantees enough space, or assert an inequality that matches the real CSS contract.
+
 ## Do not
 
-- Do not introduce `test.describe` groups unless you migrate the whole suite — **existing files use flat `test` only**.
+- Do not use **`test.describe.parallel`** for **`src/components/**`** or **`e2e-tests/**`** Electron Playwright specs unless the user explicitly requests it.
+- Do not commit **`test.describe.serial.only`** or other **`.only`** hooks except for short-lived local debugging.
 - Do not change `COMPONENT_NAME` / env contract without updating the component testing harness and docs.
 - Do not add Playwright (or other) tests whose **system under test** is a file under any **`_data/`** folder; assert behavior through `.vue` or other non-surface that uses that data.
 - For Storybook visual snapshot runs (`.storybook-workspace/visual-tests/storybook.visual.playwright.test.ts`), keep these utility Playwright-harness stories excluded because they are not meaningful visual-regression targets: `layouts-componenttestinglayout--with-social-contact-single-button`, `pages-componenttesting--social-contact-single-button`. Component story **`id`** values in **`index.json`** follow **`components-<bucket>-<componentfolder>-<story>`** (for example **`components-elements-fantasiamascotimage--reading`**) when **`meta.title`** is **`Components/<bucket>/<ComponentName>`** — match that shape in **`EXCLUDED_STORY_IDS`** when excluding harness-only component previews.

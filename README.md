@@ -48,6 +48,7 @@ Features are grouped for navigation (each still has colocated `tests/`, optional
 | `globals/` | App-chrome pieces reused across layouts (`GlobalWindowButtons`, `AppControlMenus`, `AppControlSingleMenu`). |
 | `elements/` | Small reusable leaf widgets (`FantasiaMascotImage`, `SocialContactSingleButton`). |
 | `other/` | Other composite or miscellaneous features (`SocialContactButtons`). |
+| `foundation/` | Design-time **Storybook** catalogues only (typography, theme colors). Not product routes; no **`i18n/`** modules; no Playwright component specs; stories use **`tags: ['skip-visual']`** so VRT skips them. See **Foundation components** in [AGENTS.md](AGENTS.md). |
 
 ### i18n (localisation)
 
@@ -56,7 +57,7 @@ Locale strings live under `i18n/en-US/` in a fixed folder hierarchy:
 | Folder | Purpose |
 | --- | --- |
 | `documents/` | Markdown source files (`.md`, imported with `?raw`, passed through `specialCharacterFixer`) |
-| `components/<bucket>/<ComponentName>/` | Same bucket names as `src/components/` (`globals`, `elements`, `other`); one or more `L_*.ts` locale modules per component |
+| `components/<bucket>/<ComponentName>/` | Same bucket names as `src/components/` (`globals`, `elements`, `other`; **`foundation/`** has no locale tree — Storybook-only). One or more `L_*.ts` locale modules per mirrored component |
 | `dialogs/` | One `L_<DialogName>.ts` per dialog |
 | `pages/` | One `L_<PageName>.ts` per page |
 | `globalFunctionality/` | One `L_<feature>.ts` per app-wide, non-component concern (e.g. Pinia store notifications) |
@@ -135,7 +136,7 @@ yarn test:storybook:visual:update:headed
 
 - **Storybook** — Runs from [`.storybook-workspace/`](.storybook-workspace/) (nested Yarn project) on **Storybook 10** with **Vite 8**, aligned with the root Quasar app’s **`@quasar/app-vite`** v2 line. Config keeps `staticDirs` pointed at the repo [`public/`](public/) folder (and related Vite wiring) so asset paths match the Quasar app.
 - **Electron** — The packaged renderer loads from `file://`. Root-relative `public/` URLs built from `import.meta.env.BASE_URL === '/'` can fail; prefer **relative** paths (e.g. `./images/...`) for those assets unless you control a real HTTP base.
-- **Playwright** — Component and E2E tests drive the **built** app. Run `yarn quasar:build:electron` before `yarn test:components` / `yarn test:e2e` when you change sources those tests cover. Root **`playwright.config.ts`** uses the **`line`** terminal reporter (concise progress; failures in full). Their Electron **`userData`** lives under **`%APPDATA%/<package.json name>/playwright-user-data`** (here **`Roaming\fantasia-archive\playwright-user-data`**, not **`fantasia-archive-dev`**); specs clear that folder in **`test.beforeEach`** via **`helpers/playwrightHelpers/playwrightUserDataReset.ts`** before each launch. See **Electron `userData` isolation** under **Testing**. Screen recordings attach per test in **`test-results/playwright-report/index.html`** (see **Playwright HTML report and screen recordings** under **Testing**); each run replaces that report folder.
+- **Playwright** — Component and E2E tests drive the **built** app. Run `yarn quasar:build:electron` before `yarn test:components` / `yarn test:e2e` when you change sources those tests cover. Root **`playwright.config.ts`** uses the **`line`** terminal reporter (concise progress; failures in full). Their Electron **`userData`** lives under **`%APPDATA%/<package.json name>/playwright-user-data`** (here **`Roaming\fantasia-archive\playwright-user-data`**, not **`fantasia-archive-dev`**); each **`test.describe.serial`** group clears that folder in **`test.beforeAll`** via **`helpers/playwrightHelpers/playwrightUserDataReset.ts`** before that group’s launch. See **Electron `userData` isolation** under **Testing**. Screen recordings attach with the suite’s **`TestInfo`** in **`test-results/playwright-report/index.html`** (see **Playwright HTML report and screen recordings** under **Testing**); each run replaces that report folder.
 
 #### Storybook workflow charter
 
@@ -245,7 +246,7 @@ Coverage mirrors CI when you run **`yarn test:coverage:verify`** (same chain as 
 
 Use Playwright component/E2E tests for rendered behavior and integration flows that rely on the built app runtime.
 
-**Electron `userData` isolation:** Specs set **`TEST_ENV`** to **`components`** or **`e2e`**. The main process then uses **`userData`** under **`%APPDATA%/<package.json name>/playwright-user-data`** (for this repo: **`…\Roaming\fantasia-archive\playwright-user-data`**, not inside **`fantasia-archive-dev`**). The folder name is **`PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME`** in **`src-electron/mainScripts/appIdentity/playwrightIsolatedUserDataDirName.ts`** (shared with **`appIdentity/fixAppName.ts`**, which applies it in Electron). **`electron-store`** and other persisted **`userData`** files from tests live there so they do not overlap **`quasar dev`** (which uses **`…\fantasia-archive-dev`** when **`DEBUGGING`** is set) or a normal packaged run. Each spec calls **`resetFaPlaywrightIsolatedUserData()`** from **`helpers/playwrightHelpers/playwrightUserDataReset.ts`** in **`test.beforeEach`**, which removes that whole folder before **`electron.launch`**, so **`faUserSettings.json`** and the Chromium profile start fresh every test. Rebuild Electron after changing **`appIdentity/fixAppName`** so Playwright picks up the main-process logic.
+**Electron `userData` isolation:** Specs set **`TEST_ENV`** to **`components`** or **`e2e`**. The main process then uses **`userData`** under **`%APPDATA%/<package.json name>/playwright-user-data`** (for this repo: **`…\Roaming\fantasia-archive\playwright-user-data`**, not inside **`fantasia-archive-dev`**). The folder name is **`PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME`** in **`src-electron/mainScripts/appIdentity/playwrightIsolatedUserDataDirName.ts`** (shared with **`appIdentity/fixAppName.ts`**, which applies it in Electron). **`electron-store`** and other persisted **`userData`** files from tests live there so they do not overlap **`quasar dev`** (which uses **`…\fantasia-archive-dev`** when **`DEBUGGING`** is set) or a normal packaged run. Component and E2E specs group tests in **`test.describe.serial`**; each group’s **`test.beforeAll`** calls **`resetFaPlaywrightIsolatedUserData()`** from **`helpers/playwrightHelpers/playwrightUserDataReset.ts`** **before** the group’s single **`electron.launch`**, so disk matches that session (do not reset in **`beforeEach`** while the same Electron app stays open). Rebuild Electron after changing **`appIdentity/fixAppName`** so Playwright picks up the main-process logic. Structure and video teardown are documented in **`.cursor/rules/playwright-tests.mdc`**.
 ```
 yarn test:components
 ```
@@ -255,7 +256,7 @@ yarn test:components
 #### Component list test - via Playwright
 > The app MUST be built for production with current code before running the tests due to limitations of the Playwright library.
 
-> Opens a CLI prompt listing available component tests (labels **`dialogs/…`**, **`elements/…`**, **`globals/…`**, **`other/…`** — same buckets as **`src/components/`**).
+> Opens a CLI prompt listing available component tests (labels **`dialogs/…`**, **`elements/…`**, **`globals/…`**, **`other/…`**, **`foundation/…`** when present — same buckets as **`src/components/`**). **`foundation/`** features do not ship **`*.playwright.test.ts`** files by policy.
 ```
 yarn test:components:list
 ```
@@ -290,7 +291,7 @@ yarn test:e2e:single --spec=SPEC_FILE_NAME
 
 #### Playwright HTML report and screen recordings (Electron component + E2E)
 
-Each Electron component and E2E Playwright test can record a **WebM** screen capture (full HD by default) and attach it to that test’s result. After **`yarn test:components`**, **`yarn test:e2e`**, or the matching **`:single`** / **`:single:ci`** scripts, open **`test-results/playwright-report/index.html`** in a browser, open a test, and use the **Attachments** section to play or download the video. The report bundles playable files under **`test-results/playwright-report/data/`** (hashed names).
+Each Electron component and E2E Playwright **serial suite** (**`test.describe.serial`**) records a **WebM** screen capture (full HD by default) and attaches it via that suite’s **`TestInfo`** (one attachment per group launch, not per nested **`test`** step). After **`yarn test:components`**, **`yarn test:e2e`**, or the matching **`:single`** / **`:single:ci`** scripts, open **`test-results/playwright-report/index.html`** in a browser, open a test, and use the **Attachments** section to play or download the video. The report bundles playable files under **`test-results/playwright-report/data/`** (hashed names).
 
 **Lifecycle:** Every Playwright run **regenerates** **`test-results/playwright-report/`** (and its **`data/`** tree). Running component tests and then E2E tests (or the reverse, or the same suite again) **replaces** the previous report—there is no merge of old and new runs. The **`yarn test:components`** and **`yarn test:e2e`** scripts run through **`scripts/playwrightWithArtifactTrim.mjs`**, which deletes **`test-results/playwright-artifacts`** after the run so intermediate attachment copies are not kept on disk; only the HTML report folder remains useful for videos. If you invoke **`playwright test`** directly without that wrapper, **`test-results/playwright-artifacts`** may persist until you remove it.
 
@@ -326,7 +327,7 @@ Set environment variable **`FA_PLAYWRIGHT_NO_VIDEO`** to **`1`** or **`true`** t
 | `yarn test:coverage:src` | Vitest **`unit-src-renderer`** then **`unit-components`**: enforced **`src`** **`.ts`** thresholds; **`.vue`** without failing gate. |
 | `yarn test:unit:coverage` | Alias for **`yarn test:coverage:verify`**. |
 | `yarn test:components` | Run all Playwright component tests (via `scripts/playwrightWithArtifactTrim.mjs`; see **Playwright HTML report and screen recordings** above). |
-| `yarn test:components:single --component=...` | Run a single component Playwright test by path under **`src/components/`** (**`dialogs/`**, **`elements/`**, **`globals/`**, or **`other/`** plus the feature folder; example **`elements/ErrorCard`**; same wrapper as `test:components`). |
+| `yarn test:components:single --component=...` | Run a single component Playwright test by path under **`src/components/`** (**`dialogs/`**, **`elements/`**, **`foundation/`**, **`globals/`**, or **`other/`** plus the feature folder; example **`elements/ErrorCard`**; same wrapper as `test:components`). **`foundation/`** has no Playwright specs by design. |
 | `yarn test:components:single:ci --component=...` | Run a single component Playwright test by direct path (same wrapper). |
 | `yarn test:components:list` | Open interactive picker for component Playwright tests. |
 | `yarn test:e2e` | Run all Playwright E2E tests (same wrapper and report lifecycle as `test:components`). |

@@ -46,7 +46,7 @@ Run each of these in its **own** terminal invocation (do not chain them with eac
 
 Keep logs isolated for readability and easier failure triage.
 
-**Playwright Electron `userData`:** Component and E2E runs set `TEST_ENV`; the main process then uses **`%APPDATA%/<package.json name>/playwright-user-data`** (this repo: **`Roaming\fantasia-archive\playwright-user-data`**), **not** **`fantasia-archive-dev`**. Specs call **`resetFaPlaywrightIsolatedUserData()`** in **`test.beforeEach`** (**`helpers/playwrightHelpers/playwrightUserDataReset.ts`**) so that tree is deleted before each test. See **`src-electron/mainScripts/appIdentity/fixAppName.ts`**, **`src-electron/mainScripts/appIdentity/playwrightIsolatedUserDataDirName.ts`**, and [playwright-tests.mdc](playwright-tests.mdc).
+**Playwright Electron `userData`:** Component and E2E runs set `TEST_ENV`; the main process then uses **`%APPDATA%/<package.json name>/playwright-user-data`** (this repo: **`Roaming\fantasia-archive\playwright-user-data`**), **not** **`fantasia-archive-dev`**. Specs use **`test.describe.serial`**; each group’s **`test.beforeAll`** calls **`resetFaPlaywrightIsolatedUserData()`** (**`helpers/playwrightHelpers/playwrightUserDataReset.ts`**) before that group’s **`electron.launch`**. See **`src-electron/mainScripts/appIdentity/fixAppName.ts`**, **`src-electron/mainScripts/appIdentity/playwrightIsolatedUserDataDirName.ts`**, and [playwright-tests.mdc](playwright-tests.mdc).
 
 ## Reporting
 

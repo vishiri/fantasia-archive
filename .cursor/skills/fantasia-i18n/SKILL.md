@@ -25,7 +25,7 @@ i18n/
   en-US/
     index.ts                            — composes the full locale tree; no hardcoded strings (see rules below)
     documents/                          — Markdown source files (.md); imported via ?raw and passed through specialCharacterFixer
-    components/<bucket>/<ComponentName>/ — mirrors src/components/: globals, elements, other; L_*.ts locale modules per component
+    components/<bucket>/<ComponentName>/ — mirrors src/components/: globals, elements, other (not foundation/; Storybook-only catalogues use inline English)
     dialogs/                            — one L_<DialogName>.ts per dialog (dialog copy; not the same as components/dialogs/)
     pages/                              — one L_<PageName>.ts per page
     globalFunctionality/                — one L_<feature>.ts per app-wide, non-component concern (e.g. store notifications)

@@ -3,6 +3,8 @@ name: fantasia-plan-documents
 description: >-
   Creates and updates local plan documents in .cursor/plans with required
   timestamp and package version metadata in both file body and filename.
+  Before saving a new plan, deletes existing plan files whose last modified
+  time is more than 30 days old.
 ---
 
 # Plan documents (`.cursor/plans`)
@@ -11,6 +13,12 @@ description: >-
 
 Use this skill whenever creating or updating a planning document.
 This includes rollout inventories, implementation checklists, migration trackers, and other planning artifacts.
+
+## Prune stale plans before saving
+
+- **Before** writing a new plan file, list `.cursor/plans/` when it exists.
+- For each file there, if its **last modified time** is **more than 30 days** before now, **delete** it. Skip this step when the folder is missing or has no files.
+- Judgment uses filesystem modification time (mtime), not only the timestamp in the filename.
 
 ## Required location
 

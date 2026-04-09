@@ -21,14 +21,15 @@ description: >-
 - **`globals/`** — app chrome (`GlobalWindowButtons`, `AppControlMenus`, `AppControlSingleMenu`).
 - **`elements/`** — small reusable widgets (`FantasiaMascotImage`, `SocialContactSingleButton`).
 - **`other/`** — other composites (`SocialContactButtons`).
+- **`foundation/`** — Storybook-only design catalogues (`FoundationColorPalette`, `FoundationTextList`, …): not shipped in product routes, no **`i18n/`** mirror, no Playwright component tests, stories tagged **`skip-visual`**. See [AGENTS.md](../../../AGENTS.md) **Foundation components**.
 
-Locale `L_*` paths under `i18n/<locale>/components/` use the same bucket names as `src/components/`. See [README](../../../README.md) and [AGENTS.md](../../../AGENTS.md).
+Locale `L_*` paths under `i18n/<locale>/components/` use the same bucket names as `src/components/` (**`foundation/`** excluded). See [README](../../../README.md) and [AGENTS.md](../../../AGENTS.md).
 
 ## Layout and pages
 
 - Default app chrome: `src/layouts/MainLayout.vue` and routes in `src/router/routes.ts`.
 - **Component playground**: `src/pages/ComponentTesting.vue` with `src/layouts/ComponentTestingLayout.vue` — use for isolated UI experiments before wiring into main flows.
-- **Storybook**: primary stories live under `src/components/**/tests/<Component>.stories.ts` with **`meta.title`** **`Components/<bucket>/<ComponentName>`** (**`dialogs`**, **`elements`**, **`globals`**, **`other`** — same as **`src/components/`** folders). Optional **canvas-only** stories may exist for `src/layouts/**/tests/*.stories.ts` and `src/pages/**/tests/*.stories.ts` (router previews); for those, **do not** add autodocs, Docs tab content, or `parameters.docs.description` — keep `parameters.docs.disable: true` (see [`storybook-stories.mdc`](../../rules/storybook-stories.mdc)). Storybook runs from [`.storybook-workspace/`](../../../.storybook-workspace/) (config under `.storybook-workspace/.storybook/`, static build `storybook-static/`, VRT under `visual-tests/` + `playwright.storybook-visual.config.ts`) so `staticDirs` and Vite can mirror the Quasar app’s `public/` layout. Root scripts: `yarn storybook:run`, `yarn storybook:build`, `yarn test:storybook:visual*`.
+- **Storybook**: primary stories live under `src/components/**/tests/<Component>.stories.ts` with **`meta.title`** **`Components/<bucket>/<ComponentName>`** (**`dialogs`**, **`elements`**, **`foundation`**, **`globals`**, **`other`** — same as **`src/components/`** folders). **`foundation/`** stories are reference pages only (**`skip-visual`**, docs disabled). Optional **canvas-only** stories may exist for `src/layouts/**/tests/*.stories.ts` and `src/pages/**/tests/*.stories.ts` (router previews); for those, **do not** add autodocs, Docs tab content, or `parameters.docs.description` — keep `parameters.docs.disable: true` (see [`storybook-stories.mdc`](../../rules/storybook-stories.mdc)). Storybook runs from [`.storybook-workspace/`](../../../.storybook-workspace/) (config under `.storybook-workspace/.storybook/`, static build `storybook-static/`, VRT under `visual-tests/` + `playwright.storybook-visual.config.ts`) so `staticDirs` and Vite can mirror the Quasar app’s `public/` layout. Root scripts: `yarn storybook:run`, `yarn storybook:build`, `yarn test:storybook:visual*`.
 
 ## Quasar patterns
 

@@ -5,6 +5,7 @@ alwaysApply: true
 
 # Plan document discipline
 
+- **Before saving a new plan**, scan `.cursor/plans/` (skip if the folder is missing or empty). Delete any plan file whose **last modified time** is **more than 30 days** older than the current moment so outdated local plans do not accumulate.
 - For every generated plan document, store it under `.cursor/plans/`.
 - If `.cursor/plans/` does not exist, create it.
 - Plan filenames must include both:
