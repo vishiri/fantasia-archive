@@ -4,6 +4,9 @@
 ## 2.4.11 - Version bump
 
 ### Bugfixes & Optimizations
+- **Program settings** search with no matches: empty-state **ErrorCard** shows heading **No search match** and longer guidance as **description**, each from its own **vue-i18n** key (**en-US** and **fr**). **ErrorCard** adds an optional **description** slot between title and mascot, **data-test-locator** hooks on title and description, and **Error not found** Vitest asserts the title-and-details-only layout.
+- **FantasiaMascotImage** centers art horizontally when the bitmap is narrower than its slot (**margin: auto** on the inner **img**).
+- **External links**: **http** and **https** URLs are validated with a real URL parse and an **http** / **https** scheme allowlist before **openExternal** runs in main or the preload **checkIfExternal** helper runs in the renderer. Loopback and non-routable targets are blocked using the parsed host (**localhost**, hostnames ending in **.localhost**, **127.0.0.0/8**, **::1**, IPv4-mapped loopback, **0.0.0.0**), percent-encoded **localhost** is still recognized, and scheme tricks such as **nothttps://** no longer pass as **https**. Hostnames that merely contain the letters of **localhost** inside a label (for example **notlocalhost.example**) stay allowed when the parsed host is not loopback.
 - Shipped version is now **2.4.11** in **About** and packaging metadata.
 - **Contributor docs**: **README**, **AGENTS.md**, and the **fantasia-electron-main** skill spell out **renderer sandbox** (**BrowserWindow** **webPreferences**), links to official **Electron** sandbox and context-isolation guides, which privileged work uses **main** **IPC** (harness **extraEnvVariables**, external **http** / **https** links), and that **startApp** registers **ipcMain** handlers before the first window so preload **sendSync** paths stay safe. **electron-preload** and **electron-main** carry short comments for the same guardrails.
 
