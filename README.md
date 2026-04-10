@@ -22,6 +22,8 @@ yarn global add @quasar/cli
 yarn
 ```
 
+**Git hooks**: **`yarn`** runs **`husky`** (**`prepare`** in **`package.json`**) and installs **`.husky/commit-msg`**, which enforces conventional commit messages via **`commitlint`** (**`commitlint.config.mjs`** — same types as [AGENTS.md](AGENTS.md) **Git commits**). To bypass a hook in an emergency, use **`git commit --no-verify`** (use sparingly).
+
 ## Architecture (quick reference)
 
 - **UI**: Vue 3 + Quasar 2 (`src/`)

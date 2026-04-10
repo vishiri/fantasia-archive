@@ -28,6 +28,8 @@ Use exactly one of: **`feat`** | **`fix`** | **`test`** | **`chore`** | **`refac
 
 Examples: `feat: add splash screen fade-out`, `test: cover devtools menu toggle`, `docs: split vue rules by concern`.
 
+**Local enforcement**: after **`yarn install`**, **`.husky/commit-msg`** runs **`yarn lint:commit --edit`** against **`commitlint.config.mjs`** (same type list; **`Merge …`** / **`Revert …`** ignored). See [git-conventional-commits.mdc](../../rules/git-conventional-commits.mdc). Use **`git commit --no-verify`** only when you must bypass hooks.
+
 ## Workflow (default when user wants multiple commits)
 
 1. **Inspect**: Run `git status` and review `git diff` (and `git diff --staged` if anything is already staged).

@@ -28,6 +28,12 @@ alwaysApply: true
 | `style` | Formatting, whitespace, lint autofix — no logic change |
 | `docs` | README, comments meant as documentation, AGENTS/rules/skills text |
 
+## Local enforcement (commitlint + Husky)
+
+- **`commitlint.config.mjs`** at the repo root mirrors this **`type`** list; messages starting with **`Merge `** or **`Revert `** are ignored so Git merges and reverts are not blocked.
+- **`yarn install`** runs **`husky`** via the **`prepare`** script in **`package.json`**; **`.husky/commit-msg`** runs **`yarn commitlint --edit`** so invalid subjects are rejected before **`git commit`** completes locally.
+- Try a message without committing: **`echo "feat: example" | yarn lint:commit`**. CI (**`.github/workflows/verify.yml`**) does not run commitlint unless you add a workflow step.
+
 ## Local types extraction rule
 
 - For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.

@@ -8,6 +8,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "lint:commit": "commitlint",
     "lint:eslint": "eslint .",
     "lint:stylelint": "stylelint \"src/**/*.{vue,css,scss,sass}\" \".storybook-workspace/.storybook/**/*.{vue,css,scss,sass}\"",
     "lint:stylelint:fix": "stylelint \"src/**/*.{vue,css,scss,sass}\" \".storybook-workspace/.storybook/**/*.{vue,css,scss,sass}\" --fix",
@@ -40,7 +41,8 @@
     "test:unit:coverage": "yarn test:coverage:verify",
     "testbatch:verify": "yarn lint:eslint && yarn lint:typescript && yarn lint:stylelint && yarn test:coverage:verify",
     "testbatch:ensure:change": "yarn testbatch:verify && yarn quasar:build:electron:summarized && yarn test:components && yarn test:e2e && yarn test:storybook:smoke && yarn test:storybook:visual:update",
-    "testbatch:ensure:nochange": "yarn testbatch:verify && yarn quasar:build:electron:summarized && yarn test:components && yarn test:e2e && yarn test:storybook:smoke && yarn test:storybook:visual"
+    "testbatch:ensure:nochange": "yarn testbatch:verify && yarn quasar:build:electron:summarized && yarn test:components && yarn test:e2e && yarn test:storybook:smoke && yarn test:storybook:visual",
+    "prepare": "husky"
   },
   "dependencies": {
     "@quasar/extras": "^1.17.0",
@@ -58,6 +60,8 @@
     "vue-router": "^5.0.4"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
     "@intlify/unplugin-vue-i18n": "^11.0.7",
     "@playwright/test": "^1.49.1",
     "@quasar/app-vite": "^2.5.4",
@@ -79,6 +83,7 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-storybook": "10.3.4",
     "eslint-plugin-vue": "^10.8.0",
+    "husky": "^9.1.7",
     "jsdom": "^29.0.0",
     "neostandard": "^0.13.0",
     "playwright": "^1.49.1",
