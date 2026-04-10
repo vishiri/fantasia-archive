@@ -20,10 +20,10 @@ vi.mock('electron', () => {
 
 /**
  * checkIfExternal
- * Uppercase HTTP scheme does not match the lowercase substring check (documents current behavior).
+ * URL normalization treats uppercase HTTP like lowercase http.
  */
-test('Test that uppercase HTTP scheme is not treated as external', () => {
-  expect(faExternalLinksManagerAPI.checkIfExternal('HTTP://example.com/')).toBe(false)
+test('Test that uppercase HTTP scheme is treated as external', () => {
+  expect(faExternalLinksManagerAPI.checkIfExternal('HTTP://example.com/')).toBe(true)
 })
 
 /**
@@ -63,10 +63,10 @@ test('Test for internal link with https localhost URL', () => {
 
 /**
  * checkIfExternal
- * Loopback IP is treated as external (only localhost substring is excluded).
+ * IPv4 loopback is blocked the same way in preload as in main.
  */
-test('Test for external link with http 127.0.0.1 input', () => {
-  expect(faExternalLinksManagerAPI.checkIfExternal('http://127.0.0.1:8080/')).toBe(true)
+test('Test for internal link with http 127.0.0.1 input', () => {
+  expect(faExternalLinksManagerAPI.checkIfExternal('http://127.0.0.1:8080/')).toBe(false)
 })
 
 /**

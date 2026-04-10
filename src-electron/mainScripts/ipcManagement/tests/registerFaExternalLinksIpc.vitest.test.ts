@@ -106,3 +106,17 @@ test('Test that registerFaExternalLinksIpc does not open localhost URL', async (
 
   expect(mocks.openExternalMock).not.toHaveBeenCalled()
 })
+
+/**
+ * registerFaExternalLinksIpc
+ * IPv4 loopback is not opened.
+ */
+test('Test that registerFaExternalLinksIpc does not open 127.0.0.1 URL', async () => {
+  const { registerFaExternalLinksIpc } = await import('../registerFaExternalLinksIpc')
+  registerFaExternalLinksIpc()
+
+  const handler = await handlerFor(FA_EXTERNAL_LINKS_IPC.openExternalAsync)
+  await handler({}, 'http://127.0.0.1:8080/')
+
+  expect(mocks.openExternalMock).not.toHaveBeenCalled()
+})
