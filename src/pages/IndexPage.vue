@@ -4,7 +4,6 @@
       <router-link to="/testeee">
         test
       </router-link>
-      <textarea />
     </div>
     <div>
       <a href="https://www.google.com">
