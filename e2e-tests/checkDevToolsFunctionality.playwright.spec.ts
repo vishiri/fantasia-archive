@@ -82,8 +82,8 @@ test.describe.serial('Developer tools menu', () => {
     await appWindow.waitForTimeout(menuAnimationTimer)
 
     await expect.poll(async () => {
-      return await appWindow.evaluate(() => {
-        return window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()
+      return await appWindow.evaluate(async () => {
+        return await window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()
       })
     }, { timeout: 15_000 }).toBe(true)
 
@@ -98,8 +98,8 @@ test.describe.serial('Developer tools menu', () => {
     await appWindow.waitForTimeout(menuAnimationTimer)
 
     await expect.poll(async () => {
-      return await appWindow.evaluate(() => {
-        return window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()
+      return await appWindow.evaluate(async () => {
+        return await window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()
       })
     }, { timeout: 15_000 }).toBe(false)
   })

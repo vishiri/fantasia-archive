@@ -97,7 +97,7 @@ export const StatesDevToolsOpen: StoryObj<typeof meta> = {
     }
   },
   play: async ({ canvasElement }) => {
-    expect(window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()).toBe(true)
+    expect(await window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()).toBe(true)
     const canvas = within(canvasElement)
     await waitFor(() => {
       expect(canvas.getByRole('button', { name: 'Maximize' })).toHaveAttribute('aria-label', 'Maximize')

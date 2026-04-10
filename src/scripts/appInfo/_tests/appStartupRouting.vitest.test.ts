@@ -54,10 +54,10 @@ test('Test that determineTestingComponentName returns false when testing type is
  * runAppStartupRouting
  * Test routing toward component testing path.
  */
-test('Test that runAppStartupRouting pushes component testing route when requested', () => {
+test('Test that runAppStartupRouting pushes component testing route when requested', async () => {
   const routerPushMock = vi.fn()
 
-  runAppStartupRouting(
+  await runAppStartupRouting(
     { push: routerPushMock },
     'components',
     'FantasiaMascotImage'
@@ -71,10 +71,10 @@ test('Test that runAppStartupRouting pushes component testing route when request
  * runAppStartupRouting
  * Test default route and tip side effect.
  */
-test('Test that runAppStartupRouting defaults to home route and triggers trivia tip', () => {
+test('Test that runAppStartupRouting defaults to home route and triggers trivia tip', async () => {
   const routerPushMock = vi.fn()
 
-  runAppStartupRouting(
+  await runAppStartupRouting(
     { push: routerPushMock },
     undefined,
     undefined
@@ -88,10 +88,10 @@ test('Test that runAppStartupRouting defaults to home route and triggers trivia 
  * runAppStartupRouting
  * Component mode with a missing component name falls through to the home route and trivia notification.
  */
-test('Test that runAppStartupRouting uses home route when component mode has no component name', () => {
+test('Test that runAppStartupRouting uses home route when component mode has no component name', async () => {
   const routerPushMock = vi.fn()
 
-  runAppStartupRouting(
+  await runAppStartupRouting(
     { push: routerPushMock },
     'components',
     ''

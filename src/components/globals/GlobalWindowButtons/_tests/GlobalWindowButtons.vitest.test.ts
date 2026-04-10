@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { expect, test, vi } from 'vitest'
 
 import GlobalWindowButtons from '../GlobalWindowButtons.vue'
@@ -14,6 +14,7 @@ test('Test that GlobalWindowButtons minimize invokes faWindowControl in electron
   })
 
   await w.get('[data-test-locator="globalWindowButtons-button-minimize"]').trigger('click')
+  await flushPromises()
   expect(window.faContentBridgeAPIs.faWindowControl.minimizeWindow).toHaveBeenCalled()
   w.unmount()
   vi.unstubAllEnvs()
@@ -21,7 +22,7 @@ test('Test that GlobalWindowButtons minimize invokes faWindowControl in electron
 
 /**
  * GlobalWindowButtons
- * Renders three titled window controls for accessibility hooks.
+ * Renders three window controls with data-test-locator hooks.
  */
 test('Test that GlobalWindowButtons exposes minimize, resize, and close controls', () => {
   const w = mount(GlobalWindowButtons, {
@@ -45,6 +46,7 @@ test('Test that GlobalWindowButtons resize invokes faWindowControl in electron m
   })
 
   await w.get('[data-test-locator="globalWindowButtons-button-resize"]').trigger('click')
+  await flushPromises()
   expect(window.faContentBridgeAPIs.faWindowControl.resizeWindow).toHaveBeenCalled()
   expect(window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized).toHaveBeenCalled()
   w.unmount()
@@ -62,6 +64,7 @@ test('Test that GlobalWindowButtons close invokes faWindowControl in electron mo
   })
 
   await w.get('[data-test-locator="globalWindowButtons-button-close"]').trigger('click')
+  await flushPromises()
   expect(window.faContentBridgeAPIs.faWindowControl.closeWindow).toHaveBeenCalled()
   w.unmount()
   vi.unstubAllEnvs()
@@ -78,6 +81,7 @@ test('Test that GlobalWindowButtons minimize does not invoke faWindowControl whe
   })
 
   await w.get('[data-test-locator="globalWindowButtons-button-minimize"]').trigger('click')
+  await flushPromises()
   expect(window.faContentBridgeAPIs.faWindowControl.minimizeWindow).not.toHaveBeenCalled()
   w.unmount()
   vi.unstubAllEnvs()

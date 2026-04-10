@@ -89,7 +89,9 @@ test.describe.serial('Global window buttons', () => {
     await expect(resizeButton).toHaveCount(1)
     await resizeButton.click()
 
-    await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === false)
+    await appWindow.waitForFunction(async () => {
+      return (await window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized()) === false
+    })
   })
 
   /**
@@ -100,19 +102,25 @@ test.describe.serial('Global window buttons', () => {
 
     await expect(resizeButton).toHaveCount(1)
 
-    const isMaximized = await appWindow.evaluate(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized())
+    const isMaximized = await appWindow.evaluate(async () => {
+      return await window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized()
+    })
 
     if (isMaximized) {
       await resizeButton.click()
 
-      await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === false)
+      await appWindow.waitForFunction(async () => {
+        return (await window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized()) === false
+      })
 
       await resizeButton.click()
     } else {
       await resizeButton.click()
     }
 
-    await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === true)
+    await appWindow.waitForFunction(async () => {
+      return (await window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized()) === true
+    })
   })
 
   /**
@@ -124,7 +132,9 @@ test.describe.serial('Global window buttons', () => {
     await expect(minimizeButton).toHaveCount(1)
     await minimizeButton.click()
 
-    await appWindow.waitForFunction(() => window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized() === false)
+    await appWindow.waitForFunction(async () => {
+      return (await window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized()) === false
+    })
   })
 
   /**

@@ -52,6 +52,8 @@
 
 <script setup lang="ts">
 
+import { onMounted, ref } from 'vue'
+
 import type { I_appMenuList } from 'app/types/I_appMenusDataList'
 import { openDialogMarkdownDocument } from 'src/scripts/appInfo/openDialogMarkdownDocument'
 
@@ -64,6 +66,14 @@ import AppControlSingleMenu from 'app/src/components/globals/AppControlSingleMen
 import DialogMarkdownDocument from 'app/src/components/dialogs/DialogMarkdownDocument/DialogMarkdownDocument.vue'
 import DialogAboutFantasiaArchive from 'app/src/components/dialogs/DialogAboutFantasiaArchive/DialogAboutFantasiaArchive.vue'
 import DialogProgramSettings from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.vue'
+
+function readInitialTestingType (): string | false {
+  const snap = window.faContentBridgeAPIs?.extraEnvVariables?.getCachedSnapshot?.()
+  if (!snap) {
+    return ''
+  }
+  return snap.TEST_ENV ?? ''
+}
 
 withDefaults(
   defineProps<{
@@ -80,7 +90,15 @@ withDefaults(
 /**
  * Testing type that might be happening right now
  */
-const testingType = window.faContentBridgeAPIs?.extraEnvVariables?.TEST_ENV ?? ''
+const testingType = ref<string | false>(readInitialTestingType())
+
+onMounted(async () => {
+  const bridge = window.faContentBridgeAPIs?.extraEnvVariables
+  if (bridge?.getSnapshot) {
+    const snap = await bridge.getSnapshot()
+    testingType.value = snap.TEST_ENV ?? ''
+  }
+})
 
 /**
  * Menu payload for TEST_ENV === 'components' embed only — mirrors Playwright scenarios for AppControlMenus.

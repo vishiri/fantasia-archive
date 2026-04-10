@@ -86,15 +86,16 @@ const documentName = ref('')
   * Current app version
   * NOTE: This shows Electron version in DEV mode instead of NPM package version. This is a well known issue with Electron.
   */
-let appVersion = ''
+const appVersion = ref('')
 
 /**
  * Opens the popup dialog via direct input-feed
  */
-const openDialog = (input: T_dialogName) => {
+const openDialog = async (input: T_dialogName) => {
   documentName.value = input
   dialogModel.value = true
-  appVersion = window.faContentBridgeAPIs.appDetails.PROJECT_VERSION
+  const v = await window.faContentBridgeAPIs?.appDetails?.getProjectVersion?.() ?? ''
+  appVersion.value = v
 }
 
 /**

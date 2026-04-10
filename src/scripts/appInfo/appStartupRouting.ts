@@ -16,18 +16,18 @@ export const determineTestingComponentName = (
 /**
  * Handles startup routing and tip notification side effects.
  */
-export const runAppStartupRouting = (
+export const runAppStartupRouting = async (
   router: I_appStartupRouter,
   testingType: string | false | undefined,
   testingComponentName: string | false | undefined
-): void => {
+): Promise<void> => {
   const componentNameOrFalse = determineTestingComponentName(testingType, testingComponentName)
 
   if (componentNameOrFalse) {
-    router.push({ path: `/componentTesting/${componentNameOrFalse}` })
+    await router.push({ path: `/componentTesting/${componentNameOrFalse}` })
     return
   }
 
-  router.push({ path: '/' })
+  await router.push({ path: '/' })
   tipsTricksTriviaNotification(false)
 }

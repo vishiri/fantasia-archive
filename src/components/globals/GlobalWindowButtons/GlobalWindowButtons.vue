@@ -12,16 +12,9 @@
       :ripple="false"
       class="globalWindowButtons__button globalWindowButtons__minimize"
       :aria-label="$t('globalWindowButtons.minimizeButton')"
-      :title="$t('globalWindowButtons.minimizeButton')"
       data-test-locator="globalWindowButtons-button-minimize"
       @click="minimizeWindow()"
     >
-      <q-tooltip
-        :delay="1000"
-        :offset="[0, 5]"
-      >
-        {{ $t('globalWindowButtons.minimizeButton') }}
-      </q-tooltip>
       <q-icon
         size="16px"
         name="mdi-window-minimize"
@@ -36,16 +29,9 @@
       :ripple="false"
       class="globalWindowButtons__button globalWindowButtons__resize"
       :aria-label="isMaximized ? $t('globalWindowButtons.resizeButton') : $t('globalWindowButtons.maximizeButton')"
-      :title="isMaximized ? $t('globalWindowButtons.resizeButton') : $t('globalWindowButtons.maximizeButton')"
       data-test-locator="globalWindowButtons-button-resize"
-      @click="[resizeWindow(),checkIfWindowMaximized()]"
+      @click="resizeWindowThenRefreshMaximized()"
     >
-      <q-tooltip
-        :delay="1000"
-        :offset="[0, 5]"
-      >
-        {{ isMaximized ? $t('globalWindowButtons.resizeButton') : $t('globalWindowButtons.maximizeButton') }}
-      </q-tooltip>
       <q-icon
         size="16px"
         :name="(isMaximized)
@@ -62,16 +48,9 @@
       :ripple="false"
       class="globalWindowButtons__button globalWindowButtons__close"
       :aria-label="$t('globalWindowButtons.close')"
-      :title="$t('globalWindowButtons.close')"
       data-test-locator="globalWindowButtons-button-close"
       @click="tryCloseWindow()"
     >
-      <q-tooltip
-        :delay="1000"
-        :offset="[0, 5]"
-      >
-        {{ $t('globalWindowButtons.close') }}
-      </q-tooltip>
       <q-icon
         size="16px"
         name="mdi-window-close"
@@ -87,18 +66,19 @@ import type { Ref } from 'vue'
 /**
  * Triggers minimize of the window by the minimize button click
  */
-const minimizeWindow = () => {
+const minimizeWindow = async () => {
   if (process.env.MODE === 'electron' && window.faContentBridgeAPIs?.faWindowControl) {
-    window.faContentBridgeAPIs.faWindowControl.minimizeWindow()
+    await window.faContentBridgeAPIs.faWindowControl.minimizeWindow()
   }
 }
 
 /**
- * Triggers resize of the window by the min/max button click
+ * Triggers resize of the window by the min/max button click, then refreshes maximized state.
  */
-const resizeWindow = () => {
+const resizeWindowThenRefreshMaximized = async () => {
   if (process.env.MODE === 'electron' && window.faContentBridgeAPIs?.faWindowControl) {
-    window.faContentBridgeAPIs.faWindowControl.resizeWindow()
+    await window.faContentBridgeAPIs.faWindowControl.resizeWindow()
+    await checkIfWindowMaximized()
   }
 }
 
@@ -112,19 +92,19 @@ const resizeWindow = () => {
  * If both is found to be true, then an appropriate dialog is opened.
  * Otherwise, the app simply closes.
  */
-const tryCloseWindow = () => {
+const tryCloseWindow = async () => {
   // TODO add project close checking
   if (process.env.MODE === 'electron' && window.faContentBridgeAPIs?.faWindowControl) {
-    window.faContentBridgeAPIs.faWindowControl.closeWindow()
+    await window.faContentBridgeAPIs.faWindowControl.closeWindow()
   }
 }
 
 /**
 Checks if the window is maximized and sets local variable accordingly
 */
-const checkIfWindowMaximized = () => {
+const checkIfWindowMaximized = async () => {
   if (process.env.MODE === 'electron' && window.faContentBridgeAPIs?.faWindowControl) {
-    isMaximized.value = window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized()
+    isMaximized.value = await window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized()
   }
 }
 
@@ -146,10 +126,10 @@ let checkerInterval: number
 onMounted(async () => {
   window.clearInterval(checkerInterval)
 
-  checkIfWindowMaximized()
+  await checkIfWindowMaximized()
 
   checkerInterval = window.setInterval(() => {
-    checkIfWindowMaximized()
+    void checkIfWindowMaximized()
   }, 100)
 })
 

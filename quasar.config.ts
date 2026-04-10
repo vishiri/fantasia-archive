@@ -15,7 +15,7 @@ export default defineConfig((ctx) => {
 
     // app boot file (/src/boot)
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ['i18n', 'axios', 'externalLinkManager', 'notify-defaults', 'qmarkdown'],
+    boot: ['i18n', 'axios', 'externalLinkManager', 'notify-defaults', 'qmarkdown', 'faRoutingEnv'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: ['app.scss'],
