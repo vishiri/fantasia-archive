@@ -1,8 +1,8 @@
 # Manually triggered release build. Storybook VRT baselines are win32-only (see CONTRIBUTING.md),
 # so the full `yarn testbatch:ensure:nochange` gate runs on windows-latest only; that job reuses the
 # Quasar production build from the gate (same command as `yarn quasar:build:electron`, via summarized
-# logging) and uploads the Windows installer. Linux and macOS jobs run a single packaging build after
-# the gate passes.
+# logging) and uploads the Windows installer. Linux and macOS jobs run packaging builds after
+# the gate passes. Linux uses a matrix so each installer format installs only the tooling it needs.
 
 name: Build App - FA Rewrite
 
@@ -68,10 +68,23 @@ jobs:
           if-no-files-found: ignore
 
   build-linux:
-    name: Linux package
+    name: Linux (${{ matrix.linux_pkg }})
     needs: release-gate
     runs-on: ubuntu-latest
     environment: production
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        linux_pkg:
+          - AppImage
+          - deb
+          - flatpak
+          - pacman
+          - rpm
+          - snap
+    env:
+      SNAPCRAFT_BUILD_ENVIRONMENT: host
     steps:
       - name: Check out the code
         uses: actions/checkout@v5
@@ -86,19 +99,39 @@ jobs:
       - name: Install Yarn 1.x
         run: npm install -g yarn@1.22.19
 
+      - name: Install base packaging tools (deb/rpm/pacman/AppImage)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            fakeroot \
+            rpm
+
+      - name: Install Snapcraft
+        if: matrix.linux_pkg == 'snap'
+        run: sudo apt-get install -y --no-install-recommends snapcraft
+
+      - name: Install Flatpak tooling and freedesktop 23.08 runtime
+        if: matrix.linux_pkg == 'flatpak'
+        run: |
+          sudo apt-get install -y --no-install-recommends flatpak flatpak-builder
+          flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak install -y --noninteractive --user flathub \
+            org.freedesktop.Platform//23.08 \
+            org.freedesktop.Sdk//23.08
+
       - name: Install root dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Production Electron build
+      - name: Production Electron build (${{ matrix.linux_pkg }})
+        env:
+          FA_ELECTRON_LINUX_TARGETS: ${{ matrix.linux_pkg }}
         run: yarn quasar:build:electron
 
-      - name: Upload Linux Artifact
+      - name: Upload Linux artifact (${{ matrix.linux_pkg }})
         uses: actions/upload-artifact@v5
         with:
-          name: Linux_FA ${{ github.event.inputs.version }}
-          path: |
-            dist/electron/Packaged/*.snap
-            dist/electron/Packaged/*.AppImage
+          name: Linux_${{ matrix.linux_pkg }}_FA ${{ github.event.inputs.version }}
+          path: dist/electron/Packaged/
 
   build-macos:
     name: macOS package

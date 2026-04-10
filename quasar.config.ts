@@ -6,6 +6,23 @@ import { checker } from 'vite-plugin-checker'
 
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
+/**
+ * FA_ELECTRON_LINUX_TARGETS: comma-separated electron-builder Linux targets (GitHub Actions matrix sets one per job).
+ * When unset, keep local Linux builds lightweight (no snapcraft/flatpak required).
+ */
+function resolveLinuxTargets (): string[] {
+  const raw = process.env.FA_ELECTRON_LINUX_TARGETS
+  if (raw !== undefined && raw.trim() !== '') {
+    return raw.split(',').map((t) => t.trim()).filter((t) => t.length > 0)
+  }
+
+  return [
+    'AppImage',
+    'deb',
+    'rpm'
+  ]
+}
+
 // Vite 'Plugin' types differ between the hoisted 'vite' package and '@quasar/app-vite' nested copy; the config is valid at runtime.
 // @ts-expect-error TS2345 — duplicate Vite type graphs (see vite-plugin-checker + Quasar)
 export default defineConfig((ctx) => {
@@ -145,8 +162,14 @@ export default defineConfig((ctx) => {
         mac: {
           icon: 'src-electron/icons/icon.icns'
         },
+        flatpak: {
+          // Keep in sync with .github/workflows/build.yml (flatpak install ...//VERSION).
+          runtime: 'org.freedesktop.Platform',
+          runtimeVersion: '23.08',
+          sdk: 'org.freedesktop.Sdk'
+        },
         linux: {
-          target: ['AppImage', 'deb', 'rpm'],
+          target: resolveLinuxTargets(),
           category: 'Utility',
           synopsis: 'A worldbuilding database manager',
           description: 'A worldbuilding database manager',
@@ -161,6 +184,10 @@ export default defineConfig((ctx) => {
               StartupWMClass: 'fantasia-archive'
             }
           }
+        },
+        // Arch pacman: .pkg.tar.xz (electron-builder compression is gz | bzip2 | xz | lzo only; not zstd).
+        pacman: {
+          compression: 'xz'
         }
       },
 
