@@ -25,16 +25,25 @@ elif [[ "${has_novisual}" == "false" && "${has_visual}" == "false" ]]; then
 fi
 
 if [[ "${invalid}" == "true" ]]; then
+  # Both workflows run on every PR. Without this branch, missing or conflicting labels would fail
+  # two guard jobs with the same error. Only the nochange workflow owns the failing check + comment;
+  # the change workflow exits success with run_heavy=false so the PR shows a single red guard.
+  if [[ "${MODE}" == "change" ]]; then
+    {
+      echo "run_heavy=false"
+    } >> "${GITHUB_OUTPUT:?GITHUB_OUTPUT is required}"
+    exit 0
+  fi
   MARKER='<!-- fa-pr-label-guard -->'
   if ! gh api "repos/${REPO}/issues/${PR_NUMBER}/comments" --paginate --jq '.[].body' | grep -qF "${MARKER}"; then
     gh pr comment "${PR_NUMBER}" --repo "${REPO}" --body "${MARKER}
 
-The **pr-full-suite-*** guard jobs are failing because this PR does not have **exactly one** of the labels \`novisualchange\` or \`visualchange\` (not both, not neither). Workflows run on **open** and **push** before labels may be set, so the PR is **not** auto-closed — add the correct single label in the sidebar and checks will re-run.
+The **PR full suite (ensure nochange)** guard is failing because this PR does not have **exactly one** of the labels \`novisualchange\` or \`visualchange\` (not both, not neither). Workflows run on **open** and **push** before labels may be set — add the correct single label in the sidebar and checks will re-run.
 
 - \`novisualchange\` — Storybook baselines must **not** change; CI runs \`yarn testbatch:ensure:nochange\`.
 - \`visualchange\` — You intend to refresh VRT baselines; CI runs \`yarn testbatch:ensure:change\` (includes \`yarn test:storybook:visual:update\`).
 
-See the pull request template file under the .github folder on the default branch."
+The **PR full suite (ensure change)** guard stays green when labels are missing so you only see one failure for this rule. See the pull request template file under the .github folder on the default branch."
   fi
   exit 1
 fi

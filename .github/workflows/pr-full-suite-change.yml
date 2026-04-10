@@ -1,5 +1,5 @@
 # Full integration gate when the PR is labeled visualchange only (updates Storybook VRT baselines in the branch).
-# Requires repo labels: novisualchange, visualchange (exact names). Invalid sets fail the guard job (PR stays open); see .github/scripts/pr-label-guard.sh
+# Requires repo labels: novisualchange, visualchange (exact names). Missing or both labels: this guard succeeds (run_heavy=false); ensure nochange owns the failing check. See .github/scripts/pr-label-guard.sh
 # Fork PRs: GITHUB_TOKEN may be read-only; label enforcement can fail on public fork workflows — prefer same-repo branches.
 name: PR full suite (ensure change)
 

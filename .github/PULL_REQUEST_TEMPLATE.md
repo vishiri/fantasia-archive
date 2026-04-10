@@ -7,7 +7,7 @@ Pull requests against `main` / `master` must have **exactly one** of these GitHu
 | `novisualchange` | You are **not** intentionally changing Storybook visual baselines. CI runs `yarn testbatch:ensure:nochange` (includes VRT **compare** against committed snapshots). |
 | `visualchange` | You **are** updating Storybook VRT baselines. CI runs `yarn testbatch:ensure:change` (includes `yarn test:storybook:visual:update`). **Commit the updated snapshot files** this job produces. |
 
-**Do not** add both labels. **Do not** leave both off. If the combination is wrong, the **pr-full-suite-*** guard checks fail until you fix it; GitHub may post one bot comment with instructions (the PR stays open so you can add a label after open).
+**Do not** add both labels. **Do not** leave both off. If the combination is wrong, the **PR full suite (ensure nochange)** guard fails until you fix it (one bot comment); the **ensure change** guard stays green for that case so you do not get two failures for the same label mistake. The PR stays open so you can add a label after open.
 
 Add the label in the PR sidebar (Labels) as soon as possible; the **labeled** event re-runs workflows, and pushing new commits also re-runs checks.
 
