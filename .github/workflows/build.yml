@@ -79,12 +79,7 @@ jobs:
         linux_pkg:
           - AppImage
           - deb
-          - flatpak
-          - pacman
           - rpm
-          - snap
-    env:
-      SNAPCRAFT_BUILD_ENVIRONMENT: host
     steps:
       - name: Check out the code
         uses: actions/checkout@v5
@@ -99,25 +94,12 @@ jobs:
       - name: Install Yarn 1.x
         run: npm install -g yarn@1.22.19
 
-      - name: Install base packaging tools (deb/rpm/pacman/AppImage)
+      - name: Install base packaging tools (deb/rpm/AppImage)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             fakeroot \
             rpm
-
-      - name: Install Snapcraft
-        if: matrix.linux_pkg == 'snap'
-        run: sudo apt-get install -y --no-install-recommends snapcraft
-
-      - name: Install Flatpak tooling and freedesktop 23.08 runtime
-        if: matrix.linux_pkg == 'flatpak'
-        run: |
-          sudo apt-get install -y --no-install-recommends flatpak flatpak-builder
-          flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-          flatpak install -y --noninteractive --user flathub \
-            org.freedesktop.Platform//23.08 \
-            org.freedesktop.Sdk//23.08
 
       - name: Install root dependencies
         run: yarn install --frozen-lockfile

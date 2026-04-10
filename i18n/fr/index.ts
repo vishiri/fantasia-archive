@@ -2,7 +2,7 @@ import { specialCharacterFixer } from '../specialCharactersFixer'
 
 import advancedSearchCheatSheet from './documents/advancedSearchCheatSheet.md?raw'
 import advancedSearchGuide from './documents/advancedSearchGuide.md?raw'
-import changeLog from './documents/changeLog.md?raw'
+import changeLog from '../en-US/documents/changeLog.md?raw'
 import license from './documents/license.md?raw'
 import tipsTricksTrivia from './documents/tipsTricksTrivia.md?raw'
 
