@@ -1,8 +1,11 @@
-# This is a basic workflow that is manually triggered
+# Manually triggered release build. Storybook VRT baselines are win32-only (see CONTRIBUTING.md),
+# so the full `yarn testbatch:ensure:nochange` gate runs on windows-latest only; that job reuses the
+# Quasar production build from the gate (same command as `yarn quasar:build:electron`, via summarized
+# logging) and uploads the Windows installer. Linux and macOS jobs run a single packaging build after
+# the gate passes.
 
 name: Build App - FA Rewrite
 
-# Manually triggered
 on:
   workflow_dispatch:
     inputs:
@@ -14,59 +17,116 @@ permissions:
   contents: read
 
 jobs:
-
-  # Builds all major OS versions of FA
-  build:
-    runs-on: ${{ matrix.os }}
+  release-gate:
+    name: Full gate and Windows package
+    runs-on: windows-latest
     environment: production
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-        node: ['22.22']
-
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: bash
     steps:
-    - name: Check out the code
-      uses: actions/checkout@v5
+      - name: Check out the code
+        uses: actions/checkout@v5
 
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v5
-      with:
-        node-version: ${{ matrix.node }}
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22.22'
+          cache: yarn
+          cache-dependency-path: |
+            yarn.lock
+            .storybook-workspace/yarn.lock
 
-    - name: Install dependencies
-      run: |
-        npm install --global yarn@1.22.19
-        yarn global add @quasar/cli
-        yarn install
+      - name: Install Yarn 1.x
+        run: npm install -g yarn@1.22.19
 
-    - name: Quality gate (lint, types, style, unit tests)
-      run: yarn testbatch:verify
+      - name: Install root dependencies
+        run: yarn install --frozen-lockfile
 
-    - name: Production Electron build
-      run: yarn quasar:build:electron
+      - name: Install Storybook workspace dependencies
+        run: yarn --cwd .storybook-workspace install --frozen-lockfile
 
-    - name: Upload Linux Artifact
-      if: ${{ matrix.os == 'ubuntu-latest' }}
-      uses: actions/upload-artifact@v5
-      with:
-        # Artifact name
-        name: Linux_FA ${{ github.event.inputs.version }}
-        path: |
-          dist/electron/Packaged/*.snap
-          dist/electron/Packaged/*.AppImage
+      - name: Install Playwright Chromium (Electron component, E2E, Storybook visual)
+        run: yarn playwright install chromium --with-deps
 
-    - name: Upload MacOS Artifact
-      if: ${{ matrix.os == 'macOS-latest' }}
-      uses: actions/upload-artifact@v5
-      with:
-        # Artifact name
-        name: Mac_FA ${{ github.event.inputs.version }}
-        path: dist/electron/Packaged/*.dmg
+      - name: Full ensure nochange (verify, production Electron build, Playwright, Storybook)
+        run: yarn testbatch:ensure:nochange
 
-    - name: Upload Windows Artifact
-      if: ${{ matrix.os == 'windows-latest' }}
-      uses: actions/upload-artifact@v5
-      with:
-        # Artifact name
-        name: Windows_FA ${{ github.event.inputs.version }}
-        path: dist/electron/Packaged/*.exe
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: Windows_FA ${{ github.event.inputs.version }}
+          path: dist/electron/Packaged/*.exe
+
+      - name: Upload Playwright HTML report on failure
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-report-build-${{ github.event.inputs.version }}
+          path: test-results/playwright-report
+          if-no-files-found: ignore
+
+  build-linux:
+    name: Linux package
+    needs: release-gate
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22.22'
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - name: Install Yarn 1.x
+        run: npm install -g yarn@1.22.19
+
+      - name: Install root dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Production Electron build
+        run: yarn quasar:build:electron
+
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: Linux_FA ${{ github.event.inputs.version }}
+          path: |
+            dist/electron/Packaged/*.snap
+            dist/electron/Packaged/*.AppImage
+
+  build-macos:
+    name: macOS package
+    needs: release-gate
+    runs-on: macOS-latest
+    environment: production
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22.22'
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - name: Install Yarn 1.x
+        run: npm install -g yarn@1.22.19
+
+      - name: Install root dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Production Electron build
+        run: yarn quasar:build:electron
+
+      - name: Upload MacOS Artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: Mac_FA ${{ github.event.inputs.version }}
+          path: dist/electron/Packaged/*.dmg
