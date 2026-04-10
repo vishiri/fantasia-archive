@@ -1,6 +1,11 @@
 # Changelog
 ----------
 
+## 2.4.11 - Version bump
+
+### Bugfixes & Optimizations
+- Shipped version is now **2.4.11** in **About** and packaging metadata.
+
 ## 2.4.10 - Program settings, ErrorCard, theme tokens, and contributor tooling
 
 ### New features
