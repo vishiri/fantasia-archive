@@ -37,6 +37,7 @@ description: >-
 - Do not enable broad `nodeIntegration` in the renderer to “just make it work”; keep privileged code in main or preload as appropriate.
 - Sandboxed preload cannot rely on arbitrary Node modules or `electron` APIs such as `shell`; use IPC to main (`registerFaExtraEnvIpc`, `registerFaExternalLinksIpc`, and the existing sync groups) instead of importing packages like `app-root-path` in `contentBridgeAPIs/`.
 - Privileged window and app-metadata calls go through sync IPC (`faWindowControlAPI`, `appDetailsAPI`); do not reintroduce `@electron/remote` without a documented reason.
+- **Structured IPC arguments** must be validated in **main** (not only typed in preload). Use **Zod** in `src-electron/shared/` and wire parsing in `register*Ipc.ts` — see [fantasia-electron-main](../fantasia-electron-main/SKILL.md) **IPC payload validation (Zod)** and `faUserSettingsPatchSchema.ts` / `registerFaUserSettingsIpc.ts`.
 
 ## Related skills
 

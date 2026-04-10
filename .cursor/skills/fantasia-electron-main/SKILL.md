@@ -16,6 +16,23 @@ description: >-
 - **Modular logic**: Prefer `src-electron/mainScripts/` feature folders — `appIdentity/`, `windowManagement/`, `chromiumFixes/`, `userSettings/`, `nativeShell/`, `ipcManagement/` — plus root `appManagement.ts`, over growing `electron-main.ts` indefinitely.
 - **IPC registration**: Shared channel strings live in `src-electron/electron-ipc-bridge.ts`. Main-process `ipcMain` handlers for preload-invoked channels belong in `mainScripts/ipcManagement/register*Ipc.ts` (e.g. `registerFaDevToolsIpc.ts`, `registerFaExtraEnvIpc.ts`, `registerFaExternalLinksIpc.ts`, `registerFaUserSettingsIpc.ts`, `registerFaWindowControlIpc.ts`, `registerFaAppDetailsIpc.ts`). Call those registrars from app startup (`startApp()` in `appManagement.ts` today) so preload and main always use the same names.
 
+## IPC payload validation (Zod)
+
+- **`ipcMain.handle` arguments are untrusted at runtime** even when preload and `types/` use correct TypeScript shapes. Anything the renderer can reach (including after a future XSS) may call the bridge with arbitrary structured-clone values.
+- **Objects and patches**: Define a Zod schema in **`src-electron/shared/`** (Electron-free, no `import` from `electron`) and parse with **`.parse()`** or **`.safeParse()`** in the registrar before merging into stores or calling privileged APIs. Reference: **`faUserSettingsPatchSchema.ts`** — builds a **`.strict()`** object from **`FA_USER_SETTINGS_DEFAULTS`** keys so unknown keys fail and allowed keys stay aligned with **`cleanupFaUserSettings`**. Export a small **`parse…`** helper that rejects non–plain objects if you want clearer errors than Zod’s defaults for `null`/arrays.
+- **Throw on invalid input** so `ipcRenderer.invoke` rejects; document or handle failures in the renderer (for example Pinia **`try/catch`** around **`setSettings`**).
+- **Single primitive channels** (one URL string, one flag): **`typeof`** plus an existing predicate (e.g. **`checkIfExternalUrl`** in **`registerFaExternalLinksIpc`**) is fine; optional **`z.string().refine(...)`** only if it improves readability or shared error formatting.
+- **Not renderer IPC**: **`registerFaExtraEnvIpc`** builds **`COMPONENT_PROPS`** from **`process.env`** via **`JSON.parse`** — that is harness/env trust, not preload IPC; Zod there would harden env-driven shapes but is a separate decision from channel handlers.
+- **Dependency**: **`zod`** is listed under **`package.json`** **`dependencies`** so production main bundles resolve it.
+- Add Vitest coverage for the schema module under **`src-electron/shared/tests/`** and extend **`register*Ipc`** tests so invalid payloads do not call **`store.set`** (or equivalent).
+
+### When Zod is not replacing existing code (repo scan)
+
+- **`registerFaExternalLinksIpc`**: one **`string`** argument plus **`checkIfExternalUrl`** — no structured object; switching to Zod would be **`z.string()`** plus **`refine`** duplicating the same predicate without simplifying the flow.
+- **`registerFaWindowControlIpc`**, **`registerFaAppDetailsIpc`**, **`registerFaDevToolsIpc`**: sync channels with **`event.returnValue`** and no structured payload from the renderer beyond implicit sender context.
+- **`registerFaExtraEnvIpc`**: snapshot is built from **`process.env`** in main, not from renderer IPC; **`parseComponentProps`** uses **`JSON.parse`** on **`COMPONENT_PROPS`** — optional future Zod there would harden harness/env JSON, not the preload IPC boundary.
+- Future **DB or bulk APIs** over **`invoke`**: prefer Zod (or the same pattern as **`faUserSettingsPatchSchema`**) from the start.
+
 ## Testing
 
 - Vitest tests live under `src-electron/mainScripts/tests/` (e.g. `appManagement`), each `mainScripts/<area>/tests/` (`appIdentity`, `windowManagement`, `chromiumFixes`, `userSettings`, `nativeShell`, `ipcManagement`), and `src-electron/contentBridgeAPIs/tests/` for bridge modules.
