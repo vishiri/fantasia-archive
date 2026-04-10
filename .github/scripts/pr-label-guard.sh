@@ -14,8 +14,16 @@ EVENT_PATH="${GITHUB_EVENT_PATH:?GITHUB_EVENT_PATH is required}"
 REPO="${GITHUB_REPOSITORY:?GITHUB_REPOSITORY is required}"
 PR_NUMBER="$(jq -r '.pull_request.number' "${EVENT_PATH}")"
 
-has_novisual="$(jq -r '.pull_request.labels | map(.name) | contains(["novisualchange"])' "${EVENT_PATH}")"
-has_visual="$(jq -r '.pull_request.labels | map(.name) | contains(["visualchange"])' "${EVENT_PATH}")"
+# Read labels from the GitHub API, not only GITHUB_EVENT_PATH. Re-run failed jobs replays the
+# original pull_request payload (often from open/push before labels existed), so embedded labels
+# stay stale and the guard would never pass until a new synchronize/labeled run. API state is current.
+has_novisual=false
+has_visual=false
+while IFS= read -r name; do
+  [[ -z "${name}" ]] && continue
+  [[ "${name}" == "novisualchange" ]] && has_novisual=true
+  [[ "${name}" == "visualchange" ]] && has_visual=true
+done < <(gh api "repos/${REPO}/pulls/${PR_NUMBER}" --jq '.labels[].name')
 
 invalid=false
 if [[ "${has_novisual}" == "true" && "${has_visual}" == "true" ]]; then
