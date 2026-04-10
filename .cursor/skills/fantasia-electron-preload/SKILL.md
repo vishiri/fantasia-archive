@@ -18,9 +18,10 @@ description: >-
 
 ## Main ↔ preload IPC (electron-ipc-bridge)
 
-- **Registry**: `src-electron/electron-ipc-bridge.ts` holds canonical channel strings (`export const` objects, e.g. `FA_DEVTOOLS_IPC`, `FA_USER_SETTINGS_IPC`, `FA_WINDOW_CONTROL_IPC`, `FA_APP_DETAILS_IPC`). Preload-side code that uses `ipcRenderer.invoke` / `sendSync` and main-side `ipcMain.handle` / `on` must use these constants — never duplicate string literals across files.
-- **Main registration**: Add or extend a `mainScripts/ipcManagement/register*Ipc.ts` module that wires `ipcMain` with the same constants, and ensure startup invokes that registrar (today `startApp()` in `mainScripts/appManagement.ts` calls the existing registrars).
-- **Preload usage**: Import the matching constant object in the relevant `contentBridgeAPIs/*.ts` module and pass those strings to `ipcRenderer`.
+- **Async first**: Prefer **`ipcRenderer.invoke`** with **`ipcMain.handle`** and Promise-returning methods on `faContentBridgeAPIs`. **Synchronous** **`ipcRenderer.sendSync`** (or other blocking IPC) is **not forbidden** but is a **last resort** — use only when there is no remotely reasonable async alternative; note the exception in a short comment or PR review.
+- **Registry**: `src-electron/electron-ipc-bridge.ts` holds canonical channel strings (`export const` objects, e.g. `FA_DEVTOOLS_IPC`, `FA_USER_SETTINGS_IPC`, `FA_WINDOW_CONTROL_IPC`, `FA_APP_DETAILS_IPC`, `FA_EXTRA_ENV_IPC`). Preload-side code that uses `ipcRenderer.invoke` and main-side `ipcMain.handle` must use these constants — never duplicate string literals across files.
+- **Main registration**: Add or extend a `mainScripts/ipcManagement/register*Ipc.ts` module that wires `ipcMain.handle` with the same constants, and ensure startup invokes that registrar (today `startApp()` in `mainScripts/appManagement.ts` calls the existing registrars).
+- **Preload usage**: Import the matching constant object in the relevant `contentBridgeAPIs/*.ts` module and pass those strings to `ipcRenderer.invoke`.
 
 ## Adding a new API surface
 
@@ -35,8 +36,8 @@ description: >-
 
 - Prefer **narrow, explicit** methods on the bridge object over passing raw Node/Electron objects to the renderer.
 - Do not enable broad `nodeIntegration` in the renderer to “just make it work”; keep privileged code in main or preload as appropriate.
-- Sandboxed preload cannot rely on arbitrary Node modules or `electron` APIs such as `shell`; use IPC to main (`registerFaExtraEnvIpc`, `registerFaExternalLinksIpc`, and the existing sync groups) instead of importing packages like `app-root-path` in `contentBridgeAPIs/`.
-- Privileged window and app-metadata calls go through sync IPC (`faWindowControlAPI`, `appDetailsAPI`); do not reintroduce `@electron/remote` without a documented reason.
+- Sandboxed preload cannot rely on arbitrary Node modules or `electron` APIs such as `shell`; use IPC to main (`registerFaExtraEnvIpc`, `registerFaExternalLinksIpc`, `registerFaWindowControlIpc`, `registerFaDevToolsIpc`, `registerFaAppDetailsIpc`, and similar) instead of importing packages like `app-root-path` in `contentBridgeAPIs/`.
+- Privileged window and app-metadata calls go through async `ipcRenderer.invoke` (`faWindowControlAPI`, `faDevToolsControlAPI`, `appDetailsAPI.getProjectVersion`, `extraEnvVariablesAPI.getSnapshot` with memoized promises for one round trip per load); do not reintroduce `@electron/remote` without a documented reason.
 - **Structured IPC arguments** must be validated in **main** (not only typed in preload). Use **Zod** in `src-electron/shared/` and wire parsing in `register*Ipc.ts` — see [fantasia-electron-main](../fantasia-electron-main/SKILL.md) **IPC payload validation (Zod)** and `faUserSettingsPatchSchema.ts` / `registerFaUserSettingsIpc.ts`.
 
 ## Related skills
