@@ -4,42 +4,43 @@ import { FA_WINDOW_CONTROL_IPC } from 'app/src-electron/electron-ipc-bridge'
 import type { I_faWindowControlAPI } from 'app/types/I_faWindowControlAPI'
 
 export const faWindowControlAPI: I_faWindowControlAPI = {
-
-  checkWindowMaximized () {
+  async checkWindowMaximized () {
     try {
-      return ipcRenderer.sendSync(FA_WINDOW_CONTROL_IPC.checkMaximizedSync) === true
+      const v = await ipcRenderer.invoke(FA_WINDOW_CONTROL_IPC.checkMaximizedAsync)
+
+      return v === true
     } catch {
       return false
     }
   },
 
-  minimizeWindow () {
+  async minimizeWindow () {
     try {
-      ipcRenderer.sendSync(FA_WINDOW_CONTROL_IPC.minimizeSync)
-    } catch {
-      // no-op (e.g. running outside Electron)
-    }
-  },
-
-  maximizeWindow () {
-    try {
-      ipcRenderer.sendSync(FA_WINDOW_CONTROL_IPC.maximizeSync)
+      await ipcRenderer.invoke(FA_WINDOW_CONTROL_IPC.minimizeAsync)
     } catch {
       // no-op
     }
   },
 
-  resizeWindow () {
+  async maximizeWindow () {
     try {
-      ipcRenderer.sendSync(FA_WINDOW_CONTROL_IPC.resizeToggleSync)
+      await ipcRenderer.invoke(FA_WINDOW_CONTROL_IPC.maximizeAsync)
     } catch {
       // no-op
     }
   },
 
-  closeWindow () {
+  async resizeWindow () {
     try {
-      ipcRenderer.sendSync(FA_WINDOW_CONTROL_IPC.closeSync)
+      await ipcRenderer.invoke(FA_WINDOW_CONTROL_IPC.resizeToggleAsync)
+    } catch {
+      // no-op
+    }
+  },
+
+  async closeWindow () {
+    try {
+      await ipcRenderer.invoke(FA_WINDOW_CONTROL_IPC.closeAsync)
     } catch {
       // no-op
     }

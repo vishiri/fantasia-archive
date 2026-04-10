@@ -1,70 +1,77 @@
-import { vi, expect, test, beforeEach } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_APP_DETAILS_IPC } from 'app/src-electron/electron-ipc-bridge'
 
-const { sendSyncMock } = vi.hoisted(() => {
+const { invokeMock } = vi.hoisted(() => {
   return {
-    sendSyncMock: vi.fn(() => '1.0.0')
+    invokeMock: vi.fn(() => Promise.resolve('1.0.0'))
   }
 })
 
 vi.mock('electron', () => {
   return {
     ipcRenderer: {
-      sendSync: sendSyncMock
+      invoke: invokeMock
     }
   }
 })
 
-beforeEach(() => {
-  sendSyncMock.mockReset()
+beforeEach(async () => {
+  vi.resetModules()
+  invokeMock.mockReset()
+  invokeMock.mockResolvedValue('1.0.0')
 })
 
 /**
- * appDetailsAPI
- * PROJECT_VERSION reflects sendSync at module load.
+ * getProjectVersion returns string from invoke.
  */
-test('Test if appDetailsAPI is returning correct value - PROJECT_VERSION', async () => {
-  sendSyncMock.mockReturnValue('1.0.0')
-  vi.resetModules()
+test('Test if appDetailsAPI getProjectVersion returns correct value', async () => {
+  const { appDetailsAPI } = await import('../appDetailsAPI')
+  const v = await appDetailsAPI.getProjectVersion()
+
+  expect(v).toBeTypeOf('string')
+  expect(v).toBe('1.0.0')
+  expect(invokeMock).toHaveBeenCalledWith(FA_APP_DETAILS_IPC.getVersionAsync)
+})
+
+/**
+ * Fresh module load picks up a new invoke return value after resetModules.
+ */
+test('Test if appDetailsAPI getProjectVersion follows invoke on re-import', async () => {
+  invokeMock.mockResolvedValue('9.8.7')
+  const { appDetailsAPI: reloaded } = await import('../appDetailsAPI')
+
+  await expect(reloaded.getProjectVersion()).resolves.toBe('9.8.7')
+})
+
+/**
+ * Non-string invoke result becomes empty string.
+ */
+test('Test that appDetailsAPI getProjectVersion is empty when invoke returns non-string', async () => {
+  invokeMock.mockResolvedValue(123 as unknown as string)
+  const { appDetailsAPI: reloaded } = await import('../appDetailsAPI')
+
+  await expect(reloaded.getProjectVersion()).resolves.toBe('')
+})
+
+/**
+ * invoke reject yields empty string.
+ */
+test('Test that appDetailsAPI getProjectVersion is empty when invoke rejects', async () => {
+  invokeMock.mockRejectedValue(new Error('ipc failed'))
+  const { appDetailsAPI: reloaded } = await import('../appDetailsAPI')
+
+  await expect(reloaded.getProjectVersion()).resolves.toBe('')
+})
+
+/**
+ * Second getProjectVersion reuses memoized promise (single invoke).
+ */
+test('Test that appDetailsAPI getProjectVersion memoizes invoke', async () => {
   const { appDetailsAPI } = await import('../appDetailsAPI')
 
-  expect(appDetailsAPI.PROJECT_VERSION).toBeTypeOf('string')
-  expect(appDetailsAPI.PROJECT_VERSION).toBe('1.0.0')
-  expect(sendSyncMock).toHaveBeenCalledWith(FA_APP_DETAILS_IPC.getVersionSync)
-})
+  await appDetailsAPI.getProjectVersion()
+  await appDetailsAPI.getProjectVersion()
 
-/**
- * appDetailsAPI
- * Fresh module load picks up a new sendSync return value after resetModules.
- */
-test('Test if appDetailsAPI PROJECT_VERSION follows sendSync on re-import', async () => {
-  sendSyncMock.mockReturnValue('9.8.7')
-  vi.resetModules()
-  const { appDetailsAPI: reloaded } = await import('../appDetailsAPI')
-  expect(reloaded.PROJECT_VERSION).toBe('9.8.7')
-})
-
-/**
- * appDetailsAPI
- * Non-string sendSync result becomes empty PROJECT_VERSION.
- */
-test('Test that appDetailsAPI PROJECT_VERSION is empty when sendSync returns non-string', async () => {
-  sendSyncMock.mockReturnValue(123 as unknown as string)
-  vi.resetModules()
-  const { appDetailsAPI: reloaded } = await import('../appDetailsAPI')
-  expect(reloaded.PROJECT_VERSION).toBe('')
-})
-
-/**
- * appDetailsAPI
- * sendSync throw yields empty PROJECT_VERSION on re-import.
- */
-test('Test that appDetailsAPI PROJECT_VERSION is empty when sendSync throws', async () => {
-  sendSyncMock.mockImplementation(() => {
-    throw new Error('no ipc')
-  })
-  vi.resetModules()
-  const { appDetailsAPI: reloaded } = await import('../appDetailsAPI')
-  expect(reloaded.PROJECT_VERSION).toBe('')
+  expect(invokeMock).toHaveBeenCalledTimes(1)
 })

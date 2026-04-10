@@ -1,142 +1,143 @@
-import { test, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_WINDOW_CONTROL_IPC } from 'app/src-electron/electron-ipc-bridge'
 
-const { sendSyncMock } = vi.hoisted(() => {
+const { invokeMock } = vi.hoisted(() => {
   return {
-    sendSyncMock: vi.fn()
+    invokeMock: vi.fn()
   }
 })
 
 vi.mock('electron', () => {
   return {
     ipcRenderer: {
-      sendSync: sendSyncMock
+      invoke: invokeMock
     }
   }
 })
 
-import { faWindowControlAPI } from '../faWindowControlAPI'
-
-beforeEach(() => {
-  sendSyncMock.mockReset()
+beforeEach(async () => {
+  vi.resetModules()
+  invokeMock.mockReset()
 })
 
 /**
  * checkWindowMaximized
- * Returns false when sendSync throws.
+ * Returns false when invoke rejects.
  */
-test('Test if checkWindowMaximized returns false when sendSync throws', () => {
-  sendSyncMock.mockImplementation(() => {
-    throw new Error('no ipc')
-  })
-  expect(faWindowControlAPI.checkWindowMaximized()).toBe(false)
+test('Test if checkWindowMaximized returns false when invoke rejects', async () => {
+  invokeMock.mockRejectedValue(new Error('ipc failed'))
+  const { faWindowControlAPI } = await import('../faWindowControlAPI')
+
+  await expect(faWindowControlAPI.checkWindowMaximized()).resolves.toBe(false)
 })
 
 /**
  * checkWindowMaximized
- * Returns true only when sendSync returns strict true.
+ * Returns true only when invoke returns strict true.
  */
-test('Test that checkWindowMaximized returns true when sendSync returns true', () => {
-  sendSyncMock.mockReturnValue(true)
-  expect(faWindowControlAPI.checkWindowMaximized()).toBe(true)
-  expect(sendSyncMock).toHaveBeenCalledWith(FA_WINDOW_CONTROL_IPC.checkMaximizedSync)
+test('Test that checkWindowMaximized returns true when invoke returns true', async () => {
+  invokeMock.mockResolvedValue(true)
+  const { faWindowControlAPI } = await import('../faWindowControlAPI')
+
+  await expect(faWindowControlAPI.checkWindowMaximized()).resolves.toBe(true)
+  expect(invokeMock).toHaveBeenCalledWith(FA_WINDOW_CONTROL_IPC.checkMaximizedAsync)
 })
 
 /**
  * checkWindowMaximized
- * Returns false when sendSync returns a non-boolean truthy value.
+ * Returns false when invoke returns a non-boolean truthy value.
  */
-test('Test that checkWindowMaximized returns false when sendSync returns non-true', () => {
-  sendSyncMock.mockReturnValue('yes')
-  expect(faWindowControlAPI.checkWindowMaximized()).toBe(false)
+test('Test that checkWindowMaximized returns false when invoke returns non-true', async () => {
+  invokeMock.mockResolvedValue('yes')
+  const { faWindowControlAPI } = await import('../faWindowControlAPI')
+
+  await expect(faWindowControlAPI.checkWindowMaximized()).resolves.toBe(false)
 })
 
 /**
  * checkWindowMaximized
- * Returns false when sendSync returns false.
+ * Returns false when invoke returns false.
  */
-test('Test that checkWindowMaximized returns false when sendSync returns false', () => {
-  sendSyncMock.mockReturnValue(false)
-  expect(faWindowControlAPI.checkWindowMaximized()).toBe(false)
+test('Test that checkWindowMaximized returns false when invoke returns false', async () => {
+  invokeMock.mockResolvedValue(false)
+  const { faWindowControlAPI } = await import('../faWindowControlAPI')
+
+  await expect(faWindowControlAPI.checkWindowMaximized()).resolves.toBe(false)
+})
+
+test('Test that minimizeWindow calls invoke with minimize channel', async () => {
+  invokeMock.mockResolvedValue(undefined)
+  const { faWindowControlAPI } = await import('../faWindowControlAPI')
+
+  await faWindowControlAPI.minimizeWindow()
+
+  expect(invokeMock).toHaveBeenCalledWith(FA_WINDOW_CONTROL_IPC.minimizeAsync)
 })
 
 /**
- * minimizeWindow
- * Invokes minimize sync channel.
+ * No-op when invoke rejects.
  */
-test('Test that minimizeWindow calls sendSync with minimize channel', () => {
-  faWindowControlAPI.minimizeWindow()
-  expect(sendSyncMock).toHaveBeenCalledWith(FA_WINDOW_CONTROL_IPC.minimizeSync)
+test('Test that minimizeWindow does not throw when invoke rejects', async () => {
+  invokeMock.mockRejectedValue(new Error('ipc failed'))
+  const { faWindowControlAPI } = await import('../faWindowControlAPI')
+
+  await expect(faWindowControlAPI.minimizeWindow()).resolves.toBeUndefined()
+})
+
+test('Test that maximizeWindow calls invoke with maximize channel', async () => {
+  invokeMock.mockResolvedValue(undefined)
+  const { faWindowControlAPI } = await import('../faWindowControlAPI')
+
+  await faWindowControlAPI.maximizeWindow()
+
+  expect(invokeMock).toHaveBeenCalledWith(FA_WINDOW_CONTROL_IPC.maximizeAsync)
 })
 
 /**
- * minimizeWindow
- * No-op when sendSync throws.
+ * No-op when invoke rejects.
  */
-test('Test that minimizeWindow does not throw when sendSync throws', () => {
-  sendSyncMock.mockImplementation(() => {
-    throw new Error('no ipc')
-  })
-  expect(() => faWindowControlAPI.minimizeWindow()).not.toThrow()
+test('Test that maximizeWindow does not throw when invoke rejects', async () => {
+  invokeMock.mockRejectedValue(new Error('ipc failed'))
+  const { faWindowControlAPI } = await import('../faWindowControlAPI')
+
+  await expect(faWindowControlAPI.maximizeWindow()).resolves.toBeUndefined()
+})
+
+test('Test that resizeWindow calls invoke with resize toggle channel', async () => {
+  invokeMock.mockResolvedValue(undefined)
+  const { faWindowControlAPI } = await import('../faWindowControlAPI')
+
+  await faWindowControlAPI.resizeWindow()
+
+  expect(invokeMock).toHaveBeenCalledWith(FA_WINDOW_CONTROL_IPC.resizeToggleAsync)
 })
 
 /**
- * maximizeWindow
- * Invokes maximize sync channel.
+ * No-op when invoke rejects.
  */
-test('Test that maximizeWindow calls sendSync with maximize channel', () => {
-  faWindowControlAPI.maximizeWindow()
-  expect(sendSyncMock).toHaveBeenCalledWith(FA_WINDOW_CONTROL_IPC.maximizeSync)
+test('Test that resizeWindow does not throw when invoke rejects', async () => {
+  invokeMock.mockRejectedValue(new Error('ipc failed'))
+  const { faWindowControlAPI } = await import('../faWindowControlAPI')
+
+  await expect(faWindowControlAPI.resizeWindow()).resolves.toBeUndefined()
+})
+
+test('Test that closeWindow calls invoke with close channel', async () => {
+  invokeMock.mockResolvedValue(undefined)
+  const { faWindowControlAPI } = await import('../faWindowControlAPI')
+
+  await faWindowControlAPI.closeWindow()
+
+  expect(invokeMock).toHaveBeenCalledWith(FA_WINDOW_CONTROL_IPC.closeAsync)
 })
 
 /**
- * maximizeWindow
- * No-op when sendSync throws.
+ * No-op when invoke rejects.
  */
-test('Test that maximizeWindow does not throw when sendSync throws', () => {
-  sendSyncMock.mockImplementation(() => {
-    throw new Error('no ipc')
-  })
-  expect(() => faWindowControlAPI.maximizeWindow()).not.toThrow()
-})
+test('Test that closeWindow does not throw when invoke rejects', async () => {
+  invokeMock.mockRejectedValue(new Error('ipc failed'))
+  const { faWindowControlAPI } = await import('../faWindowControlAPI')
 
-/**
- * resizeWindow
- * Invokes resize toggle sync channel.
- */
-test('Test that resizeWindow calls sendSync with resize toggle channel', () => {
-  faWindowControlAPI.resizeWindow()
-  expect(sendSyncMock).toHaveBeenCalledWith(FA_WINDOW_CONTROL_IPC.resizeToggleSync)
-})
-
-/**
- * resizeWindow
- * No-op when sendSync throws.
- */
-test('Test that resizeWindow does not throw when sendSync throws', () => {
-  sendSyncMock.mockImplementation(() => {
-    throw new Error('no ipc')
-  })
-  expect(() => faWindowControlAPI.resizeWindow()).not.toThrow()
-})
-
-/**
- * closeWindow
- * Invokes close sync channel.
- */
-test('Test that closeWindow calls sendSync with close channel', () => {
-  faWindowControlAPI.closeWindow()
-  expect(sendSyncMock).toHaveBeenCalledWith(FA_WINDOW_CONTROL_IPC.closeSync)
-})
-
-/**
- * closeWindow
- * No-op when sendSync throws.
- */
-test('Test that closeWindow does not throw when sendSync throws', () => {
-  sendSyncMock.mockImplementation(() => {
-    throw new Error('no ipc')
-  })
-  expect(() => faWindowControlAPI.closeWindow()).not.toThrow()
+  await expect(faWindowControlAPI.closeWindow()).resolves.toBeUndefined()
 })

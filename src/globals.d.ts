@@ -1,4 +1,4 @@
-import type { I_extraEnvVariablesAPI } from 'app/types/I_extraEnvVariablesAPI'
+import type { I_extraEnvVariablesBridge } from 'app/types/I_extraEnvVariablesAPI'
 import type { I_faWindowControlAPI } from 'app/types/I_faWindowControlAPI'
 import type { I_faExternalLinksManagerAPI } from 'app/types/I_faExternalLinksManagerAPI'
 import type { I_faDevToolsControl } from 'app/types/I_faDevToolsControl'
@@ -11,7 +11,7 @@ declare global{
       faWindowControl: I_faWindowControlAPI,
       faDevToolsControl: I_faDevToolsControl,
       faExternalLinksManager: I_faExternalLinksManagerAPI,
-      extraEnvVariables: I_extraEnvVariablesAPI
+      extraEnvVariables: I_extraEnvVariablesBridge
       appDetails: I_appDetailsAPI
       faUserSettings: I_faUserSettingsAPI
     }

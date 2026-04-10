@@ -1,16 +1,9 @@
-import { vi, expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 
-const { exposeInMainWorldMock, sendSyncMock, invokeMock } = vi.hoisted(() => {
+const { exposeInMainWorldMock, invokeMock } = vi.hoisted(() => {
   return {
     exposeInMainWorldMock: vi.fn(),
-    invokeMock: vi.fn(() => Promise.resolve()),
-    sendSyncMock: vi.fn(() => ({
-      COMPONENT_NAME: false,
-      COMPONENT_PROPS: false,
-      ELECTRON_MAIN_FILEPATH: '/preload-test/electron-main.js',
-      FA_FRONTEND_RENDER_TIMER: 3000,
-      TEST_ENV: false
-    }))
+    invokeMock: vi.fn(() => Promise.resolve())
   }
 })
 
@@ -20,8 +13,7 @@ vi.mock('electron', () => {
       exposeInMainWorld: exposeInMainWorldMock
     },
     ipcRenderer: {
-      invoke: invokeMock,
-      sendSync: sendSyncMock
+      invoke: invokeMock
     }
   }
 })

@@ -4,34 +4,35 @@ import { FA_DEVTOOLS_IPC } from 'app/src-electron/electron-ipc-bridge'
 import type { I_faDevToolsControl } from 'app/types/I_faDevToolsControl'
 
 export const faDevToolsControlAPI: I_faDevToolsControl = {
-
-  checkDevToolsStatus () {
+  async checkDevToolsStatus () {
     try {
-      return ipcRenderer.sendSync(FA_DEVTOOLS_IPC.statusSync) === true
+      const v = await ipcRenderer.invoke(FA_DEVTOOLS_IPC.statusAsync)
+
+      return v === true
     } catch {
       return false
     }
   },
 
-  toggleDevTools () {
+  async toggleDevTools () {
     try {
-      ipcRenderer.sendSync(FA_DEVTOOLS_IPC.toggleSync)
-    } catch {
-      // no-op (e.g. running outside Electron)
-    }
-  },
-
-  openDevTools () {
-    try {
-      ipcRenderer.sendSync(FA_DEVTOOLS_IPC.openSync)
+      await ipcRenderer.invoke(FA_DEVTOOLS_IPC.toggleAsync)
     } catch {
       // no-op
     }
   },
 
-  closeDevTools () {
+  async openDevTools () {
     try {
-      ipcRenderer.sendSync(FA_DEVTOOLS_IPC.closeSync)
+      await ipcRenderer.invoke(FA_DEVTOOLS_IPC.openAsync)
+    } catch {
+      // no-op
+    }
+  },
+
+  async closeDevTools () {
+    try {
+      await ipcRenderer.invoke(FA_DEVTOOLS_IPC.closeAsync)
     } catch {
       // no-op
     }

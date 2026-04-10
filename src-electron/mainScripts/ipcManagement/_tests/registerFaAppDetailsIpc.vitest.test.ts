@@ -3,12 +3,12 @@ import { beforeEach, expect, test, vi } from 'vitest'
 import { FA_APP_DETAILS_IPC } from 'app/src-electron/electron-ipc-bridge'
 
 const mocks = vi.hoisted(() => {
-  const ipcMainOnMock = vi.fn()
+  const ipcMainHandleMock = vi.fn()
   const getVersionMock = vi.fn(() => '2.4.10')
 
   return {
     getVersionMock,
-    ipcMainOnMock
+    ipcMainHandleMock
   }
 })
 
@@ -18,34 +18,35 @@ vi.mock('electron', () => {
       getVersion: mocks.getVersionMock
     },
     ipcMain: {
-      on: mocks.ipcMainOnMock
+      handle: mocks.ipcMainHandleMock
     }
   }
 })
 
 beforeEach(async () => {
   vi.resetModules()
-  mocks.ipcMainOnMock.mockReset()
+  mocks.ipcMainHandleMock.mockReset()
   mocks.getVersionMock.mockReset()
   mocks.getVersionMock.mockReturnValue('2.4.10')
 })
 
-function handlerFor (channel: string): (event: { returnValue?: unknown }, ...args: unknown[]) => void {
-  const call = mocks.ipcMainOnMock.mock.calls.find((c) => c[0] === channel)
+function handlerFor (channel: string): (...args: unknown[]) => unknown {
+  const call = mocks.ipcMainHandleMock.mock.calls.find((c) => c[0] === channel)
   expect(call).toBeDefined()
-  return call?.[1] as (event: { returnValue?: unknown }, ...args: unknown[]) => void
+
+  return call?.[1] as (...args: unknown[]) => unknown
 }
 
 /**
  * registerFaAppDetailsIpc
- * Subscribes getVersionSync once.
+ * Subscribes getVersionAsync once.
  */
-test('Test that registerFaAppDetailsIpc registers getVersionSync channel once', async () => {
+test('Test that registerFaAppDetailsIpc registers getVersionAsync channel once', async () => {
   const { registerFaAppDetailsIpc } = await import('../registerFaAppDetailsIpc')
   registerFaAppDetailsIpc()
 
-  expect(mocks.ipcMainOnMock).toHaveBeenCalledOnce()
-  expect(mocks.ipcMainOnMock.mock.calls[0][0]).toBe(FA_APP_DETAILS_IPC.getVersionSync)
+  expect(mocks.ipcMainHandleMock).toHaveBeenCalledOnce()
+  expect(mocks.ipcMainHandleMock.mock.calls[0][0]).toBe(FA_APP_DETAILS_IPC.getVersionAsync)
 })
 
 /**
@@ -55,40 +56,38 @@ test('Test that registerFaAppDetailsIpc registers getVersionSync channel once', 
 test('Test that registerFaAppDetailsIpc skips duplicate registration', async () => {
   const { registerFaAppDetailsIpc } = await import('../registerFaAppDetailsIpc')
   registerFaAppDetailsIpc()
-  const afterFirst = mocks.ipcMainOnMock.mock.calls.length
+  const afterFirst = mocks.ipcMainHandleMock.mock.calls.length
   registerFaAppDetailsIpc()
-  expect(mocks.ipcMainOnMock.mock.calls.length).toBe(afterFirst)
+  expect(mocks.ipcMainHandleMock.mock.calls.length).toBe(afterFirst)
 })
 
 /**
  * registerFaAppDetailsIpc
- * getVersionSync sets returnValue from app.getVersion().
+ * getVersionAsync returns app.getVersion().
  */
-test('Test that registerFaAppDetailsIpc getVersionSync returns app.getVersion', async () => {
+test('Test that registerFaAppDetailsIpc getVersionAsync returns app.getVersion', async () => {
   mocks.getVersionMock.mockReturnValue('1.0.0')
   const { registerFaAppDetailsIpc } = await import('../registerFaAppDetailsIpc')
   registerFaAppDetailsIpc()
 
-  const event: { returnValue?: string } = {}
-  handlerFor(FA_APP_DETAILS_IPC.getVersionSync)(event)
+  const result = handlerFor(FA_APP_DETAILS_IPC.getVersionAsync)()
 
   expect(mocks.getVersionMock).toHaveBeenCalledOnce()
-  expect(event.returnValue).toBe('1.0.0')
+  expect(result).toBe('1.0.0')
 })
 
 /**
  * registerFaAppDetailsIpc
- * getVersionSync sets empty string when getVersion throws.
+ * getVersionAsync returns empty string when getVersion throws.
  */
-test('Test that registerFaAppDetailsIpc getVersionSync returns empty string on getVersion error', async () => {
+test('Test that registerFaAppDetailsIpc getVersionAsync returns empty string on getVersion error', async () => {
   mocks.getVersionMock.mockImplementation(() => {
     throw new Error('no version')
   })
   const { registerFaAppDetailsIpc } = await import('../registerFaAppDetailsIpc')
   registerFaAppDetailsIpc()
 
-  const event: { returnValue?: string } = {}
-  handlerFor(FA_APP_DETAILS_IPC.getVersionSync)(event)
+  const result = handlerFor(FA_APP_DETAILS_IPC.getVersionAsync)()
 
-  expect(event.returnValue).toBe('')
+  expect(result).toBe('')
 })

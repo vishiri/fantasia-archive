@@ -56,31 +56,34 @@ beforeEach(() => {
 
   window.faContentBridgeAPIs = {
     faWindowControl: {
-      checkWindowMaximized: vi.fn(() => false),
-      minimizeWindow: vi.fn(),
-      maximizeWindow: vi.fn(),
-      resizeWindow: vi.fn(),
-      closeWindow: vi.fn()
+      checkWindowMaximized: vi.fn(async () => false),
+      minimizeWindow: vi.fn(async () => undefined),
+      maximizeWindow: vi.fn(async () => undefined),
+      resizeWindow: vi.fn(async () => undefined),
+      closeWindow: vi.fn(async () => undefined)
     },
     faDevToolsControl: {
-      checkDevToolsStatus: vi.fn(() => false),
-      toggleDevTools: vi.fn(),
-      openDevTools: vi.fn(),
-      closeDevTools: vi.fn()
+      checkDevToolsStatus: vi.fn(async () => false),
+      toggleDevTools: vi.fn(async () => undefined),
+      openDevTools: vi.fn(async () => undefined),
+      closeDevTools: vi.fn(async () => undefined)
     },
     faExternalLinksManager: {
       checkIfExternal: vi.fn(() => false),
       openExternal: vi.fn()
     },
     extraEnvVariables: {
-      ELECTRON_MAIN_FILEPATH: '/fake/electron-main.js',
-      FA_FRONTEND_RENDER_TIMER: 0,
-      TEST_ENV: undefined,
-      COMPONENT_NAME: undefined,
-      COMPONENT_PROPS: undefined
+      getCachedSnapshot: vi.fn(() => null),
+      getSnapshot: vi.fn(async () => ({
+        COMPONENT_NAME: undefined,
+        COMPONENT_PROPS: undefined,
+        ELECTRON_MAIN_FILEPATH: '/fake/electron-main.js',
+        FA_FRONTEND_RENDER_TIMER: 0,
+        TEST_ENV: undefined
+      }))
     },
     appDetails: {
-      PROJECT_VERSION: '0.0.0-unit-test'
+      getProjectVersion: vi.fn(async () => '0.0.0-unit-test')
     },
     faUserSettings: {
       getSettings: vi.fn(async () => ({ ...FA_USER_SETTINGS_DEFAULTS })),

@@ -1,12 +1,12 @@
-import { beforeEach, expect, test, vi, afterEach } from 'vitest'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_EXTRA_ENV_IPC } from 'app/src-electron/electron-ipc-bridge'
 
 const mocks = vi.hoisted(() => {
-  const ipcMainOnMock = vi.fn()
+  const ipcMainHandleMock = vi.fn()
 
   return {
-    ipcMainOnMock,
+    ipcMainHandleMock,
     resolveMainMock: vi.fn(() => '/unpackaged/electron-main.js')
   }
 })
@@ -20,14 +20,14 @@ vi.mock('app/src-electron/mainScripts/windowManagement/resolveFaElectronMainJsPa
 vi.mock('electron', () => {
   return {
     ipcMain: {
-      on: mocks.ipcMainOnMock
+      handle: mocks.ipcMainHandleMock
     }
   }
 })
 
 beforeEach(() => {
   vi.resetModules()
-  mocks.ipcMainOnMock.mockReset()
+  mocks.ipcMainHandleMock.mockReset()
   mocks.resolveMainMock.mockClear()
   mocks.resolveMainMock.mockReturnValue('/unpackaged/electron-main.js')
   vi.unstubAllEnvs()
@@ -37,23 +37,23 @@ afterEach(() => {
   vi.unstubAllEnvs()
 })
 
-function handlerFor (channel: string): (event: { returnValue?: unknown }, ...args: unknown[]) => void {
-  const call = mocks.ipcMainOnMock.mock.calls.find((c) => c[0] === channel)
+function handlerFor (channel: string): (...args: unknown[]) => unknown {
+  const call = mocks.ipcMainHandleMock.mock.calls.find((c) => c[0] === channel)
   expect(call).toBeDefined()
 
-  return call?.[1] as (event: { returnValue?: unknown }, ...args: unknown[]) => void
+  return call?.[1] as (...args: unknown[]) => unknown
 }
 
 /**
  * registerFaExtraEnvIpc
- * Subscribes snapshotSync once.
+ * Subscribes snapshotAsync once.
  */
-test('Test that registerFaExtraEnvIpc registers snapshotSync channel once', async () => {
+test('Test that registerFaExtraEnvIpc registers snapshotAsync channel once', async () => {
   const { registerFaExtraEnvIpc } = await import('../registerFaExtraEnvIpc')
   registerFaExtraEnvIpc()
 
-  expect(mocks.ipcMainOnMock).toHaveBeenCalledOnce()
-  expect(mocks.ipcMainOnMock.mock.calls[0][0]).toBe(FA_EXTRA_ENV_IPC.snapshotSync)
+  expect(mocks.ipcMainHandleMock).toHaveBeenCalledOnce()
+  expect(mocks.ipcMainHandleMock.mock.calls[0][0]).toBe(FA_EXTRA_ENV_IPC.snapshotAsync)
 })
 
 /**
@@ -63,9 +63,9 @@ test('Test that registerFaExtraEnvIpc registers snapshotSync channel once', asyn
 test('Test that registerFaExtraEnvIpc skips duplicate registration', async () => {
   const { registerFaExtraEnvIpc } = await import('../registerFaExtraEnvIpc')
   registerFaExtraEnvIpc()
-  const afterFirst = mocks.ipcMainOnMock.mock.calls.length
+  const afterFirst = mocks.ipcMainHandleMock.mock.calls.length
   registerFaExtraEnvIpc()
-  expect(mocks.ipcMainOnMock.mock.calls.length).toBe(afterFirst)
+  expect(mocks.ipcMainHandleMock.mock.calls.length).toBe(afterFirst)
 })
 
 /**
@@ -76,11 +76,10 @@ test('Test that registerFaExtraEnvIpc snapshot sets path and timer', async () =>
   const { registerFaExtraEnvIpc } = await import('../registerFaExtraEnvIpc')
   registerFaExtraEnvIpc()
 
-  const event: { returnValue?: unknown } = {}
-  handlerFor(FA_EXTRA_ENV_IPC.snapshotSync)(event)
+  const result = handlerFor(FA_EXTRA_ENV_IPC.snapshotAsync)()
 
   expect(mocks.resolveMainMock).toHaveBeenCalledOnce()
-  expect(event.returnValue).toEqual({
+  expect(result).toEqual({
     COMPONENT_NAME: false,
     COMPONENT_PROPS: false,
     ELECTRON_MAIN_FILEPATH: '/unpackaged/electron-main.js',
@@ -99,10 +98,9 @@ test('Test that registerFaExtraEnvIpc snapshot reads TEST_ENV and COMPONENT_NAME
   const { registerFaExtraEnvIpc } = await import('../registerFaExtraEnvIpc')
   registerFaExtraEnvIpc()
 
-  const event: { returnValue?: unknown } = {}
-  handlerFor(FA_EXTRA_ENV_IPC.snapshotSync)(event)
+  const result = handlerFor(FA_EXTRA_ENV_IPC.snapshotAsync)()
 
-  expect(event.returnValue).toMatchObject({
+  expect(result).toMatchObject({
     COMPONENT_NAME: 'MyComponent',
     TEST_ENV: 'components'
   })
@@ -118,10 +116,9 @@ test('Test that registerFaExtraEnvIpc snapshot treats empty env strings as false
   const { registerFaExtraEnvIpc } = await import('../registerFaExtraEnvIpc')
   registerFaExtraEnvIpc()
 
-  const event: { returnValue?: unknown } = {}
-  handlerFor(FA_EXTRA_ENV_IPC.snapshotSync)(event)
+  const result = handlerFor(FA_EXTRA_ENV_IPC.snapshotAsync)()
 
-  expect(event.returnValue).toMatchObject({
+  expect(result).toMatchObject({
     COMPONENT_NAME: false,
     TEST_ENV: false
   })
@@ -136,10 +133,9 @@ test('Test that registerFaExtraEnvIpc snapshot treats empty COMPONENT_PROPS as f
   const { registerFaExtraEnvIpc } = await import('../registerFaExtraEnvIpc')
   registerFaExtraEnvIpc()
 
-  const event: { returnValue?: unknown } = {}
-  handlerFor(FA_EXTRA_ENV_IPC.snapshotSync)(event)
+  const result = handlerFor(FA_EXTRA_ENV_IPC.snapshotAsync)()
 
-  expect(event.returnValue).toMatchObject({
+  expect(result).toMatchObject({
     COMPONENT_PROPS: false
   })
 })
@@ -153,10 +149,9 @@ test('Test that registerFaExtraEnvIpc snapshot parses COMPONENT_PROPS JSON', asy
   const { registerFaExtraEnvIpc } = await import('../registerFaExtraEnvIpc')
   registerFaExtraEnvIpc()
 
-  const event: { returnValue?: unknown } = {}
-  handlerFor(FA_EXTRA_ENV_IPC.snapshotSync)(event)
+  const result = handlerFor(FA_EXTRA_ENV_IPC.snapshotAsync)()
 
-  expect(event.returnValue).toMatchObject({
+  expect(result).toMatchObject({
     COMPONENT_PROPS: {
       a: 1,
       b: 'two'
@@ -173,9 +168,7 @@ test('Test that registerFaExtraEnvIpc snapshot throws on invalid COMPONENT_PROPS
   const { registerFaExtraEnvIpc } = await import('../registerFaExtraEnvIpc')
   registerFaExtraEnvIpc()
 
-  const event: { returnValue?: unknown } = {}
-
   expect(() => {
-    handlerFor(FA_EXTRA_ENV_IPC.snapshotSync)(event)
+    handlerFor(FA_EXTRA_ENV_IPC.snapshotAsync)()
   }).toThrow()
 })

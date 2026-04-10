@@ -17,7 +17,7 @@ fixAppName()
 // Fix Windows-only DevTools-bug concerning dark mode
 windowsDevToolsExtensionsFix(platform)
 
-// Register all ipcMain handlers before any BrowserWindow loads; preload uses sendSync for the extra-env snapshot at module load.
+// Register all ipcMain handlers before any BrowserWindow loads; preload uses invoke for bridge APIs after load.
 startApp()
 
 // Remove normal app menu

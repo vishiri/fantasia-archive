@@ -1,34 +1,60 @@
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 
+import type { I_extraEnvVariablesAPI } from 'app/types/I_extraEnvVariablesAPI'
+import type { I_extraEnvVariablesBridge } from 'app/types/I_extraEnvVariablesAPI'
+
 import type { T_contentBridgeScenario } from './contentBridge.types'
+
+const defaultExtraEnvSnapshot: I_extraEnvVariablesAPI = {
+  COMPONENT_NAME: undefined,
+  COMPONENT_PROPS: undefined,
+  ELECTRON_MAIN_FILEPATH: '/storybook/electron-main.js',
+  FA_FRONTEND_RENDER_TIMER: 0,
+  TEST_ENV: undefined
+}
+
+function resolveExtraEnvVariables (
+  override: (Partial<I_extraEnvVariablesBridge> & Partial<I_extraEnvVariablesAPI>) | undefined
+): I_extraEnvVariablesBridge {
+  if (override?.getSnapshot !== undefined) {
+    return {
+      getCachedSnapshot: override.getCachedSnapshot ?? (() => null),
+      getSnapshot: override.getSnapshot
+    }
+  }
+
+  const snap: I_extraEnvVariablesAPI = {
+    ...defaultExtraEnvSnapshot,
+    ...override
+  }
+
+  return {
+    getCachedSnapshot: () => snap,
+    getSnapshot: async () => snap
+  }
+}
 
 const baseBridge = () => ({
   faWindowControl: {
-    checkWindowMaximized: () => false,
-    minimizeWindow: () => undefined,
-    maximizeWindow: () => undefined,
-    resizeWindow: () => undefined,
-    closeWindow: () => undefined
+    checkWindowMaximized: async () => false,
+    closeWindow: async () => undefined,
+    maximizeWindow: async () => undefined,
+    minimizeWindow: async () => undefined,
+    resizeWindow: async () => undefined
   },
   faDevToolsControl: {
-    checkDevToolsStatus: () => false,
-    toggleDevTools: () => undefined,
-    openDevTools: () => undefined,
-    closeDevTools: () => undefined
+    checkDevToolsStatus: async () => false,
+    closeDevTools: async () => undefined,
+    openDevTools: async () => undefined,
+    toggleDevTools: async () => undefined
   },
   faExternalLinksManager: {
     checkIfExternal: () => false,
     openExternal: () => undefined
   },
-  extraEnvVariables: {
-    ELECTRON_MAIN_FILEPATH: '/storybook/electron-main.js',
-    FA_FRONTEND_RENDER_TIMER: 0,
-    TEST_ENV: undefined,
-    COMPONENT_NAME: undefined,
-    COMPONENT_PROPS: undefined
-  },
+  extraEnvVariables: resolveExtraEnvVariables(undefined),
   appDetails: {
-    PROJECT_VERSION: '0.0.0-storybook'
+    getProjectVersion: async () => '0.0.0-storybook'
   },
   faUserSettings: {
     getSettings: async () => ({ ...FA_USER_SETTINGS_DEFAULTS }),
@@ -39,10 +65,10 @@ const baseBridge = () => ({
 const scenarioMutations: Record<T_contentBridgeScenario, (bridge: ReturnType<typeof baseBridge>) => void> = {
   default: () => undefined,
   windowMaximized: (bridge) => {
-    bridge.faWindowControl.checkWindowMaximized = () => true
+    bridge.faWindowControl.checkWindowMaximized = async () => true
   },
   devToolsOpen: (bridge) => {
-    bridge.faDevToolsControl.checkDevToolsStatus = () => true
+    bridge.faDevToolsControl.checkDevToolsStatus = async () => true
   },
   externalLinkFailure: (bridge) => {
     bridge.faExternalLinksManager.openExternal = () => {
@@ -73,10 +99,11 @@ export const setContentBridgeScenario = (
       ...nextBridge.faExternalLinksManager,
       ...(overrides.faExternalLinksManager ?? {})
     },
-    extraEnvVariables: {
-      ...nextBridge.extraEnvVariables,
-      ...(overrides.extraEnvVariables ?? {})
-    },
+    extraEnvVariables: overrides.extraEnvVariables !== undefined
+      ? resolveExtraEnvVariables(
+        overrides.extraEnvVariables as (Partial<I_extraEnvVariablesBridge> & Partial<I_extraEnvVariablesAPI>)
+      )
+      : nextBridge.extraEnvVariables,
     appDetails: {
       ...nextBridge.appDetails,
       ...(overrides.appDetails ?? {})

@@ -3,28 +3,28 @@ export interface I_faWindowControlAPI {
   /**
    * Check the current visual sizing of the current window
    */
-  checkWindowMaximized: () => boolean
+  checkWindowMaximized: () => Promise<boolean>
 
   /**
    * Minimizes the current window
    */
-  minimizeWindow: () => void
+  minimizeWindow: () => Promise<void>
 
   /**
    * Maximizes the current window
    */
-  maximizeWindow: () => void
+  maximizeWindow: () => Promise<void>
 
   /**
    * Resizes the current window.
    * - If the window is maximized, restores it
    * - If the window is restored, maximizes it
    */
-  resizeWindow: () => void
+  resizeWindow: () => Promise<void>
 
   /**
    * Closes the current window
    */
-  closeWindow: () => void
+  closeWindow: () => Promise<void>
 
 }

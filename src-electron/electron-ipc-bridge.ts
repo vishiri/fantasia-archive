@@ -4,12 +4,12 @@
  * - Add new channel groups here as 'export const' objects.
  */
 
-/** DevTools (sync): preload uses 'ipcRenderer.sendSync'; main uses 'ipcMain.on' with 'returnValue'. */
+/** DevTools: preload uses 'ipcRenderer.invoke'; main uses 'ipcMain.handle'. */
 export const FA_DEVTOOLS_IPC = {
-  statusSync: 'fa-devtools-status-sync',
-  toggleSync: 'fa-devtools-toggle-sync',
-  openSync: 'fa-devtools-open-sync',
-  closeSync: 'fa-devtools-close-sync'
+  statusAsync: 'fa-devtools-status-async',
+  toggleAsync: 'fa-devtools-toggle-async',
+  openAsync: 'fa-devtools-open-async',
+  closeAsync: 'fa-devtools-close-async'
 } as const
 
 /** User settings ('electron-store' in main): preload uses async 'ipcRenderer.invoke'; main uses 'ipcMain.handle'. */
@@ -18,23 +18,23 @@ export const FA_USER_SETTINGS_IPC = {
   setAsync: 'fa-user-settings-set-async'
 } as const
 
-/** Window chrome (sync): preload uses 'ipcRenderer.sendSync'; main uses 'ipcMain.on' with 'returnValue'. */
+/** Window chrome: preload uses 'ipcRenderer.invoke'; main uses 'ipcMain.handle'. */
 export const FA_WINDOW_CONTROL_IPC = {
-  checkMaximizedSync: 'fa-window-control-check-maximized-sync',
-  minimizeSync: 'fa-window-control-minimize-sync',
-  maximizeSync: 'fa-window-control-maximize-sync',
-  resizeToggleSync: 'fa-window-control-resize-toggle-sync',
-  closeSync: 'fa-window-control-close-sync'
+  checkMaximizedAsync: 'fa-window-control-check-maximized-async',
+  minimizeAsync: 'fa-window-control-minimize-async',
+  maximizeAsync: 'fa-window-control-maximize-async',
+  resizeToggleAsync: 'fa-window-control-resize-toggle-async',
+  closeAsync: 'fa-window-control-close-async'
 } as const
 
-/** App metadata (sync): preload uses 'ipcRenderer.sendSync'; main uses 'ipcMain.on' with 'returnValue'. */
+/** App metadata: preload uses 'ipcRenderer.invoke'; main uses 'ipcMain.handle'. */
 export const FA_APP_DETAILS_IPC = {
-  getVersionSync: 'fa-app-details-get-version-sync'
+  getVersionAsync: 'fa-app-details-get-version-async'
 } as const
 
-/** Harness and path snapshot (sync): preload uses 'ipcRenderer.sendSync'; main uses 'ipcMain.on' with 'returnValue'. */
+/** Harness and path snapshot: preload uses 'ipcRenderer.invoke'; main uses 'ipcMain.handle'. */
 export const FA_EXTRA_ENV_IPC = {
-  snapshotSync: 'fa-extra-env-snapshot-sync'
+  snapshotAsync: 'fa-extra-env-snapshot-async'
 } as const
 
 /** Open external URLs in the system browser (async): preload uses 'ipcRenderer.invoke'; main uses 'ipcMain.handle'. */

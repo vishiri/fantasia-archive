@@ -32,3 +32,15 @@ export interface I_extraEnvVariablesAPI {
   COMPONENT_PROPS?: Record<string, unknown> | false
 
 }
+
+/**
+ * Preload bridge: async snapshot of harness env (memoized in preload implementation).
+ */
+export interface I_extraEnvVariablesBridge {
+  /**
+   * Last resolved snapshot from getSnapshot, or null before the first successful resolve.
+   * Lets renderer read harness env synchronously after boot awaited getSnapshot once.
+   */
+  getCachedSnapshot: () => I_extraEnvVariablesAPI | null
+  getSnapshot: () => Promise<I_extraEnvVariablesAPI>
+}

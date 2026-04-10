@@ -34,7 +34,7 @@ function buildExtraEnvSnapshot (): I_extraEnvVariablesAPI {
 }
 
 /**
- * Registers sync IPC so sandboxed preload can read harness paths and env without Node filesystem APIs.
+ * Registers async IPC so sandboxed preload can read harness paths and env without Node filesystem APIs.
  * Safe to call once from 'startApp'; subsequent calls no-op.
  */
 export function registerFaExtraEnvIpc (): void {
@@ -44,7 +44,7 @@ export function registerFaExtraEnvIpc (): void {
 
   registered = true
 
-  ipcMain.on(FA_EXTRA_ENV_IPC.snapshotSync, (event) => {
-    event.returnValue = buildExtraEnvSnapshot()
+  ipcMain.handle(FA_EXTRA_ENV_IPC.snapshotAsync, () => {
+    return buildExtraEnvSnapshot()
   })
 }

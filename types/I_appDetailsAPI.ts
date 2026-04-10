@@ -1,8 +1,8 @@
 export interface I_appDetailsAPI {
 
   /**
-   * Version of the project as stated in package.json
+   * Version of the project as stated in package.json (from main process).
    */
-  PROJECT_VERSION: string
+  getProjectVersion: () => Promise<string>
 
 }

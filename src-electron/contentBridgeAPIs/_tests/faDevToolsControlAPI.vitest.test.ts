@@ -1,126 +1,111 @@
-import { test, expect, vi, beforeEach } from 'vitest'
-import { FA_DEVTOOLS_IPC } from 'app/src-electron/electron-ipc-bridge'
-import { faDevToolsControlAPI } from '../faDevToolsControlAPI'
+import { beforeEach, expect, test, vi } from 'vitest'
 
-const { ipcRendererSendSyncMock } = vi.hoisted(() => {
+import { FA_DEVTOOLS_IPC } from 'app/src-electron/electron-ipc-bridge'
+
+const { invokeMock } = vi.hoisted(() => {
   return {
-    ipcRendererSendSyncMock: vi.fn()
+    invokeMock: vi.fn()
   }
 })
 
 vi.mock('electron', () => {
   return {
     ipcRenderer: {
-      sendSync: ipcRendererSendSyncMock
+      invoke: invokeMock
     }
   }
 })
 
-beforeEach(() => {
-  ipcRendererSendSyncMock.mockReset()
+beforeEach(async () => {
+  vi.resetModules()
+  invokeMock.mockReset()
+})
+
+test('Test that checkDevToolsStatus returns false if invoke rejects', async () => {
+  invokeMock.mockRejectedValue(new Error('ipc failed'))
+  const { faDevToolsControlAPI } = await import('../faDevToolsControlAPI')
+
+  await expect(faDevToolsControlAPI.checkDevToolsStatus()).resolves.toBe(false)
+})
+
+test('Test that checkDevToolsStatus returns true when IPC reports dev tools are open', async () => {
+  invokeMock.mockResolvedValue(true)
+  const { faDevToolsControlAPI } = await import('../faDevToolsControlAPI')
+
+  await expect(faDevToolsControlAPI.checkDevToolsStatus()).resolves.toBe(true)
+  expect(invokeMock).toHaveBeenCalledWith(FA_DEVTOOLS_IPC.statusAsync)
 })
 
 /**
- * checkDevToolsStatus
- * Test for IPC failure.
+ * invoke must return strict true; false means closed.
  */
-test('Test that checkDevToolsStatus returns false if sendSync throws', () => {
-  ipcRendererSendSyncMock.mockImplementation(() => {
-    throw new Error('no ipc')
-  })
-  expect(faDevToolsControlAPI.checkDevToolsStatus()).toBe(false)
+test('Test that checkDevToolsStatus returns false when IPC reports dev tools are closed', async () => {
+  invokeMock.mockResolvedValue(false)
+  const { faDevToolsControlAPI } = await import('../faDevToolsControlAPI')
+
+  await expect(faDevToolsControlAPI.checkDevToolsStatus()).resolves.toBe(false)
+})
+
+test('Test that checkDevToolsStatus returns false when invoke returns undefined', async () => {
+  invokeMock.mockResolvedValue(undefined)
+  const { faDevToolsControlAPI } = await import('../faDevToolsControlAPI')
+
+  await expect(faDevToolsControlAPI.checkDevToolsStatus()).resolves.toBe(false)
+})
+
+test('Test that checkDevToolsStatus returns false when invoke returns a truthy string', async () => {
+  invokeMock.mockResolvedValue('yes')
+  const { faDevToolsControlAPI } = await import('../faDevToolsControlAPI')
+
+  await expect(faDevToolsControlAPI.checkDevToolsStatus()).resolves.toBe(false)
+})
+
+test('Test that toggleDevTools calls IPC toggle channel', async () => {
+  invokeMock.mockResolvedValue(undefined)
+  const { faDevToolsControlAPI } = await import('../faDevToolsControlAPI')
+
+  await faDevToolsControlAPI.toggleDevTools()
+
+  expect(invokeMock).toHaveBeenCalledWith(FA_DEVTOOLS_IPC.toggleAsync)
 })
 
 /**
- * checkDevToolsStatus
- * Test for current window with opened dev tools.
+ * No-op when invoke rejects.
  */
-test('Test that checkDevToolsStatus returns true when IPC reports dev tools are open', () => {
-  ipcRendererSendSyncMock.mockReturnValue(true)
-  expect(faDevToolsControlAPI.checkDevToolsStatus()).toBe(true)
-  expect(ipcRendererSendSyncMock).toHaveBeenCalledWith(FA_DEVTOOLS_IPC.statusSync)
+test('Test that toggleDevTools does not throw when invoke rejects', async () => {
+  invokeMock.mockRejectedValue(new Error('ipc failed'))
+  const { faDevToolsControlAPI } = await import('../faDevToolsControlAPI')
+
+  await expect(faDevToolsControlAPI.toggleDevTools()).resolves.toBeUndefined()
 })
 
 /**
- * checkDevToolsStatus
- * sendSync must return strict true; false means closed.
+ * No-op when invoke rejects.
  */
-test('Test that checkDevToolsStatus returns false when IPC reports dev tools are closed', () => {
-  ipcRendererSendSyncMock.mockReturnValue(false)
-  expect(faDevToolsControlAPI.checkDevToolsStatus()).toBe(false)
+test('Test that openDevTools does not throw when invoke rejects', async () => {
+  invokeMock.mockRejectedValue(new Error('ipc failed'))
+  const { faDevToolsControlAPI } = await import('../faDevToolsControlAPI')
+
+  await expect(faDevToolsControlAPI.openDevTools()).resolves.toBeUndefined()
 })
 
 /**
- * checkDevToolsStatus
- * Undefined IPC payload is not strict true.
+ * No-op when invoke rejects.
  */
-test('Test that checkDevToolsStatus returns false when sendSync returns undefined', () => {
-  ipcRendererSendSyncMock.mockReturnValue(undefined)
-  expect(faDevToolsControlAPI.checkDevToolsStatus()).toBe(false)
+test('Test that closeDevTools does not throw when invoke rejects', async () => {
+  invokeMock.mockRejectedValue(new Error('ipc failed'))
+  const { faDevToolsControlAPI } = await import('../faDevToolsControlAPI')
+
+  await expect(faDevToolsControlAPI.closeDevTools()).resolves.toBeUndefined()
 })
 
-/**
- * checkDevToolsStatus
- * Truthy non-boolean values still yield false (strict equality to true).
- */
-test('Test that checkDevToolsStatus returns false when sendSync returns a truthy string', () => {
-  ipcRendererSendSyncMock.mockReturnValue('yes')
-  expect(faDevToolsControlAPI.checkDevToolsStatus()).toBe(false)
-})
+test('Test that openDevTools and closeDevTools call IPC channels', async () => {
+  invokeMock.mockResolvedValue(undefined)
+  const { faDevToolsControlAPI } = await import('../faDevToolsControlAPI')
 
-/**
- * toggleDevTools
- * Test that toggling invokes the toggle channel.
- */
-test('Test that toggleDevTools calls IPC toggle channel', () => {
-  ipcRendererSendSyncMock.mockReturnValue(true)
-  faDevToolsControlAPI.toggleDevTools()
-  expect(ipcRendererSendSyncMock).toHaveBeenCalledWith(FA_DEVTOOLS_IPC.toggleSync)
-})
+  await faDevToolsControlAPI.openDevTools()
+  await faDevToolsControlAPI.closeDevTools()
 
-/**
- * toggleDevTools
- * No-op when sendSync throws.
- */
-test('Test that toggleDevTools does not throw when sendSync throws', () => {
-  ipcRendererSendSyncMock.mockImplementation(() => {
-    throw new Error('no ipc')
-  })
-  expect(() => faDevToolsControlAPI.toggleDevTools()).not.toThrow()
-})
-
-/**
- * openDevTools
- * No-op when sendSync throws.
- */
-test('Test that openDevTools does not throw when sendSync throws', () => {
-  ipcRendererSendSyncMock.mockImplementation(() => {
-    throw new Error('no ipc')
-  })
-  expect(() => faDevToolsControlAPI.openDevTools()).not.toThrow()
-})
-
-/**
- * closeDevTools
- * No-op when sendSync throws.
- */
-test('Test that closeDevTools does not throw when sendSync throws', () => {
-  ipcRendererSendSyncMock.mockImplementation(() => {
-    throw new Error('no ipc')
-  })
-  expect(() => faDevToolsControlAPI.closeDevTools()).not.toThrow()
-})
-
-/**
- * openDevTools and closeDevTools
- * Test that explicit open and close methods call the expected IPC channels.
- */
-test('Test that openDevTools and closeDevTools call IPC channels', () => {
-  ipcRendererSendSyncMock.mockReturnValue(true)
-
-  faDevToolsControlAPI.openDevTools()
-  faDevToolsControlAPI.closeDevTools()
-
-  expect(ipcRendererSendSyncMock).toHaveBeenCalledWith(FA_DEVTOOLS_IPC.openSync)
-  expect(ipcRendererSendSyncMock).toHaveBeenCalledWith(FA_DEVTOOLS_IPC.closeSync)
+  expect(invokeMock).toHaveBeenCalledWith(FA_DEVTOOLS_IPC.openAsync)
+  expect(invokeMock).toHaveBeenCalledWith(FA_DEVTOOLS_IPC.closeAsync)
 })
