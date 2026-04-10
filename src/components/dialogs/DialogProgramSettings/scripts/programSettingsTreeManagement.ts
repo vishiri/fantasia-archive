@@ -13,47 +13,57 @@ import {
   toSortedRecord
 } from './programSettingsTreeSorting'
 
-export function buildProgramSettingsRenderTree (settingsSnapshot: I_faUserSettings): T_programSettingsRenderTree {
-  const unsortedTree: T_programSettingsRenderTree = {}
-  const settingKeys = Object.keys(settingsSnapshot).sort((keyA, keyB) => keyA.localeCompare(keyB))
+function buildProgramSettingLeaf (
+  settingKey: string,
+  normalizedSettingKey: keyof I_faUserSettings,
+  settingsSnapshot: I_faUserSettings
+): I_programSettingRenderItem {
+  const noteTranslationPath = `dialogs.programSettings.appOptions.${settingKey}.note`
+  const noteValue = i18n.global.te(noteTranslationPath) ? i18n.global.t(noteTranslationPath) : undefined
 
-  for (const settingKey of settingKeys) {
-    const normalizedSettingKey = settingKey as keyof I_faUserSettings
-    const settingOption = PROGRAM_SETTINGS_OPTIONS[normalizedSettingKey]
-    const categoryKey = settingOption.category
-    const subCategoryKey = settingOption.subcategory
-
-    if (unsortedTree[categoryKey] === undefined) {
-      unsortedTree[categoryKey] = {
-        title: i18n.global.t(`dialogs.programSettings.appOptionsCategories.${categoryKey}.title`),
-        subCategories: {}
-      }
-    }
-
-    if (unsortedTree[categoryKey].subCategories[subCategoryKey] === undefined) {
-      unsortedTree[categoryKey].subCategories[subCategoryKey] = {
-        title: i18n.global.t(`dialogs.programSettings.appOptionsCategories.${categoryKey}.${subCategoryKey}.subtitle`),
-        settingsList: {}
-      }
-    }
-
-    const noteTranslationPath = `dialogs.programSettings.appOptions.${settingKey}.note`
-    const noteValue = i18n.global.te(noteTranslationPath) ? i18n.global.t(noteTranslationPath) : undefined
-
-    const leaf: I_programSettingRenderItem = {
-      title: i18n.global.t(`dialogs.programSettings.appOptions.${settingKey}.title`),
-      description: i18n.global.t(`dialogs.programSettings.appOptions.${settingKey}.description`),
-      value: settingsSnapshot[normalizedSettingKey],
-      tags: i18n.global.t(`dialogs.programSettings.appOptions.${settingKey}.tags`)
-    }
-
-    if (noteValue !== undefined) {
-      leaf.note = noteValue
-    }
-
-    unsortedTree[categoryKey].subCategories[subCategoryKey].settingsList[settingKey] = leaf
+  const leaf: I_programSettingRenderItem = {
+    title: i18n.global.t(`dialogs.programSettings.appOptions.${settingKey}.title`),
+    description: i18n.global.t(`dialogs.programSettings.appOptions.${settingKey}.description`),
+    value: settingsSnapshot[normalizedSettingKey],
+    tags: i18n.global.t(`dialogs.programSettings.appOptions.${settingKey}.tags`)
   }
 
+  if (noteValue !== undefined) {
+    leaf.note = noteValue
+  }
+
+  return leaf
+}
+
+function appendOneSnapshotKeyToUnsortedTree (
+  unsortedTree: T_programSettingsRenderTree,
+  settingsSnapshot: I_faUserSettings,
+  settingKey: string
+): void {
+  const normalizedSettingKey = settingKey as keyof I_faUserSettings
+  const settingOption = PROGRAM_SETTINGS_OPTIONS[normalizedSettingKey]
+  const categoryKey = settingOption.category
+  const subCategoryKey = settingOption.subcategory
+
+  if (unsortedTree[categoryKey] === undefined) {
+    unsortedTree[categoryKey] = {
+      title: i18n.global.t(`dialogs.programSettings.appOptionsCategories.${categoryKey}.title`),
+      subCategories: {}
+    }
+  }
+
+  if (unsortedTree[categoryKey].subCategories[subCategoryKey] === undefined) {
+    unsortedTree[categoryKey].subCategories[subCategoryKey] = {
+      title: i18n.global.t(`dialogs.programSettings.appOptionsCategories.${categoryKey}.${subCategoryKey}.subtitle`),
+      settingsList: {}
+    }
+  }
+
+  const leaf = buildProgramSettingLeaf(settingKey, normalizedSettingKey, settingsSnapshot)
+  unsortedTree[categoryKey].subCategories[subCategoryKey].settingsList[settingKey] = leaf
+}
+
+function sortUnsortedProgramSettingsTree (unsortedTree: T_programSettingsRenderTree): T_programSettingsRenderTree {
   const sortedCategoryEntries = Object.entries(unsortedTree).sort(([categoryA], [categoryB]) =>
     compareProgramSettingsCategoryOrder(categoryA, categoryB)
   )
@@ -77,4 +87,15 @@ export function buildProgramSettingsRenderTree (settingsSnapshot: I_faUserSettin
   }
 
   return sortedTree
+}
+
+export function buildProgramSettingsRenderTree (settingsSnapshot: I_faUserSettings): T_programSettingsRenderTree {
+  const unsortedTree: T_programSettingsRenderTree = {}
+  const settingKeys = Object.keys(settingsSnapshot).sort((keyA, keyB) => keyA.localeCompare(keyB))
+
+  for (const settingKey of settingKeys) {
+    appendOneSnapshotKeyToUnsortedTree(unsortedTree, settingsSnapshot, settingKey)
+  }
+
+  return sortUnsortedProgramSettingsTree(unsortedTree)
 }

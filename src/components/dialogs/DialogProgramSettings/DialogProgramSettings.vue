@@ -13,15 +13,7 @@
     <q-card
       :class="['dialogComponent__wrapper', 'dialogProgramSettings', `${documentName}`]"
     >
-      <!-- Title: fixed, does not scroll with tab content -->
-      <h4
-        id="dialogProgramSettings-title"
-        class="dialogProgramSettings__title text-center"
-        data-test-locator="dialogProgramSettings-title"
-      >
-        {{ $t('dialogs.programSettings.title') }}
-      </h4>
-
+      <!-- Scrim must be a direct child of .dialogComponent__wrapper (position: relative) so inset:0 covers the full card; nesting under .dialogProgramSettings__body does not. -->
       <Transition
         enter-active-class="animated fadeIn"
         leave-active-class="animated fadeOut"
@@ -34,270 +26,31 @@
         />
       </Transition>
 
-      <!-- Body: vertical tabs + scrollable tab panels only -->
+      <!-- Title: fixed, does not scroll with tab content -->
+      <h4
+        id="dialogProgramSettings-title"
+        class="dialogProgramSettings__title text-center"
+        data-test-locator="dialogProgramSettings-title"
+      >
+        {{ $t('dialogs.programSettings.title') }}
+      </h4>
+
       <q-card-section class="dialogProgramSettings__body row no-wrap q-pa-none">
-        <div class="dialogProgramSettings__settingsSearchWrapper">
-          <q-input
-            v-model="searchSettingsQuery"
-            :placeholder="$t('dialogs.programSettings.settingsSearchPlaceholder')"
-            clearable
-            dense
-            dark
-            debounce="300"
-            class="dialogProgramSettings__settingsSearchInput"
-          >
-            <template #prepend>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </div>
-        <q-tabs
-          v-model="selectedCategoryTab"
-          vertical
-          :class="{
-            'dialogProgramSettings__tabs': true,
-            'dialogProgramSettings__tabs--nonInteractive': hasActiveSearchQuery
-          }"
-          active-color="primary-bright"
-          indicator-color="primary-bright"
-        >
-          <q-tab
-            v-for="(category, categoryKey) in programSettingsTree"
-            :key="categoryKey"
-            class="text-grey-5"
-            :name="categoryKey"
-            :label="category.title"
-            :data-test-locator="`dialogProgramSettings-tab-${categoryKey}`"
-          />
-        </q-tabs>
+        <DialogProgramSettingsLeftColumn
+          v-model:search-settings-query="searchSettingsQuery"
+          v-model:selected-category-tab="selectedCategoryTab"
+          :has-active-search-query="hasActiveSearchQuery"
+          :program-settings-tree="programSettingsTree"
+        />
 
-        <q-separator vertical />
-
-        <div class="dialogProgramSettings__tabPanelsHost col q-pa-none">
-          <q-tab-panels
-            v-model="selectedCategoryTab"
-            animated
-            vertical
-            transition-prev="jump-up"
-            transition-next="jump-down"
-            class="dialogProgramSettings__tabPanelsRoot q-pa-none"
-          >
-            <q-tab-panel
-              v-for="(category, categoryKey) in programSettingsTree"
-              :key="categoryKey"
-              :name="categoryKey"
-              class="dialogProgramSettings__tabPanel q-pa-none"
-            >
-              <div class="dialogProgramSettings__panelScroll hasScrollbar">
-                <div class="dialogProgramSettings__panelScrollInner q-py-sm">
-                  <div
-                    class="dialogProgramSettings__category"
-                    :data-test-locator="`dialogProgramSettings-category-${categoryKey}`"
-                  >
-                    <h5
-                      class="dialogProgramSettings__categoryTitle text-bold q-my-none text-h6"
-                      data-test-locator="dialogProgramSettings-categoryTitle"
-                    >
-                      {{ category.title }}
-                    </h5>
-
-                    <div
-                      v-for="(subCategory, subCategoryKey, subCategoryIndex) in category.subCategories"
-                      :key="subCategoryKey"
-                      class="dialogProgramSettings__subCategory"
-                      :data-test-locator="`dialogProgramSettings-subcategory-${categoryKey}-${subCategoryKey}`"
-                    >
-                      <h6
-                        class="dialogProgramSettings__subCategoryTitle text-bold q-mb-none text-subtitle1 text-primary-bright"
-                        data-test-locator="dialogProgramSettings-subcategoryTitle"
-                      >
-                        {{ subCategory.title }}
-                      </h6>
-
-                      <div class="row q-col-gutter-md">
-                        <div
-                          v-for="(setting, settingKey) in subCategory.settingsList"
-                          :key="settingKey"
-                          class="col-12 col-sm-6 col-lg-4"
-                        >
-                          <div
-                            class="dialogProgramSettings__setting"
-                            :data-test-locator="`dialogProgramSettings-setting-${settingKey}`"
-                            :data-test-setting-id="String(settingKey)"
-                            :data-test-tags="setting.tags"
-                          >
-                            <div class="row items-center no-wrap q-mb-xs">
-                              <div class="dialogProgramSettings__settingTitle">
-                                <span
-                                  class="dialogProgramSettings__settingLabel text-grey-3 text-weight-regular text-body2"
-                                  data-test-locator="dialogProgramSettings-settingLabel"
-                                >{{ setting.title }}</span>
-                                <q-icon
-                                  name="mdi-help-circle"
-                                  size="16px"
-                                  class="dialogProgramSettings__settingHelpIcon q-ml-md"
-                                  :data-test-tooltip-text="setting.description"
-                                >
-                                  <q-tooltip
-                                    :delay="500"
-                                  >
-                                    {{ setting.description }}
-                                  </q-tooltip>
-                                </q-icon>
-                              </div>
-                            </div>
-                            <q-toggle
-                              color="primary-bright"
-                              :model-value="setting.value"
-                              @update:model-value="(value) => updateLocalSetting(settingKey, value)"
-                            />
-                            <p
-                              v-if="setting.note !== undefined && setting.note !== ''"
-                              class="dialogProgramSettings__settingNote text-caption q-mt-xs q-mb-none text-red-12"
-                              data-test-locator="dialogProgramSettings-settingNote"
-                            >
-                              {{ setting.note }}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <q-separator
-                        v-if="showNonLastSeparator(category.subCategories, subCategoryIndex)"
-                        horizontal
-                        class="q-mt-md"
-                        color="primary"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </q-tab-panel>
-          </q-tab-panels>
-
-          <Transition
-            enter-active-class="animated fadeIn"
-            leave-active-class="animated fadeOut"
-          >
-            <div
-              v-if="hasActiveSearchQuery"
-              class="dialogProgramSettings__searchAllSettingsPanel q-tab-panel q-pa-none"
-              data-test-locator="dialogProgramSettings-searchAllSettingsPanel"
-            >
-              <div class="dialogProgramSettings__panelScroll hasScrollbar">
-                <div
-                  v-show="hasSearchNoMatchingSettings"
-                  class="dialogProgramSettings__searchEmpty flex flex-center"
-                  data-test-locator="dialogProgramSettings-searchNoResults"
-                >
-                  <ErrorCard
-                    :title="$t('dialogs.programSettings.searchNoResultsTitle')"
-                    :description="$t('dialogs.programSettings.searchNoResultsDescription')"
-                    image-name="reading"
-                    :width="650"
-                  />
-                </div>
-                <div
-                  v-show="!hasSearchNoMatchingSettings"
-                  class="dialogProgramSettings__panelScrollInner q-py-sm"
-                >
-                  <template
-                    v-for="(category, categoryKey, categoryIndex) in searchFilteredProgramSettingsTree"
-                    :key="categoryKey"
-                  >
-                    <div
-                      class="dialogProgramSettings__category"
-                      :data-test-locator="`dialogProgramSettings-search-category-${categoryKey}`"
-                    >
-                      <h5
-                        class="dialogProgramSettings__categoryTitle text-bold q-my-none text-h6"
-                        data-test-locator="dialogProgramSettings-search-categoryTitle"
-                      >
-                        {{ category.title }}
-                      </h5>
-
-                      <div
-                        v-for="(subCategory, subCategoryKey, subCategoryIndex) in category.subCategories"
-                        :key="subCategoryKey"
-                        class="dialogProgramSettings__subCategory"
-                        :data-test-locator="`dialogProgramSettings-search-subcategory-${categoryKey}-${subCategoryKey}`"
-                      >
-                        <h6
-                          class="dialogProgramSettings__subCategoryTitle text-bold q-mb-none text-subtitle1 text-primary-bright"
-                          data-test-locator="dialogProgramSettings-search-subcategoryTitle"
-                        >
-                          {{ subCategory.title }}
-                        </h6>
-
-                        <div class="row q-col-gutter-md">
-                          <div
-                            v-for="(setting, settingKey) in subCategory.settingsList"
-                            :key="settingKey"
-                            class="col-12 col-sm-6 col-lg-4"
-                          >
-                            <div
-                              class="dialogProgramSettings__setting"
-                              :data-test-locator="`dialogProgramSettings-search-setting-${settingKey}`"
-                              :data-test-setting-id="String(settingKey)"
-                              :data-test-tags="setting.tags"
-                            >
-                              <div class="row items-center no-wrap q-mb-xs">
-                                <div class="dialogProgramSettings__settingTitle">
-                                  <span
-                                    class="dialogProgramSettings__settingLabel text-grey-3 text-weight-regular text-body2"
-                                    data-test-locator="dialogProgramSettings-search-settingLabel"
-                                  >{{ setting.title }}</span>
-                                  <q-icon
-                                    name="mdi-help-circle"
-                                    size="16px"
-                                    class="dialogProgramSettings__settingHelpIcon q-ml-md"
-                                    :data-test-tooltip-text="setting.description"
-                                  >
-                                    <q-tooltip
-                                      :delay="500"
-                                    >
-                                      {{ setting.description }}
-                                    </q-tooltip>
-                                  </q-icon>
-                                </div>
-                              </div>
-                              <q-toggle
-                                color="primary-bright"
-                                :model-value="setting.value"
-                                @update:model-value="(value) => updateLocalSetting(settingKey, value)"
-                              />
-                              <p
-                                v-if="setting.note !== undefined && setting.note !== ''"
-                                class="dialogProgramSettings__settingNote text-caption q-mt-xs q-mb-none text-red-12"
-                                data-test-locator="dialogProgramSettings-search-settingNote"
-                              >
-                                {{ setting.note }}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <q-separator
-                          v-if="showNonLastSeparator(category.subCategories, subCategoryIndex)"
-                          horizontal
-                          class="q-mt-md"
-                          color="primary"
-                        />
-                      </div>
-
-                      <q-separator
-                        v-if="showNonLastTopCategorySeparator(searchFilteredProgramSettingsTree, categoryIndex)"
-                        horizontal
-                        class="q-my-lg"
-                        color="primary"
-                      />
-                    </div>
-                  </template>
-                </div>
-              </div>
-            </div>
-          </Transition>
-        </div>
+        <DialogProgramSettingsPanelsColumn
+          :has-active-search-query="hasActiveSearchQuery"
+          :has-search-no-matching-settings="hasSearchNoMatchingSettings"
+          :program-settings-tree="programSettingsTree"
+          :search-filtered-program-settings-tree="searchFilteredProgramSettingsTree"
+          :selected-category-tab="selectedCategoryTab"
+          @update-setting="updateLocalSetting"
+        />
       </q-card-section>
 
       <!-- Card actions wrapper -->
@@ -329,42 +82,10 @@
 <script setup lang="ts">
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 import type { T_dialogName } from 'app/types/T_dialogList'
-import type { T_programSettingsRenderTree } from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
-import type { StoreGeneric } from 'pinia'
-import { buildProgramSettingsRenderTree } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsTreeManagement'
-import {
-  syncLocalProgramSettingsFromStore,
-  updateLocalProgramSetting
-} from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsLocalSettingsManagement'
-import {
-  showNonLastSeparator,
-  showNonLastTopCategorySeparator
-} from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsHelpers'
-import { filterProgramSettingsTreeForSearch } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsSearching'
-import ErrorCard from 'src/components/elements/ErrorCard/ErrorCard.vue'
-import { S_DialogComponent } from 'src/stores/S_Dialog'
-import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
-import { computed, onMounted, ref, toRaw, watch } from 'vue'
+import DialogProgramSettingsLeftColumn from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettingsLeftColumn.vue'
+import DialogProgramSettingsPanelsColumn from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettingsPanelsColumn.vue'
+import { useDialogProgramSettings } from 'app/src/components/dialogs/DialogProgramSettings/scripts/useDialogProgramSettings'
 
-const resolveDialogComponentStore = (): StoreGeneric | null => {
-  try {
-    return S_DialogComponent()
-  } catch {
-    return null
-  }
-}
-
-const resolveFaUserSettingsStore = (): ReturnType<typeof S_FaUserSettings> | null => {
-  try {
-    return S_FaUserSettings()
-  } catch {
-    return null
-  }
-}
-
-/**
- * All component props
- */
 const props = defineProps<{
   /**
    * Custom input directly fed to the component in case it doesn't get triggered from the global store
@@ -376,151 +97,18 @@ const props = defineProps<{
   directSettingsSnapshot?: I_faUserSettings
 }>()
 
-/**
- * Model for the current popup dialog
- */
-const dialogModel = ref(false)
-
-/**
- * Name of the document shown inside the dialog
- */
-const documentName = ref('')
-
-/**
- * Local editable snapshot of user settings.
- */
-const localSettings = ref<I_faUserSettings | null>(null)
-
-/**
- * Program settings tree
- */
-const programSettingsTree = ref<T_programSettingsRenderTree>({})
-
-/**
- * Selected category tab
- */
-const selectedCategoryTab = ref<string>('')
-
-/**
- * Settings search / filter field (bound to the header q-input).
- */
-const searchSettingsQuery = ref<string | null>('')
-
-/**
- * True when the search field has non-whitespace text (drives the tabs dimming overlay).
- * Clearable q-input sets the model to null when cleared; normalize before trim.
- */
-const hasActiveSearchQuery = computed(
-  () => (searchSettingsQuery.value ?? '').trim() !== ''
-)
-
-/**
- * Search overlay list: same tree shape as programSettingsTree but only settings matching the query.
- */
-const searchFilteredProgramSettingsTree = computed((): T_programSettingsRenderTree => {
-  if (!hasActiveSearchQuery.value) {
-    return {}
-  }
-
-  return filterProgramSettingsTreeForSearch(programSettingsTree.value, searchSettingsQuery.value)
-})
-
-/**
- * True when search is active but no setting matches (drives empty-state UI in the search panel).
- */
-const hasSearchNoMatchingSettings = computed(
-  () =>
-    hasActiveSearchQuery.value &&
-    Object.keys(searchFilteredProgramSettingsTree.value).length === 0
-)
-
-/**
- * Opens the popup dialog via direct input-feed
- */
-const openDialog = (input: T_dialogName) => {
-  documentName.value = input
-  dialogModel.value = true
-  searchSettingsQuery.value = ''
-  if (props.directSettingsSnapshot !== undefined) {
-    localSettings.value = { ...props.directSettingsSnapshot }
-    programSettingsTree.value = buildProgramSettingsRenderTree(localSettings.value)
-    return
-  }
-
-  void syncLocalProgramSettingsFromStore(localSettings, programSettingsTree)
-}
-
-/**
- * Persists local settings snapshot and closes the dialog.
- */
-const saveAndCloseDialog = async (): Promise<void> => {
-  const faUserSettingsStore = resolveFaUserSettingsStore()
-  if (faUserSettingsStore !== null && localSettings.value !== null) {
-    const plainSettingsSnapshot: I_faUserSettings = { ...toRaw(localSettings.value) }
-    await faUserSettingsStore.updateSettings(plainSettingsSnapshot)
-  }
-
-  dialogModel.value = false
-}
-
-/**
- * Updates the local setting value
- */
-const updateLocalSetting = (settingKey: string, updatedValue: boolean): void => {
-  updateLocalProgramSetting(localSettings, programSettingsTree, settingKey, updatedValue)
-}
-
-/**
- * Watches the program settings tree and updates the selected category tab
- */
-watch(
+const {
+  dialogModel,
+  documentName,
+  hasActiveSearchQuery,
+  hasSearchNoMatchingSettings,
   programSettingsTree,
-  (tree) => {
-    const keys = Object.keys(tree)
-    if (keys.length === 0) {
-      selectedCategoryTab.value = ''
-      return
-    }
-    if (selectedCategoryTab.value === '' || !keys.includes(selectedCategoryTab.value)) {
-      selectedCategoryTab.value = keys[0] as string
-    }
-  },
-  {
-    deep: true,
-    immediate: true
-  }
-)
-
-/**
- * Trigger dialog popup via reaction to store update
- */
-watch(() => resolveDialogComponentStore()?.dialogUUID, () => {
-  const dialogComponentStore = resolveDialogComponentStore()
-  if (dialogComponentStore?.dialogToOpen === 'ProgramSettings') {
-    openDialog(dialogComponentStore.dialogToOpen as T_dialogName)
-  }
-})
-
-/**
- * Trigger dialog popup via reaction to direct prop feed
- */
-watch(() => props.directInput, () => {
-  if (props.directInput !== undefined && props.directInput !== '') {
-    if (props.directInput === 'ProgramSettings') {
-      openDialog(props.directInput)
-    }
-  }
-})
-
-/**
- * On first mount, opens the dialog when 'directInput' is already set (stabilizes component tests that feed props before mount).
- */
-onMounted(() => {
-  if (props.directInput === 'ProgramSettings') {
-    openDialog(props.directInput)
-  }
-})
-
+  saveAndCloseDialog,
+  searchFilteredProgramSettingsTree,
+  searchSettingsQuery,
+  selectedCategoryTab,
+  updateLocalSetting
+} = useDialogProgramSettings(props)
 </script>
 
 <style lang="scss">
@@ -540,209 +128,22 @@ onMounted(() => {
     z-index: $dialogProgramSettings-title-zIndex;
   }
 
-  .dialogProgramSettings__titleSection {
-    flex-shrink: 0;
-  }
-
   .dialogProgramSettings__body {
     flex: 1 1 auto;
     min-height: 0;
     overflow: hidden;
   }
 
-  .dialogProgramSettings__tabPanelsHost {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    min-height: 0;
-    min-width: 0;
-    position: relative;
-  }
-
-  .dialogProgramSettings__searchAllSettingsPanel {
-    background: $dark;
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    inset: 0;
-    max-height: 100%;
-    min-height: 0;
-    overflow: hidden;
-    position: absolute;
-    z-index: $dialogProgramSettings-searchPanel-zIndex;
-
-    &::before {
-      background: $dialogProgramSettings-gradientTop;
-      content: '';
-      height: $dialogProgramSettings-gradientBar-height;
-      left: 0;
-      position: absolute;
-      right: 0;
-      top: 0;
-      z-index: 0;
-    }
-
-    &::after {
-      background: $dialogProgramSettings-gradientBottom;
-      bottom: 0;
-      content: '';
-      height: $dialogProgramSettings-gradientBar-height;
-      left: 0;
-      position: absolute;
-      right: 0;
-      z-index: 0;
-    }
-  }
-
-  .dialogProgramSettings__tabPanelsRoot {
-    background: transparent;
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    min-height: 0;
-    min-width: 0;
-  }
-
-  .dialogProgramSettings__tabPanel {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    max-height: 100%;
-    min-height: 0;
-    overflow: hidden;
-    padding: 0;
-  }
-
-  .dialogProgramSettings__panelScroll {
-    flex: 1 1 auto;
-    height: 100%;
-    min-height: 0;
-    overflow: hidden auto;
-  }
-
-  .q-tabs--vertical .q-tab {
-    padding: 0 $dialogProgramSettings-verticalTab-paddingX;
-  }
-
-  .dialogProgramSettings__tabs {
-    position: relative;
-  }
-
   .dialogProgramSettings__tabsSearchOverlay {
     background: $dialogProgramSettings-scrimDark;
-    inset: 0 0 0 0;
+    inset: 0;
     pointer-events: none;
     position: absolute;
     z-index: $dialogProgramSettings-tabsSearchOverlay-zIndex;
   }
 
-  .dialogProgramSettings__tabs--nonInteractive {
-    pointer-events: none;
-  }
-
-  .dialogProgramSettings__category {
-    padding: $dialogProgramSettings-category-paddingTop $dialogProgramSettings-category-paddingX 0;
-  }
-
-  .dialogProgramSettings__categoryTitle {
-    background: $dark;
-    left: $dialogProgramSettings-categoryTitle-left;
-    padding-bottom: $dialogProgramSettings-categoryTitle-paddingBottom;
-    padding-top: $dialogProgramSettings-categoryTitle-paddingTop;
-    position: absolute;
-    right: $dialogProgramSettings-categoryTitle-right;
-    top: 0;
-    z-index: $dialogProgramSettings-categoryTitle-zIndex;
-  }
-
-  .dialogProgramSettings__settingTitle {
-    align-items: center;
-    display: flex;
-    font-weight: 500;
-    justify-content: flex-start;
-    margin-bottom: $dialogProgramSettings-settingTitle-marginBottom;
-    margin-left: $dialogProgramSettings-settingTitle-marginLeft;
-    margin-top: $dialogProgramSettings-settingTitle-marginTop;
-    width: calc(100% - #{$dialogProgramSettings-settingTitle-widthSubtract});
-  }
-
-  .dialogProgramSettings__settingLabel {
-  }
-
-  .dialogProgramSettings__settingHelpIcon {
-    align-self: flex-start;
-    margin-top: $dialogProgramSettings-settingHelpIcon-marginTop;
-  }
-
-  .dialogProgramSettings__settingHelp {
-  }
-
-  .dialogProgramSettings__settingNote {
-    margin-left: $dialogProgramSettings-settingTitle-marginLeft;
-    text-shadow: $dialogProgramSettings-settingNote-textShadow;
-  }
-
-  /* Fixed width so clearable append slot does not widen the field when it mounts. */
-  .dialogProgramSettings__settingsSearchInput {
-    width: 100%;
-  }
-
-  .dialogProgramSettings__settingsSearchWrapper {
-    background-color: $dark;
-    pointer-events: auto;
-    position: absolute;
-    right: $dialogProgramSettings-settingsSearchWrapper-right;
-    top: $dialogProgramSettings-settingsSearchWrapper-top;
-    width:
-      min(
-        #{$dialogProgramSettings-settingsSearchWrapper-widthMax},
-        calc(100vw - #{$dialogProgramSettings-settingsSearchWrapper-widthViewportSubtract})
-      );
-    z-index: $dialogProgramSettings-settingsSearchWrapper-zIndex;
-
-    &::before {
-      border-bottom-left-radius: $dialogProgramSettings-settingsSearchWrapper-before-borderBottomLeftRadius;
-      box-shadow: $dialogProgramSettings-settingsSearchWrapper-before-boxShadow;
-      content: "";
-      inset: $dialogProgramSettings-settingsSearchWrapper-before-inset;
-      opacity: 0;
-      position: absolute;
-      transition: $dialogProgramSettings-settingsSearchWrapper-transition;
-      z-index: 0;
-    }
-
-    &::after {
-      content: "";
-      height: $dialogProgramSettings-settingsSearchWrapper-after-height;
-      left: $dialogProgramSettings-settingsSearchWrapper-after-left;
-      opacity: 0;
-      position: absolute;
-      right: $dialogProgramSettings-settingsSearchWrapper-after-right;
-      top: $dialogProgramSettings-settingsSearchWrapper-after-top;
-      transition: $dialogProgramSettings-settingsSearchWrapper-transition;
-    }
-  }
-
-  .dialogProgramSettings__searchAllSettingsPanel {
-    .dialogProgramSettings__categoryTitle {
-      margin-bottom: $dialogProgramSettings-searchPanel-categoryTitle-marginBottom;
-      margin-top: $dialogProgramSettings-searchPanel-categoryTitle-marginTop;
-      position: static;
-    }
-  }
-
-  .dialogProgramSettings__searchEmpty {
-    box-sizing: border-box;
-    flex: 1 1 auto;
-    flex-direction: column;
-    min-height: 100%;
-    padding: $dialogProgramSettings-searchEmpty-padding;
-    position: relative;
-    z-index: 1;
-  }
-
-  .dialogProgramSettings__cardActions {
-    z-index: $dialogProgramSettings-searchPanel-zIndex;
+  .q-tabs--vertical .q-tab {
+    padding: 0 $dialogProgramSettings-verticalTab-paddingX;
   }
 
   &.hasActiveSearchQuery {
@@ -759,6 +160,10 @@ onMounted(() => {
         opacity: 1;
       }
     }
+  }
+
+  .dialogProgramSettings__cardActions {
+    z-index: $dialogProgramSettings-searchPanel-zIndex;
   }
 }
 </style>
