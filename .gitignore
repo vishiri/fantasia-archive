@@ -44,6 +44,9 @@ debug-storybook.log*
 *.njsproj
 *.sln
 
+# Playwright MCP (Cursor MCP server local workspace state; not app test output)
+.playwright-mcp/
+
 # local .env files
 .env.local*
 
