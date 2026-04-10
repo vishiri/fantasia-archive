@@ -11,6 +11,8 @@ Pull requests against `main` / `master` must have **exactly one** of these GitHu
 
 Add the label in the PR sidebar (Labels) as soon as possible; the **labeled** event re-runs workflows, and pushing new commits also re-runs checks.
 
+Fork PRs, local VRT snapshot updates, and maintainer **GitHub Actions** settings: [CONTRIBUTING.md](../CONTRIBUTING.md).
+
 ## Other labels
 
 Add any others that logically apply for your pull request.
