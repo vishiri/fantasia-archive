@@ -11,15 +11,19 @@ description: >-
 
 ## Entry and flow
 
-- **Entry**: `src-electron/electron-main.ts` orchestrates startup in order: Chromium stderr filter (`chromiumFixes/suppressChromiumDevtoolsAutofillStderrNoise`), app name and `userData` (`appIdentity/fixAppName`), Windows DevTools workaround (`chromiumFixes/windowsDevToolsExtensionsFix`), `startApp` (IPC registrars for DevTools, user settings, window chrome, and app metadata), `nativeShell/tweaks` menu removal, then `openAppWindowManager` / `closeAppManager` from `appManagement.ts`.
+- **Entry**: `src-electron/electron-main.ts` orchestrates startup in order: Chromium stderr filter (`chromiumFixes/suppressChromiumDevtoolsAutofillStderrNoise`), app name and `userData` (`appIdentity/fixAppName`), Windows DevTools workaround (`chromiumFixes/windowsDevToolsExtensionsFix`), `startApp` (all `ipcMain` registrars — DevTools, extra-env snapshot for sandboxed preload, external links / `shell.openExternal`, user settings, window chrome, app metadata), `nativeShell/tweaks` menu removal, then `openAppWindowManager` / `closeAppManager` from `appManagement.ts`. `startApp()` must run **before** any `BrowserWindow` is created so preload’s synchronous `sendSync` handlers are registered first.
 - **`userData`**: `fixAppName()` in `appIdentity/fixAppName.ts` sets `app.setPath('userData', …)`. When `process.env.TEST_ENV` is `components` or `e2e`, `userData` is **`%APPDATA%/<package.json name>/playwright-user-data`** (stable; not under the `*-dev` folder used by `quasar dev` with `DEBUGGING`). The folder segment is `PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME` in `appIdentity/playwrightIsolatedUserDataDirName.ts` (re-exported from `fixAppName.ts` for Electron callers).
 - **Modular logic**: Prefer `src-electron/mainScripts/` feature folders — `appIdentity/`, `windowManagement/`, `chromiumFixes/`, `userSettings/`, `nativeShell/`, `ipcManagement/` — plus root `appManagement.ts`, over growing `electron-main.ts` indefinitely.
-- **IPC registration**: Shared channel strings live in `src-electron/electron-ipc-bridge.ts`. Main-process `ipcMain` handlers for preload-invoked channels belong in `mainScripts/ipcManagement/register*Ipc.ts` (e.g. `registerFaDevToolsIpc.ts`, `registerFaUserSettingsIpc.ts`, `registerFaWindowControlIpc.ts`, `registerFaAppDetailsIpc.ts`). Call those registrars from app startup (`startApp()` in `appManagement.ts` today) so preload and main always use the same names.
+- **IPC registration**: Shared channel strings live in `src-electron/electron-ipc-bridge.ts`. Main-process `ipcMain` handlers for preload-invoked channels belong in `mainScripts/ipcManagement/register*Ipc.ts` (e.g. `registerFaDevToolsIpc.ts`, `registerFaExtraEnvIpc.ts`, `registerFaExternalLinksIpc.ts`, `registerFaUserSettingsIpc.ts`, `registerFaWindowControlIpc.ts`, `registerFaAppDetailsIpc.ts`). Call those registrars from app startup (`startApp()` in `appManagement.ts` today) so preload and main always use the same names.
 
 ## Testing
 
 - Vitest tests live under `src-electron/mainScripts/tests/` (e.g. `appManagement`), each `mainScripts/<area>/tests/` (`appIdentity`, `windowManagement`, `chromiumFixes`, `userSettings`, `nativeShell`, `ipcManagement`), and `src-electron/contentBridgeAPIs/tests/` for bridge modules.
 - After main-process changes, run the **quality gate** when TypeScript or related sources changed: `yarn testbatch:verify` ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)) — see [eslint-typescript.mdc](../../rules/eslint-typescript.mdc).
+
+## Renderer sandbox
+
+- The main `BrowserWindow` in `windowManagement/mainWindowCreation.ts` uses `webPreferences.sandbox: true`, `contextIsolation: true`, and explicit `nodeIntegration: false` (Electron disables the sandbox if `nodeIntegration` is true for that window). Preload must not import arbitrary Node modules; privileged work uses main + IPC — see `registerFaExtraEnvIpc.ts` (harness snapshot, paths) and `registerFaExternalLinksIpc.ts` (`shell.openExternal`). Official overview: Electron [Process Sandboxing](https://www.electronjs.org/docs/latest/tutorial/sandbox).
 
 ## Window chrome IPC
 

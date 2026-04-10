@@ -1,3 +1,9 @@
+/*
+ * Sandboxed renderer preload: keep imports to 'electron', 'contentBridgeAPIs' modules, the shared
+ * IPC registry ('electron-ipc-bridge'), pure TypeScript helpers, and type-only imports. Do not add
+ * filesystem, 'shell', or other Node APIs here; delegate those to main via 'register*Ipc' handlers.
+ * See Electron Process Sandboxing tutorial and '.cursor/rules/electron-preload.mdc'.
+ */
 import { contextBridge } from 'electron'
 
 import { faWindowControlAPI } from 'app/src-electron/contentBridgeAPIs/faWindowControlAPI'

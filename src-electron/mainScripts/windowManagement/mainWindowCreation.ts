@@ -78,7 +78,8 @@ export const mainWindowCreation = async () => {
     /*
      * Chromium OS sandbox is on; privileged work stays in main. Preload uses only 'ipcRenderer' and
      * 'contextBridge' (see 'contentBridgeAPIs/'); paths and 'shell.openExternal' use IPC from
-     * 'registerFaExtraEnvIpc' and 'registerFaExternalLinksIpc'.
+     * 'registerFaExtraEnvIpc' and 'registerFaExternalLinksIpc'. Per Electron, 'nodeIntegration: true'
+     * would disable the sandbox for this window, so keep it false.
      */
     webPreferences: {
       contextIsolation: true,

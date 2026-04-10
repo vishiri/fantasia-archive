@@ -5,6 +5,7 @@
 
 ### Bugfixes & Optimizations
 - Shipped version is now **2.4.11** in **About** and packaging metadata.
+- **Contributor docs**: **README**, **AGENTS.md**, and the **fantasia-electron-main** skill spell out **renderer sandbox** (**BrowserWindow** **webPreferences**), links to official **Electron** sandbox and context-isolation guides, which privileged work uses **main** **IPC** (harness **extraEnvVariables**, external **http** / **https** links), and that **startApp** registers **ipcMain** handlers before the first window so preload **sendSync** paths stay safe. **electron-preload** and **electron-main** carry short comments for the same guardrails.
 
 ## 2.4.10 - Program settings, ErrorCard, theme tokens, and contributor tooling
 
