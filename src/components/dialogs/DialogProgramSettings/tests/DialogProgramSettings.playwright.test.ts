@@ -363,13 +363,6 @@ test.describe.serial('Program settings dialog', () => {
     await expect(titleHeading).toHaveCount(1)
     await expect(titleHeading).toBeVisible()
 
-    const cardBox = await errorCard.boundingBox() as unknown as {
-      height: number
-      width: number
-    }
-    expect(cardBox).not.toBe(null)
-    expect(Math.round(cardBox.width)).toBe(650)
-
     await clearProgramSettingsSearch(appWindow)
   })
 

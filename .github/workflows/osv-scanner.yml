@@ -22,10 +22,12 @@ on:
     branches: [ "master" ]
 
 permissions:
-  # Require writing security events to upload SARIF file to security tab
-  security-events: write
+  # google/osv-scanner-action reusable workflows require actions: read (caller defaults otherwise deny it).
+  actions: read
   # Read commit contents
   contents: read
+  # Require writing security events to upload SARIF file to security tab
+  security-events: write
 
 jobs:
   scan-scheduled:
