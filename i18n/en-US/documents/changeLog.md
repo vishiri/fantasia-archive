@@ -77,6 +77,7 @@
 - Extracted small file-local interfaces and type aliases from **Vue** and **TypeScript** sources into colocated **`<filename>.types.ts`** modules where applicable (renderer boot, Pinia typings, **Electron** tests, **Storybook** mocks) and recorded the convention in **README**, **AGENTS**, and Cursor rules/skills.
 - Extended **Stylelint** with **`stylelint-order`** so **CSS custom properties** and regular **declarations** stay in **alphabetical** order (autofix via **`yarn lint:stylelint:fix`**); widened **`yarn lint:stylelint`** to scan **`vue`**, **`css`**, **`scss`**, and **`sass`** under **`src/`** and under **`.storybook-workspace/.storybook/`** (build output under **`storybook-static/`** stays ignored).
 - **Electron Playwright** runs attach **WebM** screen recordings per test; open **`test-results/playwright-report/index.html`** after **`yarn test:components`** or **`yarn test:e2e`** (or the **`:single`** scripts) to review videos under each test’s **Attachments** (files under **`test-results/playwright-report/data/`**). Each Playwright run **replaces** that HTML report; **`scripts/playwrightWithArtifactTrim.mjs`** removes **`test-results/playwright-artifacts`** after those yarn commands so scratch output is not kept between runs. Documented in **README**, **AGENTS**, and Cursor **fantasia-testing** / **playwright-tests** guidance; optional **`FA_PLAYWRIGHT_NO_VIDEO`** skips recording.
+- Removed a stray **HTML** **textarea** from the **Index** page template.
 
 ## 2.4.9 - Contributor tooling, Pinia dialogs, and CI hardening
 
