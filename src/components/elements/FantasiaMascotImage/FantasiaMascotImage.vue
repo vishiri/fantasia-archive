@@ -10,6 +10,8 @@
       data-test-locator="fantasiaMascotImage-image"
       :data-test-image="fantasiaImage"
       :data-test-is-random="isRandom"
+      :data-test-layout-height="height"
+      :data-test-layout-width="width"
       :height="height"
       :src="currentMascotImage"
       :width="width"
