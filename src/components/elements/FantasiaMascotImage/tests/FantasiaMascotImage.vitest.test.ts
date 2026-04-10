@@ -25,6 +25,8 @@ test('Test that FantasiaMascotImage renders list image and disables random mode 
 
   const root = w.get('[data-test-locator="fantasiaMascotImage-image"]')
   expect(root.attributes('data-test-is-random')).toBe('false')
+  expect(root.attributes('data-test-layout-width')).toBe('10px')
+  expect(root.attributes('data-test-layout-height')).toBe('10px')
   expect(root.attributes('src')).toBe(fantasiaImageList.error)
   w.unmount()
 })

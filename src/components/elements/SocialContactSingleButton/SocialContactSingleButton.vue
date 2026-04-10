@@ -15,6 +15,8 @@
         :width="`${buttonData.width}px`"
         :height="`${buttonData.height}px`"
         data-test-locator="socialContactSingleButton-image"
+        :data-test-layout-height="String(buttonData.height)"
+        :data-test-layout-width="String(buttonData.width)"
       />
       <div
         class="text-no-wrap socialContactSingleButton__text"

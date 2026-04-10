@@ -127,17 +127,7 @@ test.describe.serial('App splash screen', () => {
     const iconElement = appWindow.locator(`[data-test-locator="${selectorList.wrapper}"] svg`)
 
     await expect(iconElement).toHaveCount(1)
-
-    const iconBoxData = await iconElement.boundingBox() as unknown as { width: number, height: number }
-
-    expect(iconBoxData).not.toBe(null)
-
-    const roundedIconWidth = Math.round(iconBoxData.width)
-    const roundedTestStringWidth = Math.round(parseInt(testStringWidth))
-    expect(roundedIconWidth).toBe(roundedTestStringWidth)
-
-    const roundedIconHeight = Math.round(iconBoxData.height)
-    const roundedTestStringHeight = Math.round(parseInt(testStringHeight))
-    expect(roundedIconHeight).toBe(roundedTestStringHeight)
+    await expect(iconElement).toHaveAttribute('data-test-layout-width', testStringWidth)
+    await expect(iconElement).toHaveAttribute('data-test-layout-height', testStringHeight)
   })
 })

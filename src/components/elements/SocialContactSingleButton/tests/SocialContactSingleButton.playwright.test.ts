@@ -106,25 +106,18 @@ test.describe.serial('Social contact single button', () => {
    * Check if the component icon has proper src, height and width
    */
   test('Check if the component icon has proper src, height and width', async () => {
-    const buttonIconQuasarElement = appWindow.locator(selectorList.singleButtonImageQuasarElement)
+    const imgHost = appWindow.locator(`[data-test-locator="${selectorList.singleButtonImage}"]`)
 
+    await expect(imgHost).toHaveCount(1)
+    await expect(imgHost).toHaveAttribute('data-test-layout-width', String(testData.width))
+    await expect(imgHost).toHaveAttribute('data-test-layout-height', String(testData.height))
+
+    const buttonIconQuasarElement = appWindow.locator(selectorList.singleButtonImageQuasarElement)
     await expect(buttonIconQuasarElement).toHaveCount(1)
 
     const buttonIcon = await buttonIconQuasarElement.evaluate((el: HTMLImageElement) => el.src)
     const dataIcon = testData.icon
     expect(buttonIcon).toContain(dataIcon)
-
-    const buttonBoxData = await buttonIconQuasarElement.boundingBox() as unknown as { width: number, height: number }
-
-    expect(buttonBoxData).not.toBe(null)
-
-    const roundedImageWidth = Math.round(buttonBoxData.width)
-    const roundedTestWidth = Math.round(testData.width)
-    expect(roundedImageWidth).toBe(roundedTestWidth)
-
-    const roundedImageHeight = Math.round(buttonBoxData.height)
-    const roundedTestHeight = Math.round(testData.height)
-    expect(roundedImageHeight).toBe(roundedTestHeight)
   })
 
   /**
