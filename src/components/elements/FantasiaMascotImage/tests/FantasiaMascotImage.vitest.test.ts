@@ -79,7 +79,7 @@ test('Test that FantasiaMascotImage binds reading prop to the reading list URL',
 
 /**
  * FantasiaMascotImage
- * Unknown keys fall through determineCurrentImage to an undefined list lookup; q-img still renders.
+ * Unknown keys fall through determineCurrentImage to an undefined list lookup; img still renders without src.
  */
 test('Test that FantasiaMascotImage leaves src undefined when fantasiaImage key is not in the list', () => {
   const w = mount(FantasiaMascotImage, {

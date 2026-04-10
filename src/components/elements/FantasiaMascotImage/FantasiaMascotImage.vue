@@ -3,21 +3,17 @@
   <div
     class="fantasiaMascotImage"
   >
-    <!-- Inner image of the chosen Fantasia Mascot (q-img keeps loading/spinner API; tests target root + inner img). -->
-    <q-img
-      no-spinner
-      spinner-size="0"
+    <!-- Native img avoids q-img wrapper/async sizing that caused layout shift in tests. -->
+    <img
       :alt="`${$t('fantasiaMascotImage.label')} - ${mascotVariantName}`"
       class="fantasiaMascotImage__inner"
       data-test-locator="fantasiaMascotImage-image"
-      fit="contain"
       :data-test-image="fantasiaImage"
       :data-test-is-random="isRandom"
       :height="height"
       :src="currentMascotImage"
       :width="width"
-      img-class="fantasiaMascotImage__img"
-    />
+    >
   </div>
 </template>
 
@@ -73,14 +69,12 @@ const currentMascotImage = determineCurrentImage(fantasiaImageList, isRandom, pr
 <style lang="scss" scoped>
 .fantasiaMascotImage {
   &__inner {
+    display: block;
     height: v-bind(height);
     max-width: 100%;
+    object-fit: contain;
     user-select: none;
     width: v-bind(width);
-  }
-
-  :deep(.fantasiaMascotImage__img) {
-    user-select: none;
   }
 }
 
