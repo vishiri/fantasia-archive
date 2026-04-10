@@ -21,7 +21,7 @@ i18n/
   index.ts                 — merges en-US, fr, de, …
   externalFileLoader.ts      — standalone createI18n instance for Pinia / scripts
   specialCharactersFixer.ts  — escapes characters for vue-i18n message compiler
-  tests/                     — Vitest specs (**unit-i18n**)
+  _tests/                    — Vitest specs (**unit-i18n**)
   en-US/
     index.ts                            — composes the full locale tree; no hardcoded strings (see rules below)
     documents/                          — Markdown source files (.md); imported via ?raw and passed through specialCharacterFixer

@@ -64,7 +64,7 @@ function remapFilePaths (inputList) {
 }
 
 /**
- * '/src/components/dialogs/DialogFoo/tests/DialogFoo.playwright.test.ts' → 'dialogs/DialogFoo'
+ * '/src/components/dialogs/DialogFoo/_tests/DialogFoo.playwright.test.ts' → 'dialogs/DialogFoo'
  * (mirrors src/components bucket folders: dialogs, elements, foundation, globals, other).
  */
 function componentTestPickerLabel (repoRelativeSrcPath) {

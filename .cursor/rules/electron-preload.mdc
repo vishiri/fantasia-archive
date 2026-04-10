@@ -12,7 +12,7 @@ alwaysApply: false
 - **IPC payload validation (main)**: Structured data from `ipcMain.handle` must not be trusted from TypeScript types alone. Validate in main with **Zod** (schemas under `src-electron/shared/`, for example `faUserSettingsPatchSchema.ts` used by `registerFaUserSettingsIpc`). Prefer strict object schemas and shared key sources (defaults modules) so validation matches cleanup and persistence. Single-argument scalars may use `typeof` plus domain helpers (for example external URL checks) instead of Zod when that stays clearer.
 - Do not widen renderer `nodeIntegration` or expose raw `require`/`ipcRenderer` wholesale to fix shortcuts.
 - With `webPreferences.sandbox: true`, preload only gets the Electron-documented subset of Node and `electron` modules; do not import arbitrary npm packages (for example filesystem helpers) in `contentBridgeAPIs/` — delegate path, `shell`, and similar work to main via IPC (`electron-ipc-bridge.ts` + `register*Ipc`).
-- Prefer narrow, typed methods; add Vitest tests under `contentBridgeAPIs/tests/` when behavior is non-trivial.
+- Prefer narrow, typed methods; add Vitest tests under `contentBridgeAPIs/_tests/` when behavior is non-trivial.
 - In line comments and JSDoc inside src-electron/, follow the code-comment rules in AGENTS.md (no Markdown emphasis; use single quotes for inline symbol/path references instead of grave accents).
 
 ## Local types extraction rule

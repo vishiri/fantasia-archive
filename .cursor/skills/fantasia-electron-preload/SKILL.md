@@ -29,7 +29,7 @@ description: >-
 3. Implement functions in `src-electron/contentBridgeAPIs/<name>.ts` exporting a plain object matching that interface.
 4. Import the implementation in `electron-preload.ts` and add it to `apiObject` with a stable key (camelCase, consistent with existing keys).
 5. Extend `Window['faContentBridgeAPIs']` in `src/globals.d.ts` with the new key and interface.
-6. Add Vitest coverage under `src-electron/contentBridgeAPIs/tests/` (and `mainScripts/ipcManagement/tests/` for new IPC registrars) following existing `*.vitest.test.ts` patterns. **`yarn testbatch:verify`** enforces **100%** v8 coverage on **`src-electron`** ([vitest-tests.mdc](../../rules/vitest-tests.mdc), [vitest/vitest.electron.config.mts](../../../vitest/vitest.electron.config.mts)).
+6. Add Vitest coverage under `src-electron/contentBridgeAPIs/_tests/` (and `mainScripts/ipcManagement/_tests/` for new IPC registrars) following existing `*.vitest.test.ts` patterns. **`yarn testbatch:verify`** enforces **100%** v8 coverage on **`src-electron`** ([vitest-tests.mdc](../../rules/vitest-tests.mdc), [vitest/vitest.electron.config.mts](../../../vitest/vitest.electron.config.mts)).
 
 ## Security and boundaries
 

@@ -81,9 +81,9 @@ export default defineConfig({
       ],
       exclude: [
         ...vitestCoverageBaseExclude,
-        'src/components/**/tests/**',
-        'src/layouts/**/tests/**',
-        'src/pages/**/tests/**',
+        'src/components/**/_tests/**',
+        'src/layouts/**/_tests/**',
+        'src/pages/**/_tests/**',
         '**/*.stories.ts'
       ],
       watermarks: {

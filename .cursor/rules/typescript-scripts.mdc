@@ -6,7 +6,7 @@ alwaysApply: false
 
 # `src/scripts` — modules and extraction
 
-Vue SFCs import from here when extracting **pure helpers**; see when to split script logic in [vue-quasar.mdc](vue-quasar.mdc). **Large blocks of component-owned script logic** moved out on **explicit user request** belong under **`src/components/<Feature>/scripts/`**, not under `src/scripts/` — see vue-quasar.mdc. **Colocated component `_data/`** and **automated-test fixtures** (inline in `*.vitest.test.ts` / `*.playwright.test.ts`, not separate `tests/*.ts` dump modules) are not under `src/scripts/` — follow vue-quasar and the Vitest/Playwright rules.
+Vue SFCs import from here when extracting **pure helpers**; see when to split script logic in [vue-quasar.mdc](vue-quasar.mdc). **Large blocks of component-owned script logic** moved out on **explicit user request** belong under **`src/components/<Feature>/scripts/`**, not under `src/scripts/` — see vue-quasar.mdc. **Colocated component `_data/`** and **automated-test fixtures** (inline in `*.vitest.test.ts` / `*.playwright.test.ts`, not separate `_tests/*.ts` dump modules) are not under `src/scripts/` — follow vue-quasar and the Vitest/Playwright rules.
 
 ## Layout
 
@@ -27,7 +27,7 @@ If a single `.ts` file grows hard to scan (long functions, many exports, or mixe
 - Match existing import style (`app/...` alias where the repo already uses it).
 - Prefer explicit return types on public exports when surrounding code does.
 - Avoid `any` in function signatures, object shapes, and casts; use precise types (`unknown` if needed) and narrow at usage sites.
-- Unit tests are allowed and encouraged for `src/scripts/**` modules when colocated in neighboring `tests/` folders (for example `src/scripts/_utilities/tests/` and `src/scripts/appInfo/tests/`) using `*.vitest.test.ts`.
+- Unit tests are allowed and encouraged for `src/scripts/**` modules when colocated in neighboring `_tests/` folders (for example `src/scripts/_utilities/_tests/` and `src/scripts/appInfo/_tests/`) using `*.vitest.test.ts`.
 - Keep Playwright for UI integration flows; do not move renderer interaction coverage out of existing Playwright suites when those checks depend on built app behavior.
 
 ## Local types extraction rule

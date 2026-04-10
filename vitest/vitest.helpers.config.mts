@@ -15,7 +15,7 @@ const repoRoot = path.resolve(__dirname, '..')
 
 /**
  * Node unit tests for modules under helpers/ (e.g. helpers/playwrightHelpers/).
- * Convention: colocate *.vitest.test.ts under each package's tests/ tree; this glob picks up every helper subtree.
+ * Convention: colocate *.vitest.test.ts under each package's _tests/ tree; this glob picks up every helper subtree.
  * Vitest workspace configs live under vitest/ at the repo root so this coverage gate applies only to real helper packages.
  */
 export default defineConfig({
@@ -42,7 +42,7 @@ export default defineConfig({
       include: ['helpers/**/*.ts'],
       exclude: [
         ...vitestCoverageBaseExclude,
-        'helpers/**/tests/**'
+        'helpers/**/_tests/**'
       ],
       thresholds: vitestCoverageStrictThresholds
     }

@@ -53,13 +53,13 @@ const sassSilenceDeprecations = ['import', 'global-builtin'] as const
 
 const config: StorybookConfig = {
   /**
-   * Story modules live under each feature's 'tests/' folder (same area as Vitest and Playwright),
+   * Story modules live under each feature's '_tests/' folder (same area as Vitest and Playwright),
    * not beside '.vue' sources. Keep these globs in sync with AGENTS.md and '.cursor/rules/storybook-stories.mdc'.
    */
   stories: [
-    '../../src/components/**/tests/*.stories.ts',
-    '../../src/layouts/**/tests/*.stories.ts',
-    '../../src/pages/**/tests/*.stories.ts'
+    '../../src/components/**/_tests/*.stories.ts',
+    '../../src/layouts/**/_tests/*.stories.ts',
+    '../../src/pages/**/_tests/*.stories.ts'
   ],
 
   /**

@@ -24,7 +24,7 @@ description: >-
 - **Single primitive channels** (one URL string, one flag): **`typeof`** plus an existing predicate (e.g. **`checkIfExternalUrl`** in **`registerFaExternalLinksIpc`**) is fine; optional **`z.string().refine(...)`** only if it improves readability or shared error formatting.
 - **Not renderer IPC**: **`registerFaExtraEnvIpc`** builds **`COMPONENT_PROPS`** from **`process.env`** via **`JSON.parse`** — that is harness/env trust, not preload IPC; Zod there would harden env-driven shapes but is a separate decision from channel handlers.
 - **Dependency**: **`zod`** is listed under **`package.json`** **`dependencies`** so production main bundles resolve it.
-- Add Vitest coverage for the schema module under **`src-electron/shared/tests/`** and extend **`register*Ipc`** tests so invalid payloads do not call **`store.set`** (or equivalent).
+- Add Vitest coverage for the schema module under **`src-electron/shared/_tests/`** and extend **`register*Ipc`** tests so invalid payloads do not call **`store.set`** (or equivalent).
 
 ### When Zod is not replacing existing code (repo scan)
 
@@ -35,7 +35,7 @@ description: >-
 
 ## Testing
 
-- Vitest tests live under `src-electron/mainScripts/tests/` (e.g. `appManagement`), each `mainScripts/<area>/tests/` (`appIdentity`, `windowManagement`, `chromiumFixes`, `userSettings`, `nativeShell`, `ipcManagement`), and `src-electron/contentBridgeAPIs/tests/` for bridge modules.
+- Vitest tests live under `src-electron/mainScripts/_tests/` (e.g. `appManagement`), each `mainScripts/<area>/_tests/` (`appIdentity`, `windowManagement`, `chromiumFixes`, `userSettings`, `nativeShell`, `ipcManagement`), and `src-electron/contentBridgeAPIs/_tests/` for bridge modules.
 - After main-process changes, run the **quality gate** when TypeScript or related sources changed: `yarn testbatch:verify` ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)) — see [eslint-typescript.mdc](../../rules/eslint-typescript.mdc).
 
 ## Renderer sandbox

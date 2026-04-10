@@ -49,9 +49,9 @@ export default defineConfig({
       ],
       exclude: [
         ...vitestCoverageBaseExclude,
-        'src/boot/**/tests/**',
-        'src/scripts/**/tests/**',
-        'src/stores/**/tests/**'
+        'src/boot/**/_tests/**',
+        'src/scripts/**/_tests/**',
+        'src/stores/**/_tests/**'
       ],
       thresholds: { ...vitestCoverageStrictThresholds }
     }

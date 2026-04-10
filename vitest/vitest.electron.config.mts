@@ -40,7 +40,7 @@ export default defineConfig({
       include: ['src-electron/**/*.ts'],
       exclude: [
         ...vitestCoverageBaseExclude,
-        'src-electron/**/tests/**'
+        'src-electron/**/_tests/**'
       ],
       thresholds: vitestCoverageStrictThresholds
     }
