@@ -19,7 +19,18 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
   }
 
   async function updateSettings (updateObject: Partial<I_faUserSettings>): Promise<void> {
-    await window.faContentBridgeAPIs.faUserSettings.setSettings(updateObject)
+    try {
+      await window.faContentBridgeAPIs.faUserSettings.setSettings(updateObject)
+    } catch (error) {
+      console.error('[S_FaUserSettings] setSettings failed', error)
+      Notify.create({
+        group: false,
+        type: 'negative',
+        timeout: 0,
+        message: i18n.global.t('globalFunctionality.faUserSettings.saveError')
+      })
+      return
+    }
 
     const retrievedSettings = await window.faContentBridgeAPIs.faUserSettings.getSettings()
     settings.value = retrievedSettings

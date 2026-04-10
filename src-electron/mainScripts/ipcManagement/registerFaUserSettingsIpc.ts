@@ -2,6 +2,7 @@ import { ipcMain } from 'electron'
 
 import { FA_USER_SETTINGS_IPC } from 'app/src-electron/electron-ipc-bridge'
 import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
+import { parseFaUserSettingsPatch } from 'app/src-electron/shared/faUserSettingsPatchSchema'
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 
 let registered = false
@@ -26,10 +27,11 @@ export function registerFaUserSettingsIpc (): void {
   })
 
   // Set the user settings
-  ipcMain.handle(FA_USER_SETTINGS_IPC.setAsync, (_event, patch: Partial<I_faUserSettings>) => {
+  ipcMain.handle(FA_USER_SETTINGS_IPC.setAsync, (_event, patch: unknown) => {
+    const parsedPatch = parseFaUserSettingsPatch(patch)
     getFaUserSettings().set({
       ...userSettingsSnapshot(),
-      ...patch
+      ...parsedPatch
     })
   })
 }

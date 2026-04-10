@@ -208,3 +208,28 @@ test('Test that updateSettings shows negative notify when one of several keys mi
     message: 'globalFunctionality.faUserSettings.saveError'
   })
 })
+
+/**
+ * S_FaUserSettings / updateSettings
+ * When setSettings rejects, show save error notify, log, skip getSettings, leave settings unchanged.
+ */
+test('Test that updateSettings shows negative notify when setSettings rejects', async () => {
+  setSettingsMock.mockRejectedValueOnce(new Error('ipc failed'))
+
+  const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  await store.updateSettings({ darkMode: true })
+
+  expect(setSettingsMock).toHaveBeenCalledOnce()
+  expect(getSettingsMock).not.toHaveBeenCalled()
+  expect(store.settings).toBeNull()
+  expect(notifyCreateMock).toHaveBeenCalledOnce()
+  expect(notifyCreateMock).toHaveBeenCalledWith({
+    group: false,
+    type: 'negative',
+    timeout: 0,
+    message: 'globalFunctionality.faUserSettings.saveError'
+  })
+  expect(consoleErrorSpy).toHaveBeenCalledOnce()
+  expect(consoleErrorSpy.mock.calls[0][0]).toContain('[S_FaUserSettings] setSettings failed')
+  consoleErrorSpy.mockRestore()
+})

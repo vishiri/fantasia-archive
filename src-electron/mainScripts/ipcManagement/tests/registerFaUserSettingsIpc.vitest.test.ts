@@ -1,4 +1,5 @@
 import { vi, expect, test, beforeEach } from 'vitest'
+import { ZodError } from 'zod'
 
 import { FA_USER_SETTINGS_IPC } from 'app/src-electron/electron-ipc-bridge'
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
@@ -89,6 +90,46 @@ test('Test that user settings set handler writes merged store state', async () =
     ...FA_USER_SETTINGS_DEFAULTS,
     darkMode: false
   })
+})
+
+/**
+ * registerFaUserSettingsIpc
+ * Set handler does not persist when patch fails Zod validation.
+ */
+test('Test that user settings set handler throws ZodError and skips store set for invalid patch', async () => {
+  getFaUserSettingsMock.mockReturnValue({
+    store: { ...FA_USER_SETTINGS_DEFAULTS },
+    set: storeSetMock
+  })
+
+  const { registerFaUserSettingsIpc } = await import('../registerFaUserSettingsIpc')
+  registerFaUserSettingsIpc()
+
+  const setHandler = handlerFor(FA_USER_SETTINGS_IPC.setAsync)
+  expect(() => {
+    setHandler({}, { darkMode: 'false' })
+  }).toThrow(ZodError)
+  expect(storeSetMock).not.toHaveBeenCalled()
+})
+
+/**
+ * registerFaUserSettingsIpc
+ * Set handler does not persist when patch root is not a plain object.
+ */
+test('Test that user settings set handler throws TypeError and skips store set for non-object patch', async () => {
+  getFaUserSettingsMock.mockReturnValue({
+    store: { ...FA_USER_SETTINGS_DEFAULTS },
+    set: storeSetMock
+  })
+
+  const { registerFaUserSettingsIpc } = await import('../registerFaUserSettingsIpc')
+  registerFaUserSettingsIpc()
+
+  const setHandler = handlerFor(FA_USER_SETTINGS_IPC.setAsync)
+  expect(() => {
+    setHandler({}, null)
+  }).toThrow(TypeError)
+  expect(storeSetMock).not.toHaveBeenCalled()
 })
 
 /**
