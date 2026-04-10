@@ -53,10 +53,10 @@ Locale `L_*` paths under `i18n/<locale>/components/` use the same bucket names a
 - Those files may still use **translations** (`i18n`), **imported copy helpers**, and **functions** on items (e.g. `trigger` handlers); they are not limited to string literals.
 - **Automated-test fixture data** does **not** live in `_data/` or in **`_tests/<fixture>.ts`** modules: Vitest keeps it inside `*.vitest.test.ts`; Playwright keeps mount payloads inline in `*.playwright.test.ts` and passes them via `COMPONENT_PROPS`. If a parent SFC must embed a component-mode-only blob, keep it as a **`const` inside that `.vue`**. See [vue-quasar.mdc](../../rules/vue-quasar.mdc) for split vs `src/scripts/` boundaries.
 
-## Component `scripts/` (user-requested SFC extraction)
+## Component `scripts/` and SFC size
 
-- **Do not** extract large `<script setup>` functions into separate files unless the **user explicitly asks** for that refactor (no proactive “cleanup” splits).
-- When they do ask, new modules **always** live under **`src/components/<bucket>/<Feature>/scripts/`** (`.ts` files), imported back into the feature `.vue`. Do not park these extractions next to the `.vue` at the feature root.
+- **Enforced limits** (ESLint): **`.vue` ≤250 lines**, **functions ≤50 lines**, **non-exempt `.ts` ≤200 lines** — see [code-size-decomposition.mdc](../../rules/code-size-decomposition.mdc). When a feature would exceed them, extract into **`src/components/<bucket>/<Feature>/scripts/*.ts`**, add **subcomponents**, and/or move shared pure logic to **`src/scripts/`**. Do not park feature-owned extractions next to the `.vue` at the feature root.
+- **External `<style>` files** are a **last resort** anti-pattern; use only with **explicit user approval** in that session.
 - Distinct from **`_data/`** (production structured payloads) and from **`src/scripts/`** (shared app-wide helpers). See [vue-quasar.mdc](../../rules/vue-quasar.mdc).
 
 ## Cursor rules for `.vue` files (split by topic)

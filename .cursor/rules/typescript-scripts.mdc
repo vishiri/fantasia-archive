@@ -6,7 +6,7 @@ alwaysApply: false
 
 # `src/scripts` — modules and extraction
 
-Vue SFCs import from here when extracting **pure helpers**; see when to split script logic in [vue-quasar.mdc](vue-quasar.mdc). **Large blocks of component-owned script logic** moved out on **explicit user request** belong under **`src/components/<Feature>/scripts/`**, not under `src/scripts/` — see vue-quasar.mdc. **Colocated component `_data/`** and **automated-test fixtures** (inline in `*.vitest.test.ts` / `*.playwright.test.ts`, not separate `_tests/*.ts` dump modules) are not under `src/scripts/` — follow vue-quasar and the Vitest/Playwright rules.
+Vue SFCs import from here when extracting **pure helpers**; see [vue-quasar.mdc](vue-quasar.mdc) and [code-size-decomposition.mdc](code-size-decomposition.mdc). **Component-owned script logic** that is not app-wide belongs under **`src/components/<bucket>/<Feature>/scripts/`**, not under `src/scripts/`. **Colocated component `_data/`** and **automated-test fixtures** (inline in `*.vitest.test.ts` / `*.playwright.test.ts`, not separate `_tests/*.ts` dump modules) are not under `src/scripts/` — follow vue-quasar and the Vitest/Playwright rules.
 
 ## Layout
 
@@ -16,7 +16,9 @@ Vue SFCs import from here when extracting **pure helpers**; see when to split sc
 
 ## When to split a file
 
-If a single `.ts` file grows hard to scan (long functions, many exports, or mixed abstraction levels):
+**Hard limits** (ESLint; see [code-size-decomposition.mdc](code-size-decomposition.mdc)): each **`.ts` module under `src/scripts/`** must stay **≤200 lines** and each **function ≤50 lines** (tests and `*.types.ts` follow the global exemption list).
+
+When a file grows hard to scan or approaches those caps:
 
 1. **Group by domain** — e.g. color helpers vs list/array helpers; avoid one mega `utils.ts`.
 2. **Move reusable pure functions** into `_utilities/` with clear names.

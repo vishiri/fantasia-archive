@@ -8,6 +8,32 @@ import pluginVue from 'eslint-plugin-vue'
 import vueParser from 'vue-eslint-parser'
 import tseslint from 'typescript-eslint'
 
+/**
+ * Paths excluded from max-lines / max-lines-per-function (see .cursor/rules/code-size-decomposition.mdc).
+ */
+const codeSizeRuleIgnores = [
+  '**/*.vitest.test.ts',
+  '**/*playwright*.ts',
+  '**/*.playwright.spec.ts',
+  '**/*.stories.ts',
+  '**/*.config.mjs',
+  '**/*.config.mts',
+  '**/*.config.ts',
+  '**/eslint.config.mjs',
+  '**/commitlint.config.mjs',
+  'i18n/**/*.ts',
+  '**/*.types.ts',
+  'types/**/*.ts',
+  '**/*.d.ts',
+  'vitest/**/*.mts',
+  '.storybook-workspace/**',
+  '**/quasar.config.ts',
+  '**/quasar.config.js',
+  'scripts/**/*.mjs',
+  'testRunner_*.mjs',
+  '**/testRunner_*.mjs'
+]
+
 export default [...neostandard({
   ts: true,
   filesTs: ['**/*.mts', '**/*.cts'],
@@ -106,5 +132,59 @@ export default [...neostandard({
   rules: {
     // Playwright requires object destructuring on the first test callback argument; '{}' is valid when no fixtures are used.
     'no-empty-pattern': 'off'
+  }
+}, {
+  files: ['**/*.{ts,mts,cts}'],
+  ignores: codeSizeRuleIgnores,
+  rules: {
+    'max-lines': ['error', {
+      max: 200,
+      skipBlankLines: true,
+      skipComments: true
+    }],
+    'max-lines-per-function': ['error', {
+      max: 50,
+      skipBlankLines: true,
+      skipComments: true,
+      IIFEs: true
+    }]
+  }
+}, {
+  files: ['**/*.vue'],
+  ignores: ['.storybook-workspace/**'],
+  rules: {
+    'max-lines': ['error', {
+      max: 250,
+      skipBlankLines: true,
+      skipComments: true
+    }],
+    'max-lines-per-function': ['error', {
+      max: 50,
+      skipBlankLines: true,
+      skipComments: true,
+      IIFEs: true
+    }]
+  }
+}, {
+  files: ['**/*.{js,mjs,cjs}'],
+  ignores: [
+    ...codeSizeRuleIgnores,
+    '**/node_modules/**',
+    '**/dist/**',
+    '**/.quasar/**',
+    '**/storybook-static/**'
+  ],
+  rules: {
+    'max-lines': ['error', {
+      max: 200,
+      skipBlankLines: true,
+      skipComments: true
+    }],
+    'max-lines-per-function': ['error', {
+      max: 50,
+      skipBlankLines: true,
+      skipComments: true,
+      IIFEs: true
+    }]
   }
 }, ...storybook.configs['flat/recommended']]

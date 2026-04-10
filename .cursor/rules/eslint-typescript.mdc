@@ -24,6 +24,10 @@ In line comments, block comments, and JSDoc above APIs and tests: do not use Mar
 | `yarn lint:stylelint` | Stylelint on `src/**/*.{vue,css,scss,sass}` and `.storybook-workspace/.storybook/**/*.{vue,css,scss,sass}` (declaration blocks sorted alphabetically via `stylelint-order`; use `yarn lint:stylelint:fix` to autofix). |
 | `yarn lint:typescript` | Full **`vue-tsc`** project check (Vue SFCs + `.ts`; Quasar paths via `tsconfig.json` → `.quasar/tsconfig.json`). |
 
+## File and function size (ESLint)
+
+- **`eslint.config.mjs`** enforces **`max-lines`** and **`max-lines-per-function`** on production **`**/*.{ts,mts,cts,vue,js,mjs,cjs}`** with exemptions for tests, Storybook, configs, **`i18n/`**, **`**/*.types.ts`**, **`types/`**, declarations, **`vitest/**/*.mts`**, **`.storybook-workspace/**`**, and **`scripts/**/*.mjs`**. Targets: **Vue ≤250**, **TS/JS module ≤200**, **function ≤50** (see [code-size-decomposition.mdc](code-size-decomposition.mdc) for intent and split strategy).
+
 ## Pre-commit / pre-changelog quality gate
 
 Before commits or changelog edits tied to product or test work, run the four checks **in order** in **one** terminal via **`yarn testbatch:verify`** (see [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) for the **changelog-only** exception and [git-conventional-commits.mdc](git-conventional-commits.mdc)). That script’s Vitest step enforces layered coverage: **`src-electron`** and **`helpers`** at **100%** on statements, branches, functions, and lines; **`src`** renderer **`.ts`** in **`unit-src-renderer`** at **100%** on all four; **`.ts`** under **`src/components`**, **`src/layouts`**, and **`src/pages`** in **`unit-components`** at **100%** statements, functions, and lines; **`.vue`** files have no failing threshold. The **`unit-components`** **`.ts`** slice omits a branch gate while keeping statements, functions, and lines at **100%** ([vitest-tests.mdc](vitest-tests.mdc), **Vitest coverage tiers (CI)**).

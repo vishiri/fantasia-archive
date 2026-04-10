@@ -1,0 +1,49 @@
+---
+description: Mandatory file and function size limits; Vue SFC splitting; ESLint enforcement
+globs: "**/*"
+alwaysApply: true
+---
+
+# Code size and decomposition (project-wide)
+
+These limits are **enforced in CI** via ESLint (`max-lines`, `max-lines-per-function`) in `eslint.config.mjs` with the same exemptions listed below. Agents and contributors must follow them for any new or edited production code.
+
+## Vue single-file components (`.vue`)
+
+- **Hard limit:** any `.vue` file **must not exceed 250 lines** (ESLint `max-lines` with `skipBlankLines` and `skipComments` per rule options).
+- **When approaching or over the limit**, you **must** split work using one or both of:
+  1. **Extract logic** into colocated **`scripts/*.ts`** modules (or shared `src/scripts/` when appropriate), composed by a thin `<script setup>`.
+  2. **Extract UI** into **subcomponents** in the same feature folder, each with its own template, scoped styles, and focused script.
+- **Last resort (anti-pattern):** moving `<style>` to a separate file and re-importing is **not** a normal pattern in this repo. Use it only in **extreme** circumstances and **only after explicit user approval** in the session where it is applied.
+
+## Functions (JavaScript, TypeScript, and Vue `<script>`)
+
+- **Hard limit:** a **single function** (any declaration or method body) **must not exceed 50 lines** (ESLint `max-lines-per-function` with `skipBlankLines`, `skipComments`, and `IIFEs: true`).
+- **When a function grows**, split into **smaller named functions** with clear responsibilities; avoid “god” helpers and mega-callbacks.
+
+## TypeScript modules (`.ts`, `.mts`, `.cts`)
+
+- **Hard limit:** a **single TypeScript file** **must not exceed 200 lines** (ESLint `max-lines` with `skipBlankLines` and `skipComments`).
+- **When a module grows**, split into **smaller files** by concern (one module per responsibility), re-export from a barrel only when it genuinely simplifies imports.
+
+## Exemptions (no `max-lines` / `max-lines-per-function` on these paths)
+
+- **Tests:** `**/*.vitest.test.ts`, `**/*playwright*.ts`, `**/*.playwright.spec.ts`
+- **Storybook:** `**/*.stories.ts`
+- **Config:** `**/*.config.mjs`, `**/*.config.mts`, `**/*.config.ts`, `**/eslint.config.mjs`, `**/commitlint.config.mjs`, `**/quasar.config.ts`, `**/quasar.config.js`, `scripts/**/*.mjs`, `**/testRunner_*.mjs`
+- **Translations:** `i18n/**/*.ts` (locale trees and composed `index.ts`)
+- **Type-only modules:** `**/*.types.ts` and everything under `types/**/*.ts`
+- **Declarations:** `**/*.d.ts`
+- **Vitest workspace configs:** `vitest/**/*.mts`
+- **Storybook workspace:** `.storybook-workspace/**`
+
+## Related
+
+- Vue composition and extraction patterns: [vue-quasar.mdc](vue-quasar.mdc), [vue-bem-scss.mdc](vue-bem-scss.mdc)
+- `src/scripts/` layout: [typescript-scripts.mdc](typescript-scripts.mdc)
+- ESLint entry: [eslint-typescript.mdc](eslint-typescript.mdc)
+
+## Local types extraction rule
+
+- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

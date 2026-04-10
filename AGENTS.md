@@ -32,6 +32,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc)                   | Always — en-US `changeLog.md` vs `package.json` version (see skill)       |
 | [plan-documents.mdc](.cursor/rules/plan-documents.mdc)                     | Always — plan files in `.cursor/plans` with timestamp + version metadata; prune plans with mtime older than 30 days before saving a new one |
 | [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) | Always — **quality gate** via `yarn testbatch:verify`; `yarn quasar:build:electron`, Playwright, and Storybook test/VRT each in their own terminal unless using **`yarn testbatch:ensure:nochange`** / **`yarn testbatch:ensure:change`** |
+| [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc) | Always — **Vue ≤250 lines**, **TS module ≤200 lines**, **function ≤50 lines** (ESLint); split via **`scripts/`** + subcomponents; external `<style>` import only with **explicit user approval** |
 
 
 ## Stack (short)
@@ -69,6 +70,13 @@ When writing comments in source files (not in user-facing Markdown documents suc
 - Do not use Markdown emphasis in comments (double-asterisk bold or asterisk-wrapped italic); it clutters plain text in editors and diffs.
 - Use single quotes for inline code or identifier references (for example 'ipcMain.handle', 'src/components/') instead of grave accents (backticks).
 - There is **no** comment line-length budget: do **not** wrap prose in the middle of a sentence across JSDoc or block-comment lines (avoid ending one ` * ` line with a half-sentence and continuing on the next). Prefer one full sentence per line, or a short opening line plus ` * - ` bullet lines for details, instead of a long paragraph split arbitrarily.
+
+## Code size and decomposition (enforced)
+
+- **`.vue` SFCs**: keep each file **at or under 250 lines** (ESLint `max-lines`, with blank/comment skipping per config). If growth would exceed that, split into **`scripts/*.ts`** modules and/or **subcomponents** in the same feature folder. Moving scoped CSS to a standalone file and re-importing it is a **last-resort anti-pattern** and requires **explicit user approval** before it is applied anywhere.
+- **TypeScript modules** (non-exempt paths): **≤200 lines** per file; split by concern when a file would exceed that.
+- **Functions** (JS/TS and Vue `<script>`): **≤50 lines** per function; decompose into smaller named units when a body would exceed that.
+- **Exemptions** from these ESLint rules: Vitest specs, Playwright specs, Storybook stories, config modules, **`i18n/**/*.ts`**, **`**/*.types.ts`**, **`types/**/*.ts`**, **`**/*.d.ts`**, **`vitest/**/*.mts`**, **`.storybook-workspace/`** (nested workspace), and root **`scripts/**/*.mjs`** (see [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc) and `eslint.config.mjs`).
 
 ## Type naming conventions
 
