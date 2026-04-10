@@ -3,8 +3,9 @@ export default {
   saveButton: 'Enregistrer les paramètres',
   closeButton: 'Fermer sans enregistrer',
   settingsSearchPlaceholder: 'Filtrer les paramètres',
-  searchNoResultsMessage:
-    'Fantasia n\'a malheureusement trouvé aucun paramètre correspondant à votre recherche.',
+  searchNoResultsTitle: 'Aucun résultat de recherche',
+  searchNoResultsDescription:
+    'Fantasia n\'a malheureusement trouvé aucun paramètre correspondant à votre recherche. Essayez peut-être un autre terme ?',
   appOptionsCategories: {
     accessibility: {
       title: 'Accessibilité',

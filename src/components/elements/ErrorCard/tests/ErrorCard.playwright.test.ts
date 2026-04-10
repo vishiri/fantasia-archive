@@ -59,6 +59,7 @@ const faFrontendRenderTimer:number = FA_FRONTEND_RENDER_TIMER
  */
 const selectorList = {
   errorCard: 'errorCard',
+  errorCardTitle: 'errorCard-title',
   fantasiaMascotImage: 'fantasiaMascotImage-image'
 }
 
@@ -105,13 +106,11 @@ test.describe.serial('Error card (live component shell)', () => {
    * Title string from props appears in the live DOM.
    */
   test('Title renders in the live UI', async () => {
-    const heading = appWindow.getByRole('heading', {
-      level: 2,
-      name: testTitle
-    })
+    const title = appWindow.locator(`[data-test-locator="${selectorList.errorCardTitle}"]`)
 
-    await expect(heading).toHaveCount(1)
-    await expect(heading).toBeVisible()
+    await expect(title).toHaveCount(1)
+    await expect(title).toBeVisible()
+    await expect(title).toHaveText(testTitle)
   })
 
   /**

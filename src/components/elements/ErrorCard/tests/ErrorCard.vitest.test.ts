@@ -57,6 +57,60 @@ test('Test that ErrorCard hides the details block when details prop is absent', 
 
 /**
  * ErrorCard
+ * Renders optional description between the title and the mascot when the description prop is set.
+ */
+test('Test that ErrorCard renders description between title and mascot when description prop is set', () => {
+  const w = mount(ErrorCard, {
+    props: {
+      title: 'Heading',
+      description: 'Body line one\nBody line two',
+      imageName: 'reading'
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  expect(w.get('[data-test-locator="errorCard-title"]').text()).toBe('Heading')
+  expect(w.get('[data-test-locator="errorCard-description"]').text()).toContain('Body line one')
+  expect(w.get('[data-test-locator="errorCard-description"]').text()).toContain('Body line two')
+
+  const markup = w.html()
+  const titleIndex = markup.indexOf('errorCard-title')
+  const descriptionIndex = markup.indexOf('errorCard-description')
+  const mascotIndex = markup.indexOf('fantasiaMascotImage-image')
+  expect(titleIndex).toBeGreaterThanOrEqual(0)
+  expect(descriptionIndex).toBeGreaterThan(titleIndex)
+  expect(mascotIndex).toBeGreaterThan(descriptionIndex)
+
+  w.unmount()
+})
+
+/**
+ * ErrorCard
+ * Omits the description block when the description prop is omitted.
+ */
+test('Test that ErrorCard hides the description block when description prop is absent', () => {
+  const w = mount(ErrorCard, {
+    props: {
+      title: 'Title only',
+      imageName: 'error'
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  expect(w.find('[data-test-locator="errorCard-description"]').exists()).toBe(false)
+  w.unmount()
+})
+
+/**
+ * ErrorCard
  * Custom width prop is forwarded to the data attribute for layout contracts.
  */
 test('Test that ErrorCard applies a custom width prop to the data-test-error-card-width attribute', () => {

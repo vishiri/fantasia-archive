@@ -18,4 +18,6 @@ test('locale registry exposes en-US, de, and fr', () => {
 test('externalFileLoader exposes i18n global API', () => {
   expect(i18n.global.t('dialogs.programSettings.title')).toBeTruthy()
   expect(i18n.global.t('dialogs.programSettings.settingsSearchPlaceholder')).toBeTruthy()
+  expect(i18n.global.t('dialogs.programSettings.searchNoResultsTitle')).toBeTruthy()
+  expect(i18n.global.t('dialogs.programSettings.searchNoResultsDescription')).toBeTruthy()
 })

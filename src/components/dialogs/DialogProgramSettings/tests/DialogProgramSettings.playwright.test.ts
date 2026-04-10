@@ -98,7 +98,9 @@ const programSettingsDirectInput: T_dialogName = 'ProgramSettings'
  */
 const programSettingsSearchDebounceWaitMs = 400
 
-const expectedProgramSettingsSearchNoResultsMessage = programSettingsMessages.searchNoResultsMessage
+const expectedProgramSettingsSearchNoResultsTitle = programSettingsMessages.searchNoResultsTitle
+const expectedProgramSettingsSearchNoResultsDescription =
+  programSettingsMessages.searchNoResultsDescription
 
 /**
  * Types into the header settings search field and waits for the debounced filter to apply.
@@ -356,12 +358,13 @@ test.describe.serial('Program settings dialog', () => {
     await expect(mascot).toHaveCount(1)
     await expect(mascot).toHaveAttribute('data-test-image', 'reading')
 
-    const titleHeading = appWindow.getByRole('heading', {
-      level: 2,
-      name: expectedProgramSettingsSearchNoResultsMessage
-    })
-    await expect(titleHeading).toHaveCount(1)
-    await expect(titleHeading).toBeVisible()
+    const titleLine = errorCard.locator('[data-test-locator="errorCard-title"]')
+    await expect(titleLine).toHaveCount(1)
+    await expect(titleLine).toHaveText(expectedProgramSettingsSearchNoResultsTitle)
+
+    const descriptionLine = errorCard.locator('[data-test-locator="errorCard-description"]')
+    await expect(descriptionLine).toHaveCount(1)
+    await expect(descriptionLine).toHaveText(expectedProgramSettingsSearchNoResultsDescription)
 
     await clearProgramSettingsSearch(appWindow)
   })

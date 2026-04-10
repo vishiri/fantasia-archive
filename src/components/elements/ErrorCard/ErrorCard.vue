@@ -5,17 +5,27 @@
     :data-test-error-card-width="String(props.width)"
   >
     <q-card-section class="text-center">
-      <h2 class="errorCard__title text-negative q-my-none text-h5 text-weight-medium">
+      <p
+        class="errorCard__title text-negative q-my-none text-h5 text-weight-medium"
+        data-test-locator="errorCard-title"
+      >
         {{ title }}
-      </h2>
+      </p>
+      <p
+        v-if="description"
+        class="errorCard__description text-negative q-mt-md q-mb-none text-body1"
+        data-test-locator="errorCard-description"
+      >
+        {{ description }}
+      </p>
       <FantasiaMascotImage
-        class="q-mt-md"
+        class="q-mt-lg"
         :fantasia-image="imageName"
         width="300px"
       />
       <p
         v-if="details"
-        class="errorCard__details text-body1 q-mt-md q-mb-none"
+        class="errorCard__details text-h6 q-mt-lg q-mb-none text-negative"
       >
         {{ details }}
       </p>
@@ -33,9 +43,13 @@ import type { T_errorCardImageName } from './ErrorCard.types'
 const props = withDefaults(
   defineProps<{
     /**
-     * Primary message shown above the mascot image.
+     * Primary heading shown above the mascot (and above optional description when set).
      */
     title: string
+    /**
+     * Optional copy between the title and the mascot; omit when the title alone is enough.
+     */
+    description?: string
     /**
      * Optional supporting copy rendered below the mascot; use newlines for multi-line text.
      */
@@ -50,6 +64,7 @@ const props = withDefaults(
     width?: number
   }>(),
   {
+    description: undefined,
     details: undefined,
     width: 600
   }
@@ -68,6 +83,10 @@ const errorCardMaxWidthPx = computed(() => `${props.width}px`)
   color: $errorCard-text;
   max-width: min(100%, v-bind(errorCardMaxWidthPx));
   width: 100%;
+}
+
+.errorCard__description {
+  white-space: pre-line;
 }
 
 .errorCard__details {

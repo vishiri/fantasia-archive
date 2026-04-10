@@ -17,7 +17,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Centered cream error or empty-state card with a negative title, Fantasia mascot, and optional details below the image.'
+          'Centered cream error or empty-state card with a negative title, optional description between title and mascot, Fantasia mascot, and optional details below the image.'
       }
     }
   },
@@ -28,9 +28,10 @@ export default meta
 
 export const ProgramSettingsSearchEmpty: StoryObj<typeof meta> = {
   args: {
-    imageName: 'reading',
-    title:
+    description:
       'Fantasia sadly did not find any setting you were looking for. Perhaps try a different search term?',
+    imageName: 'reading',
+    title: 'No search match',
     width: 500
   }
 }

@@ -191,7 +191,8 @@
                   data-test-locator="dialogProgramSettings-searchNoResults"
                 >
                   <ErrorCard
-                    :title="$t('dialogs.programSettings.searchNoResultsMessage')"
+                    :title="$t('dialogs.programSettings.searchNoResultsTitle')"
+                    :description="$t('dialogs.programSettings.searchNoResultsDescription')"
                     image-name="reading"
                     :width="650"
                   />

@@ -73,6 +73,7 @@ const currentMascotImage = determineCurrentImage(fantasiaImageList, isRandom, pr
   &__inner {
     display: block;
     height: v-bind(height);
+    margin: auto;
     max-width: 100%;
     object-fit: contain;
     user-select: none;
