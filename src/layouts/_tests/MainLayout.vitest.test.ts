@@ -1,6 +1,8 @@
 import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
 
+import { setFantasiaStorybookCanvasFlag } from 'src/scripts/isFantasiaStorybookCanvas'
+
 import MainLayout from '../MainLayout.vue'
 
 /**
@@ -8,6 +10,7 @@ import MainLayout from '../MainLayout.vue'
  * Renders header chrome stubs and a router outlet so the shell layout mounts without the full menu tree.
  */
 test('Test that MainLayout mounts with header stubs and router-view slot', () => {
+  setFantasiaStorybookCanvasFlag(false)
   const w = mount(MainLayout, {
     global: {
       mocks: {
@@ -16,6 +19,9 @@ test('Test that MainLayout mounts with header stubs and router-view slot', () =>
       stubs: {
         AppControlMenus: {
           template: '<div data-test-stub="app-control-menus" />'
+        },
+        GlobalLanguageSelector: {
+          template: '<div data-test-stub="global-language-selector" />'
         },
         GlobalWindowButtons: {
           template: '<div data-test-stub="global-window-buttons" />'
@@ -26,6 +32,7 @@ test('Test that MainLayout mounts with header stubs and router-view slot', () =>
   })
 
   expect(w.find('[data-test-stub="app-control-menus"]').exists()).toBe(true)
+  expect(w.find('[data-test-stub="global-language-selector"]').exists()).toBe(true)
   expect(w.find('[data-test-stub="global-window-buttons"]').exists()).toBe(true)
   expect(w.find('.appHeader').exists()).toBe(true)
   w.unmount()

@@ -8,6 +8,8 @@
       <AppControlMenus />
     </q-header>
 
+    <GlobalLanguageSelector v-if="!isFantasiaStorybookCanvas()" />
+
     <GlobalWindowButtons />
 
     <q-drawer
@@ -30,8 +32,35 @@
 </template>
 
 <script lang="ts" setup>
-import GlobalWindowButtons from 'components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
+import { onMounted } from 'vue'
+
+import { applyFaI18nLocaleFromLanguageCode } from 'src/scripts/applyFaI18nLocaleFromLanguageCode'
+import { isFantasiaStorybookCanvas } from 'src/scripts/isFantasiaStorybookCanvas'
+import { isFaUserSettingsLanguageCode } from 'src/scripts/isFaUserSettingsLanguageCode'
+import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
+
 import AppControlMenus from 'components/globals/AppControlMenus/AppControlMenus.vue'
+import GlobalLanguageSelector from 'components/globals/GlobalLanguageSelector/GlobalLanguageSelector.vue'
+import GlobalWindowButtons from 'components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
+
+onMounted(async () => {
+  if (isFantasiaStorybookCanvas()) {
+    return
+  }
+
+  if (process.env.MODE !== 'electron' || window.faContentBridgeAPIs?.faUserSettings === undefined) {
+    return
+  }
+
+  const faUserSettingsStore = S_FaUserSettings()
+
+  await faUserSettingsStore.refreshSettings()
+  const code = faUserSettingsStore.settings?.languageCode
+
+  if (code !== undefined && isFaUserSettingsLanguageCode(code)) {
+    applyFaI18nLocaleFromLanguageCode(code)
+  }
+})
 
 </script>
 

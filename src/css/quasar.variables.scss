@@ -19,6 +19,8 @@ $secondary: #f75746;
 $warning: #f2c037;
 $white: #fff;
 
+$lightBackground: #ede4d0;
+
 /* === 2. GLOBALS === */
 
 /* GLOBALS - CUSTOM COLORS */
@@ -212,7 +214,22 @@ $globalWindowButtons-close-hoverColor: $secondary;
 $globalWindowButtons-color: $accent;
 $globalWindowButtons-height: 35px;
 $globalWindowButtons-hoverColor: $primary-bright;
+$globalWindowButtons-totalWidth: 102px;
 $globalWindowButtons-zIndex: 99999999;
+
+/* COMPONENT - GLOBAL LANGUAGE SELECTOR */
+$globalLanguageSelector-borderColor: #c8c8c8;
+$globalLanguageSelector-diameter: 24px;
+$globalLanguageSelector-gap: 65px;
+$globalLanguageSelector-menu-backgroundColor: $lightBackground;
+$globalLanguageSelector-menu-flag-boxShadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
+$globalLanguageSelector-menu-itemHover-backgroundColor: $primary-bright;
+$globalLanguageSelector-menu-item-padding: 8px 24px;
+$globalLanguageSelector-menu-itemTextColor: #000;
+$globalLanguageSelector-menu-minWidth: 180px;
+$globalLanguageSelector-topPosition: 6px;
+$globalLanguageSelector-trigger-border: 2px solid $globalLanguageSelector-borderColor;
+$globalLanguageSelector-zIndex: 7001;
 
 /* COMPONENT - SOCIAL CONTACT BUTTONS */
 $socialContactButtons-backgroundColor-discord: #7289da;
