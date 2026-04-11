@@ -16,6 +16,8 @@ import QMarkdownPlugin from '@quasar/quasar-ui-qmarkdown'
 
 import type { Preview } from '@storybook/vue3-vite'
 import type { QuasarPluginOptions } from 'quasar'
+import { setFantasiaStorybookCanvasFlag } from 'src/scripts/isFantasiaStorybookCanvas'
+
 import { setContentBridgeScenario } from './mocks/contentBridge'
 import { getStorybookI18nMessages, setI18nScenario } from './mocks/externalFileLoader'
 import {
@@ -115,6 +117,13 @@ const storybookI18n = createI18n({
 
 setup((app) => {
   ensureStorybookScrollFix()
+
+  /**
+   * The preview iframe may not expose '#storybook-root' on the first frame, and static builds can
+   * omit a reliable 'process.env.MODE' value. Mark the canvas explicitly so helpers like
+   * 'isFantasiaStorybookCanvas()' match production Storybook while MainLayout still hides chrome.
+   */
+  setFantasiaStorybookCanvasFlag(true)
 
   app.use(storybookPinia)
   app.use(storybookI18n)

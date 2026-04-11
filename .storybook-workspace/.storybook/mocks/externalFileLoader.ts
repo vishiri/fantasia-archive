@@ -1,5 +1,6 @@
 import L_documents from 'app/i18n/en-US/components/globals/AppControlMenus/L_documents'
 import L_FantasiaMascotImage from 'app/i18n/en-US/components/elements/FantasiaMascotImage/L_FantasiaMascotImage'
+import L_GlobalLanguageSelector from 'app/i18n/en-US/components/globals/GlobalLanguageSelector/L_GlobalLanguageSelector'
 import L_GlobalWindowButtons from 'app/i18n/en-US/components/globals/GlobalWindowButtons/L_GlobalWindowButtons'
 import L_helpInfo from 'app/i18n/en-US/components/globals/AppControlMenus/L_helpInfo'
 import L_project from 'app/i18n/en-US/components/globals/AppControlMenus/L_project'
@@ -10,7 +11,16 @@ import L_programSettings from 'app/i18n/en-US/dialogs/L_programSettings'
 import L_faUserSettings from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
 import L_unsortedAppTexts from 'app/i18n/en-US/globalFunctionality/L_unsortedAppTexts'
 import L_ErrorNotFound from 'app/i18n/en-US/pages/L_ErrorNotFound'
+import { ref } from 'vue'
+
 import type { T_i18nScenario } from './externalFileLoader.types'
+
+/**
+ * Mirrors vue-i18n Composer 'locale' so components and helpers that read
+ * 'i18n.global.locale.value' (or assign via 'applyFaI18nLocaleFromLanguageCode') do not throw.
+ * Story templates still use the separate 'createI18n' instance from preview setup for '$t'.
+ */
+const storybookExternalLoaderLocale = ref<string>('en-US')
 
 const defaultMessages: Record<string, unknown> = {
   errorNotFound: L_ErrorNotFound,
@@ -18,6 +28,7 @@ const defaultMessages: Record<string, unknown> = {
     aboutFantasiaArchive: L_aboutFantasiaArchive,
     programSettings: L_programSettings
   },
+  globalLanguageSelector: L_GlobalLanguageSelector,
   globalWindowButtons: L_GlobalWindowButtons,
   appControlMenus: {
     project: L_project,
@@ -125,6 +136,7 @@ const storybookI18nMessages = new Proxy(defaultMessages, {
 
 export const i18n = {
   global: {
+    locale: storybookExternalLoaderLocale,
     t: (key: string): string => resolveTranslation(key),
     te: (key: string): boolean => {
       const fragments = key.split('.')

@@ -67,9 +67,6 @@ const scenarioMutations: Record<T_contentBridgeScenario, (bridge: ReturnType<typ
   windowMaximized: (bridge) => {
     bridge.faWindowControl.checkWindowMaximized = async () => true
   },
-  devToolsOpen: (bridge) => {
-    bridge.faDevToolsControl.checkDevToolsStatus = async () => true
-  },
   externalLinkFailure: (bridge) => {
     bridge.faExternalLinksManager.openExternal = () => {
       throw new Error('Storybook simulated external link failure')
