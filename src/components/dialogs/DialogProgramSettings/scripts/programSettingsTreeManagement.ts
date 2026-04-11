@@ -1,5 +1,7 @@
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 import { PROGRAM_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogProgramSettings/_data/programSettingsOptions'
+
+type T_programSettingsManagedKey = keyof typeof PROGRAM_SETTINGS_OPTIONS
 import type {
   I_programSettingRenderItem,
   I_programSubCategoryRenderItem,
@@ -15,7 +17,7 @@ import {
 
 function buildProgramSettingLeaf (
   settingKey: string,
-  normalizedSettingKey: keyof I_faUserSettings,
+  normalizedSettingKey: T_programSettingsManagedKey,
   settingsSnapshot: I_faUserSettings
 ): I_programSettingRenderItem {
   const noteTranslationPath = `dialogs.programSettings.appOptions.${settingKey}.note`
@@ -40,7 +42,11 @@ function appendOneSnapshotKeyToUnsortedTree (
   settingsSnapshot: I_faUserSettings,
   settingKey: string
 ): void {
-  const normalizedSettingKey = settingKey as keyof I_faUserSettings
+  if (!Object.hasOwn(PROGRAM_SETTINGS_OPTIONS, settingKey)) {
+    return
+  }
+
+  const normalizedSettingKey = settingKey as T_programSettingsManagedKey
   const settingOption = PROGRAM_SETTINGS_OPTIONS[normalizedSettingKey]
   const categoryKey = settingOption.category
   const subCategoryKey = settingOption.subcategory

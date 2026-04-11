@@ -193,3 +193,15 @@ test('Test that buildProgramSettingsRenderTree hits reuse branches when two sett
 test('Test that buildProgramSettingsRenderTree returns an empty object when the settings snapshot has no keys', () => {
   expect(buildProgramSettingsRenderTree({} as I_faUserSettings)).toEqual({})
 })
+
+/**
+ * buildProgramSettingsRenderTree
+ * Omits languageCode because it is not listed in PROGRAM_SETTINGS_OPTIONS.
+ */
+test('Test that buildProgramSettingsRenderTree ignores languageCode-only snapshots', () => {
+  expect(
+    buildProgramSettingsRenderTree({
+      languageCode: 'fr'
+    } as I_faUserSettings)
+  ).toEqual({})
+})

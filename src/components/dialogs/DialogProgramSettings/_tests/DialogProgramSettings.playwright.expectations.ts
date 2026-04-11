@@ -10,8 +10,6 @@ import {
 } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsTreeSorting'
 import programSettingsMessages from 'app/i18n/en-US/dialogs/L_programSettings'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
-import type { I_faUserSettings } from 'app/types/I_faUserSettings'
-
 type T_programSettingOptionBlock = {
   title: string
   description: string
@@ -27,7 +25,7 @@ const normalizeExpectedSettingDescription = (description: string): string => {
 }
 
 /**
- * Builds the ordered program settings tree from en-US L_programSettings and FA_USER_SETTINGS_DEFAULTS, matching buildProgramSettingsRenderTree (category rank, alphabetical keys, title sort within subcategories).
+ * Builds the ordered program settings tree from en-US L_programSettings and PROGRAM_SETTINGS_OPTIONS keys with default values from FA_USER_SETTINGS_DEFAULTS, matching buildProgramSettingsRenderTree (category rank, alphabetical keys, title sort within subcategories). Keys such as languageCode that are not in PROGRAM_SETTINGS_OPTIONS are omitted from the dialog.
  *
  * - Dialog strings come from dialogs.programSettings, not globalFunctionality.faUserSettings.
  */
@@ -35,9 +33,9 @@ export function buildExpectedProgramSettingsTreeFromEnUsMessages (): T_programSe
   const cats = programSettingsMessages.appOptionsCategories
   const appOpts = programSettingsMessages.appOptions as Record<string, T_programSettingOptionBlock>
   const unsortedTree: T_programSettingsRenderTree = {}
-  const settingKeys = Object.keys(FA_USER_SETTINGS_DEFAULTS).sort((keyA, keyB) =>
-    keyA.localeCompare(keyB)
-  ) as (keyof I_faUserSettings)[]
+  const settingKeys = (Object.keys(PROGRAM_SETTINGS_OPTIONS) as Array<keyof typeof PROGRAM_SETTINGS_OPTIONS>)
+    .slice()
+    .sort((keyA, keyB) => String(keyA).localeCompare(String(keyB)))
 
   for (const settingKey of settingKeys) {
     const meta = PROGRAM_SETTINGS_OPTIONS[settingKey]

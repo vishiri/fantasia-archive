@@ -34,6 +34,22 @@ test('updateLocalProgramSetting returns early when localSettings is null', () =>
 
 /**
  * updateLocalProgramSetting
+ * Skips keys that are not part of the program settings dialog (such as languageCode).
+ */
+test('updateLocalProgramSetting returns early when settingKey is languageCode', () => {
+  const localSettings = ref<I_faUserSettings | null>({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    languageCode: 'fr'
+  })
+  const programSettingsTree = ref<T_programSettingsRenderTree>({})
+
+  updateLocalProgramSetting(localSettings, programSettingsTree, 'languageCode', false)
+
+  expect(localSettings.value?.languageCode).toBe('fr')
+})
+
+/**
+ * updateLocalProgramSetting
  * Updates both the flat settings snapshot and the matching render-tree toggle for a known key.
  */
 test('updateLocalProgramSetting writes localSettings and programSettingsTree for showDocumentID', () => {

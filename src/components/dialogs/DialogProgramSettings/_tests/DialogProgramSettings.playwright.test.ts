@@ -11,8 +11,7 @@ import {
   getFaPlaywrightElectronRecordVideoPartial,
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
-import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
-import type { I_faUserSettings } from 'app/types/I_faUserSettings'
+import { PROGRAM_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogProgramSettings/_data/programSettingsOptions'
 import type { T_dialogName } from 'app/types/T_dialogList'
 
 import { buildExpectedProgramSettingsTreeFromEnUsMessages } from './DialogProgramSettings.playwright.expectations'
@@ -85,10 +84,10 @@ const programSettingsSearchSelector = {
 } as const
 
 /**
- * Keys persisted as I_faUserSettings; dialog rows must expose exactly this set on data-test-setting-id.
+ * Keys rendered in Program settings (PROGRAM_SETTINGS_OPTIONS); dialog rows must expose exactly this set on data-test-setting-id. Persisted I_faUserSettings may include additional keys such as languageCode that the dialog does not list.
  */
 const expectedFaUserSettingKeysSorted = (
-  Object.keys(FA_USER_SETTINGS_DEFAULTS) as (keyof I_faUserSettings)[]
+  Object.keys(PROGRAM_SETTINGS_OPTIONS) as (keyof typeof PROGRAM_SETTINGS_OPTIONS)[]
 ).slice().sort((keyA, keyB) => String(keyA).localeCompare(String(keyB)))
 
 const programSettingsDirectInput: T_dialogName = 'ProgramSettings'
@@ -161,7 +160,7 @@ test.describe.serial('Program settings dialog', () => {
    * - Visits every vertical tab, category, subcategory, and setting row.
    * - Asserts titles, optional notes, tags, and help copy duplicated on data-test-tooltip-text.
    * - Hovers the first help icon once and asserts the live overlay with selectorList.quasarTooltip (retries hover + dismiss with expect().toPass because Quasar portaled tooltips are timing-sensitive under Electron); other rows skip hover.
-   * - After each tab switch, unions data-test-setting-id from the active panel so the combined set matches I_faUserSettings keys exactly (Quasar mounts one panel at a time here).
+   * - After each tab switch, unions data-test-setting-id from the active panel so the combined set matches PROGRAM_SETTINGS_OPTIONS keys exactly (Quasar mounts one panel at a time here).
    * - globalFunctionality.faUserSettings only covers save toasts, not these labels.
    */
   test('Program settings dialog matches en-US category, subcategory, and setting copy on every tab', async () => {

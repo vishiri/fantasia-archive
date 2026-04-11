@@ -35,7 +35,11 @@ export function updateLocalProgramSetting (
     return
   }
 
-  const normalizedSettingKey = settingKey as keyof I_faUserSettings
+  if (!Object.hasOwn(PROGRAM_SETTINGS_OPTIONS, settingKey)) {
+    return
+  }
+
+  const normalizedSettingKey = settingKey as keyof typeof PROGRAM_SETTINGS_OPTIONS
   localSettings.value[normalizedSettingKey] = updatedValue
 
   const settingMetadata = PROGRAM_SETTINGS_OPTIONS[normalizedSettingKey]

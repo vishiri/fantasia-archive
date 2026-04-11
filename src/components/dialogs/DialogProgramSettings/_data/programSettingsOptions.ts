@@ -1,7 +1,10 @@
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 import type { I_programSettingOption } from './programSettingsOptions.types'
 
-export const PROGRAM_SETTINGS_OPTIONS: Record<keyof I_faUserSettings, I_programSettingOption> = {
+export const PROGRAM_SETTINGS_OPTIONS: Record<
+Exclude<keyof I_faUserSettings, 'languageCode'>,
+I_programSettingOption
+> = {
   aggressiveRelationshipFilter: {
     category: 'visualAccessibility',
     subcategory: 'visualsAppwideFunctionality'
