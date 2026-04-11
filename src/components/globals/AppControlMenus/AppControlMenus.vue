@@ -52,15 +52,17 @@
 
 <script setup lang="ts">
 
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
+import { i18n } from 'app/i18n/externalFileLoader'
 import type { I_appMenuList } from 'app/types/I_appMenusDataList'
 import { openDialogMarkdownDocument } from 'src/scripts/appInfo/openDialogMarkdownDocument'
+import { isFantasiaStorybookCanvas } from 'src/scripts/isFantasiaStorybookCanvas'
 
-import { project } from 'app/src/components/globals/AppControlMenus/_data/project'
-import { documents } from 'app/src/components/globals/AppControlMenus/_data/documents'
-import { tools } from 'app/src/components/globals/AppControlMenus/_data/tools'
-import { helpInfo } from 'app/src/components/globals/AppControlMenus/_data/helpInfo'
+import { buildDocumentsMenu } from 'app/src/components/globals/AppControlMenus/_data/documents'
+import { buildHelpInfoMenu } from 'app/src/components/globals/AppControlMenus/_data/helpInfo'
+import { buildProjectMenu } from 'app/src/components/globals/AppControlMenus/_data/project'
+import { buildToolsMenu } from 'app/src/components/globals/AppControlMenus/_data/tools'
 
 import AppControlSingleMenu from 'app/src/components/globals/AppControlSingleMenu/AppControlSingleMenu.vue'
 import DialogMarkdownDocument from 'app/src/components/dialogs/DialogMarkdownDocument/DialogMarkdownDocument.vue'
@@ -83,7 +85,7 @@ withDefaults(
     embedDialogs?: boolean
   }>(),
   {
-    embedDialogs: true
+    embedDialogs: !isFantasiaStorybookCanvas()
   }
 )
 
@@ -98,6 +100,26 @@ onMounted(async () => {
     const snap = await bridge.getSnapshot()
     testingType.value = snap.TEST_ENV ?? ''
   }
+})
+
+const project = computed((): I_appMenuList => {
+  void i18n.global.locale.value
+  return buildProjectMenu()
+})
+
+const documents = computed((): I_appMenuList => {
+  void i18n.global.locale.value
+  return buildDocumentsMenu()
+})
+
+const tools = computed((): I_appMenuList => {
+  void i18n.global.locale.value
+  return buildToolsMenu()
+})
+
+const helpInfo = computed((): I_appMenuList => {
+  void i18n.global.locale.value
+  return buildHelpInfoMenu()
 })
 
 /**

@@ -158,17 +158,19 @@ const componentData = computed(() => props.dataInput)
  * - Title
  * - Overall data feed
  */
-const hasProperDataInput = !!(componentData.value.title && componentData.value.data)
+const hasProperDataInput = computed(() => {
+  return !!(componentData.value.title && componentData.value.data)
+})
 
 /**
- * Menu title from the prop
+ * Menu title from the prop (recomputed when dataInput changes, e.g. i18n locale).
  */
-const menuTitle = componentData.value.title
+const menuTitle = computed(() => componentData.value.title)
 
 /**
- * Menu data content from the prop
+ * Menu data content from the prop (recomputed when dataInput changes).
  */
-const menuData = componentData.value.data
+const menuData = computed(() => componentData.value.data)
 
 </script>
 

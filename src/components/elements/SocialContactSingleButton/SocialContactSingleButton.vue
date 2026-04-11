@@ -33,6 +33,8 @@ import { computed } from 'vue'
 
 import type { I_socialContactButton } from 'app/types/I_socialContactButtons'
 
+import { resolveVitePublicAssetPath } from 'src/scripts/resolveVitePublicAssetPath'
+
 /**
  * All component props
  */
@@ -52,15 +54,9 @@ const buttonData = computed(() => props.dataInput)
  * Public-folder assets (Vite public/ and Storybook staticDirs) must be rooted with BASE_URL so paths resolve in the Storybook iframe and when the app base path is customized.
  */
 const iconSrc = computed(() => {
-  const rawBase = import.meta.env.BASE_URL
-  // Quasar Electron maps an empty Vite base to '/' on import.meta.env.BASE_URL; root-relative /images/... fails under file:// in packaged builds, so normalize to a relative base.
-  const base =
-    rawBase === '' || rawBase === undefined || rawBase === '/'
-      ? './'
-      : rawBase
-  const baseWithSlash = base.endsWith('/') ? base : `${base}/`
-
-  return `${baseWithSlash}images/socialContactButtons/${props.dataInput.icon}`
+  return resolveVitePublicAssetPath(
+    `images/socialContactButtons/${props.dataInput.icon}`
+  )
 })
 
 </script>

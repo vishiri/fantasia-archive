@@ -40,3 +40,30 @@ test('Test that AppControlSingleMenu renders menu title and first item text from
   expect(menuTexts[0]?.textContent?.trim()).toBe('Item one')
   w.unmount()
 })
+
+/**
+ * Parent menus pass fresh I_appMenuList instances when locale changes; the trigger label must update.
+ */
+test('Test that AppControlSingleMenu menu title updates when dataInput title changes', async () => {
+  const w = mount(AppControlSingleMenu, {
+    props: {
+      dataInput: {
+        data: minimalMenu.data,
+        title: 'First title'
+      }
+    },
+    global: { mocks: { $t: (k: string) => k } }
+  })
+
+  expect(w.get('[data-test-locator="AppControlSingleMenu-title"]').text()).toBe('First title')
+
+  await w.setProps({
+    dataInput: {
+      data: minimalMenu.data,
+      title: 'Second title'
+    }
+  })
+
+  expect(w.get('[data-test-locator="AppControlSingleMenu-title"]').text()).toBe('Second title')
+  w.unmount()
+})

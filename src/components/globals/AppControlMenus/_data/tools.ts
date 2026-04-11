@@ -1,75 +1,36 @@
 import { i18n } from 'app/i18n/externalFileLoader'
 import { openDialogComponent } from 'app/src/scripts/appInfo/openDialogMarkdownDocument'
 
-import type { I_appMenuList } from 'app/types/I_appMenusDataList'
+import type { I_appMenuItem, I_appMenuList } from 'app/types/I_appMenusDataList'
+
+import {
+  faMenuItem,
+  faMenuSeparator
+} from 'app/src/components/globals/AppControlMenus/_data/menuDataHelpers'
 
 // TODO - add functionality for all buttons and conditions
 
-export const tools: I_appMenuList = {
-  title: i18n.global.t('appControlMenus.tools.title'),
-  data: [
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.tools.items.quickAddNewDocument'),
-      icon: 'mdi-text-box-plus-outline',
-      submenu: undefined,
-      trigger: undefined,
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.tools.items.quickSearchDocument'),
-      icon: 'mdi-database-search',
-      submenu: undefined,
-      trigger: undefined,
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'separator'
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.tools.items.massDeleteDocument'),
-      icon: 'mdi-text-box-remove-outline',
-      submenu: undefined,
-      trigger: undefined,
-      conditions: true,
+function buildToolsMenuData (): I_appMenuItem[] {
+  return [
+    faMenuItem('appControlMenus.tools.items.quickAddNewDocument', 'mdi-text-box-plus-outline'),
+    faMenuItem('appControlMenus.tools.items.quickSearchDocument', 'mdi-database-search'),
+    faMenuSeparator(),
+    faMenuItem('appControlMenus.tools.items.massDeleteDocument', 'mdi-text-box-remove-outline', {
       specialColor: 'secondary'
-    },
-    {
-      mode: 'separator'
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.tools.items.toggleTree'),
-      icon: 'mdi-page-layout-sidebar-left',
-      submenu: undefined,
-      trigger: undefined,
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.tools.items.showNoteBoard'),
-      icon: 'mdi-clipboard-text-outline',
-      submenu: undefined,
-      trigger: undefined,
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'separator'
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.tools.items.programSettings'),
-      icon: 'mdi-tune',
-      submenu: undefined,
-      trigger: () => openDialogComponent('ProgramSettings'),
-      conditions: true,
-      specialColor: undefined
-    }
+    }),
+    faMenuSeparator(),
+    faMenuItem('appControlMenus.tools.items.toggleTree', 'mdi-page-layout-sidebar-left'),
+    faMenuItem('appControlMenus.tools.items.showNoteBoard', 'mdi-clipboard-text-outline'),
+    faMenuSeparator(),
+    faMenuItem('appControlMenus.tools.items.programSettings', 'mdi-tune', {
+      trigger: () => openDialogComponent('ProgramSettings')
+    })
   ]
+}
+
+export function buildToolsMenu (): I_appMenuList {
+  return {
+    data: buildToolsMenuData(),
+    title: i18n.global.t('appControlMenus.tools.title')
+  }
 }

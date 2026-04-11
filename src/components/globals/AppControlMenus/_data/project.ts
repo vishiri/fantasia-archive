@@ -1,115 +1,43 @@
 import { i18n } from 'app/i18n/externalFileLoader'
 
-import type { I_appMenuList } from 'app/types/I_appMenusDataList'
+import type { I_appMenuItem, I_appMenuList } from 'app/types/I_appMenusDataList'
+
+import {
+  faMenuItem,
+  faMenuSeparator,
+  faMenuSubItem,
+  faMenuSubSeparator
+} from 'app/src/components/globals/AppControlMenus/_data/menuDataHelpers'
 
 // TODO - add functionality for all buttons and conditions
 
-export const project: I_appMenuList = {
-  title: i18n.global.t('appControlMenus.project.title'),
-  data: [
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.project.items.newProject'),
-      icon: 'mdi-plus',
-      submenu: undefined,
-      trigger: undefined,
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'separator'
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.project.items.saveProject'),
-      icon: 'mdi-package-variant-closed',
-      submenu: undefined,
-      trigger: undefined,
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.project.items.loadProject'),
-      icon: 'mdi-package-variant',
-      submenu: undefined,
-      trigger: undefined,
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'separator'
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.project.items.exportProjectDocuments'),
-      icon: 'mdi-database-export-outline',
-      submenu: undefined,
-      trigger: undefined,
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'separator'
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.project.items.showProjectDashboard'),
-      icon: 'mdi-chart-bar',
-      submenu: undefined,
-      trigger: undefined,
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.project.items.projectSettings'),
-      icon: 'mdi-book-cog-outline',
-      submenu: undefined,
-      trigger: undefined,
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.project.items.closeProject'),
-      icon: 'mdi-exit-to-app',
-      submenu: undefined,
-      trigger: undefined,
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'separator'
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.project.items.advancedProjectTools'),
-      icon: 'keyboard_arrow_right',
-      trigger: undefined,
-      conditions: true,
+function buildProjectMenuData (): I_appMenuItem[] {
+  return [
+    faMenuItem('appControlMenus.project.items.newProject', 'mdi-plus'),
+    faMenuSeparator(),
+    faMenuItem('appControlMenus.project.items.saveProject', 'mdi-package-variant-closed'),
+    faMenuItem('appControlMenus.project.items.loadProject', 'mdi-package-variant'),
+    faMenuSeparator(),
+    faMenuItem('appControlMenus.project.items.exportProjectDocuments', 'mdi-database-export-outline'),
+    faMenuSeparator(),
+    faMenuItem('appControlMenus.project.items.showProjectDashboard', 'mdi-chart-bar'),
+    faMenuItem('appControlMenus.project.items.projectSettings', 'mdi-book-cog-outline'),
+    faMenuItem('appControlMenus.project.items.closeProject', 'mdi-exit-to-app'),
+    faMenuSeparator(),
+    faMenuItem('appControlMenus.project.items.advancedProjectTools', 'keyboard_arrow_right', {
       specialColor: 'grey',
       submenu: [
-        {
-          mode: 'item',
-          text: i18n.global.t('appControlMenus.project.items.aptMerge'),
-          icon: 'mdi-folder-plus-outline',
-          trigger: undefined,
-          conditions: true,
-          specialColor: undefined
-        },
-        {
-          mode: 'separator'
-        },
-        {
-          mode: 'item',
-          text: i18n.global.t('appControlMenus.project.items.aptConvertOld'),
-          icon: 'mdi-wrench',
-          trigger: undefined,
-          conditions: true,
-          specialColor: undefined
-        }
+        faMenuSubItem('appControlMenus.project.items.aptMerge', 'mdi-folder-plus-outline'),
+        faMenuSubSeparator(),
+        faMenuSubItem('appControlMenus.project.items.aptConvertOld', 'mdi-wrench')
       ]
-    }
+    })
   ]
+}
+
+export function buildProjectMenu (): I_appMenuList {
+  return {
+    data: buildProjectMenuData(),
+    title: i18n.global.t('appControlMenus.project.title')
+  }
 }

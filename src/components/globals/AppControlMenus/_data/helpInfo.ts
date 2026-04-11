@@ -1,81 +1,47 @@
 import { i18n } from 'app/i18n/externalFileLoader'
 
-import type { I_appMenuList } from 'app/types/I_appMenusDataList'
+import type { I_appMenuItem, I_appMenuList } from 'app/types/I_appMenusDataList'
+
+import {
+  faMenuItem,
+  faMenuSeparator
+} from 'app/src/components/globals/AppControlMenus/_data/menuDataHelpers'
+import { openDialogComponent, openDialogMarkdownDocument } from 'app/src/scripts/appInfo/openDialogMarkdownDocument'
+import { toggleDevTools } from 'app/src/scripts/appInfo/toggleDevTools'
 
 // TODO - add functionality for all buttons and conditions
-import { toggleDevTools } from 'app/src/scripts/appInfo/toggleDevTools'
-import { openDialogComponent, openDialogMarkdownDocument } from 'app/src/scripts/appInfo/openDialogMarkdownDocument'
 
-export const helpInfo: I_appMenuList = {
-  title: i18n.global.t('appControlMenus.helpInfo.title'),
-  data: [
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.helpInfo.items.showKeybindsCheatsheet'),
-      icon: 'mdi-keyboard-settings',
-      submenu: undefined,
-      trigger: () => openDialogComponent(''),
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.helpInfo.items.advancedSearchGuide'),
-      icon: 'mdi-file-question',
-      submenu: undefined,
-      trigger: () => openDialogMarkdownDocument('advancedSearchGuide'),
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.helpInfo.items.tipsTricksTrivia'),
-      icon: 'mdi-fire-alert',
-      trigger: () => openDialogMarkdownDocument('tipsTricksTrivia'),
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'separator'
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.helpInfo.items.changelog'),
-      icon: 'mdi-clipboard-text',
-      submenu: undefined,
-      trigger: () => openDialogMarkdownDocument('changeLog'),
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.helpInfo.items.aboutFantasiaArchive'),
-      icon: 'mdi-information-variant',
-      submenu: undefined,
-      trigger: () => openDialogComponent('AboutFantasiaArchive'),
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.helpInfo.items.license'),
-      icon: 'mdi-script-text-outline',
-      submenu: undefined,
-      trigger: () => openDialogMarkdownDocument('license'),
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'separator'
-    },
-    {
-      mode: 'item',
-      text: i18n.global.t('appControlMenus.helpInfo.items.toggleDeveloperTools'),
-      icon: 'mdi-code-tags',
-      submenu: undefined,
-      trigger: toggleDevTools,
-      conditions: true,
-      specialColor: undefined
-    }
+function buildHelpInfoMenuData (): I_appMenuItem[] {
+  return [
+    faMenuItem('appControlMenus.helpInfo.items.showKeybindsCheatsheet', 'mdi-keyboard-settings', {
+      trigger: () => openDialogComponent('')
+    }),
+    faMenuItem('appControlMenus.helpInfo.items.advancedSearchGuide', 'mdi-file-question', {
+      trigger: () => openDialogMarkdownDocument('advancedSearchGuide')
+    }),
+    faMenuItem('appControlMenus.helpInfo.items.tipsTricksTrivia', 'mdi-fire-alert', {
+      trigger: () => openDialogMarkdownDocument('tipsTricksTrivia')
+    }),
+    faMenuSeparator(),
+    faMenuItem('appControlMenus.helpInfo.items.changelog', 'mdi-clipboard-text', {
+      trigger: () => openDialogMarkdownDocument('changeLog')
+    }),
+    faMenuItem('appControlMenus.helpInfo.items.aboutFantasiaArchive', 'mdi-information-variant', {
+      trigger: () => openDialogComponent('AboutFantasiaArchive')
+    }),
+    faMenuItem('appControlMenus.helpInfo.items.license', 'mdi-script-text-outline', {
+      trigger: () => openDialogMarkdownDocument('license')
+    }),
+    faMenuSeparator(),
+    faMenuItem('appControlMenus.helpInfo.items.toggleDeveloperTools', 'mdi-code-tags', {
+      trigger: toggleDevTools
+    })
   ]
+}
+
+export function buildHelpInfoMenu (): I_appMenuList {
+  return {
+    data: buildHelpInfoMenuData(),
+    title: i18n.global.t('appControlMenus.helpInfo.title')
+  }
 }
