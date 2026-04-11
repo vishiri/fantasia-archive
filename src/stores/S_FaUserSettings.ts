@@ -6,6 +6,7 @@ import { Notify } from 'quasar'
 
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 import { i18n } from 'app/i18n/externalFileLoader'
+import { applyFaI18nLocaleFromLanguageCode } from 'src/scripts/applyFaI18nLocaleFromLanguageCode'
 
 /**
  * Manages user settings state sourced from the Electron main process via the IPC bridge.
@@ -39,6 +40,9 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
     const saveSucceeded = updateKeys.every((key) => retrievedSettings[key] === updateObject[key])
 
     if (saveSucceeded) {
+      if (updateObject.languageCode !== undefined) {
+        applyFaI18nLocaleFromLanguageCode(updateObject.languageCode)
+      }
       Notify.create({
         group: false,
         type: 'positive',

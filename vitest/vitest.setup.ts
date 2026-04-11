@@ -1,10 +1,14 @@
 import { config } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
+import { ref } from 'vue'
 import { afterEach, beforeEach, vi } from 'vitest'
 
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
+import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/isFantasiaStorybookCanvas'
 
 const originalConsoleWarn = console.warn.bind(console)
+
+const i18nLocaleRef = ref('en-US')
 
 config.global.config = {
   compilerOptions: {
@@ -24,11 +28,12 @@ vi.mock('app/i18n/externalFileLoader', () => {
   return {
     i18n: {
       global: {
+        locale: i18nLocaleRef,
+        mergeLocaleMessage: vi.fn(),
         t: (key: string) => {
           return key
         },
-        te: () => false,
-        mergeLocaleMessage: vi.fn()
+        te: () => false
       }
     }
   }
@@ -36,23 +41,24 @@ vi.mock('app/i18n/externalFileLoader', () => {
 
 vi.mock('@quasar/quasar-ui-qmarkdown/dist/index.css', () => ({}))
 
+function forwardVueTestUtilsWarnUnlessFiltered (...args: unknown[]): void {
+  const [firstArg] = args
+  const message = typeof firstArg === 'string' ? firstArg : ''
+  if (
+    !message.includes('[Vue warn]: Failed to resolve component: q-') &&
+    !message.includes('[Vue warn]: Failed to resolve directive: close-popup') &&
+    !message.includes('[Vue warn]: injection "_q_" not found.')
+  ) {
+    originalConsoleWarn(...args)
+  }
+}
+
 /**
  * Minimal 'window.faContentBridgeAPIs' for Vitest runs that mount '.vue' components.
  */
-beforeEach(() => {
-  vi.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
-    const [firstArg] = args
-    const message = typeof firstArg === 'string' ? firstArg : ''
-    if (
-      !message.includes('[Vue warn]: Failed to resolve component: q-') &&
-      !message.includes('[Vue warn]: Failed to resolve directive: close-popup') &&
-      !message.includes('[Vue warn]: injection "_q_" not found.')
-    ) {
-      originalConsoleWarn(...args)
-    }
-  })
-
+function resetFaVitestRendererHarness (): void {
   setActivePinia(createPinia())
+  i18nLocaleRef.value = 'en-US'
 
   window.faContentBridgeAPIs = {
     faWindowControl: {
@@ -90,6 +96,12 @@ beforeEach(() => {
       setSettings: vi.fn(async () => {})
     }
   }
+}
+
+beforeEach(() => {
+  vi.spyOn(console, 'warn').mockImplementation(forwardVueTestUtilsWarnUnlessFiltered)
+  setFantasiaStorybookCanvasFlag(false)
+  resetFaVitestRendererHarness()
 })
 
 afterEach(() => {

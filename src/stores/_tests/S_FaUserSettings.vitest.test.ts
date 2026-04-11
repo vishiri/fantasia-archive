@@ -4,8 +4,15 @@ import { createPinia, setActivePinia } from 'pinia'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import type * as S_FaUserSettingsStore from '../S_FaUserSettings'
 
-const { notifyCreateMock, tMock, getSettingsMock, setSettingsMock } = vi.hoisted(() => {
+const {
+  applyLocaleMock,
+  notifyCreateMock,
+  tMock,
+  getSettingsMock,
+  setSettingsMock
+} = vi.hoisted(() => {
   return {
+    applyLocaleMock: vi.fn(),
     notifyCreateMock: vi.fn(),
     tMock: vi.fn((key: string) => key),
     getSettingsMock: vi.fn(async () => ({ ...FA_USER_SETTINGS_DEFAULTS })),
@@ -16,6 +23,12 @@ const { notifyCreateMock, tMock, getSettingsMock, setSettingsMock } = vi.hoisted
 vi.mock('quasar', () => {
   return {
     Notify: { create: notifyCreateMock }
+  }
+})
+
+vi.mock('src/scripts/applyFaI18nLocaleFromLanguageCode', () => {
+  return {
+    applyFaI18nLocaleFromLanguageCode: applyLocaleMock
   }
 })
 
@@ -30,6 +43,7 @@ let store: ReturnType<typeof S_FaUserSettingsStore.S_FaUserSettings>
 beforeEach(async () => {
   setActivePinia(createPinia())
   vi.resetModules()
+  applyLocaleMock.mockReset()
   notifyCreateMock.mockReset()
   tMock.mockReset()
   tMock.mockImplementation((key: string) => key)
@@ -115,6 +129,49 @@ test('Test that updateSettings shows positive notify when saved values match the
     type: 'positive',
     message: 'globalFunctionality.faUserSettings.saveSuccess'
   })
+})
+
+/**
+ * S_FaUserSettings / updateSettings
+ * When languageCode saves successfully, i18n switches before the positive notify so the toast string resolves in the new locale.
+ */
+test('Test that updateSettings applies i18n locale before positive notify when languageCode saves successfully', async () => {
+  const callOrder: string[] = []
+  applyLocaleMock.mockImplementation(() => {
+    callOrder.push('locale')
+  })
+  notifyCreateMock.mockImplementation(() => {
+    callOrder.push('notify')
+  })
+
+  const updateObject = { languageCode: 'fr' as const }
+  getSettingsMock.mockResolvedValueOnce({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    languageCode: 'fr'
+  })
+
+  await store.updateSettings(updateObject)
+
+  expect(applyLocaleMock).toHaveBeenCalledWith('fr')
+  expect(callOrder).toEqual(['locale', 'notify'])
+})
+
+/**
+ * S_FaUserSettings / updateSettings
+ * When languageCode is patched but the bridge returns a different code, skip locale switch and show save error.
+ */
+test('Test that updateSettings does not apply i18n locale when languageCode patch mismatches', async () => {
+  const updateObject = { languageCode: 'fr' as const }
+  getSettingsMock.mockResolvedValueOnce({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    languageCode: 'de'
+  })
+
+  const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  await store.updateSettings(updateObject)
+  consoleErrorSpy.mockRestore()
+
+  expect(applyLocaleMock).not.toHaveBeenCalled()
 })
 
 /**
