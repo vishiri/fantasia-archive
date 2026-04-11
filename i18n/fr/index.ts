@@ -14,6 +14,7 @@ import L_documents from './components/globals/AppControlMenus/L_documents'
 import L_aboutFantasiaArchive from './dialogs/L_aboutFantasiaArchive'
 import L_markdownDocument from './dialogs/L_markdownDocument'
 import L_programSettings from './dialogs/L_programSettings'
+import L_faUserSettings from './globalFunctionality/L_faUserSettings'
 import L_spellChecker from './globalFunctionality/L_spellChecker'
 
 import L_socialContactButtons from './components/other/SocialContactButtons/L_socialContactButtons'
@@ -69,6 +70,13 @@ export default {
   },
 
   // COMPONENT - APP CONTROL MENUS
+  appControlMenus: {
+    project: L_project,
+    tools: L_tools,
+    documents: L_documents,
+    helpInfo: L_helpInfo
+  },
+
   AppControlMenus: {
     project: L_project,
     tools: L_tools,
@@ -78,9 +86,11 @@ export default {
 
   // COMPONENT - SOCIAL CONTACT BUTTONS
   SocialContactButtons: L_socialContactButtons,
+  socialContactButtons: L_socialContactButtons,
 
   // GLOBAL FUNCTIONALITY (lowercase key path parity)
   globalFunctionality: {
+    faUserSettings: L_faUserSettings,
     spellChecker: L_spellChecker
   }
 

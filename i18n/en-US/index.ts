@@ -11,6 +11,7 @@ import L_project from './components/globals/AppControlMenus/L_project'
 import L_tools from './components/globals/AppControlMenus/L_tools'
 import L_documents from './components/globals/AppControlMenus/L_documents'
 
+import L_GlobalLanguageSelector from './components/globals/GlobalLanguageSelector/L_GlobalLanguageSelector'
 import L_GlobalWindowButtons from './components/globals/GlobalWindowButtons/L_GlobalWindowButtons'
 import L_FantasiaMascotImage from './components/elements/FantasiaMascotImage/L_FantasiaMascotImage'
 import L_socialContactButtons from './components/other/SocialContactButtons/L_socialContactButtons'
@@ -44,6 +45,9 @@ export default {
     markdownDocument: L_markdownDocument,
     programSettings: L_programSettings
   },
+
+  // COMPONENT - GLOBAL LANGUAGE SELECTOR
+  globalLanguageSelector: L_GlobalLanguageSelector,
 
   // COMPONENT - GLOBAL WINDOW BUTTONS
   globalWindowButtons: L_GlobalWindowButtons,
