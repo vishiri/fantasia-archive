@@ -32,6 +32,7 @@ export const FA_USER_SETTINGS_DEFAULTS: I_faUserSettings = {
   hideWelcomeScreenSocials: false,
   invertCategoryPosition: false,
   invertTreeSorting: false,
+  languageCode: 'en-US',
   limitEditorHeight: false,
   noProjectName: false,
   noTags: false,

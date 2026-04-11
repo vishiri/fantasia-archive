@@ -10,7 +10,7 @@ const constructCalls: T_storeConstructorOptions[] = []
 const { ElectronStoreMock, persistedStoreExtras, storeReplacementCalls } = vi.hoisted(() => {
   return {
     ElectronStoreMock: vi.fn(),
-    persistedStoreExtras: {} as Record<string, boolean>,
+    persistedStoreExtras: {} as Record<string, unknown>,
     storeReplacementCalls: [] as I_faUserSettings[]
   }
 })
@@ -86,7 +86,7 @@ test('Test that getFaUserSettings removes unknown persisted keys during startup 
       darkMode: true
     }
   ])
-  expect((store.store as I_faUserSettings & Record<string, boolean>).futureKey).toBeUndefined()
+  expect((store.store as I_faUserSettings & Record<string, unknown>).futureKey).toBeUndefined()
 })
 
 /**
@@ -132,7 +132,7 @@ test('Test that cleanupFaUserSettings backfills omitted default keys from a part
   const { cleanupFaUserSettings } = await import('../userSettingsStore')
   const partial = {
     darkMode: true
-  } as Partial<I_faUserSettings> & Record<string, boolean | undefined>
+  } as Partial<I_faUserSettings> & Record<string, unknown>
   const fakeStore = {
     get store () {
       return partial as I_faUserSettings

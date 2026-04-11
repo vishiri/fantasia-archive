@@ -50,7 +50,7 @@ test('Test that user settings get handler returns all keys from the backing stor
     ...FA_USER_SETTINGS_DEFAULTS,
     darkMode: true,
     futureKey: true
-  } as I_faUserSettings & Record<string, boolean>
+  } as I_faUserSettings & Record<string, unknown>
   getFaUserSettingsMock.mockReturnValue({
     store,
     set: storeSetMock

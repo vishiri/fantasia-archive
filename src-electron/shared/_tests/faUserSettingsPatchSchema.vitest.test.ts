@@ -23,6 +23,36 @@ test('Test that parseFaUserSettingsPatch accepts a single-key boolean patch', ()
 
 /**
  * parseFaUserSettingsPatch
+ * Accepts a languageCode patch with a supported locale.
+ */
+test('Test that parseFaUserSettingsPatch accepts languageCode enum values', () => {
+  expect(parseFaUserSettingsPatch({ languageCode: 'fr' })).toEqual({ languageCode: 'fr' })
+  expect(parseFaUserSettingsPatch({ languageCode: 'de' })).toEqual({ languageCode: 'de' })
+  expect(parseFaUserSettingsPatch({ languageCode: 'en-US' })).toEqual({ languageCode: 'en-US' })
+})
+
+/**
+ * parseFaUserSettingsPatch
+ * Rejects invalid languageCode strings.
+ */
+test('Test that parseFaUserSettingsPatch throws ZodError for invalid languageCode', () => {
+  expect(() => {
+    parseFaUserSettingsPatch({ languageCode: 'es' })
+  }).toThrow(ZodError)
+})
+
+/**
+ * parseFaUserSettingsPatch
+ * Rejects non-string languageCode.
+ */
+test('Test that parseFaUserSettingsPatch throws ZodError when languageCode is not a string', () => {
+  expect(() => {
+    parseFaUserSettingsPatch({ languageCode: true })
+  }).toThrow(ZodError)
+})
+
+/**
+ * parseFaUserSettingsPatch
  * Accepts a full snapshot-shaped object with all known keys.
  */
 test('Test that parseFaUserSettingsPatch accepts full settings object', () => {

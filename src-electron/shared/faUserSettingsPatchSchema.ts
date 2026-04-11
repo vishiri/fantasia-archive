@@ -3,18 +3,25 @@ import { z } from 'zod'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 
+const faUserSettingsLanguageCodeSchema = z.enum(['en-US', 'fr', 'de'])
+
 /**
- * Strict partial: only keys from 'FA_USER_SETTINGS_DEFAULTS', each value must be boolean when present.
+ * Strict partial: only keys from 'FA_USER_SETTINGS_DEFAULTS'.
+ * Boolean fields accept optional booleans; 'languageCode' accepts optional 'en-US' | 'fr' | 'de'.
  * Unknown keys are rejected. Built from defaults so IPC allowed keys stay aligned with 'cleanupFaUserSettings'.
  */
 const faUserSettingsPatchShape = Object.fromEntries(
   (Object.keys(FA_USER_SETTINGS_DEFAULTS) as Array<keyof I_faUserSettings>).map((key) => {
+    const fieldSchema = key === 'languageCode'
+      ? faUserSettingsLanguageCodeSchema.optional()
+      : z.boolean().optional()
+
     return [
       key,
-      z.boolean().optional()
+      fieldSchema
     ]
   })
-) as { [K in keyof I_faUserSettings]: z.ZodOptional<z.ZodBoolean> }
+) as unknown as z.ZodRawShape
 
 export const faUserSettingsPatchSchema = z.object(faUserSettingsPatchShape).strict()
 

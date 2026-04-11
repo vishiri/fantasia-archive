@@ -13,13 +13,13 @@ let faUserSettings: ElectronStore<I_faUserSettings> | null = null
  * Removes persisted keys that no longer exist in 'FA_USER_SETTINGS_DEFAULTS' and rewrites the settings file once per launch when stale/unknown keys are found.
  */
 export const cleanupFaUserSettings = (store: ElectronStore<I_faUserSettings>): void => {
-  const currentSettings = (store.store ?? {}) as Partial<I_faUserSettings> & Record<string, boolean | undefined>
-  const sanitizedSettings: I_faUserSettings = { ...FA_USER_SETTINGS_DEFAULTS }
-
-  // Rebuild the saved settings from the known defaults shape only
-  for (const key of Object.keys(FA_USER_SETTINGS_DEFAULTS) as Array<keyof I_faUserSettings>) {
-    sanitizedSettings[key] = currentSettings[key] ?? FA_USER_SETTINGS_DEFAULTS[key]
-  }
+  const currentSettings = (store.store ?? {}) as Partial<I_faUserSettings>
+  const knownKeys = Object.keys(FA_USER_SETTINGS_DEFAULTS) as Array<keyof I_faUserSettings>
+  const sanitizedSettings = Object.fromEntries(
+    knownKeys.map((key) => {
+      return [key, currentSettings[key] ?? FA_USER_SETTINGS_DEFAULTS[key]]
+    })
+  ) as unknown as I_faUserSettings
 
   // Check if there are any unexpected keys
   const hasUnexpectedKeys = Object.keys(currentSettings)

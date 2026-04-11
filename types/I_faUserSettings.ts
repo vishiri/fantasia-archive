@@ -1,3 +1,5 @@
+import type { T_faUserSettingsLanguageCode } from './T_faUserSettingsLanguageCode'
+
 export interface I_faUserSettings {
   aggressiveRelationshipFilter: boolean
   allowQuickPopupSameKeyClose: boolean
@@ -30,6 +32,7 @@ export interface I_faUserSettings {
   hideWelcomeScreenSocials: boolean
   invertCategoryPosition: boolean
   invertTreeSorting: boolean
+  languageCode: T_faUserSettingsLanguageCode
   limitEditorHeight: boolean
   noProjectName: boolean
   noTags: boolean
