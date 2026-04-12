@@ -1,6 +1,8 @@
 import { ipcMain } from 'electron'
 
 import { FA_USER_SETTINGS_IPC } from 'app/src-electron/electron-ipc-bridge'
+import { applyFaSpellCheckerLanguagesToSession } from 'app/src-electron/mainScripts/windowManagement/faSpellCheckerSession'
+import { appWindow } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
 import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
 import { parseFaUserSettingsPatch } from 'app/src-electron/shared/faUserSettingsPatchSchema'
 import type { I_faUserSettings } from 'app/types/I_faUserSettings'
@@ -33,5 +35,11 @@ export function registerFaUserSettingsIpc (): void {
       ...userSettingsSnapshot(),
       ...parsedPatch
     })
+    if (parsedPatch.languageCode !== undefined && appWindow !== undefined) {
+      applyFaSpellCheckerLanguagesToSession(
+        appWindow.webContents.session,
+        parsedPatch.languageCode
+      )
+    }
   })
 }

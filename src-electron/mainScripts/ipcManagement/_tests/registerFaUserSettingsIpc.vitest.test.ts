@@ -6,11 +6,32 @@ import type { I_faUserSettings } from 'app/types/I_faUserSettings'
 
 import { FA_USER_SETTINGS_DEFAULTS } from '../../userSettings/faUserSettingsDefaults'
 
-const { ipcMainHandleMock, getFaUserSettingsMock, storeSetMock } = vi.hoisted(() => {
+const {
+  applyFaSpellCheckerLanguagesToSessionMock,
+  ipcMainHandleMock,
+  getFaUserSettingsMock,
+  ipcSpellSessionStub,
+  storeSetMock
+} = vi.hoisted(() => {
+  const spellSessionStub = {}
   return {
+    applyFaSpellCheckerLanguagesToSessionMock: vi.fn(),
     ipcMainHandleMock: vi.fn(),
     getFaUserSettingsMock: vi.fn(),
+    ipcSpellSessionStub: spellSessionStub,
     storeSetMock: vi.fn()
+  }
+})
+
+const mainWindowExportState = vi.hoisted(() => {
+  return {
+    appWindow: undefined as
+    | {
+      webContents: {
+        session: object
+      }
+    }
+    | undefined
   }
 })
 
@@ -28,11 +49,27 @@ vi.mock('app/src-electron/mainScripts/userSettings/userSettingsStore', () => {
   }
 })
 
+vi.mock('app/src-electron/mainScripts/windowManagement/mainWindowCreation', () => {
+  return {
+    get appWindow () {
+      return mainWindowExportState.appWindow
+    }
+  }
+})
+
+vi.mock('app/src-electron/mainScripts/windowManagement/faSpellCheckerSession', () => {
+  return {
+    applyFaSpellCheckerLanguagesToSession: applyFaSpellCheckerLanguagesToSessionMock
+  }
+})
+
 beforeEach(async () => {
   vi.resetModules()
   ipcMainHandleMock.mockReset()
   storeSetMock.mockReset()
   getFaUserSettingsMock.mockReset()
+  applyFaSpellCheckerLanguagesToSessionMock.mockReset()
+  mainWindowExportState.appWindow = undefined
 })
 
 function handlerFor (channel: string): (...args: unknown[]) => unknown {
@@ -148,4 +185,129 @@ test('Test that registerFaUserSettingsIpc only wires handlers once', async () =>
 
   registerFaUserSettingsIpc()
   expect(ipcMainHandleMock).toHaveBeenCalledTimes(2)
+})
+
+/**
+ * registerFaUserSettingsIpc
+ * Set handler refreshes spellchecker session languages when languageCode is patched and the main window exists.
+ */
+test('Test that user settings set handler syncs spellchecker when languageCode changes', async () => {
+  mainWindowExportState.appWindow = {
+    webContents: {
+      session: ipcSpellSessionStub
+    }
+  }
+  getFaUserSettingsMock.mockReturnValue({
+    store: {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      languageCode: 'en-US'
+    },
+    set: storeSetMock
+  })
+
+  const { registerFaUserSettingsIpc } = await import('../registerFaUserSettingsIpc')
+  registerFaUserSettingsIpc()
+
+  const setHandler = handlerFor(FA_USER_SETTINGS_IPC.setAsync)
+  setHandler({}, { languageCode: 'fr' })
+
+  expect(applyFaSpellCheckerLanguagesToSessionMock).toHaveBeenCalledWith(ipcSpellSessionStub, 'fr')
+})
+
+/**
+ * registerFaUserSettingsIpc
+ * Set handler still syncs spellchecker when saving en-US again.
+ */
+test('Test that user settings set handler syncs spellchecker when saving en-US again', async () => {
+  mainWindowExportState.appWindow = {
+    webContents: {
+      session: ipcSpellSessionStub
+    }
+  }
+  getFaUserSettingsMock.mockReturnValue({
+    store: {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      languageCode: 'en-US'
+    },
+    set: storeSetMock
+  })
+
+  const { registerFaUserSettingsIpc } = await import('../registerFaUserSettingsIpc')
+  registerFaUserSettingsIpc()
+
+  const setHandler = handlerFor(FA_USER_SETTINGS_IPC.setAsync)
+  setHandler({}, { languageCode: 'en-US' })
+
+  expect(applyFaSpellCheckerLanguagesToSessionMock).toHaveBeenCalledWith(ipcSpellSessionStub, 'en-US')
+})
+
+/**
+ * registerFaUserSettingsIpc
+ * Set handler skips spellchecker sync when the patch omits languageCode.
+ */
+test('Test that user settings set handler does not sync spellchecker when languageCode is unchanged', async () => {
+  mainWindowExportState.appWindow = {
+    webContents: {
+      session: ipcSpellSessionStub
+    }
+  }
+  getFaUserSettingsMock.mockReturnValue({
+    store: { ...FA_USER_SETTINGS_DEFAULTS },
+    set: storeSetMock
+  })
+
+  const { registerFaUserSettingsIpc } = await import('../registerFaUserSettingsIpc')
+  registerFaUserSettingsIpc()
+
+  const setHandler = handlerFor(FA_USER_SETTINGS_IPC.setAsync)
+  setHandler({}, { darkMode: false })
+
+  expect(applyFaSpellCheckerLanguagesToSessionMock).not.toHaveBeenCalled()
+})
+
+/**
+ * registerFaUserSettingsIpc
+ * Set handler syncs spellchecker when switching between fr and de.
+ */
+test('Test that user settings set handler syncs spellchecker when leaving fr for de', async () => {
+  mainWindowExportState.appWindow = {
+    webContents: {
+      session: ipcSpellSessionStub
+    }
+  }
+  getFaUserSettingsMock.mockReturnValue({
+    store: {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      languageCode: 'fr'
+    },
+    set: storeSetMock
+  })
+
+  const { registerFaUserSettingsIpc } = await import('../registerFaUserSettingsIpc')
+  registerFaUserSettingsIpc()
+
+  const setHandler = handlerFor(FA_USER_SETTINGS_IPC.setAsync)
+  setHandler({}, { languageCode: 'de' })
+
+  expect(applyFaSpellCheckerLanguagesToSessionMock).toHaveBeenCalledWith(ipcSpellSessionStub, 'de')
+})
+
+/**
+ * registerFaUserSettingsIpc
+ * Set handler skips spellchecker sync when the main window is not created yet.
+ */
+test('Test that user settings set handler skips spellchecker sync when appWindow is undefined', async () => {
+  mainWindowExportState.appWindow = undefined
+  getFaUserSettingsMock.mockReturnValue({
+    store: { ...FA_USER_SETTINGS_DEFAULTS },
+    set: storeSetMock
+  })
+
+  const { registerFaUserSettingsIpc } = await import('../registerFaUserSettingsIpc')
+  registerFaUserSettingsIpc()
+
+  const setHandler = handlerFor(FA_USER_SETTINGS_IPC.setAsync)
+  setHandler({}, { languageCode: 'de' })
+
+  expect(applyFaSpellCheckerLanguagesToSessionMock).not.toHaveBeenCalled()
 })

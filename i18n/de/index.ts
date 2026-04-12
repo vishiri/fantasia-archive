@@ -1,4 +1,5 @@
 import L_documents from './components/globals/AppControlMenus/L_documents'
+import L_GlobalLanguageSelector from './components/globals/GlobalLanguageSelector/L_GlobalLanguageSelector'
 import L_helpInfo from './components/globals/AppControlMenus/L_helpInfo'
 import L_project from './components/globals/AppControlMenus/L_project'
 import L_tools from './components/globals/AppControlMenus/L_tools'
@@ -7,6 +8,7 @@ import L_socialContactButtons from './components/other/SocialContactButtons/L_so
 import L_aboutFantasiaArchive from './dialogs/L_aboutFantasiaArchive'
 
 import L_faUserSettings from './globalFunctionality/L_faUserSettings'
+import L_spellChecker from './globalFunctionality/L_spellChecker'
 
 export default {
   // GLOBAL - APP TEXTS
@@ -27,6 +29,9 @@ export default {
     aboutFantasiaArchive: L_aboutFantasiaArchive
   },
 
+  // COMPONENT - GLOBAL LANGUAGE SELECTOR
+  globalLanguageSelector: L_GlobalLanguageSelector,
+
   // COMPONENT - GLOBAL WINDOW BUTTONS
   GlobalWindowButtons: {
     minimizeButton: 'Minimize',
@@ -45,6 +50,7 @@ export default {
 
   // GLOBAL FUNCTIONALITY
   globalFunctionality: {
-    faUserSettings: L_faUserSettings
+    faUserSettings: L_faUserSettings,
+    spellChecker: L_spellChecker
   }
 }

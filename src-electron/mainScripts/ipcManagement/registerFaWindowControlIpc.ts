@@ -83,4 +83,9 @@ export function registerFaWindowControlIpc (): void {
     const w = windowFromIpcEvent(event)
     w?.close()
   })
+
+  ipcMain.handle(FA_WINDOW_CONTROL_IPC.refreshWebContentsAsync, (event) => {
+    const w = windowFromIpcEvent(event)
+    w?.webContents.reload()
+  })
 }

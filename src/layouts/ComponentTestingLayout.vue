@@ -7,7 +7,32 @@
 </template>
 
 <script lang="ts" setup>
+import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { applyFaI18nLocaleFromLanguageCode } from 'src/scripts/applyFaI18nLocaleFromLanguageCode'
+import { isFantasiaStorybookCanvas } from 'src/scripts/isFantasiaStorybookCanvas'
+import { isFaUserSettingsLanguageCode } from 'src/scripts/isFaUserSettingsLanguageCode'
+import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
+
 const route = useRoute()
+
+onMounted(async () => {
+  if (isFantasiaStorybookCanvas()) {
+    return
+  }
+
+  if (process.env.MODE !== 'electron' || window.faContentBridgeAPIs?.faUserSettings === undefined) {
+    return
+  }
+
+  const faUserSettingsStore = S_FaUserSettings()
+
+  await faUserSettingsStore.refreshSettings()
+  const code = faUserSettingsStore.settings?.languageCode
+
+  if (code !== undefined && isFaUserSettingsLanguageCode(code)) {
+    applyFaI18nLocaleFromLanguageCode(code)
+  }
+})
 </script>

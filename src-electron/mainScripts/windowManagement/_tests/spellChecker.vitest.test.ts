@@ -1,6 +1,9 @@
 import type { BrowserWindow } from 'electron'
 import { beforeEach, expect, test, vi } from 'vitest'
 
+import type { T_faUserSettingsLanguageCode } from 'app/types/T_faUserSettingsLanguageCode'
+
+import L_spellChecker_de from 'app/i18n/de/globalFunctionality/L_spellChecker'
 import L_spellChecker_enUS from 'app/i18n/en-US/globalFunctionality/L_spellChecker'
 import L_spellChecker_fr from 'app/i18n/fr/globalFunctionality/L_spellChecker'
 
@@ -24,17 +27,26 @@ const { MenuMock, MenuItemMock, menuInstances } = vi.hoisted(() => {
   }
 })
 
-const getLocaleMock = vi.hoisted(() => {
-  return vi.fn(() => 'en-US')
+const getFaUserSettingsMock = vi.hoisted(() => {
+  return vi.fn((): { store: { languageCode: T_faUserSettingsLanguageCode } } => {
+    return {
+      store: {
+        languageCode: 'en-US'
+      }
+    }
+  })
 })
 
 vi.mock('electron', () => {
   return {
     Menu: MenuMock,
-    MenuItem: MenuItemMock,
-    app: {
-      getLocale: getLocaleMock
-    }
+    MenuItem: MenuItemMock
+  }
+})
+
+vi.mock('app/src-electron/mainScripts/userSettings/userSettingsStore', () => {
+  return {
+    getFaUserSettings: getFaUserSettingsMock
   }
 })
 
@@ -42,7 +54,14 @@ beforeEach(() => {
   MenuMock.mockClear()
   MenuItemMock.mockClear()
   menuInstances.length = 0
-  getLocaleMock.mockReturnValue('en-US')
+  getFaUserSettingsMock.mockReset()
+  getFaUserSettingsMock.mockImplementation(() => {
+    return {
+      store: {
+        languageCode: 'en-US'
+      }
+    }
+  })
 })
 
 /**
@@ -180,10 +199,16 @@ test('Test that spellChecker does not popup when there is nothing to show', () =
 
 /**
  * setupSpellChecker
- * Default English locale uses the en-US spell-checker string for the add-to-dictionary menu label.
+ * English UI language uses the en-US spell-checker string for the add-to-dictionary menu label.
  */
-test('Test that spellChecker uses English add-to-dictionary label when app locale is en-US', () => {
-  getLocaleMock.mockReturnValue('en-US')
+test('Test that spellChecker uses English add-to-dictionary label when languageCode is en-US', () => {
+  getFaUserSettingsMock.mockImplementation(() => {
+    return {
+      store: {
+        languageCode: 'en-US'
+      }
+    }
+  })
 
   const onMock = vi.fn()
   const appWindow = {
@@ -211,10 +236,16 @@ test('Test that spellChecker uses English add-to-dictionary label when app local
 
 /**
  * setupSpellChecker
- * French locale uses the fr spell-checker strings for the add-to-dictionary menu label.
+ * French UI language uses the fr spell-checker strings for the add-to-dictionary menu label.
  */
-test('Test that spellChecker uses French add-to-dictionary label when app locale starts with fr', () => {
-  getLocaleMock.mockReturnValue('fr-FR')
+test('Test that spellChecker uses French add-to-dictionary label when languageCode is fr', () => {
+  getFaUserSettingsMock.mockImplementation(() => {
+    return {
+      store: {
+        languageCode: 'fr'
+      }
+    }
+  })
 
   const onMock = vi.fn()
   const appWindow = {
@@ -238,4 +269,41 @@ test('Test that spellChecker uses French add-to-dictionary label when app locale
 
   const addWordItem = MenuItemMock.mock.calls[0][0]
   expect(addWordItem.label).toBe(L_spellChecker_fr.addToDictionary)
+})
+
+/**
+ * setupSpellChecker
+ * German UI language uses the de spell-checker strings for the add-to-dictionary menu label.
+ */
+test('Test that spellChecker uses German add-to-dictionary label when languageCode is de', () => {
+  getFaUserSettingsMock.mockImplementation(() => {
+    return {
+      store: {
+        languageCode: 'de'
+      }
+    }
+  })
+
+  const onMock = vi.fn()
+  const appWindow = {
+    webContents: {
+      on: onMock,
+      replaceMisspelling: vi.fn(),
+      session: {
+        addWordToSpellCheckerDictionary: vi.fn()
+      }
+    }
+  }
+  setupSpellChecker(appWindow as unknown as BrowserWindow)
+  const contextMenuHandler = onMock.mock.calls[0][1]
+  menuInstances.length = 0
+  MenuItemMock.mockClear()
+
+  contextMenuHandler({}, {
+    dictionarySuggestions: [],
+    misspelledWord: 'Wort'
+  })
+
+  const addWordItem = MenuItemMock.mock.calls[0][0]
+  expect(addWordItem.label).toBe(L_spellChecker_de.addToDictionary)
 })

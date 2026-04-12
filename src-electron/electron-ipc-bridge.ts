@@ -24,7 +24,8 @@ export const FA_WINDOW_CONTROL_IPC = {
   minimizeAsync: 'fa-window-control-minimize-async',
   maximizeAsync: 'fa-window-control-maximize-async',
   resizeToggleAsync: 'fa-window-control-resize-toggle-async',
-  closeAsync: 'fa-window-control-close-async'
+  closeAsync: 'fa-window-control-close-async',
+  refreshWebContentsAsync: 'fa-window-control-refresh-web-contents-async'
 } as const
 
 /** App metadata: preload uses 'ipcRenderer.invoke'; main uses 'ipcMain.handle'. */

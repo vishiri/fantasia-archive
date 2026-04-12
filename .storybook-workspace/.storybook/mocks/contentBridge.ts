@@ -40,6 +40,7 @@ const baseBridge = () => ({
     closeWindow: async () => undefined,
     maximizeWindow: async () => undefined,
     minimizeWindow: async () => undefined,
+    refreshWebContents: async () => undefined,
     resizeWindow: async () => undefined
   },
   faDevToolsControl: {

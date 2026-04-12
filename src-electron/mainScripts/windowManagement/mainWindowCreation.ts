@@ -1,7 +1,9 @@
 import { BrowserWindow, app, screen } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { applyFaSpellCheckerLanguagesToSession } from 'app/src-electron/mainScripts/windowManagement/faSpellCheckerSession'
 import { setupSpellChecker } from 'app/src-electron/mainScripts/windowManagement/spellChecker'
+import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
 
 export let appWindow: BrowserWindow | undefined
 
@@ -59,6 +61,58 @@ function resolvePreloadPath (): string {
   )
 }
 
+async function loadAndWireMainWindow (win: BrowserWindow): Promise<void> {
+  // Show the windows once electron is ready to show the actual HTML content
+  win.once('ready-to-show', () => {
+    if (appWindow) {
+      appWindow.show()
+      appWindow.focus()
+      appWindow.maximize()
+
+      // In case the windows somehow didn't maximize at first, make sure it does; this is a fix for slower machines
+      setTimeout(() => {
+        if (appWindow) {
+          appWindow.maximize()
+        }
+      }, 1000)
+    }
+  })
+
+  // Set the current window's menu as empty
+  win.setMenu(null)
+
+  // Load the basic app URL (dev server) or packaged index.html
+  if (process.env.DEV) {
+    const devUrl = process.env.APP_URL
+    if (devUrl === undefined) {
+      throw new Error('APP_URL must be set when DEV is set')
+    }
+    await win.loadURL(devUrl)
+  } else {
+    await win.loadFile('index.html')
+  }
+
+  // Open DevTools by default if the app is running in Dev mode or Production with debug enabled
+  if (process.env.DEBUGGING) {
+    win.webContents.openDevTools()
+  }
+
+  // Make sure the app window properly closes when it is closed in any way, shape or form
+  win.on('closed', () => {
+    appWindow = undefined
+  })
+
+  // Check if we are on the primary or secondary instance of the app
+  preventSecondaryAppInstance(win)
+
+  // Hook up spellchecker
+  setupSpellChecker(win)
+  applyFaSpellCheckerLanguagesToSession(
+    win.webContents.session,
+    getFaUserSettings().store.languageCode
+  )
+}
+
 /**
   * Creates the main app window
   */
@@ -85,53 +139,10 @@ export const mainWindowCreation = async () => {
       contextIsolation: true,
       nodeIntegration: false,
       preload: resolvePreloadPath(),
-      sandbox: true
+      sandbox: true,
+      spellcheck: true
     }
   })
 
-  // Show the windows once electron is ready to show the actual HTML content
-  appWindow.once('ready-to-show', () => {
-    if (appWindow) {
-      appWindow.show()
-      appWindow.focus()
-      appWindow.maximize()
-
-      // In case the windows somehow didn't maximize at first, make sure it does; this is a fix for slower machines
-      setTimeout(() => {
-        if (appWindow) {
-          appWindow.maximize()
-        }
-      }, 1000)
-    }
-  })
-
-  // Set the current window's menu as empty
-  appWindow.setMenu(null)
-
-  // Load the basic app URL (dev server) or packaged index.html
-  if (process.env.DEV) {
-    const devUrl = process.env.APP_URL
-    if (devUrl === undefined) {
-      throw new Error('APP_URL must be set when DEV is set')
-    }
-    await appWindow.loadURL(devUrl)
-  } else {
-    await appWindow.loadFile('index.html')
-  }
-
-  // Open DevTools by default if the app is running in Dev mode or Production with debug enabled
-  if (process.env.DEBUGGING) {
-    appWindow.webContents.openDevTools()
-  }
-
-  // Make sure the app window properly closes when it is closed in any way, shape or form
-  appWindow.on('closed', () => {
-    appWindow = undefined
-  })
-
-  // Check if we are on the primary or secondary instance of the app
-  preventSecondaryAppInstance(appWindow)
-
-  // Hook up spellchecker
-  setupSpellChecker(appWindow)
+  await loadAndWireMainWindow(appWindow)
 }

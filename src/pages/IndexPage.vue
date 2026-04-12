@@ -1,6 +1,9 @@
 <template>
   <q-page class="row">
     <div>
+      <textarea />
+    </div>
+    <div>
       <router-link to="/testeee">
         test
       </router-link>

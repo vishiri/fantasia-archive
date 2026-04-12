@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => {
     y: 0
   }))
   const setBoundsMock = vi.fn()
+  const reloadMock = vi.fn()
 
   const fakeWindow = {
     close: closeMock,
@@ -27,7 +28,10 @@ const mocks = vi.hoisted(() => {
     maximize: maximizeMock,
     minimize: minimizeMock,
     setBounds: setBoundsMock,
-    unmaximize: unmaximizeMock
+    unmaximize: unmaximizeMock,
+    webContents: {
+      reload: reloadMock
+    }
   }
 
   return {
@@ -39,6 +43,7 @@ const mocks = vi.hoisted(() => {
     isMaximizedMock,
     maximizeMock,
     minimizeMock,
+    reloadMock,
     setBoundsMock,
     unmaximizeMock
   }
@@ -73,6 +78,7 @@ beforeEach(async () => {
     y: 0
   })
   mocks.setBoundsMock.mockReset()
+  mocks.reloadMock.mockReset()
   mocks.fromWebContentsMock.mockReturnValue(mocks.fakeWindow)
 })
 
@@ -99,7 +105,8 @@ test('Test that registerFaWindowControlIpc registers each window control async c
     FA_WINDOW_CONTROL_IPC.minimizeAsync,
     FA_WINDOW_CONTROL_IPC.maximizeAsync,
     FA_WINDOW_CONTROL_IPC.resizeToggleAsync,
-    FA_WINDOW_CONTROL_IPC.closeAsync
+    FA_WINDOW_CONTROL_IPC.closeAsync,
+    FA_WINDOW_CONTROL_IPC.refreshWebContentsAsync
   ])
 })
 
@@ -248,6 +255,35 @@ test('Test that registerFaWindowControlIpc closeAsync calls close', async () => 
   handlerFor(FA_WINDOW_CONTROL_IPC.closeAsync)(event)
 
   expect(mocks.closeMock).toHaveBeenCalledOnce()
+})
+
+/**
+ * registerFaWindowControlIpc
+ * refreshWebContentsAsync no-ops when no BrowserWindow is resolved.
+ */
+test('Test that registerFaWindowControlIpc refreshWebContentsAsync no-ops without a window', async () => {
+  mocks.fromWebContentsMock.mockReturnValue(null)
+  const { registerFaWindowControlIpc } = await import('../registerFaWindowControlIpc')
+  registerFaWindowControlIpc()
+
+  const event: { sender: unknown } = { sender: fakeSender }
+  handlerFor(FA_WINDOW_CONTROL_IPC.refreshWebContentsAsync)(event)
+
+  expect(mocks.reloadMock).not.toHaveBeenCalled()
+})
+
+/**
+ * registerFaWindowControlIpc
+ * refreshWebContentsAsync calls webContents.reload on the resolved window.
+ */
+test('Test that registerFaWindowControlIpc refreshWebContentsAsync calls reload', async () => {
+  const { registerFaWindowControlIpc } = await import('../registerFaWindowControlIpc')
+  registerFaWindowControlIpc()
+
+  const event: { sender: unknown } = { sender: fakeSender }
+  handlerFor(FA_WINDOW_CONTROL_IPC.refreshWebContentsAsync)(event)
+
+  expect(mocks.reloadMock).toHaveBeenCalledOnce()
 })
 
 /**

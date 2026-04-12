@@ -12,6 +12,8 @@ import {
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
+import L_GlobalLanguageSelectorDe from 'app/i18n/de/components/globals/GlobalLanguageSelector/L_GlobalLanguageSelector'
+import L_GlobalLanguageSelectorFr from 'app/i18n/fr/components/globals/GlobalLanguageSelector/L_GlobalLanguageSelector'
 import L_faUserSettingsEnUs from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
 import { GLOBAL_LANGUAGE_SELECTOR_LOCALES } from '../scripts/globalLanguageSelectorLocales'
 
@@ -42,6 +44,7 @@ const flagImageLoadTimeoutMs = 15_000
 const selectorList = {
   menuPanel: '.globalLanguageSelector__menu',
   root: 'globalLanguageSelector-root',
+  spellcheckRefresh: 'globalLanguageSelector-spellcheckRefresh',
   trigger: 'globalLanguageSelector-trigger',
   triggerFlag: 'globalLanguageSelector-trigger-flag'
 } as const
@@ -129,6 +132,10 @@ test.describe.serial('Global language selector', () => {
     await expect(root).toHaveAttribute('data-test-active-language-code', 'en-US')
     await expect(root).toHaveAttribute('data-test-i18n-locale', 'en-US')
 
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.spellcheckRefresh}"]`)
+    ).toBeHidden()
+
     const triggerFlag = appWindow.locator(`[data-test-locator="${selectorList.triggerFlag}"]`)
     await expect(triggerFlag).toHaveAttribute('data-test-expected-flag-path', '/countryFlags/us.svg')
     const src = await triggerFlag.getAttribute('src')
@@ -180,5 +187,39 @@ test.describe.serial('Global language selector', () => {
     const src = await triggerFlag.getAttribute('src')
     expect(src ?? '').toMatch(/de\.svg(\?|$|#)/)
     await expectFlagImageLoaded(triggerFlag)
+
+    const refreshBtn = appWindow.locator(`[data-test-locator="${selectorList.spellcheckRefresh}"]`)
+    await expect(refreshBtn).toBeVisible({ timeout: 15_000 })
+  })
+
+  /**
+   * Spellcheck reload control hides after use; persisted language stays **de**. After reload, a further
+   * language change shows the refresh hint again with vue-i18n copy for that locale (data-test-tooltip-text).
+   */
+  test('Spellcheck refresh reloads and keeps German as the active language', async () => {
+    const refreshBtn = appWindow.locator(`[data-test-locator="${selectorList.spellcheckRefresh}"]`)
+    await expect(refreshBtn).toBeVisible({ timeout: 15_000 })
+    await expect(refreshBtn).toHaveAttribute(
+      'data-test-tooltip-text',
+      L_GlobalLanguageSelectorDe.spellcheckRefreshTooltip
+    )
+
+    await refreshBtn.click()
+    await appWindow.waitForTimeout(faFrontendRenderTimer)
+
+    const root = appWindow.locator(`[data-test-locator="${selectorList.root}"]`)
+    await expect(root).toHaveAttribute('data-test-active-language-code', 'de', { timeout: 15_000 })
+    await expect(refreshBtn).toBeHidden({ timeout: 15_000 })
+
+    await openLanguageMenu(appWindow)
+    await appWindow.locator('[data-test-locator="globalLanguageSelector-option-fr"]').click()
+    await expect(root).toHaveAttribute('data-test-active-language-code', 'fr', { timeout: 15_000 })
+    await expect(root).toHaveAttribute('data-test-i18n-locale', 'fr', { timeout: 15_000 })
+
+    await expect(refreshBtn).toBeVisible({ timeout: 15_000 })
+    await expect(refreshBtn).toHaveAttribute(
+      'data-test-tooltip-text',
+      L_GlobalLanguageSelectorFr.spellcheckRefreshTooltip
+    )
   })
 })

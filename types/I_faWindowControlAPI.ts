@@ -27,4 +27,9 @@ export interface I_faWindowControlAPI {
    */
   closeWindow: () => Promise<void>
 
+  /**
+   * Reloads this window's renderer (same as 'webContents.reload' in main).
+   */
+  refreshWebContents: () => Promise<void>
+
 }

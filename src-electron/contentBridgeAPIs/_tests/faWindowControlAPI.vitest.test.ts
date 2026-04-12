@@ -141,3 +141,19 @@ test('Test that closeWindow does not throw when invoke rejects', async () => {
 
   await expect(faWindowControlAPI.closeWindow()).resolves.toBeUndefined()
 })
+
+test('Test that refreshWebContents calls invoke with refresh channel', async () => {
+  invokeMock.mockResolvedValue(undefined)
+  const { faWindowControlAPI } = await import('../faWindowControlAPI')
+
+  await faWindowControlAPI.refreshWebContents()
+
+  expect(invokeMock).toHaveBeenCalledWith(FA_WINDOW_CONTROL_IPC.refreshWebContentsAsync)
+})
+
+test('Test that refreshWebContents does not throw when invoke rejects', async () => {
+  invokeMock.mockRejectedValue(new Error('ipc failed'))
+  const { faWindowControlAPI } = await import('../faWindowControlAPI')
+
+  await expect(faWindowControlAPI.refreshWebContents()).resolves.toBeUndefined()
+})

@@ -6,97 +6,104 @@
     :data-test-active-language-code="currentCode"
     :data-test-i18n-locale="activeI18nLocale"
   >
-    <q-btn
-      round
-      flat
-      dense
-      :ripple="false"
-      class="globalLanguageSelector__trigger bg-dark"
-      :aria-label="$t('globalLanguageSelector.openMenu')"
-      :data-test-tooltip-text="$t('globalLanguageSelector.switchLanguageTooltip')"
-      data-test-locator="globalLanguageSelector-trigger"
-      @click.capture="onLanguageTriggerClickCapture"
-    >
-      <q-avatar
-        rounded
-        :size="`${globalLanguageSelectorInnerSize}px`"
-        class="globalLanguageSelector__avatar"
-      >
-        <img
-          :src="resolveVitePublicAssetPath(currentFlagSrc)"
-          alt=""
-          class="globalLanguageSelector__flagImg"
-          data-test-locator="globalLanguageSelector-trigger-flag"
-          :data-test-expected-flag-path="currentFlagSrc"
-        >
-      </q-avatar>
+    <div class="globalLanguageSelector__cluster">
+      <GlobalLanguageSelectorSpellcheckRefreshControl
+        :show="showSpellcheckRefresh"
+        @refresh-web-contents="refreshWebContentsAndHide"
+      />
 
-      <q-tooltip
-        v-if="!isLanguageMenuOpen"
-        anchor="bottom middle"
-        self="top middle"
-        :delay="300"
-        transition-hide="fade"
-        :transition-duration="280"
+      <q-btn
+        round
+        flat
+        dense
+        :ripple="false"
+        class="globalLanguageSelector__trigger bg-dark"
+        :aria-label="$t('globalLanguageSelector.openMenu')"
+        :data-test-tooltip-text="$t('globalLanguageSelector.switchLanguageTooltip')"
+        data-test-locator="globalLanguageSelector-trigger"
+        @click.capture="onLanguageTriggerClickCapture"
       >
-        {{ $t('globalLanguageSelector.switchLanguageTooltip') }}
-      </q-tooltip>
-
-      <q-menu
-        :dark="false"
-        anchor="bottom middle"
-        class="globalLanguageSelector__menu"
-        self="top middle"
-        auto-close
-        :offset="[0, 12]"
-        @hide="onLanguageMenuHide"
-        @show="onLanguageMenuShow"
-      >
-        <q-list
-          :dark="false"
+        <q-avatar
+          rounded
+          :size="`${globalLanguageSelectorInnerSize}px`"
+          class="globalLanguageSelector__avatar"
         >
-          <template
-            v-for="row in GLOBAL_LANGUAGE_SELECTOR_LOCALES"
-            :key="row.code"
+          <img
+            :src="resolveVitePublicAssetPath(currentFlagSrc)"
+            alt=""
+            class="globalLanguageSelector__flagImg"
+            data-test-locator="globalLanguageSelector-trigger-flag"
+            :data-test-expected-flag-path="currentFlagSrc"
           >
-            <q-item
-              clickable
-              class="globalLanguageSelector__menuItem"
-              :data-test-locator="`globalLanguageSelector-option-${row.code}`"
-              @click="pickLanguage(row.code)"
+        </q-avatar>
+
+        <q-tooltip
+          v-if="!isLanguageMenuOpen"
+          anchor="bottom middle"
+          self="top middle"
+          :delay="300"
+          transition-hide="fade"
+          :transition-duration="280"
+        >
+          {{ $t('globalLanguageSelector.switchLanguageTooltip') }}
+        </q-tooltip>
+
+        <q-menu
+          :dark="false"
+          anchor="bottom middle"
+          class="globalLanguageSelector__menu"
+          self="top middle"
+          auto-close
+          :offset="[0, 12]"
+          @hide="onLanguageMenuHide"
+          @show="onLanguageMenuShow"
+        >
+          <q-list
+            :dark="false"
+          >
+            <template
+              v-for="row in GLOBAL_LANGUAGE_SELECTOR_LOCALES"
+              :key="row.code"
             >
-              <q-item-section
-                avatar
-                class="globalLanguageSelector__menuAvatarSection"
+              <q-item
+                clickable
+                class="globalLanguageSelector__menuItem"
+                :data-test-locator="`globalLanguageSelector-option-${row.code}`"
+                @click="pickLanguage(row.code)"
               >
-                <q-avatar
-                  class="globalLanguageSelector__menuAvatar"
-                  square
-                  :size="`${globalLanguageSelectorInnerSize}px`"
+                <q-item-section
+                  avatar
+                  class="globalLanguageSelector__menuAvatarSection"
                 >
-                  <img
-                    :src="resolveVitePublicAssetPath(row.flagSrc)"
-                    :alt="$t(`globalFunctionality.faUserSettings.languageNames.${row.languageNamesKey}`)"
-                    class="globalLanguageSelector__flagImg"
-                    :data-test-locator="`globalLanguageSelector-menu-flag-${row.code}`"
-                    :data-test-expected-flag-path="row.flagSrc"
+                  <q-avatar
+                    class="globalLanguageSelector__menuAvatar"
+                    square
+                    :size="`${globalLanguageSelectorInnerSize}px`"
                   >
-                </q-avatar>
-              </q-item-section>
-              <q-item-section class="globalLanguageSelector__menuItemLabel text-weight-medium">
-                {{
-                  $t(`globalFunctionality.faUserSettings.languageNames.${row.languageNamesKey}`)
-                }}
-              </q-item-section>
-            </q-item>
-            <q-separator
-              :dark="false"
-              role="separator"
-            />
-          </template>
-        </q-list>
-      </q-menu>
-    </q-btn>
+                    <img
+                      :src="resolveVitePublicAssetPath(row.flagSrc)"
+                      :alt="$t(`globalFunctionality.faUserSettings.languageNames.${row.languageNamesKey}`)"
+                      class="globalLanguageSelector__flagImg"
+                      :data-test-locator="`globalLanguageSelector-menu-flag-${row.code}`"
+                      :data-test-expected-flag-path="row.flagSrc"
+                    >
+                  </q-avatar>
+                </q-item-section>
+                <q-item-section class="globalLanguageSelector__menuItemLabel text-weight-medium">
+                  {{
+                    $t(`globalFunctionality.faUserSettings.languageNames.${row.languageNamesKey}`)
+                  }}
+                </q-item-section>
+              </q-item>
+              <q-separator
+                :dark="false"
+                role="separator"
+              />
+            </template>
+          </q-list>
+        </q-menu>
+      </q-btn>
+    </div>
   </div>
 </template>
 
@@ -110,11 +117,19 @@ import { applyFaUserSettingsLanguageSelection } from 'src/scripts/applyFaUserSet
 import { resolveVitePublicAssetPath } from 'src/scripts/resolveVitePublicAssetPath'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
+import GlobalLanguageSelectorSpellcheckRefreshControl from './GlobalLanguageSelectorSpellcheckRefreshControl.vue'
 import { GLOBAL_LANGUAGE_SELECTOR_LOCALES } from './scripts/globalLanguageSelectorLocales'
+import { useGlobalLanguageSelectorSpellcheckRefresh } from './scripts/useGlobalLanguageSelectorSpellcheckRefresh'
 
 const globalLanguageSelectorInnerSize = 21
 
 const isLanguageMenuOpen = ref(false)
+
+const {
+  noteLanguageApplied,
+  refreshWebContentsAndHide,
+  showSpellcheckRefresh
+} = useGlobalLanguageSelectorSpellcheckRefresh()
 
 const faUserSettingsStore = S_FaUserSettings()
 
@@ -155,11 +170,14 @@ function onLanguageMenuHide (): void {
 }
 
 async function pickLanguage (code: T_faUserSettingsLanguageCode): Promise<void> {
+  const priorCode = currentCode.value
   await applyFaUserSettingsLanguageSelection(
     faUserSettingsStore.updateSettings,
     code,
-    currentCode.value
+    priorCode
   )
+  const nextCode = faUserSettingsStore.settings?.languageCode ?? priorCode
+  noteLanguageApplied(priorCode, nextCode)
 }
 </script>
 
@@ -176,6 +194,13 @@ async function pickLanguage (code: T_faUserSettingsLanguageCode): Promise<void> 
   right: calc(#{$globalWindowButtons-totalWidth} + #{$globalLanguageSelector-gap});
   top: $globalLanguageSelector-topPosition;
   z-index: $globalLanguageSelector-zIndex;
+
+  &__cluster {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: $globalLanguageSelector-spellcheckRefresh-gap;
+  }
 
   &__trigger {
     border: $globalLanguageSelector-trigger-border;

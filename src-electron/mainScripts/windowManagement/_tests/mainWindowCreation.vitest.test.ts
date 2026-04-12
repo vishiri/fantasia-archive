@@ -11,12 +11,15 @@ import type { BrowserWindow } from 'electron'
 const {
   BrowserWindowMock,
   appMock,
+  applyFaSpellCheckerLanguagesToSessionMock,
+  getFaUserSettingsMock,
   getPrimaryDisplayMock,
   setupSpellCheckerMock,
   appEventHandlers
 } = vi.hoisted(() => {
   const handlers: Record<string, () => void> = {}
   return {
+    applyFaSpellCheckerLanguagesToSessionMock: vi.fn(),
     BrowserWindowMock: vi.fn(),
     appEventHandlers: handlers,
     appMock: {
@@ -26,6 +29,13 @@ const {
         handlers[eventName] = handler
       })
     },
+    getFaUserSettingsMock: vi.fn(() => {
+      return {
+        store: {
+          languageCode: 'en-US' as const
+        }
+      }
+    }),
     getPrimaryDisplayMock: vi.fn(() => ({
       workAreaSize: {
         width: 1920,
@@ -52,6 +62,18 @@ vi.mock('src-electron/mainScripts/windowManagement/spellChecker', () => {
   }
 })
 
+vi.mock('app/src-electron/mainScripts/windowManagement/faSpellCheckerSession', () => {
+  return {
+    applyFaSpellCheckerLanguagesToSession: applyFaSpellCheckerLanguagesToSessionMock
+  }
+})
+
+vi.mock('app/src-electron/mainScripts/userSettings/userSettingsStore', () => {
+  return {
+    getFaUserSettings: getFaUserSettingsMock
+  }
+})
+
 beforeEach(() => {
   BrowserWindowMock.mockReset()
   appMock.requestSingleInstanceLock.mockReset()
@@ -59,6 +81,15 @@ beforeEach(() => {
   appMock.quit.mockReset()
   appMock.on.mockClear()
   setupSpellCheckerMock.mockReset()
+  applyFaSpellCheckerLanguagesToSessionMock.mockReset()
+  getFaUserSettingsMock.mockReset()
+  getFaUserSettingsMock.mockImplementation(() => {
+    return {
+      store: {
+        languageCode: 'en-US' as const
+      }
+    }
+  })
   for (const key of Object.keys(appEventHandlers)) {
     delete appEventHandlers[key]
   }
@@ -142,9 +173,11 @@ test('Test that second-instance handler no-ops when preventSecondaryAppInstance 
 test('Test that the main window is created successfully', async () => {
   const onceHandlers: Record<string, () => void> = {}
   const onHandlers: Record<string, () => void> = {}
+  const spellSession = {}
   const browserWindowInstance = {
     webContents: {
-      openDevTools: vi.fn()
+      openDevTools: vi.fn(),
+      session: spellSession
     },
     once: vi.fn((eventName: string, handler: () => void) => {
       onceHandlers[eventName] = handler
@@ -185,12 +218,14 @@ test('Test that the main window is created successfully', async () => {
   ).toMatchObject({
     contextIsolation: true,
     nodeIntegration: false,
-    sandbox: true
+    sandbox: true,
+    spellcheck: true
   })
   expect(browserWindowInstance.setMenu).toHaveBeenCalledWith(null)
   expect(browserWindowInstance.loadURL).toHaveBeenCalledWith('http://localhost:9000')
   expect(browserWindowInstance.webContents.openDevTools).toHaveBeenCalledOnce()
   expect(setupSpellCheckerMock).toHaveBeenCalledWith(expect.anything())
+  expect(applyFaSpellCheckerLanguagesToSessionMock).toHaveBeenCalledWith(spellSession, 'en-US')
 
   onceHandlers['ready-to-show']()
   expect(browserWindowInstance.show).toHaveBeenCalledOnce()

@@ -44,5 +44,13 @@ export const faWindowControlAPI: I_faWindowControlAPI = {
     } catch {
       // no-op
     }
+  },
+
+  async refreshWebContents () {
+    try {
+      await ipcRenderer.invoke(FA_WINDOW_CONTROL_IPC.refreshWebContentsAsync)
+    } catch {
+      // no-op
+    }
   }
 }

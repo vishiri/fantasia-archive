@@ -1,11 +1,18 @@
 import type { BrowserWindow } from 'electron'
-import { MenuItem, Menu, app } from 'electron'
+import { MenuItem, Menu } from 'electron'
+import L_spellChecker_de from 'app/i18n/de/globalFunctionality/L_spellChecker'
 import L_spellChecker_enUS from 'app/i18n/en-US/globalFunctionality/L_spellChecker'
 import L_spellChecker_fr from 'app/i18n/fr/globalFunctionality/L_spellChecker'
+import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
 
 const resolveAddToDictionaryLabel = () => {
-  const appLocale = app.getLocale().toLowerCase()
-  if (appLocale.startsWith('fr')) return L_spellChecker_fr.addToDictionary
+  const code = getFaUserSettings().store.languageCode
+  if (code === 'de') {
+    return L_spellChecker_de.addToDictionary
+  }
+  if (code === 'fr') {
+    return L_spellChecker_fr.addToDictionary
+  }
   return L_spellChecker_enUS.addToDictionary
 }
 

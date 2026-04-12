@@ -10,6 +10,7 @@ import L_helpInfo from './components/globals/AppControlMenus/L_helpInfo'
 import L_project from './components/globals/AppControlMenus/L_project'
 import L_tools from './components/globals/AppControlMenus/L_tools'
 import L_documents from './components/globals/AppControlMenus/L_documents'
+import L_GlobalLanguageSelector from './components/globals/GlobalLanguageSelector/L_GlobalLanguageSelector'
 
 import L_aboutFantasiaArchive from './dialogs/L_aboutFantasiaArchive'
 import L_markdownDocument from './dialogs/L_markdownDocument'
@@ -83,6 +84,9 @@ export default {
     documents: L_documents,
     helpInfo: L_helpInfo
   },
+
+  // COMPONENT - GLOBAL LANGUAGE SELECTOR
+  globalLanguageSelector: L_GlobalLanguageSelector,
 
   // COMPONENT - SOCIAL CONTACT BUTTONS
   SocialContactButtons: L_socialContactButtons,
