@@ -46,7 +46,7 @@
           >
             <ErrorCard
               :title="$t('dialogs.programSettings.searchNoResultsTitle')"
-              :description="$t('dialogs.programSettings.searchNoResultsDescription')"
+              :details="$t('dialogs.programSettings.searchNoResultsDescription')"
               image-name="reading"
               :width="650"
             />

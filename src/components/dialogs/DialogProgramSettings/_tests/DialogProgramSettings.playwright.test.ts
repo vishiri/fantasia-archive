@@ -284,7 +284,7 @@ test.describe.serial('Program settings dialog', () => {
   })
 
   /**
-   * Settings search overlay: title, tag, and description needles; empty state ErrorCard. Clearing the query restores tab interaction before the suite closes the dialog.
+   * Settings search overlay: title, tag, and setting-description substrings; empty state ErrorCard. Clearing the query restores tab interaction before the suite closes the dialog.
    */
   test('Program settings search finds Hide project name in tree by title match', async () => {
     const searchPanel = appWindow.locator('[data-test-locator="dialogProgramSettings-searchAllSettingsPanel"]')
@@ -361,9 +361,9 @@ test.describe.serial('Program settings dialog', () => {
     await expect(titleLine).toHaveCount(1)
     await expect(titleLine).toHaveText(expectedProgramSettingsSearchNoResultsTitle)
 
-    const descriptionLine = errorCard.locator('[data-test-locator="errorCard-description"]')
-    await expect(descriptionLine).toHaveCount(1)
-    await expect(descriptionLine).toHaveText(expectedProgramSettingsSearchNoResultsDescription)
+    const detailsLine = errorCard.locator('[data-test-locator="errorCard-details"]')
+    await expect(detailsLine).toHaveCount(1)
+    await expect(detailsLine).toHaveText(expectedProgramSettingsSearchNoResultsDescription)
 
     await clearProgramSettingsSearch(appWindow)
   })

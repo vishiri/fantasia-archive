@@ -77,14 +77,14 @@ test('Capture visual snapshots for Storybook stories', async ({ browser, request
           waitUntil: 'domcontentloaded'
         }), STORY_RENDER_TIMEOUT_MS, `Timed out navigating to story: ${story.id}`)
 
-        const storyRendered = await withTimeout(page.waitForFunction(() => {
+        const storyRendered = await page.waitForFunction(() => {
           const root = document.querySelector('#storybook-root, #root')
           const hasRootChildren = root !== null && root.childElementCount > 0
           const hasTeleportContent = document.querySelector('.q-dialog, [role="dialog"], .q-menu') !== null
           return hasRootChildren || hasTeleportContent
-        }, {
+        }, undefined, {
           timeout: STORY_RENDER_TIMEOUT_MS
-        }).then(() => true).catch(() => false), STORY_RENDER_TIMEOUT_MS, `Timed out waiting for story root: ${story.id}`)
+        }).then(() => true).catch(() => false)
 
         if (!storyRendered) {
           console.warn(`[storybook-visual] Skipped (did not render root): ${story.id}`)

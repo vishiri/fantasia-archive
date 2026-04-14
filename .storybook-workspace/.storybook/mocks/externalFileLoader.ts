@@ -8,6 +8,7 @@ import L_tools from 'app/i18n/en-US/components/globals/AppControlMenus/L_tools'
 import L_socialContactButtons from 'app/i18n/en-US/components/other/SocialContactButtons/L_socialContactButtons'
 import L_aboutFantasiaArchive from 'app/i18n/en-US/dialogs/L_aboutFantasiaArchive'
 import L_dialogKeybindSettings from 'app/i18n/en-US/dialogs/L_dialogKeybindSettings'
+import L_markdownDocument from 'app/i18n/en-US/dialogs/L_markdownDocument'
 import L_programSettings from 'app/i18n/en-US/dialogs/L_programSettings'
 import L_faKeybinds from 'app/i18n/en-US/globalFunctionality/L_faKeybinds'
 import L_faUserSettings from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
@@ -29,6 +30,7 @@ const defaultMessages: Record<string, unknown> = {
   dialogs: {
     aboutFantasiaArchive: L_aboutFantasiaArchive,
     keybindSettings: L_dialogKeybindSettings,
+    markdownDocument: L_markdownDocument,
     programSettings: L_programSettings
   },
   globalLanguageSelector: L_GlobalLanguageSelector,

@@ -7,7 +7,7 @@ import {
   compareProgramSettingsCategoryOrder,
   sortSettingsListByTranslatedTitle,
   toSortedRecord
-} from 'app/src/components/dialogs/DialogProgramSettings/scripts/dialogProgramSettingsTree'
+} from 'app/src/components/dialogs/DialogProgramSettings/scripts/dialogProgramSettingsTreeOrdering'
 import programSettingsMessages from 'app/i18n/en-US/dialogs/L_programSettings'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 type T_programSettingOptionBlock = {

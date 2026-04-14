@@ -117,7 +117,7 @@ test.describe.serial('Error card (live component shell)', () => {
    * Details paragraph shows the lorem ipsum body when 'details' is provided.
    */
   test('Details paragraph shows lorem ipsum copy', async () => {
-    const details = appWindow.locator('.errorCard__details')
+    const details = appWindow.locator('[data-test-locator="errorCard-details"]')
 
     await expect(details).toHaveCount(1)
     await expect(details).toContainText('Lorem ipsum dolor sit amet')

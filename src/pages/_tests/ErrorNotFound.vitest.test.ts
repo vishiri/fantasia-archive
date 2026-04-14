@@ -5,7 +5,7 @@ import ErrorNotFound from '../ErrorNotFound.vue'
 
 /**
  * ErrorNotFound
- * Fullscreen route wires ErrorCard with title and details only (no description prop), matching ErrorCard markup: errorCard-title, mascot, then errorCard__details.
+ * Fullscreen route wires ErrorCard with title and details, matching ErrorCard markup: errorCard-title, mascot, then errorCard-details.
  */
 test('Test that ErrorNotFound renders ErrorCard title hook, details block, and error mascot', () => {
   const w = mount(ErrorNotFound, {
@@ -21,9 +21,8 @@ test('Test that ErrorNotFound renders ErrorCard title hook, details block, and e
 
   const titleEl = w.get('[data-test-locator="errorCard-title"]')
   expect(titleEl.text()).toBe('errorNotFound.title')
-  expect(w.find('[data-test-locator="errorCard-description"]').exists()).toBe(false)
 
-  const detailsEl = w.get('.errorCard__details')
+  const detailsEl = w.get('[data-test-locator="errorCard-details"]')
   expect(detailsEl.text()).toContain('errorNotFound.subTitleFirst')
   expect(detailsEl.text()).toContain('errorNotFound.subTitleSecond')
 
