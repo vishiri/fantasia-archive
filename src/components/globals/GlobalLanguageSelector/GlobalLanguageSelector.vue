@@ -111,7 +111,7 @@
 import { computed, ref } from 'vue'
 
 import { i18n } from 'app/i18n/externalFileLoader'
-import type { T_faUserSettingsLanguageCode } from 'app/types/T_faUserSettingsLanguageCode'
+import type { T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 
 import { applyFaUserSettingsLanguageSelection } from 'src/scripts/applyFaUserSettingsLanguageSelection'
 import { resolveVitePublicAssetPath } from 'src/scripts/resolveVitePublicAssetPath'

@@ -1,8 +1,8 @@
 import { vi, expect, test, beforeEach } from 'vitest'
 
 import type ElectronStore from 'electron-store'
-import type { I_faUserSettings } from 'app/types/I_faUserSettings'
-import type { T_storeConstructorOptions } from './userSettingsStore.vitest.types'
+import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
+import type { T_storeConstructorOptions } from 'app/types/I_vitestUserSettingsStore'
 
 import { FA_USER_SETTINGS_DEFAULTS } from '../faUserSettingsDefaults'
 

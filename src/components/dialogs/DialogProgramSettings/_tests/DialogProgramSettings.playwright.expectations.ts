@@ -2,12 +2,12 @@ import { PROGRAM_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogProgr
 import type {
   I_programSubCategoryRenderItem,
   T_programSettingsRenderTree
-} from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
+} from 'app/types/I_dialogProgramSettings'
 import {
   compareProgramSettingsCategoryOrder,
   sortSettingsListByTranslatedTitle,
   toSortedRecord
-} from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsTreeSorting'
+} from 'app/src/components/dialogs/DialogProgramSettings/scripts/dialogProgramSettingsTree'
 import programSettingsMessages from 'app/i18n/en-US/dialogs/L_programSettings'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 type T_programSettingOptionBlock = {

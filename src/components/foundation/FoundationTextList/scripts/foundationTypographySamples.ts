@@ -2,7 +2,7 @@ import type {
   I_foundationTypographyHeading,
   I_foundationTypographyHelper,
   I_foundationTypographyWeight
-} from '../FoundationTextList.types'
+} from 'app/types/I_foundationCatalogues'
 
 /**
  * Quasar typography scale (text-h*, subtitle, body, caption, overline).

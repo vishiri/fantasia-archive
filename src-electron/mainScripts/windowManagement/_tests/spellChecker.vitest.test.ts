@@ -1,7 +1,7 @@
 import type { BrowserWindow } from 'electron'
 import { beforeEach, expect, test, vi } from 'vitest'
 
-import type { T_faUserSettingsLanguageCode } from 'app/types/T_faUserSettingsLanguageCode'
+import type { T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 
 import L_spellChecker_de from 'app/i18n/de/globalFunctionality/L_spellChecker'
 import L_spellChecker_enUS from 'app/i18n/en-US/globalFunctionality/L_spellChecker'

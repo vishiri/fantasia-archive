@@ -12,7 +12,7 @@ import {
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import { PROGRAM_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogProgramSettings/_data/programSettingsOptions'
-import type { T_dialogName } from 'app/types/T_dialogList'
+import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 
 import { buildExpectedProgramSettingsTreeFromEnUsMessages } from './DialogProgramSettings.playwright.expectations'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'

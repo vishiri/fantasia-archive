@@ -6,7 +6,9 @@ import L_tools from './components/globals/AppControlMenus/L_tools'
 import L_socialContactButtons from './components/other/SocialContactButtons/L_socialContactButtons'
 
 import L_aboutFantasiaArchive from './dialogs/L_aboutFantasiaArchive'
+import L_dialogKeybindSettings from './dialogs/L_dialogKeybindSettings'
 
+import L_faKeybinds from './globalFunctionality/L_faKeybinds'
 import L_faUserSettings from './globalFunctionality/L_faUserSettings'
 import L_spellChecker from './globalFunctionality/L_spellChecker'
 
@@ -26,7 +28,8 @@ export default {
 
   // DIALOGS
   dialogs: {
-    aboutFantasiaArchive: L_aboutFantasiaArchive
+    aboutFantasiaArchive: L_aboutFantasiaArchive,
+    keybindSettings: L_dialogKeybindSettings
   },
 
   // COMPONENT - GLOBAL LANGUAGE SELECTOR
@@ -50,6 +53,7 @@ export default {
 
   // GLOBAL FUNCTIONALITY
   globalFunctionality: {
+    faKeybinds: L_faKeybinds,
     faUserSettings: L_faUserSettings,
     spellChecker: L_spellChecker
   }

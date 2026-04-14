@@ -26,7 +26,6 @@ export const vitestCoverageBaseExclude = [
   '**/coverage/**',
   '**/*.vitest.test.ts',
   '**/*.d.ts',
-  '**/*.types.ts',
   '**/e2e-tests/**',
   '**/.storybook-workspace/**',
   '**/storybook-static/**',

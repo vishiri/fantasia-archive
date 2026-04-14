@@ -12,6 +12,7 @@ import { extraEnvVariablesAPI } from 'app/src-electron/contentBridgeAPIs/extraEn
 import { faDevToolsControlAPI } from 'app/src-electron/contentBridgeAPIs/faDevToolsControlAPI'
 import { faExternalLinksManagerAPI } from 'app/src-electron/contentBridgeAPIs/faExternalLinksManagerAPI'
 import { appDetailsAPI } from './contentBridgeAPIs/appDetailsAPI'
+import { faKeybindsAPI } from 'app/src-electron/contentBridgeAPIs/faKeybindsAPI'
 import { faUserSettingsAPI } from './contentBridgeAPIs/faUserSettingsAPI'
 
 /*
@@ -25,6 +26,7 @@ const apiObject = {
   faExternalLinksManager: { ...faExternalLinksManagerAPI },
   extraEnvVariables: { ...extraEnvVariablesAPI },
   appDetails: { ...appDetailsAPI },
+  faKeybinds: { ...faKeybindsAPI },
   faUserSettings: { ...faUserSettingsAPI }
 }
 

@@ -1,4 +1,4 @@
-import type { I_faUserSettings } from 'app/types/I_faUserSettings'
+import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 
 export const FA_USER_SETTINGS_DEFAULTS: I_faUserSettings = {
   aggressiveRelationshipFilter: false,

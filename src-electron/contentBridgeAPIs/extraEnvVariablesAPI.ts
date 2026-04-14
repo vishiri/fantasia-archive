@@ -4,7 +4,7 @@ import { FA_EXTRA_ENV_IPC } from 'app/src-electron/electron-ipc-bridge'
 import type {
   I_extraEnvVariablesAPI,
   I_extraEnvVariablesBridge
-} from 'app/types/I_extraEnvVariablesAPI'
+} from 'app/types/I_faElectronRendererBridgeAPIs'
 
 let cachedSnapshot: I_extraEnvVariablesAPI | null = null
 let snapshotPromise: Promise<I_extraEnvVariablesAPI> | null = null

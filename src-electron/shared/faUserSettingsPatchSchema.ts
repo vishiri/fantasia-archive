@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
-import type { I_faUserSettings } from 'app/types/I_faUserSettings'
+import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 
 const faUserSettingsLanguageCodeSchema = z.enum(['en-US', 'fr', 'de'])
 

@@ -7,13 +7,15 @@ import L_project from 'app/i18n/en-US/components/globals/AppControlMenus/L_proje
 import L_tools from 'app/i18n/en-US/components/globals/AppControlMenus/L_tools'
 import L_socialContactButtons from 'app/i18n/en-US/components/other/SocialContactButtons/L_socialContactButtons'
 import L_aboutFantasiaArchive from 'app/i18n/en-US/dialogs/L_aboutFantasiaArchive'
+import L_dialogKeybindSettings from 'app/i18n/en-US/dialogs/L_dialogKeybindSettings'
 import L_programSettings from 'app/i18n/en-US/dialogs/L_programSettings'
+import L_faKeybinds from 'app/i18n/en-US/globalFunctionality/L_faKeybinds'
 import L_faUserSettings from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
 import L_unsortedAppTexts from 'app/i18n/en-US/globalFunctionality/L_unsortedAppTexts'
 import L_ErrorNotFound from 'app/i18n/en-US/pages/L_ErrorNotFound'
 import { ref } from 'vue'
 
-import type { T_i18nScenario } from './externalFileLoader.types'
+import type { T_i18nScenario } from 'app/types/I_storybookWorkspaceHarness'
 
 /**
  * Mirrors vue-i18n Composer 'locale' so components and helpers that read
@@ -26,6 +28,7 @@ const defaultMessages: Record<string, unknown> = {
   errorNotFound: L_ErrorNotFound,
   dialogs: {
     aboutFantasiaArchive: L_aboutFantasiaArchive,
+    keybindSettings: L_dialogKeybindSettings,
     programSettings: L_programSettings
   },
   globalLanguageSelector: L_GlobalLanguageSelector,
@@ -39,6 +42,7 @@ const defaultMessages: Record<string, unknown> = {
   socialContactButtons: L_socialContactButtons,
   fantasiaMascotImage: L_FantasiaMascotImage,
   globalFunctionality: {
+    faKeybinds: L_faKeybinds,
     faUserSettings: L_faUserSettings,
     unsortedAppTexts: L_unsortedAppTexts
   },

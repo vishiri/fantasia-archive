@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { T_programSettingsRenderTree } from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
+import type { T_programSettingsRenderTree } from 'app/types/I_dialogProgramSettings'
 import DialogProgramSettingsCategoryPanel from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettingsCategoryPanel.vue'
 import ErrorCard from 'src/components/elements/ErrorCard/ErrorCard.vue'
-import { showNonLastTopCategorySeparator } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsHelpers'
+import { showNonLastTopCategorySeparator } from 'app/src/components/dialogs/DialogProgramSettings/scripts/dialogProgramSettingsSearch'
 
 defineProps<{
   hasActiveSearchQuery: boolean

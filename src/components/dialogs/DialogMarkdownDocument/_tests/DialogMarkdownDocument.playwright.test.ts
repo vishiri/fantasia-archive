@@ -12,7 +12,7 @@ import {
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
-import type { T_documentName } from 'app/types/T_documentList'
+import type { T_documentName } from 'app/types/T_appDialogsAndDocuments'
 
 /**
  * Extra env settings to trigger component testing via Playwright

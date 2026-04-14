@@ -82,3 +82,23 @@ test('Test that S_DialogMarkdown generateDialogUUID overwrites dialogUUID on eac
   S_DialogMarkdown.generateDialogUUID()
   expect(S_DialogMarkdown.dialogUUID).toBe('uuid-second')
 })
+
+test('Test that S_DialogMarkdown open count visible and hidden stay non-negative', () => {
+  expect(S_DialogMarkdown.markdownDialogOpenCount).toBe(0)
+  S_DialogMarkdown.onMarkdownDialogBecameVisible()
+  expect(S_DialogMarkdown.markdownDialogOpenCount).toBe(1)
+  S_DialogMarkdown.onMarkdownDialogBecameHidden()
+  expect(S_DialogMarkdown.markdownDialogOpenCount).toBe(0)
+  S_DialogMarkdown.onMarkdownDialogBecameHidden()
+  expect(S_DialogMarkdown.markdownDialogOpenCount).toBe(0)
+})
+
+test('Test that S_DialogComponent open count visible and hidden stay non-negative', () => {
+  expect(S_DialogComponent.componentDialogOpenCount).toBe(0)
+  S_DialogComponent.onComponentDialogBecameVisible()
+  expect(S_DialogComponent.componentDialogOpenCount).toBe(1)
+  S_DialogComponent.onComponentDialogBecameHidden()
+  expect(S_DialogComponent.componentDialogOpenCount).toBe(0)
+  S_DialogComponent.onComponentDialogBecameHidden()
+  expect(S_DialogComponent.componentDialogOpenCount).toBe(0)
+})

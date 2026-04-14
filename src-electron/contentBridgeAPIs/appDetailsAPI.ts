@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron'
 
 import { FA_APP_DETAILS_IPC } from 'app/src-electron/electron-ipc-bridge'
-import type { I_appDetailsAPI } from 'app/types/I_appDetailsAPI'
+import type { I_appDetailsAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
 
 let versionPromise: Promise<string> | null = null
 

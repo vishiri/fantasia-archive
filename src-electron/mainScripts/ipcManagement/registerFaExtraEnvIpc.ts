@@ -3,7 +3,7 @@ import { ipcMain } from 'electron'
 import { FA_EXTRA_ENV_IPC } from 'app/src-electron/electron-ipc-bridge'
 import { resolveFaElectronMainJsPath } from 'app/src-electron/mainScripts/windowManagement/resolveFaElectronMainJsPath'
 import { FA_FRONTEND_RENDER_TIMER_MS } from 'app/src-electron/shared/faFrontendRenderTimerMs'
-import type { I_extraEnvVariablesAPI } from 'app/types/I_extraEnvVariablesAPI'
+import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
 
 let registered = false
 

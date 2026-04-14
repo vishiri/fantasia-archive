@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { I_programCategoryRenderItem } from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
+import type { I_programCategoryRenderItem } from 'app/types/I_dialogProgramSettings'
 import DialogProgramSettingsSettingBlock from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettingsSettingBlock.vue'
-import { showNonLastSeparator } from 'app/src/components/dialogs/DialogProgramSettings/scripts/programSettingsHelpers'
+import { showNonLastSeparator } from 'app/src/components/dialogs/DialogProgramSettings/scripts/dialogProgramSettingsSearch'
 
 defineProps<{
   category: I_programCategoryRenderItem

@@ -18,6 +18,12 @@ export const FA_USER_SETTINGS_IPC = {
   setAsync: 'fa-user-settings-set-async'
 } as const
 
+/** Keybind overrides ('electron-store' in main): preload uses async 'ipcRenderer.invoke'; main uses 'ipcMain.handle'. */
+export const FA_KEYBINDS_IPC = {
+  getAsync: 'fa-keybinds-get-async',
+  setAsync: 'fa-keybinds-set-async'
+} as const
+
 /** Window chrome: preload uses 'ipcRenderer.invoke'; main uses 'ipcMain.handle'. */
 export const FA_WINDOW_CONTROL_IPC = {
   checkMaximizedAsync: 'fa-window-control-check-maximized-async',

@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { ref } from 'vue'
 import { afterEach, beforeEach, vi } from 'vitest'
 
+import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/isFantasiaStorybookCanvas'
 
@@ -95,6 +96,13 @@ function resetFaVitestRendererHarness (): void {
     faUserSettings: {
       getSettings: vi.fn(async () => ({ ...FA_USER_SETTINGS_DEFAULTS })),
       setSettings: vi.fn(async () => {})
+    },
+    faKeybinds: {
+      getKeybinds: vi.fn(async () => ({
+        platform: 'win32' as const,
+        store: { ...FA_KEYBINDS_STORE_DEFAULTS }
+      })),
+      setKeybinds: vi.fn(async () => undefined)
     }
   }
 }

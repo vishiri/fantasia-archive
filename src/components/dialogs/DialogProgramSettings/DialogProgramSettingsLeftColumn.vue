@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { T_programSettingsRenderTree } from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
+import type { T_programSettingsRenderTree } from 'app/types/I_dialogProgramSettings'
 
 const props = defineProps<{
   hasActiveSearchQuery: boolean

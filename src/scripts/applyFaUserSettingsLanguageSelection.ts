@@ -1,5 +1,5 @@
-import type { I_faUserSettings } from 'app/types/I_faUserSettings'
-import type { T_faUserSettingsLanguageCode } from 'app/types/T_faUserSettingsLanguageCode'
+import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
+import type { T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 
 /**
  * Persists a new interface language via the user-settings store.

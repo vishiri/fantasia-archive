@@ -13,7 +13,7 @@ import {
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import L_socialContactButtons from 'app/i18n/en-US/components/other/SocialContactButtons/L_socialContactButtons'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
-import type { T_dialogName } from 'app/types/T_dialogList'
+import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 
 /**
  * Extra env settings to trigger component testing via Playwright

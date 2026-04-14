@@ -2,7 +2,7 @@ import { vi, expect, test, beforeEach } from 'vitest'
 import { ZodError } from 'zod'
 
 import { FA_USER_SETTINGS_IPC } from 'app/src-electron/electron-ipc-bridge'
-import type { I_faUserSettings } from 'app/types/I_faUserSettings'
+import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 
 import { FA_USER_SETTINGS_DEFAULTS } from '../../userSettings/faUserSettingsDefaults'
 

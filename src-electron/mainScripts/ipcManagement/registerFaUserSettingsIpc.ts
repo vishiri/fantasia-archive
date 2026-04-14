@@ -5,7 +5,7 @@ import { applyFaSpellCheckerLanguagesToSession } from 'app/src-electron/mainScri
 import { appWindow } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
 import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
 import { parseFaUserSettingsPatch } from 'app/src-electron/shared/faUserSettingsPatchSchema'
-import type { I_faUserSettings } from 'app/types/I_faUserSettings'
+import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 
 let registered = false
 

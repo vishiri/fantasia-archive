@@ -263,5 +263,38 @@ $socialContactSingleButton-text-marginLeft: 10px;
 $socialContactSingleButton-variant-fontSize-compact: 15px;
 $socialContactSingleButton-website-borderWidth: 3px;
 
+/* COMPONENT - DIALOG KEYBIND SETTINGS */
+$dialogKeybindSettings-card-maxWidthViewportSubtract: 48px;
+$dialogKeybindSettings-card-width: 1200px;
+
+/* COMPONENT - DIALOG KEYBIND SETTINGS (CAPTURE POPUP) */
+$dialogKeybindSettingsCapture-actionBtn-minWidth: 140px;
+$dialogKeybindSettingsCapture-actionBtn-padding: 10px 18px;
+$dialogKeybindSettingsCapture-actions-marginTop: 8px;
+$dialogKeybindSettingsCapture-actions-padding: 16px 0 0;
+$dialogKeybindSettingsCapture-card-minWidth: 520px;
+$dialogKeybindSettingsCapture-card-padding: 28px 36px 8px;
+$dialogKeybindSettingsCapture-cardBackground: $accent;
+$dialogKeybindSettingsCapture-closeButton-inset: 4px;
+$dialogKeybindSettingsCapture-fieldAppend-top: 5px;
+$dialogKeybindSettingsCapture-fieldLabel-marginTop: 7px;
+$dialogKeybindSettingsCapture-fieldRow-marginTop: 20px;
+$dialogKeybindSettingsCapture-helpIcon-marginLeft: 10px;
+$dialogKeybindSettingsCapture-helpIcon-top: 4px;
+$dialogKeybindSettingsCapture-keybindUpdateField-maxWidth: 550px;
+$dialogKeybindSettingsCapture-keybindUpdateField-padding: 40px;
+$dialogKeybindSettingsCapture-text: $dark;
+$dialogKeybindSettingsCapture-title-fontSize: 1.15rem;
+$dialogKeybindSettingsCapture-title-marginTop: 8px;
+$dialogKeybindSettingsCapture-title-paddingRight: 36px;
+$dialogKeybindSettingsCapture-titleText: $dark;
+$dialogKeybindSettingsCapture-tooltip-background: $white;
+$dialogKeybindSettingsCapture-tooltip-border: 1px solid $dark;
+$dialogKeybindSettingsCapture-tooltip-fontSize: 13px;
+$dialogKeybindSettingsCapture-tooltip-fontWeight: 600;
+$dialogKeybindSettingsCapture-tooltip-maxWidth: 340px;
+$dialogKeybindSettingsCapture-tooltip-padding: 12px 14px;
+$dialogKeybindSettingsCapture-tooltip-text: $dark;
+
 /* LAYOUT - MAIN LAYOUT */
 $mainLayout-appHeader-zIndex: 7000;

@@ -6,6 +6,7 @@ export default {
     massDeleteDocument: 'Mass delete documents',
     toggleTree: 'Toggle hierarchical tree',
     showNoteBoard: 'Show note board',
+    keybindSettings: 'Keybind settings',
     programSettings: 'Program settings'
   }
 }

@@ -1,7 +1,7 @@
 import { defineBoot } from '#q-app/wrappers'
 
 import { runAppStartupRouting } from 'app/src/scripts/appInfo/appStartupRouting'
-import type { I_extraEnvVariablesAPI } from 'app/types/I_extraEnvVariablesAPI'
+import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
 
 /**
  * Loads harness env from the Electron preload bridge before initial navigation, then runs startup routing.

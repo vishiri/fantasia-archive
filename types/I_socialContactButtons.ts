@@ -37,6 +37,9 @@ export interface I_socialContactButton {
 
 }
 
+/**
+ * Full set of social/contact buttons rendered on the welcome screen and related chrome.
+ */
 export interface I_socialContactButtonSet {
   buttonPatreon: I_socialContactButton
   buttonKofi: I_socialContactButton

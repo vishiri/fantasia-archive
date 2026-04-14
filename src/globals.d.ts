@@ -1,9 +1,12 @@
-import type { I_extraEnvVariablesBridge } from 'app/types/I_extraEnvVariablesAPI'
-import type { I_faWindowControlAPI } from 'app/types/I_faWindowControlAPI'
-import type { I_faExternalLinksManagerAPI } from 'app/types/I_faExternalLinksManagerAPI'
-import type { I_faDevToolsControl } from 'app/types/I_faDevToolsControl'
-import type { I_appDetailsAPI } from 'app/types/I_appDetailsAPI'
-import type { I_faUserSettingsAPI } from 'app/types/I_faUserSettingsAPI'
+import type {
+  I_appDetailsAPI,
+  I_extraEnvVariablesBridge,
+  I_faDevToolsControl,
+  I_faExternalLinksManagerAPI,
+  I_faWindowControlAPI
+} from 'app/types/I_faElectronRendererBridgeAPIs'
+import type { I_faKeybindsAPI } from 'app/types/I_faKeybindsDomain'
+import type { I_faUserSettingsAPI } from 'app/types/I_faUserSettingsDomain'
 
 declare global{
   interface Window {
@@ -13,6 +16,7 @@ declare global{
       faExternalLinksManager: I_faExternalLinksManagerAPI,
       extraEnvVariables: I_extraEnvVariablesBridge
       appDetails: I_appDetailsAPI
+      faKeybinds: I_faKeybindsAPI
       faUserSettings: I_faUserSettingsAPI
     }
   }

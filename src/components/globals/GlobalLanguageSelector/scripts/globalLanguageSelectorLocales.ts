@@ -1,4 +1,4 @@
-import type { T_faUserSettingsLanguageCode } from 'app/types/T_faUserSettingsLanguageCode'
+import type { T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 
 export type T_globalLanguageSelectorLocaleRow = {
   code: T_faUserSettingsLanguageCode

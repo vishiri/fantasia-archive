@@ -1,6 +1,8 @@
 import { defineBoot } from '#q-app/wrappers'
 import axios from 'axios'
 
+import 'app/types/vueAxiosModuleAugmentation'
+
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;
 // If any client changes this (global) instance, it might be a

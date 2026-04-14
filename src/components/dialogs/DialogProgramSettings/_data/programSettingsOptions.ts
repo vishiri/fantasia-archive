@@ -1,5 +1,5 @@
-import type { I_faUserSettings } from 'app/types/I_faUserSettings'
-import type { I_programSettingOption } from './programSettingsOptions.types'
+import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
+import type { I_programSettingOption } from 'app/types/I_dialogProgramSettings'
 
 export const PROGRAM_SETTINGS_OPTIONS: Record<
 Exclude<keyof I_faUserSettings, 'languageCode'>,

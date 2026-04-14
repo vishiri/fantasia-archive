@@ -80,8 +80,8 @@
 </template>
 
 <script setup lang="ts">
-import type { I_faUserSettings } from 'app/types/I_faUserSettings'
-import type { T_dialogName } from 'app/types/T_dialogList'
+import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
+import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import DialogProgramSettingsLeftColumn from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettingsLeftColumn.vue'
 import DialogProgramSettingsPanelsColumn from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettingsPanelsColumn.vue'
 import { useDialogProgramSettings } from 'app/src/components/dialogs/DialogProgramSettings/scripts/useDialogProgramSettings'

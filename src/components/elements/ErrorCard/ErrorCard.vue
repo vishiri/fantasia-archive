@@ -38,7 +38,7 @@ import { computed } from 'vue'
 
 import FantasiaMascotImage from 'src/components/elements/FantasiaMascotImage/FantasiaMascotImage.vue'
 
-import type { T_errorCardImageName } from './ErrorCard.types'
+import type { T_errorCardImageName } from 'app/types/T_errorCardImage'
 
 const props = withDefaults(
   defineProps<{

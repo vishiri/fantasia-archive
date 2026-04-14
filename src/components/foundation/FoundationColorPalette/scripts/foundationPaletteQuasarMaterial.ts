@@ -1,4 +1,4 @@
-import type { I_foundationQuasarMaterialGroup } from '../FoundationColorPalette.types'
+import type { I_foundationQuasarMaterialGroup } from 'app/types/I_foundationCatalogues'
 
 /**
  * Root color names from the Quasar material palette (each has base plus -1 … -14).

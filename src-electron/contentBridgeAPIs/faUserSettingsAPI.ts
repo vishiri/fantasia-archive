@@ -1,8 +1,8 @@
 import { ipcRenderer } from 'electron'
 
 import { FA_USER_SETTINGS_IPC } from 'app/src-electron/electron-ipc-bridge'
-import type { I_faUserSettings } from 'app/types/I_faUserSettings'
-import type { I_faUserSettingsAPI } from 'app/types/I_faUserSettingsAPI'
+import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
+import type { I_faUserSettingsAPI } from 'app/types/I_faUserSettingsDomain'
 
 export const faUserSettingsAPI: I_faUserSettingsAPI = {
 

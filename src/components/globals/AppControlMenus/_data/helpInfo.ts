@@ -13,9 +13,6 @@ import { toggleDevTools } from 'app/src/scripts/appInfo/toggleDevTools'
 
 function buildHelpInfoMenuData (): I_appMenuItem[] {
   return [
-    faMenuItem('appControlMenus.helpInfo.items.showKeybindsCheatsheet', 'mdi-keyboard-settings', {
-      trigger: () => openDialogComponent('')
-    }),
     faMenuItem('appControlMenus.helpInfo.items.advancedSearchGuide', 'mdi-file-question', {
       trigger: () => openDialogMarkdownDocument('advancedSearchGuide')
     }),

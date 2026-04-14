@@ -4,7 +4,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { Notify } from 'quasar'
 
-import type { I_faUserSettings } from 'app/types/I_faUserSettings'
+import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
 import { applyFaI18nLocaleFromLanguageCode } from 'src/scripts/applyFaI18nLocaleFromLanguageCode'
 

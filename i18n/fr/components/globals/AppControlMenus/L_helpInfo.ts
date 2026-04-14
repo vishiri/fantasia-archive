@@ -1,7 +1,6 @@
 export default {
   title: 'Aide & Info',
   items: {
-    showKeybindsCheatsheet: 'Afficher l\'aide-mémoire des raccourcis clavier',
     advancedSearchGuide: 'Guide de recherche avancée',
     tipsTricksTrivia: 'Astuces, Conseils & Anecdotes',
     changelog: 'Journal des modifications',

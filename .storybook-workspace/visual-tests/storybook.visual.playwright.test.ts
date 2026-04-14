@@ -4,7 +4,7 @@ import {
   FANTASIA_STORYBOOK_VIEWPORT_HEIGHTS,
   FANTASIA_STORYBOOK_VIEWPORT_WIDTHS
 } from '../.storybook/viewportBreakpoints'
-import type { I_storybookIndex } from './storybook.visual.playwright.types'
+import type { I_storybookIndex } from 'app/types/I_storybookWorkspaceHarness'
 
 /**
  * Set FA_STORYBOOK_VISUAL_VERBOSE=1 (or 'true') to print per-story progress (Story count, Captured, Done).

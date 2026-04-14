@@ -32,33 +32,53 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 
+import { createFaKeybindKeydownHandler } from 'src/scripts/keybinds/faKeybindHandleKeydown'
+import { getFaKeybindKeydownContext } from 'src/scripts/keybinds/faKeybindKeydownContext'
 import { applyFaI18nLocaleFromLanguageCode } from 'src/scripts/applyFaI18nLocaleFromLanguageCode'
 import { isFantasiaStorybookCanvas } from 'src/scripts/isFantasiaStorybookCanvas'
 import { isFaUserSettingsLanguageCode } from 'src/scripts/isFaUserSettingsLanguageCode'
+import { S_FaKeybinds } from 'src/stores/S_FaKeybinds'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
 import AppControlMenus from 'components/globals/AppControlMenus/AppControlMenus.vue'
 import GlobalLanguageSelector from 'components/globals/GlobalLanguageSelector/GlobalLanguageSelector.vue'
 import GlobalWindowButtons from 'components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
 
+let faKeybindKeydownHandler: ((event: KeyboardEvent) => void) | undefined
+
 onMounted(async () => {
   if (isFantasiaStorybookCanvas()) {
     return
   }
 
-  if (process.env.MODE !== 'electron' || window.faContentBridgeAPIs?.faUserSettings === undefined) {
+  if (process.env.MODE !== 'electron') {
     return
   }
 
-  const faUserSettingsStore = S_FaUserSettings()
+  if (window.faContentBridgeAPIs?.faUserSettings !== undefined) {
+    const faUserSettingsStore = S_FaUserSettings()
 
-  await faUserSettingsStore.refreshSettings()
-  const code = faUserSettingsStore.settings?.languageCode
+    await faUserSettingsStore.refreshSettings()
+    const code = faUserSettingsStore.settings?.languageCode
 
-  if (code !== undefined && isFaUserSettingsLanguageCode(code)) {
-    applyFaI18nLocaleFromLanguageCode(code)
+    if (code !== undefined && isFaUserSettingsLanguageCode(code)) {
+      applyFaI18nLocaleFromLanguageCode(code)
+    }
+  }
+
+  if (window.faContentBridgeAPIs?.faKeybinds !== undefined) {
+    const faKeybindsStore = S_FaKeybinds()
+    await faKeybindsStore.refreshKeybinds()
+    faKeybindKeydownHandler = createFaKeybindKeydownHandler(getFaKeybindKeydownContext)
+    window.addEventListener('keydown', faKeybindKeydownHandler, true)
+  }
+})
+
+onUnmounted(() => {
+  if (faKeybindKeydownHandler !== undefined) {
+    window.removeEventListener('keydown', faKeybindKeydownHandler, true)
   }
 })
 

@@ -1,4 +1,4 @@
-import type { T_faUserSettingsLanguageCode } from 'app/types/T_faUserSettingsLanguageCode'
+import type { T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 
 const CANDIDATES_BY_CODE: Record<T_faUserSettingsLanguageCode, readonly string[]> = {
   de: ['de', 'de-DE'],

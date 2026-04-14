@@ -6,6 +6,7 @@ export default {
     massDeleteDocument: 'Suppression en masse de documents',
     toggleTree: 'Basculer l\'arborescence hiérarchique',
     showNoteBoard: 'Afficher le tableau de notes',
+    keybindSettings: 'Paramètres des raccourcis',
     programSettings: 'Paramètres du programme'
   }
 }

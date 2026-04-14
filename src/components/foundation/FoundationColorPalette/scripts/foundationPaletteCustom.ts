@@ -1,4 +1,4 @@
-import type { I_foundationCustomSwatch } from '../FoundationColorPalette.types'
+import type { I_foundationCustomSwatch } from 'app/types/I_foundationCatalogues'
 
 /**
  * Mirrors the QUASAR COLORS - GENERAL block in src/css/quasar.variables.scss.

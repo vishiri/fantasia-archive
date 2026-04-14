@@ -43,8 +43,9 @@
 <script setup lang="ts">
 import { QMarkdown } from '@quasar/quasar-ui-qmarkdown'
 import '@quasar/quasar-ui-qmarkdown/dist/index.css'
-import type { T_documentName } from 'app/types/T_documentList'
+import type { T_documentName } from 'app/types/T_appDialogsAndDocuments'
 import { i18n } from 'app/i18n/externalFileLoader'
+import { registerDialogMarkdownDocumentOpenLease } from 'app/src/scripts/appInfo/registerDialogMarkdownDocumentOpenLease'
 import { S_DialogMarkdown } from 'src/stores/S_Dialog'
 import { computed, onMounted, ref, watch } from 'vue'
 import type { StoreGeneric } from 'pinia'
@@ -71,6 +72,8 @@ const props = defineProps<{
  * Model for the current popup dialog
  */
 const dialogModel = ref(false)
+
+registerDialogMarkdownDocumentOpenLease(dialogModel)
 
 /**
  * Name of the document shown inside the dialog

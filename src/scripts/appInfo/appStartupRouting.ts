@@ -1,5 +1,5 @@
 import { tipsTricksTriviaNotification } from './tipsTricksTriviaNotification'
-import type { I_appStartupRouter } from './appStartupRouting.types'
+import type { I_appStartupRouter } from 'app/types/I_appStartupRouter'
 
 /**
  * Determines if component testing route should be used.

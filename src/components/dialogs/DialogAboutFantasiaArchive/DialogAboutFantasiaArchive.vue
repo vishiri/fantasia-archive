@@ -48,7 +48,8 @@
 </template>
 
 <script setup lang="ts">
-import type { T_dialogName } from 'app/types/T_dialogList'
+import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
+import { registerDialogComponentOpenLease } from 'app/src/scripts/appInfo/registerDialogComponentOpenLease'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { onMounted, ref, watch } from 'vue'
 import SocialContactButtons from '../../other/SocialContactButtons/SocialContactButtons.vue'
@@ -76,6 +77,8 @@ const props = defineProps<{
  * Model for the current popup dialog
  */
 const dialogModel = ref(false)
+
+registerDialogComponentOpenLease(dialogModel)
 
 /**
  * Name of the document shown inside the dialog

@@ -8,6 +8,7 @@ const {
   registerFaDevToolsIpcMock,
   registerFaExtraEnvIpcMock,
   registerFaExternalLinksIpcMock,
+  registerFaKeybindsIpcMock,
   registerFaUserSettingsIpcMock,
   registerFaWindowControlIpcMock,
   appMock,
@@ -21,6 +22,7 @@ const {
     registerFaDevToolsIpcMock: vi.fn(),
     registerFaExtraEnvIpcMock: vi.fn(),
     registerFaExternalLinksIpcMock: vi.fn(),
+    registerFaKeybindsIpcMock: vi.fn(),
     registerFaUserSettingsIpcMock: vi.fn(),
     registerFaWindowControlIpcMock: vi.fn(),
     appOnHandlers: handlers,
@@ -58,6 +60,12 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaExternalLinksIpc',
   }
 })
 
+vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaKeybindsIpc', () => {
+  return {
+    registerFaKeybindsIpc: registerFaKeybindsIpcMock
+  }
+})
+
 vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaUserSettingsIpc', () => {
   return {
     registerFaUserSettingsIpc: registerFaUserSettingsIpcMock
@@ -82,6 +90,12 @@ vi.mock('app/src-electron/mainScripts/userSettings/userSettingsStore', () => {
   }
 })
 
+vi.mock('app/src-electron/mainScripts/keybinds/faKeybindsStore', () => {
+  return {
+    getFaKeybinds: vi.fn()
+  }
+})
+
 vi.mock('electron', () => {
   return {
     app: appMock
@@ -99,6 +113,7 @@ beforeEach(() => {
   registerFaDevToolsIpcMock.mockReset()
   registerFaExtraEnvIpcMock.mockReset()
   registerFaExternalLinksIpcMock.mockReset()
+  registerFaKeybindsIpcMock.mockReset()
   registerFaUserSettingsIpcMock.mockReset()
   registerFaWindowControlIpcMock.mockReset()
   appMock.whenReady.mockClear()
@@ -118,6 +133,7 @@ test('Test that the electron app properly starts', () => {
   expect(registerFaDevToolsIpcMock).toHaveBeenCalledOnce()
   expect(registerFaExtraEnvIpcMock).toHaveBeenCalledOnce()
   expect(registerFaExternalLinksIpcMock).toHaveBeenCalledOnce()
+  expect(registerFaKeybindsIpcMock).toHaveBeenCalledOnce()
   expect(registerFaUserSettingsIpcMock).toHaveBeenCalledOnce()
   expect(registerFaWindowControlIpcMock).toHaveBeenCalledOnce()
   expect(registerFaAppDetailsIpcMock).toHaveBeenCalledOnce()

@@ -1,9 +1,10 @@
+import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 
-import type { I_extraEnvVariablesAPI } from 'app/types/I_extraEnvVariablesAPI'
-import type { I_extraEnvVariablesBridge } from 'app/types/I_extraEnvVariablesAPI'
+import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
+import type { I_extraEnvVariablesBridge } from 'app/types/I_faElectronRendererBridgeAPIs'
 
-import type { T_contentBridgeScenario } from './contentBridge.types'
+import type { T_contentBridgeScenario } from 'app/types/I_storybookWorkspaceHarness'
 
 const defaultExtraEnvSnapshot: I_extraEnvVariablesAPI = {
   COMPONENT_NAME: undefined,
@@ -60,6 +61,13 @@ const baseBridge = () => ({
   faUserSettings: {
     getSettings: async () => ({ ...FA_USER_SETTINGS_DEFAULTS }),
     setSettings: async () => undefined
+  },
+  faKeybinds: {
+    getKeybinds: async () => ({
+      platform: 'win32' as const,
+      store: { ...FA_KEYBINDS_STORE_DEFAULTS }
+    }),
+    setKeybinds: async () => undefined
   }
 })
 
@@ -109,6 +117,10 @@ export const setContentBridgeScenario = (
     faUserSettings: {
       ...nextBridge.faUserSettings,
       ...(overrides.faUserSettings ?? {})
+    },
+    faKeybinds: {
+      ...nextBridge.faKeybinds,
+      ...(overrides.faKeybinds ?? {})
     }
   }
 }

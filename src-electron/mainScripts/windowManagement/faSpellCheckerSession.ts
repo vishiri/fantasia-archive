@@ -1,7 +1,7 @@
 import type { Session } from 'electron'
 
 import { resolveFaSpellCheckerLanguageTag } from 'app/src-electron/shared/resolveFaSpellCheckerLanguageTag'
-import type { T_faUserSettingsLanguageCode } from 'app/types/T_faUserSettingsLanguageCode'
+import type { T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 
 /**
  * Disables spellcheck, clears the previous dictionary list (needed so English does not stay active

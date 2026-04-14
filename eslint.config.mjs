@@ -22,7 +22,6 @@ const codeSizeRuleIgnores = [
   '**/eslint.config.mjs',
   '**/commitlint.config.mjs',
   'i18n/**/*.ts',
-  '**/*.types.ts',
   'types/**/*.ts',
   '**/*.d.ts',
   'vitest/**/*.mts',

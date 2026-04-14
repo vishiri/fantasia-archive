@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron'
 
 import { FA_DEVTOOLS_IPC } from 'app/src-electron/electron-ipc-bridge'
-import type { I_faDevToolsControl } from 'app/types/I_faDevToolsControl'
+import type { I_faDevToolsControl } from 'app/types/I_faElectronRendererBridgeAPIs'
 
 export const faDevToolsControlAPI: I_faDevToolsControl = {
   async checkDevToolsStatus () {

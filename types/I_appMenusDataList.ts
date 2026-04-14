@@ -1,3 +1,6 @@
+/**
+ * App chrome menu models: top-level menu buttons, nested items, separators, and click triggers.
+ */
 export type T_menuItemMode = 'separator' | 'item'
 
 export type T_menuItemTrigger = (...args: unknown[]) => unknown | void

@@ -3,8 +3,10 @@ import { registerFaAppDetailsIpc } from 'app/src-electron/mainScripts/ipcManagem
 import { registerFaDevToolsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaDevToolsIpc'
 import { registerFaExtraEnvIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaExtraEnvIpc'
 import { registerFaExternalLinksIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaExternalLinksIpc'
+import { registerFaKeybindsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaKeybindsIpc'
 import { registerFaUserSettingsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaUserSettingsIpc'
 import { registerFaWindowControlIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
+import { getFaKeybinds } from 'app/src-electron/mainScripts/keybinds/faKeybindsStore'
 import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
 import { app } from 'electron'
 
@@ -13,6 +15,7 @@ export const startApp = () => {
   registerFaDevToolsIpc()
   registerFaExtraEnvIpc()
   registerFaExternalLinksIpc()
+  registerFaKeybindsIpc()
   registerFaUserSettingsIpc()
   registerFaWindowControlIpc()
   registerFaAppDetailsIpc()
@@ -22,6 +25,7 @@ export const startApp = () => {
 export const openAppWindowManager = () => {
   // Create the app window in the normal way
   app.whenReady().then(() => {
+    getFaKeybinds()
     getFaUserSettings()
     void mainWindowCreation()
   })

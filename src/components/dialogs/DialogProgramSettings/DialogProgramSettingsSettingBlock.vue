@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { I_programSettingRenderItem } from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.types'
+import type { I_programSettingRenderItem } from 'app/types/I_dialogProgramSettings'
 import { computed } from 'vue'
 
 const props = defineProps<{

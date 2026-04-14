@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-import type { T_faUserSettingsLanguageCode } from 'app/types/T_faUserSettingsLanguageCode'
+import type { T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 
 /**
  * Optional reload hint after a successful interface language change so users can refresh

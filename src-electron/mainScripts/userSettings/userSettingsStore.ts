@@ -1,5 +1,5 @@
 import ElectronStore from 'electron-store'
-import type { I_faUserSettings } from 'app/types/I_faUserSettings'
+import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 
 import { FA_USER_SETTINGS_DEFAULTS } from './faUserSettingsDefaults'
 

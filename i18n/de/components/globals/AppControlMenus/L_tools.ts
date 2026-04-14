@@ -6,6 +6,7 @@ export default {
     massDeleteDocument: 'Dokumente massenhaft löschen',
     toggleTree: 'Hierarchische Baumansicht ein/aus',
     showNoteBoard: 'Notiztafel anzeigen',
+    keybindSettings: 'Tastenkürzel-Einstellungen',
     programSettings: 'Programmeinstellungen'
   }
 }
