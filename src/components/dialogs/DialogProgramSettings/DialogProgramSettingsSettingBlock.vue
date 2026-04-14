@@ -1,31 +1,3 @@
-<script setup lang="ts">
-import type { I_programSettingRenderItem } from 'app/types/I_dialogProgramSettings'
-import { computed } from 'vue'
-
-const props = defineProps<{
-  displayMode: 'tab' | 'search'
-  setting: I_programSettingRenderItem
-  settingKey: string
-}>()
-
-const emit = defineEmits<{
-  'update-setting': [key: string, value: boolean]
-}>()
-
-const settingLocator = computed(() => {
-  const base = props.displayMode === 'tab' ? 'dialogProgramSettings-setting' : 'dialogProgramSettings-search-setting'
-  return `${base}-${props.settingKey}`
-})
-
-const labelLocator = computed(() =>
-  props.displayMode === 'tab' ? 'dialogProgramSettings-settingLabel' : 'dialogProgramSettings-search-settingLabel'
-)
-
-function onToggle (value: boolean): void {
-  emit('update-setting', props.settingKey, value)
-}
-</script>
-
 <template>
   <div
     class="col-12 col-sm-6 col-lg-4"
@@ -71,6 +43,34 @@ function onToggle (value: boolean): void {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { I_programSettingRenderItem } from 'app/types/I_dialogProgramSettings'
+import { computed } from 'vue'
+
+const props = defineProps<{
+  displayMode: 'tab' | 'search'
+  setting: I_programSettingRenderItem
+  settingKey: string
+}>()
+
+const emit = defineEmits<{
+  'update-setting': [key: string, value: boolean]
+}>()
+
+const settingLocator = computed(() => {
+  const base = props.displayMode === 'tab' ? 'dialogProgramSettings-setting' : 'dialogProgramSettings-search-setting'
+  return `${base}-${props.settingKey}`
+})
+
+const labelLocator = computed(() =>
+  props.displayMode === 'tab' ? 'dialogProgramSettings-settingLabel' : 'dialogProgramSettings-search-settingLabel'
+)
+
+function onToggle (value: boolean): void {
+  emit('update-setting', props.settingKey, value)
+}
+</script>
 
 <style lang="scss" scoped>
 .dialogProgramSettings__settingTitle {

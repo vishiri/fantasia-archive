@@ -1,27 +1,3 @@
-<script setup lang="ts">
-import type { I_programCategoryRenderItem } from 'app/types/I_dialogProgramSettings'
-import DialogProgramSettingsSettingBlock from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettingsSettingBlock.vue'
-import { showNonLastSeparator } from 'app/src/components/dialogs/DialogProgramSettings/scripts/dialogProgramSettingsSearch'
-
-defineProps<{
-  category: I_programCategoryRenderItem
-  categoryKey: string
-  displayMode: 'tab' | 'search'
-}>()
-
-const emit = defineEmits<{
-  'update-setting': [key: string, value: boolean]
-}>()
-
-function categoryTitleLocator (mode: 'tab' | 'search'): string {
-  return mode === 'tab' ? 'dialogProgramSettings-categoryTitle' : 'dialogProgramSettings-search-categoryTitle'
-}
-
-function subCategoryTitleLocator (mode: 'tab' | 'search'): string {
-  return mode === 'tab' ? 'dialogProgramSettings-subcategoryTitle' : 'dialogProgramSettings-search-subcategoryTitle'
-}
-</script>
-
 <template>
   <div
     class="dialogProgramSettings__category"
@@ -73,6 +49,30 @@ function subCategoryTitleLocator (mode: 'tab' | 'search'): string {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { I_programCategoryRenderItem } from 'app/types/I_dialogProgramSettings'
+import DialogProgramSettingsSettingBlock from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettingsSettingBlock.vue'
+import { showNonLastSeparator } from 'app/src/components/dialogs/DialogProgramSettings/scripts/dialogProgramSettingsSearch'
+
+defineProps<{
+  category: I_programCategoryRenderItem
+  categoryKey: string
+  displayMode: 'tab' | 'search'
+}>()
+
+const emit = defineEmits<{
+  'update-setting': [key: string, value: boolean]
+}>()
+
+function categoryTitleLocator (mode: 'tab' | 'search'): string {
+  return mode === 'tab' ? 'dialogProgramSettings-categoryTitle' : 'dialogProgramSettings-search-categoryTitle'
+}
+
+function subCategoryTitleLocator (mode: 'tab' | 'search'): string {
+  return mode === 'tab' ? 'dialogProgramSettings-subcategoryTitle' : 'dialogProgramSettings-search-subcategoryTitle'
+}
+</script>
 
 <style lang="scss" scoped>
 .dialogProgramSettings__category {

@@ -6,6 +6,10 @@ alwaysApply: false
 
 # Vue and Quasar
 
+## Single-file component block order
+
+- In every **`.vue`** SFC, top-level blocks appear **only** in this order: **`<template>`** (markup), then **`<script>`** (or **`<script setup>`**), then **`<style>`** (one or more blocks). Do not place **`<script>`** or **`<style>`** above **`<template>`**, and do not put **`<style>`** between **`<template>`** and **`<script>`**. This applies to all Vue files in the repo (app, layouts, Storybook workspace).
+
 ## UI and framework
 
 - Use Vue 3 **Composition API** (`<script setup>`) consistent with existing components.

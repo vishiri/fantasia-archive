@@ -1,27 +1,3 @@
-<script setup lang="ts">
-import type { T_programSettingsRenderTree } from 'app/types/I_dialogProgramSettings'
-
-const props = defineProps<{
-  hasActiveSearchQuery: boolean
-  programSettingsTree: T_programSettingsRenderTree
-  searchSettingsQuery: string | null
-  selectedCategoryTab: string
-}>()
-
-const emit = defineEmits<{
-  'update:searchSettingsQuery': [value: string | null]
-  'update:selectedCategoryTab': [value: string]
-}>()
-
-function emitSearchQueryFromInput (value: string | number | null): void {
-  if (value === null || value === undefined) {
-    emit('update:searchSettingsQuery', null)
-    return
-  }
-  emit('update:searchSettingsQuery', String(value))
-}
-</script>
-
 <template>
   <!-- display:contents so search field and tabs stay flex children of the card body row (search absolute positioning matches pre-split layout). -->
   <div class="dialogProgramSettings__leftColumnRoot">
@@ -64,6 +40,30 @@ function emitSearchQueryFromInput (value: string | number | null): void {
     </q-tabs>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { T_programSettingsRenderTree } from 'app/types/I_dialogProgramSettings'
+
+const props = defineProps<{
+  hasActiveSearchQuery: boolean
+  programSettingsTree: T_programSettingsRenderTree
+  searchSettingsQuery: string | null
+  selectedCategoryTab: string
+}>()
+
+const emit = defineEmits<{
+  'update:searchSettingsQuery': [value: string | null]
+  'update:selectedCategoryTab': [value: string]
+}>()
+
+function emitSearchQueryFromInput (value: string | number | null): void {
+  if (value === null || value === undefined) {
+    emit('update:searchSettingsQuery', null)
+    return
+  }
+  emit('update:searchSettingsQuery', String(value))
+}
+</script>
 
 <style lang="scss" scoped>
 .dialogProgramSettings__leftColumnRoot {
