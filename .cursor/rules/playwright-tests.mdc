@@ -126,7 +126,7 @@ Each **`test(...)`** inside a serial suite:
 - Do not add Playwright (or other) tests whose **system under test** is a file under any **`_data/`** folder; assert behavior through `.vue` or other non-surface that uses that data.
 - For Storybook visual snapshot runs (`.storybook-workspace/visual-tests/storybook.visual.playwright.test.ts`), keep these utility Playwright-harness stories excluded because they are not meaningful visual-regression targets: `layouts-componenttestinglayout--with-social-contact-single-button`, `pages-componenttesting--social-contact-single-button`. Component story **`id`** values in **`index.json`** follow **`components-<bucket>-<componentfolder>-<story>`** (for example **`components-elements-fantasiamascotimage--reading`**) when **`meta.title`** is **`Components/<bucket>/<ComponentName>`** — match that shape in **`EXCLUDED_STORY_IDS`** when excluding harness-only component previews.
 
-## Local types extraction rule
+## TypeScript interfaces and types (`types/`)
 
-- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
 - For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

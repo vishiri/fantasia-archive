@@ -12,17 +12,20 @@ Vue SFCs import from here when extracting **pure helpers**; see [vue-quasar.mdc]
 
 - **`_utilities/`** — small, pure helpers (format conversion, parsing) with **JSDoc on each exported function** (`@param` / `@returns` where helpful), e.g. [colorFormatConvertors.ts](src/scripts/_utilities/colorFormatConvertors.ts).
 - **Feature folders** (e.g. `appInfo/`) — behavior tied to app features; keep files focused on one area.
+- **`keybinds/`** — global shortcut matching, chord helpers, and **`faKeybindRunCommand`**; wired from **`MainLayout.vue`** with state from **`S_FaKeybinds`**. When adding app-wide shortcuts, follow [fantasia-keybinds](../skills/fantasia-keybinds/SKILL.md).
 - Leading underscore on folder names like `_utilities` signals shared non-feature helpers.
 
 ## When to split a file
 
-**Hard limits** (ESLint; see [code-size-decomposition.mdc](code-size-decomposition.mdc)): each **`.ts` module under `src/scripts/`** must stay **≤200 lines** and each **function ≤50 lines** (tests and `*.types.ts` follow the global exemption list).
+**Hard limits** (ESLint; see [code-size-decomposition.mdc](code-size-decomposition.mdc)): each **`.ts` module under `src/scripts/`** must stay **≤200 lines** and each **function ≤50 lines** (tests follow the global exemption list; shared types live under **`types/`** and are exempt there).
 
 When a file grows hard to scan or approaches those caps:
 
 1. **Group by domain** — e.g. color helpers vs list/array helpers; avoid one mega `utils.ts`.
 2. **Move reusable pure functions** into `_utilities/` with clear names.
 3. **Keep Electron/renderer boundaries clear** — code that assumes `window` or `faContentBridgeAPIs` belongs next to the feature that uses it, not in generic utilities unless already established.
+
+**Do not over-split:** many tiny files (each exporting one small helper) are harder to navigate than one domain module that stays **under the line cap**. Prefer **merging** related exports into the same file until **200 lines** or **50 lines per function** forces a real split; see [code-size-decomposition.mdc](code-size-decomposition.mdc) **Module count: prefer logical grouping**.
 
 ## Style
 
@@ -32,7 +35,7 @@ When a file grows hard to scan or approaches those caps:
 - Unit tests are allowed and encouraged for `src/scripts/**` modules when colocated in neighboring `_tests/` folders (for example `src/scripts/_utilities/_tests/` and `src/scripts/appInfo/_tests/`) using `*.vitest.test.ts`.
 - Keep Playwright for UI integration flows; do not move renderer interaction coverage out of existing Playwright suites when those checks depend on built app behavior.
 
-## Local types extraction rule
+## TypeScript interfaces and types (`types/`)
 
-- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
 - For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

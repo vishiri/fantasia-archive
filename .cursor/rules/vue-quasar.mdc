@@ -16,6 +16,7 @@ alwaysApply: false
 - All top-level i18n keys use **camelCase with a lowercase first letter** (e.g. `globalWindowButtons`, `dialogs`, `errorNotFound`). Sub-keys follow the same convention.
 - To add new strings: place them in an `L_*.ts` locale file under the matching folder (`components/<ComponentName>/`, `dialogs/`, `pages/`, or `globalFunctionality/`), import it in `i18n/en-US/index.ts`, and assign it to a camelCase top-level key. Do not add hardcoded strings inline to `index.ts`. Uncategorised app-wide strings belong in `globalFunctionality/L_unsortedAppTexts.ts` under `globalFunctionality.unsortedAppTexts`.
 - In TypeScript scripts and Pinia stores (outside Vue templates), import `{ i18n } from 'app/i18n/externalFileLoader'` and call `i18n.global.t('camelCaseKey.subKey')`.
+- **Electron global shortcuts**: app-wide **`keydown`** dispatch is registered from **`MainLayout.vue`** (after **`S_FaKeybinds`** loads); definitions and matching live under **`src/scripts/keybinds/`**. Adding commands: [fantasia-keybinds skill](../skills/fantasia-keybinds/SKILL.md) and [AGENTS.md](../../AGENTS.md) **Global keyboard shortcuts (faKeybinds)**.
 - Storybook mocks: import specific non-markdown `L_*` locale modules directly — never the full `en-US/index.ts` — and provide placeholder strings for `documents.*` keys. See [fantasia-i18n skill](../skills/fantasia-i18n/SKILL.md).
 
 ## After UI changes
@@ -40,6 +41,7 @@ alwaysApply: false
 2. **Pure, reusable helpers** (no Vue instance, no template-specific state): move to **`src/scripts/`** and follow [typescript-scripts.mdc](typescript-scripts.mdc) (JSDoc, single responsibility per file).
 3. **Composable-style or feature-specific logic**: keep a dedicated module under `src/scripts/<feature>/` or next to the feature if that matches existing patterns; avoid unrelated exports in one file.
 4. **SFC and function size** — Follow [code-size-decomposition.mdc](code-size-decomposition.mdc): keep each **`.vue` at or under 250 lines**, each **function at or under 50 lines**, and avoid **TypeScript modules over 200 lines** (exemptions listed there). When limits force a split, place feature-owned logic **only** under **`src/components/<bucket>/<Feature>/scripts/`** (one or more `.ts` files) and/or add **subcomponents** in the same feature folder — **not** loose `.ts` beside the `.vue` at the feature root. Buckets are **`dialogs/`**, **`globals/`**, **`elements/`**, **`foundation/`**, **`other/`** (see [README](../../README.md)). External `<style>` files are a **last resort** and require **explicit user approval** before use. This `scripts/` folder is **not** a substitute for **`_data/`** (structured production payloads) or **`src/scripts/`** (shared app-wide helpers).
+   - **How many `scripts/*.ts` files:** prefer **fewer, larger modules** that group a whole concern (table + rows + columns, dialog wiring + suspend, capture pipeline + API shape) until a file nears **200 lines** or a function nears **50 lines**; **avoid** a large set of **10–20 line** files that only split for splitting’s sake. Same policy as [code-size-decomposition.mdc](code-size-decomposition.mdc) **Module count: prefer logical grouping**. Colocated **`scripts/_tests/*.vitest.test.ts`** can be consolidated when the production modules merge.
 
 ## Related rules (by concern)
 
@@ -50,7 +52,7 @@ alwaysApply: false
 | Global SCSS, Quasar variables | [project-scss.mdc](project-scss.mdc) |
 | Playwright test **files** | [playwright-tests.mdc](playwright-tests.mdc) |
 
-## Local types extraction rule
+## TypeScript interfaces and types (`types/`)
 
-- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
 - For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

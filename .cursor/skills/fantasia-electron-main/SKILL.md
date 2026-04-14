@@ -15,7 +15,7 @@ description: >-
 - **IPC style (async first)**: Prefer **`ipcMain.handle`** with **`ipcRenderer.invoke`** for preload-facing channels whenever the flow can be async. **`ipcRenderer.sendSync`** / blocking one-way IPC is **not forbidden** but is a **last resort** — avoid it if any remotely reasonable async design exists; document exceptions with a short comment near the handler or in review.
 - **`userData`**: `fixAppName()` in `appIdentity/fixAppName.ts` sets `app.setPath('userData', …)`. When `process.env.TEST_ENV` is `components` or `e2e`, `userData` is **`%APPDATA%/<package.json name>/playwright-user-data`** (stable; not under the `*-dev` folder used by `quasar dev` with `DEBUGGING`). The folder segment is `PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME` in `appIdentity/playwrightIsolatedUserDataDirName.ts` (re-exported from `fixAppName.ts` for Electron callers).
 - **Modular logic**: Prefer `src-electron/mainScripts/` feature folders — `appIdentity/`, `windowManagement/`, `chromiumFixes/`, `userSettings/`, `nativeShell/`, `ipcManagement/` — plus root `appManagement.ts`, over growing `electron-main.ts` indefinitely.
-- **IPC registration**: Shared channel strings live in `src-electron/electron-ipc-bridge.ts`. Main-process `ipcMain` handlers for preload-invoked channels belong in `mainScripts/ipcManagement/register*Ipc.ts` (e.g. `registerFaDevToolsIpc.ts`, `registerFaExtraEnvIpc.ts`, `registerFaExternalLinksIpc.ts`, `registerFaUserSettingsIpc.ts`, `registerFaWindowControlIpc.ts`, `registerFaAppDetailsIpc.ts`). Call those registrars from app startup (`startApp()` in `appManagement.ts` today) so preload and main always use the same names.
+- **IPC registration**: Shared channel strings live in `src-electron/electron-ipc-bridge.ts`. Main-process `ipcMain` handlers for preload-invoked channels belong in `mainScripts/ipcManagement/register*Ipc.ts` (e.g. `registerFaDevToolsIpc.ts`, `registerFaExtraEnvIpc.ts`, `registerFaExternalLinksIpc.ts`, `registerFaUserSettingsIpc.ts`, `registerFaWindowControlIpc.ts`, `registerFaAppDetailsIpc.ts`, `registerFaKeybindsIpc.ts` for **`FA_KEYBINDS_IPC`** and `mainScripts/keybinds/faKeybindsStore.ts`). Call those registrars from app startup (`startApp()` in `appManagement.ts` today) so preload and main always use the same names.
 
 ## IPC payload validation (Zod)
 
@@ -48,11 +48,15 @@ description: >-
 - Frameless window controls and read-only app version from main use **`ipcMain.handle`** in **`registerFaWindowControlIpc.ts`** and **`registerFaAppDetailsIpc.ts`**; preload uses **`ipcRenderer.invoke`** with channels from **`electron-ipc-bridge.ts`**. Handlers resolve **`BrowserWindow`** via **`BrowserWindow.fromWebContents(event.sender)`** so the correct window is targeted when focus moves to native menus.
 - **Preload path** (`windowManagement/mainWindowCreation.ts`): Resolve `electron-preload` and the window icon with `path.resolve(currentDir, …)` where `currentDir` is `dirname(fileURLToPath(import.meta.url))` for the **bundled main-process chunk** (Quasar emits one main bundle; nested source folders like `windowManagement/` do not appear in that path). Do **not** add an extra parent `..` assuming `currentDir` is a subfolder of `mainScripts/` — that breaks preload loading, skips `contextBridge`, and leaves `window.faContentBridgeAPIs` undefined (component tests fall back to `/` instead of `/componentTesting/...`).
 
+## Keybind persistence (`mainScripts/keybinds/`)
+
+- Global shortcut **overrides** persist in main (**`faKeybindsStore.ts`**, defaults, Zod patch schema under **`src-electron/shared/`**). **`registerFaKeybindsIpc.ts`** validates patches and reads/writes the store; preload **`faKeybindsAPI`** is the renderer entry. Adding commands or changing stored shapes: see [fantasia-keybinds](../fantasia-keybinds/SKILL.md).
+
 ## SQLite and files
 
 - Database experiments and temp paths currently use `app.getPath('userData')` and `_faProjectTemp/` (see `electron-main.ts`). For full DB design, follow [fantasia-sqlite-main](../fantasia-sqlite-main/SKILL.md).
 
-## Local types extraction rule
+## TypeScript interfaces and types (`types/`)
 
-- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
 - For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

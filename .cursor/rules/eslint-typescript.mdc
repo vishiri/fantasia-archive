@@ -26,7 +26,7 @@ In line comments, block comments, and JSDoc above APIs and tests: do not use Mar
 
 ## File and function size (ESLint)
 
-- **`eslint.config.mjs`** enforces **`max-lines`** and **`max-lines-per-function`** on production **`**/*.{ts,mts,cts,vue,js,mjs,cjs}`** with exemptions for tests, Storybook, configs, **`i18n/`**, **`**/*.types.ts`**, **`types/`**, declarations, **`vitest/**/*.mts`**, **`.storybook-workspace/**`**, and **`scripts/**/*.mjs`**. Targets: **Vue ≤250**, **TS/JS module ≤200**, **function ≤50** (see [code-size-decomposition.mdc](code-size-decomposition.mdc) for intent and split strategy).
+- **`eslint.config.mjs`** enforces **`max-lines`** and **`max-lines-per-function`** on production **`**/*.{ts,mts,cts,vue,js,mjs,cjs}`** with exemptions for tests, Storybook, configs, **`i18n/`**, **`types/`**, declarations, **`vitest/**/*.mts`**, **`.storybook-workspace/**`**, and **`scripts/**/*.mjs`**. Targets: **Vue ≤250**, **TS/JS module ≤200**, **function ≤50** (see [code-size-decomposition.mdc](code-size-decomposition.mdc) for intent and split strategy).
 
 ## Pre-commit / pre-changelog quality gate
 
@@ -49,7 +49,7 @@ Run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn tes
 
 ## vue-i18n boot augmentation (`src/boot/i18n.ts`)
 
-- **`declare module 'vue-i18n'`** for `DefineLocaleMessage` / formats can trigger **TS2665** under `tsc` because the package **`module`** entry resolves to an ESM bundle. The boot file uses **`@ts-expect-error`** with a short comment; keep **`eslint-disable @typescript-eslint/no-empty-object-type`** on that augmentation block (rule name in **typescript-eslint v8**).
+- **`declare module 'vue-i18n'`** for `DefineLocaleMessage` / formats can trigger **TS2665** under `tsc` because the package **`module`** entry resolves to an ESM bundle. The schema and augmentation live in **`types/vueI18nModuleAugmentation.ts`**; **`src/boot/i18n.ts`** side-effect-imports that module, re-exports **`MessageLanguages`** / **`MessageSchema`**, and may keep **`@ts-expect-error`** plus **`eslint-disable @typescript-eslint/no-empty-object-type`** on the boot block when required (rule name in **typescript-eslint v8**).
 
 ## Vitest env stubs
 
@@ -72,7 +72,7 @@ Run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn tes
 - [fantasia-dev-setup skill](../skills/fantasia-dev-setup/SKILL.md) — install, dev, troubleshooting.
 - [vitest-tests.mdc](vitest-tests.mdc) — `vi.stubEnv` and test import patterns.
 
-## Local types extraction rule
+## TypeScript interfaces and types (`types/`)
 
-- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
 - For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

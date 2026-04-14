@@ -14,7 +14,7 @@ description: >-
 - In JSDoc and line comments under src-electron/, follow AGENTS.md code-comment rules (no Markdown emphasis in comments; use single quotes for inline references instead of grave accents).
 - **Preload**: `src-electron/electron-preload.ts` builds `apiObject` and calls `contextBridge.exposeInMainWorld('faContentBridgeAPIs', apiObject)`.
 - **Renderer access**: `window.faContentBridgeAPIs` — typed in `src/globals.d.ts`.
-- **Implementations**: One module per API under `src-electron/contentBridgeAPIs/` (e.g. `faWindowControlAPI.ts`, `appDetailsAPI.ts`).
+- **Implementations**: One module per API under `src-electron/contentBridgeAPIs/` (e.g. `faWindowControlAPI.ts`, `appDetailsAPI.ts`, `faKeybindsAPI.ts` for persisted shortcut overrides via **`FA_KEYBINDS_IPC`**).
 
 ## Main ↔ preload IPC (electron-ipc-bridge)
 
@@ -43,9 +43,10 @@ description: >-
 ## Related skills
 
 - [fantasia-electron-main](../fantasia-electron-main/SKILL.md) for main-process lifecycle and windows.
+- [fantasia-keybinds](../fantasia-keybinds/SKILL.md) for global renderer shortcuts, **`S_FaKeybinds`**, and **`faKeybinds`** persistence over IPC.
 - [fantasia-sqlite-main](../fantasia-sqlite-main/SKILL.md) for database access from main.
 
-## Local types extraction rule
+## TypeScript interfaces and types (`types/`)
 
-- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
 - For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

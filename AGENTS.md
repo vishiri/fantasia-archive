@@ -53,7 +53,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 
 ## Extending Electron APIs
 
-Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-electron/electron-preload.ts`) and typed in `src/globals.d.ts`. New surface area: implement in `src-electron/contentBridgeAPIs/`, register in preload, update types, add tests under `contentBridgeAPIs/_tests/`. Details: `.cursor/skills/fantasia-electron-preload/SKILL.md`.
+Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-electron/electron-preload.ts`) and typed in `src/globals.d.ts`. New surface area: implement in `src-electron/contentBridgeAPIs/`, register in preload, extend the appropriate repository-root **`types/`** module (for example **`types/I_faElectronRendererBridgeAPIs.ts`**) plus **`src/globals.d.ts`**, and add tests under `contentBridgeAPIs/_tests/`. Details: `.cursor/skills/fantasia-electron-preload/SKILL.md`.
 
 **Main ↔ preload IPC**: Any feature that uses `ipcRenderer` from preload and `ipcMain` in main must share channel strings from `src-electron/electron-ipc-bridge.ts` (add a new `export const` group there). Wire main-side handlers in `src-electron/mainScripts/ipcManagement/register*Ipc.ts` (see existing `registerFaDevToolsIpc` / `registerFaUserSettingsIpc`), invoke those registrars during app startup (`startApp()` in `mainScripts/appManagement.ts`, which `electron-main.ts` calls **before** `openAppWindowManager()` so handlers exist before preload runs), and use the same constants from the matching `contentBridgeAPIs/` module. Persisted user settings in main live under `src-electron/mainScripts/userSettings/` (`userSettingsStore.ts`, `faUserSettingsDefaults.ts`); `registerFaUserSettingsIpc` imports the store from there.
 
@@ -62,6 +62,17 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 **IPC payloads and runtime validation**: Renderer and preload TypeScript types do not prove the shape of values at `ipcMain.handle` / `ipcRenderer.invoke` boundaries. Treat handler arguments as **`unknown`** (or validate immediately), then parse with **Zod** in **main** for **objects** you merge, store, or forward (strict object schemas reject extra keys; optional fields model partial patches). Keep schemas in **`src-electron/shared/`** next to other Electron-free helpers (for example `faUserSettingsPatchSchema.ts` built from `FA_USER_SETTINGS_DEFAULTS` keys). On failure, throw from the handler so `invoke` rejects and callers can surface errors (see `S_FaUserSettings` for renderer-side handling). For **one primitive** per channel (for example a single URL string), **`typeof`** plus a dedicated predicate (as in `registerFaExternalLinksIpc` with `checkIfExternalUrl`) remains appropriate; wrapping only `z.string()` adds little unless you combine it with `refine`/`superRefine` for the same rules. **`zod`** lives in **`package.json`** **`dependencies`**. Details: `.cursor/skills/fantasia-electron-main/SKILL.md`, `.cursor/rules/electron-preload.mdc`.
 
 **Renderer sandbox**: The main window sets **`webPreferences.sandbox: true`** with **`contextIsolation: true`** and **`nodeIntegration: false`** in `mainScripts/windowManagement/mainWindowCreation.ts`. Electron’s [Process Sandboxing](https://www.electronjs.org/docs/latest/tutorial/sandbox) and [Context Isolation](https://www.electronjs.org/docs/latest/tutorial/context-isolation) docs describe the model. Preload code under `contentBridgeAPIs/` must stay within the sandbox-safe surface (see `.cursor/rules/electron-preload.mdc`); use main + IPC for **`shell.openExternal`**, filesystem paths, and similar privileges (`registerFaExtraEnvIpc`, `registerFaExternalLinksIpc`, and follow the same pattern for new capabilities).
+
+## Global keyboard shortcuts (faKeybinds)
+
+Electron desktop builds support **app-wide** shortcuts from the **renderer**: **`src/layouts/MainLayout.vue`** registers a **capture-phase** **`window`** **`keydown`** listener after **`S_FaKeybinds().refreshKeybinds()`** succeeds (only when **`process.env.MODE === 'electron'`** and **`window.faContentBridgeAPIs.faKeybinds`** exists; skipped in Storybook canvas and non-Electron dev).
+
+- **Matching and actions**: **`src/scripts/keybinds/faKeybindHandleKeydown.ts`** (**`createFaKeybindKeydownHandler`**) reads context from **`faKeybindKeydownContext.ts`** (Pinia **`S_FaKeybinds`** snapshot: overrides + platform + **`suspendGlobalKeybindDispatch`**), walks **`FA_KEYBIND_COMMAND_DEFINITIONS`** in **`faKeybindCommandDefinitions.ts`**, resolves each command’s effective chord (defaults plus user overrides), compares the event, honors **`firesInEditableFields`**, then calls **`faKeybindRunCommand`** in **`faKeybindRunCommand.ts`** for the first match.
+- **Persistence**: Main stores per-command overrides under **`src-electron/mainScripts/keybinds/`** (**`faKeybindsStore.ts`**, defaults, Zod patch schema in **`src-electron/shared/`**). **`registerFaKeybindsIpc.ts`** registers **`ipcMain.handle`** using **`FA_KEYBINDS_IPC`** from **`electron-ipc-bridge.ts`**. Preload **`contentBridgeAPIs/faKeybindsAPI.ts`** exposes **`getKeybinds`** / **`setKeybinds`** on **`window.faContentBridgeAPIs`** (see **Extending Electron APIs** above).
+- **Settings UI**: **`src/components/dialogs/DialogKeybindSettings/`** — the table is driven by the same **`FA_KEYBIND_COMMAND_DEFINITIONS`** list (**`dialogKeybindSettingsTable.ts`** exports **`buildDialogKeybindSettingsRows`** and related helpers). **`dialogKeybindSettingsDialogWiring.ts`** registers **`registerDialogKeybindSettingsGlobalSuspend`**, which sets **`S_FaKeybinds.setSuspendGlobalKeybindDispatch(true)`** while the main dialog or capture sheet is open so global shortcuts do not fire during capture.
+- **Command ids**: **`types/I_faKeybindsDomain.ts`** (**`FA_KEYBIND_COMMAND_IDS`**, **`T_faKeybindCommandId`**) is the canonical string union for **`id`** fields across renderer, types, and IPC payloads.
+
+**Adding a new shortcut command**: extend **`T_faKeybindCommandId`**, **`FA_KEYBIND_COMMAND_DEFINITIONS`**, **`faKeybindRunCommand`**, locale **`dialogs.keybindSettings.commands.*`**, and tests for touched modules. Full step list and file pointers: **`.cursor/skills/fantasia-keybinds/SKILL.md`**.
 
 ## Code comments (JSDoc, line comments, block comments)
 
@@ -75,14 +86,16 @@ When writing comments in source files (not in user-facing Markdown documents suc
 
 - **`.vue` SFCs**: keep each file **at or under 250 lines** (ESLint `max-lines`, with blank/comment skipping per config). If growth would exceed that, split into **`scripts/*.ts`** modules and/or **subcomponents** in the same feature folder. Moving scoped CSS to a standalone file and re-importing it is a **last-resort anti-pattern** and requires **explicit user approval** before it is applied anywhere.
 - **TypeScript modules** (non-exempt paths): **≤200 lines** per file; split by concern when a file would exceed that.
+- **Script file count (components and shared TS):** prefer **logical grouping** in fewer modules until limits force a split — do not default to one tiny file per helper. Many **10–20 line** files are discouraged when the same code could live together and stay under **200 lines** per file and **50 lines** per function. Applies to **`src/components/<bucket>/<Feature>/scripts/*.ts`** and to **`src/scripts/`** feature folders; see [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc) **Module count: prefer logical grouping** and [typescript-scripts.mdc](.cursor/rules/typescript-scripts.mdc). When production `scripts/` files merge, consolidate colocated **`scripts/_tests/*.vitest.test.ts`** where practical.
 - **Functions** (JS/TS and Vue `<script>`): **≤50 lines** per function; decompose into smaller named units when a body would exceed that.
-- **Exemptions** from these ESLint rules: Vitest specs, Playwright specs, Storybook stories, config modules, **`i18n/**/*.ts`**, **`**/*.types.ts`**, **`types/**/*.ts`**, **`**/*.d.ts`**, **`vitest/**/*.mts`**, **`.storybook-workspace/`** (nested workspace), and root **`scripts/**/*.mjs`** (see [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc) and `eslint.config.mjs`).
+- **Exemptions** from these ESLint rules: Vitest specs, Playwright specs, Storybook stories, config modules, **`i18n/**/*.ts`**, **`types/**/*.ts`**, **`**/*.d.ts`**, **`vitest/**/*.mts`**, **`.storybook-workspace/`** (nested workspace), and root **`scripts/**/*.mjs`** (see [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc) and `eslint.config.mjs`).
 
 ## Type naming conventions
 
 - Keep the existing prefix strategy: `I_` for interfaces and `T_` for TypeScript type aliases (do not use `T_` for locale files; those use `L_` — see i18n conventions).
 - Favor singular names for single-item shapes (`I_appMenuItem`, `T_documentName`) and collection-oriented names for grouped structures (`I_appMenuList`, `I_socialContactButtonSet`).
 - Keep unions and function signatures consistently spaced (for example, `string | false`, `(...args: unknown[]) => unknown | void`).
+- Store cross-cutting app and bridge shapes under repository-root **`types/`** in domain modules (for example **`I_faKeybindsDomain.ts`**, **`I_faElectronRendererBridgeAPIs.ts`**, **`I_dialogProgramSettings.ts`**) instead of many single-export files; follow the **TypeScript interfaces and types (`types/`)** section at the end of this file.
 
 ## Renderer components (`src/components/`)
 
@@ -100,7 +113,7 @@ Group new SFCs under one bucket (each feature folder still owns `_tests/`, optio
 - **Not product UI**: Do not import these into production pages, dialogs, or menus. Keep copy in **English** inside the SFC (no **`i18n/`** locale modules for **`foundation/`**).
 - **Storybook**: One canvas-only story per feature (**`parameters.docs.disable: true`**), **`meta.title`** **`Components/foundation/<ComponentName>`**, and **`tags: ['skip-visual']`** so **`yarn test:storybook:visual`** skips long or unstable catalogue pages (same mechanism as other **skip-visual** stories).
 - **Tests**: Colocated **`_tests/*.vitest.test.ts`** for mount smoke checks; **do not** add **`*.playwright.test.ts`** under **`foundation/`** (no Electron component-test coverage for catalogues).
-- **Adding a new catalogue**: Create **`src/components/foundation/<Name>/`** with the **`.vue`**, optional **`scripts/*.ts`** for static tables, **`Foundation*.types.ts`** when types are shared, **`_tests/<Name>.stories.ts`**, and **`_tests/<Name>.vitest.test.ts`**. Mirror **`FoundationColorPalette`** / **`FoundationTextList`** for **SCSS** tokens, **skip-visual**, and viewport globals when the page is wide.
+- **Adding a new catalogue**: Create **`src/components/foundation/<Name>/`** with the **`.vue`**, optional **`scripts/*.ts`** for static tables, shared typings in **`types/`** (for example **`types/I_foundationCatalogues.ts`**), **`_tests/<Name>.stories.ts`**, and **`_tests/<Name>.vitest.test.ts`**. Mirror **`FoundationColorPalette`** / **`FoundationTextList`** for **SCSS** tokens, **skip-visual**, and viewport globals when the page is wide.
 
 ## Global CSS: `hasScrollbar`
 
@@ -207,9 +220,10 @@ The same Vue UI runs under **dev server**, **Storybook**, **packaged Electron (`
 Use different instructions or @-references when starting a task:
 
 1. **Electron and preload** — Focus on `src-electron/`, bridge security, `globals.d.ts`, `electron-ipc-bridge.ts` for IPC channel names, Vitest for `contentBridgeAPIs`, `mainScripts/ipcManagement/register*Ipc`, and other `mainScripts/<area>/` modules (see **Architecture** in `README.md`).
-2. **Tests** — Vitest unit coverage in `src/` (including **`src/components/**`**, **`src/layouts/**`**, **`src/pages/**`**) + `src-electron/`, Playwright integration flows, build order, `e2e-tests/` vs `src/components/**/_tests/`.
-3. **Feature / UI** — `src/` Vue + Quasar, Pinia, router, `ComponentTesting` page, i18n strings. Place SFCs under **`src/components/dialogs/`**, **`globals/`**, **`elements/`**, **`other/`**, or **`foundation/`** (design catalogues only — see **Foundation components** above) per [README](README.md) and this file. For **large production menu/config data**, split across **`src/components/<bucket>/<Feature>/_data/*.ts`**. When the **user explicitly requests** moving bulky **SFC script** logic out of a `.vue`, place those modules **only** under **`src/components/<bucket>/<Feature>/scripts/*.ts`**. Rare **embedded** component-mode-only payloads may live as **`const` inside the `.vue`**; Playwright passes isolated props via **`COMPONENT_PROPS`** defined inline in each spec. Details: [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc).
-4. **Data / SQLite** — Main-process storage, `userData` paths, migrations, exposing data via narrow preload APIs only.
+2. **Global keyboard shortcuts (faKeybinds)** — Focus on `src/scripts/keybinds/`, `src/stores/S_FaKeybinds.ts`, `src/layouts/MainLayout.vue`, `src/components/dialogs/DialogKeybindSettings/`, `src-electron/mainScripts/keybinds/`, `contentBridgeAPIs/faKeybindsAPI.ts`, `registerFaKeybindsIpc.ts`, and `types/I_faKeybindsDomain.ts` (command ids, chords, snapshot, bridge types). Playbook: `.cursor/skills/fantasia-keybinds/SKILL.md`.
+3. **Tests** — Vitest unit coverage in `src/` (including **`src/components/**`**, **`src/layouts/**`**, **`src/pages/**`**) + `src-electron/`, Playwright integration flows, build order, `e2e-tests/` vs `src/components/**/_tests/`.
+4. **Feature / UI** — `src/` Vue + Quasar, Pinia, router, `ComponentTesting` page, i18n strings. Place SFCs under **`src/components/dialogs/`**, **`globals/`**, **`elements/`**, **`other/`**, or **`foundation/`** (design catalogues only — see **Foundation components** above) per [README](README.md) and this file. For **large production menu/config data**, split across **`src/components/<bucket>/<Feature>/_data/*.ts`**. When the **user explicitly requests** moving bulky **SFC script** logic out of a `.vue`, place those modules **only** under **`src/components/<bucket>/<Feature>/scripts/*.ts`**. Rare **embedded** component-mode-only payloads may live as **`const` inside the `.vue`**; Playwright passes isolated props via **`COMPONENT_PROPS`** defined inline in each spec. Details: [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc).
+5. **Data / SQLite** — Main-process storage, `userData` paths, migrations, exposing data via narrow preload APIs only.
 
 ## Skill index
 
@@ -220,6 +234,7 @@ Use different instructions or @-references when starting a task:
 | `fantasia-testing`              | Vitest and Playwright workflows                                     |
 | `fantasia-electron-preload`     | `faContentBridgeAPIs`, preload, and `electron-ipc-bridge.ts` IPC names |
 | `fantasia-electron-main`        | Main process lifecycle, `mainScripts/` feature folders (`appIdentity`, `windowManagement`, `chromiumFixes`, `userSettings`, `nativeShell`, `ipcManagement`), and `appManagement.ts`   |
+| `fantasia-keybinds`             | Global shortcuts: `src/scripts/keybinds/`, `S_FaKeybinds`, `MainLayout`, Keybind settings dialog, main `keybinds/` store, `faKeybindsAPI`, `registerFaKeybindsIpc` |
 | `fantasia-quasar-vue`           | Vue/Quasar app structure                                            |
 | `fantasia-i18n`                 | Repo-root **`i18n/`** and **`L_`* locale modules                    |
 | `fantasia-sqlite-main`          | SQLite in main process                                              |
@@ -232,7 +247,7 @@ Use different instructions or @-references when starting a task:
 | `horse-around`                  | Parallel AI sessions coordinated with file-based orders and answers |
 
 
-## Local types extraction rule
+## TypeScript interfaces and types (`types/`)
 
-- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
 - For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

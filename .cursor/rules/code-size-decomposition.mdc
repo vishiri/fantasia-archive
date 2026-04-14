@@ -26,13 +26,22 @@ These limits are **enforced in CI** via ESLint (`max-lines`, `max-lines-per-func
 - **Hard limit:** a **single TypeScript file** **must not exceed 200 lines** (ESLint `max-lines` with `skipBlankLines` and `skipComments`).
 - **When a module grows**, split into **smaller files** by concern (one module per responsibility), re-export from a barrel only when it genuinely simplifies imports.
 
+## Module count: prefer logical grouping
+
+Limits are **maximums**, not an invitation to maximize file count. Prefer **fewer modules** that each hold **related** functions (same feature flow, same subsystem, or the same public API surface) until a file nears the **200-line** cap or a **single function** nears **50 lines**, then split on a clear boundary.
+
+- **Avoid** many **10–20 line** one-export files that only exist because each helper was split mechanically; that makes navigation and review harder without helping the linter.
+- **Component `scripts/`** under `src/components/<bucket>/<Feature>/scripts/` should follow the same idea: e.g. one module for table + row builders + column config, one for dialog open/routing/suspend wiring, one for capture infrastructure, rather than a separate file per tiny wrapper (see [vue-quasar.mdc](vue-quasar.mdc)).
+- **`src/scripts/`** feature folders: group by **domain** and file size, not one function per filename (see [typescript-scripts.mdc](typescript-scripts.mdc)).
+- **Tests** colocated with `scripts/` may be merged into fewer **`scripts/_tests/*.vitest.test.ts`** files when they exercise the same merged module; keep coverage on the behaviors that moved.
+
 ## Exemptions (no `max-lines` / `max-lines-per-function` on these paths)
 
 - **Tests:** `**/*.vitest.test.ts`, `**/*playwright*.ts`, `**/*.playwright.spec.ts`
 - **Storybook:** `**/*.stories.ts`
 - **Config:** `**/*.config.mjs`, `**/*.config.mts`, `**/*.config.ts`, `**/eslint.config.mjs`, `**/commitlint.config.mjs`, `**/quasar.config.ts`, `**/quasar.config.js`, `scripts/**/*.mjs`, `**/testRunner_*.mjs`
 - **Translations:** `i18n/**/*.ts` (locale trees and composed `index.ts`)
-- **Type-only modules:** `**/*.types.ts` and everything under `types/**/*.ts`
+- **Type-only modules:** everything under `types/**/*.ts`
 - **Declarations:** `**/*.d.ts`
 - **Vitest workspace configs:** `vitest/**/*.mts`
 - **Storybook workspace:** `.storybook-workspace/**`
@@ -43,7 +52,7 @@ These limits are **enforced in CI** via ESLint (`max-lines`, `max-lines-per-func
 - `src/scripts/` layout: [typescript-scripts.mdc](typescript-scripts.mdc)
 - ESLint entry: [eslint-typescript.mdc](eslint-typescript.mdc)
 
-## Local types extraction rule
+## TypeScript interfaces and types (`types/`)
 
-- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
 - For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

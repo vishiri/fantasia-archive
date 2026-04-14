@@ -28,6 +28,7 @@ Locale `L_*` paths under `i18n/<locale>/components/` use the same bucket names a
 ## Layout and pages
 
 - Default app chrome: `src/layouts/MainLayout.vue` and routes in `src/router/routes.ts`.
+- **Global keyboard shortcuts (Electron)**: `MainLayout.vue` registers the app-wide **`keydown`** listener after **`S_FaKeybinds`** loads from preload; matching and actions live under **`src/scripts/keybinds/`**. **Tools → Keybind settings** edits chords (**`src/components/dialogs/DialogKeybindSettings/`**). Extension checklist: [fantasia-keybinds](../fantasia-keybinds/SKILL.md) and [AGENTS.md](../../../AGENTS.md) **Global keyboard shortcuts (faKeybinds)**.
 - **Component playground**: `src/pages/ComponentTesting.vue` with `src/layouts/ComponentTestingLayout.vue` — use for isolated UI experiments before wiring into main flows.
 - **Storybook**: primary stories live under `src/components/**/_tests/<Component>.stories.ts` with **`meta.title`** **`Components/<bucket>/<ComponentName>`** (**`dialogs`**, **`elements`**, **`foundation`**, **`globals`**, **`other`** — same as **`src/components/`** folders). **`foundation/`** stories are reference pages only (**`skip-visual`**, docs disabled). Optional **canvas-only** stories may exist for `src/layouts/**/_tests/*.stories.ts` and `src/pages/**/_tests/*.stories.ts` (router previews); for those, **do not** add autodocs, Docs tab content, or `parameters.docs.description` — keep `parameters.docs.disable: true` (see [`storybook-stories.mdc`](../../rules/storybook-stories.mdc)). Storybook runs from [`.storybook-workspace/`](../../../.storybook-workspace/) (config under `.storybook-workspace/.storybook/`, static build `storybook-static/`, VRT under `visual-tests/` + `playwright.storybook-visual.config.ts`) so `staticDirs` and Vite can mirror the Quasar app’s `public/` layout. Root scripts: `yarn storybook:run`, `yarn storybook:build`, `yarn test:storybook:visual*`.
 
@@ -56,6 +57,7 @@ Locale `L_*` paths under `i18n/<locale>/components/` use the same bucket names a
 ## Component `scripts/` and SFC size
 
 - **Enforced limits** (ESLint): **`.vue` ≤250 lines**, **functions ≤50 lines**, **non-exempt `.ts` ≤200 lines** — see [code-size-decomposition.mdc](../../rules/code-size-decomposition.mdc). When a feature would exceed them, extract into **`src/components/<bucket>/<Feature>/scripts/*.ts`**, add **subcomponents**, and/or move shared pure logic to **`src/scripts/`**. Do not park feature-owned extractions next to the `.vue` at the feature root.
+- **How to split `scripts/`:** limits are **maximums**. Prefer **fewer TypeScript modules** that each hold a **whole concern** (for example one file for table rows + columns + filtered state, one for dialog open + routing + global suspend) until a file approaches **200 lines** or a single function approaches **50 lines**. **Avoid** a long list of **10–20 line** files with one export each when grouping would stay within ESLint caps — see [code-size-decomposition.mdc](../../rules/code-size-decomposition.mdc) **Module count: prefer logical grouping**. After merging production modules, merge or rename colocated **`scripts/_tests/*.vitest.test.ts`** so tests stay easy to find.
 - **External `<style>` files** are a **last resort** anti-pattern; use only with **explicit user approval** in that session.
 - Distinct from **`_data/`** (production structured payloads) and from **`src/scripts/`** (shared app-wide helpers). See [vue-quasar.mdc](../../rules/vue-quasar.mdc).
 
@@ -89,7 +91,7 @@ Locale `L_*` paths under `i18n/<locale>/components/` use the same bucket names a
 - Do **not** create Storybook stories under the `A11y/*` category for this project.
 - Do **not** create Storybook stories that only exercise `TEST_ENV === 'components'` branches; validate those paths in Playwright/component-test harnesses instead.
 
-## Local types extraction rule
+## TypeScript interfaces and types (`types/`)
 
-- For Vue (`.vue`) and TypeScript (`.ts`) source files, move small file-local interfaces/type aliases into a colocated `<filename>.types.ts` file and import them back.
+- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
 - For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
