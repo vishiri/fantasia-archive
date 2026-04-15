@@ -2,7 +2,7 @@ import { test, expect, vi } from 'vitest'
 
 import { FA_EXTERNAL_LINKS_IPC } from 'app/src-electron/electron-ipc-bridge'
 
-import { faExternalLinksManagerAPI } from '../faExternalLinksManagerAPI'
+import { faExternalLinksManagerAPI } from '../faExternalLinksManagementAPI'
 
 const { invokeMock } = vi.hoisted(() => {
   return {
