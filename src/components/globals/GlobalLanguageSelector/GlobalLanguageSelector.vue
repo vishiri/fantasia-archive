@@ -113,8 +113,10 @@ import { computed, ref } from 'vue'
 import { i18n } from 'app/i18n/externalFileLoader'
 import type { T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 
-import { applyFaUserSettingsLanguageSelection } from 'src/scripts/applyFaUserSettingsLanguageSelection'
-import { resolveVitePublicAssetPath } from 'src/scripts/resolveVitePublicAssetPath'
+import {
+  applyFaUserSettingsLanguageSelection,
+  resolveVitePublicAssetPath
+} from 'app/src/scripts/appInternals/rendererAppInternals'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
 import GlobalLanguageSelectorSpellcheckRefreshControl from './GlobalLanguageSelectorSpellcheckRefreshControl.vue'

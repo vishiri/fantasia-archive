@@ -45,7 +45,7 @@ const props = withDefaults(
      */
     details?: string
     /**
-     * Mascot variant key from fantasiaMascotImageManager.
+     * Mascot variant key from fantasiaMascotImageManagement.
      */
     imageName: T_errorCardImageName
     /**

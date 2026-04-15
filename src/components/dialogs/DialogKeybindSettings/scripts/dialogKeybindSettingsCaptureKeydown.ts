@@ -1,8 +1,10 @@
 import type { ComputedRef, Ref } from 'vue'
 
-import { faKeybindFindChordConflict } from 'app/src/scripts/keybinds/faKeybindFindChordConflict'
-import { faKeybindTryChordFromEvent } from 'app/src/scripts/keybinds/faKeybindTryChordFromEvent'
-import { formatFaChordForDisplay } from 'app/src/scripts/keybinds/formatFaChordForDisplay'
+import {
+  faKeybindFindChordConflict,
+  formatFaChordForDisplay
+} from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
+import { faKeybindTryChordFromEvent } from 'app/src/scripts/keybinds/faKeybindsChordFromEvent'
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import type { T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'

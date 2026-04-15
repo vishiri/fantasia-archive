@@ -10,9 +10,11 @@
 import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { applyFaI18nLocaleFromLanguageCode } from 'src/scripts/applyFaI18nLocaleFromLanguageCode'
-import { isFantasiaStorybookCanvas } from 'src/scripts/isFantasiaStorybookCanvas'
-import { isFaUserSettingsLanguageCode } from 'src/scripts/isFaUserSettingsLanguageCode'
+import {
+  applyFaI18nLocaleFromLanguageCode,
+  isFaUserSettingsLanguageCode,
+  isFantasiaStorybookCanvas
+} from 'app/src/scripts/appInternals/rendererAppInternals'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
 const route = useRoute()

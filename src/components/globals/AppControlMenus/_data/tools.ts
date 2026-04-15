@@ -1,5 +1,5 @@
 import { i18n } from 'app/i18n/externalFileLoader'
-import { openDialogComponent } from 'app/src/scripts/appInfo/openDialogMarkdownDocument'
+import { openDialogComponent } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
 
 import type { I_appMenuItem, I_appMenuList } from 'app/types/I_appMenusDataList'
 

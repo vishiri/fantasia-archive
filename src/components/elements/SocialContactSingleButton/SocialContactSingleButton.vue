@@ -33,7 +33,7 @@ import { computed } from 'vue'
 
 import type { I_socialContactButton } from 'app/types/I_socialContactButtons'
 
-import { resolveVitePublicAssetPath } from 'src/scripts/resolveVitePublicAssetPath'
+import { resolveVitePublicAssetPath } from 'app/src/scripts/appInternals/rendererAppInternals'
 
 /**
  * All component props

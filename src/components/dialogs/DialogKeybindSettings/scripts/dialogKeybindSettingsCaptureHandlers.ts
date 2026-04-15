@@ -9,8 +9,10 @@ import {
   runDialogKeybindCaptureKeydown,
   type T_dialogKeybindCaptureKeydownDeps
 } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsCaptureKeydown'
-import { faKeybindFindChordConflict } from 'app/src/scripts/keybinds/faKeybindFindChordConflict'
-import { formatFaChordForDisplay } from 'app/src/scripts/keybinds/formatFaChordForDisplay'
+import {
+  faKeybindFindChordConflict,
+  formatFaChordForDisplay
+} from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
 
 export type T_captureChordDeps = T_dialogKeybindCaptureKeydownDeps

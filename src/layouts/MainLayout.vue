@@ -34,11 +34,15 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted } from 'vue'
 
-import { createFaKeybindKeydownHandler } from 'src/scripts/keybinds/faKeybindHandleKeydown'
-import { getFaKeybindKeydownContext } from 'src/scripts/keybinds/faKeybindKeydownContext'
-import { applyFaI18nLocaleFromLanguageCode } from 'src/scripts/applyFaI18nLocaleFromLanguageCode'
-import { isFantasiaStorybookCanvas } from 'src/scripts/isFantasiaStorybookCanvas'
-import { isFaUserSettingsLanguageCode } from 'src/scripts/isFaUserSettingsLanguageCode'
+import {
+  createFaKeybindKeydownHandler,
+  getFaKeybindKeydownContext
+} from 'src/scripts/keybinds/faKeybindsGlobalDispatch'
+import {
+  applyFaI18nLocaleFromLanguageCode,
+  isFaUserSettingsLanguageCode,
+  isFantasiaStorybookCanvas
+} from 'app/src/scripts/appInternals/rendererAppInternals'
 import { S_FaKeybinds } from 'src/stores/S_FaKeybinds'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 

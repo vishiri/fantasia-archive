@@ -2,7 +2,7 @@ import type { StoreGeneric } from 'pinia'
 import type { Ref } from 'vue'
 import { computed, onMounted, onUnmounted, watch } from 'vue'
 
-import { formatFaChordForDisplay } from 'app/src/scripts/keybinds/formatFaChordForDisplay'
+import { formatFaChordForDisplay } from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
 import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
@@ -54,7 +54,7 @@ function registerDialogKeybindSettingsDirectInputOnMounted (
 }
 
 /**
- * Loads keybind snapshot then shows the dialog. Component-dialog visibility is tracked by registerDialogComponentOpenLease on the root q-dialog.
+ * Loads keybind snapshot then shows the dialog. Component-dialog visibility is tracked by registerComponentDialogStackGuard from dialogManagement on the root q-dialog.
  */
 export function runDialogKeybindSettingsOpen (params: {
   dialogModel: Ref<boolean>
@@ -76,7 +76,7 @@ export function runDialogKeybindSettingsOpen (params: {
       dialogModel.value = true
     })
     .catch(() => {
-      /* Bridge errors leave the dialog closed; no store lease was taken yet. */
+      /* Bridge errors leave the dialog closed; component dialog stack guard count was not incremented yet. */
     })
 }
 

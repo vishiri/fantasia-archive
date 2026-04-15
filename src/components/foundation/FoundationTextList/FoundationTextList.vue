@@ -116,7 +116,7 @@ const helperRows = FOUNDATION_TYPOGRAPHY_HELPERS
   background-color: transparent;
   box-sizing: border-box;
   color: $grey;
-  min-height: 100vh;
+  min-height: $foundationCatalogues-root-minHeight;
   width: 100%;
 
   &__title,
@@ -125,8 +125,8 @@ const helperRows = FOUNDATION_TYPOGRAPHY_HELPERS
   }
 
   &__sampleRow {
-    border-bottom: 1px solid $gold-muted-border;
-    padding-bottom: 1rem;
+    border-bottom: $foundationTextList-sampleRow-borderBottomWidth solid $gold-muted-border;
+    padding-bottom: $foundationTextList-sampleRow-paddingBottom;
   }
 
   &__classLabel {
@@ -135,7 +135,7 @@ const helperRows = FOUNDATION_TYPOGRAPHY_HELPERS
 
   &__helperCard {
     background-color: $dark;
-    border: 1px solid $gold-muted-border;
+    border: $foundationTextList-helperCard-borderWidth solid $gold-muted-border;
     border-radius: $qCard-border-radius;
   }
 

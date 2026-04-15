@@ -209,6 +209,23 @@ $errorCard-border-radius: 10px;
 $errorCard-border-size: 2px;
 $errorCard-text: $dark;
 
+/* COMPONENT - FOUNDATION CATALOGUES (SHARED) */
+$foundationCatalogues-root-minHeight: 100vh;
+
+/* COMPONENT - FOUNDATION COLOR PALETTE */
+$foundationColorPalette-customCard-borderWidth: 1px;
+$foundationColorPalette-materialCell-width: 52px;
+$foundationColorPalette-materialPatch-borderWidth: 1px;
+$foundationColorPalette-materialPatch-minHeight: 36px;
+$foundationColorPalette-materialRootLabel-minWidth: 6.5rem;
+$foundationColorPalette-materialSwatches-gap: 6px;
+$foundationColorPalette-swatch-minHeight: 72px;
+
+/* COMPONENT - FOUNDATION TEXT LIST */
+$foundationTextList-helperCard-borderWidth: 1px;
+$foundationTextList-sampleRow-borderBottomWidth: 1px;
+$foundationTextList-sampleRow-paddingBottom: 1rem;
+
 /* COMPONENT - GLOBAL WINDOW BUTTONS */
 $globalWindowButtons-close-hoverColor: $secondary;
 $globalWindowButtons-color: $accent;
@@ -266,6 +283,7 @@ $socialContactSingleButton-website-borderWidth: 3px;
 /* COMPONENT - DIALOG KEYBIND SETTINGS */
 $dialogKeybindSettings-card-maxWidthViewportSubtract: 48px;
 $dialogKeybindSettings-card-width: 1200px;
+$dialogKeybindSettings-table-maxHeight: 60vh;
 
 /* COMPONENT - DIALOG KEYBIND SETTINGS (CAPTURE POPUP) */
 $dialogKeybindSettingsCapture-actionBtn-minWidth: 140px;
@@ -283,6 +301,7 @@ $dialogKeybindSettingsCapture-helpIcon-marginLeft: 10px;
 $dialogKeybindSettingsCapture-helpIcon-top: 4px;
 $dialogKeybindSettingsCapture-keybindUpdateField-maxWidth: 550px;
 $dialogKeybindSettingsCapture-keybindUpdateField-padding: 40px;
+$dialogKeybindSettingsCapture-srStatus-dimensionalSize: 1px;
 $dialogKeybindSettingsCapture-text: $dark;
 $dialogKeybindSettingsCapture-title-fontSize: 1.15rem;
 $dialogKeybindSettingsCapture-title-marginTop: 8px;
@@ -292,6 +311,10 @@ $dialogKeybindSettingsCapture-tooltip-background: $white;
 $dialogKeybindSettingsCapture-tooltip-border: 1px solid $dark;
 $dialogKeybindSettingsCapture-tooltip-fontSize: 13px;
 $dialogKeybindSettingsCapture-tooltip-fontWeight: 600;
+$dialogKeybindSettingsCapture-tooltip-footnote-marginTop: 10px;
+$dialogKeybindSettingsCapture-tooltip-heading-marginBottom: 6px;
+$dialogKeybindSettingsCapture-tooltip-list-paddingLeft: 1.1rem;
+$dialogKeybindSettingsCapture-tooltip-listItem-marginVertical: 2px;
 $dialogKeybindSettingsCapture-tooltip-maxWidth: 340px;
 $dialogKeybindSettingsCapture-tooltip-padding: 12px 14px;
 $dialogKeybindSettingsCapture-tooltip-text: $dark;

@@ -1,7 +1,7 @@
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import type { I_dialogProgramSettingsProps } from 'app/types/I_dialogProgramSettings'
 import type { T_programSettingsRenderTree } from 'app/types/I_dialogProgramSettings'
-import { registerDialogComponentOpenLease } from 'app/src/scripts/appInfo/registerDialogComponentOpenLease'
+import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
 import { ref, type Ref } from 'vue'
 
 import { createDialogProgramSettingsDialogActions } from './dialogProgramSettingsDialogActions'
@@ -28,7 +28,7 @@ function createDialogProgramSettingsRefs (): {
 
 export function useDialogProgramSettings (props: I_dialogProgramSettingsProps) {
   const refs = createDialogProgramSettingsRefs()
-  registerDialogComponentOpenLease(refs.dialogModel)
+  registerComponentDialogStackGuard(refs.dialogModel)
   const {
     dialogModel,
     documentName,

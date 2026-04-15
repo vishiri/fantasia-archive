@@ -6,8 +6,8 @@ import {
   faMenuItem,
   faMenuSeparator
 } from 'app/src/components/globals/AppControlMenus/_data/menuDataHelpers'
-import { openDialogComponent, openDialogMarkdownDocument } from 'app/src/scripts/appInfo/openDialogMarkdownDocument'
-import { toggleDevTools } from 'app/src/scripts/appInfo/toggleDevTools'
+import { openDialogComponent, openDialogMarkdownDocument } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
+import { toggleDevTools } from 'app/src/scripts/appGlobalManagementUI/toggleDevTools'
 
 // TODO - add functionality for all buttons and conditions
 

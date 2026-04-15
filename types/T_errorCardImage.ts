@@ -1,5 +1,5 @@
 /**
- * Fantasia mascot keys from `fantasiaImageList` in fantasiaMascotImageManager.
+ * Fantasia mascot keys from `fantasiaImageList` in fantasiaMascotImageManagement.
  */
 export type T_errorCardImageName =
   | 'didYouKnow'

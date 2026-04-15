@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, type Ref } from 'vue'
 import { expect, test } from 'vitest'
 
 import type {
@@ -316,6 +316,58 @@ test('hasSearchNoMatchingSettings is true when filter yields empty tree', () => 
   expect(c.hasActiveSearchQuery.value).toBe(true)
   expect(Object.keys(c.searchFilteredProgramSettingsTree.value).length).toBe(0)
   expect(c.hasSearchNoMatchingSettings.value).toBe(true)
+})
+
+/**
+ * useDialogProgramSettingsSearchComputed
+ * hasSearchNoMatchingSettings is false when the active query still matches at least one category.
+ */
+test('hasActiveSearchQuery treats undefined search query like nullish empty input', () => {
+  const programSettingsTree = ref<T_programSettingsRenderTree>({
+    cat: {
+      subCategories: {},
+      title: 'Cat'
+    }
+  })
+  const searchSettingsQuery = ref<string | null | undefined>(undefined)
+
+  const c = useDialogProgramSettingsSearchComputed({
+    programSettingsTree,
+    searchSettingsQuery: searchSettingsQuery as Ref<string | null>
+  })
+
+  expect(c.hasActiveSearchQuery.value).toBe(false)
+})
+
+test('hasSearchNoMatchingSettings is false when filtered tree is non-empty', () => {
+  const programSettingsTree = ref<T_programSettingsRenderTree>({
+    cat: {
+      subCategories: {
+        sub: {
+          settingsList: {
+            onlyKey: {
+              description: 'd',
+              tags: 't',
+              title: 'UniqueTitle',
+              value: false
+            }
+          },
+          title: 'Sub'
+        }
+      },
+      title: 'Cat'
+    }
+  })
+  const searchSettingsQuery = ref<string | null>('Unique')
+
+  const c = useDialogProgramSettingsSearchComputed({
+    programSettingsTree,
+    searchSettingsQuery
+  })
+
+  expect(c.hasActiveSearchQuery.value).toBe(true)
+  expect(Object.keys(c.searchFilteredProgramSettingsTree.value).length).toBeGreaterThan(0)
+  expect(c.hasSearchNoMatchingSettings.value).toBe(false)
 })
 
 /**

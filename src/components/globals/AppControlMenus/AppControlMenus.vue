@@ -57,8 +57,8 @@ import { computed, onMounted, ref } from 'vue'
 
 import { i18n } from 'app/i18n/externalFileLoader'
 import type { I_appMenuList } from 'app/types/I_appMenusDataList'
-import { openDialogMarkdownDocument } from 'src/scripts/appInfo/openDialogMarkdownDocument'
-import { isFantasiaStorybookCanvas } from 'src/scripts/isFantasiaStorybookCanvas'
+import { openDialogMarkdownDocument } from 'src/scripts/appGlobalManagementUI/dialogManagement'
+import { isFantasiaStorybookCanvas } from 'app/src/scripts/appInternals/rendererAppInternals'
 
 import { buildDocumentsMenu } from 'app/src/components/globals/AppControlMenus/_data/documents'
 import { buildHelpInfoMenu } from 'app/src/components/globals/AppControlMenus/_data/helpInfo'

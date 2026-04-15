@@ -1,10 +1,12 @@
 import { computed, type ComputedRef, type Ref } from 'vue'
 
 import { FA_KEYBIND_COMMAND_DEFINITIONS } from 'app/src/scripts/keybinds/faKeybindCommandDefinitions'
-import { faKeybindChordsEqual } from 'app/src/scripts/keybinds/faKeybindChordsEqual'
-import { faKeybindExpandDefaultChord } from 'app/src/scripts/keybinds/faKeybindExpandDefaultChord'
-import { faKeybindResolveEffectiveChord } from 'app/src/scripts/keybinds/faKeybindResolveEffectiveChord'
-import { formatFaChordForDisplay } from 'app/src/scripts/keybinds/formatFaChordForDisplay'
+import { formatFaChordForDisplay } from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
+import {
+  faKeybindChordsEqual,
+  faKeybindExpandDefaultChord,
+  faKeybindResolveEffectiveChord
+} from 'app/src/scripts/keybinds/faKeybindsChordEqualityAndResolve'
 import type { I_dialogKeybindSettingsRow } from 'app/types/I_dialogKeybindSettings'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 

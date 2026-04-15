@@ -118,7 +118,7 @@ const materialGroups = buildQuasarMaterialGroups()
   background-color: transparent;
   box-sizing: border-box;
   color: $grey;
-  min-height: 100vh;
+  min-height: $foundationCatalogues-root-minHeight;
   width: 100%;
 
   &__title,
@@ -127,13 +127,13 @@ const materialGroups = buildQuasarMaterialGroups()
   }
 
   &__customCard {
-    border: 1px solid $gold-muted-border;
+    border: $foundationColorPalette-customCard-borderWidth solid $gold-muted-border;
     border-radius: $qCard-border-radius;
     overflow: hidden;
   }
 
   &__swatch {
-    min-height: 72px;
+    min-height: $foundationColorPalette-swatch-minHeight;
   }
 
   &__meta {
@@ -153,26 +153,26 @@ const materialGroups = buildQuasarMaterialGroups()
   &__materialRootLabel {
     color: $primary-bright;
     flex-shrink: 0;
-    min-width: 6.5rem;
+    min-width: $foundationColorPalette-materialRootLabel-minWidth;
   }
 
   &__materialSwatches {
     display: flex;
     flex: 1 1 0;
     flex-flow: row wrap;
-    gap: 6px;
+    gap: $foundationColorPalette-materialSwatches-gap;
     min-width: 0;
   }
 
   &__materialCell {
     flex-shrink: 0;
-    width: 52px;
+    width: $foundationColorPalette-materialCell-width;
   }
 
   &__materialPatch {
-    border: 1px solid $gold-muted-border;
+    border: $foundationColorPalette-materialPatch-borderWidth solid $gold-muted-border;
     border-radius: $qCard-border-radius;
-    min-height: 36px;
+    min-height: $foundationColorPalette-materialPatch-minHeight;
   }
 
   &__mono {

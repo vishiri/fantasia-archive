@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 
-import { fantasiaImageList, determineCurrentImage } from 'app/src/scripts/appInfo/fantasiaMascotImageManager'
+import { fantasiaImageList, determineCurrentImage } from 'app/src/scripts/appGlobalManagementUI/fantasiaMascotImageManagement'
 import { computed } from 'vue'
 
 /**

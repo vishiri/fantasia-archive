@@ -22,7 +22,6 @@
           flat
           virtual-scroll
           :columns="tableColumns"
-          :pagination="pagination"
           :rows="tableRows"
           :rows-per-page-options="[0]"
           :title="$t('dialogs.keybindSettings.tableTitle')"
@@ -59,19 +58,13 @@
               >
                 <template v-if="bodySlot.row.editable">
                   <q-btn
-                    :color="bodySlot.row.userShowsAddNewCombo ? 'primary-bright' : 'grey-7'"
+                    :color="bodySlot.row.userShowsAddNewCombo ? 'primary-bright' : 'blue-grey-12'"
                     outline
-                    size="sm"
+                    size="11px"
                     data-test-locator="dialogKeybindSettings-userKeybind-button"
                     @click="onOpenCapture(bodySlot.row)"
                   >
-                    {{
-                      bodySlot.row.userShowsAddNewCombo
-                        ? $t('dialogs.keybindSettings.addNew')
-                        : bodySlot.row.userChord
-                          ? formatChord(bodySlot.row.userChord)
-                          : ''
-                    }}
+                    {{ userKeybindButtonLabel(bodySlot.row) }}
                   </q-btn>
                 </template>
                 <template v-else>
@@ -99,10 +92,11 @@
           v-close-popup
           flat
           color="accent"
+          class="q-mr-xl"
           :label="$t('dialogs.keybindSettings.closeWithoutSaving')"
         />
         <q-btn
-          color="primary"
+          color="primary-bright"
           outline
           :label="$t('dialogs.keybindSettings.saveButton')"
           data-test-locator="dialogKeybindSettings-save"
@@ -126,15 +120,18 @@
 </template>
 
 <script setup lang="ts">
+// Storybook SFC compile resolves this import without the 'app' alias; keep a repo-relative path to 'types/'.
+import type { I_dialogKeybindSettingsRow } from '../../../../types/I_dialogKeybindSettings'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import DialogKeybindSettingsCaptureDialog from 'app/src/components/dialogs/DialogKeybindSettings/DialogKeybindSettingsCaptureDialog.vue'
 import {
   registerDialogKeybindSettingsGlobalSuspend,
   setupDialogKeybindSettingsDialogRouting
 } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsDialogWiring'
-import { registerDialogComponentOpenLease } from 'app/src/scripts/appInfo/registerDialogComponentOpenLease'
+import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
 import { useDialogKeybindSettings } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsState'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
+import { i18n } from 'app/i18n/externalFileLoader'
 import { ref } from 'vue'
 
 const props = defineProps<{
@@ -155,7 +152,6 @@ const {
   onCloseMain,
   onOpenCapture,
   onSaveMain,
-  pagination,
   pendingChord,
   tableColumns,
   tableRows
@@ -164,7 +160,7 @@ const {
 const dialogModel = ref(false)
 const documentName = ref<T_dialogName>('KeybindSettings')
 
-registerDialogComponentOpenLease(dialogModel)
+registerComponentDialogStackGuard(dialogModel)
 
 const keybindsStore = S_FaKeybinds()
 
@@ -180,6 +176,16 @@ const {
   props
 })
 
+function userKeybindButtonLabel (row: I_dialogKeybindSettingsRow): string {
+  if (row.userShowsAddNewCombo) {
+    return i18n.global.t('dialogs.keybindSettings.addNew')
+  }
+  if (row.userChord) {
+    return formatChord(row.userChord)
+  }
+  return ''
+}
+
 registerDialogKeybindSettingsGlobalSuspend({
   captureOpen,
   dialogModel
@@ -188,7 +194,7 @@ registerDialogKeybindSettingsGlobalSuspend({
 
 <style lang="scss" scoped>
 .dialogKeybindSettings__table {
-  max-height: 60vh;
+  max-height: $dialogKeybindSettings-table-maxHeight;
 }
 </style>
 

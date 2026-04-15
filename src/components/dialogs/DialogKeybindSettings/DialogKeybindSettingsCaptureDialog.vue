@@ -68,7 +68,8 @@
 import { computed, useId } from 'vue'
 
 import DialogKeybindSettingsCaptureField from 'app/src/components/dialogs/DialogKeybindSettings/DialogKeybindSettingsCaptureField.vue'
-import type { I_dialogKeybindSettingsCaptureDialogProps } from 'app/types/I_dialogKeybindSettings'
+// Storybook SFC compile resolves this import without the 'app' alias; keep a repo-relative path to 'types/'.
+import type { I_dialogKeybindSettingsCaptureDialogProps } from '../../../../types/I_dialogKeybindSettings'
 
 const props = defineProps<I_dialogKeybindSettingsCaptureDialogProps>()
 

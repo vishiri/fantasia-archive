@@ -7,13 +7,13 @@ const { openDialogMock, toggleMock } = vi.hoisted(() => {
   }
 })
 
-vi.mock('app/src/scripts/appInfo/openDialogMarkdownDocument', () => {
+vi.mock('app/src/scripts/appGlobalManagementUI/dialogManagement', () => {
   return {
     openDialogComponent: (...args: unknown[]) => openDialogMock(...args)
   }
 })
 
-vi.mock('app/src/scripts/appInfo/toggleDevTools', () => {
+vi.mock('app/src/scripts/appGlobalManagementUI/toggleDevTools', () => {
   return {
     toggleDevTools: (...args: unknown[]) => toggleMock(...args)
   }

@@ -26,8 +26,11 @@ vi.mock('quasar', () => {
   }
 })
 
-vi.mock('src/scripts/applyFaI18nLocaleFromLanguageCode', () => {
+vi.mock('app/src/scripts/appInternals/rendererAppInternals', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('app/src/scripts/appInternals/rendererAppInternals')>()
   return {
+    ...actual,
     applyFaI18nLocaleFromLanguageCode: applyLocaleMock
   }
 })

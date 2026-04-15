@@ -49,7 +49,7 @@
 
 <script setup lang="ts">
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
-import { registerDialogComponentOpenLease } from 'app/src/scripts/appInfo/registerDialogComponentOpenLease'
+import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { onMounted, ref, watch } from 'vue'
 import SocialContactButtons from '../../other/SocialContactButtons/SocialContactButtons.vue'
@@ -78,7 +78,7 @@ const props = defineProps<{
  */
 const dialogModel = ref(false)
 
-registerDialogComponentOpenLease(dialogModel)
+registerComponentDialogStackGuard(dialogModel)
 
 /**
  * Name of the document shown inside the dialog

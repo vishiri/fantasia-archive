@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
 
-import { fantasiaImageList } from 'app/src/scripts/appInfo/fantasiaMascotImageManager'
+import { fantasiaImageList } from 'app/src/scripts/appGlobalManagementUI/fantasiaMascotImageManagement'
 
 import ErrorCard from '../ErrorCard.vue'
 

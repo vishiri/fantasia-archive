@@ -1,5 +1,10 @@
 /** @vitest-environment jsdom */
 
+/**
+ * Cross-module renderer keybind flows: global dispatch (keydown), chord helpers, command definitions, and related mocks.
+ * Narrow tests for 'getFaKeybindKeydownContext' live in 'faKeybindsGlobalDispatch.getFaKeybindKeydownContext.vitest.test.ts'.
+ */
+
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 const { runCommandMock } = vi.hoisted(() => {

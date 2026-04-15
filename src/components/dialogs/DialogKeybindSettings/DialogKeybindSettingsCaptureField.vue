@@ -67,7 +67,8 @@
 </template>
 
 <script setup lang="ts">
-import type { I_dialogKeybindSettingsCaptureFieldProps } from 'app/types/I_dialogKeybindSettings'
+// Storybook SFC compile resolves this import without the 'app' alias; keep a repo-relative path to 'types/'.
+import type { I_dialogKeybindSettingsCaptureFieldProps } from '../../../../types/I_dialogKeybindSettings'
 import {
   DIALOG_KEYBIND_CAPTURE_HELP_LINE_KEYS,
   useDialogKeybindSettingsCaptureFieldDisplay
@@ -140,11 +141,11 @@ const {
 
 .dialogKeybindSettingsCapture__srStatus {
   clip-path: inset(50%);
-  height: 1px;
+  height: $dialogKeybindSettingsCapture-srStatus-dimensionalSize;
   overflow: hidden;
   position: absolute;
   white-space: nowrap;
-  width: 1px;
+  width: $dialogKeybindSettingsCapture-srStatus-dimensionalSize;
 }
 </style>
 
@@ -157,22 +158,22 @@ const {
 }
 
 .dialogKeybindSettingsCapture__tooltipFootnote {
-  margin: 10px 0 0;
+  margin: $dialogKeybindSettingsCapture-tooltip-footnote-marginTop 0 0;
 }
 
 .dialogKeybindSettingsCapture__tooltipHeading {
-  font-weight: 600;
-  margin: 0 0 6px;
+  font-weight: $dialogKeybindSettingsCapture-tooltip-fontWeight;
+  margin: 0 0 $dialogKeybindSettingsCapture-tooltip-heading-marginBottom;
 }
 
 .dialogKeybindSettingsCapture__tooltipList {
   list-style: disc;
   margin: 0;
-  padding-left: 1.1rem;
+  padding-left: $dialogKeybindSettingsCapture-tooltip-list-paddingLeft;
 }
 
 .dialogKeybindSettingsCapture__tooltipListItem {
-  margin: 2px 0;
+  margin: $dialogKeybindSettingsCapture-tooltip-listItem-marginVertical 0;
 }
 
 .dialogKeybindSettingsCapture__tooltipShell {

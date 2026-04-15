@@ -61,7 +61,6 @@ export function createDialogKeybindSettingsSync (params: {
 export function createDialogKeybindSettingsState (t: (key: string) => string): {
   capture: ReturnType<typeof createDialogKeybindSettingsCapture>
   filter: Ref<string>
-  pagination: Ref<{ rowsPerPage: number }>
   sync: ReturnType<typeof createDialogKeybindSettingsSync>
   table: ReturnType<typeof createDialogKeybindSettingsTableState>
   workingOverrides: Ref<I_faKeybindsRoot['overrides']>
@@ -69,7 +68,6 @@ export function createDialogKeybindSettingsState (t: (key: string) => string): {
   const keybindsStore = S_FaKeybinds()
   const workingOverrides = ref<I_faKeybindsRoot['overrides']>({})
   const filter = ref('')
-  const pagination = ref({ rowsPerPage: 0 })
   const platform = computed(() => keybindsStore.snapshot?.platform ?? 'win32')
 
   const capture = createDialogKeybindSettingsCapture({
@@ -93,7 +91,6 @@ export function createDialogKeybindSettingsState (t: (key: string) => string): {
   return {
     capture,
     filter,
-    pagination,
     sync,
     table,
     workingOverrides
@@ -114,7 +111,6 @@ export function useDialogKeybindSettings (): {
   onCloseMain: () => void
   onOpenCapture: (row: I_dialogKeybindSettingsRow) => void
   onSaveMain: () => Promise<boolean>
-  pagination: Ref<{ rowsPerPage: number }>
   pendingChord: Ref<I_faChordSerialized | null>
   tableColumns: ComputedRef<Array<{ align: 'left', field: string, label: string, name: string }>>
   tableRows: ComputedRef<I_dialogKeybindSettingsRow[]>
@@ -141,7 +137,6 @@ export function useDialogKeybindSettings (): {
     onCloseMain: s.sync.onCloseMain,
     onOpenCapture: s.capture.onOpenCapture,
     onSaveMain: s.sync.onSaveMain,
-    pagination: s.pagination,
     pendingChord: s.capture.pendingChord,
     tableColumns: s.table.tableColumns,
     tableRows: s.table.tableRows,

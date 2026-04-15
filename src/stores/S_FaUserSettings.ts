@@ -6,7 +6,7 @@ import { Notify } from 'quasar'
 
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
-import { applyFaI18nLocaleFromLanguageCode } from 'src/scripts/applyFaI18nLocaleFromLanguageCode'
+import { applyFaI18nLocaleFromLanguageCode } from 'app/src/scripts/appInternals/rendererAppInternals'
 
 /**
  * Manages user settings state sourced from the Electron main process via the IPC bridge.
