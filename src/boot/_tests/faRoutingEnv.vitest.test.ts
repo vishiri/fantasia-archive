@@ -4,8 +4,11 @@ const runAppStartupRoutingMock = vi.hoisted(() => {
   return vi.fn()
 })
 
-vi.mock('app/src/scripts/appInfo/appStartupRouting', () => {
+vi.mock('app/src/scripts/appInternals/rendererAppInternals', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('app/src/scripts/appInternals/rendererAppInternals')>()
   return {
+    ...actual,
     runAppStartupRouting: runAppStartupRoutingMock
   }
 })

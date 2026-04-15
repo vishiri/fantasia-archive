@@ -20,7 +20,7 @@ vi.mock('#q-app/wrappers', () => {
   }
 })
 
-import externalLinkManagerBoot from '../externalLinkManager'
+import externalLinkManagementBoot from '../externalLinkManagement'
 
 beforeEach(() => {
   checkIfExternalMock.mockReset()
@@ -28,7 +28,7 @@ beforeEach(() => {
 })
 
 function runExternalLinkBoot (): void {
-  const run = externalLinkManagerBoot as () => void
+  const run = externalLinkManagementBoot as () => void
   run()
 }
 
@@ -57,10 +57,10 @@ function setWindowLinksStub (): void {
 }
 
 /**
- * externalLinkManager boot file
+ * externalLinkManagement boot file
  * Test if click and auxclick listeners are registered.
  */
-test('Test that externalLinkManager boot registers click handlers', () => {
+test('Test that externalLinkManagement boot registers click handlers', () => {
   const addEventListenerMock = vi.fn()
   setDocumentAddListenerMock(addEventListenerMock)
 
@@ -71,7 +71,7 @@ test('Test that externalLinkManager boot registers click handlers', () => {
 })
 
 /**
- * externalLinkManager click handler
+ * externalLinkManagement click handler
  * Test that external links are intercepted and opened through bridge API.
  */
 test('Test that click handler opens external links via faExternalLinksManager', () => {
@@ -145,7 +145,7 @@ test('Test that click handler leaves internal links to normal navigation', () =>
 })
 
 /**
- * externalLinkManager auxclick handler
+ * externalLinkManagement auxclick handler
  * Test that middle-click prevents browser defaults.
  */
 test('Test that auxclick prevents default behavior', () => {
@@ -182,7 +182,7 @@ test('Test that auxclick prevents default behavior', () => {
 })
 
 /**
- * externalLinkManager auxclick handler
+ * externalLinkManagement auxclick handler
  * Internal links assign location.href after preventing default so middle-click follows in-window navigation.
  */
 test('Test that auxclick on internal link sets location href when not external', () => {
@@ -240,7 +240,7 @@ test('Test that auxclick on internal link sets location href when not external',
 })
 
 /**
- * externalLinkManager click handler
+ * externalLinkManagement click handler
  * Ignores events whose target is null so shadow roots or detached nodes do not throw.
  */
 test('Test that click handler returns early when event target is null', () => {
@@ -269,7 +269,7 @@ test('Test that click handler returns early when event target is null', () => {
 })
 
 /**
- * externalLinkManager click handler
+ * externalLinkManagement click handler
  * Resolves the anchor via closest when the direct target is not an anchor element.
  */
 test('Test that click handler uses closest anchor when target is a nested element', () => {
@@ -309,7 +309,7 @@ test('Test that click handler uses closest anchor when target is a nested elemen
 })
 
 /**
- * externalLinkManager click handler
+ * externalLinkManagement click handler
  * Returns when closest does not find an enclosing anchor so non-link clicks are ignored.
  */
 test('Test that click handler returns when nested target has no anchor ancestor', () => {

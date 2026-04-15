@@ -1,6 +1,6 @@
 import { defineBoot } from '#q-app/wrappers'
 
-import { runAppStartupRouting } from 'app/src/scripts/appInfo/appStartupRouting'
+import { runAppStartupRouting } from 'app/src/scripts/appInternals/rendererAppInternals'
 import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
 
 /**
