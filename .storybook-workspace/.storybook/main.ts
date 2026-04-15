@@ -98,6 +98,20 @@ const config: StorybookConfig = {
           }
         : {}),
       publicDir: publicDirPath,
+      server: {
+        ...(viteConfig.server ?? {}),
+        fs: {
+          ...(viteConfig.server?.fs ?? {}),
+          allow: Array.from(
+            new Set([
+              ...(Array.isArray(viteConfig.server?.fs?.allow)
+                ? viteConfig.server.fs.allow
+                : []),
+              repoRoot
+            ])
+          )
+        }
+      },
       plugins: [
         vitePluginServeRepoPublic(publicDirPath),
         vitePluginRewriteGlobEagerForStorybook(),

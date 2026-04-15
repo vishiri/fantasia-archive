@@ -16,7 +16,7 @@ import QMarkdownPlugin from '@quasar/quasar-ui-qmarkdown'
 
 import type { Preview } from '@storybook/vue3-vite'
 import type { QuasarPluginOptions } from 'quasar'
-import { setFantasiaStorybookCanvasFlag } from 'src/scripts/isFantasiaStorybookCanvas'
+import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/rendererAppInternals'
 
 import { setContentBridgeScenario } from './mocks/contentBridge'
 import { getStorybookI18nMessages, setI18nScenario } from './mocks/externalFileLoader'

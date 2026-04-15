@@ -20,7 +20,7 @@ import type { T_i18nScenario } from 'app/types/I_storybookWorkspaceHarness'
 
 /**
  * Mirrors vue-i18n Composer 'locale' so components and helpers that read
- * 'i18n.global.locale.value' (or assign via 'applyFaI18nLocaleFromLanguageCode') do not throw.
+ * 'i18n.global.locale.value' (or assign locale via applyFaI18nLocaleFromLanguageCode from 'app/src/scripts/appInternals/rendererAppInternals') do not throw.
  * Story templates still use the separate 'createI18n' instance from preview setup for '$t'.
  */
 const storybookExternalLoaderLocale = ref<string>('en-US')
