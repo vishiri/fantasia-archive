@@ -17,7 +17,7 @@ description: >-
 
 ## Component folders (`src/components/`)
 
-- **`dialogs/`** — `Dialog*` modal SFCs.
+- **`dialogs/`** — `Dialog*` modal SFCs. Root **`q-dialog`** **`v-model`** refs that participate in global open coordination should call **`registerComponentDialogStackGuard`** or **`registerMarkdownDialogStackGuard`** from **`src/scripts/appGlobalManagementUI/dialogManagement.ts`** (same module as **`openDialogMarkdownDocument`**) so names state the stacking rule, not metaphor-only labels.
 - **`globals/`** — app chrome (`GlobalWindowButtons`, `AppControlMenus`, `AppControlSingleMenu`).
 - **`elements/`** — small reusable widgets (`FantasiaMascotImage`, `SocialContactSingleButton`).
 - **`other/`** — other composites (`SocialContactButtons`).
@@ -62,6 +62,7 @@ Locale `L_*` paths under `i18n/<locale>/components/` use the same bucket names a
 
 - **Enforced limits** (ESLint): **`.vue` ≤250 lines**, **functions ≤50 lines**, **non-exempt `.ts` ≤200 lines** — see [code-size-decomposition.mdc](../../rules/code-size-decomposition.mdc). When a feature would exceed them, extract into **`src/components/<bucket>/<Feature>/scripts/*.ts`**, add **subcomponents**, and/or move shared pure logic to **`src/scripts/`**. Do not park feature-owned extractions next to the `.vue` at the feature root.
 - **How to split `scripts/`:** limits are **maximums**. Prefer **fewer TypeScript modules** that each hold a **whole concern** (for example one file for table rows + columns + filtered state, one for dialog open + routing + global suspend) until a file approaches **200 lines** or a single function approaches **50 lines**. **Avoid** a long list of **10–20 line** files with one export each when grouping would stay within ESLint caps — see [code-size-decomposition.mdc](../../rules/code-size-decomposition.mdc) **Module count: prefer logical grouping**. After merging production modules, merge or rename colocated **`scripts/_tests/*.vitest.test.ts`** so tests stay easy to find.
+- **Shared `src/scripts/<feature>/`:** same anti-fragmentation rule as component **`scripts/`** — batch by subsystem (see [typescript-scripts.mdc](../../rules/typescript-scripts.mdc)); add a **thin** extra file only for a documented boundary (mock target, circular import, public shim).
 - **External `<style>` files** are a **last resort** anti-pattern; use only with **explicit user approval** in that session.
 - Distinct from **`_data/`** (production structured payloads) and from **`src/scripts/`** (shared app-wide helpers). See [vue-quasar.mdc](../../rules/vue-quasar.mdc).
 

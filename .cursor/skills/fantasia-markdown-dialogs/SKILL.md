@@ -11,7 +11,7 @@ description: >-
 ## Components
 
 - **`DialogMarkdownDocument.vue`**: Renders markdown via `QMarkdown` from `@quasar/quasar-ui-qmarkdown` with the package CSS imported alongside the component.
-- Dialog flow is tied to Pinia dialog state (`src/stores/S_Dialog.ts`) and helpers such as `src/scripts/appInfo/openDialogMarkdownDocument.ts`.
+- Dialog flow is tied to Pinia dialog state (`src/stores/S_Dialog.ts`) and helpers in **`src/scripts/appGlobalManagementUI/dialogManagement.ts`** (for example **`openDialogMarkdownDocument`**). The root `q-dialog` model calls **`registerMarkdownDialogStackGuard`** from that module so **`markdownDialogOpenCount`** stays aligned when the dialog closes or the host unmounts.
 
 ## Content source
 

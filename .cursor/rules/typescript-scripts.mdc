@@ -11,7 +11,8 @@ Vue SFCs import from here when extracting **pure helpers**; see [vue-quasar.mdc]
 ## Layout
 
 - **`_utilities/`** — small, pure helpers (format conversion, parsing) with **JSDoc on each exported function** (`@param` / `@returns` where helpful), e.g. [colorFormatConvertors.ts](src/scripts/_utilities/colorFormatConvertors.ts).
-- **Feature folders** (e.g. `appInfo/`) — behavior tied to app features; keep files focused on one area.
+- **`appInternals/`** — cross-cutting renderer helpers bundled in **`rendererAppInternals.ts`** (Storybook canvas detection, Vite public asset paths, interface language apply/save, boot routing side effects) — not feature-dialog or keybind-specific.
+- **Feature folders** (e.g. `appGlobalManagementUI/`) — behavior tied to app features; keep files focused on one area.
 - **`keybinds/`** — global shortcut matching, chord helpers, and **`faKeybindRunCommand`**; wired from **`MainLayout.vue`** with state from **`S_FaKeybinds`**. When adding app-wide shortcuts, follow [fantasia-keybinds](../skills/fantasia-keybinds/SKILL.md).
 - Leading underscore on folder names like `_utilities` signals shared non-feature helpers.
 
@@ -27,12 +28,17 @@ When a file grows hard to scan or approaches those caps:
 
 **Do not over-split:** many tiny files (each exporting one small helper) are harder to navigate than one domain module that stays **under the line cap**. Prefer **merging** related exports into the same file until **200 lines** or **50 lines per function** forces a real split; see [code-size-decomposition.mdc](code-size-decomposition.mdc) **Module count: prefer logical grouping**.
 
+**Intentionally small modules are allowed** when there is a **documented** reason — for example a thin file that only holds **`faKeybindRunCommand`** so integration tests can **`vi.mock`** that module without mocking the whole keydown dispatcher, or breaking a **circular import**. Prefer solving the root cause (merge callers, invert a dependency) when that is cheap; when a thin file stays, add a brief file-top or export JSDoc note so future edits do not 'consolidate away' the seam by accident.
+
+**Vitest `vitest.setup.ts`:** do **not** import **`rendererAppInternals`** there — that bundle imports **`i18n`** at module top, which runs before the hoisted **`vi.mock('app/i18n/externalFileLoader')`** factory can safely close over **`ref`**-based stubs. The setup file keeps a tiny duplicate of **`setFantasiaStorybookCanvasFlag`** next to the i18n mock (see **`vitest/vitest.setup.ts`** comments).
+
 ## Style
 
 - Match existing import style (`app/...` alias where the repo already uses it).
+- Name exports for **observable behavior** (what callers achieve or what store or UI stays consistent), not metaphor-only labels such as **lease** for coordination helpers. Prefer names that state the invariant (**stack**, exclusivity between dialog families) or the concrete entry point; add a short JSDoc when the behavior spans multiple stores or open paths (see **`dialogManagement.ts`** under **`appGlobalManagementUI/`**).
 - Prefer explicit return types on public exports when surrounding code does.
 - Avoid `any` in function signatures, object shapes, and casts; use precise types (`unknown` if needed) and narrow at usage sites.
-- Unit tests are allowed and encouraged for `src/scripts/**` modules when colocated in neighboring `_tests/` folders (for example `src/scripts/_utilities/_tests/` and `src/scripts/appInfo/_tests/`) using `*.vitest.test.ts`.
+- Unit tests are allowed and encouraged for `src/scripts/**` modules when colocated in neighboring `_tests/` folders (for example `src/scripts/_utilities/_tests/`, `src/scripts/appInternals/_tests/`, and `src/scripts/appGlobalManagementUI/_tests/`) using `*.vitest.test.ts`.
 - Keep Playwright for UI integration flows; do not move renderer interaction coverage out of existing Playwright suites when those checks depend on built app behavior.
 
 ## TypeScript interfaces and types (`types/`)

@@ -7,7 +7,7 @@ alwaysApply: true
 
 ## Quality gate (the **default** chained verification)
 
-When running the full **quality gate** — ESLint, TypeScript check, Stylelint, and Vitest with coverage (**100%** on all four v8 metrics for **`src-electron`**, **`helpers`**, and scoped **`i18n/`** (**`unit-i18n`**), **100%** on all four for renderer **`src`** **`.ts`** in **`unit-src-renderer`**, **100%** statements, functions, and lines for **`.ts`** under **`src/components`**, **`src/layouts`**, and **`src/pages`** in **`unit-components`**, **`.vue`** SFCs reported with **60%** watermarks only) — use **one** terminal invocation. Prefer the **`yarn testbatch:verify`** script in `package.json` (same steps, stops on the first failure):
+When running the full **quality gate** — ESLint, TypeScript check, Stylelint, and Vitest with coverage (**100%** on all four v8 metrics for **`src-electron`**, **`helpers`**, and scoped **`i18n/`** (**`unit-i18n`**), **100%** on all four for renderer **`src`** **`.ts`** in **`unit-src-renderer`**, **100%** on all four for **`.ts`** under **`src/components`**, **`src/layouts`**, and **`src/pages`** in **`unit-components`**, **`.vue`** SFCs reported with **~60%** watermarks only) — use **one** terminal invocation. Prefer the **`yarn testbatch:verify`** script in `package.json` (same steps, stops on the first failure):
 
 `yarn testbatch:verify`
 
