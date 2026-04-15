@@ -12,13 +12,6 @@ import {
 } from './vitest.coverage.shared'
 import { vitestTerminalReporters } from './vitest.reporters.shared'
 
-/** 100% lines/statements/functions for **.ts; branches omitted (v8 counts iterator/comparator edges oddly on some loops). */
-const vitestSrcTsStrictThresholdsNoBranches = {
-  statements: vitestCoverageStrictThresholds.statements,
-  functions: vitestCoverageStrictThresholds.functions,
-  lines: vitestCoverageStrictThresholds.lines
-} as const
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
 
@@ -31,8 +24,8 @@ type T_vitestComponentsScssOpts = NonNullable<
 
 /**
  * Vue SFC unit tests — jsdom + SFC transforms: components, layouts, and pages.
- * **.ts** files under those trees use 100% statements/functions/lines thresholds (branches omitted for this slice—v8 over-counts some iterator edges).
- * **.vue** files have no failing threshold; watermarks use a 60% lower bound so HTML/text reports flag weak Vue coverage for human review.
+ * **.ts** files under those trees: **100%** statements, branches, functions, lines (merged per Vitest **`coverage.thresholds`** glob).
+ * **.vue** SFCs: **no** failing **`coverage.thresholds`** entry; **`watermarks`** use a **60%** lower band so weak totals show orange or red in reports.
  */
 export default defineConfig({
   plugins: [vue()],
@@ -84,18 +77,20 @@ export default defineConfig({
         'src/components/**/_tests/**',
         'src/layouts/**/_tests/**',
         'src/pages/**/_tests/**',
-        '**/*.stories.ts'
+        '**/*.stories.ts',
+        // Storybook-only catalogues (see AGENTS.md foundation section); strict gates apply to product UI only.
+        'src/components/foundation/**'
       ],
       watermarks: {
-        statements: [60, 90],
-        branches: [60, 85],
-        functions: [60, 90],
-        lines: [60, 85]
+        statements: [60, 100],
+        branches: [60, 100],
+        functions: [60, 100],
+        lines: [60, 100]
       },
       thresholds: {
-        'src/components/**/*.ts': { ...vitestSrcTsStrictThresholdsNoBranches },
-        'src/layouts/**/*.ts': { ...vitestSrcTsStrictThresholdsNoBranches },
-        'src/pages/**/*.ts': { ...vitestSrcTsStrictThresholdsNoBranches }
+        'src/components/**/*.ts': { ...vitestCoverageStrictThresholds },
+        'src/layouts/**/*.ts': { ...vitestCoverageStrictThresholds },
+        'src/pages/**/*.ts': { ...vitestCoverageStrictThresholds }
       }
     }
   }

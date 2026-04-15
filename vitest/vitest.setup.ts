@@ -5,11 +5,24 @@ import { afterEach, beforeEach, vi } from 'vitest'
 
 import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
-import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/isFantasiaStorybookCanvas'
 
 const originalConsoleWarn = console.warn.bind(console)
 
 const i18nLocaleRef = ref('en-US')
+
+const FANTASIA_STORYBOOK_CANVAS_KEY = '__fantasiaStorybookCanvas'
+
+/**
+ * Mirrors 'setFantasiaStorybookCanvasFlag' from 'app/src/scripts/appInternals/rendererAppInternals'.
+ * Defined here so this setup file does not import that module (it pulls 'i18n' before the hoisted 'vi.mock' for externalFileLoader is safe).
+ */
+function setFantasiaStorybookCanvasFlag (value: boolean): void {
+  if (value) {
+    (globalThis as Record<string, unknown>)[FANTASIA_STORYBOOK_CANVAS_KEY] = true
+  } else {
+    delete (globalThis as Record<string, unknown>)[FANTASIA_STORYBOOK_CANVAS_KEY]
+  }
+}
 
 config.global.config = {
   compilerOptions: {
