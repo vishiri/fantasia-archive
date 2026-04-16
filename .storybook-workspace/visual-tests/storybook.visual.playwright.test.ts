@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
 import {
   FANTASIA_STORYBOOK_VIEWPORT_HEIGHTS,
@@ -7,7 +7,7 @@ import {
 import type { I_storybookIndex } from 'app/types/I_storybookWorkspaceHarness'
 
 /**
- * Set FA_STORYBOOK_VISUAL_VERBOSE=1 (or 'true') to print per-story progress (Story count, Captured, Done).
+ * Set FA_STORYBOOK_VISUAL_VERBOSE=1 (or 'true') to print per-story progress (Story count, Done per story).
  * Warnings and errors always print.
  */
 const verboseStorybookVisualLog = process.env.FA_STORYBOOK_VISUAL_VERBOSE === '1' ||
@@ -30,6 +30,12 @@ const EXCLUDED_STORY_IDS = new Set<string>([
   'components-elements-fantasiamascotimage--random'
 ])
 
+/**
+ * Stories may opt out of the iframe root render probe when they intentionally mount no DOM under '#storybook-root' / '#root' (rare).
+ * Prefer fixing the story; use this tag only with maintainer review. Excluded story ids above remain the primary skip mechanism.
+ */
+const SKIP_VISUAL_RENDER_ROOT_CHECK_TAG = 'skip-visual-render-check'
+
 const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number, errorMessage: string): Promise<T> => {
   let timeoutId: ReturnType<typeof setTimeout> | undefined
   try {
@@ -46,6 +52,56 @@ const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number, errorMessa
   }
 }
 
+const formatCaughtError = (error: unknown): string => {
+  if (error instanceof Error) {
+    return error.message
+  }
+  return String(error)
+}
+
+/**
+ * Ensures the HTML report lists artifacts when a story fails before or during the snapshot step.
+ * Relying only on toHaveScreenshot leaves render-time failures with no images in the report.
+ */
+const attachStorybookVisualFailureCapture = async (
+  page: Page,
+  storyId: string,
+  reason: string
+): Promise<void> => {
+  const safeStory = normalizeSnapshotName(storyId)
+  const safeReason = reason.replaceAll(/[^a-zA-Z0-9_-]/g, '_')
+  const baseName = `${safeStory}__${safeReason}`
+
+  try {
+    const screenshot = await page.screenshot({
+      fullPage: true
+    })
+    await test.info().attach(`${baseName}.png`, {
+      body: screenshot,
+      contentType: 'image/png'
+    })
+  } catch {
+    // Page may be unavailable after navigation errors or teardown races.
+  }
+
+  try {
+    const probe = await page.evaluate(() => {
+      const root = document.querySelector('#storybook-root, #root')
+      return {
+        childElementCount: root?.childElementCount ?? null,
+        locationHref: window.location.href,
+        outerHtmlSlice: root ? root.outerHTML.slice(0, 60_000) : null
+      }
+    })
+    await test.info().attach(`${baseName}__storybook-root-probe.json`, {
+      body: Buffer.from(JSON.stringify(probe, null, 2), 'utf8'),
+      contentType: 'application/json'
+    })
+  } catch {
+    // Ignore probe failures when the page is not scriptable.
+  }
+}
+
 test('Capture visual snapshots for Storybook stories', async ({ browser, request }) => {
   const indexResponse = await request.get('/index.json')
   expect(indexResponse.ok()).toBeTruthy()
@@ -57,7 +113,6 @@ test('Capture visual snapshots for Storybook stories', async ({ browser, request
     .sort((a, b) => a.id.localeCompare(b.id))
 
   vlog(`[storybook-visual] Story count: ${storyList.length}`)
-  const failedStories: string[] = []
 
   for (const [index, story] of storyList.entries()) {
     vlog(`[storybook-visual] (${index + 1}/${storyList.length}) ${story.id}`)
@@ -73,9 +128,17 @@ test('Capture visual snapshots for Storybook stories', async ({ browser, request
       })
       const page = await context.newPage()
       try {
-        await withTimeout(page.goto(`/iframe.html?id=${story.id}&viewMode=story`, {
-          waitUntil: 'domcontentloaded'
-        }), STORY_RENDER_TIMEOUT_MS, `Timed out navigating to story: ${story.id}`)
+        try {
+          await withTimeout(page.goto(`/iframe.html?id=${story.id}&viewMode=story`, {
+            waitUntil: 'load'
+          }), STORY_RENDER_TIMEOUT_MS, `Timed out navigating to story: ${story.id}`)
+        } catch (error) {
+          await attachStorybookVisualFailureCapture(page, story.id, 'navigation-failed')
+          expect.soft(false, {
+            message: `[storybook-visual] navigation failed for ${story.id}: ${formatCaughtError(error)}`
+          }).toBe(true)
+          return
+        }
 
         const storyRendered = await page.waitForFunction(() => {
           const root = document.querySelector('#storybook-root, #root')
@@ -87,11 +150,27 @@ test('Capture visual snapshots for Storybook stories', async ({ browser, request
         }).then(() => true).catch(() => false)
 
         if (!storyRendered) {
-          console.warn(`[storybook-visual] Skipped (did not render root): ${story.id}`)
+          if ((story.tags ?? []).includes(SKIP_VISUAL_RENDER_ROOT_CHECK_TAG)) {
+            console.warn(`[storybook-visual] Skipped root render check (${SKIP_VISUAL_RENDER_ROOT_CHECK_TAG}): ${story.id}`)
+            return
+          }
+          await attachStorybookVisualFailureCapture(page, story.id, 'render-probe-failed')
+          expect.soft(storyRendered, {
+            message: `[storybook-visual] story did not render in iframe (no root children / teleport): ${story.id}`
+          }).toBeTruthy()
           return
         }
 
-        await withTimeout(page.evaluate(async () => { await document.fonts.ready }), STORY_RENDER_TIMEOUT_MS, `Timed out waiting for fonts: ${story.id}`)
+        try {
+          await withTimeout(page.evaluate(async () => { await document.fonts.ready }), STORY_RENDER_TIMEOUT_MS, `Timed out waiting for fonts: ${story.id}`)
+        } catch (error) {
+          await attachStorybookVisualFailureCapture(page, story.id, 'fonts-ready-failed')
+          expect.soft(false, {
+            message: `[storybook-visual] fonts.ready failed for ${story.id}: ${formatCaughtError(error)}`
+          }).toBe(true)
+          return
+        }
+
         await page.waitForTimeout(SCREENSHOT_SETTLE_DELAY_MS)
 
         const storybookRenderErrorDetails = await page.evaluate(() => {
@@ -124,27 +203,31 @@ test('Capture visual snapshots for Storybook stories', async ({ browser, request
         })
 
         if (storybookRenderErrorDetails.hasVisibleError) {
-          throw new Error(`Storybook render error detected: ${story.id}\n${storybookRenderErrorDetails.panelTexts.join('\n---\n')}`)
+          await attachStorybookVisualFailureCapture(page, story.id, 'storybook-error-overlay')
+          expect.soft(false, {
+            message: `[storybook-visual] Storybook error overlay for ${story.id}:\n${storybookRenderErrorDetails.panelTexts.join('\n---\n')}`
+          }).toBe(true)
+          return
         }
 
-        await withTimeout(expect(page).toHaveScreenshot(`${normalizeSnapshotName(story.id)}.png`, {
-          animations: 'disabled',
-          caret: 'hide',
-          // Absorb fonts/subpixel variance (local vs GitHub windows-latest Chromium); worst CI diffs ~1.6k px
-          maxDiffPixels: 2000
-        }), STORY_STEP_TIMEOUT_MS, `Timed out taking screenshot: ${story.id}`)
-
-        vlog(`[storybook-visual] Captured: ${story.id}`)
-      } catch (error) {
-        console.warn(`[storybook-visual] Skipped (error): ${story.id}`)
-        console.warn(error)
-        failedStories.push(story.id)
+        try {
+          // Hard expect so snapshot mismatch rejects; expect.soft resolves on failure and skips the catch below.
+          await withTimeout(expect(page).toHaveScreenshot(`${normalizeSnapshotName(story.id)}.png`, {
+            animations: 'disabled',
+            caret: 'hide',
+            // Absorb fonts/subpixel variance (local vs GitHub windows-latest Chromium); worst CI diffs ~1.6k px
+            maxDiffPixels: 2000
+          }), STORY_STEP_TIMEOUT_MS, `Timed out taking screenshot: ${story.id}`)
+        } catch (error) {
+          await attachStorybookVisualFailureCapture(page, story.id, 'screenshot-step-failed')
+          expect.soft(false, {
+            message: `[storybook-visual] screenshot step failed for ${story.id}: ${formatCaughtError(error)}`
+          }).toBe(true)
+        }
       } finally {
         await context.close().catch(() => {})
         vlog(`[storybook-visual] Done: ${story.id}`)
       }
     })
   }
-
-  expect(failedStories, `Visual stories failed (${failedStories.length}): ${failedStories.join(', ')}`).toEqual([])
 })
