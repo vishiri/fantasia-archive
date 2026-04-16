@@ -1,7 +1,9 @@
 import type { StoreGeneric } from 'pinia'
 import type { Ref } from 'vue'
 import { computed, onMounted, onUnmounted, watch } from 'vue'
+import { Notify } from 'quasar'
 
+import { i18n } from 'app/i18n/externalFileLoader'
 import { formatFaChordForDisplay } from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
 import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
@@ -75,8 +77,14 @@ export function runDialogKeybindSettingsOpen (params: {
       initializeForOpen()
       dialogModel.value = true
     })
-    .catch(() => {
-      /* Bridge errors leave the dialog closed; component dialog stack guard count was not incremented yet. */
+    .catch((error: unknown) => {
+      console.error('[DialogKeybindSettings] refreshKeybinds failed before open', error)
+      Notify.create({
+        group: false,
+        message: i18n.global.t('globalFunctionality.faKeybinds.loadError'),
+        timeout: 0,
+        type: 'negative'
+      })
     })
 }
 

@@ -1,12 +1,15 @@
 import type { Ref } from 'vue'
 
 import { defineStore } from 'pinia'
-import { Notify } from 'quasar'
 import { ref } from 'vue'
 
-import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import type { I_faKeybindsSnapshot } from 'app/types/I_faKeybindsDomain'
-import { i18n } from 'app/i18n/externalFileLoader'
+
+import { runFaKeybindsRefreshKeybinds } from './faKeybindsStoreBridgeRefresh'
+import {
+  runFaKeybindsUpdateKeybinds,
+  type I_faKeybindsUpdatePatch
+} from './faKeybindsStoreBridgeUpdate'
 
 export const S_FaKeybinds = defineStore('S_FaKeybinds', () => {
   const snapshot: Ref<I_faKeybindsSnapshot | null> = ref(null)
@@ -17,43 +20,11 @@ export const S_FaKeybinds = defineStore('S_FaKeybinds', () => {
   }
 
   async function refreshKeybinds (): Promise<void> {
-    const api = window.faContentBridgeAPIs?.faKeybinds
-    if (typeof api?.getKeybinds !== 'function') {
-      return
-    }
-    snapshot.value = await api.getKeybinds()
+    await runFaKeybindsRefreshKeybinds(snapshot)
   }
 
-  async function updateKeybinds (patch: {
-    overrides?: I_faKeybindsRoot['overrides']
-    replaceAllOverrides?: boolean
-  }): Promise<boolean> {
-    const api = window.faContentBridgeAPIs?.faKeybinds
-    if (typeof api?.setKeybinds !== 'function') {
-      return false
-    }
-
-    try {
-      await api.setKeybinds(patch)
-    } catch (error) {
-      console.error('[S_FaKeybinds] setKeybinds failed', error)
-      Notify.create({
-        group: false,
-        message: i18n.global.t('globalFunctionality.faKeybinds.saveError'),
-        timeout: 0,
-        type: 'negative'
-      })
-      return false
-    }
-
-    await refreshKeybinds()
-
-    Notify.create({
-      group: false,
-      message: i18n.global.t('globalFunctionality.faKeybinds.saveSuccess'),
-      type: 'positive'
-    })
-    return true
+  async function updateKeybinds (patch: I_faKeybindsUpdatePatch): Promise<boolean> {
+    return await runFaKeybindsUpdateKeybinds(patch, refreshKeybinds)
   }
 
   return {
