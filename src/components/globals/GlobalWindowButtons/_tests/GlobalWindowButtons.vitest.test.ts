@@ -86,3 +86,27 @@ test('Test that GlobalWindowButtons minimize does not invoke faWindowControl whe
   w.unmount()
   vi.unstubAllEnvs()
 })
+
+/**
+ * GlobalWindowButtons
+ * Mounted interval should periodically refresh maximized state in electron MODE.
+ */
+test('Test that GlobalWindowButtons interval invokes checkWindowMaximized on a timer tick', async () => {
+  vi.stubEnv('MODE', 'electron')
+  vi.useFakeTimers()
+  const w = mount(GlobalWindowButtons, {
+    global: { mocks: { $t: (k: string) => k } }
+  })
+
+  await flushPromises()
+  const checkMax = vi.mocked(window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized)
+  const callsAfterMount = checkMax.mock.calls.length
+
+  await vi.advanceTimersByTimeAsync(100)
+  await flushPromises()
+
+  expect(checkMax.mock.calls.length).toBeGreaterThan(callsAfterMount)
+  w.unmount()
+  vi.useRealTimers()
+  vi.unstubAllEnvs()
+})

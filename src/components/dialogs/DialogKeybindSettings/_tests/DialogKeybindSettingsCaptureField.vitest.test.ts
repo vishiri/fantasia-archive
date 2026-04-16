@@ -91,3 +91,44 @@ test('DialogKeybindSettingsCaptureField prefers conflict message when captureErr
   expect(field.attributes('data-test-keybind-field-has-error')).toBe('true')
   w.unmount()
 })
+
+/**
+ * DialogKeybindSettingsCaptureField
+ * Help icon slot should render capture help line keys through the tooltip template.
+ */
+test('DialogKeybindSettingsCaptureField renders tooltip help lines from captureHelpLineKeys', async () => {
+  const w = mount(DialogKeybindSettingsCaptureField, {
+    global: {
+      mocks: { $t: (k: string) => k },
+      stubs: {
+        QField: {
+          inheritAttrs: true,
+          template: `
+            <div v-bind="$attrs">
+              <slot name="after" />
+              <slot name="control" />
+            </div>
+          `
+        },
+        QIcon: { template: '<span class="q-icon-stub"><slot /></span>' },
+        QTooltip: { template: '<div class="q-tooltip-stub"><slot /></div>' }
+      }
+    },
+    props: {
+      captureError: false,
+      captureErrorMessage: '',
+      captureInfoMessage: '',
+      captureLabel: 'Ctrl + B',
+      statusRegionId: 'capture-status-test'
+    }
+  })
+
+  await flushPromises()
+
+  const html = w.html()
+  expect(html).toContain('dialogs.keybindSettings.captureHelpLineCtrl')
+  expect(html).toContain('dialogs.keybindSettings.captureHelpFootnote')
+  expect(w.text()).toContain('Ctrl + B')
+
+  w.unmount()
+})

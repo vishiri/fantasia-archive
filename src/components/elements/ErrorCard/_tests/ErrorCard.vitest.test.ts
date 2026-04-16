@@ -65,6 +65,7 @@ test('Test that ErrorCard hides the details block when details prop is absent', 
   })
 
   expect(w.find('[data-test-locator="errorCard-details"]').exists()).toBe(false)
+  expect(w.attributes('data-test-error-card-width')).toBe('600')
   w.unmount()
 })
 

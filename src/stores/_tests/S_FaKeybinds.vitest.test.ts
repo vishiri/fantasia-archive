@@ -112,6 +112,26 @@ test('Test that refreshKeybinds skips when getKeybinds is unavailable', async ()
 })
 
 /**
+ * S_FaKeybinds / refreshKeybinds
+ * Shows negative notify when getKeybinds rejects.
+ */
+test('Test that refreshKeybinds notifies when getKeybinds rejects', async () => {
+  getKeybindsMock.mockRejectedValueOnce(new Error('ipc read fail'))
+  expect(store.snapshot).toBeNull()
+
+  await store.refreshKeybinds()
+
+  expect(getKeybindsMock).toHaveBeenCalledOnce()
+  expect(store.snapshot).toBeNull()
+  expect(notifyCreateMock).toHaveBeenCalledWith(
+    expect.objectContaining({
+      message: 'globalFunctionality.faKeybinds.loadError',
+      type: 'negative'
+    })
+  )
+})
+
+/**
  * S_FaKeybinds / updateKeybinds
  * Returns true and refreshes after a successful save.
  */

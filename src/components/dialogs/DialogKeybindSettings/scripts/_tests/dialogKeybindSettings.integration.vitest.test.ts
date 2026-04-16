@@ -3,11 +3,30 @@
  * SFC-focused and single-module tests stay in sibling _tests Vitest files next to their SUTs.
  */
 
+import { afterEach, expect, test, vi } from 'vitest'
+
+const { notifyCreateMock } = vi.hoisted(() => {
+  return {
+    notifyCreateMock: vi.fn(() => {
+      return (): void => {}
+    })
+  }
+})
+
+vi.mock('quasar', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('quasar')>()
+  return {
+    ...actual,
+    Notify: {
+      ...actual.Notify,
+      create: notifyCreateMock
+    }
+  }
+})
+
 import { mount, flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { computed, defineComponent, nextTick, reactive, ref } from 'vue'
-import { afterEach, expect, test, vi } from 'vitest'
-
 import { createDialogKeybindSettingsCapture } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsCapture'
 import {
   bindOnCaptureClear,
@@ -250,6 +269,7 @@ test('runDialogKeybindSettingsOpen sets model true after refresh resolves', asyn
 })
 
 test('runDialogKeybindSettingsOpen leaves dialog closed when refresh rejects', async () => {
+  notifyCreateMock.mockClear()
   const dialogModel = ref(false)
   const documentName = ref<T_dialogName>('AboutFantasiaArchive')
   const initializeForOpen = vi.fn()
@@ -266,6 +286,12 @@ test('runDialogKeybindSettingsOpen leaves dialog closed when refresh rejects', a
   expect(documentName.value).toBe('KeybindSettings')
   expect(initializeForOpen).not.toHaveBeenCalled()
   expect(dialogModel.value).toBe(false)
+  expect(notifyCreateMock).toHaveBeenCalledWith(
+    expect.objectContaining({
+      message: 'globalFunctionality.faKeybinds.loadError',
+      type: 'negative'
+    })
+  )
 })
 
 /**
