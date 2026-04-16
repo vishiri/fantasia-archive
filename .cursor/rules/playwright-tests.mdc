@@ -39,7 +39,7 @@ Primary locators use **`data-test-locator`**; additional hooks (for example `dat
 
 | Kind | Path pattern |
 |------|----------------|
-| Component | `src/components/<Component>/_tests/*.playwright.test.ts` |
+| Component | `src/components/<bucket>/<Feature>/_tests/*.playwright.test.ts` (`<bucket>` = `dialogs`, `elements`, `globals`, or `other` — `foundation/` is Storybook-only and has no Playwright specs) |
 | E2E | `e2e-tests/*.playwright.spec.ts` |
 
 ## Import order (top of file)

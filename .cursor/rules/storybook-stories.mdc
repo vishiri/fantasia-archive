@@ -1,3 +1,9 @@
+---
+description: Storybook stories placement, titles, tags, and layout/page canvas-only rules
+globs: "**/_tests/*.stories.ts"
+alwaysApply: false
+---
+
 # Storybook stories guardrails
 
 - Scope: `**/_tests/*.stories.ts`.

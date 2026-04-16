@@ -68,7 +68,7 @@ Do not place locale files in any other location. If no folder fits, use `globalF
 
 - For Storybook mocks/loaders, import focused non-markdown `L_*` locale modules directly (for example `app/i18n/en-US/components/globals/GlobalWindowButtons/L_GlobalWindowButtons.ts`) instead of importing `i18n/en-US/index.ts`.
 - Reason: the full locale entrypoint pulls markdown `documents/*.md`, which can break Storybook/Vite import analysis.
-- If Storybook stories need document content (`documents.*`), provide explicit placeholder strings (for example lorem ipsum) in `.storybook/preview.ts` rather than importing markdown files.
+- If Storybook stories need document content (`documents.*`), provide explicit placeholder strings (for example lorem ipsum) in `.storybook-workspace/.storybook/preview.ts` rather than importing markdown files.
 
 ## Related
 
