@@ -338,3 +338,127 @@ test('Test that click handler returns when nested target has no anchor ancestor'
   expect(orphanSpan.closest).toHaveBeenCalledWith('a')
   expect(checkIfExternalMock).not.toHaveBeenCalled()
 })
+
+/**
+ * externalLinkManagement click handler
+ * No-op when the content bridge omits faExternalLinksManager so non-Electron renders do not throw.
+ */
+test('Test that click handler returns when faExternalLinksManager is missing', () => {
+  const eventHandlers: Record<string, (ev: Event) => void> = {}
+  const addEventListenerMock = vi.fn((type: string, listener: unknown) => {
+    eventHandlers[type] = listener as (ev: Event) => void
+  })
+  setDocumentAddListenerMock(addEventListenerMock)
+
+  runExternalLinkBoot()
+
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    writable: true,
+    value: {
+      faContentBridgeAPIs: {}
+    } as unknown as Window & typeof globalThis
+  })
+
+  const targetAnchor = {
+    tagName: 'A',
+    href: 'https://example.com/',
+    closest: vi.fn(() => null)
+  }
+
+  const preventDefaultMock = vi.fn()
+
+  eventHandlers.click({
+    target: targetAnchor,
+    type: 'click',
+    preventDefault: preventDefaultMock
+  } as unknown as Event)
+
+  expect(preventDefaultMock).not.toHaveBeenCalled()
+})
+
+/**
+ * externalLinkManagement click handler
+ * No-op when faExternalLinksManager exists but checkIfExternal is not a function.
+ */
+test('Test that click handler returns when checkIfExternal is not a function', () => {
+  const eventHandlers: Record<string, (ev: Event) => void> = {}
+  const addEventListenerMock = vi.fn((type: string, listener: unknown) => {
+    eventHandlers[type] = listener as (ev: Event) => void
+  })
+  setDocumentAddListenerMock(addEventListenerMock)
+
+  runExternalLinkBoot()
+
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    writable: true,
+    value: {
+      faContentBridgeAPIs: {
+        faExternalLinksManager: {
+          checkIfExternal: 'not-a-fn',
+          openExternal: openExternalMock
+        }
+      }
+    } as unknown as Window & typeof globalThis
+  })
+
+  const targetAnchor = {
+    tagName: 'A',
+    href: 'https://example.com/',
+    closest: vi.fn(() => null)
+  }
+
+  const preventDefaultMock = vi.fn()
+
+  eventHandlers.click({
+    target: targetAnchor,
+    type: 'click',
+    preventDefault: preventDefaultMock
+  } as unknown as Event)
+
+  expect(preventDefaultMock).not.toHaveBeenCalled()
+})
+
+/**
+ * externalLinkManagement click handler
+ * No-op when checkIfExternal is a function but openExternal is not.
+ */
+test('Test that click handler returns when openExternal is not a function', () => {
+  const eventHandlers: Record<string, (ev: Event) => void> = {}
+  const addEventListenerMock = vi.fn((type: string, listener: unknown) => {
+    eventHandlers[type] = listener as (ev: Event) => void
+  })
+  setDocumentAddListenerMock(addEventListenerMock)
+
+  runExternalLinkBoot()
+
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    writable: true,
+    value: {
+      faContentBridgeAPIs: {
+        faExternalLinksManager: {
+          checkIfExternal: checkIfExternalMock,
+          openExternal: 'not-a-fn'
+        }
+      }
+    } as unknown as Window & typeof globalThis
+  })
+
+  const targetAnchor = {
+    tagName: 'A',
+    href: 'https://example.com/',
+    closest: vi.fn(() => null)
+  }
+
+  const preventDefaultMock = vi.fn()
+
+  eventHandlers.click({
+    target: targetAnchor,
+    type: 'click',
+    preventDefault: preventDefaultMock
+  } as unknown as Event)
+
+  expect(preventDefaultMock).not.toHaveBeenCalled()
+})
