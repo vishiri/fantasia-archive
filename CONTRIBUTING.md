@@ -63,7 +63,7 @@ If checks fail with permission or API errors on the **guard** job, paste the log
 
 ## For maintainers: GitHub settings (fork PR workflows)
 
-These settings help **B**: fork PRs can run Actions reliably and contributors get predictable behavior. They do **not** grant write access from forked **`pull_request`** workflows beyond what GitHub allows (read-only token to the base repo on public forks).
+These settings help maintainers and contributors: fork PRs can run Actions reliably and contributors get predictable behavior. They do **not** grant write access from forked **`pull_request`** workflows beyond what GitHub allows (read-only token to the base repo on public forks).
 
 1. **Enable Actions for fork PRs**
    Repository **Settings** → **Actions** → **General**: under **Fork pull request workflows from outside collaborators**, choose a policy that matches your trust model (for example require approval only for **first-time** contributors).

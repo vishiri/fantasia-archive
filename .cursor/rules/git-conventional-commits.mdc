@@ -31,7 +31,7 @@ alwaysApply: true
 ## Local enforcement (commitlint + Husky)
 
 - **`commitlint.config.mjs`** at the repo root mirrors this **`type`** list; messages starting with **`Merge `** or **`Revert `** are ignored so Git merges and reverts are not blocked.
-- **`yarn install`** runs **`husky`** via the **`prepare`** script in **`package.json`**; **`.husky/commit-msg`** runs **`yarn commitlint --edit`** so invalid subjects are rejected before **`git commit`** completes locally.
+- **`yarn install`** runs **`husky`** via the **`prepare`** script in **`package.json`**; **`.husky/commit-msg`** runs **`yarn lint:commit --edit`** so invalid subjects are rejected before **`git commit`** completes locally.
 - Try a message without committing: **`echo "feat: example" | yarn lint:commit`**. CI (**`.github/workflows/verify.yml`**) does not run commitlint unless you add a workflow step.
 
 ## TypeScript interfaces and types (`types/`)
