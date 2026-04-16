@@ -20,7 +20,11 @@ function parseComponentProps (): I_extraEnvVariablesAPI['COMPONENT_PROPS'] {
     return false
   }
 
-  return JSON.parse(raw) as Record<string, unknown>
+  try {
+    return JSON.parse(raw) as Record<string, unknown>
+  } catch {
+    return false
+  }
 }
 
 function buildExtraEnvSnapshot (): I_extraEnvVariablesAPI {

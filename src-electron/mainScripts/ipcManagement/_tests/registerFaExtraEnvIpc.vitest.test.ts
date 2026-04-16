@@ -161,14 +161,16 @@ test('Test that registerFaExtraEnvIpc snapshot parses COMPONENT_PROPS JSON', asy
 
 /**
  * registerFaExtraEnvIpc
- * Invalid COMPONENT_PROPS JSON throws when building snapshot.
+ * Invalid COMPONENT_PROPS JSON maps to false so the IPC handler stays stable.
  */
-test('Test that registerFaExtraEnvIpc snapshot throws on invalid COMPONENT_PROPS JSON', async () => {
+test('Test that registerFaExtraEnvIpc snapshot treats invalid COMPONENT_PROPS JSON as false', async () => {
   vi.stubEnv('COMPONENT_PROPS', 'not-valid-json{')
   const { registerFaExtraEnvIpc } = await import('../registerFaExtraEnvIpc')
   registerFaExtraEnvIpc()
 
-  expect(() => {
-    handlerFor(FA_EXTRA_ENV_IPC.snapshotAsync)()
-  }).toThrow()
+  const result = handlerFor(FA_EXTRA_ENV_IPC.snapshotAsync)()
+
+  expect(result).toMatchObject({
+    COMPONENT_PROPS: false
+  })
 })
