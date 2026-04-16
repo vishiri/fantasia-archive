@@ -67,14 +67,18 @@ export function registerComponentDialogStackGuard (dialogModel: Ref<boolean>): v
 }
 
 /**
- * Watches a root markdown q-dialog model and decrements S_DialogMarkdown.markdownDialogOpenCount on close or unmount.
- * Incrementing visibility is reserved synchronously in openDialogMarkdownDocument and in DialogMarkdownDocument when opening.
+ * Watches a root markdown q-dialog model and keeps S_DialogMarkdown.markdownDialogOpenCount aligned with visibility.
+ * Increments when the dialog opens from zero so directInput and store-driven opens share the same stack contract as openDialogMarkdownDocument.
+ * Decrements on close or unmount while open.
  */
 export function registerMarkdownDialogStackGuard (dialogModel: Ref<boolean>): void {
   const store = S_DialogMarkdown()
   watch(
     dialogModel,
     (isOpen, wasOpen) => {
+      if (isOpen && !wasOpen && store.markdownDialogOpenCount === 0) {
+        store.onMarkdownDialogBecameVisible()
+      }
       if (!isOpen && wasOpen === true) {
         store.onMarkdownDialogBecameHidden()
       }

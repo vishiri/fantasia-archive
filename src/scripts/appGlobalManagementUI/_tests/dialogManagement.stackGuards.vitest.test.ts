@@ -80,6 +80,29 @@ test('registerMarkdownDialogStackGuard decrements on close', async () => {
   w.unmount()
 })
 
+test('registerMarkdownDialogStackGuard increments on first open and decrements on close', async () => {
+  const pinia = createPinia()
+  setActivePinia(pinia)
+  const dialogModel = ref(false)
+  const Comp = defineComponent({
+    setup () {
+      registerMarkdownDialogStackGuard(dialogModel)
+      return {}
+    },
+    template: '<div />'
+  })
+  const w = mount(Comp, { global: { plugins: [pinia] } })
+  const st = S_DialogMarkdown()
+  expect(st.markdownDialogOpenCount).toBe(0)
+  dialogModel.value = true
+  await nextTick()
+  expect(st.markdownDialogOpenCount).toBe(1)
+  dialogModel.value = false
+  await nextTick()
+  expect(st.markdownDialogOpenCount).toBe(0)
+  w.unmount()
+})
+
 test('registerMarkdownDialogStackGuard calls hidden on unmount when still open', async () => {
   const pinia = createPinia()
   setActivePinia(pinia)
