@@ -12,9 +12,9 @@ description: >-
 
 ## Files
 
-- **Changelog (Markdown)**: [changeLog.md](i18n/en-US/documents/changeLog.md) — shown in-app via i18n `documents.changeLog`.
-- **Translations**: other locales may ship the same document path (for example [i18n/fr/documents/changeLog.md](i18n/fr/documents/changeLog.md)); mirror structure and version headings with the active locale’s prose.
-- **Canonical semver**: [package.json](package.json) field **`version`** (e.g. `2.1.0`).
+- **Changelog (Markdown)**: [changeLog.md](../../../i18n/en-US/documents/changeLog.md) — shown in-app via i18n `documents.changeLog`.
+- **Translations**: other locales may ship the same document path (for example [changeLog.md (fr)](../../../i18n/fr/documents/changeLog.md)); mirror structure and version headings with the active locale’s prose.
+- **Canonical semver**: [package.json](../../../package.json) field **`version`** (e.g. `2.1.0`).
 - **Planning context**: local `.cursor/plans/` files, especially those matching the current package version in filename or metadata.
 
 ## When to update

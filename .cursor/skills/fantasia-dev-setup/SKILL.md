@@ -11,7 +11,7 @@ description: >-
 
 ## Toolchain
 
-- **Package manager**: Yarn 1.x (README: use Yarn 1.22.19; avoid npm-only workflows for day-to-day work).
+- **Package manager**: Yarn 1.x (**`.github/workflows/verify.yml`** installs **`yarn@1.22.19`** for CI; match locally when practical). Avoid npm-only workflows for day-to-day work.
 - **Node.js**: **22.22.0 or newer** (`package.json` `engines.node` is `>=22.22.0`; Quasar `@quasar/app-vite` v2 aligns with this). Use `nvm` / `fnm` to pin (e.g. `nvm use 22.22`).
 - **Quasar CLI** (recommended): `yarn global add @quasar/cli` — ensure the global Yarn bin is on `PATH`.
 - **CI (push/PR)**: [`.github/workflows/verify.yml`](../../../.github/workflows/verify.yml) runs **`yarn testbatch:verify`** only (installs **`.storybook-workspace`** for ESLint). **Storybook** VRT (`yarn test:storybook:visual*`) is **not** run in **GitHub Actions** — use **`yarn testbatch:ensure:nochange`** or the individual scripts locally.

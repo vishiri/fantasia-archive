@@ -2,7 +2,7 @@
 
 A worldbuilding database manager
 
-Use Yarn 1.22.19, or things may become unstable.
+Use **Yarn 1.x**. **GitHub Actions** **Verify** installs **`yarn@1.22.19`** (see **`.github/workflows/verify.yml`**); matching that patch locally avoids subtle lockfile or CLI differences.
 
 Use **Node.js 22.22.0 or newer** (`package.json` `engines.node`: `>=22.22.0`; Quasar `@quasar/app-vite` v2 enforces this minimum). `nvm` / `fnm` work well to pin the version (for example **22.22** to match CI in `.github/workflows/build.yml`).
 
@@ -43,7 +43,7 @@ Fork and pull-request workflow, required **PR labels** (`novisualchange` / `visu
 - **Dialog stack coordination**: Root **`q-dialog`** models for component-backed dialogs call **`registerComponentDialogStackGuard`**; markdown-backed document dialogs call **`registerMarkdownDialogStackGuard`**. **`openDialogMarkdownDocument`**, **`openDialogComponent`**, and those stack guards live together in [`src/scripts/appGlobalManagementUI/dialogManagement.ts`](src/scripts/appGlobalManagementUI/dialogManagement.ts) so **`S_DialogComponent`** / **`S_DialogMarkdown`** open counts stay aligned and incompatible modal surfaces do not stack. Prefer transparent names for this kind of wiring; see [AGENTS.md](AGENTS.md) **Export and function naming (renderer and shared TS)**.
 - **Global keyboard shortcuts (Electron desktop)**: Renderer registers a capture-phase **`keydown`** listener from **`src/layouts/MainLayout.vue`** after **`S_FaKeybinds`** loads overrides from main via preload **`faKeybinds`** (**`getKeybinds`** / **`setKeybinds`**). Command list, defaults, chord resolution, and dispatch live under **`src/scripts/keybinds/`**; user-facing editing is **Tools → Keybind settings** (**`src/components/dialogs/DialogKeybindSettings/`**). When adding or changing shortcuts, follow **`.cursor/skills/fantasia-keybinds/SKILL.md`** and [AGENTS.md](AGENTS.md) **Global keyboard shortcuts (faKeybinds)**.
 - **i18n**: vue-i18n (repo-root **`i18n/`**)
-- **Tests**: Vitest (unit) + Playwright (component and E2E). Vitest workspace entry is [`vitest.config.mts`](vitest.config.mts); per-project configs, shared coverage defaults, and [`vitest/vitest.setup.ts`](vitest/vitest.setup.ts) live under [`vitest/`](vitest/) (not under **`helpers/`**). **Coverage tiers** for **`src-electron`**, **`helpers`**, **`src`** **`.ts`**, and **`.vue`** SFCs are summarized under **Quality gate** and **Scripts reference** below.
+- **Tests**: Vitest (unit) + Playwright (component and E2E). Vitest workspace entry is [`vitest.config.mts`](vitest.config.mts); per-project configs, shared coverage defaults, and [`vitest/vitest.setup.ts`](vitest/vitest.setup.ts) live under [`vitest/`](vitest/) (not under **`helpers/`**). **Coverage tiers** for **`src-electron`**, **`helpers`**, scoped repo-root **`i18n/`**, **`src`** **`.ts`**, and **`.vue`** SFCs are summarized under **Quality gate** and **Scripts reference** below.
 - **Component docs**: Storybook 10 (in `.storybook-workspace/`)
 - **Vue SFC structure**: **`<template>`** first, then **`<script>`** / **`<script setup>`**, then **`<style>`** — never script or style before the template ([`.cursor/rules/vue-quasar.mdc`](.cursor/rules/vue-quasar.mdc)).
 - **SFC size and TypeScript extraction**: Vue SFCs must stay **≤250 lines**; TypeScript modules (non-exempt) **≤200 lines**; single functions **≤50 lines** — enforced by ESLint ([`.cursor/rules/code-size-decomposition.mdc`](.cursor/rules/code-size-decomposition.mdc)). When a feature would exceed limits, extract under `src/components/<bucket>/<Feature>/scripts/*.ts`, shared **`src/scripts/<feature>/`**, and/or split **subcomponents**. **Granularity:** treat those caps as **ceilings**, not a target file count — group by **subsystem or workflow** (several related exports per module) until a file nears **200 lines** or a function nears **50 lines**; **avoid** extreme fragmentation (many tiny files with a single short export each). Add an extra **thin** module only for a concrete boundary (for example a stable **`vi.mock`** target in Vitest, a circular-import break, or an intentional public entry file) and note why in a one-line comment or the relevant skill. See [`.cursor/rules/typescript-scripts.mdc`](.cursor/rules/typescript-scripts.mdc). Pulling `<style>` into a separate file is a **last resort** and needs **explicit maintainer approval** in the session where it is done.
@@ -69,7 +69,7 @@ Locale strings live under `i18n/en-US/` in a fixed folder hierarchy:
 | Folder | Purpose |
 | --- | --- |
 | `documents/` | Markdown source files (`.md`, imported with `?raw`, passed through `specialCharacterFixer`) |
-| `components/<bucket>/<ComponentName>/` | Same bucket names as `src/components/` (`globals`, `elements`, `other`; **`foundation/`** has no locale tree — Storybook-only). One or more `L_*.ts` locale modules per mirrored component |
+| `components/<bucket>/<ComponentName>/` | Same bucket names as `src/components/` (`dialogs`, `globals`, `elements`, `other`; **`foundation/`** has no locale tree — Storybook-only). One or more `L_*.ts` locale modules per mirrored component |
 | `dialogs/` | One `L_<DialogName>.ts` per dialog |
 | `pages/` | One `L_<PageName>.ts` per page |
 | `globalFunctionality/` | One `L_<feature>.ts` per app-wide, non-component concern (e.g. Pinia store notifications) |
@@ -331,7 +331,7 @@ Set environment variable **`FA_PLAYWRIGHT_NO_VIDEO`** to **`1`** or **`true`** t
 | `yarn lint:stylelint` | Run Stylelint on Vue/CSS/SCSS/Sass under `src/` and Storybook config under `.storybook-workspace/.storybook/`. |
 | `yarn lint:stylelint:fix` | Same paths as `lint:stylelint` with `--fix` (alphabetical declarations, including inside Vue `<style>` blocks). |
 | `yarn lint:typescript` | Run TypeScript project check (`vue-tsc`, no emit; covers `<script setup>` in SFCs). |
-| `yarn testbatch:verify` | Quick gate: lint + typecheck + stylelint + Vitest coverage (**100%** on **`src-electron`** and **`helpers`**; **`src`** **`.ts`** per [vitest/](vitest/) rules; **`.vue`** watermarks only). |
+| `yarn testbatch:verify` | Quick gate: lint + typecheck + stylelint + **`yarn test:coverage:verify`** — same tiers as that script (**100%** on **`src-electron`**, **`helpers`**, scoped **`i18n/`**; **`src`** **`.ts`** per [vitest/](vitest/) rules; **`.vue`** watermarks only). |
 | `yarn testbatch:ensure:nochange` | Full gate: `testbatch:verify` + `quasar:build:electron:summarized` + Playwright component + E2E + Storybook smoke + `test:storybook:visual` (snapshot compare). |
 | `yarn testbatch:ensure:change` | Same through smoke, then `test:storybook:visual:update` (refresh VRT baselines; use only when intentional). |
 | `yarn test:unit` | Run Vitest workspace (no coverage): **unit-electron**, **unit-src-renderer**, **unit-helpers**, **unit-i18n**, **unit-components**. |

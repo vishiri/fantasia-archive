@@ -1,6 +1,6 @@
 # AI and agent notes — Fantasia Archive
 
-This repository is **Fantasia Archive**: a **worldbuilding database manager** shipped as a **Quasar + Vue 3 + Electron** desktop app (GPL-3.0). Use **Yarn 1.x** and **Node.js 22.22.0 or newer** for local work (see `README.md` and `package.json` `engines.node`; Quasar `@quasar/app-vite` v2 enforces this minimum). CI uses **22.22** on push/PR (**`.github/workflows/verify.yml`** runs **`yarn testbatch:verify`** only: lint, types, stylelint, then Vitest with coverage — see **Testing expectations** for **`src-electron`**, **`helpers`**, repo-root **`i18n/`**, **`src`** TypeScript vs **Vue** SFC rules) and on manual release builds (**`.github/workflows/build.yml`**).
+This repository is **Fantasia Archive**: a **worldbuilding database manager** shipped as a **Quasar + Vue 3 + Electron** desktop app (GPL-3.0). Use **Yarn 1.x** and **Node.js 22.22.0 or newer** for local work (see `README.md` and `package.json` `engines.node`; Quasar `@quasar/app-vite` v2 enforces this minimum). **Verify** CI installs **`yarn@1.22.19`** globally before **`yarn install`** (**`.github/workflows/verify.yml`**). CI uses **Node 22.22** on push/PR (**`.github/workflows/verify.yml`** runs **`yarn testbatch:verify`** only: lint, types, stylelint, then Vitest with coverage — see **Testing expectations** for **`src-electron`**, **`helpers`**, repo-root **`i18n/`**, **`src`** TypeScript vs **Vue** SFC rules) and on manual release builds (**`.github/workflows/build.yml`**).
 
 ## Where project AI guidance lives
 
@@ -45,7 +45,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | State / routes | Pinia, Vue Router                                                |
 | i18n           | vue-i18n (repo-root **`i18n/`**)                                 |
 | Lint / types   | ESLint (`yarn lint:eslint`), `vue-tsc` (`yarn lint:typescript`), Stylelint (`yarn lint:stylelint`) — see [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc) |
-| Unit tests     | Vitest — **`yarn test:unit`** (no coverage); **`yarn testbatch:verify`** runs **`yarn test:coverage:verify`** with layered gates (**`src-electron`**, **`helpers`**, **`src`** **`.ts`** vs **`.vue`** watermarks) — [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc), [vitest/](vitest/) |
+| Unit tests     | Vitest — **`yarn test:unit`** (no coverage); **`yarn testbatch:verify`** runs **`yarn test:coverage:verify`** with layered gates (**`src-electron`**, **`helpers`**, scoped **`i18n/`**, **`src`** **`.ts`** vs **`.vue`** watermarks) — [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc), [vitest/](vitest/) |
 | UI / E2E tests | Playwright (`yarn test:components`, `yarn test:e2e`)              |
 | Component docs | Storybook 10 (`yarn storybook:run`, `yarn storybook:build`)        |
 | DB (evolving)  | `better-sqlite3` in main process (`src-electron/electron-main.ts` stub) |
@@ -136,7 +136,7 @@ Central **SCSS variables** for colors, sizes, and related design tokens live in 
 Locale strings live under `i18n/en-US/` in a fixed folder hierarchy:
 
 - `documents/` — Markdown source files (`.md`, imported with `?raw` and passed through `specialCharacterFixer`).
-- `components/<bucket>/<ComponentName>/` — same buckets as `src/components/` (`globals`, `elements`, `other`); one or more `L_*.ts` locale modules per component with user-visible strings. The **`foundation/`** bucket is **not** mirrored under **`i18n/`** (Storybook-only catalogues use inline English).
+- `components/<bucket>/<ComponentName>/` — same buckets as `src/components/` (`dialogs`, `globals`, `elements`, `other`); one or more `L_*.ts` locale modules per component with user-visible strings. The **`foundation/`** bucket is **not** mirrored under **`i18n/`** (Storybook-only catalogues use inline English).
 - `dialogs/` — one `L_<DialogName>.ts` per dialog.
 - `pages/` — one `L_<PageName>.ts` per page.
 - `globalFunctionality/` — one `L_<feature>.ts` per app-wide, non-component concern (e.g. store notifications).
