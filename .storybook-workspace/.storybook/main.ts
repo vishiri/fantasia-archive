@@ -142,14 +142,29 @@ const config: StorybookConfig = {
       },
       resolve: {
         ...(viteConfig.resolve ?? {}),
+        /**
+         * Storybook workspace installs its own 'pinia' / 'vue' under '.storybook-workspace/node_modules'.
+         * Preview sources under 'src/' can resolve the repo-root copies, yielding two Pinia singletons:
+         * 'preview.ts' activates one instance while 'S_Dialog*' stores bind to the other, so
+         * 'S_DialogComponent()' throws (undefined internal '_s') and dialog stories never mount.
+         */
         alias: {
           ...(viteConfig.resolve?.alias ?? {}),
           'app/i18n/externalFileLoader': externalFileLoaderMockPath,
           app: repoRoot,
           src: path.resolve(repoRoot, 'src'),
           components: path.resolve(repoRoot, 'src/components'),
-          'src-electron': path.resolve(repoRoot, 'src-electron')
-        }
+          'src-electron': path.resolve(repoRoot, 'src-electron'),
+          pinia: path.resolve(repoRoot, 'node_modules/pinia'),
+          vue: path.resolve(repoRoot, 'node_modules/vue')
+        },
+        dedupe: Array.from(
+          new Set([
+            ...(viteConfig.resolve?.dedupe ?? []),
+            'pinia',
+            'vue'
+          ])
+        )
       },
       define: {
         ...(viteConfig.define ?? {}),

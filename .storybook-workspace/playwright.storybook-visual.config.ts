@@ -20,7 +20,12 @@ export default defineConfig({
     }]
   ],
   use: {
-    baseURL: 'http://127.0.0.1:6006',
+    /**
+     * Dedicated port so Playwright's static 'http-server ./storybook-static' does not collide with
+     * 'yarn storybook:run' on 6006. With 'reuseExistingServer: true', reusing 6006 would attach to
+     * the dev server and leave '#storybook-root' empty for standalone iframe navigations (VRT blank).
+     */
+    baseURL: 'http://127.0.0.1:6007',
     viewport: {
       height: FANTASIA_STORYBOOK_VIEWPORT_HEIGHTS.desktop,
       width: FANTASIA_STORYBOOK_VIEWPORT_WIDTHS.desktop
@@ -30,10 +35,10 @@ export default defineConfig({
     locale: 'en-US'
   },
   webServer: {
-    command: 'npx http-server ./storybook-static -p 6006 -c-1 --silent',
-    url: 'http://127.0.0.1:6006',
+    command: 'npx http-server ./storybook-static -p 6007 -c-1 --silent',
+    url: 'http://127.0.0.1:6007',
     timeout: 120_000,
-    reuseExistingServer: true
+    reuseExistingServer: false
   },
   projects: [
     {
