@@ -93,16 +93,24 @@ test('buildDialogKeybindSettingsRows marks User keybinds as Add new when effecti
   })
   const program = rowsDefault.find((r) => r.commandId === 'openProgramSettings')
   expect(program?.userChord).toEqual({
-    code: 'Comma',
-    mods: ['ctrl']
+    code: 'KeyL',
+    mods: [
+      'ctrl',
+      'alt',
+      'shift'
+    ]
   })
   expect(program?.userShowsAddNewCombo).toBe(true)
 
   const rowsExplicitSame = buildDialogKeybindSettingsRows({
     overrides: {
       openProgramSettings: {
-        code: 'Comma',
-        mods: ['ctrl']
+        code: 'KeyL',
+        mods: [
+          'ctrl',
+          'alt',
+          'shift'
+        ]
       }
     },
     platform: 'win32',
@@ -181,6 +189,28 @@ test('createDialogKeybindSettingsTableState filters rows by name label substring
 })
 
 /**
+ * createDialogKeybindSettingsTableState
+ * Clearable q-input may set the filter ref to null; treat like empty query.
+ */
+test('createDialogKeybindSettingsTableState treats null filter like an empty string', async () => {
+  const platform = computed(() => 'win32' as NodeJS.Platform)
+  const workingOverrides = ref({ ...FA_KEYBINDS_STORE_DEFAULTS.overrides })
+  const { tableRows: rowsForNull } = createDialogKeybindSettingsTableState({
+    filter: ref<string | null | undefined>(null),
+    platform,
+    t: tStub,
+    workingOverrides
+  })
+  const { tableRows: rowsForEmpty } = createDialogKeybindSettingsTableState({
+    filter: ref(''),
+    platform,
+    t: tStub,
+    workingOverrides
+  })
+  expect(rowsForNull.value.length).toBe(rowsForEmpty.value.length)
+})
+
+/**
  * createDialogKeybindSettingsSync
  * Save calls the store and refreshes working overrides only on success.
  */
@@ -190,6 +220,7 @@ test('createDialogKeybindSettingsSync onSaveMain returns false when updateKeybin
   const updateSpy = vi.spyOn(keybindsStore, 'updateKeybinds').mockResolvedValue(false)
   const workingOverrides = ref({ ...FA_KEYBINDS_STORE_DEFAULTS.overrides })
   const { onSaveMain, syncWorkingFromStore } = createDialogKeybindSettingsSync({
+    filter: ref(''),
     keybindsStore,
     workingOverrides
   })
@@ -217,7 +248,9 @@ test('createDialogKeybindSettingsSync onSaveMain syncs after success and onClose
     }
   }
   const workingOverrides = ref<I_faKeybindsRoot['overrides']>({})
+  const filter = ref<string | null | undefined>('typed-filter')
   const { onSaveMain, onCloseMain, syncWorkingFromStore, initializeForOpen } = createDialogKeybindSettingsSync({
+    filter,
     keybindsStore,
     workingOverrides
   })
@@ -237,6 +270,7 @@ test('createDialogKeybindSettingsSync onSaveMain syncs after success and onClose
     }
   }
   onCloseMain()
+  expect(filter.value).toBe('')
   expect(workingOverrides.value.openProgramSettings?.code).toBe('KeyZ')
   initializeForOpen()
   expect(workingOverrides.value.openProgramSettings?.code).toBe('KeyZ')
@@ -502,11 +536,13 @@ test('makeDialogKeybindCaptureKeydownHandler flags chord that matches another ac
     workingOverrides
   })
   const ev = new KeyboardEvent('keydown', {
+    altKey: true,
     bubbles: true,
     cancelable: true,
-    code: 'Comma',
+    code: 'KeyL',
     ctrlKey: true,
-    key: ','
+    key: 'l',
+    shiftKey: true
   })
   handler(ev)
   expect(pendingChord.value).toBeNull()
@@ -578,11 +614,13 @@ test('makeDialogKeybindCaptureKeydownHandler keeps conflict message after a modi
     workingOverrides
   })
   handler(new KeyboardEvent('keydown', {
+    altKey: true,
     bubbles: true,
     cancelable: true,
-    code: 'Comma',
+    code: 'KeyL',
     ctrlKey: true,
-    key: ','
+    key: 'l',
+    shiftKey: true
   }))
   expect(captureError.value).toBe(true)
   handler(new KeyboardEvent('keydown', {
@@ -675,7 +713,7 @@ test('bindOnOpenCapture treats userChord undefined like empty when seeding captu
   expect(captureLabel.value).toBe('')
 })
 
-test('bindOnOpenCapture leaves pending chord empty when the row has no effective shortcut', () => {
+test('bindOnOpenCapture seeds pending chord from the row effective default shortcut', () => {
   setActivePinia(createPinia())
   const platform = computed(() => 'win32' as NodeJS.Platform)
   const workingOverrides = ref({ ...FA_KEYBINDS_STORE_DEFAULTS.overrides })
@@ -715,13 +753,34 @@ test('bindOnOpenCapture leaves pending chord empty when the row has no effective
     platform: 'win32',
     t: tStub
   }).find((r) => r.commandId === 'openKeybindSettings')
-  expect(keybindRow?.userChord).toBeNull()
+  expect(keybindRow?.userChord).toEqual({
+    code: 'KeyK',
+    mods: [
+      'ctrl',
+      'alt',
+      'shift'
+    ]
+  })
   expect(keybindRow?.userShowsAddNewCombo).toBe(true)
   expect(keybindRow).toBeDefined()
   onOpen(keybindRow!)
-  expect(pendingChord.value).toBeNull()
-  expect(captureLabel.value).toBe('')
-  expect(captureBaselineChord.value).toBeNull()
+  expect(pendingChord.value).toEqual({
+    code: 'KeyK',
+    mods: [
+      'ctrl',
+      'alt',
+      'shift'
+    ]
+  })
+  expect(captureLabel.value.length).toBeGreaterThan(0)
+  expect(captureBaselineChord.value).toEqual({
+    code: 'KeyK',
+    mods: [
+      'ctrl',
+      'alt',
+      'shift'
+    ]
+  })
 })
 
 test('capture handler bindings cover open, clear, and set paths', () => {
@@ -812,10 +871,10 @@ test('capture handler bindings cover open, clear, and set paths', () => {
   expect(captureOpen.value).toBe(true)
 
   pendingChord.value = {
-    code: 'KeyI',
+    code: 'KeyK',
     mods: [
-      'alt',
       'ctrl',
+      'alt',
       'shift'
     ]
   }
@@ -824,8 +883,12 @@ test('capture handler bindings cover open, clear, and set paths', () => {
   expect(captureErrorMessage.value).toBe('dialogs.keybindSettings.validationConflict')
   expect(captureInfoMessage.value).toBe('')
   expect(pendingChord.value).toEqual({
-    code: 'Comma',
-    mods: ['ctrl']
+    code: 'KeyL',
+    mods: [
+      'ctrl',
+      'alt',
+      'shift'
+    ]
   })
 
   captureError.value = false
@@ -1014,17 +1077,25 @@ test('runDialogKeybindCaptureKeydown skips conflict lookup when editingCommandId
 
 test('runDialogKeybindCaptureKeydown restores pending chord and label to baseline on duplicate', () => {
   const captureBaselineChord = ref<I_faChordSerialized | null>({
-    code: 'Comma',
-    mods: ['ctrl']
+    code: 'KeyL',
+    mods: [
+      'ctrl',
+      'alt',
+      'shift'
+    ]
   })
   const captureError = ref(false)
   const captureErrorMessage = ref('')
   const captureInfoMessage = ref('')
-  const captureLabel = ref('Ctrl + ,')
+  const captureLabel = ref('Ctrl + Alt + Shift + L')
   const editingCommandId = ref<T_faKeybindCommandId | null>('openProgramSettings')
   const pendingChord = ref<I_faChordSerialized | null>({
-    code: 'Comma',
-    mods: ['ctrl']
+    code: 'KeyL',
+    mods: [
+      'ctrl',
+      'alt',
+      'shift'
+    ]
   })
   const platform = computed(() => 'win32' as NodeJS.Platform)
   const workingOverrides = ref<I_faKeybindsRoot['overrides']>({})
@@ -1032,9 +1103,9 @@ test('runDialogKeybindCaptureKeydown restores pending chord and label to baselin
     altKey: true,
     bubbles: true,
     cancelable: true,
-    code: 'KeyI',
+    code: 'KeyK',
     ctrlKey: true,
-    key: 'i',
+    key: 'k',
     shiftKey: true
   }), {
     captureBaselineChord,
@@ -1051,8 +1122,12 @@ test('runDialogKeybindCaptureKeydown restores pending chord and label to baselin
   expect(captureError.value).toBe(true)
   expect(captureErrorMessage.value).toBe('dialogs.keybindSettings.validationConflict')
   expect(pendingChord.value).toEqual({
-    code: 'Comma',
-    mods: ['ctrl']
+    code: 'KeyL',
+    mods: [
+      'ctrl',
+      'alt',
+      'shift'
+    ]
   })
   expect(captureLabel.value.length).toBeGreaterThan(0)
 })

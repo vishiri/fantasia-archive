@@ -65,12 +65,17 @@ const QTableStub = defineComponent({
   template: `
     <div data-test-locator="dialogKeybindSettings-qtable-stub">
       <slot name="top-right" />
-      <template v-for="(row, idx) in rows" :key="row.rowKey || String(idx)">
-        <slot name="body" :row="row" />
+      <template v-if="rows.length === 0">
+        <slot name="no-data" />
       </template>
-      <slot name="body" :row="syntheticNonEditableRow" />
-      <slot name="body" :row="syntheticEmptyChordRow" />
-      <slot name="body" :row="syntheticChordRow" />
+      <template v-else>
+        <template v-for="(row, idx) in rows" :key="row.rowKey || String(idx)">
+          <slot name="body" :row="row" />
+        </template>
+        <slot name="body" :row="syntheticNonEditableRow" />
+        <slot name="body" :row="syntheticEmptyChordRow" />
+        <slot name="body" :row="syntheticChordRow" />
+      </template>
     </div>
   `
 })
@@ -300,6 +305,29 @@ test('Test that DialogKeybindSettings forwards q-dialog v-model and filter input
   expect(w.get('.q-icon-search-stub').text()).toBe('search')
   await filterInputs[0].setValue('program')
   await flushPromises()
+
+  w.unmount()
+})
+
+/**
+ * DialogKeybindSettings
+ * When the filter matches no action names, the table no-data slot shows ErrorCard copy from vue-i18n.
+ */
+test('Test that DialogKeybindSettings shows filter empty ErrorCard when filter matches no rows', async () => {
+  const w = mount(DialogKeybindSettings, {
+    ...dialogKeybindSettingsMountOptions,
+    props: { directInput: 'KeybindSettings' }
+  })
+
+  await flushPromises()
+
+  const filterInputs = w.findAll('input')
+  await filterInputs[0].setValue('zzzz-no-matching-keybind-label-zzzz')
+  await flushPromises()
+
+  expect(w.find('[data-test-locator="dialogKeybindSettings-filterNoResults"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="errorCard"]').exists()).toBe(true)
+  expect(w.text()).toContain('dialogs.keybindSettings.filterNoResultsTitle')
 
   w.unmount()
 })
