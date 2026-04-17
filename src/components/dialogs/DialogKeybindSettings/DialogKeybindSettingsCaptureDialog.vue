@@ -39,13 +39,13 @@
         :status-region-id="statusRegionId"
       />
 
-      <q-card-actions class="dialogKeybindSettingsCapture__actions row q-gutter-md justify-center q-pb-md">
+      <div class="dialogKeybindSettingsCapture__actions flex justify-around q-mt-md">
         <q-btn
           class="dialogKeybindSettingsCapture__btnClear text-uppercase text-weight-bold"
           color="secondary"
           data-test-locator="dialogKeybindSettings-capture-clear"
           :disable="!canClearCapture"
-          unelevated
+          unelevatedd
           :label="$t('dialogs.keybindSettings.captureClear')"
           @click="emit('captureClear')"
         />
@@ -59,7 +59,7 @@
           :label="$t('dialogs.keybindSettings.captureSet')"
           @click="emit('captureSet')"
         />
-      </q-card-actions>
+      </div>
     </q-card>
   </q-dialog>
 </template>
@@ -108,6 +108,8 @@ function onDialogModel (open: boolean): void {
 .dialogKeybindSettingsCapture {
   background: $dialogKeybindSettingsCapture-cardBackground;
   color: $dialogKeybindSettingsCapture-text;
+  max-height: calc(100vh - #{$dialogKeybindSettingsCapture-card-maxHeightViewportSubtract}) !important;
+  max-width: $dialogKeybindSettingsCapture-card-maxWidth !important;
   min-width: $dialogKeybindSettingsCapture-card-minWidth;
   padding: $dialogKeybindSettingsCapture-card-padding;
   position: relative;
@@ -116,17 +118,14 @@ function onDialogModel (open: boolean): void {
     color: $dialogKeybindSettingsCapture-titleText;
     font-size: $dialogKeybindSettingsCapture-title-fontSize;
     margin-top: $dialogKeybindSettingsCapture-title-marginTop;
-    padding-right: $dialogKeybindSettingsCapture-title-paddingRight;
   }
 
   &__actions {
-    margin-top: $dialogKeybindSettingsCapture-actions-marginTop;
-    padding: $dialogKeybindSettingsCapture-actions-padding;
   }
 
   &__btnClear,
   &__btnSet {
-    min-width: $dialogKeybindSettingsCapture-actionBtn-minWidth;
+    min-width: $dialogKeybindSettingsCapture-actionBtn-minWidth !important;
     padding: $dialogKeybindSettingsCapture-actionBtn-padding;
   }
 

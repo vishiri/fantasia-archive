@@ -38,6 +38,20 @@ config.global.config = {
  */
 setActivePinia(createPinia())
 
+if (typeof globalThis.ResizeObserver === 'undefined') {
+  globalThis.ResizeObserver = class ResizeObserver {
+    constructor (callback: ResizeObserverCallback) {
+      void callback
+    }
+
+    disconnect (): void {}
+
+    observe (_target: Element, _options?: unknown): void {}
+
+    unobserve (_target: Element): void {}
+  } as unknown as typeof ResizeObserver
+}
+
 vi.mock('app/i18n/externalFileLoader', () => {
   return {
     i18n: {

@@ -33,7 +33,7 @@
             >
               <q-tooltip
                 :delay="500"
-                content-class="dialogKeybindSettingsCapture__tooltip"
+                class="dialogKeybindSettingsCapture__tooltip"
               >
                 <div class="dialogKeybindSettingsCapture__tooltipShell">
                   <p class="dialogKeybindSettingsCapture__tooltipHeading">
@@ -112,7 +112,6 @@ const {
   margin-left: auto;
   margin-right: auto;
   max-width: $dialogKeybindSettingsCapture-keybindUpdateField-maxWidth;
-  padding: $dialogKeybindSettingsCapture-keybindUpdateField-padding;
   width: 100%;
 
   :deep(.q-field--filled .q-field__control) {
@@ -132,6 +131,7 @@ const {
   :deep(.q-field__label) {
     margin-top: $dialogKeybindSettingsCapture-fieldLabel-marginTop;
     text-align: center;
+    width: 100%;
   }
 
   :deep(.q-field__native) {
@@ -151,9 +151,10 @@ const {
 
 <style lang="scss">
 .dialogKeybindSettingsCapture__tooltip {
+  border-radius: 0;
   font-size: $dialogKeybindSettingsCapture-tooltip-fontSize;
   font-weight: $dialogKeybindSettingsCapture-tooltip-fontWeight;
-  max-width: $dialogKeybindSettingsCapture-tooltip-maxWidth;
+  padding: 0;
   text-align: left;
 }
 
@@ -162,7 +163,6 @@ const {
 }
 
 .dialogKeybindSettingsCapture__tooltipHeading {
-  font-weight: $dialogKeybindSettingsCapture-tooltip-fontWeight;
   margin: 0 0 $dialogKeybindSettingsCapture-tooltip-heading-marginBottom;
 }
 

@@ -35,6 +35,11 @@ function seedCaptureFieldsFromRow (params: {
     platform,
     row
   } = params
+  if (row.userShowsAddNewCombo) {
+    pendingChord.value = null
+    captureLabel.value = ''
+    return
+  }
   const seed = row.userChord
   if (seed === null || seed === undefined) {
     pendingChord.value = null

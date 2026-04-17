@@ -10,8 +10,6 @@ import {
 import type { I_dialogKeybindSettingsRow } from 'app/types/I_dialogKeybindSettings'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 
-const VISUAL_STUB_ROW_COUNT = 30
-
 /**
  * Clearable Quasar q-input may set v-model to null; treat non-strings as empty.
  */
@@ -93,49 +91,6 @@ export function buildDialogKeybindSettingsTableColumns (t: (key: string) => stri
   ]
 }
 
-/**
- * Appends non-editable placeholder rows for layout or CSS tuning when enable is true.
- * Dialog table enables this only outside unit tests (dev or Storybook production preview).
- */
-export function appendVisualStubKeybindRows (
-  rows: I_dialogKeybindSettingsRow[],
-  options: { enable: boolean }
-): I_dialogKeybindSettingsRow[] {
-  if (!options.enable) {
-    return rows
-  }
-
-  const stubs: I_dialogKeybindSettingsRow[] = []
-  for (let i = 0; i < VISUAL_STUB_ROW_COUNT; i++) {
-    const n = i + 1
-    const cycle = i % 3
-    const defaultLabels = [
-      'Ctrl + F12',
-      'Ctrl + Alt + Shift + L',
-      'Ctrl + Alt + Shift + K'
-    ]
-    stubs.push({
-      commandId: 'openKeybindSettings',
-      defaultLabel: defaultLabels[cycle],
-      editable: false,
-      nameLabel: `Style preview ${n}`,
-      rowKey: `dialogKeybindSettings-visual-stub-${i}`,
-      userChord: cycle === 0
-        ? {
-            code: 'KeyQ',
-            mods: ['ctrl']
-          }
-        : null,
-      userShowsAddNewCombo: cycle !== 0
-    })
-  }
-
-  return [
-    ...rows,
-    ...stubs
-  ]
-}
-
 export function createDialogKeybindSettingsTableState (params: {
   filter: Ref<string | null | undefined>
   platform: ComputedRef<NodeJS.Platform>
@@ -158,14 +113,11 @@ export function createDialogKeybindSettingsTableState (params: {
       platform: platform.value,
       t: (k: string) => t(k)
     })
-    const rows = appendVisualStubKeybindRows(built, {
-      enable: import.meta.env.DEV && import.meta.env.MODE !== 'test'
-    })
     const q = dialogKeybindSettingsFilterTrimmed(filter).toLowerCase()
     if (q.length === 0) {
-      return rows
+      return built
     }
-    return rows.filter((r) => r.nameLabel.toLowerCase().includes(q))
+    return built.filter((r) => r.nameLabel.toLowerCase().includes(q))
   })
 
   const tableColumns = computed(() => {

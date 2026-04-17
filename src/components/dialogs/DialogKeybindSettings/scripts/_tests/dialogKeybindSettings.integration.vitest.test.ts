@@ -49,7 +49,6 @@ import {
   useDialogKeybindSettings
 } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsState'
 import {
-  appendVisualStubKeybindRows,
   buildDialogKeybindSettingsRows,
   buildDialogKeybindSettingsTableColumns,
   createDialogKeybindSettingsTableState
@@ -131,27 +130,6 @@ test('buildDialogKeybindSettingsRows marks User keybinds as Add new when effecti
     t: tStub
   })
   expect(rowsCustom.find((r) => r.commandId === 'openProgramSettings')?.userShowsAddNewCombo).toBe(false)
-})
-
-test('appendVisualStubKeybindRows adds 30 non-editable rows when enabled', () => {
-  const base = buildDialogKeybindSettingsRows({
-    overrides: {},
-    platform: 'win32',
-    t: tStub
-  })
-  const out = appendVisualStubKeybindRows(base, { enable: true })
-  expect(out).toHaveLength(base.length + 30)
-  expect(out[out.length - 1]?.rowKey).toBe('dialogKeybindSettings-visual-stub-29')
-  expect(out[out.length - 1]?.editable).toBe(false)
-})
-
-test('appendVisualStubKeybindRows returns the same array when disabled', () => {
-  const base = buildDialogKeybindSettingsRows({
-    overrides: {},
-    platform: 'win32',
-    t: tStub
-  })
-  expect(appendVisualStubKeybindRows(base, { enable: false })).toBe(base)
 })
 
 /**
@@ -663,6 +641,61 @@ test('bindOnCaptureClear skips workingOverrides mutation when editingCommandId i
   expect(captureOpen.value).toBe(false)
 })
 
+test('bindOnOpenCapture treats userChord null like empty when seeding capture fields', () => {
+  setActivePinia(createPinia())
+  const platform = computed(() => 'win32' as NodeJS.Platform)
+  const workingOverrides = ref({ ...FA_KEYBINDS_STORE_DEFAULTS.overrides })
+  const captureOpen = ref(false)
+  const captureActionName = ref('')
+  const captureError = ref(false)
+  const captureErrorMessage = ref('')
+  const captureInfoMessage = ref('')
+  const captureLabel = ref('prior')
+  const captureBaselineChord = ref<I_faChordSerialized | null>(null)
+  const pendingChord = ref<I_faChordSerialized | null>({
+    code: 'KeyZ',
+    mods: ['ctrl']
+  })
+  const editingCommandId = ref<T_faKeybindCommandId | null>(null)
+  const handleCaptureKeydown = vi.fn()
+  const removeCaptureListener = vi.fn()
+  const deps = {
+    captureActionName,
+    captureBaselineChord,
+    captureError,
+    captureErrorMessage,
+    captureInfoMessage,
+    captureLabel,
+    captureOpen,
+    editingCommandId,
+    handleCaptureKeydown,
+    pendingChord,
+    platform,
+    removeCaptureListener,
+    t: tStub,
+    workingOverrides
+  }
+  const onOpen = bindOnOpenCapture(deps)
+  const row = buildDialogKeybindSettingsRows({
+    overrides: {
+      openProgramSettings: {
+        code: 'KeyX',
+        mods: ['ctrl']
+      }
+    },
+    platform: 'win32',
+    t: tStub
+  }).find((r) => r.commandId === 'openProgramSettings')
+  expect(row).toBeDefined()
+  onOpen({
+    ...row!,
+    editable: true,
+    userChord: null
+  })
+  expect(pendingChord.value).toBeNull()
+  expect(captureLabel.value).toBe('')
+})
+
 test('bindOnOpenCapture treats userChord undefined like empty when seeding capture fields', () => {
   setActivePinia(createPinia())
   const platform = computed(() => 'win32' as NodeJS.Platform)
@@ -699,7 +732,12 @@ test('bindOnOpenCapture treats userChord undefined like empty when seeding captu
   }
   const onOpen = bindOnOpenCapture(deps)
   const row = buildDialogKeybindSettingsRows({
-    overrides: {},
+    overrides: {
+      openProgramSettings: {
+        code: 'KeyX',
+        mods: ['ctrl']
+      }
+    },
     platform: 'win32',
     t: tStub
   }).find((r) => r.commandId === 'openProgramSettings')
@@ -713,7 +751,7 @@ test('bindOnOpenCapture treats userChord undefined like empty when seeding captu
   expect(captureLabel.value).toBe('')
 })
 
-test('bindOnOpenCapture seeds pending chord from the row effective default shortcut', () => {
+test('bindOnOpenCapture seeds empty capture fields when the row only has the built-in default shortcut', () => {
   setActivePinia(createPinia())
   const platform = computed(() => 'win32' as NodeJS.Platform)
   const workingOverrides = ref({ ...FA_KEYBINDS_STORE_DEFAULTS.overrides })
@@ -764,23 +802,9 @@ test('bindOnOpenCapture seeds pending chord from the row effective default short
   expect(keybindRow?.userShowsAddNewCombo).toBe(true)
   expect(keybindRow).toBeDefined()
   onOpen(keybindRow!)
-  expect(pendingChord.value).toEqual({
-    code: 'KeyK',
-    mods: [
-      'ctrl',
-      'alt',
-      'shift'
-    ]
-  })
-  expect(captureLabel.value.length).toBeGreaterThan(0)
-  expect(captureBaselineChord.value).toEqual({
-    code: 'KeyK',
-    mods: [
-      'ctrl',
-      'alt',
-      'shift'
-    ]
-  })
+  expect(pendingChord.value).toBeNull()
+  expect(captureLabel.value).toBe('')
+  expect(captureBaselineChord.value).toBeNull()
 })
 
 test('capture handler bindings cover open, clear, and set paths', () => {
@@ -882,14 +906,8 @@ test('capture handler bindings cover open, clear, and set paths', () => {
   expect(captureError.value).toBe(true)
   expect(captureErrorMessage.value).toBe('dialogs.keybindSettings.validationConflict')
   expect(captureInfoMessage.value).toBe('')
-  expect(pendingChord.value).toEqual({
-    code: 'KeyL',
-    mods: [
-      'ctrl',
-      'alt',
-      'shift'
-    ]
-  })
+  expect(pendingChord.value).toBeNull()
+  expect(captureLabel.value).toBe('')
 
   captureError.value = false
   captureErrorMessage.value = ''

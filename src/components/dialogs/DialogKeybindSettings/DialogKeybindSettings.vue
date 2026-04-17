@@ -6,19 +6,22 @@
     persistent
     @hide="onCloseMain"
   >
-    <q-card :class="['dialogComponent__wrapper', documentName]">
+    <q-card :class="['dialogComponent__wrapper', documentName, 'dialogKeybindSettings__card']">
       <h4
         id="dialogKeybindSettings-title"
-        class="text-center q-mt-md q-mb-sm"
+        class="text-center q-mb-sm"
         data-test-locator="dialogKeybindSettings-title"
       >
         {{ $t('dialogs.keybindSettings.title') }}
       </h4>
 
-      <q-card-section class="q-pt-none">
-        <!-- Quasar renders the no-data slot inside the bottom bar; hide-bottom skips that entire block, so only hide the bar while rows exist. -->
+      <q-card-section
+        ref="bodySectionRef"
+        class="q-pt-none dialogKeybindSettings__body"
+      >
         <q-table
           class="dialogKeybindSettings__table"
+          :style="dialogKeybindSettingsTableHeightStyle"
           dark
           flat
           :virtual-scroll="tableRows.length > 0"
@@ -143,7 +146,6 @@
 </template>
 
 <script setup lang="ts">
-// Storybook SFC compile resolves this import without the 'app' alias; keep a repo-relative path to 'types/'.
 import type { I_dialogKeybindSettingsRow } from '../../../../types/I_dialogKeybindSettings'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import DialogKeybindSettingsCaptureDialog from 'app/src/components/dialogs/DialogKeybindSettings/DialogKeybindSettingsCaptureDialog.vue'
@@ -152,6 +154,8 @@ import {
   registerDialogKeybindSettingsGlobalSuspend,
   setupDialogKeybindSettingsDialogRouting
 } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsDialogWiring'
+import { useDialogKeybindSettingsTableChrome } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsTableLayout'
+import { formatDialogKeybindSettingsUserKeybindButtonLabel } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsUserKeybindLabel'
 import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
 import { useDialogKeybindSettings } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsState'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
@@ -180,12 +184,14 @@ const {
   tableColumns,
   tableRows
 } = useDialogKeybindSettings()
-
 const dialogModel = ref(false)
 const documentName = ref<T_dialogName>('KeybindSettings')
+const {
+  bodySectionRef,
+  dialogKeybindSettingsTableHeightStyle
+} = useDialogKeybindSettingsTableChrome(dialogModel)
 
 registerComponentDialogStackGuard(dialogModel)
-
 const keybindsStore = S_FaKeybinds()
 
 const {
@@ -201,26 +207,20 @@ const {
 })
 
 function userKeybindButtonLabel (row: I_dialogKeybindSettingsRow): string {
-  if (row.userShowsAddNewCombo) {
-    return i18n.global.t('dialogs.keybindSettings.addNew')
-  }
-  if (row.userChord) {
-    return formatChord(row.userChord)
-  }
-  return ''
+  return formatDialogKeybindSettingsUserKeybindButtonLabel(
+    row,
+    {
+      formatChord,
+      t: (key: string) => i18n.global.t(key)
+    }
+  )
 }
-
 registerDialogKeybindSettingsGlobalSuspend({
   captureOpen,
   dialogModel
 })
 </script>
-
 <style lang="scss" scoped>
-.dialogKeybindSettings__table {
-  max-height: $dialogKeybindSettings-table-maxHeight;
-}
-
 .dialogKeybindSettings__filterEmpty {
   box-sizing: border-box;
   flex: 1 1 auto;
@@ -233,17 +233,19 @@ registerDialogKeybindSettingsGlobalSuspend({
 
 <style lang="scss">
 .KeybindSettings.dialogComponent {
-  .dialogComponent__wrapper.KeybindSettings {
-    max-width:
-      min(
-        #{$dialogKeybindSettings-card-width},
-        calc(100vw - #{$dialogKeybindSettings-card-maxWidthViewportSubtract})
-      );
-    width:
-      min(
-        #{$dialogKeybindSettings-card-width},
-        calc(100vw - #{$dialogKeybindSettings-card-maxWidthViewportSubtract})
-      );
+  .dialogComponent__wrapper.KeybindSettings.dialogKeybindSettings__card {
+    display: flex;
+    flex-direction: column;
+    height: min(#{$dialogKeybindSettings-wrapper-maxHeightCap}, calc(100vh - #{$dialogKeybindSettings-wrapper-maxHeightViewportSubtract}));
+    max-width: min(#{$dialogKeybindSettings-card-width}, calc(100vw - #{$dialogKeybindSettings-card-maxWidthViewportSubtract}));
+    min-height: 0;
+    width: min(#{$dialogKeybindSettings-card-width}, calc(100vw - #{$dialogKeybindSettings-card-maxWidthViewportSubtract}));
+
+    .dialogKeybindSettings__body {
+      flex: 1 1 0;
+      min-height: 0;
+      overflow: hidden;
+    }
   }
 }
 </style>
