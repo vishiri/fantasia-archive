@@ -24,8 +24,12 @@ export default {
     openProgramSettings: 'Programmeinstellungen öffnen',
     toggleDeveloperTools: 'Entwicklerwerkzeuge ein/aus'
   },
+  filterNoResultsDescription:
+    'Fantasia hat keine Aktion gefunden, die zu eurem Filter passt. Probiert ein anderes Wort oder leert das Feld.',
+  filterNoResultsTitle: 'Kein Treffer beim Filtern',
   filterPlaceholder: 'Tastenkürzel filtern…',
   saveButton: 'Einstellungen speichern',
+  tableEmptyHint: 'Keine Tastenkürzel verfügbar.',
   tableTitle: 'Tastenkürzel',
   title: 'Tastenkürzel-Einstellungen',
   validationConflict: 'Diese Tastenkombination ist bereits vergeben. Bitte wählt eine andere.',

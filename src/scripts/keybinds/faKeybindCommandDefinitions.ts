@@ -3,12 +3,8 @@ import type { I_faKeybindCommandDefinition } from 'app/types/I_faKeybindsDomain'
 export const FA_KEYBIND_COMMAND_DEFINITIONS: I_faKeybindCommandDefinition[] = [
   {
     defaultChord: {
-      code: 'KeyI',
-      mods: [
-        'alt',
-        'primary',
-        'shift'
-      ]
+      code: 'F12',
+      mods: ['primary']
     },
     editable: true,
     firesInEditableFields: true,
@@ -17,8 +13,12 @@ export const FA_KEYBIND_COMMAND_DEFINITIONS: I_faKeybindCommandDefinition[] = [
   },
   {
     defaultChord: {
-      code: 'Comma',
-      mods: ['primary']
+      code: 'KeyL',
+      mods: [
+        'alt',
+        'primary',
+        'shift'
+      ]
     },
     editable: true,
     firesInEditableFields: true,
@@ -26,7 +26,14 @@ export const FA_KEYBIND_COMMAND_DEFINITIONS: I_faKeybindCommandDefinition[] = [
     messageKey: 'dialogs.keybindSettings.commands.openProgramSettings'
   },
   {
-    defaultChord: null,
+    defaultChord: {
+      code: 'KeyK',
+      mods: [
+        'alt',
+        'primary',
+        'shift'
+      ]
+    },
     editable: true,
     firesInEditableFields: true,
     id: 'openKeybindSettings',

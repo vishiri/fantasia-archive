@@ -24,8 +24,12 @@ export default {
     openProgramSettings: 'Ouvrir les paramètres du programme',
     toggleDeveloperTools: 'Basculer les outils de développement'
   },
+  filterNoResultsDescription:
+    'Fantasia n\'a trouvé aucune action qui correspond à votre filtre. Essayez un autre mot ou effacez le champ.',
+  filterNoResultsTitle: 'Aucun résultat pour le filtre',
   filterPlaceholder: 'Filtrer les raccourcis…',
   saveButton: 'Enregistrer les paramètres',
+  tableEmptyHint: 'Aucun raccourci clavier disponible.',
   tableTitle: 'Raccourcis clavier',
   title: 'Paramètres des raccourcis',
   validationConflict: 'Ce raccourci est déjà utilisé. Veuillez en choisir un autre.',

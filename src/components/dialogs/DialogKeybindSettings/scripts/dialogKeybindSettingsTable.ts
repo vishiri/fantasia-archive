@@ -12,6 +12,16 @@ import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 
 const VISUAL_STUB_ROW_COUNT = 30
 
+/**
+ * Clearable Quasar q-input may set v-model to null; treat non-strings as empty.
+ */
+function dialogKeybindSettingsFilterTrimmed (
+  filter: Ref<string | null | undefined>
+): string {
+  const v = filter.value
+  return typeof v === 'string' ? v.trim() : ''
+}
+
 export function buildDialogKeybindSettingsRows (params: {
   overrides: I_faKeybindsRoot['overrides']
   platform: NodeJS.Platform
@@ -100,9 +110,9 @@ export function appendVisualStubKeybindRows (
     const n = i + 1
     const cycle = i % 3
     const defaultLabels = [
-      'Ctrl + ,',
-      'Alt + Shift + I',
-      '—'
+      'Ctrl + F12',
+      'Ctrl + Alt + Shift + L',
+      'Ctrl + Alt + Shift + K'
     ]
     stubs.push({
       commandId: 'openKeybindSettings',
@@ -127,7 +137,7 @@ export function appendVisualStubKeybindRows (
 }
 
 export function createDialogKeybindSettingsTableState (params: {
-  filter: Ref<string>
+  filter: Ref<string | null | undefined>
   platform: ComputedRef<NodeJS.Platform>
   t: (key: string) => string
   workingOverrides: Ref<I_faKeybindsRoot['overrides']>
@@ -151,7 +161,7 @@ export function createDialogKeybindSettingsTableState (params: {
     const rows = appendVisualStubKeybindRows(built, {
       enable: import.meta.env.DEV && import.meta.env.MODE !== 'test'
     })
-    const q = filter.value.trim().toLowerCase()
+    const q = dialogKeybindSettingsFilterTrimmed(filter).toLowerCase()
     if (q.length === 0) {
       return rows
     }

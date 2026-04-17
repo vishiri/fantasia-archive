@@ -24,8 +24,12 @@ export default {
     openProgramSettings: 'Open program settings',
     toggleDeveloperTools: 'Toggle developer tools'
   },
+  filterNoResultsDescription:
+    'Fantasia sadly didn\'t find any keybinds you were looking for. Perhaps try looking for a different one?',
+  filterNoResultsTitle: 'No keybinds found',
   filterPlaceholder: 'Filter keybinds…',
   saveButton: 'Save settings',
+  tableEmptyHint: 'No keyboard shortcuts are available.',
   tableTitle: 'Keyboard shortcuts',
   title: 'Keybind settings',
   validationConflict: 'This keybind is already present among the existing ones. Please choose a different one.',

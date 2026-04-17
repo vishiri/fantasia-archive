@@ -16,17 +16,18 @@
       </h4>
 
       <q-card-section class="q-pt-none">
+        <!-- Quasar renders the no-data slot inside the bottom bar; hide-bottom skips that entire block, so only hide the bar while rows exist. -->
         <q-table
           class="dialogKeybindSettings__table"
           dark
           flat
-          virtual-scroll
+          :virtual-scroll="tableRows.length > 0"
           :columns="tableColumns"
           :rows="tableRows"
           :rows-per-page-options="[0]"
           :title="$t('dialogs.keybindSettings.tableTitle')"
           :virtual-scroll-sticky-size-start="48"
-          hide-bottom
+          :hide-bottom="tableRows.length > 0"
           row-key="rowKey"
         >
           <template #top-right>
@@ -81,6 +82,28 @@
               </q-td>
             </q-tr>
           </template>
+
+          <template #no-data>
+            <div
+              v-if="(filter ?? '').trim().length > 0"
+              class="dialogKeybindSettings__filterEmpty flex flex-center"
+              data-test-locator="dialogKeybindSettings-filterNoResults"
+            >
+              <ErrorCard
+                :title="$t('dialogs.keybindSettings.filterNoResultsTitle')"
+                :details="$t('dialogs.keybindSettings.filterNoResultsDescription')"
+                image-name="reading"
+                :width="650"
+              />
+            </div>
+            <div
+              v-else
+              class="dialogKeybindSettings__tableEmpty text-secondary q-pa-md text-center"
+              data-test-locator="dialogKeybindSettings-tableEmpty"
+            >
+              {{ $t('dialogs.keybindSettings.tableEmptyHint') }}
+            </div>
+          </template>
         </q-table>
       </q-card-section>
 
@@ -124,6 +147,7 @@
 import type { I_dialogKeybindSettingsRow } from '../../../../types/I_dialogKeybindSettings'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import DialogKeybindSettingsCaptureDialog from 'app/src/components/dialogs/DialogKeybindSettings/DialogKeybindSettingsCaptureDialog.vue'
+import ErrorCard from 'app/src/components/elements/ErrorCard/ErrorCard.vue'
 import {
   registerDialogKeybindSettingsGlobalSuspend,
   setupDialogKeybindSettingsDialogRouting
@@ -195,6 +219,15 @@ registerDialogKeybindSettingsGlobalSuspend({
 <style lang="scss" scoped>
 .dialogKeybindSettings__table {
   max-height: $dialogKeybindSettings-table-maxHeight;
+}
+
+.dialogKeybindSettings__filterEmpty {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 16px 24px 24px;
+  width: 100%;
 }
 </style>
 

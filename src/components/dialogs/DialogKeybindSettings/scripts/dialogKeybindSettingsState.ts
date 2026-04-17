@@ -9,6 +9,7 @@ import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 
 export function createDialogKeybindSettingsSync (params: {
+  filter: Ref<string | null | undefined>
   keybindsStore: ReturnType<typeof S_FaKeybinds>
   workingOverrides: Ref<I_faKeybindsRoot['overrides']>
 }): {
@@ -18,6 +19,7 @@ export function createDialogKeybindSettingsSync (params: {
     syncWorkingFromStore: () => void
   } {
   const {
+    filter,
     keybindsStore,
     workingOverrides
   } = params
@@ -36,6 +38,7 @@ export function createDialogKeybindSettingsSync (params: {
   }
 
   function onCloseMain (): void {
+    filter.value = ''
     syncWorkingFromStore()
   }
 
@@ -60,14 +63,14 @@ export function createDialogKeybindSettingsSync (params: {
 
 export function createDialogKeybindSettingsState (t: (key: string) => string): {
   capture: ReturnType<typeof createDialogKeybindSettingsCapture>
-  filter: Ref<string>
+  filter: Ref<string | null | undefined>
   sync: ReturnType<typeof createDialogKeybindSettingsSync>
   table: ReturnType<typeof createDialogKeybindSettingsTableState>
   workingOverrides: Ref<I_faKeybindsRoot['overrides']>
 } {
   const keybindsStore = S_FaKeybinds()
   const workingOverrides = ref<I_faKeybindsRoot['overrides']>({})
-  const filter = ref('')
+  const filter = ref<string | null | undefined>('')
   const platform = computed(() => keybindsStore.snapshot?.platform ?? 'win32')
 
   const capture = createDialogKeybindSettingsCapture({
@@ -84,6 +87,7 @@ export function createDialogKeybindSettingsState (t: (key: string) => string): {
   })
 
   const sync = createDialogKeybindSettingsSync({
+    filter,
     keybindsStore,
     workingOverrides
   })
@@ -104,7 +108,7 @@ export function useDialogKeybindSettings (): {
   captureInfoMessage: Ref<string>
   captureLabel: Ref<string>
   captureOpen: Ref<boolean>
-  filter: Ref<string>
+  filter: Ref<string | null | undefined>
   initializeForOpen: () => void
   onCaptureClear: () => void
   onCaptureSet: () => void

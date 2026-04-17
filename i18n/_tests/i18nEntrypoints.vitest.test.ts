@@ -20,4 +20,6 @@ test('externalFileLoader exposes i18n global API', () => {
   expect(i18n.global.t('dialogs.programSettings.settingsSearchPlaceholder')).toBeTruthy()
   expect(i18n.global.t('dialogs.programSettings.searchNoResultsTitle')).toBeTruthy()
   expect(i18n.global.t('dialogs.programSettings.searchNoResultsDescription')).toBeTruthy()
+  expect(i18n.global.t('dialogs.keybindSettings.filterNoResultsTitle')).toBeTruthy()
+  expect(i18n.global.t('dialogs.keybindSettings.filterNoResultsDescription')).toBeTruthy()
 })
