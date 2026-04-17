@@ -227,16 +227,20 @@ test('faKeybindFindChordConflict returns null when no command owns the chord', (
 })
 
 test('faKeybindFindChordConflict uses effective chords so a superseded default no longer blocks', () => {
-  const ctrlComma = {
-    code: 'Comma',
-    mods: ['ctrl' as const]
+  const ctrlAltShiftL = {
+    code: 'KeyL',
+    mods: [
+      'ctrl' as const,
+      'alt' as const,
+      'shift' as const
+    ]
   }
   const ctrlX = {
     code: 'KeyX',
     mods: ['ctrl' as const]
   }
   const blocked = faKeybindFindChordConflict({
-    chord: ctrlComma,
+    chord: ctrlAltShiftL,
     excludeCommandId: 'openKeybindSettings',
     overrides: {},
     platform: 'win32'
@@ -244,7 +248,7 @@ test('faKeybindFindChordConflict uses effective chords so a superseded default n
   expect(blocked).toBe('openProgramSettings')
 
   const freed = faKeybindFindChordConflict({
-    chord: ctrlComma,
+    chord: ctrlAltShiftL,
     excludeCommandId: 'openKeybindSettings',
     overrides: {
       openProgramSettings: ctrlX
@@ -416,28 +420,35 @@ test('createFaKeybindKeydownHandler skips repeat, composing, suspend, and editab
 
   const asKeyEvent = (target: EventTarget | null): KeyboardEvent => {
     return {
-      code: 'Comma',
+      altKey: true,
+      code: 'KeyL',
       ctrlKey: true,
       isComposing: false,
-      key: ',',
+      key: 'l',
       preventDefault,
       repeat: false,
+      shiftKey: true,
       stopPropagation,
       target
     } as unknown as KeyboardEvent
   }
 
   const repeatEv = new KeyboardEvent('keydown', {
-    code: 'Comma',
+    altKey: true,
+    code: 'KeyL',
     ctrlKey: true,
-    repeat: true
+    key: 'l',
+    repeat: true,
+    shiftKey: true
   })
   handler(repeatEv as KeyboardEvent)
   expect(runCommandMock).not.toHaveBeenCalled()
 
   const composingEv = new KeyboardEvent('keydown', {
-    code: 'Comma',
-    ctrlKey: true
+    altKey: true,
+    code: 'KeyL',
+    ctrlKey: true,
+    shiftKey: true
   })
   Object.defineProperty(composingEv, 'isComposing', { value: true })
   handler(composingEv)
