@@ -44,6 +44,7 @@ const selectorList = {
   dialogKeybindSettingsSave: 'dialogKeybindSettings-save',
   dialogKeybindSettingsTitle: 'dialogKeybindSettings-title',
   dialogKeybindSettingsUserKeybindButton: 'dialogKeybindSettings-userKeybind-button',
+  dialogMarkdownDocumentClose: 'dialogMarkdownDocument-button-close',
   dialogProgramSettingsClose: 'dialogProgramSettings-button-close',
   dialogProgramSettingsTitle: 'dialogProgramSettings-title',
   keybindCaptureCard: 'dialogKeybindSettings-capture-card',
@@ -55,8 +56,10 @@ const selectorList = {
 /**
  * Default chords match FA_KEYBIND_COMMAND_DEFINITIONS after expanding 'primary'.
  * Playwright 'ControlOrMeta' matches the app primary modifier (Cmd on macOS, Ctrl on Windows and Linux).
+ * Open Advanced search guide uses literal Ctrl in the app definition, so this suite always sends Control.
  */
 const defaultChord = {
+  openAdvancedSearchGuide: 'Control+Alt+Shift+G',
   openKeybindSettings: 'ControlOrMeta+Alt+Shift+k',
   openProgramSettings: 'ControlOrMeta+Alt+Shift+l'
 } as const
@@ -65,6 +68,7 @@ const defaultChord = {
  * User-adjusted chords (explicit Control so behavior matches on macOS hosts too).
  */
 const adjustedChord = {
+  openAdvancedSearchGuide: 'Control+Alt+Shift+F9',
   openKeybindSettings: 'Control+Alt+Shift+F10',
   openProgramSettings: 'Control+Alt+Shift+F11',
   toggleDeveloperTools: 'Control+Alt+Shift+F12'
@@ -181,6 +185,18 @@ async function closeProgramSettingsDialog (page: Page): Promise<void> {
   })
 }
 
+function locatorMarkdownAdvancedSearchGuideDialog (page: Page): Locator {
+  return page.locator('.q-dialog.dialogMarkdownDocument.advancedSearchGuide')
+}
+
+async function closeMarkdownAdvancedSearchGuideDialog (page: Page): Promise<void> {
+  const root = locatorMarkdownAdvancedSearchGuideDialog(page)
+  await page.locator(`[data-test-locator="${selectorList.dialogMarkdownDocumentClose}"]`).click()
+  await expect(root).toBeHidden({
+    timeout: 15_000
+  })
+}
+
 test.describe.serial('Global keybinds end-to-end', () => {
   let electronApp: ElectronApplication
   let appWindow: Page
@@ -204,7 +220,7 @@ test.describe.serial('Global keybinds end-to-end', () => {
   })
 
   /**
-   * Default shortcuts open and close dialogs and devtools; custom chords persist; clearing a user override restores the default devtools shortcut.
+   * Default shortcuts open and close dialogs, markdown guide, and devtools; custom chords persist; clearing a user override restores the default devtools shortcut.
    */
   test('Keybind defaults, custom chords, clear override, and default restore', async () => {
     const keybindTitle = appWindow.locator(`[data-test-locator="${selectorList.dialogKeybindSettingsTitle}"]`)
@@ -226,6 +242,17 @@ test.describe.serial('Global keybinds end-to-end', () => {
       await expect(programTitle).toBeVisible()
       await expect(programTitle).toHaveText(programSettingsMessages.title)
       await closeProgramSettingsDialog(appWindow)
+    })
+
+    await test.step('Default advanced search guide opens then closes', async () => {
+      await triggerGlobalShortcut(appWindow, defaultChord.openAdvancedSearchGuide)
+      await expect(locatorMarkdownAdvancedSearchGuideDialog(appWindow)).toBeVisible({
+        timeout: 15_000
+      })
+      await expect(
+        appWindow.locator('[data-test-locator="dialogMarkdownDocument-markdown-wrapper"]')
+      ).toBeVisible()
+      await closeMarkdownAdvancedSearchGuideDialog(appWindow)
     })
 
     await test.step('Default keybind settings opens', async () => {
@@ -253,6 +280,12 @@ test.describe.serial('Global keybinds end-to-end', () => {
         keybindDialogMessages.commands.openKeybindSettings,
         adjustedChord.openKeybindSettings
       )
+      await captureChordForFilteredCommand(
+        appWindow,
+        'advanced search guide',
+        keybindDialogMessages.commands.openAdvancedSearchGuide,
+        adjustedChord.openAdvancedSearchGuide
+      )
       await saveKeybindSettingsDialog(appWindow)
     })
 
@@ -264,6 +297,14 @@ test.describe.serial('Global keybinds end-to-end', () => {
       await triggerGlobalShortcut(appWindow, adjustedChord.openProgramSettings)
       await expect(programTitle).toBeVisible()
       await closeProgramSettingsDialog(appWindow)
+    })
+
+    await test.step('Adjusted advanced search guide opens then closes', async () => {
+      await triggerGlobalShortcut(appWindow, adjustedChord.openAdvancedSearchGuide)
+      await expect(locatorMarkdownAdvancedSearchGuideDialog(appWindow)).toBeVisible({
+        timeout: 15_000
+      })
+      await closeMarkdownAdvancedSearchGuideDialog(appWindow)
     })
 
     await test.step('Adjusted keybind settings opens', async () => {

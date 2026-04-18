@@ -78,6 +78,7 @@ test('buildDialogKeybindSettingsRows lists all command ids', () => {
   })
   const ids = rows.map((r) => r.commandId).sort()
   expect(ids).toEqual([
+    'openAdvancedSearchGuide',
     'openKeybindSettings',
     'openProgramSettings',
     'toggleDeveloperTools'
@@ -142,6 +143,11 @@ test('buildDialogKeybindSettingsTableColumns returns name, user, default columns
     'name',
     'userKeybinds',
     'defaultKeybinds'
+  ])
+  expect(cols.map((c) => c.classes)).toEqual([
+    'dialogKeybindSettings__tableColName',
+    'dialogKeybindSettings__tableColUser',
+    'dialogKeybindSettings__tableColDefault'
   ])
 })
 
@@ -393,6 +399,7 @@ test('makeDialogKeybindCaptureKeydownHandler sets validation error when chord is
   const captureErrorMessage = ref('')
   const captureInfoMessage = ref('')
   const captureLabel = ref('')
+  const captureOpen = ref(true)
   const editingCommandId = ref<T_faKeybindCommandId | null>('openKeybindSettings')
   const pendingChord = ref(null)
   const platform = computed(() => 'win32' as NodeJS.Platform)
@@ -403,6 +410,7 @@ test('makeDialogKeybindCaptureKeydownHandler sets validation error when chord is
     captureErrorMessage,
     captureInfoMessage,
     captureLabel,
+    captureOpen,
     editingCommandId,
     pendingChord,
     platform,
@@ -419,12 +427,50 @@ test('makeDialogKeybindCaptureKeydownHandler sets validation error when chord is
   expect(captureInfoMessage.value).toBe('')
 })
 
+test('makeDialogKeybindCaptureKeydownHandler closes capture sheet on Escape', () => {
+  const captureBaselineChord = ref(null)
+  const captureError = ref(false)
+  const captureErrorMessage = ref('')
+  const captureInfoMessage = ref('')
+  const captureLabel = ref('Ctrl + B')
+  const captureOpen = ref(true)
+  const editingCommandId = ref<T_faKeybindCommandId | null>('toggleDeveloperTools')
+  const pendingChord = ref<I_faChordSerialized | null>({
+    code: 'KeyB',
+    mods: ['ctrl']
+  })
+  const platform = computed(() => 'win32' as NodeJS.Platform)
+  const workingOverrides = ref({})
+  const handler = makeDialogKeybindCaptureKeydownHandler({
+    captureBaselineChord,
+    captureError,
+    captureErrorMessage,
+    captureInfoMessage,
+    captureLabel,
+    captureOpen,
+    editingCommandId,
+    pendingChord,
+    platform,
+    t: tStub,
+    workingOverrides
+  })
+  const ev = new KeyboardEvent('keydown', {
+    bubbles: true,
+    cancelable: true,
+    code: 'Escape',
+    key: 'Escape'
+  })
+  handler(ev)
+  expect(captureOpen.value).toBe(false)
+})
+
 test('makeDialogKeybindCaptureKeydownHandler ignores bare modifier keys without capture hint', () => {
   const captureBaselineChord = ref(null)
   const captureError = ref(false)
   const captureErrorMessage = ref('')
   const captureInfoMessage = ref('')
   const captureLabel = ref('')
+  const captureOpen = ref(true)
   const editingCommandId = ref<T_faKeybindCommandId | null>('openKeybindSettings')
   const pendingChord = ref(null)
   const platform = computed(() => 'win32' as NodeJS.Platform)
@@ -435,6 +481,7 @@ test('makeDialogKeybindCaptureKeydownHandler ignores bare modifier keys without 
     captureErrorMessage,
     captureInfoMessage,
     captureLabel,
+    captureOpen,
     editingCommandId,
     pendingChord,
     platform,
@@ -458,6 +505,7 @@ test('makeDialogKeybindCaptureKeydownHandler clears need modifier error after ba
   const captureErrorMessage = ref('')
   const captureInfoMessage = ref('')
   const captureLabel = ref('')
+  const captureOpen = ref(true)
   const editingCommandId = ref<T_faKeybindCommandId | null>('openKeybindSettings')
   const pendingChord = ref(null)
   const platform = computed(() => 'win32' as NodeJS.Platform)
@@ -468,6 +516,7 @@ test('makeDialogKeybindCaptureKeydownHandler clears need modifier error after ba
     captureErrorMessage,
     captureInfoMessage,
     captureLabel,
+    captureOpen,
     editingCommandId,
     pendingChord,
     platform,
@@ -497,6 +546,7 @@ test('makeDialogKeybindCaptureKeydownHandler flags chord that matches another ac
   const captureErrorMessage = ref('')
   const captureInfoMessage = ref('')
   const captureLabel = ref('')
+  const captureOpen = ref(true)
   const editingCommandId = ref<T_faKeybindCommandId | null>('openKeybindSettings')
   const pendingChord = ref(null)
   const platform = computed(() => 'win32' as NodeJS.Platform)
@@ -507,6 +557,7 @@ test('makeDialogKeybindCaptureKeydownHandler flags chord that matches another ac
     captureErrorMessage,
     captureInfoMessage,
     captureLabel,
+    captureOpen,
     editingCommandId,
     pendingChord,
     platform,
@@ -536,6 +587,7 @@ test('makeDialogKeybindCaptureKeydownHandler allows chord when prior default own
   const captureErrorMessage = ref('')
   const captureInfoMessage = ref('')
   const captureLabel = ref('')
+  const captureOpen = ref(true)
   const editingCommandId = ref<T_faKeybindCommandId | null>('openKeybindSettings')
   const pendingChord = ref(null)
   const platform = computed(() => 'win32' as NodeJS.Platform)
@@ -551,6 +603,7 @@ test('makeDialogKeybindCaptureKeydownHandler allows chord when prior default own
     captureErrorMessage,
     captureInfoMessage,
     captureLabel,
+    captureOpen,
     editingCommandId,
     pendingChord,
     platform,
@@ -575,6 +628,7 @@ test('makeDialogKeybindCaptureKeydownHandler keeps conflict message after a modi
   const captureErrorMessage = ref('')
   const captureInfoMessage = ref('')
   const captureLabel = ref('')
+  const captureOpen = ref(true)
   const editingCommandId = ref<T_faKeybindCommandId | null>('openKeybindSettings')
   const pendingChord = ref(null)
   const platform = computed(() => 'win32' as NodeJS.Platform)
@@ -585,6 +639,7 @@ test('makeDialogKeybindCaptureKeydownHandler keeps conflict message after a modi
     captureErrorMessage,
     captureInfoMessage,
     captureLabel,
+    captureOpen,
     editingCommandId,
     pendingChord,
     platform,
@@ -1064,6 +1119,7 @@ test('runDialogKeybindCaptureKeydown skips conflict lookup when editingCommandId
   const captureErrorMessage = ref('')
   const captureInfoMessage = ref('')
   const captureLabel = ref('')
+  const captureOpen = ref(true)
   const editingCommandId = ref<T_faKeybindCommandId | null>(null)
   const pendingChord = ref(null)
   const platform = computed(() => 'win32' as NodeJS.Platform)
@@ -1080,6 +1136,7 @@ test('runDialogKeybindCaptureKeydown skips conflict lookup when editingCommandId
     captureErrorMessage,
     captureInfoMessage,
     captureLabel,
+    captureOpen,
     editingCommandId,
     pendingChord,
     platform,
@@ -1106,6 +1163,7 @@ test('runDialogKeybindCaptureKeydown restores pending chord and label to baselin
   const captureErrorMessage = ref('')
   const captureInfoMessage = ref('')
   const captureLabel = ref('Ctrl + Alt + Shift + L')
+  const captureOpen = ref(true)
   const editingCommandId = ref<T_faKeybindCommandId | null>('openProgramSettings')
   const pendingChord = ref<I_faChordSerialized | null>({
     code: 'KeyL',
@@ -1131,6 +1189,7 @@ test('runDialogKeybindCaptureKeydown restores pending chord and label to baselin
     captureErrorMessage,
     captureInfoMessage,
     captureLabel,
+    captureOpen,
     editingCommandId,
     pendingChord,
     platform,
