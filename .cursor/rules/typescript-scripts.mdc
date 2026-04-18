@@ -13,7 +13,7 @@ Vue SFCs import from here when extracting **pure helpers**; see [vue-quasar.mdc]
 - **`_utilities/`** — small, pure helpers (format conversion, parsing) with **JSDoc on each exported function** (`@param` / `@returns` where helpful), e.g. [colorFormatConvertors.ts](src/scripts/_utilities/colorFormatConvertors.ts).
 - **`appInternals/`** — cross-cutting renderer helpers bundled in **`rendererAppInternals.ts`** (Storybook canvas detection, Vite public asset paths, interface language apply/save, boot routing side effects) — not feature-dialog or keybind-specific.
 - **Feature folders** (e.g. `appGlobalManagementUI/`) — behavior tied to app features; keep files focused on one area.
-- **`keybinds/`** — global shortcut matching, chord helpers, and **`faKeybindRunCommand`**; wired from **`MainLayout.vue`** with state from **`S_FaKeybinds`**. When adding app-wide shortcuts, follow [fantasia-keybinds](../skills/fantasia-keybinds/SKILL.md).
+- **`keybinds/`** — global shortcut matching, chord helpers, **`faKeybindRunCommand`**, and user-visible chord labels in **`faKeybindsChordUiFormatting.ts`** (**`formatFaKeybindChordForUi`**, **`formatFaKeybindCommandLabelFromSnapshot`**); wired from **`MainLayout.vue`** with state from **`S_FaKeybinds`**. When adding app-wide shortcuts, follow [fantasia-keybinds](../skills/fantasia-keybinds/SKILL.md).
 - Leading underscore on folder names like `_utilities` signals shared non-feature helpers.
 
 ## When to split a file
