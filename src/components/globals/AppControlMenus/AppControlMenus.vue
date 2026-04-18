@@ -136,14 +136,14 @@ const componentTestingMenuList: I_appMenuList = {
       icon: 'mdi-text-box-plus-outline',
       submenu: undefined,
       trigger: () => openDialogMarkdownDocument('changeLog'),
-      triggerArguments: ['changeLog'],
       conditions: true,
       specialColor: undefined
     },
     {
       mode: 'item',
-      text: 'Test Button 2',
-      icon: 'mdi-database-search',
+      text: 'Test Button 2 - Keybind settings (hint)',
+      icon: 'mdi-keyboard-settings',
+      keybindCommandId: 'openKeybindSettings',
       submenu: undefined,
       trigger: undefined,
       conditions: true,
@@ -196,8 +196,9 @@ const componentTestingMenuList: I_appMenuList = {
       submenu: [
         {
           mode: 'item',
-          text: 'Submenu-Test Button 1',
-          icon: 'mdi-folder-plus-outline',
+          text: 'Submenu-Test Button 1 - Advanced search guide (hint)',
+          icon: 'mdi-file-question',
+          keybindCommandId: 'openAdvancedSearchGuide',
           trigger: undefined,
           conditions: true,
           specialColor: undefined

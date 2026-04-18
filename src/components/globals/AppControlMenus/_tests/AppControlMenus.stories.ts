@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { expect, within } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
+
+import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
+import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 
 import AppControlMenus from '../AppControlMenus.vue'
 
@@ -17,7 +20,8 @@ const meta = {
         iframeHeight: '320px'
       },
       description: {
-        component: 'Top menu composition container. Contract: renders `AppControlSingleMenu` children from internal menu data.'
+        component:
+          'Top menu composition: four `AppControlSingleMenu` groups (Project, Documents, Tools, Help & Info) from `_data/` builders. Tools and Help rows may set `keybindCommandId` for live shortcut hints when `S_FaKeybinds.snapshot` is populated. Set `embedDialogs` true to mount markdown and settings dialogs used by menu triggers (they stay closed until an action runs).'
       }
     }
   }
@@ -33,5 +37,31 @@ export const CompositionProductionMenuContract: StoryObj<typeof meta> = {
     const canvas = within(canvasElement)
     await expect(canvas.getAllByRole('button').length).toBeGreaterThan(0)
     await expect(canvasElement.querySelectorAll('[data-test-menu-any="appControlMenus-anyMenu"]').length).toBe(4)
+
+    const keybinds = S_FaKeybinds()
+    keybinds.snapshot = {
+      platform: 'win32',
+      store: { ...FA_KEYBINDS_STORE_DEFAULTS }
+    }
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Help & Info' }))
+    await waitFor(async () => {
+      const hints = document.body.querySelectorAll('[data-test-locator="AppControlSingleMenu-menuItem-keybind"]')
+      await expect(hints.length).toBeGreaterThan(0)
+    })
+  }
+}
+
+export const WithEmbeddedDialogs: StoryObj<typeof meta> = {
+  name: 'States/WithEmbeddedDialogs',
+  args: {
+    embedDialogs: true
+  },
+  parameters: {
+    docs: {
+      story: {
+        iframeHeight: '420px'
+      }
+    }
   }
 }
