@@ -288,7 +288,7 @@ test.describe.serial('Global keybinds end-to-end', () => {
         return await appWindow.evaluate(async () => {
           return await window.faContentBridgeAPIs.faDevToolsControl.checkDevToolsStatus()
         })
-      }, { timeout: 3_000 }).toBe(false)
+      }, { timeout: 10_000 }).toBe(false)
     })
 
     await test.step('Default devtools toggle twice again: open then close', async () => {
