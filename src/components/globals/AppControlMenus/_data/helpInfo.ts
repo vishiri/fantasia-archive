@@ -14,6 +14,7 @@ import { toggleDevTools } from 'app/src/scripts/appGlobalManagementUI/toggleDevT
 function buildHelpInfoMenuData (): I_appMenuItem[] {
   return [
     faMenuItem('appControlMenus.helpInfo.items.advancedSearchGuide', 'mdi-file-question', {
+      keybindCommandId: 'openAdvancedSearchGuide',
       trigger: () => openDialogMarkdownDocument('advancedSearchGuide')
     }),
     faMenuItem('appControlMenus.helpInfo.items.tipsTricksTrivia', 'mdi-fire-alert', {
@@ -31,6 +32,7 @@ function buildHelpInfoMenuData (): I_appMenuItem[] {
     }),
     faMenuSeparator(),
     faMenuItem('appControlMenus.helpInfo.items.toggleDeveloperTools', 'mdi-code-tags', {
+      keybindCommandId: 'toggleDeveloperTools',
       trigger: toggleDevTools
     })
   ]

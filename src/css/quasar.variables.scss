@@ -1,4 +1,6 @@
 @use 'sass:color';
+/* Material palette ($blue-grey-5, etc.): loaded as a module so names do not clash with brand overrides below. */
+@use 'quasar/src/css/variables.sass' as quasarPalette;
 
 /* Quasar SCSS (& Sass) variables — single theme catalogue (see project-scss.mdc). */
 
@@ -142,10 +144,11 @@ $appControlMenus-bgColor: $dark-lighter;
 $appControlMenus-color: $accent;
 $appControlMenus-separatorColor: $primary-bright;
 $appControlMenus-singleHover: $primary-bright;
-
+$appControlMenus-separatorAltColor: quasarPalette.$blue-grey-7;
 /* COMPONENT - APP CONTROL SINGLE MENU */
 $appControlSingleMenu-item-minHeight: 42px;
 $appControlSingleMenu-item-secondary-textShadow: 0 0 3px #000;
+$appControlSingleMenu-keybindText-fontSize: 9px;
 $appControlSingleMenu-separator-height: 0.5px;
 
 /* COMPONENT - DIALOG ABOUT FANTASIA ARCHIVE */
@@ -286,6 +289,9 @@ $dialogKeybindSettings-card-maxWidthViewportSubtract: 48px;
 $dialogKeybindSettings-card-width: 1200px;
 $dialogKeybindSettings-wrapper-maxHeightCap: 900px;
 $dialogKeybindSettings-wrapper-maxHeightViewportSubtract: 200px;
+$dialogKeybindSettings-table-col-default-width: 200px;
+$dialogKeybindSettings-table-col-name-width: 200px;
+$dialogKeybindSettings-table-col-user-width: 200px;
 
 /* COMPONENT - DIALOG KEYBIND SETTINGS (CAPTURE POPUP) */
 $dialogKeybindSettingsCapture-actionBtn-minWidth: 140px;

@@ -20,6 +20,7 @@ export default {
   columnName: 'Action',
   columnUser: 'User keybinds',
   commands: {
+    openAdvancedSearchGuide: 'Open Advanced search guide',
     openKeybindSettings: 'Open keybind settings',
     openProgramSettings: 'Open program settings',
     toggleDeveloperTools: 'Toggle developer tools'

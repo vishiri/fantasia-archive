@@ -20,6 +20,7 @@ export default {
   columnName: 'Action',
   columnUser: 'Raccourcis utilisateur',
   commands: {
+    openAdvancedSearchGuide: 'Ouvrir le guide de recherche avancée',
     openKeybindSettings: 'Ouvrir les paramètres des raccourcis',
     openProgramSettings: 'Ouvrir les paramètres du programme',
     toggleDeveloperTools: 'Basculer les outils de développement'

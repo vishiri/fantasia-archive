@@ -20,6 +20,7 @@ export default {
   columnName: 'Aktion',
   columnUser: 'Nutzer-Tastenkürzel',
   commands: {
+    openAdvancedSearchGuide: 'Leitfaden zur erweiterten Suche öffnen',
     openKeybindSettings: 'Tastenkürzel-Einstellungen öffnen',
     openProgramSettings: 'Programmeinstellungen öffnen',
     toggleDeveloperTools: 'Entwicklerwerkzeuge ein/aus'

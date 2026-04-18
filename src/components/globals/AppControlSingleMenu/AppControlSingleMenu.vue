@@ -44,6 +44,13 @@
             role="separator"
           />
 
+          <q-separator
+            v-if="menuItem.mode !== 'separator'"
+            class="appControlSingleMenu__separatorAlt"
+            dark
+            role="separator"
+          />
+
           <q-item
             v-if="menuItem.mode === 'item'"
             v-close-popup="menuItem.submenu === undefined ? true : false"
@@ -60,6 +67,13 @@
           >
             <q-item-section data-test-locator="AppControlSingleMenu-menuItem-text">
               {{ menuItem.text }}
+              <div
+                v-if="keybindHintLabel(menuItem.keybindCommandId)"
+                class="appControlSingleMenu__keybindText text-blue-grey-6"
+                data-test-locator="AppControlSingleMenu-menuItem-keybind"
+              >
+                ({{ keybindHintLabel(menuItem.keybindCommandId) }})
+              </div>
             </q-item-section>
             <q-item-section avatar>
               <q-icon
@@ -97,6 +111,14 @@
                     dark
                     role="separator"
                   />
+
+                  <q-separator
+                    v-if="submenuItem.mode !== 'separator'"
+                    class="appControlSingleMenu__separatorAlt"
+                    dark
+                    role="separator"
+                  />
+
                   <q-item
                     v-if="submenuItem.mode === 'item'"
                     v-close-popup
@@ -111,6 +133,13 @@
                       data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-text"
                     >
                       {{ submenuItem.text }}
+                      <div
+                        v-if="keybindHintLabel(submenuItem.keybindCommandId)"
+                        class="appControlSingleMenu__keybindText text-blue-grey-6"
+                        data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-keybind"
+                      >
+                        ({{ keybindHintLabel(submenuItem.keybindCommandId) }})
+                      </div>
                     </q-item-section>
                     <q-item-section avatar>
                       <q-icon
@@ -134,8 +163,24 @@
 </template>
 
 <script setup lang="ts">
-import type { I_appMenuList } from 'app/types/I_appMenusDataList'
 import { computed } from 'vue'
+
+import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
+import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
+import type { I_appMenuList } from 'app/types/I_appMenusDataList'
+import type { T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
+
+const faKeybindsStore = S_FaKeybinds()
+
+/**
+ * Shortcut hint for a menu row when `keybindCommandId` is set and keybind snapshot is loaded.
+ */
+function keybindHintLabel (commandId: T_faKeybindCommandId | undefined): string | null {
+  return formatFaKeybindCommandLabelFromSnapshot({
+    commandId,
+    snapshot: faKeybindsStore.snapshot
+  })
+}
 
 /**
  * All component props
@@ -207,6 +252,18 @@ const menuData = computed(() => componentData.value.data)
   &__separator {
     background-color: $appControlMenus-separatorColor;
     height: $appControlSingleMenu-separator-height !important;
+  }
+
+  &__separatorAlt {
+    background-color: $appControlMenus-separatorAltColor;
+    height: $appControlSingleMenu-separator-height !important;
+    opacity: 0.4;
+  }
+
+  &__keybindText {
+    font-size: $appControlSingleMenu-keybindText-fontSize;
+    font-weight: 600;
+    text-shadow: none;
   }
 }
 </style>

@@ -1,4 +1,7 @@
-import { openDialogComponent } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
+import {
+  openDialogComponent,
+  openDialogMarkdownDocument
+} from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
 import { toggleDevTools } from 'app/src/scripts/appGlobalManagementUI/toggleDevTools'
 import type { T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
 
@@ -15,5 +18,9 @@ export function faKeybindRunCommand (id: T_faKeybindCommandId): void {
     openDialogComponent('ProgramSettings')
     return
   }
-  openDialogComponent('KeybindSettings')
+  if (id === 'openKeybindSettings') {
+    openDialogComponent('KeybindSettings')
+    return
+  }
+  openDialogMarkdownDocument('advancedSearchGuide')
 }

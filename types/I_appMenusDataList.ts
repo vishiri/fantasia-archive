@@ -1,3 +1,5 @@
+import type { T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
+
 /**
  * App chrome menu models: top-level menu buttons, nested items, separators, and click triggers.
  */
@@ -40,6 +42,11 @@ export interface I_appMenuSubItem {
    * Special color class for the submenu item.
    */
   specialColor?: string
+
+  /**
+   * When set, menu chrome may show the current global shortcut for this command (from `S_FaKeybinds`).
+   */
+  keybindCommandId?: T_faKeybindCommandId
 }
 
 export interface I_appMenuItem {
@@ -82,6 +89,11 @@ export interface I_appMenuItem {
    * Optional submenu items.
    */
   submenu?: I_appMenuSubItem[]
+
+  /**
+   * When set, menu chrome may show the current global shortcut for this command (from `S_FaKeybinds`).
+   */
+  keybindCommandId?: T_faKeybindCommandId
 }
 
 export interface I_appMenuList {

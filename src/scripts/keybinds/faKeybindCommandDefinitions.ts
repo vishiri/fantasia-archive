@@ -38,6 +38,20 @@ export const FA_KEYBIND_COMMAND_DEFINITIONS: I_faKeybindCommandDefinition[] = [
     firesInEditableFields: true,
     id: 'openKeybindSettings',
     messageKey: 'dialogs.keybindSettings.commands.openKeybindSettings'
+  },
+  {
+    defaultChord: {
+      code: 'KeyG',
+      mods: [
+        'alt',
+        'ctrl',
+        'shift'
+      ]
+    },
+    editable: true,
+    firesInEditableFields: true,
+    id: 'openAdvancedSearchGuide',
+    messageKey: 'dialogs.keybindSettings.commands.openAdvancedSearchGuide'
   }
 ]
 

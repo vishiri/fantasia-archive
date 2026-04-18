@@ -23,9 +23,11 @@ function buildToolsMenuData (): I_appMenuItem[] {
     faMenuItem('appControlMenus.tools.items.showNoteBoard', 'mdi-clipboard-text-outline'),
     faMenuSeparator(),
     faMenuItem('appControlMenus.tools.items.keybindSettings', 'mdi-keyboard-settings', {
+      keybindCommandId: 'openKeybindSettings',
       trigger: () => openDialogComponent('KeybindSettings')
     }),
     faMenuItem('appControlMenus.tools.items.programSettings', 'mdi-tune', {
+      keybindCommandId: 'openProgramSettings',
       trigger: () => openDialogComponent('ProgramSettings')
     })
   ]
