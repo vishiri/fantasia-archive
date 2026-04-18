@@ -32,10 +32,8 @@ vi.mock('app/src/scripts/keybinds/faKeybindCommandDefinitions', async (importOri
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
 
 import { FA_KEYBIND_COMMAND_DEFINITIONS, findFaKeybindCommandDefinition } from 'app/src/scripts/keybinds/faKeybindCommandDefinitions'
-import {
-  faKeybindFindChordConflict,
-  formatFaChordForDisplay
-} from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
+import { faKeybindFindChordConflict } from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
+import { formatFaKeybindChordForUi } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
 import {
   faKeybindChordsEqual,
   faKeybindExpandDefaultChord,
@@ -148,7 +146,7 @@ test('faKeybindResolveEffectiveChord uses override, null revert, or default', ()
   })?.code).toBe('Comma')
 })
 
-test('formatFaChordForDisplay covers modifier platforms and code labels', () => {
+test('formatFaKeybindChordForUi covers modifier platforms and code labels', () => {
   const chord: I_faChordSerialized = {
     code: 'KeyQ',
     mods: [
@@ -156,29 +154,29 @@ test('formatFaChordForDisplay covers modifier platforms and code labels', () => 
       'shift'
     ]
   }
-  expect(formatFaChordForDisplay(chord, 'darwin')).toContain('Cmd')
-  expect(formatFaChordForDisplay(chord, 'win32')).toContain('Meta')
-  expect(formatFaChordForDisplay({
+  expect(formatFaKeybindChordForUi(chord, 'darwin')).toContain('Cmd')
+  expect(formatFaKeybindChordForUi(chord, 'win32')).toContain('Meta')
+  expect(formatFaKeybindChordForUi({
     code: 'Digit1',
     mods: ['alt']
   }, 'win32')).toContain('Alt')
-  expect(formatFaChordForDisplay({
+  expect(formatFaKeybindChordForUi({
     code: 'Digit1',
     mods: ['alt']
   }, 'darwin')).toContain('Opt')
-  expect(formatFaChordForDisplay({
+  expect(formatFaKeybindChordForUi({
     code: 'ArrowLeft',
     mods: ['ctrl']
   }, 'win32')).toContain('arrow')
-  expect(formatFaChordForDisplay({
+  expect(formatFaKeybindChordForUi({
     code: 'Comma',
     mods: []
   }, 'win32')).toContain(',')
-  expect(formatFaChordForDisplay({
+  expect(formatFaKeybindChordForUi({
     code: 'F1',
     mods: []
   }, 'win32')).toContain('F1')
-  expect(formatFaChordForDisplay({
+  expect(formatFaKeybindChordForUi({
     code: 'UnknownCode',
     mods: ['shift']
   }, 'win32')).toContain('UnknownCode')
@@ -494,6 +492,7 @@ test('findFaKeybindCommandDefinition returns undefined for unknown ids', () => {
 
 test('FA_KEYBIND_COMMAND_DEFINITIONS lists expected commands', () => {
   expect(FA_KEYBIND_COMMAND_DEFINITIONS.map((d) => d.id).sort()).toEqual([
+    'openAdvancedSearchGuide',
     'openKeybindSettings',
     'openProgramSettings',
     'toggleDeveloperTools'
