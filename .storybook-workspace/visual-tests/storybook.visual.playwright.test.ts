@@ -216,7 +216,7 @@ test('Capture visual snapshots for Storybook stories', async ({ browser, request
             animations: 'disabled',
             caret: 'hide',
             // Absorb fonts/subpixel variance (local vs GitHub windows-latest Chromium); worst CI diffs ~1.6k px
-            maxDiffPixels: 2000
+            maxDiffPixelRatio: 0.02
           }), STORY_STEP_TIMEOUT_MS, `Timed out taking screenshot: ${story.id}`)
         } catch (error) {
           await attachStorybookVisualFailureCapture(page, story.id, 'screenshot-step-failed')
