@@ -44,6 +44,46 @@ function buildDialogKeybindSettingsCaptureApi (params: {
   }
 }
 
+function createDialogKeybindSettingsCaptureKeydown (params: {
+  platform: ComputedRef<NodeJS.Platform>
+  refs: T_dialogKeybindCaptureRefsBundle
+  t: (key: string) => string
+  workingOverrides: Ref<I_faKeybindsRoot['overrides']>
+}): {
+    handleCaptureKeydown: (e: KeyboardEvent) => void
+    removeCaptureListener: () => void
+  } {
+  const {
+    platform,
+    refs,
+    t,
+    workingOverrides
+  } = params
+
+  const handleCaptureKeydown = makeDialogKeybindCaptureKeydownHandler({
+    captureBaselineChord: refs.captureBaselineChord,
+    captureError: refs.captureError,
+    captureErrorMessage: refs.captureErrorMessage,
+    captureInfoMessage: refs.captureInfoMessage,
+    captureLabel: refs.captureLabel,
+    captureOpen: refs.captureOpen,
+    editingCommandId: refs.editingCommandId,
+    pendingChord: refs.pendingChord,
+    platform,
+    t,
+    workingOverrides
+  })
+
+  function removeCaptureListener (): void {
+    window.removeEventListener('keydown', handleCaptureKeydown, true)
+  }
+
+  return {
+    handleCaptureKeydown,
+    removeCaptureListener
+  }
+}
+
 function initDialogKeybindSettingsCapture (params: {
   platform: ComputedRef<NodeJS.Platform>
   t: (key: string) => string
@@ -61,22 +101,15 @@ function initDialogKeybindSettingsCapture (params: {
 
   const refs = createDialogKeybindCaptureRefs()
 
-  const handleCaptureKeydown = makeDialogKeybindCaptureKeydownHandler({
-    captureBaselineChord: refs.captureBaselineChord,
-    captureError: refs.captureError,
-    captureErrorMessage: refs.captureErrorMessage,
-    captureInfoMessage: refs.captureInfoMessage,
-    captureLabel: refs.captureLabel,
-    editingCommandId: refs.editingCommandId,
-    pendingChord: refs.pendingChord,
+  const {
+    handleCaptureKeydown,
+    removeCaptureListener
+  } = createDialogKeybindSettingsCaptureKeydown({
     platform,
+    refs,
     t,
     workingOverrides
   })
-
-  function removeCaptureListener (): void {
-    window.removeEventListener('keydown', handleCaptureKeydown, true)
-  }
 
   registerDialogKeybindCaptureOpenWatch({
     captureActionName: refs.captureActionName,

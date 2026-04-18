@@ -15,7 +15,7 @@ import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers
 import keybindDialogMessages from 'app/i18n/en-US/dialogs/L_dialogKeybindSettings'
 import { FA_KEYBIND_COMMAND_DEFINITIONS } from 'app/src/scripts/keybinds/faKeybindCommandDefinitions'
 import { buildDialogKeybindSettingsRows } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsTable'
-import { formatFaChordForDisplay } from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
+import { formatFaKeybindChordForUi } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 
 /**
@@ -330,7 +330,7 @@ test.describe.serial('Keybind settings toggleDeveloperTools persists after Save'
       ]
     })
 
-    const expectedLabel = formatFaChordForDisplay(
+    const expectedLabel = formatFaKeybindChordForUi(
       {
         code: 'F11',
         mods: [

@@ -9,10 +9,8 @@ import {
   runDialogKeybindCaptureKeydown,
   type T_dialogKeybindCaptureKeydownDeps
 } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsCaptureKeydown'
-import {
-  faKeybindFindChordConflict,
-  formatFaChordForDisplay
-} from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
+import { faKeybindFindChordConflict } from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
+import { formatFaKeybindChordForUi } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
 
 export type T_captureChordDeps = T_dialogKeybindCaptureKeydownDeps
@@ -51,7 +49,7 @@ function seedCaptureFieldsFromRow (params: {
     mods: [...seed.mods]
   }
   pendingChord.value = cloned
-  captureLabel.value = formatFaChordForDisplay(cloned, platform.value)
+  captureLabel.value = formatFaKeybindChordForUi(cloned, platform.value)
 }
 
 function syncCaptureBaselineFromPendingChord (params: {

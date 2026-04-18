@@ -231,21 +231,4 @@ registerDialogKeybindSettingsGlobalSuspend({
 }
 </style>
 
-<style lang="scss">
-.KeybindSettings.dialogComponent {
-  .dialogComponent__wrapper.KeybindSettings.dialogKeybindSettings__card {
-    display: flex;
-    flex-direction: column;
-    height: min(#{$dialogKeybindSettings-wrapper-maxHeightCap}, calc(100vh - #{$dialogKeybindSettings-wrapper-maxHeightViewportSubtract}));
-    max-width: min(#{$dialogKeybindSettings-card-width}, calc(100vw - #{$dialogKeybindSettings-card-maxWidthViewportSubtract}));
-    min-height: 0;
-    width: min(#{$dialogKeybindSettings-card-width}, calc(100vw - #{$dialogKeybindSettings-card-maxWidthViewportSubtract}));
-
-    .dialogKeybindSettings__body {
-      flex: 1 1 0;
-      min-height: 0;
-      overflow: hidden;
-    }
-  }
-}
-</style>
+<style lang="scss" src="./DialogKeybindSettings.unscoped.scss"></style>

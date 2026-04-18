@@ -116,7 +116,13 @@ export function useDialogKeybindSettings (): {
   onOpenCapture: (row: I_dialogKeybindSettingsRow) => void
   onSaveMain: () => Promise<boolean>
   pendingChord: Ref<I_faChordSerialized | null>
-  tableColumns: ComputedRef<Array<{ align: 'left', field: string, label: string, name: string }>>
+  tableColumns: ComputedRef<Array<{
+    align: 'left'
+    classes: string
+    field: string
+    label: string
+    name: string
+  }>>
   tableRows: ComputedRef<I_dialogKeybindSettingsRow[]>
   workingOverrides: Ref<I_faKeybindsRoot['overrides']>
 } {

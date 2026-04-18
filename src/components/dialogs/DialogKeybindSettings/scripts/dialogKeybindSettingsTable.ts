@@ -1,7 +1,7 @@
 import { computed, type ComputedRef, type Ref } from 'vue'
 
 import { FA_KEYBIND_COMMAND_DEFINITIONS } from 'app/src/scripts/keybinds/faKeybindCommandDefinitions'
-import { formatFaChordForDisplay } from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
+import { formatFaKeybindChordForUi } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
 import {
   faKeybindChordsEqual,
   faKeybindExpandDefaultChord,
@@ -35,7 +35,7 @@ export function buildDialogKeybindSettingsRows (params: {
     const expanded = faKeybindExpandDefaultChord(def.defaultChord, platform)
     const defaultLabel = expanded === null
       ? '—'
-      : formatFaChordForDisplay(expanded, platform)
+      : formatFaKeybindChordForUi(expanded, platform)
 
     const userChord = faKeybindResolveEffectiveChord({
       commandId: def.id,
@@ -65,6 +65,7 @@ export function buildDialogKeybindSettingsRows (params: {
 
 export function buildDialogKeybindSettingsTableColumns (t: (key: string) => string): Array<{
   align: 'left'
+  classes: string
   field: string
   label: string
   name: string
@@ -72,18 +73,21 @@ export function buildDialogKeybindSettingsTableColumns (t: (key: string) => stri
   return [
     {
       align: 'left',
+      classes: 'dialogKeybindSettings__tableColName',
       field: 'nameLabel',
       label: t('dialogs.keybindSettings.columnName'),
       name: 'name'
     },
     {
       align: 'left',
+      classes: 'dialogKeybindSettings__tableColUser',
       field: 'userChord',
       label: t('dialogs.keybindSettings.columnUser'),
       name: 'userKeybinds'
     },
     {
       align: 'left',
+      classes: 'dialogKeybindSettings__tableColDefault',
       field: 'defaultLabel',
       label: t('dialogs.keybindSettings.columnDefault'),
       name: 'defaultKeybinds'
@@ -97,7 +101,13 @@ export function createDialogKeybindSettingsTableState (params: {
   t: (key: string) => string
   workingOverrides: Ref<I_faKeybindsRoot['overrides']>
 }): {
-    tableColumns: ComputedRef<Array<{ align: 'left', field: string, label: string, name: string }>>
+    tableColumns: ComputedRef<Array<{
+      align: 'left'
+      classes: string
+      field: string
+      label: string
+      name: string
+    }>>
     tableRows: ComputedRef<I_dialogKeybindSettingsRow[]>
   } {
   const {

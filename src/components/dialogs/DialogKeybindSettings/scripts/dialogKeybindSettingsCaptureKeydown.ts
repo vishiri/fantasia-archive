@@ -1,9 +1,7 @@
 import type { ComputedRef, Ref } from 'vue'
 
-import {
-  faKeybindFindChordConflict,
-  formatFaChordForDisplay
-} from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
+import { faKeybindFindChordConflict } from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
+import { formatFaKeybindChordForUi } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
 import { faKeybindTryChordFromEvent } from 'app/src/scripts/keybinds/faKeybindsChordFromEvent'
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
@@ -15,6 +13,7 @@ export type T_dialogKeybindCaptureKeydownDeps = {
   captureErrorMessage: Ref<string>
   captureInfoMessage: Ref<string>
   captureLabel: Ref<string>
+  captureOpen: Ref<boolean>
   editingCommandId: Ref<T_faKeybindCommandId | null>
   pendingChord: Ref<I_faChordSerialized | null>
   platform: ComputedRef<NodeJS.Platform>
@@ -44,7 +43,7 @@ export function restorePendingChordAndLabelFromBaseline (params: {
     code: baseline.code,
     mods: [...baseline.mods]
   }
-  captureLabel.value = formatFaChordForDisplay(baseline, platform.value)
+  captureLabel.value = formatFaKeybindChordForUi(baseline, platform.value)
 }
 
 function applyCaptureKeydownReject (
@@ -97,7 +96,7 @@ function applyCaptureKeydownAccept (
   captureErrorMessage.value = ''
   captureInfoMessage.value = ''
   pendingChord.value = chord
-  captureLabel.value = formatFaChordForDisplay(chord, platform.value)
+  captureLabel.value = formatFaKeybindChordForUi(chord, platform.value)
 
   const id = editingCommandId.value
   if (id === null) {
@@ -123,9 +122,16 @@ function applyCaptureKeydownAccept (
 }
 
 /**
- * Applies one keydown inside the keybind capture dialog: hints, chord label, and duplicate detection.
+ * Applies one keydown inside the keybind capture dialog: Escape closes the sheet (same as the close control);
+ * otherwise chord capture runs (hints, chord label, duplicate detection).
  */
 export function runDialogKeybindCaptureKeydown (e: KeyboardEvent, deps: T_dialogKeybindCaptureKeydownDeps): void {
+  if (e.key === 'Escape' || e.code === 'Escape') {
+    e.preventDefault()
+    e.stopPropagation()
+    deps.captureOpen.value = false
+    return
+  }
   e.preventDefault()
   e.stopPropagation()
   const chordResult = faKeybindTryChordFromEvent(e)

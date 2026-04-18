@@ -4,7 +4,7 @@ import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { Notify } from 'quasar'
 
 import { i18n } from 'app/i18n/externalFileLoader'
-import { formatFaChordForDisplay } from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
+import { formatFaKeybindChordForUi } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
 import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
@@ -111,7 +111,7 @@ export function setupDialogKeybindSettingsDialogRouting (params: {
   const platform = computed(() => keybindsStore.snapshot?.platform ?? 'win32')
 
   function formatChord (chord: I_faChordSerialized): string {
-    return formatFaChordForDisplay(chord, platform.value)
+    return formatFaKeybindChordForUi(chord, platform.value)
   }
 
   async function saveMain (): Promise<void> {
