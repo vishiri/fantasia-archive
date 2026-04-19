@@ -11,7 +11,7 @@ The **renderer-side action manager** is the **single funnel** for every user-mea
 ## Mental model
 
 - **Action ids** live in **`types/I_faActionManagerDomain.ts`** (**`FA_ACTION_IDS`**, **`T_faActionId`**, **`I_faActionPayloadMap`**). The **payload map** ties each id to its handler input (`void` for no payload).
-- **Definitions** in **`src/scripts/actionManager/faActionDefinitions.ts`** (**`FA_ACTION_DEFINITIONS`**) bind each id to a **`kind`** (**`async`** or **`sync`**), an optional **`dedup`** hint, and a **`handler`**.
+- **Definitions** in **`src/scripts/actionManager/faActionDefinitions.ts`** (**`FA_ACTION_DEFINITIONS`**) bind each id to a **`kind`** (**`async`** or **`sync`**), an optional **`dedup`** hint, and a **`handler`** reference. **Handler implementations** live in **`faActionDefinitionHandlers.ts`** so the definitions table stays a shallow list of identifiers.
 - **Run APIs** in **`faActionManagerRun.ts`**:
   - **`runFaAction(id, payload)`** — fire-and-forget; the call site never sees errors.
   - **`runFaActionAwait(id, payload): Promise<boolean>`** — same dispatch but resolves **`true`** on success, **`false`** on failure (toast + console row are still emitted).
@@ -28,7 +28,7 @@ The action manager is the **only** place that emits **error** toasts for registe
 ## Adding a new action (checklist)
 
 1. **`types/I_faActionManagerDomain.ts`** — append the id to **`FA_ACTION_IDS`** and add its payload entry to **`I_faActionPayloadMap`** (use **`void`** when there is no payload).
-2. **`src/scripts/actionManager/faActionDefinitions.ts`** — append a definition with the right **`kind`** (**`sync`** for ordered window controls and similar one-at-a-time flows; **`async`** for dialog opens and fire-and-forget UI). Add **`dedup: true`** for actions where rapid double-trigger should silently collapse.
+2. **`src/scripts/actionManager/faActionDefinitionHandlers.ts`** — implement **`export async function handle…`** (or sync **`export function`** when the handler is synchronous) with the real work. **`src/scripts/actionManager/faActionDefinitions.ts`** — append one row to **`FA_ACTION_DEFINITIONS`** with the right **`kind`** (**`sync`** for ordered window controls and similar one-at-a-time flows; **`async`** for dialog opens and fire-and-forget UI). Add **`dedup: true`** for actions where rapid double-trigger should silently collapse.
 3. **Call sites** — replace direct calls to UI helpers / stores / bridges with **`runFaAction`** (or **`runFaActionAwait`** when the call site needs the boolean outcome).
 4. **Tests** — extend the relevant **`*.vitest.test.ts`** suites in **`src/scripts/actionManager/_tests/`** plus the migrated call site's tests so coverage stays green.
 5. **Keybind routing (optional)** — when the action should also be triggerable via a global shortcut, add a row to **`FA_KEYBIND_COMMAND_TO_ACTION_ID`** in **`src/scripts/keybinds/faKeybindRunCommand.ts`** and the matching **`I_faKeybindCommandDefinition`** (see [fantasia-keybinds](../skills/fantasia-keybinds/SKILL.md)).

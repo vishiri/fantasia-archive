@@ -13,7 +13,7 @@ description: >-
 ## What exists today
 
 - **Action registry** lives in **`types/I_faActionManagerDomain.ts`** (**`FA_ACTION_IDS`**, **`T_faActionId`**, **`I_faActionPayloadMap`**). Each id is paired with a payload type (or **`void`**) so the compiler enforces matching call sites.
-- **Definitions** in **`src/scripts/actionManager/faActionDefinitions.ts`** (**`FA_ACTION_DEFINITIONS`**) bind each id to a **`kind`** (**`async`** / **`sync`**), an optional **`dedup: true`** hint, and a **`handler`**. **`findFaActionDefinition`** is the lookup used by the run + sync-queue modules.
+- **Definitions** in **`src/scripts/actionManager/faActionDefinitions.ts`** (**`FA_ACTION_DEFINITIONS`**) bind each id to a **`kind`** (**`async`** / **`sync`**), an optional **`dedup: true`** hint, and a **`handler`** reference. **Handler bodies** live in **`faActionDefinitionHandlers.ts`**. **`findFaActionDefinition`** is the lookup used by the run + sync-queue modules.
 - **Run APIs** in **`src/scripts/actionManager/faActionManagerRun.ts`**:
   - **`runFaAction(id, payload)`** — fire-and-forget; the call site never sees an error.
   - **`runFaActionAwait(id, payload): Promise<boolean>`** — same dispatch, returns **`true`** on success, **`false`** on failure (toast + console row are still emitted).
@@ -44,7 +44,7 @@ Success notifications (Settings saved, etc.) remain in the originating store whe
 ## Adding a new action (checklist)
 
 1. **`types/I_faActionManagerDomain.ts`** — append the id to **`FA_ACTION_IDS`** and add the matching payload entry in **`I_faActionPayloadMap`** (use **`void`** for no payload).
-2. **`src/scripts/actionManager/faActionDefinitions.ts`** — append a definition with **`kind`** (**`sync`** for ordered window-control / lifecycle flows, **`async`** for fire-and-forget UI). Use **`dedup: true`** when the action should silently collapse rapid double-triggers (most "open dialog" actions and **`closeApp`** already do).
+2. **`src/scripts/actionManager/faActionDefinitionHandlers.ts`** — add an **`export async function handle…`** (or sync **`export function`** when appropriate) with the implementation. **`src/scripts/actionManager/faActionDefinitions.ts`** — append one row to **`FA_ACTION_DEFINITIONS`** with **`kind`** (**`sync`** for ordered window-control / lifecycle flows, **`async`** for fire-and-forget UI). Use **`dedup: true`** when the action should silently collapse rapid double-triggers (most "open dialog" actions and **`closeApp`** already do).
 3. **Call sites** — replace the previous direct call to a UI helper / store / bridge with **`runFaAction(id, payload)`** (or **`runFaActionAwait(...)`** when the caller needs the boolean outcome).
 4. **i18n** — no new keys are required for the dispatcher itself; **`globalFunctionality.faActionManager.actionFailed`** already templates **`{actionId}`**. Reuse existing dialog/menu locale keys.
 5. **Tests** — extend Vitest under **`src/scripts/actionManager/_tests/`** (registry coverage, run paths) plus the migrated call site's tests; for keybind-routed actions also extend **`src/scripts/keybinds/_tests/faKeybindRunCommand.vitest.test.ts`**.
@@ -53,7 +53,7 @@ Success notifications (Settings saved, etc.) remain in the originating store whe
 ## File map
 
 - **Domain types** — **`types/I_faActionManagerDomain.ts`**.
-- **Manager modules** — **`src/scripts/actionManager/`** (`faActionDefinitions.ts`, `faActionManagerRun.ts`, `faActionManagerSyncQueue.ts`, `faActionManagerErrorReporting.ts`, `faActionManagerHistory.ts`, `faActionManagerStoreBridge.ts`).
+- **Manager modules** — **`src/scripts/actionManager/`** (`faActionDefinitions.ts`, `faActionDefinitionHandlers.ts`, `faActionManagerRun.ts`, `faActionManagerSyncQueue.ts`, `faActionManagerErrorReporting.ts`, `faActionManagerHistory.ts`, `faActionManagerStoreBridge.ts`).
 - **Pinia store** — **`src/stores/S_FaActionManager.ts`**.
 - **Action Monitor dialog** — **`src/components/dialogs/DialogActionMonitor/`** (SFC, **`scripts/dialogActionMonitorTable.ts`**, **`_tests/DialogActionMonitor.vitest.test.ts`**, **`_tests/DialogActionMonitor.stories.ts`** with **`tags: ['skip-visual']`**).
 - **Menu wiring** — **`src/components/globals/AppControlMenus/_data/helpInfo.ts`** (Action Monitor entry under Toggle developer tools).
