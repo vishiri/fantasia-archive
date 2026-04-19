@@ -18,28 +18,34 @@ export interface I_dialogActionMonitorTableColumn {
 }
 
 export function buildDialogActionMonitorColumns (): I_dialogActionMonitorTableColumn[] {
+  const actionLabel = i18n.global.t('dialogs.actionMonitor.columns.action')
+  const timestampLabel = i18n.global.t('dialogs.actionMonitor.columns.timestamp')
+  const statusLabel = i18n.global.t('dialogs.actionMonitor.columns.status')
+  const actionColumn: I_dialogActionMonitorTableColumn = {
+    align: 'left',
+    field: 'action',
+    label: actionLabel,
+    name: 'action',
+    sortable: false
+  }
+  const timestampColumn: I_dialogActionMonitorTableColumn = {
+    align: 'left',
+    field: 'timestamp',
+    label: timestampLabel,
+    name: 'timestamp',
+    sortable: false
+  }
+  const statusColumn: I_dialogActionMonitorTableColumn = {
+    align: 'center',
+    field: 'status',
+    label: statusLabel,
+    name: 'status',
+    sortable: false
+  }
   return [
-    {
-      align: 'left',
-      field: 'action',
-      label: i18n.global.t('dialogs.actionMonitor.columns.action'),
-      name: 'action',
-      sortable: false
-    },
-    {
-      align: 'left',
-      field: 'timestamp',
-      label: i18n.global.t('dialogs.actionMonitor.columns.timestamp'),
-      name: 'timestamp',
-      sortable: false
-    },
-    {
-      align: 'center',
-      field: 'status',
-      label: i18n.global.t('dialogs.actionMonitor.columns.status'),
-      name: 'status',
-      sortable: false
-    }
+    actionColumn,
+    timestampColumn,
+    statusColumn
   ]
 }
 
@@ -79,34 +85,38 @@ export interface I_dialogActionMonitorStatusBadge {
 
 export function buildDialogActionMonitorStatusBadge (status: T_faActionHistoryStatus): I_dialogActionMonitorStatusBadge {
   if (status === 'success') {
+    const label = i18n.global.t('dialogs.actionMonitor.status.success')
     return {
       colorClass: 'text-positive',
       icon: 'mdi-check',
       isSpinner: false,
-      label: i18n.global.t('dialogs.actionMonitor.status.success')
+      label
     }
   }
   if (status === 'failed') {
+    const label = i18n.global.t('dialogs.actionMonitor.status.failed')
     return {
       colorClass: 'text-negative',
       icon: 'mdi-close',
       isSpinner: false,
-      label: i18n.global.t('dialogs.actionMonitor.status.failed')
+      label
     }
   }
   if (status === 'running') {
+    const label = i18n.global.t('dialogs.actionMonitor.status.running')
     return {
       colorClass: 'text-primary-bright',
       icon: '',
       isSpinner: true,
-      label: i18n.global.t('dialogs.actionMonitor.status.running')
+      label
     }
   }
+  const label = i18n.global.t('dialogs.actionMonitor.status.queued')
   return {
     colorClass: 'text-grey-5',
     icon: '',
     isSpinner: false,
-    label: i18n.global.t('dialogs.actionMonitor.status.queued')
+    label
   }
 }
 

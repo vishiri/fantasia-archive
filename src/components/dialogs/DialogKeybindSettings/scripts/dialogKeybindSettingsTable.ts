@@ -51,11 +51,12 @@ export function buildDialogKeybindSettingsRows (params: {
         userChord !== null &&
         faKeybindChordsEqual(userChord, expanded))
 
+    const nameLabel = t(def.messageKey)
     return {
       commandId: def.id,
       defaultLabel,
       editable: def.editable,
-      nameLabel: t(def.messageKey),
+      nameLabel,
       rowKey: def.id,
       userChord,
       userShowsAddNewCombo
@@ -70,28 +71,34 @@ export function buildDialogKeybindSettingsTableColumns (t: (key: string) => stri
   label: string
   name: string
 }> {
+  const nameLabel = t('dialogs.keybindSettings.columnName')
+  const userLabel = t('dialogs.keybindSettings.columnUser')
+  const defaultLabel = t('dialogs.keybindSettings.columnDefault')
+  const nameColumn = {
+    align: 'left' as const,
+    classes: 'dialogKeybindSettings__tableColName',
+    field: 'nameLabel',
+    label: nameLabel,
+    name: 'name'
+  }
+  const userColumn = {
+    align: 'left' as const,
+    classes: 'dialogKeybindSettings__tableColUser',
+    field: 'userChord',
+    label: userLabel,
+    name: 'userKeybinds'
+  }
+  const defaultColumn = {
+    align: 'left' as const,
+    classes: 'dialogKeybindSettings__tableColDefault',
+    field: 'defaultLabel',
+    label: defaultLabel,
+    name: 'defaultKeybinds'
+  }
   return [
-    {
-      align: 'left',
-      classes: 'dialogKeybindSettings__tableColName',
-      field: 'nameLabel',
-      label: t('dialogs.keybindSettings.columnName'),
-      name: 'name'
-    },
-    {
-      align: 'left',
-      classes: 'dialogKeybindSettings__tableColUser',
-      field: 'userChord',
-      label: t('dialogs.keybindSettings.columnUser'),
-      name: 'userKeybinds'
-    },
-    {
-      align: 'left',
-      classes: 'dialogKeybindSettings__tableColDefault',
-      field: 'defaultLabel',
-      label: t('dialogs.keybindSettings.columnDefault'),
-      name: 'defaultKeybinds'
-    }
+    nameColumn,
+    userColumn,
+    defaultColumn
   ]
 }
 

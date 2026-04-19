@@ -16,13 +16,19 @@ function createDialogProgramSettingsRefs (): {
   searchSettingsQuery: Ref<string | null>
   selectedCategoryTab: Ref<string>
 } {
+  const dialogModel = ref(false)
+  const documentName = ref('')
+  const localSettings = ref<I_faUserSettings | null>(null)
+  const programSettingsTree = ref<T_programSettingsRenderTree>({})
+  const searchSettingsQuery = ref<string | null>('')
+  const selectedCategoryTab = ref<string>('')
   return {
-    dialogModel: ref(false),
-    documentName: ref(''),
-    localSettings: ref<I_faUserSettings | null>(null),
-    programSettingsTree: ref<T_programSettingsRenderTree>({}),
-    searchSettingsQuery: ref<string | null>(''),
-    selectedCategoryTab: ref<string>('')
+    dialogModel,
+    documentName,
+    localSettings,
+    programSettingsTree,
+    searchSettingsQuery,
+    selectedCategoryTab
   }
 }
 

@@ -29,6 +29,9 @@ function buildDialogKeybindSettingsCaptureApi (params: {
     removeCaptureListener
   } = params
 
+  const onCaptureClear = bindOnCaptureClear(actionDeps)
+  const onCaptureSet = bindOnCaptureSet(actionDeps)
+  const onOpenCapture = bindOnOpenCapture(actionDeps)
   return {
     captureActionName: refs.captureActionName,
     captureError: refs.captureError,
@@ -36,9 +39,9 @@ function buildDialogKeybindSettingsCaptureApi (params: {
     captureInfoMessage: refs.captureInfoMessage,
     captureLabel: refs.captureLabel,
     captureOpen: refs.captureOpen,
-    onCaptureClear: bindOnCaptureClear(actionDeps),
-    onCaptureSet: bindOnCaptureSet(actionDeps),
-    onOpenCapture: bindOnOpenCapture(actionDeps),
+    onCaptureClear,
+    onCaptureSet,
+    onOpenCapture,
     pendingChord: refs.pendingChord,
     removeCaptureListener
   }
