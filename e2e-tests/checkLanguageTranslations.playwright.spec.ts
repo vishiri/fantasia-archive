@@ -8,6 +8,7 @@ import {
   getFaPlaywrightElectronRecordVideoPartial,
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
+import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers/playwrightDismissStartupTipsNotify'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
 import L_aboutFantasiaArchiveDe from 'app/i18n/de/dialogs/L_aboutFantasiaArchive'
 import L_helpInfoDe from 'app/i18n/de/components/globals/AppControlMenus/L_helpInfo'
@@ -96,6 +97,7 @@ test.describe.serial('Interface language and About dialog', () => {
     appWindow = await electronApp.firstWindow()
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
+    await dismissStartupTipsNotifyIfPresent(appWindow)
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {

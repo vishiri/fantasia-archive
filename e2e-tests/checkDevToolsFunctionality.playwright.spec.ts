@@ -8,6 +8,7 @@ import {
   getFaPlaywrightElectronRecordVideoPartial,
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
+import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers/playwrightDismissStartupTipsNotify'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
 
 /**
@@ -57,6 +58,7 @@ test.describe.serial('Developer tools menu', () => {
     appWindow = await electronApp.firstWindow()
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
+    await dismissStartupTipsNotifyIfPresent(appWindow)
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {

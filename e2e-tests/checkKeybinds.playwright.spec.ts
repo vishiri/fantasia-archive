@@ -11,7 +11,9 @@ import {
   getFaPlaywrightElectronRecordVideoPartial,
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
+import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers/playwrightDismissStartupTipsNotify'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
+import actionMonitorMessages from 'app/i18n/en-US/dialogs/L_DialogActionMonitor'
 import keybindDialogMessages from 'app/i18n/en-US/dialogs/L_dialogKeybindSettings'
 import programSettingsMessages from 'app/i18n/en-US/dialogs/L_programSettings'
 
@@ -68,6 +70,7 @@ const defaultChord = {
  * User-adjusted chords (explicit Control so behavior matches on macOS hosts too).
  */
 const adjustedChord = {
+  openActionMonitor: 'Control+Alt+Shift+F8',
   openAdvancedSearchGuide: 'Control+Alt+Shift+F9',
   openKeybindSettings: 'Control+Alt+Shift+F10',
   openProgramSettings: 'Control+Alt+Shift+F11',
@@ -104,6 +107,23 @@ async function pressDefaultToggleDeveloperToolsChord (page: Page): Promise<void>
 async function pressAdjustedToggleDeveloperToolsChord (page: Page): Promise<void> {
   await prepareRendererForGlobalShortcuts(page)
   await page.keyboard.press('Control+Alt+Shift+F12')
+}
+
+/**
+ * Default Open Action Monitor chord: primary modifier + F11 (Ctrl on Windows and Linux, Cmd on macOS).
+ */
+async function pressDefaultOpenActionMonitorChord (page: Page): Promise<void> {
+  await prepareRendererForGlobalShortcuts(page)
+  const primaryShortcut = process.platform === 'darwin' ? 'Meta+F11' : 'Control+F11'
+  await page.keyboard.press(primaryShortcut)
+}
+
+async function closeActionMonitorDialog (page: Page): Promise<void> {
+  const root = page.locator('.dialogActionMonitor')
+  await root.locator('[data-test-locator="dialogComponent-button-close"]').click()
+  await expect(root).toBeHidden({
+    timeout: 15_000
+  })
 }
 
 async function triggerGlobalShortcut (page: Page, playwrightShortcut: string): Promise<void> {
@@ -213,6 +233,7 @@ test.describe.serial('Global keybinds end-to-end', () => {
     appWindow = await electronApp.firstWindow()
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
+    await dismissStartupTipsNotifyIfPresent(appWindow)
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {
@@ -235,6 +256,16 @@ test.describe.serial('Global keybinds end-to-end', () => {
 
     await test.step('Default devtools toggle twice: open then close', async () => {
       await pressDefaultDevtoolsTwiceExpectOpenThenClosed(appWindow)
+    })
+
+    await test.step('Default action monitor opens then closes', async () => {
+      await pressDefaultOpenActionMonitorChord(appWindow)
+      const root = appWindow.locator('.dialogActionMonitor')
+      await expect(root).toBeVisible({
+        timeout: 15_000
+      })
+      await expect(appWindow.locator('#dialogActionMonitor-title')).toHaveText(actionMonitorMessages.title)
+      await closeActionMonitorDialog(appWindow)
     })
 
     await test.step('Default program settings opens then closes', async () => {
@@ -267,6 +298,12 @@ test.describe.serial('Global keybinds end-to-end', () => {
         'developer tools',
         keybindDialogMessages.commands.toggleDeveloperTools,
         adjustedChord.toggleDeveloperTools
+      )
+      await captureChordForFilteredCommand(
+        appWindow,
+        'action monitor',
+        keybindDialogMessages.commands.openActionMonitor,
+        adjustedChord.openActionMonitor
       )
       await captureChordForFilteredCommand(
         appWindow,
@@ -305,6 +342,16 @@ test.describe.serial('Global keybinds end-to-end', () => {
         timeout: 15_000
       })
       await closeMarkdownAdvancedSearchGuideDialog(appWindow)
+    })
+
+    await test.step('Adjusted action monitor opens then closes', async () => {
+      await triggerGlobalShortcut(appWindow, adjustedChord.openActionMonitor)
+      const root = appWindow.locator('.dialogActionMonitor')
+      await expect(root).toBeVisible({
+        timeout: 15_000
+      })
+      await expect(appWindow.locator('#dialogActionMonitor-title')).toHaveText(actionMonitorMessages.title)
+      await closeActionMonitorDialog(appWindow)
     })
 
     await test.step('Adjusted keybind settings opens', async () => {

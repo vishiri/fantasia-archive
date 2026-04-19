@@ -51,6 +51,8 @@ test.describe.serial('App splash screen', () => {
     appWindow = await electronApp.firstWindow()
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
+    // Intentionally omit dismissStartupTipsNotifyIfPresent: its full visibility-timeout wait can outlast
+    // the splash opacity assertion in the first test (splash fades while waiting for a missing tips banner).
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {
