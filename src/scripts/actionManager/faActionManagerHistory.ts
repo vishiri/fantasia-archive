@@ -121,7 +121,7 @@ export function recordHistoryOverflowDrop (entry: I_faActionQueueEntry, errorMes
 }
 
 /**
- * Returns a deep-cloned, ascending-by-'enqueuedAt' snapshot of the action history.
+ * Returns a deep-cloned, descending-by-'enqueuedAt' snapshot of the action history (newest first).
  * 'DialogActionMonitor' calls this once per open so the table never flickers as new actions stream in.
  */
 export function snapshotActionHistory (): I_faActionHistoryEntry[] {
@@ -132,6 +132,6 @@ export function snapshotActionHistory (): I_faActionHistoryEntry[] {
   const cloned = store.actionHistory.map((entry) => {
     return { ...entry }
   })
-  cloned.sort((leftEntry, rightEntry) => leftEntry.enqueuedAt - rightEntry.enqueuedAt)
+  cloned.sort((leftEntry, rightEntry) => rightEntry.enqueuedAt - leftEntry.enqueuedAt)
   return cloned
 }

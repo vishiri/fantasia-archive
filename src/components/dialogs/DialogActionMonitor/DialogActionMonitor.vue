@@ -9,80 +9,48 @@
     <q-card
       :class="['dialogComponent__wrapper', 'dialogActionMonitor', `${documentName}`]"
     >
-      <q-card-section :class="['dialogComponent__content', `${documentName}`, 'q-mt-xl', 'q-mb-lg', 'q-mr-lg', 'q-ml-xl', 'q-pt-none']">
-        <h6 id="dialogActionMonitor-title">
-          {{ $t('dialogs.actionMonitor.title') }}
-        </h6>
+      <h4
+        id="dialogActionMonitor-title"
+        class="text-center q-mb-sm"
+        data-test-locator="dialogActionMonitor-title"
+      >
+        {{ $t('dialogs.actionMonitor.title') }}
+      </h4>
 
-        <p
-          v-if="rows.length > 0"
-          class="dialogActionMonitor__rowClickHint"
-          data-test-locator="dialogActionMonitor-rowClickHint"
-        >
-          {{ $t('dialogs.actionMonitor.rowClickHint') }}
-        </p>
-
-        <q-table
-          v-if="rows.length > 0"
-          dense
-          flat
-          dark
-          hide-pagination
-          row-key="uid"
-          class="dialogActionMonitor__table hasScrollbar"
-          :columns="columns"
-          :rows="rows"
-          :rows-per-page-options="[0]"
-          data-test-locator="dialogActionMonitor-table"
-          @row-click="onRowClick"
-        >
-          <template #body-cell-action="cellProps">
-            <q-td
-              :props="cellProps"
-              data-test-locator="dialogActionMonitor-cell-action"
+      <q-card-section
+        :class="['dialogComponent__content', 'dialogActionMonitor__body', `${documentName}`, 'q-mb-lg', 'q-mr-lg', 'q-ml-xl', 'q-pt-none']"
+      >
+        <template v-if="rows.length > 0">
+          <div
+            class="dialogActionMonitor__rowClickHelpRow row justify-end items-center no-wrap"
+          >
+            <q-icon
+              name="mdi-help-circle"
+              size="23px"
+              class="dialogActionMonitor__rowClickHelpIcon"
+              role="img"
+              color="primary-bright"
+              :aria-label="$t('dialogs.actionMonitor.rowClickHint')"
+              data-test-locator="dialogActionMonitor-rowClickHint"
             >
-              <span>{{ cellProps.row.id }}</span>
-              <q-tooltip
-                anchor="top middle"
-                self="bottom middle"
-                :data-test-tooltip-text="buildDialogActionMonitorPayloadTooltip(cellProps.row)"
-              >
-                {{ buildDialogActionMonitorPayloadTooltip(cellProps.row) }}
+              <q-tooltip :delay="500">
+                {{ $t('dialogs.actionMonitor.rowClickHint') }}
               </q-tooltip>
-            </q-td>
-          </template>
+            </q-icon>
+          </div>
 
-          <template #body-cell-timestamp="cellProps">
-            <q-td
-              :props="cellProps"
-              data-test-locator="dialogActionMonitor-cell-timestamp"
-            >
-              {{ formatDialogActionMonitorTimestamp(cellProps.row.enqueuedAt) }}
-            </q-td>
-          </template>
-
-          <template #body-cell-status="cellProps">
-            <q-td
-              :props="cellProps"
-              data-test-locator="dialogActionMonitor-cell-status"
-            >
-              <q-spinner-clock
-                v-if="buildDialogActionMonitorStatusBadge(cellProps.row.status).isSpinner"
-                :class="buildDialogActionMonitorStatusBadge(cellProps.row.status).colorClass"
-                size="20px"
-                :data-test-locator="`dialogActionMonitor-status-${cellProps.row.status}`"
-              />
-              <q-icon
-                v-else-if="buildDialogActionMonitorStatusBadge(cellProps.row.status).icon !== ''"
-                :class="buildDialogActionMonitorStatusBadge(cellProps.row.status).colorClass"
-                :name="buildDialogActionMonitorStatusBadge(cellProps.row.status).icon"
-                size="20px"
-                :data-test-locator="`dialogActionMonitor-status-${cellProps.row.status}`"
-              />
-              <span class="sr-only">{{ buildDialogActionMonitorStatusBadge(cellProps.row.status).label }}</span>
-            </q-td>
-          </template>
-        </q-table>
+          <div
+            ref="tableScrollHostRef"
+            class="dialogActionMonitor__tableHost"
+          >
+            <DialogActionMonitorHistoryTable
+              :columns="columns"
+              :rows="rows"
+              :table-height-style="dialogActionMonitorTableHeightStyle"
+              @row-click="onRowClick"
+            />
+          </div>
+        </template>
 
         <p
           v-else
@@ -94,8 +62,8 @@
       </q-card-section>
 
       <q-card-actions
-        align="right"
-        class="q-mb-lg q-px-md"
+        align="around"
+        class="q-mb-lg"
       >
         <q-btn
           v-close-popup
@@ -119,13 +87,10 @@ import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
 import { snapshotActionHistory } from 'app/src/scripts/actionManager/faActionManagerHistory'
 
+import DialogActionMonitorHistoryTable from 'app/src/components/dialogs/DialogActionMonitor/DialogActionMonitorHistoryTable.vue'
 import { copyDialogActionMonitorRowToClipboard } from 'app/src/components/dialogs/DialogActionMonitor/scripts/dialogActionMonitorRowClipboard'
-import {
-  buildDialogActionMonitorColumns,
-  buildDialogActionMonitorPayloadTooltip,
-  buildDialogActionMonitorStatusBadge,
-  formatDialogActionMonitorTimestamp
-} from 'app/src/components/dialogs/DialogActionMonitor/scripts/dialogActionMonitorTable'
+import { buildDialogActionMonitorColumns } from 'app/src/components/dialogs/DialogActionMonitor/scripts/dialogActionMonitorTable'
+import { useDialogActionMonitorTableLayout } from 'app/src/components/dialogs/DialogActionMonitor/scripts/useDialogActionMonitorTableLayout'
 
 const resolveDialogComponentStore = (): StoreGeneric | null => {
   try {
@@ -149,6 +114,11 @@ const props = defineProps<{
 
 const dialogModel = ref(false)
 registerComponentDialogStackGuard(dialogModel)
+
+const {
+  dialogActionMonitorTableHeightStyle,
+  tableScrollHostRef
+} = useDialogActionMonitorTableLayout(dialogModel)
 
 const documentName = ref('')
 const columns = buildDialogActionMonitorColumns()
@@ -201,13 +171,26 @@ onMounted(() => {
 <style lang="scss">
 .ActionMonitor {
   &.dialogComponent__wrapper {
+    display: flex;
+    flex-direction: column;
+    height: min(#{$dialogActionMonitor-wrapper-maxHeightCap}, calc(100vh - #{$dialogActionMonitor-wrapper-maxHeightViewportSubtract}));
     max-width: $dialogActionMonitor-wrapper-maxWidth;
+    min-height: 0;
     width: $dialogActionMonitor-wrapper-width;
   }
 
-  .dialogComponent__content {
-    max-height: calc(100vh - #{$dialogActionMonitor-content-maxHeightSubtract});
-    overflow: auto;
+  .dialogActionMonitor__body {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .dialogActionMonitor__tableHost {
+    flex: 1 1 0;
+    min-height: 0;
+    min-width: 0;
   }
 
   .dialogActionMonitor__table {
@@ -219,11 +202,12 @@ onMounted(() => {
     }
   }
 
-  .dialogActionMonitor__rowClickHint {
-    color: $dialogActionMonitor-rowClickHint-color;
-    font-size: $dialogActionMonitor-rowClickHint-fontSize;
-    margin: $dialogActionMonitor-rowClickHint-marginTop 0 0;
-    text-align: right;
+  .dialogActionMonitor__rowClickHelpRow {
+    margin: $dialogActionMonitor-rowClickHelpRow-marginTop 0 0;
+  }
+
+  .dialogActionMonitor__rowClickHelpIcon {
+    color: $dialogActionMonitor-rowClickHelpIcon-color;
   }
 
   .dialogActionMonitor__empty {

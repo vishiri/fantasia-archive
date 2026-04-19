@@ -4,11 +4,12 @@ import type { I_faActionHistoryEntry } from 'app/types/I_faActionManagerDomain'
 
 import {
   buildDialogActionMonitorColumns,
-  buildDialogActionMonitorPayloadTooltip,
   buildDialogActionMonitorRowClipboardJson,
   buildDialogActionMonitorStatusBadge,
   DIALOG_ACTION_MONITOR_COLUMN_NAMES,
-  formatDialogActionMonitorTimestamp
+  formatDialogActionMonitorActionKind,
+  formatDialogActionMonitorTimestamp,
+  hasDialogActionMonitorPayload
 } from '../dialogActionMonitorTable'
 
 /**
@@ -23,6 +24,23 @@ test('Test that buildDialogActionMonitorColumns returns one descriptor per regis
     expect(match).toBeDefined()
     expect(match?.sortable).toBe(false)
   }
+})
+
+/**
+ * buildDialogActionMonitorColumns
+ * Keeps name order aligned with row fields for the six-column action monitor table.
+ */
+test('Test that buildDialogActionMonitorColumns maps names to id startedAt finishedAt payloadPreview kind status fields', () => {
+  const cols = buildDialogActionMonitorColumns()
+  expect(cols.map((col) => col.name)).toEqual([...DIALOG_ACTION_MONITOR_COLUMN_NAMES])
+  expect(cols.map((col) => col.field)).toEqual([
+    'id',
+    'startedAt',
+    'finishedAt',
+    'payloadPreview',
+    'kind',
+    'status'
+  ])
 })
 
 /**
@@ -45,6 +63,18 @@ test('Test that formatDialogActionMonitorTimestamp returns the HH:MM:SS wall-clo
   const date = new Date(2024, 5, 15, 13, 27, 42)
   const formatted = formatDialogActionMonitorTimestamp(date.getTime())
   expect(formatted).toBe('13:27:42')
+})
+
+/**
+ * formatDialogActionMonitorActionKind
+ * Maps execution kind to the localized sync and async labels.
+ */
+test('Test that formatDialogActionMonitorActionKind maps sync to the sync i18n key', () => {
+  expect(formatDialogActionMonitorActionKind('sync')).toBe('dialogs.actionMonitor.actionKind.sync')
+})
+
+test('Test that formatDialogActionMonitorActionKind maps async to the async i18n key', () => {
+  expect(formatDialogActionMonitorActionKind('async')).toBe('dialogs.actionMonitor.actionKind.async')
 })
 
 /**
@@ -71,18 +101,18 @@ test('Test that buildDialogActionMonitorStatusBadge maps running to the spinner 
   expect(badge.isSpinner).toBe(true)
 })
 
-test('Test that buildDialogActionMonitorStatusBadge falls back to a neutral badge for queued', () => {
+test('Test that buildDialogActionMonitorStatusBadge maps queued to a blue timer-sand icon', () => {
   const badge = buildDialogActionMonitorStatusBadge('queued')
-  expect(badge.icon).toBe('')
+  expect(badge.icon).toBe('mdi-timer-sand-empty')
   expect(badge.isSpinner).toBe(false)
-  expect(badge.colorClass).toBe('text-grey-5')
+  expect(badge.colorClass).toBe('text-blue-5')
 })
 
 /**
- * buildDialogActionMonitorPayloadTooltip
- * Returns the localized 'no payload' fallback when payloadPreview is missing or empty.
+ * hasDialogActionMonitorPayload
+ * True only when payloadPreview is a non-empty string.
  */
-test('Test that buildDialogActionMonitorPayloadTooltip returns the no-payload key when preview is missing', () => {
+test('Test that hasDialogActionMonitorPayload is false when preview is missing', () => {
   const entry: I_faActionHistoryEntry = {
     enqueuedAt: 1,
     id: 'closeApp',
@@ -90,11 +120,11 @@ test('Test that buildDialogActionMonitorPayloadTooltip returns the no-payload ke
     status: 'queued',
     uid: 'no-payload'
   }
-  expect(buildDialogActionMonitorPayloadTooltip(entry)).toBe('dialogs.actionMonitor.payloadTooltipNone')
+  expect(hasDialogActionMonitorPayload(entry)).toBe(false)
 })
 
-test('Test that buildDialogActionMonitorPayloadTooltip returns the no-payload key when preview is an empty string', () => {
-  const entry: I_faActionHistoryEntry = {
+test('Test that hasDialogActionMonitorPayload is false when preview is empty or whitespace', () => {
+  const empty: I_faActionHistoryEntry = {
     enqueuedAt: 1,
     id: 'closeApp',
     kind: 'sync',
@@ -102,10 +132,16 @@ test('Test that buildDialogActionMonitorPayloadTooltip returns the no-payload ke
     status: 'queued',
     uid: 'empty-payload'
   }
-  expect(buildDialogActionMonitorPayloadTooltip(entry)).toBe('dialogs.actionMonitor.payloadTooltipNone')
+  expect(hasDialogActionMonitorPayload(empty)).toBe(false)
+  const whitespace: I_faActionHistoryEntry = {
+    ...empty,
+    payloadPreview: '   ',
+    uid: 'ws-payload'
+  }
+  expect(hasDialogActionMonitorPayload(whitespace)).toBe(false)
 })
 
-test('Test that buildDialogActionMonitorPayloadTooltip prefixes the payload preview when present', () => {
+test('Test that hasDialogActionMonitorPayload is true when preview has non-whitespace content', () => {
   const entry: I_faActionHistoryEntry = {
     enqueuedAt: 1,
     id: 'closeApp',
@@ -114,7 +150,7 @@ test('Test that buildDialogActionMonitorPayloadTooltip prefixes the payload prev
     status: 'queued',
     uid: 'has-payload'
   }
-  expect(buildDialogActionMonitorPayloadTooltip(entry)).toBe('dialogs.actionMonitor.payloadTooltipPrefix {"reason":"menu"}')
+  expect(hasDialogActionMonitorPayload(entry)).toBe(true)
 })
 
 /**

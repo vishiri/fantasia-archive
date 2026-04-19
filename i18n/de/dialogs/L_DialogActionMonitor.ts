@@ -4,8 +4,15 @@ export default {
   emptyState: 'In dieser Sitzung wurden noch keine Aktionen aufgezeichnet.',
   columns: {
     action: 'Aktion',
-    timestamp: 'Zeit',
+    startTime: 'Startzeit',
+    finishTime: 'Endzeit',
+    payload: 'Nutzlast',
+    type: 'Typ',
     status: 'Status'
+  },
+  actionKind: {
+    async: 'Async',
+    sync: 'Sync'
   },
   status: {
     queued: 'Wartend',
@@ -13,9 +20,9 @@ export default {
     success: 'Erfolg',
     failed: 'Fehlgeschlagen'
   },
-  payloadTooltipNone: 'Keine Nutzlast',
-  payloadTooltipPrefix: 'Nutzlast:',
-  rowClickHint: 'Klicke auf eine Zeile, um ihr JSON in die Zwischenablage zu kopieren.',
+  rowClickHint: 'Linksklick auf eine Aktionszeile, um die Details in die Zwischenablage zu kopieren.',
+  payloadPresentAria: 'Diese Aktion hat eine Nutzlast.',
+  payloadEmptyAria: 'Keine Nutzlast für diese Aktion.',
   copy: {
     success: 'Aktionszeile in die Zwischenablage kopiert.',
     failed: 'Aktionszeile konnte nicht in die Zwischenablage kopiert werden.'

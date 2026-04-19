@@ -30,12 +30,13 @@ function buildHelpInfoMenuData (): I_appMenuItem[] {
       trigger: () => runFaAction('openLicenseDialog', undefined)
     }),
     faMenuSeparator(),
+    faMenuItem('appControlMenus.helpInfo.items.actionMonitor', 'mdi-pulse', {
+      keybindCommandId: 'openActionMonitor',
+      trigger: () => runFaAction('openActionMonitorDialog', undefined)
+    }),
     faMenuItem('appControlMenus.helpInfo.items.toggleDeveloperTools', 'mdi-code-tags', {
       keybindCommandId: 'toggleDeveloperTools',
       trigger: () => runFaAction('toggleDeveloperTools', undefined)
-    }),
-    faMenuItem('appControlMenus.helpInfo.items.actionMonitor', 'mdi-pulse', {
-      trigger: () => runFaAction('openActionMonitorDialog', undefined)
     })
   ]
 }

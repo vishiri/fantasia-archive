@@ -4,8 +4,15 @@ export default {
   emptyState: 'No actions have been recorded yet during this session.',
   columns: {
     action: 'Action',
-    timestamp: 'Time',
+    startTime: 'Start time',
+    finishTime: 'Finish time',
+    payload: 'Payload',
+    type: 'Type',
     status: 'Status'
+  },
+  actionKind: {
+    async: 'Async',
+    sync: 'Sync'
   },
   status: {
     queued: 'Queued',
@@ -13,9 +20,9 @@ export default {
     success: 'Success',
     failed: 'Failed'
   },
-  payloadTooltipNone: 'No payload',
-  payloadTooltipPrefix: 'Payload:',
-  rowClickHint: 'Click a row to copy its JSON to the clipboard.',
+  rowClickHint: 'Left click on an action row to copy details to the clipboard.',
+  payloadPresentAria: 'This action has a payload.',
+  payloadEmptyAria: 'No payload for this action.',
   copy: {
     success: 'Action row copied to clipboard.',
     failed: 'Could not copy the action row to the clipboard.'

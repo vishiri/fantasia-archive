@@ -125,7 +125,7 @@ test('Test that recordHistoryOverflowDrop appends a failed row stamped with the 
 
 /**
  * snapshotActionHistory
- * Returns a deep-cloned, ascending-by-enqueuedAt array.
+ * Returns a deep-cloned, descending-by-enqueuedAt array (newest first).
  */
 test('Test that snapshotActionHistory returns a sorted, cloned snapshot', () => {
   const store = S_FaActionManager()
@@ -144,7 +144,7 @@ test('Test that snapshotActionHistory returns a sorted, cloned snapshot', () => 
     uid: 'b'
   })
   const snapshot = snapshotActionHistory()
-  expect(snapshot.map((row) => row.uid)).toEqual(['b', 'a'])
+  expect(snapshot.map((row) => row.uid)).toEqual(['a', 'b'])
   snapshot[0]!.status = 'failed'
   expect(store.actionHistory.find((row) => row.uid === 'b')?.status).toBe('success')
 })

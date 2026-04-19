@@ -40,7 +40,7 @@ const monitorDialogGlobal = {
     QCardSection: { template: '<div><slot /></div>' },
     QDialog: monitorQDialogStub,
     QIcon: { template: '<i><slot /></i>' },
-    QSpinnerClock: { template: '<span data-test-locator="stub-spinner-clock" />' },
+    QSpinnerGears: { template: '<span data-test-locator="stub-spinner-gears" />' },
     QTable: {
       props: ['rows', 'columns'],
       emits: ['row-click'],
@@ -53,7 +53,10 @@ const monitorDialogGlobal = {
             @click="$emit('row-click', $event, row)"
           >
             <slot name="body-cell-action" :row="row" />
-            <slot name="body-cell-timestamp" :row="row" />
+            <slot name="body-cell-startTime" :row="row" />
+            <slot name="body-cell-finishTime" :row="row" />
+            <slot name="body-cell-payload" :row="row" />
+            <slot name="body-cell-type" :row="row" />
             <slot name="body-cell-status" :row="row" />
           </div>
         </div>
@@ -64,15 +67,24 @@ const monitorDialogGlobal = {
   }
 } as const
 
+/**
+ * Newest-first row order (matches `snapshotActionHistory` for the live monitor).
+ */
 const buildSampleHistory = (): I_faActionHistoryEntry[] => [
   {
-    enqueuedAt: 1_700_000_000_000,
-    finishedAt: 1_700_000_001_000,
-    id: 'toggleDeveloperTools',
-    kind: 'async',
-    startedAt: 1_700_000_000_500,
-    status: 'success',
-    uid: 'uid-success'
+    enqueuedAt: 1_700_000_005_000,
+    id: 'refreshWebContentsAfterLanguage',
+    kind: 'sync',
+    startedAt: 1_700_000_005_500,
+    status: 'running',
+    uid: 'uid-running'
+  },
+  {
+    enqueuedAt: 1_700_000_004_000,
+    id: 'closeApp',
+    kind: 'sync',
+    status: 'queued',
+    uid: 'uid-queued'
   },
   {
     enqueuedAt: 1_700_000_002_000,
@@ -86,19 +98,13 @@ const buildSampleHistory = (): I_faActionHistoryEntry[] => [
     uid: 'uid-failed'
   },
   {
-    enqueuedAt: 1_700_000_004_000,
-    id: 'closeApp',
-    kind: 'sync',
-    status: 'queued',
-    uid: 'uid-queued'
-  },
-  {
-    enqueuedAt: 1_700_000_005_000,
-    id: 'refreshWebContentsAfterLanguage',
-    kind: 'sync',
-    startedAt: 1_700_000_005_500,
-    status: 'running',
-    uid: 'uid-running'
+    enqueuedAt: 1_700_000_000_000,
+    finishedAt: 1_700_000_001_000,
+    id: 'toggleDeveloperTools',
+    kind: 'async',
+    startedAt: 1_700_000_000_500,
+    status: 'success',
+    uid: 'uid-success'
   }
 ]
 
@@ -134,6 +140,33 @@ test('Test that DialogActionMonitor renders supplied snapshot rows when opened v
 
 /**
  * DialogActionMonitor
+ * Row-click guidance uses the help icon (tooltip target) with an aria-label; legacy hint paragraph is gone.
+ * Payload column renders one cell per history row, three empty markers plus one positive check for the sample snapshot.
+ */
+test('Test that DialogActionMonitor shows row-click help icon and payload column cells when history is non-empty', async () => {
+  const w = mount(DialogActionMonitor, {
+    global: monitorDialogGlobal,
+    props: {
+      directHistorySnapshot: buildSampleHistory(),
+      directInput: 'ActionMonitor'
+    }
+  })
+
+  await flushPromises()
+
+  const help = w.find('[data-test-locator="dialogActionMonitor-rowClickHint"]')
+  expect(help.exists()).toBe(true)
+  expect(help.attributes('aria-label')).toBe('dialogs.actionMonitor.rowClickHint')
+  expect(w.find('.dialogActionMonitor__rowClickHint').exists()).toBe(false)
+
+  expect(w.findAll('[data-test-locator="dialogActionMonitor-cell-payload"]')).toHaveLength(4)
+  expect(w.findAll('[data-test-locator="dialogActionMonitor-cell-payload-empty"]')).toHaveLength(3)
+  expect(w.findAll('[data-test-locator="dialogActionMonitor-cell-payload"] .text-positive')).toHaveLength(1)
+  w.unmount()
+})
+
+/**
+ * DialogActionMonitor
  * Empty snapshot should render the localized empty-state message.
  */
 test('Test that DialogActionMonitor shows empty-state when snapshot is empty', async () => {
@@ -148,6 +181,7 @@ test('Test that DialogActionMonitor shows empty-state when snapshot is empty', a
   await flushPromises()
 
   expect(w.text()).toContain('dialogs.actionMonitor.emptyState')
+  expect(w.find('[data-test-locator="dialogActionMonitor-rowClickHint"]').exists()).toBe(false)
   w.unmount()
 })
 
@@ -299,7 +333,7 @@ test('Test that clicking a DialogActionMonitor row dispatches the clipboard help
 
   expect(copySpy).toHaveBeenCalledOnce()
   const calledWith = copySpy.mock.calls[0]?.[0] as I_faActionHistoryEntry | undefined
-  expect(calledWith?.uid).toBe('uid-success')
+  expect(calledWith?.uid).toBe('uid-running')
 
   copySpy.mockRestore()
   w.unmount()

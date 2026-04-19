@@ -1,38 +1,73 @@
-import type { I_faActionHistoryEntry, T_faActionHistoryStatus } from 'app/types/I_faActionManagerDomain'
+import type {
+  I_faActionHistoryEntry,
+  T_faActionHistoryStatus,
+  T_faActionKind
+} from 'app/types/I_faActionManagerDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
 
 /**
  * Fixed render columns for the action monitor table.
  * Names are the column 'name' values referenced by the q-table 'body-cell' slot bindings.
  */
-export const DIALOG_ACTION_MONITOR_COLUMN_NAMES = ['action', 'timestamp', 'status'] as const
+export const DIALOG_ACTION_MONITOR_COLUMN_NAMES = [
+  'action',
+  'startTime',
+  'finishTime',
+  'payload',
+  'type',
+  'status'
+] as const
 
 export type T_dialogActionMonitorColumnName = typeof DIALOG_ACTION_MONITOR_COLUMN_NAMES[number]
 
 export interface I_dialogActionMonitorTableColumn {
   name: T_dialogActionMonitorColumnName
   label: string
-  field: T_dialogActionMonitorColumnName
+  field: keyof I_faActionHistoryEntry
   align: 'left' | 'center'
   sortable: false
 }
 
 export function buildDialogActionMonitorColumns (): I_dialogActionMonitorTableColumn[] {
   const actionLabel = i18n.global.t('dialogs.actionMonitor.columns.action')
-  const timestampLabel = i18n.global.t('dialogs.actionMonitor.columns.timestamp')
+  const startTimeLabel = i18n.global.t('dialogs.actionMonitor.columns.startTime')
+  const finishTimeLabel = i18n.global.t('dialogs.actionMonitor.columns.finishTime')
+  const payloadLabel = i18n.global.t('dialogs.actionMonitor.columns.payload')
+  const typeLabel = i18n.global.t('dialogs.actionMonitor.columns.type')
   const statusLabel = i18n.global.t('dialogs.actionMonitor.columns.status')
   const actionColumn: I_dialogActionMonitorTableColumn = {
     align: 'left',
-    field: 'action',
+    field: 'id',
     label: actionLabel,
     name: 'action',
     sortable: false
   }
-  const timestampColumn: I_dialogActionMonitorTableColumn = {
+  const startTimeColumn: I_dialogActionMonitorTableColumn = {
     align: 'left',
-    field: 'timestamp',
-    label: timestampLabel,
-    name: 'timestamp',
+    field: 'startedAt',
+    label: startTimeLabel,
+    name: 'startTime',
+    sortable: false
+  }
+  const finishTimeColumn: I_dialogActionMonitorTableColumn = {
+    align: 'left',
+    field: 'finishedAt',
+    label: finishTimeLabel,
+    name: 'finishTime',
+    sortable: false
+  }
+  const payloadColumn: I_dialogActionMonitorTableColumn = {
+    align: 'center',
+    field: 'payloadPreview',
+    label: payloadLabel,
+    name: 'payload',
+    sortable: false
+  }
+  const typeColumn: I_dialogActionMonitorTableColumn = {
+    align: 'left',
+    field: 'kind',
+    label: typeLabel,
+    name: 'type',
     sortable: false
   }
   const statusColumn: I_dialogActionMonitorTableColumn = {
@@ -44,13 +79,34 @@ export function buildDialogActionMonitorColumns (): I_dialogActionMonitorTableCo
   }
   return [
     actionColumn,
-    timestampColumn,
+    startTimeColumn,
+    finishTimeColumn,
+    payloadColumn,
+    typeColumn,
     statusColumn
   ]
 }
 
 /**
- * 'HH:MM:SS' wall-clock display. Uses the 'enqueuedAt' timestamp from the snapshot.
+ * True when the history row captured a non-empty payload preview at enqueue time.
+ */
+export function hasDialogActionMonitorPayload (entry: I_faActionHistoryEntry): boolean {
+  const preview = entry.payloadPreview
+  return typeof preview === 'string' && preview.trim() !== ''
+}
+
+/**
+ * Localized display for the execution kind column (sync vs async).
+ */
+export function formatDialogActionMonitorActionKind (kind: T_faActionKind): string {
+  if (kind === 'sync') {
+    return i18n.global.t('dialogs.actionMonitor.actionKind.sync')
+  }
+  return i18n.global.t('dialogs.actionMonitor.actionKind.async')
+}
+
+/**
+ * 'HH:MM:SS' wall-clock display for epoch milliseconds (start / finish / enqueue).
  * Returns an empty string for missing timestamps so the table cell stays clean.
  */
 export function formatDialogActionMonitorTimestamp (timestamp: number | undefined): string {
@@ -66,7 +122,7 @@ export function formatDialogActionMonitorTimestamp (timestamp: number | undefine
 
 export interface I_dialogActionMonitorStatusBadge {
   /**
-   * Quasar 'q-icon' name; empty string means "no static icon" (use the spinner template branch instead for 'running').
+   * Quasar 'q-icon' name; empty string means "no static icon" (use the spinner template branch for 'running' instead).
    */
   icon: string
   /**
@@ -74,11 +130,11 @@ export interface I_dialogActionMonitorStatusBadge {
    */
   colorClass: string
   /**
-   * Translated status label for accessibility / tooltip use.
+   * Translated status label for accessibility, screen-reader text, and status-cell tooltips.
    */
   label: string
   /**
-   * When 'true' the status cell should render the animated 'q-spinner-clock' instead of a static icon.
+   * When 'true' the status cell should render the animated 'q-spinner-gears' instead of a static icon.
    */
   isSpinner: boolean
 }
@@ -112,22 +168,13 @@ export function buildDialogActionMonitorStatusBadge (status: T_faActionHistorySt
     }
   }
   const label = i18n.global.t('dialogs.actionMonitor.status.queued')
+  // MDI v5 webfont (`@quasar/extras/mdi-v5`) exposes timer-sand icons, not `mdi-hourglass`.
   return {
-    colorClass: 'text-grey-5',
-    icon: '',
+    colorClass: 'text-blue-5',
+    icon: 'mdi-timer-sand-empty',
     isSpinner: false,
     label
   }
-}
-
-/**
- * Tooltip body shown on hover over an action row. Empty payload preview falls back to the localized 'no payload' label.
- */
-export function buildDialogActionMonitorPayloadTooltip (entry: I_faActionHistoryEntry): string {
-  if (entry.payloadPreview === undefined || entry.payloadPreview === '') {
-    return i18n.global.t('dialogs.actionMonitor.payloadTooltipNone')
-  }
-  return `${i18n.global.t('dialogs.actionMonitor.payloadTooltipPrefix')} ${entry.payloadPreview}`
 }
 
 /**

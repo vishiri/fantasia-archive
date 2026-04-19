@@ -4,15 +4,24 @@ import type { I_faActionHistoryEntry } from 'app/types/I_faActionManagerDomain'
 
 import DialogActionMonitor from '../DialogActionMonitor.vue'
 
+/**
+ * Newest-first row order (matches `snapshotActionHistory` sort for the live monitor).
+ */
 const sampleHistory: I_faActionHistoryEntry[] = [
   {
-    enqueuedAt: Date.now() - 10_000,
-    finishedAt: Date.now() - 9_000,
-    id: 'toggleDeveloperTools',
-    kind: 'async',
-    startedAt: Date.now() - 9_500,
-    status: 'success',
-    uid: 'storybook-uid-1'
+    enqueuedAt: Date.now() - 1_500,
+    id: 'refreshWebContentsAfterLanguage',
+    kind: 'sync',
+    startedAt: Date.now() - 1_400,
+    status: 'running',
+    uid: 'storybook-uid-4'
+  },
+  {
+    enqueuedAt: Date.now() - 5_000,
+    id: 'closeApp',
+    kind: 'sync',
+    status: 'queued',
+    uid: 'storybook-uid-3'
   },
   {
     enqueuedAt: Date.now() - 7_500,
@@ -26,19 +35,22 @@ const sampleHistory: I_faActionHistoryEntry[] = [
     uid: 'storybook-uid-2'
   },
   {
-    enqueuedAt: Date.now() - 5_000,
-    id: 'closeApp',
-    kind: 'sync',
-    status: 'queued',
-    uid: 'storybook-uid-3'
+    enqueuedAt: Date.now() - 10_000,
+    finishedAt: Date.now() - 9_000,
+    id: 'toggleDeveloperTools',
+    kind: 'async',
+    startedAt: Date.now() - 9_500,
+    status: 'success',
+    uid: 'storybook-uid-1'
   },
   {
-    enqueuedAt: Date.now() - 1_500,
-    id: 'refreshWebContentsAfterLanguage',
-    kind: 'sync',
-    startedAt: Date.now() - 1_400,
-    status: 'running',
-    uid: 'storybook-uid-4'
+    enqueuedAt: Date.now() - 10_500,
+    finishedAt: Date.now() - 9_800,
+    id: 'openActionMonitorDialog',
+    kind: 'async',
+    startedAt: Date.now() - 10_000,
+    status: 'success',
+    uid: 'storybook-uid-open-monitor'
   }
 ]
 
