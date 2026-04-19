@@ -44,6 +44,7 @@ const selectorList = {
 }
 
 const licenseDocumentDirectInput: T_documentName = 'license'
+const changeLogDocumentDirectInput: T_documentName = 'changeLog'
 
 test.describe.serial('Dialog markdown document (license)', () => {
   let electronApp: ElectronApplication
@@ -95,5 +96,42 @@ test.describe.serial('Dialog markdown document (license)', () => {
     await appWindow.waitForTimeout(1500)
 
     expect(await markdownContent.isHidden()).toBe(true)
+  })
+})
+
+test.describe.serial('Dialog markdown document (changeLog)', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
+
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: changeLogDocumentDirectInput })
+    resetFaPlaywrightIsolatedUserData()
+    electronApp = await electron.launch({
+      env: extraEnvSettings,
+      args: [electronMainFilePath],
+      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    })
+    appWindow = await electronApp.firstWindow()
+    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
+    await appWindow.waitForTimeout(faFrontendRenderTimer)
+  })
+
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+  })
+
+  /**
+   * Feed **changeLog** as **directInput** so the en-US changelog markdown loads through **vue-i18n** (catches stray brace placeholder syntax) and the dialog shell renders.
+   */
+  test('Open test "changeLog" dialog with all elements in it', async () => {
+    const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
+    const markdownWrapper = appWindow.locator(`[data-test-locator="${selectorList.markdownWrapper}"]`)
+    const markdownContent = appWindow.locator(`[data-test-locator="${selectorList.markdownContent}"]`)
+
+    await expect(closeButton).toHaveCount(1)
+    await expect(markdownWrapper).toHaveCount(1)
+    await expect(markdownContent).toHaveCount(1)
   })
 })
