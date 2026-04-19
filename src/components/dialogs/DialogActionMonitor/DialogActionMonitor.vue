@@ -33,7 +33,11 @@
               :aria-label="$t('dialogs.actionMonitor.rowClickHint')"
               data-test-locator="dialogActionMonitor-rowClickHint"
             >
-              <q-tooltip :delay="500">
+              <q-tooltip
+                anchor="center left"
+                self="center right"
+                :delay="500"
+              >
                 {{ $t('dialogs.actionMonitor.rowClickHint') }}
               </q-tooltip>
             </q-icon>
