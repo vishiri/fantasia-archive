@@ -1,18 +1,22 @@
-import { expect, test, vi } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 
-const { tipsTricksTriviaNotificationMock } = vi.hoisted(() => {
+const { runFaActionMock } = vi.hoisted(() => {
   return {
-    tipsTricksTriviaNotificationMock: vi.fn()
+    runFaActionMock: vi.fn()
   }
 })
 
-vi.mock('app/src/scripts/appGlobalManagementUI/tipsTricksTriviaNotification', () => {
+vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => {
   return {
-    tipsTricksTriviaNotification: tipsTricksTriviaNotificationMock
+    runFaAction: runFaActionMock
   }
 })
 
 import { determineTestingComponentName, runAppStartupRouting } from '../rendererAppInternals'
+
+beforeEach(() => {
+  runFaActionMock.mockReset()
+})
 
 /**
  * determineTestingComponentName
@@ -64,7 +68,7 @@ test('Test that runAppStartupRouting pushes component testing route when request
   )
 
   expect(routerPushMock).toHaveBeenCalledWith({ path: '/componentTesting/FantasiaMascotImage' })
-  expect(tipsTricksTriviaNotificationMock).not.toHaveBeenCalled()
+  expect(runFaActionMock).not.toHaveBeenCalled()
 })
 
 /**
@@ -81,7 +85,7 @@ test('Test that runAppStartupRouting defaults to home route and triggers trivia 
   )
 
   expect(routerPushMock).toHaveBeenCalledWith({ path: '/' })
-  expect(tipsTricksTriviaNotificationMock).toHaveBeenCalledWith(false)
+  expect(runFaActionMock).toHaveBeenCalledWith('showStartupTipsNotification', undefined)
 })
 
 /**
@@ -98,5 +102,5 @@ test('Test that runAppStartupRouting uses home route when component mode has no 
   )
 
   expect(routerPushMock).toHaveBeenCalledWith({ path: '/' })
-  expect(tipsTricksTriviaNotificationMock).toHaveBeenCalledWith(false)
+  expect(runFaActionMock).toHaveBeenCalledWith('showStartupTipsNotification', undefined)
 })

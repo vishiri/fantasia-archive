@@ -3,6 +3,7 @@ import { computed, onUnmounted, ref, type ComputedRef, type Ref } from 'vue'
 
 import { createDialogKeybindSettingsCapture } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsCapture'
 import { createDialogKeybindSettingsTableState } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsTable'
+import { runFaActionAwait } from 'app/src/scripts/actionManager/faActionManagerRun'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import type { I_dialogKeybindSettingsRow } from 'app/types/I_dialogKeybindSettings'
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
@@ -43,9 +44,8 @@ export function createDialogKeybindSettingsSync (params: {
   }
 
   async function onSaveMain (): Promise<boolean> {
-    const ok = await keybindsStore.updateKeybinds({
-      overrides: cloneOverridesPlain(workingOverrides.value),
-      replaceAllOverrides: true
+    const ok = await runFaActionAwait('saveKeybindSettings', {
+      overrides: cloneOverridesPlain(workingOverrides.value)
     })
     if (ok) {
       syncWorkingFromStore()

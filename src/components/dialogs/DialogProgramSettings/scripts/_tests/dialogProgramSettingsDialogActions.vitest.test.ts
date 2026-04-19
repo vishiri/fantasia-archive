@@ -16,8 +16,19 @@ vi.mock('src/stores/S_FaUserSettings', () => ({
   S_FaUserSettings: vi.fn()
 }))
 
+const { runFaActionAwaitMock } = vi.hoisted(() => ({
+  runFaActionAwaitMock: vi.fn(async () => true)
+}))
+
+vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
+  runFaAction: vi.fn(),
+  runFaActionAwait: runFaActionAwaitMock
+}))
+
 beforeEach(() => {
   vi.mocked(S_FaUserSettings).mockReset()
+  runFaActionAwaitMock.mockReset()
+  runFaActionAwaitMock.mockResolvedValue(true)
 })
 
 /**
@@ -57,16 +68,12 @@ test('openDialog builds tree from directSettingsSnapshot when provided', () => {
 
 /**
  * createDialogProgramSettingsDialogActions
- * saveAndCloseDialog skips store update when Pinia store cannot be resolved.
+ * saveAndCloseDialog still closes the dialog even when the local snapshot is null and no action is dispatched.
  */
-test('saveAndCloseDialog closes dialog when fa user settings store is unavailable', async () => {
-  vi.mocked(S_FaUserSettings).mockImplementation(() => {
-    throw new Error('pinia unavailable')
-  })
-
+test('saveAndCloseDialog closes dialog without dispatching when local settings are null', async () => {
   const dialogModel = ref(true)
   const documentName = ref('')
-  const localSettings = ref<I_faUserSettings | null>({ ...FA_USER_SETTINGS_DEFAULTS })
+  const localSettings = ref<I_faUserSettings | null>(null)
   const programSettingsTree = ref<T_programSettingsRenderTree>({})
   const searchSettingsQuery = ref<string | null>(null)
 
@@ -82,18 +89,14 @@ test('saveAndCloseDialog closes dialog when fa user settings store is unavailabl
   await saveAndCloseDialog()
 
   expect(dialogModel.value).toBe(false)
+  expect(runFaActionAwaitMock).not.toHaveBeenCalled()
 })
 
 /**
  * createDialogProgramSettingsDialogActions
- * saveAndCloseDialog persists via the fa user settings store when both store and snapshot exist.
+ * saveAndCloseDialog dispatches the saveProgramSettings action with the local snapshot then closes the dialog.
  */
-test('saveAndCloseDialog calls updateSettings when store and local snapshot exist', async () => {
-  const updateSettings = vi.fn(async () => undefined)
-  vi.mocked(S_FaUserSettings).mockReturnValue({
-    updateSettings
-  } as unknown as ReturnType<typeof S_FaUserSettings>)
-
+test('saveAndCloseDialog dispatches saveProgramSettings action when local snapshot exists', async () => {
   const dialogModel = ref(true)
   const documentName = ref('')
   const localSettings = ref<I_faUserSettings | null>({
@@ -114,10 +117,11 @@ test('saveAndCloseDialog calls updateSettings when store and local snapshot exis
 
   await saveAndCloseDialog()
 
-  expect(updateSettings).toHaveBeenCalledTimes(1)
-  expect(updateSettings).toHaveBeenCalledWith(
+  expect(runFaActionAwaitMock).toHaveBeenCalledTimes(1)
+  expect(runFaActionAwaitMock).toHaveBeenCalledWith(
+    'saveProgramSettings',
     expect.objectContaining({
-      darkMode: true
+      settings: expect.objectContaining({ darkMode: true })
     })
   )
   expect(dialogModel.value).toBe(false)

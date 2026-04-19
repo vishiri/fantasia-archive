@@ -158,9 +158,10 @@ test('Test that updateKeybinds returns true and refreshes after success', async 
 
 /**
  * S_FaKeybinds / updateKeybinds
- * Returns false and shows negative notify when setKeybinds rejects.
+ * Returns false on bridge rejection without emitting any toast (the action manager
+ * is now the single error toast surface; the store only logs the bridge failure).
  */
-test('Test that updateKeybinds returns false when setKeybinds rejects', async () => {
+test('Test that updateKeybinds returns false without notifying when setKeybinds rejects', async () => {
   setKeybindsMock.mockRejectedValueOnce(new Error('ipc fail'))
 
   const ok = await store.updateKeybinds({
@@ -169,7 +170,7 @@ test('Test that updateKeybinds returns false when setKeybinds rejects', async ()
   })
 
   expect(ok).toBe(false)
-  expect(notifyCreateMock).toHaveBeenCalled()
+  expect(notifyCreateMock).not.toHaveBeenCalled()
 })
 
 /**

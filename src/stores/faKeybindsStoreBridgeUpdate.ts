@@ -9,7 +9,8 @@ export type I_faKeybindsUpdatePatch = {
 }
 
 /**
- * Persists keybind overrides via the preload bridge, refreshes snapshot, and surfaces success or save errors.
+ * Persists keybind overrides via the preload bridge, refreshes snapshot, and surfaces a success toast.
+ * Save failures are reported through the central faActionManager (one toast + console row); this module only writes a debugging console log on the catch branch.
  */
 export async function runFaKeybindsUpdateKeybinds (
   patch: I_faKeybindsUpdatePatch,
@@ -23,13 +24,8 @@ export async function runFaKeybindsUpdateKeybinds (
   try {
     await api.setKeybinds(patch)
   } catch (error) {
+    // Error toast handled by the action manager's unified failure reporter; only the bridge log stays here.
     console.error('[S_FaKeybinds] setKeybinds failed', error)
-    Notify.create({
-      group: false,
-      message: i18n.global.t('globalFunctionality.faKeybinds.saveError'),
-      timeout: 0,
-      type: 'negative'
-    })
     return false
   }
 

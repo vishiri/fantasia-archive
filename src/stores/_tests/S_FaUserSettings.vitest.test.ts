@@ -161,7 +161,7 @@ test('Test that updateSettings applies i18n locale before positive notify when l
 
 /**
  * S_FaUserSettings / updateSettings
- * When languageCode is patched but the bridge returns a different code, skip locale switch and show save error.
+ * When languageCode is patched but the bridge returns a different code, skip locale switch and surface a thrown error.
  */
 test('Test that updateSettings does not apply i18n locale when languageCode patch mismatches', async () => {
   const updateObject = { languageCode: 'fr' as const }
@@ -171,7 +171,7 @@ test('Test that updateSettings does not apply i18n locale when languageCode patc
   })
 
   const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-  await store.updateSettings(updateObject)
+  await expect(store.updateSettings(updateObject)).rejects.toThrow()
   consoleErrorSpy.mockRestore()
 
   expect(applyLocaleMock).not.toHaveBeenCalled()
@@ -179,9 +179,9 @@ test('Test that updateSettings does not apply i18n locale when languageCode patc
 
 /**
  * S_FaUserSettings / updateSettings
- * When retrieved settings do not match the update object, negative notify fires and error is logged.
+ * When retrieved settings do not match the update object, throw without emitting a notify (action manager owns the toast).
  */
-test('Test that updateSettings shows negative notify when saved values do not match the update object', async () => {
+test('Test that updateSettings throws without emitting notify when saved values do not match the update object', async () => {
   const updateObject = { darkMode: true }
   getSettingsMock.mockResolvedValueOnce({
     ...FA_USER_SETTINGS_DEFAULTS,
@@ -189,15 +189,9 @@ test('Test that updateSettings shows negative notify when saved values do not ma
   })
 
   const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-  await store.updateSettings(updateObject)
+  await expect(store.updateSettings(updateObject)).rejects.toThrow()
 
-  expect(notifyCreateMock).toHaveBeenCalledOnce()
-  expect(notifyCreateMock).toHaveBeenCalledWith({
-    group: false,
-    type: 'negative',
-    timeout: 0,
-    message: 'globalFunctionality.faUserSettings.saveError'
-  })
+  expect(notifyCreateMock).not.toHaveBeenCalled()
   expect(consoleErrorSpy).toHaveBeenCalledOnce()
   expect(consoleErrorSpy.mock.calls[0][0]).toContain('globalFunctionality.faUserSettings.saveMismatchLog')
   consoleErrorSpy.mockRestore()
@@ -215,7 +209,7 @@ test('Test that updateSettings always replaces settings with the retrieved value
   getSettingsMock.mockResolvedValueOnce(retrievedSettings)
 
   const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-  await store.updateSettings({ darkMode: true })
+  await expect(store.updateSettings({ darkMode: true })).rejects.toThrow()
   consoleErrorSpy.mockRestore()
 
   expect(store.settings).toEqual(retrievedSettings)
@@ -242,9 +236,9 @@ test('Test that updateSettings with an empty object shows positive notify and st
 
 /**
  * S_FaUserSettings / updateSettings
- * Mismatch on any updated key triggers the negative path even when other keys match.
+ * Mismatch on any updated key triggers a thrown error without any local notify.
  */
-test('Test that updateSettings shows negative notify when one of several keys mismatches', async () => {
+test('Test that updateSettings throws without emitting notify when one of several keys mismatches', async () => {
   const updateObject = {
     darkMode: true,
     compactTags: true
@@ -256,40 +250,40 @@ test('Test that updateSettings shows negative notify when one of several keys mi
   })
 
   const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-  await store.updateSettings(updateObject)
+  await expect(store.updateSettings(updateObject)).rejects.toThrow()
   consoleErrorSpy.mockRestore()
 
   expect(setSettingsMock).toHaveBeenCalledWith(updateObject)
-  expect(notifyCreateMock).toHaveBeenCalledOnce()
-  expect(notifyCreateMock).toHaveBeenCalledWith({
-    group: false,
-    type: 'negative',
-    timeout: 0,
-    message: 'globalFunctionality.faUserSettings.saveError'
-  })
+  expect(notifyCreateMock).not.toHaveBeenCalled()
 })
 
 /**
  * S_FaUserSettings / updateSettings
- * When setSettings rejects, show save error notify, log, skip getSettings, leave settings unchanged.
+ * When setSettings rejects, throw, log, skip getSettings, leave settings unchanged. Action manager owns the toast.
  */
-test('Test that updateSettings shows negative notify when setSettings rejects', async () => {
+test('Test that updateSettings throws without emitting notify when setSettings rejects', async () => {
   setSettingsMock.mockRejectedValueOnce(new Error('ipc failed'))
 
   const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-  await store.updateSettings({ darkMode: true })
+  await expect(store.updateSettings({ darkMode: true })).rejects.toThrow()
 
   expect(setSettingsMock).toHaveBeenCalledOnce()
   expect(getSettingsMock).not.toHaveBeenCalled()
   expect(store.settings).toBeNull()
-  expect(notifyCreateMock).toHaveBeenCalledOnce()
-  expect(notifyCreateMock).toHaveBeenCalledWith({
-    group: false,
-    type: 'negative',
-    timeout: 0,
-    message: 'globalFunctionality.faUserSettings.saveError'
-  })
+  expect(notifyCreateMock).not.toHaveBeenCalled()
   expect(consoleErrorSpy).toHaveBeenCalledOnce()
   expect(consoleErrorSpy.mock.calls[0][0]).toContain('[S_FaUserSettings] setSettings failed')
+  consoleErrorSpy.mockRestore()
+})
+
+/**
+ * S_FaUserSettings / updateSettings
+ * When setSettings throws a non-Error value, wraps it in an Error before re-throwing.
+ */
+test('Test that updateSettings wraps non-Error rejections in an Error before throwing', async () => {
+  setSettingsMock.mockRejectedValueOnce('plain string boom')
+
+  const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  await expect(store.updateSettings({ darkMode: true })).rejects.toThrow('plain string boom')
   consoleErrorSpy.mockRestore()
 })

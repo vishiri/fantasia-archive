@@ -5,11 +5,12 @@
 
 import { afterEach, expect, test, vi } from 'vitest'
 
-const { notifyCreateMock } = vi.hoisted(() => {
+const { notifyCreateMock, runFaActionAwaitMock } = vi.hoisted(() => {
   return {
     notifyCreateMock: vi.fn(() => {
       return (): void => {}
-    })
+    }),
+    runFaActionAwaitMock: vi.fn(async () => true)
   }
 })
 
@@ -23,6 +24,11 @@ vi.mock('quasar', async (importOriginal) => {
     }
   }
 })
+
+vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
+  runFaAction: vi.fn(),
+  runFaActionAwait: runFaActionAwaitMock
+}))
 
 import { mount, flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
@@ -198,10 +204,11 @@ test('createDialogKeybindSettingsTableState treats null filter like an empty str
  * createDialogKeybindSettingsSync
  * Save calls the store and refreshes working overrides only on success.
  */
-test('createDialogKeybindSettingsSync onSaveMain returns false when updateKeybinds fails', async () => {
+test('createDialogKeybindSettingsSync onSaveMain returns false when saveKeybindSettings action fails', async () => {
   setActivePinia(createPinia())
+  runFaActionAwaitMock.mockReset()
+  runFaActionAwaitMock.mockResolvedValueOnce(false)
   const keybindsStore = S_FaKeybinds()
-  const updateSpy = vi.spyOn(keybindsStore, 'updateKeybinds').mockResolvedValue(false)
   const workingOverrides = ref({ ...FA_KEYBINDS_STORE_DEFAULTS.overrides })
   const { onSaveMain, syncWorkingFromStore } = createDialogKeybindSettingsSync({
     filter: ref(''),
@@ -212,12 +219,17 @@ test('createDialogKeybindSettingsSync onSaveMain returns false when updateKeybin
   const before = JSON.stringify(workingOverrides.value)
   const ok = await onSaveMain()
   expect(ok).toBe(false)
-  expect(updateSpy).toHaveBeenCalled()
+  expect(runFaActionAwaitMock).toHaveBeenCalledWith(
+    'saveKeybindSettings',
+    expect.objectContaining({ overrides: expect.any(Object) })
+  )
   expect(JSON.stringify(workingOverrides.value)).toBe(before)
 })
 
 test('createDialogKeybindSettingsSync onSaveMain syncs after success and onCloseMain resets working state', async () => {
   setActivePinia(createPinia())
+  runFaActionAwaitMock.mockReset()
+  runFaActionAwaitMock.mockResolvedValue(true)
   const keybindsStore = S_FaKeybinds()
   keybindsStore.snapshot = {
     platform: 'win32',
@@ -238,7 +250,6 @@ test('createDialogKeybindSettingsSync onSaveMain syncs after success and onClose
     keybindsStore,
     workingOverrides
   })
-  vi.spyOn(keybindsStore, 'updateKeybinds').mockResolvedValue(true)
   workingOverrides.value = {
     openProgramSettings: {
       code: 'KeyY',

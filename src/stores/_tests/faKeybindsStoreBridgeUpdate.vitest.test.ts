@@ -49,7 +49,7 @@ test('Test that runFaKeybindsUpdateKeybinds returns false when setKeybinds is mi
 
 /**
  * runFaKeybindsUpdateKeybinds
- * Returns false and notifies when setKeybinds rejects.
+ * Returns false without raising a notify when setKeybinds rejects (action manager owns the error toast now).
  */
 test('Test that runFaKeybindsUpdateKeybinds returns false when setKeybinds rejects', async () => {
   vi.resetModules()
@@ -78,12 +78,7 @@ test('Test that runFaKeybindsUpdateKeybinds returns false when setKeybinds rejec
 
   expect(ok).toBe(false)
   expect(refresh).not.toHaveBeenCalled()
-  expect(notifyCreateMock).toHaveBeenCalledWith(
-    expect.objectContaining({
-      message: 'globalFunctionality.faKeybinds.saveError',
-      type: 'negative'
-    })
-  )
+  expect(notifyCreateMock).not.toHaveBeenCalled()
 })
 
 /**

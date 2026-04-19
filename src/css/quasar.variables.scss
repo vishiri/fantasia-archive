@@ -156,6 +156,18 @@ $dialogAboutFantasiaArchive-content-maxHeightSubtract: 235px;
 $dialogAboutFantasiaArchive-wrapper-maxWidth: 80vw;
 $dialogAboutFantasiaArchive-wrapper-width: 700px;
 
+/* COMPONENT - DIALOG ACTION MONITOR */
+$dialogActionMonitor-content-maxHeightSubtract: 220px;
+$dialogActionMonitor-empty-color: $grey;
+$dialogActionMonitor-empty-marginTop: 24px;
+$dialogActionMonitor-rowClickHint-color: quasarPalette.$blue-grey-5;
+$dialogActionMonitor-rowClickHint-fontSize: 12px;
+$dialogActionMonitor-rowClickHint-marginTop: 8px;
+$dialogActionMonitor-row-cursor: pointer;
+$dialogActionMonitor-table-marginTop: 16px;
+$dialogActionMonitor-wrapper-maxWidth: 80vw;
+$dialogActionMonitor-wrapper-width: 720px;
+
 /* COMPONENT - DIALOG MARKDOWN DOCUMENT */
 $dialogMarkdownDocument-card-maxWidthViewportSubtract: 100px;
 $dialogMarkdownDocument-changeLog-card-width: 1100px;

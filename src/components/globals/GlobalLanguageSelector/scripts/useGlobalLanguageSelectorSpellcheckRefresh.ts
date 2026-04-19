@@ -2,6 +2,8 @@ import { ref } from 'vue'
 
 import type { T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 
+import { runFaActionAwait } from 'app/src/scripts/actionManager/faActionManagerRun'
+
 /**
  * Optional reload hint after a successful interface language change so users can refresh
  * the renderer when Chromium keeps the previous spellcheck dictionary in open editors.
@@ -20,11 +22,7 @@ export function useGlobalLanguageSelectorSpellcheckRefresh () {
 
   async function refreshWebContentsAndHide (): Promise<void> {
     // TODO add unfinished work checking
-    try {
-      await window.faContentBridgeAPIs?.faWindowControl?.refreshWebContents?.()
-    } catch {
-      // no-op
-    }
+    await runFaActionAwait('refreshWebContentsAfterLanguage', undefined)
     showSpellcheckRefresh.value = false
   }
 

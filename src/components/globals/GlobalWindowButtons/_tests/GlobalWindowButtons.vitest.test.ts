@@ -5,7 +5,7 @@ import GlobalWindowButtons from '../GlobalWindowButtons.vue'
 
 /**
  * GlobalWindowButtons
- * Minimize click should call preload bridge when running in electron MODE.
+ * Minimize click routes through the action manager and ultimately invokes the preload bridge.
  */
 test('Test that GlobalWindowButtons minimize invokes faWindowControl in electron mode', async () => {
   vi.stubEnv('MODE', 'electron')
@@ -14,6 +14,7 @@ test('Test that GlobalWindowButtons minimize invokes faWindowControl in electron
   })
 
   await w.get('[data-test-locator="globalWindowButtons-button-minimize"]').trigger('click')
+  await flushPromises()
   await flushPromises()
   expect(window.faContentBridgeAPIs.faWindowControl.minimizeWindow).toHaveBeenCalled()
   w.unmount()
@@ -47,6 +48,7 @@ test('Test that GlobalWindowButtons resize invokes faWindowControl in electron m
 
   await w.get('[data-test-locator="globalWindowButtons-button-resize"]').trigger('click')
   await flushPromises()
+  await flushPromises()
   expect(window.faContentBridgeAPIs.faWindowControl.resizeWindow).toHaveBeenCalled()
   expect(window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized).toHaveBeenCalled()
   w.unmount()
@@ -65,6 +67,7 @@ test('Test that GlobalWindowButtons close invokes faWindowControl in electron mo
 
   await w.get('[data-test-locator="globalWindowButtons-button-close"]').trigger('click')
   await flushPromises()
+  await flushPromises()
   expect(window.faContentBridgeAPIs.faWindowControl.closeWindow).toHaveBeenCalled()
   w.unmount()
   vi.unstubAllEnvs()
@@ -72,9 +75,11 @@ test('Test that GlobalWindowButtons close invokes faWindowControl in electron mo
 
 /**
  * GlobalWindowButtons
- * Window controls should no-op the preload bridge when MODE is not electron.
+ * Window controls always reach the preload bridge through the action manager;
+ * MODE is no longer gated inside the SFC since the action handler owns the bridge call.
+ * This test confirms the click still dispatches once even outside electron MODE.
  */
-test('Test that GlobalWindowButtons minimize does not invoke faWindowControl when MODE is not electron', async () => {
+test('Test that GlobalWindowButtons minimize click still dispatches the action when MODE is not electron', async () => {
   vi.stubEnv('MODE', 'spa')
   const w = mount(GlobalWindowButtons, {
     global: { mocks: { $t: (k: string) => k } }
@@ -82,7 +87,8 @@ test('Test that GlobalWindowButtons minimize does not invoke faWindowControl whe
 
   await w.get('[data-test-locator="globalWindowButtons-button-minimize"]').trigger('click')
   await flushPromises()
-  expect(window.faContentBridgeAPIs.faWindowControl.minimizeWindow).not.toHaveBeenCalled()
+  await flushPromises()
+  expect(window.faContentBridgeAPIs.faWindowControl.minimizeWindow).toHaveBeenCalled()
   w.unmount()
   vi.unstubAllEnvs()
 })

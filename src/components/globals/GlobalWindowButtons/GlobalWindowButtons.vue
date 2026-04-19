@@ -63,40 +63,28 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import type { Ref } from 'vue'
 
+import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
+
 /**
  * Triggers minimize of the window by the minimize button click
  */
-const minimizeWindow = async () => {
-  if (process.env.MODE === 'electron' && window.faContentBridgeAPIs?.faWindowControl) {
-    await window.faContentBridgeAPIs.faWindowControl.minimizeWindow()
-  }
+const minimizeWindow = (): void => {
+  runFaAction('minimizeApp', undefined)
 }
 
 /**
- * Triggers resize of the window by the min/max button click, then refreshes maximized state.
+ * Triggers resize of the window by the min/max button click; the resize action also refreshes the maximized state.
  */
-const resizeWindowThenRefreshMaximized = async () => {
-  if (process.env.MODE === 'electron' && window.faContentBridgeAPIs?.faWindowControl) {
-    await window.faContentBridgeAPIs.faWindowControl.resizeWindow()
-    await checkIfWindowMaximized()
-  }
+const resizeWindowThenRefreshMaximized = (): void => {
+  runFaAction('resizeApp', undefined)
 }
 
 /**
- * Triggers checking of the current app state by the close button click.
- * This functionality checks the following:
-
- * 1. If the app has any projects opened to begin with at the moment
- * 2. If the project has any pending chnages to it
-
- * If both is found to be true, then an appropriate dialog is opened.
- * Otherwise, the app simply closes.
+ * Triggers the close-app sync action: future project-close checks will be added here as separate sync actions.
  */
-const tryCloseWindow = async () => {
+const tryCloseWindow = (): void => {
   // TODO add project close checking
-  if (process.env.MODE === 'electron' && window.faContentBridgeAPIs?.faWindowControl) {
-    await window.faContentBridgeAPIs.faWindowControl.closeWindow()
-  }
+  runFaAction('closeApp', undefined)
 }
 
 /**

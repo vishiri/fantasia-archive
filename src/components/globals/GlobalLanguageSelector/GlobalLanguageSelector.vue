@@ -113,10 +113,8 @@ import { computed, ref } from 'vue'
 import { i18n } from 'app/i18n/externalFileLoader'
 import type { T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 
-import {
-  applyFaUserSettingsLanguageSelection,
-  resolveVitePublicAssetPath
-} from 'app/src/scripts/appInternals/rendererAppInternals'
+import { resolveVitePublicAssetPath } from 'app/src/scripts/appInternals/rendererAppInternals'
+import { runFaActionAwait } from 'app/src/scripts/actionManager/faActionManagerRun'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
 import GlobalLanguageSelectorSpellcheckRefreshControl from './GlobalLanguageSelectorSpellcheckRefreshControl.vue'
@@ -173,11 +171,10 @@ function onLanguageMenuHide (): void {
 
 async function pickLanguage (code: T_faUserSettingsLanguageCode): Promise<void> {
   const priorCode = currentCode.value
-  await applyFaUserSettingsLanguageSelection(
-    faUserSettingsStore.updateSettings,
+  await runFaActionAwait('languageSwitch', {
     code,
     priorCode
-  )
+  })
   const nextCode = faUserSettingsStore.settings?.languageCode ?? priorCode
   noteLanguageApplied(priorCode, nextCode)
 }

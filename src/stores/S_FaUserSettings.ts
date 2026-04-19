@@ -23,14 +23,9 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
     try {
       await window.faContentBridgeAPIs.faUserSettings.setSettings(updateObject)
     } catch (error) {
+      // Error toast handled by the action manager's unified failure reporter; only the bridge log stays here.
       console.error('[S_FaUserSettings] setSettings failed', error)
-      Notify.create({
-        group: false,
-        type: 'negative',
-        timeout: 0,
-        message: i18n.global.t('globalFunctionality.faUserSettings.saveError')
-      })
-      return
+      throw error instanceof Error ? error : new Error(String(error))
     }
 
     const retrievedSettings = await window.faContentBridgeAPIs.faUserSettings.getSettings()
@@ -48,18 +43,14 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
         type: 'positive',
         message: i18n.global.t('globalFunctionality.faUserSettings.saveSuccess')
       })
-    } else {
-      console.error(`[S_FaUserSettings] ${i18n.global.t('globalFunctionality.faUserSettings.saveMismatchLog')}`, {
-        updateObject,
-        retrievedSettings
-      })
-      Notify.create({
-        group: false,
-        type: 'negative',
-        timeout: 0,
-        message: i18n.global.t('globalFunctionality.faUserSettings.saveError')
-      })
+      return
     }
+
+    console.error(`[S_FaUserSettings] ${i18n.global.t('globalFunctionality.faUserSettings.saveMismatchLog')}`, {
+      updateObject,
+      retrievedSettings
+    })
+    throw new Error(i18n.global.t('globalFunctionality.faUserSettings.saveError'))
   }
 
   return {

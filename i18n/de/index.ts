@@ -6,8 +6,10 @@ import L_tools from './components/globals/AppControlMenus/L_tools'
 import L_socialContactButtons from './components/other/SocialContactButtons/L_socialContactButtons'
 
 import L_aboutFantasiaArchive from './dialogs/L_aboutFantasiaArchive'
+import L_DialogActionMonitor from './dialogs/L_DialogActionMonitor'
 import L_dialogKeybindSettings from './dialogs/L_dialogKeybindSettings'
 
+import L_faActionManager from './globalFunctionality/L_faActionManager'
 import L_faKeybinds from './globalFunctionality/L_faKeybinds'
 import L_faUserSettings from './globalFunctionality/L_faUserSettings'
 import L_spellChecker from './globalFunctionality/L_spellChecker'
@@ -29,6 +31,7 @@ export default {
   // DIALOGS
   dialogs: {
     aboutFantasiaArchive: L_aboutFantasiaArchive,
+    actionMonitor: L_DialogActionMonitor,
     keybindSettings: L_dialogKeybindSettings
   },
 
@@ -53,6 +56,7 @@ export default {
 
   // GLOBAL FUNCTIONALITY
   globalFunctionality: {
+    faActionManager: L_faActionManager,
     faKeybinds: L_faKeybinds,
     faUserSettings: L_faUserSettings,
     spellChecker: L_spellChecker

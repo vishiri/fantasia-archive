@@ -1,52 +1,41 @@
 import { beforeEach, expect, test, vi } from 'vitest'
 
-const { openDialogMock, openMarkdownMock, toggleMock } = vi.hoisted(() => {
+const { runFaActionMock } = vi.hoisted(() => {
   return {
-    openDialogMock: vi.fn(),
-    openMarkdownMock: vi.fn(),
-    toggleMock: vi.fn()
+    runFaActionMock: vi.fn()
   }
 })
 
-vi.mock('app/src/scripts/appGlobalManagementUI/dialogManagement', () => {
+vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => {
   return {
-    openDialogComponent: (...args: unknown[]) => openDialogMock(...args),
-    openDialogMarkdownDocument: (...args: unknown[]) => openMarkdownMock(...args)
-  }
-})
-
-vi.mock('app/src/scripts/appGlobalManagementUI/toggleDevTools', () => {
-  return {
-    toggleDevTools: (...args: unknown[]) => toggleMock(...args)
+    runFaAction: (...args: unknown[]) => runFaActionMock(...args),
+    runFaActionAwait: vi.fn(async () => true)
   }
 })
 
 import { faKeybindRunCommand } from 'app/src/scripts/keybinds/faKeybindRunCommand'
 
 beforeEach(() => {
-  openDialogMock.mockReset()
-  openMarkdownMock.mockReset()
-  toggleMock.mockReset()
+  runFaActionMock.mockReset()
 })
 
-test('faKeybindRunCommand toggles developer tools', () => {
+test('faKeybindRunCommand routes toggleDeveloperTools through the action manager', () => {
   faKeybindRunCommand('toggleDeveloperTools')
-  expect(toggleMock).toHaveBeenCalledOnce()
-  expect(openDialogMock).not.toHaveBeenCalled()
+  expect(runFaActionMock).toHaveBeenCalledOnce()
+  expect(runFaActionMock).toHaveBeenCalledWith('toggleDeveloperTools', undefined)
 })
 
-test('faKeybindRunCommand opens program settings', () => {
+test('faKeybindRunCommand routes openProgramSettings to the openProgramSettingsDialog action', () => {
   faKeybindRunCommand('openProgramSettings')
-  expect(openDialogMock).toHaveBeenCalledWith('ProgramSettings')
+  expect(runFaActionMock).toHaveBeenCalledWith('openProgramSettingsDialog', undefined)
 })
 
-test('faKeybindRunCommand opens keybind settings', () => {
+test('faKeybindRunCommand routes openKeybindSettings to the openKeybindSettingsDialog action', () => {
   faKeybindRunCommand('openKeybindSettings')
-  expect(openDialogMock).toHaveBeenCalledWith('KeybindSettings')
+  expect(runFaActionMock).toHaveBeenCalledWith('openKeybindSettingsDialog', undefined)
 })
 
-test('faKeybindRunCommand opens advanced search guide markdown', () => {
+test('faKeybindRunCommand routes openAdvancedSearchGuide to the openAdvancedSearchGuideDialog action', () => {
   faKeybindRunCommand('openAdvancedSearchGuide')
-  expect(openMarkdownMock).toHaveBeenCalledWith('advancedSearchGuide')
-  expect(openDialogMock).not.toHaveBeenCalled()
+  expect(runFaActionMock).toHaveBeenCalledWith('openAdvancedSearchGuideDialog', undefined)
 })

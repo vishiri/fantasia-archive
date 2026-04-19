@@ -3,18 +3,11 @@ import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import type { T_programSettingsRenderTree } from 'app/types/I_dialogProgramSettings'
 import { PROGRAM_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogProgramSettings/_data/programSettingsOptions'
 import { buildProgramSettingsRenderTree } from 'app/src/components/dialogs/DialogProgramSettings/scripts/dialogProgramSettingsTree'
+import { runFaActionAwait } from 'app/src/scripts/actionManager/faActionManagerRun'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 import { toRaw, type Ref } from 'vue'
 
 import type { I_dialogProgramSettingsProps } from 'app/types/I_dialogProgramSettings'
-
-function resolveFaUserSettingsStore (): ReturnType<typeof S_FaUserSettings> | null {
-  try {
-    return S_FaUserSettings()
-  } catch {
-    return null
-  }
-}
 
 /**
  * Pinia store surface used when hydrating the dialog from persisted settings.
@@ -125,10 +118,9 @@ export function createDialogProgramSettingsDialogActions (params: {
   }
 
   async function saveAndCloseDialog (): Promise<void> {
-    const faUserSettingsStore = resolveFaUserSettingsStore()
-    if (faUserSettingsStore !== null && localSettings.value !== null) {
+    if (localSettings.value !== null) {
       const plainSettingsSnapshot: I_faUserSettings = { ...toRaw(localSettings.value) }
-      await faUserSettingsStore.updateSettings(plainSettingsSnapshot)
+      await runFaActionAwait('saveProgramSettings', { settings: plainSettingsSnapshot })
     }
 
     dialogModel.value = false

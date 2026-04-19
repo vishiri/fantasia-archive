@@ -6,6 +6,7 @@ export default {
     changelog: 'Journal des modifications',
     aboutFantasiaArchive: 'À propos de Fantasia Archive',
     license: 'Licence',
-    toggleDeveloperTools: 'Basculer les outils de développement'
+    toggleDeveloperTools: 'Basculer les outils de développement',
+    actionMonitor: 'Moniteur d\'actions'
   }
 }

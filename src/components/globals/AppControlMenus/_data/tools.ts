@@ -1,5 +1,5 @@
 import { i18n } from 'app/i18n/externalFileLoader'
-import { openDialogComponent } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
+import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
 
 import type { I_appMenuItem, I_appMenuList } from 'app/types/I_appMenusDataList'
 
@@ -24,11 +24,11 @@ function buildToolsMenuData (): I_appMenuItem[] {
     faMenuSeparator(),
     faMenuItem('appControlMenus.tools.items.keybindSettings', 'mdi-keyboard-settings', {
       keybindCommandId: 'openKeybindSettings',
-      trigger: () => openDialogComponent('KeybindSettings')
+      trigger: () => runFaAction('openKeybindSettingsDialog', undefined)
     }),
     faMenuItem('appControlMenus.tools.items.programSettings', 'mdi-tune', {
       keybindCommandId: 'openProgramSettings',
-      trigger: () => openDialogComponent('ProgramSettings')
+      trigger: () => runFaAction('openProgramSettingsDialog', undefined)
     })
   ]
 }

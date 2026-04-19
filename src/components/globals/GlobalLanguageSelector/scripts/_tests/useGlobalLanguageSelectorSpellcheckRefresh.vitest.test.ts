@@ -1,6 +1,20 @@
-import { expect, test, vi } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
+
+const { runFaActionAwaitMock } = vi.hoisted(() => ({
+  runFaActionAwaitMock: vi.fn(async () => true)
+}))
+
+vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
+  runFaAction: vi.fn(),
+  runFaActionAwait: runFaActionAwaitMock
+}))
 
 import { useGlobalLanguageSelectorSpellcheckRefresh } from '../useGlobalLanguageSelectorSpellcheckRefresh'
+
+beforeEach(() => {
+  runFaActionAwaitMock.mockReset()
+  runFaActionAwaitMock.mockResolvedValue(true)
+})
 
 /**
  * useGlobalLanguageSelectorSpellcheckRefresh
@@ -28,18 +42,9 @@ test('Test that noteLanguageApplied leaves visibility off when the language code
 
 /**
  * useGlobalLanguageSelectorSpellcheckRefresh
- * Invokes the window control bridge and hides the hint.
+ * Dispatches the refreshWebContentsAfterLanguage action and clears the hint.
  */
-test('Test that refreshWebContentsAndHide invokes faWindowControl.refreshWebContents', async () => {
-  const refreshWebContents = vi.fn(async () => undefined)
-  window.faContentBridgeAPIs = {
-    ...window.faContentBridgeAPIs,
-    faWindowControl: {
-      ...window.faContentBridgeAPIs.faWindowControl,
-      refreshWebContents
-    }
-  }
-
+test('Test that refreshWebContentsAndHide dispatches the refreshWebContentsAfterLanguage action and hides the hint', async () => {
   const {
     noteLanguageApplied,
     refreshWebContentsAndHide,
@@ -51,22 +56,13 @@ test('Test that refreshWebContentsAndHide invokes faWindowControl.refreshWebCont
 
   await refreshWebContentsAndHide()
 
-  expect(refreshWebContents).toHaveBeenCalledOnce()
+  expect(runFaActionAwaitMock).toHaveBeenCalledWith('refreshWebContentsAfterLanguage', undefined)
   expect(showSpellcheckRefresh.value).toBe(false)
 })
 
-test('Test that refreshWebContentsAndHide clears the hint when refreshWebContents is absent', async () => {
-  window.faContentBridgeAPIs = {
-    ...window.faContentBridgeAPIs,
-    faWindowControl: {
-      checkWindowMaximized: async () => false,
-      closeWindow: async () => undefined,
-      maximizeWindow: async () => undefined,
-      minimizeWindow: async () => undefined,
-      refreshWebContents: undefined as unknown as () => Promise<void>,
-      resizeWindow: async () => undefined
-    }
-  }
+test('Test that refreshWebContentsAndHide still clears the hint even when the action resolves false', async () => {
+  runFaActionAwaitMock.mockReset()
+  runFaActionAwaitMock.mockResolvedValueOnce(false)
 
   const {
     noteLanguageApplied,

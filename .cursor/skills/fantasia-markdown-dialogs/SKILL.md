@@ -12,6 +12,7 @@ description: >-
 
 - **`DialogMarkdownDocument.vue`**: Renders markdown via `QMarkdown` from `@quasar/quasar-ui-qmarkdown` with the package CSS imported alongside the component.
 - Dialog flow is tied to Pinia dialog state (`src/stores/S_Dialog.ts`) and helpers in **`src/scripts/appGlobalManagementUI/dialogManagement.ts`** (for example **`openDialogMarkdownDocument`**). The root `q-dialog` model calls **`registerMarkdownDialogStackGuard`** from that module so **`markdownDialogOpenCount`** stays aligned when the dialog closes or the host unmounts.
+- **Triggering opens**: User-initiated markdown dialog opens (Changelog, License, Advanced Search Guide, Tips Tricks Trivia) go through the **action manager** registry (**`openChangelogDialog`**, **`openLicenseDialog`**, **`openAdvancedSearchGuideDialog`**, **`openTipsTricksTriviaDialog`**) via **`runFaAction`** so failures funnel into the unified single-toast surface. See [fantasia-action-manager](../fantasia-action-manager/SKILL.md).
 
 ## Content source
 
@@ -27,6 +28,7 @@ description: >-
 ## Related
 
 - [fantasia-i18n](../fantasia-i18n/SKILL.md) for locale layout and `documents` registration.
+- [fantasia-action-manager](../fantasia-action-manager/SKILL.md) for the dispatcher that opens these dialogs from menus, keybinds, and other call sites.
 
 ## TypeScript interfaces and types (`types/`)
 

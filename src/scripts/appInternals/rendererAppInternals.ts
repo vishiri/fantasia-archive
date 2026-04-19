@@ -1,5 +1,5 @@
 import { i18n } from 'app/i18n/externalFileLoader'
-import { tipsTricksTriviaNotification } from 'app/src/scripts/appGlobalManagementUI/tipsTricksTriviaNotification'
+import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
 import type { I_appStartupRouter } from 'app/types/I_appStartupRouter'
 import type { I_faUserSettings, T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 
@@ -117,5 +117,5 @@ export const runAppStartupRouting = async (
   }
 
   await router.push({ path: '/' })
-  tipsTricksTriviaNotification(false)
+  runFaAction('showStartupTipsNotification', undefined)
 }
