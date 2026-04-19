@@ -71,14 +71,15 @@ export function getFaPlaywrightElectronRecordVideoPartial (
   q.push(tempDir)
   recordVideoTempDirQueues.set(testInfo, q)
 
-  return {
-    recordVideo: {
-      dir: tempDir,
-      size: {
-        height: FA_PLAYWRIGHT_ELECTRON_VIDEO_HEIGHT,
-        width: FA_PLAYWRIGHT_ELECTRON_VIDEO_WIDTH
-      }
+  const recordVideo = {
+    dir: tempDir,
+    size: {
+      height: FA_PLAYWRIGHT_ELECTRON_VIDEO_HEIGHT,
+      width: FA_PLAYWRIGHT_ELECTRON_VIDEO_WIDTH
     }
+  }
+  return {
+    recordVideo
   }
 }
 

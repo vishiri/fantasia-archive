@@ -10,7 +10,8 @@ import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 let registered = false
 
 function userSettingsSnapshot (): I_faUserSettings {
-  return { ...getFaUserSettings().store }
+  const snapshot: I_faUserSettings = { ...getFaUserSettings().store }
+  return snapshot
 }
 
 /**

@@ -10,9 +10,11 @@ let registered = false
 
 function keybindsRootSnapshot (): I_faKeybindsRoot {
   const s = getFaKeybinds().store
+  const overrides = { ...s.overrides }
+  const schemaVersion = s.schemaVersion
   return {
-    overrides: { ...s.overrides },
-    schemaVersion: s.schemaVersion
+    overrides,
+    schemaVersion
   }
 }
 
@@ -26,9 +28,11 @@ export function registerFaKeybindsIpc (): void {
   registered = true
 
   ipcMain.handle(FA_KEYBINDS_IPC.getAsync, (): I_faKeybindsSnapshot => {
+    const platform = process.platform
+    const store = keybindsRootSnapshot()
     return {
-      platform: process.platform,
-      store: keybindsRootSnapshot()
+      platform,
+      store
     }
   })
 
