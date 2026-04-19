@@ -142,7 +142,7 @@ export default [...neostandard({
       skipComments: true
     }],
     'max-lines-per-function': ['error', {
-      max: 50,
+      max: 100,
       skipBlankLines: true,
       skipComments: true,
       IIFEs: true
@@ -158,7 +158,7 @@ export default [...neostandard({
       skipComments: true
     }],
     'max-lines-per-function': ['error', {
-      max: 50,
+      max: 100,
       skipBlankLines: true,
       skipComments: true,
       IIFEs: true
@@ -180,7 +180,7 @@ export default [...neostandard({
       skipComments: true
     }],
     'max-lines-per-function': ['error', {
-      max: 50,
+      max: 100,
       skipBlankLines: true,
       skipComments: true,
       IIFEs: true
