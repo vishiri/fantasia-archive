@@ -2,82 +2,26 @@ import type {
   I_faActionDefinition,
   T_faActionId
 } from 'app/types/I_faActionManagerDomain'
-import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
-import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
+
 import {
-  openDialogComponent,
-  openDialogMarkdownDocument
-} from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
-import { toggleDevTools } from 'app/src/scripts/appGlobalManagementUI/toggleDevTools'
-import { tipsTricksTriviaNotification } from 'app/src/scripts/appGlobalManagementUI/tipsTricksTriviaNotification'
-import { applyFaUserSettingsLanguageSelection } from 'app/src/scripts/appInternals/rendererAppInternals'
-
-async function callBridge<T> (
-  invoker: () => Promise<T> | T | undefined
-): Promise<void> {
-  const result = invoker()
-  if (result instanceof Promise) {
-    await result
-  }
-}
-
-async function handleSaveKeybindSettings (payload: { overrides: import('app/types/I_faKeybindsDomain').I_faKeybindsRoot['overrides'] }): Promise<void> {
-  const ok = await S_FaKeybinds().updateKeybinds({
-    overrides: payload.overrides,
-    replaceAllOverrides: true
-  })
-  if (!ok) {
-    throw new Error('Failed to save keybind settings.')
-  }
-}
-
-async function handleSaveProgramSettings (payload: { settings: import('app/types/I_faUserSettingsDomain').I_faUserSettings }): Promise<void> {
-  await S_FaUserSettings().updateSettings(payload.settings)
-}
-
-async function handleLanguageSwitch (
-  payload: import('app/types/I_faActionManagerDomain').I_faActionPayloadMap['languageSwitch']
-): Promise<void> {
-  const faUserSettingsStore = S_FaUserSettings()
-  await applyFaUserSettingsLanguageSelection(
-    faUserSettingsStore.updateSettings,
-    payload.code,
-    payload.priorCode
-  )
-}
-
-async function handleResizeApp (): Promise<void> {
-  const ctrl = window.faContentBridgeAPIs?.faWindowControl
-  if (ctrl === undefined) {
-    return
-  }
-  await callBridge(() => ctrl.resizeWindow())
-  await callBridge(() => ctrl.checkWindowMaximized())
-}
-
-async function handleMinimizeApp (): Promise<void> {
-  const ctrl = window.faContentBridgeAPIs?.faWindowControl
-  if (ctrl === undefined) {
-    return
-  }
-  await callBridge(() => ctrl.minimizeWindow())
-}
-
-async function handleCloseApp (): Promise<void> {
-  const ctrl = window.faContentBridgeAPIs?.faWindowControl
-  if (ctrl === undefined) {
-    return
-  }
-  await callBridge(() => ctrl.closeWindow())
-}
-
-async function handleRefreshWebContents (): Promise<void> {
-  const ctrl = window.faContentBridgeAPIs?.faWindowControl
-  if (ctrl === undefined) {
-    return
-  }
-  await callBridge(() => ctrl.refreshWebContents())
-}
+  handleCloseApp,
+  handleLanguageSwitch,
+  handleMinimizeApp,
+  handleOpenAboutFantasiaArchiveDialog,
+  handleOpenActionMonitorDialog,
+  handleOpenAdvancedSearchGuideDialog,
+  handleOpenChangelogDialog,
+  handleOpenKeybindSettingsDialog,
+  handleOpenLicenseDialog,
+  handleOpenProgramSettingsDialog,
+  handleOpenTipsTricksTriviaDialog,
+  handleRefreshWebContents,
+  handleResizeApp,
+  handleSaveKeybindSettings,
+  handleSaveProgramSettings,
+  handleShowStartupTipsNotification,
+  handleToggleDeveloperTools
+} from './faActionDefinitionHandlers'
 
 /**
  * Single source of truth for every renderer-side user-meaningful action.
@@ -86,17 +30,13 @@ async function handleRefreshWebContents (): Promise<void> {
  */
 export const FA_ACTION_DEFINITIONS: ReadonlyArray<I_faActionDefinition<T_faActionId>> = [
   {
-    handler: () => {
-      toggleDevTools()
-    },
+    handler: handleToggleDeveloperTools as I_faActionDefinition<T_faActionId>['handler'],
     id: 'toggleDeveloperTools',
     kind: 'async'
   },
   {
     dedup: true,
-    handler: () => {
-      openDialogComponent('KeybindSettings')
-    },
+    handler: handleOpenKeybindSettingsDialog as I_faActionDefinition<T_faActionId>['handler'],
     id: 'openKeybindSettingsDialog',
     kind: 'async'
   },
@@ -107,9 +47,7 @@ export const FA_ACTION_DEFINITIONS: ReadonlyArray<I_faActionDefinition<T_faActio
   },
   {
     dedup: true,
-    handler: () => {
-      openDialogComponent('ProgramSettings')
-    },
+    handler: handleOpenProgramSettingsDialog as I_faActionDefinition<T_faActionId>['handler'],
     id: 'openProgramSettingsDialog',
     kind: 'async'
   },
@@ -120,41 +58,31 @@ export const FA_ACTION_DEFINITIONS: ReadonlyArray<I_faActionDefinition<T_faActio
   },
   {
     dedup: true,
-    handler: () => {
-      openDialogMarkdownDocument('advancedSearchGuide')
-    },
+    handler: handleOpenAdvancedSearchGuideDialog as I_faActionDefinition<T_faActionId>['handler'],
     id: 'openAdvancedSearchGuideDialog',
     kind: 'async'
   },
   {
     dedup: true,
-    handler: () => {
-      openDialogMarkdownDocument('changeLog')
-    },
+    handler: handleOpenChangelogDialog as I_faActionDefinition<T_faActionId>['handler'],
     id: 'openChangelogDialog',
     kind: 'async'
   },
   {
     dedup: true,
-    handler: () => {
-      openDialogMarkdownDocument('license')
-    },
+    handler: handleOpenLicenseDialog as I_faActionDefinition<T_faActionId>['handler'],
     id: 'openLicenseDialog',
     kind: 'async'
   },
   {
     dedup: true,
-    handler: () => {
-      openDialogComponent('AboutFantasiaArchive')
-    },
+    handler: handleOpenAboutFantasiaArchiveDialog as I_faActionDefinition<T_faActionId>['handler'],
     id: 'openAboutFantasiaArchiveDialog',
     kind: 'async'
   },
   {
     dedup: true,
-    handler: () => {
-      openDialogMarkdownDocument('tipsTricksTrivia')
-    },
+    handler: handleOpenTipsTricksTriviaDialog as I_faActionDefinition<T_faActionId>['handler'],
     id: 'openTipsTricksTriviaDialog',
     kind: 'async'
   },
@@ -187,16 +115,12 @@ export const FA_ACTION_DEFINITIONS: ReadonlyArray<I_faActionDefinition<T_faActio
   },
   {
     dedup: true,
-    handler: () => {
-      openDialogComponent('ActionMonitor')
-    },
+    handler: handleOpenActionMonitorDialog as I_faActionDefinition<T_faActionId>['handler'],
     id: 'openActionMonitorDialog',
     kind: 'async'
   },
   {
-    handler: () => {
-      tipsTricksTriviaNotification(false)
-    },
+    handler: handleShowStartupTipsNotification as I_faActionDefinition<T_faActionId>['handler'],
     id: 'showStartupTipsNotification',
     kind: 'async'
   }

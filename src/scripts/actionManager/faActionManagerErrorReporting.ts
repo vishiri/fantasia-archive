@@ -44,13 +44,15 @@ export function normalizeFaActionError (error: unknown): { name: string, message
     return result
   }
   if (typeof error === 'string') {
+    const message = error
     return {
-      message: error,
+      message,
       name: 'Error'
     }
   }
+  const message = String(error)
   return {
-    message: String(error),
+    message,
     name: 'Error'
   }
 }

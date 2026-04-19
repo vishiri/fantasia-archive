@@ -22,12 +22,14 @@ function buildEntry<Id extends T_faActionId> (
   payload: I_faActionPayloadMap[Id],
   kind: I_faActionDefinition<T_faActionId>['kind']
 ): I_faActionQueueEntry {
+  const enqueuedAt = Date.now()
+  const uid = uuidv4()
   return {
-    enqueuedAt: Date.now(),
+    enqueuedAt,
     id,
     kind,
     payload,
-    uid: uuidv4()
+    uid
   }
 }
 
