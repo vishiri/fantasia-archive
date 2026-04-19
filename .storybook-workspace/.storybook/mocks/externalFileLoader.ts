@@ -7,6 +7,7 @@ import L_project from 'app/i18n/en-US/components/globals/AppControlMenus/L_proje
 import L_tools from 'app/i18n/en-US/components/globals/AppControlMenus/L_tools'
 import L_socialContactButtons from 'app/i18n/en-US/components/other/SocialContactButtons/L_socialContactButtons'
 import L_aboutFantasiaArchive from 'app/i18n/en-US/dialogs/L_aboutFantasiaArchive'
+import L_DialogActionMonitor from 'app/i18n/en-US/dialogs/L_DialogActionMonitor'
 import L_dialogKeybindSettings from 'app/i18n/en-US/dialogs/L_dialogKeybindSettings'
 import L_markdownDocument from 'app/i18n/en-US/dialogs/L_markdownDocument'
 import L_programSettings from 'app/i18n/en-US/dialogs/L_programSettings'
@@ -29,6 +30,7 @@ const defaultMessages: Record<string, unknown> = {
   errorNotFound: L_ErrorNotFound,
   dialogs: {
     aboutFantasiaArchive: L_aboutFantasiaArchive,
+    actionMonitor: L_DialogActionMonitor,
     keybindSettings: L_dialogKeybindSettings,
     markdownDocument: L_markdownDocument,
     programSettings: L_programSettings

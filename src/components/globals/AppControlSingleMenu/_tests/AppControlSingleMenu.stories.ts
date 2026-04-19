@@ -102,6 +102,9 @@ const dataToolsAndHelpStyleWithHints: I_appMenuList = {
     faMenuItem('appControlMenus.helpInfo.items.advancedSearchGuide', 'mdi-file-question', {
       keybindCommandId: 'openAdvancedSearchGuide'
     }),
+    faMenuItem('appControlMenus.helpInfo.items.actionMonitor', 'mdi-pulse', {
+      keybindCommandId: 'openActionMonitor'
+    }),
     faMenuItem('appControlMenus.helpInfo.items.toggleDeveloperTools', 'mdi-code-tags', {
       keybindCommandId: 'toggleDeveloperTools'
     })

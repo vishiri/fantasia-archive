@@ -21,7 +21,7 @@ const meta = {
       },
       description: {
         component:
-          'Top menu composition: four `AppControlSingleMenu` groups (Project, Documents, Tools, Help & Info) from `_data/` builders. Tools and Help rows may set `keybindCommandId` for live shortcut hints when `S_FaKeybinds.snapshot` is populated. Set `embedDialogs` true to mount markdown and settings dialogs used by menu triggers (they stay closed until an action runs).'
+          'Top menu composition: four `AppControlSingleMenu` groups (Project, Documents, Tools, Help & Info) from `_data/` builders. Tools and Help rows may set `keybindCommandId` for live shortcut hints when `S_FaKeybinds.snapshot` is populated (Help includes **Action monitor** and **Toggle developer tools** hints when defaults load). Set `embedDialogs` true to mount markdown and settings dialogs used by menu triggers (they stay closed until an action runs).'
       }
     }
   }
