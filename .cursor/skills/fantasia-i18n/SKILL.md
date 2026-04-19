@@ -56,6 +56,10 @@ Do not place locale files in any other location. If no folder fits, use `globalF
 - **TypeScript scripts and Pinia stores**: `import { i18n } from 'app/i18n/externalFileLoader'` then `i18n.global.t('camelCaseKey.subKey')`.
 - Never hardcode user-visible prose directly in `.vue` templates, `_data/` files, or scripts; always route through an i18n key.
 
+## Tests tied to copy changes
+
+When you change or add keys that appear in **`toHaveText`**, **`toHaveAttribute('aria-label', …)`**, or imported **`L_*`** default exports inside Playwright specs, **grep** for the key path or the English default module and **run** every matching **`*.vitest.test.ts`**, **`*.playwright.test.ts`**, and **`*.playwright.spec.ts`** (rebuild Electron before Playwright when the bundled renderer matters). See [fantasia-testing](../fantasia-testing/SKILL.md) **Connected tests for any feature change**.
+
 ## Adding new strings — step by step
 
 1. Identify the right folder (`components/<bucket>/<ComponentName>/`, `dialogs/`, `pages/`, or `globalFunctionality/`).
@@ -72,6 +76,7 @@ Do not place locale files in any other location. If no folder fits, use `globalF
 
 ## Related
 
+- [fantasia-testing](../fantasia-testing/SKILL.md) for Vitest + Playwright when locale strings affect tests.
 - [fantasia-markdown-dialogs](../fantasia-markdown-dialogs/SKILL.md) for rendering markdown in dialogs.
 
 ## TypeScript interfaces and types (`types/`)

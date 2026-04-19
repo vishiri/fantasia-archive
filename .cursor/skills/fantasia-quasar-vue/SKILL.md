@@ -84,11 +84,12 @@ Locale `L_*` paths under `i18n/<locale>/components/` use the same bucket names a
 - **`src/boot/i18n.ts`**: vue-i18n module augmentation may use **`@ts-expect-error` (TS2665)** because the package `module` entry targets the ESM bundle under `tsc`.
 - Keep TypeScript strict in Vue code: avoid `any`; prefer explicit prop/emits/interfaces, `unknown`, and narrowing.
 - Keep Vitest SFC parity in **`src/components/**`**, **`src/layouts/**`**, and **`src/pages/**`**: each feature `.vue` should have a colocated **`_tests/<Name>.vitest.test.ts`** (presence baseline; not a claim of exhaustive line/branch coverage).
+- After material SFC or **`i18n`** edits, follow [fantasia-testing](../fantasia-testing/SKILL.md) **Connected tests for any feature change** (grep for locators and dialog keys; run implicated Vitest paths, then component and E2E Playwright after **`yarn quasar:build:electron`** when the feature has matching specs).
 
 ## Related
 
 - [fantasia-i18n](../fantasia-i18n/SKILL.md) for user-visible strings.
-- [fantasia-testing](../fantasia-testing/SKILL.md) for component Playwright tests next to components.
+- [fantasia-testing](../fantasia-testing/SKILL.md) for component Playwright tests next to components and the **Connected tests** sweep.
 - [fantasia-action-manager](../fantasia-action-manager/SKILL.md) for the centralized dispatcher used by menus, dialogs, window controls, and keybinds (single toast + Action Monitor).
 
 ## Storybook i18n caution

@@ -17,6 +17,17 @@ Match **existing** tests to the letter when adding or editing:
 - Playwright (test files): [`playwright-tests.mdc`](../../rules/playwright-tests.mdc) (`**/*playwright*.ts`)
 - Playwright hooks in Vue templates (`data-test-locator` and other `data-test-*`, never bare `data-test`): [`vue-template-test-hooks.mdc`](../../rules/vue-template-test-hooks.mdc) (`**/*.vue`)
 
+## Connected tests for any feature change
+
+Treat **tests as part of the same deliverable** as production edits—not an optional follow-up.
+
+1. **Discover** — Search the repository (for example **ripgrep**) for the component or dialog folder name, exported helpers, **`data-test-locator`** strings, **`T_dialogName`**, **`COMPONENT_NAME`**, action or keybind ids, store symbols, and **`i18n`** keys you added or changed. Follow imports and menu **`_data/`** entries that reference the feature.
+2. **Vitest** — Run **`yarn vitest run`** with explicit paths for **every** matching **`*.vitest.test.ts`** (feature **`_tests/`**, colocated **`scripts/_tests/`**, **`src/scripts/**/_tests`**, **`src/stores/_tests`**, **`src-electron/**/_tests`**, **`helpers/**/_tests`**, **`i18n/_tests`** when implicated). Before commits, **`yarn test:unit`** (full workspace) or **`yarn testbatch:verify`** must still pass.
+3. **Playwright (component)** — For each matching **`src/**/_tests/*.playwright.test.ts`**, run **`yarn test:components:single --component=<bucket>/<ComponentFolder>`** or **`yarn test:components`** in its **own** terminal **after** **`yarn quasar:build:electron`** when the built bundle would exercise changed renderer code ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
+4. **Playwright (E2E)** — For each matching **`e2e-tests/*.playwright.spec.ts`**, run **`yarn test:e2e:single --spec=…`** or **`yarn test:e2e`** with the same rebuild rule.
+
+**CI scope**: the default **Verify** workflow runs **`yarn testbatch:verify`** only (lint, types, stylelint, Vitest coverage). It does **not** run component or E2E Playwright—those must be run locally (or via **`yarn testbatch:ensure:nochange`**) when the feature touches flows they cover.
+
 ## Vitest coverage tiers (CI)
 
 Same rules as [vitest-tests.mdc](../../rules/vitest-tests.mdc) (**Vitest coverage tiers (CI)** section): **100%** all metrics on **`src-electron`** and **`helpers/**/*.ts`**; **100%** all metrics on **`unit-src-renderer`** **`src`** **`.ts`** (boot, scripts, stores); **100%** on all four for scoped **`i18n/`** entry **`unit-i18n`**; **100%** on all four for merged **`unit-components`** **`src/components/**/*.ts`**, **`src/layouts/**/*.ts`**, and **`src/pages/**/*.ts`**; matching **`.vue`** SFCs have **no** threshold—**~60%** **watermarks** for review (**`src/components/foundation/**`** excluded from the pool). Configs live under [**vitest/**](../../../vitest/); entry [**vitest.config.mts**](../../../vitest.config.mts) sets repo **`root`** and **`extends`** per project.
@@ -94,9 +105,10 @@ Same rules as [vitest-tests.mdc](../../rules/vitest-tests.mdc) (**Vitest coverag
 ## Checklist when changing UI or Electron shell
 
 1. **Quality gate** in one terminal: `yarn testbatch:verify` — fix issues per [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) and [vitest-tests.mdc](../../rules/vitest-tests.mdc) ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
-2. Rebuild: `yarn quasar:build:electron` (or `quasar build -m electron`) — its own terminal.
-3. `yarn test:components` / `yarn test:e2e` as needed — each in its own terminal; do not chain with `yarn quasar:build:electron` or with each other in one line, unless you intentionally run **`yarn testbatch:ensure:nochange`** or **`yarn testbatch:ensure:change`**.
-4. When Storybook-backed UI or VRT snapshots are in scope: run **`yarn test:storybook:smoke`** and **`yarn test:storybook:visual`** (or use **`yarn testbatch:ensure:nochange`** to cover verify + build + Playwright + Storybook in one shot). Use **`yarn testbatch:ensure:change`** only when deliberately updating committed Storybook snapshots.
+2. **Connected test sweep** — follow **Connected tests for any feature change** above (grep for locators, dialog names, locale keys; run every implicated Vitest path, then component and E2E Playwright after rebuild when in scope).
+3. Rebuild: `yarn quasar:build:electron` (or `quasar build -m electron`) — its own terminal.
+4. `yarn test:components` / `yarn test:e2e` as needed — each in its own terminal; do not chain with `yarn quasar:build:electron` or with each other in one line, unless you intentionally run **`yarn testbatch:ensure:nochange`** or **`yarn testbatch:ensure:change`**.
+5. When Storybook-backed UI or VRT snapshots are in scope: run **`yarn test:storybook:smoke`** and **`yarn test:storybook:visual`** (or use **`yarn testbatch:ensure:nochange`** to cover verify + build + Playwright + Storybook in one shot). Use **`yarn testbatch:ensure:change`** only when deliberately updating committed Storybook snapshots.
 
 ## Choosing Vitest vs Playwright in renderer work
 
