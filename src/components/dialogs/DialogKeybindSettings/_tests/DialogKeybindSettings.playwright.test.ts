@@ -98,6 +98,8 @@ const clearKeybindSettingsFilter = async (page: Page): Promise<void> => {
  */
 const keybindSettingsDeveloperToolsFilterQuery = 'developer tools'
 
+const keybindSettingsActionMonitorFilterQuery = 'action monitor'
+
 /**
  * Filters the table like the developer-tools filter test, then returns the tbody row that shows that action name.
  */
@@ -167,6 +169,9 @@ test.describe.serial('Keybind settings dialog list, defaults, and filter', () =>
       if (expected.commandId === 'toggleDeveloperTools') {
         await fillKeybindSettingsFilter(appWindow, keybindSettingsDeveloperToolsFilterQuery)
       }
+      if (expected.commandId === 'openActionMonitor') {
+        await fillKeybindSettingsFilter(appWindow, keybindSettingsActionMonitorFilterQuery)
+      }
       const row = tableRoot.locator('tbody tr').filter({
         hasText: expected.nameLabel
       })
@@ -178,6 +183,9 @@ test.describe.serial('Keybind settings dialog list, defaults, and filter', () =>
         row.locator(`[data-test-locator="${selectorList.userKeybindButton}"]`)
       ).toHaveText(keybindDialogMessages.addNew)
       if (expected.commandId === 'toggleDeveloperTools') {
+        await clearKeybindSettingsFilter(appWindow)
+      }
+      if (expected.commandId === 'openActionMonitor') {
         await clearKeybindSettingsFilter(appWindow)
       }
     }

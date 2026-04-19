@@ -84,6 +84,7 @@ test('buildDialogKeybindSettingsRows lists all command ids', () => {
   })
   const ids = rows.map((r) => r.commandId).sort()
   expect(ids).toEqual([
+    'openActionMonitor',
     'openAdvancedSearchGuide',
     'openKeybindSettings',
     'openProgramSettings',

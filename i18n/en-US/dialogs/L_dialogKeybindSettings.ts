@@ -20,6 +20,7 @@ export default {
   columnName: 'Action',
   columnUser: 'User keybinds',
   commands: {
+    openActionMonitor: 'Open Action Monitor',
     openAdvancedSearchGuide: 'Open Advanced search guide',
     openKeybindSettings: 'Open keybind settings',
     openProgramSettings: 'Open program settings',

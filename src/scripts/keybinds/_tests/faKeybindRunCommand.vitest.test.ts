@@ -39,3 +39,8 @@ test('faKeybindRunCommand routes openAdvancedSearchGuide to the openAdvancedSear
   faKeybindRunCommand('openAdvancedSearchGuide')
   expect(runFaActionMock).toHaveBeenCalledWith('openAdvancedSearchGuideDialog', undefined)
 })
+
+test('faKeybindRunCommand routes openActionMonitor to the openActionMonitorDialog action', () => {
+  faKeybindRunCommand('openActionMonitor')
+  expect(runFaActionMock).toHaveBeenCalledWith('openActionMonitorDialog', undefined)
+})

@@ -7,6 +7,7 @@ import type { T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
  * Centralized here so the keydown dispatcher stays small and Vitest can mock 'runFaAction' for routing tests.
  */
 const FA_KEYBIND_COMMAND_TO_ACTION_ID: Readonly<Record<T_faKeybindCommandId, T_faActionId>> = {
+  openActionMonitor: 'openActionMonitorDialog',
   openAdvancedSearchGuide: 'openAdvancedSearchGuideDialog',
   openKeybindSettings: 'openKeybindSettingsDialog',
   openProgramSettings: 'openProgramSettingsDialog',

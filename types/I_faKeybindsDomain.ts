@@ -2,10 +2,11 @@
  * Canonical command ids for global (Electron) keyboard shortcuts.
  */
 export const FA_KEYBIND_COMMAND_IDS = [
-  'toggleDeveloperTools',
-  'openProgramSettings',
+  'openActionMonitor',
+  'openAdvancedSearchGuide',
   'openKeybindSettings',
-  'openAdvancedSearchGuide'
+  'openProgramSettings',
+  'toggleDeveloperTools'
 ] as const
 
 /**

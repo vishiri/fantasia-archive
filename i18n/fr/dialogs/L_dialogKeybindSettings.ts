@@ -20,6 +20,7 @@ export default {
   columnName: 'Action',
   columnUser: 'Raccourcis utilisateur',
   commands: {
+    openActionMonitor: 'Ouvrir le moniteur d’actions',
     openAdvancedSearchGuide: 'Ouvrir le guide de recherche avancée',
     openKeybindSettings: 'Ouvrir les paramètres des raccourcis',
     openProgramSettings: 'Ouvrir les paramètres du programme',

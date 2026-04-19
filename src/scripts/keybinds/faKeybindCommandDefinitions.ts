@@ -41,6 +41,16 @@ export const FA_KEYBIND_COMMAND_DEFINITIONS: I_faKeybindCommandDefinition[] = [
   },
   {
     defaultChord: {
+      code: 'F11',
+      mods: ['primary']
+    },
+    editable: true,
+    firesInEditableFields: true,
+    id: 'openActionMonitor',
+    messageKey: 'dialogs.keybindSettings.commands.openActionMonitor'
+  },
+  {
+    defaultChord: {
       code: 'KeyG',
       mods: [
         'alt',

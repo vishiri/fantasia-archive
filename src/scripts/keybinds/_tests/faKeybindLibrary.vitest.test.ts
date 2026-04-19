@@ -492,6 +492,7 @@ test('findFaKeybindCommandDefinition returns undefined for unknown ids', () => {
 
 test('FA_KEYBIND_COMMAND_DEFINITIONS lists expected commands', () => {
   expect(FA_KEYBIND_COMMAND_DEFINITIONS.map((d) => d.id).sort()).toEqual([
+    'openActionMonitor',
     'openAdvancedSearchGuide',
     'openKeybindSettings',
     'openProgramSettings',
