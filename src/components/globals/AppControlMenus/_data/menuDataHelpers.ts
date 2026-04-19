@@ -18,17 +18,25 @@ export function faMenuItem (
   icon: string,
   patch?: Partial<I_appMenuItem>
 ): I_appMenuItem {
-  return {
+  const text = i18n.global.t(textKey)
+  const base: I_appMenuItem = {
     conditions: true,
     icon,
     mode: 'item',
     specialColor: undefined,
     submenu: undefined,
-    text: i18n.global.t(textKey),
+    text,
     trigger: undefined,
-    triggerArguments: undefined,
+    triggerArguments: undefined
+  }
+  if (patch === undefined) {
+    return base
+  }
+  const merged: I_appMenuItem = {
+    ...base,
     ...patch
   }
+  return merged
 }
 
 export function faMenuSubItem (
@@ -36,14 +44,22 @@ export function faMenuSubItem (
   icon: string,
   patch?: Partial<I_appMenuSubItem>
 ): I_appMenuSubItem {
-  return {
+  const text = i18n.global.t(textKey)
+  const base: I_appMenuSubItem = {
     conditions: true,
     icon,
     mode: 'item',
     specialColor: undefined,
-    text: i18n.global.t(textKey),
+    text,
     trigger: undefined,
-    triggerArguments: undefined,
+    triggerArguments: undefined
+  }
+  if (patch === undefined) {
+    return base
+  }
+  const merged: I_appMenuSubItem = {
+    ...base,
     ...patch
   }
+  return merged
 }

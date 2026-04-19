@@ -128,11 +128,13 @@ export function faKeybindTryChordFromEvent (event: KeyboardEvent): T_faKeybindTr
     }
   }
 
+  const sortedMods = sortFaKeybindMods(mods)
+  const chord = {
+    code: event.code,
+    mods: sortedMods
+  }
   return {
-    chord: {
-      code: event.code,
-      mods: sortFaKeybindMods(mods)
-    },
+    chord,
     ok: true
   }
 }

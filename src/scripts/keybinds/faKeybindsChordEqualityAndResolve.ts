@@ -50,9 +50,10 @@ export function faKeybindExpandDefaultChord (
     return m === 'primary' ? primary : m
   })
 
+  const sortedMods = sortFaKeybindMods(mods)
   return {
     code: chord.code,
-    mods: sortFaKeybindMods(mods)
+    mods: sortedMods
   }
 }
 

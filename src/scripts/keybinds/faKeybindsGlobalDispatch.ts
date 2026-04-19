@@ -15,10 +15,13 @@ export function getFaKeybindKeydownContext (): {
 } {
   const keybinds = S_FaKeybinds()
   const snap = keybinds.snapshot
+  const overrides = snap?.store.overrides ?? {}
+  const platform = snap?.platform ?? 'win32'
+  const suspendGlobalKeybindDispatch = keybinds.suspendGlobalKeybindDispatch
   return {
-    overrides: snap?.store.overrides ?? {},
-    platform: snap?.platform ?? 'win32',
-    suspendGlobalKeybindDispatch: keybinds.suspendGlobalKeybindDispatch
+    overrides,
+    platform,
+    suspendGlobalKeybindDispatch
   }
 }
 
