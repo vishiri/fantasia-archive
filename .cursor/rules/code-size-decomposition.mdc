@@ -1,5 +1,5 @@
 ---
-description: Mandatory file and function size limits; Vue SFC splitting; ESLint enforcement
+description: Mandatory file and function size limits; return object literal shape; Vue SFC splitting; ESLint enforcement
 globs: "**/*"
 alwaysApply: true
 ---
@@ -7,6 +7,8 @@ alwaysApply: true
 # Code size and decomposition (project-wide)
 
 These limits are **enforced in CI** via ESLint (`max-lines`, `max-lines-per-function`) in `eslint.config.mjs` with the same exemptions listed below. Agents and contributors must follow them for any new or edited production code.
+
+**Return object shape** (below) is **mandatory project-wide** for human and agent edits; it is **not** a separate ESLint rule today—follow it in **every** path (including tests, Storybook, and helpers) the same way as production code unless review explicitly documents a narrow exception.
 
 ## Vue single-file components (`.vue`)
 
@@ -18,8 +20,16 @@ These limits are **enforced in CI** via ESLint (`max-lines`, `max-lines-per-func
 
 ## Functions (JavaScript, TypeScript, and Vue `<script>`)
 
-- **Hard limit:** a **single function** (any declaration or method body) **must not exceed 50 lines** (ESLint `max-lines-per-function` with `skipBlankLines`, `skipComments`, and `IIFEs: true`).
+- **Hard limit:** a **single function** (any declaration or method body) **must not exceed 100 lines** (ESLint `max-lines-per-function` with `skipBlankLines`, `skipComments`, and `IIFEs: true`).
 - **When a function grows**, split into **smaller named functions** with clear responsibilities; avoid “god” helpers and mega-callbacks.
+
+## Return object literals (`return { ... }`, project-wide)
+
+When you **`return { ... }`** (or otherwise **return an object literal** as the value), that literal must stay **easy to scan**: it should read like a **table of names** wired to work that already exists **above** the return.
+
+- **Do:** declare **`const`** bindings first (functions, refs, primitives, precomputed values), then **`return { foo, bar, baz }`** so every property value is a **simple identifier** (or a **literal** such as `0`, `true`, `'static'`).
+- **Do not:** put **inline arrow functions**, **`function` expressions**, **ternaries**, **`||` / `&&` value expressions** used as inline branching, **IIFEs**, or other **non-trivial expressions** directly on a property inside the returned object. Assign those to a **`const`** (or a `function` declaration) **before** the return and reference the binding by name.
+- **Applies to:** Pinia **`defineStore`** setup returns, factory helpers, **`return { ...handlers }`** patterns, and any similar “build an API surface” object — **everywhere** in the repo, not only `src/`.
 
 ## TypeScript modules (`.ts`, `.mts`, `.cts`)
 
@@ -28,7 +38,7 @@ These limits are **enforced in CI** via ESLint (`max-lines`, `max-lines-per-func
 
 ## Module count: prefer logical grouping
 
-Limits are **maximums**, not an invitation to maximize file count. Prefer **fewer modules** that each hold **related** functions (same feature flow, same subsystem, or the same public API surface) until a file nears the **200-line** cap or a **single function** nears **50 lines**, then split on a clear boundary.
+Limits are **maximums**, not an invitation to maximize file count. Prefer **fewer modules** that each hold **related** functions (same feature flow, same subsystem, or the same public API surface) until a file nears the **200-line** cap or a **single function** nears **100 lines**, then split on a clear boundary.
 
 - **Avoid** many **10–20 line** one-export files that only exist because each helper was split mechanically; that makes navigation and review harder without helping the linter.
 - **Split by logical batch**, not by mechanical one-function-per-file: a new file should represent a **coherent concern** (for example chord equality + default expansion + resolving an effective chord in one place) or a **real boundary** (test mock seam, circular import, or a deliberately small public API module). Naming files after single helpers at scale is a smell unless ESLint size limits require it.

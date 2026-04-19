@@ -18,7 +18,7 @@ Vue SFCs import from here when extracting **pure helpers**; see [vue-quasar.mdc]
 
 ## When to split a file
 
-**Hard limits** (ESLint; see [code-size-decomposition.mdc](code-size-decomposition.mdc)): each **`.ts` module under `src/scripts/`** must stay **≤200 lines** and each **function ≤50 lines** (tests follow the global exemption list; shared types live under **`types/`** and are exempt there).
+**Hard limits** (ESLint; see [code-size-decomposition.mdc](code-size-decomposition.mdc)): each **`.ts` module under `src/scripts/`** must stay **≤200 lines** and each **function ≤100 lines** (tests follow the global exemption list; shared types live under **`types/`** and are exempt there).
 
 When a file grows hard to scan or approaches those caps:
 
@@ -26,7 +26,7 @@ When a file grows hard to scan or approaches those caps:
 2. **Move reusable pure functions** into `_utilities/` with clear names.
 3. **Keep Electron/renderer boundaries clear** — code that assumes `window` or `faContentBridgeAPIs` belongs next to the feature that uses it, not in generic utilities unless already established.
 
-**Do not over-split:** many tiny files (each exporting one small helper) are harder to navigate than one domain module that stays **under the line cap**. Prefer **merging** related exports into the same file until **200 lines** or **50 lines per function** forces a real split; see [code-size-decomposition.mdc](code-size-decomposition.mdc) **Module count: prefer logical grouping**.
+**Do not over-split:** many tiny files (each exporting one small helper) are harder to navigate than one domain module that stays **under the line cap**. Prefer **merging** related exports into the same file until **200 lines** or **100 lines per function** forces a real split; see [code-size-decomposition.mdc](code-size-decomposition.mdc) **Module count: prefer logical grouping** and **Return object literals**.
 
 **Intentionally small modules are allowed** when there is a **documented** reason — for example a thin file that only holds **`faKeybindRunCommand`** so integration tests can **`vi.mock`** that module without mocking the whole keydown dispatcher, or breaking a **circular import**. Prefer solving the root cause (merge callers, invert a dependency) when that is cheap; when a thin file stays, add a brief file-top or export JSDoc note so future edits do not 'consolidate away' the seam by accident.
 

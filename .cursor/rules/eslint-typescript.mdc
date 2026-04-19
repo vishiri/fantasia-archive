@@ -26,7 +26,7 @@ In line comments, block comments, and JSDoc above APIs and tests: do not use Mar
 
 ## File and function size (ESLint)
 
-- **`eslint.config.mjs`** enforces **`max-lines`** and **`max-lines-per-function`** on production **`**/*.{ts,mts,cts,vue,js,mjs,cjs}`** with exemptions for tests, Storybook, configs, **`i18n/`**, **`types/`**, declarations, **`vitest/**/*.mts`**, **`.storybook-workspace/**`**, and **`scripts/**/*.mjs`**. Targets: **Vue ≤250**, **TS/JS module ≤200**, **function ≤50** (see [code-size-decomposition.mdc](code-size-decomposition.mdc) for intent and split strategy).
+- **`eslint.config.mjs`** enforces **`max-lines`** and **`max-lines-per-function`** on production **`**/*.{ts,mts,cts,vue,js,mjs,cjs}`** with exemptions for tests, Storybook, configs, **`i18n/`**, **`types/`**, declarations, **`vitest/**/*.mts`**, **`.storybook-workspace/**`**, and **`scripts/**/*.mjs`**. Targets: **Vue ≤250**, **TS/JS module ≤200**, **function ≤100** (see [code-size-decomposition.mdc](code-size-decomposition.mdc) for intent, split strategy, and **Return object literals** policy).
 
 ## Pre-commit / pre-changelog quality gate
 
