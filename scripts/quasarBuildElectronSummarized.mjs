@@ -11,6 +11,26 @@ import { fileURLToPath } from 'node:url'
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const logPath = path.join(root, 'test-results', 'quasar-build-electron-last.log')
+const distElectronPath = path.join(root, 'dist', 'electron')
+
+/**
+ * Quasar clears dist/electron with fs-extra removeSync; on Windows that can throw ENOTEMPTY when
+ * another process briefly holds a handle, leaving a half-deleted tree and a follow-on ENOENT
+ * under UnPackaged. Pre-remove with Node retries makes testbatch builds reliable.
+ */
+function removeDistElectronIfPresent () {
+  if (!fs.existsSync(distElectronPath)) {
+    return
+  }
+  fs.rmSync(distElectronPath, {
+    force: true,
+    maxRetries: 8,
+    recursive: true,
+    retryDelay: 250
+  })
+}
+
+removeDistElectronIfPresent()
 
 fs.mkdirSync(path.dirname(logPath), {
   recursive: true
