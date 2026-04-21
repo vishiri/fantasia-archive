@@ -21,13 +21,16 @@ import L_DialogActionMonitor from './dialogs/L_DialogActionMonitor'
 import L_markdownDocument from './dialogs/L_markdownDocument'
 import L_dialogKeybindSettings from './dialogs/L_dialogKeybindSettings'
 import L_programSettings from './dialogs/L_programSettings'
+import L_programStyling from './dialogs/L_programStyling'
 
 import L_faActionManager from './globalFunctionality/L_faActionManager'
 import L_faKeybinds from './globalFunctionality/L_faKeybinds'
+import L_faProgramStyling from './globalFunctionality/L_faProgramStyling'
 import L_faUserSettings from './globalFunctionality/L_faUserSettings'
 import L_spellChecker from './globalFunctionality/L_spellChecker'
 import L_unsortedAppTexts from './globalFunctionality/L_unsortedAppTexts'
 
+import L_mainLayout from './layouts/L_mainLayout'
 import L_ErrorNotFound from './pages/L_ErrorNotFound'
 
 export default {
@@ -43,13 +46,17 @@ export default {
   // PAGE - ERROR NOT FOUND
   errorNotFound: L_ErrorNotFound,
 
+  // LAYOUT - MAIN
+  mainLayout: L_mainLayout,
+
   // DIALOGS
   dialogs: {
     aboutFantasiaArchive: L_aboutFantasiaArchive,
     actionMonitor: L_DialogActionMonitor,
     keybindSettings: L_dialogKeybindSettings,
     markdownDocument: L_markdownDocument,
-    programSettings: L_programSettings
+    programSettings: L_programSettings,
+    programStyling: L_programStyling
   },
 
   // COMPONENT - GLOBAL LANGUAGE SELECTOR
@@ -76,6 +83,7 @@ export default {
   globalFunctionality: {
     faActionManager: L_faActionManager,
     faKeybinds: L_faKeybinds,
+    faProgramStyling: L_faProgramStyling,
     faUserSettings: L_faUserSettings,
     spellChecker: L_spellChecker,
     unsortedAppTexts: L_unsortedAppTexts

@@ -22,6 +22,10 @@ function buildToolsMenuData (): I_appMenuItem[] {
     faMenuItem('appControlMenus.tools.items.toggleTree', 'mdi-page-layout-sidebar-left'),
     faMenuItem('appControlMenus.tools.items.showNoteBoard', 'mdi-clipboard-text-outline'),
     faMenuSeparator(),
+    faMenuItem('appControlMenus.tools.items.programStyling', 'mdi-language-css3', {
+      keybindCommandId: 'openProgramStyling',
+      trigger: () => runFaAction('openProgramStylingDialog', undefined)
+    }),
     faMenuItem('appControlMenus.tools.items.keybindSettings', 'mdi-keyboard-settings', {
       keybindCommandId: 'openKeybindSettings',
       trigger: () => runFaAction('openKeybindSettingsDialog', undefined)

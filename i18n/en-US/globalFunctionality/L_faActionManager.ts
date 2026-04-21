@@ -13,11 +13,13 @@ export default {
     openKeybindSettingsDialog: 'Open Keybind settings',
     openLicenseDialog: 'Open License',
     openProgramSettingsDialog: 'Open Program settings',
+    openProgramStylingDialog: 'Open Custom program CSS',
     openTipsTricksTriviaDialog: 'Open Tips, Tricks & Trivia',
     refreshWebContentsAfterLanguage: 'Refresh window contents',
     resizeApp: 'Resize window',
     saveKeybindSettings: 'Save keybind settings',
     saveProgramSettings: 'Save program settings',
+    saveProgramStyling: 'Save custom program CSS',
     showStartupTipsNotification: 'Show startup tip notification',
     toggleDeveloperTools: 'Toggle developer tools'
   }

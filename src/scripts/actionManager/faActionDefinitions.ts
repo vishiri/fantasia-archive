@@ -14,11 +14,13 @@ import {
   handleOpenKeybindSettingsDialog,
   handleOpenLicenseDialog,
   handleOpenProgramSettingsDialog,
+  handleOpenProgramStylingDialog,
   handleOpenTipsTricksTriviaDialog,
   handleRefreshWebContents,
   handleResizeApp,
   handleSaveKeybindSettings,
   handleSaveProgramSettings,
+  handleSaveProgramStyling,
   handleShowStartupTipsNotification,
   handleToggleDeveloperTools
 } from './faActionDefinitionHandlers'
@@ -54,6 +56,17 @@ export const FA_ACTION_DEFINITIONS: ReadonlyArray<I_faActionDefinition<T_faActio
   {
     handler: handleSaveProgramSettings as I_faActionDefinition<T_faActionId>['handler'],
     id: 'saveProgramSettings',
+    kind: 'async'
+  },
+  {
+    dedup: true,
+    handler: handleOpenProgramStylingDialog as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'openProgramStylingDialog',
+    kind: 'async'
+  },
+  {
+    handler: handleSaveProgramStyling as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'saveProgramStyling',
     kind: 'async'
   },
   {

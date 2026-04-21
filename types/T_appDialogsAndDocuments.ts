@@ -1,7 +1,7 @@
 /**
  * In-app dialog ids used by the dialog store and routing helpers.
  */
-export type T_dialogName = 'AboutFantasiaArchive' | 'ActionMonitor' | 'KeybindSettings' | 'ProgramSettings' | ''
+export type T_dialogName = 'AboutFantasiaArchive' | 'ActionMonitor' | 'KeybindSettings' | 'ProgramSettings' | 'ProgramStyling' | ''
 
 /**
  * Named markdown-backed documents opened through DialogMarkdownDocument and related flows.

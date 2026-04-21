@@ -17,12 +17,16 @@ import L_DialogActionMonitor from './dialogs/L_DialogActionMonitor'
 import L_dialogKeybindSettings from './dialogs/L_dialogKeybindSettings'
 import L_markdownDocument from './dialogs/L_markdownDocument'
 import L_programSettings from './dialogs/L_programSettings'
+import L_programStyling from './dialogs/L_programStyling'
 import L_faActionManager from './globalFunctionality/L_faActionManager'
 import L_faKeybinds from './globalFunctionality/L_faKeybinds'
+import L_faProgramStyling from './globalFunctionality/L_faProgramStyling'
 import L_faUserSettings from './globalFunctionality/L_faUserSettings'
 import L_spellChecker from './globalFunctionality/L_spellChecker'
 
 import L_socialContactButtons from './components/other/SocialContactButtons/L_socialContactButtons'
+
+import L_mainLayout from './layouts/L_mainLayout'
 
 export default {
   // GLOBAL - DOCUMENTS
@@ -38,6 +42,9 @@ export default {
   app: {
     name: 'FA - en français !'
   },
+
+  // LAYOUT - MAIN
+  mainLayout: L_mainLayout,
 
   // PAGE - ERROR NOT FOUND
   ErrorNotFound: {
@@ -58,7 +65,8 @@ export default {
     actionMonitor: L_DialogActionMonitor,
     keybindSettings: L_dialogKeybindSettings,
     markdownDocument: L_markdownDocument,
-    programSettings: L_programSettings
+    programSettings: L_programSettings,
+    programStyling: L_programStyling
   },
 
   // DIALOGS (lowercase key path parity)
@@ -67,7 +75,8 @@ export default {
     actionMonitor: L_DialogActionMonitor,
     keybindSettings: L_dialogKeybindSettings,
     markdownDocument: L_markdownDocument,
-    programSettings: L_programSettings
+    programSettings: L_programSettings,
+    programStyling: L_programStyling
   },
 
   // COMPONENT - GLOBAL WINDOW BUTTONS
@@ -104,6 +113,7 @@ export default {
   globalFunctionality: {
     faActionManager: L_faActionManager,
     faKeybinds: L_faKeybinds,
+    faProgramStyling: L_faProgramStyling,
     faUserSettings: L_faUserSettings,
     spellChecker: L_spellChecker
   }

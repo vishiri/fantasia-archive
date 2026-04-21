@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import { afterEach, beforeEach, vi } from 'vitest'
 
 import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
+import { FA_PROGRAM_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/programStyling/faProgramStylingStoreDefaults'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 
 const originalConsoleWarn = console.warn.bind(console)
@@ -130,6 +131,10 @@ function resetFaVitestRendererHarness (): void {
         store: { ...FA_KEYBINDS_STORE_DEFAULTS }
       })),
       setKeybinds: vi.fn(async () => undefined)
+    },
+    faProgramStyling: {
+      getProgramStyling: vi.fn(async () => ({ ...FA_PROGRAM_STYLING_STORE_DEFAULTS })),
+      setProgramStyling: vi.fn(async () => undefined)
     }
   }
 }

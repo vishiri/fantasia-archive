@@ -20,7 +20,7 @@
         <q-item-label
           header
         >
-          Essential Links
+          {{ $t('mainLayout.drawer.essentialLinksHeader') }}
         </q-item-label>
       </q-list>
     </q-drawer>
@@ -37,18 +37,19 @@ import { onMounted, onUnmounted } from 'vue'
 import {
   createFaKeybindKeydownHandler,
   getFaKeybindKeydownContext
-} from 'src/scripts/keybinds/faKeybindsGlobalDispatch'
+} from 'app/src/scripts/keybinds/faKeybindsGlobalDispatch'
 import {
   applyFaI18nLocaleFromLanguageCode,
   isFaUserSettingsLanguageCode,
   isFantasiaStorybookCanvas
 } from 'app/src/scripts/appInternals/rendererAppInternals'
-import { S_FaKeybinds } from 'src/stores/S_FaKeybinds'
-import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
+import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
+import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
+import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 
-import AppControlMenus from 'components/globals/AppControlMenus/AppControlMenus.vue'
-import GlobalLanguageSelector from 'components/globals/GlobalLanguageSelector/GlobalLanguageSelector.vue'
-import GlobalWindowButtons from 'components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
+import AppControlMenus from 'app/src/components/globals/AppControlMenus/AppControlMenus.vue'
+import GlobalLanguageSelector from 'app/src/components/globals/GlobalLanguageSelector/GlobalLanguageSelector.vue'
+import GlobalWindowButtons from 'app/src/components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
 
 let faKeybindKeydownHandler: ((event: KeyboardEvent) => void) | undefined
 
@@ -77,6 +78,10 @@ onMounted(async () => {
     await faKeybindsStore.refreshKeybinds()
     faKeybindKeydownHandler = createFaKeybindKeydownHandler(getFaKeybindKeydownContext)
     window.addEventListener('keydown', faKeybindKeydownHandler, true)
+  }
+
+  if (window.faContentBridgeAPIs?.faProgramStyling !== undefined) {
+    await S_FaProgramStyling().refreshProgramStyling()
   }
 })
 

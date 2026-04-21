@@ -501,6 +501,7 @@ test('FA_KEYBIND_COMMAND_DEFINITIONS lists expected commands', () => {
     'openAdvancedSearchGuide',
     'openKeybindSettings',
     'openProgramSettings',
+    'openProgramStyling',
     'toggleDeveloperTools'
   ])
 })

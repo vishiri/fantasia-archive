@@ -7,6 +7,7 @@ export default {
     toggleTree: 'Hierarchische Baumansicht ein/aus',
     showNoteBoard: 'Notiztafel anzeigen',
     keybindSettings: 'Tastenkürzel-Einstellungen',
-    programSettings: 'Programmeinstellungen'
+    programSettings: 'Programmeinstellungen',
+    programStyling: 'Eigenes Programm-CSS'
   }
 }

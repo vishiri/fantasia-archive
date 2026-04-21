@@ -13,11 +13,13 @@ export default {
     openKeybindSettingsDialog: 'Tastenkürzel öffnen',
     openLicenseDialog: 'Lizenz öffnen',
     openProgramSettingsDialog: 'Programmeinstellungen öffnen',
+    openProgramStylingDialog: 'Eigenes Programm-CSS öffnen',
     openTipsTricksTriviaDialog: 'Tipps, Tricks & Kurioses öffnen',
     refreshWebContentsAfterLanguage: 'Fensterinhalt aktualisieren',
     resizeApp: 'Fenstergröße ändern',
     saveKeybindSettings: 'Tastenkürzel speichern',
     saveProgramSettings: 'Programmeinstellungen speichern',
+    saveProgramStyling: 'Eigenes Programm-CSS speichern',
     showStartupTipsNotification: 'Starthinweis anzeigen',
     toggleDeveloperTools: 'Entwicklerwerkzeuge ein/aus'
   }

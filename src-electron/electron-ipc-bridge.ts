@@ -24,6 +24,12 @@ export const FA_KEYBINDS_IPC = {
   setAsync: 'fa-keybinds-set-async'
 } as const
 
+/** User-defined custom CSS ('electron-store' in main): preload uses async 'ipcRenderer.invoke'; main uses 'ipcMain.handle'. */
+export const FA_PROGRAM_STYLING_IPC = {
+  getAsync: 'fa-program-styling-get-async',
+  setAsync: 'fa-program-styling-set-async'
+} as const
+
 /** Window chrome: preload uses 'ipcRenderer.invoke'; main uses 'ipcMain.handle'. */
 export const FA_WINDOW_CONTROL_IPC = {
   checkMaximizedAsync: 'fa-window-control-check-maximized-async',

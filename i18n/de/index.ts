@@ -8,17 +8,24 @@ import L_socialContactButtons from './components/other/SocialContactButtons/L_so
 import L_aboutFantasiaArchive from './dialogs/L_aboutFantasiaArchive'
 import L_DialogActionMonitor from './dialogs/L_DialogActionMonitor'
 import L_dialogKeybindSettings from './dialogs/L_dialogKeybindSettings'
+import L_programStyling from './dialogs/L_programStyling'
 
 import L_faActionManager from './globalFunctionality/L_faActionManager'
 import L_faKeybinds from './globalFunctionality/L_faKeybinds'
+import L_faProgramStyling from './globalFunctionality/L_faProgramStyling'
 import L_faUserSettings from './globalFunctionality/L_faUserSettings'
 import L_spellChecker from './globalFunctionality/L_spellChecker'
+
+import L_mainLayout from './layouts/L_mainLayout'
 
 export default {
   // GLOBAL - APP TEXTS
   app: {
     name: 'FA - but in german!'
   },
+
+  // LAYOUT - MAIN
+  mainLayout: L_mainLayout,
 
   // COMPONENT - APP CONTROL MENUS
   appControlMenus: {
@@ -32,7 +39,8 @@ export default {
   dialogs: {
     aboutFantasiaArchive: L_aboutFantasiaArchive,
     actionMonitor: L_DialogActionMonitor,
-    keybindSettings: L_dialogKeybindSettings
+    keybindSettings: L_dialogKeybindSettings,
+    programStyling: L_programStyling
   },
 
   // COMPONENT - GLOBAL LANGUAGE SELECTOR
@@ -58,6 +66,7 @@ export default {
   globalFunctionality: {
     faActionManager: L_faActionManager,
     faKeybinds: L_faKeybinds,
+    faProgramStyling: L_faProgramStyling,
     faUserSettings: L_faUserSettings,
     spellChecker: L_spellChecker
   }

@@ -6,6 +6,7 @@ export const FA_KEYBIND_COMMAND_IDS = [
   'openAdvancedSearchGuide',
   'openKeybindSettings',
   'openProgramSettings',
+  'openProgramStyling',
   'toggleDeveloperTools'
 ] as const
 

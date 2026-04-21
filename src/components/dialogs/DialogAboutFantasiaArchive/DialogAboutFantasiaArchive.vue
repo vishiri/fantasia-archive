@@ -9,7 +9,7 @@
       :class="['dialogComponent__wrapper', `${documentName}`]"
     >
       <!-- Dialog contents wrapper -->
-      <q-card-section :class="['dialogComponent__content', `${documentName}`, 'q-mt-xl', 'q-mb-lg', 'q-mr-lg', 'q-ml-xl', 'q-pt-none']">
+      <q-card-section :class="['dialogComponent__content', `${documentName}`, 'q-mt-xl', 'q-mb-lg', 'q-mr-lg', 'q-ml-xl', 'q-pt-none', 'hasScrollbar']">
         <h6 id="dialogAboutFantasiaArchive-title">
           {{ $t('dialogs.aboutFantasiaArchive.title') }}
         </h6>
@@ -22,8 +22,7 @@
           color="primary"
           horizontal
           dark
-          class="q-my-lg q-mx-auto"
-          style="width: 400px;"
+          class="dialogAboutFantasiaArchive__titleSeparator q-my-lg q-mx-auto"
         />
 
         <SocialContactButtons />
@@ -145,6 +144,10 @@ onMounted(() => {
     max-height: calc(100vh - #{$dialogAboutFantasiaArchive-content-maxHeightSubtract});
     overflow: auto;
     text-align: center;
+  }
+
+  .dialogAboutFantasiaArchive__titleSeparator {
+    width: $dialogAboutFantasiaArchive-titleSeparator-width;
   }
 }
 

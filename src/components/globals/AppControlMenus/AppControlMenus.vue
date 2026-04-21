@@ -49,6 +49,7 @@
     <DialogActionMonitor v-if="embedDialogs" />
     <DialogKeybindSettings v-if="embedDialogs" />
     <DialogProgramSettings v-if="embedDialogs" />
+    <DialogProgramStyling v-if="embedDialogs" />
   </div>
 </template>
 
@@ -72,6 +73,7 @@ import DialogAboutFantasiaArchive from 'app/src/components/dialogs/DialogAboutFa
 import DialogActionMonitor from 'app/src/components/dialogs/DialogActionMonitor/DialogActionMonitor.vue'
 import DialogKeybindSettings from 'app/src/components/dialogs/DialogKeybindSettings/DialogKeybindSettings.vue'
 import DialogProgramSettings from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.vue'
+import DialogProgramStyling from 'app/src/components/dialogs/DialogProgramStyling/DialogProgramStyling.vue'
 
 function readInitialTestingType (): string | false {
   const snap = window.faContentBridgeAPIs?.extraEnvVariables?.getCachedSnapshot?.()

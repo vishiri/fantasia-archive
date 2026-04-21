@@ -5,6 +5,7 @@ suppressChromiumDevtoolsAutofillStderrNoise()
 import { fixAppName } from 'app/src-electron/mainScripts/appIdentity/fixAppName'
 import { windowsDevToolsExtensionsFix } from 'app/src-electron/mainScripts/chromiumFixes/windowsDevToolsExtensionsFix'
 import { startApp, openAppWindowManager, closeAppManager } from 'app/src-electron/mainScripts/appManagement'
+import { setupFaAppProtocol } from 'app/src-electron/mainScripts/appProtocol/registerFaAppProtocol'
 import { tweakMenuRemover, tweakRetriveOS } from 'app/src-electron/mainScripts/nativeShell/tweaks'
 
 // Determines what platform the app is running on
@@ -16,6 +17,9 @@ fixAppName()
 
 // Fix Windows-only DevTools-bug concerning dark mode
 windowsDevToolsExtensionsFix(platform)
+
+// Privileged 'app://' scheme registration must happen before 'app.whenReady()' so the handler installed below works for the first BrowserWindow load. The handler itself is wired post-ready.
+setupFaAppProtocol()
 
 // Register all ipcMain handlers before any BrowserWindow loads; preload uses invoke for bridge APIs after load.
 startApp()

@@ -11,6 +11,7 @@ import L_DialogActionMonitor from 'app/i18n/en-US/dialogs/L_DialogActionMonitor'
 import L_dialogKeybindSettings from 'app/i18n/en-US/dialogs/L_dialogKeybindSettings'
 import L_markdownDocument from 'app/i18n/en-US/dialogs/L_markdownDocument'
 import L_programSettings from 'app/i18n/en-US/dialogs/L_programSettings'
+import L_programStyling from 'app/i18n/en-US/dialogs/L_programStyling'
 import L_faKeybinds from 'app/i18n/en-US/globalFunctionality/L_faKeybinds'
 import L_faUserSettings from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
 import L_unsortedAppTexts from 'app/i18n/en-US/globalFunctionality/L_unsortedAppTexts'
@@ -26,6 +27,11 @@ import type { T_i18nScenario } from 'app/types/I_storybookWorkspaceHarness'
  */
 const storybookExternalLoaderLocale = ref<string>('en-US')
 
+/**
+ * Curated en-US tree for Storybook preview + Pinia mocks. Keep **structural parity** with
+ * `i18n/en-US/index.ts` for every namespace stories use: adding a dialog or `globalFunctionality`
+ * module to the app registry without a matching entry here surfaces raw i18n keys in the canvas.
+ */
 const defaultMessages: Record<string, unknown> = {
   errorNotFound: L_ErrorNotFound,
   dialogs: {
@@ -33,7 +39,8 @@ const defaultMessages: Record<string, unknown> = {
     actionMonitor: L_DialogActionMonitor,
     keybindSettings: L_dialogKeybindSettings,
     markdownDocument: L_markdownDocument,
-    programSettings: L_programSettings
+    programSettings: L_programSettings,
+    programStyling: L_programStyling
   },
   globalLanguageSelector: L_GlobalLanguageSelector,
   globalWindowButtons: L_GlobalWindowButtons,

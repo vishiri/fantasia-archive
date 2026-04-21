@@ -7,6 +7,7 @@ export default {
     toggleTree: 'Basculer l\'arborescence hiérarchique',
     showNoteBoard: 'Afficher le tableau de notes',
     keybindSettings: 'Paramètres des raccourcis',
-    programSettings: 'Paramètres du programme'
+    programSettings: 'Paramètres du programme',
+    programStyling: 'CSS de programme personnalisé'
   }
 }

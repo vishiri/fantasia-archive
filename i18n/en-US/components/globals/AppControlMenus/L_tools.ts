@@ -7,6 +7,7 @@ export default {
     toggleTree: 'Toggle hierarchical tree',
     showNoteBoard: 'Show note board',
     keybindSettings: 'Keybind settings',
-    programSettings: 'Program settings'
+    programSettings: 'Program settings',
+    programStyling: 'Custom program CSS'
   }
 }

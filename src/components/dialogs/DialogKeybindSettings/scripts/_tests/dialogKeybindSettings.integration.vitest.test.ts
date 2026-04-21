@@ -88,6 +88,7 @@ test('buildDialogKeybindSettingsRows lists all command ids', () => {
     'openAdvancedSearchGuide',
     'openKeybindSettings',
     'openProgramSettings',
+    'openProgramStyling',
     'toggleDeveloperTools'
   ])
 })

@@ -81,7 +81,8 @@ async function loadAndWireMainWindow (win: BrowserWindow): Promise<void> {
   // Set the current window's menu as empty
   win.setMenu(null)
 
-  // Load the basic app URL (dev server) or packaged index.html
+  // Load the basic app URL (dev server) or packaged index.html via the privileged 'app://' scheme.
+  // Using 'app://' instead of 'file://' for packaged builds keeps web workers (Monaco editor.worker / css.worker, etc.) on a standard, secure origin.
   if (process.env.DEV) {
     const devUrl = process.env.APP_URL
     if (devUrl === undefined) {
@@ -89,7 +90,7 @@ async function loadAndWireMainWindow (win: BrowserWindow): Promise<void> {
     }
     await win.loadURL(devUrl)
   } else {
-    await win.loadFile('index.html')
+    await win.loadURL('app://./index.html')
   }
 
   // Open DevTools by default if the app is running in Dev mode or Production with debug enabled

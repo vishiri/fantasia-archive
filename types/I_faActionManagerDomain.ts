@@ -11,6 +11,8 @@ export const FA_ACTION_IDS = [
   'saveKeybindSettings',
   'openProgramSettingsDialog',
   'saveProgramSettings',
+  'openProgramStylingDialog',
+  'saveProgramStyling',
   'openAdvancedSearchGuideDialog',
   'openChangelogDialog',
   'openLicenseDialog',
@@ -47,6 +49,8 @@ export interface I_faActionPayloadMap {
   saveKeybindSettings: { overrides: I_faKeybindsRoot['overrides'] }
   openProgramSettingsDialog: void
   saveProgramSettings: { settings: I_faUserSettings }
+  openProgramStylingDialog: void
+  saveProgramStyling: { css: string }
   openAdvancedSearchGuideDialog: void
   openChangelogDialog: void
   openLicenseDialog: void

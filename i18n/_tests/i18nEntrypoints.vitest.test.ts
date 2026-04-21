@@ -16,10 +16,13 @@ test('locale registry exposes en-US, de, and fr', () => {
  * **externalFileLoader** exposes a vue-i18n instance for Pinia and non-boot scripts.
  */
 test('externalFileLoader exposes i18n global API', () => {
+  expect(i18n.global.t('mainLayout.drawer.essentialLinksHeader')).toBeTruthy()
   expect(i18n.global.t('dialogs.programSettings.title')).toBeTruthy()
   expect(i18n.global.t('dialogs.programSettings.settingsSearchPlaceholder')).toBeTruthy()
   expect(i18n.global.t('dialogs.programSettings.searchNoResultsTitle')).toBeTruthy()
   expect(i18n.global.t('dialogs.programSettings.searchNoResultsDescription')).toBeTruthy()
   expect(i18n.global.t('dialogs.keybindSettings.filterNoResultsTitle')).toBeTruthy()
   expect(i18n.global.t('dialogs.keybindSettings.filterNoResultsDescription')).toBeTruthy()
+  expect(i18n.global.t('dialogs.programStyling.title')).toBeTruthy()
+  expect(i18n.global.t('globalFunctionality.faProgramStyling.saveSuccess')).toBeTruthy()
 })

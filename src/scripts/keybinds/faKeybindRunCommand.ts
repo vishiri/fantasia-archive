@@ -11,6 +11,7 @@ const FA_KEYBIND_COMMAND_TO_ACTION_ID: Readonly<Record<T_faKeybindCommandId, T_f
   openAdvancedSearchGuide: 'openAdvancedSearchGuideDialog',
   openKeybindSettings: 'openKeybindSettingsDialog',
   openProgramSettings: 'openProgramSettingsDialog',
+  openProgramStyling: 'openProgramStylingDialog',
   toggleDeveloperTools: 'toggleDeveloperTools'
 }
 

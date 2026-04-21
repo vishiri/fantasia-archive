@@ -24,6 +24,7 @@ export default {
     openAdvancedSearchGuide: 'Leitfaden zur erweiterten Suche öffnen',
     openKeybindSettings: 'Tastenkürzel-Einstellungen öffnen',
     openProgramSettings: 'Programmeinstellungen öffnen',
+    openProgramStyling: 'Eigenes Programm-CSS öffnen',
     toggleDeveloperTools: 'Entwicklerwerkzeuge ein/aus'
   },
   filterNoResultsDescription:

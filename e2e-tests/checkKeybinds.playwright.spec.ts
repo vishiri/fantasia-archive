@@ -16,6 +16,7 @@ import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers
 import actionMonitorMessages from 'app/i18n/en-US/dialogs/L_DialogActionMonitor'
 import keybindDialogMessages from 'app/i18n/en-US/dialogs/L_dialogKeybindSettings'
 import programSettingsMessages from 'app/i18n/en-US/dialogs/L_programSettings'
+import programStylingMessages from 'app/i18n/en-US/dialogs/L_programStyling'
 
 /**
  * Extra env settings to trigger E2E testing via Playwright
@@ -49,6 +50,8 @@ const selectorList = {
   dialogMarkdownDocumentClose: 'dialogMarkdownDocument-button-close',
   dialogProgramSettingsClose: 'dialogProgramSettings-button-close',
   dialogProgramSettingsTitle: 'dialogProgramSettings-title',
+  dialogProgramStylingClose: 'dialogProgramStyling-button-close',
+  dialogProgramStylingTitle: 'dialogProgramStyling-title',
   keybindCaptureCard: 'dialogKeybindSettings-capture-card',
   keybindCaptureClear: 'dialogKeybindSettings-capture-clear',
   keybindCaptureField: 'dialogKeybindSettings-capture-qfield',
@@ -63,7 +66,8 @@ const selectorList = {
 const defaultChord = {
   openAdvancedSearchGuide: 'Control+Alt+Shift+G',
   openKeybindSettings: 'ControlOrMeta+Alt+Shift+k',
-  openProgramSettings: 'ControlOrMeta+Alt+Shift+l'
+  openProgramSettings: 'ControlOrMeta+Alt+Shift+l',
+  openProgramStyling: 'ControlOrMeta+Alt+Shift+j'
 } as const
 
 /**
@@ -74,6 +78,7 @@ const adjustedChord = {
   openAdvancedSearchGuide: 'Control+Alt+Shift+F9',
   openKeybindSettings: 'Control+Alt+Shift+F10',
   openProgramSettings: 'Control+Alt+Shift+F11',
+  openProgramStyling: 'Control+Alt+Shift+F7',
   toggleDeveloperTools: 'Control+Alt+Shift+F12'
 } as const
 
@@ -205,6 +210,17 @@ async function closeProgramSettingsDialog (page: Page): Promise<void> {
   })
 }
 
+/**
+ * Custom program CSS dialog is persistent: only the explicit Close without saving button dismisses it.
+ */
+async function closeProgramStylingDialog (page: Page): Promise<void> {
+  await page.locator(`[data-test-locator="${selectorList.dialogProgramStylingClose}"]`).click()
+  const title = page.locator(`[data-test-locator="${selectorList.dialogProgramStylingTitle}"]`)
+  await expect(title).toBeHidden({
+    timeout: 15_000
+  })
+}
+
 function locatorMarkdownAdvancedSearchGuideDialog (page: Page): Locator {
   return page.locator('.q-dialog.dialogMarkdownDocument.advancedSearchGuide')
 }
@@ -246,6 +262,7 @@ test.describe.serial('Global keybinds end-to-end', () => {
   test('Keybind defaults, custom chords, clear override, and default restore', async () => {
     const keybindTitle = appWindow.locator(`[data-test-locator="${selectorList.dialogKeybindSettingsTitle}"]`)
     const programTitle = appWindow.locator(`[data-test-locator="${selectorList.dialogProgramSettingsTitle}"]`)
+    const programStylingTitle = appWindow.locator(`[data-test-locator="${selectorList.dialogProgramStylingTitle}"]`)
 
     await expect(
       appWindow.locator('.appHeader'),
@@ -273,6 +290,15 @@ test.describe.serial('Global keybinds end-to-end', () => {
       await expect(programTitle).toBeVisible()
       await expect(programTitle).toHaveText(programSettingsMessages.title)
       await closeProgramSettingsDialog(appWindow)
+    })
+
+    await test.step('Default custom program CSS opens then closes', async () => {
+      await triggerGlobalShortcut(appWindow, defaultChord.openProgramStyling)
+      await expect(programStylingTitle).toBeVisible({
+        timeout: 15_000
+      })
+      await expect(programStylingTitle).toHaveText(programStylingMessages.title)
+      await closeProgramStylingDialog(appWindow)
     })
 
     await test.step('Default advanced search guide opens then closes', async () => {
@@ -313,6 +339,12 @@ test.describe.serial('Global keybinds end-to-end', () => {
       )
       await captureChordForFilteredCommand(
         appWindow,
+        'custom program css',
+        keybindDialogMessages.commands.openProgramStyling,
+        adjustedChord.openProgramStyling
+      )
+      await captureChordForFilteredCommand(
+        appWindow,
         'keybind settings',
         keybindDialogMessages.commands.openKeybindSettings,
         adjustedChord.openKeybindSettings
@@ -334,6 +366,14 @@ test.describe.serial('Global keybinds end-to-end', () => {
       await triggerGlobalShortcut(appWindow, adjustedChord.openProgramSettings)
       await expect(programTitle).toBeVisible()
       await closeProgramSettingsDialog(appWindow)
+    })
+
+    await test.step('Adjusted custom program CSS opens then closes', async () => {
+      await triggerGlobalShortcut(appWindow, adjustedChord.openProgramStyling)
+      await expect(programStylingTitle).toBeVisible({
+        timeout: 15_000
+      })
+      await closeProgramStylingDialog(appWindow)
     })
 
     await test.step('Adjusted advanced search guide opens then closes', async () => {

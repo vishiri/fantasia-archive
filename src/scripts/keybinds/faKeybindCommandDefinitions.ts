@@ -41,6 +41,20 @@ export const FA_KEYBIND_COMMAND_DEFINITIONS: I_faKeybindCommandDefinition[] = [
   },
   {
     defaultChord: {
+      code: 'KeyJ',
+      mods: [
+        'alt',
+        'primary',
+        'shift'
+      ]
+    },
+    editable: true,
+    firesInEditableFields: true,
+    id: 'openProgramStyling',
+    messageKey: 'dialogs.keybindSettings.commands.openProgramStyling'
+  },
+  {
+    defaultChord: {
       code: 'F11',
       mods: ['primary']
     },

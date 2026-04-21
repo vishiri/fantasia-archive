@@ -6,6 +6,7 @@ import type {
   I_faWindowControlAPI
 } from 'app/types/I_faElectronRendererBridgeAPIs'
 import type { I_faKeybindsAPI } from 'app/types/I_faKeybindsDomain'
+import type { I_faProgramStylingAPI } from 'app/types/I_faProgramStylingDomain'
 import type { I_faUserSettingsAPI } from 'app/types/I_faUserSettingsDomain'
 
 declare global{
@@ -17,6 +18,7 @@ declare global{
       extraEnvVariables: I_extraEnvVariablesBridge
       appDetails: I_appDetailsAPI
       faKeybinds: I_faKeybindsAPI
+      faProgramStyling: I_faProgramStylingAPI
       faUserSettings: I_faUserSettingsAPI
     }
   }

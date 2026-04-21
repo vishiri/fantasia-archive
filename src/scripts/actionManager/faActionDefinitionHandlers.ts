@@ -1,4 +1,5 @@
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
+import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import {
   openDialogComponent,
@@ -29,6 +30,13 @@ export async function handleSaveKeybindSettings (payload: { overrides: import('a
 
 export async function handleSaveProgramSettings (payload: { settings: import('app/types/I_faUserSettingsDomain').I_faUserSettings }): Promise<void> {
   await S_FaUserSettings().updateSettings(payload.settings)
+}
+
+export async function handleSaveProgramStyling (payload: { css: string }): Promise<void> {
+  const ok = await S_FaProgramStyling().updateProgramStyling({ css: payload.css })
+  if (!ok) {
+    throw new Error('Failed to save program styling.')
+  }
 }
 
 export async function handleLanguageSwitch (
@@ -85,6 +93,10 @@ export async function handleOpenKeybindSettingsDialog (): Promise<void> {
 
 export async function handleOpenProgramSettingsDialog (): Promise<void> {
   openDialogComponent('ProgramSettings')
+}
+
+export async function handleOpenProgramStylingDialog (): Promise<void> {
+  openDialogComponent('ProgramStyling')
 }
 
 export async function handleOpenAdvancedSearchGuideDialog (): Promise<void> {

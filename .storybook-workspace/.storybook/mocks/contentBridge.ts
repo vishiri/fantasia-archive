@@ -1,4 +1,5 @@
 import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
+import { FA_PROGRAM_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/programStyling/faProgramStylingStoreDefaults'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 
 import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
@@ -68,6 +69,10 @@ const baseBridge = () => ({
       store: { ...FA_KEYBINDS_STORE_DEFAULTS }
     }),
     setKeybinds: async () => undefined
+  },
+  faProgramStyling: {
+    getProgramStyling: async () => ({ ...FA_PROGRAM_STYLING_STORE_DEFAULTS }),
+    setProgramStyling: async () => undefined
   }
 })
 
@@ -121,6 +126,10 @@ export const setContentBridgeScenario = (
     faKeybinds: {
       ...nextBridge.faKeybinds,
       ...(overrides.faKeybinds ?? {})
+    },
+    faProgramStyling: {
+      ...nextBridge.faProgramStyling,
+      ...(overrides.faProgramStyling ?? {})
     }
   }
 }

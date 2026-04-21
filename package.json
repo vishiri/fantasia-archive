@@ -42,6 +42,7 @@
     "testbatch:verify": "yarn lint:eslint && yarn lint:typescript && yarn lint:stylelint && yarn test:coverage:verify",
     "testbatch:ensure:change": "yarn testbatch:verify && yarn quasar:build:electron:summarized && yarn test:components && yarn test:e2e && yarn test:storybook:smoke && yarn test:storybook:visual:update",
     "testbatch:ensure:nochange": "yarn testbatch:verify && yarn quasar:build:electron:summarized && yarn test:components && yarn test:e2e && yarn test:storybook:smoke && yarn test:storybook:visual",
+    "audit:policy": "node scripts/policyComplianceAudit.mjs",
     "prepare": "husky"
   },
   "dependencies": {
@@ -52,13 +53,14 @@
     "better-sqlite3": "^12.8.0",
     "electron-store": "^11.0.2",
     "lodash-es": "^4.18.1",
+    "monaco-editor": "^0.55.1",
     "pinia": "^3.0.4",
     "quasar": "^2.16.0",
     "uuid": "^13.0.0",
     "vue": "^3.5.32",
-    "zod": "^3.24.0",
     "vue-i18n": "^11",
-    "vue-router": "^5.0.4"
+    "vue-router": "^5.0.4",
+    "zod": "^3.24.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",

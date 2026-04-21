@@ -7,7 +7,7 @@
   >
     <q-card>
       <!-- Dialog contents wrapper -->
-      <q-card-section :class="['dialogMarkdownDocument__content', `${documentName}`, 'q-mt-xl', 'q-mb-lg', 'q-mr-lg', 'q-ml-xl', 'q-pt-none']">
+      <q-card-section :class="['dialogMarkdownDocument__content', `${documentName}`, 'q-mt-xl', 'q-mb-lg', 'q-mr-lg', 'q-ml-xl', 'q-pt-none', 'hasScrollbar']">
         <div
           class="flex justify-center"
           data-test-locator="dialogMarkdownDocument-markdown-wrapper"

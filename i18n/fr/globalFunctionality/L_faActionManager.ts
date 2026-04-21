@@ -13,11 +13,13 @@ export default {
     openKeybindSettingsDialog: 'Ouvrir les raccourcis clavier',
     openLicenseDialog: 'Ouvrir la licence',
     openProgramSettingsDialog: 'Ouvrir les paramètres du programme',
+    openProgramStylingDialog: 'Ouvrir le CSS de programme personnalisé',
     openTipsTricksTriviaDialog: 'Ouvrir Astuces, Conseils & Anecdotes',
     refreshWebContentsAfterLanguage: 'Rafraîchir le contenu de la fenêtre',
     resizeApp: 'Redimensionner la fenêtre',
     saveKeybindSettings: 'Enregistrer les raccourcis clavier',
     saveProgramSettings: 'Enregistrer les paramètres du programme',
+    saveProgramStyling: 'Enregistrer le CSS de programme personnalisé',
     showStartupTipsNotification: 'Afficher l\'astuce au démarrage',
     toggleDeveloperTools: 'Basculer les outils de développement'
   }

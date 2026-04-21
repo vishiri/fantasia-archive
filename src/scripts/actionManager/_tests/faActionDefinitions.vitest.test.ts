@@ -15,6 +15,7 @@ const {
   tipsNotificationMock,
   toggleDevToolsMock,
   updateKeybindsMock,
+  updateProgramStylingMock,
   updateSettingsMock
 } = vi.hoisted(() => ({
   applyLanguageMock: vi.fn(async () => true),
@@ -28,6 +29,7 @@ const {
   tipsNotificationMock: vi.fn(),
   toggleDevToolsMock: vi.fn(),
   updateKeybindsMock: vi.fn(async () => true),
+  updateProgramStylingMock: vi.fn(async () => true),
   updateSettingsMock: vi.fn(async () => undefined)
 }))
 
@@ -41,6 +43,10 @@ vi.mock('app/i18n/externalFileLoader', () => ({
 
 vi.mock('app/src/stores/S_FaKeybinds', () => ({
   S_FaKeybinds: () => ({ updateKeybinds: updateKeybindsMock })
+}))
+
+vi.mock('app/src/stores/S_FaProgramStyling', () => ({
+  S_FaProgramStyling: () => ({ updateProgramStyling: updateProgramStylingMock })
 }))
 
 vi.mock('app/src/stores/S_FaUserSettings', () => ({
@@ -81,6 +87,8 @@ beforeEach(() => {
   toggleDevToolsMock.mockReset()
   updateKeybindsMock.mockReset()
   updateKeybindsMock.mockImplementation(async () => true)
+  updateProgramStylingMock.mockReset()
+  updateProgramStylingMock.mockImplementation(async () => true)
   updateSettingsMock.mockReset()
   updateSettingsMock.mockImplementation(async () => undefined)
   Object.assign(window, {
@@ -157,6 +165,29 @@ test('Test that openKeybindSettingsDialog handler opens the KeybindSettings dial
 test('Test that openProgramSettingsDialog handler opens the ProgramSettings dialog', () => {
   definitionFor('openProgramSettingsDialog').handler(undefined)
   expect(openDialogComponentMock).toHaveBeenCalledWith('ProgramSettings')
+})
+
+test('Test that openProgramStylingDialog handler opens the ProgramStyling dialog', () => {
+  definitionFor('openProgramStylingDialog').handler(undefined)
+  expect(openDialogComponentMock).toHaveBeenCalledWith('ProgramStyling')
+})
+
+/**
+ * Handlers — saveProgramStyling forwards the css patch and resolves on success.
+ */
+test('Test that saveProgramStyling handler forwards css to updateProgramStyling on success', async () => {
+  await (definitionFor('saveProgramStyling').handler({ css: '.theme { color: black; }' }) as Promise<unknown>)
+  expect(updateProgramStylingMock).toHaveBeenCalledWith({ css: '.theme { color: black; }' })
+})
+
+/**
+ * Handlers — saveProgramStyling throws when the store reports a non-truthy result so the action manager surfaces it.
+ */
+test('Test that saveProgramStyling handler throws when updateProgramStyling returns false', async () => {
+  updateProgramStylingMock.mockResolvedValueOnce(false)
+  await expect(
+    (definitionFor('saveProgramStyling').handler({ css: 'broken' }) as Promise<unknown>)
+  ).rejects.toThrow(/Failed to save program styling/)
 })
 
 test('Test that openAdvancedSearchGuideDialog handler opens the advancedSearchGuide markdown document', () => {

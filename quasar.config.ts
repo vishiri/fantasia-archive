@@ -83,6 +83,24 @@ export default defineConfig((ctx) => {
       ],
 
       extendViteConf (viteConf) {
+        // Pre-bundle the Monaco submodules used by 'DialogProgramStyling' so the dev server's
+        // dependency optimizer does not discover them on first dialog open and trigger a full
+        // page reload. These are the bare-spec ESM imports from
+        // 'src/components/dialogs/DialogProgramStyling/scripts/cssMonaco.ts'. The matching
+        // '?worker' chunks are deliberately excluded: Vite's worker plugin handles those on a
+        // separate path and listing them here would break worker resolution. In production
+        // ('quasar build') this list is harmless because Rollup/Rolldown pre-bundles everything
+        // ahead of time, so we apply it in both dev and prod for a single source of truth.
+        viteConf.optimizeDeps ??= {}
+        const existingOptimizeInclude = viteConf.optimizeDeps.include ?? []
+        viteConf.optimizeDeps.include = [
+          ...existingOptimizeInclude,
+          'monaco-editor/esm/vs/editor/editor.all.js',
+          'monaco-editor/esm/vs/language/css/monaco.contribution.js',
+          'monaco-editor/esm/vs/basic-languages/css/css.contribution.js',
+          'monaco-editor/esm/vs/editor/editor.api.js'
+        ]
+
         if (ctx.dev) {
           return
         }

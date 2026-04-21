@@ -307,9 +307,9 @@ test('Test that main window creation throws when DEV is set but APP_URL is missi
 
 /**
  * mainWindowCreation
- * Production build loads index.html from the packaged app.
+ * Production build loads index.html through the privileged 'app://' scheme so web workers (Monaco) load from a standard origin instead of 'file://'.
  */
-test('Test that production window uses loadFile for index.html', async () => {
+test('Test that production window uses the app:// scheme for index.html', async () => {
   const browserWindowInstance = {
     webContents: {
       openDevTools: vi.fn()
@@ -333,8 +333,8 @@ test('Test that production window uses loadFile for index.html', async () => {
 
   await mainWindowCreation()
 
-  expect(browserWindowInstance.loadFile).toHaveBeenCalledWith('index.html')
-  expect(browserWindowInstance.loadURL).not.toHaveBeenCalled()
+  expect(browserWindowInstance.loadURL).toHaveBeenCalledWith('app://./index.html')
+  expect(browserWindowInstance.loadFile).not.toHaveBeenCalled()
 })
 
 /**
