@@ -4,7 +4,8 @@ description: >-
   Maintains the English in-app changelog at i18n/en-US/documents/changeLog.md
   in strict sync with package.json version, without any automatic version
   bumping. Changelog text must be user- or release-relevant only—never
-  internal QA (lint/build/test runs, “all gates passed”). Use after substantive
+  internal QA, Git meta (commits/pushes), or “updated changelog”. Prefer editing
+  the log in the same commit as the work, before push. Use after substantive
   app, UX, or user-facing docs changes, or when the user asks for release notes.
 ---
 
@@ -34,16 +35,22 @@ The English changelog is shown **in the app** to end users. **Do not** add bulle
 
 - Re-running `yarn testbatch:verify`, `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, `yarn quasar:build:electron`, `yarn test:components`, `yarn test:e2e`, `yarn testbatch:ensure:nochange`, `yarn testbatch:ensure:change`, `yarn test:storybook:smoke`, or `yarn test:storybook:visual` / **`:update`**
 - Phrases like “revalidated the pipeline”, “all tests passed”, “Playwright/E2E/component suite green”, “full quality gates”, or “packaging succeeded after QA”
+- Git or housekeeping meta: “committed”, “pushed”, “split into multiple commits”, “updated the changelog”, or any line whose purpose is to describe the merge/commit process rather than product change
 
 Those steps may be **required before** you edit the changelog (see repo rules), but they are **not** changelog content. Put verification detail in commit messages or PR descriptions instead.
 
 When you **do** document a dependency refresh, describe **what** was refreshed (ranges, notable packages), not the full test matrix you ran afterward.
 
+## Changelog timing vs Git
+
+- **Default**: Update `changeLog.md` in the **same working tree** as the feature/fix/docs work and include it in the **same commit** when practical. Finish changelog text **before** `git commit` and **before** `git push` when you push that batch right away.
+- **Avoid**: A trailing **changelog-only** commit after substantive commits or after a push—it creates extra history and was a recurring source of noise. Use a changelog-only commit only for rare fixes (wrong heading, typo) per [testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc).
+
 ## Pre-changelog workflow gate (required)
 
 Before editing `changeLog.md` for new work, keep this order ([`testing-terminal-isolation.mdc`](../../rules/testing-terminal-isolation.mdc)):
 
-1. Run the **quality gate** in one terminal: `yarn testbatch:verify` (run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, or `yarn test:coverage:verify` / per-slice `yarn test:coverage:*` scripts individually only while debugging a failure). Layered Vitest coverage rules: [vitest-tests.mdc](../../rules/vitest-tests.mdc). **Follow-up commit that touches only** **`i18n/*/documents/changeLog.md`**: you may **skip** re-running **`yarn testbatch:verify`** if it **already passed** after the substantive edits and the working tree is otherwise unchanged; if **uncertain**, run the gate anyway.
+1. Run the **quality gate** in one terminal: `yarn testbatch:verify` (run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, or `yarn test:coverage:verify` / per-slice `yarn test:coverage:*` scripts individually only while debugging a failure). Layered Vitest coverage rules: [vitest-tests.mdc](../../rules/vitest-tests.mdc). **Exceptional follow-up** that touches **only** **`i18n/*/documents/changeLog.md`**: you may **skip** re-running **`yarn testbatch:verify`** if it **already passed** after the substantive edits and the working tree is otherwise unchanged; prefer folding changelog into the feature commit instead; if **uncertain**, run the gate anyway.
 2. For affected user-facing **`src/components/**`**, verify Storybook updates are complete (`_tests/*.stories.ts`, relevant mocks/placeholders) and Storybook starts cleanly (**`yarn storybook:run`**). Layout/page Storybook previews do not require Docs/autodocs ([`storybook-stories.mdc`](../../rules/storybook-stories.mdc)). **Skip** when you are only adjusting **`documents/changeLog.md`** files after prior verified work, as in step 1.
 3. Then draft/update changelog entries.
 
@@ -104,7 +111,7 @@ Append bullets under the right `###` subsection only if that category has real i
 
 ## Related
 
-- Commit messages: [git-conventional-commits](../git-conventional-commits/SKILL.md) (e.g. `docs:` for changelog-only edits).
+- Commit messages: [git-conventional-commits](../git-conventional-commits/SKILL.md) (e.g. `docs:` only for rare changelog-only repair commits; prefer `feat`/`fix`/… plus changelog in one commit).
 - Product tone: [fantasia-worldbuilding-domain](../fantasia-worldbuilding-domain/SKILL.md).
 
 ## TypeScript interfaces and types (`types/`)

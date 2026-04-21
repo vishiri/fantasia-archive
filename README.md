@@ -199,6 +199,8 @@ Track story depth manually to prioritize upgrades:
 
 Review this table against `src/components/**` stories each iteration and move highest-risk user-facing components toward at least **Quality** coverage.
 
+**Subcomponents (P1):** small partial UIs that exist only to compose a parent dialog (for example settings columns, keybind capture fields, or category panels) may rely on **the parent feature’s** Storybook story and parent/component tests only—separate `*.stories.ts` per sub-file is optional until that surface needs isolated review.
+
 #### Storybook visual baseline policy
 
 - Storybook **static build** output and **Playwright** visual config live in [`.storybook-workspace/`](.storybook-workspace/): `storybook-static/` (from `yarn storybook:build`) and [`playwright.storybook-visual.config.ts`](.storybook-workspace/playwright.storybook-visual.config.ts). Root `yarn test:storybook:visual*` runs the build then delegates to `yarn --cwd .storybook-workspace test:storybook:visual*`. Set **`FA_STORYBOOK_VISUAL_VERBOSE=1`** if you need per-story **`[storybook-visual]`** progress lines in the terminal (default is quiet aside from warnings/errors).

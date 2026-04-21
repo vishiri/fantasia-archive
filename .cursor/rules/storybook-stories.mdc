@@ -15,6 +15,7 @@ alwaysApply: false
 - Do **not** create stories that only validate or force `window.faContentBridgeAPIs.extraEnvVariables.TEST_ENV === 'components'`.
 - Do **not** set Storybook-only `contentBridgeOverrides.extraEnvVariables.TEST_ENV = 'components'` as a story scenario.
 - Keep `TEST_ENV` branch validation in Playwright/Vitest/component-test harnesses, not Storybook docs/stories.
+- **i18n**: Preview injects messages from [`.storybook-workspace/.storybook/mocks/externalFileLoader.ts`](../../.storybook-workspace/.storybook/mocks/externalFileLoader.ts) (`defaultMessages`), not from `i18n/en-US/index.ts`. When you add or wire a new `L_*` module in `i18n/en-US/index.ts` for UI that appears in Storybook, mirror that module under the same nested path in `defaultMessages` (import the `L_*` file, assign `dialogs.newDialog`, `globalFunctionality.newFeature`, etc.). Otherwise stories show raw `$t` key paths while the app translates correctly.
 
 ## TypeScript interfaces and types (`types/`)
 
