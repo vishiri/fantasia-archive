@@ -1,6 +1,7 @@
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
+import type { I_faActionPayloadMap } from 'app/types/I_faActionManagerDomain'
 import {
   openDialogComponent,
   openDialogMarkdownDocument
@@ -95,8 +96,8 @@ export async function handleOpenProgramSettingsDialog (): Promise<void> {
   openDialogComponent('ProgramSettings')
 }
 
-export async function handleOpenProgramStylingDialog (): Promise<void> {
-  openDialogComponent('ProgramStyling')
+export async function handleOpenProgramStylingWindow (): Promise<void> {
+  openDialogComponent('WindowProgramStyling')
 }
 
 export async function handleOpenAdvancedSearchGuideDialog (): Promise<void> {
@@ -121,6 +122,46 @@ export async function handleOpenTipsTricksTriviaDialog (): Promise<void> {
 
 export async function handleOpenActionMonitorDialog (): Promise<void> {
   openDialogComponent('ActionMonitor')
+}
+
+export async function handleOpenImportExportProgramConfigDialog (): Promise<void> {
+  openDialogComponent('ImportExportProgramConfig')
+}
+
+export async function handleExportProgramConfigPackage (
+  _payload: I_faActionPayloadMap['exportProgramConfigPackage']
+): Promise<void> {
+}
+
+export async function handleExportProgramConfigSaveResult (
+  payload: I_faActionPayloadMap['exportProgramConfigSaveResult']
+): Promise<void> {
+  if (payload.status === 'error') {
+    throw new Error(payload.errorMessage ?? payload.errorName ?? 'Export to file failed')
+  }
+}
+
+export async function handleImportProgramConfigStageResult (
+  payload: I_faActionPayloadMap['importProgramConfigStageResult']
+): Promise<void> {
+  if (payload.status === 'fail') {
+    throw new Error(payload.errorMessage ?? 'Import validation failed')
+  }
+}
+
+export async function handleImportProgramConfigApply (
+  payload: I_faActionPayloadMap['importProgramConfigApply']
+): Promise<void> {
+  const api = window.faContentBridgeAPIs?.faProgramConfig
+  if (api === undefined) {
+    throw new Error('Program configuration is only available in the desktop app.')
+  }
+  await api.applyImport(payload)
+  await Promise.all([
+    S_FaUserSettings().refreshSettings(),
+    S_FaKeybinds().refreshKeybinds(),
+    S_FaProgramStyling().refreshProgramStyling()
+  ])
 }
 
 export async function handleShowStartupTipsNotification (): Promise<void> {

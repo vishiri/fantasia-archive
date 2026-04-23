@@ -13,7 +13,7 @@ export default {
     openKeybindSettingsDialog: 'Open Keybind settings',
     openLicenseDialog: 'Open License',
     openProgramSettingsDialog: 'Open Program settings',
-    openProgramStylingDialog: 'Open Custom program CSS',
+    openProgramStylingWindow: 'Open Custom program CSS',
     openTipsTricksTriviaDialog: 'Open Tips, Tricks & Trivia',
     refreshWebContentsAfterLanguage: 'Refresh window contents',
     resizeApp: 'Resize window',

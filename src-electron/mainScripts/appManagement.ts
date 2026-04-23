@@ -4,6 +4,7 @@ import { registerFaDevToolsIpc } from 'app/src-electron/mainScripts/ipcManagemen
 import { registerFaExtraEnvIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaExtraEnvIpc'
 import { registerFaExternalLinksIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaExternalLinksIpc'
 import { registerFaKeybindsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaKeybindsIpc'
+import { registerFaProgramConfigIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProgramConfigIpc'
 import { registerFaProgramStylingIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProgramStylingIpc'
 import { registerFaUserSettingsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaUserSettingsIpc'
 import { registerFaWindowControlIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
@@ -18,6 +19,7 @@ export const startApp = () => {
   registerFaExtraEnvIpc()
   registerFaExternalLinksIpc()
   registerFaKeybindsIpc()
+  registerFaProgramConfigIpc()
   registerFaProgramStylingIpc()
   registerFaUserSettingsIpc()
   registerFaWindowControlIpc()

@@ -1,11 +1,26 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
 
 import { buildHelpInfoMenu } from '../_data/helpInfo'
 import { buildToolsMenu } from '../_data/tools'
 import AppControlMenus from '../AppControlMenus.vue'
+
+/**
+ * WindowProgramStyling uses FaFloatingWindowBodyTeleport to '#q-app'; Vitest jsdom has no Quasar root until we add it.
+ */
+beforeEach(() => {
+  if (document.getElementById('q-app') === null) {
+    const root = document.createElement('div')
+    root.id = 'q-app'
+    document.body.appendChild(root)
+  }
+})
+
+afterEach(() => {
+  document.getElementById('q-app')?.remove()
+})
 
 /**
  * helpInfo and tools menu data

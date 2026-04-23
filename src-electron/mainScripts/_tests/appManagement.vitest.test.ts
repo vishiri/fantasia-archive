@@ -9,6 +9,7 @@ const {
   registerFaExtraEnvIpcMock,
   registerFaExternalLinksIpcMock,
   registerFaKeybindsIpcMock,
+  registerFaProgramConfigIpcMock,
   registerFaProgramStylingIpcMock,
   registerFaUserSettingsIpcMock,
   registerFaWindowControlIpcMock,
@@ -24,6 +25,7 @@ const {
     registerFaExtraEnvIpcMock: vi.fn(),
     registerFaExternalLinksIpcMock: vi.fn(),
     registerFaKeybindsIpcMock: vi.fn(),
+    registerFaProgramConfigIpcMock: vi.fn(),
     registerFaProgramStylingIpcMock: vi.fn(),
     registerFaUserSettingsIpcMock: vi.fn(),
     registerFaWindowControlIpcMock: vi.fn(),
@@ -65,6 +67,12 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaExternalLinksIpc',
 vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaKeybindsIpc', () => {
   return {
     registerFaKeybindsIpc: registerFaKeybindsIpcMock
+  }
+})
+
+vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaProgramConfigIpc', () => {
+  return {
+    registerFaProgramConfigIpc: registerFaProgramConfigIpcMock
   }
 })
 
@@ -128,6 +136,7 @@ beforeEach(() => {
   registerFaExtraEnvIpcMock.mockReset()
   registerFaExternalLinksIpcMock.mockReset()
   registerFaKeybindsIpcMock.mockReset()
+  registerFaProgramConfigIpcMock.mockReset()
   registerFaProgramStylingIpcMock.mockReset()
   registerFaUserSettingsIpcMock.mockReset()
   registerFaWindowControlIpcMock.mockReset()
@@ -149,6 +158,7 @@ test('Test that the electron app properly starts', () => {
   expect(registerFaExtraEnvIpcMock).toHaveBeenCalledOnce()
   expect(registerFaExternalLinksIpcMock).toHaveBeenCalledOnce()
   expect(registerFaKeybindsIpcMock).toHaveBeenCalledOnce()
+  expect(registerFaProgramConfigIpcMock).toHaveBeenCalledOnce()
   expect(registerFaProgramStylingIpcMock).toHaveBeenCalledOnce()
   expect(registerFaUserSettingsIpcMock).toHaveBeenCalledOnce()
   expect(registerFaWindowControlIpcMock).toHaveBeenCalledOnce()

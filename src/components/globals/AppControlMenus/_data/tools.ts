@@ -22,9 +22,13 @@ function buildToolsMenuData (): I_appMenuItem[] {
     faMenuItem('appControlMenus.tools.items.toggleTree', 'mdi-page-layout-sidebar-left'),
     faMenuItem('appControlMenus.tools.items.showNoteBoard', 'mdi-clipboard-text-outline'),
     faMenuSeparator(),
+    faMenuItem('appControlMenus.tools.items.importExportProgramConfig', 'mdi-database-export-outline', {
+      trigger: () => runFaAction('openImportExportProgramConfigDialog', undefined)
+    }),
+    faMenuSeparator(),
     faMenuItem('appControlMenus.tools.items.programStyling', 'mdi-language-css3', {
       keybindCommandId: 'openProgramStyling',
-      trigger: () => runFaAction('openProgramStylingDialog', undefined)
+      trigger: () => runFaAction('openProgramStylingWindow', undefined)
     }),
     faMenuItem('appControlMenus.tools.items.keybindSettings', 'mdi-keyboard-settings', {
       keybindCommandId: 'openKeybindSettings',

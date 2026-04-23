@@ -6,6 +6,7 @@ export default {
     massDeleteDocument: 'Mass delete documents',
     toggleTree: 'Toggle hierarchical tree',
     showNoteBoard: 'Show note board',
+    importExportProgramConfig: 'Import / export program configuration',
     keybindSettings: 'Keybind settings',
     programSettings: 'Program settings',
     programStyling: 'Custom program CSS'

@@ -14,6 +14,7 @@ import { faExternalLinksManagerAPI } from 'app/src-electron/contentBridgeAPIs/fa
 import { appDetailsAPI } from './contentBridgeAPIs/appDetailsAPI'
 import { faKeybindsAPI } from 'app/src-electron/contentBridgeAPIs/faKeybindsAPI'
 import { faProgramStylingAPI } from 'app/src-electron/contentBridgeAPIs/faProgramStylingAPI'
+import { faProgramConfigAPI } from 'app/src-electron/contentBridgeAPIs/faProgramConfigAPI'
 import { faUserSettingsAPI } from './contentBridgeAPIs/faUserSettingsAPI'
 
 /*
@@ -29,7 +30,8 @@ const apiObject = {
   appDetails: { ...appDetailsAPI },
   faKeybinds: { ...faKeybindsAPI },
   faProgramStyling: { ...faProgramStylingAPI },
-  faUserSettings: { ...faUserSettingsAPI }
+  faUserSettings: { ...faUserSettingsAPI },
+  faProgramConfig: { ...faProgramConfigAPI }
 }
 
 contextBridge.exposeInMainWorld('faContentBridgeAPIs', apiObject)

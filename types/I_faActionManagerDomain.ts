@@ -1,5 +1,8 @@
-import type { I_faUserSettings, T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
+import type {
+  I_faProgramConfigApplyInput
+} from 'app/types/I_faProgramConfigDomain'
+import type { I_faUserSettings, T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 
 /**
  * Canonical list of every action id understood by the renderer-side faActionManager.
@@ -11,7 +14,7 @@ export const FA_ACTION_IDS = [
   'saveKeybindSettings',
   'openProgramSettingsDialog',
   'saveProgramSettings',
-  'openProgramStylingDialog',
+  'openProgramStylingWindow',
   'saveProgramStyling',
   'openAdvancedSearchGuideDialog',
   'openChangelogDialog',
@@ -24,7 +27,12 @@ export const FA_ACTION_IDS = [
   'languageSwitch',
   'refreshWebContentsAfterLanguage',
   'openActionMonitorDialog',
-  'showStartupTipsNotification'
+  'showStartupTipsNotification',
+  'openImportExportProgramConfigDialog',
+  'exportProgramConfigPackage',
+  'exportProgramConfigSaveResult',
+  'importProgramConfigStageResult',
+  'importProgramConfigApply'
 ] as const
 
 /**
@@ -49,7 +57,7 @@ export interface I_faActionPayloadMap {
   saveKeybindSettings: { overrides: I_faKeybindsRoot['overrides'] }
   openProgramSettingsDialog: void
   saveProgramSettings: { settings: I_faUserSettings }
-  openProgramStylingDialog: void
+  openProgramStylingWindow: void
   saveProgramStyling: { css: string }
   openAdvancedSearchGuideDialog: void
   openChangelogDialog: void
@@ -63,6 +71,25 @@ export interface I_faActionPayloadMap {
   refreshWebContentsAfterLanguage: void
   openActionMonitorDialog: void
   showStartupTipsNotification: void
+  openImportExportProgramConfigDialog: void
+  exportProgramConfigPackage: {
+    includeKeybinds: boolean
+    includeProgramSettings: boolean
+    includeProgramStyling: boolean
+  }
+  exportProgramConfigSaveResult: {
+    errorMessage?: string
+    errorName?: string
+    filePath?: string
+    status: 'canceled' | 'error' | 'saved'
+  }
+  importProgramConfigStageResult: {
+    errorCode?: string
+    errorMessage?: string
+    sessionId?: string
+    status: 'canceled' | 'fail' | 'pass'
+  }
+  importProgramConfigApply: I_faProgramConfigApplyInput
 }
 
 /**

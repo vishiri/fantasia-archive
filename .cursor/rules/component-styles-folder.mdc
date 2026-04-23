@@ -1,0 +1,43 @@
+---
+description: >-
+  When a Vue feature needs a separate SCSS/CSS file (for example to satisfy SFC
+  line limits), styles live only under that feature's styles/ subfolder — never
+  beside the .vue at the feature root.
+globs: "src/components/**/*.vue"
+alwaysApply: false
+---
+
+# Component-level `styles/` folder (`src/components/`)
+
+Use this layout when an SFC must pull in **external** styles via `<style lang="scss" src="...">` (or CSS) — typically to stay within the **250-line** `.vue` cap ([code-size-decomposition.mdc](code-size-decomposition.mdc)).
+
+## Placement
+
+- Put files under **`src/components/<bucket>/<FeatureName>/styles/`** (a **`styles`** directory **inside** the same folder as the feature `.vue`).
+- **Do not** place standalone **`*.scss`** / **`*.css`** next to the **`.vue`** at the feature root (for example not `DialogFoo/DialogFoo.unscoped.scss` beside `DialogFoo.vue`).
+- **Layouts and pages** under **`src/layouts/`** and **`src/pages/`** follow the same idea if they ever need an external sheet: **`styles/`** next to that **`.vue`**, not loose sibling files.
+
+## Naming
+
+- Prefer a **clear, feature-scoped** basename, for example **`WindowProgramStyling.unscoped.scss`**, **`DialogKeybindSettings.unscoped.scss`**, so multiple sheets under **`styles/`** stay distinguishable.
+- Scoped blocks may stay in the SFC; **unscoped** or large extracts often use a **`.unscoped.scss`** suffix when that matches existing dialogs/windows.
+
+## Wiring
+
+- From the SFC, import with a **relative path into `styles/`**, for example:
+
+```vue
+<style lang="scss" src="./styles/WindowProgramStyling.unscoped.scss"></style>
+```
+
+- Keep the usual SFC block order: **`<template>`**, **`<script>`**, then **`<style>`** last ([vue-quasar.mdc](vue-quasar.mdc)).
+
+## Related
+
+- BEM and token rules for the sheet contents: [vue-bem-scss.mdc](vue-bem-scss.mdc), [project-scss.mdc](project-scss.mdc)
+- When to extract vs keep inline: [code-size-decomposition.mdc](code-size-decomposition.mdc)
+
+## TypeScript interfaces and types (`types/`)
+
+- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

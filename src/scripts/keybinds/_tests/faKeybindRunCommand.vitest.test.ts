@@ -45,7 +45,7 @@ test('faKeybindRunCommand routes openActionMonitor to the openActionMonitorDialo
   expect(runFaActionMock).toHaveBeenCalledWith('openActionMonitorDialog', undefined)
 })
 
-test('faKeybindRunCommand routes openProgramStyling to the openProgramStylingDialog action', () => {
+test('faKeybindRunCommand routes openProgramStyling to the openProgramStylingWindow action', () => {
   faKeybindRunCommand('openProgramStyling')
-  expect(runFaActionMock).toHaveBeenCalledWith('openProgramStylingDialog', undefined)
+  expect(runFaActionMock).toHaveBeenCalledWith('openProgramStylingWindow', undefined)
 })

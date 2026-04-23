@@ -219,7 +219,8 @@ const preview: Preview = {
 
       return {
         components: { story },
-        template: '<story />'
+        // Matches production Quasar root so Teleport targets like FaFloatingWindowBodyTeleport resolve.
+        template: '<div id="q-app"><story /></div>'
       }
     }
   ],

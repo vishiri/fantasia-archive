@@ -16,7 +16,7 @@ These limits are **enforced in CI** via ESLint (`max-lines`, `max-lines-per-func
 - **When approaching or over the limit**, you **must** split work using one or both of:
   1. **Extract logic** into colocated **`scripts/*.ts`** modules (or shared `src/scripts/` when appropriate), composed by a thin `<script setup>`.
   2. **Extract UI** into **subcomponents** in the same feature folder, each with its own template, scoped styles, and focused script.
-- **Last resort (anti-pattern):** moving `<style>` to a separate file and re-importing is **not** a normal pattern in this repo. Use it only in **extreme** circumstances and **only after explicit user approval** in the session where it is applied.
+- **Separate stylesheets:** when the SFC would exceed the line limit and splitting out **`<style>`** is appropriate, put those files only under **`src/components/<bucket>/<Feature>/styles/`** (never as a loose **`*.scss`** sibling of the **`.vue`**). See [component-styles-folder.mdc](component-styles-folder.mdc).
 
 ## Functions (JavaScript, TypeScript, and Vue `<script>`)
 
@@ -59,7 +59,7 @@ Limits are **maximums**, not an invitation to maximize file count. Prefer **fewe
 
 ## Related
 
-- Vue composition and extraction patterns: [vue-quasar.mdc](vue-quasar.mdc), [vue-bem-scss.mdc](vue-bem-scss.mdc)
+- Vue composition and extraction patterns: [vue-quasar.mdc](vue-quasar.mdc), [vue-bem-scss.mdc](vue-bem-scss.mdc), [component-styles-folder.mdc](component-styles-folder.mdc)
 - `src/scripts/` layout: [typescript-scripts.mdc](typescript-scripts.mdc)
 - ESLint entry: [eslint-typescript.mdc](eslint-typescript.mdc)
 

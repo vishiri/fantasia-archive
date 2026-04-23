@@ -54,3 +54,11 @@ export const FA_EXTRA_ENV_IPC = {
 export const FA_EXTERNAL_LINKS_IPC = {
   openExternalAsync: 'fa-external-links-open-external-async'
 } as const
+
+/** Program config bundle (.faconfig) — async invoke/handle. */
+export const FA_PROGRAM_CONFIG_IPC = {
+  exportToFileAsync: 'fa-program-config-export-to-file-async',
+  prepareImportAsync: 'fa-program-config-prepare-import-async',
+  applyImportAsync: 'fa-program-config-apply-import-async',
+  disposeImportSessionAsync: 'fa-program-config-dispose-import-session-async'
+} as const

@@ -231,4 +231,4 @@ registerDialogKeybindSettingsGlobalSuspend({
 }
 </style>
 
-<style lang="scss" src="./DialogKeybindSettings.unscoped.scss"></style>
+<style lang="scss" src="./styles/DialogKeybindSettings.unscoped.scss"></style>

@@ -13,7 +13,7 @@ export default {
     openKeybindSettingsDialog: 'Ouvrir les raccourcis clavier',
     openLicenseDialog: 'Ouvrir la licence',
     openProgramSettingsDialog: 'Ouvrir les paramètres du programme',
-    openProgramStylingDialog: 'Ouvrir le CSS de programme personnalisé',
+    openProgramStylingWindow: 'Ouvrir le CSS de programme personnalisé',
     openTipsTricksTriviaDialog: 'Ouvrir Astuces, Conseils & Anecdotes',
     refreshWebContentsAfterLanguage: 'Rafraîchir le contenu de la fenêtre',
     resizeApp: 'Redimensionner la fenêtre',

@@ -23,6 +23,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc)                         | `**/*.vitest.test.ts` — JSDoc, flat `test`/`test.skip`, imports           |
 | [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc)                             | `**/*.vue` — Composition API, Quasar, i18n, script size and extraction    |
 | [vue-bem-scss.mdc](.cursor/rules/vue-bem-scss.mdc)                         | `**/*.vue` — BEM class names and scoped SCSS only                         |
+| [component-styles-folder.mdc](.cursor/rules/component-styles-folder.mdc)     | `src/components/**/*.vue` — separate SCSS/CSS for one feature only under **`<Feature>/styles/`** |
 | [vue-template-test-hooks.mdc](.cursor/rules/vue-template-test-hooks.mdc)   | `**/*.vue` — `data-test-locator` and other Playwright-facing `data-test-*` template attributes  |
 | [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc)               | `**/_tests/*.stories.ts` — Story scope, layout/page canvas-only (no Docs), `TEST_ENV` restrictions |
 | [typescript-scripts.mdc](.cursor/rules/typescript-scripts.mdc)             | `src/scripts/**/*.ts` — `_utilities`, splitting modules                   |
@@ -32,7 +33,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc)                   | Always — en-US `changeLog.md` vs `package.json` version (see skill)       |
 | [plan-documents.mdc](.cursor/rules/plan-documents.mdc)                     | Always — plan files in `.cursor/plans` with timestamp + version metadata; prune plans with mtime older than 30 days before saving a new one |
 | [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) | Always — **quality gate** via `yarn testbatch:verify`; `yarn quasar:build:electron`, Playwright, and Storybook test/VRT each in their own terminal unless using **`yarn testbatch:ensure:nochange`** / **`yarn testbatch:ensure:change`** |
-| [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc) | Always — **Vue ≤250 lines**, **TS module ≤200 lines**, **function ≤100 lines** (ESLint); **`return { ... }`** uses only prior bindings for property values (no inline fn / ternary / logic in the literal); split via **`scripts/`** + subcomponents; external `<style>` import only with **explicit user approval** |
+| [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc) | Always — **Vue ≤250 lines**, **TS module ≤200 lines**, **function ≤100 lines** (ESLint); **`return { ... }`** uses only prior bindings for property values (no inline fn / ternary / logic in the literal); split via **`scripts/`** + subcomponents; extracted styles: **[component-styles-folder.mdc](.cursor/rules/component-styles-folder.mdc)** |
 | [fa-action-manager.mdc](.cursor/rules/fa-action-manager.mdc) | `src/scripts/actionManager/**/*.ts` — central action registry, sync FIFO queue, async fire-and-forget, single-toast failure surface, session-only history |
 
 
@@ -101,7 +102,7 @@ When writing comments in source files (not in user-facing Markdown documents suc
 ## Code size and decomposition (enforced)
 
 - **Vue SFC block order**: in every **`.vue`** file, use **`<template>`** first, then **`<script>`** / **`<script setup>`**, then **`<style>`** (including multiple **`<style>`** blocks last). Never put script or style before the template. See [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc).
-- **`.vue` SFCs**: keep each file **at or under 250 lines** (ESLint `max-lines`, with blank/comment skipping per config). If growth would exceed that, split into **`scripts/*.ts`** modules and/or **subcomponents** in the same feature folder. Moving scoped CSS to a standalone file and re-importing it is a **last-resort anti-pattern** and requires **explicit user approval** before it is applied anywhere.
+- **`.vue` SFCs**: keep each file **at or under 250 lines** (ESLint `max-lines`, with blank/comment skipping per config). If growth would exceed that, split into **`scripts/*.ts`** modules and/or **subcomponents** in the same feature folder. When a **separate stylesheet** is still required, put it only under **`src/components/<bucket>/<Feature>/styles/`** (see [component-styles-folder.mdc](.cursor/rules/component-styles-folder.mdc)); do **not** add loose **`*.scss`** / **`*.css`** beside the **`.vue`** at the feature root.
 - **TypeScript modules** (non-exempt paths): **≤200 lines** per file; split by concern when a file would exceed that.
 - **Script file count (components and shared TS):** prefer **logical grouping** in fewer modules until limits force a split — do not default to one tiny file per helper. **Extreme fragmentation** (one exported function per filename while every file stays far below the **200-line** cap) is **technical debt**: merge related helpers into subsystem-sized modules (same policy as [README](README.md) **SFC size and TypeScript extraction**). Many **10–20 line** files are discouraged when the same code could live together and stay under **200 lines** per file and **100 lines** per function. Applies to **`src/components/<bucket>/<Feature>/scripts/*.ts`** and to **`src/scripts/`** feature folders; see [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc) **Module count: prefer logical grouping** and [typescript-scripts.mdc](.cursor/rules/typescript-scripts.mdc). When production `scripts/` files merge, consolidate colocated **`scripts/_tests/*.vitest.test.ts`** where practical.
 - **Functions** (JS/TS and Vue `<script>`): **≤100 lines** per function; decompose into smaller named units when a body would exceed that.
@@ -125,10 +126,23 @@ When writing comments in source files (not in user-facing Markdown documents suc
 Group new SFCs under one bucket (each feature folder still owns `_tests/`, optional `_data/`, optional `scripts/`):
 
 - **`dialogs/`** — modal `Dialog*` components.
+- **`floatingWindows/`** — movable, resizable in-renderer windows (`Window*` components); shared frame helpers live under **`src/scripts/floatingWindows/`** (see **`useFaFloatingWindowFrame.ts`**). They reuse **`registerComponentDialogStackGuard`** with **`S_DialogComponent`** like modal dialogs. Full architecture: **In-renderer floating windows** below.
 - **`globals/`** — shared app chrome (`GlobalWindowButtons`, `AppControlMenus`, `AppControlSingleMenu`).
 - **`elements/`** — small reusable widgets (`FantasiaMascotImage`, `SocialContactSingleButton`).
 - **`other/`** — other composites (`SocialContactButtons`).
 - **`foundation/`** — Storybook-only design catalogues (for example **`FoundationColorPalette`**, **`FoundationTextList`**): Quasar theme reference, not in-app routes. See **Foundation components** below.
+
+### In-renderer floating windows (`Window*`)
+
+These are **movable, resizable** **`position: fixed`** surfaces drawn by the **renderer** (not separate Electron **`BrowserWindow`** instances). Example: **`src/components/floatingWindows/WindowProgramStyling/`**. The published **`@quasar/quasar-ui-qwindow`** package targets **Quasar v1 / Vue 2** only; Fantasia Archive implements its own frame layer for **Vue 3 + Quasar 2**.
+
+- **DOM placement**: Wrap the frame root in **`FaFloatingWindowBodyTeleport`** (**`<Teleport to="body">`**, **`src/components/floatingWindows/FaFloatingWindowBodyTeleport/`**) so the window is not nested under **`q-header`**, **`AppControlMenus`**, or other ancestors that create **stacking contexts** or **`transform`** containment. The **`Window*`** component may still be **declared** under menus for wiring; only the **frame subtree** is teleported to **`document.body`**.
+- **Frame composable**: **`useFaFloatingWindowFrame`** (**`src/scripts/floatingWindows/useFaFloatingWindowFrame.ts`**) — **`centerInViewport`** on open, **title-bar** pointer drag, **edge/corner** resize via **`useFaFloatingWindowResize`**, **`ResizeObserver`** height/width sync when not dragging/resizing, **`z-index`** from a **session-wide** counter in **`5000`–`5999`** (always **below** app chrome and Quasar overlays that use **`6000+`**, for example **`$mainLayout-appHeader-zIndex`**), **`raiseZ`** when the window opens, the user clicks the frame, or drag/resize starts.
+- **Layout contract**: **`I_FaFloatingWindowFrameLayout`** and **`FA_FLOATING_WINDOW_FRAME_DEFAULT_LAYOUT`** in **`faFloatingWindowFrameLayout.ts`** — **`widthFrac`** / **`heightFrac`**, **`minWidthPx`** / **`minHeightPx`**, and **per-edge viewport inset** (**`marginTopPx`**, **`marginRightPx`**, **`marginBottomPx`**, **`marginLeftPx`**) used for centering, drag bounds, and resize clamping. **`floatingWindowComponent`** also applies **`max-width: stretch`** in CSS.
+- **Resize geometry**: **`faFloatingWindowResizeGeometry.ts`** applies pointer deltas; **`faFloatingWindowResizeClamp.ts`** clamps candidates into the viewport while **preserving anchored edges** per handle (so west/north drags do not spuriously **translate** the window). **`FA_FLOATING_WINDOW_RESIZE_HANDLE_PX`** defines hit-target size; **`FaFloatingWindowFrameResizeHandles`** is the shared chrome.
+- **Dialog stack**: The visibility ref passed into **`useFaFloatingWindowFrame`** should also be registered with **`registerComponentDialogStackGuard`** (**`src/scripts/appGlobalManagementUI/dialogManagement.ts`**) so **`S_DialogComponent`** open counts stay aligned with modal **`Dialog*`** surfaces.
+- **i18n**: User-visible copy under **`i18n/<locale>/floatingWindows/`** (for example **`floatingWindows.programStyling`**).
+- **Tests**: Pure resize/clamp logic uses **`src/scripts/floatingWindows/_tests/*.vitest.test.ts`**. Component **Vitest** mounts often **stub** **`FaFloatingWindowBodyTeleport`** with **`<div><slot /></div>`** so **`wrapper.find('[data-test-locator=…]')`** still resolves nodes that would otherwise render only under **`body`**. Playwright locators are unchanged (**`data-test-locator`** on the frame). Playbook: [.cursor/skills/fantasia-floating-windows/SKILL.md](.cursor/skills/fantasia-floating-windows/SKILL.md).
 
 ### Foundation components (`src/components/foundation/`)
 
@@ -153,8 +167,9 @@ Central **SCSS variables** for colors, sizes, and related design tokens live in 
 Locale strings live under `i18n/en-US/` in a fixed folder hierarchy:
 
 - `documents/` — Markdown source files (`.md`, imported with `?raw` and passed through `specialCharacterFixer`).
-- `components/<bucket>/<ComponentName>/` — same buckets as `src/components/` (`dialogs`, `globals`, `elements`, `other`); one or more `L_*.ts` locale modules per component with user-visible strings. The **`foundation/`** bucket is **not** mirrored under **`i18n/`** (Storybook-only catalogues use inline English).
+- `components/<bucket>/<ComponentName>/` — same buckets as `src/components/` (`dialogs`, `floatingWindows`, `globals`, `elements`, `other`); one or more `L_*.ts` locale modules per component with user-visible strings. The **`foundation/`** bucket is **not** mirrored under **`i18n/`** (Storybook-only catalogues use inline English).
 - `dialogs/` — one `L_<DialogName>.ts` per dialog.
+- `floatingWindows/` — locale modules for floating-window surfaces (for example **`floatingWindows.programStyling`**).
 - `pages/` — one `L_<PageName>.ts` per page.
 - `globalFunctionality/` — one `L_<feature>.ts` per app-wide, non-component concern (e.g. store notifications).
 
@@ -249,7 +264,7 @@ Use different instructions or @-references when starting a task:
 1. **Electron and preload** — Focus on `src-electron/`, bridge security, `globals.d.ts`, `electron-ipc-bridge.ts` for IPC channel names, Vitest for `contentBridgeAPIs`, `mainScripts/ipcManagement/register*Ipc`, and other `mainScripts/<area>/` modules (see **Architecture** in `README.md`).
 2. **Global keyboard shortcuts (faKeybinds)** — Focus on `src/scripts/keybinds/`, `src/stores/S_FaKeybinds.ts`, `src/layouts/MainLayout.vue`, `src/components/dialogs/DialogKeybindSettings/`, `src-electron/mainScripts/keybinds/`, `contentBridgeAPIs/faKeybindsAPI.ts`, `registerFaKeybindsIpc.ts`, and `types/I_faKeybindsDomain.ts` (command ids, chords, snapshot, bridge types). Playbook: `.cursor/skills/fantasia-keybinds/SKILL.md`.
 3. **Tests** — Vitest unit coverage in `src/` (including **`src/components/**`**, **`src/layouts/**`**, **`src/pages/**`**) + `src-electron/`, Playwright integration flows, build order, `e2e-tests/` vs `src/components/**/_tests/`.
-4. **Feature / UI** — `src/` Vue + Quasar, Pinia, router, `ComponentTesting` page, i18n strings. Place SFCs under **`src/components/dialogs/`**, **`globals/`**, **`elements/`**, **`other/`**, or **`foundation/`** (design catalogues only — see **Foundation components** above) per [README](README.md) and this file. For **large production menu/config data**, split across **`src/components/<bucket>/<Feature>/_data/*.ts`**. When the **user explicitly requests** moving bulky **SFC script** logic out of a `.vue`, place those modules **only** under **`src/components/<bucket>/<Feature>/scripts/*.ts`**. Rare **embedded** component-mode-only payloads may live as **`const` inside the `.vue`**; Playwright passes isolated props via **`COMPONENT_PROPS`** defined inline in each spec. Details: [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc).
+4. **Feature / UI** — `src/` Vue + Quasar, Pinia, router, `ComponentTesting` page, i18n strings. Place SFCs under **`src/components/dialogs/`**, **`floatingWindows/`**, **`globals/`**, **`elements/`**, **`other/`**, or **`foundation/`** (design catalogues only — see **Foundation components** above) per [README](README.md) and this file. For **large production menu/config data**, split across **`src/components/<bucket>/<Feature>/_data/*.ts`**. When the **user explicitly requests** moving bulky **SFC script** logic out of a `.vue`, place those modules **only** under **`src/components/<bucket>/<Feature>/scripts/*.ts`**. Rare **embedded** component-mode-only payloads may live as **`const` inside the `.vue`**; Playwright passes isolated props via **`COMPONENT_PROPS`** defined inline in each spec. Details: [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc).
 5. **Data / SQLite** — Main-process storage, `userData` paths, migrations, exposing data via narrow preload APIs only.
 
 ## Skill index
@@ -264,6 +279,7 @@ Use different instructions or @-references when starting a task:
 | `fantasia-keybinds`             | Global shortcuts: `src/scripts/keybinds/`, `S_FaKeybinds`, `MainLayout`, Keybind settings dialog, main `keybinds/` store, `faKeybindsAPI`, `registerFaKeybindsIpc` |
 | `fantasia-action-manager`       | Centralized renderer action manager (sync queue + async dispatch), unified error reporting, action history, and the `DialogActionMonitor` surface |
 | `fantasia-quasar-vue`           | Vue/Quasar app structure                                            |
+| `fantasia-floating-windows`     | In-renderer **`Window*`** frames: teleport, **`useFaFloatingWindowFrame`**, layout, resize clamp, z-index band |
 | `fantasia-i18n`                 | Repo-root **`i18n/`** and **`L_`* locale modules                    |
 | `fantasia-sqlite-main`          | SQLite in main process                                              |
 | `fantasia-worldbuilding-domain` | Product vocabulary and scope                                        |

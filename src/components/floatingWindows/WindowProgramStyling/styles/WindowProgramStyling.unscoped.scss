@@ -1,0 +1,120 @@
+.windowProgramStyling {
+  box-sizing: border-box;
+
+  .floatingWindowComponent__surface {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  &__titleRow {
+    cursor: grab;
+    flex: 0 0 auto;
+    position: relative;
+    user-select: none;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  &__title {
+    flex: 0 0 auto;
+  }
+
+  &__helpIcon {
+    bottom: $windowProgramStyling-helpIcon-bottom;
+    cursor: default;
+    position: absolute;
+    right: $windowProgramStyling-helpIcon-right;
+    z-index: $windowProgramStyling-helpIcon-zIndex;
+  }
+
+  &__helpTooltip {
+    max-width: $windowProgramStyling-helpTooltip-width;
+    width: $windowProgramStyling-helpTooltip-width;
+  }
+
+  &__helpTooltipBody {
+    display: flex;
+    flex-direction: column;
+    font-size: $windowProgramStyling-helpTooltipBody-fontSize;
+    gap: $windowProgramStyling-helpTooltipBody-gap;
+    padding: $windowProgramStyling-helpTooltipBody-padding;
+  }
+
+  &__helpTooltipTitle {
+    font-size: $windowProgramStyling-helpTooltipTitle-fontSize;
+    font-weight: $windowProgramStyling-helpTooltipTitle-fontWeight;
+    margin-bottom: $windowProgramStyling-helpTooltipTitle-marginBottom;
+  }
+
+  &__helpTooltipList {
+    display: grid;
+    font-weight: $windowProgramStyling-helpTooltipList-fontWeight;
+    gap: $windowProgramStyling-helpTooltipList-gap;
+    grid-template-columns: max-content 1fr;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__helpTooltipItem {
+    display: contents;
+  }
+
+  &__helpTooltipChord {
+    font-style: italic;
+    font-weight: $windowProgramStyling-helpTooltipChord-fontWeight;
+    white-space: nowrap;
+  }
+
+  &__helpTooltipLabel {
+    font-weight: $windowProgramStyling-helpTooltipList-fontWeight;
+    line-height: $windowProgramStyling-helpTooltipLabel-lineHeight;
+    margin-left: $windowProgramStyling-helpTooltipLabel-marginLeft;
+  }
+
+  &__helpTooltipFooter {
+    font-style: italic;
+    font-weight: 400;
+    line-height: $windowProgramStyling-helpTooltipFooter-lineHeight;
+    margin: $windowProgramStyling-helpTooltipFooter-margin;
+    opacity: 1;
+  }
+
+  &__body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    position: relative;
+  }
+
+  &__editorHost {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+  }
+
+  &__loadingOverlay {
+    align-items: center;
+    background: $windowProgramStyling-loadingOverlay-background;
+    display: flex;
+    inset: 0;
+    justify-content: center;
+    pointer-events: none;
+    position: absolute;
+  }
+
+  &__loadError {
+    padding: $windowProgramStyling-loadError-padding;
+  }
+
+  &__cardActions {
+    flex: 0 0 auto;
+  }
+}

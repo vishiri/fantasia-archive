@@ -1,6 +1,7 @@
 /** @vitest-environment jsdom */
 import { beforeEach, expect, test, vi } from 'vitest'
 
+import type { I_faProgramConfigApplyResult } from 'app/types/I_faProgramConfigDomain'
 import { FA_ACTION_IDS, type T_faActionId } from 'app/types/I_faActionManagerDomain'
 
 const {
@@ -9,15 +10,22 @@ const {
   minimizeWindowMock,
   openDialogComponentMock,
   openDialogMarkdownDocumentMock,
+  refreshKeybindsMock,
+  refreshProgramStylingMock,
+  refreshSettingsMock,
   refreshWebContentsMock,
   resizeWindowMock,
   checkWindowMaximizedMock,
+  applyImportMock,
   tipsNotificationMock,
   toggleDevToolsMock,
   updateKeybindsMock,
   updateProgramStylingMock,
   updateSettingsMock
 } = vi.hoisted(() => ({
+  applyImportMock: vi.fn(
+    async (): Promise<I_faProgramConfigApplyResult> => ({ appliedParts: [] })
+  ),
   applyLanguageMock: vi.fn(async () => true),
   checkWindowMaximizedMock: vi.fn(),
   closeWindowMock: vi.fn(),
@@ -28,6 +36,9 @@ const {
   resizeWindowMock: vi.fn(),
   tipsNotificationMock: vi.fn(),
   toggleDevToolsMock: vi.fn(),
+  refreshKeybindsMock: vi.fn(async () => undefined),
+  refreshProgramStylingMock: vi.fn(async () => undefined),
+  refreshSettingsMock: vi.fn(async () => undefined),
   updateKeybindsMock: vi.fn(async () => true),
   updateProgramStylingMock: vi.fn(async () => true),
   updateSettingsMock: vi.fn(async () => undefined)
@@ -42,15 +53,24 @@ vi.mock('app/i18n/externalFileLoader', () => ({
 }))
 
 vi.mock('app/src/stores/S_FaKeybinds', () => ({
-  S_FaKeybinds: () => ({ updateKeybinds: updateKeybindsMock })
+  S_FaKeybinds: () => ({
+    refreshKeybinds: refreshKeybindsMock,
+    updateKeybinds: updateKeybindsMock
+  })
 }))
 
 vi.mock('app/src/stores/S_FaProgramStyling', () => ({
-  S_FaProgramStyling: () => ({ updateProgramStyling: updateProgramStylingMock })
+  S_FaProgramStyling: () => ({
+    refreshProgramStyling: refreshProgramStylingMock,
+    updateProgramStyling: updateProgramStylingMock
+  })
 }))
 
 vi.mock('app/src/stores/S_FaUserSettings', () => ({
-  S_FaUserSettings: () => ({ updateSettings: updateSettingsMock })
+  S_FaUserSettings: () => ({
+    refreshSettings: refreshSettingsMock,
+    updateSettings: updateSettingsMock
+  })
 }))
 
 vi.mock('app/src/scripts/appGlobalManagementUI/dialogManagement', () => ({
@@ -85,14 +105,25 @@ beforeEach(() => {
   resizeWindowMock.mockReset()
   tipsNotificationMock.mockReset()
   toggleDevToolsMock.mockReset()
+  applyImportMock.mockReset()
+  applyImportMock.mockImplementation(async () => ({ appliedParts: ['programSettings' as const] }))
   updateKeybindsMock.mockReset()
   updateKeybindsMock.mockImplementation(async () => true)
   updateProgramStylingMock.mockReset()
   updateProgramStylingMock.mockImplementation(async () => true)
   updateSettingsMock.mockReset()
   updateSettingsMock.mockImplementation(async () => undefined)
+  refreshKeybindsMock.mockReset()
+  refreshKeybindsMock.mockImplementation(async () => undefined)
+  refreshProgramStylingMock.mockReset()
+  refreshProgramStylingMock.mockImplementation(async () => undefined)
+  refreshSettingsMock.mockReset()
+  refreshSettingsMock.mockImplementation(async () => undefined)
   Object.assign(window, {
     faContentBridgeAPIs: {
+      faProgramConfig: {
+        applyImport: applyImportMock
+      },
       faWindowControl: {
         checkWindowMaximized: checkWindowMaximizedMock,
         closeWindow: closeWindowMock,
@@ -167,9 +198,9 @@ test('Test that openProgramSettingsDialog handler opens the ProgramSettings dial
   expect(openDialogComponentMock).toHaveBeenCalledWith('ProgramSettings')
 })
 
-test('Test that openProgramStylingDialog handler opens the ProgramStyling dialog', () => {
-  definitionFor('openProgramStylingDialog').handler(undefined)
-  expect(openDialogComponentMock).toHaveBeenCalledWith('ProgramStyling')
+test('Test that openProgramStylingWindow handler opens the WindowProgramStyling surface', () => {
+  definitionFor('openProgramStylingWindow').handler(undefined)
+  expect(openDialogComponentMock).toHaveBeenCalledWith('WindowProgramStyling')
 })
 
 /**
@@ -218,6 +249,100 @@ test('Test that openTipsTricksTriviaDialog handler opens the tipsTricksTrivia ma
 test('Test that openActionMonitorDialog handler opens the ActionMonitor dialog', () => {
   definitionFor('openActionMonitorDialog').handler(undefined)
   expect(openDialogComponentMock).toHaveBeenCalledWith('ActionMonitor')
+})
+
+test('Test that openImportExportProgramConfigDialog handler opens the ImportExportProgramConfig dialog', () => {
+  definitionFor('openImportExportProgramConfigDialog').handler(undefined)
+  expect(openDialogComponentMock).toHaveBeenCalledWith('ImportExportProgramConfig')
+})
+
+test('Test that importProgramConfigApply handler calls applyImport and refreshes stores', async () => {
+  await (definitionFor('importProgramConfigApply').handler({
+    applyKeybinds: true,
+    applyProgramSettings: true,
+    applyProgramStyling: false,
+    sessionId: 'sid-1'
+  }) as Promise<unknown>)
+  expect(applyImportMock).toHaveBeenCalledWith({
+    applyKeybinds: true,
+    applyProgramSettings: true,
+    applyProgramStyling: false,
+    sessionId: 'sid-1'
+  })
+  expect(refreshSettingsMock).toHaveBeenCalledOnce()
+  expect(refreshKeybindsMock).toHaveBeenCalledOnce()
+  expect(refreshProgramStylingMock).toHaveBeenCalledOnce()
+})
+
+test('Test that importProgramConfigApply throws when the program config bridge is missing', async () => {
+  const prev = window.faContentBridgeAPIs
+  try {
+    Object.assign(window, {
+      faContentBridgeAPIs: {
+        ...window.faContentBridgeAPIs,
+        faProgramConfig: undefined
+      }
+    })
+    await expect(
+      (definitionFor('importProgramConfigApply').handler({
+        applyKeybinds: true,
+        applyProgramSettings: true,
+        applyProgramStyling: true,
+        sessionId: 's'
+      }) as Promise<unknown>)
+    ).rejects.toThrow(/only available in the desktop app/)
+  } finally {
+    Object.assign(window, { faContentBridgeAPIs: prev })
+  }
+})
+
+test('Test that exportProgramConfigSaveResult throws on error status and resolves otherwise', async () => {
+  await expect(
+    (definitionFor('exportProgramConfigSaveResult').handler({
+      status: 'error',
+      errorMessage: 'e1'
+    }) as Promise<unknown>)
+  ).rejects.toThrow('e1')
+  await expect(
+    (definitionFor('exportProgramConfigSaveResult').handler({
+      errorName: 'Ename',
+      status: 'error'
+    }) as Promise<unknown>)
+  ).rejects.toThrow('Ename')
+  await expect(
+    (definitionFor('exportProgramConfigSaveResult').handler({ status: 'error' }) as Promise<unknown>)
+  ).rejects.toThrow('Export to file failed')
+  await expect(
+    (definitionFor('exportProgramConfigSaveResult').handler({ status: 'saved' }) as Promise<unknown>)
+  ).resolves.toBeUndefined()
+  await expect(
+    (definitionFor('exportProgramConfigSaveResult').handler({ status: 'canceled' }) as Promise<unknown>)
+  ).resolves.toBeUndefined()
+})
+
+test('Test that importProgramConfigStageResult throws on fail and resolves on pass', async () => {
+  await expect(
+    (definitionFor('importProgramConfigStageResult').handler({
+      status: 'fail',
+      errorMessage: 'bad'
+    }) as Promise<unknown>)
+  ).rejects.toThrow('bad')
+  await expect(
+    (definitionFor('importProgramConfigStageResult').handler({ status: 'fail' }) as Promise<unknown>)
+  ).rejects.toThrow('Import validation failed')
+  await expect(
+    (definitionFor('importProgramConfigStageResult').handler({ status: 'pass' }) as Promise<unknown>)
+  ).resolves.toBeUndefined()
+})
+
+test('Test that exportProgramConfigPackage handler is a no-op but defined', async () => {
+  await expect(
+    (definitionFor('exportProgramConfigPackage').handler({
+      includeKeybinds: true,
+      includeProgramSettings: false,
+      includeProgramStyling: true
+    }) as Promise<unknown>)
+  ).resolves.toBeUndefined()
 })
 
 test('Test that showStartupTipsNotification handler invokes the notification helper', () => {

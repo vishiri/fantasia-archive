@@ -27,6 +27,7 @@ i18n/
     documents/                          — Markdown source files (.md); imported via ?raw and passed through specialCharacterFixer
     components/<bucket>/<ComponentName>/ — mirrors src/components/: globals, elements, other (not foundation/; Storybook-only catalogues use inline English)
     dialogs/                            — one L_<DialogName>.ts per dialog (dialog copy; not the same as components/dialogs/)
+    floatingWindows/                    — one L_<Feature>.ts per in-renderer floating window (movable/resizable surfaces; mirrors components/floatingWindows/)
     pages/                              — one L_<PageName>.ts per page
     globalFunctionality/                — one L_<feature>.ts per app-wide, non-component concern (e.g. store notifications)
 ```
@@ -48,7 +49,7 @@ Do not place locale files in any other location. If no folder fits, use `globalF
 
 - `index.ts` must contain **only imports and the composed export object**. No hardcoded user-visible strings.
 - Every new section maps a camelCase top-level key to its imported `L_*` locale module (or, for `documents`, to its `specialCharacterFixer(...)` call).
-- Import ordering in `index.ts`: markdown document imports first, then component `L_*` imports grouped by folder (`components/`, then `dialogs/`, then `globalFunctionality/`, then `pages/`).
+- Import ordering in `index.ts`: markdown document imports first, then component `L_*` imports grouped by folder (`components/`, then `dialogs/`, then `floatingWindows/`, then `globalFunctionality/`, then `pages/`).
 
 ## Using strings in code
 
@@ -73,7 +74,7 @@ When you change or add keys that appear in **`toHaveText`**, **`toHaveAttribute(
 - For Storybook mocks/loaders, import focused non-markdown `L_*` locale modules directly (for example `app/i18n/en-US/components/globals/GlobalWindowButtons/L_GlobalWindowButtons.ts`) instead of importing `i18n/en-US/index.ts`.
 - Reason: the full locale entrypoint pulls markdown `documents/*.md`, which can break Storybook/Vite import analysis.
 - If Storybook stories need document content (`documents.*`), provide explicit placeholder strings (for example lorem ipsum) in `.storybook-workspace/.storybook/mocks/externalFileLoader.ts` (`defaultMessages.documents`) rather than importing markdown files.
-- **Mandatory mirror when extending the app locale tree**: [`.storybook-workspace/.storybook/mocks/externalFileLoader.ts`](../../../.storybook-workspace/.storybook/mocks/externalFileLoader.ts) builds `defaultMessages` for the Storybook `createI18n` instance. Whenever you register a new `L_*` module in `i18n/en-US/index.ts` under a namespace that any story or component might use (`dialogs.*`, `globalFunctionality.*`, top-level sections, etc.), add the matching `import` and nested key to `defaultMessages` in the **same PR/commit** as the feature. Omitting this mirrors production i18n in the app but leaves Storybook showing untranslated key paths (for example `dialogs.programStyling.title`). After editing, smoke-check with `yarn storybook:run` on a story that exercises the new copy.
+- **Mandatory mirror when extending the app locale tree**: [`.storybook-workspace/.storybook/mocks/externalFileLoader.ts`](../../../.storybook-workspace/.storybook/mocks/externalFileLoader.ts) builds `defaultMessages` for the Storybook `createI18n` instance. Whenever you register a new `L_*` module in `i18n/en-US/index.ts` under a namespace that any story or component might use (`dialogs.*`, `floatingWindows.*`, `globalFunctionality.*`, top-level sections, etc.), add the matching `import` and nested key to `defaultMessages` in the **same PR/commit** as the feature. Omitting this mirrors production i18n in the app but leaves Storybook showing untranslated key paths (for example `floatingWindows.programStyling.title`). After editing, smoke-check with `yarn storybook:run` on a story that exercises the new copy.
 
 ## Related
 

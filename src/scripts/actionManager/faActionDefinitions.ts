@@ -11,10 +11,15 @@ import {
   handleOpenActionMonitorDialog,
   handleOpenAdvancedSearchGuideDialog,
   handleOpenChangelogDialog,
+  handleImportProgramConfigApply,
+  handleImportProgramConfigStageResult,
+  handleExportProgramConfigPackage,
+  handleExportProgramConfigSaveResult,
+  handleOpenImportExportProgramConfigDialog,
   handleOpenKeybindSettingsDialog,
   handleOpenLicenseDialog,
   handleOpenProgramSettingsDialog,
-  handleOpenProgramStylingDialog,
+  handleOpenProgramStylingWindow,
   handleOpenTipsTricksTriviaDialog,
   handleRefreshWebContents,
   handleResizeApp,
@@ -60,8 +65,8 @@ export const FA_ACTION_DEFINITIONS: ReadonlyArray<I_faActionDefinition<T_faActio
   },
   {
     dedup: true,
-    handler: handleOpenProgramStylingDialog as I_faActionDefinition<T_faActionId>['handler'],
-    id: 'openProgramStylingDialog',
+    handler: handleOpenProgramStylingWindow as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'openProgramStylingWindow',
     kind: 'async'
   },
   {
@@ -135,6 +140,32 @@ export const FA_ACTION_DEFINITIONS: ReadonlyArray<I_faActionDefinition<T_faActio
   {
     handler: handleShowStartupTipsNotification as I_faActionDefinition<T_faActionId>['handler'],
     id: 'showStartupTipsNotification',
+    kind: 'async'
+  },
+  {
+    dedup: true,
+    handler: handleOpenImportExportProgramConfigDialog as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'openImportExportProgramConfigDialog',
+    kind: 'async'
+  },
+  {
+    handler: handleExportProgramConfigPackage as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'exportProgramConfigPackage',
+    kind: 'async'
+  },
+  {
+    handler: handleExportProgramConfigSaveResult as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'exportProgramConfigSaveResult',
+    kind: 'async'
+  },
+  {
+    handler: handleImportProgramConfigStageResult as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'importProgramConfigStageResult',
+    kind: 'async'
+  },
+  {
+    handler: handleImportProgramConfigApply as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'importProgramConfigApply',
     kind: 'async'
   }
 ]

@@ -51,9 +51,9 @@ const programStylingZoomSnippet = 'body {zoom:0.9;};'
  * Object of string data selectors for the e2e
  */
 const selectorList = {
-  dialogProgramStylingSave: 'dialogProgramStyling-button-save',
-  dialogProgramStylingTitle: 'dialogProgramStyling-title',
-  editorHost: 'dialogProgramStyling-editorHost'
+  programStylingSave: 'windowProgramStyling-button-save',
+  programStylingTitle: 'windowProgramStyling-title',
+  editorHost: 'windowProgramStyling-editorHost'
 } as const
 
 /**
@@ -91,15 +91,15 @@ async function openProgramStylingFromToolsMenu (page: Page): Promise<void> {
   await page.waitForTimeout(menuAnimationTimer)
 }
 
-async function waitForProgramStylingDialog (page: Page): Promise<void> {
-  const title = page.locator(`[data-test-locator="${selectorList.dialogProgramStylingTitle}"]`)
+async function waitForProgramStylingWindow (page: Page): Promise<void> {
+  const title = page.locator(`[data-test-locator="${selectorList.programStylingTitle}"]`)
   await expect(title).toBeVisible({ timeout: 15_000 })
   await page.waitForTimeout(monacoMountSettleMs)
   await waitForMonacoEditorMount(page)
 }
 
 async function replaceMonacoText (page: Page, nextText: string): Promise<void> {
-  const editor = page.locator('.dialogProgramStyling .monaco-editor')
+  const editor = page.locator('.windowProgramStyling .monaco-editor')
   await editor.click()
   await page.keyboard.press('Control+A')
   if (nextText.length > 0) {
@@ -109,9 +109,9 @@ async function replaceMonacoText (page: Page, nextText: string): Promise<void> {
   }
 }
 
-async function saveProgramStylingDialog (page: Page): Promise<void> {
-  await page.locator(`[data-test-locator="${selectorList.dialogProgramStylingSave}"]`).click()
-  const title = page.locator(`[data-test-locator="${selectorList.dialogProgramStylingTitle}"]`)
+async function saveProgramStylingWindow (page: Page): Promise<void> {
+  await page.locator(`[data-test-locator="${selectorList.programStylingSave}"]`).click()
+  const title = page.locator(`[data-test-locator="${selectorList.programStylingTitle}"]`)
   await expect(title).toBeHidden({
     timeout: 15_000
   })
@@ -160,12 +160,12 @@ test.describe.serial('Custom program CSS end-to-end', () => {
 
     await test.step('Open Custom program CSS from Tools menu', async () => {
       await openProgramStylingFromToolsMenu(appWindow)
-      await waitForProgramStylingDialog(appWindow)
+      await waitForProgramStylingWindow(appWindow)
     })
 
     await test.step('Type zoom CSS and save', async () => {
       await replaceMonacoText(appWindow, programStylingZoomSnippet)
-      await saveProgramStylingDialog(appWindow)
+      await saveProgramStylingWindow(appWindow)
     })
 
     await test.step('Body has zoom from user CSS', async () => {
@@ -176,9 +176,9 @@ test.describe.serial('Custom program CSS end-to-end', () => {
 
     await test.step('Reopen dialog, clear editor, save empty CSS', async () => {
       await openProgramStylingFromToolsMenu(appWindow)
-      await waitForProgramStylingDialog(appWindow)
+      await waitForProgramStylingWindow(appWindow)
       await replaceMonacoText(appWindow, '')
-      await saveProgramStylingDialog(appWindow)
+      await saveProgramStylingWindow(appWindow)
     })
 
     await test.step('Body no longer has non-default zoom', async () => {

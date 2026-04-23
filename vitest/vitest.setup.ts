@@ -135,6 +135,12 @@ function resetFaVitestRendererHarness (): void {
     faProgramStyling: {
       getProgramStyling: vi.fn(async () => ({ ...FA_PROGRAM_STYLING_STORE_DEFAULTS })),
       setProgramStyling: vi.fn(async () => undefined)
+    },
+    faProgramConfig: {
+      applyImport: vi.fn(async () => ({ appliedParts: [] })),
+      disposeImportSession: vi.fn(async () => undefined),
+      exportToFile: vi.fn(async () => ({ outcome: 'canceled' as const })),
+      prepareImport: vi.fn(async () => ({ outcome: 'canceled' as const }))
     }
   }
 }

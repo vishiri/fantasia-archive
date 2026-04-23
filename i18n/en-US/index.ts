@@ -20,8 +20,9 @@ import L_aboutFantasiaArchive from './dialogs/L_aboutFantasiaArchive'
 import L_DialogActionMonitor from './dialogs/L_DialogActionMonitor'
 import L_markdownDocument from './dialogs/L_markdownDocument'
 import L_dialogKeybindSettings from './dialogs/L_dialogKeybindSettings'
+import L_importExportProgramConfig from './dialogs/L_importExportProgramConfig'
 import L_programSettings from './dialogs/L_programSettings'
-import L_programStyling from './dialogs/L_programStyling'
+import L_programStylingFloating from './floatingWindows/L_programStyling'
 
 import L_faActionManager from './globalFunctionality/L_faActionManager'
 import L_faKeybinds from './globalFunctionality/L_faKeybinds'
@@ -53,10 +54,15 @@ export default {
   dialogs: {
     aboutFantasiaArchive: L_aboutFantasiaArchive,
     actionMonitor: L_DialogActionMonitor,
+    importExportProgramConfig: L_importExportProgramConfig,
     keybindSettings: L_dialogKeybindSettings,
     markdownDocument: L_markdownDocument,
-    programSettings: L_programSettings,
-    programStyling: L_programStyling
+    programSettings: L_programSettings
+  },
+
+  // FLOATING WINDOWS (in-renderer movable / resizable surfaces)
+  floatingWindows: {
+    programStyling: L_programStylingFloating
   },
 
   // COMPONENT - GLOBAL LANGUAGE SELECTOR

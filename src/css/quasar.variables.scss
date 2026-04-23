@@ -221,29 +221,25 @@ $dialogProgramSettings-title-zIndex: 11;
 $dialogProgramSettings-verticalTab-paddingX: 16px;
 
 /* COMPONENT - DIALOG PROGRAM STYLING */
-$dialogProgramStyling-card-height: 100vh;
-$dialogProgramStyling-card-maxHeightViewportSubtract: 100px;
-$dialogProgramStyling-card-maxWidthViewportSubtract: 100px;
-$dialogProgramStyling-card-width: 100vw;
-$dialogProgramStyling-helpIcon-bottom: -55px;
-$dialogProgramStyling-helpIcon-right: 25px;
-$dialogProgramStyling-helpIcon-zIndex: 10;
-$dialogProgramStyling-helpTooltip-width: 550px;
-$dialogProgramStyling-helpTooltipBody-fontSize: 13px;
-$dialogProgramStyling-helpTooltipBody-gap: 6px;
-$dialogProgramStyling-helpTooltipBody-padding: 6px 8px;
-$dialogProgramStyling-helpTooltipChord-fontWeight: 500;
-$dialogProgramStyling-helpTooltipFooter-lineHeight: 1.3;
-$dialogProgramStyling-helpTooltipFooter-margin: 10px 0 0;
-$dialogProgramStyling-helpTooltipLabel-lineHeight: 1.3;
-$dialogProgramStyling-helpTooltipLabel-marginLeft: 10px;
-$dialogProgramStyling-helpTooltipList-fontWeight: 500;
-$dialogProgramStyling-helpTooltipList-gap: 4px 14px;
-$dialogProgramStyling-helpTooltipTitle-fontSize: 14px;
-$dialogProgramStyling-helpTooltipTitle-fontWeight: 600;
-$dialogProgramStyling-helpTooltipTitle-marginBottom: 10px;
-$dialogProgramStyling-loadError-padding: 8px 16px;
-$dialogProgramStyling-loadingOverlay-background: rgba(0, 0, 0, 0.55);
+$windowProgramStyling-helpIcon-bottom: -55px;
+$windowProgramStyling-helpIcon-right: 25px;
+$windowProgramStyling-helpIcon-zIndex: 10;
+$windowProgramStyling-helpTooltip-width: 550px;
+$windowProgramStyling-helpTooltipBody-fontSize: 13px;
+$windowProgramStyling-helpTooltipBody-gap: 6px;
+$windowProgramStyling-helpTooltipBody-padding: 6px 8px;
+$windowProgramStyling-helpTooltipChord-fontWeight: 500;
+$windowProgramStyling-helpTooltipFooter-lineHeight: 1.3;
+$windowProgramStyling-helpTooltipFooter-margin: 10px 0 0;
+$windowProgramStyling-helpTooltipLabel-lineHeight: 1.3;
+$windowProgramStyling-helpTooltipLabel-marginLeft: 10px;
+$windowProgramStyling-helpTooltipList-fontWeight: 500;
+$windowProgramStyling-helpTooltipList-gap: 4px 14px;
+$windowProgramStyling-helpTooltipTitle-fontSize: 14px;
+$windowProgramStyling-helpTooltipTitle-fontWeight: 600;
+$windowProgramStyling-helpTooltipTitle-marginBottom: 10px;
+$windowProgramStyling-loadError-padding: 8px 16px;
+$windowProgramStyling-loadingOverlay-background: rgba(0, 0, 0, 0.55);
 
 /* COMPONENT - ERROR CARD */
 $errorCard-background: #f7eeda;

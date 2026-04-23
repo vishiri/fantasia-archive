@@ -7,6 +7,7 @@ import type {
 } from 'app/types/I_faElectronRendererBridgeAPIs'
 import type { I_faKeybindsAPI } from 'app/types/I_faKeybindsDomain'
 import type { I_faProgramStylingAPI } from 'app/types/I_faProgramStylingDomain'
+import type { I_faProgramConfigAPI } from 'app/types/I_faProgramConfigDomain'
 import type { I_faUserSettingsAPI } from 'app/types/I_faUserSettingsDomain'
 
 declare global{
@@ -20,6 +21,7 @@ declare global{
       faKeybinds: I_faKeybindsAPI
       faProgramStyling: I_faProgramStylingAPI
       faUserSettings: I_faUserSettingsAPI
+      faProgramConfig: I_faProgramConfigAPI
     }
   }
 }

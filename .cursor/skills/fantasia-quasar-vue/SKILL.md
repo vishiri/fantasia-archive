@@ -18,19 +18,20 @@ description: >-
 ## Component folders (`src/components/`)
 
 - **`dialogs/`** — `Dialog*` modal SFCs. Root **`q-dialog`** **`v-model`** refs that participate in global open coordination should call **`registerComponentDialogStackGuard`** or **`registerMarkdownDialogStackGuard`** from **`src/scripts/appGlobalManagementUI/dialogManagement.ts`** (same module as **`openDialogMarkdownDocument`**) so names state the stacking rule, not metaphor-only labels.
+- **`floatingWindows/`** — `Window*` movable/resizable in-renderer surfaces (for example **`WindowProgramStyling`**). Wrap the frame in **`FaFloatingWindowBodyTeleport`** (**`Teleport to="body"`**) so **`position: fixed`** is not trapped under header/menu ancestors. Use **`useFaFloatingWindowFrame`** plus **`registerComponentDialogStackGuard`** on the same visibility ref as modal dialogs. Layout, resize clamp, and z-index band (**`5000`–`5999`**) live in **`src/scripts/floatingWindows/`**; the npm **`@quasar/quasar-ui-qwindow`** targets Quasar v1 / Vue 2 only. Playbook: [fantasia-floating-windows](../fantasia-floating-windows/SKILL.md); architecture: [AGENTS.md](../../../AGENTS.md) **In-renderer floating windows**.
 - **`globals/`** — app chrome (`GlobalWindowButtons`, `AppControlMenus`, `AppControlSingleMenu`).
 - **`elements/`** — small reusable widgets (`FantasiaMascotImage`, `SocialContactSingleButton`).
 - **`other/`** — other composites (`SocialContactButtons`).
 - **`foundation/`** — Storybook-only design catalogues (`FoundationColorPalette`, `FoundationTextList`, …): not shipped in product routes, no **`i18n/`** mirror, no Playwright component tests, stories tagged **`skip-visual`**. See [AGENTS.md](../../../AGENTS.md) **Foundation components**.
 
-Locale `L_*` paths under `i18n/<locale>/components/` use the same bucket names as `src/components/` (**`foundation/`** excluded). See [README](../../../README.md) and [AGENTS.md](../../../AGENTS.md).
+Locale `L_*` paths: `i18n/<locale>/components/<bucket>/` mirrors `src/components/` buckets (**`foundation/`** excluded). **`i18n/<locale>/dialogs/`** and **`i18n/<locale>/floatingWindows/`** sit next to **`components/`** for modal vs floating-window copy. See [README](../../../README.md) and [AGENTS.md](../../../AGENTS.md).
 
 ## Layout and pages
 
 - Default app chrome: `src/layouts/MainLayout.vue` and routes in `src/router/routes.ts`.
 - **Global keyboard shortcuts (Electron)**: `MainLayout.vue` registers the app-wide **`keydown`** listener after **`S_FaKeybinds`** loads from preload; matching and actions live under **`src/scripts/keybinds/`**; user-visible chord strings use **`faKeybindsChordUiFormatting.ts`**. **Tools → Keybind settings** edits chords (**`src/components/dialogs/DialogKeybindSettings/`**). Extension checklist: [fantasia-keybinds](../fantasia-keybinds/SKILL.md) and [AGENTS.md](../../../AGENTS.md) **Global keyboard shortcuts (faKeybinds)**.
 - **Component playground**: `src/pages/ComponentTesting.vue` with `src/layouts/ComponentTestingLayout.vue` — use for isolated UI experiments before wiring into main flows.
-- **Storybook**: primary stories live under `src/components/**/_tests/<Component>.stories.ts` with **`meta.title`** **`Components/<bucket>/<ComponentName>`** (**`dialogs`**, **`elements`**, **`foundation`**, **`globals`**, **`other`** — same as **`src/components/`** folders). **`foundation/`** stories are reference pages only (**`skip-visual`**, docs disabled). Optional **canvas-only** stories may exist for `src/layouts/**/_tests/*.stories.ts` and `src/pages/**/_tests/*.stories.ts` (router previews); for those, **do not** add autodocs, Docs tab content, or `parameters.docs.description` — keep `parameters.docs.disable: true` (see [`storybook-stories.mdc`](../../rules/storybook-stories.mdc)). Storybook runs from [`.storybook-workspace/`](../../../.storybook-workspace/) (config under `.storybook-workspace/.storybook/`, static build `storybook-static/`, VRT under `visual-tests/` + `playwright.storybook-visual.config.ts`) so `staticDirs` and Vite can mirror the Quasar app’s `public/` layout. Root scripts: `yarn storybook:run`, `yarn storybook:build`, `yarn test:storybook:visual*`.
+- **Storybook**: primary stories live under `src/components/**/_tests/<Component>.stories.ts` with **`meta.title`** **`Components/<bucket>/<ComponentName>`** (**`dialogs`**, **`floatingWindows`**, **`elements`**, **`foundation`**, **`globals`**, **`other`** — same as **`src/components/`** folders). **`foundation/`** stories are reference pages only (**`skip-visual`**, docs disabled). Optional **canvas-only** stories may exist for `src/layouts/**/_tests/*.stories.ts` and `src/pages/**/_tests/*.stories.ts` (router previews); for those, **do not** add autodocs, Docs tab content, or `parameters.docs.description` — keep `parameters.docs.disable: true` (see [`storybook-stories.mdc`](../../rules/storybook-stories.mdc)). Storybook runs from [`.storybook-workspace/`](../../../.storybook-workspace/) (config under `.storybook-workspace/.storybook/`, static build `storybook-static/`, VRT under `visual-tests/` + `playwright.storybook-visual.config.ts`) so `staticDirs` and Vite can mirror the Quasar app’s `public/` layout. Root scripts: `yarn storybook:run`, `yarn storybook:build`, `yarn test:storybook:visual*`.
 
 ## Single-file component block order
 
@@ -60,11 +61,11 @@ Locale `L_*` paths under `i18n/<locale>/components/` use the same bucket names a
 
 ## Component `scripts/` and SFC size
 
-- **Enforced limits** (ESLint): **`.vue` ≤250 lines**, **functions ≤100 lines**, **non-exempt `.ts` ≤200 lines** — see [code-size-decomposition.mdc](../../rules/code-size-decomposition.mdc). When a feature would exceed them, extract into **`src/components/<bucket>/<Feature>/scripts/*.ts`**, add **subcomponents**, and/or move shared pure logic to **`src/scripts/`**. Do not park feature-owned extractions next to the `.vue` at the feature root.
+- **Enforced limits** (ESLint): **`.vue` ≤250 lines**, **functions ≤100 lines**, **non-exempt `.ts` ≤200 lines** — see [code-size-decomposition.mdc](../../rules/code-size-decomposition.mdc). When a feature would exceed them, extract into **`src/components/<bucket>/<Feature>/scripts/*.ts`**, add **subcomponents**, and/or move shared pure logic to **`src/scripts/`**. Do not park feature-owned **`.ts`** extractions next to the `.vue` at the feature root. **Separate SCSS/CSS** for that feature goes only under **`src/components/<bucket>/<Feature>/styles/`** — see [component-styles-folder.mdc](../../rules/component-styles-folder.mdc).
 - **Return object literals** (`return { ... }`, project-wide): each property value must be a **simple identifier or literal** declared **before** the return — **no** inline arrow functions, ternaries, or other logic **inside** the returned object. Bind helpers to **`const`** / **`function`** first, then **`return { push, pop, … }`**. See [code-size-decomposition.mdc](../../rules/code-size-decomposition.mdc) **Return object literals**.
 - **How to split `scripts/`:** limits are **maximums**. Prefer **fewer TypeScript modules** that each hold a **whole concern** (for example one file for table rows + columns + filtered state, one for dialog open + routing + global suspend) until a file approaches **200 lines** or a single function approaches **100 lines**. **Avoid** a long list of **10–20 line** files with one export each when grouping would stay within ESLint caps — see [code-size-decomposition.mdc](../../rules/code-size-decomposition.mdc) **Module count: prefer logical grouping**. After merging production modules, merge or rename colocated **`scripts/_tests/*.vitest.test.ts`** so tests stay easy to find.
 - **Shared `src/scripts/<feature>/`:** same anti-fragmentation rule as component **`scripts/`** — batch by subsystem (see [typescript-scripts.mdc](../../rules/typescript-scripts.mdc)); add a **thin** extra file only for a documented boundary (mock target, circular import, public shim).
-- **External `<style>` files** are a **last resort** anti-pattern; use only with **explicit user approval** in that session.
+- **External `<style src>`** files: place under **`styles/`** inside the feature folder ([component-styles-folder.mdc](../../rules/component-styles-folder.mdc)); never as a loose **`*.scss`** sibling of the **`.vue`**.
 - Distinct from **`_data/`** (production structured payloads) and from **`src/scripts/`** (shared app-wide helpers). See [vue-quasar.mdc](../../rules/vue-quasar.mdc).
 
 ## Cursor rules for `.vue` files (split by topic)
@@ -72,7 +73,8 @@ Locale `L_*` paths under `i18n/<locale>/components/` use the same bucket names a
 | Topic | Rule |
 |-------|------|
 | Quasar, Composition API, i18n, script size / extraction | [`vue-quasar.mdc`](../../rules/vue-quasar.mdc) |
-| BEM classes and scoped SCSS only | [`vue-bem-scss.mdc`](../../rules/vue-bem-scss.mdc) |
+| BEM classes and scoped SCSS | [`vue-bem-scss.mdc`](../../rules/vue-bem-scss.mdc) |
+| Extracted styles (`styles/` folder) | [`component-styles-folder.mdc`](../../rules/component-styles-folder.mdc) |
 | `data-test-locator` and other Playwright `data-test-*` template hooks | [`vue-template-test-hooks.mdc`](../../rules/vue-template-test-hooks.mdc) |
 | Global SCSS / `src/css` | [`project-scss.mdc`](../../rules/project-scss.mdc) |
 
@@ -88,6 +90,7 @@ Locale `L_*` paths under `i18n/<locale>/components/` use the same bucket names a
 
 ## Related
 
+- [fantasia-floating-windows](../fantasia-floating-windows/SKILL.md) for **`Window*`** frames, teleport, and **`src/scripts/floatingWindows/`** helpers.
 - [fantasia-i18n](../fantasia-i18n/SKILL.md) for user-visible strings.
 - [fantasia-testing](../fantasia-testing/SKILL.md) for component Playwright tests next to components and the **Connected tests** sweep.
 - [fantasia-action-manager](../fantasia-action-manager/SKILL.md) for the centralized dispatcher used by menus, dialogs, window controls, and keybinds (single toast + Action Monitor).
