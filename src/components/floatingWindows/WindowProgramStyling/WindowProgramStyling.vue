@@ -1,7 +1,7 @@
 <template>
   <!-- Transition must wrap a single element root; Teleport cannot be the direct child of Transition. -->
   <FaFloatingWindowBodyTeleport>
-    <Transition v-bind="FA_QUASAR_DIALOG_STANDARD_TRANSITION_BINDINGS">
+    <Transition v-bind="FA_QUASAR_DIALOG_FADE_TRANSITION_BINDINGS">
       <div
         v-if="windowModel"
         ref="frameRef"
@@ -134,7 +134,7 @@ import { getMonacoKeybindHelpItems } from 'app/src/components/floatingWindows/Wi
 import { useWindowProgramStyling } from 'app/src/components/floatingWindows/WindowProgramStyling/scripts/windowProgramStylingState'
 import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
 import {
-  FA_QUASAR_DIALOG_STANDARD_TRANSITION_BINDINGS,
+  FA_QUASAR_DIALOG_FADE_TRANSITION_BINDINGS,
   FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS
 } from 'app/src/scripts/floatingWindows/faQuasarDialogStandardTransition'
 import { useFaFloatingWindowFrame } from 'app/src/scripts/floatingWindows/useFaFloatingWindowFrame'

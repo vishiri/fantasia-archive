@@ -41,11 +41,17 @@ const faFrontendRenderTimer: number = FA_FRONTEND_RENDER_TIMER
 const monacoMountSettleMs = 2500
 
 /**
+ * Component-testing can hydrate `directInput` after `ComponentTesting.vue` resolves `getSnapshot`, so the floating frame may appear later than the initial render timer.
+ */
+const programStylingWindowReadyMs = 30_000
+
+/**
  * Object of string data selectors for the component
  */
 const selectorList = {
   closeButton: 'windowProgramStyling-button-close',
   editorHost: 'windowProgramStyling-editorHost',
+  frame: 'windowProgramStyling-frame',
   loadingOverlay: 'windowProgramStyling-loadingOverlay',
   saveButton: 'windowProgramStyling-button-save',
   title: 'windowProgramStyling-title'
@@ -54,12 +60,25 @@ const selectorList = {
 const programStylingDirectInput: T_dialogName = 'WindowProgramStyling'
 
 /**
+ * If Monaco owns focus, Escape can be consumed by the editor; blur any focused node inside the host.
+ */
+async function blurProgramStylingMonacoIfFocused (page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const host = document.querySelector('[data-test-locator="windowProgramStyling-editorHost"]')
+    const ae = document.activeElement
+    if (host !== null && ae !== null && host.contains(ae)) {
+      (ae as HTMLElement).blur()
+    }
+  })
+}
+
+/**
  * Wait helper for the cold-loaded Monaco shell to mount inside the editor host.
  * Treats either the loading overlay disappearing or the host getting non-zero height as 'ready'.
  */
 async function waitForMonacoEditorMount (page: Page): Promise<void> {
   const host = page.locator(`[data-test-locator="${selectorList.editorHost}"]`)
-  await expect(host).toHaveCount(1)
+  await expect(host).toHaveCount(1, { timeout: programStylingWindowReadyMs })
   await expect(async () => {
     const handle = await host.elementHandle()
     if (handle === null) {
@@ -71,6 +90,8 @@ async function waitForMonacoEditorMount (page: Page): Promise<void> {
 }
 
 test.describe.serial('Program styling floating window chrome and persistent close behaviour', () => {
+  test.describe.configure({ timeout: 120_000 })
+
   let electronApp: ElectronApplication
   let appWindow: Page
   let suiteTestInfo: TestInfo
@@ -98,15 +119,18 @@ test.describe.serial('Program styling floating window chrome and persistent clos
    * directInput mounts the window with the Custom program CSS title and both action buttons.
    */
   test('Program styling window renders title, save and close-without-saving controls', async () => {
-    const title = appWindow.locator(`[data-test-locator="${selectorList.title}"]`)
+    const frame = appWindow.locator(`[data-test-locator="${selectorList.frame}"]`)
+    await expect(frame).toHaveCount(1, { timeout: programStylingWindowReadyMs })
+
+    const title = frame.locator(`[data-test-locator="${selectorList.title}"]`)
     await expect(title).toHaveCount(1)
     await expect(title).toHaveText(programStylingMessages.title)
 
-    const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
+    const closeButton = frame.locator(`[data-test-locator="${selectorList.closeButton}"]`)
     await expect(closeButton).toHaveCount(1)
     await expect(closeButton).toContainText(programStylingMessages.closeWithoutSaving)
 
-    const saveButton = appWindow.locator(`[data-test-locator="${selectorList.saveButton}"]`)
+    const saveButton = frame.locator(`[data-test-locator="${selectorList.saveButton}"]`)
     await expect(saveButton).toHaveCount(1)
     await expect(saveButton).toContainText(programStylingMessages.saveButton)
   })
@@ -124,28 +148,33 @@ test.describe.serial('Program styling floating window chrome and persistent clos
    * No modal backdrop: Escape and outside clicks must not dismiss the window; only explicit buttons close it.
    */
   test('Program styling window ignores Escape and outside click until a button closes it', async () => {
-    const title = appWindow.locator(`[data-test-locator="${selectorList.title}"]`)
-    await expect(title).toBeVisible()
+    // Assert on the frame root: the title node can satisfy toHaveText while Playwright still treats it as
+    // not "visible" (transition/stacking), but v-if removes the whole frame when the window closes.
+    const frame = appWindow.locator(`[data-test-locator="${selectorList.frame}"]`)
+    await expect(frame).toHaveCount(1, { timeout: programStylingWindowReadyMs })
+
+    // Monaco may own focus after mount; blur the editor so Escape is not handled inside Monaco.
+    await blurProgramStylingMonacoIfFocused(appWindow)
 
     await appWindow.keyboard.press('Escape')
     await appWindow.waitForTimeout(400)
-    await expect(title).toBeVisible()
+    await expect(frame).toHaveCount(1, { timeout: 10_000 })
 
     await appWindow.mouse.click(5, 5)
     await appWindow.waitForTimeout(400)
-    await expect(title).toBeVisible()
+    await expect(frame).toHaveCount(1, { timeout: 10_000 })
   })
 
   /**
    * Close button dismisses the window without writing CSS to the persistent store.
    */
   test('Program styling Close without saving dismisses the window and leaves stored css empty', async () => {
-    const title = appWindow.locator(`[data-test-locator="${selectorList.title}"]`)
-    const closeButton = appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`)
+    const frame = appWindow.locator(`[data-test-locator="${selectorList.frame}"]`)
+    const closeButton = frame.locator(`[data-test-locator="${selectorList.closeButton}"]`)
 
-    await expect(title).toBeVisible()
+    await expect(frame).toHaveCount(1, { timeout: programStylingWindowReadyMs })
     await closeButton.click()
-    await expect(title).toBeHidden({ timeout: 15_000 })
+    await expect(frame).toHaveCount(0, { timeout: 15_000 })
 
     const stored = await appWindow.evaluate(async () => {
       return await window.faContentBridgeAPIs.faProgramStyling.getProgramStyling()

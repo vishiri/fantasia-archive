@@ -12,7 +12,14 @@ body {
 }`
   return {
     components: { story },
-    template: '<div class="fa-storybook-windowProgramStyling-stage"><story /></div>'
+    /**
+     * Stage sizing only; FaFloatingWindowBodyTeleport mounts the frame under document.body (same as production).
+     */
+    template: `
+      <div class="fa-storybook-windowProgramStyling-stage" style="min-height: 85vh; position: relative;">
+        <story />
+      </div>
+    `
   }
 }
 
@@ -21,6 +28,12 @@ const meta = {
   component: WindowProgramStyling,
   tags: ['autodocs'],
   decorators: [seedUserCss],
+  argTypes: {
+    directInput: {
+      control: 'select',
+      options: ['', 'WindowProgramStyling']
+    }
+  },
   parameters: {
     docs: {
       story: {
@@ -29,7 +42,7 @@ const meta = {
       },
       description: {
         component:
-          'Custom program CSS editor (Monaco) in a movable, resizable floating window. The Storybook decorator seeds sample CSS in S_FaProgramStyling; en-US copy comes from the Storybook locale mock.'
+          'Custom program CSS editor (Monaco) in a movable, resizable floating window. The Storybook decorator seeds sample CSS in S_FaProgramStyling; en-US copy comes from the Storybook locale mock. The frame teleports to document.body; set directInput to WindowProgramStyling for the window to open.'
       }
     }
   }

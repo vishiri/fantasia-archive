@@ -14,6 +14,7 @@ import {
 import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers/playwrightDismissStartupTipsNotify'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
 import toolsMenuMessages from 'app/i18n/en-US/components/globals/AppControlMenus/L_tools'
+import programStylingMessages from 'app/i18n/en-US/floatingWindows/L_programStyling'
 
 /**
  * Extra env settings to trigger E2E testing via Playwright
@@ -43,14 +44,22 @@ const menuAnimationTimer = 600
 const monacoMountSettleMs = 2500
 
 /**
- * Sample user CSS applied in the Program Styling dialog (requested E2E payload).
+ * Floating window can appear after menu navigation; match component-test resilience (assert frame root, not title visibility alone).
  */
-const programStylingZoomSnippet = 'body {zoom:0.9;};'
+const programStylingWindowReadyMs = 30_000
+
+/**
+ * Sample user CSS for body zoom in the Program Styling dialog (live preview + save checks).
+ */
+const programStylingZoomSnippet08 = 'body {zoom:0.8;};'
+
+const programStylingZoomSnippet09 = 'body {zoom:0.9;};'
 
 /**
  * Object of string data selectors for the e2e
  */
 const selectorList = {
+  programStylingFrame: 'windowProgramStyling-frame',
   programStylingSave: 'windowProgramStyling-button-save',
   programStylingTitle: 'windowProgramStyling-title',
   editorHost: 'windowProgramStyling-editorHost'
@@ -62,9 +71,11 @@ const selectorList = {
 const bodyZoomNoneExpected = '1'
 
 /**
- * After applying 'body { zoom: 0.9 }' via injected user stylesheet, computed body zoom in Electron.
+ * Expected computed body zoom after typing unsaved CSS (live preview) and after save.
  */
-const bodyZoomAppliedExpected = '0.9'
+const bodyZoomLivePreviewExpected = '0.8'
+
+const bodyZoomAfterSaveExpected = '0.9'
 
 async function waitForMonacoEditorMount (page: Page): Promise<void> {
   const host = page.locator(`[data-test-locator="${selectorList.editorHost}"]`)
@@ -92,8 +103,11 @@ async function openProgramStylingFromToolsMenu (page: Page): Promise<void> {
 }
 
 async function waitForProgramStylingWindow (page: Page): Promise<void> {
-  const title = page.locator(`[data-test-locator="${selectorList.programStylingTitle}"]`)
-  await expect(title).toBeVisible({ timeout: 15_000 })
+  const frame = page.locator(`[data-test-locator="${selectorList.programStylingFrame}"]`)
+  await expect(frame).toHaveCount(1, { timeout: programStylingWindowReadyMs })
+  const title = frame.locator(`[data-test-locator="${selectorList.programStylingTitle}"]`)
+  await expect(title).toHaveCount(1)
+  await expect(title).toHaveText(programStylingMessages.title)
   await page.waitForTimeout(monacoMountSettleMs)
   await waitForMonacoEditorMount(page)
 }
@@ -110,11 +124,9 @@ async function replaceMonacoText (page: Page, nextText: string): Promise<void> {
 }
 
 async function saveProgramStylingWindow (page: Page): Promise<void> {
-  await page.locator(`[data-test-locator="${selectorList.programStylingSave}"]`).click()
-  const title = page.locator(`[data-test-locator="${selectorList.programStylingTitle}"]`)
-  await expect(title).toBeHidden({
-    timeout: 15_000
-  })
+  const frame = page.locator(`[data-test-locator="${selectorList.programStylingFrame}"]`)
+  await frame.locator(`[data-test-locator="${selectorList.programStylingSave}"]`).click()
+  await expect(frame).toHaveCount(0, { timeout: 15_000 })
 }
 
 async function readBodyZoom (page: Page): Promise<string> {
@@ -148,9 +160,9 @@ test.describe.serial('Custom program CSS end-to-end', () => {
   })
 
   /**
-   * Saves user CSS with a body zoom rule, asserts it affects the app shell, clears CSS, and asserts zoom returns to default.
+   * Live preview applies body zoom before save; saving a different zoom persists it; clearing CSS resets zoom.
    */
-  test('Program styling save applies body zoom and clearing removes it', async () => {
+  test('Program styling live preview and save apply body zoom; clearing removes it', async () => {
     await expect(
       appWindow.locator('.appHeader'),
       'Program styling menu lives on MainLayout; this suite must start on the home route.'
@@ -163,15 +175,22 @@ test.describe.serial('Custom program CSS end-to-end', () => {
       await waitForProgramStylingWindow(appWindow)
     })
 
-    await test.step('Type zoom CSS and save', async () => {
-      await replaceMonacoText(appWindow, programStylingZoomSnippet)
+    await test.step('Type zoom 0.8 — applied to body before save (live preview)', async () => {
+      await replaceMonacoText(appWindow, programStylingZoomSnippet08)
+      await expect.poll(async () => await readBodyZoom(appWindow), {
+        timeout: 15_000
+      }).toBe(bodyZoomLivePreviewExpected)
+    })
+
+    await test.step('Change to zoom 0.9 and save', async () => {
+      await replaceMonacoText(appWindow, programStylingZoomSnippet09)
       await saveProgramStylingWindow(appWindow)
     })
 
-    await test.step('Body has zoom from user CSS', async () => {
+    await test.step('Body has zoom 0.9 from saved user CSS', async () => {
       await expect.poll(async () => await readBodyZoom(appWindow), {
         timeout: 15_000
-      }).toBe(bodyZoomAppliedExpected)
+      }).toBe(bodyZoomAfterSaveExpected)
     })
 
     await test.step('Reopen dialog, clear editor, save empty CSS', async () => {

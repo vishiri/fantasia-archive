@@ -18,7 +18,11 @@ const {
   editorInstance,
   runFaActionAwaitMock,
   faProgramStylingCssRef,
-  dialogStoreRef
+  faProgramStylingCssLivePreviewRef,
+  dialogStoreRef,
+  setCssLivePreviewMock,
+  clearCssLivePreviewMock,
+  refreshProgramStylingMock
 } = vi.hoisted(() => {
   const editorDispose = vi.fn()
   let currentValue = ''
@@ -42,10 +46,14 @@ const {
     editorInstance: instance,
     runFaActionAwaitMock: vi.fn(async () => true),
     faProgramStylingCssRef: { value: '' as string },
+    faProgramStylingCssLivePreviewRef: { value: null as string | null },
     dialogStoreRef: {
       value: null as { dialogToOpen: string | null, dialogUUID: string } | null,
       throwOnAccess: false
-    }
+    },
+    setCssLivePreviewMock: vi.fn(),
+    clearCssLivePreviewMock: vi.fn(),
+    refreshProgramStylingMock: vi.fn(async () => true)
   }
 })
 
@@ -68,7 +76,19 @@ vi.mock('app/src/stores/S_FaProgramStyling', () => {
     S_FaProgramStyling: () => ({
       get css () {
         return faProgramStylingCssRef.value
-      }
+      },
+      get cssLivePreview () {
+        return faProgramStylingCssLivePreviewRef.value
+      },
+      setCssLivePreview (text: string) {
+        faProgramStylingCssLivePreviewRef.value = text
+        setCssLivePreviewMock(text)
+      },
+      clearCssLivePreview () {
+        faProgramStylingCssLivePreviewRef.value = null
+        clearCssLivePreviewMock()
+      },
+      refreshProgramStyling: refreshProgramStylingMock
     })
   }
 })
@@ -91,11 +111,15 @@ beforeEach(() => {
   runFaActionAwaitMock.mockReset()
   runFaActionAwaitMock.mockResolvedValue(true)
   faProgramStylingCssRef.value = ''
+  faProgramStylingCssLivePreviewRef.value = null
   dialogStoreRef.value = reactive({
     dialogToOpen: 'WindowProgramStyling',
     dialogUUID: '0'
   })
   dialogStoreRef.throwOnAccess = false
+  setCssLivePreviewMock.mockClear()
+  clearCssLivePreviewMock.mockClear()
+  refreshProgramStylingMock.mockClear()
 })
 
 interface I_TestHarness {
@@ -296,17 +320,93 @@ test('Test that onWindowHide disposes Monaco and clears the working css', async 
 
 /**
  * useWindowProgramStyling
- * closeWithoutSaving simply flips windowModel to false; nothing is dispatched to the action manager.
+ * closeWithoutSaving clears live preview, re-reads styling from disk, closes the window, and does not dispatch save.
  */
-test('Test that closeWithoutSaving flips windowModel without invoking any action', async () => {
+test('Test that closeWithoutSaving refreshes from disk, clears preview, and closes without save action', async () => {
   const { harness } = mountUseWindow('WindowProgramStyling')
   await nextTick()
   expect(harness.current!.state.windowModel.value).toBe(true)
 
-  harness.current!.state.closeWithoutSaving()
+  await harness.current!.state.closeWithoutSaving()
 
+  expect(refreshProgramStylingMock).toHaveBeenCalled()
+  expect(clearCssLivePreviewMock).toHaveBeenCalled()
   expect(harness.current!.state.windowModel.value).toBe(false)
   expect(runFaActionAwaitMock).not.toHaveBeenCalled()
+})
+
+/**
+ * useWindowProgramStyling
+ * When the disk refresh fails, discard keeps the window open and leaves live preview intact.
+ */
+test('Test that closeWithoutSaving keeps the window open when refreshProgramStyling fails', async () => {
+  refreshProgramStylingMock.mockResolvedValueOnce(false)
+  const { harness } = mountUseWindow('WindowProgramStyling')
+  await nextTick()
+  clearCssLivePreviewMock.mockClear()
+
+  await harness.current!.state.closeWithoutSaving()
+
+  expect(harness.current!.state.windowModel.value).toBe(true)
+  expect(clearCssLivePreviewMock).not.toHaveBeenCalled()
+})
+
+/**
+ * useWindowProgramStyling
+ * Any path that sets windowModel false should clear live preview so '#faUserCss' cannot stay on unsaved text.
+ */
+test('Test that setting windowModel false clears live preview', async () => {
+  const { harness } = mountUseWindow('WindowProgramStyling')
+  await nextTick()
+  clearCssLivePreviewMock.mockClear()
+
+  harness.current!.state.windowModel.value = false
+  await nextTick()
+
+  expect(clearCssLivePreviewMock).toHaveBeenCalled()
+})
+
+/**
+ * useWindowProgramStyling
+ * After a normal close, unmount skips an extra refresh when preview is already cleared.
+ */
+test('Test that unmount after closeWithoutSaving does not call refreshProgramStyling again', async () => {
+  const { harness, wrapper } = mountUseWindow('WindowProgramStyling')
+  await nextTick()
+  await harness.current!.state.closeWithoutSaving()
+  await flushPromises()
+  refreshProgramStylingMock.mockClear()
+
+  wrapper.unmount()
+
+  expect(refreshProgramStylingMock).not.toHaveBeenCalled()
+})
+
+/**
+ * useWindowProgramStyling
+ * While the window is open, editor working css is pushed to the program styling store for live preview.
+ */
+test('Test that opening the program styling window publishes working css as live preview', async () => {
+  faProgramStylingCssRef.value = 'body { margin: 0; }'
+  mountUseWindow('WindowProgramStyling')
+  await nextTick()
+  await flushPromises()
+  expect(setCssLivePreviewMock).toHaveBeenCalledWith('body { margin: 0; }')
+})
+
+/**
+ * useWindowProgramStyling
+ * Editing working css updates live preview while the window stays open.
+ */
+test('Test that workingCss changes update live preview while the window is open', async () => {
+  const { harness } = mountUseWindow('WindowProgramStyling')
+  await nextTick()
+  setCssLivePreviewMock.mockClear()
+
+  harness.current!.state.workingCss.value = 'a { color: lime; }'
+  await nextTick()
+
+  expect(setCssLivePreviewMock).toHaveBeenCalledWith('a { color: lime; }')
 })
 
 /**
@@ -355,8 +455,9 @@ test(
 
     harness.current!.state.workingCss.value = 'awaiting teardown'
 
-    harness.current!.state.closeWithoutSaving()
+    await harness.current!.state.closeWithoutSaving()
     await nextTick()
+    await flushPromises()
     await new Promise<void>((resolve) => {
       setTimeout(resolve, FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS + 50)
     })
@@ -383,8 +484,9 @@ test(
     await flushPromises()
     editorInstance.dispose.mockClear()
 
-    harness.current!.state.closeWithoutSaving()
+    await harness.current!.state.closeWithoutSaving()
     await nextTick()
+    await flushPromises()
     harness.current!.state.windowModel.value = true
     await nextTick()
     await flushPromises()
@@ -410,8 +512,9 @@ test(
     await flushPromises()
     editorInstance.dispose.mockClear()
 
-    harness.current!.state.closeWithoutSaving()
+    await harness.current!.state.closeWithoutSaving()
     await nextTick()
+    await flushPromises()
     wrapper.unmount()
 
     await new Promise<void>((resolve) => {

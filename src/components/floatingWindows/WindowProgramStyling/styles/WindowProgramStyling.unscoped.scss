@@ -11,10 +11,15 @@
   }
 
   &__titleRow {
+    align-items: center;
     cursor: grab;
+    display: flex;
     flex: 0 0 auto;
+    justify-content: center;
+    min-height: 2.75rem;
     position: relative;
     user-select: none;
+    width: 100%;
 
     &:active {
       cursor: grabbing;
@@ -22,7 +27,9 @@
   }
 
   &__title {
-    flex: 0 0 auto;
+    flex: 1 1 auto;
+    margin: 0;
+    min-width: 0;
   }
 
   &__helpIcon {

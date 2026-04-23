@@ -65,6 +65,28 @@ test('Test that FaUserCssInjector updates the style element textContent when the
 
 /**
  * FaUserCssInjector
+ * When 'cssLivePreview' is set it overrides persisted 'css' in the injected style until cleared.
+ */
+test('Test that FaUserCssInjector applies cssLivePreview over store css when preview is active', async () => {
+  const store = S_FaProgramStyling()
+  store.css = '.persisted { color: blue; }'
+  store.cssLivePreview = 'body { color: red; }'
+
+  const w = mount(FaUserCssInjector)
+  await flushPromises()
+
+  const styleEl = document.getElementById(FA_USER_CSS_STYLE_ELEMENT_ID)
+  expect(styleEl?.textContent).toBe('body { color: red; }')
+
+  store.cssLivePreview = null
+  await flushPromises()
+  expect(styleEl?.textContent).toBe('.persisted { color: blue; }')
+
+  w.unmount()
+})
+
+/**
+ * FaUserCssInjector
  * Unmounting should detach the style element so subsequent app shells can mount cleanly without duplicates.
  */
 test('Test that FaUserCssInjector removes its style#faUserCss element on unmount', async () => {

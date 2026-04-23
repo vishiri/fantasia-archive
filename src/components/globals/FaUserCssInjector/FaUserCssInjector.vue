@@ -22,6 +22,11 @@ const FA_USER_CSS_STYLE_ELEMENT_ID = 'faUserCss'
 const programStylingStore = S_FaProgramStyling()
 let styleElement: HTMLStyleElement | null = null
 
+function effectiveUserCss (): string {
+  const live = programStylingStore.cssLivePreview
+  return live !== null ? live : programStylingStore.css
+}
+
 /**
  * Returns an existing or newly created 'style#faUserCss' in 'document.head'.
  */
@@ -55,13 +60,13 @@ function applyCss (css: string): void {
 
 onMounted(() => {
   styleElement = ensureStyleElement()
-  applyCss(programStylingStore.css)
+  applyCss(effectiveUserCss())
 })
 
 watch(
-  () => programStylingStore.css,
-  (next) => {
-    applyCss(next)
+  [() => programStylingStore.cssLivePreview, () => programStylingStore.css],
+  () => {
+    applyCss(effectiveUserCss())
   }
 )
 

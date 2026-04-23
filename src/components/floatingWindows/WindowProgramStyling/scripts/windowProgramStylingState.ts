@@ -1,7 +1,6 @@
-import { nextTick, onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue'
+import { nextTick, onBeforeUnmount, ref, watch, type Ref } from 'vue'
 
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
-import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
 import { runFaActionAwait } from 'app/src/scripts/actionManager/faActionManagerRun'
 import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/faQuasarDialogStandardTransition'
@@ -11,20 +10,12 @@ import {
   useMonacoMount,
   type I_FaMonacoMount
 } from 'app/src/components/floatingWindows/WindowProgramStyling/scripts/useMonacoMount'
-
-/**
- * Internal alias for the Pinia generic store accessed via 'S_DialogComponent'.
- * Avoids importing the Pinia 'StoreGeneric' type into the window template.
- */
-type T_resolvedDialogComponentStore = ReturnType<typeof S_DialogComponent> | null
-
-function resolveDialogComponentStore (): T_resolvedDialogComponentStore {
-  try {
-    return S_DialogComponent()
-  } catch {
-    return null
-  }
-}
+import {
+  clearProgramStylingLivePreviewAndRefreshFromDisk,
+  refreshPersistedProgramStylingAndCloseWindow,
+  watchProgramStylingEditorCssLivePreview,
+  wireProgramStylingWindowOpenFromMenuAndProps
+} from 'app/src/components/floatingWindows/WindowProgramStyling/scripts/windowProgramStylingStateSideEffects'
 
 /**
  * Public surface returned by 'useWindowProgramStyling'. Exposes:
@@ -34,7 +25,7 @@ function resolveDialogComponentStore (): T_resolvedDialogComponentStore {
  *  - lifecycle helpers (open / show / hide / save).
  */
 export interface I_FaWindowProgramStylingState {
-  closeWithoutSaving: () => void
+  closeWithoutSaving: () => Promise<void>
   documentName: Ref<T_dialogName>
   editorHostRef: Ref<HTMLDivElement | null>
   monaco: I_FaMonacoMount
@@ -79,8 +70,8 @@ export function useWindowProgramStyling (props: { directInput?: T_dialogName }):
     workingCss.value = ''
   }
 
-  function closeWithoutSaving (): void {
-    windowModel.value = false
+  async function closeWithoutSaving (): Promise<void> {
+    await refreshPersistedProgramStylingAndCloseWindow(windowModel)
   }
 
   async function saveAndCloseWindow (): Promise<void> {
@@ -89,6 +80,8 @@ export function useWindowProgramStyling (props: { directInput?: T_dialogName }):
       windowModel.value = false
     }
   }
+
+  watchProgramStylingEditorCssLivePreview(workingCss, windowModel)
 
   watch(windowModel, async (isOpen, wasOpen) => {
     if (isOpen && !wasOpen) {
@@ -100,6 +93,7 @@ export function useWindowProgramStyling (props: { directInput?: T_dialogName }):
       await onWindowShow()
     }
     if (!isOpen && wasOpen) {
+      S_FaProgramStyling().clearCssLivePreview()
       hideAfterTransitionId = scheduleFaFloatingWindowDelayedHide(
         hideAfterTransitionId,
         FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS,
@@ -116,32 +110,13 @@ export function useWindowProgramStyling (props: { directInput?: T_dialogName }):
       clearTimeout(hideAfterTransitionId)
       hideAfterTransitionId = null
     }
+    clearProgramStylingLivePreviewAndRefreshFromDisk(windowModel)
     onWindowHide()
   })
 
-  watch(
-    () => resolveDialogComponentStore()?.dialogUUID,
-    () => {
-      const store = resolveDialogComponentStore()
-      if (store?.dialogToOpen === 'WindowProgramStyling') {
-        openWindow()
-      }
-    }
-  )
-
-  watch(
-    () => props.directInput,
-    () => {
-      if (props.directInput === 'WindowProgramStyling') {
-        openWindow()
-      }
-    }
-  )
-
-  onMounted(() => {
-    if (props.directInput === 'WindowProgramStyling') {
-      openWindow()
-    }
+  wireProgramStylingWindowOpenFromMenuAndProps({
+    openWindow,
+    props
   })
 
   return {

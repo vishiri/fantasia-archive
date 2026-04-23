@@ -62,6 +62,18 @@ beforeEach(async () => {
 })
 
 /**
+ * S_FaProgramStyling / setCssLivePreview & clearCssLivePreview
+ * Drives the injected style override while the program styling editor is open.
+ */
+test('Test that setCssLivePreview and clearCssLivePreview update cssLivePreview', () => {
+  expect(store.cssLivePreview).toBeNull()
+  store.setCssLivePreview('body { margin: 0; }')
+  expect(store.cssLivePreview).toBe('body { margin: 0; }')
+  store.clearCssLivePreview()
+  expect(store.cssLivePreview).toBeNull()
+})
+
+/**
  * S_FaProgramStyling / refreshProgramStyling
  * Pulls the current root from the bridge and mirrors 'css' for global injection.
  */
@@ -75,8 +87,9 @@ test('Test that refreshProgramStyling populates root and css from the IPC bridge
   expect(store.root).toBeNull()
   expect(store.css).toBe('')
 
-  await store.refreshProgramStyling()
+  const ok = await store.refreshProgramStyling()
 
+  expect(ok).toBe(true)
   expect(getProgramStylingMock).toHaveBeenCalledOnce()
   expect(store.root).toEqual(incoming)
   expect(store.css).toBe(incoming.css)
@@ -96,7 +109,8 @@ test('Test that refreshProgramStyling skips when getProgramStyling is unavailabl
   const stores = await import('../S_FaProgramStyling')
   const localStore = stores.S_FaProgramStyling()
 
-  await localStore.refreshProgramStyling()
+  const ok = await localStore.refreshProgramStyling()
+  expect(ok).toBe(false)
   expect(localStore.root).toBeNull()
   expect(localStore.css).toBe('')
 })
@@ -108,8 +122,9 @@ test('Test that refreshProgramStyling skips when getProgramStyling is unavailabl
 test('Test that refreshProgramStyling notifies when getProgramStyling rejects', async () => {
   getProgramStylingMock.mockRejectedValueOnce(new Error('ipc read fail'))
 
-  await store.refreshProgramStyling()
+  const ok = await store.refreshProgramStyling()
 
+  expect(ok).toBe(false)
   expect(getProgramStylingMock).toHaveBeenCalledOnce()
   expect(store.root).toBeNull()
   expect(store.css).toBe('')
@@ -145,6 +160,23 @@ test('Test that updateProgramStyling returns true and re-reads root after succes
       type: 'positive'
     })
   )
+})
+
+/**
+ * S_FaProgramStyling / updateProgramStyling
+ * A successful save clears any in-editor live preview override so '#faUserCss' tracks persisted css only.
+ */
+test('Test that updateProgramStyling clears cssLivePreview after a successful save', async () => {
+  store.cssLivePreview = 'preview { color: red; }'
+  const afterRoot: I_faProgramStylingRoot = {
+    css: 'a { color: blue; }',
+    schemaVersion: 1
+  }
+  getProgramStylingMock.mockResolvedValueOnce(afterRoot)
+
+  await store.updateProgramStyling({ css: afterRoot.css })
+
+  expect(store.cssLivePreview).toBeNull()
 })
 
 /**
@@ -239,4 +271,22 @@ test('Test that updateProgramStyling throws saveError when retrieved css does no
     'globalFunctionality.faProgramStyling.saveError'
   )
   expect(notifyCreateMock).not.toHaveBeenCalled()
+})
+
+/**
+ * S_FaProgramStyling / updateProgramStyling
+ * On save mismatch, 'cssLivePreview' stays set so the injected stylesheet still tracks the open editor.
+ */
+test('Test that updateProgramStyling leaves cssLivePreview unchanged when save mismatch throws', async () => {
+  store.cssLivePreview = 'body { color: lime; }'
+  getProgramStylingMock.mockResolvedValueOnce({
+    css: 'retrieved mismatch',
+    schemaVersion: 1
+  })
+  vi.spyOn(console, 'error').mockImplementation(() => undefined)
+
+  await expect(store.updateProgramStyling({ css: 'sent css' })).rejects.toThrow(
+    'globalFunctionality.faProgramStyling.saveError'
+  )
+  expect(store.cssLivePreview).toBe('body { color: lime; }')
 })
