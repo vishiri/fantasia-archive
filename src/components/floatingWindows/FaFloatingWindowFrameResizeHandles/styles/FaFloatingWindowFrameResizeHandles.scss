@@ -1,0 +1,145 @@
+@mixin fa-fw-resize-handle-glow($gradient) {
+  &::before {
+    background-image: $gradient;
+    content: '';
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    transition: $faFloatingWindowFrameResizeHandles-glowPseudo-transition;
+  }
+
+  &.faFloatingWindowFrameResizeHandles__hit--glow::before {
+    opacity: 1;
+  }
+}
+
+.faFloatingWindowFrameResizeHandles {
+  box-sizing: border-box;
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  touch-action: none;
+  z-index: $faFloatingWindowFrameResizeHandles-root-zIndex;
+
+  $corner: var(--fa-fw-resize, #{$faFloatingWindowFrameResizeHandles-cornerHit-fallback});
+  $z-corner: $faFloatingWindowFrameResizeHandles-stacking-cornerZ;
+  $z-edge: $faFloatingWindowFrameResizeHandles-stacking-edgeZ;
+
+  &__hit {
+    pointer-events: auto;
+    position: absolute;
+  }
+
+  &__n {
+    @include fa-fw-resize-handle-glow(linear-gradient(0deg, $faFloatingWindowFrameResizeHandles-glow-inner 0%, $faFloatingWindowFrameResizeHandles-glow-outer 100%));
+
+    cursor: ns-resize;
+    height: $corner;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: $z-edge;
+  }
+
+  &__s {
+    @include fa-fw-resize-handle-glow(linear-gradient(180deg, $faFloatingWindowFrameResizeHandles-glow-inner 0%, $faFloatingWindowFrameResizeHandles-glow-outer 100%));
+
+    bottom: 0;
+    cursor: ns-resize;
+    height: $corner;
+    left: 0;
+    right: 0;
+    z-index: $z-edge;
+  }
+
+  &__e {
+    @include fa-fw-resize-handle-glow(linear-gradient(90deg, $faFloatingWindowFrameResizeHandles-glow-inner 0%, $faFloatingWindowFrameResizeHandles-glow-outer 100%));
+
+    bottom: 0;
+    cursor: ew-resize;
+    right: 0;
+    top: 0;
+    width: $corner;
+    z-index: $z-edge;
+  }
+
+  &__w {
+    @include fa-fw-resize-handle-glow(linear-gradient(270deg, $faFloatingWindowFrameResizeHandles-glow-inner 0%, $faFloatingWindowFrameResizeHandles-glow-outer 100%));
+
+    bottom: 0;
+    cursor: ew-resize;
+    left: 0;
+    top: 0;
+    width: $corner;
+    z-index: $z-edge;
+  }
+
+  &__corner {
+    z-index: $z-corner;
+  }
+
+  &__nw {
+    @include fa-fw-resize-handle-glow(
+      radial-gradient(
+        circle at 0 0,
+        $faFloatingWindowFrameResizeHandles-glow-outer 0%,
+        $faFloatingWindowFrameResizeHandles-glow-inner $faFloatingWindowFrameResizeHandles-radialGradient-innerStop
+      )
+    );
+
+    cursor: nwse-resize;
+    height: $corner;
+    left: 0;
+    top: 0;
+    width: $corner;
+  }
+
+  &__ne {
+    @include fa-fw-resize-handle-glow(
+      radial-gradient(
+        circle at 100% 0,
+        $faFloatingWindowFrameResizeHandles-glow-outer 0%,
+        $faFloatingWindowFrameResizeHandles-glow-inner $faFloatingWindowFrameResizeHandles-radialGradient-innerStop
+      )
+    );
+
+    cursor: nesw-resize;
+    height: $corner;
+    right: 0;
+    top: 0;
+    width: $corner;
+  }
+
+  &__sw {
+    @include fa-fw-resize-handle-glow(
+      radial-gradient(
+        circle at 0 100%,
+        $faFloatingWindowFrameResizeHandles-glow-outer 0%,
+        $faFloatingWindowFrameResizeHandles-glow-inner $faFloatingWindowFrameResizeHandles-radialGradient-innerStop
+      )
+    );
+
+    bottom: 0;
+    cursor: nesw-resize;
+    height: $corner;
+    left: 0;
+    width: $corner;
+  }
+
+  &__se {
+    @include fa-fw-resize-handle-glow(
+      radial-gradient(
+        circle at 100% 100%,
+        $faFloatingWindowFrameResizeHandles-glow-outer 0%,
+        $faFloatingWindowFrameResizeHandles-glow-inner $faFloatingWindowFrameResizeHandles-radialGradient-innerStop
+      )
+    );
+
+    bottom: 0;
+    cursor: nwse-resize;
+    height: $corner;
+    right: 0;
+    width: $corner;
+  }
+}

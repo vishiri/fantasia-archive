@@ -248,6 +248,16 @@ $errorCard-border-radius: 10px;
 $errorCard-border-size: 2px;
 $errorCard-text: $dark;
 
+/* COMPONENT - FA FLOATING WINDOW FRAME RESIZE HANDLES */
+$faFloatingWindowFrameResizeHandles-cornerHit-fallback: 8px;
+$faFloatingWindowFrameResizeHandles-glow-inner: rgba($primary-bright, 0);
+$faFloatingWindowFrameResizeHandles-glow-outer: rgba($primary-bright, 0.3);
+$faFloatingWindowFrameResizeHandles-glowPseudo-transition: opacity 0.24s ease-out;
+$faFloatingWindowFrameResizeHandles-radialGradient-innerStop: 65%;
+$faFloatingWindowFrameResizeHandles-root-zIndex: 3;
+$faFloatingWindowFrameResizeHandles-stacking-cornerZ: 2;
+$faFloatingWindowFrameResizeHandles-stacking-edgeZ: 1;
+
 /* COMPONENT - FOUNDATION CATALOGUES (SHARED) */
 $foundationCatalogues-root-minHeight: 100vh;
 
