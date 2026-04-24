@@ -11,6 +11,8 @@ vi.mock('quasar', () => ({
 import type { I_dialogKeybindSettingsRow } from 'app/types/I_dialogKeybindSettings'
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
 
+import { FA_KEYBIND_COMMAND_DEFINITIONS } from 'app/src/scripts/keybinds/faKeybindCommandDefinitions'
+
 import DialogKeybindSettings from '../DialogKeybindSettings.vue'
 
 const syntheticNonEditableRow: I_dialogKeybindSettingsRow = {
@@ -330,4 +332,30 @@ test('Test that DialogKeybindSettings shows filter empty ErrorCard when filter m
   expect(w.text()).toContain('dialogs.keybindSettings.filterNoResultsTitle')
 
   w.unmount()
+})
+
+/**
+ * DialogKeybindSettings
+ * With an empty command-definition list the no-data slot should show the generic empty hint (not the filter ErrorCard).
+ */
+test('Test that DialogKeybindSettings shows table empty hint when the keybind definition list is empty', async () => {
+  const backup = FA_KEYBIND_COMMAND_DEFINITIONS.slice()
+  try {
+    FA_KEYBIND_COMMAND_DEFINITIONS.length = 0
+
+    const w = mount(DialogKeybindSettings, {
+      ...dialogKeybindSettingsMountOptions,
+      props: { directInput: 'KeybindSettings' }
+    })
+
+    await flushPromises()
+
+    expect(w.find('[data-test-locator="dialogKeybindSettings-tableEmpty"]').exists()).toBe(true)
+    expect(w.find('[data-test-locator="dialogKeybindSettings-filterNoResults"]').exists()).toBe(false)
+
+    w.unmount()
+  } finally {
+    FA_KEYBIND_COMMAND_DEFINITIONS.length = 0
+    FA_KEYBIND_COMMAND_DEFINITIONS.push(...backup)
+  }
 })

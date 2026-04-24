@@ -22,6 +22,16 @@ const monitorQDialogStub = defineComponent({
     }
   },
   emits: ['update:modelValue', 'show'],
+  watch: {
+    modelValue: {
+      immediate: true,
+      handler (v: boolean): void {
+        if (v) {
+          this.$emit('show')
+        }
+      }
+    }
+  },
   template: `
     <div class="action-monitor-qdialog-stub" v-bind="$attrs">
       <div v-if="modelValue" class="action-monitor-qdialog-inner">

@@ -19,6 +19,7 @@ vi.mock('app/src/scripts/appInternals/rendererAppInternals', async (importOrigin
 })
 
 import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/rendererAppInternals'
+import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
 
 import MainLayout from '../MainLayout.vue'
 
@@ -273,6 +274,52 @@ test('Test that MainLayout removes capture keydown listener on unmount after key
   expect(afterUnmount.length).toBe(1)
 
   removeSpy.mockRestore()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * MainLayout / onMounted
+ * Refreshes persisted program styling when the bridge exposes faProgramStyling.
+ */
+test('Test that MainLayout refreshes program styling when faProgramStyling bridge is present', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'electron')
+
+  const stylingStore = S_FaProgramStyling()
+  const refreshSpy = vi.spyOn(stylingStore, 'refreshProgramStyling').mockResolvedValue(true)
+
+  const w = mountMainLayoutStubs()
+  await flushPromises()
+
+  expect(refreshSpy).toHaveBeenCalledTimes(1)
+
+  refreshSpy.mockRestore()
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * MainLayout / onMounted
+ * Skips program styling hydration when the bridge omits faProgramStyling.
+ */
+test('Test that MainLayout skips program styling refresh when faProgramStyling bridge is absent', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'electron')
+
+  const stylingStore = S_FaProgramStyling()
+  const refreshSpy = vi.spyOn(stylingStore, 'refreshProgramStyling').mockResolvedValue(true)
+
+  const prev = window.faContentBridgeAPIs.faProgramStyling
+  delete (window.faContentBridgeAPIs as { faProgramStyling?: unknown }).faProgramStyling
+
+  const w = mountMainLayoutStubs()
+  await flushPromises()
+
+  expect(refreshSpy).not.toHaveBeenCalled()
+
+  window.faContentBridgeAPIs.faProgramStyling = prev
+  refreshSpy.mockRestore()
+  w.unmount()
   vi.unstubAllEnvs()
 })
 

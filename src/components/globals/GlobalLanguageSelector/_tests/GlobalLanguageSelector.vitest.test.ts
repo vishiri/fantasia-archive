@@ -143,6 +143,32 @@ test('Test that GlobalLanguageSelector does not render when MODE is not electron
 
 /**
  * GlobalLanguageSelector
+ * Hidden in electron MODE when the user-settings bridge is absent.
+ */
+test('Test that GlobalLanguageSelector does not render when faUserSettings bridge is missing', () => {
+  vi.stubEnv('MODE', 'electron')
+  setActivePinia(createPinia())
+  const prev = window.faContentBridgeAPIs.faUserSettings
+  delete (window.faContentBridgeAPIs as { faUserSettings?: unknown }).faUserSettings
+
+  const w = mount(GlobalLanguageSelector, {
+    global: {
+      config: { compilerOptions: globalLanguageSelectorCompilerOpts },
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  expect(w.find('[data-test-locator="globalLanguageSelector-root"]').exists()).toBe(false)
+
+  window.faContentBridgeAPIs.faUserSettings = prev
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * GlobalLanguageSelector
  * Renders the trigger in electron MODE with user-settings bridge present.
  */
 test('Test that GlobalLanguageSelector exposes the menu trigger in electron mode', async () => {

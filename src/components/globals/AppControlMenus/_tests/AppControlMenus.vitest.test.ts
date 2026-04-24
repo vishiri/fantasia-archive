@@ -3,6 +3,8 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
 
+import * as dialogManagement from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
+
 import { buildHelpInfoMenu } from '../_data/helpInfo'
 import { buildToolsMenu } from '../_data/tools'
 import AppControlMenus from '../AppControlMenus.vue'
@@ -133,5 +135,49 @@ test('Test that AppControlMenus skips async snapshot refresh without getSnapshot
   await flushPromises()
   expect(w.find('[data-test-menu-test="appControlMenus-testMenu"]').exists()).toBe(true)
   window.faContentBridgeAPIs.extraEnvVariables = prev
+  w.unmount()
+})
+
+/**
+ * AppControlMenus
+ * Component-testing menu wiring should invoke openDialogMarkdownDocument for the Markdown document row.
+ */
+test('Test that AppControlMenus component-testing menu triggers openDialogMarkdownDocument for changeLog', async () => {
+  window.faContentBridgeAPIs.extraEnvVariables.getCachedSnapshot = vi.fn((): I_extraEnvVariablesAPI | null => ({
+    COMPONENT_NAME: undefined,
+    COMPONENT_PROPS: undefined,
+    ELECTRON_MAIN_FILEPATH: '/fake/electron-main.js',
+    FA_FRONTEND_RENDER_TIMER: 0,
+    TEST_ENV: 'components'
+  }))
+  window.faContentBridgeAPIs.extraEnvVariables.getSnapshot = vi.fn(async (): Promise<I_extraEnvVariablesAPI> => ({
+    COMPONENT_NAME: undefined,
+    COMPONENT_PROPS: undefined,
+    ELECTRON_MAIN_FILEPATH: '/fake/electron-main.js',
+    FA_FRONTEND_RENDER_TIMER: 0,
+    TEST_ENV: 'components'
+  }))
+
+  const spy = vi.spyOn(dialogManagement, 'openDialogMarkdownDocument').mockImplementation(() => {})
+
+  const w = mount(AppControlMenus, {
+    attachTo: document.body,
+    global: { mocks: { $t: (k: string) => k } },
+    props: { embedDialogs: false }
+  })
+
+  await flushPromises()
+
+  await w.get('[data-test-menu-test="appControlMenus-testMenu"]').trigger('click')
+  await flushPromises()
+
+  const itemTexts = document.body.querySelectorAll('[data-test-locator="AppControlSingleMenu-menuItem-text"]')
+  expect(itemTexts.length).toBeGreaterThan(0)
+  ;(itemTexts[0] as HTMLElement).click()
+  await flushPromises()
+
+  expect(spy).toHaveBeenCalledWith('changeLog')
+
+  spy.mockRestore()
   w.unmount()
 })

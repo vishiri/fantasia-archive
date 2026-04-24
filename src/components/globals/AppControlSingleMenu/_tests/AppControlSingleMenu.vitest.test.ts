@@ -321,3 +321,54 @@ test('Test that AppControlSingleMenu invokes submenu item trigger on nested row 
   expect(subTrigger).toHaveBeenCalledTimes(1)
   w.unmount()
 })
+
+/**
+ * AppControlSingleMenu
+ * Submenu item clicks should not throw when the nested row omits a trigger (expression falls back to false).
+ */
+test('Test that AppControlSingleMenu submenu item click tolerates a missing trigger', async () => {
+  const w = mount(AppControlSingleMenu, {
+    attachTo: document.body,
+    props: {
+      dataInput: {
+        title: 'T',
+        data: [
+          {
+            conditions: true,
+            icon: 'keyboard_arrow_right',
+            mode: 'item',
+            submenu: [
+              {
+                conditions: true,
+                icon: 'mdi-dots-horizontal',
+                mode: 'item',
+                text: 'No trigger row'
+              }
+            ],
+            text: 'Parent',
+            trigger: undefined
+          }
+        ]
+      }
+    },
+    global: { mocks: { $t: (k: string) => k } }
+  })
+
+  await w.get('[data-test-locator="AppControlSingleMenu-wrapper"]').trigger('click')
+  await flushPromises()
+
+  const parentRow = document.body.querySelector('[data-test-locator="AppControlSingleMenu-menuItem"]')
+  expect(parentRow).not.toBeNull()
+  ;(parentRow as HTMLElement).dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }))
+  await flushPromises()
+
+  const nestedRows = document.body.querySelectorAll(
+    '[data-test-locator="AppControlSingleMenu-menuItem-subMenu-item"]'
+  )
+  expect(nestedRows.length).toBeGreaterThan(0)
+  expect(() => {
+    ;(nestedRows[nestedRows.length - 1] as HTMLElement).click()
+  }).not.toThrow()
+
+  w.unmount()
+})

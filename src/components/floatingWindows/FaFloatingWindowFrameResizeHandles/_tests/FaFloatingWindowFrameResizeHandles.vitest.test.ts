@@ -15,15 +15,27 @@ test('Test that FaFloatingWindowFrameResizeHandles wires all edges to onResizePo
 
   expect(w.find('[data-test-locator="faFloatingWindowFrameResizeHandles"]').exists()).toBe(true)
 
-  const east = w.find('.faFloatingWindowFrameResizeHandles__e').element
-  east.dispatchEvent(
-    new PointerEvent('pointerdown', {
-      bubbles: true,
-      button: 0,
-      pointerId: 42
-    })
-  )
-  expect(onResizePointerDown).toHaveBeenCalledWith('e', expect.any(PointerEvent))
+  const fireDown = (selector: string, edge: string): void => {
+    w.find(selector).element.dispatchEvent(
+      new PointerEvent('pointerdown', {
+        bubbles: true,
+        button: 0,
+        pointerId: 42
+      })
+    )
+    expect(onResizePointerDown).toHaveBeenLastCalledWith(edge, expect.any(PointerEvent))
+  }
+
+  fireDown('.faFloatingWindowFrameResizeHandles__e', 'e')
+  fireDown('.faFloatingWindowFrameResizeHandles__n', 'n')
+  fireDown('.faFloatingWindowFrameResizeHandles__s', 's')
+  fireDown('.faFloatingWindowFrameResizeHandles__w', 'w')
+  fireDown('.faFloatingWindowFrameResizeHandles__nw', 'nw')
+  fireDown('.faFloatingWindowFrameResizeHandles__ne', 'ne')
+  fireDown('.faFloatingWindowFrameResizeHandles__sw', 'sw')
+  fireDown('.faFloatingWindowFrameResizeHandles__se', 'se')
+
+  expect(onResizePointerDown).toHaveBeenCalledTimes(8)
 
   w.unmount()
 })
@@ -49,6 +61,37 @@ test('Test that FaFloatingWindowFrameResizeHandles highlights north and west whe
     'faFloatingWindowFrameResizeHandles__hit--glow'
   )
 
+  w.unmount()
+})
+
+/**
+ * FaFloatingWindowFrameResizeHandles
+ * Each edge strip and corner picks up hover glow on mouseenter.
+ */
+test('Test that FaFloatingWindowFrameResizeHandles highlights every handle on mouseenter', async () => {
+  vi.useFakeTimers()
+  const w = mount(FaFloatingWindowFrameResizeHandles, {
+    props: { onResizePointerDown: vi.fn() }
+  })
+
+  const expectGlow = async (selector: string): Promise<void> => {
+    await w.find(selector).trigger('mouseenter')
+    expect(w.find(selector).classes()).toContain('faFloatingWindowFrameResizeHandles__hit--glow')
+    await w.find(selector).trigger('mouseleave')
+    vi.advanceTimersByTime(50)
+    await w.vm.$nextTick()
+  }
+
+  await expectGlow('.faFloatingWindowFrameResizeHandles__n')
+  await expectGlow('.faFloatingWindowFrameResizeHandles__s')
+  await expectGlow('.faFloatingWindowFrameResizeHandles__e')
+  await expectGlow('.faFloatingWindowFrameResizeHandles__w')
+  await expectGlow('.faFloatingWindowFrameResizeHandles__nw')
+  await expectGlow('.faFloatingWindowFrameResizeHandles__ne')
+  await expectGlow('.faFloatingWindowFrameResizeHandles__sw')
+  await expectGlow('.faFloatingWindowFrameResizeHandles__se')
+
+  vi.useRealTimers()
   w.unmount()
 })
 

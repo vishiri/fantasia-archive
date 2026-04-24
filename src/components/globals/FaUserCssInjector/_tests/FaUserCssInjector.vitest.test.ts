@@ -1,6 +1,6 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-import { afterEach, beforeEach, expect, test } from 'vitest'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
 
@@ -120,5 +120,29 @@ test('Test that FaUserCssInjector reuses an existing style#faUserCss element ins
   expect(all).toHaveLength(1)
   expect(preexisting.textContent).toBe('.fa-shared { color: pink; }')
 
+  w.unmount()
+})
+
+/**
+ * FaUserCssInjector
+ * applyCss should not rewrite textContent when the incoming css string already matches the node.
+ */
+test('Test that FaUserCssInjector skips redundant style text writes when css is unchanged', async () => {
+  const store = S_FaProgramStyling()
+  store.css = '.stable { color: navy; }'
+
+  const w = mount(FaUserCssInjector)
+  await flushPromises()
+
+  const styleEl = document.getElementById(FA_USER_CSS_STYLE_ELEMENT_ID) as HTMLStyleElement
+  const spy = vi.spyOn(styleEl, 'textContent', 'set')
+  spy.mockClear()
+
+  store.css = '.stable { color: navy; }'
+  await flushPromises()
+
+  expect(spy).not.toHaveBeenCalled()
+
+  spy.mockRestore()
   w.unmount()
 })
