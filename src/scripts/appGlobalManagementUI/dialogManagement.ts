@@ -39,8 +39,13 @@ export const openDialogComponent = (inputDialogName: T_dialogName) => {
 }
 
 /**
- * Watches a root component q-dialog model and updates S_DialogComponent.componentDialogOpenCount
- * so openDialogMarkdownDocument and openDialogComponent can avoid stacking incompatible surfaces.
+ * Watches a **modal** root `QDialog` `v-model` and updates `S_DialogComponent.componentDialogOpenCount`
+ * so `openDialogMarkdownDocument` and `openDialogComponent` can avoid opening a second modal `Dialog*`
+ * while one is already open.
+ *
+ * **Do not** use this for in-renderer floating `Window*` frames: they are not `QDialog`s, paint in the
+ * `5000`–`5999` z-index band below modal dialogs, and registering them would incorrectly block all
+ * programmatic dialog opens. Multiple `Window*` instances may be open at once the same way.
  */
 export function registerComponentDialogStackGuard (dialogModel: Ref<boolean>): void {
   const store = S_DialogComponent()

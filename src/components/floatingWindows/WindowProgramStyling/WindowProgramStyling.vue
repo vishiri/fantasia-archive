@@ -1,6 +1,7 @@
 <template>
   <!-- Transition must wrap a single element root; Teleport cannot be the direct child of Transition. -->
   <FaFloatingWindowBodyTeleport>
+    <!-- Fade, not default QDialog scale: scale enter-from can leave 0×0 layout in Electron/Playwright (see faQuasarDialogStandardTransition). -->
     <Transition v-bind="FA_QUASAR_DIALOG_FADE_TRANSITION_BINDINGS">
       <div
         v-if="windowModel"
@@ -21,7 +22,12 @@
           >
             <h4
               id="windowProgramStyling-title"
-              class="text-center windowProgramStyling__title"
+              :class="[
+                'text-center',
+                'floatingWindowComponent__title',
+                'windowProgramStyling__title',
+                titleShortFrameClass
+              ]"
               data-test-locator="windowProgramStyling-title"
             >
               {{ $t('floatingWindows.programStyling.title') }}
@@ -132,7 +138,6 @@ import FaFloatingWindowBodyTeleport from 'app/src/components/floatingWindows/FaF
 import FaFloatingWindowFrameResizeHandles from 'app/src/components/floatingWindows/FaFloatingWindowFrameResizeHandles/FaFloatingWindowFrameResizeHandles.vue'
 import { getMonacoKeybindHelpItems } from 'app/src/components/floatingWindows/WindowProgramStyling/scripts/windowProgramStylingKeybindHelp'
 import { useWindowProgramStyling } from 'app/src/components/floatingWindows/WindowProgramStyling/scripts/windowProgramStylingState'
-import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
 import {
   FA_QUASAR_DIALOG_FADE_TRANSITION_BINDINGS,
   FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS
@@ -159,8 +164,14 @@ const {
   windowModel
 } = useWindowProgramStyling(props)
 
-const { frameRef, frameStyle, onFramePointerDown, onResizePointerDown, onTitlePointerDown } =
-  useFaFloatingWindowFrame(windowModel)
+const {
+  frameRef,
+  frameStyle,
+  onFramePointerDown,
+  onResizePointerDown,
+  onTitlePointerDown,
+  titleShortFrameClass
+} = useFaFloatingWindowFrame(windowModel)
 
 const frameStyleWithDialogTransition = computed(() => ({
   ...frameStyle.value,
@@ -172,8 +183,6 @@ const frameStyleWithDialogTransition = computed(() => ({
  * (e.g. after the first 'S_FaKeybinds().refreshKeybinds()' resolves on app startup).
  */
 const monacoKeybindHelpItems = computed(() => getMonacoKeybindHelpItems())
-
-registerComponentDialogStackGuard(windowModel)
 </script>
 
 <style lang="scss" src="./styles/WindowProgramStyling.unscoped.scss"></style>

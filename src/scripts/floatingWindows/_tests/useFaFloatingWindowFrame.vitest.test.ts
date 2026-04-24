@@ -95,6 +95,50 @@ test('Test that useFaFloatingWindowFrame centers the frame and bumps z-index whe
 
 /**
  * useFaFloatingWindowFrame
+ * titleShortFrameClass is set when observed height is below the compact vertical threshold.
+ */
+test('Test that useFaFloatingWindowFrame titleShortFrameClass follows frame height versus the compact threshold', async () => {
+  let resizeObserverCallback: ResizeObserverCallback | null = null
+  globalThis.ResizeObserver = class {
+    observe = vi.fn()
+    disconnect = vi.fn()
+    constructor (cb: ResizeObserverCallback) {
+      resizeObserverCallback = cb
+    }
+  } as unknown as typeof ResizeObserver
+
+  const { useFaFloatingWindowFrame, FA_FLOATING_WINDOW_TITLE_SHORT_FRAME_CLASS } =
+    await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame)
+  visible.value = true
+  await wrapper.vm.$nextTick()
+  await wrapper.vm.$nextTick()
+  const el = wrapper.find('[data-test-locator="floating-frame-harness"]').element
+  const vm = wrapper.vm as unknown as { titleShortFrameClass: string | undefined }
+  expect(vm.titleShortFrameClass).toBeUndefined()
+  Object.defineProperty(el, 'offsetWidth', {
+    configurable: true,
+    value: 900
+  })
+  Object.defineProperty(el, 'offsetHeight', {
+    configurable: true,
+    value: 599
+  })
+  resizeObserverCallback!([], {} as ResizeObserver)
+  await wrapper.vm.$nextTick()
+  expect(vm.titleShortFrameClass).toBe(FA_FLOATING_WINDOW_TITLE_SHORT_FRAME_CLASS)
+  Object.defineProperty(el, 'offsetHeight', {
+    configurable: true,
+    value: 600
+  })
+  resizeObserverCallback!([], {} as ResizeObserver)
+  await wrapper.vm.$nextTick()
+  expect(vm.titleShortFrameClass).toBeUndefined()
+  wrapper.unmount()
+})
+
+/**
+ * useFaFloatingWindowFrame
  * ResizeObserver attaches when open and disconnects when closed or unmounted.
  */
 test('Test that useFaFloatingWindowFrame wires ResizeObserver observe and disconnect around visibility', async () => {

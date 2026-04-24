@@ -11,8 +11,10 @@ import {
   getFaPlaywrightElectronRecordVideoPartial,
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
+import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers/playwrightDismissStartupTipsNotify'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
 import programStylingMessages from 'app/i18n/en-US/floatingWindows/L_programStyling'
+import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/faQuasarDialogStandardTransition'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 
 /**
@@ -50,43 +52,38 @@ const programStylingWindowReadyMs = 30_000
  */
 const selectorList = {
   closeButton: 'windowProgramStyling-button-close',
+  dragHandle: 'windowProgramStyling-dragHandle',
   editorHost: 'windowProgramStyling-editorHost',
   frame: 'windowProgramStyling-frame',
   loadingOverlay: 'windowProgramStyling-loadingOverlay',
   saveButton: 'windowProgramStyling-button-save',
   title: 'windowProgramStyling-title'
-}
+} as const
 
 const programStylingDirectInput: T_dialogName = 'WindowProgramStyling'
 
 /**
- * If Monaco owns focus, Escape can be consumed by the editor; blur any focused node inside the host.
- */
-async function blurProgramStylingMonacoIfFocused (page: Page): Promise<void> {
-  await page.evaluate(() => {
-    const host = document.querySelector('[data-test-locator="windowProgramStyling-editorHost"]')
-    const ae = document.activeElement
-    if (host !== null && ae !== null && host.contains(ae)) {
-      (ae as HTMLElement).blur()
-    }
-  })
-}
-
-/**
- * Wait helper for the cold-loaded Monaco shell to mount inside the editor host.
- * Treats either the loading overlay disappearing or the host getting non-zero height as 'ready'.
+ * Match e2e checkAppStyling: editor host present and Monaco root visible.
  */
 async function waitForMonacoEditorMount (page: Page): Promise<void> {
   const host = page.locator(`[data-test-locator="${selectorList.editorHost}"]`)
-  await expect(host).toHaveCount(1, { timeout: programStylingWindowReadyMs })
-  await expect(async () => {
-    const handle = await host.elementHandle()
-    if (handle === null) {
-      throw new Error('editor host detached before Monaco mount')
-    }
-    const childCount = await handle.evaluate((node: Element) => node.childElementCount)
-    expect(childCount).toBeGreaterThan(0)
-  }).toPass({ timeout: 15_000 })
+  await expect(host).toHaveCount(1)
+  await expect(page.locator('.windowProgramStyling .monaco-editor')).toBeVisible({ timeout: 15_000 })
+}
+
+/**
+ * Mirrors e2e checkAppStyling.waitForProgramStylingWindow: frame and title, transition buffer, cold-load
+ * wait, then Monaco. (The window uses fade transition; duration constant matches Quasar transition timing.)
+ */
+async function waitForProgramStylingWindowReady (page: Page): Promise<void> {
+  const frame = page.locator(`[data-test-locator="${selectorList.frame}"]`)
+  await expect(frame).toHaveCount(1, { timeout: programStylingWindowReadyMs })
+  const title = frame.locator(`[data-test-locator="${selectorList.title}"]`)
+  await expect(title).toHaveCount(1)
+  await expect(title).toHaveText(programStylingMessages.title)
+  await page.waitForTimeout(FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS + 100)
+  await page.waitForTimeout(monacoMountSettleMs)
+  await waitForMonacoEditorMount(page)
 }
 
 test.describe.serial('Program styling floating window chrome and persistent close behaviour', () => {
@@ -108,7 +105,7 @@ test.describe.serial('Program styling floating window chrome and persistent clos
     appWindow = await electronApp.firstWindow()
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
-    await appWindow.waitForTimeout(monacoMountSettleMs)
+    await dismissStartupTipsNotifyIfPresent(appWindow)
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {
@@ -139,7 +136,7 @@ test.describe.serial('Program styling floating window chrome and persistent clos
    * Cold-loaded Monaco shell mounts an editor child node into the editor host after the window opens.
    */
   test('Program styling window mounts the cold-loaded Monaco editor host', async () => {
-    await waitForMonacoEditorMount(appWindow)
+    await waitForProgramStylingWindowReady(appWindow)
     const loadingOverlay = appWindow.locator(`[data-test-locator="${selectorList.loadingOverlay}"]`)
     await expect(loadingOverlay).toHaveCount(0)
   })
@@ -148,18 +145,20 @@ test.describe.serial('Program styling floating window chrome and persistent clos
    * No modal backdrop: Escape and outside clicks must not dismiss the window; only explicit buttons close it.
    */
   test('Program styling window ignores Escape and outside click until a button closes it', async () => {
-    // Assert on the frame root: the title node can satisfy toHaveText while Playwright still treats it as
-    // not "visible" (transition/stacking), but v-if removes the whole frame when the window closes.
+    await waitForProgramStylingWindowReady(appWindow)
     const frame = appWindow.locator(`[data-test-locator="${selectorList.frame}"]`)
-    await expect(frame).toHaveCount(1, { timeout: programStylingWindowReadyMs })
 
-    // Monaco may own focus after mount; blur the editor so Escape is not handled inside Monaco.
-    await blurProgramStylingMonacoIfFocused(appWindow)
+    // Move focus out of Monaco before Escape. Click the title text (not the top-left of the title row:
+    // the NW resize handle sits there and intercepts pointer events in Playwright).
+    const titleHeading = frame.locator(`[data-test-locator="${selectorList.title}"]`)
+    await expect(titleHeading).toHaveCount(1)
+    await titleHeading.click()
 
     await appWindow.keyboard.press('Escape')
     await appWindow.waitForTimeout(400)
     await expect(frame).toHaveCount(1, { timeout: 10_000 })
 
+    // Top-left of the page content (outside a centered frame on typical viewports), not a slow hit-target wait.
     await appWindow.mouse.click(5, 5)
     await appWindow.waitForTimeout(400)
     await expect(frame).toHaveCount(1, { timeout: 10_000 })

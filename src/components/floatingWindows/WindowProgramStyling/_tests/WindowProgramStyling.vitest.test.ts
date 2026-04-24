@@ -5,17 +5,14 @@ import { beforeEach, expect, test, vi } from 'vitest'
 
 import programStyling from 'app/i18n/en-US/floatingWindows/L_programStyling'
 
-vi.mock('app/src/scripts/appGlobalManagementUI/dialogManagement', () => ({
-  registerComponentDialogStackGuard: vi.fn()
-}))
-
 vi.mock('app/src/scripts/floatingWindows/useFaFloatingWindowFrame', () => ({
   useFaFloatingWindowFrame: () => ({
     frameRef: ref(null),
     frameStyle: ref({}),
     onFramePointerDown: vi.fn(),
     onResizePointerDown: vi.fn(),
-    onTitlePointerDown: vi.fn()
+    onTitlePointerDown: vi.fn(),
+    titleShortFrameClass: ref(undefined)
   })
 }))
 

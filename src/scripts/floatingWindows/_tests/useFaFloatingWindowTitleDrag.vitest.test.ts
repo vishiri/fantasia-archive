@@ -22,9 +22,15 @@ beforeEach(() => {
   vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(800)
   Element.prototype.setPointerCapture = vi.fn()
   Element.prototype.releasePointerCapture = vi.fn()
+  vi.stubGlobal('requestAnimationFrame', (fn: FrameRequestCallback) => {
+    fn(0)
+    return 1
+  })
+  vi.stubGlobal('cancelAnimationFrame', vi.fn())
 })
 
 afterEach(() => {
+  vi.unstubAllGlobals()
   vi.restoreAllMocks()
 })
 
@@ -256,6 +262,67 @@ test('Test that useFaFloatingWindowTitleDrag onDragEnd returns early when no dra
       pointerId: 1
     }))
     expect(isDragActive.value).toBe(false)
+  })
+  scope.stop()
+})
+
+/**
+ * useFaFloatingWindowTitleDrag
+ * Second pointermove before rAF runs does not schedule again; flush uses the latest pointer.
+ */
+test('Test that useFaFloatingWindowTitleDrag coalesces pointermoves until the animation frame runs', () => {
+  let rafCallback: FrameRequestCallback | null = null
+  const rafMock = vi.fn((fn: FrameRequestCallback) => {
+    rafCallback = fn
+    return 7
+  })
+  vi.stubGlobal('requestAnimationFrame', rafMock)
+  vi.stubGlobal('cancelAnimationFrame', vi.fn())
+  const raiseZ = vi.fn()
+  const scope = effectScope()
+  scope.run(() => {
+    const x = ref(100)
+    const y = ref(100)
+    const w = ref(400)
+    const h = ref(300)
+    const { onTitlePointerDown } = useFaFloatingWindowTitleDrag(testLayout, x, y, w, h, raiseZ)
+    const target = fakeTarget()
+    const down = new PointerEvent('pointerdown', {
+      bubbles: true,
+      button: 0,
+      clientX: 50,
+      clientY: 50,
+      pointerId: 1
+    })
+    Object.defineProperty(down, 'currentTarget', {
+      value: target,
+      enumerable: true
+    })
+    onTitlePointerDown(down)
+    window.dispatchEvent(
+      new PointerEvent('pointermove', {
+        bubbles: true,
+        clientX: 80,
+        clientY: 70,
+        pointerId: 1
+      })
+    )
+    window.dispatchEvent(
+      new PointerEvent('pointermove', {
+        bubbles: true,
+        clientX: 100,
+        clientY: 90,
+        pointerId: 1
+      })
+    )
+    expect(rafMock).toHaveBeenCalledTimes(1)
+    rafCallback!(0)
+    expect(x.value).toBe(150)
+    expect(y.value).toBe(140)
+    window.dispatchEvent(new PointerEvent('pointerup', {
+      bubbles: true,
+      pointerId: 1
+    }))
   })
   scope.stop()
 })

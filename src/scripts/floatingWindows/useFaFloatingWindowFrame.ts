@@ -10,6 +10,12 @@ import { useFaFloatingWindowTitleDrag } from 'app/src/scripts/floatingWindows/us
 
 export type { I_FaFloatingWindowFrameLayout }
 
+/** `h4.floatingWindowComponent__title` when frame `h` is below this value (inclusive of tighter vertical spacing). */
+export const FA_FLOATING_WINDOW_TITLE_COMPACT_VERTICAL_THRESHOLD_PX = 600
+
+/** BEM modifier for `h4.floatingWindowComponent__title` when the frame is shorter than {@link FA_FLOATING_WINDOW_TITLE_COMPACT_VERTICAL_THRESHOLD_PX}. */
+export const FA_FLOATING_WINDOW_TITLE_SHORT_FRAME_CLASS = 'floatingWindowComponent__title--shortFrame'
+
 export function centerFloatingWindowFrameInViewport (
   layout: I_FaFloatingWindowFrameLayout,
   x: Ref<number>,
@@ -120,6 +126,12 @@ export function useFaFloatingWindowFrame (
     zIndex: z.value
   }))
 
+  const titleShortFrameClass = computed(() =>
+    h.value < FA_FLOATING_WINDOW_TITLE_COMPACT_VERTICAL_THRESHOLD_PX
+      ? FA_FLOATING_WINDOW_TITLE_SHORT_FRAME_CLASS
+      : undefined
+  )
+
   onUnmounted(() => {
     teardownResizeObserver()
   })
@@ -129,6 +141,8 @@ export function useFaFloatingWindowFrame (
     frameStyle,
     onFramePointerDown,
     onResizePointerDown,
-    onTitlePointerDown
+    onTitlePointerDown,
+    /** Optional BEM class for `h4.floatingWindowComponent__title` when the frame is short; ignore on surfaces with no title row. */
+    titleShortFrameClass
   }
 }

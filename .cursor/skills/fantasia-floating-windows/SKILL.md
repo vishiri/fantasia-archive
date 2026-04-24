@@ -3,7 +3,7 @@ name: fantasia-floating-windows
 description: >-
   In-renderer floating Window* surfaces: Teleport to body, useFaFloatingWindowFrame,
   per-edge viewport margins, resize geometry and clamp, z-index band 5000–5999,
-  dialog stack guard, Vitest teleport stub. Use when adding or changing Window*
+  Vitest teleport stub. Use when adding or changing Window*
   components, frame behavior, or src/scripts/floatingWindows helpers.
 ---
 
@@ -20,7 +20,7 @@ description: >-
 3. **Z-index** — Session counter **`5000`–`5999`**, wraps after **`5999`**. Must stay **below** **`6000`** so Quasar dialogs and app chrome (**`6000+`**, e.g. **`$mainLayout-appHeader-zIndex`**) paint above. **`raiseZ`** on open, frame **`pointerdown`**, drag start, resize start.
 4. **Layout** — **`I_FaFloatingWindowFrameLayout`** / **`FA_FLOATING_WINDOW_FRAME_DEFAULT_LAYOUT`** in **`faFloatingWindowFrameLayout.ts`**: fractions, min/max width/height, **`marginTopPx`**, **`marginRightPx`**, **`marginBottomPx`**, **`marginLeftPx`** for centering, drag bounds, and clamping.
 5. **Resize** — **`faFloatingWindowResizeGeometry.ts`**, **`faFloatingWindowResizeClamp.ts`**: per-handle viewport clamp with **anchor preservation** (west/north must not move the opposite edge incorrectly). **`FaFloatingWindowFrameResizeHandles`** + **`FA_FLOATING_WINDOW_RESIZE_HANDLE_PX`** for hit targets.
-6. **Dialog stack** — Pass the same visibility ref through **`registerComponentDialogStackGuard`** (**`dialogManagement.ts`**) as modal **`Dialog*`** surfaces.
+6. **Modals** — **Do not** use **`registerComponentDialogStackGuard`** for **`Window*`**; that guard exists so **`openDialog*`** can serialize **modal** `QDialog` instances. Floating windows sit in a lower z-index band; multiple **`Window*`** and modal dialogs can be open at once.
 7. **i18n** — Strings under **`i18n/<locale>/floatingWindows/`** (locale modules such as **`L_programStyling.ts`**; keys like **`floatingWindows.programStyling.*`**).
 
 ## Tests
