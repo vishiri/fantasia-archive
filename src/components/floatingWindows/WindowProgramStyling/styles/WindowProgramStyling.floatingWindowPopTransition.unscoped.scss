@@ -1,0 +1,26 @@
+/* Pop transition for floating `WindowProgramStyling` — mirrors QDialog feel without scale(0) (see faFloatingWindowPopTransition.ts). */
+$fa-floatingWindowPop-ease: cubic-bezier(0, 0, 0.2, 1);
+/* Min scale must stay above zero: Quasar stock scale(0) can degenerate in Electron/Playwright; 0.1 gives a hard pop. */
+$fa-floatingWindowPop-scale-from: 0.1;
+
+.fa-floatingWindowPop-enter-active,
+.fa-floatingWindowPop-leave-active {
+  pointer-events: none;
+  transform-origin: center center;
+  transition:
+    opacity var(--q-transition-duration, 300ms) $fa-floatingWindowPop-ease,
+    transform var(--q-transition-duration, 300ms) $fa-floatingWindowPop-ease;
+  user-select: none;
+}
+
+.fa-floatingWindowPop-enter-from,
+.fa-floatingWindowPop-leave-to {
+  opacity: 0;
+  transform: scale($fa-floatingWindowPop-scale-from);
+}
+
+.fa-floatingWindowPop-enter-to,
+.fa-floatingWindowPop-leave-from {
+  opacity: 1;
+  transform: scale(1);
+}

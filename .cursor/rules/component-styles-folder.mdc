@@ -19,7 +19,7 @@ Use this layout when an SFC must pull in **external** styles via `<style lang="s
 
 ## Naming
 
-- Prefer a **clear, feature-scoped** basename, for example **`WindowProgramStyling.unscoped.scss`**, **`DialogKeybindSettings.unscoped.scss`**, so multiple sheets under **`styles/`** stay distinguishable.
+- Prefer a **clear, feature-scoped** basename, for example **`WindowProgramStyling.unscoped.scss`**, **`WindowProgramStyling.floatingWindowPopTransition.unscoped.scss`**, **`DialogKeybindSettings.unscoped.scss`**, so multiple sheets under **`styles/`** stay distinguishable.
 - Scoped blocks may stay in the SFC; **unscoped** or large extracts often use a **`.unscoped.scss`** suffix when that matches existing dialogs/windows.
 
 ## Wiring

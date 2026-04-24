@@ -6,6 +6,9 @@ export const FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS = 300
 
 /**
  * Vue <Transition> bindings mirroring Quasar's useTransition() output for transitionShow/Hide "scale".
+ * The Custom program CSS floating window (WindowProgramStyling) uses `faFloatingWindowPopTransition` instead: stock
+ * Quasar scale uses scale3d(0,0,1) in enter-from, which is unsafe in Electron for that surface; the custom pop still
+ * matches 300ms timing and material-like easing.
  */
 export const FA_QUASAR_DIALOG_STANDARD_TRANSITION_BINDINGS = {
   appear: true,

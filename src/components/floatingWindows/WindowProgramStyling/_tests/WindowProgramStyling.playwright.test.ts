@@ -73,7 +73,7 @@ async function waitForMonacoEditorMount (page: Page): Promise<void> {
 
 /**
  * Mirrors e2e checkAppStyling.waitForProgramStylingWindow: frame and title, transition buffer, cold-load
- * wait, then Monaco. (The window uses fade transition; duration constant matches Quasar transition timing.)
+ * wait, then Monaco. (The window uses Quasar fade on the frame; duration constant matches transition timing.)
  */
 async function waitForProgramStylingWindowReady (page: Page): Promise<void> {
   const frame = page.locator(`[data-test-locator="${selectorList.frame}"]`)

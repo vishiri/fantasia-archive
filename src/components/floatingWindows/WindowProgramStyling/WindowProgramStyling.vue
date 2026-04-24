@@ -1,8 +1,11 @@
 <template>
   <!-- Transition must wrap a single element root; Teleport cannot be the direct child of Transition. -->
   <FaFloatingWindowBodyTeleport>
-    <!-- Fade, not default QDialog scale: scale enter-from can leave 0×0 layout in Electron/Playwright (see faQuasarDialogStandardTransition). -->
-    <Transition v-bind="FA_QUASAR_DIALOG_FADE_TRANSITION_BINDINGS">
+    <!-- Custom pop: Quasar’s q-transition--scale uses scale(0) and can break in Electron/Playwright; we use a positive min scale (see faFloatingWindowPopTransition). -->
+    <Transition
+      v-bind="FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS"
+      :duration="FA_FLOATING_WINDOW_POP_TRANSITION_MS"
+    >
       <div
         v-if="windowModel"
         ref="frameRef"
@@ -139,9 +142,9 @@ import FaFloatingWindowFrameResizeHandles from 'app/src/components/floatingWindo
 import { getMonacoKeybindHelpItems } from 'app/src/components/floatingWindows/WindowProgramStyling/scripts/windowProgramStylingKeybindHelp'
 import { useWindowProgramStyling } from 'app/src/components/floatingWindows/WindowProgramStyling/scripts/windowProgramStylingState'
 import {
-  FA_QUASAR_DIALOG_FADE_TRANSITION_BINDINGS,
-  FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS
-} from 'app/src/scripts/floatingWindows/faQuasarDialogStandardTransition'
+  FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
+  FA_FLOATING_WINDOW_POP_TRANSITION_MS
+} from 'app/src/scripts/floatingWindows/faFloatingWindowPopTransition'
 import { useFaFloatingWindowFrame } from 'app/src/scripts/floatingWindows/useFaFloatingWindowFrame'
 
 defineOptions({
@@ -175,7 +178,7 @@ const {
 
 const frameStyleWithDialogTransition = computed(() => ({
   ...frameStyle.value,
-  '--q-transition-duration': `${FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS}ms`
+  '--q-transition-duration': `${FA_FLOATING_WINDOW_POP_TRANSITION_MS}ms`
 }))
 
 /**
