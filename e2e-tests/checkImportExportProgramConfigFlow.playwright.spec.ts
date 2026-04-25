@@ -497,7 +497,7 @@ test.describe.serial('Import / export program configuration E2E', () => {
       ).toBeHidden({ timeout: 15_000 })
     })
 
-    await test.step('Import keybinds blank: Ctrl+Shift+F12 no longer toggles devtools; keybind dialog shows default chord', async () => {
+    await test.step('Import keybinds blank: Default keybind for developer tools no longer toggles devtools; keybind dialog shows default chord', async () => {
       await e2eSetNextProgramConfigImportPath(electronApp, blankKeybinds)
       await openImportExportFromTools(
         appWindow,
