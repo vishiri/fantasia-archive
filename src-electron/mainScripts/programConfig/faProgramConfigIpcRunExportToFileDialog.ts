@@ -5,6 +5,7 @@ import type { IpcMainInvokeEvent } from 'electron'
 
 import { getFaKeybinds } from 'app/src-electron/mainScripts/keybinds/faKeybindsStore'
 import { windowFromIpcEvent } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
+import { getFaProgramConfigExportSaveDefaultPath } from 'app/src-electron/mainScripts/programConfig/faProgramConfigFileDialogDefaultPaths'
 import { zipProgramConfigBundle } from 'app/src-electron/mainScripts/programConfig/faProgramConfigBundle'
 import { getFaProgramStyling } from 'app/src-electron/mainScripts/programStyling/faProgramStylingStore'
 import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
@@ -77,7 +78,7 @@ export async function runExportProgramConfigToFile (
 
   const win = windowFromIpcEvent(event) ?? appWindow
   const saveOpts: SaveDialogOptions = {
-    defaultPath: 'faConfigExport.faconfig',
+    defaultPath: getFaProgramConfigExportSaveDefaultPath(),
     filters: [
       {
         extensions: ['faconfig'],

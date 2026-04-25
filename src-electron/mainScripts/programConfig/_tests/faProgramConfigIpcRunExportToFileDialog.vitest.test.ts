@@ -1,3 +1,5 @@
+import path from 'node:path'
+
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import * as programConfigBundle from '../faProgramConfigBundle'
@@ -7,6 +9,7 @@ import { runExportProgramConfigToFile } from '../faProgramConfigIpcRunExportToFi
 class SyntheticZipMockFailure {}
 
 const {
+  appGetPathMock,
   dialogShowSaveDialogMock,
   getFaKeybindsMock,
   getFaProgramStylingMock,
@@ -14,6 +17,7 @@ const {
   windowFromIpcEventMock,
   writeFileMock
 } = vi.hoisted(() => ({
+  appGetPathMock: vi.fn((name: string) => (name === 'downloads' ? 'C:\\TestDownloads' : 'C:\\x')),
   dialogShowSaveDialogMock: vi.fn(),
   getFaKeybindsMock: vi.fn(),
   getFaProgramStylingMock: vi.fn(),
@@ -23,6 +27,7 @@ const {
 }))
 
 vi.mock('electron', () => ({
+  app: { getPath: appGetPathMock },
   dialog: { showSaveDialog: dialogShowSaveDialogMock }
 }))
 
@@ -174,7 +179,9 @@ test('Test runExportProgramConfigToFile uses showSaveDialog with window when one
   expect(r.outcome).toBe('canceled')
   expect(dialogShowSaveDialogMock).toHaveBeenCalledWith(
     win,
-    expect.objectContaining({ defaultPath: 'faConfigExport.faconfig' })
+    expect.objectContaining({
+      defaultPath: path.join('C:\\TestDownloads', 'faConfigExport.faconfig')
+    })
   )
 })
 

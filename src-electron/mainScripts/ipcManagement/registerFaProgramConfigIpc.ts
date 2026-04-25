@@ -8,6 +8,7 @@ import {
   pathLooksLikeFaconfigFile,
   purgeFaProgramConfigStagedImportSessionsExpired
 } from 'app/src-electron/mainScripts/programConfig/faProgramConfigImportStagedState'
+import { getFaProgramConfigImportOpenDefaultPath } from 'app/src-electron/mainScripts/programConfig/faProgramConfigFileDialogDefaultPaths'
 import { runApplyStagedProgramConfigImport } from 'app/src-electron/mainScripts/programConfig/faProgramConfigIpcRunApplyStagedImport'
 import { runExportProgramConfigToFile } from 'app/src-electron/mainScripts/programConfig/faProgramConfigIpcRunExportToFileDialog'
 import { runPrepareImportFromFaconfigFilePath } from 'app/src-electron/mainScripts/programConfig/faProgramConfigIpcRunPrepareImportFromFile'
@@ -44,6 +45,7 @@ export function registerFaProgramConfigIpc (): void {
       purgeFaProgramConfigStagedImportSessionsExpired()
       const win = windowFromIpcEvent(event) ?? appWindow
       const openOpts: OpenDialogOptions = {
+        defaultPath: getFaProgramConfigImportOpenDefaultPath(),
         filters: [
           {
             extensions: ['faconfig'],

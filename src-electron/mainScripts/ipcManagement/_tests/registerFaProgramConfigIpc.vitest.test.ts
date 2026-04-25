@@ -3,6 +3,7 @@ import { beforeEach, expect, test, vi } from 'vitest'
 import { FA_PROGRAM_CONFIG_IPC } from 'app/src-electron/electron-ipc-bridge'
 
 const {
+  appGetPathMock,
   dialogShowOpenDialogMock,
   ipcMainHandleMock,
   runApplyMock,
@@ -10,6 +11,7 @@ const {
   runPrepareFromPathMock,
   windowFromIpcEventMock
 } = vi.hoisted(() => ({
+  appGetPathMock: vi.fn((name: string) => (name === 'downloads' ? 'C:\\TestDownloads' : 'C:\\x')),
   dialogShowOpenDialogMock: vi.fn(),
   ipcMainHandleMock: vi.fn(),
   runApplyMock: vi.fn(),
@@ -19,6 +21,7 @@ const {
 }))
 
 vi.mock('electron', () => ({
+  app: { getPath: appGetPathMock },
   dialog: { showOpenDialog: dialogShowOpenDialogMock },
   ipcMain: { handle: ipcMainHandleMock }
 }))
@@ -137,7 +140,10 @@ test('Test that prepareImport uses showOpenDialog with window when the IPC sende
   expect(r.outcome).toBe('canceled')
   expect(dialogShowOpenDialogMock).toHaveBeenCalledWith(
     win,
-    expect.objectContaining({ title: 'Import program configuration' })
+    expect.objectContaining({
+      defaultPath: 'C:\\TestDownloads',
+      title: 'Import program configuration'
+    })
   )
 })
 
