@@ -1,5 +1,5 @@
 export default {
-  title: 'Werkzeuge',
+  title: 'Werkzeuge & Einstellungen',
   items: {
     quickAddNewDocument: 'Dokument schnell anlegen',
     quickSearchDocument: 'Bestehendes Dokument schnell suchen',

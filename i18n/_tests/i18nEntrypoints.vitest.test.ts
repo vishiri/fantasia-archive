@@ -12,6 +12,21 @@ test('locale registry exposes en-US, de, and fr', () => {
   expect(messages.fr).toBeDefined()
 })
 
+test('de and fr include core keys aligned with en-US (error page, window buttons, did-you-know)', () => {
+  expect((messages.de as { errorNotFound: { title: string } }).errorNotFound?.title).toBeTruthy()
+  expect((messages.fr as { errorNotFound: { title: string } }).errorNotFound?.title).toBeTruthy()
+  expect((messages.de as { globalWindowButtons: { close: string } }).globalWindowButtons?.close).toBeTruthy()
+  expect((messages.fr as { globalWindowButtons: { close: string } }).globalWindowButtons?.close).toBeTruthy()
+  expect(
+    (messages.de as { globalFunctionality: { unsortedAppTexts: { didYouKnow: string } } }).globalFunctionality
+      .unsortedAppTexts.didYouKnow
+  ).toBeTruthy()
+  expect(
+    (messages.fr as { globalFunctionality: { unsortedAppTexts: { didYouKnow: string } } }).globalFunctionality
+      .unsortedAppTexts.didYouKnow
+  ).toBeTruthy()
+})
+
 /**
  * **externalFileLoader** exposes a vue-i18n instance for Pinia and non-boot scripts.
  */
