@@ -25,7 +25,7 @@ i18n/
   en-US/
     index.ts                            — composes the full locale tree; no hardcoded strings (see rules below)
     documents/                          — Markdown source files (.md); imported via ?raw and passed through specialCharacterFixer
-    components/<bucket>/<ComponentName>/ — mirrors src/components/: globals, elements, other (not foundation/; Storybook-only catalogues use inline English)
+    components/<bucket>/<ComponentName>/ — mirrors src/components/: globals, elements, other (not foundation/; Storybook-only catalogues use inline English). **ComponentName** includes a leading underscore only for the three infrastructure helpers in [AGENTS.md](../../../AGENTS.md) **Helper / wrapper SFC naming (`_` prefix)** if one ever gains user-visible copy (none do today).
     dialogs/                            — one L_<DialogName>.ts per dialog (dialog copy; not the same as components/dialogs/)
     floatingWindows/                    — one L_<Feature>.ts per in-renderer floating window (movable/resizable surfaces; mirrors components/floatingWindows/)
     pages/                              — one L_<PageName>.ts per page
