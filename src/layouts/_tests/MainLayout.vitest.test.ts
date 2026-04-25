@@ -1,25 +1,11 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, expect, test, vi } from 'vitest'
 
+import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
-
-const { applyLocaleMock } = vi.hoisted(() => {
-  return {
-    applyLocaleMock: vi.fn()
-  }
-})
-
-vi.mock('app/src/scripts/appInternals/rendererAppInternals', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('app/src/scripts/appInternals/rendererAppInternals')>()
-  return {
-    ...actual,
-    applyFaI18nLocaleFromLanguageCode: applyLocaleMock
-  }
-})
-
 import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/rendererAppInternals'
 import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
+import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
 import MainLayout from '../MainLayout.vue'
 
@@ -58,7 +44,6 @@ function countKeydownCaptureAdds (spy: { mock: { calls: unknown[][] } }): number
 test('Test that MainLayout mounts with header stubs and router-view slot', async () => {
   setFantasiaStorybookCanvasFlag(false)
   vi.stubEnv('MODE', 'spa')
-  applyLocaleMock.mockClear()
 
   const w = mountMainLayoutStubs()
 
@@ -96,7 +81,6 @@ test('Test that MainLayout hides GlobalLanguageSelector when isFantasiaStorybook
 test('Test that MainLayout skips keybind wiring when MODE is not electron', async () => {
   setFantasiaStorybookCanvasFlag(false)
   vi.stubEnv('MODE', 'spa')
-  applyLocaleMock.mockClear()
 
   const addSpy = vi.spyOn(window, 'addEventListener')
   const before = countKeydownCaptureAdds(addSpy)
@@ -105,7 +89,6 @@ test('Test that MainLayout skips keybind wiring when MODE is not electron', asyn
   await flushPromises()
 
   expect(countKeydownCaptureAdds(addSpy)).toBe(before)
-  expect(applyLocaleMock).not.toHaveBeenCalled()
   w.unmount()
   addSpy.mockRestore()
   vi.unstubAllEnvs()
@@ -113,12 +96,11 @@ test('Test that MainLayout skips keybind wiring when MODE is not electron', asyn
 
 /**
  * MainLayout / onMounted
- * Applies vue-i18n locale from persisted user settings when the language code is supported.
+ * Hydrates user settings and persists languageCode (i18n sync lives in S_FaUserSettings.refreshSettings).
  */
-test('Test that MainLayout applies locale after refreshSettings when languageCode is supported', async () => {
+test('Test that MainLayout hydrates user settings when persisted languageCode is supported', async () => {
   setFantasiaStorybookCanvasFlag(false)
   vi.stubEnv('MODE', 'electron')
-  applyLocaleMock.mockClear()
 
   const getSettings = window.faContentBridgeAPIs.faUserSettings.getSettings as ReturnType<typeof vi.fn>
   getSettings.mockResolvedValueOnce({
@@ -129,7 +111,8 @@ test('Test that MainLayout applies locale after refreshSettings when languageCod
   const w = mountMainLayoutStubs()
   await flushPromises()
 
-  expect(applyLocaleMock).toHaveBeenCalledWith('de')
+  expect(getSettings).toHaveBeenCalled()
+  expect(S_FaUserSettings().settings?.languageCode).toBe('de')
   w.unmount()
   vi.unstubAllEnvs()
 })
@@ -141,18 +124,19 @@ test('Test that MainLayout applies locale after refreshSettings when languageCod
 test('Test that MainLayout does not apply locale when languageCode is unsupported', async () => {
   setFantasiaStorybookCanvasFlag(false)
   vi.stubEnv('MODE', 'electron')
-  applyLocaleMock.mockClear()
 
   const getSettings = window.faContentBridgeAPIs.faUserSettings.getSettings as ReturnType<typeof vi.fn>
-  getSettings.mockResolvedValueOnce({
-    ...FA_USER_SETTINGS_DEFAULTS,
-    languageCode: 'xx-XX'
-  })
+  getSettings.mockResolvedValueOnce(
+    {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      languageCode: 'xx-XX'
+    } as unknown as I_faUserSettings
+  )
 
   const w = mountMainLayoutStubs()
   await flushPromises()
 
-  expect(applyLocaleMock).not.toHaveBeenCalled()
+  expect(S_FaUserSettings().settings?.languageCode).toBe('xx-XX')
   w.unmount()
   vi.unstubAllEnvs()
 })
@@ -164,7 +148,6 @@ test('Test that MainLayout does not apply locale when languageCode is unsupporte
 test('Test that MainLayout does not apply locale when languageCode is missing after refresh', async () => {
   setFantasiaStorybookCanvasFlag(false)
   vi.stubEnv('MODE', 'electron')
-  applyLocaleMock.mockClear()
 
   const getSettings = window.faContentBridgeAPIs.faUserSettings.getSettings as ReturnType<typeof vi.fn>
   const snapshot = {
@@ -176,7 +159,9 @@ test('Test that MainLayout does not apply locale when languageCode is missing af
   const w = mountMainLayoutStubs()
   await flushPromises()
 
-  expect(applyLocaleMock).not.toHaveBeenCalled()
+  expect(
+    (S_FaUserSettings().settings as { languageCode?: string } | null)?.languageCode
+  ).toBeUndefined()
   w.unmount()
   vi.unstubAllEnvs()
 })
@@ -188,15 +173,16 @@ test('Test that MainLayout does not apply locale when languageCode is missing af
 test('Test that MainLayout skips user settings refresh when faUserSettings bridge is absent', async () => {
   setFantasiaStorybookCanvasFlag(false)
   vi.stubEnv('MODE', 'electron')
-  applyLocaleMock.mockClear()
 
   const prev = window.faContentBridgeAPIs.faUserSettings
+  const getSettings = prev.getSettings as ReturnType<typeof vi.fn>
+  const before = getSettings.mock.calls.length
   delete (window.faContentBridgeAPIs as { faUserSettings?: unknown }).faUserSettings
 
   const w = mountMainLayoutStubs()
   await flushPromises()
 
-  expect(applyLocaleMock).not.toHaveBeenCalled()
+  expect(getSettings.mock.calls.length).toBe(before)
   w.unmount()
 
   window.faContentBridgeAPIs.faUserSettings = prev

@@ -245,3 +245,49 @@ test('Test that GlobalLanguageSelector handles trigger click and language select
   w.unmount()
   vi.unstubAllEnvs()
 })
+
+/**
+ * When language changes without the menu (e.g. program-config import + refreshSettings), the spellcheck
+ * reload control should show the same as after a normal language switch.
+ */
+test('Test that GlobalLanguageSelector shows spellcheck refresh when languageCode changes externally', async () => {
+  vi.stubEnv('MODE', 'electron')
+  setActivePinia(createPinia())
+  const store = S_FaUserSettings()
+  store.settings = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    languageCode: 'en-US'
+  }
+  window.faContentBridgeAPIs.faUserSettings = {
+    getSettings: vi.fn(async (): Promise<I_faUserSettings> => (store.settings === null
+      ? { ...FA_USER_SETTINGS_DEFAULTS }
+      : { ...store.settings })),
+    setSettings: vi.fn()
+  }
+
+  const w = mount(GlobalLanguageSelector, {
+    global: {
+      components: {
+        ...globalLanguageSelectorQuasarStubs,
+        GlobalLanguageSelectorSpellcheckRefreshControl: globalLanguageSelectorSpellcheckStub
+      },
+      config: { compilerOptions: globalLanguageSelectorCompilerOpts },
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  await flushPromises()
+  expect(w.find('[data-test-locator="globalLanguageSelector-spellcheckRefresh"]').exists()).toBe(false)
+
+  store.settings = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    languageCode: 'fr'
+  }
+  await flushPromises()
+
+  expect(w.find('[data-test-locator="globalLanguageSelector-spellcheckRefresh"]').exists()).toBe(true)
+  w.unmount()
+  vi.unstubAllEnvs()
+})

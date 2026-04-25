@@ -6,7 +6,10 @@ import { Notify } from 'quasar'
 
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
-import { applyFaI18nLocaleFromLanguageCode } from 'app/src/scripts/appInternals/rendererAppInternals'
+import {
+  applyFaI18nLocaleFromLanguageCode,
+  isFaUserSettingsLanguageCode
+} from 'app/src/scripts/appInternals/rendererAppInternals'
 
 /**
  * Manages user settings state sourced from the Electron main process via the IPC bridge.
@@ -17,6 +20,10 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
 
   async function refreshSettings (): Promise<void> {
     settings.value = await window.faContentBridgeAPIs.faUserSettings.getSettings()
+    const s = settings.value
+    if (s !== null && s.languageCode !== undefined && isFaUserSettingsLanguageCode(s.languageCode)) {
+      applyFaI18nLocaleFromLanguageCode(s.languageCode)
+    }
   }
 
   async function updateSettings (updateObject: Partial<I_faUserSettings>): Promise<void> {

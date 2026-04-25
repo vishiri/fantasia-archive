@@ -38,11 +38,7 @@ import {
   createFaKeybindKeydownHandler,
   getFaKeybindKeydownContext
 } from 'app/src/scripts/keybinds/faKeybindsGlobalDispatch'
-import {
-  applyFaI18nLocaleFromLanguageCode,
-  isFaUserSettingsLanguageCode,
-  isFantasiaStorybookCanvas
-} from 'app/src/scripts/appInternals/rendererAppInternals'
+import { isFantasiaStorybookCanvas } from 'app/src/scripts/appInternals/rendererAppInternals'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
@@ -66,11 +62,6 @@ onMounted(async () => {
     const faUserSettingsStore = S_FaUserSettings()
 
     await faUserSettingsStore.refreshSettings()
-    const code = faUserSettingsStore.settings?.languageCode
-
-    if (code !== undefined && isFaUserSettingsLanguageCode(code)) {
-      applyFaI18nLocaleFromLanguageCode(code)
-    }
   }
 
   if (window.faContentBridgeAPIs?.faKeybinds !== undefined) {

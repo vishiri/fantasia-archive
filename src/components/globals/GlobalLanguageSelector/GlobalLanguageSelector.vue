@@ -108,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { i18n } from 'app/i18n/externalFileLoader'
 import type { T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
@@ -157,6 +157,22 @@ const activeI18nLocale = computed((): string => {
   return String(i18n.global.locale.value)
 })
 
+watch(
+  () => faUserSettingsStore.settings?.languageCode,
+  (next, prior) => {
+    if (next === undefined) {
+      return
+    }
+    if (prior === undefined) {
+      return
+    }
+    if (prior === next) {
+      return
+    }
+    noteLanguageApplied(prior, next)
+  }
+)
+
 function onLanguageTriggerClickCapture (): void {
   isLanguageMenuOpen.value = true
 }
@@ -170,13 +186,10 @@ function onLanguageMenuHide (): void {
 }
 
 async function pickLanguage (code: T_faUserSettingsLanguageCode): Promise<void> {
-  const priorCode = currentCode.value
   await runFaActionAwait('languageSwitch', {
     code,
-    priorCode
+    priorCode: currentCode.value
   })
-  const nextCode = faUserSettingsStore.settings?.languageCode ?? priorCode
-  noteLanguageApplied(priorCode, nextCode)
 }
 </script>
 

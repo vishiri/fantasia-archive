@@ -87,6 +87,7 @@ test('Test that refreshSettings populates settings from the IPC bridge', async (
 
   expect(getSettingsMock).toHaveBeenCalledOnce()
   expect(store.settings).toEqual(snapshot)
+  expect(applyLocaleMock).toHaveBeenCalledWith('en-US')
 })
 
 /**
@@ -109,6 +110,32 @@ test('Test that refreshSettings replaces settings on each call', async () => {
   await store.refreshSettings()
   expect(store.settings).toEqual(secondSnapshot)
   expect(getSettingsMock).toHaveBeenCalledTimes(2)
+  expect(applyLocaleMock).toHaveBeenCalledWith('en-US')
+})
+
+/**
+ * S_FaUserSettings / refreshSettings
+ * Syncs vue-i18n to persisted language (import and other code paths use refresh without updateSettings).
+ */
+test('Test that refreshSettings applies i18n for a supported persisted languageCode', async () => {
+  getSettingsMock.mockResolvedValueOnce({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    languageCode: 'fr'
+  })
+  await store.refreshSettings()
+  expect(applyLocaleMock).toHaveBeenCalledWith('fr')
+})
+
+test('Test that refreshSettings does not apply i18n when persisted languageCode is not supported', async () => {
+  applyLocaleMock.mockClear()
+  getSettingsMock.mockResolvedValueOnce({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    // Malformed/legacy value from the bridge; must not call apply with an unknown locale
+    // @ts-expect-error intentional invalid code for this test
+    languageCode: 'xx-XX'
+  })
+  await store.refreshSettings()
+  expect(applyLocaleMock).not.toHaveBeenCalled()
 })
 
 /**
