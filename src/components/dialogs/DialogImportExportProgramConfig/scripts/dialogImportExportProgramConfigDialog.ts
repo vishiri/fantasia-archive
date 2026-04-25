@@ -8,7 +8,7 @@ import { useImportExportProgramConfigDialogModel } from './dialogImportExportPro
 export { type T_importExportView } from './dialogImportExportProgramConfigDialogModel'
 
 /**
- * Composes the Import / export program configuration dialog state and action wiring.
+ * Composes the Import / Export program configuration dialog state and action wiring.
  */
 export function useDialogImportExportProgramConfigDialog (opts: { onRequestClose: () => void }) {
   const m = useImportExportProgramConfigDialogModel(opts)

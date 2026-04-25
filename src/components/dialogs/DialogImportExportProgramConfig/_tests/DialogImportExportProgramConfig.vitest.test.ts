@@ -41,7 +41,8 @@ const importExportDialogGlobal = {
     QCardActions: { template: '<div><slot /></div>' },
     QCardSection: { template: '<div><slot /></div>' },
     QCheckbox: { template: '<div class="q-checkbox-stub" />' },
-    QDialog: importExportQDialogStub
+    QDialog: importExportQDialogStub,
+    QSeparator: { template: '<div class="q-separator-stub" role="separator" />' }
   }
 } as const
 

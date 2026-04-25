@@ -7,128 +7,171 @@
     <q-card
       :class="['dialogComponent__wrapper', 'importExportProgramConfig', documentName]"
     >
+      <h5
+        id="dialogImportExportProgramConfig-title"
+        class="q-mb-md text-center"
+      >
+        {{ $t('dialogs.importExportProgramConfig.title') }}
+      </h5>
+
       <q-card-section
-        :class="['dialogComponent__content', 'importExportProgramConfig', documentName, 'q-mt-md', 'q-mb-sm', 'q-px-lg', 'q-pt-sm', 'hasScrollbar']"
+        :class="['dialogComponent__content', 'importExportProgramConfig', documentName, 'hasScrollbar', 'q-pt-none']"
       >
-        <h6
-          id="dialogImportExportProgramConfig-title"
-          class="q-mb-md text-center"
-        >
-          {{ $t('dialogs.importExportProgramConfig.title') }}
-        </h6>
-
-        <div
-          v-if="view === 'root'"
-          class="row q-col-gutter-sm q-mb-sm justify-center"
-        >
-          <q-btn
-            class="col-12 col-sm-auto"
-            color="primary-bright"
-            :label="$t('dialogs.importExportProgramConfig.importButton')"
-            outline
-            data-test-locator="dialogImportExportProgramConfig-button-import"
-            @click="onRootImport"
-          />
-          <q-btn
-            class="col-12 col-sm-auto"
-            color="primary-bright"
-            :label="$t('dialogs.importExportProgramConfig.exportButton')"
-            outline
-            data-test-locator="dialogImportExportProgramConfig-button-export"
-            @click="view = 'export'"
-          />
-        </div>
-
-        <div
-          v-else-if="view === 'export'"
-          class="q-gutter-y-sm"
-        >
-          <div class="text-body2 text-center q-mb-sm">
-            {{ $t('dialogs.importExportProgramConfig.exportHint') }}
-          </div>
-          <q-checkbox
-            v-model="exportIncludeProgramSettings"
-            color="accent"
-            data-test-locator="dialogImportExportProgramConfig-check-export-settings"
-            :label="$t('dialogs.importExportProgramConfig.checkboxes.programSettings')"
-          />
-          <q-checkbox
-            v-model="exportIncludeKeybinds"
-            color="accent"
-            data-test-locator="dialogImportExportProgramConfig-check-export-keybinds"
-            :label="$t('dialogs.importExportProgramConfig.checkboxes.keybinds')"
-          />
-          <q-checkbox
-            v-model="exportIncludeProgramStyling"
-            color="accent"
-            data-test-locator="dialogImportExportProgramConfig-check-export-styling"
-            :label="$t('dialogs.importExportProgramConfig.checkboxes.programStyling')"
-          />
-          <div class="row justify-center q-mt-md">
-            <q-btn
-              color="primary-bright"
-              :disable="createExportDisabled"
-              :label="$t('dialogs.importExportProgramConfig.createExportFile')"
-              data-test-locator="dialogImportExportProgramConfig-button-createExport"
-              outline
-              @click="onClickCreateExport"
-            />
-          </div>
-        </div>
-
-        <div
-          v-else
-          class="q-gutter-y-sm"
-        >
-          <div class="text-body2 text-center q-mb-sm">
-            {{ $t('dialogs.importExportProgramConfig.importSelectHint') }}
-          </div>
-          <q-checkbox
-            v-model="importApplyProgramSettings"
-            color="accent"
-            data-test-locator="dialogImportExportProgramConfig-check-import-settings"
-            :disable="!programSettingsImportEnabled"
-            :label="$t('dialogs.importExportProgramConfig.checkboxes.programSettings')"
-          />
-          <q-checkbox
-            v-model="importApplyKeybinds"
-            color="accent"
-            data-test-locator="dialogImportExportProgramConfig-check-import-keybinds"
-            :disable="!keybindsImportEnabled"
-            :label="$t('dialogs.importExportProgramConfig.checkboxes.keybinds')"
-          />
-          <q-checkbox
-            v-model="importApplyProgramStyling"
-            color="accent"
-            data-test-locator="dialogImportExportProgramConfig-check-import-styling"
-            :disable="!programStylingImportEnabled"
-            :label="$t('dialogs.importExportProgramConfig.checkboxes.programStyling')"
-          />
-          <div class="row justify-center q-mt-md">
-            <q-btn
-              color="primary-bright"
-              :disable="importApplyDisabled"
-              :label="$t('dialogs.importExportProgramConfig.importSelected')"
-              data-test-locator="dialogImportExportProgramConfig-button-importSelected"
-              outline
-              @click="onClickImportSelected"
-            />
-          </div>
-        </div>
-      </q-card-section>
-
-      <q-card-actions
-        align="around"
-        class="q-mb-md"
-      >
-        <q-btn
-          v-close-popup
+        <q-stepper
+          v-model="stepperPanel"
+          animated
+          :header-nav="false"
           flat
-          :label="$t('dialogs.markdownDocument.closeButton')"
-          color="accent"
-          data-test-locator="dialogImportExportProgramConfig-button-close"
-        />
-      </q-card-actions>
+          class="importExportProgramConfig__stepper"
+        >
+          <q-step
+            :name="'import'"
+            :header-nav="false"
+            :title="$t('dialogs.importExportProgramConfig.stepper.importPanel')"
+          >
+            <div class="q-gutter-y-sm">
+              <h6 class="text-primary-bright text-center q-mt-lg q-mb-md">
+                {{ $t('dialogs.importExportProgramConfig.importSelectHint') }}
+              </h6>
+
+              <q-list class="q-pl-xl q-pr-xl">
+                <DialogImportExportProgramConfigQItemCheckboxRow
+                  v-model="importApplyProgramSettings"
+                  checkbox-color="dark"
+                  data-test-locator="dialogImportExportProgramConfig-check-import-settings"
+                  :disabled="!programSettingsImportEnabled"
+                  label-i18n-key="dialogs.importExportProgramConfig.checkboxes.programSettings"
+                />
+                <DialogImportExportProgramConfigQItemCheckboxRow
+                  v-model="importApplyKeybinds"
+                  checkbox-color="dark"
+                  data-test-locator="dialogImportExportProgramConfig-check-import-keybinds"
+                  :disabled="!keybindsImportEnabled"
+                  label-i18n-key="dialogs.importExportProgramConfig.checkboxes.keybinds"
+                />
+                <DialogImportExportProgramConfigQItemCheckboxRow
+                  v-model="importApplyProgramStyling"
+                  checkbox-color="dark"
+                  data-test-locator="dialogImportExportProgramConfig-check-import-styling"
+                  :disabled="!programStylingImportEnabled"
+                  label-i18n-key="dialogs.importExportProgramConfig.checkboxes.programStyling"
+                />
+              </q-list>
+              <div class="row justify-center q-mt-lg q-mb-lg">
+                <q-btn
+                  color="primary-bright"
+                  :disable="importApplyDisabled"
+                  :label="$t('dialogs.importExportProgramConfig.importSelected')"
+                  data-test-locator="dialogImportExportProgramConfig-button-importSelected"
+                  outline
+                  @click="onClickImportSelected"
+                />
+              </div>
+            </div>
+          </q-step>
+
+          <q-step
+            :name="'root'"
+            :header-nav="false"
+            :title="$t('dialogs.importExportProgramConfig.stepper.rootPanel')"
+          >
+            <h6 class="text-primary-bright text-center q-mt-lg q-mb-none">
+              {{ $t('dialogs.importExportProgramConfig.notice.heading') }}
+            </h6>
+            <q-card-section class="row q-mx-xl">
+              <ul>
+                <li>{{ $t('dialogs.importExportProgramConfig.notice.list.exportFirst') }}</li>
+                <li>{{ $t('dialogs.importExportProgramConfig.notice.list.importOverwrites') }}</li>
+                <li>{{ $t('dialogs.importExportProgramConfig.notice.list.selectiveImport') }}</li>
+              </ul>
+            </q-card-section>
+            <q-card-section class="q-pa-none importExportProgramConfig__rootActions q-mb-sm q-mt-sm">
+              <div class="row no-wrap importExportProgramConfig__rootActionRow">
+                <div class="col importExportProgramConfig__rootActionCol">
+                  <q-card-actions
+                    align="center"
+                    class="importExportProgramConfig__rootActionActions"
+                  >
+                    <q-btn
+                      flat
+                      class="importExportProgramConfig__rootActionBtn full-width"
+                      color="primary-bright"
+                      data-test-locator="dialogImportExportProgramConfig-button-import"
+                      :label="$t('dialogs.importExportProgramConfig.importButton')"
+                      @click="void onClickImport()"
+                    />
+                  </q-card-actions>
+                </div>
+
+                <q-separator
+                  color="grey-lighter"
+                  inset
+                  vertical
+                />
+
+                <div class="col importExportProgramConfig__rootActionCol">
+                  <q-card-actions
+                    align="center"
+                    class="importExportProgramConfig__rootActionActions"
+                  >
+                    <q-btn
+                      flat
+                      class="importExportProgramConfig__rootActionBtn full-width"
+                      color="primary-bright"
+                      data-test-locator="dialogImportExportProgramConfig-button-export"
+                      :label="$t('dialogs.importExportProgramConfig.exportButton')"
+                      @click="view = 'export'"
+                    />
+                  </q-card-actions>
+                </div>
+              </div>
+            </q-card-section>
+          </q-step>
+
+          <q-step
+            :name="'export'"
+            :header-nav="false"
+            :title="$t('dialogs.importExportProgramConfig.stepper.exportPanel')"
+          >
+            <div class="q-gutter-y-sm">
+              <h6 class="text-primary-bright text-center q-mt-lg q-mb-md">
+                {{ $t('dialogs.importExportProgramConfig.exportHint') }}
+              </h6>
+
+              <q-list class="q-pl-xl q-pr-xl">
+                <DialogImportExportProgramConfigQItemCheckboxRow
+                  v-model="exportIncludeProgramSettings"
+                  checkbox-color="dark"
+                  data-test-locator="dialogImportExportProgramConfig-check-export-settings"
+                  label-i18n-key="dialogs.importExportProgramConfig.checkboxes.programSettings"
+                />
+                <DialogImportExportProgramConfigQItemCheckboxRow
+                  v-model="exportIncludeKeybinds"
+                  checkbox-color="dark"
+                  data-test-locator="dialogImportExportProgramConfig-check-export-keybinds"
+                  label-i18n-key="dialogs.importExportProgramConfig.checkboxes.keybinds"
+                />
+                <DialogImportExportProgramConfigQItemCheckboxRow
+                  v-model="exportIncludeProgramStyling"
+                  checkbox-color="dark"
+                  data-test-locator="dialogImportExportProgramConfig-check-export-styling"
+                  label-i18n-key="dialogs.importExportProgramConfig.checkboxes.programStyling"
+                />
+              </q-list>
+              <div class="row justify-center q-mt-lg q-mb-lg">
+                <q-btn
+                  color="primary-bright"
+                  :disable="createExportDisabled"
+                  :label="$t('dialogs.importExportProgramConfig.createExportFile')"
+                  data-test-locator="dialogImportExportProgramConfig-button-createExport"
+                  outline
+                  @click="onClickCreateExport"
+                />
+              </div>
+            </div>
+          </q-step>
+        </q-stepper>
+      </q-card-section>
     </q-card>
   </q-dialog>
 </template>
@@ -137,10 +180,16 @@
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
 import { S_DialogComponent } from 'app/src/stores/S_Dialog'
-import { onMounted, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import type { StoreGeneric } from 'pinia'
 
 import { useDialogImportExportProgramConfigDialog } from './scripts/dialogImportExportProgramConfigDialog'
+import {
+  type T_importExportStepperPanel,
+  importExportViewToStepperPanel
+} from './scripts/dialogImportExportProgramConfigStepperMap'
+
+import DialogImportExportProgramConfigQItemCheckboxRow from './DialogImportExportProgramConfigQItemCheckboxRow.vue'
 
 const resolveDialogComponentStore = (): StoreGeneric | null => {
   try {
@@ -175,20 +224,20 @@ const {
   }
 })
 
+const stepperPanel = ref<T_importExportStepperPanel>(importExportViewToStepperPanel(view.value))
+watch(
+  view,
+  (v) => {
+    stepperPanel.value = importExportViewToStepperPanel(v)
+  },
+  { flush: 'sync' }
+)
 const props = defineProps<{
   directInput?: T_dialogName
 }>()
 
 registerComponentDialogStackGuard(dialogModel)
-
-function openDialog (): void {
-  dialogModel.value = true
-}
-
-function onRootImport (): void {
-  void onClickImport()
-}
-
+function openDialog (): void { dialogModel.value = true }
 watch(
   () => resolveDialogComponentStore()?.dialogUUID,
   () => {
@@ -215,9 +264,4 @@ onMounted(() => {
 })
 </script>
 
-<style lang="scss" scoped>
-.importExportProgramConfig .dialogComponent__wrapper {
-  max-width: 28rem;
-  width: 90vw;
-}
-</style>
+<style lang="scss" scoped src="./styles/DialogImportExportProgramConfig.scoped.scss"></style>

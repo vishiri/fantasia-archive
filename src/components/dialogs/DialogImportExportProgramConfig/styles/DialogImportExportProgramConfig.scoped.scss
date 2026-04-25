@@ -1,0 +1,52 @@
+@use '../../../../css/quasar.variables.scss' as *;
+
+.importExportProgramConfig {
+  .importExportProgramConfig__stepper {
+    /* stylelint-disable selector-pseudo-class-no-unknown -- scoped :deep into Quasar QStepper */
+    :deep(.q-stepper__header) {
+      display: none;
+    }
+
+    :deep(.q-stepper__content) {
+      min-height: 0;
+    }
+
+    :deep(.q-panel.scroll[class*="q-transition-"]) {
+      overflow: hidden;
+    }
+    /* stylelint-enable selector-pseudo-class-no-unknown */
+  }
+
+  .dialogComponent__wrapper {
+    max-width: $dialogImportExportProgramConfig-wrapper-maxWidth;
+    width: $dialogImportExportProgramConfig-wrapper-width;
+  }
+
+  .importExportProgramConfig__rootActionRow {
+    align-items: stretch;
+    box-sizing: border-box;
+    height: $dialogImportExportProgramConfig-rootActionRow-height;
+  }
+
+  .importExportProgramConfig__rootActionActions {
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+  }
+
+  .importExportProgramConfig__rootActionCol {
+    display: flex;
+    flex: 1 1 0;
+    margin-left: $dialogImportExportProgramConfig-rootActionCol-marginX;
+    margin-right: $dialogImportExportProgramConfig-rootActionCol-marginX;
+    min-width: 0;
+  }
+
+  .importExportProgramConfig__rootActionBtn {
+    font-weight: $dialogImportExportProgramConfig-rootActionBtn-fontWeight;
+    letter-spacing: $dialogImportExportProgramConfig-rootActionBtn-letterSpacing;
+    min-height: $dialogImportExportProgramConfig-rootActionBtn-minHeight;
+    text-transform: uppercase;
+    width: 100%;
+  }
+}
