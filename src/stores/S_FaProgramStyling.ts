@@ -12,7 +12,7 @@ import { i18n } from 'app/i18n/externalFileLoader'
 
 /**
  * Manages persisted user CSS sourced from the Electron main process via the IPC bridge.
- * Loads once on app start; saves go through 'updateProgramStyling' which mirrors the new value back into the reactive 'css' ref so any listener (for example FaUserCssInjector) can react.
+ * Loads once on app start; saves go through 'updateProgramStyling' which mirrors the new value back into the reactive 'css' ref so any listener (for example _FaUserCssInjector) can react.
  *
  * 'cssLivePreview' overrides 'css' for the injected '#faUserCss' node while the program styling editor is open so edits preview live; it is cleared on save or when discarding edits (after refresh from disk).
  */

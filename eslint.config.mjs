@@ -165,6 +165,12 @@ export default [...neostandard({
     }]
   }
 }, {
+  files: ['src/components/**/_*.vue'],
+  rules: {
+    // Infrastructure helpers use defineOptions name _Fa… per AGENTS.md Helper / wrapper SFC naming.
+    'vue/component-definition-name-casing': 'off'
+  }
+}, {
   files: ['**/*.{js,mjs,cjs}'],
   ignores: [
     ...codeSizeRuleIgnores,

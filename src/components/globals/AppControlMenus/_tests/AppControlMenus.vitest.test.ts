@@ -10,7 +10,7 @@ import { buildToolsMenu } from '../_data/tools'
 import AppControlMenus from '../AppControlMenus.vue'
 
 /**
- * WindowProgramStyling uses FaFloatingWindowBodyTeleport to '#q-app'; Vitest jsdom has no Quasar root until we add it.
+ * WindowProgramStyling uses _FaFloatingWindowBodyTeleport (body Teleport); Vitest jsdom has no Quasar root until we add it.
  */
 beforeEach(() => {
   if (document.getElementById('q-app') === null) {

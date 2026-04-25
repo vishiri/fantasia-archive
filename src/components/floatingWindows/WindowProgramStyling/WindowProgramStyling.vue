@@ -137,8 +137,8 @@
 import { computed } from 'vue'
 
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
-import FaFloatingWindowBodyTeleport from 'app/src/components/floatingWindows/FaFloatingWindowBodyTeleport/FaFloatingWindowBodyTeleport.vue'
-import FaFloatingWindowFrameResizeHandles from 'app/src/components/floatingWindows/FaFloatingWindowFrameResizeHandles/FaFloatingWindowFrameResizeHandles.vue'
+import FaFloatingWindowBodyTeleport from 'app/src/components/floatingWindows/_FaFloatingWindowBodyTeleport/_FaFloatingWindowBodyTeleport.vue'
+import FaFloatingWindowFrameResizeHandles from 'app/src/components/floatingWindows/_FaFloatingWindowFrameResizeHandles/_FaFloatingWindowFrameResizeHandles.vue'
 import { getMonacoKeybindHelpItems } from 'app/src/components/floatingWindows/WindowProgramStyling/scripts/windowProgramStylingKeybindHelp'
 import { useWindowProgramStyling } from 'app/src/components/floatingWindows/WindowProgramStyling/scripts/windowProgramStylingState'
 import {

@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { expect, test, vi } from 'vitest'
 
-import FaFloatingWindowFrameResizeHandles from '../FaFloatingWindowFrameResizeHandles.vue'
+import FaFloatingWindowFrameResizeHandles from '../_FaFloatingWindowFrameResizeHandles.vue'
 
 /**
  * FaFloatingWindowFrameResizeHandles

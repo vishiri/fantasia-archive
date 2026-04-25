@@ -10,6 +10,6 @@
 
 <script setup lang="ts">
 defineOptions({
-  name: 'FaFloatingWindowBodyTeleport'
+  name: '_FaFloatingWindowBodyTeleport'
 })
 </script>

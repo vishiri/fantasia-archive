@@ -17,6 +17,10 @@ import { onBeforeUnmount, onMounted, watch } from 'vue'
 
 import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
 
+defineOptions({
+  name: '_FaUserCssInjector'
+})
+
 const FA_USER_CSS_STYLE_ELEMENT_ID = 'faUserCss'
 
 const programStylingStore = S_FaProgramStyling()

@@ -4,7 +4,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
 
-import FaUserCssInjector from '../FaUserCssInjector.vue'
+import FaUserCssInjector from '../_FaUserCssInjector.vue'
 
 const FA_USER_CSS_STYLE_ELEMENT_ID = 'faUserCss'
 

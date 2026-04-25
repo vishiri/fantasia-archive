@@ -67,12 +67,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { useFaFloatingWindowFrameResizeHandlesHover } from 'app/src/components/floatingWindows/FaFloatingWindowFrameResizeHandles/scripts/faFloatingWindowFrameResizeHandlesHover'
+import { useFaFloatingWindowFrameResizeHandlesHover } from 'app/src/components/floatingWindows/_FaFloatingWindowFrameResizeHandles/scripts/faFloatingWindowFrameResizeHandlesHover'
 import { FA_FLOATING_WINDOW_RESIZE_HANDLE_PX } from 'app/src/scripts/floatingWindows/faFloatingWindowResizeGeometry'
 import type { T_faFloatingWindowResizeEdge } from 'app/src/scripts/floatingWindows/useFaFloatingWindowResize'
 
 defineOptions({
-  name: 'FaFloatingWindowFrameResizeHandles'
+  name: '_FaFloatingWindowFrameResizeHandles'
 })
 
 const props = defineProps<{
@@ -92,4 +92,4 @@ function down (edge: T_faFloatingWindowResizeEdge, e: PointerEvent): void {
 }
 </script>
 
-<style lang="scss" scoped src="./styles/FaFloatingWindowFrameResizeHandles.scss"></style>
+<style lang="scss" scoped src="./styles/_FaFloatingWindowFrameResizeHandles.scss"></style>

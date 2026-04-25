@@ -13,7 +13,7 @@ body {
   return {
     components: { story },
     /**
-     * Stage sizing only; FaFloatingWindowBodyTeleport mounts the frame under document.body (same as production).
+     * Stage sizing only; _FaFloatingWindowBodyTeleport mounts the frame under document.body (same as production).
      */
     template: `
       <div class="fa-storybook-windowProgramStyling-stage" style="min-height: 85vh; position: relative;">
