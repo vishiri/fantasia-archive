@@ -9,6 +9,7 @@ import L_socialContactButtons from 'app/i18n/en-US/components/other/SocialContac
 import L_aboutFantasiaArchive from 'app/i18n/en-US/dialogs/L_aboutFantasiaArchive'
 import L_DialogActionMonitor from 'app/i18n/en-US/dialogs/L_DialogActionMonitor'
 import L_dialogKeybindSettings from 'app/i18n/en-US/dialogs/L_dialogKeybindSettings'
+import L_importExportProgramConfig from 'app/i18n/en-US/dialogs/L_importExportProgramConfig'
 import L_markdownDocument from 'app/i18n/en-US/dialogs/L_markdownDocument'
 import L_programSettings from 'app/i18n/en-US/dialogs/L_programSettings'
 import L_programStylingFloating from 'app/i18n/en-US/floatingWindows/L_programStyling'
@@ -38,6 +39,7 @@ const defaultMessages: Record<string, unknown> = {
     aboutFantasiaArchive: L_aboutFantasiaArchive,
     actionMonitor: L_DialogActionMonitor,
     keybindSettings: L_dialogKeybindSettings,
+    importExportProgramConfig: L_importExportProgramConfig,
     markdownDocument: L_markdownDocument,
     programSettings: L_programSettings
   },

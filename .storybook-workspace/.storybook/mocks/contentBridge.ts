@@ -73,6 +73,20 @@ const baseBridge = () => ({
   faProgramStyling: {
     getProgramStyling: async () => ({ ...FA_PROGRAM_STYLING_STORE_DEFAULTS }),
     setProgramStyling: async () => undefined
+  },
+  faProgramConfig: {
+    applyImport: async () => ({ appliedParts: [] }),
+    disposeImportSession: async () => undefined,
+    exportToFile: async () => ({ outcome: 'canceled' }),
+    prepareImport: async () => ({
+      outcome: 'ready',
+      parts: {
+        keybinds: 'ok',
+        programSettings: 'ok',
+        programStyling: 'ok'
+      },
+      sessionId: 'storybook-import-session'
+    })
   }
 })
 
@@ -130,6 +144,10 @@ export const setContentBridgeScenario = (
     faProgramStyling: {
       ...nextBridge.faProgramStyling,
       ...(overrides.faProgramStyling ?? {})
+    },
+    faProgramConfig: {
+      ...nextBridge.faProgramConfig,
+      ...(overrides.faProgramConfig ?? {})
     }
   }
 }

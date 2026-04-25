@@ -22,6 +22,7 @@
 - **End-to-end**: the **`checkKeybinds`** Playwright spec covers default **Ctrl + Alt + Shift + G** and a persisted custom chord for **Open Advanced search guide** against the markdown guide dialog, in the same flow as other global shortcuts.
 - **End-to-end**: the **`checkAppStyling`** Playwright spec opens **Custom program CSS** from **Tools**, enters **CSS** in **Monaco**, saves so **document.body** picks up **zoom** from the injected stylesheet, reopens the styling window, clears the editor, saves empty **CSS**, and asserts **zoom** returns to the default.
 - **Storybook**: **`externalFileLoader`** registers **`floatingWindows.programStyling`** for **en-US** so **WindowProgramStyling** **autodocs** and canvas stories resolve titles, tooltip copy, and action labels instead of raw **vue-i18n** keys; the story seeds multi-line sample **CSS** so **Monaco** syntax highlighting is easy to spot.
+- **Storybook**: **DialogImportExportProgramConfig** canvas and **autodocs**; **`externalFileLoader`** registers **dialogs.importExportProgramConfig**; the workspace content bridge mock adds **faProgramConfig** stubs so **prepareImport** can succeed in the canvas while **exportToFile** returns **canceled**, matching the real flow enough to review the dialog without **Electron**.
 
 ### Bugfixes & Optimizations
 - **Top app menus** (**AppControlSingleMenu**): after a full-width **separator** row in the menu data, the thin divider before the next item no longer stacks on the full separator (no double horizontal rules).
