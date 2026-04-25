@@ -68,6 +68,46 @@ test('Test that AppControlSingleMenu omits keybind hint markup when keybindComma
 
 /**
  * AppControlSingleMenu
+ * After a full-width separator row, the next item must not get a second thin separator (avoids double lines).
+ */
+test('Test that AppControlSingleMenu does not render separatorAlt immediately after a separator row', async () => {
+  const w = mount(AppControlSingleMenu, {
+    attachTo: document.body,
+    props: {
+      dataInput: {
+        title: 'Menu',
+        data: [
+          {
+            mode: 'item',
+            text: 'First',
+            icon: 'mdi-numeric-1',
+            conditions: true
+          },
+          { mode: 'separator' },
+          {
+            mode: 'item',
+            text: 'After sep',
+            icon: 'mdi-numeric-2',
+            conditions: true
+          }
+        ]
+      }
+    },
+    global: { mocks: { $t: (k: string) => k } }
+  })
+
+  await w.get('[data-test-locator="AppControlSingleMenu-wrapper"]').trigger('click')
+  await flushPromises()
+
+  const alt = document.body.querySelectorAll('.appControlSingleMenu__separatorAlt')
+  const standard = document.body.querySelectorAll('.appControlSingleMenu__separator')
+  expect(alt.length).toBe(1)
+  expect(standard.length).toBe(1)
+  w.unmount()
+})
+
+/**
+ * AppControlSingleMenu
  * When `keybindCommandId` is set and `S_FaKeybinds.snapshot` is loaded, the hint matches the shared formatter.
  */
 test('Test that AppControlSingleMenu shows keybind hint from S_FaKeybinds snapshot', async () => {

@@ -45,7 +45,7 @@
           />
 
           <q-separator
-            v-if="menuItem.mode !== 'separator'"
+            v-if="menuItem.mode === 'item' && shouldShowSeparatorAltBeforeItem(menuData, index)"
             class="appControlSingleMenu__separatorAlt"
             dark
             role="separator"
@@ -112,7 +112,7 @@
                   />
 
                   <q-separator
-                    v-if="submenuItem.mode !== 'separator'"
+                    v-if="submenuItem.mode === 'item' && shouldShowSeparatorAltBeforeItem(menuItem.submenu, subIndex)"
                     class="appControlSingleMenu__separatorAlt"
                     dark
                     role="separator"
@@ -165,10 +165,23 @@ import { computed } from 'vue'
 
 import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
-import type { I_appMenuList } from 'app/types/I_appMenusDataList'
+import type { I_appMenuItem, I_appMenuList, I_appMenuSubItem } from 'app/types/I_appMenusDataList'
 import type { T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
 
 const faKeybindsStore = S_FaKeybinds()
+
+/**
+ * Thin divider before a row: skip when the previous entry is already a full separator (avoids double lines).
+ */
+function shouldShowSeparatorAltBeforeItem (
+  items: readonly (I_appMenuItem | I_appMenuSubItem)[] | undefined,
+  itemIndex: number
+): boolean {
+  if (items === undefined || itemIndex === 0) {
+    return true
+  }
+  return items[itemIndex - 1]!.mode !== 'separator'
+}
 
 /**
  * Shortcut hint for a menu row when `keybindCommandId` is set and keybind snapshot is loaded.
