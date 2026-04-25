@@ -39,7 +39,7 @@ export default defineConfig((ctx) => {
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
-      'mdi-v5',
+      'mdi-v7',
       'fontawesome-v6',
       'roboto-font-latin-ext',
       'material-icons'

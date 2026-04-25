@@ -155,7 +155,7 @@ const {
       }
 
       &::before {
-        background-color: $dark;
+        background-color: $dialogProgramSettings-surface-backgroundColor;
         content: "";
         opacity: 1;
       }

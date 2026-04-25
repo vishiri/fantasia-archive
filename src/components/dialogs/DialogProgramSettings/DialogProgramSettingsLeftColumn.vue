@@ -83,7 +83,7 @@ function emitSearchQueryFromInput (value: string | number | null): void {
 }
 
 .dialogProgramSettings__settingsSearchWrapper {
-  background-color: $dark;
+  background-color: $dialogProgramSettings-surface-backgroundColor;
   pointer-events: auto;
   position: absolute;
   right: $dialogProgramSettings-settingsSearchWrapper-right;

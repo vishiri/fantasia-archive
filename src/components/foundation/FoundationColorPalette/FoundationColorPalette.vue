@@ -117,13 +117,13 @@ const materialGroups = buildQuasarMaterialGroups()
   /* Transparent root so Storybook backgrounds toolbar (paper / dark app) paints the canvas. */
   background-color: transparent;
   box-sizing: border-box;
-  color: $grey;
+  color: $foundationCatalogues-body-color;
   min-height: $foundationCatalogues-root-minHeight;
   width: 100%;
 
   &__title,
   &__sectionTitle {
-    color: $primary-bright;
+    color: $foundationCatalogues-emphasisText-color;
   }
 
   &__customCard {
@@ -137,11 +137,11 @@ const materialGroups = buildQuasarMaterialGroups()
   }
 
   &__meta {
-    background-color: $dark;
+    background-color: $foundationCatalogues-panel-backgroundColor;
   }
 
   &__var {
-    color: $primary-bright;
+    color: $foundationCatalogues-emphasisText-color;
   }
 
   &__materialRow {
@@ -151,7 +151,7 @@ const materialGroups = buildQuasarMaterialGroups()
   }
 
   &__materialRootLabel {
-    color: $primary-bright;
+    color: $foundationCatalogues-emphasisText-color;
     flex-shrink: 0;
     min-width: $foundationColorPalette-materialRootLabel-minWidth;
   }

@@ -1,5 +1,4 @@
 @use 'sass:color';
-/* Material palette ($blue-grey-5, etc.): loaded as a module so names do not clash with brand overrides below. */
 @use 'quasar/src/css/variables.sass' as quasarPalette;
 
 /* Quasar SCSS (& Sass) variables — single theme catalogue (see project-scss.mdc). */
@@ -40,8 +39,16 @@ $selectTextColor-lightMode: #eedbb0;
 
 /* GLOBALS - HTML ELEMENTS */
 $aLinkColor: $primary-bright;
+$globals-codeToken-backgroundColor: #366c82;
+$globals-codeToken-borderRadius: 4px;
+$globals-codeToken-fontFamily: 'Courier New', courier, monospace;
+$globals-codeToken-fontSize: 13px;
+$globals-codeToken-lineHeight: 13px;
+$globals-codeToken-padding: 4px 6px;
+$globals-codeToken-textColor: $primary-bright;
 $globals-letterSpacing: 0.025em;
 $globals-paragraph-margin: 0 0 16px;
+$globals-utilityPrimaryBright-foreground: $primary-bright;
 
 /* GLOBALS - SCROLLBAR */
 $globals-scrollbar-height: 5px;
@@ -60,6 +67,18 @@ $qCard-border-radius: 5px;
 $qCard-border-size: 0;
 $qCard-boxShadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
 $qCard-text: $white;
+
+/* QUASAR COMPONENT - Q-CHECKBOX */
+$qCheckbox-bg-borderColor: $white;
+$qCheckbox-bg-transition: 0.3s cubic-bezier(0.4, 0, 0.6, 1) border-color;
+$qCheckbox-disabled-borderColor: quasarPalette.$blue-grey-5;
+$qCheckbox-inner-before-backgroundColor: $primary-bright;
+$qCheckbox-inner-before-backgroundColorTransition: 0.3s cubic-bezier(0.4, 0, 0.6, 1) background-color;
+$qCheckbox-inner-before-opacity: 0.25;
+$qCheckbox-path-strokeDashoffsetTransition: stroke-dashoffset 0.3s cubic-bezier(0.4, 0, 0.6, 1) 0ms;
+$qCheckbox-svg-color: $primary-bright;
+$qCheckbox-truthy-borderColor: $primary;
+$qCheckbox-truthy-borderWidth: 2px;
 
 /* QUASAR COMPONENT - Q-DIALOG */
 $qDialog-card-maxHeightSubtract: 125px;
@@ -132,6 +151,8 @@ $qToggle-thumb-transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 $qToggle-width: 100%;
 
 /* QUASAR COMPONENT - Q-TOOLTIP */
+$qTooltip-backgroundColor: $accent;
+$qTooltip-color: $dark;
 $qTooltip-fontSize: 13px;
 $qTooltip-fontWeight: 600;
 $qTooltip-maxWidth: 600px;
@@ -216,6 +237,7 @@ $dialogProgramSettings-settingTitle-marginBottom: 8px;
 $dialogProgramSettings-settingTitle-marginLeft: 10px;
 $dialogProgramSettings-settingTitle-marginTop: 16px;
 $dialogProgramSettings-settingTitle-widthSubtract: 45px;
+$dialogProgramSettings-surface-backgroundColor: $dark;
 $dialogProgramSettings-tabsSearchOverlay-zIndex: 10;
 $dialogProgramSettings-title-zIndex: 11;
 $dialogProgramSettings-verticalTab-paddingX: 16px;
@@ -240,6 +262,8 @@ $windowProgramStyling-helpTooltipTitle-fontWeight: 600;
 $windowProgramStyling-helpTooltipTitle-marginBottom: 10px;
 $windowProgramStyling-loadError-padding: 8px 16px;
 $windowProgramStyling-loadingOverlay-background: rgba(0, 0, 0, 0.55);
+$windowProgramStyling-titleRow-borderBottom: 1px solid rgba(255, 255, 255, 0.28);
+$windowProgramStyling-titleRow-minHeight: 2.75rem;
 
 /* COMPONENT - ERROR CARD */
 $errorCard-background: #f7eeda;
@@ -247,6 +271,14 @@ $errorCard-border-color: $dark;
 $errorCard-border-radius: 10px;
 $errorCard-border-size: 2px;
 $errorCard-text: $dark;
+
+/* COMPONENT - FLOATING WINDOW COMPONENT (ROOT) */
+$floatingWindowComponent-base-background: $white;
+$floatingWindowComponent-border: 1px solid rgba(0, 0, 0, 0.3);
+$floatingWindowComponent-borderRadius: 4px;
+$floatingWindowComponent-boxShadow: 0 3px 10px rgba(0, 0, 0, 0.35), 0 6px 6px rgba(0, 0, 0, 0.2), 0 3px 1px -2px rgba(0, 0, 0, 0.3);
+$floatingWindowComponent-surface-backgroundColor: $dark;
+$floatingWindowComponent-titleShortFrame-margin: 15px 0;
 
 /* COMPONENT - FA FLOATING WINDOW FRAME RESIZE HANDLES */
 $faFloatingWindowFrameResizeHandles-cornerHit-fallback: 8px;
@@ -259,6 +291,9 @@ $faFloatingWindowFrameResizeHandles-stacking-cornerZ: 2;
 $faFloatingWindowFrameResizeHandles-stacking-edgeZ: 1;
 
 /* COMPONENT - FOUNDATION CATALOGUES (SHARED) */
+$foundationCatalogues-body-color: $grey;
+$foundationCatalogues-emphasisText-color: $primary-bright;
+$foundationCatalogues-panel-backgroundColor: $dark;
 $foundationCatalogues-root-minHeight: 100vh;
 
 /* COMPONENT - FOUNDATION COLOR PALETTE */
@@ -332,11 +367,12 @@ $socialContactSingleButton-website-borderWidth: 3px;
 /* COMPONENT - DIALOG KEYBIND SETTINGS */
 $dialogKeybindSettings-card-maxWidthViewportSubtract: 48px;
 $dialogKeybindSettings-card-width: 1200px;
-$dialogKeybindSettings-wrapper-maxHeightCap: 900px;
-$dialogKeybindSettings-wrapper-maxHeightViewportSubtract: 200px;
+$dialogKeybindSettings-filterEmpty-padding: 16px 24px 24px;
 $dialogKeybindSettings-table-col-default-width: 200px;
 $dialogKeybindSettings-table-col-name-width: 200px;
 $dialogKeybindSettings-table-col-user-width: 200px;
+$dialogKeybindSettings-wrapper-maxHeightCap: 900px;
+$dialogKeybindSettings-wrapper-maxHeightViewportSubtract: 200px;
 
 /* COMPONENT - DIALOG KEYBIND SETTINGS (CAPTURE POPUP) */
 $dialogKeybindSettingsCapture-actionBtn-minWidth: 140px;
@@ -368,6 +404,15 @@ $dialogKeybindSettingsCapture-tooltip-list-paddingLeft: 1.1rem;
 $dialogKeybindSettingsCapture-tooltip-listItem-marginVertical: 2px;
 $dialogKeybindSettingsCapture-tooltip-padding: 12px 14px;
 $dialogKeybindSettingsCapture-tooltip-text: $dark;
+
+/* COMPONENT - IMPORT EXPORT PROGRAM CONFIG DIALOG */
+$dialogImportExportProgramConfig-rootActionBtn-fontWeight: 700;
+$dialogImportExportProgramConfig-rootActionBtn-letterSpacing: 0.06em;
+$dialogImportExportProgramConfig-rootActionBtn-minHeight: 70px;
+$dialogImportExportProgramConfig-rootActionCol-marginX: 24px;
+$dialogImportExportProgramConfig-rootActionRow-height: 100px;
+$dialogImportExportProgramConfig-wrapper-maxWidth: 90vw;
+$dialogImportExportProgramConfig-wrapper-width: 800px;
 
 /* LAYOUT - MAIN LAYOUT */
 $mainLayout-appHeader-zIndex: 7000;

@@ -1,9 +1,9 @@
 @use '../quasar.variables.scss' as *;
 
 .text-primary-bright {
-  color: $primary-bright !important;
+  color: $globals-utilityPrimaryBright-foreground !important;
 }
 
 .bg-primary-bright {
-  background: $primary-bright !important;
+  background: $globals-utilityPrimaryBright-foreground !important;
 }

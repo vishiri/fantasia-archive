@@ -1,4 +1,4 @@
-@import 'WindowProgramStyling.floatingWindowPopTransition.unscoped';
+@use './WindowProgramStyling.floatingWindowPopTransition.unscoped.scss' as *;
 
 .windowProgramStyling {
   box-sizing: border-box;
@@ -14,12 +14,12 @@
 
   &__titleRow {
     align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+    border-bottom: $windowProgramStyling-titleRow-borderBottom;
     cursor: grab;
     display: flex;
     flex: 0 0 auto;
     justify-content: center;
-    min-height: 2.75rem;
+    min-height: $windowProgramStyling-titleRow-minHeight;
     position: relative;
     user-select: none;
     width: 100%;

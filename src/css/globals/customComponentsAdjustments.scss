@@ -1,11 +1,11 @@
 @use '../quasar.variables.scss' as *;
 
 .floatingWindowComponent {
-  background: $white;
-  background-color: $dark;
-  border: 1px solid rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35), 0 6px 6px rgba(0, 0, 0, 0.2), 0 3px 1px -2px rgba(0, 0, 0, 0.3);
+  background: $floatingWindowComponent-base-background;
+  background-color: $floatingWindowComponent-surface-backgroundColor;
+  border: $floatingWindowComponent-border;
+  border-radius: $floatingWindowComponent-borderRadius;
+  box-shadow: $floatingWindowComponent-boxShadow;
   max-width: stretch;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
@@ -16,5 +16,5 @@
 }
 
 .floatingWindowComponent__title--shortFrame {
-  margin: 15px 0;
+  margin: $floatingWindowComponent-titleShortFrame-margin;
 }

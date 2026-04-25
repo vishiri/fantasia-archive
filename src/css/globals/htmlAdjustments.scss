@@ -1,4 +1,5 @@
 @use '../quasar.variables.scss' as *;
+@use 'quasar/src/css/variables.sass' as quasarPalette;
 
 * {
   letter-spacing: $globals-letterSpacing;
@@ -52,4 +53,21 @@ a {
 
 p {
   margin: $globals-paragraph-margin;
+}
+
+li {
+  padding-bottom: 3px;
+}
+
+code {
+  &.code-token {
+    background-color: $globals-codeToken-backgroundColor;
+    border-radius: $globals-codeToken-borderRadius;
+    color: $globals-codeToken-textColor;
+    font-family: $globals-codeToken-fontFamily;
+    font-size: $globals-codeToken-fontSize;
+    line-height: $globals-codeToken-lineHeight;
+    padding: $globals-codeToken-padding;
+    vertical-align: baseline;
+  }
 }

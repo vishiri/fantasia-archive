@@ -59,6 +59,42 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
   box-shadow: $qCard-boxShadow;
 }
 
+.q-checkbox {
+  &__bg {
+    border-color: $qCheckbox-bg-borderColor;
+    transition: $qCheckbox-bg-transition;
+  }
+
+  &__svg {
+    color: $qCheckbox-svg-color !important;
+  }
+
+  &__inner {
+    &::before {
+      background-color: $qCheckbox-inner-before-backgroundColor !important;
+      opacity: $qCheckbox-inner-before-opacity !important;
+      transition: $qCheckbox-inner-before-backgroundColorTransition;
+    }
+
+    &--truthy,
+    &--indeterminate {
+      .q-checkbox__bg {
+        border: $qCheckbox-truthy-borderWidth solid $qCheckbox-truthy-borderColor !important;
+      }
+    }
+  }
+
+  path {
+    transition: $qCheckbox-path-strokeDashoffsetTransition;
+  }
+
+  &.disabled {
+    .q-checkbox__bg {
+      border-color: $qCheckbox-disabled-borderColor;
+    }
+  }
+}
+
 .q-dialog > .q-dialog__inner > .q-card {
   max-height: calc(100vh - #{$qDialog-card-maxHeightSubtract});
   max-width: $qDialog-card-maxWidth;
@@ -280,8 +316,8 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 }
 
 .q-tooltip {
-  background-color: $accent;
-  color: $dark;
+  background-color: $qTooltip-backgroundColor;
+  color: $qTooltip-color;
   font-size: $qTooltip-fontSize;
   font-weight: $qTooltip-fontWeight;
   max-width: $qTooltip-maxWidth;

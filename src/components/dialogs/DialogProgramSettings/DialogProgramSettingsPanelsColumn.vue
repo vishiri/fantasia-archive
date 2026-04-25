@@ -110,7 +110,7 @@ const emit = defineEmits<{
 }
 
 .dialogProgramSettings__searchAllSettingsPanel {
-  background: $dark;
+  background: $dialogProgramSettings-surface-backgroundColor;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;

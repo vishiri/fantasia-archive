@@ -221,12 +221,14 @@ registerDialogKeybindSettingsGlobalSuspend({
 })
 </script>
 <style lang="scss" scoped>
+@use '../../../css/quasar.variables.scss' as *;
+
 .dialogKeybindSettings__filterEmpty {
   box-sizing: border-box;
   flex: 1 1 auto;
   flex-direction: column;
   min-height: 100%;
-  padding: 16px 24px 24px;
+  padding: $dialogKeybindSettings-filterEmpty-padding;
   width: 100%;
 }
 </style>

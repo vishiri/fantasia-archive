@@ -115,13 +115,13 @@ const helperRows = FOUNDATION_TYPOGRAPHY_HELPERS
 .foundationTextList {
   background-color: transparent;
   box-sizing: border-box;
-  color: $grey;
+  color: $foundationCatalogues-body-color;
   min-height: $foundationCatalogues-root-minHeight;
   width: 100%;
 
   &__title,
   &__sectionTitle {
-    color: $primary-bright;
+    color: $foundationCatalogues-emphasisText-color;
   }
 
   &__sampleRow {
@@ -130,11 +130,11 @@ const helperRows = FOUNDATION_TYPOGRAPHY_HELPERS
   }
 
   &__classLabel {
-    color: $primary-bright;
+    color: $foundationCatalogues-emphasisText-color;
   }
 
   &__helperCard {
-    background-color: $dark;
+    background-color: $foundationCatalogues-panel-backgroundColor;
     border: $foundationTextList-helperCard-borderWidth solid $gold-muted-border;
     border-radius: $qCard-border-radius;
   }

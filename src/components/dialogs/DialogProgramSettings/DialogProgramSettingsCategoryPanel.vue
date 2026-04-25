@@ -80,7 +80,7 @@ function subCategoryTitleLocator (mode: 'tab' | 'search'): string {
 }
 
 .dialogProgramSettings__categoryTitle {
-  background: $dark;
+  background: $dialogProgramSettings-surface-backgroundColor;
   left: $dialogProgramSettings-categoryTitle-left;
   padding-bottom: $dialogProgramSettings-categoryTitle-paddingBottom;
   padding-top: $dialogProgramSettings-categoryTitle-paddingTop;
