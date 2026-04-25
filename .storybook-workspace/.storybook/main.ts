@@ -75,6 +75,15 @@ const config: StorybookConfig = {
     options: {}
   },
 
+  /** Suppresses What's New toasts and the settings-gear notification dot for version/ecosystem updates. */
+  core: {
+    disableWhatsNewNotifications: true
+  },
+
+  features: {
+    sidebarOnboardingChecklist: false
+  },
+
   async viteFinal (viteConfig, { configType }) {
     const productionPreview = configType === 'PRODUCTION'
 

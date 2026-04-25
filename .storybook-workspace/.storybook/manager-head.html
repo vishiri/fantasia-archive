@@ -1,0 +1,9 @@
+<!-- Hides the What's New green dot on the manager cog (pseudo-elements; see Storybook Menu.tsx). -->
+<style>
+  button[aria-label='Settings']::before,
+  button[aria-label='Settings']::after,
+  button[aria-label='About Storybook']::before,
+  button[aria-label='About Storybook']::after {
+    display: none !important;
+  }
+</style>
