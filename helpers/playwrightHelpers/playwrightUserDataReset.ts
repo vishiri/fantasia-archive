@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
+import { performance } from 'node:perf_hooks'
 
 import packageJSON from '../../package.json' with { type: 'json' }
 import { PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME } from '../../src-electron/mainScripts/appIdentity/playwrightIsolatedUserDataDirName'
@@ -65,13 +66,73 @@ export function getFaPlaywrightIsolatedUserDataDir (): string {
   })
 }
 
+const RESET_FA_USER_DATA_MAX_ATTEMPTS = 15
+const RESET_FA_USER_DATA_BASE_DELAY_MS = 80
+
+/**
+ * Windows can hold a short lock on Chromium under 'Cache' after Electron exits; a single
+ * 'fs.rmSync' may throw EBUSY. Short spin-waited retries make serial E2E runs reliable.
+ */
+function sleepSyncForResetMs (ms: number): void {
+  const end = performance.now() + Math.max(0, ms)
+  while (performance.now() < end) {
+    // no-op: bounded busy wait (test-only reset path, typically a few seconds total)
+  }
+}
+
+/**
+ * True when 'fs.rmSync' failed because a file or directory is still locked. On Windows,
+ * the 'code' field is not always present on the thrown value even when the message
+ * contains 'EBUSY' or 'resource busy or locked'.
+ */
+function isTransientUserDataRmError (e: unknown): boolean {
+  if (typeof e !== 'object' || e === null) {
+    return false
+  }
+  const err = e as NodeJS.ErrnoException
+  const c = err.code
+  if (c === 'EPERM' || c === 'EBUSY' || c === 'EACCES' || c === 'ENOTEMPTY') {
+    return true
+  }
+  if (typeof err.message !== 'string') {
+    return false
+  }
+  const m = err.message
+  return (
+    m.includes('EBUSY') ||
+    m.includes('EPERM') ||
+    m.toLowerCase().includes('resource busy') ||
+    m.toLowerCase().includes('file is being used') ||
+    m.toLowerCase().includes('being used by another process')
+  )
+}
+
 /**
  * Removes the entire Playwright-isolated 'userData' tree (including 'faUserSettings.json'
  * and Chromium profile folders) so the next 'electron.launch' starts from defaults.
+ * Retries on EBUSY and common transient Windows file-lock codes so the next suite can
+ * delete a profile a prior Electron instance recently released.
  */
 export function resetFaPlaywrightIsolatedUserData (): void {
-  fs.rmSync(getFaPlaywrightIsolatedUserDataDir(), {
-    force: true,
-    recursive: true
-  })
+  const dir = getFaPlaywrightIsolatedUserDataDir()
+  let last: unknown
+  for (let attempt = 0; attempt < RESET_FA_USER_DATA_MAX_ATTEMPTS; attempt++) {
+    try {
+      fs.rmSync(dir, {
+        force: true,
+        recursive: true
+      })
+      return
+    } catch (e) {
+      last = e
+      if (isTransientUserDataRmError(e)) {
+        if (attempt < RESET_FA_USER_DATA_MAX_ATTEMPTS - 1) {
+          sleepSyncForResetMs(RESET_FA_USER_DATA_BASE_DELAY_MS * (attempt + 1))
+        }
+        continue
+      }
+      throw e
+    }
+  }
+  throw last
 }

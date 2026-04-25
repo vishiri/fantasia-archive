@@ -89,12 +89,16 @@ export function getFaPlaywrightElectronRecordVideoPartial (
  *
  * For 'test.describe.serial' groups with more than one test, pass 'test.afterAll''s 'TestInfo' as 'htmlReportAttachTestInfo'.
  * Playwright's HTML report does not show attachments registered on 'beforeAll''s 'TestInfo' on each test's page; 'afterAll''s 'TestInfo' is attributed to the last test and shows the Videos section there.
+ * When 'electronApp' is undefined (e.g. 'test.beforeAll' failed before 'electron.launch'), the call is a no-op so 'afterAll' does not add a spurious 'close' error.
  */
 export async function closeFaElectronAppWithRecordedVideoAttachments (
-  electronApp: ElectronApplication,
+  electronApp: ElectronApplication | undefined,
   recordVideoQueueTestInfo: TestInfo,
   htmlReportAttachTestInfo?: TestInfo
 ): Promise<void> {
+  if (electronApp === undefined) {
+    return
+  }
   await electronApp.close()
 
   if (

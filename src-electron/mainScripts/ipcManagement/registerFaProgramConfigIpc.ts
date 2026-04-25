@@ -9,6 +9,10 @@ import {
   purgeFaProgramConfigStagedImportSessionsExpired
 } from 'app/src-electron/mainScripts/programConfig/faProgramConfigImportStagedState'
 import { getFaProgramConfigImportOpenDefaultPath } from 'app/src-electron/mainScripts/programConfig/faProgramConfigFileDialogDefaultPaths'
+import {
+  installFaProgramConfigE2ePathOverrideGlobals,
+  takeNextE2eProgramConfigImportPath
+} from 'app/src-electron/mainScripts/programConfig/faProgramConfigE2ePathOverride'
 import { runApplyStagedProgramConfigImport } from 'app/src-electron/mainScripts/programConfig/faProgramConfigIpcRunApplyStagedImport'
 import { runExportProgramConfigToFile } from 'app/src-electron/mainScripts/programConfig/faProgramConfigIpcRunExportToFileDialog'
 import { runPrepareImportFromFaconfigFilePath } from 'app/src-electron/mainScripts/programConfig/faProgramConfigIpcRunPrepareImportFromFile'
@@ -43,6 +47,17 @@ export function registerFaProgramConfigIpc (): void {
     FA_PROGRAM_CONFIG_IPC.prepareImportAsync,
     async (event): Promise<I_faProgramConfigPrepareResult> => {
       purgeFaProgramConfigStagedImportSessionsExpired()
+      const e2eImportPath = takeNextE2eProgramConfigImportPath()
+      if (e2eImportPath !== null) {
+        if (!pathLooksLikeFaconfigFile(e2eImportPath)) {
+          return {
+            errorName: 'FileError',
+            errorMessage: 'Only .faconfig files are accepted',
+            outcome: 'error'
+          }
+        }
+        return await runPrepareImportFromFaconfigFilePath(e2eImportPath)
+      }
       const win = windowFromIpcEvent(event) ?? appWindow
       const openOpts: OpenDialogOptions = {
         defaultPath: getFaProgramConfigImportOpenDefaultPath(),
@@ -102,4 +117,6 @@ export function registerFaProgramConfigIpc (): void {
       }
     }
   )
+
+  installFaProgramConfigE2ePathOverrideGlobals()
 }

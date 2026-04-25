@@ -13,7 +13,7 @@ export default defineConfig({
   fullyParallel: false,
   outputDir: '../test-results/storybook-visual-artifacts',
   reporter: [
-    ['line'],
+    ['list'],
     ['html', {
       outputFolder: '../test-results/storybook-visual-report',
       open: 'never'

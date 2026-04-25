@@ -5,18 +5,22 @@ import { FA_PROGRAM_CONFIG_IPC } from 'app/src-electron/electron-ipc-bridge'
 const {
   appGetPathMock,
   dialogShowOpenDialogMock,
+  installE2eProgramConfigGlobalsMock,
   ipcMainHandleMock,
   runApplyMock,
   runExportMock,
   runPrepareFromPathMock,
+  takeNextE2eProgramConfigImportPathMock,
   windowFromIpcEventMock
 } = vi.hoisted(() => ({
   appGetPathMock: vi.fn((name: string) => (name === 'downloads' ? 'C:\\TestDownloads' : 'C:\\x')),
   dialogShowOpenDialogMock: vi.fn(),
+  installE2eProgramConfigGlobalsMock: vi.fn(),
   ipcMainHandleMock: vi.fn(),
   runApplyMock: vi.fn(),
   runExportMock: vi.fn(),
   runPrepareFromPathMock: vi.fn(),
+  takeNextE2eProgramConfigImportPathMock: vi.fn((): string | null => null),
   windowFromIpcEventMock: vi.fn()
 }))
 
@@ -46,6 +50,11 @@ vi.mock('app/src-electron/mainScripts/programConfig/faProgramConfigIpcRunApplySt
   runApplyStagedProgramConfigImport: runApplyMock
 }))
 
+vi.mock('app/src-electron/mainScripts/programConfig/faProgramConfigE2ePathOverride', () => ({
+  installFaProgramConfigE2ePathOverrideGlobals: installE2eProgramConfigGlobalsMock,
+  takeNextE2eProgramConfigImportPath: takeNextE2eProgramConfigImportPathMock
+}))
+
 beforeEach(() => {
   vi.resetModules()
   ipcMainHandleMock.mockReset()
@@ -53,6 +62,8 @@ beforeEach(() => {
   runPrepareFromPathMock.mockReset()
   runApplyMock.mockReset()
   dialogShowOpenDialogMock.mockReset()
+  takeNextE2eProgramConfigImportPathMock.mockReset()
+  takeNextE2eProgramConfigImportPathMock.mockReturnValue(null)
   windowFromIpcEventMock.mockReturnValue(undefined)
   runExportMock.mockResolvedValue({ outcome: 'canceled' })
   runPrepareFromPathMock.mockResolvedValue({ outcome: 'canceled' })
@@ -241,6 +252,29 @@ test('Test that disposeImportSessionAsync is a no-op for empty and non-string se
   await h({}, '')
   await h({}, 1 as never)
   expect(faProgramConfigImportStagedSessions.has('keep')).toBe(true)
+})
+
+test('Test that prepareImport uses E2E import path and skips the open dialog', async () => {
+  takeNextE2eProgramConfigImportPathMock.mockReturnValueOnce('c:\\e2e\\only.faconfig')
+  runPrepareFromPathMock.mockResolvedValueOnce({ outcome: 'ready' })
+  const { registerFaProgramConfigIpc } = await import('../registerFaProgramConfigIpc')
+  registerFaProgramConfigIpc()
+  const h = handlerFor(FA_PROGRAM_CONFIG_IPC.prepareImportAsync)
+  await h({})
+  expect(runPrepareFromPathMock).toHaveBeenCalledWith('c:\\e2e\\only.faconfig')
+  expect(dialogShowOpenDialogMock).not.toHaveBeenCalled()
+})
+
+test('Test that prepareImport E2E path branch errors when the path is not a .faconfig file', async () => {
+  takeNextE2eProgramConfigImportPathMock.mockReturnValueOnce('c:\\e2e\\bad.txt')
+  const { registerFaProgramConfigIpc } = await import('../registerFaProgramConfigIpc')
+  registerFaProgramConfigIpc()
+  const h = handlerFor(FA_PROGRAM_CONFIG_IPC.prepareImportAsync)
+  const r = (await h({})) as { errorName?: string, outcome: string }
+  expect(r.outcome).toBe('error')
+  expect(r.errorName).toBe('FileError')
+  expect(runPrepareFromPathMock).not.toHaveBeenCalled()
+  expect(dialogShowOpenDialogMock).not.toHaveBeenCalled()
 })
 
 test('Test that registerFaProgramConfigIpc is idempotent on second call', async () => {

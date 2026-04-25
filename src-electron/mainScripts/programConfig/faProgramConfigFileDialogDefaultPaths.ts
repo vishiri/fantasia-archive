@@ -3,12 +3,17 @@ import path from 'node:path'
 
 const FA_CONFIG_EXPORT_BASENAME = 'faConfigExport.faconfig'
 
-/** Save dialog default: Downloads + suggested `.faconfig` name (bare filename was resolving under Documents on some systems). */
-export function getFaProgramConfigExportSaveDefaultPath (): string {
-  return path.join(app.getPath('downloads'), FA_CONFIG_EXPORT_BASENAME)
+function e2eProgramConfigFileDialogsUseUserData (): boolean {
+  return process.env.TEST_ENV === 'e2e'
 }
 
-/** Open dialog default folder: Downloads. */
+/** Save dialog default: Downloads + suggested `.faconfig` name (bare filename was resolving under Documents on some systems). */
+export function getFaProgramConfigExportSaveDefaultPath (): string {
+  const base = e2eProgramConfigFileDialogsUseUserData() ? app.getPath('userData') : app.getPath('downloads')
+  return path.join(base, FA_CONFIG_EXPORT_BASENAME)
+}
+
+/** Open dialog default folder: Downloads, or the Electron userData path when 'TEST_ENV' is 'e2e' (Playwright). */
 export function getFaProgramConfigImportOpenDefaultPath (): string {
-  return app.getPath('downloads')
+  return e2eProgramConfigFileDialogsUseUserData() ? app.getPath('userData') : app.getPath('downloads')
 }

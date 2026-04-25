@@ -207,6 +207,14 @@ test('installFaPlaywrightCursorMarkerIfVideoEnabled does not call page.evaluate 
 
 /**
  * closeFaElectronAppWithRecordedVideoAttachments
+ * Skips closing when the app was never launched (beforeAll failed before electron.launch).
+ */
+test('closeFaElectronAppWithRecordedVideoAttachments is a no-op when electronApp is undefined', async () => {
+  await closeFaElectronAppWithRecordedVideoAttachments(undefined, {} as TestInfo)
+})
+
+/**
+ * closeFaElectronAppWithRecordedVideoAttachments
  * Always closes the Electron application even when video capture is disabled.
  */
 test('closeFaElectronAppWithRecordedVideoAttachments invokes electronApp.close when FA_PLAYWRIGHT_NO_VIDEO is set', async () => {

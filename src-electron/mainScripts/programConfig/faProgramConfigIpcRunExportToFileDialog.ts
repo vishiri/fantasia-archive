@@ -9,11 +9,37 @@ import { getFaProgramConfigExportSaveDefaultPath } from 'app/src-electron/mainSc
 import { zipProgramConfigBundle } from 'app/src-electron/mainScripts/programConfig/faProgramConfigBundle'
 import { getFaProgramStyling } from 'app/src-electron/mainScripts/programStyling/faProgramStylingStore'
 import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
+import { takeNextE2eProgramConfigExportPath } from 'app/src-electron/mainScripts/programConfig/faProgramConfigE2ePathOverride'
 import { appWindow } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
 import type { I_faProgramConfigExportOptions, I_faProgramConfigExportResult } from 'app/types/I_faProgramConfigDomain'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import type { I_faProgramStylingRoot } from 'app/types/I_faProgramStylingDomain'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
+
+async function tryWriteE2eExportPath (zipped: Uint8Array): Promise<I_faProgramConfigExportResult | null> {
+  const e2ePath = takeNextE2eProgramConfigExportPath()
+  if (e2ePath === null) {
+    return null
+  }
+  try {
+    await writeFile(e2ePath, zipped)
+    return {
+      filePath: e2ePath,
+      outcome: 'saved'
+    }
+  } catch (e) {
+    const err = e instanceof Error ? e : new Error(String(e))
+    console.error('[faProgramConfig] e2e write failed', {
+      e2ePath,
+      err
+    })
+    return {
+      errorMessage: err.message,
+      errorName: err.name,
+      outcome: 'error'
+    }
+  }
+}
 
 /**
  * Zips the selected store JSON snapshots, prompts for a save path, and writes a '.faconfig' file.
@@ -74,6 +100,11 @@ export async function runExportProgramConfigToFile (
       errorName: err.name,
       outcome: 'error'
     }
+  }
+
+  const e2eR = await tryWriteE2eExportPath(zipped)
+  if (e2eR !== null) {
+    return e2eR
   }
 
   const win = windowFromIpcEvent(event) ?? appWindow

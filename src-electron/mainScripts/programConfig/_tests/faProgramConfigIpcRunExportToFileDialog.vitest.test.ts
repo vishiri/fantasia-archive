@@ -14,6 +14,7 @@ const {
   getFaKeybindsMock,
   getFaProgramStylingMock,
   getFaUserSettingsMock,
+  takeNextE2eProgramConfigExportPathMock,
   windowFromIpcEventMock,
   writeFileMock
 } = vi.hoisted(() => ({
@@ -22,6 +23,7 @@ const {
   getFaKeybindsMock: vi.fn(),
   getFaProgramStylingMock: vi.fn(),
   getFaUserSettingsMock: vi.fn(),
+  takeNextE2eProgramConfigExportPathMock: vi.fn((): string | null => null),
   windowFromIpcEventMock: vi.fn(),
   writeFileMock: vi.fn()
 }))
@@ -55,6 +57,10 @@ vi.mock('app/src-electron/mainScripts/windowManagement/mainWindowCreation', () =
   appWindow: undefined
 }))
 
+vi.mock('app/src-electron/mainScripts/programConfig/faProgramConfigE2ePathOverride', () => ({
+  takeNextE2eProgramConfigExportPath: () => takeNextE2eProgramConfigExportPathMock()
+}))
+
 beforeEach(() => {
   dialogShowSaveDialogMock.mockReset()
   getFaKeybindsMock.mockReset()
@@ -62,6 +68,8 @@ beforeEach(() => {
   getFaUserSettingsMock.mockReset()
   windowFromIpcEventMock.mockReset()
   writeFileMock.mockReset()
+  takeNextE2eProgramConfigExportPathMock.mockReset()
+  takeNextE2eProgramConfigExportPathMock.mockReturnValue(null)
   getFaUserSettingsMock.mockReturnValue({ store: { languageCode: 'en-US' } })
   getFaKeybindsMock.mockReturnValue({
     store: {
@@ -162,6 +170,54 @@ test('Test runExportProgramConfigToFile returns saved on successful write', asyn
   })
   expect(r.outcome).toBe('saved')
   expect(writeFileMock).toHaveBeenCalled()
+})
+
+test('Test runExportProgramConfigToFile writes to e2e path without opening the save dialog', async () => {
+  takeNextE2eProgramConfigExportPathMock.mockImplementationOnce(
+    () => 'C:\\e2e\\out.faconfig'
+  )
+  writeFileMock.mockResolvedValueOnce(undefined)
+  const r = await runExportProgramConfigToFile(fakeEvent, {
+    includeKeybinds: true,
+    includeProgramSettings: false,
+    includeProgramStyling: false
+  })
+  expect(r.outcome).toBe('saved')
+  expect((r as { filePath?: string }).filePath).toBe('C:\\e2e\\out.faconfig')
+  expect(dialogShowSaveDialogMock).not.toHaveBeenCalled()
+  expect(writeFileMock).toHaveBeenCalledWith('C:\\e2e\\out.faconfig', expect.any(Uint8Array))
+})
+
+test('Test runExportProgramConfigToFile returns error when e2e path write fails', async () => {
+  takeNextE2eProgramConfigExportPathMock.mockImplementationOnce(
+    () => 'C:\\e2e\\bad.faconfig'
+  )
+  writeFileMock.mockRejectedValueOnce(new Error('e2e disk full'))
+  const r = await runExportProgramConfigToFile(fakeEvent, {
+    includeKeybinds: true,
+    includeProgramSettings: false,
+    includeProgramStyling: false
+  })
+  expect(r.outcome).toBe('error')
+  expect((r as { errorMessage?: string }).errorMessage).toBe('e2e disk full')
+  expect(dialogShowSaveDialogMock).not.toHaveBeenCalled()
+})
+
+test('Test runExportProgramConfigToFile treats a non-Error e2e write rejection as Error', async () => {
+  takeNextE2eProgramConfigExportPathMock.mockImplementationOnce(
+    () => 'C:\\e2e\\bad2.faconfig'
+  )
+  writeFileMock.mockRejectedValueOnce(404)
+  const r = await runExportProgramConfigToFile(fakeEvent, {
+    includeKeybinds: true,
+    includeProgramSettings: false,
+    includeProgramStyling: false
+  })
+  expect(r.outcome).toBe('error')
+  if (r.outcome === 'error') {
+    expect(r.errorName).toBe('Error')
+  }
+  expect(dialogShowSaveDialogMock).not.toHaveBeenCalled()
 })
 
 test('Test runExportProgramConfigToFile uses showSaveDialog with window when one is available', async () => {
