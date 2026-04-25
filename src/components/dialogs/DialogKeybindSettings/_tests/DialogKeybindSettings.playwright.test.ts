@@ -6,6 +6,7 @@ import {
   FA_ELECTRON_MAIN_JS_PATH,
   FA_FRONTEND_RENDER_TIMER
 } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
+import { FA_PLAYWRIGHT_PRESS_CONTROL_SHIFT_F11 } from 'app/helpers/playwrightHelpers/faPlaywrightKeyboardChords'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
   getFaPlaywrightElectronRecordVideoPartial,
@@ -281,7 +282,7 @@ test.describe.serial('Keybind settings toggleDeveloperTools persists after Save'
     await expect(captureCard).toBeVisible()
 
     await appWindow.locator('[data-test-locator="dialogKeybindSettings-capture-qfield"]').click()
-    await appWindow.keyboard.press('Control+Shift+F11')
+    await appWindow.keyboard.press(FA_PLAYWRIGHT_PRESS_CONTROL_SHIFT_F11)
 
     const setButton = appWindow.locator('[data-test-locator="dialogKeybindSettings-capture-set"]')
     await expect(setButton).toBeEnabled()

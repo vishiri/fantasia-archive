@@ -7,6 +7,10 @@ import {
   FA_FRONTEND_RENDER_TIMER
 } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
 import {
+  FA_PLAYWRIGHT_PRESS_CONTROL_SHIFT_F12,
+  getFaPlaywrightDefaultActionMonitorOpenPressString
+} from 'app/helpers/playwrightHelpers/faPlaywrightKeyboardChords'
+import {
   closeFaElectronAppWithRecordedVideoAttachments,
   getFaPlaywrightElectronRecordVideoPartial,
   installFaPlaywrightCursorMarkerIfVideoEnabled
@@ -94,8 +98,7 @@ async function triggerGlobalShortcut (page: Page, playwrightShortcut: string): P
 
 async function pressDefaultOpenActionMonitorChord (page: Page): Promise<void> {
   await prepareRendererForGlobalShortcuts(page)
-  const primaryShortcut = process.platform === 'darwin' ? 'Meta+F11' : 'Control+F11'
-  await page.keyboard.press(primaryShortcut)
+  await page.keyboard.press(getFaPlaywrightDefaultActionMonitorOpenPressString())
 }
 
 async function fillKeybindSettingsFilter (page: Page, query: string): Promise<void> {
@@ -199,7 +202,7 @@ test.describe.serial('Action monitor end-to-end', () => {
       await expect(captureCard).toBeVisible()
       const captureField = appWindow.locator(`[data-test-locator="${selectorList.keybindCaptureField}"]`)
       await captureField.focus()
-      await captureField.press('Control+Shift+F12')
+      await captureField.press(FA_PLAYWRIGHT_PRESS_CONTROL_SHIFT_F12)
       const setButton = appWindow.locator(`[data-test-locator="${selectorList.keybindCaptureSet}"]`)
       await expect(setButton).toBeEnabled()
       await setButton.click()

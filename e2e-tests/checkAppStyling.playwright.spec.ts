@@ -6,6 +6,7 @@ import {
   FA_ELECTRON_MAIN_JS_PATH,
   FA_FRONTEND_RENDER_TIMER
 } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
+import { getFaPlaywrightMonacoSelectAllPressString } from 'app/helpers/playwrightHelpers/faPlaywrightKeyboardChords'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
   getFaPlaywrightElectronRecordVideoPartial,
@@ -115,7 +116,7 @@ async function waitForProgramStylingWindow (page: Page): Promise<void> {
 async function replaceMonacoText (page: Page, nextText: string): Promise<void> {
   const editor = page.locator('.windowProgramStyling .monaco-editor')
   await editor.click()
-  await page.keyboard.press('Control+A')
+  await page.keyboard.press(getFaPlaywrightMonacoSelectAllPressString())
   if (nextText.length > 0) {
     await page.keyboard.type(nextText)
   } else {

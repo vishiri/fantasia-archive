@@ -7,6 +7,11 @@ import {
   FA_FRONTEND_RENDER_TIMER
 } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
 import {
+  FA_PLAYWRIGHT_PRESS_ADJUSTED_TOGGLE_DEVTOOLS_F12,
+  getFaPlaywrightDefaultActionMonitorOpenPressString,
+  getFaPlaywrightDefaultToggleDevtoolsPressString
+} from 'app/helpers/playwrightHelpers/faPlaywrightKeyboardChords'
+import {
   closeFaElectronAppWithRecordedVideoAttachments,
   getFaPlaywrightElectronRecordVideoPartial,
   installFaPlaywrightCursorMarkerIfVideoEnabled
@@ -79,7 +84,7 @@ const adjustedChord = {
   openKeybindSettings: 'Control+Alt+Shift+F10',
   openProgramSettings: 'Control+Alt+Shift+F11',
   openProgramStyling: 'Control+Alt+Shift+F7',
-  toggleDeveloperTools: 'Control+Alt+Shift+F12'
+  toggleDeveloperTools: FA_PLAYWRIGHT_PRESS_ADJUSTED_TOGGLE_DEVTOOLS_F12
 } as const
 
 /**
@@ -102,8 +107,7 @@ async function prepareRendererForGlobalShortcuts (page: Page): Promise<void> {
  */
 async function pressDefaultToggleDeveloperToolsChord (page: Page): Promise<void> {
   await prepareRendererForGlobalShortcuts(page)
-  const primaryShortcut = process.platform === 'darwin' ? 'Meta+F12' : 'Control+F12'
-  await page.keyboard.press(primaryShortcut)
+  await page.keyboard.press(getFaPlaywrightDefaultToggleDevtoolsPressString())
 }
 
 /**
@@ -111,7 +115,7 @@ async function pressDefaultToggleDeveloperToolsChord (page: Page): Promise<void>
  */
 async function pressAdjustedToggleDeveloperToolsChord (page: Page): Promise<void> {
   await prepareRendererForGlobalShortcuts(page)
-  await page.keyboard.press('Control+Alt+Shift+F12')
+  await page.keyboard.press(FA_PLAYWRIGHT_PRESS_ADJUSTED_TOGGLE_DEVTOOLS_F12)
 }
 
 /**
@@ -119,8 +123,7 @@ async function pressAdjustedToggleDeveloperToolsChord (page: Page): Promise<void
  */
 async function pressDefaultOpenActionMonitorChord (page: Page): Promise<void> {
   await prepareRendererForGlobalShortcuts(page)
-  const primaryShortcut = process.platform === 'darwin' ? 'Meta+F11' : 'Control+F11'
-  await page.keyboard.press(primaryShortcut)
+  await page.keyboard.press(getFaPlaywrightDefaultActionMonitorOpenPressString())
 }
 
 async function closeActionMonitorDialog (page: Page): Promise<void> {
@@ -234,7 +237,7 @@ async function closeMarkdownAdvancedSearchGuideDialog (page: Page): Promise<void
 }
 
 test.describe.serial('Global keybinds end-to-end', () => {
-  let electronApp: ElectronApplication
+  let electronApp: ElectronApplication | undefined
   let appWindow: Page
   let suiteTestInfo: TestInfo
 
