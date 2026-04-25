@@ -50,6 +50,8 @@ Keep logs isolated for readability and easier failure triage.
 
 **Playwright Electron `userData`:** Component and E2E runs set `TEST_ENV`; the main process then uses **`%APPDATA%/<package.json name>/playwright-user-data`** (this repo: **`Roaming\fantasia-archive\playwright-user-data`**), **not** **`fantasia-archive-dev`**. Specs use **`test.describe.serial`**; each group’s **`test.beforeAll`** calls **`resetFaPlaywrightIsolatedUserData()`** (**`helpers/playwrightHelpers/playwrightUserDataReset.ts`**) before that group’s **`electron.launch`**. See **`src-electron/mainScripts/appIdentity/fixAppName.ts`**, **`src-electron/mainScripts/appIdentity/playwrightIsolatedUserDataDirName.ts`**, and [playwright-tests.mdc](playwright-tests.mdc).
 
+**Playwright `keyboard.press` (cross-OS keybinds):** Component and E2E specs that drive global shortcuts or keybind capture must match how the app resolves **primary** (Command on macOS, Control on Windows/Linux) vs **literal Control** in saved overrides. Use **`helpers/playwrightHelpers/faPlaywrightKeyboardChords.ts`** and the **Keyboard strings** section in [playwright-tests.mdc](playwright-tests.mdc); see [fantasia-testing](../skills/fantasia-testing/SKILL.md) **Playwright keyboard.press and app keybinds**.
+
 ## Reporting
 
 When reporting progress, list results in execution order (for the quality gate, you may report one combined pass/fail, or break out the first failing step if the chain stopped early).

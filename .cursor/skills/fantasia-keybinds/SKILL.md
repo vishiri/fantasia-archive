@@ -37,6 +37,13 @@ description: >-
 
 If the command needs **new persisted fields** or **schema** changes beyond **`overrides`**, extend **`src-electron/shared/`** Zod schemas and **`faKeybindsStore`** with the same discipline as user settings; keep **`electron-ipc-bridge`** and **`registerFaKeybindsIpc`** in sync.
 
+## Playwright and component/E2E tests (`keyboard.press`)
+
+Automated tests that simulate global shortcuts or keybind capture must use the same **primary** vs **literal Control** behavior as the renderer (**`faKeybindExpandDefaultChord`** in **`faKeybindsChordEqualityAndResolve.ts`**).
+
+- **Shared helpers**: [`helpers/playwrightHelpers/faPlaywrightKeyboardChords.ts`](../../helpers/playwrightHelpers/faPlaywrightKeyboardChords.ts) — defaults for Toggle developer tools (**F12**), Open Action monitor (**F11**), **Monaco** select all, and fixed **Control+Shift+…** strings for capture tests. Import from Playwright specs with the **`app`** alias; extend the module (and its Vitest file) when a new default shortcut needs a matching getter.
+- **Docs**: [playwright-tests.mdc](../../rules/playwright-tests.mdc) **Keyboard strings**, [fantasia-testing](../fantasia-testing/SKILL.md) **Playwright keyboard.press and app keybinds**, [AGENTS.md](../../AGENTS.md) **Global keyboard shortcuts** and **Testing expectations** (**Playwright keyboard vs keybinds**).
+
 ## Related skills and rules
 
 - [fantasia-action-manager](../fantasia-action-manager/SKILL.md) — every keybind dispatches through **`runFaAction`** via **`FA_KEYBIND_COMMAND_TO_ACTION_ID`**; new shortcuts that need new actions register here too.
