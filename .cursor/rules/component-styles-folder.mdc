@@ -34,7 +34,7 @@ Use this layout when an SFC must pull in **external** styles via `<style lang="s
 
 ## Related
 
-- BEM and token rules for the sheet contents: [vue-bem-scss.mdc](vue-bem-scss.mdc), [project-scss.mdc](project-scss.mdc)
+- BEM and token rules for the sheet contents: [vue-bem-scss.mdc](vue-bem-scss.mdc), [project-scss.mdc](project-scss.mdc) (including **palette** vs **semantic** color tokens in consumer SCSS)
 - When to extract vs keep inline: [code-size-decomposition.mdc](code-size-decomposition.mdc)
 
 ## TypeScript interfaces and types (`types/`)

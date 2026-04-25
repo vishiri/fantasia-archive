@@ -157,9 +157,15 @@ These are **movable, resizable** **`position: fixed`** surfaces drawn by the **r
 
 The app defines a global class **`hasScrollbar`** in [`src/css/globals/scrollbar.scss`](src/css/globals/scrollbar.scss). Add it to elements that **act as scroll containers** (or will when content overflows) when a vertical scrollbar may **appear or disappear** depending on content or viewport, so **`scrollbar-gutter: stable`** reserves space and avoids **horizontal layout shift**. Use for dialogs, side panels, long lists, or similar. Details: [project-scss.mdc](.cursor/rules/project-scss.mdc), [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc), [fantasia-quasar-vue skill](.cursor/skills/fantasia-quasar-vue/SKILL.md).
 
+## Global CSS: `code.code-token`
+
+The app defines a global pair **`<code class="code-token">…</code>`** in [`src/css/globals/htmlAdjustments.scss`](src/css/globals/htmlAdjustments.scss), with lengths and colors driven by **`$globals-codeToken-*`** tokens in [`src/css/quasar.variables.scss`](src/css/quasar.variables.scss) (defaults: teal chip background, **primary-bright**-linked text, compact padding, monospace). Use it in Vue templates, **v-html**, or other HTML you control whenever you need a **special code snippet** or path-like token to read as a chip without feature-local SCSS. Do not duplicate the same visual in a component unless the design must diverge. Details: [project-scss.mdc](.cursor/rules/project-scss.mdc), [fantasia-quasar-vue skill](.cursor/skills/fantasia-quasar-vue/SKILL.md).
+
 ## Theme tokens (`quasar.variables.scss`)
 
 Central **SCSS variables** for colors, sizes, and related design tokens live in [`src/css/quasar.variables.scss`](src/css/quasar.variables.scss). When adding or editing styles in **`src/css/**/*.scss`** or Vue **`<style lang="scss">`** under **`src/`**, extract new literals into that file under the correct group and section (Quasar colors, Globals, Quasar components, then custom component/page/layout). Use **hyphen-separated** segments after the camelCase block in every **`$` name** (no underscores). Naming, section banners, and exceptions are defined in [project-scss.mdc](.cursor/rules/project-scss.mdc) and [vue-bem-scss.mdc](.cursor/rules/vue-bem-scss.mdc). Template-only dimensions and colors are out of scope unless policy changes.
+
+**Semantic color indirection**: in **consumer** styles (global partials, feature SCSS, Vue **`<style>`**), do **not** use **framework palette** variables such as **`$primary`**, **`$grey`**, **`$white`**, **`$dark`**, **`$accent`**, and the like — treat them like raw hex or `px`. Define a **semantic** token in [`quasar.variables.scss`](src/css/quasar.variables.scss) (for example under a Quasar component or custom section) whose value may reference the palette on the **right-hand side** inside that file only. The **`/* QUASAR COLORS - … */`** sections remain the single place those palette names are **defined**; elsewhere they are implementation details of semantic tokens. Full policy: [project-scss.mdc](.cursor/rules/project-scss.mdc) **Palette variables vs semantic color tokens**.
 
 ## i18n conventions
 

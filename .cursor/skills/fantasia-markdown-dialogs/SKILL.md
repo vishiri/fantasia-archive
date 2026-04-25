@@ -29,6 +29,7 @@ description: >-
 
 - [fantasia-i18n](../fantasia-i18n/SKILL.md) for locale layout and `documents` registration.
 - [fantasia-action-manager](../fantasia-action-manager/SKILL.md) for the dispatcher that opens these dialogs from menus, keybinds, and other call sites.
+- **Inline code chip in custom HTML** (for example raw HTML beside or outside **QMarkdown**): use the app-wide **`<code class="code-token">…</code>`** hook from [`htmlAdjustments.scss`](../../../src/css/globals/htmlAdjustments.scss) — see [AGENTS.md](../../../AGENTS.md) **Global CSS: `code.code-token`** and [project-scss.mdc](../../rules/project-scss.mdc).
 
 ## TypeScript interfaces and types (`types/`)
 

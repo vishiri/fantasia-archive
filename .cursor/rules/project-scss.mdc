@@ -40,12 +40,22 @@ Place a token in **Globals** when it is shared by multiple unrelated selectors; 
 - Reuse **`/* QUASAR COLORS - GENERAL */`** and **`/* GLOBALS - CUSTOM COLORS */`** variables before adding new hex/rgb literals.
 - Third-party brand colors may stay as literals on the **right-hand side** of a named semantic variable (e.g. `$socialContactButtons-backgroundColor-patreon: #ff424d`).
 
+### Palette variables vs semantic color tokens
+
+Treat **framework palette** Sass variables the same as raw hex: they must **not** be referenced directly in **consumer** stylesheets (global partials under `src/css/globals/`, feature `styles/*.scss`, or Vue **`<style lang="scss">`**).
+
+- **Palette** means the shared Quasar / app colors defined only under **`/* QUASAR COLORS - … */`** in [quasar.variables.scss](src/css/quasar.variables.scss), for example `$primary`, `$primary-bright`, `$secondary`, `$accent`, `$positive`, `$negative`, `$info`, `$warning`, `$dark`, `$white`, `$grey`, `$grey-lighter`, and other `$` names that **name the palette** rather than a specific UI role.
+- **Consumer** code must use **semantic** catalogue variables (Globals, Quasar component sections, or custom sections) whose values **may** be bound to a palette variable on the **right-hand side inside [quasar.variables.scss](src/css/quasar.variables.scss)** (e.g. `$qTooltip-color: $dark;`, `$qCheckbox-truthy-borderColor: $primary;`) — same pattern as abstracting a raw `8px` into `$qFoo-bar-width`.
+- **Where palette names may appear**: defining them under **`/* QUASAR COLORS - … */`**, and as **values** when assigning a new semantic token elsewhere in the catalogue. Do **not** use palette variables as the value in a rule in `quasarComponentsAdjustments.scss` or a component stylesheet when a matching semantic token can express the role.
+- **Already-semantic** Globals such as `$aLinkColor` or **`$globals-codeToken-textColor`** are not “palette” in this sense; prefer reusing them or adding a new semantic name in the right section.
+- **Stylelint** does not enforce this; apply it when authoring or editing styles, and when reviewing (e.g. search consumer SCSS for `\$primary`, `\$grey`, `\$white` outside the catalogue file or outside QUASAR COLORS blocks).
+
 ### What to extract into the catalogue
 
 Apply to **`src/css/**/*.scss`** and **`<style lang="scss">` in `src/**/*.vue`** only:
 
 - Lengths with units: `px`, `rem`, `em`, `%`, `vh`, `vw`, and similar.
-- Colors: hex, `rgb`/`rgba`, `hsl`/`hsla` (Sass `color.adjust` / `color.scale` may remain on the RHS of variables).
+- Colors: hex, `rgb`/`rgba`, `hsl`/`hsla` (Sass `color.adjust` / `color.scale` may remain on the RHS of variables), and **direct** uses of **palette** Sass variables in consumer files — use semantic tokens in the catalogue instead (see **Palette variables vs semantic color tokens** above).
 - Design tokens: meaningful **`z-index`**, **`opacity`** on focused layers, **`letter-spacing`**, repeated **`line-height`** scales, **`border-radius`** / **`border-width`** when not `0`.
 - Prefer variables inside **`calc(...)`** for magic numbers; the whole `calc(...)` may be assigned to one variable or composed with interpolation.
 
@@ -57,8 +67,10 @@ Apply to **`src/css/**/*.scss`** and **`<style lang="scss">` in `src/**/*.vue`**
 ## Conventions
 
 - **Stylelint** sorts **declaration** properties alphabetically project-wide (`order/properties-alphabetical-order` and `order/custom-properties-alphabetical-order` via `stylelint-order`), with autofix from **`yarn lint:stylelint:fix`**. Shorthand-before-longhand and vendor-prefix ordering follow the rule’s documented exceptions.
+- **Stylelint is not the whole policy**: it does **not** enforce moving lengths, colors, or **palette** `$` color references from feature **`*.scss`** or Vue **`<style lang="scss">`** into [quasar.variables.scss](src/css/quasar.variables.scss) as **semantic** names, nor does it catch bare **`$primary`** / **`$grey`** in consumers. After edits, apply **What to extract into the catalogue** and **Palette variables vs semantic color tokens** (above) by hand; use ripgrep on **`src/css/globals/`** and **`src/components/**/*.scss`** (and SFC **`<style>`** blocks) for literals such as `\\d+px`, **`#` + hex**, and direct palette variable names. **`yarn testbatch:verify`** only runs what **`yarn lint:stylelint`** reports.
 - **Partials** in `globals/` are focused: scrollbar, html tweaks, component adjustments, custom colors — follow that separation when adding new cross-app styling.
 - **`hasScrollbar` (global class)**: defined in [scrollbar.scss](src/css/globals/scrollbar.scss). Add this class to the **scroll container** (the element with `overflow: auto` / `scroll` or that will show a scrollbar when content overflows) when that area **may intermittently** show or hide a vertical scrollbar. It sets `scrollbar-gutter: stable` so the layout keeps a consistent gutter and avoids **unwanted horizontal shifts** in edge cases. Use on dialogs, panels, lists, or any region where scrollbar presence is content-dependent.
+- **`code.code-token` (global hook)**: defined in [htmlAdjustments.scss](src/css/globals/htmlAdjustments.scss) using **`$globals-codeToken-*`** in [quasar.variables.scss](src/css/quasar.variables.scss) under **`/* GLOBALS - HTML ELEMENTS */`**. Add the second class **`code-token`** on a **`<code>`** element (for example **`<code class="code-token">path/to/file</code>`**) anywhere in the app when you need the shared **inline code chip** look. The stylesheet is loaded app-wide via [app.scss](src/css/app.scss); prefer this over inventing a one-off inline-code style in a feature unless the design must differ. Pair with [AGENTS.md](AGENTS.md) **Global CSS: `code.code-token`**.
 - Prefer **low-specificity** selectors and avoid deep nesting unless mirroring an existing pattern in the same file.
 - Component-specific BEM and scoped styles belong in **Vue SFCs** or in **`src/components/<bucket>/<Feature>/styles/`** when extracted ([vue-bem-scss.mdc](vue-bem-scss.mdc), [component-styles-folder.mdc](component-styles-folder.mdc)), not in `src/css/`, unless the team already uses a global override file for that concern.
 
