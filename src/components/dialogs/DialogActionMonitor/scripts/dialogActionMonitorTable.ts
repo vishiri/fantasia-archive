@@ -126,7 +126,7 @@ export interface I_dialogActionMonitorStatusBadge {
    */
   icon: string
   /**
-   * Text color helper from globals/faSemanticText.scss (and Quasar brand util classes), so status tints follow :root --fa-*.
+   * Text color helper from globals/faSemanticText.scss (and Quasar brand util classes), so status tints follow :root --fa-color-*.
    */
   colorClass: string
   /**

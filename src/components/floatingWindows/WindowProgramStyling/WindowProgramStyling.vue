@@ -35,7 +35,9 @@
             >
               {{ $t('floatingWindows.programStyling.title') }}
             </h4>
+          </div>
 
+          <q-card-section class="q-pa-none windowProgramStyling__body">
             <q-icon
               name="mdi-help-circle"
               size="23px"
@@ -44,42 +46,78 @@
               color="primary-bright"
               :aria-label="$t('floatingWindows.programStyling.helpTooltip.aria')"
               data-test-locator="windowProgramStyling-helpIcon"
+              @mouseenter="onHelpIconMouseEnter"
+              @mouseleave="onHelpIconMouseLeave"
             >
-              <q-tooltip
+              <q-menu
+                v-model="helpKeybindMenuOpen"
                 anchor="bottom right"
-                self="top right"
-                :delay="500"
-                :offset="[0, 10]"
                 class="windowProgramStyling__helpTooltip"
+                data-test-locator="windowProgramStyling-helpMenu"
+                :dark="false"
+                :offset="[0, 10]"
+                self="top right"
+                no-focus
+                :transition-duration="300"
               >
                 <div
                   class="windowProgramStyling__helpTooltipBody"
                   data-test-locator="windowProgramStyling-helpTooltipBody"
                 >
-                  <strong class="windowProgramStyling__helpTooltipTitle">
-                    {{ $t('floatingWindows.programStyling.helpTooltip.title') }}
-                  </strong>
-                  <ul class="windowProgramStyling__helpTooltipList">
-                    <li
-                      v-for="item in monacoKeybindHelpItems"
-                      :key="item.labelKey"
-                      class="windowProgramStyling__helpTooltipItem"
+                  <div class="windowProgramStyling__helpTooltipKeybinds">
+                    <strong class="windowProgramStyling__helpTooltipTitle">
+                      {{ $t('floatingWindows.programStyling.helpTooltip.title') }}
+                    </strong>
+                    <ul class="windowProgramStyling__helpTooltipList">
+                      <li
+                        v-for="item in monacoKeybindHelpItems"
+                        :key="item.labelKey"
+                        class="windowProgramStyling__helpTooltipItem"
+                      >
+                        <span class="windowProgramStyling__helpTooltipChord">{{ item.chord }}</span>
+                        <span class="windowProgramStyling__helpTooltipLabel">
+                          {{ $t(`floatingWindows.programStyling.helpTooltip.items.${item.labelKey}`) }}
+                        </span>
+                      </li>
+                    </ul>
+                    <p class="windowProgramStyling__helpTooltipFooter">
+                      {{ $t('floatingWindows.programStyling.helpTooltip.footer') }}
+                    </p>
+                  </div>
+                  <q-separator
+                    class="fa-separator-grey-lighter"
+                    inset
+                    vertical
+                  />
+                  <div class="windowProgramStyling__helpTooltipVariableList">
+                    <strong class="windowProgramStyling__helpTooltipTitle">
+                      {{ $t('floatingWindows.programStyling.helpTooltip.variableListTitle') }}
+                    </strong>
+                    <ul
+                      class="windowProgramStyling__helpTooltipFaVarList hasScrollbar"
+                      data-test-locator="windowProgramStyling-faThemeVarList"
                     >
-                      <span class="windowProgramStyling__helpTooltipChord">{{ item.chord }}</span>
-                      <span class="windowProgramStyling__helpTooltipLabel">
-                        {{ $t(`floatingWindows.programStyling.helpTooltip.items.${item.labelKey}`) }}
-                      </span>
-                    </li>
-                  </ul>
-                  <p class="windowProgramStyling__helpTooltipFooter">
-                    {{ $t('floatingWindows.programStyling.helpTooltip.footer') }}
-                  </p>
+                      <li
+                        v-for="name in faThemeCustomPropertyNames"
+                        :key="name"
+                        class="windowProgramStyling__helpTooltipFaVarItem"
+                        :data-test-fa-theme-var="name"
+                      >
+                        <span
+                          class="windowProgramStyling__helpTooltipFaVarSwatch"
+                          :style="buildFaColorVarSwatchStyle(name)"
+                          aria-hidden="true"
+                          :data-test-fa-theme-var-swatch="name"
+                        />
+                        <span
+                          class="windowProgramStyling__helpTooltipFaVarName"
+                        >{{ name }}</span>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
-              </q-tooltip>
+              </q-menu>
             </q-icon>
-          </div>
-
-          <q-card-section class="q-pa-none windowProgramStyling__body">
             <div
               ref="editorHostRef"
               class="windowProgramStyling__editorHost"
@@ -134,13 +172,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import FaFloatingWindowBodyTeleport from 'app/src/components/floatingWindows/_FaFloatingWindowBodyTeleport/_FaFloatingWindowBodyTeleport.vue'
 import FaFloatingWindowFrameResizeHandles from 'app/src/components/floatingWindows/_FaFloatingWindowFrameResizeHandles/_FaFloatingWindowFrameResizeHandles.vue'
 import { getMonacoKeybindHelpItems } from 'app/src/components/floatingWindows/WindowProgramStyling/scripts/windowProgramStylingKeybindHelp'
+import { useWindowProgramStylingHelpMenu } from 'app/src/components/floatingWindows/WindowProgramStyling/scripts/windowProgramStylingHelpMenu'
 import { useWindowProgramStyling } from 'app/src/components/floatingWindows/WindowProgramStyling/scripts/windowProgramStylingState'
+import { buildFaColorVarSwatchStyle } from 'app/src/components/floatingWindows/WindowProgramStyling/scripts/faColorVarSwatchStyle'
+import { getFaColorCustomPropertyNamesForHelpPanel } from 'app/src/scripts/faTheme/faThemeCustomPropertyNames'
 import {
   FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
   FA_FLOATING_WINDOW_POP_TRANSITION_MS
@@ -176,6 +217,12 @@ const {
   titleShortFrameClass
 } = useFaFloatingWindowFrame(windowModel)
 
+const {
+  helpKeybindMenuOpen,
+  onHelpIconMouseEnter,
+  onHelpIconMouseLeave
+} = useWindowProgramStylingHelpMenu()
+
 const frameStyleWithDialogTransition = computed(() => ({
   ...frameStyle.value,
   '--q-transition-duration': `${FA_FLOATING_WINDOW_POP_TRANSITION_MS}ms`
@@ -186,6 +233,18 @@ const frameStyleWithDialogTransition = computed(() => ({
  * (e.g. after the first 'S_FaKeybinds().refreshKeybinds()' resolves on app startup).
  */
 const monacoKeybindHelpItems = computed(() => getMonacoKeybindHelpItems())
+
+const faThemeCustomPropertyNames = ref<readonly string[]>(
+  getFaColorCustomPropertyNamesForHelpPanel()
+)
+
+watch(helpKeybindMenuOpen, (open) => {
+  if (open) {
+    void nextTick(() => {
+      faThemeCustomPropertyNames.value = getFaColorCustomPropertyNamesForHelpPanel()
+    })
+  }
+})
 </script>
 
 <style lang="scss" src="./styles/WindowProgramStyling.unscoped.scss"></style>

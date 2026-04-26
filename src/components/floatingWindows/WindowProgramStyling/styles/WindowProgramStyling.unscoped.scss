@@ -1,4 +1,6 @@
 @use './WindowProgramStyling.floatingWindowPopTransition.unscoped.scss' as *;
+@use './variables' as *;
+@use '../../../../css/app.palette.scss' as *;
 
 .windowProgramStyling {
   box-sizing: border-box;
@@ -35,21 +37,31 @@
   }
 
   &__helpIcon {
-    bottom: $windowProgramStyling-helpIcon-bottom;
     cursor: default;
     position: absolute;
     right: $windowProgramStyling-helpIcon-right;
+    top: $windowProgramStyling-helpIcon-top;
     z-index: $windowProgramStyling-helpIcon-zIndex;
   }
 
   &__helpTooltip {
+    /* QMenu (replaces QTooltip): match global Fantasia tooltip colors and z-index. */
+    background-color: var(--fa-color-tooltip-background, #{$accent});
+    color: var(--fa-color-dark, #{$dark});
     max-width: $windowProgramStyling-helpTooltip-width;
     width: $windowProgramStyling-helpTooltip-width;
+    z-index: 999999999;
+  }
+
+  &__helpTooltipKeybinds {
+    max-width: $windowProgramStyling-helpTooltipKeybinds-width;
+    min-width: $windowProgramStyling-helpTooltipKeybinds-width;
+    width: $windowProgramStyling-helpTooltipKeybinds-width;
   }
 
   &__helpTooltipBody {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     font-size: $windowProgramStyling-helpTooltipBody-fontSize;
     gap: $windowProgramStyling-helpTooltipBody-gap;
     padding: $windowProgramStyling-helpTooltipBody-padding;
@@ -93,6 +105,46 @@
     line-height: $windowProgramStyling-helpTooltipFooter-lineHeight;
     margin: $windowProgramStyling-helpTooltipFooter-margin;
     opacity: 1;
+  }
+
+  &__helpTooltipVariableList {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__helpTooltipFaVarList {
+    list-style: none;
+    margin: 0;
+    max-height: $windowProgramStyling-helpTooltipFaVarList-maxHeight;
+    overflow-y: auto;
+    padding: 0;
+  }
+
+  &__helpTooltipFaVarItem {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: $windowProgramStyling-helpTooltipFaVarRow-gap;
+    line-height: $windowProgramStyling-helpTooltipFaVarItem-lineHeight;
+  }
+
+  &__helpTooltipFaVarSwatch {
+    border: $windowProgramStyling-helpTooltipFaVarSwatch-border;
+    border-radius: $windowProgramStyling-helpTooltipFaVarSwatch-borderRadius;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    height: $windowProgramStyling-helpTooltipFaVarSwatch-size;
+    width: $windowProgramStyling-helpTooltipFaVarSwatch-size;
+  }
+
+  &__helpTooltipFaVarName {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: $windowProgramStyling-helpTooltipBody-fontSize;
+    font-weight: 600;
+    min-width: 0;
+    word-break: break-all;
   }
 
   &__body {

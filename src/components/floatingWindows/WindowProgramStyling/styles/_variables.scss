@@ -1,10 +1,17 @@
 @use '../../../../css/app.palette.scss' as *;
 
 /* COMPONENT - DIALOG PROGRAM STYLING */
-$windowProgramStyling-helpIcon-bottom: -55px;
+$windowProgramStyling-helpIcon-top: 30px;
 $windowProgramStyling-helpIcon-right: 25px;
 $windowProgramStyling-helpIcon-zIndex: 10;
-$windowProgramStyling-helpTooltip-width: 550px;
+$windowProgramStyling-helpTooltip-width: 900px;
+$windowProgramStyling-helpTooltipKeybinds-width: 500px;
+$windowProgramStyling-helpTooltipFaVarList-maxHeight: 550px;
+$windowProgramStyling-helpTooltipFaVarItem-lineHeight: 24px;
+$windowProgramStyling-helpTooltipFaVarSwatch-size: 20px;
+$windowProgramStyling-helpTooltipFaVarSwatch-borderRadius: 2px;
+$windowProgramStyling-helpTooltipFaVarSwatch-border: 1px solid rgba($black, 0.2);
+$windowProgramStyling-helpTooltipFaVarRow-gap: 8px;
 $windowProgramStyling-helpTooltipBody-fontSize: 13px;
 $windowProgramStyling-helpTooltipBody-gap: 6px;
 $windowProgramStyling-helpTooltipBody-padding: 6px 8px;

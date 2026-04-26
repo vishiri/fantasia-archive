@@ -14,7 +14,8 @@ export default {
       addPadding: 'Einzug vergrößern',
       removePadding: 'Einzug verkleinern'
     },
-    footer: 'Weitere Befehle, Tastenkürzel und Details findet ihr in der Befehlspalette.'
+    footer: 'Weitere Befehle, Tastenkürzel und Details findet ihr in der Befehlspalette.',
+    variableListTitle: 'FA-Variablenliste'
   },
   loading: 'Editor wird geladen…',
   saveButton: 'Änderungen speichern',

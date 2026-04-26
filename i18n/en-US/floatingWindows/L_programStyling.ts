@@ -14,7 +14,8 @@ export default {
       addPadding: 'Add padding',
       removePadding: 'Remove padding'
     },
-    footer: 'Further commands, keybinds and details can be found in the Command palette.'
+    footer: 'Further commands, keybinds and details can be found in the Command palette.',
+    variableListTitle: 'FA variable list'
   },
   loading: 'Loading editor…',
   saveButton: 'Save changes',

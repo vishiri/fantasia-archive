@@ -2,7 +2,7 @@
 
 /* QUASAR COMPONENT - Q-NOTIFY
  * 'color: info' toasts get .bg-info from a light --q-info tint, so message/caption/inline icons
- * must stay dark. Do not use --fa-notify-foreground here; that is for contrasting light copy on
+ * must stay dark. Do not use --fa-color-notify-foreground here; that is for contrasting light copy on
  * dark bars only. */
 $qNotify-bgColor: fa-v('dark', $dark);
 $qNotify-color: fa-v('dark', $dark);

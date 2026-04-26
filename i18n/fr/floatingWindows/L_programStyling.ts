@@ -14,7 +14,8 @@ export default {
       addPadding: 'Augmenter le retrait',
       removePadding: 'Réduire le retrait'
     },
-    footer: 'D’autres commandes, raccourcis et détails sont disponibles dans la palette de commandes.'
+    footer: 'D’autres commandes, raccourcis et détails sont disponibles dans la palette de commandes.',
+    variableListTitle: 'Liste des variables FA'
   },
   loading: 'Chargement de l’éditeur…',
   saveButton: 'Enregistrer les modifications',

@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { ref } from 'vue'
-import { beforeEach, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import programStyling from 'app/i18n/en-US/floatingWindows/L_programStyling'
 
@@ -48,10 +48,34 @@ vi.mock('app/src/components/floatingWindows/WindowProgramStyling/scripts/windowP
 
 import WindowProgramStyling from '../WindowProgramStyling.vue'
 
+const injectMinimalFaRootVarsForList = (): void => {
+  const s = document.createElement('style')
+  s.setAttribute('data-fa-vitest-theme-stub', '1')
+  s.append(
+    document.createTextNode(
+      [
+        ':root {',
+        '  --fa-color-accent: 0;',
+        '  --fa-color-primary: 0;',
+        '  --fa-color-tooltip-background: 0;',
+        '}'
+      ].join(' ')
+    )
+  )
+  document.head.append(s)
+}
+
 beforeEach(() => {
   setActivePinia(createPinia())
   windowProgramStylingMonacoState.isLoading.value = false
   windowProgramStylingMonacoState.loadError.value = null
+  injectMinimalFaRootVarsForList()
+})
+
+afterEach(() => {
+  for (const el of document.querySelectorAll('style[data-fa-vitest-theme-stub="1"]')) {
+    el.remove()
+  }
 })
 
 /**
@@ -76,6 +100,9 @@ const programStylingT = (k: string): string => {
   }
   if (k === 'floatingWindows.programStyling.helpTooltip.title') {
     return programStyling.helpTooltip.title
+  }
+  if (k === 'floatingWindows.programStyling.helpTooltip.variableListTitle') {
+    return programStyling.helpTooltip.variableListTitle
   }
   if (k === 'floatingWindows.programStyling.helpTooltip.footer') {
     return programStyling.helpTooltip.footer
@@ -110,8 +137,8 @@ test('Test that WindowProgramStyling surfaces title and action button locators',
         QCardActions: { template: '<div><slot /></div>' },
         QCardSection: { template: '<div><slot /></div>' },
         QIcon: { template: '<i><slot /></i>' },
-        QSpinnerDots: { template: '<span />' },
-        QTooltip: { template: '<div><slot /></div>' }
+        QMenu: { template: '<div class="q-menu-stub"><slot /></div>' },
+        QSpinnerDots: { template: '<span />' }
       }
     }
   })
@@ -127,6 +154,12 @@ test('Test that WindowProgramStyling surfaces title and action button locators',
   expect(helpBody.text()).toContain(programStyling.helpTooltip.items.commandPalette)
   expect(helpBody.text()).toContain('F1')
   expect(helpBody.findAll('.windowProgramStyling__helpTooltipItem').length).toBeGreaterThan(0)
+  expect(helpBody.find('[data-test-locator="windowProgramStyling-faThemeVarList"]').exists()).toBe(true)
+  expect(helpBody.findAll('.windowProgramStyling__helpTooltipFaVarItem').length).toBeGreaterThan(0)
+  expect(helpBody.findAll('.windowProgramStyling__helpTooltipFaVarSwatch').length).toBe(
+    helpBody.findAll('.windowProgramStyling__helpTooltipFaVarItem').length
+  )
+  expect(helpBody.text()).toContain('--fa-color-accent')
 
   w.unmount()
 })
@@ -160,8 +193,8 @@ test('Test that WindowProgramStyling forwards frame and title-bar pointerdown to
         QCardActions: { template: '<div><slot /></div>' },
         QCardSection: { template: '<div><slot /></div>' },
         QIcon: { template: '<i><slot /></i>' },
-        QSpinnerDots: { template: '<span />' },
-        QTooltip: { template: '<div><slot /></div>' }
+        QMenu: { template: '<div class="q-menu-stub"><slot /></div>' },
+        QSpinnerDots: { template: '<span />' }
       }
     }
   })
@@ -203,8 +236,8 @@ test('Test that WindowProgramStyling shows loading and load-error overlays from 
         QCardActions: { template: '<div><slot /></div>' },
         QCardSection: { template: '<div><slot /></div>' },
         QIcon: { template: '<i><slot /></i>' },
-        QSpinnerDots: { template: '<span data-test-locator="stub-spinner-dots" />' },
-        QTooltip: { template: '<div><slot /></div>' }
+        QMenu: { template: '<div class="q-menu-stub"><slot /></div>' },
+        QSpinnerDots: { template: '<span data-test-locator="stub-spinner-dots" />' }
       }
     }
   })
@@ -237,8 +270,8 @@ test('Test that WindowProgramStyling shows loading and load-error overlays from 
         QCardActions: { template: '<div><slot /></div>' },
         QCardSection: { template: '<div><slot /></div>' },
         QIcon: { template: '<i><slot /></i>' },
-        QSpinnerDots: { template: '<span />' },
-        QTooltip: { template: '<div><slot /></div>' }
+        QMenu: { template: '<div class="q-menu-stub"><slot /></div>' },
+        QSpinnerDots: { template: '<span />' }
       }
     }
   })
