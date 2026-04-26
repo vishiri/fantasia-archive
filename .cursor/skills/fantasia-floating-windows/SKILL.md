@@ -35,6 +35,10 @@ description: >-
 - **Component Vitest** — Stub the body teleport with the **same key the parent uses** (for example **`FaFloatingWindowBodyTeleport`** in **`WindowProgramStyling.vitest.test.ts`**) and **`<div><slot /></div>`** so **`mount(...).find('[data-test-locator=…]')`** still finds nodes (real Teleport moves content to **`body`**).
 - **Playwright** — Locators unchanged; frame keeps **`data-test-locator`** on the teleported node.
 
+## Custom program **CSS** help (**`WindowProgramStyling`**)
+
+- The **?** menu lists **`--fa-color-*`** variable names (with color swatches) for discovery while editing; logic lives in [`src/scripts/faTheme/`](../../../src/scripts/faTheme/) (**DOM** scan of parsed rules, with a [`fa-theme.scss`](../../../src/css/fa-theme.scss) text fallback). Runtime theme colors use the **`--fa-color-*`** prefix; other custom properties (for example **`--fa-fw-resize`**) use a different **`--fa-…`** family — see [AGENTS.md](../../../AGENTS.md) **Theme tokens**.
+
 ## Related docs
 
 - [AGENTS.md](../../../AGENTS.md) **In-renderer floating windows**
