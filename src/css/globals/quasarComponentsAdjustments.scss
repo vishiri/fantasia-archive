@@ -268,13 +268,16 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 }
 
 .q-notification {
+  /* Quasar adds .text-white on the same node as .bg-info; faSemanticText.scss uses
+   * .text-white { color: var(--fa-white) !important; }. This block must be !important
+   * and match or beat that selector's specificity so dark text stays on the light info tint. */
   &.bg-info {
     border: $qNotification-bgInfo-borderWidth solid $qNotify-bgColor;
-    color: $qNotify-color;
+    color: $qNotify-color !important;
     max-width: $qNotification-bgInfo-maxWidth;
 
     i {
-      color: $qNotify-icon-color;
+      color: $qNotify-icon-color !important;
     }
   }
 

@@ -1,0 +1,9 @@
+@use '../../app.palette.scss' as *;
+
+/* QUASAR COMPONENT - Q-CARD */
+$qCard-background: fa-v('dark', $dark);
+$qCard-border-color: fa-v('dark', $dark);
+$qCard-border-radius: 5px;
+$qCard-border-size: 0;
+$qCard-boxShadow: 0 1px 5px rgba($black, 0.2), 0 2px 2px rgba($black, 0.14), 0 3px 1px -2px rgba($black, 0.12);
+$qCard-text: fa-v('white', $white);

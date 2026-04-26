@@ -1,0 +1,60 @@
+@use 'sass:color';
+@use 'sass:string';
+
+/* Quasar SCSS: app color source (see project-scss.mdc). Re-exported via quasar.variables.scss.
+ * Runtime theming: matching --fa-* tokens are declared on :root in fa-theme.scss; override in Custom program CSS.
+ * Use fa-v for properties that should respect those variables at paint time. */
+
+/* QUASAR COLORS - GENERAL */
+$accent: #f5f5f5;
+$dark: #1b333e;
+$dark-lighter: #234655;
+$dark-page: #303742;
+
+$primary: #d7ac47;
+$primary-bright: #ffd673;
+$secondary: #f75746;
+
+$negative: #c10015;
+$positive: #35a14e;
+$info: color.adjust($primary, $lightness: 35%);
+$warning: #f2c037;
+
+$light-background: #ede4d0;
+$gold-muted-border-raw: color.scale($primary, $saturation: -35%, $lightness: 14%);
+
+/* APP COLORS - SHARED (single home for shared literals; @use this file in partials) */
+$white: #fff;
+$black: #000;
+$grey: #d4d0c9;
+$grey-lighter: #dde4e4;
+$brand-discord: #7289da;
+$brand-patreon: #ff424d;
+$brand-reddit: #ff4500;
+$codeToken-background: #366c82;
+$neutral-border: #c8c8c8;
+$select-background-dark: #bb3b32;
+$select-background-light: #aa2a21;
+$select-text: #eedbb0;
+$surface-error: #f7eeda;
+
+/* APP COLORS - SEMANTIC TEXT & ACCENTS
+ * Shapes and shade roles previously expressed as Quasar Material text-* (grey-5, red-12, etc.).
+ * Exposed on :root as --fa-* in fa-theme.scss; use globals/faSemanticText.scss helper classes. */
+$text-muted: #9e9e9e;
+$text-label: #e0e0e0;
+$text-danger-emphasis: #b71c1c;
+$text-keybind-hint: #78909c;
+$text-menu-separator: #78909c;
+$text-checkbox-idle: #eceff1;
+$text-checkbox-disabled: #b0bec5;
+$text-status-queued: #2196f3;
+$text-keybind-dim: #455a64;
+$text-icon-help: #78909b;
+$icon-spellcheck-refresh: #e53935;
+$notify-foreground: #f5f5f5;
+
+/// Pairs with --fa-#{$token} on :root (see fa-theme.scss). $value must stay a real color for Sass color.* APIs elsewhere.
+@function fa-v($token, $value) {
+  @return string.unquote("var(--fa-#{$token}, #{$value})");
+}

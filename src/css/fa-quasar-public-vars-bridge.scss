@@ -1,0 +1,16 @@
+/* Re-binds Quasar :root public variables (quasar/src/css/core/colors.sass) to --fa-*.
+ * Quasar compiles the brand palette into --q-primary … --q-dark-page as static fallbacks; without
+ * this bridge, Custom program CSS could change --fa-dark on :root while .q-dark still used the
+ * built-in --q-dark. Load this after fa-theme and other app SCSS so these assignments win the cascade. */
+
+:root {
+  --q-accent: var(--fa-accent);
+  --q-dark: var(--fa-dark);
+  --q-dark-page: var(--fa-dark-page);
+  --q-info: var(--fa-info);
+  --q-negative: var(--fa-negative);
+  --q-positive: var(--fa-positive);
+  --q-primary: var(--fa-primary);
+  --q-secondary: var(--fa-secondary);
+  --q-warning: var(--fa-warning);
+}

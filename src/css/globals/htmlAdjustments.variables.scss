@@ -1,0 +1,22 @@
+@use '../app.palette.scss' as *;
+
+/* Variables for 'htmlAdjustments.scss' (and 'customColors.scss' for utility foreground). Re-exported from 'quasar.variables.scss' barrel. */
+
+/* GLOBALS - GENERAL SELECT */
+$selectBackgroundColor-darkMode: fa-v('select-background-dark', $select-background-dark);
+$selectBackgroundColor-lightMode: fa-v('select-background-light', $select-background-light);
+$selectTextColor-darkMode: fa-v('select-text', $select-text);
+$selectTextColor-lightMode: fa-v('select-text', $select-text);
+
+/* GLOBALS - HTML ELEMENTS */
+$aLinkColor: fa-v('primary-bright', $primary-bright);
+$globals-codeToken-backgroundColor: fa-v('code-token-background', $codeToken-background);
+$globals-codeToken-borderRadius: 4px;
+$globals-codeToken-fontFamily: 'Courier New', courier, monospace;
+$globals-codeToken-fontSize: 13px;
+$globals-codeToken-lineHeight: 13px;
+$globals-codeToken-padding: 4px 6px;
+$globals-codeToken-textColor: fa-v('primary-bright', $primary-bright);
+$globals-letterSpacing: 0.025em;
+$globals-paragraph-margin: 0 0 16px;
+$globals-utilityPrimaryBright-foreground: fa-v('primary-bright', $primary-bright);

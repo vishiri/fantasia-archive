@@ -1,6 +1,6 @@
 {
   "name": "fantasia-archive",
-  "version": "2.4.11",
+  "version": "2.4.12",
   "description": "A worldbuilding database manager",
   "productName": "Fantasia Archive",
   "author": "Vishiri <vishiri.rilgatan@gmail.com>",
@@ -43,6 +43,7 @@
     "testbatch:ensure:change": "yarn testbatch:verify && yarn quasar:build:electron:summarized && yarn test:components && yarn test:e2e && yarn test:storybook:smoke && yarn test:storybook:visual:update",
     "testbatch:ensure:nochange": "yarn testbatch:verify && yarn quasar:build:electron:summarized && yarn test:components && yarn test:e2e && yarn test:storybook:smoke && yarn test:storybook:visual",
     "audit:policy": "node scripts/policyComplianceAudit.mjs",
+    "audit:quasar-component-tokens": "node scripts/auditQuasarComponentTokens.mjs",
     "prepare": "husky"
   },
   "dependencies": {

@@ -2,7 +2,7 @@
  * Custom color swatch row for Storybook foundation palette previews.
  */
 export interface I_foundationCustomSwatch {
-  /** SCSS variable name as in quasar.variables.scss (QUASAR COLORS - GENERAL). */
+  /** SCSS variable name as in app.palette.scss (QUASAR COLORS - GENERAL). */
   sassVar: string
   /** Resolved hex for the swatch (must stay aligned with the SCSS source). */
   hex: string

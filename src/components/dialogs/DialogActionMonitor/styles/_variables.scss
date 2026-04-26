@@ -1,0 +1,14 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - DIALOG ACTION MONITOR */
+$dialogActionMonitor-empty-color: fa-v('grey', $grey);
+$dialogActionMonitor-empty-marginTop: 24px;
+$dialogActionMonitor-rowClickHelpIcon-color: fa-v('text-icon-help', $text-icon-help);
+$dialogActionMonitor-rowClickHelpRow-marginTop: 8px;
+$dialogActionMonitor-row-cursor: pointer;
+$dialogActionMonitor-status-icon-size: 20px;
+$dialogActionMonitor-table-marginTop: 16px;
+$dialogActionMonitor-wrapper-maxHeightCap: 900px;
+$dialogActionMonitor-wrapper-maxHeightViewportSubtract: 200px;
+$dialogActionMonitor-wrapper-maxWidth: 96vw;
+$dialogActionMonitor-wrapper-width: 960px;

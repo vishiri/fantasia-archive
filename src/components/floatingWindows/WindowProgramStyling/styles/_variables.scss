@@ -1,0 +1,42 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - DIALOG PROGRAM STYLING */
+$windowProgramStyling-helpIcon-bottom: -55px;
+$windowProgramStyling-helpIcon-right: 25px;
+$windowProgramStyling-helpIcon-zIndex: 10;
+$windowProgramStyling-helpTooltip-width: 550px;
+$windowProgramStyling-helpTooltipBody-fontSize: 13px;
+$windowProgramStyling-helpTooltipBody-gap: 6px;
+$windowProgramStyling-helpTooltipBody-padding: 6px 8px;
+$windowProgramStyling-helpTooltipChord-fontWeight: 500;
+$windowProgramStyling-helpTooltipFooter-lineHeight: 1.3;
+$windowProgramStyling-helpTooltipFooter-margin: 10px 0 0;
+$windowProgramStyling-helpTooltipLabel-lineHeight: 1.3;
+$windowProgramStyling-helpTooltipLabel-marginLeft: 10px;
+$windowProgramStyling-helpTooltipList-fontWeight: 500;
+$windowProgramStyling-helpTooltipList-gap: 4px 14px;
+$windowProgramStyling-helpTooltipTitle-fontSize: 14px;
+$windowProgramStyling-helpTooltipTitle-fontWeight: 600;
+$windowProgramStyling-helpTooltipTitle-marginBottom: 10px;
+$windowProgramStyling-loadError-padding: 8px 16px;
+$windowProgramStyling-loadingOverlay-background: rgba($black, 0.55);
+$windowProgramStyling-titleRow-borderBottom: 1px solid rgba($white, 0.28);
+$windowProgramStyling-titleRow-minHeight: 2.75rem;
+
+/* COMPONENT - FLOATING WINDOW COMPONENT (ROOT) */
+$floatingWindowComponent-base-background: fa-v('white', $white);
+$floatingWindowComponent-border: 1px solid rgba($black, 0.3);
+$floatingWindowComponent-borderRadius: 4px;
+$floatingWindowComponent-boxShadow: 0 3px 10px rgba($black, 0.35), 0 6px 6px rgba($black, 0.2), 0 3px 1px -2px rgba($black, 0.3);
+$floatingWindowComponent-surface-backgroundColor: fa-v('dark', $dark);
+$floatingWindowComponent-titleShortFrame-margin: 15px 0;
+
+/* COMPONENT - FA FLOATING WINDOW FRAME RESIZE HANDLES */
+$faFloatingWindowFrameResizeHandles-cornerHit-fallback: 8px;
+$faFloatingWindowFrameResizeHandles-glow-inner: rgba($primary-bright, 0);
+$faFloatingWindowFrameResizeHandles-glow-outer: rgba($primary-bright, 0.3);
+$faFloatingWindowFrameResizeHandles-glowPseudo-transition: opacity 0.24s ease-out;
+$faFloatingWindowFrameResizeHandles-radialGradient-innerStop: 65%;
+$faFloatingWindowFrameResizeHandles-root-zIndex: 3;
+$faFloatingWindowFrameResizeHandles-stacking-cornerZ: 2;
+$faFloatingWindowFrameResizeHandles-stacking-edgeZ: 1;

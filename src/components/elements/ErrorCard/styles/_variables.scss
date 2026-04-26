@@ -1,0 +1,8 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - ERROR CARD */
+$errorCard-background: fa-v('surface-error', $surface-error);
+$errorCard-border-color: fa-v('dark', $dark);
+$errorCard-border-radius: 10px;
+$errorCard-border-size: 2px;
+$errorCard-text: fa-v('dark', $dark);

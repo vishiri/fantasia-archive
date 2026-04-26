@@ -1,0 +1,42 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - DIALOG KEYBIND SETTINGS */
+$dialogKeybindSettings-card-maxWidthViewportSubtract: 48px;
+$dialogKeybindSettings-card-width: 1200px;
+$dialogKeybindSettings-filterEmpty-padding: 16px 24px 24px;
+$dialogKeybindSettings-table-col-default-width: 200px;
+$dialogKeybindSettings-table-col-name-width: 200px;
+$dialogKeybindSettings-table-col-user-width: 200px;
+$dialogKeybindSettings-wrapper-maxHeightCap: 900px;
+$dialogKeybindSettings-wrapper-maxHeightViewportSubtract: 200px;
+
+/* COMPONENT - DIALOG KEYBIND SETTINGS (CAPTURE POPUP) */
+$dialogKeybindSettingsCapture-actionBtn-minWidth: 140px;
+$dialogKeybindSettingsCapture-actionBtn-padding: 0 18px;
+$dialogKeybindSettingsCapture-card-maxHeightViewportSubtract: 125px;
+$dialogKeybindSettingsCapture-card-maxWidth: 600px;
+$dialogKeybindSettingsCapture-card-minWidth: 520px;
+$dialogKeybindSettingsCapture-card-padding: 40px;
+$dialogKeybindSettingsCapture-cardBackground: fa-v('grey-lighter', $grey-lighter);
+$dialogKeybindSettingsCapture-closeButton-inset: 4px;
+$dialogKeybindSettingsCapture-fieldAppend-top: 5px;
+$dialogKeybindSettingsCapture-fieldLabel-marginTop: 7px;
+$dialogKeybindSettingsCapture-fieldRow-marginTop: 20px;
+$dialogKeybindSettingsCapture-helpIcon-marginLeft: 10px;
+$dialogKeybindSettingsCapture-helpIcon-top: 4px;
+$dialogKeybindSettingsCapture-keybindUpdateField-maxWidth: 550px;
+$dialogKeybindSettingsCapture-srStatus-dimensionalSize: 1px;
+$dialogKeybindSettingsCapture-text: fa-v('dark', $dark);
+$dialogKeybindSettingsCapture-title-fontSize: 1.15rem;
+$dialogKeybindSettingsCapture-title-marginTop: 8px;
+$dialogKeybindSettingsCapture-titleText: fa-v('dark', $dark);
+$dialogKeybindSettingsCapture-tooltip-background: fa-v('white', $white);
+$dialogKeybindSettingsCapture-tooltip-border: 1px solid fa-v('dark', $dark);
+$dialogKeybindSettingsCapture-tooltip-fontSize: 13px;
+$dialogKeybindSettingsCapture-tooltip-fontWeight: 500;
+$dialogKeybindSettingsCapture-tooltip-footnote-marginTop: 10px;
+$dialogKeybindSettingsCapture-tooltip-heading-marginBottom: 6px;
+$dialogKeybindSettingsCapture-tooltip-list-paddingLeft: 1.1rem;
+$dialogKeybindSettingsCapture-tooltip-listItem-marginVertical: 2px;
+$dialogKeybindSettingsCapture-tooltip-padding: 12px 14px;
+$dialogKeybindSettingsCapture-tooltip-text: fa-v('dark', $dark);

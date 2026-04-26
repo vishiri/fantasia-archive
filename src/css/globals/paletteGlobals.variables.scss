@@ -1,0 +1,10 @@
+@use 'sass:color';
+@use '../app.palette.scss' as *;
+
+/* Misc global tokens that depend on the palette. Re-exported from 'quasar.variables.scss' barrel. */
+
+/* GLOBALS - CUSTOM COLORS — keep color.scale in sync with fa-theme.scss (gold-muted-border-raw) */
+$gold-muted-border: fa-v('gold-muted-border', color.scale($primary, $saturation: -35%, $lightness: 14%));
+
+/* GLOBALS - GENERAL ICONS */
+$iconSize: 21px;

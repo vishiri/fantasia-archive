@@ -1,0 +1,27 @@
+@use '../../app.palette.scss' as *;
+@use '../../globals/paletteGlobals.variables.scss' as *;
+
+/* QUASAR COMPONENT - Q-MARKDOWN */
+$qMarkdown-blockquote-borderColor: $gold-muted-border;
+$qMarkdown-blockquote-borderWidthSide: 8px;
+$qMarkdown-blockquote-borderWidthVertical: 1px;
+$qMarkdown-blockquote-padding: 5px 14px;
+$qMarkdown-blockquote-textStyle: italic;
+$qMarkdown-code-backgroundColor: fa-v('grey', $grey);
+$qMarkdown-code-borderColor: fa-v('grey', $grey);
+$qMarkdown-code-borderRadius: 3px;
+$qMarkdown-code-lineHeight: 1.75;
+$qMarkdown-code-padding: 10px;
+$qMarkdown-code-textColor: fa-v('dark', $dark);
+$qMarkdown-color: fa-v('grey', $grey);
+$qMarkdown-lineHeight: 1.75;
+$qMarkdown-lineNumbers-gutterEm: 3.2em;
+$qMarkdown-lineNumbers-padding: 10px 0 10px 10px;
+$qMarkdown-link-borderBottomStyle: dotted;
+$qMarkdown-link-borderBottomWidth: 1px;
+$qMarkdown-pre-marginBottom: 16px;
+$qMarkdown-table-borderColor: $gold-muted-border;
+$qMarkdown-table-borderRadius: 3px;
+$qMarkdown-table-borderWidth: 1px;
+$qMarkdown-token-fontWeight: 600;
+$qMarkdown-token-paddingX: 5px;

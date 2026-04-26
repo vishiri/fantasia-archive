@@ -1,0 +1,21 @@
+@use '../../app.palette.scss' as *;
+
+/* QUASAR COMPONENT - Q-CHECKBOX (see node_modules/quasar/src/components/checkbox/QCheckbox.sass for upstream timing) */
+$qCheckbox-bg-borderColor: fa-v('white', $white);
+$qCheckbox-bg-borderWidth: 1px;
+$qCheckbox-bg-transition: background 0s cubic-bezier(0, 0, 0.2, 1) 0ms;
+
+$qCheckbox-inner-before-backgroundColor: fa-v('primary-bright', $primary-bright);
+$qCheckbox-inner-before-borderColor: fa-v('text-muted', $text-muted);
+$qCheckbox-inner-before-borderWidth: 2px;
+$qCheckbox-inner-before-opacity: 0.12;
+$qCheckbox-inner-before-backgroundColorTransition: background-color 0.22s cubic-bezier(0, 0, 0.2, 1) 0ms;
+
+$qCheckbox-svg-color: fa-v('primary-bright', $primary-bright);
+
+$qCheckbox-truthy-borderWidth: 2px;
+$qCheckbox-truthy-borderColor: fa-v('primary', $primary);
+
+$qCheckbox-path-strokeDashoffsetTransition: stroke-dashoffset 0.18s cubic-bezier(0.4, 0, 0.6, 1) 0ms;
+
+$qCheckbox-disabled-borderColor: fa-v('grey', $grey);

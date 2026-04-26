@@ -1,0 +1,48 @@
+@use 'sass:color';
+@use './app.palette.scss' as *;
+
+/* Default theme token values. Custom program CSS may override any --fa-* on :root or body. */
+
+:root {
+  --fa-accent: #{$accent};
+  --fa-black: #{$black};
+  --fa-brand-discord: #{$brand-discord};
+  --fa-brand-patreon: #{$brand-patreon};
+  --fa-brand-reddit: #{$brand-reddit};
+  --fa-code-token-background: #{$codeToken-background};
+  --fa-dark: #{$dark};
+  --fa-dark-lighter: #{$dark-lighter};
+  --fa-dark-page: #{$dark-page};
+  --fa-gold-muted-border: #{$gold-muted-border-raw};
+  --fa-grey: #{$grey};
+  --fa-grey-lighter: #{$grey-lighter};
+  --fa-icon-spellcheck-refresh: #{$icon-spellcheck-refresh};
+  --fa-info: #{$info};
+  --fa-light-background: #{$light-background};
+  --fa-negative: #{$negative};
+  --fa-neutral-border: #{$neutral-border};
+  --fa-notify-foreground: #{$notify-foreground};
+  --fa-positive: #{$positive};
+  --fa-primary: #{$primary};
+  --fa-primary-bright: #{$primary-bright};
+  --fa-scrollbar-thumb: #{color.adjust($dark, $lightness: 40%)};
+  --fa-scrollbar-thumb-hover: #{color.adjust($dark, $lightness: 60%)};
+  --fa-scrollbar-track: #{$dark};
+  --fa-secondary: #{$secondary};
+  --fa-select-background-dark: #{$select-background-dark};
+  --fa-select-background-light: #{$select-background-light};
+  --fa-select-text: #{$select-text};
+  --fa-surface-error: #{$surface-error};
+  --fa-text-checkbox-disabled: #{$text-checkbox-disabled};
+  --fa-text-checkbox-idle: #{$text-checkbox-idle};
+  --fa-text-danger-emphasis: #{$text-danger-emphasis};
+  --fa-text-icon-help: #{$text-icon-help};
+  --fa-text-keybind-dim: #{$text-keybind-dim};
+  --fa-text-keybind-hint: #{$text-keybind-hint};
+  --fa-text-label: #{$text-label};
+  --fa-text-menu-separator: #{$text-menu-separator};
+  --fa-text-muted: #{$text-muted};
+  --fa-text-status-queued: #{$text-status-queued};
+  --fa-warning: #{$warning};
+  --fa-white: #{$white};
+}

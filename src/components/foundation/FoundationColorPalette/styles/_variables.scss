@@ -1,0 +1,15 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - FOUNDATION COLOR PALETTE CATALOG
+ * foundationCatalogues-* is shared with FoundationTextList; foundationColorPalette-* is layout for this page only. */
+$foundationCatalogues-body-color: fa-v('grey', $grey);
+$foundationCatalogues-emphasisText-color: fa-v('primary-bright', $primary-bright);
+$foundationCatalogues-panel-backgroundColor: fa-v('dark', $dark);
+$foundationCatalogues-root-minHeight: 320px;
+$foundationColorPalette-customCard-borderWidth: 1px;
+$foundationColorPalette-materialCell-width: 88px;
+$foundationColorPalette-materialPatch-borderWidth: 1px;
+$foundationColorPalette-materialPatch-minHeight: 48px;
+$foundationColorPalette-materialRootLabel-minWidth: 9rem;
+$foundationColorPalette-materialSwatches-gap: 8px;
+$foundationColorPalette-swatch-minHeight: 48px;

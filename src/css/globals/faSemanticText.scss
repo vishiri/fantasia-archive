@@ -1,0 +1,67 @@
+/* Replaces ad hoc Quasar Material text-* and fixed #fff / #000 utilities with :root --fa-* tokens. */
+
+/* Quasar hard-codes .text-white / .text-black to #fff and #000 in quasar/src/css/core/colors.sass.
+ * Info notifications also use .text-white on the root; .q-notification.bg-info in
+ * quasarComponentsAdjustments.scss sets color with !important so this rule does not wash out dark copy. */
+.text-white {
+  color: var(--fa-white) !important;
+}
+
+.text-black {
+  color: var(--fa-black) !important;
+}
+
+.bg-white {
+  background: var(--fa-white) !important;
+}
+
+.bg-black {
+  background: var(--fa-black) !important;
+}
+
+.fa-color-icon-spellcheck-refresh {
+  color: var(--fa-icon-spellcheck-refresh) !important;
+}
+
+.fa-text-checkbox-disabled {
+  color: var(--fa-text-checkbox-disabled) !important;
+}
+
+.fa-text-checkbox-idle {
+  color: var(--fa-text-checkbox-idle) !important;
+}
+
+.fa-text-danger-emphasis {
+  color: var(--fa-text-danger-emphasis) !important;
+}
+
+.fa-text-keybind-hint {
+  color: var(--fa-text-keybind-hint) !important;
+}
+
+.fa-text-label {
+  color: var(--fa-text-label) !important;
+}
+
+.fa-text-muted {
+  color: var(--fa-text-muted) !important;
+}
+
+.fa-text-on-solid {
+  color: var(--fa-white) !important;
+}
+
+.fa-text-status-queued {
+  color: var(--fa-text-status-queued) !important;
+}
+
+/* Flat keybind table row CTA in dim state (replaces fixed Material outline for blue-grey-12). */
+.q-btn.fa-btn-keybind-dim--flat {
+  color: var(--fa-text-keybind-dim) !important;
+}
+
+/* 'QSeparator' vertical rule (replaces color="grey-lighter" fixed Material mapping). */
+.q-separator.fa-separator-grey-lighter {
+  background: var(--fa-grey-lighter) !important;
+  opacity: 1 !important;
+}

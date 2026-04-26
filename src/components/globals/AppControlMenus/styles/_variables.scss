@@ -1,0 +1,8 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - APP CONTROL MENUS */
+$appControlMenus-bgColor: fa-v('dark-lighter', $dark-lighter);
+$appControlMenus-color: fa-v('accent', $accent);
+$appControlMenus-separatorColor: fa-v('primary-bright', $primary-bright);
+$appControlMenus-separatorAltColor: fa-v('text-menu-separator', $text-menu-separator);
+$appControlMenus-singleHover: fa-v('primary-bright', $primary-bright);

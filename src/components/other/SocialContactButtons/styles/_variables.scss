@@ -1,0 +1,18 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - SOCIAL CONTACT BUTTONS */
+$socialContactButtons-backgroundColor-discord: fa-v('brand-discord', $brand-discord);
+$socialContactButtons-backgroundColor-github: fa-v('white', $white);
+$socialContactButtons-backgroundColor-kofi: fa-v('black', $black);
+$socialContactButtons-backgroundColor-patreon: fa-v('brand-patreon', $brand-patreon);
+$socialContactButtons-backgroundColor-reddit: fa-v('brand-reddit', $brand-reddit);
+$socialContactButtons-backgroundColor-twitter: fa-v('black', $black);
+$socialContactButtons-backgroundColor-webpage: fa-v('dark', $dark);
+$socialContactButtons-hoverColor-discord: fa-v('black', $black);
+$socialContactButtons-hoverColor-github: fa-v('black', $black);
+$socialContactButtons-hoverColor-patreon: fa-v('black', $black);
+$socialContactButtons-hoverColor-reddit: fa-v('black', $black);
+$socialContactButtons-hoverColor-webpage: fa-v('primary-bright', $primary-bright);
+$socialContactButtons-textColor-github: fa-v('black', $black);
+$socialContactButtons-textColor-twitter: fa-v('white', $white);
+$socialContactButtons-textColor-webpage: fa-v('primary-bright', $primary-bright);

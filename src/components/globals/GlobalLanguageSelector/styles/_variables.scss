@@ -1,0 +1,19 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - GLOBAL LANGUAGE SELECTOR */
+$globalLanguageSelector-borderColor: fa-v('neutral-border', $neutral-border);
+$globalLanguageSelector-diameter: 24px;
+$globalLanguageSelector-gap: 65px;
+$globalLanguageSelector-spellcheckRefresh-button-marginTop: 2px;
+$globalLanguageSelector-spellcheckRefresh-gap: 15px;
+$globalLanguageSelector-spellcheckRefresh-iconSpin-duration: 2.5s;
+$globalLanguageSelector-spellcheckRefresh-popTransition-duration: 280ms;
+$globalLanguageSelector-menu-backgroundColor: fa-v('light-background', $light-background);
+$globalLanguageSelector-menu-flag-boxShadow: 0px 0px 4px rgba($black, 0.5);
+$globalLanguageSelector-menu-itemHover-backgroundColor: fa-v('primary-bright', $primary-bright);
+$globalLanguageSelector-menu-item-padding: 8px 24px;
+$globalLanguageSelector-menu-itemTextColor: fa-v('black', $black);
+$globalLanguageSelector-menu-minWidth: 180px;
+$globalLanguageSelector-topPosition: 6px;
+$globalLanguageSelector-trigger-border: 2px solid $globalLanguageSelector-borderColor;
+$globalLanguageSelector-zIndex: 7001;

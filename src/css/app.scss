@@ -1,5 +1,8 @@
+@use 'fa-theme.scss';
 @use './globals/customColors.scss';
+@use './globals/faSemanticText.scss';
 @use './globals/scrollbar.scss';
 @use './globals/htmlAdjustments.scss';
 @use './globals/quasarComponentsAdjustments.scss';
 @use './globals/customComponentsAdjustments.scss';
+@use 'fa-quasar-public-vars-bridge.scss';

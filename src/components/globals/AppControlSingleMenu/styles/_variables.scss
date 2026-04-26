@@ -1,0 +1,7 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - APP CONTROL SINGLE MENU */
+$appControlSingleMenu-item-minHeight: 42px;
+$appControlSingleMenu-item-secondary-textShadow: 0 0 3px fa-v('black', $black);
+$appControlSingleMenu-keybindText-fontSize: 9px;
+$appControlSingleMenu-separator-height: 0.5px;

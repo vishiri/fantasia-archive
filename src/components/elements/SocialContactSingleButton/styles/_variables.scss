@@ -1,0 +1,12 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - SOCIAL CONTACT SINGLE BUTTON (chip row + text spacing; see SocialContactSingleButton.vue) */
+$socialContactSingleButton-chip-borderRadius: 2px;
+$socialContactSingleButton-chip-color: fa-v('white', $white);
+$socialContactSingleButton-chip-fontSize: 12px;
+$socialContactSingleButton-chip-fontWeight: 500;
+$socialContactSingleButton-chip-padding: 5px 10px;
+$socialContactSingleButton-chip-transition: 0.3s ease;
+$socialContactSingleButton-text-marginLeft: 8px;
+$socialContactSingleButton-variant-fontSize-compact: 11px;
+$socialContactSingleButton-website-borderWidth: 1px;
