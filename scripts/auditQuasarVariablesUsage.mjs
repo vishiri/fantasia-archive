@@ -1,7 +1,12 @@
 /**
- * Reports SCSS variables defined under "=== 4. CUSTOM" in quasar.variables.scss
- * that have no references anywhere in the repo (with Sass-safe $name boundaries),
- * excluding internal-only chains that never reach outside the catalogue file.
+ * Reports SCSS variables defined in feature colocated `styles/_variables.scss` files
+ * (under `src/components/**` and `src/layouts/**`) that have no references anywhere else
+ * in the repo (with Sass-safe $name boundaries), including dependency closure for
+ * internal-only $ chains between those custom definitions.
+ *
+ * Skips: the barrel `quasar.variables.scss`, `app.palette.scss`, and
+ * `src/css/theme/quasar-components/**` when looking for *references* (definitions are
+ * only read from `styles/_variables.scss`).
  *
  * Usage: node scripts/auditQuasarVariablesUsage.mjs
  */
@@ -14,11 +19,6 @@ const CATALOGUE_REL = join(
   'css',
   'quasar.variables.scss'
 )
-const CATALOGUE_ABS = join(
-  ROOT,
-  CATALOGUE_REL
-)
-
 const SKIP_DIR_NAMES = new Set([
   'node_modules',
   '.git',
@@ -121,36 +121,80 @@ function parseLhsFromDefinitionLine (
   return m[1].slice(1)
 }
 
-function main () {
-  const catalogueText = readFileSync(
-    CATALOGUE_ABS,
-    'utf8'
+function isColocatedFeatureVariablesFile (
+  relPosix
+) {
+  const n = relPosix.replaceAll(
+    '\\',
+    '/'
   )
-  const lines = catalogueText.split(/\n/)
-  const section4Start = lines.findIndex((l) =>
-    l.includes('/* === 4. CUSTOM')
-  )
-  if (section4Start < 0) {
-    throw new Error('Could not find section 4 header in quasar.variables.scss')
+  if (!n.endsWith('styles/_variables.scss')) {
+    return false
   }
-  const section4Body = lines.slice(section4Start).join('\n')
+  return n.startsWith('src/components/') || n.startsWith('src/layouts/')
+}
 
+function main () {
+  const allTextFiles = walkFiles(ROOT)
+  const defFileAbs = allTextFiles.filter(
+    (abs) => isColocatedFeatureVariablesFile(
+      relative(
+        ROOT,
+        abs
+      )
+    )
+  )
+  if (defFileAbs.length === 0) {
+    throw new Error('No feature styles/_variables.scss files found; expected colocated custom tokens under src/components or src/layouts')
+  }
   const defs = []
-  const defLines = section4Body.split(/\n/)
-  for (const line of defLines) {
-    const lhs = parseLhsFromDefinitionLine(line)
-    if (lhs) {
-      defs.push({
-        lhs,
-        line
-      })
+  for (const abs of defFileAbs) {
+    const text = readFileSync(
+      abs,
+      'utf8'
+    )
+    for (const line of text.split(/\n/)) {
+      const lhs = parseLhsFromDefinitionLine(line)
+      if (lhs) {
+        defs.push({
+          lhs,
+          line
+        })
+      }
     }
   }
   const defined = defs.map((d) => d.lhs)
-
-  const allFiles = walkFiles(ROOT)
+  if (new Set(defined).size !== defined.length) {
+    const dupes = defined.filter(
+      (n, i) => defined.indexOf(n) !== i
+    )
+    throw new Error(`Duplicate custom SCSS variable names: ${[...new Set(dupes)].join(', ')}`)
+  }
+  const defFileRelSet = new Set(
+    defFileAbs.map(
+      (a) => relative(
+        ROOT,
+        a
+      )
+        .replaceAll(
+          '\\',
+          '/'
+        )
+    )
+  )
+  const skipRefScanRel = new Set(
+    [
+      CATALOGUE_REL,
+      join(
+        'src',
+        'css',
+        'app.palette.scss'
+      ),
+      ...defFileRelSet
+    ]
+  )
   const outsideTexts = []
-  for (const abs of allFiles) {
+  for (const abs of allTextFiles) {
     const rel = relative(
       ROOT,
       abs
@@ -158,10 +202,10 @@ function main () {
       '\\',
       '/'
     )
-    if (rel === CATALOGUE_REL.replaceAll(
-      '\\',
-      '/'
-    )) {
+    if (skipRefScanRel.has(rel)) {
+      continue
+    }
+    if (rel.startsWith('src/css/theme/quasar-components/')) {
       continue
     }
     try {
@@ -175,7 +219,6 @@ function main () {
       // skip unreadable
     }
   }
-
   const externallyReferenced = new Set()
   for (const { text } of outsideTexts) {
     const hits = collectVarRefsInText(
@@ -186,7 +229,6 @@ function main () {
       externallyReferenced.add(h)
     }
   }
-
   const rhsByLhs = new Map()
   for (const {
     lhs,
@@ -199,7 +241,6 @@ function main () {
       rhs
     )
   }
-
   const needed = new Set(externallyReferenced)
   let changed = true
   while (changed) {
@@ -218,14 +259,24 @@ function main () {
       }
     }
   }
-
   const dead = defined.filter((n) => !needed.has(n))
-
   console.log(JSON.stringify(
     {
       catalogue: CATALOGUE_REL.replaceAll(
         '\\',
         '/'
+      ),
+      definitionFiles: [
+        ...defFileRelSet
+      ].map(
+        (p) => p.replaceAll(
+          '\\',
+          '/'
+        )
+      ).toSorted(
+        (a, b) => a.localeCompare(
+          b
+        )
       ),
       definedCustomVarCount: defined.length,
       externallyReferencedCount: externallyReferenced.size,

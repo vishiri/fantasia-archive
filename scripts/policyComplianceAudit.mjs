@@ -1,7 +1,7 @@
 // Optional maintainer aid: surface likely policy drift (not a CI gate).
 // Run: yarn audit:policy
 // - Non-foundation src/components .vue without matching _tests Vitest or Storybook story
-// - Vue <style> blocks that still use rgba( or #hex (consider quasar.variables.scss; see project-scss.mdc)
+// - Vue <style> blocks that still use rgba( or #hex (consider app.palette.scss, feature styles/_variables.scss, or the barrel; see project-scss.mdc)
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -83,7 +83,7 @@ if (missingStory.length === 0) {
   missingStory.sort().forEach((l) => console.log(l))
 }
 
-console.log('\n--- <style> blocks with rgba( or #hex (review vs quasar.variables.scss) ---')
+console.log('\n--- <style> blocks with rgba( or #hex (review vs theme token files) ---')
 if (styleLiteralHits.length === 0) {
   console.log('(none)')
 } else {
