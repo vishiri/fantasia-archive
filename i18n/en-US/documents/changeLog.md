@@ -1,6 +1,17 @@
 # Changelog
 ----------
 
+## 2.4.12 - Version bump
+
+### New features
+- Shipped version is now **2.4.12** in **About** and packaging metadata.
+- **Quasar** public brand variables on **`:root`**, from **`--q-primary`** through **`--q-dark-page`**, are re-bound to the matching **Fantasia** **`--fa-…`** names in **`src/css/fa-quasar-public-vars-bridge.scss`** (last **app** stylesheet) so **Custom program CSS** can drive **`var(--q-*)`** from the same Fantasia token set.
+- **SCSS** theme layout: **`app.palette.scss`** (including semantic text tokens under **APP COLORS**), default custom properties in **`fa-theme.scss`**, shared **`faSemanticText.scss`** ( **`fa-text-*`**, and **`.text-white` / `.text-black`** mapped to **Fantasia** neutrals), split **`q-*`** tokens under **`src/css/theme/quasar-components/`**, colocated feature **`styles/_variables.scss`**, globals **`htmlAdjustments.variables.scss`** and **`scrollbar.variables.scss`**, and a slim **`quasar.variables.scss`** barrel. **`yarn audit:quasar-component-tokens`** helps catch missing **`$q*`** definitions.
+- **UI copy and icons** use those helpers instead of ad hoc **Quasar** Material text shade classes where a role should follow runtime theme. **Notify** defaults no longer set **`textColor`**.
+
+### Bugfixes & Optimizations
+- **Did you know?** (**info** **Notify**): the dismiss action is **`color: dark`**; **`_qNotify`** uses **dark** foreground on **`.q-notification.bg-info`**, and **`quasarComponentsAdjustments`** applies that **`color`** with **`!important`** so it wins over the same node’s **Quasar** **`text-white`** class and the global **`.text-white { … !important }`** rule that would otherwise force near-white on a light **info** background.
+
 ## 2.4.11 - Version bump
 
 ### New features
