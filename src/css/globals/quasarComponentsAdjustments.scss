@@ -323,6 +323,8 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
   color: $qTooltip-color;
   font-size: $qTooltip-fontSize;
   font-weight: $qTooltip-fontWeight;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
   max-width: $qTooltip-maxWidth;
   z-index: $qTooltip-zIndex !important;
 }

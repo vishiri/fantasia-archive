@@ -1,10 +1,9 @@
 @use '../../app.palette.scss' as *;
-@use 'quasar/src/css/variables.sass' as quasarPalette;
 
-/* QUASAR COMPONENT - Q-TOOLTIP (see quasar QTooltip.sass + variables.sass) */
-$qTooltip-backgroundColor: fa-v('accent', $accent);
+/* QUASAR COMPONENT - Q-TOOLTIP — Fantasia: $accent surface, $dark copy (not stock Quasar tooltip tokens). */
+$qTooltip-backgroundColor: fa-v('tooltip-background', $accent);
 $qTooltip-color: fa-v('dark', $dark);
-$qTooltip-fontSize: quasarPalette.$tooltip-fontsize;
-$qTooltip-fontWeight: normal;
-$qTooltip-maxWidth: quasarPalette.$tooltip-max-width;
-$qTooltip-zIndex: quasarPalette.$z-tooltip;
+$qTooltip-fontSize: 13px;
+$qTooltip-fontWeight: 600;
+$qTooltip-maxWidth: 600px;
+$qTooltip-zIndex: 999999999;

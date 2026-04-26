@@ -10,6 +10,7 @@
 - **UI copy and icons** use those helpers instead of ad hoc **Quasar** Material text shade classes where a role should follow runtime theme. **Notify** defaults no longer set **`textColor`**.
 
 ### Bugfixes & Optimizations
+- **QTooltip**: popups on dark chrome use **`$accent`** (**#f5f5f5**) and **`$dark`** (**#1b333e**), **13px** copy at weight **600**, **600px** max width, a high **`z-index`** for title-bar stacking, plus **`line-height` / `letter-spacing`** in **`quasarComponentsAdjustments`**, instead of **Quasar** stock tooltip sizing and colors.
 - **Did you know?** (**info** **Notify**): the dismiss action is **`color: dark`**; **`_qNotify`** uses **dark** foreground on **`.q-notification.bg-info`**, and **`quasarComponentsAdjustments`** applies that **`color`** with **`!important`** so it wins over the same node’s **Quasar** **`text-white`** class and the global **`.text-white { … !important }`** rule that would otherwise force near-white on a light **info** background.
 
 ## 2.4.11 - Version bump

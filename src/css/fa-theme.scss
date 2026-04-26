@@ -43,6 +43,8 @@
   --fa-text-menu-separator: #{$text-menu-separator};
   --fa-text-muted: #{$text-muted};
   --fa-text-status-queued: #{$text-status-queued};
+  /* QTooltip: same values as $accent / $dark in app.palette.scss (rgb 245,245,245 and 27,51,62). */
+  --fa-tooltip-background: #{$accent};
   --fa-warning: #{$warning};
   --fa-white: #{$white};
 }
