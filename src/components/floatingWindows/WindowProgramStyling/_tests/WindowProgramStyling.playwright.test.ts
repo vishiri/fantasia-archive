@@ -43,6 +43,23 @@ const faFrontendRenderTimer: number = FA_FRONTEND_RENDER_TIMER
 const monacoMountSettleMs = 2500
 
 /**
+ * Help `QMenu` opens after a hover delay on the icon; hover at least this long before asserting.
+ * (Implementation uses 500 ms; one second of hover keeps the spec stable under load.)
+ */
+const programStylingHelpMenuHoverMs = 1000
+
+/**
+ * Theme variable rows asserted in the help panel (sorted names from `fa-theme.scss` / DOM scan).
+ */
+const programStylingHelpFaVarNames = [
+  '--fa-color-accent',
+  '--fa-color-black',
+  '--fa-color-dark',
+  '--fa-color-primary',
+  '--fa-color-primary-bright'
+] as const
+
+/**
  * Component-testing can hydrate `directInput` after `ComponentTesting.vue` resolves `getSnapshot`, so the floating frame may appear later than the initial render timer.
  */
 const programStylingWindowReadyMs = 30_000
@@ -54,7 +71,11 @@ const selectorList = {
   closeButton: 'windowProgramStyling-button-close',
   dragHandle: 'windowProgramStyling-dragHandle',
   editorHost: 'windowProgramStyling-editorHost',
+  faThemeVarList: 'windowProgramStyling-faThemeVarList',
   frame: 'windowProgramStyling-frame',
+  helpIcon: 'windowProgramStyling-helpIcon',
+  helpMenu: 'windowProgramStyling-helpMenu',
+  helpTooltipBody: 'windowProgramStyling-helpTooltipBody',
   loadingOverlay: 'windowProgramStyling-loadingOverlay',
   saveButton: 'windowProgramStyling-button-save',
   title: 'windowProgramStyling-title'
@@ -162,6 +183,53 @@ test.describe.serial('Program styling floating window chrome and persistent clos
     await appWindow.mouse.click(5, 5)
     await appWindow.waitForTimeout(400)
     await expect(frame).toHaveCount(1, { timeout: 10_000 })
+  })
+
+  /**
+   * Help icon opens a sticky `QMenu` after hover; leaving the icon for the title bar does not dismiss it.
+   * Body lists English keybind copy and theme variables with 20×20 swatches that resolve a background color.
+   */
+  test('Program styling help menu opens on hover and lists keybinds and theme variables with swatches', async () => {
+    await waitForProgramStylingWindowReady(appWindow)
+    const frame = appWindow.locator(`[data-test-locator="${selectorList.frame}"]`)
+    const helpIcon = frame.locator(`[data-test-locator="${selectorList.helpIcon}"]`)
+    await expect(helpIcon).toHaveCount(1)
+    await helpIcon.hover()
+    await appWindow.waitForTimeout(programStylingHelpMenuHoverMs)
+
+    const helpMenu = appWindow.locator(`[data-test-locator="${selectorList.helpMenu}"]`)
+    await expect(helpMenu).toBeVisible({ timeout: 10_000 })
+
+    const helpBody = appWindow.locator(`[data-test-locator="${selectorList.helpTooltipBody}"]`)
+    await expect(helpBody).toContainText(programStylingMessages.helpTooltip.title)
+    await expect(helpBody).toContainText('F1')
+    await expect(helpBody).toContainText(programStylingMessages.helpTooltip.items.commandPalette)
+    await expect(helpBody).toContainText(programStylingMessages.helpTooltip.variableListTitle)
+
+    const varList = appWindow.locator(`[data-test-locator="${selectorList.faThemeVarList}"]`)
+    await expect(varList).toBeVisible()
+
+    const titleHeading = frame.locator(`[data-test-locator="${selectorList.title}"]`)
+    await titleHeading.hover()
+    await appWindow.waitForTimeout(200)
+    await expect(helpMenu).toBeVisible()
+
+    for (const varName of programStylingHelpFaVarNames) {
+      const item = appWindow.locator(`.windowProgramStyling__helpTooltipFaVarItem[data-test-fa-theme-var="${varName}"]`)
+      await expect(item).toHaveCount(1)
+      await expect(item).toContainText(varName)
+      const swatch = item.locator(`[data-test-fa-theme-var-swatch="${varName}"]`)
+      await expect(swatch).toHaveCount(1)
+      const box = await swatch.boundingBox()
+      expect(box).not.toBeNull()
+      if (box !== null) {
+        expect(box.width).toBeCloseTo(20, 0)
+        expect(box.height).toBeCloseTo(20, 0)
+      }
+      const backgroundColor = await swatch.evaluate((el) => window.getComputedStyle(el).backgroundColor)
+      expect(backgroundColor.trim().length).toBeGreaterThan(0)
+      expect(backgroundColor.toLowerCase()).not.toBe('transparent')
+    }
   })
 
   /**

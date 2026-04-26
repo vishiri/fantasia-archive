@@ -58,14 +58,21 @@ const meta = {
   component: DialogActionMonitor,
   parameters: {
     docs: {
-      disable: true
+      story: {
+        inline: false,
+        iframeHeight: '720px'
+      },
+      description: {
+        component:
+          'Read-only Action Monitor dialog: newest-first rows from a session action-history snapshot (sync queue and async). Storybook uses directInput plus directHistorySnapshot sample rows from the locale mock. Canvas VRT is skipped because the running-row spinner animates and timestamps change each load.'
+      }
     }
   },
   /**
    * Visual capture intentionally skipped: the running spinner animates and 'enqueuedAt' timestamps shift on every render,
    * which would constantly invalidate the screenshot baseline.
    */
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogActionMonitor'
 } satisfies Meta<typeof DialogActionMonitor>
 

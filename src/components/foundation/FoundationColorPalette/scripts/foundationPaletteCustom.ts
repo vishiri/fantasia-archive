@@ -2,7 +2,7 @@ import type { I_foundationCustomSwatch } from 'app/types/I_foundationCatalogues'
 
 /**
  * Mirrors the QUASAR COLORS - GENERAL block in src/css/app.palette.scss.
- * Keep hex values in sync when editing that block; $info uses the resolved color.adjust output.
+ * Keep hex values in sync when editing that block; $info is derived from $primary in SCSS (see app.palette.scss).
  */
 export const FOUNDATION_CUSTOM_SWATCHES: I_foundationCustomSwatch[] = [
   {
@@ -27,7 +27,6 @@ export const FOUNDATION_CUSTOM_SWATCHES: I_foundationCustomSwatch[] = [
   },
   {
     hex: '#f7eed9',
-    note: 'SCSS: color.adjust(#d7ac47, $lightness: 35%)',
     sassVar: '$info'
   },
   {

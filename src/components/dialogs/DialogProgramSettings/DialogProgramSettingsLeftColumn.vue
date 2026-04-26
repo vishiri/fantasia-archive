@@ -32,7 +32,7 @@
       <q-tab
         v-for="(category, categoryKey) in programSettingsTree"
         :key="categoryKey"
-        class="fa-text-muted"
+        :class="{ 'fa-text-muted': categoryKey !== props.selectedCategoryTab }"
         :name="categoryKey"
         :label="category.title"
         :data-test-locator="`dialogProgramSettings-tab-${categoryKey}`"

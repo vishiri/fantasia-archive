@@ -16,6 +16,15 @@ import QMarkdownPlugin from '@quasar/quasar-ui-qmarkdown'
 
 import type { Preview } from '@storybook/vue3-vite'
 import type { QuasarPluginOptions } from 'quasar'
+import {
+  Controls,
+  Description,
+  Primary,
+  Stories,
+  Subtitle,
+  Title
+} from '@storybook/addon-docs/blocks'
+import React from 'react'
 import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/rendererAppInternals'
 
 import { setContentBridgeScenario } from './mocks/contentBridge'
@@ -197,7 +206,23 @@ const preview: Preview = {
     docs: {
       controls: {
         sort: 'requiredFirst'
-      }
+      },
+      /**
+       * Default Autodocs renders Primary (first story) and Stories (all stories), so the first story
+       * appears twice when a file exports more than one story. Keybind-style files with a single
+       * export avoid that because Stories omits the lone primary. Match that behavior project-wide.
+       */
+      page: () =>
+        React.createElement(
+          React.Fragment,
+          null,
+          React.createElement(Title),
+          React.createElement(Subtitle),
+          React.createElement(Description),
+          React.createElement(Primary),
+          React.createElement(Controls),
+          React.createElement(Stories, { includePrimary: false })
+        )
     }
   },
 

@@ -24,6 +24,14 @@ const minimalTree: T_programSettingsRenderTree = {
   }
 }
 
+const twoCategoryTree: T_programSettingsRenderTree = {
+  ...minimalTree,
+  otherCategory: {
+    subCategories: {},
+    title: 'Other'
+  }
+}
+
 /**
  * DialogProgramSettingsLeftColumn
  * Mounts with a minimal render tree and exposes the first category tab locator.
@@ -60,6 +68,38 @@ test('Test that DialogProgramSettingsLeftColumn renders a tab for each top categ
   })
 
   expect(w.find('[data-test-locator="dialogProgramSettings-tab-demoCategory"]').exists()).toBe(true)
+  w.unmount()
+})
+
+/**
+ * Active category tab must not use fa-text-muted so Quasar active-color (text-primary-bright) wins over !important muted.
+ */
+test('Test that only non-selected category tabs get fa-text-muted', () => {
+  const w = mount(DialogProgramSettingsLeftColumn, {
+    props: {
+      hasActiveSearchQuery: false,
+      programSettingsTree: twoCategoryTree,
+      searchSettingsQuery: '',
+      selectedCategoryTab: 'demoCategory'
+    },
+    global: {
+      mocks: { $t: (k: string) => k },
+      stubs: {
+        QIcon: { template: '<i />' },
+        QInput: { template: '<div />' },
+        QTab: {
+          inheritAttrs: true,
+          template: '<div v-bind="$attrs"><slot /></div>'
+        },
+        QTabs: { template: '<div><slot /></div>' }
+      }
+    }
+  })
+
+  const active = w.find('[data-test-locator="dialogProgramSettings-tab-demoCategory"]')
+  const inactive = w.find('[data-test-locator="dialogProgramSettings-tab-otherCategory"]')
+  expect(active.classes()).not.toContain('fa-text-muted')
+  expect(inactive.classes()).toContain('fa-text-muted')
   w.unmount()
 })
 
