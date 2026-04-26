@@ -104,7 +104,7 @@
                 </div>
 
                 <q-separator
-                  color="grey-lighter"
+                  class="fa-separator-grey-lighter"
                   inset
                   vertical
                 />

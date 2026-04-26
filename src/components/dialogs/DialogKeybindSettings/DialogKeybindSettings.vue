@@ -62,8 +62,19 @@
               >
                 <template v-if="bodySlot.row.editable">
                   <q-btn
-                    :color="bodySlot.row.userShowsAddNewCombo ? 'primary-bright' : 'blue-grey-12'"
+                    v-if="bodySlot.row.userShowsAddNewCombo"
+                    color="primary-bright"
                     outline
+                    size="11px"
+                    data-test-locator="dialogKeybindSettings-userKeybind-button"
+                    @click="onOpenCapture(bodySlot.row)"
+                  >
+                    {{ userKeybindButtonLabel(bodySlot.row) }}
+                  </q-btn>
+                  <q-btn
+                    v-else
+                    class="fa-btn-keybind-dim--flat"
+                    flat
                     size="11px"
                     data-test-locator="dialogKeybindSettings-userKeybind-button"
                     @click="onOpenCapture(bodySlot.row)"

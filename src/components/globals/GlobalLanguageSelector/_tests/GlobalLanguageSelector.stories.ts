@@ -31,7 +31,7 @@ const stageDecorator: Decorator = (story, context) => {
         style="box-sizing: border-box; min-height: 160px; min-width: 100%; padding: 8px 200px 48px 8px;"
       >
         <p
-          style="margin: 0 0 12px; color: #9e9e9e; font-size: 12px; line-height: 1.4; max-width: 42rem;"
+          style="margin: 0 0 12px; color: var(--fa-text-muted); font-size: 12px; line-height: 1.4; max-width: 42rem;"
         >
           Fixed to the top-right like the in-app title bar; widen the viewport if the round flag
           trigger is clipped.

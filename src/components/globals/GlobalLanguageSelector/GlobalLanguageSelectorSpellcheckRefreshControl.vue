@@ -16,8 +16,7 @@
         @click="emit('refreshWebContents')"
       >
         <q-icon
-          class="globalLanguageSelectorSpellcheckRefreshControl__iconSpin"
-          color="red-6"
+          class="globalLanguageSelectorSpellcheckRefreshControl__iconSpin fa-color-icon-spellcheck-refresh"
           name="mdi-refresh"
           size="22px"
         />
@@ -47,7 +46,7 @@ import {
 } from 'vue'
 
 /**
- * Keep in sync with '$globalLanguageSelector-spellcheckRefresh-popTransition-duration' in 'quasar.variables.scss'.
+ * Keep in sync with '$globalLanguageSelector-spellcheckRefresh-popTransition-duration' in 'GlobalLanguageSelector/styles/_variables.scss'.
  */
 const spellcheckRefreshPopTransitionMs = 280
 const spellcheckRefreshTooltipAutoOpenBufferMs = 80

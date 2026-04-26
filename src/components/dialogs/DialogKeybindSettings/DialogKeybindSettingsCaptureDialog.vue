@@ -45,16 +45,15 @@
           color="secondary"
           data-test-locator="dialogKeybindSettings-capture-clear"
           :disable="!canClearCapture"
-          unelevatedd
+          unelevated
           :label="$t('dialogs.keybindSettings.captureClear')"
           @click="emit('captureClear')"
         />
         <q-btn
-          class="dialogKeybindSettingsCapture__btnSet text-uppercase text-weight-bold"
+          class="dialogKeybindSettingsCapture__btnSet fa-text-on-solid text-uppercase text-weight-bold"
           color="dark"
           data-test-locator="dialogKeybindSettings-capture-set"
           :disable="!canSubmitChord"
-          text-color="white"
           unelevated
           :label="$t('dialogs.keybindSettings.captureSet')"
           @click="emit('captureSet')"

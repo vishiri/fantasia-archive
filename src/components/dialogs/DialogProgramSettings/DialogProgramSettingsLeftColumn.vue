@@ -32,7 +32,7 @@
       <q-tab
         v-for="(category, categoryKey) in programSettingsTree"
         :key="categoryKey"
-        class="text-grey-5"
+        class="fa-text-muted"
         :name="categoryKey"
         :label="category.title"
         :data-test-locator="`dialogProgramSettings-tab-${categoryKey}`"

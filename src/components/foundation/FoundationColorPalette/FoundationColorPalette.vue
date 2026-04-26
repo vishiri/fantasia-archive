@@ -7,7 +7,7 @@
     <h1 class="foundationColorPalette__title text-h4 q-mb-sm">
       Color foundation
     </h1>
-    <p class="text-body2 q-mb-lg text-grey-5">
+    <p class="text-body2 q-mb-lg fa-text-muted">
       Storybook-only reference: Fantasia theme variables and the default Quasar material scale.
     </p>
 
@@ -16,11 +16,11 @@
       <h2 class="foundationColorPalette__sectionTitle text-h5 q-mb-sm">
         Custom theme colors
       </h2>
-      <p class="text-body2 q-mb-md text-grey-5">
+      <p class="text-body2 q-mb-md fa-text-muted">
         From
         <span class="text-weight-medium text-primary">QUASAR COLORS - GENERAL</span>
         in
-        <code class="text-primary">src/css/quasar.variables.scss</code>
+        <code class="text-primary">src/css/app.palette.scss</code>
         (Quasar brand variables for this app).
       </p>
 
@@ -39,12 +39,12 @@
               <div class="foundationColorPalette__var foundationColorPalette__mono text-caption">
                 {{ swatch.sassVar }}
               </div>
-              <div class="foundationColorPalette__mono text-caption text-grey-5 q-mt-xs">
+              <div class="foundationColorPalette__mono text-caption fa-text-muted q-mt-xs">
                 {{ swatch.hex }}
               </div>
               <div
                 v-if="swatch.note"
-                class="text-caption text-grey-5 q-mt-xs"
+                class="text-caption fa-text-muted q-mt-xs"
               >
                 {{ swatch.note }}
               </div>
@@ -59,7 +59,7 @@
       <h2 class="foundationColorPalette__sectionTitle text-h5 q-mb-sm">
         Default Quasar material palette
       </h2>
-      <p class="text-body2 q-mb-md text-grey-5">
+      <p class="text-body2 q-mb-md fa-text-muted">
         Class stems for
         <code class="text-primary">bg-&#42;</code>
         and
@@ -94,7 +94,7 @@
               class="foundationColorPalette__materialPatch"
               :class="`bg-${stem}`"
             />
-            <div class="foundationColorPalette__mono text-caption text-grey-5 q-mt-xs text-center">
+            <div class="foundationColorPalette__mono text-caption fa-text-muted q-mt-xs text-center">
               {{ stem }}
             </div>
           </div>

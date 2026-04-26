@@ -13,15 +13,15 @@ export const tipsTricksTriviaNotification = (hideMascot: boolean) => {
   const randomMessage = messageList[messageList.length * Math.random() << 0]
 
   Notify.create({
-    timeout: 15000,
+    timeout: 1500000,
     icon: (hideMascot) ? 'mdi-help' : undefined,
     color: 'info',
     message: i18n.global.t('globalFunctionality.unsortedAppTexts.didYouKnow'),
     avatar: (!hideMascot) ? determineCurrentImage(fantasiaImageList, true, '') : undefined,
     caption: randomMessage,
     actions: [{
-      icon: 'mdi-close',
-      color: 'white'
+      color: 'dark',
+      icon: 'mdi-close'
     }]
   })
 }

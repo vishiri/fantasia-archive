@@ -22,8 +22,8 @@
       <q-item-label
         class="importExportProgramConfig__label"
         :class="{
-          'text-blue-grey-2': !model && !isDisabled,
-          'text-blue-grey-4': !model && isDisabled
+          'fa-text-checkbox-idle': !model && !isDisabled,
+          'fa-text-checkbox-disabled': !model && isDisabled
         }"
       >
         {{ $t(labelI18nKey) }}

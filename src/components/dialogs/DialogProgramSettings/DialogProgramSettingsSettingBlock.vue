@@ -11,7 +11,7 @@
       <div class="row items-center no-wrap q-mb-xs">
         <div class="dialogProgramSettings__settingTitle">
           <span
-            class="dialogProgramSettings__settingLabel text-grey-3 text-weight-regular text-body2"
+            class="dialogProgramSettings__settingLabel fa-text-label text-weight-regular text-body2"
             :data-test-locator="labelLocator"
           >{{ setting.title }}</span>
           <q-icon
@@ -35,7 +35,7 @@
       />
       <p
         v-if="setting.note !== undefined && setting.note !== ''"
-        class="dialogProgramSettings__settingNote text-caption q-mt-xs q-mb-none text-red-12"
+        class="dialogProgramSettings__settingNote fa-text-danger-emphasis text-caption q-mt-xs q-mb-none"
         data-test-locator="dialogProgramSettings-settingNote"
       >
         {{ setting.note }}

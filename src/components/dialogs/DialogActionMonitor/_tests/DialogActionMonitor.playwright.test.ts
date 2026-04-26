@@ -187,7 +187,7 @@ test.describe.serial('Action monitor dialog (fixture history)', () => {
   })
 
   /**
-   * directHistorySnapshot supplies four rows; status cells show spinner, success icon, failure icon, and queued mdi-timer-sand-empty (text-blue-5); each has a tooltip with the status meaning.
+   * directHistorySnapshot supplies four rows; status cells show spinner, success icon, failure icon, and queued mdi-timer-sand-empty (fa-text-status-queued); each has a tooltip with the status meaning.
    * Payload column shows a green check for rows with payload preview, grey dash (empty marker) otherwise.
    * Thead and six data-cell locators match the current column set; run yarn quasar:build:electron:summarized when the renderer bundle is stale.
    */
@@ -251,7 +251,7 @@ test.describe.serial('Action monitor dialog (fixture history)', () => {
     const rowQueued = rows.filter({ hasText: 'closeApp' })
     await expect(rowQueued.locator(`[data-test-locator="${selectorList.statusQueued}"]`)).toBeVisible()
     await expect(
-      rowQueued.locator(`[data-test-locator="${selectorList.statusQueued}"] .text-blue-5`)
+      rowQueued.locator(`[data-test-locator="${selectorList.statusQueued}"] .fa-text-status-queued`)
     ).toBeVisible()
     await expect(rowQueued.locator('.sr-only')).toHaveText(actionMonitorMessages.status.queued)
     await expect(rowQueued.locator('[data-test-locator="dialogActionMonitor-cell-type"]')).toHaveText(

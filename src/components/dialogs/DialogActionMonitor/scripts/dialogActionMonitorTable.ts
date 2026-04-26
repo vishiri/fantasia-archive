@@ -126,7 +126,7 @@ export interface I_dialogActionMonitorStatusBadge {
    */
   icon: string
   /**
-   * Quasar text-color class; aligned with the project's negative / positive colors so the table reads at a glance.
+   * Text color helper from globals/faSemanticText.scss (and Quasar brand util classes), so status tints follow :root --fa-*.
    */
   colorClass: string
   /**
@@ -170,7 +170,7 @@ export function buildDialogActionMonitorStatusBadge (status: T_faActionHistorySt
   const label = i18n.global.t('dialogs.actionMonitor.status.queued')
   // MDI v5 webfont (`@quasar/extras/mdi-v5`) exposes timer-sand icons, not `mdi-hourglass`.
   return {
-    colorClass: 'text-blue-5',
+    colorClass: 'fa-text-status-queued',
     icon: 'mdi-timer-sand-empty',
     isSpinner: false,
     label

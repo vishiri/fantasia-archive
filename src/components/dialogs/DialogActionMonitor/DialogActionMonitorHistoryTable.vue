@@ -55,7 +55,7 @@
         />
         <q-icon
           v-else
-          class="text-grey-5"
+          class="fa-text-muted"
           name="mdi-minus"
           size="20px"
           role="img"

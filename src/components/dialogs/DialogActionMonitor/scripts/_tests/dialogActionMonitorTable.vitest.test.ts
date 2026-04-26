@@ -105,7 +105,7 @@ test('Test that buildDialogActionMonitorStatusBadge maps queued to a blue timer-
   const badge = buildDialogActionMonitorStatusBadge('queued')
   expect(badge.icon).toBe('mdi-timer-sand-empty')
   expect(badge.isSpinner).toBe(false)
-  expect(badge.colorClass).toBe('text-blue-5')
+  expect(badge.colorClass).toBe('fa-text-status-queued')
 })
 
 /**

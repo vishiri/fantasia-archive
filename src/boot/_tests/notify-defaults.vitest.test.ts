@@ -24,8 +24,7 @@ test('Test that notify-defaults configures expected Quasar Notify defaults', asy
   expect(notifySetDefaultsMock).toHaveBeenCalledOnce()
   expect(notifySetDefaultsMock).toHaveBeenCalledWith({
     position: 'bottom-right',
-    timeout: 4000,
     progress: true,
-    textColor: 'cultured'
+    timeout: 4000
   })
 })

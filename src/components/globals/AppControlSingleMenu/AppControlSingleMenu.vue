@@ -68,7 +68,7 @@
             <q-item-section data-test-locator="AppControlSingleMenu-menuItem-text">
               <span>{{ menuItem.text }}</span><div
                 v-if="keybindHintLabel(menuItem.keybindCommandId)"
-                class="appControlSingleMenu__keybindText text-blue-grey-6"
+                class="appControlSingleMenu__keybindText fa-text-keybind-hint"
                 data-test-locator="AppControlSingleMenu-menuItem-keybind"
               >
                 ({{ keybindHintLabel(menuItem.keybindCommandId) }})
@@ -133,7 +133,7 @@
                     >
                       <span>{{ submenuItem.text }}</span><div
                         v-if="keybindHintLabel(submenuItem.keybindCommandId)"
-                        class="appControlSingleMenu__keybindText text-blue-grey-6"
+                        class="appControlSingleMenu__keybindText fa-text-keybind-hint"
                         data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-keybind"
                       >
                         ({{ keybindHintLabel(submenuItem.keybindCommandId) }})
