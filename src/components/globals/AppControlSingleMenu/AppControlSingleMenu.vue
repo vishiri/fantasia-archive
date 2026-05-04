@@ -249,8 +249,8 @@ const menuData = computed(() => componentData.value.data)
   &__item {
     min-height: $appControlSingleMenu-item-minHeight;
 
-    &:hover,
-    &:focus {
+    &:hover:not([aria-disabled="true"]),
+    &:focus:not([aria-disabled="true"]) {
       color: $appControlMenus-singleHover;
     }
 

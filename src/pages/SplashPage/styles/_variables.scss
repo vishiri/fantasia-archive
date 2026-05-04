@@ -1,0 +1,11 @@
+@use '../../../css/app.palette.scss' as *;
+
+/* PAGE - SPLASH */
+$splashPage-background: fa-v('dark-page', $dark-page);
+$splashPage-inner-margin: 0 auto;
+$splashPage-inner-width: 100%;
+$splashPage-minHeight: 100%;
+$splashPage-padding: 32px 24px 48px;
+$splashPage-separator-maxWidth: 360px;
+$splashPage-separator-opacity: 0.75;
+$splashPage-separator-width: 100%;

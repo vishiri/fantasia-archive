@@ -147,6 +147,7 @@ onMounted(() => {
   }
 
   .dialogAboutFantasiaArchive__titleSeparator {
+    max-width: 100%;
     width: $dialogAboutFantasiaArchive-titleSeparator-width;
   }
 }

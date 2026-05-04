@@ -2,6 +2,15 @@
 
 /* Native element selectors first (alphabetical), then class-based rules (alphabetical). */
 
+.q-item {
+  padding: 14px 16px;
+}
+
+.disabled,
+[disabled] {
+  opacity: 0.35 !important;
+}
+
 body.desktop .q-focusable:focus > .q-focus-helper {
 
   /* Replacement of the overlay (before/after) elements via simple background-color opacity */

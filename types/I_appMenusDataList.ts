@@ -7,6 +7,16 @@ export type T_menuItemMode = 'separator' | 'item'
 
 export type T_menuItemTrigger = (...args: unknown[]) => unknown | void
 
+/**
+ * Session inputs for building Product menu trees (for example whether a project database is open).
+ */
+export interface I_appMenuBuildSession {
+  /**
+   * True when the app has a loaded project database for this session.
+   */
+  hasActiveProject: boolean
+}
+
 export interface I_appMenuSubItem {
   /**
    * Determines whether the item is a separator or a regular menu item.
@@ -34,7 +44,7 @@ export interface I_appMenuSubItem {
   triggerArguments?: unknown[]
 
   /**
-   * Condition to show the submenu item as active.
+   * When false, the row is disabled. When true or unset, the row is enabled.
    */
   conditions?: boolean
 
@@ -76,7 +86,7 @@ export interface I_appMenuItem {
   triggerArguments?: unknown[]
 
   /**
-   * Condition to show the menu item as active.
+   * When false, the row is disabled (Quasar `q-item` `disable`). When true or unset, the row is enabled.
    */
   conditions?: boolean
 

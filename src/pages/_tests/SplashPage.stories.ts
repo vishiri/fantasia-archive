@@ -3,19 +3,19 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import StoryRouterShell from '../../../.storybook-workspace/.storybook/components/StoryRouterShell.vue'
 
 const meta = {
-  title: 'Pages/IndexPage',
+  title: 'Pages/SplashPage',
   component: StoryRouterShell,
   parameters: {
     docs: { disable: true }
   },
   args: {
-    initialPath: '/home'
+    initialPath: '/'
   }
 } satisfies Meta<typeof StoryRouterShell>
 
 export default meta
 
-/** Legacy dev home with MainLayout (production route: /home). */
-export const WithinMainLayout: StoryObj<typeof meta> = {
-  args: { initialPath: '/home' }
+/** Fullscreen welcome layout (production default route). */
+export const Default: StoryObj<typeof meta> = {
+  args: { initialPath: '/' }
 }

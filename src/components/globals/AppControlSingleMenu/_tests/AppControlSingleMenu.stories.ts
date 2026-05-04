@@ -90,7 +90,7 @@ const dataWithSubmenu: I_appMenuList = {
 const dataToolsAndHelpStyleWithHints: I_appMenuList = {
   title: 'Tools (storybook fixture)',
   data: [
-    faMenuItem('appControlMenus.tools.items.quickAddNewDocument', 'mdi-text-box-plus-outline'),
+    faMenuItem('appControlMenus.documents.items.quickAddNewDocument', 'mdi-text-box-plus-outline'),
     faMenuSeparator(),
     faMenuItem('appControlMenus.tools.items.keybindSettings', 'mdi-keyboard-settings', {
       keybindCommandId: 'openKeybindSettings'

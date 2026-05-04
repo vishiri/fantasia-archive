@@ -17,6 +17,7 @@ import L_faKeybinds from 'app/i18n/en-US/globalFunctionality/L_faKeybinds'
 import L_faUserSettings from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
 import L_unsortedAppTexts from 'app/i18n/en-US/globalFunctionality/L_unsortedAppTexts'
 import L_ErrorNotFound from 'app/i18n/en-US/pages/L_ErrorNotFound'
+import L_splashPage from 'app/i18n/en-US/pages/L_splashPage'
 import { ref } from 'vue'
 
 import type { T_i18nScenario } from 'app/types/I_storybookWorkspaceHarness'
@@ -35,6 +36,7 @@ const storybookExternalLoaderLocale = ref<string>('en-US')
  */
 const defaultMessages: Record<string, unknown> = {
   errorNotFound: L_ErrorNotFound,
+  splashPage: L_splashPage,
   dialogs: {
     aboutFantasiaArchive: L_aboutFantasiaArchive,
     actionMonitor: L_DialogActionMonitor,

@@ -1,7 +1,7 @@
 import { i18n } from 'app/i18n/externalFileLoader'
 import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
 
-import type { I_appMenuItem, I_appMenuList } from 'app/types/I_appMenusDataList'
+import type { I_appMenuBuildSession, I_appMenuItem, I_appMenuList } from 'app/types/I_appMenusDataList'
 
 import {
   faMenuItem,
@@ -10,16 +10,13 @@ import {
 
 // TODO - add functionality for all buttons and conditions
 
-function buildToolsMenuData (): I_appMenuItem[] {
+function buildToolsMenuData (session: I_appMenuBuildSession): I_appMenuItem[] {
+  const gate = session.hasActiveProject
+
   return [
-    faMenuItem('appControlMenus.tools.items.quickAddNewDocument', 'mdi-text-box-plus-outline'),
-    faMenuItem('appControlMenus.tools.items.quickSearchDocument', 'mdi-database-search'),
-    faMenuSeparator(),
-    faMenuItem('appControlMenus.tools.items.massDeleteDocument', 'mdi-text-box-remove-outline', {
-      specialColor: 'secondary'
+    faMenuItem('appControlMenus.tools.items.toggleTree', 'mdi-page-layout-sidebar-left', {
+      conditions: gate
     }),
-    faMenuSeparator(),
-    faMenuItem('appControlMenus.tools.items.toggleTree', 'mdi-page-layout-sidebar-left'),
     faMenuItem('appControlMenus.tools.items.showNoteBoard', 'mdi-clipboard-text-outline'),
     faMenuSeparator(),
     faMenuItem('appControlMenus.tools.items.importExportProgramConfig', 'mdi-cog-transfer', {
@@ -41,9 +38,9 @@ function buildToolsMenuData (): I_appMenuItem[] {
   ]
 }
 
-export function buildToolsMenu (): I_appMenuList {
+export function buildToolsMenu (session: I_appMenuBuildSession): I_appMenuList {
   return {
-    data: buildToolsMenuData(),
+    data: buildToolsMenuData(session),
     title: i18n.global.t('appControlMenus.tools.title')
   }
 }

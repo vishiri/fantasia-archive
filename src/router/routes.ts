@@ -1,12 +1,29 @@
 import type { RouteRecordRaw } from 'vue-router'
 
+import 'app/types/vueRouterRouteMetaAugmentation'
+
 const routes: RouteRecordRaw[] = [
 
   /**
-   * Default pathing
+   * Welcome / splash (first screen on startup — same chrome as MainLayout)
    */
   {
     path: '/',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [{
+      path: '',
+      meta: {
+        faMainLayoutHideDrawer: true
+      },
+      component: () => import('pages/SplashPage.vue')
+    }]
+  },
+
+  /**
+   * Legacy dev home / future workspace entry
+   */
+  {
+    path: '/home',
     component: () => import('layouts/MainLayout.vue'),
     children: [{
       path: '',

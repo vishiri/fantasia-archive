@@ -161,5 +161,22 @@ const iconSrc = computed(() => {
       color: $socialContactButtons-textColor-twitter !important;
     }
   }
+
+  &.discord,
+  &.email,
+  &.facebook,
+  &.github,
+  &.instagram,
+  &.kofi,
+  &.linkedin,
+  &.mastodon,
+  &.patreon,
+  &.reddit,
+  &.telegram,
+  &.twitter,
+  &.website,
+  &.youtube {
+    margin-bottom: $socialContactSingleButton-variant-marginBottom;
+  }
 }
 </style>

@@ -1,4 +1,4 @@
-import { flushPromises, mount } from '@vue/test-utils'
+import { flushPromises } from '@vue/test-utils'
 import { afterEach, expect, test, vi } from 'vitest'
 
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
@@ -7,29 +7,7 @@ import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/ren
 import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
-import MainLayout from '../MainLayout.vue'
-
-const mountMainLayoutStubs = () => {
-  return mount(MainLayout, {
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
-      stubs: {
-        AppControlMenus: {
-          template: '<div data-test-stub="app-control-menus" />'
-        },
-        GlobalLanguageSelector: {
-          template: '<div data-test-stub="global-language-selector" />'
-        },
-        GlobalWindowButtons: {
-          template: '<div data-test-stub="global-window-buttons" />'
-        },
-        RouterView: true
-      }
-    }
-  })
-}
+import { mountMainLayoutForVitest } from './mainLayoutVitestMount'
 
 function countKeydownCaptureAdds (spy: { mock: { calls: unknown[][] } }): number {
   return spy.mock.calls.filter((call) => {
@@ -45,7 +23,7 @@ test('Test that MainLayout mounts with header stubs and router-view slot', async
   setFantasiaStorybookCanvasFlag(false)
   vi.stubEnv('MODE', 'spa')
 
-  const w = mountMainLayoutStubs()
+  const w = await mountMainLayoutForVitest()
 
   await flushPromises()
 
@@ -53,6 +31,28 @@ test('Test that MainLayout mounts with header stubs and router-view slot', async
   expect(w.find('[data-test-stub="global-language-selector"]').exists()).toBe(true)
   expect(w.find('[data-test-stub="global-window-buttons"]').exists()).toBe(true)
   expect(w.find('.appHeader').exists()).toBe(true)
+  expect(w.find('[data-test-locator="mainLayout-drawer"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="mainLayout-vitest-leaf"]').exists()).toBe(true)
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * MainLayout / route meta faMainLayoutHideDrawer
+ * Splash and similar routes omit the navigation drawer without affecting header chrome.
+ */
+test('Test that MainLayout hides the drawer when child route meta faMainLayoutHideDrawer is true', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'spa')
+
+  const w = await mountMainLayoutForVitest({
+    childRouteMeta: { faMainLayoutHideDrawer: true }
+  })
+
+  await flushPromises()
+
+  expect(w.find('[data-test-locator="mainLayout-drawer"]').exists()).toBe(false)
+  expect(w.find('[data-test-stub="app-control-menus"]').exists()).toBe(true)
   w.unmount()
   vi.unstubAllEnvs()
 })
@@ -61,11 +61,11 @@ test('Test that MainLayout mounts with header stubs and router-view slot', async
  * MainLayout / onMounted
  * Skips Electron hydration when the Storybook canvas flag is set so the layout matches preview-only runs.
  */
-test('Test that MainLayout hides GlobalLanguageSelector when isFantasiaStorybookCanvas is true', () => {
+test('Test that MainLayout hides GlobalLanguageSelector when isFantasiaStorybookCanvas is true', async () => {
   setFantasiaStorybookCanvasFlag(true)
   vi.stubEnv('MODE', 'electron')
 
-  const w = mountMainLayoutStubs()
+  const w = await mountMainLayoutForVitest()
 
   expect(w.find('[data-test-stub="global-language-selector"]').exists()).toBe(false)
   expect(w.find('[data-test-stub="app-control-menus"]').exists()).toBe(true)
@@ -85,7 +85,7 @@ test('Test that MainLayout skips keybind wiring when MODE is not electron', asyn
   const addSpy = vi.spyOn(window, 'addEventListener')
   const before = countKeydownCaptureAdds(addSpy)
 
-  const w = mountMainLayoutStubs()
+  const w = await mountMainLayoutForVitest()
   await flushPromises()
 
   expect(countKeydownCaptureAdds(addSpy)).toBe(before)
@@ -108,7 +108,7 @@ test('Test that MainLayout hydrates user settings when persisted languageCode is
     languageCode: 'de'
   })
 
-  const w = mountMainLayoutStubs()
+  const w = await mountMainLayoutForVitest()
   await flushPromises()
 
   expect(getSettings).toHaveBeenCalled()
@@ -133,7 +133,7 @@ test('Test that MainLayout does not apply locale when languageCode is unsupporte
     } as unknown as I_faUserSettings
   )
 
-  const w = mountMainLayoutStubs()
+  const w = await mountMainLayoutForVitest()
   await flushPromises()
 
   expect(S_FaUserSettings().settings?.languageCode).toBe('xx-XX')
@@ -156,7 +156,7 @@ test('Test that MainLayout does not apply locale when languageCode is missing af
   delete (snapshot as { languageCode?: string }).languageCode
   getSettings.mockResolvedValueOnce(snapshot)
 
-  const w = mountMainLayoutStubs()
+  const w = await mountMainLayoutForVitest()
   await flushPromises()
 
   expect(
@@ -179,7 +179,7 @@ test('Test that MainLayout skips user settings refresh when faUserSettings bridg
   const before = getSettings.mock.calls.length
   delete (window.faContentBridgeAPIs as { faUserSettings?: unknown }).faUserSettings
 
-  const w = mountMainLayoutStubs()
+  const w = await mountMainLayoutForVitest()
   await flushPromises()
 
   expect(getSettings.mock.calls.length).toBe(before)
@@ -200,7 +200,7 @@ test('Test that MainLayout registers capture keydown listener when faKeybinds br
   const addSpy = vi.spyOn(window, 'addEventListener')
   const before = countKeydownCaptureAdds(addSpy)
 
-  const w = mountMainLayoutStubs()
+  const w = await mountMainLayoutForVitest()
   await flushPromises()
 
   expect(countKeydownCaptureAdds(addSpy)).toBeGreaterThan(before)
@@ -223,7 +223,7 @@ test('Test that MainLayout skips keybind listener when faKeybinds bridge is abse
   const addSpy = vi.spyOn(window, 'addEventListener')
   const before = countKeydownCaptureAdds(addSpy)
 
-  const w = mountMainLayoutStubs()
+  const w = await mountMainLayoutForVitest()
   await flushPromises()
 
   expect(countKeydownCaptureAdds(addSpy)).toBe(before)
@@ -244,7 +244,7 @@ test('Test that MainLayout removes capture keydown listener on unmount after key
 
   const removeSpy = vi.spyOn(window, 'removeEventListener')
 
-  const w = mountMainLayoutStubs()
+  const w = await mountMainLayoutForVitest()
   await flushPromises()
 
   const keydownRemoves = removeSpy.mock.calls.filter((call) => {
@@ -274,7 +274,7 @@ test('Test that MainLayout refreshes program styling when faProgramStyling bridg
   const stylingStore = S_FaProgramStyling()
   const refreshSpy = vi.spyOn(stylingStore, 'refreshProgramStyling').mockResolvedValue(true)
 
-  const w = mountMainLayoutStubs()
+  const w = await mountMainLayoutForVitest()
   await flushPromises()
 
   expect(refreshSpy).toHaveBeenCalledTimes(1)
@@ -298,7 +298,7 @@ test('Test that MainLayout skips program styling refresh when faProgramStyling b
   const prev = window.faContentBridgeAPIs.faProgramStyling
   delete (window.faContentBridgeAPIs as { faProgramStyling?: unknown }).faProgramStyling
 
-  const w = mountMainLayoutStubs()
+  const w = await mountMainLayoutForVitest()
   await flushPromises()
 
   expect(refreshSpy).not.toHaveBeenCalled()

@@ -57,6 +57,7 @@
 <script setup lang="ts">
 
 import { computed, onMounted, ref } from 'vue'
+import { storeToRefs } from 'pinia'
 
 import { i18n } from 'app/i18n/externalFileLoader'
 import type { I_appMenuList } from 'app/types/I_appMenusDataList'
@@ -67,6 +68,7 @@ import { buildDocumentsMenu } from 'app/src/components/globals/AppControlMenus/_
 import { buildHelpInfoMenu } from 'app/src/components/globals/AppControlMenus/_data/helpInfo'
 import { buildProjectMenu } from 'app/src/components/globals/AppControlMenus/_data/project'
 import { buildToolsMenu } from 'app/src/components/globals/AppControlMenus/_data/tools'
+import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 
 import AppControlSingleMenu from 'app/src/components/globals/AppControlSingleMenu/AppControlSingleMenu.vue'
 import DialogMarkdownDocument from 'app/src/components/dialogs/DialogMarkdownDocument/DialogMarkdownDocument.vue'
@@ -97,6 +99,8 @@ withDefaults(
   }
 )
 
+const { hasActiveProject } = storeToRefs(S_FaActiveProject())
+
 /**
  * Testing type that might be happening right now
  */
@@ -112,17 +116,26 @@ onMounted(async () => {
 
 const project = computed((): I_appMenuList => {
   void i18n.global.locale.value
-  return buildProjectMenu()
+  void hasActiveProject.value
+  return buildProjectMenu({
+    hasActiveProject: hasActiveProject.value
+  })
 })
 
 const documents = computed((): I_appMenuList => {
   void i18n.global.locale.value
-  return buildDocumentsMenu()
+  void hasActiveProject.value
+  return buildDocumentsMenu({
+    hasActiveProject: hasActiveProject.value
+  })
 })
 
 const tools = computed((): I_appMenuList => {
   void i18n.global.locale.value
-  return buildToolsMenu()
+  void hasActiveProject.value
+  return buildToolsMenu({
+    hasActiveProject: hasActiveProject.value
+  })
 })
 
 const helpInfo = computed((): I_appMenuList => {

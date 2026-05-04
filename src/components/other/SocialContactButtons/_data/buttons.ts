@@ -49,7 +49,7 @@ export const buttonList: I_socialContactButtonSet = {
   },
   buttonReddit: {
     title: i18n.global.t('socialContactButtons.buttonReddit.title'),
-    label: i18n.global.t('socialContactButtons.buttonReddit.label'),
+    label: '',
     url: 'https://www.reddit.com/r/FantasiaArchive',
     icon: 'reddit_logo.png',
     width: 95,

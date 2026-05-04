@@ -13,6 +13,8 @@
     <GlobalWindowButtons />
 
     <q-drawer
+      v-if="mainLayoutShowDrawer"
+      data-test-locator="mainLayout-drawer"
       show-if-above
       dark
     >
@@ -32,7 +34,8 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 
 import {
   createFaKeybindKeydownHandler,
@@ -46,6 +49,12 @@ import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import AppControlMenus from 'app/src/components/globals/AppControlMenus/AppControlMenus.vue'
 import GlobalLanguageSelector from 'app/src/components/globals/GlobalLanguageSelector/GlobalLanguageSelector.vue'
 import GlobalWindowButtons from 'app/src/components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
+
+const route = useRoute()
+
+const mainLayoutShowDrawer = computed(() => {
+  return route.meta.faMainLayoutHideDrawer !== true
+})
 
 let faKeybindKeydownHandler: ((event: KeyboardEvent) => void) | undefined
 

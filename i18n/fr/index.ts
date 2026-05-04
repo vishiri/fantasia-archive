@@ -32,6 +32,7 @@ import L_unsortedAppTexts from './globalFunctionality/L_unsortedAppTexts'
 
 import L_mainLayout from './layouts/L_mainLayout'
 import L_ErrorNotFound from './pages/L_ErrorNotFound'
+import L_splashPage from './pages/L_splashPage'
 
 export default {
   // GLOBAL - DOCUMENTS
@@ -45,6 +46,9 @@ export default {
 
   // PAGE - ERROR NOT FOUND
   errorNotFound: L_ErrorNotFound,
+
+  // PAGE - SPLASH / WELCOME
+  splashPage: L_splashPage,
 
   // LAYOUT - MAIN
   mainLayout: L_mainLayout,

@@ -13,7 +13,7 @@ test('Test that IndexPage renders a link to the testeee path', async () => {
     history: createMemoryHistory(),
     routes: [
       {
-        path: '/',
+        path: '/home',
         component: IndexPage
       },
       {
@@ -25,7 +25,7 @@ test('Test that IndexPage renders a link to the testeee path', async () => {
     ]
   })
 
-  await router.push('/')
+  await router.push('/home')
   await router.isReady()
 
   const w = mount(IndexPage, {

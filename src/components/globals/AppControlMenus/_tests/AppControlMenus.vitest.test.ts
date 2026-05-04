@@ -5,6 +5,7 @@ import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridg
 
 import * as dialogManagement from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
 
+import { buildDocumentsMenu } from '../_data/documents'
 import { buildHelpInfoMenu } from '../_data/helpInfo'
 import { buildToolsMenu } from '../_data/tools'
 import AppControlMenus from '../AppControlMenus.vue'
@@ -25,13 +26,14 @@ afterEach(() => {
 })
 
 /**
- * helpInfo and tools menu data
+ * helpInfo, documents, and tools menu data
  * Triggers are plain callables wired to dialog and markdown helpers; they should not throw with Vitest Pinia active.
  */
-test('Test that helpInfo and tools menu item triggers run without throwing', () => {
+test('Test that helpInfo, documents, and tools menu item triggers run without throwing', () => {
   const helpInfo = buildHelpInfoMenu()
-  const tools = buildToolsMenu()
-  for (const entry of [...helpInfo.data, ...tools.data]) {
+  const documents = buildDocumentsMenu({ hasActiveProject: true })
+  const tools = buildToolsMenu({ hasActiveProject: true })
+  for (const entry of [...helpInfo.data, ...documents.data, ...tools.data]) {
     if (entry.mode === 'item' && typeof entry.trigger === 'function') {
       expect(() => entry.trigger?.()).not.toThrow()
     }

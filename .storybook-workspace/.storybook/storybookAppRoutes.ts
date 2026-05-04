@@ -1,11 +1,14 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { defineComponent, h } from 'vue'
 
+import 'app/types/vueRouterRouteMetaAugmentation'
+
 import ComponentTestingLayout from '../../src/layouts/ComponentTestingLayout.vue'
 import MainLayout from '../../src/layouts/MainLayout.vue'
 import ComponentTesting from '../../src/pages/ComponentTesting.vue'
 import ErrorNotFound from '../../src/pages/ErrorNotFound.vue'
 import IndexPage from '../../src/pages/IndexPage.vue'
+import SplashPage from '../../src/pages/SplashPage.vue'
 
 /**
  * Minimal outlet so 'MainLayout' can be previewed without loading the full index page.
@@ -28,6 +31,18 @@ export const StoryEmptyOutlet = defineComponent({
 export const STORYBOOK_APP_ROUTES: RouteRecordRaw[] = [
   {
     path: '/',
+    component: MainLayout,
+    children: [{
+      path: '',
+      name: 'storybook-splash',
+      meta: {
+        faMainLayoutHideDrawer: true
+      },
+      component: SplashPage
+    }]
+  },
+  {
+    path: '/home',
     component: MainLayout,
     children: [{
       path: '',
