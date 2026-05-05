@@ -24,6 +24,7 @@
 - **Did you know?** (**info** **Notify**): the dismiss action is **`color: dark`**; **`_qNotify`** uses **dark** foreground on **`.q-notification.bg-info`**, and **`quasarComponentsAdjustments`** applies that **`color`** with **`!important`** so it wins over the same node’s **Quasar** **`text-white`** class and the global **`.text-white`** utility that also uses **!important**, which would otherwise force near-white on a light **info** background.
 - **Welcome screen** and **About** social rows: the **Reddit** chip shows a **Reddit** label beside the icon again. Welcome copy uses heading markup and muted subtitle opacity. **SocialContactButtons** nests **row justify-center** wrappers so Patreon/Ko‑fi and secondary link groups stay horizontally centered on wide layouts.
 - **Welcome screen** — primary actions use wider horizontal padding and **fit-content** width so each **button** sizes to its label instead of stretching the full actions column. **SplashPage** and **SplashControls** read layout from colocated **`styles/_variables.scss`** modules **`@forward`ed** through **`quasar.variables.scss`**, matching semantic **SCSS** token rules used elsewhere under **`src/components/`**.
+- **Welcome screen** title row and the top-bar **language** dropdown suppress selectable text during drags so chrome labels do not pick up accidental highlight.
 
 ## 2.4.11 - Version bump
 

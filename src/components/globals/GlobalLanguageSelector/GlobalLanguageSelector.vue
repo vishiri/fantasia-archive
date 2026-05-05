@@ -198,6 +198,7 @@ async function pickLanguage (code: T_faUserSettingsLanguageCode): Promise<void> 
 :global(.globalLanguageSelector__menu) {
   background-color: $globalLanguageSelector-menu-backgroundColor;
   min-width: $globalLanguageSelector-menu-minWidth;
+  user-select: none;
 }
 
 .globalLanguageSelector {

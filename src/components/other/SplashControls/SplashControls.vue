@@ -89,6 +89,7 @@ const splashTitleWingSrc = resolveVitePublicAssetPath('images/splash/splash_logo
 .splashControls {
   &__header {
     max-width: $splashControls-header-maxWidth;
+    user-select: none;
   }
 
   &__welcome {
