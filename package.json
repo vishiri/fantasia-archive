@@ -111,6 +111,9 @@
     "vue-eslint-parser": "^10.0.0",
     "vue-tsc": "^2.2.0"
   },
+  "resolutions": {
+    "dompurify": "3.4.2"
+  },
   "engines": {
     "node": ">=22.22.0",
     "npm": ">= 6.13.4",

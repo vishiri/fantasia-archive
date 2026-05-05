@@ -25,6 +25,7 @@
 - **Welcome screen** and **About** social rows: the **Reddit** chip shows a **Reddit** label beside the icon again. Welcome copy uses heading markup and muted subtitle opacity. **SocialContactButtons** nests **row justify-center** wrappers so Patreon/Ko‑fi and secondary link groups stay horizontally centered on wide layouts.
 - **Welcome screen** — primary actions use wider horizontal padding and **fit-content** width so each **button** sizes to its label instead of stretching the full actions column. **SplashPage** and **SplashControls** read layout from colocated **`styles/_variables.scss`** modules **`@forward`ed** through **`quasar.variables.scss`**, matching semantic **SCSS** token rules used elsewhere under **`src/components/`**.
 - **Welcome screen** title row and the top-bar **language** dropdown suppress selectable text during drags so chrome labels do not pick up accidental highlight.
+- **Dependencies**: **dompurify** (pulled in by **Monaco**) is pinned to **3.4.2** with a **Yarn** **resolutions** entry so the editor stack tracks a patched **3.x** sanitization release instead of an older transitive pin.
 
 ## 2.4.11 - Version bump
 
