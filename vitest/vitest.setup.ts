@@ -141,6 +141,9 @@ function resetFaVitestRendererHarness (): void {
       disposeImportSession: vi.fn(async () => undefined),
       exportToFile: vi.fn(async () => ({ outcome: 'canceled' as const })),
       prepareImport: vi.fn(async () => ({ outcome: 'canceled' as const }))
+    },
+    projectManagement: {
+      createProject: vi.fn(async () => ({ outcome: 'canceled' as const }))
     }
   }
 }

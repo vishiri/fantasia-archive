@@ -16,6 +16,7 @@ import { faKeybindsAPI } from 'app/src-electron/contentBridgeAPIs/faKeybindsAPI'
 import { faProgramStylingAPI } from 'app/src-electron/contentBridgeAPIs/faProgramStylingAPI'
 import { faProgramConfigAPI } from 'app/src-electron/contentBridgeAPIs/faProgramConfigAPI'
 import { faUserSettingsAPI } from './contentBridgeAPIs/faUserSettingsAPI'
+import { projectManagementAPI } from 'app/src-electron/contentBridgeAPIs/projectManagementAPI'
 
 /*
   List of APIs to expose to the renderer process.
@@ -31,7 +32,8 @@ const apiObject = {
   faKeybinds: { ...faKeybindsAPI },
   faProgramStyling: { ...faProgramStylingAPI },
   faUserSettings: { ...faUserSettingsAPI },
-  faProgramConfig: { ...faProgramConfigAPI }
+  faProgramConfig: { ...faProgramConfigAPI },
+  projectManagement: { ...projectManagementAPI }
 }
 
 contextBridge.exposeInMainWorld('faContentBridgeAPIs', apiObject)

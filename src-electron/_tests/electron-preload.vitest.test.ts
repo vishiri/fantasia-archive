@@ -39,7 +39,8 @@ test('Test that electron preload exposes faContentBridgeAPIs with expected API k
       'faProgramConfig',
       'faProgramStyling',
       'faUserSettings',
-      'faWindowControl'
+      'faWindowControl',
+      'projectManagement'
     ].sort()
   )
 

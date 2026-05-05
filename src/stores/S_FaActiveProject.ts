@@ -24,9 +24,34 @@ export const S_FaActiveProject = defineStore('S_FaActiveProject', () => {
     activeProject.value = null
   }
 
+  async function createProjectFromUserInput (projectName: string): Promise<'created' | 'canceled'> {
+    const api = window.faContentBridgeAPIs?.projectManagement
+    if (api === undefined) {
+      throw new Error('Project management is not available in this environment.')
+    }
+    const result = await api.createProject({ projectName })
+    if (result.outcome === 'canceled') {
+      return 'canceled'
+    }
+    if (result.outcome === 'error') {
+      throw new Error(result.errorMessage ?? 'Failed to create project.')
+    }
+    const p = result.project
+    if (p === undefined) {
+      throw new Error('Project creation returned no project snapshot.')
+    }
+    activeProject.value = {
+      filePath: p.filePath,
+      id: p.id,
+      name: p.name
+    }
+    return 'created'
+  }
+
   return {
     activeProject,
     clearActiveProject,
+    createProjectFromUserInput,
     hasActiveProject,
     setActiveProject
   }

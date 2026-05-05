@@ -1,3 +1,4 @@
+import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
@@ -6,6 +7,7 @@ import {
   openDialogComponent,
   openDialogMarkdownDocument
 } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
+import { FaActionUserCanceledError } from 'app/src/scripts/actionManager/faActionUserCanceledError'
 import { toggleDevTools } from 'app/src/scripts/appGlobalManagementUI/toggleDevTools'
 import { tipsTricksTriviaNotification } from 'app/src/scripts/appGlobalManagementUI/tipsTricksTriviaNotification'
 import { applyFaUserSettingsLanguageSelection } from 'app/src/scripts/appInternals/rendererAppInternals'
@@ -162,6 +164,19 @@ export async function handleImportProgramConfigApply (
     S_FaKeybinds().refreshKeybinds(),
     S_FaProgramStyling().refreshProgramStyling()
   ])
+}
+
+export async function handleOpenNewProjectSettingsDialog (): Promise<void> {
+  openDialogComponent('NewProjectSettings')
+}
+
+export async function handleCreateNewProject (
+  payload: I_faActionPayloadMap['createNewProject']
+): Promise<void> {
+  const outcome = await S_FaActiveProject().createProjectFromUserInput(payload.projectName)
+  if (outcome === 'canceled') {
+    throw new FaActionUserCanceledError()
+  }
 }
 
 export async function handleShowStartupTipsNotification (): Promise<void> {

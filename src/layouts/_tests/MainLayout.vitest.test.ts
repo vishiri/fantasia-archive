@@ -4,6 +4,7 @@ import { afterEach, expect, test, vi } from 'vitest'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/rendererAppInternals'
+import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
@@ -34,6 +35,26 @@ test('Test that MainLayout mounts with header stubs and router-view slot', async
   expect(w.find('[data-test-locator="mainLayout-drawer"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="mainLayout-vitest-leaf"]').exists()).toBe(true)
   w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * MainLayout / S_FaActiveProject
+ * Header shows the active project display name when one is loaded.
+ */
+test('Test that MainLayout shows active project label when a project is open', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'spa')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\arcovia.faproject',
+    id: 'id-arc',
+    name: 'Arcovia'
+  })
+  const w = await mountMainLayoutForVitest()
+  await flushPromises()
+  expect(w.find('[data-test-locator="mainLayout-activeProjectName"]').text()).toBe('Arcovia')
+  w.unmount()
+  S_FaActiveProject().clearActiveProject()
   vi.unstubAllEnvs()
 })
 

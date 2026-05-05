@@ -1,12 +1,37 @@
-import { expect, test } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
+
+const { runFaActionMock } = vi.hoisted(() => ({
+  runFaActionMock: vi.fn()
+}))
+
+vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
+  runFaAction: runFaActionMock,
+  runFaActionAwait: vi.fn()
+}))
 
 import { buildDocumentsMenu } from '../documents'
 import { buildProjectMenu } from '../project'
 import { buildToolsMenu } from '../tools'
 
+beforeEach(() => {
+  runFaActionMock.mockClear()
+})
+
 /**
  * Menu feed helpers treat `conditions: false` as disabled rows (see AppControlSingleMenu).
  */
+
+/**
+ * Project menu
+ * New project dispatches the open dialog action from the first row trigger.
+ */
+test('Test that buildProjectMenu new project row opens the settings dialog action', () => {
+  const menu = buildProjectMenu({ hasActiveProject: false })
+  const items = menu.data.filter((row) => row.mode === 'item')
+  items[0]!.trigger?.()
+  expect(runFaActionMock).toHaveBeenCalledTimes(1)
+  expect(runFaActionMock).toHaveBeenCalledWith('openNewProjectSettingsDialog', undefined)
+})
 
 /**
  * Project menu

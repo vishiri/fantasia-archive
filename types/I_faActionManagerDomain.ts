@@ -32,7 +32,9 @@ export const FA_ACTION_IDS = [
   'exportProgramConfigPackage',
   'exportProgramConfigSaveResult',
   'importProgramConfigStageResult',
-  'importProgramConfigApply'
+  'importProgramConfigApply',
+  'createNewProject',
+  'openNewProjectSettingsDialog'
 ] as const
 
 /**
@@ -72,6 +74,8 @@ export interface I_faActionPayloadMap {
   openActionMonitorDialog: void
   showStartupTipsNotification: void
   openImportExportProgramConfigDialog: void
+  openNewProjectSettingsDialog: void
+  createNewProject: { projectName: string }
   exportProgramConfigPackage: {
     includeKeybinds: boolean
     includeProgramSettings: boolean

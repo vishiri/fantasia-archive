@@ -6,6 +6,7 @@ export type T_dialogName =
   | 'ActionMonitor'
   | 'ImportExportProgramConfig'
   | 'KeybindSettings'
+  | 'NewProjectSettings'
   | 'ProgramSettings'
   | 'WindowProgramStyling'
   | ''

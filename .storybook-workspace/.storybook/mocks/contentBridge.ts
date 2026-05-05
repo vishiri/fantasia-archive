@@ -87,6 +87,9 @@ const baseBridge = () => ({
       },
       sessionId: 'storybook-import-session'
     })
+  },
+  projectManagement: {
+    createProject: async () => ({ outcome: 'canceled' })
   }
 })
 
@@ -148,6 +151,10 @@ export const setContentBridgeScenario = (
     faProgramConfig: {
       ...nextBridge.faProgramConfig,
       ...(overrides.faProgramConfig ?? {})
+    },
+    projectManagement: {
+      ...nextBridge.projectManagement,
+      ...(overrides.projectManagement ?? {})
     }
   }
 }

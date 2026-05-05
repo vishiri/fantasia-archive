@@ -59,6 +59,7 @@
         outline
         type="button"
         :label="$t('splashPage.newProject')"
+        @click="runFaAction('openNewProjectSettingsDialog', undefined)"
       />
       <q-btn
         class="splashControls__actionBtn text-uppercase"
@@ -73,6 +74,7 @@
 </template>
 
 <script lang="ts" setup>
+import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
 import { resolveVitePublicAssetPath } from 'app/src/scripts/appInternals/rendererAppInternals'
 
 defineOptions({

@@ -14,12 +14,12 @@ description: >-
 - In JSDoc and line comments under src-electron/, follow AGENTS.md code-comment rules (no Markdown emphasis in comments; use single quotes for inline references instead of grave accents).
 - **Preload**: `src-electron/electron-preload.ts` builds `apiObject` and calls `contextBridge.exposeInMainWorld('faContentBridgeAPIs', apiObject)`.
 - **Renderer access**: `window.faContentBridgeAPIs` — typed in `src/globals.d.ts`.
-- **Implementations**: One module per API under `src-electron/contentBridgeAPIs/` (e.g. `faWindowControlAPI.ts`, `appDetailsAPI.ts`, `faKeybindsAPI.ts` for persisted shortcut overrides via **`FA_KEYBINDS_IPC`**).
+- **Implementations**: One module per API under `src-electron/contentBridgeAPIs/` (e.g. `faWindowControlAPI.ts`, `appDetailsAPI.ts`, `faKeybindsAPI.ts` for persisted shortcut overrides via **`FA_KEYBINDS_IPC`**, `projectManagementAPI.ts` for **`.faproject`** creation via **`FA_PROJECT_MANAGEMENT_IPC`**).
 
 ## Main ↔ preload IPC (electron-ipc-bridge)
 
 - **Async first**: Prefer **`ipcRenderer.invoke`** with **`ipcMain.handle`** and Promise-returning methods on `faContentBridgeAPIs`. **Synchronous** **`ipcRenderer.sendSync`** (or other blocking IPC) is **not forbidden** but is a **last resort** — use only when there is no remotely reasonable async alternative; note the exception in a short comment or PR review.
-- **Registry**: `src-electron/electron-ipc-bridge.ts` holds canonical channel strings (`export const` objects, e.g. `FA_DEVTOOLS_IPC`, `FA_USER_SETTINGS_IPC`, `FA_WINDOW_CONTROL_IPC`, `FA_APP_DETAILS_IPC`, `FA_EXTRA_ENV_IPC`). Preload-side code that uses `ipcRenderer.invoke` and main-side `ipcMain.handle` must use these constants — never duplicate string literals across files.
+- **Registry**: `src-electron/electron-ipc-bridge.ts` holds canonical channel strings (`export const` objects, e.g. `FA_DEVTOOLS_IPC`, `FA_USER_SETTINGS_IPC`, `FA_WINDOW_CONTROL_IPC`, `FA_APP_DETAILS_IPC`, `FA_EXTRA_ENV_IPC`, `FA_PROJECT_MANAGEMENT_IPC`). Preload-side code that uses `ipcRenderer.invoke` and main-side `ipcMain.handle` must use these constants — never duplicate string literals across files.
 - **Main registration**: Add or extend a `mainScripts/ipcManagement/register*Ipc.ts` module that wires `ipcMain.handle` with the same constants, and ensure startup invokes that registrar (today `startApp()` in `mainScripts/appManagement.ts` calls the existing registrars).
 - **Preload usage**: Import the matching constant object in the relevant `contentBridgeAPIs/*.ts` module and pass those strings to `ipcRenderer.invoke`.
 

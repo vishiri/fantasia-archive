@@ -10,25 +10,16 @@ const {
   registerFaExternalLinksIpcMock,
   registerFaKeybindsIpcMock,
   registerFaProgramConfigIpcMock,
+  registerFaProjectManagementIpcMock,
   registerFaProgramStylingIpcMock,
   registerFaUserSettingsIpcMock,
   registerFaWindowControlIpcMock,
   appMock,
-  appOnHandlers
+  appOnHandlers,
+  ipcMainHandleMock
 } = vi.hoisted(() => {
   const handlers: Record<string, () => void> = {}
   return {
-    getFaUserSettingsMock: vi.fn(),
-    mainWindowCreationMock: vi.fn(),
-    registerFaAppDetailsIpcMock: vi.fn(),
-    registerFaDevToolsIpcMock: vi.fn(),
-    registerFaExtraEnvIpcMock: vi.fn(),
-    registerFaExternalLinksIpcMock: vi.fn(),
-    registerFaKeybindsIpcMock: vi.fn(),
-    registerFaProgramConfigIpcMock: vi.fn(),
-    registerFaProgramStylingIpcMock: vi.fn(),
-    registerFaUserSettingsIpcMock: vi.fn(),
-    registerFaWindowControlIpcMock: vi.fn(),
     appOnHandlers: handlers,
     appMock: {
       whenReady: vi.fn(() => Promise.resolve()),
@@ -36,7 +27,20 @@ const {
         handlers[eventName] = handler
       }),
       quit: vi.fn()
-    }
+    },
+    getFaUserSettingsMock: vi.fn(),
+    ipcMainHandleMock: vi.fn(),
+    mainWindowCreationMock: vi.fn(),
+    registerFaAppDetailsIpcMock: vi.fn(),
+    registerFaDevToolsIpcMock: vi.fn(),
+    registerFaExtraEnvIpcMock: vi.fn(),
+    registerFaExternalLinksIpcMock: vi.fn(),
+    registerFaKeybindsIpcMock: vi.fn(),
+    registerFaProgramConfigIpcMock: vi.fn(),
+    registerFaProjectManagementIpcMock: vi.fn(),
+    registerFaProgramStylingIpcMock: vi.fn(),
+    registerFaUserSettingsIpcMock: vi.fn(),
+    registerFaWindowControlIpcMock: vi.fn()
   }
 })
 
@@ -73,6 +77,12 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaKeybindsIpc', () =
 vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaProgramConfigIpc', () => {
   return {
     registerFaProgramConfigIpc: registerFaProgramConfigIpcMock
+  }
+})
+
+vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaProjectManagementIpc', () => {
+  return {
+    registerFaProjectManagementIpc: registerFaProjectManagementIpcMock
   }
 })
 
@@ -120,7 +130,10 @@ vi.mock('app/src-electron/mainScripts/keybinds/faKeybindsStore', () => {
 
 vi.mock('electron', () => {
   return {
-    app: appMock
+    app: appMock,
+    ipcMain: {
+      handle: ipcMainHandleMock
+    }
   }
 })
 
@@ -137,9 +150,11 @@ beforeEach(() => {
   registerFaExternalLinksIpcMock.mockReset()
   registerFaKeybindsIpcMock.mockReset()
   registerFaProgramConfigIpcMock.mockReset()
+  registerFaProjectManagementIpcMock.mockReset()
   registerFaProgramStylingIpcMock.mockReset()
   registerFaUserSettingsIpcMock.mockReset()
   registerFaWindowControlIpcMock.mockReset()
+  ipcMainHandleMock.mockReset()
   appMock.whenReady.mockClear()
   appMock.on.mockClear()
   appMock.quit.mockReset()
@@ -159,6 +174,7 @@ test('Test that the electron app properly starts', () => {
   expect(registerFaExternalLinksIpcMock).toHaveBeenCalledOnce()
   expect(registerFaKeybindsIpcMock).toHaveBeenCalledOnce()
   expect(registerFaProgramConfigIpcMock).toHaveBeenCalledOnce()
+  expect(registerFaProjectManagementIpcMock).toHaveBeenCalledOnce()
   expect(registerFaProgramStylingIpcMock).toHaveBeenCalledOnce()
   expect(registerFaUserSettingsIpcMock).toHaveBeenCalledOnce()
   expect(registerFaWindowControlIpcMock).toHaveBeenCalledOnce()

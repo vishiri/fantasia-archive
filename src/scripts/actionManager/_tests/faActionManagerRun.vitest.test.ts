@@ -29,6 +29,7 @@ import {
   awaitSyncQueueDrain,
   FA_ACTION_SYNC_QUEUE_MAX
 } from '../faActionManagerSyncQueue'
+import { FaActionUserCanceledError } from '../faActionUserCanceledError'
 import { runFaAction, runFaActionAwait } from '../faActionManagerRun'
 
 let consoleErrorSpy: ReturnType<typeof vi.spyOn>
@@ -163,6 +164,20 @@ test('Test that runFaActionAwait resolves false on sync failure', async () => {
     buildDef('closeApp', () => { throw new Error('sync boom') }, 'sync')
   )
   await expect(runFaActionAwait('closeApp', undefined)).resolves.toBe(false)
+})
+
+/**
+ * runFaActionAwait
+ * FaActionUserCanceledError resolves false without negative Notify.
+ */
+test('Test that runFaActionAwait resolves false on FaActionUserCanceledError without Notify', async () => {
+  const handler = vi.fn(async () => {
+    await Promise.resolve()
+    throw new FaActionUserCanceledError()
+  })
+  findFaActionDefinitionMock.mockReturnValue(buildDef('toggleDeveloperTools', handler, 'async'))
+  await expect(runFaActionAwait('toggleDeveloperTools', undefined)).resolves.toBe(false)
+  expect(notifyCreateMock).not.toHaveBeenCalled()
 })
 
 /**

@@ -62,3 +62,8 @@ export const FA_PROGRAM_CONFIG_IPC = {
   applyImportAsync: 'fa-program-config-apply-import-async',
   disposeImportSessionAsync: 'fa-program-config-dispose-import-session-async'
 } as const
+
+/** Project database (.faproject) — async invoke/handle. */
+export const FA_PROJECT_MANAGEMENT_IPC = {
+  createProjectAsync: 'fa-project-management-create-project-async'
+} as const

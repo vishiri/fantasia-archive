@@ -5,7 +5,16 @@
       dark
       class="bg-dark appHeader"
     >
-      <AppControlMenus />
+      <div class="row items-center no-wrap full-width">
+        <AppControlMenus class="col-auto" />
+        <div
+          v-if="activeProjectLabel !== null"
+          class="col-auto q-ml-md text-caption fa-text-muted text-no-wrap ellipsis"
+          data-test-locator="mainLayout-activeProjectName"
+        >
+          {{ activeProjectLabel }}
+        </div>
+      </div>
     </q-header>
 
     <GlobalLanguageSelector v-if="!isFantasiaStorybookCanvas()" />
@@ -36,12 +45,14 @@
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { storeToRefs } from 'pinia'
 
 import {
   createFaKeybindKeydownHandler,
   getFaKeybindKeydownContext
 } from 'app/src/scripts/keybinds/faKeybindsGlobalDispatch'
 import { isFantasiaStorybookCanvas } from 'app/src/scripts/appInternals/rendererAppInternals'
+import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
@@ -51,6 +62,16 @@ import GlobalLanguageSelector from 'app/src/components/globals/GlobalLanguageSel
 import GlobalWindowButtons from 'app/src/components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
 
 const route = useRoute()
+
+const { activeProject } = storeToRefs(S_FaActiveProject())
+
+const activeProjectLabel = computed((): string | null => {
+  const n = activeProject.value?.name
+  if (typeof n !== 'string' || n.length === 0) {
+    return null
+  }
+  return n
+})
 
 const mainLayoutShowDrawer = computed(() => {
   return route.meta.faMainLayoutHideDrawer !== true

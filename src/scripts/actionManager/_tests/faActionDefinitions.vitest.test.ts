@@ -7,6 +7,7 @@ import { FA_ACTION_IDS, type T_faActionId } from 'app/types/I_faActionManagerDom
 const {
   applyLanguageMock,
   closeWindowMock,
+  createProjectFromUserInputMock,
   minimizeWindowMock,
   openDialogComponentMock,
   openDialogMarkdownDocumentMock,
@@ -36,6 +37,7 @@ const {
   resizeWindowMock: vi.fn(),
   tipsNotificationMock: vi.fn(),
   toggleDevToolsMock: vi.fn(),
+  createProjectFromUserInputMock: vi.fn(),
   refreshKeybindsMock: vi.fn(async () => undefined),
   refreshProgramStylingMock: vi.fn(async () => undefined),
   refreshSettingsMock: vi.fn(async () => undefined),
@@ -50,6 +52,12 @@ vi.mock('quasar', () => ({
 
 vi.mock('app/i18n/externalFileLoader', () => ({
   i18n: { global: { t: (key: string) => key } }
+}))
+
+vi.mock('app/src/stores/S_FaActiveProject', () => ({
+  S_FaActiveProject: () => ({
+    createProjectFromUserInput: createProjectFromUserInputMock
+  })
 }))
 
 vi.mock('app/src/stores/S_FaKeybinds', () => ({
@@ -91,6 +99,7 @@ vi.mock('app/src/scripts/appInternals/rendererAppInternals', () => ({
 }))
 
 import { FA_ACTION_DEFINITIONS, findFaActionDefinition } from '../faActionDefinitions'
+import { FaActionUserCanceledError } from '../faActionUserCanceledError'
 
 beforeEach(() => {
   applyLanguageMock.mockReset()
@@ -119,6 +128,8 @@ beforeEach(() => {
   refreshProgramStylingMock.mockImplementation(async () => undefined)
   refreshSettingsMock.mockReset()
   refreshSettingsMock.mockImplementation(async () => undefined)
+  createProjectFromUserInputMock.mockReset()
+  createProjectFromUserInputMock.mockImplementation(async () => 'created')
   Object.assign(window, {
     faContentBridgeAPIs: {
       faProgramConfig: {
@@ -254,6 +265,23 @@ test('Test that openActionMonitorDialog handler opens the ActionMonitor dialog',
 test('Test that openImportExportProgramConfigDialog handler opens the ImportExportProgramConfig dialog', () => {
   definitionFor('openImportExportProgramConfigDialog').handler(undefined)
   expect(openDialogComponentMock).toHaveBeenCalledWith('ImportExportProgramConfig')
+})
+
+test('Test that openNewProjectSettingsDialog handler opens the NewProjectSettings dialog', () => {
+  definitionFor('openNewProjectSettingsDialog').handler(undefined)
+  expect(openDialogComponentMock).toHaveBeenCalledWith('NewProjectSettings')
+})
+
+test('Test that createNewProject handler delegates to S_FaActiveProject when creation succeeds', async () => {
+  await (definitionFor('createNewProject').handler({ projectName: 'Realm' }) as Promise<unknown>)
+  expect(createProjectFromUserInputMock).toHaveBeenCalledWith('Realm')
+})
+
+test('Test that createNewProject handler throws FaActionUserCanceledError when creation is canceled', async () => {
+  createProjectFromUserInputMock.mockResolvedValueOnce('canceled')
+  await expect(
+    definitionFor('createNewProject').handler({ projectName: 'x' }) as Promise<unknown>
+  ).rejects.toBeInstanceOf(FaActionUserCanceledError)
 })
 
 test('Test that importProgramConfigApply handler calls applyImport and refreshes stores', async () => {

@@ -4,7 +4,12 @@
  */
 export interface I_faActiveProject {
   /**
-   * Stable identifier for this open project (for example a database id or path-derived key).
+   * Absolute path to the loaded '.faproject' SQLite file on disk.
+   */
+  filePath: string
+
+  /**
+   * Stable identifier for this open project (for example a session id from main).
    */
   id: string
 

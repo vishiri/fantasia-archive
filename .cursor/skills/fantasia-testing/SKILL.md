@@ -100,6 +100,7 @@ Same rules as [vitest-tests.mdc](../../rules/vitest-tests.mdc) (**Vitest coverag
 ### E2E tests
 
 - **Structure**: Same **`test.describe.serial`** / **`beforeAll`** / **`afterAll`** pattern as components; e2e files use **`TEST_ENV: 'e2e'`**, may use numeric **`faFrontendRenderTimer`**, and sometimes **`getByText`** with visible labels — see **`e2e-tests/*.playwright.spec.ts`** in the repo.
+- **New project / `.faproject`**: [checkNewProjectCreation.playwright.spec.ts](../../../e2e-tests/checkNewProjectCreation.playwright.spec.ts) covers welcome **New project** and **Project → New project**. Stage the next file path with **`e2eSetNextProjectCreatePath`** from [`playwrightE2eProjectPaths.ts`](../../../helpers/playwrightHelpers/playwrightE2eProjectPaths.ts) (pairs with **`faProjectManagementE2ePathOverride`** in main). When the welcome screen is visible, use **`getByRole('button', { name: '…', exact: true })`** for the **Project** top menu so Playwright strict mode does not match **New project** or other labels that contain **project**.
 
 - **Command**: `yarn test:e2e`
 - **Execution policy**: run this command in its own terminal invocation; keep E2E output isolated from other command logs.

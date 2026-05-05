@@ -8,6 +8,7 @@ import {
   faMenuSubItem,
   faMenuSubSeparator
 } from 'app/src/components/globals/AppControlMenus/_data/menuDataHelpers'
+import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
 
 // TODO - add functionality for all buttons and conditions
 
@@ -15,7 +16,9 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
   const gate = session.hasActiveProject
 
   return [
-    faMenuItem('appControlMenus.project.items.newProject', 'mdi-plus'),
+    faMenuItem('appControlMenus.project.items.newProject', 'mdi-plus', {
+      trigger: () => runFaAction('openNewProjectSettingsDialog', undefined)
+    }),
     faMenuSeparator(),
     faMenuItem('appControlMenus.project.items.saveProject', 'mdi-package-variant-closed', {
       conditions: gate

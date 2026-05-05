@@ -51,6 +51,7 @@
     <DialogProgramSettings v-if="embedDialogs" />
     <WindowProgramStyling v-if="embedDialogs" />
     <DialogImportExportProgramConfig v-if="embedDialogs" />
+    <DialogNewProjectSettings v-if="embedDialogs" />
   </div>
 </template>
 
@@ -72,6 +73,7 @@ import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 
 import AppControlSingleMenu from 'app/src/components/globals/AppControlSingleMenu/AppControlSingleMenu.vue'
 import DialogMarkdownDocument from 'app/src/components/dialogs/DialogMarkdownDocument/DialogMarkdownDocument.vue'
+import DialogNewProjectSettings from 'app/src/components/dialogs/DialogNewProjectSettings/DialogNewProjectSettings.vue'
 import DialogAboutFantasiaArchive from 'app/src/components/dialogs/DialogAboutFantasiaArchive/DialogAboutFantasiaArchive.vue'
 import DialogActionMonitor from 'app/src/components/dialogs/DialogActionMonitor/DialogActionMonitor.vue'
 import DialogKeybindSettings from 'app/src/components/dialogs/DialogKeybindSettings/DialogKeybindSettings.vue'

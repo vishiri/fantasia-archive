@@ -15,6 +15,7 @@ import {
 } from './faActionManagerHistory'
 import { enqueueSyncAction } from './faActionManagerSyncQueue'
 import { reportFaActionFailure } from './faActionManagerErrorReporting'
+import { FaActionUserCanceledError } from './faActionUserCanceledError'
 import { resolveFaActionManagerStore } from './faActionManagerStoreBridge'
 
 function buildEntry<Id extends T_faActionId> (
@@ -48,6 +49,10 @@ async function dispatchAsyncEntry (
     recordHistoryCompleted(entry.uid, { kind: 'success' }, Date.now())
     return true
   } catch (error) {
+    if (error instanceof FaActionUserCanceledError) {
+      recordHistoryCompleted(entry.uid, { kind: 'success' }, Date.now())
+      return false
+    }
     const failure = reportFaActionFailure(entry, error)
     recordHistoryCompleted(
       entry.uid,

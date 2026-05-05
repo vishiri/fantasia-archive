@@ -11,6 +11,7 @@ import L_DialogActionMonitor from 'app/i18n/en-US/dialogs/L_DialogActionMonitor'
 import L_dialogKeybindSettings from 'app/i18n/en-US/dialogs/L_dialogKeybindSettings'
 import L_importExportProgramConfig from 'app/i18n/en-US/dialogs/L_importExportProgramConfig'
 import L_markdownDocument from 'app/i18n/en-US/dialogs/L_markdownDocument'
+import L_newProjectSettings from 'app/i18n/en-US/dialogs/L_newProjectSettings'
 import L_programSettings from 'app/i18n/en-US/dialogs/L_programSettings'
 import L_programStylingFloating from 'app/i18n/en-US/floatingWindows/L_programStyling'
 import L_faKeybinds from 'app/i18n/en-US/globalFunctionality/L_faKeybinds'
@@ -43,6 +44,7 @@ const defaultMessages: Record<string, unknown> = {
     keybindSettings: L_dialogKeybindSettings,
     importExportProgramConfig: L_importExportProgramConfig,
     markdownDocument: L_markdownDocument,
+    newProjectSettings: L_newProjectSettings,
     programSettings: L_programSettings
   },
   floatingWindows: {

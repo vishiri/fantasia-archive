@@ -1,7 +1,28 @@
 import { mount } from '@vue/test-utils'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
+
+import * as faActionRun from 'app/src/scripts/actionManager/faActionManagerRun'
 
 import SplashControls from '../SplashControls.vue'
+
+/**
+ * SplashControls
+ * New project wires to openNewProjectSettingsDialog.
+ */
+test('Test that splash New project triggers openNewProjectSettingsDialog', async () => {
+  const spy = vi.spyOn(faActionRun, 'runFaAction').mockImplementation(() => undefined)
+  const w = mount(SplashControls, {
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+  await w.get('[data-test-locator="splashPage-btn-new"]').trigger('click')
+  expect(spy).toHaveBeenCalledWith('openNewProjectSettingsDialog', undefined)
+  spy.mockRestore()
+  w.unmount()
+})
 
 /**
  * SplashControls
