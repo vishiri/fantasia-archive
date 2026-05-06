@@ -2,15 +2,6 @@
 
 /* Native element selectors first (alphabetical), then class-based rules (alphabetical). */
 
-.q-item {
-  padding: 14px 16px;
-}
-
-.disabled,
-[disabled] {
-  opacity: 0.35 !important;
-}
-
 body.desktop .q-focusable:focus > .q-focus-helper {
 
   /* Replacement of the overlay (before/after) elements via simple background-color opacity */
@@ -58,10 +49,28 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
   opacity: 1 !important;
 }
 
+.disabled,
+[disabled] {
+  opacity: 0.35 !important;
+}
+
 .fullscreen {
 
   /* Tweak for top bar and other element with z-index between 6000 to 7000 */
   z-index: $qFullscreen-zIndex;
+}
+
+.q-button {
+  -webkit-user-drag: none;
+
+  * {
+    -webkit-user-drag: none;
+
+    &::after,
+    &::before {
+      -webkit-user-drag: none;
+    }
+  }
 }
 
 .q-card {
@@ -107,6 +116,10 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 .q-dialog > .q-dialog__inner > .q-card {
   max-height: calc(100vh - #{$qDialog-card-maxHeightSubtract});
   max-width: $qDialog-card-maxWidth;
+}
+
+.q-item {
+  padding: 14px 16px;
 }
 
 .q-layout {
