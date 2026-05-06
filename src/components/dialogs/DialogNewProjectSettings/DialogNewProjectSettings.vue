@@ -1,7 +1,6 @@
 <template>
   <q-dialog
     v-model="dialogModel"
-    persistent
     :class="['dialogComponent', documentName, 'newProjectSettings']"
     :aria-label="$t('dialogs.newProjectSettings.ariaLabel')"
   >
@@ -18,25 +17,25 @@
           {{ $t('dialogs.newProjectSettings.title') }}
         </h5>
 
-        <q-input
-          v-model="projectName"
-          class="q-mb-sm"
-          color="dark"
-          dark
-          data-test-locator="dialogNewProjectSettings-input-name"
-          filled
-          :label="$t('dialogs.newProjectSettings.nameLabel')"
-          lazy-rules
-          outlined
-          @keyup.enter="void onClickCreate()"
-        />
-
-        <p class="text-caption fa-text-muted q-mb-none">
-          {{ $t('dialogs.newProjectSettings.nameHint') }}
-        </p>
+        <div class="dialogNewProjectSettings__nameInput q-mb-sm">
+          <q-input
+            v-model="projectName"
+            color="primary-bright"
+            dark
+            data-test-locator="dialogNewProjectSettings-input-name"
+            filled
+            :label="$t('dialogs.newProjectSettings.nameLabel')"
+            lazy-rules
+            outlined
+            @keyup.enter="void onClickCreate()"
+          />
+        </div>
       </q-card-section>
 
-      <q-card-actions align="around">
+      <q-card-actions
+        align="around"
+        class="q-card__actions q-mx-xl q-mt-lg q-mb-md q-card__actions--horiz row justify-around"
+      >
         <q-btn
           v-close-popup
           flat
@@ -92,6 +91,12 @@ registerComponentDialogStackGuard(dialogModel)
 
 const documentName = ref('')
 
+watch(dialogModel, (isOpen) => {
+  if (isOpen) {
+    projectName.value = ''
+  }
+})
+
 const createDisabled = computed(() => {
   return projectName.value.trim().length === 0
 })
@@ -103,7 +108,6 @@ function openDialog (input: T_dialogName): void {
 
 function closeDialog (): void {
   dialogModel.value = false
-  projectName.value = ''
 }
 
 async function onClickCreate (): Promise<void> {
@@ -134,15 +138,17 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-.newProjectSettings {
-  .dialogComponent__wrapper {
-    max-width: $dialogNewProjectSettings-wrapper-maxWidth;
-    width: $dialogNewProjectSettings-wrapper-width;
-  }
+.q-dialog.dialogComponent.newProjectSettings > .q-dialog__inner > .q-card.dialogComponent__wrapper {
+  width: $dialogNewProjectSettings-wrapper-width;
 
   .dialogComponent__content {
     max-height: calc(100vh - #{$dialogNewProjectSettings-content-maxHeightSubtract});
     overflow: auto;
+  }
+
+  .dialogNewProjectSettings__nameInput {
+    margin: 0 auto;
+    max-width: $dialogNewProjectSettings-nameInput-maxWidth;
   }
 }
 </style>

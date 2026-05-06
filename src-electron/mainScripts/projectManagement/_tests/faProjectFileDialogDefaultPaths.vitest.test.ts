@@ -1,3 +1,5 @@
+import path from 'node:path'
+
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 const { getPathMock } = vi.hoisted(() => {
@@ -48,5 +50,5 @@ test('faProjectSaveDialogDefaultDirectory uses userData when TEST_ENV is e2e', (
 })
 
 test('getFaProjectSaveDefaultPath joins directory and basename', () => {
-  expect(getFaProjectSaveDefaultPath('a.faproject')).toBe('D:\\dl\\a.faproject')
+  expect(getFaProjectSaveDefaultPath('a.faproject')).toBe(path.join('D:\\dl', 'a.faproject'))
 })

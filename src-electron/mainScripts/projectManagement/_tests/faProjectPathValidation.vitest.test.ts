@@ -17,11 +17,8 @@ test('pathLooksLikeFaProjectFile accepts absolute faproject paths', () => {
   expect(pathLooksLikeFaProjectFile(`D:${path.sep}x${path.sep}y.FAPROJECT`)).toBe(true)
 })
 
-test('pathLooksLikeFaProjectFile normalizes forward slashes before checking absolute', () => {
-  const posixStyle = 'D:/x/y.faproject'
-  if (path.isAbsolute(posixStyle)) {
-    expect(pathLooksLikeFaProjectFile(posixStyle)).toBe(true)
-  }
+test('pathLooksLikeFaProjectFile accepts drive-letter paths with forward slashes on any host', () => {
+  expect(pathLooksLikeFaProjectFile('D:/x/y.faproject')).toBe(true)
 })
 
 test('ensureFaProjectExtension appends extension when missing', () => {

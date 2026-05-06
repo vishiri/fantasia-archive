@@ -14,6 +14,18 @@ vi.mock('../scripts/dialogNewProjectSettingsSubmit', () => {
 
 import { runDialogNewProjectSettingsCreate } from '../scripts/dialogNewProjectSettingsSubmit'
 
+const dialogNewProjectSettingsQDialogStub = defineComponent({
+  name: 'QDialog',
+  props: {
+    modelValue: {
+      type: Boolean,
+      default: false
+    }
+  },
+  emits: ['update:modelValue'],
+  template: '<div class="q-dialog-stub"><div v-show="modelValue" class="q-dialog-stub-inner"><slot /></div></div>'
+})
+
 const dialogNewProjectSettingsQInputStub = defineComponent({
   name: 'QInput',
   props: {
@@ -46,6 +58,7 @@ const dialogNewProjectSettingsQBtnStub = defineComponent({
 
 const dialogNewProjectSettingsStubs = {
   QBtn: dialogNewProjectSettingsQBtnStub,
+  QDialog: dialogNewProjectSettingsQDialogStub,
   QInput: dialogNewProjectSettingsQInputStub
 }
 
@@ -71,6 +84,35 @@ test('Test that DialogNewProjectSettings disables create for blank name', async 
   await w.get('.dialog-new-project-settings-qinput-mock').setValue('World')
   await flushPromises()
   expect((create.element as HTMLButtonElement).disabled).toBe(false)
+  w.unmount()
+})
+
+/**
+ * DialogNewProjectSettings
+ * Closing without create leaves no stale text on the next open because the field resets whenever the sheet opens.
+ */
+test('Test that DialogNewProjectSettings clears project name when dialog reopens', async () => {
+  const w = mount(DialogNewProjectSettings, {
+    global: {
+      components: { ...dialogNewProjectSettingsStubs },
+      mocks: {
+        $t: (k: string) => k
+      }
+    },
+    props: {
+      directInput: 'NewProjectSettings'
+    }
+  })
+  await flushPromises()
+  const inputSel = '.dialog-new-project-settings-qinput-mock'
+  await w.get(inputSel).setValue('partial')
+  await flushPromises()
+  const dlg = w.findComponent({ name: 'QDialog' })
+  await dlg.vm.$emit('update:modelValue', false)
+  await flushPromises()
+  await dlg.vm.$emit('update:modelValue', true)
+  await flushPromises()
+  expect((w.get(inputSel).element as HTMLInputElement).value).toBe('')
   w.unmount()
 })
 

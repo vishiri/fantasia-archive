@@ -3,17 +3,22 @@ import path from 'node:path'
 import { FA_PROJECT_FILE_EXTENSION } from 'app/src-electron/shared/faProjectConstants'
 
 /**
- * True when path is non-empty, looks like an absolute path, and ends with .faproject (case-insensitive).
+ * True when path is non-empty, looks like an absolute path on the current OS or like a Windows
+ * absolute path (drive letter or UNC), and ends with .faproject (case-insensitive).
  */
 export function pathLooksLikeFaProjectFile (filePath: string): boolean {
   if (typeof filePath !== 'string' || filePath.length === 0) {
     return false
   }
-  const normalized = filePath.replaceAll('/', path.sep)
-  if (!path.isAbsolute(normalized)) {
+  const nativeNormalized = filePath.replaceAll('/', path.sep)
+  const looksAbsolute =
+    path.isAbsolute(nativeNormalized) ||
+    path.win32.isAbsolute(filePath)
+  if (!looksAbsolute) {
     return false
   }
-  return normalized.toLowerCase().endsWith(`.${FA_PROJECT_FILE_EXTENSION}`)
+  const forSuffixCheck = filePath.replaceAll('\\', '/')
+  return forSuffixCheck.toLowerCase().endsWith(`.${FA_PROJECT_FILE_EXTENSION}`)
 }
 
 /**

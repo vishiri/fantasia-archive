@@ -1,5 +1,4 @@
 <template>
-  <!-- Dialog wrapper: persistent blocks backdrop and Escape from closing; only actions dismiss. -->
   <q-dialog
     v-model="dialogModel"
     persistent
