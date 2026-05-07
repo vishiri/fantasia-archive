@@ -16,10 +16,9 @@ export function assignAppWindowRefForTesting (next: BrowserWindow | undefined): 
 
 /**
  * Directory of the compiled main-process bundle file (or this module's output folder).
- * Do not walk up an extra level for preload/icon paths: after bundling, 'import.meta.url'
- * points at the shared electron main chunk (e.g. dist/electron/electron-main.js), not at
- * the original 'windowManagement/' source folder — an extra '..' would miss 'electron-preload'
- * and break 'contextBridge' ('window.faContentBridgeAPIs'), so component tests stay on '/'.
+ * After bundling, 'import.meta.url' points at the shared electron main chunk, not at
+ * the original 'windowManagement/' source folder. Keep the fallback preload path aligned
+ * with Quasar's production output so Playwright can launch the un-packaged app directly.
  */
 const currentDir = fileURLToPath(new URL('.', import.meta.url))
 
@@ -53,8 +52,8 @@ export const preventSecondaryAppInstance = (appWindow: BrowserWindow | undefined
 }
 
 function resolvePreloadPath (): string {
-  const folder = process.env.QUASAR_ELECTRON_PRELOAD_FOLDER ?? '..'
-  const ext = process.env.QUASAR_ELECTRON_PRELOAD_EXTENSION ?? '.js'
+  const folder = process.env.QUASAR_ELECTRON_PRELOAD_FOLDER ?? 'preload'
+  const ext = process.env.QUASAR_ELECTRON_PRELOAD_EXTENSION ?? '.cjs'
   return path.resolve(
     currentDir,
     path.join(folder, `electron-preload${ext}`)

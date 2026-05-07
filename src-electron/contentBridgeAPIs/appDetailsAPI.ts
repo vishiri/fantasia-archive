@@ -7,13 +7,11 @@ let versionPromise: Promise<string> | null = null
 
 function loadProjectVersion (): Promise<string> {
   return (async () => {
-    try {
-      const v = await ipcRenderer.invoke(FA_APP_DETAILS_IPC.getVersionAsync) as unknown
+    const v = await ipcRenderer
+      .invoke(FA_APP_DETAILS_IPC.getVersionAsync)
+      .catch(() => '')
 
-      return typeof v === 'string' ? v : ''
-    } catch {
-      return ''
-    }
+    return typeof v === 'string' ? v : ''
   })()
 }
 

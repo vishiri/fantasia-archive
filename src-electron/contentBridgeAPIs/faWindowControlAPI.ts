@@ -5,52 +5,39 @@ import type { I_faWindowControlAPI } from 'app/types/I_faElectronRendererBridgeA
 
 export const faWindowControlAPI: I_faWindowControlAPI = {
   async checkWindowMaximized () {
-    try {
-      const v = await ipcRenderer.invoke(FA_WINDOW_CONTROL_IPC.checkMaximizedAsync)
-
-      return v === true
-    } catch {
-      return false
-    }
+    const maximized = await ipcRenderer
+      .invoke(FA_WINDOW_CONTROL_IPC.checkMaximizedAsync)
+      .catch(() => false)
+    return maximized === true
   },
 
   async minimizeWindow () {
-    try {
-      await ipcRenderer.invoke(FA_WINDOW_CONTROL_IPC.minimizeAsync)
-    } catch {
-      // no-op
-    }
+    await ipcRenderer
+      .invoke(FA_WINDOW_CONTROL_IPC.minimizeAsync)
+      .catch(() => undefined)
   },
 
   async maximizeWindow () {
-    try {
-      await ipcRenderer.invoke(FA_WINDOW_CONTROL_IPC.maximizeAsync)
-    } catch {
-      // no-op
-    }
+    await ipcRenderer
+      .invoke(FA_WINDOW_CONTROL_IPC.maximizeAsync)
+      .catch(() => undefined)
   },
 
   async resizeWindow () {
-    try {
-      await ipcRenderer.invoke(FA_WINDOW_CONTROL_IPC.resizeToggleAsync)
-    } catch {
-      // no-op
-    }
+    await ipcRenderer
+      .invoke(FA_WINDOW_CONTROL_IPC.resizeToggleAsync)
+      .catch(() => undefined)
   },
 
   async closeWindow () {
-    try {
-      await ipcRenderer.invoke(FA_WINDOW_CONTROL_IPC.closeAsync)
-    } catch {
-      // no-op
-    }
+    await ipcRenderer
+      .invoke(FA_WINDOW_CONTROL_IPC.closeAsync)
+      .catch(() => undefined)
   },
 
   async refreshWebContents () {
-    try {
-      await ipcRenderer.invoke(FA_WINDOW_CONTROL_IPC.refreshWebContentsAsync)
-    } catch {
-      // no-op
-    }
+    await ipcRenderer
+      .invoke(FA_WINDOW_CONTROL_IPC.refreshWebContentsAsync)
+      .catch(() => undefined)
   }
 }

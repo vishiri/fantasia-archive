@@ -5,36 +5,27 @@ import type { I_faDevToolsControl } from 'app/types/I_faElectronRendererBridgeAP
 
 export const faDevToolsControlAPI: I_faDevToolsControl = {
   async checkDevToolsStatus () {
-    try {
-      const v = await ipcRenderer.invoke(FA_DEVTOOLS_IPC.statusAsync)
-
-      return v === true
-    } catch {
-      return false
-    }
+    const status = await ipcRenderer
+      .invoke(FA_DEVTOOLS_IPC.statusAsync)
+      .catch(() => false)
+    return status === true
   },
 
   async toggleDevTools () {
-    try {
-      await ipcRenderer.invoke(FA_DEVTOOLS_IPC.toggleAsync)
-    } catch {
-      // no-op
-    }
+    await ipcRenderer
+      .invoke(FA_DEVTOOLS_IPC.toggleAsync)
+      .catch(() => undefined)
   },
 
   async openDevTools () {
-    try {
-      await ipcRenderer.invoke(FA_DEVTOOLS_IPC.openAsync)
-    } catch {
-      // no-op
-    }
+    await ipcRenderer
+      .invoke(FA_DEVTOOLS_IPC.openAsync)
+      .catch(() => undefined)
   },
 
   async closeDevTools () {
-    try {
-      await ipcRenderer.invoke(FA_DEVTOOLS_IPC.closeAsync)
-    } catch {
-      // no-op
-    }
+    await ipcRenderer
+      .invoke(FA_DEVTOOLS_IPC.closeAsync)
+      .catch(() => undefined)
   }
 }

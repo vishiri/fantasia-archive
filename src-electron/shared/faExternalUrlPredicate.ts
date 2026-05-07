@@ -3,7 +3,7 @@
  * does not target the local machine. Hostnames come from WHATWG 'URL' after normalization
  * (percent-decoding, IPv6 compression, IPv4-mapped IPv6 in hex hextets).
  *
- * No Node.js built-in imports: this module is bundled into sandboxed preload as well as main.
+ * No Node.js built-in or package imports: this module is bundled into sandboxed preload as well as main.
  */
 const ALLOWED_PROTOCOLS = new Set([
   'http:',
@@ -166,13 +166,11 @@ export function checkIfExternalUrl (url: string): boolean {
     return false
   }
 
-  let parsed: URL
-
-  try {
-    parsed = new URL(trimmed)
-  } catch {
+  if (!URL.canParse(trimmed)) {
     return false
   }
 
-  return isSafeExternalHttpUrl(parsed.protocol, parsed.hostname)
+  const parsedUrl = new URL(trimmed)
+
+  return isSafeExternalHttpUrl(parsedUrl.protocol, parsedUrl.hostname)
 }

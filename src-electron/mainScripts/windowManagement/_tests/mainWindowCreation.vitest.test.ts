@@ -339,7 +339,7 @@ test('Test that production window uses the app:// scheme for index.html', async 
 
 /**
  * mainWindowCreation
- * QUASAR_ELECTRON_PRELOAD_FOLDER and QUASAR_ELECTRON_PRELOAD_EXTENSION default to parent folder and .js when unset.
+ * QUASAR_ELECTRON_PRELOAD_FOLDER and QUASAR_ELECTRON_PRELOAD_EXTENSION default to Quasar's production preload path when unset.
  */
 test('Test that main window preload path uses Quasar defaults when preload env vars are missing', async () => {
   const browserWindowInstance = {
@@ -368,7 +368,7 @@ test('Test that main window preload path uses Quasar defaults when preload env v
   const windowOpts = BrowserWindowMock.mock.calls[0][0] as {
     webPreferences: { preload: string }
   }
-  expect(windowOpts.webPreferences.preload).toMatch(/electron-preload\.js$/)
+  expect(windowOpts.webPreferences.preload).toMatch(/preload[\\/]electron-preload\.cjs$/)
 })
 
 /**

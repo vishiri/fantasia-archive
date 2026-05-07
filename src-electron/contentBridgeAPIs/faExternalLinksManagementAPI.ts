@@ -11,7 +11,9 @@ export const faExternalLinksManagerAPI: I_faExternalLinksManagerAPI = {
   },
 
   openExternal (url: string) {
-    void ipcRenderer.invoke(FA_EXTERNAL_LINKS_IPC.openExternalAsync, url).catch(() => {})
+    void ipcRenderer
+      .invoke(FA_EXTERNAL_LINKS_IPC.openExternalAsync, url)
+      .catch(() => undefined)
   }
 
 }
