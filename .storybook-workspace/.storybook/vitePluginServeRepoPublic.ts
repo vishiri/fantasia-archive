@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import type { Connect, Plugin } from 'vite'
+import { Result } from 'neverthrow'
 
 const mimeByExt: Record<string, string> = {
   '.png': 'image/png',
@@ -41,52 +42,56 @@ export const vitePluginServeRepoPublic = (absolutePublicDir: string): Plugin => 
     const root = path.normalize(path.resolve(absolutePublicDir))
 
     const handler: Connect.NextHandleFunction = (req, res, next) => {
-      try {
-        const rawUrl = req.url?.split('?')[0]
+      const routed = Result.fromThrowable(
+        (): void => {
+          const rawUrl = req.url?.split('?')[0]
 
-        if (rawUrl === undefined || rawUrl === '' || rawUrl === '/') {
-          next()
+          if (rawUrl === undefined || rawUrl === '' || rawUrl === '/') {
+            next()
 
-          return
-        }
+            return
+          }
 
-        if (!rawUrl.startsWith('/')) {
-          next()
+          if (!rawUrl.startsWith('/')) {
+            next()
 
-          return
-        }
+            return
+          }
 
-        const pathPart = decodeURIComponent(rawUrl)
+          const pathPart = decodeURIComponent(rawUrl)
 
-        if (pathPart.includes('\0')) {
-          next()
+          if (pathPart.includes('\0')) {
+            next()
 
-          return
-        }
+            return
+          }
 
-        const rel = pathPart.replace(/^\/+/, '')
-        const candidate = path.normalize(path.join(root, rel))
+          const rel = pathPart.replace(/^\/+/, '')
+          const candidate = path.normalize(path.join(root, rel))
 
-        if (!isPathInsideDir(candidate, root)) {
-          next()
+          if (!isPathInsideDir(candidate, root)) {
+            next()
 
-          return
-        }
+            return
+          }
 
-        if (!fs.existsSync(candidate) || !fs.statSync(candidate).isFile()) {
-          next()
+          if (!fs.existsSync(candidate) || !fs.statSync(candidate).isFile()) {
+            next()
 
-          return
-        }
+            return
+          }
 
-        const ext = path.extname(candidate).toLowerCase()
+          const ext = path.extname(candidate).toLowerCase()
 
-        res.statusCode = 200
-        res.setHeader('Content-Type', mimeByExt[ext] ?? 'application/octet-stream')
-        fs.createReadStream(candidate)
-          .on('error', () => next())
-          .pipe(res)
-      } catch {
+          res.statusCode = 200
+          res.setHeader('Content-Type', mimeByExt[ext] ?? 'application/octet-stream')
+          fs.createReadStream(candidate)
+            .on('error', () => next())
+            .pipe(res)
+        },
+        (): undefined => undefined
+      )()
+      if (routed.isErr()) {
         next()
       }
     }
