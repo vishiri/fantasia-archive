@@ -1,4 +1,4 @@
-import { beforeEach, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 const runAppStartupRoutingMock = vi.hoisted(() => {
   return vi.fn()
@@ -23,6 +23,11 @@ import faRoutingEnvBoot from '../faRoutingEnv'
 
 beforeEach(() => {
   runAppStartupRoutingMock.mockReset()
+})
+
+afterEach(() => {
+  vi.useRealTimers()
+  vi.unstubAllEnvs()
 })
 
 const routerStub = {
@@ -61,6 +66,49 @@ test('Test that faRoutingEnv boot awaits getSnapshot and calls runAppStartupRout
     routerStub,
     'components',
     'MyComp'
+  )
+})
+
+/**
+ * faRoutingEnv boot
+ * Polls briefly in Electron mode when the preload bridge appears just after boot starts.
+ */
+test('Test that faRoutingEnv boot waits for delayed Electron preload bridge', async () => {
+  vi.useFakeTimers()
+  vi.stubEnv('MODE', 'electron')
+
+  const getSnapshot = vi.fn(async () => ({
+    COMPONENT_NAME: 'DelayedComp',
+    COMPONENT_PROPS: false,
+    ELECTRON_MAIN_FILEPATH: '/x',
+    FA_FRONTEND_RENDER_TIMER: 0,
+    TEST_ENV: 'components'
+  }))
+
+  const stubWindow = {} as Window & typeof globalThis
+
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: stubWindow
+  })
+
+  const boot = faRoutingEnvBoot as unknown as (args: { router: typeof routerStub }) => Promise<void>
+  const bootPromise = boot({ router: routerStub })
+
+  stubWindow.faContentBridgeAPIs = {
+    extraEnvVariables: {
+      getSnapshot
+    }
+  } as unknown as typeof stubWindow.faContentBridgeAPIs
+
+  await vi.advanceTimersByTimeAsync(50)
+  await bootPromise
+
+  expect(getSnapshot).toHaveBeenCalledOnce()
+  expect(runAppStartupRoutingMock).toHaveBeenCalledWith(
+    routerStub,
+    'components',
+    'DelayedComp'
   )
 })
 

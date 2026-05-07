@@ -74,7 +74,7 @@ const activeProjectLabel = computed((): string | null => {
 })
 
 const mainLayoutShowDrawer = computed(() => {
-  return route.meta.faMainLayoutHideDrawer !== true
+  return route?.meta?.faMainLayoutHideDrawer !== true
 })
 
 let faKeybindKeydownHandler: ((event: KeyboardEvent) => void) | undefined
