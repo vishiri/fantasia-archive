@@ -6,6 +6,7 @@ import {
   FA_ELECTRON_MAIN_JS_PATH,
   FA_FRONTEND_RENDER_TIMER
 } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
+import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
   getFaPlaywrightElectronRecordVideoPartial,
@@ -16,6 +17,7 @@ import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers
 /**
  * Extra env settings to trigger component testing via Playwright
  */
+import { waitForFaRendererContentBridgeApis } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
 const extraEnvSettings = {
   TEST_ENV: 'components',
   COMPONENT_NAME: 'FantasiaMascotImage',
@@ -53,11 +55,12 @@ test.describe.serial('Fantasia mascot image (default props)', () => {
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({})
     resetFaPlaywrightIsolatedUserData()
     electronApp = await electron.launch({
-      env: extraEnvSettings,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaRendererContentBridgeApis(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
@@ -110,11 +113,12 @@ test.describe.serial('Fantasia mascot image (explicit dimensions)', () => {
     })
     resetFaPlaywrightIsolatedUserData()
     electronApp = await electron.launch({
-      env: extraEnvSettings,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaRendererContentBridgeApis(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
@@ -152,11 +156,12 @@ test.describe.serial('Fantasia mascot image (fixed fantasiaImage id)', () => {
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ fantasiaImage: testString })
     resetFaPlaywrightIsolatedUserData()
     electronApp = await electron.launch({
-      env: extraEnvSettings,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaRendererContentBridgeApis(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
   })

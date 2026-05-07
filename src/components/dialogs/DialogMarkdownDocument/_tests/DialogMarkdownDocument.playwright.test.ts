@@ -6,6 +6,7 @@ import {
   FA_ELECTRON_MAIN_JS_PATH,
   FA_FRONTEND_RENDER_TIMER
 } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
+import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
   getFaPlaywrightElectronRecordVideoPartial,
@@ -17,6 +18,7 @@ import type { T_documentName } from 'app/types/T_appDialogsAndDocuments'
 /**
  * Extra env settings to trigger component testing via Playwright
  */
+import { waitForFaRendererContentBridgeApis } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
 const extraEnvSettings = {
   TEST_ENV: 'components',
   COMPONENT_NAME: 'DialogMarkdownDocument',
@@ -56,11 +58,12 @@ test.describe.serial('Dialog markdown document (license)', () => {
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: licenseDocumentDirectInput })
     resetFaPlaywrightIsolatedUserData()
     electronApp = await electron.launch({
-      env: extraEnvSettings,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaRendererContentBridgeApis(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
@@ -109,11 +112,12 @@ test.describe.serial('Dialog markdown document (changeLog)', () => {
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: changeLogDocumentDirectInput })
     resetFaPlaywrightIsolatedUserData()
     electronApp = await electron.launch({
-      env: extraEnvSettings,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaRendererContentBridgeApis(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
   })

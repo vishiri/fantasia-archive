@@ -49,6 +49,16 @@ test('e2eSetNextProjectCreatePath evaluate no-ops when setter is absent on globa
   await e2eSetNextProjectCreatePath(electronApp, 'orphan.faproject')
 })
 
+test('tryUnlinkE2eFaprojectFixture swallows unlinkSync errors', () => {
+  const spy = vi.spyOn(fs, 'unlinkSync').mockImplementation(() => {
+    throw new Error('boom')
+  })
+  expect(() => {
+    tryUnlinkE2eFaprojectFixture('x.faproject')
+  }).not.toThrow()
+  spy.mockRestore()
+})
+
 test('tryUnlinkE2eFaprojectFixture removes file under isolated userData', () => {
   const spy = vi.spyOn(fs, 'unlinkSync').mockImplementation(() => undefined)
   tryUnlinkE2eFaprojectFixture('x.faproject')

@@ -6,12 +6,14 @@ import {
   FA_ELECTRON_MAIN_JS_PATH,
   FA_FRONTEND_RENDER_TIMER
 } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
+import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
   getFaPlaywrightElectronRecordVideoPartial,
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
+import { waitForFaRendererContentBridgeApis } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
 import actionMonitorMessages from 'app/i18n/en-US/dialogs/L_DialogActionMonitor'
 import type { I_faActionHistoryEntry } from 'app/types/I_faActionManagerDomain'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
@@ -104,11 +106,12 @@ test.describe.serial('Action monitor dialog', () => {
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: actionMonitorDirectInput })
     resetFaPlaywrightIsolatedUserData()
     electronApp = await electron.launch({
-      env: extraEnvSettings,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaRendererContentBridgeApis(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
@@ -173,11 +176,12 @@ test.describe.serial('Action monitor dialog (fixture history)', () => {
     suiteTestInfo = testInfo
     resetFaPlaywrightIsolatedUserData()
     electronApp = await electron.launch({
-      env: extraEnvSettingsFixture,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettingsFixture),
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaRendererContentBridgeApis(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
   })

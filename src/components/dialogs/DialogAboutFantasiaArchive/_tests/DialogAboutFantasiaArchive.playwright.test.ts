@@ -6,13 +6,15 @@ import {
   FA_ELECTRON_MAIN_JS_PATH,
   FA_FRONTEND_RENDER_TIMER
 } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
+import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
   getFaPlaywrightElectronRecordVideoPartial,
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
-import L_socialContactButtons from 'app/i18n/en-US/components/other/SocialContactButtons/L_socialContactButtons'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
+import { waitForFaRendererContentBridgeApis } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
+import L_socialContactButtons from 'app/i18n/en-US/components/other/SocialContactButtons/L_socialContactButtons'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 
 /**
@@ -58,11 +60,12 @@ test.describe.serial('About Fantasia Archive dialog', () => {
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: aboutDialogDirectInput })
     resetFaPlaywrightIsolatedUserData()
     electronApp = await electron.launch({
-      env: extraEnvSettings,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaRendererContentBridgeApis(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
   })

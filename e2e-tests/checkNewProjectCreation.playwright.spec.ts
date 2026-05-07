@@ -6,6 +6,7 @@ import {
   FA_ELECTRON_MAIN_JS_PATH,
   FA_FRONTEND_RENDER_TIMER
 } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
+import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
   getFaPlaywrightElectronRecordVideoPartial,
@@ -17,6 +18,7 @@ import {
 } from 'app/helpers/playwrightHelpers/playwrightE2eProjectPaths'
 import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers/playwrightDismissStartupTipsNotify'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
+import { waitForFaE2eRendererDomReady } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
 import projectMenu from 'app/i18n/en-US/components/globals/AppControlMenus/L_project'
 import newProjectSettings from 'app/i18n/en-US/dialogs/L_newProjectSettings'
 
@@ -45,10 +47,11 @@ test.describe.serial('New project creation', () => {
     tryUnlinkE2eFaprojectFixture('e2e-menu-project.faproject')
     electronApp = await electron.launch({
       args: [electronMainFilePath],
-      env: extraEnvSettings,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaE2eRendererDomReady(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(FA_FRONTEND_RENDER_TIMER)
     await dismissStartupTipsNotifyIfPresent(appWindow)

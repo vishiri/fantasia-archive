@@ -6,6 +6,7 @@ import {
   FA_ELECTRON_MAIN_JS_PATH,
   FA_FRONTEND_RENDER_TIMER
 } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
+import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
   getFaPlaywrightElectronRecordVideoPartial,
@@ -16,6 +17,7 @@ import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 
 import { buildExpectedProgramSettingsTreeFromEnUsMessages } from './DialogProgramSettings.playwright.expectations'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
+import { waitForFaRendererContentBridgeApis } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
 import programSettingsMessages from 'app/i18n/en-US/dialogs/L_programSettings'
 
 /**
@@ -131,11 +133,12 @@ test.describe.serial('Program settings dialog', () => {
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: programSettingsDirectInput })
     resetFaPlaywrightIsolatedUserData()
     electronApp = await electron.launch({
-      env: extraEnvSettings,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaRendererContentBridgeApis(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
@@ -404,11 +407,12 @@ test.describe.serial('Program settings showDocumentID persists after Save', () =
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: programSettingsDirectInput })
     resetFaPlaywrightIsolatedUserData()
     electronApp = await electron.launch({
-      env: extraEnvSettings,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaRendererContentBridgeApis(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
@@ -468,11 +472,12 @@ test.describe.serial('Program settings showDocumentID defaults on fresh userData
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: programSettingsDirectInput })
     resetFaPlaywrightIsolatedUserData()
     electronApp = await electron.launch({
-      env: extraEnvSettings,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaRendererContentBridgeApis(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
   })

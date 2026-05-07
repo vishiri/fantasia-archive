@@ -3,6 +3,7 @@ import type { ElectronApplication, Page } from 'playwright'
 import { test, expect } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 import { FA_ELECTRON_MAIN_JS_PATH } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
+import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
   getFaPlaywrightElectronRecordVideoPartial,
@@ -10,6 +11,7 @@ import {
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers/playwrightDismissStartupTipsNotify'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
+import { waitForFaE2eRendererDomReady } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
 import L_aboutFantasiaArchiveDe from 'app/i18n/de/dialogs/L_aboutFantasiaArchive'
 import L_helpInfoDe from 'app/i18n/de/components/globals/AppControlMenus/L_helpInfo'
 import L_aboutFantasiaArchiveEnUs from 'app/i18n/en-US/dialogs/L_aboutFantasiaArchive'
@@ -90,11 +92,12 @@ test.describe.serial('Interface language and About dialog', () => {
     suiteTestInfo = testInfo
     resetFaPlaywrightIsolatedUserData()
     electronApp = await electron.launch({
-      env: extraEnvSettings,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaE2eRendererDomReady(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
     await dismissStartupTipsNotifyIfPresent(appWindow)

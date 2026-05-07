@@ -111,10 +111,10 @@ export async function closeFaElectronAppWithRecordedVideoAttachments (
   const attachTarget = htmlReportAttachTestInfo ?? recordVideoQueueTestInfo
   const tempDir = takeNextRecordVideoTempDir(recordVideoQueueTestInfo)
   if (tempDir !== undefined) {
-    try {
-      await attachWebmFilesUnderDir(attachTarget, tempDir, '')
-    } finally {
+    await Promise.resolve(
+      attachWebmFilesUnderDir(attachTarget, tempDir, '')
+    ).finally(async () => {
       await removeRecordVideoTempDirBestEffort(tempDir)
-    }
+    })
   }
 }

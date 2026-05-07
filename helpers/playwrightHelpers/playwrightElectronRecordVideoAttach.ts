@@ -2,6 +2,7 @@ import fsPromises from 'node:fs/promises'
 import path from 'node:path'
 
 import type { TestInfo } from '@playwright/test'
+import { ResultAsync } from 'neverthrow'
 
 function isWindowsTransientRmError (err: unknown): boolean {
   const code = err && typeof err === 'object' && 'code' in err
@@ -18,22 +19,25 @@ export async function removeRecordVideoTempDirBestEffort (dir: string): Promise<
   const maxAttempts = 16
   const delayMs = 250
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    try {
-      await fsPromises.rm(dir, {
+    const rmResult = await ResultAsync.fromPromise(
+      fsPromises.rm(dir, {
         force: true,
         recursive: true
-      })
-      return
-    } catch (err) {
-      if (attempt === maxAttempts - 1) {
-        return
-      }
-      if (isWindowsTransientRmError(err)) {
-        await new Promise((resolve) => setTimeout(resolve, delayMs))
-        continue
-      }
+      }),
+      (err): unknown => err
+    )
+    if (rmResult.isOk()) {
       return
     }
+    const err = rmResult.error
+    if (attempt === maxAttempts - 1) {
+      return
+    }
+    if (isWindowsTransientRmError(err)) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs))
+      continue
+    }
+    return
   }
 }
 
@@ -45,12 +49,14 @@ export async function attachWebmFilesUnderDir (
   scanDir: string,
   namePrefix: string
 ): Promise<void> {
-  let entries
-  try {
-    entries = await fsPromises.readdir(scanDir, { withFileTypes: true })
-  } catch {
+  const entriesResult = await ResultAsync.fromPromise(
+    fsPromises.readdir(scanDir, { withFileTypes: true }),
+    (): undefined => undefined
+  )
+  if (entriesResult.isErr()) {
     return
   }
+  const entries = entriesResult.value
 
   for (const ent of entries) {
     const full = path.join(scanDir, ent.name)

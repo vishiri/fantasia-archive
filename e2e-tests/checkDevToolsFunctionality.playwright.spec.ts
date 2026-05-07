@@ -3,6 +3,7 @@ import type { ElectronApplication, Page } from 'playwright'
 import { test, expect } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 import { FA_ELECTRON_MAIN_JS_PATH } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
+import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
   getFaPlaywrightElectronRecordVideoPartial,
@@ -14,6 +15,7 @@ import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers
 /**
  * Extra env settings to trigger testing via Playwright
  */
+import { waitForFaE2eRendererDomReady } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
 const extraEnvSettings = {
   TEST_ENV: 'e2e'
 }
@@ -51,11 +53,12 @@ test.describe.serial('Developer tools menu', () => {
     suiteTestInfo = testInfo
     resetFaPlaywrightIsolatedUserData()
     electronApp = await electron.launch({
-      env: extraEnvSettings,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaE2eRendererDomReady(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
     await dismissStartupTipsNotifyIfPresent(appWindow)

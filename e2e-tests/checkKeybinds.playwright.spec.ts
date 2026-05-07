@@ -6,6 +6,7 @@ import {
   FA_ELECTRON_MAIN_JS_PATH,
   FA_FRONTEND_RENDER_TIMER
 } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
+import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
 import {
   FA_PLAYWRIGHT_PRESS_ADJUSTED_TOGGLE_DEVTOOLS_F12,
   getFaPlaywrightDefaultActionMonitorOpenPressString,
@@ -18,6 +19,7 @@ import {
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers/playwrightDismissStartupTipsNotify'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
+import { waitForFaE2eRendererDomReady } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
 import actionMonitorMessages from 'app/i18n/en-US/dialogs/L_DialogActionMonitor'
 import keybindDialogMessages from 'app/i18n/en-US/dialogs/L_dialogKeybindSettings'
 import programSettingsMessages from 'app/i18n/en-US/dialogs/L_programSettings'
@@ -245,11 +247,12 @@ test.describe.serial('Global keybinds end-to-end', () => {
     suiteTestInfo = testInfo
     resetFaPlaywrightIsolatedUserData()
     electronApp = await electron.launch({
-      env: extraEnvSettings,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaE2eRendererDomReady(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
     await dismissStartupTipsNotifyIfPresent(appWindow)

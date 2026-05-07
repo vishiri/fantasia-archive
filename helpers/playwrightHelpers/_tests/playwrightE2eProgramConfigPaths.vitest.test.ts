@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
+import { Result } from 'neverthrow'
 import { expect, test, vi } from 'vitest'
 
 import * as prUserData from '../playwrightUserDataReset'
@@ -20,6 +21,18 @@ const FA_E2E_GLOBAL_SET_NEXT_IMPORT_PATH = '__faE2eSetNextProgramConfigImportPat
 
 const getDirSpy = vi.spyOn(prUserData, 'getFaPlaywrightIsolatedUserDataDir')
 
+/** Runs 'fn', always removes 'tmp'; rethrows assertions or errors from 'fn'. */
+function withTempCleanup (tmpDir: string, fn: () => void): void {
+  const body = Result.fromThrowable(fn, (e): unknown => e)()
+  fs.rmSync(tmpDir, {
+    force: true,
+    recursive: true
+  })
+  if (body.isErr()) {
+    throw body.error
+  }
+}
+
 test('getPlaywrightE2eUserDataFilePath appends the basename to the userData directory', () => {
   getDirSpy.mockReturnValueOnce('C:\\u\\d')
   expect(getPlaywrightE2eUserDataFilePath('foo.faconfig')).toBe(
@@ -34,19 +47,29 @@ test('removePlaywrightE2eBlankFaconfigFilesIfPresent is a no-op when the userDat
 
 test('removePlaywrightE2eBlankFaconfigFilesIfPresent deletes only blank_*.faconfig in the userData tree', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fa-pw-e2e-'))
-  try {
+  withTempCleanup(tmp, (): void => {
     fs.writeFileSync(path.join(tmp, 'blank_settings.faconfig'), 'a')
     fs.writeFileSync(path.join(tmp, 'keep.txt'), 'b')
     getDirSpy.mockReturnValueOnce(tmp)
     removePlaywrightE2eBlankFaconfigFilesIfPresent()
     expect(fs.existsSync(path.join(tmp, 'blank_settings.faconfig'))).toBe(false)
     expect(fs.existsSync(path.join(tmp, 'keep.txt'))).toBe(true)
-  } finally {
-    fs.rmSync(tmp, {
-      force: true,
-      recursive: true
+  })
+})
+
+test('removePlaywrightE2eBlankFaconfigFilesIfPresent swallows unlink failures', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fa-pw-e2e-unlink-err-'))
+  withTempCleanup(tmp, (): void => {
+    fs.writeFileSync(path.join(tmp, 'blank_err.faconfig'), 'z')
+    getDirSpy.mockReturnValueOnce(tmp)
+    const unlinkSpy = vi.spyOn(fs, 'unlinkSync').mockImplementation(() => {
+      throw new Error('unlink failed')
     })
-  }
+    expect(() => {
+      removePlaywrightE2eBlankFaconfigFilesIfPresent()
+    }).not.toThrow()
+    unlinkSpy.mockRestore()
+  })
 })
 
 test('tryUnlinkE2eProgramConfigFixtureFiles ignores when files are missing', () => {
@@ -54,9 +77,27 @@ test('tryUnlinkE2eProgramConfigFixtureFiles ignores when files are missing', () 
   tryUnlinkE2eProgramConfigFixtureFiles()
 })
 
+test('tryUnlinkE2eProgramConfigFixtureFiles swallows unlink failures', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fa-pw-e2e-fixture-unlink-err-'))
+  withTempCleanup(tmp, (): void => {
+    for (const name of ['blank_settings.faconfig', 'blank_keybinds.faconfig', 'blank_css.faconfig'] as const) {
+      fs.writeFileSync(path.join(tmp, name), 'z')
+    }
+    getDirSpy.mockReturnValue(tmp)
+    const unlinkSpy = vi.spyOn(fs, 'unlinkSync').mockImplementation(() => {
+      throw new Error('unlink failed')
+    })
+    expect(() => {
+      tryUnlinkE2eProgramConfigFixtureFiles()
+    }).not.toThrow()
+    unlinkSpy.mockRestore()
+    getDirSpy.mockReset()
+  })
+})
+
 test('tryUnlinkE2eProgramConfigFixtureFiles unlinks the three basenames when present', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fa-pw-e2e-clean-'))
-  try {
+  withTempCleanup(tmp, (): void => {
     for (const name of ['blank_settings.faconfig', 'blank_keybinds.faconfig', 'blank_css.faconfig'] as const) {
       fs.writeFileSync(path.join(tmp, name), 'z')
     }
@@ -64,12 +105,7 @@ test('tryUnlinkE2eProgramConfigFixtureFiles unlinks the three basenames when pre
     tryUnlinkE2eProgramConfigFixtureFiles()
     getDirSpy.mockReset()
     expect(fs.readdirSync(tmp)).toHaveLength(0)
-  } finally {
-    fs.rmSync(tmp, {
-      force: true,
-      recursive: true
-    })
-  }
+  })
 })
 
 test('e2eSetNextProgramConfigExportPath calls main evaluate with the export global key and absolute path', async () => {

@@ -1,4 +1,5 @@
 import type { Page } from 'playwright'
+import { ResultAsync } from 'neverthrow'
 
 import L_unsortedAppTexts from 'app/i18n/en-US/globalFunctionality/L_unsortedAppTexts'
 
@@ -22,24 +23,31 @@ export function startupTipsNotificationBanner (page: Page) {
  */
 export async function dismissStartupTipsNotifyIfPresent (page: Page): Promise<void> {
   const banner = startupTipsNotificationBanner(page)
-  try {
-    await banner.waitFor({
+  const visibleGate = await ResultAsync.fromPromise(
+    banner.waitFor({
       state: 'visible',
       timeout: 2000
-    })
-  } catch {
+    }),
+    (): undefined => undefined
+  )
+  if (visibleGate.isErr()) {
     return
   }
   const closeControl = banner
     .locator('.q-notification__actions .q-btn, .q-notification__actions button')
     .first()
-  try {
-    await closeControl.click({ timeout: 4000 })
-  } catch {
+  const clickGate = await ResultAsync.fromPromise(
+    closeControl.click({ timeout: 4000 }),
+    (): undefined => undefined
+  )
+  if (clickGate.isErr()) {
     return
   }
-  await banner.waitFor({
-    state: 'hidden',
-    timeout: 8000
-  }).catch(() => {})
+  await ResultAsync.fromPromise(
+    banner.waitFor({
+      state: 'hidden',
+      timeout: 8000
+    }),
+    (): undefined => undefined
+  ).unwrapOr(undefined)
 }

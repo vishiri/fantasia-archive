@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import type { ElectronApplication } from 'playwright'
+import { Result } from 'neverthrow'
 
 import { getFaPlaywrightIsolatedUserDataDir } from './playwrightUserDataReset'
 
@@ -39,9 +40,8 @@ export async function e2eSetNextProjectCreatePath (electronApp: ElectronApplicat
  */
 export function tryUnlinkE2eFaprojectFixture (baseName: string): void {
   const p = path.join(getFaPlaywrightIsolatedUserDataDir(), baseName)
-  try {
-    fs.unlinkSync(p)
-  } catch {
-    // ignore
-  }
+  void Result.fromThrowable(
+    (): void => fs.unlinkSync(p),
+    (): undefined => undefined
+  )()
 }

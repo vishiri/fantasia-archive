@@ -4,6 +4,7 @@ import path from 'node:path'
 import { performance } from 'node:perf_hooks'
 
 import packageJSON from '../../package.json' with { type: 'json' }
+import { Result } from 'neverthrow'
 import { PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME } from '../../src-electron/mainScripts/appIdentity/playwrightIsolatedUserDataDirName'
 
 export type T_faPlaywrightUserDataPathInput = {
@@ -117,22 +118,27 @@ export function resetFaPlaywrightIsolatedUserData (): void {
   const dir = getFaPlaywrightIsolatedUserDataDir()
   let last: unknown
   for (let attempt = 0; attempt < RESET_FA_USER_DATA_MAX_ATTEMPTS; attempt++) {
-    try {
-      fs.rmSync(dir, {
-        force: true,
-        recursive: true
-      })
+    const rmResult = Result.fromThrowable(
+      (): void => {
+        fs.rmSync(dir, {
+          force: true,
+          recursive: true
+        })
+      },
+      (e): unknown => e
+    )()
+    if (rmResult.isOk()) {
       return
-    } catch (e) {
-      last = e
-      if (isTransientUserDataRmError(e)) {
-        if (attempt < RESET_FA_USER_DATA_MAX_ATTEMPTS - 1) {
-          sleepSyncForResetMs(RESET_FA_USER_DATA_BASE_DELAY_MS * (attempt + 1))
-        }
-        continue
-      }
-      throw e
     }
+    const e = rmResult.error
+    last = e
+    if (isTransientUserDataRmError(e)) {
+      if (attempt < RESET_FA_USER_DATA_MAX_ATTEMPTS - 1) {
+        sleepSyncForResetMs(RESET_FA_USER_DATA_BASE_DELAY_MS * (attempt + 1))
+      }
+      continue
+    }
+    throw e
   }
   throw last
 }

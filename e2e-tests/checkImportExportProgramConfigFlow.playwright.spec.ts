@@ -5,6 +5,7 @@ import { test, expect } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 
 import { FA_ELECTRON_MAIN_JS_PATH, FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
+import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
 import {
   FA_PLAYWRIGHT_PRESS_CONTROL_SHIFT_F12,
   getFaPlaywrightDefaultActionMonitorOpenPressString,
@@ -24,6 +25,7 @@ import {
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers/playwrightDismissStartupTipsNotify'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
+import { waitForFaE2eRendererDomReady } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
 import L_toolsDe from 'app/i18n/de/components/globals/AppControlMenus/L_tools'
 import L_toolsEn from 'app/i18n/en-US/components/globals/AppControlMenus/L_tools'
 import importExportMessages from 'app/i18n/en-US/dialogs/L_importExportProgramConfig'
@@ -319,11 +321,12 @@ test.describe.serial('Import / export program configuration E2E', () => {
     removePlaywrightE2eBlankFaconfigFilesIfPresent()
     resetFaPlaywrightIsolatedUserData()
     electronApp = await electron.launch({
-      env: extraEnvSettings,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaE2eRendererDomReady(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
     await dismissStartupTipsNotifyIfPresent(appWindow)
@@ -594,11 +597,10 @@ test.describe.serial('Import / export program configuration E2E', () => {
         await row.click()
         await appWindow.waitForTimeout(300)
         const raw = await appWindow.evaluate(async () => {
-          try {
-            return await navigator.clipboard.readText()
-          } catch {
-            return null
-          }
+          return await navigator.clipboard.readText().then(
+            (t) => t,
+            (): null => null
+          )
         })
         if (raw === null || raw === '') {
           return null
@@ -655,11 +657,7 @@ test.describe.serial('Import / export program configuration E2E', () => {
     })
 
     await test.step('best-effort cleanup of fixture .faconfig files', () => {
-      try {
-        tryUnlinkE2eProgramConfigFixtureFiles()
-      } catch {
-        // not a test failure
-      }
+      tryUnlinkE2eProgramConfigFixtureFiles()
     })
   })
 })

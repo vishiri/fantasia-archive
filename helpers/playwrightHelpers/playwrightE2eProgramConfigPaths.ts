@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import type { ElectronApplication } from 'playwright'
+import { Result } from 'neverthrow'
 
 import { getFaPlaywrightIsolatedUserDataDir } from './playwrightUserDataReset'
 
@@ -25,11 +26,10 @@ export function removePlaywrightE2eBlankFaconfigFilesIfPresent (): void {
   }
   for (const name of fs.readdirSync(dir)) {
     if (BLANK_FACONFIG_PATTERN.test(name)) {
-      try {
-        fs.unlinkSync(path.join(dir, name))
-      } catch {
-        // ignore: best-effort cleanup
-      }
+      void Result.fromThrowable(
+        (): void => fs.unlinkSync(path.join(dir, name)),
+        (): undefined => undefined
+      )()
     }
   }
 }
@@ -90,12 +90,13 @@ const E2E_FACONFIG_BASENAMES = [
 export function tryUnlinkE2eProgramConfigFixtureFiles (): void {
   for (const name of E2E_FACONFIG_BASENAMES) {
     const full = getPlaywrightE2eUserDataFilePath(name)
-    try {
-      if (fs.existsSync(full)) {
-        fs.unlinkSync(full)
-      }
-    } catch {
-      // ignore: cleanup only
-    }
+    void Result.fromThrowable(
+      (): void => {
+        if (fs.existsSync(full)) {
+          fs.unlinkSync(full)
+        }
+      },
+      (): undefined => undefined
+    )()
   }
 }

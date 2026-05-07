@@ -6,12 +6,14 @@ import {
   FA_ELECTRON_MAIN_JS_PATH,
   FA_FRONTEND_RENDER_TIMER
 } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
+import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
 import {
   closeFaElectronAppWithRecordedVideoAttachments,
   getFaPlaywrightElectronRecordVideoPartial,
   installFaPlaywrightCursorMarkerIfVideoEnabled
 } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
 import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
+import { waitForFaRendererContentBridgeApis } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
 import L_GlobalLanguageSelectorDe from 'app/i18n/de/components/globals/GlobalLanguageSelector/L_GlobalLanguageSelector'
 import L_GlobalLanguageSelectorFr from 'app/i18n/fr/components/globals/GlobalLanguageSelector/L_GlobalLanguageSelector'
 import L_faUserSettingsEnUs from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
@@ -68,12 +70,11 @@ async function expectFlagImageLoaded (flagLocator: Locator): Promise<void> {
         el.addEventListener('error', () => resolve(), { once: true })
       })
 
-      try {
-        await el.decode()
-        return true
-      } catch {
-        return false
-      }
+      const decodedOk = await el.decode().then(
+        (): true => true,
+        (): false => false
+      )
+      return decodedOk
     })
     expect(ok).toBe(true)
   }).toPass({ timeout: flagImageLoadTimeoutMs })
@@ -110,11 +111,12 @@ test.describe.serial('Global language selector', () => {
     suiteTestInfo = testInfo
     resetFaPlaywrightIsolatedUserData()
     electronApp = await electron.launch({
-      env: extraEnvSettings,
+      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
       args: [electronMainFilePath],
       ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
     })
     appWindow = await electronApp.firstWindow()
+    await waitForFaRendererContentBridgeApis(appWindow)
     await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
     await appWindow.waitForTimeout(faFrontendRenderTimer)
   })
