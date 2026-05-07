@@ -12,6 +12,12 @@ JSDoc above tests and line comments in these files: follow AGENTS.md code-commen
 
 - Run against a **production Electron build** after relevant source changes (`yarn quasar:build:electron` / `quasar build -m electron`). See [README.md](README.md).
 
+## Renderer readiness (Electron + hash router)
+
+- **Do not probe `window.faContentBridgeAPIs` via `page.evaluate` / `waitForFunction`** for harness gates — Playwright’s isolated worlds do not see Electron **`contextBridge`** globals even when the Quasar renderer does.
+- **Component harness** waits for **`#/componentTesting/…`** by **`await waitForFaRendererContentBridgeApis(appWindow)`** from **`helpers/playwrightHelpers/waitForFaRendererContentBridgeApis`** (polls **`page.url()`**; **Vue Router** hash updates rarely satisfy **`waitForURL`** defaults).
+- **E2E** specs on **`#/`** typically **`await waitForFaE2eRendererDomReady(appWindow)`** instead (**`domcontentloaded`** timeout).
+
 ## Connected specs
 
 - When you change renderer UI, menus, **`i18n`** copy used in assertions, or **`data-test-locator`** hooks, **search** **`src/components/**/_tests/*.playwright.test.ts`** and **`e2e-tests/*.playwright.spec.ts`** for imports of your locale modules, dialog titles, locators, or **`COMPONENT_NAME`** / flow keywords; **run** each matching spec **after** rebuild when the bundled app would differ from source. Same playbook as [fantasia-testing](../skills/fantasia-testing/SKILL.md) **Connected tests for any feature change**.

@@ -38,6 +38,7 @@ description: >-
 - Do not enable broad `nodeIntegration` in the renderer to “just make it work”; keep privileged code in main or preload as appropriate.
 - Sandboxed preload cannot rely on arbitrary Node modules or `electron` APIs such as `shell`; use IPC to main (`registerFaExtraEnvIpc`, `registerFaExternalLinksIpc`, `registerFaWindowControlIpc`, `registerFaDevToolsIpc`, `registerFaAppDetailsIpc`, and similar) instead of importing packages like `app-root-path` in `contentBridgeAPIs/`.
 - Privileged window and app-metadata calls go through async `ipcRenderer.invoke` (`faWindowControlAPI`, `faDevToolsControlAPI`, `appDetailsAPI.getProjectVersion`, `extraEnvVariablesAPI.getSnapshot` with memoized promises for one round trip per load); do not reintroduce `@electron/remote` without a documented reason.
+- **No `neverthrow` in preload** — keep `contentBridgeAPIs/` on **`Promise`** chains (**`.catch`** for benign IPC failures) rather than **`ResultAsync`**, so the preload artifact stays compatible with the sandboxed bundle policy (see [.cursor/rules/neverthrow.mdc](../../rules/neverthrow.mdc) **Preload / sandboxed bundle**).
 - **Structured IPC arguments** must be validated in **main** (not only typed in preload). Use **Zod** in `src-electron/shared/` and wire parsing in `register*Ipc.ts` — see [fantasia-electron-main](../fantasia-electron-main/SKILL.md) **IPC payload validation (Zod)** and `faUserSettingsPatchSchema.ts` / `registerFaUserSettingsIpc.ts`.
 
 ## Related skills

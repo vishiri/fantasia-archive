@@ -35,6 +35,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) | Always — **quality gate** via `yarn testbatch:verify`; `yarn quasar:build:electron`, Playwright, and Storybook test/VRT each in their own terminal unless using **`yarn testbatch:ensure:nochange`** / **`yarn testbatch:ensure:change`** |
 | [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc) | Always — **Vue ≤250 lines**, **TS module ≤200 lines**, **function ≤100 lines** (ESLint); **`return { ... }`** uses only prior bindings for property values (no inline fn / ternary / logic in the literal); split via **`scripts/`** + subcomponents; extracted styles: **[component-styles-folder.mdc](.cursor/rules/component-styles-folder.mdc)** |
 | [fa-action-manager.mdc](.cursor/rules/fa-action-manager.mdc) | `src/scripts/actionManager/**/*.ts` — central action registry, sync FIFO queue, async fire-and-forget, single-toast failure surface, session-only history |
+| [neverthrow.mdc](.cursor/rules/neverthrow.mdc) | First-party **`.ts`** / **`.vue`** / **`.mjs`** — prefer **Neverthrow** **`Result`** / **`ResultAsync`** over **`try`** / **`catch`** for recoverable failures |
 
 
 ## Stack (short)
@@ -53,6 +54,12 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | DB (evolving)  | `better-sqlite3` in main process; project files use **`.faproject`** (SQLite), created via **`projectManagement`** bridge and **`mainScripts/projectManagement/`** |
 
 
+## Error handling (Neverthrow)
+
+Use the **`neverthrow`** package for **recoverable** errors: return **`Result`** / **`ResultAsync`** instead of **`try`** / **`catch`** when the flow can be expressed that way. Prefer **`Result.fromThrowable`**, **`ResultAsync.fromPromise`**, and **`match`** / **`unwrapOr`** over exception-based control flow; use **`.finally`** on **`Promise`** when you only need cleanup. Policy and examples: [`.cursor/rules/neverthrow.mdc`](.cursor/rules/neverthrow.mdc), [`.cursor/skills/fantasia-neverthrow/SKILL.md`](.cursor/skills/fantasia-neverthrow/SKILL.md).
+
+**Preload bundle exclusion**: **`src-electron/contentBridgeAPIs/**`** modules are bundled into the sandboxed preload script. Keep them free of **`neverthrow`** imports — use **`Promise`** chains (**`ipcRenderer.invoke(…).catch(…)`**, early returns, **`URL.canParse`**, etc.) instead. **`src-electron/shared/**`** helpers referenced from preload (**`faExternalUrlPredicate`**, schemas used only by main, etc.) must follow the same rule when they participate in that import graph so the preload artifact stays small and reliable.
+
 ## Extending Electron APIs
 
 Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-electron/electron-preload.ts`) and typed in `src/globals.d.ts`. New surface area: implement in `src-electron/contentBridgeAPIs/`, register in preload, extend the appropriate repository-root **`types/`** module (for example **`types/I_faElectronRendererBridgeAPIs.ts`**) plus **`src/globals.d.ts`**, and add tests under `contentBridgeAPIs/_tests/`. Details: `.cursor/skills/fantasia-electron-preload/SKILL.md`.
@@ -63,7 +70,7 @@ Renderer code uses `**window.faContentBridgeAPIs`**, defined in preload (`src-el
 
 **IPC payloads and runtime validation**: Renderer and preload TypeScript types do not prove the shape of values at `ipcMain.handle` / `ipcRenderer.invoke` boundaries. Treat handler arguments as **`unknown`** (or validate immediately), then parse with **Zod** in **main** for **objects** you merge, store, or forward (strict object schemas reject extra keys; optional fields model partial patches). Keep schemas in **`src-electron/shared/`** next to other Electron-free helpers (for example `faUserSettingsPatchSchema.ts` built from `FA_USER_SETTINGS_DEFAULTS` keys). On failure, throw from the handler so `invoke` rejects and callers can surface errors (see `S_FaUserSettings` for renderer-side handling). For **one primitive** per channel (for example a single URL string), **`typeof`** plus a dedicated predicate (as in `registerFaExternalLinksIpc` with `checkIfExternalUrl`) remains appropriate; wrapping only `z.string()` adds little unless you combine it with `refine`/`superRefine` for the same rules. **`zod`** lives in **`package.json`** **`dependencies`**. Details: `.cursor/skills/fantasia-electron-main/SKILL.md`, `.cursor/rules/electron-preload.mdc`.
 
-**Renderer sandbox**: The main window sets **`webPreferences.sandbox: true`** with **`contextIsolation: true`** and **`nodeIntegration: false`** in `mainScripts/windowManagement/mainWindowCreation.ts`. Electron’s [Process Sandboxing](https://www.electronjs.org/docs/latest/tutorial/sandbox) and [Context Isolation](https://www.electronjs.org/docs/latest/tutorial/context-isolation) docs describe the model. Preload code under `contentBridgeAPIs/` must stay within the sandbox-safe surface (see `.cursor/rules/electron-preload.mdc`); use main + IPC for **`shell.openExternal`**, filesystem paths, and similar privileges (`registerFaExtraEnvIpc`, `registerFaExternalLinksIpc`, and follow the same pattern for new capabilities).
+**Renderer sandbox**: The main window sets **`webPreferences.sandbox: true`** with **`contextIsolation: true`** and **`nodeIntegration: false`** in `mainScripts/windowManagement/mainWindowCreation.ts`. Electron’s [Process Sandboxing](https://www.electronjs.org/docs/latest/tutorial/sandbox) and [Context Isolation](https://www.electronjs.org/docs/latest/tutorial/context-isolation) docs describe the model. Preload code under `contentBridgeAPIs/` must stay within the sandbox-safe surface (see `.cursor/rules/electron-preload.mdc`); use main + IPC for **`shell.openExternal`**, filesystem paths, and similar privileges (`registerFaExtraEnvIpc`, `registerFaExternalLinksIpc`, and follow the same pattern for new capabilities). The **`BrowserWindow`** **`webPreferences.preload`** path resolves to Quasar’s output (**`preload/electron-preload.cjs`** by default via **`QUASAR_ELECTRON_PRELOAD_FOLDER`** / **`QUASAR_ELECTRON_PRELOAD_EXTENSION`**) — see **`resolvePreloadPath`** in **`mainWindowCreation.ts`**.
 
 ## Global keyboard shortcuts (faKeybinds)
 
@@ -316,6 +323,7 @@ Use different instructions or @-references when starting a task:
 | `git-conventional-commits`      | Logical commits, conventional `type:` messages, per-commit approval |
 | `fantasia-changelog-en-us`      | `changeLog.md` strictly aligned to existing `package.json` version  |
 | `fantasia-plan-documents`       | `.cursor/plans` filename, metadata, and 30-day mtime prune before new plans |
+| `fantasia-neverthrow`           | **`Result`** / **`ResultAsync`** patterns instead of **`try`** / **`catch`** for recoverable failures |
 | `horse-around`                  | Parallel AI sessions coordinated with file-based orders and answers |
 
 
