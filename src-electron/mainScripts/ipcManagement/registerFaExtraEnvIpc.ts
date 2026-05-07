@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron'
+import { Result } from 'neverthrow'
 
 import { FA_EXTRA_ENV_IPC } from 'app/src-electron/electron-ipc-bridge'
 import { resolveFaElectronMainJsPath } from 'app/src-electron/mainScripts/windowManagement/resolveFaElectronMainJsPath'
@@ -20,11 +21,13 @@ function parseComponentProps (): I_extraEnvVariablesAPI['COMPONENT_PROPS'] {
     return false
   }
 
-  try {
-    return JSON.parse(raw) as Record<string, unknown>
-  } catch {
-    return false
-  }
+  return Result.fromThrowable(
+    (): Record<string, unknown> => JSON.parse(raw) as Record<string, unknown>,
+    (): false => false
+  )().match(
+    (ok) => ok,
+    (parseFailed) => parseFailed
+  )
 }
 
 function buildExtraEnvSnapshot (): I_extraEnvVariablesAPI {

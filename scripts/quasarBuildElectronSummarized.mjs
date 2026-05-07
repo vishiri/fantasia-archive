@@ -8,6 +8,7 @@ import { spawn } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { Result, ResultAsync } from 'neverthrow'
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const logPath = path.join(root, 'test-results', 'quasar-build-electron-last.log')
@@ -51,9 +52,8 @@ for (const stream of [child.stdout, child.stderr]) {
   })
 }
 
-let exitCode
-try {
-  exitCode = await new Promise((resolve, reject) => {
+const exitOutcome = await ResultAsync.fromPromise(
+  new Promise((resolve, reject) => {
     child.on('error', (err) => {
       logStream.write(`\n[spawn error] ${String(err)}\n`)
       logStream.end(() => {
@@ -69,22 +69,31 @@ try {
         resolve(code === null ? 1 : code)
       })
     })
-  })
-} catch {
-  try {
-    process.stderr.write(fs.readFileSync(logPath, 'utf8'))
-  } catch {
-    process.stderr.write(`(no log file at ${logPath})\n`)
+  }),
+  (e) => e
+)
+
+function writeStderrLogOrPlaceholder () {
+  const read = Result.fromThrowable(
+    () => fs.readFileSync(logPath, 'utf8'),
+    () => null
+  )()
+  if (read.isOk()) {
+    process.stderr.write(read.value)
+    return
   }
+  process.stderr.write(`(no log file at ${logPath})\n`)
+}
+
+if (exitOutcome.isErr()) {
+  writeStderrLogOrPlaceholder()
   process.exit(1)
 }
 
+const exitCode = exitOutcome.value
+
 if (exitCode !== 0) {
-  try {
-    process.stderr.write(fs.readFileSync(logPath, 'utf8'))
-  } catch {
-    process.stderr.write(`(no log file at ${logPath})\n`)
-  }
+  writeStderrLogOrPlaceholder()
   process.exit(exitCode)
 }
 

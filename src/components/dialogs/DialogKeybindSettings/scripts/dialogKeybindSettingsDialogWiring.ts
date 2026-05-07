@@ -1,7 +1,9 @@
 import type { StoreGeneric } from 'pinia'
+import { Result } from 'neverthrow'
 import type { Ref } from 'vue'
 import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { Notify } from 'quasar'
+import { ResultAsync } from 'neverthrow'
 
 import { i18n } from 'app/i18n/externalFileLoader'
 import { formatFaKeybindChordForUi } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
@@ -11,11 +13,10 @@ import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 
 function resolveDialogComponentStore (): StoreGeneric | null {
-  try {
-    return S_DialogComponent()
-  } catch {
-    return null
-  }
+  return Result.fromThrowable(
+    (): StoreGeneric => S_DialogComponent(),
+    (): null => null
+  )().unwrapOr(null)
 }
 
 function registerDialogKeybindSettingsStoreUuidWatch (openDialog: () => void): void {
@@ -72,12 +73,15 @@ export function runDialogKeybindSettingsOpen (params: {
   } = params
 
   documentName.value = 'KeybindSettings'
-  void keybindsStore.refreshKeybinds()
-    .then(() => {
+  void ResultAsync.fromPromise(
+    keybindsStore.refreshKeybinds(),
+    (error): unknown => error
+  ).match(
+    () => {
       initializeForOpen()
       dialogModel.value = true
-    })
-    .catch((error: unknown) => {
+    },
+    (error: unknown) => {
       console.error('[DialogKeybindSettings] refreshKeybinds failed before open', error)
       Notify.create({
         group: false,
@@ -85,7 +89,8 @@ export function runDialogKeybindSettingsOpen (params: {
         timeout: 0,
         type: 'negative'
       })
-    })
+    }
+  )
 }
 
 export function setupDialogKeybindSettingsDialogRouting (params: {

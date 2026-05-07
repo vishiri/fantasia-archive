@@ -71,35 +71,30 @@ test('Test that runFaAction reports unknown action ids', () => {
 })
 
 /**
- * runFaAction
- * Dispatches async actions immediately and tracks them through the in-flight set.
+ * runFaActionAwait
+ * Dispatches async actions and clears them from the in-flight set when the handler settles.
  */
-test('Test that runFaAction dispatches async handlers and clears in-flight on completion', async () => {
+test('Test that runFaActionAwait dispatches async handlers and clears in-flight on completion', async () => {
   const handler = vi.fn(async () => {
     await Promise.resolve()
   })
   findFaActionDefinitionMock.mockReturnValue(buildDef('toggleDeveloperTools', handler, 'async'))
-  runFaAction('toggleDeveloperTools', undefined)
-  await Promise.resolve()
-  await Promise.resolve()
-  await Promise.resolve()
+  await runFaActionAwait('toggleDeveloperTools', undefined)
   expect(handler).toHaveBeenCalledOnce()
   expect(S_FaActionManager().inFlightAsyncActions).toHaveLength(0)
 })
 
 /**
- * runFaAction
+ * runFaActionAwait
  * Routes async handler errors through the failure reporter and records them in history.
  */
-test('Test that runFaAction reports async handler errors and records a failed history row', async () => {
+test('Test that runFaActionAwait reports async handler errors and records a failed history row', async () => {
   findFaActionDefinitionMock.mockReturnValue(
     buildDef('toggleDeveloperTools', () => {
       throw new Error('async boom')
     }, 'async')
   )
-  runFaAction('toggleDeveloperTools', undefined)
-  await Promise.resolve()
-  await Promise.resolve()
+  await runFaActionAwait('toggleDeveloperTools', undefined)
   expect(notifyCreateMock).toHaveBeenCalledWith(
     expect.objectContaining({
       type: 'negative',
@@ -108,6 +103,22 @@ test('Test that runFaAction reports async handler errors and records a failed hi
   )
   const lastRow = S_FaActionManager().actionHistory.at(-1)
   expect(lastRow?.status).toBe('failed')
+})
+
+/**
+ * runFaAction
+ * Fire-and-forget path still awaits full async cleanup despite not returning the dispatch promise.
+ */
+test('Test that runFaAction clears async in-flight rows after handlers settle', async () => {
+  const handler = vi.fn(async () => {
+    await Promise.resolve()
+  })
+  findFaActionDefinitionMock.mockReturnValue(buildDef('toggleDeveloperTools', handler, 'async'))
+  runFaAction('toggleDeveloperTools', undefined)
+  await vi.waitFor(() => {
+    expect(handler).toHaveBeenCalledOnce()
+    expect(S_FaActionManager().inFlightAsyncActions).toHaveLength(0)
+  })
 })
 
 /**

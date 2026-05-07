@@ -83,6 +83,7 @@
 
 <script setup lang="ts">
 import type { StoreGeneric } from 'pinia'
+import { Result } from 'neverthrow'
 import { onMounted, ref, watch } from 'vue'
 
 import type { I_faActionHistoryEntry } from 'app/types/I_faActionManagerDomain'
@@ -97,11 +98,10 @@ import { buildDialogActionMonitorColumns } from 'app/src/components/dialogs/Dial
 import { useDialogActionMonitorTableLayout } from 'app/src/components/dialogs/DialogActionMonitor/scripts/useDialogActionMonitorTableLayout'
 
 const resolveDialogComponentStore = (): StoreGeneric | null => {
-  try {
-    return S_DialogComponent()
-  } catch {
-    return null
-  }
+  return Result.fromThrowable(
+    (): StoreGeneric => S_DialogComponent(),
+    (): null => null
+  )().unwrapOr(null)
 }
 
 const props = defineProps<{

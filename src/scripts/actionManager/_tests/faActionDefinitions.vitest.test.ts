@@ -1,4 +1,5 @@
 /** @vitest-environment jsdom */
+import { ResultAsync } from 'neverthrow'
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import type { I_faProgramConfigApplyResult } from 'app/types/I_faProgramConfigDomain'
@@ -304,23 +305,28 @@ test('Test that importProgramConfigApply handler calls applyImport and refreshes
 
 test('Test that importProgramConfigApply throws when the program config bridge is missing', async () => {
   const prev = window.faContentBridgeAPIs
-  try {
-    Object.assign(window, {
-      faContentBridgeAPIs: {
-        ...window.faContentBridgeAPIs,
-        faProgramConfig: undefined
-      }
-    })
-    await expect(
-      (definitionFor('importProgramConfigApply').handler({
-        applyKeybinds: true,
-        applyProgramSettings: true,
-        applyProgramStyling: true,
-        sessionId: 's'
-      }) as Promise<unknown>)
-    ).rejects.toThrow(/only available in the desktop app/)
-  } finally {
-    Object.assign(window, { faContentBridgeAPIs: prev })
+  const body = await ResultAsync.fromPromise(
+    (async (): Promise<void> => {
+      Object.assign(window, {
+        faContentBridgeAPIs: {
+          ...window.faContentBridgeAPIs,
+          faProgramConfig: undefined
+        }
+      })
+      await expect(
+        (definitionFor('importProgramConfigApply').handler({
+          applyKeybinds: true,
+          applyProgramSettings: true,
+          applyProgramStyling: true,
+          sessionId: 's'
+        }) as Promise<unknown>)
+      ).rejects.toThrow(/only available in the desktop app/)
+    })(),
+    (e): unknown => e
+  )
+  Object.assign(window, { faContentBridgeAPIs: prev })
+  if (body.isErr()) {
+    throw body.error
   }
 })
 

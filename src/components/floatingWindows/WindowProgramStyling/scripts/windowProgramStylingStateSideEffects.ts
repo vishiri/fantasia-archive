@@ -1,4 +1,5 @@
 import { onMounted, watch, type Ref } from 'vue'
+import { Result } from 'neverthrow'
 
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import { S_DialogComponent } from 'app/src/stores/S_Dialog'
@@ -7,11 +8,10 @@ import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
 type T_resolvedDialogComponentStore = ReturnType<typeof S_DialogComponent> | null
 
 function resolveDialogComponentStore (): T_resolvedDialogComponentStore {
-  try {
-    return S_DialogComponent()
-  } catch {
-    return null
-  }
+  return Result.fromThrowable(
+    (): T_resolvedDialogComponentStore => S_DialogComponent(),
+    (): null => null
+  )().unwrapOr(null)
 }
 
 export function watchProgramStylingEditorCssLivePreview (

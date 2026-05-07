@@ -1,4 +1,7 @@
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
+import { Result } from 'neverthrow'
+
+import type { I_faKeybindsSnapshot } from 'app/types/I_faKeybindsDomain'
 
 /**
  * Single help-tooltip row: an i18n key (under 'floatingWindows.programStyling.helpTooltip.items')
@@ -23,14 +26,14 @@ export interface I_FaMonacoKeybindHelpItem {
  * Falls back to a simple 'navigator.userAgent' check before the keybinds store has been hydrated.
  */
 function isMacPlatform (): boolean {
-  try {
-    const snap = S_FaKeybinds().snapshot
-    if (snap !== null) {
-      return snap.platform === 'darwin'
-    }
-  } catch {
-    // Pinia not active in this context (e.g. early Storybook canvas); fall through.
+  const snapshotResult = Result.fromThrowable(
+    (): I_faKeybindsSnapshot | null => S_FaKeybinds().snapshot,
+    (): null => null
+  )()
+  if (snapshotResult.isOk() && snapshotResult.value !== null) {
+    return snapshotResult.value.platform === 'darwin'
   }
+
   if (typeof navigator !== 'undefined') {
     const ua = navigator.userAgent
     if (typeof ua === 'string' && /Mac|iPhone|iPad/i.test(ua)) {

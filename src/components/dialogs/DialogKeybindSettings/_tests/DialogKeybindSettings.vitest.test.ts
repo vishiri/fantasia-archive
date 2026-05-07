@@ -2,6 +2,7 @@
 
 import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
+import { ResultAsync } from 'neverthrow'
 import { beforeEach, expect, test, vi } from 'vitest'
 
 vi.mock('quasar', () => ({
@@ -340,22 +341,27 @@ test('Test that DialogKeybindSettings shows filter empty ErrorCard when filter m
  */
 test('Test that DialogKeybindSettings shows table empty hint when the keybind definition list is empty', async () => {
   const backup = FA_KEYBIND_COMMAND_DEFINITIONS.slice()
-  try {
-    FA_KEYBIND_COMMAND_DEFINITIONS.length = 0
+  const body = await ResultAsync.fromPromise(
+    (async (): Promise<void> => {
+      FA_KEYBIND_COMMAND_DEFINITIONS.length = 0
 
-    const w = mount(DialogKeybindSettings, {
-      ...dialogKeybindSettingsMountOptions,
-      props: { directInput: 'KeybindSettings' }
-    })
+      const w = mount(DialogKeybindSettings, {
+        ...dialogKeybindSettingsMountOptions,
+        props: { directInput: 'KeybindSettings' }
+      })
 
-    await flushPromises()
+      await flushPromises()
 
-    expect(w.find('[data-test-locator="dialogKeybindSettings-tableEmpty"]').exists()).toBe(true)
-    expect(w.find('[data-test-locator="dialogKeybindSettings-filterNoResults"]').exists()).toBe(false)
+      expect(w.find('[data-test-locator="dialogKeybindSettings-tableEmpty"]').exists()).toBe(true)
+      expect(w.find('[data-test-locator="dialogKeybindSettings-filterNoResults"]').exists()).toBe(false)
 
-    w.unmount()
-  } finally {
-    FA_KEYBIND_COMMAND_DEFINITIONS.length = 0
-    FA_KEYBIND_COMMAND_DEFINITIONS.push(...backup)
+      w.unmount()
+    })(),
+    (e): unknown => e
+  )
+  FA_KEYBIND_COMMAND_DEFINITIONS.length = 0
+  FA_KEYBIND_COMMAND_DEFINITIONS.push(...backup)
+  if (body.isErr()) {
+    throw body.error
   }
 })

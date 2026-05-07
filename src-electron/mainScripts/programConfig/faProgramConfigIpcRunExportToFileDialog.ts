@@ -2,6 +2,7 @@ import type { SaveDialogOptions } from 'electron'
 import { dialog } from 'electron'
 import { writeFile } from 'node:fs/promises'
 import type { IpcMainInvokeEvent } from 'electron'
+import { Result, ResultAsync } from 'neverthrow'
 
 import { getFaKeybinds } from 'app/src-electron/mainScripts/keybinds/faKeybindsStore'
 import { windowFromIpcEvent } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
@@ -21,33 +22,32 @@ async function tryWriteE2eExportPath (zipped: Uint8Array): Promise<I_faProgramCo
   if (e2ePath === null) {
     return null
   }
-  try {
-    await writeFile(e2ePath, zipped)
+  const writeResult = await ResultAsync.fromPromise(
+    writeFile(e2ePath, zipped),
+    (e): unknown => e
+  )
+  if (writeResult.isOk()) {
     return {
       filePath: e2ePath,
       outcome: 'saved'
     }
-  } catch (e) {
-    const err = e instanceof Error ? e : new Error(String(e))
-    console.error('[faProgramConfig] e2e write failed', {
-      e2ePath,
-      err
-    })
-    return {
-      errorMessage: err.message,
-      errorName: err.name,
-      outcome: 'error'
-    }
+  }
+  const e = writeResult.error
+  const err = e instanceof Error ? e : new Error(String(e))
+  console.error('[faProgramConfig] e2e write failed', {
+    e2ePath,
+    err
+  })
+  return {
+    errorMessage: err.message,
+    errorName: err.name,
+    outcome: 'error'
   }
 }
 
-/**
- * Zips the selected store JSON snapshots, prompts for a save path, and writes a '.faconfig' file.
- */
-export async function runExportProgramConfigToFile (
-  event: IpcMainInvokeEvent,
-  o: I_faProgramConfigExportOptions
-): Promise<I_faProgramConfigExportResult> {
+function validateFaProgramConfigExportPayload (
+  o: unknown
+): I_faProgramConfigExportResult | null {
   if (typeof o !== 'object' || o === null) {
     return {
       errorName: 'TypeError',
@@ -55,25 +55,33 @@ export async function runExportProgramConfigToFile (
       outcome: 'error'
     }
   }
+  const opts = o as I_faProgramConfigExportOptions
   if (
-    typeof o.includeProgramSettings !== 'boolean' ||
-    typeof o.includeKeybinds !== 'boolean' ||
-    typeof o.includeProgramStyling !== 'boolean'
+    typeof opts.includeProgramSettings !== 'boolean' ||
+    typeof opts.includeKeybinds !== 'boolean' ||
+    typeof opts.includeProgramStyling !== 'boolean'
   ) {
     return {
-      errorName: 'TypeError',
       errorMessage: 'include flags must be booleans',
+      errorName: 'TypeError',
       outcome: 'error'
     }
   }
-  if (!o.includeProgramSettings && !o.includeKeybinds && !o.includeProgramStyling) {
+  if (!opts.includeProgramSettings && !opts.includeKeybinds && !opts.includeProgramStyling) {
     return {
-      errorName: 'RangeError',
       errorMessage: 'at least one include flag is required',
+      errorName: 'RangeError',
       outcome: 'error'
     }
   }
+  return null
+}
 
+function buildProgramConfigExportInputs (o: I_faProgramConfigExportOptions): {
+  keybinds?: I_faKeybindsRoot
+  programStyling?: I_faProgramStylingRoot
+  userSettings?: I_faUserSettings
+} {
   const inputs: {
     keybinds?: I_faKeybindsRoot
     programStyling?: I_faProgramStylingRoot
@@ -88,11 +96,30 @@ export async function runExportProgramConfigToFile (
   if (o.includeProgramStyling) {
     inputs.programStyling = { ...getFaProgramStyling().store }
   }
+  return inputs
+}
 
-  let zipped: Uint8Array
-  try {
-    zipped = zipProgramConfigBundle(inputs)
-  } catch (e) {
+/**
+ * Zips the selected store JSON snapshots, prompts for a save path, and writes a '.faconfig' file.
+ */
+export async function runExportProgramConfigToFile (
+  event: IpcMainInvokeEvent,
+  o: I_faProgramConfigExportOptions
+): Promise<I_faProgramConfigExportResult> {
+  const validation = validateFaProgramConfigExportPayload(o)
+  if (validation !== null) {
+    return validation
+  }
+
+  const inputs = buildProgramConfigExportInputs(o)
+
+  const zipResult = Result.fromThrowable(
+    (): Uint8Array => zipProgramConfigBundle(inputs),
+    (e): unknown => e
+  )()
+
+  if (zipResult.isErr()) {
+    const e = zipResult.error
     const err = e instanceof Error ? e : new Error(String(e))
     console.error('[faProgramConfig] zip failed', err)
     return {
@@ -101,6 +128,8 @@ export async function runExportProgramConfigToFile (
       outcome: 'error'
     }
   }
+
+  const zipped = zipResult.value
 
   const e2eR = await tryWriteE2eExportPath(zipped)
   if (e2eR !== null) {
@@ -125,22 +154,25 @@ export async function runExportProgramConfigToFile (
     return { outcome: 'canceled' }
   }
 
-  try {
-    await writeFile(filePath, zipped)
+  const finalWriteResult = await ResultAsync.fromPromise(
+    writeFile(filePath, zipped),
+    (e): unknown => e
+  )
+  if (finalWriteResult.isOk()) {
     return {
       filePath,
       outcome: 'saved'
     }
-  } catch (e) {
-    const err = e instanceof Error ? e : new Error(String(e))
-    console.error('[faProgramConfig] write failed', {
-      err,
-      filePath
-    })
-    return {
-      errorMessage: err.message,
-      errorName: err.name,
-      outcome: 'error'
-    }
+  }
+  const e = finalWriteResult.error
+  const err = e instanceof Error ? e : new Error(String(e))
+  console.error('[faProgramConfig] write failed', {
+    err,
+    filePath
+  })
+  return {
+    errorMessage: err.message,
+    errorName: err.name,
+    outcome: 'error'
   }
 }

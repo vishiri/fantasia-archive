@@ -1,3 +1,4 @@
+import { ResultAsync } from 'neverthrow'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 
@@ -241,22 +242,27 @@ test('Test that awaitSyncQueueDrain resolves immediately when Pinia is missing',
  */
 test('Test that hung sync handlers are timed out via the timeout reject branch', async () => {
   vi.useFakeTimers()
-  try {
-    const def = buildDef('closeApp', () => new Promise<void>(() => {}))
-    const lookup = (): I_faActionDefinition<T_faActionId> | undefined => def
-    const entry = buildEntry('closeApp')
-    recordHistoryEnqueued(entry)
-    enqueueSyncAction(entry, def, lookup)
-    await vi.advanceTimersByTimeAsync(FA_ACTION_SYNC_TIMEOUT_MS + 10)
-    vi.useRealTimers()
-    await awaitSyncQueueDrain()
-    const lastRow = S_FaActionManager().actionHistory.at(-1)
-    expect(lastRow?.status).toBe('failed')
-    expect(notifyCreateMock).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'negative' })
-    )
-  } finally {
-    vi.useRealTimers()
+  const body = await ResultAsync.fromPromise(
+    (async (): Promise<void> => {
+      const def = buildDef('closeApp', () => new Promise<void>(() => {}))
+      const lookup = (): I_faActionDefinition<T_faActionId> | undefined => def
+      const entry = buildEntry('closeApp')
+      recordHistoryEnqueued(entry)
+      enqueueSyncAction(entry, def, lookup)
+      await vi.advanceTimersByTimeAsync(FA_ACTION_SYNC_TIMEOUT_MS + 10)
+      vi.useRealTimers()
+      await awaitSyncQueueDrain()
+      const lastRow = S_FaActionManager().actionHistory.at(-1)
+      expect(lastRow?.status).toBe('failed')
+      expect(notifyCreateMock).toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'negative' })
+      )
+    })(),
+    (e): unknown => e
+  )
+  vi.useRealTimers()
+  if (body.isErr()) {
+    throw body.error
   }
 })
 
@@ -268,19 +274,24 @@ test('Test that hung sync handlers are timed out via the timeout reject branch',
 test('Test that the late-firing timeout is short-circuited by the settled guard', async () => {
   vi.useFakeTimers()
   const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout').mockImplementation(() => undefined)
-  try {
-    const handler = vi.fn(() => {})
-    const def = buildDef('closeApp', handler)
-    const lookup = (): I_faActionDefinition<T_faActionId> | undefined => def
-    const entry = buildEntry('closeApp')
-    recordHistoryEnqueued(entry)
-    enqueueSyncAction(entry, def, lookup)
-    await vi.advanceTimersByTimeAsync(FA_ACTION_SYNC_TIMEOUT_MS + 5)
-    expect(handler).toHaveBeenCalledOnce()
-  } finally {
-    clearTimeoutSpy.mockRestore()
-    vi.useRealTimers()
-    await awaitSyncQueueDrain()
+  const body = await ResultAsync.fromPromise(
+    (async (): Promise<void> => {
+      const handler = vi.fn(() => {})
+      const def = buildDef('closeApp', handler)
+      const lookup = (): I_faActionDefinition<T_faActionId> | undefined => def
+      const entry = buildEntry('closeApp')
+      recordHistoryEnqueued(entry)
+      enqueueSyncAction(entry, def, lookup)
+      await vi.advanceTimersByTimeAsync(FA_ACTION_SYNC_TIMEOUT_MS + 5)
+      expect(handler).toHaveBeenCalledOnce()
+    })(),
+    (e): unknown => e
+  )
+  clearTimeoutSpy.mockRestore()
+  vi.useRealTimers()
+  await awaitSyncQueueDrain()
+  if (body.isErr()) {
+    throw body.error
   }
 })
 
@@ -323,22 +334,29 @@ test('Test that synchronous handlers complete via the synchronous finish branch'
  */
 test('Test that the late settle guard short-circuits finish when the timeout already fired', async () => {
   vi.useFakeTimers()
-  try {
-    let resolveHandler!: () => void
-    const handlerPromise = new Promise<void>((resolve) => { resolveHandler = resolve })
-    const def = buildDef('closeApp', () => handlerPromise)
-    const lookup = (): I_faActionDefinition<T_faActionId> | undefined => def
-    const entry = buildEntry('closeApp')
-    recordHistoryEnqueued(entry)
-    enqueueSyncAction(entry, def, lookup)
-    await vi.advanceTimersByTimeAsync(FA_ACTION_SYNC_TIMEOUT_MS + 5)
-    resolveHandler()
-    await vi.runAllTimersAsync()
-    vi.useRealTimers()
-    await awaitSyncQueueDrain()
-    const lastRow = S_FaActionManager().actionHistory.at(-1)
-    expect(lastRow?.status).toBe('failed')
-  } finally {
-    vi.useRealTimers()
+  const body = await ResultAsync.fromPromise(
+    (async (): Promise<void> => {
+      let resolveHandler!: () => void
+      const handlerPromise = new Promise<void>((resolve) => {
+        resolveHandler = resolve
+      })
+      const def = buildDef('closeApp', () => handlerPromise)
+      const lookup = (): I_faActionDefinition<T_faActionId> | undefined => def
+      const entry = buildEntry('closeApp')
+      recordHistoryEnqueued(entry)
+      enqueueSyncAction(entry, def, lookup)
+      await vi.advanceTimersByTimeAsync(FA_ACTION_SYNC_TIMEOUT_MS + 5)
+      resolveHandler()
+      await vi.runAllTimersAsync()
+      vi.useRealTimers()
+      await awaitSyncQueueDrain()
+      const lastRow = S_FaActionManager().actionHistory.at(-1)
+      expect(lastRow?.status).toBe('failed')
+    })(),
+    (e): unknown => e
+  )
+  vi.useRealTimers()
+  if (body.isErr()) {
+    throw body.error
   }
 })

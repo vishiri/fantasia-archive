@@ -60,6 +60,7 @@
 <script setup lang="ts">
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import type { StoreGeneric } from 'pinia'
+import { Result } from 'neverthrow'
 
 import { computed, onMounted, ref, watch } from 'vue'
 
@@ -73,11 +74,10 @@ defineOptions({
 })
 
 const resolveDialogComponentStore = (): StoreGeneric | null => {
-  try {
-    return S_DialogComponent()
-  } catch {
-    return null
-  }
+  return Result.fromThrowable(
+    (): StoreGeneric => S_DialogComponent(),
+    (): null => null
+  )().unwrapOr(null)
 }
 
 const props = defineProps<{

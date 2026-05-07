@@ -53,13 +53,13 @@ import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { onMounted, ref, watch } from 'vue'
 import SocialContactButtons from '../../other/SocialContactButtons/SocialContactButtons.vue'
 import type { StoreGeneric } from 'pinia'
+import { Result } from 'neverthrow'
 
 const resolveDialogComponentStore = (): StoreGeneric | null => {
-  try {
-    return S_DialogComponent()
-  } catch {
-    return null
-  }
+  return Result.fromThrowable(
+    (): StoreGeneric => S_DialogComponent(),
+    (): null => null
+  )().unwrapOr(null)
 }
 
 /**

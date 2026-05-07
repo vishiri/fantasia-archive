@@ -1,8 +1,9 @@
-import type { Ref } from 'vue'
-
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 import { Notify } from 'quasar'
+import { ref } from 'vue'
+import { ResultAsync } from 'neverthrow'
+
+import type { Ref } from 'vue'
 
 import type {
   I_faProgramStylingPatch,
@@ -42,11 +43,12 @@ export const S_FaProgramStyling = defineStore('S_FaProgramStyling', () => {
     if (typeof api?.getProgramStyling !== 'function') {
       return false
     }
-    try {
-      const next = await api.getProgramStyling()
-      setRoot(next)
-      return true
-    } catch (error) {
+    const readResult = await ResultAsync.fromPromise(
+      api.getProgramStyling(),
+      (error): unknown => error
+    )
+    if (readResult.isErr()) {
+      const error = readResult.error
       console.error('[S_FaProgramStyling] getProgramStyling failed', error)
       Notify.create({
         group: false,
@@ -56,6 +58,8 @@ export const S_FaProgramStyling = defineStore('S_FaProgramStyling', () => {
       })
       return false
     }
+    setRoot(readResult.value)
+    return true
   }
 
   async function updateProgramStyling (patch: I_faProgramStylingPatch): Promise<boolean> {
@@ -64,22 +68,27 @@ export const S_FaProgramStyling = defineStore('S_FaProgramStyling', () => {
       return false
     }
 
-    try {
-      await api.setProgramStyling(patch)
-    } catch (error) {
+    const writeResult = await ResultAsync.fromPromise(
+      api.setProgramStyling(patch),
+      (error): unknown => error
+    )
+    if (writeResult.isErr()) {
+      const error = writeResult.error
       // Error toast handled by the action manager's unified failure reporter; only the bridge log stays here.
       console.error('[S_FaProgramStyling] setProgramStyling failed', error)
       throw error instanceof Error ? error : new Error(String(error))
     }
 
-    let retrieved: I_faProgramStylingRoot
-    try {
-      retrieved = await api.getProgramStyling()
-    } catch (error) {
+    const afterSaveResult = await ResultAsync.fromPromise(
+      api.getProgramStyling(),
+      (error): unknown => error
+    )
+    if (afterSaveResult.isErr()) {
+      const error = afterSaveResult.error
       console.error('[S_FaProgramStyling] getProgramStyling after save failed', error)
       throw error instanceof Error ? error : new Error(String(error))
     }
-    setRoot(retrieved)
+    const retrieved = afterSaveResult.value
 
     if (retrieved.css !== patch.css) {
       console.error(`[S_FaProgramStyling] ${i18n.global.t('globalFunctionality.faProgramStyling.saveMismatchLog')}`, {
@@ -89,6 +98,8 @@ export const S_FaProgramStyling = defineStore('S_FaProgramStyling', () => {
       // Keep 'cssLivePreview' so '#faUserCss' still reflects the open editor until the user fixes or discards.
       throw new Error(i18n.global.t('globalFunctionality.faProgramStyling.saveError'))
     }
+
+    setRoot(retrieved)
 
     cssLivePreview.value = null
 

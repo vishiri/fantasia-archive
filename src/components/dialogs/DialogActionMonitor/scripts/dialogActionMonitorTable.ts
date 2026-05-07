@@ -4,6 +4,7 @@ import type {
   T_faActionKind
 } from 'app/types/I_faActionManagerDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
+import { Result } from 'neverthrow'
 
 /**
  * Fixed render columns for the action monitor table.
@@ -199,9 +200,12 @@ function parseDialogActionMonitorPayloadPreview (payloadPreview: string | undefi
   if (payloadPreview === undefined || payloadPreview === '') {
     return undefined
   }
-  try {
-    return JSON.parse(payloadPreview) as unknown
-  } catch {
-    return undefined
+  const parsedPayloadResult = Result.fromThrowable(
+    (): unknown => JSON.parse(payloadPreview) as unknown,
+    (): undefined => undefined
+  )()
+  if (parsedPayloadResult.isOk()) {
+    return parsedPayloadResult.value
   }
+  return undefined
 }

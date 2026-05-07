@@ -4,19 +4,22 @@
  * Skips stylesheets that throw on `cssRules` (cross-origin) and any nested rule list that is not
  * accessible.
  */
+import { Result } from 'neverthrow'
+
 export function collectFaColorCustomPropertyNamesFromDocument (): string[] {
   if (typeof document === 'undefined') {
     return []
   }
   const found = new Set<string>()
   for (const sheet of Array.from(document.styleSheets)) {
-    let rules: CSSRuleList
-    try {
-      rules = sheet.cssRules
-    } catch {
+    const sheetRulesResult = Result.fromThrowable(
+      (): CSSRuleList => sheet.cssRules,
+      (): undefined => undefined
+    )()
+    if (sheetRulesResult.isErr()) {
       continue
     }
-    walkRuleList(rules, found)
+    walkRuleList(sheetRulesResult.value, found)
   }
   return Array.from(found).sort()
 }
@@ -47,21 +50,25 @@ function walkRule (rule: CSSRule | null | undefined, found: Set<string>): void {
    */
   const withNestedSheet = rule as { styleSheet?: CSSStyleSheet | null }
   if (withNestedSheet.styleSheet) {
-    try {
-      const rules = withNestedSheet.styleSheet.cssRules
-      walkRuleList(rules, found)
-    } catch {
-      // Ignore nested sheets that are not readable.
+    const nestedRules = Result.fromThrowable(
+      (): CSSRuleList => withNestedSheet.styleSheet!.cssRules,
+      (): undefined => undefined
+    )()
+    if (nestedRules.isOk()) {
+      walkRuleList(nestedRules.value, found)
     }
     return
   }
   const withRules = rule as CSSRule & { cssRules?: CSSRuleList }
-  try {
-    const nested = withRules.cssRules
-    if (nested) {
-      walkRuleList(nested, found)
-    }
-  } catch {
-    // Ignore nested at-rules the engine does not expose or getters that throw.
+  const nestedListResult = Result.fromThrowable(
+    (): CSSRuleList | undefined | null => withRules.cssRules,
+    (): undefined => undefined
+  )()
+  if (nestedListResult.isErr()) {
+    return
+  }
+  const nestedList = nestedListResult.value
+  if (nestedList) {
+    walkRuleList(nestedList, found)
   }
 }

@@ -6,6 +6,7 @@ import { buildProgramSettingsRenderTree } from 'app/src/components/dialogs/Dialo
 import { runFaActionAwait } from 'app/src/scripts/actionManager/faActionManagerRun'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 import { toRaw, type Ref } from 'vue'
+import { Result } from 'neverthrow'
 
 import type { I_dialogProgramSettingsProps } from 'app/types/I_dialogProgramSettings'
 
@@ -18,11 +19,10 @@ export type T_programSettingsFaUserSettingsStoreForSync = {
 }
 
 function tryResolveFaUserSettingsStoreForSync (): T_programSettingsFaUserSettingsStoreForSync | null {
-  try {
-    return S_FaUserSettings()
-  } catch {
-    return null
-  }
+  return Result.fromThrowable(
+    (): T_programSettingsFaUserSettingsStoreForSync => S_FaUserSettings(),
+    (): null => null
+  )().unwrapOr(null)
 }
 
 /**

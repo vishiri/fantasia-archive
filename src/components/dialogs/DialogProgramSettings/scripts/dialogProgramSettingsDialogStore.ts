@@ -1,4 +1,5 @@
 import type { StoreGeneric } from 'pinia'
+import { Result } from 'neverthrow'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import type { T_programSettingsRenderTree } from 'app/types/I_dialogProgramSettings'
 import { onMounted, watch, type Ref } from 'vue'
@@ -10,11 +11,10 @@ import { S_DialogComponent } from 'src/stores/S_Dialog'
  * Resolves the component-dialog Pinia store when the app has an active Pinia instance; returns null if the store cannot be constructed (for example outside a component or without Pinia).
  */
 export function resolveDialogComponentStore (): StoreGeneric | null {
-  try {
-    return S_DialogComponent()
-  } catch {
-    return null
-  }
+  return Result.fromThrowable(
+    (): StoreGeneric => S_DialogComponent(),
+    (): null => null
+  )().unwrapOr(null)
 }
 
 function syncSelectedTabToTreeKeys (

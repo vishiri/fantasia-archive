@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
+import { ResultAsync } from 'neverthrow'
 
 import type {
   I_faActionDefinition,
@@ -41,31 +42,38 @@ async function dispatchAsyncEntry (
   const store = resolveFaActionManagerStore()
   store?.addAsync(entry)
   recordHistoryStartedFromEntry(entry, entry.enqueuedAt)
-  try {
-    const outcome = (definition.handler as (payload: unknown) => void | Promise<void>)(entry.payload)
-    if (outcome instanceof Promise) {
-      await outcome
-    }
-    recordHistoryCompleted(entry.uid, { kind: 'success' }, Date.now())
-    return true
-  } catch (error) {
-    if (error instanceof FaActionUserCanceledError) {
+  const outcomeBool = await ResultAsync.fromPromise(
+    (async (): Promise<void> => {
+      const raw = (definition.handler as (payload: unknown) => void | Promise<void>)(entry.payload)
+      if (raw instanceof Promise) {
+        await raw
+      }
+    })(),
+    (e): unknown => e
+  ).match(
+    () => {
       recordHistoryCompleted(entry.uid, { kind: 'success' }, Date.now())
+      return true
+    },
+    (error: unknown): boolean => {
+      if (error instanceof FaActionUserCanceledError) {
+        recordHistoryCompleted(entry.uid, { kind: 'success' }, Date.now())
+        return false
+      }
+      const failure = reportFaActionFailure(entry, error)
+      recordHistoryCompleted(
+        entry.uid,
+        {
+          errorMessage: failure.errorMessage,
+          kind: 'failed'
+        },
+        Date.now()
+      )
       return false
     }
-    const failure = reportFaActionFailure(entry, error)
-    recordHistoryCompleted(
-      entry.uid,
-      {
-        errorMessage: failure.errorMessage,
-        kind: 'failed'
-      },
-      Date.now()
-    )
-    return false
-  } finally {
-    store?.removeAsync(entry.uid)
-  }
+  )
+  store?.removeAsync(entry.uid)
+  return outcomeBool
 }
 
 function enqueueSyncEntry<Id extends T_faActionId> (
@@ -124,16 +132,24 @@ export function runFaActionAwait<Id extends T_faActionId> (
     const wrappedDefinition: I_faActionDefinition<T_faActionId> = {
       dedup: definition.dedup,
       handler: async (innerPayload) => {
-        try {
-          const outcome = (definition.handler as (innerPayloadInner: unknown) => void | Promise<void>)(innerPayload)
-          if (outcome instanceof Promise) {
-            await outcome
+        await ResultAsync.fromPromise(
+          (async (): Promise<void> => {
+            const innerOutcome =
+              (definition.handler as (innerPayloadInner: unknown) => void | Promise<void>)(
+                innerPayload
+              )
+            if (innerOutcome instanceof Promise) {
+              await innerOutcome
+            }
+          })(),
+          (e): unknown => e
+        ).match(
+          () => resolve(true),
+          (error): void => {
+            resolve(false)
+            throw error
           }
-          resolve(true)
-        } catch (error) {
-          resolve(false)
-          throw error
-        }
+        )
       },
       id: definition.id,
       kind: 'sync'

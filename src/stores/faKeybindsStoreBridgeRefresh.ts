@@ -1,6 +1,7 @@
 import type { Ref } from 'vue'
 
 import { Notify } from 'quasar'
+import { ResultAsync } from 'neverthrow'
 
 import type { I_faKeybindsSnapshot } from 'app/types/I_faKeybindsDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
@@ -15,15 +16,20 @@ export async function runFaKeybindsRefreshKeybinds (
   if (typeof api?.getKeybinds !== 'function') {
     return
   }
-  try {
-    snapshot.value = await api.getKeybinds()
-  } catch (error) {
-    console.error('[S_FaKeybinds] getKeybinds failed', error)
-    Notify.create({
-      group: false,
-      message: i18n.global.t('globalFunctionality.faKeybinds.loadError'),
-      timeout: 0,
-      type: 'negative'
-    })
+  const loadResult = await ResultAsync.fromPromise(
+    api.getKeybinds(),
+    (error): unknown => error
+  )
+  if (loadResult.isOk()) {
+    snapshot.value = loadResult.value
+    return
   }
+  const error = loadResult.error
+  console.error('[S_FaKeybinds] getKeybinds failed', error)
+  Notify.create({
+    group: false,
+    message: i18n.global.t('globalFunctionality.faKeybinds.loadError'),
+    timeout: 0,
+    type: 'negative'
+  })
 }

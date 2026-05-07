@@ -1,4 +1,5 @@
 import { readFile, stat } from 'node:fs/promises'
+import { Result, ResultAsync } from 'neverthrow'
 
 import { unzipProgramConfigBundle } from 'app/src-electron/mainScripts/programConfig/faProgramConfigBundle'
 import { tryStageImportFromUnzippedEntries } from 'app/src-electron/mainScripts/programConfig/faProgramConfigStageImportFromEntries'
@@ -11,10 +12,12 @@ import type { I_faProgramConfigPrepareResult } from 'app/types/I_faProgramConfig
 export async function runPrepareImportFromFaconfigFilePath (
   filePath: string
 ): Promise<I_faProgramConfigPrepareResult> {
-  let fstat: Awaited<ReturnType<typeof stat>>
-  try {
-    fstat = await stat(filePath)
-  } catch (e) {
+  const statResult = await ResultAsync.fromPromise(
+    stat(filePath),
+    (e): unknown => e
+  )
+  if (statResult.isErr()) {
+    const e = statResult.error
     const err = e instanceof Error ? e : new Error(String(e))
     console.error('[faProgramConfig] stat failed', {
       err,
@@ -26,6 +29,9 @@ export async function runPrepareImportFromFaconfigFilePath (
       outcome: 'error'
     }
   }
+
+  const fstat = statResult.value
+
   if (fstat.size > FA_PROGRAM_CONFIG_MAX_FILE_BYTES) {
     return {
       errorMessage: 'File is larger than 3 MB',
@@ -34,10 +40,12 @@ export async function runPrepareImportFromFaconfigFilePath (
     }
   }
 
-  let buf: Buffer
-  try {
-    buf = await readFile(filePath)
-  } catch (e) {
+  const readResult = await ResultAsync.fromPromise(
+    readFile(filePath),
+    (e): unknown => e
+  )
+  if (readResult.isErr()) {
+    const e = readResult.error
     const err = e instanceof Error ? e : new Error(String(e))
     console.error('[faProgramConfig] readFile failed', {
       err,
@@ -49,6 +57,9 @@ export async function runPrepareImportFromFaconfigFilePath (
       outcome: 'error'
     }
   }
+
+  const buf = readResult.value
+
   if (buf.length > FA_PROGRAM_CONFIG_MAX_FILE_BYTES) {
     return {
       errorMessage: 'File is larger than 3 MB',
@@ -57,10 +68,13 @@ export async function runPrepareImportFromFaconfigFilePath (
     }
   }
 
-  let unzipped: ReturnType<typeof unzipProgramConfigBundle>
-  try {
-    unzipped = unzipProgramConfigBundle(new Uint8Array(buf))
-  } catch (e) {
+  const unzippedResult = Result.fromThrowable(
+    (): ReturnType<typeof unzipProgramConfigBundle> => unzipProgramConfigBundle(new Uint8Array(buf)),
+    (e): unknown => e
+  )()
+
+  if (unzippedResult.isErr()) {
+    const e = unzippedResult.error
     const err = e instanceof Error ? e : new Error(String(e))
     console.error('[faProgramConfig] unzip failed', err)
     return {
@@ -69,6 +83,8 @@ export async function runPrepareImportFromFaconfigFilePath (
       outcome: 'error'
     }
   }
+
+  const unzipped = unzippedResult.value
 
   return tryStageImportFromUnzippedEntries(unzipped.entries)
 }

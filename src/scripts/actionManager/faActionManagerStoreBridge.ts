@@ -1,3 +1,5 @@
+import { Result } from 'neverthrow'
+
 import { S_FaActionManager } from 'app/src/stores/S_FaActionManager'
 
 /**
@@ -5,9 +7,8 @@ import { S_FaActionManager } from 'app/src/stores/S_FaActionManager'
  * Lets the manager modules avoid importing the store at module-eval time (and dodges circular imports).
  */
 export function resolveFaActionManagerStore (): ReturnType<typeof S_FaActionManager> | null {
-  try {
-    return S_FaActionManager()
-  } catch {
-    return null
-  }
+  return Result.fromThrowable(
+    (): ReturnType<typeof S_FaActionManager> => S_FaActionManager(),
+    (): null => null
+  )().unwrapOr(null)
 }

@@ -1,4 +1,5 @@
 import type { Session } from 'electron'
+import { Result } from 'neverthrow'
 
 import { resolveFaSpellCheckerLanguageTag } from 'app/src-electron/shared/resolveFaSpellCheckerLanguageTag'
 import type { T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
@@ -32,9 +33,11 @@ export function applyFaSpellCheckerLanguagesToSession (
   if (tag === null) {
     return
   }
-  try {
-    applyResolvedSpellCheckerLanguage(session, tag)
-  } catch {
-    // Chromium rejected the tag (for example bare fr/de before dictionaries are listed).
-  }
+  const resolvedTag = tag
+  void Result.fromThrowable(
+    (): void => {
+      applyResolvedSpellCheckerLanguage(session, resolvedTag)
+    },
+    (): undefined => undefined
+  )()
 }

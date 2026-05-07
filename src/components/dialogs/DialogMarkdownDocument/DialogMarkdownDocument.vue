@@ -49,13 +49,13 @@ import { registerMarkdownDialogStackGuard } from 'app/src/scripts/appGlobalManag
 import { S_DialogMarkdown } from 'src/stores/S_Dialog'
 import { computed, onMounted, ref, watch } from 'vue'
 import type { StoreGeneric } from 'pinia'
+import { Result } from 'neverthrow'
 
 const resolveDialogMarkdownStore = (): StoreGeneric | null => {
-  try {
-    return S_DialogMarkdown()
-  } catch {
-    return null
-  }
+  return Result.fromThrowable(
+    (): StoreGeneric => S_DialogMarkdown(),
+    (): null => null
+  )().unwrapOr(null)
 }
 
 /**

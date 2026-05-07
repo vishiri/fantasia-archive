@@ -12,6 +12,7 @@
  */
 import { readFileSync, readdirSync } from 'node:fs'
 import { join, relative } from 'node:path'
+import { Result } from 'neverthrow'
 
 const ROOT = process.cwd()
 const CATALOGUE_REL = join(
@@ -208,15 +209,17 @@ function main () {
     if (rel.startsWith('src/css/theme/quasar-components/')) {
       continue
     }
-    try {
-      outsideTexts.push({
+    const textResult = Result.fromThrowable(
+      () => ({
         text: readFileSync(
           abs,
           'utf8'
         )
-      })
-    } catch {
-      // skip unreadable
+      }),
+      () => undefined
+    )()
+    if (textResult.isOk()) {
+      outsideTexts.push(textResult.value)
     }
   }
   const externallyReferenced = new Set()

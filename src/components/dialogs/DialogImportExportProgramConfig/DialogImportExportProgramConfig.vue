@@ -182,6 +182,7 @@ import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalMana
 import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 import { onMounted, ref, watch } from 'vue'
 import type { StoreGeneric } from 'pinia'
+import { Result } from 'neverthrow'
 
 import { useDialogImportExportProgramConfigDialog } from './scripts/dialogImportExportProgramConfigDialog'
 import {
@@ -192,11 +193,10 @@ import {
 import DialogImportExportProgramConfigQItemCheckboxRow from './DialogImportExportProgramConfigQItemCheckboxRow.vue'
 
 const resolveDialogComponentStore = (): StoreGeneric | null => {
-  try {
-    return S_DialogComponent()
-  } catch {
-    return null
-  }
+  return Result.fromThrowable(
+    (): StoreGeneric => S_DialogComponent(),
+    (): null => null
+  )().unwrapOr(null)
 }
 
 const documentName: T_dialogName = 'ImportExportProgramConfig'

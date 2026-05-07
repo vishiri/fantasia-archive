@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
+import { Result } from 'neverthrow'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 const { BetterSqlite3Mock } = vi.hoisted(() => {
@@ -30,11 +31,12 @@ afterEach(() => {
   closeFaProjectActiveDatabase()
   BetterSqlite3Mock.mockReset()
   for (const p of tracked) {
-    try {
-      fs.unlinkSync(p)
-    } catch {
-      // ignore stray temp cleanup failures on Windows handles
-    }
+    void Result.fromThrowable(
+      (): void => {
+        fs.unlinkSync(p)
+      },
+      (): undefined => undefined
+    )()
   }
   tracked.length = 0
 })

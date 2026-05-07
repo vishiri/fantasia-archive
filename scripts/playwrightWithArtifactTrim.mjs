@@ -7,6 +7,7 @@ import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { Result } from 'neverthrow'
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -80,13 +81,14 @@ const r = spawnSync('npx', ['playwright', ...pwArgs], {
 })
 
 const artifacts = path.join(root, 'test-results', 'playwright-artifacts')
-try {
-  fs.rmSync(artifacts, {
-    recursive: true,
-    force: true
-  })
-} catch {
-  // ignore
-}
+void Result.fromThrowable(
+  () => {
+    fs.rmSync(artifacts, {
+      recursive: true,
+      force: true
+    })
+  },
+  () => undefined
+)()
 
 process.exit(r.status === null ? 1 : r.status)

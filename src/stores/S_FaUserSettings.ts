@@ -1,8 +1,9 @@
 import type { Ref } from 'vue'
 
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 import { Notify } from 'quasar'
+import { ref } from 'vue'
+import { ResultAsync } from 'neverthrow'
 
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
@@ -27,9 +28,12 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
   }
 
   async function updateSettings (updateObject: Partial<I_faUserSettings>): Promise<void> {
-    try {
-      await window.faContentBridgeAPIs.faUserSettings.setSettings(updateObject)
-    } catch (error) {
+    const setResult = await ResultAsync.fromPromise(
+      window.faContentBridgeAPIs.faUserSettings.setSettings(updateObject),
+      (error): unknown => error
+    )
+    if (setResult.isErr()) {
+      const error = setResult.error
       // Error toast handled by the action manager's unified failure reporter; only the bridge log stays here.
       console.error('[S_FaUserSettings] setSettings failed', error)
       throw error instanceof Error ? error : new Error(String(error))

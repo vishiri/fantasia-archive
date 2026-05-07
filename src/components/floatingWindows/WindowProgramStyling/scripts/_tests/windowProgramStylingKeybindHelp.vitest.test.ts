@@ -4,6 +4,7 @@ import {
   test,
   vi
 } from 'vitest'
+import { Result } from 'neverthrow'
 
 import { getMonacoKeybindHelpItems } from '../windowProgramStylingKeybindHelp'
 
@@ -155,14 +156,19 @@ test('Test that getMonacoKeybindHelpItems defaults to Ctrl chords when neither s
 test('Test that getMonacoKeybindHelpItems uses Ctrl when snapshot is null and navigator is not defined on globalThis', () => {
   faKeybindsSnapshotRef.value = null
   vi.stubGlobal('navigator', undefined)
-  try {
-    const chords = Object.fromEntries(
-      getMonacoKeybindHelpItems().map((row) => [row.labelKey, row.chord])
-    )
-    expect(chords.find).toBe('Ctrl + F')
-    expect(chords.findReplace).toBe('Ctrl + H')
-  } finally {
-    vi.unstubAllGlobals()
+  const body = Result.fromThrowable(
+    (): void => {
+      const chords = Object.fromEntries(
+        getMonacoKeybindHelpItems().map((row) => [row.labelKey, row.chord])
+      )
+      expect(chords.find).toBe('Ctrl + F')
+      expect(chords.findReplace).toBe('Ctrl + H')
+    },
+    (e): unknown => e
+  )()
+  vi.unstubAllGlobals()
+  if (body.isErr()) {
+    throw body.error
   }
 })
 

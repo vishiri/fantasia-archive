@@ -111,6 +111,71 @@ test('Test that collectFaColorCustomPropertyNamesFromDocument follows a nested s
 
 /**
  * collectFaColorCustomPropertyNamesFromDocument
+ * Nested `styleSheet` access can throw like top-level sheets; walkers ignore unreadable nested sheets.
+ */
+test('Test that collectFaColorCustomPropertyNamesFromDocument skips a nested styleSheet that throws on cssRules', () => {
+  const badNested = {
+    get cssRules () {
+      throw new Error('nested blocked')
+    }
+  } as unknown as CSSStyleSheet
+  const fakeImportShape = { styleSheet: badNested } as unknown as CSSRule
+  const ruleList = {
+    length: 1,
+    0: fakeImportShape,
+    item: (i: number) => (i === 0 ? fakeImportShape : null)
+  } as unknown as CSSRuleList
+  const topSheet = { get cssRules () { return ruleList } } as unknown as CSSStyleSheet
+  const sheetList = {
+    length: 1,
+    0: topSheet,
+    item: (i: number) => (i === 0 ? topSheet : null)
+  } as unknown as StyleSheetList
+  const owner = styleSheetsDefaultDesc
+    ? Object.getPrototypeOf(document)
+    : document
+  Object.defineProperty(owner, 'styleSheets', {
+    configurable: true,
+    enumerable: true,
+    value: sheetList
+  })
+  expect(collectFaColorCustomPropertyNamesFromDocument()).toEqual([])
+})
+
+/**
+ * collectFaColorCustomPropertyNamesFromDocument
+ * `cssRules` can be present but undefined/null; those edges are ignored.
+ */
+test('Test that collectFaColorCustomPropertyNamesFromDocument ignores rules whose cssRules resolves to undefined', () => {
+  const emptyRule = {
+    get cssRules () {
+      return undefined
+    }
+  } as unknown as CSSRule
+  const ruleList = {
+    length: 1,
+    0: emptyRule,
+    item: (i: number) => (i === 0 ? emptyRule : null)
+  } as unknown as CSSRuleList
+  const topSheet = { get cssRules () { return ruleList } } as unknown as CSSStyleSheet
+  const sheetList = {
+    length: 1,
+    0: topSheet,
+    item: (i: number) => (i === 0 ? topSheet : null)
+  } as unknown as StyleSheetList
+  const owner = styleSheetsDefaultDesc
+    ? Object.getPrototypeOf(document)
+    : document
+  Object.defineProperty(owner, 'styleSheets', {
+    configurable: true,
+    enumerable: true,
+    value: sheetList
+  })
+  expect(collectFaColorCustomPropertyNamesFromDocument()).toEqual([])
+})
+
+/**
+ * collectFaColorCustomPropertyNamesFromDocument
  * Nested at-rules (for example a media block) are walked.
  */
 test('Test that collectFaColorCustomPropertyNamesFromDocument walks rules inside a media block', () => {

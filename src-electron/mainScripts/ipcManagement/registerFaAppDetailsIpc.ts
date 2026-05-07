@@ -1,4 +1,5 @@
 import { app, ipcMain } from 'electron'
+import { Result } from 'neverthrow'
 
 import { FA_APP_DETAILS_IPC } from 'app/src-electron/electron-ipc-bridge'
 
@@ -15,10 +16,9 @@ export function registerFaAppDetailsIpc (): void {
   registered = true
 
   ipcMain.handle(FA_APP_DETAILS_IPC.getVersionAsync, () => {
-    try {
-      return app.getVersion()
-    } catch {
-      return ''
-    }
+    return Result.fromThrowable(
+      (): string => app.getVersion(),
+      (): '' => ''
+    )().unwrapOr('')
   })
 }

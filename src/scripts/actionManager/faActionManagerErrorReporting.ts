@@ -1,4 +1,5 @@
 import { Notify } from 'quasar'
+import { Result } from 'neverthrow'
 
 import type { I_faActionFailureLog, I_faActionQueueEntry } from 'app/types/I_faActionManagerDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
@@ -14,12 +15,14 @@ export function buildFaActionPayloadPreview (payload: unknown, maxLength = 400):
   if (payload === undefined) {
     return ''
   }
-  let serialized: string
-  try {
-    serialized = JSON.stringify(payload)
-  } catch {
+  const serializedResult = Result.fromThrowable(
+    (): string => JSON.stringify(payload),
+    (): undefined => undefined
+  )()
+  if (serializedResult.isErr()) {
     return '[unserializable]'
   }
+  const serialized = serializedResult.value
   if (serialized === undefined) {
     return ''
   }

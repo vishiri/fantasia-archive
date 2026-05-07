@@ -2,6 +2,7 @@ import fs from 'node:fs'
 
 import type Database from 'better-sqlite3'
 import BetterSqlite3 from 'better-sqlite3'
+import { Result } from 'neverthrow'
 
 let activeDb: Database | null = null
 
@@ -9,15 +10,20 @@ export function getFaProjectActiveDatabase (): Database | null {
   return activeDb
 }
 
+function closeDbIgnoringErrors (db: Database): void {
+  void Result.fromThrowable(
+    (): void => {
+      db.close()
+    },
+    (): undefined => undefined
+  )()
+}
+
 export function closeFaProjectActiveDatabase (): void {
   if (activeDb === null) {
     return
   }
-  try {
-    activeDb.close()
-  } catch {
-    // ignore close errors during shutdown
-  }
+  closeDbIgnoringErrors(activeDb)
   activeDb = null
 }
 
@@ -26,11 +32,7 @@ export function closeFaProjectActiveDatabase (): void {
  */
 export function replaceFaProjectActiveDatabase (next: Database): void {
   if (activeDb !== null && activeDb !== next) {
-    try {
-      activeDb.close()
-    } catch {
-      // ignore
-    }
+    closeDbIgnoringErrors(activeDb)
   }
   activeDb = next
 }

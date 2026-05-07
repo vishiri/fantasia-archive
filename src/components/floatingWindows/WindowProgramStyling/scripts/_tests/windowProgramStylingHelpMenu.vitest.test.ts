@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick } from 'vue'
+import { ResultAsync } from 'neverthrow'
 import { test, expect, vi } from 'vitest'
 
 import { useWindowProgramStylingHelpMenu } from 'app/src/components/floatingWindows/WindowProgramStyling/scripts/windowProgramStylingHelpMenu'
@@ -33,18 +34,23 @@ const HelpMenuTestHarness = defineComponent({
 test('Test that useWindowProgramStylingHelpMenu opens after the hover delay', async () => {
   vi.useFakeTimers()
   const w = mount(HelpMenuTestHarness)
-  try {
-    expect(w.get('[data-test-locator="helpMenuOpenState"]').text()).toBe('0')
-    await w.get('[data-test-locator="helpMenuHoverTarget"]').trigger('mouseenter')
-    vi.advanceTimersByTime(499)
-    await nextTick()
-    expect(w.get('[data-test-locator="helpMenuOpenState"]').text()).toBe('0')
-    vi.advanceTimersByTime(1)
-    await nextTick()
-    expect(w.get('[data-test-locator="helpMenuOpenState"]').text()).toBe('1')
-  } finally {
-    w.unmount()
-    vi.useRealTimers()
+  const body = await ResultAsync.fromPromise(
+    (async (): Promise<void> => {
+      expect(w.get('[data-test-locator="helpMenuOpenState"]').text()).toBe('0')
+      await w.get('[data-test-locator="helpMenuHoverTarget"]').trigger('mouseenter')
+      vi.advanceTimersByTime(499)
+      await nextTick()
+      expect(w.get('[data-test-locator="helpMenuOpenState"]').text()).toBe('0')
+      vi.advanceTimersByTime(1)
+      await nextTick()
+      expect(w.get('[data-test-locator="helpMenuOpenState"]').text()).toBe('1')
+    })(),
+    (e): unknown => e
+  )
+  w.unmount()
+  vi.useRealTimers()
+  if (body.isErr()) {
+    throw body.error
   }
 })
 
@@ -55,16 +61,21 @@ test('Test that useWindowProgramStylingHelpMenu opens after the hover delay', as
 test('Test that useWindowProgramStylingHelpMenu cancels a pending open on mouse leave', async () => {
   vi.useFakeTimers()
   const w = mount(HelpMenuTestHarness)
-  try {
-    const t = w.get('[data-test-locator="helpMenuHoverTarget"]')
-    await t.trigger('mouseenter')
-    await t.trigger('mouseleave')
-    vi.advanceTimersByTime(500)
-    await nextTick()
-    expect(w.get('[data-test-locator="helpMenuOpenState"]').text()).toBe('0')
-  } finally {
-    w.unmount()
-    vi.useRealTimers()
+  const body = await ResultAsync.fromPromise(
+    (async (): Promise<void> => {
+      const t = w.get('[data-test-locator="helpMenuHoverTarget"]')
+      await t.trigger('mouseenter')
+      await t.trigger('mouseleave')
+      vi.advanceTimersByTime(500)
+      await nextTick()
+      expect(w.get('[data-test-locator="helpMenuOpenState"]').text()).toBe('0')
+    })(),
+    (e): unknown => e
+  )
+  w.unmount()
+  vi.useRealTimers()
+  if (body.isErr()) {
+    throw body.error
   }
 })
 

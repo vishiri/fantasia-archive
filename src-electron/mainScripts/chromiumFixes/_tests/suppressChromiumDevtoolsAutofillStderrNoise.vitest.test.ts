@@ -1,8 +1,17 @@
 import { Buffer } from 'node:buffer'
 
+import { Result } from 'neverthrow'
 import { expect, test, vi } from 'vitest'
 
 import { suppressChromiumDevtoolsAutofillStderrNoise } from '../suppressChromiumDevtoolsAutofillStderrNoise'
+
+function withStderrWriteRestoredAfter (realWrite: typeof process.stderr.write, fn: () => void): void {
+  const body = Result.fromThrowable(fn, (e): unknown => e)()
+  process.stderr.write = realWrite
+  if (body.isErr()) {
+    throw body.error
+  }
+}
 
 /**
  * suppressChromiumDevtoolsAutofillStderrNoise
@@ -22,7 +31,7 @@ test('Test that suppressChromiumDevtoolsAutofillStderrNoise filters Autofill std
     return true
   }) as typeof process.stderr.write
 
-  try {
+  withStderrWriteRestoredAfter(realWrite, (): void => {
     suppressChromiumDevtoolsAutofillStderrNoise()
 
     const ret = process.stderr.write(
@@ -35,9 +44,7 @@ test('Test that suppressChromiumDevtoolsAutofillStderrNoise filters Autofill std
     forwarded.length = 0
     process.stderr.write('regular stderr line\n')
     expect(forwarded.length).toBe(1)
-  } finally {
-    process.stderr.write = realWrite
-  }
+  })
 })
 
 /**
@@ -58,15 +65,13 @@ test('Test that suppressChromiumDevtoolsAutofillStderrNoise filters Buffer chunk
     return true
   }) as typeof process.stderr.write
 
-  try {
+  withStderrWriteRestoredAfter(realWrite, (): void => {
     suppressChromiumDevtoolsAutofillStderrNoise()
 
     const noise = Buffer.from("Autofill.setAddresses wasn't found\n", 'utf8')
     process.stderr.write(noise, () => {})
     expect(forwarded).toHaveLength(0)
-  } finally {
-    process.stderr.write = realWrite
-  }
+  })
 })
 
 /**
@@ -91,7 +96,7 @@ test('Test that suppressChromiumDevtoolsAutofillStderrNoise forwards payload wit
     return true
   }) as typeof process.stderr.write
 
-  try {
+  withStderrWriteRestoredAfter(realWrite, (): void => {
     suppressChromiumDevtoolsAutofillStderrNoise()
 
     const cb = vi.fn()
@@ -100,9 +105,7 @@ test('Test that suppressChromiumDevtoolsAutofillStderrNoise forwards payload wit
     expect(forwarded[0]?.args[0]).toBe('keep me')
     expect(forwarded[0]?.args[1]).toBe('utf8')
     expect(forwarded[0]?.args[2]).toBe(cb)
-  } finally {
-    process.stderr.write = realWrite
-  }
+  })
 })
 
 /**
@@ -123,14 +126,12 @@ test('Test that suppressChromiumDevtoolsAutofillStderrNoise forwards numeric chu
     return true
   }) as typeof process.stderr.write
 
-  try {
+  withStderrWriteRestoredAfter(realWrite, (): void => {
     suppressChromiumDevtoolsAutofillStderrNoise()
 
     process.stderr.write(404 as unknown as string, () => {})
     expect(forwarded).toEqual([404])
-  } finally {
-    process.stderr.write = realWrite
-  }
+  })
 })
 
 /**
@@ -151,7 +152,7 @@ test('Test that suppressChromiumDevtoolsAutofillStderrNoise forwards write with 
     return true
   }) as typeof process.stderr.write
 
-  try {
+  withStderrWriteRestoredAfter(realWrite, (): void => {
     suppressChromiumDevtoolsAutofillStderrNoise()
 
     const cb = vi.fn()
@@ -159,9 +160,7 @@ test('Test that suppressChromiumDevtoolsAutofillStderrNoise forwards write with 
     expect(forwarded[0]).toBe('payload-only-callback')
     expect(forwarded[1]).toBe(cb)
     expect(forwarded[2]).toBeUndefined()
-  } finally {
-    process.stderr.write = realWrite
-  }
+  })
 })
 
 /**
@@ -177,16 +176,14 @@ test('Test that suppressChromiumDevtoolsAutofillStderrNoise forwards encoding wi
     return true
   }) as typeof process.stderr.write
 
-  try {
+  withStderrWriteRestoredAfter(realWrite, (): void => {
     suppressChromiumDevtoolsAutofillStderrNoise()
 
     process.stderr.write('enc-only', 'utf8')
     expect(forwarded[0]).toBe('enc-only')
     expect(forwarded[1]).toBe('utf8')
     expect(forwarded[2]).toBeUndefined()
-  } finally {
-    process.stderr.write = realWrite
-  }
+  })
 })
 
 /**
@@ -202,14 +199,12 @@ test('Test that suppressChromiumDevtoolsAutofillStderrNoise forwards single-argu
     return true
   }) as typeof process.stderr.write
 
-  try {
+  withStderrWriteRestoredAfter(realWrite, (): void => {
     suppressChromiumDevtoolsAutofillStderrNoise()
 
     process.stderr.write('single-arg-line\n')
     expect(forwarded[0]).toBe('single-arg-line\n')
     expect(forwarded[1]).toBeUndefined()
     expect(forwarded[2]).toBeUndefined()
-  } finally {
-    process.stderr.write = realWrite
-  }
+  })
 })

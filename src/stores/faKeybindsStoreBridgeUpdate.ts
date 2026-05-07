@@ -1,4 +1,5 @@
 import { Notify } from 'quasar'
+import { ResultAsync } from 'neverthrow'
 
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
@@ -21,9 +22,12 @@ export async function runFaKeybindsUpdateKeybinds (
     return false
   }
 
-  try {
-    await api.setKeybinds(patch)
-  } catch (error) {
+  const saveResult = await ResultAsync.fromPromise(
+    api.setKeybinds(patch),
+    (error): unknown => error
+  )
+  if (saveResult.isErr()) {
+    const error = saveResult.error
     // Error toast handled by the action manager's unified failure reporter; only the bridge log stays here.
     console.error('[S_FaKeybinds] setKeybinds failed', error)
     return false

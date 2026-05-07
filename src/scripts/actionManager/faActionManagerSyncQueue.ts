@@ -1,4 +1,5 @@
 import { Notify } from 'quasar'
+import { Result, ResultAsync } from 'neverthrow'
 
 import type { I_faActionDefinition, I_faActionQueueEntry, T_faActionId } from 'app/types/I_faActionManagerDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
@@ -74,15 +75,22 @@ function runHandlerWithTimeout (
         reject(errorOrNull)
       }
     }
-    let outcome: void | Promise<void>
-    try {
-      outcome = (definition.handler as (payload: unknown) => void | Promise<void>)(entry.payload)
-    } catch (immediateError) {
-      finish(immediateError)
+    const invocation = Result.fromThrowable(
+      (): void | Promise<void> => (
+        definition.handler as (payload: unknown) => void | Promise<void>
+      )(entry.payload),
+      (e): unknown => e
+    )()
+    if (invocation.isErr()) {
+      finish(invocation.error)
       return
     }
+    const outcome = invocation.value
     if (outcome instanceof Promise) {
-      outcome.then(() => finish(null)).catch((error: unknown) => finish(error))
+      void ResultAsync.fromPromise(outcome, (e): unknown => e).match(
+        () => finish(null),
+        finish
+      )
       return
     }
     finish(null)
@@ -96,22 +104,24 @@ async function executeSyncEntry (
   const store = resolveFaActionManagerStore()
   store?.setCurrent(entry)
   recordHistoryStarted(entry.uid, Date.now())
-  try {
-    await runHandlerWithTimeout(definition, entry)
-    recordHistoryCompleted(entry.uid, { kind: 'success' }, Date.now())
-  } catch (error) {
-    const failure = reportFaActionFailure(entry, error)
-    recordHistoryCompleted(
-      entry.uid,
-      {
-        errorMessage: failure.errorMessage,
-        kind: 'failed'
-      },
-      Date.now()
+  await Promise.resolve(
+    ResultAsync.fromPromise(runHandlerWithTimeout(definition, entry), (e): unknown => e).match(
+      () => recordHistoryCompleted(entry.uid, { kind: 'success' }, Date.now()),
+      (error) => {
+        const failure = reportFaActionFailure(entry, error)
+        recordHistoryCompleted(
+          entry.uid,
+          {
+            errorMessage: failure.errorMessage,
+            kind: 'failed'
+          },
+          Date.now()
+        )
+      }
     )
-  } finally {
+  ).finally(() => {
     store?.setCurrent(null)
-  }
+  })
 }
 
 async function processNextSyncAction (

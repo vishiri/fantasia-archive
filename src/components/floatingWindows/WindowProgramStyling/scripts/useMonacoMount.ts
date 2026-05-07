@@ -1,5 +1,6 @@
 import type { Ref } from 'vue'
 import { onBeforeUnmount, shallowRef } from 'vue'
+import { Result, ResultAsync } from 'neverthrow'
 
 /**
  * Lightweight subset of the Monaco standalone editor surface used by 'WindowProgramStyling'.
@@ -45,19 +46,23 @@ export function useMonacoMount (params: {
 
   function disposeEditor (): void {
     if (contentChangeDisposer !== null) {
-      try {
-        contentChangeDisposer.dispose()
-      } catch {
-        // Monaco swallows disposal errors at teardown; nothing actionable for the UI.
-      }
+      const disposable = contentChangeDisposer
+      void Result.fromThrowable(
+        (): void => {
+          disposable.dispose()
+        },
+        (): undefined => undefined
+      )()
       contentChangeDisposer = null
     }
     if (editor.value !== null) {
-      try {
-        editor.value.dispose()
-      } catch {
-        // Same rationale as above.
-      }
+      const disposed = editor.value
+      void Result.fromThrowable(
+        (): void => {
+          disposed.dispose()
+        },
+        (): undefined => undefined
+      )()
       editor.value = null
     }
   }
@@ -70,30 +75,38 @@ export function useMonacoMount (params: {
     }
     isLoading.value = true
     loadError.value = null
-    try {
-      const wrapper = await import('app/src/components/floatingWindows/WindowProgramStyling/scripts/cssMonaco')
-      const { monaco } = wrapper
-      const created = monaco.editor.create(host, {
-        value: initialValue,
-        language: 'css',
-        automaticLayout: true,
-        minimap: { enabled: false },
-        theme: 'vs-dark',
-        scrollBeyondLastLine: false,
-        wordWrap: 'on',
-        tabSize: 2,
-        fontSize: 13
-      }) as unknown as I_FaMonacoStandaloneEditorLike
-      editor.value = created
-      contentChangeDisposer = created.onDidChangeModelContent(() => {
-        params.onChange(created.getValue())
-      })
-    } catch (error) {
-      loadError.value = error instanceof Error ? error.message : String(error)
-      console.error('[WindowProgramStyling] Monaco load/mount failed', error)
-    } finally {
+    await Promise.resolve(
+      ResultAsync.fromPromise(
+        (async (): Promise<void> => {
+          const wrapper = await import('app/src/components/floatingWindows/WindowProgramStyling/scripts/cssMonaco')
+          const { monaco } = wrapper
+          const created = monaco.editor.create(host, {
+            value: initialValue,
+            language: 'css',
+            automaticLayout: true,
+            minimap: { enabled: false },
+            theme: 'vs-dark',
+            scrollBeyondLastLine: false,
+            wordWrap: 'on',
+            tabSize: 2,
+            fontSize: 13
+          }) as unknown as I_FaMonacoStandaloneEditorLike
+          editor.value = created
+          contentChangeDisposer = created.onDidChangeModelContent(() => {
+            params.onChange(created.getValue())
+          })
+        })(),
+        (error): unknown => error
+      ).match(
+        () => undefined,
+        (error) => {
+          loadError.value = error instanceof Error ? error.message : String(error)
+          console.error('[WindowProgramStyling] Monaco load/mount failed', error)
+        }
+      )
+    ).finally(() => {
       isLoading.value = false
-    }
+    })
   }
 
   onBeforeUnmount(() => {

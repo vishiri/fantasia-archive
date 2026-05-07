@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
+import { Result } from 'neverthrow'
 
 import type { I_faProgramConfigUnzipOk } from 'app/src-electron/mainScripts/programConfig/faProgramConfigBundle'
 import { faProgramConfigImportStagedSessions } from 'app/src-electron/mainScripts/programConfig/faProgramConfigImportStagedState'
@@ -36,7 +37,7 @@ export function tryStageImportFromUnzippedEntries (
     programStyling: 'absent'
   }
 
-  try {
+  const parseResult = Result.fromThrowable((): void => {
     if (usRaw !== undefined) {
       data.programSettings = parseFaUserSettingsFile(JSON.parse(usRaw) as unknown)
       parts.programSettings = 'ok'
@@ -49,7 +50,10 @@ export function tryStageImportFromUnzippedEntries (
       data.programStyling = parseFaProgramStylingRootFile(JSON.parse(stRaw) as unknown)
       parts.programStyling = 'ok'
     }
-  } catch (e) {
+  }, (e): unknown => e)()
+
+  if (parseResult.isErr()) {
+    const e = parseResult.error
     const err = e instanceof Error ? e : new Error(String(e))
     console.error('[faProgramConfig] JSON or schema validation failed', {
       message: err.message,

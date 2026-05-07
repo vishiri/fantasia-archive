@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto'
 import type { IpcMainInvokeEvent } from 'electron'
 import type { SaveDialogOptions } from 'electron'
 import { dialog } from 'electron'
+import { Result } from 'neverthrow'
 import { ZodError } from 'zod'
 
 import { windowFromIpcEvent } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
@@ -92,10 +93,13 @@ export async function runFaProjectCreateFromIpc (
   event: IpcMainInvokeEvent,
   raw: unknown
 ): Promise<I_faProjectCreateResult> {
-  let parsed: ReturnType<typeof parseFaProjectCreateInput>
-  try {
-    parsed = parseFaProjectCreateInput(raw)
-  } catch (e) {
+  const parsedResult = Result.fromThrowable(
+    (): ReturnType<typeof parseFaProjectCreateInput> => parseFaProjectCreateInput(raw),
+    (e): unknown => e
+  )()
+
+  if (parsedResult.isErr()) {
+    const e = parsedResult.error
     if (e instanceof TypeError) {
       return {
         errorMessage: e.message,
@@ -120,6 +124,8 @@ export async function runFaProjectCreateFromIpc (
     }
   }
 
+  const parsed = parsedResult.value
+
   const target = await resolveCreateTargetPath(event, parsed.projectName)
   if (target === null) {
     return { outcome: 'canceled' }
@@ -136,7 +142,23 @@ export async function runFaProjectCreateFromIpc (
   unlinkFaProjectFileIfExists(filePath)
 
   let db: Database | null = null
-  try {
+
+  function cleanupAfterFailedCreate (): void {
+    if (db !== null) {
+      void Result.fromThrowable(
+        (): void => {
+          db!.close()
+        },
+        (): undefined => undefined
+      )()
+    }
+    void Result.fromThrowable(
+      (): void => unlinkFaProjectFileIfExists(filePath),
+      (): undefined => undefined
+    )()
+  }
+
+  const createResult = Result.fromThrowable((): void => {
     db = openFaProjectDatabase(filePath)
     db.pragma('foreign_keys = ON')
     db.pragma('busy_timeout = 5000')
@@ -144,20 +166,13 @@ export async function runFaProjectCreateFromIpc (
     applyFaProjectMigrations(db, parsed.projectName)
     assertFaProjectDatabaseQuickCheck(db)
     replaceFaProjectActiveDatabase(db)
-  } catch (e) {
-    try {
-      if (db !== null) {
-        db.close()
-      }
-    } catch {
-      // ignore
-    }
-    try {
-      unlinkFaProjectFileIfExists(filePath)
-    } catch {
-      // ignore
-    }
-    const err = e instanceof Error ? e : new Error(String(e))
+  }, (e): unknown => e)()
+
+  if (createResult.isErr()) {
+    cleanupAfterFailedCreate()
+    const err = createResult.error instanceof Error
+      ? createResult.error
+      : new Error(String(createResult.error))
     console.error('[faProjectManagement] create failed', {
       err,
       filePath
