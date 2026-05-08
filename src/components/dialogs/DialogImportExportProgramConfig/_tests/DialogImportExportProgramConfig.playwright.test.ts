@@ -1,19 +1,9 @@
-import { _electron as electron } from 'playwright'
 import type { ElectronApplication, Page } from 'playwright'
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
-import {
-  FA_ELECTRON_MAIN_JS_PATH,
-  FA_FRONTEND_RENDER_TIMER
-} from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
-import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
-import {
-  closeFaElectronAppWithRecordedVideoAttachments,
-  getFaPlaywrightElectronRecordVideoPartial,
-  installFaPlaywrightCursorMarkerIfVideoEnabled
-} from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
-import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
-import { waitForFaRendererContentBridgeApis } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
+import { launchFaPlaywrightComponentHarnessWindow } from 'app/helpers/playwrightHelpers_component/faPlaywrightComponentHarnessLifecycle'
+import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
+import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import importExportMessages from 'app/i18n/en-US/dialogs/L_importExportProgramConfig'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 
@@ -25,11 +15,6 @@ const extraEnvSettings = {
   COMPONENT_NAME: 'DialogImportExportProgramConfig',
   COMPONENT_PROPS: JSON.stringify({})
 }
-
-/**
- * Electron main filepath
- */
-const electronMainFilePath: string = FA_ELECTRON_MAIN_JS_PATH
 
 /**
  * Buffer before assertions so the component-testing shell finishes rendering.
@@ -57,20 +42,27 @@ test.describe.serial('Import / export program configuration dialog (smoke)', () 
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({
       directInput: importExportDirectInput
     })
-    resetFaPlaywrightIsolatedUserData()
-    electronApp = await electron.launch({
-      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
-      args: [electronMainFilePath],
-      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    const launched = await launchFaPlaywrightComponentHarnessWindow({
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          COMPONENT_NAME: extraEnvSettings.COMPONENT_NAME,
+          COMPONENT_PROPS: extraEnvSettings.COMPONENT_PROPS,
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      renderDelayMs: faFrontendRenderTimer,
+      testInfo
     })
-    appWindow = await electronApp.firstWindow()
-    await waitForFaRendererContentBridgeApis(appWindow)
-    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-    await appWindow.waitForTimeout(faFrontendRenderTimer)
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {
-    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      electronApp,
+      suiteTestInfo
+    })
   })
 
   /**

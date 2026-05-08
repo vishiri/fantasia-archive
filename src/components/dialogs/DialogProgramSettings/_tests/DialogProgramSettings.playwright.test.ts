@@ -1,24 +1,15 @@
-import { _electron as electron } from 'playwright'
 import type { ElectronApplication, Page } from 'playwright'
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
-import {
-  FA_ELECTRON_MAIN_JS_PATH,
-  FA_FRONTEND_RENDER_TIMER
-} from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
-import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
-import {
-  closeFaElectronAppWithRecordedVideoAttachments,
-  getFaPlaywrightElectronRecordVideoPartial,
-  installFaPlaywrightCursorMarkerIfVideoEnabled
-} from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
+import { launchFaPlaywrightComponentHarnessWindow } from 'app/helpers/playwrightHelpers_component/faPlaywrightComponentHarnessLifecycle'
+import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
+import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import { PROGRAM_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogProgramSettings/_data/programSettingsOptions'
+
+import programSettingsMessages from 'app/i18n/en-US/dialogs/L_programSettings'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 
 import { buildExpectedProgramSettingsTreeFromEnUsMessages } from './DialogProgramSettings.playwright.expectations'
-import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
-import { waitForFaRendererContentBridgeApis } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
-import programSettingsMessages from 'app/i18n/en-US/dialogs/L_programSettings'
 
 /**
  * Extra env settings to trigger component testing via Playwright
@@ -28,11 +19,6 @@ const extraEnvSettings = {
   COMPONENT_NAME: 'DialogProgramSettings',
   COMPONENT_PROPS: JSON.stringify({})
 }
-
-/**
- * Electron main filepath
- */
-const electronMainFilePath:string = FA_ELECTRON_MAIN_JS_PATH
 
 /**
  * Buffer so the component-testing shell finishes rendering before assertions.
@@ -131,20 +117,27 @@ test.describe.serial('Program settings dialog', () => {
   test.beforeAll(async ({}, testInfo) => {
     suiteTestInfo = testInfo
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: programSettingsDirectInput })
-    resetFaPlaywrightIsolatedUserData()
-    electronApp = await electron.launch({
-      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
-      args: [electronMainFilePath],
-      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    const launched = await launchFaPlaywrightComponentHarnessWindow({
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          COMPONENT_NAME: extraEnvSettings.COMPONENT_NAME,
+          COMPONENT_PROPS: extraEnvSettings.COMPONENT_PROPS,
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      renderDelayMs: faFrontendRenderTimer,
+      testInfo
     })
-    appWindow = await electronApp.firstWindow()
-    await waitForFaRendererContentBridgeApis(appWindow)
-    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-    await appWindow.waitForTimeout(faFrontendRenderTimer)
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {
-    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      electronApp,
+      suiteTestInfo
+    })
   })
 
   /**
@@ -405,20 +398,27 @@ test.describe.serial('Program settings showDocumentID persists after Save', () =
   test.beforeAll(async ({}, testInfo) => {
     suiteTestInfo = testInfo
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: programSettingsDirectInput })
-    resetFaPlaywrightIsolatedUserData()
-    electronApp = await electron.launch({
-      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
-      args: [electronMainFilePath],
-      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    const launched = await launchFaPlaywrightComponentHarnessWindow({
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          COMPONENT_NAME: extraEnvSettings.COMPONENT_NAME,
+          COMPONENT_PROPS: extraEnvSettings.COMPONENT_PROPS,
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      renderDelayMs: faFrontendRenderTimer,
+      testInfo
     })
-    appWindow = await electronApp.firstWindow()
-    await waitForFaRendererContentBridgeApis(appWindow)
-    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-    await appWindow.waitForTimeout(faFrontendRenderTimer)
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {
-    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      electronApp,
+      suiteTestInfo
+    })
   })
 
   test('showDocumentID persists after Save; getSettings returns true over the IPC bridge', async () => {
@@ -470,20 +470,27 @@ test.describe.serial('Program settings showDocumentID defaults on fresh userData
   test.beforeAll(async ({}, testInfo) => {
     suiteTestInfo = testInfo
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: programSettingsDirectInput })
-    resetFaPlaywrightIsolatedUserData()
-    electronApp = await electron.launch({
-      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
-      args: [electronMainFilePath],
-      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    const launched = await launchFaPlaywrightComponentHarnessWindow({
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          COMPONENT_NAME: extraEnvSettings.COMPONENT_NAME,
+          COMPONENT_PROPS: extraEnvSettings.COMPONENT_PROPS,
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      renderDelayMs: faFrontendRenderTimer,
+      testInfo
     })
-    appWindow = await electronApp.firstWindow()
-    await waitForFaRendererContentBridgeApis(appWindow)
-    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-    await appWindow.waitForTimeout(faFrontendRenderTimer)
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {
-    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      electronApp,
+      suiteTestInfo
+    })
   })
 
   test('showDocumentID toggle is off on a fresh profile after Playwright userData reset', async () => {

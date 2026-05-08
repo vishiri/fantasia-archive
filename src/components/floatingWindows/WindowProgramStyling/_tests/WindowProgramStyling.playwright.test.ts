@@ -1,20 +1,9 @@
-import { _electron as electron } from 'playwright'
 import type { ElectronApplication, Page } from 'playwright'
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
-import {
-  FA_ELECTRON_MAIN_JS_PATH,
-  FA_FRONTEND_RENDER_TIMER
-} from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
-import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
-import {
-  closeFaElectronAppWithRecordedVideoAttachments,
-  getFaPlaywrightElectronRecordVideoPartial,
-  installFaPlaywrightCursorMarkerIfVideoEnabled
-} from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
-import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers/playwrightDismissStartupTipsNotify'
-import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
-import { waitForFaRendererContentBridgeApis } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
+import { launchFaPlaywrightComponentHarnessWindow } from 'app/helpers/playwrightHelpers_component/faPlaywrightComponentHarnessLifecycle'
+import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
+import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import programStylingMessages from 'app/i18n/en-US/floatingWindows/L_programStyling'
 import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/faQuasarDialogStandardTransition'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
@@ -27,11 +16,6 @@ const extraEnvSettings = {
   COMPONENT_NAME: 'WindowProgramStyling',
   COMPONENT_PROPS: JSON.stringify({})
 }
-
-/**
- * Electron main filepath
- */
-const electronMainFilePath: string = FA_ELECTRON_MAIN_JS_PATH
 
 /**
  * Buffer so the component-testing shell finishes rendering before assertions.
@@ -119,21 +103,28 @@ test.describe.serial('Program styling floating window chrome and persistent clos
   test.beforeAll(async ({}, testInfo) => {
     suiteTestInfo = testInfo
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: programStylingDirectInput })
-    resetFaPlaywrightIsolatedUserData()
-    electronApp = await electron.launch({
-      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
-      args: [electronMainFilePath],
-      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    const launched = await launchFaPlaywrightComponentHarnessWindow({
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          COMPONENT_NAME: extraEnvSettings.COMPONENT_NAME,
+          COMPONENT_PROPS: extraEnvSettings.COMPONENT_PROPS,
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      dismissStartupTips: true,
+      renderDelayMs: faFrontendRenderTimer,
+      testInfo
     })
-    appWindow = await electronApp.firstWindow()
-    await waitForFaRendererContentBridgeApis(appWindow)
-    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-    await appWindow.waitForTimeout(faFrontendRenderTimer)
-    await dismissStartupTipsNotifyIfPresent(appWindow)
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {
-    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      electronApp,
+      suiteTestInfo
+    })
   })
 
   /**

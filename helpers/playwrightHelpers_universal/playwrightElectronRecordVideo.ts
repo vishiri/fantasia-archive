@@ -8,9 +8,9 @@ import type { ElectronApplication } from 'playwright'
 import {
   attachWebmFilesUnderDir,
   removeRecordVideoTempDirBestEffort
-} from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideoAttach'
+} from 'app/helpers/playwrightHelpers_universal/playwrightElectronRecordVideoAttach'
 
-export { installFaPlaywrightCursorMarkerIfVideoEnabled } from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideoCursor'
+export { installFaPlaywrightCursorMarkerIfVideoEnabled } from 'app/helpers/playwrightHelpers_universal/playwrightElectronRecordVideoCursor'
 
 /** Frame width for Playwright 'recordVideo.size' (1080p). */
 export const FA_PLAYWRIGHT_ELECTRON_VIDEO_WIDTH = 1920

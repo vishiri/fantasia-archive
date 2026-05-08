@@ -1,28 +1,15 @@
-import { _electron as electron } from 'playwright'
 import type { ElectronApplication, Page } from 'playwright'
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
-import { FA_ELECTRON_MAIN_JS_PATH } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
-import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
-import {
-  closeFaElectronAppWithRecordedVideoAttachments,
-  getFaPlaywrightElectronRecordVideoPartial,
-  installFaPlaywrightCursorMarkerIfVideoEnabled
-} from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
-import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
+import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
+import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 
 /**
  * Extra env settings to trigger testing via Playwright
  */
-import { waitForFaE2eRendererDomReady } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
 const extraEnvSettings = {
   TEST_ENV: 'e2e'
 }
-
-/**
- * Electron main filepath
- */
-const electronMainFilePath:string = FA_ELECTRON_MAIN_JS_PATH
 
 /**
  * Buffer before assertions so the window is ready (e2e uses 0 here).
@@ -44,22 +31,29 @@ test.describe.serial('App splash screen', () => {
 
   test.beforeAll(async ({}, testInfo) => {
     suiteTestInfo = testInfo
-    resetFaPlaywrightIsolatedUserData()
-    electronApp = await electron.launch({
-      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
-      args: [electronMainFilePath],
-      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    /**
+     * Dismiss tips stays off: visibility wait can exceed splash opacity asserts when no banner mounts.
+     */
+    const launched = await launchFaPlaywrightE2eAppWindow({
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      dismissStartupTips: false,
+      renderDelayMs: faFrontendRenderTimer,
+      testInfo
     })
-    appWindow = await electronApp.firstWindow()
-    await waitForFaE2eRendererDomReady(appWindow)
-    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-    await appWindow.waitForTimeout(faFrontendRenderTimer)
-    // Intentionally omit dismissStartupTipsNotifyIfPresent: its full visibility-timeout wait can outlast
-    // the splash opacity assertion in the first test (splash fades while waiting for a missing tips banner).
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {
-    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      electronApp,
+      suiteTestInfo
+    })
   })
 
   /**

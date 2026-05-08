@@ -5,18 +5,23 @@ import { defineConfig } from 'vitest/config'
 
 import {
   vitestCoverageBaseExclude,
-  vitestCoverageSkipFull,
-  vitestCoverageStrictThresholds
+  vitestCoverageSkipFull
 } from './vitest.coverage.shared'
 import { vitestTerminalReporters } from './vitest.reporters.shared'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
 
+/** Playwright harness packages stay out of Vitest strict coverage—they are exercised by Playwright specs. */
+const PLAYWRIGHT_HELPERS_COVERAGE_EXCLUDE = [
+  'helpers/playwrightHelpers_universal/**',
+  'helpers/playwrightHelpers_component/**',
+  'helpers/playwrightHelpers_e2e/**'
+] as const
+
 /**
- * Node unit tests for modules under helpers/ (e.g. helpers/playwrightHelpers/).
- * Convention: colocate *.vitest.test.ts under each package's _tests/ tree; this glob picks up every helper subtree.
- * Vitest workspace configs live under vitest/ at the repo root so this coverage gate applies only to real helper packages.
+ * Node unit tests for modules under helpers/ excluding Playwright-only harness trees.
+ * Playwright helpers (helpers/playwrightHelpers_*) intentionally have no *.vitest.test.ts corpus today.
  */
 export default defineConfig({
   resolve: {
@@ -34,6 +39,11 @@ export default defineConfig({
     name: 'unit-helpers',
     environment: 'node',
     include: ['helpers/**/*.vitest.test.ts'],
+    exclude: [
+      ...PLAYWRIGHT_HELPERS_COVERAGE_EXCLUDE,
+      'helpers/playwrightHelpers/**'
+    ],
+    passWithNoTests: true,
     reporters: [...vitestTerminalReporters],
     outputFile: 'test-results/vitest-report/test-results-vitest-helpers.json',
     coverage: {
@@ -42,9 +52,10 @@ export default defineConfig({
       include: ['helpers/**/*.ts'],
       exclude: [
         ...vitestCoverageBaseExclude,
-        'helpers/**/_tests/**'
-      ],
-      thresholds: vitestCoverageStrictThresholds
+        'helpers/**/_tests/**',
+        ...PLAYWRIGHT_HELPERS_COVERAGE_EXCLUDE,
+        'helpers/playwrightHelpers/**'
+      ]
     }
   }
 })

@@ -1,24 +1,14 @@
-import { _electron as electron } from 'playwright'
 import type { ElectronApplication, Locator, Page } from 'playwright'
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
-import {
-  FA_ELECTRON_MAIN_JS_PATH,
-  FA_FRONTEND_RENDER_TIMER
-} from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
-import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
-import { FA_PLAYWRIGHT_PRESS_CONTROL_SHIFT_F11 } from 'app/helpers/playwrightHelpers/faPlaywrightKeyboardChords'
-import {
-  closeFaElectronAppWithRecordedVideoAttachments,
-  getFaPlaywrightElectronRecordVideoPartial,
-  installFaPlaywrightCursorMarkerIfVideoEnabled
-} from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
-import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
-import { waitForFaRendererContentBridgeApis } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
-import keybindDialogMessages from 'app/i18n/en-US/dialogs/L_dialogKeybindSettings'
-import { FA_KEYBIND_COMMAND_DEFINITIONS } from 'app/src/scripts/keybinds/faKeybindCommandDefinitions'
 import { buildDialogKeybindSettingsRows } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsTable'
+import { FA_KEYBIND_COMMAND_DEFINITIONS } from 'app/src/scripts/keybinds/faKeybindCommandDefinitions'
 import { formatFaKeybindChordForUi } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
+import { launchFaPlaywrightComponentHarnessWindow } from 'app/helpers/playwrightHelpers_component/faPlaywrightComponentHarnessLifecycle'
+import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
+import { FA_PLAYWRIGHT_PRESS_CONTROL_SHIFT_F11 } from 'app/helpers/playwrightHelpers_universal/faPlaywrightKeyboardChords'
+import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
+import keybindDialogMessages from 'app/i18n/en-US/dialogs/L_dialogKeybindSettings'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 
 /**
@@ -29,11 +19,6 @@ const extraEnvSettings = {
   COMPONENT_NAME: 'DialogKeybindSettings',
   COMPONENT_PROPS: JSON.stringify({})
 }
-
-/**
- * Electron main filepath
- */
-const electronMainFilePath: string = FA_ELECTRON_MAIN_JS_PATH
 
 /**
  * Buffer so the component-testing shell finishes rendering before assertions.
@@ -123,20 +108,27 @@ test.describe.serial('Keybind settings dialog list, defaults, and filter', () =>
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({
       directInput: keybindSettingsDirectInput
     })
-    resetFaPlaywrightIsolatedUserData()
-    electronApp = await electron.launch({
-      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
-      args: [electronMainFilePath],
-      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    const launched = await launchFaPlaywrightComponentHarnessWindow({
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          COMPONENT_NAME: extraEnvSettings.COMPONENT_NAME,
+          COMPONENT_PROPS: extraEnvSettings.COMPONENT_PROPS,
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      renderDelayMs: faFrontendRenderTimer,
+      testInfo
     })
-    appWindow = await electronApp.firstWindow()
-    await waitForFaRendererContentBridgeApis(appWindow)
-    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-    await appWindow.waitForTimeout(faFrontendRenderTimer)
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {
-    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      electronApp,
+      suiteTestInfo
+    })
   })
 
   /**
@@ -255,20 +247,27 @@ test.describe.serial('Keybind settings toggleDeveloperTools persists after Save'
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({
       directInput: keybindSettingsDirectInput
     })
-    resetFaPlaywrightIsolatedUserData()
-    electronApp = await electron.launch({
-      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
-      args: [electronMainFilePath],
-      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    const launched = await launchFaPlaywrightComponentHarnessWindow({
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          COMPONENT_NAME: extraEnvSettings.COMPONENT_NAME,
+          COMPONENT_PROPS: extraEnvSettings.COMPONENT_PROPS,
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      renderDelayMs: faFrontendRenderTimer,
+      testInfo
     })
-    appWindow = await electronApp.firstWindow()
-    await waitForFaRendererContentBridgeApis(appWindow)
-    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-    await appWindow.waitForTimeout(faFrontendRenderTimer)
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {
-    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      electronApp,
+      suiteTestInfo
+    })
   })
 
   /**

@@ -1,32 +1,19 @@
-import { _electron as electron } from 'playwright'
 import type { ElectronApplication, Page } from 'playwright'
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
-import {
-  FA_ELECTRON_MAIN_JS_PATH,
-  FA_FRONTEND_RENDER_TIMER
-} from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
-import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
-import {
-  closeFaElectronAppWithRecordedVideoAttachments,
-  getFaPlaywrightElectronRecordVideoPartial,
-  installFaPlaywrightCursorMarkerIfVideoEnabled
-} from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
+import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
 import {
   e2eSetNextProjectCreatePath,
   tryUnlinkE2eFaprojectFixture
-} from 'app/helpers/playwrightHelpers/playwrightE2eProjectPaths'
-import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers/playwrightDismissStartupTipsNotify'
-import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
-import { waitForFaE2eRendererDomReady } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
+} from 'app/helpers/playwrightHelpers_e2e/playwrightE2eProjectPaths'
+import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
+import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import projectMenu from 'app/i18n/en-US/components/globals/AppControlMenus/L_project'
 import newProjectSettings from 'app/i18n/en-US/dialogs/L_newProjectSettings'
 
 const extraEnvSettings = {
   TEST_ENV: 'e2e' as const
 }
-
-const electronMainFilePath: string = FA_ELECTRON_MAIN_JS_PATH
 
 const selectorList = {
   activeProject: 'mainLayout-activeProjectName',
@@ -42,25 +29,34 @@ test.describe.serial('New project creation', () => {
 
   test.beforeAll(async ({}, testInfo) => {
     suiteTestInfo = testInfo
-    resetFaPlaywrightIsolatedUserData()
-    tryUnlinkE2eFaprojectFixture('e2e-splash-project.faproject')
-    tryUnlinkE2eFaprojectFixture('e2e-menu-project.faproject')
-    electronApp = await electron.launch({
-      args: [electronMainFilePath],
-      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
-      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    const launched = await launchFaPlaywrightE2eAppWindow({
+      afterIsolationResetBeforeLaunch (): void {
+        tryUnlinkE2eFaprojectFixture('e2e-splash-project.faproject')
+        tryUnlinkE2eFaprojectFixture('e2e-menu-project.faproject')
+      },
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      dismissStartupTips: true,
+      renderDelayMs: FA_FRONTEND_RENDER_TIMER,
+      testInfo
     })
-    appWindow = await electronApp.firstWindow()
-    await waitForFaE2eRendererDomReady(appWindow)
-    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-    await appWindow.waitForTimeout(FA_FRONTEND_RENDER_TIMER)
-    await dismissStartupTipsNotifyIfPresent(appWindow)
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {
-    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
-    tryUnlinkE2eFaprojectFixture('e2e-splash-project.faproject')
-    tryUnlinkE2eFaprojectFixture('e2e-menu-project.faproject')
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      async afterClose (): Promise<void> {
+        tryUnlinkE2eFaprojectFixture('e2e-splash-project.faproject')
+        tryUnlinkE2eFaprojectFixture('e2e-menu-project.faproject')
+      },
+      electronApp,
+      suiteTestInfo
+    })
   })
 
   test('creates a .faproject from the splash New project control', async () => {

@@ -1,33 +1,18 @@
-import { _electron as electron } from 'playwright'
 import type { ElectronApplication, Page } from 'playwright'
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
-import {
-  FA_ELECTRON_MAIN_JS_PATH,
-  FA_FRONTEND_RENDER_TIMER
-} from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
-import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
-import {
-  closeFaElectronAppWithRecordedVideoAttachments,
-  getFaPlaywrightElectronRecordVideoPartial,
-  installFaPlaywrightCursorMarkerIfVideoEnabled
-} from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
-import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
+import { launchFaPlaywrightComponentHarnessWindow } from 'app/helpers/playwrightHelpers_component/faPlaywrightComponentHarnessLifecycle'
+import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
+import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 
 /**
  * Extra env settings to trigger component testing via Playwright
  */
-import { waitForFaRendererContentBridgeApis } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
 const extraEnvSettings = {
   TEST_ENV: 'components',
   COMPONENT_NAME: 'FantasiaMascotImage',
   COMPONENT_PROPS: JSON.stringify({})
 }
-
-/**
- * Electron main filepath
- */
-const electronMainFilePath:string = FA_ELECTRON_MAIN_JS_PATH
 
 /**
  * Buffer before assertions so the component-testing shell finishes rendering.
@@ -53,20 +38,27 @@ test.describe.serial('Fantasia mascot image (default props)', () => {
   test.beforeAll(async ({}, testInfo) => {
     suiteTestInfo = testInfo
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({})
-    resetFaPlaywrightIsolatedUserData()
-    electronApp = await electron.launch({
-      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
-      args: [electronMainFilePath],
-      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    const launched = await launchFaPlaywrightComponentHarnessWindow({
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          COMPONENT_NAME: extraEnvSettings.COMPONENT_NAME,
+          COMPONENT_PROPS: extraEnvSettings.COMPONENT_PROPS,
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      renderDelayMs: faFrontendRenderTimer,
+      testInfo
     })
-    appWindow = await electronApp.firstWindow()
-    await waitForFaRendererContentBridgeApis(appWindow)
-    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-    await appWindow.waitForTimeout(faFrontendRenderTimer)
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {
-    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      electronApp,
+      suiteTestInfo
+    })
   })
 
   /**
@@ -111,20 +103,27 @@ test.describe.serial('Fantasia mascot image (explicit dimensions)', () => {
       width: testStringWidth,
       height: testStringHeight
     })
-    resetFaPlaywrightIsolatedUserData()
-    electronApp = await electron.launch({
-      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
-      args: [electronMainFilePath],
-      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    const launched = await launchFaPlaywrightComponentHarnessWindow({
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          COMPONENT_NAME: extraEnvSettings.COMPONENT_NAME,
+          COMPONENT_PROPS: extraEnvSettings.COMPONENT_PROPS,
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      renderDelayMs: faFrontendRenderTimer,
+      testInfo
     })
-    appWindow = await electronApp.firstWindow()
-    await waitForFaRendererContentBridgeApis(appWindow)
-    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-    await appWindow.waitForTimeout(faFrontendRenderTimer)
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {
-    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      electronApp,
+      suiteTestInfo
+    })
   })
 
   /**
@@ -154,20 +153,27 @@ test.describe.serial('Fantasia mascot image (fixed fantasiaImage id)', () => {
     suiteTestInfo = testInfo
     const testString = 'flop'
     extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ fantasiaImage: testString })
-    resetFaPlaywrightIsolatedUserData()
-    electronApp = await electron.launch({
-      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
-      args: [electronMainFilePath],
-      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    const launched = await launchFaPlaywrightComponentHarnessWindow({
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          COMPONENT_NAME: extraEnvSettings.COMPONENT_NAME,
+          COMPONENT_PROPS: extraEnvSettings.COMPONENT_PROPS,
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      renderDelayMs: faFrontendRenderTimer,
+      testInfo
     })
-    appWindow = await electronApp.firstWindow()
-    await waitForFaRendererContentBridgeApis(appWindow)
-    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-    await appWindow.waitForTimeout(faFrontendRenderTimer)
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {
-    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      electronApp,
+      suiteTestInfo
+    })
   })
 
   /**

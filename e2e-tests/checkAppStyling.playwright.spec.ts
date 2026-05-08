@@ -1,21 +1,11 @@
-import { _electron as electron } from 'playwright'
 import type { ElectronApplication, Page } from 'playwright'
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
-import {
-  FA_ELECTRON_MAIN_JS_PATH,
-  FA_FRONTEND_RENDER_TIMER
-} from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchConstants'
-import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers/faPlaywrightElectronLaunchEnv'
-import { getFaPlaywrightMonacoSelectAllPressString } from 'app/helpers/playwrightHelpers/faPlaywrightKeyboardChords'
-import {
-  closeFaElectronAppWithRecordedVideoAttachments,
-  getFaPlaywrightElectronRecordVideoPartial,
-  installFaPlaywrightCursorMarkerIfVideoEnabled
-} from 'app/helpers/playwrightHelpers/playwrightElectronRecordVideo'
-import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers/playwrightDismissStartupTipsNotify'
-import { resetFaPlaywrightIsolatedUserData } from 'app/helpers/playwrightHelpers/playwrightUserDataReset'
-import { waitForFaE2eRendererDomReady } from 'app/helpers/playwrightHelpers/waitForFaRendererContentBridgeApis'
+import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
+import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
+import { getFaPlaywrightMonacoSelectAllPressString } from 'app/helpers/playwrightHelpers_universal/faPlaywrightKeyboardChords'
+import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers_universal/playwrightDismissStartupTipsNotify'
+import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import toolsMenuMessages from 'app/i18n/en-US/components/globals/AppControlMenus/L_tools'
 import programStylingMessages from 'app/i18n/en-US/floatingWindows/L_programStyling'
 
@@ -25,11 +15,6 @@ import programStylingMessages from 'app/i18n/en-US/floatingWindows/L_programStyl
 const extraEnvSettings = {
   TEST_ENV: 'e2e'
 }
-
-/**
- * Electron main filepath
- */
-const electronMainFilePath: string = FA_ELECTRON_MAIN_JS_PATH
 
 /**
  * Buffer before assertions so the window and menus are ready.
@@ -146,21 +131,25 @@ test.describe.serial('Custom program CSS end-to-end', () => {
 
   test.beforeAll(async ({}, testInfo) => {
     suiteTestInfo = testInfo
-    resetFaPlaywrightIsolatedUserData()
-    electronApp = await electron.launch({
-      env: buildFaPlaywrightElectronLaunchEnv(extraEnvSettings),
-      args: [electronMainFilePath],
-      ...getFaPlaywrightElectronRecordVideoPartial(testInfo)
+    const launched = await launchFaPlaywrightE2eAppWindow({
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      renderDelayMs: faFrontendRenderTimer,
+      testInfo
     })
-    appWindow = await electronApp.firstWindow()
-    await waitForFaE2eRendererDomReady(appWindow)
-    await installFaPlaywrightCursorMarkerIfVideoEnabled(appWindow)
-    await appWindow.waitForTimeout(faFrontendRenderTimer)
-    await dismissStartupTipsNotifyIfPresent(appWindow)
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {
-    await closeFaElectronAppWithRecordedVideoAttachments(electronApp, suiteTestInfo, afterAllTestInfo)
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      electronApp,
+      suiteTestInfo
+    })
   })
 
   /**

@@ -4,7 +4,7 @@ import path from 'node:path'
 import type { ElectronApplication } from 'playwright'
 import { Result } from 'neverthrow'
 
-import { getFaPlaywrightIsolatedUserDataDir } from './playwrightUserDataReset'
+import { getFaPlaywrightIsolatedUserDataDir } from 'app/helpers/playwrightHelpers_universal/playwrightUserDataReset'
 
 /**
  * Keep in lockstep with 'src-electron/mainScripts/projectManagement/faProjectManagementE2ePathOverride.ts'
