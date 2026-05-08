@@ -94,11 +94,30 @@ const attachStorybookVisualFailureCapture = async (
 
   const probe = await ResultAsync.fromPromise(
     page.evaluate(() => {
-      const root = document.querySelector('#storybook-root, #root')
+      const storybookRoot = document.querySelector('#storybook-root')
+      const hashedRoot = document.querySelector('#root')
+      /**
+       * 'querySelector(#storybook-root, #root)' returns whichever appears first in the document,
+       * not a preference for the filled root node. Prefer explicit OR semantics so empty legacy '#root' does not hide
+       * a mounted Vue tree under '#storybook-root'.
+       */
+      let reportRoot = storybookRoot ?? hashedRoot
+
+      if (storybookRoot !== null && storybookRoot.childElementCount > 0) {
+        reportRoot = storybookRoot
+      } else if (hashedRoot !== null && hashedRoot.childElementCount > 0) {
+        reportRoot = hashedRoot
+      }
+
       return {
-        childElementCount: root?.childElementCount ?? null,
         locationHref: window.location.href,
-        outerHtmlSlice: root ? root.outerHTML.slice(0, 60_000) : null
+        storybookRootChildCount: storybookRoot?.childElementCount ?? null,
+        legacyRootChildCount: hashedRoot?.childElementCount ?? null,
+        teleportSignalCount:
+          document.querySelectorAll('.q-dialog, [role="dialog"], .q-menu').length,
+        observedRootId: reportRoot?.id ?? null,
+        childElementCount: reportRoot?.childElementCount ?? null,
+        outerHtmlSlice: reportRoot !== null ? reportRoot.outerHTML.slice(0, 60_000) : null
       }
     }),
     (): undefined => undefined
@@ -154,9 +173,13 @@ test('Capture visual snapshots for Storybook stories', async ({ browser, request
           }
 
           const storyRendered = await page.waitForFunction(() => {
-            const root = document.querySelector('#storybook-root, #root')
-            const hasRootChildren = root !== null && root.childElementCount > 0
-            const hasTeleportContent = document.querySelector('.q-dialog, [role="dialog"], .q-menu') !== null
+            const storybookRoot = document.querySelector('#storybook-root')
+            const hashedRoot = document.querySelector('#root')
+            const hasRootChildren =
+              (storybookRoot !== null && storybookRoot.childElementCount > 0) ||
+              (hashedRoot !== null && hashedRoot.childElementCount > 0)
+            const hasTeleportContent =
+              document.querySelector('.q-dialog, [role="dialog"], .q-menu') !== null
             return hasRootChildren || hasTeleportContent
           }, undefined, {
             timeout: STORY_RENDER_TIMEOUT_MS

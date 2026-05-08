@@ -15,7 +15,10 @@ import {
   recordHistoryStartedFromEntry
 } from './faActionManagerHistory'
 import { enqueueSyncAction } from './faActionManagerSyncQueue'
-import { reportFaActionFailure } from './faActionManagerErrorReporting'
+import {
+  buildFaActionFailureHistoryPayloadPreview,
+  reportFaActionFailure
+} from './faActionManagerErrorReporting'
 import { FaActionUserCanceledError } from './faActionUserCanceledError'
 import { resolveFaActionManagerStore } from './faActionManagerStoreBridge'
 
@@ -43,16 +46,29 @@ async function dispatchAsyncEntry (
   store?.addAsync(entry)
   recordHistoryStartedFromEntry(entry, entry.enqueuedAt)
   const outcomeBool = await ResultAsync.fromPromise(
-    (async (): Promise<void> => {
-      const raw = (definition.handler as (payload: unknown) => void | Promise<void>)(entry.payload)
-      if (raw instanceof Promise) {
-        await raw
+    (async (): Promise<{ payloadPreview?: string } | undefined> => {
+      const raw = definition.handler(entry.payload as never)
+      const resolved = raw instanceof Promise ? await raw : raw
+      if (
+        resolved !== undefined &&
+        resolved !== null &&
+        typeof resolved === 'object' &&
+        typeof (resolved as { payloadPreview?: unknown }).payloadPreview === 'string'
+      ) {
+        const pv = (resolved as { payloadPreview: string }).payloadPreview
+        return { payloadPreview: pv }
       }
+      return undefined
     })(),
     (e): unknown => e
   ).match(
-    () => {
-      recordHistoryCompleted(entry.uid, { kind: 'success' }, Date.now())
+    (continuation): boolean => {
+      recordHistoryCompleted(
+        entry.uid,
+        { kind: 'success' },
+        Date.now(),
+        continuation?.payloadPreview
+      )
       return true
     },
     (error: unknown): boolean => {
@@ -61,13 +77,15 @@ async function dispatchAsyncEntry (
         return false
       }
       const failure = reportFaActionFailure(entry, error)
+      const failurePreview = buildFaActionFailureHistoryPayloadPreview(error)
       recordHistoryCompleted(
         entry.uid,
         {
           errorMessage: failure.errorMessage,
           kind: 'failed'
         },
-        Date.now()
+        Date.now(),
+        failurePreview
       )
       return false
     }

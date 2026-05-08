@@ -4,17 +4,17 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import { expect, test, vi } from 'vitest'
 
-import DialogNewProjectSettings from '../DialogNewProjectSettings.vue'
+import DialogNewProject from '../DialogNewProject.vue'
 
-vi.mock('../scripts/dialogNewProjectSettingsSubmit', () => {
+vi.mock('../scripts/dialogNewProjectSubmit', () => {
   return {
-    runDialogNewProjectSettingsCreate: vi.fn(async () => undefined)
+    runDialogNewProjectCreate: vi.fn(async () => undefined)
   }
 })
 
-import { runDialogNewProjectSettingsCreate } from '../scripts/dialogNewProjectSettingsSubmit'
+import { runDialogNewProjectCreate } from '../scripts/dialogNewProjectSubmit'
 
-const dialogNewProjectSettingsQDialogStub = defineComponent({
+const dialogNewProjectQDialogStub = defineComponent({
   name: 'QDialog',
   props: {
     modelValue: {
@@ -26,7 +26,7 @@ const dialogNewProjectSettingsQDialogStub = defineComponent({
   template: '<div class="q-dialog-stub"><div v-show="modelValue" class="q-dialog-stub-inner"><slot /></div></div>'
 })
 
-const dialogNewProjectSettingsQInputStub = defineComponent({
+const dialogNewProjectQInputStub = defineComponent({
   name: 'QInput',
   props: {
     modelValue: {
@@ -41,10 +41,10 @@ const dialogNewProjectSettingsQInputStub = defineComponent({
       this.$emit('update:modelValue', v)
     }
   },
-  template: '<input class="dialog-new-project-settings-qinput-mock" :value="modelValue" @input="onInput" />'
+  template: '<input class="dialog-new-project-qinput-mock" :value="modelValue" @input="onInput" />'
 })
 
-const dialogNewProjectSettingsQBtnStub = defineComponent({
+const dialogNewProjectQBtnStub = defineComponent({
   name: 'QBtn',
   inheritAttrs: true,
   props: {
@@ -56,55 +56,55 @@ const dialogNewProjectSettingsQBtnStub = defineComponent({
   template: '<button type="button" v-bind="$attrs" :disabled="disable" @click="$emit(\'click\')"><slot /></button>'
 })
 
-const dialogNewProjectSettingsStubs = {
-  QBtn: dialogNewProjectSettingsQBtnStub,
-  QDialog: dialogNewProjectSettingsQDialogStub,
-  QInput: dialogNewProjectSettingsQInputStub
+const dialogNewProjectStubs = {
+  QBtn: dialogNewProjectQBtnStub,
+  QDialog: dialogNewProjectQDialogStub,
+  QInput: dialogNewProjectQInputStub
 }
 
 /**
- * DialogNewProjectSettings
+ * DialogNewProject
  * Create stays disabled until the name is non-empty after trim.
  */
-test('Test that DialogNewProjectSettings disables create for blank name', async () => {
-  const w = mount(DialogNewProjectSettings, {
+test('Test that DialogNewProject disables create for blank name', async () => {
+  const w = mount(DialogNewProject, {
     global: {
-      components: { ...dialogNewProjectSettingsStubs },
+      components: { ...dialogNewProjectStubs },
       mocks: {
         $t: (k: string) => k
       }
     },
     props: {
-      directInput: 'NewProjectSettings'
+      directInput: 'NewProject'
     }
   })
   await flushPromises()
-  const create = w.get('[data-test-locator="dialogNewProjectSettings-button-create"]')
+  const create = w.get('[data-test-locator="dialogNewProject-button-create"]')
   expect((create.element as HTMLButtonElement).disabled).toBe(true)
-  await w.get('.dialog-new-project-settings-qinput-mock').setValue('World')
+  await w.get('.dialog-new-project-qinput-mock').setValue('World')
   await flushPromises()
   expect((create.element as HTMLButtonElement).disabled).toBe(false)
   w.unmount()
 })
 
 /**
- * DialogNewProjectSettings
+ * DialogNewProject
  * Closing without create leaves no stale text on the next open because the field resets whenever the sheet opens.
  */
-test('Test that DialogNewProjectSettings clears project name when dialog reopens', async () => {
-  const w = mount(DialogNewProjectSettings, {
+test('Test that DialogNewProject clears project name when dialog reopens', async () => {
+  const w = mount(DialogNewProject, {
     global: {
-      components: { ...dialogNewProjectSettingsStubs },
+      components: { ...dialogNewProjectStubs },
       mocks: {
         $t: (k: string) => k
       }
     },
     props: {
-      directInput: 'NewProjectSettings'
+      directInput: 'NewProject'
     }
   })
   await flushPromises()
-  const inputSel = '.dialog-new-project-settings-qinput-mock'
+  const inputSel = '.dialog-new-project-qinput-mock'
   await w.get(inputSel).setValue('partial')
   await flushPromises()
   const dlg = w.findComponent({ name: 'QDialog' })
@@ -117,26 +117,26 @@ test('Test that DialogNewProjectSettings clears project name when dialog reopens
 })
 
 /**
- * DialogNewProjectSettings
+ * DialogNewProject
  * Create invokes submit helper with trimmed name.
  */
-test('Test that DialogNewProjectSettings calls submit on create', async () => {
-  const submit = vi.mocked(runDialogNewProjectSettingsCreate)
+test('Test that DialogNewProject calls submit on create', async () => {
+  const submit = vi.mocked(runDialogNewProjectCreate)
   submit.mockReset()
-  const w = mount(DialogNewProjectSettings, {
+  const w = mount(DialogNewProject, {
     global: {
-      components: { ...dialogNewProjectSettingsStubs },
+      components: { ...dialogNewProjectStubs },
       mocks: {
         $t: (k: string) => k
       }
     },
     props: {
-      directInput: 'NewProjectSettings'
+      directInput: 'NewProject'
     }
   })
   await flushPromises()
-  await w.get('.dialog-new-project-settings-qinput-mock').setValue('  Hi  ')
-  await w.get('[data-test-locator="dialogNewProjectSettings-button-create"]').trigger('click')
+  await w.get('.dialog-new-project-qinput-mock').setValue('  Hi  ')
+  await w.get('[data-test-locator="dialogNewProject-button-create"]').trigger('click')
   await flushPromises()
   expect(submit).toHaveBeenCalled()
   const firstArg = submit.mock.calls[0]?.[0]

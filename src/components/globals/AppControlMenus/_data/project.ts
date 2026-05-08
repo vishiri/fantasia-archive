@@ -17,13 +17,15 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
 
   return [
     faMenuItem('appControlMenus.project.items.newProject', 'mdi-plus', {
-      trigger: () => runFaAction('openNewProjectSettingsDialog', undefined)
+      trigger: () => runFaAction('openNewProjectDialog', undefined)
     }),
     faMenuSeparator(),
     faMenuItem('appControlMenus.project.items.saveProject', 'mdi-package-variant-closed', {
       conditions: gate
     }),
-    faMenuItem('appControlMenus.project.items.loadProject', 'mdi-package-variant'),
+    faMenuItem('appControlMenus.project.items.loadProject', 'mdi-package-variant', {
+      trigger: () => runFaAction('loadExistingProject', {})
+    }),
     faMenuSeparator(),
     faMenuItem('appControlMenus.project.items.exportProjectDocuments', 'mdi-database-export-outline'),
     faMenuSeparator(),

@@ -2,12 +2,13 @@ import { beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_PROJECT_MANAGEMENT_IPC } from 'app/src-electron/electron-ipc-bridge'
 
-const { runCreateMock, ipcMainHandleMock, appOnMock, closeActiveMock } = vi.hoisted(() => {
+const { runCreateMock, runOpenMock, ipcMainHandleMock, appOnMock, closeActiveMock } = vi.hoisted(() => {
   return {
     appOnMock: vi.fn(),
     closeActiveMock: vi.fn(),
     ipcMainHandleMock: vi.fn(),
-    runCreateMock: vi.fn(async () => ({ outcome: 'canceled' as const }))
+    runCreateMock: vi.fn(async () => ({ outcome: 'canceled' as const })),
+    runOpenMock: vi.fn(async () => ({ outcome: 'canceled' as const }))
   }
 })
 
@@ -28,6 +29,12 @@ vi.mock('app/src-electron/mainScripts/projectManagement/faProjectCreateRun', () 
   }
 })
 
+vi.mock('app/src-electron/mainScripts/projectManagement/faProjectOpenRun', () => {
+  return {
+    runFaProjectOpenFromIpc: runOpenMock
+  }
+})
+
 vi.mock('app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase', () => {
   return {
     closeFaProjectActiveDatabase: closeActiveMock
@@ -40,7 +47,9 @@ beforeEach(async () => {
   appOnMock.mockReset()
   closeActiveMock.mockReset()
   runCreateMock.mockReset()
+  runOpenMock.mockReset()
   runCreateMock.mockResolvedValue({ outcome: 'canceled' })
+  runOpenMock.mockResolvedValue({ outcome: 'canceled' })
 })
 
 function handlerFor (channel: string): (...args: unknown[]) => unknown {
@@ -49,11 +58,15 @@ function handlerFor (channel: string): (...args: unknown[]) => unknown {
   return call?.[1] as (...args: unknown[]) => unknown
 }
 
-test('registerFaProjectManagementIpc registers createProject and before-quit hook once', async () => {
+test('registerFaProjectManagementIpc registers createProject, openProject, and before-quit hook once', async () => {
   const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
   registerFaProjectManagementIpc()
   expect(ipcMainHandleMock).toHaveBeenCalledWith(
     FA_PROJECT_MANAGEMENT_IPC.createProjectAsync,
+    expect.any(Function)
+  )
+  expect(ipcMainHandleMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.openProjectAsync,
     expect.any(Function)
   )
   expect(appOnMock).toHaveBeenCalledWith('before-quit', expect.any(Function))
@@ -71,6 +84,14 @@ test('createProjectAsync handler delegates to runFaProjectCreateFromIpc', async 
   const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.createProjectAsync)
   await expect(h({}, { projectName: 'Alpha' })).resolves.toEqual({ outcome: 'canceled' })
   expect(runCreateMock).toHaveBeenCalledOnce()
+})
+
+test('openProjectAsync handler delegates to runFaProjectOpenFromIpc', async () => {
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.openProjectAsync)
+  await expect(h({}, {})).resolves.toEqual({ outcome: 'canceled' })
+  expect(runOpenMock).toHaveBeenCalledOnce()
 })
 
 test('registerFaProjectManagementIpc before-quit hook closes active project database', async () => {

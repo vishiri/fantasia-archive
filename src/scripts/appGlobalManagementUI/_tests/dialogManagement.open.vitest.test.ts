@@ -70,11 +70,11 @@ test('Test that openDialogComponent accepts ProgramSettings dialog name', () => 
   expect(generateDialogUUIDComponentMock).toHaveBeenCalled()
 })
 
-test('Test that openDialogComponent accepts NewProjectSettings dialog name', () => {
+test('Test that openDialogComponent accepts NewProject dialog name', () => {
   markdownStoreMock.markdownDialogOpenCount = 0
   componentStoreMock.componentDialogOpenCount = 0
-  openDialogComponent('NewProjectSettings')
-  expect(componentStoreMock.dialogToOpen).toBe('NewProjectSettings')
+  openDialogComponent('NewProject')
+  expect(componentStoreMock.dialogToOpen).toBe('NewProject')
   expect(generateDialogUUIDComponentMock).toHaveBeenCalled()
 })
 

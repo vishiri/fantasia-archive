@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import DialogNewProjectSettings from '../DialogNewProjectSettings.vue'
+import DialogNewProject from '../DialogNewProject.vue'
 
 const meta = {
-  title: 'Components/dialogs/DialogNewProjectSettings',
-  component: DialogNewProjectSettings,
+  title: 'Components/dialogs/DialogNewProject',
+  component: DialogNewProject,
   tags: ['autodocs'],
   parameters: {
     docs: {
@@ -18,12 +18,12 @@ const meta = {
       }
     }
   }
-} satisfies Meta<typeof DialogNewProjectSettings>
+} satisfies Meta<typeof DialogNewProject>
 
 export default meta
 
 export const Default: StoryObj<typeof meta> = {
   args: {
-    directInput: 'NewProjectSettings'
+    directInput: 'NewProject'
   }
 }

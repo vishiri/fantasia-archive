@@ -20,7 +20,7 @@ export default {
     title: 'Dem FA-Discord-Server beitreten'
   },
   buttonReddit: {
-    label: 'Reddit',
+    label: '',
     title: 'Dem FA-Subreddit beitreten'
   },
   buttonTwitter: {

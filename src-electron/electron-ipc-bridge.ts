@@ -65,5 +65,6 @@ export const FA_PROGRAM_CONFIG_IPC = {
 
 /** Project database (.faproject) — async invoke/handle. */
 export const FA_PROJECT_MANAGEMENT_IPC = {
-  createProjectAsync: 'fa-project-management-create-project-async'
+  createProjectAsync: 'fa-project-management-create-project-async',
+  openProjectAsync: 'fa-project-management-open-project-async'
 } as const

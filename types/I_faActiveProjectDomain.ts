@@ -9,7 +9,7 @@ export interface I_faActiveProject {
   filePath: string
 
   /**
-   * Stable identifier for this open project (for example a session id from main).
+   * Persistent project UUID stored in the SQLite `project_options.project_uuid` row (same value after reload).
    */
   id: string
 

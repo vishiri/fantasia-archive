@@ -89,7 +89,8 @@ const baseBridge = () => ({
     })
   },
   projectManagement: {
-    createProject: async () => ({ outcome: 'canceled' })
+    createProject: async () => ({ outcome: 'canceled' }),
+    openProject: async () => ({ outcome: 'canceled' })
   }
 })
 

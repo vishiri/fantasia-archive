@@ -59,7 +59,7 @@
         outline
         type="button"
         :label="$t('splashPage.newProject')"
-        @click="runFaAction('openNewProjectSettingsDialog', undefined)"
+        @click="runFaAction('openNewProjectDialog', undefined)"
       />
       <q-btn
         class="splashControls__actionBtn text-uppercase"
@@ -68,6 +68,7 @@
         outline
         type="button"
         :label="$t('splashPage.loadExistingProject')"
+        @click="runFaAction('loadExistingProject', {})"
       />
     </div>
   </div>

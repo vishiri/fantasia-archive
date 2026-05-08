@@ -76,20 +76,23 @@ export type T_faActionHistoryOutcome =
 
 /**
  * Patch an existing history row to its terminal status and stamp 'finishedAt'.
+ * Optional terminal 'payloadPreview' replaces the enqueue-time preview (for deferred context such as picked file paths).
  */
 export function recordHistoryCompleted (
   uid: string,
   outcome: T_faActionHistoryOutcome,
-  finishedAt: number
+  finishedAt: number,
+  payloadPreview?: string
 ): void {
   const store = resolveFaActionManagerStore()
   if (store === null) {
     return
   }
   store.updateHistoryEntryStatus(uid, {
+    ...(outcome.kind === 'failed' ? { errorMessage: outcome.errorMessage } : {}),
     finishedAt,
-    status: outcome.kind === 'success' ? 'success' : 'failed',
-    ...(outcome.kind === 'failed' ? { errorMessage: outcome.errorMessage } : {})
+    ...(payloadPreview !== undefined ? { payloadPreview } : {}),
+    status: outcome.kind === 'success' ? 'success' : 'failed'
   })
 }
 

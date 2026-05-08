@@ -22,11 +22,13 @@ vi.mock('../faActionManagerStoreBridge', () => ({
 }))
 
 import {
+  buildFaActionFailureHistoryPayloadPreview,
   buildFaActionPayloadPreview,
   normalizeFaActionError,
   reportFaActionFailure
 } from '../faActionManagerErrorReporting'
 import type { I_faActionQueueEntry } from 'app/types/I_faActionManagerDomain'
+import { FaProjectOpenFailedError } from '../faProjectOpenFailedError'
 
 beforeEach(() => {
   notifyCreateMock.mockReset()
@@ -40,6 +42,46 @@ beforeEach(() => {
  */
 test('Test that buildFaActionPayloadPreview returns empty string for undefined', () => {
   expect(buildFaActionPayloadPreview(undefined)).toBe('')
+})
+
+/**
+ * buildFaActionPayloadPreview
+ * Treats empty plain objects as having no preview text.
+ */
+test('Test that buildFaActionPayloadPreview returns empty string for empty plain objects', () => {
+  expect(buildFaActionPayloadPreview({})).toBe('')
+})
+
+/**
+ * buildFaActionFailureHistoryPayloadPreview
+ * Summarizes FaProjectOpenFailedError for action monitor rows.
+ */
+test('Test that buildFaActionFailureHistoryPayloadPreview maps FaProjectOpenFailedError', () => {
+  const err = new FaProjectOpenFailedError('bad', 'C:\\x.faproject')
+  const expected = buildFaActionPayloadPreview({
+    errorMessage: 'bad',
+    filePath: 'C:\\x.faproject'
+  })
+  expect(buildFaActionFailureHistoryPayloadPreview(err)).toBe(expected)
+})
+
+/**
+ * buildFaActionFailureHistoryPayloadPreview
+ * Omits filePath when the error carries no attempted path.
+ */
+test('Test that buildFaActionFailureHistoryPayloadPreview maps FaProjectOpenFailedError without file path', () => {
+  const err = new FaProjectOpenFailedError('bad')
+  const expected = buildFaActionPayloadPreview({
+    errorMessage: 'bad'
+  })
+  expect(buildFaActionFailureHistoryPayloadPreview(err)).toBe(expected)
+})
+
+/**
+ * buildFaActionFailureHistoryPayloadPreview
+ */
+test('Test that buildFaActionFailureHistoryPayloadPreview returns undefined for generic errors', () => {
+  expect(buildFaActionFailureHistoryPayloadPreview(new Error('no'))).toBeUndefined()
 })
 
 /**

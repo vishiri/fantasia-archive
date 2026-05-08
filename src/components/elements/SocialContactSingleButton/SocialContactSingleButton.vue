@@ -10,7 +10,7 @@
       <q-img
         spinner-size="0"
         :src="iconSrc"
-        :alt="`${buttonData.label} icon`"
+        :alt="imageAltText"
         fit="contain"
         :width="`${buttonData.width}px`"
         :height="`${buttonData.height}px`"
@@ -19,6 +19,7 @@
         :data-test-layout-width="String(buttonData.width)"
       />
       <div
+        v-if="showButtonLabel"
         class="text-no-wrap socialContactSingleButton__text"
         data-test-locator="socialContactSingleButton-text"
       >
@@ -49,6 +50,18 @@ const props = defineProps<{
  * Data input for the component (Playwright component mode passes 'dataInput' via 'COMPONENT_PROPS'.)
  */
 const buttonData = computed(() => props.dataInput)
+
+const showButtonLabel = computed((): boolean => {
+  return props.dataInput.label.trim().length > 0
+})
+
+const imageAltText = computed((): string => {
+  const label = props.dataInput.label.trim()
+  if (label.length > 0) {
+    return `${label} icon`
+  }
+  return props.dataInput.title
+})
 
 /**
  * Public-folder assets (Vite public/ and Storybook staticDirs) must be rooted with BASE_URL so paths resolve in the Storybook iframe and when the app base path is customized.

@@ -16,10 +16,11 @@ import type {
 export const FA_ACTION_HISTORY_MAX = 500
 
 interface I_historyEntryStatusPatch {
-  status?: T_faActionHistoryStatus
-  startedAt?: number
-  finishedAt?: number
   errorMessage?: string
+  finishedAt?: number
+  payloadPreview?: string
+  startedAt?: number
+  status?: T_faActionHistoryStatus
 }
 
 /**
@@ -84,17 +85,20 @@ function buildQueueState (): I_faActionManagerQueueState {
 }
 
 function applyHistoryEntryStatusPatch (entry: I_faActionHistoryEntry, patch: I_historyEntryStatusPatch): void {
-  if (patch.status !== undefined) {
-    entry.status = patch.status
-  }
-  if (patch.startedAt !== undefined) {
-    entry.startedAt = patch.startedAt
+  if (patch.errorMessage !== undefined) {
+    entry.errorMessage = patch.errorMessage
   }
   if (patch.finishedAt !== undefined) {
     entry.finishedAt = patch.finishedAt
   }
-  if (patch.errorMessage !== undefined) {
-    entry.errorMessage = patch.errorMessage
+  if (patch.payloadPreview !== undefined) {
+    entry.payloadPreview = patch.payloadPreview
+  }
+  if (patch.startedAt !== undefined) {
+    entry.startedAt = patch.startedAt
+  }
+  if (patch.status !== undefined) {
+    entry.status = patch.status
   }
 }
 

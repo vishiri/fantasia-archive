@@ -17,7 +17,8 @@ import {
   handleExportProgramConfigSaveResult,
   handleOpenImportExportProgramConfigDialog,
   handleCreateNewProject,
-  handleOpenNewProjectSettingsDialog,
+  handleLoadExistingProject,
+  handleOpenNewProjectDialog,
   handleOpenKeybindSettingsDialog,
   handleOpenLicenseDialog,
   handleOpenProgramSettingsDialog,
@@ -152,8 +153,8 @@ export const FA_ACTION_DEFINITIONS: ReadonlyArray<I_faActionDefinition<T_faActio
   },
   {
     dedup: true,
-    handler: handleOpenNewProjectSettingsDialog as I_faActionDefinition<T_faActionId>['handler'],
-    id: 'openNewProjectSettingsDialog',
+    handler: handleOpenNewProjectDialog as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'openNewProjectDialog',
     kind: 'async'
   },
   {
@@ -179,6 +180,12 @@ export const FA_ACTION_DEFINITIONS: ReadonlyArray<I_faActionDefinition<T_faActio
   {
     handler: handleCreateNewProject as I_faActionDefinition<T_faActionId>['handler'],
     id: 'createNewProject',
+    kind: 'async'
+  },
+  {
+    dedup: true,
+    handler: handleLoadExistingProject as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'loadExistingProject',
     kind: 'async'
   }
 ]

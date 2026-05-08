@@ -109,6 +109,20 @@ test('Test that recordHistoryCompleted writes a failed terminal status with erro
 })
 
 /**
+ * recordHistoryCompleted
+ * Merges payload preview when callers provide a closing summary.
+ */
+test('Test that recordHistoryCompleted merges payloadPreview on success', () => {
+  const store = S_FaActionManager()
+  recordHistoryEnqueued(buildEntry('loadExistingProject', 'u-prev', {}))
+  recordHistoryStarted('u-prev', 1)
+  recordHistoryCompleted('u-prev', { kind: 'success' }, 2, '{"filePath":"x.faproject","projectName":"P"}')
+  const row = store.actionHistory[0]
+  expect(row?.status).toBe('success')
+  expect(row?.payloadPreview).toBe('{"filePath":"x.faproject","projectName":"P"}')
+})
+
+/**
  * recordHistoryOverflowDrop
  * Appends a synthetic failed row with both startedAt and finishedAt set.
  */

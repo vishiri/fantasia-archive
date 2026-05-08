@@ -9,7 +9,10 @@ import {
   recordHistoryOverflowDrop,
   recordHistoryStarted
 } from './faActionManagerHistory'
-import { reportFaActionFailure } from './faActionManagerErrorReporting'
+import {
+  buildFaActionFailureHistoryPayloadPreview,
+  reportFaActionFailure
+} from './faActionManagerErrorReporting'
 import { resolveFaActionManagerStore } from './faActionManagerStoreBridge'
 
 /**
@@ -109,13 +112,15 @@ async function executeSyncEntry (
       () => recordHistoryCompleted(entry.uid, { kind: 'success' }, Date.now()),
       (error) => {
         const failure = reportFaActionFailure(entry, error)
+        const failurePreview = buildFaActionFailureHistoryPayloadPreview(error)
         recordHistoryCompleted(
           entry.uid,
           {
             errorMessage: failure.errorMessage,
             kind: 'failed'
           },
-          Date.now()
+          Date.now(),
+          failurePreview
         )
       }
     )

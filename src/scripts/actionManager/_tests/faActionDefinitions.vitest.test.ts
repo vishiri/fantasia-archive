@@ -1,14 +1,24 @@
 /** @vitest-environment jsdom */
+import { Notify } from 'quasar'
 import { ResultAsync } from 'neverthrow'
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import type { I_faProgramConfigApplyResult } from 'app/types/I_faProgramConfigDomain'
 import { FA_ACTION_IDS, type T_faActionId } from 'app/types/I_faActionManagerDomain'
 
+const faActiveProjectFixture = vi.hoisted(() => ({
+  activeProject: {
+    filePath: 'C:\\fixture.faproject',
+    id: 'fixture-id',
+    name: 'Fixture Realm'
+  }
+}))
+
 const {
   applyLanguageMock,
   closeWindowMock,
   createProjectFromUserInputMock,
+  openProjectFromUserDialogMock,
   minimizeWindowMock,
   openDialogComponentMock,
   openDialogMarkdownDocumentMock,
@@ -31,17 +41,18 @@ const {
   applyLanguageMock: vi.fn(async () => true),
   checkWindowMaximizedMock: vi.fn(),
   closeWindowMock: vi.fn(),
+  createProjectFromUserInputMock: vi.fn(),
   minimizeWindowMock: vi.fn(),
   openDialogComponentMock: vi.fn(),
   openDialogMarkdownDocumentMock: vi.fn(),
+  openProjectFromUserDialogMock: vi.fn(),
+  refreshKeybindsMock: vi.fn(async () => undefined),
+  refreshProgramStylingMock: vi.fn(async () => undefined),
+  refreshSettingsMock: vi.fn(async () => undefined),
   refreshWebContentsMock: vi.fn(async () => true),
   resizeWindowMock: vi.fn(),
   tipsNotificationMock: vi.fn(),
   toggleDevToolsMock: vi.fn(),
-  createProjectFromUserInputMock: vi.fn(),
-  refreshKeybindsMock: vi.fn(async () => undefined),
-  refreshProgramStylingMock: vi.fn(async () => undefined),
-  refreshSettingsMock: vi.fn(async () => undefined),
   updateKeybindsMock: vi.fn(async () => true),
   updateProgramStylingMock: vi.fn(async () => true),
   updateSettingsMock: vi.fn(async () => undefined)
@@ -52,12 +63,26 @@ vi.mock('quasar', () => ({
 }))
 
 vi.mock('app/i18n/externalFileLoader', () => ({
-  i18n: { global: { t: (key: string) => key } }
+  i18n: {
+    global: {
+      t: (key: string, params?: Record<string, unknown>) => {
+        const projectName = params?.projectName
+        if (typeof projectName === 'string') {
+          return `${key}|${projectName}`
+        }
+        return key
+      }
+    }
+  }
 }))
 
 vi.mock('app/src/stores/S_FaActiveProject', () => ({
   S_FaActiveProject: () => ({
-    createProjectFromUserInput: createProjectFromUserInputMock
+    get activeProject () {
+      return faActiveProjectFixture.activeProject
+    },
+    createProjectFromUserInput: createProjectFromUserInputMock,
+    openProjectFromUserDialog: openProjectFromUserDialogMock
   })
 }))
 
@@ -100,9 +125,11 @@ vi.mock('app/src/scripts/appInternals/rendererAppInternals', () => ({
 }))
 
 import { FA_ACTION_DEFINITIONS, findFaActionDefinition } from '../faActionDefinitions'
+import { buildFaActionPayloadPreview } from '../faActionManagerErrorReporting'
 import { FaActionUserCanceledError } from '../faActionUserCanceledError'
 
 beforeEach(() => {
+  vi.mocked(Notify.create).mockClear()
   applyLanguageMock.mockReset()
   applyLanguageMock.mockImplementation(async () => true)
   checkWindowMaximizedMock.mockReset()
@@ -131,6 +158,8 @@ beforeEach(() => {
   refreshSettingsMock.mockImplementation(async () => undefined)
   createProjectFromUserInputMock.mockReset()
   createProjectFromUserInputMock.mockImplementation(async () => 'created')
+  openProjectFromUserDialogMock.mockReset()
+  openProjectFromUserDialogMock.mockImplementation(async () => 'opened')
   Object.assign(window, {
     faContentBridgeAPIs: {
       faProgramConfig: {
@@ -268,14 +297,19 @@ test('Test that openImportExportProgramConfigDialog handler opens the ImportExpo
   expect(openDialogComponentMock).toHaveBeenCalledWith('ImportExportProgramConfig')
 })
 
-test('Test that openNewProjectSettingsDialog handler opens the NewProjectSettings dialog', () => {
-  definitionFor('openNewProjectSettingsDialog').handler(undefined)
-  expect(openDialogComponentMock).toHaveBeenCalledWith('NewProjectSettings')
+test('Test that openNewProjectDialog handler opens the NewProject dialog', () => {
+  definitionFor('openNewProjectDialog').handler(undefined)
+  expect(openDialogComponentMock).toHaveBeenCalledWith('NewProject')
 })
 
 test('Test that createNewProject handler delegates to S_FaActiveProject when creation succeeds', async () => {
   await (definitionFor('createNewProject').handler({ projectName: 'Realm' }) as Promise<unknown>)
   expect(createProjectFromUserInputMock).toHaveBeenCalledWith('Realm')
+  expect(Notify.create).toHaveBeenCalledWith({
+    message:
+      'globalFunctionality.faProjectSession.notifyProjectCreated|Fixture Realm',
+    type: 'positive'
+  })
 })
 
 test('Test that createNewProject handler throws FaActionUserCanceledError when creation is canceled', async () => {
@@ -283,6 +317,46 @@ test('Test that createNewProject handler throws FaActionUserCanceledError when c
   await expect(
     definitionFor('createNewProject').handler({ projectName: 'x' }) as Promise<unknown>
   ).rejects.toBeInstanceOf(FaActionUserCanceledError)
+  expect(Notify.create).not.toHaveBeenCalled()
+})
+
+test('Test that loadExistingProject handler delegates to openProjectFromUserDialog and notifies', async () => {
+  const result = await (definitionFor('loadExistingProject').handler({}) as Promise<{
+    payloadPreview: string
+  }>)
+  expect(openProjectFromUserDialogMock).toHaveBeenCalledOnce()
+  expect(Notify.create).toHaveBeenCalledWith({
+    message:
+      'globalFunctionality.faProjectSession.notifyProjectLoaded|Fixture Realm',
+    type: 'positive'
+  })
+  const expectedPreview = buildFaActionPayloadPreview({
+    filePath: faActiveProjectFixture.activeProject.filePath,
+    projectName: faActiveProjectFixture.activeProject.name
+  })
+  expect(result).toEqual({
+    payloadPreview: expectedPreview
+  })
+})
+
+test('Test that loadExistingProject handler throws when open succeeds but active project is missing', async () => {
+  const prior = faActiveProjectFixture.activeProject
+  faActiveProjectFixture.activeProject = null as never
+  try {
+    await expect(
+      definitionFor('loadExistingProject').handler({}) as Promise<unknown>
+    ).rejects.toThrow(/no active project snapshot/)
+  } finally {
+    faActiveProjectFixture.activeProject = prior
+  }
+})
+
+test('Test that loadExistingProject handler throws FaActionUserCanceledError when load is canceled', async () => {
+  openProjectFromUserDialogMock.mockResolvedValueOnce('canceled')
+  await expect(
+    definitionFor('loadExistingProject').handler({}) as Promise<unknown>
+  ).rejects.toBeInstanceOf(FaActionUserCanceledError)
+  expect(Notify.create).not.toHaveBeenCalled()
 })
 
 test('Test that importProgramConfigApply handler calls applyImport and refreshes stores', async () => {

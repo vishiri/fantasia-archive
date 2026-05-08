@@ -11,10 +11,11 @@ import L_DialogActionMonitor from 'app/i18n/en-US/dialogs/L_DialogActionMonitor'
 import L_dialogKeybindSettings from 'app/i18n/en-US/dialogs/L_dialogKeybindSettings'
 import L_importExportProgramConfig from 'app/i18n/en-US/dialogs/L_importExportProgramConfig'
 import L_markdownDocument from 'app/i18n/en-US/dialogs/L_markdownDocument'
-import L_newProjectSettings from 'app/i18n/en-US/dialogs/L_newProjectSettings'
+import L_newProject from 'app/i18n/en-US/dialogs/L_newProject'
 import L_programSettings from 'app/i18n/en-US/dialogs/L_programSettings'
 import L_programStylingFloating from 'app/i18n/en-US/floatingWindows/L_programStyling'
 import L_faKeybinds from 'app/i18n/en-US/globalFunctionality/L_faKeybinds'
+import L_faProjectSession from 'app/i18n/en-US/globalFunctionality/L_faProjectSession'
 import L_faUserSettings from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
 import L_unsortedAppTexts from 'app/i18n/en-US/globalFunctionality/L_unsortedAppTexts'
 import L_ErrorNotFound from 'app/i18n/en-US/pages/L_ErrorNotFound'
@@ -44,7 +45,7 @@ const defaultMessages: Record<string, unknown> = {
     keybindSettings: L_dialogKeybindSettings,
     importExportProgramConfig: L_importExportProgramConfig,
     markdownDocument: L_markdownDocument,
-    newProjectSettings: L_newProjectSettings,
+    newProject: L_newProject,
     programSettings: L_programSettings
   },
   floatingWindows: {
@@ -62,6 +63,7 @@ const defaultMessages: Record<string, unknown> = {
   fantasiaMascotImage: L_FantasiaMascotImage,
   globalFunctionality: {
     faKeybinds: L_faKeybinds,
+    faProjectSession: L_faProjectSession,
     faUserSettings: L_faUserSettings,
     unsortedAppTexts: L_unsortedAppTexts
   },

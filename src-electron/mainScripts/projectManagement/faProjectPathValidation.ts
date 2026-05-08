@@ -32,3 +32,20 @@ export function ensureFaProjectExtension (filePath: string): string {
   }
   return `${filePath}${suffix}`
 }
+
+/**
+ * Stem of '.faproject' basename for migration bootstrap when user_version is zero; falls back to 'Project'.
+ */
+export function faDisplayNameFallbackFromProjectPath (filePath: string): string {
+  const base = path.basename(filePath)
+  const suffix = `.${FA_PROJECT_FILE_EXTENSION}`
+  const lowerBase = base.toLowerCase()
+  const stem = lowerBase.endsWith(suffix)
+    ? base.slice(0, base.length - suffix.length)
+    : base
+  const trimmed = stem.trim()
+  if (trimmed.length === 0 || trimmed === '.' || trimmed === '..') {
+    return 'Project'
+  }
+  return trimmed
+}

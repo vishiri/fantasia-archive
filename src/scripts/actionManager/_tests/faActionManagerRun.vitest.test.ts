@@ -30,6 +30,7 @@ import {
   FA_ACTION_SYNC_QUEUE_MAX
 } from '../faActionManagerSyncQueue'
 import { FaActionUserCanceledError } from '../faActionUserCanceledError'
+import { FaProjectOpenFailedError } from '../faProjectOpenFailedError'
 import { runFaAction, runFaActionAwait } from '../faActionManagerRun'
 
 let consoleErrorSpy: ReturnType<typeof vi.spyOn>
@@ -46,7 +47,7 @@ afterEach(() => {
   consoleErrorSpy.mockRestore()
 })
 
-function buildDef (id: T_faActionId, handler: (payload: unknown) => void | Promise<void>, kind: 'sync' | 'async' = 'async', dedup = false): I_faActionDefinition<T_faActionId> {
+function buildDef (id: T_faActionId, handler: (payload: unknown) => unknown, kind: 'sync' | 'async' = 'async', dedup = false): I_faActionDefinition<T_faActionId> {
   const def: I_faActionDefinition<T_faActionId> = {
     handler: handler as I_faActionDefinition<T_faActionId>['handler'],
     id,
@@ -146,6 +147,37 @@ test('Test that runFaActionAwait resolves true on async success', async () => {
 
 /**
  * runFaActionAwait
+ * Merges an async handler continuation payloadPreview into the terminal history row.
+ */
+test('Test that runFaActionAwait merges async payloadPreview continuation into history', async () => {
+  const preview = '{"filePath":"/x.faproject","projectName":"P"}'
+  const handler = vi.fn(async (): Promise<{ payloadPreview: string }> => {
+    await Promise.resolve()
+    return { payloadPreview: preview }
+  })
+  findFaActionDefinitionMock.mockReturnValue(buildDef('loadExistingProject', handler, 'async'))
+  await expect(runFaActionAwait('loadExistingProject', {})).resolves.toBe(true)
+  expect(handler).toHaveBeenCalledWith({})
+  const row = S_FaActionManager().actionHistory.at(-1)
+  expect(row?.id).toBe('loadExistingProject')
+  expect(row?.payloadPreview).toBe(preview)
+})
+
+/**
+ * runFaActionAwait
+ * Handles synchronous handler results that carry payloadPreview without awaiting.
+ */
+test('Test that runFaActionAwait merges sync payloadPreview continuation into history', async () => {
+  const preview = '{"filePath":"/y.faproject","projectName":"Q"}'
+  const handler = vi.fn((): { payloadPreview: string } => ({ payloadPreview: preview }))
+  findFaActionDefinitionMock.mockReturnValue(buildDef('loadExistingProject', handler, 'async'))
+  await expect(runFaActionAwait('loadExistingProject', {})).resolves.toBe(true)
+  const row = S_FaActionManager().actionHistory.at(-1)
+  expect(row?.payloadPreview).toBe(preview)
+})
+
+/**
+ * runFaActionAwait
  * Resolves false when the async handler throws.
  */
 test('Test that runFaActionAwait resolves false on async failure', async () => {
@@ -153,6 +185,23 @@ test('Test that runFaActionAwait resolves false on async failure', async () => {
     buildDef('toggleDeveloperTools', () => { throw new Error('boom') }, 'async')
   )
   await expect(runFaActionAwait('toggleDeveloperTools', undefined)).resolves.toBe(false)
+})
+
+/**
+ * runFaActionAwait
+ * Writes structured failure preview when async handler throws FaProjectOpenFailedError.
+ */
+test('Test that runFaActionAwait records FaProjectOpenFailedError path payload on failure', async () => {
+  const handler = vi.fn(async (): Promise<void> => {
+    await Promise.resolve()
+    throw new FaProjectOpenFailedError('bad db', '/p/x.faproject')
+  })
+  findFaActionDefinitionMock.mockReturnValue(buildDef('loadExistingProject', handler, 'async'))
+  await expect(runFaActionAwait('loadExistingProject', {})).resolves.toBe(false)
+  const row = S_FaActionManager().actionHistory.at(-1)
+  expect(row?.status).toBe('failed')
+  expect(row?.payloadPreview).toContain('/p/x.faproject')
+  expect(row?.payloadPreview).toContain('bad db')
 })
 
 /**

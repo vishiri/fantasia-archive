@@ -9,6 +9,7 @@ const {
   replaceMock,
   unlinkMock,
   takeE2ePathMock,
+  readProjectUuidMock,
   browserWindowStub,
   windowDialogState,
   mainWindowExports
@@ -26,6 +27,7 @@ const {
       }
     }),
     quickCheckMock: vi.fn(),
+    readProjectUuidMock: vi.fn(() => '22222222-2222-4222-8222-222222222222'),
     replaceMock: vi.fn(),
     showSaveDialogMock: vi.fn(),
     takeE2ePathMock: vi.fn((): string | null => null),
@@ -81,7 +83,8 @@ vi.mock('../faProjectActiveDatabase', () => {
 vi.mock('../faProjectDbMigrate', () => {
   return {
     applyFaProjectMigrations: applyMigrationsMock,
-    assertFaProjectDatabaseQuickCheck: quickCheckMock
+    assertFaProjectDatabaseQuickCheck: quickCheckMock,
+    readFaProjectStoredProjectUuid: readProjectUuidMock
   }
 })
 
@@ -106,6 +109,8 @@ beforeEach(() => {
   unlinkMock.mockReset()
   takeE2ePathMock.mockReset()
   takeE2ePathMock.mockReturnValue(null)
+  readProjectUuidMock.mockReset()
+  readProjectUuidMock.mockReturnValue('22222222-2222-4222-8222-222222222222')
   showSaveDialogMock.mockResolvedValue({
     canceled: false,
     filePath: 'D:\\dl\\proj.faproject'
@@ -151,6 +156,7 @@ test('runFaProjectCreateFromIpc creates project when save path chosen', async ()
   expect(applyMigrationsMock).toHaveBeenCalled()
   expect(quickCheckMock).toHaveBeenCalled()
   expect(r.project?.name).toBe('Realm')
+  expect(r.project?.id).toBe('22222222-2222-4222-8222-222222222222')
 })
 
 test('runFaProjectCreateFromIpc passes browser window reference into showSaveDialog', async () => {

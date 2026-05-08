@@ -2,21 +2,26 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 
 import type { I_faActiveProject } from 'app/types/I_faActiveProjectDomain'
+import { FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE } from 'app/types/I_faProjectManagementDomain'
 
 import { S_FaActiveProject } from '../S_FaActiveProject'
 
 let store: ReturnType<typeof S_FaActiveProject>
 
 const createProjectMock = vi.fn()
+const openProjectMock = vi.fn()
 
 beforeEach(() => {
   setActivePinia(createPinia())
   createProjectMock.mockReset()
   createProjectMock.mockResolvedValue({ outcome: 'canceled' as const })
+  openProjectMock.mockReset()
+  openProjectMock.mockResolvedValue({ outcome: 'canceled' as const })
   vi.stubGlobal('window', {
     faContentBridgeAPIs: {
       projectManagement: {
-        createProject: createProjectMock
+        createProject: createProjectMock,
+        openProject: openProjectMock
       }
     }
   } as unknown as Window & typeof globalThis)
@@ -152,4 +157,92 @@ test('Test that createProjectFromUserInput throws on error outcome with message'
 test('Test that createProjectFromUserInput throws when created result omits project', async () => {
   createProjectMock.mockResolvedValueOnce({ outcome: 'created' as const })
   await expect(store.createProjectFromUserInput('x')).rejects.toThrow(/no project snapshot/)
+})
+
+/**
+ * S_FaActiveProject / openProjectFromUserDialog
+ * Hydrates store from bridge success.
+ */
+test('Test that openProjectFromUserDialog sets activeProject on success', async () => {
+  openProjectMock.mockResolvedValueOnce({
+    outcome: 'opened' as const,
+    project: {
+      filePath: 'C:\\o.faproject',
+      id: 'id-open',
+      name: 'Opened Realm'
+    }
+  })
+  const r = await store.openProjectFromUserDialog()
+  expect(r).toBe('opened')
+  expect(store.activeProject).toEqual({
+    filePath: 'C:\\o.faproject',
+    id: 'id-open',
+    name: 'Opened Realm'
+  })
+  expect(openProjectMock).toHaveBeenCalledOnce()
+})
+
+/**
+ * S_FaActiveProject / openProjectFromUserDialog
+ * Returns canceled without changing store.
+ */
+test('Test that openProjectFromUserDialog returns canceled when bridge cancels', async () => {
+  openProjectMock.mockResolvedValueOnce({ outcome: 'canceled' as const })
+  const r = await store.openProjectFromUserDialog()
+  expect(r).toBe('canceled')
+  expect(store.activeProject).toBeNull()
+})
+
+test('Test that openProjectFromUserDialog throws when bridge is unavailable', async () => {
+  vi.stubGlobal('window', {
+    faContentBridgeAPIs: {}
+  } as unknown as Window & typeof globalThis)
+  store = S_FaActiveProject()
+  await expect(store.openProjectFromUserDialog()).rejects.toThrow(/not available/)
+})
+
+test('Test that openProjectFromUserDialog throws on error outcome', async () => {
+  openProjectMock.mockResolvedValueOnce({
+    outcome: 'error' as const,
+    errorMessage: 'sqlite boom'
+  })
+  await expect(store.openProjectFromUserDialog()).rejects.toMatchObject({
+    message: expect.stringMatching(/sqlite boom/),
+    name: 'FaProjectOpenFailedError'
+  })
+})
+
+test('Test that openProjectFromUserDialog maps already-active error to locale string', async () => {
+  openProjectMock.mockResolvedValueOnce({
+    errorMessage: 'ignored',
+    errorName: FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE,
+    outcome: 'error' as const
+  })
+  await expect(store.openProjectFromUserDialog()).rejects.toMatchObject({
+    message: expect.stringMatching(/already open/i),
+    name: 'FaProjectOpenFailedError'
+  })
+})
+
+test('Test that openProjectFromUserDialog attaches attemptedFilePath when main reports one', async () => {
+  openProjectMock.mockResolvedValueOnce({
+    attemptedFilePath: 'C:\\bad.faproject',
+    errorMessage: 'corrupt db',
+    outcome: 'error' as const
+  })
+  await expect(store.openProjectFromUserDialog()).rejects.toMatchObject({
+    attemptedFilePath: 'C:\\bad.faproject',
+    message: 'corrupt db',
+    name: 'FaProjectOpenFailedError'
+  })
+})
+
+test('Test that openProjectFromUserDialog throws on error outcome without message', async () => {
+  openProjectMock.mockResolvedValueOnce({ outcome: 'error' as const })
+  await expect(store.openProjectFromUserDialog()).rejects.toThrow(/Failed to open project/)
+})
+
+test('Test that openProjectFromUserDialog throws when opened result omits project', async () => {
+  openProjectMock.mockResolvedValueOnce({ outcome: 'opened' as const })
+  await expect(store.openProjectFromUserDialog()).rejects.toThrow(/no project snapshot/)
 })

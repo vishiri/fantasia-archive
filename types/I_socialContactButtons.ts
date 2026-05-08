@@ -1,7 +1,7 @@
 export interface I_socialContactButton {
 
   /**
-   * Label of the button (actual text seen)
+   * Label of the button (text beside the icon). Use an empty string when the icon is self-contained (for example the Reddit wordmark asset).
    */
   label: string
 

@@ -93,7 +93,14 @@ test.describe.serial('About Fantasia Archive dialog', () => {
     ]
 
     for (let i = 0; i < expectedButtonLabels.length; i++) {
-      await expect(socialButtons.nth(i)).toHaveText(expectedButtonLabels[i])
+      const label = expectedButtonLabels[i]
+      if (label.length === 0) {
+        await expect(
+          socialButtons.nth(i).locator('[data-test-locator="socialContactSingleButton-text"]')
+        ).toHaveCount(0)
+      } else {
+        await expect(socialButtons.nth(i)).toHaveText(label)
+      }
     }
   })
 

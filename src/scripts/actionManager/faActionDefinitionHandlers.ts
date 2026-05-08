@@ -8,6 +8,11 @@ import {
   openDialogMarkdownDocument
 } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
 import { FaActionUserCanceledError } from 'app/src/scripts/actionManager/faActionUserCanceledError'
+import { buildFaActionPayloadPreview } from 'app/src/scripts/actionManager/faActionManagerErrorReporting'
+import {
+  notifyFaProjectCreatedPositive,
+  notifyFaProjectLoadedPositive
+} from 'app/src/scripts/actionManager/faProjectSessionNotify'
 import { toggleDevTools } from 'app/src/scripts/appGlobalManagementUI/toggleDevTools'
 import { tipsTricksTriviaNotification } from 'app/src/scripts/appGlobalManagementUI/tipsTricksTriviaNotification'
 import { applyFaUserSettingsLanguageSelection } from 'app/src/scripts/appInternals/rendererAppInternals'
@@ -166,8 +171,8 @@ export async function handleImportProgramConfigApply (
   ])
 }
 
-export async function handleOpenNewProjectSettingsDialog (): Promise<void> {
-  openDialogComponent('NewProjectSettings')
+export async function handleOpenNewProjectDialog (): Promise<void> {
+  openDialogComponent('NewProject')
 }
 
 export async function handleCreateNewProject (
@@ -177,6 +182,26 @@ export async function handleCreateNewProject (
   if (outcome === 'canceled') {
     throw new FaActionUserCanceledError()
   }
+  notifyFaProjectCreatedPositive()
+}
+
+export async function handleLoadExistingProject (
+  _payload: I_faActionPayloadMap['loadExistingProject']
+): Promise<{ payloadPreview: string } | void> {
+  const outcome = await S_FaActiveProject().openProjectFromUserDialog()
+  if (outcome === 'canceled') {
+    throw new FaActionUserCanceledError()
+  }
+  notifyFaProjectLoadedPositive()
+  const snap = S_FaActiveProject().activeProject
+  if (snap === null) {
+    throw new Error('Project open returned no active project snapshot.')
+  }
+  const payloadPreview = buildFaActionPayloadPreview({
+    filePath: snap.filePath,
+    projectName: snap.name
+  })
+  return { payloadPreview }
 }
 
 export async function handleShowStartupTipsNotification (): Promise<void> {

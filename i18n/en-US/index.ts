@@ -19,7 +19,7 @@ import L_socialContactButtons from './components/other/SocialContactButtons/L_so
 import L_aboutFantasiaArchive from './dialogs/L_aboutFantasiaArchive'
 import L_DialogActionMonitor from './dialogs/L_DialogActionMonitor'
 import L_markdownDocument from './dialogs/L_markdownDocument'
-import L_newProjectSettings from './dialogs/L_newProjectSettings'
+import L_newProject from './dialogs/L_newProject'
 import L_dialogKeybindSettings from './dialogs/L_dialogKeybindSettings'
 import L_importExportProgramConfig from './dialogs/L_importExportProgramConfig'
 import L_programSettings from './dialogs/L_programSettings'
@@ -28,6 +28,7 @@ import L_programStylingFloating from './floatingWindows/L_programStyling'
 import L_faActionManager from './globalFunctionality/L_faActionManager'
 import L_faKeybinds from './globalFunctionality/L_faKeybinds'
 import L_faProgramStyling from './globalFunctionality/L_faProgramStyling'
+import L_faProjectSession from './globalFunctionality/L_faProjectSession'
 import L_faUserSettings from './globalFunctionality/L_faUserSettings'
 import L_spellChecker from './globalFunctionality/L_spellChecker'
 import L_unsortedAppTexts from './globalFunctionality/L_unsortedAppTexts'
@@ -62,7 +63,7 @@ export default {
     importExportProgramConfig: L_importExportProgramConfig,
     keybindSettings: L_dialogKeybindSettings,
     markdownDocument: L_markdownDocument,
-    newProjectSettings: L_newProjectSettings,
+    newProject: L_newProject,
     programSettings: L_programSettings
   },
 
@@ -96,6 +97,7 @@ export default {
     faActionManager: L_faActionManager,
     faKeybinds: L_faKeybinds,
     faProgramStyling: L_faProgramStyling,
+    faProjectSession: L_faProjectSession,
     faUserSettings: L_faUserSettings,
     spellChecker: L_spellChecker,
     unsortedAppTexts: L_unsortedAppTexts

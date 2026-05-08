@@ -7,9 +7,9 @@ import SplashControls from '../SplashControls.vue'
 
 /**
  * SplashControls
- * New project wires to openNewProjectSettingsDialog.
+ * New project wires to openNewProjectDialog.
  */
-test('Test that splash New project triggers openNewProjectSettingsDialog', async () => {
+test('Test that splash New project triggers openNewProjectDialog', async () => {
   const spy = vi.spyOn(faActionRun, 'runFaAction').mockImplementation(() => undefined)
   const w = mount(SplashControls, {
     global: {
@@ -19,7 +19,26 @@ test('Test that splash New project triggers openNewProjectSettingsDialog', async
     }
   })
   await w.get('[data-test-locator="splashPage-btn-new"]').trigger('click')
-  expect(spy).toHaveBeenCalledWith('openNewProjectSettingsDialog', undefined)
+  expect(spy).toHaveBeenCalledWith('openNewProjectDialog', undefined)
+  spy.mockRestore()
+  w.unmount()
+})
+
+/**
+ * SplashControls
+ * Load existing project wires to loadExistingProject.
+ */
+test('Test that splash Load existing project triggers loadExistingProject', async () => {
+  const spy = vi.spyOn(faActionRun, 'runFaAction').mockImplementation(() => undefined)
+  const w = mount(SplashControls, {
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+  await w.get('[data-test-locator="splashPage-btn-load"]').trigger('click')
+  expect(spy).toHaveBeenCalledWith('loadExistingProject', {})
   spy.mockRestore()
   w.unmount()
 })

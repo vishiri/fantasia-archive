@@ -1,7 +1,5 @@
 import type Database from 'better-sqlite3'
 
-import { randomUUID } from 'node:crypto'
-
 import type { IpcMainInvokeEvent } from 'electron'
 import type { SaveDialogOptions } from 'electron'
 import { dialog } from 'electron'
@@ -12,7 +10,7 @@ import { windowFromIpcEvent } from 'app/src-electron/mainScripts/ipcManagement/r
 import { appWindow } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
 import { parseFaProjectCreateInput } from 'app/src-electron/shared/faProjectCreateInputSchema'
 import { FA_PROJECT_FILE_EXTENSION } from 'app/src-electron/shared/faProjectConstants'
-import type { I_faProjectCreateResult } from 'app/types/I_faProjectManagementDomain'
+import type { I_faProjectCreateResult, I_faProjectManagementActiveSnapshot } from 'app/types/I_faProjectManagementDomain'
 
 import {
   openFaProjectDatabase,
@@ -21,7 +19,8 @@ import {
 } from './faProjectActiveDatabase'
 import {
   applyFaProjectMigrations,
-  assertFaProjectDatabaseQuickCheck
+  assertFaProjectDatabaseQuickCheck,
+  readFaProjectStoredProjectUuid
 } from './faProjectDbMigrate'
 import { getFaProjectSaveDefaultPath } from './faProjectFileDialogDefaultPaths'
 import { takeNextE2eProjectCreatePath } from './faProjectManagementE2ePathOverride'
@@ -158,14 +157,21 @@ export async function runFaProjectCreateFromIpc (
     )()
   }
 
-  const createResult = Result.fromThrowable((): void => {
+  const createResult = Result.fromThrowable((): I_faProjectManagementActiveSnapshot => {
     db = openFaProjectDatabase(filePath)
     db.pragma('foreign_keys = ON')
     db.pragma('busy_timeout = 5000')
     db.pragma('journal_mode = DELETE')
     applyFaProjectMigrations(db, parsed.projectName)
     assertFaProjectDatabaseQuickCheck(db)
+    const projectUuid = readFaProjectStoredProjectUuid(db)
     replaceFaProjectActiveDatabase(db)
+    db = null
+    return {
+      filePath,
+      id: projectUuid,
+      name: parsed.projectName
+    }
   }, (e): unknown => e)()
 
   if (createResult.isErr()) {
@@ -186,10 +192,6 @@ export async function runFaProjectCreateFromIpc (
 
   return {
     outcome: 'created',
-    project: {
-      filePath,
-      id: randomUUID(),
-      name: parsed.projectName
-    }
+    project: createResult.value
   }
 }

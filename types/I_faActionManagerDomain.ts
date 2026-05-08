@@ -34,7 +34,8 @@ export const FA_ACTION_IDS = [
   'importProgramConfigStageResult',
   'importProgramConfigApply',
   'createNewProject',
-  'openNewProjectSettingsDialog'
+  'openNewProjectDialog',
+  'loadExistingProject'
 ] as const
 
 /**
@@ -48,6 +49,11 @@ export type T_faActionId = typeof FA_ACTION_IDS[number]
  * - 'async' is dispatched immediately and runs in parallel with anything else.
  */
 export type T_faActionKind = 'sync' | 'async'
+
+/**
+ * Load existing project at dispatch: pass an empty object. Action monitor history records filePath and projectName after a successful open.
+ */
+export type I_faLoadExistingProjectPayload = Record<string, never>
 
 /**
  * Per-action payload contract. Actions with no inputs map to 'void'.
@@ -74,7 +80,8 @@ export interface I_faActionPayloadMap {
   openActionMonitorDialog: void
   showStartupTipsNotification: void
   openImportExportProgramConfigDialog: void
-  openNewProjectSettingsDialog: void
+  openNewProjectDialog: void
+  loadExistingProject: I_faLoadExistingProjectPayload
   createNewProject: { projectName: string }
   exportProgramConfigPackage: {
     includeKeybinds: boolean
@@ -97,13 +104,22 @@ export interface I_faActionPayloadMap {
 }
 
 /**
+ * Optional async handler return: terminal payload preview for the action monitor.
+ */
+export type T_faActionHandlerContinuation = { payloadPreview: string }
+
+export type T_faActionHandlerResult = void | T_faActionHandlerContinuation
+
+export type T_faActionHandlerReturn = T_faActionHandlerResult | Promise<T_faActionHandlerResult>
+
+/**
  * Static metadata for one action: kind, handler, and optional dedup hint.
- * The handler may return either void or Promise<void>; failures (thrown or rejected) are routed to the manager's error reporter.
+ * The handler may return void, an optional payload preview for history, or a Promise of either; failures are routed to the error reporter.
  */
 export interface I_faActionDefinition<Id extends T_faActionId> {
   id: Id
   kind: T_faActionKind
-  handler: (payload: I_faActionPayloadMap[Id]) => void | Promise<void>
+  handler: (payload: I_faActionPayloadMap[Id]) => T_faActionHandlerReturn
   /**
    * When 'true', repeated sync enqueues for this action while another instance is already pending or running are silently dropped.
    * Async actions ignore this flag.

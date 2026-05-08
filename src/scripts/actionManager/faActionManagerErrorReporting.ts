@@ -5,6 +5,23 @@ import type { I_faActionFailureLog, I_faActionQueueEntry } from 'app/types/I_faA
 import { i18n } from 'app/i18n/externalFileLoader'
 
 import { resolveFaActionManagerStore } from './faActionManagerStoreBridge'
+import { FaProjectOpenFailedError } from './faProjectOpenFailedError'
+
+/**
+ * Optional terminal payload preview for failed actions that carry structured context.
+ */
+export function buildFaActionFailureHistoryPayloadPreview (error: unknown): string | undefined {
+  if (!(error instanceof FaProjectOpenFailedError)) {
+    return undefined
+  }
+  const row: Record<string, string> = {
+    errorMessage: error.message
+  }
+  if (error.attemptedFilePath !== undefined) {
+    row.filePath = error.attemptedFilePath
+  }
+  return buildFaActionPayloadPreview(row)
+}
 
 /**
  * JSON-safe stringification of arbitrary action payloads.
@@ -14,6 +31,13 @@ import { resolveFaActionManagerStore } from './faActionManagerStoreBridge'
 export function buildFaActionPayloadPreview (payload: unknown, maxLength = 400): string {
   if (payload === undefined) {
     return ''
+  }
+  if (payload !== null && typeof payload === 'object' && !Array.isArray(payload)) {
+    const plain = payload as Record<string, unknown>
+    const keys = Object.keys(plain)
+    if (keys.length === 0) {
+      return ''
+    }
   }
   const serializedResult = Result.fromThrowable(
     (): string => JSON.stringify(payload),

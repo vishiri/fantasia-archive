@@ -1,30 +1,30 @@
 <template>
   <q-dialog
     v-model="dialogModel"
-    :class="['dialogComponent', documentName, 'newProjectSettings']"
-    :aria-label="$t('dialogs.newProjectSettings.ariaLabel')"
+    :class="['dialogComponent', documentName, 'newProject']"
+    :aria-label="$t('dialogs.newProject.ariaLabel')"
   >
     <q-card
-      :class="['dialogComponent__wrapper', 'newProjectSettings', documentName]"
+      :class="['dialogComponent__wrapper', 'newProject', documentName]"
     >
       <q-card-section
-        :class="['dialogComponent__content', documentName, 'newProjectSettings', 'hasScrollbar', 'q-pt-none']"
+        :class="['dialogComponent__content', documentName, 'newProject', 'hasScrollbar', 'q-pt-none']"
       >
         <h5
-          id="dialogNewProjectSettings-title"
+          id="dialogNewProject-title"
           class="q-mb-md text-center"
         >
-          {{ $t('dialogs.newProjectSettings.title') }}
+          {{ $t('dialogs.newProject.title') }}
         </h5>
 
-        <div class="dialogNewProjectSettings__nameInput q-mb-sm">
+        <div class="dialogNewProject__nameInput q-mb-sm">
           <q-input
             v-model="projectName"
             color="primary-bright"
             dark
-            data-test-locator="dialogNewProjectSettings-input-name"
+            data-test-locator="dialogNewProject-input-name"
             filled
-            :label="$t('dialogs.newProjectSettings.nameLabel')"
+            :label="$t('dialogs.newProject.nameLabel')"
             lazy-rules
             outlined
             @keyup.enter="void onClickCreate()"
@@ -40,14 +40,14 @@
           v-close-popup
           flat
           color="accent"
-          data-test-locator="dialogNewProjectSettings-button-close"
-          :label="$t('dialogs.newProjectSettings.closeButton')"
+          data-test-locator="dialogNewProject-button-close"
+          :label="$t('dialogs.newProject.closeButton')"
         />
         <q-btn
           color="primary-bright"
-          data-test-locator="dialogNewProjectSettings-button-create"
+          data-test-locator="dialogNewProject-button-create"
           :disable="createDisabled"
-          :label="$t('dialogs.newProjectSettings.createButton')"
+          :label="$t('dialogs.newProject.createButton')"
           outline
           type="button"
           @click="void onClickCreate()"
@@ -67,10 +67,10 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
 import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 
-import { runDialogNewProjectSettingsCreate } from './scripts/dialogNewProjectSettingsSubmit'
+import { runDialogNewProjectCreate } from './scripts/dialogNewProjectSubmit'
 
 defineOptions({
-  name: 'DialogNewProjectSettings'
+  name: 'DialogNewProject'
 })
 
 const resolveDialogComponentStore = (): StoreGeneric | null => {
@@ -114,41 +114,41 @@ async function onClickCreate (): Promise<void> {
   if (createDisabled.value) {
     return
   }
-  await runDialogNewProjectSettingsCreate(projectName.value.trim(), closeDialog)
+  await runDialogNewProjectCreate(projectName.value.trim(), closeDialog)
 }
 
 watch(() => resolveDialogComponentStore()?.dialogUUID, () => {
   const dialogComponentStore = resolveDialogComponentStore()
-  if (dialogComponentStore?.dialogToOpen === 'NewProjectSettings') {
+  if (dialogComponentStore?.dialogToOpen === 'NewProject') {
     openDialog(dialogComponentStore.dialogToOpen as T_dialogName)
   }
 })
 
 watch(() => props.directInput, () => {
-  if (props.directInput === 'NewProjectSettings') {
+  if (props.directInput === 'NewProject') {
     openDialog(props.directInput)
   }
 })
 
 onMounted(() => {
-  if (props.directInput === 'NewProjectSettings') {
+  if (props.directInput === 'NewProject') {
     openDialog(props.directInput)
   }
 })
 </script>
 
 <style lang="scss">
-.q-dialog.dialogComponent.newProjectSettings > .q-dialog__inner > .q-card.dialogComponent__wrapper {
-  width: $dialogNewProjectSettings-wrapper-width;
+.q-dialog.dialogComponent.newProject > .q-dialog__inner > .q-card.dialogComponent__wrapper {
+  width: $dialogNewProject-wrapper-width;
 
   .dialogComponent__content {
-    max-height: calc(100vh - #{$dialogNewProjectSettings-content-maxHeightSubtract});
+    max-height: calc(100vh - #{$dialogNewProject-content-maxHeightSubtract});
     overflow: auto;
   }
 
-  .dialogNewProjectSettings__nameInput {
+  .dialogNewProject__nameInput {
     margin: 0 auto;
-    max-width: $dialogNewProjectSettings-nameInput-maxWidth;
+    max-width: $dialogNewProject-nameInput-maxWidth;
   }
 }
 </style>

@@ -79,3 +79,29 @@ test('Test that SocialContactSingleButton prefixes icon path when BASE_URL is a 
   w.unmount()
   vi.unstubAllEnvs()
 })
+
+/**
+ * SocialContactSingleButton
+ * Icon-only buttons omit the label strip and use the title for image alt text.
+ */
+test('Test that SocialContactSingleButton hides text and uses title for alt when label is empty', () => {
+  const iconOnly: I_socialContactButton = {
+    title: 'Subreddit hover title',
+    label: '',
+    url: 'https://www.reddit.com/r/FantasiaArchive',
+    icon: 'reddit_logo.png',
+    width: 80,
+    height: 24,
+    cssClass: 'reddit'
+  }
+  const w = mount(SocialContactSingleButton, {
+    props: { dataInput: iconOnly },
+    global: { mocks: { $t: (k: string) => k } }
+  })
+
+  expect(w.find('[data-test-locator="socialContactSingleButton-text"]').exists()).toBe(false)
+  expect(w.get('[data-test-locator="socialContactSingleButton-image"]').attributes('alt')).toBe(
+    iconOnly.title
+  )
+  w.unmount()
+})

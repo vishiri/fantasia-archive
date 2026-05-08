@@ -30,7 +30,18 @@ test('Test that buildProjectMenu new project row opens the settings dialog actio
   const items = menu.data.filter((row) => row.mode === 'item')
   items[0]!.trigger?.()
   expect(runFaActionMock).toHaveBeenCalledTimes(1)
-  expect(runFaActionMock).toHaveBeenCalledWith('openNewProjectSettingsDialog', undefined)
+  expect(runFaActionMock).toHaveBeenCalledWith('openNewProjectDialog', undefined)
+})
+
+/**
+ * Project menu
+ * Load existing project dispatches the load action from the load row trigger.
+ */
+test('Test that buildProjectMenu load existing project row dispatches loadExistingProject', () => {
+  const menu = buildProjectMenu({ hasActiveProject: false })
+  const items = menu.data.filter((row) => row.mode === 'item')
+  items[2]!.trigger?.()
+  expect(runFaActionMock).toHaveBeenCalledWith('loadExistingProject', {})
 })
 
 /**

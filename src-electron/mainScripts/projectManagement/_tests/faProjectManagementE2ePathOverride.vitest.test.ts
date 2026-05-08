@@ -2,18 +2,22 @@ import { afterEach, beforeEach, expect, test } from 'vitest'
 
 import {
   FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH,
+  FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH,
   installFaProjectManagementE2ePathOverrideGlobals,
-  takeNextE2eProjectCreatePath
+  takeNextE2eProjectCreatePath,
+  takeNextE2eProjectOpenPath
 } from '../faProjectManagementE2ePathOverride'
 
 beforeEach(() => {
   delete process.env.TEST_ENV
   delete (globalThis as Record<string, unknown>)[FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH]
+  delete (globalThis as Record<string, unknown>)[FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH]
 })
 
 afterEach(() => {
   delete process.env.TEST_ENV
   delete (globalThis as Record<string, unknown>)[FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH]
+  delete (globalThis as Record<string, unknown>)[FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH]
 })
 
 test('takeNextE2eProjectCreatePath returns null outside e2e', () => {
@@ -24,6 +28,7 @@ test('installFaProjectManagementE2ePathOverrideGlobals is a no-op outside e2e', 
   process.env.TEST_ENV = 'components'
   installFaProjectManagementE2ePathOverrideGlobals()
   expect(takeNextE2eProjectCreatePath()).toBeNull()
+  expect(takeNextE2eProjectOpenPath()).toBeNull()
 })
 
 test('e2e path override round-trips through global setter', () => {
@@ -46,7 +51,43 @@ test('takeNextE2eProjectCreatePath ignores empty pending path', () => {
   expect(takeNextE2eProjectCreatePath()).toBeNull()
 })
 
-test('install clears pending path when leaving e2e mode', () => {
+test('takeNextE2eProjectOpenPath returns null outside e2e', () => {
+  expect(takeNextE2eProjectOpenPath()).toBeNull()
+})
+
+test('e2e open path override round-trips through global setter', () => {
+  process.env.TEST_ENV = 'e2e'
+  installFaProjectManagementE2ePathOverrideGlobals()
+  const setter = (globalThis as Record<string, unknown>)[FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH]
+  expect(typeof setter).toBe('function')
+  ;(setter as (p: string) => void)('D:\\e2e\\open.faproject')
+  expect(takeNextE2eProjectOpenPath()).toBe('D:\\e2e\\open.faproject')
+  expect(takeNextE2eProjectOpenPath()).toBeNull()
+})
+
+test('takeNextE2eProjectOpenPath ignores empty pending path', () => {
+  process.env.TEST_ENV = 'e2e'
+  installFaProjectManagementE2ePathOverrideGlobals()
+  const setter = (globalThis as Record<string, unknown>)[FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH] as (
+    p: string
+  ) => void
+  setter('')
+  expect(takeNextE2eProjectOpenPath()).toBeNull()
+})
+
+test('install clears pending open path when leaving e2e mode', () => {
+  process.env.TEST_ENV = 'e2e'
+  installFaProjectManagementE2ePathOverrideGlobals()
+  const setter = (globalThis as Record<string, unknown>)[FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH] as (
+    p: string
+  ) => void
+  setter('D:\\e2e\\z.faproject')
+  process.env.TEST_ENV = 'components'
+  installFaProjectManagementE2ePathOverrideGlobals()
+  expect(takeNextE2eProjectOpenPath()).toBeNull()
+})
+
+test('install clears pending create path when leaving e2e mode', () => {
   process.env.TEST_ENV = 'e2e'
   installFaProjectManagementE2ePathOverrideGlobals()
   const setter = (globalThis as Record<string, unknown>)[FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH] as (

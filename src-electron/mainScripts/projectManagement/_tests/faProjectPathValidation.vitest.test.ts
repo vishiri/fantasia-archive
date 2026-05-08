@@ -4,6 +4,7 @@ import { expect, test } from 'vitest'
 
 import {
   ensureFaProjectExtension,
+  faDisplayNameFallbackFromProjectPath,
   pathLooksLikeFaProjectFile
 } from '../faProjectPathValidation'
 
@@ -27,4 +28,20 @@ test('ensureFaProjectExtension appends extension when missing', () => {
 
 test('ensureFaProjectExtension preserves existing extension', () => {
   expect(ensureFaProjectExtension('D:\\a\\proj.faproject')).toBe('D:\\a\\proj.faproject')
+})
+
+test('faDisplayNameFallbackFromProjectPath uses basename stem', () => {
+  expect(faDisplayNameFallbackFromProjectPath('D:\\w\\My Book.faproject')).toBe('My Book')
+})
+
+test('faDisplayNameFallbackFromProjectPath keeps basename when extension suffix mismatches', () => {
+  expect(faDisplayNameFallbackFromProjectPath('D:\\only\\Backup')).toBe('Backup')
+})
+
+test('faDisplayNameFallbackFromProjectPath falls back to Project when stem empty', () => {
+  expect(faDisplayNameFallbackFromProjectPath('D:\\w\\.faproject')).toBe('Project')
+})
+
+test('faDisplayNameFallbackFromProjectPath falls back to Project when stem is only dots', () => {
+  expect(faDisplayNameFallbackFromProjectPath('D:\\w\\..faproject')).toBe('Project')
 })

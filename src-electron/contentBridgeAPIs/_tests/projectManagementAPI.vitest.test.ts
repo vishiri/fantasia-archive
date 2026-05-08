@@ -40,3 +40,20 @@ test('projectManagementAPI createProject invokes IPC with cloned payload', async
   )
   expect(input.projectName).toBe('  Hello  ')
 })
+
+test('projectManagementAPI openProject invokes IPC with empty payload object', async () => {
+  invokeMock.mockResolvedValueOnce({
+    outcome: 'opened',
+    project: {
+      filePath: 'C:\\y.faproject',
+      id: 'id-o',
+      name: 'Opened'
+    }
+  })
+  const r = await projectManagementAPI.openProject()
+  expect(r.outcome).toBe('opened')
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.openProjectAsync,
+    {}
+  )
+})

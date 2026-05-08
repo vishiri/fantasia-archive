@@ -1,0 +1,198 @@
+import fs from 'node:fs'
+
+import type { ElectronApplication, Page } from 'playwright'
+import { expect, test } from '@playwright/test'
+import type { TestInfo } from '@playwright/test'
+import { e2eExpectFaActiveProjectStoreName } from 'app/helpers/playwrightHelpers_e2e/e2eExpectFaActiveProjectStore'
+import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
+import {
+  e2eSetNextProjectCreatePath,
+  e2eSetNextProjectOpenPath,
+  getE2eFaprojectFixtureAbsolutePath,
+  tryUnlinkE2eFaprojectFixture
+} from 'app/helpers/playwrightHelpers_e2e/playwrightE2eProjectPaths'
+import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
+import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
+import projectMenu from 'app/i18n/en-US/components/globals/AppControlMenus/L_project'
+import L_newProject from 'app/i18n/en-US/dialogs/L_newProject'
+import L_faProjectSession from 'app/i18n/en-US/globalFunctionality/L_faProjectSession'
+
+/**
+ * Extra env settings to trigger E2E via Playwright (isolated userData, dialog path overrides).
+ */
+const extraEnvSettings = {
+  TEST_ENV: 'e2e' as const
+}
+
+/**
+ * Object of string data selectors for the e2e
+ */
+const selectorList = {
+  closeBtn: 'dialogNewProject-button-close',
+  createBtn: 'dialogNewProject-button-create',
+  nameInput: 'dialogNewProject-input-name',
+  splashLoad: 'splashPage-btn-load',
+  splashNew: 'splashPage-btn-new'
+} as const
+
+function interpolateFaProjectSessionNotify (
+  template: string,
+  projectName: string
+): string {
+  return template.split('{projectName}').join(projectName)
+}
+
+/**
+ * SQLite **.faproject** files must exist on disk and be non-empty after a successful creation flow (schema + migrations).
+ */
+function assertE2eCreatedFaprojectFileExistsWithContent (baseName: string): void {
+  const absolutePath = getE2eFaprojectFixtureAbsolutePath(baseName)
+  expect(fs.existsSync(absolutePath)).toBe(true)
+  const stat = fs.statSync(absolutePath)
+  expect(stat.isFile()).toBe(true)
+  expect(stat.size).toBeGreaterThan(0)
+}
+
+test.describe.serial('Project management flow', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
+
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    const launched = await launchFaPlaywrightE2eAppWindow({
+      afterIsolationResetBeforeLaunch (): void {
+        tryUnlinkE2eFaprojectFixture('e2e-splash-project.faproject')
+        tryUnlinkE2eFaprojectFixture('e2e-menu-project.faproject')
+      },
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      dismissStartupTips: true,
+      renderDelayMs: FA_FRONTEND_RENDER_TIMER,
+      testInfo
+    })
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
+  })
+
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      async afterClose (): Promise<void> {
+        tryUnlinkE2eFaprojectFixture('e2e-splash-project.faproject')
+        tryUnlinkE2eFaprojectFixture('e2e-menu-project.faproject')
+      },
+      electronApp,
+      suiteTestInfo
+    })
+  })
+
+  /**
+   * **New project** dialog must clear stale typing when reopened after dismissal without creation.
+   */
+  test('New project dialog resets the name field after close without creating', async () => {
+    const nameField = appWindow.locator(`[data-test-locator="${selectorList.nameInput}"]`)
+
+    await appWindow.locator(`[data-test-locator="${selectorList.splashNew}"]`).click()
+    await expect(nameField).toBeVisible()
+    await expect(nameField).toHaveValue('')
+    await nameField.fill('E2E discarded project name typing')
+    await appWindow.locator(`[data-test-locator="${selectorList.closeBtn}"]`).click()
+    await expect(appWindow.locator('#dialogNewProject-title')).toBeHidden()
+
+    await appWindow.locator(`[data-test-locator="${selectorList.splashNew}"]`).click()
+    await expect(nameField).toBeVisible()
+    await expect(nameField).toHaveValue('')
+    await appWindow.locator(`[data-test-locator="${selectorList.closeBtn}"]`).click()
+    await expect(appWindow.locator('#dialogNewProject-title')).toBeHidden()
+  })
+
+  /**
+   * Creates a new `.faproject` from the splash welcome **New project** control and verifies session plus creation toast.
+   */
+  test('creates a .faproject from the splash New project control', async () => {
+    await e2eSetNextProjectCreatePath(electronApp, 'e2e-splash-project.faproject')
+    await appWindow.locator(`[data-test-locator="${selectorList.splashNew}"]`).click()
+    await expect(appWindow.locator(`[data-test-locator="${selectorList.nameInput}"]`)).toBeVisible()
+    await appWindow.locator(`[data-test-locator="${selectorList.nameInput}"]`).fill('E2E Splash Realm')
+    await appWindow.locator(`[data-test-locator="${selectorList.createBtn}"]`).click()
+    await e2eExpectFaActiveProjectStoreName(appWindow, 'E2E Splash Realm')
+    await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
+      L_faProjectSession.notifyProjectCreated,
+      'E2E Splash Realm'
+    ))).toBeVisible()
+    assertE2eCreatedFaprojectFileExistsWithContent('e2e-splash-project.faproject')
+  })
+
+  /**
+   * Opens **Project → New project**, creates a second fixture, and verifies the active project switches to the menu-created realm.
+   */
+  test('opens New project from the Project menu and creates a file', async () => {
+    await e2eSetNextProjectCreatePath(electronApp, 'e2e-menu-project.faproject')
+    const projectTitle = projectMenu.title
+    await appWindow.getByRole('button', {
+      exact: true,
+      name: projectTitle
+    }).click()
+    await appWindow.getByRole('menuitem', { name: projectMenu.items.newProject }).click()
+    await expect(appWindow.locator('#dialogNewProject-title')).toContainText(L_newProject.title)
+    await appWindow.locator(`[data-test-locator="${selectorList.nameInput}"]`).fill('E2E Menu Realm')
+    await appWindow.locator(`[data-test-locator="${selectorList.createBtn}"]`).click()
+    await e2eExpectFaActiveProjectStoreName(appWindow, 'E2E Menu Realm')
+    await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
+      L_faProjectSession.notifyProjectCreated,
+      'E2E Menu Realm'
+    ))).toBeVisible()
+    assertE2eCreatedFaprojectFileExistsWithContent('e2e-menu-project.faproject')
+  })
+
+  /**
+   * Stages the splash-created fixture path, uses the splash **Load existing project** button, and expects the splash realm plus loaded toast.
+   */
+  test('loads an existing .faproject from the splash Load existing project control', async () => {
+    await e2eSetNextProjectOpenPath(electronApp, 'e2e-splash-project.faproject')
+    await appWindow.locator(`[data-test-locator="${selectorList.splashLoad}"]`).click()
+    await e2eExpectFaActiveProjectStoreName(appWindow, 'E2E Splash Realm')
+    await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
+      L_faProjectSession.notifyProjectLoaded,
+      'E2E Splash Realm'
+    ))).toBeVisible()
+  })
+
+  /**
+   * Stages the menu-created fixture path, opens **Project → Load project**, and expects the menu realm plus loaded toast.
+   */
+  test('loads an existing .faproject from the Project menu', async () => {
+    await e2eSetNextProjectOpenPath(electronApp, 'e2e-menu-project.faproject')
+    const projectTitle = projectMenu.title
+    await appWindow.getByRole('button', {
+      exact: true,
+      name: projectTitle
+    }).click()
+    await appWindow.getByRole('menuitem', { name: projectMenu.items.loadProject }).click()
+    await e2eExpectFaActiveProjectStoreName(appWindow, 'E2E Menu Realm')
+    await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
+      L_faProjectSession.notifyProjectLoaded,
+      'E2E Menu Realm'
+    ))).toBeVisible()
+  })
+
+  /**
+   * Loading the file that is already the active session should surface one clear error toast, not reload the project.
+   */
+  test('Load existing project rejects opening the currently active file again', async () => {
+    await e2eSetNextProjectOpenPath(electronApp, 'e2e-menu-project.faproject')
+    const projectTitle = projectMenu.title
+    await appWindow.getByRole('button', {
+      exact: true,
+      name: projectTitle
+    }).click()
+    await appWindow.getByRole('menuitem', { name: projectMenu.items.loadProject }).click()
+
+    await e2eExpectFaActiveProjectStoreName(appWindow, 'E2E Menu Realm')
+    await expect(appWindow.getByText(L_faProjectSession.openRejectedAlreadyActive)).toBeVisible()
+  })
+})
