@@ -7,7 +7,7 @@ alwaysApply: true
 
 ## Quality gate (the **default** chained verification)
 
-When running the full **quality gate** — ESLint, TypeScript check, Stylelint, and Vitest with coverage (**100%** on all four v8 metrics for **`src-electron`**, **`helpers`**, and scoped **`i18n/`** (**`unit-i18n`**), **100%** on all four for renderer **`src`** **`.ts`** in **`unit-src-renderer`**, **100%** on all four for **`.ts`** under **`src/components`**, **`src/layouts`**, and **`src/pages`** in **`unit-components`**, **`.vue`** SFCs reported with **~60%** watermarks only) — use **one** terminal invocation. Prefer the **`yarn testbatch:verify`** script in `package.json` (same steps, stops on the first failure):
+When running the full **quality gate** — ESLint, TypeScript check, Stylelint, and Vitest with coverage (**100%** on all four v8 metrics for **`src-electron`**, for **`helpers/**/*.ts`** that **`unit-helpers`** actually instruments (**`helpers/playwrightHelpers_*`** excluded), and scoped **`i18n/`** (**`unit-i18n`**), **100%** on all four for renderer **`src`** **`.ts`** in **`unit-src-renderer`**, **100%** on all four for **`.ts`** under **`src/components`**, **`src/layouts`**, and **`src/pages`** in **`unit-components`**, **`.vue`** SFCs reported with **~60%** watermarks only) — use **one** terminal invocation. Prefer the **`yarn testbatch:verify`** script in `package.json` (same steps, stops on the first failure):
 
 `yarn testbatch:verify`
 
@@ -48,9 +48,9 @@ Run each of these in its **own** terminal invocation (do not chain them with eac
 
 Keep logs isolated for readability and easier failure triage.
 
-**Playwright Electron `userData`:** Component and E2E runs set `TEST_ENV`; the main process then uses **`%APPDATA%/<package.json name>/playwright-user-data`** (this repo: **`Roaming\fantasia-archive\playwright-user-data`**), **not** **`fantasia-archive-dev`**. Specs use **`test.describe.serial`**; each group’s **`test.beforeAll`** calls **`resetFaPlaywrightIsolatedUserData()`** (**`helpers/playwrightHelpers/playwrightUserDataReset.ts`**) before that group’s **`electron.launch`**. See **`src-electron/mainScripts/appIdentity/fixAppName.ts`**, **`src-electron/mainScripts/appIdentity/playwrightIsolatedUserDataDirName.ts`**, and [playwright-tests.mdc](playwright-tests.mdc).
+**Playwright Electron `userData`:** Component and E2E runs set `TEST_ENV`; the main process then uses **`%APPDATA%/<package.json name>/playwright-user-data`** (this repo: **`Roaming\fantasia-archive\playwright-user-data`**), **not** **`fantasia-archive-dev`**. Specs use **`test.describe.serial`**; each group’s **`test.beforeAll`** **`await`**s **`launchFaPlaywrightComponentHarnessWindow`** / **`launchFaPlaywrightE2eAppWindow`**, which run **`resetFaPlaywrightIsolatedUserData()`** from **`helpers/playwrightHelpers_universal/playwrightUserDataReset.ts`** before **`electron.launch`**. See **`src-electron/mainScripts/appIdentity/fixAppName.ts`**, **`src-electron/mainScripts/appIdentity/playwrightIsolatedUserDataDirName.ts`**, and [playwright-tests.mdc](playwright-tests.mdc).
 
-**Playwright `keyboard.press` (cross-OS keybinds):** Component and E2E specs that drive global shortcuts or keybind capture must match how the app resolves **primary** (Command on macOS, Control on Windows/Linux) vs **literal Control** in saved overrides. Use **`helpers/playwrightHelpers/faPlaywrightKeyboardChords.ts`** and the **Keyboard strings** section in [playwright-tests.mdc](playwright-tests.mdc); see [fantasia-testing](../skills/fantasia-testing/SKILL.md) **Playwright keyboard.press and app keybinds**.
+**Playwright `keyboard.press` (cross-OS keybinds):** Component and E2E specs that drive global shortcuts or keybind capture must match how the app resolves **primary** (Command on macOS, Control on Windows/Linux) vs **literal Control** in saved overrides. Use **`helpers/playwrightHelpers_universal/faPlaywrightKeyboardChords.ts`** and the **Keyboard strings** section in [playwright-tests.mdc](playwright-tests.mdc); see [fantasia-testing](../skills/fantasia-testing/SKILL.md) **Playwright keyboard.press and app keybinds**.
 
 ## Reporting
 
