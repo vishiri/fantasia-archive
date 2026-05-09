@@ -2,10 +2,11 @@ import { beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_PROJECT_MANAGEMENT_IPC } from 'app/src-electron/electron-ipc-bridge'
 
-const { runCreateMock, runOpenMock, ipcMainHandleMock, appOnMock, closeActiveMock } = vi.hoisted(() => {
+const { runCreateMock, runOpenMock, ipcMainHandleMock, appOnMock, closeActiveMock, getRecentSnapshotMock } = vi.hoisted(() => {
   return {
     appOnMock: vi.fn(),
     closeActiveMock: vi.fn(),
+    getRecentSnapshotMock: vi.fn((): Array<{ filePath: string, name: string }> => []),
     ipcMainHandleMock: vi.fn(),
     runCreateMock: vi.fn(async () => ({ outcome: 'canceled' as const })),
     runOpenMock: vi.fn(async () => ({ outcome: 'canceled' as const }))
@@ -41,6 +42,12 @@ vi.mock('app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase'
   }
 })
 
+vi.mock('app/src-electron/mainScripts/projectManagement/faRecentProjectListRuntime', () => {
+  return {
+    getRecentProjectsSnapshot: getRecentSnapshotMock
+  }
+})
+
 beforeEach(async () => {
   vi.resetModules()
   ipcMainHandleMock.mockReset()
@@ -50,6 +57,8 @@ beforeEach(async () => {
   runOpenMock.mockReset()
   runCreateMock.mockResolvedValue({ outcome: 'canceled' })
   runOpenMock.mockResolvedValue({ outcome: 'canceled' })
+  getRecentSnapshotMock.mockReset()
+  getRecentSnapshotMock.mockReturnValue([])
 })
 
 function handlerFor (channel: string): (...args: unknown[]) => unknown {
@@ -58,11 +67,15 @@ function handlerFor (channel: string): (...args: unknown[]) => unknown {
   return call?.[1] as (...args: unknown[]) => unknown
 }
 
-test('registerFaProjectManagementIpc registers createProject, openProject, and before-quit hook once', async () => {
+test('registerFaProjectManagementIpc registers create, recent list, open, and before-quit hook once', async () => {
   const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
   registerFaProjectManagementIpc()
   expect(ipcMainHandleMock).toHaveBeenCalledWith(
     FA_PROJECT_MANAGEMENT_IPC.createProjectAsync,
+    expect.any(Function)
+  )
+  expect(ipcMainHandleMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.getRecentProjectsAsync,
     expect.any(Function)
   )
   expect(ipcMainHandleMock).toHaveBeenCalledWith(
@@ -76,6 +89,25 @@ test('registerFaProjectManagementIpc registers createProject, openProject, and b
   registerFaProjectManagementIpc()
   expect(ipcMainHandleMock.mock.calls.length).toBe(afterFirstHandle)
   expect(appOnMock.mock.calls.length).toBe(afterFirstOn)
+})
+
+test('getRecentProjectsAsync handler returns snapshot rows', async () => {
+  getRecentSnapshotMock.mockReturnValueOnce([
+    {
+      filePath: 'D:\\m.faproject',
+      name: 'Mine'
+    }
+  ])
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.getRecentProjectsAsync)
+  expect(h(undefined as never, undefined as never)).toEqual([
+    {
+      filePath: 'D:\\m.faproject',
+      name: 'Mine'
+    }
+  ])
+  expect(getRecentSnapshotMock).toHaveBeenCalledOnce()
 })
 
 test('createProjectAsync handler delegates to runFaProjectCreateFromIpc', async () => {

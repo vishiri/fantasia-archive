@@ -57,3 +57,29 @@ test('projectManagementAPI openProject invokes IPC with empty payload object', a
     {}
   )
 })
+
+test('projectManagementAPI getRecentProjects invokes IPC', async () => {
+  invokeMock.mockResolvedValueOnce([
+    {
+      filePath: 'D:\\r.faproject',
+      name: 'Recent'
+    }
+  ])
+  const r = await projectManagementAPI.getRecentProjects()
+  expect(r).toEqual([{
+    filePath: 'D:\\r.faproject',
+    name: 'Recent'
+  }])
+  expect(invokeMock).toHaveBeenCalledWith(FA_PROJECT_MANAGEMENT_IPC.getRecentProjectsAsync)
+})
+
+test('projectManagementAPI openProject clones optional filePath payload', async () => {
+  invokeMock.mockResolvedValueOnce({ outcome: 'canceled' })
+  const input = { filePath: 'D:\\z.faproject' }
+  await projectManagementAPI.openProject(input)
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.openProjectAsync,
+    { filePath: 'D:\\z.faproject' }
+  )
+  expect(input.filePath).toBe('D:\\z.faproject')
+})

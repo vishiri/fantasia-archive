@@ -176,6 +176,8 @@ test('Test that the main window is created successfully', async () => {
   const spellSession = {}
   const browserWindowInstance = {
     webContents: {
+      on: vi.fn(),
+      once: vi.fn(),
       openDevTools: vi.fn(),
       session: spellSession
     },
@@ -247,6 +249,8 @@ test('Test that main window creation does not open DevTools when DEBUGGING is un
   const onceHandlers: Record<string, () => void> = {}
   const browserWindowInstance = {
     webContents: {
+      on: vi.fn(),
+      once: vi.fn(),
       openDevTools: vi.fn()
     },
     once: vi.fn((eventName: string, handler: () => void) => {
@@ -282,6 +286,8 @@ test('Test that main window creation does not open DevTools when DEBUGGING is un
 test('Test that main window creation throws when DEV is set but APP_URL is missing', async () => {
   const browserWindowInstance = {
     webContents: {
+      on: vi.fn(),
+      once: vi.fn(),
       openDevTools: vi.fn()
     },
     once: vi.fn(),
@@ -312,6 +318,8 @@ test('Test that main window creation throws when DEV is set but APP_URL is missi
 test('Test that production window uses the app:// scheme for index.html', async () => {
   const browserWindowInstance = {
     webContents: {
+      on: vi.fn(),
+      once: vi.fn(),
       openDevTools: vi.fn()
     },
     once: vi.fn(),
@@ -344,6 +352,8 @@ test('Test that production window uses the app:// scheme for index.html', async 
 test('Test that main window preload path uses Quasar defaults when preload env vars are missing', async () => {
   const browserWindowInstance = {
     webContents: {
+      on: vi.fn(),
+      once: vi.fn(),
       openDevTools: vi.fn()
     },
     once: vi.fn(),
@@ -380,6 +390,8 @@ test('Test that ready-to-show and delayed maximize no-op after closed when appWi
   const onHandlers: Record<string, () => void> = {}
   const browserWindowInstance = {
     webContents: {
+      on: vi.fn(),
+      once: vi.fn(),
       openDevTools: vi.fn()
     },
     once: vi.fn((eventName: string, handler: () => void) => {
@@ -426,6 +438,8 @@ test('Test that ready-to-show no-ops when appWindow is undefined before the hand
   const onceHandlers: Record<string, () => void> = {}
   const browserWindowInstance = {
     webContents: {
+      on: vi.fn(),
+      once: vi.fn(),
       openDevTools: vi.fn()
     },
     once: vi.fn((eventName: string, handler: () => void) => {

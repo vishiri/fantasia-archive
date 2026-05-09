@@ -4,8 +4,6 @@ import type { IpcMainInvokeEvent } from 'electron'
 import type { SaveDialogOptions } from 'electron'
 import { dialog } from 'electron'
 import { Result } from 'neverthrow'
-import { ZodError } from 'zod'
-
 import { windowFromIpcEvent } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
 import { appWindow } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
 import { parseFaProjectCreateInput } from 'app/src-electron/shared/faProjectCreateInputSchema'
@@ -28,7 +26,9 @@ import {
   ensureFaProjectExtension,
   pathLooksLikeFaProjectFile
 } from './faProjectPathValidation'
+import { faProjectCreateMapParseFailure } from './faProjectCreateIpcParseFailure'
 import { faProjectSlugFromDisplayName } from './faProjectSlugFromDisplayName'
+import { recordRecentProjectEntry } from './faRecentProjectListRuntime'
 
 function buildSaveDialogOptions (defaultPath: string): SaveDialogOptions {
   return {
@@ -98,29 +98,7 @@ export async function runFaProjectCreateFromIpc (
   )()
 
   if (parsedResult.isErr()) {
-    const e = parsedResult.error
-    if (e instanceof TypeError) {
-      return {
-        errorMessage: e.message,
-        errorName: e.name,
-        outcome: 'error'
-      }
-    }
-    if (e instanceof ZodError) {
-      const first = e.issues[0]
-      const msg = first?.message ?? 'invalid project create input'
-      return {
-        errorMessage: msg,
-        errorName: 'ZodError',
-        outcome: 'error'
-      }
-    }
-    const err = e instanceof Error ? e : new Error(String(e))
-    return {
-      errorMessage: err.message,
-      errorName: err.name,
-      outcome: 'error'
-    }
+    return faProjectCreateMapParseFailure(parsedResult.error)
   }
 
   const parsed = parsedResult.value
@@ -189,6 +167,11 @@ export async function runFaProjectCreateFromIpc (
       outcome: 'error'
     }
   }
+
+  recordRecentProjectEntry({
+    filePath: createResult.value.filePath,
+    name: createResult.value.name
+  })
 
   return {
     outcome: 'created',

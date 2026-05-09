@@ -12,7 +12,9 @@ const {
   browserWindowStub,
   windowDialogState,
   mainWindowExports,
-  existsSyncMock
+  existsSyncMock,
+  recordRecentMock,
+  removeRecentMock
 } = vi.hoisted(() => {
   const browserWindowStubInner = { tag: 'browser-window-stub' as const }
   return {
@@ -35,7 +37,9 @@ const {
     takeE2eOpenMock: vi.fn((): string | null => null),
     windowDialogState: {
       attachWindow: true as boolean | 'ipc-null'
-    }
+    },
+    recordRecentMock: vi.fn(),
+    removeRecentMock: vi.fn()
   }
 })
 
@@ -105,6 +109,13 @@ vi.mock('../faProjectManagementE2ePathOverride', () => {
   }
 })
 
+vi.mock('../faRecentProjectListRuntime', () => {
+  return {
+    recordRecentProjectEntry: recordRecentMock,
+    removeRecentProjectEntryByPath: removeRecentMock
+  }
+})
+
 import { FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE } from 'app/types/I_faProjectManagementDomain'
 
 import { runFaProjectOpenFromIpc } from '../faProjectOpenRun'
@@ -132,6 +143,8 @@ beforeEach(() => {
   openDbMock.mockReturnValue({
     pragma: vi.fn()
   })
+  recordRecentMock.mockReset()
+  removeRecentMock.mockReset()
 })
 
 /**
@@ -172,6 +185,10 @@ test('Test that runFaProjectOpenFromIpc returns opened with project snapshot on 
   expect(r.project?.id).toBe('11111111-1111-4111-8111-111111111111')
   expect(openDbMock).toHaveBeenCalledOnce()
   expect(replaceMock).toHaveBeenCalledOnce()
+  expect(recordRecentMock).toHaveBeenCalledWith({
+    filePath: 'D:\\dl\\open.faproject',
+    name: 'Stored Name'
+  })
 })
 
 /**
@@ -311,6 +328,7 @@ test('Test that runFaProjectOpenFromIpc returns error when migrations throw', as
   expect(r.outcome).toBe('error')
   expect(r.errorMessage).toMatch(/migrate boom/)
   expect(r.attemptedFilePath).toBe('D:\\dl\\open.faproject')
+  expect(removeRecentMock).not.toHaveBeenCalled()
   expect(spy).toHaveBeenCalled()
   spy.mockRestore()
 })
@@ -422,4 +440,89 @@ test('Test that runFaProjectOpenFromIpc returns error when E2E path is not absol
   const r = await runFaProjectOpenFromIpc({} as never, {})
   expect(r.outcome).toBe('error')
   expect(r.errorMessage).toMatch(/absolute/)
+})
+
+test('Test that runFaProjectOpenFromIpc maps parse failures for invalid envelopes', async () => {
+  const nullish = await runFaProjectOpenFromIpc({} as never, null as never)
+  expect(nullish.outcome).toBe('error')
+  expect(nullish.errorName).toBe('TypeError')
+  const strict = await runFaProjectOpenFromIpc({} as never, {
+    filePath: 'D:\\x.faproject',
+    rogue: true
+  } as never)
+  expect(strict.outcome).toBe('error')
+  expect(strict.errorName).toBe('ZodError')
+})
+
+test('Test that runFaProjectOpenFromIpc opens explicit ipc path without dialog', async () => {
+  const r = await runFaProjectOpenFromIpc({} as never, {
+    filePath: 'D:\\ipc\\direct.faproject'
+  })
+  expect(showOpenDialogMock).not.toHaveBeenCalled()
+  expect(r.outcome).toBe('opened')
+  expect(recordRecentMock).toHaveBeenCalled()
+})
+
+test('Test that runFaProjectOpenFromIpc prunes MRU on explicit ipc bad suffix', async () => {
+  const r = await runFaProjectOpenFromIpc({} as never, { filePath: 'D:\\bad.txt' })
+  expect(r.outcome).toBe('error')
+  expect(removeRecentMock).toHaveBeenCalledWith('D:\\bad.txt')
+})
+
+test('Test that runFaProjectOpenFromIpc prunes MRU when explicit ipc open fails after resolve', async () => {
+  applyMigrationsMock.mockImplementationOnce(() => {
+    throw new Error('boom ipc path')
+  })
+  const r = await runFaProjectOpenFromIpc({} as never, {
+    filePath: 'D:\\ipc\\direct.faproject'
+  })
+  expect(r.outcome).toBe('error')
+  expect(removeRecentMock).toHaveBeenCalledWith('D:\\ipc\\direct.faproject')
+})
+
+test('Test that runFaProjectOpenFromIpc does not prune MRU when already-active on explicit path', async () => {
+  getActiveDbMock.mockReturnValueOnce({ tag: 'active-db' } as never)
+  readProjectUuidMock.mockReturnValue('11111111-1111-4111-8111-111111111111')
+  const r = await runFaProjectOpenFromIpc({} as never, {
+    filePath: 'D:\\ipc\\same.faproject'
+  })
+  expect(r.outcome).toBe('error')
+  expect(r.errorName).toBe(FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE)
+  expect(removeRecentMock).not.toHaveBeenCalled()
+})
+
+test('Test that ipc parse failure stringifies non-Error throws', async () => {
+  const schema = await import('app/src-electron/shared/faProjectOpenInputSchema')
+  const spy = vi.spyOn(schema, 'parseFaProjectOpenInput').mockImplementation((): never => {
+    // eslint-disable-next-line no-throw-literal -- exercises ipcParseFailureResult non-Error branch
+    throw 42
+  })
+  const r = await runFaProjectOpenFromIpc({} as never, {})
+  expect(r.outcome).toBe('error')
+  expect(r.errorMessage).toBe('42')
+  spy.mockRestore()
+})
+
+test('Test that ipc parse failure uses default text for empty Zod issues', async () => {
+  const { ZodError } = await import('zod')
+  const schema = await import('app/src-electron/shared/faProjectOpenInputSchema')
+  const spy = vi.spyOn(schema, 'parseFaProjectOpenInput').mockImplementation((): never => {
+    throw new ZodError([])
+  })
+  const r = await runFaProjectOpenFromIpc({} as never, {})
+  expect(r.outcome).toBe('error')
+  expect(r.errorMessage).toBe('invalid project open input')
+  spy.mockRestore()
+})
+
+test('Test that ipc parse failure forwards other Error instances', async () => {
+  const schema = await import('app/src-electron/shared/faProjectOpenInputSchema')
+  const spy = vi.spyOn(schema, 'parseFaProjectOpenInput').mockImplementation((): never => {
+    throw new Error('plain ipc failure')
+  })
+  const r = await runFaProjectOpenFromIpc({} as never, {})
+  expect(r.outcome).toBe('error')
+  expect(r.errorMessage).toBe('plain ipc failure')
+  expect(r.errorName).toBe('Error')
+  spy.mockRestore()
 })

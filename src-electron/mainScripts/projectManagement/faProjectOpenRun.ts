@@ -1,15 +1,10 @@
-import fs from 'node:fs'
-
 import type Database from 'better-sqlite3'
 
 import type { IpcMainInvokeEvent } from 'electron'
-import type { OpenDialogOptions } from 'electron'
-import { dialog } from 'electron'
 import { Result } from 'neverthrow'
+import { ZodError } from 'zod'
 
-import { windowFromIpcEvent } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
-import { appWindow } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
-import { FA_PROJECT_FILE_EXTENSION } from 'app/src-electron/shared/faProjectConstants'
+import { parseFaProjectOpenInput } from 'app/src-electron/shared/faProjectOpenInputSchema'
 import {
   FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE,
   type I_faProjectManagementActiveSnapshot,
@@ -27,74 +22,14 @@ import {
   readFaProjectStoredDisplayName,
   readFaProjectStoredProjectUuid
 } from './faProjectDbMigrate'
-import { faProjectSaveDialogDefaultDirectory } from './faProjectFileDialogDefaultPaths'
-import { takeNextE2eProjectOpenPath } from './faProjectManagementE2ePathOverride'
 import {
-  faDisplayNameFallbackFromProjectPath,
-  pathLooksLikeFaProjectFile
+  faDisplayNameFallbackFromProjectPath
 } from './faProjectPathValidation'
-
-function buildOpenDialogOptions (defaultPath: string): OpenDialogOptions {
-  return {
-    defaultPath,
-    filters: [
-      {
-        extensions: [FA_PROJECT_FILE_EXTENSION],
-        name: 'Fantasia Archive project'
-      }
-    ],
-    properties: ['openFile'],
-    title: 'Open Fantasia Archive project'
-  }
-}
-
-async function resolveOpenTargetPath (
-  event: IpcMainInvokeEvent
-): Promise<string | null | { errorMessage: string, errorName: string }> {
-  const e2ePath = takeNextE2eProjectOpenPath()
-  if (e2ePath != null) {
-    if (!pathLooksLikeFaProjectFile(e2ePath)) {
-      return {
-        errorMessage: 'E2E project path must be an absolute .faproject file',
-        errorName: 'FileError'
-      }
-    }
-    if (!fs.existsSync(e2ePath)) {
-      return {
-        errorMessage: 'E2E project file does not exist',
-        errorName: 'FileError'
-      }
-    }
-    return e2ePath
-  }
-
-  const defaultDir = faProjectSaveDialogDefaultDirectory()
-  const senderWin = windowFromIpcEvent(event) ?? appWindow
-  const opts = buildOpenDialogOptions(defaultDir)
-  const { canceled, filePaths } = senderWin != null
-    ? await dialog.showOpenDialog(senderWin, opts)
-    : await dialog.showOpenDialog(opts)
-  if (canceled) {
-    return null
-  }
-  const first = filePaths[0]
-  if (first === undefined || first.length === 0) {
-    return null
-  }
-  if (!pathLooksLikeFaProjectFile(first)) {
-    return {
-      errorMessage: 'Selected file must be a .faproject file',
-      errorName: 'FileError'
-    }
-  }
-  if (!fs.existsSync(first)) {
-    return {
-      errorMessage: 'Project file does not exist',
-      errorName: 'FileError'
-    }
-  }
-  return first
-}
+import { resolveFaProjectOpenTargetPath } from './faProjectOpenResolveTargetPath'
+import {
+  recordRecentProjectEntry,
+  removeRecentProjectEntryByPath
+} from './faRecentProjectListRuntime'
 
 function normalizeFaProjectOpenFailure (e: unknown): Error {
   if (e instanceof Error) {
@@ -132,28 +67,35 @@ function closeOpenAttemptDb (db: Database | null): void {
   )()
 }
 
-/**
- * Opens an existing '.faproject' from IPC (native open dialog or E2E path override); replaces active DB on success.
- */
-export async function runFaProjectOpenFromIpc (
-  event: IpcMainInvokeEvent,
-  _raw: unknown
-): Promise<I_faProjectOpenResult> {
-  const target = await resolveOpenTargetPath(event)
-  if (target === null) {
-    return { outcome: 'canceled' }
-  }
-  if (typeof target === 'object' && 'errorMessage' in target) {
+function ipcParseFailureResult (e: unknown): I_faProjectOpenResult {
+  if (e instanceof TypeError) {
     return {
-      errorMessage: target.errorMessage,
-      errorName: target.errorName,
+      errorMessage: e.message,
+      errorName: e.name,
       outcome: 'error'
     }
   }
+  if (e instanceof ZodError) {
+    const first = e.issues[0]
+    const msg = first?.message ?? 'invalid project open input'
+    return {
+      errorMessage: msg,
+      errorName: 'ZodError',
+      outcome: 'error'
+    }
+  }
+  const err = e instanceof Error ? e : new Error(String(e))
+  return {
+    errorMessage: err.message,
+    errorName: err.name,
+    outcome: 'error'
+  }
+}
 
-  const filePath = target
+function attemptOpenReplaceFaProject (
+  filePath: string
+): Result<I_faProjectManagementActiveSnapshot, unknown> {
   let db: Database | null = null
-
   const opened = Result.fromThrowable((): I_faProjectManagementActiveSnapshot => {
     db = openFaProjectDatabase(filePath)
     db.pragma('foreign_keys = ON')
@@ -182,6 +124,52 @@ export async function runFaProjectOpenFromIpc (
 
   closeOpenAttemptDb(db)
 
+  return opened
+}
+
+/**
+ * Opens an existing '.faproject' from IPC (native open dialog, optional path, or E2E path override); replaces active DB on success.
+ */
+export async function runFaProjectOpenFromIpc (
+  event: IpcMainInvokeEvent,
+  raw: unknown
+): Promise<I_faProjectOpenResult> {
+  let parsed: ReturnType<typeof parseFaProjectOpenInput>
+  try {
+    parsed = parseFaProjectOpenInput(raw)
+  } catch (e: unknown) {
+    return ipcParseFailureResult(e)
+  }
+
+  const target = await resolveFaProjectOpenTargetPath(event, parsed)
+  if ('canceled' in target && target.canceled) {
+    return { outcome: 'canceled' }
+  }
+  if ('errorMessage' in target) {
+    if (target.ipcExplicitPathFailed === true && target.attemptedFilePath !== undefined) {
+      removeRecentProjectEntryByPath(target.attemptedFilePath)
+    }
+    return {
+      attemptedFilePath: target.attemptedFilePath,
+      errorMessage: target.errorMessage,
+      errorName: target.errorName,
+      outcome: 'error'
+    }
+  }
+
+  if (!('filePath' in target)) {
+    return {
+      errorMessage: 'Unable to resolve project file to open',
+      errorName: 'FileError',
+      outcome: 'error'
+    }
+  }
+
+  const filePath = target.filePath
+  const ipcExplicitPath = target.ipcExplicitPath
+
+  const opened = attemptOpenReplaceFaProject(filePath)
+
   if (opened.isErr()) {
     const rawErr = opened.error
     if (rawErr instanceof FaProjectOpenRejectedAlreadyActiveError) {
@@ -200,6 +188,12 @@ export async function runFaProjectOpenFromIpc (
       err,
       filePath
     })
+    if (
+      ipcExplicitPath &&
+      err.name !== FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE
+    ) {
+      removeRecentProjectEntryByPath(filePath)
+    }
     return {
       attemptedFilePath: filePath,
       errorMessage: err.message,
@@ -207,6 +201,11 @@ export async function runFaProjectOpenFromIpc (
       outcome: 'error'
     }
   }
+
+  recordRecentProjectEntry({
+    filePath: opened.value.filePath,
+    name: opened.value.name
+  })
 
   return {
     outcome: 'opened',

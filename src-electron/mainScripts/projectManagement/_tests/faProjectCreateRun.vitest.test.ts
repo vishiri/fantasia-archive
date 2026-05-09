@@ -94,6 +94,14 @@ vi.mock('../faProjectManagementE2ePathOverride', () => {
   }
 })
 
+const recordRecentForCreateMock = vi.hoisted(() => vi.fn())
+
+vi.mock('../faRecentProjectListRuntime', () => {
+  return {
+    recordRecentProjectEntry: recordRecentForCreateMock
+  }
+})
+
 import * as faProjectCreateInputModule from 'app/src-electron/shared/faProjectCreateInputSchema'
 
 import { runFaProjectCreateFromIpc } from '../faProjectCreateRun'
@@ -109,6 +117,7 @@ beforeEach(() => {
   unlinkMock.mockReset()
   takeE2ePathMock.mockReset()
   takeE2ePathMock.mockReturnValue(null)
+  recordRecentForCreateMock.mockReset()
   readProjectUuidMock.mockReset()
   readProjectUuidMock.mockReturnValue('22222222-2222-4222-8222-222222222222')
   showSaveDialogMock.mockResolvedValue({
@@ -157,6 +166,10 @@ test('runFaProjectCreateFromIpc creates project when save path chosen', async ()
   expect(quickCheckMock).toHaveBeenCalled()
   expect(r.project?.name).toBe('Realm')
   expect(r.project?.id).toBe('22222222-2222-4222-8222-222222222222')
+  expect(recordRecentForCreateMock).toHaveBeenCalledWith({
+    filePath: 'D:\\dl\\proj.faproject',
+    name: 'Realm'
+  })
 })
 
 test('runFaProjectCreateFromIpc passes browser window reference into showSaveDialog', async () => {

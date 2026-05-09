@@ -2,6 +2,7 @@ import { BrowserWindow, app, screen } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { applyFaSpellCheckerLanguagesToSession } from 'app/src-electron/mainScripts/windowManagement/faSpellCheckerSession'
+import { registerFaMainWindowWebContentsSessionReset } from 'app/src-electron/mainScripts/windowManagement/faMainWindowWebContentsSessionReset'
 import { setupSpellChecker } from 'app/src-electron/mainScripts/windowManagement/spellChecker'
 import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
 
@@ -79,6 +80,8 @@ async function loadAndWireMainWindow (win: BrowserWindow): Promise<void> {
 
   // Set the current window's menu as empty
   win.setMenu(null)
+
+  registerFaMainWindowWebContentsSessionReset(win.webContents)
 
   // Load the basic app URL (dev server) or packaged index.html via the privileged 'app://' scheme.
   // Using 'app://' instead of 'file://' for packaged builds keeps web workers (Monaco editor.worker / css.worker, etc.) on a standard, secure origin.
