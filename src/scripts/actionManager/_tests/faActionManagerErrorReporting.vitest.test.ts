@@ -199,6 +199,26 @@ test('Test that reportFaActionFailure emits one console error and one notify', (
 
 /**
  * reportFaActionFailure
+ * Uses warning Notify when FaProjectOpenFailedError requests it (console stays error).
+ */
+test('Test that reportFaActionFailure uses warning notify for soft FaProjectOpenFailedError', () => {
+  const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  reportFaActionFailure(
+    buildEntry('loadExistingProject'),
+    new FaProjectOpenFailedError('already open', '/p/old.faproject', 'warning')
+  )
+  expect(consoleSpy).toHaveBeenCalledOnce()
+  expect(notifyCreateMock).toHaveBeenCalledWith(
+    expect.objectContaining({
+      caption: 'already open',
+      type: 'warning'
+    })
+  )
+  consoleSpy.mockRestore()
+})
+
+/**
+ * reportFaActionFailure
  * Forwards the failure to the Pinia store when one is available.
  */
 test('Test that reportFaActionFailure records the failure on the store when present', () => {

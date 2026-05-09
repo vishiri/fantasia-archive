@@ -3,6 +3,7 @@
     v-model="dialogModel"
     :class="['dialogComponent', documentName, 'newProject']"
     :aria-label="$t('dialogs.newProject.ariaLabel')"
+    @show="onDialogShow"
   >
     <q-card
       :class="['dialogComponent__wrapper', 'newProject', documentName]"
@@ -19,6 +20,7 @@
 
         <div class="dialogNewProject__nameInput q-mb-sm">
           <q-input
+            ref="nameInputRef"
             v-model="projectName"
             color="primary-bright"
             dark
@@ -62,7 +64,7 @@ import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import type { StoreGeneric } from 'pinia'
 import { Result } from 'neverthrow'
 
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
 import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
 import { S_DialogComponent } from 'app/src/stores/S_Dialog'
@@ -86,10 +88,20 @@ const props = defineProps<{
 
 const dialogModel = ref(false)
 const projectName = ref('')
+const nameInputRef = ref<{ focus: () => void } | null>(null)
 
 registerComponentDialogStackGuard(dialogModel)
 
 const documentName = ref('')
+
+async function focusNameInputAfterShow (): Promise<void> {
+  await nextTick()
+  nameInputRef.value?.focus()
+}
+
+function onDialogShow (): void {
+  void focusNameInputAfterShow()
+}
 
 watch(dialogModel, (isOpen) => {
   if (isOpen) {

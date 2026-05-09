@@ -1,6 +1,7 @@
 import { i18n } from 'app/i18n/externalFileLoader'
 
-import type { I_appMenuBuildSession, I_appMenuItem, I_appMenuList } from 'app/types/I_appMenusDataList'
+import type { I_faRecentProjectEntry } from 'app/types/I_faRecentProjectsDomain'
+import type { I_appMenuBuildSession, I_appMenuItem, I_appMenuList, I_appMenuSubItem } from 'app/types/I_appMenusDataList'
 
 import {
   faMenuItem,
@@ -12,8 +13,20 @@ import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
 
 // TODO - add functionality for all buttons and conditions
 
+function buildLoadRecentSubmenu (recent: readonly I_faRecentProjectEntry[]): I_appMenuSubItem[] {
+  return recent.map((entry) => {
+    return faMenuSubItem('appControlMenus.project.items.recentProjectRow', '', {
+      icon: undefined,
+      text: entry.name,
+      trigger: () => runFaAction('loadExistingProject', { filePath: entry.filePath })
+    })
+  })
+}
+
 function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] {
   const gate = session.hasActiveProject
+  const recent = session.recentProjects ?? []
+  const hasRecent = recent.length > 0
 
   return [
     faMenuItem('appControlMenus.project.items.newProject', 'mdi-plus', {
@@ -25,6 +38,11 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
     }),
     faMenuItem('appControlMenus.project.items.loadProject', 'mdi-package-variant', {
       trigger: () => runFaAction('loadExistingProject', {})
+    }),
+    faMenuItem('appControlMenus.project.items.loadRecentProject', 'keyboard_arrow_right', {
+      conditions: hasRecent,
+      specialColor: 'grey',
+      submenu: hasRecent ? buildLoadRecentSubmenu(recent) : undefined
     }),
     faMenuSeparator(),
     faMenuItem('appControlMenus.project.items.exportProjectDocuments', 'mdi-database-export-outline'),

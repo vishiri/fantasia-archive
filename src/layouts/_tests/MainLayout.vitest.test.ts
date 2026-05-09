@@ -6,6 +6,7 @@ import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSett
 import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/rendererAppInternals'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
+import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
 import { mountMainLayoutForVitest } from './mainLayoutVitestMount'
@@ -134,6 +135,52 @@ test('Test that MainLayout hydrates user settings when persisted languageCode is
 
   expect(getSettings).toHaveBeenCalled()
   expect(S_FaUserSettings().settings?.languageCode).toBe('de')
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * MainLayout / onMounted
+ * Refreshes recent project MRU when projectManagement exists on the bridge.
+ */
+test('Test that MainLayout refreshes recent projects list when projectManagement bridge is present', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'electron')
+
+  const recentStore = S_FaRecentProjects()
+  const refreshSpy = vi.spyOn(recentStore, 'refreshRecentProjects').mockResolvedValue()
+
+  const w = await mountMainLayoutForVitest()
+  await flushPromises()
+
+  expect(refreshSpy).toHaveBeenCalledTimes(1)
+
+  refreshSpy.mockRestore()
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * MainLayout / onMounted
+ * Skips MRU hydration when the bridge omits projectManagement.
+ */
+test('Test that MainLayout skips recent projects refresh when projectManagement bridge is absent', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'electron')
+
+  const recentStore = S_FaRecentProjects()
+  const refreshSpy = vi.spyOn(recentStore, 'refreshRecentProjects').mockResolvedValue()
+
+  const prev = window.faContentBridgeAPIs.projectManagement
+  delete (window.faContentBridgeAPIs as { projectManagement?: unknown }).projectManagement
+
+  const w = await mountMainLayoutForVitest()
+  await flushPromises()
+
+  expect(refreshSpy).not.toHaveBeenCalled()
+
+  window.faContentBridgeAPIs.projectManagement = prev
+  refreshSpy.mockRestore()
   w.unmount()
   vi.unstubAllEnvs()
 })

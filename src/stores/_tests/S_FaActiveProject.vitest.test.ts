@@ -208,7 +208,8 @@ test('Test that openProjectFromUserDialog throws on error outcome', async () => 
   })
   await expect(store.openProjectFromUserDialog()).rejects.toMatchObject({
     message: expect.stringMatching(/sqlite boom/),
-    name: 'FaProjectOpenFailedError'
+    name: 'FaProjectOpenFailedError',
+    notifyType: 'negative'
   })
 })
 
@@ -220,7 +221,8 @@ test('Test that openProjectFromUserDialog maps already-active error to locale st
   })
   await expect(store.openProjectFromUserDialog()).rejects.toMatchObject({
     message: expect.stringMatching(/already open/i),
-    name: 'FaProjectOpenFailedError'
+    name: 'FaProjectOpenFailedError',
+    notifyType: 'warning'
   })
 })
 
@@ -233,7 +235,8 @@ test('Test that openProjectFromUserDialog attaches attemptedFilePath when main r
   await expect(store.openProjectFromUserDialog()).rejects.toMatchObject({
     attemptedFilePath: 'C:\\bad.faproject',
     message: 'corrupt db',
-    name: 'FaProjectOpenFailedError'
+    name: 'FaProjectOpenFailedError',
+    notifyType: 'negative'
   })
 })
 
@@ -245,4 +248,30 @@ test('Test that openProjectFromUserDialog throws on error outcome without messag
 test('Test that openProjectFromUserDialog throws when opened result omits project', async () => {
   openProjectMock.mockResolvedValueOnce({ outcome: 'opened' as const })
   await expect(store.openProjectFromUserDialog()).rejects.toThrow(/no project snapshot/)
+})
+
+/**
+ * S_FaActiveProject / openProjectFromKnownPath
+ * Sends absolute path through the bridge payload shape.
+ */
+test('Test that openProjectFromKnownPath invokes openProject with filePath', async () => {
+  openProjectMock.mockResolvedValueOnce({
+    outcome: 'opened' as const,
+    project: {
+      filePath: 'D:\\by-path.faproject',
+      id: 'id-p',
+      name: 'By path'
+    }
+  })
+  const r = await store.openProjectFromKnownPath('D:\\by-path.faproject')
+  expect(r).toBe('opened')
+  expect(openProjectMock).toHaveBeenCalledWith({ filePath: 'D:\\by-path.faproject' })
+})
+
+test('Test that openProjectFromKnownPath throws when bridge is unavailable', async () => {
+  vi.stubGlobal('window', {
+    faContentBridgeAPIs: {}
+  } as unknown as Window & typeof globalThis)
+  store = S_FaActiveProject()
+  await expect(store.openProjectFromKnownPath('D:\\x.faproject')).rejects.toThrow(/not available/)
 })

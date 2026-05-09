@@ -139,7 +139,10 @@
                         ({{ keybindHintLabel(submenuItem.keybindCommandId) }})
                       </div>
                     </q-item-section>
-                    <q-item-section avatar>
+                    <q-item-section
+                      v-if="submenuItem.icon"
+                      avatar
+                    >
                       <q-icon
                         class="appControlSingleMenu__icon"
                         data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-icon"

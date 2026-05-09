@@ -1,8 +1,8 @@
 /* eslint-disable vue/one-component-per-file -- colocated Quasar stub components for Vue Test Utils mounts */
 
 import { flushPromises, mount } from '@vue/test-utils'
-import { defineComponent } from 'vue'
-import { expect, test, vi } from 'vitest'
+import { defineComponent, nextTick } from 'vue'
+import { expect, test, vi, beforeEach } from 'vitest'
 
 import DialogNewProject from '../DialogNewProject.vue'
 
@@ -22,9 +22,23 @@ const dialogNewProjectQDialogStub = defineComponent({
       default: false
     }
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'show'],
+  watch: {
+    modelValue: {
+      immediate: true,
+      handler (v: boolean) {
+        if (v) {
+          void this.$nextTick(() => {
+            this.$emit('show')
+          })
+        }
+      }
+    }
+  },
   template: '<div class="q-dialog-stub"><div v-show="modelValue" class="q-dialog-stub-inner"><slot /></div></div>'
 })
+
+const dialogNewProjectQInputFocusMock = vi.fn()
 
 const dialogNewProjectQInputStub = defineComponent({
   name: 'QInput',
@@ -36,6 +50,10 @@ const dialogNewProjectQInputStub = defineComponent({
   },
   emits: ['update:modelValue'],
   methods: {
+    focus (): void {
+      dialogNewProjectQInputFocusMock()
+      ;(this.$el as HTMLInputElement).focus()
+    },
     onInput (e: Event): void {
       const v = (e.target as HTMLInputElement).value
       this.$emit('update:modelValue', v)
@@ -61,6 +79,34 @@ const dialogNewProjectStubs = {
   QDialog: dialogNewProjectQDialogStub,
   QInput: dialogNewProjectQInputStub
 }
+
+beforeEach(() => {
+  dialogNewProjectQInputFocusMock.mockClear()
+})
+
+/**
+ * DialogNewProject
+ * Name field focuses when the dialog shows so typing can start without an extra click.
+ */
+test('Test that DialogNewProject focuses name input when dialog opens', async () => {
+  const w = mount(DialogNewProject, {
+    global: {
+      components: { ...dialogNewProjectStubs },
+      mocks: {
+        $t: (k: string) => k
+      }
+    },
+    props: {
+      directInput: 'NewProject'
+    }
+  })
+  await flushPromises()
+  await nextTick()
+  await nextTick()
+  await flushPromises()
+  expect(dialogNewProjectQInputFocusMock).toHaveBeenCalledTimes(1)
+  w.unmount()
+})
 
 /**
  * DialogNewProject

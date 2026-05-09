@@ -16,7 +16,7 @@
         @click="emit('refreshWebContents')"
       >
         <q-icon
-          class="globalLanguageSelectorSpellcheckRefreshControl__iconSpin fa-color-icon-spellcheck-refresh"
+          class="globalLanguageSelectorSpellcheckRefreshControl__iconSpin fa-icon-spellcheck-refresh"
           name="mdi-refresh"
           size="22px"
         />

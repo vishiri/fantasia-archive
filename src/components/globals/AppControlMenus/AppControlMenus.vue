@@ -70,6 +70,7 @@ import { buildHelpInfoMenu } from 'app/src/components/globals/AppControlMenus/_d
 import { buildProjectMenu } from 'app/src/components/globals/AppControlMenus/_data/project'
 import { buildToolsMenu } from 'app/src/components/globals/AppControlMenus/_data/tools'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
+import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 
 import AppControlSingleMenu from 'app/src/components/globals/AppControlSingleMenu/AppControlSingleMenu.vue'
 import DialogMarkdownDocument from 'app/src/components/dialogs/DialogMarkdownDocument/DialogMarkdownDocument.vue'
@@ -102,6 +103,7 @@ withDefaults(
 )
 
 const { hasActiveProject } = storeToRefs(S_FaActiveProject())
+const { entries: recentProjectEntries } = storeToRefs(S_FaRecentProjects())
 
 /**
  * Testing type that might be happening right now
@@ -119,8 +121,10 @@ onMounted(async () => {
 const project = computed((): I_appMenuList => {
   void i18n.global.locale.value
   void hasActiveProject.value
+  void recentProjectEntries.value
   return buildProjectMenu({
-    hasActiveProject: hasActiveProject.value
+    hasActiveProject: hasActiveProject.value,
+    recentProjects: recentProjectEntries.value
   })
 })
 

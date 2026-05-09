@@ -51,9 +51,11 @@ export type T_faActionId = typeof FA_ACTION_IDS[number]
 export type T_faActionKind = 'sync' | 'async'
 
 /**
- * Load existing project at dispatch: pass an empty object. Action monitor history records filePath and projectName after a successful open.
+ * Load existing project: omit filePath for the native picker; pass filePath to open a known path (recent list).
  */
-export type I_faLoadExistingProjectPayload = Record<string, never>
+export interface I_faLoadExistingProjectPayload {
+  filePath?: string
+}
 
 /**
  * Per-action payload contract. Actions with no inputs map to 'void'.

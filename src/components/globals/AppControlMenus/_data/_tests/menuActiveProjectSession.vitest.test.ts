@@ -13,6 +13,16 @@ import { buildDocumentsMenu } from '../documents'
 import { buildProjectMenu } from '../project'
 import { buildToolsMenu } from '../tools'
 
+function emptyRecentSession (hasActiveProject: boolean): {
+  hasActiveProject: boolean
+  recentProjects: readonly []
+} {
+  return {
+    hasActiveProject,
+    recentProjects: []
+  }
+}
+
 beforeEach(() => {
   runFaActionMock.mockClear()
 })
@@ -26,7 +36,7 @@ beforeEach(() => {
  * New project dispatches the open dialog action from the first row trigger.
  */
 test('Test that buildProjectMenu new project row opens the settings dialog action', () => {
-  const menu = buildProjectMenu({ hasActiveProject: false })
+  const menu = buildProjectMenu(emptyRecentSession(false))
   const items = menu.data.filter((row) => row.mode === 'item')
   items[0]!.trigger?.()
   expect(runFaActionMock).toHaveBeenCalledTimes(1)
@@ -38,7 +48,7 @@ test('Test that buildProjectMenu new project row opens the settings dialog actio
  * Load existing project dispatches the load action from the load row trigger.
  */
 test('Test that buildProjectMenu load existing project row dispatches loadExistingProject', () => {
-  const menu = buildProjectMenu({ hasActiveProject: false })
+  const menu = buildProjectMenu(emptyRecentSession(false))
   const items = menu.data.filter((row) => row.mode === 'item')
   items[2]!.trigger?.()
   expect(runFaActionMock).toHaveBeenCalledWith('loadExistingProject', {})
@@ -49,19 +59,20 @@ test('Test that buildProjectMenu load existing project row dispatches loadExisti
  * Rows that require an open project are disabled when `hasActiveProject` is false.
  */
 test('Test that buildProjectMenu disables gated rows when hasActiveProject is false', () => {
-  const menu = buildProjectMenu({ hasActiveProject: false })
+  const menu = buildProjectMenu(emptyRecentSession(false))
   const items = menu.data.filter((row) => row.mode === 'item')
 
   expect(items[0]!.conditions).not.toBe(false)
   expect(items[1]!.conditions).toBe(false)
   expect(items[2]!.conditions).not.toBe(false)
-  expect(items[3]!.conditions).not.toBe(false)
-  expect(items[4]!.conditions).toBe(false)
+  expect(items[3]!.conditions).toBe(false)
+  expect(items[4]!.conditions).not.toBe(false)
   expect(items[5]!.conditions).toBe(false)
   expect(items[6]!.conditions).toBe(false)
-  expect(items[7]!.conditions).not.toBe(false)
+  expect(items[7]!.conditions).toBe(false)
+  expect(items[8]!.conditions).not.toBe(false)
 
-  const sub = items[7]!.submenu?.filter((row) => row.mode === 'item') ?? []
+  const sub = items[8]!.submenu?.filter((row) => row.mode === 'item') ?? []
   expect(sub[0]!.conditions).toBe(false)
   expect(sub[1]!.conditions).not.toBe(false)
 })
@@ -71,12 +82,63 @@ test('Test that buildProjectMenu disables gated rows when hasActiveProject is fa
  * Gated rows enable when a project is active.
  */
 test('Test that buildProjectMenu enables gated rows when hasActiveProject is true', () => {
-  const menu = buildProjectMenu({ hasActiveProject: true })
+  const menu = buildProjectMenu(emptyRecentSession(true))
   const items = menu.data.filter((row) => row.mode === 'item')
 
-  expect(items.every((row) => row.conditions !== false)).toBe(true)
-  const sub = items[7]!.submenu?.filter((row) => row.mode === 'item') ?? []
+  expect(items[0]!.conditions).not.toBe(false)
+  expect(items[1]!.conditions).not.toBe(false)
+  expect(items[2]!.conditions).not.toBe(false)
+  expect(items[3]!.conditions).toBe(false)
+  expect(items[4]!.conditions).not.toBe(false)
+  expect(items[5]!.conditions).not.toBe(false)
+  expect(items[6]!.conditions).not.toBe(false)
+  expect(items[7]!.conditions).not.toBe(false)
+  expect(items[8]!.conditions).not.toBe(false)
+  const sub = items[8]!.submenu?.filter((row) => row.mode === 'item') ?? []
   expect(sub.every((row) => row.conditions !== false)).toBe(true)
+})
+
+/**
+ * Project menu
+ * Recent submenu dispatches load with filePath when entries exist.
+ */
+test('Test that buildProjectMenu recent row dispatches loadExistingProject with filePath', () => {
+  const menu = buildProjectMenu({
+    hasActiveProject: false,
+    recentProjects: [{
+      filePath: 'C:\\x\\a.faproject',
+      name: 'Alpha'
+    }]
+  })
+  const items = menu.data.filter((row) => row.mode === 'item')
+  const recentParent = items[3]
+  expect(recentParent?.conditions).not.toBe(false)
+  expect(recentParent?.icon).toBe('keyboard_arrow_right')
+  expect(recentParent?.specialColor).toBe('grey')
+  expect(recentParent?.submenu?.length).toBe(1)
+  const subRow = recentParent?.submenu?.find((r) => r.mode === 'item')
+  expect(subRow?.icon).toBeUndefined()
+  subRow?.trigger?.()
+  expect(runFaActionMock).toHaveBeenCalledWith(
+    'loadExistingProject',
+    {
+      filePath: 'C:\\x\\a.faproject'
+    }
+  )
+})
+
+/**
+ * Project menu
+ * Omitted recentProjects disables load-recent parent with no submenu placeholder.
+ */
+test('Test that buildProjectMenu treats omitted recentProjects as no recent entries', () => {
+  const menu = buildProjectMenu({ hasActiveProject: false })
+  const items = menu.data.filter((row) => row.mode === 'item')
+  const recentParent = items[3]
+  expect(recentParent?.conditions).toBe(false)
+  expect(recentParent?.submenu).toBeUndefined()
+  expect(recentParent?.icon).toBe('keyboard_arrow_right')
+  expect(recentParent?.specialColor).toBe('grey')
 })
 
 /**

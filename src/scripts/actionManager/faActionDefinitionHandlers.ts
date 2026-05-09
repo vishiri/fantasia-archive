@@ -1,4 +1,5 @@
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
+import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
@@ -178,30 +179,42 @@ export async function handleOpenNewProjectDialog (): Promise<void> {
 export async function handleCreateNewProject (
   payload: I_faActionPayloadMap['createNewProject']
 ): Promise<void> {
-  const outcome = await S_FaActiveProject().createProjectFromUserInput(payload.projectName)
-  if (outcome === 'canceled') {
-    throw new FaActionUserCanceledError()
+  try {
+    const outcome = await S_FaActiveProject().createProjectFromUserInput(payload.projectName)
+    if (outcome === 'canceled') {
+      throw new FaActionUserCanceledError()
+    }
+    notifyFaProjectCreatedPositive()
+  } finally {
+    await S_FaRecentProjects().refreshRecentProjects()
   }
-  notifyFaProjectCreatedPositive()
 }
 
 export async function handleLoadExistingProject (
-  _payload: I_faActionPayloadMap['loadExistingProject']
+  payload: I_faActionPayloadMap['loadExistingProject']
 ): Promise<{ payloadPreview: string } | void> {
-  const outcome = await S_FaActiveProject().openProjectFromUserDialog()
-  if (outcome === 'canceled') {
-    throw new FaActionUserCanceledError()
+  try {
+    const pathArg = payload.filePath
+    const outcome =
+      pathArg !== undefined && pathArg.length > 0
+        ? await S_FaActiveProject().openProjectFromKnownPath(pathArg)
+        : await S_FaActiveProject().openProjectFromUserDialog()
+    if (outcome === 'canceled') {
+      throw new FaActionUserCanceledError()
+    }
+    notifyFaProjectLoadedPositive()
+    const snap = S_FaActiveProject().activeProject
+    if (snap === null) {
+      throw new Error('Project open returned no active project snapshot.')
+    }
+    const payloadPreview = buildFaActionPayloadPreview({
+      filePath: snap.filePath,
+      projectName: snap.name
+    })
+    return { payloadPreview }
+  } finally {
+    await S_FaRecentProjects().refreshRecentProjects()
   }
-  notifyFaProjectLoadedPositive()
-  const snap = S_FaActiveProject().activeProject
-  if (snap === null) {
-    throw new Error('Project open returned no active project snapshot.')
-  }
-  const payloadPreview = buildFaActionPayloadPreview({
-    filePath: snap.filePath,
-    projectName: snap.name
-  })
-  return { payloadPreview }
 }
 
 export async function handleShowStartupTipsNotification (): Promise<void> {

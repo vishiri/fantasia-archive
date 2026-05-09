@@ -90,6 +90,7 @@ const baseBridge = () => ({
   },
   projectManagement: {
     createProject: async () => ({ outcome: 'canceled' }),
+    getRecentProjects: async () => [],
     openProject: async () => ({ outcome: 'canceled' })
   }
 })

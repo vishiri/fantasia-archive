@@ -1,4 +1,5 @@
 import type { T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
+import type { I_faRecentProjectEntry } from 'app/types/I_faRecentProjectsDomain'
 
 /**
  * App chrome menu models: top-level menu buttons, nested items, separators, and click triggers.
@@ -15,6 +16,8 @@ export interface I_appMenuBuildSession {
    * True when the app has a loaded project database for this session.
    */
   hasActiveProject: boolean
+
+  recentProjects?: readonly I_faRecentProjectEntry[]
 }
 
 export interface I_appMenuSubItem {

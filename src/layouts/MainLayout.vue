@@ -55,6 +55,7 @@ import { isFantasiaStorybookCanvas } from 'app/src/scripts/appInternals/renderer
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
+import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 
 import AppControlMenus from 'app/src/components/globals/AppControlMenus/AppControlMenus.vue'
@@ -92,6 +93,10 @@ onMounted(async () => {
     const faUserSettingsStore = S_FaUserSettings()
 
     await faUserSettingsStore.refreshSettings()
+  }
+
+  if (window.faContentBridgeAPIs?.projectManagement !== undefined) {
+    await S_FaRecentProjects().refreshRecentProjects()
   }
 
   if (window.faContentBridgeAPIs?.faKeybinds !== undefined) {

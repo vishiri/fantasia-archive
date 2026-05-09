@@ -103,6 +103,11 @@ export function reportFaActionFailure (
     uid: entry.uid
   })
 
+  const notifyDisplayType =
+    error instanceof FaProjectOpenFailedError && error.notifyType === 'warning'
+      ? 'warning'
+      : 'negative'
+
   Notify.create({
     actions: [{
       color: 'white',
@@ -114,7 +119,7 @@ export function reportFaActionFailure (
       actionId: entry.id
     }),
     timeout: 6000,
-    type: 'negative'
+    type: notifyDisplayType
   })
 
   const failure: I_faActionFailureLog = {

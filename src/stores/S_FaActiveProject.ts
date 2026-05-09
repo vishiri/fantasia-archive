@@ -4,6 +4,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
 import type { I_faActiveProject } from 'app/types/I_faActiveProjectDomain'
+import type { I_faProjectOpenResult } from 'app/types/I_faProjectManagementDomain'
 import { FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE } from 'app/types/I_faProjectManagementDomain'
 
 import { i18n } from 'app/i18n/externalFileLoader'
@@ -52,22 +53,19 @@ export const S_FaActiveProject = defineStore('S_FaActiveProject', () => {
     return 'created'
   }
 
-  async function openProjectFromUserDialog (): Promise<'opened' | 'canceled'> {
-    const api = window.faContentBridgeAPIs?.projectManagement
-    if (api === undefined) {
-      throw new Error('Project management is not available in this environment.')
-    }
-    const result = await api.openProject()
+  async function finalizeOpenResult (result: I_faProjectOpenResult): Promise<'opened' | 'canceled'> {
     if (result.outcome === 'canceled') {
       return 'canceled'
     }
     if (result.outcome === 'error') {
-      const localized = result.errorName === FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE
+      const isAlreadyActive = result.errorName === FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE
+      const localized = isAlreadyActive
         ? i18n.global.t('globalFunctionality.faProjectSession.openRejectedAlreadyActive')
         : (result.errorMessage ?? 'Failed to open project.')
       throw new FaProjectOpenFailedError(
         localized,
-        result.attemptedFilePath
+        result.attemptedFilePath,
+        isAlreadyActive ? 'warning' : 'negative'
       )
     }
     const p = result.project
@@ -82,11 +80,30 @@ export const S_FaActiveProject = defineStore('S_FaActiveProject', () => {
     return 'opened'
   }
 
+  async function openProjectFromUserDialog (): Promise<'opened' | 'canceled'> {
+    const api = window.faContentBridgeAPIs?.projectManagement
+    if (api === undefined) {
+      throw new Error('Project management is not available in this environment.')
+    }
+    const result = await api.openProject()
+    return await finalizeOpenResult(result)
+  }
+
+  async function openProjectFromKnownPath (filePath: string): Promise<'opened' | 'canceled'> {
+    const api = window.faContentBridgeAPIs?.projectManagement
+    if (api === undefined) {
+      throw new Error('Project management is not available in this environment.')
+    }
+    const result = await api.openProject({ filePath })
+    return await finalizeOpenResult(result)
+  }
+
   return {
     activeProject,
     clearActiveProject,
     createProjectFromUserInput,
     hasActiveProject,
+    openProjectFromKnownPath,
     openProjectFromUserDialog,
     setActiveProject
   }

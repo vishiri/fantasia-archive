@@ -412,3 +412,51 @@ test('Test that AppControlSingleMenu submenu item click tolerates a missing trig
 
   w.unmount()
 })
+
+/**
+ * AppControlSingleMenu
+ * Omits the trailing submenu icon stack when the model leaves `icon` unset.
+ */
+test('Test that AppControlSingleMenu hides submenu avatar icon when icon is absent', async () => {
+  const w = mount(AppControlSingleMenu, {
+    attachTo: document.body,
+    props: {
+      dataInput: {
+        title: 'T',
+        data: [
+          {
+            conditions: true,
+            icon: 'keyboard_arrow_right',
+            mode: 'item',
+            submenu: [
+              {
+                conditions: true,
+                mode: 'item',
+                text: 'Text only row'
+              }
+            ],
+            text: 'Parent',
+            trigger: undefined
+          }
+        ]
+      }
+    },
+    global: { mocks: { $t: (k: string) => k } }
+  })
+
+  await w.get('[data-test-locator="AppControlSingleMenu-wrapper"]').trigger('click')
+  await flushPromises()
+
+  const parentRow = document.body.querySelector('[data-test-locator="AppControlSingleMenu-menuItem"]')
+  expect(parentRow).not.toBeNull()
+  ;(parentRow as HTMLElement).dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }))
+  await flushPromises()
+
+  expect(
+    document.body.querySelector(
+      '[data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-icon"]'
+    )
+  ).toBeNull()
+
+  w.unmount()
+})
