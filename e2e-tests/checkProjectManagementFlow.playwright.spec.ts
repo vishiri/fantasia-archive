@@ -51,6 +51,45 @@ const MENU_ANIMATION_MS = 600
 const E2E_PROJECT_MENU_REALM = 'E2E Menu Realm'
 const E2E_PROJECT_SPLASH_REALM = 'E2E Splash Realm'
 
+/** Eleven successive creates to exercise MRU cap 10 (entries 02–11 remain; 01 evicted). */
+const E2E_RECENT_CAP_TOTAL = 11
+
+function recentCapFixtureBaseName (index1Based: number): string {
+  return `e2e-recent-cap-${String(index1Based).padStart(2, '0')}.faproject`
+}
+
+function recentCapDisplayName (index1Based: number): string {
+  return `E2E Recent Cap ${String(index1Based).padStart(2, '0')}`
+}
+
+function unlinkAllE2eRecentCapFixtures (): void {
+  for (let i = 1; i <= E2E_RECENT_CAP_TOTAL; i++) {
+    tryUnlinkE2eFaprojectFixture(recentCapFixtureBaseName(i))
+  }
+}
+
+/**
+ * Newest-first labels after 11 capped prepends: 11 … 02 (01 dropped).
+ */
+function expectedRecentCapLabelsAfterElevenCreates (): string[] {
+  const out: string[] = []
+  for (let n = E2E_RECENT_CAP_TOTAL; n >= 2; n--) {
+    out.push(recentCapDisplayName(n))
+  }
+  return out
+}
+
+/**
+ * After removing missing-file 11 from MRU: 10 … 02 (nine rows).
+ */
+function expectedRecentCapLabelsAfterMissingFilePruned (): string[] {
+  const out: string[] = []
+  for (let n = E2E_RECENT_CAP_TOTAL - 1; n >= 2; n--) {
+    out.push(recentCapDisplayName(n))
+  }
+  return out
+}
+
 async function dismissOpenMenus (page: Page): Promise<void> {
   await page.keyboard.press('Escape')
   await page.waitForTimeout(150)
@@ -75,15 +114,44 @@ async function expectLoadRecentSubmenuLabels (
   firstLabel: string,
   secondLabel: string
 ): Promise<void> {
+  await expectLoadRecentSubmenuLabelsOrdered(page, [firstLabel, secondLabel])
+}
+
+async function expectLoadRecentSubmenuLabelsOrdered (
+  page: Page,
+  expectedLabelsNewestFirst: readonly string[]
+): Promise<void> {
   const panel = page.locator(`[data-test-locator="${selectorList.submenuItemSubMenu}"]`).last()
   const items = panel.locator(`[data-test-locator="${selectorList.submenuItemSubMenuItem}"]`)
-  await expect(items).toHaveCount(2)
-  await expect(
-    items.nth(0).locator(`[data-test-locator="${selectorList.submenuItemSubMenuItemText}"] span`)
-  ).toHaveText(firstLabel)
-  await expect(
-    items.nth(1).locator(`[data-test-locator="${selectorList.submenuItemSubMenuItemText}"] span`)
-  ).toHaveText(secondLabel)
+  await expect(items).toHaveCount(expectedLabelsNewestFirst.length)
+  for (let i = 0; i < expectedLabelsNewestFirst.length; i++) {
+    await expect(
+      items.nth(i).locator(`[data-test-locator="${selectorList.submenuItemSubMenuItemText}"] span`)
+    ).toHaveText(expectedLabelsNewestFirst[i]!)
+  }
+}
+
+async function createProjectViaMenu (
+  appWin: Page,
+  electron: ElectronApplication,
+  projectName: string,
+  fixtureBaseName: string
+): Promise<void> {
+  await e2eSetNextProjectCreatePath(electron, fixtureBaseName)
+  await appWin.getByRole('button', {
+    exact: true,
+    name: projectMenu.title
+  }).click()
+  await appWin.waitForTimeout(MENU_ANIMATION_MS)
+  await appWin.getByRole('menuitem', { name: projectMenu.items.newProject }).click()
+  await expect(appWin.locator('#dialogNewProject-title')).toContainText(L_newProject.title)
+  await appWin.locator(`[data-test-locator="${selectorList.nameInput}"]`).fill(projectName)
+  await appWin.locator(`[data-test-locator="${selectorList.createBtn}"]`).click()
+  await e2eExpectFaActiveProjectStoreName(appWin, projectName)
+  await expect(appWin.getByText(interpolateFaProjectSessionNotify(
+    L_faProjectSession.notifyProjectCreated,
+    projectName
+  ))).toBeVisible()
 }
 
 function interpolateFaProjectSessionNotify (
@@ -115,6 +183,7 @@ test.describe.serial('Project management flow', () => {
       afterIsolationResetBeforeLaunch (): void {
         tryUnlinkE2eFaprojectFixture('e2e-splash-project.faproject')
         tryUnlinkE2eFaprojectFixture('e2e-menu-project.faproject')
+        unlinkAllE2eRecentCapFixtures()
       },
       buildLaunchEnv (): Record<string, string> {
         return {
@@ -135,6 +204,7 @@ test.describe.serial('Project management flow', () => {
       async afterClose (): Promise<void> {
         tryUnlinkE2eFaprojectFixture('e2e-splash-project.faproject')
         tryUnlinkE2eFaprojectFixture('e2e-menu-project.faproject')
+        unlinkAllE2eRecentCapFixtures()
       },
       electronApp,
       suiteTestInfo
@@ -335,5 +405,66 @@ test.describe.serial('Project management flow', () => {
       L_faProjectSession.notifyProjectLoaded,
       E2E_PROJECT_MENU_REALM
     ))).toBeVisible()
+  })
+
+  /**
+   * Eleven New project creates hit the MRU cap (10): submenu shows E2E Recent Cap 11 … 02 only.
+   * While 11 is active its SQLite file stays open, so we switch to Cap 10, delete 11's file on disk, then open 11 from MRU.
+   * That surfaces 'Project file does not exist', prunes the stale MRU row, and leaves nine entries (10 … 02).
+   */
+  test('Recent project MRU caps at 10 and drops stale paths after a missing file open', async () => {
+    for (let i = 1; i <= E2E_RECENT_CAP_TOTAL; i++) {
+      await createProjectViaMenu(
+        appWindow,
+        electronApp,
+        recentCapDisplayName(i),
+        recentCapFixtureBaseName(i)
+      )
+      assertE2eCreatedFaprojectFileExistsWithContent(recentCapFixtureBaseName(i))
+      await dismissOpenMenus(appWindow)
+    }
+
+    await openProjectMenu(appWindow)
+    await openLoadRecentSubmenu(appWindow)
+    await expectLoadRecentSubmenuLabelsOrdered(
+      appWindow,
+      expectedRecentCapLabelsAfterElevenCreates()
+    )
+    await appWindow.getByRole('menuitem', {
+      name: recentCapDisplayName(E2E_RECENT_CAP_TOTAL - 1)
+    }).click()
+    await dismissOpenMenus(appWindow)
+    await e2eExpectFaActiveProjectStoreName(
+      appWindow,
+      recentCapDisplayName(E2E_RECENT_CAP_TOTAL - 1)
+    )
+
+    tryUnlinkE2eFaprojectFixture(recentCapFixtureBaseName(E2E_RECENT_CAP_TOTAL))
+    expect(fs.existsSync(getE2eFaprojectFixtureAbsolutePath(
+      recentCapFixtureBaseName(E2E_RECENT_CAP_TOTAL)
+    ))).toBe(false)
+
+    await openProjectMenu(appWindow)
+    await openLoadRecentSubmenu(appWindow)
+    await appWindow.getByRole('menuitem', {
+      name: recentCapDisplayName(E2E_RECENT_CAP_TOTAL)
+    }).click()
+    await dismissOpenMenus(appWindow)
+
+    await expect(
+      appWindow.getByText('Project file does not exist').first()
+    ).toBeVisible()
+    await e2eExpectFaActiveProjectStoreName(
+      appWindow,
+      recentCapDisplayName(E2E_RECENT_CAP_TOTAL - 1)
+    )
+
+    await openProjectMenu(appWindow)
+    await openLoadRecentSubmenu(appWindow)
+    await expectLoadRecentSubmenuLabelsOrdered(
+      appWindow,
+      expectedRecentCapLabelsAfterMissingFilePruned()
+    )
+    await dismissOpenMenus(appWindow)
   })
 })
