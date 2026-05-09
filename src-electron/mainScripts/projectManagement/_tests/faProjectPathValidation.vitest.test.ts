@@ -45,3 +45,7 @@ test('faDisplayNameFallbackFromProjectPath falls back to Project when stem empty
 test('faDisplayNameFallbackFromProjectPath falls back to Project when stem is only dots', () => {
   expect(faDisplayNameFallbackFromProjectPath('D:\\w\\..faproject')).toBe('Project')
 })
+
+test('faDisplayNameFallbackFromProjectPath uses unix-style basename on forward-slash posix paths', () => {
+  expect(faDisplayNameFallbackFromProjectPath('/home/me/My Book.faproject')).toBe('My Book')
+})

@@ -3,6 +3,20 @@ import path from 'node:path'
 import { FA_PROJECT_FILE_EXTENSION } from 'app/src-electron/shared/faProjectConstants'
 
 /**
+ * Basename for project display when filePath strings may retain Windows separators while Node's
+ * default path API is posix (Linux CI hosts).
+ */
+function faProjectPathBasenameForStem (filePath: string): string {
+  const looksLikeWindowsParsing =
+    filePath.includes('\\') ||
+    /^[A-Za-z]:[\\/]/.test(filePath)
+  if (looksLikeWindowsParsing) {
+    return path.win32.basename(filePath)
+  }
+  return path.basename(filePath)
+}
+
+/**
  * True when path is non-empty, looks like an absolute path on the current OS or like a Windows
  * absolute path (drive letter or UNC), and ends with .faproject (case-insensitive).
  */
@@ -37,7 +51,7 @@ export function ensureFaProjectExtension (filePath: string): string {
  * Stem of '.faproject' basename for migration bootstrap when user_version is zero; falls back to 'Project'.
  */
 export function faDisplayNameFallbackFromProjectPath (filePath: string): string {
-  const base = path.basename(filePath)
+  const base = faProjectPathBasenameForStem(filePath)
   const suffix = `.${FA_PROJECT_FILE_EXTENSION}`
   const lowerBase = base.toLowerCase()
   const stem = lowerBase.endsWith(suffix)
