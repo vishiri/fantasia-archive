@@ -17,6 +17,7 @@
 - **Top bar**: **Quick-add new document**, **Quick-search existing document**, and **Mass delete documents** moved from **Tools & Settings** to the **Documents** menu (same actions and labels; **Tools & Settings** now starts with tree and note-board toggles, then import/export and settings).
 
 ### Bugfixes & Optimizations
+- **Quasar palette** (**`app.palette.scss`**): **negative**, **positive**, and **warning** brand slots use deeper, less glaring hex values so framework-tinted surfaces (including **Notify** types and related **Material**-mapped chrome) align better with the Fantasia identity.
 - **Load recent project**: the **Project** menu row matches **Advanced project tools** (grey side-arrow styling) and stays disabled when there is no recent list, instead of opening an empty submenu; each recent entry in the submenu lists the project name only with no icon.
 - **Load existing project**: each **`.faproject`** now stores a persistent **project** UUID in SQLite; trying to load the same project again while it is already active shows a single clear message instead of reopening the file, and the **Notify** uses a **warning** style (not red) while the console and Action Monitor still record a failed action.
 - **Notify** — **warning**-type toasts paint dismiss and other action-row **QBtn** chrome in the same dark tone as the message text so icons stay readable on the light **warning** background (call sites often still pass Quasar color **white**, meant for red error bars).

@@ -15,10 +15,10 @@ $primary: #d7ac47;
 $primary-bright: #ffd673;
 $secondary: #f75746;
 
-$negative: #c10015;
-$positive: #35a14e;
+$negative: #bf033b;
+$positive: #128262;
 $info: color.adjust($primary, $lightness: 35%);
-$warning: #f2c037;
+$warning: #ffb939;
 
 $light-background: #ede4d0;
 $gold-muted-border-raw: color.scale($primary, $saturation: -35%, $lightness: 14%);
