@@ -3,7 +3,10 @@ import fs from 'node:fs'
 import type { ElectronApplication, Page } from 'playwright'
 import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
-import { e2eExpectFaActiveProjectStoreName } from 'app/helpers/playwrightHelpers_e2e/e2eExpectFaActiveProjectStore'
+import {
+  e2eExpectFaActiveProjectStoreEmpty,
+  e2eExpectFaActiveProjectStoreName
+} from 'app/helpers/playwrightHelpers_e2e/e2eExpectFaActiveProjectStore'
 import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
 import {
   e2eSetNextProjectCreatePath,
@@ -30,10 +33,58 @@ const extraEnvSettings = {
 const selectorList = {
   closeBtn: 'dialogNewProject-button-close',
   createBtn: 'dialogNewProject-button-create',
+  globalLanguageSelectorOptionDe: 'globalLanguageSelector-option-de',
+  globalLanguageSelectorOptionEnUs: 'globalLanguageSelector-option-en-US',
+  globalLanguageSelectorSpellcheckRefresh: 'globalLanguageSelector-spellcheckRefresh',
+  globalLanguageSelectorTrigger: 'globalLanguageSelector-trigger',
   nameInput: 'dialogNewProject-input-name',
+  submenuItemSubMenu: 'AppControlSingleMenu-menuItem-subMenu',
+  submenuItemSubMenuItem: 'AppControlSingleMenu-menuItem-subMenu-item',
+  submenuItemSubMenuItemText: 'AppControlSingleMenu-menuItem-subMenu-item-text',
   splashLoad: 'splashPage-btn-load',
   splashNew: 'splashPage-btn-new'
 } as const
+
+/** Quasar menu open / nested submenu animation slack (see AppControlSingleMenu Playwright specs). */
+const MENU_ANIMATION_MS = 600
+
+const E2E_PROJECT_MENU_REALM = 'E2E Menu Realm'
+const E2E_PROJECT_SPLASH_REALM = 'E2E Splash Realm'
+
+async function dismissOpenMenus (page: Page): Promise<void> {
+  await page.keyboard.press('Escape')
+  await page.waitForTimeout(150)
+}
+
+async function openProjectMenu (page: Page): Promise<void> {
+  await dismissOpenMenus(page)
+  await page.getByRole('button', {
+    exact: true,
+    name: projectMenu.title
+  }).click()
+  await page.waitForTimeout(MENU_ANIMATION_MS)
+}
+
+async function openLoadRecentSubmenu (page: Page): Promise<void> {
+  await page.getByRole('menuitem', { name: projectMenu.items.loadRecentProject }).click()
+  await page.waitForTimeout(MENU_ANIMATION_MS)
+}
+
+async function expectLoadRecentSubmenuLabels (
+  page: Page,
+  firstLabel: string,
+  secondLabel: string
+): Promise<void> {
+  const panel = page.locator(`[data-test-locator="${selectorList.submenuItemSubMenu}"]`).last()
+  const items = panel.locator(`[data-test-locator="${selectorList.submenuItemSubMenuItem}"]`)
+  await expect(items).toHaveCount(2)
+  await expect(
+    items.nth(0).locator(`[data-test-locator="${selectorList.submenuItemSubMenuItemText}"] span`)
+  ).toHaveText(firstLabel)
+  await expect(
+    items.nth(1).locator(`[data-test-locator="${selectorList.submenuItemSubMenuItemText}"] span`)
+  ).toHaveText(secondLabel)
+}
 
 function interpolateFaProjectSessionNotify (
   template: string,
@@ -194,5 +245,95 @@ test.describe.serial('Project management flow', () => {
 
     await e2eExpectFaActiveProjectStoreName(appWindow, 'E2E Menu Realm')
     await expect(appWindow.getByText(L_faProjectSession.openRejectedAlreadyActive)).toBeVisible()
+  })
+
+  /**
+   * **Load recent project**: MRU order matches the session, opens reorder the list, the active file cannot be opened again from the list,
+   * spellcheck refresh after a language round-trip clears the main-process session, and the top MRU entry loads again cleanly.
+   */
+  test('Load recent project submenu orders MRU, switches active session, warns on duplicate open, clears after reload, and reopens', async () => {
+    await openProjectMenu(appWindow)
+    const loadRecentRow = appWindow.getByRole('menuitem', { name: projectMenu.items.loadRecentProject })
+    await expect(loadRecentRow).toBeEnabled()
+    await openLoadRecentSubmenu(appWindow)
+    await expectLoadRecentSubmenuLabels(
+      appWindow,
+      E2E_PROJECT_MENU_REALM,
+      E2E_PROJECT_SPLASH_REALM
+    )
+
+    await appWindow.getByRole('menuitem', { name: E2E_PROJECT_SPLASH_REALM }).click()
+    await dismissOpenMenus(appWindow)
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_SPLASH_REALM)
+    await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
+      L_faProjectSession.notifyProjectLoaded,
+      E2E_PROJECT_SPLASH_REALM
+    ))).toBeVisible()
+
+    await openProjectMenu(appWindow)
+    await openLoadRecentSubmenu(appWindow)
+    await expectLoadRecentSubmenuLabels(
+      appWindow,
+      E2E_PROJECT_SPLASH_REALM,
+      E2E_PROJECT_MENU_REALM
+    )
+
+    await appWindow.getByRole('menuitem', { name: E2E_PROJECT_MENU_REALM }).click()
+    await dismissOpenMenus(appWindow)
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_MENU_REALM)
+
+    await openProjectMenu(appWindow)
+    await openLoadRecentSubmenu(appWindow)
+    await expectLoadRecentSubmenuLabels(
+      appWindow,
+      E2E_PROJECT_MENU_REALM,
+      E2E_PROJECT_SPLASH_REALM
+    )
+    await appWindow.getByRole('menuitem', { name: E2E_PROJECT_MENU_REALM }).click()
+    await dismissOpenMenus(appWindow)
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_MENU_REALM)
+    await expect(
+      appWindow.getByText(L_faProjectSession.openRejectedAlreadyActive).first()
+    ).toBeVisible()
+
+    await appWindow.locator(`[data-test-locator="${selectorList.globalLanguageSelectorTrigger}"]`).click()
+    await appWindow.locator(`[data-test-locator="${selectorList.globalLanguageSelectorOptionDe}"]`).click()
+    await expect(appWindow.locator('[data-test-locator="globalLanguageSelector-root"]')).toHaveAttribute(
+      'data-test-active-language-code',
+      'de',
+      { timeout: 15_000 }
+    )
+
+    await appWindow.locator(`[data-test-locator="${selectorList.globalLanguageSelectorTrigger}"]`).click()
+    await appWindow.locator(`[data-test-locator="${selectorList.globalLanguageSelectorOptionEnUs}"]`).click()
+    await expect(appWindow.locator('[data-test-locator="globalLanguageSelector-root"]')).toHaveAttribute(
+      'data-test-active-language-code',
+      'en-US',
+      { timeout: 15_000 }
+    )
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.globalLanguageSelectorSpellcheckRefresh}"]`)
+    ).toBeVisible({ timeout: 10_000 })
+    await appWindow.locator(`[data-test-locator="${selectorList.globalLanguageSelectorSpellcheckRefresh}"]`).click()
+    await appWindow.waitForTimeout(FA_FRONTEND_RENDER_TIMER)
+
+    await e2eExpectFaActiveProjectStoreEmpty(appWindow)
+    await expect(appWindow.locator('[data-test-locator="mainLayout-activeProjectName"]')).toHaveCount(0)
+
+    await openProjectMenu(appWindow)
+    await openLoadRecentSubmenu(appWindow)
+    await expectLoadRecentSubmenuLabels(
+      appWindow,
+      E2E_PROJECT_MENU_REALM,
+      E2E_PROJECT_SPLASH_REALM
+    )
+    await appWindow.getByRole('menuitem', { name: E2E_PROJECT_MENU_REALM }).click()
+    await dismissOpenMenus(appWindow)
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_MENU_REALM)
+    await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
+      L_faProjectSession.notifyProjectLoaded,
+      E2E_PROJECT_MENU_REALM
+    ))).toBeVisible()
   })
 })
