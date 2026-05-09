@@ -303,6 +303,18 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
     }
   }
 
+  &.bg-warning {
+
+    /* Match body copy (text-dark); close actions often pass Quasar color 'white' for contrast on red bars. */
+    .q-notification__actions .q-btn {
+      color: $qNotify-warningActions-color !important;
+    }
+
+    .q-notification__actions .q-btn .q-icon {
+      color: inherit !important;
+    }
+  }
+
   &__message {
     font-size: $qNotification-message-fontSize;
     font-weight: $qNotification-message-fontWeight;

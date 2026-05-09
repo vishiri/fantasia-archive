@@ -7,3 +7,5 @@
 $qNotify-bgColor: fa-v('dark', $dark);
 $qNotify-color: fa-v('dark', $dark);
 $qNotify-icon-color: fa-v('dark', $dark);
+/* Light warning tint + text-dark body; dismiss actions often still use color 'white' from callers. */
+$qNotify-warningActions-color: fa-v('dark', $dark);
