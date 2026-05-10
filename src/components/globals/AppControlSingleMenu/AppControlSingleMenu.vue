@@ -27,6 +27,7 @@
       role="menu"
       transition-show="jump-down"
       transition-hide="jump-up"
+      @hide="onRootMenuHide"
     >
       <q-list
         class="appControlSingleMenu__list"
@@ -59,6 +60,8 @@
             data-test-locator="AppControlSingleMenu-menuItem"
             :class="['appControlSingleMenu__item', `text-${menuItem.specialColor}`, 'non-selectable']"
             :disable="(!menuItem.conditions)"
+            @mouseenter="onMenuRowMouseEnter(menuItem, index)"
+            @mouseleave="onMenuRowMouseLeave(menuItem)"
             @click="(menuItem.trigger)
               ? menuItem.triggerArguments
                 ? menuItem.trigger(...menuItem.triggerArguments)
@@ -67,6 +70,12 @@
           >
             <q-item-section data-test-locator="AppControlSingleMenu-menuItem-text">
               <span>{{ menuItem.text }}</span><div
+                v-if="trimmedSecondaryHintText(menuItem.secondaryHintText)"
+                class="appControlSingleMenu__keybindText appControlSingleMenu__secondaryHint fa-text-keybind-hint"
+                data-test-locator="AppControlSingleMenu-menuItem-secondaryHint"
+              >
+                {{ trimmedSecondaryHintText(menuItem.secondaryHintText) }}
+              </div><div
                 v-if="keybindHintLabel(menuItem.keybindCommandId)"
                 class="appControlSingleMenu__keybindText fa-text-keybind-hint"
                 data-test-locator="AppControlSingleMenu-menuItem-keybind"
@@ -85,6 +94,7 @@
             <!-- Sub-menu -->
             <q-menu
               v-if="menuItem.submenu !== undefined"
+              :model-value="openSubmenuRowIndex === index"
               anchor="top end"
               self="top start"
               square
@@ -94,6 +104,9 @@
               transition-hide="jump-left"
               class="-subMenu"
               data-test-locator="AppControlSingleMenu-menuItem-subMenu"
+              @mouseenter="onSubmenuContentEnter"
+              @mouseleave="onSubmenuContentLeave"
+              @update:model-value="(v) => onSubmenuModelUpdate(index, v)"
             >
               <q-list
                 class="appControlSingleMenu__list"
@@ -132,6 +145,12 @@
                       data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-text"
                     >
                       <span>{{ submenuItem.text }}</span><div
+                        v-if="trimmedSecondaryHintText(submenuItem.secondaryHintText)"
+                        class="appControlSingleMenu__keybindText appControlSingleMenu__secondaryHint fa-text-keybind-hint"
+                        data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-secondaryHint"
+                      >
+                        {{ trimmedSecondaryHintText(submenuItem.secondaryHintText) }}
+                      </div><div
                         v-if="keybindHintLabel(submenuItem.keybindCommandId)"
                         class="appControlSingleMenu__keybindText fa-text-keybind-hint"
                         data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-keybind"
@@ -166,12 +185,43 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+import { createAppControlSingleMenuSubmenuHover } from 'app/src/components/globals/AppControlSingleMenu/scripts/appControlSingleMenuSubmenuHover'
 import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import type { I_appMenuItem, I_appMenuList, I_appMenuSubItem } from 'app/types/I_appMenusDataList'
 import type { T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
 
 const faKeybindsStore = S_FaKeybinds()
+
+const {
+  onRootMenuHide,
+  onSubmenuActivatorEnter,
+  onSubmenuActivatorLeave,
+  onSubmenuContentEnter,
+  onSubmenuContentLeave,
+  onSubmenuModelUpdate,
+  openSubmenuRowIndex
+} = createAppControlSingleMenuSubmenuHover()
+
+/**
+ * Hover opens nested QMenus; no-op rows without a submenu.
+ */
+function onMenuRowMouseEnter (menuItem: I_appMenuItem, itemIndex: number): void {
+  if (menuItem.submenu === undefined) {
+    return
+  }
+  onSubmenuActivatorEnter(itemIndex)
+}
+
+/**
+ * Leaving a submenu row starts the delayed hide unless the pointer entered the submenu panel.
+ */
+function onMenuRowMouseLeave (menuItem: I_appMenuItem): void {
+  if (menuItem.submenu === undefined) {
+    return
+  }
+  onSubmenuActivatorLeave()
+}
 
 /**
  * Thin divider before a row: skip when the previous entry is already a full separator (avoids double lines).
@@ -194,6 +244,17 @@ function keybindHintLabel (commandId: T_faKeybindCommandId | undefined): string 
     commandId,
     snapshot: faKeybindsStore.snapshot
   })
+}
+
+/**
+ * Optional subtitle line (for example a path); trimmed empty strings hide the row.
+ */
+function trimmedSecondaryHintText (hint: string | undefined): string | null {
+  const trimmed = hint?.trim()
+  if (trimmed === undefined || trimmed.length === 0) {
+    return null
+  }
+  return trimmed
 }
 
 /**
@@ -233,51 +294,4 @@ const menuData = computed(() => componentData.value.data)
 
 </script>
 
-<style lang="scss" scoped>
-.appControlSingleMenu {
-  &:hover,
-  &:focus {
-    color: $appControlMenus-singleHover;
-  }
-
-  &__icon {
-    font-size: $iconSize;
-  }
-
-  &__list {
-    background-color: $appControlMenus-bgColor;
-    color: $appControlMenus-color;
-  }
-
-  &__item {
-    min-height: $appControlSingleMenu-item-minHeight;
-
-    &:hover:not([aria-disabled="true"]),
-    &:focus:not([aria-disabled="true"]) {
-      color: $appControlMenus-singleHover;
-    }
-
-    /* Text legibility fix: red and green blend too much into each other without a little shadow */
-    &.text-secondary {
-      text-shadow: $appControlSingleMenu-item-secondary-textShadow;
-    }
-  }
-
-  &__separator {
-    background-color: $appControlMenus-separatorColor;
-    height: $appControlSingleMenu-separator-height !important;
-  }
-
-  &__separatorAlt {
-    background-color: $appControlMenus-separatorAltColor;
-    height: $appControlSingleMenu-separator-height !important;
-    opacity: 0.4;
-  }
-
-  &__keybindText {
-    font-size: $appControlSingleMenu-keybindText-fontSize;
-    font-weight: 600;
-    text-shadow: none;
-  }
-}
-</style>
+<style lang="scss" scoped src="./styles/AppControlSingleMenu.scoped.scss"></style>

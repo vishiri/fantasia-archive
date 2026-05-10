@@ -17,6 +17,7 @@ function buildLoadRecentSubmenu (recent: readonly I_faRecentProjectEntry[]): I_a
   return recent.map((entry) => {
     return faMenuSubItem('appControlMenus.project.items.recentProjectRow', '', {
       icon: undefined,
+      secondaryHintText: entry.filePath,
       text: entry.name,
       trigger: () => runFaAction('loadExistingProject', { filePath: entry.filePath })
     })

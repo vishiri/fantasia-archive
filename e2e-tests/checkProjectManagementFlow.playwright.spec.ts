@@ -105,7 +105,7 @@ async function openProjectMenu (page: Page): Promise<void> {
 }
 
 async function openLoadRecentSubmenu (page: Page): Promise<void> {
-  await page.getByRole('menuitem', { name: projectMenu.items.loadRecentProject }).click()
+  await page.getByRole('menuitem', { name: projectMenu.items.loadRecentProject }).hover({ force: true })
   await page.waitForTimeout(MENU_ANIMATION_MS)
 }
 

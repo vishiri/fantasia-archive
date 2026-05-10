@@ -1,0 +1,53 @@
+.appControlSingleMenu {
+  &:hover,
+  &:focus {
+    color: $appControlMenus-singleHover;
+  }
+
+  &__icon {
+    font-size: $iconSize;
+  }
+
+  &__list {
+    background-color: $appControlMenus-bgColor;
+    color: $appControlMenus-color;
+  }
+
+  &__item {
+    min-height: $appControlSingleMenu-item-minHeight;
+
+    &:hover:not([aria-disabled="true"]),
+    &:focus:not([aria-disabled="true"]) {
+      color: $appControlMenus-singleHover;
+    }
+
+    /* Text legibility fix: red and green blend too much into each other without a little shadow */
+    &.text-secondary {
+      text-shadow: $appControlSingleMenu-item-secondary-textShadow;
+    }
+  }
+
+  &__separator {
+    background-color: $appControlMenus-separatorColor;
+    height: $appControlSingleMenu-separator-height !important;
+  }
+
+  &__separatorAlt {
+    background-color: $appControlMenus-separatorAltColor;
+    height: $appControlSingleMenu-separator-height !important;
+    opacity: 0.4;
+  }
+
+  &__keybindText {
+    font-size: $appControlSingleMenu-keybindText-fontSize;
+    font-weight: 600;
+    text-shadow: none;
+  }
+
+  &__secondaryHint {
+    max-width: $appControlSingleMenu-secondaryHint-maxWidth;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

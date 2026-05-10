@@ -269,9 +269,9 @@ test.describe.serial('App control single menu', () => {
   })
 
   /**
-   * Check if the sub-menu opens properly on click of the main menu item and all parts are loaded properly
+   * Check if the sub-menu opens on hover of the row with a nested menu and all parts load.
    */
-  test('Check if the sub-menu opens properly on click of the main menu item and all parts are loaded properly', async () => {
+  test('Check if the sub-menu opens on hover of the main menu item and all parts are loaded properly', async () => {
     await dismissOpenMenus()
 
     const menuWrapper = appWindow.locator(`[data-test-locator="${selectorList.menuWrapper}"]`)
@@ -288,7 +288,7 @@ test.describe.serial('App control single menu', () => {
     const submenuTrigger = menuItems.nth(dataIndex)
 
     await expect(submenuTrigger).toHaveCount(1)
-    await submenuTrigger.click()
+    await submenuTrigger.hover({ force: true })
 
     await appWindow.waitForTimeout(menuAnimationTimer)
 
@@ -322,7 +322,7 @@ test.describe.serial('App control single menu', () => {
     const submenuTrigger = menuItems.nth(dataIndex)
 
     await expect(submenuTrigger).toHaveCount(1)
-    await submenuTrigger.click()
+    await submenuTrigger.hover({ force: true })
 
     await appWindow.waitForTimeout(menuAnimationTimer)
 
@@ -372,7 +372,7 @@ test.describe.serial('App control single menu', () => {
     const submenuTrigger = menuItems.nth(dataIndex)
 
     await expect(submenuTrigger).toHaveCount(1)
-    await submenuTrigger.click()
+    await submenuTrigger.hover({ force: true })
 
     await appWindow.waitForTimeout(menuAnimationTimer)
 

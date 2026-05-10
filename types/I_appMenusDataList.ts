@@ -60,6 +60,11 @@ export interface I_appMenuSubItem {
    * When set, menu chrome may show the current global shortcut for this command (from `S_FaKeybinds`).
    */
   keybindCommandId?: T_faKeybindCommandId
+
+  /**
+   * Optional second line under the title using the same typography as shortcut hints (for example a file path).
+   */
+  secondaryHintText?: string
 }
 
 export interface I_appMenuItem {
@@ -107,6 +112,11 @@ export interface I_appMenuItem {
    * When set, menu chrome may show the current global shortcut for this command (from `S_FaKeybinds`).
    */
   keybindCommandId?: T_faKeybindCommandId
+
+  /**
+   * Optional second line under the title using the same typography as shortcut hints (for example a file path).
+   */
+  secondaryHintText?: string
 }
 
 export interface I_appMenuList {

@@ -48,6 +48,29 @@ test('Test that AppControlSingleMenu renders menu title and first item text from
 
 /**
  * AppControlSingleMenu
+ * Rows without nested menus ignore pointer enter or leave for submenu hover logic (early return paths).
+ */
+test('Test that menu row hover handlers no-op when the row has no submenu', async () => {
+  const w = mount(AppControlSingleMenu, {
+    attachTo: document.body,
+    props: { dataInput: minimalMenu },
+    global: { mocks: { $t: (k: string) => k } }
+  })
+
+  await w.get('[data-test-locator="AppControlSingleMenu-wrapper"]').trigger('click')
+  await flushPromises()
+
+  const row = document.body.querySelector('[data-test-locator="AppControlSingleMenu-menuItem"]')
+  expect(row).not.toBeNull()
+  ;(row as HTMLElement).dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }))
+  ;(row as HTMLElement).dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }))
+  await flushPromises()
+
+  w.unmount()
+})
+
+/**
+ * AppControlSingleMenu
  * Rows without `keybindCommandId` must not render shortcut hint nodes.
  */
 test('Test that AppControlSingleMenu omits keybind hint markup when keybindCommandId is absent', async () => {
@@ -207,6 +230,57 @@ test('Test that AppControlSingleMenu shows submenu keybind hint when configured'
     snapshot: keybinds.snapshot
   })
   expect(subHint?.textContent?.trim()).toBe(`(${expectedSubLabel})`)
+  w.unmount()
+})
+
+/**
+ * AppControlSingleMenu
+ * Submenu rows render `secondaryHintText` with the shortcut-hint typography when provided.
+ */
+test('Test that AppControlSingleMenu shows submenu secondary hint text when configured', async () => {
+  const w = mount(AppControlSingleMenu, {
+    attachTo: document.body,
+    props: {
+      dataInput: {
+        title: 'T',
+        data: [
+          {
+            conditions: true,
+            icon: 'keyboard_arrow_right',
+            mode: 'item',
+            submenu: [
+              {
+                conditions: true,
+                mode: 'item',
+                secondaryHintText: 'D:\\projects\\mine.faproject',
+                text: 'Mine project',
+                trigger: vi.fn()
+              }
+            ],
+            text: 'Parent',
+            trigger: undefined
+          }
+        ]
+      }
+    },
+    global: { mocks: { $t: (k: string) => k } }
+  })
+
+  await w.get('[data-test-locator="AppControlSingleMenu-wrapper"]').trigger('click')
+  await flushPromises()
+
+  const parentRow = document.body.querySelector('[data-test-locator="AppControlSingleMenu-menuItem"]')
+  expect(parentRow).not.toBeNull()
+  ;(parentRow as HTMLElement).dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }))
+  await flushPromises()
+
+  const secondary = document.body.querySelector(
+    '[data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-secondaryHint"]'
+  )
+  expect(secondary).not.toBeNull()
+  expect(secondary?.textContent?.trim()).toBe('D:\\projects\\mine.faproject')
+  expect(document.body.querySelectorAll('[data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-keybind"]').length)
+    .toBe(0)
   w.unmount()
 })
 

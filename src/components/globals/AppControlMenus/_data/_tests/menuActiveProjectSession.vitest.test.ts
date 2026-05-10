@@ -117,6 +117,7 @@ test('Test that buildProjectMenu recent row dispatches loadExistingProject with 
   expect(recentParent?.specialColor).toBe('grey')
   expect(recentParent?.submenu?.length).toBe(1)
   const subRow = recentParent?.submenu?.find((r) => r.mode === 'item')
+  expect(subRow?.secondaryHintText).toBe('C:\\x\\a.faproject')
   expect(subRow?.icon).toBeUndefined()
   subRow?.trigger?.()
   expect(runFaActionMock).toHaveBeenCalledWith(
