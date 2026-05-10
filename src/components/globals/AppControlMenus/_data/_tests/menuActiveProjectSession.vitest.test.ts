@@ -45,9 +45,9 @@ test('Test that buildProjectMenu new project row opens the settings dialog actio
 
 /**
  * Project menu
- * Load existing project dispatches the load action from the load row trigger.
+ * Load project dispatches the load action from the load row trigger.
  */
-test('Test that buildProjectMenu load existing project row dispatches loadExistingProject', () => {
+test('Test that buildProjectMenu load project row dispatches loadExistingProject', () => {
   const menu = buildProjectMenu(emptyRecentSession(false))
   const items = menu.data.filter((row) => row.mode === 'item')
   items[2]!.trigger?.()

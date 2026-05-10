@@ -91,9 +91,9 @@ test('Test that AppControlSingleMenu omits keybind hint markup when keybindComma
 
 /**
  * AppControlSingleMenu
- * After a full-width separator row, the next item must not get a second thin separator (avoids double lines).
+ * The first item omits separatorAlt above it; after a full-width separator row, the next item must not get a second thin line.
  */
-test('Test that AppControlSingleMenu does not render separatorAlt immediately after a separator row', async () => {
+test('Test that AppControlSingleMenu omits separatorAlt above the first item and after a separator row', async () => {
   const w = mount(AppControlSingleMenu, {
     attachTo: document.body,
     props: {
@@ -124,8 +124,45 @@ test('Test that AppControlSingleMenu does not render separatorAlt immediately af
 
   const alt = document.body.querySelectorAll('.appControlSingleMenu__separatorAlt')
   const standard = document.body.querySelectorAll('.appControlSingleMenu__separator')
-  expect(alt.length).toBe(1)
+  expect(alt.length).toBe(0)
   expect(standard.length).toBe(1)
+  w.unmount()
+})
+
+/**
+ * AppControlSingleMenu
+ * Consecutive items get a thin separator before the second and later rows only.
+ */
+test('Test that AppControlSingleMenu renders separatorAlt between two item rows without a full separator', async () => {
+  const w = mount(AppControlSingleMenu, {
+    attachTo: document.body,
+    props: {
+      dataInput: {
+        title: 'Menu',
+        data: [
+          {
+            mode: 'item',
+            text: 'First',
+            icon: 'mdi-numeric-1',
+            conditions: true
+          },
+          {
+            mode: 'item',
+            text: 'Second',
+            icon: 'mdi-numeric-2',
+            conditions: true
+          }
+        ]
+      }
+    },
+    global: { mocks: { $t: (k: string) => k } }
+  })
+
+  await w.get('[data-test-locator="AppControlSingleMenu-wrapper"]').trigger('click')
+  await flushPromises()
+
+  expect(document.body.querySelectorAll('.appControlSingleMenu__separatorAlt').length).toBe(1)
+  expect(document.body.querySelectorAll('.appControlSingleMenu__separator').length).toBe(0)
   w.unmount()
 })
 

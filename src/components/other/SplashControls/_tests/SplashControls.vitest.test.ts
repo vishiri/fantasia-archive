@@ -26,9 +26,9 @@ test('Test that splash New project triggers openNewProjectDialog', async () => {
 
 /**
  * SplashControls
- * Load existing project wires to loadExistingProject.
+ * Load project wires to loadExistingProject.
  */
-test('Test that splash Load existing project triggers loadExistingProject', async () => {
+test('Test that splash Load project triggers loadExistingProject', async () => {
   const spy = vi.spyOn(faActionRun, 'runFaAction').mockImplementation(() => undefined)
   const w = mount(SplashControls, {
     global: {

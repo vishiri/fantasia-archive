@@ -8,6 +8,10 @@
     font-size: $iconSize;
   }
 
+  &__primaryLabel {
+    white-space: nowrap;
+  }
+
   &__list {
     background-color: $appControlMenus-bgColor;
     color: $appControlMenus-color;

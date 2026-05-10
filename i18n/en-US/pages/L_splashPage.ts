@@ -1,5 +1,5 @@
 export default {
-  loadExistingProject: 'Load existing project',
+  loadExistingProject: 'Load project',
   newProject: 'New project',
   resumeProject: 'Resume project',
   title: 'Fantasia Archive',

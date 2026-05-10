@@ -271,9 +271,9 @@ test.describe.serial('Project management flow', () => {
   })
 
   /**
-   * Stages the splash-created fixture path, uses the splash **Load existing project** button, and expects the splash realm plus loaded toast.
+   * Stages the splash-created fixture path, uses the splash **Load project** button, and expects the splash realm plus loaded toast.
    */
-  test('loads an existing .faproject from the splash Load existing project control', async () => {
+  test('loads an existing .faproject from the splash Load project control', async () => {
     await e2eSetNextProjectOpenPath(electronApp, 'e2e-splash-project.faproject')
     await appWindow.locator(`[data-test-locator="${selectorList.splashLoad}"]`).click()
     await e2eExpectFaActiveProjectStoreName(appWindow, 'E2E Splash Realm')
@@ -304,7 +304,7 @@ test.describe.serial('Project management flow', () => {
   /**
    * Loading the file that is already the active session should surface one clear error toast, not reload the project.
    */
-  test('Load existing project rejects opening the currently active file again', async () => {
+  test('Load project rejects opening the currently active file again', async () => {
     await e2eSetNextProjectOpenPath(electronApp, 'e2e-menu-project.faproject')
     const projectTitle = projectMenu.title
     await appWindow.getByRole('button', {

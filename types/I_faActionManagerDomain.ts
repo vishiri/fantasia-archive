@@ -51,7 +51,7 @@ export type T_faActionId = typeof FA_ACTION_IDS[number]
 export type T_faActionKind = 'sync' | 'async'
 
 /**
- * Load existing project: omit filePath for the native picker; pass filePath to open a known path (recent list).
+ * Load project: omit filePath for the native picker; pass filePath to open a known path (recent list).
  */
 export interface I_faLoadExistingProjectPayload {
   filePath?: string

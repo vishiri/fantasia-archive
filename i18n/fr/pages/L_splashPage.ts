@@ -1,5 +1,5 @@
 export default {
-  loadExistingProject: 'Charger un projet existant',
+  loadExistingProject: 'Charger le projet',
   newProject: 'Nouveau projet',
   resumeProject: 'Reprendre le projet',
   title: 'Fantasia Archive',

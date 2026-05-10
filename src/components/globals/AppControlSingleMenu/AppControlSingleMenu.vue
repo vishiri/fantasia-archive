@@ -69,7 +69,7 @@
               : false"
           >
             <q-item-section data-test-locator="AppControlSingleMenu-menuItem-text">
-              <span>{{ menuItem.text }}</span><div
+              <span class="appControlSingleMenu__primaryLabel">{{ menuItem.text }}</span><div
                 v-if="trimmedSecondaryHintText(menuItem.secondaryHintText)"
                 class="appControlSingleMenu__keybindText appControlSingleMenu__secondaryHint fa-text-keybind-hint"
                 data-test-locator="AppControlSingleMenu-menuItem-secondaryHint"
@@ -144,7 +144,7 @@
                     <q-item-section
                       data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-text"
                     >
-                      <span>{{ submenuItem.text }}</span><div
+                      <span class="appControlSingleMenu__primaryLabel">{{ submenuItem.text }}</span><div
                         v-if="trimmedSecondaryHintText(submenuItem.secondaryHintText)"
                         class="appControlSingleMenu__keybindText appControlSingleMenu__secondaryHint fa-text-keybind-hint"
                         data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-secondaryHint"
@@ -224,14 +224,18 @@ function onMenuRowMouseLeave (menuItem: I_appMenuItem): void {
 }
 
 /**
- * Thin divider before a row: skip when the previous entry is already a full separator (avoids double lines).
+ * Thin divider before a menu row when it follows another item row.
+ * The first visible item omits this line; skip when the previous entry is already a full separator (avoids double lines).
  */
 function shouldShowSeparatorAltBeforeItem (
   items: readonly (I_appMenuItem | I_appMenuSubItem)[] | undefined,
   itemIndex: number
 ): boolean {
-  if (items === undefined || itemIndex === 0) {
-    return true
+  if (items === undefined) {
+    return false
+  }
+  if (itemIndex === 0) {
+    return false
   }
   return items[itemIndex - 1]!.mode !== 'separator'
 }
