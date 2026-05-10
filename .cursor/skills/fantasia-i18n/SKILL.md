@@ -34,7 +34,7 @@ i18n/
 
 Do not place locale files in any other location. If no folder fits, use `globalFunctionality/`.
 
-**Naming**: locale message files use the **`L_` prefix** (for example `L_programSettings.ts`). TypeScript **type aliases** elsewhere in the app use **`T_`** per project conventions — do not use `T_` for locale filenames.
+**Naming**: locale message files use the **`L_` prefix** (for example `L_appSettings.ts`). TypeScript **type aliases** elsewhere in the app use **`T_`** per project conventions — do not use `T_` for locale filenames.
 
 ## Key naming rules
 
@@ -74,7 +74,7 @@ When you change or add keys that appear in **`toHaveText`**, **`toHaveAttribute(
 - For Storybook mocks/loaders, import focused non-markdown `L_*` locale modules directly (for example `app/i18n/en-US/components/globals/GlobalWindowButtons/L_GlobalWindowButtons.ts`) instead of importing `i18n/en-US/index.ts`.
 - Reason: the full locale entrypoint pulls markdown `documents/*.md`, which can break Storybook/Vite import analysis.
 - If Storybook stories need document content (`documents.*`), provide explicit placeholder strings (for example lorem ipsum) in `.storybook-workspace/.storybook/mocks/externalFileLoader.ts` (`defaultMessages.documents`) rather than importing markdown files.
-- **Mandatory mirror when extending the app locale tree**: [`.storybook-workspace/.storybook/mocks/externalFileLoader.ts`](../../../.storybook-workspace/.storybook/mocks/externalFileLoader.ts) builds `defaultMessages` for the Storybook `createI18n` instance. Whenever you register a new `L_*` module in `i18n/en-US/index.ts` under a namespace that any story or component might use (`dialogs.*`, `floatingWindows.*`, `globalFunctionality.*`, top-level sections, etc.), add the matching `import` and nested key to `defaultMessages` in the **same PR/commit** as the feature. Omitting this mirrors production i18n in the app but leaves Storybook showing untranslated key paths (for example `floatingWindows.programStyling.title`). After editing, smoke-check with `yarn storybook:run` on a story that exercises the new copy.
+- **Mandatory mirror when extending the app locale tree**: [`.storybook-workspace/.storybook/mocks/externalFileLoader.ts`](../../../.storybook-workspace/.storybook/mocks/externalFileLoader.ts) builds `defaultMessages` for the Storybook `createI18n` instance. Whenever you register a new `L_*` module in `i18n/en-US/index.ts` under a namespace that any story or component might use (`dialogs.*`, `floatingWindows.*`, `globalFunctionality.*`, top-level sections, etc.), add the matching `import` and nested key to `defaultMessages` in the **same PR/commit** as the feature. Omitting this mirrors production i18n in the app but leaves Storybook showing untranslated key paths (for example `floatingWindows.appStyling.title`). After editing, smoke-check with `yarn storybook:run` on a story that exercises the new copy.
 
 ## Related
 

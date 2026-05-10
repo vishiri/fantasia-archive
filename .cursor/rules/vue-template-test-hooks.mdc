@@ -15,11 +15,11 @@ Use this rule when adding or changing **attributes the UI tests locate**. It pai
 
 ## Primary locator
 
-- **`data-test-locator`** — stable string id per node (often `componentName-role-suffix`, e.g. `dialogProgramSettings-title`, `globalWindowButtons-button-minimize`). Tests store these values in `selectorList` and build locators as `appWindow.locator(\`[data-test-locator="${selectorList.someKey}"]\`)`.
+- **`data-test-locator`** — stable string id per node (often `componentName-role-suffix`, e.g. `dialogAppSettings-title`, `globalWindowButtons-button-minimize`). Tests store these values in `selectorList` and build locators as `appWindow.locator(\`[data-test-locator="${selectorList.someKey}"]\`)`.
 
 ## Other `data-test-*` hooks in this repo
 
-- **`data-test-setting-id`**, **`data-test-tags`**, **`data-test-tooltip-text`** on Program Settings rows and help icons ([DialogProgramSettings.vue](src/components/dialogs/DialogProgramSettings/DialogProgramSettings.vue)).
+- **`data-test-setting-id`**, **`data-test-tags`**, **`data-test-tooltip-text`** on App settings rows and help icons ([DialogAppSettings.vue](src/components/dialogs/DialogAppSettings/DialogAppSettings.vue)).
 - **Menu bar**: **`data-test-menu-test`** and **`data-test-menu-any`** on [AppControlMenus.vue](src/components/globals/AppControlMenus/AppControlMenus.vue) (see [AppControlMenus.playwright.test.ts](src/components/globals/AppControlMenus/_tests/AppControlMenus.playwright.test.ts)); Playwright uses `[data-test-menu-test="..."]` / `[data-test-menu-any="..."]`.
 - **Metadata / flags** asserted via attributes or `dataset`: e.g. **`data-test-image`**, **`data-test-is-random`**, **`data-test-layout-width`**, **`data-test-layout-height`** ([FantasiaMascotImage.vue](src/components/elements/FantasiaMascotImage/FantasiaMascotImage.vue)); the same layout keys on **[SocialContactSingleButton](src/components/elements/SocialContactSingleButton/SocialContactSingleButton.vue)** **q-img** and on the splash **SVG** in **[index.html](index.html)**; **`data-test-error-card-width`**, **`data-test-locator="errorCard-title"`**, and **`data-test-locator="errorCard-details"`** on **[ErrorCard](src/components/elements/ErrorCard/ErrorCard.vue)** (max-width cap in CSS pixels plus title and optional body copy). **`data-test-button-number`** ([SocialContactButtons.vue](src/components/other/SocialContactButtons/SocialContactButtons.vue)), **`data-test-has-proper-data-input`** ([AppControlSingleMenu.vue](src/components/globals/AppControlSingleMenu/AppControlSingleMenu.vue)).
 
