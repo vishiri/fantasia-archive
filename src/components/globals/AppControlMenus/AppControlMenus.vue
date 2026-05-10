@@ -251,6 +251,9 @@ const componentTestingMenuList: I_appMenuList = {
 .appControlMenus {
   &__inner {
     -webkit-app-region: no-drag;
+
+    // Adjust for global window chrome offset in order to make the menu clickable when mouse hover the left top corner of the window
+    margin-left: $appControlMenus-inner-marginLeft;
   }
 }
 </style>
