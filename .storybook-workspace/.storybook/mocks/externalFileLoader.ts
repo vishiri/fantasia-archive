@@ -9,12 +9,14 @@ import L_socialContactButtons from 'app/i18n/en-US/components/other/SocialContac
 import L_aboutFantasiaArchive from 'app/i18n/en-US/dialogs/L_aboutFantasiaArchive'
 import L_DialogActionMonitor from 'app/i18n/en-US/dialogs/L_DialogActionMonitor'
 import L_dialogKeybindSettings from 'app/i18n/en-US/dialogs/L_dialogKeybindSettings'
-import L_importExportProgramConfig from 'app/i18n/en-US/dialogs/L_importExportProgramConfig'
+import L_importExportAppConfig from 'app/i18n/en-US/dialogs/L_importExportAppConfig'
 import L_markdownDocument from 'app/i18n/en-US/dialogs/L_markdownDocument'
 import L_newProject from 'app/i18n/en-US/dialogs/L_newProject'
-import L_programSettings from 'app/i18n/en-US/dialogs/L_programSettings'
-import L_programStylingFloating from 'app/i18n/en-US/floatingWindows/L_programStyling'
+import L_appSettings from 'app/i18n/en-US/dialogs/L_appSettings'
+import L_appStylingFloating from 'app/i18n/en-US/floatingWindows/L_appStyling'
+import L_appNoteboardFloating from 'app/i18n/en-US/floatingWindows/L_appNoteboard'
 import L_faKeybinds from 'app/i18n/en-US/globalFunctionality/L_faKeybinds'
+import L_faAppNoteboard from 'app/i18n/en-US/globalFunctionality/L_faAppNoteboard'
 import L_faProjectSession from 'app/i18n/en-US/globalFunctionality/L_faProjectSession'
 import L_faUserSettings from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
 import L_unsortedAppTexts from 'app/i18n/en-US/globalFunctionality/L_unsortedAppTexts'
@@ -43,13 +45,14 @@ const defaultMessages: Record<string, unknown> = {
     aboutFantasiaArchive: L_aboutFantasiaArchive,
     actionMonitor: L_DialogActionMonitor,
     keybindSettings: L_dialogKeybindSettings,
-    importExportProgramConfig: L_importExportProgramConfig,
+    importExportAppConfig: L_importExportAppConfig,
     markdownDocument: L_markdownDocument,
     newProject: L_newProject,
-    programSettings: L_programSettings
+    appSettings: L_appSettings
   },
   floatingWindows: {
-    programStyling: L_programStylingFloating
+    appNoteboard: L_appNoteboardFloating,
+    appStyling: L_appStylingFloating
   },
   globalLanguageSelector: L_GlobalLanguageSelector,
   globalWindowButtons: L_GlobalWindowButtons,
@@ -63,6 +66,7 @@ const defaultMessages: Record<string, unknown> = {
   fantasiaMascotImage: L_FantasiaMascotImage,
   globalFunctionality: {
     faKeybinds: L_faKeybinds,
+    faAppNoteboard: L_faAppNoteboard,
     faProjectSession: L_faProjectSession,
     faUserSettings: L_faUserSettings,
     unsortedAppTexts: L_unsortedAppTexts

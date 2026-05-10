@@ -3,6 +3,9 @@
 
 import { mount } from '@vue/test-utils'
 import { defineComponent, ref, type Ref } from 'vue'
+
+import type { I_UseFaFloatingWindowFrameOptions } from 'app/src/scripts/floatingWindows/useFaFloatingWindowFrame'
+import type { I_faFloatingWindowPersistedRect } from 'app/types/I_faFloatingWindowPersistedRect'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import type { I_FaFloatingWindowFrameLayout } from 'app/src/scripts/floatingWindows/faFloatingWindowFrameLayout'
@@ -21,13 +24,15 @@ const testLayout: I_FaFloatingWindowFrameLayout = {
 function mountFloatingFrameHarness (
   useFaFloatingWindowFrame: (
     visible: Ref<boolean>,
-    layout?: I_FaFloatingWindowFrameLayout
-  ) => ReturnType<typeof import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame').useFaFloatingWindowFrame>
+    layout?: I_FaFloatingWindowFrameLayout,
+    options?: I_UseFaFloatingWindowFrameOptions
+  ) => ReturnType<typeof import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame').useFaFloatingWindowFrame>,
+  options: I_UseFaFloatingWindowFrameOptions = {}
 ): { visible: Ref<boolean>; wrapper: ReturnType<typeof mount> } {
   const visible = ref(false)
   const Harness = defineComponent({
     setup () {
-      const frameApi = useFaFloatingWindowFrame(visible, testLayout)
+      const frameApi = useFaFloatingWindowFrame(visible, testLayout, options)
       return {
         ...frameApi,
         visible
@@ -89,6 +94,30 @@ test('Test that useFaFloatingWindowFrame centers the frame and bumps z-index whe
   expect(vm.frameStyle.width).toBe('900px')
   expect(vm.frameStyle.height).toBe('680px')
   expect(vm.frameStyle.zIndex).toBeGreaterThan(initialZ)
+  expect(vm.frameStyle.zIndex).toBeLessThan(6000)
+  wrapper.unmount()
+})
+
+/**
+ * useFaFloatingWindowFrame
+ * Noteboard layer uses the upper z-index band (5900+) so it stacks above standard floating windows.
+ */
+test('Test that useFaFloatingWindowFrame uses the noteboard z-index band when options request it', async () => {
+  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MIN } = await import(
+    'app/src/scripts/floatingWindows/faFloatingWindowZIndex'
+  )
+  const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame, {
+    floatingWindowZLayer: 'noteboard'
+  })
+  const vm = wrapper.vm as unknown as {
+    frameStyle: { zIndex: number }
+  }
+  expect(vm.frameStyle.zIndex).toBeGreaterThanOrEqual(FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MIN)
+  visible.value = true
+  await wrapper.vm.$nextTick()
+  await wrapper.vm.$nextTick()
+  expect(vm.frameStyle.zIndex).toBeGreaterThanOrEqual(FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MIN)
   expect(vm.frameStyle.zIndex).toBeLessThan(6000)
   wrapper.unmount()
 })
@@ -441,5 +470,61 @@ test('Test that useFaFloatingWindowFrame ResizeObserver callback does not run wh
     pointerId: 4
   }))
   await wrapper.vm.$nextTick()
+  wrapper.unmount()
+})
+
+/**
+ * useFaFloatingWindowFrame
+ * When 'persistedFrame' holds a usable rect, opening applies clamped geometry instead of centering.
+ */
+test('Test that useFaFloatingWindowFrame restores persisted geometry when visible becomes true', async () => {
+  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const persistedFrame = ref<I_faFloatingWindowPersistedRect | null>({
+    height: 300,
+    width: 300,
+    x: 10,
+    y: 40
+  })
+  const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame, {
+    persistedFrame
+  })
+  const vm = wrapper.vm as unknown as {
+    frameStyle: { left: string; top: string; width: string; height: string }
+  }
+  visible.value = true
+  await wrapper.vm.$nextTick()
+  await wrapper.vm.$nextTick()
+  expect(vm.frameStyle.left).toBe('10px')
+  expect(vm.frameStyle.top).toBe('40px')
+  expect(vm.frameStyle.width).toBe('300px')
+  expect(vm.frameStyle.height).toBe('300px')
+  wrapper.unmount()
+})
+
+/**
+ * useFaFloatingWindowFrame
+ * When 'persistedFrame' is unusable, opening keeps the center-in-viewport path.
+ */
+test('Test that useFaFloatingWindowFrame ignores unusable persisted geometry and centers', async () => {
+  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const persistedFrame = ref<I_faFloatingWindowPersistedRect | null>({
+    height: 50,
+    width: 50,
+    x: 0,
+    y: 0
+  })
+  const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame, {
+    persistedFrame
+  })
+  const vm = wrapper.vm as unknown as {
+    frameStyle: { left: string; top: string; width: string; height: string }
+  }
+  visible.value = true
+  await wrapper.vm.$nextTick()
+  await wrapper.vm.$nextTick()
+  expect(vm.frameStyle.left).toBe('50px')
+  expect(vm.frameStyle.top).toBe('60px')
+  expect(vm.frameStyle.width).toBe('900px')
+  expect(vm.frameStyle.height).toBe('680px')
   wrapper.unmount()
 })

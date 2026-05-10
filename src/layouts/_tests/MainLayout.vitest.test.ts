@@ -5,7 +5,7 @@ import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/rendererAppInternals'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
-import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
+import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
@@ -333,14 +333,14 @@ test('Test that MainLayout removes capture keydown listener on unmount after key
 
 /**
  * MainLayout / onMounted
- * Refreshes persisted program styling when the bridge exposes faProgramStyling.
+ * Refreshes persisted app styling when the bridge exposes faAppStyling.
  */
-test('Test that MainLayout refreshes program styling when faProgramStyling bridge is present', async () => {
+test('Test that MainLayout refreshes app styling when faAppStyling bridge is present', async () => {
   setFantasiaStorybookCanvasFlag(false)
   vi.stubEnv('MODE', 'electron')
 
-  const stylingStore = S_FaProgramStyling()
-  const refreshSpy = vi.spyOn(stylingStore, 'refreshProgramStyling').mockResolvedValue(true)
+  const stylingStore = S_FaAppStyling()
+  const refreshSpy = vi.spyOn(stylingStore, 'refreshAppStyling').mockResolvedValue(true)
 
   const w = await mountMainLayoutForVitest()
   await flushPromises()
@@ -354,24 +354,24 @@ test('Test that MainLayout refreshes program styling when faProgramStyling bridg
 
 /**
  * MainLayout / onMounted
- * Skips program styling hydration when the bridge omits faProgramStyling.
+ * Skips app styling hydration when the bridge omits faAppStyling.
  */
-test('Test that MainLayout skips program styling refresh when faProgramStyling bridge is absent', async () => {
+test('Test that MainLayout skips app styling refresh when faAppStyling bridge is absent', async () => {
   setFantasiaStorybookCanvasFlag(false)
   vi.stubEnv('MODE', 'electron')
 
-  const stylingStore = S_FaProgramStyling()
-  const refreshSpy = vi.spyOn(stylingStore, 'refreshProgramStyling').mockResolvedValue(true)
+  const stylingStore = S_FaAppStyling()
+  const refreshSpy = vi.spyOn(stylingStore, 'refreshAppStyling').mockResolvedValue(true)
 
-  const prev = window.faContentBridgeAPIs.faProgramStyling
-  delete (window.faContentBridgeAPIs as { faProgramStyling?: unknown }).faProgramStyling
+  const prev = window.faContentBridgeAPIs.faAppStyling
+  delete (window.faContentBridgeAPIs as { faAppStyling?: unknown }).faAppStyling
 
   const w = await mountMainLayoutForVitest()
   await flushPromises()
 
   expect(refreshSpy).not.toHaveBeenCalled()
 
-  window.faContentBridgeAPIs.faProgramStyling = prev
+  window.faContentBridgeAPIs.faAppStyling = prev
   refreshSpy.mockRestore()
   w.unmount()
   vi.unstubAllEnvs()

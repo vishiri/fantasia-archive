@@ -10,10 +10,10 @@
 - FA a un Mode Sombre qui n'est pas une simple réflexion après coup et est entièrement fonctionnel !
 - De nombreuses parties de l'application réagissent au clic du bouton central de la souris. Par exemple, vous pouvez fermer les onglets de documents ou ouvrir les éléments de l'arborescence hiérarchique avec celui-ci directement !
 - Fantasia Archive est gratuit ; sans conditions : Pas de pub, pas de traceurs, pas de minage de crypto sur votre PC et toutes vos données vous appartiennent !
-- Si ces astuces vous ennuient, il y a un interrupteur pour les désactiver dans les paramètres du programme.
+- Si ces astuces vous ennuient, il y a un interrupteur pour les désactiver dans les paramètres de l'application.
 - La fonctionnalité de recherche de relations est remplie de fonctionnalités supplémentaires que vous pouvez utiliser pour trouver ce dont vous avez besoin ! Lisez tout à ce sujet dans le `Guide de recherche avancée` dans le menu Aide !
 - Votre projet est sauvegardé automatiquement à la sortie, mais il est recommandé d'utiliser la fonction `Sauvegarder` de temps en temps pour s'assurer que les données restent en sécurité.
-- L'arborescence hiérarchique de gauche est extensible avec un glisser de souris et le programme se souvient où vous l'avez laissée la prochaine fois que vous lancez !
+- L'arborescence hiérarchique de gauche est extensible avec un glisser de souris et l'application se souvient où vous l'avez laissée la prochaine fois que vous lancez !
 - N'hésitez pas à ajouter autant de sous-catégories que vous le souhaitez. Vous pouvez toujours déplacer des éléments plus tard et réorganiser la structure de votre projet.
 - Les étiquettes sont une fonctionnalité très puissante qui vous permet d'ajouter des semi-catégories à l'arborescence du projet et de créer des paramètres de recherche supplémentaires pour faciliter la navigation.
 - Il y a une feuille de route des fonctionnalités prévues sur Patreon ! Si vous êtes curieux de savoir ce qui viendra éventuellement, n'hésitez pas à la lire.

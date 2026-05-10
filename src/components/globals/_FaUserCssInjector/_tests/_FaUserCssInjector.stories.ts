@@ -1,11 +1,11 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/vue3-vite'
 
-import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
+import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 
 import FaUserCssInjector from '../_FaUserCssInjector.vue'
 
 const seedCustomCss: Decorator = (story) => {
-  const store = S_FaProgramStyling()
+  const store = S_FaAppStyling()
   store.css = '.fa-storybook-user-css-probe { text-decoration: underline; }'
   return {
     components: { story },

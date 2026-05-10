@@ -17,23 +17,26 @@ function buildToolsMenuData (session: I_appMenuBuildSession): I_appMenuItem[] {
     faMenuItem('appControlMenus.tools.items.toggleTree', 'mdi-page-layout-sidebar-left', {
       conditions: gate
     }),
-    faMenuItem('appControlMenus.tools.items.showNoteBoard', 'mdi-clipboard-text-outline'),
     faMenuSeparator(),
-    faMenuItem('appControlMenus.tools.items.importExportProgramConfig', 'mdi-cog-transfer', {
-      trigger: () => runFaAction('openImportExportProgramConfigDialog', undefined)
+    faMenuItem('appControlMenus.tools.items.importExportAppConfig', 'mdi-cog-transfer', {
+      trigger: () => runFaAction('openImportExportAppConfigDialog', undefined)
     }),
     faMenuSeparator(),
-    faMenuItem('appControlMenus.tools.items.programStyling', 'mdi-language-css3', {
-      keybindCommandId: 'openProgramStyling',
-      trigger: () => runFaAction('openProgramStylingWindow', undefined)
+    faMenuItem('appControlMenus.tools.items.appNoteBoard', 'mdi-clipboard-text-outline', {
+      keybindCommandId: 'toggleAppNoteboard',
+      trigger: () => runFaAction('toggleAppNoteboardWindow', undefined)
+    }),
+    faMenuItem('appControlMenus.tools.items.appStyling', 'mdi-language-css3', {
+      keybindCommandId: 'openAppStyling',
+      trigger: () => runFaAction('openAppStylingWindow', undefined)
     }),
     faMenuItem('appControlMenus.tools.items.keybindSettings', 'mdi-keyboard-settings', {
       keybindCommandId: 'openKeybindSettings',
       trigger: () => runFaAction('openKeybindSettingsDialog', undefined)
     }),
-    faMenuItem('appControlMenus.tools.items.programSettings', 'mdi-tune', {
-      keybindCommandId: 'openProgramSettings',
-      trigger: () => runFaAction('openProgramSettingsDialog', undefined)
+    faMenuItem('appControlMenus.tools.items.appSettings', 'mdi-tune', {
+      keybindCommandId: 'openAppSettings',
+      trigger: () => runFaAction('openAppSettingsDialog', undefined)
     })
   ]
 }

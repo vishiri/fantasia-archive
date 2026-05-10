@@ -26,7 +26,7 @@ test('Test that formatFaKeybindCommandLabelFromSnapshot returns null without sna
     }
   })).toBeNull()
   expect(formatFaKeybindCommandLabelFromSnapshot({
-    commandId: 'openProgramSettings',
+    commandId: 'openAppSettings',
     snapshot: null
   })).toBeNull()
 })
@@ -41,7 +41,7 @@ test('Test that formatFaKeybindCommandLabelFromSnapshot uses effective chord fro
     store: { ...FA_KEYBINDS_STORE_DEFAULTS }
   }
   const label = formatFaKeybindCommandLabelFromSnapshot({
-    commandId: 'openProgramSettings',
+    commandId: 'openAppSettings',
     snapshot
   })
   expect(label).toBe(formatFaKeybindChordForUi({
@@ -64,7 +64,7 @@ test('Test that formatFaKeybindCommandLabelFromSnapshot reflects overrides', () 
     store: {
       ...FA_KEYBINDS_STORE_DEFAULTS,
       overrides: {
-        openProgramSettings: {
+        openAppSettings: {
           code: 'KeyA',
           mods: ['ctrl']
         }
@@ -72,7 +72,7 @@ test('Test that formatFaKeybindCommandLabelFromSnapshot reflects overrides', () 
     }
   }
   expect(formatFaKeybindCommandLabelFromSnapshot({
-    commandId: 'openProgramSettings',
+    commandId: 'openAppSettings',
     snapshot
   })).toBe('Ctrl + A')
 })
@@ -88,7 +88,7 @@ test('Test that formatFaKeybindCommandLabelFromSnapshot returns null without com
     store: { ...FA_KEYBINDS_STORE_DEFAULTS }
   }
   expect(formatFaKeybindCommandLabelFromSnapshot({
-    commandId: 'openProgramSettings',
+    commandId: 'openAppSettings',
     snapshot
   })).toBeNull()
 })
@@ -104,7 +104,7 @@ test('Test that formatFaKeybindCommandLabelFromSnapshot returns null when effect
     store: { ...FA_KEYBINDS_STORE_DEFAULTS }
   }
   expect(formatFaKeybindCommandLabelFromSnapshot({
-    commandId: 'openProgramSettings',
+    commandId: 'openAppSettings',
     snapshot
   })).toBeNull()
 })

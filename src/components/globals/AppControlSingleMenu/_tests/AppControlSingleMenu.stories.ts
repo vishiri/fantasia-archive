@@ -95,8 +95,8 @@ const dataToolsAndHelpStyleWithHints: I_appMenuList = {
     faMenuItem('appControlMenus.tools.items.keybindSettings', 'mdi-keyboard-settings', {
       keybindCommandId: 'openKeybindSettings'
     }),
-    faMenuItem('appControlMenus.tools.items.programSettings', 'mdi-tune', {
-      keybindCommandId: 'openProgramSettings'
+    faMenuItem('appControlMenus.tools.items.appSettings', 'mdi-tune', {
+      keybindCommandId: 'openAppSettings'
     }),
     faMenuSeparator(),
     faMenuItem('appControlMenus.helpInfo.items.advancedSearchGuide', 'mdi-file-question', {

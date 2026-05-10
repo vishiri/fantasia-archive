@@ -67,8 +67,8 @@ test('Test that S_DialogMarkdown documentToOpen accepts a new document key', () 
  * Store fields accept new dialog keys like production open flows.
  */
 test('Test that S_DialogComponent dialogToOpen accepts a new dialog key', () => {
-  S_DialogComponent.dialogToOpen = 'ProgramSettings'
-  expect(S_DialogComponent.dialogToOpen).toBe('ProgramSettings')
+  S_DialogComponent.dialogToOpen = 'AppSettings'
+  expect(S_DialogComponent.dialogToOpen).toBe('AppSettings')
 })
 
 /**

@@ -62,11 +62,11 @@ test('Test that openDialogComponent updates component dialog store', () => {
   expect(generateDialogUUIDComponentMock).toHaveBeenCalledOnce()
 })
 
-test('Test that openDialogComponent accepts ProgramSettings dialog name', () => {
+test('Test that openDialogComponent accepts AppSettings dialog name', () => {
   markdownStoreMock.markdownDialogOpenCount = 0
   componentStoreMock.componentDialogOpenCount = 0
-  openDialogComponent('ProgramSettings')
-  expect(componentStoreMock.dialogToOpen).toBe('ProgramSettings')
+  openDialogComponent('AppSettings')
+  expect(componentStoreMock.dialogToOpen).toBe('AppSettings')
   expect(generateDialogUUIDComponentMock).toHaveBeenCalled()
 })
 
@@ -109,7 +109,7 @@ test('Test that openDialogComponent calls generateDialogUUID on each open', () =
   markdownStoreMock.markdownDialogOpenCount = 0
   componentStoreMock.componentDialogOpenCount = 0
   generateDialogUUIDComponentMock.mockClear()
-  openDialogComponent('ProgramSettings')
+  openDialogComponent('AppSettings')
   openDialogComponent('AboutFantasiaArchive')
   expect(generateDialogUUIDComponentMock).toHaveBeenCalledTimes(2)
   expect(componentStoreMock.dialogToOpen).toBe('AboutFantasiaArchive')
@@ -137,7 +137,7 @@ test('Test that openDialogComponent no-ops when markdown dialog is open', () => 
   markdownStoreMock.markdownDialogOpenCount = 1
   componentStoreMock.componentDialogOpenCount = 0
   generateDialogUUIDComponentMock.mockClear()
-  openDialogComponent('ProgramSettings')
+  openDialogComponent('AppSettings')
   expect(generateDialogUUIDComponentMock).not.toHaveBeenCalled()
 })
 

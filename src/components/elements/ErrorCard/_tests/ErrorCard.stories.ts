@@ -26,7 +26,7 @@ const meta = {
 
 export default meta
 
-export const ProgramSettingsSearchEmpty: StoryObj<typeof meta> = {
+export const AppSettingsSearchEmpty: StoryObj<typeof meta> = {
   args: {
     details:
       'Fantasia sadly did not find any setting you were looking for. Perhaps try a different search term?',

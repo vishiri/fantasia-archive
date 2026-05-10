@@ -1,21 +1,9 @@
-import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
-import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
-import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
+import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
+import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
-import type { I_faActionPayloadMap } from 'app/types/I_faActionManagerDomain'
-import {
-  openDialogComponent,
-  openDialogMarkdownDocument
-} from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
-import { FaActionUserCanceledError } from 'app/src/scripts/actionManager/faActionUserCanceledError'
-import { buildFaActionPayloadPreview } from 'app/src/scripts/actionManager/faActionManagerErrorReporting'
-import {
-  notifyFaProjectCreatedPositive,
-  notifyFaProjectLoadedPositive
-} from 'app/src/scripts/actionManager/faProjectSessionNotify'
+import { canOpenAppNoteboardFloatingWindow } from 'app/src/scripts/appNoteboard/faAppNoteboardCanOpen'
 import { toggleDevTools } from 'app/src/scripts/appGlobalManagementUI/toggleDevTools'
-import { tipsTricksTriviaNotification } from 'app/src/scripts/appGlobalManagementUI/tipsTricksTriviaNotification'
 import { applyFaUserSettingsLanguageSelection } from 'app/src/scripts/appInternals/rendererAppInternals'
 
 async function callBridge<T> (
@@ -25,6 +13,26 @@ async function callBridge<T> (
   if (result instanceof Promise) {
     await result
   }
+}
+
+export async function handleReportAppNoteboardSaveFailure (payload: { message: string }): Promise<void> {
+  throw new Error(payload.message)
+}
+
+export async function handleToggleAppNoteboardWindow (): Promise<void> {
+  const store = S_FaAppNoteboard()
+  if (store.isWindowOpen) {
+    store.setWindowOpen(false)
+    return
+  }
+  if (!canOpenAppNoteboardFloatingWindow()) {
+    return
+  }
+  store.setWindowOpen(true)
+}
+
+export async function handleReportAppStylingPersistFailure (payload: { message: string }): Promise<void> {
+  throw new Error(payload.message)
 }
 
 export async function handleSaveKeybindSettings (payload: { overrides: import('app/types/I_faKeybindsDomain').I_faKeybindsRoot['overrides'] }): Promise<void> {
@@ -37,14 +45,14 @@ export async function handleSaveKeybindSettings (payload: { overrides: import('a
   }
 }
 
-export async function handleSaveProgramSettings (payload: { settings: import('app/types/I_faUserSettingsDomain').I_faUserSettings }): Promise<void> {
+export async function handleSaveAppSettings (payload: { settings: import('app/types/I_faUserSettingsDomain').I_faUserSettings }): Promise<void> {
   await S_FaUserSettings().updateSettings(payload.settings)
 }
 
-export async function handleSaveProgramStyling (payload: { css: string }): Promise<void> {
-  const ok = await S_FaProgramStyling().updateProgramStyling({ css: payload.css })
+export async function handleSaveAppStyling (payload: { css: string }): Promise<void> {
+  const ok = await S_FaAppStyling().updateAppStyling({ css: payload.css })
   if (!ok) {
-    throw new Error('Failed to save program styling.')
+    throw new Error('Failed to save app styling.')
   }
 }
 
@@ -96,127 +104,23 @@ export async function handleToggleDeveloperTools (): Promise<void> {
   toggleDevTools()
 }
 
-export async function handleOpenKeybindSettingsDialog (): Promise<void> {
-  openDialogComponent('KeybindSettings')
-}
-
-export async function handleOpenProgramSettingsDialog (): Promise<void> {
-  openDialogComponent('ProgramSettings')
-}
-
-export async function handleOpenProgramStylingWindow (): Promise<void> {
-  openDialogComponent('WindowProgramStyling')
-}
-
-export async function handleOpenAdvancedSearchGuideDialog (): Promise<void> {
-  openDialogMarkdownDocument('advancedSearchGuide')
-}
-
-export async function handleOpenChangelogDialog (): Promise<void> {
-  openDialogMarkdownDocument('changeLog')
-}
-
-export async function handleOpenLicenseDialog (): Promise<void> {
-  openDialogMarkdownDocument('license')
-}
-
-export async function handleOpenAboutFantasiaArchiveDialog (): Promise<void> {
-  openDialogComponent('AboutFantasiaArchive')
-}
-
-export async function handleOpenTipsTricksTriviaDialog (): Promise<void> {
-  openDialogMarkdownDocument('tipsTricksTrivia')
-}
-
-export async function handleOpenActionMonitorDialog (): Promise<void> {
-  openDialogComponent('ActionMonitor')
-}
-
-export async function handleOpenImportExportProgramConfigDialog (): Promise<void> {
-  openDialogComponent('ImportExportProgramConfig')
-}
-
-export async function handleExportProgramConfigPackage (
-  _payload: I_faActionPayloadMap['exportProgramConfigPackage']
-): Promise<void> {
-}
-
-export async function handleExportProgramConfigSaveResult (
-  payload: I_faActionPayloadMap['exportProgramConfigSaveResult']
-): Promise<void> {
-  if (payload.status === 'error') {
-    throw new Error(payload.errorMessage ?? payload.errorName ?? 'Export to file failed')
-  }
-}
-
-export async function handleImportProgramConfigStageResult (
-  payload: I_faActionPayloadMap['importProgramConfigStageResult']
-): Promise<void> {
-  if (payload.status === 'fail') {
-    throw new Error(payload.errorMessage ?? 'Import validation failed')
-  }
-}
-
-export async function handleImportProgramConfigApply (
-  payload: I_faActionPayloadMap['importProgramConfigApply']
-): Promise<void> {
-  const api = window.faContentBridgeAPIs?.faProgramConfig
-  if (api === undefined) {
-    throw new Error('Program configuration is only available in the desktop app.')
-  }
-  await api.applyImport(payload)
-  await Promise.all([
-    S_FaUserSettings().refreshSettings(),
-    S_FaKeybinds().refreshKeybinds(),
-    S_FaProgramStyling().refreshProgramStyling()
-  ])
-}
-
-export async function handleOpenNewProjectDialog (): Promise<void> {
-  openDialogComponent('NewProject')
-}
-
-export async function handleCreateNewProject (
-  payload: I_faActionPayloadMap['createNewProject']
-): Promise<void> {
-  try {
-    const outcome = await S_FaActiveProject().createProjectFromUserInput(payload.projectName)
-    if (outcome === 'canceled') {
-      throw new FaActionUserCanceledError()
-    }
-    notifyFaProjectCreatedPositive()
-  } finally {
-    await S_FaRecentProjects().refreshRecentProjects()
-  }
-}
-
-export async function handleLoadExistingProject (
-  payload: I_faActionPayloadMap['loadExistingProject']
-): Promise<{ payloadPreview: string } | void> {
-  try {
-    const pathArg = payload.filePath
-    const outcome =
-      pathArg !== undefined && pathArg.length > 0
-        ? await S_FaActiveProject().openProjectFromKnownPath(pathArg)
-        : await S_FaActiveProject().openProjectFromUserDialog()
-    if (outcome === 'canceled') {
-      throw new FaActionUserCanceledError()
-    }
-    notifyFaProjectLoadedPositive()
-    const snap = S_FaActiveProject().activeProject
-    if (snap === null) {
-      throw new Error('Project open returned no active project snapshot.')
-    }
-    const payloadPreview = buildFaActionPayloadPreview({
-      filePath: snap.filePath,
-      projectName: snap.name
-    })
-    return { payloadPreview }
-  } finally {
-    await S_FaRecentProjects().refreshRecentProjects()
-  }
-}
-
-export async function handleShowStartupTipsNotification (): Promise<void> {
-  tipsTricksTriviaNotification(false)
-}
+export {
+  handleCreateNewProject,
+  handleExportAppConfigPackage,
+  handleExportAppConfigSaveResult,
+  handleImportAppConfigApply,
+  handleImportAppConfigStageResult,
+  handleLoadExistingProject,
+  handleOpenAboutFantasiaArchiveDialog,
+  handleOpenActionMonitorDialog,
+  handleOpenAdvancedSearchGuideDialog,
+  handleOpenChangelogDialog,
+  handleOpenImportExportAppConfigDialog,
+  handleOpenKeybindSettingsDialog,
+  handleOpenLicenseDialog,
+  handleOpenNewProjectDialog,
+  handleOpenAppSettingsDialog,
+  handleOpenAppStylingWindow,
+  handleOpenTipsTricksTriviaDialog,
+  handleShowStartupTipsNotification
+} from 'app/src/scripts/actionManager/faActionDefinitionHandlersDialogs'

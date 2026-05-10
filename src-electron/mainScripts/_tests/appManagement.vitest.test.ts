@@ -9,9 +9,10 @@ const {
   registerFaExtraEnvIpcMock,
   registerFaExternalLinksIpcMock,
   registerFaKeybindsIpcMock,
-  registerFaProgramConfigIpcMock,
+  registerFaAppConfigIpcMock,
   registerFaProjectManagementIpcMock,
-  registerFaProgramStylingIpcMock,
+  registerFaAppNoteboardIpcMock,
+  registerFaAppStylingIpcMock,
   registerFaUserSettingsIpcMock,
   registerFaWindowControlIpcMock,
   appMock,
@@ -36,9 +37,10 @@ const {
     registerFaExtraEnvIpcMock: vi.fn(),
     registerFaExternalLinksIpcMock: vi.fn(),
     registerFaKeybindsIpcMock: vi.fn(),
-    registerFaProgramConfigIpcMock: vi.fn(),
+    registerFaAppConfigIpcMock: vi.fn(),
     registerFaProjectManagementIpcMock: vi.fn(),
-    registerFaProgramStylingIpcMock: vi.fn(),
+    registerFaAppNoteboardIpcMock: vi.fn(),
+    registerFaAppStylingIpcMock: vi.fn(),
     registerFaUserSettingsIpcMock: vi.fn(),
     registerFaWindowControlIpcMock: vi.fn()
   }
@@ -74,9 +76,9 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaKeybindsIpc', () =
   }
 })
 
-vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaProgramConfigIpc', () => {
+vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaAppConfigIpc', () => {
   return {
-    registerFaProgramConfigIpc: registerFaProgramConfigIpcMock
+    registerFaAppConfigIpc: registerFaAppConfigIpcMock
   }
 })
 
@@ -86,15 +88,27 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaProjectManagementI
   }
 })
 
-vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaProgramStylingIpc', () => {
+vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaAppNoteboardIpc', () => {
   return {
-    registerFaProgramStylingIpc: registerFaProgramStylingIpcMock
+    registerFaAppNoteboardIpc: registerFaAppNoteboardIpcMock
   }
 })
 
-vi.mock('app/src-electron/mainScripts/programStyling/faProgramStylingStore', () => {
+vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaAppStylingIpc', () => {
   return {
-    getFaProgramStyling: vi.fn()
+    registerFaAppStylingIpc: registerFaAppStylingIpcMock
+  }
+})
+
+vi.mock('app/src-electron/mainScripts/appNoteboard/faAppNoteboardStore', () => {
+  return {
+    getFaAppNoteboard: vi.fn()
+  }
+})
+
+vi.mock('app/src-electron/mainScripts/appStyling/faAppStylingStore', () => {
+  return {
+    getFaAppStyling: vi.fn()
   }
 })
 
@@ -149,9 +163,10 @@ beforeEach(() => {
   registerFaExtraEnvIpcMock.mockReset()
   registerFaExternalLinksIpcMock.mockReset()
   registerFaKeybindsIpcMock.mockReset()
-  registerFaProgramConfigIpcMock.mockReset()
+  registerFaAppConfigIpcMock.mockReset()
   registerFaProjectManagementIpcMock.mockReset()
-  registerFaProgramStylingIpcMock.mockReset()
+  registerFaAppNoteboardIpcMock.mockReset()
+  registerFaAppStylingIpcMock.mockReset()
   registerFaUserSettingsIpcMock.mockReset()
   registerFaWindowControlIpcMock.mockReset()
   ipcMainHandleMock.mockReset()
@@ -173,9 +188,10 @@ test('Test that the electron app properly starts', () => {
   expect(registerFaExtraEnvIpcMock).toHaveBeenCalledOnce()
   expect(registerFaExternalLinksIpcMock).toHaveBeenCalledOnce()
   expect(registerFaKeybindsIpcMock).toHaveBeenCalledOnce()
-  expect(registerFaProgramConfigIpcMock).toHaveBeenCalledOnce()
+  expect(registerFaAppConfigIpcMock).toHaveBeenCalledOnce()
   expect(registerFaProjectManagementIpcMock).toHaveBeenCalledOnce()
-  expect(registerFaProgramStylingIpcMock).toHaveBeenCalledOnce()
+  expect(registerFaAppNoteboardIpcMock).toHaveBeenCalledOnce()
+  expect(registerFaAppStylingIpcMock).toHaveBeenCalledOnce()
   expect(registerFaUserSettingsIpcMock).toHaveBeenCalledOnce()
   expect(registerFaWindowControlIpcMock).toHaveBeenCalledOnce()
   expect(registerFaAppDetailsIpcMock).toHaveBeenCalledOnce()

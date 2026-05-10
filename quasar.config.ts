@@ -91,10 +91,10 @@ export default defineConfig((ctx) => {
       ],
 
       extendViteConf (viteConf) {
-        // Pre-bundle the Monaco submodules used by 'WindowProgramStyling' so the dev server's
+        // Pre-bundle the Monaco submodules used by 'WindowAppStyling' so the dev server's
         // dependency optimizer does not discover them on first window open and trigger a full
         // page reload. These are the bare-spec ESM imports from
-        // 'src/components/floatingWindows/WindowProgramStyling/scripts/cssMonaco.ts'. The matching
+        // 'src/components/floatingWindows/WindowAppStyling/scripts/cssMonaco.ts'. The matching
         // '?worker' chunks are deliberately excluded: Vite's worker plugin handles those on a
         // separate path and listing them here would break worker resolution. In production
         // ('quasar build') this list is harmless because Rollup/Rolldown pre-bundles everything

@@ -13,7 +13,7 @@
       >
         <h5
           id="dialogNewProject-title"
-          class="q-mb-md text-center"
+          class="q-mb-md text-center text-h5"
         >
           {{ $t('dialogs.newProject.title') }}
         </h5>

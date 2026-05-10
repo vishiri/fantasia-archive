@@ -86,9 +86,10 @@ test('buildDialogKeybindSettingsRows lists all command ids', () => {
   expect(ids).toEqual([
     'openActionMonitor',
     'openAdvancedSearchGuide',
+    'openAppSettings',
+    'openAppStyling',
     'openKeybindSettings',
-    'openProgramSettings',
-    'openProgramStyling',
+    'toggleAppNoteboard',
     'toggleDeveloperTools'
   ])
 })
@@ -99,8 +100,8 @@ test('buildDialogKeybindSettingsRows marks User keybinds as Add new when effecti
     platform: 'win32',
     t: tStub
   })
-  const program = rowsDefault.find((r) => r.commandId === 'openProgramSettings')
-  expect(program?.userChord).toEqual({
+  const appSettingsRow = rowsDefault.find((r) => r.commandId === 'openAppSettings')
+  expect(appSettingsRow?.userChord).toEqual({
     code: 'KeyL',
     mods: [
       'ctrl',
@@ -108,11 +109,11 @@ test('buildDialogKeybindSettingsRows marks User keybinds as Add new when effecti
       'shift'
     ]
   })
-  expect(program?.userShowsAddNewCombo).toBe(true)
+  expect(appSettingsRow?.userShowsAddNewCombo).toBe(true)
 
   const rowsExplicitSame = buildDialogKeybindSettingsRows({
     overrides: {
-      openProgramSettings: {
+      openAppSettings: {
         code: 'KeyL',
         mods: [
           'ctrl',
@@ -124,13 +125,13 @@ test('buildDialogKeybindSettingsRows marks User keybinds as Add new when effecti
     platform: 'win32',
     t: tStub
   })
-  expect(rowsExplicitSame.find((r) => r.commandId === 'openProgramSettings')?.userShowsAddNewCombo).toBe(
+  expect(rowsExplicitSame.find((r) => r.commandId === 'openAppSettings')?.userShowsAddNewCombo).toBe(
     true
   )
 
   const rowsCustom = buildDialogKeybindSettingsRows({
     overrides: {
-      openProgramSettings: {
+      openAppSettings: {
         code: 'KeyX',
         mods: ['ctrl']
       }
@@ -138,7 +139,7 @@ test('buildDialogKeybindSettingsRows marks User keybinds as Add new when effecti
     platform: 'win32',
     t: tStub
   })
-  expect(rowsCustom.find((r) => r.commandId === 'openProgramSettings')?.userShowsAddNewCombo).toBe(false)
+  expect(rowsCustom.find((r) => r.commandId === 'openAppSettings')?.userShowsAddNewCombo).toBe(false)
 })
 
 /**
@@ -237,7 +238,7 @@ test('createDialogKeybindSettingsSync onSaveMain syncs after success and onClose
     platform: 'win32',
     store: {
       overrides: {
-        openProgramSettings: {
+        openAppSettings: {
           code: 'KeyZ',
           mods: ['alt']
         }
@@ -253,24 +254,24 @@ test('createDialogKeybindSettingsSync onSaveMain syncs after success and onClose
     workingOverrides
   })
   workingOverrides.value = {
-    openProgramSettings: {
+    openAppSettings: {
       code: 'KeyY',
       mods: ['ctrl']
     }
   }
   await onSaveMain()
-  expect(workingOverrides.value.openProgramSettings?.code).toBe('KeyZ')
+  expect(workingOverrides.value.openAppSettings?.code).toBe('KeyZ')
   workingOverrides.value = {
-    openProgramSettings: {
+    openAppSettings: {
       code: 'KeyY',
       mods: ['ctrl']
     }
   }
   onCloseMain()
   expect(filter.value).toBe('')
-  expect(workingOverrides.value.openProgramSettings?.code).toBe('KeyZ')
+  expect(workingOverrides.value.openAppSettings?.code).toBe('KeyZ')
   initializeForOpen()
-  expect(workingOverrides.value.openProgramSettings?.code).toBe('KeyZ')
+  expect(workingOverrides.value.openAppSettings?.code).toBe('KeyZ')
   keybindsStore.snapshot = null
   syncWorkingFromStore()
   expect(workingOverrides.value).toEqual({})
@@ -605,7 +606,7 @@ test('makeDialogKeybindCaptureKeydownHandler allows chord when prior default own
   const pendingChord = ref(null)
   const platform = computed(() => 'win32' as NodeJS.Platform)
   const workingOverrides = ref<I_faKeybindsRoot['overrides']>({
-    openProgramSettings: {
+    openAppSettings: {
       code: 'KeyX',
       mods: ['ctrl']
     }
@@ -746,14 +747,14 @@ test('bindOnOpenCapture treats userChord null like empty when seeding capture fi
   const onOpen = bindOnOpenCapture(deps)
   const row = buildDialogKeybindSettingsRows({
     overrides: {
-      openProgramSettings: {
+      openAppSettings: {
         code: 'KeyX',
         mods: ['ctrl']
       }
     },
     platform: 'win32',
     t: tStub
-  }).find((r) => r.commandId === 'openProgramSettings')
+  }).find((r) => r.commandId === 'openAppSettings')
   expect(row).toBeDefined()
   onOpen({
     ...row!,
@@ -801,14 +802,14 @@ test('bindOnOpenCapture treats userChord undefined like empty when seeding captu
   const onOpen = bindOnOpenCapture(deps)
   const row = buildDialogKeybindSettingsRows({
     overrides: {
-      openProgramSettings: {
+      openAppSettings: {
         code: 'KeyX',
         mods: ['ctrl']
       }
     },
     platform: 'win32',
     t: tStub
-  }).find((r) => r.commandId === 'openProgramSettings')
+  }).find((r) => r.commandId === 'openAppSettings')
   expect(row).toBeDefined()
   onOpen({
     ...row!,
@@ -880,7 +881,7 @@ test('capture handler bindings cover open, clear, and set paths', () => {
   const platform = computed(() => 'win32' as NodeJS.Platform)
   const workingOverrides = ref({
     ...FA_KEYBINDS_STORE_DEFAULTS.overrides,
-    openProgramSettings: {
+    openAppSettings: {
       code: 'KeyX',
       mods: ['ctrl' as const]
     }
@@ -920,20 +921,20 @@ test('capture handler bindings cover open, clear, and set paths', () => {
     platform: 'win32',
     t: tStub
   })
-  const programRow = rows.find((r) => r.commandId === 'openProgramSettings')
-  expect(programRow).toBeDefined()
+  const appSettingsRow = rows.find((r) => r.commandId === 'openAppSettings')
+  expect(appSettingsRow).toBeDefined()
   onOpen({
-    ...programRow!,
+    ...appSettingsRow!,
     editable: false
   })
   expect(captureOpen.value).toBe(false)
 
-  const editable = rows.find((r) => r.editable && r.commandId === 'openProgramSettings')
+  const editable = rows.find((r) => r.editable && r.commandId === 'openAppSettings')
   expect(editable).toBeDefined()
   onOpen(editable!)
   expect(captureOpen.value).toBe(true)
   expect(captureActionName.value).toBe(editable!.nameLabel)
-  expect(editingCommandId.value).toBe('openProgramSettings')
+  expect(editingCommandId.value).toBe('openAppSettings')
   expect(pendingChord.value).toEqual({
     code: 'KeyX',
     mods: ['ctrl']
@@ -947,13 +948,13 @@ test('capture handler bindings cover open, clear, and set paths', () => {
   bindOnCaptureClear(deps)()
   expect(pendingChord.value).toBeNull()
   expect(captureOpen.value).toBe(false)
-  expect(workingOverrides.value.openProgramSettings).toBeNull()
+  expect(workingOverrides.value.openAppSettings).toBeNull()
 
   const editableAfterClear = buildDialogKeybindSettingsRows({
     overrides: workingOverrides.value,
     platform: 'win32',
     t: tStub
-  }).find((r) => r.editable && r.commandId === 'openProgramSettings')
+  }).find((r) => r.editable && r.commandId === 'openAppSettings')
   expect(editableAfterClear).toBeDefined()
   onOpen(editableAfterClear!)
   expect(captureOpen.value).toBe(true)
@@ -986,13 +987,13 @@ test('capture handler bindings cover open, clear, and set paths', () => {
   }
   bindOnCaptureSet(deps)()
   expect(captureOpen.value).toBe(false)
-  expect(workingOverrides.value.openProgramSettings?.code).toBe('KeyQ')
+  expect(workingOverrides.value.openAppSettings?.code).toBe('KeyQ')
 })
 
 test('registerDialogKeybindCaptureOpenWatch removes listener when capture closes', async () => {
   const captureOpen = ref(true)
-  const captureActionName = ref('Open program settings')
-  const editingCommandId = ref<T_faKeybindCommandId>('openProgramSettings')
+  const captureActionName = ref('Open app settings')
+  const editingCommandId = ref<T_faKeybindCommandId>('openAppSettings')
   const removed = vi.fn()
   registerDialogKeybindCaptureOpenWatch({
     captureActionName,
@@ -1033,7 +1034,7 @@ test('setupDialogKeybindSettingsDialogRouting opens on UUID and directInput, and
   })).toContain('Ctrl')
 
   const componentStore = S_DialogComponent()
-  componentStore.dialogToOpen = 'ProgramSettings'
+  componentStore.dialogToOpen = 'AppSettings'
   componentStore.generateDialogUUID()
   await flushPromises()
   expect(dialogModel.value).toBe(false)
@@ -1177,7 +1178,7 @@ test('runDialogKeybindCaptureKeydown restores pending chord and label to baselin
   const captureInfoMessage = ref('')
   const captureLabel = ref('Ctrl + Alt + Shift + L')
   const captureOpen = ref(true)
-  const editingCommandId = ref<T_faKeybindCommandId | null>('openProgramSettings')
+  const editingCommandId = ref<T_faKeybindCommandId | null>('openAppSettings')
   const pendingChord = ref<I_faChordSerialized | null>({
     code: 'KeyL',
     mods: [

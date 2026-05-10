@@ -27,7 +27,7 @@ const syntheticNonEditableRow: I_dialogKeybindSettingsRow = {
 }
 
 const syntheticEmptyChordRow: I_dialogKeybindSettingsRow = {
-  commandId: 'openProgramSettings',
+  commandId: 'openAppSettings',
   defaultLabel: 'stub-default-2',
   editable: true,
   nameLabel: 'stub-empty-chord-label',
@@ -37,7 +37,7 @@ const syntheticEmptyChordRow: I_dialogKeybindSettingsRow = {
 }
 
 const syntheticChordRow: I_dialogKeybindSettingsRow = {
-  commandId: 'openProgramSettings',
+  commandId: 'openAppSettings',
   defaultLabel: 'stub-default-3',
   editable: true,
   nameLabel: 'stub-chord-row',
@@ -306,7 +306,7 @@ test('Test that DialogKeybindSettings forwards q-dialog v-model and filter input
   const filterInputs = w.findAll('input')
   expect(filterInputs.length).toBeGreaterThan(0)
   expect(w.get('.q-icon-search-stub').text()).toBe('search')
-  await filterInputs[0].setValue('program')
+  await filterInputs[0].setValue('app')
   await flushPromises()
 
   w.unmount()

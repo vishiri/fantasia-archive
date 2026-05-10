@@ -32,7 +32,7 @@ test('DialogKeybindSettingsCaptureDialog shows action title and placeholder i18n
       }
     },
     props: {
-      actionName: 'Open program settings',
+      actionName: 'Open app settings',
       captureError: false,
       captureErrorMessage: '',
       captureInfoMessage: '',
@@ -44,7 +44,7 @@ test('DialogKeybindSettingsCaptureDialog shows action title and placeholder i18n
 
   await flushPromises()
 
-  expect(w.text()).toContain('Open program settings')
+  expect(w.text()).toContain('Open app settings')
   expect(w.html()).toContain('dialogs.keybindSettings.captureHint')
   const clearBtn = w.find('[data-test-locator="dialogKeybindSettings-capture-clear"]')
   expect(clearBtn.attributes('disabled')).toBeDefined()
@@ -73,7 +73,7 @@ test('DialogKeybindSettingsCaptureDialog enables clear keybind when captureLabel
       }
     },
     props: {
-      actionName: 'Open program settings',
+      actionName: 'Open app settings',
       captureError: false,
       captureErrorMessage: '',
       captureInfoMessage: '',

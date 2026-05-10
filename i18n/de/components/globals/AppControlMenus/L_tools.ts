@@ -2,10 +2,10 @@ export default {
   title: 'Werkzeuge & Einstellungen',
   items: {
     toggleTree: 'Hierarchische Baumansicht ein/aus',
-    showNoteBoard: 'Notiztafel anzeigen',
-    importExportProgramConfig: 'Programmkonfiguration importieren / exportieren',
+    appNoteBoard: 'App-Notiztafel',
+    importExportAppConfig: 'App-Konfiguration importieren / exportieren',
     keybindSettings: 'Tastenkürzel-Einstellungen',
-    programSettings: 'Programmeinstellungen',
-    programStyling: 'Eigenes Programm-CSS'
+    appSettings: 'App-Einstellungen',
+    appStyling: 'Eigenes App-CSS'
   }
 }

@@ -12,15 +12,18 @@ export default {
     openChangelogDialog: 'Änderungsprotokoll öffnen',
     openKeybindSettingsDialog: 'Tastenkürzel öffnen',
     openLicenseDialog: 'Lizenz öffnen',
-    openProgramSettingsDialog: 'Programmeinstellungen öffnen',
-    openProgramStylingWindow: 'Eigenes Programm-CSS öffnen',
+    openAppSettingsDialog: 'App-Einstellungen öffnen',
+    openAppStylingWindow: 'Eigenes App-CSS öffnen',
     openTipsTricksTriviaDialog: 'Tipps, Tricks & Kurioses öffnen',
     refreshWebContentsAfterLanguage: 'Fensterinhalt aktualisieren',
+    reportAppNoteboardSaveFailure: 'Fehler beim Speichern der App-Notiztafel melden',
+    reportAppStylingPersistFailure: 'Fehler beim Speichern des App-CSS-Fensterlayouts melden',
     resizeApp: 'Fenstergröße ändern',
     saveKeybindSettings: 'Tastenkürzel speichern',
-    saveProgramSettings: 'Programmeinstellungen speichern',
-    saveProgramStyling: 'Eigenes Programm-CSS speichern',
+    saveAppSettings: 'App-Einstellungen speichern',
+    saveAppStyling: 'Eigenes App-CSS speichern',
     showStartupTipsNotification: 'Starthinweis anzeigen',
-    toggleDeveloperTools: 'Entwicklerwerkzeuge ein/aus'
+    toggleDeveloperTools: 'Entwicklerwerkzeuge ein/aus',
+    toggleAppNoteboardWindow: 'App-Notiztafel-Fenster ein/aus'
   }
 }

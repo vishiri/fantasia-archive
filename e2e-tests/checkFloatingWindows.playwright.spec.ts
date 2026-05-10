@@ -7,7 +7,7 @@ import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import helpInfoMenuMessages from 'app/i18n/en-US/components/globals/AppControlMenus/L_helpInfo'
 import toolsMenuMessages from 'app/i18n/en-US/components/globals/AppControlMenus/L_tools'
-import programStylingMessages from 'app/i18n/en-US/floatingWindows/L_programStyling'
+import appStylingMessages from 'app/i18n/en-US/floatingWindows/L_appStyling'
 
 /**
  * Extra env settings to trigger E2E testing via Playwright
@@ -34,7 +34,7 @@ const monacoMountSettleMs = 2500
 /**
  * Floating window can appear after menu navigation.
  */
-const programStylingWindowReadyMs = 30_000
+const appStylingWindowReadyMs = 30_000
 
 /**
  * Target size after resize drag (matches floating frame minimum width and height).
@@ -59,11 +59,11 @@ const defaultFloatingLayout = {
  * Object of string data selectors for the e2e
  */
 const selectorList = {
-  programStylingFrame: 'windowProgramStyling-frame',
-  programStylingTitle: 'windowProgramStyling-title',
-  dragHandle: 'windowProgramStyling-dragHandle',
-  closeButton: 'windowProgramStyling-button-close',
-  editorHost: 'windowProgramStyling-editorHost',
+  appStylingFrame: 'windowAppStyling-frame',
+  appStylingTitle: 'windowAppStyling-title',
+  dragHandle: 'windowAppStyling-dragHandle',
+  closeButton: 'windowAppStyling-button-close',
+  editorHost: 'windowAppStyling-editorHost',
   resizeHandleSe: '.faFloatingWindowFrameResizeHandles__se',
   licenseMarkdownWrapper: 'dialogMarkdownDocument-markdown-wrapper',
   licenseDialogClose: 'dialogMarkdownDocument-button-close'
@@ -126,15 +126,15 @@ async function waitForMonacoEditorMount (page: Page): Promise<void> {
   }).toPass({ timeout: 15_000 })
 }
 
-async function openProgramStylingFromToolsMenu (page: Page): Promise<void> {
+async function openAppStylingFromToolsMenu (page: Page): Promise<void> {
   await dismissStartupTipsNotifyIfPresent(page)
   const toolsTrigger = page.getByText(toolsMenuMessages.title, { exact: true })
   await expect(toolsTrigger).toBeVisible({ timeout: 20_000 })
   await toolsTrigger.click()
   await page.waitForTimeout(menuAnimationTimer)
-  const programCssItem = page.getByText(toolsMenuMessages.items.programStyling, { exact: true })
-  await expect(programCssItem).toBeVisible()
-  await programCssItem.click()
+  const appStylingMenuItem = page.getByText(toolsMenuMessages.items.appStyling, { exact: true })
+  await expect(appStylingMenuItem).toBeVisible()
+  await appStylingMenuItem.click()
   await page.waitForTimeout(menuAnimationTimer)
 }
 
@@ -149,12 +149,12 @@ async function openLicenseFromHelpMenu (page: Page): Promise<void> {
   await page.waitForTimeout(menuAnimationTimer)
 }
 
-async function waitForProgramStylingWindow (page: Page): Promise<void> {
-  const frame = page.locator(`[data-test-locator="${selectorList.programStylingFrame}"]`)
-  await expect(frame).toHaveCount(1, { timeout: programStylingWindowReadyMs })
-  const title = frame.locator(`[data-test-locator="${selectorList.programStylingTitle}"]`)
+async function waitForAppStylingWindow (page: Page): Promise<void> {
+  const frame = page.locator(`[data-test-locator="${selectorList.appStylingFrame}"]`)
+  await expect(frame).toHaveCount(1, { timeout: appStylingWindowReadyMs })
+  const title = frame.locator(`[data-test-locator="${selectorList.appStylingTitle}"]`)
   await expect(title).toHaveCount(1)
-  await expect(title).toHaveText(programStylingMessages.title)
+  await expect(title).toHaveText(appStylingMessages.title)
   await page.waitForTimeout(monacoMountSettleMs)
   await waitForMonacoEditorMount(page)
 }
@@ -196,10 +196,10 @@ test.describe.serial('Floating windows end-to-end (checkFloatingWindows)', () =>
 
   /**
    * checkFloatingWindows
-   * Opens Custom program CSS, asserts initial layout, resizes to 400 by 400, drags to the top-right, opens and closes
+   * Opens Custom app CSS, asserts initial layout, resizes to 400 by 400, drags to the top-right, opens and closes
    * License (markdown dialog) from Help while the floating window stays open, then closes without saving.
    */
-  test('Custom program CSS floating window sizes, resizes, moves to top-right, and closes without saving', async () => {
+  test('Custom app CSS floating window sizes, resizes, moves to top-right, and closes without saving', async () => {
     await expect(
       appWindow.locator('.appHeader'),
       'Floating window menu lives on MainLayout; this suite must start on the home route.'
@@ -209,12 +209,12 @@ test.describe.serial('Floating windows end-to-end (checkFloatingWindows)', () =>
 
     const expectedLayout = await readExpectedInitialFrameLayout(appWindow)
 
-    await test.step('Open Custom program CSS from Tools menu', async () => {
-      await openProgramStylingFromToolsMenu(appWindow)
-      await waitForProgramStylingWindow(appWindow)
+    await test.step('Open Custom app CSS from Tools menu', async () => {
+      await openAppStylingFromToolsMenu(appWindow)
+      await waitForAppStylingWindow(appWindow)
     })
 
-    const frame = appWindow.locator(`[data-test-locator="${selectorList.programStylingFrame}"]`)
+    const frame = appWindow.locator(`[data-test-locator="${selectorList.appStylingFrame}"]`)
 
     await test.step('Assert initial size and position match centered default layout', async () => {
       const box = await frame.boundingBox()
@@ -369,8 +369,8 @@ test.describe.serial('Floating windows end-to-end (checkFloatingWindows)', () =>
         'frame y after License close',
         3
       )
-      const title = frame.locator(`[data-test-locator="${selectorList.programStylingTitle}"]`)
-      await expect(title).toHaveText(programStylingMessages.title)
+      const title = frame.locator(`[data-test-locator="${selectorList.appStylingTitle}"]`)
+      await expect(title).toHaveText(appStylingMessages.title)
     })
 
     await test.step('Close without saving', async () => {

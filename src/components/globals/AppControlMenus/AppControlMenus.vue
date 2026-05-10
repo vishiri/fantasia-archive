@@ -48,9 +48,10 @@
     <DialogAboutFantasiaArchive v-if="embedDialogs" />
     <DialogActionMonitor v-if="embedDialogs" />
     <DialogKeybindSettings v-if="embedDialogs" />
-    <DialogProgramSettings v-if="embedDialogs" />
-    <WindowProgramStyling v-if="embedDialogs" />
-    <DialogImportExportProgramConfig v-if="embedDialogs" />
+    <DialogAppSettings v-if="embedDialogs" />
+    <WindowAppStyling v-if="embedDialogs" />
+    <WindowAppNoteboard v-if="embedDialogs" />
+    <DialogImportExportAppConfig v-if="embedDialogs" />
     <DialogNewProject v-if="embedDialogs" />
   </div>
 </template>
@@ -78,9 +79,10 @@ import DialogNewProject from 'app/src/components/dialogs/DialogNewProject/Dialog
 import DialogAboutFantasiaArchive from 'app/src/components/dialogs/DialogAboutFantasiaArchive/DialogAboutFantasiaArchive.vue'
 import DialogActionMonitor from 'app/src/components/dialogs/DialogActionMonitor/DialogActionMonitor.vue'
 import DialogKeybindSettings from 'app/src/components/dialogs/DialogKeybindSettings/DialogKeybindSettings.vue'
-import DialogProgramSettings from 'app/src/components/dialogs/DialogProgramSettings/DialogProgramSettings.vue'
-import DialogImportExportProgramConfig from 'app/src/components/dialogs/DialogImportExportProgramConfig/DialogImportExportProgramConfig.vue'
-import WindowProgramStyling from 'app/src/components/floatingWindows/WindowProgramStyling/WindowProgramStyling.vue'
+import DialogAppSettings from 'app/src/components/dialogs/DialogAppSettings/DialogAppSettings.vue'
+import DialogImportExportAppConfig from 'app/src/components/dialogs/DialogImportExportAppConfig/DialogImportExportAppConfig.vue'
+import WindowAppNoteboard from 'app/src/components/floatingWindows/WindowAppNoteboard/WindowAppNoteboard.vue'
+import WindowAppStyling from 'app/src/components/floatingWindows/WindowAppStyling/WindowAppStyling.vue'
 
 function readInitialTestingType (): string | false {
   const snap = window.faContentBridgeAPIs?.extraEnvVariables?.getCachedSnapshot?.()

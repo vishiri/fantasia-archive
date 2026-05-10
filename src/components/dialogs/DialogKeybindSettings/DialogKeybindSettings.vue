@@ -7,13 +7,13 @@
     @hide="onCloseMain"
   >
     <q-card :class="['dialogComponent__wrapper', documentName, 'dialogKeybindSettings__card']">
-      <h4
+      <h5
         id="dialogKeybindSettings-title"
-        class="text-center q-mb-sm"
+        class="text-center text-h5 q-mb-sm"
         data-test-locator="dialogKeybindSettings-title"
       >
         {{ $t('dialogs.keybindSettings.title') }}
-      </h4>
+      </h5>
 
       <q-card-section
         ref="bodySectionRef"

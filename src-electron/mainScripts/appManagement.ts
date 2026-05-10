@@ -4,13 +4,15 @@ import { registerFaDevToolsIpc } from 'app/src-electron/mainScripts/ipcManagemen
 import { registerFaExtraEnvIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaExtraEnvIpc'
 import { registerFaExternalLinksIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaExternalLinksIpc'
 import { registerFaKeybindsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaKeybindsIpc'
-import { registerFaProgramConfigIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProgramConfigIpc'
+import { registerFaAppConfigIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaAppConfigIpc'
 import { registerFaProjectManagementIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProjectManagementIpc'
-import { registerFaProgramStylingIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProgramStylingIpc'
+import { registerFaAppNoteboardIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaAppNoteboardIpc'
+import { registerFaAppStylingIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaAppStylingIpc'
 import { registerFaUserSettingsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaUserSettingsIpc'
 import { registerFaWindowControlIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
 import { getFaKeybinds } from 'app/src-electron/mainScripts/keybinds/faKeybindsStore'
-import { getFaProgramStyling } from 'app/src-electron/mainScripts/programStyling/faProgramStylingStore'
+import { getFaAppNoteboard } from 'app/src-electron/mainScripts/appNoteboard/faAppNoteboardStore'
+import { getFaAppStyling } from 'app/src-electron/mainScripts/appStyling/faAppStylingStore'
 import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
 import { app } from 'electron'
 
@@ -20,9 +22,10 @@ export const startApp = () => {
   registerFaExtraEnvIpc()
   registerFaExternalLinksIpc()
   registerFaKeybindsIpc()
-  registerFaProgramConfigIpc()
+  registerFaAppConfigIpc()
   registerFaProjectManagementIpc()
-  registerFaProgramStylingIpc()
+  registerFaAppNoteboardIpc()
+  registerFaAppStylingIpc()
   registerFaUserSettingsIpc()
   registerFaWindowControlIpc()
   registerFaAppDetailsIpc()
@@ -33,7 +36,8 @@ export const openAppWindowManager = () => {
   // Create the app window in the normal way
   app.whenReady().then(() => {
     getFaKeybinds()
-    getFaProgramStyling()
+    getFaAppNoteboard()
+    getFaAppStyling()
     getFaUserSettings()
     void mainWindowCreation()
   })

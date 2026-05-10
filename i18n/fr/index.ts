@@ -18,15 +18,17 @@ import L_socialContactButtons from './components/other/SocialContactButtons/L_so
 import L_aboutFantasiaArchive from './dialogs/L_aboutFantasiaArchive'
 import L_DialogActionMonitor from './dialogs/L_DialogActionMonitor'
 import L_dialogKeybindSettings from './dialogs/L_dialogKeybindSettings'
-import L_importExportProgramConfig from './dialogs/L_importExportProgramConfig'
+import L_importExportAppConfig from './dialogs/L_importExportAppConfig'
 import L_newProject from './dialogs/L_newProject'
 import L_markdownDocument from './dialogs/L_markdownDocument'
-import L_programSettings from './dialogs/L_programSettings'
-import L_programStylingFloating from './floatingWindows/L_programStyling'
+import L_appSettings from './dialogs/L_appSettings'
+import L_appNoteboard from './floatingWindows/L_appNoteboard'
+import L_appStylingFloating from './floatingWindows/L_appStyling'
 
 import L_faActionManager from './globalFunctionality/L_faActionManager'
 import L_faKeybinds from './globalFunctionality/L_faKeybinds'
-import L_faProgramStyling from './globalFunctionality/L_faProgramStyling'
+import L_faAppNoteboard from './globalFunctionality/L_faAppNoteboard'
+import L_faAppStyling from './globalFunctionality/L_faAppStyling'
 import L_faProjectSession from './globalFunctionality/L_faProjectSession'
 import L_faUserSettings from './globalFunctionality/L_faUserSettings'
 import L_spellChecker from './globalFunctionality/L_spellChecker'
@@ -59,16 +61,17 @@ export default {
   dialogs: {
     aboutFantasiaArchive: L_aboutFantasiaArchive,
     actionMonitor: L_DialogActionMonitor,
-    importExportProgramConfig: L_importExportProgramConfig,
+    importExportAppConfig: L_importExportAppConfig,
     keybindSettings: L_dialogKeybindSettings,
     markdownDocument: L_markdownDocument,
     newProject: L_newProject,
-    programSettings: L_programSettings
+    appSettings: L_appSettings
   },
 
   // FLOATING WINDOWS (in-renderer movable / resizable surfaces)
   floatingWindows: {
-    programStyling: L_programStylingFloating
+    appNoteboard: L_appNoteboard,
+    appStyling: L_appStylingFloating
   },
 
   // COMPONENT - GLOBAL LANGUAGE SELECTOR
@@ -95,7 +98,8 @@ export default {
   globalFunctionality: {
     faActionManager: L_faActionManager,
     faKeybinds: L_faKeybinds,
-    faProgramStyling: L_faProgramStyling,
+    faAppNoteboard: L_faAppNoteboard,
+    faAppStyling: L_faAppStyling,
     faProjectSession: L_faProjectSession,
     faUserSettings: L_faUserSettings,
     spellChecker: L_spellChecker,

@@ -25,9 +25,15 @@ export const FA_KEYBINDS_IPC = {
 } as const
 
 /** User-defined custom CSS ('electron-store' in main): preload uses async 'ipcRenderer.invoke'; main uses 'ipcMain.handle'. */
-export const FA_PROGRAM_STYLING_IPC = {
-  getAsync: 'fa-program-styling-get-async',
-  setAsync: 'fa-program-styling-set-async'
+export const FA_APP_STYLING_IPC = {
+  getAsync: 'fa-app-styling-get-async',
+  setAsync: 'fa-app-styling-set-async'
+} as const
+
+/** App note board text + frame ('electron-store' in main): preload uses async invoke; main uses handle. */
+export const FA_APP_NOTEBOARD_IPC = {
+  getAsync: 'fa-app-noteboard-get-async',
+  setAsync: 'fa-app-noteboard-set-async'
 } as const
 
 /** Window chrome: preload uses 'ipcRenderer.invoke'; main uses 'ipcMain.handle'. */
@@ -55,12 +61,12 @@ export const FA_EXTERNAL_LINKS_IPC = {
   openExternalAsync: 'fa-external-links-open-external-async'
 } as const
 
-/** Program config bundle (.faconfig) — async invoke/handle. */
-export const FA_PROGRAM_CONFIG_IPC = {
-  exportToFileAsync: 'fa-program-config-export-to-file-async',
-  prepareImportAsync: 'fa-program-config-prepare-import-async',
-  applyImportAsync: 'fa-program-config-apply-import-async',
-  disposeImportSessionAsync: 'fa-program-config-dispose-import-session-async'
+/** App configuration bundle (.faconfig) — async invoke/handle. */
+export const FA_APP_CONFIG_IPC = {
+  exportToFileAsync: 'fa-app-config-export-to-file-async',
+  prepareImportAsync: 'fa-app-config-prepare-import-async',
+  applyImportAsync: 'fa-app-config-apply-import-async',
+  disposeImportSessionAsync: 'fa-app-config-dispose-import-session-async'
 } as const
 
 /** Project database (.faproject) — async invoke/handle. */

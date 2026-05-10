@@ -22,8 +22,8 @@ export const FA_KEYBIND_COMMAND_DEFINITIONS: I_faKeybindCommandDefinition[] = [
     },
     editable: true,
     firesInEditableFields: true,
-    id: 'openProgramSettings',
-    messageKey: 'dialogs.keybindSettings.commands.openProgramSettings'
+    id: 'openAppSettings',
+    messageKey: 'dialogs.keybindSettings.commands.openAppSettings'
   },
   {
     defaultChord: {
@@ -50,8 +50,21 @@ export const FA_KEYBIND_COMMAND_DEFINITIONS: I_faKeybindCommandDefinition[] = [
     },
     editable: true,
     firesInEditableFields: true,
-    id: 'openProgramStyling',
-    messageKey: 'dialogs.keybindSettings.commands.openProgramStyling'
+    id: 'openAppStyling',
+    messageKey: 'dialogs.keybindSettings.commands.openAppStyling'
+  },
+  {
+    defaultChord: {
+      code: 'KeyE',
+      mods: [
+        'alt',
+        'ctrl'
+      ]
+    },
+    editable: true,
+    firesInEditableFields: true,
+    id: 'toggleAppNoteboard',
+    messageKey: 'dialogs.keybindSettings.commands.toggleAppNoteboard'
   },
   {
     defaultChord: {

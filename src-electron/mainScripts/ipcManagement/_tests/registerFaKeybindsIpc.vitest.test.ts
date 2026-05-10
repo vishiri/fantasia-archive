@@ -49,7 +49,7 @@ function handlerFor (channel: string): (...args: unknown[]) => unknown {
  */
 test('Test that keybinds get handler returns platform and cloned store snapshot', async () => {
   const storeSnap = {
-    overrides: { openProgramSettings: null },
+    overrides: { openAppSettings: null },
     schemaVersion: 1 as const
   }
   const setMock = vi.fn()
@@ -78,7 +78,7 @@ test('Test that keybinds get handler returns platform and cloned store snapshot'
  */
 test('Test that keybinds set handler replaces overrides when replaceAllOverrides is true', async () => {
   const storeSnap = {
-    overrides: { openProgramSettings: null },
+    overrides: { openAppSettings: null },
     schemaVersion: 1 as const
   }
   const setMock = vi.fn()
@@ -147,7 +147,7 @@ test('Test that keybinds set handler merges overrides by default', async () => {
     null,
     {
       overrides: {
-        openProgramSettings: {
+        openAppSettings: {
           code: 'Comma',
           mods: ['meta']
         }
@@ -157,7 +157,7 @@ test('Test that keybinds set handler merges overrides by default', async () => {
 
   expect(setMock).toHaveBeenCalledWith({
     overrides: {
-      openProgramSettings: {
+      openAppSettings: {
         code: 'Comma',
         mods: ['meta']
       }
@@ -173,7 +173,7 @@ test('Test that keybinds set handler merges overrides by default', async () => {
 test('Test that keybinds set handler merges when patch omits overrides', async () => {
   const storeSnap = {
     overrides: {
-      openProgramSettings: null
+      openAppSettings: null
     },
     schemaVersion: 1 as const
   }
@@ -191,7 +191,7 @@ test('Test that keybinds set handler merges when patch omits overrides', async (
 
   expect(setMock).toHaveBeenCalledWith({
     overrides: {
-      openProgramSettings: null
+      openAppSettings: null
     },
     schemaVersion: 1
   })

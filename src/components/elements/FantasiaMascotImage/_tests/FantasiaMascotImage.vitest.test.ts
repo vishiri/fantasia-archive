@@ -58,7 +58,7 @@ test('Test that FantasiaMascotImage enables random mode when fantasiaImage prop 
 
 /**
  * FantasiaMascotImage
- * The reading variant matches production usage in program settings search empty state.
+ * The reading variant matches production usage in app settings search empty state.
  */
 test('Test that FantasiaMascotImage binds reading prop to the reading list URL', () => {
   const w = mount(FantasiaMascotImage, {

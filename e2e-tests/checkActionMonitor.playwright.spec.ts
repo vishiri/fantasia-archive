@@ -10,7 +10,7 @@ import {
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import actionMonitorMessages from 'app/i18n/en-US/dialogs/L_DialogActionMonitor'
 import keybindDialogMessages from 'app/i18n/en-US/dialogs/L_dialogKeybindSettings'
-import programSettingsMessages from 'app/i18n/en-US/dialogs/L_programSettings'
+import appSettingsMessages from 'app/i18n/en-US/dialogs/L_appSettings'
 
 /**
  * Extra env settings to trigger E2E testing via Playwright
@@ -38,8 +38,8 @@ const selectorList = {
   dialogKeybindSettingsSave: 'dialogKeybindSettings-save',
   dialogKeybindSettingsTitle: 'dialogKeybindSettings-title',
   dialogKeybindSettingsUserKeybindButton: 'dialogKeybindSettings-userKeybind-button',
-  dialogProgramSettingsClose: 'dialogProgramSettings-button-close',
-  dialogProgramSettingsTitle: 'dialogProgramSettings-title',
+  dialogAppSettingsClose: 'dialogAppSettings-button-close',
+  dialogAppSettingsTitle: 'dialogAppSettings-title',
   keybindCaptureCard: 'dialogKeybindSettings-capture-card',
   keybindCaptureField: 'dialogKeybindSettings-capture-qfield',
   keybindCaptureSet: 'dialogKeybindSettings-capture-set',
@@ -52,7 +52,7 @@ const selectorList = {
  */
 const defaultChord = {
   openKeybindSettings: 'ControlOrMeta+Alt+Shift+k',
-  openProgramSettings: 'ControlOrMeta+Alt+Shift+l'
+  openAppSettings: 'ControlOrMeta+Alt+Shift+l'
 } as const
 
 /**
@@ -62,7 +62,7 @@ const expectedActionIdsNewestFirst = [
   'openActionMonitorDialog',
   'saveKeybindSettings',
   'openKeybindSettingsDialog',
-  'openProgramSettingsDialog',
+  'openAppSettingsDialog',
   'showStartupTipsNotification'
 ] as const
 
@@ -109,9 +109,9 @@ async function saveKeybindSettingsDialog (page: Page): Promise<void> {
   })
 }
 
-async function closeProgramSettingsDialog (page: Page): Promise<void> {
-  await page.locator(`[data-test-locator="${selectorList.dialogProgramSettingsClose}"]`).click()
-  const title = page.locator(`[data-test-locator="${selectorList.dialogProgramSettingsTitle}"]`)
+async function closeAppSettingsDialog (page: Page): Promise<void> {
+  await page.locator(`[data-test-locator="${selectorList.dialogAppSettingsClose}"]`).click()
+  const title = page.locator(`[data-test-locator="${selectorList.dialogAppSettingsTitle}"]`)
   await expect(title).toBeHidden({
     timeout: 15_000
   })
@@ -155,7 +155,7 @@ test.describe.serial('Action monitor end-to-end', () => {
   })
 
   /**
-   * Startup registers showStartupTipsNotification; program and keybind dialogs plus save register three more;
+   * Startup registers showStartupTipsNotification; app settings and keybind dialogs plus save register three more;
    * opening the Action monitor registers openActionMonitorDialog. The table lists five rows newest-first,
    * and row click may copy saveKeybindSettings JSON when clipboard read is available in the renderer.
    * Requires a current dist/electron/UnPackaged bundle (yarn quasar:build:electron:summarized) when renderer
@@ -169,12 +169,12 @@ test.describe.serial('Action monitor end-to-end', () => {
       timeout: 20_000
     })
 
-    await test.step('Open program settings then close without saving', async () => {
-      await triggerGlobalShortcut(appWindow, defaultChord.openProgramSettings)
-      const programTitle = appWindow.locator(`[data-test-locator="${selectorList.dialogProgramSettingsTitle}"]`)
-      await expect(programTitle).toBeVisible()
-      await expect(programTitle).toHaveText(programSettingsMessages.title)
-      await closeProgramSettingsDialog(appWindow)
+    await test.step('Open app settings then close without saving', async () => {
+      await triggerGlobalShortcut(appWindow, defaultChord.openAppSettings)
+      const appSettingsTitle = appWindow.locator(`[data-test-locator="${selectorList.dialogAppSettingsTitle}"]`)
+      await expect(appSettingsTitle).toBeVisible()
+      await expect(appSettingsTitle).toHaveText(appSettingsMessages.title)
+      await closeAppSettingsDialog(appWindow)
     })
 
     await test.step('Open keybind settings, set Toggle developer tools to Ctrl+Shift+F12, save', async () => {

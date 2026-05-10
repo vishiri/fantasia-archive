@@ -3,7 +3,7 @@ import { Notify } from 'quasar'
 import { ResultAsync } from 'neverthrow'
 import { beforeEach, expect, test, vi } from 'vitest'
 
-import type { I_faProgramConfigApplyResult } from 'app/types/I_faProgramConfigDomain'
+import type { I_faAppConfigApplyResult } from 'app/types/I_faAppConfigDomain'
 import { FA_ACTION_IDS, type T_faActionId } from 'app/types/I_faActionManagerDomain'
 
 const faActiveProjectFixture = vi.hoisted(() => ({
@@ -28,17 +28,18 @@ const {
   refreshKeybindsMock,
   refreshSettingsMock,
   refreshRecentProjectsMock,
-  refreshProgramStylingMock,
+  refreshAppStylingMock,
+  refreshNoteboardMock,
   refreshWebContentsMock,
   resizeWindowMock,
   tipsNotificationMock,
   toggleDevToolsMock,
   updateKeybindsMock,
-  updateProgramStylingMock,
+  updateAppStylingMock,
   updateSettingsMock
 } = vi.hoisted(() => ({
   applyImportMock: vi.fn(
-    async (): Promise<I_faProgramConfigApplyResult> => ({ appliedParts: [] })
+    async (): Promise<I_faAppConfigApplyResult> => ({ appliedParts: [] })
   ),
   applyLanguageMock: vi.fn(async () => true),
   checkWindowMaximizedMock: vi.fn(),
@@ -50,7 +51,8 @@ const {
   openProjectFromKnownPathMock: vi.fn(),
   openProjectFromUserDialogMock: vi.fn(),
   refreshKeybindsMock: vi.fn(async () => undefined),
-  refreshProgramStylingMock: vi.fn(async () => undefined),
+  refreshAppStylingMock: vi.fn(async () => undefined),
+  refreshNoteboardMock: vi.fn(async () => undefined),
   refreshRecentProjectsMock: vi.fn(async () => undefined),
   refreshSettingsMock: vi.fn(async () => undefined),
   refreshWebContentsMock: vi.fn(async () => true),
@@ -58,7 +60,7 @@ const {
   tipsNotificationMock: vi.fn(),
   toggleDevToolsMock: vi.fn(),
   updateKeybindsMock: vi.fn(async () => true),
-  updateProgramStylingMock: vi.fn(async () => true),
+  updateAppStylingMock: vi.fn(async () => true),
   updateSettingsMock: vi.fn(async () => undefined)
 }))
 
@@ -104,10 +106,16 @@ vi.mock('app/src/stores/S_FaKeybinds', () => ({
   })
 }))
 
-vi.mock('app/src/stores/S_FaProgramStyling', () => ({
-  S_FaProgramStyling: () => ({
-    refreshProgramStyling: refreshProgramStylingMock,
-    updateProgramStyling: updateProgramStylingMock
+vi.mock('app/src/stores/S_FaAppStyling', () => ({
+  S_FaAppStyling: () => ({
+    refreshAppStyling: refreshAppStylingMock,
+    updateAppStyling: updateAppStylingMock
+  })
+}))
+
+vi.mock('app/src/stores/S_FaAppNoteboard', () => ({
+  S_FaAppNoteboard: () => ({
+    refreshNoteboard: refreshNoteboardMock
   })
 }))
 
@@ -154,17 +162,19 @@ beforeEach(() => {
   tipsNotificationMock.mockReset()
   toggleDevToolsMock.mockReset()
   applyImportMock.mockReset()
-  applyImportMock.mockImplementation(async () => ({ appliedParts: ['programSettings' as const] }))
+  applyImportMock.mockImplementation(async () => ({ appliedParts: ['appSettings' as const] }))
   updateKeybindsMock.mockReset()
   updateKeybindsMock.mockImplementation(async () => true)
-  updateProgramStylingMock.mockReset()
-  updateProgramStylingMock.mockImplementation(async () => true)
+  updateAppStylingMock.mockReset()
+  updateAppStylingMock.mockImplementation(async () => true)
   updateSettingsMock.mockReset()
   updateSettingsMock.mockImplementation(async () => undefined)
   refreshKeybindsMock.mockReset()
   refreshKeybindsMock.mockImplementation(async () => undefined)
-  refreshProgramStylingMock.mockReset()
-  refreshProgramStylingMock.mockImplementation(async () => undefined)
+  refreshAppStylingMock.mockReset()
+  refreshAppStylingMock.mockImplementation(async () => undefined)
+  refreshNoteboardMock.mockReset()
+  refreshNoteboardMock.mockImplementation(async () => undefined)
   refreshSettingsMock.mockReset()
   refreshSettingsMock.mockImplementation(async () => undefined)
   createProjectFromUserInputMock.mockReset()
@@ -177,7 +187,7 @@ beforeEach(() => {
   refreshRecentProjectsMock.mockImplementation(async () => undefined)
   Object.assign(window, {
     faContentBridgeAPIs: {
-      faProgramConfig: {
+      faAppConfig: {
         applyImport: applyImportMock
       },
       faWindowControl: {
@@ -249,32 +259,41 @@ test('Test that openKeybindSettingsDialog handler opens the KeybindSettings dial
   expect(openDialogComponentMock).toHaveBeenCalledWith('KeybindSettings')
 })
 
-test('Test that openProgramSettingsDialog handler opens the ProgramSettings dialog', () => {
-  definitionFor('openProgramSettingsDialog').handler(undefined)
-  expect(openDialogComponentMock).toHaveBeenCalledWith('ProgramSettings')
+test('Test that openAppSettingsDialog handler opens the AppSettings dialog', () => {
+  definitionFor('openAppSettingsDialog').handler(undefined)
+  expect(openDialogComponentMock).toHaveBeenCalledWith('AppSettings')
 })
 
-test('Test that openProgramStylingWindow handler opens the WindowProgramStyling surface', () => {
-  definitionFor('openProgramStylingWindow').handler(undefined)
-  expect(openDialogComponentMock).toHaveBeenCalledWith('WindowProgramStyling')
-})
-
-/**
- * Handlers — saveProgramStyling forwards the css patch and resolves on success.
- */
-test('Test that saveProgramStyling handler forwards css to updateProgramStyling on success', async () => {
-  await (definitionFor('saveProgramStyling').handler({ css: '.theme { color: black; }' }) as Promise<unknown>)
-  expect(updateProgramStylingMock).toHaveBeenCalledWith({ css: '.theme { color: black; }' })
+test('Test that openAppStylingWindow handler opens the WindowAppStyling surface', () => {
+  definitionFor('openAppStylingWindow').handler(undefined)
+  expect(openDialogComponentMock).toHaveBeenCalledWith('WindowAppStyling')
 })
 
 /**
- * Handlers — saveProgramStyling throws when the store reports a non-truthy result so the action manager surfaces it.
+ * Handlers — saveAppStyling forwards the css patch and resolves on success.
  */
-test('Test that saveProgramStyling handler throws when updateProgramStyling returns false', async () => {
-  updateProgramStylingMock.mockResolvedValueOnce(false)
+test('Test that saveAppStyling handler forwards css to updateAppStyling on success', async () => {
+  await (definitionFor('saveAppStyling').handler({ css: '.theme { color: black; }' }) as Promise<unknown>)
+  expect(updateAppStylingMock).toHaveBeenCalledWith({ css: '.theme { color: black; }' })
+})
+
+/**
+ * Handlers — saveAppStyling throws when the store reports a non-truthy result so the action manager surfaces it.
+ */
+test('Test that saveAppStyling handler throws when updateAppStyling returns false', async () => {
+  updateAppStylingMock.mockResolvedValueOnce(false)
   await expect(
-    (definitionFor('saveProgramStyling').handler({ css: 'broken' }) as Promise<unknown>)
-  ).rejects.toThrow(/Failed to save program styling/)
+    (definitionFor('saveAppStyling').handler({ css: 'broken' }) as Promise<unknown>)
+  ).rejects.toThrow(/Failed to save app styling/)
+})
+
+/**
+ * Handlers — reportAppStylingPersistFailure throws so the action manager surfaces one failure toast.
+ */
+test('Test that reportAppStylingPersistFailure handler throws the payload message', async () => {
+  await expect(
+    (definitionFor('reportAppStylingPersistFailure').handler({ message: 'persist failed' }) as Promise<unknown>)
+  ).rejects.toThrow('persist failed')
 })
 
 test('Test that openAdvancedSearchGuideDialog handler opens the advancedSearchGuide markdown document', () => {
@@ -307,9 +326,9 @@ test('Test that openActionMonitorDialog handler opens the ActionMonitor dialog',
   expect(openDialogComponentMock).toHaveBeenCalledWith('ActionMonitor')
 })
 
-test('Test that openImportExportProgramConfigDialog handler opens the ImportExportProgramConfig dialog', () => {
-  definitionFor('openImportExportProgramConfigDialog').handler(undefined)
-  expect(openDialogComponentMock).toHaveBeenCalledWith('ImportExportProgramConfig')
+test('Test that openImportExportAppConfigDialog handler opens the ImportExportAppConfig dialog', () => {
+  definitionFor('openImportExportAppConfigDialog').handler(undefined)
+  expect(openDialogComponentMock).toHaveBeenCalledWith('ImportExportAppConfig')
 })
 
 test('Test that openNewProjectDialog handler opens the NewProject dialog', () => {
@@ -388,39 +407,43 @@ test('Test that loadExistingProject handler throws FaActionUserCanceledError whe
   expect(refreshRecentProjectsMock).toHaveBeenCalled()
 })
 
-test('Test that importProgramConfigApply handler calls applyImport and refreshes stores', async () => {
-  await (definitionFor('importProgramConfigApply').handler({
+test('Test that importAppConfigApply handler calls applyImport and refreshes stores', async () => {
+  await (definitionFor('importAppConfigApply').handler({
     applyKeybinds: true,
-    applyProgramSettings: true,
-    applyProgramStyling: false,
+    applyAppNoteboard: false,
+    applyAppSettings: true,
+    applyAppStyling: false,
     sessionId: 'sid-1'
   }) as Promise<unknown>)
   expect(applyImportMock).toHaveBeenCalledWith({
     applyKeybinds: true,
-    applyProgramSettings: true,
-    applyProgramStyling: false,
+    applyAppNoteboard: false,
+    applyAppSettings: true,
+    applyAppStyling: false,
     sessionId: 'sid-1'
   })
   expect(refreshSettingsMock).toHaveBeenCalledOnce()
   expect(refreshKeybindsMock).toHaveBeenCalledOnce()
-  expect(refreshProgramStylingMock).toHaveBeenCalledOnce()
+  expect(refreshAppStylingMock).toHaveBeenCalledOnce()
+  expect(refreshNoteboardMock).toHaveBeenCalledOnce()
 })
 
-test('Test that importProgramConfigApply throws when the program config bridge is missing', async () => {
+test('Test that importAppConfigApply throws when the app config bridge is missing', async () => {
   const prev = window.faContentBridgeAPIs
   const body = await ResultAsync.fromPromise(
     (async (): Promise<void> => {
       Object.assign(window, {
         faContentBridgeAPIs: {
           ...window.faContentBridgeAPIs,
-          faProgramConfig: undefined
+          faAppConfig: undefined
         }
       })
       await expect(
-        (definitionFor('importProgramConfigApply').handler({
+        (definitionFor('importAppConfigApply').handler({
           applyKeybinds: true,
-          applyProgramSettings: true,
-          applyProgramStyling: true,
+          applyAppNoteboard: true,
+          applyAppSettings: true,
+          applyAppStyling: true,
           sessionId: 's'
         }) as Promise<unknown>)
       ).rejects.toThrow(/only available in the desktop app/)
@@ -433,51 +456,52 @@ test('Test that importProgramConfigApply throws when the program config bridge i
   }
 })
 
-test('Test that exportProgramConfigSaveResult throws on error status and resolves otherwise', async () => {
+test('Test that exportAppConfigSaveResult throws on error status and resolves otherwise', async () => {
   await expect(
-    (definitionFor('exportProgramConfigSaveResult').handler({
+    (definitionFor('exportAppConfigSaveResult').handler({
       status: 'error',
       errorMessage: 'e1'
     }) as Promise<unknown>)
   ).rejects.toThrow('e1')
   await expect(
-    (definitionFor('exportProgramConfigSaveResult').handler({
+    (definitionFor('exportAppConfigSaveResult').handler({
       errorName: 'Ename',
       status: 'error'
     }) as Promise<unknown>)
   ).rejects.toThrow('Ename')
   await expect(
-    (definitionFor('exportProgramConfigSaveResult').handler({ status: 'error' }) as Promise<unknown>)
+    (definitionFor('exportAppConfigSaveResult').handler({ status: 'error' }) as Promise<unknown>)
   ).rejects.toThrow('Export to file failed')
   await expect(
-    (definitionFor('exportProgramConfigSaveResult').handler({ status: 'saved' }) as Promise<unknown>)
+    (definitionFor('exportAppConfigSaveResult').handler({ status: 'saved' }) as Promise<unknown>)
   ).resolves.toBeUndefined()
   await expect(
-    (definitionFor('exportProgramConfigSaveResult').handler({ status: 'canceled' }) as Promise<unknown>)
+    (definitionFor('exportAppConfigSaveResult').handler({ status: 'canceled' }) as Promise<unknown>)
   ).resolves.toBeUndefined()
 })
 
-test('Test that importProgramConfigStageResult throws on fail and resolves on pass', async () => {
+test('Test that importAppConfigStageResult throws on fail and resolves on pass', async () => {
   await expect(
-    (definitionFor('importProgramConfigStageResult').handler({
+    (definitionFor('importAppConfigStageResult').handler({
       status: 'fail',
       errorMessage: 'bad'
     }) as Promise<unknown>)
   ).rejects.toThrow('bad')
   await expect(
-    (definitionFor('importProgramConfigStageResult').handler({ status: 'fail' }) as Promise<unknown>)
+    (definitionFor('importAppConfigStageResult').handler({ status: 'fail' }) as Promise<unknown>)
   ).rejects.toThrow('Import validation failed')
   await expect(
-    (definitionFor('importProgramConfigStageResult').handler({ status: 'pass' }) as Promise<unknown>)
+    (definitionFor('importAppConfigStageResult').handler({ status: 'pass' }) as Promise<unknown>)
   ).resolves.toBeUndefined()
 })
 
-test('Test that exportProgramConfigPackage handler is a no-op but defined', async () => {
+test('Test that exportAppConfigPackage handler is a no-op but defined', async () => {
   await expect(
-    (definitionFor('exportProgramConfigPackage').handler({
+    (definitionFor('exportAppConfigPackage').handler({
       includeKeybinds: true,
-      includeProgramSettings: false,
-      includeProgramStyling: true
+      includeAppNoteboard: false,
+      includeAppSettings: false,
+      includeAppStyling: true
     }) as Promise<unknown>)
   ).resolves.toBeUndefined()
 })
@@ -508,10 +532,10 @@ test('Test that saveKeybindSettings handler resolves when updateKeybinds succeed
 })
 
 /**
- * Handlers — saveProgramSettings forwards the payload to updateSettings.
+ * Handlers — saveAppSettings forwards the payload to updateSettings.
  */
-test('Test that saveProgramSettings handler forwards settings to updateSettings', async () => {
-  await (definitionFor('saveProgramSettings').handler({ settings: { foo: 'bar' } }) as Promise<unknown>)
+test('Test that saveAppSettings handler forwards settings to updateSettings', async () => {
+  await (definitionFor('saveAppSettings').handler({ settings: { foo: 'bar' } }) as Promise<unknown>)
   expect(updateSettingsMock).toHaveBeenCalledWith({ foo: 'bar' })
 })
 

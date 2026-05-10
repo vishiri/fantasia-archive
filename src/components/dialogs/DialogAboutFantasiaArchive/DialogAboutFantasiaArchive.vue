@@ -10,9 +10,12 @@
     >
       <!-- Dialog contents wrapper -->
       <q-card-section :class="['dialogComponent__content', `${documentName}`, 'q-mt-xl', 'q-mb-lg', 'q-mr-lg', 'q-ml-xl', 'q-pt-none', 'hasScrollbar']">
-        <h4 id="dialogAboutFantasiaArchive-title">
+        <h5
+          id="dialogAboutFantasiaArchive-title"
+          class="text-h5"
+        >
           {{ $t('dialogs.aboutFantasiaArchive.title') }}
-        </h4>
+        </h5>
 
         <div>
           {{ $t('dialogs.aboutFantasiaArchive.versionTitle') }} <span class="text-bold text-primary-bright">{{ appVersion }}</span>

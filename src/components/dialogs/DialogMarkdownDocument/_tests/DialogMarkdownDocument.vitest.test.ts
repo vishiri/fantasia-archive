@@ -96,7 +96,7 @@ test('Test that directInput open blocks openDialogComponent while markdown is vi
   await flushPromises()
   expect(S_DialogMarkdown().markdownDialogOpenCount).toBe(1)
 
-  openDialogComponent('ProgramSettings')
+  openDialogComponent('AppSettings')
   expect(genSpy).not.toHaveBeenCalled()
 
   genSpy.mockRestore()

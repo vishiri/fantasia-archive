@@ -247,7 +247,7 @@ test('Test that GlobalLanguageSelector handles trigger click and language select
 })
 
 /**
- * When language changes without the menu (e.g. program-config import + refreshSettings), the spellcheck
+ * When language changes without the menu (e.g. app-config import + refreshSettings), the spellcheck
  * reload control should show the same as after a normal language switch.
  */
 test('Test that GlobalLanguageSelector shows spellcheck refresh when languageCode changes externally', async () => {

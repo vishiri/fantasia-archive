@@ -18,13 +18,13 @@ test('parseFaKeybindsPatch accepts empty object', () => {
 test('parseFaKeybindsPatch accepts partial overrides', () => {
   const parsed = parseFaKeybindsPatch({
     overrides: {
-      openProgramSettings: {
+      openAppSettings: {
         code: 'KeyA',
         mods: ['ctrl']
       }
     }
   })
-  expect(parsed.overrides?.openProgramSettings).toEqual({
+  expect(parsed.overrides?.openAppSettings).toEqual({
     code: 'KeyA',
     mods: ['ctrl']
   })
@@ -37,10 +37,10 @@ test('parseFaKeybindsPatch accepts partial overrides', () => {
 test('parseFaKeybindsPatch accepts null override entries', () => {
   const parsed = parseFaKeybindsPatch({
     overrides: {
-      openProgramSettings: null
+      openAppSettings: null
     }
   })
-  expect(parsed.overrides?.openProgramSettings).toBeNull()
+  expect(parsed.overrides?.openAppSettings).toBeNull()
 })
 
 /**

@@ -24,9 +24,9 @@ vi.mock('app/src/scripts/keybinds/faKeybindCommandDefinitions', async (importOri
   const defs = actual.FA_KEYBIND_COMMAND_DEFINITIONS.map((d) => {
     return { ...d }
   })
-  const program = defs.find((d) => d.id === 'openProgramSettings')
-  if (program !== undefined) {
-    program.firesInEditableFields = false
+  const openAppSettingsDef = defs.find((d) => d.id === 'openAppSettings')
+  if (openAppSettingsDef !== undefined) {
+    openAppSettingsDef.firesInEditableFields = false
   }
   return {
     ...actual,
@@ -126,7 +126,7 @@ test('faKeybindExpandDefaultChord maps primary per platform and returns null for
 
 test('faKeybindResolveEffectiveChord uses override, null revert, or default', () => {
   const base = {
-    commandId: 'openProgramSettings' as const,
+    commandId: 'openAppSettings' as const,
     defaultChord: {
       code: 'Comma',
       mods: ['primary' as const]
@@ -139,11 +139,11 @@ test('faKeybindResolveEffectiveChord uses override, null revert, or default', ()
   }
   expect(faKeybindResolveEffectiveChord({
     ...base,
-    overrides: { openProgramSettings: custom }
+    overrides: { openAppSettings: custom }
   })).toEqual(custom)
   expect(faKeybindResolveEffectiveChord({
     ...base,
-    overrides: { openProgramSettings: null }
+    overrides: { openAppSettings: null }
   })?.code).toBe('Comma')
   expect(faKeybindResolveEffectiveChord({
     ...base,
@@ -196,7 +196,7 @@ test('faKeybindFindChordConflict returns a different command sharing the chord',
     chord: shared,
     excludeCommandId: 'toggleDeveloperTools',
     overrides: {
-      openProgramSettings: shared,
+      openAppSettings: shared,
       toggleDeveloperTools: {
         code: 'KeyI',
         mods: [
@@ -208,7 +208,7 @@ test('faKeybindFindChordConflict returns a different command sharing the chord',
     },
     platform: 'win32'
   })
-  expect(conflict).toBe('openProgramSettings')
+  expect(conflict).toBe('openAppSettings')
 })
 
 test('faKeybindFindChordConflict returns null when no command owns the chord', () => {
@@ -217,7 +217,7 @@ test('faKeybindFindChordConflict returns null when no command owns the chord', (
       code: 'KeyZ',
       mods: ['ctrl']
     },
-    excludeCommandId: 'openProgramSettings',
+    excludeCommandId: 'openAppSettings',
     overrides: {},
     platform: 'win32'
   })
@@ -243,13 +243,13 @@ test('faKeybindFindChordConflict uses effective chords so a superseded default n
     overrides: {},
     platform: 'win32'
   })
-  expect(blocked).toBe('openProgramSettings')
+  expect(blocked).toBe('openAppSettings')
 
   const freed = faKeybindFindChordConflict({
     chord: ctrlAltShiftL,
     excludeCommandId: 'openKeybindSettings',
     overrides: {
-      openProgramSettings: ctrlX
+      openAppSettings: ctrlX
     },
     platform: 'win32'
   })
@@ -470,7 +470,7 @@ test('createFaKeybindKeydownHandler skips repeat, composing, suspend, and editab
   expect(runCommandMock).not.toHaveBeenCalled()
 
   handler(asKeyEvent(document.body))
-  expect(runCommandMock).toHaveBeenCalledWith('openProgramSettings')
+  expect(runCommandMock).toHaveBeenCalledWith('openAppSettings')
   expect(preventDefault).toHaveBeenCalled()
   expect(stopPropagation).toHaveBeenCalled()
 })
@@ -490,7 +490,7 @@ test('createFaKeybindKeydownHandler does nothing when normalized chord is null',
 })
 
 test('findFaKeybindCommandDefinition returns undefined for unknown ids', () => {
-  expect(findFaKeybindCommandDefinition('openProgramSettings')).toBeDefined()
+  expect(findFaKeybindCommandDefinition('openAppSettings')).toBeDefined()
   // @ts-expect-error — deliberate unknown id for runtime guard coverage
   expect(findFaKeybindCommandDefinition('notARealCommand')).toBeUndefined()
 })
@@ -499,9 +499,10 @@ test('FA_KEYBIND_COMMAND_DEFINITIONS lists expected commands', () => {
   expect(FA_KEYBIND_COMMAND_DEFINITIONS.map((d) => d.id).sort()).toEqual([
     'openActionMonitor',
     'openAdvancedSearchGuide',
+    'openAppSettings',
+    'openAppStyling',
     'openKeybindSettings',
-    'openProgramSettings',
-    'openProgramStyling',
+    'toggleAppNoteboard',
     'toggleDeveloperTools'
   ])
 })

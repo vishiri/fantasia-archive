@@ -1,7 +1,7 @@
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import type {
-  I_faProgramConfigApplyInput
-} from 'app/types/I_faProgramConfigDomain'
+  I_faAppConfigApplyInput
+} from 'app/types/I_faAppConfigDomain'
 import type { I_faUserSettings, T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 
 /**
@@ -9,13 +9,14 @@ import type { I_faUserSettings, T_faUserSettingsLanguageCode } from 'app/types/I
  * Order is irrelevant; uniqueness is required.
  */
 export const FA_ACTION_IDS = [
+  'toggleAppNoteboardWindow',
   'toggleDeveloperTools',
   'openKeybindSettingsDialog',
   'saveKeybindSettings',
-  'openProgramSettingsDialog',
-  'saveProgramSettings',
-  'openProgramStylingWindow',
-  'saveProgramStyling',
+  'openAppSettingsDialog',
+  'saveAppSettings',
+  'openAppStylingWindow',
+  'saveAppStyling',
   'openAdvancedSearchGuideDialog',
   'openChangelogDialog',
   'openLicenseDialog',
@@ -26,13 +27,15 @@ export const FA_ACTION_IDS = [
   'resizeApp',
   'languageSwitch',
   'refreshWebContentsAfterLanguage',
+  'reportAppNoteboardSaveFailure',
+  'reportAppStylingPersistFailure',
   'openActionMonitorDialog',
   'showStartupTipsNotification',
-  'openImportExportProgramConfigDialog',
-  'exportProgramConfigPackage',
-  'exportProgramConfigSaveResult',
-  'importProgramConfigStageResult',
-  'importProgramConfigApply',
+  'openImportExportAppConfigDialog',
+  'exportAppConfigPackage',
+  'exportAppConfigSaveResult',
+  'importAppConfigStageResult',
+  'importAppConfigApply',
   'createNewProject',
   'openNewProjectDialog',
   'loadExistingProject'
@@ -63,12 +66,13 @@ export interface I_faLoadExistingProjectPayload {
  */
 export interface I_faActionPayloadMap {
   toggleDeveloperTools: void
+  toggleAppNoteboardWindow: void
   openKeybindSettingsDialog: void
   saveKeybindSettings: { overrides: I_faKeybindsRoot['overrides'] }
-  openProgramSettingsDialog: void
-  saveProgramSettings: { settings: I_faUserSettings }
-  openProgramStylingWindow: void
-  saveProgramStyling: { css: string }
+  openAppSettingsDialog: void
+  saveAppSettings: { settings: I_faUserSettings }
+  openAppStylingWindow: void
+  saveAppStyling: { css: string }
   openAdvancedSearchGuideDialog: void
   openChangelogDialog: void
   openLicenseDialog: void
@@ -79,30 +83,33 @@ export interface I_faActionPayloadMap {
   resizeApp: void
   languageSwitch: { code: T_faUserSettingsLanguageCode, priorCode: T_faUserSettingsLanguageCode }
   refreshWebContentsAfterLanguage: void
+  reportAppNoteboardSaveFailure: { message: string }
+  reportAppStylingPersistFailure: { message: string }
   openActionMonitorDialog: void
   showStartupTipsNotification: void
-  openImportExportProgramConfigDialog: void
+  openImportExportAppConfigDialog: void
   openNewProjectDialog: void
   loadExistingProject: I_faLoadExistingProjectPayload
   createNewProject: { projectName: string }
-  exportProgramConfigPackage: {
+  exportAppConfigPackage: {
     includeKeybinds: boolean
-    includeProgramSettings: boolean
-    includeProgramStyling: boolean
+    includeAppNoteboard: boolean
+    includeAppSettings: boolean
+    includeAppStyling: boolean
   }
-  exportProgramConfigSaveResult: {
+  exportAppConfigSaveResult: {
     errorMessage?: string
     errorName?: string
     filePath?: string
     status: 'canceled' | 'error' | 'saved'
   }
-  importProgramConfigStageResult: {
+  importAppConfigStageResult: {
     errorCode?: string
     errorMessage?: string
     sessionId?: string
     status: 'canceled' | 'fail' | 'pass'
   }
-  importProgramConfigApply: I_faProgramConfigApplyInput
+  importAppConfigApply: I_faAppConfigApplyInput
 }
 
 /**

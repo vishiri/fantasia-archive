@@ -54,7 +54,8 @@ import {
 import { isFantasiaStorybookCanvas } from 'app/src/scripts/appInternals/rendererAppInternals'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
-import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
+import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
+import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 
@@ -106,8 +107,12 @@ onMounted(async () => {
     window.addEventListener('keydown', faKeybindKeydownHandler, true)
   }
 
-  if (window.faContentBridgeAPIs?.faProgramStyling !== undefined) {
-    await S_FaProgramStyling().refreshProgramStyling()
+  if (window.faContentBridgeAPIs?.faAppStyling !== undefined) {
+    await S_FaAppStyling().refreshAppStyling()
+  }
+
+  if (window.faContentBridgeAPIs?.faAppNoteboard !== undefined) {
+    await S_FaAppNoteboard().refreshNoteboard()
   }
 })
 

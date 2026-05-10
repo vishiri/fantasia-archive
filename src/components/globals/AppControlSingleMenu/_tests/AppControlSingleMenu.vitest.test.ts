@@ -186,9 +186,9 @@ test('Test that AppControlSingleMenu shows keybind hint from S_FaKeybinds snapsh
           {
             conditions: true,
             icon: 'mdi-tune',
-            keybindCommandId: 'openProgramSettings',
+            keybindCommandId: 'openAppSettings',
             mode: 'item',
-            text: 'Program settings',
+            text: 'App settings',
             trigger: vi.fn()
           }
         ]
@@ -203,7 +203,7 @@ test('Test that AppControlSingleMenu shows keybind hint from S_FaKeybinds snapsh
   const hint = document.body.querySelector('[data-test-locator="AppControlSingleMenu-menuItem-keybind"]')
   expect(hint).not.toBeNull()
   const expectedLabel = formatFaKeybindCommandLabelFromSnapshot({
-    commandId: 'openProgramSettings',
+    commandId: 'openAppSettings',
     snapshot: keybinds.snapshot
   })
   expect(hint?.textContent?.trim()).toBe(`(${expectedLabel})`)

@@ -1,0 +1,7 @@
+@use '../../../../css/app.palette.scss' as *;
+@use '../../WindowAppStyling/styles/_variables.scss' as floatingWindowSurface;
+
+/* COMPONENT - WINDOW APP NOTEBOARD */
+$windowAppNoteboard-editorRegion-backgroundColor: fa-v('dark-lighter', $dark-lighter);
+$windowAppNoteboard-title-margin: floatingWindowSurface.$floatingWindowComponent-title-margin;
+$windowAppNoteboard-titleRow-minHeight: floatingWindowSurface.$floatingWindowComponent-titleRow-minHeight;

@@ -16,16 +16,16 @@ function isFaKeybindCommandId (key: string): key is T_faKeybindCommandId {
 export const cleanupFaKeybinds = (store: ElectronStore<I_faKeybindsRoot>): void => {
   const raw = (store.store ?? {}) as Partial<I_faKeybindsRoot> & Record<string, unknown>
   const rawOverrides = raw.overrides
-  const fromDisk = typeof rawOverrides === 'object' && rawOverrides !== null && !Array.isArray(rawOverrides)
+  const fromDiskRaw = typeof rawOverrides === 'object' && rawOverrides !== null && !Array.isArray(rawOverrides)
     ? rawOverrides as Record<string, unknown>
     : {}
 
   const overrides: I_faKeybindsRoot['overrides'] = {}
   for (const id of FA_KEYBIND_COMMAND_IDS) {
-    if (!Object.prototype.hasOwnProperty.call(fromDisk, id)) {
+    if (!Object.prototype.hasOwnProperty.call(fromDiskRaw, id)) {
       continue
     }
-    const v = fromDisk[id]
+    const v = fromDiskRaw[id]
     if (v === null) {
       overrides[id] = null
     } else if (v !== undefined && typeof v === 'object' && !Array.isArray(v)) {
@@ -39,7 +39,9 @@ export const cleanupFaKeybinds = (store: ElectronStore<I_faKeybindsRoot>): void 
   }
 
   const unexpectedTop = Object.keys(raw).some((k) => k !== 'schemaVersion' && k !== 'overrides')
-  const unexpectedOverrideKeys = Object.keys(fromDisk).some((k) => !isFaKeybindCommandId(k))
+  const unexpectedOverrideKeys = Object.keys(fromDiskRaw).some((k) => {
+    return !isFaKeybindCommandId(k)
+  })
 
   if (unexpectedTop || unexpectedOverrideKeys || raw.schemaVersion !== 1) {
     store.store = next

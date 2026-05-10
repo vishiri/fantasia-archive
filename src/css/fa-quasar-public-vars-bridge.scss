@@ -1,5 +1,5 @@
 /* Re-binds Quasar :root public variables (quasar/src/css/core/colors.sass) to --fa-color-*.
- * Without this bridge, Custom program CSS could change --fa-color-dark on :root while .q-dark still used the
+ * Without this bridge, Custom app CSS could change --fa-color-dark on :root while .q-dark still used the
  * framework’s static --q-dark. This file is @use’d last from app.scss so it wins in the cascade. */
 :root {
   --q-accent: var(--fa-color-accent);

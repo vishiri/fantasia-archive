@@ -1,5 +1,6 @@
 import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
-import { FA_PROGRAM_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/programStyling/faProgramStylingStoreDefaults'
+import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appNoteboard/faAppNoteboardStoreDefaults'
+import { FA_APP_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appStyling/faAppStylingStoreDefaults'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 
 import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
@@ -70,11 +71,15 @@ const baseBridge = () => ({
     }),
     setKeybinds: async () => undefined
   },
-  faProgramStyling: {
-    getProgramStyling: async () => ({ ...FA_PROGRAM_STYLING_STORE_DEFAULTS }),
-    setProgramStyling: async () => undefined
+  faAppStyling: {
+    getAppStyling: async () => ({ ...FA_APP_STYLING_STORE_DEFAULTS }),
+    setAppStyling: async () => undefined
   },
-  faProgramConfig: {
+  faAppNoteboard: {
+    getNoteboard: async () => ({ ...FA_APP_NOTEBOARD_STORE_DEFAULTS }),
+    setNoteboard: async () => undefined
+  },
+  faAppConfig: {
     applyImport: async () => ({ appliedParts: [] }),
     disposeImportSession: async () => undefined,
     exportToFile: async () => ({ outcome: 'canceled' }),
@@ -82,8 +87,9 @@ const baseBridge = () => ({
       outcome: 'ready',
       parts: {
         keybinds: 'ok',
-        programSettings: 'ok',
-        programStyling: 'ok'
+        appNoteboard: 'ok',
+        appSettings: 'ok',
+        appStyling: 'ok'
       },
       sessionId: 'storybook-import-session'
     })
@@ -146,13 +152,17 @@ export const setContentBridgeScenario = (
       ...nextBridge.faKeybinds,
       ...(overrides.faKeybinds ?? {})
     },
-    faProgramStyling: {
-      ...nextBridge.faProgramStyling,
-      ...(overrides.faProgramStyling ?? {})
+    faAppStyling: {
+      ...nextBridge.faAppStyling,
+      ...(overrides.faAppStyling ?? {})
     },
-    faProgramConfig: {
-      ...nextBridge.faProgramConfig,
-      ...(overrides.faProgramConfig ?? {})
+    faAppNoteboard: {
+      ...nextBridge.faAppNoteboard,
+      ...(overrides.faAppNoteboard ?? {})
+    },
+    faAppConfig: {
+      ...nextBridge.faAppConfig,
+      ...(overrides.faAppConfig ?? {})
     },
     projectManagement: {
       ...nextBridge.projectManagement,

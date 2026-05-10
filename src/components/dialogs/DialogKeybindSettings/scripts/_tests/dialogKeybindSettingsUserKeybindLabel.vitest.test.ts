@@ -6,7 +6,7 @@ import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
 import { formatDialogKeybindSettingsUserKeybindButtonLabel } from '../dialogKeybindSettingsUserKeybindLabel'
 
 const baseRow: Omit<I_dialogKeybindSettingsRow, 'userShowsAddNewCombo' | 'userChord'> = {
-  commandId: 'openProgramSettings',
+  commandId: 'openAppSettings',
   defaultLabel: 'd',
   editable: true,
   nameLabel: 'n',

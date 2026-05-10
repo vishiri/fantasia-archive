@@ -12,15 +12,18 @@ export default {
     openChangelogDialog: 'Open Changelog',
     openKeybindSettingsDialog: 'Open Keybind settings',
     openLicenseDialog: 'Open License',
-    openProgramSettingsDialog: 'Open Program settings',
-    openProgramStylingWindow: 'Open Custom program CSS',
+    openAppSettingsDialog: 'Open App settings',
+    openAppStylingWindow: 'Open Custom app CSS',
     openTipsTricksTriviaDialog: 'Open Tips, Tricks & Trivia',
     refreshWebContentsAfterLanguage: 'Refresh window contents',
+    reportAppNoteboardSaveFailure: 'Report app note board save failure',
+    reportAppStylingPersistFailure: 'Report custom app CSS window persist failure',
     resizeApp: 'Resize window',
     saveKeybindSettings: 'Save keybind settings',
-    saveProgramSettings: 'Save program settings',
-    saveProgramStyling: 'Save custom program CSS',
+    saveAppSettings: 'Save app settings',
+    saveAppStyling: 'Save custom app CSS',
     showStartupTipsNotification: 'Show startup tip notification',
-    toggleDeveloperTools: 'Toggle developer tools'
+    toggleDeveloperTools: 'Toggle developer tools',
+    toggleAppNoteboardWindow: 'Toggle App note board window'
   }
 }

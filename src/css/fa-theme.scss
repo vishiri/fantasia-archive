@@ -1,7 +1,7 @@
 @use 'sass:color';
 @use './app.palette.scss' as *;
 
-/* Default theme token values. Custom program CSS may override any --fa-color-* on :root or body. */
+/* Default theme token values. Custom app CSS may override any --fa-color-* on :root or body. */
 
 :root {
   --fa-color-accent: #{$accent};

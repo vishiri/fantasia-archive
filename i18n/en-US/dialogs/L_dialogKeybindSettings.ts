@@ -23,9 +23,10 @@ export default {
     openActionMonitor: 'Open Action Monitor',
     openAdvancedSearchGuide: 'Open Advanced search guide',
     openKeybindSettings: 'Open keybind settings',
-    openProgramSettings: 'Open program settings',
-    openProgramStyling: 'Open Custom program CSS',
-    toggleDeveloperTools: 'Toggle developer tools'
+    openAppSettings: 'Open app settings',
+    openAppStyling: 'Open Custom app CSS',
+    toggleDeveloperTools: 'Toggle developer tools',
+    toggleAppNoteboard: 'Toggle App note board'
   },
   filterNoResultsDescription:
     'Fantasia sadly didn\'t find any keybinds you were looking for. Perhaps try looking for a different one?',

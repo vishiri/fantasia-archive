@@ -21,7 +21,7 @@ export function getFaColorCustomPropertyNamesForHelpPanel (): readonly string[] 
 
 /**
  * Extracts **`--fa-color-*`** names declared under `:root` in `fa-theme.scss`. Values are not
- * included. Used as a fallback for the Custom program CSS help list when a DOM walk finds no
+ * included. Used as a fallback for the Custom app CSS help list when a DOM walk finds no
  * matching rules yet.
  */
 export function parseFaColorCustomPropertyNamesFromThemeScss (source: string): string[] {

@@ -2,10 +2,10 @@ export default {
   title: 'Tools & Settings',
   items: {
     toggleTree: 'Toggle hierarchical tree',
-    showNoteBoard: 'Show note board',
-    importExportProgramConfig: 'Import / Export program configuration',
+    appNoteBoard: 'App note board',
+    importExportAppConfig: 'Import / Export app configuration',
     keybindSettings: 'Keybind settings',
-    programSettings: 'Program settings',
-    programStyling: 'Custom program CSS'
+    appSettings: 'App settings',
+    appStyling: 'Custom app CSS'
   }
 }

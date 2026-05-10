@@ -77,7 +77,7 @@ test('Test that refreshKeybinds populates snapshot from the IPC bridge', async (
     store: {
       ...FA_KEYBINDS_STORE_DEFAULTS,
       overrides: {
-        openProgramSettings: {
+        openAppSettings: {
           code: 'KeyA',
           mods: ['ctrl']
         }
@@ -140,13 +140,13 @@ test('Test that updateKeybinds returns true and refreshes after success', async 
     platform: 'win32' as const,
     store: {
       ...FA_KEYBINDS_STORE_DEFAULTS,
-      overrides: { openProgramSettings: null }
+      overrides: { openAppSettings: null }
     }
   }
   getKeybindsMock.mockResolvedValueOnce(afterSnap)
 
   const ok = await store.updateKeybinds({
-    overrides: { openProgramSettings: null },
+    overrides: { openAppSettings: null },
     replaceAllOverrides: true
   })
 

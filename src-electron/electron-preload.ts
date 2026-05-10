@@ -13,8 +13,9 @@ import { faDevToolsControlAPI } from 'app/src-electron/contentBridgeAPIs/faDevTo
 import { faExternalLinksManagerAPI } from 'app/src-electron/contentBridgeAPIs/faExternalLinksManagementAPI'
 import { appDetailsAPI } from './contentBridgeAPIs/appDetailsAPI'
 import { faKeybindsAPI } from 'app/src-electron/contentBridgeAPIs/faKeybindsAPI'
-import { faProgramStylingAPI } from 'app/src-electron/contentBridgeAPIs/faProgramStylingAPI'
-import { faProgramConfigAPI } from 'app/src-electron/contentBridgeAPIs/faProgramConfigAPI'
+import { faAppNoteboardAPI } from 'app/src-electron/contentBridgeAPIs/faAppNoteboardAPI'
+import { faAppStylingAPI } from 'app/src-electron/contentBridgeAPIs/faAppStylingAPI'
+import { faAppConfigAPI } from 'app/src-electron/contentBridgeAPIs/faAppConfigAPI'
 import { faUserSettingsAPI } from './contentBridgeAPIs/faUserSettingsAPI'
 import { projectManagementAPI } from 'app/src-electron/contentBridgeAPIs/projectManagementAPI'
 
@@ -30,9 +31,10 @@ const apiObject = {
   extraEnvVariables: { ...extraEnvVariablesAPI },
   appDetails: { ...appDetailsAPI },
   faKeybinds: { ...faKeybindsAPI },
-  faProgramStyling: { ...faProgramStylingAPI },
+  faAppNoteboard: { ...faAppNoteboardAPI },
+  faAppStyling: { ...faAppStylingAPI },
   faUserSettings: { ...faUserSettingsAPI },
-  faProgramConfig: { ...faProgramConfigAPI },
+  faAppConfig: { ...faAppConfigAPI },
   projectManagement: { ...projectManagementAPI }
 }
 

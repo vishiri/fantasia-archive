@@ -4,11 +4,12 @@
 export type T_dialogName =
   | 'AboutFantasiaArchive'
   | 'ActionMonitor'
-  | 'ImportExportProgramConfig'
+  | 'ImportExportAppConfig'
   | 'KeybindSettings'
   | 'NewProject'
-  | 'ProgramSettings'
-  | 'WindowProgramStyling'
+  | 'AppSettings'
+  | 'WindowAppNoteboard'
+  | 'WindowAppStyling'
   | ''
 
 /**

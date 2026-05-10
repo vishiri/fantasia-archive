@@ -179,7 +179,7 @@ test('Test that DialogAboutFantasiaArchive store watch skips non-about dialogToO
 
   await flushPromises()
 
-  st.dialogToOpen = 'ProgramSettings'
+  st.dialogToOpen = 'AppSettings'
   st.generateDialogUUID()
   await flushPromises()
 
@@ -198,7 +198,7 @@ test('Test that DialogAboutFantasiaArchive directInput watch skips other dialog 
 
   await flushPromises()
 
-  await w.setProps({ directInput: 'ProgramSettings' })
+  await w.setProps({ directInput: 'AppSettings' })
   await flushPromises()
 
   expect(w.find('.about-qdialog-inner').exists()).toBe(false)

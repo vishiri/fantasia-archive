@@ -9,13 +9,13 @@
     <q-card
       :class="['dialogComponent__wrapper', 'dialogActionMonitor', `${documentName}`]"
     >
-      <h4
+      <h5
         id="dialogActionMonitor-title"
-        class="text-center q-mb-sm"
+        class="text-center text-h5 q-mb-sm"
         data-test-locator="dialogActionMonitor-title"
       >
         {{ $t('dialogs.actionMonitor.title') }}
-      </h4>
+      </h5>
 
       <q-card-section
         :class="['dialogComponent__content', 'dialogActionMonitor__body', `${documentName}`, 'q-mb-lg', 'q-mr-lg', 'q-ml-xl', 'q-pt-none']"

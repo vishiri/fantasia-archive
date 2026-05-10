@@ -12,15 +12,18 @@ export default {
     openChangelogDialog: 'Ouvrir le journal des modifications',
     openKeybindSettingsDialog: 'Ouvrir les raccourcis clavier',
     openLicenseDialog: 'Ouvrir la licence',
-    openProgramSettingsDialog: 'Ouvrir les paramètres du programme',
-    openProgramStylingWindow: 'Ouvrir le CSS de programme personnalisé',
+    openAppSettingsDialog: 'Ouvrir les paramètres de l’app',
+    openAppStylingWindow: 'Ouvrir le CSS personnalisé de l’app',
     openTipsTricksTriviaDialog: 'Ouvrir Astuces, Conseils & Anecdotes',
     refreshWebContentsAfterLanguage: 'Rafraîchir le contenu de la fenêtre',
+    reportAppNoteboardSaveFailure: 'Signaler une erreur d’enregistrement du tableau de notes de l’app',
+    reportAppStylingPersistFailure: 'Signaler une erreur d’enregistrement du cadre CSS de l’app',
     resizeApp: 'Redimensionner la fenêtre',
     saveKeybindSettings: 'Enregistrer les raccourcis clavier',
-    saveProgramSettings: 'Enregistrer les paramètres du programme',
-    saveProgramStyling: 'Enregistrer le CSS de programme personnalisé',
+    saveAppSettings: 'Enregistrer les paramètres de l’app',
+    saveAppStyling: 'Enregistrer le CSS personnalisé de l’app',
     showStartupTipsNotification: 'Afficher l\'astuce au démarrage',
-    toggleDeveloperTools: 'Basculer les outils de développement'
+    toggleDeveloperTools: 'Basculer les outils de développement',
+    toggleAppNoteboardWindow: 'Basculer la fenêtre du tableau de notes de l’app'
   }
 }

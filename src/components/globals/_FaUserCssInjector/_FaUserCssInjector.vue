@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, watch } from 'vue'
 
-import { S_FaProgramStyling } from 'app/src/stores/S_FaProgramStyling'
+import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 
 defineOptions({
   name: '_FaUserCssInjector'
@@ -23,12 +23,12 @@ defineOptions({
 
 const FA_USER_CSS_STYLE_ELEMENT_ID = 'faUserCss'
 
-const programStylingStore = S_FaProgramStyling()
+const appStylingStore = S_FaAppStyling()
 let styleElement: HTMLStyleElement | null = null
 
 function effectiveUserCss (): string {
-  const live = programStylingStore.cssLivePreview
-  return live !== null ? live : programStylingStore.css
+  const live = appStylingStore.cssLivePreview
+  return live !== null ? live : appStylingStore.css
 }
 
 /**
@@ -68,7 +68,7 @@ onMounted(() => {
 })
 
 watch(
-  [() => programStylingStore.cssLivePreview, () => programStylingStore.css],
+  [() => appStylingStore.cssLivePreview, () => appStylingStore.css],
   () => {
     applyCss(effectiveUserCss())
   }

@@ -23,9 +23,10 @@ export default {
     openActionMonitor: 'Ouvrir le moniteur d’actions',
     openAdvancedSearchGuide: 'Ouvrir le guide de recherche avancée',
     openKeybindSettings: 'Ouvrir les paramètres des raccourcis',
-    openProgramSettings: 'Ouvrir les paramètres du programme',
-    openProgramStyling: 'Ouvrir le CSS personnalisé du programme',
-    toggleDeveloperTools: 'Basculer les outils de développement'
+    openAppSettings: 'Ouvrir les paramètres de l’app',
+    openAppStyling: 'Ouvrir le CSS personnalisé de l’app',
+    toggleDeveloperTools: 'Basculer les outils de développement',
+    toggleAppNoteboard: 'Basculer le tableau de notes de l’app'
   },
   filterNoResultsDescription:
     'Fantasia n\'a trouvé aucune action qui correspond à votre filtre. Essayez un autre mot ou effacez le champ.',

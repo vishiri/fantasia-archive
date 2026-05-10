@@ -10,10 +10,10 @@
 - FA has a Dark Mode that is no mere afterthought and is fully serviceable!
 - Many parts of the app react to a middle-mouse click. For example, you can close document tabs or open hierarchical tree items with it directly!
 - Fantasia Archive is free; no strings attached: No ads, no trackers, no crypto-mining happening on your PC and all your data is all yours!
-- If these tips annoy you, there is a switch to turn them off in the program settings.
+- If these tips annoy you, there is a switch to turn them off in the app settings.
 - The Relationship searching functionality is packed to the brim with extra features you can use to find what you need! Read all about it in the `Advanced search guide` in the Help menu!
 - Your project gets auto-saved on exit, but it is recommended to use the `Save` function once in a while to make sure the data stays safe.
-- The left hierarchical tree is expandable with a mouse-drag and the program remembers where you left it the next time you launch!
+- The left hierarchical tree is expandable with a mouse-drag and the app remembers where you left it the next time you launch!
 - Don't hesitate to add as many sub-categories as you want. You can always move stuff around later and reorganize your project structure.
 - Tags are a very powerful feature that allow you to add semi-categories to the project tree and create additional search parameters to aid navigation.
 - There is a roadmap of planned features on Patreon! If you are curious about what will eventually come, feel free to read it.

@@ -46,7 +46,7 @@ test('faKeybindsAPI setKeybinds invokes IPC set channel with cloned patch', asyn
   invokeMock.mockResolvedValueOnce(undefined)
   const patch = {
     overrides: {
-      openProgramSettings: {
+      openAppSettings: {
         code: 'KeyQ',
         mods: ['ctrl' as const]
       }

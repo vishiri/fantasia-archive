@@ -2,10 +2,10 @@ export default {
   title: 'Outils et paramètres',
   items: {
     toggleTree: 'Basculer l\'arborescence hiérarchique',
-    showNoteBoard: 'Afficher le tableau de notes',
-    importExportProgramConfig: 'Importer / exporter la configuration du programme',
+    appNoteBoard: 'Tableau de notes de l’app',
+    importExportAppConfig: 'Importer / exporter la configuration de l’app',
     keybindSettings: 'Paramètres des raccourcis',
-    programSettings: 'Paramètres du programme',
-    programStyling: 'CSS de programme personnalisé'
+    appSettings: 'Paramètres de l’app',
+    appStyling: 'CSS personnalisé de l’app'
   }
 }

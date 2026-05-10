@@ -1,0 +1,56 @@
+@use '../../../../css/quasar.variables.scss' as *;
+
+.importExportAppConfig {
+  .importExportAppConfig__stepper {
+    flex: 1 1 auto;
+    min-height: $dialogImportExportAppConfig-stepper-minHeight;
+
+    /* stylelint-disable selector-pseudo-class-no-unknown -- scoped :deep into Quasar QStepper */
+    :deep(.q-stepper__header) {
+      display: none;
+    }
+
+    :deep(.q-stepper__content) {
+      flex: 1 1 auto;
+      min-height: $dialogImportExportAppConfig-stepper-minHeight;
+    }
+
+    :deep(.q-panel.scroll) {
+      min-height: $dialogImportExportAppConfig-stepper-minHeight;
+    }
+    /* stylelint-enable selector-pseudo-class-no-unknown */
+  }
+
+  .dialogComponent__wrapper {
+    max-width: $dialogImportExportAppConfig-wrapper-maxWidth;
+    width: $dialogImportExportAppConfig-wrapper-width;
+  }
+
+  .importExportAppConfig__rootActionRow {
+    align-items: stretch;
+    box-sizing: border-box;
+    height: $dialogImportExportAppConfig-rootActionRow-height;
+  }
+
+  .importExportAppConfig__rootActionActions {
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+  }
+
+  .importExportAppConfig__rootActionCol {
+    display: flex;
+    flex: 1 1 0;
+    margin-left: $dialogImportExportAppConfig-rootActionCol-marginX;
+    margin-right: $dialogImportExportAppConfig-rootActionCol-marginX;
+    min-width: 0;
+  }
+
+  .importExportAppConfig__rootActionBtn {
+    font-weight: $dialogImportExportAppConfig-rootActionBtn-fontWeight;
+    letter-spacing: $dialogImportExportAppConfig-rootActionBtn-letterSpacing;
+    min-height: $dialogImportExportAppConfig-rootActionBtn-minHeight;
+    text-transform: uppercase;
+    width: 100%;
+  }
+}

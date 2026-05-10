@@ -83,7 +83,7 @@ test('Test that getFaKeybinds removes unknown override keys during startup clean
       code: 'KeyZ',
       mods: ['alt']
     },
-    openProgramSettings: null
+    openAppSettings: null
   }
   persistedStoreExtras.schemaVersion = 1
 
@@ -92,7 +92,7 @@ test('Test that getFaKeybinds removes unknown override keys during startup clean
 
   expect(storeReplacementCalls.length).toBeGreaterThanOrEqual(1)
   const last = storeReplacementCalls.at(-1)
-  expect(last?.overrides.openProgramSettings).toBeNull()
+  expect(last?.overrides.openAppSettings).toBeNull()
   expect('futureCommand' in (last?.overrides ?? {})).toBe(false)
 })
 
@@ -102,7 +102,7 @@ test('Test that getFaKeybinds removes unknown override keys during startup clean
  */
 test('Test that getFaKeybinds does not rewrite a clean persisted keybind store', async () => {
   persistedStoreExtras.overrides = {
-    openProgramSettings: null
+    openAppSettings: null
   }
   persistedStoreExtras.schemaVersion = 1
 
@@ -118,7 +118,7 @@ test('Test that getFaKeybinds does not rewrite a clean persisted keybind store',
  */
 test('Test that cleanupFaKeybinds keeps object chord overrides', async () => {
   persistedStoreExtras.overrides = {
-    openProgramSettings: {
+    openAppSettings: {
       code: 'Comma',
       mods: ['meta']
     }
@@ -141,7 +141,7 @@ test('Test that cleanupFaKeybinds drops array override values when disk also has
       code: 'KeyZ',
       mods: ['alt']
     },
-    openProgramSettings: ['not', 'a', 'chord']
+    openAppSettings: ['not', 'a', 'chord']
   }
   persistedStoreExtras.schemaVersion = 1
 
@@ -150,7 +150,7 @@ test('Test that cleanupFaKeybinds drops array override values when disk also has
 
   expect(storeReplacementCalls.length).toBeGreaterThanOrEqual(1)
   const last = storeReplacementCalls.at(-1)
-  expect(last?.overrides.openProgramSettings).toBeUndefined()
+  expect(last?.overrides.openAppSettings).toBeUndefined()
 })
 
 /**
@@ -188,4 +188,26 @@ test('Test that cleanupFaKeybinds handles null store snapshot', async () => {
   })
   cleanupFaKeybinds(fake)
   expect(written.length).toBeGreaterThan(0)
+})
+
+/**
+ * cleanupFaKeybinds
+ * Drops unknown override keys, including retired command ids no longer in the registry.
+ */
+test('Test that getFaKeybinds strips retired unknown override keys', async () => {
+  persistedStoreExtras.overrides = {
+    openObsoleteSettingsAlias: {
+      code: 'Comma',
+      mods: ['meta']
+    }
+  }
+  persistedStoreExtras.schemaVersion = 1
+
+  const { getFaKeybinds } = await import('../faKeybindsStore')
+  getFaKeybinds()
+
+  expect(storeReplacementCalls.length).toBeGreaterThanOrEqual(1)
+  const last = storeReplacementCalls.at(-1)
+  expect(last?.overrides.openAppSettings).toBeUndefined()
+  expect('openObsoleteSettingsAlias' in (last?.overrides ?? {})).toBe(false)
 })

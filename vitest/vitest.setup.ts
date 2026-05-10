@@ -4,7 +4,8 @@ import { ref } from 'vue'
 import { afterEach, beforeEach, vi } from 'vitest'
 
 import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
-import { FA_PROGRAM_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/programStyling/faProgramStylingStoreDefaults'
+import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appNoteboard/faAppNoteboardStoreDefaults'
+import { FA_APP_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appStyling/faAppStylingStoreDefaults'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 
 const originalConsoleWarn = console.warn.bind(console)
@@ -132,11 +133,15 @@ function resetFaVitestRendererHarness (): void {
       })),
       setKeybinds: vi.fn(async () => undefined)
     },
-    faProgramStyling: {
-      getProgramStyling: vi.fn(async () => ({ ...FA_PROGRAM_STYLING_STORE_DEFAULTS })),
-      setProgramStyling: vi.fn(async () => undefined)
+    faAppNoteboard: {
+      getNoteboard: vi.fn(async () => ({ ...FA_APP_NOTEBOARD_STORE_DEFAULTS })),
+      setNoteboard: vi.fn(async () => undefined)
     },
-    faProgramConfig: {
+    faAppStyling: {
+      getAppStyling: vi.fn(async () => ({ ...FA_APP_STYLING_STORE_DEFAULTS })),
+      setAppStyling: vi.fn(async () => undefined)
+    },
+    faAppConfig: {
       applyImport: vi.fn(async () => ({ appliedParts: [] })),
       disposeImportSession: vi.fn(async () => undefined),
       exportToFile: vi.fn(async () => ({ outcome: 'canceled' as const })),

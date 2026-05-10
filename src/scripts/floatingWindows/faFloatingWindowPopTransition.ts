@@ -6,7 +6,7 @@ import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatin
 export const FA_FLOATING_WINDOW_POP_TRANSITION_MS = FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS
 
 /**
- * Pop in/out (opacity + transform scale) for floating `WindowProgramStyling` without Quasar’s stock
+ * Pop in/out (opacity + transform scale) for floating `WindowAppStyling` without Quasar’s stock
  * `q-transition--scale` classes: their enter-from uses scale3d(0,0,1), which can leave the frame
  * with a degenerate transform in Electron and break Playwright’s visibility checks. The SCSS for these
  * class names uses a scale strictly between 0 and 1 (never zero).

@@ -25,9 +25,9 @@ test('faKeybindRunCommand routes toggleDeveloperTools through the action manager
   expect(runFaActionMock).toHaveBeenCalledWith('toggleDeveloperTools', undefined)
 })
 
-test('faKeybindRunCommand routes openProgramSettings to the openProgramSettingsDialog action', () => {
-  faKeybindRunCommand('openProgramSettings')
-  expect(runFaActionMock).toHaveBeenCalledWith('openProgramSettingsDialog', undefined)
+test('faKeybindRunCommand routes openAppSettings to the openAppSettingsDialog action', () => {
+  faKeybindRunCommand('openAppSettings')
+  expect(runFaActionMock).toHaveBeenCalledWith('openAppSettingsDialog', undefined)
 })
 
 test('faKeybindRunCommand routes openKeybindSettings to the openKeybindSettingsDialog action', () => {
@@ -45,7 +45,7 @@ test('faKeybindRunCommand routes openActionMonitor to the openActionMonitorDialo
   expect(runFaActionMock).toHaveBeenCalledWith('openActionMonitorDialog', undefined)
 })
 
-test('faKeybindRunCommand routes openProgramStyling to the openProgramStylingWindow action', () => {
-  faKeybindRunCommand('openProgramStyling')
-  expect(runFaActionMock).toHaveBeenCalledWith('openProgramStylingWindow', undefined)
+test('faKeybindRunCommand routes toggleAppNoteboard to the toggleAppNoteboardWindow action', () => {
+  faKeybindRunCommand('toggleAppNoteboard')
+  expect(runFaActionMock).toHaveBeenCalledWith('toggleAppNoteboardWindow', undefined)
 })

@@ -23,9 +23,10 @@ export default {
     openActionMonitor: 'Aktionsmonitor öffnen',
     openAdvancedSearchGuide: 'Leitfaden zur erweiterten Suche öffnen',
     openKeybindSettings: 'Tastenkürzel-Einstellungen öffnen',
-    openProgramSettings: 'Programmeinstellungen öffnen',
-    openProgramStyling: 'Eigenes Programm-CSS öffnen',
-    toggleDeveloperTools: 'Entwicklerwerkzeuge ein/aus'
+    openAppSettings: 'App-Einstellungen öffnen',
+    openAppStyling: 'Eigenes App-CSS öffnen',
+    toggleDeveloperTools: 'Entwicklerwerkzeuge ein/aus',
+    toggleAppNoteboard: 'App-Notiztafel ein/aus'
   },
   filterNoResultsDescription:
     'Fantasia hat keine Aktion gefunden, die zu eurem Filter passt. Probiert ein anderes Wort oder leert das Feld.',

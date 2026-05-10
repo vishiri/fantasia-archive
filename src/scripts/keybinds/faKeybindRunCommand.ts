@@ -10,9 +10,10 @@ const FA_KEYBIND_COMMAND_TO_ACTION_ID: Readonly<Record<T_faKeybindCommandId, T_f
   openActionMonitor: 'openActionMonitorDialog',
   openAdvancedSearchGuide: 'openAdvancedSearchGuideDialog',
   openKeybindSettings: 'openKeybindSettingsDialog',
-  openProgramSettings: 'openProgramSettingsDialog',
-  openProgramStyling: 'openProgramStylingWindow',
-  toggleDeveloperTools: 'toggleDeveloperTools'
+  openAppSettings: 'openAppSettingsDialog',
+  openAppStyling: 'openAppStylingWindow',
+  toggleDeveloperTools: 'toggleDeveloperTools',
+  toggleAppNoteboard: 'toggleAppNoteboardWindow'
 }
 
 /**
