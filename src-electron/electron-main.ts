@@ -32,12 +32,3 @@ openAppWindowManager()
 
 // Set up manager for closing app instance
 closeAppManager(platform)
-
-/*
---------------------------------------------
-*/
-
-/*
-DB TESTING MANAGEMENT
-TODO: ADJUST THIS WHEN SETTING UP `better-sqlite3`
-*/

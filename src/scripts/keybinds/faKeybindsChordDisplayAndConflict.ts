@@ -1,5 +1,4 @@
 import { FA_KEYBIND_COMMAND_DEFINITIONS } from 'app/src/scripts/keybinds/faKeybindCommandDefinitions'
-import { formatFaKeybindChordForUi } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
 import {
   faKeybindChordsEqual,
   faKeybindResolveEffectiveChord
@@ -7,12 +6,6 @@ import {
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import type { T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
-
-/**
- * @deprecated Prefer importing {@link formatFaKeybindChordForUi} from `faKeybindsChordUiFormatting.ts` in new code.
- * Alias retained for existing imports and tests.
- */
-export const formatFaChordForDisplay = formatFaKeybindChordForUi
 
 /**
  * Returns another command id that already uses this chord, or null if none.

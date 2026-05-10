@@ -8,8 +8,6 @@ import {
 } from 'app/src/components/globals/AppControlMenus/_data/menuDataHelpers'
 import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
 
-// TODO - add functionality for all buttons and conditions
-
 function buildHelpInfoMenuData (): I_appMenuItem[] {
   return [
     faMenuItem('appControlMenus.helpInfo.items.advancedSearchGuide', 'mdi-file-question', {
