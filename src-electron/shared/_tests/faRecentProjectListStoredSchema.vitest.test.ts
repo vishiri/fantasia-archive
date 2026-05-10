@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { FA_PROJECT_DISPLAY_NAME_MAX_LEN } from '../faProjectConstants'
+import { FA_PROJECT_NAME_MAX_LEN } from '../faProjectConstants'
 import { parseFaRecentProjectListStored } from '../faRecentProjectListStoredSchema'
 
 test('Test that parse returns empty array for malformed blob', () => {
@@ -24,7 +24,7 @@ test('Test that parse strips unknown keys and defaults missing recentProjects', 
 })
 
 test('Test that parse rejects too-long display names', () => {
-  const longName = 'x'.repeat(FA_PROJECT_DISPLAY_NAME_MAX_LEN + 1)
+  const longName = 'x'.repeat(FA_PROJECT_NAME_MAX_LEN + 1)
   const out = parseFaRecentProjectListStored({
     recentProjects: [{
       filePath: 'D:\\a.faproject',

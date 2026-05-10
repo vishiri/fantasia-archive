@@ -1,5 +1,5 @@
 import {
-  FA_PROJECT_SLUG_MAX_LEN
+  FA_PROJECT_NAME_MAX_LEN
 } from 'app/src-electron/shared/faProjectConstants'
 
 const DEFAULT_SAFE_BASENAME = 'fantasia-project'
@@ -86,7 +86,7 @@ export function faProjectSlugFromDisplayName (displayName: string): string {
     return DEFAULT_SAFE_BASENAME
   }
 
-  s = truncateToMaxCodePoints(s, FA_PROJECT_SLUG_MAX_LEN)
+  s = truncateToMaxCodePoints(s, FA_PROJECT_NAME_MAX_LEN)
   s = stripTrailingDotsAndSpaces(s.trim())
 
   return withReservedStemPrefix(s)

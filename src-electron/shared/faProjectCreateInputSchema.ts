@@ -1,13 +1,13 @@
 import { z } from 'zod'
 
 import {
-  FA_PROJECT_DISPLAY_NAME_MAX_LEN
+  FA_PROJECT_NAME_MAX_LEN
 } from 'app/src-electron/shared/faProjectConstants'
 
 const projectNameSchema = z
   .string()
   .min(1, 'project name is required')
-  .max(FA_PROJECT_DISPLAY_NAME_MAX_LEN, 'project name is too long')
+  .max(FA_PROJECT_NAME_MAX_LEN, 'project name is too long')
   .transform((s) => s.trim())
   .refine((s) => s.length > 0, 'project name is empty after trim')
 

@@ -23,11 +23,13 @@
             ref="nameInputRef"
             v-model="projectName"
             color="primary-bright"
+            counter
             dark
             data-test-locator="dialogNewProject-input-name"
             filled
             :label="$t('dialogs.newProject.nameLabel')"
             lazy-rules
+            :maxlength="FA_PROJECT_NAME_MAX_LEN"
             outlined
             @keyup.enter="void onClickCreate()"
           />
@@ -66,6 +68,7 @@ import { Result } from 'neverthrow'
 
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
+import { FA_PROJECT_NAME_MAX_LEN } from 'app/src-electron/shared/faProjectConstants'
 import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
 import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 

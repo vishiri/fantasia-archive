@@ -1,14 +1,14 @@
 import { z } from 'zod'
 
 import {
-  FA_PROJECT_DISPLAY_NAME_MAX_LEN
+  FA_PROJECT_NAME_MAX_LEN
 } from 'app/src-electron/shared/faProjectConstants'
 
 const recentProjectEntryStoredSchema = z.object({
   filePath: z.string(),
   name: z
     .string()
-    .max(FA_PROJECT_DISPLAY_NAME_MAX_LEN, 'name is too long')
+    .max(FA_PROJECT_NAME_MAX_LEN, 'name is too long')
 }).strict()
 
 const recentProjectListStoredSchema = z.object({

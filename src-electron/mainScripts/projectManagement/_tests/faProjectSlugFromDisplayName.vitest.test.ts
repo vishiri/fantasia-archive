@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 
 import {
-  FA_PROJECT_SLUG_MAX_LEN
+  FA_PROJECT_NAME_MAX_LEN
 } from 'app/src-electron/shared/faProjectConstants'
 
 import { faProjectSlugFromDisplayName } from '../faProjectSlugFromDisplayName'
@@ -32,14 +32,14 @@ test('faProjectSlugFromDisplayName rewrites dot-only collapse to the default bas
 })
 
 test('faProjectSlugFromDisplayName caps long ascii basenames', () => {
-  const long = 'a'.repeat(FA_PROJECT_SLUG_MAX_LEN + 20)
+  const long = 'a'.repeat(FA_PROJECT_NAME_MAX_LEN + 20)
   const slug = faProjectSlugFromDisplayName(long)
-  expect(slug.length).toBeLessThanOrEqual(FA_PROJECT_SLUG_MAX_LEN)
+  expect(slug.length).toBeLessThanOrEqual(FA_PROJECT_NAME_MAX_LEN)
 })
 
 test('faProjectSlugFromDisplayName trims trailing dots and spaces after length cap', () => {
   const slug = faProjectSlugFromDisplayName(`${'m'.repeat(118)} ..`)
-  expect(slug.length).toBeLessThanOrEqual(FA_PROJECT_SLUG_MAX_LEN)
+  expect(slug.length).toBeLessThanOrEqual(FA_PROJECT_NAME_MAX_LEN)
   expect(slug.endsWith('.')).toBe(false)
   expect(/\s$/u.test(slug)).toBe(false)
 })

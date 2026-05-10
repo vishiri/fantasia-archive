@@ -1,11 +1,10 @@
 /**
- * Fantasia project file (.faproject) — extension and validation limits shared by main, IPC, and Zod.
+ * Fantasia project file (.faproject) — extension and validation limits shared by main, IPC, Zod, and renderer UI.
  */
 
 export const FA_PROJECT_FILE_EXTENSION = 'faproject' as const
 
-/** Display name length bound before trimming (Zod refine after trim). */
-export const FA_PROJECT_DISPLAY_NAME_MAX_LEN = 200
-
-/** Suggested basename stem length cap excluding the '.faproject' suffix (normalized for OS save dialogs). */
-export const FA_PROJECT_SLUG_MAX_LEN = 120
+/**
+ * Unified maximum length for project display names and related surfaces: Zod validation, New project **q-input**, recent-project list entry names, and save-dialog slug stem normalization.
+ */
+export const FA_PROJECT_NAME_MAX_LEN = 120
