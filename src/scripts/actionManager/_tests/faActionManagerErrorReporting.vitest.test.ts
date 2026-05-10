@@ -189,6 +189,7 @@ test('Test that reportFaActionFailure emits one console error and one notify', (
   expect(notifyCreateMock).toHaveBeenCalledWith(
     expect.objectContaining({
       caption: 'oops',
+      faSkipNotifyConsoleLog: true,
       type: 'negative'
     })
   )
@@ -211,6 +212,7 @@ test('Test that reportFaActionFailure uses warning notify for soft FaProjectOpen
   expect(notifyCreateMock).toHaveBeenCalledWith(
     expect.objectContaining({
       caption: 'already open',
+      faSkipNotifyConsoleLog: true,
       type: 'warning'
     })
   )

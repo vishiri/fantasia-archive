@@ -1,7 +1,11 @@
 import { expect, test, vi } from 'vitest'
 
-const { notifySetDefaultsMock } = vi.hoisted(() => {
+const {
+  notifyCreateMock,
+  notifySetDefaultsMock
+} = vi.hoisted(() => {
   return {
+    notifyCreateMock: vi.fn(() => (): void => {}),
     notifySetDefaultsMock: vi.fn()
   }
 })
@@ -9,6 +13,7 @@ const { notifySetDefaultsMock } = vi.hoisted(() => {
 vi.mock('quasar', () => {
   return {
     Notify: {
+      create: notifyCreateMock,
       setDefaults: notifySetDefaultsMock
     }
   }
@@ -19,6 +24,8 @@ vi.mock('quasar', () => {
  * Test if Notify defaults are configured on module import.
  */
 test('Test that notify-defaults configures expected Quasar Notify defaults', async () => {
+  notifyCreateMock.mockClear()
+  notifySetDefaultsMock.mockClear()
   await import('../notify-defaults')
 
   expect(notifySetDefaultsMock).toHaveBeenCalledOnce()

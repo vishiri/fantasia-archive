@@ -11,6 +11,7 @@ JSDoc above tests and line comments in these files: follow AGENTS.md code-commen
 ## Preconditions
 
 - Run against a **production Electron build** after relevant source changes (`yarn quasar:build:electron` / `quasar build -m electron`). See [README.md](README.md).
+- **Single E2E file**: `yarn test:e2e:single --spec=<stem>` where **`<stem>`** is the **`*.playwright.spec.ts`** basename **without** that suffix; **`yarn test:e2e:single:ci`** expects the **full** filename under **`e2e-tests/`** (see README **E2E single test** and **Scripts reference**).
 
 ## Renderer readiness (Electron + hash router)
 

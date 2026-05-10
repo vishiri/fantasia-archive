@@ -2,6 +2,16 @@ import { beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_DEVTOOLS_IPC } from 'app/src-electron/electron-ipc-bridge'
 
+const revealElectronDevToolsConsoleBestEffortMock = vi.hoisted(() => {
+  return vi.fn(async (): Promise<boolean> => true)
+})
+
+vi.mock('../revealElectronDevToolsConsoleBestEffort', () => {
+  return {
+    revealElectronDevToolsConsoleBestEffort: revealElectronDevToolsConsoleBestEffortMock
+  }
+})
+
 const mocks = vi.hoisted(() => {
   const ipcMainHandleMock = vi.fn()
   const isDevToolsOpenedMock = vi.fn(() => false)
@@ -47,6 +57,8 @@ beforeEach(async () => {
   mocks.isDevToolsOpenedMock.mockReset()
   mocks.openDevToolsMock.mockReset()
   mocks.closeDevToolsMock.mockReset()
+  revealElectronDevToolsConsoleBestEffortMock.mockReset()
+  revealElectronDevToolsConsoleBestEffortMock.mockResolvedValue(true)
   mocks.isDevToolsOpenedMock.mockReturnValue(false)
   mocks.fromWebContentsMock.mockReturnValue(mocks.win)
 })
@@ -124,9 +136,10 @@ test('Test that registerFaDevToolsIpc toggleAsync opens DevTools when closed', a
   const { registerFaDevToolsIpc } = await import('../registerFaDevToolsIpc')
   registerFaDevToolsIpc()
 
-  const result = handlerFor(FA_DEVTOOLS_IPC.toggleAsync)({ sender: fakeSender })
+  const result = await handlerFor(FA_DEVTOOLS_IPC.toggleAsync)({ sender: fakeSender })
 
   expect(mocks.openDevToolsMock).toHaveBeenCalledTimes(1)
+  expect(revealElectronDevToolsConsoleBestEffortMock).toHaveBeenCalledWith(mocks.webContents)
   expect(mocks.closeDevToolsMock).not.toHaveBeenCalled()
   expect(result).toBe(true)
 })
@@ -140,9 +153,10 @@ test('Test that registerFaDevToolsIpc toggleAsync closes DevTools when open', as
   const { registerFaDevToolsIpc } = await import('../registerFaDevToolsIpc')
   registerFaDevToolsIpc()
 
-  const result = handlerFor(FA_DEVTOOLS_IPC.toggleAsync)({ sender: fakeSender })
+  const result = await handlerFor(FA_DEVTOOLS_IPC.toggleAsync)({ sender: fakeSender })
 
   expect(mocks.closeDevToolsMock).toHaveBeenCalledTimes(1)
+  expect(revealElectronDevToolsConsoleBestEffortMock).not.toHaveBeenCalled()
   expect(mocks.openDevToolsMock).not.toHaveBeenCalled()
   expect(result).toBe(false)
 })
@@ -156,9 +170,10 @@ test('Test that registerFaDevToolsIpc toggleAsync returns false without a window
   const { registerFaDevToolsIpc } = await import('../registerFaDevToolsIpc')
   registerFaDevToolsIpc()
 
-  const result = handlerFor(FA_DEVTOOLS_IPC.toggleAsync)({ sender: fakeSender })
+  const result = await handlerFor(FA_DEVTOOLS_IPC.toggleAsync)({ sender: fakeSender })
 
   expect(result).toBe(false)
+  expect(revealElectronDevToolsConsoleBestEffortMock).not.toHaveBeenCalled()
   expect(mocks.openDevToolsMock).not.toHaveBeenCalled()
   expect(mocks.closeDevToolsMock).not.toHaveBeenCalled()
 })
@@ -172,9 +187,10 @@ test('Test that registerFaDevToolsIpc openAsync opens and reports DevTools state
   const { registerFaDevToolsIpc } = await import('../registerFaDevToolsIpc')
   registerFaDevToolsIpc()
 
-  const result = handlerFor(FA_DEVTOOLS_IPC.openAsync)({ sender: fakeSender })
+  const result = await handlerFor(FA_DEVTOOLS_IPC.openAsync)({ sender: fakeSender })
 
   expect(mocks.openDevToolsMock).toHaveBeenCalledTimes(1)
+  expect(revealElectronDevToolsConsoleBestEffortMock).toHaveBeenCalledWith(mocks.webContents)
   expect(result).toBe(true)
 })
 
@@ -187,9 +203,10 @@ test('Test that registerFaDevToolsIpc openAsync returns false without a window',
   const { registerFaDevToolsIpc } = await import('../registerFaDevToolsIpc')
   registerFaDevToolsIpc()
 
-  const result = handlerFor(FA_DEVTOOLS_IPC.openAsync)({ sender: fakeSender })
+  const result = await handlerFor(FA_DEVTOOLS_IPC.openAsync)({ sender: fakeSender })
 
   expect(result).toBe(false)
+  expect(revealElectronDevToolsConsoleBestEffortMock).not.toHaveBeenCalled()
   expect(mocks.openDevToolsMock).not.toHaveBeenCalled()
 })
 

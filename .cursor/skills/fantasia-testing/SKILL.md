@@ -106,7 +106,7 @@ Same rules as [vitest-tests.mdc](../../rules/vitest-tests.mdc) (**Vitest coverag
 - **Command**: `yarn test:e2e`
 - **Execution policy**: run this command in its own terminal invocation; keep E2E output isolated from other command logs.
 - **Location**: `e2e-tests/*.playwright.spec.ts`
-- **Single spec**: `yarn test:e2e:single --spec=SPEC_FILE_NAME` (see `package.json`).
+- **Single spec**: `yarn test:e2e:single --spec=<stem>` — **`stem`** only, **no** **`.playwright.spec.ts`** (for example **`checkDevToolsFunctionality`**). **`yarn test:e2e:single:ci --spec=<file>`** takes the **full** **`e2e-tests/`** file name including the suffix (same string **`yarn test:e2e:list`** uses). Yarn forwards these flags with the same **`npm_config_*`** pattern as **`--component=`** on component runs (see **`package.json`**).
 - **Interactive picker**: `yarn test:e2e:list` → `testRunner_e2e.mjs`
 
 ### Full project gate

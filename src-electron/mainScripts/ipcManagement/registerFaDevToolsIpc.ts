@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron'
 
 import { FA_DEVTOOLS_IPC } from 'app/src-electron/electron-ipc-bridge'
+import { revealElectronDevToolsConsoleBestEffort } from 'app/src-electron/mainScripts/ipcManagement/revealElectronDevToolsConsoleBestEffort'
 import { windowFromIpcEvent } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
 
 let registered = false
@@ -22,7 +23,7 @@ export function registerFaDevToolsIpc (): void {
     return w?.webContents.isDevToolsOpened() ?? false
   })
 
-  ipcMain.handle(FA_DEVTOOLS_IPC.toggleAsync, (event) => {
+  ipcMain.handle(FA_DEVTOOLS_IPC.toggleAsync, async (event) => {
     const w = windowFromIpcEvent(event)
     if (w === undefined) {
       return false
@@ -32,19 +33,22 @@ export function registerFaDevToolsIpc (): void {
       wc.closeDevTools()
     } else {
       wc.openDevTools()
+      await revealElectronDevToolsConsoleBestEffort(wc)
     }
 
     return wc.isDevToolsOpened()
   })
 
-  ipcMain.handle(FA_DEVTOOLS_IPC.openAsync, (event) => {
+  ipcMain.handle(FA_DEVTOOLS_IPC.openAsync, async (event) => {
     const w = windowFromIpcEvent(event)
     if (w === undefined) {
       return false
     }
-    w.webContents.openDevTools()
+    const wc = w.webContents
+    wc.openDevTools()
+    await revealElectronDevToolsConsoleBestEffort(wc)
 
-    return w.webContents.isDevToolsOpened()
+    return wc.isDevToolsOpened()
   })
 
   ipcMain.handle(FA_DEVTOOLS_IPC.closeAsync, (event) => {

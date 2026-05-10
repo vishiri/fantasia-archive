@@ -29,6 +29,7 @@ export async function copyDialogActionMonitorRowToClipboard (row: I_faActionHist
       Notify.create({
         caption: reason,
         color: 'negative',
+        faSkipNotifyConsoleLog: true,
         icon: 'mdi-clipboard-alert-outline',
         message: i18n.global.t('dialogs.actionMonitor.copy.failed'),
         timeout: 4000,

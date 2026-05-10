@@ -318,6 +318,8 @@ yarn test:e2e:list
 yarn test:e2e:single --spec=SPEC_FILE_NAME
 ```
 
+> **`SPEC_FILE_NAME`** is the **`e2e-tests/*.playwright.spec.ts`** basename **without** the **`.playwright.spec.ts`** suffix (for example **`checkDevToolsFunctionality`** for **`e2e-tests/checkDevToolsFunctionality.playwright.spec.ts`**). **`yarn test:e2e:single:ci --spec=…`** expects the **full file name** under **`e2e-tests/`**, including **`.playwright.spec.ts`** — the same string **`yarn test:e2e:list`** passes when you pick a spec.
+
 #### Playwright HTML report and screen recordings (Electron component + E2E)
 
 Each Electron component and E2E Playwright **serial suite** (**`test.describe.serial`**) records a **WebM** screen capture (full HD by default) and attaches it via that suite’s **`TestInfo`** (one attachment per group launch, not per nested **`test`** step). After **`yarn test:components`**, **`yarn test:e2e`**, or the matching **`:single`** / **`:single:ci`** scripts, open **`test-results/playwright-report/index.html`** in a browser, open a test, and use the **Attachments** section to play or download the video. The report bundles playable files under **`test-results/playwright-report/data/`** (hashed names).
@@ -360,8 +362,8 @@ Set environment variable **`FA_PLAYWRIGHT_NO_VIDEO`** to **`1`** or **`true`** t
 | `yarn test:components:single:ci --component=...` | Run a single component Playwright test by direct path (same wrapper). |
 | `yarn test:components:list` | Open interactive picker for component Playwright tests. |
 | `yarn test:e2e` | Run all Playwright E2E tests (same wrapper and report lifecycle as `test:components`). |
-| `yarn test:e2e:single --spec=...` | Run one E2E spec by spec file name (same wrapper). |
-| `yarn test:e2e:single:ci --spec=...` | Run one E2E spec by direct path (same wrapper). |
+| `yarn test:e2e:single --spec=...` | Run one E2E spec: **`--spec`** is the **stem** only (omit **`.playwright.spec.ts`**; same wrapper as **`test:e2e`**). |
+| `yarn test:e2e:single:ci --spec=...` | Run one E2E spec: **`--spec`** is the **full file name** under **`e2e-tests/`** (include **`.playwright.spec.ts`**; same value as **`test:e2e:list`**). |
 | `yarn test:e2e:list` | Open interactive picker for E2E tests. |
 | `yarn test:storybook:smoke` | Run Storybook smoke check in CI-friendly mode. |
 | `yarn test:storybook:visual` | Compare Storybook stories with committed Playwright visual snapshots. |

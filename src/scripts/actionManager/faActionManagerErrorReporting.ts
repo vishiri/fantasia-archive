@@ -86,6 +86,7 @@ export function normalizeFaActionError (error: unknown): { name: string, message
 
 /**
  * Single-source unified failure surface: one console.error and one Notify.create per failed action.
+ * The notify payload sets faSkipNotifyConsoleLog so the boot-time console mirror does not duplicate the error line.
  * Returns the structured failure record so callers may also write it to the Pinia store.
  */
 export function reportFaActionFailure (
@@ -114,6 +115,7 @@ export function reportFaActionFailure (
       icon: 'mdi-close'
     }],
     caption: normalized.message,
+    faSkipNotifyConsoleLog: true,
     group: false,
     message: i18n.global.t('globalFunctionality.faActionManager.actionFailed', {
       actionId: entry.id
