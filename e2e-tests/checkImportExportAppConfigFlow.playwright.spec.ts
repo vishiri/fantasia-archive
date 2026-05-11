@@ -78,15 +78,15 @@ const defaultChord = {
 
 const bodyBgBlackRgb = 'rgb(0, 0, 0)'
 
-const openToolsMenu = async (page: Page, toolsTitle: string) => {
-  const t = page.getByText(toolsTitle, { exact: true })
+const openTopBarMenuSection = async (page: Page, sectionTitle: string) => {
+  const t = page.getByText(sectionTitle, { exact: true })
   await expect(t).toBeVisible({ timeout: 20_000 })
   await t.click()
   await page.waitForTimeout(menuAnimationTimer)
 }
 
-const openImportExportFromTools = async (page: Page, toolsTitle: string, itemLabel: string) => {
-  await openToolsMenu(page, toolsTitle)
+const openImportExportAppConfigDialogFromMenu = async (page: Page, menuTitle: string, itemLabel: string) => {
+  await openTopBarMenuSection(page, menuTitle)
   await page.getByText(itemLabel, { exact: true }).click()
   await page.waitForTimeout(menuAnimationTimer)
   const card = page.locator('.dialogComponent__wrapper.importExportAppConfig')
@@ -241,7 +241,7 @@ async function saveKeybindSettingsDialog (page: Page): Promise<void> {
 
 async function openAppStylingFromTools (page: Page, tools: typeof L_toolsEn) {
   await dismissStartupTipsNotifyIfPresent(page)
-  await openToolsMenu(page, tools.title)
+  await openTopBarMenuSection(page, tools.title)
   await page.getByText(tools.items.appStyling, { exact: true }).click()
   await page.waitForTimeout(menuAnimationTimer)
 }
@@ -287,7 +287,7 @@ async function saveAppStylingWindow (page: Page): Promise<void> {
 
 async function openAppNoteboardFromTools (page: Page, tools: typeof L_toolsEn): Promise<void> {
   await dismissStartupTipsNotifyIfPresent(page)
-  await openToolsMenu(page, tools.title)
+  await openTopBarMenuSection(page, tools.title)
   await page.getByText(tools.items.appNoteBoard, { exact: true }).click()
   await page.waitForTimeout(menuAnimationTimer)
 }
@@ -410,7 +410,7 @@ test.describe.serial('Import / export app configuration E2E', () => {
     const blankNoteboard = 'blank_noteboard.faconfig'
 
     await test.step('Export only app settings', async () => {
-      await openImportExportFromTools(
+      await openImportExportAppConfigDialogFromMenu(
         appWindow,
         L_toolsEn.title,
         L_toolsEn.items.importExportAppConfig
@@ -423,7 +423,7 @@ test.describe.serial('Import / export app configuration E2E', () => {
     })
 
     await test.step('Export only keybinds', async () => {
-      await openImportExportFromTools(
+      await openImportExportAppConfigDialogFromMenu(
         appWindow,
         L_toolsEn.title,
         L_toolsEn.items.importExportAppConfig
@@ -436,7 +436,7 @@ test.describe.serial('Import / export app configuration E2E', () => {
     })
 
     await test.step('Export only custom CSS', async () => {
-      await openImportExportFromTools(
+      await openImportExportAppConfigDialogFromMenu(
         appWindow,
         L_toolsEn.title,
         L_toolsEn.items.importExportAppConfig
@@ -449,7 +449,7 @@ test.describe.serial('Import / export app configuration E2E', () => {
     })
 
     await test.step('Export only app noteboard', async () => {
-      await openImportExportFromTools(
+      await openImportExportAppConfigDialogFromMenu(
         appWindow,
         L_toolsEn.title,
         L_toolsEn.items.importExportAppConfig
@@ -558,7 +558,7 @@ test.describe.serial('Import / export app configuration E2E', () => {
 
     await test.step('Import app-settings blank and expect English + show document IDs off', async () => {
       await e2eSetNextAppConfigImportPath(electronApp, blankSettings)
-      await openImportExportFromTools(
+      await openImportExportAppConfigDialogFromMenu(
         appWindow,
         L_toolsDe.title,
         L_toolsDe.items.importExportAppConfig
@@ -586,7 +586,7 @@ test.describe.serial('Import / export app configuration E2E', () => {
 
     await test.step('Import keybinds blank: Default keybind for developer tools no longer toggles devtools; keybind dialog shows default chord', async () => {
       await e2eSetNextAppConfigImportPath(electronApp, blankKeybinds)
-      await openImportExportFromTools(
+      await openImportExportAppConfigDialogFromMenu(
         appWindow,
         L_toolsEn.title,
         L_toolsEn.items.importExportAppConfig
@@ -625,7 +625,7 @@ test.describe.serial('Import / export app configuration E2E', () => {
 
     await test.step('Import custom CSS blank: body not black, Monaco empty after reopen', async () => {
       await e2eSetNextAppConfigImportPath(electronApp, blankCss)
-      await openImportExportFromTools(
+      await openImportExportAppConfigDialogFromMenu(
         appWindow,
         L_toolsEn.title,
         L_toolsEn.items.importExportAppConfig
@@ -646,7 +646,7 @@ test.describe.serial('Import / export app configuration E2E', () => {
 
     await test.step('Import app noteboard blank: textarea empty after reopen', async () => {
       await e2eSetNextAppConfigImportPath(electronApp, blankNoteboard)
-      await openImportExportFromTools(
+      await openImportExportAppConfigDialogFromMenu(
         appWindow,
         L_toolsEn.title,
         L_toolsEn.items.importExportAppConfig

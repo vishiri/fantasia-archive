@@ -10,18 +10,8 @@ import {
 
 // TODO - add functionality for all buttons and conditions
 
-function buildToolsMenuData (session: I_appMenuBuildSession): I_appMenuItem[] {
-  const gate = session.hasActiveProject
-
+function buildToolsMenuData (_session: I_appMenuBuildSession): I_appMenuItem[] {
   return [
-    faMenuItem('appControlMenus.tools.items.toggleTree', 'mdi-page-layout-sidebar-left', {
-      conditions: gate
-    }),
-    faMenuSeparator(),
-    faMenuItem('appControlMenus.tools.items.importExportAppConfig', 'mdi-cog-transfer', {
-      trigger: () => runFaAction('openImportExportAppConfigDialog', undefined)
-    }),
-    faMenuSeparator(),
     faMenuItem('appControlMenus.tools.items.appNoteBoard', 'mdi-clipboard-text-outline', {
       keybindCommandId: 'toggleAppNoteboard',
       trigger: () => runFaAction('toggleAppNoteboardWindow', undefined)
@@ -37,6 +27,10 @@ function buildToolsMenuData (session: I_appMenuBuildSession): I_appMenuItem[] {
     faMenuItem('appControlMenus.tools.items.appSettings', 'mdi-tune', {
       keybindCommandId: 'openAppSettings',
       trigger: () => runFaAction('openAppSettingsDialog', undefined)
+    }),
+    faMenuSeparator(),
+    faMenuItem('appControlMenus.tools.items.importExportAppConfig', 'mdi-cog-transfer', {
+      trigger: () => runFaAction('openImportExportAppConfigDialog', undefined)
     })
   ]
 }

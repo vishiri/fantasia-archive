@@ -69,10 +69,9 @@ test('Test that buildProjectMenu disables gated rows when hasActiveProject is fa
   expect(items[4]!.conditions).toBe(false)
   expect(items[5]!.conditions).toBe(false)
   expect(items[6]!.conditions).toBe(false)
-  expect(items[7]!.conditions).toBe(false)
-  expect(items[8]!.conditions).not.toBe(false)
+  expect(items[7]!.conditions).not.toBe(false)
 
-  const sub = items[8]!.submenu?.filter((row) => row.mode === 'item') ?? []
+  const sub = items[7]!.submenu?.filter((row) => row.mode === 'item') ?? []
   expect(sub[0]!.conditions).toBe(false)
   expect(sub[1]!.conditions).not.toBe(false)
 })
@@ -93,8 +92,7 @@ test('Test that buildProjectMenu enables gated rows when hasActiveProject is tru
   expect(items[5]!.conditions).not.toBe(false)
   expect(items[6]!.conditions).not.toBe(false)
   expect(items[7]!.conditions).not.toBe(false)
-  expect(items[8]!.conditions).not.toBe(false)
-  const sub = items[8]!.submenu?.filter((row) => row.mode === 'item') ?? []
+  const sub = items[7]!.submenu?.filter((row) => row.mode === 'item') ?? []
   expect(sub.every((row) => row.conditions !== false)).toBe(true)
 })
 
@@ -144,23 +142,38 @@ test('Test that buildProjectMenu treats omitted recentProjects as no recent entr
 
 /**
  * Documents menu
- * Document actions require an open project.
+ * Project-scoped rows disable when `hasActiveProject` is false.
  */
-test('Test that buildDocumentsMenu disables all document actions when hasActiveProject is false', () => {
+test('Test that buildDocumentsMenu disables project-scoped rows when hasActiveProject is false', () => {
   const menu = buildDocumentsMenu({ hasActiveProject: false })
   const items = menu.data.filter((row) => row.mode === 'item')
-  expect(items.length).toBe(3)
-  expect(items.every((row) => row.conditions === false)).toBe(true)
+  expect(items.length).toBe(4)
+  expect(items[0]!.conditions).toBe(false)
+  expect(items[1]!.conditions).toBe(false)
+  expect(items[2]!.conditions).toBe(false)
+  expect(items[3]!.conditions).toBe(false)
 })
 
 /**
  * Tools menu
- * Toggle hierarchical tree requires an open project; other tools stay available.
+ * Import / Export App Configuration fires the centralized action regardless of loaded project session.
  */
-test('Test that buildToolsMenu disables only toggle tree when hasActiveProject is false', () => {
+test('Test that buildToolsMenu import export row opens the app configuration dialog action', () => {
+  const menu = buildToolsMenu({ hasActiveProject: false })
+  const items = menu.data.filter((row) => row.mode === 'item')
+  items[4]!.trigger?.()
+  expect(runFaActionMock).toHaveBeenCalledTimes(1)
+  expect(runFaActionMock).toHaveBeenCalledWith('openImportExportAppConfigDialog', undefined)
+})
+
+/**
+ * Tools menu
+ * No project-only gates: five rows stay available when **hasActiveProject** is false.
+ */
+test('Test that buildToolsMenu keeps all tool rows available when hasActiveProject is false', () => {
   const menu = buildToolsMenu({ hasActiveProject: false })
   const items = menu.data.filter((row) => row.mode === 'item')
 
-  expect(items[0]!.conditions).toBe(false)
-  expect(items.slice(1).every((row) => row.conditions !== false)).toBe(true)
+  expect(items.length).toBe(5)
+  expect(items.every((row) => row.conditions !== false)).toBe(true)
 })

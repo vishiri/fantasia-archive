@@ -3,6 +3,7 @@ export default {
   items: {
     quickAddNewDocument: 'Dokument schnell anlegen',
     quickSearchDocument: 'Bestehendes Dokument schnell suchen',
-    massDeleteDocument: 'Dokumente massenhaft löschen'
+    massDeleteDocument: 'Dokumente massenhaft löschen',
+    exportProjectDocuments: 'Projekt / Dokumente exportieren'
   }
 }

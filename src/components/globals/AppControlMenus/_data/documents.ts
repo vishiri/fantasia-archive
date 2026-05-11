@@ -24,6 +24,10 @@ export function buildDocumentsMenu (session: I_appMenuBuildSession): I_appMenuLi
       faMenuItem('appControlMenus.documents.items.massDeleteDocument', 'mdi-text-box-remove-outline', {
         conditions: gate,
         specialColor: 'secondary'
+      }),
+      faMenuSeparator(),
+      faMenuItem('appControlMenus.documents.items.exportProjectDocuments', 'mdi-database-export-outline', {
+        conditions: gate
       })
     ],
     title: i18n.global.t('appControlMenus.documents.title')
