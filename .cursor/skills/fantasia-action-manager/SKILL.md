@@ -37,7 +37,7 @@ Success notifications (Settings saved, etc.) remain in the originating store whe
 
 ## Migrated call sites (today)
 
-- **Async** — toggle dev tools, open Keybind / App settings dialog, open Advanced Search Guide / Changelog / License / About / Tips Tricks Trivia dialogs, save Keybind Settings, save App settings, minimize / resize app, language switch, startup tips notification, open Action Monitor.
+- **Async** — toggle dev tools, open Keybind / App settings dialog, open Advanced Search Guide / About / Changelog / License / Tips, Tricks & Trivia dialogs, save Keybind Settings, save App settings, minimize / resize app, language switch, startup tips notification, open Action Monitor.
 - **Sync** — close app, refresh web contents after language change.
 - **Keybind dispatcher** — **`src/scripts/keybinds/faKeybindRunCommand.ts`** maps each **`T_faKeybindCommandId`** to a **`T_faActionId`** through **`FA_KEYBIND_COMMAND_TO_ACTION_ID`** and calls **`runFaAction`**.
 

@@ -45,6 +45,14 @@ Do not place locale files in any other location. If no folder fits, use `globalF
 - **vue-i18n** (Intlify) message syntax treats **`|`** as special (plural / list). To show a literal vertical bar in user-visible text, write **`\\|`** in the TypeScript string (backslash + pipe in the source so the runtime message contains **`\|`**, which compiles to a single **`|`**). The same escape style applies to **`@`**, **`{`**, **`}`**, and **`\`** where you need them literally; see Intlify message syntax docs.
 - App-wide strings that do not belong to a specific component, dialog, or page go in `globalFunctionality/`. Uncategorised strings live in `globalFunctionality/L_unsortedAppTexts.ts` under the `globalFunctionality.unsortedAppTexts` key.
 
+## English (`en-US`) capitalization
+
+- **Sentence-style** for **running prose** in **`L_*.ts`**, document body paragraphs, longer tooltips and Notify descriptions, plus **bold changelog references embedded in sentences**, etc.: capitalize the opening word (and each introductory chunk of slash-linked labels such as **Import / Export**), keep ordinary later words lowercase, preserve acronyms and product tokens (**CSS**, **FA**, **`HTML`**, **`UI`**, **`FA 1.0`**, Electron, Monaco, SQLite, **`macOS`**, **Fantasia Archive**).
+- **Headline-style** for **chrome** that reads as discrete UI stems: **`AppControlMenus`** submenu rows, **Splash** primary actions copying menu labels, **`dialogs.keybindSettings.commands.*`** and matching **Action monitor** / **`globalFunctionality.faActionManager.labels`** wording, checklist captions beside toggles, principal **dialog** and **floating-window** headings (**Import / Export App Configuration**, **Fantasia Archive Settings**, etc.). Principal words capped; conventional short-word lowercasing applies (**into**, **the**, **to** when medial). Never ship submenu or keybind stems with an accidental lowercase first letter.
+- Canonical markdown **H1** titles surfaced in dialogs: **Advanced Search Guide**, **Tips, Tricks & Trivia**.
+- The four **`appControlMenus`** top **`title`** strings (**Project Management**, **Documents & Content**, **Settings & Tools**, **Help & Info**) use deliberate **menu-bar title casing** separate from submenu headline rules ([en-us-ui-copy-capitalization.mdc](../../rules/en-us-ui-copy-capitalization.mdc)).
+- **German**, **French**, and other locales follow their own grammar; mirror semantic roles rather than copying English capitalization unless maintainers intentionally align wording.
+
 ## index.ts rules
 
 - `index.ts` must contain **only imports and the composed export object**. No hardcoded user-visible strings.
@@ -78,6 +86,7 @@ When you change or add keys that appear in **`toHaveText`**, **`toHaveAttribute(
 
 ## Related
 
+- [.cursor/rules/en-us-ui-copy-capitalization.mdc](../../rules/en-us-ui-copy-capitalization.mdc) — sentence-style **English** labels and preserved acronyms.
 - [fantasia-testing](../fantasia-testing/SKILL.md) for Vitest + Playwright when locale strings affect tests.
 - [fantasia-markdown-dialogs](../fantasia-markdown-dialogs/SKILL.md) for rendering markdown in dialogs.
 

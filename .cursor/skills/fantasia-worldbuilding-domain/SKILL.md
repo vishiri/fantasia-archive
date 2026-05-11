@@ -11,7 +11,7 @@ description: >-
 ## What the app is
 
 - **Fantasia Archive** is a **worldbuilding database manager** (see `package.json` / README).
-- Users organize fictional worlds as **projects** and **documents** (and related tooling: search, tree, note board, settings — see menu data under `src/components/globals/AppControlMenus/_data/`).
+- Users organize fictional worlds as **projects** and **documents** (and related tooling: search, tree, noteboard, settings — see menu data under `src/components/globals/AppControlMenus/_data/`).
 - **Floating tool windows** (for example **App styling**, `WindowAppStyling`) are **app chrome**: movable in-renderer surfaces for editing theme/CSS and similar, not in-universe lore. Implementation: [AGENTS.md](../../../AGENTS.md) **In-renderer floating windows**.
 
 ## Vocabulary (prefer in UI and models)

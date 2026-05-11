@@ -32,7 +32,7 @@ The action manager is the **only** place that emits **error** toasts for registe
 3. **Call sites** — replace direct calls to UI helpers / stores / bridges with **`runFaAction`** (or **`runFaActionAwait`** when the call site needs the boolean outcome).
 4. **Tests** — extend **`src/scripts/actionManager/_tests/`**, Vitest suites for **migrated** call sites, and **`src/scripts/keybinds/_tests/`** when **`FA_KEYBIND_COMMAND_TO_ACTION_ID`** changes. **Also** run or update **connected** UI coverage: **`src/components/dialogs/DialogActionMonitor/_tests/`** (Vitest + component Playwright), **`e2e-tests/checkActionMonitor.playwright.spec.ts`**, and any E2E flow that opens the monitor (for example **`checkKeybinds.playwright.spec.ts`**) when table columns, copy text, **`L_DialogActionMonitor`**, or history shape changes—**grep** for **`DialogActionMonitor`**, **`dialogActionMonitor`**, and the action id when unsure.
 5. **Keybind routing (optional)** — when the action should also be triggerable via a global shortcut, add a row to **`FA_KEYBIND_COMMAND_TO_ACTION_ID`** in **`src/scripts/keybinds/faKeybindRunCommand.ts`** and the matching **`I_faKeybindCommandDefinition`** (see [fantasia-keybinds](../skills/fantasia-keybinds/SKILL.md)).
-6. **Action Monitor** — no extra wiring; the new id appears automatically in **`DialogActionMonitor`** rows once it executes.
+6. **Action monitor** — no extra wiring; the new id appears automatically in **`DialogActionMonitor`** rows once it executes.
 
 ## Authoring constraints
 

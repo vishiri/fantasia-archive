@@ -1,0 +1,26 @@
+---
+description: English en-US UI copy — headline-style chrome vs sentence-style prose
+globs:
+  - i18n/en-US/**/*.ts
+  - i18n/en-US/**/*.md
+---
+
+# English UI copy capitalization (`en-US`)
+
+- **Audience**: Labels powered by **`L_*.ts`**, markdown headings under **`i18n/en-US/documents/`** shown in dialogs, **`globalFunctionality`** strings that surface beside actions, **`dialogs.keybindSettings.commands.*`**, **`quasarNotify`** copy, Storybook **`externalFileLoader`** strings aligned with shipped titles, Playwright asserts on resolved **`$t`** text, and **bold UI references** in **`documents/changeLog.md`** when they quote shipped chrome.
+- **Running prose**: Sentence-style capitalization — capitalize the **first word** (and each introductory segment for slash-linked heads such as **Import / Export**). Keep ordinary words afterward **lowercase** unless they are acronyms, brands, product tokens, or the full name **Fantasia Archive** listed below.
+- **Chrome labels / capital menu titles** — treat these as **headline-style**: capitalize principal words across top-bar **submenu** rows under **`AppControlMenus`**, matching **Splash** primary actions where they reuse menu wording, **Keybind Settings** command names (**`dialogs.keybindSettings.commands.*`**) plus that dialog header and matching primary-action labels, major **dialog** headings (for example **Fantasia Archive Settings**, **Import / Export App Configuration**), **`globalFunctionality.faActionManager.labels`** aligned with keyboard actions, checklist captions beside toggles inside those flows, discrete **floating-window** headings (**Custom App CSS**, **App Noteboard**, etc.). Use **short-word lowercasing** where conventional English headlines do (**the**, **to**, **into**, **a**, **an**, **and**, **but**, **or**, **nor**, **as**, **at**, **by**, **for**, **from**, **in**, **of**, **off**, **on**, **onto**, **out**, **over**, **with** when medial rather than phrase-leading). Prefer the exact strings in locale modules instead of mechanically title-casing.
+- **Top chrome menu `title` strings**: **`L_project`**, **`L_documents`**, **`L_tools`**, **`L_helpInfo`** (for example **Project Management**, **Documents & Content**, **Settings & Tools**, **Help & Info**) ship deliberate title casing independent of submenu rules; submenu rows underneath follow the headline pattern above (not lowercase-first stems).
+- **Compound rows**: Menus such as **Tips, Tricks & Trivia** keep commas and **`&`** with headline intent; **`&`** stays capitalized (**Tips, Tricks & Trivia**) per locale modules — do not downgrade **&**-linked segments to lowercase just to match sentence prose.
+- **Canonical markdown headings** surfaced in dialogs: **Advanced Search Guide**, **Tips, Tricks & Trivia** — match **`i18n/en-US/documents/*.md`** H1 casing.
+- **Keep literal casing** for intentional tokens: **`CSS`**, **`FA`**, **`HTML`**, **`JSON`**, **`UUID`**, **`IPC`**, **`OS`**, **`UI`**, **`FA 1.0`**, **`F1`**, **`Electron`**, **`Monaco`**, **`Quasar`**, **`SQLite`**, **`Storybook`**, **`TypeScript`**, **`Vite`**, **`Vue`**, **`macOS`**, **`Markdown`**, product **Fantasia Archive**, **About Fantasia Archive**, platforms and brands (**Discord**, **GitHub**, **Grammarly**, **Ko-Fi**, **Patreon**, **Reddit**, **WebM**, **Windows**, **Linux**). User demos may shout **`YOUR KEY`** when illustrative.
+- **Other locales**: Do not mechanically impose English headline rules on **German** (capitalized nouns) or **French**; mirror **roles** while following target-language norms (**de**, **fr** menus were refreshed alongside **noteboard** terminology).
+
+## Related
+
+[changelog-en-us.mdc](changelog-en-us.mdc) for changelog message-compiler constraints. [fantasia-i18n skill](../skills/fantasia-i18n/SKILL.md) for **`i18n/`** layout.
+
+## TypeScript interfaces and types (`types/`)
+
+- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
