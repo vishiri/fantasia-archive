@@ -246,3 +246,103 @@ test('Test that ComponentTestingLayout skips user settings refresh when faUserSe
   window.faContentBridgeAPIs.faUserSettings = prev
   vi.unstubAllEnvs()
 })
+
+/**
+ * ComponentTestingLayout
+ * Refreshes persisted keybinds when Electron exposes the preload bridge so component harness previews match shortcut hints keyed off Pinia store 'S_FaKeybinds'.
+ */
+test('Test that ComponentTestingLayout refreshes keybinds when MODE is electron', async () => {
+  vi.stubEnv('MODE', 'electron')
+
+  const Child = {
+    name: 'LayoutChildStub',
+    template: '<div data-test-layout-child>child-route</div>'
+  }
+
+  const router = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      {
+        path: '/componentTesting/:componentName',
+        component: ComponentTestingLayout,
+        children: [
+          {
+            path: '',
+            component: Child
+          }
+        ]
+      }
+    ]
+  })
+
+  await router.push('/componentTesting/Example')
+  await router.isReady()
+
+  const getKeybinds = window.faContentBridgeAPIs.faKeybinds.getKeybinds as ReturnType<typeof vi.fn>
+
+  getKeybinds.mockClear()
+
+  const w = mount(ComponentTestingLayout, {
+    global: {
+      plugins: [router]
+    }
+  })
+
+  await flushPromises()
+
+  expect(getKeybinds).toHaveBeenCalled()
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * ComponentTestingLayout
+ * Skips keybind refresh when the preload bridge omits faKeybinds APIs.
+ */
+test('Test that ComponentTestingLayout skips keybind refresh when faKeybinds bridge is absent', async () => {
+  vi.stubEnv('MODE', 'electron')
+
+  const prevKb = window.faContentBridgeAPIs.faKeybinds
+  const getKeybinds = prevKb.getKeybinds as ReturnType<typeof vi.fn>
+
+  getKeybinds.mockClear()
+  delete (window.faContentBridgeAPIs as { faKeybinds?: unknown }).faKeybinds
+
+  const Child = {
+    name: 'LayoutChildStub',
+    template: '<div data-test-layout-child>child-route</div>'
+  }
+
+  const router = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      {
+        path: '/componentTesting/:componentName',
+        component: ComponentTestingLayout,
+        children: [
+          {
+            path: '',
+            component: Child
+          }
+        ]
+      }
+    ]
+  })
+
+  await router.push('/componentTesting/Example')
+  await router.isReady()
+
+  const w = mount(ComponentTestingLayout, {
+    global: {
+      plugins: [router]
+    }
+  })
+
+  await flushPromises()
+
+  expect(getKeybinds).not.toHaveBeenCalled()
+  w.unmount()
+
+  window.faContentBridgeAPIs.faKeybinds = prevKb
+  vi.unstubAllEnvs()
+})

@@ -5,7 +5,7 @@ import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 
 /**
- * Debounced persistence of the app note board floating window frame (silent; no success toast).
+ * Debounced persistence of the app noteboard floating window frame (silent; no success toast).
  */
 export function useWindowAppNoteboardFramePersist (opts: {
   h: Ref<number>

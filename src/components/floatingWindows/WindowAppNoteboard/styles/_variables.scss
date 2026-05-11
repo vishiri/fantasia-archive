@@ -2,6 +2,9 @@
 @use '../../WindowAppStyling/styles/_variables.scss' as floatingWindowSurface;
 
 /* COMPONENT - WINDOW APP NOTEBOARD */
+/* Matches AppControlSingleMenu shortcut hint sizing for parity with menu rows. */
+$windowAppNoteboard-closeBtn-keybind-fontSize: 9px;
+$windowAppNoteboard-closeBtn-keybind-marginTop: 5px;
 $windowAppNoteboard-editorRegion-backgroundColor: fa-v('dark-lighter', $dark-lighter);
 $windowAppNoteboard-title-margin: floatingWindowSurface.$floatingWindowComponent-title-margin;
 $windowAppNoteboard-titleRow-minHeight: floatingWindowSurface.$floatingWindowComponent-titleRow-minHeight;

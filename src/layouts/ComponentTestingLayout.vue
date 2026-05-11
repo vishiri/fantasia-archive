@@ -11,6 +11,7 @@ import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { isFantasiaStorybookCanvas } from 'app/src/scripts/appInternals/rendererAppInternals'
+import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
 const route = useRoute()
@@ -20,12 +21,16 @@ onMounted(async () => {
     return
   }
 
-  if (process.env.MODE !== 'electron' || window.faContentBridgeAPIs?.faUserSettings === undefined) {
+  if (process.env.MODE !== 'electron') {
     return
   }
 
-  const faUserSettingsStore = S_FaUserSettings()
+  if (window.faContentBridgeAPIs?.faUserSettings !== undefined) {
+    await S_FaUserSettings().refreshSettings()
+  }
 
-  await faUserSettingsStore.refreshSettings()
+  if (window.faContentBridgeAPIs?.faKeybinds !== undefined) {
+    await S_FaKeybinds().refreshKeybinds()
+  }
 })
 </script>

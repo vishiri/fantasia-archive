@@ -5,7 +5,7 @@ export const FA_FLOATING_WINDOW_Z_INDEX_MAX = 5999
 export const FA_FLOATING_WINDOW_Z_INDEX_STANDARD_MIN = 5000
 export const FA_FLOATING_WINDOW_Z_INDEX_STANDARD_MAX = 5899
 
-/** App note board: stacks above other floating windows, still below 6000. */
+/** App noteboard: stacks above other floating windows, still below 6000. */
 export const FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MIN = 5900
 export const FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MAX = FA_FLOATING_WINDOW_Z_INDEX_MAX
 

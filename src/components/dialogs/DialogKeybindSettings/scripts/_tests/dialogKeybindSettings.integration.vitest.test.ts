@@ -992,7 +992,7 @@ test('capture handler bindings cover open, clear, and set paths', () => {
 
 test('registerDialogKeybindCaptureOpenWatch removes listener when capture closes', async () => {
   const captureOpen = ref(true)
-  const captureActionName = ref('Open app settings')
+  const captureActionName = ref('Open App Settings')
   const editingCommandId = ref<T_faKeybindCommandId>('openAppSettings')
   const removed = vi.fn()
   registerDialogKeybindCaptureOpenWatch({

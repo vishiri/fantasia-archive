@@ -2,7 +2,7 @@ export default {
   title: 'Aide & Info',
   items: {
     advancedSearchGuide: 'Guide de recherche avancée',
-    tipsTricksTrivia: 'Astuces, Conseils & Anecdotes',
+    tipsTricksTrivia: 'Astuces, conseils & anecdotes',
     changelog: 'Journal des modifications',
     aboutFantasiaArchive: 'À propos de Fantasia Archive',
     license: 'Licence',

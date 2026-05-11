@@ -66,7 +66,7 @@ test('Test that buildProjectMenu disables gated rows when hasActiveProject is fa
   expect(items[1]!.conditions).toBe(false)
   expect(items[2]!.conditions).not.toBe(false)
   expect(items[3]!.conditions).toBe(false)
-  expect(items[4]!.conditions).not.toBe(false)
+  expect(items[4]!.conditions).toBe(false)
   expect(items[5]!.conditions).toBe(false)
   expect(items[6]!.conditions).toBe(false)
   expect(items[7]!.conditions).toBe(false)

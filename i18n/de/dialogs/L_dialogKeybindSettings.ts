@@ -26,7 +26,7 @@ export default {
     openAppSettings: 'App-Einstellungen öffnen',
     openAppStyling: 'Eigenes App-CSS öffnen',
     toggleDeveloperTools: 'Entwicklerwerkzeuge ein/aus',
-    toggleAppNoteboard: 'App-Notiztafel ein/aus'
+    toggleAppNoteboard: 'App-Noteboard umschalten'
   },
   filterNoResultsDescription:
     'Fantasia hat keine Aktion gefunden, die zu eurem Filter passt. Probiert ein anderes Wort oder leert das Feld.',

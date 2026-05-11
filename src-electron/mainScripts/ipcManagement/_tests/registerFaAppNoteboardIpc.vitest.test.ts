@@ -47,7 +47,7 @@ function handlerFor (channel: string): (...args: unknown[]) => unknown {
  * registerFaAppNoteboardIpc
  * Get handler returns a snapshot of the persisted root.
  */
-test('Test that app note board get handler returns a clone of the persisted root', async () => {
+test('Test that app noteboard get handler returns a clone of the persisted root', async () => {
   const storeSnap = {
     frame: {
       height: 400,
@@ -76,7 +76,7 @@ test('Test that app note board get handler returns a clone of the persisted root
  * registerFaAppNoteboardIpc
  * Set handler validates the patch, merges into the store, and runs cleanup.
  */
-test('Test that app note board set handler merges patch and runs cleanup', async () => {
+test('Test that app noteboard set handler merges patch and runs cleanup', async () => {
   const storeSnap = {
     ...FA_APP_NOTEBOARD_STORE_DEFAULTS,
     text: 'keep'
@@ -106,7 +106,7 @@ test('Test that app note board set handler merges patch and runs cleanup', async
  * registerFaAppNoteboardIpc
  * Set handler preserves text when only frame is patched.
  */
-test('Test that app note board set handler merges frame-only patch', async () => {
+test('Test that app noteboard set handler merges frame-only patch', async () => {
   const storeSnap = {
     frame: null,
     schemaVersion: 1 as const,
@@ -148,7 +148,7 @@ test('Test that app note board set handler merges frame-only patch', async () =>
  * registerFaAppNoteboardIpc
  * Set handler rejects malformed payloads without writing.
  */
-test('Test that app note board set handler rejects non-plain payloads without writing', async () => {
+test('Test that app noteboard set handler rejects non-plain payloads without writing', async () => {
   const setMock = vi.fn()
   getFaAppNoteboardMock.mockReturnValue({
     set: setMock,

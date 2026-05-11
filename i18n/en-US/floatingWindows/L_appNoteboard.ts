@@ -1,5 +1,5 @@
 export default {
   close: 'Close',
-  editorAria: 'App note board text',
-  title: 'App note board'
+  editorAria: 'App Noteboard text',
+  title: 'App Noteboard'
 }

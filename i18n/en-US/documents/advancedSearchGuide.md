@@ -1,5 +1,5 @@
 
-# Advanced search guide
+# Advanced Search Guide
 
 ---
 

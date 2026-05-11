@@ -1,3 +1,3 @@
 export default {
-  bridgeMissing: 'Could not reach the app note board from the desktop bridge.'
+  bridgeMissing: 'Could not reach the app noteboard from the desktop bridge.'
 }

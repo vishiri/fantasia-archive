@@ -1,11 +1,11 @@
 export default {
-  title: 'Action monitor',
+  title: 'Action Monitor',
   closeButton: 'Close',
   emptyState: 'No actions have been recorded yet during this session.',
   columns: {
     action: 'Action',
-    startTime: 'Start time',
-    finishTime: 'Finish time',
+    startTime: 'Start Time',
+    finishTime: 'Finish Time',
     payload: 'Payload',
     type: 'Type',
     status: 'Status'

@@ -76,7 +76,7 @@ test('Test that tryStageAppImportFromUnzippedEntries stages keybinds and app sty
   expect(r.parts?.appStyling).toBe('ok')
 })
 
-test('Test that tryStageAppImportFromUnzippedEntries stages app note board when present and valid', () => {
+test('Test that tryStageAppImportFromUnzippedEntries stages app noteboard when present and valid', () => {
   const r = tryStageAppImportFromUnzippedEntries({
     appNoteboard: JSON.stringify({
       ...FA_APP_NOTEBOARD_STORE_DEFAULTS,

@@ -1,11 +1,11 @@
 export default {
-  title: 'Tools & Settings',
+  title: 'Settings & Tools',
   items: {
-    toggleTree: 'Toggle hierarchical tree',
-    appNoteBoard: 'App note board',
-    importExportAppConfig: 'Import / Export app configuration',
-    keybindSettings: 'Keybind settings',
-    appSettings: 'App settings',
-    appStyling: 'Custom app CSS'
+    toggleTree: 'Toggle Hierarchical Tree',
+    appNoteBoard: 'Toggle App Noteboard',
+    importExportAppConfig: 'Import / Export App Configuration',
+    keybindSettings: 'Keybind Settings',
+    appSettings: 'App Settings',
+    appStyling: 'Custom App CSS'
   }
 }

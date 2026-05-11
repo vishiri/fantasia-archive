@@ -37,7 +37,7 @@ export const cleanupFaAppNoteboard = (store: ElectronStore<I_faAppNoteboardRoot>
 }
 
 /**
- * Lazily creates the app note board store. Call after 'app.whenReady()' so Electron 'userData' paths resolve.
+ * Lazily creates the app noteboard store. Call after 'app.whenReady()' so Electron 'userData' paths resolve.
  */
 export const getFaAppNoteboard = (): ElectronStore<I_faAppNoteboardRoot> => {
   if (faAppNoteboardStore === null) {

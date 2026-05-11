@@ -58,10 +58,22 @@
             <q-btn
               flat
               color="accent"
-              :label="$t('floatingWindows.appNoteboard.close')"
+              class="windowAppNoteboard__closeBtn"
               data-test-locator="windowAppNoteboard-button-close"
               @click="onClose"
-            />
+            >
+              <div class="windowAppNoteboard__closeBtn-stack">
+                <span class="windowAppNoteboard__closeBtn-label">
+                  {{ $t('floatingWindows.appNoteboard.close') }}
+                </span><div
+                  v-if="noteboardToggleKeybindLabel !== null"
+                  class="windowAppNoteboard__closeBtn-keybind fa-text-keybind-hint"
+                  data-test-locator="windowAppNoteboard-button-close-keybind"
+                >
+                  ({{ noteboardToggleKeybindLabel }})
+                </div>
+              </div>
+            </q-btn>
           </q-card-actions>
         </q-card>
       </div>
@@ -84,7 +96,9 @@ import {
   FA_FLOATING_WINDOW_POP_TRANSITION_MS
 } from 'app/src/scripts/floatingWindows/faFloatingWindowPopTransition'
 import { useFaFloatingWindowFrame } from 'app/src/scripts/floatingWindows/useFaFloatingWindowFrame'
+import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
+import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 
 defineOptions({
   name: 'WindowAppNoteboard'
@@ -98,6 +112,15 @@ const props = defineProps<{
 }>()
 
 const noteboardStore = S_FaAppNoteboard()
+const faKeybindsStore = S_FaKeybinds()
+
+const noteboardToggleKeybindLabel = computed((): string | null => {
+  return formatFaKeybindCommandLabelFromSnapshot({
+    commandId: 'toggleAppNoteboard',
+    snapshot: faKeybindsStore.snapshot
+  })
+})
+
 const {
   isWindowOpen: windowModel,
   root: noteboardRoot,

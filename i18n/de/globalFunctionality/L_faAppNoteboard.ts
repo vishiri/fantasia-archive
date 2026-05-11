@@ -1,3 +1,3 @@
 export default {
-  bridgeMissing: 'Die App-Notiztafel ist über die Desktop-Brücke nicht erreichbar.'
+  bridgeMissing: 'Das App-Noteboard ist über die Desktop-Brücke nicht erreichbar.'
 }

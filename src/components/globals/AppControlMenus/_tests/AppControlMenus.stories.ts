@@ -21,7 +21,7 @@ const meta = {
       },
       description: {
         component:
-          'Top menu composition: four `AppControlSingleMenu` groups (Project, Documents, Tools & Settings, Help & Info) from `_data/` builders. Documents lists quick-add, quick-search, and mass-delete rows; Tools & Settings keeps layout, note board, import/export, custom **CSS**, keybinds, and app settings. Tools and Help rows may set `keybindCommandId` for live shortcut hints when `S_FaKeybinds.snapshot` is populated (Help includes **Action monitor** and **Toggle developer tools** hints when defaults load). Set `embedDialogs` true to mount markdown and settings dialogs used by menu triggers (they stay closed until an action runs).'
+          'Top menu composition: four `AppControlSingleMenu` groups (**Project Management**, **Documents & Content**, **Settings & Tools**, **Help & Info**) from `_data/` builders. **Documents & Content** lists Quick-Add, Quick-Search, and Mass Delete rows; **Settings & Tools** keeps layout, **Toggle App Noteboard**, import/export, custom **CSS**, keybinds, and App Settings. Those rows may set `keybindCommandId` for live shortcut hints when `S_FaKeybinds.snapshot` is populated (**Help & Info** includes **Action Monitor** and **Toggle Developer Tools** hints when defaults load). Set `embedDialogs` true to mount markdown and settings dialogs used by menu triggers (they stay closed until an action runs).'
       }
     }
   }

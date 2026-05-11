@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
+import L_helpInfo from 'app/i18n/en-US/components/globals/AppControlMenus/L_helpInfo'
 
 /**
  * Extra env settings to trigger testing via Playwright
@@ -26,8 +27,8 @@ const menuAnimationTimer = 600
  * Object of string data selectors for the component
  */
 const selectorList = {
-  menuButton: 'Help & Info',
-  menuItemButton: 'Toggle developer tools'
+  menuButton: L_helpInfo.title,
+  menuItemButton: L_helpInfo.items.toggleDeveloperTools
 }
 
 test.describe.serial('Developer tools menu', () => {

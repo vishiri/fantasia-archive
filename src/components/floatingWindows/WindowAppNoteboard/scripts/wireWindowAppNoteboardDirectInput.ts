@@ -4,7 +4,7 @@ import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 
 /**
- * Opens the note board when 'directInput' is 'WindowAppNoteboard' (Storybook / harness).
+ * Opens the noteboard when 'directInput' is 'WindowAppNoteboard' (Storybook / harness).
  */
 export function wireWindowAppNoteboardDirectInput (props: {
   directInput?: T_dialogName

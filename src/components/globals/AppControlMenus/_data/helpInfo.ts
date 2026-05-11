@@ -18,11 +18,11 @@ function buildHelpInfoMenuData (): I_appMenuItem[] {
       trigger: () => runFaAction('openTipsTricksTriviaDialog', undefined)
     }),
     faMenuSeparator(),
-    faMenuItem('appControlMenus.helpInfo.items.changelog', 'mdi-clipboard-text', {
-      trigger: () => runFaAction('openChangelogDialog', undefined)
-    }),
     faMenuItem('appControlMenus.helpInfo.items.aboutFantasiaArchive', 'mdi-information-variant', {
       trigger: () => runFaAction('openAboutFantasiaArchiveDialog', undefined)
+    }),
+    faMenuItem('appControlMenus.helpInfo.items.changelog', 'mdi-clipboard-text', {
+      trigger: () => runFaAction('openChangelogDialog', undefined)
     }),
     faMenuItem('appControlMenus.helpInfo.items.license', 'mdi-script-text-outline', {
       trigger: () => runFaAction('openLicenseDialog', undefined)

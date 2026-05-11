@@ -1,5 +1,5 @@
 export default {
   drawer: {
-    essentialLinksHeader: 'Essential Links'
+    essentialLinksHeader: 'Essential links'
   }
 }

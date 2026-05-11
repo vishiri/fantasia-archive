@@ -18,7 +18,7 @@ export interface I_faAppNoteboardPatch {
 }
 
 /**
- * Preload bridge for the app note board store.
+ * Preload bridge for the app noteboard store.
  */
 export interface I_faAppNoteboardAPI {
   getNoteboard: () => Promise<I_faAppNoteboardRoot>

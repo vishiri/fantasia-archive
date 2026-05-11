@@ -30,11 +30,11 @@ function isPlainRecord (value: unknown): value is Record<string, unknown> {
 }
 
 /**
- * Parses an IPC payload patching the app note board. Throws for non-object payloads or Zod failures.
+ * Parses an IPC payload patching the app noteboard. Throws for non-object payloads or Zod failures.
  */
 export function parseFaAppNoteboardPatch (patch: unknown): I_faAppNoteboardPatch {
   if (!isPlainRecord(patch)) {
-    throw new TypeError('App note board patch must be a plain object')
+    throw new TypeError('App noteboard patch must be a plain object')
   }
 
   return faAppNoteboardPatchSchema.parse(patch)

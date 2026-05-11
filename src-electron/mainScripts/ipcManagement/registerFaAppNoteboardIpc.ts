@@ -20,7 +20,7 @@ function noteboardSnapshot (): I_faAppNoteboardRoot {
 }
 
 /**
- * Registers async IPC for the app note board store read/write. Safe to call once from 'startApp'; subsequent calls no-op.
+ * Registers async IPC for the app noteboard store read/write. Safe to call once from 'startApp'; subsequent calls no-op.
  */
 export function registerFaAppNoteboardIpc (): void {
   if (registered) {

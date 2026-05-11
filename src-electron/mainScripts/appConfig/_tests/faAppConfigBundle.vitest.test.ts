@@ -7,7 +7,7 @@ import { FA_APP_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appS
 import { unzipAppConfigBundle, zipAppConfigBundle } from '../faAppConfigBundle'
 import { FA_APP_CONFIG_INNER, FA_APP_CONFIG_MAX_FILE_BYTES } from 'app/src-electron/shared/faAppConfigConstants'
 
-test('Test that zip and unzip round-trip allowlisted store JSON files including note board', () => {
+test('Test that zip and unzip round-trip allowlisted store JSON files including noteboard', () => {
   const zipped = zipAppConfigBundle({
     keybinds: { ...FA_KEYBINDS_STORE_DEFAULTS },
     appNoteboard: {

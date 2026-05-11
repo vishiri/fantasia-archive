@@ -1,7 +1,7 @@
 import { S_DialogComponent, S_DialogMarkdown } from 'app/src/stores/S_Dialog'
 
 /**
- * Whether the app note board floating window may open without violating modal dialog stack rules.
+ * Whether the app noteboard floating window may open without violating modal dialog stack rules.
  */
 export function canOpenAppNoteboardFloatingWindow (): boolean {
   return (

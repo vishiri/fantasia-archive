@@ -30,7 +30,7 @@ export const FA_APP_STYLING_IPC = {
   setAsync: 'fa-app-styling-set-async'
 } as const
 
-/** App note board text + frame ('electron-store' in main): preload uses async invoke; main uses handle. */
+/** App noteboard text + frame ('electron-store' in main): preload uses async invoke; main uses handle. */
 export const FA_APP_NOTEBOARD_IPC = {
   getAsync: 'fa-app-noteboard-get-async',
   setAsync: 'fa-app-noteboard-set-async'

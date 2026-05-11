@@ -14,9 +14,9 @@ export default {
     openLicenseDialog: 'Ouvrir la licence',
     openAppSettingsDialog: 'Ouvrir les paramètres de l’app',
     openAppStylingWindow: 'Ouvrir le CSS personnalisé de l’app',
-    openTipsTricksTriviaDialog: 'Ouvrir Astuces, Conseils & Anecdotes',
+    openTipsTricksTriviaDialog: 'Ouvrir astuces, conseils & anecdotes',
     refreshWebContentsAfterLanguage: 'Rafraîchir le contenu de la fenêtre',
-    reportAppNoteboardSaveFailure: 'Signaler une erreur d’enregistrement du tableau de notes de l’app',
+    reportAppNoteboardSaveFailure: 'Signaler une erreur d’enregistrement du noteboard de l’app',
     reportAppStylingPersistFailure: 'Signaler une erreur d’enregistrement du cadre CSS de l’app',
     resizeApp: 'Redimensionner la fenêtre',
     saveKeybindSettings: 'Enregistrer les raccourcis clavier',
@@ -24,6 +24,6 @@ export default {
     saveAppStyling: 'Enregistrer le CSS personnalisé de l’app',
     showStartupTipsNotification: 'Afficher l\'astuce au démarrage',
     toggleDeveloperTools: 'Basculer les outils de développement',
-    toggleAppNoteboardWindow: 'Basculer la fenêtre du tableau de notes de l’app'
+    toggleAppNoteboardWindow: 'Basculer la fenêtre du noteboard de l’app'
   }
 }

@@ -66,4 +66,26 @@
   &__cardActions {
     flex: 0 0 auto;
   }
+
+  &__closeBtn {
+    min-width: auto;
+  }
+
+  &__closeBtn-keybind {
+    font-size: $windowAppNoteboard-closeBtn-keybind-fontSize;
+    font-weight: 600;
+    margin-top: $windowAppNoteboard-closeBtn-keybind-marginTop;
+    text-shadow: none;
+  }
+
+  &__closeBtn-label {
+    white-space: nowrap;
+  }
+
+  &__closeBtn-stack {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
 }

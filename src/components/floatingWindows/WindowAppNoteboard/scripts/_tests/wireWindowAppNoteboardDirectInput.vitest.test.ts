@@ -15,7 +15,7 @@ beforeEach(() => {
   setActivePinia(pinia)
 })
 
-test('wireWindowAppNoteboardDirectInput opens the store when directInput targets the note board', async () => {
+test('wireWindowAppNoteboardDirectInput opens the store when directInput targets the noteboard', async () => {
   const Harness = defineComponent({
     props: {
       directInputProp: {

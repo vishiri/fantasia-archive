@@ -11,7 +11,7 @@ import type {
 import { i18n } from 'app/i18n/externalFileLoader'
 
 /**
- * Instance-wide app note board: text + floating window open state, persisted via the desktop bridge.
+ * Instance-wide app noteboard: text + floating window open state, persisted via the desktop bridge.
  */
 export const S_FaAppNoteboard = defineStore('S_FaAppNoteboard', () => {
   const root: Ref<I_faAppNoteboardRoot | null> = ref(null)

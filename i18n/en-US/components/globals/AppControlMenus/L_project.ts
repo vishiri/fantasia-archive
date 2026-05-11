@@ -1,18 +1,18 @@
 export default {
-  title: 'Project',
+  title: 'Project Management',
   items: {
-    newProject: 'New project',
-    saveProject: 'Save project',
-    loadProject: 'Load project',
-    loadRecentProject: 'Load recent project',
-    noRecentProjects: 'No recent projects',
-    recentProjectRow: 'Recent project',
-    exportProjectDocuments: 'Export project / documents',
-    showProjectDashboard: 'Show project dashboard',
-    closeProject: 'Close project',
-    projectSettings: 'Project settings',
-    advancedProjectTools: 'Advanced project tools',
-    aptMerge: 'Merge another project into the current one',
-    aptConvertOld: 'Convert legacy project to FA 2.0'
+    newProject: 'New Project',
+    saveProject: 'Save Project',
+    loadProject: 'Load Project',
+    loadRecentProject: 'Load Recent Project',
+    noRecentProjects: 'No Recent Projects',
+    recentProjectRow: 'Recent Project',
+    exportProjectDocuments: 'Export Project / Documents',
+    showProjectDashboard: 'Show Project Dashboard',
+    closeProject: 'Close Project',
+    projectSettings: 'Project Settings',
+    advancedProjectTools: 'Advanced Project Tools',
+    aptMerge: 'Merge Another Project into the Current One',
+    aptConvertOld: 'Convert Legacy Project to FA 2.0'
   }
 }

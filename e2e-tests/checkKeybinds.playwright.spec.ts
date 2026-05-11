@@ -52,7 +52,7 @@ const selectorList = {
 /**
  * Default chords match FA_KEYBIND_COMMAND_DEFINITIONS after expanding 'primary'.
  * Playwright 'ControlOrMeta' matches the app primary modifier (Cmd on macOS, Ctrl on Windows and Linux).
- * Open Advanced search guide uses literal Ctrl in the app definition, so this suite always sends Control.
+ * Open Advanced Search Guide uses literal Ctrl in the app definition, so this suite always sends Control.
  */
 const defaultChord = {
   openAdvancedSearchGuide: 'Control+Alt+Shift+G',
@@ -105,7 +105,7 @@ async function pressAdjustedToggleDeveloperToolsChord (page: Page): Promise<void
 }
 
 /**
- * Default Open Action Monitor chord: primary modifier + F11 (Ctrl on Windows and Linux, Cmd on macOS).
+ * Default Open action monitor chord: primary modifier + F11 (Ctrl on Windows and Linux, Cmd on macOS).
  */
 async function pressDefaultOpenActionMonitorChord (page: Page): Promise<void> {
   await prepareRendererForGlobalShortcuts(page)
@@ -295,7 +295,7 @@ test.describe.serial('Global keybinds end-to-end', () => {
       await closeAppStylingDialog(appWindow)
     })
 
-    await test.step('Default advanced search guide opens then closes', async () => {
+    await test.step('Default Advanced Search Guide opens then closes', async () => {
       await triggerGlobalShortcut(appWindow, defaultChord.openAdvancedSearchGuide)
       await expect(locatorMarkdownAdvancedSearchGuideDialog(appWindow)).toBeVisible({
         timeout: 15_000
@@ -345,7 +345,7 @@ test.describe.serial('Global keybinds end-to-end', () => {
       )
       await captureChordForFilteredCommand(
         appWindow,
-        'advanced search guide',
+        'Advanced Search Guide',
         keybindDialogMessages.commands.openAdvancedSearchGuide,
         adjustedChord.openAdvancedSearchGuide
       )
@@ -370,7 +370,7 @@ test.describe.serial('Global keybinds end-to-end', () => {
       await closeAppStylingDialog(appWindow)
     })
 
-    await test.step('Adjusted advanced search guide opens then closes', async () => {
+    await test.step('Adjusted Advanced Search Guide opens then closes', async () => {
       await triggerGlobalShortcut(appWindow, adjustedChord.openAdvancedSearchGuide)
       await expect(locatorMarkdownAdvancedSearchGuideDialog(appWindow)).toBeVisible({
         timeout: 15_000

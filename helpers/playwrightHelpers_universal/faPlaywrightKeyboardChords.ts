@@ -19,7 +19,7 @@ export function getFaPlaywrightDefaultToggleDevtoolsPressString (
 }
 
 /**
- * Open Action Monitor: default is **primary** + **F11** in `FA_KEYBIND_COMMAND_DEFINITIONS`.
+ * Open action monitor: default is **primary** + **F11** in `FA_KEYBIND_COMMAND_DEFINITIONS`.
  */
 export function getFaPlaywrightDefaultActionMonitorOpenPressString (
   platform: NodeJS.Platform = process.platform

@@ -137,7 +137,7 @@ test('Test runApplyStagedAppConfigImport applies only keybinds from staged data'
   expect(applySpellMock).not.toHaveBeenCalled()
 })
 
-test('Test runApplyStagedAppConfigImport applies only app note board from staged data', () => {
+test('Test runApplyStagedAppConfigImport applies only app noteboard from staged data', () => {
   const sid = 'nb'
   faAppConfigImportStagedSessions.set(sid, {
     data: {

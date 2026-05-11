@@ -1,5 +1,5 @@
 export default {
-  title: 'Projet',
+  title: 'Gestion de projet',
   items: {
     newProject: 'Nouveau projet',
     saveProject: 'Sauvegarder le projet',

@@ -341,6 +341,14 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
   }
 }
 
+.q-notification__caption {
+  line-height: 1.4;
+}
+
+div + .q-notification__caption {
+  margin-top: 4px;
+}
+
 .q-page {
 
   /* Max-height of the window minus the height of the top bar */

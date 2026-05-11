@@ -1,6 +1,6 @@
 export default {
   minimizeButton: 'Minimize',
-  resizeButton: 'Resize Down',
+  resizeButton: 'Resize down',
   maximizeButton: 'Maximize',
   close: 'Close'
 }

@@ -1,11 +1,11 @@
 export default {
   closeButton: 'Close',
   ariaLabels: {
-    advancedSearchCheatSheet: 'Advanced Search Cheat Sheet',
+    advancedSearchCheatSheet: 'Advanced search cheat sheet',
     advancedSearchGuide: 'Advanced Search Guide',
     changeLog: 'Changelog',
     license: 'License',
-    tipsTricksTrivia: 'Tips, Tricks and Trivia',
+    tipsTricksTrivia: 'Tips, Tricks & Trivia',
     fallback: 'Markdown document dialog'
   }
 }

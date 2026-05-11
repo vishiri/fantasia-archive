@@ -448,7 +448,7 @@ test.describe.serial('Import / export app configuration E2E', () => {
       expect(fs.existsSync(getPlaywrightE2eUserDataFilePath(blankCss))).toBe(true)
     })
 
-    await test.step('Export only app note board', async () => {
+    await test.step('Export only app noteboard', async () => {
       await openImportExportFromTools(
         appWindow,
         L_toolsEn.title,
@@ -461,7 +461,7 @@ test.describe.serial('Import / export app configuration E2E', () => {
       expect(fs.existsSync(getPlaywrightE2eUserDataFilePath(blankNoteboard))).toBe(true)
     })
 
-    await test.step('Switch interface to German, devtools keybind, custom CSS, app note board, and Show document IDs', async () => {
+    await test.step('Switch interface to German, devtools keybind, custom CSS, app noteboard, and Show document IDs', async () => {
       const root = appWindow.locator(`[data-test-locator="${selectorList.languageSelectorRoot}"]`)
       await appWindow.locator(`[data-test-locator="${selectorList.languageSelectorTrigger}"]`).click()
       await expect(appWindow.locator(selectorList.languageMenuPanel)).toBeVisible()
@@ -644,7 +644,7 @@ test.describe.serial('Import / export app configuration E2E', () => {
       await saveAppStylingWindow(appWindow)
     })
 
-    await test.step('Import app note board blank: textarea empty after reopen', async () => {
+    await test.step('Import app noteboard blank: textarea empty after reopen', async () => {
       await e2eSetNextAppConfigImportPath(electronApp, blankNoteboard)
       await openImportExportFromTools(
         appWindow,

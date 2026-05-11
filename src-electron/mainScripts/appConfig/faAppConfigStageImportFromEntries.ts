@@ -27,7 +27,7 @@ export function tryStageAppImportFromUnzippedEntries (
   if (usRaw === undefined && kbRaw === undefined && nbRaw === undefined && stRaw === undefined) {
     return {
       errorName: 'FileError',
-      errorMessage: 'The archive has no app settings, keybind, note board, or app styling files',
+      errorMessage: 'The archive has no app settings, keybind, noteboard, or app styling files',
       outcome: 'error'
     }
   }

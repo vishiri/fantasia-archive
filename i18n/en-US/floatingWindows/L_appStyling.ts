@@ -1,5 +1,5 @@
 export default {
-  closeWithoutSaving: 'Close without saving',
+  closeWithoutSaving: 'Close Without Saving',
   helpTooltip: {
     aria: 'Show editor keybind reference',
     title: 'Editor keybinds',
@@ -14,10 +14,10 @@ export default {
       addPadding: 'Add padding',
       removePadding: 'Remove padding'
     },
-    footer: 'Further commands, keybinds and details can be found in the Command palette.',
+    footer: 'Further commands, keybinds and details can be found in the command palette.',
     variableListTitle: 'Fantasia Archive variable list'
   },
   loading: 'Loading editor…',
   saveButton: 'Save changes',
-  title: 'Custom app CSS'
+  title: 'Custom App CSS'
 }

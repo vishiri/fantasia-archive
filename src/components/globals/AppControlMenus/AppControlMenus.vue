@@ -35,7 +35,7 @@
         data-test-menu-any="appControlMenus-anyMenu"
       />
 
-      <!-- Help & Info Menu -->
+      <!-- Help & Info menu -->
       <AppControlSingleMenu
         v-if="testingType !== 'components'"
         :data-input="helpInfo"
@@ -168,7 +168,7 @@ const componentTestingMenuList: I_appMenuList = {
     },
     {
       mode: 'item',
-      text: 'Test Button 2 - Keybind settings (hint)',
+      text: 'Test Button 2 - Keybind Settings (hint)',
       icon: 'mdi-keyboard-settings',
       keybindCommandId: 'openKeybindSettings',
       submenu: undefined,
@@ -223,7 +223,7 @@ const componentTestingMenuList: I_appMenuList = {
       submenu: [
         {
           mode: 'item',
-          text: 'Submenu-Test Button 1 - Advanced search guide (hint)',
+          text: 'Submenu-Test Button 1 - Advanced Search Guide (hint)',
           icon: 'mdi-file-question',
           keybindCommandId: 'openAdvancedSearchGuide',
           trigger: undefined,

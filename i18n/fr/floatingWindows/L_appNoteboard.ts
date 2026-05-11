@@ -1,5 +1,5 @@
 export default {
   close: 'Fermer',
-  editorAria: 'Texte du tableau de notes de l’app',
-  title: 'Tableau de notes de l’app'
+  editorAria: 'Texte du noteboard de l’app',
+  title: 'Noteboard de l’app'
 }

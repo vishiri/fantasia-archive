@@ -1,8 +1,8 @@
 export default {
-  title: 'Documents',
+  title: 'Documents & Content',
   items: {
-    quickAddNewDocument: 'Quick-add new document',
-    quickSearchDocument: 'Quick-search existing document',
-    massDeleteDocument: 'Mass delete documents'
+    quickAddNewDocument: 'Quick-Add New Document',
+    quickSearchDocument: 'Quick-Search Existing Document',
+    massDeleteDocument: 'Mass Delete Documents'
   }
 }

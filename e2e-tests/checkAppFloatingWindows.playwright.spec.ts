@@ -41,7 +41,7 @@ const monacoMountSettleMs = 2500
 const appStylingWindowReadyMs = 30_000
 
 /**
- * Matches note board Transition timing plus a small slack for layout paint.
+ * Matches noteboard Transition timing plus a small slack for layout paint.
  */
 const noteboardChromeSettleMs = FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS + 100
 
@@ -482,10 +482,10 @@ test.describe.serial('Floating windows record geometry (fresh Playwright profile
   })
 
   /**
-   * Captures pre-open default rectangles and post-manipulation rectangles for Custom app CSS and the App note board on a clean profile, then writes them next to the Playwright report path for the follow-up launch.
-   * - Custom app CSS ends at the smallest square before it is parked at the bottom-right corner; the note board uses the same minimum square then parks top-left under the header margin band.
+   * Captures pre-open default rectangles and post-manipulation rectangles for Custom app CSS and the App noteboard on a clean profile, then writes them next to the Playwright report path for the follow-up launch.
+   * - Custom app CSS ends at the smallest square before it is parked at the bottom-right corner; the noteboard uses the same minimum square then parks top-left under the header margin band.
    */
-  test('Resize and park Custom app CSS bottom-right, then note board top-left, writing a geometry snapshot', async () => {
+  test('Resize and park Custom app CSS bottom-right, then noteboard top-left, writing a geometry snapshot', async () => {
     await expect(
       appWindow.locator('.appHeader'),
       'Floating window entries live on MainLayout; start from the splash or home route.'
@@ -526,10 +526,10 @@ test.describe.serial('Floating windows record geometry (fresh Playwright profile
     await openNoteboardFromToolsMenu(appWindow)
     const nbFrame = await waitForWindowAppNoteboardVisible(appWindow)
     const nbPreRounded = await readRoundedBoundingBoxForLocator(nbFrame)
-    assertCloseToPx(nbPreRounded.w, expectedLayout.expW, 'initial note board width', 3)
-    assertCloseToPx(nbPreRounded.h, expectedLayout.expH, 'initial note board height', 3)
-    assertCloseToPx(nbPreRounded.x, expectedLayout.expX, 'initial note board left', 3)
-    assertCloseToPx(nbPreRounded.y, expectedLayout.expY, 'initial note board top', 3)
+    assertCloseToPx(nbPreRounded.w, expectedLayout.expW, 'initial noteboard width', 3)
+    assertCloseToPx(nbPreRounded.h, expectedLayout.expH, 'initial noteboard height', 3)
+    assertCloseToPx(nbPreRounded.x, expectedLayout.expX, 'initial noteboard left', 3)
+    assertCloseToPx(nbPreRounded.y, expectedLayout.expY, 'initial noteboard top', 3)
 
     const noteboardPre: I_geomBoxRounded = nbPreRounded
 
@@ -594,9 +594,9 @@ test.describe.serial('Floating windows restore geometry after app restart (reuse
 
   /**
    * Reads the JSON snapshot from the prior serial group, reopens each floating window, and proves geometry matches the recorded post-resize snapshot instead of the centered default.
-   * - With both frames visible the note board stack order must sit above Custom app CSS; coarse reset moves each frame toward the default layout before closing the note board first per maintainer workflow notes.
+   * - With both frames visible the noteboard stack order must sit above Custom app CSS; coarse reset moves each frame toward the default layout before closing the noteboard first per maintainer workflow notes.
    */
-  test('After restart Custom app CSS and note board reopen to parked geometry, note board stacks above, then rough reset closes', async () => {
+  test('After restart Custom app CSS and noteboard reopen to parked geometry, noteboard stacks above, then rough reset closes', async () => {
     const snap = await readGeomSnapshotFromDisk()
 
     await expect(
@@ -619,14 +619,14 @@ test.describe.serial('Floating windows restore geometry after app restart (reuse
       expect(boxesAreFarApart(stylingBox, snap.stylingPre)).toBe(true)
     })
 
-    await test.step('Reopen note board on top and match post snapshot, not default pre snapshot', async () => {
+    await test.step('Reopen noteboard on top and match post snapshot, not default pre snapshot', async () => {
       await openNoteboardFromToolsMenu(appWindow)
       const nbFrame = await waitForWindowAppNoteboardVisible(appWindow)
       const nbBox = await readRoundedBoundingBoxForLocator(nbFrame)
-      assertCloseToPx(nbBox.w, snap.noteboardPost.w, 'restored note board width', 5)
-      assertCloseToPx(nbBox.h, snap.noteboardPost.h, 'restored note board height', 5)
-      assertCloseToPx(nbBox.x, snap.noteboardPost.x, 'restored note board left', 5)
-      assertCloseToPx(nbBox.y, snap.noteboardPost.y, 'restored note board top', 5)
+      assertCloseToPx(nbBox.w, snap.noteboardPost.w, 'restored noteboard width', 5)
+      assertCloseToPx(nbBox.h, snap.noteboardPost.h, 'restored noteboard height', 5)
+      assertCloseToPx(nbBox.x, snap.noteboardPost.x, 'restored noteboard left', 5)
+      assertCloseToPx(nbBox.y, snap.noteboardPost.y, 'restored noteboard top', 5)
       expect(boxesAreFarApart(nbBox, snap.noteboardPre)).toBe(true)
     })
 
@@ -637,9 +637,9 @@ test.describe.serial('Floating windows restore geometry after app restart (reuse
 
     const stylingZ = await readRoundedZIndexUnderViewport(stylingFrameLive)
     const nbZ = await readRoundedZIndexUnderViewport(nbFrameLive)
-    expect(nbZ, 'App note board z-index must exceed Custom app CSS when both floaters are visible').toBeGreaterThan(stylingZ)
+    expect(nbZ, 'App noteboard z-index must exceed Custom app CSS when both floaters are visible').toBeGreaterThan(stylingZ)
 
-    await test.step('Coarse reset note board first, close it, reset Custom app CSS, close it', async () => {
+    await test.step('Coarse reset noteboard first, close it, reset Custom app CSS, close it', async () => {
       await coarseResetFloatingTowardPreferredLayout(
         appWindow,
         nbFrameLive,

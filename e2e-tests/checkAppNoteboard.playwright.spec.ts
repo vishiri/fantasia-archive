@@ -8,7 +8,10 @@ import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import toolsMenuMessages from 'app/i18n/en-US/components/globals/AppControlMenus/L_tools'
 import noteboardMessages from 'app/i18n/en-US/floatingWindows/L_appNoteboard'
+
+import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
 import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/faQuasarDialogStandardTransition'
+import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
 
 /**
  * Extra env settings to trigger E2E testing via Playwright
@@ -28,7 +31,7 @@ const faFrontendRenderTimer: number = FA_FRONTEND_RENDER_TIMER
 const menuAnimationTimer = 600
 
 /**
- * Floating note board chrome can appear shortly after Tools menu dismissal.
+ * Floating noteboard chrome can appear shortly after Tools menu dismissal.
  */
 const noteboardWindowReadyMs = 30_000
 
@@ -41,19 +44,38 @@ const noteboardTextPersistSettleMs = 900
  * Sample paragraphs saved in phase one and expected again after an app restart.
  */
 const phaseOneNoteSample =
-  'E2E app note board line one alpha.\n' +
-  'E2E app note board line two bravo.\n' +
-  'E2E app note board line three charlie.'
+  'E2E app noteboard line one alpha.\n' +
+  'E2E app noteboard line two bravo.\n' +
+  'E2E app noteboard line three charlie.'
 
 /**
  * Object of string data selectors for the e2e
  */
 const selectorList = {
   closeButton: 'windowAppNoteboard-button-close',
+  closeButtonKeybind: 'windowAppNoteboard-button-close-keybind',
   editor: 'windowAppNoteboard-editor',
   frame: 'windowAppNoteboard-frame',
   title: 'windowAppNoteboard-title'
 } as const
+
+function toggleNoteboardKeybindParenText (): string {
+  const chord = formatFaKeybindCommandLabelFromSnapshot({
+    commandId: 'toggleAppNoteboard',
+    snapshot: {
+      platform: process.platform as NodeJS.Platform,
+      store: {
+        ...FA_KEYBINDS_STORE_DEFAULTS
+      }
+    }
+  })
+
+  if (chord === null || chord === '') {
+    throw new Error('Expected toggleAppNoteboard chord label for default store')
+  }
+
+  return `(${chord})`
+}
 
 async function openAppNoteboardFromToolsMenu (page: Page): Promise<void> {
   await dismissStartupTipsNotifyIfPresent(page)
@@ -76,9 +98,13 @@ async function waitForNoteboardFloatingWindow (page: Page): Promise<void> {
   await page.waitForTimeout(FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS + 100)
   const editor = frame.locator(`[data-test-locator="${selectorList.editor}"]`)
   await expect(editor).toBeVisible()
+
+  const closeKeybind = frame.locator(`[data-test-locator="${selectorList.closeButtonKeybind}"]`)
+  await expect(closeKeybind).toHaveCount(1)
+  await expect(closeKeybind).toHaveText(toggleNoteboardKeybindParenText())
 }
 
-test.describe.serial('App note board E2E persistence phase one (fresh Playwright profile)', () => {
+test.describe.serial('App noteboard E2E persistence phase one (fresh Playwright profile)', () => {
   let electronApp: ElectronApplication
   let appWindow: Page
   let suiteTestInfo: TestInfo
@@ -114,7 +140,7 @@ test.describe.serial('App note board E2E persistence phase one (fresh Playwright
    * Types sample notes while the floating window stays open long enough for debounced persistence, then hides the window via Close without clearing the textarea first.
    * - Subsequent phases launch the real app shell again against the same on-disk isolated profile with no reset between launches.
    */
-  test('Open App note board, type sample notes, Close', async () => {
+  test('Open App noteboard, type sample notes, Close', async () => {
     await expect(
       appWindow.locator('.appHeader'),
       'Menus live on MainLayout; phases must exercise the splash or home chrome.'
@@ -122,7 +148,7 @@ test.describe.serial('App note board E2E persistence phase one (fresh Playwright
       timeout: 20_000
     })
 
-    await test.step('Open App note board from Tools menu', async () => {
+    await test.step('Open App noteboard from Tools menu', async () => {
       await openAppNoteboardFromToolsMenu(appWindow)
       await waitForNoteboardFloatingWindow(appWindow)
     })
@@ -138,7 +164,7 @@ test.describe.serial('App note board E2E persistence phase one (fresh Playwright
   })
 })
 
-test.describe.serial('App note board E2E persistence phase two (reuse profile, no isolation reset)', () => {
+test.describe.serial('App noteboard E2E persistence phase two (reuse profile, no isolation reset)', () => {
   let electronApp: ElectronApplication
   let appWindow: Page
   let suiteTestInfo: TestInfo
@@ -175,7 +201,7 @@ test.describe.serial('App note board E2E persistence phase two (reuse profile, n
    * After a cold start on the warmed profile from phase one the textarea replays persisted characters.
    * - Clearing the textarea and allowing the debouncer to idle writes an empty string for the phase three reopen.
    */
-  test('Reopen App note board and confirm persisted text, clear all notes, Close', async () => {
+  test('Reopen App noteboard and confirm persisted text, clear all notes, Close', async () => {
     await expect(
       appWindow.locator('.appHeader'),
       'Menus live on MainLayout; phases must exercise the splash or home chrome.'
@@ -203,7 +229,7 @@ test.describe.serial('App note board E2E persistence phase two (reuse profile, n
   })
 })
 
-test.describe.serial('App note board E2E persistence phase three (reuse profile again, no isolation reset)', () => {
+test.describe.serial('App noteboard E2E persistence phase three (reuse profile again, no isolation reset)', () => {
   let electronApp: ElectronApplication
   let appWindow: Page
   let suiteTestInfo: TestInfo
@@ -239,7 +265,7 @@ test.describe.serial('App note board E2E persistence phase three (reuse profile 
   /**
    * A third cold start confirms the empty document from phase two remains empty when the Tools entry opens the chrome again.
    */
-  test('Reopen App note board confirms empty textarea', async () => {
+  test('Reopen App noteboard confirms empty textarea', async () => {
     await expect(
       appWindow.locator('.appHeader'),
       'Menus live on MainLayout; phases must exercise the splash or home chrome.'

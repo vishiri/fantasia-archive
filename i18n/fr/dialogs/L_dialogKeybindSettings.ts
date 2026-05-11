@@ -26,7 +26,7 @@ export default {
     openAppSettings: 'Ouvrir les paramètres de l’app',
     openAppStyling: 'Ouvrir le CSS personnalisé de l’app',
     toggleDeveloperTools: 'Basculer les outils de développement',
-    toggleAppNoteboard: 'Basculer le tableau de notes de l’app'
+    toggleAppNoteboard: 'Basculer le noteboard de l’app'
   },
   filterNoResultsDescription:
     'Fantasia n\'a trouvé aucune action qui correspond à votre filtre. Essayez un autre mot ou effacez le champ.',

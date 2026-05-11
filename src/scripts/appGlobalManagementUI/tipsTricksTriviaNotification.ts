@@ -4,9 +4,9 @@ import { fantasiaImageList, determineCurrentImage } from 'app/src/scripts/appGlo
 import { mdListArrayConverter } from '../_utilities/mdListArrayConverter'
 
 /**
-  * This function displays a notification with a random tip, trick, or trivia message from the tips, tricks, and trivia document.
-  * @param hideMascot - A boolean value that determines whether to hide the Fantasia mascot image or not.
-  */
+ * This function displays a notification with a random tip, trick, or trivia message from the Tips, Tricks & Trivia document.
+ * @param hideMascot - A boolean value that determines whether to hide the Fantasia mascot image or not.
+ */
 export const tipsTricksTriviaNotification = (hideMascot: boolean) => {
   const messageList = mdListArrayConverter(i18n.global.t('documents.tipsTricksTrivia'))
 
