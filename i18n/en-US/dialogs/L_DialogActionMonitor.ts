@@ -24,7 +24,8 @@ export default {
   payloadPresentAria: 'This action has a payload.',
   payloadEmptyAria: 'No payload for this action.',
   copy: {
-    success: 'Action row copied to clipboard.',
+    success: 'Action row copied to clipboard',
+    successCaption: 'Activity copied - {actionId}',
     failed: 'Could not copy the action row to the clipboard.'
   }
 }

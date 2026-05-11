@@ -13,7 +13,19 @@ vi.mock('quasar', () => ({
 }))
 
 vi.mock('app/i18n/externalFileLoader', () => ({
-  i18n: { global: { t: (key: string) => key } }
+  i18n: {
+    global: {
+      t (key: string, params?: Record<string, string>): string {
+        if (
+          key === 'dialogs.actionMonitor.copy.successCaption' &&
+          params?.actionId !== undefined
+        ) {
+          return `Activity copied - ${params.actionId}`
+        }
+        return key
+      }
+    }
+  }
 }))
 
 import { copyDialogActionMonitorRowToClipboard } from '../dialogActionMonitorRowClipboard'
@@ -35,7 +47,7 @@ beforeEach(() => {
 
 /**
  * copyDialogActionMonitorRowToClipboard
- * Should write JSON via copyToClipboard and emit a positive Notify with the row id as the message.
+ * Should write JSON via copyToClipboard and emit a positive Notify (title = success copy, caption includes action id).
  */
 test('Test that copyDialogActionMonitorRowToClipboard copies JSON and emits a positive notification', async () => {
   copyToClipboardMock.mockResolvedValueOnce(undefined)
@@ -47,7 +59,9 @@ test('Test that copyDialogActionMonitorRowToClipboard copies JSON and emits a po
   expect(parsed.id).toBe('languageSwitch')
   expect(notifyCreateMock).toHaveBeenCalledWith(
     expect.objectContaining({
-      message: 'languageSwitch',
+      caption: 'Activity copied - languageSwitch',
+      faSkipNotifyConsoleLog: true,
+      message: 'dialogs.actionMonitor.copy.success',
       type: 'positive'
     })
   )
@@ -60,6 +74,7 @@ test('Test that copyDialogActionMonitorRowToClipboard emits a negative notificat
   expect(notifyCreateMock).toHaveBeenCalledWith(
     expect.objectContaining({
       caption: 'clipboard offline',
+      faSkipNotifyConsoleLog: true,
       type: 'negative'
     })
   )
@@ -74,6 +89,7 @@ test('Test that copyDialogActionMonitorRowToClipboard wraps non-Error rejections
   expect(notifyCreateMock).toHaveBeenCalledWith(
     expect.objectContaining({
       caption: 'plain reason',
+      faSkipNotifyConsoleLog: true,
       type: 'negative'
     })
   )

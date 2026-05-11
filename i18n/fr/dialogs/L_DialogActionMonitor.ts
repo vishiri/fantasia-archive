@@ -24,7 +24,8 @@ export default {
   payloadPresentAria: 'Cette action a une charge utile.',
   payloadEmptyAria: 'Aucune charge utile pour cette action.',
   copy: {
-    success: 'Ligne d\'action copiée dans le presse-papiers.',
+    success: 'Ligne d\'action copiée dans le presse-papiers',
+    successCaption: 'Activité copiée - {actionId}',
     failed: 'Impossible de copier la ligne d\'action dans le presse-papiers.'
   }
 }

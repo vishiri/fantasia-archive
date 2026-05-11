@@ -24,7 +24,8 @@ export default {
   payloadPresentAria: 'Diese Aktion hat eine Nutzlast.',
   payloadEmptyAria: 'Keine Nutzlast für diese Aktion.',
   copy: {
-    success: 'Aktionszeile in die Zwischenablage kopiert.',
+    success: 'Aktionszeile in die Zwischenablage kopiert',
+    successCaption: 'Aktivität kopiert - {actionId}',
     failed: 'Aktionszeile konnte nicht in die Zwischenablage kopiert werden.'
   }
 }

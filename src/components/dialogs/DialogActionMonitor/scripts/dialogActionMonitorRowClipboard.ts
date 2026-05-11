@@ -8,17 +8,24 @@ import { buildDialogActionMonitorRowClipboardJson } from './dialogActionMonitorT
 
 /**
  * Copy a single action history row to the clipboard as pretty-printed JSON, surfacing one positive / negative
- * 'Notify.create' per outcome. Failures also log via 'console.error' to mirror the action manager's reporting style.
+ * 'Notify.create' per outcome. Both payloads pass 'faSkipNotifyConsoleLog' so the boot-time notify console mirror skips them;
+ * failures also log via 'console.error' before the negative toast.
  */
 export async function copyDialogActionMonitorRowToClipboard (row: I_faActionHistoryEntry): Promise<void> {
   const payload = buildDialogActionMonitorRowClipboardJson(row)
   await ResultAsync.fromPromise(copyToClipboard(payload), (error): unknown => error).match(
     (): void => {
       Notify.create({
-        caption: i18n.global.t('dialogs.actionMonitor.copy.success'),
+        caption: i18n.global.t(
+          'dialogs.actionMonitor.copy.successCaption',
+          {
+            actionId: row.id
+          }
+        ),
         color: 'positive',
+        faSkipNotifyConsoleLog: true,
         icon: 'mdi-clipboard-check-outline',
-        message: row.id,
+        message: i18n.global.t('dialogs.actionMonitor.copy.success'),
         timeout: 2500,
         type: 'positive'
       })
