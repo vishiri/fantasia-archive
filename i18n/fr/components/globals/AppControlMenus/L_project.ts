@@ -7,7 +7,6 @@ export default {
     loadRecentProject: 'Charger un projet récent',
     noRecentProjects: 'Aucun projet récent',
     recentProjectRow: 'Projet récent',
-    exportProjectDocuments: 'Exporter le projet / documents',
     showProjectDashboard: 'Afficher le tableau de bord du projet',
     closeProject: 'Fermer le projet',
     projectSettings: 'Paramètres du projet',

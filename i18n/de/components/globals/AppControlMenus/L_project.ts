@@ -7,7 +7,6 @@ export default {
     loadRecentProject: 'Zuletzt geöffnete Projekte',
     noRecentProjects: 'Keine zuletzt geöffneten Projekte',
     recentProjectRow: 'Zuletzt geöffnetes Projekt',
-    exportProjectDocuments: 'Projekt / Dokumente exportieren',
     showProjectDashboard: 'Projekt-Dashboard anzeigen',
     closeProject: 'Projekt schließen',
     projectSettings: 'Projekt-Einstellungen',

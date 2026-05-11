@@ -7,7 +7,6 @@ export default {
     loadRecentProject: 'Load Recent Project',
     noRecentProjects: 'No Recent Projects',
     recentProjectRow: 'Recent Project',
-    exportProjectDocuments: 'Export Project / Documents',
     showProjectDashboard: 'Show Project Dashboard',
     closeProject: 'Close Project',
     projectSettings: 'Project Settings',

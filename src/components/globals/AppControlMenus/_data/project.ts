@@ -46,10 +46,6 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
       submenu: hasRecent ? buildLoadRecentSubmenu(recent) : undefined
     }),
     faMenuSeparator(),
-    faMenuItem('appControlMenus.project.items.exportProjectDocuments', 'mdi-database-export-outline', {
-      conditions: gate
-    }),
-    faMenuSeparator(),
     faMenuItem('appControlMenus.project.items.showProjectDashboard', 'mdi-chart-bar', {
       conditions: gate
     }),
