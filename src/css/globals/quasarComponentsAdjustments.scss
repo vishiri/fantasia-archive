@@ -2,6 +2,12 @@
 
 /* Native element selectors first (alphabetical), then class-based rules (alphabetical). */
 
+body.body--dark {
+
+  /* Quasar ships color: #fff on the dark document shell; bind to Fantasia token for Custom app CSS. */
+  color: var(--fa-color-white);
+}
+
 body.desktop .q-focusable:focus > .q-focus-helper {
 
   /* Replacement of the overlay (before/after) elements via simple background-color opacity */
@@ -113,9 +119,46 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
   }
 }
 
+.q-dark {
+
+  /* Quasar ships color: #fff; bind to Fantasia token so Custom app CSS can theme dark surfaces consistently. */
+  color: var(--fa-color-white);
+}
+
 .q-dialog > .q-dialog__inner > .q-card {
   max-height: calc(100vh - #{$qDialog-card-maxHeightSubtract});
   max-width: $qDialog-card-maxWidth;
+}
+
+.q-field--dark .q-field__control::before {
+
+  /* Quasar uses rgba white at ~60%; tint follows Custom app CSS --fa-color-white. */
+  border-color: color-mix(in srgb, var(--fa-color-white) 60%, transparent);
+}
+
+.q-field--dark .q-field__control:hover::before {
+  border-color: var(--fa-color-white);
+}
+
+.q-field--dark .q-field__input,
+.q-field--dark .q-field__native,
+.q-field--dark .q-field__prefix,
+.q-field--dark .q-field__suffix {
+  color: var(--fa-color-white);
+}
+
+.q-field--dark .q-field__bottom,
+.q-field--dark .q-field__marginal,
+.q-field--dark:not(.q-field--highlighted) .q-field__label {
+  color: color-mix(in srgb, var(--fa-color-white) 70%, transparent);
+}
+
+.q-field--standout.q-field--dark.q-field--highlighted .q-field__control {
+  background: var(--fa-color-white);
+}
+
+.q-field--standout.q-field--dark.q-field--readonly .q-field__control::before {
+  border-color: color-mix(in srgb, var(--fa-color-white) 24%, transparent);
 }
 
 .q-item {
@@ -128,6 +171,42 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
     /* Tweak for default light shadow rendering in the dark-mode variation of the element */
     box-shadow: $qLayout-shadowAfter-boxShadow !important;
   }
+}
+
+.q-layout__section--marginal {
+
+  /* Quasar ships color: #fff against var(--q-primary); bind foreground to Fantasia token for Custom app CSS. */
+  color: var(--fa-color-white);
+}
+
+.q-list--dark.q-list--separator > .q-item-type + .q-item-type,
+.q-list--dark.q-list--separator > .q-virtual-scroll__content > .q-item-type + .q-item-type {
+
+  /* Quasar uses rgba white at 28% opacity; tint follows --fa-color-white via color-mix. */
+  border-top-color: color-mix(in srgb, var(--fa-color-white) 28%, transparent);
+}
+
+.q-list--dark,
+.q-item--dark {
+  border-color: color-mix(in srgb, var(--fa-color-white) 28%, transparent);
+  color: var(--fa-color-white);
+}
+
+.q-list--dark .q-item__label--header,
+.q-item--dark .q-item__label--header {
+  color: color-mix(in srgb, var(--fa-color-white) 64%, transparent);
+}
+
+.q-list--dark .q-item__label--caption,
+.q-list--dark .q-item__label--overline,
+.q-item--dark .q-item__label--caption,
+.q-item--dark .q-item__label--overline {
+  color: color-mix(in srgb, var(--fa-color-white) 80%, transparent);
+}
+
+.q-list--dark .q-item__section--side:not(.q-item__section--avatar),
+.q-item--dark .q-item__section--side:not(.q-item__section--avatar) {
+  color: color-mix(in srgb, var(--fa-color-white) 70%, transparent);
 }
 
 .q-markdown {
@@ -375,6 +454,10 @@ div + .q-notification__caption {
   width: $qToggle-width;
 }
 
+.q-toggle--dark .q-toggle__inner {
+  color: var(--fa-color-white);
+}
+
 .q-toggle__inner {
   max-width: $qToggle-inner-maxWidth;
   width: $qToggle-width;
@@ -384,8 +467,16 @@ div + .q-notification__caption {
   left: calc(100% - #{$qToggle-thumb-leftCalcSubtract});
 }
 
+.q-toggle__inner--truthy .q-toggle__thumb .q-icon {
+  color: var(--fa-color-white);
+}
+
 .q-toggle__thumb {
   transition: $qToggle-thumb-transition;
+}
+
+.q-toggle__thumb::after {
+  background: var(--fa-color-white);
 }
 
 .q-transition--fade-enter-active,

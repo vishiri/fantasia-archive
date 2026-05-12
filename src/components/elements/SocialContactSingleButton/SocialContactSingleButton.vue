@@ -141,9 +141,10 @@ const iconSrc = computed(() => {
 
   &.github {
     background-color: $socialContactButtons-backgroundColor-github;
+    color: $socialContactButtons-textColor-github !important;
 
     .socialContactSingleButton__text {
-      color: $socialContactButtons-textColor-github;
+      color: $socialContactButtons-textColor-github !important;
     }
 
     .q-focus-helper {
@@ -153,6 +154,11 @@ const iconSrc = computed(() => {
 
   &.discord {
     background-color: $socialContactButtons-backgroundColor-discord;
+    color: $socialContactButtons-textColor-discord !important;
+
+    .socialContactSingleButton__text {
+      color: $socialContactButtons-textColor-discord !important;
+    }
 
     .q-focus-helper {
       background-color: $socialContactButtons-hoverColor-discord !important;
@@ -161,6 +167,11 @@ const iconSrc = computed(() => {
 
   &.reddit {
     background-color: $socialContactButtons-backgroundColor-reddit;
+    color: $socialContactButtons-textColor-reddit !important;
+
+    .socialContactSingleButton__text {
+      color: $socialContactButtons-textColor-reddit !important;
+    }
 
     .q-focus-helper {
       background-color: $socialContactButtons-hoverColor-reddit !important;
@@ -169,6 +180,7 @@ const iconSrc = computed(() => {
 
   &.twitter {
     background-color: $socialContactButtons-backgroundColor-twitter;
+    color: $socialContactButtons-textColor-twitter !important;
 
     .socialContactSingleButton__text {
       color: $socialContactButtons-textColor-twitter !important;

@@ -1,7 +1,25 @@
-/* Re-binds Quasar :root public variables (quasar/src/css/core/colors.sass) to --fa-color-*.
- * Without this bridge, Custom app CSS could change --fa-color-dark on :root while .q-dark still used the
- * framework’s static --q-dark. This file is @use’d last from app.scss so it wins in the cascade. */
+/* Re-binds Quasar public brand variables (dist/quasar.css :root hex defaults) to Fantasia --fa-color-*.
+ * This file is @use’d last from app.scss so these declarations win over Quasar’s literals in the bundle.
+ *
+ * Also repeat the same mappings on body (not only :root). Inherited custom properties propagate their
+ * computed value: if only :root sets --q-dark: var(--fa-color-dark), descendants inherit the color
+ * computed on :root, so Custom app CSS that overrides --fa-color-dark on body cannot change .q-dark
+ * backgrounds that read var(--q-dark). Binding --q-* on body makes var(--fa-color-*) resolve against
+ * body’s token values for the subtree under body. */
+
 :root {
+  --q-accent: var(--fa-color-accent);
+  --q-dark: var(--fa-color-dark);
+  --q-dark-page: var(--fa-color-dark-page);
+  --q-info: var(--fa-color-info);
+  --q-negative: var(--fa-color-negative);
+  --q-positive: var(--fa-color-positive);
+  --q-primary: var(--fa-color-primary);
+  --q-secondary: var(--fa-color-secondary);
+  --q-warning: var(--fa-color-warning);
+}
+
+body {
   --q-accent: var(--fa-color-accent);
   --q-dark: var(--fa-color-dark);
   --q-dark-page: var(--fa-color-dark-page);

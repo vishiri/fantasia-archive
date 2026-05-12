@@ -1,8 +1,9 @@
 @use '../../../../css/app.palette.scss' as *;
 
-/* COMPONENT - SOCIAL CONTACT SINGLE BUTTON (chip row + text spacing; see SocialContactSingleButton.vue) */
+/* COMPONENT - SOCIAL CONTACT SINGLE BUTTON (chip row + text spacing; see SocialContactSingleButton.vue)
+ * Patreon/Ko-fi chips use literal palette white — not fa-v — so Custom App CSS cannot repaint chip labels via --fa-color-white. */
 $socialContactSingleButton-chip-borderRadius: 2px;
-$socialContactSingleButton-chip-color: fa-v('white', $white);
+$socialContactSingleButton-chip-color: $white;
 $socialContactSingleButton-chip-fontSize: 14px;
 $socialContactSingleButton-chip-fontWeight: 500;
 $socialContactSingleButton-chip-padding: 20px 30px;
