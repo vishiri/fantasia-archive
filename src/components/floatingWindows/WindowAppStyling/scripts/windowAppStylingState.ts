@@ -1,4 +1,10 @@
-import { nextTick, onBeforeUnmount, ref, watch, type Ref } from 'vue'
+import {
+  nextTick,
+  onBeforeUnmount,
+  ref,
+  watch,
+  type Ref
+} from 'vue'
 
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
@@ -12,8 +18,10 @@ import {
 } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/useMonacoMount'
 import {
   clearAppStylingLivePreviewAndRefreshFromDisk,
+  reconcileMountedMonacoWithWorkingCss,
   refreshPersistedAppStylingAndCloseWindow,
   watchAppStylingEditorCssLivePreview,
+  wireAppStylingPersistedCssIntoOpenEditor,
   wireAppStylingWindowOpenFromMenuAndProps
 } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStylingStateSideEffects'
 
@@ -42,6 +50,7 @@ export function useWindowAppStyling (props: { directInput?: T_dialogName }): I_F
   const workingCss = ref('')
   const editorHostRef = ref<HTMLDivElement | null>(null)
   let hideAfterTransitionId: number | null = null
+  const stylingStore = S_FaAppStyling()
 
   const monaco = useMonacoMount({
     onChange (next: string): void {
@@ -50,7 +59,7 @@ export function useWindowAppStyling (props: { directInput?: T_dialogName }): I_F
   })
 
   function syncWorkingFromStore (): void {
-    workingCss.value = S_FaAppStyling().css
+    workingCss.value = stylingStore.css
   }
 
   function openWindow (): void {
@@ -63,6 +72,10 @@ export function useWindowAppStyling (props: { directInput?: T_dialogName }): I_F
       return
     }
     await monaco.mountInto(editorHostRef.value, workingCss.value)
+    reconcileMountedMonacoWithWorkingCss({
+      monaco,
+      workingCss
+    })
   }
 
   function onWindowHide (): void {
@@ -83,6 +96,13 @@ export function useWindowAppStyling (props: { directInput?: T_dialogName }): I_F
 
   watchAppStylingEditorCssLivePreview(workingCss, windowModel)
 
+  wireAppStylingPersistedCssIntoOpenEditor({
+    getPersistedCss: () => stylingStore.css,
+    monaco,
+    windowModel,
+    workingCss
+  })
+
   watch(windowModel, async (isOpen, wasOpen) => {
     if (isOpen && !wasOpen) {
       if (hideAfterTransitionId !== null) {
@@ -93,7 +113,7 @@ export function useWindowAppStyling (props: { directInput?: T_dialogName }): I_F
       await onWindowShow()
     }
     if (!isOpen && wasOpen) {
-      S_FaAppStyling().clearCssLivePreview()
+      stylingStore.clearCssLivePreview()
       hideAfterTransitionId = scheduleFaFloatingWindowDelayedHide(
         hideAfterTransitionId,
         FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS,

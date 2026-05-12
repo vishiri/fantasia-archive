@@ -2,6 +2,7 @@ import { onMounted, watch, type Ref } from 'vue'
 import { Result } from 'neverthrow'
 
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
+import type { I_FaMonacoMount } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/useMonacoMount'
 import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 
@@ -23,6 +24,46 @@ export function watchAppStylingEditorCssLivePreview (
       S_FaAppStyling().setCssLivePreview(cssVal)
     }
   })
+}
+
+/**
+ * Keeps the Monaco working copy aligned when persisted styling changes while the floating window stays open, for example after Import / Export App Configuration applies newly imported styling from disk.
+ */
+export function wireAppStylingPersistedCssIntoOpenEditor (opts: {
+  getPersistedCss: () => string
+  monaco: I_FaMonacoMount
+  windowModel: Ref<boolean>
+  workingCss: Ref<string>
+}): void {
+  watch(
+    (): string => opts.getPersistedCss(),
+    (next: string) => {
+      if (!opts.windowModel.value) {
+        return
+      }
+      if (opts.workingCss.value === next) {
+        return
+      }
+      opts.workingCss.value = next
+      const ed = opts.monaco.editor.value
+      if (ed !== null) {
+        ed.setValue(next)
+      }
+    }
+  )
+}
+
+export function reconcileMountedMonacoWithWorkingCss (opts: {
+  monaco: I_FaMonacoMount
+  workingCss: Ref<string>
+}): void {
+  const ed = opts.monaco.editor.value
+  if (ed === null) {
+    return
+  }
+  if (ed.getValue() !== opts.workingCss.value) {
+    ed.setValue(opts.workingCss.value)
+  }
 }
 
 export async function refreshPersistedAppStylingAndCloseWindow (

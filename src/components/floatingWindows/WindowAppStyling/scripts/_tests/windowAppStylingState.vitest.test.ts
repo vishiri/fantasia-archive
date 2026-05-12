@@ -13,11 +13,15 @@ import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatin
 import { useWindowAppStyling } from '../windowAppStylingState'
 import type { I_FaWindowAppStylingState } from '../windowAppStylingState'
 
+/**
+ * Mirrors Pinia-backed `css` reactivity while `S_FaAppStyling` is mocked without `defineStore`; `watch` on `stylingStore.css` subscribes to this ref inside the mocked getter.
+ */
+const faAppStylingCssRef = ref('')
+
 const {
   monacoEditorCreateMock,
   editorInstance,
   runFaActionAwaitMock,
-  faAppStylingCssRef,
   faAppStylingCssLivePreviewRef,
   dialogStoreRef,
   setCssLivePreviewMock,
@@ -45,7 +49,6 @@ const {
     monacoEditorCreateMock: vi.fn((_host: unknown, _opts: unknown) => instance),
     editorInstance: instance,
     runFaActionAwaitMock: vi.fn(async () => true),
-    faAppStylingCssRef: { value: '' as string },
     faAppStylingCssLivePreviewRef: { value: null as string | null },
     dialogStoreRef: {
       value: null as { dialogToOpen: string | null, dialogUUID: string } | null,
@@ -392,6 +395,29 @@ test('Test that opening the app styling window publishes working css as live pre
   await nextTick()
   await flushPromises()
   expect(setCssLivePreviewMock).toHaveBeenCalledWith('body { margin: 0; }')
+})
+
+/**
+ * useWindowAppStyling
+ * Persisted store CSS changes (for example after .faconfig import) resync the Monaco working copy while the window stays open.
+ */
+test('Test that persisted css changes resync workingCss and Monaco while the window is open', async () => {
+  faAppStylingCssRef.value = ':root { --x: 1; }'
+
+  const { harness } = mountUseWindow('WindowAppStyling')
+  await nextTick()
+  const host = document.createElement('div')
+  harness.current!.setEditorHost(host)
+  await harness.current!.state.onWindowShow()
+  await flushPromises()
+
+  expect(harness.current!.state.workingCss.value).toBe(':root { --x: 1; }')
+
+  faAppStylingCssRef.value = '/* imported */\nbody {}'
+  await nextTick()
+
+  expect(harness.current!.state.workingCss.value).toBe('/* imported */\nbody {}')
+  expect(editorInstance.getValue()).toBe('/* imported */\nbody {}')
 })
 
 /**
