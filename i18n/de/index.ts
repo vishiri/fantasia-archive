@@ -23,11 +23,13 @@ import L_newProject from './dialogs/L_newProject'
 import L_markdownDocument from './dialogs/L_markdownDocument'
 import L_appSettings from '../en-US/dialogs/L_appSettings'
 import L_appNoteboard from './floatingWindows/L_appNoteboard'
+import L_projectNoteboard from './floatingWindows/L_projectNoteboard'
 import L_appStylingFloating from './floatingWindows/L_appStyling'
 
 import L_faActionManager from './globalFunctionality/L_faActionManager'
 import L_faKeybinds from './globalFunctionality/L_faKeybinds'
 import L_faAppNoteboard from './globalFunctionality/L_faAppNoteboard'
+import L_faProjectNoteboard from './globalFunctionality/L_faProjectNoteboard'
 import L_faAppStyling from './globalFunctionality/L_faAppStyling'
 import L_faProjectSession from './globalFunctionality/L_faProjectSession'
 import L_faUserSettings from './globalFunctionality/L_faUserSettings'
@@ -71,7 +73,8 @@ export default {
   // FLOATING WINDOWS (in-renderer movable / resizable surfaces)
   floatingWindows: {
     appNoteboard: L_appNoteboard,
-    appStyling: L_appStylingFloating
+    appStyling: L_appStylingFloating,
+    projectNoteboard: L_projectNoteboard
   },
 
   // COMPONENT - GLOBAL LANGUAGE SELECTOR
@@ -99,6 +102,7 @@ export default {
     faActionManager: L_faActionManager,
     faKeybinds: L_faKeybinds,
     faAppNoteboard: L_faAppNoteboard,
+    faProjectNoteboard: L_faProjectNoteboard,
     faAppStyling: L_faAppStyling,
     faProjectSession: L_faProjectSession,
     faUserSettings: L_faUserSettings,

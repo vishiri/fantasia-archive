@@ -31,6 +31,34 @@ export function registerFaFloatingWindowFrameOpenLayoutWatch (opts: {
     y
   } = opts
 
+  async function layoutFromPersistedStorageOrViewportCenter (): Promise<void> {
+    const pf = options.persistedFrame?.value
+    if (isUsableFaFloatingWindowPersistedRect(pf, layout)) {
+      const clamped = clampFaFloatingWindowFrameToViewport(
+        layout,
+        {
+          innerHeight: window.innerHeight,
+          innerWidth: window.innerWidth
+        },
+        {
+          h: pf.height,
+          w: pf.width,
+          x: pf.x,
+          y: pf.y
+        }
+      )
+      x.value = clamped.x
+      y.value = clamped.y
+      w.value = clamped.w
+      h.value = clamped.h
+    } else {
+      centerFloatingWindowFrameInViewport(layout, x, y, w, h)
+    }
+    raiseZ()
+    await nextTick()
+    attachResizeObserver()
+  }
+
   watch(
     visible,
     async (isOpen) => {
@@ -38,31 +66,20 @@ export function registerFaFloatingWindowFrameOpenLayoutWatch (opts: {
         teardownResizeObserver()
         return
       }
-      const pf = options.persistedFrame?.value
-      if (isUsableFaFloatingWindowPersistedRect(pf, layout)) {
-        const clamped = clampFaFloatingWindowFrameToViewport(
-          layout,
-          {
-            innerHeight: window.innerHeight,
-            innerWidth: window.innerWidth
-          },
-          {
-            h: pf.height,
-            w: pf.width,
-            x: pf.x,
-            y: pf.y
-          }
-        )
-        x.value = clamped.x
-        y.value = clamped.y
-        w.value = clamped.w
-        h.value = clamped.h
-      } else {
-        centerFloatingWindowFrameInViewport(layout, x, y, w, h)
-      }
-      raiseZ()
-      await nextTick()
-      attachResizeObserver()
+      await layoutFromPersistedStorageOrViewportCenter()
     }
   )
+
+  const persistedFrameRef = options.persistedFrame
+  if (persistedFrameRef !== undefined) {
+    watch(
+      persistedFrameRef,
+      async () => {
+        if (!visible.value) {
+          return
+        }
+        await layoutFromPersistedStorageOrViewportCenter()
+      }
+    )
+  }
 }

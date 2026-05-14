@@ -8,7 +8,8 @@ import type { I_UseFaFloatingWindowFrameOptions } from 'app/src/scripts/floating
 import { useFaFloatingWindowFramePresentation } from 'app/src/scripts/floatingWindows/useFaFloatingWindowFramePresentation'
 import {
   bumpFloatingWindowZIndex,
-  bumpNoteboardFloatingWindowZIndex
+  bumpNoteboardFloatingWindowZIndex,
+  bumpProjectNoteboardFloatingWindowZIndex
 } from 'app/src/scripts/floatingWindows/faFloatingWindowZIndex'
 import { useFaFloatingWindowResize } from 'app/src/scripts/floatingWindows/useFaFloatingWindowResize'
 import { useFaFloatingWindowTitleDrag } from 'app/src/scripts/floatingWindows/useFaFloatingWindowTitleDrag'
@@ -24,6 +25,19 @@ export {
 
 export { centerFloatingWindowFrameInViewport } from 'app/src/scripts/floatingWindows/faFloatingWindowFrameCenterInViewport'
 
+function bumpZSelectorForFloatingWindowLayer (
+  layer: I_UseFaFloatingWindowFrameOptions['floatingWindowZLayer']
+): typeof bumpFloatingWindowZIndex {
+  const resolvedFloatingLayer = layer ?? 'standard'
+  if (resolvedFloatingLayer === 'noteboard') {
+    return bumpNoteboardFloatingWindowZIndex
+  }
+  if (resolvedFloatingLayer === 'projectNoteboard') {
+    return bumpProjectNoteboardFloatingWindowZIndex
+  }
+  return bumpFloatingWindowZIndex
+}
+
 /**
  * Draggable, resizable fixed-position frame for in-renderer floating windows (Vue 3 + Quasar 2).
  * The published '@quasar/quasar-ui-qwindow' targets Quasar v1 / Vue 2 only, so Fantasia Archive ships this composable instead.
@@ -33,11 +47,7 @@ export function useFaFloatingWindowFrame (
   layout: I_FaFloatingWindowFrameLayout = FA_FLOATING_WINDOW_FRAME_DEFAULT_LAYOUT,
   options: I_UseFaFloatingWindowFrameOptions = {}
 ) {
-  const floatingWindowZLayer = options.floatingWindowZLayer ?? 'standard'
-  const bumpZ =
-    floatingWindowZLayer === 'noteboard'
-      ? bumpNoteboardFloatingWindowZIndex
-      : bumpFloatingWindowZIndex
+  const bumpZ = bumpZSelectorForFloatingWindowLayer(options.floatingWindowZLayer)
 
   const frameRef = ref<HTMLElement | null>(null)
   const x = ref(0)

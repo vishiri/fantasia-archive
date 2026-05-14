@@ -124,6 +124,30 @@ test('Test that useFaFloatingWindowFrame uses the noteboard z-index band when op
 
 /**
  * useFaFloatingWindowFrame
+ * Project noteboard layer uses the top sub-band (5950+) so it stacks above the app noteboard floats.
+ */
+test('Test that useFaFloatingWindowFrame uses the project noteboard z-index band when options request it', async () => {
+  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MIN } = await import(
+    'app/src/scripts/floatingWindows/faFloatingWindowZIndex'
+  )
+  const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame, {
+    floatingWindowZLayer: 'projectNoteboard'
+  })
+  const vm = wrapper.vm as unknown as {
+    frameStyle: { zIndex: number }
+  }
+  expect(vm.frameStyle.zIndex).toBeGreaterThanOrEqual(FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MIN)
+  visible.value = true
+  await wrapper.vm.$nextTick()
+  await wrapper.vm.$nextTick()
+  expect(vm.frameStyle.zIndex).toBeGreaterThanOrEqual(FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MIN)
+  expect(vm.frameStyle.zIndex).toBeLessThan(6000)
+  wrapper.unmount()
+})
+
+/**
+ * useFaFloatingWindowFrame
  * titleShortFrameClass is set when observed height is below the compact vertical threshold.
  */
 test('Test that useFaFloatingWindowFrame titleShortFrameClass follows frame height versus the compact threshold', async () => {
@@ -498,6 +522,79 @@ test('Test that useFaFloatingWindowFrame restores persisted geometry when visibl
   expect(vm.frameStyle.top).toBe('40px')
   expect(vm.frameStyle.width).toBe('300px')
   expect(vm.frameStyle.height).toBe('300px')
+  wrapper.unmount()
+})
+
+/**
+ * useFaFloatingWindowFrame
+ * When 'persistedFrame' updates while visible (loading a different persisted project snapshot), clamped geometry is reapplied.
+ */
+test('Test that useFaFloatingWindowFrame reapplies persisted geometry when persistedFrame changes while visible', async () => {
+  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const persistedFrame = ref<I_faFloatingWindowPersistedRect | null>({
+    height: 300,
+    width: 300,
+    x: 10,
+    y: 40
+  })
+  const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame, {
+    persistedFrame
+  })
+  const vm = wrapper.vm as unknown as {
+    frameStyle: { left: string; top: string; width: string; height: string }
+  }
+  visible.value = true
+  await wrapper.vm.$nextTick()
+  await wrapper.vm.$nextTick()
+  expect(vm.frameStyle.left).toBe('10px')
+  expect(vm.frameStyle.top).toBe('40px')
+  persistedFrame.value = {
+    height: 400,
+    width: 250,
+    x: 120,
+    y: 80
+  }
+  await wrapper.vm.$nextTick()
+  await wrapper.vm.$nextTick()
+  expect(vm.frameStyle.left).toBe('120px')
+  expect(vm.frameStyle.top).toBe('80px')
+  expect(vm.frameStyle.width).toBe('250px')
+  expect(vm.frameStyle.height).toBe('400px')
+  wrapper.unmount()
+})
+
+/**
+ * useFaFloatingWindowFrame
+ * When 'persistedFrame' updates while the window is hidden, geometry is not reapplied until the user opens the window again.
+ */
+test('Test that useFaFloatingWindowFrame ignores persistedFrame updates while hidden', async () => {
+  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const persistedFrame = ref<I_faFloatingWindowPersistedRect | null>({
+    height: 300,
+    width: 300,
+    x: 10,
+    y: 40
+  })
+  const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame, {
+    persistedFrame
+  })
+  const vm = wrapper.vm as unknown as {
+    frameStyle: { left: string; top: string; width: string; height: string }
+  }
+  expect(vm.frameStyle.left).toBe('0px')
+  persistedFrame.value = {
+    height: 400,
+    width: 350,
+    x: 200,
+    y: 100
+  }
+  await wrapper.vm.$nextTick()
+  await wrapper.vm.$nextTick()
+  expect(vm.frameStyle.left).toBe('0px')
+  visible.value = true
+  await wrapper.vm.$nextTick()
+  await wrapper.vm.$nextTick()
+  expect(vm.frameStyle.left).toBe('200px')
   wrapper.unmount()
 })
 

@@ -1,7 +1,6 @@
 import prompts from '@tmaize/prompts'
 import appRoot from 'app-root-path'
-import { spawn } from 'node:child_process'
-import { resolve } from 'path'
+import { spawnSync } from 'node:child_process'
 import { readdir } from 'fs/promises'
 import path from 'node:path'
 
@@ -20,10 +19,33 @@ async function runSpecificTest () {
     }
   })
 
-  spawn('npm', ['run', 'test:components:single:ci', response.value], {
-    stdio: 'inherit',
-    shell: true
+  // Invoke the Playwright trim wrapper directly with the spec path. Using 'npm run … %npm_config_component%'
+  // from the list picker leaves the token unexpanded on Windows (Yarn/npm), which breaks single:ci.
+  const root = path.resolve(String(appRoot))
+  const specRel = response.value.replaceAll('\\', '/').replace(/^\/+/u, '')
+  const specResolved = path.resolve(root, specRel)
+
+  /**
+   * Pass a posix-style repo-relative path so downstream Playwright spawning never relies on shell
+   * quoting around Windows absolute backslash paths under cmd.exe shell:true.
+   */
+  const specArg = path.relative(root, specResolved).replace(/\\/gu, '/')
+  const trimmer = path.join(root, 'scripts', 'playwrightWithArtifactTrim.mjs')
+  const childEnv = {
+    ...process.env
+  }
+  delete childEnv.npm_config_component
+  delete childEnv.NPM_CONFIG_COMPONENT
+  const result = spawnSync(process.execPath, [
+    trimmer,
+    'test',
+    specArg
+  ], {
+    cwd: root,
+    env: childEnv,
+    stdio: 'inherit'
   })
+  process.exit(result.status === null ? 1 : result.status)
 }
 
 async function getTestList () {
@@ -39,11 +61,11 @@ async function getTestList () {
 
   return testList
 }
-async function readDirectory (path = '', fitler = '') {
-  const filesInPath = await readdir(path, { withFileTypes: true })
+async function readDirectory (dir = '', fitler = '') {
+  const filesInPath = await readdir(dir, { withFileTypes: true })
 
   const files = await Promise.all(filesInPath.map((fileInPath) => {
-    const resolvedPath = resolve(path, fileInPath.name)
+    const resolvedPath = path.resolve(dir, fileInPath.name)
     return fileInPath.isDirectory() ? readDirectory(resolvedPath) : resolvedPath
   }))
 

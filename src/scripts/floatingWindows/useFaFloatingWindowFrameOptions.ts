@@ -8,9 +8,10 @@ import type { I_faFloatingWindowPersistedRect } from 'app/types/I_faFloatingWind
  */
 export interface I_UseFaFloatingWindowFrameOptions {
   /**
-   * 'noteboard' uses the upper z-index band (5900–5999) so the app noteboard stays above
-   * other floating windows (5000–5899) while remaining below modal dialogs and menus (6000+).
+   * 'noteboard' anchors the floating frame in band 5900–5949 (app-wide sticky notes).
+   * 'projectNoteboard' uses band 5950–5999 so it stacks visibly above those windows yet still beneath modal chrome (6000+).
+   * 'standard' uses band 5000–5899 (for example styling or other panels).
    */
-  floatingWindowZLayer?: 'noteboard' | 'standard'
+  floatingWindowZLayer?: 'noteboard' | 'projectNoteboard' | 'standard'
   persistedFrame?: Ref<I_faFloatingWindowPersistedRect | null | undefined>
 }

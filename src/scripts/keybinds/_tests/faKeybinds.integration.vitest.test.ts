@@ -503,6 +503,7 @@ test('FA_KEYBIND_COMMAND_DEFINITIONS lists expected commands', () => {
     'openAppStyling',
     'openKeybindSettings',
     'toggleAppNoteboard',
-    'toggleDeveloperTools'
+    'toggleDeveloperTools',
+    'toggleProjectNoteboard'
   ])
 })

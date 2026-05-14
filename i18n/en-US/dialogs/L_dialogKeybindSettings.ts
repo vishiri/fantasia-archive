@@ -26,7 +26,8 @@ export default {
     openAppSettings: 'Open App Settings',
     openAppStyling: 'Open Custom App CSS',
     toggleDeveloperTools: 'Toggle Developer Tools',
-    toggleAppNoteboard: 'Toggle App Noteboard'
+    toggleAppNoteboard: 'Toggle App Noteboard',
+    toggleProjectNoteboard: 'Toggle Project Noteboard'
   },
   filterNoResultsDescription:
     'Fantasia sadly didn\'t find any keybinds you were looking for. Perhaps try looking for a different one?',

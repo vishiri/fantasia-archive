@@ -8,7 +8,8 @@ export const FA_KEYBIND_COMMAND_IDS = [
   'openAppSettings',
   'openAppStyling',
   'toggleDeveloperTools',
-  'toggleAppNoteboard'
+  'toggleAppNoteboard',
+  'toggleProjectNoteboard'
 ] as const
 
 /**

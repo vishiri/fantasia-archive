@@ -8,6 +8,10 @@ import type {
   I_faProjectOpenInput,
   I_faProjectOpenResult
 } from 'app/types/I_faProjectManagementDomain'
+import type {
+  I_faProjectNoteboardPatch,
+  I_faProjectNoteboardRoot
+} from 'app/types/I_faProjectNoteboardDomain'
 import type { I_faRecentProjectEntry } from 'app/types/I_faRecentProjectsDomain'
 
 export const projectManagementAPI: I_faProjectManagementAPI = {
@@ -17,6 +21,12 @@ export const projectManagementAPI: I_faProjectManagementAPI = {
       FA_PROJECT_MANAGEMENT_IPC.createProjectAsync,
       payload
     ) as I_faProjectCreateResult
+  },
+
+  async getProjectNoteboard (): Promise<I_faProjectNoteboardRoot> {
+    return await ipcRenderer.invoke(
+      FA_PROJECT_MANAGEMENT_IPC.getProjectNoteboardAsync
+    ) as I_faProjectNoteboardRoot
   },
 
   async getRecentProjects (): Promise<I_faRecentProjectEntry[]> {
@@ -33,5 +43,13 @@ export const projectManagementAPI: I_faProjectManagementAPI = {
       FA_PROJECT_MANAGEMENT_IPC.openProjectAsync,
       payload
     ) as I_faProjectOpenResult
+  },
+
+  async setProjectNoteboard (patch: I_faProjectNoteboardPatch): Promise<boolean> {
+    const payload = JSON.parse(JSON.stringify(patch)) as I_faProjectNoteboardPatch
+    return await ipcRenderer.invoke(
+      FA_PROJECT_MANAGEMENT_IPC.setProjectNoteboardPatchAsync,
+      payload
+    ) as boolean
   }
 }

@@ -40,5 +40,6 @@ test('externalFileLoader exposes i18n global API', () => {
   expect(i18n.global.t('dialogs.keybindSettings.filterNoResultsDescription')).toBeTruthy()
   expect(i18n.global.t('floatingWindows.appStyling.title')).toBeTruthy()
   expect(i18n.global.t('floatingWindows.appNoteboard.title')).toBeTruthy()
+  expect(i18n.global.t('floatingWindows.projectNoteboard.title')).toBeTruthy()
   expect(i18n.global.t('globalFunctionality.faAppStyling.saveSuccess')).toBeTruthy()
 })

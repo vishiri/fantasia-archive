@@ -149,8 +149,14 @@ function resetFaVitestRendererHarness (): void {
     },
     projectManagement: {
       createProject: vi.fn(async () => ({ outcome: 'canceled' as const })),
+      getProjectNoteboard: vi.fn(async () => ({
+        frame: null,
+        schemaVersion: 1 as const,
+        text: ''
+      })),
       getRecentProjects: vi.fn(async () => []),
-      openProject: vi.fn(async () => ({ outcome: 'canceled' as const }))
+      openProject: vi.fn(async () => ({ outcome: 'canceled' as const })),
+      setProjectNoteboard: vi.fn(async (): Promise<boolean> => true)
     }
   }
 }

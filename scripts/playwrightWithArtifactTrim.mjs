@@ -73,10 +73,15 @@ function normalizePlaywrightCliArgs (argv) {
 }
 
 const pwArgs = normalizePlaywrightCliArgs(process.argv.slice(2))
-const r = spawnSync('npx', ['playwright', ...pwArgs], {
+
+const playwrightCli = path.join(root, 'node_modules', 'playwright', 'cli.js')
+
+const r = spawnSync(process.execPath, [
+  playwrightCli,
+  ...pwArgs
+], {
   cwd: root,
   env: process.env,
-  shell: true,
   stdio: 'inherit'
 })
 

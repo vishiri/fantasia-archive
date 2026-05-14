@@ -9,7 +9,7 @@ export interface I_faActiveProject {
   filePath: string
 
   /**
-   * Persistent project UUID stored in the SQLite `project_options.project_uuid` row (same value after reload).
+   * Persistent project UUID stored in the SQLite 'project_data' row keyed 'project_uuid' (same value after reload).
    */
   id: string
 

@@ -49,3 +49,8 @@ test('faKeybindRunCommand routes toggleAppNoteboard to the toggleAppNoteboardWin
   faKeybindRunCommand('toggleAppNoteboard')
   expect(runFaActionMock).toHaveBeenCalledWith('toggleAppNoteboardWindow', undefined)
 })
+
+test('faKeybindRunCommand routes toggleProjectNoteboard to the toggleProjectNoteboardWindow action', () => {
+  faKeybindRunCommand('toggleProjectNoteboard')
+  expect(runFaActionMock).toHaveBeenCalledWith('toggleProjectNoteboardWindow', undefined)
+})

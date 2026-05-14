@@ -17,6 +17,7 @@ export default {
     openTipsTricksTriviaDialog: 'Ouvrir astuces, conseils & anecdotes',
     refreshWebContentsAfterLanguage: 'Rafraîchir le contenu de la fenêtre',
     reportAppNoteboardSaveFailure: 'Signaler une erreur d’enregistrement du noteboard de l’app',
+    reportProjectNoteboardSaveFailure: 'Signaler une erreur d’enregistrement du noteboard du projet',
     reportAppStylingPersistFailure: 'Signaler une erreur d’enregistrement du cadre CSS de l’app',
     resizeApp: 'Redimensionner la fenêtre',
     saveKeybindSettings: 'Enregistrer les raccourcis clavier',
@@ -24,6 +25,7 @@ export default {
     saveAppStyling: 'Enregistrer le CSS personnalisé de l’app',
     showStartupTipsNotification: 'Afficher l\'astuce au démarrage',
     toggleDeveloperTools: 'Basculer les outils de développement',
-    toggleAppNoteboardWindow: 'Basculer la fenêtre du noteboard de l’app'
+    toggleAppNoteboardWindow: 'Basculer la fenêtre du noteboard de l’app',
+    toggleProjectNoteboardWindow: 'Basculer la fenêtre du noteboard du projet'
   }
 }

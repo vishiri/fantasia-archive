@@ -83,3 +83,28 @@ test('projectManagementAPI openProject clones optional filePath payload', async 
   )
   expect(input.filePath).toBe('D:\\z.faproject')
 })
+
+test('projectManagementAPI getProjectNoteboard invokes IPC', async () => {
+  const snapshot = {
+    frame: null,
+    schemaVersion: 1 as const,
+    text: 'x'
+  }
+
+  invokeMock.mockResolvedValueOnce(snapshot)
+  const r = await projectManagementAPI.getProjectNoteboard()
+  expect(r).toEqual(snapshot)
+  expect(invokeMock).toHaveBeenCalledWith(FA_PROJECT_MANAGEMENT_IPC.getProjectNoteboardAsync)
+})
+
+test('projectManagementAPI setProjectNoteboard invokes IPC with cloned patch', async () => {
+  invokeMock.mockResolvedValueOnce(true)
+  const patch = { text: 'y' }
+  const persisted = await projectManagementAPI.setProjectNoteboard(patch)
+  expect(persisted).toBe(true)
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.setProjectNoteboardPatchAsync,
+    { text: 'y' }
+  )
+  expect(patch.text).toBe('y')
+})

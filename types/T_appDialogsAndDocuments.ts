@@ -9,6 +9,7 @@ export type T_dialogName =
   | 'NewProject'
   | 'AppSettings'
   | 'WindowAppNoteboard'
+  | 'WindowProjectNoteboard'
   | 'WindowAppStyling'
   | ''
 

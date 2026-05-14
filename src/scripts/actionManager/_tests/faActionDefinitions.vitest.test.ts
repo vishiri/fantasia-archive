@@ -30,6 +30,7 @@ const {
   refreshRecentProjectsMock,
   refreshAppStylingMock,
   refreshNoteboardMock,
+  refreshProjectNoteboardMock,
   refreshWebContentsMock,
   resizeWindowMock,
   tipsNotificationMock,
@@ -53,6 +54,7 @@ const {
   refreshKeybindsMock: vi.fn(async () => undefined),
   refreshAppStylingMock: vi.fn(async () => undefined),
   refreshNoteboardMock: vi.fn(async () => undefined),
+  refreshProjectNoteboardMock: vi.fn(async () => undefined),
   refreshRecentProjectsMock: vi.fn(async () => undefined),
   refreshSettingsMock: vi.fn(async () => undefined),
   refreshWebContentsMock: vi.fn(async () => true),
@@ -119,6 +121,12 @@ vi.mock('app/src/stores/S_FaAppNoteboard', () => ({
   })
 }))
 
+vi.mock('app/src/stores/S_FaProjectNoteboard', () => ({
+  S_FaProjectNoteboard: () => ({
+    refreshProjectNoteboard: refreshProjectNoteboardMock
+  })
+}))
+
 vi.mock('app/src/stores/S_FaUserSettings', () => ({
   S_FaUserSettings: () => ({
     refreshSettings: refreshSettingsMock,
@@ -175,6 +183,8 @@ beforeEach(() => {
   refreshAppStylingMock.mockImplementation(async () => undefined)
   refreshNoteboardMock.mockReset()
   refreshNoteboardMock.mockImplementation(async () => undefined)
+  refreshProjectNoteboardMock.mockReset()
+  refreshProjectNoteboardMock.mockImplementation(async () => undefined)
   refreshSettingsMock.mockReset()
   refreshSettingsMock.mockImplementation(async () => undefined)
   createProjectFromUserInputMock.mockReset()
@@ -340,6 +350,7 @@ test('Test that createNewProject handler delegates to S_FaActiveProject when cre
   await (definitionFor('createNewProject').handler({ projectName: 'Realm' }) as Promise<unknown>)
   expect(createProjectFromUserInputMock).toHaveBeenCalledWith('Realm')
   expect(refreshRecentProjectsMock).toHaveBeenCalledOnce()
+  expect(refreshProjectNoteboardMock).toHaveBeenCalledOnce()
   expect(Notify.create).toHaveBeenCalledWith({
     message:
       'globalFunctionality.faProjectSession.notifyProjectCreated|Fixture Realm',
@@ -362,6 +373,7 @@ test('Test that loadExistingProject handler delegates to openProjectFromUserDial
   expect(openProjectFromUserDialogMock).toHaveBeenCalledOnce()
   expect(openProjectFromKnownPathMock).not.toHaveBeenCalled()
   expect(refreshRecentProjectsMock).toHaveBeenCalledOnce()
+  expect(refreshProjectNoteboardMock).toHaveBeenCalledOnce()
   expect(Notify.create).toHaveBeenCalledWith({
     message:
       'globalFunctionality.faProjectSession.notifyProjectLoaded|Fixture Realm',
@@ -383,6 +395,7 @@ test('Test that loadExistingProject handler delegates to openProjectFromKnownPat
   expect(openProjectFromKnownPathMock).toHaveBeenCalledWith('C:\\r\\recent.faproject')
   expect(openProjectFromUserDialogMock).not.toHaveBeenCalled()
   expect(refreshRecentProjectsMock).toHaveBeenCalledOnce()
+  expect(refreshProjectNoteboardMock).toHaveBeenCalledOnce()
 })
 
 test('Test that loadExistingProject handler throws when open succeeds but active project is missing', async () => {
@@ -426,6 +439,7 @@ test('Test that importAppConfigApply handler calls applyImport and refreshes sto
   expect(refreshKeybindsMock).toHaveBeenCalledOnce()
   expect(refreshAppStylingMock).toHaveBeenCalledOnce()
   expect(refreshNoteboardMock).toHaveBeenCalledOnce()
+  expect(refreshProjectNoteboardMock).toHaveBeenCalledOnce()
 })
 
 test('Test that importAppConfigApply throws when the app config bridge is missing', async () => {

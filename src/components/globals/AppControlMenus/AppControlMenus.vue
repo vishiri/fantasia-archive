@@ -51,6 +51,7 @@
     <DialogAppSettings v-if="embedDialogs" />
     <WindowAppStyling v-if="embedDialogs" />
     <WindowAppNoteboard v-if="embedDialogs" />
+    <WindowProjectNoteboard v-if="embedDialogs" />
     <DialogImportExportAppConfig v-if="embedDialogs" />
     <DialogNewProject v-if="embedDialogs" />
   </div>
@@ -82,6 +83,7 @@ import DialogKeybindSettings from 'app/src/components/dialogs/DialogKeybindSetti
 import DialogAppSettings from 'app/src/components/dialogs/DialogAppSettings/DialogAppSettings.vue'
 import DialogImportExportAppConfig from 'app/src/components/dialogs/DialogImportExportAppConfig/DialogImportExportAppConfig.vue'
 import WindowAppNoteboard from 'app/src/components/floatingWindows/WindowAppNoteboard/WindowAppNoteboard.vue'
+import WindowProjectNoteboard from 'app/src/components/floatingWindows/WindowProjectNoteboard/WindowProjectNoteboard.vue'
 import WindowAppStyling from 'app/src/components/floatingWindows/WindowAppStyling/WindowAppStyling.vue'
 
 function readInitialTestingType (): string | false {

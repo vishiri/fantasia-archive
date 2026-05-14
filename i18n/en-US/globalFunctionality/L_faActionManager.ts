@@ -17,6 +17,7 @@ export default {
     openTipsTricksTriviaDialog: 'Open Tips, Tricks & Trivia',
     refreshWebContentsAfterLanguage: 'Refresh Window Contents',
     reportAppNoteboardSaveFailure: 'Report App Noteboard Save Failure',
+    reportProjectNoteboardSaveFailure: 'Report Project Noteboard Save Failure',
     reportAppStylingPersistFailure: 'Report Custom App CSS Window Persist Failure',
     resizeApp: 'Resize Window',
     saveKeybindSettings: 'Save Keybind Settings',
@@ -24,6 +25,7 @@ export default {
     saveAppStyling: 'Save Custom App CSS',
     showStartupTipsNotification: 'Show Startup Tip Notification',
     toggleDeveloperTools: 'Toggle Developer Tools',
-    toggleAppNoteboardWindow: 'Toggle App Noteboard Window'
+    toggleAppNoteboardWindow: 'Toggle App Noteboard Window',
+    toggleProjectNoteboardWindow: 'Toggle Project Noteboard Window'
   }
 }

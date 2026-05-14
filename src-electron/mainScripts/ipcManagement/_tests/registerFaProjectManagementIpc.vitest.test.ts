@@ -2,14 +2,27 @@ import { beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_PROJECT_MANAGEMENT_IPC } from 'app/src-electron/electron-ipc-bridge'
 
-const { runCreateMock, runOpenMock, ipcMainHandleMock, appOnMock, closeActiveMock, getRecentSnapshotMock } = vi.hoisted(() => {
+const {
+  runCreateMock,
+  runOpenMock,
+  ipcMainHandleMock,
+  appOnMock,
+  closeActiveMock,
+  getRecentSnapshotMock,
+  readProjectNoteboardRootMock,
+  upsertProjectNoteboardKvMock,
+  getFaProjectActiveDbMock
+} = vi.hoisted(() => {
   return {
     appOnMock: vi.fn(),
     closeActiveMock: vi.fn(),
+    getFaProjectActiveDbMock: vi.fn(),
     getRecentSnapshotMock: vi.fn((): Array<{ filePath: string, name: string }> => []),
     ipcMainHandleMock: vi.fn(),
+    readProjectNoteboardRootMock: vi.fn(),
     runCreateMock: vi.fn(async () => ({ outcome: 'canceled' as const })),
-    runOpenMock: vi.fn(async () => ({ outcome: 'canceled' as const }))
+    runOpenMock: vi.fn(async () => ({ outcome: 'canceled' as const })),
+    upsertProjectNoteboardKvMock: vi.fn()
   }
 })
 
@@ -38,7 +51,8 @@ vi.mock('app/src-electron/mainScripts/projectManagement/faProjectOpenRun', () =>
 
 vi.mock('app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase', () => {
   return {
-    closeFaProjectActiveDatabase: closeActiveMock
+    closeFaProjectActiveDatabase: closeActiveMock,
+    getFaProjectActiveDatabase: () => getFaProjectActiveDbMock()
   }
 })
 
@@ -47,6 +61,16 @@ vi.mock('app/src-electron/mainScripts/projectManagement/faRecentProjectListRunti
     getRecentProjectsSnapshot: getRecentSnapshotMock
   }
 })
+
+vi.mock(
+  'app/src-electron/mainScripts/projectManagement/faProjectNoteboardPersist',
+  () => {
+    return {
+      readFaProjectNoteboardRoot: readProjectNoteboardRootMock,
+      upsertFaProjectNoteboardKv: upsertProjectNoteboardKvMock
+    }
+  }
+)
 
 beforeEach(async () => {
   vi.resetModules()
@@ -59,6 +83,10 @@ beforeEach(async () => {
   runOpenMock.mockResolvedValue({ outcome: 'canceled' })
   getRecentSnapshotMock.mockReset()
   getRecentSnapshotMock.mockReturnValue([])
+  readProjectNoteboardRootMock.mockReset()
+  upsertProjectNoteboardKvMock.mockReset()
+  getFaProjectActiveDbMock.mockReset()
+  getFaProjectActiveDbMock.mockReturnValue(null)
 })
 
 function handlerFor (channel: string): (...args: unknown[]) => unknown {
@@ -67,7 +95,7 @@ function handlerFor (channel: string): (...args: unknown[]) => unknown {
   return call?.[1] as (...args: unknown[]) => unknown
 }
 
-test('registerFaProjectManagementIpc registers create, recent list, open, and before-quit hook once', async () => {
+test('registerFaProjectManagementIpc registers project-noteboard IPC handlers with create, recent, open, and before-quit hook once', async () => {
   const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
   registerFaProjectManagementIpc()
   expect(ipcMainHandleMock).toHaveBeenCalledWith(
@@ -76,6 +104,14 @@ test('registerFaProjectManagementIpc registers create, recent list, open, and be
   )
   expect(ipcMainHandleMock).toHaveBeenCalledWith(
     FA_PROJECT_MANAGEMENT_IPC.getRecentProjectsAsync,
+    expect.any(Function)
+  )
+  expect(ipcMainHandleMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.getProjectNoteboardAsync,
+    expect.any(Function)
+  )
+  expect(ipcMainHandleMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.setProjectNoteboardPatchAsync,
     expect.any(Function)
   )
   expect(ipcMainHandleMock).toHaveBeenCalledWith(
@@ -124,6 +160,72 @@ test('openProjectAsync handler delegates to runFaProjectOpenFromIpc', async () =
   const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.openProjectAsync)
   await expect(h({}, {})).resolves.toEqual({ outcome: 'canceled' })
   expect(runOpenMock).toHaveBeenCalledOnce()
+})
+
+test('getProjectNoteboardAsync returns default snapshot when active database handle is absent', async () => {
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.getProjectNoteboardAsync)
+  expect(readProjectNoteboardRootMock).not.toHaveBeenCalled()
+  expect(h()).toEqual({
+    frame: null,
+    schemaVersion: 1,
+    text: ''
+  })
+})
+
+test('getProjectNoteboardAsync clones persisted root payload', async () => {
+  const fakeDb = { dummy: true } as unknown
+  getFaProjectActiveDbMock.mockReturnValue(fakeDb)
+  readProjectNoteboardRootMock.mockImplementation(() => {
+    return {
+      frame: {
+        height: 400,
+        width: 500,
+        x: 11,
+        y: 22
+      },
+      schemaVersion: 1,
+      text: 'alpha'
+    }
+  })
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.getProjectNoteboardAsync)
+  const snap = h() as { frame: { x: number } }
+  snap.frame.x = -1
+  const second = h() as { frame: { x: number } }
+  expect(second.frame.x).toBe(11)
+  expect(readProjectNoteboardRootMock).toHaveBeenCalledTimes(2)
+})
+
+test('setProjectNoteboardPatchAsync upserts KV rows against the active SQLite handle', async () => {
+  const fakeDb = { tag: 'db' } as unknown
+  getFaProjectActiveDbMock.mockReturnValue(fakeDb)
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.setProjectNoteboardPatchAsync)
+  const ok = h(undefined as never, {
+    text: 'next'
+  }) as boolean
+  expect(ok).toBe(true)
+  expect(upsertProjectNoteboardKvMock).toHaveBeenCalledWith(fakeDb, { text: 'next' })
+})
+
+test('setProjectNoteboardPatchAsync returns false without an active project database', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.setProjectNoteboardPatchAsync)
+  const ok = h(undefined as never, {
+    text: 'x'
+  }) as boolean
+  expect(ok).toBe(false)
+  expect(upsertProjectNoteboardKvMock).not.toHaveBeenCalled()
+  expect(warn).toHaveBeenCalledWith(
+    expect.stringMatching(/setProjectNoteboard skipped/)
+  )
+  warn.mockRestore()
 })
 
 test('registerFaProjectManagementIpc before-quit hook closes active project database', async () => {

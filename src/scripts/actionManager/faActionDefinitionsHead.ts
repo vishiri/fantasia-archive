@@ -18,7 +18,9 @@ import {
   handleSaveAppSettings,
   handleSaveAppStyling,
   handleToggleDeveloperTools,
-  handleToggleAppNoteboardWindow
+  handleToggleAppNoteboardWindow,
+  handleToggleProjectNoteboardWindow,
+  handleReportProjectNoteboardSaveFailure
 } from './faActionDefinitionHandlers'
 
 export const FA_ACTION_DEFINITIONS_HEAD: ReadonlyArray<I_faActionDefinition<T_faActionId>> = [
@@ -26,6 +28,12 @@ export const FA_ACTION_DEFINITIONS_HEAD: ReadonlyArray<I_faActionDefinition<T_fa
     dedup: true,
     handler: handleToggleAppNoteboardWindow as I_faActionDefinition<T_faActionId>['handler'],
     id: 'toggleAppNoteboardWindow',
+    kind: 'async'
+  },
+  {
+    dedup: true,
+    handler: handleToggleProjectNoteboardWindow as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'toggleProjectNoteboardWindow',
     kind: 'async'
   },
   {
@@ -69,6 +77,11 @@ export const FA_ACTION_DEFINITIONS_HEAD: ReadonlyArray<I_faActionDefinition<T_fa
   {
     handler: handleReportAppNoteboardSaveFailure as I_faActionDefinition<T_faActionId>['handler'],
     id: 'reportAppNoteboardSaveFailure',
+    kind: 'async'
+  },
+  {
+    handler: handleReportProjectNoteboardSaveFailure as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'reportProjectNoteboardSaveFailure',
     kind: 'async'
   },
   {

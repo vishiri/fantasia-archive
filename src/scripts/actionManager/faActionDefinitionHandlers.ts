@@ -1,5 +1,7 @@
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
+import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
+import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import { canOpenAppNoteboardFloatingWindow } from 'app/src/scripts/appNoteboard/faAppNoteboardCanOpen'
@@ -23,6 +25,25 @@ export async function handleToggleAppNoteboardWindow (): Promise<void> {
   const store = S_FaAppNoteboard()
   if (store.isWindowOpen) {
     store.setWindowOpen(false)
+    return
+  }
+  if (!canOpenAppNoteboardFloatingWindow()) {
+    return
+  }
+  store.setWindowOpen(true)
+}
+
+export async function handleReportProjectNoteboardSaveFailure (payload: { message: string }): Promise<void> {
+  throw new Error(payload.message)
+}
+
+export async function handleToggleProjectNoteboardWindow (): Promise<void> {
+  const store = S_FaProjectNoteboard()
+  if (store.isWindowOpen) {
+    store.setWindowOpen(false)
+    return
+  }
+  if (!S_FaActiveProject().hasActiveProject) {
     return
   }
   if (!canOpenAppNoteboardFloatingWindow()) {

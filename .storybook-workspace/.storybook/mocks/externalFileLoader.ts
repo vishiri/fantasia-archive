@@ -15,8 +15,10 @@ import L_newProject from 'app/i18n/en-US/dialogs/L_newProject'
 import L_appSettings from 'app/i18n/en-US/dialogs/L_appSettings'
 import L_appStylingFloating from 'app/i18n/en-US/floatingWindows/L_appStyling'
 import L_appNoteboardFloating from 'app/i18n/en-US/floatingWindows/L_appNoteboard'
+import L_projectNoteboardFloating from 'app/i18n/en-US/floatingWindows/L_projectNoteboard'
 import L_faKeybinds from 'app/i18n/en-US/globalFunctionality/L_faKeybinds'
 import L_faAppNoteboard from 'app/i18n/en-US/globalFunctionality/L_faAppNoteboard'
+import L_faProjectNoteboard from 'app/i18n/en-US/globalFunctionality/L_faProjectNoteboard'
 import L_faProjectSession from 'app/i18n/en-US/globalFunctionality/L_faProjectSession'
 import L_faUserSettings from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
 import L_unsortedAppTexts from 'app/i18n/en-US/globalFunctionality/L_unsortedAppTexts'
@@ -52,7 +54,8 @@ const defaultMessages: Record<string, unknown> = {
   },
   floatingWindows: {
     appNoteboard: L_appNoteboardFloating,
-    appStyling: L_appStylingFloating
+    appStyling: L_appStylingFloating,
+    projectNoteboard: L_projectNoteboardFloating
   },
   globalLanguageSelector: L_GlobalLanguageSelector,
   globalWindowButtons: L_GlobalWindowButtons,
@@ -67,6 +70,7 @@ const defaultMessages: Record<string, unknown> = {
   globalFunctionality: {
     faKeybinds: L_faKeybinds,
     faAppNoteboard: L_faAppNoteboard,
+    faProjectNoteboard: L_faProjectNoteboard,
     faProjectSession: L_faProjectSession,
     faUserSettings: L_faUserSettings,
     unsortedAppTexts: L_unsortedAppTexts

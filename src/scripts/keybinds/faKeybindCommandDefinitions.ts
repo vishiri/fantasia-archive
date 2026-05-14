@@ -68,6 +68,19 @@ export const FA_KEYBIND_COMMAND_DEFINITIONS: I_faKeybindCommandDefinition[] = [
   },
   {
     defaultChord: {
+      code: 'KeyD',
+      mods: [
+        'alt',
+        'ctrl'
+      ]
+    },
+    editable: true,
+    firesInEditableFields: true,
+    id: 'toggleProjectNoteboard',
+    messageKey: 'dialogs.keybindSettings.commands.toggleProjectNoteboard'
+  },
+  {
+    defaultChord: {
       code: 'F11',
       mods: ['primary']
     },

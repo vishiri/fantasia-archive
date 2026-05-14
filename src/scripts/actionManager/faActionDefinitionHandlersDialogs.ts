@@ -2,6 +2,7 @@ import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
+import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import type { I_faActionPayloadMap } from 'app/types/I_faActionManagerDomain'
@@ -89,6 +90,7 @@ export async function handleImportAppConfigApply (
   await Promise.all([
     S_FaKeybinds().refreshKeybinds(),
     S_FaAppNoteboard().refreshNoteboard(),
+    S_FaProjectNoteboard().refreshProjectNoteboard(),
     S_FaAppStyling().refreshAppStyling(),
     S_FaUserSettings().refreshSettings()
   ])
@@ -107,6 +109,7 @@ export async function handleCreateNewProject (
       throw new FaActionUserCanceledError()
     }
     notifyFaProjectCreatedPositive()
+    await S_FaProjectNoteboard().refreshProjectNoteboard()
   } finally {
     await S_FaRecentProjects().refreshRecentProjects()
   }
@@ -125,6 +128,7 @@ export async function handleLoadExistingProject (
       throw new FaActionUserCanceledError()
     }
     notifyFaProjectLoadedPositive()
+    await S_FaProjectNoteboard().refreshProjectNoteboard()
     const snap = S_FaActiveProject().activeProject
     if (snap === null) {
       throw new Error('Project open returned no active project snapshot.')

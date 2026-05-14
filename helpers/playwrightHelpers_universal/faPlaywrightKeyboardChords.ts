@@ -53,3 +53,10 @@ export const FA_PLAYWRIGHT_PRESS_CONTROL_SHIFT_F11 = 'Control+Shift+F11' as cons
  * all platforms so the in-app modifier set stays **ctrl+alt+shift** after capture.
  */
 export const FA_PLAYWRIGHT_PRESS_ADJUSTED_TOGGLE_DEVTOOLS_F12 = 'Control+Alt+Shift+F12' as const
+
+/**
+ * Default **Toggle Project Noteboard** chord: literal **Ctrl+Alt+D** stored as **ctrl+alt**
+ * modifiers (matches 'FA_KEYBIND_COMMAND_DEFINITIONS' for 'toggleProjectNoteboard').
+ * Playwright sends that combination on Windows, Linux, and macOS the same way.
+ */
+export const FA_PLAYWRIGHT_PRESS_DEFAULT_TOGGLE_PROJECT_NOTEBOARD = 'Control+Alt+D' as const

@@ -10,6 +10,7 @@ import type { I_faUserSettings, T_faUserSettingsLanguageCode } from 'app/types/I
  */
 export const FA_ACTION_IDS = [
   'toggleAppNoteboardWindow',
+  'toggleProjectNoteboardWindow',
   'toggleDeveloperTools',
   'openKeybindSettingsDialog',
   'saveKeybindSettings',
@@ -28,6 +29,7 @@ export const FA_ACTION_IDS = [
   'languageSwitch',
   'refreshWebContentsAfterLanguage',
   'reportAppNoteboardSaveFailure',
+  'reportProjectNoteboardSaveFailure',
   'reportAppStylingPersistFailure',
   'openActionMonitorDialog',
   'showStartupTipsNotification',
@@ -67,6 +69,7 @@ export interface I_faLoadExistingProjectPayload {
 export interface I_faActionPayloadMap {
   toggleDeveloperTools: void
   toggleAppNoteboardWindow: void
+  toggleProjectNoteboardWindow: void
   openKeybindSettingsDialog: void
   saveKeybindSettings: { overrides: I_faKeybindsRoot['overrides'] }
   openAppSettingsDialog: void
@@ -84,6 +87,7 @@ export interface I_faActionPayloadMap {
   languageSwitch: { code: T_faUserSettingsLanguageCode, priorCode: T_faUserSettingsLanguageCode }
   refreshWebContentsAfterLanguage: void
   reportAppNoteboardSaveFailure: { message: string }
+  reportProjectNoteboardSaveFailure: { message: string }
   reportAppStylingPersistFailure: { message: string }
   openActionMonitorDialog: void
   showStartupTipsNotification: void

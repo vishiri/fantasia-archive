@@ -1,0 +1,91 @@
+@use '../../WindowAppStyling/styles/WindowAppStyling.floatingWindowPopTransition.unscoped.scss' as *;
+@use './variables' as *;
+
+.windowProjectNoteboard {
+  box-sizing: border-box;
+
+  .floatingWindowComponent__surface {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  &__titleRow {
+    align-items: center;
+    cursor: grab;
+    display: flex;
+    flex: 0 0 auto;
+    justify-content: center;
+    min-height: $windowProjectNoteboard-titleRow-minHeight;
+    position: relative;
+    user-select: none;
+    width: 100%;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  &__title {
+    flex: 1 1 auto;
+    margin: $windowProjectNoteboard-title-margin;
+    min-width: 0;
+  }
+
+  &__body {
+    background-color: $windowProjectNoteboard-editorRegion-backgroundColor;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  &__textarea {
+    background-color: transparent;
+    border: medium none;
+    box-sizing: border-box;
+    color: inherit;
+    display: block;
+    flex: 1 1 auto;
+    font-family: inherit;
+    font-size: inherit;
+    letter-spacing: inherit;
+    line-height: inherit;
+    margin: 0;
+    min-height: 0;
+    outline: none;
+    overflow: auto;
+    padding: 0;
+    resize: none;
+    width: 100%;
+  }
+
+  &__cardActions {
+    flex: 0 0 auto;
+  }
+
+  &__closeBtn {
+    min-width: auto;
+  }
+
+  &__closeBtn-keybind {
+    font-size: $windowProjectNoteboard-closeBtn-keybind-fontSize;
+    font-weight: 600;
+    margin-top: $windowProjectNoteboard-closeBtn-keybind-marginTop;
+    text-shadow: none;
+  }
+
+  &__closeBtn-label {
+    white-space: nowrap;
+  }
+
+  &__closeBtn-stack {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+}

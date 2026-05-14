@@ -5,17 +5,42 @@ export const FA_FLOATING_WINDOW_Z_INDEX_MAX = 5999
 export const FA_FLOATING_WINDOW_Z_INDEX_STANDARD_MIN = 5000
 export const FA_FLOATING_WINDOW_Z_INDEX_STANDARD_MAX = 5899
 
-/** App noteboard: stacks above other floating windows, still below 6000. */
-export const FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MIN = 5900
-export const FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MAX = FA_FLOATING_WINDOW_Z_INDEX_MAX
+/**
+ * App-wide noteboard: stacks above styling windows within the overlay band below 6000.
+ */
+export const FA_FLOATING_WINDOW_Z_INDEX_APP_NOTEBOARD_MIN = 5900
+export const FA_FLOATING_WINDOW_Z_INDEX_APP_NOTEBOARD_MAX = 5949
+
+/**
+ * Project-scoped noteboard: stacks strictly above 'FA_FLOATING_WINDOW_Z_INDEX_APP_NOTEBOARD_*'.
+ */
+export const FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MIN = 5950
+export const FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MAX = FA_FLOATING_WINDOW_Z_INDEX_MAX
 
 /**
  * Historical name: same as 'FA_FLOATING_WINDOW_Z_INDEX_STANDARD_MIN' (overall band floor).
  */
 export const FA_FLOATING_WINDOW_Z_INDEX_MIN = FA_FLOATING_WINDOW_Z_INDEX_STANDARD_MIN
 
+/**
+ * Compatibility alias for older imports referring to app noteboard layering before splitting sub-bands.
+ */
+export const FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MIN =
+  FA_FLOATING_WINDOW_Z_INDEX_APP_NOTEBOARD_MIN
+
+/**
+ * Compatibility alias for older imports referring to app noteboard layering before splitting sub-bands.
+ */
+export const FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MAX =
+  FA_FLOATING_WINDOW_Z_INDEX_APP_NOTEBOARD_MAX
+
 let floatingWindowStandardZSeed = FA_FLOATING_WINDOW_Z_INDEX_STANDARD_MIN - 1
-let floatingWindowNoteboardZSeed = FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MIN - 1
+
+let floatingWindowAppNoteboardZSeed =
+  FA_FLOATING_WINDOW_Z_INDEX_APP_NOTEBOARD_MIN - 1
+
+let floatingWindowProjectNoteboardZSeed =
+  FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MIN - 1
 
 export function bumpFloatingWindowZIndex (): number {
   floatingWindowStandardZSeed += 1
@@ -26,9 +51,21 @@ export function bumpFloatingWindowZIndex (): number {
 }
 
 export function bumpNoteboardFloatingWindowZIndex (): number {
-  floatingWindowNoteboardZSeed += 1
-  if (floatingWindowNoteboardZSeed > FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MAX) {
-    floatingWindowNoteboardZSeed = FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MIN
+  floatingWindowAppNoteboardZSeed += 1
+  if (floatingWindowAppNoteboardZSeed > FA_FLOATING_WINDOW_Z_INDEX_APP_NOTEBOARD_MAX) {
+    floatingWindowAppNoteboardZSeed = FA_FLOATING_WINDOW_Z_INDEX_APP_NOTEBOARD_MIN
   }
-  return floatingWindowNoteboardZSeed
+  return floatingWindowAppNoteboardZSeed
+}
+
+export function bumpProjectNoteboardFloatingWindowZIndex (): number {
+  floatingWindowProjectNoteboardZSeed += 1
+  if (
+    floatingWindowProjectNoteboardZSeed >
+    FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MAX
+  ) {
+    floatingWindowProjectNoteboardZSeed =
+      FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MIN
+  }
+  return floatingWindowProjectNoteboardZSeed
 }

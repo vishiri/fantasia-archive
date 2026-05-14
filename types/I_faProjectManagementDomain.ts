@@ -1,3 +1,7 @@
+import type {
+  I_faProjectNoteboardPatch,
+  I_faProjectNoteboardRoot
+} from 'app/types/I_faProjectNoteboardDomain'
 import type { I_faRecentProjectEntry } from 'app/types/I_faRecentProjectsDomain'
 
 /**
@@ -54,6 +58,12 @@ export interface I_faProjectOpenResult {
  */
 export interface I_faProjectManagementAPI {
   createProject: (input: I_faProjectCreateInput) => Promise<I_faProjectCreateResult>
+  getProjectNoteboard: () => Promise<I_faProjectNoteboardRoot>
   getRecentProjects: () => Promise<I_faRecentProjectEntry[]>
   openProject: (input?: I_faProjectOpenInput) => Promise<I_faProjectOpenResult>
+  /**
+   * Resolves **true** when the patch wrote into the active project's SQLite KV.
+   * Resolves **false** when there is no active project database (for example immediately after main cleared the handle during a renderer reload).
+   */
+  setProjectNoteboard: (patch: I_faProjectNoteboardPatch) => Promise<boolean>
 }

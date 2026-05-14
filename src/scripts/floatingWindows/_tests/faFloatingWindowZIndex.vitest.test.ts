@@ -49,3 +49,28 @@ test('Test that bumpNoteboardFloatingWindowZIndex stays within the noteboard sub
   }
   expect(bumpNoteboardFloatingWindowZIndex()).toBe(FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MIN)
 })
+
+/**
+ * bumpProjectNoteboardFloatingWindowZIndex
+ * Higher sub-band runs above the app-wide noteboard floats and still wraps at the overlay ceiling.
+ */
+test('Test that bumpProjectNoteboardFloatingWindowZIndex stays above the app noteboard band and wraps', async () => {
+  const {
+    bumpProjectNoteboardFloatingWindowZIndex,
+    FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MAX,
+    FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MIN
+  } = await import('app/src/scripts/floatingWindows/faFloatingWindowZIndex')
+  expect(bumpProjectNoteboardFloatingWindowZIndex()).toBe(
+    FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MIN
+  )
+  for (
+    let projectZ = FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MIN + 1;
+    projectZ <= FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MAX;
+    projectZ++
+  ) {
+    expect(bumpProjectNoteboardFloatingWindowZIndex()).toBe(projectZ)
+  }
+  expect(bumpProjectNoteboardFloatingWindowZIndex()).toBe(
+    FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MIN
+  )
+})
