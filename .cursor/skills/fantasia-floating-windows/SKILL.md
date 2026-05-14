@@ -29,6 +29,11 @@ description: >-
 - **Styles** — **`WindowAppStyling/…/WindowAppStyling.floatingWindowPopTransition.unscoped.scss`**, loaded from **`WindowAppStyling.unscoped.scss`**: opacity and **`transform: scale`** with a **non-zero** minimum (tune **`$fa-floatingWindowPop-scale-from`**), **300 ms** QDialog-style pop.
 - **Not** Quasar stock **`q-transition--scale`**: that uses **scale(0)** in enter-from and can break **Electron** and **Monaco** **Playwright** checks. **Reference** — stock **`q-transition`…** names and **300 ms** in **`faQuasarDialogStandardTransition.ts`**.
 
+## Project **Noteboard** ( **`WindowProjectNoteboard`** )
+
+- **Text vs frame debounces** — Text persistence debounces on **`380`** ms while the frame geometry path debounces on **`280`** ms (`useWindowProjectNoteboardTextPersist` vs `useWindowProjectNoteboardFramePersist`). A frame-only save can read SQLite **before** the text debounce has written the scratch body, so **`S_FaProjectNoteboard.persistProjectNoteboardPartialSilent`** merges the **in-memory** textarea value into the read-back snapshot **when the patch omits `text`**. That keeps on-screen draft text from being replaced by an earlier empty **`project_noteboard_content`** row during the same session.
+- **Stacking** — **`floatingWindowZLayer: 'projectNoteboard'`** uses **`5950`–`5999`** so **Project Noteboard** paints above standard **`Window*`** surfaces and **App Noteboard**, still **below** modal chrome (**`6000+`**).
+
 ## Tests
 
 - **Geometry** — **`src/scripts/floatingWindows/_tests/faFloatingWindowResizeGeometry.vitest.test.ts`** (and related). Tests may use a **spread** of **`FA_FLOATING_WINDOW_FRAME_DEFAULT_LAYOUT`** with **smaller** **`minWidthPx` / `minHeightPx`** when assertions need resize math not dominated by production minimums.

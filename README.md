@@ -8,6 +8,8 @@ Use **Node.js 22.22.0 or newer** (`package.json` `engines.node`: `>=22.22.0`; Qu
 
 > Playwright tests run from a built, live version of FA. Therefore, to run them, you need to locally build the app on your machine first - both the first time you use them and every time something is changed in the source code.
 
+> **Electron Playwright** launches the output under **`dist/electron`** (packaged renderer + main), not the **`quasar dev`** bundle. If a spec still behaves like older code after you edited **`src/`**, **`src-electron/`**, or **`src/stores/`** (for example main-process snapshots or bridge reads look stuck on an old build), run **`yarn quasar:build:electron`** again before re-running **`yarn test:components`** or **`yarn test:e2e`**.
+
 > The same **rebuild** rule applies to **i18n** document sources under **`i18n/*/documents/*.md`** when a spec opens them in the packaged renderer (for example **DialogMarkdownDocument** component tests and anything else that depends on the bundled `documents.*` message text).
 
 ## Install Quasar CLI for the smoothest experience
