@@ -192,4 +192,35 @@ export default [...neostandard({
       IIFEs: true
     }]
   }
+}, {
+  files: ['src-electron/mainScripts/**/*.ts'],
+  ignores: [
+    '**/*.vitest.test.ts',
+    'src-electron/mainScripts/projectManagement/faProjectActiveDatabase.ts',
+    'src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected.ts',
+    'src-electron/mainScripts/projectManagement/faProjectReconnectAtKnownPath.ts',
+    'src-electron/mainScripts/projectManagement/faProjectOpenRun.ts',
+    'src-electron/mainScripts/projectManagement/faProjectCreateRun.ts'
+  ],
+  rules: {
+    'no-restricted-imports': ['error', {
+      paths: [
+        {
+          name: 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase',
+          importNames: ['getFaProjectActiveDatabase'],
+          message: 'Use runWithFaProjectDatabaseForIpcAsync / runWithFaProjectDatabaseSync from faProjectDatabaseEnsureConnected.ts (faProjectOpenRun may read the active handle during open).'
+        },
+        {
+          name: 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase',
+          importNames: ['getFaProjectLastKnownActiveProjectFilePath'],
+          message: 'Use faProjectDatabaseEnsureConnected.ts internals only through that module; see .cursor/rules/fa-project-database-access.mdc.'
+        },
+        {
+          name: 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase',
+          importNames: ['replaceFaProjectActiveDatabase'],
+          message: 'replaceFaProjectActiveDatabase is only for open, create, and reconnect paths; see .cursor/rules/fa-project-database-access.mdc.'
+        }
+      ]
+    }]
+  }
 }, ...storybook.configs['flat/recommended']]

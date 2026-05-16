@@ -1,8 +1,10 @@
+import { i18n } from 'app/i18n/externalFileLoader'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
+import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import { canOpenAppNoteboardFloatingWindow } from 'app/src/scripts/appNoteboard/faAppNoteboardCanOpen'
 import { toggleDevTools } from 'app/src/scripts/appGlobalManagementUI/toggleDevTools'
@@ -56,6 +58,10 @@ export async function handleReportAppStylingPersistFailure (payload: { message: 
   throw new Error(payload.message)
 }
 
+export async function handleReportProjectStylingSaveFailure (payload: { message: string }): Promise<void> {
+  throw new Error(payload.message)
+}
+
 export async function handleSaveKeybindSettings (payload: { overrides: import('app/types/I_faKeybindsDomain').I_faKeybindsRoot['overrides'] }): Promise<void> {
   const ok = await S_FaKeybinds().updateKeybinds({
     overrides: payload.overrides,
@@ -74,6 +80,16 @@ export async function handleSaveAppStyling (payload: { css: string }): Promise<v
   const ok = await S_FaAppStyling().updateAppStyling({ css: payload.css })
   if (!ok) {
     throw new Error('Failed to save app styling.')
+  }
+}
+
+export async function handleSaveProjectStyling (payload: { css: string }): Promise<void> {
+  if (!S_FaActiveProject().hasActiveProject) {
+    throw new Error(i18n.global.t('globalFunctionality.faProjectStyling.saveNoActiveProject'))
+  }
+  const ok = await S_FaProjectStyling().savePersistedCssFromEditor(payload.css)
+  if (!ok) {
+    throw new Error(i18n.global.t('globalFunctionality.faProjectStyling.saveRejected'))
   }
 }
 
@@ -142,6 +158,7 @@ export {
   handleOpenNewProjectDialog,
   handleOpenAppSettingsDialog,
   handleOpenAppStylingWindow,
+  handleOpenProjectStylingWindow,
   handleOpenTipsTricksTriviaDialog,
   handleShowStartupTipsNotification
 } from 'app/src/scripts/actionManager/faActionDefinitionHandlersDialogs'

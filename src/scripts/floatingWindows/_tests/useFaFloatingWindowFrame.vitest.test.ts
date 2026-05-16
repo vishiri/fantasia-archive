@@ -124,6 +124,30 @@ test('Test that useFaFloatingWindowFrame uses the noteboard z-index band when op
 
 /**
  * useFaFloatingWindowFrame
+ * Project styling layer uses band 5800+ so it stacks above app-wide Custom CSS but below noteboards.
+ */
+test('Test that useFaFloatingWindowFrame uses the project styling z-index band when options request it', async () => {
+  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { FA_FLOATING_WINDOW_Z_INDEX_PROJECT_STYLING_MIN } = await import(
+    'app/src/scripts/floatingWindows/faFloatingWindowZIndex'
+  )
+  const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame, {
+    floatingWindowZLayer: 'projectStyling'
+  })
+  const vm = wrapper.vm as unknown as {
+    frameStyle: { zIndex: number }
+  }
+  expect(vm.frameStyle.zIndex).toBeGreaterThanOrEqual(FA_FLOATING_WINDOW_Z_INDEX_PROJECT_STYLING_MIN)
+  visible.value = true
+  await wrapper.vm.$nextTick()
+  await wrapper.vm.$nextTick()
+  expect(vm.frameStyle.zIndex).toBeGreaterThanOrEqual(FA_FLOATING_WINDOW_Z_INDEX_PROJECT_STYLING_MIN)
+  expect(vm.frameStyle.zIndex).toBeLessThan(5900)
+  wrapper.unmount()
+})
+
+/**
+ * useFaFloatingWindowFrame
  * Project noteboard layer uses the top sub-band (5950+) so it stacks above the app noteboard floats.
  */
 test('Test that useFaFloatingWindowFrame uses the project noteboard z-index band when options request it', async () => {

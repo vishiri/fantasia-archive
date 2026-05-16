@@ -30,6 +30,31 @@ test('Test that bumpFloatingWindowZIndex stays within the standard sub-band and 
 })
 
 /**
+ * bumpProjectStylingFloatingWindowZIndex
+ * Project Custom CSS band stacks above standard Window* surfaces and wraps at 5899.
+ */
+test('Test that bumpProjectStylingFloatingWindowZIndex stays within the project styling sub-band and wraps', async () => {
+  const {
+    bumpProjectStylingFloatingWindowZIndex,
+    FA_FLOATING_WINDOW_Z_INDEX_PROJECT_STYLING_MAX,
+    FA_FLOATING_WINDOW_Z_INDEX_PROJECT_STYLING_MIN
+  } = await import('app/src/scripts/floatingWindows/faFloatingWindowZIndex')
+  expect(bumpProjectStylingFloatingWindowZIndex()).toBe(
+    FA_FLOATING_WINDOW_Z_INDEX_PROJECT_STYLING_MIN
+  )
+  for (
+    let k = FA_FLOATING_WINDOW_Z_INDEX_PROJECT_STYLING_MIN + 1;
+    k <= FA_FLOATING_WINDOW_Z_INDEX_PROJECT_STYLING_MAX;
+    k++
+  ) {
+    expect(bumpProjectStylingFloatingWindowZIndex()).toBe(k)
+  }
+  expect(bumpProjectStylingFloatingWindowZIndex()).toBe(
+    FA_FLOATING_WINDOW_Z_INDEX_PROJECT_STYLING_MIN
+  )
+})
+
+/**
  * bumpNoteboardFloatingWindowZIndex
  * Values stay in the noteboard sub-band and wrap after the maximum.
  */

@@ -51,6 +51,11 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
       keybindCommandId: 'toggleProjectNoteboard',
       trigger: () => runFaAction('toggleProjectNoteboardWindow', undefined)
     }),
+    faMenuItem('appControlMenus.project.items.openProjectCustomCss', 'mdi-language-css3', {
+      conditions: gate,
+      keybindCommandId: 'openProjectStyling',
+      trigger: () => runFaAction('openProjectStylingDialog', undefined)
+    }),
     faMenuItem('appControlMenus.project.items.showProjectDashboard', 'mdi-chart-bar', {
       conditions: gate
     }),

@@ -12,6 +12,7 @@ const FA_KEYBIND_COMMAND_TO_ACTION_ID: Readonly<Record<T_faKeybindCommandId, T_f
   openKeybindSettings: 'openKeybindSettingsDialog',
   openAppSettings: 'openAppSettingsDialog',
   openAppStyling: 'openAppStylingWindow',
+  openProjectStyling: 'openProjectStylingDialog',
   toggleDeveloperTools: 'toggleDeveloperTools',
   toggleAppNoteboard: 'toggleAppNoteboardWindow',
   toggleProjectNoteboard: 'toggleProjectNoteboardWindow'

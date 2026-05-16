@@ -74,7 +74,20 @@ export const FA_PROJECT_MANAGEMENT_IPC = {
   createProjectAsync: 'fa-project-management-create-project-async',
   getRecentProjectsAsync: 'fa-project-management-get-recent-projects-async',
   getProjectNoteboardAsync: 'fa-project-management-get-project-noteboard-async',
+  getProjectStylingAsync: 'fa-project-management-get-project-styling-async',
   openProjectAsync: 'fa-project-management-open-project-async',
   setProjectNoteboardPatchAsync:
-    'fa-project-management-set-project-noteboard-patch-async'
+    'fa-project-management-set-project-noteboard-patch-async',
+  setProjectStylingPatchAsync:
+    'fa-project-management-set-project-styling-patch-async'
+} as const
+
+/**
+ * Main ↔ renderer failsafe: when main lost the mirrored path but the renderer still has an active project path.
+ */
+export const FA_PROJECT_FAILSAFE_IPC = {
+  /** Main → renderer: string correlation id */
+  requestActiveProjectPathFromRenderer: 'fa-project-failsafe-request-active-path',
+  /** Renderer → main: payload '{ correlationId: string, filePath: string | null }' */
+  replyActiveProjectPathToMain: 'fa-project-failsafe-reply-active-path'
 } as const

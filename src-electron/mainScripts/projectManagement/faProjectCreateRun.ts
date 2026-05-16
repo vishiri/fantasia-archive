@@ -143,7 +143,7 @@ export async function runFaProjectCreateFromIpc (
     applyFaProjectMigrations(db, parsed.projectName)
     assertFaProjectDatabaseQuickCheck(db)
     const projectUuid = readFaProjectStoredProjectUuid(db)
-    replaceFaProjectActiveDatabase(db)
+    replaceFaProjectActiveDatabase(db, filePath)
     db = null
     return {
       filePath,

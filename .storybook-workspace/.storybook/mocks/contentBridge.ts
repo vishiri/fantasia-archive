@@ -24,6 +24,10 @@ import type {
   I_faProjectNoteboardPatch,
   I_faProjectNoteboardRoot
 } from 'app/types/I_faProjectNoteboardDomain'
+import type {
+  I_faProjectStylingPatch,
+  I_faProjectStylingRoot
+} from 'app/types/I_faProjectStylingDomain'
 
 const defaultExtraEnvSnapshot: I_extraEnvVariablesAPI = {
   COMPONENT_NAME: undefined,
@@ -66,6 +70,18 @@ function duplicateStorybookProjectNoteboardRoot (
   }
 }
 
+function duplicateStorybookProjectStylingRoot (
+  root: I_faProjectStylingRoot
+): I_faProjectStylingRoot {
+  const frameFrom = root.frame
+  const frame = frameFrom === null ? null : { ...frameFrom }
+  return {
+    css: root.css,
+    frame,
+    schemaVersion: root.schemaVersion
+  }
+}
+
 const baseBridge = () => {
   let storybookProjectNoteboardRoot: I_faProjectNoteboardRoot = {
     frame: null,
@@ -92,6 +108,34 @@ const baseBridge = () => {
       }
     }
     storybookProjectNoteboardRoot = next
+    return true
+  }
+
+  let storybookProjectStylingRoot: I_faProjectStylingRoot = {
+    css: '',
+    frame: null,
+    schemaVersion: 1
+  }
+
+  const getProjectStyling = async (): Promise<I_faProjectStylingRoot> => {
+    return duplicateStorybookProjectStylingRoot(storybookProjectStylingRoot)
+  }
+
+  const setProjectStyling = async (patch: I_faProjectStylingPatch): Promise<boolean> => {
+    let next = storybookProjectStylingRoot
+    if (patch.css !== undefined) {
+      next = {
+        ...next,
+        css: patch.css
+      }
+    }
+    if (patch.frame !== undefined) {
+      next = {
+        ...next,
+        frame: patch.frame === null ? null : { ...patch.frame }
+      }
+    }
+    storybookProjectStylingRoot = next
     return true
   }
 
@@ -158,16 +202,21 @@ const baseBridge = () => {
         sessionId: 'storybook-import-session'
       })
     },
+    faProjectFailsafe: {
+      installActiveProjectPathReply: () => undefined
+    },
     projectManagement: {
       createProject: async (_input: I_faProjectCreateInput): Promise<I_faProjectCreateResult> => ({
         outcome: 'canceled'
       }),
       getProjectNoteboard,
+      getProjectStyling,
       getRecentProjects: async () => [],
       openProject: async (_input?: I_faProjectOpenInput): Promise<I_faProjectOpenResult> => ({
         outcome: 'canceled'
       }),
-      setProjectNoteboard
+      setProjectNoteboard,
+      setProjectStyling
     }
   }
 }
@@ -234,6 +283,10 @@ export const setContentBridgeScenario = (
     faAppConfig: {
       ...nextBridge.faAppConfig,
       ...(overrides.faAppConfig ?? {})
+    },
+    faProjectFailsafe: {
+      ...nextBridge.faProjectFailsafe,
+      ...(overrides.faProjectFailsafe ?? {})
     },
     projectManagement: {
       ...nextBridge.projectManagement,

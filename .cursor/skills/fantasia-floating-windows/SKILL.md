@@ -17,7 +17,7 @@ description: >-
 
 1. **Teleport** — Wrap the frame root (inside **`Transition`** if used) with **`_FaFloatingWindowBodyTeleport`** so the DOM node lives under **`document.body`**. Avoids nesting under **`q-header`** / **`AppControlMenus`** where **`transform`** or stacking contexts break **`fixed`** and **`z-index`** expectations. **`Transition`**, when used, must wrap a **single** element; in **`WindowAppStyling`**, the order is **Teleport** → **Transition** → frame root **`div`**.
 2. **Composable** — **`useFaFloatingWindowFrame(visibleRef, layout?)`** from **`src/scripts/floatingWindows/useFaFloatingWindowFrame.ts`**: **`centerInViewport`**, title drag (**`useFaFloatingWindowTitleDrag`**), resize (**`useFaFloatingWindowResize`** + **`computeFaFloatingWindowResizeFrame`**), **`ResizeObserver`** sync, **`frameStyle`** with **`z-index`**.
-3. **Z-index** — Session counter **`5000`–`5999`**, wraps after **`5999`**. Must stay **below** **`6000`** so Quasar dialogs and app chrome (**`6000+`**, e.g. **`$mainLayout-appHeader-zIndex`**) paint above. **`raiseZ`** on open, frame **`pointerdown`**, drag start, resize start.
+3. **Z-index** — Session counters in **`5000`–`5999`**, sub-bands wrap within their range. Must stay **below** **`6000`** so Quasar dialogs and app chrome (**`6000+`**, e.g. **`$mainLayout-appHeader-zIndex`**) paint above. **`standard`** uses **`5000`–`5799`** (app-wide Custom CSS); **`projectStyling`** uses **`5800`–`5899`**; app noteboard **`5900`–`5949`**; project noteboard **`5950`–`5999`**. **`raiseZ`** on open, frame **`pointerdown`**, drag start, resize start.
 4. **Layout** — **`I_FaFloatingWindowFrameLayout`** / **`FA_FLOATING_WINDOW_FRAME_DEFAULT_LAYOUT`** in **`faFloatingWindowFrameLayout.ts`**: fractions, min/max width/height, **`marginTopPx`**, **`marginRightPx`**, **`marginBottomPx`**, **`marginLeftPx`** for centering, drag bounds, and clamping.
 5. **Resize** — **`faFloatingWindowResizeGeometry.ts`**, **`faFloatingWindowResizeClamp.ts`**: per-handle viewport clamp with **anchor preservation** (west/north must not move the opposite edge incorrectly). **`_FaFloatingWindowFrameResizeHandles`** + **`FA_FLOATING_WINDOW_RESIZE_HANDLE_PX`** for hit targets.
 6. **Modals** — **Do not** use **`registerComponentDialogStackGuard`** for **`Window*`**; that guard exists so **`openDialog*`** can serialize **modal** `QDialog` instances. Floating windows sit in a lower z-index band; multiple **`Window*`** and modal dialogs can be open at once.
@@ -32,7 +32,11 @@ description: >-
 ## Project **Noteboard** ( **`WindowProjectNoteboard`** )
 
 - **Text vs frame debounces** — Text persistence debounces on **`380`** ms while the frame geometry path debounces on **`280`** ms (`useWindowProjectNoteboardTextPersist` vs `useWindowProjectNoteboardFramePersist`). A frame-only save can read SQLite **before** the text debounce has written the scratch body, so **`S_FaProjectNoteboard.persistProjectNoteboardPartialSilent`** merges the **in-memory** textarea value into the read-back snapshot **when the patch omits `text`**. That keeps on-screen draft text from being replaced by an earlier empty **`project_noteboard_content`** row during the same session.
-- **Stacking** — **`floatingWindowZLayer: 'projectNoteboard'`** uses **`5950`–`5999`** so **Project Noteboard** paints above standard **`Window*`** surfaces and **App Noteboard**, still **below** modal chrome (**`6000+`**).
+- **Stacking** — **`floatingWindowZLayer: 'projectNoteboard'`** uses **`5950`–`5999`** so **Project Noteboard** paints above **`projectStyling`**, **App Noteboard**, and **`standard`** **`Window*`** surfaces, still **below** modal chrome (**`6000+`**). Project Custom CSS uses **`'projectStyling'`** (**`5800`–`5899`**) above **`'standard'`**.
+
+## Project **Custom CSS** (**`WindowProjectStyling`**)
+
+- **Persistence** — SQLite KV keys **`project_styling_*`** mirror the project noteboard geometry plus content pattern; frame debounce **`280`** ms, editor body debounce **`380`** ms when writing to SQLite; **`S_FaProjectStyling.persistProjectStylingPartialSilent`** merges in-memory CSS when a frame-only patch races the body debounce.
 
 ## Tests
 

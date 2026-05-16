@@ -20,6 +20,7 @@ vi.mock('better-sqlite3', () => {
 import {
   closeFaProjectActiveDatabase,
   getFaProjectActiveDatabase,
+  getFaProjectLastKnownActiveProjectFilePath,
   openFaProjectDatabase,
   replaceFaProjectActiveDatabase,
   unlinkFaProjectFileIfExists
@@ -74,6 +75,11 @@ test('unlinkFaProjectFileIfExists does nothing when the file is missing', () => 
   unlinkFaProjectFileIfExists(p)
 })
 
+const FA_TEST_PROJECT_A = 'D:\\test\\a.faproject'
+const FA_TEST_PROJECT_B = 'D:\\test\\b.faproject'
+const FA_TEST_PROJECT_C = 'D:\\test\\c.faproject'
+const FA_TEST_PROJECT_SAME = 'D:\\test\\same.faproject'
+
 test('replaceFaProjectActiveDatabase swaps handles and closeFaProjectActiveDatabase clears', () => {
   const db1 = { close: vi.fn() }
   const db2 = { close: vi.fn() }
@@ -82,9 +88,9 @@ test('replaceFaProjectActiveDatabase swaps handles and closeFaProjectActiveDatab
     i += 1
     return i === 1 ? db1 : db2
   })
-  replaceFaProjectActiveDatabase(openFaProjectDatabase('a.faproject'))
+  replaceFaProjectActiveDatabase(openFaProjectDatabase(FA_TEST_PROJECT_A), FA_TEST_PROJECT_A)
   expect(getFaProjectActiveDatabase()).toBe(db1)
-  replaceFaProjectActiveDatabase(openFaProjectDatabase('b.faproject'))
+  replaceFaProjectActiveDatabase(openFaProjectDatabase(FA_TEST_PROJECT_B), FA_TEST_PROJECT_B)
   expect(getFaProjectActiveDatabase()).toBe(db2)
   expect(db1.close).toHaveBeenCalledOnce()
   closeFaProjectActiveDatabase()
@@ -97,9 +103,9 @@ test('replaceFaProjectActiveDatabase does not close when re-applying the same ha
   BetterSqlite3Mock.mockImplementation(function () {
     return db
   })
-  const opened = openFaProjectDatabase('same.faproject')
-  replaceFaProjectActiveDatabase(opened)
-  replaceFaProjectActiveDatabase(opened)
+  const opened = openFaProjectDatabase(FA_TEST_PROJECT_SAME)
+  replaceFaProjectActiveDatabase(opened, FA_TEST_PROJECT_SAME)
+  replaceFaProjectActiveDatabase(opened, FA_TEST_PROJECT_SAME)
   expect(db.close).not.toHaveBeenCalled()
   closeFaProjectActiveDatabase()
 })
@@ -113,7 +119,7 @@ test('closeFaProjectActiveDatabase tolerates close errors', () => {
   BetterSqlite3Mock.mockImplementation(function () {
     return db
   })
-  replaceFaProjectActiveDatabase(openFaProjectDatabase('c.faproject'))
+  replaceFaProjectActiveDatabase(openFaProjectDatabase(FA_TEST_PROJECT_C), FA_TEST_PROJECT_C)
   closeFaProjectActiveDatabase()
   expect(getFaProjectActiveDatabase()).toBeNull()
 })
@@ -121,4 +127,25 @@ test('closeFaProjectActiveDatabase tolerates close errors', () => {
 test('closeFaProjectActiveDatabase is harmless when nothing is open', () => {
   closeFaProjectActiveDatabase()
   expect(getFaProjectActiveDatabase()).toBeNull()
+})
+
+test('getFaProjectLastKnownActiveProjectFilePath mirrors replaceFaProjectActiveDatabase and clears on full close', () => {
+  const db = { close: vi.fn() }
+  BetterSqlite3Mock.mockImplementation(function () {
+    return db
+  })
+  const opened = openFaProjectDatabase(FA_TEST_PROJECT_A)
+  replaceFaProjectActiveDatabase(opened, FA_TEST_PROJECT_A)
+  expect(getFaProjectLastKnownActiveProjectFilePath()).toBe(FA_TEST_PROJECT_A)
+  closeFaProjectActiveDatabase()
+  expect(getFaProjectLastKnownActiveProjectFilePath()).toBeNull()
+})
+
+test('replaceFaProjectActiveDatabase rejects paths that do not look like project files', () => {
+  const opened = {
+    close: vi.fn()
+  } as never
+  expect(() => {
+    replaceFaProjectActiveDatabase(opened, 'D:\\x\\bad.txt')
+  }).toThrow('replaceFaProjectActiveDatabase')
 })

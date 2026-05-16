@@ -108,3 +108,28 @@ test('projectManagementAPI setProjectNoteboard invokes IPC with cloned patch', a
   )
   expect(patch.text).toBe('y')
 })
+
+test('projectManagementAPI getProjectStyling invokes IPC', async () => {
+  const snapshot = {
+    css: 'p{}',
+    frame: null,
+    schemaVersion: 1 as const
+  }
+
+  invokeMock.mockResolvedValueOnce(snapshot)
+  const r = await projectManagementAPI.getProjectStyling()
+  expect(r).toEqual(snapshot)
+  expect(invokeMock).toHaveBeenCalledWith(FA_PROJECT_MANAGEMENT_IPC.getProjectStylingAsync)
+})
+
+test('projectManagementAPI setProjectStyling invokes IPC with cloned patch', async () => {
+  invokeMock.mockResolvedValueOnce(true)
+  const patch = { css: 'z{}' }
+  const persisted = await projectManagementAPI.setProjectStyling(patch)
+  expect(persisted).toBe(true)
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.setProjectStylingPatchAsync,
+    { css: 'z{}' }
+  )
+  expect(patch.css).toBe('z{}')
+})

@@ -1,0 +1,28 @@
+---
+description: Mandatory entry points for reads and writes against the active .faproject SQLite database in Electron main.
+globs: src-electron/mainScripts/**/*.ts
+alwaysApply: false
+---
+
+# Active project database access (main process)
+
+## Rule
+
+Do **not** call **`getFaProjectActiveDatabase()`**, **`getFaProjectLastKnownActiveProjectFilePath()`**, or **`replaceFaProjectActiveDatabase()`** from arbitrary main-process modules. ESLint **`no-restricted-imports`** blocks those imports outside the small allowlisted files (see **`eslint.config.mjs`**).
+
+- **IPC handlers and other call sites** that operate on the **currently loaded** project file must use **`runWithFaProjectDatabaseForIpcAsync`** (when `IpcMainInvokeEvent` is available) or **`runWithFaProjectDatabaseSync`** from **`src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected.ts`**. These helpers reconnect once from the mirrored path, retry once after a recoverable SQLite error, and may ask the renderer for the path via **`FA_PROJECT_FAILSAFE_IPC`** when main lost both handle and path mirror.
+- **Opening or creating** a project continues to use **`runFaProjectOpenFromIpc`**, **`runFaProjectCreateFromIpc`**, and internal **`replaceFaProjectActiveDatabase(..., filePath)`** inside **`faProjectOpenRun.ts`** / **`faProjectCreateRun.ts`**. **Reconnect-only** paths use **`reconnectFaProjectDatabaseAtKnownPathSync`** in **`faProjectReconnectAtKnownPath.ts`**.
+- **`faProjectActiveDatabase.ts`** owns the handle, mirrored absolute path, **closeFaProjectActiveDatabase** (full clear), and **closeFaProjectActiveDatabaseHandleOnly** (keep path for reconnect).
+
+## Main window session reset
+
+On the first real loading pass, **`faMainWindowWebContentsSessionReset`** listens for **`did-start-navigation`** and calls **`closeFaProjectActiveDatabase()`** only when **`details.isMainFrame && !details.isSameDocument`**, so internal same-document or subframe activity does not clear the mirrored path and handle the way a full document navigation does.
+
+## Renderer bridge
+
+- Preload exposes **`window.faContentBridgeAPIs.faProjectFailsafe.installActiveProjectPathReply`**. **`src/boot/faProjectFailsafePathReply.ts`** registers the callback that reads **`S_FaActiveProject`**. Main installs **`installFaProjectFailsafePathReplyListener`** from **`appManagement`** startup.
+
+## TypeScript interfaces and types (`types/`)
+
+- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

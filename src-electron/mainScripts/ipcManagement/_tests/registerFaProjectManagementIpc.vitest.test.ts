@@ -11,7 +11,10 @@ const {
   getRecentSnapshotMock,
   readProjectNoteboardRootMock,
   upsertProjectNoteboardKvMock,
-  getFaProjectActiveDbMock
+  readProjectStylingRootMock,
+  upsertProjectStylingKvMock,
+  getFaProjectActiveDbMock,
+  runWithForIpcMock
 } = vi.hoisted(() => {
   return {
     appOnMock: vi.fn(),
@@ -20,15 +23,19 @@ const {
     getRecentSnapshotMock: vi.fn((): Array<{ filePath: string, name: string }> => []),
     ipcMainHandleMock: vi.fn(),
     readProjectNoteboardRootMock: vi.fn(),
+    readProjectStylingRootMock: vi.fn(),
     runCreateMock: vi.fn(async () => ({ outcome: 'canceled' as const })),
     runOpenMock: vi.fn(async () => ({ outcome: 'canceled' as const })),
-    upsertProjectNoteboardKvMock: vi.fn()
+    runWithForIpcMock: vi.fn(),
+    upsertProjectNoteboardKvMock: vi.fn(),
+    upsertProjectStylingKvMock: vi.fn()
   }
 })
 
 vi.mock('electron', () => {
   return {
     app: {
+      getPath: vi.fn(() => '/fake-user-data'),
       on: appOnMock
     },
     ipcMain: {
@@ -46,6 +53,17 @@ vi.mock('app/src-electron/mainScripts/projectManagement/faProjectCreateRun', () 
 vi.mock('app/src-electron/mainScripts/projectManagement/faProjectOpenRun', () => {
   return {
     runFaProjectOpenFromIpc: runOpenMock
+  }
+})
+
+vi.mock('app/src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected', () => {
+  return {
+    runWithFaProjectDatabaseForIpcAsync: async (
+      event: unknown,
+      work: (db: unknown) => unknown
+    ) => {
+      return await runWithForIpcMock(event, work)
+    }
   }
 })
 
@@ -72,6 +90,16 @@ vi.mock(
   }
 )
 
+vi.mock(
+  'app/src-electron/mainScripts/projectManagement/faProjectStylingPersist',
+  () => {
+    return {
+      readFaProjectStylingRoot: readProjectStylingRootMock,
+      upsertFaProjectStylingKv: upsertProjectStylingKvMock
+    }
+  }
+)
+
 beforeEach(async () => {
   vi.resetModules()
   ipcMainHandleMock.mockReset()
@@ -85,8 +113,21 @@ beforeEach(async () => {
   getRecentSnapshotMock.mockReturnValue([])
   readProjectNoteboardRootMock.mockReset()
   upsertProjectNoteboardKvMock.mockReset()
+  readProjectStylingRootMock.mockReset()
+  upsertProjectStylingKvMock.mockReset()
   getFaProjectActiveDbMock.mockReset()
   getFaProjectActiveDbMock.mockReturnValue(null)
+  runWithForIpcMock.mockReset()
+  runWithForIpcMock.mockImplementation(async (_event: unknown, work: (db: unknown) => unknown) => {
+    const db = getFaProjectActiveDbMock()
+    if (db === null) {
+      return { ok: false }
+    }
+    return {
+      ok: true,
+      value: work(db)
+    }
+  })
 })
 
 function handlerFor (channel: string): (...args: unknown[]) => unknown {
@@ -95,7 +136,7 @@ function handlerFor (channel: string): (...args: unknown[]) => unknown {
   return call?.[1] as (...args: unknown[]) => unknown
 }
 
-test('registerFaProjectManagementIpc registers project-noteboard IPC handlers with create, recent, open, and before-quit hook once', async () => {
+test('registerFaProjectManagementIpc registers project-noteboard and project-styling IPC handlers with create, recent, open, and before-quit hook once', async () => {
   const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
   registerFaProjectManagementIpc()
   expect(ipcMainHandleMock).toHaveBeenCalledWith(
@@ -112,6 +153,14 @@ test('registerFaProjectManagementIpc registers project-noteboard IPC handlers wi
   )
   expect(ipcMainHandleMock).toHaveBeenCalledWith(
     FA_PROJECT_MANAGEMENT_IPC.setProjectNoteboardPatchAsync,
+    expect.any(Function)
+  )
+  expect(ipcMainHandleMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.getProjectStylingAsync,
+    expect.any(Function)
+  )
+  expect(ipcMainHandleMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.setProjectStylingPatchAsync,
     expect.any(Function)
   )
   expect(ipcMainHandleMock).toHaveBeenCalledWith(
@@ -167,7 +216,7 @@ test('getProjectNoteboardAsync returns default snapshot when active database han
   registerFaProjectManagementIpc()
   const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.getProjectNoteboardAsync)
   expect(readProjectNoteboardRootMock).not.toHaveBeenCalled()
-  expect(h()).toEqual({
+  await expect(h({} as never, undefined as never)).resolves.toEqual({
     frame: null,
     schemaVersion: 1,
     text: ''
@@ -192,9 +241,9 @@ test('getProjectNoteboardAsync clones persisted root payload', async () => {
   const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
   registerFaProjectManagementIpc()
   const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.getProjectNoteboardAsync)
-  const snap = h() as { frame: { x: number } }
+  const snap = (await h({} as never, undefined as never)) as { frame: { x: number } }
   snap.frame.x = -1
-  const second = h() as { frame: { x: number } }
+  const second = (await h({} as never, undefined as never)) as { frame: { x: number } }
   expect(second.frame.x).toBe(11)
   expect(readProjectNoteboardRootMock).toHaveBeenCalledTimes(2)
 })
@@ -205,9 +254,9 @@ test('setProjectNoteboardPatchAsync upserts KV rows against the active SQLite ha
   const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
   registerFaProjectManagementIpc()
   const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.setProjectNoteboardPatchAsync)
-  const ok = h(undefined as never, {
+  const ok = (await h(undefined as never, {
     text: 'next'
-  }) as boolean
+  })) as boolean
   expect(ok).toBe(true)
   expect(upsertProjectNoteboardKvMock).toHaveBeenCalledWith(fakeDb, { text: 'next' })
 })
@@ -217,13 +266,79 @@ test('setProjectNoteboardPatchAsync returns false without an active project data
   const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
   registerFaProjectManagementIpc()
   const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.setProjectNoteboardPatchAsync)
-  const ok = h(undefined as never, {
+  const ok = (await h(undefined as never, {
     text: 'x'
-  }) as boolean
+  })) as boolean
   expect(ok).toBe(false)
   expect(upsertProjectNoteboardKvMock).not.toHaveBeenCalled()
   expect(warn).toHaveBeenCalledWith(
     expect.stringMatching(/setProjectNoteboard skipped/)
+  )
+  warn.mockRestore()
+})
+
+test('getProjectStylingAsync returns default snapshot when active database handle is absent', async () => {
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.getProjectStylingAsync)
+  expect(readProjectStylingRootMock).not.toHaveBeenCalled()
+  await expect(h({} as never, undefined as never)).resolves.toEqual({
+    css: '',
+    frame: null,
+    schemaVersion: 1
+  })
+})
+
+test('getProjectStylingAsync clones persisted root payload', async () => {
+  const fakeDb = { dummy: true } as unknown
+  getFaProjectActiveDbMock.mockReturnValue(fakeDb)
+  readProjectStylingRootMock.mockImplementation(() => {
+    return {
+      css: 'a{}',
+      frame: {
+        height: 400,
+        width: 500,
+        x: 11,
+        y: 22
+      },
+      schemaVersion: 1
+    }
+  })
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.getProjectStylingAsync)
+  const snap = (await h({} as never, undefined as never)) as { frame: { x: number } }
+  snap.frame.x = -1
+  const second = (await h({} as never, undefined as never)) as { frame: { x: number } }
+  expect(second.frame.x).toBe(11)
+  expect(readProjectStylingRootMock).toHaveBeenCalledTimes(2)
+})
+
+test('setProjectStylingPatchAsync upserts KV rows against the active SQLite handle', async () => {
+  const fakeDb = { tag: 'db' } as unknown
+  getFaProjectActiveDbMock.mockReturnValue(fakeDb)
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.setProjectStylingPatchAsync)
+  const ok = (await h(undefined as never, {
+    css: 'next'
+  })) as boolean
+  expect(ok).toBe(true)
+  expect(upsertProjectStylingKvMock).toHaveBeenCalledWith(fakeDb, { css: 'next' })
+})
+
+test('setProjectStylingPatchAsync returns false without an active project database', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.setProjectStylingPatchAsync)
+  const ok = (await h(undefined as never, {
+    css: 'x'
+  })) as boolean
+  expect(ok).toBe(false)
+  expect(upsertProjectStylingKvMock).not.toHaveBeenCalled()
+  expect(warn).toHaveBeenCalledWith(
+    expect.stringMatching(/setProjectStyling skipped/)
   )
   warn.mockRestore()
 })

@@ -146,3 +146,10 @@ export interface I_extraEnvVariablesBridge {
   getCachedSnapshot: () => I_extraEnvVariablesAPI | null
   getSnapshot: () => Promise<I_extraEnvVariablesAPI>
 }
+
+/**
+ * SQLite failsafe: renderer supplies the active .faproject path when main requests it.
+ */
+export interface I_faProjectFailsafeAPI {
+  installActiveProjectPathReply: (getActiveProjectFilePath: () => string | null) => void
+}

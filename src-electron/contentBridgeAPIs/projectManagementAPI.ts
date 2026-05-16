@@ -12,6 +12,10 @@ import type {
   I_faProjectNoteboardPatch,
   I_faProjectNoteboardRoot
 } from 'app/types/I_faProjectNoteboardDomain'
+import type {
+  I_faProjectStylingPatch,
+  I_faProjectStylingRoot
+} from 'app/types/I_faProjectStylingDomain'
 import type { I_faRecentProjectEntry } from 'app/types/I_faRecentProjectsDomain'
 
 export const projectManagementAPI: I_faProjectManagementAPI = {
@@ -27,6 +31,12 @@ export const projectManagementAPI: I_faProjectManagementAPI = {
     return await ipcRenderer.invoke(
       FA_PROJECT_MANAGEMENT_IPC.getProjectNoteboardAsync
     ) as I_faProjectNoteboardRoot
+  },
+
+  async getProjectStyling (): Promise<I_faProjectStylingRoot> {
+    return await ipcRenderer.invoke(
+      FA_PROJECT_MANAGEMENT_IPC.getProjectStylingAsync
+    ) as I_faProjectStylingRoot
   },
 
   async getRecentProjects (): Promise<I_faRecentProjectEntry[]> {
@@ -49,6 +59,14 @@ export const projectManagementAPI: I_faProjectManagementAPI = {
     const payload = JSON.parse(JSON.stringify(patch)) as I_faProjectNoteboardPatch
     return await ipcRenderer.invoke(
       FA_PROJECT_MANAGEMENT_IPC.setProjectNoteboardPatchAsync,
+      payload
+    ) as boolean
+  },
+
+  async setProjectStyling (patch: I_faProjectStylingPatch): Promise<boolean> {
+    const payload = JSON.parse(JSON.stringify(patch)) as I_faProjectStylingPatch
+    return await ipcRenderer.invoke(
+      FA_PROJECT_MANAGEMENT_IPC.setProjectStylingPatchAsync,
       payload
     ) as boolean
   }

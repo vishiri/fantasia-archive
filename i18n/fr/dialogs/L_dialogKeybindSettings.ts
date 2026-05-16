@@ -25,6 +25,7 @@ export default {
     openKeybindSettings: 'Ouvrir les paramètres des raccourcis',
     openAppSettings: 'Ouvrir les paramètres de l’app',
     openAppStyling: 'Ouvrir le CSS personnalisé de l’app',
+    openProjectStyling: 'Ouvrir le CSS personnalisé du projet',
     toggleDeveloperTools: 'Basculer les outils de développement',
     toggleAppNoteboard: 'Basculer le noteboard de l’app',
     toggleProjectNoteboard: 'Basculer le noteboard du projet'

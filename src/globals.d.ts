@@ -3,7 +3,8 @@ import type {
   I_extraEnvVariablesBridge,
   I_faDevToolsControl,
   I_faExternalLinksManagerAPI,
-  I_faWindowControlAPI
+  I_faWindowControlAPI,
+  I_faProjectFailsafeAPI
 } from 'app/types/I_faElectronRendererBridgeAPIs'
 import type { I_faKeybindsAPI } from 'app/types/I_faKeybindsDomain'
 import type { I_faAppNoteboardAPI } from 'app/types/I_faAppNoteboardDomain'
@@ -30,6 +31,7 @@ declare global{
       faAppStyling: I_faAppStylingAPI,
       faUserSettings: I_faUserSettingsAPI,
       faAppConfig: I_faAppConfigAPI,
+      faProjectFailsafe: I_faProjectFailsafeAPI,
       projectManagement: I_faProjectManagementAPI
     }
   }

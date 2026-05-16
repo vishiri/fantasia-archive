@@ -1,5 +1,6 @@
 <template>
   <FaUserCssInjector v-if="mountUserCssInjector" />
+  <FaProjectUserCssInjector v-if="mountUserCssInjector" />
   <router-view />
 </template>
 
@@ -8,6 +9,7 @@
 import { computed } from 'vue'
 
 import FaUserCssInjector from 'app/src/components/globals/_FaUserCssInjector/_FaUserCssInjector.vue'
+import FaProjectUserCssInjector from 'app/src/components/globals/_FaProjectUserCssInjector/_FaProjectUserCssInjector.vue'
 import { isFantasiaStorybookCanvas } from 'app/src/scripts/appInternals/rendererAppInternals'
 
 // User CSS is meaningful only inside the real Electron renderer; Storybook canvas mounts skip it so the shared style element does not bleed across previews.

@@ -25,6 +25,7 @@ export default {
     openKeybindSettings: 'Tastenkürzel-Einstellungen öffnen',
     openAppSettings: 'App-Einstellungen öffnen',
     openAppStyling: 'Eigenes App-CSS öffnen',
+    openProjectStyling: 'Eigenes Projekt-CSS öffnen',
     toggleDeveloperTools: 'Entwicklerwerkzeuge ein/aus',
     toggleAppNoteboard: 'App-Noteboard umschalten',
     toggleProjectNoteboard: 'Projekt-Noteboard umschalten'

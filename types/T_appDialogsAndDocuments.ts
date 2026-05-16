@@ -11,6 +11,7 @@ export type T_dialogName =
   | 'WindowAppNoteboard'
   | 'WindowProjectNoteboard'
   | 'WindowAppStyling'
+  | 'WindowProjectStyling'
   | ''
 
 /**

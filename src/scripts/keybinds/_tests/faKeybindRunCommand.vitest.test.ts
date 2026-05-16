@@ -54,3 +54,8 @@ test('faKeybindRunCommand routes toggleProjectNoteboard to the toggleProjectNote
   faKeybindRunCommand('toggleProjectNoteboard')
   expect(runFaActionMock).toHaveBeenCalledWith('toggleProjectNoteboardWindow', undefined)
 })
+
+test('faKeybindRunCommand routes openProjectStyling to the openProjectStylingDialog action', () => {
+  faKeybindRunCommand('openProjectStyling')
+  expect(runFaActionMock).toHaveBeenCalledWith('openProjectStylingDialog', undefined)
+})

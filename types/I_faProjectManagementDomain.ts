@@ -2,6 +2,10 @@ import type {
   I_faProjectNoteboardPatch,
   I_faProjectNoteboardRoot
 } from 'app/types/I_faProjectNoteboardDomain'
+import type {
+  I_faProjectStylingPatch,
+  I_faProjectStylingRoot
+} from 'app/types/I_faProjectStylingDomain'
 import type { I_faRecentProjectEntry } from 'app/types/I_faRecentProjectsDomain'
 
 /**
@@ -59,6 +63,7 @@ export interface I_faProjectOpenResult {
 export interface I_faProjectManagementAPI {
   createProject: (input: I_faProjectCreateInput) => Promise<I_faProjectCreateResult>
   getProjectNoteboard: () => Promise<I_faProjectNoteboardRoot>
+  getProjectStyling: () => Promise<I_faProjectStylingRoot>
   getRecentProjects: () => Promise<I_faRecentProjectEntry[]>
   openProject: (input?: I_faProjectOpenInput) => Promise<I_faProjectOpenResult>
   /**
@@ -66,4 +71,5 @@ export interface I_faProjectManagementAPI {
    * Resolves **false** when there is no active project database (for example immediately after main cleared the handle during a renderer reload).
    */
   setProjectNoteboard: (patch: I_faProjectNoteboardPatch) => Promise<boolean>
+  setProjectStyling: (patch: I_faProjectStylingPatch) => Promise<boolean>
 }

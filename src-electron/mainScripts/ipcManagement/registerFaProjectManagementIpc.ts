@@ -1,10 +1,8 @@
 import { app, ipcMain } from 'electron'
 
 import { FA_PROJECT_MANAGEMENT_IPC } from 'app/src-electron/electron-ipc-bridge'
-import {
-  closeFaProjectActiveDatabase,
-  getFaProjectActiveDatabase
-} from 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase'
+import { closeFaProjectActiveDatabase } from 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase'
+import { runWithFaProjectDatabaseForIpcAsync } from 'app/src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected'
 import { runFaProjectCreateFromIpc } from 'app/src-electron/mainScripts/projectManagement/faProjectCreateRun'
 import { installFaProjectManagementE2ePathOverrideGlobals } from 'app/src-electron/mainScripts/projectManagement/faProjectManagementE2ePathOverride'
 import { runFaProjectOpenFromIpc } from 'app/src-electron/mainScripts/projectManagement/faProjectOpenRun'
@@ -12,19 +10,31 @@ import {
   readFaProjectNoteboardRoot,
   upsertFaProjectNoteboardKv
 } from 'app/src-electron/mainScripts/projectManagement/faProjectNoteboardPersist'
+import {
+  readFaProjectStylingRoot,
+  upsertFaProjectStylingKv
+} from 'app/src-electron/mainScripts/projectManagement/faProjectStylingPersist'
 import { getRecentProjectsSnapshot } from 'app/src-electron/mainScripts/projectManagement/faRecentProjectListRuntime'
 import { parseFaProjectNoteboardPatch } from 'app/src-electron/shared/faProjectNoteboardPatchSchema'
+import { parseFaProjectStylingPatch } from 'app/src-electron/shared/faProjectStylingPatchSchema'
 import type {
   I_faProjectCreateResult,
   I_faProjectOpenResult
 } from 'app/types/I_faProjectManagementDomain'
 import type { I_faProjectNoteboardRoot } from 'app/types/I_faProjectNoteboardDomain'
+import type { I_faProjectStylingRoot } from 'app/types/I_faProjectStylingDomain'
 import type { I_faRecentProjectEntry } from 'app/types/I_faRecentProjectsDomain'
 
 const FA_PROJECT_MANAGEMENT_FALLBACK_PROJECT_NOTEBOARD: I_faProjectNoteboardRoot = {
   frame: null,
   schemaVersion: 1,
   text: ''
+}
+
+const FA_PROJECT_MANAGEMENT_FALLBACK_PROJECT_STYLING: I_faProjectStylingRoot = {
+  css: '',
+  frame: null,
+  schemaVersion: 1
 }
 
 let registered = false
@@ -41,6 +51,21 @@ function duplicateFaProjectNoteboardSnapshot (
     frame,
     schemaVersion: schemaVersionValue,
     text: snapshotText
+  }
+}
+
+function duplicateFaProjectStylingSnapshot (
+  next: I_faProjectStylingRoot
+): I_faProjectStylingRoot {
+  const frameFrom = next.frame
+  const frame =
+    frameFrom === null ? null : { ...frameFrom }
+  const snapshotCss = next.css
+  const schemaVersionValue = next.schemaVersion
+  return {
+    css: snapshotCss,
+    frame,
+    schemaVersion: schemaVersionValue
   }
 }
 
@@ -69,28 +94,63 @@ export function registerFaProjectManagementIpc (): void {
 
   ipcMain.handle(
     FA_PROJECT_MANAGEMENT_IPC.getProjectNoteboardAsync,
-    (): I_faProjectNoteboardRoot => {
-      const db = getFaProjectActiveDatabase()
-      if (db === null) {
+    async (event): Promise<I_faProjectNoteboardRoot> => {
+      const ran = await runWithFaProjectDatabaseForIpcAsync(event, (db) => {
+        return duplicateFaProjectNoteboardSnapshot(readFaProjectNoteboardRoot(db))
+      })
+      if (!ran.ok) {
         return duplicateFaProjectNoteboardSnapshot(FA_PROJECT_MANAGEMENT_FALLBACK_PROJECT_NOTEBOARD)
       }
-      return duplicateFaProjectNoteboardSnapshot(readFaProjectNoteboardRoot(db))
+      return ran.value
     }
   )
 
   ipcMain.handle(
     FA_PROJECT_MANAGEMENT_IPC.setProjectNoteboardPatchAsync,
-    (_event, raw: unknown): boolean => {
+    async (event, raw: unknown): Promise<boolean> => {
       const parsed = parseFaProjectNoteboardPatch(raw)
-      const db = getFaProjectActiveDatabase()
-      if (db === null) {
+      const ran = await runWithFaProjectDatabaseForIpcAsync(event, (db) => {
+        upsertFaProjectNoteboardKv(db, parsed)
+        return true
+      })
+      if (!ran.ok) {
         console.warn(
           '[faProjectManagement] setProjectNoteboard skipped — no active project database (reload or session reset may be in progress)'
         )
         return false
       }
-      upsertFaProjectNoteboardKv(db, parsed)
-      return true
+      return ran.value
+    }
+  )
+
+  ipcMain.handle(
+    FA_PROJECT_MANAGEMENT_IPC.getProjectStylingAsync,
+    async (event): Promise<I_faProjectStylingRoot> => {
+      const ran = await runWithFaProjectDatabaseForIpcAsync(event, (db) => {
+        return duplicateFaProjectStylingSnapshot(readFaProjectStylingRoot(db))
+      })
+      if (!ran.ok) {
+        return duplicateFaProjectStylingSnapshot(FA_PROJECT_MANAGEMENT_FALLBACK_PROJECT_STYLING)
+      }
+      return ran.value
+    }
+  )
+
+  ipcMain.handle(
+    FA_PROJECT_MANAGEMENT_IPC.setProjectStylingPatchAsync,
+    async (event, raw: unknown): Promise<boolean> => {
+      const parsed = parseFaProjectStylingPatch(raw)
+      const ran = await runWithFaProjectDatabaseForIpcAsync(event, (db) => {
+        upsertFaProjectStylingKv(db, parsed)
+        return true
+      })
+      if (!ran.ok) {
+        console.warn(
+          '[faProjectManagement] setProjectStyling skipped — no active project database (reload or session reset may be in progress)'
+        )
+        return false
+      }
+      return ran.value
     }
   )
 

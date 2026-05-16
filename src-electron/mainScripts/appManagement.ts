@@ -5,6 +5,7 @@ import { registerFaExtraEnvIpc } from 'app/src-electron/mainScripts/ipcManagemen
 import { registerFaExternalLinksIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaExternalLinksIpc'
 import { registerFaKeybindsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaKeybindsIpc'
 import { registerFaAppConfigIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaAppConfigIpc'
+import { installFaProjectFailsafePathReplyListener } from 'app/src-electron/mainScripts/ipcManagement/faProjectFailsafePathFromRenderer'
 import { registerFaProjectManagementIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProjectManagementIpc'
 import { registerFaAppNoteboardIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaAppNoteboardIpc'
 import { registerFaAppStylingIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaAppStylingIpc'
@@ -23,6 +24,7 @@ export const startApp = () => {
   registerFaExternalLinksIpc()
   registerFaKeybindsIpc()
   registerFaAppConfigIpc()
+  installFaProjectFailsafePathReplyListener()
   registerFaProjectManagementIpc()
   registerFaAppNoteboardIpc()
   registerFaAppStylingIpc()

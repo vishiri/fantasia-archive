@@ -147,6 +147,9 @@ function resetFaVitestRendererHarness (): void {
       exportToFile: vi.fn(async () => ({ outcome: 'canceled' as const })),
       prepareImport: vi.fn(async () => ({ outcome: 'canceled' as const }))
     },
+    faProjectFailsafe: {
+      installActiveProjectPathReply: vi.fn()
+    },
     projectManagement: {
       createProject: vi.fn(async () => ({ outcome: 'canceled' as const })),
       getProjectNoteboard: vi.fn(async () => ({
@@ -154,9 +157,15 @@ function resetFaVitestRendererHarness (): void {
         schemaVersion: 1 as const,
         text: ''
       })),
+      getProjectStyling: vi.fn(async () => ({
+        css: '',
+        frame: null,
+        schemaVersion: 1 as const
+      })),
       getRecentProjects: vi.fn(async () => []),
       openProject: vi.fn(async () => ({ outcome: 'canceled' as const })),
-      setProjectNoteboard: vi.fn(async (): Promise<boolean> => true)
+      setProjectNoteboard: vi.fn(async (): Promise<boolean> => true),
+      setProjectStyling: vi.fn(async (): Promise<boolean> => true)
     }
   }
 }

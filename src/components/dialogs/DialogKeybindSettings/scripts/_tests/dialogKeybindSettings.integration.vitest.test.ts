@@ -89,6 +89,7 @@ test('buildDialogKeybindSettingsRows lists all command ids', () => {
     'openAppSettings',
     'openAppStyling',
     'openKeybindSettings',
+    'openProjectStyling',
     'toggleAppNoteboard',
     'toggleDeveloperTools',
     'toggleProjectNoteboard'

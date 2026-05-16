@@ -22,6 +22,17 @@ description: >-
 3. **Native builds**: `better-sqlite3` must compile for the Electron/Node ABI used by the packaged app; verify `yarn quasar:build:electron` and packaged runs after upgrades.
 4. **Lifecycle**: Open/close or pool connections deliberately; avoid leaking handles on window reload during dev.
 
+## Active project DB access (mandatory failsafe)
+
+All **active `.faproject`** reads and writes in main (including project noteboard, styling persistence, and any new IPC that touches the open project file) must go through **`runWithFaProjectDatabaseForIpcAsync`** or **`runWithFaProjectDatabaseSync`** from **`src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected.ts`**, not direct **`getFaProjectActiveDatabase()`** calls. ESLint restricts **`getFaProjectActiveDatabase`**, **`getFaProjectLastKnownActiveProjectFilePath`**, and **`replaceFaProjectActiveDatabase`** imports outside the allowlisted modules; see **`.cursor/rules/fa-project-database-access.mdc`**.
+
+- **Mirrored path**: Main keeps the last known absolute **`.faproject`** path alongside the **`better-sqlite3`** handle (**`faProjectActiveDatabase.ts`**). **`replaceFaProjectActiveDatabase(db, filePath)`** runs on successful open and create; **`closeFaProjectActiveDatabase()`** clears both; **`closeFaProjectActiveDatabaseHandleOnly()`** drops only the handle so a single reconnect can reuse the path.
+- **Reconnect + retry**: One synchronous reopen from the mirrored path when the handle is null, plus at most **one** handle-only close and retry when the operation throws a classified SQLite / **better-sqlite3** error. A **single-flight** mutex avoids overlapping reconnects.
+- **Optional renderer path**: If main has no mirrored path after reconnect, async IPC paths may request the active path from the renderer via **`FA_PROJECT_FAILSAFE_IPC`** (**`electron-ipc-bridge.ts`**); the boot script registers **`faProjectFailsafeAPI.installActiveProjectPathReply`** with Pinia **`S_FaActiveProject`**. Replied paths are validated with **`pathLooksLikeFaProjectFile`** before open.
+- **Session reset**: Main window session cleanup uses **`did-start-navigation`** with **`isMainFrame && !details.isSameDocument`** so spurious navigations do not drop the connection ( **`faMainWindowWebContentsSessionReset.ts`** ).
+
+When adding new project-DB IPC handlers, wire them through the ensure layer and extend tests under **`src-electron/mainScripts/projectManagement/_tests/`** and **`registerFaProjectManagementIpc` Vitest** as needed.
+
 ## Evolution
 
 - When replacing the stub, add a dedicated module under `src-electron/` (e.g. `mainScripts/db/` or `database/`) and keep `electron-main.ts` thin.

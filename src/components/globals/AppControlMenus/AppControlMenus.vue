@@ -50,6 +50,7 @@
     <DialogKeybindSettings v-if="embedDialogs" />
     <DialogAppSettings v-if="embedDialogs" />
     <WindowAppStyling v-if="embedDialogs" />
+    <WindowProjectStyling v-if="embedDialogs" />
     <WindowAppNoteboard v-if="embedDialogs" />
     <WindowProjectNoteboard v-if="embedDialogs" />
     <DialogImportExportAppConfig v-if="embedDialogs" />
@@ -85,6 +86,7 @@ import DialogImportExportAppConfig from 'app/src/components/dialogs/DialogImport
 import WindowAppNoteboard from 'app/src/components/floatingWindows/WindowAppNoteboard/WindowAppNoteboard.vue'
 import WindowProjectNoteboard from 'app/src/components/floatingWindows/WindowProjectNoteboard/WindowProjectNoteboard.vue'
 import WindowAppStyling from 'app/src/components/floatingWindows/WindowAppStyling/WindowAppStyling.vue'
+import WindowProjectStyling from 'app/src/components/floatingWindows/WindowProjectStyling/WindowProjectStyling.vue'
 
 function readInitialTestingType (): string | false {
   const snap = window.faContentBridgeAPIs?.extraEnvVariables?.getCachedSnapshot?.()

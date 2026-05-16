@@ -25,12 +25,14 @@ import L_appSettings from './dialogs/L_appSettings'
 import L_appNoteboard from './floatingWindows/L_appNoteboard'
 import L_projectNoteboard from './floatingWindows/L_projectNoteboard'
 import L_appStylingFloating from './floatingWindows/L_appStyling'
+import L_projectStylingFloating from './floatingWindows/L_projectStyling'
 
 import L_faActionManager from './globalFunctionality/L_faActionManager'
 import L_faKeybinds from './globalFunctionality/L_faKeybinds'
 import L_faAppNoteboard from './globalFunctionality/L_faAppNoteboard'
 import L_faProjectNoteboard from './globalFunctionality/L_faProjectNoteboard'
 import L_faAppStyling from './globalFunctionality/L_faAppStyling'
+import L_faProjectStyling from './globalFunctionality/L_faProjectStyling'
 import L_faProjectSession from './globalFunctionality/L_faProjectSession'
 import L_faUserSettings from './globalFunctionality/L_faUserSettings'
 import L_spellChecker from './globalFunctionality/L_spellChecker'
@@ -74,7 +76,8 @@ export default {
   floatingWindows: {
     appNoteboard: L_appNoteboard,
     appStyling: L_appStylingFloating,
-    projectNoteboard: L_projectNoteboard
+    projectNoteboard: L_projectNoteboard,
+    projectStyling: L_projectStylingFloating
   },
 
   // COMPONENT - GLOBAL LANGUAGE SELECTOR
@@ -104,6 +107,7 @@ export default {
     faAppNoteboard: L_faAppNoteboard,
     faProjectNoteboard: L_faProjectNoteboard,
     faAppStyling: L_faAppStyling,
+    faProjectStyling: L_faProjectStyling,
     faProjectSession: L_faProjectSession,
     faUserSettings: L_faUserSettings,
     spellChecker: L_spellChecker,

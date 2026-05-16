@@ -11,12 +11,15 @@ import {
   handleOpenLicenseDialog,
   handleOpenAppSettingsDialog,
   handleOpenAppStylingWindow,
+  handleOpenProjectStylingWindow,
   handleOpenTipsTricksTriviaDialog,
   handleReportAppNoteboardSaveFailure,
   handleReportAppStylingPersistFailure,
+  handleReportProjectStylingSaveFailure,
   handleSaveKeybindSettings,
   handleSaveAppSettings,
   handleSaveAppStyling,
+  handleSaveProjectStyling,
   handleToggleDeveloperTools,
   handleToggleAppNoteboardWindow,
   handleToggleProjectNoteboardWindow,
@@ -70,8 +73,19 @@ export const FA_ACTION_DEFINITIONS_HEAD: ReadonlyArray<I_faActionDefinition<T_fa
     kind: 'async'
   },
   {
+    dedup: true,
+    handler: handleOpenProjectStylingWindow as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'openProjectStylingDialog',
+    kind: 'async'
+  },
+  {
     handler: handleSaveAppStyling as I_faActionDefinition<T_faActionId>['handler'],
     id: 'saveAppStyling',
+    kind: 'async'
+  },
+  {
+    handler: handleSaveProjectStyling as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'saveProjectStyling',
     kind: 'async'
   },
   {
@@ -87,6 +101,11 @@ export const FA_ACTION_DEFINITIONS_HEAD: ReadonlyArray<I_faActionDefinition<T_fa
   {
     handler: handleReportAppStylingPersistFailure as I_faActionDefinition<T_faActionId>['handler'],
     id: 'reportAppStylingPersistFailure',
+    kind: 'async'
+  },
+  {
+    handler: handleReportProjectStylingSaveFailure as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'reportProjectStylingSaveFailure',
     kind: 'async'
   },
   {

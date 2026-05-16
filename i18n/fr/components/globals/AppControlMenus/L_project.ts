@@ -9,6 +9,7 @@ export default {
     recentProjectRow: 'Projet récent',
     showProjectDashboard: 'Afficher le tableau de bord du projet',
     toggleProjectNoteboard: 'Basculer le noteboard du projet',
+    openProjectCustomCss: 'CSS projet personnalisé',
     closeProject: 'Fermer le projet',
     projectSettings: 'Paramètres du projet',
     advancedProjectTools: 'Outils avancés du projet',

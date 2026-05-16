@@ -15,6 +15,7 @@ const {
   registerFaAppStylingIpcMock,
   registerFaUserSettingsIpcMock,
   registerFaWindowControlIpcMock,
+  installFaProjectFailsafePathReplyListenerMock,
   appMock,
   appOnHandlers,
   ipcMainHandleMock
@@ -31,6 +32,7 @@ const {
     },
     getFaUserSettingsMock: vi.fn(),
     ipcMainHandleMock: vi.fn(),
+    installFaProjectFailsafePathReplyListenerMock: vi.fn(),
     mainWindowCreationMock: vi.fn(),
     registerFaAppDetailsIpcMock: vi.fn(),
     registerFaDevToolsIpcMock: vi.fn(),
@@ -79,6 +81,12 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaKeybindsIpc', () =
 vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaAppConfigIpc', () => {
   return {
     registerFaAppConfigIpc: registerFaAppConfigIpcMock
+  }
+})
+
+vi.mock('app/src-electron/mainScripts/ipcManagement/faProjectFailsafePathFromRenderer', () => {
+  return {
+    installFaProjectFailsafePathReplyListener: installFaProjectFailsafePathReplyListenerMock
   }
 })
 
@@ -164,6 +172,7 @@ beforeEach(() => {
   registerFaExternalLinksIpcMock.mockReset()
   registerFaKeybindsIpcMock.mockReset()
   registerFaAppConfigIpcMock.mockReset()
+  installFaProjectFailsafePathReplyListenerMock.mockReset()
   registerFaProjectManagementIpcMock.mockReset()
   registerFaAppNoteboardIpcMock.mockReset()
   registerFaAppStylingIpcMock.mockReset()
@@ -189,6 +198,7 @@ test('Test that the electron app properly starts', () => {
   expect(registerFaExternalLinksIpcMock).toHaveBeenCalledOnce()
   expect(registerFaKeybindsIpcMock).toHaveBeenCalledOnce()
   expect(registerFaAppConfigIpcMock).toHaveBeenCalledOnce()
+  expect(installFaProjectFailsafePathReplyListenerMock).toHaveBeenCalledOnce()
   expect(registerFaProjectManagementIpcMock).toHaveBeenCalledOnce()
   expect(registerFaAppNoteboardIpcMock).toHaveBeenCalledOnce()
   expect(registerFaAppStylingIpcMock).toHaveBeenCalledOnce()

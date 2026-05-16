@@ -14,6 +14,10 @@ const faActiveProjectFixture = vi.hoisted(() => ({
   }
 }))
 
+const canOpenAppNoteboardFloatingWindowMock = vi.hoisted(() => {
+  return vi.fn((): boolean => true)
+})
+
 const {
   applyLanguageMock,
   applyImportMock,
@@ -31,8 +35,10 @@ const {
   refreshAppStylingMock,
   refreshNoteboardMock,
   refreshProjectNoteboardMock,
+  refreshProjectStylingMock,
   refreshWebContentsMock,
   resizeWindowMock,
+  savePersistedCssFromEditorMock,
   tipsNotificationMock,
   toggleDevToolsMock,
   updateKeybindsMock,
@@ -55,10 +61,12 @@ const {
   refreshAppStylingMock: vi.fn(async () => undefined),
   refreshNoteboardMock: vi.fn(async () => undefined),
   refreshProjectNoteboardMock: vi.fn(async () => undefined),
+  refreshProjectStylingMock: vi.fn(async () => undefined),
   refreshRecentProjectsMock: vi.fn(async () => undefined),
   refreshSettingsMock: vi.fn(async () => undefined),
   refreshWebContentsMock: vi.fn(async () => true),
   resizeWindowMock: vi.fn(),
+  savePersistedCssFromEditorMock: vi.fn(async (): Promise<boolean> => true),
   tipsNotificationMock: vi.fn(),
   toggleDevToolsMock: vi.fn(),
   updateKeybindsMock: vi.fn(async () => true),
@@ -89,10 +97,17 @@ vi.mock('app/src/stores/S_FaActiveProject', () => ({
     get activeProject () {
       return faActiveProjectFixture.activeProject
     },
+    get hasActiveProject () {
+      return faActiveProjectFixture.activeProject !== null
+    },
     createProjectFromUserInput: createProjectFromUserInputMock,
     openProjectFromKnownPath: openProjectFromKnownPathMock,
     openProjectFromUserDialog: openProjectFromUserDialogMock
   })
+}))
+
+vi.mock('app/src/scripts/appNoteboard/faAppNoteboardCanOpen', () => ({
+  canOpenAppNoteboardFloatingWindow: (): boolean => canOpenAppNoteboardFloatingWindowMock()
 }))
 
 vi.mock('app/src/stores/S_FaRecentProjects', () => ({
@@ -124,6 +139,13 @@ vi.mock('app/src/stores/S_FaAppNoteboard', () => ({
 vi.mock('app/src/stores/S_FaProjectNoteboard', () => ({
   S_FaProjectNoteboard: () => ({
     refreshProjectNoteboard: refreshProjectNoteboardMock
+  })
+}))
+
+vi.mock('app/src/stores/S_FaProjectStyling', () => ({
+  S_FaProjectStyling: () => ({
+    refreshProjectStyling: refreshProjectStylingMock,
+    savePersistedCssFromEditor: savePersistedCssFromEditorMock
   })
 }))
 
@@ -185,6 +207,10 @@ beforeEach(() => {
   refreshNoteboardMock.mockImplementation(async () => undefined)
   refreshProjectNoteboardMock.mockReset()
   refreshProjectNoteboardMock.mockImplementation(async () => undefined)
+  refreshProjectStylingMock.mockReset()
+  refreshProjectStylingMock.mockImplementation(async () => undefined)
+  savePersistedCssFromEditorMock.mockReset()
+  savePersistedCssFromEditorMock.mockImplementation(async (): Promise<boolean> => true)
   refreshSettingsMock.mockReset()
   refreshSettingsMock.mockImplementation(async () => undefined)
   createProjectFromUserInputMock.mockReset()
@@ -195,6 +221,8 @@ beforeEach(() => {
   openProjectFromUserDialogMock.mockImplementation(async () => 'opened')
   refreshRecentProjectsMock.mockReset()
   refreshRecentProjectsMock.mockImplementation(async () => undefined)
+  canOpenAppNoteboardFloatingWindowMock.mockReset()
+  canOpenAppNoteboardFloatingWindowMock.mockReturnValue(true)
   Object.assign(window, {
     faContentBridgeAPIs: {
       faAppConfig: {
@@ -279,9 +307,75 @@ test('Test that openAppStylingWindow handler opens the WindowAppStyling surface'
   expect(openDialogComponentMock).toHaveBeenCalledWith('WindowAppStyling')
 })
 
+test('Test that openProjectStylingDialog handler opens WindowProjectStyling when a project is active', () => {
+  definitionFor('openProjectStylingDialog').handler(undefined)
+  expect(openDialogComponentMock).toHaveBeenCalledWith('WindowProjectStyling')
+})
+
+test('Test that openProjectStylingDialog handler skips when modal chrome blocks floating windows', () => {
+  canOpenAppNoteboardFloatingWindowMock.mockReturnValue(false)
+  definitionFor('openProjectStylingDialog').handler(undefined)
+  expect(openDialogComponentMock).not.toHaveBeenCalled()
+})
+
+test('Test that openProjectStylingDialog handler skips without an active project', () => {
+  const prior = faActiveProjectFixture.activeProject
+  faActiveProjectFixture.activeProject = null as never
+  try {
+    definitionFor('openProjectStylingDialog').handler(undefined)
+    expect(openDialogComponentMock).not.toHaveBeenCalled()
+  } finally {
+    faActiveProjectFixture.activeProject = prior
+  }
+})
+
+test('Test that saveProjectStyling handler throws saveNoActiveProject without calling the store when no project is open', async () => {
+  const prior = faActiveProjectFixture.activeProject
+  faActiveProjectFixture.activeProject = null as never
+  try {
+    await expect(
+      (definitionFor('saveProjectStyling').handler({ css: 'x' }) as Promise<unknown>)
+    ).rejects.toThrow(/globalFunctionality\.faProjectStyling\.saveNoActiveProject/)
+    expect(savePersistedCssFromEditorMock).not.toHaveBeenCalled()
+  } finally {
+    faActiveProjectFixture.activeProject = prior
+  }
+})
+
+test('Test that saveProjectStyling handler throws saveNoActiveProject without calling the store when no project is open', async () => {
+  const prior = faActiveProjectFixture.activeProject
+  faActiveProjectFixture.activeProject = null as never
+  try {
+    await expect(
+      (definitionFor('saveProjectStyling').handler({ css: 'x' }) as Promise<unknown>)
+    ).rejects.toThrow(/globalFunctionality\.faProjectStyling\.saveNoActiveProject/)
+    expect(savePersistedCssFromEditorMock).not.toHaveBeenCalled()
+  } finally {
+    faActiveProjectFixture.activeProject = prior
+  }
+})
+
+test('Test that saveProjectStyling handler forwards css to savePersistedCssFromEditor on success', async () => {
+  await (definitionFor('saveProjectStyling').handler({ css: ':root{}' }) as Promise<unknown>)
+  expect(savePersistedCssFromEditorMock).toHaveBeenCalledWith(':root{}')
+})
+
+test('Test that saveProjectStyling handler throws when savePersistedCssFromEditor returns false', async () => {
+  savePersistedCssFromEditorMock.mockResolvedValueOnce(false)
+  await expect(
+    (definitionFor('saveProjectStyling').handler({ css: 'x' }) as Promise<unknown>)
+  ).rejects.toThrow(/globalFunctionality\.faProjectStyling\.saveRejected/)
+})
+
 /**
- * Handlers — saveAppStyling forwards the css patch and resolves on success.
+ * Handlers — reportProjectStylingSaveFailure throws so the action manager surfaces one failure toast.
  */
+test('Test that reportProjectStylingSaveFailure handler throws the payload message', async () => {
+  await expect(
+    (definitionFor('reportProjectStylingSaveFailure').handler({ message: 'css fail' }) as Promise<unknown>)
+  ).rejects.toThrow('css fail')
+})
+
 test('Test that saveAppStyling handler forwards css to updateAppStyling on success', async () => {
   await (definitionFor('saveAppStyling').handler({ css: '.theme { color: black; }' }) as Promise<unknown>)
   expect(updateAppStylingMock).toHaveBeenCalledWith({ css: '.theme { color: black; }' })
@@ -351,6 +445,7 @@ test('Test that createNewProject handler delegates to S_FaActiveProject when cre
   expect(createProjectFromUserInputMock).toHaveBeenCalledWith('Realm')
   expect(refreshRecentProjectsMock).toHaveBeenCalledOnce()
   expect(refreshProjectNoteboardMock).toHaveBeenCalledOnce()
+  expect(refreshProjectStylingMock).toHaveBeenCalledOnce()
   expect(Notify.create).toHaveBeenCalledWith({
     message:
       'globalFunctionality.faProjectSession.notifyProjectCreated|Fixture Realm',
@@ -374,6 +469,7 @@ test('Test that loadExistingProject handler delegates to openProjectFromUserDial
   expect(openProjectFromKnownPathMock).not.toHaveBeenCalled()
   expect(refreshRecentProjectsMock).toHaveBeenCalledOnce()
   expect(refreshProjectNoteboardMock).toHaveBeenCalledOnce()
+  expect(refreshProjectStylingMock).toHaveBeenCalledOnce()
   expect(Notify.create).toHaveBeenCalledWith({
     message:
       'globalFunctionality.faProjectSession.notifyProjectLoaded|Fixture Realm',
@@ -396,6 +492,7 @@ test('Test that loadExistingProject handler delegates to openProjectFromKnownPat
   expect(openProjectFromUserDialogMock).not.toHaveBeenCalled()
   expect(refreshRecentProjectsMock).toHaveBeenCalledOnce()
   expect(refreshProjectNoteboardMock).toHaveBeenCalledOnce()
+  expect(refreshProjectStylingMock).toHaveBeenCalledOnce()
 })
 
 test('Test that loadExistingProject handler throws when open succeeds but active project is missing', async () => {
@@ -440,6 +537,7 @@ test('Test that importAppConfigApply handler calls applyImport and refreshes sto
   expect(refreshAppStylingMock).toHaveBeenCalledOnce()
   expect(refreshNoteboardMock).toHaveBeenCalledOnce()
   expect(refreshProjectNoteboardMock).toHaveBeenCalledOnce()
+  expect(refreshProjectStylingMock).toHaveBeenCalledOnce()
 })
 
 test('Test that importAppConfigApply throws when the app config bridge is missing', async () => {

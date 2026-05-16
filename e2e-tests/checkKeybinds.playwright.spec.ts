@@ -58,7 +58,8 @@ const defaultChord = {
   openAdvancedSearchGuide: 'Control+Alt+Shift+G',
   openKeybindSettings: 'ControlOrMeta+Alt+Shift+k',
   openAppSettings: 'ControlOrMeta+Alt+Shift+l',
-  openAppStyling: 'ControlOrMeta+Alt+Shift+j'
+  openAppStyling: 'ControlOrMeta+Alt+Shift+j',
+  openProjectStyling: 'Control+Shift+j'
 } as const
 
 /**
@@ -70,6 +71,7 @@ const adjustedChord = {
   openKeybindSettings: 'Control+Alt+Shift+F10',
   openAppSettings: 'Control+Alt+Shift+F11',
   openAppStyling: 'Control+Alt+Shift+F7',
+  openProjectStyling: 'Control+Shift+F6',
   toggleDeveloperTools: FA_PLAYWRIGHT_PRESS_ADJUSTED_TOGGLE_DEVTOOLS_F12
 } as const
 
@@ -295,6 +297,13 @@ test.describe.serial('Global keybinds end-to-end', () => {
       await closeAppStylingDialog(appWindow)
     })
 
+    await test.step('Default Open Custom Project CSS chord does nothing without an active project', async () => {
+      const frame = appWindow.locator('[data-test-locator="windowProjectStyling-frame"]')
+      await expect(frame).toHaveCount(0)
+      await triggerGlobalShortcut(appWindow, defaultChord.openProjectStyling)
+      await expect(frame).toHaveCount(0)
+    })
+
     await test.step('Default Advanced Search Guide opens then closes', async () => {
       await triggerGlobalShortcut(appWindow, defaultChord.openAdvancedSearchGuide)
       await expect(locatorMarkdownAdvancedSearchGuideDialog(appWindow)).toBeVisible({
@@ -339,6 +348,12 @@ test.describe.serial('Global keybinds end-to-end', () => {
       )
       await captureChordForFilteredCommand(
         appWindow,
+        'project css',
+        keybindDialogMessages.commands.openProjectStyling,
+        adjustedChord.openProjectStyling
+      )
+      await captureChordForFilteredCommand(
+        appWindow,
         'keybind settings',
         keybindDialogMessages.commands.openKeybindSettings,
         adjustedChord.openKeybindSettings
@@ -368,6 +383,12 @@ test.describe.serial('Global keybinds end-to-end', () => {
         timeout: 15_000
       })
       await closeAppStylingDialog(appWindow)
+    })
+
+    await test.step('Adjusted Open Custom Project CSS chord still does nothing without a project', async () => {
+      const frame = appWindow.locator('[data-test-locator="windowProjectStyling-frame"]')
+      await triggerGlobalShortcut(appWindow, adjustedChord.openProjectStyling)
+      await expect(frame).toHaveCount(0)
     })
 
     await test.step('Adjusted Advanced Search Guide opens then closes', async () => {

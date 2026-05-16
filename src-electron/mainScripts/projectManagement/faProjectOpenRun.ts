@@ -113,7 +113,7 @@ function attemptOpenReplaceFaProject (
         throw new FaProjectOpenRejectedAlreadyActiveError()
       }
     }
-    replaceFaProjectActiveDatabase(db)
+    replaceFaProjectActiveDatabase(db, filePath)
     db = null
     return {
       filePath,

@@ -61,6 +61,14 @@ test('Test that buildProjectMenu toggle noteboard row dispatches toggleProjectNo
   expect(runFaActionMock).toHaveBeenCalledWith('toggleProjectNoteboardWindow', undefined)
 })
 
+test('Test that buildProjectMenu custom Project CSS row dispatches openProjectStylingDialog', () => {
+  const menu = buildProjectMenu(emptyRecentSession(true))
+  const items = menu.data.filter((row) => row.mode === 'item')
+  expect(items[5]!.keybindCommandId).toBe('openProjectStyling')
+  items[5]!.trigger?.()
+  expect(runFaActionMock).toHaveBeenCalledWith('openProjectStylingDialog', undefined)
+})
+
 /**
  * Project menu
  * Rows that require an open project are disabled when `hasActiveProject` is false.
@@ -77,9 +85,10 @@ test('Test that buildProjectMenu disables gated rows when hasActiveProject is fa
   expect(items[5]!.conditions).toBe(false)
   expect(items[6]!.conditions).toBe(false)
   expect(items[7]!.conditions).toBe(false)
-  expect(items[8]!.conditions).not.toBe(false)
+  expect(items[8]!.conditions).toBe(false)
+  expect(items[9]!.conditions).not.toBe(false)
 
-  const sub = items[8]!.submenu?.filter((row) => row.mode === 'item') ?? []
+  const sub = items[9]!.submenu?.filter((row) => row.mode === 'item') ?? []
   expect(sub[0]!.conditions).toBe(false)
   expect(sub[1]!.conditions).not.toBe(false)
 })
@@ -101,7 +110,8 @@ test('Test that buildProjectMenu enables gated rows when hasActiveProject is tru
   expect(items[6]!.conditions).not.toBe(false)
   expect(items[7]!.conditions).not.toBe(false)
   expect(items[8]!.conditions).not.toBe(false)
-  const sub = items[8]!.submenu?.filter((row) => row.mode === 'item') ?? []
+  expect(items[9]!.conditions).not.toBe(false)
+  const sub = items[9]!.submenu?.filter((row) => row.mode === 'item') ?? []
   expect(sub.every((row) => row.conditions !== false)).toBe(true)
 })
 

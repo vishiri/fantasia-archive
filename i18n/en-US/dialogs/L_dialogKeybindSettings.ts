@@ -25,6 +25,7 @@ export default {
     openKeybindSettings: 'Open Keybind Settings',
     openAppSettings: 'Open App Settings',
     openAppStyling: 'Open Custom App CSS',
+    openProjectStyling: 'Open Custom Project CSS',
     toggleDeveloperTools: 'Toggle Developer Tools',
     toggleAppNoteboard: 'Toggle App Noteboard',
     toggleProjectNoteboard: 'Toggle Project Noteboard'

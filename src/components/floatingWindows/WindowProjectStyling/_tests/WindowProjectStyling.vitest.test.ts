@@ -1,0 +1,278 @@
+/** @vitest-environment jsdom */
+import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
+import { ref } from 'vue'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
+
+import projectStyling from 'app/i18n/en-US/floatingWindows/L_projectStyling'
+
+const frameSpies = vi.hoisted(() => {
+  return {
+    onFramePointerDown: vi.fn(),
+    onResizePointerDown: vi.fn(),
+    onTitlePointerDown: vi.fn()
+  }
+})
+
+vi.mock('app/src/scripts/floatingWindows/useFaFloatingWindowFrame', () => ({
+  useFaFloatingWindowFrame: () => ({
+    frameRef: ref(null),
+    frameStyle: ref({}),
+    h: ref(480),
+    onFramePointerDown: frameSpies.onFramePointerDown,
+    onResizePointerDown: frameSpies.onResizePointerDown,
+    onTitlePointerDown: frameSpies.onTitlePointerDown,
+    titleShortFrameClass: ref(undefined),
+    w: ref(560),
+    x: ref(20),
+    y: ref(20)
+  })
+}))
+
+const projectStylingMonacoState = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  return {
+    isLoading: ref(false),
+    loadError: ref<string | null>(null)
+  }
+})
+
+vi.mock('app/src/components/floatingWindows/WindowProjectStyling/scripts/useWindowProjectStylingCssPersist', () => ({
+  useWindowProjectStylingCssPersist: vi.fn()
+}))
+
+vi.mock('app/src/components/floatingWindows/WindowProjectStyling/scripts/useWindowProjectStylingFramePersist', () => ({
+  useWindowProjectStylingFramePersist: vi.fn()
+}))
+
+vi.mock('app/src/components/floatingWindows/WindowProjectStyling/scripts/windowProjectStylingState', () => ({
+  useWindowProjectStyling: () => ({
+    closeWithoutSaving: vi.fn(),
+    documentName: ref('WindowProjectStyling'),
+    editorHostRef: ref(null),
+    monaco: {
+      isLoading: projectStylingMonacoState.isLoading,
+      loadError: projectStylingMonacoState.loadError
+    },
+    saveAndCloseWindow: vi.fn(async () => undefined),
+    windowModel: ref(true),
+    workingCss: ref('')
+  })
+}))
+
+import WindowProjectStyling from '../WindowProjectStyling.vue'
+
+const injectMinimalFaRootVarsForList = (): void => {
+  const s = document.createElement('style')
+  s.setAttribute('data-fa-vitest-theme-stub', 'project-styling')
+  s.append(
+    document.createTextNode(
+      [
+        ':root {',
+        '  --fa-color-accent: 0;',
+        '  --fa-color-primary: 0;',
+        '  --fa-color-tooltip-background: 0;',
+        '}'
+      ].join(' ')
+    )
+  )
+  document.head.append(s)
+}
+
+beforeEach(() => {
+  setActivePinia(createPinia())
+  projectStylingMonacoState.isLoading.value = false
+  projectStylingMonacoState.loadError.value = null
+  injectMinimalFaRootVarsForList()
+})
+
+afterEach(() => {
+  for (const el of document.querySelectorAll('style[data-fa-vitest-theme-stub="project-styling"]')) {
+    el.remove()
+  }
+})
+
+const stylingT = (k: string): string => {
+  if (k === 'floatingWindows.projectStyling.title') {
+    return projectStyling.title
+  }
+  if (k === 'floatingWindows.projectStyling.closeWithoutSaving') {
+    return projectStyling.closeWithoutSaving
+  }
+  if (k === 'floatingWindows.projectStyling.saveButton') {
+    return projectStyling.saveButton
+  }
+  if (k === 'floatingWindows.projectStyling.helpTooltip.aria') {
+    return projectStyling.helpTooltip.aria
+  }
+  if (k === 'floatingWindows.projectStyling.loading') {
+    return projectStyling.loading
+  }
+  if (k === 'floatingWindows.projectStyling.helpTooltip.title') {
+    return projectStyling.helpTooltip.title
+  }
+  if (k === 'floatingWindows.projectStyling.helpTooltip.variableListTitle') {
+    return projectStyling.helpTooltip.variableListTitle
+  }
+  if (k === 'floatingWindows.projectStyling.helpTooltip.footer') {
+    return projectStyling.helpTooltip.footer
+  }
+  if (k.startsWith('floatingWindows.projectStyling.helpTooltip.items.')) {
+    const sub = k.replace('floatingWindows.projectStyling.helpTooltip.items.', '')
+    const items = projectStyling.helpTooltip.items as Record<string, string>
+    return items[sub] ?? k
+  }
+  return k
+}
+
+test('Test that WindowProjectStyling surfaces title and action button locators', () => {
+  const w = mount(WindowProjectStyling, {
+    global: {
+      mocks: { $t: stylingT },
+      stubs: {
+        FaFloatingWindowBodyTeleport: {
+          template: '<div><slot /></div>'
+        },
+        QBtn: {
+          inheritAttrs: true,
+          props: {
+            label: {
+              default: '',
+              type: String
+            }
+          },
+          template: '<button type="button" v-bind="$attrs"><span>{{ label }}</span></button>'
+        },
+        QCard: { template: '<div><slot /></div>' },
+        QCardActions: { template: '<div><slot /></div>' },
+        QCardSection: { template: '<div><slot /></div>' },
+        QIcon: { template: '<i><slot /></i>' },
+        QMenu: { template: '<div class="q-menu-stub"><slot /></div>' },
+        QSpinnerDots: { template: '<span />' }
+      }
+    }
+  })
+
+  expect(w.find('[data-test-locator="windowProjectStyling-title"]').text()).toContain(projectStyling.title)
+  expect(w.find('[data-test-locator="windowProjectStyling-button-close"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="windowProjectStyling-button-save"]').exists()).toBe(true)
+
+  const helpBody = w.find('[data-test-locator="windowProjectStyling-helpTooltipBody"]')
+  expect(helpBody.exists()).toBe(true)
+  expect(helpBody.text()).toContain(projectStyling.helpTooltip.title)
+  expect(helpBody.text()).toContain(projectStyling.helpTooltip.items.commandPalette)
+  expect(helpBody.find('[data-test-locator="windowProjectStyling-faThemeVarList"]').exists()).toBe(true)
+  expect(helpBody.text()).toContain('--fa-color-accent')
+
+  w.unmount()
+})
+
+test('Test that WindowProjectStyling forwards frame and title-bar pointerdown handlers', async () => {
+  frameSpies.onFramePointerDown.mockClear()
+  frameSpies.onTitlePointerDown.mockClear()
+
+  const w = mount(WindowProjectStyling, {
+    global: {
+      mocks: { $t: stylingT },
+      stubs: {
+        FaFloatingWindowBodyTeleport: {
+          template: '<div><slot /></div>'
+        },
+        QBtn: {
+          inheritAttrs: true,
+          props: {
+            label: {
+              default: '',
+              type: String
+            }
+          },
+          template: '<button type="button" v-bind="$attrs"><span>{{ label }}</span></button>'
+        },
+        QCard: { template: '<div><slot /></div>' },
+        QCardActions: { template: '<div><slot /></div>' },
+        QCardSection: { template: '<div><slot /></div>' },
+        QIcon: { template: '<i><slot /></i>' },
+        QMenu: { template: '<div class="q-menu-stub"><slot /></div>' },
+        QSpinnerDots: { template: '<span />' }
+      }
+    }
+  })
+
+  await w.get('[data-test-locator="windowProjectStyling-frame"]').trigger('pointerdown')
+  expect(frameSpies.onFramePointerDown).toHaveBeenCalledTimes(1)
+
+  await w.get('[data-test-locator="windowProjectStyling-dragHandle"]').trigger('pointerdown')
+  expect(frameSpies.onTitlePointerDown).toHaveBeenCalledTimes(1)
+
+  w.unmount()
+})
+
+test('Test that WindowProjectStyling shows loading and load-error overlays from monaco state', async () => {
+  projectStylingMonacoState.isLoading.value = true
+
+  const wLoading = mount(WindowProjectStyling, {
+    global: {
+      mocks: { $t: stylingT },
+      stubs: {
+        FaFloatingWindowBodyTeleport: {
+          template: '<div><slot /></div>'
+        },
+        QBtn: {
+          inheritAttrs: true,
+          props: {
+            label: {
+              default: '',
+              type: String
+            }
+          },
+          template: '<button type="button" v-bind="$attrs"><span>{{ label }}</span></button>'
+        },
+        QCard: { template: '<div><slot /></div>' },
+        QCardActions: { template: '<div><slot /></div>' },
+        QCardSection: { template: '<div><slot /></div>' },
+        QIcon: { template: '<i><slot /></i>' },
+        QMenu: { template: '<div class="q-menu-stub"><slot /></div>' },
+        QSpinnerDots: { template: '<span />' }
+      }
+    }
+  })
+
+  expect(wLoading.find('[data-test-locator="windowProjectStyling-loadingOverlay"]').exists()).toBe(true)
+  expect(wLoading.text()).toContain(projectStyling.loading)
+  wLoading.unmount()
+
+  projectStylingMonacoState.isLoading.value = false
+  projectStylingMonacoState.loadError.value = 'Monaco failed to load'
+
+  const wError = mount(WindowProjectStyling, {
+    global: {
+      mocks: { $t: stylingT },
+      stubs: {
+        FaFloatingWindowBodyTeleport: {
+          template: '<div><slot /></div>'
+        },
+        QBtn: {
+          inheritAttrs: true,
+          props: {
+            label: {
+              default: '',
+              type: String
+            }
+          },
+          template: '<button type="button" v-bind="$attrs"><span>{{ label }}</span></button>'
+        },
+        QCard: { template: '<div><slot /></div>' },
+        QCardActions: { template: '<div><slot /></div>' },
+        QCardSection: { template: '<div><slot /></div>' },
+        QIcon: { template: '<i><slot /></i>' },
+        QMenu: { template: '<div class="q-menu-stub"><slot /></div>' },
+        QSpinnerDots: { template: '<span />' }
+      }
+    }
+  })
+
+  expect(wError.find('[data-test-locator="windowProjectStyling-loadError"]').text()).toContain(
+    'Monaco failed to load'
+  )
+  wError.unmount()
+})

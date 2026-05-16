@@ -38,6 +38,7 @@ export default defineConfig((ctx) => {
       'externalLinkManagement',
       'notify-defaults',
       'qmarkdown',
+      'faProjectFailsafePathReply',
       'faRoutingEnv',
       'faE2eRendererProbes'
     ],

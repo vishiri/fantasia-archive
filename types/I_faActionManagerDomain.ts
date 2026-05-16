@@ -17,7 +17,9 @@ export const FA_ACTION_IDS = [
   'openAppSettingsDialog',
   'saveAppSettings',
   'openAppStylingWindow',
+  'openProjectStylingDialog',
   'saveAppStyling',
+  'saveProjectStyling',
   'openAdvancedSearchGuideDialog',
   'openChangelogDialog',
   'openLicenseDialog',
@@ -31,6 +33,7 @@ export const FA_ACTION_IDS = [
   'reportAppNoteboardSaveFailure',
   'reportProjectNoteboardSaveFailure',
   'reportAppStylingPersistFailure',
+  'reportProjectStylingSaveFailure',
   'openActionMonitorDialog',
   'showStartupTipsNotification',
   'openImportExportAppConfigDialog',
@@ -75,7 +78,9 @@ export interface I_faActionPayloadMap {
   openAppSettingsDialog: void
   saveAppSettings: { settings: I_faUserSettings }
   openAppStylingWindow: void
+  openProjectStylingDialog: void
   saveAppStyling: { css: string }
+  saveProjectStyling: { css: string }
   openAdvancedSearchGuideDialog: void
   openChangelogDialog: void
   openLicenseDialog: void
@@ -89,6 +94,7 @@ export interface I_faActionPayloadMap {
   reportAppNoteboardSaveFailure: { message: string }
   reportProjectNoteboardSaveFailure: { message: string }
   reportAppStylingPersistFailure: { message: string }
+  reportProjectStylingSaveFailure: { message: string }
   openActionMonitorDialog: void
   showStartupTipsNotification: void
   openImportExportAppConfigDialog: void

@@ -3,6 +3,7 @@ import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
+import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import type { I_faActionPayloadMap } from 'app/types/I_faActionManagerDomain'
@@ -10,6 +11,7 @@ import {
   openDialogComponent,
   openDialogMarkdownDocument
 } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
+import { canOpenAppNoteboardFloatingWindow } from 'app/src/scripts/appNoteboard/faAppNoteboardCanOpen'
 import { FaActionUserCanceledError } from 'app/src/scripts/actionManager/faActionUserCanceledError'
 import { buildFaActionPayloadPreview } from 'app/src/scripts/actionManager/faActionManagerErrorReporting'
 import {
@@ -28,6 +30,16 @@ export async function handleOpenAppSettingsDialog (): Promise<void> {
 
 export async function handleOpenAppStylingWindow (): Promise<void> {
   openDialogComponent('WindowAppStyling')
+}
+
+export async function handleOpenProjectStylingWindow (): Promise<void> {
+  if (!S_FaActiveProject().hasActiveProject) {
+    return
+  }
+  if (!canOpenAppNoteboardFloatingWindow()) {
+    return
+  }
+  openDialogComponent('WindowProjectStyling')
 }
 
 export async function handleOpenAdvancedSearchGuideDialog (): Promise<void> {
@@ -91,6 +103,7 @@ export async function handleImportAppConfigApply (
     S_FaKeybinds().refreshKeybinds(),
     S_FaAppNoteboard().refreshNoteboard(),
     S_FaProjectNoteboard().refreshProjectNoteboard(),
+    S_FaProjectStyling().refreshProjectStyling(),
     S_FaAppStyling().refreshAppStyling(),
     S_FaUserSettings().refreshSettings()
   ])
@@ -110,6 +123,7 @@ export async function handleCreateNewProject (
     }
     notifyFaProjectCreatedPositive()
     await S_FaProjectNoteboard().refreshProjectNoteboard()
+    await S_FaProjectStyling().refreshProjectStyling()
   } finally {
     await S_FaRecentProjects().refreshRecentProjects()
   }
@@ -129,6 +143,7 @@ export async function handleLoadExistingProject (
     }
     notifyFaProjectLoadedPositive()
     await S_FaProjectNoteboard().refreshProjectNoteboard()
+    await S_FaProjectStyling().refreshProjectStyling()
     const snap = S_FaActiveProject().activeProject
     if (snap === null) {
       throw new Error('Project open returned no active project snapshot.')

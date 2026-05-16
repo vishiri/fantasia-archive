@@ -7,6 +7,8 @@ import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/ren
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
+import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
+import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
@@ -182,6 +184,60 @@ test('Test that MainLayout skips recent projects refresh when projectManagement 
 
   window.faContentBridgeAPIs.projectManagement = prev
   refreshSpy.mockRestore()
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * MainLayout / onMounted
+ * Refreshes persisted project KV surfaces alongside recent projects when projectManagement bridge is present.
+ */
+test('Test that MainLayout refreshes project noteboard and project styling when projectManagement bridge exists', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'electron')
+
+  const pn = S_FaProjectNoteboard()
+  const ps = S_FaProjectStyling()
+  const spyNoteboard = vi.spyOn(pn, 'refreshProjectNoteboard').mockResolvedValue(true)
+  const spyStyling = vi.spyOn(ps, 'refreshProjectStyling').mockResolvedValue(true)
+
+  const w = await mountMainLayoutForVitest()
+  await flushPromises()
+
+  expect(spyNoteboard).toHaveBeenCalledTimes(1)
+  expect(spyStyling).toHaveBeenCalledTimes(1)
+
+  spyNoteboard.mockRestore()
+  spyStyling.mockRestore()
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * MainLayout / onMounted
+ * Skips project noteboard and styling refresh when projectManagement bridge is absent.
+ */
+test('Test that MainLayout skips project noteboard and styling refresh without projectManagement', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'electron')
+
+  const pn = S_FaProjectNoteboard()
+  const ps = S_FaProjectStyling()
+  const spyNoteboard = vi.spyOn(pn, 'refreshProjectNoteboard').mockResolvedValue(true)
+  const spyStyling = vi.spyOn(ps, 'refreshProjectStyling').mockResolvedValue(true)
+
+  const prev = window.faContentBridgeAPIs.projectManagement
+  delete (window.faContentBridgeAPIs as { projectManagement?: unknown }).projectManagement
+
+  const w = await mountMainLayoutForVitest()
+  await flushPromises()
+
+  expect(spyNoteboard).not.toHaveBeenCalled()
+  expect(spyStyling).not.toHaveBeenCalled()
+
+  window.faContentBridgeAPIs.projectManagement = prev
+  spyNoteboard.mockRestore()
+  spyStyling.mockRestore()
   w.unmount()
   vi.unstubAllEnvs()
 })

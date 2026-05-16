@@ -4,10 +4,19 @@ import type Database from 'better-sqlite3'
 import BetterSqlite3 from 'better-sqlite3'
 import { Result } from 'neverthrow'
 
+import { pathLooksLikeFaProjectFile } from 'app/src-electron/mainScripts/projectManagement/faProjectPathValidation'
+
 let activeDb: Database | null = null
+
+/** Absolute path for the current handle; survives handle-only close for reconnect. Cleared on full session close. */
+let lastKnownActiveProjectFilePath: string | null = null
 
 export function getFaProjectActiveDatabase (): Database | null {
   return activeDb
+}
+
+export function getFaProjectLastKnownActiveProjectFilePath (): string | null {
+  return lastKnownActiveProjectFilePath
 }
 
 function closeDbIgnoringErrors (db: Database): void {
@@ -19,7 +28,10 @@ function closeDbIgnoringErrors (db: Database): void {
   )()
 }
 
-export function closeFaProjectActiveDatabase (): void {
+/**
+ * Closes the active handle only so a new open can replace it; keeps last-known path for failsafe reconnect.
+ */
+export function closeFaProjectActiveDatabaseHandleOnly (): void {
   if (activeDb === null) {
     return
   }
@@ -27,14 +39,24 @@ export function closeFaProjectActiveDatabase (): void {
   activeDb = null
 }
 
+/** Full session teardown: closes the SQLite handle and drops the mirrored project path. */
+export function closeFaProjectActiveDatabase (): void {
+  closeFaProjectActiveDatabaseHandleOnly()
+  lastKnownActiveProjectFilePath = null
+}
+
 /**
- * Closes any previous project DB handle and adopts the new open database.
+ * Closes any previous project DB handle and adopts the new open database; mirrors filePath for reconnect.
  */
-export function replaceFaProjectActiveDatabase (next: Database): void {
+export function replaceFaProjectActiveDatabase (next: Database, filePath: string): void {
+  if (!pathLooksLikeFaProjectFile(filePath)) {
+    throw new TypeError('replaceFaProjectActiveDatabase: filePath must look like an absolute .faproject file')
+  }
   if (activeDb !== null && activeDb !== next) {
     closeDbIgnoringErrors(activeDb)
   }
   activeDb = next
+  lastKnownActiveProjectFilePath = filePath
 }
 
 /**

@@ -9,7 +9,8 @@ import { useFaFloatingWindowFramePresentation } from 'app/src/scripts/floatingWi
 import {
   bumpFloatingWindowZIndex,
   bumpNoteboardFloatingWindowZIndex,
-  bumpProjectNoteboardFloatingWindowZIndex
+  bumpProjectNoteboardFloatingWindowZIndex,
+  bumpProjectStylingFloatingWindowZIndex
 } from 'app/src/scripts/floatingWindows/faFloatingWindowZIndex'
 import { useFaFloatingWindowResize } from 'app/src/scripts/floatingWindows/useFaFloatingWindowResize'
 import { useFaFloatingWindowTitleDrag } from 'app/src/scripts/floatingWindows/useFaFloatingWindowTitleDrag'
@@ -34,6 +35,9 @@ function bumpZSelectorForFloatingWindowLayer (
   }
   if (resolvedFloatingLayer === 'projectNoteboard') {
     return bumpProjectNoteboardFloatingWindowZIndex
+  }
+  if (resolvedFloatingLayer === 'projectStyling') {
+    return bumpProjectStylingFloatingWindowZIndex
   }
   return bumpFloatingWindowZIndex
 }
