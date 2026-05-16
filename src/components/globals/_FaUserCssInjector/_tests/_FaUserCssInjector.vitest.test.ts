@@ -125,6 +125,33 @@ test('Test that FaUserCssInjector reuses an existing style#faUserCss element ins
 
 /**
  * FaUserCssInjector
+ * A non-style node with the managed id is skipped so a real HTMLStyleElement is appended afterward.
+ */
+test('Test that FaUserCssInjector creates a style element when the id is occupied by a non-style node', async () => {
+  const blocker = document.createElement('div')
+  blocker.id = FA_USER_CSS_STYLE_ELEMENT_ID
+  document.head.appendChild(blocker)
+
+  const store = S_FaAppStyling()
+  store.css = '.fa-after-blocker { color: teal; }'
+
+  const w = mount(FaUserCssInjector)
+  await flushPromises()
+
+  const styleNodes = document.querySelectorAll(`#${FA_USER_CSS_STYLE_ELEMENT_ID}`)
+  const styleEl = Array.from(styleNodes).find((n): n is HTMLStyleElement => n instanceof HTMLStyleElement)
+  expect(styleEl).toBeDefined()
+  expect(styleEl?.textContent).toBe('.fa-after-blocker { color: teal; }')
+
+  blocker.remove()
+  w.unmount()
+  document.querySelectorAll(`#${FA_USER_CSS_STYLE_ELEMENT_ID}`).forEach((el) => {
+    el.remove()
+  })
+})
+
+/**
+ * FaUserCssInjector
  * applyCss should not rewrite textContent when the incoming css string already matches the node.
  */
 test('Test that FaUserCssInjector skips redundant style text writes when css is unchanged', async () => {
@@ -145,4 +172,25 @@ test('Test that FaUserCssInjector skips redundant style text writes when css is 
 
   spy.mockRestore()
   w.unmount()
+})
+
+/**
+ * FaUserCssInjector
+ * Unmount after the style node was externally detached skips redundant DOM surgery.
+ */
+test('Test that FaUserCssInjector unmount survives when managed style lacks a parent tree', async () => {
+  const store = S_FaAppStyling()
+  store.css = ''
+
+  const w = mount(FaUserCssInjector)
+  await flushPromises()
+
+  const styleEl = document.getElementById(FA_USER_CSS_STYLE_ELEMENT_ID)
+  expect(styleEl).not.toBeNull()
+
+  styleEl!.remove()
+
+  expect(() => {
+    w.unmount()
+  }).not.toThrow()
 })

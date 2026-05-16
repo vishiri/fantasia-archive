@@ -1,14 +1,21 @@
 /* eslint-disable vue/one-component-per-file -- colocated Quasar stub components for Vue Test Utils mounts */
 
 import { flushPromises, mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent, nextTick } from 'vue'
 import { expect, test, vi, beforeEach } from 'vitest'
+
+import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 
 import DialogNewProject from '../DialogNewProject.vue'
 
 vi.mock('../scripts/dialogNewProjectSubmit', () => {
   return {
-    runDialogNewProjectCreate: vi.fn(async () => undefined)
+    runDialogNewProjectCreate: vi.fn(
+      async (_projectName: string, closeDialog: () => void) => {
+        closeDialog()
+      }
+    )
   }
 })
 
@@ -42,6 +49,7 @@ const dialogNewProjectQInputFocusMock = vi.fn()
 
 const dialogNewProjectQInputStub = defineComponent({
   name: 'QInput',
+  inheritAttrs: true,
   props: {
     modelValue: {
       type: String,
@@ -59,7 +67,14 @@ const dialogNewProjectQInputStub = defineComponent({
       this.$emit('update:modelValue', v)
     }
   },
-  template: '<input class="dialog-new-project-qinput-mock" :value="modelValue" @input="onInput" />'
+  template: `
+    <input
+      class="dialog-new-project-qinput-mock"
+      :value="modelValue"
+      v-bind="$attrs"
+      @input="onInput"
+    />
+  `
 })
 
 const dialogNewProjectQBtnStub = defineComponent({
@@ -135,6 +150,33 @@ test('Test that DialogNewProject disables create for blank name', async () => {
 
 /**
  * DialogNewProject
+ * Enter on the name field matches create; with a blank trimmed name it returns before invoking submit.
+ */
+test('Test that DialogNewProject treats enter on blank name like a gated create action', async () => {
+  const submit = vi.mocked(runDialogNewProjectCreate)
+  submit.mockClear()
+  const w = mount(DialogNewProject, {
+    global: {
+      components: { ...dialogNewProjectStubs },
+      mocks: {
+        $t: (k: string) => k
+      }
+    },
+    props: {
+      directInput: 'NewProject'
+    }
+  })
+  await flushPromises()
+
+  await w.get('.dialog-new-project-qinput-mock').trigger('keyup.enter')
+  await flushPromises()
+
+  expect(submit).not.toHaveBeenCalled()
+  w.unmount()
+})
+
+/**
+ * DialogNewProject
  * Closing without create leaves no stale text on the next open because the field resets whenever the sheet opens.
  */
 test('Test that DialogNewProject clears project name when dialog reopens', async () => {
@@ -187,5 +229,134 @@ test('Test that DialogNewProject calls submit on create', async () => {
   expect(submit).toHaveBeenCalled()
   const firstArg = submit.mock.calls[0]?.[0]
   expect(firstArg).toBe('Hi')
+  w.unmount()
+})
+
+/**
+ * DialogNewProject
+ * S_DialogComponent UUID watch should open when dialogToOpen is NewProject.
+ */
+test('Test that DialogNewProject opens from S_DialogComponent when dialogToOpen is NewProject', async () => {
+  const pinia = createPinia()
+  setActivePinia(pinia)
+  const store = S_DialogComponent()
+
+  const w = mount(DialogNewProject, {
+    global: {
+      components: { ...dialogNewProjectStubs },
+      mocks: {
+        $t: (k: string) => k
+      },
+      plugins: [pinia]
+    },
+    props: {}
+  })
+
+  await flushPromises()
+  const dlgClosed = w.findComponent({ name: 'QDialog' })
+  expect(dlgClosed.props('modelValue')).toBe(false)
+
+  store.dialogToOpen = 'NewProject'
+  store.generateDialogUUID()
+  await flushPromises()
+  await nextTick()
+
+  const dlgOpen = w.findComponent({ name: 'QDialog' })
+  expect(dlgOpen.props('modelValue')).toBe(true)
+  w.unmount()
+})
+
+/**
+ * DialogNewProject
+ * Store UUID churn for other routed dialogs leaves the sheet closed unless the target is NewProject.
+ */
+test('Test that DialogNewProject skips open when routed dialog differs from NewProject', async () => {
+  const pinia = createPinia()
+  setActivePinia(pinia)
+  const store = S_DialogComponent()
+
+  const w = mount(DialogNewProject, {
+    global: {
+      components: { ...dialogNewProjectStubs },
+      mocks: {
+        $t: (k: string) => k
+      },
+      plugins: [pinia]
+    },
+    props: {}
+  })
+
+  await flushPromises()
+
+  store.dialogToOpen = 'KeybindSettings'
+  store.generateDialogUUID()
+  await flushPromises()
+  await nextTick()
+
+  expect(w.findComponent({ name: 'QDialog' }).props('modelValue')).toBe(false)
+
+  w.unmount()
+})
+
+/**
+ * DialogNewProject
+ * directInput prop watch only opens for the NewProject shell so other dialog ids stay ignored.
+ */
+test('Test that DialogNewProject ignores directInput values other than NewProject', async () => {
+  const pinia = createPinia()
+  setActivePinia(pinia)
+
+  const w = mount(DialogNewProject, {
+    global: {
+      components: { ...dialogNewProjectStubs },
+      mocks: {
+        $t: (k: string) => k
+      },
+      plugins: [pinia]
+    },
+    props: {
+      directInput: ''
+    }
+  })
+
+  await flushPromises()
+  expect(w.findComponent({ name: 'QDialog' }).props('modelValue')).toBe(false)
+
+  await w.setProps({ directInput: 'AppSettings' })
+  await flushPromises()
+  await nextTick()
+
+  expect(w.findComponent({ name: 'QDialog' }).props('modelValue')).toBe(false)
+
+  w.unmount()
+})
+
+/**
+ * DialogNewProject
+ * directInput watch should open the dialog when the prop is set to NewProject after mount.
+ */
+test('Test that DialogNewProject opens when directInput becomes NewProject after mount', async () => {
+  const pinia = createPinia()
+  setActivePinia(pinia)
+
+  const w = mount(DialogNewProject, {
+    global: {
+      components: { ...dialogNewProjectStubs },
+      mocks: {
+        $t: (k: string) => k
+      },
+      plugins: [pinia]
+    },
+    props: {}
+  })
+
+  await flushPromises()
+  expect(w.findComponent({ name: 'QDialog' }).props('modelValue')).toBe(false)
+
+  await w.setProps({ directInput: 'NewProject' })
+  await flushPromises()
+  await nextTick()
+
+  expect(w.findComponent({ name: 'QDialog' }).props('modelValue')).toBe(true)
   w.unmount()
 })

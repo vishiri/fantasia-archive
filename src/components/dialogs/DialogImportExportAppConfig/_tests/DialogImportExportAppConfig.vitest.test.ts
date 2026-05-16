@@ -1,3 +1,5 @@
+/** @vitest-environment jsdom */
+/* eslint-disable vue/one-component-per-file -- colocated Quasar stub components for Vue Test Utils mounts */
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent } from 'vue'
@@ -8,11 +10,21 @@ import type { I_faAppConfigPrepareResult } from 'app/types/I_faAppConfigDomain'
 import * as dialogStores from 'app/src/stores/S_Dialog'
 import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 
-import DialogImportExportAppConfig from '../DialogImportExportAppConfig.vue'
+const { runFaActionAwaitMock, runFaActionMock } = vi.hoisted(() => ({
+  runFaActionAwaitMock: vi.fn(async (): Promise<boolean> => true),
+  runFaActionMock: vi.fn(async (): Promise<void> => {})
+}))
+
+vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
+  runFaAction: runFaActionMock,
+  runFaActionAwait: runFaActionAwaitMock
+}))
 
 vi.mock('quasar', () => ({
   Notify: { create: vi.fn() }
 }))
+
+import DialogImportExportAppConfig from '../DialogImportExportAppConfig.vue'
 
 const importExportQDialogStub = defineComponent({
   name: 'QDialog',
@@ -33,6 +45,42 @@ const importExportQDialogStub = defineComponent({
   `
 })
 
+const importExportQCheckboxStub = defineComponent({
+  name: 'QCheckbox',
+  inheritAttrs: true,
+  props: {
+    modelValue: {
+      default: false,
+      type: Boolean
+    }
+  },
+  emits: ['update:modelValue'],
+  template:
+    '<button type="button" class="q-checkbox-stub" v-bind="$attrs" @click="$emit(\'update:modelValue\', !modelValue)" />'
+})
+
+const importExportQStepperStub = defineComponent({
+  name: 'QStepper',
+  inheritAttrs: true,
+  props: {
+    modelValue: {
+      default: 'root',
+      type: String
+    }
+  },
+  emits: ['update:modelValue'],
+  template: `
+    <div class="import-export-qstepper-stub">
+      <button
+        type="button"
+        class="import-export-qstepper-emit-import"
+        @click="$emit('update:modelValue', 'import')"
+      />
+      <slot />
+    </div>
+  `
+})
+
 const importExportDialogGlobal = {
   mocks: { $t: (key: string) => key },
   stubs: {
@@ -40,14 +88,22 @@ const importExportDialogGlobal = {
     QCard: { template: '<div><slot /></div>' },
     QCardActions: { template: '<div><slot /></div>' },
     QCardSection: { template: '<div><slot /></div>' },
-    QCheckbox: { template: '<div class="q-checkbox-stub" />' },
+    QCheckbox: importExportQCheckboxStub,
     QDialog: importExportQDialogStub,
-    QSeparator: { template: '<div class="q-separator-stub" role="separator" />' }
+    QItem: { template: '<div class="q-item-stub"><slot /></div>' },
+    QItemLabel: { template: '<div class="q-item-label-stub"><slot /></div>' },
+    QItemSection: { template: '<div class="q-item-section-stub"><slot /></div>' },
+    QList: { template: '<div class="q-list-stub"><slot /></div>' },
+    QSeparator: { template: '<div class="q-separator-stub" role="separator" />' },
+    QStep: { template: '<div class="q-step-stub"><slot /></div>' },
+    QStepper: importExportQStepperStub
   }
 } as const
 
 beforeEach(() => {
-  vi.restoreAllMocks()
+  runFaActionMock.mockReset()
+  runFaActionAwaitMock.mockReset()
+  runFaActionAwaitMock.mockResolvedValue(true)
 })
 
 /**
@@ -151,6 +207,7 @@ test('Test that DialogImportExportAppConfig shows import selection after prepare
       sessionId: 'unit-import-session'
     }
   })
+  const prevAppConfig = window.faContentBridgeAPIs.faAppConfig
   window.faContentBridgeAPIs.faAppConfig = {
     ...window.faContentBridgeAPIs.faAppConfig,
     prepareImport
@@ -171,6 +228,176 @@ test('Test that DialogImportExportAppConfig shows import selection after prepare
   expect(w.find('[data-test-locator="dialogImportExportAppConfig-check-import-settings"]').exists()).toBe(true)
 
   w.unmount()
+  window.faContentBridgeAPIs.faAppConfig = prevAppConfig
+})
+
+/**
+ * DialogImportExportAppConfig
+ * Toggling export checklist checkboxes exercises v-model bindings on the export step.
+ */
+test('Test that DialogImportExportAppConfig export step checkboxes emit model updates', async () => {
+  const w = mount(DialogImportExportAppConfig, {
+    global: importExportDialogGlobal,
+    props: { directInput: 'ImportExportAppConfig' }
+  })
+
+  await flushPromises()
+  await w.get('[data-test-locator="dialogImportExportAppConfig-button-export"]').trigger('click')
+  await flushPromises()
+
+  const locators = [
+    'dialogImportExportAppConfig-check-export-settings',
+    'dialogImportExportAppConfig-check-export-keybinds',
+    'dialogImportExportAppConfig-check-export-styling',
+    'dialogImportExportAppConfig-check-export-noteboard'
+  ] as const
+
+  for (const loc of locators) {
+    const cells = w.findAll(`[data-test-locator="${loc}"]`)
+    expect(cells[0]?.exists()).toBe(true)
+    await cells[0].trigger('click')
+    await flushPromises()
+    expect(cells[1]?.exists()).toBe(true)
+    await cells[1].trigger('click')
+    await flushPromises()
+  }
+
+  w.unmount()
+})
+
+/**
+ * DialogImportExportAppConfig
+ * Successful export to file should notify, invoke close, and clear the dialog shell.
+ */
+test('Test that DialogImportExportAppConfig create export success closes the dialog', async () => {
+  const exportToFile = vi.fn(async () => {
+    return {
+      filePath: 'C:\\export.faconfig',
+      outcome: 'saved' as const
+    }
+  })
+  const prevAppConfig = window.faContentBridgeAPIs.faAppConfig
+  window.faContentBridgeAPIs.faAppConfig = {
+    ...window.faContentBridgeAPIs.faAppConfig,
+    exportToFile
+  }
+
+  const w = mount(DialogImportExportAppConfig, {
+    global: importExportDialogGlobal,
+    props: { directInput: 'ImportExportAppConfig' }
+  })
+
+  await flushPromises()
+  await w.get('[data-test-locator="dialogImportExportAppConfig-button-export"]').trigger('click')
+  await flushPromises()
+
+  await w.get('[data-test-locator="dialogImportExportAppConfig-button-createExport"]').trigger('click')
+  await flushPromises()
+
+  expect(exportToFile).toHaveBeenCalledTimes(1)
+  expect(w.find('.import-export-qdialog-inner').exists()).toBe(false)
+  w.unmount()
+  window.faContentBridgeAPIs.faAppConfig = prevAppConfig
+})
+
+/**
+ * DialogImportExportAppConfig
+ * Successful import apply should notify and close the dialog when the apply action succeeds.
+ */
+test('Test that DialogImportExportAppConfig import selected success closes the dialog', async () => {
+  const prepareImport = vi.fn(async (): Promise<I_faAppConfigPrepareResult> => {
+    return {
+      outcome: 'ready',
+      parts: {
+        keybinds: 'ok',
+        appNoteboard: 'ok',
+        appSettings: 'ok',
+        appStyling: 'ok'
+      },
+      sessionId: 'unit-import-session-apply'
+    }
+  })
+  const prevAppConfig = window.faContentBridgeAPIs.faAppConfig
+  window.faContentBridgeAPIs.faAppConfig = {
+    ...window.faContentBridgeAPIs.faAppConfig,
+    prepareImport
+  }
+
+  const w = mount(DialogImportExportAppConfig, {
+    global: importExportDialogGlobal,
+    props: { directInput: 'ImportExportAppConfig' }
+  })
+
+  await flushPromises()
+  await w.get('[data-test-locator="dialogImportExportAppConfig-button-import"]').trigger('click')
+  await flushPromises()
+
+  const importLocators = [
+    'dialogImportExportAppConfig-check-import-settings',
+    'dialogImportExportAppConfig-check-import-keybinds',
+    'dialogImportExportAppConfig-check-import-styling',
+    'dialogImportExportAppConfig-check-import-noteboard'
+  ] as const
+
+  for (const loc of importLocators) {
+    const cells = w.findAll(`[data-test-locator="${loc}"]`)
+    expect(cells[0]?.exists()).toBe(true)
+    await cells[0].trigger('click')
+    await flushPromises()
+    expect(cells[1]?.exists()).toBe(true)
+    await cells[1].trigger('click')
+    await flushPromises()
+  }
+
+  await w.get('[data-test-locator="dialogImportExportAppConfig-button-importSelected"]').trigger('click')
+  await flushPromises()
+
+  expect(runFaActionAwaitMock).toHaveBeenCalled()
+  expect(w.find('.import-export-qdialog-inner').exists()).toBe(false)
+  w.unmount()
+  window.faContentBridgeAPIs.faAppConfig = prevAppConfig
+})
+
+/**
+ * DialogImportExportAppConfig
+ * QStepper v-model should respond to update:modelValue from the stepper shell.
+ */
+test('Test that DialogImportExportAppConfig QStepper stub honours update:modelValue', async () => {
+  const w = mount(DialogImportExportAppConfig, {
+    global: importExportDialogGlobal,
+    props: { directInput: 'ImportExportAppConfig' }
+  })
+
+  await flushPromises()
+  await w.get('[data-test-locator="dialogImportExportAppConfig-button-export"]').trigger('click')
+  await flushPromises()
+
+  const stepper = w.findComponent({ name: 'QStepper' })
+  expect(stepper.exists()).toBe(true)
+  await stepper.get('.import-export-qstepper-emit-import').trigger('click')
+  await flushPromises()
+
+  w.unmount()
+})
+
+/**
+ * DialogImportExportAppConfig
+ * QDialog v-model should respond to update:modelValue false from the dialog shell.
+ */
+test('Test that DialogImportExportAppConfig QDialog stub honours update:modelValue false', async () => {
+  const w = mount(DialogImportExportAppConfig, {
+    global: importExportDialogGlobal,
+    props: { directInput: 'ImportExportAppConfig' }
+  })
+
+  await flushPromises()
+  const dlg = w.findComponent({ name: 'QDialog' })
+  expect(dlg.exists()).toBe(true)
+  await dlg.vm.$emit('update:modelValue', false)
+  await flushPromises()
+
+  expect(w.find('.import-export-qdialog-inner').exists()).toBe(false)
+  w.unmount()
 })
 
 /**
@@ -183,7 +410,7 @@ test('Test that DialogImportExportAppConfig tolerates S_DialogComponent throwing
   const store = S_DialogComponent()
   const orig = dialogStores.S_DialogComponent
   let calls = 0
-  vi.spyOn(dialogStores, 'S_DialogComponent').mockImplementation(() => {
+  const spy = vi.spyOn(dialogStores, 'S_DialogComponent').mockImplementation(() => {
     calls += 1
     if (calls === 1) {
       return orig()
@@ -203,5 +430,6 @@ test('Test that DialogImportExportAppConfig tolerates S_DialogComponent throwing
   store.dialogToOpen = 'ImportExportAppConfig'
   store.generateDialogUUID()
   await flushPromises()
+  spy.mockRestore()
   w.unmount()
 })

@@ -1,4 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
+import { defineComponent } from 'vue'
 import { expect, test, vi } from 'vitest'
 
 import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
@@ -568,6 +569,158 @@ test('Test that AppControlSingleMenu hides submenu avatar icon when icon is abse
       '[data-test-locator="AppControlSingleMenu-menuItem-subMenu-item-icon"]'
     )
   ).toBeNull()
+
+  w.unmount()
+})
+
+const appControlSingleMenuQMenuModelStub = defineComponent({
+  name: 'QMenu',
+  inheritAttrs: true,
+  props: {
+    modelValue: {
+      default: false,
+      type: Boolean
+    }
+  },
+  emits: ['update:modelValue'],
+  template: `
+    <div
+      class="app-control-single-menu-qmenu-stub"
+      data-test-locator="AppControlSingleMenu-menuItem-subMenu"
+      v-bind="$attrs"
+    >
+      <slot />
+      <button
+        type="button"
+        class="app-control-single-menu-qmenu-emit-true"
+        @click="$emit('update:modelValue', true)"
+      />
+    </div>
+  `
+})
+
+/**
+ * AppControlSingleMenu
+ * Submenu q-menu update:model-value should reach onSubmenuModelUpdate for coverage of the v-model handler.
+ */
+test('Test that AppControlSingleMenu submenu q-menu emits model updates to the hover controller', async () => {
+  const w = mount(AppControlSingleMenu, {
+    attachTo: document.body,
+    global: {
+      components: {
+        QMenu: appControlSingleMenuQMenuModelStub
+      },
+      config: {
+        compilerOptions: {
+          isCustomElement: (tag: string): boolean => {
+            const lower = tag.toLowerCase()
+            if (lower === 'q-menu') {
+              return false
+            }
+
+            return /^q-/i.test(tag)
+          }
+        }
+      },
+      mocks: { $t: (k: string) => k }
+    },
+    props: {
+      dataInput: {
+        title: 'T',
+        data: [
+          {
+            conditions: true,
+            icon: 'keyboard_arrow_right',
+            mode: 'item',
+            submenu: [
+              {
+                conditions: true,
+                icon: 'mdi-check',
+                mode: 'item',
+                text: 'Nested',
+                trigger: vi.fn()
+              }
+            ],
+            text: 'Parent',
+            trigger: undefined
+          }
+        ]
+      }
+    }
+  })
+
+  await w.get('[data-test-locator="AppControlSingleMenu-wrapper"]').trigger('click')
+  await flushPromises()
+
+  const parentRow = document.body.querySelector('[data-test-locator="AppControlSingleMenu-menuItem"]')
+  expect(parentRow).not.toBeNull()
+  ;(parentRow as HTMLElement).dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }))
+  await flushPromises()
+
+  await w.get('.app-control-single-menu-qmenu-emit-true').trigger('click')
+  await flushPromises()
+
+  w.unmount()
+})
+
+/**
+ * AppControlSingleMenu
+ * Leaving a submenu parent row should invoke submenu hover leave wiring.
+ */
+test('Test that AppControlSingleMenu submenu parent mouseleave runs hover leave path', async () => {
+  const w = mount(AppControlSingleMenu, {
+    attachTo: document.body,
+    global: {
+      components: {
+        QMenu: appControlSingleMenuQMenuModelStub
+      },
+      config: {
+        compilerOptions: {
+          isCustomElement: (tag: string): boolean => {
+            const lower = tag.toLowerCase()
+            if (lower === 'q-menu') {
+              return false
+            }
+
+            return /^q-/i.test(tag)
+          }
+        }
+      },
+      mocks: { $t: (k: string) => k }
+    },
+    props: {
+      dataInput: {
+        title: 'T',
+        data: [
+          {
+            conditions: true,
+            icon: 'keyboard_arrow_right',
+            mode: 'item',
+            submenu: [
+              {
+                conditions: true,
+                mode: 'item',
+                text: 'Nested',
+                trigger: vi.fn()
+              }
+            ],
+            text: 'Parent',
+            trigger: undefined
+          }
+        ]
+      }
+    }
+  })
+
+  await w.get('[data-test-locator="AppControlSingleMenu-wrapper"]').trigger('click')
+  await flushPromises()
+
+  const parentRow = document.body.querySelector('[data-test-locator="AppControlSingleMenu-menuItem"]')
+  expect(parentRow).not.toBeNull()
+  ;(parentRow as HTMLElement).dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }))
+  await flushPromises()
+  ;(parentRow as HTMLElement).dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }))
+  await flushPromises()
 
   w.unmount()
 })

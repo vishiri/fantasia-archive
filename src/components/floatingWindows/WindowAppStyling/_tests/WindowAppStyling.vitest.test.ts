@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-import { ref } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import appStyling from 'app/i18n/en-US/floatingWindows/L_appStyling'
@@ -278,4 +278,77 @@ test('Test that WindowAppStyling shows loading and load-error overlays from mona
 
   expect(wError.find('[data-test-locator="windowAppStyling-loadError"]').text()).toContain('Monaco failed to load')
   wError.unmount()
+})
+
+/**
+ * WindowAppStyling
+ * Help icon hover opens the menu after the delay, the q-menu v-model handler runs, and the help watch refreshes theme names.
+ */
+test('Test that WindowAppStyling help menu opens after hover delay and closes via q-menu v-model', async () => {
+  vi.useFakeTimers()
+  const qMenuStub = defineComponent({
+    name: 'QMenu',
+    inheritAttrs: true,
+    props: {
+      modelValue: {
+        default: false,
+        type: Boolean
+      }
+    },
+    emits: ['update:modelValue'],
+    template: `
+      <div class="window-app-styling-q-menu-stub" data-test-locator="windowAppStyling-helpMenu" v-bind="$attrs">
+        <slot />
+        <button
+          type="button"
+          class="window-app-styling-q-menu-close"
+          @click="$emit('update:modelValue', false)"
+        />
+      </div>
+    `
+  })
+
+  const w = mount(WindowAppStyling, {
+    global: {
+      components: { QMenu: qMenuStub },
+      mocks: { $t: appStylingT },
+      stubs: {
+        FaFloatingWindowBodyTeleport: {
+          template: '<div><slot /></div>'
+        },
+        QBtn: {
+          inheritAttrs: true,
+          props: {
+            label: {
+              default: '',
+              type: String
+            }
+          },
+          template: '<button type="button" v-bind="$attrs"><span>{{ label }}</span></button>'
+        },
+        QCard: { template: '<div><slot /></div>' },
+        QCardActions: { template: '<div><slot /></div>' },
+        QCardSection: { template: '<div><slot /></div>' },
+        QIcon: {
+          inheritAttrs: true,
+          template: '<span><slot /></span>'
+        },
+        QSeparator: { template: '<div />' },
+        QSpinnerDots: { template: '<span />' }
+      }
+    }
+  })
+
+  await w.get('[data-test-locator="windowAppStyling-helpIcon"]').trigger('mouseenter')
+  await vi.advanceTimersByTimeAsync(500)
+  await vi.runAllTimersAsync()
+
+  const menu = w.findComponent({ name: 'QMenu' })
+  expect(menu.props('modelValue')).toBe(true)
+
+  await menu.find('.window-app-styling-q-menu-close').trigger('click')
+  expect(menu.emitted('update:modelValue')?.some((row) => row[0] === false)).toBe(true)
+
+  w.unmount()
+  vi.useRealTimers()
 })

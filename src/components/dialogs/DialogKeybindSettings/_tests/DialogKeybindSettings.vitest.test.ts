@@ -3,7 +3,7 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import { ResultAsync } from 'neverthrow'
-import { beforeEach, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 vi.mock('quasar', () => ({
   Notify: { create: vi.fn() }
@@ -218,6 +218,10 @@ beforeEach(() => {
   vi.restoreAllMocks()
 })
 
+afterEach(() => {
+  vi.useRealTimers()
+})
+
 /**
  * DialogKeybindSettings
  * directInput should open the keybind dialog shell and surface i18n title key via mocked translator.
@@ -265,6 +269,12 @@ test('Test that DialogKeybindSettings table body covers default column, non-edit
   await flushPromises()
 
   expect(w.find('[data-test-locator="dialogKeybindSettings-capture-dialog-stub"]').exists()).toBe(false)
+
+  const flatKeybindButtons = w.findAll('.fa-btn-keybind-dim--flat')
+  expect(flatKeybindButtons.length).toBeGreaterThan(0)
+  await flatKeybindButtons[0].trigger('click')
+  await flushPromises()
+  expect(w.find('[data-test-locator="dialogKeybindSettings-capture-dialog-stub"]').exists()).toBe(true)
 
   w.unmount()
 })
@@ -326,6 +336,9 @@ test('Test that DialogKeybindSettings shows filter empty ErrorCard when filter m
 
   const filterInputs = w.findAll('input')
   await filterInputs[0].setValue('zzzz-no-matching-keybind-label-zzzz')
+  await new Promise((resolve) => {
+    setTimeout(resolve, 350)
+  })
   await flushPromises()
 
   expect(w.find('[data-test-locator="dialogKeybindSettings-filterNoResults"]').exists()).toBe(true)

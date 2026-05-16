@@ -99,6 +99,31 @@ test('Test that spellcheck refresh control opens the tooltip model after the deb
 
 /**
  * GlobalLanguageSelectorSpellcheckRefreshControl
+ * External updates to the tooltip v-model should be accepted by the stubbed QTooltip.
+ */
+test('Test that spellcheck refresh control QTooltip stub accepts update:modelValue', async () => {
+  const w = mount(GlobalLanguageSelectorSpellcheckRefreshControl, {
+    props: {
+      show: true
+    },
+    ...spellcheckRefreshMount
+  })
+
+  await flushPromises()
+  const tip = w.findComponent({ name: 'QTooltip' })
+  expect(tip.exists()).toBe(true)
+  await tip.vm.$emit('update:modelValue', true)
+  await flushPromises()
+  expect(w.find('.spellcheck-qtooltip-stub').attributes('data-test-stub-tooltip-open')).toBe('true')
+
+  await tip.vm.$emit('update:modelValue', false)
+  await flushPromises()
+  expect(w.find('.spellcheck-qtooltip-stub').attributes('data-test-stub-tooltip-open')).toBe('false')
+  w.unmount()
+})
+
+/**
+ * GlobalLanguageSelectorSpellcheckRefreshControl
  * Hiding the control before the tooltip timer fires should cancel the pending timeout.
  */
 test('Test that spellcheck refresh control cancels tooltip auto-open when hidden early', async () => {

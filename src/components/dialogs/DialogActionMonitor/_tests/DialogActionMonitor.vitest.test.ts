@@ -177,6 +177,29 @@ test('Test that DialogActionMonitor shows row-click help icon and payload column
 
 /**
  * DialogActionMonitor
+ * QDialog v-model should accept update:modelValue false from the stubbed shell.
+ */
+test('Test that DialogActionMonitor QDialog stub honours update:modelValue false', async () => {
+  const w = mount(DialogActionMonitor, {
+    global: monitorDialogGlobal,
+    props: {
+      directHistorySnapshot: buildSampleHistory(),
+      directInput: 'ActionMonitor'
+    }
+  })
+
+  await flushPromises()
+  const dlg = w.findComponent({ name: 'QDialog' })
+  expect(dlg.exists()).toBe(true)
+  await dlg.vm.$emit('update:modelValue', false)
+  await flushPromises()
+
+  expect(w.find('.action-monitor-qdialog-inner').exists()).toBe(false)
+  w.unmount()
+})
+
+/**
+ * DialogActionMonitor
  * Empty snapshot should render the localized empty-state message.
  */
 test('Test that DialogActionMonitor shows empty-state when snapshot is empty', async () => {

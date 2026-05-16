@@ -197,6 +197,50 @@ test('Test that GlobalLanguageSelector exposes the menu trigger in electron mode
 
 /**
  * GlobalLanguageSelector
+ * Unknown persisted language codes still render a deterministic fallback flag binding.
+ */
+test('Test that GlobalLanguageSelector resolves default flag when locale row is missing', async () => {
+  vi.stubEnv('MODE', 'electron')
+  setActivePinia(createPinia())
+  const store = S_FaUserSettings()
+  store.settings = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    languageCode: 'en-US'
+  }
+  ;(store.settings as { languageCode?: string }).languageCode = '__unknown-code__'
+
+  window.faContentBridgeAPIs.faUserSettings = {
+    getSettings: vi.fn(async (): Promise<I_faUserSettings> =>
+      ({
+        ...(store.settings as I_faUserSettings)
+      })),
+    setSettings: vi.fn()
+  }
+
+  const w = mount(GlobalLanguageSelector, {
+    global: {
+      components: {
+        ...globalLanguageSelectorQuasarStubs,
+        GlobalLanguageSelectorSpellcheckRefreshControl: globalLanguageSelectorSpellcheckStub
+      },
+      config: { compilerOptions: globalLanguageSelectorCompilerOpts },
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  await flushPromises()
+
+  const flagImg = w.get('[data-test-locator="globalLanguageSelector-trigger-flag"]')
+  expect(flagImg.attributes('data-test-expected-flag-path')).toBe('/countryFlags/us.svg')
+
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * GlobalLanguageSelector
  * Trigger capture click, menu show or hide hooks, and language pick should run without throwing.
  */
 test('Test that GlobalLanguageSelector handles trigger click and language selection', async () => {
@@ -288,6 +332,92 @@ test('Test that GlobalLanguageSelector shows spellcheck refresh when languageCod
   await flushPromises()
 
   expect(w.find('[data-test-locator="globalLanguageSelector-spellcheckRefresh"]').exists()).toBe(true)
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * GlobalLanguageSelector
+ * Language watch should bail out when the next language code is undefined.
+ */
+test('Test that GlobalLanguageSelector ignores language watch when languageCode becomes undefined', async () => {
+  vi.stubEnv('MODE', 'electron')
+  setActivePinia(createPinia())
+  const store = S_FaUserSettings()
+  store.settings = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    languageCode: 'en-US'
+  }
+  window.faContentBridgeAPIs.faUserSettings = {
+    getSettings: vi.fn(async (): Promise<I_faUserSettings> => ({ ...store.settings as I_faUserSettings })),
+    setSettings: vi.fn()
+  }
+
+  const w = mount(GlobalLanguageSelector, {
+    global: {
+      components: {
+        ...globalLanguageSelectorQuasarStubs,
+        GlobalLanguageSelectorSpellcheckRefreshControl: globalLanguageSelectorSpellcheckStub
+      },
+      config: { compilerOptions: globalLanguageSelectorCompilerOpts },
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  await flushPromises()
+
+  const nextSettings = {
+    ...FA_USER_SETTINGS_DEFAULTS
+  }
+  delete (nextSettings as { languageCode?: string }).languageCode
+  store.settings = nextSettings as I_faUserSettings
+  await flushPromises()
+
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * GlobalLanguageSelector
+ * First language assignment is skipped by the watch when prior is undefined (initial effective value).
+ */
+test('Test that GlobalLanguageSelector skips language note when prior languageCode is undefined', async () => {
+  vi.stubEnv('MODE', 'electron')
+  setActivePinia(createPinia())
+  const store = S_FaUserSettings()
+  store.settings = null
+
+  window.faContentBridgeAPIs.faUserSettings = {
+    getSettings: vi.fn(async (): Promise<I_faUserSettings> => ({
+      ...FA_USER_SETTINGS_DEFAULTS,
+      languageCode: 'en-US'
+    })),
+    setSettings: vi.fn()
+  }
+
+  const w = mount(GlobalLanguageSelector, {
+    global: {
+      components: {
+        ...globalLanguageSelectorQuasarStubs,
+        GlobalLanguageSelectorSpellcheckRefreshControl: globalLanguageSelectorSpellcheckStub
+      },
+      config: { compilerOptions: globalLanguageSelectorCompilerOpts },
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  await flushPromises()
+
+  store.settings = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    languageCode: 'en-US'
+  }
+  await flushPromises()
+
   w.unmount()
   vi.unstubAllEnvs()
 })

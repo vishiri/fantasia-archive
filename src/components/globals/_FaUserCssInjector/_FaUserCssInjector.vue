@@ -17,6 +17,15 @@ import { onBeforeUnmount, onMounted, watch } from 'vue'
 
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 
+import {
+  resolveFaUserCssInjectorEffectiveCssPayload,
+  resolveFaUserCssInjectorHostDocument
+} from './scripts/faUserCssInjectorHostAndCssPayload'
+import {
+  applyFaUserCssToStyleElementIfNeeded,
+  ensureFaUserCssStyleElementInHead
+} from './scripts/faUserCssInjectorStyleElement'
+
 defineOptions({
   name: '_FaUserCssInjector'
 })
@@ -27,50 +36,24 @@ const appStylingStore = S_FaAppStyling()
 let styleElement: HTMLStyleElement | null = null
 
 function effectiveUserCss (): string {
-  const live = appStylingStore.cssLivePreview
-  return live !== null ? live : appStylingStore.css
-}
-
-/**
- * Returns an existing or newly created 'style#faUserCss' in 'document.head'.
- */
-function ensureStyleElement (): HTMLStyleElement | null {
-  if (typeof document === 'undefined') {
-    return null
-  }
-  const existing = document.getElementById(FA_USER_CSS_STYLE_ELEMENT_ID)
-  if (existing instanceof HTMLStyleElement) {
-    return existing
-  }
-  const created = document.createElement('style')
-  created.id = FA_USER_CSS_STYLE_ELEMENT_ID
-  created.setAttribute('type', 'text/css')
-  created.setAttribute('data-fa-user-css', 'true')
-  document.head.appendChild(created)
-  return created
-}
-
-/**
- * Writes the given CSS string into the managed style node when it differs from the current text.
- */
-function applyCss (css: string): void {
-  if (styleElement === null) {
-    return
-  }
-  if (styleElement.textContent !== css) {
-    styleElement.textContent = css
-  }
+  return resolveFaUserCssInjectorEffectiveCssPayload(
+    appStylingStore.cssLivePreview,
+    appStylingStore.css
+  )
 }
 
 onMounted(() => {
-  styleElement = ensureStyleElement()
-  applyCss(effectiveUserCss())
+  styleElement = ensureFaUserCssStyleElementInHead(
+    resolveFaUserCssInjectorHostDocument(globalThis),
+    FA_USER_CSS_STYLE_ELEMENT_ID
+  )
+  applyFaUserCssToStyleElementIfNeeded(styleElement, effectiveUserCss())
 })
 
 watch(
   [() => appStylingStore.cssLivePreview, () => appStylingStore.css],
   () => {
-    applyCss(effectiveUserCss())
+    applyFaUserCssToStyleElementIfNeeded(styleElement, effectiveUserCss())
   }
 )
 

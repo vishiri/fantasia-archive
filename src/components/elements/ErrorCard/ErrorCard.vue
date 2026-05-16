@@ -32,6 +32,8 @@ import { computed } from 'vue'
 
 import FantasiaMascotImage from 'src/components/elements/FantasiaMascotImage/FantasiaMascotImage.vue'
 
+import { errorCardScopedMaxWidthBindPx } from 'app/src/components/elements/ErrorCard/scripts/errorCardScopedMaxWidthBindPx'
+
 import type { T_errorCardImageName } from 'app/types/T_errorCardImage'
 
 const props = withDefaults(
@@ -59,7 +61,7 @@ const props = withDefaults(
   }
 )
 
-const errorCardMaxWidthPx = computed(() => `${props.width}px`)
+const errorCardMaxWidthPx = computed(() => errorCardScopedMaxWidthBindPx(props.width))
 </script>
 
 <style lang="scss" scoped>

@@ -118,6 +118,7 @@ import { runFaActionAwait } from 'app/src/scripts/actionManager/faActionManagerR
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
 import GlobalLanguageSelectorSpellcheckRefreshControl from './GlobalLanguageSelectorSpellcheckRefreshControl.vue'
+import { resolveGlobalLanguageSelectorAppliedPair } from './scripts/globalLanguageSelectorLanguageCodeWatchGate'
 import { GLOBAL_LANGUAGE_SELECTOR_LOCALES } from './scripts/globalLanguageSelectorLocales'
 import { useGlobalLanguageSelectorSpellcheckRefresh } from './scripts/useGlobalLanguageSelectorSpellcheckRefresh'
 
@@ -160,16 +161,14 @@ const activeI18nLocale = computed((): string => {
 watch(
   () => faUserSettingsStore.settings?.languageCode,
   (next, prior) => {
-    if (next === undefined) {
+    const appliedPair = resolveGlobalLanguageSelectorAppliedPair(next, prior)
+    const missLanguagePair = appliedPair === null
+    if (missLanguagePair) {
       return
     }
-    if (prior === undefined) {
-      return
-    }
-    if (prior === next) {
-      return
-    }
-    noteLanguageApplied(prior, next)
+    const priorCode = appliedPair[0]
+    const nextCode = appliedPair[1]
+    noteLanguageApplied(priorCode, nextCode)
   }
 )
 

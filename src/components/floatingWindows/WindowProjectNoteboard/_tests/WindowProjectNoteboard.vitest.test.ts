@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { ref } from 'vue'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
@@ -9,6 +9,7 @@ import noteboardMessages from 'app/i18n/en-US/floatingWindows/L_projectNoteboard
 import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
 import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
+import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
 
 const windowProjectNoteboardFrameSpies = vi.hoisted(() => {
   return {
@@ -129,5 +130,52 @@ test('Test that WindowProjectNoteboard hides close keybind hint when keybind sna
   })
 
   expect(w.find('[data-test-locator="windowProjectNoteboard-button-close-keybind"]').exists()).toBe(false)
+  w.unmount()
+})
+
+/**
+ * WindowProjectNoteboard
+ * Frame chrome should forward pointer events to the floating-window frame composable spies.
+ */
+test('Test that WindowProjectNoteboard forwards frame and title pointerdown targets', async () => {
+  windowProjectNoteboardFrameSpies.onFramePointerDown.mockClear()
+  windowProjectNoteboardFrameSpies.onTitlePointerDown.mockClear()
+
+  const w = mount(WindowProjectNoteboard, {
+    global: windowProjectNoteboardTestGlobalMount,
+    props: { directInput: 'WindowProjectNoteboard' }
+  })
+
+  await w.get('[data-test-locator="windowProjectNoteboard-frame"]').trigger('pointerdown')
+  expect(windowProjectNoteboardFrameSpies.onFramePointerDown).toHaveBeenCalledTimes(1)
+
+  await w.get('[data-test-locator="windowProjectNoteboard-dragHandle"]').trigger('pointerdown')
+  expect(windowProjectNoteboardFrameSpies.onTitlePointerDown).toHaveBeenCalledTimes(1)
+
+  w.unmount()
+})
+
+/**
+ * WindowProjectNoteboard
+ * Editor typing and close should update the project noteboard store.
+ */
+test('Test that WindowProjectNoteboard textarea and close button update the project noteboard store', async () => {
+  const noteboard = S_FaProjectNoteboard()
+  const closeSpy = vi.spyOn(noteboard, 'setWindowOpen')
+
+  const w = mount(WindowProjectNoteboard, {
+    global: windowProjectNoteboardTestGlobalMount,
+    props: { directInput: 'WindowProjectNoteboard' }
+  })
+
+  const editor = w.get('[data-test-locator="windowProjectNoteboard-editor"]')
+  await editor.setValue('project note')
+  expect((editor.element as HTMLTextAreaElement).value).toBe('project note')
+
+  await w.get('[data-test-locator="windowProjectNoteboard-button-close"]').trigger('click')
+  await flushPromises()
+
+  expect(closeSpy).toHaveBeenCalledWith(false)
+  closeSpy.mockRestore()
   w.unmount()
 })

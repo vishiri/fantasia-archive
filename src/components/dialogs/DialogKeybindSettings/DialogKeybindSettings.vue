@@ -99,7 +99,7 @@
 
           <template #no-data>
             <div
-              v-if="(filter ?? '').trim().length > 0"
+              v-if="noDataShowsFilterMiss"
               class="dialogKeybindSettings__filterEmpty flex flex-center"
               data-test-locator="dialogKeybindSettings-filterNoResults"
             >
@@ -161,6 +161,7 @@ import type { I_dialogKeybindSettingsRow } from '../../../../types/I_dialogKeybi
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import DialogKeybindSettingsCaptureDialog from 'app/src/components/dialogs/DialogKeybindSettings/DialogKeybindSettingsCaptureDialog.vue'
 import ErrorCard from 'app/src/components/elements/ErrorCard/ErrorCard.vue'
+import { dialogKeybindSettingsNoDataSlotShowsFilterError } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsNoDataSlotFilterUi'
 import {
   registerDialogKeybindSettingsGlobalSuspend,
   setupDialogKeybindSettingsDialogRouting
@@ -171,7 +172,7 @@ import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalMana
 import { useDialogKeybindSettings } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsState'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { i18n } from 'app/i18n/externalFileLoader'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 const props = defineProps<{
   directInput?: T_dialogName
@@ -196,6 +197,7 @@ const {
   tableRows
 } = useDialogKeybindSettings()
 const dialogModel = ref(false)
+const noDataShowsFilterMiss = computed(() => dialogKeybindSettingsNoDataSlotShowsFilterError(filter.value))
 const documentName = ref<T_dialogName>('KeybindSettings')
 const {
   bodySectionRef,

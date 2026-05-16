@@ -5,6 +5,7 @@ import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/rendererAppInternals'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
+import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
@@ -180,6 +181,52 @@ test('Test that MainLayout skips recent projects refresh when projectManagement 
   expect(refreshSpy).not.toHaveBeenCalled()
 
   window.faContentBridgeAPIs.projectManagement = prev
+  refreshSpy.mockRestore()
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * MainLayout / onMounted
+ * Refreshes app noteboard state when the bridge exposes faAppNoteboard.
+ */
+test('Test that MainLayout refreshes app noteboard when faAppNoteboard bridge is present', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'electron')
+
+  const appNoteboardStore = S_FaAppNoteboard()
+  const refreshSpy = vi.spyOn(appNoteboardStore, 'refreshNoteboard').mockResolvedValue(true)
+
+  const w = await mountMainLayoutForVitest()
+  await flushPromises()
+
+  expect(refreshSpy).toHaveBeenCalledTimes(1)
+
+  refreshSpy.mockRestore()
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * MainLayout / onMounted
+ * Skips app noteboard hydration when the bridge omits faAppNoteboard.
+ */
+test('Test that MainLayout skips app noteboard refresh when faAppNoteboard bridge is absent', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'electron')
+
+  const appNoteboardStore = S_FaAppNoteboard()
+  const refreshSpy = vi.spyOn(appNoteboardStore, 'refreshNoteboard').mockResolvedValue(true)
+
+  const prev = window.faContentBridgeAPIs.faAppNoteboard
+  delete (window.faContentBridgeAPIs as { faAppNoteboard?: unknown }).faAppNoteboard
+
+  const w = await mountMainLayoutForVitest()
+  await flushPromises()
+
+  expect(refreshSpy).not.toHaveBeenCalled()
+
+  window.faContentBridgeAPIs.faAppNoteboard = prev
   refreshSpy.mockRestore()
   w.unmount()
   vi.unstubAllEnvs()

@@ -63,27 +63,18 @@
 
 <script setup lang="ts">
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
-import type { StoreGeneric } from 'pinia'
-import { Result } from 'neverthrow'
 
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
 import { FA_PROJECT_NAME_MAX_LEN } from 'app/src-electron/shared/faProjectConstants'
 import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
-import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 
+import { resolveDialogComponentStoreOrNull } from './scripts/dialogNewProjectResolveDialogComponentStore'
 import { runDialogNewProjectCreate } from './scripts/dialogNewProjectSubmit'
 
 defineOptions({
   name: 'DialogNewProject'
 })
-
-const resolveDialogComponentStore = (): StoreGeneric | null => {
-  return Result.fromThrowable(
-    (): StoreGeneric => S_DialogComponent(),
-    (): null => null
-  )().unwrapOr(null)
-}
 
 const props = defineProps<{
   directInput?: T_dialogName
@@ -132,8 +123,8 @@ async function onClickCreate (): Promise<void> {
   await runDialogNewProjectCreate(projectName.value.trim(), closeDialog)
 }
 
-watch(() => resolveDialogComponentStore()?.dialogUUID, () => {
-  const dialogComponentStore = resolveDialogComponentStore()
+watch(() => resolveDialogComponentStoreOrNull()?.dialogUUID, () => {
+  const dialogComponentStore = resolveDialogComponentStoreOrNull()
   if (dialogComponentStore?.dialogToOpen === 'NewProject') {
     openDialog(dialogComponentStore.dialogToOpen as T_dialogName)
   }
