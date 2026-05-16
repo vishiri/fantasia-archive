@@ -3,10 +3,27 @@ import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/ap
 import { FA_APP_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appStyling/faAppStylingStoreDefaults'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 
+import type {
+  I_faAppConfigApplyInput,
+  I_faAppConfigApplyResult,
+  I_faAppConfigExportOptions,
+  I_faAppConfigExportResult,
+  I_faAppConfigPrepareResult
+} from 'app/types/I_faAppConfigDomain'
 import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
 import type { I_extraEnvVariablesBridge } from 'app/types/I_faElectronRendererBridgeAPIs'
+import type {
+  I_faProjectCreateInput,
+  I_faProjectCreateResult,
+  I_faProjectOpenInput,
+  I_faProjectOpenResult
+} from 'app/types/I_faProjectManagementDomain'
 
 import type { T_contentBridgeScenario } from 'app/types/I_storybookWorkspaceHarness'
+import type {
+  I_faProjectNoteboardPatch,
+  I_faProjectNoteboardRoot
+} from 'app/types/I_faProjectNoteboardDomain'
 
 const defaultExtraEnvSnapshot: I_extraEnvVariablesAPI = {
   COMPONENT_NAME: undefined,
@@ -37,69 +54,123 @@ function resolveExtraEnvVariables (
   }
 }
 
-const baseBridge = () => ({
-  faWindowControl: {
-    checkWindowMaximized: async () => false,
-    closeWindow: async () => undefined,
-    maximizeWindow: async () => undefined,
-    minimizeWindow: async () => undefined,
-    refreshWebContents: async () => undefined,
-    resizeWindow: async () => undefined
-  },
-  faDevToolsControl: {
-    checkDevToolsStatus: async () => false,
-    closeDevTools: async () => undefined,
-    openDevTools: async () => undefined,
-    toggleDevTools: async () => undefined
-  },
-  faExternalLinksManager: {
-    checkIfExternal: () => false,
-    openExternal: () => undefined
-  },
-  extraEnvVariables: resolveExtraEnvVariables(undefined),
-  appDetails: {
-    getProjectVersion: async () => '0.0.0-storybook'
-  },
-  faUserSettings: {
-    getSettings: async () => ({ ...FA_USER_SETTINGS_DEFAULTS }),
-    setSettings: async () => undefined
-  },
-  faKeybinds: {
-    getKeybinds: async () => ({
-      platform: 'win32' as const,
-      store: { ...FA_KEYBINDS_STORE_DEFAULTS }
-    }),
-    setKeybinds: async () => undefined
-  },
-  faAppStyling: {
-    getAppStyling: async () => ({ ...FA_APP_STYLING_STORE_DEFAULTS }),
-    setAppStyling: async () => undefined
-  },
-  faAppNoteboard: {
-    getNoteboard: async () => ({ ...FA_APP_NOTEBOARD_STORE_DEFAULTS }),
-    setNoteboard: async () => undefined
-  },
-  faAppConfig: {
-    applyImport: async () => ({ appliedParts: [] }),
-    disposeImportSession: async () => undefined,
-    exportToFile: async () => ({ outcome: 'canceled' }),
-    prepareImport: async () => ({
-      outcome: 'ready',
-      parts: {
-        keybinds: 'ok',
-        appNoteboard: 'ok',
-        appSettings: 'ok',
-        appStyling: 'ok'
-      },
-      sessionId: 'storybook-import-session'
-    })
-  },
-  projectManagement: {
-    createProject: async () => ({ outcome: 'canceled' }),
-    getRecentProjects: async () => [],
-    openProject: async () => ({ outcome: 'canceled' })
+function duplicateStorybookProjectNoteboardRoot (
+  root: I_faProjectNoteboardRoot
+): I_faProjectNoteboardRoot {
+  const frameFrom = root.frame
+  const frame = frameFrom === null ? null : { ...frameFrom }
+  return {
+    frame,
+    schemaVersion: root.schemaVersion,
+    text: root.text
   }
-})
+}
+
+const baseBridge = () => {
+  let storybookProjectNoteboardRoot: I_faProjectNoteboardRoot = {
+    frame: null,
+    schemaVersion: 1,
+    text: ''
+  }
+
+  const getProjectNoteboard = async (): Promise<I_faProjectNoteboardRoot> => {
+    return duplicateStorybookProjectNoteboardRoot(storybookProjectNoteboardRoot)
+  }
+
+  const setProjectNoteboard = async (patch: I_faProjectNoteboardPatch): Promise<boolean> => {
+    let next = storybookProjectNoteboardRoot
+    if (patch.text !== undefined) {
+      next = {
+        ...next,
+        text: patch.text
+      }
+    }
+    if (patch.frame !== undefined) {
+      next = {
+        ...next,
+        frame: patch.frame === null ? null : { ...patch.frame }
+      }
+    }
+    storybookProjectNoteboardRoot = next
+    return true
+  }
+
+  return {
+    faWindowControl: {
+      checkWindowMaximized: async () => false,
+      closeWindow: async () => undefined,
+      maximizeWindow: async () => undefined,
+      minimizeWindow: async () => undefined,
+      refreshWebContents: async () => undefined,
+      resizeWindow: async () => undefined
+    },
+    faDevToolsControl: {
+      checkDevToolsStatus: async () => false,
+      closeDevTools: async () => undefined,
+      openDevTools: async () => undefined,
+      toggleDevTools: async () => undefined
+    },
+    faExternalLinksManager: {
+      checkIfExternal: () => false,
+      openExternal: () => undefined
+    },
+    extraEnvVariables: resolveExtraEnvVariables(undefined),
+    appDetails: {
+      getProjectVersion: async () => '0.0.0-storybook'
+    },
+    faUserSettings: {
+      getSettings: async () => ({ ...FA_USER_SETTINGS_DEFAULTS }),
+      setSettings: async () => undefined
+    },
+    faKeybinds: {
+      getKeybinds: async () => ({
+        platform: 'win32' as const,
+        store: { ...FA_KEYBINDS_STORE_DEFAULTS }
+      }),
+      setKeybinds: async () => undefined
+    },
+    faAppStyling: {
+      getAppStyling: async () => ({ ...FA_APP_STYLING_STORE_DEFAULTS }),
+      setAppStyling: async () => undefined
+    },
+    faAppNoteboard: {
+      getNoteboard: async () => ({ ...FA_APP_NOTEBOARD_STORE_DEFAULTS }),
+      setNoteboard: async () => undefined
+    },
+    faAppConfig: {
+      applyImport: async (_input: I_faAppConfigApplyInput): Promise<I_faAppConfigApplyResult> => ({
+        appliedParts: []
+      }),
+      disposeImportSession: async (_sessionId: string): Promise<void> => {
+        await Promise.resolve()
+      },
+      exportToFile: async (_options: I_faAppConfigExportOptions): Promise<I_faAppConfigExportResult> => ({
+        outcome: 'canceled'
+      }),
+      prepareImport: async (): Promise<I_faAppConfigPrepareResult> => ({
+        outcome: 'ready',
+        parts: {
+          appNoteboard: 'ok',
+          appSettings: 'ok',
+          appStyling: 'ok',
+          keybinds: 'ok'
+        },
+        sessionId: 'storybook-import-session'
+      })
+    },
+    projectManagement: {
+      createProject: async (_input: I_faProjectCreateInput): Promise<I_faProjectCreateResult> => ({
+        outcome: 'canceled'
+      }),
+      getProjectNoteboard,
+      getRecentProjects: async () => [],
+      openProject: async (_input?: I_faProjectOpenInput): Promise<I_faProjectOpenResult> => ({
+        outcome: 'canceled'
+      }),
+      setProjectNoteboard
+    }
+  }
+}
 
 const scenarioMutations: Record<T_contentBridgeScenario, (bridge: ReturnType<typeof baseBridge>) => void> = {
   default: () => undefined,
