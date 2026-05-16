@@ -2,7 +2,6 @@ export default {
   title: 'Project Management',
   items: {
     newProject: 'New Project',
-    saveProject: 'Save Project',
     loadProject: 'Load Project',
     loadRecentProject: 'Load Recent Project',
     noRecentProjects: 'No Recent Projects',
@@ -10,7 +9,6 @@ export default {
     showProjectDashboard: 'Show Project Dashboard',
     toggleProjectNoteboard: 'Toggle Project Noteboard',
     openProjectCustomCss: 'Custom Project CSS',
-    closeProject: 'Close Project',
     projectSettings: 'Project Settings',
     advancedProjectTools: 'Advanced Project Tools',
     aptMerge: 'Merge Another Project into the Current One',

@@ -50,22 +50,22 @@ test('Test that buildProjectMenu new project row opens the settings dialog actio
 test('Test that buildProjectMenu load project row dispatches loadExistingProject', () => {
   const menu = buildProjectMenu(emptyRecentSession(false))
   const items = menu.data.filter((row) => row.mode === 'item')
-  items[2]!.trigger?.()
+  items[1]!.trigger?.()
   expect(runFaActionMock).toHaveBeenCalledWith('loadExistingProject', {})
 })
 
 test('Test that buildProjectMenu toggle noteboard row dispatches toggleProjectNoteboardWindow', () => {
   const menu = buildProjectMenu(emptyRecentSession(true))
   const items = menu.data.filter((row) => row.mode === 'item')
-  items[4]!.trigger?.()
+  items[3]!.trigger?.()
   expect(runFaActionMock).toHaveBeenCalledWith('toggleProjectNoteboardWindow', undefined)
 })
 
 test('Test that buildProjectMenu custom Project CSS row dispatches openProjectStylingDialog', () => {
   const menu = buildProjectMenu(emptyRecentSession(true))
   const items = menu.data.filter((row) => row.mode === 'item')
-  expect(items[5]!.keybindCommandId).toBe('openProjectStyling')
-  items[5]!.trigger?.()
+  expect(items[4]!.keybindCommandId).toBe('openProjectStyling')
+  items[4]!.trigger?.()
   expect(runFaActionMock).toHaveBeenCalledWith('openProjectStylingDialog', undefined)
 })
 
@@ -78,17 +78,15 @@ test('Test that buildProjectMenu disables gated rows when hasActiveProject is fa
   const items = menu.data.filter((row) => row.mode === 'item')
 
   expect(items[0]!.conditions).not.toBe(false)
-  expect(items[1]!.conditions).toBe(false)
-  expect(items[2]!.conditions).not.toBe(false)
+  expect(items[1]!.conditions).not.toBe(false)
+  expect(items[2]!.conditions).toBe(false)
   expect(items[3]!.conditions).toBe(false)
   expect(items[4]!.conditions).toBe(false)
   expect(items[5]!.conditions).toBe(false)
   expect(items[6]!.conditions).toBe(false)
-  expect(items[7]!.conditions).toBe(false)
-  expect(items[8]!.conditions).toBe(false)
-  expect(items[9]!.conditions).not.toBe(false)
+  expect(items[7]!.conditions).not.toBe(false)
 
-  const sub = items[9]!.submenu?.filter((row) => row.mode === 'item') ?? []
+  const sub = items[7]!.submenu?.filter((row) => row.mode === 'item') ?? []
   expect(sub[0]!.conditions).toBe(false)
   expect(sub[1]!.conditions).not.toBe(false)
 })
@@ -103,15 +101,13 @@ test('Test that buildProjectMenu enables gated rows when hasActiveProject is tru
 
   expect(items[0]!.conditions).not.toBe(false)
   expect(items[1]!.conditions).not.toBe(false)
-  expect(items[2]!.conditions).not.toBe(false)
-  expect(items[3]!.conditions).toBe(false)
+  expect(items[2]!.conditions).toBe(false)
+  expect(items[3]!.conditions).not.toBe(false)
   expect(items[4]!.conditions).not.toBe(false)
   expect(items[5]!.conditions).not.toBe(false)
   expect(items[6]!.conditions).not.toBe(false)
   expect(items[7]!.conditions).not.toBe(false)
-  expect(items[8]!.conditions).not.toBe(false)
-  expect(items[9]!.conditions).not.toBe(false)
-  const sub = items[9]!.submenu?.filter((row) => row.mode === 'item') ?? []
+  const sub = items[7]!.submenu?.filter((row) => row.mode === 'item') ?? []
   expect(sub.every((row) => row.conditions !== false)).toBe(true)
 })
 
@@ -128,7 +124,7 @@ test('Test that buildProjectMenu recent row dispatches loadExistingProject with 
     }]
   })
   const items = menu.data.filter((row) => row.mode === 'item')
-  const recentParent = items[3]
+  const recentParent = items[2]
   expect(recentParent?.conditions).not.toBe(false)
   expect(recentParent?.icon).toBe('keyboard_arrow_right')
   expect(recentParent?.specialColor).toBe('grey')
@@ -152,7 +148,7 @@ test('Test that buildProjectMenu recent row dispatches loadExistingProject with 
 test('Test that buildProjectMenu treats omitted recentProjects as no recent entries', () => {
   const menu = buildProjectMenu({ hasActiveProject: false })
   const items = menu.data.filter((row) => row.mode === 'item')
-  const recentParent = items[3]
+  const recentParent = items[2]
   expect(recentParent?.conditions).toBe(false)
   expect(recentParent?.submenu).toBeUndefined()
   expect(recentParent?.icon).toBe('keyboard_arrow_right')

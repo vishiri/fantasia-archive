@@ -2,7 +2,6 @@ export default {
   title: 'Gestion de projet',
   items: {
     newProject: 'Nouveau projet',
-    saveProject: 'Sauvegarder le projet',
     loadProject: 'Charger le projet',
     loadRecentProject: 'Charger un projet récent',
     noRecentProjects: 'Aucun projet récent',
@@ -10,7 +9,6 @@ export default {
     showProjectDashboard: 'Afficher le tableau de bord du projet',
     toggleProjectNoteboard: 'Basculer le noteboard du projet',
     openProjectCustomCss: 'CSS projet personnalisé',
-    closeProject: 'Fermer le projet',
     projectSettings: 'Paramètres du projet',
     advancedProjectTools: 'Outils avancés du projet',
     aptMerge: 'Fusionner un autre projet dans le projet actuel',

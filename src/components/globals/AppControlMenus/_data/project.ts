@@ -34,9 +34,6 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
       trigger: () => runFaAction('openNewProjectDialog', undefined)
     }),
     faMenuSeparator(),
-    faMenuItem('appControlMenus.project.items.saveProject', 'mdi-package-variant-closed', {
-      conditions: gate
-    }),
     faMenuItem('appControlMenus.project.items.loadProject', 'mdi-package-variant', {
       trigger: () => runFaAction('loadExistingProject', {})
     }),
@@ -60,9 +57,6 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
       conditions: gate
     }),
     faMenuItem('appControlMenus.project.items.projectSettings', 'mdi-book-cog-outline', {
-      conditions: gate
-    }),
-    faMenuItem('appControlMenus.project.items.closeProject', 'mdi-exit-to-app', {
       conditions: gate
     }),
     faMenuSeparator(),

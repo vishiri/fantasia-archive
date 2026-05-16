@@ -2,7 +2,6 @@ export default {
   title: 'Projektverwaltung',
   items: {
     newProject: 'Neues Projekt',
-    saveProject: 'Projekt speichern',
     loadProject: 'Projekt laden',
     loadRecentProject: 'Zuletzt geöffnete Projekte',
     noRecentProjects: 'Keine zuletzt geöffneten Projekte',
@@ -10,7 +9,6 @@ export default {
     showProjectDashboard: 'Projekt-Dashboard anzeigen',
     toggleProjectNoteboard: 'Projekt-Noteboard umschalten',
     openProjectCustomCss: 'Eigenes Projekt-CSS',
-    closeProject: 'Projekt schließen',
     projectSettings: 'Projekt-Einstellungen',
     advancedProjectTools: 'Erweiterte Projektwerkzeuge',
     aptMerge: 'Anderes Projekt in das aktuelle einfügen',
