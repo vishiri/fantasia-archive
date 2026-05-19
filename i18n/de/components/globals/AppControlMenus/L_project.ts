@@ -1,8 +1,8 @@
 export default {
   title: 'Projektverwaltung',
   items: {
-    newProject: 'Neues Projekt',
-    loadProject: 'Projekt laden',
+    newProject: 'Neues Projekt erstellen',
+    loadProject: 'Bestehendes Projekt laden',
     loadRecentProject: 'Zuletzt geöffnete Projekte',
     noRecentProjects: 'Keine zuletzt geöffneten Projekte',
     recentProjectRow: 'Zuletzt geöffnetes Projekt',

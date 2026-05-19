@@ -1,10 +1,24 @@
 @use '../../../../css/app.palette.scss' as *;
+@use '../../../../css/theme/quasar-components/qCard.variables' as *;
 
 /* COMPONENT - SPLASH CONTROLS */
 $splashControls-actionBtn-fontSize: 14px;
 $splashControls-actionBtn-padding: 14px 80px;
 $splashControls-actions-maxWidth: 360px;
+$splashControls-actionBtnDropdownButton-padding: 14px 55px 14px 80px;
+$splashControls-actionBtnDropdownTrigger-padding: 14px 16px 14px 16px;
 $splashControls-header-maxWidth: 100%;
+$splashControls-resumeMenu-backgroundColor: fa-v('dark-page', $dark-page);
+$splashControls-resumeMenu-borderColor: fa-v('gold-muted-border', $gold-muted-border-raw);
+$splashControls-resumeMenu-borderWidth: 1px;
+$splashControls-resumeMenu-boxShadow: $qCard-boxShadow;
+$splashControls-resumeMenu-itemCaption-color: fa-v('text-muted', $text-muted);
+$splashControls-resumeMenu-itemHover-overlayColor: fa-v('primary-bright', $primary-bright);
+$splashControls-resumeMenu-itemHover-overlayOpacity: 0.1;
+$splashControls-resumeMenu-itemLabel-color: fa-v('primary-bright', $primary-bright);
+$splashControls-resumeMenu-item-padding: 14px 20px;
+$splashControls-resumeMenu-separator-backgroundColor: fa-v('primary-bright', $primary-bright);
+$splashControls-resumeMenu-separator-height: 0.5px;
 $splashControls-titleRow-maxWidth: 100%;
 $splashControls-welcome-opacity: 0.8;
 $splashControls-wing-height: 100px;

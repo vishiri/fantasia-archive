@@ -1,7 +1,8 @@
 export default {
-  loadExistingProject: 'Charger le projet',
-  newProject: 'Nouveau projet',
-  resumeProject: 'Reprendre le projet',
+  browseLatestProjects: 'Parcourir les derniers projets',
+  loadExistingProject: 'Charger un projet existant',
+  newProject: 'Créer un nouveau projet',
+  resumeLatestProject: 'Reprendre le dernier projet',
   title: 'Fantasia Archive',
   welcomeLine: 'Bienvenue sur'
 }

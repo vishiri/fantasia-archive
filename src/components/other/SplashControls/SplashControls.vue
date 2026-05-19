@@ -44,14 +44,7 @@
       class="splashControls__actions column items-center q-gutter-lg q-mt-lg"
       data-test-locator="splashPage-primaryActions"
     >
-      <q-btn
-        class="splashControls__actionBtn text-uppercase"
-        color="primary-bright"
-        data-test-locator="splashPage-btn-resume"
-        outline
-        type="button"
-        :label="$t('splashPage.resumeProject')"
-      />
+      <SplashControlsResumeDropdown />
       <q-btn
         class="splashControls__actionBtn text-uppercase"
         color="primary-bright"
@@ -77,6 +70,8 @@
 <script lang="ts" setup>
 import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
 import { resolveVitePublicAssetPath } from 'app/src/scripts/appInternals/rendererAppInternals'
+
+import SplashControlsResumeDropdown from './SplashControlsResumeDropdown.vue'
 
 defineOptions({
   name: 'SplashControls'

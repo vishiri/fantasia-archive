@@ -1,0 +1,38 @@
+/* Teleported q-menu panel for Resume Latest Project; matches splash slate + gold chrome. */
+
+.splashControls__resumeMenu.q-menu {
+  background-color: $splashControls-resumeMenu-backgroundColor !important;
+  border: $splashControls-resumeMenu-borderWidth solid $splashControls-resumeMenu-borderColor;
+  box-shadow: $splashControls-resumeMenu-boxShadow !important;
+  color: $splashControls-resumeMenu-itemLabel-color;
+
+  .q-item {
+    color: $splashControls-resumeMenu-itemLabel-color;
+    padding: $splashControls-resumeMenu-item-padding;
+
+    > .q-focus-helper {
+      background: $splashControls-resumeMenu-itemHover-overlayColor;
+      opacity: 0 !important;
+    }
+
+    &:hover,
+    &:focus {
+      > .q-focus-helper {
+        opacity: $splashControls-resumeMenu-itemHover-overlayOpacity !important;
+      }
+    }
+  }
+
+  .q-item__label {
+    color: $splashControls-resumeMenu-itemLabel-color;
+  }
+
+  .q-item__label--caption {
+    color: $splashControls-resumeMenu-itemCaption-color;
+  }
+
+  .splashControls__resumeMenuSeparator {
+    background-color: $splashControls-resumeMenu-separator-backgroundColor;
+    height: $splashControls-resumeMenu-separator-height !important;
+  }
+}

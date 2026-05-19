@@ -1,8 +1,8 @@
 export default {
   title: 'Gestion de projet',
   items: {
-    newProject: 'Nouveau projet',
-    loadProject: 'Charger le projet',
+    newProject: 'Créer un nouveau projet',
+    loadProject: 'Charger un projet existant',
     loadRecentProject: 'Charger un projet récent',
     noRecentProjects: 'Aucun projet récent',
     recentProjectRow: 'Projet récent',
