@@ -33,9 +33,9 @@ beforeEach(() => {
 
 /**
  * Project menu
- * New project dispatches the open dialog action from the first row trigger.
+ * Create new project dispatches the open dialog action from the first row trigger.
  */
-test('Test that buildProjectMenu new project row opens the settings dialog action', () => {
+test('Test that buildProjectMenu create new project row opens the settings dialog action', () => {
   const menu = buildProjectMenu(emptyRecentSession(false))
   const items = menu.data.filter((row) => row.mode === 'item')
   items[0]!.trigger?.()
@@ -45,9 +45,9 @@ test('Test that buildProjectMenu new project row opens the settings dialog actio
 
 /**
  * Project menu
- * Load project dispatches the load action from the load row trigger.
+ * Load existing project dispatches the load action from the load row trigger.
  */
-test('Test that buildProjectMenu load project row dispatches loadExistingProject', () => {
+test('Test that buildProjectMenu load existing project row dispatches loadExistingProject', () => {
   const menu = buildProjectMenu(emptyRecentSession(false))
   const items = menu.data.filter((row) => row.mode === 'item')
   items[1]!.trigger?.()

@@ -48,8 +48,11 @@ const selectorList = {
 /** Quasar menu open / nested submenu animation slack (see AppControlSingleMenu Playwright specs). */
 const MENU_ANIMATION_MS = 600
 
-const E2E_PROJECT_MENU_REALM = 'E2E Menu Realm'
-const E2E_PROJECT_SPLASH_REALM = 'E2E Splash Realm'
+/** Display name for the `.faproject` created via Project → Create new project in this suite (MRU and load flows). */
+const E2E_PROJECT_DISPLAY_MENU_NEW = 'E2E project from Project menu Create new project'
+
+/** Display name for the `.faproject` created via splash welcome Create new project in this suite. */
+const E2E_PROJECT_DISPLAY_SPLASH_NEW = 'E2E project from splash Create new project'
 
 /** Eleven successive creates to exercise MRU cap 10 (entries 02–11 remain; 01 evicted). */
 const E2E_RECENT_CAP_TOTAL = 11
@@ -59,7 +62,7 @@ function recentCapFixtureBaseName (index1Based: number): string {
 }
 
 function recentCapDisplayName (index1Based: number): string {
-  return `E2E Recent Cap ${String(index1Based).padStart(2, '0')}`
+  return `E2E MRU cap exercise project ${String(index1Based).padStart(2, '0')}`
 }
 
 function unlinkAllE2eRecentCapFixtures (): void {
@@ -212,9 +215,9 @@ test.describe.serial('Project management flow', () => {
   })
 
   /**
-   * **New project** dialog must clear stale typing when reopened after dismissal without creation.
+   * **DialogNewProject** must clear stale typing when reopened after dismissal without creation.
    */
-  test('New project dialog resets the name field after close without creating', async () => {
+  test('DialogNewProject resets the name field after close without creating', async () => {
     const nameField = appWindow.locator(`[data-test-locator="${selectorList.nameInput}"]`)
 
     await appWindow.locator(`[data-test-locator="${selectorList.splashNew}"]`).click()
@@ -232,26 +235,26 @@ test.describe.serial('Project management flow', () => {
   })
 
   /**
-   * Creates a new `.faproject` from the splash welcome **New project** control and verifies session plus creation toast.
+   * Creates a new `.faproject` from the splash welcome **Create new project** control and verifies session plus creation toast.
    */
-  test('creates a .faproject from the splash New project control', async () => {
+  test('creates a .faproject from the splash Create new project control', async () => {
     await e2eSetNextProjectCreatePath(electronApp, 'e2e-splash-project.faproject')
     await appWindow.locator(`[data-test-locator="${selectorList.splashNew}"]`).click()
     await expect(appWindow.locator(`[data-test-locator="${selectorList.nameInput}"]`)).toBeVisible()
-    await appWindow.locator(`[data-test-locator="${selectorList.nameInput}"]`).fill('E2E Splash Realm')
+    await appWindow.locator(`[data-test-locator="${selectorList.nameInput}"]`).fill(E2E_PROJECT_DISPLAY_SPLASH_NEW)
     await appWindow.locator(`[data-test-locator="${selectorList.createBtn}"]`).click()
-    await e2eExpectFaActiveProjectStoreName(appWindow, 'E2E Splash Realm')
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_SPLASH_NEW)
     await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
       L_faProjectSession.notifyProjectCreated,
-      'E2E Splash Realm'
+      E2E_PROJECT_DISPLAY_SPLASH_NEW
     ))).toBeVisible()
     assertE2eCreatedFaprojectFileExistsWithContent('e2e-splash-project.faproject')
   })
 
   /**
-   * Opens **Project → New project**, creates a second fixture, and verifies the active project switches to the menu-created realm.
+   * Opens **Project → Create new project**, creates a second fixture, and verifies the active project switches to the menu-created display name.
    */
-  test('opens New project from the Project menu and creates a file', async () => {
+  test('opens Create new project from the Project menu and creates a file', async () => {
     await e2eSetNextProjectCreatePath(electronApp, 'e2e-menu-project.faproject')
     const projectTitle = projectMenu.title
     await appWindow.getByRole('button', {
@@ -260,31 +263,31 @@ test.describe.serial('Project management flow', () => {
     }).click()
     await appWindow.getByRole('menuitem', { name: projectMenu.items.newProject }).click()
     await expect(appWindow.locator('#dialogNewProject-title')).toContainText(L_newProject.title)
-    await appWindow.locator(`[data-test-locator="${selectorList.nameInput}"]`).fill('E2E Menu Realm')
+    await appWindow.locator(`[data-test-locator="${selectorList.nameInput}"]`).fill(E2E_PROJECT_DISPLAY_MENU_NEW)
     await appWindow.locator(`[data-test-locator="${selectorList.createBtn}"]`).click()
-    await e2eExpectFaActiveProjectStoreName(appWindow, 'E2E Menu Realm')
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_MENU_NEW)
     await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
       L_faProjectSession.notifyProjectCreated,
-      'E2E Menu Realm'
+      E2E_PROJECT_DISPLAY_MENU_NEW
     ))).toBeVisible()
     assertE2eCreatedFaprojectFileExistsWithContent('e2e-menu-project.faproject')
   })
 
   /**
-   * Stages the splash-created fixture path, uses the splash **Load project** button, and expects the splash realm plus loaded toast.
+   * Stages the splash-created fixture path, uses the splash **Load existing project** button, and expects that project's display name plus loaded toast.
    */
-  test('loads an existing .faproject from the splash Load project control', async () => {
+  test('loads an existing .faproject from the splash Load existing project control', async () => {
     await e2eSetNextProjectOpenPath(electronApp, 'e2e-splash-project.faproject')
     await appWindow.locator(`[data-test-locator="${selectorList.splashLoad}"]`).click()
-    await e2eExpectFaActiveProjectStoreName(appWindow, 'E2E Splash Realm')
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_SPLASH_NEW)
     await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
       L_faProjectSession.notifyProjectLoaded,
-      'E2E Splash Realm'
+      E2E_PROJECT_DISPLAY_SPLASH_NEW
     ))).toBeVisible()
   })
 
   /**
-   * Stages the menu-created fixture path, opens **Project → Load project**, and expects the menu realm plus loaded toast.
+   * Stages the menu-created fixture path, opens **Project → Load existing project**, and expects that project's display name plus loaded toast.
    */
   test('loads an existing .faproject from the Project menu', async () => {
     await e2eSetNextProjectOpenPath(electronApp, 'e2e-menu-project.faproject')
@@ -294,17 +297,17 @@ test.describe.serial('Project management flow', () => {
       name: projectTitle
     }).click()
     await appWindow.getByRole('menuitem', { name: projectMenu.items.loadProject }).click()
-    await e2eExpectFaActiveProjectStoreName(appWindow, 'E2E Menu Realm')
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_MENU_NEW)
     await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
       L_faProjectSession.notifyProjectLoaded,
-      'E2E Menu Realm'
+      E2E_PROJECT_DISPLAY_MENU_NEW
     ))).toBeVisible()
   })
 
   /**
    * Loading the file that is already the active session should surface one clear error toast, not reload the project.
    */
-  test('Load project rejects opening the currently active file again', async () => {
+  test('Load existing project rejects opening the currently active file again', async () => {
     await e2eSetNextProjectOpenPath(electronApp, 'e2e-menu-project.faproject')
     const projectTitle = projectMenu.title
     await appWindow.getByRole('button', {
@@ -313,7 +316,7 @@ test.describe.serial('Project management flow', () => {
     }).click()
     await appWindow.getByRole('menuitem', { name: projectMenu.items.loadProject }).click()
 
-    await e2eExpectFaActiveProjectStoreName(appWindow, 'E2E Menu Realm')
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_MENU_NEW)
     await expect(appWindow.getByText(L_faProjectSession.openRejectedAlreadyActive)).toBeVisible()
   })
 
@@ -328,40 +331,40 @@ test.describe.serial('Project management flow', () => {
     await openLoadRecentSubmenu(appWindow)
     await expectLoadRecentSubmenuLabels(
       appWindow,
-      E2E_PROJECT_MENU_REALM,
-      E2E_PROJECT_SPLASH_REALM
+      E2E_PROJECT_DISPLAY_MENU_NEW,
+      E2E_PROJECT_DISPLAY_SPLASH_NEW
     )
 
-    await appWindow.getByRole('menuitem', { name: E2E_PROJECT_SPLASH_REALM }).click()
+    await appWindow.getByRole('menuitem', { name: E2E_PROJECT_DISPLAY_SPLASH_NEW }).click()
     await dismissOpenMenus(appWindow)
-    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_SPLASH_REALM)
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_SPLASH_NEW)
     await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
       L_faProjectSession.notifyProjectLoaded,
-      E2E_PROJECT_SPLASH_REALM
+      E2E_PROJECT_DISPLAY_SPLASH_NEW
     ))).toBeVisible()
 
     await openProjectMenu(appWindow)
     await openLoadRecentSubmenu(appWindow)
     await expectLoadRecentSubmenuLabels(
       appWindow,
-      E2E_PROJECT_SPLASH_REALM,
-      E2E_PROJECT_MENU_REALM
+      E2E_PROJECT_DISPLAY_SPLASH_NEW,
+      E2E_PROJECT_DISPLAY_MENU_NEW
     )
 
-    await appWindow.getByRole('menuitem', { name: E2E_PROJECT_MENU_REALM }).click()
+    await appWindow.getByRole('menuitem', { name: E2E_PROJECT_DISPLAY_MENU_NEW }).click()
     await dismissOpenMenus(appWindow)
-    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_MENU_REALM)
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_MENU_NEW)
 
     await openProjectMenu(appWindow)
     await openLoadRecentSubmenu(appWindow)
     await expectLoadRecentSubmenuLabels(
       appWindow,
-      E2E_PROJECT_MENU_REALM,
-      E2E_PROJECT_SPLASH_REALM
+      E2E_PROJECT_DISPLAY_MENU_NEW,
+      E2E_PROJECT_DISPLAY_SPLASH_NEW
     )
-    await appWindow.getByRole('menuitem', { name: E2E_PROJECT_MENU_REALM }).click()
+    await appWindow.getByRole('menuitem', { name: E2E_PROJECT_DISPLAY_MENU_NEW }).click()
     await dismissOpenMenus(appWindow)
-    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_MENU_REALM)
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_MENU_NEW)
     await expect(
       appWindow.getByText(L_faProjectSession.openRejectedAlreadyActive).first()
     ).toBeVisible()
@@ -395,21 +398,21 @@ test.describe.serial('Project management flow', () => {
     await openLoadRecentSubmenu(appWindow)
     await expectLoadRecentSubmenuLabels(
       appWindow,
-      E2E_PROJECT_MENU_REALM,
-      E2E_PROJECT_SPLASH_REALM
+      E2E_PROJECT_DISPLAY_MENU_NEW,
+      E2E_PROJECT_DISPLAY_SPLASH_NEW
     )
-    await appWindow.getByRole('menuitem', { name: E2E_PROJECT_MENU_REALM }).click()
+    await appWindow.getByRole('menuitem', { name: E2E_PROJECT_DISPLAY_MENU_NEW }).click()
     await dismissOpenMenus(appWindow)
-    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_MENU_REALM)
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_MENU_NEW)
     await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
       L_faProjectSession.notifyProjectLoaded,
-      E2E_PROJECT_MENU_REALM
+      E2E_PROJECT_DISPLAY_MENU_NEW
     ))).toBeVisible()
   })
 
   /**
-   * Eleven New project creates hit the MRU cap (10): submenu shows E2E Recent Cap 11 … 02 only.
-   * While 11 is active its SQLite file stays open, so we switch to Cap 10, delete 11's file on disk, then open 11 from MRU.
+   * Eleven **Create new project** flows hit the MRU cap (10): submenu lists E2E MRU cap exercise project 11 … 02 only.
+   * While 11 is active its SQLite file stays open, so we switch to project 10, delete 11's file on disk, then open 11 from MRU.
    * That surfaces 'Project file does not exist', prunes the stale MRU row, and leaves nine entries (10 … 02).
    */
   test('Recent project MRU caps at 10 and drops stale paths after a missing file open', async () => {

@@ -42,20 +42,27 @@ const e2ePostTypingSettleMs = 1_000
 const PROJECT_NOTEBOARD_READY_MS = 30_000
 const SPLASH_SHELL_TIMEOUT_MS = 20_000
 
-const PROJECT_ALPHA_FIXTURE_BASE = 'e2e-project-noteboard-alpha.faproject'
-const PROJECT_BETA_FIXTURE_BASE = 'e2e-project-noteboard-beta.faproject'
+/**
+ * Baseline `.faproject` basename: first serial group captures parked window geometry and note text here.
+ */
+const PROJECT_NOTEBOARD_E2E_BASELINE_FAPROJECT = 'e2e-project-noteboard-baseline.faproject'
 
-const PROJECT_ALPHA_DISPLAY_NAME = 'E2e Noteboard Realm Alpha'
-const PROJECT_BETA_DISPLAY_NAME = 'E2e Noteboard Realm Beta'
+/**
+ * Companion `.faproject` basename: second serial group types different notes here to prove per-project SQLite isolation when switching back to the baseline file.
+ */
+const PROJECT_NOTEBOARD_E2E_COMPANION_FAPROJECT = 'e2e-project-noteboard-companion.faproject'
 
-const PROJECT_ALPHA_NOTE_SAMPLE =
-  'E2E project noteboard realm alpha line one.\n' +
-  'E2E project noteboard realm alpha line two.\n' +
-  'E2E project noteboard realm alpha line three.'
+const PROJECT_NOTEBOARD_E2E_BASELINE_DISPLAY_NAME = 'E2E Project noteboard baseline'
+const PROJECT_NOTEBOARD_E2E_COMPANION_DISPLAY_NAME = 'E2E Project noteboard companion'
 
-const PROJECT_BETA_NOTE_SAMPLE =
-  'E2E project noteboard realm beta line one omega.\n' +
-  'E2E project noteboard realm beta line two omega.'
+const PROJECT_NOTEBOARD_E2E_BASELINE_NOTE_SAMPLE =
+  'E2E baseline project noteboard — paragraph one.\n' +
+  'E2E baseline project noteboard — paragraph two.\n' +
+  'E2E baseline project noteboard — paragraph three.'
+
+const PROJECT_NOTEBOARD_E2E_COMPANION_NOTE_SAMPLE =
+  'E2E companion project noteboard — line one (different project).\n' +
+  'E2E companion project noteboard — line two (different project).'
 
 /**
  * Mirrors default floating-window layout clamps (margins plus minimum square chrome).
@@ -90,9 +97,9 @@ interface I_expectedFloatingViewportLayout {
 }
 
 /**
- * Bounding box parked at end of phase one resize plus top-left placement; asserted after reloading alpha in phase two while the overlay stays open across the beta session.
+ * Bounding box after shrinking the noteboard to its minimum size and parking it at the top-left margin; the second serial group reloads the baseline `.faproject` and expects this geometry again after editing the companion project in between.
  */
-let savedProjectAlphaParkedGeom!: I_geomBoxRounded
+let savedBaselineParkedNoteboardGeom!: I_geomBoxRounded
 
 const selectorList = {
   dialogCreateBtn: 'dialogNewProject-button-create',
@@ -335,34 +342,39 @@ async function dragMinFloaterToCorner (
   return parked
 }
 
-async function createBetaProjectViaMenu (
+/**
+ * Creates the companion `.faproject` from Project → Create new project so the path override matches `PROJECT_NOTEBOARD_E2E_COMPANION_FAPROJECT`.
+ */
+async function createCompanionProjectForNoteboardIsolation (
   electron: ElectronApplication,
   appWin: Page
 ): Promise<void> {
-  await e2eSetNextProjectCreatePath(electron, PROJECT_BETA_FIXTURE_BASE)
+  await e2eSetNextProjectCreatePath(electron, PROJECT_NOTEBOARD_E2E_COMPANION_FAPROJECT)
   await openProjectMenu(appWin)
   await appWin.getByRole('menuitem', { name: projectMenu.items.newProject }).click()
   await expect(appWin.locator('#dialogNewProject-title')).toContainText(L_newProject.title)
-  await appWin.locator(`[data-test-locator="${selectorList.dialogNameInput}"]`).fill(PROJECT_BETA_DISPLAY_NAME)
+  await appWin.locator(`[data-test-locator="${selectorList.dialogNameInput}"]`).fill(
+    PROJECT_NOTEBOARD_E2E_COMPANION_DISPLAY_NAME
+  )
   await appWin.waitForTimeout(e2ePostTypingSettleMs)
   await appWin.locator(`[data-test-locator="${selectorList.dialogCreateBtn}"]`).click()
-  await e2eExpectFaActiveProjectStoreName(appWin, PROJECT_BETA_DISPLAY_NAME)
+  await e2eExpectFaActiveProjectStoreName(appWin, PROJECT_NOTEBOARD_E2E_COMPANION_DISPLAY_NAME)
   await expect(appWin.getByText(interpolateFaProjectSessionNotify(
     L_faProjectSession.notifyProjectCreated,
-    PROJECT_BETA_DISPLAY_NAME
+    PROJECT_NOTEBOARD_E2E_COMPANION_DISPLAY_NAME
   ))).toBeVisible()
   await dismissOpenMenus(appWin)
 }
 
-async function loadAlphaViaMenuLoadProject (electronApp: ElectronApplication, appWin: Page): Promise<void> {
-  await e2eSetNextProjectOpenPath(electronApp, PROJECT_ALPHA_FIXTURE_BASE)
+async function loadBaselineProjectViaMenu (electronApp: ElectronApplication, appWin: Page): Promise<void> {
+  await e2eSetNextProjectOpenPath(electronApp, PROJECT_NOTEBOARD_E2E_BASELINE_FAPROJECT)
   await openProjectMenu(appWin)
   await appWin.getByRole('menuitem', { name: projectMenu.items.loadProject }).click()
   await dismissOpenMenus(appWin)
-  await e2eExpectFaActiveProjectStoreName(appWin, PROJECT_ALPHA_DISPLAY_NAME)
+  await e2eExpectFaActiveProjectStoreName(appWin, PROJECT_NOTEBOARD_E2E_BASELINE_DISPLAY_NAME)
   await expect(appWin.getByText(interpolateFaProjectSessionNotify(
     L_faProjectSession.notifyProjectLoaded,
-    PROJECT_ALPHA_DISPLAY_NAME
+    PROJECT_NOTEBOARD_E2E_BASELINE_DISPLAY_NAME
   ))).toBeVisible()
 }
 
@@ -377,7 +389,7 @@ async function toggleProjectNoteboardFromMenu (appWin: Page): Promise<void> {
   await dismissOpenMenus(appWin)
 }
 
-test.describe.serial('Project noteboard E2E phase one (fresh isolation, geometry captured)', () => {
+test.describe.serial('Project noteboard E2E — fresh Playwright profile: resize, park geometry, persist notes, toggle window', () => {
   let electronApp: ElectronApplication
   let appWindow: Page
   let suiteTestInfo: TestInfo
@@ -388,8 +400,8 @@ test.describe.serial('Project noteboard E2E phase one (fresh isolation, geometry
     suiteTestInfo = testInfo
     const launched = await launchFaPlaywrightE2eAppWindow({
       afterIsolationResetBeforeLaunch (): void {
-        tryUnlinkE2eFaprojectFixture(PROJECT_ALPHA_FIXTURE_BASE)
-        tryUnlinkE2eFaprojectFixture(PROJECT_BETA_FIXTURE_BASE)
+        tryUnlinkE2eFaprojectFixture(PROJECT_NOTEBOARD_E2E_BASELINE_FAPROJECT)
+        tryUnlinkE2eFaprojectFixture(PROJECT_NOTEBOARD_E2E_COMPANION_FAPROJECT)
       },
       buildLaunchEnv (): Record<string, string> {
         return {
@@ -412,6 +424,9 @@ test.describe.serial('Project noteboard E2E phase one (fresh isolation, geometry
     })
   })
 
+  /**
+   * With no `.faproject` loaded, Toggle Project Noteboard must stay disabled because project-scoped UI has nothing to attach to.
+   */
   test('Project menu disables Toggle Project Noteboard until a project is active', async () => {
     await openProjectMenu(appWindow)
     const row = appWindow.getByRole('menuitem', {
@@ -423,21 +438,24 @@ test.describe.serial('Project noteboard E2E phase one (fresh isolation, geometry
     await dismissOpenMenus(appWindow)
   })
 
-  test('Alpha realm: shrink noteboard to minimum, park top-left, persist geometry and text samples; toggle survives hot hide', async () => {
-    await e2eSetNextProjectCreatePath(electronApp, PROJECT_ALPHA_FIXTURE_BASE)
+  /**
+   * Shrinks the floating window to minimum size, drags it to the top-left clamp, saves multi-line notes to the baseline SQLite file, then hides and reopens with the global shortcut and asserts geometry and text round-trip before Close.
+   */
+  test('Baseline project: minimum-size noteboard, parked top-left geometry, persisted textarea, survives toggle hide', async () => {
+    await e2eSetNextProjectCreatePath(electronApp, PROJECT_NOTEBOARD_E2E_BASELINE_FAPROJECT)
     await appWindow.locator(`[data-test-locator="${selectorList.splashNew}"]`).click()
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.dialogNameInput}"]`)
     ).toBeVisible()
     await appWindow.locator(`[data-test-locator="${selectorList.dialogNameInput}"]`).fill(
-      PROJECT_ALPHA_DISPLAY_NAME
+      PROJECT_NOTEBOARD_E2E_BASELINE_DISPLAY_NAME
     )
     await appWindow.waitForTimeout(e2ePostTypingSettleMs)
     await appWindow.locator(`[data-test-locator="${selectorList.dialogCreateBtn}"]`).click()
     await expect(appWindow.locator('[data-test-locator="mainLayout-activeProjectName"]')).toBeVisible({
       timeout: 20_000
     })
-    assertE2eFaprojectFixtureHasContentOnDisk(PROJECT_ALPHA_FIXTURE_BASE)
+    assertE2eFaprojectFixtureHasContentOnDisk(PROJECT_NOTEBOARD_E2E_BASELINE_FAPROJECT)
 
     await toggleProjectNoteboardFromMenu(appWindow)
     let frame = await waitForProjectNoteboardFrame(appWindow)
@@ -445,7 +463,7 @@ test.describe.serial('Project noteboard E2E phase one (fresh isolation, geometry
     await resizeFloatingFrameTowardMinSquare(appWindow, frame)
 
     const viewportLayout = await readExpectedFloatingOpenLayoutFromViewport(appWindow)
-    savedProjectAlphaParkedGeom = await dragMinFloaterToCorner(
+    savedBaselineParkedNoteboardGeom = await dragMinFloaterToCorner(
       appWindow,
       frame,
       selectorList.nbDrag,
@@ -459,7 +477,7 @@ test.describe.serial('Project noteboard E2E phase one (fresh isolation, geometry
     await appWindow.waitForTimeout(FLOATING_FRAME_PERSIST_SETTLE_MS)
 
     const editor = frame.locator(`[data-test-locator="${selectorList.nbEditor}"]`)
-    await fillProjectNoteboardEditorPersist(editor, PROJECT_ALPHA_NOTE_SAMPLE, appWindow)
+    await fillProjectNoteboardEditorPersist(editor, PROJECT_NOTEBOARD_E2E_BASELINE_NOTE_SAMPLE, appWindow)
 
     await appWindow.keyboard.press(FA_PLAYWRIGHT_PRESS_DEFAULT_TOGGLE_PROJECT_NOTEBOARD)
     await expect(
@@ -470,29 +488,52 @@ test.describe.serial('Project noteboard E2E phase one (fresh isolation, geometry
 
     await appWindow.keyboard.press(FA_PLAYWRIGHT_PRESS_DEFAULT_TOGGLE_PROJECT_NOTEBOARD)
     frame = await waitForProjectNoteboardFrame(appWindow)
-    await expect(frame.locator(`[data-test-locator="${selectorList.nbEditor}"]`)).toHaveValue(PROJECT_ALPHA_NOTE_SAMPLE, {
-      timeout: 15_000
-    })
+    await expect(frame.locator(`[data-test-locator="${selectorList.nbEditor}"]`)).toHaveValue(
+      PROJECT_NOTEBOARD_E2E_BASELINE_NOTE_SAMPLE,
+      {
+        timeout: 15_000
+      }
+    )
 
     const afterToggleParked = await readRoundedBoundingBoxForLocator(frame)
-    assertCloseToPx(afterToggleParked.x, savedProjectAlphaParkedGeom.x, 'alpha noteboard restored left after toggle hide', 5)
-    assertCloseToPx(afterToggleParked.y, savedProjectAlphaParkedGeom.y, 'alpha noteboard restored top after toggle hide', 5)
-    assertCloseToPx(afterToggleParked.w, savedProjectAlphaParkedGeom.w, 'alpha noteboard restored width after toggle hide', 5)
-    assertCloseToPx(afterToggleParked.h, savedProjectAlphaParkedGeom.h, 'alpha noteboard restored height after toggle hide', 5)
+    assertCloseToPx(
+      afterToggleParked.x,
+      savedBaselineParkedNoteboardGeom.x,
+      'baseline project noteboard restored left after toggle hide',
+      5
+    )
+    assertCloseToPx(
+      afterToggleParked.y,
+      savedBaselineParkedNoteboardGeom.y,
+      'baseline project noteboard restored top after toggle hide',
+      5
+    )
+    assertCloseToPx(
+      afterToggleParked.w,
+      savedBaselineParkedNoteboardGeom.w,
+      'baseline project noteboard restored width after toggle hide',
+      5
+    )
+    assertCloseToPx(
+      afterToggleParked.h,
+      savedBaselineParkedNoteboardGeom.h,
+      'baseline project noteboard restored height after toggle hide',
+      5
+    )
 
     await appWindow.locator(`[data-test-locator="${selectorList.nbCloseButton}"]`).click()
     await expect(appWindow.locator(`[data-test-locator="${selectorList.nbFrame}"]`)).toHaveCount(0, {
       timeout: 15_000
     })
 
-    assertE2eFaprojectFixtureHasContentOnDisk(PROJECT_ALPHA_FIXTURE_BASE)
+    assertE2eFaprojectFixtureHasContentOnDisk(PROJECT_NOTEBOARD_E2E_BASELINE_FAPROJECT)
   })
 })
 
 /**
- * Shares the warmed Playwright userData partition from phase one ('resetUserData' false) without deleting fixture files mid-suite.
+ * Cold-launches Electron again on the same Playwright `userData` (`resetUserData` false) without deleting the `.faproject` files written in the first serial group.
  */
-test.describe.serial('Project noteboard E2E phase two (cold restart, realm B then reload alpha persistence)', () => {
+test.describe.serial('Project noteboard E2E — cold restart: companion project notes do not overwrite baseline SQLite', () => {
   let electronApp: ElectronApplication
   let appWindow: Page
   let suiteTestInfo: TestInfo
@@ -522,13 +563,16 @@ test.describe.serial('Project noteboard E2E phase two (cold restart, realm B the
       electronApp,
       suiteTestInfo,
       afterClose (): void {
-        tryUnlinkE2eFaprojectFixture(PROJECT_ALPHA_FIXTURE_BASE)
-        tryUnlinkE2eFaprojectFixture(PROJECT_BETA_FIXTURE_BASE)
+        tryUnlinkE2eFaprojectFixture(PROJECT_NOTEBOARD_E2E_BASELINE_FAPROJECT)
+        tryUnlinkE2eFaprojectFixture(PROJECT_NOTEBOARD_E2E_COMPANION_FAPROJECT)
       }
     })
   })
 
-  test('Cold restart opens alpha, realm beta noteboard overlays different notes, reloading alpha restores parked geometry plus alpha corpus', async () => {
+  /**
+   * Opens the baseline `.faproject`, creates the companion project and saves different note text there, loads the baseline file again, and expects the baseline textarea and parked bounding box from the first serial group—not the companion strings.
+   */
+  test('Cold restart: baseline load, type notes on companion project, reload baseline restores parked frame and baseline notes only', async () => {
     await expect(
       appWindow.locator('.appHeader'),
       'Expect MainLayout chrome on the rewarmed profile.'
@@ -536,46 +580,70 @@ test.describe.serial('Project noteboard E2E phase two (cold restart, realm B the
       timeout: SPLASH_SHELL_TIMEOUT_MS
     })
 
-    await e2eSetNextProjectOpenPath(electronApp, PROJECT_ALPHA_FIXTURE_BASE)
+    await e2eSetNextProjectOpenPath(electronApp, PROJECT_NOTEBOARD_E2E_BASELINE_FAPROJECT)
     await appWindow.locator(`[data-test-locator="${selectorList.splashLoad}"]`).click()
-    await e2eExpectFaActiveProjectStoreName(appWindow, PROJECT_ALPHA_DISPLAY_NAME)
+    await e2eExpectFaActiveProjectStoreName(appWindow, PROJECT_NOTEBOARD_E2E_BASELINE_DISPLAY_NAME)
     await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
       L_faProjectSession.notifyProjectLoaded,
-      PROJECT_ALPHA_DISPLAY_NAME
+      PROJECT_NOTEBOARD_E2E_BASELINE_DISPLAY_NAME
     ))).toBeVisible()
 
-    await createBetaProjectViaMenu(electronApp, appWindow)
-    assertE2eFaprojectFixtureHasContentOnDisk(PROJECT_BETA_FIXTURE_BASE)
+    await createCompanionProjectForNoteboardIsolation(electronApp, appWindow)
+    assertE2eFaprojectFixtureHasContentOnDisk(PROJECT_NOTEBOARD_E2E_COMPANION_FAPROJECT)
 
     await toggleProjectNoteboardFromMenu(appWindow)
-    const betaFrame = await waitForProjectNoteboardFrame(appWindow)
-    const betaEditor = betaFrame.locator(`[data-test-locator="${selectorList.nbEditor}"]`)
-    await fillProjectNoteboardEditorPersist(betaEditor, PROJECT_BETA_NOTE_SAMPLE, appWindow)
+    const companionFrame = await waitForProjectNoteboardFrame(appWindow)
+    const companionEditor = companionFrame.locator(`[data-test-locator="${selectorList.nbEditor}"]`)
+    await fillProjectNoteboardEditorPersist(
+      companionEditor,
+      PROJECT_NOTEBOARD_E2E_COMPANION_NOTE_SAMPLE,
+      appWindow
+    )
 
-    await loadAlphaViaMenuLoadProject(electronApp, appWindow)
+    await loadBaselineProjectViaMenu(electronApp, appWindow)
     await appWindow.waitForTimeout(
       FLOATING_FRAME_PERSIST_SETTLE_MS +
         FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS +
         noteboardTextPersistSettleMs
     )
 
-    const alphaFrame = await waitForProjectNoteboardFrame(appWindow)
+    const baselineFrame = await waitForProjectNoteboardFrame(appWindow)
 
-    await expectActiveProjectNoteboardTextInDatabaseEventually(appWindow, PROJECT_ALPHA_NOTE_SAMPLE)
-    await expect(alphaFrame.locator(`[data-test-locator="${selectorList.nbEditor}"]`)).toHaveValue(
-      PROJECT_ALPHA_NOTE_SAMPLE,
+    await expectActiveProjectNoteboardTextInDatabaseEventually(appWindow, PROJECT_NOTEBOARD_E2E_BASELINE_NOTE_SAMPLE)
+    await expect(baselineFrame.locator(`[data-test-locator="${selectorList.nbEditor}"]`)).toHaveValue(
+      PROJECT_NOTEBOARD_E2E_BASELINE_NOTE_SAMPLE,
       {
         timeout: 15_000
       }
     )
 
-    const restored = await readRoundedBoundingBoxForLocator(alphaFrame)
-    assertCloseToPx(restored.x, savedProjectAlphaParkedGeom.x, 'alpha reloaded noteboard left', 6)
-    assertCloseToPx(restored.y, savedProjectAlphaParkedGeom.y, 'alpha reloaded noteboard top', 6)
-    assertCloseToPx(restored.w, savedProjectAlphaParkedGeom.w, 'alpha reloaded noteboard width', 6)
-    assertCloseToPx(restored.h, savedProjectAlphaParkedGeom.h, 'alpha reloaded noteboard height', 6)
+    const restored = await readRoundedBoundingBoxForLocator(baselineFrame)
+    assertCloseToPx(
+      restored.x,
+      savedBaselineParkedNoteboardGeom.x,
+      'baseline project noteboard left after reload',
+      6
+    )
+    assertCloseToPx(
+      restored.y,
+      savedBaselineParkedNoteboardGeom.y,
+      'baseline project noteboard top after reload',
+      6
+    )
+    assertCloseToPx(
+      restored.w,
+      savedBaselineParkedNoteboardGeom.w,
+      'baseline project noteboard width after reload',
+      6
+    )
+    assertCloseToPx(
+      restored.h,
+      savedBaselineParkedNoteboardGeom.h,
+      'baseline project noteboard height after reload',
+      6
+    )
 
-    await alphaFrame.locator(`[data-test-locator="${selectorList.nbCloseButton}"]`).click()
+    await baselineFrame.locator(`[data-test-locator="${selectorList.nbCloseButton}"]`).click()
     await expect(appWindow.locator(`[data-test-locator="${selectorList.nbFrame}"]`)).toHaveCount(0, {
       timeout: 15_000
     })

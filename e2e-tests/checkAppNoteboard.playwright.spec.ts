@@ -41,12 +41,12 @@ const noteboardWindowReadyMs = 30_000
 const noteboardTextPersistSettleMs = 900
 
 /**
- * Sample paragraphs saved in phase one and expected again after an app restart.
+ * Multi-line textarea fixture typed in the first serial group; expect the same string after an app restart before clearing it in the second group.
  */
-const phaseOneNoteSample =
-  'E2E app noteboard line one alpha.\n' +
-  'E2E app noteboard line two bravo.\n' +
-  'E2E app noteboard line three charlie.'
+const appNoteboardPersistedRoundTripSample =
+  'E2E app-wide noteboard persisted paragraph one.\n' +
+  'E2E app-wide noteboard persisted paragraph two.\n' +
+  'E2E app-wide noteboard persisted paragraph three.'
 
 /**
  * Object of string data selectors for the e2e
@@ -104,7 +104,7 @@ async function waitForNoteboardFloatingWindow (page: Page): Promise<void> {
   await expect(closeKeybind).toHaveText(toggleNoteboardKeybindParenText())
 }
 
-test.describe.serial('App noteboard E2E persistence phase one (fresh Playwright profile)', () => {
+test.describe.serial('App noteboard E2E — fresh Playwright profile: type notes and Close', () => {
   let electronApp: ElectronApplication
   let appWindow: Page
   let suiteTestInfo: TestInfo
@@ -138,12 +138,12 @@ test.describe.serial('App noteboard E2E persistence phase one (fresh Playwright 
 
   /**
    * Types sample notes while the floating window stays open long enough for debounced persistence, then hides the window via Close without clearing the textarea first.
-   * - Subsequent phases launch the real app shell again against the same on-disk isolated profile with no reset between launches.
+   * Later serial groups cold-start Electron again on the same isolated profile without resetting userData.
    */
   test('Open App noteboard, type sample notes, Close', async () => {
     await expect(
       appWindow.locator('.appHeader'),
-      'Menus live on MainLayout; phases must exercise the splash or home chrome.'
+      'Menus live on MainLayout; serial groups must reach splash or home chrome.'
     ).toBeVisible({
       timeout: 20_000
     })
@@ -156,7 +156,7 @@ test.describe.serial('App noteboard E2E persistence phase one (fresh Playwright 
     const frame = appWindow.locator(`[data-test-locator="${selectorList.frame}"]`)
     const editor = frame.locator(`[data-test-locator="${selectorList.editor}"]`)
     await editor.click()
-    await editor.fill(phaseOneNoteSample)
+    await editor.fill(appNoteboardPersistedRoundTripSample)
     await appWindow.waitForTimeout(noteboardTextPersistSettleMs)
 
     await frame.locator(`[data-test-locator="${selectorList.closeButton}"]`).click()
@@ -164,7 +164,7 @@ test.describe.serial('App noteboard E2E persistence phase one (fresh Playwright 
   })
 })
 
-test.describe.serial('App noteboard E2E persistence phase two (reuse profile, no isolation reset)', () => {
+test.describe.serial('App noteboard E2E — reuse profile: reopen persisted text, clear notes, Close', () => {
   let electronApp: ElectronApplication
   let appWindow: Page
   let suiteTestInfo: TestInfo
@@ -198,13 +198,13 @@ test.describe.serial('App noteboard E2E persistence phase two (reuse profile, no
   })
 
   /**
-   * After a cold start on the warmed profile from phase one the textarea replays persisted characters.
-   * - Clearing the textarea and allowing the debouncer to idle writes an empty string for the phase three reopen.
+   * After a cold start on the warmed profile, the textarea still shows the multi-line string from the first serial group.
+   * Clearing the editor and waiting for the debouncer persists an empty string so the next launch expects an empty textarea.
    */
   test('Reopen App noteboard and confirm persisted text, clear all notes, Close', async () => {
     await expect(
       appWindow.locator('.appHeader'),
-      'Menus live on MainLayout; phases must exercise the splash or home chrome.'
+      'Menus live on MainLayout; serial groups must reach splash or home chrome.'
     ).toBeVisible({
       timeout: 20_000
     })
@@ -215,7 +215,7 @@ test.describe.serial('App noteboard E2E persistence phase two (reuse profile, no
     const frame = appWindow.locator(`[data-test-locator="${selectorList.frame}"]`)
     const editor = frame.locator(`[data-test-locator="${selectorList.editor}"]`)
 
-    await expect(editor).toHaveValue(phaseOneNoteSample)
+    await expect(editor).toHaveValue(appNoteboardPersistedRoundTripSample)
 
     await editor.click()
     await appWindow.keyboard.press(getFaPlaywrightMonacoSelectAllPressString())
@@ -229,7 +229,7 @@ test.describe.serial('App noteboard E2E persistence phase two (reuse profile, no
   })
 })
 
-test.describe.serial('App noteboard E2E persistence phase three (reuse profile again, no isolation reset)', () => {
+test.describe.serial('App noteboard E2E — reuse profile again: empty editor stays empty after restart', () => {
   let electronApp: ElectronApplication
   let appWindow: Page
   let suiteTestInfo: TestInfo
@@ -263,12 +263,12 @@ test.describe.serial('App noteboard E2E persistence phase three (reuse profile a
   })
 
   /**
-   * A third cold start confirms the empty document from phase two remains empty when the Tools entry opens the chrome again.
+   * Third cold start: confirms the cleared textarea from the second serial group is still empty when Tools opens the noteboard again.
    */
   test('Reopen App noteboard confirms empty textarea', async () => {
     await expect(
       appWindow.locator('.appHeader'),
-      'Menus live on MainLayout; phases must exercise the splash or home chrome.'
+      'Menus live on MainLayout; serial groups must reach splash or home chrome.'
     ).toBeVisible({
       timeout: 20_000
     })

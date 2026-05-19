@@ -271,9 +271,9 @@ test.describe.serial('Custom Project CSS E2E — fresh Playwright profile: Monac
   })
 
   /**
-   * Walks the baseline `.faproject` through: new project, open Custom Project CSS, Monaco live preview (body zoom), Save to persist in SQLite, reopen and save an empty editor to clear stored CSS, then assert bridge reads back an empty string.
+   * Walks the baseline `.faproject` through: **Create new project**, open Custom Project CSS, Monaco live preview (body zoom), Save to persist in SQLite, reopen and save an empty editor to clear stored CSS, then assert bridge reads back an empty string.
    */
-  test('New project: Custom Project CSS live preview, Save persists body zoom to SQLite, then Save with empty editor clears stored CSS', async () => {
+  test('Create new project: Custom Project CSS live preview, Save persists body zoom to SQLite, then Save with empty editor clears stored CSS', async () => {
     await e2eSetNextProjectCreatePath(electronApp, PROJECT_STYLING_E2E_BASELINE_FAPROJECT)
     await appWindow.locator(`[data-test-locator="${selectorList.splashNew}"]`).click()
     await expect(
