@@ -24,6 +24,10 @@ export interface IFaLaunchFaPlaywrightElectronSerialSuiteWindowOptions {
   buildLaunchEnv: () => Record<string, string>
   readiness: TFaPlaywrightSerialSuiteReadiness
   renderDelayMs: number
+  /**
+   * Extra strings appended after packaged main-process entry (cold OS-open tests pass an absolute `.faproject` path).
+   */
+  electronLaunchAdditionalArgs?: readonly string[]
   electronMainJsPath?: string
   resetUserData?: boolean
   dismissStartupTips?: TFaPlaywrightDismissStartupTips
@@ -63,6 +67,7 @@ export async function launchFaPlaywrightElectronSerialSuiteWindow (
   appWindow: Page
 }> {
   const electronMainJsPath = options.electronMainJsPath ?? FA_ELECTRON_MAIN_JS_PATH
+  const electronLaunchAdditionalArgsBinding = options.electronLaunchAdditionalArgs ?? []
   const skipResetUserData = options.resetUserData === false
   const dismissTipsResolved = resolveDismissStartupTips(
     options.readiness,
@@ -85,7 +90,7 @@ export async function launchFaPlaywrightElectronSerialSuiteWindow (
   const recordVideoPartial = getFaPlaywrightElectronRecordVideoPartial(options.testInfo)
 
   const electronApp = await electron.launch({
-    args: [electronMainJsPath],
+    args: [electronMainJsPath, ...electronLaunchAdditionalArgsBinding],
     env: mergedEnv,
     ...recordVideoPartial
   })

@@ -39,6 +39,7 @@ export default defineConfig((ctx) => {
       'notify-defaults',
       'qmarkdown',
       'faProjectFailsafePathReply',
+      'faProjectOsOpen',
       'faRoutingEnv',
       'faE2eRendererProbes'
     ],
@@ -183,6 +184,15 @@ export default defineConfig((ctx) => {
       builder: {
         appId: 'fantasia-archive',
         productName: 'Fantasia Archive',
+        fileAssociations: [
+          {
+            description: 'Fantasia Archive project',
+            ext: 'faproject',
+            mimeType: 'application/x-fantasia-archive-project',
+            name: 'fantasia-archive-project',
+            role: 'Editor'
+          }
+        ],
         win: {
           icon: 'src-electron/icons/icon.ico'
         },
@@ -191,6 +201,9 @@ export default defineConfig((ctx) => {
         },
         flatpak: {
           // Keep in sync with .github/workflows/build.yml (flatpak install ...//VERSION).
+          mimeTypes: [
+            'application/x-fantasia-archive-project'
+          ],
           runtime: 'org.freedesktop.Platform',
           runtimeVersion: '23.08',
           sdk: 'org.freedesktop.Sdk'

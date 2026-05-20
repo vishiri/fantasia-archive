@@ -46,6 +46,14 @@ const {
   }
 })
 
+const registerFaProjectOsOpenMainWindowMock = vi.hoisted(() => vi.fn())
+
+vi.mock('app/src-electron/mainScripts/projectManagement/faProjectOsOpenDelivery', () => {
+  return {
+    registerFaProjectOsOpenMainWindow: registerFaProjectOsOpenMainWindowMock
+  }
+})
+
 vi.mock('electron', () => {
   return {
     BrowserWindow: BrowserWindowMock,
@@ -75,6 +83,7 @@ vi.mock('app/src-electron/mainScripts/userSettings/userSettingsStore', () => {
 })
 
 beforeEach(() => {
+  registerFaProjectOsOpenMainWindowMock.mockReset()
   BrowserWindowMock.mockReset()
   appMock.requestSingleInstanceLock.mockReset()
   appMock.requestSingleInstanceLock.mockReturnValue(true)
@@ -207,6 +216,7 @@ test('Test that the main window is created successfully', async () => {
 
   await mainWindowCreation()
 
+  expect(registerFaProjectOsOpenMainWindowMock).toHaveBeenCalledOnce()
   expect(BrowserWindowMock).toHaveBeenCalledOnce()
   expect(BrowserWindowMock.mock.calls[0][0]).toMatchObject({
     frame: false,
@@ -276,6 +286,7 @@ test('Test that main window creation does not open DevTools when DEBUGGING is un
 
   await mainWindowCreation()
 
+  expect(registerFaProjectOsOpenMainWindowMock).toHaveBeenCalledOnce()
   expect(browserWindowInstance.webContents.openDevTools).not.toHaveBeenCalled()
 })
 
@@ -309,6 +320,8 @@ test('Test that main window creation throws when DEV is set but APP_URL is missi
   Reflect.deleteProperty(process.env, 'APP_URL')
 
   await expect(mainWindowCreation()).rejects.toThrow('APP_URL must be set when DEV is set')
+
+  expect(registerFaProjectOsOpenMainWindowMock).toHaveBeenCalledOnce()
 })
 
 /**
@@ -341,6 +354,7 @@ test('Test that production window uses the app:// scheme for index.html', async 
 
   await mainWindowCreation()
 
+  expect(registerFaProjectOsOpenMainWindowMock).toHaveBeenCalledOnce()
   expect(browserWindowInstance.loadURL).toHaveBeenCalledWith('app://./index.html')
   expect(browserWindowInstance.loadFile).not.toHaveBeenCalled()
 })
@@ -375,6 +389,7 @@ test('Test that main window preload path uses Quasar defaults when preload env v
 
   await mainWindowCreation()
 
+  expect(registerFaProjectOsOpenMainWindowMock).toHaveBeenCalledOnce()
   const windowOpts = BrowserWindowMock.mock.calls[0][0] as {
     webPreferences: { preload: string }
   }
@@ -418,6 +433,7 @@ test('Test that ready-to-show and delayed maximize no-op after closed when appWi
   vi.useFakeTimers()
   await mainWindowCreation()
 
+  expect(registerFaProjectOsOpenMainWindowMock).toHaveBeenCalledOnce()
   onceHandlers['ready-to-show']()
   expect(browserWindowInstance.maximize).toHaveBeenCalledTimes(1)
 
@@ -463,6 +479,7 @@ test('Test that ready-to-show no-ops when appWindow is undefined before the hand
 
   await mainWindowCreation()
 
+  expect(registerFaProjectOsOpenMainWindowMock).toHaveBeenCalledOnce()
   assignAppWindowRefForTesting(undefined)
   onceHandlers['ready-to-show']()
 

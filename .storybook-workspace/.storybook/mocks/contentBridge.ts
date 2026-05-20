@@ -205,6 +205,10 @@ const baseBridge = () => {
     faProjectFailsafe: {
       installActiveProjectPathReply: () => undefined
     },
+    faProjectOsOpen: {
+      installOsOpenListener: () => undefined,
+      sendRendererReady: () => undefined
+    },
     projectManagement: {
       createProject: async (_input: I_faProjectCreateInput): Promise<I_faProjectCreateResult> => ({
         outcome: 'canceled'
@@ -287,6 +291,10 @@ export const setContentBridgeScenario = (
     faProjectFailsafe: {
       ...nextBridge.faProjectFailsafe,
       ...(overrides.faProjectFailsafe ?? {})
+    },
+    faProjectOsOpen: {
+      ...nextBridge.faProjectOsOpen,
+      ...(overrides.faProjectOsOpen ?? {})
     },
     projectManagement: {
       ...nextBridge.projectManagement,

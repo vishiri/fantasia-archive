@@ -17,6 +17,7 @@ import { faAppNoteboardAPI } from 'app/src-electron/contentBridgeAPIs/faAppNoteb
 import { faAppStylingAPI } from 'app/src-electron/contentBridgeAPIs/faAppStylingAPI'
 import { faAppConfigAPI } from 'app/src-electron/contentBridgeAPIs/faAppConfigAPI'
 import { faProjectFailsafeAPI } from 'app/src-electron/contentBridgeAPIs/faProjectFailsafeAPI'
+import { faProjectOsOpenAPI } from 'app/src-electron/contentBridgeAPIs/faProjectOsOpenAPI'
 import { faUserSettingsAPI } from './contentBridgeAPIs/faUserSettingsAPI'
 import { projectManagementAPI } from 'app/src-electron/contentBridgeAPIs/projectManagementAPI'
 
@@ -37,6 +38,7 @@ const apiObject = {
   faUserSettings: { ...faUserSettingsAPI },
   faAppConfig: { ...faAppConfigAPI },
   faProjectFailsafe: { ...faProjectFailsafeAPI },
+  faProjectOsOpen: { ...faProjectOsOpenAPI },
   projectManagement: { ...projectManagementAPI }
 }
 

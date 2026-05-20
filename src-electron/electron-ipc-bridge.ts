@@ -91,3 +91,11 @@ export const FA_PROJECT_FAILSAFE_IPC = {
   /** Renderer → main: payload '{ correlationId: string, filePath: string | null }' */
   replyActiveProjectPathToMain: 'fa-project-failsafe-reply-active-path'
 } as const
+
+/**
+ * OS file-open → renderer: main 'webContents.send'; renderer boot 'ipcRenderer.send' when listeners are wired.
+ */
+export const FA_PROJECT_OS_OPEN_IPC = {
+  openFromOsToRenderer: 'fa-project-os-open-from-os-to-renderer',
+  rendererReadyToMain: 'fa-project-os-open-renderer-ready-to-main'
+} as const

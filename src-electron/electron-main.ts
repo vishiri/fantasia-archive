@@ -3,6 +3,7 @@ import { suppressChromiumDevtoolsAutofillStderrNoise } from 'app/src-electron/ma
 suppressChromiumDevtoolsAutofillStderrNoise()
 
 import { fixAppName } from 'app/src-electron/mainScripts/appIdentity/fixAppName'
+import { installFaProjectOsOpenListeners } from 'app/src-electron/mainScripts/projectManagement/faProjectOsOpenDelivery'
 import { windowsDevToolsExtensionsFix } from 'app/src-electron/mainScripts/chromiumFixes/windowsDevToolsExtensionsFix'
 import { startApp, openAppWindowManager, closeAppManager } from 'app/src-electron/mainScripts/appManagement'
 import { setupFaAppProtocol } from 'app/src-electron/mainScripts/appProtocol/registerFaAppProtocol'
@@ -14,6 +15,8 @@ const platform = tweakRetriveOS()
 
 // Fix app name and connected pathing to it
 fixAppName()
+
+installFaProjectOsOpenListeners()
 
 // Fix Windows-only DevTools-bug concerning dark mode
 windowsDevToolsExtensionsFix(platform)

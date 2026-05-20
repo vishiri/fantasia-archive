@@ -150,6 +150,10 @@ function resetFaVitestRendererHarness (): void {
     faProjectFailsafe: {
       installActiveProjectPathReply: vi.fn()
     },
+    faProjectOsOpen: {
+      installOsOpenListener: vi.fn(),
+      sendRendererReady: vi.fn()
+    },
     projectManagement: {
       createProject: vi.fn(async () => ({ outcome: 'canceled' as const })),
       getProjectNoteboard: vi.fn(async () => ({

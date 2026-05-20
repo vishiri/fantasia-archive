@@ -42,7 +42,9 @@ const selectorList = {
   submenuItemSubMenuItem: 'AppControlSingleMenu-menuItem-subMenu-item',
   submenuItemSubMenuItemText: 'AppControlSingleMenu-menuItem-subMenu-item-text',
   splashLoad: 'splashPage-btn-load',
-  splashNew: 'splashPage-btn-new'
+  splashNew: 'splashPage-btn-new',
+  splashResumeLatest: 'splashPage-btn-resume-latest',
+  splashResumeMenu: 'splashPage-resumeMenu'
 } as const
 
 /** Quasar menu open / nested submenu animation slack (see AppControlSingleMenu Playwright specs). */
@@ -96,6 +98,52 @@ function expectedRecentCapLabelsAfterMissingFilePruned (): string[] {
 async function dismissOpenMenus (page: Page): Promise<void> {
   await page.keyboard.press('Escape')
   await page.waitForTimeout(150)
+}
+
+/**
+ * Clears renderer Pinia active-project session while preserving MRU (matches Project menu MRU regression coverage).
+ */
+async function clearActiveProjectViaSpellcheckLanguageRoundTrip (page: Page): Promise<void> {
+  await page.locator(`[data-test-locator="${selectorList.globalLanguageSelectorTrigger}"]`).click()
+  await page.locator(`[data-test-locator="${selectorList.globalLanguageSelectorOptionDe}"]`).click()
+  await expect(page.locator('[data-test-locator="globalLanguageSelector-root"]')).toHaveAttribute(
+    'data-test-active-language-code',
+    'de',
+    { timeout: 15_000 }
+  )
+
+  await page.locator(`[data-test-locator="${selectorList.globalLanguageSelectorTrigger}"]`).click()
+  await page.locator(`[data-test-locator="${selectorList.globalLanguageSelectorOptionEnUs}"]`).click()
+  await expect(page.locator('[data-test-locator="globalLanguageSelector-root"]')).toHaveAttribute(
+    'data-test-active-language-code',
+    'en-US',
+    { timeout: 15_000 }
+  )
+
+  await expect(
+    page.locator(`[data-test-locator="${selectorList.globalLanguageSelectorSpellcheckRefresh}"]`)
+  ).toBeVisible({ timeout: 10_000 })
+  await page.locator(`[data-test-locator="${selectorList.globalLanguageSelectorSpellcheckRefresh}"]`).click()
+  await page.waitForTimeout(FA_FRONTEND_RENDER_TIMER)
+}
+
+async function openSplashResumeDropdown (page: Page): Promise<void> {
+  await dismissOpenMenus(page)
+  await page.locator(`[data-test-locator="${selectorList.splashResumeLatest}"] .q-btn-dropdown__arrow-container`).click()
+  await page.waitForTimeout(MENU_ANIMATION_MS)
+}
+
+async function expectSplashResumeDropdownLabelsOrdered (
+  page: Page,
+  expectedLabelsNewestFirst: readonly string[]
+): Promise<void> {
+  const menuRoot = page.locator(`[data-test-locator="${selectorList.splashResumeMenu}"]`)
+  await expect(menuRoot).toBeVisible()
+  for (let i = 0; i < expectedLabelsNewestFirst.length; i++) {
+    const row = page.locator(`[data-test-locator="splashPage-recentProject-${String(i)}"]`)
+    await expect(row).toBeVisible()
+    await expect(row.locator('.q-item__label').first()).toHaveText(expectedLabelsNewestFirst[i]!)
+  }
 }
 
 async function openProjectMenu (page: Page): Promise<void> {
@@ -321,6 +369,52 @@ test.describe.serial('Project management flow', () => {
   })
 
   /**
+   * Splash **Resume Latest Project** split lists MRU newest-first in its dropdown; after clearing the renderer session,
+   * the primary segment reloads MRU head and an alternate row loads another recent entry.
+   */
+  test('splash Resume Latest split dropdown lists MRU and loads entries after spellcheck-clear reset', async () => {
+    await expect(appWindow.locator(`[data-test-locator="${selectorList.splashResumeLatest}"]`)).toBeVisible()
+
+    await openSplashResumeDropdown(appWindow)
+    await expectSplashResumeDropdownLabelsOrdered(appWindow, [
+      E2E_PROJECT_DISPLAY_MENU_NEW,
+      E2E_PROJECT_DISPLAY_SPLASH_NEW
+    ])
+    await dismissOpenMenus(appWindow)
+
+    await clearActiveProjectViaSpellcheckLanguageRoundTrip(appWindow)
+    await e2eExpectFaActiveProjectStoreEmpty(appWindow)
+
+    await expect(appWindow.locator(`[data-test-locator="${selectorList.splashResumeLatest}"]`)).toBeVisible()
+    await appWindow.locator(`[data-test-locator="${selectorList.splashResumeLatest}"] .q-btn-dropdown--current`).click()
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_MENU_NEW)
+    await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
+      L_faProjectSession.notifyProjectLoaded,
+      E2E_PROJECT_DISPLAY_MENU_NEW
+    ))).toBeVisible()
+
+    await openSplashResumeDropdown(appWindow)
+    await expectSplashResumeDropdownLabelsOrdered(appWindow, [
+      E2E_PROJECT_DISPLAY_MENU_NEW,
+      E2E_PROJECT_DISPLAY_SPLASH_NEW
+    ])
+
+    await appWindow.locator('[data-test-locator="splashPage-recentProject-1"]').click()
+    await dismissOpenMenus(appWindow)
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_SPLASH_NEW)
+    await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
+      L_faProjectSession.notifyProjectLoaded,
+      E2E_PROJECT_DISPLAY_SPLASH_NEW
+    ))).toBeVisible()
+
+    await openProjectMenu(appWindow)
+    await openLoadRecentSubmenu(appWindow)
+    await appWindow.getByRole('menuitem', { name: E2E_PROJECT_DISPLAY_MENU_NEW }).click()
+    await dismissOpenMenus(appWindow)
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_MENU_NEW)
+  })
+
+  /**
    * **Load recent project**: MRU order matches the session, opens reorder the list, the active file cannot be opened again from the list,
    * spellcheck refresh after a language round-trip clears the main-process session, and the top MRU entry loads again cleanly.
    */
@@ -369,27 +463,7 @@ test.describe.serial('Project management flow', () => {
       appWindow.getByText(L_faProjectSession.openRejectedAlreadyActive).first()
     ).toBeVisible()
 
-    await appWindow.locator(`[data-test-locator="${selectorList.globalLanguageSelectorTrigger}"]`).click()
-    await appWindow.locator(`[data-test-locator="${selectorList.globalLanguageSelectorOptionDe}"]`).click()
-    await expect(appWindow.locator('[data-test-locator="globalLanguageSelector-root"]')).toHaveAttribute(
-      'data-test-active-language-code',
-      'de',
-      { timeout: 15_000 }
-    )
-
-    await appWindow.locator(`[data-test-locator="${selectorList.globalLanguageSelectorTrigger}"]`).click()
-    await appWindow.locator(`[data-test-locator="${selectorList.globalLanguageSelectorOptionEnUs}"]`).click()
-    await expect(appWindow.locator('[data-test-locator="globalLanguageSelector-root"]')).toHaveAttribute(
-      'data-test-active-language-code',
-      'en-US',
-      { timeout: 15_000 }
-    )
-
-    await expect(
-      appWindow.locator(`[data-test-locator="${selectorList.globalLanguageSelectorSpellcheckRefresh}"]`)
-    ).toBeVisible({ timeout: 10_000 })
-    await appWindow.locator(`[data-test-locator="${selectorList.globalLanguageSelectorSpellcheckRefresh}"]`).click()
-    await appWindow.waitForTimeout(FA_FRONTEND_RENDER_TIMER)
+    await clearActiveProjectViaSpellcheckLanguageRoundTrip(appWindow)
 
     await e2eExpectFaActiveProjectStoreEmpty(appWindow)
     await expect(appWindow.locator('[data-test-locator="mainLayout-activeProjectName"]')).toHaveCount(0)

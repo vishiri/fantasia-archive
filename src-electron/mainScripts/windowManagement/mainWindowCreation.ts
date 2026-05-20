@@ -1,6 +1,7 @@
 import { BrowserWindow, app, screen } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { registerFaProjectOsOpenMainWindow } from 'app/src-electron/mainScripts/projectManagement/faProjectOsOpenDelivery'
 import { applyFaSpellCheckerLanguagesToSession } from 'app/src-electron/mainScripts/windowManagement/faSpellCheckerSession'
 import { registerFaMainWindowWebContentsSessionReset } from 'app/src-electron/mainScripts/windowManagement/faMainWindowWebContentsSessionReset'
 import { setupSpellChecker } from 'app/src-electron/mainScripts/windowManagement/spellChecker'
@@ -146,6 +147,8 @@ export const mainWindowCreation = async () => {
       spellcheck: true
     }
   })
+
+  registerFaProjectOsOpenMainWindow(appWindow)
 
   await loadAndWireMainWindow(appWindow)
 }

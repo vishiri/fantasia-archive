@@ -26,9 +26,7 @@ import {
 } from '../windowProjectStylingLifecycleWatches'
 
 beforeEach(() => {
-  vi.useFakeTimers({
-    shouldAdvanceTime: true
-  })
+  vi.useFakeTimers()
 })
 
 afterEach(() => {

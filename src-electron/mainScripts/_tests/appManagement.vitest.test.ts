@@ -18,7 +18,8 @@ const {
   installFaProjectFailsafePathReplyListenerMock,
   appMock,
   appOnHandlers,
-  ipcMainHandleMock
+  ipcMainHandleMock,
+  ipcMainOnMock
 } = vi.hoisted(() => {
   const handlers: Record<string, () => void> = {}
   return {
@@ -32,6 +33,7 @@ const {
     },
     getFaUserSettingsMock: vi.fn(),
     ipcMainHandleMock: vi.fn(),
+    ipcMainOnMock: vi.fn(),
     installFaProjectFailsafePathReplyListenerMock: vi.fn(),
     mainWindowCreationMock: vi.fn(),
     registerFaAppDetailsIpcMock: vi.fn(),
@@ -154,7 +156,8 @@ vi.mock('electron', () => {
   return {
     app: appMock,
     ipcMain: {
-      handle: ipcMainHandleMock
+      handle: ipcMainHandleMock,
+      on: ipcMainOnMock
     }
   }
 })
@@ -173,6 +176,7 @@ beforeEach(() => {
   registerFaKeybindsIpcMock.mockReset()
   registerFaAppConfigIpcMock.mockReset()
   installFaProjectFailsafePathReplyListenerMock.mockReset()
+  ipcMainOnMock.mockReset()
   registerFaProjectManagementIpcMock.mockReset()
   registerFaAppNoteboardIpcMock.mockReset()
   registerFaAppStylingIpcMock.mockReset()
@@ -199,6 +203,7 @@ test('Test that the electron app properly starts', () => {
   expect(registerFaKeybindsIpcMock).toHaveBeenCalledOnce()
   expect(registerFaAppConfigIpcMock).toHaveBeenCalledOnce()
   expect(installFaProjectFailsafePathReplyListenerMock).toHaveBeenCalledOnce()
+  expect(ipcMainOnMock).toHaveBeenCalledOnce()
   expect(registerFaProjectManagementIpcMock).toHaveBeenCalledOnce()
   expect(registerFaAppNoteboardIpcMock).toHaveBeenCalledOnce()
   expect(registerFaAppStylingIpcMock).toHaveBeenCalledOnce()

@@ -26,6 +26,7 @@ export async function launchFaPlaywrightE2eAppWindow (
   const dismissStartupTips = options.dismissStartupTips ?? 'auto'
   const testInfoBinding = options.testInfo
   const buildLaunchEnvBinding = options.buildLaunchEnv
+  const electronLaunchAdditionalArgsBinding = options.electronLaunchAdditionalArgs
   const renderDelayMsBinding = options.renderDelayMs
   const electronMainJsPathBinding = options.electronMainJsPath
   const resetUserDataBinding = options.resetUserData
@@ -37,6 +38,7 @@ export async function launchFaPlaywrightE2eAppWindow (
     beforeIsolationReset: beforeIsolationResetBinding,
     buildLaunchEnv: buildLaunchEnvBinding,
     dismissStartupTips,
+    electronLaunchAdditionalArgs: electronLaunchAdditionalArgsBinding,
     electronMainJsPath: electronMainJsPathBinding,
     readiness: 'e2e',
     renderDelayMs: renderDelayMsBinding,

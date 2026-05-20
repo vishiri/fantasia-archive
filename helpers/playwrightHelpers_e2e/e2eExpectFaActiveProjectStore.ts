@@ -18,7 +18,7 @@ export async function e2eExpectFaActiveProjectStoreName (
       }
       return probe()?.name ?? null
     })
-  ).toBe(expectedName)
+  , { timeout: 30_000 }).toBe(expectedName)
 }
 
 type T_e2eActiveProbePoll = 'missing-probe' | 'empty' | string

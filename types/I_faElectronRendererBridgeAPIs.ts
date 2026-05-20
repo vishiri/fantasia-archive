@@ -153,3 +153,11 @@ export interface I_extraEnvVariablesBridge {
 export interface I_faProjectFailsafeAPI {
   installActiveProjectPathReply: (getActiveProjectFilePath: () => string | null) => void
 }
+
+/**
+ * OS double-click / open-with → main forwards absolute '.faproject' path after app UI is ready.
+ */
+export interface I_faProjectOsOpenAPI {
+  installOsOpenListener: (onOpen: (filePath: string) => void) => void
+  sendRendererReady: () => void
+}

@@ -4,7 +4,8 @@ import type {
   I_faDevToolsControl,
   I_faExternalLinksManagerAPI,
   I_faWindowControlAPI,
-  I_faProjectFailsafeAPI
+  I_faProjectFailsafeAPI,
+  I_faProjectOsOpenAPI
 } from 'app/types/I_faElectronRendererBridgeAPIs'
 import type { I_faKeybindsAPI } from 'app/types/I_faKeybindsDomain'
 import type { I_faAppNoteboardAPI } from 'app/types/I_faAppNoteboardDomain'
@@ -32,6 +33,7 @@ declare global{
       faUserSettings: I_faUserSettingsAPI,
       faAppConfig: I_faAppConfigAPI,
       faProjectFailsafe: I_faProjectFailsafeAPI,
+      faProjectOsOpen: I_faProjectOsOpenAPI,
       projectManagement: I_faProjectManagementAPI
     }
   }
