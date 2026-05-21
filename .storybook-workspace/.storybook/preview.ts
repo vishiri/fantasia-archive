@@ -130,7 +130,7 @@ setup((app) => {
   /**
    * The preview iframe may not expose '#storybook-root' on the first frame, and static builds can
    * omit a reliable 'process.env.MODE' value. Mark the canvas explicitly so helpers like
-   * 'isFantasiaStorybookCanvas()' match production Storybook while MainLayout still hides chrome.
+   * 'isFantasiaStorybookCanvas()' match production Storybook while MainLayout hides language chrome on the canvas.
    */
   setFantasiaStorybookCanvasFlag(true)
 

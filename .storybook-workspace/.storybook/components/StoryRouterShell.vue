@@ -1,10 +1,11 @@
 <template>
-  <router-view />
+  <router-view v-if="storyRouterReady" />
 </template>
 
 <script setup lang="ts">
-import { getCurrentInstance, watch } from 'vue'
-import { createMemoryHistory, createRouter } from 'vue-router'
+import type { App } from 'vue'
+import { getCurrentInstance, ref, watch } from 'vue'
+import { createMemoryHistory, createRouter, type Router } from 'vue-router'
 
 import { STORYBOOK_APP_ROUTES } from '../storybookAppRoutes'
 
@@ -16,9 +17,9 @@ const props = withDefaults(
   { initialPath: '/' }
 )
 
-const inst = getCurrentInstance()
-if (inst != null) {
-  const app = inst.appContext.app
+const storyRouterReady = ref(false)
+
+function resolveStoryRouter (app: App): Router {
   const g = app.config.globalProperties
 
   if (g.$router == null) {
@@ -27,24 +28,31 @@ if (inst != null) {
       routes: STORYBOOK_APP_ROUTES
     })
     app.use(router)
-    void router.replace(props.initialPath)
-  } else {
-    const existing = g.$router as { replace: (loc: string) => Promise<unknown> }
-    void existing.replace(props.initialPath)
+    return router
   }
+
+  return g.$router as Router
 }
+
+async function navigateStoryRouter (path: string): Promise<void> {
+  const inst = getCurrentInstance()
+  if (inst == null) {
+    return
+  }
+
+  const router = resolveStoryRouter(inst.appContext.app)
+  storyRouterReady.value = false
+  await router.replace(path)
+  await router.isReady()
+  storyRouterReady.value = true
+}
+
+void navigateStoryRouter(props.initialPath)
 
 watch(
   () => props.initialPath,
   (path) => {
-    const inst2 = getCurrentInstance()
-    if (inst2 == null) return
-    const router = inst2.appContext.config.globalProperties.$router as
-      | { replace: (loc: string) => Promise<unknown> }
-      | undefined
-    if (router != null) {
-      void router.replace(path)
-    }
+    void navigateStoryRouter(path)
   }
 )
 </script>

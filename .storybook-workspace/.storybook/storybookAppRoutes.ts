@@ -35,9 +35,6 @@ export const STORYBOOK_APP_ROUTES: RouteRecordRaw[] = [
     children: [{
       path: '',
       name: 'storybook-splash',
-      meta: {
-        faMainLayoutHideDrawer: true
-      },
       component: SplashPage
     }]
   },
@@ -70,6 +67,11 @@ export const STORYBOOK_APP_ROUTES: RouteRecordRaw[] = [
   },
   {
     path: '/error-not-found',
-    component: ErrorNotFound
+    component: MainLayout,
+    children: [{
+      path: '',
+      name: 'storybook-error-not-found',
+      component: ErrorNotFound
+    }]
   }
 ]
