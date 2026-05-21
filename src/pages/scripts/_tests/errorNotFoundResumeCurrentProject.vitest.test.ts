@@ -13,7 +13,8 @@ test('Test that errorNotFoundResumeCurrentProjectClick dispatches loadExistingPr
 
   errorNotFoundResumeCurrentProjectClick('C:\\Projects\\demo.faproject')
   expect(runFaActionMock).toHaveBeenCalledWith('loadExistingProject', {
-    filePath: 'C:\\Projects\\demo.faproject'
+    filePath: 'C:\\Projects\\demo.faproject',
+    resumeActiveSession: true
   })
 
   runFaActionMock.mockRestore()

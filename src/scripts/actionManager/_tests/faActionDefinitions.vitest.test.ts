@@ -517,14 +517,43 @@ test('Test that loadExistingProject handler throws FaActionUserCanceledError whe
   expect(refreshRecentProjectsMock).toHaveBeenCalled()
 })
 
-test('Test that loadExistingProject handler skips notify when open flow reuses active project', async () => {
+test('Test that loadExistingProject handler shows warning notify when open flow reuses active project', async () => {
   openProjectFromKnownPathMock.mockResolvedValueOnce('reused')
   await (definitionFor('loadExistingProject').handler({
     filePath: 'C:\\r\\recent.faproject'
   }) as Promise<unknown>)
-  expect(Notify.create).not.toHaveBeenCalled()
+  expect(Notify.create).toHaveBeenCalledWith({
+    message: expect.stringMatching(
+      /globalFunctionality\.faProjectSession\.openRejectedAlreadyActive/
+    ),
+    type: 'warning'
+  })
   expect(refreshProjectNoteboardMock).not.toHaveBeenCalled()
   expect(refreshProjectStylingMock).not.toHaveBeenCalled()
+  expect(refreshRecentProjectsMock).toHaveBeenCalledOnce()
+})
+
+test('Test that loadExistingProject handler shows warning when user dialog flow reuses active project', async () => {
+  openProjectFromUserDialogMock.mockResolvedValueOnce('reused')
+  await (definitionFor('loadExistingProject').handler({}) as Promise<unknown>)
+  expect(openProjectFromUserDialogMock).toHaveBeenCalledOnce()
+  expect(Notify.create).toHaveBeenCalledWith({
+    message: expect.stringMatching(
+      /globalFunctionality\.faProjectSession\.openRejectedAlreadyActive/
+    ),
+    type: 'warning'
+  })
+  expect(refreshProjectNoteboardMock).not.toHaveBeenCalled()
+  expect(refreshProjectStylingMock).not.toHaveBeenCalled()
+})
+
+test('Test that loadExistingProject handler skips warning when resumeActiveSession is true on reuse', async () => {
+  openProjectFromKnownPathMock.mockResolvedValueOnce('reused')
+  await (definitionFor('loadExistingProject').handler({
+    filePath: 'C:\\r\\recent.faproject',
+    resumeActiveSession: true
+  }) as Promise<unknown>)
+  expect(Notify.create).not.toHaveBeenCalled()
   expect(refreshRecentProjectsMock).toHaveBeenCalledOnce()
 })
 

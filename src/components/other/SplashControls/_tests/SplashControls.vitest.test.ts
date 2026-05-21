@@ -1,9 +1,12 @@
 import { mount, flushPromises } from '@vue/test-utils'
 import { expect, test, vi } from 'vitest'
 
+import { i18n } from 'app/i18n/externalFileLoader'
 import * as faActionRun from 'app/src/scripts/actionManager/faActionManagerRun'
+import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 
 import SplashControls from '../SplashControls.vue'
+import SplashControlsResumeDropdown from '../SplashControlsResumeDropdown.vue'
 
 /**
  * SplashControls
@@ -100,7 +103,10 @@ test('Test that resume-latest split loads MRU paths via faActionManager', async 
   expect(w.find('[data-test-locator="splashPage-recentProject-1"]').exists()).toBe(true)
 
   await w.get('[data-test-locator="splashPage-btn-resume-latest"]').trigger('click')
-  expect(spy).toHaveBeenCalledWith('loadExistingProject', { filePath: '/newest.faproject' })
+  expect(spy).toHaveBeenCalledWith('loadExistingProject', {
+    filePath: '/newest.faproject',
+    resumeActiveSession: true
+  })
 
   spy.mockClear()
 
@@ -108,6 +114,54 @@ test('Test that resume-latest split loads MRU paths via faActionManager', async 
   expect(spy).toHaveBeenCalledWith('loadExistingProject', { filePath: '/older.faproject' })
 
   spy.mockRestore()
+  w.unmount()
+})
+
+/**
+ * SplashControls
+ * Primary resume segment label and path follow the active session when one is loaded.
+ */
+test('Test that resume primary segment shows Resume Current Project and opens active path', async () => {
+  window.faContentBridgeAPIs.projectManagement.getRecentProjects = vi.fn(async () => {
+    return [
+      {
+        filePath: '/newest.faproject',
+        name: 'Newest'
+      }
+    ]
+  })
+
+  const tSpy = vi.spyOn(i18n.global, 't')
+  const actionSpy = vi.spyOn(faActionRun, 'runFaAction').mockImplementation(() => undefined)
+
+  const w = mount(SplashControlsResumeDropdown, {
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  S_FaActiveProject().setActiveProject({
+    filePath: '/active-session.faproject',
+    id: 'id-active',
+    name: 'Active Session'
+  })
+
+  await flushPromises()
+
+  expect(tSpy.mock.calls.some(([key]) => key === 'splashPage.resumeCurrentProject')).toBe(true)
+
+  await w.get('[data-test-locator="splashPage-btn-resume-latest"]').trigger('click')
+  expect(actionSpy).toHaveBeenCalledWith('loadExistingProject', {
+    filePath: '/active-session.faproject',
+    resumeActiveSession: true
+  })
+
+  tSpy.mockRestore()
+
+  actionSpy.mockRestore()
+  S_FaActiveProject().clearActiveProject()
   w.unmount()
 })
 

@@ -139,6 +139,38 @@ test('Test that createProjectFromUserInput sets activeProject on success', async
   expect(createProjectMock).toHaveBeenCalledWith({ projectName: ' Zed ' })
 })
 
+test('Test that createProjectFromUserInput navigates to workspace from a catch-all route', async () => {
+  faVitestRouterPath = '/not-found-route'
+  routerPushMock.mockReset()
+  createProjectMock.mockResolvedValueOnce({
+    outcome: 'created' as const,
+    project: {
+      filePath: 'C:\\404.faproject',
+      id: 'id-404',
+      name: 'From 404'
+    }
+  })
+  await store.createProjectFromUserInput('From 404')
+  await flushPromises()
+  expect(routerPushMock).toHaveBeenCalledWith({ path: '/home' })
+})
+
+test('Test that createProjectFromUserInput does not navigate away from component testing route', async () => {
+  faVitestRouterPath = '/componentTesting/FantasiaMascotImage'
+  routerPushMock.mockReset()
+  createProjectMock.mockResolvedValueOnce({
+    outcome: 'created' as const,
+    project: {
+      filePath: 'C:\\harness.faproject',
+      id: 'id-h',
+      name: 'Harness'
+    }
+  })
+  await store.createProjectFromUserInput('Harness')
+  await flushPromises()
+  expect(routerPushMock).not.toHaveBeenCalled()
+})
+
 /**
  * S_FaActiveProject / createProjectFromUserInput
  * Returns canceled without changing store.
@@ -197,6 +229,22 @@ test('Test that openProjectFromUserDialog sets activeProject on success', async 
     name: 'Opened Realm'
   })
   expect(openProjectMock).toHaveBeenCalledOnce()
+})
+
+test('Test that openProjectFromUserDialog navigates to workspace from a catch-all route', async () => {
+  faVitestRouterPath = '/bogus-path'
+  routerPushMock.mockReset()
+  openProjectMock.mockResolvedValueOnce({
+    outcome: 'opened' as const,
+    project: {
+      filePath: 'C:\\open-404.faproject',
+      id: 'id-o4',
+      name: 'Open from 404'
+    }
+  })
+  await store.openProjectFromUserDialog()
+  await flushPromises()
+  expect(routerPushMock).toHaveBeenCalledWith({ path: '/home' })
 })
 
 /**

@@ -28,6 +28,7 @@ vi.mock('app/src/stores/S_FaActiveProject', () => ({
 }))
 
 import {
+  notifyFaProjectAlreadyActiveWarning,
   notifyFaProjectCreatedPositive,
   notifyFaProjectLoadedPositive
 } from '../faProjectSessionNotify'
@@ -57,5 +58,17 @@ test('Test that notifyFaProjectLoadedPositive shows a positive Notify with proje
     message:
       'globalFunctionality.faProjectSession.notifyProjectLoaded|Stored',
     type: 'positive'
+  })
+})
+
+/**
+ * notifyFaProjectAlreadyActiveWarning
+ */
+test('Test that notifyFaProjectAlreadyActiveWarning shows a warning Notify with project label', () => {
+  notifyFaProjectAlreadyActiveWarning()
+  expect(Notify.create).toHaveBeenCalledWith({
+    message:
+      'globalFunctionality.faProjectSession.openRejectedAlreadyActive|Stored',
+    type: 'warning'
   })
 })

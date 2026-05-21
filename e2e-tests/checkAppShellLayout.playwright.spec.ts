@@ -9,16 +9,33 @@ import {
   expectFaPlaywrightE2eWorkspaceShell
 } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppShellAssertions'
 import {
+  FA_PLAYWRIGHT_E2E_NONEXISTENT_ROUTE_PATH,
+  gotoFaPlaywrightE2eNonexistentRouteFor404
+} from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eNavigate404'
+import {
   navigateFaPlaywrightE2eToHomeRoute,
   navigateFaPlaywrightE2eToSplashRoute,
   waitForFaPlaywrightE2eAppShellPageTransitionIdle
 } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eNavigateHome'
-import { e2eSetNextProjectCreatePath } from 'app/helpers/playwrightHelpers_e2e/playwrightE2eProjectPaths'
+import {
+  expectFaPlaywrightE2eNoProjectSessionNotifyForName,
+  expectFaPlaywrightE2eProjectAlreadyActiveReuseAfter,
+  interpolateFaProjectSessionNotify
+} from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eProjectSessionNotify'
+import {
+  clickFaPlaywrightE2eSplashResumePrimarySegment,
+  expectFaPlaywrightE2eSplashResumePrimaryLabel
+} from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eSplashResume'
+import {
+  e2eSetNextProjectCreatePath,
+  e2eSetNextProjectOpenPath
+} from 'app/helpers/playwrightHelpers_e2e/playwrightE2eProjectPaths'
 import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import projectMenu from 'app/i18n/en-US/components/globals/AppControlMenus/L_project'
 import L_faProjectSession from 'app/i18n/en-US/globalFunctionality/L_faProjectSession'
 import L_ErrorNotFound from 'app/i18n/en-US/pages/L_ErrorNotFound'
+import L_splashPage from 'app/i18n/en-US/pages/L_splashPage'
 
 /**
  * Extra env settings to trigger E2E via Playwright (isolated userData).
@@ -39,21 +56,11 @@ const selectorList = {
   globalLanguageSelectorTrigger: 'globalLanguageSelector-trigger',
   mainLayout: 'mainLayout',
   nameInput: 'dialogNewProject-input-name',
-  splashNew: 'splashPage-btn-new'
+  splashNew: 'splashPage-btn-new',
+  splashResumeLatest: 'splashPage-btn-resume-latest'
 } as const
 
-/** Deliberately invalid hash route for ErrorNotFound E2E coverage. */
-const NONEXISTENT_ROUTE_PATH = '/this-route-does-not-exist-at-all-e2e-404'
-
 const E2E_SHELL_404_PROJECT_NAME = 'E2E shell 404 resume current project'
-
-async function gotoNonexistentRouteFor404 (page: Page): Promise<void> {
-  const currentUrl = page.url()
-  const hashIndex = currentUrl.indexOf('#')
-  const baseUrl = hashIndex >= 0 ? currentUrl.slice(0, hashIndex) : currentUrl
-  await page.goto(`${baseUrl}#${NONEXISTENT_ROUTE_PATH}`, { waitUntil: 'domcontentloaded' })
-  await waitForFaPlaywrightE2eAppShellPageTransitionIdle(page)
-}
 
 async function createE2eProjectFromSplashWelcome (
   page: Page,
@@ -132,7 +139,7 @@ test.describe.serial('App shell layout (MainLayout)', () => {
    * Unknown hash paths render ErrorNotFound under the same shell with menus and language switcher.
    */
   test('unknown route shows ErrorNotFound inside MainLayout chrome', async () => {
-    await gotoNonexistentRouteFor404(appWindow)
+    await gotoFaPlaywrightE2eNonexistentRouteFor404(appWindow)
 
     await expect(appWindow.locator(`[data-test-locator="${selectorList.mainLayout}"]`)).toBeVisible()
     await expect(appWindow.locator(`[data-test-locator="${selectorList.errorNotFoundPage}"]`)).toBeVisible()
@@ -153,7 +160,7 @@ test.describe.serial('App shell layout (MainLayout)', () => {
   })
 
   /**
-   * Loads a project, opens a nonsense URL, and uses Resume Current Project to return to the workspace quietly.
+   * Loads a project, opens a nonsense URL, and uses Resume Current Project to return to the workspace with already-active warning.
    */
   test('nonexistent route resume current project reopens active session', async () => {
     await createE2eProjectFromSplashWelcome(
@@ -163,8 +170,8 @@ test.describe.serial('App shell layout (MainLayout)', () => {
       E2E_SHELL_404_PROJECT_NAME
     )
 
-    await gotoNonexistentRouteFor404(appWindow)
-    await expectFaPlaywrightE2eHashRoute(appWindow, NONEXISTENT_ROUTE_PATH)
+    await gotoFaPlaywrightE2eNonexistentRouteFor404(appWindow)
+    await expectFaPlaywrightE2eHashRoute(appWindow, FA_PLAYWRIGHT_E2E_NONEXISTENT_ROUTE_PATH)
     await expect(appWindow.locator(`[data-test-locator="${selectorList.errorNotFoundPage}"]`)).toBeVisible()
     await expect(appWindow.locator(`[data-test-locator="${selectorList.errorCardTitle}"]`)).toHaveText(
       L_ErrorNotFound.title
@@ -199,7 +206,65 @@ test.describe.serial('App shell layout (MainLayout)', () => {
       E2E_SHELL_404_PROJECT_NAME
     )
     await e2eExpectFaActiveProjectStoreName(appWindow, E2E_SHELL_404_PROJECT_NAME)
-    await expect(appWindow.getByText(L_faProjectSession.notifyProjectLoaded)).toHaveCount(0)
-    await expect(appWindow.getByText(L_faProjectSession.openRejectedAlreadyActive)).toHaveCount(0)
+    await expectFaPlaywrightE2eNoProjectSessionNotifyForName(appWindow, E2E_SHELL_404_PROJECT_NAME)
+  })
+
+  /**
+   * Welcome splash shows Resume Current Project when a session is active; primary segment reopens workspace quietly.
+   */
+  test('welcome splash resume current project reopens workspace without warning toast', async () => {
+    await createE2eProjectFromSplashWelcome(
+      appWindow,
+      electronApp,
+      'e2e-shell-splash-resume-current.faproject',
+      'E2E shell splash resume current project'
+    )
+
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
+    await expect(appWindow.locator(`[data-test-locator="${selectorList.splashResumeLatest}"]`)).toBeVisible()
+    await expectFaPlaywrightE2eSplashResumePrimaryLabel(appWindow, L_splashPage.resumeCurrentProject)
+
+    await clickFaPlaywrightE2eSplashResumePrimarySegment(appWindow)
+    await expectFaPlaywrightE2eNoProjectSessionNotifyForName(appWindow, 'E2E shell splash resume current project')
+    await expectFaPlaywrightE2eHashRoute(appWindow, '/home')
+    await expectFaPlaywrightE2eWorkspaceShell(appWindow)
+    await e2eExpectFaActiveProjectStoreName(appWindow, 'E2E shell splash resume current project')
+  })
+
+  /**
+   * Loading the active file from Project menu on a 404 route warns and navigates to workspace.
+   */
+  test('nonexistent route load existing project reuses active session with warning toast', async () => {
+    await createE2eProjectFromSplashWelcome(
+      appWindow,
+      electronApp,
+      'e2e-shell-404-load-reuse.faproject',
+      'E2E shell 404 load reuse project'
+    )
+
+    await gotoFaPlaywrightE2eNonexistentRouteFor404(appWindow)
+    await expectFaPlaywrightE2eHashRoute(appWindow, FA_PLAYWRIGHT_E2E_NONEXISTENT_ROUTE_PATH)
+
+    const loadedNotify = interpolateFaProjectSessionNotify(
+      L_faProjectSession.notifyProjectLoaded,
+      'E2E shell 404 load reuse project'
+    )
+    await e2eSetNextProjectOpenPath(electronApp, 'e2e-shell-404-load-reuse.faproject')
+    await expectFaPlaywrightE2eProjectAlreadyActiveReuseAfter(
+      appWindow,
+      'E2E shell 404 load reuse project',
+      loadedNotify,
+      async () => {
+        await appWindow.getByRole('button', {
+          exact: true,
+          name: projectMenu.title
+        }).click()
+        await appWindow.getByRole('menuitem', { name: projectMenu.items.loadProject }).click()
+      }
+    )
+
+    await e2eExpectFaActiveProjectStoreName(appWindow, 'E2E shell 404 load reuse project')
+    await expectFaPlaywrightE2eHashRoute(appWindow, '/home')
+    await expectFaPlaywrightE2eWorkspaceShell(appWindow)
   })
 })

@@ -1,6 +1,7 @@
 import { afterEach, expect, test, vi } from 'vitest'
 
 import {
+  isFaComponentTestingRoutePath,
   navigateToWorkspaceRouteForActiveProject,
   navigateToWorkspaceWhenOnWelcomeRoute,
   registerFaAppRouterSession,
@@ -21,6 +22,28 @@ afterEach(() => {
  */
 test('Test that navigateToWorkspaceRouteForActiveProject pushes home from welcome route', async () => {
   faVitestRouterPath = '/'
+  routerPushMock.mockReset()
+  registerFaAppRouterSession({
+    getCurrentPath (): string {
+      return faVitestRouterPath
+    },
+    push (payload): void {
+      faVitestRouterPath = payload.path
+      routerPushMock(payload)
+    }
+  })
+
+  await navigateToWorkspaceRouteForActiveProject()
+
+  expect(routerPushMock).toHaveBeenCalledWith({ path: '/home' })
+})
+
+/**
+ * faAppRouterSession
+ * navigateToWorkspaceRouteForActiveProject pushes home from an unknown route (404 catch-all).
+ */
+test('Test that navigateToWorkspaceRouteForActiveProject pushes home from a catch-all route', async () => {
+  faVitestRouterPath = '/this-route-does-not-exist'
   routerPushMock.mockReset()
   registerFaAppRouterSession({
     getCurrentPath (): string {
@@ -77,7 +100,41 @@ test('Test that resolveFaAppRouterCurrentPath returns welcome without a register
 
 /**
  * faAppRouterSession
- * navigateToWorkspaceWhenOnWelcomeRoute pushes home only from welcome.
+ * isFaComponentTestingRoutePath matches harness routes only.
+ */
+test('Test that isFaComponentTestingRoutePath matches component testing paths', () => {
+  expect(isFaComponentTestingRoutePath('/componentTesting')).toBe(true)
+  expect(isFaComponentTestingRoutePath('/componentTesting/FantasiaMascotImage')).toBe(true)
+  expect(isFaComponentTestingRoutePath('/')).toBe(false)
+  expect(isFaComponentTestingRoutePath('/home')).toBe(false)
+  expect(isFaComponentTestingRoutePath('/unknown')).toBe(false)
+})
+
+/**
+ * faAppRouterSession
+ * navigateToWorkspaceRouteForActiveProject skips push on component testing routes.
+ */
+test('Test that navigateToWorkspaceRouteForActiveProject skips push on component testing route', async () => {
+  faVitestRouterPath = '/componentTesting/FantasiaMascotImage'
+  routerPushMock.mockReset()
+  registerFaAppRouterSession({
+    getCurrentPath (): string {
+      return faVitestRouterPath
+    },
+    push (payload): void {
+      faVitestRouterPath = payload.path
+      routerPushMock(payload)
+    }
+  })
+
+  await navigateToWorkspaceRouteForActiveProject()
+
+  expect(routerPushMock).not.toHaveBeenCalled()
+})
+
+/**
+ * faAppRouterSession
+ * navigateToWorkspaceWhenOnWelcomeRoute delegates to workspace navigation from welcome.
  */
 test('Test that navigateToWorkspaceWhenOnWelcomeRoute pushes home from welcome route', async () => {
   faVitestRouterPath = '/'
