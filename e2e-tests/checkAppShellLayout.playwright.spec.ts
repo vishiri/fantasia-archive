@@ -1,6 +1,7 @@
 import type { ElectronApplication, Page } from 'playwright'
 import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
+import { e2eExpectFaActiveProjectStoreName } from 'app/helpers/playwrightHelpers_e2e/e2eExpectFaActiveProjectStore'
 import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
 import {
   expectFaPlaywrightE2eHashRoute,
@@ -9,11 +10,14 @@ import {
 } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppShellAssertions'
 import {
   navigateFaPlaywrightE2eToHomeRoute,
-  navigateFaPlaywrightE2eToSplashRoute
+  navigateFaPlaywrightE2eToSplashRoute,
+  waitForFaPlaywrightE2eAppShellPageTransitionIdle
 } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eNavigateHome'
+import { e2eSetNextProjectCreatePath } from 'app/helpers/playwrightHelpers_e2e/playwrightE2eProjectPaths'
 import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import projectMenu from 'app/i18n/en-US/components/globals/AppControlMenus/L_project'
+import L_faProjectSession from 'app/i18n/en-US/globalFunctionality/L_faProjectSession'
 import L_ErrorNotFound from 'app/i18n/en-US/pages/L_ErrorNotFound'
 
 /**
@@ -27,13 +31,46 @@ const extraEnvSettings = {
  * Object of string data selectors for the e2e
  */
 const selectorList = {
+  createBtn: 'dialogNewProject-button-create',
   errorCardTitle: 'errorCard-title',
   errorNotFoundPage: 'errorNotFoundPage',
+  errorNotFoundResumeCurrent: 'errorNotFound-btn-resume-current',
+  errorNotFoundReturnToStart: 'errorNotFound-btn-return-to-start',
   globalLanguageSelectorTrigger: 'globalLanguageSelector-trigger',
-  mainLayout: 'mainLayout'
+  mainLayout: 'mainLayout',
+  nameInput: 'dialogNewProject-input-name',
+  splashNew: 'splashPage-btn-new'
 } as const
 
-const UNKNOWN_ROUTE_PATH = '/e2e-unknown-route-for-404'
+/** Deliberately invalid hash route for ErrorNotFound E2E coverage. */
+const NONEXISTENT_ROUTE_PATH = '/this-route-does-not-exist-at-all-e2e-404'
+
+const E2E_SHELL_404_PROJECT_NAME = 'E2E shell 404 resume current project'
+
+async function gotoNonexistentRouteFor404 (page: Page): Promise<void> {
+  const currentUrl = page.url()
+  const hashIndex = currentUrl.indexOf('#')
+  const baseUrl = hashIndex >= 0 ? currentUrl.slice(0, hashIndex) : currentUrl
+  await page.goto(`${baseUrl}#${NONEXISTENT_ROUTE_PATH}`, { waitUntil: 'domcontentloaded' })
+  await waitForFaPlaywrightE2eAppShellPageTransitionIdle(page)
+}
+
+async function createE2eProjectFromSplashWelcome (
+  page: Page,
+  electronApplication: ElectronApplication,
+  fixtureBaseName: string,
+  displayName: string
+): Promise<void> {
+  await navigateFaPlaywrightE2eToSplashRoute(page)
+  await e2eSetNextProjectCreatePath(electronApplication, fixtureBaseName)
+  await page.locator(`[data-test-locator="${selectorList.splashNew}"]`).click()
+  await expect(page.locator(`[data-test-locator="${selectorList.nameInput}"]`)).toBeVisible()
+  await page.locator(`[data-test-locator="${selectorList.nameInput}"]`).fill(displayName)
+  await page.locator(`[data-test-locator="${selectorList.createBtn}"]`).click()
+  await e2eExpectFaActiveProjectStoreName(page, displayName)
+  await expectFaPlaywrightE2eHashRoute(page, '/home')
+  await expectFaPlaywrightE2eWorkspaceShell(page)
+}
 
 test.describe.serial('App shell layout (MainLayout)', () => {
   let electronApp: ElectronApplication
@@ -95,10 +132,7 @@ test.describe.serial('App shell layout (MainLayout)', () => {
    * Unknown hash paths render ErrorNotFound under the same shell with menus and language switcher.
    */
   test('unknown route shows ErrorNotFound inside MainLayout chrome', async () => {
-    const currentUrl = appWindow.url()
-    const hashIndex = currentUrl.indexOf('#')
-    const baseUrl = hashIndex >= 0 ? currentUrl.slice(0, hashIndex) : currentUrl
-    await appWindow.goto(`${baseUrl}#${UNKNOWN_ROUTE_PATH}`, { waitUntil: 'domcontentloaded' })
+    await gotoNonexistentRouteFor404(appWindow)
 
     await expect(appWindow.locator(`[data-test-locator="${selectorList.mainLayout}"]`)).toBeVisible()
     await expect(appWindow.locator(`[data-test-locator="${selectorList.errorNotFoundPage}"]`)).toBeVisible()
@@ -113,5 +147,59 @@ test.describe.serial('App shell layout (MainLayout)', () => {
       `[data-test-locator="${selectorList.globalLanguageSelectorTrigger}"]`
     )).toBeVisible()
     await expect(appWindow.locator('.appShellLayout--workspace')).toHaveCount(0)
+    await expect(appWindow.locator(
+      `[data-test-locator="${selectorList.errorNotFoundResumeCurrent}"]`
+    )).toHaveCount(0)
+  })
+
+  /**
+   * Loads a project, opens a nonsense URL, and uses Resume Current Project to return to the workspace quietly.
+   */
+  test('nonexistent route resume current project reopens active session', async () => {
+    await createE2eProjectFromSplashWelcome(
+      appWindow,
+      electronApp,
+      'e2e-shell-404-resume.faproject',
+      E2E_SHELL_404_PROJECT_NAME
+    )
+
+    await gotoNonexistentRouteFor404(appWindow)
+    await expectFaPlaywrightE2eHashRoute(appWindow, NONEXISTENT_ROUTE_PATH)
+    await expect(appWindow.locator(`[data-test-locator="${selectorList.errorNotFoundPage}"]`)).toBeVisible()
+    await expect(appWindow.locator(`[data-test-locator="${selectorList.errorCardTitle}"]`)).toHaveText(
+      L_ErrorNotFound.title
+    )
+
+    const resumeLocator = appWindow.locator(
+      `[data-test-locator="${selectorList.errorNotFoundResumeCurrent}"]`
+    )
+    const returnLocator = appWindow.locator(
+      `[data-test-locator="${selectorList.errorNotFoundReturnToStart}"]`
+    )
+    await expect(resumeLocator).toBeVisible()
+    await expect(resumeLocator).toHaveText(L_ErrorNotFound.resumeCurrentProject)
+    await expect(returnLocator).toBeVisible()
+    await expect(returnLocator).toHaveText(L_ErrorNotFound.ctaText)
+
+    const resumeBox = await resumeLocator.boundingBox()
+    const returnBox = await returnLocator.boundingBox()
+    expect(resumeBox).not.toBeNull()
+    expect(returnBox).not.toBeNull()
+    if (resumeBox !== null && returnBox !== null) {
+      expect(resumeBox.y).toBeLessThan(returnBox.y)
+    }
+
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_SHELL_404_PROJECT_NAME)
+    await resumeLocator.click()
+    await waitForFaPlaywrightE2eAppShellPageTransitionIdle(appWindow)
+
+    await expectFaPlaywrightE2eHashRoute(appWindow, '/home')
+    await expectFaPlaywrightE2eWorkspaceShell(appWindow)
+    await expect(appWindow.locator('[data-test-locator="mainLayout-activeProjectName"]')).toHaveText(
+      E2E_SHELL_404_PROJECT_NAME
+    )
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_SHELL_404_PROJECT_NAME)
+    await expect(appWindow.getByText(L_faProjectSession.notifyProjectLoaded)).toHaveCount(0)
+    await expect(appWindow.getByText(L_faProjectSession.openRejectedAlreadyActive)).toHaveCount(0)
   })
 })
