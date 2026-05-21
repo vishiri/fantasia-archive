@@ -28,3 +28,15 @@ export function notifyFaProjectLoadedPositive (): void {
     type: 'positive'
   })
 }
+
+export function notifyFaProjectAlreadyActiveWarning (): void {
+  const projectName = formatFaActiveProjectNotifyLabel(S_FaActiveProject().activeProject)
+  const message = i18n.global.t(
+    'globalFunctionality.faProjectSession.openRejectedAlreadyActive',
+    { projectName }
+  )
+  Notify.create({
+    message,
+    type: 'warning'
+  })
+}

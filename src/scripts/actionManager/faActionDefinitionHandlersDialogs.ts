@@ -15,6 +15,7 @@ import { canOpenAppNoteboardFloatingWindow } from 'app/src/scripts/appNoteboard/
 import { FaActionUserCanceledError } from 'app/src/scripts/actionManager/faActionUserCanceledError'
 import { buildFaActionPayloadPreview } from 'app/src/scripts/actionManager/faActionManagerErrorReporting'
 import {
+  notifyFaProjectAlreadyActiveWarning,
   notifyFaProjectCreatedPositive,
   notifyFaProjectLoadedPositive
 } from 'app/src/scripts/actionManager/faProjectSessionNotify'
@@ -145,6 +146,9 @@ export async function handleLoadExistingProject (
       notifyFaProjectLoadedPositive()
       await S_FaProjectNoteboard().refreshProjectNoteboard()
       await S_FaProjectStyling().refreshProjectStyling()
+    }
+    if (outcome === 'reused' && payload.resumeActiveSession !== true) {
+      notifyFaProjectAlreadyActiveWarning()
     }
     const snap = S_FaActiveProject().activeProject
     if (snap === null) {

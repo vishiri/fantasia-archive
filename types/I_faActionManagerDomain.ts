@@ -60,9 +60,11 @@ export type T_faActionKind = 'sync' | 'async'
 
 /**
  * Load existing project: omit filePath for the native picker; pass filePath to open a known path (recent list).
+ * resumeActiveSession: true for **Resume Current Project** (404) or splash **Resume Latest Project** primary segment — navigates without the already-active warning toast on idempotent reopen.
  */
 export interface I_faLoadExistingProjectPayload {
   filePath?: string
+  resumeActiveSession?: boolean
 }
 
 /**

@@ -10,5 +10,8 @@ export function errorNotFoundResumeCurrentProjectClick (
     return
   }
 
-  void runFaAction('loadExistingProject', { filePath })
+  void runFaAction('loadExistingProject', {
+    filePath,
+    resumeActiveSession: true
+  })
 }

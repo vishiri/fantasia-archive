@@ -4,8 +4,16 @@ import { isFantasiaStorybookCanvas } from 'app/src/scripts/appInternals/renderer
 
 const FA_WELCOME_ROUTE_PATH = '/'
 const FA_WORKSPACE_ROUTE_PATH = '/home'
+const FA_COMPONENT_TESTING_ROUTE_PREFIX = '/componentTesting/'
 
 let faAppRouterSession: I_appStartupRouter | null = null
+
+/**
+ * True when the path is the Playwright/component-harness layout (must not auto-navigate to workspace).
+ */
+export function isFaComponentTestingRoutePath (path: string): boolean {
+  return path === '/componentTesting' || path.startsWith(FA_COMPONENT_TESTING_ROUTE_PREFIX)
+}
 
 /**
  * Registers the live Vue Router instance for session navigation from Pinia stores and action handlers.
@@ -26,27 +34,7 @@ export function resolveFaAppRouterCurrentPath (): string {
 }
 
 /**
- * Moves from the welcome page to the workspace route when a project session becomes active on '/'.
- */
-export async function navigateToWorkspaceWhenOnWelcomeRoute (): Promise<void> {
-  if (isFantasiaStorybookCanvas()) {
-    return
-  }
-
-  const router = faAppRouterSession
-  if (router === null) {
-    return
-  }
-
-  if (resolveFaAppRouterCurrentPath() !== FA_WELCOME_ROUTE_PATH) {
-    return
-  }
-
-  await router.push({ path: FA_WORKSPACE_ROUTE_PATH })
-}
-
-/**
- * Navigates to the workspace route whenever a project is already active but the user is not on '/home' yet.
+ * Navigates to the workspace route when a project session becomes active, except on component-testing routes.
  */
 export async function navigateToWorkspaceRouteForActiveProject (): Promise<void> {
   if (isFantasiaStorybookCanvas()) {
@@ -58,9 +46,20 @@ export async function navigateToWorkspaceRouteForActiveProject (): Promise<void>
     return
   }
 
-  if (resolveFaAppRouterCurrentPath() === FA_WORKSPACE_ROUTE_PATH) {
+  const currentPath = resolveFaAppRouterCurrentPath()
+  if (currentPath === FA_WORKSPACE_ROUTE_PATH) {
+    return
+  }
+  if (isFaComponentTestingRoutePath(currentPath)) {
     return
   }
 
   await router.push({ path: FA_WORKSPACE_ROUTE_PATH })
+}
+
+/**
+ * @deprecated Prefer navigateToWorkspaceRouteForActiveProject; kept for boot registration smoke tests.
+ */
+export async function navigateToWorkspaceWhenOnWelcomeRoute (): Promise<void> {
+  await navigateToWorkspaceRouteForActiveProject()
 }

@@ -13,10 +13,10 @@
       outline
       split
       type="button"
-      :label="$t('splashPage.resumeLatestProject')"
+      :label="resumePrimarySegmentLabel"
       :menu-offset="[0, 0]"
       :toggle-aria-label="$t('splashPage.browseLatestProjects')"
-      @click="onResumeLatestProjectClick"
+      @click="onResumePrimarySegmentClick"
     >
       <q-list
         class="splashControlsResumeDropdown__resumeMenuList"
@@ -75,6 +75,7 @@ import { storeToRefs } from 'pinia'
 import { i18n } from 'app/i18n/externalFileLoader'
 
 import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
+import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 
 import { resolveSplashResumeDropdownArrowElement } from './scripts/resolveSplashResumeDropdownArrowElement'
@@ -86,11 +87,21 @@ defineOptions({
 const resumeDropdownRef = ref<ComponentPublicInstance | null>(null)
 const resumeDropdownArrowEl = ref<HTMLElement | null>(null)
 
+const activeProjectStore = S_FaActiveProject()
+const { activeProject } = storeToRefs(activeProjectStore)
+
 const recentProjectsStore = S_FaRecentProjects()
 const { entries: recentProjectEntries } = storeToRefs(recentProjectsStore)
 
 const hasRecentProjects = computed(() => {
   return recentProjectEntries.value.length > 0
+})
+
+const resumePrimarySegmentLabel = computed(() => {
+  if (activeProject.value !== null) {
+    return i18n.global.t('splashPage.resumeCurrentProject')
+  }
+  return i18n.global.t('splashPage.resumeLatestProject')
 })
 
 watch(
@@ -134,12 +145,24 @@ function onLoadRecentProjectByPath (filePath: string): void {
   void runFaAction('loadExistingProject', { filePath })
 }
 
-function onResumeLatestProjectClick (): void {
+function onResumePrimarySegmentClick (): void {
+  const sessionFilePath = activeProject.value?.filePath
+  if (sessionFilePath !== undefined && sessionFilePath.length > 0) {
+    void runFaAction('loadExistingProject', {
+      filePath: sessionFilePath,
+      resumeActiveSession: true
+    })
+    return
+  }
+
   const first = recentProjectEntries.value[0]
   if (first === undefined) {
     return
   }
-  onLoadRecentProjectByPath(first.filePath)
+  void runFaAction('loadExistingProject', {
+    filePath: first.filePath,
+    resumeActiveSession: true
+  })
 }
 
 onMounted(() => {

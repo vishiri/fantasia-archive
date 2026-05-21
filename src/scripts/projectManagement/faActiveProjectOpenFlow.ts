@@ -12,7 +12,7 @@ export type T_faActiveProjectOpenFlowHandlers = {
 }
 
 /**
- * Applies IPC open results to session state; reused opens navigate without a load toast.
+ * Applies IPC open results to session state; reused opens navigate off welcome or 404 and surface a warning toast via the action handler.
  */
 export async function finalizeFaActiveProjectOpenResult (
   result: I_faProjectOpenResult,

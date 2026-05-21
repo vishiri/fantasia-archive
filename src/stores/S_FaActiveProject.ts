@@ -5,10 +5,7 @@ import { computed, ref } from 'vue'
 
 import type { I_faActiveProject } from 'app/types/I_faActiveProjectDomain'
 
-import {
-  navigateToWorkspaceRouteForActiveProject,
-  navigateToWorkspaceWhenOnWelcomeRoute
-} from 'app/src/scripts/appInternals/faAppRouterSession'
+import { navigateToWorkspaceRouteForActiveProject } from 'app/src/scripts/appInternals/faAppRouterSession'
 import {
   finalizeFaActiveProjectOpenResult,
   tryReuseFaActiveProjectKnownPath,
@@ -30,7 +27,7 @@ export const S_FaActiveProject = defineStore('S_FaActiveProject', () => {
 
   function commitActiveProjectSnapshot (next: I_faActiveProject): void {
     activeProject.value = next
-    void navigateToWorkspaceWhenOnWelcomeRoute()
+    void navigateToWorkspaceRouteForActiveProject()
   }
 
   function reuseActiveProjectSession (next: I_faActiveProject): void {
