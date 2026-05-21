@@ -1,6 +1,7 @@
 import { defineBoot } from '#q-app/wrappers'
 import { ResultAsync } from 'neverthrow'
 
+import { registerFaAppRouterSession } from 'app/src/scripts/appInternals/faAppRouterSession'
 import { runAppStartupRouting } from 'app/src/scripts/appInternals/rendererAppInternals'
 import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
 
@@ -32,6 +33,15 @@ async function waitForPreloadExtraEnvBridgeWhenElectron (): Promise<void> {
  * Loads harness env from the Electron preload bridge before initial navigation, then runs startup routing.
  */
 export default defineBoot(async ({ router }) => {
+  registerFaAppRouterSession({
+    getCurrentPath (): string {
+      return router.currentRoute.value.path
+    },
+    push (payload): void | Promise<unknown> {
+      return router.push(payload)
+    }
+  })
+
   await waitForPreloadExtraEnvBridgeWhenElectron()
 
   const bridge = window.faContentBridgeAPIs?.extraEnvVariables

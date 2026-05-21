@@ -43,18 +43,7 @@
       />
     </q-btn-group>
 
-    <!-- Dialog Popups (optional so mounted surfaces like Storybook can preview the menu bar only) -->
-    <DialogMarkdownDocument v-if="embedDialogs" />
-    <DialogAboutFantasiaArchive v-if="embedDialogs" />
-    <DialogActionMonitor v-if="embedDialogs" />
-    <DialogKeybindSettings v-if="embedDialogs" />
-    <DialogAppSettings v-if="embedDialogs" />
-    <WindowAppStyling v-if="embedDialogs" />
-    <WindowProjectStyling v-if="embedDialogs" />
-    <WindowAppNoteboard v-if="embedDialogs" />
-    <WindowProjectNoteboard v-if="embedDialogs" />
-    <DialogImportExportAppConfig v-if="embedDialogs" />
-    <DialogNewProject v-if="embedDialogs" />
+    <FaModalAndFloatingWindowHost v-if="embedDialogs" />
   </div>
 </template>
 
@@ -76,17 +65,7 @@ import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 
 import AppControlSingleMenu from 'app/src/components/globals/AppControlSingleMenu/AppControlSingleMenu.vue'
-import DialogMarkdownDocument from 'app/src/components/dialogs/DialogMarkdownDocument/DialogMarkdownDocument.vue'
-import DialogNewProject from 'app/src/components/dialogs/DialogNewProject/DialogNewProject.vue'
-import DialogAboutFantasiaArchive from 'app/src/components/dialogs/DialogAboutFantasiaArchive/DialogAboutFantasiaArchive.vue'
-import DialogActionMonitor from 'app/src/components/dialogs/DialogActionMonitor/DialogActionMonitor.vue'
-import DialogKeybindSettings from 'app/src/components/dialogs/DialogKeybindSettings/DialogKeybindSettings.vue'
-import DialogAppSettings from 'app/src/components/dialogs/DialogAppSettings/DialogAppSettings.vue'
-import DialogImportExportAppConfig from 'app/src/components/dialogs/DialogImportExportAppConfig/DialogImportExportAppConfig.vue'
-import WindowAppNoteboard from 'app/src/components/floatingWindows/WindowAppNoteboard/WindowAppNoteboard.vue'
-import WindowProjectNoteboard from 'app/src/components/floatingWindows/WindowProjectNoteboard/WindowProjectNoteboard.vue'
-import WindowAppStyling from 'app/src/components/floatingWindows/WindowAppStyling/WindowAppStyling.vue'
-import WindowProjectStyling from 'app/src/components/floatingWindows/WindowProjectStyling/WindowProjectStyling.vue'
+import FaModalAndFloatingWindowHost from 'app/src/components/globals/_FaModalAndFloatingWindowHost/_FaModalAndFloatingWindowHost.vue'
 
 function readInitialTestingType (): string | false {
   const snap = window.faContentBridgeAPIs?.extraEnvVariables?.getCachedSnapshot?.()

@@ -8,6 +8,7 @@ const {
   replaceMock,
   takeE2eOpenMock,
   getActiveDbMock,
+  getLastKnownPathMock,
   readProjectUuidMock,
   browserWindowStub,
   windowDialogState,
@@ -22,6 +23,7 @@ const {
     browserWindowStub: browserWindowStubInner,
     existsSyncMock: vi.fn(() => true),
     getActiveDbMock: vi.fn(() => null),
+    getLastKnownPathMock: vi.fn(() => 'D:\\dl\\open.faproject'),
     mainWindowExports: {
       appWindow: undefined as typeof browserWindowStubInner | undefined
     },
@@ -89,6 +91,7 @@ vi.mock('app/src-electron/mainScripts/windowManagement/mainWindowCreation', () =
 vi.mock('../faProjectActiveDatabase', () => {
   return {
     getFaProjectActiveDatabase: getActiveDbMock,
+    getFaProjectLastKnownActiveProjectFilePath: getLastKnownPathMock,
     openFaProjectDatabase: openDbMock,
     replaceFaProjectActiveDatabase: replaceMock
   }
@@ -116,8 +119,6 @@ vi.mock('../faRecentProjectListRuntime', () => {
   }
 })
 
-import { FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE } from 'app/types/I_faProjectManagementDomain'
-
 import { runFaProjectOpenFromIpc } from '../faProjectOpenRun'
 
 beforeEach(() => {
@@ -132,6 +133,8 @@ beforeEach(() => {
   takeE2eOpenMock.mockReturnValue(null)
   getActiveDbMock.mockReset()
   getActiveDbMock.mockReturnValue(null)
+  getLastKnownPathMock.mockReset()
+  getLastKnownPathMock.mockReturnValue('D:\\dl\\open.faproject')
   readProjectUuidMock.mockReset()
   readProjectUuidMock.mockReturnValue('11111111-1111-4111-8111-111111111111')
   existsSyncMock.mockReset()
@@ -195,14 +198,15 @@ test('Test that runFaProjectOpenFromIpc returns opened with project snapshot on 
  * runFaProjectOpenFromIpc
  * Rejects when the candidate database shares project_uuid with the active project.
  */
-test('Test that runFaProjectOpenFromIpc returns error when project uuid matches active project', async () => {
-  getActiveDbMock.mockReturnValueOnce({ tag: 'active-db' } as never)
+test('Test that runFaProjectOpenFromIpc returns idempotent opened when project uuid matches active project', async () => {
+  getActiveDbMock.mockReturnValue({ tag: 'active-db' } as never)
   readProjectUuidMock.mockReturnValue('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa')
   const r = await runFaProjectOpenFromIpc({} as never, {})
-  expect(r.outcome).toBe('error')
-  expect(r.errorName).toBe(FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE)
-  expect(r.errorMessage).toMatch(/already open/)
+  expect(r.outcome).toBe('opened')
+  expect(r.idempotentReuse).toBe(true)
+  expect(r.project?.name).toBe('Stored Name')
   expect(replaceMock).not.toHaveBeenCalled()
+  expect(recordRecentMock).toHaveBeenCalledOnce()
 })
 
 /**
@@ -480,15 +484,16 @@ test('Test that runFaProjectOpenFromIpc prunes MRU when explicit ipc open fails 
   expect(removeRecentMock).toHaveBeenCalledWith('D:\\ipc\\direct.faproject')
 })
 
-test('Test that runFaProjectOpenFromIpc does not prune MRU when already-active on explicit path', async () => {
-  getActiveDbMock.mockReturnValueOnce({ tag: 'active-db' } as never)
+test('Test that runFaProjectOpenFromIpc idempotent-opens and touches MRU on explicit path for active project', async () => {
+  getActiveDbMock.mockReturnValue({ tag: 'active-db' } as never)
   readProjectUuidMock.mockReturnValue('11111111-1111-4111-8111-111111111111')
   const r = await runFaProjectOpenFromIpc({} as never, {
     filePath: 'D:\\ipc\\same.faproject'
   })
-  expect(r.outcome).toBe('error')
-  expect(r.errorName).toBe(FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE)
+  expect(r.outcome).toBe('opened')
+  expect(r.idempotentReuse).toBe(true)
   expect(removeRecentMock).not.toHaveBeenCalled()
+  expect(recordRecentMock).toHaveBeenCalledOnce()
 })
 
 test('Test that ipc parse failure stringifies non-Error throws', async () => {

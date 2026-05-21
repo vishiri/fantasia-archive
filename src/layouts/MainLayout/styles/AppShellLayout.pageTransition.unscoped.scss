@@ -1,0 +1,18 @@
+/* Welcome ↔ workspace page crossfade inside MainLayout (see faAppShellPageTransition.ts). */
+$fa-appShellPage-ease: cubic-bezier(0, 0, 0.2, 1);
+
+.fa-appShellPage-enter-active,
+.fa-appShellPage-leave-active {
+  pointer-events: none;
+  transition: opacity var(--q-transition-duration, 300ms) $fa-appShellPage-ease;
+}
+
+.fa-appShellPage-enter-from,
+.fa-appShellPage-leave-to {
+  opacity: 0;
+}
+
+.fa-appShellPage-enter-to,
+.fa-appShellPage-leave-from {
+  opacity: 1;
+}

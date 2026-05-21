@@ -4,11 +4,18 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
 import type { I_faActiveProject } from 'app/types/I_faActiveProjectDomain'
-import type { I_faProjectOpenResult } from 'app/types/I_faProjectManagementDomain'
-import { FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE } from 'app/types/I_faProjectManagementDomain'
 
-import { i18n } from 'app/i18n/externalFileLoader'
-import { FaProjectOpenFailedError } from 'app/src/scripts/actionManager/faProjectOpenFailedError'
+import {
+  navigateToWorkspaceRouteForActiveProject,
+  navigateToWorkspaceWhenOnWelcomeRoute
+} from 'app/src/scripts/appInternals/faAppRouterSession'
+import {
+  finalizeFaActiveProjectOpenResult,
+  tryReuseFaActiveProjectKnownPath,
+  type T_faActiveProjectOpenFlowOutcome
+} from 'app/src/scripts/projectManagement/faActiveProjectOpenFlow'
+
+export type { T_faActiveProjectOpenFlowOutcome } from 'app/src/scripts/projectManagement/faActiveProjectOpenFlow'
 
 /**
  * Session-only state for the database project currently loaded in the renderer.
@@ -21,8 +28,23 @@ export const S_FaActiveProject = defineStore('S_FaActiveProject', () => {
     return activeProject.value !== null
   })
 
-  function setActiveProject (next: I_faActiveProject): void {
+  function commitActiveProjectSnapshot (next: I_faActiveProject): void {
     activeProject.value = next
+    void navigateToWorkspaceWhenOnWelcomeRoute()
+  }
+
+  function reuseActiveProjectSession (next: I_faActiveProject): void {
+    activeProject.value = next
+    void navigateToWorkspaceRouteForActiveProject()
+  }
+
+  const openFlowHandlers = {
+    commitActiveProjectSnapshot,
+    reuseActiveProjectSession
+  }
+
+  function setActiveProject (next: I_faActiveProject): void {
+    commitActiveProjectSnapshot(next)
   }
 
   function clearActiveProject (): void {
@@ -45,57 +67,41 @@ export const S_FaActiveProject = defineStore('S_FaActiveProject', () => {
     if (p === undefined) {
       throw new Error('Project creation returned no project snapshot.')
     }
-    activeProject.value = {
+    commitActiveProjectSnapshot({
       filePath: p.filePath,
       id: p.id,
       name: p.name
-    }
+    })
     return 'created'
   }
 
-  async function finalizeOpenResult (result: I_faProjectOpenResult): Promise<'opened' | 'canceled'> {
-    if (result.outcome === 'canceled') {
-      return 'canceled'
-    }
-    if (result.outcome === 'error') {
-      const isAlreadyActive = result.errorName === FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE
-      const localized = isAlreadyActive
-        ? i18n.global.t('globalFunctionality.faProjectSession.openRejectedAlreadyActive')
-        : (result.errorMessage ?? 'Failed to open project.')
-      throw new FaProjectOpenFailedError(
-        localized,
-        result.attemptedFilePath,
-        isAlreadyActive ? 'warning' : 'negative'
-      )
-    }
-    const p = result.project
-    if (p === undefined) {
-      throw new Error('Project open returned no project snapshot.')
-    }
-    activeProject.value = {
-      filePath: p.filePath,
-      id: p.id,
-      name: p.name
-    }
-    return 'opened'
-  }
-
-  async function openProjectFromUserDialog (): Promise<'opened' | 'canceled'> {
+  async function openProjectFromUserDialog (): Promise<T_faActiveProjectOpenFlowOutcome> {
     const api = window.faContentBridgeAPIs?.projectManagement
     if (api === undefined) {
       throw new Error('Project management is not available in this environment.')
     }
     const result = await api.openProject()
-    return await finalizeOpenResult(result)
+    return await finalizeFaActiveProjectOpenResult(result, openFlowHandlers)
   }
 
-  async function openProjectFromKnownPath (filePath: string): Promise<'opened' | 'canceled'> {
+  async function openProjectFromKnownPath (
+    filePath: string
+  ): Promise<T_faActiveProjectOpenFlowOutcome> {
+    const reused = tryReuseFaActiveProjectKnownPath(
+      activeProject.value,
+      filePath,
+      reuseActiveProjectSession
+    )
+    if (reused !== null) {
+      return reused
+    }
+
     const api = window.faContentBridgeAPIs?.projectManagement
     if (api === undefined) {
       throw new Error('Project management is not available in this environment.')
     }
     const result = await api.openProject({ filePath })
-    return await finalizeOpenResult(result)
+    return await finalizeFaActiveProjectOpenResult(result, openFlowHandlers)
   }
 
   return {

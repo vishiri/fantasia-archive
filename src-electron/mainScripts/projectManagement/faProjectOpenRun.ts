@@ -12,6 +12,10 @@ import {
 } from 'app/types/I_faProjectManagementDomain'
 
 import {
+  buildFaProjectIdempotentOpenResult,
+  FaProjectOpenRejectedAlreadyActiveError
+} from './faProjectOpenAlreadyActive'
+import {
   getFaProjectActiveDatabase,
   openFaProjectDatabase,
   replaceFaProjectActiveDatabase
@@ -42,16 +46,6 @@ function normalizeFaProjectOpenFailure (e: unknown): Error {
     return new Error(JSON.stringify(e))
   } catch {
     return new Error('Unexpected failure opening project')
-  }
-}
-
-/**
- * Thrown when the file represents the same logical project (same `project_uuid`) as the already active database.
- */
-class FaProjectOpenRejectedAlreadyActiveError extends Error {
-  constructor () {
-    super('This project is already open in this session.')
-    this.name = 'FaProjectOpenRejectedAlreadyActiveError'
   }
 }
 
@@ -173,15 +167,7 @@ export async function runFaProjectOpenFromIpc (
   if (opened.isErr()) {
     const rawErr = opened.error
     if (rawErr instanceof FaProjectOpenRejectedAlreadyActiveError) {
-      console.error('[faProjectManagement] open rejected — same project already active', {
-        filePath
-      })
-      return {
-        attemptedFilePath: filePath,
-        errorMessage: rawErr.message,
-        errorName: FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE,
-        outcome: 'error'
-      }
+      return buildFaProjectIdempotentOpenResult(filePath, rawErr)
     }
     const err = normalizeFaProjectOpenFailure(rawErr)
     console.error('[faProjectManagement] open failed', {

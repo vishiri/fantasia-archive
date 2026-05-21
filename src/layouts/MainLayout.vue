@@ -1,5 +1,10 @@
 <template>
-  <q-layout view="hHh Lpr lFf">
+  <q-layout
+    :view="appShellLayoutQuasarView"
+    class="appShellLayout"
+    :class="appShellLayoutRouteClass"
+    data-test-locator="mainLayout"
+  >
     <q-header
       elevated
       dark
@@ -22,10 +27,12 @@
     <GlobalWindowButtons />
 
     <q-drawer
-      v-if="mainLayoutShowDrawer"
+      :model-value="showWorkspaceDrawer"
       data-test-locator="mainLayout-drawer"
-      show-if-above
       dark
+      :transition-duration="FA_APP_SHELL_DRAWER_TRANSITION_MS"
+      transition-hide="slide-left"
+      transition-show="slide-right"
     >
       <q-list>
         <q-item-label
@@ -36,21 +43,39 @@
       </q-list>
     </q-drawer>
 
-    <q-page-container>
-      <router-view />
+    <q-page-container class="appShellLayout__pageContainer">
+      <div class="appShellLayout__pageTransitionHost">
+        <router-view v-slot="{ Component, route: childRoute }">
+          <Transition
+            v-bind="FA_APP_SHELL_PAGE_TRANSITION_BINDINGS"
+            mode="out-in"
+          >
+            <component
+              :is="Component"
+              v-if="Component !== null && childRoute !== undefined"
+              :key="resolveMainLayoutOutletKey(childRoute)"
+            />
+          </Transition>
+        </router-view>
+      </div>
     </q-page-container>
   </q-layout>
 </template>
 
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, type RouteLocationNormalizedLoaded } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import {
   createFaKeybindKeydownHandler,
   getFaKeybindKeydownContext
 } from 'app/src/scripts/keybinds/faKeybindsGlobalDispatch'
+import {
+  FA_APP_SHELL_DRAWER_TRANSITION_MS,
+  FA_APP_SHELL_PAGE_TRANSITION_BINDINGS
+} from 'app/src/scripts/appRouting/faAppShellPageTransition'
+import { useAppShellLayoutDrawerRail } from 'app/src/layouts/MainLayout/scripts/appShellLayoutDrawerRail'
 import { isFantasiaStorybookCanvas } from 'app/src/scripts/appInternals/rendererAppInternals'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
@@ -65,9 +90,43 @@ import AppControlMenus from 'app/src/components/globals/AppControlMenus/AppContr
 import GlobalLanguageSelector from 'app/src/components/globals/GlobalLanguageSelector/GlobalLanguageSelector.vue'
 import GlobalWindowButtons from 'app/src/components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
 
+defineOptions({
+  name: 'MainLayout'
+})
+
 const route = useRoute()
 
 const { activeProject } = storeToRefs(S_FaActiveProject())
+
+/**
+ * Router-view slot can pass an undefined 'route' before the nested match is ready (Storybook iframe).
+ */
+function resolveMainLayoutOutletKey (
+  childRoute: RouteLocationNormalizedLoaded | undefined
+): string {
+  const path = childRoute?.path
+  if (typeof path === 'string' && path.length > 0) {
+    return path
+  }
+  return 'app-shell-outlet'
+}
+
+const mainLayoutRoutePath = computed((): string => {
+  return route?.path ?? '/'
+})
+
+const showWorkspaceDrawer = computed((): boolean => {
+  return mainLayoutRoutePath.value === '/home'
+})
+
+const { appShellLayoutQuasarView } = useAppShellLayoutDrawerRail(showWorkspaceDrawer)
+
+const appShellLayoutRouteClass = computed((): Record<string, boolean> => {
+  return {
+    'appShellLayout--welcome': !showWorkspaceDrawer.value,
+    'appShellLayout--workspace': showWorkspaceDrawer.value
+  }
+})
 
 const activeProjectLabel = computed((): string | null => {
   const n = activeProject.value?.name
@@ -75,10 +134,6 @@ const activeProjectLabel = computed((): string | null => {
     return null
   }
   return n
-})
-
-const mainLayoutShowDrawer = computed(() => {
-  return route?.meta?.faMainLayoutHideDrawer !== true
 })
 
 let faKeybindKeydownHandler: ((event: KeyboardEvent) => void) | undefined
@@ -131,8 +186,19 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .appHeader {
   -webkit-app-region: drag;
-
-  // Tweak, so the menus will slide nicely behind/from behind the top bar
   z-index: $mainLayout-appHeader-zIndex;
 }
+
+.appShellLayout__pageTransitionHost {
+  min-height: 100%;
+  pointer-events: none;
+  position: relative;
+  width: 100%;
+
+  :deep(> *) {
+    pointer-events: auto;
+  }
+}
 </style>
+
+<style lang="scss" src="./MainLayout/styles/AppShellLayout.pageTransition.unscoped.scss"></style>

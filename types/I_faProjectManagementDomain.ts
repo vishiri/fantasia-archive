@@ -53,6 +53,10 @@ export interface I_faProjectOpenResult {
   attemptedFilePath?: string
   errorMessage?: string
   errorName?: string
+  /**
+   * When true with outcome 'opened', main left the active database unchanged and the renderer should navigate only (no load toast).
+   */
+  idempotentReuse?: boolean
   outcome: T_faProjectOpenOutcome
   project?: I_faProjectManagementActiveSnapshot
 }

@@ -1,6 +1,8 @@
 <template>
-  <div class="fullscreen bg-dark text-primary text-center q-pa-md flex column flex-center">
-    <GlobalWindowButtons />
+  <q-page
+    class="errorNotFoundPage flex flex-center column text-center q-pa-md bg-dark text-primary"
+    data-test-locator="errorNotFoundPage"
+  >
     <ErrorCard
       :title="$t('errorNotFound.title')"
       :details="errorCardDetails"
@@ -18,7 +20,7 @@
         {{ $t('errorNotFound.ctaText') }}
       </q-btn>
     </div>
-  </div>
+  </q-page>
 </template>
 
 <script lang="ts" setup>
@@ -26,9 +28,18 @@ import { computed } from 'vue'
 
 import { i18n } from 'app/i18n/externalFileLoader'
 import ErrorCard from 'src/components/elements/ErrorCard/ErrorCard.vue'
-import GlobalWindowButtons from 'src/components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
+
+defineOptions({
+  name: 'ErrorNotFound'
+})
 
 const errorCardDetails = computed(() =>
   `${i18n.global.t('errorNotFound.subTitleFirst')}\n${i18n.global.t('errorNotFound.subTitleSecond')}`
 )
 </script>
+
+<style scoped lang="scss">
+.errorNotFoundPage {
+  min-height: inherit;
+}
+</style>

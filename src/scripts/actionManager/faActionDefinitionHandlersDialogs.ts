@@ -141,9 +141,11 @@ export async function handleLoadExistingProject (
     if (outcome === 'canceled') {
       throw new FaActionUserCanceledError()
     }
-    notifyFaProjectLoadedPositive()
-    await S_FaProjectNoteboard().refreshProjectNoteboard()
-    await S_FaProjectStyling().refreshProjectStyling()
+    if (outcome === 'opened') {
+      notifyFaProjectLoadedPositive()
+      await S_FaProjectNoteboard().refreshProjectNoteboard()
+      await S_FaProjectStyling().refreshProjectStyling()
+    }
     const snap = S_FaActiveProject().activeProject
     if (snap === null) {
       throw new Error('Project open returned no active project snapshot.')
