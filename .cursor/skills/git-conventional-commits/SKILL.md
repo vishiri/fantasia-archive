@@ -53,9 +53,14 @@ Examples: `feat: add splash screen fade-out`, `test: cover devtools menu toggle`
 - Do not skip changelog review before committing substantive work; missing release-note updates should be handled **in the same commit or batch** before `git push`, not as a trailing docs-only commit after the fact. An **exceptional** second commit that adjusts **only** **`i18n/*/documents/changeLog.md`** (typo repair) may skip **`yarn testbatch:verify`** per [testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)—do not treat that as the default workflow.
 - Do not skip Storybook review for changed user-facing **`src/components/**`** before you finish the **product** commit; an **exceptional changelog-only** repair commit skips Storybook when the prior verified work already covered UI.
 
+## Final cleanup override
+
+When the user invokes **final cleanup** (see [fantasia-final-cleanup](../fantasia-final-cleanup/SKILL.md)), run **`yarn testbatch:verify`** first, then changelog and logical commits, then **`git push`**. That workflow may commit each planned batch without waiting for per-commit approval unless the user interrupts.
+
 ## Related
 
 - Short reminder rule: `.cursor/rules/git-conventional-commits.mdc` (always on).
+- End-of-batch ship: [fantasia-final-cleanup](../fantasia-final-cleanup/SKILL.md)
 
 ## TypeScript interfaces and types (`types/`)
 

@@ -37,6 +37,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | [fa-action-manager.mdc](.cursor/rules/fa-action-manager.mdc) | `src/scripts/actionManager/**/*.ts` — central action registry, sync FIFO queue, async fire-and-forget, single-toast failure surface, session-only history |
 | [fa-project-database-access.mdc](.cursor/rules/fa-project-database-access.mdc) | `src-electron/mainScripts/**` — active **`.faproject`** reads/writes must use **`faProjectDatabaseEnsureConnected.ts`**; mirrored path, ESLint import allowlist |
 | [neverthrow.mdc](.cursor/rules/neverthrow.mdc) | First-party **`.ts`** / **`.vue`** / **`.mjs`** — prefer **Neverthrow** **`Result`** / **`ResultAsync`** over **`try`** / **`catch`** for recoverable failures |
+| [final-cleanup.mdc](.cursor/rules/final-cleanup.mdc) | Always — when the user asks for **final cleanup**, run the ordered verify → docs → changelog → commit → push workflow ([fantasia-final-cleanup skill](.cursor/skills/fantasia-final-cleanup/SKILL.md)) |
 
 
 ## Stack (short)
@@ -333,6 +334,7 @@ Use different instructions or @-references when starting a task:
 | `fantasia-changelog-en-us`      | `changeLog.md` strictly aligned to existing `package.json` version  |
 | `fantasia-plan-documents`       | `.cursor/plans` filename, metadata, and 30-day mtime prune before new plans |
 | `fantasia-neverthrow`           | **`Result`** / **`ResultAsync`** patterns instead of **`try`** / **`catch`** for recoverable failures |
+| `fantasia-final-cleanup`        | End-of-batch **final cleanup**: **`yarn testbatch:verify`**, sync README/AGENTS/rules/skills, changelog, logical commits, **`git push`** |
 
 
 ## TypeScript interfaces and types (`types/`)
