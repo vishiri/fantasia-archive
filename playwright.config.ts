@@ -10,6 +10,7 @@ export default defineConfig({
   outputDir: 'test-results/playwright-artifacts',
   testMatch: [
     '**/src/components/**/*playwright.@(spec|test).?(c|m)[jt]s?(x)',
+    '**/src/layouts/**/*playwright.@(spec|test).?(c|m)[jt]s?(x)',
     '**/e2e-tests/**/*playwright.@(spec|test).?(c|m)[jt]s?(x)'
   ],
   expect: { timeout: 3_000 },

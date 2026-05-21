@@ -517,6 +517,17 @@ test('Test that loadExistingProject handler throws FaActionUserCanceledError whe
   expect(refreshRecentProjectsMock).toHaveBeenCalled()
 })
 
+test('Test that loadExistingProject handler skips notify when open flow reuses active project', async () => {
+  openProjectFromKnownPathMock.mockResolvedValueOnce('reused')
+  await (definitionFor('loadExistingProject').handler({
+    filePath: 'C:\\r\\recent.faproject'
+  }) as Promise<unknown>)
+  expect(Notify.create).not.toHaveBeenCalled()
+  expect(refreshProjectNoteboardMock).not.toHaveBeenCalled()
+  expect(refreshProjectStylingMock).not.toHaveBeenCalled()
+  expect(refreshRecentProjectsMock).toHaveBeenCalledOnce()
+})
+
 test('Test that importAppConfigApply handler calls applyImport and refreshes stores', async () => {
   await (definitionFor('importAppConfigApply').handler({
     applyKeybinds: true,

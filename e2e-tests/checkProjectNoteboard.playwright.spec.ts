@@ -6,6 +6,10 @@ import type { TestInfo } from '@playwright/test'
 import { e2eExpectFaActiveProjectStoreName } from 'app/helpers/playwrightHelpers_e2e/e2eExpectFaActiveProjectStore'
 import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
 import {
+  navigateFaPlaywrightE2eToHomeRoute,
+  navigateFaPlaywrightE2eToSplashRoute
+} from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eNavigateHome'
+import {
   e2eSetNextProjectCreatePath,
   e2eSetNextProjectOpenPath,
   getE2eFaprojectFixtureAbsolutePath,
@@ -428,6 +432,7 @@ test.describe.serial('Project noteboard E2E — fresh Playwright profile: resize
    * With no `.faproject` loaded, Toggle Project Noteboard must stay disabled because project-scoped UI has nothing to attach to.
    */
   test('Project menu disables Toggle Project Noteboard until a project is active', async () => {
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
     await openProjectMenu(appWindow)
     const row = appWindow.getByRole('menuitem', {
       exact: false,
@@ -442,6 +447,7 @@ test.describe.serial('Project noteboard E2E — fresh Playwright profile: resize
    * Shrinks the floating window to minimum size, drags it to the top-left clamp, saves multi-line notes to the baseline SQLite file, then hides and reopens with the global shortcut and asserts geometry and text round-trip before Close.
    */
   test('Baseline project: minimum-size noteboard, parked top-left geometry, persisted textarea, survives toggle hide', async () => {
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await e2eSetNextProjectCreatePath(electronApp, PROJECT_NOTEBOARD_E2E_BASELINE_FAPROJECT)
     await appWindow.locator(`[data-test-locator="${selectorList.splashNew}"]`).click()
     await expect(
@@ -452,6 +458,7 @@ test.describe.serial('Project noteboard E2E — fresh Playwright profile: resize
     )
     await appWindow.waitForTimeout(e2ePostTypingSettleMs)
     await appWindow.locator(`[data-test-locator="${selectorList.dialogCreateBtn}"]`).click()
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
     await expect(appWindow.locator('[data-test-locator="mainLayout-activeProjectName"]')).toBeVisible({
       timeout: 20_000
     })
@@ -573,12 +580,7 @@ test.describe.serial('Project noteboard E2E — cold restart: companion project 
    * Opens the baseline `.faproject`, creates the companion project and saves different note text there, loads the baseline file again, and expects the baseline textarea and parked bounding box from the first serial group—not the companion strings.
    */
   test('Cold restart: baseline load, type notes on companion project, reload baseline restores parked frame and baseline notes only', async () => {
-    await expect(
-      appWindow.locator('.appHeader'),
-      'Expect MainLayout chrome on the rewarmed profile.'
-    ).toBeVisible({
-      timeout: SPLASH_SHELL_TIMEOUT_MS
-    })
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
 
     await e2eSetNextProjectOpenPath(electronApp, PROJECT_NOTEBOARD_E2E_BASELINE_FAPROJECT)
     await appWindow.locator(`[data-test-locator="${selectorList.splashLoad}"]`).click()
@@ -588,6 +590,7 @@ test.describe.serial('Project noteboard E2E — cold restart: companion project 
       PROJECT_NOTEBOARD_E2E_BASELINE_DISPLAY_NAME
     ))).toBeVisible()
 
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
     await createCompanionProjectForNoteboardIsolation(electronApp, appWindow)
     assertE2eFaprojectFixtureHasContentOnDisk(PROJECT_NOTEBOARD_E2E_COMPANION_FAPROJECT)
 

@@ -6,7 +6,11 @@ import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 
-const canOpenAppNoteboardFloatingWindowMock = vi.fn((): boolean => true)
+const { canOpenAppNoteboardFloatingWindowMock } = vi.hoisted(() => {
+  return {
+    canOpenAppNoteboardFloatingWindowMock: vi.fn((): boolean => true)
+  }
+})
 
 vi.mock('app/src/scripts/appNoteboard/faAppNoteboardCanOpen', () => {
   return {

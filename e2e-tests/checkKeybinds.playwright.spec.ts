@@ -2,6 +2,7 @@ import type { ElectronApplication, Locator, Page } from 'playwright'
 import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
+import { navigateFaPlaywrightE2eToHomeRoute } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eNavigateHome'
 import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
 import {
   FA_PLAYWRIGHT_PRESS_ADJUSTED_TOGGLE_DEVTOOLS_F12,
@@ -260,12 +261,7 @@ test.describe.serial('Global keybinds end-to-end', () => {
     const appSettingsTitle = appWindow.locator(`[data-test-locator="${selectorList.dialogAppSettingsTitle}"]`)
     const appStylingTitle = appWindow.locator(`[data-test-locator="${selectorList.appStylingTitle}"]`)
 
-    await expect(
-      appWindow.locator('.appHeader'),
-      'Global keybinds are registered only under MainLayout; this suite must start on the home route, not ErrorNotFound.vue.'
-    ).toBeVisible({
-      timeout: 20_000
-    })
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
 
     await test.step('Default devtools toggle twice: open then close', async () => {
       await pressDefaultDevtoolsTwiceExpectOpenThenClosed(appWindow)

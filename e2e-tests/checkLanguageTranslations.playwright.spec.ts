@@ -2,6 +2,7 @@ import type { ElectronApplication, Page } from 'playwright'
 import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
+import { navigateFaPlaywrightE2eToHomeRoute } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eNavigateHome'
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import L_aboutFantasiaArchiveDe from 'app/i18n/de/dialogs/L_aboutFantasiaArchive'
 import L_helpInfoDe from 'app/i18n/de/components/globals/AppControlMenus/L_helpInfo'
@@ -101,6 +102,8 @@ test.describe.serial('Interface language and About dialog', () => {
    * About dialog title matches en-US, then Deutsch after switching via the language control; Help menu labels follow the active locale.
    */
   test('About dialog title tracks interface locale en-US then de', async () => {
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
+
     await openHelpAboutDialog(
       appWindow,
       L_helpInfoEnUs.title,

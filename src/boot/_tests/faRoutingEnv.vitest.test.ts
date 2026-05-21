@@ -31,6 +31,11 @@ afterEach(() => {
 })
 
 const routerStub = {
+  currentRoute: {
+    value: {
+      path: '/'
+    }
+  },
   push: vi.fn()
 }
 
@@ -140,6 +145,27 @@ test('Test that faRoutingEnv boot survives getSnapshot rejection', async () => {
     undefined,
     undefined
   )
+})
+
+/**
+ * faRoutingEnv boot
+ * Without a bridge, runAppStartupRouting receives undefined normalized testing fields.
+ */
+test('Test that faRoutingEnv boot registers router session for workspace navigation', async () => {
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {} as unknown as Window & typeof globalThis
+  })
+
+  const boot = faRoutingEnvBoot as unknown as (args: { router: typeof routerStub }) => Promise<void>
+  await boot({ router: routerStub })
+
+  const { navigateToWorkspaceWhenOnWelcomeRoute, resolveFaAppRouterCurrentPath } =
+    await import('app/src/scripts/appInternals/faAppRouterSession')
+
+  expect(resolveFaAppRouterCurrentPath()).toBe('/')
+  await navigateToWorkspaceWhenOnWelcomeRoute()
+  expect(routerStub.push).toHaveBeenCalledWith({ path: '/home' })
 })
 
 /**

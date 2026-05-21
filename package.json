@@ -19,7 +19,7 @@
     "app:dev": "concurrently -k -n electron,storybook -c blue,magenta \"yarn quasar:dev:electron\" \"yarn storybook:run\"",
     "storybook:build": "yarn --cwd .storybook-workspace storybook:build",
     "storybook:run": "yarn --cwd .storybook-workspace storybook:run",
-    "test:components": "node scripts/playwrightWithArtifactTrim.mjs test src/components",
+    "test:components": "node scripts/playwrightWithArtifactTrim.mjs test src/components src/layouts",
     "test:components:list": "node testRunner_component.mjs",
     "test:components:single": "node scripts/playwrightWithArtifactTrim.mjs test src/components/%npm_config_component%",
     "test:components:single:ci": "node scripts/playwrightWithArtifactTrim.mjs test %npm_config_component%",

@@ -2,6 +2,7 @@ import type { ElectronApplication, Page } from 'playwright'
 import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
+import { navigateFaPlaywrightE2eToHomeRoute } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eNavigateHome'
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import L_helpInfo from 'app/i18n/en-US/components/globals/AppControlMenus/L_helpInfo'
 
@@ -63,6 +64,8 @@ test.describe.serial('Developer tools menu', () => {
    * Check if dev tools toggle properly on and off using the menu button
    */
   test('Dev tools toggle properly', async () => {
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
+
     const menuWrapper = appWindow.getByText(selectorList.menuButton)
 
     const menuButton = appWindow.getByText(selectorList.menuItemButton)

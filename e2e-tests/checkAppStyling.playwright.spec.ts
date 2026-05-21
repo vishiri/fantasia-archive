@@ -2,6 +2,7 @@ import type { ElectronApplication, Page } from 'playwright'
 import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
+import { navigateFaPlaywrightE2eToHomeRoute } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eNavigateHome'
 import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
 import { getFaPlaywrightMonacoSelectAllPressString } from 'app/helpers/playwrightHelpers_universal/faPlaywrightKeyboardChords'
 import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers_universal/playwrightDismissStartupTipsNotify'
@@ -156,12 +157,7 @@ test.describe.serial('Custom app CSS end-to-end', () => {
    * Live preview applies body zoom before save; saving a different zoom persists it; clearing CSS resets zoom.
    */
   test('App styling live preview and save apply body zoom; clearing removes it', async () => {
-    await expect(
-      appWindow.locator('.appHeader'),
-      'App styling menu lives on MainLayout; this suite must start on the home route.'
-    ).toBeVisible({
-      timeout: 20_000
-    })
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
 
     await test.step('Open Custom app CSS from Tools menu', async () => {
       await openAppStylingFromToolsMenu(appWindow)

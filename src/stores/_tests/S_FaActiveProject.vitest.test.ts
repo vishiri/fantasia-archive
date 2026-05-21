@@ -1,10 +1,14 @@
+import { flushPromises } from '@vue/test-utils'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 
 import type { I_faActiveProject } from 'app/types/I_faActiveProjectDomain'
-import { FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE } from 'app/types/I_faProjectManagementDomain'
+import { registerFaAppRouterSession } from 'app/src/scripts/appInternals/faAppRouterSession'
 
 import { S_FaActiveProject } from '../S_FaActiveProject'
+
+const routerPushMock = vi.fn()
+let faVitestRouterPath = '/'
 
 let store: ReturnType<typeof S_FaActiveProject>
 
@@ -13,6 +17,17 @@ const openProjectMock = vi.fn()
 
 beforeEach(() => {
   setActivePinia(createPinia())
+  routerPushMock.mockReset()
+  faVitestRouterPath = '/'
+  registerFaAppRouterSession({
+    getCurrentPath (): string {
+      return faVitestRouterPath
+    },
+    push (payload): void {
+      faVitestRouterPath = payload.path
+      routerPushMock(payload)
+    }
+  })
   createProjectMock.mockReset()
   createProjectMock.mockResolvedValue({ outcome: 'canceled' as const })
   openProjectMock.mockReset()
@@ -45,7 +60,7 @@ test('Test that S_FaActiveProject starts with null activeProject and hasActivePr
  * S_FaActiveProject / setActiveProject
  * Persists the open project snapshot for the session.
  */
-test('Test that setActiveProject assigns activeProject and sets hasActiveProject true', () => {
+test('Test that setActiveProject assigns activeProject and sets hasActiveProject true', async () => {
   const payload: I_faActiveProject = {
     filePath: 'C:\\p\\a.faproject',
     id: 'proj-1',
@@ -53,9 +68,11 @@ test('Test that setActiveProject assigns activeProject and sets hasActiveProject
   }
 
   store.setActiveProject(payload)
+  await flushPromises()
 
   expect(store.activeProject).toEqual(payload)
   expect(store.hasActiveProject).toBe(true)
+  expect(routerPushMock).toHaveBeenCalledWith({ path: '/home' })
 })
 
 /**
@@ -213,17 +230,34 @@ test('Test that openProjectFromUserDialog throws on error outcome', async () => 
   })
 })
 
-test('Test that openProjectFromUserDialog maps already-active error to locale string', async () => {
+test('Test that openProjectFromUserDialog returns reused when main reports idempotent open', async () => {
   openProjectMock.mockResolvedValueOnce({
-    errorMessage: 'ignored',
-    errorName: FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE,
-    outcome: 'error' as const
+    idempotentReuse: true,
+    outcome: 'opened' as const,
+    project: {
+      filePath: 'D:\\open.faproject',
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Stored Name'
+    }
   })
-  await expect(store.openProjectFromUserDialog()).rejects.toMatchObject({
-    message: expect.stringMatching(/already open/i),
-    name: 'FaProjectOpenFailedError',
-    notifyType: 'warning'
+  faVitestRouterPath = '/'
+  const r = await store.openProjectFromUserDialog()
+  expect(r).toBe('reused')
+  expect(routerPushMock).toHaveBeenCalledWith({ path: '/home' })
+  expect(store.activeProject?.name).toBe('Stored Name')
+})
+
+test('Test that openProjectFromKnownPath returns reused without IPC when filePath matches active project', async () => {
+  store.setActiveProject({
+    filePath: 'D:\\already.faproject',
+    id: 'id-1',
+    name: 'Already'
   })
+  faVitestRouterPath = '/'
+  const r = await store.openProjectFromKnownPath('D:\\already.faproject')
+  expect(r).toBe('reused')
+  expect(openProjectMock).not.toHaveBeenCalled()
+  expect(routerPushMock).toHaveBeenCalledWith({ path: '/home' })
 })
 
 test('Test that openProjectFromUserDialog attaches attemptedFilePath when main reports one', async () => {

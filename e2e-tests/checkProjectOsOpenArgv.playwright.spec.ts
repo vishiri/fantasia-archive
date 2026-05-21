@@ -8,6 +8,7 @@ import { expect, test } from '@playwright/test'
 
 import { e2eExpectFaActiveProjectStoreName } from 'app/helpers/playwrightHelpers_e2e/e2eExpectFaActiveProjectStore'
 import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
+import { navigateFaPlaywrightE2eToSplashRoute } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eNavigateHome'
 import {
   e2eSetNextProjectCreatePath,
   getE2eFaprojectFixtureAbsolutePath,
@@ -107,6 +108,7 @@ test.describe.serial('OS-open argv prep: writable .faproject copy', () => {
    * - The duplicate stays outside playwright-user-data so argv replay can reset the profile cleanly.
    */
   test('stages argv-fixture project via splash Create new project then copies SQLite to argv temp dir', async () => {
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await e2eSetNextProjectCreatePath(electronApp, SOURCE_FAPROJECT_BASENAME)
     await appWindow.locator(`[data-test-locator="${selectorList.splashNew}"]`).click()
     await expect(appWindow.locator(`[data-test-locator="${selectorList.nameInput}"]`)).toBeVisible()

@@ -16,6 +16,7 @@ test('Test that ErrorNotFound renders ErrorCard title hook, details block, and e
     }
   })
 
+  expect(w.find('[data-test-locator="errorNotFoundPage"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="errorCard"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="errorCard"]').attributes('data-test-error-card-width')).toBe('600')
 

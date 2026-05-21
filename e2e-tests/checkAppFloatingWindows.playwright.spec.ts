@@ -5,6 +5,7 @@ import type { ElectronApplication, Locator, Page } from 'playwright'
 import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
+import { navigateFaPlaywrightE2eToHomeRoute } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eNavigateHome'
 import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
 import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers_universal/playwrightDismissStartupTipsNotify'
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
@@ -486,12 +487,7 @@ test.describe.serial('Floating windows record geometry (fresh Playwright profile
    * - Custom app CSS ends at the smallest square before it is parked at the bottom-right corner; the noteboard uses the same minimum square then parks top-left under the header margin band.
    */
   test('Resize and park Custom app CSS bottom-right, then noteboard top-left, writing a geometry snapshot', async () => {
-    await expect(
-      appWindow.locator('.appHeader'),
-      'Floating window entries live on MainLayout; start from the splash or home route.'
-    ).toBeVisible({
-      timeout: 20_000
-    })
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
 
     const expectedLayout = await readExpectedFloatingOpenLayoutFromViewport(appWindow)
     const viewportMetrics = {
@@ -599,12 +595,7 @@ test.describe.serial('Floating windows restore geometry after app restart (reuse
   test('After restart Custom app CSS and noteboard reopen to parked geometry, noteboard stacks above, then rough reset closes', async () => {
     const snap = await readGeomSnapshotFromDisk()
 
-    await expect(
-      appWindow.locator('.appHeader'),
-      'Floating window entries live on MainLayout; start from the splash or home route.'
-    ).toBeVisible({
-      timeout: 20_000
-    })
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
 
     const preferredLayout = await readExpectedFloatingOpenLayoutFromViewport(appWindow)
 

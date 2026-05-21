@@ -9,6 +9,15 @@ import {
 } from 'app/helpers/playwrightHelpers_e2e/e2eExpectFaActiveProjectStore'
 import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
 import {
+  expectFaPlaywrightE2eHashRoute,
+  expectFaPlaywrightE2eWorkspaceShell
+} from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppShellAssertions'
+import {
+  navigateFaPlaywrightE2eToHomeRoute,
+  navigateFaPlaywrightE2eToSplashRoute,
+  waitForFaPlaywrightE2eAppShellPageTransitionIdle
+} from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eNavigateHome'
+import {
   e2eSetNextProjectCreatePath,
   e2eSetNextProjectOpenPath,
   getE2eFaprojectFixtureAbsolutePath,
@@ -129,6 +138,7 @@ async function clearActiveProjectViaSpellcheckLanguageRoundTrip (page: Page): Pr
 
 async function openSplashResumeDropdown (page: Page): Promise<void> {
   await dismissOpenMenus(page)
+  await waitForFaPlaywrightE2eAppShellPageTransitionIdle(page)
   await page.locator(`[data-test-locator="${selectorList.splashResumeLatest}"] .q-btn-dropdown__arrow-container`).click()
   await page.waitForTimeout(MENU_ANIMATION_MS)
 }
@@ -213,6 +223,20 @@ function interpolateFaProjectSessionNotify (
 }
 
 /**
+ * Idempotent open flows must not emit another loaded notify; earlier toasts may still be visible.
+ */
+async function expectProjectLoadedNotifyCountUnchangedAfter (
+  page: Page,
+  notifyText: string,
+  run: () => Promise<void>
+): Promise<void> {
+  const locator = page.getByText(notifyText)
+  const countBefore = await locator.count()
+  await run()
+  await expect.poll(async () => locator.count()).toBe(countBefore)
+}
+
+/**
  * SQLite **.faproject** files must exist on disk and be non-empty after a successful creation flow (schema + migrations).
  */
 function assertE2eCreatedFaprojectFileExistsWithContent (baseName: string): void {
@@ -268,8 +292,9 @@ test.describe.serial('Project management flow', () => {
   test('DialogNewProject resets the name field after close without creating', async () => {
     const nameField = appWindow.locator(`[data-test-locator="${selectorList.nameInput}"]`)
 
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await appWindow.locator(`[data-test-locator="${selectorList.splashNew}"]`).click()
-    await expect(nameField).toBeVisible()
+    await expect(nameField).toBeVisible({ timeout: 15_000 })
     await expect(nameField).toHaveValue('')
     await nameField.fill('E2E discarded project name typing')
     await appWindow.locator(`[data-test-locator="${selectorList.closeBtn}"]`).click()
@@ -286,6 +311,7 @@ test.describe.serial('Project management flow', () => {
    * Creates a new `.faproject` from the splash welcome **Create new project** control and verifies session plus creation toast.
    */
   test('creates a .faproject from the splash Create new project control', async () => {
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await e2eSetNextProjectCreatePath(electronApp, 'e2e-splash-project.faproject')
     await appWindow.locator(`[data-test-locator="${selectorList.splashNew}"]`).click()
     await expect(appWindow.locator(`[data-test-locator="${selectorList.nameInput}"]`)).toBeVisible()
@@ -297,12 +323,15 @@ test.describe.serial('Project management flow', () => {
       E2E_PROJECT_DISPLAY_SPLASH_NEW
     ))).toBeVisible()
     assertE2eCreatedFaprojectFileExistsWithContent('e2e-splash-project.faproject')
+    await expectFaPlaywrightE2eHashRoute(appWindow, '/home')
+    await expectFaPlaywrightE2eWorkspaceShell(appWindow)
   })
 
   /**
    * Opens **Project → Create new project**, creates a second fixture, and verifies the active project switches to the menu-created display name.
    */
   test('opens Create new project from the Project menu and creates a file', async () => {
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
     await e2eSetNextProjectCreatePath(electronApp, 'e2e-menu-project.faproject')
     const projectTitle = projectMenu.title
     await appWindow.getByRole('button', {
@@ -325,6 +354,7 @@ test.describe.serial('Project management flow', () => {
    * Stages the splash-created fixture path, uses the splash **Load existing project** button, and expects that project's display name plus loaded toast.
    */
   test('loads an existing .faproject from the splash Load existing project control', async () => {
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await e2eSetNextProjectOpenPath(electronApp, 'e2e-splash-project.faproject')
     await appWindow.locator(`[data-test-locator="${selectorList.splashLoad}"]`).click()
     await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_SPLASH_NEW)
@@ -332,12 +362,15 @@ test.describe.serial('Project management flow', () => {
       L_faProjectSession.notifyProjectLoaded,
       E2E_PROJECT_DISPLAY_SPLASH_NEW
     ))).toBeVisible()
+    await expectFaPlaywrightE2eHashRoute(appWindow, '/home')
+    await expectFaPlaywrightE2eWorkspaceShell(appWindow)
   })
 
   /**
    * Stages the menu-created fixture path, opens **Project → Load existing project**, and expects that project's display name plus loaded toast.
    */
   test('loads an existing .faproject from the Project menu', async () => {
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
     await e2eSetNextProjectOpenPath(electronApp, 'e2e-menu-project.faproject')
     const projectTitle = projectMenu.title
     await appWindow.getByRole('button', {
@@ -353,19 +386,64 @@ test.describe.serial('Project management flow', () => {
   })
 
   /**
-   * Loading the file that is already the active session should surface one clear error toast, not reload the project.
+   * Loading the file that is already the active session keeps the workspace route without a warning or reload toast.
    */
-  test('Load existing project rejects opening the currently active file again', async () => {
+  test('Load existing project reuses the currently active file without warning', async () => {
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
     await e2eSetNextProjectOpenPath(electronApp, 'e2e-menu-project.faproject')
+    const loadedNotify = interpolateFaProjectSessionNotify(
+      L_faProjectSession.notifyProjectLoaded,
+      E2E_PROJECT_DISPLAY_MENU_NEW
+    )
     const projectTitle = projectMenu.title
-    await appWindow.getByRole('button', {
-      exact: true,
-      name: projectTitle
-    }).click()
-    await appWindow.getByRole('menuitem', { name: projectMenu.items.loadProject }).click()
+    await expectProjectLoadedNotifyCountUnchangedAfter(appWindow, loadedNotify, async () => {
+      await appWindow.getByRole('button', {
+        exact: true,
+        name: projectTitle
+      }).click()
+      await appWindow.getByRole('menuitem', { name: projectMenu.items.loadProject }).click()
+    })
 
     await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_MENU_NEW)
-    await expect(appWindow.getByText(L_faProjectSession.openRejectedAlreadyActive)).toBeVisible()
+    await expect(appWindow.getByText(L_faProjectSession.openRejectedAlreadyActive)).toHaveCount(0)
+  })
+
+  /**
+   * Splash **Load existing project** on a file that is already active reuses the session without warning or a second load toast.
+   */
+  test('splash Load existing project reuses the currently active file without warning', async () => {
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
+    await e2eSetNextProjectOpenPath(electronApp, 'e2e-menu-project.faproject')
+    const loadedNotify = interpolateFaProjectSessionNotify(
+      L_faProjectSession.notifyProjectLoaded,
+      E2E_PROJECT_DISPLAY_MENU_NEW
+    )
+    await expectProjectLoadedNotifyCountUnchangedAfter(appWindow, loadedNotify, async () => {
+      await appWindow.locator(`[data-test-locator="${selectorList.splashLoad}"]`).click()
+    })
+
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_MENU_NEW)
+    await expect(appWindow.getByText(L_faProjectSession.openRejectedAlreadyActive)).toHaveCount(0)
+    await expectFaPlaywrightE2eHashRoute(appWindow, '/home')
+    await expectFaPlaywrightE2eWorkspaceShell(appWindow)
+  })
+
+  /**
+   * Splash **Resume Latest Project** primary segment on the MRU head reuses an already-open session without warning.
+   */
+  test('splash Resume latest reuses the active MRU head without warning', async () => {
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
+    const loadedNotify = interpolateFaProjectSessionNotify(
+      L_faProjectSession.notifyProjectLoaded,
+      E2E_PROJECT_DISPLAY_MENU_NEW
+    )
+    await expectProjectLoadedNotifyCountUnchangedAfter(appWindow, loadedNotify, async () => {
+      await appWindow.locator(`[data-test-locator="${selectorList.splashResumeLatest}"] .q-btn-dropdown--current`).click()
+    })
+
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_MENU_NEW)
+    await expect(appWindow.getByText(L_faProjectSession.openRejectedAlreadyActive)).toHaveCount(0)
+    await expectFaPlaywrightE2eHashRoute(appWindow, '/home')
   })
 
   /**
@@ -373,6 +451,7 @@ test.describe.serial('Project management flow', () => {
    * the primary segment reloads MRU head and an alternate row loads another recent entry.
    */
   test('splash Resume Latest split dropdown lists MRU and loads entries after spellcheck-clear reset', async () => {
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await expect(appWindow.locator(`[data-test-locator="${selectorList.splashResumeLatest}"]`)).toBeVisible()
 
     await openSplashResumeDropdown(appWindow)
@@ -393,6 +472,7 @@ test.describe.serial('Project management flow', () => {
       E2E_PROJECT_DISPLAY_MENU_NEW
     ))).toBeVisible()
 
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await openSplashResumeDropdown(appWindow)
     await expectSplashResumeDropdownLabelsOrdered(appWindow, [
       E2E_PROJECT_DISPLAY_MENU_NEW,
@@ -407,6 +487,7 @@ test.describe.serial('Project management flow', () => {
       E2E_PROJECT_DISPLAY_SPLASH_NEW
     ))).toBeVisible()
 
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
     await openProjectMenu(appWindow)
     await openLoadRecentSubmenu(appWindow)
     await appWindow.getByRole('menuitem', { name: E2E_PROJECT_DISPLAY_MENU_NEW }).click()
@@ -415,10 +496,11 @@ test.describe.serial('Project management flow', () => {
   })
 
   /**
-   * **Load recent project**: MRU order matches the session, opens reorder the list, the active file cannot be opened again from the list,
+   * **Load recent project**: MRU order matches the session, opens reorder the list, re-selecting the active file reuses the session,
    * spellcheck refresh after a language round-trip clears the main-process session, and the top MRU entry loads again cleanly.
    */
-  test('Load recent project submenu orders MRU, switches active session, warns on duplicate open, clears after reload, and reopens', async () => {
+  test('Load recent project submenu orders MRU, switches active session, reuses duplicate open, clears after reload, and reopens', async () => {
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
     await openProjectMenu(appWindow)
     const loadRecentRow = appWindow.getByRole('menuitem', { name: projectMenu.items.loadRecentProject })
     await expect(loadRecentRow).toBeEnabled()
@@ -459,13 +541,12 @@ test.describe.serial('Project management flow', () => {
     await appWindow.getByRole('menuitem', { name: E2E_PROJECT_DISPLAY_MENU_NEW }).click()
     await dismissOpenMenus(appWindow)
     await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_DISPLAY_MENU_NEW)
-    await expect(
-      appWindow.getByText(L_faProjectSession.openRejectedAlreadyActive).first()
-    ).toBeVisible()
+    await expect(appWindow.getByText(L_faProjectSession.openRejectedAlreadyActive)).toHaveCount(0)
 
     await clearActiveProjectViaSpellcheckLanguageRoundTrip(appWindow)
 
     await e2eExpectFaActiveProjectStoreEmpty(appWindow)
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
     await expect(appWindow.locator('[data-test-locator="mainLayout-activeProjectName"]')).toHaveCount(0)
 
     await openProjectMenu(appWindow)
@@ -490,6 +571,7 @@ test.describe.serial('Project management flow', () => {
    * That surfaces 'Project file does not exist', prunes the stale MRU row, and leaves nine entries (10 … 02).
    */
   test('Recent project MRU caps at 10 and drops stale paths after a missing file open', async () => {
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
     for (let i = 1; i <= E2E_RECENT_CAP_TOTAL; i++) {
       await createProjectViaMenu(
         appWindow,

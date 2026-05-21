@@ -29,10 +29,16 @@ export async function waitForFaRendererContentBridgeApis (appWindow: Page): Prom
 }
 
 /**
- * E2E runs stay on '#/' startup routes. Wait only for DOM readiness.
+ * E2E runs stay on '#/' (welcome), '#/home' (workspace), or catch-all error routes under MainLayout.
+ * Wait for DOM readiness, then for the shared shell root (child routes mount inside it).
  */
 export async function waitForFaE2eRendererDomReady (appWindow: Page): Promise<void> {
   await appWindow.waitForLoadState('domcontentloaded', {
+    timeout: FA_E2E_SHELL_LOAD_TIMEOUT_MS
+  })
+
+  await appWindow.locator('[data-test-locator="mainLayout"]').waitFor({
+    state: 'visible',
     timeout: FA_E2E_SHELL_LOAD_TIMEOUT_MS
   })
 }

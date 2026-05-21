@@ -2,6 +2,7 @@ import type { ElectronApplication, Page } from 'playwright'
 import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
+import { navigateFaPlaywrightE2eToHomeRoute } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eNavigateHome'
 import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
 import { getFaPlaywrightMonacoSelectAllPressString } from 'app/helpers/playwrightHelpers_universal/faPlaywrightKeyboardChords'
 import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers_universal/playwrightDismissStartupTipsNotify'
@@ -141,12 +142,7 @@ test.describe.serial('App noteboard E2E — fresh Playwright profile: type notes
    * Later serial groups cold-start Electron again on the same isolated profile without resetting userData.
    */
   test('Open App noteboard, type sample notes, Close', async () => {
-    await expect(
-      appWindow.locator('.appHeader'),
-      'Menus live on MainLayout; serial groups must reach splash or home chrome.'
-    ).toBeVisible({
-      timeout: 20_000
-    })
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
 
     await test.step('Open App noteboard from Tools menu', async () => {
       await openAppNoteboardFromToolsMenu(appWindow)
@@ -202,12 +198,7 @@ test.describe.serial('App noteboard E2E — reuse profile: reopen persisted text
    * Clearing the editor and waiting for the debouncer persists an empty string so the next launch expects an empty textarea.
    */
   test('Reopen App noteboard and confirm persisted text, clear all notes, Close', async () => {
-    await expect(
-      appWindow.locator('.appHeader'),
-      'Menus live on MainLayout; serial groups must reach splash or home chrome.'
-    ).toBeVisible({
-      timeout: 20_000
-    })
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
 
     await openAppNoteboardFromToolsMenu(appWindow)
     await waitForNoteboardFloatingWindow(appWindow)
@@ -266,12 +257,7 @@ test.describe.serial('App noteboard E2E — reuse profile again: empty editor st
    * Third cold start: confirms the cleared textarea from the second serial group is still empty when Tools opens the noteboard again.
    */
   test('Reopen App noteboard confirms empty textarea', async () => {
-    await expect(
-      appWindow.locator('.appHeader'),
-      'Menus live on MainLayout; serial groups must reach splash or home chrome.'
-    ).toBeVisible({
-      timeout: 20_000
-    })
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
 
     await openAppNoteboardFromToolsMenu(appWindow)
     await waitForNoteboardFloatingWindow(appWindow)

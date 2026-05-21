@@ -6,6 +6,10 @@ import type { TestInfo } from '@playwright/test'
 import { e2eExpectFaActiveProjectStoreName } from 'app/helpers/playwrightHelpers_e2e/e2eExpectFaActiveProjectStore'
 import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
 import {
+  navigateFaPlaywrightE2eToHomeRoute,
+  navigateFaPlaywrightE2eToSplashRoute
+} from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eNavigateHome'
+import {
   e2eSetNextProjectCreatePath,
   e2eSetNextProjectOpenPath,
   getE2eFaprojectFixtureAbsolutePath,
@@ -260,6 +264,7 @@ test.describe.serial('Custom Project CSS E2E — fresh Playwright profile: Monac
    * With no project loaded yet, the Project menu must disable Custom Project CSS because there is no active SQLite file to read or write.
    */
   test('Project menu keeps Custom Project CSS disabled until an active `.faproject` session exists', async () => {
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
     await openProjectMenu(appWindow)
     const row = appWindow.getByRole('menuitem', {
       exact: false,
@@ -274,6 +279,7 @@ test.describe.serial('Custom Project CSS E2E — fresh Playwright profile: Monac
    * Walks the baseline `.faproject` through: **Create new project**, open Custom Project CSS, Monaco live preview (body zoom), Save to persist in SQLite, reopen and save an empty editor to clear stored CSS, then assert bridge reads back an empty string.
    */
   test('Create new project: Custom Project CSS live preview, Save persists body zoom to SQLite, then Save with empty editor clears stored CSS', async () => {
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await e2eSetNextProjectCreatePath(electronApp, PROJECT_STYLING_E2E_BASELINE_FAPROJECT)
     await appWindow.locator(`[data-test-locator="${selectorList.splashNew}"]`).click()
     await expect(
@@ -284,6 +290,7 @@ test.describe.serial('Custom Project CSS E2E — fresh Playwright profile: Monac
     )
     await appWindow.waitForTimeout(e2ePostTypingSettleMs)
     await appWindow.locator(`[data-test-locator="${selectorList.dialogCreateBtn}"]`).click()
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
     await expect(appWindow.locator('[data-test-locator="mainLayout-activeProjectName"]')).toBeVisible({
       timeout: 20_000
     })
@@ -375,12 +382,7 @@ test.describe.serial('Custom Project CSS E2E — warm app session: per-project S
    * Loads the baseline project (still no saved Custom CSS after the first serial group), creates a companion project, saves a different body zoom only on the companion, then switches projects and checks computed body zoom plus `getProjectStyling().css` for each.
    */
   test('Saving Custom Project CSS on one .faproject leaves another .faproject default zoom and empty stored CSS', async () => {
-    await expect(
-      appWindow.locator('.appHeader'),
-      'Project styling floats on MainLayout; this phase must hydrate on the rewarmed partition.'
-    ).toBeVisible({
-      timeout: SPLASH_SHELL_TIMEOUT_MS
-    })
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
 
     await e2eSetNextProjectOpenPath(electronApp, PROJECT_STYLING_E2E_BASELINE_FAPROJECT)
     await appWindow.locator(`[data-test-locator="${selectorList.splashLoad}"]`).click()
@@ -391,6 +393,7 @@ test.describe.serial('Custom Project CSS E2E — warm app session: per-project S
       PROJECT_STYLING_E2E_BASELINE_DISPLAY_NAME
     ))).toBeVisible()
 
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
     await createCompanionProjectForPerProjectIsolation(electronApp, appWindow)
     assertE2eFaprojectFixtureHasContentOnDisk(PROJECT_STYLING_E2E_COMPANION_FAPROJECT)
 

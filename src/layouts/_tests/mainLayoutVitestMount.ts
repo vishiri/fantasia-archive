@@ -2,51 +2,53 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
 import {
-  type RouteMeta,
   createMemoryHistory,
   createRouter,
   RouterView
 } from 'vue-router'
 
-import 'app/types/vueRouterRouteMetaAugmentation'
-
 import MainLayout from '../MainLayout.vue'
-
-export type T_mainLayoutVitestMountOptions = {
-  childRouteMeta?: Partial<RouteMeta>
-}
 
 const mainLayoutVitestLeaf = defineComponent({
   name: 'MainLayoutVitestLeaf',
   template: '<div data-test-locator="mainLayout-vitest-leaf" />'
 })
 
+export type T_mainLayoutVitestInitialPath = '/' | '/home'
+
 /**
  * Mounts MainLayout behind a real vue-router instance so layout code that calls useRoute() behaves like production.
  */
 export async function mountMainLayoutForVitest (
-  options?: T_mainLayoutVitestMountOptions
+  initialPath: T_mainLayoutVitestInitialPath = '/home'
 ): Promise<ReturnType<typeof mount>> {
-  const childRouteMeta = options?.childRouteMeta ?? {}
-
   const router = createRouter({
     history: createMemoryHistory(),
     routes: [
       {
-        path: '/vitest-main-layout-shell',
+        path: '/',
         component: MainLayout,
         children: [
           {
             path: '',
-            component: mainLayoutVitestLeaf,
-            meta: childRouteMeta
+            component: mainLayoutVitestLeaf
+          }
+        ]
+      },
+      {
+        path: '/home',
+        component: MainLayout,
+        children: [
+          {
+            path: '',
+            component: mainLayoutVitestLeaf
           }
         ]
       }
     ]
   })
 
-  await router.push('/vitest-main-layout-shell')
+  await router.push(initialPath)
   await router.isReady()
 
   const rootComponent = defineComponent({

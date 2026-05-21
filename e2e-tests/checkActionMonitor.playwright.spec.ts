@@ -2,6 +2,7 @@ import type { ElectronApplication, Locator, Page } from 'playwright'
 import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
+import { navigateFaPlaywrightE2eToHomeRoute } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eNavigateHome'
 import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
 import {
   FA_PLAYWRIGHT_PRESS_CONTROL_SHIFT_F12,
@@ -162,12 +163,7 @@ test.describe.serial('Action monitor end-to-end', () => {
    * action-manager code affecting history order or the action monitor table columns changed since the last build.
    */
   test('Action history lists five scripted events newest-first and optional save-row clipboard JSON', async () => {
-    await expect(
-      appWindow.locator('.appHeader'),
-      'Action monitor E2E expects MainLayout home; splash must have finished.'
-    ).toBeVisible({
-      timeout: 20_000
-    })
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
 
     await test.step('Open app settings then close without saving', async () => {
       await triggerGlobalShortcut(appWindow, defaultChord.openAppSettings)

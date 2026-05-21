@@ -3,6 +3,7 @@ import type { ElectronApplication, Locator, Page } from 'playwright'
 import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
+import { navigateFaPlaywrightE2eToHomeRoute } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eNavigateHome'
 import {
   e2eSetNextAppConfigExportPath,
   e2eSetNextAppConfigImportPath,
@@ -390,7 +391,7 @@ test.describe.serial('Import / export app configuration E2E', () => {
     })
     electronApp = launched.electronApp
     appWindow = launched.appWindow
-    await expect(appWindow.locator('.appHeader')).toBeVisible({ timeout: 20_000 })
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
   })
 
   test.afterAll(async ({}, afterAllTestInfo) => {

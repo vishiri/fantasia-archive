@@ -2,6 +2,7 @@ import type { ElectronApplication, Page } from 'playwright'
 import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 import { launchFaPlaywrightE2eAppWindow } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eAppLifecycle'
+import { navigateFaPlaywrightE2eToHomeRoute } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eNavigateHome'
 import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
 import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers_universal/playwrightDismissStartupTipsNotify'
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
@@ -200,12 +201,7 @@ test.describe.serial('Floating windows end-to-end (checkFloatingWindows)', () =>
    * License (markdown dialog) from Help while the floating window stays open, then closes without saving.
    */
   test('Custom app CSS floating window sizes, resizes, moves to top-right, and closes without saving', async () => {
-    await expect(
-      appWindow.locator('.appHeader'),
-      'Floating window menu lives on MainLayout; this suite must start on the home route.'
-    ).toBeVisible({
-      timeout: 20_000
-    })
+    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
 
     const expectedLayout = await readExpectedInitialFrameLayout(appWindow)
 

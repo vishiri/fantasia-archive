@@ -22,9 +22,47 @@ function countKeydownCaptureAdds (spy: { mock: { calls: unknown[][] } }): number
 
 /**
  * MainLayout
+ * Welcome route keeps the shared shell but hides the workspace drawer.
+ */
+test('Test that MainLayout on welcome route hides the workspace drawer', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'spa')
+
+  const w = await mountMainLayoutForVitest('/')
+
+  await flushPromises()
+
+  expect(w.find('[data-test-locator="mainLayout"]').exists()).toBe(true)
+  expect(w.find('.appShellLayout--welcome').exists()).toBe(true)
+  expect(w.find('[data-test-locator="mainLayout-drawer"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="mainLayout-vitest-leaf"]').exists()).toBe(true)
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * MainLayout
+ * Workspace route opens the drawer (v-model) so Quasar can run slide-right.
+ */
+test('Test that MainLayout on workspace route shows the workspace drawer chrome', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'spa')
+
+  const w = await mountMainLayoutForVitest('/home')
+
+  await flushPromises()
+
+  expect(w.find('.appShellLayout--workspace').exists()).toBe(true)
+  expect(w.find('[data-test-locator="mainLayout-drawer"]').exists()).toBe(true)
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * MainLayout
  * Renders header chrome stubs and a router outlet so the shell layout mounts without the full menu tree.
  */
-test('Test that MainLayout mounts with header stubs and router-view slot', async () => {
+test('Test that MainLayout mounts with header stubs and router-view slot on workspace route', async () => {
   setFantasiaStorybookCanvasFlag(false)
   vi.stubEnv('MODE', 'spa')
 
@@ -59,26 +97,6 @@ test('Test that MainLayout shows active project label when a project is open', a
   expect(w.find('[data-test-locator="mainLayout-activeProjectName"]').text()).toBe('Arcovia')
   w.unmount()
   S_FaActiveProject().clearActiveProject()
-  vi.unstubAllEnvs()
-})
-
-/**
- * MainLayout / route meta faMainLayoutHideDrawer
- * Splash and similar routes omit the navigation drawer without affecting header chrome.
- */
-test('Test that MainLayout hides the drawer when child route meta faMainLayoutHideDrawer is true', async () => {
-  setFantasiaStorybookCanvasFlag(false)
-  vi.stubEnv('MODE', 'spa')
-
-  const w = await mountMainLayoutForVitest({
-    childRouteMeta: { faMainLayoutHideDrawer: true }
-  })
-
-  await flushPromises()
-
-  expect(w.find('[data-test-locator="mainLayout-drawer"]').exists()).toBe(false)
-  expect(w.find('[data-test-stub="app-control-menus"]').exists()).toBe(true)
-  w.unmount()
   vi.unstubAllEnvs()
 })
 
