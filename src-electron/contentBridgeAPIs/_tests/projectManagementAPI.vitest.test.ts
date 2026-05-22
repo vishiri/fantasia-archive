@@ -58,6 +58,27 @@ test('projectManagementAPI openProject invokes IPC with empty payload object', a
   )
 })
 
+test('projectManagementAPI resolveRecentProjectMruHeadForOpen invokes IPC', async () => {
+  invokeMock.mockResolvedValueOnce({
+    entry: {
+      filePath: 'D:\\r.faproject',
+      name: 'Recent'
+    },
+    outcome: 'ready'
+  })
+  const r = await projectManagementAPI.resolveRecentProjectMruHeadForOpen()
+  expect(r).toEqual({
+    entry: {
+      filePath: 'D:\\r.faproject',
+      name: 'Recent'
+    },
+    outcome: 'ready'
+  })
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.resolveRecentProjectMruHeadForOpenAsync
+  )
+})
+
 test('projectManagementAPI getRecentProjects invokes IPC', async () => {
   invokeMock.mockResolvedValueOnce([
     {

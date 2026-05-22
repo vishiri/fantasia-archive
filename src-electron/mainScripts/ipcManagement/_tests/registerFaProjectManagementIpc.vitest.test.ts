@@ -1,6 +1,7 @@
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_PROJECT_MANAGEMENT_IPC } from 'app/src-electron/electron-ipc-bridge'
+import type { I_faRecentProjectMruHeadResolve } from 'app/types/I_faRecentProjectsDomain'
 
 const {
   runCreateMock,
@@ -9,6 +10,7 @@ const {
   appOnMock,
   closeActiveMock,
   getRecentSnapshotMock,
+  resolveRecentMruHeadMock,
   readProjectNoteboardRootMock,
   upsertProjectNoteboardKvMock,
   readProjectStylingRootMock,
@@ -21,6 +23,9 @@ const {
     closeActiveMock: vi.fn(),
     getFaProjectActiveDbMock: vi.fn(),
     getRecentSnapshotMock: vi.fn((): Array<{ filePath: string, name: string }> => []),
+    resolveRecentMruHeadMock: vi.fn((): I_faRecentProjectMruHeadResolve => {
+      return { outcome: 'empty' }
+    }),
     ipcMainHandleMock: vi.fn(),
     readProjectNoteboardRootMock: vi.fn(),
     readProjectStylingRootMock: vi.fn(),
@@ -76,7 +81,8 @@ vi.mock('app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase'
 
 vi.mock('app/src-electron/mainScripts/projectManagement/faRecentProjectListRuntime', () => {
   return {
-    getRecentProjectsSnapshot: getRecentSnapshotMock
+    getRecentProjectsSnapshot: getRecentSnapshotMock,
+    resolveRecentProjectMruHeadForOpen: resolveRecentMruHeadMock
   }
 })
 
@@ -111,6 +117,8 @@ beforeEach(async () => {
   runOpenMock.mockResolvedValue({ outcome: 'canceled' })
   getRecentSnapshotMock.mockReset()
   getRecentSnapshotMock.mockReturnValue([])
+  resolveRecentMruHeadMock.mockReset()
+  resolveRecentMruHeadMock.mockReturnValue({ outcome: 'empty' })
   readProjectNoteboardRootMock.mockReset()
   upsertProjectNoteboardKvMock.mockReset()
   readProjectStylingRootMock.mockReset()
@@ -148,6 +156,10 @@ test('registerFaProjectManagementIpc registers project-noteboard and project-sty
     expect.any(Function)
   )
   expect(ipcMainHandleMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.resolveRecentProjectMruHeadForOpenAsync,
+    expect.any(Function)
+  )
+  expect(ipcMainHandleMock).toHaveBeenCalledWith(
     FA_PROJECT_MANAGEMENT_IPC.getProjectNoteboardAsync,
     expect.any(Function)
   )
@@ -174,6 +186,27 @@ test('registerFaProjectManagementIpc registers project-noteboard and project-sty
   registerFaProjectManagementIpc()
   expect(ipcMainHandleMock.mock.calls.length).toBe(afterFirstHandle)
   expect(appOnMock.mock.calls.length).toBe(afterFirstOn)
+})
+
+test('resolveRecentProjectMruHeadForOpenAsync handler returns MRU head resolve', async () => {
+  resolveRecentMruHeadMock.mockReturnValueOnce({
+    entry: {
+      filePath: 'D:\\head.faproject',
+      name: 'Head'
+    },
+    outcome: 'ready'
+  })
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.resolveRecentProjectMruHeadForOpenAsync)
+  expect(h(undefined as never, undefined as never)).toEqual({
+    entry: {
+      filePath: 'D:\\head.faproject',
+      name: 'Head'
+    },
+    outcome: 'ready'
+  })
+  expect(resolveRecentMruHeadMock).toHaveBeenCalledOnce()
 })
 
 test('getRecentProjectsAsync handler returns snapshot rows', async () => {

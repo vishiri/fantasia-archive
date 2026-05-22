@@ -216,6 +216,7 @@ const baseBridge = () => {
       getProjectNoteboard,
       getProjectStyling,
       getRecentProjects: async () => [],
+      resolveRecentProjectMruHeadForOpen: async () => ({ outcome: 'empty' as const }),
       openProject: async (_input?: I_faProjectOpenInput): Promise<I_faProjectOpenResult> => ({
         outcome: 'canceled'
       }),

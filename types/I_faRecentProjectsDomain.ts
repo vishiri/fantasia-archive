@@ -9,3 +9,19 @@ export interface I_faRecentProjectEntry {
   filePath: string
   name: string
 }
+
+/**
+ * Main-process result when resolving the MRU head for welcome auto-load (does not fall through to the next recent row).
+ */
+export type I_faRecentProjectMruHeadResolve =
+  | {
+    outcome: 'empty'
+  }
+  | {
+    attemptedEntry: I_faRecentProjectEntry
+    outcome: 'missing'
+  }
+  | {
+    entry: I_faRecentProjectEntry
+    outcome: 'ready'
+  }

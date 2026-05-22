@@ -14,7 +14,10 @@ import {
   readFaProjectStylingRoot,
   upsertFaProjectStylingKv
 } from 'app/src-electron/mainScripts/projectManagement/faProjectStylingPersist'
-import { getRecentProjectsSnapshot } from 'app/src-electron/mainScripts/projectManagement/faRecentProjectListRuntime'
+import {
+  getRecentProjectsSnapshot,
+  resolveRecentProjectMruHeadForOpen
+} from 'app/src-electron/mainScripts/projectManagement/faRecentProjectListRuntime'
 import { parseFaProjectNoteboardPatch } from 'app/src-electron/shared/faProjectNoteboardPatchSchema'
 import { parseFaProjectStylingPatch } from 'app/src-electron/shared/faProjectStylingPatchSchema'
 import type {
@@ -23,7 +26,10 @@ import type {
 } from 'app/types/I_faProjectManagementDomain'
 import type { I_faProjectNoteboardRoot } from 'app/types/I_faProjectNoteboardDomain'
 import type { I_faProjectStylingRoot } from 'app/types/I_faProjectStylingDomain'
-import type { I_faRecentProjectEntry } from 'app/types/I_faRecentProjectsDomain'
+import type {
+  I_faRecentProjectEntry,
+  I_faRecentProjectMruHeadResolve
+} from 'app/types/I_faRecentProjectsDomain'
 
 const FA_PROJECT_MANAGEMENT_FALLBACK_PROJECT_NOTEBOARD: I_faProjectNoteboardRoot = {
   frame: null,
@@ -89,6 +95,13 @@ export function registerFaProjectManagementIpc (): void {
     FA_PROJECT_MANAGEMENT_IPC.getRecentProjectsAsync,
     (): I_faRecentProjectEntry[] => {
       return getRecentProjectsSnapshot()
+    }
+  )
+
+  ipcMain.handle(
+    FA_PROJECT_MANAGEMENT_IPC.resolveRecentProjectMruHeadForOpenAsync,
+    (): I_faRecentProjectMruHeadResolve => {
+      return resolveRecentProjectMruHeadForOpen()
     }
   )
 

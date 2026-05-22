@@ -88,11 +88,19 @@ export default {
       tags: 'appearance, interface, global, ui, look and feel',
       applicationExtras: {
         subtitle: 'Application extras',
-        tags: 'welcome screen, startup, tips, social, mascot'
+        tags: 'mascot, plush, project overview tips, extras'
       },
       visualsAppwideFunctionality: {
         subtitle: 'Visuals & app-wide functionality',
         tags: 'theme, chrome, layout, general options'
+      }
+    },
+    welcomeScreen: {
+      title: 'Welcome screen',
+      tags: 'splash, start screen, welcome, first launch, home',
+      welcomeScreenBehavior: {
+        subtitle: 'Welcome screen behavior',
+        tags: 'startup tips, social links, onboarding, splash'
       }
     }
   },
@@ -209,7 +217,7 @@ export default {
       tags: 'project home, dashboard card, overview hints'
     },
     hideTooltipsStart: {
-      title: 'TODO - Hide tips popup on start screen',
+      title: 'Hide tips popup on start screen',
       description: 'Hides the start screen tips & tricks popup.',
       tags: 'first launch, onboarding, splash, startup tips, tricks'
     },
@@ -238,10 +246,20 @@ export default {
       description: 'Hides the custom order numbers to the left of the names.',
       tags: 'sequence index, manual order, rank prefix, left gutter'
     },
+    hideRecentProjectTooltip: {
+      title: 'Hide "Browse latest projects" tooltip',
+      description: 'Hides the tooltip on the browse-latest-projects caret beside Resume Latest Project on the welcome screen.',
+      tags: 'project, load, loading, latest, recent, intro, start, welcome, tooltip, pop-up, tooltips, pop up'
+    },
     hideWelcomeScreenSocials: {
-      title: 'TODO - Hide welcome screen social links',
+      title: 'Hide welcome screen social links',
       description: 'Hides all the social links on the Welcome screen.',
       tags: 'discord, twitter, community links, social media, welcome'
+    },
+    skipWelcomeScreen: {
+      title: 'Skip welcome screen',
+      description: 'Skips the welcome screen and attempts to load the latest project directly when launching the app.',
+      tags: 'project, load, loading, latest, recent, intro, start, welcome'
     },
     invertCategoryPosition: {
       title: 'TODO - Invert category position',

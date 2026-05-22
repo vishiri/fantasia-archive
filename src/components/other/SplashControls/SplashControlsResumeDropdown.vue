@@ -52,12 +52,12 @@
       </q-list>
     </q-btn-dropdown>
     <q-tooltip
-      v-if="resumeDropdownArrowEl !== null"
+      v-if="showResumeDropdownArrowTooltip"
       anchor="center right"
       self="center left"
       :delay="300"
       :offset="[10, 0]"
-      :target="resumeDropdownArrowEl"
+      :target="resumeDropdownArrowTarget"
       transition-hide="fade"
       :transition-duration="300"
     >
@@ -74,9 +74,12 @@ import { storeToRefs } from 'pinia'
 
 import { i18n } from 'app/i18n/externalFileLoader'
 
+import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
+import { openWelcomeScreenAutoLoadProject } from 'app/src/scripts/projectManagement/faWelcomeScreenAutoLoadProject'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
+import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 
 import { resolveSplashResumeDropdownArrowElement } from './scripts/resolveSplashResumeDropdownArrowElement'
 
@@ -90,11 +93,30 @@ const resumeDropdownArrowEl = ref<HTMLElement | null>(null)
 const activeProjectStore = S_FaActiveProject()
 const { activeProject } = storeToRefs(activeProjectStore)
 
+const faUserSettingsStore = S_FaUserSettings()
+const { settings: faUserSettings } = storeToRefs(faUserSettingsStore)
+
 const recentProjectsStore = S_FaRecentProjects()
 const { entries: recentProjectEntries } = storeToRefs(recentProjectsStore)
 
+const hideRecentProjectTooltip = computed(() => {
+  return faUserSettings.value?.hideRecentProjectTooltip ??
+    FA_USER_SETTINGS_DEFAULTS.hideRecentProjectTooltip
+})
+
 const hasRecentProjects = computed(() => {
   return recentProjectEntries.value.length > 0
+})
+
+const showResumeDropdownArrowTooltip = computed(() => {
+  if (hideRecentProjectTooltip.value === true) {
+    return false
+  }
+  return resumeDropdownArrowEl.value !== null
+})
+
+const resumeDropdownArrowTarget = computed((): Element | undefined => {
+  return resumeDropdownArrowEl.value ?? undefined
 })
 
 const resumePrimarySegmentLabel = computed(() => {
@@ -104,19 +126,31 @@ const resumePrimarySegmentLabel = computed(() => {
   return i18n.global.t('splashPage.resumeLatestProject')
 })
 
+function syncResumeDropdownArrowTarget (): void {
+  if (hasRecentProjects.value !== true || hideRecentProjectTooltip.value === true) {
+    resumeDropdownArrowEl.value = null
+    return
+  }
+
+  void nextTick(() => {
+    resumeDropdownArrowEl.value = resolveSplashResumeDropdownArrowElement(
+      resumeDropdownRef.value
+    )
+  })
+}
+
 watch(
   hasRecentProjects,
-  (show) => {
-    if (show !== true) {
-      resumeDropdownArrowEl.value = null
-      return
-    }
+  () => {
+    syncResumeDropdownArrowTarget()
+  },
+  { flush: 'post' }
+)
 
-    void nextTick(() => {
-      resumeDropdownArrowEl.value = resolveSplashResumeDropdownArrowElement(
-        resumeDropdownRef.value
-      )
-    })
+watch(
+  hideRecentProjectTooltip,
+  () => {
+    syncResumeDropdownArrowTarget()
   },
   { flush: 'post' }
 )
@@ -124,15 +158,7 @@ watch(
 watch(
   () => i18n.global.locale.value,
   () => {
-    if (hasRecentProjects.value !== true) {
-      return
-    }
-
-    void nextTick(() => {
-      resumeDropdownArrowEl.value = resolveSplashResumeDropdownArrowElement(
-        resumeDropdownRef.value
-      )
-    })
+    syncResumeDropdownArrowTarget()
   },
   { flush: 'post' }
 )
@@ -155,18 +181,13 @@ function onResumePrimarySegmentClick (): void {
     return
   }
 
-  const first = recentProjectEntries.value[0]
-  if (first === undefined) {
-    return
-  }
-  void runFaAction('loadExistingProject', {
-    filePath: first.filePath,
-    resumeActiveSession: true
-  })
+  void openWelcomeScreenAutoLoadProject()
 }
 
 onMounted(() => {
-  void recentProjectsStore.refreshRecentProjects()
+  void recentProjectsStore.refreshRecentProjects().then(() => {
+    syncResumeDropdownArrowTarget()
+  })
 })
 </script>
 

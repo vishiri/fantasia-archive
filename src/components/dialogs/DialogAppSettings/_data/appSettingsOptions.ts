@@ -94,8 +94,8 @@ I_appSettingsStaticOption
     subcategory: 'applicationExtras'
   },
   hideTooltipsStart: {
-    category: 'visualAccessibility',
-    subcategory: 'applicationExtras'
+    category: 'welcomeScreen',
+    subcategory: 'welcomeScreenBehavior'
   },
   hideTreeExtraIcons: {
     category: 'hierarchicalTree',
@@ -117,9 +117,13 @@ I_appSettingsStaticOption
     category: 'hierarchicalTree',
     subcategory: 'informationDisplaySettings'
   },
+  hideRecentProjectTooltip: {
+    category: 'welcomeScreen',
+    subcategory: 'welcomeScreenBehavior'
+  },
   hideWelcomeScreenSocials: {
-    category: 'visualAccessibility',
-    subcategory: 'applicationExtras'
+    category: 'welcomeScreen',
+    subcategory: 'welcomeScreenBehavior'
   },
   invertCategoryPosition: {
     category: 'hierarchicalTree',
@@ -168,6 +172,10 @@ I_appSettingsStaticOption
   showDocumentID: {
     category: 'developerSettings',
     subcategory: 'documentBody'
+  },
+  skipWelcomeScreen: {
+    category: 'welcomeScreen',
+    subcategory: 'welcomeScreenBehavior'
   },
   tagsAtTop: {
     category: 'hierarchicalTree',

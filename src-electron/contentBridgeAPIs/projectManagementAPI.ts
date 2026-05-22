@@ -16,7 +16,10 @@ import type {
   I_faProjectStylingPatch,
   I_faProjectStylingRoot
 } from 'app/types/I_faProjectStylingDomain'
-import type { I_faRecentProjectEntry } from 'app/types/I_faRecentProjectsDomain'
+import type {
+  I_faRecentProjectEntry,
+  I_faRecentProjectMruHeadResolve
+} from 'app/types/I_faRecentProjectsDomain'
 
 export const projectManagementAPI: I_faProjectManagementAPI = {
   async createProject (input: I_faProjectCreateInput): Promise<I_faProjectCreateResult> {
@@ -43,6 +46,12 @@ export const projectManagementAPI: I_faProjectManagementAPI = {
     return await ipcRenderer.invoke(
       FA_PROJECT_MANAGEMENT_IPC.getRecentProjectsAsync
     ) as I_faRecentProjectEntry[]
+  },
+
+  async resolveRecentProjectMruHeadForOpen (): Promise<I_faRecentProjectMruHeadResolve> {
+    return await ipcRenderer.invoke(
+      FA_PROJECT_MANAGEMENT_IPC.resolveRecentProjectMruHeadForOpenAsync
+    ) as I_faRecentProjectMruHeadResolve
   },
 
   async openProject (input?: I_faProjectOpenInput): Promise<I_faProjectOpenResult> {

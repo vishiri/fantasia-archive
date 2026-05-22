@@ -40,9 +40,9 @@ function entryRowsExistAsFiles (rows: readonly I_faRecentProjectEntry[]): I_faRe
 }
 
 /**
- * Idempotent MRU normalization: Zod strip, main path validation, dedupe, cap, drop missing paths.
+ * Idempotent MRU normalization without dropping missing files (path shape and dedupe only).
  */
-export function faRecentProjectsSanitizeForPersistence (storeBlob: unknown): I_faRecentProjectEntry[] {
+export function faRecentProjectsSanitizeStructural (storeBlob: unknown): I_faRecentProjectEntry[] {
   const parsed = parseFaRecentProjectListStored(storeBlob)
   const vetted: I_faRecentProjectEntry[] = []
   for (const row of parsed) {
@@ -51,9 +51,15 @@ export function faRecentProjectsSanitizeForPersistence (storeBlob: unknown): I_f
       vetted.push(next)
     }
   }
-  const deduped = faRecentProjectListStructuralNormalize(vetted)
-  const living = entryRowsExistAsFiles(deduped)
-  return living
+  return faRecentProjectListStructuralNormalize(vetted)
+}
+
+/**
+ * Idempotent MRU normalization: Zod strip, main path validation, dedupe, cap, drop missing paths.
+ */
+export function faRecentProjectsSanitizeForPersistence (storeBlob: unknown): I_faRecentProjectEntry[] {
+  const structural = faRecentProjectsSanitizeStructural(storeBlob)
+  return entryRowsExistAsFiles(structural)
 }
 
 export function faRecentProjectsListsEqual (

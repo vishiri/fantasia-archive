@@ -1,4 +1,6 @@
 import { i18n } from 'app/i18n/externalFileLoader'
+import { tryRunSkipWelcomeScreenOnLaunch } from 'app/src/scripts/appInternals/faAppStartupSkipWelcomeScreen'
+import { markWelcomeScreenAutoLoadBootAttempted } from 'app/src/scripts/projectManagement/faWelcomeScreenAutoLoadSession'
 import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
 import type { I_appStartupRouter } from 'app/types/I_appStartupRouter'
 import type { I_faUserSettings, T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
@@ -113,6 +115,12 @@ export const runAppStartupRouting = async (
 
   if (componentNameOrFalse) {
     await router.push({ path: `/componentTesting/${componentNameOrFalse}` })
+    return
+  }
+
+  markWelcomeScreenAutoLoadBootAttempted()
+  const skippedWelcomeScreen = await tryRunSkipWelcomeScreenOnLaunch()
+  if (skippedWelcomeScreen) {
     return
   }
 

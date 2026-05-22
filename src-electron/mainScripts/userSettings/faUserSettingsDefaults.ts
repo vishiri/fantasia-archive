@@ -22,6 +22,7 @@ export const FA_USER_SETTINGS_DEFAULTS: I_faUserSettings = {
   hideEmptyFields: false,
   hideHierarchyTree: false,
   hidePlushes: false,
+  hideRecentProjectTooltip: false,
   hideTooltipsProject: false,
   hideTooltipsStart: false,
   hideTreeExtraIcons: false,
@@ -43,6 +44,7 @@ export const FA_USER_SETTINGS_DEFAULTS: I_faUserSettings = {
   preventPreviewsTabs: true,
   preventPreviewsTree: true,
   showDocumentID: false,
+  skipWelcomeScreen: false,
   tagsAtTop: false,
   textShadow: false
 }

@@ -20,11 +20,19 @@ export default {
       tags: 'apparence, interface, global, interface utilisateur, rendu',
       applicationExtras: {
         subtitle: 'Options supplémentaires de l\'application',
-        tags: 'écran d\'accueil, démarrage, conseils, réseaux sociaux, mascotte'
+        tags: 'mascotte, peluche, conseils vue projet, extras'
       },
       visualsAppwideFunctionality: {
         subtitle: 'Visuels et fonctionnalités générales',
         tags: 'thème, chrome, disposition, options générales'
+      }
+    },
+    welcomeScreen: {
+      title: 'Écran d\'accueil',
+      tags: 'splash, écran de démarrage, accueil, premier lancement',
+      welcomeScreenBehavior: {
+        subtitle: 'Comportement de l\'écran d\'accueil',
+        tags: 'conseils au démarrage, liens sociaux, onboarding, splash'
       }
     }
   }

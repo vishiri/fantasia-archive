@@ -658,9 +658,52 @@ test('Test that exportAppConfigPackage handler is a no-op but defined', async ()
   ).resolves.toBeUndefined()
 })
 
-test('Test that showStartupTipsNotification handler invokes the notification helper', () => {
-  definitionFor('showStartupTipsNotification').handler(undefined)
+test('Test that showStartupTipsNotification handler invokes the notification helper', async () => {
+  await (definitionFor('showStartupTipsNotification').handler(undefined) as Promise<unknown>)
   expect(tipsNotificationMock).toHaveBeenCalledWith(false)
+})
+
+test('Test that showStartupTipsNotification handler shows notify when hideTooltipsStart is false in persisted settings', async () => {
+  tipsNotificationMock.mockClear()
+  const prev = window.faContentBridgeAPIs
+  Object.assign(window, {
+    faContentBridgeAPIs: {
+      ...prev,
+      faUserSettings: {
+        getSettings: vi.fn(async () => ({
+          hideTooltipsStart: false
+        })),
+        setSettings: vi.fn()
+      }
+    }
+  })
+
+  await (definitionFor('showStartupTipsNotification').handler(undefined) as Promise<unknown>)
+
+  expect(tipsNotificationMock).toHaveBeenCalledWith(false)
+  Object.assign(window, { faContentBridgeAPIs: prev })
+})
+
+test('Test that showStartupTipsNotification handler skips notify when hideTooltipsStart is enabled', async () => {
+  const prev = window.faContentBridgeAPIs
+  const getSettingsMock = vi.fn(async () => ({
+    hideTooltipsStart: true
+  }))
+  Object.assign(window, {
+    faContentBridgeAPIs: {
+      ...prev,
+      faUserSettings: {
+        getSettings: getSettingsMock,
+        setSettings: vi.fn()
+      }
+    }
+  })
+
+  await (definitionFor('showStartupTipsNotification').handler(undefined) as Promise<unknown>)
+
+  expect(getSettingsMock).toHaveBeenCalledOnce()
+  expect(tipsNotificationMock).not.toHaveBeenCalled()
+  Object.assign(window, { faContentBridgeAPIs: prev })
 })
 
 /**

@@ -136,3 +136,108 @@ test('Test that second snapshot avoids persist when sanitized list matches store
   expect(setSpy).not.toHaveBeenCalled()
   setSpy.mockRestore()
 })
+
+/**
+ * resolveRecentProjectMruHeadForOpen
+ * Empty MRU list reports outcome empty.
+ */
+test('Test that resolveRecentProjectMruHeadForOpen returns empty when MRU list has no rows', async () => {
+  const mod = await import('../faRecentProjectListRuntime')
+  expect(mod.resolveRecentProjectMruHeadForOpen()).toEqual({ outcome: 'empty' })
+})
+
+/**
+ * resolveRecentProjectMruHeadForOpen
+ * Present MRU head file reports outcome ready with the head entry.
+ */
+test('Test that resolveRecentProjectMruHeadForOpen returns ready for existing MRU head file', async () => {
+  ElectronStoreMock.mockImplementationOnce(function (
+    this: unknown,
+    opts: { defaults: I_recentFile }
+  ) {
+    const state = {
+      recentProjects: [
+        {
+          filePath: 'D:\\head.faproject',
+          name: 'Head'
+        },
+        ...opts.defaults.recentProjects
+      ] as Array<{ filePath: string, name: string }>
+    }
+    return {
+      get (k: keyof I_recentFile): unknown {
+        return state[k]
+      },
+      set (k: keyof I_recentFile, v: unknown): void {
+        if (k === 'recentProjects') {
+          state.recentProjects = v as typeof state.recentProjects
+        }
+      }
+    }
+  })
+
+  const mod = await import('../faRecentProjectListRuntime')
+  expect(mod.resolveRecentProjectMruHeadForOpen()).toEqual({
+    entry: {
+      filePath: 'D:\\head.faproject',
+      name: 'Head'
+    },
+    outcome: 'ready'
+  })
+})
+
+/**
+ * resolveRecentProjectMruHeadForOpen
+ * Reports missing for the MRU head only and removes it without returning the second recent row.
+ */
+test('Test that resolveRecentProjectMruHeadForOpen returns missing for absent MRU head file', async () => {
+  ElectronStoreMock.mockImplementationOnce(function (
+    this: unknown,
+    opts: { defaults: I_recentFile }
+  ) {
+    const state = {
+      recentProjects: [
+        {
+          filePath: 'D:\\gone.faproject',
+          name: 'Gone'
+        },
+        {
+          filePath: 'D:\\next.faproject',
+          name: 'Next'
+        },
+        ...opts.defaults.recentProjects
+      ] as Array<{ filePath: string, name: string }>
+    }
+    return {
+      get (k: keyof I_recentFile): unknown {
+        return state[k]
+      },
+      set (k: keyof I_recentFile, v: unknown): void {
+        if (k === 'recentProjects') {
+          state.recentProjects = v as typeof state.recentProjects
+        }
+      }
+    }
+  })
+
+  fsMock.existsSync.mockImplementation((p: string) => {
+    return p.includes('next.faproject')
+  })
+
+  const mod = await import('../faRecentProjectListRuntime')
+  const result = mod.resolveRecentProjectMruHeadForOpen()
+
+  expect(result).toEqual({
+    attemptedEntry: {
+      filePath: 'D:\\gone.faproject',
+      name: 'Gone'
+    },
+    outcome: 'missing'
+  })
+
+  const rows = mod.getFaRecentProjectListStore().get('recentProjects') as Array<{
+    filePath: string
+  }>
+  expect(rows.some((r) => r.filePath.includes('gone.faproject'))).toBe(false)
+  expect(rows[0]?.filePath).toContain('next.faproject')
+})

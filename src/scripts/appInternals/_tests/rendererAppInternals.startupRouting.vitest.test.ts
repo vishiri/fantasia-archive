@@ -1,8 +1,23 @@
 import { beforeEach, expect, test, vi } from 'vitest'
 
-const { runFaActionMock } = vi.hoisted(() => {
+const { runFaActionMock, tryRunSkipWelcomeScreenOnLaunchMock, markWelcomeScreenAutoLoadBootAttemptedMock } =
+  vi.hoisted(() => {
+    return {
+      markWelcomeScreenAutoLoadBootAttemptedMock: vi.fn(),
+      runFaActionMock: vi.fn(),
+      tryRunSkipWelcomeScreenOnLaunchMock: vi.fn()
+    }
+  })
+
+vi.mock('app/src/scripts/appInternals/faAppStartupSkipWelcomeScreen', () => {
   return {
-    runFaActionMock: vi.fn()
+    tryRunSkipWelcomeScreenOnLaunch: tryRunSkipWelcomeScreenOnLaunchMock
+  }
+})
+
+vi.mock('app/src/scripts/projectManagement/faWelcomeScreenAutoLoadSession', () => {
+  return {
+    markWelcomeScreenAutoLoadBootAttempted: markWelcomeScreenAutoLoadBootAttemptedMock
   }
 })
 
@@ -16,6 +31,9 @@ import { determineTestingComponentName, runAppStartupRouting } from '../renderer
 
 beforeEach(() => {
   runFaActionMock.mockReset()
+  tryRunSkipWelcomeScreenOnLaunchMock.mockReset()
+  tryRunSkipWelcomeScreenOnLaunchMock.mockResolvedValue(false)
+  markWelcomeScreenAutoLoadBootAttemptedMock.mockReset()
 })
 
 /**
@@ -68,6 +86,27 @@ test('Test that runAppStartupRouting pushes component testing route when request
   )
 
   expect(routerPushMock).toHaveBeenCalledWith({ path: '/componentTesting/FantasiaMascotImage' })
+  expect(runFaActionMock).not.toHaveBeenCalled()
+  expect(tryRunSkipWelcomeScreenOnLaunchMock).not.toHaveBeenCalled()
+})
+
+/**
+ * runAppStartupRouting
+ * Skips welcome route and tips when skipWelcomeScreen launch succeeds.
+ */
+test('Test that runAppStartupRouting returns early when skip welcome screen succeeds', async () => {
+  const routerPushMock = vi.fn()
+  tryRunSkipWelcomeScreenOnLaunchMock.mockResolvedValueOnce(true)
+
+  await runAppStartupRouting(
+    { push: routerPushMock },
+    undefined,
+    undefined
+  )
+
+  expect(tryRunSkipWelcomeScreenOnLaunchMock).toHaveBeenCalled()
+  expect(markWelcomeScreenAutoLoadBootAttemptedMock).toHaveBeenCalled()
+  expect(routerPushMock).not.toHaveBeenCalled()
   expect(runFaActionMock).not.toHaveBeenCalled()
 })
 

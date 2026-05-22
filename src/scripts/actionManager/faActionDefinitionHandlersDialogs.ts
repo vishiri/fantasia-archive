@@ -165,5 +165,13 @@ export async function handleLoadExistingProject (
 }
 
 export async function handleShowStartupTipsNotification (): Promise<void> {
+  const userSettingsBridge = window.faContentBridgeAPIs?.faUserSettings
+  if (userSettingsBridge?.getSettings !== undefined) {
+    const persistedSettings = await userSettingsBridge.getSettings()
+    if (persistedSettings.hideTooltipsStart === true) {
+      return
+    }
+  }
+
   tipsTricksTriviaNotification(false)
 }

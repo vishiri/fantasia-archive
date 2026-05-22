@@ -1,11 +1,15 @@
 import ElectronStore from 'electron-store'
 
 import { faRecentProjectPathKey } from 'app/src-electron/shared/faRecentProjectPathKey'
-import type { I_faRecentProjectEntry } from 'app/types/I_faRecentProjectsDomain'
+import type {
+  I_faRecentProjectEntry,
+  I_faRecentProjectMruHeadResolve
+} from 'app/types/I_faRecentProjectsDomain'
 
 import {
   faRecentProjectsListsEqual,
-  faRecentProjectsSanitizeForPersistence
+  faRecentProjectsSanitizeForPersistence,
+  faRecentProjectsSanitizeStructural
 } from './faRecentProjectListSanitize'
 
 type I_faRecentProjectListFile = {
@@ -48,6 +52,38 @@ export function getRecentProjectsSnapshot (): I_faRecentProjectEntry[] {
   const sanitized = faRecentProjectsSanitizeForPersistence(blob)
   persistSanitizedIfChanged(sanitized)
   return sanitized
+}
+
+function recentProjectHeadRowExistsOnDisk (row: I_faRecentProjectEntry): boolean {
+  const living = faRecentProjectsSanitizeForPersistence({
+    recentProjects: [row]
+  })
+  return living.length === 1
+}
+
+/**
+ * Resolves only the MRU head for welcome skip/resume auto-load; does not substitute the next recent row when the head file is missing.
+ */
+export function resolveRecentProjectMruHeadForOpen (): I_faRecentProjectMruHeadResolve {
+  const store = getFaRecentProjectListStore()
+  const structural = faRecentProjectsSanitizeStructural({
+    recentProjects: store.get('recentProjects') as unknown
+  })
+  const head = structural[0]
+  if (head === undefined) {
+    return { outcome: 'empty' }
+  }
+  if (!recentProjectHeadRowExistsOnDisk(head)) {
+    removeRecentProjectEntryByPath(head.filePath)
+    return {
+      attemptedEntry: head,
+      outcome: 'missing'
+    }
+  }
+  return {
+    entry: head,
+    outcome: 'ready'
+  }
 }
 
 /**

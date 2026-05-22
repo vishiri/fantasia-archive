@@ -6,7 +6,10 @@ import type {
   I_faProjectStylingPatch,
   I_faProjectStylingRoot
 } from 'app/types/I_faProjectStylingDomain'
-import type { I_faRecentProjectEntry } from 'app/types/I_faRecentProjectsDomain'
+import type {
+  I_faRecentProjectEntry,
+  I_faRecentProjectMruHeadResolve
+} from 'app/types/I_faRecentProjectsDomain'
 
 /**
  * Fantasia Archive project files (.faproject) — renderer↔main bridge contracts.
@@ -69,6 +72,10 @@ export interface I_faProjectManagementAPI {
   getProjectNoteboard: () => Promise<I_faProjectNoteboardRoot>
   getProjectStyling: () => Promise<I_faProjectStylingRoot>
   getRecentProjects: () => Promise<I_faRecentProjectEntry[]>
+  /**
+   * Newest MRU row for auto-open on the welcome screen; reports missing when that file alone is gone (no next-row fallback).
+   */
+  resolveRecentProjectMruHeadForOpen: () => Promise<I_faRecentProjectMruHeadResolve>
   openProject: (input?: I_faProjectOpenInput) => Promise<I_faProjectOpenResult>
   /**
    * Resolves **true** when the patch wrote into the active project's SQLite KV.

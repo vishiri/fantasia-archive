@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest'
 
 import { i18n } from 'app/i18n/externalFileLoader'
+import { APP_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogAppSettings/_data/appSettingsOptions'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import {
   applyAppSettingsStorybookDisplayTitlesPatch,
@@ -16,11 +17,12 @@ test('stripTodoPrefixFromAppSettingsOptionTitle removes leading TODO dash prefix
 
 test('buildAppSettingsStorybookAppOptionsTitlePatch covers every persisted app settings key', () => {
   const patch = buildAppSettingsStorybookAppOptionsTitlePatch()
-  const keys = Object.keys(patch).sort() as (keyof I_faUserSettings)[]
+  const patchKeys = Object.keys(patch).sort()
+  const managedKeys = (Object.keys(APP_SETTINGS_OPTIONS) as (keyof I_faUserSettings)[]).sort()
 
-  expect(keys.length).toBe(43)
+  expect(patchKeys).toEqual(managedKeys)
 
-  for (const key of keys) {
+  for (const key of patchKeys) {
     expect(patch[key].title).not.toMatch(/^\s*TODO\s*-/i)
   }
 })

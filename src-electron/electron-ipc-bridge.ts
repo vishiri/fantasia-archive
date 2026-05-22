@@ -73,6 +73,8 @@ export const FA_APP_CONFIG_IPC = {
 export const FA_PROJECT_MANAGEMENT_IPC = {
   createProjectAsync: 'fa-project-management-create-project-async',
   getRecentProjectsAsync: 'fa-project-management-get-recent-projects-async',
+  resolveRecentProjectMruHeadForOpenAsync:
+    'fa-project-management-resolve-recent-project-mru-head-for-open-async',
   getProjectNoteboardAsync: 'fa-project-management-get-project-noteboard-async',
   getProjectStylingAsync: 'fa-project-management-get-project-styling-async',
   openProjectAsync: 'fa-project-management-open-project-async',
