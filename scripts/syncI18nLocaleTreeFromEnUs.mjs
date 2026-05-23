@@ -1,0 +1,178 @@
+/**
+ * Copies the en-US i18n module tree into target locale folders and writes a matching index.ts.
+ * Usage: node scripts/syncI18nLocaleTreeFromEnUs.mjs de fr it ...
+ */
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+const enUsRoot = path.join(repoRoot, 'i18n', 'en-US')
+
+const ALL_TARGET_LOCALES = [
+  'de',
+  'fr',
+  'it',
+  'sv',
+  'fi',
+  'nb',
+  'pt',
+  'es',
+  'el',
+  'uk',
+  'ar',
+  'zh',
+  'ja',
+  'hi',
+  'ru'
+]
+
+function copyDirectoryRecursive (sourceDir, targetDir) {
+  fs.mkdirSync(targetDir, { recursive: true })
+  for (const entry of fs.readdirSync(sourceDir, { withFileTypes: true })) {
+    const sourcePath = path.join(sourceDir, entry.name)
+    const targetPath = path.join(targetDir, entry.name)
+    if (entry.isDirectory()) {
+      copyDirectoryRecursive(sourcePath, targetPath)
+      continue
+    }
+    if (entry.isFile() && entry.name !== 'index.ts') {
+      fs.copyFileSync(sourcePath, targetPath)
+    }
+  }
+}
+
+function buildIndexTs (localeCode) {
+  return `import { specialCharacterFixer } from '../specialCharactersFixer'
+
+import advancedSearchCheatSheet from './documents/advancedSearchCheatSheet.md?raw'
+import advancedSearchGuide from './documents/advancedSearchGuide.md?raw'
+import changeLog from './documents/changeLog.md?raw'
+import license from '../en-US/documents/license.md?raw'
+import tipsTricksTrivia from './documents/tipsTricksTrivia.md?raw'
+
+import L_FantasiaMascotImage from './components/elements/FantasiaMascotImage/L_FantasiaMascotImage'
+import L_helpInfo from './components/globals/AppControlMenus/L_helpInfo'
+import L_project from './components/globals/AppControlMenus/L_project'
+import L_tools from './components/globals/AppControlMenus/L_tools'
+import L_documents from './components/globals/AppControlMenus/L_documents'
+
+import L_GlobalLanguageSelector from './components/globals/GlobalLanguageSelector/L_GlobalLanguageSelector'
+import L_GlobalWindowButtons from './components/globals/GlobalWindowButtons/L_GlobalWindowButtons'
+import L_socialContactButtons from './components/other/SocialContactButtons/L_socialContactButtons'
+
+import L_aboutFantasiaArchive from './dialogs/L_aboutFantasiaArchive'
+import L_DialogActionMonitor from './dialogs/L_DialogActionMonitor'
+import L_markdownDocument from './dialogs/L_markdownDocument'
+import L_newProject from './dialogs/L_newProject'
+import L_dialogKeybindSettings from './dialogs/L_dialogKeybindSettings'
+import L_importExportAppConfig from './dialogs/L_importExportAppConfig'
+import L_appSettings from './dialogs/L_appSettings'
+import L_appNoteboard from './floatingWindows/L_appNoteboard'
+import L_projectNoteboard from './floatingWindows/L_projectNoteboard'
+import L_appStylingFloating from './floatingWindows/L_appStyling'
+import L_projectStylingFloating from './floatingWindows/L_projectStyling'
+
+import L_faActionManager from './globalFunctionality/L_faActionManager'
+import L_faKeybinds from './globalFunctionality/L_faKeybinds'
+import L_faAppNoteboard from './globalFunctionality/L_faAppNoteboard'
+import L_faProjectNoteboard from './globalFunctionality/L_faProjectNoteboard'
+import L_faAppStyling from './globalFunctionality/L_faAppStyling'
+import L_faProjectStyling from './globalFunctionality/L_faProjectStyling'
+import L_faProjectSession from './globalFunctionality/L_faProjectSession'
+import L_faUserSettings from './globalFunctionality/L_faUserSettings'
+import L_spellChecker from './globalFunctionality/L_spellChecker'
+import L_unsortedAppTexts from './globalFunctionality/L_unsortedAppTexts'
+
+import L_mainLayout from './layouts/L_mainLayout'
+import L_ErrorNotFound from './pages/L_ErrorNotFound'
+import L_splashPage from './pages/L_splashPage'
+
+export default {
+  // GLOBAL - DOCUMENTS
+  documents: {
+    advancedSearchCheatSheet: specialCharacterFixer(advancedSearchCheatSheet),
+    advancedSearchGuide: specialCharacterFixer(advancedSearchGuide),
+    changeLog: specialCharacterFixer(changeLog),
+    license: specialCharacterFixer(license),
+    tipsTricksTrivia: specialCharacterFixer(tipsTricksTrivia)
+  },
+
+  // PAGE - ERROR NOT FOUND
+  errorNotFound: L_ErrorNotFound,
+
+  // PAGE - SPLASH / WELCOME
+  splashPage: L_splashPage,
+
+  // LAYOUT - MAIN
+  mainLayout: L_mainLayout,
+
+  // DIALOGS
+  dialogs: {
+    aboutFantasiaArchive: L_aboutFantasiaArchive,
+    actionMonitor: L_DialogActionMonitor,
+    importExportAppConfig: L_importExportAppConfig,
+    keybindSettings: L_dialogKeybindSettings,
+    markdownDocument: L_markdownDocument,
+    newProject: L_newProject,
+    appSettings: L_appSettings
+  },
+
+  // FLOATING WINDOWS (in-renderer movable / resizable surfaces)
+  floatingWindows: {
+    appNoteboard: L_appNoteboard,
+    appStyling: L_appStylingFloating,
+    projectNoteboard: L_projectNoteboard,
+    projectStyling: L_projectStylingFloating
+  },
+
+  // COMPONENT - GLOBAL LANGUAGE SELECTOR
+  globalLanguageSelector: L_GlobalLanguageSelector,
+
+  // COMPONENT - GLOBAL WINDOW BUTTONS
+  globalWindowButtons: L_GlobalWindowButtons,
+
+  // COMPONENT - APP CONTROL MENUS
+  appControlMenus: {
+    project: L_project,
+    tools: L_tools,
+    documents: L_documents,
+    helpInfo: L_helpInfo
+  },
+
+  // COMPONENT - SOCIAL CONTACT BUTTONS
+  socialContactButtons: L_socialContactButtons,
+
+  // COMPONENT - FANTASIA MASCOT IMAGE
+  fantasiaMascotImage: L_FantasiaMascotImage,
+
+  // GLOBAL FUNCTIONALITY
+  globalFunctionality: {
+    faActionManager: L_faActionManager,
+    faKeybinds: L_faKeybinds,
+    faAppNoteboard: L_faAppNoteboard,
+    faProjectNoteboard: L_faProjectNoteboard,
+    faAppStyling: L_faAppStyling,
+    faProjectStyling: L_faProjectStyling,
+    faProjectSession: L_faProjectSession,
+    faUserSettings: L_faUserSettings,
+    spellChecker: L_spellChecker,
+    unsortedAppTexts: L_unsortedAppTexts
+  }
+}
+`
+}
+
+function syncLocale (localeCode) {
+  const targetRoot = path.join(repoRoot, 'i18n', localeCode)
+  copyDirectoryRecursive(enUsRoot, targetRoot)
+  fs.writeFileSync(path.join(targetRoot, 'index.ts'), buildIndexTs(localeCode), 'utf8')
+  console.log(`Synced i18n/${localeCode} from en-US`)
+}
+
+const cliLocales = process.argv.slice(2)
+const locales = cliLocales.length > 0 ? cliLocales : ALL_TARGET_LOCALES
+
+for (const localeCode of locales) {
+  syncLocale(localeCode)
+}
