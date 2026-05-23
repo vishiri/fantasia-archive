@@ -1,10 +1,10 @@
 export default {
-  title: 'Paramètres & outils',
+  title: 'Paramètres et outils',
   items: {
-    appNoteBoard: 'Basculer le noteboard de l’app',
-    keybindSettings: 'Paramètres des raccourcis',
-    appSettings: 'Paramètres de l’app',
-    appStyling: 'CSS personnalisé de l’app',
-    importExportAppConfig: 'Importer / exporter la configuration de l’app'
+    appNoteBoard: 'Basculer le bloc-notes de l\'application',
+    keybindSettings: 'Paramètres de raccourci clavier',
+    appSettings: 'Paramètres de l\'application',
+    appStyling: 'Application personnalisée CSS',
+    importExportAppConfig: 'Importer/Exporter la configuration de l\'application',
   }
 }

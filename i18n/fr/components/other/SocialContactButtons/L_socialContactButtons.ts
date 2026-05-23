@@ -1,30 +1,30 @@
 export default {
   buttonPatreon: {
-    label: 'Soutenir FA sur Patreon !',
-    title: 'Soutenir FA sur Patreon !'
+    label: 'Soutenez FA sur Patreon !',
+    title: 'Soutenez FA sur Patreon !',
   },
   buttonKofi: {
-    label: 'Soutenir FA sur Ko-Fi !',
-    title: 'Soutenir FA sur Ko-Fi !'
+    label: 'Soutenez FA sur Ko-Fi !',
+    title: 'Soutenez FA sur Ko-Fi !',
   },
   buttonWebsite: {
     label: 'Site web',
-    title: 'Visiter le site web de FA'
+    title: 'Visitez le site Web FA',
   },
   buttonGitHub: {
     label: 'GitHub',
-    title: 'Visiter le dépôt GitHub de FA'
+    title: 'Visitez le référentiel FA GitHub',
   },
   buttonDiscord: {
     label: 'Discord',
-    title: 'Rejoindre le serveur Discord de FA'
+    title: 'Rejoignez le serveur FA Discord',
   },
   buttonReddit: {
     label: '',
-    title: 'S\'abonner au subreddit de FA'
+    title: 'Abonnez-vous au sous-reddit FA',
   },
   buttonTwitter: {
     label: 'Suivre sur X',
-    title: 'Suivre FA sur X'
+    title: 'Suivez FA sur X',
   }
 }

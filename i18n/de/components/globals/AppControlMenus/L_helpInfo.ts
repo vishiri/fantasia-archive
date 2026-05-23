@@ -1,12 +1,12 @@
 export default {
-  title: 'Hilfe & Info',
+  title: 'Hilfe und Informationen',
   items: {
     advancedSearchGuide: 'Leitfaden zur erweiterten Suche',
-    tipsTricksTrivia: 'Tipps, Tricks & Kurioses',
+    tipsTricksTrivia: 'Tipps, Tricks und Wissenswertes',
     changelog: 'Änderungsprotokoll',
     aboutFantasiaArchive: 'Über Fantasia Archive',
     license: 'Lizenz',
-    toggleDeveloperTools: 'Entwicklerwerkzeuge ein/aus',
-    actionMonitor: 'Aktionsmonitor'
+    toggleDeveloperTools: 'Entwicklertools umschalten',
+    actionMonitor: 'Aktionsmonitor',
   }
 }

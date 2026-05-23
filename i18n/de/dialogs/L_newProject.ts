@@ -1,7 +1,7 @@
 export default {
   ariaLabel: 'Neues Projekt',
   closeButton: 'Schließen',
-  createButton: 'Erstellen',
-  nameLabel: 'Projektname',
-  title: 'Neues Projekt'
+  createButton: 'Neues Projekt erstellen',
+  nameLabel: 'Neuer Projektname',
+  title: 'Neues Projekt',
 }

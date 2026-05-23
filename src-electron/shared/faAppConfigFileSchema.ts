@@ -8,8 +8,9 @@ import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import type { I_faAppNoteboardRoot } from 'app/types/I_faAppNoteboardDomain'
 import type { I_faAppStylingRoot } from 'app/types/I_faAppStylingDomain'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
+import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
 
-const faUserSettingsLanguageCodeSchema = z.enum(['en-US', 'fr', 'de'])
+const faUserSettingsLanguageCodeSchema = z.enum(FA_USER_SETTINGS_LANGUAGE_CODES)
 
 /**
  * Full persisted 'faUserSettings.json' document (not a patch). Unknown keys rejected via .strict().

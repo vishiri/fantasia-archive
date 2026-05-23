@@ -1,3 +1,3 @@
 export default {
-  label: 'Fantasia-Maskottchen'
+  label: 'Fantasia-Maskottchen',
 }

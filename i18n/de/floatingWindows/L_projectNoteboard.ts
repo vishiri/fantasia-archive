@@ -1,5 +1,5 @@
 export default {
   close: 'Schließen',
-  editorAria: 'Text des Projekt-Noteboards',
-  title: 'Projekt-Noteboard'
+  editorAria: 'Projekt-Noteboard-Text',
+  title: 'Projekt-Notiztafel',
 }

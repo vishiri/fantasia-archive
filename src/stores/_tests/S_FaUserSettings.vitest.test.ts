@@ -130,10 +130,8 @@ test('Test that refreshSettings does not apply i18n when persisted languageCode 
   applyLocaleMock.mockClear()
   getSettingsMock.mockResolvedValueOnce({
     ...FA_USER_SETTINGS_DEFAULTS,
-    // Malformed/legacy value from the bridge; must not call apply with an unknown locale
-    // @ts-expect-error intentional invalid code for this test
     languageCode: 'xx-XX'
-  })
+  } as unknown as typeof FA_USER_SETTINGS_DEFAULTS)
   await store.refreshSettings()
   expect(applyLocaleMock).not.toHaveBeenCalled()
 })

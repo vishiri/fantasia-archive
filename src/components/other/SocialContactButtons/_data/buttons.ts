@@ -1,10 +1,17 @@
 import type { I_socialContactButtonSet } from 'app/types/I_socialContactButtons'
-import { i18n } from 'app/i18n/externalFileLoader'
 
-export const buttonList: I_socialContactButtonSet = {
+/**
+ * Static social-button fields (URLs, icons, layout). Labels and titles come from i18n at render time.
+ */
+export type I_socialContactButtonStaticConfig = Omit<
+  I_socialContactButtonSet[keyof I_socialContactButtonSet],
+  'label' | 'title'
+>
+
+export const socialContactButtonStaticConfig: {
+  [K in keyof I_socialContactButtonSet]: I_socialContactButtonStaticConfig
+} = {
   buttonPatreon: {
-    title: i18n.global.t('socialContactButtons.buttonPatreon.title'),
-    label: i18n.global.t('socialContactButtons.buttonPatreon.label'),
     url: 'https://www.patreon.com/c/vishiri',
     icon: 'patreon_logo.png',
     width: 26,
@@ -12,8 +19,6 @@ export const buttonList: I_socialContactButtonSet = {
     cssClass: 'patreon'
   },
   buttonKofi: {
-    title: i18n.global.t('socialContactButtons.buttonKofi.title'),
-    label: i18n.global.t('socialContactButtons.buttonKofi.label'),
     url: 'https://ko-fi.com/vishiri',
     icon: 'kofi_logo.png',
     width: 30,
@@ -21,8 +26,6 @@ export const buttonList: I_socialContactButtonSet = {
     cssClass: 'kofi'
   },
   buttonWebsite: {
-    title: i18n.global.t('socialContactButtons.buttonWebsite.title'),
-    label: i18n.global.t('socialContactButtons.buttonWebsite.label'),
     url: 'https://fantasiaarchive.com',
     icon: 'fa_logo.png',
     width: 40,
@@ -30,8 +33,6 @@ export const buttonList: I_socialContactButtonSet = {
     cssClass: 'website'
   },
   buttonGitHub: {
-    title: i18n.global.t('socialContactButtons.buttonGitHub.title'),
-    label: i18n.global.t('socialContactButtons.buttonGitHub.label'),
     url: 'https://github.com/vishiri/fantasia-archive',
     icon: 'gh_logo_dark.png',
     width: 40,
@@ -39,8 +40,6 @@ export const buttonList: I_socialContactButtonSet = {
     cssClass: 'github'
   },
   buttonDiscord: {
-    title: i18n.global.t('socialContactButtons.buttonDiscord.title'),
-    label: i18n.global.t('socialContactButtons.buttonDiscord.label'),
     url: 'https://discord.gg/JQDBvsN9Te',
     icon: 'discord_logo.png',
     width: 37,
@@ -48,8 +47,6 @@ export const buttonList: I_socialContactButtonSet = {
     cssClass: 'discord'
   },
   buttonReddit: {
-    title: i18n.global.t('socialContactButtons.buttonReddit.title'),
-    label: i18n.global.t('socialContactButtons.buttonReddit.label'),
     url: 'https://www.reddit.com/r/FantasiaArchive',
     icon: 'reddit_logo.png',
     width: 95,
@@ -57,8 +54,6 @@ export const buttonList: I_socialContactButtonSet = {
     cssClass: 'reddit'
   },
   buttonTwitter: {
-    title: i18n.global.t('socialContactButtons.buttonTwitter.title'),
-    label: i18n.global.t('socialContactButtons.buttonTwitter.label'),
     url: 'https://x.com/VishiriRilgatan',
     icon: 'twitter_logo.png',
     width: 25,

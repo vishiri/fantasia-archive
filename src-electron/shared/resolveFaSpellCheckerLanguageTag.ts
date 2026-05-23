@@ -1,10 +1,9 @@
 import type { T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 
-const CANDIDATES_BY_CODE: Record<T_faUserSettingsLanguageCode, readonly string[]> = {
-  de: ['de', 'de-DE'],
-  fr: ['fr', 'fr-FR'],
-  'en-US': ['en-US', 'en-GB', 'en']
-}
+import {
+  FA_SPELL_CHECKER_CANDIDATES_BY_LANGUAGE_CODE,
+  resolveFaSpellCheckerLanguageFamilyPrefix
+} from 'app/types/faUserSettingsLanguageRegistry'
 
 function buildAvailableLowerToCanonical (available: readonly string[]): Map<string, string> {
   const map = new Map<string, string>()
@@ -31,11 +30,11 @@ function pickFirstAvailable (
 }
 
 /**
- * Matches fr / fr-* or de / de-* tags in Chromium order when exact candidate keys are absent.
+ * Matches family / family-* tags in Chromium order when exact candidate keys are absent.
  */
 function pickFirstLanguageFamilyMatch (
   available: readonly string[],
-  family: 'fr' | 'de'
+  family: string
 ): string | null {
   const fam = family.toLowerCase()
   for (const tag of available) {
@@ -52,7 +51,7 @@ function pickFirstLanguageFamilyMatch (
 
 /**
  * Picks a Chromium spellchecker BCP-47 tag for the app's UI language.
- * fr / de UI never falls back to English when English is only what Chromium lists first; that mismatch
+ * Non-English UI never falls back to English when English is only what Chromium lists first; that mismatch
  * kept spellcheck on en-US after leaving English. en-US UI tries English variant candidates first,
  * then the first string entry in the list when none match.
  */
@@ -66,17 +65,28 @@ export function resolveFaSpellCheckerLanguageTag (
 
   const byLower = buildAvailableLowerToCanonical(available)
 
-  const preferred = pickFirstAvailable(CANDIDATES_BY_CODE[languageCode], byLower)
+  const preferred = pickFirstAvailable(
+    FA_SPELL_CHECKER_CANDIDATES_BY_LANGUAGE_CODE[languageCode],
+    byLower
+  )
   if (preferred !== null) {
     return preferred
   }
 
-  if (languageCode === 'fr' || languageCode === 'de') {
-    return pickFirstLanguageFamilyMatch(available, languageCode)
+  const familyPrefix = resolveFaSpellCheckerLanguageFamilyPrefix(languageCode)
+  if (familyPrefix !== null) {
+    const familyMatch = pickFirstLanguageFamilyMatch(available, familyPrefix)
+    if (familyMatch !== null) {
+      return familyMatch
+    }
   }
 
-  const firstString = available.find((tag) => {
-    return typeof tag === 'string'
-  })
-  return firstString ?? null
+  if (languageCode === 'en-US') {
+    const firstString = available.find((tag) => {
+      return typeof tag === 'string'
+    })
+    return firstString ?? null
+  }
+
+  return null
 }

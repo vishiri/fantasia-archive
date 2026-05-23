@@ -1,13 +1,14 @@
 import { z } from 'zod'
 
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
+import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 
-const faUserSettingsLanguageCodeSchema = z.enum(['en-US', 'fr', 'de'])
+const faUserSettingsLanguageCodeSchema = z.enum(FA_USER_SETTINGS_LANGUAGE_CODES)
 
 /**
  * Strict partial: only keys from 'FA_USER_SETTINGS_DEFAULTS'.
- * Boolean fields accept optional booleans; 'languageCode' accepts optional 'en-US' | 'fr' | 'de'.
+ * Boolean fields accept optional booleans; 'languageCode' accepts optional supported locale codes.
  * Unknown keys are rejected. Built from defaults so IPC allowed keys stay aligned with 'cleanupFaUserSettings'.
  */
 const faUserSettingsPatchShape = Object.fromEntries(

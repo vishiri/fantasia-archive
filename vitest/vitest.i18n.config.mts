@@ -46,7 +46,20 @@ export default defineConfig({
         'i18n/specialCharactersFixer.ts',
         'i18n/en-US/index.ts',
         'i18n/fr/index.ts',
-        'i18n/de/index.ts'
+        'i18n/de/index.ts',
+        'i18n/ar/index.ts',
+        'i18n/el/index.ts',
+        'i18n/es/index.ts',
+        'i18n/fi/index.ts',
+        'i18n/hi/index.ts',
+        'i18n/it/index.ts',
+        'i18n/ja/index.ts',
+        'i18n/nb/index.ts',
+        'i18n/pt/index.ts',
+        'i18n/ru/index.ts',
+        'i18n/sv/index.ts',
+        'i18n/uk/index.ts',
+        'i18n/zh/index.ts'
       ],
       exclude: [...vitestCoverageBaseExclude],
       thresholds: { ...vitestCoverageStrictThresholds }

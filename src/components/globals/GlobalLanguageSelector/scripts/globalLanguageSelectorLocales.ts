@@ -1,25 +1,11 @@
-import type { T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
+import {
+  buildFaUserSettingsLanguageSelectorLocales
+} from 'app/types/faUserSettingsLanguageRegistry'
 
-export type T_globalLanguageSelectorLocaleRow = {
-  code: T_faUserSettingsLanguageCode
-  flagSrc: string
-  languageNamesKey: 'enUS' | 'de' | 'fr'
-}
+import { sortGlobalLanguageSelectorLocalesByLatinDisplayName } from './sortGlobalLanguageSelectorLocalesByLatinDisplayName'
 
-export const GLOBAL_LANGUAGE_SELECTOR_LOCALES: T_globalLanguageSelectorLocaleRow[] = [
-  {
-    code: 'en-US',
-    flagSrc: '/countryFlags/us.svg',
-    languageNamesKey: 'enUS'
-  },
-  {
-    code: 'de',
-    flagSrc: '/countryFlags/de.svg',
-    languageNamesKey: 'de'
-  },
-  {
-    code: 'fr',
-    flagSrc: '/countryFlags/fr.svg',
-    languageNamesKey: 'fr'
-  }
-]
+export type { T_globalLanguageSelectorLocaleRow } from './globalLanguageSelectorLocaleRow'
+
+export const GLOBAL_LANGUAGE_SELECTOR_LOCALES = sortGlobalLanguageSelectorLocalesByLatinDisplayName(
+  buildFaUserSettingsLanguageSelectorLocales()
+)

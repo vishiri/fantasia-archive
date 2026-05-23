@@ -1,5 +1,5 @@
 export default {
-  loadError: 'Impossible de charger les raccourcis depuis le pont du bureau.',
-  saveError: 'Impossible d\'enregistrer les paramètres des raccourcis.',
-  saveSuccess: 'Paramètres des raccourcis enregistrés.'
+  loadError: 'Impossible de charger les paramètres de raccourci clavier à partir du pont de bureau.',
+  saveError: 'Impossible d\'enregistrer les paramètres de raccourci clavier.',
+  saveSuccess: 'Paramètres de raccourci clavier enregistrés.',
 }

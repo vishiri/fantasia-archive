@@ -5,6 +5,8 @@ import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
 import type { I_appStartupRouter } from 'app/types/I_appStartupRouter'
 import type { I_faUserSettings, T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 
+import { applyFaInterfaceTextDirectionFromLanguageCode } from 'app/src/scripts/appInternals/faInterfaceTextDirection'
+
 /**
  * Cross-cutting renderer helpers for boot, layouts, and stores.
  * Grouped in one module under the line cap; import from app/src/scripts/appInternals/rendererAppInternals.
@@ -61,15 +63,14 @@ export function resolveVitePublicAssetPath (pathFromPublicRoot: string): string 
   return `${baseWithSlash}${trimmed}`
 }
 
-export function isFaUserSettingsLanguageCode (value: string): value is T_faUserSettingsLanguageCode {
-  return value === 'en-US' || value === 'fr' || value === 'de'
-}
+export { isFaUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 
 /**
  * Switches the shared vue-i18n instance (also registered on the Quasar app in boot) to the given locale.
  */
 export function applyFaI18nLocaleFromLanguageCode (code: T_faUserSettingsLanguageCode): void {
   i18n.global.locale.value = code
+  applyFaInterfaceTextDirectionFromLanguageCode(code)
 }
 
 /**

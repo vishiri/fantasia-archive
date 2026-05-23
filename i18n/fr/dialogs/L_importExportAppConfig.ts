@@ -1,33 +1,33 @@
 export default {
-  ariaLabel: 'Importer ou exporter la configuration de l’app',
-  title: 'Importer / exporter la configuration de l’app',
+  ariaLabel: 'Importer ou exporter la configuration de l\'application',
+  title: 'Importer/Exporter la configuration de l\'application',
   stepper: {
-    importPanel: 'Sélection des éléments à importer',
+    importPanel: 'Sélectionnez les pièces à importer',
     rootPanel: 'Importer ou exporter',
-    exportPanel: 'Sélection des éléments à exporter'
+    exportPanel: 'Sélectionnez les pièces à exporter',
   },
   importButton: 'Importer',
   exportButton: 'Exporter',
-  exportHint: 'Choisissez les paramètres à inclure dans le fichier d’export.',
-  importSelectHint: 'Choisissez les éléments à restaurer à partir du fichier.',
+  exportHint: 'Choisissez les paramètres à inclure dans le fichier d\'exportation',
+  importSelectHint: 'Choisissez les paramètres à charger à partir du fichier',
   notice: {
-    heading: 'Veuillez noter ce qui suit :',
+    heading: 'Veuillez noter ce qui suit :',
     list: {
-      exportFirst: 'Si vous souhaitez conserver vos réglages, raccourcis, CSS personnalisé de l’app et noteboard de l’app actuels, exportez-les d’abord, puis importez les nouveaux seulement ensuite.',
-      importOverwrites: 'L’import ÉCRASERA vos paramètres de l’app, raccourcis, CSS personnalisé de l’app et noteboard de l’app actuels selon les choix que vous ferez à l’étape suivante.',
-      selectiveImport: 'Vous pouvez n’importer qu’une partie de la configuration de l’app (paramètres de l’app, raccourcis, CSS personnalisé de l’app ou noteboard de l’app) sans écraser le reste, selon ce que vous choisirez d’importer à l’étape suivante.'
+      exportFirst: 'Si vous souhaitez conserver vos paramètres d\'application existants, vos raccourcis clavier d\'application, votre application personnalisée CSS et votre tableau de notes d\'application, exportez-les d\'abord, puis importez la configuration de remplacement.',
+      importOverwrites: 'L\'importation écrasera vos paramètres d\'application existants, vos raccourcis clavier d\'application, votre application personnalisée CSS et votre tableau de notes d\'application en fonction de vos choix à l\'étape suivante.',
+      selectiveImport: 'Il est possible d\'importer une seule partie de la configuration de l\'application (paramètres de l\'application, raccourcis clavier de l\'application, application personnalisée CSS ou tableau de notes de l\'application) sans écraser le reste de la configuration existante en fonction de ce que vous choisissez d\'importer à l\'étape suivante.',
     }
   },
   checkboxes: {
-    appSettings: 'Paramètres de l’app',
-    keybinds: 'Raccourcis de l’app',
-    appNoteboard: 'Noteboard de l’app',
-    appStyling: 'CSS personnalisé de l’app'
+    appSettings: 'Paramètres de l\'application',
+    keybinds: 'Raccourcis clavier d\'application',
+    appNoteboard: 'Tableau de notes de l\'application',
+    appStyling: 'Application personnalisée CSS',
   },
-  createExportFile: 'Créer le fichier d’export',
+  createExportFile: 'Créer un fichier d\'exportation',
   importSelected: 'Importer la sélection',
   toasts: {
-    exportSuccess: 'Configuration exportée',
-    importSuccess: 'Configuration importée'
+    exportSuccess: 'Configuration exportée avec succès',
+    importSuccess: 'Configuration importée avec succès',
   }
 }

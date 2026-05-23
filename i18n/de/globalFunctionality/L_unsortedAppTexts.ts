@@ -1,3 +1,3 @@
 export default {
-  didYouKnow: 'Wusstest du schon?'
+  didYouKnow: 'Wussten Sie?',
 }

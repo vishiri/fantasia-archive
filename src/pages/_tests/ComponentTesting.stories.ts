@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import { buttonList } from '../../components/other/SocialContactButtons/_data/buttons'
+import { getSocialContactButtonListForCurrentLocale } from '../../components/other/SocialContactButtons/scripts/getSocialContactButtonListForCurrentLocale'
+
+const buttonList = getSocialContactButtonListForCurrentLocale()
 import StoryRouterShell from '../../../.storybook-workspace/.storybook/components/StoryRouterShell.vue'
 
 const meta = {

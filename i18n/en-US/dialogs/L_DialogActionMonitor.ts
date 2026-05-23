@@ -20,7 +20,7 @@ export default {
     success: 'Success',
     failed: 'Failed'
   },
-  rowClickHint: 'Left click on an action row to copy details to the clipboard.',
+  rowClickHint: 'Left-click an action row to copy details to the clipboard.',
   payloadPresentAria: 'This action has a payload.',
   payloadEmptyAria: 'No payload for this action.',
   copy: {

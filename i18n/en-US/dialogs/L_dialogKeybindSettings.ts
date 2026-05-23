@@ -31,7 +31,7 @@ export default {
     toggleProjectNoteboard: 'Toggle Project Noteboard'
   },
   filterNoResultsDescription:
-    'Fantasia sadly didn\'t find any keybinds you were looking for. Perhaps try looking for a different one?',
+    'Fantasia sadly didn\'t find any keybinds you were looking for. Try a different search term?',
   filterNoResultsTitle: 'No Keybinds Found',
   filterPlaceholder: 'Filter Keybinds…',
   saveButton: 'Save Settings',

@@ -1,6 +1,6 @@
 export default {
   minimizeButton: 'Minimieren',
-  resizeButton: 'Wiederherstellen',
+  resizeButton: 'Verkleinern Sie die Größe',
   maximizeButton: 'Maximieren',
-  close: 'Schließen'
+  close: 'Schließen',
 }

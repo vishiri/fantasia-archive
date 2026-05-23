@@ -1,3 +1,3 @@
 export default {
-  bridgeMissing: 'Le noteboard de l’application est injoignable depuis le pont du bureau.'
+  bridgeMissing: 'Impossible d\'accéder au bloc-notes de l\'application depuis le pont de bureau.',
 }

@@ -13,7 +13,7 @@ export default {
   notice: {
     heading: 'Please note the following:',
     list: {
-      exportFirst: 'If you wish to keep your existing App Settings, App Keybinds, Custom App CSS, and App Noteboard, you should export them first and ONLY then import any new ones.',
+      exportFirst: 'If you wish to keep your existing App Settings, App Keybinds, Custom App CSS, and App Noteboard, export them first, then import the replacement configuration.',
       importOverwrites: 'Importing WILL overwrite your existing App Settings, App Keybinds, Custom App CSS, and App Noteboard according to your choices in the next step.',
       selectiveImport: 'It is possible to import only a single part of the app configuration (App Settings, App Keybinds, Custom App CSS, or App Noteboard) without overwriting the rest of the existing configuration based on what you choose to import in the next step.'
     }

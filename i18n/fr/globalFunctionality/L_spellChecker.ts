@@ -1,3 +1,3 @@
 export default {
-  addToDictionary: 'Ajouter au dictionnaire'
+  addToDictionary: 'Ajouter au dictionnaire',
 }

@@ -1,5 +1,5 @@
 export default {
   title: 'À propos de Fantasia Archive',
-  versionTitle: 'Version actuelle de Fantasia Archive :',
-  closeButton: 'Fermer'
+  versionTitle: 'Exécution actuelle de la version Fantasia Archive :',
+  closeButton: 'Fermer',
 }

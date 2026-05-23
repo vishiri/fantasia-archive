@@ -241,6 +241,50 @@ test('Test that GlobalLanguageSelector resolves default flag when locale row is 
 
 /**
  * GlobalLanguageSelector
+ * Keeps LTR chrome when Arabic sets the document root to rtl.
+ */
+test('Test that GlobalLanguageSelector stays ltr when interface language is Arabic', async () => {
+  vi.stubEnv('MODE', 'electron')
+  document.documentElement.dir = 'rtl'
+  document.documentElement.style.direction = 'rtl'
+  setActivePinia(createPinia())
+  const store = S_FaUserSettings()
+  store.settings = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    languageCode: 'ar'
+  }
+  window.faContentBridgeAPIs.faUserSettings = {
+    getSettings: vi.fn(async (): Promise<I_faUserSettings> => ({ ...store.settings as I_faUserSettings })),
+    setSettings: vi.fn()
+  }
+
+  const w = mount(GlobalLanguageSelector, {
+    global: {
+      components: {
+        ...globalLanguageSelectorQuasarStubs,
+        GlobalLanguageSelectorSpellcheckRefreshControl: globalLanguageSelectorSpellcheckStub
+      },
+      config: { compilerOptions: globalLanguageSelectorCompilerOpts },
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  await flushPromises()
+
+  const root = w.get('[data-test-locator="globalLanguageSelector-root"]')
+  expect(root.attributes('dir')).toBe('ltr')
+  expect(root.find('.globalLanguageSelector__menuItemLabel').attributes('dir')).toBe('auto')
+
+  w.unmount()
+  document.documentElement.dir = 'ltr'
+  document.documentElement.style.direction = 'ltr'
+  vi.unstubAllEnvs()
+})
+
+/**
+ * GlobalLanguageSelector
  * Trigger capture click, menu show or hide hooks, and language pick should run without throwing.
  */
 test('Test that GlobalLanguageSelector handles trigger click and language selection', async () => {

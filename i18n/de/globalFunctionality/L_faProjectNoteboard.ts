@@ -1,3 +1,3 @@
 export default {
-  bridgeMissing: 'Das Projekt-Noteboard ist über die Desktop-Brücke nicht erreichbar.'
+  bridgeMissing: 'Das Projekt-Noteboard konnte von der Desktop-Bridge aus nicht erreicht werden.',
 }

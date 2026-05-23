@@ -157,3 +157,13 @@ test('Test that resolveFaSpellCheckerLanguageTag matches de-AT for de UI', () =>
     resolveFaSpellCheckerLanguageTag('de', ['fr', 'de-AT'])
   ).toBe('de-AT')
 })
+
+/**
+ * resolveFaSpellCheckerLanguageTag
+ * nb UI matches no-* tags when nb packs are absent.
+ */
+test('Test that resolveFaSpellCheckerLanguageTag matches no for nb UI when nb is absent', () => {
+  expect(
+    resolveFaSpellCheckerLanguageTag('nb', ['en-US', 'no-NO'])
+  ).toBe('no-NO')
+})

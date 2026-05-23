@@ -1,10 +1,10 @@
 export default {
-  title: 'Einstellungen & Werkzeuge',
+  title: 'Einstellungen und Tools',
   items: {
     appNoteBoard: 'App-Noteboard umschalten',
-    keybindSettings: 'Tastenkürzel-Einstellungen',
+    keybindSettings: 'Tastenkombinationseinstellungen',
     appSettings: 'App-Einstellungen',
-    appStyling: 'Eigenes App-CSS',
-    importExportAppConfig: 'App-Konfiguration importieren / exportieren'
+    appStyling: 'Benutzerdefinierte App CSS',
+    importExportAppConfig: 'App-Konfiguration importieren/exportieren',
   }
 }

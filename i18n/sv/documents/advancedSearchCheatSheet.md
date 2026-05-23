@@ -1,0 +1,21 @@
+- Anmärkningar för filtertyper
+  - Ersätt blanksteg med `-`
+  - `@` prefix för att inkludera "Andra namn" i sökningen
+- Filtertyper
+  - `$` - Dokumenttyp
+  - `#` - Tagg
+  - `>` - Hierarkisk väg
+  - `^` - Byt
+    - `^c` - Är en kategori
+    - `^d` - Är död/borta/förstörd
+    - `^f` - Är klar
+    - `^m` - Är ett mindre dokument
+- Fullständig sökning
+  - `%` - Början av hela sökningen
+  - `:` - Skiljetecken mellan fältnamnet och fältvärdet
+  - `%some-field:some-value` - Sök igenom alla fält efter ett värde
+  - Detta kan också användas för att söka efter färger: `%color:blue`
+  - `""` wrap för exakt sökning (fältnamn och/eller värde)
+    - Exempel fullt exakt: `%"some-field":"något-värde"`
+    - Exempelvärde precist: `%some-field:"något-värde"`
+    - Exempelnamn exakt: `%"some-field":some-value`

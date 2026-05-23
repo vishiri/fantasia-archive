@@ -29,6 +29,7 @@ test('Test that parseFaUserSettingsPatch accepts languageCode enum values', () =
   expect(parseFaUserSettingsPatch({ languageCode: 'fr' })).toEqual({ languageCode: 'fr' })
   expect(parseFaUserSettingsPatch({ languageCode: 'de' })).toEqual({ languageCode: 'de' })
   expect(parseFaUserSettingsPatch({ languageCode: 'en-US' })).toEqual({ languageCode: 'en-US' })
+  expect(parseFaUserSettingsPatch({ languageCode: 'es' })).toEqual({ languageCode: 'es' })
 })
 
 /**
@@ -37,7 +38,7 @@ test('Test that parseFaUserSettingsPatch accepts languageCode enum values', () =
  */
 test('Test that parseFaUserSettingsPatch throws ZodError for invalid languageCode', () => {
   expect(() => {
-    parseFaUserSettingsPatch({ languageCode: 'es' })
+    parseFaUserSettingsPatch({ languageCode: 'xx' })
   }).toThrow(ZodError)
 })
 

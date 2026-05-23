@@ -1,17 +1,17 @@
 export default {
-  title: 'Projektverwaltung',
+  title: 'Projektmanagement',
   items: {
     newProject: 'Neues Projekt erstellen',
-    loadProject: 'Bestehendes Projekt laden',
-    loadRecentProject: 'Zuletzt geöffnete Projekte',
-    noRecentProjects: 'Keine zuletzt geöffneten Projekte',
-    recentProjectRow: 'Zuletzt geöffnetes Projekt',
+    loadProject: 'Vorhandenes Projekt laden',
+    loadRecentProject: 'Letztes Projekt laden',
+    noRecentProjects: 'Keine aktuellen Projekte',
+    recentProjectRow: 'Aktuelles Projekt',
     showProjectDashboard: 'Projekt-Dashboard anzeigen',
-    toggleProjectNoteboard: 'Projekt-Noteboard umschalten',
-    openProjectCustomCss: 'Eigenes Projekt-CSS',
-    projectSettings: 'Projekt-Einstellungen',
-    advancedProjectTools: 'Erweiterte Projektwerkzeuge',
-    aptMerge: 'Anderes Projekt in das aktuelle einfügen',
-    aptConvertOld: 'Altes Projekt nach FA 2.0 konvertieren'
+    toggleProjectNoteboard: 'Schalten Sie die Projektnotiz um',
+    openProjectCustomCss: 'Benutzerdefiniertes Projekt CSS',
+    projectSettings: 'Projekteinstellungen',
+    advancedProjectTools: 'Erweiterte Projekttools',
+    aptMerge: 'Ein anderes Projekt mit dem aktuellen zusammenführen',
+    aptConvertOld: 'Konvertieren Sie ein Legacy-Projekt in FA 2.0',
   }
 }

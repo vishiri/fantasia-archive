@@ -1,9 +1,9 @@
 export default {
-  title: 'Dokumente & Inhalte',
+  title: 'Dokumente und Inhalte',
   items: {
-    quickAddNewDocument: 'Dokument schnell anlegen',
-    quickSearchDocument: 'Bestehendes Dokument schnell suchen',
-    massDeleteDocument: 'Dokumente massenhaft löschen',
-    exportProjectDocuments: 'Projekt / Dokumente exportieren'
+    quickAddNewDocument: 'Neues Dokument schnell hinzufügen',
+    quickSearchDocument: 'Vorhandenes Dokument schnell durchsuchen',
+    massDeleteDocument: 'Massenlöschung von Dokumenten',
+    exportProjectDocuments: 'Projekt/Dokumente exportieren',
   }
 }

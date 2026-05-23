@@ -1,0 +1,21 @@
+- Hinweise zu Filtertypen
+  - Ersetzen Sie Leerzeichen durch „-“.
+  - „@“-Präfix, um „Andere Namen“ in die Suche einzubeziehen
+- Filtertypen
+  - „$“ – Dokumenttyp
+  - „#“ – Tag
+  - `>` – Hierarchischer Pfad
+  - `^` - Schalter
+    - „^c“ – Ist eine Kategorie
+    - „^d“ – ist tot/verschwunden/zerstört
+    - `^f` - Ist fertig
+    - „^m“ – Ist ein untergeordnetes Dokument
+- Vollständige Suche
+  - „%“ – Beginn der Vollsuche
+  - `:` – Trennzeichen zwischen Feldname und Feldwert
+  - „%some-field:some-value“ – Durchsucht alle Felder nach einem Wert
+  - Dies kann auch zur Suche nach Farben verwendet werden: „%color:blue“.
+  - „““-Umbruch für präzise Suche (Feldname und/oder Wert)
+    – Beispiel vollständig präzise: „%“some-field“: „some-value““.
+    - Beispielwert präzise: `%some-field:"some-value"`
+    - Beispielname präzise: `%"some-field":some-value`

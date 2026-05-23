@@ -1,11 +1,11 @@
 export default {
   closeButton: 'Schließen',
   ariaLabels: {
-    advancedSearchCheatSheet: 'Schnellreferenz erweiterte Suche',
-    advancedSearchGuide: 'Leitfaden erweiterte Suche',
+    advancedSearchCheatSheet: 'Spickzettel für die erweiterte Suche',
+    advancedSearchGuide: 'Leitfaden zur erweiterten Suche',
     changeLog: 'Änderungsprotokoll',
     license: 'Lizenz',
-    tipsTricksTrivia: 'Tipps, Tricks & Kurioses',
-    fallback: 'Markdown-Dokumentdialog'
+    tipsTricksTrivia: 'Tipps, Tricks und Wissenswertes',
+    fallback: 'Dialogfeld „Markdown-Dokument“.',
   }
 }

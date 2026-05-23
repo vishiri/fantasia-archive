@@ -2,6 +2,7 @@
   <div
     v-if="showSelector"
     class="globalLanguageSelector"
+    dir="ltr"
     data-test-locator="globalLanguageSelector-root"
     :data-test-active-language-code="currentCode"
     :data-test-i18n-locale="activeI18nLocale"
@@ -89,7 +90,10 @@
                     >
                   </q-avatar>
                 </q-item-section>
-                <q-item-section class="globalLanguageSelector__menuItemLabel text-weight-medium">
+                <q-item-section
+                  class="globalLanguageSelector__menuItemLabel text-weight-medium"
+                  dir="auto"
+                >
                   {{
                     $t(`globalFunctionality.faUserSettings.languageNames.${row.languageNamesKey}`)
                   }}
@@ -196,12 +200,16 @@ async function pickLanguage (code: T_faUserSettingsLanguageCode): Promise<void> 
 /* Teleported q-menu panel is outside this scope; use :global for the shell. */
 :global(.globalLanguageSelector__menu) {
   background-color: $globalLanguageSelector-menu-backgroundColor;
+  direction: ltr;
+  max-height: $globalLanguageSelector-menu-maxHeight;
   min-width: $globalLanguageSelector-menu-minWidth;
+  overflow-y: auto;
   user-select: none;
 }
 
 .globalLanguageSelector {
   -webkit-app-region: no-drag;
+  direction: ltr;
   position: fixed;
   right: calc(#{$globalWindowButtons-totalWidth} + #{$globalLanguageSelector-gap});
   top: $globalLanguageSelector-topPosition;

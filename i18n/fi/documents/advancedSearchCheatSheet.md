@@ -1,0 +1,21 @@
+- Huomautuksia suodatintyypeistä
+  - Korvaa välilyönnit merkillä "-".
+  - @-etuliite sisällyttääksesi "Muut nimet" hakuun
+- Suodatintyypit
+  - `$` - Asiakirjan tyyppi
+  - `#` - Tag
+  - `>` - Hierarkkinen polku
+  - `^` - Vaihda
+    - `^c` - On luokka
+    - `^d` - On Dead/Gone/Stroyed
+    - `^f` - On valmis
+    - `^m` - On vähäinen asiakirja
+- Täysi haku
+  - `%` - Koko haun alku
+  - `:` - Erotin kentän nimen ja arvon välillä
+  - "%joku kenttä:joku arvo" - Hae arvoa kaikista kentistä
+  - Tätä voidaan käyttää myös värien etsimiseen: `%color:blue`
+  - `""` rivitys tarkkaan hakuun (kentän nimi ja/tai arvo)
+    - Esimerkki täysin tarkka: `%"joku-kenttä":"joku-arvo"`
+    - Esimerkki arvon tarkka: `%joku-kenttä:"joku-arvo"`
+    - Esimerkki nimen tarkka: `%"joku-kenttä":joku-arvo'

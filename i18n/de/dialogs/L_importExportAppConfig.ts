@@ -1,33 +1,33 @@
 export default {
   ariaLabel: 'App-Konfiguration importieren oder exportieren',
-  title: 'App-Konfiguration importieren / exportieren',
+  title: 'App-Konfiguration importieren/exportieren',
   stepper: {
-    importPanel: 'Teile zum Import wählen',
-    rootPanel: 'Import oder Export',
-    exportPanel: 'Teile für den Export wählen'
+    importPanel: 'Wählen Sie Teile zum Importieren aus',
+    rootPanel: 'Importieren oder exportieren',
+    exportPanel: 'Wählen Sie Teile zum Exportieren aus',
   },
-  importButton: 'Importieren',
-  exportButton: 'Exportieren',
-  exportHint: 'Wähle, welche Einstellungen in die Exportdatei aufgenommen werden sollen.',
-  importSelectHint: 'Wähle, welche Teile aus der Datei wiederhergestellt werden sollen.',
+  importButton: 'Import',
+  exportButton: 'Export',
+  exportHint: 'Wählen Sie aus, welche Einstellungen in die Exportdatei einbezogen werden sollen',
+  importSelectHint: 'Wählen Sie aus, welche Einstellungen aus der Datei geladen werden sollen',
   notice: {
-    heading: 'Bitte beachte Folgendes:',
+    heading: 'Bitte beachten Sie Folgendes:',
     list: {
-      exportFirst: 'Wenn du deine bisherigen Einstellungen, Tastaturkürzel, benutzerdefiniertes App-CSS und App-Noteboard behalten willst, exportiere sie zuerst und importiere danach ERST die neuen Konfigurationen.',
-      importOverwrites: 'Beim Import werden deine bisherigen App-Einstellungen, Tastaturkürzel, benutzerdefiniertes App-CSS und App-Noteboard je nach deiner Auswahl im nächsten Schritt überschrieben.',
-      selectiveImport: 'Du kannst nur einen Teil der App-Konfiguration importieren (App-Einstellungen, Tastaturkürzel, benutzerdefiniertes App-CSS oder App-Noteboard) und den übrigen Teil der bisherigen Konfiguration dabei beibehalten — abhängig von deiner Auswahl im nächsten Schritt.'
+      exportFirst: 'Wenn Sie Ihre vorhandenen App-Einstellungen, App-Tastenkombinationen, benutzerdefinierten App CSS und App Noteboard beibehalten möchten, exportieren Sie sie zuerst und importieren Sie dann die Ersatzkonfiguration.',
+      importOverwrites: 'Beim Importieren werden Ihre vorhandenen App-Einstellungen, App-Tastenkombinationen, benutzerdefinierten App CSS und App Noteboard entsprechend Ihren Entscheidungen im nächsten Schritt überschrieben.',
+      selectiveImport: 'Es ist möglich, nur einen einzelnen Teil der App-Konfiguration (App-Einstellungen, App-Tastenkombinationen, benutzerdefinierte App CSS oder App Noteboard) zu importieren, ohne den Rest der vorhandenen Konfiguration zu überschreiben, je nachdem, was Sie im nächsten Schritt importieren möchten.',
     }
   },
   checkboxes: {
     appSettings: 'App-Einstellungen',
-    keybinds: 'App-Tastaturkürzel',
-    appNoteboard: 'App-Noteboard',
-    appStyling: 'Benutzerdefiniertes App-CSS'
+    keybinds: 'App-Tastenkombinationen',
+    appNoteboard: 'App-Notizbrett',
+    appStyling: 'Benutzerdefinierte App CSS',
   },
   createExportFile: 'Exportdatei erstellen',
-  importSelected: 'Auswahl importieren',
+  importSelected: 'Importieren ausgewählt',
   toasts: {
-    exportSuccess: 'Konfiguration exportiert',
-    importSuccess: 'Konfiguration importiert'
+    exportSuccess: 'Konfiguration erfolgreich exportiert',
+    importSuccess: 'Konfiguration erfolgreich importiert',
   }
 }

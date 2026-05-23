@@ -1,31 +1,31 @@
 export default {
   title: 'Aktionsmonitor',
   closeButton: 'Schließen',
-  emptyState: 'In dieser Sitzung wurden noch keine Aktionen aufgezeichnet.',
+  emptyState: 'Während dieser Sitzung wurden noch keine Aktionen aufgezeichnet.',
   columns: {
     action: 'Aktion',
     startTime: 'Startzeit',
     finishTime: 'Endzeit',
     payload: 'Nutzlast',
     type: 'Typ',
-    status: 'Status'
+    status: 'Status',
   },
   actionKind: {
-    async: 'Async',
-    sync: 'Sync'
+    async: 'Asynchron',
+    sync: 'Synchronisieren',
   },
   status: {
-    queued: 'Wartend',
+    queued: 'In der Warteschlange',
     running: 'Läuft',
     success: 'Erfolg',
-    failed: 'Fehlgeschlagen'
+    failed: 'Fehlgeschlagen',
   },
-  rowClickHint: 'Linksklick auf eine Aktionszeile, um die Details in die Zwischenablage zu kopieren.',
+  rowClickHint: 'Klicken Sie mit der linken Maustaste auf eine Aktionszeile, um Details in die Zwischenablage zu kopieren.',
   payloadPresentAria: 'Diese Aktion hat eine Nutzlast.',
   payloadEmptyAria: 'Keine Nutzlast für diese Aktion.',
   copy: {
     success: 'Aktionszeile in die Zwischenablage kopiert',
-    successCaption: 'Aktivität kopiert - {actionId}',
-    failed: 'Aktionszeile konnte nicht in die Zwischenablage kopiert werden.'
+    successCaption: 'Aktivität kopiert – {actionId}',
+    failed: 'Die Aktionszeile konnte nicht in die Zwischenablage kopiert werden.',
   }
 }

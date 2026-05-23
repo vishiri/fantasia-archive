@@ -1,0 +1,21 @@
+- Merknader for filtertyper
+  - Erstatt mellomrom med `-`
+  - `@`-prefiks for å inkludere `Andre navn` i søket
+- Filtertyper
+  - `$` - Dokumenttype
+  - `#` - Tag
+  - `>` - Hierarkisk bane
+  - `^` - Bytt
+    - `^c` - Er en kategori
+    - `^d` - Er død/borte/ødelagt
+    - `^f` - Er ferdig
+    - `^m` - Er et mindre dokument
+- Fullt søk
+  - `%` - Begynnelsen av hele søket
+  - `:` - Skilletegn mellom feltnavnet og feltverdien
+  - `%some-field:some-value` - Søk gjennom alle feltene etter en verdi
+  - Dette kan også brukes til å søke etter farger: `%color:blue`
+  - `""`-omslag for nøyaktig søk (feltnavn og/eller verdi)
+    - Eksempel fullstendig presis: `%"some-field":"noen-verdi"`
+    - Eksempelverdi presis: `%some-field:"noen-verdi"`
+    - Eksempelnavn nøyaktig: `%"noen-felt":en-verdi`

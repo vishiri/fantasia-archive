@@ -1,14 +1,9 @@
 export default {
-  bridgeMissing:
-    'Impossible d’atteindre le CSS personnalisé du projet via la passerelle bureau.',
-  loadError:
-    'Impossible de charger le CSS personnalisé du projet depuis la passerelle bureau.',
-  saveError: 'Impossible d’enregistrer le CSS personnalisé du projet.',
-  saveMismatchLog:
-    'Incohérence du CSS personnalisé du projet après l’enregistrement',
-  saveNoActiveProject:
-    'Chargez un fichier .faproject avant d’enregistrer le CSS personnalisé du projet.',
-  saveRejected:
-    'Impossible d’écrire le CSS personnalisé du projet. Ouvrez un projet si aucun n’est chargé, ou rechargez-le après une réinitialisation de session.',
-  saveSuccess: 'CSS personnalisé du projet enregistré.'
+  bridgeMissing: 'Impossible d\'atteindre le projet personnalisé CSS via le pont de bureau.',
+  loadError: 'Impossible de charger le projet personnalisé CSS à partir du pont de bureau.',
+  saveError: 'Impossible d\'enregistrer la personnalisation du projet CSS.',
+  saveMismatchLog: 'Incompatibilité CSS personnalisée du projet après l\'enregistrement',
+  saveNoActiveProject: 'Chargez un projet .fa avant d\'enregistrer le projet personnalisé CSS.',
+  saveRejected: 'Impossible d\'écrire le projet personnalisé CSS. Ouvrez un projet si aucun n\'est chargé ou rechargez le projet si la session est réinitialisée.',
+  saveSuccess: 'Projet personnalisé CSS enregistré.',
 }

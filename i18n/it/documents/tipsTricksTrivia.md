@@ -1,0 +1,22 @@
+# Suggerimenti, trucchi e curiosità
+----------
+
+- Digitando "@" durante la modifica di campi di testo di grandi dimensioni puoi collegarti ad altri documenti direttamente all'interno dell'editor di testo!
+- `Ctrl+Shift+F` apre la ricerca nel documento corrente quando hai bisogno di una parola particolare nella pagina!
+- Qualsiasi campo in modalità di modifica del documento con la piccola freccia a discesa consente valori personalizzati! Chiudere il menu dei valori predefiniti con Esc, digitare il valore desiderato e confermare con Invio.
+- Puoi effettuare ricerche in tutti i documenti e in tutti i relativi campi contemporaneamente utilizzando quanto segue nel popup di ricerca rapida o in qualsiasi ricerca di relazione: "%nome-campo:qualunque-cosa-ti-serva"
+- C'è un intero elenco di combinazioni di tasti davvero utili che possono rendere il tuo utilizzo di FA molto più semplice e veloce!
+- Il menu delle impostazioni contiene un intero assortimento di modifiche grandi e piccole per adattare l'app alle tue esigenze!
+- FA ha una modalità oscura che non è un semplice ripensamento ed è completamente utilizzabile!
+- Molte parti dell'app reagiscono al clic con il pulsante centrale del mouse. Ad esempio, puoi chiudere direttamente le schede dei documenti o aprire direttamente gli elementi dell'albero gerarchico!
+- Fantasia Archive è gratuito; nessun vincolo: nessuna pubblicità, nessun tracker, nessun mining di criptovaluta sul tuo PC e i tuoi dati rimangono interamente tuoi!- Se questi suggerimenti ti danno fastidio, c'è un interruttore per disattivarli nelle impostazioni dell'app.
+- La ricerca delle relazioni è ricca di funzionalità extra che puoi utilizzare per trovare ciò di cui hai bisogno! Leggi tutto nella "Guida alla ricerca avanzata" nel menu Aiuto!
+- Il tuo progetto viene salvato automaticamente all'uscita, ma si consiglia di utilizzare la funzione "Salva" di tanto in tanto per assicurarsi che i dati rimangano al sicuro.
+- L'albero gerarchico di sinistra è espandibile trascinando il divisore e l'app ricorda dove l'hai lasciato al prossimo avvio!
+- Non esitare ad aggiungere tutte le sottocategorie che desideri. Puoi sempre spostare le cose in un secondo momento e riorganizzare la struttura del progetto.
+- I tag sono una funzionalità molto potente che ti consente di aggiungere semicategorie all'albero del progetto e creare parametri di ricerca aggiuntivi per facilitare la navigazione.
+- C'è una tabella di marcia delle funzionalità pianificate su Patreon! Se sei curioso di sapere cosa accadrà alla fine, sentiti libero di leggerlo.
+- Questo software è in realtà un sito Web locale che finge di essere un'applicazione desktop! La tecnologia è pazzesca!
+- Se mai avessi bisogno di un buon software per la creazione di mappe offline, dai un'occhiata a Wonderdraft e Dungeondraft di Megasploot!- L'adorabile piccolo drago arcano che potresti aver visto mentre utilizzavi l'app si chiama Fantasia ed è la mascotte ufficiale di FA!
+- Se mai avessi voglia di sponsorizzare lo sviluppo, c'è Patreon. Se non puoi o non vuoi, va benissimo lo stesso: divertiti con l'app e crea qualcosa di interessante con essa!
+- DISCLAIMER: Nessuna creatura magica è stata danneggiata durante la realizzazione di questo software.

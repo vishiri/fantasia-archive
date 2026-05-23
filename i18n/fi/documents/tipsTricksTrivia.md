@@ -1,0 +1,22 @@
+# Vinkkejä, temppuja ja triviaa
+-----------
+
+- Kun kirjoitat @-kirjaimen, kun muokkaat suuria tekstikenttiä, voit linkittää muihin asiakirjoihin suoraan tekstieditorissa!
+- `Ctrl+Shift+F` avaa etsinnän nykyisessä asiakirjassa, kun tarvitset tietyn sanan sivulla!
+- Mikä tahansa asiakirjan muokkaustilassa oleva kenttä pienellä pudotusvalikon nuolella sallii mukautetut arvot! Sulje ennalta määritettyjen arvojen valikko Esc-näppäimellä, kirjoita haluamasi arvo ja vahvista painamalla Enter.
+- Voit etsiä kaikkia asiakirjoja ja niiden kenttiä kerralla käyttämällä seuraavia joko Pikahaku-ponnahdusikkunassa tai missä tahansa suhdehaussa: `%kentän-nimi:mitä-tarvitset`
+- Siellä on koko luettelo todella hyödyllisiä näppäinsidoksia, jotka voivat tehdä FA:n käytöstä paljon nopeampaa ja helpompaa!
+- Asetusvalikko sisältää koko valikoiman sekä suuria että pieniä parannuksia räätälöidäksesi sovelluksen tarpeisiisi!
+- FA:ssa on Dark Mode, joka ei ole pelkkä jälkikäteen ja on täysin huollettavissa!
+- Monet sovelluksen osat reagoivat hiiren keskinapsautukseen. Voit esimerkiksi sulkea asiakirjan välilehtiä tai avata hierarkkisia puukohteita suoraan sillä!
+- Fantasia Archive on ilmainen; ilman ehtoja: Ei mainoksia, ei seurantalaitteita, ei salauslouhintaa tietokoneellasi, ja tietosi pysyvät täysin sinun!- Jos nämä vinkit ärsyttävät sinua, sovelluksen asetuksissa on kytkin niiden poistamiseksi käytöstä.
+- Suhdehaku on ääriään myöten täynnä lisäominaisuuksia, joiden avulla voit löytää tarvitsemasi! Lue kaikki siitä Ohje-valikon `Tarkennettu hakuoppaasta'!
+- Projektisi tallennetaan automaattisesti poistuttaessa, mutta on suositeltavaa käyttää "Tallenna"-toimintoa silloin tällöin varmistaaksesi, että tiedot pysyvät turvassa.
+- Vasen hierarkkinen puu on laajennettavissa vetämällä jakajaa, ja sovellus muistaa, mihin jätit sen seuraavan käynnistyksen yhteydessä!
+- Älä epäröi lisätä niin monta alaluokkaa kuin haluat. Voit aina siirtää tavaraa myöhemmin ja järjestää projektisi rakenteen uudelleen.
+- Tunnisteet ovat erittäin tehokas ominaisuus, jonka avulla voit lisätä puolikategorioita projektipuuhun ja luoda lisähakuparametreja navigoinnin helpottamiseksi.
+- Sivulla Patreon on etenemissuunnitelma suunnitelluista ominaisuuksista! Jos olet utelias siitä, mitä lopulta tapahtuu, lue se vapaasti.
+- Tämä ohjelmisto on itse asiassa paikallinen verkkosivusto, joka teeskentelee olevansa työpöytäsovellus! Tekniikka on hullua!
+- Jos tarvitset joskus hyvän offline-kartantekoohjelmiston, katso Megasplootin Wonderdraft ja Dungeondraft!- Suloinen pieni arkaaninen lohikäärme, jonka olet ehkä nähnyt sovellusta käyttäessäsi, on nimeltään Fantasia ja hän on FA:n virallinen maskotti!
+- Jos joskus haluat sponsoroida kehitystä, on olemassa Patreon. Jos et pysty tai et halua, sekin on hienoa – pidä vain hauskaa sovelluksen kanssa ja rakenna siitä jotain hienoa!
+- VASTUUVAPAUSLAUSEKE: Mitään maagisia olentoja ei vahingoitettu tämän ohjelmiston valmistuksen aikana.

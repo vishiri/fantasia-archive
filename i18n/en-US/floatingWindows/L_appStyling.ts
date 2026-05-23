@@ -14,7 +14,7 @@ export default {
       addPadding: 'Add padding',
       removePadding: 'Remove padding'
     },
-    footer: 'Further commands, keybinds and details can be found in the command palette.',
+    footer: 'Further commands, keybinds, and details are available in the command palette.',
     variableListTitle: 'Fantasia Archive variable list'
   },
   loading: 'Loading editor…',

@@ -1,23 +1,23 @@
 export default {
-  closeWithoutSaving: 'Schließen ohne Speichern',
+  closeWithoutSaving: 'Schließen ohne zu speichern',
   helpTooltip: {
-    aria: 'Tastenkürzel-Referenz des Editors anzeigen',
-    title: 'Tastenkürzel im Editor',
+    aria: 'Referenz zur Editor-Tastenkombination anzeigen',
+    title: 'Editor-Tastenkombinationen',
     items: {
       commandPalette: 'Befehlspalette',
-      triggerSuggestion: 'Vorschläge einblenden',
-      find: 'Suchen',
+      triggerSuggestion: 'Popup mit Triggervorschlägen',
+      find: 'Finden',
       findReplace: 'Suchen und ersetzen',
-      copy: 'Kopieren (kopiert die ganze Zeile, wenn nichts markiert ist)',
-      paste: 'Einfügen (fügt die ganze Zeile ein, wenn nichts markiert ist)',
-      cut: 'Ausschneiden (schneidet die aktuelle Zeile aus, wenn nichts markiert ist)',
-      addPadding: 'Einzug vergrößern',
-      removePadding: 'Einzug verkleinern'
+      copy: 'Kopieren (kopiert die gesamte Zeile, wenn die Auswahl leer ist)',
+      paste: 'Einfügen (fügt die gesamte Zeile ein, wenn die Auswahl leer ist)',
+      cut: 'Ausschneiden (schneidet die aktuelle Zeile aus, wenn die Auswahl leer ist)',
+      addPadding: 'Polsterung hinzufügen',
+      removePadding: 'Polsterung entfernen',
     },
-    footer: 'Weitere Befehle, Tastenkürzel und Details findet ihr in der Befehlspalette.',
-    variableListTitle: 'FA-Variablenliste'
+    footer: 'Weitere Befehle, Tastenkombinationen und Details sind in der Befehlspalette verfügbar.',
+    variableListTitle: 'Fantasia Archive Variablenliste',
   },
   loading: 'Editor wird geladen…',
   saveButton: 'Änderungen speichern',
-  title: 'Eigenes App-CSS'
+  title: 'Benutzerdefinierte App CSS',
 }

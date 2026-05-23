@@ -1,0 +1,21 @@
+- Notas para los tipos de filtro.
+  - Sustituya los espacios en blanco por `-`
+  - Prefijo `@` para incluir `Otros nombres` en la búsqueda
+- Tipos de filtro
+  - `$` - Tipo de documento
+  - `#` - Etiqueta
+  - `>` - Ruta jerárquica
+  - `^` - Cambiar
+    - `^c` - Es una categoría
+    - `^d` - Está muerto/desaparecido/destruido
+    - `^f` - Está terminado
+    - `^m` - Es un documento menor
+- Búsqueda completa
+  - `%` - Inicio de la búsqueda completa
+  - `:` - Separador entre el nombre del campo y el valor del campo
+  - `%some-field:some-value` - Busca un valor en todos los campos
+  - Esto también se puede utilizar para buscar colores: `%color:blue`
+  - Ajuste `""` para una búsqueda precisa (nombre de campo y/o valor)
+    - Ejemplo completo y preciso: `%"algún-campo":"algún-valor"`
+    - Valor de ejemplo preciso: `%algún-campo:"algún-valor"`
+    - Ejemplo de nombre preciso: `%"algún-campo":algún-valor`

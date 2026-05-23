@@ -25,10 +25,19 @@
 </template>
 
 <script setup lang="ts">
-import { buttonList } from './_data/buttons'
+import { computed } from 'vue'
+
+import { i18n } from 'app/i18n/externalFileLoader'
+
+import { buildSocialContactButtonList } from './scripts/buildSocialContactButtonList'
 
 import SocialContactSingleButton from 'app/src/components/elements/SocialContactSingleButton/SocialContactSingleButton.vue'
 
-const buttonListLength = Object.keys(buttonList).length
+const buttonList = computed(() => {
+  void i18n.global.locale.value
+  return buildSocialContactButtonList((messageKey) => i18n.global.t(messageKey))
+})
+
+const buttonListLength = computed(() => Object.keys(buttonList.value).length)
 
 </script>

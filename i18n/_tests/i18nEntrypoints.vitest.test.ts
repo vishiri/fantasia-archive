@@ -2,14 +2,15 @@ import { expect, test } from 'vitest'
 
 import messages from 'app/i18n'
 import { i18n } from 'app/i18n/externalFileLoader'
+import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
 
 /**
  * Ensures the locale registry and standalone i18n instance load (drives **unit-i18n** coverage for **index.ts** and **externalFileLoader.ts**).
  */
-test('locale registry exposes en-US, de, and fr', () => {
-  expect(messages['en-US']).toBeDefined()
-  expect(messages.de).toBeDefined()
-  expect(messages.fr).toBeDefined()
+test('locale registry exposes every supported interface language', () => {
+  for (const code of FA_USER_SETTINGS_LANGUAGE_CODES) {
+    expect(messages[code]).toBeDefined()
+  }
 })
 
 test('de and fr include core keys aligned with en-US (error page, window buttons, did-you-know)', () => {

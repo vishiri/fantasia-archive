@@ -1,0 +1,22 @@
+# Dicas, truques e curiosidades
+----------
+
+- Digitar `@` ao editar campos de texto grandes permite vincular a outros documentos diretamente dentro do editor de texto!
+- `Ctrl+Shift+F` abre a busca no documento atual quando você precisa de uma palavra específica na página!
+- Qualquer campo no modo de edição de documento com uma pequena seta suspensa permite valores personalizados! Feche o menu de valores predefinidos com Esc, digite o valor desejado e confirme com Enter.
+- Você pode pesquisar todos os documentos e todos os seus campos de uma vez usando o seguinte no pop-up de pesquisa rápida ou em qualquer uma das pesquisas de relacionamento: `%field-name:whatever-you-need`
+- Há uma lista completa de atalhos de teclado realmente úteis que podem tornar o uso do FA muito mais rápido e fácil!
+- O menu de configurações contém uma grande variedade de ajustes grandes e pequenos para adaptar o aplicativo às suas necessidades!
+- FA tem um Modo Escuro que não é uma mera reflexão tardia e é totalmente utilizável!
+- Muitas partes do aplicativo reagem a um clique do meio do mouse. Por exemplo, você pode fechar guias de documentos ou abrir itens da árvore hierárquica diretamente com ele!
+- Fantasia Archive é gratuito; sem compromisso: sem anúncios, sem rastreadores, sem mineração de criptografia acontecendo no seu PC e seus dados permanecem inteiramente seus!- Se essas dicas incomodam você, existe um botão para desativá-las nas configurações do aplicativo.
+- A pesquisa de relacionamento está repleta de recursos extras que você pode usar para encontrar o que precisa! Leia tudo sobre isso no `Guia de Pesquisa Avançada` no menu Ajuda!
+- Seu projeto é salvo automaticamente ao sair, mas é recomendado usar a função `Salvar` de vez em quando para garantir que os dados permaneçam seguros.
+- A árvore hierárquica esquerda pode ser expandida arrastando o divisor, e o aplicativo lembrará onde você o deixou na próxima vez que for iniciado!
+- Não hesite em adicionar quantas subcategorias desejar. Você sempre pode mover as coisas mais tarde e reorganizar a estrutura do seu projeto.
+- Tags são um recurso muito poderoso que permite adicionar semicategorias à árvore do projeto e criar parâmetros de pesquisa adicionais para auxiliar na navegação.
+- Existe um roteiro de recursos planejados em Patreon! Se você está curioso sobre o que virá, sinta-se à vontade para lê-lo.
+- Este software é na verdade um site local que finge ser um aplicativo de desktop! A tecnologia é uma loucura!
+- Se você precisar de um bom software de criação de mapas offline, dê uma olhada em Wonderdraft e Dungeondraft da Megasploot!- O adorável pequeno dragão arcano que você deve ter visto ao usar o aplicativo se chama Fantasia e ela é a mascote oficial de FA!
+- Se você quiser patrocinar o desenvolvimento, existe Patreon. Se você não pode ou não quer, tudo bem também - apenas divirta-se com o aplicativo e crie algo legal com ele!
+- AVISO LEGAL: Nenhuma criatura mágica foi ferida durante a criação deste software.

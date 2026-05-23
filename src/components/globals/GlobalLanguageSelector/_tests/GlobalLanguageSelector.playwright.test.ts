@@ -6,6 +6,8 @@ import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universa
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import L_GlobalLanguageSelectorDe from 'app/i18n/de/components/globals/GlobalLanguageSelector/L_GlobalLanguageSelector'
 import L_GlobalLanguageSelectorFr from 'app/i18n/fr/components/globals/GlobalLanguageSelector/L_GlobalLanguageSelector'
+import type { T_faUserSettingsLanguageNamesKey } from 'app/types/faUserSettingsLanguageRegistry'
+
 import L_faUserSettingsEnUs from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
 import { GLOBAL_LANGUAGE_SELECTOR_LOCALES } from '../scripts/globalLanguageSelectorLocales'
 
@@ -65,15 +67,8 @@ async function expectFlagImageLoaded (flagLocator: Locator): Promise<void> {
   }).toPass({ timeout: flagImageLoadTimeoutMs })
 }
 
-function languageNameForMenuKey (key: 'de' | 'enUS' | 'fr'): string {
-  const names = L_faUserSettingsEnUs.languageNames
-  if (key === 'enUS') {
-    return names.enUS
-  }
-  if (key === 'de') {
-    return names.de
-  }
-  return names.fr
+function languageNameForMenuKey (key: T_faUserSettingsLanguageNamesKey): string {
+  return L_faUserSettingsEnUs.languageNames[key]
 }
 
 /**

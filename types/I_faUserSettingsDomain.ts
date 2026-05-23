@@ -1,7 +1,19 @@
-/**
- * Locale codes supported by the in-app language selector and persisted user settings.
- */
-export type T_faUserSettingsLanguageCode = 'en-US' | 'fr' | 'de'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
+
+export type {
+  T_faUserSettingsLanguageCode,
+  T_faUserSettingsLanguageNamesKey,
+  T_faUserSettingsLanguageSelectorRow
+} from 'app/types/faUserSettingsLanguageRegistry'
+
+export {
+  FA_SPELL_CHECKER_CANDIDATES_BY_LANGUAGE_CODE,
+  FA_USER_SETTINGS_LANGUAGE_CODES,
+  buildFaUserSettingsLanguageSelectorLocales,
+  faUserSettingsLanguageCodeToNamesKey,
+  isFaUserSettingsLanguageCode,
+  resolveFaSpellCheckerLanguageFamilyPrefix
+} from 'app/types/faUserSettingsLanguageRegistry'
 
 /**
  * Full persisted user preference surface mirrored with the main-process user settings store.

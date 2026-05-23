@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import { buttonList } from '../../../other/SocialContactButtons/_data/buttons'
+import { getSocialContactButtonListForCurrentLocale } from '../../../other/SocialContactButtons/scripts/getSocialContactButtonListForCurrentLocale'
 import SocialContactSingleButton from '../SocialContactSingleButton.vue'
+
+const buttonList = getSocialContactButtonListForCurrentLocale()
 
 const meta = {
   title: 'Components/elements/SocialContactSingleButton',

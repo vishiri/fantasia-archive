@@ -1,22 +1,21 @@
-
 - Notes pour les types de filtres
   - Remplacer les espaces par `-`
-  - Préfixe `@` pour inclure les `Autres noms` dans la recherche
+  - Préfixe `@` pour inclure `Autres noms` dans la recherche
 - Types de filtres
   - `$` - Type de document
-  - `#` - Étiquette
+  - `#` - Balise
   - `>` - Chemin hiérarchique
-  - `^` - Interrupteur
+  - `^` - Changer
     - `^c` - Est une catégorie
-    - `^d` - Est Mort/Parti/Détruit
+    - `^d` - Est mort/parti/détruit
     - `^f` - Est terminé
     - `^m` - Est un document mineur
 - Recherche complète
   - `%` - Début de la recherche complète
-  - `:` - Division entre le nom du champ et la valeur du champ
-  - `%nom-du-champ:une-valeur` - Rechercher dans tous les champs pour une valeur
-  - Cela peut aussi être utilisé pour rechercher des couleurs : `%couleur:bleu`
-  - `""` encadrement pour une recherche précise (nom du champ et/ou valeur)
-    - Exemple complet précis : `%"nom-du-champ":"une-valeur"`
-    - Exemple valeur précise : `%nom-du-champ:"une-valeur"`
-    - Exemple nom précis : `%"nom-du-champ":une-valeur`
+  - `:` - Séparateur entre le nom du champ et la valeur du champ
+  - `%some-field:some-value` - Rechercher une valeur dans tous les champs
+  - Cela peut également être utilisé pour rechercher des couleurs : `%color:blue`
+  - Wrap `""` pour une recherche précise (nom et/ou valeur du champ)
+    - Exemple très précis : `%"some-field":"some-value"`
+    - Exemple de valeur précise : `%some-field:"some-value"`
+    - Exemple de nom précis : `%"some-field":some-value`

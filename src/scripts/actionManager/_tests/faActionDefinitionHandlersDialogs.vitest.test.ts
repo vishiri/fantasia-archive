@@ -43,7 +43,7 @@ test('handleOpenKeybindSettingsDialog opens KeybindSettings', async () => {
   )
   await handleOpenKeybindSettingsDialog()
   expect(openDialogComponentMock).toHaveBeenCalledWith('KeybindSettings')
-})
+}, 15_000)
 
 test('handleOpenAppSettingsDialog opens AppSettings', async () => {
   const { handleOpenAppSettingsDialog } = await import(

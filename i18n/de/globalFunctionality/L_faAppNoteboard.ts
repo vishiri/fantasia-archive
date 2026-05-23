@@ -1,3 +1,3 @@
 export default {
-  bridgeMissing: 'Das App-Noteboard ist über die Desktop-Brücke nicht erreichbar.'
+  bridgeMissing: 'Das App-Noteboard konnte von der Desktop-Bridge aus nicht erreicht werden.',
 }

@@ -1,0 +1,22 @@
+# Tipps, Tricks und Wissenswertes
+----------
+
+- Durch die Eingabe von „@“ beim Bearbeiten großer Textfelder können Sie direkt im Texteditor auf andere Dokumente verlinken!
+- „Ctrl+Shift+F“ öffnet die Suche im aktuellen Dokument, wenn Sie ein bestimmtes Wort auf der Seite benötigen!
+- Jedes Feld im Dokumentbearbeitungsmodus mit dem kleinen Dropdown-Pfeil erlaubt benutzerdefinierte Werte! Schließen Sie das Menü der vordefinierten Werte mit Esc, geben Sie Ihren gewünschten Wert ein und bestätigen Sie mit Enter.
+- Sie können alle Dokumente und alle ihre Felder gleichzeitig durchsuchen, indem Sie entweder im Schnellsuch-Popup oder in einer der Beziehungssuchen Folgendes verwenden: „%field-name:whatever-you-need“.
+- Es gibt eine ganze Liste wirklich hilfreicher Tastenkombinationen, die Ihnen die Verwendung von FA viel schneller und einfacher machen können!
+- Das Einstellungsmenü enthält eine ganze Reihe großer und kleiner Optimierungen, um die App an Ihre Bedürfnisse anzupassen!
+- FA verfügt über einen Dunkelmodus, der kein nachträglicher Einfall ist und voll funktionsfähig ist!
+- Viele Teile der App reagieren auf einen mittleren Mausklick. Sie können damit beispielsweise Dokumentregisterkarten schließen oder hierarchische Baumelemente direkt öffnen!
+- Fantasia Archive ist kostenlos; Keine Bedingungen: Keine Werbung, keine Tracker, kein Krypto-Mining auf Ihrem PC und Ihre Daten bleiben ganz bei Ihnen!- Wenn Sie diese Tipps stören, gibt es in den App-Einstellungen einen Schalter, mit dem Sie sie deaktivieren können.
+- Die Beziehungssuche ist randvoll mit zusätzlichen Funktionen, mit denen Sie finden können, was Sie brauchen! Lesen Sie alles darüber im „Anleitung zur erweiterten Suche“ im Hilfemenü!
+- Ihr Projekt wird beim Beenden automatisch gespeichert, es wird jedoch empfohlen, ab und zu die Funktion „Speichern“ zu verwenden, um sicherzustellen, dass die Daten sicher bleiben.
+- Der linke hierarchische Baum kann durch Ziehen der Trennlinie erweitert werden, und die App merkt sich beim nächsten Start, wo Sie ihn verlassen haben!
+- Zögern Sie nicht, so viele Unterkategorien hinzuzufügen, wie Sie möchten. Sie können später jederzeit Dinge verschieben und Ihre Projektstruktur neu organisieren.
+- Tags sind eine sehr leistungsstarke Funktion, mit der Sie Halbkategorien zum Projektbaum hinzufügen und zusätzliche Suchparameter erstellen können, um die Navigation zu erleichtern.
+- Es gibt eine Roadmap der geplanten Funktionen auf Patreon! Wenn Sie neugierig sind, was irgendwann kommen wird, können Sie es gerne lesen.
+- Bei dieser Software handelt es sich tatsächlich um eine lokale Website, die vorgibt, eine Desktop-Anwendung zu sein! Technologie ist verrückt!
+- Wenn Sie jemals eine gute Offline-Kartenerstellungssoftware benötigen, schauen Sie sich Wonderdraft und Dungeondraft von Megasploot an!- Der entzückende kleine arkane Drache, den Sie vielleicht bei der Nutzung der App gesehen haben, heißt Fantasia und sie ist das offizielle Maskottchen von FA!
+- Wenn Sie jemals Lust haben, die Entwicklung zu sponsern, gibt es Patreon. Wenn du das nicht kannst oder willst, ist das auch völlig in Ordnung – hab einfach Spaß mit der App und baue etwas Cooles damit!
+- HAFTUNGSAUSSCHLUSS: Bei der Erstellung dieser Software wurden keine magischen Kreaturen geschädigt.

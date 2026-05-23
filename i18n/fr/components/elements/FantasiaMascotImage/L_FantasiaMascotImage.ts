@@ -1,3 +1,3 @@
 export default {
-  label: 'Mascotte Fantasia'
+  label: 'Mascotte de Fantaisie',
 }
