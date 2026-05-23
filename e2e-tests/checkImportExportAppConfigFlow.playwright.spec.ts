@@ -27,6 +27,8 @@ import appStylingMessages from 'app/i18n/en-US/floatingWindows/L_appStyling'
 import appStylingMessagesDe from 'app/i18n/de/floatingWindows/L_appStyling'
 import appNoteboardMessagesEn from 'app/i18n/en-US/floatingWindows/L_appNoteboard'
 import appNoteboardMessagesDe from 'app/i18n/de/floatingWindows/L_appNoteboard'
+import L_appSettingsDe from 'app/i18n/de/dialogs/L_appSettings'
+import L_appSettingsEn from 'app/i18n/en-US/dialogs/L_appSettings'
 import actionMonitorMessages from 'app/i18n/en-US/dialogs/L_DialogActionMonitor'
 
 const extraEnvSettings = { TEST_ENV: 'e2e' as const }
@@ -330,8 +332,17 @@ async function fillAppSettingsSearch (page: Page, query: string) {
   await page.waitForTimeout(400)
 }
 
+async function resolveShowDocumentIdSearchQuery (page: Page): Promise<string> {
+  const root = page.locator(`[data-test-locator="${selectorList.languageSelectorRoot}"]`)
+  const locale = await root.getAttribute('data-test-i18n-locale')
+  if (locale === 'de') {
+    return L_appSettingsDe.appOptions.showDocumentID.title
+  }
+  return L_appSettingsEn.appOptions.showDocumentID.title
+}
+
 async function setShowDocumentId (page: Page, on: boolean) {
-  await fillAppSettingsSearch(page, 'Show document IDs')
+  await fillAppSettingsSearch(page, await resolveShowDocumentIdSearchQuery(page))
   const block = page.locator(
     '[data-test-locator="dialogAppSettings-search-setting-showDocumentID"]'
   )
@@ -574,7 +585,7 @@ test.describe.serial('Import / export app configuration E2E', () => {
         appWindow.getByText(L_toolsEn.title, { exact: true })
       ).toBeVisible()
       await triggerGlobalShortcut(appWindow, defaultChord.openAppSettings)
-      await fillAppSettingsSearch(appWindow, 'Show document IDs')
+      await fillAppSettingsSearch(appWindow, L_appSettingsEn.appOptions.showDocumentID.title)
       const tgl = appWindow
         .locator('[data-test-locator="dialogAppSettings-search-setting-showDocumentID"]')
         .locator(selectorList.quasarToggle)
