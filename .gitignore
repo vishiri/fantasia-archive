@@ -59,5 +59,12 @@ debug-storybook.log*
 # Local agent planning documents (temporary)
 /.cursor/plans/
 
+# i18n batch-translate scratch (not shipped)
+/scripts/i18nMaps/
+/scripts/__pycache__/
+
+# Stray empty folder from old Playwright layout (use helpers/ at repo root)
+/playwrightHelpers/
+
 .nyc_output
 coverage/
