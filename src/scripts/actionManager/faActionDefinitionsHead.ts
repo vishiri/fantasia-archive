@@ -16,6 +16,7 @@ import {
   handleReportAppNoteboardSaveFailure,
   handleReportAppStylingPersistFailure,
   handleReportProjectStylingSaveFailure,
+  handleReportBridgeLoadFailure,
   handleSaveKeybindSettings,
   handleSaveAppSettings,
   handleSaveAppStyling,
@@ -106,6 +107,11 @@ export const FA_ACTION_DEFINITIONS_HEAD: ReadonlyArray<I_faActionDefinition<T_fa
   {
     handler: handleReportProjectStylingSaveFailure as I_faActionDefinition<T_faActionId>['handler'],
     id: 'reportProjectStylingSaveFailure',
+    kind: 'async'
+  },
+  {
+    handler: handleReportBridgeLoadFailure as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'reportBridgeLoadFailure',
     kind: 'async'
   },
   {

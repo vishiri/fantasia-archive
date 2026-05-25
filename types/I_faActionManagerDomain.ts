@@ -34,6 +34,7 @@ export const FA_ACTION_IDS = [
   'reportProjectNoteboardSaveFailure',
   'reportAppStylingPersistFailure',
   'reportProjectStylingSaveFailure',
+  'reportBridgeLoadFailure',
   'openActionMonitorDialog',
   'showStartupTipsNotification',
   'openImportExportAppConfigDialog',
@@ -97,6 +98,7 @@ export interface I_faActionPayloadMap {
   reportProjectNoteboardSaveFailure: { message: string }
   reportAppStylingPersistFailure: { message: string }
   reportProjectStylingSaveFailure: { message: string }
+  reportBridgeLoadFailure: { message: string }
   openActionMonitorDialog: void
   showStartupTipsNotification: void
   openImportExportAppConfigDialog: void

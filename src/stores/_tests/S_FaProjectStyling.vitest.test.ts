@@ -155,16 +155,12 @@ test('Test that persistProjectStylingPartialSilent skips read-back when setProje
   expect(store.css).toBe('preserve')
 })
 
-test('Test that refreshProjectStyling returns false when getProjectStyling rejects', async () => {
+test('Test that refreshProjectStyling throws when getProjectStyling rejects', async () => {
   getProjectStylingMock.mockRejectedValueOnce(new Error('read fail'))
-  const ok = await store.refreshProjectStyling()
-  expect(ok).toBe(false)
-  expect(notifyCreateMock).toHaveBeenCalledWith({
-    group: false,
-    message: 'globalFunctionality.faProjectStyling.loadError',
-    timeout: 0,
-    type: 'negative'
-  })
+  await expect(store.refreshProjectStyling()).rejects.toThrow(
+    'globalFunctionality.faProjectStyling.loadError'
+  )
+  expect(notifyCreateMock).not.toHaveBeenCalled()
 })
 
 test('Test that persistProjectStylingPartialSilent throws when setProjectStyling is missing', async () => {

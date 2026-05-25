@@ -118,23 +118,18 @@ test('Test that refreshAppStyling skips when getAppStyling is unavailable', asyn
 
 /**
  * S_FaAppStyling / refreshAppStyling
- * Surfaces a sticky negative toast when the bridge rejects so the user knows persistence is broken.
+ * Throws when the bridge rejects so callers route failure through the action manager.
  */
-test('Test that refreshAppStyling notifies when getAppStyling rejects', async () => {
+test('Test that refreshAppStyling throws when getAppStyling rejects', async () => {
   getAppStylingMock.mockRejectedValueOnce(new Error('ipc read fail'))
 
-  const ok = await store.refreshAppStyling()
-
-  expect(ok).toBe(false)
+  await expect(store.refreshAppStyling()).rejects.toThrow(
+    'globalFunctionality.faAppStyling.loadError'
+  )
   expect(getAppStylingMock).toHaveBeenCalledOnce()
   expect(store.root).toBeNull()
   expect(store.css).toBe('')
-  expect(notifyCreateMock).toHaveBeenCalledWith(
-    expect.objectContaining({
-      message: 'globalFunctionality.faAppStyling.loadError',
-      type: 'negative'
-    })
-  )
+  expect(notifyCreateMock).not.toHaveBeenCalled()
 })
 
 /**

@@ -4,19 +4,14 @@ import { ref } from 'vue'
 import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
 import type { I_faKeybindsSnapshot } from 'app/types/I_faKeybindsDomain'
 
-const { notifyCreateMock, tMock, getKeybindsMock } = vi.hoisted(() => {
+const { tMock, getKeybindsMock } = vi.hoisted(() => {
   return {
-    notifyCreateMock: vi.fn(),
     tMock: vi.fn((key: string) => key),
     getKeybindsMock: vi.fn(async (): Promise<I_faKeybindsSnapshot> => ({
       platform: 'win32',
       store: { ...FA_KEYBINDS_STORE_DEFAULTS }
     }))
   }
-})
-
-vi.mock('quasar', () => {
-  return { Notify: { create: notifyCreateMock } }
 })
 
 vi.mock('app/i18n/externalFileLoader', () => {
@@ -29,7 +24,6 @@ vi.mock('app/i18n/externalFileLoader', () => {
  */
 test('Test that runFaKeybindsRefreshKeybinds no-ops when getKeybinds is missing', async () => {
   vi.resetModules()
-  notifyCreateMock.mockReset()
   Object.defineProperty(globalThis, 'window', {
     configurable: true,
     value: { faContentBridgeAPIs: {} },
@@ -42,7 +36,6 @@ test('Test that runFaKeybindsRefreshKeybinds no-ops when getKeybinds is missing'
   await runFaKeybindsRefreshKeybinds(snapshot)
 
   expect(snapshot.value).toBeNull()
-  expect(notifyCreateMock).not.toHaveBeenCalled()
 })
 
 /**
@@ -75,11 +68,10 @@ test('Test that runFaKeybindsRefreshKeybinds assigns snapshot on success', async
 
 /**
  * runFaKeybindsRefreshKeybinds
- * Notifies when getKeybinds rejects.
+ * Throws when getKeybinds rejects so callers route failure through the action manager.
  */
-test('Test that runFaKeybindsRefreshKeybinds notifies on getKeybinds failure', async () => {
+test('Test that runFaKeybindsRefreshKeybinds throws on getKeybinds failure', async () => {
   vi.resetModules()
-  notifyCreateMock.mockReset()
   getKeybindsMock.mockReset()
   getKeybindsMock.mockRejectedValueOnce(new Error('bridge fail'))
   Object.defineProperty(globalThis, 'window', {
@@ -93,13 +85,8 @@ test('Test that runFaKeybindsRefreshKeybinds notifies on getKeybinds failure', a
   const { runFaKeybindsRefreshKeybinds } = await import('../faKeybindsStoreBridgeRefresh')
   const snapshot = ref<I_faKeybindsSnapshot | null>(null)
 
-  await runFaKeybindsRefreshKeybinds(snapshot)
-
-  expect(snapshot.value).toBeNull()
-  expect(notifyCreateMock).toHaveBeenCalledWith(
-    expect.objectContaining({
-      message: 'globalFunctionality.faKeybinds.loadError',
-      type: 'negative'
-    })
+  await expect(runFaKeybindsRefreshKeybinds(snapshot)).rejects.toThrow(
+    'globalFunctionality.faKeybinds.loadError'
   )
+  expect(snapshot.value).toBeNull()
 })

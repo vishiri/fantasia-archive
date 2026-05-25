@@ -85,6 +85,7 @@ import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
+import { hydrateFromBridgeOrReport } from 'app/src/scripts/stores/faBridgeLoadFailureReporting'
 
 import AppControlMenus from 'app/src/components/globals/AppControlMenus/AppControlMenus.vue'
 import GlobalLanguageSelector from 'app/src/components/globals/GlobalLanguageSelector/GlobalLanguageSelector.vue'
@@ -155,19 +156,19 @@ onMounted(async () => {
 
   if (window.faContentBridgeAPIs?.projectManagement !== undefined) {
     await S_FaRecentProjects().refreshRecentProjects()
-    await S_FaProjectNoteboard().refreshProjectNoteboard()
-    await S_FaProjectStyling().refreshProjectStyling()
+    await hydrateFromBridgeOrReport(() => S_FaProjectNoteboard().refreshProjectNoteboard())
+    await hydrateFromBridgeOrReport(() => S_FaProjectStyling().refreshProjectStyling())
   }
 
   if (window.faContentBridgeAPIs?.faKeybinds !== undefined) {
     const faKeybindsStore = S_FaKeybinds()
-    await faKeybindsStore.refreshKeybinds()
+    await hydrateFromBridgeOrReport(() => faKeybindsStore.refreshKeybinds())
     faKeybindKeydownHandler = createFaKeybindKeydownHandler(getFaKeybindKeydownContext)
     window.addEventListener('keydown', faKeybindKeydownHandler, true)
   }
 
   if (window.faContentBridgeAPIs?.faAppStyling !== undefined) {
-    await S_FaAppStyling().refreshAppStyling()
+    await hydrateFromBridgeOrReport(() => S_FaAppStyling().refreshAppStyling())
   }
 
   if (window.faContentBridgeAPIs?.faAppNoteboard !== undefined) {

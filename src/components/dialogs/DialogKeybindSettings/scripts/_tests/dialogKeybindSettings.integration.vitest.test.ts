@@ -5,12 +5,13 @@
 
 import { afterEach, expect, test, vi } from 'vitest'
 
-const { notifyCreateMock, runFaActionAwaitMock } = vi.hoisted(() => {
+const { notifyCreateMock, runFaActionAwaitMock, runFaActionMock } = vi.hoisted(() => {
   return {
     notifyCreateMock: vi.fn(() => {
       return (): void => {}
     }),
-    runFaActionAwaitMock: vi.fn(async () => true)
+    runFaActionAwaitMock: vi.fn(async () => true),
+    runFaActionMock: vi.fn()
   }
 })
 
@@ -26,13 +27,14 @@ vi.mock('quasar', async (importOriginal) => {
 })
 
 vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
-  runFaAction: vi.fn(),
+  runFaAction: runFaActionMock,
   runFaActionAwait: runFaActionAwaitMock
 }))
 
 import { mount, flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { computed, defineComponent, nextTick, reactive, ref } from 'vue'
+import { i18n } from 'app/i18n/externalFileLoader'
 import { createDialogKeybindSettingsCapture } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsCapture'
 import {
   bindOnCaptureClear,
@@ -303,7 +305,7 @@ test('runDialogKeybindSettingsOpen sets model true after refresh resolves', asyn
 })
 
 test('runDialogKeybindSettingsOpen leaves dialog closed when refresh rejects', async () => {
-  notifyCreateMock.mockClear()
+  runFaActionMock.mockClear()
   const dialogModel = ref(false)
   const documentName = ref<T_dialogName>('AboutFantasiaArchive')
   const initializeForOpen = vi.fn()
@@ -320,12 +322,29 @@ test('runDialogKeybindSettingsOpen leaves dialog closed when refresh rejects', a
   expect(documentName.value).toBe('KeybindSettings')
   expect(initializeForOpen).not.toHaveBeenCalled()
   expect(dialogModel.value).toBe(false)
-  expect(notifyCreateMock).toHaveBeenCalledWith(
-    expect.objectContaining({
-      message: 'globalFunctionality.faKeybinds.loadError',
-      type: 'negative'
-    })
-  )
+  expect(runFaActionMock).toHaveBeenCalledWith('reportBridgeLoadFailure', { message: 'bridge' })
+  expect(notifyCreateMock).not.toHaveBeenCalled()
+})
+
+test('runDialogKeybindSettingsOpen uses i18n fallback when refresh rejects a non-Error', async () => {
+  runFaActionMock.mockClear()
+  const dialogModel = ref(false)
+  const documentName = ref<T_dialogName>('AboutFantasiaArchive')
+  const initializeForOpen = vi.fn()
+  const keybindsStore = {
+    refreshKeybinds: vi.fn(() => Promise.reject('plain-failure'))
+  }
+  runDialogKeybindSettingsOpen({
+    dialogModel,
+    documentName,
+    initializeForOpen,
+    keybindsStore: keybindsStore as unknown as ReturnType<typeof S_FaKeybinds>
+  })
+  await flushPromises()
+  expect(dialogModel.value).toBe(false)
+  expect(runFaActionMock).toHaveBeenCalledWith('reportBridgeLoadFailure', {
+    message: i18n.global.t('globalFunctionality.faKeybinds.loadError')
+  })
 })
 
 /**

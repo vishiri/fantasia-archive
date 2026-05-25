@@ -20,13 +20,7 @@ export async function faProjectStylingRefreshFromBridge (opts: {
   )
   if (readResult.isErr()) {
     console.error('[S_FaProjectStyling] getProjectStyling failed', readResult.error)
-    Notify.create({
-      group: false,
-      message: i18n.global.t('globalFunctionality.faProjectStyling.loadError'),
-      timeout: 0,
-      type: 'negative'
-    })
-    return false
+    throw new Error(i18n.global.t('globalFunctionality.faProjectStyling.loadError'))
   }
   opts.applyRoot(readResult.value)
   return true

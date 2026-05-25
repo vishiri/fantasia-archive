@@ -22,13 +22,7 @@ export async function faAppStylingRefreshFromBridge (opts: {
   if (readResult.isErr()) {
     const error = readResult.error
     console.error('[S_FaAppStyling] getAppStyling failed', error)
-    Notify.create({
-      group: false,
-      message: i18n.global.t('globalFunctionality.faAppStyling.loadError'),
-      timeout: 0,
-      type: 'negative'
-    })
-    return false
+    throw new Error(i18n.global.t('globalFunctionality.faAppStyling.loadError'))
   }
   opts.setRoot(readResult.value)
   return true

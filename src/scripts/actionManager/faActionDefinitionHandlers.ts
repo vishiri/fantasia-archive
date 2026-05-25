@@ -6,7 +6,7 @@ import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
-import { canOpenAppNoteboardFloatingWindow } from 'app/src/scripts/appNoteboard/faAppNoteboardCanOpen'
+import { canOpenFloatingWindowWhileNoModal } from 'app/src/scripts/appNoteboard/faAppNoteboardCanOpen'
 import { toggleDevTools } from 'app/src/scripts/appGlobalManagementUI/toggleDevTools'
 import { applyFaUserSettingsLanguageSelection } from 'app/src/scripts/appInternals/rendererAppInternals'
 
@@ -29,7 +29,7 @@ export async function handleToggleAppNoteboardWindow (): Promise<void> {
     store.setWindowOpen(false)
     return
   }
-  if (!canOpenAppNoteboardFloatingWindow()) {
+  if (!canOpenFloatingWindowWhileNoModal()) {
     return
   }
   store.setWindowOpen(true)
@@ -48,7 +48,7 @@ export async function handleToggleProjectNoteboardWindow (): Promise<void> {
   if (!S_FaActiveProject().hasActiveProject) {
     return
   }
-  if (!canOpenAppNoteboardFloatingWindow()) {
+  if (!canOpenFloatingWindowWhileNoModal()) {
     return
   }
   store.setWindowOpen(true)
@@ -59,6 +59,10 @@ export async function handleReportAppStylingPersistFailure (payload: { message: 
 }
 
 export async function handleReportProjectStylingSaveFailure (payload: { message: string }): Promise<void> {
+  throw new Error(payload.message)
+}
+
+export async function handleReportBridgeLoadFailure (payload: { message: string }): Promise<void> {
   throw new Error(payload.message)
 }
 

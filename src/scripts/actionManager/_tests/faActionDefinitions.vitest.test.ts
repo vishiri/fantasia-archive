@@ -14,7 +14,7 @@ const faActiveProjectFixture = vi.hoisted(() => ({
   }
 }))
 
-const canOpenAppNoteboardFloatingWindowMock = vi.hoisted(() => {
+const canOpenFloatingWindowWhileNoModalMock = vi.hoisted(() => {
   return vi.fn((): boolean => true)
 })
 
@@ -107,7 +107,7 @@ vi.mock('app/src/stores/S_FaActiveProject', () => ({
 }))
 
 vi.mock('app/src/scripts/appNoteboard/faAppNoteboardCanOpen', () => ({
-  canOpenAppNoteboardFloatingWindow: (): boolean => canOpenAppNoteboardFloatingWindowMock()
+  canOpenFloatingWindowWhileNoModal: (): boolean => canOpenFloatingWindowWhileNoModalMock()
 }))
 
 vi.mock('app/src/stores/S_FaRecentProjects', () => ({
@@ -221,8 +221,8 @@ beforeEach(() => {
   openProjectFromUserDialogMock.mockImplementation(async () => 'opened')
   refreshRecentProjectsMock.mockReset()
   refreshRecentProjectsMock.mockImplementation(async () => undefined)
-  canOpenAppNoteboardFloatingWindowMock.mockReset()
-  canOpenAppNoteboardFloatingWindowMock.mockReturnValue(true)
+  canOpenFloatingWindowWhileNoModalMock.mockReset()
+  canOpenFloatingWindowWhileNoModalMock.mockReturnValue(true)
   Object.assign(window, {
     faContentBridgeAPIs: {
       faAppConfig: {
@@ -313,7 +313,7 @@ test('Test that openProjectStylingDialog handler opens WindowProjectStyling when
 })
 
 test('Test that openProjectStylingDialog handler skips when modal chrome blocks floating windows', () => {
-  canOpenAppNoteboardFloatingWindowMock.mockReturnValue(false)
+  canOpenFloatingWindowWhileNoModalMock.mockReturnValue(false)
   definitionFor('openProjectStylingDialog').handler(undefined)
   expect(openDialogComponentMock).not.toHaveBeenCalled()
 })
@@ -647,7 +647,24 @@ test('Test that importAppConfigStageResult throws on fail and resolves on pass',
   ).resolves.toBeUndefined()
 })
 
-test('Test that exportAppConfigPackage handler is a no-op but defined', async () => {
+test('Test that exportAppConfigPackage handler exports through the bridge', async () => {
+  const exportToFileMock = vi.fn(async () => ({
+    filePath: 'C:\\a.faconfig',
+    outcome: 'saved' as const
+  }))
+  const runFaActionSpy = vi.spyOn(
+    await import('app/src/scripts/actionManager/faActionManagerRun'),
+    'runFaAction'
+  ).mockImplementation(() => undefined)
+  const prev = window.faContentBridgeAPIs
+  Object.assign(window, {
+    faContentBridgeAPIs: {
+      ...window.faContentBridgeAPIs,
+      faAppConfig: {
+        exportToFile: exportToFileMock
+      }
+    }
+  })
   await expect(
     (definitionFor('exportAppConfigPackage').handler({
       includeKeybinds: true,
@@ -656,6 +673,125 @@ test('Test that exportAppConfigPackage handler is a no-op but defined', async ()
       includeAppStyling: true
     }) as Promise<unknown>)
   ).resolves.toBeUndefined()
+  expect(exportToFileMock).toHaveBeenCalledOnce()
+  expect(runFaActionSpy).toHaveBeenCalledWith('exportAppConfigSaveResult', {
+    filePath: 'C:\\a.faconfig',
+    status: 'saved'
+  })
+  runFaActionSpy.mockRestore()
+  window.faContentBridgeAPIs = prev
+})
+
+test('Test that exportAppConfigPackage handler throws when the bridge is missing', async () => {
+  const prev = window.faContentBridgeAPIs
+  window.faContentBridgeAPIs = {
+    ...window.faContentBridgeAPIs,
+    faAppConfig: undefined
+  } as unknown as typeof window.faContentBridgeAPIs
+  await expect(
+    (definitionFor('exportAppConfigPackage').handler({
+      includeKeybinds: true,
+      includeAppNoteboard: false,
+      includeAppSettings: false,
+      includeAppStyling: true
+    }) as Promise<unknown>)
+  ).rejects.toThrow('App configuration is only available in the desktop app.')
+  window.faContentBridgeAPIs = prev
+})
+
+test('Test that exportAppConfigPackage handler throws FaActionUserCanceledError on cancel', async () => {
+  const exportToFileMock = vi.fn(async () => ({ outcome: 'canceled' as const }))
+  const prev = window.faContentBridgeAPIs
+  Object.assign(window, {
+    faContentBridgeAPIs: {
+      ...window.faContentBridgeAPIs,
+      faAppConfig: { exportToFile: exportToFileMock }
+    }
+  })
+  await expect(
+    (definitionFor('exportAppConfigPackage').handler({
+      includeKeybinds: true,
+      includeAppNoteboard: false,
+      includeAppSettings: false,
+      includeAppStyling: true
+    }) as Promise<unknown>)
+  ).rejects.toBeInstanceOf(FaActionUserCanceledError)
+  window.faContentBridgeAPIs = prev
+})
+
+test('Test that exportAppConfigPackage handler throws on export error outcome', async () => {
+  const exportToFileMock = vi.fn(async () => ({
+    errorMessage: 'disk full',
+    errorName: 'Error',
+    outcome: 'error' as const
+  }))
+  const prev = window.faContentBridgeAPIs
+  Object.assign(window, {
+    faContentBridgeAPIs: {
+      ...window.faContentBridgeAPIs,
+      faAppConfig: { exportToFile: exportToFileMock }
+    }
+  })
+  await expect(
+    (definitionFor('exportAppConfigPackage').handler({
+      includeKeybinds: true,
+      includeAppNoteboard: false,
+      includeAppSettings: false,
+      includeAppStyling: true
+    }) as Promise<unknown>)
+  ).rejects.toThrow('disk full')
+  window.faContentBridgeAPIs = prev
+})
+
+test('Test that exportAppConfigPackage handler falls back to errorName when errorMessage is missing', async () => {
+  const exportToFileMock = vi.fn(async () => ({
+    errorName: 'ExportFailed',
+    outcome: 'error' as const
+  }))
+  const prev = window.faContentBridgeAPIs
+  Object.assign(window, {
+    faContentBridgeAPIs: {
+      ...window.faContentBridgeAPIs,
+      faAppConfig: { exportToFile: exportToFileMock }
+    }
+  })
+  await expect(
+    (definitionFor('exportAppConfigPackage').handler({
+      includeKeybinds: true,
+      includeAppNoteboard: false,
+      includeAppSettings: false,
+      includeAppStyling: true
+    }) as Promise<unknown>)
+  ).rejects.toThrow('ExportFailed')
+  window.faContentBridgeAPIs = prev
+})
+
+test('Test that exportAppConfigPackage handler uses default export failure message', async () => {
+  const exportToFileMock = vi.fn(async () => ({
+    outcome: 'error' as const
+  }))
+  const prev = window.faContentBridgeAPIs
+  Object.assign(window, {
+    faContentBridgeAPIs: {
+      ...window.faContentBridgeAPIs,
+      faAppConfig: { exportToFile: exportToFileMock }
+    }
+  })
+  await expect(
+    (definitionFor('exportAppConfigPackage').handler({
+      includeKeybinds: true,
+      includeAppNoteboard: false,
+      includeAppSettings: false,
+      includeAppStyling: true
+    }) as Promise<unknown>)
+  ).rejects.toThrow('Export to file failed')
+  window.faContentBridgeAPIs = prev
+})
+
+test('Test that reportBridgeLoadFailure handler throws the payload message', async () => {
+  await expect(
+    (definitionFor('reportBridgeLoadFailure').handler({ message: 'load failed' }) as Promise<unknown>)
+  ).rejects.toThrow('load failed')
 })
 
 test('Test that showStartupTipsNotification handler invokes the notification helper', async () => {

@@ -2,11 +2,11 @@ import type { StoreGeneric } from 'pinia'
 import { Result } from 'neverthrow'
 import type { Ref } from 'vue'
 import { computed, onMounted, onUnmounted, watch } from 'vue'
-import { Notify } from 'quasar'
 import { ResultAsync } from 'neverthrow'
 
 import { i18n } from 'app/i18n/externalFileLoader'
 import { formatFaKeybindChordForUi } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
+import { reportFaBridgeLoadFailure } from 'app/src/scripts/stores/faBridgeLoadFailureReporting'
 import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
@@ -83,12 +83,10 @@ export function runDialogKeybindSettingsOpen (params: {
     },
     (error: unknown) => {
       console.error('[DialogKeybindSettings] refreshKeybinds failed before open', error)
-      Notify.create({
-        group: false,
-        message: i18n.global.t('globalFunctionality.faKeybinds.loadError'),
-        timeout: 0,
-        type: 'negative'
-      })
+      const message = error instanceof Error
+        ? error.message
+        : i18n.global.t('globalFunctionality.faKeybinds.loadError')
+      reportFaBridgeLoadFailure(message)
     }
   )
 }
