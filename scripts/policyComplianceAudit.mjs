@@ -36,15 +36,27 @@ const vues = walk(
 )
 const rel = (f) => path.relative(repoRoot, f).replace(/\\/g, '/')
 
+/**
+ * Storybook/Vitest colocation: feature SFCs use sibling _tests/<Name>.*; helpers already under _tests/ use same folder.
+ * @param {string} vuePath
+ * @param {string} suffix
+ */
+function resolveColocatedTestPath (vuePath, suffix) {
+  const base = path.basename(vuePath, '.vue')
+  const dir = path.dirname(vuePath)
+  if (dir.replace(/\\/g, '/').endsWith('/_tests')) {
+    return path.join(dir, `${base}${suffix}`)
+  }
+  return path.join(dir, '_tests', `${base}${suffix}`)
+}
+
 const missingVitest = []
 const missingStory = []
 for (const f of vues) {
-  const base = path.basename(f, '.vue')
-  const dir = path.dirname(f)
-  if (!fs.existsSync(path.join(dir, '_tests', `${base}.vitest.test.ts`))) {
+  if (!fs.existsSync(resolveColocatedTestPath(f, '.vitest.test.ts'))) {
     missingVitest.push(rel(f))
   }
-  if (!fs.existsSync(path.join(dir, '_tests', `${base}.stories.ts`))) {
+  if (!fs.existsSync(resolveColocatedTestPath(f, '.stories.ts'))) {
     missingStory.push(rel(f))
   }
 }
