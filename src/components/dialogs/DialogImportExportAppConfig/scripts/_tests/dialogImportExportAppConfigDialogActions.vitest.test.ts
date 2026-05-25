@@ -28,7 +28,6 @@ vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
   runFaActionAwait: runFaActionAwaitMock
 }))
 
-const exportToFileMock = vi.fn()
 const prepareImportMock = vi.fn()
 const disposeImportSessionMock = vi.fn()
 
@@ -67,10 +66,8 @@ beforeEach(() => {
   runFaActionMock.mockReset()
   runFaActionAwaitMock.mockReset()
   runFaActionAwaitMock.mockResolvedValue(true)
-  exportToFileMock.mockReset()
   prepareImportMock.mockReset()
   disposeImportSessionMock.mockReset()
-  exportToFileMock.mockResolvedValue({ outcome: 'canceled' })
   prepareImportMock.mockResolvedValue({ outcome: 'canceled' })
   prevApis = window.faContentBridgeAPIs
   Object.assign(window, {
@@ -78,7 +75,7 @@ beforeEach(() => {
       ...window.faContentBridgeAPIs,
       faAppConfig: {
         disposeImportSession: disposeImportSessionMock,
-        exportToFile: exportToFileMock,
+        exportToFile: vi.fn(),
         prepareImport: prepareImportMock
       }
     } as never
@@ -91,60 +88,31 @@ afterEach(() => {
   }
 })
 
-test('importExportDialogClickCreateExport no-ops exportToFile when the bridge is missing', async () => {
+test('importExportDialogClickCreateExport awaits exportAppConfigPackage with include flags', async () => {
   const b = makeBindings()
-  const saved = window.faContentBridgeAPIs
-  window.faContentBridgeAPIs = bridgeWithAppConfigOmitted(saved)
   await importExportDialogClickCreateExport(b)
-  expect(exportToFileMock).not.toHaveBeenCalled()
-  expect(runFaActionMock).toHaveBeenCalledWith('exportAppConfigPackage', {
+  expect(runFaActionAwaitMock).toHaveBeenCalledWith('exportAppConfigPackage', {
     includeKeybinds: true,
     includeAppNoteboard: true,
     includeAppSettings: true,
     includeAppStyling: true
   })
-  window.faContentBridgeAPIs = saved
 })
 
-test('importExportDialogClickCreateExport on saved notifies and closes', async () => {
+test('importExportDialogClickCreateExport on success notifies and closes', async () => {
   const b = makeBindings()
-  exportToFileMock.mockResolvedValueOnce({
-    filePath: 'C:\\a.faconfig',
-    outcome: 'saved'
-  })
+  runFaActionAwaitMock.mockResolvedValueOnce(true)
   await importExportDialogClickCreateExport(b)
-  expect(exportToFileMock).toHaveBeenCalled()
-  expect(runFaActionMock).toHaveBeenCalledWith('exportAppConfigSaveResult', {
-    filePath: 'C:\\a.faconfig',
-    status: 'saved'
-  })
   expect(notifyCreateMock).toHaveBeenCalled()
   expect(onRequestCloseMock).toHaveBeenCalled()
 })
 
-test('importExportDialogClickCreateExport reports canceled save result and does not close', async () => {
+test('importExportDialogClickCreateExport does not close when export action fails', async () => {
   const b = makeBindings()
-  exportToFileMock.mockResolvedValueOnce({ outcome: 'canceled' })
+  runFaActionAwaitMock.mockResolvedValueOnce(false)
   await importExportDialogClickCreateExport(b)
-  expect(runFaActionMock).toHaveBeenCalledWith('exportAppConfigSaveResult', {
-    status: 'canceled'
-  })
+  expect(notifyCreateMock).not.toHaveBeenCalled()
   expect(onRequestCloseMock).not.toHaveBeenCalled()
-})
-
-test('importExportDialogClickCreateExport reports error result', async () => {
-  const b = makeBindings()
-  exportToFileMock.mockResolvedValueOnce({
-    errorMessage: 'e',
-    errorName: 'E',
-    outcome: 'error'
-  })
-  await importExportDialogClickCreateExport(b)
-  expect(runFaActionMock).toHaveBeenCalledWith('exportAppConfigSaveResult', {
-    errorMessage: 'e',
-    errorName: 'E',
-    status: 'error'
-  })
 })
 
 test('importExportDialogClickPrepareImport no-ops when the bridge is missing', async () => {

@@ -100,6 +100,31 @@ test('Test that export handler delegates to runExportAppConfigToFile', async () 
   expect(runExportMock).toHaveBeenCalled()
 })
 
+test('Test that export handler returns error outcome for invalid export options', async () => {
+  const { registerFaAppConfigIpc } = await import('../registerFaAppConfigIpc')
+  registerFaAppConfigIpc()
+  const h = handlerFor(FA_APP_CONFIG_IPC.exportToFileAsync)
+  const r = (await h({}, null)) as { outcome: string, errorMessage?: string }
+  expect(r.outcome).toBe('error')
+  expect(r.errorMessage).toContain('export options must be an object')
+  expect(runExportMock).not.toHaveBeenCalled()
+})
+
+test('Test that export handler stringifies non-Error validation failures', async () => {
+  const schemas = await import('app/src-electron/shared/faAppConfigIpcPayloadSchemas')
+  const parseSpy = vi.spyOn(schemas, 'parseFaAppConfigExportOptions').mockImplementation(() => {
+    // eslint-disable-next-line no-throw-literal -- exercises non-Error catch branch
+    throw 'raw failure'
+  })
+  const { registerFaAppConfigIpc } = await import('../registerFaAppConfigIpc')
+  registerFaAppConfigIpc()
+  const h = handlerFor(FA_APP_CONFIG_IPC.exportToFileAsync)
+  const r = (await h({}, {})) as { outcome: string, errorMessage?: string }
+  expect(r.outcome).toBe('error')
+  expect(r.errorMessage).toBe('raw failure')
+  parseSpy.mockRestore()
+})
+
 test('Test that prepareImport handler returns early when the open dialog is canceled', async () => {
   dialogShowOpenDialogMock.mockResolvedValueOnce({
     canceled: true,

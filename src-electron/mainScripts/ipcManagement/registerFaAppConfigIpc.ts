@@ -17,10 +17,12 @@ import { runApplyStagedAppConfigImport } from 'app/src-electron/mainScripts/appC
 import { runExportAppConfigToFile } from 'app/src-electron/mainScripts/appConfig/faAppConfigIpcRunExportToFileDialog'
 import { runPrepareImportFromFaconfigFilePath } from 'app/src-electron/mainScripts/appConfig/faAppConfigIpcRunPrepareImportFromFile'
 import { appWindow } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
+import {
+  parseFaAppConfigApplyInput,
+  parseFaAppConfigExportOptions
+} from 'app/src-electron/shared/faAppConfigIpcPayloadSchemas'
 import type {
-  I_faAppConfigApplyInput,
   I_faAppConfigApplyResult,
-  I_faAppConfigExportOptions,
   I_faAppConfigExportResult,
   I_faAppConfigPrepareResult
 } from 'app/types/I_faAppConfigDomain'
@@ -39,7 +41,17 @@ export function registerFaAppConfigIpc (): void {
   ipcMain.handle(
     FA_APP_CONFIG_IPC.exportToFileAsync,
     async (event, options: unknown): Promise<I_faAppConfigExportResult> => {
-      return await runExportAppConfigToFile(event, options as I_faAppConfigExportOptions)
+      try {
+        const parsed = parseFaAppConfigExportOptions(options)
+        return await runExportAppConfigToFile(event, parsed)
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error(String(error))
+        return {
+          errorMessage: err.message,
+          errorName: err.name,
+          outcome: 'error'
+        }
+      }
     }
   )
 
@@ -91,22 +103,8 @@ export function registerFaAppConfigIpc (): void {
   ipcMain.handle(
     FA_APP_CONFIG_IPC.applyImportAsync,
     (_event, input: unknown): I_faAppConfigApplyResult => {
-      if (typeof input !== 'object' || input === null) {
-        throw new TypeError('applyImport: expected object')
-      }
-      const p = input as I_faAppConfigApplyInput
-      if (typeof p.sessionId !== 'string') {
-        throw new TypeError('applyImport: expected sessionId')
-      }
-      if (
-        typeof p.applyKeybinds !== 'boolean' ||
-        typeof p.applyAppNoteboard !== 'boolean' ||
-        typeof p.applyAppSettings !== 'boolean' ||
-        typeof p.applyAppStyling !== 'boolean'
-      ) {
-        throw new TypeError('applyImport: expected boolean apply flags')
-      }
-      return runApplyStagedAppConfigImport(p)
+      const parsed = parseFaAppConfigApplyInput(input)
+      return runApplyStagedAppConfigImport(parsed)
     }
   )
 

@@ -39,8 +39,13 @@ const mocks = vi.hoisted(() => {
   }
 })
 
+const appPackagedState = vi.hoisted(() => ({
+  isPackaged: false
+}))
+
 vi.mock('electron', () => {
   return {
+    app: appPackagedState,
     BrowserWindow: {
       fromWebContents: mocks.fromWebContentsMock
     },
@@ -52,6 +57,7 @@ vi.mock('electron', () => {
 
 beforeEach(async () => {
   vi.resetModules()
+  appPackagedState.isPackaged = false
   mocks.ipcMainHandleMock.mockReset()
   mocks.fromWebContentsMock.mockReset()
   mocks.isDevToolsOpenedMock.mockReset()
@@ -237,5 +243,22 @@ test('Test that registerFaDevToolsIpc closeAsync returns false without a window'
   const result = handlerFor(FA_DEVTOOLS_IPC.closeAsync)({ sender: fakeSender })
 
   expect(result).toBe(false)
+  expect(mocks.closeDevToolsMock).not.toHaveBeenCalled()
+})
+
+/**
+ * registerFaDevToolsIpc
+ * Packaged builds reject DevTools IPC before touching webContents.
+ */
+test('Test that registerFaDevToolsIpc handlers return false when the app is packaged', async () => {
+  appPackagedState.isPackaged = true
+  const { registerFaDevToolsIpc } = await import('../registerFaDevToolsIpc')
+  registerFaDevToolsIpc()
+
+  expect(handlerFor(FA_DEVTOOLS_IPC.statusAsync)({ sender: fakeSender })).toBe(false)
+  await expect(handlerFor(FA_DEVTOOLS_IPC.toggleAsync)({ sender: fakeSender })).resolves.toBe(false)
+  await expect(handlerFor(FA_DEVTOOLS_IPC.openAsync)({ sender: fakeSender })).resolves.toBe(false)
+  expect(handlerFor(FA_DEVTOOLS_IPC.closeAsync)({ sender: fakeSender })).toBe(false)
+  expect(mocks.openDevToolsMock).not.toHaveBeenCalled()
   expect(mocks.closeDevToolsMock).not.toHaveBeenCalled()
 })

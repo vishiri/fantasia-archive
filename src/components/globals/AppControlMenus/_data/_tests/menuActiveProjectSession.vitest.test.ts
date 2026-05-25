@@ -71,7 +71,7 @@ test('Test that buildProjectMenu custom Project CSS row dispatches openProjectSt
 
 /**
  * Project menu
- * Rows that require an open project are disabled when `hasActiveProject` is false.
+ * Implemented project-scoped rows honor hasActiveProject; unimplemented rows stay hidden.
  */
 test('Test that buildProjectMenu disables gated rows when hasActiveProject is false', () => {
   const menu = buildProjectMenu(emptyRecentSession(false))
@@ -87,13 +87,12 @@ test('Test that buildProjectMenu disables gated rows when hasActiveProject is fa
   expect(items[7]!.conditions).not.toBe(false)
 
   const sub = items[7]!.submenu?.filter((row) => row.mode === 'item') ?? []
-  expect(sub[0]!.conditions).toBe(false)
-  expect(sub[1]!.conditions).not.toBe(false)
+  expect(sub.every((row) => row.conditions === false)).toBe(true)
 })
 
 /**
  * Project menu
- * Gated rows enable when a project is active.
+ * Implemented gated rows enable when a project is active; unimplemented rows stay hidden.
  */
 test('Test that buildProjectMenu enables gated rows when hasActiveProject is true', () => {
   const menu = buildProjectMenu(emptyRecentSession(true))
@@ -104,11 +103,11 @@ test('Test that buildProjectMenu enables gated rows when hasActiveProject is tru
   expect(items[2]!.conditions).toBe(false)
   expect(items[3]!.conditions).not.toBe(false)
   expect(items[4]!.conditions).not.toBe(false)
-  expect(items[5]!.conditions).not.toBe(false)
-  expect(items[6]!.conditions).not.toBe(false)
+  expect(items[5]!.conditions).toBe(false)
+  expect(items[6]!.conditions).toBe(false)
   expect(items[7]!.conditions).not.toBe(false)
   const sub = items[7]!.submenu?.filter((row) => row.mode === 'item') ?? []
-  expect(sub.every((row) => row.conditions !== false)).toBe(true)
+  expect(sub.every((row) => row.conditions === false)).toBe(true)
 })
 
 /**

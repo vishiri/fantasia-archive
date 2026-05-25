@@ -54,20 +54,22 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
       trigger: () => runFaAction('openProjectStylingDialog', undefined)
     }),
     faMenuItem('appControlMenus.project.items.showProjectDashboard', 'mdi-chart-bar', {
-      conditions: gate
+      conditions: false
     }),
     faMenuItem('appControlMenus.project.items.projectSettings', 'mdi-book-cog-outline', {
-      conditions: gate
+      conditions: false
     }),
     faMenuSeparator(),
     faMenuItem('appControlMenus.project.items.advancedProjectTools', 'keyboard_arrow_right', {
       specialColor: 'grey',
       submenu: [
         faMenuSubItem('appControlMenus.project.items.aptMerge', 'mdi-folder-plus-outline', {
-          conditions: gate
+          conditions: false
         }),
         faMenuSubSeparator(),
-        faMenuSubItem('appControlMenus.project.items.aptConvertOld', 'mdi-wrench')
+        faMenuSubItem('appControlMenus.project.items.aptConvertOld', 'mdi-wrench', {
+          conditions: false
+        })
       ]
     })
   ]

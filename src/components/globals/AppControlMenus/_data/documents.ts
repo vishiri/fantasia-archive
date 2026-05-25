@@ -7,27 +7,23 @@ import {
   faMenuSeparator
 } from 'app/src/components/globals/AppControlMenus/_data/menuDataHelpers'
 
-// TODO - add functionality for all buttons and conditions
-
-export function buildDocumentsMenu (session: I_appMenuBuildSession): I_appMenuList {
-  const gate = session.hasActiveProject
-
+export function buildDocumentsMenu (_session: I_appMenuBuildSession): I_appMenuList {
   return {
     data: [
       faMenuItem('appControlMenus.documents.items.quickAddNewDocument', 'mdi-text-box-plus-outline', {
-        conditions: gate
+        conditions: false
       }),
       faMenuItem('appControlMenus.documents.items.quickSearchDocument', 'mdi-database-search', {
-        conditions: gate
+        conditions: false
       }),
       faMenuSeparator(),
       faMenuItem('appControlMenus.documents.items.massDeleteDocument', 'mdi-text-box-remove-outline', {
-        conditions: gate,
+        conditions: false,
         specialColor: 'secondary'
       }),
       faMenuSeparator(),
       faMenuItem('appControlMenus.documents.items.exportProjectDocuments', 'mdi-database-export-outline', {
-        conditions: gate
+        conditions: false
       })
     ],
     title: i18n.global.t('appControlMenus.documents.title')

@@ -6,14 +6,15 @@ import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
+import { FaActionUserCanceledError } from 'app/src/scripts/actionManager/faActionUserCanceledError'
+import { buildFaActionPayloadPreview } from 'app/src/scripts/actionManager/faActionManagerErrorReporting'
+import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
 import type { I_faActionPayloadMap } from 'app/types/I_faActionManagerDomain'
 import {
   openDialogComponent,
   openDialogMarkdownDocument
 } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
-import { canOpenAppNoteboardFloatingWindow } from 'app/src/scripts/appNoteboard/faAppNoteboardCanOpen'
-import { FaActionUserCanceledError } from 'app/src/scripts/actionManager/faActionUserCanceledError'
-import { buildFaActionPayloadPreview } from 'app/src/scripts/actionManager/faActionManagerErrorReporting'
+import { canOpenFloatingWindowWhileNoModal } from 'app/src/scripts/appNoteboard/faAppNoteboardCanOpen'
 import {
   notifyFaProjectAlreadyActiveWarning,
   notifyFaProjectCreatedPositive,
@@ -37,7 +38,7 @@ export async function handleOpenProjectStylingWindow (): Promise<void> {
   if (!S_FaActiveProject().hasActiveProject) {
     return
   }
-  if (!canOpenAppNoteboardFloatingWindow()) {
+  if (!canOpenFloatingWindowWhileNoModal()) {
     return
   }
   openDialogComponent('WindowProjectStyling')
@@ -72,8 +73,29 @@ export async function handleOpenImportExportAppConfigDialog (): Promise<void> {
 }
 
 export async function handleExportAppConfigPackage (
-  _payload: I_faActionPayloadMap['exportAppConfigPackage']
+  payload: I_faActionPayloadMap['exportAppConfigPackage']
 ): Promise<void> {
+  const api = window.faContentBridgeAPIs?.faAppConfig
+  if (api === undefined) {
+    throw new Error('App configuration is only available in the desktop app.')
+  }
+  const result = await api.exportToFile(payload)
+  if (result.outcome === 'canceled') {
+    void runFaAction('exportAppConfigSaveResult', { status: 'canceled' })
+    throw new FaActionUserCanceledError()
+  }
+  if (result.outcome === 'error') {
+    void runFaAction('exportAppConfigSaveResult', {
+      errorMessage: result.errorMessage,
+      errorName: result.errorName,
+      status: 'error'
+    })
+    throw new Error(result.errorMessage ?? result.errorName ?? 'Export to file failed')
+  }
+  void runFaAction('exportAppConfigSaveResult', {
+    filePath: result.filePath,
+    status: 'saved'
+  })
 }
 
 export async function handleExportAppConfigSaveResult (

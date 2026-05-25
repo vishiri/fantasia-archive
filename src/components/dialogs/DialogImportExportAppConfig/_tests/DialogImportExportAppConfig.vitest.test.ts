@@ -270,17 +270,7 @@ test('Test that DialogImportExportAppConfig export step checkboxes emit model up
  * Successful export to file should notify, invoke close, and clear the dialog shell.
  */
 test('Test that DialogImportExportAppConfig create export success closes the dialog', async () => {
-  const exportToFile = vi.fn(async () => {
-    return {
-      filePath: 'C:\\export.faconfig',
-      outcome: 'saved' as const
-    }
-  })
-  const prevAppConfig = window.faContentBridgeAPIs.faAppConfig
-  window.faContentBridgeAPIs.faAppConfig = {
-    ...window.faContentBridgeAPIs.faAppConfig,
-    exportToFile
-  }
+  runFaActionAwaitMock.mockResolvedValueOnce(true)
 
   const w = mount(DialogImportExportAppConfig, {
     global: importExportDialogGlobal,
@@ -294,10 +284,14 @@ test('Test that DialogImportExportAppConfig create export success closes the dia
   await w.get('[data-test-locator="dialogImportExportAppConfig-button-createExport"]').trigger('click')
   await flushPromises()
 
-  expect(exportToFile).toHaveBeenCalledTimes(1)
+  expect(runFaActionAwaitMock).toHaveBeenCalledWith('exportAppConfigPackage', expect.objectContaining({
+    includeKeybinds: expect.any(Boolean),
+    includeAppNoteboard: expect.any(Boolean),
+    includeAppSettings: expect.any(Boolean),
+    includeAppStyling: expect.any(Boolean)
+  }))
   expect(w.find('.import-export-qdialog-inner').exists()).toBe(false)
   w.unmount()
-  window.faContentBridgeAPIs.faAppConfig = prevAppConfig
 })
 
 /**

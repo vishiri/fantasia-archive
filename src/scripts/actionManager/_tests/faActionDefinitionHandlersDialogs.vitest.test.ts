@@ -8,7 +8,7 @@ const mockActiveProjectGate = vi.hoisted(() => ({
   hasActiveProject: true
 }))
 
-const canOpenAppNoteboardFloatingWindowMock = vi.hoisted(() => vi.fn((): boolean => true))
+const canOpenFloatingWindowWhileNoModalMock = vi.hoisted(() => vi.fn((): boolean => true))
 
 vi.mock('app/src/stores/S_FaActiveProject', () => ({
   S_FaActiveProject: () => ({
@@ -19,7 +19,7 @@ vi.mock('app/src/stores/S_FaActiveProject', () => ({
 }))
 
 vi.mock('app/src/scripts/appNoteboard/faAppNoteboardCanOpen', () => ({
-  canOpenAppNoteboardFloatingWindow: (): boolean => canOpenAppNoteboardFloatingWindowMock()
+  canOpenFloatingWindowWhileNoModal: (): boolean => canOpenFloatingWindowWhileNoModalMock()
 }))
 
 vi.mock('app/src/scripts/appGlobalManagementUI/dialogManagement', () => {
@@ -33,8 +33,8 @@ beforeEach(() => {
   openDialogComponentMock.mockReset()
   openDialogMarkdownDocumentMock.mockReset()
   mockActiveProjectGate.hasActiveProject = true
-  canOpenAppNoteboardFloatingWindowMock.mockReset()
-  canOpenAppNoteboardFloatingWindowMock.mockReturnValue(true)
+  canOpenFloatingWindowWhileNoModalMock.mockReset()
+  canOpenFloatingWindowWhileNoModalMock.mockReturnValue(true)
 })
 
 test('handleOpenKeybindSettingsDialog opens KeybindSettings', async () => {
@@ -79,7 +79,7 @@ test('handleOpenProjectStylingWindow skips without an active project', async () 
 })
 
 test('handleOpenProjectStylingWindow skips when floating windows cannot open', async () => {
-  canOpenAppNoteboardFloatingWindowMock.mockReturnValue(false)
+  canOpenFloatingWindowWhileNoModalMock.mockReturnValue(false)
   const { handleOpenProjectStylingWindow } = await import(
     'app/src/scripts/actionManager/faActionDefinitionHandlersDialogs'
   )

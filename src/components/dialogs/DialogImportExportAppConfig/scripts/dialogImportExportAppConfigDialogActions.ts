@@ -29,26 +29,16 @@ export async function importExportDialogClickCreateExport (b: I_importExportDial
     includeAppSettings: b.exportIncludeAppSettings.value,
     includeAppStyling: b.exportIncludeAppStyling.value
   }
-  runFaAction('exportAppConfigPackage', inc)
-  const api = window.faContentBridgeAPIs?.faAppConfig
-  if (api === undefined) {
+  const ok = await runFaActionAwait('exportAppConfigPackage', inc)
+  if (!ok) {
     return
   }
-  const r = await api.exportToFile(inc)
-  runFaAction('exportAppConfigSaveResult', {
-    errorMessage: r.errorMessage,
-    errorName: r.errorName,
-    filePath: r.filePath,
-    status: r.outcome === 'saved' ? 'saved' : r.outcome === 'canceled' ? 'canceled' : 'error'
+  Notify.create({
+    group: false,
+    message: i18n.global.t('dialogs.importExportAppConfig.toasts.exportSuccess'),
+    type: 'positive'
   })
-  if (r.outcome === 'saved') {
-    Notify.create({
-      group: false,
-      message: i18n.global.t('dialogs.importExportAppConfig.toasts.exportSuccess'),
-      type: 'positive'
-    })
-    b.onRequestClose()
-  }
+  b.onRequestClose()
 }
 
 export async function importExportDialogClickPrepareImport (b: I_importExportDialogActionBindings): Promise<void> {
