@@ -6,23 +6,23 @@ import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 
-const { canOpenAppNoteboardFloatingWindowMock } = vi.hoisted(() => {
+const { canOpenFloatingWindowWhileNoModalMock } = vi.hoisted(() => {
   return {
-    canOpenAppNoteboardFloatingWindowMock: vi.fn((): boolean => true)
+    canOpenFloatingWindowWhileNoModalMock: vi.fn((): boolean => true)
   }
 })
 
 vi.mock('app/src/scripts/appNoteboard/faAppNoteboardCanOpen', () => {
   return {
-    canOpenAppNoteboardFloatingWindow: canOpenAppNoteboardFloatingWindowMock
+    canOpenFloatingWindowWhileNoModal: canOpenFloatingWindowWhileNoModalMock
   }
 })
 
 beforeEach(() => {
   setActivePinia(createPinia())
   vi.resetModules()
-  canOpenAppNoteboardFloatingWindowMock.mockReset()
-  canOpenAppNoteboardFloatingWindowMock.mockReturnValue(true)
+  canOpenFloatingWindowWhileNoModalMock.mockReset()
+  canOpenFloatingWindowWhileNoModalMock.mockReturnValue(true)
   const activeProject = S_FaActiveProject()
   activeProject.clearActiveProject()
 })
@@ -54,7 +54,7 @@ test('handleToggleAppNoteboardWindow opens when allowed', async () => {
 })
 
 test('handleToggleAppNoteboardWindow no-ops when the modal stack blocks floating windows', async () => {
-  canOpenAppNoteboardFloatingWindowMock.mockReturnValue(false)
+  canOpenFloatingWindowWhileNoModalMock.mockReturnValue(false)
   const { handleToggleAppNoteboardWindow } = await import(
     'app/src/scripts/actionManager/faActionDefinitionHandlers'
   )
@@ -111,7 +111,7 @@ test('handleToggleProjectNoteboardWindow no-ops when no project is active', asyn
 })
 
 test('handleToggleProjectNoteboardWindow no-ops when the modal stack blocks floating windows', async () => {
-  canOpenAppNoteboardFloatingWindowMock.mockReturnValue(false)
+  canOpenFloatingWindowWhileNoModalMock.mockReturnValue(false)
   const { handleToggleProjectNoteboardWindow } = await import(
     'app/src/scripts/actionManager/faActionDefinitionHandlers'
   )

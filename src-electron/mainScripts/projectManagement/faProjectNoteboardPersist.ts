@@ -6,6 +6,7 @@ import {
   readFaProjectDataKv,
   upsertFaProjectDataKv
 } from './faProjectDataKv'
+import { parseFaProjectOverlayFinitePx } from './faProjectOverlayFrameKvShared'
 
 const FA_PROJECT_NOTEBOARD_KV_KEYS = {
   content: 'project_noteboard_content',
@@ -14,21 +15,6 @@ const FA_PROJECT_NOTEBOARD_KV_KEYS = {
   xPx: 'project_noteboard_x',
   yPx: 'project_noteboard_y'
 } as const
-
-function parseFinitePx (raw: string | undefined): number | undefined {
-  if (raw === undefined) {
-    return undefined
-  }
-  const trimmed = raw.trim()
-  if (trimmed.length === 0) {
-    return undefined
-  }
-  const parsed = Number(trimmed)
-  if (!Number.isFinite(parsed)) {
-    return undefined
-  }
-  return parsed
-}
 
 /**
  * Deletes persisted frame KV rows used by the project noteboard overlay.
@@ -46,10 +32,10 @@ export function deleteFaProjectNoteboardFrameKv (db: Database): void {
 }
 
 function readPersistedFrame (db: Database): I_faProjectNoteboardRoot['frame'] {
-  const x = parseFinitePx(readFaProjectDataKv(db, FA_PROJECT_NOTEBOARD_KV_KEYS.xPx))
-  const y = parseFinitePx(readFaProjectDataKv(db, FA_PROJECT_NOTEBOARD_KV_KEYS.yPx))
-  const w = parseFinitePx(readFaProjectDataKv(db, FA_PROJECT_NOTEBOARD_KV_KEYS.widthPx))
-  const h = parseFinitePx(readFaProjectDataKv(db, FA_PROJECT_NOTEBOARD_KV_KEYS.heightPx))
+  const x = parseFaProjectOverlayFinitePx(readFaProjectDataKv(db, FA_PROJECT_NOTEBOARD_KV_KEYS.xPx))
+  const y = parseFaProjectOverlayFinitePx(readFaProjectDataKv(db, FA_PROJECT_NOTEBOARD_KV_KEYS.yPx))
+  const w = parseFaProjectOverlayFinitePx(readFaProjectDataKv(db, FA_PROJECT_NOTEBOARD_KV_KEYS.widthPx))
+  const h = parseFaProjectOverlayFinitePx(readFaProjectDataKv(db, FA_PROJECT_NOTEBOARD_KV_KEYS.heightPx))
   if (
     x === undefined ||
     y === undefined ||

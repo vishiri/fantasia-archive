@@ -1,7 +1,6 @@
-import debounce from 'lodash-es/debounce'
-import { watch, type Ref } from 'vue'
+import type { Ref } from 'vue'
 
-import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
+import { useFaFloatingWindowFramePersist } from 'app/src/scripts/floatingWindows/useFaFloatingWindowFramePersist'
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 
 /**
@@ -16,11 +15,10 @@ export function useWindowProjectStylingFramePersist (opts: {
 }): void {
   const styling = S_FaProjectStyling()
 
-  async function persistFrameNow (): Promise<void> {
-    if (!opts.windowModel.value) {
-      return
-    }
-    try {
+  useFaFloatingWindowFramePersist({
+    failureActionId: 'reportProjectStylingSaveFailure',
+    h: opts.h,
+    persistFrame: async () => {
       await styling.persistProjectStylingPartialSilent({
         frame: {
           height: opts.h.value,
@@ -29,41 +27,10 @@ export function useWindowProjectStylingFramePersist (opts: {
           y: opts.y.value
         }
       })
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      void runFaAction('reportProjectStylingSaveFailure', { message })
-    }
-  }
-
-  const schedulePersist = debounce(() => {
-    void persistFrameNow()
-  }, 280)
-
-  watch(
-    [
-      opts.x,
-      opts.y,
-      opts.w,
-      opts.h
-    ],
-    () => {
-      if (!opts.windowModel.value) {
-        return
-      }
-      schedulePersist()
-    }
-  )
-
-  watch(
-    () => opts.windowModel.value,
-    (open, wasOpen) => {
-      if (!open && wasOpen) {
-        schedulePersist.flush()
-        void persistFrameNow()
-      }
     },
-    {
-      immediate: true
-    }
-  )
+    w: opts.w,
+    windowModel: opts.windowModel,
+    x: opts.x,
+    y: opts.y
+  })
 }

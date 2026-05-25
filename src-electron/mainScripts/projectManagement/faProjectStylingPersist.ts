@@ -6,6 +6,7 @@ import {
   readFaProjectDataKv,
   upsertFaProjectDataKv
 } from './faProjectDataKv'
+import { parseFaProjectOverlayFinitePx } from './faProjectOverlayFrameKvShared'
 
 const FA_PROJECT_STYLING_KV_KEYS = {
   content: 'project_styling_content',
@@ -14,21 +15,6 @@ const FA_PROJECT_STYLING_KV_KEYS = {
   xPx: 'project_styling_x',
   yPx: 'project_styling_y'
 } as const
-
-function parseFinitePx (raw: string | undefined): number | undefined {
-  if (raw === undefined) {
-    return undefined
-  }
-  const trimmed = raw.trim()
-  if (trimmed.length === 0) {
-    return undefined
-  }
-  const parsed = Number(trimmed)
-  if (!Number.isFinite(parsed)) {
-    return undefined
-  }
-  return parsed
-}
 
 /**
  * Deletes persisted frame KV rows used by the project styling overlay.
@@ -46,10 +32,10 @@ export function deleteFaProjectStylingFrameKv (db: Database): void {
 }
 
 function readPersistedFrame (db: Database): I_faProjectStylingRoot['frame'] {
-  const x = parseFinitePx(readFaProjectDataKv(db, FA_PROJECT_STYLING_KV_KEYS.xPx))
-  const y = parseFinitePx(readFaProjectDataKv(db, FA_PROJECT_STYLING_KV_KEYS.yPx))
-  const w = parseFinitePx(readFaProjectDataKv(db, FA_PROJECT_STYLING_KV_KEYS.widthPx))
-  const h = parseFinitePx(readFaProjectDataKv(db, FA_PROJECT_STYLING_KV_KEYS.heightPx))
+  const x = parseFaProjectOverlayFinitePx(readFaProjectDataKv(db, FA_PROJECT_STYLING_KV_KEYS.xPx))
+  const y = parseFaProjectOverlayFinitePx(readFaProjectDataKv(db, FA_PROJECT_STYLING_KV_KEYS.yPx))
+  const w = parseFaProjectOverlayFinitePx(readFaProjectDataKv(db, FA_PROJECT_STYLING_KV_KEYS.widthPx))
+  const h = parseFaProjectOverlayFinitePx(readFaProjectDataKv(db, FA_PROJECT_STYLING_KV_KEYS.heightPx))
   if (
     x === undefined ||
     y === undefined ||

@@ -1,7 +1,6 @@
-import debounce from 'lodash-es/debounce'
-import { watch, type Ref } from 'vue'
+import type { Ref } from 'vue'
 
-import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
+import { useFaFloatingWindowTextPersist } from 'app/src/scripts/floatingWindows/useFaFloatingWindowTextPersist'
 import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
 
 /**
@@ -13,40 +12,10 @@ export function useWindowProjectNoteboardTextPersist (opts: {
 }): void {
   const noteboard = S_FaProjectNoteboard()
 
-  async function persistTextNow (): Promise<void> {
-    if (!opts.windowModel.value) {
-      return
-    }
-    try {
-      await noteboard.persistCurrentTextSilent()
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      void runFaAction('reportProjectNoteboardSaveFailure', { message })
-    }
-  }
-
-  const schedulePersist = debounce(() => {
-    void persistTextNow()
-  }, 380)
-
-  watch(
-    opts.text,
-    () => {
-      if (!opts.windowModel.value) {
-        return
-      }
-      schedulePersist()
-    }
-  )
-
-  watch(
-    () => opts.windowModel.value,
-    (open, wasOpen) => {
-      if (!open && wasOpen) {
-        schedulePersist.flush()
-        void persistTextNow()
-      }
-    },
-    { immediate: true }
-  )
+  useFaFloatingWindowTextPersist({
+    failureActionId: 'reportProjectNoteboardSaveFailure',
+    persistText: () => noteboard.persistCurrentTextSilent(),
+    text: opts.text,
+    windowModel: opts.windowModel
+  })
 }

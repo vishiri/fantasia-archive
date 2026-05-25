@@ -45,33 +45,29 @@ const FA_PROJECT_MANAGEMENT_FALLBACK_PROJECT_STYLING: I_faProjectStylingRoot = {
 
 let registered = false
 
+function duplicateFaProjectOverlayFrame (
+  frame: I_faProjectNoteboardRoot['frame']
+): I_faProjectNoteboardRoot['frame'] {
+  return frame === null ? null : { ...frame }
+}
+
 function duplicateFaProjectNoteboardSnapshot (
   next: I_faProjectNoteboardRoot
 ): I_faProjectNoteboardRoot {
-  const frameFrom = next.frame
-  const frame =
-    frameFrom === null ? null : { ...frameFrom }
-  const snapshotText = next.text
-  const schemaVersionValue = next.schemaVersion
   return {
-    frame,
-    schemaVersion: schemaVersionValue,
-    text: snapshotText
+    frame: duplicateFaProjectOverlayFrame(next.frame),
+    schemaVersion: next.schemaVersion,
+    text: next.text
   }
 }
 
 function duplicateFaProjectStylingSnapshot (
   next: I_faProjectStylingRoot
 ): I_faProjectStylingRoot {
-  const frameFrom = next.frame
-  const frame =
-    frameFrom === null ? null : { ...frameFrom }
-  const snapshotCss = next.css
-  const schemaVersionValue = next.schemaVersion
   return {
-    css: snapshotCss,
-    frame,
-    schemaVersion: schemaVersionValue
+    css: next.css,
+    frame: duplicateFaProjectOverlayFrame(next.frame),
+    schemaVersion: next.schemaVersion
   }
 }
 
