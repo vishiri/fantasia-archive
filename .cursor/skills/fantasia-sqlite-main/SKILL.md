@@ -24,7 +24,19 @@ description: >-
 
 ## Active project DB access (mandatory failsafe)
 
-All **active `.faproject`** reads and writes in main (including project noteboard, styling persistence, and any new IPC that touches the open project file) must go through **`runWithFaProjectDatabaseForIpcAsync`** or **`runWithFaProjectDatabaseSync`** from **`src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected.ts`**, not direct **`getFaProjectActiveDatabase()`** calls. ESLint restricts **`getFaProjectActiveDatabase`**, **`getFaProjectLastKnownActiveProjectFilePath`**, and **`replaceFaProjectActiveDatabase`** imports outside the allowlisted modules; see **`.cursor/rules/fa-project-database-access.mdc`**.
+All **active `.faproject`** reads and writes in main (including project noteboard, styling, **project settings**, and any new IPC that touches the open project file) must go through **`runWithFaProjectDatabaseForIpcAsync`** or **`runWithFaProjectDatabaseSync`** from **`src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected.ts`**, not direct **`getFaProjectActiveDatabase()`** calls. ESLint restricts **`getFaProjectActiveDatabase`**, **`getFaProjectLastKnownActiveProjectFilePath`**, and **`replaceFaProjectActiveDatabase`** imports outside the allowlisted modules; see **`.cursor/rules/fa-project-database-access.mdc`**.
+
+### Project settings refresh contract (renderer)
+
+Unlike **App Settings** (**`DialogAppSettings`**, hydrated from **`S_FaUserSettings`** on open), **Project Settings** always reads SQLite on dialog open:
+
+1. **Open:** IPC **`getProjectSettings`** only (no Pinia seed without a DB read; Storybook may use **`directSettingsSnapshot`**).
+2. **Edit:** Local draft until **Save**; **Close without saving** discards it.
+3. **Save:** action manager → **`S_FaProjectSettings.updateProjectSettings`** → IPC **set** → IPC **get** read-back → **`propagateFaProjectSettingsToAppConsumers`** (header name, MRU today).
+4. **Errors:** store throws; action manager toast (same as user settings).
+5. **Main:** **`runWithFaProjectDatabaseForIpcAsync`** only; KV in **`project_data`** (**`faProjectSettingsPersist.ts`**, key **`project_name`**).
+
+Extend **`propagateFaProjectSettingsToAppConsumers`** when new settings fields need live UI updates after save.
 
 - **Mirrored path**: Main keeps the last known absolute **`.faproject`** path alongside the **`better-sqlite3`** handle (**`faProjectActiveDatabase.ts`**). **`replaceFaProjectActiveDatabase(db, filePath)`** runs on successful open and create; **`closeFaProjectActiveDatabase()`** clears both; **`closeFaProjectActiveDatabaseHandleOnly()`** drops only the handle so a single reconnect can reuse the path.
 - **Reconnect + retry**: One synchronous reopen from the mirrored path when the handle is null, plus at most **one** handle-only close and retry when the operation throws a classified SQLite / **better-sqlite3** error. A **single-flight** mutex avoids overlapping reconnects.

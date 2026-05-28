@@ -101,6 +101,17 @@ Every user-meaningful renderer action — dialog opens, settings saves, window c
 
 **Adding a new action**: extend **`FA_ACTION_IDS`** + **`I_faActionPayloadMap`** in **`types/I_faActionManagerDomain.ts`**, add the **`handle…`** function in **`faActionDefinitionHandlers.ts`**, append a definition row in **`faActionDefinitions.ts`**, replace the matching call sites with **`runFaAction`** / **`runFaActionAwait`**, strip any duplicated negative toasts in invoked stores, and extend the Vitest suites under **`src/scripts/actionManager/_tests/`** plus the migrated call site's tests. Full file map and conventions: [.cursor/skills/fantasia-action-manager/SKILL.md](.cursor/skills/fantasia-action-manager/SKILL.md) and [.cursor/rules/fa-action-manager.mdc](.cursor/rules/fa-action-manager.mdc).
 
+## Project settings (DialogProjectSettings)
+
+**Project → Project Settings** opens **`src/components/dialogs/DialogProjectSettings/`** when **`S_FaActiveProject.hasActiveProject`** is true. Unlike **Fantasia Archive Settings**, which hydrates from **`S_FaUserSettings`** on open, project settings **always** read the active **`.faproject`** when the dialog opens.
+
+- **Open:** **`dialogProjectSettingsDialogActions`** calls **`faProjectSettingsFetchFreshForDialog`** (IPC **`getProjectSettings`**) — never seed the editor from Pinia without a DB read (Storybook / component harness may pass **`directSettingsSnapshot`**).
+- **Edit:** Local draft until **Save**; **Close without saving** discards it.
+- **Save:** **`runFaActionAwait('saveProjectSettings', …)`** → **`S_FaProjectSettings.updateProjectSettings`** → IPC **set** (Zod patch) → IPC **get** read-back → **`propagateFaProjectSettingsToAppConsumers`** (**`S_FaActiveProject.patchActiveProjectDisplayName`**, **`S_FaRecentProjects.refreshRecentProjects()`**; extend that helper for future fields).
+- **Persistence:** Main **`faProjectSettingsPersist.ts`** writes **`project_name`** KV rows; rename saves also call **`recordRecentProjectEntry`** in **`registerFaProjectManagementProjectSettingsIpc.ts`**.
+
+Full refresh contract: **`.cursor/rules/fa-project-database-access.mdc`**, **`.cursor/skills/fantasia-sqlite-main/SKILL.md`**, [README.md](README.md) **Project settings refresh contract**.
+
 ## Code comments (JSDoc, line comments, block comments)
 
 When writing comments in source files (not in user-facing Markdown documents such as the in-app changelog):
