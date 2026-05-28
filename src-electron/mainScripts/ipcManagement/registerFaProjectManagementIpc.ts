@@ -1,6 +1,7 @@
 import { app, ipcMain } from 'electron'
 
 import { FA_PROJECT_MANAGEMENT_IPC } from 'app/src-electron/electron-ipc-bridge'
+import { registerFaProjectManagementProjectSettingsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProjectManagementProjectSettingsIpc'
 import { closeFaProjectActiveDatabase } from 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase'
 import { runWithFaProjectDatabaseForIpcAsync } from 'app/src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected'
 import { runFaProjectCreateFromIpc } from 'app/src-electron/mainScripts/projectManagement/faProjectCreateRun'
@@ -131,6 +132,8 @@ export function registerFaProjectManagementIpc (): void {
       return ran.value
     }
   )
+
+  registerFaProjectManagementProjectSettingsIpc()
 
   ipcMain.handle(
     FA_PROJECT_MANAGEMENT_IPC.getProjectStylingAsync,

@@ -357,3 +357,32 @@ test('Test that openProjectFromKnownPath throws when bridge is unavailable', asy
   store = S_FaActiveProject()
   await expect(store.openProjectFromKnownPath('D:\\x.faproject')).rejects.toThrow(/not available/)
 })
+
+/**
+ * S_FaActiveProject / patchActiveProjectDisplayName
+ * No-ops when no project is loaded.
+ */
+test('Test that patchActiveProjectDisplayName ignores updates without an active project', () => {
+  store = S_FaActiveProject()
+  store.patchActiveProjectDisplayName('Ignored')
+  expect(store.activeProject).toBeNull()
+})
+
+/**
+ * S_FaActiveProject / patchActiveProjectDisplayName
+ * Updates the display name on the active snapshot without navigation side effects.
+ */
+test('Test that patchActiveProjectDisplayName updates the active project name', () => {
+  store = S_FaActiveProject()
+  const snapshot: I_faActiveProject = {
+    filePath: 'D:\\alpha.faproject',
+    id: 'uuid-alpha',
+    name: 'Before'
+  }
+  store.setActiveProject(snapshot)
+  routerPushMock.mockClear()
+  store.patchActiveProjectDisplayName('After')
+  expect(store.activeProject?.name).toBe('After')
+  expect(store.activeProject?.filePath).toBe('D:\\alpha.faproject')
+  expect(routerPushMock).not.toHaveBeenCalled()
+})

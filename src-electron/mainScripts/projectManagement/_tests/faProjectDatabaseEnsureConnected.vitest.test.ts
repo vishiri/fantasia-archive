@@ -30,7 +30,7 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/faProjectFailsafePathFromRen
   }
 })
 
-import { runWithFaProjectDatabaseForIpcAsync, runWithFaProjectDatabaseSync } from '../faProjectDatabaseEnsureConnected'
+import { runWithFaProjectDatabaseForIpcAsync, readMirroredActiveProjectFilePathSync, runWithFaProjectDatabaseSync } from '../faProjectDatabaseEnsureConnected'
 
 const absoluteProjectPath = path.join(os.tmpdir(), 'fa-ensure-connected-mock.faproject')
 
@@ -49,6 +49,11 @@ afterEach(() => {
   if (fs.existsSync(absoluteProjectPath)) {
     fs.unlinkSync(absoluteProjectPath)
   }
+})
+
+test('readMirroredActiveProjectFilePathSync returns the mirrored path from the active database module', () => {
+  getPathMock.mockReturnValue(absoluteProjectPath)
+  expect(readMirroredActiveProjectFilePathSync()).toBe(absoluteProjectPath)
 })
 
 test('runWithFaProjectDatabaseSync returns ok false when there is no handle and no known path', () => {

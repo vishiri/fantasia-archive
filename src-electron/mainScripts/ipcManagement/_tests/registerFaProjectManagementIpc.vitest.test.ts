@@ -11,10 +11,14 @@ const {
   closeActiveMock,
   getRecentSnapshotMock,
   resolveRecentMruHeadMock,
+  recordRecentProjectEntryMock,
   readProjectNoteboardRootMock,
   upsertProjectNoteboardKvMock,
+  readProjectSettingsRootMock,
+  upsertProjectSettingsKvMock,
   readProjectStylingRootMock,
   upsertProjectStylingKvMock,
+  readMirroredActiveProjectFilePathSyncMock,
   getFaProjectActiveDbMock,
   runWithForIpcMock
 } = vi.hoisted(() => {
@@ -23,16 +27,20 @@ const {
     closeActiveMock: vi.fn(),
     getFaProjectActiveDbMock: vi.fn(),
     getRecentSnapshotMock: vi.fn((): Array<{ filePath: string, name: string }> => []),
+    readMirroredActiveProjectFilePathSyncMock: vi.fn((): string | null => null),
+    recordRecentProjectEntryMock: vi.fn(),
     resolveRecentMruHeadMock: vi.fn((): I_faRecentProjectMruHeadResolve => {
       return { outcome: 'empty' }
     }),
     ipcMainHandleMock: vi.fn(),
     readProjectNoteboardRootMock: vi.fn(),
+    readProjectSettingsRootMock: vi.fn(),
     readProjectStylingRootMock: vi.fn(),
     runCreateMock: vi.fn(async () => ({ outcome: 'canceled' as const })),
     runOpenMock: vi.fn(async () => ({ outcome: 'canceled' as const })),
     runWithForIpcMock: vi.fn(),
     upsertProjectNoteboardKvMock: vi.fn(),
+    upsertProjectSettingsKvMock: vi.fn(),
     upsertProjectStylingKvMock: vi.fn()
   }
 })
@@ -63,6 +71,7 @@ vi.mock('app/src-electron/mainScripts/projectManagement/faProjectOpenRun', () =>
 
 vi.mock('app/src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected', () => {
   return {
+    readMirroredActiveProjectFilePathSync: readMirroredActiveProjectFilePathSyncMock,
     runWithFaProjectDatabaseForIpcAsync: async (
       event: unknown,
       work: (db: unknown) => unknown
@@ -82,6 +91,7 @@ vi.mock('app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase'
 vi.mock('app/src-electron/mainScripts/projectManagement/faRecentProjectListRuntime', () => {
   return {
     getRecentProjectsSnapshot: getRecentSnapshotMock,
+    recordRecentProjectEntry: recordRecentProjectEntryMock,
     resolveRecentProjectMruHeadForOpen: resolveRecentMruHeadMock
   }
 })
@@ -106,6 +116,16 @@ vi.mock(
   }
 )
 
+vi.mock(
+  'app/src-electron/mainScripts/projectManagement/faProjectSettingsPersist',
+  () => {
+    return {
+      readFaProjectSettingsRoot: readProjectSettingsRootMock,
+      upsertFaProjectSettingsKv: upsertProjectSettingsKvMock
+    }
+  }
+)
+
 beforeEach(async () => {
   vi.resetModules()
   ipcMainHandleMock.mockReset()
@@ -123,6 +143,11 @@ beforeEach(async () => {
   upsertProjectNoteboardKvMock.mockReset()
   readProjectStylingRootMock.mockReset()
   upsertProjectStylingKvMock.mockReset()
+  readProjectSettingsRootMock.mockReset()
+  upsertProjectSettingsKvMock.mockReset()
+  recordRecentProjectEntryMock.mockReset()
+  readMirroredActiveProjectFilePathSyncMock.mockReset()
+  readMirroredActiveProjectFilePathSyncMock.mockReturnValue(null)
   getFaProjectActiveDbMock.mockReset()
   getFaProjectActiveDbMock.mockReturnValue(null)
   runWithForIpcMock.mockReset()
@@ -165,6 +190,14 @@ test('registerFaProjectManagementIpc registers project-noteboard and project-sty
   )
   expect(ipcMainHandleMock).toHaveBeenCalledWith(
     FA_PROJECT_MANAGEMENT_IPC.setProjectNoteboardPatchAsync,
+    expect.any(Function)
+  )
+  expect(ipcMainHandleMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.getProjectSettingsAsync,
+    expect.any(Function)
+  )
+  expect(ipcMainHandleMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.setProjectSettingsPatchAsync,
     expect.any(Function)
   )
   expect(ipcMainHandleMock).toHaveBeenCalledWith(
@@ -372,6 +405,99 @@ test('setProjectStylingPatchAsync returns false without an active project databa
   expect(upsertProjectStylingKvMock).not.toHaveBeenCalled()
   expect(warn).toHaveBeenCalledWith(
     expect.stringMatching(/setProjectStyling skipped/)
+  )
+  warn.mockRestore()
+})
+
+test('getProjectSettingsAsync returns default snapshot when active database handle is absent', async () => {
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.getProjectSettingsAsync)
+  expect(readProjectSettingsRootMock).not.toHaveBeenCalled()
+  await expect(h({} as never, undefined as never)).resolves.toEqual({
+    projectName: '',
+    schemaVersion: 1
+  })
+})
+
+test('getProjectSettingsAsync clones persisted root payload', async () => {
+  const fakeDb = { dummy: true } as unknown
+  getFaProjectActiveDbMock.mockReturnValue(fakeDb)
+  readProjectSettingsRootMock.mockImplementation(() => {
+    return {
+      projectName: 'Alpha',
+      schemaVersion: 1
+    }
+  })
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.getProjectSettingsAsync)
+  const snap = (await h({} as never, undefined as never)) as { projectName: string }
+  snap.projectName = 'mutated'
+  const second = (await h({} as never, undefined as never)) as { projectName: string }
+  expect(second.projectName).toBe('Alpha')
+  expect(readProjectSettingsRootMock).toHaveBeenCalledTimes(2)
+})
+
+test('setProjectSettingsPatchAsync upserts KV rows and records MRU when path mirror exists', async () => {
+  const fakeDb = { tag: 'db' } as unknown
+  getFaProjectActiveDbMock.mockReturnValue(fakeDb)
+  readMirroredActiveProjectFilePathSyncMock.mockReturnValue('D:\\alpha.faproject')
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.setProjectSettingsPatchAsync)
+  const ok = (await h(undefined as never, {
+    projectName: '  Renamed  '
+  })) as boolean
+  expect(ok).toBe(true)
+  expect(upsertProjectSettingsKvMock).toHaveBeenCalledWith(fakeDb, { projectName: 'Renamed' })
+  expect(recordRecentProjectEntryMock).toHaveBeenCalledWith({
+    filePath: 'D:\\alpha.faproject',
+    name: 'Renamed'
+  })
+})
+
+test('setProjectSettingsPatchAsync upserts without MRU when the path mirror is absent', async () => {
+  const fakeDb = { tag: 'db' } as unknown
+  getFaProjectActiveDbMock.mockReturnValue(fakeDb)
+  readMirroredActiveProjectFilePathSyncMock.mockReturnValue(null)
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.setProjectSettingsPatchAsync)
+  const ok = (await h(undefined as never, {
+    projectName: 'Renamed only'
+  })) as boolean
+  expect(ok).toBe(true)
+  expect(upsertProjectSettingsKvMock).toHaveBeenCalledWith(fakeDb, { projectName: 'Renamed only' })
+  expect(recordRecentProjectEntryMock).not.toHaveBeenCalled()
+})
+
+test('setProjectSettingsPatchAsync accepts an empty patch without MRU updates', async () => {
+  const fakeDb = { tag: 'db' } as unknown
+  getFaProjectActiveDbMock.mockReturnValue(fakeDb)
+  readMirroredActiveProjectFilePathSyncMock.mockReturnValue('D:\\alpha.faproject')
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.setProjectSettingsPatchAsync)
+  const ok = (await h(undefined as never, {})) as boolean
+  expect(ok).toBe(true)
+  expect(upsertProjectSettingsKvMock).toHaveBeenCalledWith(fakeDb, {})
+  expect(recordRecentProjectEntryMock).not.toHaveBeenCalled()
+})
+
+test('setProjectSettingsPatchAsync returns false without an active project database', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.setProjectSettingsPatchAsync)
+  const ok = (await h(undefined as never, {
+    projectName: 'x'
+  })) as boolean
+  expect(ok).toBe(false)
+  expect(upsertProjectSettingsKvMock).not.toHaveBeenCalled()
+  expect(recordRecentProjectEntryMock).not.toHaveBeenCalled()
+  expect(warn).toHaveBeenCalledWith(
+    expect.stringMatching(/setProjectSettings skipped/)
   )
   warn.mockRestore()
 })

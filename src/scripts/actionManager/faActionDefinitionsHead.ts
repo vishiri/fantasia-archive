@@ -10,6 +10,7 @@ import {
   handleOpenKeybindSettingsDialog,
   handleOpenLicenseDialog,
   handleOpenAppSettingsDialog,
+  handleOpenProjectSettingsDialog,
   handleOpenAppStylingWindow,
   handleOpenProjectStylingWindow,
   handleOpenTipsTricksTriviaDialog,
@@ -19,6 +20,7 @@ import {
   handleReportBridgeLoadFailure,
   handleSaveKeybindSettings,
   handleSaveAppSettings,
+  handleSaveProjectSettings,
   handleSaveAppStyling,
   handleSaveProjectStyling,
   handleToggleDeveloperTools,
@@ -65,6 +67,17 @@ export const FA_ACTION_DEFINITIONS_HEAD: ReadonlyArray<I_faActionDefinition<T_fa
   {
     handler: handleSaveAppSettings as I_faActionDefinition<T_faActionId>['handler'],
     id: 'saveAppSettings',
+    kind: 'async'
+  },
+  {
+    dedup: true,
+    handler: handleOpenProjectSettingsDialog as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'openProjectSettingsDialog',
+    kind: 'async'
+  },
+  {
+    handler: handleSaveProjectSettings as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'saveProjectSettings',
     kind: 'async'
   },
   {

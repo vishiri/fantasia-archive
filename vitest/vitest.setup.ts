@@ -161,6 +161,10 @@ function resetFaVitestRendererHarness (): void {
         schemaVersion: 1 as const,
         text: ''
       })),
+      getProjectSettings: vi.fn(async () => ({
+        projectName: '',
+        schemaVersion: 1 as const
+      })),
       getProjectStyling: vi.fn(async () => ({
         css: '',
         frame: null,
@@ -170,6 +174,7 @@ function resetFaVitestRendererHarness (): void {
       resolveRecentProjectMruHeadForOpen: vi.fn(async () => ({ outcome: 'empty' as const })),
       openProject: vi.fn(async () => ({ outcome: 'canceled' as const })),
       setProjectNoteboard: vi.fn(async (): Promise<boolean> => true),
+      setProjectSettings: vi.fn(async (): Promise<boolean> => true),
       setProjectStyling: vi.fn(async (): Promise<boolean> => true)
     }
   }

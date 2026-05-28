@@ -86,3 +86,20 @@ test('handleOpenProjectStylingWindow skips when floating windows cannot open', a
   await handleOpenProjectStylingWindow()
   expect(openDialogComponentMock).not.toHaveBeenCalled()
 })
+
+test('handleOpenProjectSettingsDialog opens ProjectSettings when a project is active', async () => {
+  const { handleOpenProjectSettingsDialog } = await import(
+    'app/src/scripts/actionManager/faActionDefinitionHandlersDialogs'
+  )
+  await handleOpenProjectSettingsDialog()
+  expect(openDialogComponentMock).toHaveBeenCalledWith('ProjectSettings')
+})
+
+test('handleOpenProjectSettingsDialog skips without an active project', async () => {
+  mockActiveProjectGate.hasActiveProject = false
+  const { handleOpenProjectSettingsDialog } = await import(
+    'app/src/scripts/actionManager/faActionDefinitionHandlersDialogs'
+  )
+  await handleOpenProjectSettingsDialog()
+  expect(openDialogComponentMock).not.toHaveBeenCalled()
+})

@@ -48,6 +48,17 @@ export const S_FaActiveProject = defineStore('S_FaActiveProject', () => {
     activeProject.value = null
   }
 
+  function patchActiveProjectDisplayName (name: string): void {
+    const current = activeProject.value
+    if (current === null) {
+      return
+    }
+    activeProject.value = {
+      ...current,
+      name
+    }
+  }
+
   async function createProjectFromUserInput (projectName: string): Promise<'created' | 'canceled'> {
     const api = window.faContentBridgeAPIs?.projectManagement
     if (api === undefined) {
@@ -108,6 +119,7 @@ export const S_FaActiveProject = defineStore('S_FaActiveProject', () => {
     hasActiveProject,
     openProjectFromKnownPath,
     openProjectFromUserDialog,
+    patchActiveProjectDisplayName,
     setActiveProject
   }
 })

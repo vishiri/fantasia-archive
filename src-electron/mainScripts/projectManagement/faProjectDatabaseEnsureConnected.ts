@@ -99,3 +99,10 @@ export async function runWithFaProjectDatabaseForIpcAsync<T> (
   }
   return runWithFaProjectDatabaseSync(work)
 }
+
+/**
+ * Returns the mirrored absolute '.faproject' path when main still knows the active session file.
+ */
+export function readMirroredActiveProjectFilePathSync (): string | null {
+  return getFaProjectLastKnownActiveProjectFilePath()
+}

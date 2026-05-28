@@ -7,6 +7,10 @@ import type {
   I_faProjectStylingRoot
 } from 'app/types/I_faProjectStylingDomain'
 import type {
+  I_faProjectSettingsPatch,
+  I_faProjectSettingsRoot
+} from 'app/types/I_faProjectSettingsDomain'
+import type {
   I_faRecentProjectEntry,
   I_faRecentProjectMruHeadResolve
 } from 'app/types/I_faRecentProjectsDomain'
@@ -70,6 +74,7 @@ export interface I_faProjectOpenResult {
 export interface I_faProjectManagementAPI {
   createProject: (input: I_faProjectCreateInput) => Promise<I_faProjectCreateResult>
   getProjectNoteboard: () => Promise<I_faProjectNoteboardRoot>
+  getProjectSettings: () => Promise<I_faProjectSettingsRoot>
   getProjectStyling: () => Promise<I_faProjectStylingRoot>
   getRecentProjects: () => Promise<I_faRecentProjectEntry[]>
   /**
@@ -82,5 +87,6 @@ export interface I_faProjectManagementAPI {
    * Resolves **false** when there is no active project database (for example immediately after main cleared the handle during a renderer reload).
    */
   setProjectNoteboard: (patch: I_faProjectNoteboardPatch) => Promise<boolean>
+  setProjectSettings: (patch: I_faProjectSettingsPatch) => Promise<boolean>
   setProjectStyling: (patch: I_faProjectStylingPatch) => Promise<boolean>
 }

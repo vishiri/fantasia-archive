@@ -30,6 +30,13 @@ export async function handleOpenAppSettingsDialog (): Promise<void> {
   openDialogComponent('AppSettings')
 }
 
+export async function handleOpenProjectSettingsDialog (): Promise<void> {
+  if (!S_FaActiveProject().hasActiveProject) {
+    return
+  }
+  openDialogComponent('ProjectSettings')
+}
+
 export async function handleOpenAppStylingWindow (): Promise<void> {
   openDialogComponent('WindowAppStyling')
 }

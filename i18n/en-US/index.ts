@@ -23,6 +23,7 @@ import L_newProject from './dialogs/L_newProject'
 import L_dialogKeybindSettings from './dialogs/L_dialogKeybindSettings'
 import L_importExportAppConfig from './dialogs/L_importExportAppConfig'
 import L_appSettings from './dialogs/L_appSettings'
+import L_projectSettings from './dialogs/L_projectSettings'
 import L_appNoteboard from './floatingWindows/L_appNoteboard'
 import L_projectNoteboard from './floatingWindows/L_projectNoteboard'
 import L_appStylingFloating from './floatingWindows/L_appStyling'
@@ -36,6 +37,7 @@ import L_faAppStyling from './globalFunctionality/L_faAppStyling'
 import L_faProjectStyling from './globalFunctionality/L_faProjectStyling'
 import L_faProjectSession from './globalFunctionality/L_faProjectSession'
 import L_faUserSettings from './globalFunctionality/L_faUserSettings'
+import L_faProjectSettings from './globalFunctionality/L_faProjectSettings'
 import L_spellChecker from './globalFunctionality/L_spellChecker'
 import L_unsortedAppTexts from './globalFunctionality/L_unsortedAppTexts'
 
@@ -70,7 +72,8 @@ export default {
     keybindSettings: L_dialogKeybindSettings,
     markdownDocument: L_markdownDocument,
     newProject: L_newProject,
-    appSettings: L_appSettings
+    appSettings: L_appSettings,
+    projectSettings: L_projectSettings
   },
 
   // FLOATING WINDOWS (in-renderer movable / resizable surfaces)
@@ -110,6 +113,7 @@ export default {
     faAppStyling: L_faAppStyling,
     faProjectStyling: L_faProjectStyling,
     faProjectSession: L_faProjectSession,
+    faProjectSettings: L_faProjectSettings,
     faUserSettings: L_faUserSettings,
     spellChecker: L_spellChecker,
     unsortedAppTexts: L_unsortedAppTexts

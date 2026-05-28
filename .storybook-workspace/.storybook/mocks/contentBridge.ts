@@ -25,6 +25,10 @@ import type {
   I_faProjectNoteboardRoot
 } from 'app/types/I_faProjectNoteboardDomain'
 import type {
+  I_faProjectSettingsPatch,
+  I_faProjectSettingsRoot
+} from 'app/types/I_faProjectSettingsDomain'
+import type {
   I_faProjectStylingPatch,
   I_faProjectStylingRoot
 } from 'app/types/I_faProjectStylingDomain'
@@ -139,6 +143,27 @@ const baseBridge = () => {
     return true
   }
 
+  let storybookProjectSettingsRoot: I_faProjectSettingsRoot = {
+    projectName: 'Storybook Sample Project',
+    schemaVersion: 1
+  }
+
+  const getProjectSettings = async (): Promise<I_faProjectSettingsRoot> => {
+    return {
+      ...storybookProjectSettingsRoot
+    }
+  }
+
+  const setProjectSettings = async (patch: I_faProjectSettingsPatch): Promise<boolean> => {
+    if (patch.projectName !== undefined) {
+      storybookProjectSettingsRoot = {
+        ...storybookProjectSettingsRoot,
+        projectName: patch.projectName
+      }
+    }
+    return true
+  }
+
   return {
     faWindowControl: {
       checkWindowMaximized: async () => false,
@@ -214,6 +239,7 @@ const baseBridge = () => {
         outcome: 'canceled'
       }),
       getProjectNoteboard,
+      getProjectSettings,
       getProjectStyling,
       getRecentProjects: async () => [],
       resolveRecentProjectMruHeadForOpen: async () => ({ outcome: 'empty' as const }),
@@ -221,6 +247,7 @@ const baseBridge = () => {
         outcome: 'canceled'
       }),
       setProjectNoteboard,
+      setProjectSettings,
       setProjectStyling
     }
   }

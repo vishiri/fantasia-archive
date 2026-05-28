@@ -13,6 +13,7 @@ import L_importExportAppConfig from 'app/i18n/en-US/dialogs/L_importExportAppCon
 import L_markdownDocument from 'app/i18n/en-US/dialogs/L_markdownDocument'
 import L_newProject from 'app/i18n/en-US/dialogs/L_newProject'
 import L_appSettings from 'app/i18n/en-US/dialogs/L_appSettings'
+import L_projectSettings from 'app/i18n/en-US/dialogs/L_projectSettings'
 import L_appStylingFloating from 'app/i18n/en-US/floatingWindows/L_appStyling'
 import L_projectStylingFloating from 'app/i18n/en-US/floatingWindows/L_projectStyling'
 import L_appNoteboardFloating from 'app/i18n/en-US/floatingWindows/L_appNoteboard'
@@ -21,6 +22,7 @@ import L_faKeybinds from 'app/i18n/en-US/globalFunctionality/L_faKeybinds'
 import L_faAppNoteboard from 'app/i18n/en-US/globalFunctionality/L_faAppNoteboard'
 import L_faProjectNoteboard from 'app/i18n/en-US/globalFunctionality/L_faProjectNoteboard'
 import L_faProjectStyling from 'app/i18n/en-US/globalFunctionality/L_faProjectStyling'
+import L_faProjectSettings from 'app/i18n/en-US/globalFunctionality/L_faProjectSettings'
 import L_faProjectSession from 'app/i18n/en-US/globalFunctionality/L_faProjectSession'
 import L_faUserSettings from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
 import L_unsortedAppTexts from 'app/i18n/en-US/globalFunctionality/L_unsortedAppTexts'
@@ -52,7 +54,8 @@ const defaultMessages: Record<string, unknown> = {
     importExportAppConfig: L_importExportAppConfig,
     markdownDocument: L_markdownDocument,
     newProject: L_newProject,
-    appSettings: L_appSettings
+    appSettings: L_appSettings,
+    projectSettings: L_projectSettings
   },
   floatingWindows: {
     appNoteboard: L_appNoteboardFloating,
@@ -75,6 +78,7 @@ const defaultMessages: Record<string, unknown> = {
     faAppNoteboard: L_faAppNoteboard,
     faProjectNoteboard: L_faProjectNoteboard,
     faProjectStyling: L_faProjectStyling,
+    faProjectSettings: L_faProjectSettings,
     faProjectSession: L_faProjectSession,
     faUserSettings: L_faUserSettings,
     unsortedAppTexts: L_unsortedAppTexts

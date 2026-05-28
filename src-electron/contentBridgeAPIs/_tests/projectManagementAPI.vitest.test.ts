@@ -154,3 +154,27 @@ test('projectManagementAPI setProjectStyling invokes IPC with cloned patch', asy
   )
   expect(patch.css).toBe('z{}')
 })
+
+test('projectManagementAPI getProjectSettings invokes IPC', async () => {
+  const snapshot = {
+    projectName: 'Alpha',
+    schemaVersion: 1 as const
+  }
+
+  invokeMock.mockResolvedValueOnce(snapshot)
+  const r = await projectManagementAPI.getProjectSettings()
+  expect(r).toEqual(snapshot)
+  expect(invokeMock).toHaveBeenCalledWith(FA_PROJECT_MANAGEMENT_IPC.getProjectSettingsAsync)
+})
+
+test('projectManagementAPI setProjectSettings invokes IPC with cloned patch', async () => {
+  invokeMock.mockResolvedValueOnce(true)
+  const patch = { projectName: 'Renamed' }
+  const persisted = await projectManagementAPI.setProjectSettings(patch)
+  expect(persisted).toBe(true)
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.setProjectSettingsPatchAsync,
+    { projectName: 'Renamed' }
+  )
+  expect(patch.projectName).toBe('Renamed')
+})

@@ -5,6 +5,7 @@ import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
+import { S_FaProjectSettings } from 'app/src/stores/S_FaProjectSettings'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import { canOpenFloatingWindowWhileNoModal } from 'app/src/scripts/appNoteboard/faAppNoteboardCanOpen'
 import { toggleDevTools } from 'app/src/scripts/appGlobalManagementUI/toggleDevTools'
@@ -78,6 +79,15 @@ export async function handleSaveKeybindSettings (payload: { overrides: import('a
 
 export async function handleSaveAppSettings (payload: { settings: import('app/types/I_faUserSettingsDomain').I_faUserSettings }): Promise<void> {
   await S_FaUserSettings().updateSettings(payload.settings)
+}
+
+export async function handleSaveProjectSettings (
+  payload: { settings: import('app/types/I_faProjectSettingsDomain').I_faProjectSettingsPatch }
+): Promise<void> {
+  if (!S_FaActiveProject().hasActiveProject) {
+    throw new Error(i18n.global.t('globalFunctionality.faProjectSettings.saveError'))
+  }
+  await S_FaProjectSettings().updateProjectSettings(payload.settings)
 }
 
 export async function handleSaveAppStyling (payload: { css: string }): Promise<void> {
@@ -161,6 +171,7 @@ export {
   handleOpenLicenseDialog,
   handleOpenNewProjectDialog,
   handleOpenAppSettingsDialog,
+  handleOpenProjectSettingsDialog,
   handleOpenAppStylingWindow,
   handleOpenProjectStylingWindow,
   handleOpenTipsTricksTriviaDialog,
