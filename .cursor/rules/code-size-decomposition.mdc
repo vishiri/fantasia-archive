@@ -50,7 +50,7 @@ Limits are **maximums**, not an invitation to maximize file count. Prefer **fewe
 
 - **Tests:** `**/*.vitest.test.ts`, `**/*playwright*.ts`, `**/*.playwright.spec.ts`
 - **Storybook:** `**/*.stories.ts`
-- **Config:** `**/*.config.mjs`, `**/*.config.mts`, `**/*.config.ts`, `**/eslint.config.mjs`, `**/commitlint.config.mjs`, `**/quasar.config.ts`, `**/quasar.config.js`, `scripts/**/*.mjs`, `**/testRunner_*.mjs`
+- **Config:** `**/*.config.mjs`, `**/*.config.mts`, `**/*.config.ts`, `**/eslint.config.mjs`, `**/commitlint.config.mjs`, `**/quasar.config.ts`, `**/quasar.config.js`, `.utility-scripts/**/*.mjs`, `**/testRunner_*.mjs`
 - **Translations:** `i18n/**/*.ts` (locale trees and composed `index.ts`)
 - **Type-only modules:** everything under `types/**/*.ts`
 - **Declarations:** `**/*.d.ts`

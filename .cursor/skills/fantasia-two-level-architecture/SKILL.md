@@ -50,7 +50,14 @@ description: >-
 
 ## Electron
 
-Same layout under `src-electron/mainScripts/<area>/`. Keep `contentBridgeAPIs/` thin.
+Same layout under `src-electron/mainScripts/<area>/`:
+
+- `functions/` — pure helpers (`import type` from `app/types/**` only).
+- `<area>_manager.ts` — wiring-only public entry; re-export or bind factories from `functions/` and `*Wiring.ts` modules.
+- `*Wiring.ts` (and `*Surface.ts`, `*Runtime.ts`, etc.) — impure implementation siblings (SQLite, `electron`, `fs`, cross-module orchestration).
+- `ipcManagement/` — `ipcManagement_manager.ts` exports `registerAllFaIpc`; individual `registerFa*Ipc.ts` files stay as IPC registrars and should import domain APIs from `*_manager.ts` when possible.
+
+Keep `contentBridgeAPIs/` thin.
 
 ## Related
 

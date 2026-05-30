@@ -39,7 +39,7 @@ JSDoc above tests and line comments in these files: follow AGENTS.md code-commen
 
 - Each Electron test attaches **WebM** screen video (see [helpers/playwrightHelpers_universal/playwrightElectronRecordVideo.ts](helpers/playwrightHelpers_universal/playwrightElectronRecordVideo.ts)) unless `FA_PLAYWRIGHT_NO_VIDEO` is set. Open **`test-results/playwright-report/index.html`** after a run, open a test, and use **Attachments** to play or download; playable files are under **`test-results/playwright-report/data/`**.
 - **Every** Playwright run **replaces** the HTML report folder. Running component tests, then E2E (or the reverse, or a repeat of either) **overwrites** the prior report—there is no merge across runs.
-- Root **`yarn test:components`** / **`yarn test:e2e`** (and **`:single`** / **`:single:ci`**) use **`scripts/playwrightWithArtifactTrim.mjs`**, which deletes **`test-results/playwright-artifacts`** after the run. Raw `recordVideo` output uses a temp dir under the OS temp folder, then is attached and trimmed (see **`helpers/playwrightHelpers_universal/playwrightElectronRecordVideo.ts`**).
+- Root **`yarn test:components`** / **`yarn test:e2e`** (and **`:single`** / **`:single:ci`**) use **`.utility-scripts/playwrightWithArtifactTrim.mjs`**, which deletes **`test-results/playwright-artifacts`** after the run. Raw `recordVideo` output uses a temp dir under the OS temp folder, then is attached and trimmed (see **`helpers/playwrightHelpers_universal/playwrightElectronRecordVideo.ts`**).
 - For agents: point humans to **`test-results/playwright-report/index.html`** for per-test videos; do not assume reliable analysis of raw **`.webm`** bytes without specialized tooling.
 
 ## Vue templates (hooks for locators)

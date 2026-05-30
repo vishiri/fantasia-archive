@@ -44,7 +44,7 @@ Composable managers use the same rule: `export const useFeature = createUseFeatu
       <concern>.ts
 ```
 
-Shared domains: `src/scripts/<domain>/functions/` + `<domain>/*_manager.ts` (and optional `<domain>_manager.ts` barrel). Electron: `src-electron/mainScripts/<area>/functions/` + `*_manager.ts` wiring modules.
+Shared domains: `src/scripts/<domain>/functions/` + `<domain>/*_manager.ts` (and optional `<domain>_manager.ts` barrel). Electron: `src-electron/mainScripts/<area>/functions/` + `*_manager.ts` (public entry) plus allowed siblings: `*_managerDefaults.ts`, `*Wiring.ts`, `*Surface.ts`, `*Session.ts`, `*Runtime.ts`, `*Api.ts`, `*Bound.ts`. Under `ipcManagement/`, `registerFa*Ipc.ts` and `revealElectronDevToolsConsoleBestEffort.ts` are level-2 IPC registrars. Under `appProtocol/`, `registerFaAppProtocolWiring.ts`. ESLint `fa-two-level/feature-scripts-layout` applies to `mainScripts/<area>/` the same way as component `scripts/` when `functions/` exists.
 
 ## ESLint rule ids (CI)
 
