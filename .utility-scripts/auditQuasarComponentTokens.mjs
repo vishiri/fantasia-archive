@@ -4,7 +4,7 @@
  * component token files (same class of bug as missing `$qCheckbox-bg-transition` or
  * `$qTooltip-fontSize`).
  *
- * Run: node scripts/auditQuasarComponentTokens.mjs
+ * Run: node .utility-scripts/auditQuasarComponentTokens.mjs
  * Or:  yarn audit:quasar-component-tokens
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs'

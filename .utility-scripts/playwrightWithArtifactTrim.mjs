@@ -45,7 +45,7 @@ function normalizePlaywrightCliArgs (argv) {
         console.error(
           '[playwrightWithArtifactTrim] Path still contains %npm_config_component% (not expanded on Yarn for Windows).\n' +
             '  Use:  yarn test:components:single --component=bucket/ComponentFolder\n' +
-            '  Or:   node scripts/playwrightWithArtifactTrim.mjs test src/components/bucket/ComponentFolder\n'
+            '  Or:   node .utility-scripts/playwrightWithArtifactTrim.mjs test src/components/bucket/ComponentFolder\n'
         )
         process.exit(1)
       }

@@ -8,7 +8,7 @@
  * `src/css/theme/quasar-components/**` when looking for *references* (definitions are
  * only read from `styles/_variables.scss`).
  *
- * Usage: node scripts/auditQuasarVariablesUsage.mjs
+ * Usage: node .utility-scripts/auditQuasarVariablesUsage.mjs
  */
 import { readFileSync, readdirSync } from 'node:fs'
 import { join, relative } from 'node:path'

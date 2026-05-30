@@ -1,6 +1,6 @@
 /**
  * Copies the en-US i18n module tree into target locale folders and writes a matching index.ts.
- * Usage: node scripts/syncI18nLocaleTreeFromEnUs.mjs de fr it ...
+ * Usage: node .utility-scripts/syncI18nLocaleTreeFromEnUs.mjs de fr it ...
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -81,7 +81,7 @@ import L_faAppStyling from './globalFunctionality/L_faAppStyling'
 import L_faProjectStyling from './globalFunctionality/L_faProjectStyling'
 import L_faProjectSession from './globalFunctionality/L_faProjectSession'
 import L_faUserSettings from './globalFunctionality/L_faUserSettings'
-import L_spellChecker from './globalFunctionality/L_spellChecker'
+import L_spellCheckerWiring from './globalFunctionality/L_spellCheckerWiring'
 import L_unsortedAppTexts from './globalFunctionality/L_unsortedAppTexts'
 
 import L_mainLayout from './layouts/L_mainLayout'
@@ -156,7 +156,7 @@ export default {
     faProjectStyling: L_faProjectStyling,
     faProjectSession: L_faProjectSession,
     faUserSettings: L_faUserSettings,
-    spellChecker: L_spellChecker,
+    spellCheckerWiring: L_spellCheckerWiring,
     unsortedAppTexts: L_unsortedAppTexts
   }
 }

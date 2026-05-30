@@ -2,8 +2,8 @@
  * Batch-translates i18n locale trees from corrected en-US sources.
  * Protects vue-i18n placeholders and product tokens before machine translation.
  *
- * Usage: node scripts/batchTranslateI18nLocales.mjs de fr it ...
- *        node scripts/batchTranslateI18nLocales.mjs   (all non-en-US selector locales)
+ * Usage: node .utility-scripts/batchTranslateI18nLocales.mjs de fr it ...
+ *        node .utility-scripts/batchTranslateI18nLocales.mjs   (all non-en-US selector locales)
  */
 import fs from 'node:fs'
 import path from 'node:path'
