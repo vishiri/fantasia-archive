@@ -291,9 +291,6 @@ test.describe.serial('Custom Project CSS E2E — fresh Playwright profile: Monac
     await appWindow.waitForTimeout(e2ePostTypingSettleMs)
     await appWindow.locator(`[data-test-locator="${selectorList.dialogCreateBtn}"]`).click()
     await navigateFaPlaywrightE2eToHomeRoute(appWindow)
-    await expect(appWindow.locator('[data-test-locator="mainLayout-activeProjectName"]')).toBeVisible({
-      timeout: 20_000
-    })
     await e2eExpectFaActiveProjectStoreName(appWindow, PROJECT_STYLING_E2E_BASELINE_DISPLAY_NAME)
 
     await expect(appWindow.getByText(interpolateFaProjectSessionNotify(

@@ -1,4 +1,4 @@
-import { isFantasiaStorybookCanvas } from './rendererAppInternals_manager'
+import { isFantasiaStorybookCanvas } from './functions/faFantasiaStorybookCanvas'
 import { createFaAppRouterSession } from './functions/createFaAppRouterSession'
 
 const faAppRouterSessionApi = createFaAppRouterSession({

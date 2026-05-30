@@ -1,6 +1,6 @@
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import type { I_ref } from 'app/types/I_vueCompositionShims'
-import type { StoreGeneric, T_piniaStoreToRefs } from 'app/types/I_vuePiniaInjected'
+import type { StoreGeneric } from 'app/types/I_vuePiniaInjected'
 
 type T_faKeybindKeydownContext = {
   overrides: I_faKeybindsRoot['overrides']
@@ -22,7 +22,6 @@ type T_createMainLayoutDeps = {
   awaitWelcomeScreenAutoLoadBootCompletion: () => Promise<void>
   FA_APP_SHELL_DRAWER_TRANSITION_MS: number
   FA_APP_SHELL_PAGE_TRANSITION_BINDINGS: T_faAppShellPageTransitionBindings
-  S_FaActiveProject: () => StoreGeneric
   S_FaAppNoteboard: () => StoreGeneric
   S_FaAppStyling: () => StoreGeneric
   S_FaKeybinds: () => StoreGeneric
@@ -52,11 +51,9 @@ type T_createMainLayoutDeps = {
   onMounted: (hook: () => void | Promise<void>) => void
   onUnmounted: (hook: () => void) => void
   ref: <T>(value: T) => I_ref<T>
-  resolveMainLayoutActiveProjectLabel: (name: string | undefined) => string | null
   resolveMainLayoutOutletKey: (childRoutePath: string | undefined) => string
   resolveMainLayoutRouteClass: (showWorkspaceDrawer: boolean) => Record<string, boolean>
   resolveMainLayoutShowWorkspaceDrawer: (routePath: string) => boolean
-  storeToRefs: T_piniaStoreToRefs
   useRoute: () => { path?: string } | undefined
   watch: (
     source: I_ref<boolean>,
@@ -78,7 +75,6 @@ function useMainLayout (
 ): {
     FA_APP_SHELL_DRAWER_TRANSITION_MS: number
     FA_APP_SHELL_PAGE_TRANSITION_BINDINGS: T_faAppShellPageTransitionBindings
-    activeProjectLabel: I_ref<string | null>
     appShellLayoutQuasarView: I_ref<string>
     appShellLayoutRouteClass: I_ref<Record<string, boolean>>
     isFantasiaStorybookCanvas: () => boolean
@@ -86,7 +82,6 @@ function useMainLayout (
     showWorkspaceDrawer: I_ref<boolean>
   } {
   const route = deps.useRoute()
-  const { activeProject } = deps.storeToRefs(deps.S_FaActiveProject())
   const mainLayoutRoutePath = deps.computed((): string => route?.path ?? '/')
   const showWorkspaceDrawer = deps.computed((): boolean => {
     return deps.resolveMainLayoutShowWorkspaceDrawer(mainLayoutRoutePath.value)
@@ -94,9 +89,6 @@ function useMainLayout (
   const { appShellLayoutQuasarView } = useAppShellLayoutDrawerRail(showWorkspaceDrawer)
   const appShellLayoutRouteClass = deps.computed((): Record<string, boolean> => {
     return deps.resolveMainLayoutRouteClass(showWorkspaceDrawer.value)
-  })
-  const activeProjectLabel = deps.computed((): string | null => {
-    return deps.resolveMainLayoutActiveProjectLabel(activeProject.value?.name)
   })
   let faKeybindKeydownHandler: ((event: KeyboardEvent) => void) | undefined
 
@@ -140,7 +132,6 @@ function useMainLayout (
   return {
     FA_APP_SHELL_DRAWER_TRANSITION_MS: deps.FA_APP_SHELL_DRAWER_TRANSITION_MS,
     FA_APP_SHELL_PAGE_TRANSITION_BINDINGS: deps.FA_APP_SHELL_PAGE_TRANSITION_BINDINGS,
-    activeProjectLabel,
     appShellLayoutQuasarView,
     appShellLayoutRouteClass,
     isFantasiaStorybookCanvas: deps.isFantasiaStorybookCanvas,

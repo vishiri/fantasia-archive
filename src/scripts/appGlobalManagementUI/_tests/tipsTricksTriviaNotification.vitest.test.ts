@@ -90,7 +90,7 @@ test('Test that tipsTricksTriviaNotification uses icon payload when mascot is hi
 
 /**
  * tipsTricksTriviaNotification
- * When the markdown list is empty the notify still runs with an undefined caption.
+ * When the markdown list is empty the notify still runs with an empty caption.
  */
 test('Test that tipsTricksTriviaNotification invokes Notify when the tip list is empty', () => {
   mdListArrayConverterMock.mockReturnValueOnce([])
@@ -99,6 +99,6 @@ test('Test that tipsTricksTriviaNotification invokes Notify when the tip list is
 
   expect(notifyCreateMock).toHaveBeenCalledOnce()
   expect(notifyCreateMock.mock.calls[0][0]).toMatchObject({
-    caption: undefined
+    caption: ''
   })
 })

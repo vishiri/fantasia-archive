@@ -1,44 +1,25 @@
 import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
-import { createMemoryHistory, createRouter } from 'vue-router'
 
 import IndexPage from '../IndexPage/IndexPage.vue'
 
 /**
  * IndexPage
- * Home route shows a router-link to the test path used by local experiments.
+ * Mounts the workspace home shell with the project overview block.
  */
-test('Test that IndexPage renders a link to the testeee path', async () => {
-  const router = createRouter({
-    history: createMemoryHistory(),
-    routes: [
-      {
-        path: '/home',
-        component: IndexPage
-      },
-      {
-        path: '/testeee',
-        component: {
-          template: '<div />'
-        }
-      }
-    ]
-  })
-
-  await router.push('/home')
-  await router.isReady()
-
-  const w = mount(IndexPage, {
+test('Test that IndexPage renders ProjectOverview inside the main wrapper', () => {
+  const wrapper = mount(IndexPage, {
     global: {
-      plugins: [router],
-      mocks: {
-        $t: (key: string) => key
+      stubs: {
+        ProjectOverview: {
+          template: '<div data-test-locator="projectOverview-stub" />'
+        }
       }
     }
   })
 
-  const link = w.find('a')
-  expect(link.exists()).toBe(true)
-  expect(link.attributes('href')).toContain('testeee')
-  w.unmount()
+  expect(wrapper.find('main.indexPage').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator=projectOverview-stub]').exists()).toBe(true)
+
+  wrapper.unmount()
 })

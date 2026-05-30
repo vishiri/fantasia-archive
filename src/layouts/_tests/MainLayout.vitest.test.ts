@@ -82,9 +82,9 @@ test('Test that MainLayout mounts with header stubs and router-view slot on work
 
 /**
  * MainLayout / S_FaActiveProject
- * Header shows the active project display name when one is loaded.
+ * Header no longer duplicates the project name; Pinia holds the active session label.
  */
-test('Test that MainLayout shows active project label when a project is open', async () => {
+test('Test that MainLayout omits header project name while Pinia stores the active project', async () => {
   setFantasiaStorybookCanvasFlag(false)
   vi.stubEnv('MODE', 'spa')
   S_FaActiveProject().setActiveProject({
@@ -94,7 +94,8 @@ test('Test that MainLayout shows active project label when a project is open', a
   })
   const w = await mountMainLayoutForVitest()
   await flushPromises()
-  expect(w.find('[data-test-locator="mainLayout-activeProjectName"]').text()).toBe('Arcovia')
+  expect(w.find('[data-test-locator="mainLayout-activeProjectName"]').exists()).toBe(false)
+  expect(S_FaActiveProject().activeProject?.name).toBe('Arcovia')
   w.unmount()
   S_FaActiveProject().clearActiveProject()
   vi.unstubAllEnvs()

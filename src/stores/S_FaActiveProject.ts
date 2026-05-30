@@ -5,7 +5,7 @@ import { computed, ref } from 'vue'
 
 import type { I_faActiveProject } from 'app/types/I_faActiveProjectDomain'
 
-import { navigateToWorkspaceRouteForActiveProject } from 'app/src/scripts/appInternals/appInternals_manager'
+import { navigateToWorkspaceRouteForActiveProject } from 'app/src/scripts/appInternals/faAppRouterSession_manager'
 import type { T_faActiveProjectOpenFlowOutcome } from 'app/types/I_faActiveProjectOpenFlow'
 import {
   finalizeFaActiveProjectOpenResult,

@@ -1,30 +1,6 @@
 import type { I_appStartupRouter } from 'app/types/I_appStartupRouter'
 import type { I_faUserSettings, T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
 
-const FANTASIA_STORYBOOK_CANVAS_KEY = '__fantasiaStorybookCanvas'
-
-function hasStorybookCanvasRoot (): boolean {
-  if (typeof document === 'undefined') {
-    return false
-  }
-  return document.getElementById('storybook-root') !== null
-}
-
-function isFantasiaStorybookCanvas (): boolean {
-  if ((globalThis as Record<string, unknown>)[FANTASIA_STORYBOOK_CANVAS_KEY] === true) {
-    return true
-  }
-  return hasStorybookCanvasRoot()
-}
-
-function setFantasiaStorybookCanvasFlag (value: boolean): void {
-  if (value) {
-    (globalThis as Record<string, unknown>)[FANTASIA_STORYBOOK_CANVAS_KEY] = true
-  } else {
-    delete (globalThis as Record<string, unknown>)[FANTASIA_STORYBOOK_CANVAS_KEY]
-  }
-}
-
 function resolveVitePublicAssetPath (pathFromPublicRoot: string): string {
   const rawBase = import.meta.env.BASE_URL
   const base =
@@ -53,8 +29,10 @@ export function createRendererAppInternals (deps: {
     languageCode: T_faUserSettingsLanguageCode,
     currentLanguageCode: T_faUserSettingsLanguageCode
   ) => Promise<void>
+  isFantasiaStorybookCanvas: () => boolean
   markWelcomeScreenAutoLoadBootAttempted: () => void
   runFaAction: (id: 'showStartupTipsNotification', payload: undefined) => void
+  setFantasiaStorybookCanvasFlag: (value: boolean) => void
   tryRunSkipWelcomeScreenOnLaunch: () => Promise<boolean>
   waitForSkipWelcomeScreenBridgeWhenElectron: () => Promise<void>
   refreshUserSettingsBeforeSkipWelcomeScreenOnLaunch: () => Promise<void>
@@ -67,14 +45,14 @@ export function createRendererAppInternals (deps: {
       currentLanguageCode: T_faUserSettingsLanguageCode
     ) => Promise<void>
     determineTestingComponentName: typeof determineTestingComponentName
-    isFantasiaStorybookCanvas: typeof isFantasiaStorybookCanvas
+    isFantasiaStorybookCanvas: () => boolean
     resolveVitePublicAssetPath: typeof resolveVitePublicAssetPath
     runAppStartupRouting: (
       router: I_appStartupRouter,
       testingType: string | false | undefined,
       testingComponentName: string | false | undefined
     ) => Promise<void>
-    setFantasiaStorybookCanvasFlag: typeof setFantasiaStorybookCanvasFlag
+    setFantasiaStorybookCanvasFlag: (value: boolean) => void
   } {
   async function runAppStartupRouting (
     router: I_appStartupRouter,
@@ -117,9 +95,9 @@ export function createRendererAppInternals (deps: {
     applyFaI18nLocaleFromLanguageCode: deps.applyFaI18nLocaleFromLanguageCode,
     applyFaUserSettingsLanguageSelection: deps.applyFaUserSettingsLanguageSelection,
     determineTestingComponentName,
-    isFantasiaStorybookCanvas,
+    isFantasiaStorybookCanvas: deps.isFantasiaStorybookCanvas,
     resolveVitePublicAssetPath,
     runAppStartupRouting,
-    setFantasiaStorybookCanvasFlag
+    setFantasiaStorybookCanvasFlag: deps.setFantasiaStorybookCanvasFlag
   }
 }

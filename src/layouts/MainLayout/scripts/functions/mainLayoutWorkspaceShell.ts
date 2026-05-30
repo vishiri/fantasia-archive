@@ -13,13 +13,3 @@ export function resolveMainLayoutRouteClass (
     'appShellLayout--workspace': showWorkspaceDrawer
   }
 }
-
-export function resolveMainLayoutActiveProjectLabel (
-  projectName: string | undefined
-): string | null {
-  if (typeof projectName !== 'string' || projectName.length === 0) {
-    return null
-  }
-
-  return projectName
-}

@@ -27,6 +27,7 @@ import L_faProjectSession from 'app/i18n/en-US/globalFunctionality/L_faProjectSe
 import L_faUserSettings from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
 import L_unsortedAppTexts from 'app/i18n/en-US/globalFunctionality/L_unsortedAppTexts'
 import L_ErrorNotFound from 'app/i18n/en-US/pages/L_ErrorNotFound'
+import L_projectOverview from 'app/i18n/en-US/components/projectUI/ProjectOverview/L_projectOverview'
 import L_splashPage from 'app/i18n/en-US/pages/L_splashPage'
 import { ref } from 'vue'
 
@@ -73,6 +74,9 @@ const defaultMessages: Record<string, unknown> = {
   },
   socialContactButtons: L_socialContactButtons,
   fantasiaMascotImage: L_FantasiaMascotImage,
+  projectUI: {
+    projectOverview: L_projectOverview
+  },
   globalFunctionality: {
     faKeybinds: L_faKeybinds,
     faAppNoteboard: L_faAppNoteboard,

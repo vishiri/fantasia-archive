@@ -1,14 +1,18 @@
-import { tryRunSkipWelcomeScreenOnLaunch } from './faAppStartupSkipWelcomeScreen_manager'
 import {
   markWelcomeScreenAutoLoadBootAttempted,
   markWelcomeScreenAutoLoadBootCompletion
-} from 'app/src/scripts/projectManagement/projectManagement_manager'
+} from 'app/src/scripts/projectManagement/functions/faWelcomeScreenAutoLoadSession'
 import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
+import {
+  isFantasiaStorybookCanvas,
+  setFantasiaStorybookCanvasFlag
+} from './functions/faFantasiaStorybookCanvas'
 import {
   applyFaI18nLocaleFromLanguageCode,
   applyFaUserSettingsLanguageSelection
 } from './faAppInternalsLocale_manager'
+import { tryRunSkipWelcomeScreenOnLaunch } from './rendererAppInternalsTryRunSkipWelcomeScreenWiring'
 import { createRefreshUserSettingsBeforeSkipWelcomeScreenOnLaunch } from './functions/createRefreshUserSettingsBeforeSkipWelcomeScreenOnLaunch'
 import { createRendererAppInternals } from './functions/createRendererAppInternals'
 import { isFaSkipWelcomeScreenBridgeReady } from './functions/isFaSkipWelcomeScreenBridgeReady'
@@ -32,17 +36,20 @@ const refreshUserSettingsBeforeSkipWelcomeScreenOnLaunch =
 const rendererAppInternalsApi = createRendererAppInternals({
   applyFaI18nLocaleFromLanguageCode,
   applyFaUserSettingsLanguageSelection,
+  isFantasiaStorybookCanvas,
   markWelcomeScreenAutoLoadBootAttempted,
   markWelcomeScreenAutoLoadBootCompletion,
   refreshUserSettingsBeforeSkipWelcomeScreenOnLaunch,
   runFaAction,
+  setFantasiaStorybookCanvasFlag,
   tryRunSkipWelcomeScreenOnLaunch,
   waitForSkipWelcomeScreenBridgeWhenElectron
 })
 
-export const isFantasiaStorybookCanvas = rendererAppInternalsApi.isFantasiaStorybookCanvas
-
-export const setFantasiaStorybookCanvasFlag = rendererAppInternalsApi.setFantasiaStorybookCanvasFlag
+export {
+  isFantasiaStorybookCanvas,
+  setFantasiaStorybookCanvasFlag
+} from './functions/faFantasiaStorybookCanvas'
 
 export const resolveVitePublicAssetPath = rendererAppInternalsApi.resolveVitePublicAssetPath
 

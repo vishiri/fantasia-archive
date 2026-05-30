@@ -2,7 +2,6 @@ import { expect, test } from 'vitest'
 
 import { resolveMainLayoutOutletKey } from '../mainLayoutOutletKey'
 import {
-  resolveMainLayoutActiveProjectLabel,
   resolveMainLayoutRouteClass,
   resolveMainLayoutShowWorkspaceDrawer
 } from '../mainLayoutWorkspaceShell'
@@ -33,13 +32,4 @@ test('Test that resolveMainLayoutRouteClass maps welcome and workspace flags', (
     'appShellLayout--welcome': true,
     'appShellLayout--workspace': false
   })
-})
-
-/**
- * resolveMainLayoutActiveProjectLabel
- * Empty names become null for the header chip.
- */
-test('Test that resolveMainLayoutActiveProjectLabel rejects blank names', () => {
-  expect(resolveMainLayoutActiveProjectLabel('')).toBe(null)
-  expect(resolveMainLayoutActiveProjectLabel('Demo')).toBe('Demo')
 })

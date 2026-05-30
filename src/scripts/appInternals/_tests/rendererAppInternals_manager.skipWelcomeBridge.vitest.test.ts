@@ -19,7 +19,7 @@ vi.mock('../faAppStartupSkipWelcomeScreen_manager', () => {
   }
 })
 
-vi.mock('app/src/scripts/projectManagement/projectManagement_manager', () => {
+vi.mock('app/src/scripts/projectManagement/functions/faWelcomeScreenAutoLoadSession', () => {
   return {
     markWelcomeScreenAutoLoadBootAttempted: vi.fn(),
     markWelcomeScreenAutoLoadBootCompletion: markWelcomeScreenAutoLoadBootCompletionMock

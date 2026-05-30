@@ -1,4 +1,4 @@
-import { openWelcomeScreenAutoLoadProject } from 'app/src/scripts/projectManagement/projectManagement_manager'
+import { openWelcomeScreenAutoLoadProject } from 'app/src/scripts/projectManagement/faWelcomeScreenAutoLoadProject_manager'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 
 import { createFaAppStartupSkipWelcomeScreen } from './functions/createFaAppStartupSkipWelcomeScreen'

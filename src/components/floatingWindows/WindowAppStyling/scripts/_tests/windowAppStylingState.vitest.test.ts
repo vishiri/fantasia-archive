@@ -1,3 +1,4 @@
+/* eslint-disable vue/one-component-per-file -- colocated defineComponent harness slices per test */
 import {
   beforeEach,
   expect,

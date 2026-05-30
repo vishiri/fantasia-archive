@@ -9,8 +9,10 @@ import {
 import { mdListArrayConverter } from '../_utilities/functions/mdListArrayConverter'
 
 import { createTipsTricksTriviaNotification } from './functions/createTipsTricksTriviaNotification'
+import { pickRandomTipsTricksTriviaCaption } from './functions/pickRandomTipsTricksTriviaCaption'
 
 const tipsTricksTriviaNotificationApi = createTipsTricksTriviaNotification({
+  pickRandomTipsTricksTriviaCaption,
   createNotify: (opts) => Notify.create(opts),
   determineCurrentImage,
   fantasiaImageList,

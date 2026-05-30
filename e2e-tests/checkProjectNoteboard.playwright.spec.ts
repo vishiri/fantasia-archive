@@ -459,9 +459,7 @@ test.describe.serial('Project noteboard E2E — fresh Playwright profile: resize
     await appWindow.waitForTimeout(e2ePostTypingSettleMs)
     await appWindow.locator(`[data-test-locator="${selectorList.dialogCreateBtn}"]`).click()
     await navigateFaPlaywrightE2eToHomeRoute(appWindow)
-    await expect(appWindow.locator('[data-test-locator="mainLayout-activeProjectName"]')).toBeVisible({
-      timeout: 20_000
-    })
+    await e2eExpectFaActiveProjectStoreName(appWindow, PROJECT_NOTEBOARD_E2E_BASELINE_DISPLAY_NAME)
     assertE2eFaprojectFixtureHasContentOnDisk(PROJECT_NOTEBOARD_E2E_BASELINE_FAPROJECT)
 
     await toggleProjectNoteboardFromMenu(appWindow)

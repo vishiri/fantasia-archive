@@ -533,7 +533,6 @@ test.describe.serial('Project management flow', () => {
 
     await e2eExpectFaActiveProjectStoreEmpty(appWindow)
     await navigateFaPlaywrightE2eToHomeRoute(appWindow)
-    await expect(appWindow.locator('[data-test-locator="mainLayout-activeProjectName"]')).toHaveCount(0)
 
     await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await expect(appWindow.locator(`[data-test-locator="${selectorList.splashResumeLatest}"]`)).toBeVisible()

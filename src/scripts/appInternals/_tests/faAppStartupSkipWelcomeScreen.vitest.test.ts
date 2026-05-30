@@ -10,7 +10,7 @@ const userSettingsRef = vi.hoisted(() => {
   }
 })
 
-vi.mock('app/src/scripts/projectManagement/projectManagement_manager', () => {
+vi.mock('app/src/scripts/projectManagement/faWelcomeScreenAutoLoadProject_manager', () => {
   return {
     openWelcomeScreenAutoLoadProject: openWelcomeScreenAutoLoadProjectMock
   }

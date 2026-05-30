@@ -1,0 +1,20 @@
+@use 'sass:color';
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - PROJECT OVERVIEW */
+$projectOverview-hint-background: $info;
+$projectOverview-hint-border-color: fa-v('dark', $dark);
+$projectOverview-hint-border-radius: 5px;
+$projectOverview-hint-border-width: 2px;
+$projectOverview-hint-marginBottom: 30px;
+$projectOverview-hint-mascot-height: 135px;
+$projectOverview-hint-mascot-marginRight: 30px;
+$projectOverview-hint-mascot-width: 135px;
+$projectOverview-hint-paddingBlock: 15px;
+$projectOverview-hint-paddingInline: 20px;
+$projectOverview-maxWidth: 1450px;
+$projectOverview-subtitle-marginTop: 40px;
+$projectOverview-subtitle-opacity: 0.8;
+$projectOverview-title-fontWeight: 500;
+$projectOverview-title-marginBottom: 30px;
+$projectOverview-title-marginTop: 10px;

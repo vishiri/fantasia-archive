@@ -81,8 +81,7 @@ vi.mock('../functions/faWelcomeScreenAutoLoadSession', () => {
   }
 })
 
-vi.mock('app/src/scripts/appInternals/appInternals_manager', () => ({
-  applyFaUserSettingsLanguageSelection: vi.fn(async () => true),
+vi.mock('app/src/scripts/appInternals/faAppRouterSession_manager', () => ({
   navigateToWorkspaceRouteForActiveProject: navigateToWorkspaceRouteForActiveProjectMock
 }))
 

@@ -50,7 +50,6 @@ const selectorList = {
   dialogProjectSettingsInput: 'dialogProjectSettings-input-projectName',
   dialogProjectSettingsSave: 'dialogProjectSettings-button-save',
   dialogProjectSettingsTitle: 'dialogProjectSettings-title',
-  mainLayoutActiveProjectName: 'mainLayout-activeProjectName',
   submenuItemSubMenu: 'AppControlSingleMenu-menuItem-subMenu',
   submenuItemSubMenuItem: 'AppControlSingleMenu-menuItem-subMenu-item',
   submenuItemSubMenuItemText: 'AppControlSingleMenu-menuItem-subMenu-item-text',
@@ -192,7 +191,7 @@ test.describe.serial('Project settings E2E — rename via dialog', () => {
   })
 
   /**
-   * Creates a project, renames it through Project Settings, and asserts header label, MRU submenu, and splash resume dropdown.
+   * Creates a project, renames it through Project Settings, and asserts Pinia name, MRU submenu, and splash resume dropdown.
    */
   test('Create project, rename via Project Settings, assert same-session UI sync', async () => {
     await navigateFaPlaywrightE2eToSplashRoute(appWindow)
@@ -205,9 +204,7 @@ test.describe.serial('Project settings E2E — rename via dialog', () => {
     assertE2eFaprojectFixtureHasContentOnDisk(PROJECT_SETTINGS_E2E_FAPROJECT)
 
     await navigateFaPlaywrightE2eToHomeRoute(appWindow)
-    await expect(
-      appWindow.locator(`[data-test-locator="${selectorList.mainLayoutActiveProjectName}"]`)
-    ).toHaveText(PROJECT_SETTINGS_E2E_INITIAL_NAME)
+    await e2eExpectFaActiveProjectStoreName(appWindow, PROJECT_SETTINGS_E2E_INITIAL_NAME)
 
     await openProjectSettingsFromMenu(appWindow)
     await expect(
@@ -225,9 +222,6 @@ test.describe.serial('Project settings E2E — rename via dialog', () => {
     ).toHaveCount(0, { timeout: 15_000 })
 
     await e2eExpectFaActiveProjectStoreName(appWindow, PROJECT_SETTINGS_E2E_RENAMED)
-    await expect(
-      appWindow.locator(`[data-test-locator="${selectorList.mainLayoutActiveProjectName}"]`)
-    ).toHaveText(PROJECT_SETTINGS_E2E_RENAMED)
 
     await openProjectMenu(appWindow)
     await openLoadRecentSubmenu(appWindow)
@@ -269,9 +263,7 @@ test.describe.serial('Project settings E2E — rename via dialog', () => {
     ))).toBeVisible()
 
     await navigateFaPlaywrightE2eToHomeRoute(appWindow)
-    await expect(
-      appWindow.locator(`[data-test-locator="${selectorList.mainLayoutActiveProjectName}"]`)
-    ).toHaveText(PROJECT_SETTINGS_E2E_RENAMED)
+    await e2eExpectFaActiveProjectStoreName(appWindow, PROJECT_SETTINGS_E2E_RENAMED)
 
     await openProjectSettingsFromMenu(appWindow)
     await expect(

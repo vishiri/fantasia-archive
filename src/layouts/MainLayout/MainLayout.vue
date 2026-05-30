@@ -12,13 +12,6 @@
     >
       <div class="row items-center no-wrap full-width">
         <AppControlMenus class="col-auto" />
-        <div
-          v-if="activeProjectLabel !== null"
-          class="col-auto q-ml-md text-caption fa-text-muted text-no-wrap ellipsis"
-          data-test-locator="mainLayout-activeProjectName"
-        >
-          {{ activeProjectLabel }}
-        </div>
       </div>
     </q-header>
 
@@ -76,7 +69,6 @@ defineOptions({
 const {
   FA_APP_SHELL_DRAWER_TRANSITION_MS,
   FA_APP_SHELL_PAGE_TRANSITION_BINDINGS,
-  activeProjectLabel,
   appShellLayoutQuasarView,
   appShellLayoutRouteClass,
   isFantasiaStorybookCanvas,

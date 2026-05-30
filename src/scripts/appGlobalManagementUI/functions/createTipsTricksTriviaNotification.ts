@@ -1,4 +1,9 @@
 export function createTipsTricksTriviaNotification (deps: {
+  pickRandomTipsTricksTriviaCaption: (args: {
+    mdListArrayConverter: (markdown: string) => string[]
+    randomIndex: (length: number) => number
+    tipsTricksTriviaMarkdown: string
+  }) => string
   createNotify: (opts: {
     actions: Array<{ color: string; icon: string }>
     avatar?: string
@@ -22,9 +27,11 @@ export function createTipsTricksTriviaNotification (deps: {
     tipsTricksTriviaNotification: (hideMascot: boolean) => void
   } {
   const tipsTricksTriviaNotification = (hideMascot: boolean): void => {
-    const messageList = deps.mdListArrayConverter(deps.tipsTricksTriviaMarkdown())
-
-    const randomMessage = messageList[deps.randomIndex(messageList.length)]
+    const randomMessage = deps.pickRandomTipsTricksTriviaCaption({
+      mdListArrayConverter: deps.mdListArrayConverter,
+      randomIndex: deps.randomIndex,
+      tipsTricksTriviaMarkdown: deps.tipsTricksTriviaMarkdown()
+    })
 
     const avatar = hideMascot
       ? undefined

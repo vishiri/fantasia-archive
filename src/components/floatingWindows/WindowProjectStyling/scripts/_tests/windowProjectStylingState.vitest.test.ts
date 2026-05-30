@@ -1,4 +1,5 @@
 /** @vitest-environment jsdom */
+/* eslint-disable vue/one-component-per-file -- colocated defineComponent harness slices per test */
 import { flushPromises, mount } from '@vue/test-utils'
 import {
   defineComponent,

@@ -202,9 +202,6 @@ test.describe.serial('App shell layout (MainLayout)', () => {
 
     await expectFaPlaywrightE2eHashRoute(appWindow, '/home')
     await expectFaPlaywrightE2eWorkspaceShell(appWindow)
-    await expect(appWindow.locator('[data-test-locator="mainLayout-activeProjectName"]')).toHaveText(
-      E2E_SHELL_404_PROJECT_NAME
-    )
     await e2eExpectFaActiveProjectStoreName(appWindow, E2E_SHELL_404_PROJECT_NAME)
     await expectFaPlaywrightE2eNoProjectSessionNotifyForName(appWindow, E2E_SHELL_404_PROJECT_NAME)
   })
