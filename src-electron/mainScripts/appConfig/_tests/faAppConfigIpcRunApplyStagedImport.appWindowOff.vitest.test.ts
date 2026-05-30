@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
-import { faAppConfigImportStagedSessions } from 'app/src-electron/mainScripts/appConfig/faAppConfigImportStagedState'
+import { faAppConfigImportStagedSessions } from 'app/src-electron/mainScripts/appConfig/faAppConfigImportStagedStateWiring'
 
 const {
   applySpellMock,
@@ -37,11 +37,11 @@ vi.mock('app/src-electron/mainScripts/appStyling/appStyling_manager', () => ({
   getFaAppStyling: getFaAppStylingMock
 }))
 
-vi.mock('app/src-electron/mainScripts/windowManagement/faSpellCheckerSession', () => ({
+vi.mock('app/src-electron/mainScripts/windowManagement/faSpellCheckerSessionWiring', () => ({
   applyFaSpellCheckerLanguagesToSession: applySpellMock
 }))
 
-vi.mock('app/src-electron/mainScripts/windowManagement/mainWindowCreation', () => ({
+vi.mock('app/src-electron/mainScripts/windowManagement/windowManagement_manager', () => ({
   appWindow: undefined
 }))
 
@@ -58,7 +58,7 @@ afterEach(() => {
 })
 
 test('Test runApplyStagedAppConfigImport skips spell checker when there is no main window', async () => {
-  const { runApplyStagedAppConfigImport } = await import('../faAppConfigIpcRunApplyStagedImport')
+  const { runApplyStagedAppConfigImport } = await import('../faAppConfigIpcRunApplyStagedImportWiring')
   const sid = 'noWin'
   faAppConfigImportStagedSessions.set(sid, {
     data: { appSettings: { ...FA_USER_SETTINGS_DEFAULTS } },

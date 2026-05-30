@@ -5,10 +5,10 @@ import {
   closeFaProjectActiveDatabaseHandleOnly,
   getFaProjectActiveDatabase,
   getFaProjectLastKnownActiveProjectFilePath
-} from 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase'
-import { reconnectFaProjectDatabaseAtKnownPathSync } from 'app/src-electron/mainScripts/projectManagement/faProjectReconnectAtKnownPath'
+} from 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabaseWiring'
+import { reconnectFaProjectDatabaseAtKnownPathSync } from 'app/src-electron/mainScripts/projectManagement/faProjectReconnectAtKnownPathWiring'
 import { pathLooksLikeFaProjectFile } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
-import { requestRendererActiveProjectPathForFailsafe } from 'app/src-electron/mainScripts/ipcManagement/faProjectFailsafePathFromRenderer'
+import { requestRendererActiveProjectPathForFailsafe } from 'app/src-electron/mainScripts/ipcManagement/faProjectFailsafePathFromRendererWiring'
 
 function ensureActiveDatabaseAttachedSync (): boolean {
   if (getFaProjectActiveDatabase() !== null) {

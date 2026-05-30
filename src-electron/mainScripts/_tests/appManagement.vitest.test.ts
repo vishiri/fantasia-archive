@@ -4,22 +4,9 @@ import { closeAppManager, openAppWindowManager, startApp } from '../appManagemen
 const {
   getFaUserSettingsMock,
   mainWindowCreationMock,
-  registerFaAppDetailsIpcMock,
-  registerFaDevToolsIpcMock,
-  registerFaExtraEnvIpcMock,
-  registerFaExternalLinksIpcMock,
-  registerFaKeybindsIpcMock,
-  registerFaAppConfigIpcMock,
-  registerFaProjectManagementIpcMock,
-  registerFaAppNoteboardIpcMock,
-  registerFaAppStylingIpcMock,
-  registerFaUserSettingsIpcMock,
-  registerFaWindowControlIpcMock,
-  installFaProjectFailsafePathReplyListenerMock,
+  registerAllFaIpcMock,
   appMock,
-  appOnHandlers,
-  ipcMainHandleMock,
-  ipcMainOnMock
+  appOnHandlers
 } = vi.hoisted(() => {
   const handlers: Record<string, () => void> = {}
   return {
@@ -32,81 +19,20 @@ const {
       quit: vi.fn()
     },
     getFaUserSettingsMock: vi.fn(),
-    ipcMainHandleMock: vi.fn(),
-    ipcMainOnMock: vi.fn(),
-    installFaProjectFailsafePathReplyListenerMock: vi.fn(),
     mainWindowCreationMock: vi.fn(),
-    registerFaAppDetailsIpcMock: vi.fn(),
-    registerFaDevToolsIpcMock: vi.fn(),
-    registerFaExtraEnvIpcMock: vi.fn(),
-    registerFaExternalLinksIpcMock: vi.fn(),
-    registerFaKeybindsIpcMock: vi.fn(),
-    registerFaAppConfigIpcMock: vi.fn(),
-    registerFaProjectManagementIpcMock: vi.fn(),
-    registerFaAppNoteboardIpcMock: vi.fn(),
-    registerFaAppStylingIpcMock: vi.fn(),
-    registerFaUserSettingsIpcMock: vi.fn(),
-    registerFaWindowControlIpcMock: vi.fn()
+    registerAllFaIpcMock: vi.fn()
   }
 })
 
-vi.mock('app/src-electron/mainScripts/windowManagement/mainWindowCreation', () => {
+vi.mock('app/src-electron/mainScripts/windowManagement/windowManagement_manager', () => {
   return {
     mainWindowCreation: mainWindowCreationMock
   }
 })
 
-vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaDevToolsIpc', () => {
+vi.mock('app/src-electron/mainScripts/ipcManagement/ipcManagement_manager', () => {
   return {
-    registerFaDevToolsIpc: registerFaDevToolsIpcMock
-  }
-})
-
-vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaExtraEnvIpc', () => {
-  return {
-    registerFaExtraEnvIpc: registerFaExtraEnvIpcMock
-  }
-})
-
-vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaExternalLinksIpc', () => {
-  return {
-    registerFaExternalLinksIpc: registerFaExternalLinksIpcMock
-  }
-})
-
-vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaKeybindsIpc', () => {
-  return {
-    registerFaKeybindsIpc: registerFaKeybindsIpcMock
-  }
-})
-
-vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaAppConfigIpc', () => {
-  return {
-    registerFaAppConfigIpc: registerFaAppConfigIpcMock
-  }
-})
-
-vi.mock('app/src-electron/mainScripts/ipcManagement/faProjectFailsafePathFromRenderer', () => {
-  return {
-    installFaProjectFailsafePathReplyListener: installFaProjectFailsafePathReplyListenerMock
-  }
-})
-
-vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaProjectManagementIpc', () => {
-  return {
-    registerFaProjectManagementIpc: registerFaProjectManagementIpcMock
-  }
-})
-
-vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaAppNoteboardIpc', () => {
-  return {
-    registerFaAppNoteboardIpc: registerFaAppNoteboardIpcMock
-  }
-})
-
-vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaAppStylingIpc', () => {
-  return {
-    registerFaAppStylingIpc: registerFaAppStylingIpcMock
+    registerAllFaIpc: registerAllFaIpcMock
   }
 })
 
@@ -119,24 +45,6 @@ vi.mock('app/src-electron/mainScripts/appNoteboard/appNoteboard_manager', () => 
 vi.mock('app/src-electron/mainScripts/appStyling/appStyling_manager', () => {
   return {
     getFaAppStyling: vi.fn()
-  }
-})
-
-vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaUserSettingsIpc', () => {
-  return {
-    registerFaUserSettingsIpc: registerFaUserSettingsIpcMock
-  }
-})
-
-vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc', () => {
-  return {
-    registerFaWindowControlIpc: registerFaWindowControlIpcMock
-  }
-})
-
-vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaAppDetailsIpc', () => {
-  return {
-    registerFaAppDetailsIpc: registerFaAppDetailsIpcMock
   }
 })
 
@@ -154,11 +62,7 @@ vi.mock('app/src-electron/mainScripts/keybinds/keybinds_manager', () => {
 
 vi.mock('electron', () => {
   return {
-    app: appMock,
-    ipcMain: {
-      handle: ipcMainHandleMock,
-      on: ipcMainOnMock
-    }
+    app: appMock
   }
 })
 
@@ -169,20 +73,7 @@ vi.mock('electron-store', () => ({
 beforeEach(() => {
   getFaUserSettingsMock.mockReset()
   mainWindowCreationMock.mockReset()
-  registerFaAppDetailsIpcMock.mockReset()
-  registerFaDevToolsIpcMock.mockReset()
-  registerFaExtraEnvIpcMock.mockReset()
-  registerFaExternalLinksIpcMock.mockReset()
-  registerFaKeybindsIpcMock.mockReset()
-  registerFaAppConfigIpcMock.mockReset()
-  installFaProjectFailsafePathReplyListenerMock.mockReset()
-  ipcMainOnMock.mockReset()
-  registerFaProjectManagementIpcMock.mockReset()
-  registerFaAppNoteboardIpcMock.mockReset()
-  registerFaAppStylingIpcMock.mockReset()
-  registerFaUserSettingsIpcMock.mockReset()
-  registerFaWindowControlIpcMock.mockReset()
-  ipcMainHandleMock.mockReset()
+  registerAllFaIpcMock.mockReset()
   appMock.whenReady.mockClear()
   appMock.on.mockClear()
   appMock.quit.mockReset()
@@ -197,19 +88,7 @@ beforeEach(() => {
  */
 test('Test that the electron app properly starts', () => {
   startApp()
-  expect(registerFaDevToolsIpcMock).toHaveBeenCalledOnce()
-  expect(registerFaExtraEnvIpcMock).toHaveBeenCalledOnce()
-  expect(registerFaExternalLinksIpcMock).toHaveBeenCalledOnce()
-  expect(registerFaKeybindsIpcMock).toHaveBeenCalledOnce()
-  expect(registerFaAppConfigIpcMock).toHaveBeenCalledOnce()
-  expect(installFaProjectFailsafePathReplyListenerMock).toHaveBeenCalledOnce()
-  expect(ipcMainOnMock).toHaveBeenCalledOnce()
-  expect(registerFaProjectManagementIpcMock).toHaveBeenCalledOnce()
-  expect(registerFaAppNoteboardIpcMock).toHaveBeenCalledOnce()
-  expect(registerFaAppStylingIpcMock).toHaveBeenCalledOnce()
-  expect(registerFaUserSettingsIpcMock).toHaveBeenCalledOnce()
-  expect(registerFaWindowControlIpcMock).toHaveBeenCalledOnce()
-  expect(registerFaAppDetailsIpcMock).toHaveBeenCalledOnce()
+  expect(registerAllFaIpcMock).toHaveBeenCalledOnce()
 })
 
 /**

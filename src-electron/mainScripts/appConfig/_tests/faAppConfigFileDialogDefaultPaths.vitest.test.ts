@@ -5,7 +5,7 @@ import { afterEach, expect, test, vi } from 'vitest'
 import {
   getFaAppConfigExportSaveDefaultPath,
   getFaAppConfigImportOpenDefaultPath
-} from '../faAppConfigFileDialogDefaultPaths'
+} from '../faAppConfigFileDialogDefaultPathsWiring'
 
 const appGetPathMock = vi.hoisted(() => vi.fn())
 

@@ -54,7 +54,7 @@ beforeEach(async () => {
 })
 
 test('Test that getFaRecentProjectListStore is a lazy singleton', async () => {
-  const { getFaRecentProjectListStore } = await import('../faRecentProjectListRuntime')
+  const { getFaRecentProjectListStore } = await import('../faRecentProjectListRuntimeWiring')
   const first = getFaRecentProjectListStore()
   const second = getFaRecentProjectListStore()
   expect(first).toBe(second)
@@ -63,7 +63,7 @@ test('Test that getFaRecentProjectListStore is a lazy singleton', async () => {
 })
 
 test('Test that getRecentProjectsSnapshot returns sanitized rows and persists repairs', async () => {
-  const mod = await import('../faRecentProjectListRuntime')
+  const mod = await import('../faRecentProjectListRuntimeWiring')
   mod.getFaRecentProjectListStore().set('recentProjects', [
     {
       filePath: 'D:\\bad.txt',
@@ -83,7 +83,7 @@ test('Test that getRecentProjectsSnapshot returns sanitized rows and persists re
 })
 
 test('Test that recordRecentProjectEntry prepends and re-sanitizes', async () => {
-  const mod = await import('../faRecentProjectListRuntime')
+  const mod = await import('../faRecentProjectListRuntimeWiring')
   mod.getFaRecentProjectListStore().set('recentProjects', [
     {
       filePath: 'D:\\old.faproject',
@@ -105,7 +105,7 @@ test('Test that recordRecentProjectEntry prepends and re-sanitizes', async () =>
 })
 
 test('Test that removeRecentProjectEntryByPath filters then sanitizes', async () => {
-  const mod = await import('../faRecentProjectListRuntime')
+  const mod = await import('../faRecentProjectListRuntimeWiring')
   mod.getFaRecentProjectListStore().set('recentProjects', [
     {
       filePath: 'D:\\a.faproject',
@@ -122,7 +122,7 @@ test('Test that removeRecentProjectEntryByPath filters then sanitizes', async ()
 })
 
 test('Test that second snapshot avoids persist when sanitized list matches store', async () => {
-  const mod = await import('../faRecentProjectListRuntime')
+  const mod = await import('../faRecentProjectListRuntimeWiring')
   const clean = [
     {
       filePath: 'D:\\ok.faproject',
@@ -142,7 +142,7 @@ test('Test that second snapshot avoids persist when sanitized list matches store
  * Empty MRU list reports outcome empty.
  */
 test('Test that resolveRecentProjectMruHeadForOpen returns empty when MRU list has no rows', async () => {
-  const mod = await import('../faRecentProjectListRuntime')
+  const mod = await import('../faRecentProjectListRuntimeWiring')
   expect(mod.resolveRecentProjectMruHeadForOpen()).toEqual({ outcome: 'empty' })
 })
 
@@ -176,7 +176,7 @@ test('Test that resolveRecentProjectMruHeadForOpen returns ready for existing MR
     }
   })
 
-  const mod = await import('../faRecentProjectListRuntime')
+  const mod = await import('../faRecentProjectListRuntimeWiring')
   expect(mod.resolveRecentProjectMruHeadForOpen()).toEqual({
     entry: {
       filePath: 'D:\\head.faproject',
@@ -224,7 +224,7 @@ test('Test that resolveRecentProjectMruHeadForOpen returns missing for absent MR
     return p.includes('next.faproject')
   })
 
-  const mod = await import('../faRecentProjectListRuntime')
+  const mod = await import('../faRecentProjectListRuntimeWiring')
   const result = mod.resolveRecentProjectMruHeadForOpen()
 
   expect(result).toEqual({

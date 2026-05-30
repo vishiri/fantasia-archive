@@ -2,14 +2,12 @@ import { ipcMain } from 'electron'
 
 import { FA_PROJECT_MANAGEMENT_IPC } from 'app/src-electron/electron-ipc-bridge'
 import {
-  readMirroredActiveProjectFilePathSync,
-  runWithFaProjectDatabaseForIpcAsync
-} from 'app/src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected'
-import {
   readFaProjectSettingsRoot,
+  readMirroredActiveProjectFilePathSync,
+  recordRecentProjectEntry,
+  runWithFaProjectDatabaseForIpcAsync,
   upsertFaProjectSettingsKv
-} from 'app/src-electron/mainScripts/projectManagement/faProjectSettingsPersist'
-import { recordRecentProjectEntry } from 'app/src-electron/mainScripts/projectManagement/faRecentProjectListRuntime'
+} from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
 import { parseFaProjectSettingsPatch } from 'app/src-electron/shared/faProjectSettingsPatchSchema'
 import {
   FA_PROJECT_SETTINGS_FALLBACK_ROOT,

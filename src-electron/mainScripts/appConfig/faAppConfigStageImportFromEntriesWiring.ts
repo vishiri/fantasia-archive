@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Result } from 'neverthrow'
 
-import { faAppConfigImportStagedSessions } from 'app/src-electron/mainScripts/appConfig/faAppConfigImportStagedState'
+import { faAppConfigImportStagedSessions } from 'app/src-electron/mainScripts/appConfig/faAppConfigImportStagedStateWiring'
 import type {
   I_faAppConfigUnzipOk,
   I_faStagedImportSession

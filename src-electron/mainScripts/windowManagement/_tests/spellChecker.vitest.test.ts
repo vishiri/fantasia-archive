@@ -7,7 +7,7 @@ import L_spellChecker_de from 'app/i18n/de/globalFunctionality/L_spellChecker'
 import L_spellChecker_enUS from 'app/i18n/en-US/globalFunctionality/L_spellChecker'
 import L_spellChecker_fr from 'app/i18n/fr/globalFunctionality/L_spellChecker'
 
-import { setupSpellChecker } from '../spellChecker'
+import { setupSpellChecker } from '../spellCheckerWiring'
 
 const { MenuMock, MenuItemMock, menuInstances } = vi.hoisted(() => {
   const instances: Array<{ append: ReturnType<typeof vi.fn>, popup: ReturnType<typeof vi.fn> }> = []

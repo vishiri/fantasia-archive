@@ -10,7 +10,7 @@ const closeHandleOnlyMock = vi.hoisted(() => vi.fn())
 const reconnectMock = vi.hoisted(() => vi.fn())
 const requestPathMock = vi.hoisted(() => vi.fn(async (): Promise<string | null> => null))
 
-vi.mock('app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase', () => {
+vi.mock('app/src-electron/mainScripts/projectManagement/faProjectActiveDatabaseWiring', () => {
   return {
     closeFaProjectActiveDatabaseHandleOnly: closeHandleOnlyMock,
     getFaProjectActiveDatabase: () => getDbMock(),
@@ -18,19 +18,19 @@ vi.mock('app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase'
   }
 })
 
-vi.mock('app/src-electron/mainScripts/projectManagement/faProjectReconnectAtKnownPath', () => {
+vi.mock('app/src-electron/mainScripts/projectManagement/faProjectReconnectAtKnownPathWiring', () => {
   return {
     reconnectFaProjectDatabaseAtKnownPathSync: reconnectMock
   }
 })
 
-vi.mock('app/src-electron/mainScripts/ipcManagement/faProjectFailsafePathFromRenderer', () => {
+vi.mock('app/src-electron/mainScripts/ipcManagement/faProjectFailsafePathFromRendererWiring', () => {
   return {
     requestRendererActiveProjectPathForFailsafe: requestPathMock
   }
 })
 
-import { runWithFaProjectDatabaseForIpcAsync, readMirroredActiveProjectFilePathSync, runWithFaProjectDatabaseSync } from '../faProjectDatabaseEnsureConnected'
+import { runWithFaProjectDatabaseForIpcAsync, readMirroredActiveProjectFilePathSync, runWithFaProjectDatabaseSync } from '../faProjectDatabaseEnsureConnectedWiring'
 
 const absoluteProjectPath = path.join(os.tmpdir(), 'fa-ensure-connected-mock.faproject')
 

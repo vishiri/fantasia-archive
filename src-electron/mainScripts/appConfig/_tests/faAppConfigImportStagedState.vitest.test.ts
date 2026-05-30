@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, test } from 'vitest'
 
-import { faAppConfigImportStagedSessions, purgeFaAppConfigStagedImportSessionsExpired, pathLooksLikeFaconfigFile } from '../faAppConfigImportStagedState'
+import { faAppConfigImportStagedSessions, purgeFaAppConfigStagedImportSessionsExpired, pathLooksLikeFaconfigFile } from '../faAppConfigImportStagedStateWiring'
 
 beforeEach(() => {
   faAppConfigImportStagedSessions.clear()

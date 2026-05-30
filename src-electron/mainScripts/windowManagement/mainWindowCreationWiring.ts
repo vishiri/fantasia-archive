@@ -1,16 +1,16 @@
 import { BrowserWindow, app, screen } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { registerFaProjectOsOpenMainWindow } from 'app/src-electron/mainScripts/projectManagement/faProjectOsOpenDelivery'
-import { applyFaSpellCheckerLanguagesToSession } from 'app/src-electron/mainScripts/windowManagement/faSpellCheckerSession'
-import { registerFaMainWindowWebContentsSessionReset } from 'app/src-electron/mainScripts/windowManagement/faMainWindowWebContentsSessionReset'
-import { setupSpellChecker } from 'app/src-electron/mainScripts/windowManagement/spellChecker'
+import { registerFaProjectOsOpenMainWindow } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
+import { applyFaSpellCheckerLanguagesToSession } from 'app/src-electron/mainScripts/windowManagement/faSpellCheckerSessionWiring'
+import { registerFaMainWindowWebContentsSessionReset } from 'app/src-electron/mainScripts/windowManagement/faMainWindowWebContentsSessionResetWiring'
+import { setupSpellChecker } from 'app/src-electron/mainScripts/windowManagement/spellCheckerWiring'
 import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettings_manager'
 
 export let appWindow: BrowserWindow | undefined
 
 /**
- * Assigns the module-level main window reference (Vitest only; production startup uses mainWindowCreation).
+ * Assigns the module-level main window reference (Vitest only; production startup uses mainWindowCreationWiring).
  */
 export function assignAppWindowRefForTesting (next: BrowserWindow | undefined): void {
   appWindow = next

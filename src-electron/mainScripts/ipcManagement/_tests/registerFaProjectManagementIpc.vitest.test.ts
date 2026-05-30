@@ -57,19 +57,19 @@ vi.mock('electron', () => {
   }
 })
 
-vi.mock('app/src-electron/mainScripts/projectManagement/faProjectCreateRun', () => {
+vi.mock('app/src-electron/mainScripts/projectManagement/faProjectCreateRunWiring', () => {
   return {
     runFaProjectCreateFromIpc: runCreateMock
   }
 })
 
-vi.mock('app/src-electron/mainScripts/projectManagement/faProjectOpenRun', () => {
+vi.mock('app/src-electron/mainScripts/projectManagement/faProjectOpenRunWiring', () => {
   return {
     runFaProjectOpenFromIpc: runOpenMock
   }
 })
 
-vi.mock('app/src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected', () => {
+vi.mock('app/src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnectedWiring', () => {
   return {
     readMirroredActiveProjectFilePathSync: readMirroredActiveProjectFilePathSyncMock,
     runWithFaProjectDatabaseForIpcAsync: async (
@@ -81,14 +81,14 @@ vi.mock('app/src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureC
   }
 })
 
-vi.mock('app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase', () => {
+vi.mock('app/src-electron/mainScripts/projectManagement/faProjectActiveDatabaseWiring', () => {
   return {
     closeFaProjectActiveDatabase: closeActiveMock,
     getFaProjectActiveDatabase: () => getFaProjectActiveDbMock()
   }
 })
 
-vi.mock('app/src-electron/mainScripts/projectManagement/faRecentProjectListRuntime', () => {
+vi.mock('app/src-electron/mainScripts/projectManagement/faRecentProjectListRuntimeWiring', () => {
   return {
     getRecentProjectsSnapshot: getRecentSnapshotMock,
     recordRecentProjectEntry: recordRecentProjectEntryMock,
@@ -97,7 +97,7 @@ vi.mock('app/src-electron/mainScripts/projectManagement/faRecentProjectListRunti
 })
 
 vi.mock(
-  'app/src-electron/mainScripts/projectManagement/faProjectNoteboardPersist',
+  'app/src-electron/mainScripts/projectManagement/faProjectNoteboardPersistWiring',
   () => {
     return {
       readFaProjectNoteboardRoot: readProjectNoteboardRootMock,
@@ -107,7 +107,7 @@ vi.mock(
 )
 
 vi.mock(
-  'app/src-electron/mainScripts/projectManagement/faProjectStylingPersist',
+  'app/src-electron/mainScripts/projectManagement/faProjectStylingPersistWiring',
   () => {
     return {
       readFaProjectStylingRoot: readProjectStylingRootMock,
@@ -117,7 +117,7 @@ vi.mock(
 )
 
 vi.mock(
-  'app/src-electron/mainScripts/projectManagement/faProjectSettingsPersist',
+  'app/src-electron/mainScripts/projectManagement/faProjectSettingsPersistWiring',
   () => {
     return {
       readFaProjectSettingsRoot: readProjectSettingsRootMock,

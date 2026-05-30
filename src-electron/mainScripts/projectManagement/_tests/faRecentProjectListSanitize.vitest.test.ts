@@ -19,7 +19,7 @@ vi.mock('node:fs', () => {
 import {
   faRecentProjectsListsEqual,
   faRecentProjectsSanitizeForPersistence
-} from '../faRecentProjectListSanitize'
+} from '../faRecentProjectListSanitizeWiring'
 
 beforeEach(() => {
   fsMock.existsSync.mockReset()

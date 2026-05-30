@@ -34,26 +34,22 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc',
   windowFromIpcEvent: windowFromIpcEventMock
 }))
 
-vi.mock('app/src-electron/mainScripts/windowManagement/mainWindowCreation', () => ({
+vi.mock('app/src-electron/mainScripts/windowManagement/windowManagement_manager', () => ({
   appWindow: undefined
 }))
 
-vi.mock('app/src-electron/mainScripts/appConfig/faAppConfigIpcRunExportToFileDialog', () => ({
-  runExportAppConfigToFile: runExportMock
-}))
+vi.mock('app/src-electron/mainScripts/appConfig/appConfig_manager', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('app/src-electron/mainScripts/appConfig/appConfig_manager')>()
 
-vi.mock('app/src-electron/mainScripts/appConfig/faAppConfigIpcRunPrepareImportFromFile', () => ({
-  runPrepareImportFromFaconfigFilePath: runPrepareFromPathMock
-}))
-
-vi.mock('app/src-electron/mainScripts/appConfig/faAppConfigIpcRunApplyStagedImport', () => ({
-  runApplyStagedAppConfigImport: runApplyMock
-}))
-
-vi.mock('app/src-electron/mainScripts/appConfig/faAppConfigE2ePathOverride', () => ({
-  installFaAppConfigE2ePathOverrideGlobals: installE2eAppConfigGlobalsMock,
-  takeNextE2eAppConfigImportPath: takeNextE2eAppConfigImportPathMock
-}))
+  return {
+    ...actual,
+    installFaAppConfigE2ePathOverrideGlobals: installE2eAppConfigGlobalsMock,
+    runApplyStagedAppConfigImport: runApplyMock,
+    runExportAppConfigToFile: runExportMock,
+    runPrepareImportFromFaconfigFilePath: runPrepareFromPathMock,
+    takeNextE2eAppConfigImportPath: takeNextE2eAppConfigImportPathMock
+  }
+})
 
 beforeEach(() => {
   vi.resetModules()
@@ -245,7 +241,7 @@ test('Test that applyImportAsync handler throws when apply flags are not boolean
 test('Test that disposeImportSessionAsync handler deletes the session when id is a non-empty string', async () => {
   const { registerFaAppConfigIpc } = await import('../registerFaAppConfigIpc')
   const { faAppConfigImportStagedSessions } = await import(
-    'app/src-electron/mainScripts/appConfig/faAppConfigImportStagedState'
+    'app/src-electron/mainScripts/appConfig/appConfig_manager'
   )
   registerFaAppConfigIpc()
   faAppConfigImportStagedSessions.set('z', {
@@ -266,7 +262,7 @@ test('Test that disposeImportSessionAsync handler deletes the session when id is
 test('Test that disposeImportSessionAsync is a no-op for empty and non-string session ids', async () => {
   const { registerFaAppConfigIpc } = await import('../registerFaAppConfigIpc')
   const { faAppConfigImportStagedSessions } = await import(
-    'app/src-electron/mainScripts/appConfig/faAppConfigImportStagedState'
+    'app/src-electron/mainScripts/appConfig/appConfig_manager'
   )
   registerFaAppConfigIpc()
   faAppConfigImportStagedSessions.set('keep', {

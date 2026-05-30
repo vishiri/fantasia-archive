@@ -49,7 +49,7 @@ vi.mock('app/src-electron/mainScripts/userSettings/userSettings_manager', () => 
   }
 })
 
-vi.mock('app/src-electron/mainScripts/windowManagement/mainWindowCreation', () => {
+vi.mock('app/src-electron/mainScripts/windowManagement/windowManagement_manager', () => {
   return {
     get appWindow () {
       return mainWindowExportState.appWindow
@@ -57,7 +57,7 @@ vi.mock('app/src-electron/mainScripts/windowManagement/mainWindowCreation', () =
   }
 })
 
-vi.mock('app/src-electron/mainScripts/windowManagement/faSpellCheckerSession', () => {
+vi.mock('app/src-electron/mainScripts/windowManagement/faSpellCheckerSessionWiring', () => {
   return {
     applyFaSpellCheckerLanguagesToSession: applyFaSpellCheckerLanguagesToSessionMock
   }

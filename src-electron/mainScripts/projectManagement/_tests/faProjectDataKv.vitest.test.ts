@@ -1,6 +1,6 @@
 import { expect, test, vi } from 'vitest'
 
-import { readFaProjectDataKv, upsertFaProjectDataKv } from '../faProjectDataKv'
+import { readFaProjectDataKv, upsertFaProjectDataKv } from '../faProjectDataKvWiring'
 
 /**
  * upsertFaProjectDataKv

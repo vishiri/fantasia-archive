@@ -4,11 +4,11 @@ import { Result } from 'neverthrow'
 import {
   openFaProjectDatabase,
   replaceFaProjectActiveDatabase
-} from 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase'
+} from 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabaseWiring'
 import {
   applyFaProjectMigrations,
   assertFaProjectDatabaseQuickCheck
-} from 'app/src-electron/mainScripts/projectManagement/faProjectDbMigrate'
+} from 'app/src-electron/mainScripts/projectManagement/faProjectDbMigrateWiring'
 import { faDisplayNameFallbackFromProjectPath } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
 
 function closeAttemptDb (db: Database | null): void {

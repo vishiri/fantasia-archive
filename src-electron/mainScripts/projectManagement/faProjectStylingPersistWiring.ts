@@ -1,11 +1,11 @@
 import type Database from 'better-sqlite3'
 
 import type { I_faProjectStylingPatch, I_faProjectStylingRoot } from 'app/types/I_faProjectStylingDomain'
-import { FA_PROJECT_DATA_TABLE_NAME } from './faProjectDatabaseConstants'
+import { FA_PROJECT_DATA_TABLE_NAME } from './projectManagement_managerDefaults'
 import {
   readFaProjectDataKv,
   upsertFaProjectDataKv
-} from './faProjectDataKv'
+} from './faProjectDataKvWiring'
 import { parseFaProjectOverlayFinitePx } from './functions/faProjectOverlayFinitePx'
 
 const FA_PROJECT_STYLING_KV_KEYS = {

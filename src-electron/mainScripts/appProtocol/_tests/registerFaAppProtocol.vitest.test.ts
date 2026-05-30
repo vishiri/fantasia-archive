@@ -65,7 +65,7 @@ beforeEach(async () => {
  * Registers the 'app' scheme as privileged with secure / standard / fetch / cors / stream privileges.
  */
 test('Test that registerFaAppProtocolAsPrivileged registers app scheme with secure privileged flags', async () => {
-  const mod = await import('../registerFaAppProtocol')
+  const mod = await import('../registerFaAppProtocolWiring')
   mod.registerFaAppProtocolAsPrivileged()
 
   expect(protocolRegisterSchemesAsPrivilegedMock).toHaveBeenCalledTimes(1)
@@ -88,7 +88,7 @@ test('Test that registerFaAppProtocolAsPrivileged registers app scheme with secu
  * Idempotent: calling twice still only registers once.
  */
 test('Test that registerFaAppProtocolAsPrivileged is idempotent', async () => {
-  const mod = await import('../registerFaAppProtocol')
+  const mod = await import('../registerFaAppProtocolWiring')
   mod.registerFaAppProtocolAsPrivileged()
   mod.registerFaAppProtocolAsPrivileged()
 
@@ -100,7 +100,7 @@ test('Test that registerFaAppProtocolAsPrivileged is idempotent', async () => {
  * Registers a handler for the 'app' scheme exactly once.
  */
 test('Test that installFaAppProtocolHandler installs the app scheme handler once', async () => {
-  const mod = await import('../registerFaAppProtocol')
+  const mod = await import('../registerFaAppProtocolWiring')
   mod.installFaAppProtocolHandler()
   mod.installFaAppProtocolHandler()
 
@@ -113,7 +113,7 @@ test('Test that installFaAppProtocolHandler installs the app scheme handler once
  * Forwards normal in-root requests to net.fetch using a 'file://' URL.
  */
 test('Test that installFaAppProtocolHandler forwards in-root requests to net.fetch', async () => {
-  const mod = await import('../registerFaAppProtocol')
+  const mod = await import('../registerFaAppProtocolWiring')
   mod.installFaAppProtocolHandler()
 
   const handler = protocolHandleMock.mock.calls[0]?.[1] as (request: { url: string }) => Promise<Response>
@@ -134,7 +134,7 @@ test('Test that installFaAppProtocolHandler forwards in-root requests to net.fet
  * Returns 403 for path traversal attempts that escape the renderer root.
  */
 test('Test that installFaAppProtocolHandler refuses traversal outside renderer root', async () => {
-  const mod = await import('../registerFaAppProtocol')
+  const mod = await import('../registerFaAppProtocolWiring')
   mod.installFaAppProtocolHandler()
 
   const handler = protocolHandleMock.mock.calls[0]?.[1] as (request: { url: string }) => Promise<Response>
@@ -151,7 +151,7 @@ test('Test that installFaAppProtocolHandler refuses traversal outside renderer r
  * Defaults to serving index.html when the URL has no pathname.
  */
 test('Test that installFaAppProtocolHandler defaults missing pathname to index.html', async () => {
-  const mod = await import('../registerFaAppProtocol')
+  const mod = await import('../registerFaAppProtocolWiring')
   mod.installFaAppProtocolHandler()
 
   const handler = protocolHandleMock.mock.calls[0]?.[1] as (request: { url: string }) => Promise<Response>
@@ -166,7 +166,7 @@ test('Test that installFaAppProtocolHandler defaults missing pathname to index.h
  * Registers privileges immediately and installs the handler once 'app.whenReady()' resolves.
  */
 test('Test that setupFaAppProtocol registers privileges immediately and installs handler after whenReady', async () => {
-  const mod = await import('../registerFaAppProtocol')
+  const mod = await import('../registerFaAppProtocolWiring')
   mod.setupFaAppProtocol()
 
   expect(protocolRegisterSchemesAsPrivilegedMock).toHaveBeenCalledTimes(1)
@@ -189,7 +189,7 @@ test('Test that setupFaAppProtocol logs an error if whenReady rejects', async ()
 
   const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-  const mod = await import('../registerFaAppProtocol')
+  const mod = await import('../registerFaAppProtocolWiring')
   mod.setupFaAppProtocol()
 
   await new Promise<void>((resolve) => { setImmediate(resolve) })

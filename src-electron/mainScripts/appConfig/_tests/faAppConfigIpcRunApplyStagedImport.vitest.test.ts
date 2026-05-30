@@ -2,8 +2,8 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appNoteboard/appNoteboard_managerDefaults'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
-import { faAppConfigImportStagedSessions } from 'app/src-electron/mainScripts/appConfig/faAppConfigImportStagedState'
-import { runApplyStagedAppConfigImport } from '../faAppConfigIpcRunApplyStagedImport'
+import { faAppConfigImportStagedSessions } from 'app/src-electron/mainScripts/appConfig/faAppConfigImportStagedStateWiring'
+import { runApplyStagedAppConfigImport } from '../faAppConfigIpcRunApplyStagedImportWiring'
 
 const {
   applySpellMock,
@@ -39,11 +39,11 @@ vi.mock('app/src-electron/mainScripts/appStyling/appStyling_manager', () => ({
   getFaAppStyling: getFaAppStylingMock
 }))
 
-vi.mock('app/src-electron/mainScripts/windowManagement/faSpellCheckerSession', () => ({
+vi.mock('app/src-electron/mainScripts/windowManagement/faSpellCheckerSessionWiring', () => ({
   applyFaSpellCheckerLanguagesToSession: applySpellMock
 }))
 
-vi.mock('app/src-electron/mainScripts/windowManagement/mainWindowCreation', () => ({
+vi.mock('app/src-electron/mainScripts/windowManagement/windowManagement_manager', () => ({
   appWindow: { webContents: { session: {} } }
 }))
 

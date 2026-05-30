@@ -7,12 +7,12 @@ import {
 import {
   getFaProjectActiveDatabase,
   getFaProjectLastKnownActiveProjectFilePath
-} from './faProjectActiveDatabase'
+} from './faProjectActiveDatabaseWiring'
 import {
   readFaProjectStoredDisplayName,
   readFaProjectStoredProjectUuid
-} from './faProjectDbMigrate'
-import { recordRecentProjectEntry } from './faRecentProjectListRuntime'
+} from './faProjectDbMigrateWiring'
+import { recordRecentProjectEntry } from './faRecentProjectListRuntimeWiring'
 
 /**
  * Thrown when the file represents the same logical project (same project_uuid) as the already active database.

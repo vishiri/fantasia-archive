@@ -84,11 +84,11 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc',
   }
 })
 
-vi.mock('app/src-electron/mainScripts/windowManagement/mainWindowCreation', () => {
+vi.mock('app/src-electron/mainScripts/windowManagement/windowManagement_manager', () => {
   return mainWindowExports
 })
 
-vi.mock('../faProjectActiveDatabase', () => {
+vi.mock('../faProjectActiveDatabaseWiring', () => {
   return {
     getFaProjectActiveDatabase: getActiveDbMock,
     getFaProjectLastKnownActiveProjectFilePath: getLastKnownPathMock,
@@ -97,7 +97,7 @@ vi.mock('../faProjectActiveDatabase', () => {
   }
 })
 
-vi.mock('../faProjectDbMigrate', () => {
+vi.mock('../faProjectDbMigrateWiring', () => {
   return {
     applyFaProjectMigrations: applyMigrationsMock,
     assertFaProjectDatabaseQuickCheck: quickCheckMock,
@@ -106,23 +106,22 @@ vi.mock('../faProjectDbMigrate', () => {
   }
 })
 
-vi.mock('../projectManagement_manager', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../projectManagement_manager')>()
-
-  return {
-    ...actual,
+vi.mock('../projectManagementE2ePathRuntime', () => ({
+  createProjectManagementE2ePathRuntime: vi.fn(() => ({
+    installFaProjectManagementE2ePathOverrideGlobals: vi.fn(),
+    takeNextE2eProjectCreatePath: vi.fn(() => null),
     takeNextE2eProjectOpenPath: takeE2eOpenMock
-  }
-})
+  }))
+}))
 
-vi.mock('../faRecentProjectListRuntime', () => {
+vi.mock('../faRecentProjectListRuntimeWiring', () => {
   return {
     recordRecentProjectEntry: recordRecentMock,
     removeRecentProjectEntryByPath: removeRecentMock
   }
 })
 
-import { runFaProjectOpenFromIpc } from '../faProjectOpenRun'
+import { runFaProjectOpenFromIpc } from '../faProjectOpenRunWiring'
 
 beforeEach(() => {
   windowDialogState.attachWindow = true

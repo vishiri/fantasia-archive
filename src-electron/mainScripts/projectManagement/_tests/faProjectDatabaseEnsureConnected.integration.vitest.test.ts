@@ -9,16 +9,16 @@ import {
   closeFaProjectActiveDatabaseHandleOnly,
   getFaProjectActiveDatabase,
   getFaProjectLastKnownActiveProjectFilePath
-} from '../faProjectActiveDatabase'
-import { runWithFaProjectDatabaseForIpcAsync, runWithFaProjectDatabaseSync } from '../faProjectDatabaseEnsureConnected'
-import { reconnectFaProjectDatabaseAtKnownPathSync } from '../faProjectReconnectAtKnownPath'
+} from '../faProjectActiveDatabaseWiring'
+import { runWithFaProjectDatabaseForIpcAsync, runWithFaProjectDatabaseSync } from '../faProjectDatabaseEnsureConnectedWiring'
+import { reconnectFaProjectDatabaseAtKnownPathSync } from '../faProjectReconnectAtKnownPathWiring'
 
 const requestPathMock = vi.hoisted(() => vi.fn(async (): Promise<string | null> => null))
 const applyMigrationsMock = vi.hoisted(() => vi.fn())
 const quickCheckMock = vi.hoisted(() => vi.fn())
 const BetterSqlite3Mock = vi.hoisted(() => vi.fn())
 
-vi.mock('app/src-electron/mainScripts/ipcManagement/faProjectFailsafePathFromRenderer', () => {
+vi.mock('app/src-electron/mainScripts/ipcManagement/faProjectFailsafePathFromRendererWiring', () => {
   return {
     requestRendererActiveProjectPathForFailsafe: requestPathMock
   }
@@ -30,8 +30,8 @@ vi.mock('better-sqlite3', () => {
   }
 })
 
-vi.mock('../faProjectDbMigrate', async (importOriginal) => {
-  const mod = await importOriginal<typeof import('../faProjectDbMigrate')>()
+vi.mock('../faProjectDbMigrateWiring', async (importOriginal) => {
+  const mod = await importOriginal<typeof import('../faProjectDbMigrateWiring')>()
   return {
     ...mod,
     applyFaProjectMigrations: applyMigrationsMock,

@@ -2,15 +2,15 @@ import { cleanupFaKeybinds, getFaKeybinds } from 'app/src-electron/mainScripts/k
 import {
   faAppConfigImportStagedSessions,
   purgeFaAppConfigStagedImportSessionsExpired
-} from 'app/src-electron/mainScripts/appConfig/faAppConfigImportStagedState'
+} from 'app/src-electron/mainScripts/appConfig/faAppConfigImportStagedStateWiring'
 import {
   cleanupFaAppNoteboard,
   getFaAppNoteboard
 } from 'app/src-electron/mainScripts/appNoteboard/appNoteboard_manager'
 import { cleanupFaAppStyling, getFaAppStyling } from 'app/src-electron/mainScripts/appStyling/appStyling_manager'
 import { cleanupFaUserSettings, getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettings_manager'
-import { applyFaSpellCheckerLanguagesToSession } from 'app/src-electron/mainScripts/windowManagement/faSpellCheckerSession'
-import { appWindow } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
+import { applyFaSpellCheckerLanguagesToSession } from 'app/src-electron/mainScripts/windowManagement/faSpellCheckerSessionWiring'
+import { appWindow } from 'app/src-electron/mainScripts/windowManagement/windowManagement_manager'
 import type { I_faAppConfigApplyInput, I_faAppConfigApplyResult } from 'app/types/I_faAppConfigDomain'
 
 /**

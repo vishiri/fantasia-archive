@@ -4,7 +4,7 @@ import {
   deleteFaProjectNoteboardFrameKv,
   readFaProjectNoteboardRoot,
   upsertFaProjectNoteboardKv
-} from '../faProjectNoteboardPersist'
+} from '../faProjectNoteboardPersistWiring'
 
 interface I_kvBackedDb {
   db: {

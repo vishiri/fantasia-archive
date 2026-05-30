@@ -3,10 +3,10 @@ import { suppressChromiumDevtoolsAutofillStderrNoise } from 'app/src-electron/ma
 suppressChromiumDevtoolsAutofillStderrNoise()
 
 import { fixAppName } from 'app/src-electron/mainScripts/appIdentity/appIdentity_manager'
-import { installFaProjectOsOpenListeners } from 'app/src-electron/mainScripts/projectManagement/faProjectOsOpenDelivery'
+import { installFaProjectOsOpenListeners } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
 import { windowsDevToolsExtensionsFix } from 'app/src-electron/mainScripts/chromiumFixes/chromiumFixes_manager'
 import { startApp, openAppWindowManager, closeAppManager } from 'app/src-electron/mainScripts/appManagement'
-import { setupFaAppProtocol } from 'app/src-electron/mainScripts/appProtocol/registerFaAppProtocol'
+import { setupFaAppProtocol } from 'app/src-electron/mainScripts/appProtocol/appProtocol_manager'
 import { tweakMenuRemover, tweakRetriveOS } from 'app/src-electron/mainScripts/nativeShell/nativeShell_manager'
 
 // Determines what platform the app is running on

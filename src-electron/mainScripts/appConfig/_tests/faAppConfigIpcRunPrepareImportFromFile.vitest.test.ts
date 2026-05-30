@@ -1,11 +1,11 @@
 import { strToU8, zipSync } from 'fflate'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
-import { faAppConfigImportStagedSessions } from 'app/src-electron/mainScripts/appConfig/faAppConfigImportStagedState'
+import { faAppConfigImportStagedSessions } from 'app/src-electron/mainScripts/appConfig/faAppConfigImportStagedStateWiring'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import { FA_APP_CONFIG_INNER } from 'app/src-electron/shared/faAppConfigConstants'
-import * as appConfigBundle from '../faAppConfigBundle'
-import { runPrepareImportFromFaconfigFilePath } from '../faAppConfigIpcRunPrepareImportFromFile'
+import * as appConfigBundle from '../faAppConfigBundleWiring'
+import { runPrepareImportFromFaconfigFilePath } from '../faAppConfigIpcRunPrepareImportFromFileWiring'
 
 /** Caught as non-Error in prepare catch for branch coverage. */
 class SyntheticUnzipMockFailure {}

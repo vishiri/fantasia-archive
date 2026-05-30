@@ -3,8 +3,8 @@ import path from 'node:path'
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appNoteboard/appNoteboard_managerDefaults'
-import * as appConfigBundle from '../faAppConfigBundle'
-import { runExportAppConfigToFile } from '../faAppConfigIpcRunExportToFileDialog'
+import * as appConfigBundle from '../faAppConfigBundleWiring'
+import { runExportAppConfigToFile } from '../faAppConfigIpcRunExportToFileDialogWiring'
 
 /** Caught as non-Error to cover `e instanceof Error` false in the export catch. */
 class SyntheticZipMockFailure {}
@@ -60,11 +60,11 @@ vi.mock('app/src-electron/mainScripts/appStyling/appStyling_manager', () => ({
   getFaAppStyling: getFaAppStylingMock
 }))
 
-vi.mock('app/src-electron/mainScripts/windowManagement/mainWindowCreation', () => ({
+vi.mock('app/src-electron/mainScripts/windowManagement/windowManagement_manager', () => ({
   appWindow: undefined
 }))
 
-vi.mock('app/src-electron/mainScripts/appConfig/faAppConfigE2ePathOverride', () => ({
+vi.mock('app/src-electron/mainScripts/appConfig/faAppConfigE2ePathOverrideWiring', () => ({
   takeNextE2eAppConfigExportPath: () => takeNextE2eAppConfigExportPathMock()
 }))
 

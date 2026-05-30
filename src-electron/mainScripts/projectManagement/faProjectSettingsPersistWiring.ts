@@ -4,11 +4,11 @@ import type {
   I_faProjectSettingsPatch,
   I_faProjectSettingsRoot
 } from 'app/types/I_faProjectSettingsDomain'
-import { readFaProjectStoredDisplayName } from './faProjectDbMigrate'
+import { readFaProjectStoredDisplayName } from './faProjectDbMigrateWiring'
 import {
   readFaProjectDataKv,
   upsertFaProjectDataKv
-} from './faProjectDataKv'
+} from './faProjectDataKvWiring'
 
 const FA_PROJECT_SETTINGS_KV_PROJECT_NAME = 'project_name'
 

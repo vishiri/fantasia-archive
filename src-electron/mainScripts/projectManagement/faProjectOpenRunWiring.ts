@@ -14,26 +14,26 @@ import {
 import {
   buildFaProjectIdempotentOpenResult,
   FaProjectOpenRejectedAlreadyActiveError
-} from './faProjectOpenAlreadyActive'
+} from './faProjectOpenAlreadyActiveWiring'
 import {
   getFaProjectActiveDatabase,
   openFaProjectDatabase,
   replaceFaProjectActiveDatabase
-} from './faProjectActiveDatabase'
+} from './faProjectActiveDatabaseWiring'
 import {
   applyFaProjectMigrations,
   assertFaProjectDatabaseQuickCheck,
   readFaProjectStoredDisplayName,
   readFaProjectStoredProjectUuid
-} from './faProjectDbMigrate'
+} from './faProjectDbMigrateWiring'
 import {
   faDisplayNameFallbackFromProjectPath
 } from './projectManagement_manager'
-import { resolveFaProjectOpenTargetPath } from './faProjectOpenResolveTargetPath'
+import { resolveFaProjectOpenTargetPath } from './faProjectOpenResolveTargetPathWiring'
 import {
   recordRecentProjectEntry,
   removeRecentProjectEntryByPath
-} from './faRecentProjectListRuntime'
+} from './faRecentProjectListRuntimeWiring'
 
 function normalizeFaProjectOpenFailure (e: unknown): Error {
   if (e instanceof Error) {

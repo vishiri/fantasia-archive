@@ -1,6 +1,6 @@
 import { expect, test, vi } from 'vitest'
 
-import { applyFaSpellCheckerLanguagesToSession } from '../faSpellCheckerSession'
+import { applyFaSpellCheckerLanguagesToSession } from '../faSpellCheckerSessionWiring'
 
 /**
  * applyFaSpellCheckerLanguagesToSession

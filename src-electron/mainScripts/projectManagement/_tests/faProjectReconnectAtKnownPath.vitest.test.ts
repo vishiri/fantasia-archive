@@ -7,8 +7,8 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import {
   closeFaProjectActiveDatabase,
   getFaProjectActiveDatabase
-} from '../faProjectActiveDatabase'
-import { reconnectFaProjectDatabaseAtKnownPathSync } from '../faProjectReconnectAtKnownPath'
+} from '../faProjectActiveDatabaseWiring'
+import { reconnectFaProjectDatabaseAtKnownPathSync } from '../faProjectReconnectAtKnownPathWiring'
 
 const applyMigrationsMock = vi.hoisted(() => vi.fn())
 const quickCheckMock = vi.hoisted(() => vi.fn())
@@ -20,8 +20,8 @@ vi.mock('better-sqlite3', () => {
   }
 })
 
-vi.mock('../faProjectDbMigrate', async (importOriginal) => {
-  const mod = await importOriginal<typeof import('../faProjectDbMigrate')>()
+vi.mock('../faProjectDbMigrateWiring', async (importOriginal) => {
+  const mod = await importOriginal<typeof import('../faProjectDbMigrateWiring')>()
   return {
     ...mod,
     applyFaProjectMigrations: applyMigrationsMock,

@@ -1,8 +1,8 @@
 import { readFile, stat } from 'node:fs/promises'
 import { Result, ResultAsync } from 'neverthrow'
 
-import { unzipAppConfigBundle } from 'app/src-electron/mainScripts/appConfig/faAppConfigBundle'
-import { tryStageAppImportFromUnzippedEntries } from 'app/src-electron/mainScripts/appConfig/faAppConfigStageImportFromEntries'
+import { unzipAppConfigBundle } from 'app/src-electron/mainScripts/appConfig/faAppConfigBundleWiring'
+import { tryStageAppImportFromUnzippedEntries } from 'app/src-electron/mainScripts/appConfig/faAppConfigStageImportFromEntriesWiring'
 import { FA_APP_CONFIG_MAX_FILE_BYTES } from 'app/src-electron/shared/faAppConfigConstants'
 import type { I_faAppConfigPrepareResult } from 'app/types/I_faAppConfigDomain'
 

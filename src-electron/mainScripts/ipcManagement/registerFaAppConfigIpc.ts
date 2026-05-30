@@ -5,18 +5,16 @@ import { FA_APP_CONFIG_IPC } from 'app/src-electron/electron-ipc-bridge'
 import { windowFromIpcEvent } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
 import {
   faAppConfigImportStagedSessions,
-  pathLooksLikeFaconfigFile,
-  purgeFaAppConfigStagedImportSessionsExpired
-} from 'app/src-electron/mainScripts/appConfig/faAppConfigImportStagedState'
-import { getFaAppConfigImportOpenDefaultPath } from 'app/src-electron/mainScripts/appConfig/faAppConfigFileDialogDefaultPaths'
-import {
+  getFaAppConfigImportOpenDefaultPath,
   installFaAppConfigE2ePathOverrideGlobals,
+  pathLooksLikeFaconfigFile,
+  purgeFaAppConfigStagedImportSessionsExpired,
+  runApplyStagedAppConfigImport,
+  runExportAppConfigToFile,
+  runPrepareImportFromFaconfigFilePath,
   takeNextE2eAppConfigImportPath
-} from 'app/src-electron/mainScripts/appConfig/faAppConfigE2ePathOverride'
-import { runApplyStagedAppConfigImport } from 'app/src-electron/mainScripts/appConfig/faAppConfigIpcRunApplyStagedImport'
-import { runExportAppConfigToFile } from 'app/src-electron/mainScripts/appConfig/faAppConfigIpcRunExportToFileDialog'
-import { runPrepareImportFromFaconfigFilePath } from 'app/src-electron/mainScripts/appConfig/faAppConfigIpcRunPrepareImportFromFile'
-import { appWindow } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
+} from 'app/src-electron/mainScripts/appConfig/appConfig_manager'
+import { appWindow } from 'app/src-electron/mainScripts/windowManagement/windowManagement_manager'
 import {
   parseFaAppConfigApplyInput,
   parseFaAppConfigExportOptions

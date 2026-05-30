@@ -2,23 +2,19 @@ import { app, ipcMain } from 'electron'
 
 import { FA_PROJECT_MANAGEMENT_IPC } from 'app/src-electron/electron-ipc-bridge'
 import { registerFaProjectManagementProjectSettingsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProjectManagementProjectSettingsIpc'
-import { closeFaProjectActiveDatabase } from 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase'
-import { runWithFaProjectDatabaseForIpcAsync } from 'app/src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected'
-import { runFaProjectCreateFromIpc } from 'app/src-electron/mainScripts/projectManagement/faProjectCreateRun'
-import { installFaProjectManagementE2ePathOverrideGlobals } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
-import { runFaProjectOpenFromIpc } from 'app/src-electron/mainScripts/projectManagement/faProjectOpenRun'
 import {
-  readFaProjectNoteboardRoot,
-  upsertFaProjectNoteboardKv
-} from 'app/src-electron/mainScripts/projectManagement/faProjectNoteboardPersist'
-import {
-  readFaProjectStylingRoot,
-  upsertFaProjectStylingKv
-} from 'app/src-electron/mainScripts/projectManagement/faProjectStylingPersist'
-import {
+  closeFaProjectActiveDatabase,
   getRecentProjectsSnapshot,
-  resolveRecentProjectMruHeadForOpen
-} from 'app/src-electron/mainScripts/projectManagement/faRecentProjectListRuntime'
+  installFaProjectManagementE2ePathOverrideGlobals,
+  readFaProjectNoteboardRoot,
+  readFaProjectStylingRoot,
+  resolveRecentProjectMruHeadForOpen,
+  runFaProjectCreateFromIpc,
+  runFaProjectOpenFromIpc,
+  runWithFaProjectDatabaseForIpcAsync,
+  upsertFaProjectNoteboardKv,
+  upsertFaProjectStylingKv
+} from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
 import { parseFaProjectNoteboardPatch } from 'app/src-electron/shared/faProjectNoteboardPatchSchema'
 import { parseFaProjectStylingPatch } from 'app/src-electron/shared/faProjectStylingPatchSchema'
 import type {

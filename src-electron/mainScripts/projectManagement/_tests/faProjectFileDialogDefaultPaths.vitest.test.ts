@@ -27,7 +27,7 @@ vi.mock('electron', () => {
 import {
   faProjectSaveDialogDefaultDirectory,
   getFaProjectSaveDefaultPath
-} from '../faProjectFileDialogDefaultPaths'
+} from '../faProjectFileDialogDefaultPathsWiring'
 
 beforeEach(() => {
   getPathMock.mockClear()

@@ -1,7 +1,7 @@
 import type Database from 'better-sqlite3'
 import { v4 as uuidv4, validate as validateUuid } from 'uuid'
 
-import { FA_PROJECT_DATA_TABLE_NAME } from './faProjectDatabaseConstants'
+import { FA_PROJECT_DATA_TABLE_NAME } from './projectManagement_managerDefaults'
 
 const OPTION_PROJECT_NAME = 'project_name'
 const OPTION_PROJECT_UUID = 'project_uuid'

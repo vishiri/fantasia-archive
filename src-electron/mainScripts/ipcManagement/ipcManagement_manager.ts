@@ -1,0 +1,1 @@
+export { registerAllFaIpc } from './ipcManagementRegistrationWiring'

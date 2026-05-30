@@ -68,11 +68,11 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc',
   }
 })
 
-vi.mock('app/src-electron/mainScripts/windowManagement/mainWindowCreation', () => {
+vi.mock('app/src-electron/mainScripts/windowManagement/windowManagement_manager', () => {
   return mainWindowExports
 })
 
-vi.mock('../faProjectActiveDatabase', () => {
+vi.mock('../faProjectActiveDatabaseWiring', () => {
   return {
     openFaProjectDatabase: openDbMock,
     replaceFaProjectActiveDatabase: replaceMock,
@@ -80,7 +80,7 @@ vi.mock('../faProjectActiveDatabase', () => {
   }
 })
 
-vi.mock('../faProjectDbMigrate', () => {
+vi.mock('../faProjectDbMigrateWiring', () => {
   return {
     applyFaProjectMigrations: applyMigrationsMock,
     assertFaProjectDatabaseQuickCheck: quickCheckMock,
@@ -99,7 +99,7 @@ vi.mock('../projectManagement_manager', async (importOriginal) => {
 
 const recordRecentForCreateMock = vi.hoisted(() => vi.fn())
 
-vi.mock('../faRecentProjectListRuntime', () => {
+vi.mock('../faRecentProjectListRuntimeWiring', () => {
   return {
     recordRecentProjectEntry: recordRecentForCreateMock
   }
@@ -107,7 +107,7 @@ vi.mock('../faRecentProjectListRuntime', () => {
 
 import * as faProjectCreateInputModule from 'app/src-electron/shared/faProjectCreateInputSchema'
 
-import { runFaProjectCreateFromIpc } from '../faProjectCreateRun'
+import { runFaProjectCreateFromIpc } from '../faProjectCreateRunWiring'
 
 beforeEach(() => {
   windowDialogState.attachWindow = true

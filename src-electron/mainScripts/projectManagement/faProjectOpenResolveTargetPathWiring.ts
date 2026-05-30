@@ -5,12 +5,12 @@ import type { OpenDialogOptions } from 'electron'
 import { dialog } from 'electron'
 
 import { windowFromIpcEvent } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
-import { appWindow } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
+import { appWindow } from 'app/src-electron/mainScripts/windowManagement/windowManagement_manager'
 import { FA_PROJECT_FILE_EXTENSION } from 'app/src-electron/shared/faProjectConstants'
 import type { I_faProjectOpenInputParsed } from 'app/types/I_faProjectOpenInputParsed'
 import type { I_faProjectOpenResolveResult } from 'app/types/I_faProjectManagementElectronMain'
 
-import { faProjectSaveDialogDefaultDirectory } from './faProjectFileDialogDefaultPaths'
+import { faProjectSaveDialogDefaultDirectory } from './faProjectFileDialogDefaultPathsWiring'
 import { takeNextE2eProjectOpenPath } from './projectManagement_manager'
 import { pathLooksLikeFaProjectFile } from './projectManagement_manager'
 

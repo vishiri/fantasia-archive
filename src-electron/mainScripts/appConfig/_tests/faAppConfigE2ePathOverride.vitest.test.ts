@@ -6,7 +6,7 @@ import {
   installFaAppConfigE2ePathOverrideGlobals,
   takeNextE2eAppConfigImportPath,
   takeNextE2eAppConfigExportPath
-} from '../faAppConfigE2ePathOverride'
+} from '../faAppConfigE2ePathOverrideWiring'
 
 const originalTestEnv = process.env.TEST_ENV
 

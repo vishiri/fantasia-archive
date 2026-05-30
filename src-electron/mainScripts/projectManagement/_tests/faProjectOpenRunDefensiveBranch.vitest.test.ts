@@ -2,20 +2,20 @@ import { expect, test, vi } from 'vitest'
 
 const resolveMock = vi.hoisted(() => vi.fn())
 
-vi.mock('../faProjectOpenResolveTargetPath', () => {
+vi.mock('../faProjectOpenResolveTargetPathWiring', () => {
   return {
     resolveFaProjectOpenTargetPath: (...args: unknown[]) => resolveMock(...args)
   }
 })
 
-vi.mock('../faRecentProjectListRuntime', () => {
+vi.mock('../faRecentProjectListRuntimeWiring', () => {
   return {
     recordRecentProjectEntry: vi.fn(),
     removeRecentProjectEntryByPath: vi.fn()
   }
 })
 
-import { runFaProjectOpenFromIpc } from '../faProjectOpenRun'
+import { runFaProjectOpenFromIpc } from '../faProjectOpenRunWiring'
 
 test('Test that runFaProjectOpenFromIpc surfaces error when resolve omits filePath', async () => {
   resolveMock.mockResolvedValueOnce({ ipcExplicitPath: false })

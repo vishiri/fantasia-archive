@@ -5,7 +5,7 @@ import {
   assertFaProjectDatabaseQuickCheck,
   readFaProjectStoredDisplayName,
   readFaProjectStoredProjectUuid
-} from '../faProjectDbMigrate'
+} from '../faProjectDbMigrateWiring'
 
 test('applyFaProjectMigrations runs ddl when user_version is 0', () => {
   const run = vi.fn((fn: () => void) => {

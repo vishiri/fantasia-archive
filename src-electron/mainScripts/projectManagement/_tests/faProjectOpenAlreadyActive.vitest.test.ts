@@ -5,7 +5,7 @@ import { FA_PROJECT_OPEN_ERROR_NAME_ALREADY_ACTIVE } from 'app/types/I_faProject
 import {
   buildFaProjectIdempotentOpenResult,
   FaProjectOpenRejectedAlreadyActiveError
-} from '../faProjectOpenAlreadyActive'
+} from '../faProjectOpenAlreadyActiveWiring'
 
 const getActiveDbMock = vi.hoisted(() => vi.fn())
 const getLastKnownPathMock = vi.hoisted(() => vi.fn())
@@ -13,17 +13,17 @@ const readUuidMock = vi.hoisted(() => vi.fn())
 const readNameMock = vi.hoisted(() => vi.fn())
 const recordRecentMock = vi.hoisted(() => vi.fn())
 
-vi.mock('../faProjectActiveDatabase', () => ({
+vi.mock('../faProjectActiveDatabaseWiring', () => ({
   getFaProjectActiveDatabase: getActiveDbMock,
   getFaProjectLastKnownActiveProjectFilePath: getLastKnownPathMock
 }))
 
-vi.mock('../faProjectDbMigrate', () => ({
+vi.mock('../faProjectDbMigrateWiring', () => ({
   readFaProjectStoredDisplayName: readNameMock,
   readFaProjectStoredProjectUuid: readUuidMock
 }))
 
-vi.mock('../faRecentProjectListRuntime', () => ({
+vi.mock('../faRecentProjectListRuntimeWiring', () => ({
   recordRecentProjectEntry: recordRecentMock
 }))
 
@@ -40,7 +40,7 @@ beforeEach(() => {
 })
 
 /**
- * faProjectOpenAlreadyActive
+ * faProjectOpenAlreadyActiveWiring
  * buildFaProjectIdempotentOpenResult returns opened with idempotentReuse when main still has a handle.
  */
 test('Test that buildFaProjectIdempotentOpenResult returns idempotent opened when active db exists', () => {
@@ -53,7 +53,7 @@ test('Test that buildFaProjectIdempotentOpenResult returns idempotent opened whe
 })
 
 /**
- * faProjectOpenAlreadyActive
+ * faProjectOpenAlreadyActiveWiring
  * buildFaProjectIdempotentOpenResult falls back to ProjectAlreadyOpen error when handle is missing.
  */
 test('Test that buildFaProjectIdempotentOpenResult returns error when active db is missing', () => {
@@ -66,7 +66,7 @@ test('Test that buildFaProjectIdempotentOpenResult returns error when active db 
 })
 
 /**
- * faProjectOpenAlreadyActive
+ * faProjectOpenAlreadyActiveWiring
  * buildFaProjectIdempotentOpenResult uses the attempted path when main has no mirrored path yet.
  */
 test('Test that buildFaProjectIdempotentOpenResult prefers attempted path when mirrored path is empty', () => {

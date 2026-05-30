@@ -3,7 +3,7 @@ import type { WebContents } from 'electron'
 import type { Event as ElectronTypedEvent } from 'electron'
 import type { WebContentsDidStartNavigationEventParams } from 'electron'
 
-import { closeFaProjectActiveDatabase } from 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase'
+import { closeFaProjectActiveDatabase } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
 
 /**
  * Full renderer reloads (DevTools refresh, Control+F5, locale spellcheck reload) reset Pinia but the main

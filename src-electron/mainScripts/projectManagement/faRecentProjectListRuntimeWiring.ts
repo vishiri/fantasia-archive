@@ -10,7 +10,7 @@ import {
   faRecentProjectsListsEqual,
   faRecentProjectsSanitizeForPersistence,
   faRecentProjectsSanitizeStructural
-} from './faRecentProjectListSanitize'
+} from './faRecentProjectListSanitizeWiring'
 
 type I_faRecentProjectListFile = {
   recentProjects: I_faRecentProjectEntry[]

@@ -5,7 +5,7 @@ import type { SaveDialogOptions } from 'electron'
 import { dialog } from 'electron'
 import { Result } from 'neverthrow'
 import { windowFromIpcEvent } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
-import { appWindow } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
+import { appWindow } from 'app/src-electron/mainScripts/windowManagement/windowManagement_manager'
 import { parseFaProjectCreateInput } from 'app/src-electron/shared/faProjectCreateInputSchema'
 import { FA_PROJECT_FILE_EXTENSION } from 'app/src-electron/shared/faProjectConstants'
 import type { I_faProjectCreateResult, I_faProjectManagementActiveSnapshot } from 'app/types/I_faProjectManagementDomain'
@@ -14,21 +14,21 @@ import {
   openFaProjectDatabase,
   replaceFaProjectActiveDatabase,
   unlinkFaProjectFileIfExists
-} from './faProjectActiveDatabase'
+} from './faProjectActiveDatabaseWiring'
 import {
   applyFaProjectMigrations,
   assertFaProjectDatabaseQuickCheck,
   readFaProjectStoredProjectUuid
-} from './faProjectDbMigrate'
-import { getFaProjectSaveDefaultPath } from './faProjectFileDialogDefaultPaths'
+} from './faProjectDbMigrateWiring'
+import { getFaProjectSaveDefaultPath } from './faProjectFileDialogDefaultPathsWiring'
 import { takeNextE2eProjectCreatePath } from './projectManagement_manager'
 import {
   ensureFaProjectExtension,
   pathLooksLikeFaProjectFile
 } from './projectManagement_manager'
-import { faProjectCreateMapParseFailure } from './faProjectCreateIpcParseFailure'
+import { faProjectCreateMapParseFailure } from './faProjectCreateIpcParseFailureWiring'
 import { faProjectSlugFromDisplayName } from './projectManagement_manager'
-import { recordRecentProjectEntry } from './faRecentProjectListRuntime'
+import { recordRecentProjectEntry } from './faRecentProjectListRuntimeWiring'
 
 function buildSaveDialogOptions (defaultPath: string): SaveDialogOptions {
   return {

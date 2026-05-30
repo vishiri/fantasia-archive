@@ -8,7 +8,9 @@ import path from 'node:path'
 
 import {
   getFaTwoLevelFeatureRootFromVue,
+  getFaTwoLevelMainScriptsAreaFromFile,
   getFaTwoLevelScriptsDirFromFile,
+  isFaTwoLevelAllowedMainScriptsSiblingFile,
   isFaTwoLevelAllowedVueImportSource,
   isFaTwoLevelExcludedLintPath,
   isFaTwoLevelFunctionsFile,
@@ -124,7 +126,7 @@ const featureScriptsLayout = {
       return {}
     }
 
-    if (filename.includes('/scripts/_tests/')) {
+    if (filename.includes('/scripts/_tests/') || filename.includes('/_tests/')) {
       return {}
     }
 
@@ -146,6 +148,13 @@ const featureScriptsLayout = {
       return {}
     }
 
+    const mainScriptsArea = getFaTwoLevelMainScriptsAreaFromFile(filename)
+
+    if (mainScriptsArea !== null &&
+      isFaTwoLevelAllowedMainScriptsSiblingFile(filename, mainScriptsArea)) {
+      return {}
+    }
+
     if (!filename.startsWith(`${scriptsDir}/`) || !filename.endsWith('.ts')) {
       return {}
     }
@@ -154,7 +163,7 @@ const featureScriptsLayout = {
       Program (node) {
         context.report({
           node,
-          message: `Legacy script module is not allowed beside scripts/functions/. Move logic into functions/ and wire from a *_manager.ts file. ${FA_TWO_LEVEL_DOC}`
+          message: `Legacy script module is not allowed beside scripts/functions/ (or mainScripts/<area>/functions/). Move logic into functions/ and wire from a *_manager.ts or *Wiring.ts sibling. ${FA_TWO_LEVEL_DOC}`
         })
       }
     }

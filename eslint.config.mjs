@@ -31,7 +31,7 @@ const codeSizeRuleIgnores = [
   '.storybook-workspace/**',
   '**/quasar.config.ts',
   '**/quasar.config.js',
-  'scripts/**/*.mjs',
+  '.utility-scripts/**/*.mjs',
   'testRunner_*.mjs',
   '**/testRunner_*.mjs',
   '**/*_manager.ts',
@@ -100,7 +100,7 @@ export default [...neostandard({
     '**/test-results/**',
     '**/coverage/**',
     'eslint*.json',
-    'scripts/.eslint-report.json',
+    '.utility-scripts/.eslint-report.json',
     'quasar.config.*.temporary.compiled*'
   ],
   globals: {
@@ -388,27 +388,27 @@ export default [...neostandard({
   files: ['src-electron/mainScripts/**/*.ts'],
   ignores: [
     '**/*.vitest.test.ts',
-    'src-electron/mainScripts/projectManagement/faProjectActiveDatabase.ts',
-    'src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected.ts',
-    'src-electron/mainScripts/projectManagement/faProjectReconnectAtKnownPath.ts',
-    'src-electron/mainScripts/projectManagement/faProjectOpenRun.ts',
-    'src-electron/mainScripts/projectManagement/faProjectCreateRun.ts'
+    'src-electron/mainScripts/projectManagement/faProjectActiveDatabaseWiring.ts',
+    'src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnectedWiring.ts',
+    'src-electron/mainScripts/projectManagement/faProjectReconnectAtKnownPathWiring.ts',
+    'src-electron/mainScripts/projectManagement/faProjectOpenRunWiring.ts',
+    'src-electron/mainScripts/projectManagement/faProjectCreateRunWiring.ts'
   ],
   rules: {
     'no-restricted-imports': ['error', {
       paths: [
         {
-          name: 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase',
+          name: 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabaseWiring',
           importNames: ['getFaProjectActiveDatabase'],
-          message: 'Use runWithFaProjectDatabaseForIpcAsync / runWithFaProjectDatabaseSync from faProjectDatabaseEnsureConnected.ts (faProjectOpenRun may read the active handle during open).'
+          message: 'Use runWithFaProjectDatabaseForIpcAsync / runWithFaProjectDatabaseSync from faProjectDatabaseEnsureConnectedWiring.ts (faProjectOpenRunWiring may read the active handle during open).'
         },
         {
-          name: 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase',
+          name: 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabaseWiring',
           importNames: ['getFaProjectLastKnownActiveProjectFilePath'],
-          message: 'Use faProjectDatabaseEnsureConnected.ts internals only through that module; see .cursor/rules/fa-project-database-access.mdc.'
+          message: 'Use faProjectDatabaseEnsureConnectedWiring.ts internals only through that module; see .cursor/rules/fa-project-database-access.mdc.'
         },
         {
-          name: 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase',
+          name: 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabaseWiring',
           importNames: ['replaceFaProjectActiveDatabase'],
           message: 'replaceFaProjectActiveDatabase is only for open, create, and reconnect paths; see .cursor/rules/fa-project-database-access.mdc.'
         }

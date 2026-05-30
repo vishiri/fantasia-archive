@@ -4,7 +4,7 @@ import {
   deleteFaProjectStylingFrameKv,
   readFaProjectStylingRoot,
   upsertFaProjectStylingKv
-} from '../faProjectStylingPersist'
+} from '../faProjectStylingPersistWiring'
 
 interface I_kvBackedDb {
   db: {

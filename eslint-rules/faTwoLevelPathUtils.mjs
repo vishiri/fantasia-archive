@@ -61,6 +61,62 @@ export function isFaTwoLevelAllowedVueImportSource (importSource) {
   return false
 }
 
+export function getFaTwoLevelMainScriptsAreaFromFile (normalizedPath) {
+  const areaMatch = normalizedPath.match(/^(src-electron\/mainScripts\/[^/]+)\//)
+
+  if (areaMatch !== null) {
+    return areaMatch[1]
+  }
+
+  return null
+}
+
+export function isFaTwoLevelAllowedMainScriptsSiblingFile (normalizedPath, areaDir) {
+  if (!normalizedPath.startsWith(`${areaDir}/`) || !normalizedPath.endsWith('.ts')) {
+    return false
+  }
+
+  const baseName = normalizedPath.slice(areaDir.length + 1)
+
+  if (baseName.includes('/')) {
+    if (baseName.startsWith('_tests/') || baseName.startsWith('functions/')) {
+      return true
+    }
+
+    return false
+  }
+
+  if (isFaTwoLevelManagerFile(normalizedPath)) {
+    return true
+  }
+
+  if (/_managerDefaults\.ts$/.test(baseName)) {
+    return true
+  }
+
+  if (/(Wiring|Surface|Session|Runtime|Api|Bound)\.ts$/.test(baseName)) {
+    return true
+  }
+
+  if (areaDir === 'src-electron/mainScripts/ipcManagement') {
+    if (/^registerFa[A-Za-z]+\.ts$/.test(baseName)) {
+      return true
+    }
+
+    if (baseName === 'revealElectronDevToolsConsoleBestEffort.ts') {
+      return true
+    }
+  }
+
+  if (areaDir === 'src-electron/mainScripts/appProtocol') {
+    if (/^registerFaAppProtocolWiring\.ts$/.test(baseName)) {
+      return true
+    }
+  }
+
+  return false
+}
+
 export function getFaTwoLevelScriptsDirFromFile (normalizedPath) {
   const scriptsMatch = normalizedPath.match(/^(.*\/scripts)\//)
 
@@ -72,6 +128,12 @@ export function getFaTwoLevelScriptsDirFromFile (normalizedPath) {
 
   if (domainMatch !== null) {
     return domainMatch[1]
+  }
+
+  const mainScriptsArea = getFaTwoLevelMainScriptsAreaFromFile(normalizedPath)
+
+  if (mainScriptsArea !== null) {
+    return mainScriptsArea
   }
 
   return null

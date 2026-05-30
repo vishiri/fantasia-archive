@@ -4,7 +4,7 @@ import {
   readFaProjectSettingsProjectNameRaw,
   readFaProjectSettingsRoot,
   upsertFaProjectSettingsKv
-} from '../faProjectSettingsPersist'
+} from '../faProjectSettingsPersistWiring'
 
 interface I_kvBackedDb {
   db: {

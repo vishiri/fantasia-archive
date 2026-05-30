@@ -4,7 +4,7 @@ import { FA_PROJECT_OS_OPEN_IPC } from 'app/src-electron/electron-ipc-bridge'
 
 const onRendererReadyMock = vi.hoisted(() => vi.fn())
 
-vi.mock('app/src-electron/mainScripts/projectManagement/faProjectOsOpenDelivery', () => {
+vi.mock('app/src-electron/mainScripts/projectManagement/faProjectOsOpenDeliveryWiring', () => {
   return {
     onFaProjectOsOpenRendererReady: onRendererReadyMock
   }

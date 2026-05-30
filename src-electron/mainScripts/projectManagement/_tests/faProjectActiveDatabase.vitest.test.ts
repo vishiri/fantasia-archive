@@ -24,7 +24,7 @@ import {
   openFaProjectDatabase,
   replaceFaProjectActiveDatabase,
   unlinkFaProjectFileIfExists
-} from '../faProjectActiveDatabase'
+} from '../faProjectActiveDatabaseWiring'
 
 const tracked: string[] = []
 

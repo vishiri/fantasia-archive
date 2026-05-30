@@ -73,7 +73,7 @@ afterEach(() => {
  * Flushes to the renderer after the window is registered, the path exists, and renderer reported ready.
  */
 test('Test that enqueue and renderer ready sends openFromOsToRenderer once', async () => {
-  const mod = await import('../faProjectOsOpenDelivery')
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
   const win = {
     webContents: {
       isDestroyed: isDestroyedMock,
@@ -98,7 +98,7 @@ test('Test that enqueue and renderer ready sends openFromOsToRenderer once', asy
  * did-finish-load triggers tryFlush (renderer may not be ready yet).
  */
 test('Test that did-finish-load handler runs tryFlush before renderer ready', async () => {
-  const mod = await import('../faProjectOsOpenDelivery')
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
   const win = {
     webContents: {
       isDestroyed: isDestroyedMock,
@@ -128,7 +128,7 @@ test('Test that did-finish-load handler runs tryFlush before renderer ready', as
  * Skips send when webContents is destroyed.
  */
 test('Test that flush no-ops when webContents is destroyed', async () => {
-  const mod = await import('../faProjectOsOpenDelivery')
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
   isDestroyedMock.mockReturnValue(true)
   const win = {
     webContents: {
@@ -149,7 +149,7 @@ test('Test that flush no-ops when webContents is destroyed', async () => {
  * Does not queue when the file is missing on disk.
  */
 test('Test that enqueue ignores paths that fail existsSync', async () => {
-  const mod = await import('../faProjectOsOpenDelivery')
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
   existsSyncMock.mockReturnValue(false)
   const win = {
     webContents: {
@@ -170,7 +170,7 @@ test('Test that enqueue ignores paths that fail existsSync', async () => {
  * Rejects paths that do not look like a project file before existsSync.
  */
 test('Test that enqueue ignores paths that fail pathLooksLikeFaProjectFile', async () => {
-  const mod = await import('../faProjectOsOpenDelivery')
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
   existsSyncMock.mockReturnValue(true)
   const win = {
     webContents: {
@@ -195,7 +195,7 @@ test('Test that enqueue ignores paths that fail pathLooksLikeFaProjectFile', asy
  * Latest pending path wins when several arrive before flush.
  */
 test('Test that two enqueues before flush deliver only the last file path', async () => {
-  const mod = await import('../faProjectOsOpenDelivery')
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
   const win = {
     webContents: {
       isDestroyed: isDestroyedMock,
@@ -220,7 +220,7 @@ test('Test that two enqueues before flush deliver only the last file path', asyn
  */
 test('Test that installFaProjectOsOpenListeners is a no-op when TEST_ENV is components', async () => {
   vi.stubEnv('TEST_ENV', 'components')
-  const mod = await import('../faProjectOsOpenDelivery')
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
   mod.installFaProjectOsOpenListeners()
   expect(appOnMock).not.toHaveBeenCalled()
 })
@@ -232,7 +232,7 @@ test('Test that installFaProjectOsOpenListeners is a no-op when TEST_ENV is comp
  */
 test('Test that installFaProjectOsOpenListeners is a no-op under Playwright e2e env without flag', async () => {
   vi.stubEnv('TEST_ENV', 'e2e')
-  const mod = await import('../faProjectOsOpenDelivery')
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
   mod.installFaProjectOsOpenListeners()
   expect(appOnMock).not.toHaveBeenCalled()
 })
@@ -245,7 +245,7 @@ test('Test that installFaProjectOsOpenListeners is a no-op under Playwright e2e 
 test('Test that installFaProjectOsOpenListeners registers when e2e and FA_E2E_OS_OPEN is 1', async () => {
   vi.stubEnv('TEST_ENV', 'e2e')
   vi.stubEnv('FA_E2E_OS_OPEN', '1')
-  const mod = await import('../faProjectOsOpenDelivery')
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
   mod.installFaProjectOsOpenListeners()
   expect(appOnMock).toHaveBeenCalled()
 })
@@ -256,7 +256,7 @@ test('Test that installFaProjectOsOpenListeners registers when e2e and FA_E2E_OS
  * Registers second-instance handler that forwards a .faproject path from the command line.
  */
 test('Test that second-instance handler enqueues a path from commandLine strings', async () => {
-  const mod = await import('../faProjectOsOpenDelivery')
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
   mod.installFaProjectOsOpenListeners()
   const second = appOnHandlers['second-instance']
   expect(second).toBeTypeOf('function')
@@ -282,7 +282,7 @@ test('Test that second-instance handler enqueues a path from commandLine strings
  * second-instance with no faproject path does not enqueue.
  */
 test('Test that second-instance handler no-ops when commandLine has no faproject', async () => {
-  const mod = await import('../faProjectOsOpenDelivery')
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
   mod.installFaProjectOsOpenListeners()
   const second = appOnHandlers['second-instance']
   expect(second).toBeTypeOf('function')
@@ -309,7 +309,7 @@ test('Test that open-file handler enqueues on darwin', async () => {
     configurable: true,
     value: 'darwin'
   })
-  const mod = await import('../faProjectOsOpenDelivery')
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
   const osPath = absFaProjectFixture('open-file')
   mod.installFaProjectOsOpenListeners()
   const openFile = appOnHandlers['open-file']
@@ -341,7 +341,7 @@ test('Test that whenReady handler enqueues argv .faproject path', async () => {
   const originalArgv = [...process.argv]
   const coldPath = absFaProjectFixture('cold')
   process.argv = ['electron', 'main.js', coldPath]
-  const mod = await import('../faProjectOsOpenDelivery')
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
   mod.installFaProjectOsOpenListeners()
   await Promise.resolve()
   await Promise.resolve()
@@ -370,7 +370,7 @@ test('Test that cold argv is ignored in DEV without FA_DEV_OPEN_FAPROJECT', asyn
   const originalArgv = [...process.argv]
   process.argv = ['electron', 'main.js', absFaProjectFixture('dev')]
   vi.stubEnv('DEV', true)
-  const mod = await import('../faProjectOsOpenDelivery')
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
   mod.installFaProjectOsOpenListeners()
   await Promise.resolve()
   await Promise.resolve()
@@ -395,7 +395,7 @@ test('Test that cold argv is ignored in DEV without FA_DEV_OPEN_FAPROJECT', asyn
 test('Test that direct enqueue is ignored in DEV without FA_DEV_OPEN_FAPROJECT', async () => {
   vi.stubEnv('DEV', true)
   Reflect.deleteProperty(process.env, 'FA_DEV_OPEN_FAPROJECT')
-  const mod = await import('../faProjectOsOpenDelivery')
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
   mod.enqueueFaProjectOsOpenPath(absFaProjectFixture('dev-direct'))
   const win = {
     webContents: {

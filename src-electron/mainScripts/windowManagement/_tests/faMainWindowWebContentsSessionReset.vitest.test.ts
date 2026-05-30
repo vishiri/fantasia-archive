@@ -3,13 +3,13 @@ import { afterEach, expect, test, vi } from 'vitest'
 
 const closeDbMock = vi.hoisted(() => vi.fn())
 
-vi.mock('app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase', () => {
+vi.mock('app/src-electron/mainScripts/projectManagement/faProjectActiveDatabaseWiring', () => {
   return {
     closeFaProjectActiveDatabase: closeDbMock
   }
 })
 
-import { registerFaMainWindowWebContentsSessionReset } from '../faMainWindowWebContentsSessionReset'
+import { registerFaMainWindowWebContentsSessionReset } from '../faMainWindowWebContentsSessionResetWiring'
 
 afterEach(() => {
   closeDbMock.mockReset()

@@ -5,7 +5,7 @@ import {
   appWindow,
   mainWindowCreation,
   preventSecondaryAppInstance
-} from '../mainWindowCreation'
+} from '../mainWindowCreationWiring'
 import type { BrowserWindow } from 'electron'
 
 const {
@@ -48,7 +48,7 @@ const {
 
 const registerFaProjectOsOpenMainWindowMock = vi.hoisted(() => vi.fn())
 
-vi.mock('app/src-electron/mainScripts/projectManagement/faProjectOsOpenDelivery', () => {
+vi.mock('app/src-electron/mainScripts/projectManagement/faProjectOsOpenDeliveryWiring', () => {
   return {
     registerFaProjectOsOpenMainWindow: registerFaProjectOsOpenMainWindowMock
   }
@@ -64,13 +64,13 @@ vi.mock('electron', () => {
   }
 })
 
-vi.mock('src-electron/mainScripts/windowManagement/spellChecker', () => {
+vi.mock('src-electron/mainScripts/windowManagement/spellCheckerWiring', () => {
   return {
     setupSpellChecker: setupSpellCheckerMock
   }
 })
 
-vi.mock('app/src-electron/mainScripts/windowManagement/faSpellCheckerSession', () => {
+vi.mock('app/src-electron/mainScripts/windowManagement/faSpellCheckerSessionWiring', () => {
   return {
     applyFaSpellCheckerLanguagesToSession: applyFaSpellCheckerLanguagesToSessionMock
   }

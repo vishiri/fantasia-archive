@@ -22,12 +22,12 @@ vi.mock('node:crypto', () => {
   }
 })
 
-let installModule: typeof import('../faProjectFailsafePathFromRenderer')
+let installModule: typeof import('../faProjectFailsafePathFromRendererWiring')
 
 beforeEach(async () => {
   vi.resetModules()
   ipcMainOnMock.mockReset()
-  installModule = await import('../faProjectFailsafePathFromRenderer')
+  installModule = await import('../faProjectFailsafePathFromRendererWiring')
 })
 
 function getReplyHandler (): (event: IpcMainEvent, payload: unknown) => void {

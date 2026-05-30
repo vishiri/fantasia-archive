@@ -47,7 +47,7 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc',
   }
 })
 
-vi.mock('app/src-electron/mainScripts/windowManagement/mainWindowCreation', () => {
+vi.mock('app/src-electron/mainScripts/windowManagement/windowManagement_manager', () => {
   return resolvePathMocks.mainWindowExports
 })
 
@@ -60,7 +60,7 @@ vi.mock('../projectManagement_manager', async (importOriginal) => {
   }
 })
 
-import { resolveFaProjectOpenTargetPath } from '../faProjectOpenResolveTargetPath'
+import { resolveFaProjectOpenTargetPath } from '../faProjectOpenResolveTargetPathWiring'
 
 beforeEach(() => {
   resolvePathMocks.windowDialogState.attachWindow = true
