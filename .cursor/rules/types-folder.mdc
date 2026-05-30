@@ -1,0 +1,23 @@
+---
+description: Shared TypeScript types live under repository-root types/
+alwaysApply: true
+---
+
+# TypeScript interfaces and types (`types/`)
+
+- Put shared `export interface` and `export type` declarations in repository-root **`types/`** and import them with **`app/types/...`** (for example **`app/types/I_faActionManagerDomain`**).
+- Prefer one domain-oriented module per feature area with brief JSDoc on exports (see **`types/I_appMenusDataList.ts`**). Do **not** add colocated **`<filename>.types.ts`** under **`src/`**, **`src-electron/`**, **`.storybook-workspace/`**, or **`helpers/`**.
+- Ambient augmentations for third-party modules also live under **`types/`** and are loaded with a side-effect import from the owning boot file or **`src/stores/index.ts`** (see **`types/piniaModuleAugmentation.ts`**).
+- **Do not** add modules whose only job is **`export type { … } from 'app/types/...'`** (or re-exporting types from implementation files). Import from the defining **`types/`** module at each call site instead.
+- **Managers**, **stores**, and **barrel** files may export **values** (functions, constants) but must **not** re-export types; consumers import types from **`app/types/...`** directly.
+- ESLint enforces **`types-folder/no-exported-types-outside-types`** on **`**/*.{ts,vue}`** outside **`types/**`**, **`**/*.d.ts`**, and **`i18n/**`**.
+
+## Naming
+
+- **`I_`** prefix for interfaces (for example **`I_faActiveProject`**).
+- **`T_`** prefix for type aliases (for example **`T_faActionId`**).
+- Locale message modules under **`i18n/`** keep their own **`L_`** convention.
+
+## Level-1 `functions/`
+
+- **`functions/**`** may use **`import type`** from **`app/types/**`** only (see [fa-two-level-architecture.mdc](fa-two-level-architecture.mdc)).
