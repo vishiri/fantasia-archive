@@ -87,7 +87,7 @@ export default defineConfig((ctx) => {
         checker({
           eslint: {
             useFlatConfig: true,
-            lintCommand: 'eslint src i18n src-electron quasar.config.ts'
+            lintCommand: 'eslint src i18n src-electron quasar.config.ts --max-warnings 0'
           }
         })
       ],

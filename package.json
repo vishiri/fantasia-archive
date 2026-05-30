@@ -9,7 +9,7 @@
   "type": "module",
   "scripts": {
     "lint:commit": "commitlint",
-    "lint:eslint": "eslint .",
+    "lint:eslint": "eslint . --max-warnings 0",
     "lint:stylelint": "stylelint \"src/**/*.{vue,css,scss,sass}\" \".storybook-workspace/.storybook/**/*.{vue,css,scss,sass}\"",
     "lint:stylelint:fix": "stylelint \"src/**/*.{vue,css,scss,sass}\" \".storybook-workspace/.storybook/**/*.{vue,css,scss,sass}\" --fix",
     "lint:typescript": "vue-tsc -p tsconfig.json --noEmit",

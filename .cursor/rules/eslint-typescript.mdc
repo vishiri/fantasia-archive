@@ -20,7 +20,7 @@ In line comments, block comments, and JSDoc above APIs and tests: do not use Mar
 
 | Command | Role |
 |--------|------|
-| `yarn lint:eslint` | ESLint over `src/`, `src-electron/`, `e2e-tests/`, `types/`, Quasar/Vitest/Playwright configs, and `.storybook-workspace/.storybook/` — see `package.json` `lint:eslint` script. |
+| `yarn lint:eslint` | ESLint over `src/`, `src-electron/`, `e2e-tests/`, `types/`, Quasar/Vitest/Playwright configs, and `.storybook-workspace/.storybook/` with **`--max-warnings 0`** so warnings fail the quality gate (same as `quasar dev` via `vite-plugin-checker`). |
 | `yarn lint:stylelint` | Stylelint on `src/**/*.{vue,css,scss,sass}` and `.storybook-workspace/.storybook/**/*.{vue,css,scss,sass}` (declaration blocks sorted alphabetically via `stylelint-order`; use `yarn lint:stylelint:fix` to autofix). |
 | `yarn lint:typescript` | Full **`vue-tsc`** project check (Vue SFCs + `.ts`; Quasar paths via `tsconfig.json` → `.quasar/tsconfig.json`). |
 
@@ -34,7 +34,7 @@ Before commits or changelog edits tied to product or test work, run the four che
 
 Run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, or `yarn test:coverage:verify` individually only while debugging a specific failure.
 
-**Dev server**: `vite-plugin-checker` runs ESLint during `quasar dev`; keep `@typescript-eslint` major in sync with TypeScript so you do not see unsupported-TS-version warnings from `typescript-estree`.
+**Dev server**: `vite-plugin-checker` runs ESLint during `quasar dev` with the same **`--max-warnings 0`** flag as `yarn lint:eslint`; keep `@typescript-eslint` major in sync with TypeScript so you do not see unsupported-TS-version warnings from `typescript-estree`.
 
 ## `tsconfig` and `.vue` / Quasar
 
