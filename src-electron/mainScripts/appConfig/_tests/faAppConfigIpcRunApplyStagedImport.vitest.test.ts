@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
-import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appNoteboard/faAppNoteboardStoreDefaults'
+import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appNoteboard/appNoteboard_managerDefaults'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import { faAppConfigImportStagedSessions } from 'app/src-electron/mainScripts/appConfig/faAppConfigImportStagedState'
 import { runApplyStagedAppConfigImport } from '../faAppConfigIpcRunApplyStagedImport'
@@ -19,22 +19,22 @@ const {
   getFaUserSettingsMock: vi.fn()
 }))
 
-vi.mock('app/src-electron/mainScripts/userSettings/userSettingsStore', () => ({
+vi.mock('app/src-electron/mainScripts/userSettings/userSettings_manager', () => ({
   cleanupFaUserSettings: vi.fn(),
   getFaUserSettings: getFaUserSettingsMock
 }))
 
-vi.mock('app/src-electron/mainScripts/keybinds/faKeybindsStore', () => ({
+vi.mock('app/src-electron/mainScripts/keybinds/keybinds_manager', () => ({
   cleanupFaKeybinds: vi.fn(),
   getFaKeybinds: getFaKeybindsMock
 }))
 
-vi.mock('app/src-electron/mainScripts/appNoteboard/faAppNoteboardStore', () => ({
+vi.mock('app/src-electron/mainScripts/appNoteboard/appNoteboard_manager', () => ({
   cleanupFaAppNoteboard: vi.fn(),
   getFaAppNoteboard: getFaAppNoteboardMock
 }))
 
-vi.mock('app/src-electron/mainScripts/appStyling/faAppStylingStore', () => ({
+vi.mock('app/src-electron/mainScripts/appStyling/appStyling_manager', () => ({
   cleanupFaAppStyling: vi.fn(),
   getFaAppStyling: getFaAppStylingMock
 }))

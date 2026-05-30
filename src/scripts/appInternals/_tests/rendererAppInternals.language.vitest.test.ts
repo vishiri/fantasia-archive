@@ -2,12 +2,17 @@ import { expect, test, vi } from 'vitest'
 
 import { i18n } from 'app/i18n/externalFileLoader'
 
-import * as faInterfaceTextDirection from '../faInterfaceTextDirection'
+const applyFaInterfaceTextDirectionFromLanguageCodeMock = vi.hoisted(() => vi.fn())
+
+vi.mock('../functions/faInterfaceTextDirection', () => ({
+  applyFaInterfaceTextDirectionFromLanguageCode: applyFaInterfaceTextDirectionFromLanguageCodeMock
+}))
+
 import {
   applyFaI18nLocaleFromLanguageCode,
   applyFaUserSettingsLanguageSelection,
-  isFaUserSettingsLanguageCode
-} from '../rendererAppInternals'
+} from '../faAppInternalsLocale_manager'
+import { isFaUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 
 /**
  * isFaUserSettingsLanguageCode
@@ -35,17 +40,15 @@ test('Test that isFaUserSettingsLanguageCode returns false for unsupported codes
  * Updates the shared vue-i18n locale ref and applies root text direction.
  */
 test('Test that applyFaI18nLocaleFromLanguageCode sets i18n.global.locale', () => {
-  const directionSpy = vi.spyOn(faInterfaceTextDirection, 'applyFaInterfaceTextDirectionFromLanguageCode')
+  applyFaInterfaceTextDirectionFromLanguageCodeMock.mockClear()
 
   applyFaI18nLocaleFromLanguageCode('de')
   expect(i18n.global.locale.value).toBe('de')
-  expect(directionSpy).toHaveBeenCalledWith('de')
+  expect(applyFaInterfaceTextDirectionFromLanguageCodeMock).toHaveBeenCalledWith('de')
 
   applyFaI18nLocaleFromLanguageCode('en-US')
   expect(i18n.global.locale.value).toBe('en-US')
-  expect(directionSpy).toHaveBeenLastCalledWith('en-US')
-
-  directionSpy.mockRestore()
+  expect(applyFaInterfaceTextDirectionFromLanguageCodeMock).toHaveBeenLastCalledWith('en-US')
 })
 
 /**
@@ -53,13 +56,11 @@ test('Test that applyFaI18nLocaleFromLanguageCode sets i18n.global.locale', () =
  * Arabic delegates rtl direction apply through the shared helper.
  */
 test('Test that applyFaI18nLocaleFromLanguageCode applies rtl when Arabic is selected', () => {
-  const directionSpy = vi.spyOn(faInterfaceTextDirection, 'applyFaInterfaceTextDirectionFromLanguageCode')
+  applyFaInterfaceTextDirectionFromLanguageCodeMock.mockClear()
 
   applyFaI18nLocaleFromLanguageCode('ar')
   expect(i18n.global.locale.value).toBe('ar')
-  expect(directionSpy).toHaveBeenCalledWith('ar')
-
-  directionSpy.mockRestore()
+  expect(applyFaInterfaceTextDirectionFromLanguageCodeMock).toHaveBeenCalledWith('ar')
 })
 
 /**

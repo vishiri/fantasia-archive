@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX } from 'app/src/scripts/floatingWindows/faFloatingWindowPersistedGeometry'
+import { FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX } from 'app/src/scripts/floatingWindows/faFloatingWindowPersistedGeometry_manager'
 import type { I_faAppStylingPatch } from 'app/types/I_faAppStylingDomain'
 
 /**

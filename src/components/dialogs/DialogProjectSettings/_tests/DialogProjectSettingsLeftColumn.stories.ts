@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import { FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB } from '../scripts/dialogProjectSettingsConstants'
+import { FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB } from '../scripts/functions/dialogProjectSettingsDialogInput'
 import DialogProjectSettingsLeftColumn from '../DialogProjectSettingsLeftColumn.vue'
 
 const meta = {

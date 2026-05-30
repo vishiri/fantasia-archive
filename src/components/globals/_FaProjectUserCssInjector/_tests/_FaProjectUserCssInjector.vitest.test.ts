@@ -10,12 +10,12 @@ import {
   vi
 } from 'vitest'
 
-import * as faUserCssHostDocument from '../../_FaUserCssInjector/scripts/faUserCssInjectorHostAndCssPayload'
+import * as faUserCssHostDocument from 'app/src/components/globals/_FaUserCssInjector/scripts/functions/faUserCssInjectorHostAndCssPayload'
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 
 import FaProjectUserCssInjector from '../_FaProjectUserCssInjector.vue'
 
-import * as projectUserCssDom from '../scripts/faProjectUserCssStyleElement'
+import * as projectUserCssDom from 'app/src/components/globals/_FaProjectUserCssInjector/scripts/functions/faProjectUserCssStyleElement'
 
 const FA_PROJECT_USER_CSS_ELEMENT_ID = projectUserCssDom.FA_PROJECT_USER_CSS_ELEMENT_ID
 

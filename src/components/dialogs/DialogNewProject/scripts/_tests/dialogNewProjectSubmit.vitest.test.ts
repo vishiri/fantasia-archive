@@ -1,10 +1,10 @@
 import { expect, test, vi } from 'vitest'
 
-import { runFaActionAwait } from 'app/src/scripts/actionManager/faActionManagerRun'
+import { runFaActionAwait } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
 
-import { runDialogNewProjectCreate } from '../dialogNewProjectSubmit'
+import { runDialogNewProjectCreate } from '../dialogNewProject_manager'
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => ({
   runFaActionAwait: vi.fn()
 }))
 

@@ -1,0 +1,23 @@
+import {
+  FA_FLOATING_WINDOW_FRAME_DEFAULT_LAYOUT
+} from './functions/faFloatingWindowFrameLayout'
+import { createFaFloatingWindowPersistedGeometry } from './functions/createFaFloatingWindowPersistedGeometry'
+
+const faFloatingWindowPersistedRectMaxEdgePx = 32_000
+
+const faFloatingWindowPersistedGeometryApi = createFaFloatingWindowPersistedGeometry({
+  FA_FLOATING_WINDOW_FRAME_DEFAULT_LAYOUT,
+  FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX: faFloatingWindowPersistedRectMaxEdgePx
+})
+
+export const FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX =
+  faFloatingWindowPersistedGeometryApi.FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX
+
+export const isUsableFaFloatingWindowPersistedRect =
+  faFloatingWindowPersistedGeometryApi.isUsableFaFloatingWindowPersistedRect
+
+export const normalizePersistedRectForStorage =
+  faFloatingWindowPersistedGeometryApi.normalizePersistedRectForStorage
+
+export const persistedFloatingWindowFramesAreEquivalent =
+  faFloatingWindowPersistedGeometryApi.persistedFloatingWindowFramesAreEquivalent

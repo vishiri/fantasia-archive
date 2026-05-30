@@ -3,7 +3,7 @@ import { afterEach, expect, test, vi } from 'vitest'
 
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
-import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/rendererAppInternals'
+import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/appInternals_manager'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'

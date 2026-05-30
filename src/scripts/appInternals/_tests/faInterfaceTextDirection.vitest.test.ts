@@ -3,7 +3,7 @@ import { afterEach, expect, test, vi } from 'vitest'
 import {
   applyFaInterfaceTextDirectionFromLanguageCode,
   resolveFaInterfaceTextDirectionFromLanguageCode
-} from '../faInterfaceTextDirection'
+} from '../functions/faInterfaceTextDirection'
 
 type T_mockHtmlElement = {
   dir: string

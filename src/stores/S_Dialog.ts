@@ -7,6 +7,11 @@ import { v4 as uuidv4 } from 'uuid'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
+import {
+  decrementDialogOpenCountNonNegative,
+  incrementDialogOpenCount
+} from './functions/dialogOpenCount'
+
 /**
  * This store manages the state of the markdown document dialogs in the application.
  */
@@ -22,11 +27,11 @@ export const S_DialogMarkdown = defineStore('S_DialogMarkdown', () => {
   }
 
   function onMarkdownDialogBecameVisible (): void {
-    markdownDialogOpenCount.value += 1
+    markdownDialogOpenCount.value = incrementDialogOpenCount(markdownDialogOpenCount.value)
   }
 
   function onMarkdownDialogBecameHidden (): void {
-    markdownDialogOpenCount.value = Math.max(0, markdownDialogOpenCount.value - 1)
+    markdownDialogOpenCount.value = decrementDialogOpenCountNonNegative(markdownDialogOpenCount.value)
   }
 
   return {
@@ -54,11 +59,11 @@ export const S_DialogComponent = defineStore('S_DialogComponent', () => {
   }
 
   function onComponentDialogBecameVisible (): void {
-    componentDialogOpenCount.value += 1
+    componentDialogOpenCount.value = incrementDialogOpenCount(componentDialogOpenCount.value)
   }
 
   function onComponentDialogBecameHidden (): void {
-    componentDialogOpenCount.value = Math.max(0, componentDialogOpenCount.value - 1)
+    componentDialogOpenCount.value = decrementDialogOpenCountNonNegative(componentDialogOpenCount.value)
   }
 
   return {

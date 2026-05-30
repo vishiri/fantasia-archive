@@ -53,7 +53,7 @@
 <script setup lang="ts">
 import type { I_appSettingsCategoryRenderItem } from 'app/types/I_dialogAppSettings'
 import DialogAppSettingsSettingBlock from 'app/src/components/dialogs/DialogAppSettings/DialogAppSettingsSettingBlock.vue'
-import { showNonLastSeparator } from 'app/src/components/dialogs/DialogAppSettings/scripts/dialogAppSettingsSearch'
+import { showNonLastSeparator } from 'app/src/components/dialogs/DialogAppSettings/scripts/functions/dialogAppSettingsSearch'
 
 defineProps<{
   category: I_appSettingsCategoryRenderItem

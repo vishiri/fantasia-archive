@@ -8,6 +8,8 @@ import type {
 } from 'app/types/I_faAppStylingDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
 
+import { didCssPatchPersist } from '../functions/faPersistPatchVerify'
+
 export async function faAppStylingRefreshFromBridge (opts: {
   setRoot: (next: I_faAppStylingRoot) => void
 }): Promise<boolean> {
@@ -94,7 +96,7 @@ export async function faAppStylingUpdateWithUserNotify (opts: {
   }
   const retrieved = afterSaveResult.value
 
-  if (retrieved.css !== opts.patch.css) {
+  if (!didCssPatchPersist(opts.patch.css, retrieved.css)) {
     console.error(`[S_FaAppStyling] ${i18n.global.t('globalFunctionality.faAppStyling.saveMismatchLog')}`, {
       patch: opts.patch,
       retrieved

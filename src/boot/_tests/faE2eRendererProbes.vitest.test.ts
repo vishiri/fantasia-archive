@@ -2,7 +2,7 @@ import { afterEach, expect, test, vi } from 'vitest'
 
 const registerFaE2eActiveProjectSnapshotProbeMock = vi.hoisted(() => vi.fn())
 
-vi.mock('app/src/scripts/e2e/registerFaE2eActiveProjectSnapshotProbe', () => ({
+vi.mock('app/src/scripts/e2e/e2e_manager', () => ({
   registerFaE2eActiveProjectSnapshotProbe: registerFaE2eActiveProjectSnapshotProbeMock
 }))
 
@@ -73,6 +73,33 @@ test('Test that faE2eRendererProbes boot skips probe when TEST_ENV is not e2e', 
             ELECTRON_MAIN_FILEPATH: '/x',
             FA_FRONTEND_RENDER_TIMER: 0,
             TEST_ENV: 'components'
+          }))
+        }
+      }
+    } as unknown as Window & typeof globalThis
+  })
+  const boot = faE2eRendererProbesBoot as unknown as () => Promise<void>
+  await boot()
+  expect(registerFaE2eActiveProjectSnapshotProbeMock).not.toHaveBeenCalled()
+})
+
+/**
+ * faE2eRendererProbes boot
+ * Non-string TEST_ENV values are treated as absent so the probe is not registered.
+ */
+test('Test that faE2eRendererProbes boot skips probe when TEST_ENV is not a string', async () => {
+  vi.stubEnv('MODE', 'electron')
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        extraEnvVariables: {
+          getCachedSnapshot: vi.fn(() => ({
+            COMPONENT_NAME: '',
+            COMPONENT_PROPS: false,
+            ELECTRON_MAIN_FILEPATH: '/x',
+            FA_FRONTEND_RENDER_TIMER: 0,
+            TEST_ENV: false
           }))
         }
       }

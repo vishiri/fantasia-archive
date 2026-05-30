@@ -6,8 +6,8 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import noteboardMessages from 'app/i18n/en-US/floatingWindows/L_appNoteboard'
 
-import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
-import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
+import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/keybinds_managerDefaults'
+import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/keybinds_manager'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 
@@ -19,33 +19,36 @@ const windowAppNoteboardFrameSpies = vi.hoisted(() => {
   }
 })
 
-vi.mock('app/src/scripts/floatingWindows/useFaFloatingWindowFrame', () => ({
-  useFaFloatingWindowFrame: () => ({
-    frameRef: ref(null),
-    frameStyle: ref({}),
-    h: ref(400),
-    onFramePointerDown: windowAppNoteboardFrameSpies.onFramePointerDown,
-    onResizePointerDown: windowAppNoteboardFrameSpies.onResizePointerDown,
-    onTitlePointerDown: windowAppNoteboardFrameSpies.onTitlePointerDown,
-    titleShortFrameClass: ref(undefined),
-    w: ref(400),
-    x: ref(0),
-    y: ref(0)
-  })
-}))
+vi.mock('app/src/scripts/floatingWindows/floatingWindows_manager', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('app/src/scripts/floatingWindows/floatingWindows_manager')>()
+  return {
+    ...actual,
+    useFaFloatingWindowFrame: () => ({
+      frameRef: ref(null),
+      frameStyle: ref({}),
+      h: ref(400),
+      onFramePointerDown: windowAppNoteboardFrameSpies.onFramePointerDown,
+      onResizePointerDown: windowAppNoteboardFrameSpies.onResizePointerDown,
+      onTitlePointerDown: windowAppNoteboardFrameSpies.onTitlePointerDown,
+      titleShortFrameClass: ref(undefined),
+      w: ref(400),
+      x: ref(0),
+      y: ref(0)
+    }),
+    useFaFloatingWindowFramePersist: () => undefined
+  }
+})
 
 vi.mock(
-  'app/src/components/floatingWindows/WindowAppNoteboard/scripts/useWindowAppNoteboardFramePersist',
-  () => ({
-    useWindowAppNoteboardFramePersist: () => undefined
-  })
-)
-
-vi.mock(
-  'app/src/components/floatingWindows/WindowAppNoteboard/scripts/useWindowAppNoteboardTextPersist',
-  () => ({
-    useWindowAppNoteboardTextPersist: () => undefined
-  })
+  'app/src/components/floatingWindows/WindowAppNoteboard/scripts/windowAppNoteboard_manager',
+  async (importOriginal) => {
+    const actual = await importOriginal<typeof import('app/src/components/floatingWindows/WindowAppNoteboard/scripts/windowAppNoteboard_manager')>()
+    return {
+      ...actual,
+      useWindowAppNoteboardFramePersist: () => undefined,
+      useWindowAppNoteboardTextPersist: () => undefined
+    }
+  }
 )
 
 import WindowAppNoteboard from '../WindowAppNoteboard.vue'

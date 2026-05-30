@@ -1,10 +1,10 @@
 import { expect, test } from 'vitest'
 
-import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/faQuasarDialogStandardTransition'
+import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from '../functions/faQuasarDialogStandardTransition'
 import {
   FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
   FA_FLOATING_WINDOW_POP_TRANSITION_MS
-} from 'app/src/scripts/floatingWindows/faFloatingWindowPopTransition'
+} from '../faFloatingWindowPopTransition_manager'
 
 test('Test that FA_FLOATING_WINDOW_POP_TRANSITION_MS matches Quasar default dialog transition duration', () => {
   expect(FA_FLOATING_WINDOW_POP_TRANSITION_MS).toBe(300)

@@ -82,27 +82,11 @@
 </template>
 
 <script setup lang="ts">
-import type { StoreGeneric } from 'pinia'
-import { Result } from 'neverthrow'
-import { onMounted, ref, watch } from 'vue'
-
 import type { I_faActionHistoryEntry } from 'app/types/I_faActionManagerDomain'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
-import { S_DialogComponent } from 'src/stores/S_Dialog'
-import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
-import { snapshotActionHistory } from 'app/src/scripts/actionManager/faActionManagerHistory'
 
-import DialogActionMonitorHistoryTable from 'app/src/components/dialogs/DialogActionMonitor/DialogActionMonitorHistoryTable.vue'
-import { copyDialogActionMonitorRowToClipboard } from 'app/src/components/dialogs/DialogActionMonitor/scripts/dialogActionMonitorRowClipboard'
-import { buildDialogActionMonitorColumns } from 'app/src/components/dialogs/DialogActionMonitor/scripts/dialogActionMonitorTable'
-import { useDialogActionMonitorTableLayout } from 'app/src/components/dialogs/DialogActionMonitor/scripts/useDialogActionMonitorTableLayout'
-
-const resolveDialogComponentStore = (): StoreGeneric | null => {
-  return Result.fromThrowable(
-    (): StoreGeneric => S_DialogComponent(),
-    (): null => null
-  )().unwrapOr(null)
-}
+import DialogActionMonitorHistoryTable from './DialogActionMonitorHistoryTable.vue'
+import { useDialogActionMonitor } from './scripts/dialogActionMonitor_manager'
 
 const props = defineProps<{
   /**
@@ -111,65 +95,20 @@ const props = defineProps<{
   directInput?: T_dialogName
   /**
    * Optional pre-built snapshot; when present the table renders these rows instead of calling 'snapshotActionHistory'.
-   * Used by Storybook stories and Vitest specs that want deterministic content.
    */
   directHistorySnapshot?: I_faActionHistoryEntry[]
 }>()
 
-const dialogModel = ref(false)
-registerComponentDialogStackGuard(dialogModel)
-
 const {
+  columns,
   dialogActionMonitorTableHeightStyle,
+  dialogModel,
+  documentName,
+  onDialogShow,
+  onRowClick,
+  rows,
   tableScrollHostRef
-} = useDialogActionMonitorTableLayout(dialogModel)
-
-const documentName = ref('')
-const columns = buildDialogActionMonitorColumns()
-const rows = ref<I_faActionHistoryEntry[]>([])
-
-function refreshRows (): void {
-  if (props.directHistorySnapshot !== undefined) {
-    rows.value = props.directHistorySnapshot.map((entry) => {
-      return { ...entry }
-    })
-    return
-  }
-  rows.value = snapshotActionHistory()
-}
-
-const openDialog = (input: T_dialogName): void => {
-  documentName.value = input
-  refreshRows()
-  dialogModel.value = true
-}
-
-function onDialogShow (): void {
-  refreshRows()
-}
-
-function onRowClick (_event: Event, row: I_faActionHistoryEntry): void {
-  void copyDialogActionMonitorRowToClipboard(row)
-}
-
-watch(() => resolveDialogComponentStore()?.dialogUUID, () => {
-  const componentDialogStore = resolveDialogComponentStore()
-  if (componentDialogStore?.dialogToOpen === 'ActionMonitor') {
-    openDialog(componentDialogStore.dialogToOpen as T_dialogName)
-  }
-})
-
-watch(() => props.directInput, () => {
-  if (props.directInput === 'ActionMonitor') {
-    openDialog(props.directInput)
-  }
-})
-
-onMounted(() => {
-  if (props.directInput === 'ActionMonitor') {
-    openDialog(props.directInput)
-  }
-})
+} = useDialogActionMonitor(props)
 </script>
 
 <style lang="scss">

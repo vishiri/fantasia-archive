@@ -14,7 +14,7 @@ vi.mock('app/src/stores/scripts/sFaProjectSettingsBridge', () => ({
   }))
 }))
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => ({
   runFaActionAwait: vi.fn(async () => true)
 }))
 
@@ -148,7 +148,7 @@ test('Test that DialogProjectSettings mounts with direct snapshot and shows proj
  */
 test('Test that DialogProjectSettings save button persists and closes the dialog', async () => {
   const runFaActionAwait = vi.mocked(
-    (await import('app/src/scripts/actionManager/faActionManagerRun')).runFaActionAwait
+    (await import('app/src/scripts/actionManager/faActionManagerRun_manager')).runFaActionAwait
   )
 
   const w = mount(DialogProjectSettings, {

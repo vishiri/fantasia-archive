@@ -3,7 +3,7 @@ import type { WebContents } from 'electron'
 import { randomUUID } from 'node:crypto'
 
 import { FA_PROJECT_FAILSAFE_IPC } from 'app/src-electron/electron-ipc-bridge'
-import { pathLooksLikeFaProjectFile } from 'app/src-electron/mainScripts/projectManagement/faProjectPathValidation'
+import { pathLooksLikeFaProjectFile } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
 
 type T_pending = {
   resolve: (value: string | null) => void

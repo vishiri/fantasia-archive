@@ -1,6 +1,6 @@
 import { expect, test, vi } from 'vitest'
 
-import { resolveVitePublicAssetPath } from '../rendererAppInternals'
+import { resolveVitePublicAssetPath } from '../rendererAppInternals_manager'
 
 /**
  * resolveVitePublicAssetPath

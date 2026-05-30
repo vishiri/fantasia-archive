@@ -4,8 +4,8 @@ import { type BrowserWindow, type WebContents, app } from 'electron'
 
 import { FA_PROJECT_OS_OPEN_IPC } from 'app/src-electron/electron-ipc-bridge'
 
-import { resolveOsOpenFaProjectPathFromArgv } from './faProjectOsOpenArgv'
-import { pathLooksLikeFaProjectFile } from './faProjectPathValidation'
+import { resolveOsOpenFaProjectPathFromArgv } from './projectManagement_manager'
+import { pathLooksLikeFaProjectFile } from './projectManagement_manager'
 
 let pendingOsOpenPath: string | null = null
 let rendererReportedReady = false

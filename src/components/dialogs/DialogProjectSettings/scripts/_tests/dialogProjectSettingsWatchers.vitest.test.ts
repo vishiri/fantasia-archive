@@ -3,7 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent, nextTick, reactive } from 'vue'
 import { beforeEach, expect, test, vi } from 'vitest'
 
-import { registerDialogProjectSettingsWatchers } from '../dialogProjectSettingsDialogStore'
+import { registerDialogProjectSettingsWatchers } from '../dialogProjectSettings_manager'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 
 beforeEach(() => {

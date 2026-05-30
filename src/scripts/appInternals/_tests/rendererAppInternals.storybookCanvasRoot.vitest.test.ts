@@ -6,7 +6,7 @@ import { expect, test } from 'vitest'
 import {
   isFantasiaStorybookCanvas,
   setFantasiaStorybookCanvasFlag
-} from '../rendererAppInternals'
+} from '../rendererAppInternals_manager'
 
 /**
  * isFantasiaStorybookCanvas

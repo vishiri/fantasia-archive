@@ -38,18 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  nextTick,
-  onBeforeUnmount,
-  ref,
-  watch
-} from 'vue'
-
-/**
- * Keep in sync with '$globalLanguageSelector-spellcheckRefresh-popTransition-duration' in 'GlobalLanguageSelector/styles/_variables.scss'.
- */
-const spellcheckRefreshPopTransitionMs = 280
-const spellcheckRefreshTooltipAutoOpenBufferMs = 80
+import { useGlobalLanguageSelectorSpellcheckRefreshControl } from './scripts/globalLanguageSelectorSpellcheckRefreshControl_manager'
 
 const props = defineProps<{
   show: boolean
@@ -59,38 +48,7 @@ const emit = defineEmits<{
   refreshWebContents: []
 }>()
 
-const tooltipOpen = ref(false)
-
-let tooltipAutoOpenTimerId: ReturnType<typeof setTimeout> | undefined
-
-function clearTooltipAutoOpenTimer (): void {
-  if (tooltipAutoOpenTimerId === undefined) {
-    return
-  }
-  clearTimeout(tooltipAutoOpenTimerId)
-  tooltipAutoOpenTimerId = undefined
-}
-
-watch(
-  () => props.show,
-  (visible) => {
-    clearTooltipAutoOpenTimer()
-    if (!visible) {
-      tooltipOpen.value = false
-      return
-    }
-    void nextTick(() => {
-      tooltipAutoOpenTimerId = setTimeout(() => {
-        tooltipAutoOpenTimerId = undefined
-        tooltipOpen.value = true
-      }, spellcheckRefreshPopTransitionMs + spellcheckRefreshTooltipAutoOpenBufferMs)
-    })
-  }
-)
-
-onBeforeUnmount(() => {
-  clearTooltipAutoOpenTimer()
-})
+const { tooltipOpen } = useGlobalLanguageSelectorSpellcheckRefreshControl(props)
 </script>
 
 <style lang="scss" scoped>

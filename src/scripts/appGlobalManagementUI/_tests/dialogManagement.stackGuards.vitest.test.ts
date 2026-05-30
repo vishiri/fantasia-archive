@@ -9,7 +9,7 @@ import { afterEach, expect, test } from 'vitest'
 import {
   registerComponentDialogStackGuard,
   registerMarkdownDialogStackGuard
-} from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
+} from 'app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager'
 import { S_DialogComponent, S_DialogMarkdown } from 'app/src/stores/S_Dialog'
 
 afterEach(() => {

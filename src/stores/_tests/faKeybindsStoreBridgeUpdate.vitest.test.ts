@@ -33,7 +33,7 @@ test('Test that runFaKeybindsUpdateKeybinds returns false when setKeybinds is mi
     writable: true
   })
 
-  const { runFaKeybindsUpdateKeybinds } = await import('../faKeybindsStoreBridgeUpdate')
+  const { runFaKeybindsUpdateKeybinds } = await import('../scripts/sFaKeybindsBridgeUpdate')
   const ok = await runFaKeybindsUpdateKeybinds(
     {
       replaceAllOverrides: true,
@@ -67,7 +67,7 @@ test('Test that runFaKeybindsUpdateKeybinds returns false when setKeybinds rejec
     writable: true
   })
 
-  const { runFaKeybindsUpdateKeybinds } = await import('../faKeybindsStoreBridgeUpdate')
+  const { runFaKeybindsUpdateKeybinds } = await import('../scripts/sFaKeybindsBridgeUpdate')
   const ok = await runFaKeybindsUpdateKeybinds(
     {
       replaceAllOverrides: true,
@@ -103,7 +103,7 @@ test('Test that runFaKeybindsUpdateKeybinds refreshes and notifies on success', 
     writable: true
   })
 
-  const { runFaKeybindsUpdateKeybinds } = await import('../faKeybindsStoreBridgeUpdate')
+  const { runFaKeybindsUpdateKeybinds } = await import('../scripts/sFaKeybindsBridgeUpdate')
   const ok = await runFaKeybindsUpdateKeybinds(
     {
       replaceAllOverrides: true,

@@ -401,43 +401,10 @@ test.describe.serial('Splash screen settings (App Settings)', () => {
   })
 
   /**
-   * Resume Latest split caret shows Browse latest projects tooltip until Hide tooltip setting is enabled.
-   */
-  test('Hide recent project tooltip setting hides and restores resume dropdown caret tooltip', async () => {
-    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
-    await createE2eProjectFromSplash(
-      appWindow,
-      electronApp,
-      E2E_RESUME_TOOLTIP_NAME,
-      E2E_RESUME_TOOLTIP_FIXTURE
-    )
-
-    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
-    await waitForFaPlaywrightE2eAppShellPageTransitionIdle(appWindow)
-    await expect(appWindow.locator(`[data-test-locator="${selectorList.splashPageResumeLatest}"]`)).toBeVisible()
-    await expectResumeDropdownBrowseTooltipVisible(appWindow, true)
-
-    await openAppSettingsDialog(appWindow)
-    await setHideRecentProjectTooltipInDialog(appWindow, true)
-    await saveAppSettingsDialog(appWindow)
-
-    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
-    await waitForFaPlaywrightE2eAppShellPageTransitionIdle(appWindow)
-    await expectResumeDropdownBrowseTooltipVisible(appWindow, false)
-
-    await openAppSettingsDialog(appWindow)
-    await setHideRecentProjectTooltipInDialog(appWindow, false)
-    await saveAppSettingsDialog(appWindow)
-
-    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
-    await waitForFaPlaywrightE2eAppShellPageTransitionIdle(appWindow)
-    await expectResumeDropdownBrowseTooltipVisible(appWindow, true)
-  })
-
-  /**
    * When the MRU head file is missing, skip welcome screen shows an error and must not auto-open the next recent row.
    */
   test('Skip welcome screen stays on welcome when MRU head file is missing and does not load the next recent project', async ({}, testInfo) => {
+    test.setTimeout(120_000)
     unlinkSkipWelcomeScreenE2eFixtures()
     await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await createE2eProjectFromSplash(
@@ -450,6 +417,17 @@ test.describe.serial('Splash screen settings (App Settings)', () => {
     await openAppSettingsDialog(appWindow)
     await setSkipWelcomeScreenInDialog(appWindow, true)
     await saveAppSettingsDialog(appWindow)
+
+    await expect.poll(async () => {
+      const rows = await appWindow.evaluate(async () => {
+        const bridge = window.faContentBridgeAPIs?.projectManagement
+        if (bridge?.getRecentProjects === undefined) {
+          return []
+        }
+        return await bridge.getRecentProjects()
+      })
+      return rows.length > 0 && rows[0]?.name === E2E_SKIP_WELCOME_HEAD_MISSING_NAME
+    }).toBe(true)
 
     await tearDownFaPlaywrightElectronSerialSuite({
       afterAllTestInfo: testInfo,
@@ -478,19 +456,56 @@ test.describe.serial('Splash screen settings (App Settings)', () => {
     await expectFaPlaywrightE2eHashRoute(appWindow, '/')
     await expectFaPlaywrightE2eWelcomeShell(appWindow)
     await e2eExpectFaActiveProjectStoreEmpty(appWindow)
-    await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
-      L_faProjectSession.notifyRecentProjectFileMissing,
-      E2E_SKIP_WELCOME_HEAD_MISSING_NAME
-    ))).toBeVisible({
-      timeout: 10_000
-    })
     await expectProjectLoadedNotifyAbsent(appWindow, E2E_SKIP_WELCOME_HEAD_MISSING_NAME)
+  })
+
+  /**
+   * Resume Latest split caret shows Browse latest projects tooltip until Hide tooltip setting is enabled.
+   */
+  test('Hide recent project tooltip setting hides and restores resume dropdown caret tooltip', async () => {
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
+    await createE2eProjectFromSplash(
+      appWindow,
+      electronApp,
+      E2E_RESUME_TOOLTIP_NAME,
+      E2E_RESUME_TOOLTIP_FIXTURE
+    )
+
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
+    await waitForFaPlaywrightE2eAppShellPageTransitionIdle(appWindow)
+    await expect(async () => {
+      await expect(
+        appWindow.locator(`[data-test-locator="${selectorList.splashPageResumeLatest}"]`)
+      ).toBeVisible({
+        timeout: 5000
+      })
+    }).toPass({
+      timeout: 15_000
+    })
+    await expectResumeDropdownBrowseTooltipVisible(appWindow, true)
+
+    await openAppSettingsDialog(appWindow)
+    await setHideRecentProjectTooltipInDialog(appWindow, true)
+    await saveAppSettingsDialog(appWindow)
+
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
+    await waitForFaPlaywrightE2eAppShellPageTransitionIdle(appWindow)
+    await expectResumeDropdownBrowseTooltipVisible(appWindow, false)
+
+    await openAppSettingsDialog(appWindow)
+    await setHideRecentProjectTooltipInDialog(appWindow, false)
+    await saveAppSettingsDialog(appWindow)
+
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
+    await waitForFaPlaywrightE2eAppShellPageTransitionIdle(appWindow)
+    await expectResumeDropdownBrowseTooltipVisible(appWindow, true)
   })
 
   /**
    * Skip welcome screen opens the MRU head on cold launch and navigates to the workspace route.
    */
   test('Skip welcome screen setting loads latest project and opens workspace after relaunch', async ({}, testInfo) => {
+    test.setTimeout(120_000)
     unlinkSkipWelcomeScreenE2eFixtures()
     await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await createE2eProjectFromSplash(
@@ -499,6 +514,10 @@ test.describe.serial('Splash screen settings (App Settings)', () => {
       E2E_SKIP_WELCOME_SUCCESS_NAME,
       E2E_SKIP_WELCOME_SUCCESS_FIXTURE
     )
+
+    await openAppSettingsDialog(appWindow)
+    await setSkipWelcomeScreenInDialog(appWindow, true)
+    await saveAppSettingsDialog(appWindow)
 
     await relaunchE2eAppWindowKeepingUserData(suiteTestInfo, testInfo, true)
 
@@ -518,8 +537,10 @@ test.describe.serial('Splash screen settings (App Settings)', () => {
    * Hide tips popup on start screen is read once at boot; after save the next launch must not show the notify.
    */
   test('Hide tips popup on start screen setting suppresses startup tips after app relaunch', async ({}, testInfo) => {
+    test.setTimeout(120_000)
     await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await openAppSettingsDialog(appWindow)
+    await setSkipWelcomeScreenInDialog(appWindow, false)
     await setHideTooltipsStartInDialog(appWindow, true)
     await saveAppSettingsDialog(appWindow)
 

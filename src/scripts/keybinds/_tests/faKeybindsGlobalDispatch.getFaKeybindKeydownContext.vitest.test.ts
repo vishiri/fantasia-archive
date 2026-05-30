@@ -1,7 +1,7 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, expect, test } from 'vitest'
 
-import { getFaKeybindKeydownContext } from 'app/src/scripts/keybinds/faKeybindsGlobalDispatch'
+import { getFaKeybindKeydownContext } from 'app/src/scripts/keybinds/keybinds_manager'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 
 beforeEach(() => {

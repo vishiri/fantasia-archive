@@ -4,8 +4,8 @@ import {
   FA_APP_SHELL_DRAWER_TRANSITION_MS,
   FA_APP_SHELL_PAGE_TRANSITION_BINDINGS,
   FA_APP_SHELL_PAGE_TRANSITION_MS
-} from '../faAppShellPageTransition'
-import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/faQuasarDialogStandardTransition'
+} from '../faAppShellPageTransition_manager'
+import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from '../../floatingWindows/functions/faQuasarDialogStandardTransition'
 
 /**
  * faAppShellPageTransition

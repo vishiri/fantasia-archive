@@ -1,16 +1,18 @@
 import { expect, test } from 'vitest'
 
 import type { I_faActionHistoryEntry } from 'app/types/I_faActionManagerDomain'
+import { DIALOG_ACTION_MONITOR_COLUMN_NAMES } from 'app/types/I_dialogActionMonitorUi'
 
+import { buildDialogActionMonitorColumns } from '../dialogActionMonitor_manager'
 import {
-  buildDialogActionMonitorColumns,
   buildDialogActionMonitorRowClipboardJson,
   buildDialogActionMonitorStatusBadge,
-  DIALOG_ACTION_MONITOR_COLUMN_NAMES,
   formatDialogActionMonitorActionKind,
   formatDialogActionMonitorTimestamp,
   hasDialogActionMonitorPayload
-} from '../dialogActionMonitorTable'
+} from '../functions/dialogActionMonitorTableModel'
+
+const actionMonitorTableTestTranslate = (key: string): string => key
 
 /**
  * buildDialogActionMonitorColumns
@@ -70,11 +72,11 @@ test('Test that formatDialogActionMonitorTimestamp returns the HH:MM:SS wall-clo
  * Maps execution kind to the localized sync and async labels.
  */
 test('Test that formatDialogActionMonitorActionKind maps sync to the sync i18n key', () => {
-  expect(formatDialogActionMonitorActionKind('sync')).toBe('dialogs.actionMonitor.actionKind.sync')
+  expect(formatDialogActionMonitorActionKind('sync', actionMonitorTableTestTranslate)).toBe('dialogs.actionMonitor.actionKind.sync')
 })
 
 test('Test that formatDialogActionMonitorActionKind maps async to the async i18n key', () => {
-  expect(formatDialogActionMonitorActionKind('async')).toBe('dialogs.actionMonitor.actionKind.async')
+  expect(formatDialogActionMonitorActionKind('async', actionMonitorTableTestTranslate)).toBe('dialogs.actionMonitor.actionKind.async')
 })
 
 /**
@@ -82,27 +84,27 @@ test('Test that formatDialogActionMonitorActionKind maps async to the async i18n
  * Maps every status value to a deterministic badge descriptor.
  */
 test('Test that buildDialogActionMonitorStatusBadge maps success to a positive check icon', () => {
-  const badge = buildDialogActionMonitorStatusBadge('success')
+  const badge = buildDialogActionMonitorStatusBadge('success', actionMonitorTableTestTranslate)
   expect(badge.icon).toBe('mdi-check')
   expect(badge.colorClass).toBe('text-positive')
   expect(badge.isSpinner).toBe(false)
 })
 
 test('Test that buildDialogActionMonitorStatusBadge maps failed to a negative close icon', () => {
-  const badge = buildDialogActionMonitorStatusBadge('failed')
+  const badge = buildDialogActionMonitorStatusBadge('failed', actionMonitorTableTestTranslate)
   expect(badge.icon).toBe('mdi-close')
   expect(badge.colorClass).toBe('text-negative')
   expect(badge.isSpinner).toBe(false)
 })
 
 test('Test that buildDialogActionMonitorStatusBadge maps running to the spinner branch', () => {
-  const badge = buildDialogActionMonitorStatusBadge('running')
+  const badge = buildDialogActionMonitorStatusBadge('running', actionMonitorTableTestTranslate)
   expect(badge.icon).toBe('')
   expect(badge.isSpinner).toBe(true)
 })
 
 test('Test that buildDialogActionMonitorStatusBadge maps queued to a blue timer-sand icon', () => {
-  const badge = buildDialogActionMonitorStatusBadge('queued')
+  const badge = buildDialogActionMonitorStatusBadge('queued', actionMonitorTableTestTranslate)
   expect(badge.icon).toBe('mdi-timer-sand-empty')
   expect(badge.isSpinner).toBe(false)
   expect(badge.colorClass).toBe('fa-text-status-queued')

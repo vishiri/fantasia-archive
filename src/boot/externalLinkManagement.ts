@@ -1,17 +1,10 @@
 import { defineBoot } from '#q-app/wrappers'
 
-import { dispatchFaExternalLinkMouseEvent } from './faExternalLinkMouseDispatch'
+import {
+  handleFaExternalLinkMouseEvent,
+  runExternalLinkManagementBoot
+} from './scripts/externalLinkManagement_manager'
 
-const getBrowserWindowForFaExternalLinks = (): Window | undefined => {
-  return (globalThis as unknown as { window?: Window }).window
-}
+export { handleFaExternalLinkMouseEvent }
 
-export function handleFaExternalLinkMouseEvent (event: MouseEvent): void {
-  dispatchFaExternalLinkMouseEvent(event, getBrowserWindowForFaExternalLinks)
-}
-
-export default defineBoot(() => {
-  document.addEventListener('click', handleFaExternalLinkMouseEvent)
-
-  document.addEventListener('auxclick', handleFaExternalLinkMouseEvent)
-})
+export default defineBoot(runExternalLinkManagementBoot)

@@ -1,0 +1,13 @@
+import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from './functions/faQuasarDialogStandardTransition'
+
+import { createFaFloatingWindowPopTransitionExports } from './functions/createFaFloatingWindowPopTransitionExports'
+
+const faFloatingWindowPopTransitionExports = createFaFloatingWindowPopTransitionExports({
+  quasarDialogStandardTransitionMs: FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS
+})
+
+export const FA_FLOATING_WINDOW_POP_TRANSITION_MS =
+  faFloatingWindowPopTransitionExports.FA_FLOATING_WINDOW_POP_TRANSITION_MS
+
+export const FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS =
+  faFloatingWindowPopTransitionExports.FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS

@@ -3,7 +3,7 @@ import { nextTick, ref } from 'vue'
 import { expect, test } from 'vitest'
 
 import type { I_faAppConfigImportPartsUi } from 'app/types/I_faAppConfigDomain'
-import { buildImportExportAppConfigDialogModelComputeds } from '../dialogImportExportAppConfigDialogModelComputeds'
+import { buildImportExportAppConfigDialogModelComputeds } from '../dialogImportExportAppConfig_manager'
 
 test('buildImportExportAppConfigDialogModelComputeds importApplyDisabled is false when only noteboard can be applied', async () => {
   const exportIncludeKeybinds = ref(true)

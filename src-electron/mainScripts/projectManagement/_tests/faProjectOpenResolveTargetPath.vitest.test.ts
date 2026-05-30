@@ -51,8 +51,11 @@ vi.mock('app/src-electron/mainScripts/windowManagement/mainWindowCreation', () =
   return resolvePathMocks.mainWindowExports
 })
 
-vi.mock('../faProjectManagementE2ePathOverride', () => {
+vi.mock('../projectManagement_manager', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../projectManagement_manager')>()
+
   return {
+    ...actual,
     takeNextE2eProjectOpenPath: resolvePathMocks.takeE2eOpen
   }
 })
@@ -98,6 +101,28 @@ test('Test that explicit ipc path returns ipcExplicitPath true', async () => {
     filePath: 'D:\\ipc.faproject',
     ipcExplicitPath: true
   })
+})
+
+test('Test that explicit ipc path wins over staged E2E path', async () => {
+  resolvePathMocks.takeE2eOpen.mockReturnValueOnce('D:\\e2e.faproject')
+  const r = await resolveFaProjectOpenTargetPath({} as never, {
+    filePath: 'D:\\ipc.faproject'
+  })
+  expect(r).toEqual({
+    filePath: 'D:\\ipc.faproject',
+    ipcExplicitPath: true
+  })
+  expect(resolvePathMocks.takeE2eOpen).not.toHaveBeenCalled()
+})
+
+test('Test that explicit ipc missing file does not consume staged E2E path', async () => {
+  resolvePathMocks.takeE2eOpen.mockReturnValueOnce('D:\\e2e.faproject')
+  resolvePathMocks.existsSync.mockReturnValue(false)
+  const r = await resolveFaProjectOpenTargetPath({} as never, {
+    filePath: 'D:\\missing.faproject'
+  })
+  expect('ipcExplicitPathFailed' in r && r.ipcExplicitPathFailed).toBe(true)
+  expect(resolvePathMocks.takeE2eOpen).not.toHaveBeenCalled()
 })
 
 test('Test that explicit ipc path errors trigger ipcExplicitPathFailed', async () => {

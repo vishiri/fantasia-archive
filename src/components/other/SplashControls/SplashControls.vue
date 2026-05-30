@@ -68,19 +68,17 @@
 </template>
 
 <script lang="ts" setup>
-import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
-import { resolveVitePublicAssetPath } from 'app/src/scripts/appInternals/rendererAppInternals'
-
 import SplashControlsResumeDropdown from './SplashControlsResumeDropdown.vue'
+
+import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
+
+import { useSplashControls } from './scripts/splashControls_manager'
 
 defineOptions({
   name: 'SplashControls'
 })
 
-/**
- * Same wing raster as public/icons/favicon-512x512.png, copied under public/images/splash/ for preload and a dedicated splash URL.
- */
-const splashTitleWingSrc = resolveVitePublicAssetPath('images/splash/splash_logo.png')
+const { splashTitleWingSrc } = useSplashControls()
 </script>
 
 <style scoped lang="scss">

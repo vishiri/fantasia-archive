@@ -5,7 +5,7 @@ import { afterEach, expect, test } from 'vitest'
 import {
   applyFaUserCssToStyleElementIfNeeded,
   ensureFaUserCssStyleElementInHead
-} from '../faUserCssInjectorStyleElement'
+} from '../functions/faUserCssInjectorStyleElement'
 
 const STYLE_ID = 'faUserCssInjectorStyleHelpersVitest'
 

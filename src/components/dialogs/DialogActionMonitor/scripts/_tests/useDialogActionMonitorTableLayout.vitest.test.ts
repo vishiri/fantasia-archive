@@ -9,7 +9,7 @@ const store = vi.hoisted(() => {
 
 let lastGetSectionElement: (() => HTMLElement | null) | undefined
 
-vi.mock('app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsTableLayoutObserve', () => ({
+vi.mock('app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettings_manager', () => ({
   useDialogKeybindSettingsTableLayout: (opts: {
     dialogModel: ReturnType<typeof import('vue').ref<boolean>>
     getSectionElement: () => HTMLElement | null
@@ -23,7 +23,7 @@ vi.mock('app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindS
 
 import { ref } from 'vue'
 
-import { useDialogActionMonitorTableLayout } from '../useDialogActionMonitorTableLayout'
+import { useDialogActionMonitorTableLayout } from '../dialogActionMonitor_manager'
 
 beforeEach(() => {
   store.tableMaxHeightPx.value = null

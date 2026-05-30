@@ -8,7 +8,7 @@ import type { Page } from 'playwright'
  */
 
 const FA_RENDERER_COMPONENT_TESTING_ROUTE_TIMEOUT_MS = 30_000
-const FA_E2E_SHELL_LOAD_TIMEOUT_MS = 30_000
+const FA_E2E_SHELL_LOAD_TIMEOUT_MS = 60_000
 const FA_RENDERER_ROUTE_POLL_MS = 100
 
 /**

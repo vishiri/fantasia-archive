@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { hexToRgb, rgbToHex } from '../colorFormatConvertors'
+import { hexToRgb, rgbToHex } from '../functions/colorFormatConvertors'
 
 /**
  * rgbToHex

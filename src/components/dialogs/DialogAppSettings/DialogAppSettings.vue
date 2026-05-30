@@ -83,7 +83,7 @@ import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import DialogAppSettingsLeftColumn from 'app/src/components/dialogs/DialogAppSettings/DialogAppSettingsLeftColumn.vue'
 import DialogAppSettingsPanelsColumn from 'app/src/components/dialogs/DialogAppSettings/DialogAppSettingsPanelsColumn.vue'
-import { useDialogAppSettings } from 'app/src/components/dialogs/DialogAppSettings/scripts/useDialogAppSettings'
+import { useDialogAppSettings } from 'app/src/components/dialogs/DialogAppSettings/scripts/dialogAppSettings_manager'
 
 const props = defineProps<{
   /**

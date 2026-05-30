@@ -9,7 +9,7 @@ test('Test that resolveFaElectronMainJsPath returns argv[1] when non-empty', asy
   process.argv[1] = '/fake/unpackaged/electron-main.js'
 
   vi.resetModules()
-  const { resolveFaElectronMainJsPath } = await import('../resolveFaElectronMainJsPath')
+  const { resolveFaElectronMainJsPath } = await import('../windowManagement_manager')
 
   expect(resolveFaElectronMainJsPath()).toBe('/fake/unpackaged/electron-main.js')
 
@@ -25,7 +25,7 @@ test('Test that resolveFaElectronMainJsPath falls back when argv[1] is empty', a
   process.argv[1] = ''
 
   vi.resetModules()
-  const { resolveFaElectronMainJsPath } = await import('../resolveFaElectronMainJsPath')
+  const { resolveFaElectronMainJsPath } = await import('../windowManagement_manager')
 
   const resolved = resolveFaElectronMainJsPath()
 

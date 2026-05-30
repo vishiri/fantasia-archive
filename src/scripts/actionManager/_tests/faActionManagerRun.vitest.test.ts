@@ -19,7 +19,7 @@ vi.mock('app/i18n/externalFileLoader', () => ({
   i18n: { global: { t: (key: string, params?: Record<string, unknown>) => `${key}${params !== undefined ? ` ${JSON.stringify(params)}` : ''}` } }
 }))
 
-vi.mock('../faActionDefinitions', () => ({
+vi.mock('../faActionDefinitions_manager', () => ({
   findFaActionDefinition: findFaActionDefinitionMock
 }))
 
@@ -28,10 +28,10 @@ import {
   _resetFaActionSyncQueueForTests,
   awaitSyncQueueDrain,
   FA_ACTION_SYNC_QUEUE_MAX
-} from '../faActionManagerSyncQueue'
-import { FaActionUserCanceledError } from '../faActionUserCanceledError'
-import { FaProjectOpenFailedError } from '../faProjectOpenFailedError'
-import { runFaAction, runFaActionAwait } from '../faActionManagerRun'
+} from '../faActionManagerSyncQueue_manager'
+import { FaActionUserCanceledError } from '../functions/faActionUserCanceledError'
+import { FaProjectOpenFailedError } from '../functions/faProjectOpenFailedError'
+import { runFaAction, runFaActionAwait } from '../faActionManagerRun_manager'
 
 let consoleErrorSpy: ReturnType<typeof vi.spyOn>
 

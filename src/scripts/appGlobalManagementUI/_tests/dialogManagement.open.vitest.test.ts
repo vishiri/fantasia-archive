@@ -35,7 +35,7 @@ vi.mock('app/src/stores/S_Dialog', () => {
   }
 })
 
-import { openDialogComponent, openDialogMarkdownDocument } from '../dialogManagement'
+import { openDialogComponent, openDialogMarkdownDocument } from '../dialogManagement_manager'
 
 /**
  * openDialogMarkdownDocument

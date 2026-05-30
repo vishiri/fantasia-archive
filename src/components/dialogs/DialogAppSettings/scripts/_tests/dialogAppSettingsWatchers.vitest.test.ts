@@ -3,7 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent, nextTick, reactive, ref } from 'vue'
 import { beforeEach, expect, test, vi } from 'vitest'
 
-import { registerDialogAppSettingsWatchers } from 'app/src/components/dialogs/DialogAppSettings/scripts/dialogAppSettingsDialogStore'
+import { registerDialogAppSettingsWatchers } from 'app/src/components/dialogs/DialogAppSettings/scripts/dialogAppSettings_manager'
 import type { T_appSettingsRenderTree } from 'app/types/I_dialogAppSettings'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import { S_DialogComponent } from 'src/stores/S_Dialog'

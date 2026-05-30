@@ -4,22 +4,11 @@ import { parseFaRecentProjectListStored } from 'app/src-electron/shared/faRecent
 import { faRecentProjectListStructuralNormalize } from 'app/src-electron/shared/faRecentProjectListStructural'
 import type { I_faRecentProjectEntry } from 'app/types/I_faRecentProjectsDomain'
 
-import { pathLooksLikeFaProjectFile } from './faProjectPathValidation'
-
-function trimAndValidateMainRow (row: I_faRecentProjectEntry): I_faRecentProjectEntry | null {
-  const name = row.name.trim()
-  const filePath = row.filePath.trim()
-  if (name.length === 0 || filePath.length === 0) {
-    return null
-  }
-  if (!pathLooksLikeFaProjectFile(filePath)) {
-    return null
-  }
-  return {
-    filePath,
-    name
-  }
-}
+import {
+  faRecentProjectsListsEqual as faRecentProjectsListsEqualFn,
+  trimAndValidateRecentProjectRow
+} from './functions/faRecentProjectListSanitize'
+import { pathLooksLikeFaProjectFile } from './projectManagement_manager'
 
 function entryRowsExistAsFiles (rows: readonly I_faRecentProjectEntry[]): I_faRecentProjectEntry[] {
   const out: I_faRecentProjectEntry[] = []
@@ -46,7 +35,7 @@ export function faRecentProjectsSanitizeStructural (storeBlob: unknown): I_faRec
   const parsed = parseFaRecentProjectListStored(storeBlob)
   const vetted: I_faRecentProjectEntry[] = []
   for (const row of parsed) {
-    const next = trimAndValidateMainRow(row)
+    const next = trimAndValidateRecentProjectRow(row, pathLooksLikeFaProjectFile)
     if (next !== null) {
       vetted.push(next)
     }
@@ -66,5 +55,5 @@ export function faRecentProjectsListsEqual (
   a: readonly I_faRecentProjectEntry[],
   b: readonly I_faRecentProjectEntry[]
 ): boolean {
-  return JSON.stringify(a) === JSON.stringify(b)
+  return faRecentProjectsListsEqualFn(a, b)
 }

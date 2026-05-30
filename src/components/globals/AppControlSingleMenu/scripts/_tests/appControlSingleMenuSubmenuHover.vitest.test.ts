@@ -3,7 +3,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import {
   APP_CONTROL_SINGLE_MENU_SUBMENU_HOVER_LEAVE_MS,
   createAppControlSingleMenuSubmenuHover
-} from '../appControlSingleMenuSubmenuHover'
+} from '../appControlSingleMenu_manager'
 
 beforeEach(() => {
   vi.useFakeTimers()

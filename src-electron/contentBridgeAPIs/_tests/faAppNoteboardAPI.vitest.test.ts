@@ -15,7 +15,7 @@ vi.mock('electron', () => {
 })
 
 import { FA_APP_NOTEBOARD_IPC } from 'app/src-electron/electron-ipc-bridge'
-import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appNoteboard/faAppNoteboardStoreDefaults'
+import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appNoteboard/appNoteboard_managerDefaults'
 import type { I_faAppNoteboardRoot } from 'app/types/I_faAppNoteboardDomain'
 
 import { faAppNoteboardAPI } from '../faAppNoteboardAPI'

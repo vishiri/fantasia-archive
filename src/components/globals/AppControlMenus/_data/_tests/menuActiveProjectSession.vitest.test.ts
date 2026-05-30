@@ -4,7 +4,7 @@ const { runFaActionMock } = vi.hoisted(() => ({
   runFaActionMock: vi.fn()
 }))
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => ({
   runFaAction: runFaActionMock,
   runFaActionAwait: vi.fn()
 }))

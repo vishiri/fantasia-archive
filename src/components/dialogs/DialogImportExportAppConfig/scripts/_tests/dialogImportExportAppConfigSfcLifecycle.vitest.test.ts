@@ -9,7 +9,7 @@ import { createPinia, setActivePinia } from 'pinia'
 
 const S_DialogComponentMock = vi.fn()
 
-vi.mock('app/src/stores/S_Dialog', () => {
+vi.mock('src/stores/S_Dialog', () => {
   return {
     S_DialogComponent: S_DialogComponentMock
   }
@@ -17,8 +17,11 @@ vi.mock('app/src/stores/S_Dialog', () => {
 
 const registerComponentDialogStackGuardMock = vi.fn()
 
-vi.mock('app/src/scripts/appGlobalManagementUI/dialogManagement', () => {
+vi.mock('app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager')>()
   return {
+    ...actual,
     registerComponentDialogStackGuard: registerComponentDialogStackGuardMock
   }
 })
@@ -39,7 +42,7 @@ test('useDialogImportExportAppConfigLifecycle opens from directInput prop', asyn
   }))
 
   const { useDialogImportExportAppConfigLifecycle } = await import(
-    '../dialogImportExportAppConfigSfcLifecycle'
+    '../dialogImportExportAppConfig_manager'
   )
 
   const Wrapper = defineComponent({
@@ -80,7 +83,7 @@ test('useDialogImportExportAppConfigLifecycle opens on mount when directInput is
   }))
 
   const { useDialogImportExportAppConfigLifecycle } = await import(
-    '../dialogImportExportAppConfigSfcLifecycle'
+    '../dialogImportExportAppConfig_manager'
   )
 
   const Wrapper = defineComponent({
@@ -120,7 +123,7 @@ test('useDialogImportExportAppConfigLifecycle opens when the dialog store reques
   S_DialogComponentMock.mockImplementation(() => storeState)
 
   const { useDialogImportExportAppConfigLifecycle } = await import(
-    '../dialogImportExportAppConfigSfcLifecycle'
+    '../dialogImportExportAppConfig_manager'
   )
 
   const Wrapper = defineComponent({
@@ -161,7 +164,7 @@ test('useDialogImportExportAppConfigLifecycle does not open for other dialog tar
   S_DialogComponentMock.mockImplementation(() => storeState)
 
   const { useDialogImportExportAppConfigLifecycle } = await import(
-    '../dialogImportExportAppConfigSfcLifecycle'
+    '../dialogImportExportAppConfig_manager'
   )
 
   const Wrapper = defineComponent({
@@ -201,7 +204,7 @@ test('useDialogImportExportAppConfigLifecycle keeps the dialog closed when direc
   }))
 
   const { useDialogImportExportAppConfigLifecycle } = await import(
-    '../dialogImportExportAppConfigSfcLifecycle'
+    '../dialogImportExportAppConfig_manager'
   )
 
   const Wrapper = defineComponent({
@@ -251,7 +254,7 @@ test('useDialogImportExportAppConfigLifecycle ignores store flips that yield no 
   })
 
   const { useDialogImportExportAppConfigLifecycle } = await import(
-    '../dialogImportExportAppConfigSfcLifecycle'
+    '../dialogImportExportAppConfig_manager'
   )
 
   const Wrapper = defineComponent({

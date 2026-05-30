@@ -6,22 +6,14 @@ import { ref } from 'vue'
 import type {
   I_faActionFailureLog,
   I_faActionHistoryEntry,
-  I_faActionQueueEntry,
-  T_faActionHistoryStatus
+  I_faActionHistoryEntryStatusPatch,
+  I_faActionQueueEntry
 } from 'app/types/I_faActionManagerDomain'
 
-/**
- * Hard cap for the session-only action history ring buffer; oldest entries are dropped on overflow.
- */
-export const FA_ACTION_HISTORY_MAX = 500
-
-interface I_historyEntryStatusPatch {
-  errorMessage?: string
-  finishedAt?: number
-  payloadPreview?: string
-  startedAt?: number
-  status?: T_faActionHistoryStatus
-}
+import {
+  applyFaActionHistoryEntryStatusPatch,
+  trimFaActionHistoryRingBuffer
+} from './functions/faActionManagerHistoryRing'
 
 /**
  * Session history buffer API returned from 'buildHistoryState'.
@@ -29,7 +21,7 @@ interface I_historyEntryStatusPatch {
 interface I_faActionManagerHistoryState {
   actionHistory: Ref<I_faActionHistoryEntry[]>
   appendHistoryEntry: (entry: I_faActionHistoryEntry) => void
-  updateHistoryEntryStatus: (uid: string, patch: I_historyEntryStatusPatch) => void
+  updateHistoryEntryStatus: (uid: string, patch: I_faActionHistoryEntryStatusPatch) => void
   findHistoryEntry: (uid: string) => I_faActionHistoryEntry | undefined
 }
 
@@ -84,53 +76,24 @@ function buildQueueState (): I_faActionManagerQueueState {
   }
 }
 
-function applyHistoryEntryStatusPatch (entry: I_faActionHistoryEntry, patch: I_historyEntryStatusPatch): void {
-  if (patch.errorMessage !== undefined) {
-    entry.errorMessage = patch.errorMessage
-  }
-  if (patch.finishedAt !== undefined) {
-    entry.finishedAt = patch.finishedAt
-  }
-  if (patch.payloadPreview !== undefined) {
-    entry.payloadPreview = patch.payloadPreview
-  }
-  if (patch.startedAt !== undefined) {
-    entry.startedAt = patch.startedAt
-  }
-  if (patch.status !== undefined) {
-    entry.status = patch.status
-  }
-}
-
-/**
- * Drops the oldest rows so length never exceeds 'FA_ACTION_HISTORY_MAX' (ring buffer behavior).
- */
-function trimOldestActionHistoryEntries (entries: I_faActionHistoryEntry[]): void {
-  if (entries.length <= FA_ACTION_HISTORY_MAX) {
-    return
-  }
-  const removeCount = entries.length - FA_ACTION_HISTORY_MAX
-  entries.splice(0, removeCount)
-}
-
 function buildHistoryState (): I_faActionManagerHistoryState {
   const actionHistory: Ref<I_faActionHistoryEntry[]> = ref([])
 
   const appendHistoryEntry = (entry: I_faActionHistoryEntry): void => {
     actionHistory.value.push(entry)
-    trimOldestActionHistoryEntries(actionHistory.value)
+    trimFaActionHistoryRingBuffer(actionHistory.value)
   }
 
   const findHistoryEntry = (uid: string): I_faActionHistoryEntry | undefined => {
     return actionHistory.value.find((row) => row.uid === uid)
   }
 
-  const updateHistoryEntryStatus = (uid: string, patch: I_historyEntryStatusPatch): void => {
+  const updateHistoryEntryStatus = (uid: string, patch: I_faActionHistoryEntryStatusPatch): void => {
     const entry = findHistoryEntry(uid)
     if (entry === undefined) {
       return
     }
-    applyHistoryEntryStatusPatch(entry, patch)
+    applyFaActionHistoryEntryStatusPatch(entry, patch)
   }
 
   return {

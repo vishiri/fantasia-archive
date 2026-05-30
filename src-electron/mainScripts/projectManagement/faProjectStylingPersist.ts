@@ -6,7 +6,7 @@ import {
   readFaProjectDataKv,
   upsertFaProjectDataKv
 } from './faProjectDataKv'
-import { parseFaProjectOverlayFinitePx } from './faProjectOverlayFrameKvShared'
+import { parseFaProjectOverlayFinitePx } from './functions/faProjectOverlayFinitePx'
 
 const FA_PROJECT_STYLING_KV_KEYS = {
   content: 'project_styling_content',

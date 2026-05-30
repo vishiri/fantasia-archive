@@ -10,12 +10,10 @@ function resolveE2eIsolatedUserDataFaprojectPath (baseName: string): string {
   return path.join(getFaPlaywrightIsolatedUserDataDir(), baseName)
 }
 
-/**
- * Keep in lockstep with 'src-electron/mainScripts/projectManagement/faProjectManagementE2ePathOverride.ts'
- * globalThis keys for Playwright E2E main-process hooks.
- */
-const FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH = '__faE2eSetNextProjectCreatePath' as const
-const FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH = '__faE2eSetNextProjectOpenPath' as const
+import {
+  FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH,
+  FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH
+} from 'app/src-electron/mainScripts/projectManagement/functions/faProjectManagementE2ePathOverride'
 
 type T_mainGlobalE2eSetterArg = { k: string, p: string }
 

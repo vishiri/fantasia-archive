@@ -9,10 +9,10 @@ const routes: RouteRecordRaw[] = [
    */
   {
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => import('layouts/MainLayout/MainLayout.vue'),
     children: [{
       path: '',
-      component: () => import('pages/SplashPage.vue')
+      component: () => import('pages/SplashPage/SplashPage.vue')
     }]
   },
 
@@ -21,10 +21,10 @@ const routes: RouteRecordRaw[] = [
    */
   {
     path: '/home',
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => import('layouts/MainLayout/MainLayout.vue'),
     children: [{
       path: '',
-      component: () => import('pages/IndexPage.vue')
+      component: () => import('pages/IndexPage/IndexPage.vue')
     }]
   },
 
@@ -34,11 +34,11 @@ const routes: RouteRecordRaw[] = [
    */
   {
     path: '/componentTesting/:componentName',
-    component: () => import('layouts/ComponentTestingLayout.vue'),
+    component: () => import('layouts/ComponentTestingLayout/ComponentTestingLayout.vue'),
     children: [
       {
         path: '',
-        component: () => import('pages/ComponentTesting.vue')
+        component: () => import('pages/ComponentTesting/ComponentTesting.vue')
       }
     ]
   },
@@ -49,10 +49,10 @@ const routes: RouteRecordRaw[] = [
    */
   {
     path: '/:catchAll(.*)*',
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => import('layouts/MainLayout/MainLayout.vue'),
     children: [{
       path: '',
-      component: () => import('pages/ErrorNotFound.vue')
+      component: () => import('pages/ErrorNotFound/ErrorNotFound.vue')
     }]
   }
 ]

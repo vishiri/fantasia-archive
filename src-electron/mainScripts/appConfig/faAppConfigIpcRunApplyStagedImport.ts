@@ -1,4 +1,4 @@
-import { cleanupFaKeybinds, getFaKeybinds } from 'app/src-electron/mainScripts/keybinds/faKeybindsStore'
+import { cleanupFaKeybinds, getFaKeybinds } from 'app/src-electron/mainScripts/keybinds/keybinds_manager'
 import {
   faAppConfigImportStagedSessions,
   purgeFaAppConfigStagedImportSessionsExpired
@@ -6,9 +6,9 @@ import {
 import {
   cleanupFaAppNoteboard,
   getFaAppNoteboard
-} from 'app/src-electron/mainScripts/appNoteboard/faAppNoteboardStore'
-import { cleanupFaAppStyling, getFaAppStyling } from 'app/src-electron/mainScripts/appStyling/faAppStylingStore'
-import { cleanupFaUserSettings, getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
+} from 'app/src-electron/mainScripts/appNoteboard/appNoteboard_manager'
+import { cleanupFaAppStyling, getFaAppStyling } from 'app/src-electron/mainScripts/appStyling/appStyling_manager'
+import { cleanupFaUserSettings, getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettings_manager'
 import { applyFaSpellCheckerLanguagesToSession } from 'app/src-electron/mainScripts/windowManagement/faSpellCheckerSession'
 import { appWindow } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
 import type { I_faAppConfigApplyInput, I_faAppConfigApplyResult } from 'app/types/I_faAppConfigDomain'

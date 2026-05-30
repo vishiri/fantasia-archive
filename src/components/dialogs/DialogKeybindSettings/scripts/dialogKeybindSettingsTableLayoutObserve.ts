@@ -1,28 +1,10 @@
-import type { ComponentPublicInstance } from 'vue'
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  ref,
-  watch,
-  type ComputedRef,
-  type Ref
-} from 'vue'
+import type { I_ref, I_vueComponentPublicInstance } from 'app/types/I_vueCompositionShims'
 
-import { computeDialogKeybindSettingsTableMaxHeightPx } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsTableLayoutSizing'
+import type { T_dialogKeybindSettingsTableLayoutObserveModuleDeps } from 'app/types/I_dialogKeybindSettings'
+import type { T_dialogKeybindTableLayoutRun } from 'app/types/I_dialogKeybindSettingsFactories'
 
-type T_dialogKeybindTableLayoutRun = {
-  generation: number
-  getSectionElement: () => HTMLElement | null
-  observer: ResizeObserver | null
-  tableMaxHeightPx: Ref<number | null>
-}
-
-/**
- * Resolves the measured HTMLElement for the keybind dialog body section ref.
- */
 export function resolveDialogKeybindSettingsBodySectionHTMLElement (
-  inst: ComponentPublicInstance | null
+  inst: I_vueComponentPublicInstance | null
 ): HTMLElement | null {
   if (!inst) {
     return null
@@ -34,7 +16,9 @@ export function resolveDialogKeybindSettingsBodySectionHTMLElement (
   return raw
 }
 
-async function dialogKeybindSettingsTableLayoutAfterOpenDelay (): Promise<void> {
+async function dialogKeybindSettingsTableLayoutAfterOpenDelay (
+  nextTick: () => Promise<void>
+): Promise<void> {
   await nextTick()
   await new Promise<void>((resolve) => {
     requestAnimationFrame(() => {
@@ -45,7 +29,13 @@ async function dialogKeybindSettingsTableLayoutAfterOpenDelay (): Promise<void> 
   })
 }
 
-function tableLayoutMeasure (ctx: T_dialogKeybindTableLayoutRun): void {
+function tableLayoutMeasure (
+  computeDialogKeybindSettingsTableMaxHeightPx: (
+    sectionElement: HTMLElement,
+    minPx?: number
+  ) => number,
+  ctx: T_dialogKeybindTableLayoutRun
+): void {
   const el = ctx.getSectionElement()
   if (!el) {
     return
@@ -57,10 +47,7 @@ function tableLayoutStop (
   ctx: T_dialogKeybindTableLayoutRun,
   measure: () => void
 ): void {
-  window.removeEventListener(
-    'resize',
-    measure
-  )
+  window.removeEventListener('resize', measure)
   ctx.observer?.disconnect()
   ctx.observer = null
 }
@@ -69,20 +56,14 @@ function tableLayoutStart (
   ctx: T_dialogKeybindTableLayoutRun,
   measure: () => void
 ): void {
-  tableLayoutStop(
-    ctx,
-    measure
-  )
+  tableLayoutStop(ctx, measure)
   const el = ctx.getSectionElement()
   if (!el) {
     return
   }
   ctx.observer = new ResizeObserver(measure)
   ctx.observer.observe(el)
-  window.addEventListener(
-    'resize',
-    measure
-  )
+  window.addEventListener('resize', measure)
   measure()
 }
 
@@ -90,37 +71,31 @@ async function tableLayoutOnModelChange (
   open: boolean,
   gen: number,
   ctx: T_dialogKeybindTableLayoutRun,
-  measure: () => void
+  measure: () => void,
+  nextTick: () => Promise<void>
 ): Promise<void> {
   if (!open) {
-    tableLayoutStop(
-      ctx,
-      measure
-    )
+    tableLayoutStop(ctx, measure)
     ctx.tableMaxHeightPx.value = null
     return
   }
-  await dialogKeybindSettingsTableLayoutAfterOpenDelay()
+  await dialogKeybindSettingsTableLayoutAfterOpenDelay(nextTick)
   if (gen !== ctx.generation) {
     return
   }
-  tableLayoutStart(
-    ctx,
-    measure
-  )
+  tableLayoutStart(ctx, measure)
 }
 
-/**
- * Observes the keybind dialog body section and keeps a q-table max-height in sync
- * with the flex layout (ResizeObserver + window resize while the dialog is open).
- */
-export function useDialogKeybindSettingsTableLayout (args: {
-  dialogModel: Ref<boolean>
-  getSectionElement: () => HTMLElement | null
-}): {
-    tableMaxHeightPx: Ref<number | null>
+export function useDialogKeybindSettingsTableLayout (
+  deps: T_dialogKeybindSettingsTableLayoutObserveModuleDeps,
+  args: {
+    dialogModel: I_ref<boolean>
+    getSectionElement: () => HTMLElement | null
+  }
+): {
+    tableMaxHeightPx: I_ref<number | null>
   } {
-  const tableMaxHeightPx = ref<number | null>(null)
+  const tableMaxHeightPx = deps.ref<number | null>(null)
   const ctx: T_dialogKeybindTableLayoutRun = {
     generation: 0,
     getSectionElement: args.getSectionElement,
@@ -128,29 +103,21 @@ export function useDialogKeybindSettingsTableLayout (args: {
     tableMaxHeightPx
   }
   const measureAndApply = (): void => {
-    tableLayoutMeasure(ctx)
+    tableLayoutMeasure(deps.computeDialogKeybindSettingsTableMaxHeightPx, ctx)
   }
 
-  watch(
+  deps.watch(
     () => args.dialogModel.value,
     async (open) => {
       const gen = ++ctx.generation
-      await tableLayoutOnModelChange(
-        open,
-        gen,
-        ctx,
-        measureAndApply
-      )
+      await tableLayoutOnModelChange(open, gen, ctx, measureAndApply, deps.nextTick)
     },
     { immediate: true }
   )
 
-  onBeforeUnmount(() => {
+  deps.onBeforeUnmount(() => {
     ctx.generation += 1
-    tableLayoutStop(
-      ctx,
-      measureAndApply
-    )
+    tableLayoutStop(ctx, measureAndApply)
   })
 
   return {
@@ -158,28 +125,27 @@ export function useDialogKeybindSettingsTableLayout (args: {
   }
 }
 
-/**
- * Binds the keybind settings q-card-section ref to table max-height layout updates.
- */
-export function useDialogKeybindSettingsTableChrome (dialogModel: Ref<boolean>): {
-  bodySectionRef: Ref<ComponentPublicInstance | null>
-  dialogKeybindSettingsTableHeightStyle: ComputedRef<Record<string, string> | undefined>
-} {
-  const bodySectionRef = ref<ComponentPublicInstance | null>(null)
-  const { tableMaxHeightPx } = useDialogKeybindSettingsTableLayout({
+export function useDialogKeybindSettingsTableChrome (
+  deps: T_dialogKeybindSettingsTableLayoutObserveModuleDeps,
+  dialogModel: I_ref<boolean>
+): {
+    bodySectionRef: I_ref<I_vueComponentPublicInstance | null>
+    dialogKeybindSettingsTableHeightStyle: ReturnType<typeof deps.computed<Record<string, string> | undefined>>
+  } {
+  const bodySectionRef = deps.ref<I_vueComponentPublicInstance | null>(null)
+  const { tableMaxHeightPx } = useDialogKeybindSettingsTableLayout(deps, {
     dialogModel,
     getSectionElement (): HTMLElement | null {
       return resolveDialogKeybindSettingsBodySectionHTMLElement(bodySectionRef.value)
     }
   })
-  const dialogKeybindSettingsTableHeightStyle = computed((): Record<string, string> | undefined => {
+  const dialogKeybindSettingsTableHeightStyle = deps.computed((): Record<string, string> | undefined => {
     const px = tableMaxHeightPx.value
     if (px === null) {
       return undefined
     }
-    const maxHeight = `${String(px)}px`
     return {
-      maxHeight
+      maxHeight: `${String(px)}px`
     }
   })
   return {

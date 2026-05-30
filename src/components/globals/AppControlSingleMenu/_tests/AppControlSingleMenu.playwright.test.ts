@@ -5,7 +5,7 @@ import { launchFaPlaywrightComponentHarnessWindow } from 'app/helpers/playwright
 import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import type { I_appMenuList } from 'app/types/I_appMenusDataList'
-import { rgbToHex } from 'src/scripts/_utilities/colorFormatConvertors'
+import { rgbToHex } from 'app/src/scripts/_utilities/functions/colorFormatConvertors'
 
 /**
  * Menu payload for this spec — must match what the app receives via 'COMPONENT_PROPS.dataInput'.

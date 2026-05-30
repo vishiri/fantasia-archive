@@ -21,13 +21,13 @@ import {
   readFaProjectStoredProjectUuid
 } from './faProjectDbMigrate'
 import { getFaProjectSaveDefaultPath } from './faProjectFileDialogDefaultPaths'
-import { takeNextE2eProjectCreatePath } from './faProjectManagementE2ePathOverride'
+import { takeNextE2eProjectCreatePath } from './projectManagement_manager'
 import {
   ensureFaProjectExtension,
   pathLooksLikeFaProjectFile
-} from './faProjectPathValidation'
+} from './projectManagement_manager'
 import { faProjectCreateMapParseFailure } from './faProjectCreateIpcParseFailure'
-import { faProjectSlugFromDisplayName } from './faProjectSlugFromDisplayName'
+import { faProjectSlugFromDisplayName } from './projectManagement_manager'
 import { recordRecentProjectEntry } from './faRecentProjectListRuntime'
 
 function buildSaveDialogOptions (defaultPath: string): SaveDialogOptions {

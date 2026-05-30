@@ -24,7 +24,7 @@ import L_newProject from 'app/i18n/en-US/dialogs/L_newProject'
 import L_faProjectSession from 'app/i18n/en-US/globalFunctionality/L_faProjectSession'
 import noteboardMessages from 'app/i18n/en-US/floatingWindows/L_projectNoteboard'
 
-import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/faQuasarDialogStandardTransition'
+import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/functions/faQuasarDialogStandardTransition'
 
 /**
  * Extra env settings to trigger isolated E2E profile.

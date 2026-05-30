@@ -76,7 +76,7 @@ vi.mock('app/src-electron/mainScripts/windowManagement/faSpellCheckerSession', (
   }
 })
 
-vi.mock('app/src-electron/mainScripts/userSettings/userSettingsStore', () => {
+vi.mock('app/src-electron/mainScripts/userSettings/userSettings_manager', () => {
   return {
     getFaUserSettings: getFaUserSettingsMock
   }

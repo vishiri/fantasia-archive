@@ -12,7 +12,7 @@ export function vitePluginRewriteGlobEagerForStorybook (): Plugin {
     enforce: 'pre',
     transform (code, id) {
       const normalized = id.replace(/\\/g, '/')
-      if (!normalized.includes('/src/pages/ComponentTesting.vue')) return
+      if (!normalized.includes('/src/pages/ComponentTesting/ComponentTesting.vue')) return
       if (!code.includes('globEager')) return
       const next = code.replace(
         /import\.meta\.globEager\(\s*(['"])components\/\*\*\/\*\.vue\1\s*\)/,

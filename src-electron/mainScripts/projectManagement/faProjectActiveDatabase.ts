@@ -4,7 +4,7 @@ import type Database from 'better-sqlite3'
 import BetterSqlite3 from 'better-sqlite3'
 import { Result } from 'neverthrow'
 
-import { pathLooksLikeFaProjectFile } from 'app/src-electron/mainScripts/projectManagement/faProjectPathValidation'
+import { pathLooksLikeFaProjectFile } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
 
 let activeDb: Database | null = null
 
@@ -58,11 +58,6 @@ export function replaceFaProjectActiveDatabase (next: Database, filePath: string
   activeDb = next
   lastKnownActiveProjectFilePath = filePath
 }
-
-/**
- * Factory for tests: inject a mock or use real better-sqlite3.
- */
-export type T_faProjectDatabaseOpener = (filePath: string) => Database
 
 export function openFaProjectDatabase (filePath: string): Database {
   return new BetterSqlite3(filePath)

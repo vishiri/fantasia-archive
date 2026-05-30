@@ -5,7 +5,7 @@ import { expect, test } from 'vitest'
 import {
   resolveFaUserCssInjectorEffectiveCssPayload,
   resolveFaUserCssInjectorHostDocument
-} from '../faUserCssInjectorHostAndCssPayload'
+} from '../functions/faUserCssInjectorHostAndCssPayload'
 
 test('Test live preview dominates persisted css when preview is non-null string', () => {
   expect(resolveFaUserCssInjectorEffectiveCssPayload('z', '.a{color:red}')).toBe('z')

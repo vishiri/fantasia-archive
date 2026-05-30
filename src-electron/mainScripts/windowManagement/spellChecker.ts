@@ -3,7 +3,7 @@ import { MenuItem, Menu } from 'electron'
 import L_spellChecker_de from 'app/i18n/de/globalFunctionality/L_spellChecker'
 import L_spellChecker_enUS from 'app/i18n/en-US/globalFunctionality/L_spellChecker'
 import L_spellChecker_fr from 'app/i18n/fr/globalFunctionality/L_spellChecker'
-import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
+import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettings_manager'
 
 const resolveAddToDictionaryLabel = () => {
   const code = getFaUserSettings().store.languageCode

@@ -5,14 +5,16 @@ import { computed, ref } from 'vue'
 
 import type { I_faActiveProject } from 'app/types/I_faActiveProjectDomain'
 
-import { navigateToWorkspaceRouteForActiveProject } from 'app/src/scripts/appInternals/faAppRouterSession'
+import { navigateToWorkspaceRouteForActiveProject } from 'app/src/scripts/appInternals/appInternals_manager'
+import type { T_faActiveProjectOpenFlowOutcome } from 'app/types/I_faActiveProjectOpenFlow'
 import {
   finalizeFaActiveProjectOpenResult,
-  tryReuseFaActiveProjectKnownPath,
-  type T_faActiveProjectOpenFlowOutcome
-} from 'app/src/scripts/projectManagement/faActiveProjectOpenFlow'
-
-export type { T_faActiveProjectOpenFlowOutcome } from 'app/src/scripts/projectManagement/faActiveProjectOpenFlow'
+  tryReuseFaActiveProjectKnownPath
+} from 'app/src/scripts/projectManagement/projectManagement_manager'
+import {
+  buildFaActiveProjectFromBridgeProject,
+  patchFaActiveProjectDisplayName
+} from './functions/faActiveProjectSnapshot'
 
 /**
  * Session-only state for the database project currently loaded in the renderer.
@@ -49,14 +51,7 @@ export const S_FaActiveProject = defineStore('S_FaActiveProject', () => {
   }
 
   function patchActiveProjectDisplayName (name: string): void {
-    const current = activeProject.value
-    if (current === null) {
-      return
-    }
-    activeProject.value = {
-      ...current,
-      name
-    }
+    activeProject.value = patchFaActiveProjectDisplayName(activeProject.value, name)
   }
 
   async function createProjectFromUserInput (projectName: string): Promise<'created' | 'canceled'> {
@@ -75,11 +70,7 @@ export const S_FaActiveProject = defineStore('S_FaActiveProject', () => {
     if (p === undefined) {
       throw new Error('Project creation returned no project snapshot.')
     }
-    commitActiveProjectSnapshot({
-      filePath: p.filePath,
-      id: p.id,
-      name: p.name
-    })
+    commitActiveProjectSnapshot(buildFaActiveProjectFromBridgeProject(p))
     return 'created'
   }
 

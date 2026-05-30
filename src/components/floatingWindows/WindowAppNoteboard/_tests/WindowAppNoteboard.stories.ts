@@ -1,6 +1,6 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/vue3-vite'
 
-import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
+import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/keybinds_managerDefaults'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 

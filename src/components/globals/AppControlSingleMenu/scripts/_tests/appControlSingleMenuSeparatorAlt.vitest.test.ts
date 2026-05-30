@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 
 import type { I_appMenuItem } from 'app/types/I_appMenusDataList'
 
-import { appControlShouldShowSeparatorAltBeforeItem } from '../appControlSingleMenuSeparatorAlt'
+import { appControlShouldShowSeparatorAltBeforeItem } from '../functions/appControlSingleMenuSeparatorAlt'
 
 /**
  * Narrow menu rows for divider coverage only.

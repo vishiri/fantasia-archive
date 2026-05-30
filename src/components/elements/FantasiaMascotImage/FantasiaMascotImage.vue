@@ -20,9 +20,7 @@
 </template>
 
 <script setup lang="ts">
-
-import { fantasiaImageList, determineCurrentImage } from 'app/src/scripts/appGlobalManagementUI/fantasiaMascotImageManagement'
-import { computed } from 'vue'
+import { useFantasiaMascotImage } from './scripts/fantasiaMascotImage_manager'
 
 /**
  * All component props
@@ -54,17 +52,14 @@ const props = defineProps({
   }
 })
 
-/**
- * Determines if the image URL will be generating randomly or if it is set via the prop.
- */
-const isRandom = ((imageUrl: string) => (imageUrl === ''))(props.fantasiaImage)
-
-const mascotVariantName = computed(() => props.fantasiaImage || 'random')
-
-/**
- * Currently selected image URL for rendering
- */
-const currentMascotImage = determineCurrentImage(fantasiaImageList, isRandom, props.fantasiaImage)
+const {
+  currentMascotImage,
+  fantasiaImage,
+  height,
+  isRandom,
+  mascotVariantName,
+  width
+} = useFantasiaMascotImage(props)
 
 </script>
 

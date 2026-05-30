@@ -57,7 +57,7 @@ beforeEach(async () => {
  * Lazily constructs one 'electron-store' instance with the Fantasia settings file name and boolean defaults.
  */
 test('Test that getFaUserSettings creates the store once with expected name and defaults', async () => {
-  const { getFaUserSettings } = await import('../userSettingsStore')
+  const { getFaUserSettings } = await import('../userSettings_manager')
   const first = getFaUserSettings()
   const second = getFaUserSettings()
 
@@ -77,7 +77,7 @@ test('Test that getFaUserSettings removes unknown persisted keys during startup 
   persistedStoreExtras.darkMode = true
   persistedStoreExtras.futureKey = true
 
-  const { getFaUserSettings } = await import('../userSettingsStore')
+  const { getFaUserSettings } = await import('../userSettings_manager')
   const store = getFaUserSettings()
 
   expect(storeReplacementCalls).toEqual([
@@ -96,7 +96,7 @@ test('Test that getFaUserSettings removes unknown persisted keys during startup 
 test('Test that getFaUserSettings does not rewrite a clean persisted settings store', async () => {
   persistedStoreExtras.darkMode = true
 
-  const { getFaUserSettings } = await import('../userSettingsStore')
+  const { getFaUserSettings } = await import('../userSettings_manager')
   const store = getFaUserSettings()
 
   expect(storeReplacementCalls).toEqual([])
@@ -108,7 +108,7 @@ test('Test that getFaUserSettings does not rewrite a clean persisted settings st
  * Nullish 'store.store' is treated as an empty object, and missing keys are filled from defaults without rewriting when no unknown keys exist.
  */
 test('Test that cleanupFaUserSettings fills missing keys when persisted store snapshot is nullish', async () => {
-  const { cleanupFaUserSettings } = await import('../userSettingsStore')
+  const { cleanupFaUserSettings } = await import('../userSettings_manager')
   let persisted: I_faUserSettings | undefined | null
   const fakeStore = {
     get store () {
@@ -129,7 +129,7 @@ test('Test that cleanupFaUserSettings fills missing keys when persisted store sn
  * Partial persisted objects still merge each known key via nullish coalescing to defaults.
  */
 test('Test that cleanupFaUserSettings backfills omitted default keys from a partial persisted object', async () => {
-  const { cleanupFaUserSettings } = await import('../userSettingsStore')
+  const { cleanupFaUserSettings } = await import('../userSettings_manager')
   const partial = {
     darkMode: true
   } as Partial<I_faUserSettings> & Record<string, unknown>

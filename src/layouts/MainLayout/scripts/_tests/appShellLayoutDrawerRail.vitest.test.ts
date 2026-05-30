@@ -5,8 +5,8 @@ import {
 } from 'vue'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
-import { FA_APP_SHELL_DRAWER_TRANSITION_MS } from 'app/src/scripts/appRouting/faAppShellPageTransition'
-import { useAppShellLayoutDrawerRail } from 'app/src/layouts/MainLayout/scripts/appShellLayoutDrawerRail'
+import { FA_APP_SHELL_DRAWER_TRANSITION_MS } from 'app/src/scripts/appRouting/appRouting_manager'
+import { useAppShellLayoutDrawerRail } from 'app/src/layouts/MainLayout/scripts/mainLayout_manager'
 
 beforeEach(() => {
   vi.useFakeTimers()

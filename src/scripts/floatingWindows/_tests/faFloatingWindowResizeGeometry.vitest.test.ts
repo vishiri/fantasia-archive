@@ -1,14 +1,12 @@
 import { expect, test } from 'vitest'
 
-import {
-  FA_FLOATING_WINDOW_FRAME_DEFAULT_LAYOUT,
-  type I_FaFloatingWindowFrameLayout
-} from 'app/src/scripts/floatingWindows/faFloatingWindowFrameLayout'
+import type { I_FaFloatingWindowFrameLayout } from 'app/types/I_faFloatingWindowFrameLayout'
+import { FA_FLOATING_WINDOW_FRAME_DEFAULT_LAYOUT } from '../functions/faFloatingWindowFrameLayout'
+import { computeFaFloatingWindowResizeFrame } from '../faFloatingWindowResizeGeometry_manager'
 import {
   clampFaFloatingWindowFrameToViewport,
-  clampFaFloatingWindowResizeToViewport,
-  computeFaFloatingWindowResizeFrame
-} from 'app/src/scripts/floatingWindows/faFloatingWindowResizeGeometry'
+  clampFaFloatingWindowResizeToViewport
+} from '../faFloatingWindowResizeClamp_manager'
 
 /** Same margins as production; smaller mins so resize math in these tests is not dominated by frame minimums. */
 const layout: I_FaFloatingWindowFrameLayout = {

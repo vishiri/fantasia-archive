@@ -6,8 +6,8 @@ import {
   importExportDialogClickApplyImport,
   importExportDialogClickCreateExport,
   importExportDialogClickPrepareImport
-} from '../dialogImportExportAppConfigDialogActions'
-import type { I_importExportDialogActionBindings } from '../dialogImportExportAppConfigDialogActions'
+} from '../dialogImportExportAppConfig_manager'
+import type { I_importExportDialogActionBindings } from 'app/types/I_dialogImportExportAppConfig'
 
 const { notifyCreateMock, runFaActionAwaitMock, runFaActionMock } = vi.hoisted(() => ({
   notifyCreateMock: vi.fn(),
@@ -23,7 +23,7 @@ vi.mock('app/i18n/externalFileLoader', () => ({
   i18n: { global: { t: (k: string) => k } }
 }))
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => ({
   runFaAction: runFaActionMock,
   runFaActionAwait: runFaActionAwaitMock
 }))

@@ -8,6 +8,9 @@ import pluginVue from 'eslint-plugin-vue'
 import vueParser from 'vue-eslint-parser'
 import tseslint from 'typescript-eslint'
 
+import { faTwoLevelPlugin } from './eslint-rules/faTwoLevelPlugin.mjs'
+import { typesFolderPlugin } from './eslint-rules/typesFolderPlugin.mjs'
+
 /**
  * Paths excluded from max-lines / max-lines-per-function (see .cursor/rules/code-size-decomposition.mdc).
  */
@@ -30,7 +33,56 @@ const codeSizeRuleIgnores = [
   '**/quasar.config.js',
   'scripts/**/*.mjs',
   'testRunner_*.mjs',
-  '**/testRunner_*.mjs'
+  '**/testRunner_*.mjs',
+  '**/*_manager.ts',
+  'src/stores/S_*.ts',
+  '**/_data/**/*.ts',
+  'eslint-rules/**'
+]
+
+/** Level-1 functions/*.ts — no NPM / in-repo value imports (types/ only as import type). */
+const faTwoLevelFunctionsGlobs = [
+  'src/**/functions/**/*.ts',
+  'src-electron/**/functions/**/*.ts'
+]
+
+const faTwoLevelNpmRestrictedPaths = [
+  {
+    name: 'vue',
+    message: 'Level-1 functions/ must not import NPM packages; inject via the manager.'
+  },
+  {
+    name: 'pinia',
+    message: 'Level-1 functions/ must not import NPM packages; inject via the manager.'
+  },
+  {
+    name: 'quasar',
+    message: 'Level-1 functions/ must not import NPM packages; inject via the manager.'
+  },
+  {
+    name: 'neverthrow',
+    message: 'Level-1 functions/ must not import NPM packages; inject via the manager.'
+  },
+  {
+    name: 'vue-i18n',
+    message: 'Level-1 functions/ must not import NPM packages; inject via the manager.'
+  },
+  {
+    name: 'vue-router',
+    message: 'Level-1 functions/ must not import NPM packages; inject via the manager.'
+  },
+  {
+    name: 'axios',
+    message: 'Level-1 functions/ must not import NPM packages; inject via the manager.'
+  },
+  {
+    name: 'lodash-es',
+    message: 'Level-1 functions/ must not import NPM packages; inject via the manager.'
+  },
+  {
+    name: 'monaco-editor',
+    message: 'Level-1 functions/ must not import NPM packages; inject via the manager.'
+  }
 ]
 
 export default [...neostandard({
@@ -47,6 +99,8 @@ export default [...neostandard({
     '**/src-ssr/**',
     '**/test-results/**',
     '**/coverage/**',
+    'eslint*.json',
+    'scripts/.eslint-report.json',
     'quasar.config.*.temporary.compiled*'
   ],
   globals: {
@@ -73,7 +127,9 @@ export default [...neostandard({
 }, {
   plugins: {
     import: importPlugin,
-    '@typescript-eslint': tseslint.plugin
+    '@typescript-eslint': tseslint.plugin,
+    'fa-two-level': faTwoLevelPlugin,
+    'types-folder': typesFolderPlugin
   },
   rules: {
     'import/first': 'off',
@@ -193,6 +249,142 @@ export default [...neostandard({
     }]
   }
 }, {
+  files: faTwoLevelFunctionsGlobs,
+  rules: {
+    'import/no-restricted-paths': ['error', {
+      zones: [
+        {
+          target: './src/**/functions',
+          from: './src',
+          except: ['./types'],
+          message: 'Level-1 functions/ may not import from src/ except types/ (use import type only).'
+        },
+        {
+          target: './src-electron/**/functions',
+          from: './src-electron',
+          except: ['./shared'],
+          message: 'Level-1 functions/ may not import from src-electron/ except shared schemas as import type.'
+        },
+        {
+          target: './src/**/functions',
+          from: './src-electron',
+          message: 'Level-1 functions/ may not import from src-electron/.'
+        },
+        {
+          target: './src-electron/**/functions',
+          from: './src',
+          message: 'Level-1 functions/ may not import from src/.'
+        },
+        {
+          target: './src/**/functions',
+          from: './i18n',
+          message: 'Level-1 functions/ may not import i18n; pass translated strings from the manager.'
+        },
+        {
+          target: './src/**/functions',
+          from: './node_modules',
+          message: 'Level-1 functions/ must not import NPM packages.'
+        },
+        {
+          target: './src-electron/**/functions',
+          from: './node_modules',
+          message: 'Level-1 functions/ must not import NPM packages.'
+        }
+      ]
+    }],
+    '@typescript-eslint/no-restricted-imports': ['error', {
+      paths: [
+        ...faTwoLevelNpmRestrictedPaths,
+        {
+          name: 'app/types/*',
+          allowTypeImports: true
+        },
+        {
+          name: 'app/i18n/**',
+          message: 'Level-1 functions/ may not import i18n.'
+        }
+      ],
+      patterns: [
+        {
+          group: ['app/src/**', 'src/**', 'app/src-electron/**'],
+          allowTypeImports: true,
+          message: 'Level-1 functions/ may only use import type from app/types/, not value imports from src/.'
+        }
+      ]
+    }],
+    '@typescript-eslint/consistent-type-imports': ['error', {
+      prefer: 'type-imports',
+      fixStyle: 'separate-type-imports'
+    }],
+    'fa-two-level/functions-only-type-imports': 'error',
+    'fa-two-level/no-functions-import-manager': 'error'
+  }
+}, {
+  files: [
+    'src/**/*.{ts,vue}',
+    'src-electron/**/*.ts'
+  ],
+  ignores: [
+    ...faTwoLevelFunctionsGlobs,
+    '**/*.vitest.test.ts',
+    '**/*playwright*.ts',
+    '**/*.stories.ts',
+    'i18n/**/*.ts',
+    'types/**/*.ts',
+    'helpers/playwrightHelpers_*/**',
+    'e2e-tests/**'
+  ],
+  rules: {
+    'import/no-restricted-paths': ['error', {
+      zones: [
+        {
+          target: './src/**',
+          from: './src/**/functions',
+          except: [
+            './src/**/**/*_manager.ts',
+            './src/stores',
+            './src/**/_data',
+            './src/**/_tests'
+          ],
+          message: 'Import functions/ only from *_manager.ts, S_*.ts, _data/, or tests.'
+        },
+        {
+          target: './src-electron/**',
+          from: './src/**/functions',
+          except: [
+            './src-electron/**/register*Ipc.ts',
+            './src-electron/**/contentBridgeAPIs/**'
+          ],
+          message: 'Renderer functions/ are imported from managers, stores, _data/, or tests only.'
+        }
+      ]
+    }],
+    'fa-two-level/feature-scripts-layout': 'error',
+    'fa-two-level/require-manager-when-functions': 'error',
+    'fa-two-level/stores-functions-layout': 'error',
+    'fa-two-level/manager-wiring-only': 'error'
+  }
+}, {
+  files: [
+    '**/*_manager.ts'
+  ],
+  ignores: [
+    '**/*.vitest.test.ts'
+  ],
+  rules: {
+    'fa-two-level/manager-wiring-only': 'error'
+  }
+}, {
+  files: [
+    'src/components/**/*.vue',
+    'src/layouts/**/*.vue',
+    'src/pages/**/*.vue',
+    'src/App.vue'
+  ],
+  rules: {
+    'fa-two-level/vue-script-import-allowlist': 'error'
+  }
+}, {
   files: ['src-electron/mainScripts/**/*.ts'],
   ignores: [
     '**/*.vitest.test.ts',
@@ -222,5 +414,19 @@ export default [...neostandard({
         }
       ]
     }]
+  }
+}, {
+  files: ['**/*.{ts,vue}'],
+  ignores: [
+    'types/**',
+    '**/*.d.ts',
+    'i18n/**',
+    '**/node_modules/**',
+    '**/dist/**',
+    '**/.quasar/**',
+    '**/storybook-static/**'
+  ],
+  rules: {
+    'types-folder/no-exported-types-outside-types': 'error'
   }
 }, ...storybook.configs['flat/recommended']]

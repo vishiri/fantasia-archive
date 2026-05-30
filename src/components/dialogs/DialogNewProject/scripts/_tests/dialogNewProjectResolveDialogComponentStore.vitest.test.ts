@@ -8,7 +8,7 @@ vi.mock('app/src/stores/S_Dialog', () => {
 
 import * as DialogStoreModule from 'app/src/stores/S_Dialog'
 
-import { resolveDialogComponentStoreOrNull } from '../dialogNewProjectResolveDialogComponentStore'
+import { resolveDialogComponentStoreOrNull } from '../dialogNewProject_manager'
 
 type T_AccessorFn = typeof DialogStoreModule.S_DialogComponent
 

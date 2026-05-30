@@ -17,22 +17,22 @@ const {
   getFaUserSettingsMock: vi.fn()
 }))
 
-vi.mock('app/src-electron/mainScripts/userSettings/userSettingsStore', () => ({
+vi.mock('app/src-electron/mainScripts/userSettings/userSettings_manager', () => ({
   cleanupFaUserSettings: vi.fn(),
   getFaUserSettings: getFaUserSettingsMock
 }))
 
-vi.mock('app/src-electron/mainScripts/keybinds/faKeybindsStore', () => ({
+vi.mock('app/src-electron/mainScripts/keybinds/keybinds_manager', () => ({
   cleanupFaKeybinds: vi.fn(),
   getFaKeybinds: getFaKeybindsMock
 }))
 
-vi.mock('app/src-electron/mainScripts/appNoteboard/faAppNoteboardStore', () => ({
+vi.mock('app/src-electron/mainScripts/appNoteboard/appNoteboard_manager', () => ({
   cleanupFaAppNoteboard: vi.fn(),
   getFaAppNoteboard: getFaAppNoteboardMock
 }))
 
-vi.mock('app/src-electron/mainScripts/appStyling/faAppStylingStore', () => ({
+vi.mock('app/src-electron/mainScripts/appStyling/appStyling_manager', () => ({
   cleanupFaAppStyling: vi.fn(),
   getFaAppStyling: getFaAppStylingMock
 }))

@@ -1,7 +1,7 @@
 import { expect, test, vi } from 'vitest'
 import { ref } from 'vue'
 
-import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
+import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/keybinds_managerDefaults'
 import type { I_faKeybindsSnapshot } from 'app/types/I_faKeybindsDomain'
 
 const { tMock, getKeybindsMock } = vi.hoisted(() => {
@@ -30,7 +30,7 @@ test('Test that runFaKeybindsRefreshKeybinds no-ops when getKeybinds is missing'
     writable: true
   })
 
-  const { runFaKeybindsRefreshKeybinds } = await import('../faKeybindsStoreBridgeRefresh')
+  const { runFaKeybindsRefreshKeybinds } = await import('../scripts/sFaKeybindsBridgeRefresh')
   const snapshot = ref<I_faKeybindsSnapshot | null>(null)
 
   await runFaKeybindsRefreshKeybinds(snapshot)
@@ -57,7 +57,7 @@ test('Test that runFaKeybindsRefreshKeybinds assigns snapshot on success', async
     writable: true
   })
 
-  const { runFaKeybindsRefreshKeybinds } = await import('../faKeybindsStoreBridgeRefresh')
+  const { runFaKeybindsRefreshKeybinds } = await import('../scripts/sFaKeybindsBridgeRefresh')
   const snapshot = ref<I_faKeybindsSnapshot | null>(null)
 
   await runFaKeybindsRefreshKeybinds(snapshot)
@@ -82,7 +82,7 @@ test('Test that runFaKeybindsRefreshKeybinds throws on getKeybinds failure', asy
     writable: true
   })
 
-  const { runFaKeybindsRefreshKeybinds } = await import('../faKeybindsStoreBridgeRefresh')
+  const { runFaKeybindsRefreshKeybinds } = await import('../scripts/sFaKeybindsBridgeRefresh')
   const snapshot = ref<I_faKeybindsSnapshot | null>(null)
 
   await expect(runFaKeybindsRefreshKeybinds(snapshot)).rejects.toThrow(

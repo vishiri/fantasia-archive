@@ -17,7 +17,7 @@ import {
   resolveDialogKeybindSettingsBodySectionHTMLElement,
   useDialogKeybindSettingsTableChrome,
   useDialogKeybindSettingsTableLayout
-} from '../dialogKeybindSettingsTableLayoutObserve'
+} from '../dialogKeybindSettings_manager'
 
 let resizeObserverOriginal: typeof ResizeObserver | undefined
 

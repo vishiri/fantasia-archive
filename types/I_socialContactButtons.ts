@@ -51,3 +51,11 @@ export interface I_socialContactButtonSet {
   buttonReddit: I_socialContactButton
   buttonTwitter: I_socialContactButton
 }
+
+/** Static fields for a single social button (URLs, icons, layout). */
+export type I_socialContactButtonStaticFields = Omit<I_socialContactButton, 'label' | 'title'>
+
+/** Full static config map for SocialContactButtons. */
+export type T_socialContactButtonStaticConfig = {
+  [K in keyof I_socialContactButtonSet]: I_socialContactButtonStaticFields
+}

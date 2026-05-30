@@ -6,14 +6,14 @@ const { runFaActionMock } = vi.hoisted(() => {
   }
 })
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => {
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => {
   return {
     runFaAction: (...args: unknown[]) => runFaActionMock(...args),
     runFaActionAwait: vi.fn(async () => true)
   }
 })
 
-import { faKeybindRunCommand } from 'app/src/scripts/keybinds/faKeybindRunCommand'
+import { faKeybindRunCommand } from 'app/src/scripts/keybinds/keybinds_manager'
 
 beforeEach(() => {
   runFaActionMock.mockReset()

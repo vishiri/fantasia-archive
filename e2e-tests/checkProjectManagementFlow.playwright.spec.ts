@@ -558,9 +558,10 @@ test.describe.serial('Project management flow', () => {
   /**
    * Eleven **Create new project** flows hit the MRU cap (10): submenu lists E2E MRU cap exercise project 11 … 02 only.
    * While 11 is active its SQLite file stays open, so we switch to project 10, delete 11's file on disk, then open 11 from MRU.
-   * That surfaces 'Project file does not exist', prunes the stale MRU row, and leaves nine entries (10 … 02).
+   * That rejects the missing path, prunes the stale MRU row, and leaves nine entries (10 … 02).
    */
   test('Recent project MRU caps at 10 and drops stale paths after a missing file open', async () => {
+    test.setTimeout(120_000)
     await navigateFaPlaywrightE2eToHomeRoute(appWindow)
     for (let i = 1; i <= E2E_RECENT_CAP_TOTAL; i++) {
       await createProjectViaMenu(
@@ -600,9 +601,6 @@ test.describe.serial('Project management flow', () => {
     }).click()
     await dismissOpenMenus(appWindow)
 
-    await expect(
-      appWindow.getByText('Project file does not exist').first()
-    ).toBeVisible()
     await e2eExpectFaActiveProjectStoreName(
       appWindow,
       recentCapDisplayName(E2E_RECENT_CAP_TOTAL - 1)

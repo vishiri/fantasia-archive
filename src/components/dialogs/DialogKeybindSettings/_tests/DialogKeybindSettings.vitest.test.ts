@@ -12,7 +12,7 @@ vi.mock('quasar', () => ({
 import type { I_dialogKeybindSettingsRow } from 'app/types/I_dialogKeybindSettings'
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
 
-import { FA_KEYBIND_COMMAND_DEFINITIONS } from 'app/src/scripts/keybinds/faKeybindCommandDefinitions'
+import { FA_KEYBIND_COMMAND_DEFINITIONS } from 'app/src/scripts/keybinds/keybinds_manager'
 
 import DialogKeybindSettings from '../DialogKeybindSettings.vue'
 

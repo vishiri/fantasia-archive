@@ -1,5 +1,5 @@
 import { expect, test, vi } from 'vitest'
-import { determineCurrentImage, randomMascotImage } from '../fantasiaMascotImageManagement'
+import { determineCurrentImage, randomMascotImage } from '../functions/fantasiaMascotImageManagement'
 
 const mockImageList = {
   one: 'img-1.png',

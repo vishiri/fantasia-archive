@@ -5,11 +5,12 @@ import {
 } from 'vitest'
 import { nextTick, ref, shallowRef } from 'vue'
 
-import type { I_FaMonacoMount } from '../useMonacoMount'
+import type { I_FaMonacoMount } from 'app/types/I_faWindowStylingMonaco'
+
 import {
   reconcileMountedMonacoWithWorkingCss,
   wireAppStylingPersistedCssIntoOpenEditor
-} from '../windowAppStylingStateSideEffects'
+} from '../windowAppStyling_manager'
 
 /**
  * wireAppStylingPersistedCssIntoOpenEditor
@@ -127,12 +128,9 @@ test('persisted-css wire skips when persisted matches workingCss ahead of watche
  * Leaves the stub alone when Monaco has no active editor wrapper.
  */
 test('monaco reconcile ignores null editor refs', () => {
-  const monaco: Pick<I_FaMonacoMount, 'editor'> = {
-    editor: shallowRef(null)
-  }
   reconcileMountedMonacoWithWorkingCss({
-    monaco: monaco as unknown as I_FaMonacoMount,
-    workingCss: ref('anything')
+    editor: null,
+    workingCss: 'anything'
   })
 })
 
@@ -148,8 +146,8 @@ test('monaco reconcile pushes workingCss when editor differs', () => {
   })
 
   reconcileMountedMonacoWithWorkingCss({
-    monaco: { editor: stubEditor } as unknown as I_FaMonacoMount,
-    workingCss: ref('wanted')
+    editor: stubEditor.value,
+    workingCss: 'wanted'
   })
 
   expect(setValueSpy).toHaveBeenCalledWith('wanted')
@@ -168,8 +166,8 @@ test('monaco reconcile skips setValue when text already matches workingCss', () 
   })
 
   reconcileMountedMonacoWithWorkingCss({
-    monaco: { editor: stubEditor } as unknown as I_FaMonacoMount,
-    workingCss: ref(same)
+    editor: stubEditor.value,
+    workingCss: same
   })
 
   expect(setValueSpy).not.toHaveBeenCalled()

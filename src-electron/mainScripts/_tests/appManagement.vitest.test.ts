@@ -110,13 +110,13 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaAppStylingIpc', ()
   }
 })
 
-vi.mock('app/src-electron/mainScripts/appNoteboard/faAppNoteboardStore', () => {
+vi.mock('app/src-electron/mainScripts/appNoteboard/appNoteboard_manager', () => {
   return {
     getFaAppNoteboard: vi.fn()
   }
 })
 
-vi.mock('app/src-electron/mainScripts/appStyling/faAppStylingStore', () => {
+vi.mock('app/src-electron/mainScripts/appStyling/appStyling_manager', () => {
   return {
     getFaAppStyling: vi.fn()
   }
@@ -140,13 +140,13 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaAppDetailsIpc', ()
   }
 })
 
-vi.mock('app/src-electron/mainScripts/userSettings/userSettingsStore', () => {
+vi.mock('app/src-electron/mainScripts/userSettings/userSettings_manager', () => {
   return {
     getFaUserSettings: getFaUserSettingsMock
   }
 })
 
-vi.mock('app/src-electron/mainScripts/keybinds/faKeybindsStore', () => {
+vi.mock('app/src-electron/mainScripts/keybinds/keybinds_manager', () => {
   return {
     getFaKeybinds: vi.fn()
   }

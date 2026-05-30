@@ -172,23 +172,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import FaFloatingWindowBodyTeleport from 'app/src/components/floatingWindows/_FaFloatingWindowBodyTeleport/_FaFloatingWindowBodyTeleport.vue'
 import FaFloatingWindowFrameResizeHandles from 'app/src/components/floatingWindows/_FaFloatingWindowFrameResizeHandles/_FaFloatingWindowFrameResizeHandles.vue'
-import { buildFaColorVarSwatchStyle } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/faColorVarSwatchStyle'
-import { useWindowProjectStylingCssPersist } from 'app/src/components/floatingWindows/WindowProjectStyling/scripts/useWindowProjectStylingCssPersist'
-import { useWindowProjectStylingFramePersist } from 'app/src/components/floatingWindows/WindowProjectStyling/scripts/useWindowProjectStylingFramePersist'
-import { useWindowProjectStylingHelpPanel } from 'app/src/components/floatingWindows/WindowProjectStyling/scripts/windowProjectStylingHelpPanel'
-import { useWindowProjectStyling } from 'app/src/components/floatingWindows/WindowProjectStyling/scripts/windowProjectStylingState'
-import { useWindowAppStylingHelpMenu } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStylingHelpMenu'
-import {
-  FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
-  FA_FLOATING_WINDOW_POP_TRANSITION_MS
-} from 'app/src/scripts/floatingWindows/faFloatingWindowPopTransition'
-import { useFaFloatingWindowFrame } from 'app/src/scripts/floatingWindows/useFaFloatingWindowFrame'
-import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
+import { useWindowProjectStylingSurface } from 'app/src/components/floatingWindows/WindowProjectStyling/scripts/windowProjectStyling_manager'
 
 defineOptions({
   name: 'WindowProjectStyling'
@@ -202,61 +189,27 @@ const props = defineProps<{
 }>()
 
 const {
+  FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
+  FA_FLOATING_WINDOW_POP_TRANSITION_MS,
+  buildFaColorVarSwatchStyle,
   closeWithoutSaving,
   documentName,
   editorHostRef,
-  monaco,
-  saveAndCloseWindow,
-  windowModel,
-  workingCss
-} = useWindowProjectStyling(props)
-
-const projectStylingStore = S_FaProjectStyling()
-const persistedProjectStylingFrame = computed(() => projectStylingStore.root?.frame ?? null)
-
-const {
+  faThemeCustomPropertyNames,
   frameRef,
-  frameStyle,
-  h,
+  frameStyleWithDialogTransition,
+  helpKeybindMenuOpen,
+  monaco,
+  monacoKeybindHelpItems,
   onFramePointerDown,
+  onHelpIconMouseEnter,
+  onHelpIconMouseLeave,
   onResizePointerDown,
   onTitlePointerDown,
+  saveAndCloseWindow,
   titleShortFrameClass,
-  w,
-  x,
-  y
-} = useFaFloatingWindowFrame(windowModel, undefined, {
-  floatingWindowZLayer: 'projectStyling',
-  persistedFrame: persistedProjectStylingFrame
-})
-
-useWindowProjectStylingCssPersist({
-  css: workingCss,
   windowModel
-})
-
-useWindowProjectStylingFramePersist({
-  h,
-  windowModel,
-  w,
-  x,
-  y
-})
-
-const {
-  helpKeybindMenuOpen,
-  onHelpIconMouseEnter,
-  onHelpIconMouseLeave
-} = useWindowAppStylingHelpMenu()
-
-const { faThemeCustomPropertyNames, monacoKeybindHelpItems } = useWindowProjectStylingHelpPanel(
-  helpKeybindMenuOpen
-)
-
-const frameStyleWithDialogTransition = computed(() => ({
-  ...frameStyle.value,
-  '--q-transition-duration': `${FA_FLOATING_WINDOW_POP_TRANSITION_MS}ms`
-}))
+} = useWindowProjectStylingSurface(props)
 </script>
 
 <style lang="scss" src="./styles/WindowProjectStyling.unscoped.scss"></style>

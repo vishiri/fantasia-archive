@@ -4,7 +4,7 @@ import {
   FA_PROJECT_NAME_MAX_LEN
 } from 'app/src-electron/shared/faProjectConstants'
 
-import { faProjectSlugFromDisplayName } from '../faProjectSlugFromDisplayName'
+import { faProjectSlugFromDisplayName } from '../projectManagement_manager'
 
 test('faProjectSlugFromDisplayName preserves spaces and casing when safe', () => {
   expect(faProjectSlugFromDisplayName('Some project')).toBe('Some project')

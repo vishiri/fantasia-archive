@@ -6,7 +6,7 @@ import {
   faMenuItem,
   faMenuSeparator
 } from 'app/src/components/globals/AppControlMenus/_data/menuDataHelpers'
-import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
+import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/keybinds_managerDefaults'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 
 import AppControlSingleMenu from '../AppControlSingleMenu.vue'

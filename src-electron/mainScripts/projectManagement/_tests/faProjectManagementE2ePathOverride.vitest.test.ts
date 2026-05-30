@@ -2,11 +2,13 @@ import { afterEach, beforeEach, expect, test } from 'vitest'
 
 import {
   FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH,
-  FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH,
+  FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH
+} from '../functions/faProjectManagementE2ePathOverride'
+import {
   installFaProjectManagementE2ePathOverrideGlobals,
   takeNextE2eProjectCreatePath,
   takeNextE2eProjectOpenPath
-} from '../faProjectManagementE2ePathOverride'
+} from '../projectManagement_manager'
 
 beforeEach(() => {
   delete process.env.TEST_ENV

@@ -65,11 +65,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-
-import { useFaFloatingWindowFrameResizeHandlesHover } from 'app/src/components/floatingWindows/_FaFloatingWindowFrameResizeHandles/scripts/faFloatingWindowFrameResizeHandlesHover'
-import { FA_FLOATING_WINDOW_RESIZE_HANDLE_PX } from 'app/src/scripts/floatingWindows/faFloatingWindowResizeGeometry'
-import type { T_faFloatingWindowResizeEdge } from 'app/src/scripts/floatingWindows/useFaFloatingWindowResize'
+import { useFaFloatingWindowFrameResizeHandlesChrome } from 'app/src/components/floatingWindows/_FaFloatingWindowFrameResizeHandles/scripts/faFloatingWindowFrameResizeHandles_manager'
+import type { T_faFloatingWindowResizeEdge } from 'app/types/I_faFloatingWindowResize'
 
 defineOptions({
   name: '_FaFloatingWindowFrameResizeHandles'
@@ -79,12 +76,14 @@ const props = defineProps<{
   onResizePointerDown: (edge: T_faFloatingWindowResizeEdge, e: PointerEvent) => void
 }>()
 
-const { activeHandle, beginResizeHighlight, edgeGlow, onHoverEnter, onHoverLeave } =
-  useFaFloatingWindowFrameResizeHandlesHover()
-
-const rootStyle = computed(() => ({
-  '--fa-fw-resize': `${FA_FLOATING_WINDOW_RESIZE_HANDLE_PX}px`
-}))
+const {
+  activeHandle,
+  beginResizeHighlight,
+  edgeGlow,
+  onHoverEnter,
+  onHoverLeave,
+  rootStyle
+} = useFaFloatingWindowFrameResizeHandlesChrome()
 
 function down (edge: T_faFloatingWindowResizeEdge, e: PointerEvent): void {
   beginResizeHighlight(edge)

@@ -3,7 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 
-import { registerFaE2eActiveProjectSnapshotProbe } from '../registerFaE2eActiveProjectSnapshotProbe'
+import { registerFaE2eActiveProjectSnapshotProbe } from '../registerFaE2eActiveProjectSnapshotProbe_manager'
 
 beforeEach(() => {
   setActivePinia(createPinia())

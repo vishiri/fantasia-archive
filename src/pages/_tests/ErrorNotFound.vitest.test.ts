@@ -4,7 +4,7 @@ import { expect, test } from 'vitest'
 
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 
-import ErrorNotFound from '../ErrorNotFound.vue'
+import ErrorNotFound from '../ErrorNotFound/ErrorNotFound.vue'
 
 /**
  * ErrorNotFound

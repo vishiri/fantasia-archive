@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX } from 'app/src/scripts/floatingWindows/faFloatingWindowPersistedGeometry'
+import { FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX } from 'app/src/scripts/floatingWindows/faFloatingWindowPersistedGeometry_manager'
 import { FA_APP_NOTEBOARD_MAX_TEXT_LENGTH } from './faAppNoteboardPatchSchema'
 import type { I_faProjectNoteboardPatch } from 'app/types/I_faProjectNoteboardDomain'
 

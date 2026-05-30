@@ -49,31 +49,22 @@
 
 <script setup lang="ts">
 
-import { computed, onMounted, ref } from 'vue'
-import { storeToRefs } from 'pinia'
-
-import { i18n } from 'app/i18n/externalFileLoader'
-import type { I_appMenuList } from 'app/types/I_appMenusDataList'
-import { openDialogMarkdownDocument } from 'src/scripts/appGlobalManagementUI/dialogManagement'
-import { isFantasiaStorybookCanvas } from 'app/src/scripts/appInternals/rendererAppInternals'
-
-import { buildDocumentsMenu } from 'app/src/components/globals/AppControlMenus/_data/documents'
-import { buildHelpInfoMenu } from 'app/src/components/globals/AppControlMenus/_data/helpInfo'
-import { buildProjectMenu } from 'app/src/components/globals/AppControlMenus/_data/project'
-import { buildToolsMenu } from 'app/src/components/globals/AppControlMenus/_data/tools'
-import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
-import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
-
 import AppControlSingleMenu from 'app/src/components/globals/AppControlSingleMenu/AppControlSingleMenu.vue'
 import FaModalAndFloatingWindowHost from 'app/src/components/globals/_FaModalAndFloatingWindowHost/_FaModalAndFloatingWindowHost.vue'
 
-function readInitialTestingType (): string | false {
-  const snap = window.faContentBridgeAPIs?.extraEnvVariables?.getCachedSnapshot?.()
-  if (!snap) {
-    return ''
-  }
-  return snap.TEST_ENV ?? ''
-}
+import {
+  appControlMenusEmbedDialogsDefault,
+  useAppControlMenus
+} from './scripts/appControlMenus_manager'
+
+const {
+  componentTestingMenuList,
+  documents,
+  helpInfo,
+  project,
+  testingType,
+  tools
+} = useAppControlMenus()
 
 withDefaults(
   defineProps<{
@@ -83,152 +74,9 @@ withDefaults(
     embedDialogs?: boolean
   }>(),
   {
-    embedDialogs: !isFantasiaStorybookCanvas()
+    embedDialogs: appControlMenusEmbedDialogsDefault
   }
 )
-
-const { hasActiveProject } = storeToRefs(S_FaActiveProject())
-const { entries: recentProjectEntries } = storeToRefs(S_FaRecentProjects())
-
-/**
- * Testing type that might be happening right now
- */
-const testingType = ref<string | false>(readInitialTestingType())
-
-onMounted(async () => {
-  const bridge = window.faContentBridgeAPIs?.extraEnvVariables
-  if (bridge?.getSnapshot) {
-    const snap = await bridge.getSnapshot()
-    testingType.value = snap.TEST_ENV ?? ''
-  }
-})
-
-const project = computed((): I_appMenuList => {
-  void i18n.global.locale.value
-  void hasActiveProject.value
-  void recentProjectEntries.value
-  return buildProjectMenu({
-    hasActiveProject: hasActiveProject.value,
-    recentProjects: recentProjectEntries.value
-  })
-})
-
-const documents = computed((): I_appMenuList => {
-  void i18n.global.locale.value
-  void hasActiveProject.value
-  return buildDocumentsMenu({
-    hasActiveProject: hasActiveProject.value
-  })
-})
-
-const tools = computed((): I_appMenuList => {
-  void i18n.global.locale.value
-  void hasActiveProject.value
-  return buildToolsMenu({
-    hasActiveProject: hasActiveProject.value
-  })
-})
-
-const helpInfo = computed((): I_appMenuList => {
-  void i18n.global.locale.value
-  return buildHelpInfoMenu()
-})
-
-/**
- * Menu payload for TEST_ENV === 'components' embed only — mirrors Playwright scenarios for AppControlMenus.
- */
-const componentTestingMenuList: I_appMenuList = {
-  title: 'Test Title',
-  data: [
-    {
-      mode: 'item',
-      text: 'Test Button 1 - Open Dialog with Markdown document',
-      icon: 'mdi-text-box-plus-outline',
-      submenu: undefined,
-      trigger: () => openDialogMarkdownDocument('changeLog'),
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'item',
-      text: 'Test Button 2 - Keybind Settings (hint)',
-      icon: 'mdi-keyboard-settings',
-      keybindCommandId: 'openKeybindSettings',
-      submenu: undefined,
-      trigger: undefined,
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'separator'
-    },
-    {
-      mode: 'item',
-      text: 'Test Button 3 - Secondary',
-      icon: 'mdi-text-box-remove-outline',
-      submenu: undefined,
-      trigger: undefined,
-      conditions: true,
-      specialColor: 'secondary'
-    },
-    {
-      mode: 'separator'
-    },
-    {
-      mode: 'item',
-      text: 'Test Button 4',
-      icon: 'mdi-page-layout-sidebar-left',
-      submenu: undefined,
-      trigger: undefined,
-      conditions: true,
-      specialColor: undefined
-    },
-    {
-      mode: 'item',
-      text: 'Test Button 5',
-      icon: 'mdi-clipboard-text-outline',
-      submenu: undefined,
-      trigger: undefined,
-      conditions: true,
-      specialColor: undefined
-    },
-
-    {
-      mode: 'separator'
-    },
-    {
-      mode: 'item',
-      text: 'Test Button 6 - Grey, Submenu',
-      icon: 'keyboard_arrow_right',
-      trigger: undefined,
-      conditions: true,
-      specialColor: 'grey',
-      submenu: [
-        {
-          mode: 'item',
-          text: 'Submenu-Test Button 1 - Advanced Search Guide (hint)',
-          icon: 'mdi-file-question',
-          keybindCommandId: 'openAdvancedSearchGuide',
-          trigger: undefined,
-          conditions: true,
-          specialColor: undefined
-        },
-        {
-          mode: 'separator'
-        },
-        {
-          mode: 'item',
-          text: 'Submenu-Test Button 2 - Secondary',
-          icon: 'mdi-wrench',
-          trigger: undefined,
-          conditions: true,
-          specialColor: 'secondary'
-        }
-      ]
-
-    }
-  ]
-}
 
 </script>
 

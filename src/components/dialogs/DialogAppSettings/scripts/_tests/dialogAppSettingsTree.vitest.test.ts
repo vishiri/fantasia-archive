@@ -19,12 +19,31 @@ vi.mock('app/i18n/externalFileLoader', () => {
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import type { I_appSettingsSettingRenderItem } from 'app/types/I_dialogAppSettings'
+import { APP_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogAppSettings/_data/appSettingsOptions'
 import {
   buildAppSettingsRenderTree,
   compareAppSettingsCategoryOrder,
   sortSettingsListByTranslatedTitle,
   toSortedRecord
-} from 'app/src/components/dialogs/DialogAppSettings/scripts/dialogAppSettingsTree'
+} from 'app/src/components/dialogs/DialogAppSettings/scripts/functions/dialogAppSettingsTreeBuild'
+
+const dialogAppSettingsTreeTranslate = {
+  t: (key: string): string => {
+    if (key === 'dialogs.appSettings.appOptions.darkMode.note') {
+      return 'Fixture note'
+    }
+    return key
+  },
+  te: (key: string): boolean => key === 'dialogs.appSettings.appOptions.darkMode.note'
+}
+
+function buildAppSettingsRenderTreeForTest (settingsSnapshot: I_faUserSettings) {
+  return buildAppSettingsRenderTree(
+    dialogAppSettingsTreeTranslate,
+    APP_SETTINGS_OPTIONS,
+    settingsSnapshot
+  )
+}
 
 const stubSetting = (title: string): I_appSettingsSettingRenderItem => ({
   description: '',
@@ -129,7 +148,7 @@ test('Test that toSortedRecord returns empty object for empty input', () => {
  * Category tabs end with accessibility then developerSettings after ordinary keys.
  */
 test('Test that buildAppSettingsRenderTree orders accessibility before developerSettings at the end', () => {
-  const tree = buildAppSettingsRenderTree({
+  const tree = buildAppSettingsRenderTreeForTest({
     ...FA_USER_SETTINGS_DEFAULTS
   })
   const keys = Object.keys(tree)
@@ -143,7 +162,7 @@ test('Test that buildAppSettingsRenderTree orders accessibility before developer
  * Copies each boolean from the snapshot into the matching leaf in the render tree.
  */
 test('Test that buildAppSettingsRenderTree maps showDocumentID into developer document body', () => {
-  const tree = buildAppSettingsRenderTree({
+  const tree = buildAppSettingsRenderTreeForTest({
     ...FA_USER_SETTINGS_DEFAULTS,
     showDocumentID: true
   })
@@ -158,7 +177,7 @@ test('Test that buildAppSettingsRenderTree maps showDocumentID into developer do
  * When a translation exists for the optional note path, the leaf includes a note field.
  */
 test('Test that buildAppSettingsRenderTree attaches note text when i18n te reports the note key exists', () => {
-  const tree = buildAppSettingsRenderTree({
+  const tree = buildAppSettingsRenderTreeForTest({
     ...FA_USER_SETTINGS_DEFAULTS,
     darkMode: false
   })
@@ -178,7 +197,7 @@ test('Test that buildAppSettingsRenderTree hits reuse branches when two settings
     disableSpellCheck: true
   }
 
-  const tree = buildAppSettingsRenderTree(partial as I_faUserSettings)
+  const tree = buildAppSettingsRenderTreeForTest(partial as I_faUserSettings)
   const list =
     tree.visualAccessibility?.subCategories.visualsAppwideFunctionality?.settingsList
 
@@ -191,7 +210,7 @@ test('Test that buildAppSettingsRenderTree hits reuse branches when two settings
  * Empty snapshots skip both build passes and return an empty render tree object.
  */
 test('Test that buildAppSettingsRenderTree returns an empty object when the settings snapshot has no keys', () => {
-  expect(buildAppSettingsRenderTree({} as I_faUserSettings)).toEqual({})
+  expect(buildAppSettingsRenderTreeForTest({} as I_faUserSettings)).toEqual({})
 })
 
 /**
@@ -200,7 +219,7 @@ test('Test that buildAppSettingsRenderTree returns an empty object when the sett
  */
 test('Test that buildAppSettingsRenderTree ignores languageCode-only snapshots', () => {
   expect(
-    buildAppSettingsRenderTree({
+    buildAppSettingsRenderTreeForTest({
       languageCode: 'fr'
     } as I_faUserSettings)
   ).toEqual({})

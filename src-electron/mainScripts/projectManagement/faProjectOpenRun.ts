@@ -28,7 +28,7 @@ import {
 } from './faProjectDbMigrate'
 import {
   faDisplayNameFallbackFromProjectPath
-} from './faProjectPathValidation'
+} from './projectManagement_manager'
 import { resolveFaProjectOpenTargetPath } from './faProjectOpenResolveTargetPath'
 import {
   recordRecentProjectEntry,

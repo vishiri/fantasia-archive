@@ -82,23 +82,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { storeToRefs } from 'pinia'
-
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import FaFloatingWindowBodyTeleport from 'app/src/components/floatingWindows/_FaFloatingWindowBodyTeleport/_FaFloatingWindowBodyTeleport.vue'
 import FaFloatingWindowFrameResizeHandles from 'app/src/components/floatingWindows/_FaFloatingWindowFrameResizeHandles/_FaFloatingWindowFrameResizeHandles.vue'
-import { useWindowAppNoteboardFramePersist } from 'app/src/components/floatingWindows/WindowAppNoteboard/scripts/useWindowAppNoteboardFramePersist'
-import { useWindowAppNoteboardTextPersist } from 'app/src/components/floatingWindows/WindowAppNoteboard/scripts/useWindowAppNoteboardTextPersist'
-import { wireWindowAppNoteboardDirectInput } from 'app/src/components/floatingWindows/WindowAppNoteboard/scripts/wireWindowAppNoteboardDirectInput'
-import {
-  FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
-  FA_FLOATING_WINDOW_POP_TRANSITION_MS
-} from 'app/src/scripts/floatingWindows/faFloatingWindowPopTransition'
-import { useFaFloatingWindowFrame } from 'app/src/scripts/floatingWindows/useFaFloatingWindowFrame'
-import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
-import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
-import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
+import { useWindowAppNoteboard } from 'app/src/components/floatingWindows/WindowAppNoteboard/scripts/windowAppNoteboard_manager'
 
 defineOptions({
   name: 'WindowAppNoteboard'
@@ -111,65 +98,21 @@ const props = defineProps<{
   directInput?: T_dialogName
 }>()
 
-const noteboardStore = S_FaAppNoteboard()
-const faKeybindsStore = S_FaKeybinds()
-
-const noteboardToggleKeybindLabel = computed((): string | null => {
-  return formatFaKeybindCommandLabelFromSnapshot({
-    commandId: 'toggleAppNoteboard',
-    snapshot: faKeybindsStore.snapshot
-  })
-})
-
 const {
-  isWindowOpen: windowModel,
-  root: noteboardRoot,
-  text
-} = storeToRefs(noteboardStore)
-
-const documentNameClass = 'WindowAppNoteboard'
-
-const persistedNoteboardFrame = computed(() => noteboardRoot.value?.frame ?? null)
-
-const {
+  FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
+  FA_FLOATING_WINDOW_POP_TRANSITION_MS,
+  documentNameClass,
   frameRef,
-  frameStyle,
-  h,
+  frameStyleWithDialogTransition,
+  noteboardToggleKeybindLabel,
+  onClose,
   onFramePointerDown,
   onResizePointerDown,
   onTitlePointerDown,
-  titleShortFrameClass,
-  w,
-  x,
-  y
-} = useFaFloatingWindowFrame(windowModel, undefined, {
-  floatingWindowZLayer: 'noteboard',
-  persistedFrame: persistedNoteboardFrame
-})
-
-useWindowAppNoteboardFramePersist({
-  h,
-  w,
-  windowModel,
-  x,
-  y
-})
-
-useWindowAppNoteboardTextPersist({
   text,
+  titleShortFrameClass,
   windowModel
-})
-
-wireWindowAppNoteboardDirectInput(props)
-
-const frameStyleWithDialogTransition = computed(() => ({
-  ...frameStyle.value,
-  '--q-transition-duration': `${FA_FLOATING_WINDOW_POP_TRANSITION_MS}ms`
-}))
-
-function onClose (): void {
-  noteboardStore.setWindowOpen(false)
-}
+} = useWindowAppNoteboard(props)
 </script>
 
 <style lang="scss" src="./styles/WindowAppNoteboard.unscoped.scss"></style>

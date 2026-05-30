@@ -3,8 +3,11 @@
 import { ref } from 'vue'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
-import type { I_FaFloatingWindowFrameLayout } from 'app/src/scripts/floatingWindows/faFloatingWindowFrameLayout'
-import { FaFloatingWindowResizePointerSession } from 'app/src/scripts/floatingWindows/faFloatingWindowResizePointerDrive'
+import type { I_FaFloatingWindowFrameLayout } from 'app/types/I_faFloatingWindowFrameLayout'
+import {
+  applyFaFloatingWindowResizePointerSample,
+  FaFloatingWindowResizePointerSession
+} from '../faFloatingWindowResizePointerDrive_manager'
 
 const testLayout: I_FaFloatingWindowFrameLayout = {
   widthFrac: 0.9,
@@ -32,6 +35,39 @@ afterEach(() => {
 function fakeTarget (): HTMLElement {
   return document.createElement('div')
 }
+
+/**
+ * applyFaFloatingWindowResizePointerSample (manager export)
+ * Updates frame axis refs from a pointer sample on the east edge.
+ */
+test('Test that applyFaFloatingWindowResizePointerSample updates width from pointer delta', () => {
+  const x = ref(100)
+  const y = ref(100)
+  const w = ref(400)
+  const h = ref(300)
+  const pointerEvent = new PointerEvent('pointermove', {
+    clientX: 200,
+    clientY: 100
+  })
+
+  applyFaFloatingWindowResizePointerSample(
+    testLayout,
+    'e',
+    x.value,
+    y.value,
+    w.value,
+    h.value,
+    100,
+    100,
+    pointerEvent,
+    x,
+    y,
+    w,
+    h
+  )
+
+  expect(w.value).toBe(500)
+})
 
 /**
  * FaFloatingWindowResizePointerSession

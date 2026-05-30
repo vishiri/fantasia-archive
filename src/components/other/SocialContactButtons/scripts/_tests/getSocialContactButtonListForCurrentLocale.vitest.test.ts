@@ -20,7 +20,7 @@ vi.mock('app/i18n/externalFileLoader', () => {
   }
 })
 
-import { getSocialContactButtonListForCurrentLocale } from '../getSocialContactButtonListForCurrentLocale'
+import { getSocialContactButtonListForCurrentLocale } from '../socialContactButtons_manager'
 
 beforeEach(() => {
   tMock.mockReset()

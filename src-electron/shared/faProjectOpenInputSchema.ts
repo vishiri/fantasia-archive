@@ -9,7 +9,7 @@ function isPlainRecord (value: unknown): value is Record<string, unknown> {
   )
 }
 
-const faProjectOpenInputSchema = z
+export const faProjectOpenInputSchema = z
   .object({
     filePath: z
       .string()
@@ -18,7 +18,7 @@ const faProjectOpenInputSchema = z
   })
   .strict()
 
-export type I_faProjectOpenInputParsed = z.infer<typeof faProjectOpenInputSchema>
+import type { I_faProjectOpenInputParsed } from 'app/types/I_faProjectOpenInputParsed'
 
 /**
  * Parses renderer IPC payload for project open (empty object or optional absolute file path).

@@ -32,20 +32,20 @@ vi.mock('app/i18n/externalFileLoader', () => {
   }
 })
 
-vi.mock('../../_utilities/mdListArrayConverter', () => {
+vi.mock('../../_utilities/functions/mdListArrayConverter', () => {
   return {
     mdListArrayConverter: mdListArrayConverterMock
   }
 })
 
-vi.mock('../fantasiaMascotImageManagement', () => {
+vi.mock('../functions/fantasiaMascotImageManagement', () => {
   return {
     fantasiaImageList: { didYouKnow: 'image://did-you-know' },
     determineCurrentImage: determineCurrentImageMock
   }
 })
 
-import { tipsTricksTriviaNotification } from '../tipsTricksTriviaNotification'
+import { tipsTricksTriviaNotification } from '../tipsTricksTriviaNotification_manager'
 
 beforeEach(() => {
   notifyCreateMock.mockClear()

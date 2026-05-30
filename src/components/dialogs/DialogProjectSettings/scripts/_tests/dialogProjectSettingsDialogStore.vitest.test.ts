@@ -1,6 +1,6 @@
 import { expect, test, vi } from 'vitest'
 
-import { resolveDialogComponentStore } from '../dialogProjectSettingsDialogStore'
+import { resolveDialogComponentStore } from '../dialogProjectSettings_manager'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 
 vi.mock('src/stores/S_Dialog', () => {

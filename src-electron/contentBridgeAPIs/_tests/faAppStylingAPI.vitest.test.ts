@@ -15,7 +15,7 @@ vi.mock('electron', () => {
 })
 
 import { FA_APP_STYLING_IPC } from 'app/src-electron/electron-ipc-bridge'
-import { FA_APP_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appStyling/faAppStylingStoreDefaults'
+import { FA_APP_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appStyling/appStyling_managerDefaults'
 import type { I_faAppStylingRoot } from 'app/types/I_faAppStylingDomain'
 
 import { faAppStylingAPI } from '../faAppStylingAPI'

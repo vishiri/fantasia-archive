@@ -64,13 +64,10 @@
 <script setup lang="ts">
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
-
-import { FA_PROJECT_NAME_MAX_LEN } from 'app/src-electron/shared/faProjectConstants'
-import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
-
-import { resolveDialogComponentStoreOrNull } from './scripts/dialogNewProjectResolveDialogComponentStore'
-import { runDialogNewProjectCreate } from './scripts/dialogNewProjectSubmit'
+import {
+  FA_PROJECT_NAME_MAX_LEN,
+  useDialogNewProject
+} from './scripts/dialogNewProject_manager'
 
 defineOptions({
   name: 'DialogNewProject'
@@ -80,67 +77,15 @@ const props = defineProps<{
   directInput?: T_dialogName
 }>()
 
-const dialogModel = ref(false)
-const projectName = ref('')
-const nameInputRef = ref<{ focus: () => void } | null>(null)
-
-registerComponentDialogStackGuard(dialogModel)
-
-const documentName = ref('')
-
-async function focusNameInputAfterShow (): Promise<void> {
-  await nextTick()
-  nameInputRef.value?.focus()
-}
-
-function onDialogShow (): void {
-  void focusNameInputAfterShow()
-}
-
-watch(dialogModel, (isOpen) => {
-  if (isOpen) {
-    projectName.value = ''
-  }
-})
-
-const createDisabled = computed(() => {
-  return projectName.value.trim().length === 0
-})
-
-function openDialog (input: T_dialogName): void {
-  documentName.value = input
-  dialogModel.value = true
-}
-
-function closeDialog (): void {
-  dialogModel.value = false
-}
-
-async function onClickCreate (): Promise<void> {
-  if (createDisabled.value) {
-    return
-  }
-  await runDialogNewProjectCreate(projectName.value.trim(), closeDialog)
-}
-
-watch(() => resolveDialogComponentStoreOrNull()?.dialogUUID, () => {
-  const dialogComponentStore = resolveDialogComponentStoreOrNull()
-  if (dialogComponentStore?.dialogToOpen === 'NewProject') {
-    openDialog(dialogComponentStore.dialogToOpen as T_dialogName)
-  }
-})
-
-watch(() => props.directInput, () => {
-  if (props.directInput === 'NewProject') {
-    openDialog(props.directInput)
-  }
-})
-
-onMounted(() => {
-  if (props.directInput === 'NewProject') {
-    openDialog(props.directInput)
-  }
-})
+const {
+  createDisabled,
+  dialogModel,
+  documentName,
+  nameInputRef,
+  onClickCreate,
+  onDialogShow,
+  projectName
+} = useDialogNewProject(props)
 </script>
 
 <style lang="scss">

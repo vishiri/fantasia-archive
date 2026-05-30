@@ -22,11 +22,11 @@ vi.mock('app/src/css/fa-theme.scss?raw', () => {
 
 import {
   collectFaColorCustomPropertyNamesFromDocument
-} from 'app/src/scripts/faTheme/faThemeCustomPropertyNamesFromDocument'
+} from 'app/src/scripts/faTheme/faTheme_manager'
 import {
   getFaColorCustomPropertyNamesForHelpPanel,
   parseFaColorCustomPropertyNamesFromThemeScss
-} from 'app/src/scripts/faTheme/faThemeCustomPropertyNames'
+} from 'app/src/scripts/faTheme/faTheme_manager'
 
 /**
  * collectFaColorCustomPropertyNamesFromDocument

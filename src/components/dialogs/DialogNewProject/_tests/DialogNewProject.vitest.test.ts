@@ -9,17 +9,11 @@ import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 
 import DialogNewProject from '../DialogNewProject.vue'
 
-vi.mock('../scripts/dialogNewProjectSubmit', () => {
-  return {
-    runDialogNewProjectCreate: vi.fn(
-      async (_projectName: string, closeDialog: () => void) => {
-        closeDialog()
-      }
-    )
-  }
-})
+const runFaActionAwaitMock = vi.hoisted(() => vi.fn(async () => true))
 
-import { runDialogNewProjectCreate } from '../scripts/dialogNewProjectSubmit'
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => ({
+  runFaActionAwait: runFaActionAwaitMock
+}))
 
 const dialogNewProjectQDialogStub = defineComponent({
   name: 'QDialog',
@@ -153,8 +147,7 @@ test('Test that DialogNewProject disables create for blank name', async () => {
  * Enter on the name field matches create; with a blank trimmed name it returns before invoking submit.
  */
 test('Test that DialogNewProject treats enter on blank name like a gated create action', async () => {
-  const submit = vi.mocked(runDialogNewProjectCreate)
-  submit.mockClear()
+  runFaActionAwaitMock.mockClear()
   const w = mount(DialogNewProject, {
     global: {
       components: { ...dialogNewProjectStubs },
@@ -171,7 +164,7 @@ test('Test that DialogNewProject treats enter on blank name like a gated create 
   await w.get('.dialog-new-project-qinput-mock').trigger('keyup.enter')
   await flushPromises()
 
-  expect(submit).not.toHaveBeenCalled()
+  expect(runFaActionAwaitMock).not.toHaveBeenCalled()
   w.unmount()
 })
 
@@ -209,8 +202,7 @@ test('Test that DialogNewProject clears project name when dialog reopens', async
  * Create invokes submit helper with trimmed name.
  */
 test('Test that DialogNewProject calls submit on create', async () => {
-  const submit = vi.mocked(runDialogNewProjectCreate)
-  submit.mockReset()
+  runFaActionAwaitMock.mockReset()
   const w = mount(DialogNewProject, {
     global: {
       components: { ...dialogNewProjectStubs },
@@ -226,9 +218,7 @@ test('Test that DialogNewProject calls submit on create', async () => {
   await w.get('.dialog-new-project-qinput-mock').setValue('  Hi  ')
   await w.get('[data-test-locator="dialogNewProject-button-create"]').trigger('click')
   await flushPromises()
-  expect(submit).toHaveBeenCalled()
-  const firstArg = submit.mock.calls[0]?.[0]
-  expect(firstArg).toBe('Hi')
+  expect(runFaActionAwaitMock).toHaveBeenCalledWith('createNewProject', { projectName: 'Hi' })
   w.unmount()
 })
 

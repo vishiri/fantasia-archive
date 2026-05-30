@@ -8,9 +8,24 @@ import type { I_faActionHistoryEntry } from 'app/types/I_faActionManagerDomain'
 import * as dialogStores from 'app/src/stores/S_Dialog'
 import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 
-import * as rowClipboardModule from '../scripts/dialogActionMonitorRowClipboard'
-
 import DialogActionMonitor from '../DialogActionMonitor.vue'
+
+const { copyToClipboardMock } = vi.hoisted(() => ({
+  copyToClipboardMock: vi.fn(async (_payload: string) => undefined)
+}))
+
+vi.mock('quasar', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('quasar')>()
+  return {
+    ...actual,
+    copyToClipboard: copyToClipboardMock,
+    Notify: { create: vi.fn() }
+  }
+})
+
+vi.mock('app/i18n/externalFileLoader', () => ({
+  i18n: { global: { t: (k: string) => k } }
+}))
 
 const monitorQDialogStub = defineComponent({
   name: 'QDialog',
@@ -347,7 +362,7 @@ test('Test that DialogActionMonitor tolerates S_DialogComponent throwing from th
  * Clicking a rendered row should call the clipboard helper with that row's entry.
  */
 test('Test that clicking a DialogActionMonitor row dispatches the clipboard helper for that row', async () => {
-  const copySpy = vi.spyOn(rowClipboardModule, 'copyDialogActionMonitorRowToClipboard').mockResolvedValue(undefined)
+  copyToClipboardMock.mockClear()
 
   const w = mount(DialogActionMonitor, {
     global: monitorDialogGlobal,
@@ -364,11 +379,9 @@ test('Test that clicking a DialogActionMonitor row dispatches the clipboard help
   await rows[0]?.trigger('click')
   await flushPromises()
 
-  expect(copySpy).toHaveBeenCalledOnce()
-  const calledWith = copySpy.mock.calls[0]?.[0] as I_faActionHistoryEntry | undefined
-  expect(calledWith?.uid).toBe('uid-running')
-
-  copySpy.mockRestore()
+  expect(copyToClipboardMock).toHaveBeenCalledOnce()
+  const payload = copyToClipboardMock.mock.calls[0]?.[0] as string | undefined
+  expect(payload).toContain('uid-running')
   w.unmount()
 })
 

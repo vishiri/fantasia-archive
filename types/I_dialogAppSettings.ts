@@ -48,3 +48,21 @@ export interface I_appSettingsStaticOption {
   category: string
   subcategory: string
 }
+
+/** Metadata for one App settings toggle in the static options table. */
+export type T_dialogAppSettingsOptionMetadata = {
+  category: string
+  subcategory: string
+}
+
+/** i18n helpers passed into App settings tree builders. */
+export type T_dialogAppSettingsTranslate = {
+  t: (key: string) => string
+  te: (key: string) => boolean
+}
+
+/** Minimal FaUserSettings store surface for App settings dialog sync. */
+export type T_appSettingsFaUserSettingsStoreForSync = {
+  settings: I_faUserSettings | null
+  refreshSettings: () => Promise<void>
+}

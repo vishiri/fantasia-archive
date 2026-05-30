@@ -1,32 +1,19 @@
-import type { ComputedRef, Ref } from 'vue'
+import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
 
-import { faKeybindFindChordConflict } from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
-import { formatFaKeybindChordForUi } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
-import { faKeybindTryChordFromEvent } from 'app/src/scripts/keybinds/faKeybindsChordFromEvent'
+import type { T_dialogKeybindCaptureKeydownDeps } from 'app/types/I_dialogKeybindSettings'
+import type { T_dialogKeybindSettingsCaptureKeydownModuleDeps } from 'app/types/I_dialogKeybindSettings'
+
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
-import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
-import type { T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
 
-export type T_dialogKeybindCaptureKeydownDeps = {
-  captureBaselineChord: Ref<I_faChordSerialized | null>
-  captureError: Ref<boolean>
-  captureErrorMessage: Ref<string>
-  captureInfoMessage: Ref<string>
-  captureLabel: Ref<string>
-  captureOpen: Ref<boolean>
-  editingCommandId: Ref<T_faKeybindCommandId | null>
-  pendingChord: Ref<I_faChordSerialized | null>
-  platform: ComputedRef<NodeJS.Platform>
-  t: (key: string) => string
-  workingOverrides: Ref<I_faKeybindsRoot['overrides']>
-}
-
-export function restorePendingChordAndLabelFromBaseline (params: {
-  captureBaselineChord: Ref<I_faChordSerialized | null>
-  captureLabel: Ref<string>
-  pendingChord: Ref<I_faChordSerialized | null>
-  platform: ComputedRef<NodeJS.Platform>
-}): void {
+export function restorePendingChordAndLabelFromBaseline (
+  deps: T_dialogKeybindSettingsCaptureKeydownModuleDeps,
+  params: {
+    captureBaselineChord: I_ref<I_faChordSerialized | null>
+    captureLabel: I_ref<string>
+    pendingChord: I_ref<I_faChordSerialized | null>
+    platform: I_computedRef<NodeJS.Platform>
+  }
+): void {
   const {
     captureBaselineChord,
     captureLabel,
@@ -43,11 +30,11 @@ export function restorePendingChordAndLabelFromBaseline (params: {
     code: baseline.code,
     mods: [...baseline.mods]
   }
-  captureLabel.value = formatFaKeybindChordForUi(baseline, platform.value)
+  captureLabel.value = deps.formatFaKeybindChordForUi(baseline, platform.value)
 }
 
 function applyCaptureKeydownReject (
-  deps: T_dialogKeybindCaptureKeydownDeps,
+  keydownDeps: T_dialogKeybindCaptureKeydownDeps,
   reason: 'modifier_key_alone' | 'need_modifier' | 'unsupported_key'
 ): void {
   const {
@@ -55,7 +42,7 @@ function applyCaptureKeydownReject (
     captureErrorMessage,
     captureInfoMessage,
     t
-  } = deps
+  } = keydownDeps
   if (reason === 'modifier_key_alone') {
     captureInfoMessage.value = ''
     if (
@@ -77,7 +64,8 @@ function applyCaptureKeydownReject (
 }
 
 function applyCaptureKeydownAccept (
-  deps: T_dialogKeybindCaptureKeydownDeps,
+  deps: T_dialogKeybindSettingsCaptureKeydownModuleDeps,
+  keydownDeps: T_dialogKeybindCaptureKeydownDeps,
   chord: I_faChordSerialized
 ): void {
   const {
@@ -91,18 +79,18 @@ function applyCaptureKeydownAccept (
     platform,
     t,
     workingOverrides
-  } = deps
+  } = keydownDeps
   captureError.value = false
   captureErrorMessage.value = ''
   captureInfoMessage.value = ''
   pendingChord.value = chord
-  captureLabel.value = formatFaKeybindChordForUi(chord, platform.value)
+  captureLabel.value = deps.formatFaKeybindChordForUi(chord, platform.value)
 
   const id = editingCommandId.value
   if (id === null) {
     return
   }
-  const conflict = faKeybindFindChordConflict({
+  const conflict = deps.faKeybindFindChordConflict({
     chord,
     excludeCommandId: id,
     overrides: workingOverrides.value,
@@ -112,7 +100,7 @@ function applyCaptureKeydownAccept (
     captureInfoMessage.value = ''
     captureError.value = true
     captureErrorMessage.value = t('dialogs.keybindSettings.validationConflict')
-    restorePendingChordAndLabelFromBaseline({
+    restorePendingChordAndLabelFromBaseline(deps, {
       captureBaselineChord,
       captureLabel,
       pendingChord,
@@ -121,23 +109,32 @@ function applyCaptureKeydownAccept (
   }
 }
 
-/**
- * Applies one keydown inside the keybind capture dialog: Escape closes the sheet (same as the close control);
- * otherwise chord capture runs (hints, chord label, duplicate detection).
- */
-export function runDialogKeybindCaptureKeydown (e: KeyboardEvent, deps: T_dialogKeybindCaptureKeydownDeps): void {
+export function runDialogKeybindCaptureKeydown (
+  deps: T_dialogKeybindSettingsCaptureKeydownModuleDeps,
+  e: KeyboardEvent,
+  keydownDeps: T_dialogKeybindCaptureKeydownDeps
+): void {
   if (e.key === 'Escape' || e.code === 'Escape') {
     e.preventDefault()
     e.stopPropagation()
-    deps.captureOpen.value = false
+    keydownDeps.captureOpen.value = false
     return
   }
   e.preventDefault()
   e.stopPropagation()
-  const chordResult = faKeybindTryChordFromEvent(e)
+  const chordResult = deps.faKeybindTryChordFromEvent(e)
   if (!chordResult.ok) {
-    applyCaptureKeydownReject(deps, chordResult.reason)
+    applyCaptureKeydownReject(keydownDeps, chordResult.reason)
     return
   }
-  applyCaptureKeydownAccept(deps, chordResult.chord)
+  applyCaptureKeydownAccept(deps, keydownDeps, chordResult.chord)
+}
+
+export function makeDialogKeybindCaptureKeydownHandler (
+  deps: T_dialogKeybindSettingsCaptureKeydownModuleDeps,
+  keydownDeps: T_dialogKeybindCaptureKeydownDeps
+): (e: KeyboardEvent) => void {
+  return (e: KeyboardEvent) => {
+    runDialogKeybindCaptureKeydown(deps, e, keydownDeps)
+  }
 }

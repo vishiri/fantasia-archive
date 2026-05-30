@@ -38,7 +38,7 @@ beforeEach(() => {
  * Rejects when no active project session is loaded.
  */
 test('Test that handleSaveProjectSettings throws when no project is active', async () => {
-  const { handleSaveProjectSettings } = await import('../faActionDefinitionHandlers')
+  const { handleSaveProjectSettings } = await import('../faActionDefinitionHandlers_manager')
   await expect(
     handleSaveProjectSettings({ settings: { projectName: 'X' } })
   ).rejects.toThrow('globalFunctionality.faProjectSettings.saveError')
@@ -49,7 +49,7 @@ test('Test that handleSaveProjectSettings throws when no project is active', asy
  * Delegates persistence to S_FaProjectSettings when a project is loaded.
  */
 test('Test that handleSaveProjectSettings delegates to S_FaProjectSettings', async () => {
-  const { handleSaveProjectSettings } = await import('../faActionDefinitionHandlers')
+  const { handleSaveProjectSettings } = await import('../faActionDefinitionHandlers_manager')
   S_FaActiveProject().setActiveProject({
     filePath: 'C:\\a.faproject',
     id: 'project-id',

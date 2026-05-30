@@ -18,12 +18,14 @@ vi.mock('app/src/stores/S_FaActiveProject', () => ({
   })
 }))
 
-vi.mock('app/src/scripts/appNoteboard/faAppNoteboardCanOpen', () => ({
+vi.mock('app/src/scripts/appNoteboard/appNoteboard_manager', () => ({
   canOpenFloatingWindowWhileNoModal: (): boolean => canOpenFloatingWindowWhileNoModalMock()
 }))
 
-vi.mock('app/src/scripts/appGlobalManagementUI/dialogManagement', () => {
+vi.mock('app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager')>()
   return {
+    ...actual,
     openDialogComponent: openDialogComponentMock,
     openDialogMarkdownDocument: openDialogMarkdownDocumentMock
   }
@@ -39,7 +41,7 @@ beforeEach(() => {
 
 test('handleOpenKeybindSettingsDialog opens KeybindSettings', async () => {
   const { handleOpenKeybindSettingsDialog } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlersDialogs'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   await handleOpenKeybindSettingsDialog()
   expect(openDialogComponentMock).toHaveBeenCalledWith('KeybindSettings')
@@ -47,7 +49,7 @@ test('handleOpenKeybindSettingsDialog opens KeybindSettings', async () => {
 
 test('handleOpenAppSettingsDialog opens AppSettings', async () => {
   const { handleOpenAppSettingsDialog } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlersDialogs'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   await handleOpenAppSettingsDialog()
   expect(openDialogComponentMock).toHaveBeenCalledWith('AppSettings')
@@ -55,7 +57,7 @@ test('handleOpenAppSettingsDialog opens AppSettings', async () => {
 
 test('handleOpenAppStylingWindow opens WindowAppStyling', async () => {
   const { handleOpenAppStylingWindow } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlersDialogs'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   await handleOpenAppStylingWindow()
   expect(openDialogComponentMock).toHaveBeenCalledWith('WindowAppStyling')
@@ -63,7 +65,7 @@ test('handleOpenAppStylingWindow opens WindowAppStyling', async () => {
 
 test('handleOpenProjectStylingWindow opens WindowProjectStyling when allowed', async () => {
   const { handleOpenProjectStylingWindow } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlersDialogs'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   await handleOpenProjectStylingWindow()
   expect(openDialogComponentMock).toHaveBeenCalledWith('WindowProjectStyling')
@@ -72,7 +74,7 @@ test('handleOpenProjectStylingWindow opens WindowProjectStyling when allowed', a
 test('handleOpenProjectStylingWindow skips without an active project', async () => {
   mockActiveProjectGate.hasActiveProject = false
   const { handleOpenProjectStylingWindow } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlersDialogs'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   await handleOpenProjectStylingWindow()
   expect(openDialogComponentMock).not.toHaveBeenCalled()
@@ -81,7 +83,7 @@ test('handleOpenProjectStylingWindow skips without an active project', async () 
 test('handleOpenProjectStylingWindow skips when floating windows cannot open', async () => {
   canOpenFloatingWindowWhileNoModalMock.mockReturnValue(false)
   const { handleOpenProjectStylingWindow } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlersDialogs'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   await handleOpenProjectStylingWindow()
   expect(openDialogComponentMock).not.toHaveBeenCalled()
@@ -89,7 +91,7 @@ test('handleOpenProjectStylingWindow skips when floating windows cannot open', a
 
 test('handleOpenProjectSettingsDialog opens ProjectSettings when a project is active', async () => {
   const { handleOpenProjectSettingsDialog } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlersDialogs'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   await handleOpenProjectSettingsDialog()
   expect(openDialogComponentMock).toHaveBeenCalledWith('ProjectSettings')
@@ -98,7 +100,7 @@ test('handleOpenProjectSettingsDialog opens ProjectSettings when a project is ac
 test('handleOpenProjectSettingsDialog skips without an active project', async () => {
   mockActiveProjectGate.hasActiveProject = false
   const { handleOpenProjectSettingsDialog } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlersDialogs'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   await handleOpenProjectSettingsDialog()
   expect(openDialogComponentMock).not.toHaveBeenCalled()

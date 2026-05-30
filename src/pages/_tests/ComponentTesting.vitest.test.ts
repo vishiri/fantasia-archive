@@ -2,7 +2,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { expect, test, vi } from 'vitest'
 import { createMemoryHistory, createRouter } from 'vue-router'
 
-import ComponentTesting from '../ComponentTesting.vue'
+import ComponentTesting from '../ComponentTesting/ComponentTesting.vue'
 
 /**
  * ComponentTesting

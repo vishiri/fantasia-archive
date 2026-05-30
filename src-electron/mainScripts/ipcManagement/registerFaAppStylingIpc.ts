@@ -4,7 +4,7 @@ import { FA_APP_STYLING_IPC } from 'app/src-electron/electron-ipc-bridge'
 import {
   cleanupFaAppStyling,
   getFaAppStyling
-} from 'app/src-electron/mainScripts/appStyling/faAppStylingStore'
+} from 'app/src-electron/mainScripts/appStyling/appStyling_manager'
 import { parseFaAppStylingPatch } from 'app/src-electron/shared/faAppStylingPatchSchema'
 import type { I_faAppStylingRoot } from 'app/types/I_faAppStylingDomain'
 

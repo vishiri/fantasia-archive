@@ -3,9 +3,9 @@ import { createPinia, setActivePinia } from 'pinia'
 import { ref } from 'vue'
 import { afterEach, beforeEach, vi } from 'vitest'
 
-import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
-import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appNoteboard/faAppNoteboardStoreDefaults'
-import { FA_APP_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appStyling/faAppStylingStoreDefaults'
+import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/keybinds_managerDefaults'
+import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appNoteboard/appNoteboard_managerDefaults'
+import { FA_APP_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appStyling/appStyling_managerDefaults'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 
 const originalConsoleWarn = console.warn.bind(console)
@@ -15,7 +15,7 @@ const i18nLocaleRef = ref('en-US')
 const FANTASIA_STORYBOOK_CANVAS_KEY = '__fantasiaStorybookCanvas'
 
 /**
- * Mirrors 'setFantasiaStorybookCanvasFlag' from 'app/src/scripts/appInternals/rendererAppInternals'.
+ * Mirrors 'setFantasiaStorybookCanvasFlag' from 'app/src/scripts/appInternals/appInternals_manager'.
  * Defined here so this setup file does not import that module (it pulls 'i18n' before the hoisted 'vi.mock' for externalFileLoader is safe).
  */
 function setFantasiaStorybookCanvasFlag (value: boolean): void {
@@ -39,6 +39,10 @@ config.global.config = {
  * before component Vitest files import those dependency chains.
  */
 setActivePinia(createPinia())
+
+if (typeof document.queryCommandSupported !== 'function') {
+  document.queryCommandSupported = () => false
+}
 
 if (typeof globalThis.ResizeObserver === 'undefined') {
   globalThis.ResizeObserver = class ResizeObserver {
@@ -70,6 +74,18 @@ vi.mock('app/i18n/externalFileLoader', () => {
 })
 
 vi.mock('@quasar/quasar-ui-qmarkdown/dist/index.css', () => ({}))
+
+vi.mock('quasar', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('quasar')>()
+  return {
+    ...actual,
+    Notify: {
+      ...actual.Notify,
+      create: vi.fn(),
+      setDefaults: vi.fn()
+    }
+  }
+})
 
 function forwardVueTestUtilsWarnUnlessFiltered (...args: unknown[]): void {
   const [firstArg] = args

@@ -5,20 +5,22 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
-const { runFaActionMock } = vi.hoisted(() => {
+const { runFaActionAwaitMock, runFaActionMock } = vi.hoisted(() => {
   return {
+    runFaActionAwaitMock: vi.fn(async () => true),
     runFaActionMock: vi.fn()
   }
 })
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => {
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => {
   return {
-    runFaAction: runFaActionMock
+    runFaAction: runFaActionMock,
+    runFaActionAwait: runFaActionAwaitMock
   }
 })
 
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
-import { useWindowProjectStylingFramePersist } from '../useWindowProjectStylingFramePersist'
+import { useWindowProjectStylingFramePersist } from '../windowProjectStyling_manager'
 
 let pinia: ReturnType<typeof createPinia>
 

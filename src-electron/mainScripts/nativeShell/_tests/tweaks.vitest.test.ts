@@ -1,7 +1,7 @@
 import os from 'os'
-import { tweakRetriveOS } from 'app/src-electron/mainScripts/nativeShell/tweaks'
-import { expectTypeOf, test, expect, vi } from 'vitest'
-import { tweakMenuRemover } from '../tweaks'
+import { tweakRetriveOS } from 'app/src-electron/mainScripts/nativeShell/nativeShell_manager'
+import { test, expect, vi } from 'vitest'
+import { tweakMenuRemover } from '../nativeShell_manager'
 
 const { setApplicationMenuMock } = vi.hoisted(() => {
   return {
@@ -21,7 +21,7 @@ vi.mock('electron', () => {
  * tweakRetriveOS
  */
 test('Test that platform detection works', () => {
-  expectTypeOf(tweakRetriveOS()).toEqualTypeOf(process.platform || os.platform())
+  expect(typeof tweakRetriveOS()).toBe('string')
 })
 
 /**

@@ -2,7 +2,7 @@
 import { beforeEach, expect, test } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 
-import { canOpenFloatingWindowWhileNoModal } from 'app/src/scripts/appNoteboard/faAppNoteboardCanOpen'
+import { canOpenFloatingWindowWhileNoModal } from 'app/src/scripts/appNoteboard/appNoteboard_manager'
 import { S_DialogComponent, S_DialogMarkdown } from 'app/src/stores/S_Dialog'
 
 beforeEach(() => {

@@ -1,7 +1,7 @@
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_APP_NOTEBOARD_IPC } from 'app/src-electron/electron-ipc-bridge'
-import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appNoteboard/faAppNoteboardStoreDefaults'
+import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appNoteboard/appNoteboard_managerDefaults'
 
 const {
   cleanupFaAppNoteboardMock,
@@ -23,7 +23,7 @@ vi.mock('electron', () => {
   }
 })
 
-vi.mock('app/src-electron/mainScripts/appNoteboard/faAppNoteboardStore', () => {
+vi.mock('app/src-electron/mainScripts/appNoteboard/appNoteboard_manager', () => {
   return {
     cleanupFaAppNoteboard: cleanupFaAppNoteboardMock,
     getFaAppNoteboard: getFaAppNoteboardMock

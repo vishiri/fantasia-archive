@@ -4,11 +4,11 @@ import { defineComponent, nextTick, ref } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
-import { useFaFloatingWindowTextPersist } from '../useFaFloatingWindowTextPersist'
+import { useFaFloatingWindowTextPersist } from '../useFaFloatingWindowTextPersist_manager'
 
 const runFaActionMock = vi.hoisted(() => vi.fn())
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => ({
   runFaAction: runFaActionMock
 }))
 

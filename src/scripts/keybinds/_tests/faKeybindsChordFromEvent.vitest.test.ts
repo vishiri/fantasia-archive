@@ -4,7 +4,7 @@ import {
   faKeybindMainKeyRequiresModifier,
   isFaKeybindBindableMainKeyCode,
   isFaKeybindModifierPhysicalCode
-} from 'app/src/scripts/keybinds/faKeybindsChordFromEvent'
+} from 'app/src/scripts/keybinds/keybinds_manager'
 
 test('isFaKeybindModifierPhysicalCode recognizes left/right modifier codes', () => {
   expect(isFaKeybindModifierPhysicalCode('ShiftLeft')).toBe(true)

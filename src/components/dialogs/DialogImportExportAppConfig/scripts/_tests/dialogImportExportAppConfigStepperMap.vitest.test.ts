@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 import { expect, test } from 'vitest'
 
-import { importExportViewToStepperPanel } from '../dialogImportExportAppConfigStepperMap'
+import { importExportViewToStepperPanel } from '../functions/dialogImportExportAppConfigStepperMap'
 
 /**
  * importExportViewToStepperPanel

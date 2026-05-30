@@ -3,7 +3,7 @@ import { ipcMain } from 'electron'
 import { FA_USER_SETTINGS_IPC } from 'app/src-electron/electron-ipc-bridge'
 import { applyFaSpellCheckerLanguagesToSession } from 'app/src-electron/mainScripts/windowManagement/faSpellCheckerSession'
 import { appWindow } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
-import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
+import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettings_manager'
 import { parseFaUserSettingsPatch } from 'app/src-electron/shared/faUserSettingsPatchSchema'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 

@@ -3,20 +3,40 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, expect, test, vi } from 'vitest'
 
-import * as faActionRun from 'app/src/scripts/actionManager/faActionManagerRun'
-import * as faWelcomeScreenAutoLoad from 'app/src/scripts/projectManagement/faWelcomeScreenAutoLoadProject'
-
-import SplashControlsResumeDropdown from '../SplashControlsResumeDropdown.vue'
+const { runFaActionMock, openWelcomeScreenAutoLoadProjectMock } = vi.hoisted(() => {
+  return {
+    openWelcomeScreenAutoLoadProjectMock: vi.fn(async () => false),
+    runFaActionMock: vi.fn()
+  }
+})
 
 const resolveSplashResumeDropdownArrowElementMock = vi.hoisted(() => {
   return vi.fn()
 })
 
-vi.mock('app/src/components/other/SplashControls/scripts/resolveSplashResumeDropdownArrowElement', () => {
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => {
+  return {
+    runFaAction: (...args: unknown[]) => runFaActionMock(...args),
+    runFaActionAwait: vi.fn(async () => true)
+  }
+})
+
+vi.mock('app/src/scripts/projectManagement/projectManagement_manager', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('app/src/scripts/projectManagement/projectManagement_manager')>()
+  return {
+    ...actual,
+    openWelcomeScreenAutoLoadProject: openWelcomeScreenAutoLoadProjectMock
+  }
+})
+
+vi.mock('app/src/components/other/SplashControls/scripts/functions/resolveSplashResumeDropdownArrowElement', () => {
   return {
     resolveSplashResumeDropdownArrowElement: resolveSplashResumeDropdownArrowElementMock
   }
 })
+
+import SplashControlsResumeDropdown from '../SplashControlsResumeDropdown.vue'
 
 beforeEach(() => {
   setActivePinia(createPinia())
@@ -55,10 +75,8 @@ test('Test that SplashControlsResumeDropdown shows resume control when recent pr
  * Primary segment triggers welcome auto-load when no active session is open.
  */
 test('Test that SplashControlsResumeDropdown primary segment calls welcome auto-load', async () => {
-  const autoLoadSpy = vi.spyOn(
-    faWelcomeScreenAutoLoad,
-    'openWelcomeScreenAutoLoadProject'
-  ).mockResolvedValue(false)
+  openWelcomeScreenAutoLoadProjectMock.mockReset()
+  openWelcomeScreenAutoLoadProjectMock.mockResolvedValue(false)
 
   const w = mount(SplashControlsResumeDropdown, {
     global: {
@@ -71,9 +89,7 @@ test('Test that SplashControlsResumeDropdown primary segment calls welcome auto-
   await flushPromises()
   await w.get('[data-test-locator="splashPage-btn-resume-latest"]').trigger('click')
 
-  expect(autoLoadSpy).toHaveBeenCalledOnce()
-
-  autoLoadSpy.mockRestore()
+  expect(openWelcomeScreenAutoLoadProjectMock).toHaveBeenCalledOnce()
   w.unmount()
 })
 
@@ -82,7 +98,8 @@ test('Test that SplashControlsResumeDropdown primary segment calls welcome auto-
  * Recent project rows dispatch loadExistingProject with the row path.
  */
 test('Test that SplashControlsResumeDropdown recent row loads project by path', async () => {
-  const actionSpy = vi.spyOn(faActionRun, 'runFaAction').mockImplementation(() => undefined)
+  runFaActionMock.mockReset()
+  const actionSpy = runFaActionMock
 
   const w = mount(SplashControlsResumeDropdown, {
     global: {
@@ -97,6 +114,6 @@ test('Test that SplashControlsResumeDropdown recent row loads project by path', 
 
   expect(actionSpy).toHaveBeenCalledWith('loadExistingProject', { filePath: '/newest.faproject' })
 
-  actionSpy.mockRestore()
+  runFaActionMock.mockReset()
   w.unmount()
 })

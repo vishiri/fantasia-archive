@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { dialogKeybindSettingsNoDataSlotShowsFilterError } from '../dialogKeybindSettingsNoDataSlotFilterUi'
+import { dialogKeybindSettingsNoDataSlotShowsFilterError } from '../functions/dialogKeybindSettingsNoDataSlotFilterUi'
 
 test('Test dialogKeybindSettingsNoDataSlotShowsFilterError is false for null undefined empty and whitespace-only', () => {
   expect(dialogKeybindSettingsNoDataSlotShowsFilterError(null)).toBe(false)

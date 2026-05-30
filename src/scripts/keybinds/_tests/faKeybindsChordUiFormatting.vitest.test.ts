@@ -1,12 +1,13 @@
 import { afterEach, expect, test, vi } from 'vitest'
 
-import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
-import * as faKeybindCommandDefinitions from 'app/src/scripts/keybinds/faKeybindCommandDefinitions'
-import * as faKeybindsChordEqualityAndResolve from 'app/src/scripts/keybinds/faKeybindsChordEqualityAndResolve'
+import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/keybinds_managerDefaults'
+import * as faKeybindCommandDefinitions from '../functions/faKeybindCommandDefinitions'
+import * as faKeybindsChordEqualityAndResolve from '../functions/faKeybindsChordEqualityAndResolve'
+import { createFaKeybindsChordUiFormatting } from '../functions/createFaKeybindsChordUiFormatting'
 import {
   formatFaKeybindChordForUi,
   formatFaKeybindCommandLabelFromSnapshot
-} from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
+} from '../faKeybindsChordUiFormatting_manager'
 import type { I_faKeybindsSnapshot } from 'app/types/I_faKeybindsDomain'
 
 afterEach(() => {
@@ -82,12 +83,16 @@ test('Test that formatFaKeybindCommandLabelFromSnapshot reflects overrides', () 
  * Returns null when no command definition exists for the id.
  */
 test('Test that formatFaKeybindCommandLabelFromSnapshot returns null without command definition', () => {
-  vi.spyOn(faKeybindCommandDefinitions, 'findFaKeybindCommandDefinition').mockReturnValue(undefined)
+  const formatLabel = createFaKeybindsChordUiFormatting({
+    faKeybindResolveEffectiveChord: faKeybindsChordEqualityAndResolve.faKeybindResolveEffectiveChord,
+    findFaKeybindCommandDefinition: () => undefined,
+    sortFaKeybindMods: faKeybindsChordEqualityAndResolve.sortFaKeybindMods
+  }).formatFaKeybindCommandLabelFromSnapshot
   const snapshot: I_faKeybindsSnapshot = {
     platform: 'win32',
     store: { ...FA_KEYBINDS_STORE_DEFAULTS }
   }
-  expect(formatFaKeybindCommandLabelFromSnapshot({
+  expect(formatLabel({
     commandId: 'openAppSettings',
     snapshot
   })).toBeNull()
@@ -98,12 +103,16 @@ test('Test that formatFaKeybindCommandLabelFromSnapshot returns null without com
  * Returns null when effective chord resolves to null.
  */
 test('Test that formatFaKeybindCommandLabelFromSnapshot returns null when effective chord is null', () => {
-  vi.spyOn(faKeybindsChordEqualityAndResolve, 'faKeybindResolveEffectiveChord').mockReturnValue(null)
+  const formatLabel = createFaKeybindsChordUiFormatting({
+    faKeybindResolveEffectiveChord: () => null,
+    findFaKeybindCommandDefinition: faKeybindCommandDefinitions.findFaKeybindCommandDefinition,
+    sortFaKeybindMods: faKeybindsChordEqualityAndResolve.sortFaKeybindMods
+  }).formatFaKeybindCommandLabelFromSnapshot
   const snapshot: I_faKeybindsSnapshot = {
     platform: 'win32',
     store: { ...FA_KEYBINDS_STORE_DEFAULTS }
   }
-  expect(formatFaKeybindCommandLabelFromSnapshot({
+  expect(formatLabel({
     commandId: 'openAppSettings',
     snapshot
   })).toBeNull()

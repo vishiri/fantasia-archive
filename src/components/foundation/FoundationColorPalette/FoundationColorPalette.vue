@@ -105,11 +105,12 @@
 </template>
 
 <script lang="ts" setup>
-import { FOUNDATION_CUSTOM_SWATCHES } from './scripts/foundationPaletteCustom'
-import { buildQuasarMaterialGroups } from './scripts/foundationPaletteQuasarMaterial'
+import { useFoundationColorPalette } from './scripts/foundationColorPalette_manager'
 
-const customSwatches = FOUNDATION_CUSTOM_SWATCHES
-const materialGroups = buildQuasarMaterialGroups()
+const {
+  customSwatches,
+  materialGroups
+} = useFoundationColorPalette()
 </script>
 
 <style lang="scss" scoped>

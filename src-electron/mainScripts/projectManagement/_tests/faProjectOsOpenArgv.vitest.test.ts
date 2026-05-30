@@ -5,7 +5,7 @@ import {
   extractFaProjectPathsFromArgv,
   pickLastFaProjectPathForOsOpen,
   resolveOsOpenFaProjectPathFromArgv
-} from '../faProjectOsOpenArgv'
+} from '../projectManagement_manager'
 
 describe('extractFaProjectPathsFromArgv', () => {
   test('returns empty for flag-only argv', () => {

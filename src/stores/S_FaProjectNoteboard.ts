@@ -10,6 +10,8 @@ import type {
 } from 'app/types/I_faProjectNoteboardDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
 
+import { mergeProjectNoteboardRootAfterSilentPersist } from './functions/faProjectNoteboardPersistMerge'
+
 /**
  * Per-project noteboard: text plus floating-window open flag, persisted in the active project's SQLite KV.
  */
@@ -55,7 +57,6 @@ export const S_FaProjectNoteboard = defineStore('S_FaProjectNoteboard', () => {
       throw new Error(i18n.global.t('globalFunctionality.faProjectNoteboard.bridgeMissing'))
     }
 
-    const preserveLocalTextBecausePatchOmittedText = patch.text === undefined
     const textSnapshotBeforePersist = text.value
 
     const writeResult = await ResultAsync.fromPromise(
@@ -80,15 +81,11 @@ export const S_FaProjectNoteboard = defineStore('S_FaProjectNoteboard', () => {
       console.error('[S_FaProjectNoteboard] getProjectNoteboard after silent partial failed', error)
       throw error instanceof Error ? error : new Error(String(error))
     }
-    const snapshot = afterSaveResult.value
-    if (preserveLocalTextBecausePatchOmittedText) {
-      applyRoot({
-        ...snapshot,
-        text: textSnapshotBeforePersist
-      })
-    } else {
-      applyRoot(snapshot)
-    }
+    applyRoot(mergeProjectNoteboardRootAfterSilentPersist(
+      afterSaveResult.value,
+      patch,
+      textSnapshotBeforePersist
+    ))
   }
 
   async function persistCurrentTextSilent (): Promise<void> {

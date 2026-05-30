@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { mdListArrayConverter } from '../mdListArrayConverter'
+import { mdListArrayConverter } from '../functions/mdListArrayConverter'
 
 /**
  * mdListArrayConverter

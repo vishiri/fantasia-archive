@@ -72,7 +72,7 @@ import type { I_dialogKeybindSettingsCaptureFieldProps } from '../../../../types
 import {
   DIALOG_KEYBIND_CAPTURE_HELP_LINE_KEYS,
   useDialogKeybindSettingsCaptureFieldDisplay
-} from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsCaptureFieldDisplay'
+} from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettings_manager'
 
 const props = defineProps<I_dialogKeybindSettingsCaptureFieldProps>()
 

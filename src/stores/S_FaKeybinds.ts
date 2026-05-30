@@ -4,12 +4,10 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 import type { I_faKeybindsSnapshot } from 'app/types/I_faKeybindsDomain'
+import type { I_faKeybindsUpdatePatch } from 'app/types/I_faKeybindsBridgeUpdate'
 
-import { runFaKeybindsRefreshKeybinds } from './faKeybindsStoreBridgeRefresh'
-import {
-  runFaKeybindsUpdateKeybinds,
-  type I_faKeybindsUpdatePatch
-} from './faKeybindsStoreBridgeUpdate'
+import { runFaKeybindsRefreshKeybinds } from './scripts/sFaKeybindsBridgeRefresh'
+import { runFaKeybindsUpdateKeybinds } from './scripts/sFaKeybindsBridgeUpdate'
 
 export const S_FaKeybinds = defineStore('S_FaKeybinds', () => {
   const snapshot: Ref<I_faKeybindsSnapshot | null> = ref(null)

@@ -15,7 +15,7 @@ export const faProjectCreateInputSchema = z.object({
   projectName: projectNameSchema
 }).strict()
 
-export type I_faProjectCreateInputParsed = z.infer<typeof faProjectCreateInputSchema>
+import type { I_faProjectCreateInputParsed } from 'app/types/I_faProjectCreateInputParsed'
 
 function isPlainRecord (value: unknown): value is Record<string, unknown> {
   return (

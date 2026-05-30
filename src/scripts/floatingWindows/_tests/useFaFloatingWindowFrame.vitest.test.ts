@@ -4,11 +4,11 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent, ref, type Ref } from 'vue'
 
-import type { I_UseFaFloatingWindowFrameOptions } from 'app/src/scripts/floatingWindows/useFaFloatingWindowFrame'
+import type { I_UseFaFloatingWindowFrameOptions } from 'app/types/I_useFaFloatingWindowFrameOptions'
 import type { I_faFloatingWindowPersistedRect } from 'app/types/I_faFloatingWindowPersistedRect'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
-import type { I_FaFloatingWindowFrameLayout } from 'app/src/scripts/floatingWindows/faFloatingWindowFrameLayout'
+import type { I_FaFloatingWindowFrameLayout } from 'app/types/I_faFloatingWindowFrameLayout'
 
 const testLayout: I_FaFloatingWindowFrameLayout = {
   widthFrac: 0.9,
@@ -26,7 +26,7 @@ function mountFloatingFrameHarness (
     visible: Ref<boolean>,
     layout?: I_FaFloatingWindowFrameLayout,
     options?: I_UseFaFloatingWindowFrameOptions
-  ) => ReturnType<typeof import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame').useFaFloatingWindowFrame>,
+  ) => ReturnType<typeof import('../useFaFloatingWindowFrame_manager').useFaFloatingWindowFrame>,
   options: I_UseFaFloatingWindowFrameOptions = {}
 ): { visible: Ref<boolean>; wrapper: ReturnType<typeof mount> } {
   const visible = ref(false)
@@ -80,7 +80,7 @@ afterEach(() => {
  * Opening applies centerInViewport geometry and raises z-index within the floating band.
  */
 test('Test that useFaFloatingWindowFrame centers the frame and bumps z-index when visibility becomes true', async () => {
-  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { useFaFloatingWindowFrame } = await import('../useFaFloatingWindowFrame_manager')
   const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame)
   const vm = wrapper.vm as unknown as {
     frameStyle: { left: string; top: string; width: string; height: string; zIndex: number }
@@ -103,9 +103,9 @@ test('Test that useFaFloatingWindowFrame centers the frame and bumps z-index whe
  * Noteboard layer uses the upper z-index band (5900+) so it stacks above standard floating windows.
  */
 test('Test that useFaFloatingWindowFrame uses the noteboard z-index band when options request it', async () => {
-  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { useFaFloatingWindowFrame } = await import('../useFaFloatingWindowFrame_manager')
   const { FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MIN } = await import(
-    'app/src/scripts/floatingWindows/faFloatingWindowZIndex'
+    '../functions/faFloatingWindowZIndex'
   )
   const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame, {
     floatingWindowZLayer: 'noteboard'
@@ -127,9 +127,9 @@ test('Test that useFaFloatingWindowFrame uses the noteboard z-index band when op
  * Project styling layer uses band 5800+ so it stacks above app-wide Custom CSS but below noteboards.
  */
 test('Test that useFaFloatingWindowFrame uses the project styling z-index band when options request it', async () => {
-  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { useFaFloatingWindowFrame } = await import('../useFaFloatingWindowFrame_manager')
   const { FA_FLOATING_WINDOW_Z_INDEX_PROJECT_STYLING_MIN } = await import(
-    'app/src/scripts/floatingWindows/faFloatingWindowZIndex'
+    '../functions/faFloatingWindowZIndex'
   )
   const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame, {
     floatingWindowZLayer: 'projectStyling'
@@ -151,9 +151,9 @@ test('Test that useFaFloatingWindowFrame uses the project styling z-index band w
  * Project noteboard layer uses the top sub-band (5950+) so it stacks above the app noteboard floats.
  */
 test('Test that useFaFloatingWindowFrame uses the project noteboard z-index band when options request it', async () => {
-  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { useFaFloatingWindowFrame } = await import('../useFaFloatingWindowFrame_manager')
   const { FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MIN } = await import(
-    'app/src/scripts/floatingWindows/faFloatingWindowZIndex'
+    '../functions/faFloatingWindowZIndex'
   )
   const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame, {
     floatingWindowZLayer: 'projectNoteboard'
@@ -185,7 +185,7 @@ test('Test that useFaFloatingWindowFrame titleShortFrameClass follows frame heig
   } as unknown as typeof ResizeObserver
 
   const { useFaFloatingWindowFrame, FA_FLOATING_WINDOW_TITLE_SHORT_FRAME_CLASS } =
-    await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+    await import('../useFaFloatingWindowFrame_manager')
   const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame)
   visible.value = true
   await wrapper.vm.$nextTick()
@@ -229,7 +229,7 @@ test('Test that useFaFloatingWindowFrame wires ResizeObserver observe and discon
     }
   } as unknown as typeof ResizeObserver
 
-  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { useFaFloatingWindowFrame } = await import('../useFaFloatingWindowFrame_manager')
   const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame)
   visible.value = true
   await wrapper.vm.$nextTick()
@@ -250,7 +250,7 @@ test('Test that useFaFloatingWindowFrame wires ResizeObserver observe and discon
  * Frame self pointerdown raises z-index for click-to-front on the shell.
  */
 test('Test that useFaFloatingWindowFrame onFramePointerDown bumps z-index when the frame element receives pointerdown', async () => {
-  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { useFaFloatingWindowFrame } = await import('../useFaFloatingWindowFrame_manager')
   const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame)
   visible.value = true
   await wrapper.vm.$nextTick()
@@ -282,7 +282,7 @@ test('Test that useFaFloatingWindowFrame does not observe when frameRef stays un
     }
   } as unknown as typeof ResizeObserver
 
-  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { useFaFloatingWindowFrame } = await import('../useFaFloatingWindowFrame_manager')
   const visible = ref(false)
   const NoRefHarness = defineComponent({
     setup () {
@@ -316,7 +316,7 @@ test('Test that useFaFloatingWindowFrame ResizeObserver callback syncs w and h f
     }
   } as unknown as typeof ResizeObserver
 
-  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { useFaFloatingWindowFrame } = await import('../useFaFloatingWindowFrame_manager')
   const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame)
   visible.value = true
   await wrapper.vm.$nextTick()
@@ -353,7 +353,7 @@ test('Test that useFaFloatingWindowFrame ResizeObserver callback does not run wh
     }
   } as unknown as typeof ResizeObserver
 
-  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { useFaFloatingWindowFrame } = await import('../useFaFloatingWindowFrame_manager')
   const visible = ref(false)
   const Harness = defineComponent({
     setup () {
@@ -425,7 +425,7 @@ test('Test that useFaFloatingWindowFrame ResizeObserver callback ignores zero of
     }
   } as unknown as typeof ResizeObserver
 
-  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { useFaFloatingWindowFrame } = await import('../useFaFloatingWindowFrame_manager')
   const { visible, wrapper } = mountFloatingFrameHarness(useFaFloatingWindowFrame)
   visible.value = true
   await wrapper.vm.$nextTick()
@@ -461,7 +461,7 @@ test('Test that useFaFloatingWindowFrame ResizeObserver callback does not run wh
     }
   } as unknown as typeof ResizeObserver
 
-  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { useFaFloatingWindowFrame } = await import('../useFaFloatingWindowFrame_manager')
   const visible = ref(false)
   const Harness = defineComponent({
     setup () {
@@ -526,7 +526,7 @@ test('Test that useFaFloatingWindowFrame ResizeObserver callback does not run wh
  * When 'persistedFrame' holds a usable rect, opening applies clamped geometry instead of centering.
  */
 test('Test that useFaFloatingWindowFrame restores persisted geometry when visible becomes true', async () => {
-  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { useFaFloatingWindowFrame } = await import('../useFaFloatingWindowFrame_manager')
   const persistedFrame = ref<I_faFloatingWindowPersistedRect | null>({
     height: 300,
     width: 300,
@@ -554,7 +554,7 @@ test('Test that useFaFloatingWindowFrame restores persisted geometry when visibl
  * When 'persistedFrame' updates while visible (loading a different persisted project snapshot), clamped geometry is reapplied.
  */
 test('Test that useFaFloatingWindowFrame reapplies persisted geometry when persistedFrame changes while visible', async () => {
-  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { useFaFloatingWindowFrame } = await import('../useFaFloatingWindowFrame_manager')
   const persistedFrame = ref<I_faFloatingWindowPersistedRect | null>({
     height: 300,
     width: 300,
@@ -592,7 +592,7 @@ test('Test that useFaFloatingWindowFrame reapplies persisted geometry when persi
  * When 'persistedFrame' updates while the window is hidden, geometry is not reapplied until the user opens the window again.
  */
 test('Test that useFaFloatingWindowFrame ignores persistedFrame updates while hidden', async () => {
-  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { useFaFloatingWindowFrame } = await import('../useFaFloatingWindowFrame_manager')
   const persistedFrame = ref<I_faFloatingWindowPersistedRect | null>({
     height: 300,
     width: 300,
@@ -627,7 +627,7 @@ test('Test that useFaFloatingWindowFrame ignores persistedFrame updates while hi
  * When 'persistedFrame' is unusable, opening keeps the center-in-viewport path.
  */
 test('Test that useFaFloatingWindowFrame ignores unusable persisted geometry and centers', async () => {
-  const { useFaFloatingWindowFrame } = await import('app/src/scripts/floatingWindows/useFaFloatingWindowFrame')
+  const { useFaFloatingWindowFrame } = await import('../useFaFloatingWindowFrame_manager')
   const persistedFrame = ref<I_faFloatingWindowPersistedRect | null>({
     height: 50,
     width: 50,

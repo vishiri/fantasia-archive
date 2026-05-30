@@ -1,0 +1,70 @@
+import { buildFaActionDefinitionHandlersDialogsAppConfig } from './faActionDefinitionHandlersDialogsAppConfig'
+import { buildFaActionDefinitionHandlersDialogsOpens } from './faActionDefinitionHandlersDialogsOpens'
+import { buildFaActionDefinitionHandlersDialogsProjectFlow } from './faActionDefinitionHandlersDialogsProjectFlow'
+import { faActionDefinitionHandlersDialogsDeps } from './faActionDefinitionHandlersDialogsWiring'
+
+const faActionDefinitionHandlersDialogsApi = {
+  ...buildFaActionDefinitionHandlersDialogsOpens(faActionDefinitionHandlersDialogsDeps),
+  ...buildFaActionDefinitionHandlersDialogsAppConfig(faActionDefinitionHandlersDialogsDeps),
+  ...buildFaActionDefinitionHandlersDialogsProjectFlow(faActionDefinitionHandlersDialogsDeps)
+}
+
+export const handleOpenKeybindSettingsDialog =
+  faActionDefinitionHandlersDialogsApi.handleOpenKeybindSettingsDialog
+
+export const handleOpenAppSettingsDialog =
+  faActionDefinitionHandlersDialogsApi.handleOpenAppSettingsDialog
+
+export const handleOpenProjectSettingsDialog =
+  faActionDefinitionHandlersDialogsApi.handleOpenProjectSettingsDialog
+
+export const handleOpenAppStylingWindow =
+  faActionDefinitionHandlersDialogsApi.handleOpenAppStylingWindow
+
+export const handleOpenProjectStylingWindow =
+  faActionDefinitionHandlersDialogsApi.handleOpenProjectStylingWindow
+
+export const handleOpenAdvancedSearchGuideDialog =
+  faActionDefinitionHandlersDialogsApi.handleOpenAdvancedSearchGuideDialog
+
+export const handleOpenChangelogDialog =
+  faActionDefinitionHandlersDialogsApi.handleOpenChangelogDialog
+
+export const handleOpenLicenseDialog =
+  faActionDefinitionHandlersDialogsApi.handleOpenLicenseDialog
+
+export const handleOpenAboutFantasiaArchiveDialog =
+  faActionDefinitionHandlersDialogsApi.handleOpenAboutFantasiaArchiveDialog
+
+export const handleOpenTipsTricksTriviaDialog =
+  faActionDefinitionHandlersDialogsApi.handleOpenTipsTricksTriviaDialog
+
+export const handleOpenActionMonitorDialog =
+  faActionDefinitionHandlersDialogsApi.handleOpenActionMonitorDialog
+
+export const handleOpenImportExportAppConfigDialog =
+  faActionDefinitionHandlersDialogsApi.handleOpenImportExportAppConfigDialog
+
+export const handleExportAppConfigPackage =
+  faActionDefinitionHandlersDialogsApi.handleExportAppConfigPackage
+
+export const handleExportAppConfigSaveResult =
+  faActionDefinitionHandlersDialogsApi.handleExportAppConfigSaveResult
+
+export const handleImportAppConfigStageResult =
+  faActionDefinitionHandlersDialogsApi.handleImportAppConfigStageResult
+
+export const handleImportAppConfigApply =
+  faActionDefinitionHandlersDialogsApi.handleImportAppConfigApply
+
+export const handleOpenNewProjectDialog =
+  faActionDefinitionHandlersDialogsApi.handleOpenNewProjectDialog
+
+export const handleCreateNewProject =
+  faActionDefinitionHandlersDialogsApi.handleCreateNewProject
+
+export const handleLoadExistingProject =
+  faActionDefinitionHandlersDialogsApi.handleLoadExistingProject
+
+export const handleShowStartupTipsNotification =
+  faActionDefinitionHandlersDialogsApi.handleShowStartupTipsNotification

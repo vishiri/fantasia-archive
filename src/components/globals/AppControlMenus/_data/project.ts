@@ -9,7 +9,7 @@ import {
   faMenuSubItem,
   faMenuSubSeparator
 } from 'app/src/components/globals/AppControlMenus/_data/menuDataHelpers'
-import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
+import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
 
 // TODO - add functionality for all buttons and conditions
 

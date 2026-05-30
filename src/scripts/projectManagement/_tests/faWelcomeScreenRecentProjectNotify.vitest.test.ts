@@ -17,7 +17,7 @@ vi.mock('app/i18n/externalFileLoader', () => ({
   }
 }))
 
-import { notifyWelcomeScreenRecentProjectFileMissing } from '../faWelcomeScreenRecentProjectNotify'
+import { notifyWelcomeScreenRecentProjectFileMissing } from '../faWelcomeScreenRecentProjectNotify_manager'
 
 beforeEach(() => {
   vi.mocked(Notify.create).mockClear()

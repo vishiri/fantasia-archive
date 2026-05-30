@@ -1,7 +1,10 @@
 import { _electron as electron } from 'playwright'
 import type { ElectronApplication, Page } from 'playwright'
-import type { TestInfo } from '@playwright/test'
-
+import type {
+  I_faLaunchFaPlaywrightElectronSerialSuiteWindowOptions,
+  T_faPlaywrightDismissStartupTips,
+  T_faPlaywrightSerialSuiteReadiness
+} from 'app/types/I_faPlaywrightElectronHarness'
 import { FA_ELECTRON_MAIN_JS_PATH } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
 import { buildFaPlaywrightElectronLaunchEnv } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchEnv'
 import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers_universal/playwrightDismissStartupTipsNotify'
@@ -15,29 +18,9 @@ import {
   waitForFaRendererContentBridgeApis
 } from 'app/helpers/playwrightHelpers_universal/waitForFaRendererContentBridgeApis'
 
-export type TFaPlaywrightSerialSuiteReadiness = 'component' | 'e2e'
-
-export type TFaPlaywrightDismissStartupTips = boolean | 'auto'
-
-export interface IFaLaunchFaPlaywrightElectronSerialSuiteWindowOptions {
-  testInfo: TestInfo
-  buildLaunchEnv: () => Record<string, string>
-  readiness: TFaPlaywrightSerialSuiteReadiness
-  renderDelayMs: number
-  /**
-   * Extra strings appended after packaged main-process entry (cold OS-open tests pass an absolute `.faproject` path).
-   */
-  electronLaunchAdditionalArgs?: readonly string[]
-  electronMainJsPath?: string
-  resetUserData?: boolean
-  dismissStartupTips?: TFaPlaywrightDismissStartupTips
-  beforeIsolationReset?: () => void | Promise<void>
-  afterIsolationResetBeforeLaunch?: () => void | Promise<void>
-}
-
 function resolveDismissStartupTips (
-  readiness: TFaPlaywrightSerialSuiteReadiness,
-  dismissStartupTips?: TFaPlaywrightDismissStartupTips
+  readiness: T_faPlaywrightSerialSuiteReadiness,
+  dismissStartupTips?: T_faPlaywrightDismissStartupTips
 ): boolean {
   if (dismissStartupTips === undefined || dismissStartupTips === 'auto') {
     return readiness === 'e2e'
@@ -47,7 +30,7 @@ function resolveDismissStartupTips (
 
 async function applyReadinessWait (
   appWindow: Page,
-  readiness: TFaPlaywrightSerialSuiteReadiness
+  readiness: T_faPlaywrightSerialSuiteReadiness
 ): Promise<void> {
   if (readiness === 'component') {
     await waitForFaRendererContentBridgeApis(appWindow)
@@ -61,7 +44,7 @@ async function applyReadinessWait (
  * PLAYwright launch, recordVideo, readiness wait, marker, delay, and optional tips-dismiss flow.
  */
 export async function launchFaPlaywrightElectronSerialSuiteWindow (
-  options: IFaLaunchFaPlaywrightElectronSerialSuiteWindowOptions
+  options: I_faLaunchFaPlaywrightElectronSerialSuiteWindowOptions
 ): Promise<{
   electronApp: ElectronApplication
   appWindow: Page

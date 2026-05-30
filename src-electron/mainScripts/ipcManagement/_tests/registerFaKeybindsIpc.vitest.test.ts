@@ -1,7 +1,7 @@
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_KEYBINDS_IPC } from 'app/src-electron/electron-ipc-bridge'
-import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
+import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/keybinds_managerDefaults'
 
 const {
   cleanupFaKeybindsMock,
@@ -23,7 +23,7 @@ vi.mock('electron', () => {
   }
 })
 
-vi.mock('app/src-electron/mainScripts/keybinds/faKeybindsStore', () => {
+vi.mock('app/src-electron/mainScripts/keybinds/keybinds_manager', () => {
   return {
     cleanupFaKeybinds: cleanupFaKeybindsMock,
     getFaKeybinds: getFaKeybindsMock

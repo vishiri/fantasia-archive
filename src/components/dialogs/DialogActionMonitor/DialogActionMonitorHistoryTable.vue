@@ -70,7 +70,7 @@
         :props="cellProps"
         data-test-locator="dialogActionMonitor-cell-type"
       >
-        {{ formatDialogActionMonitorActionKind(cellProps.row.kind) }}
+        {{ formatDialogActionMonitorActionKindForUi(cellProps.row.kind) }}
       </q-td>
     </template>
 
@@ -80,7 +80,7 @@
         data-test-locator="dialogActionMonitor-cell-status"
       >
         <span
-          v-for="badge in [buildDialogActionMonitorStatusBadge(cellProps.row.status)]"
+          v-for="badge in [buildDialogActionMonitorStatusBadgeForUi(cellProps.row.status)]"
           :key="`${cellProps.row.uid}-${badge.label}`"
           class="dialogActionMonitor__statusWithTooltip"
           :data-test-locator="`dialogActionMonitor-status-${cellProps.row.status}`"
@@ -109,13 +109,15 @@
 <script setup lang="ts">
 import type { I_faActionHistoryEntry } from 'app/types/I_faActionManagerDomain'
 
-import type { I_dialogActionMonitorTableColumn } from 'app/src/components/dialogs/DialogActionMonitor/scripts/dialogActionMonitorTable'
 import {
-  buildDialogActionMonitorStatusBadge,
-  formatDialogActionMonitorActionKind,
+  buildDialogActionMonitorStatusBadgeForUi,
+  formatDialogActionMonitorActionKindForUi
+} from 'app/src/components/dialogs/DialogActionMonitor/scripts/dialogActionMonitor_manager'
+import type { I_dialogActionMonitorTableColumn } from 'app/types/I_dialogActionMonitorUi'
+import {
   formatDialogActionMonitorTimestamp,
   hasDialogActionMonitorPayload
-} from 'app/src/components/dialogs/DialogActionMonitor/scripts/dialogActionMonitorTable'
+} from 'app/src/components/dialogs/DialogActionMonitor/scripts/functions/dialogActionMonitorTableModel'
 
 defineProps<{
   columns: I_dialogActionMonitorTableColumn[]

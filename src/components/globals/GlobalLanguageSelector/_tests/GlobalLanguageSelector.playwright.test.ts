@@ -9,7 +9,7 @@ import L_GlobalLanguageSelectorFr from 'app/i18n/fr/components/globals/GlobalLan
 import type { T_faUserSettingsLanguageNamesKey } from 'app/types/faUserSettingsLanguageRegistry'
 
 import L_faUserSettingsEnUs from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
-import { GLOBAL_LANGUAGE_SELECTOR_LOCALES } from '../scripts/globalLanguageSelectorLocales'
+import { GLOBAL_LANGUAGE_SELECTOR_LOCALES } from '../scripts/globalLanguageSelectorLocales_manager'
 
 /**
  * Extra env settings to trigger component testing via Playwright

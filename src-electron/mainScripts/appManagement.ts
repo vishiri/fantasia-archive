@@ -12,10 +12,10 @@ import { registerFaAppNoteboardIpc } from 'app/src-electron/mainScripts/ipcManag
 import { registerFaAppStylingIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaAppStylingIpc'
 import { registerFaUserSettingsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaUserSettingsIpc'
 import { registerFaWindowControlIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
-import { getFaKeybinds } from 'app/src-electron/mainScripts/keybinds/faKeybindsStore'
-import { getFaAppNoteboard } from 'app/src-electron/mainScripts/appNoteboard/faAppNoteboardStore'
-import { getFaAppStyling } from 'app/src-electron/mainScripts/appStyling/faAppStylingStore'
-import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
+import { getFaKeybinds } from 'app/src-electron/mainScripts/keybinds/keybinds_manager'
+import { getFaAppNoteboard } from 'app/src-electron/mainScripts/appNoteboard/appNoteboard_manager'
+import { getFaAppStyling } from 'app/src-electron/mainScripts/appStyling/appStyling_manager'
+import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettings_manager'
 import { app } from 'electron'
 
 // Starts the app's Electron instance

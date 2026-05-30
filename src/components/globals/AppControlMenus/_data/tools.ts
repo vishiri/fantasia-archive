@@ -1,5 +1,5 @@
 import { i18n } from 'app/i18n/externalFileLoader'
-import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
+import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
 
 import type { I_appMenuBuildSession, I_appMenuItem, I_appMenuList } from 'app/types/I_appMenusDataList'
 

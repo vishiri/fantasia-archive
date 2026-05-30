@@ -1,5 +1,5 @@
 import { test, expect, vi, beforeEach } from 'vitest'
-import { windowsDevToolsExtensionsFix } from '../windowsDevToolsExtensionsFix'
+import { windowsDevToolsExtensionsFix } from '../chromiumFixes_manager'
 import path from 'path'
 
 const { appMock, nativeThemeMock, existsSyncMock, unlinkSyncMock } = vi.hoisted(() => {

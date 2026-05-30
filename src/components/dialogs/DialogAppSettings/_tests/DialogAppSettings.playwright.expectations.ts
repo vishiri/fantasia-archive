@@ -7,7 +7,7 @@ import {
   compareAppSettingsCategoryOrder,
   sortSettingsListByTranslatedTitle,
   toSortedRecord
-} from 'app/src/components/dialogs/DialogAppSettings/scripts/dialogAppSettingsTreeOrdering'
+} from 'app/src/components/dialogs/DialogAppSettings/scripts/functions/dialogAppSettingsTreeBuild'
 import appSettingsMessages from 'app/i18n/en-US/dialogs/L_appSettings'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 type T_appSettingsOptionMessageBlock = {

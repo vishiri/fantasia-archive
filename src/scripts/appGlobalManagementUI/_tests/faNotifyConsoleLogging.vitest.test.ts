@@ -11,7 +11,7 @@ beforeEach(() => {
  * Returns strings unchanged so shorthand Notify.create payloads stay valid.
  */
 test('Test that stripFaSkipFlagFromQuasarNotifyOpts leaves string opts unchanged', async () => {
-  const { stripFaSkipFlagFromQuasarNotifyOpts } = await import('../faNotifyConsoleLogging')
+  const { stripFaSkipFlagFromQuasarNotifyOpts } = await import('../faNotifyConsoleLogging_manager')
   expect(stripFaSkipFlagFromQuasarNotifyOpts('hello')).toBe('hello')
 })
 
@@ -20,7 +20,7 @@ test('Test that stripFaSkipFlagFromQuasarNotifyOpts leaves string opts unchanged
  * Drops the Fantasia skip flag before Quasar consumes the props object.
  */
 test('Test that stripFaSkipFlagFromQuasarNotifyOpts removes faSkipNotifyConsoleLog', async () => {
-  const { stripFaSkipFlagFromQuasarNotifyOpts } = await import('../faNotifyConsoleLogging')
+  const { stripFaSkipFlagFromQuasarNotifyOpts } = await import('../faNotifyConsoleLogging_manager')
   const stripped = stripFaSkipFlagFromQuasarNotifyOpts({
     faSkipNotifyConsoleLog: true,
     message: 'x',
@@ -37,7 +37,7 @@ test('Test that stripFaSkipFlagFromQuasarNotifyOpts removes faSkipNotifyConsoleL
  * Leaves objects untouched when the skip flag is absent or false.
  */
 test('Test that stripFaSkipFlagFromQuasarNotifyOpts preserves opts without skip', async () => {
-  const { stripFaSkipFlagFromQuasarNotifyOpts } = await import('../faNotifyConsoleLogging')
+  const { stripFaSkipFlagFromQuasarNotifyOpts } = await import('../faNotifyConsoleLogging_manager')
   const opts = {
     message: 'ok',
     type: 'positive' as const
@@ -50,7 +50,7 @@ test('Test that stripFaSkipFlagFromQuasarNotifyOpts preserves opts without skip'
  * Always mirrors string shorthand notifications.
  */
 test('Test that shouldMirrorFaNotifyToConsole accepts string opts', async () => {
-  const { shouldMirrorFaNotifyToConsole } = await import('../faNotifyConsoleLogging')
+  const { shouldMirrorFaNotifyToConsole } = await import('../faNotifyConsoleLogging_manager')
   expect(shouldMirrorFaNotifyToConsole('msg')).toBe(true)
 })
 
@@ -59,7 +59,7 @@ test('Test that shouldMirrorFaNotifyToConsole accepts string opts', async () => 
  * Skips the mirror line when callers already logged the same event.
  */
 test('Test that shouldMirrorFaNotifyToConsole rejects faSkipNotifyConsoleLog true', async () => {
-  const { shouldMirrorFaNotifyToConsole } = await import('../faNotifyConsoleLogging')
+  const { shouldMirrorFaNotifyToConsole } = await import('../faNotifyConsoleLogging_manager')
   expect(
     shouldMirrorFaNotifyToConsole({
       faSkipNotifyConsoleLog: true,
@@ -73,7 +73,7 @@ test('Test that shouldMirrorFaNotifyToConsole rejects faSkipNotifyConsoleLog tru
  * Maps string opts to a message field for the console mirror.
  */
 test('Test that buildFaNotifyConsoleMirrorPayload wraps string opts', async () => {
-  const { buildFaNotifyConsoleMirrorPayload } = await import('../faNotifyConsoleLogging')
+  const { buildFaNotifyConsoleMirrorPayload } = await import('../faNotifyConsoleLogging_manager')
   expect(buildFaNotifyConsoleMirrorPayload('hint')).toEqual({
     message: 'hint'
   })
@@ -84,7 +84,7 @@ test('Test that buildFaNotifyConsoleMirrorPayload wraps string opts', async () =
  * Copies only toast fields helpful in devtools.
  */
 test('Test that buildFaNotifyConsoleMirrorPayload copies known toast fields', async () => {
-  const { buildFaNotifyConsoleMirrorPayload } = await import('../faNotifyConsoleLogging')
+  const { buildFaNotifyConsoleMirrorPayload } = await import('../faNotifyConsoleLogging_manager')
   expect(
     buildFaNotifyConsoleMirrorPayload({
       caption: 'detail',
@@ -107,7 +107,7 @@ test('Test that buildFaNotifyConsoleMirrorPayload copies known toast fields', as
  * Skips mirrored keys when callers omit matching notify props.
  */
 test('Test that buildFaNotifyConsoleMirrorPayload omits undefined optional toast fields', async () => {
-  const { buildFaNotifyConsoleMirrorPayload } = await import('../faNotifyConsoleLogging')
+  const { buildFaNotifyConsoleMirrorPayload } = await import('../faNotifyConsoleLogging_manager')
   expect(buildFaNotifyConsoleMirrorPayload({
     caption: 'cap'
   })).toEqual({
@@ -127,7 +127,7 @@ test('Test that buildFaNotifyConsoleMirrorPayload omits undefined optional toast
  * Routes built-in toast types and common colors to matching console sinks.
  */
 test('Test that resolveFaNotifyConsoleLogFn picks console methods per type', async () => {
-  const { resolveFaNotifyConsoleLogFn } = await import('../faNotifyConsoleLogging')
+  const { resolveFaNotifyConsoleLogFn } = await import('../faNotifyConsoleLogging_manager')
   expect(resolveFaNotifyConsoleLogFn('quick')).toBe(console.log)
   expect(resolveFaNotifyConsoleLogFn({
     message: '',
@@ -156,7 +156,7 @@ test('Test that resolveFaNotifyConsoleLogFn picks console methods per type', asy
  * Falls back through color hints when type is omitted.
  */
 test('Test that resolveFaNotifyConsoleLogFn maps color fallback when type is omitted', async () => {
-  const { resolveFaNotifyConsoleLogFn } = await import('../faNotifyConsoleLogging')
+  const { resolveFaNotifyConsoleLogFn } = await import('../faNotifyConsoleLogging_manager')
   expect(resolveFaNotifyConsoleLogFn({
     color: 'info',
     message: ''
@@ -180,7 +180,7 @@ test('Test that resolveFaNotifyConsoleLogFn maps color fallback when type is omi
  * Defaults unknown combinations to console.log like neutral toasts.
  */
 test('Test that resolveFaNotifyConsoleLogFn defaults to console.log', async () => {
-  const { resolveFaNotifyConsoleLogFn } = await import('../faNotifyConsoleLogging')
+  const { resolveFaNotifyConsoleLogFn } = await import('../faNotifyConsoleLogging_manager')
   expect(resolveFaNotifyConsoleLogFn({
     message: '',
     type: 'customRegistered'
@@ -192,7 +192,7 @@ test('Test that resolveFaNotifyConsoleLogFn defaults to console.log', async () =
  * Sends the notify payload through the resolved console sink.
  */
 test('Test that emitFaNotifyConsoleMirror calls console.info for info typed toasts', async () => {
-  const { emitFaNotifyConsoleMirror } = await import('../faNotifyConsoleLogging')
+  const { emitFaNotifyConsoleMirror } = await import('../faNotifyConsoleLogging_manager')
   const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {})
   emitFaNotifyConsoleMirror({
     caption: 'c',
@@ -214,7 +214,7 @@ test('Test that emitFaNotifyConsoleMirror calls console.info for info typed toas
  * emitFaNotifyConsoleMirror
  */
 test('Test that emitFaNotifyConsoleMirror calls console.error for negative toasts', async () => {
-  const { emitFaNotifyConsoleMirror } = await import('../faNotifyConsoleLogging')
+  const { emitFaNotifyConsoleMirror } = await import('../faNotifyConsoleLogging_manager')
   const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
   emitFaNotifyConsoleMirror({
     message: 'bad',
@@ -237,7 +237,7 @@ test('Test that emitFaNotifyConsoleMirror calls console.error for negative toast
 test('Test that installFaNotifyConsoleLogging does not double-wrap Notify.create', async () => {
   const originalCreate = vi.fn(() => (): void => {})
   const notify = { create: originalCreate }
-  const { installFaNotifyConsoleLogging } = await import('../faNotifyConsoleLogging')
+  const { installFaNotifyConsoleLogging } = await import('../faNotifyConsoleLogging_manager')
   installFaNotifyConsoleLogging(notify as unknown as Notify)
   const wrapped = notify.create
   installFaNotifyConsoleLogging(notify as unknown as Notify)
@@ -257,7 +257,7 @@ test('Test that installFaNotifyConsoleLogging does not mutate a second notify ob
   const n2 = {
     create: inner2
   }
-  const { installFaNotifyConsoleLogging } = await import('../faNotifyConsoleLogging')
+  const { installFaNotifyConsoleLogging } = await import('../faNotifyConsoleLogging_manager')
   installFaNotifyConsoleLogging(n1 as unknown as Notify)
   installFaNotifyConsoleLogging(n2 as unknown as Notify)
   expect(n2.create).toBe(inner2)
@@ -271,7 +271,7 @@ test('Test that installFaNotifyConsoleLogging logs then calls the original notif
   const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
   const originalCreate = vi.fn(() => (): void => {})
   const notify = { create: originalCreate }
-  const { installFaNotifyConsoleLogging } = await import('../faNotifyConsoleLogging')
+  const { installFaNotifyConsoleLogging } = await import('../faNotifyConsoleLogging_manager')
   installFaNotifyConsoleLogging(notify as unknown as Notify)
   const callCreate = notify.create as (opts: Parameters<Notify['create']>[0]) => ReturnType<Notify['create']>
   callCreate({
@@ -300,7 +300,7 @@ test('Test that installFaNotifyConsoleLogging honors faSkipNotifyConsoleLog', as
   const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
   const originalCreate = vi.fn(() => (): void => {})
   const notify = { create: originalCreate }
-  const { installFaNotifyConsoleLogging } = await import('../faNotifyConsoleLogging')
+  const { installFaNotifyConsoleLogging } = await import('../faNotifyConsoleLogging_manager')
   installFaNotifyConsoleLogging(notify as unknown as Notify)
   const callCreate = notify.create as (opts: Parameters<Notify['create']>[0]) => ReturnType<Notify['create']>
   callCreate({

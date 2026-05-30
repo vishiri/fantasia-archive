@@ -28,13 +28,13 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { toRef } from 'vue'
 
 import FantasiaMascotImage from 'src/components/elements/FantasiaMascotImage/FantasiaMascotImage.vue'
 
-import { errorCardScopedMaxWidthBindPx } from 'app/src/components/elements/ErrorCard/scripts/errorCardScopedMaxWidthBindPx'
-
 import type { T_errorCardImageName } from 'app/types/T_errorCardImage'
+
+import { useErrorCard } from './scripts/errorCard_manager'
 
 const props = withDefaults(
   defineProps<{
@@ -61,7 +61,7 @@ const props = withDefaults(
   }
 )
 
-const errorCardMaxWidthPx = computed(() => errorCardScopedMaxWidthBindPx(props.width))
+const { errorCardMaxWidthPx } = useErrorCard(toRef(props, 'width'))
 </script>
 
 <style lang="scss" scoped>

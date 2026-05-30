@@ -28,7 +28,7 @@ beforeEach(() => {
  */
 test('Test that propagateFaProjectSettingsToAppConsumers updates active project and MRU', async () => {
   const { propagateFaProjectSettingsToAppConsumers } = await import(
-    '../faProjectSettingsConsumerPropagation'
+    '../faProjectSettingsConsumerPropagation_manager'
   )
   propagateFaProjectSettingsToAppConsumers({
     projectName: 'Renamed Via Settings',

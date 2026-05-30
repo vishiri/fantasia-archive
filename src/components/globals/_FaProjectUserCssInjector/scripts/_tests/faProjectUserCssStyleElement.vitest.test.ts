@@ -7,7 +7,7 @@ import {
   FA_PROJECT_USER_CSS_ELEMENT_ID,
   faProjectUserCssHeadIsUnset,
   repositionProjectStyleAfterAppCss
-} from '../faProjectUserCssStyleElement'
+} from '../functions/faProjectUserCssStyleElement'
 
 afterEach(() => {
   ;[...document.querySelectorAll(`#${FA_PROJECT_USER_CSS_ELEMENT_ID}`)].forEach((node) => {

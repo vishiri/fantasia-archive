@@ -14,20 +14,25 @@ const frameSpies = vi.hoisted(() => {
   }
 })
 
-vi.mock('app/src/scripts/floatingWindows/useFaFloatingWindowFrame', () => ({
-  useFaFloatingWindowFrame: () => ({
-    frameRef: ref(null),
-    frameStyle: ref({}),
-    h: ref(480),
-    onFramePointerDown: frameSpies.onFramePointerDown,
-    onResizePointerDown: frameSpies.onResizePointerDown,
-    onTitlePointerDown: frameSpies.onTitlePointerDown,
-    titleShortFrameClass: ref(undefined),
-    w: ref(560),
-    x: ref(20),
-    y: ref(20)
-  })
-}))
+vi.mock('app/src/scripts/floatingWindows/floatingWindows_manager', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('app/src/scripts/floatingWindows/floatingWindows_manager')>()
+  return {
+    ...actual,
+    useFaFloatingWindowFrame: () => ({
+      frameRef: ref(null),
+      frameStyle: ref({}),
+      h: ref(480),
+      onFramePointerDown: frameSpies.onFramePointerDown,
+      onResizePointerDown: frameSpies.onResizePointerDown,
+      onTitlePointerDown: frameSpies.onTitlePointerDown,
+      titleShortFrameClass: ref(undefined),
+      w: ref(560),
+      x: ref(20),
+      y: ref(20)
+    }),
+    useFaFloatingWindowFramePersist: () => undefined
+  }
+})
 
 const projectStylingMonacoState = vi.hoisted(() => {
   const { ref } = require('vue') as typeof import('vue')
@@ -37,26 +42,36 @@ const projectStylingMonacoState = vi.hoisted(() => {
   }
 })
 
-vi.mock('app/src/components/floatingWindows/WindowProjectStyling/scripts/useWindowProjectStylingCssPersist', () => ({
-  useWindowProjectStylingCssPersist: vi.fn()
-}))
-
-vi.mock('app/src/components/floatingWindows/WindowProjectStyling/scripts/useWindowProjectStylingFramePersist', () => ({
-  useWindowProjectStylingFramePersist: vi.fn()
-}))
-
-vi.mock('app/src/components/floatingWindows/WindowProjectStyling/scripts/windowProjectStylingState', () => ({
-  useWindowProjectStyling: () => ({
+vi.mock('app/src/components/floatingWindows/WindowProjectStyling/scripts/windowProjectStyling_manager', () => ({
+  useWindowProjectStylingSurface: () => ({
+    FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS: {},
+    FA_FLOATING_WINDOW_POP_TRANSITION_MS: 300,
+    buildFaColorVarSwatchStyle: () => ({ backgroundColor: 'var(--fa-color-primary)' }),
     closeWithoutSaving: vi.fn(),
     documentName: ref('WindowProjectStyling'),
     editorHostRef: ref(null),
+    faThemeCustomPropertyNames: ref(['--fa-color-accent']),
+    frameRef: ref(null),
+    frameStyleWithDialogTransition: ref({}),
+    helpKeybindMenuOpen: ref(false),
     monaco: {
       isLoading: projectStylingMonacoState.isLoading,
       loadError: projectStylingMonacoState.loadError
     },
+    monacoKeybindHelpItems: ref([
+      {
+        labelKey: 'commandPalette',
+        chord: 'F1'
+      }
+    ]),
+    onFramePointerDown: frameSpies.onFramePointerDown,
+    onHelpIconMouseEnter: vi.fn(),
+    onHelpIconMouseLeave: vi.fn(),
+    onResizePointerDown: frameSpies.onResizePointerDown,
+    onTitlePointerDown: frameSpies.onTitlePointerDown,
     saveAndCloseWindow: vi.fn(async () => undefined),
-    windowModel: ref(true),
-    workingCss: ref('')
+    titleShortFrameClass: ref(undefined),
+    windowModel: ref(true)
   })
 }))
 

@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => {
   }
 })
 
-vi.mock('app/src-electron/mainScripts/windowManagement/resolveFaElectronMainJsPath', () => {
+vi.mock('app/src-electron/mainScripts/windowManagement/windowManagement_manager', () => {
   return {
     resolveFaElectronMainJsPath: mocks.resolveMainMock
   }

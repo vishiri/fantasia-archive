@@ -13,16 +13,20 @@ const windowAppStylingFrameSpies = vi.hoisted(() => {
   }
 })
 
-vi.mock('app/src/scripts/floatingWindows/useFaFloatingWindowFrame', () => ({
-  useFaFloatingWindowFrame: () => ({
-    frameRef: ref(null),
-    frameStyle: ref({}),
-    onFramePointerDown: windowAppStylingFrameSpies.onFramePointerDown,
-    onResizePointerDown: windowAppStylingFrameSpies.onResizePointerDown,
-    onTitlePointerDown: windowAppStylingFrameSpies.onTitlePointerDown,
-    titleShortFrameClass: ref(undefined)
-  })
-}))
+vi.mock('app/src/scripts/floatingWindows/floatingWindows_manager', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('app/src/scripts/floatingWindows/floatingWindows_manager')>()
+  return {
+    ...actual,
+    useFaFloatingWindowFrame: () => ({
+      frameRef: ref(null),
+      frameStyle: ref({}),
+      onFramePointerDown: windowAppStylingFrameSpies.onFramePointerDown,
+      onResizePointerDown: windowAppStylingFrameSpies.onResizePointerDown,
+      onTitlePointerDown: windowAppStylingFrameSpies.onTitlePointerDown,
+      titleShortFrameClass: ref(undefined)
+    })
+  }
+})
 
 const windowAppStylingMonacoState = vi.hoisted(() => {
   const { ref } = require('vue') as typeof import('vue')
@@ -32,8 +36,32 @@ const windowAppStylingMonacoState = vi.hoisted(() => {
   }
 })
 
-vi.mock('app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStylingState', () => ({
-  useWindowAppStyling: () => ({
+const windowAppStylingHelpState = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  const helpKeybindMenuOpen = ref(false)
+  let helpMenuHoverTimer: ReturnType<typeof setTimeout> | undefined
+  return {
+    helpKeybindMenuOpen,
+    onHelpIconMouseEnter: (): void => {
+      if (helpMenuHoverTimer !== undefined) {
+        clearTimeout(helpMenuHoverTimer)
+      }
+      helpMenuHoverTimer = setTimeout(() => {
+        helpMenuHoverTimer = undefined
+        helpKeybindMenuOpen.value = true
+      }, 500)
+    },
+    onHelpIconMouseLeave: (): void => {
+      if (helpMenuHoverTimer !== undefined) {
+        clearTimeout(helpMenuHoverTimer)
+        helpMenuHoverTimer = undefined
+      }
+    }
+  }
+})
+
+vi.mock('app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStyling_manager', () => ({
+  useWindowAppStylingSurface: () => ({
     closeWithoutSaving: vi.fn(),
     documentName: ref('WindowAppStyling'),
     editorHostRef: ref(null),
@@ -42,7 +70,26 @@ vi.mock('app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppSt
       loadError: windowAppStylingMonacoState.loadError
     },
     saveAndCloseWindow: vi.fn(async () => undefined),
-    windowModel: ref(true)
+    windowModel: ref(true),
+    FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS: {},
+    FA_FLOATING_WINDOW_POP_TRANSITION_MS: 300,
+    buildFaColorVarSwatchStyle: () => ({ backgroundColor: 'var(--fa-color-primary)' }),
+    faThemeCustomPropertyNames: ref(['--fa-color-accent']),
+    frameStyleWithDialogTransition: ref({}),
+    helpKeybindMenuOpen: windowAppStylingHelpState.helpKeybindMenuOpen,
+    monacoKeybindHelpItems: ref([
+      {
+        labelKey: 'commandPalette',
+        chord: 'F1'
+      }
+    ]),
+    onHelpIconMouseEnter: windowAppStylingHelpState.onHelpIconMouseEnter,
+    onHelpIconMouseLeave: windowAppStylingHelpState.onHelpIconMouseLeave,
+    frameRef: ref(null),
+    onFramePointerDown: windowAppStylingFrameSpies.onFramePointerDown,
+    onResizePointerDown: windowAppStylingFrameSpies.onResizePointerDown,
+    onTitlePointerDown: windowAppStylingFrameSpies.onTitlePointerDown,
+    titleShortFrameClass: ref(undefined)
   })
 }))
 

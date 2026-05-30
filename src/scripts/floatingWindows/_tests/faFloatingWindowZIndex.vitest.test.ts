@@ -17,7 +17,7 @@ test('Test that bumpFloatingWindowZIndex stays within the standard sub-band and 
     bumpFloatingWindowZIndex,
     FA_FLOATING_WINDOW_Z_INDEX_STANDARD_MAX,
     FA_FLOATING_WINDOW_Z_INDEX_STANDARD_MIN
-  } = await import('app/src/scripts/floatingWindows/faFloatingWindowZIndex')
+  } = await import('../functions/faFloatingWindowZIndex')
   expect(bumpFloatingWindowZIndex()).toBe(FA_FLOATING_WINDOW_Z_INDEX_STANDARD_MIN)
   for (
     let k = FA_FLOATING_WINDOW_Z_INDEX_STANDARD_MIN + 1;
@@ -38,7 +38,7 @@ test('Test that bumpProjectStylingFloatingWindowZIndex stays within the project 
     bumpProjectStylingFloatingWindowZIndex,
     FA_FLOATING_WINDOW_Z_INDEX_PROJECT_STYLING_MAX,
     FA_FLOATING_WINDOW_Z_INDEX_PROJECT_STYLING_MIN
-  } = await import('app/src/scripts/floatingWindows/faFloatingWindowZIndex')
+  } = await import('../functions/faFloatingWindowZIndex')
   expect(bumpProjectStylingFloatingWindowZIndex()).toBe(
     FA_FLOATING_WINDOW_Z_INDEX_PROJECT_STYLING_MIN
   )
@@ -63,7 +63,7 @@ test('Test that bumpNoteboardFloatingWindowZIndex stays within the noteboard sub
     bumpNoteboardFloatingWindowZIndex,
     FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MAX,
     FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MIN
-  } = await import('app/src/scripts/floatingWindows/faFloatingWindowZIndex')
+  } = await import('../functions/faFloatingWindowZIndex')
   expect(bumpNoteboardFloatingWindowZIndex()).toBe(FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MIN)
   for (
     let k = FA_FLOATING_WINDOW_Z_INDEX_NOTEBOARD_MIN + 1;
@@ -84,7 +84,7 @@ test('Test that bumpProjectNoteboardFloatingWindowZIndex stays above the app not
     bumpProjectNoteboardFloatingWindowZIndex,
     FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MAX,
     FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MIN
-  } = await import('app/src/scripts/floatingWindows/faFloatingWindowZIndex')
+  } = await import('../functions/faFloatingWindowZIndex')
   expect(bumpProjectNoteboardFloatingWindowZIndex()).toBe(
     FA_FLOATING_WINDOW_Z_INDEX_PROJECT_NOTEBOARD_MIN
   )

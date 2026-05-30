@@ -1,9 +1,6 @@
 import { test, expect, vi, beforeEach, afterEach } from 'vitest'
-import {
-  determineAppName,
-  fixAppName,
-  PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME
-} from '../fixAppName'
+import { determineAppName, fixAppName } from '../appIdentity_manager'
+import { PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME } from '../playwrightIsolatedUserDataDirName'
 import packageJSON from '../../../../package.json' with { type: 'json' }
 import path from 'path'
 

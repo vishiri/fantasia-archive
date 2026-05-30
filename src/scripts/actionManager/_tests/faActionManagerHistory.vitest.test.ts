@@ -19,7 +19,7 @@ import {
   recordHistoryStarted,
   recordHistoryStartedFromEntry,
   snapshotActionHistory
-} from '../faActionManagerHistory'
+} from '../faActionManagerHistory_manager'
 
 beforeEach(() => {
   setActivePinia(createPinia())
@@ -219,7 +219,7 @@ test('Test that history helpers no-op when Pinia is missing', () => {
  * appendHistoryEntry trims the buffer when it exceeds FA_ACTION_HISTORY_MAX.
  */
 test('Test that appendHistoryEntry trims the history buffer at FA_ACTION_HISTORY_MAX', async () => {
-  const { FA_ACTION_HISTORY_MAX } = await import('app/src/stores/S_FaActionManager')
+  const { FA_ACTION_HISTORY_MAX } = await import('app/src/stores/functions/faActionManagerHistoryRing')
   const store = S_FaActionManager()
   for (let index = 0; index < FA_ACTION_HISTORY_MAX + 5; index += 1) {
     store.appendHistoryEntry({

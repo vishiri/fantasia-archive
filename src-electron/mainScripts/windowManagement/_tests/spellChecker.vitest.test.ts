@@ -44,7 +44,7 @@ vi.mock('electron', () => {
   }
 })
 
-vi.mock('app/src-electron/mainScripts/userSettings/userSettingsStore', () => {
+vi.mock('app/src-electron/mainScripts/userSettings/userSettings_manager', () => {
   return {
     getFaUserSettings: getFaUserSettingsMock
   }

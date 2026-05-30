@@ -51,23 +51,10 @@
 
 <script setup lang="ts">
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
-import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
-import { S_DialogComponent } from 'src/stores/S_Dialog'
-import { onMounted, ref, watch } from 'vue'
+
 import SocialContactButtons from '../../other/SocialContactButtons/SocialContactButtons.vue'
-import type { StoreGeneric } from 'pinia'
-import { Result } from 'neverthrow'
+import { useDialogAboutFantasiaArchive } from './scripts/dialogAboutFantasiaArchive_manager'
 
-const resolveDialogComponentStore = (): StoreGeneric | null => {
-  return Result.fromThrowable(
-    (): StoreGeneric => S_DialogComponent(),
-    (): null => null
-  )().unwrapOr(null)
-}
-
-/**
- * All component props
- */
 const props = defineProps<{
   /**
    * Custom input directly fed to the component in case it doesn't get triggered from the global store
@@ -75,65 +62,11 @@ const props = defineProps<{
   directInput?: T_dialogName
 }>()
 
-/**
- * Model for the current popup dialog
- */
-const dialogModel = ref(false)
-
-registerComponentDialogStackGuard(dialogModel)
-
-/**
- * Name of the document shown inside the dialog
- */
-const documentName = ref('')
-
-/**
-  * Current app version
-  * NOTE: This shows Electron version in DEV mode instead of NPM package version. This is a well known issue with Electron.
-  */
-const appVersion = ref('')
-
-/**
- * Opens the popup dialog via direct input-feed
- */
-const openDialog = async (input: T_dialogName) => {
-  documentName.value = input
-  dialogModel.value = true
-  const v = await window.faContentBridgeAPIs?.appDetails?.getProjectVersion?.() ?? ''
-  appVersion.value = v
-}
-
-/**
- * Trigger dialog popup via reaction to store update
- */
-watch(() => resolveDialogComponentStore()?.dialogUUID, () => {
-  const dialogComponentStore = resolveDialogComponentStore()
-  if (dialogComponentStore?.dialogToOpen === 'AboutFantasiaArchive') {
-    openDialog(dialogComponentStore.dialogToOpen as T_dialogName)
-  }
-})
-
-/**
- * Trigger dialog popup via reaction to direct prop feed
- */
-watch(() => props.directInput, () => {
-  if (props.directInput !== undefined && props.directInput !== '') {
-    if (props.directInput === 'AboutFantasiaArchive') {
-      openDialog(props.directInput)
-    }
-  }
-})
-
-/**
- * Checks the prop feed-status on the first mount and open the dialog if the prop is properly fed in
- * This exists mostly due to component tests being flaky otherwise
- */
-onMounted(() => {
-  if (props.directInput !== undefined && props.directInput !== '') {
-    openDialog(props.directInput)
-  }
-})
-
+const {
+  appVersion,
+  dialogModel,
+  documentName
+} = useDialogAboutFantasiaArchive(props)
 </script>
 
 <style lang="scss">

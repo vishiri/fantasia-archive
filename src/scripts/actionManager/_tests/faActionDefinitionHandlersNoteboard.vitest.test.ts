@@ -12,7 +12,7 @@ const { canOpenFloatingWindowWhileNoModalMock } = vi.hoisted(() => {
   }
 })
 
-vi.mock('app/src/scripts/appNoteboard/faAppNoteboardCanOpen', () => {
+vi.mock('app/src/scripts/appNoteboard/appNoteboard_manager', () => {
   return {
     canOpenFloatingWindowWhileNoModal: canOpenFloatingWindowWhileNoModalMock
   }
@@ -29,14 +29,14 @@ beforeEach(() => {
 
 test('handleReportAppNoteboardSaveFailure throws the payload message', async () => {
   const { handleReportAppNoteboardSaveFailure } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlers'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   await expect(handleReportAppNoteboardSaveFailure({ message: 'x' })).rejects.toThrow('x')
 })
 
 test('handleToggleAppNoteboardWindow closes when the window is already open', async () => {
   const { handleToggleAppNoteboardWindow } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlers'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   const s = S_FaAppNoteboard()
   s.setWindowOpen(true)
@@ -46,7 +46,7 @@ test('handleToggleAppNoteboardWindow closes when the window is already open', as
 
 test('handleToggleAppNoteboardWindow opens when allowed', async () => {
   const { handleToggleAppNoteboardWindow } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlers'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   const s = S_FaAppNoteboard()
   await handleToggleAppNoteboardWindow()
@@ -56,7 +56,7 @@ test('handleToggleAppNoteboardWindow opens when allowed', async () => {
 test('handleToggleAppNoteboardWindow no-ops when the modal stack blocks floating windows', async () => {
   canOpenFloatingWindowWhileNoModalMock.mockReturnValue(false)
   const { handleToggleAppNoteboardWindow } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlers'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   const s = S_FaAppNoteboard()
   await handleToggleAppNoteboardWindow()
@@ -65,14 +65,14 @@ test('handleToggleAppNoteboardWindow no-ops when the modal stack blocks floating
 
 test('handleReportProjectNoteboardSaveFailure throws the payload message', async () => {
   const { handleReportProjectNoteboardSaveFailure } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlers'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   await expect(handleReportProjectNoteboardSaveFailure({ message: 'pn' })).rejects.toThrow('pn')
 })
 
 test('handleToggleProjectNoteboardWindow closes when the window is already open', async () => {
   const { handleToggleProjectNoteboardWindow } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlers'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   const active = S_FaActiveProject()
 
@@ -89,7 +89,7 @@ test('handleToggleProjectNoteboardWindow closes when the window is already open'
 
 test('handleToggleProjectNoteboardWindow opens when allowed and a project is active', async () => {
   const { handleToggleProjectNoteboardWindow } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlers'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   S_FaActiveProject().setActiveProject({
     filePath: 'C:\\a.faproject',
@@ -103,7 +103,7 @@ test('handleToggleProjectNoteboardWindow opens when allowed and a project is act
 
 test('handleToggleProjectNoteboardWindow no-ops when no project is active', async () => {
   const { handleToggleProjectNoteboardWindow } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlers'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   const s = S_FaProjectNoteboard()
   await handleToggleProjectNoteboardWindow()
@@ -113,7 +113,7 @@ test('handleToggleProjectNoteboardWindow no-ops when no project is active', asyn
 test('handleToggleProjectNoteboardWindow no-ops when the modal stack blocks floating windows', async () => {
   canOpenFloatingWindowWhileNoModalMock.mockReturnValue(false)
   const { handleToggleProjectNoteboardWindow } = await import(
-    'app/src/scripts/actionManager/faActionDefinitionHandlers'
+    'app/src/scripts/actionManager/actionManager_manager'
   )
   S_FaActiveProject().setActiveProject({
     filePath: 'C:\\a.faproject',

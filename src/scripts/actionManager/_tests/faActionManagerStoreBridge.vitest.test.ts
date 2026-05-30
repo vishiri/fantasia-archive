@@ -1,7 +1,7 @@
 import { beforeEach, expect, test } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 
-import { resolveFaActionManagerStore } from '../faActionManagerStoreBridge'
+import { resolveFaActionManagerStore } from '../faActionManagerStoreBridge_manager'
 
 beforeEach(() => {
   setActivePinia(undefined)

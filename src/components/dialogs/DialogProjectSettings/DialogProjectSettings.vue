@@ -60,7 +60,7 @@ import type { I_faProjectSettingsRoot } from 'app/types/I_faProjectSettingsDomai
 import type { I_dialogProjectSettingsProps } from 'app/types/I_dialogProjectSettings'
 import DialogProjectSettingsLeftColumn from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsLeftColumn.vue'
 import DialogProjectSettingsPanelsColumn from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsPanelsColumn.vue'
-import { useDialogProjectSettings } from 'app/src/components/dialogs/DialogProjectSettings/scripts/useDialogProjectSettings'
+import { useDialogProjectSettings } from 'app/src/components/dialogs/DialogProjectSettings/scripts/dialogProjectSettings_manager'
 
 defineOptions({
   name: 'DialogProjectSettings'

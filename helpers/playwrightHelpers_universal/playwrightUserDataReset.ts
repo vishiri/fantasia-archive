@@ -7,12 +7,7 @@ import packageJSON from '../../package.json' with { type: 'json' }
 import { Result } from 'neverthrow'
 import { PLAYWRIGHT_ISOLATED_USER_DATA_DIR_NAME } from '../../src-electron/mainScripts/appIdentity/playwrightIsolatedUserDataDirName'
 
-export type T_faPlaywrightUserDataPathInput = {
-  /** Subset of process.env; only APPDATA / XDG_CONFIG_HOME are read. */
-  env: Record<string, string | undefined>
-  homedir: string
-  platform: NodeJS.Platform
-}
+import type { T_faPlaywrightUserDataPathInput } from 'app/types/I_faPlaywrightUserDataReset'
 
 /**
  * Mirrors Electron 'app.getPath("appData")' layout so Playwright can delete the same

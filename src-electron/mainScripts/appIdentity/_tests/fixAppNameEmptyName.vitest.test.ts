@@ -24,7 +24,7 @@ vi.mock('../../../../package.json', () => {
   }
 })
 
-import { fixAppName } from '../fixAppName'
+import { fixAppName } from '../appIdentity_manager'
 
 afterEach(() => {
   vi.unstubAllEnvs()

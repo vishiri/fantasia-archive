@@ -100,15 +100,13 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  FOUNDATION_TYPOGRAPHY_HEADINGS,
-  FOUNDATION_TYPOGRAPHY_HELPERS,
-  FOUNDATION_TYPOGRAPHY_WEIGHTS
-} from './scripts/foundationTypographySamples'
+import { useFoundationTextList } from './scripts/foundationTextList_manager'
 
-const headingRows = FOUNDATION_TYPOGRAPHY_HEADINGS
-const weightRows = FOUNDATION_TYPOGRAPHY_WEIGHTS
-const helperRows = FOUNDATION_TYPOGRAPHY_HELPERS
+const {
+  headingRows,
+  helperRows,
+  weightRows
+} = useFoundationTextList()
 </script>
 
 <style lang="scss" scoped>

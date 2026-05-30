@@ -21,9 +21,9 @@ vi.mock('app/src/css/fa-theme.scss?raw', () => {
   }
 })
 
-import * as fromDocument from 'app/src/scripts/faTheme/faThemeCustomPropertyNamesFromDocument'
-import { collectFaColorCustomPropertyNamesFromDocument } from 'app/src/scripts/faTheme/faThemeCustomPropertyNamesFromDocument'
-import { getFaColorCustomPropertyNamesForHelpPanel } from 'app/src/scripts/faTheme/faThemeCustomPropertyNames'
+import * as fromDocument from 'app/src/scripts/faTheme/faTheme_manager'
+import { collectFaColorCustomPropertyNamesFromDocument } from 'app/src/scripts/faTheme/faTheme_manager'
+import { getFaColorCustomPropertyNamesForHelpPanel } from 'app/src/scripts/faTheme/faTheme_manager'
 
 const appended: HTMLStyleElement[] = []
 

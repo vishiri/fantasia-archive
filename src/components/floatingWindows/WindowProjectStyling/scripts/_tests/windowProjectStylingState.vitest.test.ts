@@ -20,15 +20,18 @@ import {
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 
-import type { I_FaWindowProjectStylingState } from '../windowProjectStylingState'
+import type { I_FaWindowProjectStylingState } from 'app/types/I_faWindowStylingMonaco'
+
 import {
-  useWindowProjectStyling
-} from '../windowProjectStylingState'
+  useWindowProjectStyling,
+  useWindowProjectStylingSurface
+} from '../windowProjectStyling_manager'
 
 const {
   monacoEditorCreateMock,
   editorInstance,
   runFaActionAwaitMock,
+  runFaActionMock,
   dialogStoreRef
 } = vi.hoisted(() => {
   let currentValue = ''
@@ -71,11 +74,13 @@ const {
 
     monacoEditorCreateMock: vi.fn((_host: unknown, _opts: unknown) => instance),
 
-    runFaActionAwaitMock: vi.fn(async () => true)
+    runFaActionAwaitMock: vi.fn(async () => true),
+
+    runFaActionMock: vi.fn()
   }
 })
 
-vi.mock('app/src/components/floatingWindows/WindowAppStyling/scripts/cssMonaco', () => {
+vi.mock('app/src/scripts/floatingWindows/windowStylingCssMonaco_manager', () => {
   return {
     monaco: {
       editor: {
@@ -85,16 +90,17 @@ vi.mock('app/src/components/floatingWindows/WindowAppStyling/scripts/cssMonaco',
   }
 })
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => {
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => {
   return {
+    runFaAction: runFaActionMock,
     runFaActionAwait: runFaActionAwaitMock
   }
 })
 
 vi.mock(
-  'app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStylingStateSideEffects',
+  'app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStyling_manager',
   async (importOriginal) => {
-    const actual = await importOriginal<typeof import('app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStylingStateSideEffects')>()
+    const actual = await importOriginal<typeof import('app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStyling_manager')>()
     return {
       ...actual,
       reconcileMountedMonacoWithWorkingCss: vi.fn()
@@ -411,6 +417,43 @@ test('hiding WindowProjectStyling invokes clearCssLivePreview through the lifecy
   await flushPromises()
 
   expect(clearSpy).toHaveBeenCalledTimes(1)
+
+  wrapper.unmount()
+})
+
+/**
+ * useWindowProjectStylingSurface
+ * Composes frame, help panel, and core project styling state for the SFC.
+ */
+test('Test that useWindowProjectStylingSurface exposes frame bindings when opened', async () => {
+  const surfaceHarness: { current: ReturnType<typeof useWindowProjectStylingSurface> | null } = {
+    current: null
+  }
+
+  const Harness = defineComponent({
+    setup () {
+      surfaceHarness.current = useWindowProjectStylingSurface({
+        directInput: 'WindowProjectStyling'
+      })
+      return () => h('div')
+    }
+  })
+
+  const wrapper = mount(Harness)
+  await flushPromises()
+
+  const surface = surfaceHarness.current!
+  expect(surface.windowModel.value).toBe(true)
+  expect(surface.frameStyleWithDialogTransition.value['--q-transition-duration']).toBeDefined()
+  expect(surface.helpKeybindMenuOpen.value).toBe(false)
+  expect(Array.isArray(surface.faThemeCustomPropertyNames.value)).toBe(true)
+
+  const faTheme = await import('app/src/scripts/faTheme/faTheme_manager')
+  const themeSpy = vi.spyOn(faTheme, 'getFaColorCustomPropertyNamesForHelpPanel').mockReturnValue(['--refreshed'])
+  surface.helpKeybindMenuOpen.value = true
+  await flushPromises()
+  expect(themeSpy).toHaveBeenCalled()
+  expect(Array.isArray(surface.monacoKeybindHelpItems.value)).toBe(true)
 
   wrapper.unmount()
 })

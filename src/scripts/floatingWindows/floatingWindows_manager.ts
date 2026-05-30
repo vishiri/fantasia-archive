@@ -1,0 +1,23 @@
+/**
+ * floatingWindows domain — re-exports functions/ and wiring managers.
+ */
+export { FA_FLOATING_WINDOW_FRAME_DEFAULT_LAYOUT } from './functions/faFloatingWindowFrameLayout'
+export * from './functions/faFloatingWindowScheduleDelayedHide'
+export * from './functions/faFloatingWindowZIndex'
+export * from './functions/faQuasarDialogStandardTransition'
+export * from './functions/useFaFloatingWindowFrameConstants'
+export * from './faFloatingWindowFrameCenterInViewport_manager'
+export * from './faFloatingWindowPersistedGeometry_manager'
+export * from './faFloatingWindowPopTransition_manager'
+export * from './faFloatingWindowResizeClamp_manager'
+export * from './faFloatingWindowResizeGeometry_manager'
+export * from './faFloatingWindowResizePointerDrive_manager'
+export * from './faFloatingWindowTitleDragPointerApply_manager'
+export * from './faFloatingWindowTitleDragPointerSession'
+export * from './useFaFloatingWindowFrame_manager'
+export * from './useFaFloatingWindowFrameOpenLayoutWatch_manager'
+export * from './useFaFloatingWindowFramePersist_manager'
+export * from './useFaFloatingWindowFramePresentation_manager'
+export * from './useFaFloatingWindowResize_manager'
+export * from './useFaFloatingWindowTextPersist_manager'
+export * from './useFaFloatingWindowTitleDrag_manager'

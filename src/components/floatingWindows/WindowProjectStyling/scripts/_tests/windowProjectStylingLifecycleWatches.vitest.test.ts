@@ -14,16 +14,15 @@ import {
   vi
 } from 'vitest'
 
-import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/faQuasarDialogStandardTransition'
+import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/floatingWindows_manager'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 
-import * as stylingSide from '../windowProjectStylingStateSideEffects'
 import {
   registerProjectStylingActiveProjectWatch,
   registerProjectStylingUnmount,
   registerProjectStylingWindowModelWatch
-} from '../windowProjectStylingLifecycleWatches'
+} from '../windowProjectStyling_manager'
 
 beforeEach(() => {
   vi.useFakeTimers()
@@ -115,9 +114,9 @@ test('registerProjectStylingUnmount clears timers, refreshes KV, and runs hard-h
 
   const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout')
 
-  const clearSpy = vi
-    .spyOn(stylingSide, 'clearProjectStylingLivePreviewAndRefreshFromKv')
-    .mockImplementation(() => {})
+  const styling = S_FaProjectStyling()
+  const clearLivePreviewSpy = vi.spyOn(styling, 'clearCssLivePreview')
+  const refreshKvSpy = vi.spyOn(styling, 'refreshProjectStyling').mockResolvedValue(true)
   const onHardHide = vi.fn()
   const windowModel = ref(true)
 
@@ -138,7 +137,8 @@ test('registerProjectStylingUnmount clears timers, refreshes KV, and runs hard-h
   wrapper.unmount()
   expect(clearTimeoutSpy).toHaveBeenCalledWith(tid)
   expect(hideAfterTransitionId.value).toBe(null)
-  expect(clearSpy).toHaveBeenCalledWith(windowModel)
+  expect(clearLivePreviewSpy).toHaveBeenCalled()
+  expect(refreshKvSpy).toHaveBeenCalled()
   expect(onHardHide).toHaveBeenCalledTimes(1)
 })
 

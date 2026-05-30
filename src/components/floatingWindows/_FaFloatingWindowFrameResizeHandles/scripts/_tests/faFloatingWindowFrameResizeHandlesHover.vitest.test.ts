@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import { expect, test, vi } from 'vitest'
 
-import { useFaFloatingWindowFrameResizeHandlesHover } from '../faFloatingWindowFrameResizeHandlesHover'
+import { useFaFloatingWindowFrameResizeHandlesHover } from '../faFloatingWindowFrameResizeHandles_manager'
 
 const HoverHarness = defineComponent({
   setup () {

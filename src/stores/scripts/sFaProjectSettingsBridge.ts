@@ -6,7 +6,9 @@ import type {
   I_faProjectSettingsRoot
 } from 'app/types/I_faProjectSettingsDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
-import { propagateFaProjectSettingsToAppConsumers } from 'app/src/scripts/projectManagement/faProjectSettingsConsumerPropagation'
+import { propagateFaProjectSettingsToAppConsumers } from 'app/src/scripts/projectManagement/projectManagement_manager'
+
+import { didObjectPatchPersist } from '../functions/faPersistPatchVerify'
 
 /**
  * Hydrates canonical project settings from SQLite via the preload bridge.
@@ -89,10 +91,7 @@ export async function faProjectSettingsPersistPatchFromStore (opts: {
   }
   const retrieved = afterSaveResult.value
 
-  const patchKeys = Object.keys(opts.patch) as Array<keyof I_faProjectSettingsPatch>
-  const saveSucceeded = patchKeys.every((key) => retrieved[key] === opts.patch[key])
-
-  if (!saveSucceeded) {
+  if (!didObjectPatchPersist(opts.patch, retrieved)) {
     console.error(
       `[S_FaProjectSettings] ${i18n.global.t('globalFunctionality.faProjectSettings.saveMismatchLog')}`,
       {

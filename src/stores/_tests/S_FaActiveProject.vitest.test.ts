@@ -3,7 +3,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 
 import type { I_faActiveProject } from 'app/types/I_faActiveProjectDomain'
-import { registerFaAppRouterSession } from 'app/src/scripts/appInternals/faAppRouterSession'
+import { registerFaAppRouterSession } from 'app/src/scripts/appInternals/appInternals_manager'
 
 import { S_FaActiveProject } from '../S_FaActiveProject'
 

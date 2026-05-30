@@ -35,7 +35,7 @@ vi.mock('app/i18n/externalFileLoader', () => {
   }
 })
 
-vi.mock('app/src/scripts/projectManagement/faProjectSettingsConsumerPropagation', () => {
+vi.mock('app/src/scripts/projectManagement/projectManagement_manager', () => {
   return {
     propagateFaProjectSettingsToAppConsumers: propagateMock
   }

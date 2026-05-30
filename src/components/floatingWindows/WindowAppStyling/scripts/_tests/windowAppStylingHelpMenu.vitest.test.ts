@@ -3,7 +3,7 @@ import { defineComponent, nextTick } from 'vue'
 import { ResultAsync } from 'neverthrow'
 import { test, expect, vi } from 'vitest'
 
-import { useWindowAppStylingHelpMenu } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStylingHelpMenu'
+import { useWindowAppStylingHelpMenu } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStyling_manager'
 
 const HelpMenuTestHarness = defineComponent({
   setup () {

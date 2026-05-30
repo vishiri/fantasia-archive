@@ -3,12 +3,12 @@ import { defineComponent, h } from 'vue'
 
 import 'app/types/vueRouterRouteMetaAugmentation'
 
-import ComponentTestingLayout from '../../src/layouts/ComponentTestingLayout.vue'
-import MainLayout from '../../src/layouts/MainLayout.vue'
-import ComponentTesting from '../../src/pages/ComponentTesting.vue'
-import ErrorNotFound from '../../src/pages/ErrorNotFound.vue'
-import IndexPage from '../../src/pages/IndexPage.vue'
-import SplashPage from '../../src/pages/SplashPage.vue'
+import ComponentTestingLayout from '../../src/layouts/ComponentTestingLayout/ComponentTestingLayout.vue'
+import MainLayout from '../../src/layouts/MainLayout/MainLayout.vue'
+import ComponentTesting from '../../src/pages/ComponentTesting/ComponentTesting.vue'
+import ErrorNotFound from '../../src/pages/ErrorNotFound/ErrorNotFound.vue'
+import IndexPage from '../../src/pages/IndexPage/IndexPage.vue'
+import SplashPage from '../../src/pages/SplashPage/SplashPage.vue'
 
 /**
  * Minimal outlet so 'MainLayout' can be previewed without loading the full index page.

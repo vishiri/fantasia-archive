@@ -2,7 +2,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { expect, test } from 'vitest'
 
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
-import { useDialogAppSettings } from 'app/src/components/dialogs/DialogAppSettings/scripts/useDialogAppSettings'
+import { useDialogAppSettings } from 'app/src/components/dialogs/DialogAppSettings/scripts/dialogAppSettings_manager'
 
 /**
  * useDialogAppSettings

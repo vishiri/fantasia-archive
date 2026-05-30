@@ -10,7 +10,7 @@ const userSettingsRef = vi.hoisted(() => {
   }
 })
 
-vi.mock('app/src/scripts/projectManagement/faWelcomeScreenAutoLoadProject', () => {
+vi.mock('app/src/scripts/projectManagement/projectManagement_manager', () => {
   return {
     openWelcomeScreenAutoLoadProject: openWelcomeScreenAutoLoadProjectMock
   }
@@ -31,7 +31,7 @@ vi.mock('app/src/stores/S_FaUserSettings', () => {
 import {
   runSkipWelcomeScreenRedirect,
   tryRunSkipWelcomeScreenOnLaunch
-} from '../faAppStartupSkipWelcomeScreen'
+} from '../faAppStartupSkipWelcomeScreen_manager'
 
 function assignFaContentBridgeApis (apis: unknown): void {
   vi.stubGlobal('window', {

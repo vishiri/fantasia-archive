@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import type { I_faActionHistoryEntry } from 'app/types/I_faActionManagerDomain'
 
-import { buildDialogActionMonitorColumns } from '../scripts/dialogActionMonitorTable'
+import { buildDialogActionMonitorColumns } from '../scripts/dialogActionMonitor_manager'
 import DialogActionMonitorHistoryTable from '../DialogActionMonitorHistoryTable.vue'
 
 const sampleHistory: I_faActionHistoryEntry[] = [

@@ -4,6 +4,9 @@ import { ResultAsync } from 'neverthrow'
 import type { I_faProjectStylingPatch, I_faProjectStylingRoot } from 'app/types/I_faProjectStylingDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
 
+import { didCssPatchPersist } from '../functions/faPersistPatchVerify'
+import { mergeProjectStylingRootAfterSilentPersist } from '../functions/faProjectStylingPersistMerge'
+
 /**
  * Hydrates reactive project CSS from SQLite via the preload bridge once a '.faproject' is active.
  */
@@ -42,8 +45,6 @@ export async function faProjectStylingPersistPartialSilent (opts: {
     throw new Error(i18n.global.t('globalFunctionality.faProjectStyling.bridgeMissing'))
   }
 
-  const preserveLocalCssBecausePatchOmittedCss = opts.patch.css === undefined
-
   const writeResult = await ResultAsync.fromPromise(
     api.setProjectStyling(opts.patch),
     (error): unknown => error
@@ -66,15 +67,11 @@ export async function faProjectStylingPersistPartialSilent (opts: {
     console.error('[S_FaProjectStyling] getProjectStyling after silent partial failed', error)
     throw error instanceof Error ? error : new Error(String(error))
   }
-  const snapshot = afterSaveResult.value
-  if (preserveLocalCssBecausePatchOmittedCss) {
-    opts.applyRoot({
-      ...snapshot,
-      css: opts.cssSnapshotBeforePersist
-    })
-    return
-  }
-  opts.applyRoot(snapshot)
+  opts.applyRoot(mergeProjectStylingRootAfterSilentPersist(
+    afterSaveResult.value,
+    opts.patch,
+    opts.cssSnapshotBeforePersist
+  ))
 }
 
 /**
@@ -121,7 +118,7 @@ export async function faProjectStylingSaveCssFromEditor (opts: {
   }
   const retrieved = afterSaveResult.value
 
-  if (retrieved.css !== opts.css) {
+  if (!didCssPatchPersist(opts.css, retrieved.css)) {
     console.error(`[S_FaProjectStyling] ${i18n.global.t('globalFunctionality.faProjectStyling.saveMismatchLog')}`, {
       patch,
       retrieved

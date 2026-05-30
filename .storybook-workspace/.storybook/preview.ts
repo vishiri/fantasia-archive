@@ -25,7 +25,7 @@ import {
   Title
 } from '@storybook/addon-docs/blocks'
 import React from 'react'
-import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/rendererAppInternals'
+import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/appInternals_manager'
 
 import { setContentBridgeScenario } from './mocks/contentBridge'
 import { getStorybookI18nMessages, setI18nScenario } from './mocks/externalFileLoader'

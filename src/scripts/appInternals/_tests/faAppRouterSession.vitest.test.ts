@@ -6,8 +6,8 @@ import {
   navigateToWorkspaceWhenOnWelcomeRoute,
   registerFaAppRouterSession,
   resolveFaAppRouterCurrentPath
-} from 'app/src/scripts/appInternals/faAppRouterSession'
-import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/rendererAppInternals'
+} from 'app/src/scripts/appInternals/appInternals_manager'
+import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/appInternals_manager'
 
 const routerPushMock = vi.fn()
 let faVitestRouterPath = '/'
@@ -204,6 +204,6 @@ test('Test that navigateToWorkspaceWhenOnWelcomeRoute skips push in Storybook ca
  */
 test('Test that navigateToWorkspaceRouteForActiveProject no-ops without a registered router', async () => {
   vi.resetModules()
-  const mod = await import('app/src/scripts/appInternals/faAppRouterSession')
+  const mod = await import('app/src/scripts/appInternals/appInternals_manager')
   await mod.navigateToWorkspaceRouteForActiveProject()
 })

@@ -1,37 +1,31 @@
-import type { ComputedRef, Ref } from 'vue'
+import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
 
-import {
-  bindOnCaptureClear,
-  bindOnCaptureSet,
-  bindOnOpenCapture,
-  makeDialogKeybindCaptureKeydownHandler
-} from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsCaptureHandlers'
-import {
-  buildDialogKeybindCaptureActionDeps,
-  createDialogKeybindCaptureRefs,
-  registerDialogKeybindCaptureOpenWatch,
-  type T_dialogKeybindCaptureRefsBundle
-} from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsCaptureInfrastructure'
 import type {
   T_createDialogKeybindSettingsCaptureResult,
-  T_dialogKeybindCaptureActionDeps
+  T_dialogKeybindCaptureActionDeps,
+  T_dialogKeybindCaptureKeydownDeps,
+  T_dialogKeybindCaptureRefsBundle
 } from 'app/types/I_dialogKeybindSettings'
+import type { T_dialogKeybindSettingsCaptureFactoryDeps } from 'app/types/I_dialogKeybindSettingsFactories'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 
-function buildDialogKeybindSettingsCaptureApi (params: {
-  actionDeps: T_dialogKeybindCaptureActionDeps
-  refs: T_dialogKeybindCaptureRefsBundle
-  removeCaptureListener: () => void
-}): T_createDialogKeybindSettingsCaptureResult {
+export function buildDialogKeybindSettingsCaptureApi (
+  deps: T_dialogKeybindSettingsCaptureFactoryDeps,
+  params: {
+    actionDeps: T_dialogKeybindCaptureActionDeps
+    refs: T_dialogKeybindCaptureRefsBundle
+    removeCaptureListener: () => void
+  }
+): T_createDialogKeybindSettingsCaptureResult {
   const {
     actionDeps,
     refs,
     removeCaptureListener
   } = params
 
-  const onCaptureClear = bindOnCaptureClear(actionDeps)
-  const onCaptureSet = bindOnCaptureSet(actionDeps)
-  const onOpenCapture = bindOnOpenCapture(actionDeps)
+  const onCaptureClear = deps.bindOnCaptureClear(actionDeps)
+  const onCaptureSet = deps.bindOnCaptureSet(actionDeps)
+  const onOpenCapture = deps.bindOnOpenCapture(actionDeps)
   return {
     captureActionName: refs.captureActionName,
     captureError: refs.captureError,
@@ -47,23 +41,27 @@ function buildDialogKeybindSettingsCaptureApi (params: {
   }
 }
 
-function createDialogKeybindSettingsCaptureKeydown (params: {
-  platform: ComputedRef<NodeJS.Platform>
-  refs: T_dialogKeybindCaptureRefsBundle
-  t: (key: string) => string
-  workingOverrides: Ref<I_faKeybindsRoot['overrides']>
-}): {
-    handleCaptureKeydown: (e: KeyboardEvent) => void
+export function initDialogKeybindSettingsCapture (
+  deps: T_dialogKeybindSettingsCaptureFactoryDeps,
+  params: {
+    platform: I_computedRef<NodeJS.Platform>
+    t: (key: string) => string
+    workingOverrides: I_ref<I_faKeybindsRoot['overrides']>
+  }
+): {
+    actionDeps: T_dialogKeybindCaptureActionDeps
+    refs: T_dialogKeybindCaptureRefsBundle
     removeCaptureListener: () => void
   } {
   const {
     platform,
-    refs,
     t,
     workingOverrides
   } = params
 
-  const handleCaptureKeydown = makeDialogKeybindCaptureKeydownHandler({
+  const refs = deps.createDialogKeybindCaptureRefs()
+
+  const keydownDeps: T_dialogKeybindCaptureKeydownDeps = {
     captureBaselineChord: refs.captureBaselineChord,
     captureError: refs.captureError,
     captureErrorMessage: refs.captureErrorMessage,
@@ -75,53 +73,21 @@ function createDialogKeybindSettingsCaptureKeydown (params: {
     platform,
     t,
     workingOverrides
-  })
-
-  function removeCaptureListener (): void {
-    window.removeEventListener('keydown', handleCaptureKeydown, true)
   }
 
-  return {
-    handleCaptureKeydown,
-    removeCaptureListener
+  const handleCaptureKeydown = deps.makeDialogKeybindCaptureKeydownHandler(keydownDeps)
+  const removeCaptureListener = (): void => {
+    deps.removeKeydownListener(handleCaptureKeydown)
   }
-}
 
-function initDialogKeybindSettingsCapture (params: {
-  platform: ComputedRef<NodeJS.Platform>
-  t: (key: string) => string
-  workingOverrides: Ref<I_faKeybindsRoot['overrides']>
-}): {
-    actionDeps: T_dialogKeybindCaptureActionDeps
-    refs: T_dialogKeybindCaptureRefsBundle
-    removeCaptureListener: () => void
-  } {
-  const {
-    platform,
-    t,
-    workingOverrides
-  } = params
-
-  const refs = createDialogKeybindCaptureRefs()
-
-  const {
-    handleCaptureKeydown,
-    removeCaptureListener
-  } = createDialogKeybindSettingsCaptureKeydown({
-    platform,
-    refs,
-    t,
-    workingOverrides
-  })
-
-  registerDialogKeybindCaptureOpenWatch({
+  deps.registerDialogKeybindCaptureOpenWatch({
     captureActionName: refs.captureActionName,
     captureOpen: refs.captureOpen,
     editingCommandId: refs.editingCommandId,
     removeCaptureListener
   })
 
-  const actionDeps = buildDialogKeybindCaptureActionDeps({
+  const actionDeps = deps.buildDialogKeybindCaptureActionDeps({
     handleCaptureKeydown,
     platform,
     refs,
@@ -137,20 +103,14 @@ function initDialogKeybindSettingsCapture (params: {
   }
 }
 
-export function createDialogKeybindSettingsCapture (params: {
-  platform: ComputedRef<NodeJS.Platform>
-  t: (key: string) => string
-  workingOverrides: Ref<I_faKeybindsRoot['overrides']>
-}): T_createDialogKeybindSettingsCaptureResult {
-  const {
-    actionDeps,
-    refs,
-    removeCaptureListener
-  } = initDialogKeybindSettingsCapture(params)
-
-  return buildDialogKeybindSettingsCaptureApi({
-    actionDeps,
-    refs,
-    removeCaptureListener
-  })
+export function createDialogKeybindSettingsCaptureInstance (
+  deps: T_dialogKeybindSettingsCaptureFactoryDeps,
+  params: {
+    platform: I_computedRef<NodeJS.Platform>
+    t: (key: string) => string
+    workingOverrides: I_ref<I_faKeybindsRoot['overrides']>
+  }
+): T_createDialogKeybindSettingsCaptureResult {
+  const init = initDialogKeybindSettingsCapture(deps, params)
+  return buildDialogKeybindSettingsCaptureApi(deps, init)
 }

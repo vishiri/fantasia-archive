@@ -16,8 +16,6 @@ export const FA_APP_CONFIG_INNER = {
   userSettings: 'faUserSettings.json'
 } as const
 
-export type T_faAppConfigInnerKey = keyof typeof FA_APP_CONFIG_INNER
-
 /**
  * Staged import session validity window (ms) before the main process drops cached data.
  */

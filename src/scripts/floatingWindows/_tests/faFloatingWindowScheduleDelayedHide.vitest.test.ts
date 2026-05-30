@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
-import { scheduleFaFloatingWindowDelayedHide } from '../faFloatingWindowScheduleDelayedHide'
+import { scheduleFaFloatingWindowDelayedHide } from '../functions/faFloatingWindowScheduleDelayedHide'
 
 beforeEach(() => {
   vi.useFakeTimers()

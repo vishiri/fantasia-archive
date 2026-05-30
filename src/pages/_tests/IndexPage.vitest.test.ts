@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
 import { createMemoryHistory, createRouter } from 'vue-router'
 
-import IndexPage from '../IndexPage.vue'
+import IndexPage from '../IndexPage/IndexPage.vue'
 
 /**
  * IndexPage

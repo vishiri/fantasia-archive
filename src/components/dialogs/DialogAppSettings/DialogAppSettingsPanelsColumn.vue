@@ -84,7 +84,7 @@
 import type { T_appSettingsRenderTree } from 'app/types/I_dialogAppSettings'
 import DialogAppSettingsCategoryPanel from 'app/src/components/dialogs/DialogAppSettings/DialogAppSettingsCategoryPanel.vue'
 import ErrorCard from 'src/components/elements/ErrorCard/ErrorCard.vue'
-import { showNonLastTopCategorySeparator } from 'app/src/components/dialogs/DialogAppSettings/scripts/dialogAppSettingsSearch'
+import { showNonLastTopCategorySeparator } from 'app/src/components/dialogs/DialogAppSettings/scripts/functions/dialogAppSettingsSearch'
 
 defineProps<{
   hasActiveSearchQuery: boolean

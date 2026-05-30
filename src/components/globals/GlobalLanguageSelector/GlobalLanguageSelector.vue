@@ -112,88 +112,26 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-
-import { i18n } from 'app/i18n/externalFileLoader'
-import type { T_faUserSettingsLanguageCode } from 'app/types/I_faUserSettingsDomain'
-
-import { resolveVitePublicAssetPath } from 'app/src/scripts/appInternals/rendererAppInternals'
-import { runFaActionAwait } from 'app/src/scripts/actionManager/faActionManagerRun'
-import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
-
 import GlobalLanguageSelectorSpellcheckRefreshControl from './GlobalLanguageSelectorSpellcheckRefreshControl.vue'
-import { resolveGlobalLanguageSelectorAppliedPair } from './scripts/globalLanguageSelectorLanguageCodeWatchGate'
-import { GLOBAL_LANGUAGE_SELECTOR_LOCALES } from './scripts/globalLanguageSelectorLocales'
-import { useGlobalLanguageSelectorSpellcheckRefresh } from './scripts/useGlobalLanguageSelectorSpellcheckRefresh'
 
-const globalLanguageSelectorInnerSize = 21
-
-const isLanguageMenuOpen = ref(false)
+import { GLOBAL_LANGUAGE_SELECTOR_LOCALES } from './scripts/globalLanguageSelectorLocales_manager'
+import { useGlobalLanguageSelector } from './scripts/globalLanguageSelector_manager'
 
 const {
-  noteLanguageApplied,
+  activeI18nLocale,
+  currentCode,
+  currentFlagSrc,
+  globalLanguageSelectorInnerSize,
+  isLanguageMenuOpen,
+  onLanguageMenuHide,
+  onLanguageMenuShow,
+  onLanguageTriggerClickCapture,
+  pickLanguage,
   refreshWebContentsAndHide,
+  resolveVitePublicAssetPath,
+  showSelector,
   showSpellcheckRefresh
-} = useGlobalLanguageSelectorSpellcheckRefresh()
-
-const faUserSettingsStore = S_FaUserSettings()
-
-const showSelector = computed((): boolean => {
-  return (
-    process.env.MODE === 'electron' &&
-    window.faContentBridgeAPIs?.faUserSettings !== undefined
-  )
-})
-
-const currentCode = computed((): T_faUserSettingsLanguageCode => {
-  return faUserSettingsStore.settings?.languageCode ?? 'en-US'
-})
-
-const currentFlagSrc = computed((): string => {
-  const row = GLOBAL_LANGUAGE_SELECTOR_LOCALES.find((r) => {
-    return r.code === currentCode.value
-  })
-
-  return row?.flagSrc ?? '/countryFlags/us.svg'
-})
-
-const activeI18nLocale = computed((): string => {
-  void currentCode.value
-  return String(i18n.global.locale.value)
-})
-
-watch(
-  () => faUserSettingsStore.settings?.languageCode,
-  (next, prior) => {
-    const appliedPair = resolveGlobalLanguageSelectorAppliedPair(next, prior)
-    const missLanguagePair = appliedPair === null
-    if (missLanguagePair) {
-      return
-    }
-    const priorCode = appliedPair[0]
-    const nextCode = appliedPair[1]
-    noteLanguageApplied(priorCode, nextCode)
-  }
-)
-
-function onLanguageTriggerClickCapture (): void {
-  isLanguageMenuOpen.value = true
-}
-
-function onLanguageMenuShow (): void {
-  isLanguageMenuOpen.value = true
-}
-
-function onLanguageMenuHide (): void {
-  isLanguageMenuOpen.value = false
-}
-
-async function pickLanguage (code: T_faUserSettingsLanguageCode): Promise<void> {
-  await runFaActionAwait('languageSwitch', {
-    code,
-    priorCode: currentCode.value
-  })
-}
+} = useGlobalLanguageSelector()
 </script>
 
 <style lang="scss" scoped>

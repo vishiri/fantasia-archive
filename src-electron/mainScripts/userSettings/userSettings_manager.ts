@@ -1,0 +1,18 @@
+import ElectronStore from 'electron-store'
+
+import { buildSanitizedFaUserSettings } from './functions/faUserSettingsStoreCleanup'
+import { createFaUserSettingsStoreApi } from './functions/faUserSettingsStoreApi'
+import { createLazySingleton } from './functions/lazySingleton'
+import { FA_USER_SETTINGS_DEFAULTS } from './faUserSettingsDefaults'
+
+const faUserSettingsStoreApi = createFaUserSettingsStoreApi({
+  ElectronStore,
+  buildSanitizedFaUserSettings,
+  createLazySingleton,
+  defaults: FA_USER_SETTINGS_DEFAULTS,
+  storeName: 'faUserSettings'
+})
+
+export const cleanupFaUserSettings = faUserSettingsStoreApi.cleanup
+
+export const getFaUserSettings = faUserSettingsStoreApi.get

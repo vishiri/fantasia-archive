@@ -4,9 +4,9 @@ const runAppStartupRoutingMock = vi.hoisted(() => {
   return vi.fn()
 })
 
-vi.mock('app/src/scripts/appInternals/rendererAppInternals', async (importOriginal) => {
+vi.mock('app/src/scripts/appInternals/appInternals_manager', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('app/src/scripts/appInternals/rendererAppInternals')>()
+    await importOriginal<typeof import('app/src/scripts/appInternals/appInternals_manager')>()
   return {
     ...actual,
     runAppStartupRouting: runAppStartupRoutingMock
@@ -161,7 +161,7 @@ test('Test that faRoutingEnv boot registers router session for workspace navigat
   await boot({ router: routerStub })
 
   const { navigateToWorkspaceWhenOnWelcomeRoute, resolveFaAppRouterCurrentPath } =
-    await import('app/src/scripts/appInternals/faAppRouterSession')
+    await import('app/src/scripts/appInternals/appInternals_manager')
 
   expect(resolveFaAppRouterCurrentPath()).toBe('/')
   await navigateToWorkspaceWhenOnWelcomeRoute()

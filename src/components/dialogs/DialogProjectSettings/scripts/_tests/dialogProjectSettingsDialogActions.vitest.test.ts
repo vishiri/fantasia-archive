@@ -2,8 +2,8 @@ import { ref } from 'vue'
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import type { I_faProjectSettingsRoot } from 'app/types/I_faProjectSettingsDomain'
-import { FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB } from '../dialogProjectSettingsConstants'
-import { createDialogProjectSettingsDialogActions } from '../dialogProjectSettingsDialogActions'
+import { FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB } from '../functions/dialogProjectSettingsDialogInput'
+import { createDialogProjectSettingsDialogActions } from '../dialogProjectSettings_manager'
 
 const { fetchFreshMock, runFaActionAwaitMock } = vi.hoisted(() => ({
   fetchFreshMock: vi.fn(),
@@ -14,7 +14,7 @@ vi.mock('app/src/stores/scripts/sFaProjectSettingsBridge', () => ({
   faProjectSettingsFetchFreshForDialog: fetchFreshMock
 }))
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => ({
   runFaActionAwait: runFaActionAwaitMock
 }))
 

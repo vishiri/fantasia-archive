@@ -3,7 +3,7 @@ import { expect, test } from 'vitest'
 import { FA_USER_SETTINGS_LANGUAGE_DISPLAY_NAMES } from 'app/i18n/faUserSettingsLanguageDisplayNames'
 import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
 
-import { GLOBAL_LANGUAGE_SELECTOR_LOCALES } from '../globalLanguageSelectorLocales'
+import { GLOBAL_LANGUAGE_SELECTOR_LOCALES } from '../globalLanguageSelectorLocales_manager'
 
 const latinDisplayNameCollator = new Intl.Collator('en', {
   sensitivity: 'base',

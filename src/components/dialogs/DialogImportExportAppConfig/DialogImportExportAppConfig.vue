@@ -125,12 +125,12 @@
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import { ref, toRef, watch } from 'vue'
 
-import { useDialogImportExportAppConfigLifecycle } from './scripts/dialogImportExportAppConfigSfcLifecycle'
-import { useDialogImportExportAppConfigDialog } from './scripts/dialogImportExportAppConfigDialog'
+import type { T_importExportStepperPanel } from 'app/types/I_dialogImportExportAppConfig'
+import { importExportViewToStepperPanel } from './scripts/functions/dialogImportExportAppConfigStepperMap'
 import {
-  type T_importExportStepperPanel,
-  importExportViewToStepperPanel
-} from './scripts/dialogImportExportAppConfigStepperMap'
+  useDialogImportExportAppConfigDialog,
+  useDialogImportExportAppConfigLifecycle
+} from './scripts/dialogImportExportAppConfig_manager'
 
 import DialogImportExportAppConfigExportStep from './DialogImportExportAppConfigExportStep.vue'
 import DialogImportExportAppConfigImportStep from './DialogImportExportAppConfigImportStep.vue'

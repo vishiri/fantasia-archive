@@ -7,10 +7,10 @@ import { ResultAsync } from 'neverthrow'
 
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
-import {
-  applyFaI18nLocaleFromLanguageCode,
-  isFaUserSettingsLanguageCode
-} from 'app/src/scripts/appInternals/rendererAppInternals'
+import { applyFaI18nLocaleFromLanguageCode } from 'app/src/scripts/appInternals/faAppInternalsLocale_manager'
+import { isFaUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
+
+import { didObjectPatchPersist } from './functions/faPersistPatchVerify'
 
 /**
  * Manages user settings state sourced from the Electron main process via the IPC bridge.
@@ -42,8 +42,7 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
     const retrievedSettings = await window.faContentBridgeAPIs.faUserSettings.getSettings()
     settings.value = retrievedSettings
 
-    const updateKeys = Object.keys(updateObject) as Array<keyof I_faUserSettings>
-    const saveSucceeded = updateKeys.every((key) => retrievedSettings[key] === updateObject[key])
+    const saveSucceeded = didObjectPatchPersist(updateObject, retrievedSettings)
 
     if (saveSucceeded) {
       if (updateObject.languageCode !== undefined) {

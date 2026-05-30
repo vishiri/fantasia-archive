@@ -3,7 +3,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
 
-import * as dialogManagement from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
+import * as dialogManagement from 'app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager'
 
 import { buildDocumentsMenu } from '../_data/documents'
 import { buildHelpInfoMenu } from '../_data/helpInfo'

@@ -2,7 +2,7 @@ import { afterEach, expect, test, vi } from 'vitest'
 
 const runFaActionAwaitMock = vi.hoisted(() => vi.fn(() => Promise.resolve(true)))
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => {
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => {
   return {
     runFaActionAwait: runFaActionAwaitMock
   }

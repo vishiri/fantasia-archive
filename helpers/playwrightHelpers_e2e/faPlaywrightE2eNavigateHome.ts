@@ -1,7 +1,7 @@
 import type { Page } from 'playwright'
 import { expect } from '@playwright/test'
 
-import { FA_APP_SHELL_PAGE_TRANSITION_MS } from 'app/src/scripts/appRouting/faAppShellPageTransition'
+import { FA_APP_SHELL_PAGE_TRANSITION_MS } from 'app/src/scripts/appRouting/faAppShellPageTransition_manager'
 
 const FA_E2E_ROUTE_SHELL_TIMEOUT_MS = 20_000
 const FA_E2E_PAGE_TRANSITION_SETTLE_TIMEOUT_MS = FA_APP_SHELL_PAGE_TRANSITION_MS + 5_000

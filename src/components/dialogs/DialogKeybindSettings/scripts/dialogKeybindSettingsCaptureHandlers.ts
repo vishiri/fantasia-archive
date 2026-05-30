@@ -1,32 +1,24 @@
-import type { ComputedRef, Ref } from 'vue'
+import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
 
 import type {
   I_dialogKeybindSettingsRow,
   T_dialogKeybindCaptureActionDeps
 } from 'app/types/I_dialogKeybindSettings'
-import {
-  restorePendingChordAndLabelFromBaseline,
-  runDialogKeybindCaptureKeydown,
-  type T_dialogKeybindCaptureKeydownDeps
-} from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsCaptureKeydown'
-import { faKeybindFindChordConflict } from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
-import { formatFaKeybindChordForUi } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
+import type { T_dialogKeybindSettingsCaptureHandlersModuleDeps } from 'app/types/I_dialogKeybindSettings'
+
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
 
-export type T_captureChordDeps = T_dialogKeybindCaptureKeydownDeps
+import { restorePendingChordAndLabelFromBaseline } from './dialogKeybindSettingsCaptureKeydown'
 
-export function makeDialogKeybindCaptureKeydownHandler (deps: T_captureChordDeps): (e: KeyboardEvent) => void {
-  return (e: KeyboardEvent) => {
-    runDialogKeybindCaptureKeydown(e, deps)
+export function seedCaptureFieldsFromRow (
+  deps: Pick<T_dialogKeybindSettingsCaptureHandlersModuleDeps, 'formatFaKeybindChordForUi'>,
+  params: {
+    captureLabel: I_ref<string>
+    pendingChord: I_ref<I_faChordSerialized | null>
+    platform: I_computedRef<NodeJS.Platform>
+    row: I_dialogKeybindSettingsRow
   }
-}
-
-function seedCaptureFieldsFromRow (params: {
-  captureLabel: Ref<string>
-  pendingChord: Ref<I_faChordSerialized | null>
-  platform: ComputedRef<NodeJS.Platform>
-  row: I_dialogKeybindSettingsRow
-}): void {
+): void {
   const {
     captureLabel,
     pendingChord,
@@ -49,12 +41,12 @@ function seedCaptureFieldsFromRow (params: {
     mods: [...seed.mods]
   }
   pendingChord.value = cloned
-  captureLabel.value = formatFaKeybindChordForUi(cloned, platform.value)
+  captureLabel.value = deps.formatFaKeybindChordForUi(cloned, platform.value)
 }
 
-function syncCaptureBaselineFromPendingChord (params: {
-  captureBaselineChord: Ref<I_faChordSerialized | null>
-  pendingChord: Ref<I_faChordSerialized | null>
+export function syncCaptureBaselineFromPendingChord (params: {
+  captureBaselineChord: I_ref<I_faChordSerialized | null>
+  pendingChord: I_ref<I_faChordSerialized | null>
 }): void {
   const {
     captureBaselineChord,
@@ -71,7 +63,10 @@ function syncCaptureBaselineFromPendingChord (params: {
   }
 }
 
-export function bindOnOpenCapture (deps: T_dialogKeybindCaptureActionDeps): (row: I_dialogKeybindSettingsRow) => void {
+export function bindOnOpenCapture (
+  deps: T_dialogKeybindSettingsCaptureHandlersModuleDeps,
+  actionDeps: T_dialogKeybindCaptureActionDeps
+): (row: I_dialogKeybindSettingsRow) => void {
   const {
     captureActionName,
     captureBaselineChord,
@@ -84,7 +79,7 @@ export function bindOnOpenCapture (deps: T_dialogKeybindCaptureActionDeps): (row
     handleCaptureKeydown,
     pendingChord,
     platform
-  } = deps
+  } = actionDeps
 
   return (row: I_dialogKeybindSettingsRow) => {
     if (!row.editable) {
@@ -95,7 +90,7 @@ export function bindOnOpenCapture (deps: T_dialogKeybindCaptureActionDeps): (row
     captureError.value = false
     captureErrorMessage.value = ''
     captureInfoMessage.value = ''
-    seedCaptureFieldsFromRow({
+    seedCaptureFieldsFromRow(deps, {
       captureLabel,
       pendingChord,
       platform,
@@ -106,11 +101,13 @@ export function bindOnOpenCapture (deps: T_dialogKeybindCaptureActionDeps): (row
       pendingChord
     })
     captureOpen.value = true
-    window.addEventListener('keydown', handleCaptureKeydown, true)
+    deps.addKeydownListener(handleCaptureKeydown)
   }
 }
 
-export function bindOnCaptureClear (deps: Pick<T_dialogKeybindCaptureActionDeps, 'captureBaselineChord' | 'captureError' | 'captureErrorMessage' | 'captureInfoMessage' | 'captureLabel' | 'captureOpen' | 'editingCommandId' | 'pendingChord' | 'workingOverrides'>): () => void {
+export function bindOnCaptureClear (
+  actionDeps: Pick<T_dialogKeybindCaptureActionDeps, 'captureBaselineChord' | 'captureError' | 'captureErrorMessage' | 'captureInfoMessage' | 'captureLabel' | 'captureOpen' | 'editingCommandId' | 'pendingChord' | 'workingOverrides'>
+): () => void {
   const {
     captureBaselineChord,
     captureError,
@@ -121,7 +118,7 @@ export function bindOnCaptureClear (deps: Pick<T_dialogKeybindCaptureActionDeps,
     editingCommandId,
     pendingChord,
     workingOverrides
-  } = deps
+  } = actionDeps
 
   return () => {
     const id = editingCommandId.value
@@ -141,7 +138,10 @@ export function bindOnCaptureClear (deps: Pick<T_dialogKeybindCaptureActionDeps,
   }
 }
 
-export function bindOnCaptureSet (deps: T_dialogKeybindCaptureActionDeps): () => void {
+export function bindOnCaptureSet (
+  deps: T_dialogKeybindSettingsCaptureHandlersModuleDeps,
+  actionDeps: T_dialogKeybindCaptureActionDeps
+): () => void {
   const {
     captureBaselineChord,
     captureError,
@@ -154,7 +154,7 @@ export function bindOnCaptureSet (deps: T_dialogKeybindCaptureActionDeps): () =>
     platform,
     t,
     workingOverrides
-  } = deps
+  } = actionDeps
 
   return () => {
     const id = editingCommandId.value
@@ -162,7 +162,7 @@ export function bindOnCaptureSet (deps: T_dialogKeybindCaptureActionDeps): () =>
       return
     }
 
-    const conflict = faKeybindFindChordConflict({
+    const conflict = deps.faKeybindFindChordConflict({
       chord: pendingChord.value,
       excludeCommandId: id,
       overrides: workingOverrides.value,
@@ -172,7 +172,7 @@ export function bindOnCaptureSet (deps: T_dialogKeybindCaptureActionDeps): () =>
       captureInfoMessage.value = ''
       captureError.value = true
       captureErrorMessage.value = t('dialogs.keybindSettings.validationConflict')
-      restorePendingChordAndLabelFromBaseline({
+      restorePendingChordAndLabelFromBaseline(deps, {
         captureBaselineChord,
         captureLabel,
         pendingChord,

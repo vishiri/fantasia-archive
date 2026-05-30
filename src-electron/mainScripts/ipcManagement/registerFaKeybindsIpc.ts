@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron'
 
 import { FA_KEYBINDS_IPC } from 'app/src-electron/electron-ipc-bridge'
-import { cleanupFaKeybinds, getFaKeybinds } from 'app/src-electron/mainScripts/keybinds/faKeybindsStore'
+import { cleanupFaKeybinds, getFaKeybinds } from 'app/src-electron/mainScripts/keybinds/keybinds_manager'
 import { parseFaKeybindsPatch } from 'app/src-electron/shared/faKeybindsPatchSchema'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import type { I_faKeybindsSnapshot } from 'app/types/I_faKeybindsDomain'

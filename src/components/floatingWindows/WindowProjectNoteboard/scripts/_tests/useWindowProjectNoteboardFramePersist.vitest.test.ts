@@ -11,14 +11,14 @@ const { runFaActionMock } = vi.hoisted(() => {
   }
 })
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => {
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => {
   return {
     runFaAction: runFaActionMock
   }
 })
 
 import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
-import { useWindowProjectNoteboardFramePersist } from '../useWindowProjectNoteboardFramePersist'
+import { useWindowProjectNoteboardFramePersist } from '../windowProjectNoteboard_manager'
 
 let pinia: ReturnType<typeof createPinia>
 

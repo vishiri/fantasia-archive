@@ -60,75 +60,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
-import type { Ref } from 'vue'
+import { useGlobalWindowButtons } from './scripts/globalWindowButtons_manager'
 
-import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
-
-/**
- * Triggers minimize of the window by the minimize button click
- */
-const minimizeWindow = (): void => {
-  runFaAction('minimizeApp', undefined)
-}
-
-/**
- * Triggers resize of the window by the min/max button click; the resize action also refreshes the maximized state.
- */
-const resizeWindowThenRefreshMaximized = (): void => {
-  runFaAction('resizeApp', undefined)
-}
-
-/**
- * Triggers the close-app sync action: future project-close checks will be added here as separate sync actions.
- */
-const tryCloseWindow = (): void => {
-  // TODO add project close checking
-  runFaAction('closeApp', undefined)
-}
-
-/**
-Checks if the window is maximized and sets local variable accordingly
-*/
-const checkIfWindowMaximized = async () => {
-  if (process.env.MODE === 'electron' && window.faContentBridgeAPIs?.faWindowControl) {
-    isMaximized.value = await window.faContentBridgeAPIs.faWindowControl.checkWindowMaximized()
-  }
-}
-
-/**
- * Determines if the window is currently maximized or not
- */
-const isMaximized: Ref<boolean> = ref(true)
-
-/**
- * Window interval checker variable
- */
-let checkerInterval: number
-
-/**
- * Hook up a interval timer on mount for continuous checking
- * This is done due to the fact that dragging via the top header bar doesn't properly fire "drag" event
- * Async due to UI render blocking
- */
-onMounted(async () => {
-  window.clearInterval(checkerInterval)
-
-  await checkIfWindowMaximized()
-
-  checkerInterval = window.setInterval(() => {
-    void checkIfWindowMaximized()
-  }, 100)
-})
-
-/**
- *Unhook the interval timer on unmounting in order to prevent left-over intervals ticking in the app
- * Async due to UI render blocking
- */
-onUnmounted(async () => {
-  window.clearInterval(checkerInterval)
-})
-
+const {
+  isMaximized,
+  minimizeWindow,
+  resizeWindowThenRefreshMaximized,
+  tryCloseWindow
+} = useGlobalWindowButtons()
 </script>
 
 <style lang="scss" scoped>

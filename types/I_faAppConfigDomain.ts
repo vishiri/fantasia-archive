@@ -1,8 +1,13 @@
+import type { FA_APP_CONFIG_INNER } from 'app/src-electron/shared/faAppConfigConstants'
+
 /**
  * App configuration export/import (.faconfig) — renderer bridge contracts (main does real work).
  */
 
 export type T_faAppConfigImportPartStatus = 'ok' | 'absent'
+
+/** Basename keys allowed inside a '.faconfig' ZIP archive. */
+export type T_faAppConfigInnerKey = keyof typeof FA_APP_CONFIG_INNER
 
 /**
  * Part flags returned after a successful prepare step (no file body payload).

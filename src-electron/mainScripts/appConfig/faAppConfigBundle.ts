@@ -5,17 +5,10 @@ import {
   FA_APP_CONFIG_MAX_FILE_BYTES
 } from 'app/src-electron/shared/faAppConfigConstants'
 
-import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
-import type { I_faAppNoteboardRoot } from 'app/types/I_faAppNoteboardDomain'
-import type { I_faAppStylingRoot } from 'app/types/I_faAppStylingDomain'
-import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
-
-export interface I_faAppConfigZipInputs {
-  keybinds?: I_faKeybindsRoot
-  appNoteboard?: I_faAppNoteboardRoot
-  appStyling?: I_faAppStylingRoot
-  userSettings?: I_faUserSettings
-}
+import type {
+  I_faAppConfigUnzipOk,
+  I_faAppConfigZipInputs
+} from 'app/types/I_faAppConfigElectronMain'
 
 /**
  * Builds a '.faconfig' (zip) buffer from the given store snapshots.
@@ -55,10 +48,6 @@ const ALLOWED_BASENAMES = new Set<string>(Object.values(FA_APP_CONFIG_INNER))
 function basenamePosix (p: string): string {
   const i = p.lastIndexOf('/')
   return i === -1 ? p : p.slice(i + 1)
-}
-
-export interface I_faAppConfigUnzipOk {
-  entries: Partial<Record<keyof typeof FA_APP_CONFIG_INNER, string>>
 }
 
 /**

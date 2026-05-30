@@ -1,7 +1,7 @@
 import { reactive } from 'vue'
 import { expect, test } from 'vitest'
 
-import { useDialogKeybindSettingsCaptureFieldDisplay } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsCaptureFieldDisplay'
+import { useDialogKeybindSettingsCaptureFieldDisplay } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettings_manager'
 
 test('useDialogKeybindSettingsCaptureFieldDisplay surfaces guidance text when only captureInfoMessage is set', () => {
   const props = reactive({

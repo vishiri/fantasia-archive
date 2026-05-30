@@ -1,33 +1,32 @@
-import { i18n } from 'app/i18n/externalFileLoader'
-import { computed, onUnmounted, ref, type ComputedRef, type Ref } from 'vue'
+import type { I_ref } from 'app/types/I_vueCompositionShims'
 
-import { createDialogKeybindSettingsCapture } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsCapture'
-import { createDialogKeybindSettingsTableState } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsTable'
-import { runFaActionAwait } from 'app/src/scripts/actionManager/faActionManagerRun'
-import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
-import type { I_dialogKeybindSettingsRow } from 'app/types/I_dialogKeybindSettings'
-import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
+import type { T_createDialogKeybindSettingsCaptureResult } from 'app/types/I_dialogKeybindSettings'
+import type { T_dialogKeybindSettingsStateModuleDeps } from 'app/types/I_dialogKeybindSettings'
+import type {
+  T_dialogKeybindSettingsSyncApi,
+  T_useDialogKeybindSettingsResult
+} from 'app/types/I_dialogKeybindSettingsFactories'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 
-export function createDialogKeybindSettingsSync (params: {
-  filter: Ref<string | null | undefined>
-  keybindsStore: ReturnType<typeof S_FaKeybinds>
-  workingOverrides: Ref<I_faKeybindsRoot['overrides']>
-}): {
-    initializeForOpen: () => void
-    onCloseMain: () => void
-    onSaveMain: () => Promise<boolean>
-    syncWorkingFromStore: () => void
-  } {
+function cloneOverridesPlain (o: I_faKeybindsRoot['overrides']): I_faKeybindsRoot['overrides'] {
+  return JSON.parse(JSON.stringify(o)) as I_faKeybindsRoot['overrides']
+}
+
+export function createDialogKeybindSettingsSync (
+  deps: T_dialogKeybindSettingsStateModuleDeps,
+  params: {
+    filter: I_ref<string | null | undefined>
+    keybindsStore: {
+      snapshot: { store: { overrides: I_faKeybindsRoot['overrides'] } } | null
+    }
+    workingOverrides: I_ref<I_faKeybindsRoot['overrides']>
+  }
+): T_dialogKeybindSettingsSyncApi {
   const {
     filter,
     keybindsStore,
     workingOverrides
   } = params
-
-  function cloneOverridesPlain (o: I_faKeybindsRoot['overrides']): I_faKeybindsRoot['overrides'] {
-    return JSON.parse(JSON.stringify(o)) as I_faKeybindsRoot['overrides']
-  }
 
   function syncWorkingFromStore (): void {
     const o = keybindsStore.snapshot?.store.overrides ?? {}
@@ -44,7 +43,7 @@ export function createDialogKeybindSettingsSync (params: {
   }
 
   async function onSaveMain (): Promise<boolean> {
-    const ok = await runFaActionAwait('saveKeybindSettings', {
+    const ok = await deps.runFaActionAwait('saveKeybindSettings', {
       overrides: cloneOverridesPlain(workingOverrides.value)
     })
     if (ok) {
@@ -61,32 +60,35 @@ export function createDialogKeybindSettingsSync (params: {
   }
 }
 
-export function createDialogKeybindSettingsState (t: (key: string) => string): {
-  capture: ReturnType<typeof createDialogKeybindSettingsCapture>
-  filter: Ref<string | null | undefined>
-  sync: ReturnType<typeof createDialogKeybindSettingsSync>
-  table: ReturnType<typeof createDialogKeybindSettingsTableState>
-  workingOverrides: Ref<I_faKeybindsRoot['overrides']>
-} {
-  const keybindsStore = S_FaKeybinds()
-  const workingOverrides = ref<I_faKeybindsRoot['overrides']>({})
-  const filter = ref<string | null | undefined>('')
-  const platform = computed(() => keybindsStore.snapshot?.platform ?? 'win32')
+export function createDialogKeybindSettingsStateBundle (
+  deps: T_dialogKeybindSettingsStateModuleDeps,
+  t: (key: string) => string
+): {
+    capture: T_createDialogKeybindSettingsCaptureResult
+    filter: I_ref<string | null | undefined>
+    sync: T_dialogKeybindSettingsSyncApi
+    table: ReturnType<typeof deps.createDialogKeybindSettingsTableState>
+    workingOverrides: I_ref<I_faKeybindsRoot['overrides']>
+  } {
+  const keybindsStore = deps.getKeybindsStore()
+  const workingOverrides = deps.ref<I_faKeybindsRoot['overrides']>({})
+  const filter = deps.ref<string | null | undefined>('')
+  const platform = deps.computed(() => keybindsStore.snapshot?.platform ?? 'win32')
 
-  const capture = createDialogKeybindSettingsCapture({
+  const capture = deps.createDialogKeybindSettingsCapture({
     platform,
     t,
     workingOverrides
   })
 
-  const table = createDialogKeybindSettingsTableState({
+  const table = deps.createDialogKeybindSettingsTableState({
     filter,
     platform,
     t,
     workingOverrides
   })
 
-  const sync = createDialogKeybindSettingsSync({
+  const sync = createDialogKeybindSettingsSync(deps, {
     filter,
     keybindsStore,
     workingOverrides
@@ -101,35 +103,13 @@ export function createDialogKeybindSettingsState (t: (key: string) => string): {
   }
 }
 
-export function useDialogKeybindSettings (): {
-  captureActionName: Ref<string>
-  captureError: Ref<boolean>
-  captureErrorMessage: Ref<string>
-  captureInfoMessage: Ref<string>
-  captureLabel: Ref<string>
-  captureOpen: Ref<boolean>
-  filter: Ref<string | null | undefined>
-  initializeForOpen: () => void
-  onCaptureClear: () => void
-  onCaptureSet: () => void
-  onCloseMain: () => void
-  onOpenCapture: (row: I_dialogKeybindSettingsRow) => void
-  onSaveMain: () => Promise<boolean>
-  pendingChord: Ref<I_faChordSerialized | null>
-  tableColumns: ComputedRef<Array<{
-    align: 'left'
-    classes: string
-    field: string
-    label: string
-    name: string
-  }>>
-  tableRows: ComputedRef<I_dialogKeybindSettingsRow[]>
-  workingOverrides: Ref<I_faKeybindsRoot['overrides']>
-} {
-  const t = (key: string) => i18n.global.t(key)
-  const s = createDialogKeybindSettingsState(t)
+export function useDialogKeybindSettingsFromDeps (
+  deps: T_dialogKeybindSettingsStateModuleDeps
+): T_useDialogKeybindSettingsResult {
+  const t = (key: string) => deps.translate(key)
+  const s = createDialogKeybindSettingsStateBundle(deps, t)
 
-  onUnmounted(() => {
+  deps.onUnmounted(() => {
     s.capture.removeCaptureListener()
   })
 

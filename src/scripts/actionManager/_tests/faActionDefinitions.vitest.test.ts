@@ -106,7 +106,7 @@ vi.mock('app/src/stores/S_FaActiveProject', () => ({
   })
 }))
 
-vi.mock('app/src/scripts/appNoteboard/faAppNoteboardCanOpen', () => ({
+vi.mock('app/src/scripts/appNoteboard/appNoteboard_manager', () => ({
   canOpenFloatingWindowWhileNoModal: (): boolean => canOpenFloatingWindowWhileNoModalMock()
 }))
 
@@ -156,26 +156,30 @@ vi.mock('app/src/stores/S_FaUserSettings', () => ({
   })
 }))
 
-vi.mock('app/src/scripts/appGlobalManagementUI/dialogManagement', () => ({
+vi.mock('app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager', () => ({
   openDialogComponent: openDialogComponentMock,
-  openDialogMarkdownDocument: openDialogMarkdownDocumentMock
-}))
-
-vi.mock('app/src/scripts/appGlobalManagementUI/toggleDevTools', () => ({
-  toggleDevTools: toggleDevToolsMock
-}))
-
-vi.mock('app/src/scripts/appGlobalManagementUI/tipsTricksTriviaNotification', () => ({
+  openDialogMarkdownDocument: openDialogMarkdownDocumentMock,
+  toggleDevTools: toggleDevToolsMock,
   tipsTricksTriviaNotification: tipsNotificationMock
 }))
 
-vi.mock('app/src/scripts/appInternals/rendererAppInternals', () => ({
+vi.mock('app/src/scripts/appInternals/faAppInternalsLocale_manager', () => ({
+  applyFaI18nLocaleFromLanguageCode: vi.fn(),
   applyFaUserSettingsLanguageSelection: applyLanguageMock
 }))
 
-import { FA_ACTION_DEFINITIONS, findFaActionDefinition } from '../faActionDefinitions'
-import { buildFaActionPayloadPreview } from '../faActionManagerErrorReporting'
-import { FaActionUserCanceledError } from '../faActionUserCanceledError'
+vi.mock('app/src/scripts/appInternals/appInternals_manager', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('app/src/scripts/appInternals/appInternals_manager')>()
+  return {
+    ...actual,
+    navigateToWorkspaceRouteForActiveProject: vi.fn(async () => undefined)
+  }
+})
+
+import { FA_ACTION_DEFINITIONS, findFaActionDefinition } from '../faActionDefinitions_manager'
+import { buildFaActionPayloadPreview } from '../faActionManagerErrorReporting_manager'
+import { FaActionUserCanceledError } from '../functions/faActionUserCanceledError'
 
 beforeEach(() => {
   vi.mocked(Notify.create).mockClear()
@@ -254,6 +258,12 @@ function definitionFor (id: T_faActionId): { handler: (payload: unknown) => unkn
 test('Test that every action id from FA_ACTION_IDS has a registered definition', () => {
   for (const id of FA_ACTION_IDS) {
     expect(findFaActionDefinition(id)).toBeDefined()
+  }
+})
+
+test('Test that every registered definition exposes a callable handler', () => {
+  for (const definition of FA_ACTION_DEFINITIONS) {
+    expect(typeof definition.handler, `handler for ${definition.id}`).toBe('function')
   }
 })
 
@@ -652,10 +662,10 @@ test('Test that exportAppConfigPackage handler exports through the bridge', asyn
     filePath: 'C:\\a.faconfig',
     outcome: 'saved' as const
   }))
-  const runFaActionSpy = vi.spyOn(
-    await import('app/src/scripts/actionManager/faActionManagerRun'),
-    'runFaAction'
-  ).mockImplementation(() => undefined)
+  const runFaActionForward = await import('../faActionManagerRunForward_manager')
+  const runFaActionSpy = vi
+    .spyOn(runFaActionForward, 'runFaActionThroughForward')
+    .mockImplementation(() => undefined)
   const prev = window.faContentBridgeAPIs
   Object.assign(window, {
     faContentBridgeAPIs: {

@@ -1,3 +1,4 @@
+/** @vitest-environment jsdom */
 import { beforeEach, expect, test, vi } from 'vitest'
 
 const {

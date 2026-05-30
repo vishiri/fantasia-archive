@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 
 import type { I_faActiveProject } from 'app/types/I_faActiveProjectDomain'
 
-import { formatFaActiveProjectNotifyLabel } from '../faProjectSessionNotifyLabel'
+import { formatFaActiveProjectNotifyLabel } from '../functions/faProjectSessionNotifyLabel'
 
 /**
  * formatFaActiveProjectNotifyLabel

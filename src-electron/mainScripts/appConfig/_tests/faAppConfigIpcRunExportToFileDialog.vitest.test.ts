@@ -2,7 +2,7 @@ import path from 'node:path'
 
 import { beforeEach, expect, test, vi } from 'vitest'
 
-import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appNoteboard/faAppNoteboardStoreDefaults'
+import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appNoteboard/appNoteboard_managerDefaults'
 import * as appConfigBundle from '../faAppConfigBundle'
 import { runExportAppConfigToFile } from '../faAppConfigIpcRunExportToFileDialog'
 
@@ -44,19 +44,19 @@ vi.mock('app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc',
   windowFromIpcEvent: windowFromIpcEventMock
 }))
 
-vi.mock('app/src-electron/mainScripts/userSettings/userSettingsStore', () => ({
+vi.mock('app/src-electron/mainScripts/userSettings/userSettings_manager', () => ({
   getFaUserSettings: getFaUserSettingsMock
 }))
 
-vi.mock('app/src-electron/mainScripts/keybinds/faKeybindsStore', () => ({
+vi.mock('app/src-electron/mainScripts/keybinds/keybinds_manager', () => ({
   getFaKeybinds: getFaKeybindsMock
 }))
 
-vi.mock('app/src-electron/mainScripts/appNoteboard/faAppNoteboardStore', () => ({
+vi.mock('app/src-electron/mainScripts/appNoteboard/appNoteboard_manager', () => ({
   getFaAppNoteboard: getFaAppNoteboardMock
 }))
 
-vi.mock('app/src-electron/mainScripts/appStyling/faAppStylingStore', () => ({
+vi.mock('app/src-electron/mainScripts/appStyling/appStyling_manager', () => ({
   getFaAppStyling: getFaAppStylingMock
 }))
 

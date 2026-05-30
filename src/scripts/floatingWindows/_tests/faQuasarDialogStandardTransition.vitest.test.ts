@@ -4,7 +4,7 @@ import {
   FA_QUASAR_DIALOG_FADE_TRANSITION_BINDINGS,
   FA_QUASAR_DIALOG_STANDARD_TRANSITION_BINDINGS,
   FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS
-} from 'app/src/scripts/floatingWindows/faQuasarDialogStandardTransition'
+} from '../functions/faQuasarDialogStandardTransition'
 
 /**
  * FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS

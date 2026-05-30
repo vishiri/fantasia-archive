@@ -12,9 +12,9 @@ import {
   normalizeAppSettingsSearchNeedle,
   appSettingsRowMatchesSearchNeedle,
   showNonLastSeparator,
-  showNonLastTopCategorySeparator,
-  useDialogAppSettingsSearchComputed
-} from 'app/src/components/dialogs/DialogAppSettings/scripts/dialogAppSettingsSearch'
+  showNonLastTopCategorySeparator
+} from 'app/src/components/dialogs/DialogAppSettings/scripts/functions/dialogAppSettingsSearch'
+import { useDialogAppSettingsSearchComputed } from 'app/src/components/dialogs/DialogAppSettings/scripts/dialogAppSettings_manager'
 
 const stubSetting = (overrides: Partial<I_appSettingsSettingRenderItem> = {}): I_appSettingsSettingRenderItem => ({
   description: '',

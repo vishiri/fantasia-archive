@@ -10,13 +10,13 @@ const bindSplashPageSkipWelcomeScreenLifecycleMock = vi.hoisted(() => {
   return vi.fn()
 })
 
-vi.mock('app/src/pages/scripts/splashPageSkipWelcomeScreen', () => {
+vi.mock('app/src/pages/SplashPage/scripts/functions/splashPageSkipWelcomeScreen', () => {
   return {
     bindSplashPageSkipWelcomeScreenLifecycle: bindSplashPageSkipWelcomeScreenLifecycleMock
   }
 })
 
-import SplashPage from '../SplashPage.vue'
+import SplashPage from '../SplashPage/SplashPage.vue'
 
 function mountSplashPageWithSettings (settings: I_faUserSettings | null): ReturnType<typeof mount> {
   const pinia = createPinia()

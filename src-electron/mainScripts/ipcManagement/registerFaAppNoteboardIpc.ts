@@ -4,7 +4,7 @@ import { FA_APP_NOTEBOARD_IPC } from 'app/src-electron/electron-ipc-bridge'
 import {
   cleanupFaAppNoteboard,
   getFaAppNoteboard
-} from 'app/src-electron/mainScripts/appNoteboard/faAppNoteboardStore'
+} from 'app/src-electron/mainScripts/appNoteboard/appNoteboard_manager'
 import { parseFaAppNoteboardPatch } from 'app/src-electron/shared/faAppNoteboardPatchSchema'
 import type { I_faAppNoteboardRoot } from 'app/types/I_faAppNoteboardDomain'
 

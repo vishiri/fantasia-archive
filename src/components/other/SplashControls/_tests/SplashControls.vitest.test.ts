@@ -6,30 +6,52 @@ import { expect, test, vi } from 'vitest'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import { i18n } from 'app/i18n/externalFileLoader'
-import * as faActionRun from 'app/src/scripts/actionManager/faActionManagerRun'
-import * as faWelcomeScreenAutoLoad from 'app/src/scripts/projectManagement/faWelcomeScreenAutoLoadProject'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 
-import SplashControls from '../SplashControls.vue'
-import SplashControlsResumeDropdown from '../SplashControlsResumeDropdown.vue'
+const { runFaActionMock, openWelcomeScreenAutoLoadProjectMock } = vi.hoisted(() => {
+  return {
+    openWelcomeScreenAutoLoadProjectMock: vi.fn(async () => false),
+    runFaActionMock: vi.fn()
+  }
+})
 
 const resolveSplashResumeDropdownArrowElementMock = vi.hoisted(() => {
   return vi.fn()
 })
 
-vi.mock('app/src/components/other/SplashControls/scripts/resolveSplashResumeDropdownArrowElement', () => {
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => {
+  return {
+    runFaAction: (...args: unknown[]) => runFaActionMock(...args),
+    runFaActionAwait: vi.fn(async () => true)
+  }
+})
+
+vi.mock('app/src/scripts/projectManagement/projectManagement_manager', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('app/src/scripts/projectManagement/projectManagement_manager')>()
+  return {
+    ...actual,
+    openWelcomeScreenAutoLoadProject: openWelcomeScreenAutoLoadProjectMock
+  }
+})
+
+vi.mock('app/src/components/other/SplashControls/scripts/functions/resolveSplashResumeDropdownArrowElement', () => {
   return {
     resolveSplashResumeDropdownArrowElement: resolveSplashResumeDropdownArrowElementMock
   }
 })
+
+import SplashControls from '../SplashControls.vue'
+import SplashControlsResumeDropdown from '../SplashControlsResumeDropdown.vue'
 
 /**
  * SplashControls
  * Create new project wires to openNewProjectDialog.
  */
 test('Test that splash Create new project triggers openNewProjectDialog', async () => {
-  const spy = vi.spyOn(faActionRun, 'runFaAction').mockImplementation(() => undefined)
+  runFaActionMock.mockReset()
+  const spy = runFaActionMock
   const w = mount(SplashControls, {
     global: {
       mocks: {
@@ -39,7 +61,7 @@ test('Test that splash Create new project triggers openNewProjectDialog', async 
   })
   await w.get('[data-test-locator="splashPage-btn-new"]').trigger('click')
   expect(spy).toHaveBeenCalledWith('openNewProjectDialog', undefined)
-  spy.mockRestore()
+  runFaActionMock.mockReset()
   w.unmount()
 })
 
@@ -48,7 +70,8 @@ test('Test that splash Create new project triggers openNewProjectDialog', async 
  * Load existing project wires to loadExistingProject.
  */
 test('Test that splash Load existing project triggers loadExistingProject', async () => {
-  const spy = vi.spyOn(faActionRun, 'runFaAction').mockImplementation(() => undefined)
+  runFaActionMock.mockReset()
+  const spy = runFaActionMock
   const w = mount(SplashControls, {
     global: {
       mocks: {
@@ -58,7 +81,7 @@ test('Test that splash Load existing project triggers loadExistingProject', asyn
   })
   await w.get('[data-test-locator="splashPage-btn-load"]').trigger('click')
   expect(spy).toHaveBeenCalledWith('loadExistingProject', {})
-  spy.mockRestore()
+  runFaActionMock.mockReset()
   w.unmount()
 })
 
@@ -102,11 +125,10 @@ test('Test that resume-latest split loads MRU paths via faActionManager', async 
     ]
   })
 
-  const actionSpy = vi.spyOn(faActionRun, 'runFaAction').mockImplementation(() => undefined)
-  const autoLoadSpy = vi.spyOn(
-    faWelcomeScreenAutoLoad,
-    'openWelcomeScreenAutoLoadProject'
-  ).mockResolvedValue(false)
+  runFaActionMock.mockReset()
+  openWelcomeScreenAutoLoadProjectMock.mockReset()
+  openWelcomeScreenAutoLoadProjectMock.mockResolvedValue(false)
+  const actionSpy = runFaActionMock
 
   const w = mount(SplashControls, {
     global: {
@@ -123,7 +145,7 @@ test('Test that resume-latest split loads MRU paths via faActionManager', async 
   expect(w.find('[data-test-locator="splashPage-recentProject-1"]').exists()).toBe(true)
 
   await w.get('[data-test-locator="splashPage-btn-resume-latest"]').trigger('click')
-  expect(autoLoadSpy).toHaveBeenCalledOnce()
+  expect(openWelcomeScreenAutoLoadProjectMock).toHaveBeenCalledOnce()
   expect(actionSpy).not.toHaveBeenCalledWith('loadExistingProject', {
     filePath: '/newest.faproject',
     resumeActiveSession: true
@@ -134,8 +156,7 @@ test('Test that resume-latest split loads MRU paths via faActionManager', async 
   await w.get('[data-test-locator="splashPage-recentProject-1"]').trigger('click')
   expect(actionSpy).toHaveBeenCalledWith('loadExistingProject', { filePath: '/older.faproject' })
 
-  actionSpy.mockRestore()
-  autoLoadSpy.mockRestore()
+  runFaActionMock.mockReset()
   w.unmount()
 })
 
@@ -154,7 +175,8 @@ test('Test that resume primary segment shows Resume Current Project and opens ac
   })
 
   const tSpy = vi.spyOn(i18n.global, 't')
-  const actionSpy = vi.spyOn(faActionRun, 'runFaAction').mockImplementation(() => undefined)
+  runFaActionMock.mockReset()
+  const actionSpy = runFaActionMock
 
   const w = mount(SplashControlsResumeDropdown, {
     global: {
@@ -182,7 +204,7 @@ test('Test that resume primary segment shows Resume Current Project and opens ac
 
   tSpy.mockRestore()
 
-  actionSpy.mockRestore()
+  runFaActionMock.mockReset()
   S_FaActiveProject().clearActiveProject()
   w.unmount()
 })

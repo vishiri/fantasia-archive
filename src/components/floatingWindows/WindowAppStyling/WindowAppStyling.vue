@@ -173,23 +173,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
-
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import FaFloatingWindowBodyTeleport from 'app/src/components/floatingWindows/_FaFloatingWindowBodyTeleport/_FaFloatingWindowBodyTeleport.vue'
 import FaFloatingWindowFrameResizeHandles from 'app/src/components/floatingWindows/_FaFloatingWindowFrameResizeHandles/_FaFloatingWindowFrameResizeHandles.vue'
-import { getMonacoKeybindHelpItems } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStylingKeybindHelp'
-import { useWindowAppStylingHelpMenu } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStylingHelpMenu'
-import { useWindowAppStylingFramePersist } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/useWindowAppStylingFramePersist'
-import { useWindowAppStyling } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStylingState'
-import { buildFaColorVarSwatchStyle } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/faColorVarSwatchStyle'
-import { getFaColorCustomPropertyNamesForHelpPanel } from 'app/src/scripts/faTheme/faThemeCustomPropertyNames'
-import {
-  FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
-  FA_FLOATING_WINDOW_POP_TRANSITION_MS
-} from 'app/src/scripts/floatingWindows/faFloatingWindowPopTransition'
-import { useFaFloatingWindowFrame } from 'app/src/scripts/floatingWindows/useFaFloatingWindowFrame'
-import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
+import { useWindowAppStylingSurface } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStyling_manager'
 
 defineOptions({
   name: 'WindowAppStyling'
@@ -203,68 +190,27 @@ const props = defineProps<{
 }>()
 
 const {
+  FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
+  FA_FLOATING_WINDOW_POP_TRANSITION_MS,
+  buildFaColorVarSwatchStyle,
   closeWithoutSaving,
   documentName,
   editorHostRef,
-  monaco,
-  saveAndCloseWindow,
-  windowModel
-} = useWindowAppStyling(props)
-
-const appStylingStore = S_FaAppStyling()
-const persistedAppStylingFrame = computed(() => appStylingStore.root?.frame ?? null)
-
-const {
+  faThemeCustomPropertyNames,
   frameRef,
-  frameStyle,
-  h,
+  frameStyleWithDialogTransition,
+  helpKeybindMenuOpen,
+  monaco,
+  monacoKeybindHelpItems,
   onFramePointerDown,
+  onHelpIconMouseEnter,
+  onHelpIconMouseLeave,
   onResizePointerDown,
   onTitlePointerDown,
+  saveAndCloseWindow,
   titleShortFrameClass,
-  w,
-  x,
-  y
-} = useFaFloatingWindowFrame(windowModel, undefined, {
-  persistedFrame: persistedAppStylingFrame
-})
-
-useWindowAppStylingFramePersist({
-  h,
-  w,
-  windowModel,
-  x,
-  y
-})
-
-const {
-  helpKeybindMenuOpen,
-  onHelpIconMouseEnter,
-  onHelpIconMouseLeave
-} = useWindowAppStylingHelpMenu()
-
-const frameStyleWithDialogTransition = computed(() => ({
-  ...frameStyle.value,
-  '--q-transition-duration': `${FA_FLOATING_WINDOW_POP_TRANSITION_MS}ms`
-}))
-
-/**
- * Reactive so the chord text re-evaluates if the keybinds snapshot lands while the window is open
- * (e.g. after the first 'S_FaKeybinds().refreshKeybinds()' resolves on app startup).
- */
-const monacoKeybindHelpItems = computed(() => getMonacoKeybindHelpItems())
-
-const faThemeCustomPropertyNames = ref<readonly string[]>(
-  getFaColorCustomPropertyNamesForHelpPanel()
-)
-
-watch(helpKeybindMenuOpen, (open) => {
-  if (open) {
-    void nextTick(() => {
-      faThemeCustomPropertyNames.value = getFaColorCustomPropertyNamesForHelpPanel()
-    })
-  }
-})
+  windowModel
+} = useWindowAppStylingSurface(props)
 </script>
 
 <style lang="scss" src="./styles/WindowAppStyling.unscoped.scss"></style>

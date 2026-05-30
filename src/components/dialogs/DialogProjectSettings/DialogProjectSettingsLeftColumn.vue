@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB } from 'app/src/components/dialogs/DialogProjectSettings/scripts/dialogProjectSettingsConstants'
+import { FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDialogInput'
 
 const props = defineProps<{
   selectedCategoryTab: string

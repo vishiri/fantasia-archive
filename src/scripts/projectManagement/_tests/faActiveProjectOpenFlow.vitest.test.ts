@@ -3,7 +3,7 @@ import { expect, test, vi } from 'vitest'
 import {
   finalizeFaActiveProjectOpenResult,
   tryReuseFaActiveProjectKnownPath
-} from 'app/src/scripts/projectManagement/faActiveProjectOpenFlow'
+} from 'app/src/scripts/projectManagement/projectManagement_manager'
 
 /**
  * faActiveProjectOpenFlow

@@ -15,14 +15,14 @@ const { runCommandMock } = vi.hoisted(() => {
   }
 })
 
-vi.mock('app/src/scripts/keybinds/faKeybindRunCommand', () => {
+vi.mock('../faKeybindRunCommand_manager', () => {
   return {
     faKeybindRunCommand: (...args: unknown[]) => runCommandMock(...args)
   }
 })
 
-vi.mock('app/src/scripts/keybinds/faKeybindCommandDefinitions', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('app/src/scripts/keybinds/faKeybindCommandDefinitions')>()
+vi.mock('../functions/faKeybindCommandDefinitions', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../functions/faKeybindCommandDefinitions')>()
   return {
     ...actual,
     FA_KEYBIND_COMMAND_DEFINITIONS: actual.FA_KEYBIND_COMMAND_DEFINITIONS.map((d) => {
@@ -37,8 +37,8 @@ vi.mock('app/src/scripts/keybinds/faKeybindCommandDefinitions', async (importOri
   }
 })
 
-import { createFaKeybindKeydownHandler } from 'app/src/scripts/keybinds/faKeybindsGlobalDispatch'
-import { faKeybindFindChordConflict } from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
+import { createFaKeybindKeydownHandler } from '../faKeybindsGlobalDispatch_manager'
+import { faKeybindFindChordConflict } from '../faKeybindsChordDisplayAndConflict_manager'
 
 /**
  * faKeybindFindChordConflict

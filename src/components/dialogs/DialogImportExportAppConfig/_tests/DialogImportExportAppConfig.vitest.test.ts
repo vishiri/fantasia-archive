@@ -15,7 +15,7 @@ const { runFaActionAwaitMock, runFaActionMock } = vi.hoisted(() => ({
   runFaActionMock: vi.fn(async (): Promise<void> => {})
 }))
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => ({
   runFaAction: runFaActionMock,
   runFaActionAwait: runFaActionAwaitMock
 }))

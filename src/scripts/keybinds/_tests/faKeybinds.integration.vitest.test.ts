@@ -13,14 +13,14 @@ const { runCommandMock } = vi.hoisted(() => {
   }
 })
 
-vi.mock('app/src/scripts/keybinds/faKeybindRunCommand', () => {
+vi.mock('../faKeybindRunCommand_manager', () => {
   return {
     faKeybindRunCommand: (...args: unknown[]) => runCommandMock(...args)
   }
 })
 
-vi.mock('app/src/scripts/keybinds/faKeybindCommandDefinitions', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('app/src/scripts/keybinds/faKeybindCommandDefinitions')>()
+vi.mock('../functions/faKeybindCommandDefinitions', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../functions/faKeybindCommandDefinitions')>()
   const defs = actual.FA_KEYBIND_COMMAND_DEFINITIONS.map((d) => {
     return { ...d }
   })
@@ -36,23 +36,21 @@ vi.mock('app/src/scripts/keybinds/faKeybindCommandDefinitions', async (importOri
 
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
 
-import { FA_KEYBIND_COMMAND_DEFINITIONS, findFaKeybindCommandDefinition } from 'app/src/scripts/keybinds/faKeybindCommandDefinitions'
-import { faKeybindFindChordConflict } from 'app/src/scripts/keybinds/faKeybindsChordDisplayAndConflict'
-import { formatFaKeybindChordForUi } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
+import { FA_KEYBIND_COMMAND_DEFINITIONS, findFaKeybindCommandDefinition } from '../functions/faKeybindCommandDefinitions'
+import { faKeybindFindChordConflict } from '../faKeybindsChordDisplayAndConflict_manager'
+import { formatFaKeybindChordForUi } from '../faKeybindsChordUiFormatting_manager'
 import {
   faKeybindChordsEqual,
   faKeybindExpandDefaultChord,
   faKeybindResolveEffectiveChord,
   sortFaKeybindMods
-} from 'app/src/scripts/keybinds/faKeybindsChordEqualityAndResolve'
+} from '../functions/faKeybindsChordEqualityAndResolve'
 import {
   faKeybindEventToChord,
   faKeybindTryChordFromEvent
-} from 'app/src/scripts/keybinds/faKeybindsChordFromEvent'
-import {
-  createFaKeybindKeydownHandler,
-  faKeybindIsEditableTarget
-} from 'app/src/scripts/keybinds/faKeybindsGlobalDispatch'
+} from '../faKeybindsChordFromEvent_manager'
+import { createFaKeybindKeydownHandler } from '../faKeybindsGlobalDispatch_manager'
+import { faKeybindIsEditableTarget } from '../functions/faKeybindsGlobalDispatchEditable'
 
 beforeEach(() => {
   runCommandMock.mockReset()

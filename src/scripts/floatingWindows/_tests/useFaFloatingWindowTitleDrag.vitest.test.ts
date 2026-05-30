@@ -3,8 +3,8 @@
 import { effectScope, ref } from 'vue'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
-import type { I_FaFloatingWindowFrameLayout } from 'app/src/scripts/floatingWindows/faFloatingWindowFrameLayout'
-import { useFaFloatingWindowTitleDrag } from 'app/src/scripts/floatingWindows/useFaFloatingWindowTitleDrag'
+import type { I_FaFloatingWindowFrameLayout } from 'app/types/I_faFloatingWindowFrameLayout'
+import { useFaFloatingWindowTitleDrag } from '../useFaFloatingWindowTitleDrag_manager'
 
 const testLayout: I_FaFloatingWindowFrameLayout = {
   widthFrac: 0.9,

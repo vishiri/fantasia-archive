@@ -6,9 +6,9 @@ import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
-import type { I_FaMonacoMount } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/useMonacoMount'
-import * as dialogStore from 'app/src/stores/S_Dialog'
-import { S_DialogComponent } from 'app/src/stores/S_Dialog'
+import type { I_FaMonacoMount } from 'app/types/I_faWindowStylingMonaco'
+import * as dialogStore from 'src/stores/S_Dialog'
+import { S_DialogComponent } from 'src/stores/S_Dialog'
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 
 import {
@@ -18,7 +18,7 @@ import {
   watchProjectStylingEditorCssLivePreview,
   wireProjectStylingPersistedCssIntoOpenEditor,
   wireProjectStylingWindowOpenFromMenuAndProps
-} from '../windowProjectStylingStateSideEffects'
+} from '../windowProjectStyling_manager'
 
 beforeEach(() => {
   setActivePinia(createPinia())

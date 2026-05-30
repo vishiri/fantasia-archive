@@ -6,7 +6,7 @@ import {
   ensureFaProjectExtension,
   faDisplayNameFallbackFromProjectPath,
   pathLooksLikeFaProjectFile
-} from '../faProjectPathValidation'
+} from '../projectManagement_manager'
 
 test('pathLooksLikeFaProjectFile rejects empty and non-absolute paths', () => {
   expect(pathLooksLikeFaProjectFile('')).toBe(false)

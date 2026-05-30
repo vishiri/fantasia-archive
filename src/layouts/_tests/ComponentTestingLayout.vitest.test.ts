@@ -3,9 +3,9 @@ import { expect, test, vi } from 'vitest'
 import { createMemoryHistory, createRouter } from 'vue-router'
 
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
-import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/rendererAppInternals'
+import { setFantasiaStorybookCanvasFlag } from 'app/src/scripts/appInternals/appInternals_manager'
 
-import ComponentTestingLayout from '../ComponentTestingLayout.vue'
+import ComponentTestingLayout from '../ComponentTestingLayout/ComponentTestingLayout.vue'
 
 /**
  * ComponentTestingLayout

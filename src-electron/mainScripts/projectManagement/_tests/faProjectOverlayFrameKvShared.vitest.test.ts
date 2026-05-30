@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { parseFaProjectOverlayFinitePx } from '../faProjectOverlayFrameKvShared'
+import { parseFaProjectOverlayFinitePx } from '../functions/faProjectOverlayFinitePx'
 
 /**
  * parseFaProjectOverlayFinitePx

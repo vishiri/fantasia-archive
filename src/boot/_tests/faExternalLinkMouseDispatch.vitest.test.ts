@@ -1,6 +1,6 @@
 import { expect, test, vi } from 'vitest'
 
-import { dispatchFaExternalLinkMouseEvent } from '../faExternalLinkMouseDispatch'
+import { dispatchFaExternalLinkMouseEvent } from '../scripts/functions/faExternalLinkMouseDispatch'
 
 const { checkIfExternalMock, openExternalMock } = vi.hoisted(() => {
   return {

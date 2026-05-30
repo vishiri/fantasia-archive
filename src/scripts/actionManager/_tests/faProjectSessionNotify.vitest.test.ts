@@ -31,7 +31,7 @@ import {
   notifyFaProjectAlreadyActiveWarning,
   notifyFaProjectCreatedPositive,
   notifyFaProjectLoadedPositive
-} from '../faProjectSessionNotify'
+} from '../faProjectSessionNotify_manager'
 
 beforeEach(() => {
   vi.mocked(Notify.create).mockClear()

@@ -1,0 +1,8 @@
+import {
+  clampFaFloatingWindowFrameToViewport as clampFaFloatingWindowFrameToViewportFn,
+  clampFaFloatingWindowResizeToViewport as clampFaFloatingWindowResizeToViewportFn
+} from './functions/faFloatingWindowResizeClamp'
+
+export const clampFaFloatingWindowResizeToViewport = clampFaFloatingWindowResizeToViewportFn
+
+export const clampFaFloatingWindowFrameToViewport = clampFaFloatingWindowFrameToViewportFn

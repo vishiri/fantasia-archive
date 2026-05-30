@@ -1,7 +1,6 @@
-import type { Ref } from 'vue'
-
-import { applyFaFloatingWindowTitleDragFromPointer } from 'app/src/scripts/floatingWindows/faFloatingWindowTitleDragPointerApply'
-import type { I_FaFloatingWindowFrameLayout } from 'app/src/scripts/floatingWindows/faFloatingWindowFrameLayout'
+import { applyFaFloatingWindowTitleDragFromPointer } from './faFloatingWindowTitleDragPointerApply_manager'
+import type { I_FaFloatingWindowFrameLayout } from 'app/types/I_faFloatingWindowFrameLayout'
+import type { I_ref } from 'app/types/I_vueCompositionShims'
 
 /**
  * Window-level pointer listeners for floating-window title drag. Coalesces pointermove to one geometry update per frame.
@@ -17,12 +16,12 @@ export class FaFloatingWindowTitleDragPointerSession {
 
   public constructor (
     private readonly layout: I_FaFloatingWindowFrameLayout,
-    private readonly x: Ref<number>,
-    private readonly y: Ref<number>,
-    private readonly w: Ref<number>,
-    private readonly h: Ref<number>,
+    private readonly x: I_ref<number>,
+    private readonly y: I_ref<number>,
+    private readonly w: I_ref<number>,
+    private readonly h: I_ref<number>,
     private readonly raiseZ: () => void,
-    private readonly isDragActive: Ref<boolean>
+    private readonly isDragActive: I_ref<boolean>
   ) {}
 
   public dispose (): void {

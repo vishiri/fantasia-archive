@@ -1,9 +1,11 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Result } from 'neverthrow'
 
-import type { I_faAppConfigUnzipOk } from 'app/src-electron/mainScripts/appConfig/faAppConfigBundle'
 import { faAppConfigImportStagedSessions } from 'app/src-electron/mainScripts/appConfig/faAppConfigImportStagedState'
-import type { I_faStagedImportSession } from 'app/src-electron/mainScripts/appConfig/faAppConfigImportStagedState'
+import type {
+  I_faAppConfigUnzipOk,
+  I_faStagedImportSession
+} from 'app/types/I_faAppConfigElectronMain'
 import { FA_APP_CONFIG_IMPORT_SESSION_TTL_MS } from 'app/src-electron/shared/faAppConfigConstants'
 import {
   parseFaKeybindsRootFile,

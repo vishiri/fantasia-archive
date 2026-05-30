@@ -3,7 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent } from 'vue'
 import { beforeEach, expect, test, vi } from 'vitest'
 
-import { openDialogComponent } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
+import { openDialogComponent } from 'app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager'
 import * as dialogStores from 'app/src/stores/S_Dialog'
 import { S_DialogComponent, S_DialogMarkdown } from 'app/src/stores/S_Dialog'
 

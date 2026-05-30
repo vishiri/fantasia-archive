@@ -1,12 +1,12 @@
 import { expect, test } from 'vitest'
 
-import type { I_FaFloatingWindowFrameLayout } from 'app/src/scripts/floatingWindows/faFloatingWindowFrameLayout'
+import type { I_FaFloatingWindowFrameLayout } from 'app/types/I_faFloatingWindowFrameLayout'
 import {
   FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX,
   isUsableFaFloatingWindowPersistedRect,
   normalizePersistedRectForStorage,
   persistedFloatingWindowFramesAreEquivalent
-} from 'app/src/scripts/floatingWindows/faFloatingWindowPersistedGeometry'
+} from '../faFloatingWindowPersistedGeometry_manager'
 
 const layout: I_FaFloatingWindowFrameLayout = {
   widthFrac: 0.9,

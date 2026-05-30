@@ -106,8 +106,11 @@ vi.mock('../faProjectDbMigrate', () => {
   }
 })
 
-vi.mock('../faProjectManagementE2ePathOverride', () => {
+vi.mock('../projectManagement_manager', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../projectManagement_manager')>()
+
   return {
+    ...actual,
     takeNextE2eProjectOpenPath: takeE2eOpenMock
   }
 })

@@ -5,7 +5,7 @@ import { registerFaProjectManagementProjectSettingsIpc } from 'app/src-electron/
 import { closeFaProjectActiveDatabase } from 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabase'
 import { runWithFaProjectDatabaseForIpcAsync } from 'app/src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected'
 import { runFaProjectCreateFromIpc } from 'app/src-electron/mainScripts/projectManagement/faProjectCreateRun'
-import { installFaProjectManagementE2ePathOverrideGlobals } from 'app/src-electron/mainScripts/projectManagement/faProjectManagementE2ePathOverride'
+import { installFaProjectManagementE2ePathOverrideGlobals } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
 import { runFaProjectOpenFromIpc } from 'app/src-electron/mainScripts/projectManagement/faProjectOpenRun'
 import {
   readFaProjectNoteboardRoot,

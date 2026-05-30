@@ -6,7 +6,9 @@ import {
 } from 'vitest'
 import { defineComponent, h, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
-import { useMonacoMount, type I_FaMonacoMount } from '../useMonacoMount'
+import type { I_FaMonacoMount } from 'app/types/I_faWindowStylingMonaco'
+
+import { useMonacoMount } from '../windowAppStyling_manager'
 
 const {
   monacoEditorCreateMock,
@@ -41,7 +43,7 @@ const {
   }
 })
 
-vi.mock('app/src/components/floatingWindows/WindowAppStyling/scripts/cssMonaco', () => {
+vi.mock('app/src/scripts/floatingWindows/windowStylingCssMonaco_manager', () => {
   return {
     monaco: {
       editor: {

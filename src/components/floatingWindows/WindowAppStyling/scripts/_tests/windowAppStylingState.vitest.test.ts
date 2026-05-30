@@ -9,9 +9,13 @@ import { defineComponent, h, nextTick, reactive, ref } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
-import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/faQuasarDialogStandardTransition'
-import { useWindowAppStyling } from '../windowAppStylingState'
-import type { I_FaWindowAppStylingState } from '../windowAppStylingState'
+import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/floatingWindows_manager'
+import type { I_FaWindowAppStylingState } from 'app/types/I_faWindowStylingMonaco'
+
+import {
+  useWindowAppStyling,
+  useWindowAppStylingSurface
+} from '../windowAppStyling_manager'
 
 /**
  * Mirrors Pinia-backed `css` reactivity while `S_FaAppStyling` is mocked without `defineStore`; `watch` on `stylingStore.css` subscribes to this ref inside the mocked getter.
@@ -60,7 +64,7 @@ const {
   }
 })
 
-vi.mock('app/src/components/floatingWindows/WindowAppStyling/scripts/cssMonaco', () => {
+vi.mock('app/src/scripts/floatingWindows/windowStylingCssMonaco_manager', () => {
   return {
     monaco: {
       editor: { create: monacoEditorCreateMock }
@@ -68,8 +72,9 @@ vi.mock('app/src/components/floatingWindows/WindowAppStyling/scripts/cssMonaco',
   }
 })
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => {
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => {
   return {
+    runFaAction: vi.fn(),
     runFaActionAwait: runFaActionAwaitMock
   }
 })
@@ -551,3 +556,43 @@ test(
   },
   10_000
 )
+
+/**
+ * useWindowAppStylingSurface
+ * Composes frame, help panel, and core styling state for the SFC.
+ */
+test('Test that useWindowAppStylingSurface exposes frame and help bindings when opened', async () => {
+  const surfaceHarness: { current: ReturnType<typeof useWindowAppStylingSurface> | null } = {
+    current: null
+  }
+
+  const Harness = defineComponent({
+    setup () {
+      surfaceHarness.current = useWindowAppStylingSurface({
+        directInput: 'WindowAppStyling'
+      })
+      return () => h('div')
+    }
+  })
+
+  const wrapper = mount(Harness)
+  await flushPromises()
+
+  const surface = surfaceHarness.current!
+  expect(surface.windowModel.value).toBe(true)
+  expect(surface.frameStyleWithDialogTransition.value['--q-transition-duration']).toBe(
+    `${FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS}ms`
+  )
+  expect(surface.helpKeybindMenuOpen.value).toBe(false)
+  expect(Array.isArray(surface.faThemeCustomPropertyNames.value)).toBe(true)
+
+  const faTheme = await import('app/src/scripts/faTheme/faTheme_manager')
+  const themeSpy = vi.spyOn(faTheme, 'getFaColorCustomPropertyNamesForHelpPanel').mockReturnValue(['--refreshed'])
+  surface.helpKeybindMenuOpen.value = true
+  await flushPromises()
+  expect(themeSpy).toHaveBeenCalled()
+  expect([...surface.faThemeCustomPropertyNames.value]).toEqual(['--refreshed'])
+  expect(Array.isArray(surface.monacoKeybindHelpItems.value)).toBe(true)
+
+  wrapper.unmount()
+})

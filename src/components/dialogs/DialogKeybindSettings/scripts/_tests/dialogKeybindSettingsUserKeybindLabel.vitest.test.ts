@@ -3,7 +3,7 @@ import { expect, test } from 'vitest'
 import type { I_dialogKeybindSettingsRow } from 'app/types/I_dialogKeybindSettings'
 import type { I_faChordSerialized } from 'app/types/I_faKeybindsDomain'
 
-import { formatDialogKeybindSettingsUserKeybindButtonLabel } from '../dialogKeybindSettingsUserKeybindLabel'
+import { formatDialogKeybindSettingsUserKeybindButtonLabel } from '../functions/dialogKeybindSettingsUserKeybindLabel'
 
 const baseRow: Omit<I_dialogKeybindSettingsRow, 'userShowsAddNewCombo' | 'userChord'> = {
   commandId: 'openAppSettings',

@@ -7,11 +7,12 @@ import { dialog } from 'electron'
 import { windowFromIpcEvent } from 'app/src-electron/mainScripts/ipcManagement/registerFaWindowControlIpc'
 import { appWindow } from 'app/src-electron/mainScripts/windowManagement/mainWindowCreation'
 import { FA_PROJECT_FILE_EXTENSION } from 'app/src-electron/shared/faProjectConstants'
-import type { I_faProjectOpenInputParsed } from 'app/src-electron/shared/faProjectOpenInputSchema'
+import type { I_faProjectOpenInputParsed } from 'app/types/I_faProjectOpenInputParsed'
+import type { I_faProjectOpenResolveResult } from 'app/types/I_faProjectManagementElectronMain'
 
 import { faProjectSaveDialogDefaultDirectory } from './faProjectFileDialogDefaultPaths'
-import { takeNextE2eProjectOpenPath } from './faProjectManagementE2ePathOverride'
-import { pathLooksLikeFaProjectFile } from './faProjectPathValidation'
+import { takeNextE2eProjectOpenPath } from './projectManagement_manager'
+import { pathLooksLikeFaProjectFile } from './projectManagement_manager'
 
 function buildOpenDialogOptions (defaultPath: string): OpenDialogOptions {
   return {
@@ -27,23 +28,43 @@ function buildOpenDialogOptions (defaultPath: string): OpenDialogOptions {
   }
 }
 
-export type I_faProjectOpenResolveResult =
-  | { canceled: true }
-  | {
-    attemptedFilePath?: string
-    errorMessage: string
-    errorName: string
-    ipcExplicitPathFailed?: boolean
+function resolveExplicitIpcOpenPath (
+  ipcPath: string
+): I_faProjectOpenResolveResult {
+  if (!pathLooksLikeFaProjectFile(ipcPath)) {
+    return {
+      attemptedFilePath: ipcPath,
+      errorMessage: 'Selected file must be a .faproject file',
+      errorName: 'FileError',
+      ipcExplicitPathFailed: true
+    }
   }
-  | { filePath: string, ipcExplicitPath: boolean }
+  if (!fs.existsSync(ipcPath)) {
+    return {
+      attemptedFilePath: ipcPath,
+      errorMessage: 'Project file does not exist',
+      errorName: 'FileError',
+      ipcExplicitPathFailed: true
+    }
+  }
+  return {
+    filePath: ipcPath,
+    ipcExplicitPath: true
+  }
+}
 
 /**
- * Resolves path for open: E2E queue, optional IPC filePath, else native dialog.
+ * Resolves path for open: explicit IPC filePath (MRU / known path), else E2E queue, else native dialog.
  */
 export async function resolveFaProjectOpenTargetPath (
   event: IpcMainInvokeEvent,
   parsed: I_faProjectOpenInputParsed
 ): Promise<I_faProjectOpenResolveResult> {
+  const ipcPath = parsed.filePath
+  if (ipcPath !== undefined && ipcPath.length > 0) {
+    return resolveExplicitIpcOpenPath(ipcPath)
+  }
+
   const e2ePath = takeNextE2eProjectOpenPath()
   if (e2ePath != null) {
     if (!pathLooksLikeFaProjectFile(e2ePath)) {
@@ -61,30 +82,6 @@ export async function resolveFaProjectOpenTargetPath (
     return {
       filePath: e2ePath,
       ipcExplicitPath: false
-    }
-  }
-
-  const ipcPath = parsed.filePath
-  if (ipcPath !== undefined && ipcPath.length > 0) {
-    if (!pathLooksLikeFaProjectFile(ipcPath)) {
-      return {
-        attemptedFilePath: ipcPath,
-        errorMessage: 'Selected file must be a .faproject file',
-        errorName: 'FileError',
-        ipcExplicitPathFailed: true
-      }
-    }
-    if (!fs.existsSync(ipcPath)) {
-      return {
-        attemptedFilePath: ipcPath,
-        errorMessage: 'Project file does not exist',
-        errorName: 'FileError',
-        ipcExplicitPathFailed: true
-      }
-    }
-    return {
-      filePath: ipcPath,
-      ipcExplicitPath: true
     }
   }
 

@@ -157,81 +157,40 @@
 </template>
 
 <script setup lang="ts">
-import type { I_dialogKeybindSettingsRow } from '../../../../types/I_dialogKeybindSettings'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
-import DialogKeybindSettingsCaptureDialog from 'app/src/components/dialogs/DialogKeybindSettings/DialogKeybindSettingsCaptureDialog.vue'
+
+import DialogKeybindSettingsCaptureDialog from './DialogKeybindSettingsCaptureDialog.vue'
 import ErrorCard from 'app/src/components/elements/ErrorCard/ErrorCard.vue'
-import { dialogKeybindSettingsNoDataSlotShowsFilterError } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsNoDataSlotFilterUi'
-import {
-  registerDialogKeybindSettingsGlobalSuspend,
-  setupDialogKeybindSettingsDialogRouting
-} from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsDialogWiring'
-import { useDialogKeybindSettingsTableChrome } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsTableLayout'
-import { formatDialogKeybindSettingsUserKeybindButtonLabel } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsUserKeybindLabel'
-import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/dialogManagement'
-import { useDialogKeybindSettings } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsState'
-import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
-import { i18n } from 'app/i18n/externalFileLoader'
-import { computed, ref } from 'vue'
+
+import { useDialogKeybindSettingsView } from './scripts/dialogKeybindSettings_manager'
 
 const props = defineProps<{
   directInput?: T_dialogName
 }>()
 
 const {
+  bodySectionRef,
   captureActionName,
   captureError,
   captureErrorMessage,
   captureInfoMessage,
   captureLabel,
   captureOpen,
+  dialogKeybindSettingsTableHeightStyle,
+  dialogModel,
+  documentName,
   filter,
-  initializeForOpen,
+  noDataShowsFilterMiss,
   onCaptureClear,
   onCaptureSet,
   onCloseMain,
   onOpenCapture,
-  onSaveMain,
   pendingChord,
+  saveMain,
   tableColumns,
-  tableRows
-} = useDialogKeybindSettings()
-const dialogModel = ref(false)
-const noDataShowsFilterMiss = computed(() => dialogKeybindSettingsNoDataSlotShowsFilterError(filter.value))
-const documentName = ref<T_dialogName>('KeybindSettings')
-const {
-  bodySectionRef,
-  dialogKeybindSettingsTableHeightStyle
-} = useDialogKeybindSettingsTableChrome(dialogModel)
-
-registerComponentDialogStackGuard(dialogModel)
-const keybindsStore = S_FaKeybinds()
-
-const {
-  formatChord,
-  saveMain
-} = setupDialogKeybindSettingsDialogRouting({
-  dialogModel,
-  documentName,
-  initializeForOpen,
-  keybindsStore,
-  onSaveMain,
-  props
-})
-
-function userKeybindButtonLabel (row: I_dialogKeybindSettingsRow): string {
-  return formatDialogKeybindSettingsUserKeybindButtonLabel(
-    row,
-    {
-      formatChord,
-      t: (key: string) => i18n.global.t(key)
-    }
-  )
-}
-registerDialogKeybindSettingsGlobalSuspend({
-  captureOpen,
-  dialogModel
-})
+  tableRows,
+  userKeybindButtonLabel
+} = useDialogKeybindSettingsView(props)
 </script>
 <style lang="scss" scoped>
 @use '../../../css/quasar.variables.scss' as *;

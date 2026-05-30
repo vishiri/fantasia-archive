@@ -6,7 +6,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, expect, test } from 'vitest'
 
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
-import { wireWindowAppNoteboardDirectInput } from '../wireWindowAppNoteboardDirectInput'
+import { wireWindowAppNoteboardDirectInput } from '../windowAppNoteboard_manager'
 
 let pinia: ReturnType<typeof createPinia>
 

@@ -36,11 +36,15 @@ const navigateToWorkspaceRouteForActiveProjectMock = vi.hoisted(() => {
   return vi.fn()
 })
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => {
-  return {
-    runFaActionAwait: runFaActionAwaitMock
+vi.mock('quasar', () => ({
+  Notify: {
+    create: vi.fn()
   }
-})
+}))
+
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => ({
+  runFaActionAwait: runFaActionAwaitMock
+}))
 
 vi.mock('app/src/stores/S_FaRecentProjects', () => {
   return {
@@ -64,29 +68,28 @@ vi.mock('app/src/stores/S_FaActiveProject', () => {
   }
 })
 
-vi.mock('app/src/scripts/projectManagement/faWelcomeScreenRecentProjectNotify', () => {
+vi.mock('../faWelcomeScreenRecentProjectNotify_manager', () => {
   return {
     notifyWelcomeScreenRecentProjectFileMissing: notifyMissingMock
   }
 })
 
-vi.mock('app/src/scripts/projectManagement/faWelcomeScreenAutoLoadSession', () => {
+vi.mock('../functions/faWelcomeScreenAutoLoadSession', () => {
   return {
     hasWelcomeScreenAutoLoadMruHeadFailed: hasWelcomeScreenAutoLoadMruHeadFailedMock,
     markWelcomeScreenAutoLoadMruHeadFailed: markWelcomeScreenAutoLoadMruHeadFailedMock
   }
 })
 
-vi.mock('app/src/scripts/appInternals/faAppRouterSession', () => {
-  return {
-    navigateToWorkspaceRouteForActiveProject: navigateToWorkspaceRouteForActiveProjectMock
-  }
-})
+vi.mock('app/src/scripts/appInternals/appInternals_manager', () => ({
+  applyFaUserSettingsLanguageSelection: vi.fn(async () => true),
+  navigateToWorkspaceRouteForActiveProject: navigateToWorkspaceRouteForActiveProjectMock
+}))
 
 import {
   openWelcomeScreenAutoLoadProject,
   resolveWelcomeScreenAutoLoadTarget
-} from '../faWelcomeScreenAutoLoadProject'
+} from '../faWelcomeScreenAutoLoadProject_manager'
 
 function assignFaContentBridgeApis (apis: unknown): void {
   vi.stubGlobal('window', {

@@ -3,8 +3,8 @@
 import { ref } from 'vue'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
-import { FaFloatingWindowTitleDragPointerSession } from 'app/src/scripts/floatingWindows/faFloatingWindowTitleDragPointerSession'
-import type { I_FaFloatingWindowFrameLayout } from 'app/src/scripts/floatingWindows/faFloatingWindowFrameLayout'
+import { FaFloatingWindowTitleDragPointerSession } from '../faFloatingWindowTitleDragPointerSession'
+import type { I_FaFloatingWindowFrameLayout } from 'app/types/I_faFloatingWindowFrameLayout'
 
 const testLayout: I_FaFloatingWindowFrameLayout = {
   widthFrac: 0.9,

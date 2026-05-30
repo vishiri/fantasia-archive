@@ -1,13 +1,14 @@
 import { ref } from 'vue'
 import { beforeEach, expect, test, vi } from 'vitest'
 
+import { APP_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogAppSettings/_data/appSettingsOptions'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
+import { updateLocalAppSettingsField } from 'app/src/components/dialogs/DialogAppSettings/scripts/functions/dialogAppSettingsUpdateLocalField'
 import {
   createDialogAppSettingsDialogActions,
-  syncLocalAppSettingsFromStore,
-  updateLocalAppSettingsField,
-  type T_appSettingsFaUserSettingsStoreForSync
-} from 'app/src/components/dialogs/DialogAppSettings/scripts/dialogAppSettingsDialogActions'
+  syncLocalAppSettingsFromStore
+} from 'app/src/components/dialogs/DialogAppSettings/scripts/dialogAppSettings_manager'
+import type { T_appSettingsFaUserSettingsStoreForSync } from 'app/types/I_dialogAppSettings'
 import type { T_appSettingsRenderTree } from 'app/types/I_dialogAppSettings'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
@@ -20,7 +21,7 @@ const { runFaActionAwaitMock } = vi.hoisted(() => ({
   runFaActionAwaitMock: vi.fn(async () => true)
 }))
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => ({
   runFaAction: vi.fn(),
   runFaActionAwait: runFaActionAwaitMock
 }))
@@ -180,14 +181,22 @@ test('updateLocalSetting updates a toggle leaf when the tree contains the key', 
 })
 
 /**
- * updateLocalAppSettingsField
+ * createDialogAppSettingsDialogActions updateLocalSetting
  * No-ops when the local settings ref is still null.
  */
-test('updateLocalAppSettingsField returns early when localSettings is null', () => {
+test('updateLocalSetting returns early when localSettings is null', () => {
   const localSettings = ref<I_faUserSettings | null>(null)
   const appSettingsTree = ref<T_appSettingsRenderTree>({})
+  const actions = createDialogAppSettingsDialogActions({
+    dialogModel: ref(false),
+    documentName: ref(''),
+    localSettings,
+    appSettingsTree,
+    props: {},
+    searchSettingsQuery: ref('')
+  })
 
-  updateLocalAppSettingsField(localSettings, appSettingsTree, 'showDocumentID', true)
+  actions.updateLocalSetting('showDocumentID', true)
 
   expect(localSettings.value).toBe(null)
 })
@@ -203,7 +212,13 @@ test('updateLocalAppSettingsField returns early when settingKey is languageCode'
   })
   const appSettingsTree = ref<T_appSettingsRenderTree>({})
 
-  updateLocalAppSettingsField(localSettings, appSettingsTree, 'languageCode', false)
+  updateLocalAppSettingsField(
+    localSettings.value as I_faUserSettings,
+    appSettingsTree.value,
+    APP_SETTINGS_OPTIONS,
+    'languageCode',
+    false
+  )
 
   expect(localSettings.value?.languageCode).toBe('fr')
 })
@@ -235,7 +250,13 @@ test('updateLocalAppSettingsField writes localSettings and appSettingsTree for s
     }
   })
 
-  updateLocalAppSettingsField(localSettings, appSettingsTree, 'showDocumentID', true)
+  updateLocalAppSettingsField(
+    localSettings.value as I_faUserSettings,
+    appSettingsTree.value,
+    APP_SETTINGS_OPTIONS,
+    'showDocumentID',
+    true
+  )
 
   expect(localSettings.value?.showDocumentID).toBe(true)
   expect(
@@ -254,7 +275,13 @@ test('updateLocalAppSettingsField returns early when appSettingsTree lacks the c
   })
   const appSettingsTree = ref<T_appSettingsRenderTree>({})
 
-  updateLocalAppSettingsField(localSettings, appSettingsTree, 'showDocumentID', true)
+  updateLocalAppSettingsField(
+    localSettings.value as I_faUserSettings,
+    appSettingsTree.value,
+    APP_SETTINGS_OPTIONS,
+    'showDocumentID',
+    true
+  )
 
   expect(localSettings.value?.showDocumentID).toBe(true)
   expect(Object.keys(appSettingsTree.value)).toHaveLength(0)
@@ -275,7 +302,13 @@ test('updateLocalAppSettingsField returns early when appSettingsTree lacks the s
     }
   })
 
-  updateLocalAppSettingsField(localSettings, appSettingsTree, 'showDocumentID', true)
+  updateLocalAppSettingsField(
+    localSettings.value as I_faUserSettings,
+    appSettingsTree.value,
+    APP_SETTINGS_OPTIONS,
+    'showDocumentID',
+    true
+  )
 
   expect(localSettings.value?.showDocumentID).toBe(true)
   expect(

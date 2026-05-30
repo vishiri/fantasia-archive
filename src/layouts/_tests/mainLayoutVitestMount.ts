@@ -7,14 +7,14 @@ import {
   RouterView
 } from 'vue-router'
 
-import MainLayout from '../MainLayout.vue'
+import MainLayout from '../MainLayout/MainLayout.vue'
 
 const mainLayoutVitestLeaf = defineComponent({
   name: 'MainLayoutVitestLeaf',
   template: '<div data-test-locator="mainLayout-vitest-leaf" />'
 })
 
-export type T_mainLayoutVitestInitialPath = '/' | '/home'
+import type { T_mainLayoutVitestInitialPath } from 'app/types/I_vitestMainLayoutMount'
 
 /**
  * Mounts MainLayout behind a real vue-router instance so layout code that calls useRoute() behaves like production.

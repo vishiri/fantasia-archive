@@ -1,7 +1,7 @@
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_APP_STYLING_IPC } from 'app/src-electron/electron-ipc-bridge'
-import { FA_APP_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appStyling/faAppStylingStoreDefaults'
+import { FA_APP_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appStyling/appStyling_managerDefaults'
 
 const {
   cleanupFaAppStylingMock,
@@ -23,7 +23,7 @@ vi.mock('electron', () => {
   }
 })
 
-vi.mock('app/src-electron/mainScripts/appStyling/faAppStylingStore', () => {
+vi.mock('app/src-electron/mainScripts/appStyling/appStyling_manager', () => {
   return {
     cleanupFaAppStyling: cleanupFaAppStylingMock,
     getFaAppStyling: getFaAppStylingMock

@@ -1,16 +1,6 @@
-import type { I_socialContactButtonSet } from 'app/types/I_socialContactButtons'
+import type { T_socialContactButtonStaticConfig } from 'app/types/I_socialContactButtons'
 
-/**
- * Static social-button fields (URLs, icons, layout). Labels and titles come from i18n at render time.
- */
-export type I_socialContactButtonStaticConfig = Omit<
-  I_socialContactButtonSet[keyof I_socialContactButtonSet],
-  'label' | 'title'
->
-
-export const socialContactButtonStaticConfig: {
-  [K in keyof I_socialContactButtonSet]: I_socialContactButtonStaticConfig
-} = {
+export const socialContactButtonStaticConfig: T_socialContactButtonStaticConfig = {
   buttonPatreon: {
     url: 'https://www.patreon.com/c/vishiri',
     icon: 'patreon_logo.png',

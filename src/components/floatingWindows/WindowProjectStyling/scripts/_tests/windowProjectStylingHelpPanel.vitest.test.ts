@@ -12,10 +12,10 @@ afterEach(() => {
 })
 
 test('Test that FA custom property names refresh after the help menu opens', async () => {
-  const faTheme = await import('app/src/scripts/faTheme/faThemeCustomPropertyNames')
+  const faTheme = await import('app/src/scripts/faTheme/faTheme_manager')
   const spy = vi.spyOn(faTheme, 'getFaColorCustomPropertyNamesForHelpPanel').mockReturnValue(['--a'])
 
-  const { useWindowProjectStylingHelpPanel } = await import('../windowProjectStylingHelpPanel')
+  const { useWindowProjectStylingHelpPanel } = await import('../windowProjectStyling_manager')
   const open = ref(false)
 
   const { faThemeCustomPropertyNames } = useWindowProjectStylingHelpPanel(open)
@@ -32,12 +32,12 @@ test('Test that FA custom property names refresh after the help menu opens', asy
 })
 
 test('useWindowProjectStylingHelpPanel leaves FA palette scanners idle unless the overlay menu reports open=true', async () => {
-  const faTheme = await import('app/src/scripts/faTheme/faThemeCustomPropertyNames')
+  const faTheme = await import('app/src/scripts/faTheme/faTheme_manager')
   const spy = vi.spyOn(faTheme, 'getFaColorCustomPropertyNamesForHelpPanel').mockReturnValue([
     '--palette'
   ])
 
-  const { useWindowProjectStylingHelpPanel } = await import('../windowProjectStylingHelpPanel')
+  const { useWindowProjectStylingHelpPanel } = await import('../windowProjectStyling_manager')
 
   const open = ref<boolean | undefined>(undefined)
   useWindowProjectStylingHelpPanel(open)

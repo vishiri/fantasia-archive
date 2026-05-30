@@ -26,7 +26,7 @@ vi.mock('quasar', async (importOriginal) => {
   }
 })
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => ({
   runFaAction: runFaActionMock,
   runFaActionAwait: runFaActionAwaitMock
 }))
@@ -35,33 +35,27 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { computed, defineComponent, nextTick, reactive, ref } from 'vue'
 import { i18n } from 'app/i18n/externalFileLoader'
-import { createDialogKeybindSettingsCapture } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsCapture'
+import {
+  buildDialogKeybindSettingsRows,
+  buildDialogKeybindSettingsTableColumns
+} from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsTableBuild_manager'
 import {
   bindOnCaptureClear,
   bindOnCaptureSet,
   bindOnOpenCapture,
-  makeDialogKeybindCaptureKeydownHandler
-} from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsCaptureHandlers'
-import {
-  restorePendingChordAndLabelFromBaseline,
-  runDialogKeybindCaptureKeydown
-} from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsCaptureKeydown'
-import { registerDialogKeybindCaptureOpenWatch } from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsCaptureInfrastructure'
-import {
-  registerDialogKeybindSettingsGlobalSuspend,
-  runDialogKeybindSettingsOpen,
-  setupDialogKeybindSettingsDialogRouting
-} from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsDialogWiring'
-import {
+  createDialogKeybindSettingsCapture,
   createDialogKeybindSettingsSync,
+  createDialogKeybindSettingsTableState,
+  makeDialogKeybindCaptureKeydownHandler,
+  registerDialogKeybindCaptureOpenWatch,
+  registerDialogKeybindSettingsGlobalSuspend,
+  restorePendingChordAndLabelFromBaseline,
+  runDialogKeybindCaptureKeydown,
+  runDialogKeybindSettingsOpen,
+  setupDialogKeybindSettingsDialogRouting,
   useDialogKeybindSettings
-} from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsState'
-import {
-  buildDialogKeybindSettingsRows,
-  buildDialogKeybindSettingsTableColumns,
-  createDialogKeybindSettingsTableState
-} from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettingsTable'
-import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
+} from 'app/src/components/dialogs/DialogKeybindSettings/scripts/dialogKeybindSettings_manager'
+import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/keybinds_managerDefaults'
 import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import type { I_faChordSerialized, I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'

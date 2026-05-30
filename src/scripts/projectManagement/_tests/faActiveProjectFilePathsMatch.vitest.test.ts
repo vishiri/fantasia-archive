@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { faActiveProjectFilePathsMatch } from 'app/src/scripts/projectManagement/faActiveProjectFilePathsMatch'
+import { faActiveProjectFilePathsMatch } from 'app/src/scripts/projectManagement/projectManagement_manager'
 
 /**
  * faActiveProjectFilePathsMatch

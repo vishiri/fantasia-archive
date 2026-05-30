@@ -8,7 +8,9 @@ import { expect, test, vi } from 'vitest'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 
 import DialogAppSettings from '../DialogAppSettings.vue'
-import { buildAppSettingsRenderTree } from '../scripts/dialogAppSettingsTree'
+import { APP_SETTINGS_OPTIONS } from '../_data/appSettingsOptions'
+import { buildAppSettingsRenderTree } from '../scripts/functions/dialogAppSettingsTreeBuild'
+import { i18n } from 'app/i18n/externalFileLoader'
 
 const SEARCH_DEBOUNCE_MS = 300
 
@@ -385,7 +387,14 @@ test('Test that DialogAppSettings updates selected category tab from QTabs emit'
 
   await flushPromises()
 
-  const keys = Object.keys(buildAppSettingsRenderTree({ ...FA_USER_SETTINGS_DEFAULTS }))
+  const keys = Object.keys(buildAppSettingsRenderTree(
+    {
+      t: (key: string) => i18n.global.t(key),
+      te: (key: string) => i18n.global.te(key)
+    },
+    APP_SETTINGS_OPTIONS,
+    { ...FA_USER_SETTINGS_DEFAULTS }
+  ))
   const nextTab = keys.length > 1 ? keys[1] : keys[0]
   const tabs = w.findComponent({ name: 'QTabs' })
   await tabs.vm.$emit('update:modelValue', nextTab)

@@ -5,7 +5,7 @@ import { launchFaPlaywrightComponentHarnessWindow } from 'app/helpers/playwright
 import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import appStylingMessages from 'app/i18n/en-US/floatingWindows/L_appStyling'
-import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/faQuasarDialogStandardTransition'
+import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/functions/faQuasarDialogStandardTransition'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 
 /**

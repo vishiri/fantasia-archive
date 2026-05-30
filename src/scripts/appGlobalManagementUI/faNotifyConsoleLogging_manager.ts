@@ -1,0 +1,17 @@
+import { createFaNotifyConsoleLogging } from './functions/createFaNotifyConsoleLogging'
+
+const faNotifyConsoleLoggingApi = createFaNotifyConsoleLogging()
+
+export const stripFaSkipFlagFromQuasarNotifyOpts =
+  faNotifyConsoleLoggingApi.stripFaSkipFlagFromQuasarNotifyOpts
+
+export const shouldMirrorFaNotifyToConsole = faNotifyConsoleLoggingApi.shouldMirrorFaNotifyToConsole
+
+export const resolveFaNotifyConsoleLogFn = faNotifyConsoleLoggingApi.resolveFaNotifyConsoleLogFn
+
+export const buildFaNotifyConsoleMirrorPayload =
+  faNotifyConsoleLoggingApi.buildFaNotifyConsoleMirrorPayload
+
+export const emitFaNotifyConsoleMirror = faNotifyConsoleLoggingApi.emitFaNotifyConsoleMirror
+
+export const installFaNotifyConsoleLogging = faNotifyConsoleLoggingApi.installFaNotifyConsoleLogging

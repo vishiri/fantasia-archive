@@ -4,7 +4,7 @@ import { expect, test } from 'vitest'
 
 import type { I_faAppConfigImportPartsUi } from 'app/types/I_faAppConfigDomain'
 
-import { registerImportExportApplyCheckboxSync } from '../dialogImportExportAppConfigImportApplySync'
+import { registerImportExportApplyCheckboxSync } from '../dialogImportExportAppConfig_manager'
 
 test('registerImportExportApplyCheckboxSync sets apply flags from part availability', async () => {
   const importApplyKeybinds = ref(true)

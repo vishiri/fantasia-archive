@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
 
 import DialogProjectSettingsPanelsColumn from '../DialogProjectSettingsPanelsColumn.vue'
-import { FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB } from '../scripts/dialogProjectSettingsConstants'
+import { FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB } from '../scripts/functions/dialogProjectSettingsDialogInput'
 
 /**
  * DialogProjectSettingsPanelsColumn

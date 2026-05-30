@@ -1,26 +1,16 @@
 import type { ElectronApplication, Page } from 'playwright'
 
+import type { I_faLaunchFaPlaywrightComponentHarnessWindowOptions } from 'app/types/I_faPlaywrightComponentHarness'
+import type { T_faPlaywrightDismissStartupTips } from 'app/types/I_faPlaywrightElectronHarness'
 import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
-import type {
-  IFaLaunchFaPlaywrightElectronSerialSuiteWindowOptions,
-  TFaPlaywrightDismissStartupTips
-} from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleLaunch'
 import { launchFaPlaywrightElectronSerialSuiteWindow } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleLaunch'
 
-type THarnessDismissTips = Exclude<TFaPlaywrightDismissStartupTips, 'auto'> | 'auto'
-
-export type IFaLaunchFaPlaywrightComponentHarnessWindowOptions =
-  Omit<
-  IFaLaunchFaPlaywrightElectronSerialSuiteWindowOptions,
-  'readiness' | 'renderDelayMs' | 'dismissStartupTips'
-  > & {
-    dismissStartupTips?: THarnessDismissTips
-    renderDelayMs?: number
-  }
+type T_faPlaywrightComponentHarnessDismissTips =
+  Exclude<T_faPlaywrightDismissStartupTips, 'auto'> | 'auto'
 
 function resolveComponentDismiss (
-  dismiss?: THarnessDismissTips
-): TFaPlaywrightDismissStartupTips {
+  dismiss?: T_faPlaywrightComponentHarnessDismissTips
+): T_faPlaywrightDismissStartupTips {
   if (dismiss === undefined) {
     return false
   }
@@ -34,7 +24,7 @@ function resolveComponentDismiss (
  * Opens the component-testing shell with shared serial-suite defaults ('readiness': 'component').
  */
 export async function launchFaPlaywrightComponentHarnessWindow (
-  options: IFaLaunchFaPlaywrightComponentHarnessWindowOptions
+  options: I_faLaunchFaPlaywrightComponentHarnessWindowOptions
 ): Promise<{
   electronApp: ElectronApplication
   appWindow: Page

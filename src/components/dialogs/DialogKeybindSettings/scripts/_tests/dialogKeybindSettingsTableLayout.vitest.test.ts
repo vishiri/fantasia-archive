@@ -17,7 +17,7 @@ import {
   parseCssLengthPx,
   readVerticalPaddingPx,
   useDialogKeybindSettingsTableLayout
-} from '../dialogKeybindSettingsTableLayout'
+} from '../dialogKeybindSettings_manager'
 
 beforeEach(() => {
   vi.restoreAllMocks()

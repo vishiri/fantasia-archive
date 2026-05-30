@@ -4,12 +4,12 @@ const { runFaActionAwaitMock } = vi.hoisted(() => ({
   runFaActionAwaitMock: vi.fn(async () => true)
 }))
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => ({
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => ({
   runFaAction: vi.fn(),
   runFaActionAwait: runFaActionAwaitMock
 }))
 
-import { useGlobalLanguageSelectorSpellcheckRefresh } from '../useGlobalLanguageSelectorSpellcheckRefresh'
+import { useGlobalLanguageSelectorSpellcheckRefresh } from '../globalLanguageSelector_manager'
 
 beforeEach(() => {
   runFaActionAwaitMock.mockReset()

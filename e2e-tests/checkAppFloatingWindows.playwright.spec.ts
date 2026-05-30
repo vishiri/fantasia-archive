@@ -12,7 +12,7 @@ import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightH
 import toolsMenuMessages from 'app/i18n/en-US/components/globals/AppControlMenus/L_tools'
 import appStylingMessages from 'app/i18n/en-US/floatingWindows/L_appStyling'
 import noteboardMessages from 'app/i18n/en-US/floatingWindows/L_appNoteboard'
-import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/faQuasarDialogStandardTransition'
+import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/functions/faQuasarDialogStandardTransition'
 
 /**
  * Extra env settings to trigger E2E testing via Playwright

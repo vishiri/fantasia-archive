@@ -15,7 +15,7 @@ vi.mock('electron', () => {
 })
 
 import { FA_KEYBINDS_IPC } from 'app/src-electron/electron-ipc-bridge'
-import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/faKeybindsStoreDefaults'
+import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/keybinds_managerDefaults'
 import type { I_faKeybindsSnapshot } from 'app/types/I_faKeybindsDomain'
 
 import { faKeybindsAPI } from '../faKeybindsAPI'

@@ -17,7 +17,7 @@ const { resolveStoreMock } = vi.hoisted(() => ({
   resolveStoreMock: vi.fn<() => unknown>(() => null)
 }))
 
-vi.mock('../faActionManagerStoreBridge', () => ({
+vi.mock('../faActionManagerStoreBridge_manager', () => ({
   resolveFaActionManagerStore: resolveStoreMock
 }))
 
@@ -26,9 +26,9 @@ import {
   buildFaActionPayloadPreview,
   normalizeFaActionError,
   reportFaActionFailure
-} from '../faActionManagerErrorReporting'
+} from '../faActionManagerErrorReporting_manager'
 import type { I_faActionQueueEntry } from 'app/types/I_faActionManagerDomain'
-import { FaProjectOpenFailedError } from '../faProjectOpenFailedError'
+import { FaProjectOpenFailedError } from '../functions/faProjectOpenFailedError'
 
 beforeEach(() => {
   notifyCreateMock.mockReset()

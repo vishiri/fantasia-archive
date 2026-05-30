@@ -30,11 +30,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-
 import type { I_socialContactButton } from 'app/types/I_socialContactButtons'
 
-import { resolveVitePublicAssetPath } from 'app/src/scripts/appInternals/rendererAppInternals'
+import { useSocialContactSingleButton } from './scripts/socialContactSingleButton_manager'
 
 /**
  * All component props
@@ -46,31 +44,12 @@ const props = defineProps<{
   dataInput: I_socialContactButton
 }>()
 
-/**
- * Data input for the component (Playwright component mode passes 'dataInput' via 'COMPONENT_PROPS'.)
- */
-const buttonData = computed(() => props.dataInput)
-
-const showButtonLabel = computed((): boolean => {
-  return props.dataInput.label.trim().length > 0
-})
-
-const imageAltText = computed((): string => {
-  const label = props.dataInput.label.trim()
-  if (label.length > 0) {
-    return `${label} icon`
-  }
-  return props.dataInput.title
-})
-
-/**
- * Public-folder assets (Vite public/ and Storybook staticDirs) must be rooted with BASE_URL so paths resolve in the Storybook iframe and when the app base path is customized.
- */
-const iconSrc = computed(() => {
-  return resolveVitePublicAssetPath(
-    `images/socialContactButtons/${props.dataInput.icon}`
-  )
-})
+const {
+  buttonData,
+  iconSrc,
+  imageAltText,
+  showButtonLabel
+} = useSocialContactSingleButton(props)
 
 </script>
 

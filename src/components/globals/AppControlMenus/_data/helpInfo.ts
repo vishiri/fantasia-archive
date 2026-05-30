@@ -6,7 +6,7 @@ import {
   faMenuItem,
   faMenuSeparator
 } from 'app/src/components/globals/AppControlMenus/_data/menuDataHelpers'
-import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun'
+import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
 
 function buildHelpInfoMenuData (): I_appMenuItem[] {
   return [

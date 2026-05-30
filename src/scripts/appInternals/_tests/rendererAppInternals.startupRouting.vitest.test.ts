@@ -1,39 +1,55 @@
 import { beforeEach, expect, test, vi } from 'vitest'
 
-const { runFaActionMock, tryRunSkipWelcomeScreenOnLaunchMock, markWelcomeScreenAutoLoadBootAttemptedMock } =
+const {
+  runFaActionMock,
+  tryRunSkipWelcomeScreenOnLaunchMock,
+  markWelcomeScreenAutoLoadBootAttemptedMock,
+  markWelcomeScreenAutoLoadBootCompletionMock
+} =
   vi.hoisted(() => {
     return {
       markWelcomeScreenAutoLoadBootAttemptedMock: vi.fn(),
+      markWelcomeScreenAutoLoadBootCompletionMock: vi.fn(),
       runFaActionMock: vi.fn(),
       tryRunSkipWelcomeScreenOnLaunchMock: vi.fn()
     }
   })
 
-vi.mock('app/src/scripts/appInternals/faAppStartupSkipWelcomeScreen', () => {
+vi.mock('../faAppStartupSkipWelcomeScreen_manager', () => {
   return {
     tryRunSkipWelcomeScreenOnLaunch: tryRunSkipWelcomeScreenOnLaunchMock
   }
 })
 
-vi.mock('app/src/scripts/projectManagement/faWelcomeScreenAutoLoadSession', () => {
+vi.mock('app/src/scripts/projectManagement/projectManagement_manager', () => {
   return {
-    markWelcomeScreenAutoLoadBootAttempted: markWelcomeScreenAutoLoadBootAttemptedMock
+    markWelcomeScreenAutoLoadBootAttempted: markWelcomeScreenAutoLoadBootAttemptedMock,
+    markWelcomeScreenAutoLoadBootCompletion: markWelcomeScreenAutoLoadBootCompletionMock
   }
 })
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun', () => {
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => {
   return {
     runFaAction: runFaActionMock
   }
 })
 
-import { determineTestingComponentName, runAppStartupRouting } from '../rendererAppInternals'
+vi.mock('app/src/stores/S_FaUserSettings', () => {
+  return {
+    S_FaUserSettings: () => ({
+      refreshSettings: vi.fn(async () => undefined)
+    })
+  }
+})
+
+import { determineTestingComponentName, runAppStartupRouting } from '../rendererAppInternals_manager'
 
 beforeEach(() => {
   runFaActionMock.mockReset()
   tryRunSkipWelcomeScreenOnLaunchMock.mockReset()
   tryRunSkipWelcomeScreenOnLaunchMock.mockResolvedValue(false)
   markWelcomeScreenAutoLoadBootAttemptedMock.mockReset()
+  markWelcomeScreenAutoLoadBootCompletionMock.mockReset()
 })
 
 /**
@@ -92,9 +108,9 @@ test('Test that runAppStartupRouting pushes component testing route when request
 
 /**
  * runAppStartupRouting
- * Skips welcome route and tips when skipWelcomeScreen launch succeeds.
+ * Pushes welcome first, then skips tips when skipWelcomeScreen launch succeeds.
  */
-test('Test that runAppStartupRouting returns early when skip welcome screen succeeds', async () => {
+test('Test that runAppStartupRouting pushes welcome before skip welcome screen succeeds', async () => {
   const routerPushMock = vi.fn()
   tryRunSkipWelcomeScreenOnLaunchMock.mockResolvedValueOnce(true)
 
@@ -103,18 +119,23 @@ test('Test that runAppStartupRouting returns early when skip welcome screen succ
     undefined,
     undefined
   )
+  await vi.waitFor(() => {
+    expect(tryRunSkipWelcomeScreenOnLaunchMock).toHaveBeenCalled()
+  })
 
-  expect(tryRunSkipWelcomeScreenOnLaunchMock).toHaveBeenCalled()
   expect(markWelcomeScreenAutoLoadBootAttemptedMock).toHaveBeenCalled()
-  expect(routerPushMock).not.toHaveBeenCalled()
+  expect(routerPushMock).toHaveBeenCalledWith({ path: '/' })
   expect(runFaActionMock).not.toHaveBeenCalled()
+  await vi.waitFor(() => {
+    expect(markWelcomeScreenAutoLoadBootCompletionMock).toHaveBeenCalled()
+  })
 })
 
 /**
  * runAppStartupRouting
  * Test default route and tip side effect.
  */
-test('Test that runAppStartupRouting defaults to home route and triggers trivia tip', async () => {
+test('Test that runAppStartupRouting defaults to welcome route and triggers trivia tip', async () => {
   const routerPushMock = vi.fn()
 
   await runAppStartupRouting(
@@ -122,9 +143,11 @@ test('Test that runAppStartupRouting defaults to home route and triggers trivia 
     undefined,
     undefined
   )
+  await vi.waitFor(() => {
+    expect(runFaActionMock).toHaveBeenCalledWith('showStartupTipsNotification', undefined)
+  })
 
   expect(routerPushMock).toHaveBeenCalledWith({ path: '/' })
-  expect(runFaActionMock).toHaveBeenCalledWith('showStartupTipsNotification', undefined)
 })
 
 /**
@@ -139,7 +162,9 @@ test('Test that runAppStartupRouting uses home route when component mode has no 
     'components',
     ''
   )
+  await vi.waitFor(() => {
+    expect(runFaActionMock).toHaveBeenCalledWith('showStartupTipsNotification', undefined)
+  })
 
   expect(routerPushMock).toHaveBeenCalledWith({ path: '/' })
-  expect(runFaActionMock).toHaveBeenCalledWith('showStartupTipsNotification', undefined)
 })

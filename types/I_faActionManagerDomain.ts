@@ -199,3 +199,17 @@ export interface I_faActionHistoryEntry {
   finishedAt?: number
   errorMessage?: string
 }
+
+/** Partial status fields applied to an existing action history row. */
+export interface I_faActionHistoryEntryStatusPatch {
+  errorMessage?: string
+  finishedAt?: number
+  payloadPreview?: string
+  startedAt?: number
+  status?: T_faActionHistoryStatus
+}
+
+/** Terminal outcome recorded when an action history row completes. */
+export type T_faActionHistoryOutcome =
+  | { kind: 'success' }
+  | { kind: 'failed', errorMessage: string }

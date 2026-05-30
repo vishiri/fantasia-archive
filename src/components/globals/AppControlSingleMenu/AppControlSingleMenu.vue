@@ -183,71 +183,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import type { I_appMenuList } from 'app/types/I_appMenusDataList'
 
-import { createAppControlSingleMenuSubmenuHover } from 'app/src/components/globals/AppControlSingleMenu/scripts/appControlSingleMenuSubmenuHover'
-import { appControlShouldShowSeparatorAltBeforeItem } from 'app/src/components/globals/AppControlSingleMenu/scripts/appControlSingleMenuSeparatorAlt'
-import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/faKeybindsChordUiFormatting'
-import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
-import type { I_appMenuItem, I_appMenuList } from 'app/types/I_appMenusDataList'
-import type { T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
+import { useAppControlSingleMenu } from './scripts/appControlSingleMenu_manager'
 
-const faKeybindsStore = S_FaKeybinds()
-
-const {
-  onRootMenuHide,
-  onSubmenuActivatorEnter,
-  onSubmenuActivatorLeave,
-  onSubmenuContentEnter,
-  onSubmenuContentLeave,
-  onSubmenuModelUpdate,
-  openSubmenuRowIndex
-} = createAppControlSingleMenuSubmenuHover()
-
-/**
- * Hover opens nested QMenus; no-op rows without a submenu.
- */
-function onMenuRowMouseEnter (menuItem: I_appMenuItem, itemIndex: number): void {
-  if (menuItem.submenu === undefined) {
-    return
-  }
-  onSubmenuActivatorEnter(itemIndex)
-}
-
-/**
- * Leaving a submenu row starts the delayed hide unless the pointer entered the submenu panel.
- */
-function onMenuRowMouseLeave (menuItem: I_appMenuItem): void {
-  if (menuItem.submenu === undefined) {
-    return
-  }
-  onSubmenuActivatorLeave()
-}
-
-/**
- * Shortcut hint for a menu row when `keybindCommandId` is set and keybind snapshot is loaded.
- */
-function keybindHintLabel (commandId: T_faKeybindCommandId | undefined): string | null {
-  return formatFaKeybindCommandLabelFromSnapshot({
-    commandId,
-    snapshot: faKeybindsStore.snapshot
-  })
-}
-
-/**
- * Optional subtitle line (for example a path); trimmed empty strings hide the row.
- */
-function trimmedSecondaryHintText (hint: string | undefined): string | null {
-  const trimmed = hint?.trim()
-  if (trimmed === undefined || trimmed.length === 0) {
-    return null
-  }
-  return trimmed
-}
-
-/**
- * All component props
- */
 const props = defineProps<{
   /**
    * Data input for the component
@@ -255,30 +194,21 @@ const props = defineProps<{
   dataInput: I_appMenuList
 }>()
 
-/**
- * Data input for the component (Playwright component mode passes 'dataInput' via 'COMPONENT_PROPS'.)
- */
-const componentData = computed(() => props.dataInput)
-
-/**
- * Determines if the input has "proper" data in it
- * Checks for:
- * - Title
- * - Overall data feed
- */
-const hasProperDataInput = computed(() => {
-  return !!(componentData.value.title && componentData.value.data)
-})
-
-/**
- * Menu title from the prop (recomputed when dataInput changes, e.g. i18n locale).
- */
-const menuTitle = computed(() => componentData.value.title)
-
-/**
- * Menu data content from the prop (recomputed when dataInput changes).
- */
-const menuData = computed(() => componentData.value.data)
+const {
+  appControlShouldShowSeparatorAltBeforeItem,
+  hasProperDataInput,
+  keybindHintLabel,
+  menuData,
+  menuTitle,
+  onMenuRowMouseEnter,
+  onMenuRowMouseLeave,
+  onRootMenuHide,
+  onSubmenuContentEnter,
+  onSubmenuContentLeave,
+  onSubmenuModelUpdate,
+  openSubmenuRowIndex,
+  trimmedSecondaryHintText
+} = useAppControlSingleMenu(props)
 
 </script>
 

@@ -21,15 +21,15 @@ vi.mock('app/i18n/externalFileLoader', () => ({
 }))
 
 import { S_FaActionManager } from 'app/src/stores/S_FaActionManager'
-import { recordHistoryEnqueued } from '../faActionManagerHistory'
-import * as storeBridgeModule from '../faActionManagerStoreBridge'
+import { recordHistoryEnqueued } from '../faActionManagerHistory_manager'
+import * as storeBridgeModule from '../faActionManagerStoreBridge_manager'
 import {
   _resetFaActionSyncQueueForTests,
   awaitSyncQueueDrain,
   enqueueSyncAction,
   FA_ACTION_SYNC_QUEUE_MAX,
   FA_ACTION_SYNC_TIMEOUT_MS
-} from '../faActionManagerSyncQueue'
+} from '../faActionManagerSyncQueue_manager'
 
 let consoleErrorSpy: ReturnType<typeof vi.spyOn>
 
@@ -67,6 +67,19 @@ function buildDef (id: T_faActionId, handler: () => void | Promise<void>, dedup 
   }
   return definition
 }
+
+/**
+ * faActionManagerSyncQueue_manager
+ * The manager resolveFaActionManagerStore wrapper delegates to the store bridge.
+ */
+test('Test that enqueueSyncAction resolves the store through the manager bridge', () => {
+  const resolveSpy = vi.spyOn(storeBridgeModule, 'resolveFaActionManagerStore')
+  const def = buildDef('closeApp', async () => undefined)
+  const lookup = (): I_faActionDefinition<T_faActionId> | undefined => def
+  expect(enqueueSyncAction(buildEntry('closeApp'), def, lookup)).toBe(true)
+  expect(resolveSpy).toHaveBeenCalled()
+  resolveSpy.mockRestore()
+})
 
 /**
  * processNextSyncAction

@@ -2,7 +2,7 @@
 import { nextTick } from 'vue'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
-import { useImportExportAppConfigDialogModel } from '../dialogImportExportAppConfigDialogModel'
+import { useImportExportAppConfigDialogModel } from '../dialogImportExportAppConfig_manager'
 
 const disposeImportSessionMock = vi.fn()
 let prevApis: typeof window.faContentBridgeAPIs | undefined

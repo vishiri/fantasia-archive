@@ -3,7 +3,7 @@ import { expect, test } from 'vitest'
 import {
   globalLanguageSelectorShouldNotifyLanguageApplied,
   resolveGlobalLanguageSelectorAppliedPair
-} from '../globalLanguageSelectorLanguageCodeWatchGate'
+} from '../functions/globalLanguageSelectorLanguageCodeWatchGate'
 
 test('Test resolvePair returns null for undefined transitions', () => {
   expect(resolveGlobalLanguageSelectorAppliedPair(undefined, 'en-US')).toBeNull()

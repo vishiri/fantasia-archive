@@ -6,7 +6,7 @@ import {
 } from 'vitest'
 import { Result } from 'neverthrow'
 
-import { getMonacoKeybindHelpItems } from '../windowAppStylingKeybindHelp'
+import { getMonacoKeybindHelpItems } from '../windowAppStyling_manager'
 
 const { faKeybindsSnapshotRef, faKeybindsStoreThrow } = vi.hoisted(() => {
   return {

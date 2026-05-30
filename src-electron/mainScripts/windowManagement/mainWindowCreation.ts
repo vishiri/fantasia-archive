@@ -5,7 +5,7 @@ import { registerFaProjectOsOpenMainWindow } from 'app/src-electron/mainScripts/
 import { applyFaSpellCheckerLanguagesToSession } from 'app/src-electron/mainScripts/windowManagement/faSpellCheckerSession'
 import { registerFaMainWindowWebContentsSessionReset } from 'app/src-electron/mainScripts/windowManagement/faMainWindowWebContentsSessionReset'
 import { setupSpellChecker } from 'app/src-electron/mainScripts/windowManagement/spellChecker'
-import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettingsStore'
+import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettings_manager'
 
 export let appWindow: BrowserWindow | undefined
 

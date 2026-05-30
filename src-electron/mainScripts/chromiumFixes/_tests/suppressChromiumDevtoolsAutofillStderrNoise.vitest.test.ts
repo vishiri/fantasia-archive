@@ -3,7 +3,7 @@ import { Buffer } from 'node:buffer'
 import { Result } from 'neverthrow'
 import { expect, test, vi } from 'vitest'
 
-import { suppressChromiumDevtoolsAutofillStderrNoise } from '../suppressChromiumDevtoolsAutofillStderrNoise'
+import { suppressChromiumDevtoolsAutofillStderrNoise } from '../chromiumFixes_manager'
 
 function withStderrWriteRestoredAfter (realWrite: typeof process.stderr.write, fn: () => void): void {
   const body = Result.fromThrowable(fn, (e): unknown => e)()

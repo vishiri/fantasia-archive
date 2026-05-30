@@ -28,7 +28,7 @@ vi.mock('app/i18n/externalFileLoader', () => ({
   }
 }))
 
-import { copyDialogActionMonitorRowToClipboard } from '../dialogActionMonitorRowClipboard'
+import { copyDialogActionMonitorRowToClipboard } from '../dialogActionMonitor_manager'
 
 const buildRow = (overrides: Partial<I_faActionHistoryEntry> = {}): I_faActionHistoryEntry => ({
   enqueuedAt: 1_700_000_000_000,
