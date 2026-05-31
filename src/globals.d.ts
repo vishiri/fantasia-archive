@@ -4,6 +4,7 @@ import type {
   I_faDevToolsControl,
   I_faExternalLinksManagerAPI,
   I_faWindowControlAPI,
+  I_faChromiumCtrlShiftShortcutAPI,
   I_faProjectFailsafeAPI,
   I_faProjectOsOpenAPI
 } from 'app/types/I_faElectronRendererBridgeAPIs'
@@ -14,9 +15,15 @@ import type { I_faAppConfigAPI } from 'app/types/I_faAppConfigDomain'
 import type { I_faUserSettingsAPI } from 'app/types/I_faUserSettingsDomain'
 import type { I_faProjectManagementAPI } from 'app/types/I_faProjectManagementDomain'
 import type { I_faActiveProject } from 'app/types/I_faActiveProjectDomain'
+import type { I_faComponentTestingStoreSeed } from 'app/types/I_faComponentTestingStoreSeed'
 
 declare global{
   interface Window {
+    /**
+     * Component-testing harness: patches Pinia stores from Playwright (installed when TEST_ENV is 'components').
+     */
+    __faComponentTestingPatchStores?: (seed: I_faComponentTestingStoreSeed) => void
+
     /**
      * E2E-only: Pinia active project snapshot for Playwright page.evaluate (installed when TEST_ENV is 'e2e').
      */
@@ -32,6 +39,7 @@ declare global{
       faAppStyling: I_faAppStylingAPI,
       faUserSettings: I_faUserSettingsAPI,
       faAppConfig: I_faAppConfigAPI,
+      faChromiumCtrlShiftShortcut: I_faChromiumCtrlShiftShortcutAPI,
       faProjectFailsafe: I_faProjectFailsafeAPI,
       faProjectOsOpen: I_faProjectOsOpenAPI,
       projectManagement: I_faProjectManagementAPI
