@@ -36,7 +36,6 @@ type T_createMainLayoutDeps = {
   ensureFaChromiumForwardedKeyChordListener: () => void
   createMainLayoutDrawerRail: (
     drawerDeps: {
-      FA_APP_SHELL_DRAWER_TRANSITION_MS: number
       computed: <T>(getter: () => T) => I_ref<T>
       ref: <T>(value: T) => I_ref<T>
       watch: (
@@ -81,8 +80,6 @@ function useMainLayout (
     isFantasiaStorybookCanvas: () => boolean
     resolveMainLayoutOutletKeyFromRoute: (childRoute: { path?: string } | undefined) => string
     showWorkspaceDrawer: I_ref<boolean>
-    storybookDrawerBehavior: I_ref<'desktop' | undefined>
-    storybookDrawerOverlay: I_ref<false | undefined>
   } {
   const route = deps.useRoute()
   const mainLayoutRoutePath = deps.computed((): string => route?.path ?? '/')
@@ -92,12 +89,6 @@ function useMainLayout (
   const { appShellLayoutQuasarView } = useAppShellLayoutDrawerRail(showWorkspaceDrawer)
   const appShellLayoutRouteClass = deps.computed((): Record<string, boolean> => {
     return deps.resolveMainLayoutRouteClass(showWorkspaceDrawer.value)
-  })
-  const storybookDrawerBehavior = deps.computed((): 'desktop' | undefined => {
-    return deps.isFantasiaStorybookCanvas() ? 'desktop' : undefined
-  })
-  const storybookDrawerOverlay = deps.computed((): false | undefined => {
-    return deps.isFantasiaStorybookCanvas() ? false : undefined
   })
   let faKeybindKeydownHandler: ((event: KeyboardEvent) => void) | undefined
 
@@ -146,9 +137,7 @@ function useMainLayout (
     appShellLayoutRouteClass,
     isFantasiaStorybookCanvas: deps.isFantasiaStorybookCanvas,
     resolveMainLayoutOutletKeyFromRoute: (childRoute) => resolveMainLayoutOutletKeyFromRoute(deps, childRoute),
-    showWorkspaceDrawer,
-    storybookDrawerBehavior,
-    storybookDrawerOverlay
+    showWorkspaceDrawer
   }
 }
 
@@ -157,7 +146,6 @@ export function createMainLayout (deps: T_createMainLayoutDeps): {
   useMainLayout: () => ReturnType<typeof useMainLayout>
 } {
   const useAppShellLayoutDrawerRail = deps.createMainLayoutDrawerRail({
-    FA_APP_SHELL_DRAWER_TRANSITION_MS: deps.FA_APP_SHELL_DRAWER_TRANSITION_MS,
     computed: deps.computed,
     ref: deps.ref,
     watch: deps.watch as (

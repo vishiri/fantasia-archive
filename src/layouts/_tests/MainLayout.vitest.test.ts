@@ -119,11 +119,11 @@ test('Test that MainLayout hides GlobalLanguageSelector when isFantasiaStorybook
 })
 
 /**
- * MainLayout / Storybook canvas
- * Embeds the workspace drawer without overlay so iframe previews avoid modal drag chrome.
+ * MainLayout / workspace drawer
+ * Desktop drawer stays in the layout flow (no overlay band) at every viewport width.
  */
-test('Test that MainLayout uses desktop non-overlay drawer on Storybook canvas workspace route', async () => {
-  setFantasiaStorybookCanvasFlag(true)
+test('Test that MainLayout uses desktop non-overlay drawer on workspace route', async () => {
+  setFantasiaStorybookCanvasFlag(false)
   vi.stubEnv('MODE', 'spa')
 
   const w = await mountMainLayoutForVitest('/home')
@@ -135,7 +135,6 @@ test('Test that MainLayout uses desktop non-overlay drawer on Storybook canvas w
   expect(drawer.attributes('overlay')).toBe('false')
 
   w.unmount()
-  setFantasiaStorybookCanvasFlag(false)
   vi.unstubAllEnvs()
 })
 

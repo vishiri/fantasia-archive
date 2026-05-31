@@ -3,18 +3,9 @@ import {
   nextTick,
   ref
 } from 'vue'
-import { afterEach, beforeEach, expect, test, vi } from 'vitest'
+import { expect, test } from 'vitest'
 
-import { FA_APP_SHELL_DRAWER_TRANSITION_MS } from 'app/src/scripts/appRouting/appRouting_manager'
 import { useAppShellLayoutDrawerRail } from 'app/src/layouts/MainLayout/scripts/mainLayout_manager'
-
-beforeEach(() => {
-  vi.useFakeTimers()
-})
-
-afterEach(() => {
-  vi.useRealTimers()
-})
 
 /**
  * appShellLayoutDrawerRail
@@ -31,17 +22,12 @@ test('Test that useAppShellLayoutDrawerRail keeps lpr view while workspace drawe
 
 /**
  * appShellLayoutDrawerRail
- * Workspace route delays capital L until the drawer slide duration elapses.
+ * Workspace route reserves drawer rail in the layout view immediately.
  */
-test('Test that useAppShellLayoutDrawerRail switches to Lpr after drawer transition ms', async () => {
+test('Test that useAppShellLayoutDrawerRail uses Lpr when workspace drawer is open', async () => {
   const showWorkspaceDrawer = computed(() => true)
   const { appShellLayoutQuasarView } = useAppShellLayoutDrawerRail(showWorkspaceDrawer)
 
-  await nextTick()
-
-  expect(appShellLayoutQuasarView.value).toBe('hHh lpr lFf')
-
-  vi.advanceTimersByTime(FA_APP_SHELL_DRAWER_TRANSITION_MS)
   await nextTick()
 
   expect(appShellLayoutQuasarView.value).toBe('hHh Lpr lFf')
@@ -49,14 +35,12 @@ test('Test that useAppShellLayoutDrawerRail switches to Lpr after drawer transit
 
 /**
  * appShellLayoutDrawerRail
- * Leaving workspace clears the rail immediately for the hide transition.
+ * Leaving workspace clears the rail when the drawer closes.
  */
 test('Test that useAppShellLayoutDrawerRail drops Lpr when workspace drawer closes', async () => {
   const showWorkspaceDrawer = ref(true)
   const { appShellLayoutQuasarView } = useAppShellLayoutDrawerRail(showWorkspaceDrawer)
 
-  await nextTick()
-  vi.advanceTimersByTime(FA_APP_SHELL_DRAWER_TRANSITION_MS)
   await nextTick()
   expect(appShellLayoutQuasarView.value).toBe('hHh Lpr lFf')
 
