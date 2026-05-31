@@ -3,6 +3,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { registerFaProjectOsOpenMainWindow } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
 import { applyFaSpellCheckerLanguagesToSession } from 'app/src-electron/mainScripts/windowManagement/faSpellCheckerSessionWiring'
+import { registerFaChromiumCtrlShiftShortcutSuppress } from 'app/src-electron/mainScripts/chromiumFixes/faChromiumCtrlShiftShortcutSuppressWiring'
 import { registerFaMainWindowWebContentsSessionReset } from 'app/src-electron/mainScripts/windowManagement/faMainWindowWebContentsSessionResetWiring'
 import { setupSpellChecker } from 'app/src-electron/mainScripts/windowManagement/spellCheckerWiring'
 import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettings_manager'
@@ -83,6 +84,10 @@ async function loadAndWireMainWindow (win: BrowserWindow): Promise<void> {
   win.setMenu(null)
 
   registerFaMainWindowWebContentsSessionReset(win.webContents)
+  let unregisterFaChromiumCtrlShiftGlobalShortcuts: (() => void) | undefined
+  registerFaChromiumCtrlShiftShortcutSuppress(win.webContents, (unregister) => {
+    unregisterFaChromiumCtrlShiftGlobalShortcuts = unregister
+  })
 
   // Load the basic app URL (dev server) or packaged index.html via the privileged 'app://' scheme.
   // Using 'app://' instead of 'file://' for packaged builds keeps web workers (Monaco editor.worker / css.worker, etc.) on a standard, secure origin.
@@ -103,6 +108,8 @@ async function loadAndWireMainWindow (win: BrowserWindow): Promise<void> {
 
   // Make sure the app window properly closes when it is closed in any way, shape or form
   win.on('closed', () => {
+    unregisterFaChromiumCtrlShiftGlobalShortcuts?.()
+    unregisterFaChromiumCtrlShiftGlobalShortcuts = undefined
     appWindow = undefined
   })
 

@@ -47,10 +47,17 @@ const {
 })
 
 const registerFaProjectOsOpenMainWindowMock = vi.hoisted(() => vi.fn())
+const registerFaChromiumCtrlShiftShortcutSuppressMock = vi.hoisted(() => vi.fn())
 
 vi.mock('app/src-electron/mainScripts/projectManagement/faProjectOsOpenDeliveryWiring', () => {
   return {
     registerFaProjectOsOpenMainWindow: registerFaProjectOsOpenMainWindowMock
+  }
+})
+
+vi.mock('app/src-electron/mainScripts/chromiumFixes/faChromiumCtrlShiftShortcutSuppressWiring', () => {
+  return {
+    registerFaChromiumCtrlShiftShortcutSuppress: registerFaChromiumCtrlShiftShortcutSuppressMock
   }
 })
 
@@ -83,6 +90,7 @@ vi.mock('app/src-electron/mainScripts/userSettings/userSettings_manager', () => 
 })
 
 beforeEach(() => {
+  registerFaChromiumCtrlShiftShortcutSuppressMock.mockReset()
   registerFaProjectOsOpenMainWindowMock.mockReset()
   BrowserWindowMock.mockReset()
   appMock.requestSingleInstanceLock.mockReset()
@@ -180,6 +188,10 @@ test('Test that second-instance handler no-ops when preventSecondaryAppInstance 
  * Test BrowserWindow construction, event handlers, and delayed maximize flow.
  */
 test('Test that the main window is created successfully', async () => {
+  const unregisterGlobalShortcutsMock = vi.fn()
+  registerFaChromiumCtrlShiftShortcutSuppressMock.mockImplementation((_wc, onUnregister) => {
+    onUnregister?.(unregisterGlobalShortcutsMock)
+  })
   const onceHandlers: Record<string, () => void> = {}
   const onHandlers: Record<string, () => void> = {}
   const spellSession = {}
@@ -238,6 +250,10 @@ test('Test that the main window is created successfully', async () => {
   expect(browserWindowInstance.webContents.openDevTools).toHaveBeenCalledOnce()
   expect(setupSpellCheckerMock).toHaveBeenCalledWith(expect.anything())
   expect(applyFaSpellCheckerLanguagesToSessionMock).toHaveBeenCalledWith(spellSession, 'en-US')
+  expect(registerFaChromiumCtrlShiftShortcutSuppressMock).toHaveBeenCalledWith(
+    browserWindowInstance.webContents,
+    expect.any(Function)
+  )
 
   onceHandlers['ready-to-show']()
   expect(browserWindowInstance.show).toHaveBeenCalledOnce()
@@ -248,6 +264,7 @@ test('Test that the main window is created successfully', async () => {
   expect(browserWindowInstance.maximize).toHaveBeenCalledTimes(2)
 
   onHandlers.closed()
+  expect(unregisterGlobalShortcutsMock).toHaveBeenCalledOnce()
   expect(appWindow).toBeUndefined()
 })
 

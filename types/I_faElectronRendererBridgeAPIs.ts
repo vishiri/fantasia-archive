@@ -1,3 +1,5 @@
+import type { I_faChromiumForwardedKeyChordPayload } from 'app/types/I_faChromiumCtrlShiftSuppress'
+
 /**
  * Read-only app metadata exposed from the main process through preload.
  */
@@ -145,6 +147,15 @@ export interface I_extraEnvVariablesBridge {
    */
   getCachedSnapshot: () => I_extraEnvVariablesAPI | null
   getSnapshot: () => Promise<I_extraEnvVariablesAPI>
+}
+
+/**
+ * Chromium-reserved Ctrl+Shift chords forwarded from main after preventDefault.
+ */
+export interface I_faChromiumCtrlShiftShortcutAPI {
+  installForwardedKeyChordListener: (
+    onForwardedKeyChord: (payload: I_faChromiumForwardedKeyChordPayload) => void
+  ) => void
 }
 
 /**

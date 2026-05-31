@@ -227,6 +227,9 @@ const baseBridge = () => {
         sessionId: 'storybook-import-session'
       })
     },
+    faChromiumCtrlShiftShortcut: {
+      installForwardedKeyChordListener: () => undefined
+    },
     faProjectFailsafe: {
       installActiveProjectPathReply: () => undefined
     },
@@ -315,6 +318,10 @@ export const setContentBridgeScenario = (
     faAppConfig: {
       ...nextBridge.faAppConfig,
       ...(overrides.faAppConfig ?? {})
+    },
+    faChromiumCtrlShiftShortcut: {
+      ...nextBridge.faChromiumCtrlShiftShortcut,
+      ...(overrides.faChromiumCtrlShiftShortcut ?? {})
     },
     faProjectFailsafe: {
       ...nextBridge.faProjectFailsafe,

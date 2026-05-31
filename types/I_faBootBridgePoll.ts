@@ -5,6 +5,13 @@ export type T_faProjectOsOpenBridgePollDeps = {
   hasProjectOsOpenBridge: () => boolean
 }
 
+/** Injected clock and sleep for Chromium Ctrl+Shift forward bridge polling in boot. */
+export type T_faChromiumCtrlShiftShortcutBridgePollDeps = {
+  nowMs: () => number
+  sleepMs: (ms: number) => Promise<void>
+  hasChromiumCtrlShiftShortcutBridge: () => boolean
+}
+
 /** Injected clock and sleep while waiting for preload extra-env snapshot in boot. */
 export type T_faRoutingEnvBridgePollDeps = {
   isElectronMode: boolean

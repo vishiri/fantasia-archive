@@ -104,3 +104,10 @@ export const FA_PROJECT_OS_OPEN_IPC = {
   openFromOsToRenderer: 'fa-project-os-open-from-os-to-renderer',
   rendererReadyToMain: 'fa-project-os-open-renderer-ready-to-main'
 } as const
+
+/**
+ * Chromium-reserved Ctrl+Shift chords: main 'webContents.send' after 'before-input-event' preventDefault.
+ */
+export const FA_CHROMIUM_CTRL_SHIFT_SHORTCUT_IPC = {
+  forwardKeyChordToRenderer: 'fa-chromium-ctrl-shift-forward-key-chord'
+} as const
