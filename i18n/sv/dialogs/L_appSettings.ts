@@ -87,11 +87,19 @@ export default {
       tags: 'utseende, gränssnitt, globalt, användargränssnitt, utseende och känsla',
       applicationExtras: {
         subtitle: 'Applikationstillägg',
-        tags: 'maskot, plysch, projektöversiktstips, extramaterial',
+        tags: 'maskot, plysch, fantasia, extramaterial',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Visuals och app-omfattande funktionalitet',
         tags: 'tema, krom, layout, allmänna alternativ',
+      }
+    },
+    projectOverview: {
+      title: 'Sida: Projektöversikt',
+      tags: 'projekthem, instrumentpanel, översikt, arbetsyta',
+      projectOverviewBehavior: {
+        subtitle: 'Beteende för projektöversikt',
+        tags: 'tips, tricks, visste du, översiktskort',
       }
     },
     welcomeScreen: {

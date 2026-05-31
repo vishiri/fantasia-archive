@@ -26,6 +26,7 @@ export default {
     saveAppSettings: 'Зберегти налаштування програми',
     saveAppStyling: 'Зберегти спеціальну програму CSS',
     saveProjectStyling: 'Зберегти спеціальний проект CSS',
+    showProjectDashboard: 'Показати інформаційну панель проекту',
     showStartupTipsNotification: 'Показати сповіщення про підказку при запуску',
     toggleDeveloperTools: 'Перемкнути інструменти розробника',
     toggleAppNoteboardWindow: 'Перемкнути вікно блокнота програми',

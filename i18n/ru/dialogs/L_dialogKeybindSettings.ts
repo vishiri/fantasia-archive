@@ -26,6 +26,7 @@ export default {
     openAppSettings: 'Откройте настройки приложения',
     openAppStyling: 'Откройте пользовательское приложение CSS',
     openProjectStyling: 'Открыть пользовательский проект CSS',
+    showProjectDashboard: 'Показать панель управления проектом',
     toggleDeveloperTools: 'Переключить инструменты разработчика',
     toggleAppNoteboard: 'Переключить блокнот приложения',
     toggleProjectNoteboard: 'Переключить блокнот проекта',

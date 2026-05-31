@@ -26,6 +26,7 @@ export default {
     saveAppSettings: 'ऐप सेटिंग सहेजें',
     saveAppStyling: 'कस्टम ऐप सहेजें CSS',
     saveProjectStyling: 'कस्टम प्रोजेक्ट सहेजें CSS',
+    showProjectDashboard: 'प्रोजेक्ट डैशबोर्ड दिखाएँ',
     showStartupTipsNotification: 'स्टार्टअप टिप अधिसूचना दिखाएँ',
     toggleDeveloperTools: 'डेवलपर टूल टॉगल करें',
     toggleAppNoteboardWindow: 'ऐप नोटबोर्ड विंडो टॉगल करें',

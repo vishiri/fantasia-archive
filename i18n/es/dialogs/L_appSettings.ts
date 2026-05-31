@@ -87,11 +87,19 @@ export default {
       tags: 'apariencia, interfaz, global, ui, apariencia',
       applicationExtras: {
         subtitle: 'Extras de la aplicación',
-        tags: 'mascota, felpa, consejos generales del proyecto, extras',
+        tags: 'mascota, felpa, fantasia, extras',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Imágenes y funcionalidad para toda la aplicación',
         tags: 'tema, chrome, diseño, opciones generales',
+      }
+    },
+    projectOverview: {
+      title: 'Página: Resumen del proyecto',
+      tags: 'inicio del proyecto, panel, resumen, espacio de trabajo',
+      projectOverviewBehavior: {
+        subtitle: 'Comportamiento del resumen del proyecto',
+        tags: 'consejos, trucos, sabías que, tarjeta de resumen',
       }
     },
     welcomeScreen: {

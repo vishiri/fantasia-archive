@@ -26,6 +26,7 @@ export default {
     saveAppSettings: 'Lagre appinnstillinger',
     saveAppStyling: 'Lagre tilpasset app CSS',
     saveProjectStyling: 'Lagre tilpasset prosjekt CSS',
+    showProjectDashboard: 'Vis prosjektdashbord',
     showStartupTipsNotification: 'Vis oppstartstipsvarsel',
     toggleDeveloperTools: 'Slå av/på utviklerverktøy',
     toggleAppNoteboardWindow: 'Slå av/på App Noteboard-vinduet',

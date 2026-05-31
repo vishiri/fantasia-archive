@@ -26,6 +26,7 @@ export default {
     openAppSettings: '打开应用程序设置',
     openAppStyling: '打开自定义应用程序 CSS',
     openProjectStyling: '打开自定义项目 CSS',
+    showProjectDashboard: '显示项目仪表板',
     toggleDeveloperTools: '切换开发者工具',
     toggleAppNoteboard: '切换应用程序记事板',
     toggleProjectNoteboard: '切换项目记事本',

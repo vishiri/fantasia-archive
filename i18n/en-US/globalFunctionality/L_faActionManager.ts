@@ -28,6 +28,7 @@ export default {
     saveProjectSettings: 'Save Project Settings',
     saveAppStyling: 'Save Custom App CSS',
     saveProjectStyling: 'Save Custom Project CSS',
+    showProjectDashboard: 'Show Project Dashboard',
     showStartupTipsNotification: 'Show Startup Tip Notification',
     toggleDeveloperTools: 'Toggle Developer Tools',
     toggleAppNoteboardWindow: 'Toggle App Noteboard Window',

@@ -87,11 +87,19 @@ export default {
       tags: 'apparence, interface, global, ui, look and feel',
       applicationExtras: {
         subtitle: 'Suppléments d\'application',
-        tags: 'mascotte, peluche, conseils de présentation du projet, extras',
+        tags: 'mascotte, peluche, fantasia, extras',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Visuels et fonctionnalités à l\'échelle de l\'application',
         tags: 'thème, chrome, mise en page, options générales',
+      }
+    },
+    projectOverview: {
+      title: 'Page : Aperçu du projet',
+      tags: 'accueil projet, tableau de bord, aperçu, espace de travail',
+      projectOverviewBehavior: {
+        subtitle: 'Comportement de l\'aperçu du projet',
+        tags: 'conseils, astuces, le saviez-vous, carte d\'aperçu',
       }
     },
     welcomeScreen: {

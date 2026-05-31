@@ -43,7 +43,8 @@ const {
   toggleDevToolsMock,
   updateKeybindsMock,
   updateAppStylingMock,
-  updateSettingsMock
+  updateSettingsMock,
+  navigateToWorkspaceRouteForActiveProjectMock
 } = vi.hoisted(() => ({
   applyImportMock: vi.fn(
     async (): Promise<I_faAppConfigApplyResult> => ({ appliedParts: [] })
@@ -71,7 +72,8 @@ const {
   toggleDevToolsMock: vi.fn(),
   updateKeybindsMock: vi.fn(async () => true),
   updateAppStylingMock: vi.fn(async () => true),
-  updateSettingsMock: vi.fn(async () => undefined)
+  updateSettingsMock: vi.fn(async () => undefined),
+  navigateToWorkspaceRouteForActiveProjectMock: vi.fn(async () => undefined)
 }))
 
 vi.mock('quasar', () => ({
@@ -168,12 +170,12 @@ vi.mock('app/src/scripts/appInternals/faAppInternalsLocale_manager', () => ({
   applyFaUserSettingsLanguageSelection: applyLanguageMock
 }))
 
-vi.mock('app/src/scripts/appInternals/appInternals_manager', async (importOriginal) => {
+vi.mock('app/src/scripts/appInternals/faAppRouterSession_manager', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('app/src/scripts/appInternals/appInternals_manager')>()
+    await importOriginal<typeof import('app/src/scripts/appInternals/faAppRouterSession_manager')>()
   return {
     ...actual,
-    navigateToWorkspaceRouteForActiveProject: vi.fn(async () => undefined)
+    navigateToWorkspaceRouteForActiveProject: navigateToWorkspaceRouteForActiveProjectMock
   }
 })
 
@@ -227,6 +229,7 @@ beforeEach(() => {
   refreshRecentProjectsMock.mockImplementation(async () => undefined)
   canOpenFloatingWindowWhileNoModalMock.mockReset()
   canOpenFloatingWindowWhileNoModalMock.mockReturnValue(true)
+  navigateToWorkspaceRouteForActiveProjectMock.mockClear()
   Object.assign(window, {
     faContentBridgeAPIs: {
       faAppConfig: {
@@ -334,6 +337,22 @@ test('Test that openProjectStylingDialog handler skips without an active project
   try {
     definitionFor('openProjectStylingDialog').handler(undefined)
     expect(openDialogComponentMock).not.toHaveBeenCalled()
+  } finally {
+    faActiveProjectFixture.activeProject = prior
+  }
+})
+
+test('Test that showProjectDashboard handler navigates to workspace home when a project is active', async () => {
+  await (definitionFor('showProjectDashboard').handler(undefined) as Promise<unknown>)
+  expect(navigateToWorkspaceRouteForActiveProjectMock).toHaveBeenCalledOnce()
+})
+
+test('Test that showProjectDashboard handler skips navigation without an active project', async () => {
+  const prior = faActiveProjectFixture.activeProject
+  faActiveProjectFixture.activeProject = null as never
+  try {
+    await (definitionFor('showProjectDashboard').handler(undefined) as Promise<unknown>)
+    expect(navigateToWorkspaceRouteForActiveProjectMock).not.toHaveBeenCalled()
   } finally {
     faActiveProjectFixture.activeProject = prior
   }

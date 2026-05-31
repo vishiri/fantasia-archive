@@ -26,6 +26,7 @@ export default {
     saveAppSettings: 'Αποθήκευση ρυθμίσεων εφαρμογής',
     saveAppStyling: 'Αποθήκευση προσαρμοσμένης εφαρμογής CSS',
     saveProjectStyling: 'Αποθήκευση προσαρμοσμένου έργου CSS',
+    showProjectDashboard: 'Εμφάνιση πίνακα ελέγχου έργου',
     showStartupTipsNotification: 'Εμφάνιση ειδοποίησης συμβουλής εκκίνησης',
     toggleDeveloperTools: 'Εναλλαγή Εργαλείων προγραμματιστή',
     toggleAppNoteboardWindow: 'Εναλλαγή του παραθύρου σημειωματάριου εφαρμογής',

@@ -87,11 +87,19 @@ export default {
       tags: 'Erscheinungsbild, Benutzeroberfläche, global, Benutzeroberfläche, Erscheinungsbild',
       applicationExtras: {
         subtitle: 'Anwendungsextras',
-        tags: 'Maskottchen, Plüsch, Tipps zur Projektübersicht, Extras',
+        tags: 'Maskottchen, Plüsch, Fantasia, Extras',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Visuals und App-weite Funktionalität',
         tags: 'Thema, Chrom, Layout, allgemeine Optionen',
+      }
+    },
+    projectOverview: {
+      title: 'Seite: Projektübersicht',
+      tags: 'Projektstart, Dashboard, Übersicht, Arbeitsbereich',
+      projectOverviewBehavior: {
+        subtitle: 'Verhalten der Projektübersicht',
+        tags: 'Tipps, Tricks, Wussten Sie schon, Übersichtskarte',
       }
     },
     welcomeScreen: {

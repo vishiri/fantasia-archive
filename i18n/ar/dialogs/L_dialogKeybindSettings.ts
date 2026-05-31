@@ -26,6 +26,7 @@ export default {
     openAppSettings: 'افتح إعدادات التطبيق',
     openAppStyling: 'افتح التطبيق المخصص CSS',
     openProjectStyling: 'فتح مشروع مخصص CSS',
+    showProjectDashboard: 'إظهار لوحة تحكم المشروع',
     toggleDeveloperTools: 'تبديل أدوات المطور',
     toggleAppNoteboard: 'تبديل التطبيق المفكرة',
     toggleProjectNoteboard: 'تبديل دفتر المشروع',

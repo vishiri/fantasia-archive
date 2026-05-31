@@ -26,6 +26,7 @@ export default {
     saveAppSettings: '保存应用程序设置',
     saveAppStyling: '保存自定义应用程序 CSS',
     saveProjectStyling: '保存自定义项目 CSS',
+    showProjectDashboard: '显示项目仪表板',
     showStartupTipsNotification: '显示启动提示通知',
     toggleDeveloperTools: '切换开发者工具',
     toggleAppNoteboardWindow: '切换应用程序记事板窗口',

@@ -26,6 +26,7 @@ export default {
     openAppSettings: 'Åpne appinnstillinger',
     openAppStyling: 'Åpne egendefinert app CSS',
     openProjectStyling: 'Åpne tilpasset prosjekt CSS',
+    showProjectDashboard: 'Vis prosjektdashbord',
     toggleDeveloperTools: 'Slå av/på utviklerverktøy',
     toggleAppNoteboard: 'Slå på app-noteboard',
     toggleProjectNoteboard: 'Slå på prosjektnotatbordet',

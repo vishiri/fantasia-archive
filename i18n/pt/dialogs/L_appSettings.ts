@@ -87,11 +87,19 @@ export default {
       tags: 'aparência, interface, global, interface do usuário, aparência',
       applicationExtras: {
         subtitle: 'Extras do aplicativo',
-        tags: 'mascote, pelúcia, dicas de visão geral do projeto, extras',
+        tags: 'mascote, pelúcia, fantasia, extras',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Funcionalidades visuais e em todo o aplicativo',
         tags: 'tema, cromo, layout, opções gerais',
+      }
+    },
+    projectOverview: {
+      title: 'Página: Visão geral do projeto',
+      tags: 'início do projeto, painel, visão geral, área de trabalho',
+      projectOverviewBehavior: {
+        subtitle: 'Comportamento da visão geral do projeto',
+        tags: 'dicas, truques, você sabia, cartão de visão geral',
       }
     },
     welcomeScreen: {

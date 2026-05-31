@@ -473,6 +473,35 @@ test('createFaKeybindKeydownHandler skips repeat, composing, suspend, and editab
   expect(stopPropagation).toHaveBeenCalled()
 })
 
+test('createFaKeybindKeydownHandler dispatches showProjectDashboard for Ctrl+Shift+O', () => {
+  const preventDefault = vi.fn()
+  const stopPropagation = vi.fn()
+  const handler = createFaKeybindKeydownHandler(() => ({
+    overrides: {},
+    platform: 'win32',
+    suspendGlobalKeybindDispatch: false
+  }))
+
+  const ev = {
+    altKey: false,
+    code: 'KeyO',
+    ctrlKey: true,
+    isComposing: false,
+    key: 'o',
+    preventDefault,
+    repeat: false,
+    shiftKey: true,
+    stopPropagation,
+    target: document.body
+  } as unknown as KeyboardEvent
+
+  handler(ev)
+
+  expect(runCommandMock).toHaveBeenCalledWith('showProjectDashboard')
+  expect(preventDefault).toHaveBeenCalled()
+  expect(stopPropagation).toHaveBeenCalled()
+})
+
 test('createFaKeybindKeydownHandler does nothing when normalized chord is null', () => {
   const handler = createFaKeybindKeydownHandler(() => ({
     overrides: {},
@@ -501,6 +530,7 @@ test('FA_KEYBIND_COMMAND_DEFINITIONS lists expected commands', () => {
     'openAppStyling',
     'openKeybindSettings',
     'openProjectStyling',
+    'showProjectDashboard',
     'toggleAppNoteboard',
     'toggleDeveloperTools',
     'toggleProjectNoteboard'

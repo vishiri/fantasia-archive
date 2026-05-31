@@ -19,6 +19,7 @@ export const FA_ACTION_IDS = [
   'openAppStylingWindow',
   'openProjectStylingDialog',
   'openProjectSettingsDialog',
+  'showProjectDashboard',
   'saveProjectSettings',
   'saveAppStyling',
   'saveProjectStyling',
@@ -85,6 +86,7 @@ export interface I_faActionPayloadMap {
   openAppStylingWindow: void
   openProjectStylingDialog: void
   openProjectSettingsDialog: void
+  showProjectDashboard: void
   saveProjectSettings: { settings: import('app/types/I_faProjectSettingsDomain').I_faProjectSettingsPatch }
   saveAppStyling: { css: string }
   saveProjectStyling: { css: string }

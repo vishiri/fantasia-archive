@@ -60,3 +60,9 @@ export const FA_PLAYWRIGHT_PRESS_ADJUSTED_TOGGLE_DEVTOOLS_F12 = 'Control+Alt+Shi
  * Playwright sends that combination on Windows, Linux, and macOS the same way.
  */
 export const FA_PLAYWRIGHT_PRESS_DEFAULT_TOGGLE_PROJECT_NOTEBOARD = 'Control+Alt+D' as const
+
+/**
+ * Default **Show Project Dashboard** chord: literal **Ctrl+Shift+O** (see
+ * 'FA_KEYBIND_COMMAND_DEFINITIONS' for 'showProjectDashboard').
+ */
+export const FA_PLAYWRIGHT_PRESS_DEFAULT_SHOW_PROJECT_DASHBOARD = 'Control+Shift+O' as const

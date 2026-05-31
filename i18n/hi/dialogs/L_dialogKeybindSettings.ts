@@ -26,6 +26,7 @@ export default {
     openAppSettings: 'ऐप सेटिंग खोलें',
     openAppStyling: 'कस्टम ऐप खोलें CSS',
     openProjectStyling: 'कस्टम प्रोजेक्ट खोलें CSS',
+    showProjectDashboard: 'प्रोजेक्ट डैशबोर्ड दिखाएँ',
     toggleDeveloperTools: 'डेवलपर टूल टॉगल करें',
     toggleAppNoteboard: 'ऐप नोटबोर्ड टॉगल करें',
     toggleProjectNoteboard: 'प्रोजेक्ट नोटबोर्ड टॉगल करें',

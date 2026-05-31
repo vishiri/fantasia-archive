@@ -68,6 +68,19 @@ export const FA_KEYBIND_COMMAND_DEFINITIONS: I_faKeybindCommandDefinition[] = [
   },
   {
     defaultChord: {
+      code: 'KeyO',
+      mods: [
+        'ctrl',
+        'shift'
+      ]
+    },
+    editable: true,
+    firesInEditableFields: true,
+    id: 'showProjectDashboard',
+    messageKey: 'dialogs.keybindSettings.commands.showProjectDashboard'
+  },
+  {
+    defaultChord: {
       code: 'KeyE',
       mods: [
         'alt',

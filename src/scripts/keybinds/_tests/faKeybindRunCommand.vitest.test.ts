@@ -59,3 +59,8 @@ test('faKeybindRunCommand routes openProjectStyling to the openProjectStylingDia
   faKeybindRunCommand('openProjectStyling')
   expect(runFaActionMock).toHaveBeenCalledWith('openProjectStylingDialog', undefined)
 })
+
+test('faKeybindRunCommand routes showProjectDashboard to the showProjectDashboard action', () => {
+  faKeybindRunCommand('showProjectDashboard')
+  expect(runFaActionMock).toHaveBeenCalledWith('showProjectDashboard', undefined)
+})

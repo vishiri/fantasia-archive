@@ -26,6 +26,7 @@ export default {
     saveAppSettings: 'Spara appinställningar',
     saveAppStyling: 'Spara anpassad app CSS',
     saveProjectStyling: 'Spara anpassat projekt CSS',
+    showProjectDashboard: 'Visa projektinstrumentpanel',
     showStartupTipsNotification: 'Visa starttipsmeddelande',
     toggleDeveloperTools: 'Växla utvecklarverktyg',
     toggleAppNoteboardWindow: 'Växla App Noteboard-fönstret',

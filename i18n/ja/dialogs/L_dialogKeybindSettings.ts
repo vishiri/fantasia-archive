@@ -26,6 +26,7 @@ export default {
     openAppSettings: 'アプリ設定を開く',
     openAppStyling: 'カスタム アプリ CSS を開く',
     openProjectStyling: 'カスタム プロジェクト CSS を開く',
+    showProjectDashboard: 'プロジェクトダッシュボードを表示',
     toggleDeveloperTools: '開発者ツールの切り替え',
     toggleAppNoteboard: 'アプリノートボードの切り替え',
     toggleProjectNoteboard: 'プロジェクトノートボードの切り替え',

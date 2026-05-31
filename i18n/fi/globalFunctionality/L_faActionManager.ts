@@ -26,6 +26,7 @@ export default {
     saveAppSettings: 'Tallenna sovellusasetukset',
     saveAppStyling: 'Tallenna mukautettu sovellus CSS',
     saveProjectStyling: 'Tallenna mukautettu projekti CSS',
+    showProjectDashboard: 'Näytä projektin hallintapaneeli',
     showStartupTipsNotification: 'Näytä käynnistysvihjeilmoitus',
     toggleDeveloperTools: 'Vaihda Kehittäjätyökalut',
     toggleAppNoteboardWindow: 'Ota App Noteboard -ikkuna käyttöön',

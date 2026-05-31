@@ -87,11 +87,19 @@ export default {
       tags: 'utseende, grensesnitt, globalt, ui, utseende og følelse',
       applicationExtras: {
         subtitle: 'Applikasjonstillegg',
-        tags: 'maskot, plysj, prosjektoversiktstips, statister',
+        tags: 'maskot, plysj, fantasia, statister',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Visuelt og app-omfattende funksjonalitet',
         tags: 'tema, krom, layout, generelle alternativer',
+      }
+    },
+    projectOverview: {
+      title: 'Side: Prosjektoversikt',
+      tags: 'prosjekthjem, dashbord, oversikt, arbeidsområde',
+      projectOverviewBehavior: {
+        subtitle: 'Atferd for prosjektoversikt',
+        tags: 'tips, triks, visste du, oversiktskort',
       }
     },
     welcomeScreen: {

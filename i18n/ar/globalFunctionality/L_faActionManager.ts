@@ -26,6 +26,7 @@ export default {
     saveAppSettings: 'حفظ إعدادات التطبيق',
     saveAppStyling: 'حفظ التطبيق المخصص CSS',
     saveProjectStyling: 'حفظ المشروع المخصص CSS',
+    showProjectDashboard: 'إظهار لوحة تحكم المشروع',
     showStartupTipsNotification: 'إظهار إشعار تلميح بدء التشغيل',
     toggleDeveloperTools: 'تبديل أدوات المطور',
     toggleAppNoteboardWindow: 'تبديل نافذة المفكرة التطبيق',

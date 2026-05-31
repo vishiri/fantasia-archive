@@ -54,7 +54,9 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
       trigger: () => runFaAction('openProjectStylingDialog', undefined)
     }),
     faMenuItem('appControlMenus.project.items.showProjectDashboard', 'mdi-chart-bar', {
-      conditions: false
+      conditions: gate,
+      keybindCommandId: 'showProjectDashboard',
+      trigger: () => runFaAction('showProjectDashboard', undefined)
     }),
     faMenuItem('appControlMenus.project.items.projectSettings', 'mdi-book-cog-outline', {
       conditions: gate,

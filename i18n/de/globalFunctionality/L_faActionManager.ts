@@ -26,6 +26,7 @@ export default {
     saveAppSettings: 'App-Einstellungen speichern',
     saveAppStyling: 'Benutzerdefinierte App speichern CSS',
     saveProjectStyling: 'Benutzerdefiniertes Projekt CSS speichern',
+    showProjectDashboard: 'Projekt-Dashboard anzeigen',
     showStartupTipsNotification: 'Benachrichtigung zum Starttipp anzeigen',
     toggleDeveloperTools: 'Entwicklertools umschalten',
     toggleAppNoteboardWindow: 'App-Noteboard-Fenster umschalten',

@@ -87,11 +87,19 @@ export default {
       tags: 'ulkonäkö, käyttöliittymä, globaali, käyttöliittymä, ulkoasu ja tuntuma',
       applicationExtras: {
         subtitle: 'Sovelluksen lisäosat',
-        tags: 'maskotti, pehmo, projektin yleiskuvausvinkkejä, extrat',
+        tags: 'maskotti, pehmo, fantasia, extrat',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Visuaaliset ja sovelluksenlaajuiset toiminnot',
         tags: 'teema, kromi, asettelu, yleiset vaihtoehdot',
+      }
+    },
+    projectOverview: {
+      title: 'Sivu: Projektin yleiskatsaus',
+      tags: 'projektin koti, kojelauta, yleiskatsaus, työtila',
+      projectOverviewBehavior: {
+        subtitle: 'Projektin yleiskatsauksen käyttäytyminen',
+        tags: 'vinkit, temput, tiesitkö, yleiskatsauskortti',
       }
     },
     welcomeScreen: {

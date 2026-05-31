@@ -10,8 +10,10 @@ import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import { canOpenFloatingWindowWhileNoModal } from 'app/src/scripts/appNoteboard/appNoteboard_manager'
 import { toggleDevTools } from 'app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager'
 import { applyFaUserSettingsLanguageSelection } from 'app/src/scripts/appInternals/faAppInternalsLocale_manager'
+import { navigateToWorkspaceRouteForActiveProject } from 'app/src/scripts/appInternals/faAppRouterSession_manager'
 
 import { createFaActionDefinitionHandlers } from './functions/createFaActionDefinitionHandlers'
+import { createFaActionDefinitionHandlersShowProjectDashboard } from './functions/createFaActionDefinitionHandlersShowProjectDashboard'
 import { buildFaActionDefinitionHandlersWindowChrome } from './faActionDefinitionHandlersWindowChrome'
 import {
   handleCreateNewProject as handleCreateNewProjectExport,
@@ -52,6 +54,10 @@ const faActionDefinitionHandlersApi = {
   }),
   ...buildFaActionDefinitionHandlersWindowChrome({
     toggleDevTools
+  }),
+  ...createFaActionDefinitionHandlersShowProjectDashboard({
+    S_FaActiveProject,
+    navigateToWorkspaceRouteForActiveProject
   })
 }
 
@@ -132,6 +138,9 @@ export const handleOpenLicenseDialog = handleOpenLicenseDialogExport
 export const handleOpenNewProjectDialog = handleOpenNewProjectDialogExport
 
 export const handleOpenProjectSettingsDialog = handleOpenProjectSettingsDialogExport
+
+export const handleShowProjectDashboard =
+  faActionDefinitionHandlersApi.handleShowProjectDashboard
 
 export const handleOpenProjectStylingWindow = handleOpenProjectStylingWindowExport
 

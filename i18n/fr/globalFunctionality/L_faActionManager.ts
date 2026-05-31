@@ -26,6 +26,7 @@ export default {
     saveAppSettings: 'Enregistrer les paramètres de l\'application',
     saveAppStyling: 'Enregistrer l\'application personnalisée CSS',
     saveProjectStyling: 'Enregistrer le projet personnalisé CSS',
+    showProjectDashboard: 'Afficher le tableau de bord du projet',
     showStartupTipsNotification: 'Afficher la notification de conseil de démarrage',
     toggleDeveloperTools: 'Toggle Outils de développement',
     toggleAppNoteboardWindow: 'Basculer la fenêtre du bloc-notes de l\'application',

@@ -87,11 +87,19 @@ export default {
       tags: '外观、界面、全局、ui、外观和感觉',
       applicationExtras: {
         subtitle: '应用附加功能',
-        tags: '吉祥物、毛绒玩具、项目概览提示、附加内容',
+        tags: '吉祥物、毛绒玩具、幻想、附加内容',
       },
       visualsAppwideFunctionality: {
         subtitle: '视觉效果和应用程序范围内的功能',
         tags: '主题、镀铬、布局、常规选项',
+      }
+    },
+    projectOverview: {
+      title: '页面：项目概览',
+      tags: '项目主页, 仪表板, 概览, 工作区',
+      projectOverviewBehavior: {
+        subtitle: '项目概览行为',
+        tags: '提示, 技巧, 你知道吗, 概览卡片',
       }
     },
     welcomeScreen: {

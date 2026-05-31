@@ -26,6 +26,7 @@ export default {
     openAppSettings: 'Öffnen Sie die App-Einstellungen',
     openAppStyling: 'Benutzerdefinierte App CSS öffnen',
     openProjectStyling: 'Benutzerdefiniertes Projekt CSS öffnen',
+    showProjectDashboard: 'Projekt-Dashboard anzeigen',
     toggleDeveloperTools: 'Entwicklertools umschalten',
     toggleAppNoteboard: 'App-Noteboard umschalten',
     toggleProjectNoteboard: 'Schalten Sie die Projektnotiz um',

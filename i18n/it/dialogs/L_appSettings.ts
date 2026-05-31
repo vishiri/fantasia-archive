@@ -87,11 +87,19 @@ export default {
       tags: 'aspetto, interfaccia, globale, interfaccia utente, aspetto grafico',
       applicationExtras: {
         subtitle: 'Extra dell\'applicazione',
-        tags: 'mascotte, peluche, suggerimenti per la panoramica del progetto, extra',
+        tags: 'mascotte, peluche, fantasia, extra',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Immagini e funzionalità a livello di app',
         tags: 'tema, cromo, layout, opzioni generali',
+      }
+    },
+    projectOverview: {
+      title: 'Pagina: Panoramica del progetto',
+      tags: 'home progetto, dashboard, panoramica, area di lavoro',
+      projectOverviewBehavior: {
+        subtitle: 'Comportamento panoramica del progetto',
+        tags: 'suggerimenti, trucchi, lo sapevi, scheda panoramica',
       }
     },
     welcomeScreen: {

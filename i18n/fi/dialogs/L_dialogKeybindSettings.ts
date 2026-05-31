@@ -26,6 +26,7 @@ export default {
     openAppSettings: 'Avaa Sovellusasetukset',
     openAppStyling: 'Avaa mukautettu sovellus CSS',
     openProjectStyling: 'Avaa mukautettu projekti CSS',
+    showProjectDashboard: 'Näytä projektin hallintapaneeli',
     toggleDeveloperTools: 'Vaihda Kehittäjätyökalut',
     toggleAppNoteboard: 'Vaihda sovellusmuistio',
     toggleProjectNoteboard: 'Ota Project Noteboard käyttöön',

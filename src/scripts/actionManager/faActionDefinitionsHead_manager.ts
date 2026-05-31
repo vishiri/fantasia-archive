@@ -11,6 +11,7 @@ import {
   handleOpenLicenseDialog,
   handleOpenAppSettingsDialog,
   handleOpenProjectSettingsDialog,
+  handleShowProjectDashboard,
   handleOpenAppStylingWindow,
   handleOpenProjectStylingWindow,
   handleOpenTipsTricksTriviaDialog,
@@ -73,6 +74,12 @@ export const FA_ACTION_DEFINITIONS_HEAD: ReadonlyArray<I_faActionDefinition<T_fa
     dedup: true,
     handler: handleOpenProjectSettingsDialog as I_faActionDefinition<T_faActionId>['handler'],
     id: 'openProjectSettingsDialog',
+    kind: 'async'
+  },
+  {
+    dedup: true,
+    handler: handleShowProjectDashboard as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'showProjectDashboard',
     kind: 'async'
   },
   {

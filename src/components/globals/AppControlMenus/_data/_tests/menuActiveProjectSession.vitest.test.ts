@@ -69,6 +69,14 @@ test('Test that buildProjectMenu custom Project CSS row dispatches openProjectSt
   expect(runFaActionMock).toHaveBeenCalledWith('openProjectStylingDialog', undefined)
 })
 
+test('Test that buildProjectMenu show project dashboard row dispatches showProjectDashboard', () => {
+  const menu = buildProjectMenu(emptyRecentSession(true))
+  const items = menu.data.filter((row) => row.mode === 'item')
+  expect(items[5]!.keybindCommandId).toBe('showProjectDashboard')
+  items[5]!.trigger?.()
+  expect(runFaActionMock).toHaveBeenCalledWith('showProjectDashboard', undefined)
+})
+
 test('Test that buildProjectMenu project settings row dispatches openProjectSettingsDialog', () => {
   const menu = buildProjectMenu(emptyRecentSession(true))
   const items = menu.data.filter((row) => row.mode === 'item')
@@ -110,7 +118,7 @@ test('Test that buildProjectMenu enables gated rows when hasActiveProject is tru
   expect(items[2]!.conditions).toBe(false)
   expect(items[3]!.conditions).not.toBe(false)
   expect(items[4]!.conditions).not.toBe(false)
-  expect(items[5]!.conditions).toBe(false)
+  expect(items[5]!.conditions).not.toBe(false)
   expect(items[6]!.conditions).not.toBe(false)
   expect(items[7]!.conditions).not.toBe(false)
   const sub = items[7]!.submenu?.filter((row) => row.mode === 'item') ?? []

@@ -26,6 +26,7 @@ export default {
     openAppSettings: 'Ανοίξτε τις Ρυθμίσεις εφαρμογής',
     openAppStyling: 'Άνοιγμα προσαρμοσμένης εφαρμογής CSS',
     openProjectStyling: 'Άνοιγμα προσαρμοσμένου έργου CSS',
+    showProjectDashboard: 'Εμφάνιση πίνακα ελέγχου έργου',
     toggleDeveloperTools: 'Εναλλαγή Εργαλείων προγραμματιστή',
     toggleAppNoteboard: 'Εναλλαγή σημειωματάριου εφαρμογής',
     toggleProjectNoteboard: 'Εναλλαγή Σημειωματάριου έργου',

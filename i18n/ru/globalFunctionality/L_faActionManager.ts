@@ -26,6 +26,7 @@ export default {
     saveAppSettings: 'Сохранить настройки приложения',
     saveAppStyling: 'Сохранить пользовательское приложение CSS',
     saveProjectStyling: 'Сохранить индивидуальный проект CSS',
+    showProjectDashboard: 'Показать панель управления проектом',
     showStartupTipsNotification: 'Показать уведомление о подсказке при запуске',
     toggleDeveloperTools: 'Переключить инструменты разработчика',
     toggleAppNoteboardWindow: 'Переключить окно «Блокнот приложения»',

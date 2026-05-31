@@ -87,11 +87,19 @@ export default {
       tags: '外観、インターフェイス、グローバル、UI、ルック アンド フィール',
       applicationExtras: {
         subtitle: 'アプリケーションの追加機能',
-        tags: 'マスコット、ぬいぐるみ、プロジェクト概要のヒント、おまけ',
+        tags: 'マスコット、ぬいぐるみ、ファンタジア、おまけ',
       },
       visualsAppwideFunctionality: {
         subtitle: 'ビジュアルとアプリ全体の機能',
         tags: 'テーマ、クロム、レイアウト、一般オプション',
+      }
+    },
+    projectOverview: {
+      title: 'ページ: プロジェクト概要',
+      tags: 'プロジェクトホーム, ダッシュボード, 概要, ワークスペース',
+      projectOverviewBehavior: {
+        subtitle: 'プロジェクト概要の動作',
+        tags: 'ヒント, トリック, ご存知ですか, 概要カード',
       }
     },
     welcomeScreen: {
