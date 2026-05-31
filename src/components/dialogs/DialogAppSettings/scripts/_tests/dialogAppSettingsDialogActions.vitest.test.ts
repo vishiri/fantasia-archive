@@ -32,6 +32,19 @@ beforeEach(() => {
   runFaActionAwaitMock.mockResolvedValue(true)
 })
 
+function createDialogAppSettingsDialogActionsParams (
+  params: Omit<
+    Parameters<typeof createDialogAppSettingsDialogActions>[0],
+    'appSettingsClosedViaSave' | 'appSettingsLivePreviewSnapshot'
+  >
+): Parameters<typeof createDialogAppSettingsDialogActions>[0] {
+  return {
+    appSettingsClosedViaSave: ref(false),
+    appSettingsLivePreviewSnapshot: ref(null),
+    ...params
+  }
+}
+
 /**
  * createDialogAppSettingsDialogActions
  * openDialog hydrates from directSettingsSnapshot without calling the user-settings store.
@@ -47,16 +60,18 @@ test('openDialog builds tree from directSettingsSnapshot when provided', () => {
   const appSettingsTree = ref<T_appSettingsRenderTree>({})
   const searchSettingsQuery = ref<string | null>('x')
 
-  const { openDialog } = createDialogAppSettingsDialogActions({
-    dialogModel,
-    documentName,
-    localSettings,
-    appSettingsTree,
-    props: {
-      directSettingsSnapshot: { ...FA_USER_SETTINGS_DEFAULTS }
-    },
-    searchSettingsQuery
-  })
+  const { openDialog } = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      dialogModel,
+      documentName,
+      localSettings,
+      appSettingsTree,
+      props: {
+        directSettingsSnapshot: { ...FA_USER_SETTINGS_DEFAULTS }
+      },
+      searchSettingsQuery
+    })
+  )
 
   openDialog('AppSettings')
 
@@ -78,14 +93,16 @@ test('saveAndCloseDialog closes dialog without dispatching when local settings a
   const appSettingsTree = ref<T_appSettingsRenderTree>({})
   const searchSettingsQuery = ref<string | null>(null)
 
-  const { saveAndCloseDialog } = createDialogAppSettingsDialogActions({
-    dialogModel,
-    documentName,
-    localSettings,
-    appSettingsTree,
-    props: {},
-    searchSettingsQuery
-  })
+  const { saveAndCloseDialog } = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      dialogModel,
+      documentName,
+      localSettings,
+      appSettingsTree,
+      props: {},
+      searchSettingsQuery
+    })
+  )
 
   await saveAndCloseDialog()
 
@@ -107,14 +124,16 @@ test('saveAndCloseDialog dispatches saveAppSettings action when local snapshot e
   const appSettingsTree = ref<T_appSettingsRenderTree>({})
   const searchSettingsQuery = ref<string | null>(null)
 
-  const { saveAndCloseDialog } = createDialogAppSettingsDialogActions({
-    dialogModel,
-    documentName,
-    localSettings,
-    appSettingsTree,
-    props: {},
-    searchSettingsQuery
-  })
+  const { saveAndCloseDialog } = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      dialogModel,
+      documentName,
+      localSettings,
+      appSettingsTree,
+      props: {},
+      searchSettingsQuery
+    })
+  )
 
   await saveAndCloseDialog()
 
@@ -162,14 +181,16 @@ test('updateLocalSetting updates a toggle leaf when the tree contains the key', 
   })
   const searchSettingsQuery = ref<string | null>(null)
 
-  const { updateLocalSetting } = createDialogAppSettingsDialogActions({
-    dialogModel,
-    documentName,
-    localSettings,
-    appSettingsTree,
-    props: {},
-    searchSettingsQuery
-  })
+  const { updateLocalSetting } = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      dialogModel,
+      documentName,
+      localSettings,
+      appSettingsTree,
+      props: {},
+      searchSettingsQuery
+    })
+  )
 
   updateLocalSetting('showDocumentID', true)
 
@@ -187,18 +208,100 @@ test('updateLocalSetting updates a toggle leaf when the tree contains the key', 
 test('updateLocalSetting returns early when localSettings is null', () => {
   const localSettings = ref<I_faUserSettings | null>(null)
   const appSettingsTree = ref<T_appSettingsRenderTree>({})
-  const actions = createDialogAppSettingsDialogActions({
-    dialogModel: ref(false),
-    documentName: ref(''),
-    localSettings,
-    appSettingsTree,
-    props: {},
-    searchSettingsQuery: ref('')
-  })
+  const actions = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      dialogModel: ref(false),
+      documentName: ref(''),
+      localSettings,
+      appSettingsTree,
+      props: {},
+      searchSettingsQuery: ref('')
+    })
+  )
 
   actions.updateLocalSetting('showDocumentID', true)
 
   expect(localSettings.value).toBe(null)
+})
+
+/**
+ * createDialogAppSettingsDialogActions
+ * updateLocalSetting mirrors boolean toggles into S_FaUserSettings for live preview on open surfaces.
+ */
+test('updateLocalSetting patches hideTooltipsProject on the user settings store', () => {
+  const store: T_appSettingsFaUserSettingsStoreForSync = {
+    settings: {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      hideTooltipsProject: false
+    },
+    refreshSettings: vi.fn()
+  }
+  vi.mocked(S_FaUserSettings).mockReturnValue(
+    store as unknown as ReturnType<typeof S_FaUserSettings>
+  )
+
+  const localSettings = ref<I_faUserSettings | null>({
+    ...FA_USER_SETTINGS_DEFAULTS
+  })
+  const appSettingsTree = ref<T_appSettingsRenderTree>({})
+
+  const { updateLocalSetting } = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      dialogModel: ref(true),
+      documentName: ref(''),
+      localSettings,
+      appSettingsTree,
+      props: {},
+      searchSettingsQuery: ref(null)
+    })
+  )
+
+  updateLocalSetting('hideTooltipsProject', true)
+
+  expect(store.settings?.hideTooltipsProject).toBe(true)
+  expect(localSettings.value?.hideTooltipsProject).toBe(true)
+})
+
+/**
+ * createDialogAppSettingsDialogActions
+ * updateLocalSetting skips live preview when directSettingsSnapshot is provided.
+ */
+test('updateLocalSetting does not patch the user settings store for directSettingsSnapshot props', () => {
+  const store: T_appSettingsFaUserSettingsStoreForSync = {
+    settings: {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      hideTooltipsProject: false
+    },
+    refreshSettings: vi.fn()
+  }
+  vi.mocked(S_FaUserSettings).mockReturnValue(
+    store as unknown as ReturnType<typeof S_FaUserSettings>
+  )
+
+  const localSettings = ref<I_faUserSettings | null>({
+    ...FA_USER_SETTINGS_DEFAULTS
+  })
+  const appSettingsTree = ref<T_appSettingsRenderTree>({})
+
+  const { updateLocalSetting } = createDialogAppSettingsDialogActions(
+    createDialogAppSettingsDialogActionsParams({
+      dialogModel: ref(true),
+      documentName: ref(''),
+      localSettings,
+      appSettingsTree,
+      props: {
+        directSettingsSnapshot: {
+          ...FA_USER_SETTINGS_DEFAULTS
+        }
+      },
+      searchSettingsQuery: ref(null)
+    })
+  )
+
+  updateLocalSetting('hideTooltipsProject', true)
+
+  expect(store.settings?.hideTooltipsProject).toBe(false)
+  expect(localSettings.value?.hideTooltipsProject).toBe(true)
 })
 
 /**

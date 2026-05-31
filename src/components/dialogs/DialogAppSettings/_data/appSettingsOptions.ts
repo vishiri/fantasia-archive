@@ -90,8 +90,8 @@ I_appSettingsStaticOption
     subcategory: 'applicationExtras'
   },
   hideTooltipsProject: {
-    category: 'visualAccessibility',
-    subcategory: 'applicationExtras'
+    category: 'projectOverview',
+    subcategory: 'projectOverviewBehavior'
   },
   hideTooltipsStart: {
     category: 'welcomeScreen',

@@ -9,34 +9,55 @@ import type {
 
 const ACCESSIBILITY_CATEGORY_KEY = 'accessibility'
 const DEVELOPER_SETTINGS_CATEGORY_KEY = 'developerSettings'
+const APP_SETTINGS_PAGE_CATEGORY_TITLE_PREFIX = 'page:'
+
+function isAppSettingsPageCategoryTitle (categoryTitle: string): boolean {
+  return categoryTitle.trim().toLocaleLowerCase().startsWith(APP_SETTINGS_PAGE_CATEGORY_TITLE_PREFIX)
+}
+
+function appSettingsCategorySortLabel (categoryKey: string, categoryTitle: string): string {
+  if (categoryTitle !== '') {
+    return categoryTitle
+  }
+  return categoryKey
+}
 
 /**
- * Tab order: ordinary category keys sort alphabetically, then 'accessibility', then 'developerSettings' last.
+ * Tab order: Page-prefixed categories first (alphabetical by title), then other categories
+ * (alphabetical by title), then accessibility, then developerSettings last.
  */
 export function compareAppSettingsCategoryOrder (
   categoryA: string,
-  categoryB: string
+  categoryB: string,
+  categoryTitleA = '',
+  categoryTitleB = ''
 ): number {
   if (categoryA === categoryB) {
     return 0
   }
 
-  const rank = (key: string): number => {
+  const rank = (key: string, title: string): number => {
     if (key === DEVELOPER_SETTINGS_CATEGORY_KEY) {
-      return 2
+      return 3
     }
     if (key === ACCESSIBILITY_CATEGORY_KEY) {
-      return 1
+      return 2
     }
-    return 0
+    if (isAppSettingsPageCategoryTitle(title)) {
+      return 0
+    }
+    return 1
   }
 
-  const rankA = rank(categoryA)
-  const rankB = rank(categoryB)
+  const rankA = rank(categoryA, categoryTitleA)
+  const rankB = rank(categoryB, categoryTitleB)
   if (rankA !== rankB) {
     return rankA - rankB
   }
-  return categoryA.localeCompare(categoryB)
+
+  const labelA = appSettingsCategorySortLabel(categoryA, categoryTitleA)
+  const labelB = appSettingsCategorySortLabel(categoryB, categoryTitleB)
+  return labelA.localeCompare(labelB, undefined, { sensitivity: 'base' })
 }
 
 export function toSortedRecord<T> (record: Record<string, T>): Record<string, T> {
@@ -125,8 +146,14 @@ function appendOneSnapshotKeyToUnsortedTree (
 }
 
 function sortUnsortedAppSettingsTree (unsortedTree: T_appSettingsRenderTree): T_appSettingsRenderTree {
-  const sortedCategoryEntries = Object.entries(unsortedTree).sort(([categoryA], [categoryB]) =>
-    compareAppSettingsCategoryOrder(categoryA, categoryB)
+  const sortedCategoryEntries = Object.entries(unsortedTree).sort(
+    ([categoryA, categoryValueA], [categoryB, categoryValueB]) =>
+      compareAppSettingsCategoryOrder(
+        categoryA,
+        categoryB,
+        categoryValueA.title,
+        categoryValueB.title
+      )
   )
   const sortedTree: T_appSettingsRenderTree = {}
 

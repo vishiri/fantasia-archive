@@ -27,10 +27,27 @@ import {
   toSortedRecord
 } from 'app/src/components/dialogs/DialogAppSettings/scripts/functions/dialogAppSettingsTreeBuild'
 
+const appSettingsCategoryTitleByKey: Record<string, string> = {
+  accessibility: 'Accessibility',
+  developerSettings: 'Developer settings',
+  documentViewEdit: 'Document view/edit',
+  hierarchicalTree: 'Hierarchical tree',
+  openedDocumentsTabs: 'Open document tabs',
+  popupsFloatingWindows: 'Popups & floating windows',
+  projectOverview: 'Page: Project overview',
+  visualAccessibility: 'Visuals & app-wide functionality',
+  welcomeScreen: 'Page: Welcome Screen'
+}
+
 const dialogAppSettingsTreeTranslate = {
   t: (key: string): string => {
     if (key === 'dialogs.appSettings.appOptions.darkMode.note') {
       return 'Fixture note'
+    }
+    const categoryTitleMatch = /^dialogs\.appSettings\.appOptionsCategories\.([^.]+)\.title$/.exec(key)
+    if (categoryTitleMatch !== null) {
+      const categoryKey = categoryTitleMatch[1]
+      return appSettingsCategoryTitleByKey[categoryKey] ?? key
     }
     return key
   },
@@ -62,14 +79,43 @@ test('Test that compareAppSettingsCategoryOrder returns zero for the same catego
 
 /**
  * compareAppSettingsCategoryOrder
- * Puts 'developerSettings' last and 'accessibility' immediately before it; others sort alphabetically among themselves.
+ * When category titles are empty, sort labels fall back to category keys.
  */
-test('Test that compareAppSettingsCategoryOrder orders accessibility before developer and both after ordinary keys', () => {
-  const keys = ['developerSettings', 'documentViewEdit', 'accessibility', 'hierarchicalTree']
+test('Test that compareAppSettingsCategoryOrder sorts by category key when titles are empty', () => {
+  expect(compareAppSettingsCategoryOrder('beta', 'alpha', '', '')).toBeGreaterThan(0)
+  expect(compareAppSettingsCategoryOrder('alpha', 'beta', '', '')).toBeLessThan(0)
+})
 
-  const ordered = [...keys].sort(compareAppSettingsCategoryOrder)
+/**
+ * compareAppSettingsCategoryOrder
+ * Puts Page categories first, then other categories alphabetically by title, then accessibility, then developerSettings.
+ */
+test('Test that compareAppSettingsCategoryOrder orders page categories first then ordinary accessibility and developer last', () => {
+  const keys = [
+    'developerSettings',
+    'documentViewEdit',
+    'accessibility',
+    'hierarchicalTree',
+    'projectOverview',
+    'welcomeScreen'
+  ]
+
+  const titleByKey: Record<string, string> = {
+    accessibility: 'Accessibility',
+    developerSettings: 'Developer settings',
+    documentViewEdit: 'Document view/edit',
+    hierarchicalTree: 'Hierarchical tree',
+    projectOverview: 'Page: Project overview',
+    welcomeScreen: 'Page: Welcome Screen'
+  }
+
+  const ordered = [...keys].sort((keyA, keyB) =>
+    compareAppSettingsCategoryOrder(keyA, keyB, titleByKey[keyA], titleByKey[keyB])
+  )
 
   expect(ordered).toEqual([
+    'projectOverview',
+    'welcomeScreen',
     'documentViewEdit',
     'hierarchicalTree',
     'accessibility',
@@ -145,14 +191,18 @@ test('Test that toSortedRecord returns empty object for empty input', () => {
 
 /**
  * buildAppSettingsRenderTree
- * Category tabs end with accessibility then developerSettings after ordinary keys.
+ * Category tabs: Page categories first, ordinary keys alphabetically, accessibility, then developerSettings.
  */
-test('Test that buildAppSettingsRenderTree orders accessibility before developerSettings at the end', () => {
+test('Test that buildAppSettingsRenderTree orders page categories first and pins accessibility then developerSettings at the end', () => {
   const tree = buildAppSettingsRenderTreeForTest({
     ...FA_USER_SETTINGS_DEFAULTS
   })
   const keys = Object.keys(tree)
 
+  expect(keys.slice(0, 2)).toEqual([
+    'projectOverview',
+    'welcomeScreen'
+  ])
   expect(keys[keys.length - 1]).toBe('developerSettings')
   expect(keys[keys.length - 2]).toBe('accessibility')
 })

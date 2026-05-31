@@ -75,8 +75,14 @@ export function buildExpectedAppSettingsTreeFromEnUsMessages (): T_appSettingsRe
     }
   }
 
-  const sortedCategoryEntries = Object.entries(unsortedTree).sort(([categoryA], [categoryB]) =>
-    compareAppSettingsCategoryOrder(categoryA, categoryB)
+  const sortedCategoryEntries = Object.entries(unsortedTree).sort(
+    ([categoryA, categoryValueA], [categoryB, categoryValueB]) =>
+      compareAppSettingsCategoryOrder(
+        categoryA,
+        categoryB,
+        categoryValueA.title,
+        categoryValueB.title
+      )
   )
   const sortedTree: T_appSettingsRenderTree = {}
 
