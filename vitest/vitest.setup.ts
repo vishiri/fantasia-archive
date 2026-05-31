@@ -163,6 +163,9 @@ function resetFaVitestRendererHarness (): void {
       exportToFile: vi.fn(async () => ({ outcome: 'canceled' as const })),
       prepareImport: vi.fn(async () => ({ outcome: 'canceled' as const }))
     },
+    faChromiumCtrlShiftShortcut: {
+      installForwardedKeyChordListener: vi.fn()
+    },
     faProjectFailsafe: {
       installActiveProjectPathReply: vi.fn()
     },

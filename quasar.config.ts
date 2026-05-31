@@ -39,9 +39,11 @@ export default defineConfig((ctx) => {
       'notify-defaults',
       'qmarkdown',
       'faProjectFailsafePathReply',
+      'faChromiumForwardedKeyChord',
       'faProjectOsOpen',
       'faRoutingEnv',
-      'faE2eRendererProbes'
+      'faE2eRendererProbes',
+      'faComponentTestingRendererProbes'
     ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
