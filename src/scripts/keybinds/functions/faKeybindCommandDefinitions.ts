@@ -70,6 +70,7 @@ export const FA_KEYBIND_COMMAND_DEFINITIONS: I_faKeybindCommandDefinition[] = [
     defaultChord: {
       code: 'KeyO',
       mods: [
+        'alt',
         'ctrl',
         'shift'
       ]

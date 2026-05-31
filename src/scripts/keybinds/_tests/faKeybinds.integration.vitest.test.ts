@@ -473,7 +473,7 @@ test('createFaKeybindKeydownHandler skips repeat, composing, suspend, and editab
   expect(stopPropagation).toHaveBeenCalled()
 })
 
-test('createFaKeybindKeydownHandler dispatches showProjectDashboard for Ctrl+Shift+O', () => {
+test('createFaKeybindKeydownHandler dispatches showProjectDashboard for Ctrl+Shift+Alt+O', () => {
   const preventDefault = vi.fn()
   const stopPropagation = vi.fn()
   const handler = createFaKeybindKeydownHandler(() => ({
@@ -483,7 +483,7 @@ test('createFaKeybindKeydownHandler dispatches showProjectDashboard for Ctrl+Shi
   }))
 
   const ev = {
-    altKey: false,
+    altKey: true,
     code: 'KeyO',
     ctrlKey: true,
     isComposing: false,

@@ -80,7 +80,7 @@ let electronApp: ElectronApplication
 let appWindow: Page
 let suiteTestInfo: TestInfo
 
-test.describe.serial('Show Project Dashboard keybind (Ctrl+Shift+O)', () => {
+test.describe.serial('Show Project Dashboard keybind (Ctrl+Shift+Alt+O)', () => {
   test.beforeAll(async ({}, testInfo) => {
     suiteTestInfo = testInfo
     const launched = await launchFaPlaywrightE2eAppWindow({
@@ -105,7 +105,7 @@ test.describe.serial('Show Project Dashboard keybind (Ctrl+Shift+O)', () => {
     })
   })
 
-  test('default Control+Shift+O leaves 404 and shows Project Overview when a project is active', async () => {
+  test('default Control+Alt+Shift+O leaves 404 and shows Project Overview when a project is active', async () => {
     await createE2eProjectOnHome(appWindow, electronApp)
     await gotoFaPlaywrightE2eNonexistentRouteFor404(appWindow)
     await expect(appWindow.locator(`[data-test-locator="${selectorList.errorNotFoundPage}"]`)).toBeVisible()
