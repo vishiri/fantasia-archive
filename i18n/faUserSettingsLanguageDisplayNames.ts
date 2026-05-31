@@ -7,7 +7,7 @@ export const FA_USER_SETTINGS_LANGUAGE_DISPLAY_NAMES: Record<T_faUserSettingsLan
   ar: 'العربية (مُولَّد بواسطة AI)',
   de: 'Deutsch (AI-generiert)',
   el: 'Ελληνικά (δημιουργήθηκε με AI)',
-  enUS: 'English, US (AI-generated)',
+  enUS: 'English, US',
   es: 'Español (generado por AI)',
   fi: 'Suomi (AI-generoitu)',
   fr: 'Français (généré par AI)',
