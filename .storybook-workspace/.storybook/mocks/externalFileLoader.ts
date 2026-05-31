@@ -26,6 +26,7 @@ import L_faProjectSettings from 'app/i18n/en-US/globalFunctionality/L_faProjectS
 import L_faProjectSession from 'app/i18n/en-US/globalFunctionality/L_faProjectSession'
 import L_faUserSettings from 'app/i18n/en-US/globalFunctionality/L_faUserSettings'
 import L_unsortedAppTexts from 'app/i18n/en-US/globalFunctionality/L_unsortedAppTexts'
+import L_mainLayout from 'app/i18n/en-US/layouts/L_mainLayout'
 import L_ErrorNotFound from 'app/i18n/en-US/pages/L_ErrorNotFound'
 import L_projectOverview from 'app/i18n/en-US/components/projectUI/ProjectOverview/L_projectOverview'
 import L_splashPage from 'app/i18n/en-US/pages/L_splashPage'
@@ -41,12 +42,27 @@ import type { T_i18nScenario } from 'app/types/I_storybookWorkspaceHarness'
 const storybookExternalLoaderLocale = ref<string>('en-US')
 
 /**
+ * Bullet-list shape matches production tipsTricksTrivia.md so ProjectOverview and notify pickers resolve lines.
+ */
+const storybookDefaultTipsTricksTriviaMarkdown = [
+  '# Tips, Tricks & Trivia',
+  '----------',
+  '',
+  '- Typing `@` while editing large text fields lets you link to other documents directly inside the text editor!',
+  '- `Ctrl+Shift+F` opens find in the current document when you need a particular word on the page!',
+  '- The settings menu contains a whole assortment of both big and small tweaks to tailor the app to your needs!',
+  '- FA has a Dark Mode that is no mere afterthought and is fully serviceable!',
+  '- If these tips annoy you, there is a switch to turn them off in the app settings.'
+].join('\n')
+
+/**
  * Curated en-US tree for Storybook preview + Pinia mocks. Keep **structural parity** with
  * `i18n/en-US/index.ts` for every namespace stories use: adding a dialog or `globalFunctionality`
  * module to the app registry without a matching entry here surfaces raw i18n keys in the canvas.
  */
 const defaultMessages: Record<string, unknown> = {
   errorNotFound: L_ErrorNotFound,
+  mainLayout: L_mainLayout,
   splashPage: L_splashPage,
   dialogs: {
     aboutFantasiaArchive: L_aboutFantasiaArchive,
@@ -92,7 +108,7 @@ const defaultMessages: Record<string, unknown> = {
     advancedSearchGuide: '# Advanced Search Guide\n\nThe Archive supports layered criteria, so you can trace a single rumor across continents, dynasties, and calamities. Start with one stable anchor (`type` or `region`), then add `AND` clauses until noise drops to a usable shortlist. If a query becomes too strict, replace one clause with `OR` to recover adjacent lore.\n\nWhen documenting discoveries, keep a reproducible query trail in your notes. This helps collaborators verify whether a contradiction is a data issue or a timeline split caused by retcons in newer chronicles.\n\n## Suggested workflow\n\n1. Begin broad: `type:location AND region:"Western Fjords"`\n2. Add intent: `AND tag:"trade-route"`\n3. Exclude stale lore: `AND NOT status:archived`\n\n- Prefer quoted phrases for multi-word names.\n- Keep aliases in parentheses when known.\n- Confirm date scopes before publishing summaries.',
     changeLog: '# Changelog\n\n## 2.3.0\n\n### New features\n\n- Added Storybook-first component coverage with reusable mocks and docs-focused story taxonomy.\n- Introduced stress stories for long localization strings and markdown-heavy document rendering.\n\n### Bugfixes & Optimizations\n\n- Stabilized dialog previews in docs with iframe rendering to avoid overlay bleed.\n- Improved interaction assertions for Quasar menu rendering in Storybook.\n\n### Notes for worldbuilders\n\nThis release focuses on safer UI iteration loops, so lore-heavy interfaces can be validated before full Electron boot. Expect faster visual checks when polishing document dialogs and control menus.',
     license: '# License\n\nThis Storybook entry is placeholder prose for layout validation only and does **not** represent legal terms. In the setting, the Scribes\' Accord grants free circulation of non-commercial chronicles while preserving attribution for original curators.\n\nRedistributions should retain provenance markers, revision lineage, and source seals. Derivative codices are welcome when they document divergences clearly and avoid claiming canonical status without council approval.\n\n---\n\n## Validation checklist\n\n- Heading hierarchy renders correctly.\n- Long paragraphs wrap without overflow.\n- Inline emphasis, lists, and separators remain legible.',
-    tipsTricksTrivia: '# Tips, Tricks & Trivia\n\nThe fastest way to keep continuity intact is to cross-reference each new character entry against its parent house and region before publishing. Tiny naming differences often signal different eras, not mistakes. Keep aliases visible and annotate first sightings.\n\nFor crowded timelines, draft summaries in short bullets first, then expand into narrative paragraphs once the sequence is stable. This reduces accidental contradictions when multiple collaborators edit in parallel.\n\n## Field tips\n\n- Use **one canonical spelling** per release cycle.\n- Add `aka:` aliases immediately when discovered.\n- Mark disputed lore with `status:review` instead of deleting it.\n\n`Pro tip:` keep one query that always returns your current "must-review" set.',
+    tipsTricksTrivia: storybookDefaultTipsTricksTriviaMarkdown,
     test: '# Storybook Markdown Test\n\nThis document intentionally mixes formatting so dialog rendering can be verified in isolation. It simulates production-like lore paragraphs with headings, lists, quotes, code spans, and tables.\n\n> If this block is readable and wrapped correctly, markdown styling is likely healthy.\n\n- First paragraph checks spacing.\n- Second paragraph checks line-height.\n- Third paragraph checks nested formatting like **bold**, *italic*, and `inline code`.\n\n| Check | Expected |\n| --- | --- |\n| Wrapping | No horizontal overflow |\n| Typography | Consistent rhythm |\n| Emphasis | Clear visual contrast |'
   }
 }

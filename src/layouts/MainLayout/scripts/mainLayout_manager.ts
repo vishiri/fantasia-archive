@@ -14,6 +14,7 @@ import {
   createFaKeybindKeydownHandler,
   getFaKeybindKeydownContext
 } from 'app/src/scripts/keybinds/keybinds_manager'
+import { ensureFaChromiumForwardedKeyChordListener } from 'app/src/scripts/keybinds/faChromiumForwardedKeyChordInstall_manager'
 import { isFantasiaStorybookCanvas } from 'app/src/scripts/appInternals/appInternals_manager'
 import { hydrateFromBridgeOrReport } from 'app/src/scripts/stores/stores_manager'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
@@ -47,6 +48,7 @@ const mainLayoutApi = createMainLayout({
   computed,
   createMainLayoutDrawerRail,
   createFaKeybindKeydownHandler,
+  ensureFaChromiumForwardedKeyChordListener,
   getFaKeybindKeydownContext,
   hydrateFromBridgeOrReport,
   isFantasiaStorybookCanvas,

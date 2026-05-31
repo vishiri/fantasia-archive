@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
+import { withStorybookWorkspaceHomePreview } from '../../../.storybook-workspace/.storybook/decorators/withStorybookWorkspaceHomePreview'
 import StoryRouterShell from '../../../.storybook-workspace/.storybook/components/StoryRouterShell.vue'
 
 const meta = {
@@ -17,5 +18,6 @@ export default meta
 
 /** Legacy dev home with MainLayout (production route: /home). */
 export const WithinMainLayout: StoryObj<typeof meta> = {
-  args: { initialPath: '/home' }
+  args: { initialPath: '/home' },
+  decorators: [withStorybookWorkspaceHomePreview]
 }

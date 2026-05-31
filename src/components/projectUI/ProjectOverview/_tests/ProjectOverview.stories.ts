@@ -1,7 +1,9 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/vue3-vite'
 
-import { S_FaActiveProject } from 'src/stores/S_FaActiveProject'
-import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
+import {
+  withStorybookWorkspaceHomePreview,
+  withStorybookWorkspaceHomePreviewTipsHidden
+} from '../../../../../.storybook-workspace/.storybook/decorators/withStorybookWorkspaceHomePreview'
 
 import ProjectOverview from '../ProjectOverview.vue'
 
@@ -16,30 +18,6 @@ const projectOverviewCanvasDecorator: Decorator = (story) => {
       </div>
     `
   }
-}
-
-const withActiveProject: Decorator = (story) => {
-  S_FaActiveProject().$patch({
-    activeProject: {
-      filePath: 'C:\\Storybook\\Aurelion Citadel.faproject',
-      name: 'Aurelion Citadel'
-    }
-  })
-
-  return story()
-}
-
-const withTipsHidden: Decorator = (story) => {
-  const settingsStore = S_FaUserSettings()
-
-  settingsStore.$patch({
-    settings: {
-      ...settingsStore.settings,
-      hideTooltipsProject: true
-    }
-  })
-
-  return story()
 }
 
 const meta = {
@@ -59,17 +37,16 @@ const meta = {
 
 export default meta
 
-export const Default: StoryObj<typeof meta> = {}
+export const Default: StoryObj<typeof meta> = {
+  decorators: [withStorybookWorkspaceHomePreview]
+}
 
 export const WithActiveProject: StoryObj<typeof meta> = {
   name: 'States/WithActiveProject',
-  decorators: [withActiveProject]
+  decorators: [withStorybookWorkspaceHomePreview]
 }
 
 export const TipsCardHidden: StoryObj<typeof meta> = {
   name: 'States/TipsCardHidden',
-  decorators: [
-    withActiveProject,
-    withTipsHidden
-  ]
+  decorators: [withStorybookWorkspaceHomePreviewTipsHidden]
 }

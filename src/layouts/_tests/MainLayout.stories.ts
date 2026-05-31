@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
+import { withStorybookWorkspaceHomePreview } from '../../../.storybook-workspace/.storybook/decorators/withStorybookWorkspaceHomePreview'
 import StoryRouterShell from '../../../.storybook-workspace/.storybook/components/StoryRouterShell.vue'
 
 const meta = {
@@ -22,7 +23,8 @@ export const WelcomeWithSplashPage: StoryObj<typeof meta> = {
 
 /** Home route: IndexPage inside the main chrome. */
 export const WithIndexPage: StoryObj<typeof meta> = {
-  args: { initialPath: '/home' }
+  args: { initialPath: '/home' },
+  decorators: [withStorybookWorkspaceHomePreview]
 }
 
 /** Main layout with an empty outlet (header + drawer + placeholder body). */

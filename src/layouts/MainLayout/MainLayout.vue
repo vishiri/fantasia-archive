@@ -21,8 +21,10 @@
 
     <q-drawer
       :model-value="showWorkspaceDrawer"
+      :behavior="storybookDrawerBehavior"
       data-test-locator="mainLayout-drawer"
       dark
+      :overlay="storybookDrawerOverlay"
       :transition-duration="FA_APP_SHELL_DRAWER_TRANSITION_MS"
       transition-hide="slide-left"
       transition-show="slide-right"
@@ -73,7 +75,9 @@ const {
   appShellLayoutRouteClass,
   isFantasiaStorybookCanvas,
   resolveMainLayoutOutletKeyFromRoute,
-  showWorkspaceDrawer
+  showWorkspaceDrawer,
+  storybookDrawerBehavior,
+  storybookDrawerOverlay
 } = useMainLayout()
 </script>
 
