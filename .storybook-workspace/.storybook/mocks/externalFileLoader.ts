@@ -30,6 +30,7 @@ import L_mainLayout from 'app/i18n/en-US/layouts/L_mainLayout'
 import L_ErrorNotFound from 'app/i18n/en-US/pages/L_ErrorNotFound'
 import L_projectOverview from 'app/i18n/en-US/components/projectUI/ProjectOverview/L_projectOverview'
 import L_splashPage from 'app/i18n/en-US/pages/L_splashPage'
+import { specialCharacterFixer } from 'app/i18n/specialCharactersFixer'
 import { ref } from 'vue'
 
 import type { T_i18nScenario } from 'app/types/I_storybookWorkspaceHarness'
@@ -44,7 +45,7 @@ const storybookExternalLoaderLocale = ref<string>('en-US')
 /**
  * Bullet-list shape matches production tipsTricksTrivia.md so ProjectOverview and notify pickers resolve lines.
  */
-const storybookDefaultTipsTricksTriviaMarkdown = [
+const storybookDefaultTipsTricksTriviaMarkdown = specialCharacterFixer([
   '# Tips, Tricks & Trivia',
   '----------',
   '',
@@ -53,7 +54,7 @@ const storybookDefaultTipsTricksTriviaMarkdown = [
   '- The settings menu contains a whole assortment of both big and small tweaks to tailor the app to your needs!',
   '- FA has a Dark Mode that is no mere afterthought and is fully serviceable!',
   '- If these tips annoy you, there is a switch to turn them off in the app settings.'
-].join('\n')
+].join('\n'))
 
 /**
  * Curated en-US tree for Storybook preview + Pinia mocks. Keep **structural parity** with

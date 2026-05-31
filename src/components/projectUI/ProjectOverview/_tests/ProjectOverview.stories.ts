@@ -41,11 +41,6 @@ export const Default: StoryObj<typeof meta> = {
   decorators: [withStorybookWorkspaceHomePreview]
 }
 
-export const WithActiveProject: StoryObj<typeof meta> = {
-  name: 'States/WithActiveProject',
-  decorators: [withStorybookWorkspaceHomePreview]
-}
-
 export const TipsCardHidden: StoryObj<typeof meta> = {
   name: 'States/TipsCardHidden',
   decorators: [withStorybookWorkspaceHomePreviewTipsHidden]
