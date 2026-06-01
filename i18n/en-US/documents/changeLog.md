@@ -1,6 +1,8 @@
 # Changelog
 ----------
 
+## 2.4.14 - Version bump
+
 ## 2.4.13 - Version bump
 
 ### New features

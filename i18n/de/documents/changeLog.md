@@ -1,6 +1,8 @@
 # Änderungsprotokoll
 ----------
 
+## 2.4.14 – Versionssprung
+
 ## 2.4.13 – Versionssprung
 
 ### Neue Funktionen

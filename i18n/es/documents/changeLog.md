@@ -1,6 +1,8 @@
 # Registro de cambios
 ----------
 
+## 2.4.14 - Mejora de versión
+
 ## 2.4.13 - Mejora de versión
 
 ### Nuevas funciones

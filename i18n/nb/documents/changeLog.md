@@ -1,6 +1,8 @@
 # Endringslogg
 ----------
 
+## 2.4.14 - Versjonsbump
+
 ## 2.4.13 - Versjonsbump
 
 ### Nye funksjoner
