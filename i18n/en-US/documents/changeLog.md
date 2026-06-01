@@ -18,6 +18,7 @@
 - **Show Project Dashboard**: **Project Management** lists **Show Project Dashboard** when a **`.faproject`** is loaded. The default global shortcut is **Ctrl+Shift+Alt+O** on every desktop platform (literal Control on macOS).
 
 ### Bugfixes & Optimizations
+- Bumped **axios** to **1.16.1** for HTTP and fetch adapter fixes (redirect and proxy **Host** handling, fetch **maxBodyLength** / **maxContentLength** enforcement) and security hardening from recent **1.15.x** and **1.16.x** releases.
 - **Contributor layout**: Repository-root automation moved from **`scripts/`** to **`.utility-scripts/`** so it is distinct from **`src/scripts/`** application code and from **`package.json` `scripts`**; **README**, **AGENTS**, Cursor rules/skills, and **`yarn`** commands that invoke those **`.mjs`** files use the new path.
 - **Contributor layout**: **Electron** **`mainScripts`** areas now follow the same two-level layout as the renderer (**`functions/`**, **`*_manager.ts`** entry modules, **`*Wiring.ts`** implementation siblings); cross-area imports prefer those managers (for example **`projectManagement_manager`**, **`appConfig_manager`**, **`windowManagement_manager`**, **`ipcManagement_manager`** with **`registerAllFaIpc`**).
 - **Action Monitor**: Failed desktop-bridge refreshes for **Keybind Settings**, **Custom App CSS**, and **Custom Project CSS** at startup or before those surfaces open now surface one shared error toast through the **action manager** instead of duplicate notifications from each store.
