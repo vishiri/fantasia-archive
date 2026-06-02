@@ -52,6 +52,18 @@ yarn install
 
 Bundled DevTools call Chrome CDP domains that Electron does not implement; Chromium logs harmless failures to stderr. The app filters those specific lines in the Electron **main** process so the dev terminal stays readable (they can still appear inside the DevTools console itself).
 
+### `Could not locate the bindings file` when opening a `.faproject`
+
+**better-sqlite3** is a native addon. It must be compiled for the **Electron** Node ABI, not only system **Node**. A missing **`node_modules/better-sqlite3/build`** tree or a bindings error on **Load existing project** / **Resume Latest Project** usually means native deps were not rebuilt.
+
+**Fix** (close **quasar dev** / Electron first if Windows reports file locks):
+
+```bash
+yarn rebuild:native
+```
+
+That runs **`electron-builder install-app-deps`** (also hooked from **`yarn install`** via **`postinstall`**). If it still fails, remove **`node_modules/better-sqlite3`**, run **`yarn install`** with lifecycle scripts enabled (do not use **`npm install --ignore-scripts`**), then **`yarn rebuild:native`** again.
+
 ## Production build
 
 Required for packaged app behavior and **before Playwright** component/e2e runs:
