@@ -3,19 +3,21 @@ import type { I_faActionFailureLog, I_faActionQueueEntry } from 'app/types/I_faA
 import type { T_injectedResultFromThrowable } from 'app/types/I_injectedNeverthrow'
 
 type T_createFaActionManagerErrorReportingDeps = {
-  FaProjectOpenFailedError: new (
-    message: string,
-    attemptedFilePath?: string,
-    notifyType?: 'negative' | 'warning'
-  ) => Error & {
+  fromThrowable: T_injectedResultFromThrowable
+  normalizeFaActionError: (error: unknown) => { name: string, message: string, stack?: string }
+  notifyCreate: (options: Record<string, unknown>) => void
+  readFaProjectOpenFailedShape: (error: unknown) => {
     attemptedFilePath?: string
     notifyType?: 'negative' | 'warning'
-  }
-  fromThrowable: T_injectedResultFromThrowable
-  notifyCreate: (options: Record<string, unknown>) => void
+  } | null
   resolveFaActionManagerStore: () => {
     recordFailure: (failure: I_faActionFailureLog) => void
   } | null
+  resolveFaActionFailureNotifyCaption: (
+    entry: I_faActionQueueEntry,
+    error: unknown,
+    normalizedMessage: string
+  ) => string
   translateActionFailed: (actionId: string) => string
 }
 
@@ -54,40 +56,17 @@ function buildFaActionFailureHistoryPayloadPreview (
   deps: T_createFaActionManagerErrorReportingDeps,
   error: unknown
 ): string | undefined {
-  if (!(error instanceof deps.FaProjectOpenFailedError)) {
+  const projectOpenFailed = deps.readFaProjectOpenFailedShape(error)
+  if (projectOpenFailed === null) {
     return undefined
   }
   const row: Record<string, string> = {
-    errorMessage: error.message
+    errorMessage: (error as Error).message
   }
-  const projectError = error as InstanceType<typeof deps.FaProjectOpenFailedError>
-  if (projectError.attemptedFilePath !== undefined) {
-    row.filePath = projectError.attemptedFilePath
+  if (projectOpenFailed.attemptedFilePath !== undefined) {
+    row.filePath = projectOpenFailed.attemptedFilePath
   }
   return buildFaActionPayloadPreview(deps, row)
-}
-
-function normalizeFaActionError (error: unknown): { name: string, message: string, stack?: string } {
-  if (error instanceof Error) {
-    const result: { name: string, message: string, stack?: string } = {
-      message: error.message,
-      name: error.name
-    }
-    if (typeof error.stack === 'string') {
-      result.stack = error.stack
-    }
-    return result
-  }
-  if (typeof error === 'string') {
-    return {
-      message: error,
-      name: 'Error'
-    }
-  }
-  return {
-    message: String(error),
-    name: 'Error'
-  }
 }
 
 function reportFaActionFailure (
@@ -95,7 +74,7 @@ function reportFaActionFailure (
   entry: I_faActionQueueEntry,
   error: unknown
 ): I_faActionFailureLog {
-  const normalized = normalizeFaActionError(error)
+  const normalized = deps.normalizeFaActionError(error)
   const payloadPreview = buildFaActionPayloadPreview(deps, entry.payload)
 
   console.error('[faActionManager]', {
@@ -107,16 +86,21 @@ function reportFaActionFailure (
   })
 
   const notifyDisplayType =
-    error instanceof deps.FaProjectOpenFailedError && error.notifyType === 'warning'
+    deps.readFaProjectOpenFailedShape(error)?.notifyType === 'warning'
       ? 'warning'
       : 'negative'
+  const notifyCaption = deps.resolveFaActionFailureNotifyCaption(
+    entry,
+    error,
+    normalized.message
+  )
 
   deps.notifyCreate({
     actions: [{
       color: 'white',
       icon: 'mdi-close'
     }],
-    caption: normalized.message,
+    caption: notifyCaption,
     faSkipNotifyConsoleLog: true,
     group: false,
     message: deps.translateActionFailed(entry.id),
@@ -148,6 +132,8 @@ export function createFaActionManagerErrorReporting (deps: T_createFaActionManag
   normalizeFaActionError: (error: unknown) => { name: string, message: string, stack?: string }
   reportFaActionFailure: (entry: I_faActionQueueEntry, error: unknown) => I_faActionFailureLog
 } {
+  const normalizeFaActionError = deps.normalizeFaActionError
+
   return {
     buildFaActionFailureHistoryPayloadPreview: (error) => buildFaActionFailureHistoryPayloadPreview(deps, error),
     buildFaActionPayloadPreview: (payload, maxLength) => buildFaActionPayloadPreview(deps, payload, maxLength),

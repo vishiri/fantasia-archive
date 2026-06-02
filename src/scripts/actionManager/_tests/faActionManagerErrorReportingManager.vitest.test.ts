@@ -55,3 +55,18 @@ test('Test that reportFaActionFailure calls the bridge when no store is active',
   expect(resolveSpy).toHaveBeenCalled()
   resolveSpy.mockRestore()
 })
+
+/**
+ * reportFaActionFailure
+ * Emits the unified failure toast through Notify.create at call time.
+ */
+test('Test that reportFaActionFailure calls Notify.create for the failure toast', () => {
+  reportFaActionFailure(buildEntry(), new Error('resume load failed'))
+  expect(notifyCreateMock).toHaveBeenCalledOnce()
+  expect(notifyCreateMock).toHaveBeenCalledWith(
+    expect.objectContaining({
+      caption: 'resume load failed',
+      type: 'negative'
+    })
+  )
+})

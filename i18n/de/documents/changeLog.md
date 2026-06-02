@@ -3,6 +3,11 @@
 
 ## 2.4.14 – Versionssprung
 
+### Fehlerbehebungen und Optimierungen
+- **Willkommensbildschirm**: **Letztes Projekt fortsetzen** zeigt wieder den Fehler-Toast des Aktionsmanagers, wenn das zuletzt verwendete Projekt nicht geöffnet werden kann (zum Beispiel eine fehlende **`.faproject`**-Datei), statt nach einem Konsolenfehler still zu scheitern.
+- **Projektladen**: Schlägt **Vorhandenes Projekt laden** fehl, zeigt die Fehler-Toast-Beschriftung nur den Pfad der **`.faproject`**, die nicht geöffnet werden konnte (auch nach dem Dateiauswahldialog); technische Backend-Meldungen bleiben in der Konsole und in der **Aktionsmonitor**-Historie.
+- **Desktop-Entwicklung**: **`yarn install`** führt jetzt **`electron-builder install-app-deps`** aus, damit native **better-sqlite3**-Bindungen zur gebündelten **Electron**-Laufzeit passen; nach einem Wechsel von **Electron** oder **Node** **`yarn rebuild:native`** ausführen, wenn das Öffnen von Projekten weiterhin fehlende Bindings meldet.
+
 ## 2.4.13 – Versionssprung
 
 ### Neue Funktionen

@@ -3,6 +3,11 @@
 
 ## 2.4.14 - Version bump
 
+### Bugfixes & Optimizations
+- **Welcome screen**: **Resume Latest Project** again shows the action manager failure toast when the recent project cannot be opened (for example a missing **`.faproject`** file), instead of failing silently after a console error.
+- **Project load failures**: When **loadExistingProject** fails, the error toast caption shows only the **`.faproject`** path that could not be opened (including **Load existing project** after the file picker); technical backend messages stay in the console and **Action Monitor** history.
+- **Desktop development**: **`yarn install`** now runs **`electron-builder install-app-deps`** so **better-sqlite3** native bindings match the bundled **Electron** runtime; use **`yarn rebuild:native`** after changing **Electron** or **Node** if project open still reports missing bindings.
+
 ## 2.4.13 - Version bump
 
 ### New features

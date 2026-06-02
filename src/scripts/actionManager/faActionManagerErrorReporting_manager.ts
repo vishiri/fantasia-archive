@@ -4,13 +4,19 @@ import { Result } from 'neverthrow'
 import { i18n } from 'app/i18n/externalFileLoader'
 
 import * as faActionManagerStoreBridge from './faActionManagerStoreBridge_manager'
-import { FaProjectOpenFailedError } from './functions/faProjectOpenFailedError'
 import { createFaActionManagerErrorReporting } from './functions/createFaActionManagerErrorReporting'
+import {
+  normalizeFaActionError as normalizeFaActionErrorImpl,
+  readFaProjectOpenFailedShape,
+  resolveFaActionFailureNotifyCaption
+} from './faActionManagerErrorReportingNormalize'
 
 const faActionManagerErrorReportingApi = createFaActionManagerErrorReporting({
-  FaProjectOpenFailedError,
   fromThrowable: Result.fromThrowable,
-  notifyCreate: Notify.create,
+  normalizeFaActionError: normalizeFaActionErrorImpl,
+  notifyCreate: (options) => Notify.create(options),
+  readFaProjectOpenFailedShape,
+  resolveFaActionFailureNotifyCaption,
   resolveFaActionManagerStore: () => faActionManagerStoreBridge.resolveFaActionManagerStore(),
   translateActionFailed: (actionId) =>
     i18n.global.t('globalFunctionality.faActionManager.actionFailed', {

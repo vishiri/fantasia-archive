@@ -3,6 +3,11 @@
 
 ## 2.4.14 - Changement de version
 
+### Corrections de bugs et optimisations
+- **Écran de bienvenue** : **Reprendre le dernier projet** affiche à nouveau le toast d'échec du gestionnaire d'actions lorsque le projet récent ne peut pas être ouvert (par exemple un fichier **`.faproject`** manquant), au lieu d'échouer silencieusement après une erreur console.
+- **Chargement de projet** : lorsque **Charger un projet existant** échoue, la légende du toast d'erreur n'affiche que le chemin du **`.faproject`** qui n'a pas pu être ouvert (y compris après le sélecteur de fichiers) ; les messages techniques du backend restent dans la console et l'historique du **Moniteur d'actions**.
+- **Développement bureau** : **`yarn install`** exécute désormais **`electron-builder install-app-deps`** pour que les liaisons natives **better-sqlite3** correspondent à l'exécution **Electron** empaquetée ; utilisez **`yarn rebuild:native`** après un changement d'**Electron** ou de **Node** si l'ouverture de projet signale encore des liaisons manquantes.
+
 ## 2.4.13 - Changement de version
 
 ### Nouvelles fonctionnalités

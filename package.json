@@ -44,7 +44,9 @@
     "testbatch:ensure:nochange": "yarn testbatch:verify && yarn quasar:build:electron:summarized && yarn test:components && yarn test:e2e && yarn test:storybook:smoke && yarn test:storybook:visual",
     "audit:policy": "node .utility-scripts/policyComplianceAudit.mjs",
     "audit:quasar-component-tokens": "node .utility-scripts/auditQuasarComponentTokens.mjs",
-    "prepare": "husky"
+    "postinstall": "electron-builder install-app-deps",
+    "prepare": "husky",
+    "rebuild:native": "electron-builder install-app-deps"
   },
   "dependencies": {
     "@quasar/extras": "^1.17.0",

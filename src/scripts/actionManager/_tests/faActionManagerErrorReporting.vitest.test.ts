@@ -200,6 +200,52 @@ test('Test that reportFaActionFailure emits one console error and one notify', (
 
 /**
  * reportFaActionFailure
+ * Resolves project open path from error.name when instanceof is unreliable across bundles.
+ */
+test('Test that reportFaActionFailure uses attempted file path for FaProjectOpenFailedError by error name', () => {
+  const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  const bindingsNoise = 'Could not locate the bindings file.'
+  const err = new Error(bindingsNoise)
+  err.name = 'FaProjectOpenFailedError'
+  Object.assign(err, {
+    attemptedFilePath: 'C:\\data\\picked.faproject',
+    notifyType: 'negative'
+  })
+  reportFaActionFailure(
+    buildEntry('loadExistingProject'),
+    err
+  )
+  expect(notifyCreateMock).toHaveBeenCalledWith(
+    expect.objectContaining({
+      caption: 'C:\\data\\picked.faproject',
+      type: 'negative'
+    })
+  )
+  consoleSpy.mockRestore()
+})
+
+/**
+ * reportFaActionFailure
+ * Shows attempted project path in the toast caption for hard project open failures.
+ */
+test('Test that reportFaActionFailure uses attempted file path as notify caption for FaProjectOpenFailedError', () => {
+  const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  const bindingsNoise = 'Could not locate the bindings file. Tried: C:\\build\\Release\\better_sqlite3.node'
+  reportFaActionFailure(
+    buildEntry('loadExistingProject', { filePath: 'C:\\data\\latest.faproject' }),
+    new FaProjectOpenFailedError(bindingsNoise, 'C:\\data\\latest.faproject', 'negative')
+  )
+  expect(notifyCreateMock).toHaveBeenCalledWith(
+    expect.objectContaining({
+      caption: 'C:\\data\\latest.faproject',
+      type: 'negative'
+    })
+  )
+  consoleSpy.mockRestore()
+})
+
+/**
+ * reportFaActionFailure
  * Uses warning Notify when FaProjectOpenFailedError requests it (console stays error).
  */
 test('Test that reportFaActionFailure uses warning notify for soft FaProjectOpenFailedError', () => {
