@@ -193,7 +193,7 @@ export default [...neostandard({
   ignores: codeSizeRuleIgnores,
   rules: {
     'max-lines': ['error', {
-      max: 200,
+      max: 250,
       skipBlankLines: true,
       skipComments: true
     }],
@@ -237,7 +237,7 @@ export default [...neostandard({
   ],
   rules: {
     'max-lines': ['error', {
-      max: 200,
+      max: 250,
       skipBlankLines: true,
       skipComments: true
     }],

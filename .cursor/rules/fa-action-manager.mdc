@@ -36,7 +36,7 @@ The action manager is the **only** place that emits **error** toasts for registe
 
 ## Authoring constraints
 
-- **Module size and function size** — every file under **`src/scripts/actionManager/`** stays within the global **≤200 lines per `.ts` module** and **≤100 lines per function** caps from [code-size-decomposition.mdc](code-size-decomposition.mdc). Split by concern (registry vs run vs sync queue vs error vs history vs store bridge) instead of stuffing one mega module.
+- **Module size and function size** — every file under **`src/scripts/actionManager/`** stays within the global **≤250 lines per `.ts` module** and **≤100 lines per function** caps from [code-size-decomposition.mdc](code-size-decomposition.mdc). Split by concern (registry vs run vs sync queue vs error vs history vs store bridge) instead of stuffing one mega module.
 - **No direct `Notify.create` for action failures** — call **`reportFaActionFailure`** (or rely on the manager's automatic path). Overflow drops in the sync queue are the one place that already emits its own dedicated toast and immediately records a synthetic **`failed`** history row.
 - **Handler errors** — handlers may **throw** or **reject**; the manager catches both, normalizes them via **`normalizeFaActionError`**, and routes them through **`reportFaActionFailure`**.
 - **Payload preview** — the manager always uses **`buildFaActionPayloadPreview`** for log/history rendering. Cycles or unserializable payloads degrade gracefully to **`[unserializable]`**; long previews are truncated to keep the monitor table readable.

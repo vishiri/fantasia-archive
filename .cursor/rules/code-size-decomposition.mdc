@@ -33,12 +33,12 @@ When you **`return { ... }`** (or otherwise **return an object literal** as the 
 
 ## TypeScript modules (`.ts`, `.mts`, `.cts`)
 
-- **Hard limit:** a **single TypeScript file** **must not exceed 200 lines** (ESLint `max-lines` with `skipBlankLines` and `skipComments`).
+- **Hard limit:** a **single TypeScript file** **must not exceed 250 lines** (ESLint `max-lines` with `skipBlankLines` and `skipComments`).
 - **When a module grows**, split into **smaller files** by concern (one module per responsibility), re-export from a barrel only when it genuinely simplifies imports.
 
 ## Module count: prefer logical grouping
 
-Limits are **maximums**, not an invitation to maximize file count. Prefer **fewer modules** that each hold **related** functions (same feature flow, same subsystem, or the same public API surface) until a file nears the **200-line** cap or a **single function** nears **100 lines**, then split on a clear boundary.
+Limits are **maximums**, not an invitation to maximize file count. Prefer **fewer modules** that each hold **related** functions (same feature flow, same subsystem, or the same public API surface) until a file nears the **250-line** cap or a **single function** nears **100 lines**, then split on a clear boundary.
 
 - **Avoid** many **10–20 line** one-export files that only exist because each helper was split mechanically; that makes navigation and review harder without helping the linter.
 - **Split by logical batch**, not by mechanical one-function-per-file: a new file should represent a **coherent concern** (for example chord equality + default expansion + resolving an effective chord in one place) or a **real boundary** (test mock seam, circular import, or a deliberately small public API module). Naming files after single helpers at scale is a smell unless ESLint size limits require it.
