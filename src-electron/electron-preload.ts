@@ -20,6 +20,7 @@ import { faChromiumCtrlShiftShortcutAPI } from 'app/src-electron/contentBridgeAP
 import { faProjectFailsafeAPI } from 'app/src-electron/contentBridgeAPIs/faProjectFailsafeAPI'
 import { faProjectOsOpenAPI } from 'app/src-electron/contentBridgeAPIs/faProjectOsOpenAPI'
 import { faUserSettingsAPI } from './contentBridgeAPIs/faUserSettingsAPI'
+import { projectContentAPI } from 'app/src-electron/contentBridgeAPIs/projectContentAPI'
 import { projectManagementAPI } from 'app/src-electron/contentBridgeAPIs/projectManagementAPI'
 
 /*
@@ -41,7 +42,8 @@ const apiObject = {
   faChromiumCtrlShiftShortcut: { ...faChromiumCtrlShiftShortcutAPI },
   faProjectFailsafe: { ...faProjectFailsafeAPI },
   faProjectOsOpen: { ...faProjectOsOpenAPI },
-  projectManagement: { ...projectManagementAPI }
+  projectManagement: { ...projectManagementAPI },
+  projectContent: { ...projectContentAPI }
 }
 
 contextBridge.exposeInMainWorld('faContentBridgeAPIs', apiObject)

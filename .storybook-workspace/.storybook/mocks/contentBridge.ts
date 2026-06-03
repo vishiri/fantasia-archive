@@ -32,6 +32,7 @@ import type {
   I_faProjectStylingPatch,
   I_faProjectStylingRoot
 } from 'app/types/I_faProjectStylingDomain'
+import { createFaProjectContentBridgeHarnessStub } from 'app/helpers/faProjectContentBridgeHarnessStub'
 
 const defaultExtraEnvSnapshot: I_extraEnvVariablesAPI = {
   COMPONENT_NAME: undefined,
@@ -237,6 +238,7 @@ const baseBridge = () => {
       installOsOpenListener: () => undefined,
       sendRendererReady: () => undefined
     },
+    projectContent: createFaProjectContentBridgeHarnessStub(),
     projectManagement: {
       createProject: async (_input: I_faProjectCreateInput): Promise<I_faProjectCreateResult> => ({
         outcome: 'canceled'
@@ -330,6 +332,10 @@ export const setContentBridgeScenario = (
     faProjectOsOpen: {
       ...nextBridge.faProjectOsOpen,
       ...(overrides.faProjectOsOpen ?? {})
+    },
+    projectContent: {
+      ...nextBridge.projectContent,
+      ...(overrides.projectContent ?? {})
     },
     projectManagement: {
       ...nextBridge.projectManagement,

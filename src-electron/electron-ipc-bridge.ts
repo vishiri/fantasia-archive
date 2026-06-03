@@ -87,6 +87,38 @@ export const FA_PROJECT_MANAGEMENT_IPC = {
     'fa-project-management-set-project-styling-patch-async'
 } as const
 
+/** Active '.faproject' worldbuilding content tables — async invoke/handle. */
+export const FA_PROJECT_CONTENT_IPC = {
+  createDocumentAsync: 'fa-project-content-create-document-async',
+  createDocumentTemplateAsync: 'fa-project-content-create-document-template-async',
+  createMediaAsync: 'fa-project-content-create-media-async',
+  createWorldAsync: 'fa-project-content-create-world-async',
+  deleteDocumentAsync: 'fa-project-content-delete-document-async',
+  deleteDocumentTemplateAsync: 'fa-project-content-delete-document-template-async',
+  deleteMediaAsync: 'fa-project-content-delete-media-async',
+  deleteWorldAsync: 'fa-project-content-delete-world-async',
+  getDocumentByIdAsync: 'fa-project-content-get-document-by-id-async',
+  getDocumentTemplateByIdAsync: 'fa-project-content-get-document-template-by-id-async',
+  getMediaByIdAsync: 'fa-project-content-get-media-by-id-async',
+  getWorldByIdAsync: 'fa-project-content-get-world-by-id-async',
+  linkDocumentMediaAsync: 'fa-project-content-link-document-media-async',
+  linkWorldMediaAsync: 'fa-project-content-link-world-media-async',
+  listDocumentMediaAsync: 'fa-project-content-list-document-media-async',
+  listDocumentsAsync: 'fa-project-content-list-documents-async',
+  listDocumentTemplatesAsync: 'fa-project-content-list-document-templates-async',
+  listMediaAsync: 'fa-project-content-list-media-async',
+  listMediaForWorldAsync: 'fa-project-content-list-media-for-world-async',
+  listWorldsAsync: 'fa-project-content-list-worlds-async',
+  setDocumentTemplateAsync: 'fa-project-content-set-document-template-async',
+  setDocumentWorldAsync: 'fa-project-content-set-document-world-async',
+  unlinkDocumentMediaAsync: 'fa-project-content-unlink-document-media-async',
+  unlinkWorldMediaAsync: 'fa-project-content-unlink-world-media-async',
+  updateDocumentAsync: 'fa-project-content-update-document-async',
+  updateDocumentTemplateAsync: 'fa-project-content-update-document-template-async',
+  updateMediaAsync: 'fa-project-content-update-media-async',
+  updateWorldAsync: 'fa-project-content-update-world-async'
+} as const
+
 /**
  * Main ↔ renderer failsafe: when main lost the mirrored path but the renderer still has an active project path.
  */

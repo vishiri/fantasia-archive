@@ -10,6 +10,7 @@ const {
   registerFaExtraEnvIpcMock,
   registerFaExternalLinksIpcMock,
   registerFaKeybindsIpcMock,
+  registerFaProjectContentIpcMock,
   registerFaProjectManagementIpcMock,
   registerFaProjectOsOpenIpcMock,
   registerFaUserSettingsIpcMock,
@@ -24,6 +25,7 @@ const {
   registerFaExtraEnvIpcMock: vi.fn(),
   registerFaExternalLinksIpcMock: vi.fn(),
   registerFaKeybindsIpcMock: vi.fn(),
+  registerFaProjectContentIpcMock: vi.fn(),
   registerFaProjectManagementIpcMock: vi.fn(),
   registerFaProjectOsOpenIpcMock: vi.fn(),
   registerFaUserSettingsIpcMock: vi.fn(),
@@ -62,6 +64,10 @@ vi.mock('../registerFaKeybindsIpc', () => ({
   registerFaKeybindsIpc: registerFaKeybindsIpcMock
 }))
 
+vi.mock('../registerFaProjectContentIpc', () => ({
+  registerFaProjectContentIpc: registerFaProjectContentIpcMock
+}))
+
 vi.mock('../registerFaProjectManagementIpc', () => ({
   registerFaProjectManagementIpc: registerFaProjectManagementIpcMock
 }))
@@ -93,6 +99,7 @@ beforeEach(() => {
   registerFaExtraEnvIpcMock.mockReset()
   registerFaExternalLinksIpcMock.mockReset()
   registerFaKeybindsIpcMock.mockReset()
+  registerFaProjectContentIpcMock.mockReset()
   registerFaProjectManagementIpcMock.mockReset()
   registerFaProjectOsOpenIpcMock.mockReset()
   registerFaUserSettingsIpcMock.mockReset()
@@ -114,6 +121,7 @@ test('Test that registerAllFaIpc registers every IPC surface once', () => {
   expect(installFaProjectFailsafePathReplyListenerMock).toHaveBeenCalledOnce()
   expect(registerFaProjectOsOpenIpcMock).toHaveBeenCalledOnce()
   expect(registerFaProjectManagementIpcMock).toHaveBeenCalledOnce()
+  expect(registerFaProjectContentIpcMock).toHaveBeenCalledOnce()
   expect(registerFaAppNoteboardIpcMock).toHaveBeenCalledOnce()
   expect(registerFaAppStylingIpcMock).toHaveBeenCalledOnce()
   expect(registerFaUserSettingsIpcMock).toHaveBeenCalledOnce()

@@ -13,6 +13,7 @@ import type { I_faAppNoteboardAPI } from 'app/types/I_faAppNoteboardDomain'
 import type { I_faAppStylingAPI } from 'app/types/I_faAppStylingDomain'
 import type { I_faAppConfigAPI } from 'app/types/I_faAppConfigDomain'
 import type { I_faUserSettingsAPI } from 'app/types/I_faUserSettingsDomain'
+import type { I_faProjectContentAPI } from 'app/types/I_faProjectContentAPI'
 import type { I_faProjectManagementAPI } from 'app/types/I_faProjectManagementDomain'
 import type { I_faActiveProject } from 'app/types/I_faActiveProjectDomain'
 import type { I_faComponentTestingStoreSeed } from 'app/types/I_faComponentTestingStoreSeed'
@@ -42,7 +43,8 @@ declare global{
       faChromiumCtrlShiftShortcut: I_faChromiumCtrlShiftShortcutAPI,
       faProjectFailsafe: I_faProjectFailsafeAPI,
       faProjectOsOpen: I_faProjectOsOpenAPI,
-      projectManagement: I_faProjectManagementAPI
+      projectManagement: I_faProjectManagementAPI,
+      projectContent: I_faProjectContentAPI
     }
   }
 }

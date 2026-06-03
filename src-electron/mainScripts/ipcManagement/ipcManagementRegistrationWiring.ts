@@ -6,6 +6,7 @@ import { registerFaDevToolsIpc } from './registerFaDevToolsIpc'
 import { registerFaExtraEnvIpc } from './registerFaExtraEnvIpc'
 import { registerFaExternalLinksIpc } from './registerFaExternalLinksIpc'
 import { registerFaKeybindsIpc } from './registerFaKeybindsIpc'
+import { registerFaProjectContentIpc } from './registerFaProjectContentIpc'
 import { registerFaProjectManagementIpc } from './registerFaProjectManagementIpc'
 import { registerFaProjectOsOpenIpc } from './registerFaProjectOsOpenIpc'
 import { registerFaUserSettingsIpc } from './registerFaUserSettingsIpc'
@@ -25,6 +26,7 @@ export function registerAllFaIpc (): void {
   installFaProjectFailsafePathReplyListener()
   registerFaProjectOsOpenIpc()
   registerFaProjectManagementIpc()
+  registerFaProjectContentIpc()
   registerFaAppNoteboardIpc()
   registerFaAppStylingIpc()
   registerFaUserSettingsIpc()

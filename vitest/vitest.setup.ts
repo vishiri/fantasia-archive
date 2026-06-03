@@ -7,6 +7,7 @@ import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybind
 import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appNoteboard/appNoteboard_managerDefaults'
 import { FA_APP_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appStyling/appStyling_managerDefaults'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
+import { createFaProjectContentBridgeHarnessStub } from 'app/helpers/faProjectContentBridgeHarnessStub'
 
 const originalConsoleWarn = console.warn.bind(console)
 
@@ -100,6 +101,43 @@ function forwardVueTestUtilsWarnUnlessFiltered (...args: unknown[]): void {
 }
 
 /**
+ * Vitest-wrapped projectContent bridge stub for renderer component tests.
+ */
+function buildVitestProjectContentApiMock (): ReturnType<typeof createFaProjectContentBridgeHarnessStub> {
+  const stub = createFaProjectContentBridgeHarnessStub()
+  return {
+    createDocument: vi.fn(stub.createDocument),
+    createDocumentTemplate: vi.fn(stub.createDocumentTemplate),
+    createMedia: vi.fn(stub.createMedia),
+    createWorld: vi.fn(stub.createWorld),
+    deleteDocument: vi.fn(stub.deleteDocument),
+    deleteDocumentTemplate: vi.fn(stub.deleteDocumentTemplate),
+    deleteMedia: vi.fn(stub.deleteMedia),
+    deleteWorld: vi.fn(stub.deleteWorld),
+    getDocumentById: vi.fn(stub.getDocumentById),
+    getDocumentTemplateById: vi.fn(stub.getDocumentTemplateById),
+    getMediaById: vi.fn(stub.getMediaById),
+    getWorldById: vi.fn(stub.getWorldById),
+    linkDocumentMedia: vi.fn(stub.linkDocumentMedia),
+    linkWorldMedia: vi.fn(stub.linkWorldMedia),
+    listDocumentMedia: vi.fn(stub.listDocumentMedia),
+    listDocuments: vi.fn(stub.listDocuments),
+    listDocumentTemplates: vi.fn(stub.listDocumentTemplates),
+    listMedia: vi.fn(stub.listMedia),
+    listMediaForWorld: vi.fn(stub.listMediaForWorld),
+    listWorlds: vi.fn(stub.listWorlds),
+    setDocumentTemplate: vi.fn(stub.setDocumentTemplate),
+    setDocumentWorld: vi.fn(stub.setDocumentWorld),
+    unlinkDocumentMedia: vi.fn(stub.unlinkDocumentMedia),
+    unlinkWorldMedia: vi.fn(stub.unlinkWorldMedia),
+    updateDocument: vi.fn(stub.updateDocument),
+    updateDocumentTemplate: vi.fn(stub.updateDocumentTemplate),
+    updateMedia: vi.fn(stub.updateMedia),
+    updateWorld: vi.fn(stub.updateWorld)
+  }
+}
+
+/**
  * Minimal 'window.faContentBridgeAPIs' for Vitest runs that mount '.vue' components.
  */
 function resetFaVitestRendererHarness (): void {
@@ -173,6 +211,7 @@ function resetFaVitestRendererHarness (): void {
       installOsOpenListener: vi.fn(),
       sendRendererReady: vi.fn()
     },
+    projectContent: buildVitestProjectContentApiMock(),
     projectManagement: {
       createProject: vi.fn(async () => ({ outcome: 'canceled' as const })),
       getProjectNoteboard: vi.fn(async () => ({
