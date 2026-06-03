@@ -8,12 +8,20 @@ description: >-
 
 # Fantasia Archive — SQLite in main process
 
+## Canonical schema documentation
+
+- **[docs/database/projectDB.md](../../docs/database/projectDB.md)** — **`.faproject`** `user_version` ladder, `project_data` KV, v4 tables, FK/delete rules, module map, **`FA_PROJECT_CONTENT_IPC`**
+- **[docs/database/appUserDataKv.md](../../docs/database/appUserDataKv.md)** — **`electron-store`** under **`userData`** (not project SQLite)
+- **[docs/database/README.md](../../docs/database/README.md)** — index and agent routing
+
+When you change migrations, persist modules, or project IPC, update the matching doc in the **same commit** (see **`.cursor/rules/docs-database.mdc`**).
+
 ## Current state
 
 - **`better-sqlite3`** is a native Node dependency; access belongs in the **main process** only.
 - **User projects** are SQLite files with the **`.faproject`** extension. Main code lives under **`src-electron/mainScripts/projectManagement/`** (save dialog, slugging, path checks, **`PRAGMA user_version`** migrations, active connection lifecycle). The renderer calls **`window.faContentBridgeAPIs.projectManagement.createProject`** (see **`types/I_faProjectManagementDomain.ts`**, **`FA_PROJECT_MANAGEMENT_IPC`**, **`registerFaProjectManagementIpc`**).
 - **E2E**: Playwright uses **`e2eSetNextProjectCreatePath`** in **`helpers/playwrightHelpers_e2e/playwrightE2eProjectPaths.ts`** (**`TEST_ENV: 'e2e'`** only) to set the absolute path for the next create; main reads it via **`projectManagement_manager.ts`** and **`functions/faProjectManagementE2ePathOverride.ts`** (global setter keys must stay aligned with the helper).
-- Older temp / prototype paths under **`userData`** may still use **`_faProjectTemp/`** or experimental extensions (for example **`.fae`**) in local branches; product **`.faproject`** files are the supported user-visible project containers.
+- Product **`.faproject`** files are the supported user-visible project containers. **`PRAGMA user_version`** **4** adds **worlds**, **documents**, **document_templates**, **media**, and junction tables (see **docs/database/projectDB.md**).
 
 ## Principles
 

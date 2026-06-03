@@ -1,0 +1,27 @@
+---
+description: Keep docs/database in sync with .faproject schema and project persistence
+globs:
+  - docs/database/**
+  - src-electron/mainScripts/projectManagement/**
+  - src-electron/shared/faProject*Schema.ts
+  - src-electron/shared/faProjectContent*.ts
+  - src-electron/electron-ipc-bridge.ts
+  - src-electron/mainScripts/ipcManagement/registerFaProjectContentIpc.ts
+  - src-electron/contentBridgeAPIs/projectContentAPI.ts
+alwaysApply: false
+---
+
+# Database documentation (`docs/database/`)
+
+When you change **`.faproject`** migrations, **`project_data`** KV keys, **v4 content** tables, **project content** persist modules, **`FA_PROJECT_CONTENT_IPC`**, related **Zod** schemas, or **`projectContent`** preload APIs, update the matching doc in the **same commit**:
+
+- [docs/database/projectDB.md](../../docs/database/projectDB.md) — schema version ladder, tables, FK rules, module map, IPC table
+- [docs/database/README.md](../../docs/database/README.md) — index (only when file list or agent rules change)
+- [docs/database/appUserDataKv.md](../../docs/database/appUserDataKv.md) — when **`electron-store`** domains (user settings, keybinds, MRU, app styling/noteboard) change — **not** mixed into `projectDB.md`
+
+**Agents:** read [docs/database/projectDB.md](../../docs/database/projectDB.md) before editing project SQLite or **`runWithFaProjectDatabase*`** call sites. See also [fa-project-database-access.mdc](fa-project-database-access.mdc) and [fantasia-sqlite-main skill](../skills/fantasia-sqlite-main/SKILL.md).
+
+## TypeScript interfaces and types (`types/`)
+
+- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

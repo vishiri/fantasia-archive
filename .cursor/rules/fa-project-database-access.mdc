@@ -35,6 +35,12 @@ Unlike **Fantasia Archive Settings**, which hydrates its editor from **`S_FaUser
 
 When adding project-settings fields, extend **`types/I_faProjectSettingsDomain.ts`**, the Zod patch schema, persist module, propagation helper, dialog panel, and connected tests in the same change.
 
+## See also
+
+- [docs/database/projectDB.md](../../docs/database/projectDB.md) — canonical **`.faproject`** schema, migrations, content CRUD IPC
+- [docs/database/README.md](../../docs/database/README.md) — documentation index
+- [docs-database.mdc](docs-database.mdc) — keep docs in sync with code changes
+
 ## TypeScript interfaces and types (`types/`)
 
 - Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).

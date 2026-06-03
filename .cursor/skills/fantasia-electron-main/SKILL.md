@@ -54,7 +54,7 @@ description: >-
 
 ## SQLite and files
 
-- Database experiments and temp paths currently use `app.getPath('userData')` and `_faProjectTemp/` (see `electron-main.ts`). For full DB design, follow [fantasia-sqlite-main](../fantasia-sqlite-main/SKILL.md).
+- User projects use **`.faproject`** SQLite under paths chosen at create/open; schema and IPC are documented in [docs/database/projectDB.md](../../../docs/database/projectDB.md). App-wide JSON stores use **`electron-store`** in **`userData`** ([docs/database/appUserDataKv.md](../../../docs/database/appUserDataKv.md)). Follow [fantasia-sqlite-main](../fantasia-sqlite-main/SKILL.md) for main-process DB work.
 
 ## TypeScript interfaces and types (`types/`)
 

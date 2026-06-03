@@ -42,6 +42,7 @@ Inspect the working tree and recent diff (`git status`, `git diff`, `git diff --
 | `AGENTS.md` | New subsystems, rules, skills, testing expectations, or repo layout changes |
 | `.cursor/rules/*.mdc` | New enforced policies or corrections to existing rule text |
 | `.cursor/skills/**/SKILL.md` | New playbooks or materially changed workflows |
+| `docs/database/**` | **`.faproject`** schema, migrations, project content IPC, or **`electron-store`** persistence changed |
 
 - Match existing tone and structure; avoid drive-by rewrites unrelated to the diff.
 - Omit doc edits when the batch is trivial and already covered elsewhere.
