@@ -38,7 +38,7 @@ Run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn tes
 
 ## `tsconfig` and `.vue` / Quasar
 
-- Root **`tsconfig.json`** extends **`.quasar/tsconfig.json`** and excludes the whole **`.quasar`** tree (generated output). **`src/env.d.ts`** declares **`*.vue`** modules and includes **`/// <reference types="vite/client" />`** so **`import.meta.env`** and other Vite typings resolve in the IDE and in **`vue-tsc`** (generated **`.quasar/quasar.d.ts`** also references **`vite/client`**, but **`src/env.d.ts`** keeps SFC scripts consistent when tooling does not load `.quasar` types first).
+- Root **`tsconfig.json`** extends **`.quasar/tsconfig.json`** and excludes the whole **`.quasar`** tree (generated output). Set **`compilerOptions.types`** to **`["node"]`** so TypeScript does not auto-load every transitive **`@types/*`** package under **`node_modules/@types`** (for example **`connect`** from Express tooling); **`vite/client`**, **`@quasar/app-vite`**, and other ambient types still load through **`/// <reference types="…" />`** in **`src/env.d.ts`** and generated **`.quasar/quasar.d.ts`**. **`src/env.d.ts`** declares **`*.vue`** modules and includes **`/// <reference types="vite/client" />`** so **`import.meta.env`** and other Vite typings resolve in the IDE and in **`vue-tsc`** (generated **`.quasar/quasar.d.ts`** also references **`vite/client`**, but **`src/env.d.ts`** keeps SFC scripts consistent when tooling does not load `.quasar` types first).
 - Do **not** add a top-level `compilerOptions.paths` override in `tsconfig.json` unless you merge with Quasar’s `paths`; replacing `paths` breaks `app/`, `src/`, `#q-app/*`, etc.
 
 ## `quasar.config.ts` typing notes

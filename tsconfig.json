@@ -1,5 +1,10 @@
 {
   "extends": "./.quasar/tsconfig.json",
+  "compilerOptions": {
+    "types": [
+      "node"
+    ]
+  },
   "exclude": [
     "dist",
     ".quasar",
