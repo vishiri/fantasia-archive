@@ -394,7 +394,7 @@ Set environment variable **`FA_PLAYWRIGHT_NO_VIDEO`** to **`1`** or **`true`** t
 ### Customize the configuration
 See [The quasar.config file](https://quasar.dev/quasar-cli-vite/quasar-config-file) (this repo uses `quasar.config.ts`).
 
-Root [`tsconfig.json`](tsconfig.json) extends [`.quasar/tsconfig.json`](.quasar/tsconfig.json), which is generated locally (gitignored). Run `yarn quasar:dev:electron` or `quasar prepare` once so TypeScript and Vitest can resolve Quasar path aliases before `yarn lint:typescript` or `yarn test:unit`.
+Root [`tsconfig.json`](tsconfig.json) extends [`.quasar/tsconfig.json`](.quasar/tsconfig.json), which is committed so fresh clones resolve Quasar path aliases without a local `quasar prepare`. Other `.quasar/` output stays gitignored; run `yarn quasar:dev:electron` or `quasar prepare` when you need regenerated ambient types such as `.quasar/quasar.d.ts`.
 
 ### Native modules (better-sqlite3)
 
