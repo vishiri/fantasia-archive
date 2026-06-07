@@ -17,7 +17,9 @@ description: >-
 ## Vocabulary (prefer in UI and models)
 
 - **Project**: A container for a worldbuilding dataset (new / save / load / export flows in menus).
-- **Document**: A unit of content in the database (quick add, search, mass delete, etc.).
+- **Document**: A unit of worldbuilding content in the **`.faproject`** SQLite **`documents`** table (quick add, search, mass delete, etc.). Not the same as in-app help or license **markdown** under **`i18n/.../documents/`**.
+- **Template** (document template): A named form schema assigned to documents via **`template_id`**. Today v4 stores only a display name on **`document_templates`**; typed **custom fields** are specified in [docs/database/templateCustomFields.md](../../docs/database/templateCustomFields.md).
+- **Custom field**: A typed slot on a template (text, relationship, etc.) identified by a stable **`field_id`**; documents store **values** keyed by that id, merged with the template's active field list at read time.
 - **Tools / settings**: Application behavior, not “the world” itself — keep naming distinct from in-universe lore terms unless intentionally meta.
 
 ## License

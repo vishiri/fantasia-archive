@@ -1,0 +1,40 @@
+---
+description: Document template custom fields — read design doc before implementation; enforce orphan and field_id policies
+globs:
+  - docs/database/templateCustomFields.md
+  - src-electron/mainScripts/projectManagement/**
+  - src-electron/shared/faProjectTemplateField*
+  - src-electron/shared/faProjectDocumentField*
+  - types/I_faProjectTemplateField*
+  - types/I_faProjectDocumentField*
+alwaysApply: false
+---
+
+# Document template custom fields
+
+Before designing or implementing template field definitions, document field values, template editor UI, or document form merge/save:
+
+1. Read [docs/database/templateCustomFields.md](../../docs/database/templateCustomFields.md) — approved architecture (not yet in v4 schema).
+2. Read [docs/database/projectDB.md](../../docs/database/projectDB.md) for the **shipped** schema; when migrations or IPC land, update **projectDB.md in the same commit** per [docs-database.mdc](docs-database.mdc).
+
+## Non-negotiable design rules
+
+- **Stable `field_id`** — document values reference UUID field ids, never labels or sort order.
+- **Live template + soft-delete** — field definitions use soft-delete (`deleted_at_ms` or equivalent); do not hard-delete definitions when a field is removed from the form.
+- **Orphan retention** — removing a field or switching templates hides values in the main UI; **do not** auto-delete value or link rows.
+- **Merge at read time** — documents store values only; merge active field definitions with stored values when loading for edit.
+- **Hybrid storage** — relational `template_fields`; typed scalar rows; junction tables for M:N relationship fields (mirror `document_media` pattern).
+- **Type changes** — block, assign a new `field_id`, or require explicit user review; never silently coerce stored values.
+- **No template versioning in v1** — do not pin documents to `template_version_id` until a future explicit feature ships.
+
+## Implementation routing
+
+- SQLite migrations and persist: [fantasia-sqlite-main skill](../skills/fantasia-sqlite-main/SKILL.md), [fa-project-database-access.mdc](fa-project-database-access.mdc).
+- Preload / IPC: [fantasia-electron-preload skill](../skills/fantasia-electron-preload/SKILL.md).
+- Product vocabulary: [fantasia-worldbuilding-domain skill](../skills/fantasia-worldbuilding-domain/SKILL.md).
+- Full playbook: [fantasia-template-custom-fields skill](../skills/fantasia-template-custom-fields/SKILL.md).
+
+## TypeScript interfaces and types (`types/`)
+
+- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

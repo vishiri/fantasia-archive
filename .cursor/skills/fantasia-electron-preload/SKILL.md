@@ -14,7 +14,7 @@ description: >-
 - In JSDoc and line comments under src-electron/, follow AGENTS.md code-comment rules (no Markdown emphasis in comments; use single quotes for inline references instead of grave accents).
 - **Preload**: `src-electron/electron-preload.ts` builds `apiObject` and calls `contextBridge.exposeInMainWorld('faContentBridgeAPIs', apiObject)`.
 - **Renderer access**: `window.faContentBridgeAPIs` — typed in `src/globals.d.ts`.
-- **Implementations**: One module per API under `src-electron/contentBridgeAPIs/` (e.g. `faWindowControlAPI.ts`, `appDetailsAPI.ts`, `faKeybindsAPI.ts` for persisted shortcut overrides via **`FA_KEYBINDS_IPC`**, `projectManagementAPI.ts` for **`.faproject`** lifecycle/settings/styling/noteboard via **`FA_PROJECT_MANAGEMENT_IPC`**, **`projectContentAPI.ts`** for worlds/documents/templates/media CRUD via **`FA_PROJECT_CONTENT_IPC`** — schema in **[docs/database/projectDB.md](../../../docs/database/projectDB.md)**).
+- **Implementations**: One module per API under `src-electron/contentBridgeAPIs/` (e.g. `faWindowControlAPI.ts`, `appDetailsAPI.ts`, `faKeybindsAPI.ts` for persisted shortcut overrides via **`FA_KEYBINDS_IPC`**, `projectManagementAPI.ts` for **`.faproject`** lifecycle/settings/styling/noteboard via **`FA_PROJECT_MANAGEMENT_IPC`**, **`projectContentAPI.ts`** for worlds/documents/templates/media CRUD via **`FA_PROJECT_CONTENT_IPC`** — schema in **[docs/database/projectDB.md](../../../docs/database/projectDB.md)**). Future **template field definition** and **document field value** channels extend **`FA_PROJECT_CONTENT_IPC`** per **[docs/database/templateCustomFields.md](../../../docs/database/templateCustomFields.md)** (not implemented yet).
 
 ## Main ↔ preload IPC (electron-ipc-bridge)
 

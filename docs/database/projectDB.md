@@ -49,7 +49,7 @@ Primary keys are **TEXT UUID v4** on entity tables. Timestamps are **`created_at
 
 ### `document_templates`
 
-Same shape as **`worlds`** (id, display_name, timestamps).
+Same shape as **`worlds`** (id, display_name, timestamps). This is a **name-only shell** today; typed **field definitions** on templates are **planned** — see [templateCustomFields.md](templateCustomFields.md).
 
 ### `media`
 
@@ -95,8 +95,14 @@ Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_w
 | Document → template | `documents.template_id` (nullable) |
 | World ↔ media | `world_media` |
 | Document ↔ media | `document_media` |
+| Template → field definitions (planned) | `template_fields` — see [templateCustomFields.md](templateCustomFields.md) |
+| Document → custom field values (planned) | `document_field_values`, link tables — see [templateCustomFields.md](templateCustomFields.md) |
 
 **Link helpers (FK assignment):** **`setFaProjectDocumentWorld`**, **`setFaProjectDocumentTemplate`** in **`faProjectDocumentsPersistWiring.ts`**.
+
+## Planned extensions (not in v4)
+
+**`user_version` 4** is the current max (**`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 4`**). Custom fields on document templates (field definitions, typed values, orphan retention) are specified in [templateCustomFields.md](templateCustomFields.md) and will land in a future migration; table detail moves into this file when that ships.
 
 ## Main-process module map
 
