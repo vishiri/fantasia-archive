@@ -1,4 +1,4 @@
-import { expect, test, vi } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 
 import {
   applyFaProjectMigrations,
@@ -7,7 +7,28 @@ import {
   readFaProjectStoredProjectUuid
 } from '../faProjectDbMigrateWiring'
 
-test('applyFaProjectMigrations runs ddl when user_version is 0', () => {
+const seedFaProjectDefaultWorldIfEmptyMock = vi.hoisted(() => vi.fn())
+
+vi.mock('../projectDbContent/faProjectWorldBootstrapWiring', () => {
+  return {
+    seedFaProjectDefaultWorldIfEmpty: seedFaProjectDefaultWorldIfEmptyMock
+  }
+})
+
+beforeEach(() => {
+  seedFaProjectDefaultWorldIfEmptyMock.mockClear()
+})
+
+function applyMockUserVersionPragma (
+  name: string,
+  pragmas: Record<string, unknown>
+): void {
+  if (name === 'user_version = 1') {
+    pragmas.user_version = 1
+  }
+}
+
+test('applyFaProjectMigrations bootstraps schema when user_version is 0', () => {
   const run = vi.fn((fn: () => void) => {
     return () => {
       fn()
@@ -21,10 +42,7 @@ test('applyFaProjectMigrations runs ddl when user_version is 0', () => {
       if (name === 'user_version' && opts?.simple === true) {
         return pragmas.user_version
       }
-      if (name === 'user_version = 4') {
-        pragmas.user_version = 4
-        return undefined
-      }
+      applyMockUserVersionPragma(name, pragmas)
       return undefined
     }),
     prepare: vi.fn((sql: string) => {
@@ -45,7 +63,8 @@ test('applyFaProjectMigrations runs ddl when user_version is 0', () => {
   applyFaProjectMigrations(db as never, 'Realm')
   expect(db.exec).toHaveBeenCalled()
   expect(insertRun).toHaveBeenCalledTimes(2)
-  expect(pragmas.user_version).toBe(4)
+  expect(pragmas.user_version).toBe(1)
+  expect(seedFaProjectDefaultWorldIfEmptyMock).toHaveBeenCalledWith(db, 'Realm')
   expect(
     db.exec.mock.calls.some(
       (call) => typeof call[0] === 'string' && call[0].includes('worlds')
@@ -100,7 +119,7 @@ test('applyFaProjectMigrations is a no-op when user_version already at maximum',
     prepare: vi.fn(),
     pragma: vi.fn((name: string, opts?: { simple?: boolean }) => {
       if (name === 'user_version' && opts?.simple === true) {
-        return 4
+        return 1
       }
       return undefined
     }),
@@ -108,9 +127,10 @@ test('applyFaProjectMigrations is a no-op when user_version already at maximum',
   }
   applyFaProjectMigrations(db as never, 'Idle')
   expect(db.exec).not.toHaveBeenCalled()
+  expect(seedFaProjectDefaultWorldIfEmptyMock).not.toHaveBeenCalled()
 })
 
-test('applyFaProjectMigrations throws when post-migration project_name read does not match after v0 bootstrap', () => {
+test('applyFaProjectMigrations throws when post-migration project_name read does not match after bootstrap', () => {
   const run = vi.fn((fn: () => void) => {
     return () => {
       fn()
@@ -124,14 +144,7 @@ test('applyFaProjectMigrations throws when post-migration project_name read does
       if (name === 'user_version' && opts?.simple === true) {
         return pragmas.user_version
       }
-      if (name === 'user_version = 3') {
-        pragmas.user_version = 3
-        return undefined
-      }
-      if (name === 'user_version = 4') {
-        pragmas.user_version = 4
-        return undefined
-      }
+      applyMockUserVersionPragma(name, pragmas)
       return undefined
     }),
     prepare: vi.fn((sql: string) => {
@@ -166,14 +179,7 @@ test('applyFaProjectMigrations treats invalid user_version pragma as zero', () =
       if (name === 'user_version' && opts?.simple === true) {
         return pragmas.user_version
       }
-      if (name === 'user_version = 3') {
-        pragmas.user_version = 3
-        return undefined
-      }
-      if (name === 'user_version = 4') {
-        pragmas.user_version = 4
-        return undefined
-      }
+      applyMockUserVersionPragma(name, pragmas)
       return undefined
     }),
     prepare: vi.fn((sql: string) => {
@@ -195,200 +201,19 @@ test('applyFaProjectMigrations treats invalid user_version pragma as zero', () =
   expect(insertRun).toHaveBeenCalled()
 })
 
-test('applyFaProjectMigrations upgrades v1 to v3 when project_uuid is missing', () => {
-  const run = vi.fn((fn: () => void) => {
-    return () => {
-      fn()
-    }
-  })
-  const insertRun = vi.fn()
-  const selectGetUuidBefore = vi.fn().mockReturnValueOnce(undefined)
-  const pragmas: Record<string, unknown> = { user_version: 1 }
+test('applyFaProjectMigrations throws for unexpected non-zero user_version below max', () => {
   const db = {
-    exec: vi.fn(),
     pragma: vi.fn((name: string, opts?: { simple?: boolean }) => {
       if (name === 'user_version' && opts?.simple === true) {
-        return pragmas.user_version
-      }
-      if (name === 'user_version = 3') {
-        pragmas.user_version = 3
-        return undefined
-      }
-      if (name === 'user_version = 4') {
-        pragmas.user_version = 4
-        return undefined
+        return 0.5
       }
       return undefined
     }),
-    prepare: vi.fn((sql: string) => {
-      if (sql.includes('INSERT')) {
-        return { run: insertRun }
-      }
-      if (sql.includes('project_options')) {
-        return {
-          get: (param: string) => {
-            if (param === 'project_uuid') {
-              return selectGetUuidBefore()
-            }
-            return undefined
-          }
-        }
-      }
-      return {
-        get: (): { v: string } => {
-          return { v: '850e8400-e29b-41d4-a716-446655440003' }
-        }
-      }
-    }),
-    transaction: run
+    transaction: vi.fn()
   }
-  applyFaProjectMigrations(db as never, 'Legacy')
-  expect(insertRun).toHaveBeenCalled()
-  expect(run).toHaveBeenCalledTimes(2)
-  expect(db.exec.mock.calls.some((call) => typeof call[0] === 'string' && call[0].includes('RENAME TO'))).toBe(true)
-  expect(pragmas.user_version).toBe(4)
-})
-
-test('applyFaProjectMigrations upgrades v1 without insert when project_uuid already exists', () => {
-  const run = vi.fn((fn: () => void) => {
-    return () => {
-      fn()
-    }
-  })
-  const insertRun = vi.fn()
-  const pragmas: Record<string, unknown> = { user_version: 1 }
-  const db = {
-    exec: vi.fn(),
-    pragma: vi.fn((name: string, opts?: { simple?: boolean }) => {
-      if (name === 'user_version' && opts?.simple === true) {
-        return pragmas.user_version
-      }
-      if (name === 'user_version = 3') {
-        pragmas.user_version = 3
-        return undefined
-      }
-      if (name === 'user_version = 4') {
-        pragmas.user_version = 4
-        return undefined
-      }
-      return undefined
-    }),
-    prepare: vi.fn((sql: string) => {
-      if (sql.includes('INSERT')) {
-        return { run: insertRun }
-      }
-      if (sql.includes('project_options')) {
-        return {
-          get: (param: string) => {
-            if (param === 'project_uuid') {
-              return { v: '750e8400-e29b-41d4-a716-446655440002' }
-            }
-            return undefined
-          }
-        }
-      }
-      return {
-        get: (): { v: string } => ({
-          v: '750e8400-e29b-41d4-a716-446655440002'
-        })
-      }
-    }),
-    transaction: run
-  }
-  applyFaProjectMigrations(db as never, 'HasUuid')
-  expect(insertRun).not.toHaveBeenCalled()
-  expect(pragmas.user_version).toBe(4)
-})
-
-test('applyFaProjectMigrations upgrades v2 to v3 renaming project_options', () => {
-  const run = vi.fn((fn: () => void) => {
-    return () => {
-      fn()
-    }
-  })
-  const pragmas: Record<string, unknown> = { user_version: 2 }
-  const db = {
-    exec: vi.fn(),
-    pragma: vi.fn((name: string, opts?: { simple?: boolean }) => {
-      if (name === 'user_version' && opts?.simple === true) {
-        return pragmas.user_version
-      }
-      if (name === 'user_version = 3') {
-        pragmas.user_version = 3
-        return undefined
-      }
-      if (name === 'user_version = 4') {
-        pragmas.user_version = 4
-        return undefined
-      }
-      return undefined
-    }),
-    prepare: vi.fn(() => {
-      return {
-        get: (): { v: string } => ({
-          v: '550e8400-e29b-41d4-a716-446655440000'
-        })
-      }
-    }),
-    transaction: run
-  }
-  applyFaProjectMigrations(db as never, 'V2Realm')
-  expect(run).toHaveBeenCalledTimes(2)
-  expect(db.exec.mock.calls.some((call) => typeof call[0] === 'string' && call[0].includes('RENAME TO'))).toBe(true)
-  expect(pragmas.user_version).toBe(4)
-})
-
-test('applyFaProjectMigrations inserts uuid on v1 when project_uuid row is only whitespace', () => {
-  const run = vi.fn((fn: () => void) => {
-    return () => {
-      fn()
-    }
-  })
-  const insertRun = vi.fn()
-  const selectUuid = vi
-    .fn()
-    .mockReturnValueOnce({ v: '   ' })
-    .mockReturnValueOnce({ v: '950e8400-e29b-41d4-a716-446655440044' })
-  const pragmas: Record<string, unknown> = { user_version: 1 }
-  const db = {
-    exec: vi.fn(),
-    pragma: vi.fn((name: string, opts?: { simple?: boolean }) => {
-      if (name === 'user_version' && opts?.simple === true) {
-        return pragmas.user_version
-      }
-      if (name === 'user_version = 3') {
-        pragmas.user_version = 3
-        return undefined
-      }
-      if (name === 'user_version = 4') {
-        pragmas.user_version = 4
-        return undefined
-      }
-      return undefined
-    }),
-    prepare: vi.fn((sql: string) => {
-      if (sql.includes('INSERT')) {
-        return { run: insertRun }
-      }
-      if (sql.includes('project_options')) {
-        return {
-          get: (param: string) => {
-            if (param === 'project_uuid') {
-              return selectUuid()
-            }
-            return undefined
-          }
-        }
-      }
-      return {
-        get: (): { v: string } => ({ v: '950e8400-e29b-41d4-a716-446655440044' })
-      }
-    }),
-    transaction: run
-  }
-  applyFaProjectMigrations(db as never, 'WhitespaceUuid')
-  expect(insertRun).toHaveBeenCalled()
-  expect(pragmas.user_version).toBe(4)
+  expect(() => applyFaProjectMigrations(db as never, 'Odd')).toThrow(
+    /Unexpected project file schema state/
+  )
 })
 
 test('applyFaProjectMigrations throws when final project_uuid verification is empty', () => {
@@ -405,14 +230,7 @@ test('applyFaProjectMigrations throws when final project_uuid verification is em
       if (name === 'user_version' && opts?.simple === true) {
         return pragmas.user_version
       }
-      if (name === 'user_version = 3') {
-        pragmas.user_version = 3
-        return undefined
-      }
-      if (name === 'user_version = 4') {
-        pragmas.user_version = 4
-        return undefined
-      }
+      applyMockUserVersionPragma(name, pragmas)
       return undefined
     }),
     prepare: vi.fn((sql: string) => {
@@ -435,58 +253,6 @@ test('applyFaProjectMigrations throws when final project_uuid verification is em
   }
   expect(() => applyFaProjectMigrations(db as never, 'Realm')).toThrow(
     /project_uuid row after migration/
-  )
-})
-
-test('applyFaProjectMigrations upgrades existing user_version 3 to 4', () => {
-  const run = vi.fn((fn: () => void) => {
-    return () => {
-      fn()
-    }
-  })
-  const pragmas: Record<string, unknown> = { user_version: 3 }
-  const db = {
-    exec: vi.fn(),
-    prepare: vi.fn(() => ({
-      get: (): { v: string } => ({
-        v: '550e8400-e29b-41d4-a716-446655440000'
-      })
-    })),
-    pragma: vi.fn((name: string, opts?: { simple?: boolean }) => {
-      if (name === 'user_version' && opts?.simple === true) {
-        return pragmas.user_version
-      }
-      if (name === 'user_version = 4') {
-        pragmas.user_version = 4
-        return undefined
-      }
-      return undefined
-    }),
-    transaction: run
-  }
-  applyFaProjectMigrations(db as never, 'V3')
-  expect(run).toHaveBeenCalledOnce()
-  expect(db.exec).toHaveBeenCalled()
-  expect(pragmas.user_version).toBe(4)
-})
-
-test('applyFaProjectMigrations throws for unexpected user_version between 0 and max', () => {
-  const run = vi.fn((fn: () => void) => {
-    return () => {
-      fn()
-    }
-  })
-  const db = {
-    pragma: vi.fn((name: string, opts?: { simple?: boolean }) => {
-      if (name === 'user_version' && opts?.simple === true) {
-        return 0.5
-      }
-      return undefined
-    }),
-    transaction: run
-  }
-  expect(() => applyFaProjectMigrations(db as never, 'Odd')).toThrow(
-    /Unexpected project file schema state/
   )
 })
 

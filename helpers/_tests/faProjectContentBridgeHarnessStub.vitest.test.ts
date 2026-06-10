@@ -11,6 +11,12 @@ const stubNamedEntityShape = {
   updatedAtMs: 0
 }
 
+const stubWorldShape = {
+  ...stubNamedEntityShape,
+  color: '#808080',
+  sortOrder: 0
+}
+
 const stubDocumentShape = {
   ...stubNamedEntityShape,
   templateId: null,
@@ -30,12 +36,12 @@ test('Test that createFaProjectContentBridgeHarnessStub create and get methods r
   })).resolves.toEqual(stubDocumentShape)
   await expect(api.createDocumentTemplate({ displayName: 'Template' })).resolves.toEqual(stubNamedEntityShape)
   await expect(api.createMedia({ displayName: 'Media' })).resolves.toEqual(stubNamedEntityShape)
-  await expect(api.createWorld({ displayName: 'World' })).resolves.toEqual(stubNamedEntityShape)
+  await expect(api.createWorld({ displayName: 'World' })).resolves.toEqual(stubWorldShape)
 
   await expect(api.getDocumentById(STUB_UUID)).resolves.toEqual(stubDocumentShape)
   await expect(api.getDocumentTemplateById(STUB_UUID)).resolves.toEqual(stubNamedEntityShape)
   await expect(api.getMediaById(STUB_UUID)).resolves.toEqual(stubNamedEntityShape)
-  await expect(api.getWorldById(STUB_UUID)).resolves.toEqual(stubNamedEntityShape)
+  await expect(api.getWorldById(STUB_UUID)).resolves.toEqual(stubWorldShape)
 })
 
 /**
@@ -48,7 +54,7 @@ test('Test that createFaProjectContentBridgeHarnessStub update and set methods r
   await expect(api.updateDocument(STUB_UUID, { displayName: 'Updated' })).resolves.toEqual(stubDocumentShape)
   await expect(api.updateDocumentTemplate(STUB_UUID, { displayName: 'Updated' })).resolves.toEqual(stubNamedEntityShape)
   await expect(api.updateMedia(STUB_UUID, { displayName: 'Updated' })).resolves.toEqual(stubNamedEntityShape)
-  await expect(api.updateWorld(STUB_UUID, { displayName: 'Updated' })).resolves.toEqual(stubNamedEntityShape)
+  await expect(api.updateWorld(STUB_UUID, { displayName: 'Updated' })).resolves.toEqual(stubWorldShape)
 
   await expect(api.setDocumentTemplate({
     documentId: STUB_UUID,

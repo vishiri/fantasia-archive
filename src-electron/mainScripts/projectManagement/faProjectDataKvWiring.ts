@@ -1,6 +1,6 @@
 import type Database from 'better-sqlite3'
 
-import { FA_PROJECT_DATA_TABLE_NAME } from './projectManagement_managerDefaults'
+import { FA_PROJECT_DATA_TABLE_NAME } from './functions/faProjectDbSchemaDdl'
 
 /**
  * Upserts a single keyed row under 'project_data' (active project SQLite file).

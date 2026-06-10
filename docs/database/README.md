@@ -6,7 +6,7 @@ This folder is the canonical reference for **where data lives** and **how it is 
 
 | File | Scope |
 |------|--------|
-| [projectDB.md](projectDB.md) | Active **`.faproject`** SQLite files: `PRAGMA user_version`, `project_data` KV, v4 content tables, migrations, main-process modules, and **`FA_PROJECT_CONTENT_IPC`** |
+| [projectDB.md](projectDB.md) | Active **`.faproject`** SQLite files: `PRAGMA user_version` (1 today), `project_data` KV, content tables, migrations, main-process modules, and **`FA_PROJECT_CONTENT_IPC`** |
 | [templateCustomFields.md](templateCustomFields.md) | **Approved design** (not yet in SQLite): document template field definitions, document values, orphan policy, and implementation route |
 | [appUserDataKv.md](appUserDataKv.md) | **Not** project SQLite: **`electron-store`** JSON under the app **`userData`** directory (user settings, keybinds, MRU, app-wide styling/noteboard) |
 
@@ -23,3 +23,4 @@ This folder is the canonical reference for **where data lives** and **how it is 
 - [AGENTS.md](../../AGENTS.md) — stack, IPC, testing
 - [README.md](../../README.md) — **Native modules (better-sqlite3)** and project settings refresh contract
 - `.cursor/skills/fantasia-sqlite-main/SKILL.md` — main-process SQLite playbook
+- `.cursor/skills/fantasia-flatten-database-schemas/SKILL.md` — pre-release squash of **`user_version`** ladders (dev resets only)

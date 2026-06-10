@@ -10,17 +10,18 @@ The SQLite table **`documents`** stores **worldbuilding document entities** (row
 
 | Version | Contents |
 |---------|----------|
-| **0** | New file bootstrap: creates **`project_data`**, seeds metadata, then applies **v4** content DDL (see below). Ends at **4**. |
-| **1** | Legacy **`project_options`** table; migration may insert **`project_uuid`**. |
-| **2** | Renames **`project_options`** → **`project_data`**, sets version **3**. |
-| **3** | KV-only project file (settings, styling, noteboard keys). |
-| **4** | Adds worldbuilding **content tables** (current max). |
+| **0** | Uninitialized file (bootstrap target on first open/create). |
+| **1** | Full schema: **`project_data`** KV, worldbuilding **content tables**, default **world** seed on create (current max). |
 
-**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 4`** in **`faProjectDbMigrateWiring.ts`**.
+**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 1`** in **`faProjectDbMigrateWiring.ts`**.
 
-**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0** and land on **4** in one transaction; legacy **1/2** paths run the rename ladder then a separate **3→4** step; files already at **3** skip legacy work and only run **v3→4** content DDL.
+**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, run one bootstrap transaction (metadata rows + content DDL), set **`user_version = 1`**, then seed a default **world** named like the project. Files already at **1** are a no-op. Other versions throw until a forward migration is added.
 
-**DDL source:** **`src-electron/mainScripts/projectManagement/functions/faProjectDbSchemaDdl.ts`** (`applyFaProjectContentSchemaV4`).
+**DDL source:** **`src-electron/mainScripts/projectManagement/functions/faProjectDbSchemaDdl.ts`** (**`applyFaProjectProjectDataSchemaV1`**, **`applyFaProjectContentSchemaV1`**).
+
+**Pre-release flatten:** During dev, schema versions may be squashed back to **1** with no upgrade path for older local files — see **`.cursor/skills/fantasia-flatten-database-schemas/SKILL.md`**.
+
+**Product ↔ SQL naming:** UI “world name” / “template name” map to **`display_name`** on **`worlds`** and **`document_templates`**. Optional world ↔ template associations use the **`world_document_templates`** junction (many-to-many).
 
 ## Table: `project_data` (key–value)
 
@@ -35,7 +36,7 @@ The SQLite table **`documents`** stores **worldbuilding document entities** (row
 
 **Modules:** **`faProjectDataKvWiring.ts`**, **`faProjectSettingsPersistWiring.ts`**, **`faProjectNoteboardPersistWiring.ts`**, **`faProjectStylingPersistWiring.ts`**.
 
-## Version 4 content tables
+## Content tables (schema version 1)
 
 Primary keys are **TEXT UUID v4** on entity tables. Timestamps are **`created_at_ms`** / **`updated_at_ms`** (Unix ms).
 
@@ -44,16 +45,30 @@ Primary keys are **TEXT UUID v4** on entity tables. Timestamps are **`created_at
 | Column | Type | Notes |
 |--------|------|--------|
 | `id` | TEXT PK | UUID |
-| `display_name` | TEXT | Non-empty |
+| `display_name` | TEXT | Non-empty (product “name”) |
+| `color` | TEXT | **`#RRGGBB`** hex; default **`#808080`** |
+| `sort_order` | INTEGER | Zero-based GUI order; new worlds append **`MAX(sort_order) + 1`** |
 | `created_at_ms`, `updated_at_ms` | INTEGER | |
+
+Index: **`idx_worlds_sort_order`**. New **`.faproject`** files receive one default world row whose **`display_name`** matches the project name at create time.
 
 ### `document_templates`
 
-Same shape as **`worlds`** (id, display_name, timestamps). This is a **name-only shell** today; typed **field definitions** on templates are **planned** — see [templateCustomFields.md](templateCustomFields.md).
+| Column | Type | Notes |
+|--------|------|--------|
+| `id` | TEXT PK | UUID |
+| `display_name` | TEXT | Non-empty (product “name”) |
+| `created_at_ms`, `updated_at_ms` | INTEGER | |
+
+Typed **field definitions** on templates are **planned** — see [templateCustomFields.md](templateCustomFields.md). World associations are optional and many-to-many via **`world_document_templates`** (below).
 
 ### `media`
 
-Same shape as **`worlds`**.
+| Column | Type | Notes |
+|--------|------|--------|
+| `id` | TEXT PK | UUID |
+| `display_name` | TEXT | Non-empty |
+| `created_at_ms`, `updated_at_ms` | INTEGER | |
 
 ### `documents`
 
@@ -85,7 +100,17 @@ Same shape as **`worlds`**.
 | `media_id` | FK → `media.id` **ON DELETE CASCADE** |
 | PRIMARY KEY (`document_id`, `media_id`) | |
 
-Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_world_media_media_id`**, **`idx_document_media_media_id`**.
+### `world_document_templates` (M:N)
+
+| Column | Notes |
+|--------|--------|
+| `world_id` | FK → `worlds.id` **ON DELETE CASCADE** |
+| `document_template_id` | FK → `document_templates.id` **ON DELETE CASCADE** |
+| PRIMARY KEY (`world_id`, `document_template_id`) | |
+
+A template may be linked to zero, one, or many worlds; a world may link to zero, one, or many templates. Links are independent of **`documents.template_id`** (documents still pick at most one template per row).
+
+Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_world_media_media_id`**, **`idx_document_media_media_id`**, **`idx_world_document_templates_document_template_id`**.
 
 ## Relationships (summary)
 
@@ -95,14 +120,15 @@ Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_w
 | Document → template | `documents.template_id` (nullable) |
 | World ↔ media | `world_media` |
 | Document ↔ media | `document_media` |
+| World ↔ document template | `world_document_templates` (optional M:N) |
 | Template → field definitions (planned) | `template_fields` — see [templateCustomFields.md](templateCustomFields.md) |
 | Document → custom field values (planned) | `document_field_values`, link tables — see [templateCustomFields.md](templateCustomFields.md) |
 
 **Link helpers (FK assignment):** **`setFaProjectDocumentWorld`**, **`setFaProjectDocumentTemplate`** in **`faProjectDocumentsPersistWiring.ts`**.
 
-## Planned extensions (not in v4)
+## Planned extensions (after version 1)
 
-**`user_version` 4** is the current max (**`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 4`**). Custom fields on document templates (field definitions, typed values, orphan retention) are specified in [templateCustomFields.md](templateCustomFields.md) and will land in a future migration; table detail moves into this file when that ships.
+Custom fields on document templates (field definitions, typed values, orphan retention) are specified in [templateCustomFields.md](templateCustomFields.md) and will land in a future migration; table detail moves into this file when that ships.
 
 ## Main-process module map
 
@@ -115,16 +141,19 @@ src-electron/mainScripts/projectManagement/
   faProjectNoteboardPersistWiring.ts
   faProjectStylingPersistWiring.ts
   functions/
-    faProjectDbSchemaDdl.ts             # v4 DDL
+    faProjectDbSchemaDdl.ts             # schema v1 DDL
     faProjectContentRowMap.ts           # row → DTO mappers
   projectDbContent/
     faProjectContentNamedEntitySqlWiring.ts
+    faProjectWorldsSqlWiring.ts
+    faProjectWorldBootstrapWiring.ts
     faProjectWorldsPersistWiring.ts
     faProjectDocumentsPersistWiring.ts
     faProjectDocumentTemplatesPersistWiring.ts
     faProjectMediaPersistWiring.ts
     faProjectWorldMediaLinksWiring.ts
     faProjectDocumentMediaLinksWiring.ts
+    faProjectWorldDocumentTemplateLinksWiring.ts
 ```
 
 **Barrel:** **`projectManagement_manager.ts`** re-exports lifecycle and **`runWithFaProjectDatabase*`**; content persist modules are imported directly from IPC registration.
@@ -171,6 +200,10 @@ All content handlers wrap work in **`runWithFaProjectDatabaseForIpcAsync`**.
 | `link-document-media-async` | `linkFaProjectDocumentMedia` |
 | `unlink-document-media-async` | `unlinkFaProjectDocumentMedia` |
 | `list-document-media-async` | `listFaProjectMediaForDocument` |
+| `link-world-document-template-async` | `linkFaProjectWorldDocumentTemplate` |
+| `unlink-world-document-template-async` | `unlinkFaProjectWorldDocumentTemplate` |
+| `list-document-templates-for-world-async` | `listFaProjectDocumentTemplatesForWorld` |
+| `list-worlds-for-document-template-async` | `listFaProjectWorldsForDocumentTemplate` |
 
 Exact channel strings: **`src-electron/electron-ipc-bridge.ts`** (`FA_PROJECT_CONTENT_IPC`).
 

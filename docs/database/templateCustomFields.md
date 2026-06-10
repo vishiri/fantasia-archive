@@ -1,6 +1,6 @@
 # Document template custom fields (approved design)
 
-**Status:** Architecture approved. **Not implemented** in SQLite, IPC, or UI. The shipped schema remains **`user_version` 4** per [projectDB.md](projectDB.md) until a v5+ migration lands.
+**Status:** Architecture approved. **Not implemented** in SQLite, IPC, or UI. The shipped schema is **`user_version` 1** per [projectDB.md](projectDB.md) (includes **`worlds.color`**, **`worlds.sort_order`**, optional **world ↔ document template** links via **`world_document_templates`**, and default-world seed on create). Custom fields remain a **separate future migration** (version **2+**).
 
 ## Problem
 
@@ -19,14 +19,14 @@ Users define **document templates** with an open-ended set of typed fields (text
 
 | Layer | Role |
 |-------|------|
-| **Template shell** | `document_templates` row (display name) — exists today in v4 |
+| **Template shell** | `document_templates` row (display name) — exists today in schema v1 |
 | **Field definitions** | Rows per field on a template (type, label, order, config) — **planned** `template_fields` |
 | **Document values** | Rows (and link tables) keyed by `document_id` + `field_id` — **planned** |
 | **Orphans** | Values whose `field_id` is not in the template's **active** definition set — kept in DB, hidden from main UI |
 
 Documents do **not** store a full copy of the template schema.
 
-## Relationship to v4 schema
+## Relationship to shipped schema (v1)
 
 Today ([projectDB.md](projectDB.md)):
 
@@ -135,7 +135,7 @@ documents
 
 ### Template shell delete (whole template)
 
-Today v4 **`deleteFaProjectDocumentTemplate`** hard-deletes the shell; **`documents.template_id` ON DELETE RESTRICT** blocks delete while any document still references the template.
+Today **`deleteFaProjectDocumentTemplate`** hard-deletes the shell; **`documents.template_id` ON DELETE RESTRICT** blocks delete while any document still references the template.
 
 **Planned v1 policy when `template_fields` exist:**
 
@@ -188,11 +188,13 @@ Templates define a live, soft-deletable field catalog; documents store a persist
 
 Phases are ordered for future work. Update [projectDB.md](projectDB.md) in the **same commit** as each schema/IPC phase.
 
-### Phase 1 — Schema v5+
+### Phase 1 — Schema v2+ (custom fields)
 
 - **`src-electron/mainScripts/projectManagement/functions/faProjectDbSchemaDdl.ts`** — add DDL for `template_fields`, `document_field_values`, link tables, indexes.
-- **`src-electron/mainScripts/projectManagement/faProjectDbMigrateWiring.ts`** — v4→v5 step; bump **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX`**.
+- **`src-electron/mainScripts/projectManagement/faProjectDbMigrateWiring.ts`** — v1→v2 step; bump **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX`**.
 - Fold resulting tables into **`projectDB.md`**; relabel sections here from **proposed** to **implemented**.
+
+**Note:** Shipped schema v1 already includes **`worlds.color`**, **`worlds.sort_order`**, and **`world_document_templates`** (optional M:N world ↔ template links) — see [projectDB.md](projectDB.md).
 
 ### Phase 2 — Main persist
 
@@ -236,7 +238,7 @@ When implementation begins:
 
 ## Related docs and skills
 
-- [projectDB.md](projectDB.md) — shipped **`.faproject`** schema (v4 today)
+- [projectDB.md](projectDB.md) — shipped **`.faproject`** schema (v1 today)
 - [README.md](../../README.md) — project database overview
 - [fantasia-template-custom-fields](../../.cursor/skills/fantasia-template-custom-fields/SKILL.md) — agent playbook
 - [fantasia-sqlite-main](../../.cursor/skills/fantasia-sqlite-main/SKILL.md) — migrations and ensure-connected access

@@ -1,7 +1,7 @@
 import type Database from 'better-sqlite3'
 
 import type { I_faProjectStylingPatch, I_faProjectStylingRoot } from 'app/types/I_faProjectStylingDomain'
-import { FA_PROJECT_DATA_TABLE_NAME } from './projectManagement_managerDefaults'
+import { FA_PROJECT_DATA_TABLE_NAME } from './functions/faProjectDbSchemaDdl'
 import {
   readFaProjectDataKv,
   upsertFaProjectDataKv

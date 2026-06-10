@@ -14,8 +14,11 @@ import type {
 import type {
   I_faProjectDocumentMediaListResult,
   I_faProjectDocumentMediaLinkInput,
+  I_faProjectDocumentTemplateWorldListResult,
   I_faProjectSetDocumentTemplateInput,
   I_faProjectSetDocumentWorldInput,
+  I_faProjectWorldDocumentTemplateLinkInput,
+  I_faProjectWorldDocumentTemplateListResult,
   I_faProjectWorldMediaLinkInput,
   I_faProjectWorldMediaListResult
 } from 'app/types/I_faProjectContentLinksDomain'
@@ -51,16 +54,24 @@ export interface I_faProjectContentAPI {
   getMediaById: (id: string) => Promise<I_faProjectMedia>
   getWorldById: (id: string) => Promise<I_faProjectWorld>
   linkDocumentMedia: (input: I_faProjectDocumentMediaLinkInput) => Promise<void>
+  linkWorldDocumentTemplate: (input: I_faProjectWorldDocumentTemplateLinkInput) => Promise<void>
   linkWorldMedia: (input: I_faProjectWorldMediaLinkInput) => Promise<void>
   listDocumentMedia: (documentId: string) => Promise<I_faProjectDocumentMediaListResult>
+  listDocumentTemplatesForWorld: (
+    worldId: string
+  ) => Promise<I_faProjectWorldDocumentTemplateListResult>
   listDocuments: (filter?: I_faProjectDocumentListFilter) => Promise<I_faProjectDocumentListResult>
   listDocumentTemplates: () => Promise<I_faProjectDocumentTemplateListResult>
   listMedia: () => Promise<I_faProjectMediaListResult>
   listMediaForWorld: (worldId: string) => Promise<I_faProjectWorldMediaListResult>
   listWorlds: () => Promise<I_faProjectWorldListResult>
+  listWorldsForDocumentTemplate: (
+    documentTemplateId: string
+  ) => Promise<I_faProjectDocumentTemplateWorldListResult>
   setDocumentTemplate: (input: I_faProjectSetDocumentTemplateInput) => Promise<I_faProjectDocument>
   setDocumentWorld: (input: I_faProjectSetDocumentWorldInput) => Promise<I_faProjectDocument>
   unlinkDocumentMedia: (input: I_faProjectDocumentMediaLinkInput) => Promise<void>
+  unlinkWorldDocumentTemplate: (input: I_faProjectWorldDocumentTemplateLinkInput) => Promise<void>
   unlinkWorldMedia: (input: I_faProjectWorldMediaLinkInput) => Promise<void>
   updateDocument: (id: string, patch: I_faProjectDocumentPatch) => Promise<I_faProjectDocument>
   updateDocumentTemplate: (

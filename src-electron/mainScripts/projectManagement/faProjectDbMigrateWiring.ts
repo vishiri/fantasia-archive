@@ -1,36 +1,21 @@
 import type Database from 'better-sqlite3'
 import { v4 as uuidv4, validate as validateUuid } from 'uuid'
 
-import { applyFaProjectContentSchemaV4 } from './functions/faProjectDbSchemaDdl'
-import { FA_PROJECT_DATA_TABLE_NAME } from './projectManagement_managerDefaults'
+import {
+  applyFaProjectContentSchemaV1,
+  applyFaProjectProjectDataSchemaV1,
+  FA_PROJECT_DATA_TABLE_NAME
+} from './functions/faProjectDbSchemaDdl'
+import { seedFaProjectDefaultWorldIfEmpty } from './projectDbContent/faProjectWorldBootstrapWiring'
 
 const OPTION_PROJECT_NAME = 'project_name'
 const OPTION_PROJECT_UUID = 'project_uuid'
 
-const PROJECT_OPTIONS_LEGACY_TABLE_NAME = 'project_options'
-
-/** Current schema revision: project_data KV + v4 content tables. */
-export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 4
-
-function ddlCreateProjectDataTable (): string {
-  return `
-CREATE TABLE ${FA_PROJECT_DATA_TABLE_NAME} (
-  option_id INTEGER PRIMARY KEY,
-  option_name TEXT NOT NULL UNIQUE CHECK (length(option_name) BETWEEN 1 AND 255),
-  option_value TEXT NOT NULL
-);
-`
-}
+/** Current schema revision: project_data KV + content tables at user_version 1. */
+export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 1
 
 function sqlSelectValueFromActiveTable (): string {
   return `SELECT option_value AS v FROM ${FA_PROJECT_DATA_TABLE_NAME} WHERE option_name = ?`
-}
-
-function sqlSelectValueFromLegacyTable (): string {
-  return (
-    `SELECT option_value AS v FROM ${PROJECT_OPTIONS_LEGACY_TABLE_NAME} ` +
-    'WHERE option_name = ?'
-  )
 }
 
 function readUserVersion (db: Database): number {
@@ -39,15 +24,10 @@ function readUserVersion (db: Database): number {
   return Number.isFinite(current) ? current : 0
 }
 
-function migrateProjectDataV3ToV4 (db: Database): void {
-  applyFaProjectContentSchemaV4(db)
-  db.pragma('user_version = 4')
-}
-
 /**
- * Applies SQLite migrations up to the latest supported schema. Bootstraps 'project_data' from v0;
- * legacy v1 preserves 'project_uuid' then renames options table; v2 performs table rename only;
- * v3 adds worldbuilding content tables.
+ * Applies SQLite migrations up to the latest supported schema.
+ * Fresh files start at user_version 0, bootstrap full schema v1, seed metadata and default world.
+ * Add future steps as migrateProjectDataV1ToV2 (etc.) when the schema grows.
  */
 export function applyFaProjectMigrations (
   db: Database,
@@ -61,62 +41,32 @@ export function applyFaProjectMigrations (
     return
   }
 
-  if (startVer < 3) {
-    const run = db.transaction(() => {
-      if (startVer === 0) {
-        db.exec(ddlCreateProjectDataTable())
-        db.prepare(
-          `INSERT INTO ${FA_PROJECT_DATA_TABLE_NAME} ` +
-            '(option_name, option_value) VALUES (?, ?)'
-        ).run(OPTION_PROJECT_NAME, displayProjectName)
-        db.prepare(
-          `INSERT INTO ${FA_PROJECT_DATA_TABLE_NAME} ` +
-            '(option_name, option_value) VALUES (?, ?)'
-        ).run(OPTION_PROJECT_UUID, uuidv4())
-        migrateProjectDataV3ToV4(db)
-        return
-      }
-
-      const selectFromLegacySql = sqlSelectValueFromLegacyTable()
-
-      if (startVer === 1) {
-        const existingUuid = db
-          .prepare(selectFromLegacySql)
-          .get(OPTION_PROJECT_UUID) as { v?: string } | undefined
-        const u = existingUuid?.v?.trim()
-        if (u === undefined || u.length === 0) {
-          db.prepare(
-            `INSERT INTO ${PROJECT_OPTIONS_LEGACY_TABLE_NAME} ` +
-              '(option_name, option_value) VALUES (?, ?)'
-          ).run(OPTION_PROJECT_UUID, uuidv4())
-        }
-      } else if (startVer !== 2) {
-        throw new Error('Unexpected project file schema state')
-      }
-
-      db.exec(
-        `ALTER TABLE ${PROJECT_OPTIONS_LEGACY_TABLE_NAME} ` +
-          `RENAME TO ${FA_PROJECT_DATA_TABLE_NAME}`
-      )
-      db.pragma('user_version = 3')
-    })
-    run()
+  if (startVer !== 0) {
+    throw new Error('Unexpected project file schema state')
   }
 
-  if (readUserVersion(db) === 3) {
-    const runV4 = db.transaction(() => {
-      migrateProjectDataV3ToV4(db)
-    })
-    runV4()
-  }
+  const runBootstrap = db.transaction(() => {
+    applyFaProjectProjectDataSchemaV1(db)
+    db.prepare(
+      `INSERT INTO ${FA_PROJECT_DATA_TABLE_NAME} ` +
+        '(option_name, option_value) VALUES (?, ?)'
+    ).run(OPTION_PROJECT_NAME, displayProjectName)
+    db.prepare(
+      `INSERT INTO ${FA_PROJECT_DATA_TABLE_NAME} ` +
+        '(option_name, option_value) VALUES (?, ?)'
+    ).run(OPTION_PROJECT_UUID, uuidv4())
+    applyFaProjectContentSchemaV1(db)
+    db.pragma('user_version = 1')
+  })
+  runBootstrap()
 
-  if (startVer === 0) {
-    const verifyName = db
-      .prepare(sqlSelectValueFromActiveTable())
-      .get(OPTION_PROJECT_NAME) as { v?: string } | undefined
-    if (verifyName?.v !== displayProjectName) {
-      throw new Error('Failed to verify project_name row after migration')
-    }
+  seedFaProjectDefaultWorldIfEmpty(db, displayProjectName)
+
+  const verifyName = db
+    .prepare(sqlSelectValueFromActiveTable())
+    .get(OPTION_PROJECT_NAME) as { v?: string } | undefined
+  if (verifyName?.v !== displayProjectName) {
+    throw new Error('Failed to verify project_name row after migration')
   }
 
   const uuidVerify = db

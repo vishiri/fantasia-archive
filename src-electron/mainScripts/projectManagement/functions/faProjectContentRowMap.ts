@@ -1,7 +1,20 @@
 import type { I_faProjectContentNamedEntity } from 'app/types/I_faProjectContentShared'
 import type { I_faProjectDocument } from 'app/types/I_faProjectDocumentDomain'
+import type { I_faProjectWorld } from 'app/types/I_faProjectWorldDomain'
 import type { I_faSqlNamedEntityRow } from 'app/types/I_faProjectContentRowMap'
 import type { I_faSqlProjectDocumentRow } from 'app/types/I_faProjectContentRowMap'
+import type { I_faSqlWorldRow } from 'app/types/I_faProjectContentRowMap'
+
+export function mapFaProjectWorldRow (row: I_faSqlWorldRow): I_faProjectWorld {
+  return {
+    id: row.id,
+    displayName: row.display_name,
+    color: row.color,
+    sortOrder: row.sort_order,
+    createdAtMs: row.created_at_ms,
+    updatedAtMs: row.updated_at_ms
+  }
+}
 
 export function mapFaProjectNamedEntityRow (
   row: I_faSqlNamedEntityRow

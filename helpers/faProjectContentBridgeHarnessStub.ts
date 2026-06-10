@@ -11,6 +11,14 @@ function stubNamedEntity () {
   }
 }
 
+function stubWorld () {
+  return {
+    ...stubNamedEntity(),
+    color: '#808080',
+    sortOrder: 0
+  }
+}
+
 function stubDocument () {
   return {
     ...stubNamedEntity(),
@@ -29,7 +37,7 @@ export function createFaProjectContentBridgeHarnessStub (): I_faProjectContentAP
     createDocument: async () => stubDocument(),
     createDocumentTemplate: async () => stubNamedEntity(),
     createMedia: async () => stubNamedEntity(),
-    createWorld: async () => stubNamedEntity(),
+    createWorld: async () => stubWorld(),
     deleteDocument: noop,
     deleteDocumentTemplate: noop,
     deleteMedia: noop,
@@ -37,22 +45,26 @@ export function createFaProjectContentBridgeHarnessStub (): I_faProjectContentAP
     getDocumentById: async () => stubDocument(),
     getDocumentTemplateById: async () => stubNamedEntity(),
     getMediaById: async () => stubNamedEntity(),
-    getWorldById: async () => stubNamedEntity(),
+    getWorldById: async () => stubWorld(),
     linkDocumentMedia: noop,
+    linkWorldDocumentTemplate: noop,
     linkWorldMedia: noop,
     listDocumentMedia: emptyList,
     listDocuments: emptyList,
     listDocumentTemplates: emptyList,
+    listDocumentTemplatesForWorld: emptyList,
     listMedia: emptyList,
     listMediaForWorld: emptyList,
     listWorlds: emptyList,
+    listWorldsForDocumentTemplate: emptyList,
     setDocumentTemplate: async () => stubDocument(),
     setDocumentWorld: async () => stubDocument(),
     unlinkDocumentMedia: noop,
+    unlinkWorldDocumentTemplate: noop,
     unlinkWorldMedia: noop,
     updateDocument: async () => stubDocument(),
     updateDocumentTemplate: async () => stubNamedEntity(),
     updateMedia: async () => stubNamedEntity(),
-    updateWorld: async () => stubNamedEntity()
+    updateWorld: async () => stubWorld()
   }
 }

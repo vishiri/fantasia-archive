@@ -1,9 +1,13 @@
-import type {
-  I_faProjectContentListResult,
-  I_faProjectContentNamedEntity
-} from 'app/types/I_faProjectContentShared'
+import type { I_faProjectContentListResult } from 'app/types/I_faProjectContentShared'
 
-export type I_faProjectWorld = I_faProjectContentNamedEntity
+export interface I_faProjectWorld {
+  id: string
+  displayName: string
+  color: string
+  sortOrder: number
+  createdAtMs: number
+  updatedAtMs: number
+}
 
 export interface I_faProjectWorldCreateInput {
   displayName: string

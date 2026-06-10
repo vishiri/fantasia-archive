@@ -77,6 +77,17 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
   })
   await projectContentAPI.listDocumentMedia(SAMPLE_UUID)
 
+  await projectContentAPI.linkWorldDocumentTemplate({
+    worldId: SAMPLE_UUID,
+    documentTemplateId: SAMPLE_UUID_B
+  })
+  await projectContentAPI.unlinkWorldDocumentTemplate({
+    worldId: SAMPLE_UUID,
+    documentTemplateId: SAMPLE_UUID_B
+  })
+  await projectContentAPI.listDocumentTemplatesForWorld(SAMPLE_UUID)
+  await projectContentAPI.listWorldsForDocumentTemplate(SAMPLE_UUID_B)
+
   expect(invokeMock).toHaveBeenCalledWith(
     FA_PROJECT_CONTENT_IPC.createWorldAsync,
     { displayName: 'Realm' }
@@ -91,5 +102,13 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
   expect(invokeMock).toHaveBeenCalledWith(
     FA_PROJECT_CONTENT_IPC.listDocumentMediaAsync,
     { documentId: SAMPLE_UUID }
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.listDocumentTemplatesForWorldAsync,
+    { worldId: SAMPLE_UUID }
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.listWorldsForDocumentTemplateAsync,
+    { documentTemplateId: SAMPLE_UUID_B }
   )
 })

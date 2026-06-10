@@ -13,14 +13,14 @@ alwaysApply: false
 
 # Database documentation (`docs/database/`)
 
-When you change **`.faproject`** migrations, **`project_data`** KV keys, **v4 content** tables, **project content** persist modules, **`FA_PROJECT_CONTENT_IPC`**, related **Zod** schemas, or **`projectContent`** preload APIs, update the matching doc in the **same commit**:
+When you change **`.faproject`** migrations, **`project_data`** KV keys, **content** tables, **project content** persist modules, **`FA_PROJECT_CONTENT_IPC`**, related **Zod** schemas, or **`projectContent`** preload APIs, update the matching doc in the **same commit**:
 
 - [docs/database/projectDB.md](../../docs/database/projectDB.md) — schema version ladder, tables, FK rules, module map, IPC table
 - [docs/database/templateCustomFields.md](../../docs/database/templateCustomFields.md) — approved custom-fields architecture; update when **design decisions change**; when **implementing**, migrate table detail into `projectDB.md` and trim duplicate DDL from the design doc
 - [docs/database/README.md](../../docs/database/README.md) — index (only when file list or agent rules change)
 - [docs/database/appUserDataKv.md](../../docs/database/appUserDataKv.md) — when **`electron-store`** domains (user settings, keybinds, MRU, app styling/noteboard) change — **not** mixed into `projectDB.md`
 
-**Agents:** read [docs/database/projectDB.md](../../docs/database/projectDB.md) before editing project SQLite or **`runWithFaProjectDatabase*`** call sites. See also [fa-project-database-access.mdc](fa-project-database-access.mdc) and [fantasia-sqlite-main skill](../skills/fantasia-sqlite-main/SKILL.md).
+**Agents:** read [docs/database/projectDB.md](../../docs/database/projectDB.md) before editing project SQLite or **`runWithFaProjectDatabase*`** call sites. See also [fa-project-database-access.mdc](fa-project-database-access.mdc), [fantasia-sqlite-main skill](../skills/fantasia-sqlite-main/SKILL.md), and pre-release schema squash [fantasia-flatten-database-schemas skill](../skills/fantasia-flatten-database-schemas/SKILL.md).
 
 ## TypeScript interfaces and types (`types/`)
 
