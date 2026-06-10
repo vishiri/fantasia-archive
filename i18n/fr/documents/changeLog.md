@@ -3,6 +3,12 @@
 
 ## 2.4.14 - Changement de version
 
+### Nouvelles fonctionnalités
+- **Paramètres du projet** : un onglet **Mondes** ouvre une section provisoire **Mondes du projet** (style de titre de panneau partagé avec **Paramètres généraux**) ; le câblage de gestion des mondes suivra dans une version ultérieure.
+- **Base de données projet** : les **mondes** et les **modèles de document** peuvent être liés de façon optionnelle en relation plusieurs-à-plusieurs (un modèle peut s'appliquer à plusieurs mondes et un monde peut utiliser plusieurs modèles) ; les liens sont stockés dans SQLite avec des API IPC preload (pas encore d'interface pour les modifier). Chaque **monde** stocke aussi une **couleur** hex pour une future interface.
+- **Base de données projet** : la création d'un **`.faproject`** ajoute aussi un **monde** par défaut dont le nom correspond au **nom du projet**. Chaque **monde** stocke un **ordre de tri** à base zéro pour un futur ordre dans l'interface ; les nouveaux mondes reçoivent automatiquement l'index suivant (le réordonnancement manuel ajustera ces valeurs dans une version ultérieure).
+- **Base de données projet** : le schéma **`.faproject`** est consolidé à **`user_version` 1** pour ce cycle de développement (pas de mise à niveau depuis les anciens fichiers locaux de test — recréez les projets après la mise à jour).
+
 ### Corrections de bugs et optimisations
 - **Écran de bienvenue** : **Reprendre le dernier projet** affiche à nouveau le toast d'échec du gestionnaire d'actions lorsque le projet récent ne peut pas être ouvert (par exemple un fichier **`.faproject`** manquant), au lieu d'échouer silencieusement après une erreur console.
 - **Chargement de projet** : lorsque **Charger un projet existant** échoue, la légende du toast d'erreur n'affiche que le chemin du **`.faproject`** qui n'a pas pu être ouvert (y compris après le sélecteur de fichiers) ; les messages techniques du backend restent dans la console et l'historique du **Moniteur d'actions**.

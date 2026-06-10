@@ -1,0 +1,12 @@
+.dialogProjectSettings__generalPanel,
+.dialogProjectSettings__worldsPanel {
+  padding: 0 $dialogProjectSettings-category-paddingX;
+}
+
+.dialogProjectSettings__panelTitle {
+  margin:
+    $dialogProjectSettings-fieldTitle-marginTop
+    0
+    $dialogProjectSettings-fieldTitle-marginBottom
+    0;
+}

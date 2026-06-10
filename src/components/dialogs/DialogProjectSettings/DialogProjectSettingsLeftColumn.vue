@@ -14,12 +14,21 @@
         :label="$t('dialogs.projectSettings.categories.generalSettings.title')"
         data-test-locator="dialogProjectSettings-tab-generalSettings"
       />
+      <q-tab
+        :class="{ 'fa-text-muted': props.selectedCategoryTab !== worldsTabKey }"
+        :name="worldsTabKey"
+        :label="$t('dialogs.projectSettings.categories.worldsSettings.title')"
+        data-test-locator="dialogProjectSettings-tab-worldsSettings"
+      />
     </q-tabs>
   </div>
 </template>
 
 <script setup lang="ts">
-import { FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDialogInput'
+import {
+  FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB,
+  FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB
+} from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDialogInput'
 
 const props = defineProps<{
   selectedCategoryTab: string
@@ -30,6 +39,7 @@ const emit = defineEmits<{
 }>()
 
 const generalTabKey = FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB
+const worldsTabKey = FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB
 </script>
 
 <style lang="scss" scoped>

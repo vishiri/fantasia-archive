@@ -42,9 +42,14 @@ test('Test that DialogProjectSettingsLeftColumn renders the general settings tab
   })
 
   expect(w.find('[data-test-locator="dialogProjectSettings-tab-generalSettings"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="dialogProjectSettings-tab-worldsSettings"]').exists()).toBe(true)
 
   const tabs = w.findComponent(qTabsStub)
   await tabs.vm.$emit('update:modelValue', 'generalSettings')
 
   expect(w.emitted('update:selectedCategoryTab')?.[0]).toEqual(['generalSettings'])
+
+  await tabs.vm.$emit('update:modelValue', 'worldsSettings')
+
+  expect(w.emitted('update:selectedCategoryTab')?.[1]).toEqual(['worldsSettings'])
 })

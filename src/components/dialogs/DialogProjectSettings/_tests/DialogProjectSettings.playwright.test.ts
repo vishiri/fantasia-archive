@@ -22,9 +22,11 @@ const componentFixtureProjectName = 'Component test project name'
 
 const selectorList = {
   closeButton: 'dialogProjectSettings-button-close',
+  panelWorldsTitle: 'dialogProjectSettings-panel-worlds-title',
   projectNameInput: 'dialogProjectSettings-input-projectName',
   saveButton: 'dialogProjectSettings-button-save',
   tabGeneralSettings: 'dialogProjectSettings-tab-generalSettings',
+  tabWorldsSettings: 'dialogProjectSettings-tab-worldsSettings',
   title: 'dialogProjectSettings-title'
 } as const
 
@@ -82,6 +84,10 @@ test.describe.serial('Project settings dialog', () => {
       appWindow.locator(`[data-test-locator="${selectorList.tabGeneralSettings}"]`)
     ).toHaveText(L_projectSettings.categories.generalSettings.title)
 
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.tabWorldsSettings}"]`)
+    ).toHaveText(L_projectSettings.categories.worldsSettings.title)
+
     const nameInput = appWindow.locator(`[data-test-locator="${selectorList.projectNameInput}"]`)
     await expect(nameInput).toHaveValue(componentFixtureProjectName)
 
@@ -95,9 +101,26 @@ test.describe.serial('Project settings dialog', () => {
   })
 
   /**
+   * Worlds settings tab shows the Project's Worlds panel title when selected.
+   */
+  test('Worlds settings tab shows Project\'s Worlds panel title when selected', async () => {
+    await appWindow.locator(`[data-test-locator="${selectorList.tabWorldsSettings}"]`).click()
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.panelWorldsTitle}"]`)
+    ).toHaveText(L_projectSettings.panels.worlds.title)
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectNameInput}"]`)
+    ).toHaveCount(0)
+  })
+
+  /**
    * Close without saving dismisses the dialog without requiring a persisted project database.
    */
   test('Close without saving dismisses the dialog', async () => {
+    await appWindow.locator(`[data-test-locator="${selectorList.tabGeneralSettings}"]`).click()
+
     const nameInput = appWindow.locator(`[data-test-locator="${selectorList.projectNameInput}"]`)
     await nameInput.fill('Edited but not saved')
 

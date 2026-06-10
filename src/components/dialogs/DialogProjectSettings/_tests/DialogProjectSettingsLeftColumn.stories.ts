@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
-import { FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB } from '../scripts/functions/dialogProjectSettingsDialogInput'
+import {
+  FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB,
+  FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB
+} from '../scripts/functions/dialogProjectSettingsDialogInput'
 import DialogProjectSettingsLeftColumn from '../DialogProjectSettingsLeftColumn.vue'
 
 const meta = {
@@ -19,5 +22,11 @@ export default meta
 export const Default: StoryObj<typeof meta> = {
   args: {
     selectedCategoryTab: FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB
+  }
+}
+
+export const WorldsTabSelected: StoryObj<typeof meta> = {
+  args: {
+    selectedCategoryTab: FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB
   }
 }

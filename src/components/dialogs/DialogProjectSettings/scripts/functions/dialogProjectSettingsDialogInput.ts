@@ -3,6 +3,9 @@ import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 /** Vertical tab id for the General settings category in Project Settings. */
 export const FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB = 'generalSettings'
 
+/** Vertical tab id for the Worlds settings category in Project Settings. */
+export const FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB = 'worldsSettings'
+
 /**
  * True when a direct prop feed should open Project Settings.
  */

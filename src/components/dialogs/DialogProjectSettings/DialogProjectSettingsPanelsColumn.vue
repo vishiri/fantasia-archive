@@ -23,13 +23,27 @@
           </div>
         </div>
       </q-tab-panel>
+      <q-tab-panel
+        :name="worldsTabKey"
+        class="dialogProjectSettings__tabPanel q-pa-none"
+      >
+        <div class="dialogProjectSettings__panelScroll hasScrollbar">
+          <div class="dialogProjectSettings__panelScrollInner q-py-sm">
+            <DialogProjectSettingsWorldsPanel />
+          </div>
+        </div>
+      </q-tab-panel>
     </q-tab-panels>
   </div>
 </template>
 
 <script setup lang="ts">
 import DialogProjectSettingsGeneralPanel from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsGeneralPanel.vue'
-import { FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDialogInput'
+import DialogProjectSettingsWorldsPanel from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsWorldsPanel.vue'
+import {
+  FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB,
+  FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB
+} from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDialogInput'
 
 const props = defineProps<{
   projectName: string
@@ -41,6 +55,7 @@ const emit = defineEmits<{
 }>()
 
 const generalTabKey = FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB
+const worldsTabKey = FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB
 </script>
 
 <style lang="scss" scoped>

@@ -1,7 +1,7 @@
 <template>
   <div class="dialogProjectSettings__generalPanel">
     <h6
-      class="dialogProjectSettings__fieldTitle text-bold q-mb-none text-subtitle1 text-primary-bright"
+      class="dialogProjectSettings__panelTitle text-bold q-mb-none text-subtitle1 text-primary-bright"
       data-test-locator="dialogProjectSettings-field-projectName-title"
     >
       {{ $t('dialogs.projectSettings.fields.projectName.title') }}
@@ -42,19 +42,4 @@ function emitProjectName (value: string | number | null): void {
 }
 </script>
 
-<style lang="scss" scoped>
-.dialogProjectSettings__generalPanel {
-  padding:
-    $dialogProjectSettings-category-paddingTop
-    $dialogProjectSettings-category-paddingX
-    0;
-}
-
-.dialogProjectSettings__fieldTitle {
-  margin:
-    $dialogProjectSettings-fieldTitle-marginTop
-    0
-    $dialogProjectSettings-fieldTitle-marginBottom
-    $dialogProjectSettings-fieldTitle-marginLeft;
-}
-</style>
+<style lang="scss" src="./styles/DialogProjectSettings.panelTitle.unscoped.scss"></style>
