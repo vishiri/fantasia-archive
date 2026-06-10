@@ -1,0 +1,50 @@
+---
+description: List and table drag-and-drop — vue-draggable-plus, q-draggable-table, he-tree exceptions
+globs: "**/*.vue,src/scripts/**/*.ts"
+alwaysApply: false
+---
+
+# Drag-and-drop for lists and tables
+
+## Default — flat and simple lists
+
+Whenever the renderer needs **drag-and-drop to reorder items in a list** (for example **`QList`** / **`QItem`**, vertical settings rows, chip lists, or any non-tree, non-**`QTable`** collection), use **[`vue-draggable-plus`](https://vue-draggable-plus.pages.dev/en/)** (`package.json` dependency).
+
+- Prefer **`VueDraggable`** with **`v-model`** on the backing array, or **`useDraggable`** / **`v-draggable`** when the list root is not a plain wrapper (for example Quasar list bodies).
+- Use a dedicated **drag handle** (grip icon on **`QItemSection`**) via Sortable **`handle`** when rows also navigate or open menus on click.
+- Persist new order through existing Pinia + IPC patterns after drop; map indices to domain fields (for example **`sort_order`** on worlds).
+- Add **`data-test-locator`** on handles and list roots per [vue-template-test-hooks.mdc](vue-template-test-hooks.mdc).
+
+**Do not** add SortableJS, **`vuedraggable`**, **`vue-draggable-next`**, or ad hoc HTML5 **`draggable`** for list reorder unless a maintainer documents a narrow exception in review.
+
+## Exception 1 — hierarchical trees (`@he-tree/vue`)
+
+When the UI is a **nested expand/collapse tree**, use **`@he-tree/vue`** (`BaseTree` / **`Draggable`**) and its **built-in drag-and-drop**. **Do not** wrap tree nodes with **`vue-draggable-plus`** or replace he-tree DnD.
+
+See [fa-he-tree.mdc](fa-he-tree.mdc) and [fantasia-he-tree skill](../skills/fantasia-he-tree/SKILL.md).
+
+## Exception 2 — **`QTable`** row reorder
+
+When reordering **rows inside a Quasar `QTable`**, use **`quasar-ui-q-draggable-table`** (**`v-draggable-table`** directive). The app registers it from boot file **`src/boot/q-draggable-table.ts`**.
+
+- Set directive **`options.mode`** to **`'row'`** for row reorder (default column mode is for column drag).
+- Implement **`onDrop(from, to)`** to splice the backing **`rows`** array; the library reports indexes only — it does not mutate Vue state.
+- **Row mode is incompatible with `virtual-scroll`** on the same table; use a non-virtual table or another UX for very large row sets.
+- Column reorder uses the same directive with **`mode: 'column'`** when that product need arises.
+
+**Do not** use **`vue-draggable-plus`** on **`QTable`** body rows.
+
+## Out of scope (custom pointer sessions)
+
+**Spatial** drag (movable floating windows, free-position panels) stays in feature **`src/scripts/`** pointer sessions (for example **`faFloatingWindowTitleDragPointerSession`**) — not list libraries above.
+
+## Related
+
+- Playbook: [fantasia-drag-drop skill](../skills/fantasia-drag-drop/SKILL.md)
+- [AGENTS.md](../../AGENTS.md) **Drag-and-drop (lists and tables)**
+- Vue/Quasar: [vue-quasar.mdc](vue-quasar.mdc)
+
+## TypeScript interfaces and types (`types/`)
+
+- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
+- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

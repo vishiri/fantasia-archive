@@ -38,11 +38,14 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | [fa-action-manager.mdc](.cursor/rules/fa-action-manager.mdc) | `src/scripts/actionManager/**/*.ts` — central action registry, sync FIFO queue, async fire-and-forget, single-toast failure surface, session-only history |
 | [fa-project-database-access.mdc](.cursor/rules/fa-project-database-access.mdc) | `src-electron/mainScripts/**` — active **`.faproject`** reads/writes must use **`faProjectDatabaseEnsureConnected.ts`**; mirrored path, ESLint import allowlist |
 | [docs-database.mdc](.cursor/rules/docs-database.mdc) | `docs/database/**`, project management / content IPC — keep schema docs in sync with code |
+| [flatten-database-schemas.mdc](.cursor/rules/flatten-database-schemas.mdc) | Pre-release squash of **`.faproject`** **`user_version`** ladders — see **fantasia-flatten-database-schemas** skill |
 | [fa-template-custom-fields.mdc](.cursor/rules/fa-template-custom-fields.mdc) | `docs/database/templateCustomFields.md`, `projectManagement/**`, template/field value types — custom fields design and implementation policy |
 | [neverthrow.mdc](.cursor/rules/neverthrow.mdc) | First-party **`.ts`** / **`.vue`** / **`.mjs`** — prefer **Neverthrow** **`Result`** / **`ResultAsync`** over **`try`** / **`catch`** for recoverable failures |
 | [fa-two-level-architecture.mdc](.cursor/rules/fa-two-level-architecture.mdc) | Always — **`functions/`** (level 1) vs **`*_manager.ts`** wiring-only (level 2); **`fa-two-level/*`** ESLint |
 | [types-folder.mdc](.cursor/rules/types-folder.mdc) | Always — shared **`interface`** / **`type`** under repo-root **`types/`** only; **`types-folder/no-exported-types-outside-types`** |
 | [final-cleanup.mdc](.cursor/rules/final-cleanup.mdc) | Always — when the user asks for **final cleanup**, run the ordered verify → docs → changelog → commit → push workflow ([fantasia-final-cleanup skill](.cursor/skills/fantasia-final-cleanup/SKILL.md)) |
+| [fa-he-tree.mdc](.cursor/rules/fa-he-tree.mdc) | `**/*.vue`, `src/scripts/**/*.ts` — **`@he-tree/vue` only**; Quasar **`QTree`** / **`q-tree` forbidden project-wide |
+| [fa-drag-drop-lists.mdc](.cursor/rules/fa-drag-drop-lists.mdc) | `**/*.vue`, `src/scripts/**/*.ts` — list reorder: **`vue-draggable-plus`**; **`QTable`** rows: **`v-draggable-table`**; trees: **he-tree** DnD |
 
 
 ## Stack (short)
@@ -50,7 +53,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 
 | Area           | Technology                                                       |
 | -------------- | ---------------------------------------------------------------- |
-| UI             | Vue 3, Quasar 2, TypeScript                                      |
+| UI             | Vue 3, Quasar 2, TypeScript; hierarchical trees: **`@he-tree/vue` only** (**`QTree`** forbidden); list DnD: **`vue-draggable-plus`**; **`QTable`** row reorder: **`quasar-ui-q-draggable-table`** |
 | Desktop        | Electron, Quasar Electron mode                                   |
 | State / routes | Pinia, Vue Router                                                |
 | i18n           | vue-i18n (repo-root **`i18n/`**)                                 |
@@ -58,7 +61,7 @@ This repository is **Fantasia Archive**: a **worldbuilding database manager** sh
 | Unit tests     | Vitest — **`yarn test:unit`** (no coverage); **`yarn testbatch:verify`** runs **`yarn test:coverage:verify`** with layered gates (**`src-electron`**, **`helpers`** **`unit-helpers`** corpus excluding **`helpers/playwrightHelpers_*`**, scoped **`i18n/`**, **`src`** **`.ts`** vs **`.vue`** watermarks) — [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc), [vitest/](vitest/) |
 | UI / E2E tests | Playwright (`yarn test:components`, `yarn test:e2e`)              |
 | Component docs | Storybook 10 (`yarn storybook:run`, `yarn storybook:build`)        |
-| DB (evolving)  | `better-sqlite3` in main process; project files use **`.faproject`** (SQLite, **`user_version` 4** with worlds/documents/template shells/media — see **[`docs/database/projectDB.md`](docs/database/projectDB.md)**; typed **template field definitions** planned — **[`docs/database/templateCustomFields.md`](docs/database/templateCustomFields.md)**), created via **`projectManagement`** / **`projectContent`** preload APIs and **`mainScripts/projectManagement/`**. All IPC on the **active** project database must go through **`runWithFaProjectDatabaseForIpcAsync`** / **`runWithFaProjectDatabaseSync`** from **`faProjectDatabaseEnsureConnected.ts`**, not direct **`getFaProjectActiveDatabase()`** calls (see **`.cursor/rules/fa-project-database-access.mdc`**, **`.cursor/skills/fantasia-sqlite-main/SKILL.md`**). |
+| DB (evolving)  | `better-sqlite3` in main process; project files use **`.faproject`** (SQLite, **`user_version` 1** with **`project_data`** KV and worlds/documents/template/media content tables — see **[`docs/database/projectDB.md`](docs/database/projectDB.md)**; typed **template field definitions** planned — **[`docs/database/templateCustomFields.md`](docs/database/templateCustomFields.md)**), created via **`projectManagement`** / **`projectContent`** preload APIs and **`mainScripts/projectManagement/`**. All IPC on the **active** project database must go through **`runWithFaProjectDatabaseForIpcAsync`** / **`runWithFaProjectDatabaseSync`** from **`faProjectDatabaseEnsureConnected.ts`**, not direct **`getFaProjectActiveDatabase()`** calls (see **`.cursor/rules/fa-project-database-access.mdc`**, **`.cursor/skills/fantasia-sqlite-main/SKILL.md`**). Pre-release **schema flatten** (squash migrations to a single version): **`.cursor/skills/fantasia-flatten-database-schemas/SKILL.md`**. |
 
 
 ## Error handling (Neverthrow)
@@ -189,6 +192,31 @@ These are **movable, resizable** **`position: fixed`** surfaces drawn by the **r
 - **Open/close transition** (today: **`WindowAppStyling`**, Custom app **CSS**): The frame root uses **Vue** **`Transition`** with bindings from **`src/scripts/floatingWindows/faFloatingWindowPopTransition.ts`** and styles in **`WindowAppStyling/…/WindowAppStyling.floatingWindowPopTransition.unscoped.scss`**. The animation mirrors a default **`QDialog`** “pop” (opacity and **`transform: scale`**, **300 ms**, standard easing) but keeps the minimum **scale** strictly **above zero** (currently **0.1** in **SCSS**). **Do not** use Quasar stock **`q-transition--scale`** for this window: that transition’s enter-from is **`scale(0)`** / **`scale3d(0, 0, 1)`**, which can leave a **degenerate** transform in **Electron** and break **Monaco** under **Playwright** visibility. Stock **`q-transition`…** class names and duration (for `QDialog` and other surfaces) are documented in **`src/scripts/floatingWindows/faQuasarDialogStandardTransition.ts`**.
 - **i18n**: User-visible copy under **`i18n/<locale>/floatingWindows/`** (for example **`floatingWindows.appStyling`**).
 - **Tests**: Pure resize/clamp logic uses **`src/scripts/floatingWindows/_tests/*.vitest.test.ts`**. Component **Vitest** mounts often **stub** the body teleport using the **same stub key the parent SFC uses** (for example **`FaFloatingWindowBodyTeleport`** in **`WindowAppStyling.vitest.test.ts`**) with **`<div><slot /></div>`** so **`wrapper.find('[data-test-locator=…]')`** still resolves nodes that would otherwise render only under **`body`**. Playwright locators are unchanged (**`data-test-locator`** on the frame). Playbook: [.cursor/skills/fantasia-floating-windows/SKILL.md](.cursor/skills/fantasia-floating-windows/SKILL.md).
+
+### Hierarchical trees (he-tree)
+
+Whenever the renderer shows a **nested hierarchy** (expand/collapse, folder trees, reorderable branches, checkboxes on tree nodes), use **[`@he-tree/vue`](https://hetree.phphe.com/)** exclusively — **`BaseTree`** for read-only or selection trees, **`Draggable`** when users may reorder nodes. **Quasar `QTree` / `q-tree` is forbidden project-wide**; **`@he-tree/vue`** is the full replacement for every tree surface (small and large). Remove any legacy **`QTree`** when you touch that code.
+
+- **Virtualization**: set prop **`virtualization`** when the tree may hold many visible rows; the tree or a bounded parent must have explicit **`height`** or **`max-height`**.
+- **Styles**: import **`@he-tree/vue/style/default.css`** once per tree surface; override in feature **`styles/`** SCSS with BEM + semantic tokens.
+- **Layout**: thin **`.vue`** (slots, **`data-test-locator`**, Quasar controls inside node templates); tree data mapping and handlers in feature **`scripts/`** or shared **`src/scripts/faHeTree/`**; shared node types in **`types/`**.
+- **Large projects**: prefer lazy child load from SQLite on expand where branches are loaded from **`.faproject`**.
+- Playbook: [.cursor/skills/fantasia-he-tree/SKILL.md](.cursor/skills/fantasia-he-tree/SKILL.md), [`.cursor/rules/fa-he-tree.mdc`](.cursor/rules/fa-he-tree.mdc).
+
+### Drag-and-drop (lists and tables)
+
+Policy for **reordering items in lists and tables** (not spatial window drag):
+
+| Surface | Library |
+| --- | --- |
+| **Flat lists** (`QList`, `QItem`, vertical settings rows) | **`vue-draggable-plus`** (`VueDraggable`, `useDraggable`, or `v-draggable`) |
+| **`QTable` row reorder** | **`quasar-ui-q-draggable-table`** — global **`v-draggable-table`** from boot **`src/boot/q-draggable-table.ts`**; set **`options.mode: 'row'`** and splice **`rows`** in **`onDrop`** |
+| **Hierarchical trees** | **`@he-tree/vue`** **`Draggable`** built-in DnD — **do not** use vue-draggable-plus on tree nodes |
+| **Floating windows / free move** | Custom pointer sessions under **`src/scripts/floatingWindows/`** |
+
+Boot registers **`quasar-ui-q-draggable-table`** once (CSS + directive). **`vue-draggable-plus`** is imported per feature SFC or script module — no global boot.
+
+Playbook: [.cursor/skills/fantasia-drag-drop/SKILL.md](.cursor/skills/fantasia-drag-drop/SKILL.md), [`.cursor/rules/fa-drag-drop-lists.mdc`](.cursor/rules/fa-drag-drop-lists.mdc).
 
 ### Foundation components (`src/components/foundation/`)
 
@@ -351,8 +379,11 @@ Use different instructions or @-references when starting a task:
 | `fantasia-quasar-vue`           | Vue/Quasar app structure                                            |
 | `fantasia-two-level-architecture` | **`functions/`** vs **`*_manager.ts`**, wiring-only managers, ESLint **`fa-two-level/*`** |
 | `fantasia-floating-windows`     | In-renderer **`Window*`** frames: teleport, **`useFaFloatingWindowFrame`**, layout, resize clamp, z-index band |
+| `fantasia-he-tree`              | Hierarchical tree UI — **`@he-tree/vue` only**; **`QTree`** forbidden (virtualization, DnD) |
+| `fantasia-drag-drop`            | List/table reorder — **`vue-draggable-plus`**, **`v-draggable-table`**, he-tree exception |
 | `fantasia-i18n`                 | Repo-root **`i18n/`** and **`L_`* locale modules                    |
 | `fantasia-sqlite-main`          | SQLite in main process                                              |
+| `fantasia-flatten-database-schemas` | Pre-release squash of **`.faproject`** schema versions to a single bootstrap revision |
 | `fantasia-template-custom-fields` | Template field definitions, document values, merge/save, orphan policy |
 | `fantasia-worldbuilding-domain` | Product vocabulary and scope                                        |
 | `fantasia-markdown-dialogs`     | QMarkdown dialogs and document markdown                             |

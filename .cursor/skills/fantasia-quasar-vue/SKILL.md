@@ -24,6 +24,8 @@ description: >-
 - **`elements/`** — small reusable widgets (`FantasiaMascotImage`, `SocialContactSingleButton`).
 - **`other/`** — other composites (`SocialContactButtons`).
 - **`foundation/`** — Storybook-only design catalogues (`FoundationColorPalette`, `FoundationTextList`, …): not shipped in product routes, no **`i18n/`** mirror, no Playwright component tests, stories tagged **`skip-visual`**. See [AGENTS.md](../../../AGENTS.md) **Foundation components**.
+- **Hierarchical trees** — Any nested expand/collapse tree uses **`@he-tree/vue`** (`BaseTree` / **`Draggable`**) only. **Quasar `QTree` / `q-tree` is forbidden project-wide.** Enable **`virtualization`** when lists may grow large. Playbook: [fantasia-he-tree](../fantasia-he-tree/SKILL.md).
+- **List / table reorder** — Flat lists: **`vue-draggable-plus`**. **`QTable`** rows: **`v-draggable-table`** (`quasar-ui-q-draggable-table`, boot **`q-draggable-table`**). Trees keep **he-tree** DnD. Playbook: [fantasia-drag-drop](../fantasia-drag-drop/SKILL.md).
 
 Locale `L_*` paths: `i18n/<locale>/components/<bucket>/` mirrors `src/components/` buckets (**`foundation/`** excluded). **`i18n/<locale>/dialogs/`** and **`i18n/<locale>/floatingWindows/`** sit next to **`components/`** for modal vs floating-window copy. See [README](../../../README.md) and [AGENTS.md](../../../AGENTS.md).
 
@@ -78,6 +80,8 @@ Locale `L_*` paths: `i18n/<locale>/components/<bucket>/` mirrors `src/components
 | BEM classes and scoped SCSS | [`vue-bem-scss.mdc`](../../rules/vue-bem-scss.mdc) |
 | Extracted styles (`styles/` folder) | [`component-styles-folder.mdc`](../../rules/component-styles-folder.mdc) |
 | `data-test-locator` and other Playwright `data-test-*` template hooks | [`vue-template-test-hooks.mdc`](../../rules/vue-template-test-hooks.mdc) |
+| Hierarchical trees (`@he-tree/vue` only; `QTree` forbidden) | [`fa-he-tree.mdc`](../../rules/fa-he-tree.mdc) |
+| List / table drag-and-drop | [`fa-drag-drop-lists.mdc`](../../rules/fa-drag-drop-lists.mdc) |
 | Global SCSS / `src/css` | [`project-scss.mdc`](../../rules/project-scss.mdc) |
 
 ## Quality gates
@@ -93,6 +97,8 @@ Locale `L_*` paths: `i18n/<locale>/components/<bucket>/` mirrors `src/components
 ## Related
 
 - [fantasia-floating-windows](../fantasia-floating-windows/SKILL.md) for **`Window*`** frames, teleport, and **`src/scripts/floatingWindows/`** helpers.
+- [fantasia-he-tree](../fantasia-he-tree/SKILL.md) for **`@he-tree/vue`** hierarchical trees (virtualization, drag-and-drop).
+- [fantasia-drag-drop](../fantasia-drag-drop/SKILL.md) for **`vue-draggable-plus`** lists and **`v-draggable-table`** on **`QTable`**.
 - [fantasia-i18n](../fantasia-i18n/SKILL.md) for user-visible strings.
 - [fantasia-testing](../fantasia-testing/SKILL.md) for component Playwright tests next to components and the **Connected tests** sweep.
 - [fantasia-action-manager](../fantasia-action-manager/SKILL.md) for the centralized dispatcher used by menus, dialogs, window controls, and keybinds (single toast + Action Monitor).

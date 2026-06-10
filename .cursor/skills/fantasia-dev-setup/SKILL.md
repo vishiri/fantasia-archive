@@ -22,6 +22,8 @@ description: >-
 yarn
 ```
 
+Renderer drag-and-drop libraries (**`vue-draggable-plus`**, **`quasar-ui-q-draggable-table`**) ship in root **`package.json`** **`dependencies`**. **`quasar-ui-q-draggable-table`** registers via boot **`q-draggable-table`** in **`quasar.config.ts`**. Policy: [fantasia-drag-drop](../fantasia-drag-drop/SKILL.md).
+
 ## Run (development)
 
 Hot reload and Electron debugging:
