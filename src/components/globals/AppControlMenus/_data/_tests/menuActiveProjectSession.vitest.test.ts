@@ -80,6 +80,7 @@ test('Test that buildProjectMenu show project dashboard row dispatches showProje
 test('Test that buildProjectMenu project settings row dispatches openProjectSettingsDialog', () => {
   const menu = buildProjectMenu(emptyRecentSession(true))
   const items = menu.data.filter((row) => row.mode === 'item')
+  expect(items[6]!.keybindCommandId).toBe('openProjectSettings')
   items[6]!.trigger?.()
   expect(runFaActionMock).toHaveBeenCalledWith('openProjectSettingsDialog', undefined)
 })

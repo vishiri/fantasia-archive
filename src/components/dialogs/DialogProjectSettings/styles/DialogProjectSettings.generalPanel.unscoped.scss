@@ -1,0 +1,26 @@
+.dialogProjectSettings__generalPanel {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  min-height: 0;
+  padding: $dialogProjectSettings-category-paddingY $dialogProjectSettings-category-paddingX;
+}
+
+.dialogProjectSettings__generalPanelContent {
+  max-width: $dialogProjectSettings-generalPanelContent-maxWidth;
+  width: 100%;
+}
+
+.dialogProjectSettings__generalPanelTitle {
+  font-size: $dialogProjectSettings-generalPanelTitle-fontSize;
+  margin-bottom: $dialogProjectSettings-generalPanelTitle-marginBottom;
+  text-align: center;
+}
+
+.dialogProjectSettings__generalPanelProjectNameInput {
+  .q-field__input,
+  .q-field__native {
+    font-size: $dialogProjectSettings-generalPanelProjectNameInput-fontSize;
+  }
+}

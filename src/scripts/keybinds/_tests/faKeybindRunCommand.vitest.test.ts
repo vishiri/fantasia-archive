@@ -64,3 +64,8 @@ test('faKeybindRunCommand routes showProjectDashboard to the showProjectDashboar
   faKeybindRunCommand('showProjectDashboard')
   expect(runFaActionMock).toHaveBeenCalledWith('showProjectDashboard', undefined)
 })
+
+test('faKeybindRunCommand routes openProjectSettings to the openProjectSettingsDialog action', () => {
+  faKeybindRunCommand('openProjectSettings')
+  expect(runFaActionMock).toHaveBeenCalledWith('openProjectSettingsDialog', undefined)
+})

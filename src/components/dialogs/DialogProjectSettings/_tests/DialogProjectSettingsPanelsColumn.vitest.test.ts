@@ -15,7 +15,9 @@ test('Test that DialogProjectSettingsPanelsColumn forwards project name updates'
   const w = mount(DialogProjectSettingsPanelsColumn, {
     props: {
       projectName: 'Panel name',
-      selectedCategoryTab: FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB
+      projectNameHasError: false,
+      selectedCategoryTab: FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB,
+      worlds: null
     },
     global: {
       stubs: {
@@ -45,7 +47,9 @@ test('Test that DialogProjectSettingsPanelsColumn renders the worlds settings pa
   const w = mount(DialogProjectSettingsPanelsColumn, {
     props: {
       projectName: 'Panel name',
-      selectedCategoryTab: FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB
+      projectNameHasError: false,
+      selectedCategoryTab: FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB,
+      worlds: []
     },
     global: {
       stubs: {

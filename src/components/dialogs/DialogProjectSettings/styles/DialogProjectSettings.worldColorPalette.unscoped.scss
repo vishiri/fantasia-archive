@@ -1,0 +1,32 @@
+.dialogProjectSettingsWorldColorPaletteSwatch + .dialogProjectSettingsWorldColorPaletteSwatch {
+  margin-left: calc(-1 * $dialogProjectSettings-worldColorPalette-swatch-borderWidth);
+}
+
+.dialogProjectSettingsWorldColorPaletteSwatch + .dialogProjectSettingsWorldColorPalette__addButton {
+  margin-left: calc(-1 * $dialogProjectSettings-worldColorPalette-swatch-borderWidth);
+}
+
+.dialogProjectSettingsWorldColorPalette--listDragging {
+  .dialogProjectSettingsWorldColorPaletteSwatch {
+    cursor: grab;
+  }
+}
+
+.dialogProjectSettingsWorldColorPaletteSwatch__pickerMenu.q-menu {
+  /* Teleported q-menu; stack above modal QDialog chrome (same band as FaColorPickerInput). */
+  z-index: $dialogProjectSettings-worldColorPalette-pickerMenu-zIndex !important;
+}
+
+.dialogProjectSettingsWorldColorPaletteSwatch__picker.q-color-picker {
+  background-color: $dialogProjectSettings-worldColorPalette-picker-backgroundColor;
+}
+
+.dialogProjectSettingsWorldColorPalette__sortableFallback {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+body.dialogProjectSettingsWorldColorPalette--documentDragging,
+body.dialogProjectSettingsWorldColorPalette--documentDragging * {
+  cursor: grabbing !important;
+}

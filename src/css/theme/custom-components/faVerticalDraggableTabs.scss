@@ -1,0 +1,153 @@
+@use '../../quasar.variables.scss' as *;
+
+.faVerticalDraggableTabs {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: scroll;
+  width: $faVerticalDraggableTabs-column-default-width;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.faVerticalDraggableTabs--listDragging {
+  cursor: $faVerticalDraggableTabs-tab-cursor-default;
+
+  .faVerticalDraggableTabs__tab,
+  .faVerticalDraggableTabs__tab:active {
+    cursor: $faVerticalDraggableTabs-tab-cursor-default !important;
+  }
+
+  .faVerticalDraggableTabs__tab.q-hoverable:hover > .q-focus-helper {
+    opacity: 0 !important;
+
+    &::after,
+    &::before {
+      opacity: 0 !important;
+    }
+  }
+}
+
+.faVerticalDraggableTabs__addButton {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.faVerticalDraggableTabs__addButtonRow {
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+}
+
+.faVerticalDraggableTabs__divider {
+  flex: 0 0 auto;
+  margin: $faVerticalDraggableTabs-divider-marginTop auto $faVerticalDraggableTabs-divider-marginBottom;
+  width: calc(100% - #{$faVerticalDraggableTabs-divider-widthSubtract});
+}
+
+.faVerticalDraggableTabs__draggable {
+  width: 100%;
+}
+
+.faVerticalDraggableTabs__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.faVerticalDraggableTabs__tab {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  cursor: $faVerticalDraggableTabs-tab-cursor-default;
+  display: flex;
+  font: inherit;
+  justify-content: center;
+  min-height: $faVerticalDraggableTabs-tab-minHeight;
+  min-width: $faVerticalDraggableTabs-tab-content-minWidth;
+  overflow: hidden;
+  padding:
+    $faVerticalDraggableTabs-tab-paddingY
+    $faVerticalDraggableTabs-tab-paddingX;
+  position: relative;
+  text-align: left;
+  transition:
+    background-color $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing,
+    color $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing;
+  width: 100%;
+
+  &:active {
+    cursor: $faVerticalDraggableTabs-tab-cursor-active;
+  }
+
+  > .q-focus-helper {
+    transition:
+      background-color $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing,
+      opacity $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing !important;
+
+    &::after,
+    &::before {
+      transition:
+        background-color $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing,
+        opacity $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing !important;
+    }
+  }
+}
+
+.faVerticalDraggableTabs__tab--active {
+  color: var(--fa-color-primary-bright);
+
+  &::after {
+    background: var(--fa-color-primary-bright);
+    bottom: 0;
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: $faVerticalDraggableTabs-tab-activeIndicator-width;
+    z-index: $faVerticalDraggableTabs-tab-activeIndicator-zIndex;
+  }
+}
+
+.faVerticalDraggableTabs__tab--dragging > .q-focus-helper {
+  opacity: $qFocusable-hoverHelper-opacity !important;
+
+  &::after,
+  &::before {
+    opacity: 0 !important;
+  }
+}
+
+.faVerticalDraggableTabs__sortableFallback {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+.faVerticalDraggableTabs__tab--error .faVerticalDraggableTabs__tabLabel {
+  color: $faVerticalDraggableTabs-tab-error-color;
+}
+
+.faVerticalDraggableTabs__tabContent {
+  height: inherit;
+  min-width: $faVerticalDraggableTabs-tab-content-minWidth;
+  z-index: $faVerticalDraggableTabs-tab-content-zIndex;
+}
+
+.faVerticalDraggableTabs__tabLabel {
+  display: block;
+  font-size: $faVerticalDraggableTabs-tab-label-fontSize;
+  font-weight: $faVerticalDraggableTabs-tab-label-fontWeight;
+  line-height: $faVerticalDraggableTabs-tab-label-lineHeight;
+  text-align: center;
+  text-transform: uppercase;
+  transition:
+    background-color $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing,
+    color $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing;
+  user-select: none;
+}
+
+body.faVerticalDraggableTabs--documentDragging,
+body.faVerticalDraggableTabs--documentDragging * {
+  cursor: $faVerticalDraggableTabs-tab-cursor-default !important;
+}

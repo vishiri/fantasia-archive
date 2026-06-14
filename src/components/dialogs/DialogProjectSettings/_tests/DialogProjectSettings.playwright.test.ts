@@ -20,14 +20,21 @@ const faFrontendRenderTimer = FA_FRONTEND_RENDER_TIMER
 
 const componentFixtureProjectName = 'Component test project name'
 
+const componentFixtureWorldId = '550e8400-e29b-41d4-a716-446655440000'
+
 const selectorList = {
   closeButton: 'dialogProjectSettings-button-close',
-  panelWorldsTitle: 'dialogProjectSettings-panel-worlds-title',
+  colorPaletteAddButton: 'dialogProjectSettings-worlds-colorPaletteAddButton',
+  colorPaletteEditor: 'dialogProjectSettings-worlds-colorPaletteEditor',
+  colorPaletteSwatch: 'dialogProjectSettings-worlds-colorPaletteSwatch',
   projectNameInput: 'dialogProjectSettings-input-projectName',
   saveButton: 'dialogProjectSettings-button-save',
+  saveErrorsIcon: 'dialogProjectSettings-saveErrorsIcon',
   tabGeneralSettings: 'dialogProjectSettings-tab-generalSettings',
   tabWorldsSettings: 'dialogProjectSettings-tab-worldsSettings',
-  title: 'dialogProjectSettings-title'
+  title: 'dialogProjectSettings-title',
+  worldsAddButton: 'dialogProjectSettings-worlds-addButton',
+  worldsList: 'dialogProjectSettings-worlds-list'
 } as const
 
 const projectSettingsDirectInput: T_dialogName = 'ProjectSettings'
@@ -44,7 +51,14 @@ test.describe.serial('Project settings dialog', () => {
       directSettingsSnapshot: {
         projectName: componentFixtureProjectName,
         schemaVersion: 1
-      }
+      },
+      directWorldsSnapshot: [{
+        color: '',
+        colorPallete: '',
+        displayName: 'Component test world',
+        documentCount: 0,
+        id: componentFixtureWorldId
+      }]
     })
     const launched = await launchFaPlaywrightComponentHarnessWindow({
       buildLaunchEnv (): Record<string, string> {
@@ -101,18 +115,64 @@ test.describe.serial('Project settings dialog', () => {
   })
 
   /**
-   * Worlds settings tab shows the Project's Worlds panel title when selected.
+   * Worlds settings tab shows the worlds list and add-world control when selected.
    */
-  test('Worlds settings tab shows Project\'s Worlds panel title when selected', async () => {
+  test('Worlds settings tab shows worlds list when selected', async () => {
     await appWindow.locator(`[data-test-locator="${selectorList.tabWorldsSettings}"]`).click()
 
     await expect(
-      appWindow.locator(`[data-test-locator="${selectorList.panelWorldsTitle}"]`)
-    ).toHaveText(L_projectSettings.panels.worlds.title)
+      appWindow.locator(`[data-test-locator="${selectorList.worldsList}"]`)
+    ).toBeVisible()
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.worldsAddButton}"]`)
+    ).toContainText(L_projectSettings.panels.worlds.addWorldButton)
 
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.projectNameInput}"]`)
     ).toHaveCount(0)
+  })
+
+  /**
+   * World color palette editor supports adding swatches and shows hex tooltips.
+   */
+  test('World color palette editor adds swatches and exposes hex tooltips', async () => {
+    const editor = appWindow.locator(`[data-test-locator="${selectorList.colorPaletteEditor}"]`)
+    await expect(editor).toHaveCount(1)
+
+    const addButton = appWindow.locator(`[data-test-locator="${selectorList.colorPaletteAddButton}"]`)
+    await expect(addButton).toHaveAttribute(
+      'aria-label',
+      L_projectSettings.fields.worldColorPalette.addButton
+    )
+
+    const swatches = appWindow.locator(`[data-test-locator="${selectorList.colorPaletteSwatch}"]`)
+    await expect(swatches).toHaveCount(0)
+
+    await addButton.click()
+    await expect(swatches).toHaveCount(1)
+    await expect(swatches.first()).toHaveAttribute('data-test-tooltip-text', '#FFFFFF')
+
+    await addButton.click()
+    await expect(swatches).toHaveCount(2)
+    await expect(swatches.nth(1)).toHaveAttribute('data-test-tooltip-text', '#FFFFFF')
+  })
+
+  /**
+   * Duplicate world palette colors disable Save settings while the dialog stays open.
+   */
+  test('Duplicate world palette colors disable Save settings', async () => {
+    const saveButton = appWindow.locator(`[data-test-locator="${selectorList.saveButton}"]`)
+    await expect(saveButton).toBeDisabled()
+
+    const saveErrorsIcon = appWindow.locator(`[data-test-locator="${selectorList.saveErrorsIcon}"]`)
+    await expect(saveErrorsIcon).toHaveCount(1)
+    const bulletLine = L_projectSettings.saveErrors.bulletDuplicatePalette.replace(
+      '{worldLabel}',
+      'Component test world'
+    )
+    const expectedTooltip = `${L_projectSettings.saveErrors.tooltipIntro}\n- ${bulletLine}`
+    await expect(saveErrorsIcon).toHaveAttribute('data-test-tooltip-text', expectedTooltip)
   })
 
   /**

@@ -4,12 +4,22 @@
 ## 2.4.14 - Version bump
 
 ### New features
-- **Project Settings**: A **Worlds settings** tab opens a placeholder **Project's Worlds** section (shared panel title styling with **General settings**); world management wiring follows in a later release.
-- **Project database**: **Worlds** and **document templates** can be linked optionally in a many-to-many relationship (a template may apply to several worlds and a world may use several templates); links are stored in SQLite with IPC preload APIs (no UI to edit links yet). Each **world** also stores a hex **color** for future GUI use.
-- **Project database**: Creating a **`.faproject`** now also adds a default **world** whose name matches the **project name**. Each **world** stores a zero-based **sort order** for future GUI ordering; new worlds append the next index automatically (manual reorder will adjust values in a later release).
-- **Project database**: **`.faproject`** schema is consolidated at **`user_version` 1** for this dev cycle (no upgrade from earlier local test files — create new projects after updating).
+- **Project Settings**: The **Worlds settings** tab uses a draggable world list on the left and a detail editor on the right for the selected world's name, optional hex **color**, and remove control. **Add world** inserts a new row at the top of the list. **Save settings** persists the project name and the full worlds list together; at least one world must remain, and worlds that still contain documents cannot be deleted.
+- **Project Settings**: Each world's **World color palette** editor supports **Add Color**, drag reorder, and per-swatch color editing; duplicate palette entries show a warning border and block **Save settings** until resolved.
+- **Project Settings**: When **Save settings** is blocked, an error icon beside the button lists what must be fixed (blank project name, missing world names, or duplicate palette colors) in a structured tooltip; **General settings**, **Worlds settings**, and individual world tabs highlight in the negative accent color while those errors remain.
+- **Project Settings**: Right-click a palette swatch to open **Duplicate color** or **Delete color** from a context menu; left-click still opens the color picker.
+- **Project Settings**: The **World color** field includes a **+** control to add the current hex to that world's palette in the unsaved draft (disabled when the value is empty, invalid, or already listed).
+- **Project database**: Creating a **`.faproject`** adds a default **world** whose name matches the **project name**. Each **world** stores a hex **color** and zero-based **sort order**; **Project Settings** snapshot save rewrites the ordered list in one transaction.
+- **Project database**: Optional many-to-many links between **worlds** and **document templates** persist in the **`world_document_templates`** junction table with matching project-content IPC (link, unlink, and list helpers).
+- **Open Project Settings**: With an active **`.faproject`**, the default global shortcut **Ctrl+Alt+Shift+P** on every desktop platform (literal Control on macOS) opens **Project Settings**, matching **Project Management → Project Settings** and listing **Open Project Settings** in **Keybind Settings**.
 
 ### Bugfixes & Optimizations
+- **Project Settings**: Opening **Worlds settings** no longer fails with a console error when loading worlds from the active **`.faproject`**; project-content IPC now returns the worlds list payload the dialog expects.
+- **Project Settings**: **World color** picker footer swatches list only the active world's palette instead of every world's colors.
+- **Project Settings**: World tabs select reliably on click even when the pointer moves slightly before release; drag reorder uses a small movement threshold so short clicks are not treated as drags.
+- **Project Settings**: The **+** control beside **World color** shows a tooltip when the current hex is already in that world's palette.
+- **Project Settings**: **World color** and palette color pickers show only the spectrum and palette tabs (the **Tune** sliders view is hidden).
+- **Project Settings**: The **World color palette** help tooltip lists right-click **Deletion** and **Duplication** on separate lines.
 - **Welcome screen**: **Resume Latest Project** again shows the action manager failure toast when the recent project cannot be opened (for example a missing **`.faproject`** file), instead of failing silently after a console error.
 - **Project load failures**: When **loadExistingProject** fails, the error toast caption shows only the **`.faproject`** path that could not be opened (including **Load existing project** after the file picker); technical backend messages stay in the console and **Action Monitor** history.
 - **Desktop development**: **`yarn install`** now runs **`electron-builder install-app-deps`** so **better-sqlite3** native bindings match the bundled **Electron** runtime; use **`yarn rebuild:native`** after changing **Electron** or **Node** if project open still reports missing bindings.

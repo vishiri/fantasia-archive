@@ -87,7 +87,10 @@ export interface I_faActionPayloadMap {
   openProjectStylingDialog: void
   openProjectSettingsDialog: void
   showProjectDashboard: void
-  saveProjectSettings: { settings: import('app/types/I_faProjectSettingsDomain').I_faProjectSettingsPatch }
+  saveProjectSettings: {
+    settings: import('app/types/I_faProjectSettingsDomain').I_faProjectSettingsPatch
+    worlds?: import('app/types/I_faProjectWorldDomain').I_faProjectWorldSnapshotItem[]
+  }
   saveAppStyling: { css: string }
   saveProjectStyling: { css: string }
   openAdvancedSearchGuideDialog: void

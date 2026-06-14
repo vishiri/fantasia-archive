@@ -2,6 +2,7 @@ import type { I_faActionPayloadMap } from 'app/types/I_faActionManagerDomain'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import type { I_faProjectSettingsPatch } from 'app/types/I_faProjectSettingsDomain'
+import type { I_faProjectWorldSnapshotItem } from 'app/types/I_faProjectWorldDomain'
 
 type T_createFaActionDefinitionHandlersDeps = {
   i18n: { global: { t: (key: string) => string } }
@@ -13,6 +14,7 @@ type T_createFaActionDefinitionHandlersDeps = {
   S_FaProjectStyling: () => { savePersistedCssFromEditor: (css: string) => Promise<boolean> }
   S_FaProjectSettings: () => { updateProjectSettings: (patch: I_faProjectSettingsPatch) => Promise<void> }
   S_FaUserSettings: () => { updateSettings: (patch: Partial<I_faUserSettings>) => Promise<void> }
+  faProjectWorldsPersistSnapshotFromDialog: (items: I_faProjectWorldSnapshotItem[]) => Promise<void>
   canOpenFloatingWindowWhileNoModal: () => boolean
   applyFaUserSettingsLanguageSelection: (
     updateSettings: (patch: Partial<I_faUserSettings>) => Promise<void>,
@@ -90,12 +92,18 @@ async function handleSaveAppSettings (
 
 async function handleSaveProjectSettings (
   deps: T_createFaActionDefinitionHandlersDeps,
-  payload: { settings: I_faProjectSettingsPatch }
+  payload: {
+    settings: I_faProjectSettingsPatch
+    worlds?: I_faProjectWorldSnapshotItem[]
+  }
 ): Promise<void> {
   if (!deps.S_FaActiveProject().hasActiveProject) {
     throw new Error(deps.i18n.global.t('globalFunctionality.faProjectSettings.saveError'))
   }
   await deps.S_FaProjectSettings().updateProjectSettings(payload.settings)
+  if (payload.worlds !== undefined) {
+    await deps.faProjectWorldsPersistSnapshotFromDialog(payload.worlds)
+  }
 }
 
 async function handleSaveAppStyling (
@@ -143,7 +151,10 @@ export function createFaActionDefinitionHandlers (deps: T_createFaActionDefiniti
   handleReportBridgeLoadFailure: (payload: { message: string }) => Promise<void>
   handleSaveKeybindSettings: (payload: { overrides: I_faKeybindsRoot['overrides'] }) => Promise<void>
   handleSaveAppSettings: (payload: { settings: I_faUserSettings }) => Promise<void>
-  handleSaveProjectSettings: (payload: { settings: I_faProjectSettingsPatch }) => Promise<void>
+  handleSaveProjectSettings: (payload: {
+    settings: I_faProjectSettingsPatch
+    worlds?: I_faProjectWorldSnapshotItem[]
+  }) => Promise<void>
   handleSaveAppStyling: (payload: { css: string }) => Promise<void>
   handleSaveProjectStyling: (payload: { css: string }) => Promise<void>
   handleLanguageSwitch: (payload: I_faActionPayloadMap['languageSwitch']) => Promise<void>

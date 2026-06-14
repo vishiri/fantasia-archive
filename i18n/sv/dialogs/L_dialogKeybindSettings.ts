@@ -26,6 +26,7 @@ export default {
     openAppSettings: 'Öppna Appinställningar',
     openAppStyling: 'Öppna anpassad app CSS',
     openProjectStyling: 'Öppna anpassat projekt CSS',
+    openProjectSettings: 'Öppna projektinställningar',
     showProjectDashboard: 'Visa projektinstrumentpanel',
     toggleDeveloperTools: 'Växla utvecklarverktyg',
     toggleAppNoteboard: 'Växla App Noteboard',

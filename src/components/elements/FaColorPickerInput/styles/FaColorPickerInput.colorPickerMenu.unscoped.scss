@@ -1,0 +1,9 @@
+/* Teleported q-menu; stack above modal QDialog chrome. */
+
+.faColorPickerInput__picker.q-color-picker {
+  background-color: $faColorPickerInput-colorPicker-backgroundColor;
+}
+
+.faColorPickerInput__pickerMenu.q-menu {
+  z-index: $faColorPickerInput-colorPickerMenu-zIndex !important;
+}

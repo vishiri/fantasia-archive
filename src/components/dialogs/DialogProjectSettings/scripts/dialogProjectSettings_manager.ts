@@ -1,33 +1,74 @@
 import { computed, onMounted, ref, watch } from 'vue'
-import { Result } from 'neverthrow'
 
+import { i18n } from 'app/i18n/externalFileLoader'
 import { faProjectSettingsFetchFreshForDialog } from 'app/src/stores/scripts/sFaProjectSettingsBridge'
+import { faProjectWorldsFetchFreshForDialog } from 'app/src/stores/scripts/sFaProjectWorldsBridge'
 import { registerComponentDialogStackGuard } from 'app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager'
 import { runFaActionAwait } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 
+import { createDialogProjectSettingsRefsWiring } from './createDialogProjectSettingsRefsWiring'
+import { createDialogProjectSettingsUseHook } from './createDialogProjectSettingsUseWiring'
+import { createDialogProjectSettingsWatchersWiring } from './createDialogProjectSettingsWatchersWiring'
+import { createDialogProjectSettingsDialogActions as buildDialogProjectSettingsDialogActions } from './dialogProjectSettingsDialogActionsWiring'
+import { createBuildDialogProjectSettingsSaveValidationTooltip } from './dialogProjectSettingsSaveValidationTooltipWiring'
 import { createDialogProjectSettings } from './functions/createDialogProjectSettings'
 import {
   FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB,
   isDialogProjectSettingsDirectInput,
-  isDialogProjectSettingsSaveDisabled,
   isDialogProjectSettingsStoreTarget
 } from './functions/dialogProjectSettingsDialogInput'
+import {
+  hasDialogProjectSettingsWorldColorPalleteValidationError,
+  hasDialogProjectSettingsWorldNameValidationError,
+  isDialogProjectSettingsDialogSaveDisabled,
+  isDialogProjectSettingsProjectNameInvalid
+} from './functions/dialogProjectSettingsWorldsDraft'
+
+const buildDialogProjectSettingsSaveValidationTooltipForDraft =
+  createBuildDialogProjectSettingsSaveValidationTooltip({
+    defaultNewWorldName: i18n.global.t('dialogs.projectSettings.panels.worlds.defaultNewWorldName'),
+    translate: (key, params) => i18n.global.t(key, params ?? {})
+  })
 
 const dialogProjectSettingsApi = createDialogProjectSettings({
-  FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB,
   S_DialogComponent,
+  buildDialogProjectSettingsSaveValidationTooltipForDraft,
   computed,
-  faProjectSettingsFetchFreshForDialog,
-  isDialogProjectSettingsDirectInput,
-  isDialogProjectSettingsSaveDisabled,
-  isDialogProjectSettingsStoreTarget,
-  onMounted,
-  ref,
+  createDialogProjectSettingsDialogActions: (params) => {
+    return buildDialogProjectSettingsDialogActions({
+      FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB,
+      faProjectSettingsFetchFreshForDialog,
+      faProjectWorldsFetchFreshForDialog,
+      newWorldDefaultDisplayName: i18n.global.t('dialogs.projectSettings.panels.worlds.defaultNewWorldName'),
+      runFaActionAwait
+    }, params)
+  },
+  createDialogProjectSettingsRefs: () => {
+    return createDialogProjectSettingsRefsWiring({
+      FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB,
+      ref
+    })
+  },
+  createDialogProjectSettingsUseHook,
+  hasDialogProjectSettingsWorldColorPalleteValidationError,
+  hasDialogProjectSettingsWorldNameValidationError,
+  isDialogProjectSettingsDialogSaveDisabled,
+  isDialogProjectSettingsProjectNameInvalid,
   registerComponentDialogStackGuard,
-  Result,
-  runFaActionAwait,
-  watch
+  registerDialogProjectSettingsWatchers: createDialogProjectSettingsWatchersWiring({
+    isDialogProjectSettingsDirectInput,
+    isDialogProjectSettingsStoreTarget,
+    onMounted,
+    resolveDialogComponentStore: () => {
+      try {
+        return S_DialogComponent()
+      } catch {
+        return null
+      }
+    },
+    watch
+  })
 })
 
 export const resolveDialogComponentStore = dialogProjectSettingsApi.resolveDialogComponentStore

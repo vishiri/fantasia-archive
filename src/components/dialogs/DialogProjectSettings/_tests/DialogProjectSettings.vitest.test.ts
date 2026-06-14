@@ -68,6 +68,17 @@ const dialogProjectSettingsQBtnStub = defineComponent({
   template: '<button type="button" v-bind="$attrs" :disabled="disable" @click="$emit(\'click\')"><slot /></button>'
 })
 
+const dialogProjectSettingsQIconStub = defineComponent({
+  name: 'QIcon',
+  inheritAttrs: true,
+  template: '<span class="q-icon-stub" v-bind="$attrs"><slot /></span>'
+})
+
+const dialogProjectSettingsQTooltipStub = defineComponent({
+  name: 'QTooltip',
+  template: '<span class="q-tooltip-stub"><slot /></span>'
+})
+
 const dialogProjectSettingsQTabsStub = defineComponent({
   name: 'QTabs',
   inheritAttrs: true,
@@ -102,9 +113,11 @@ const dialogProjectSettingsStubs = {
     template: '<div class="q-card-section-stub"><slot /></div>'
   }),
   QDialog: dialogProjectSettingsQDialogStub,
+  QIcon: dialogProjectSettingsQIconStub,
   QInput: dialogProjectSettingsQInputStub,
   QTab: dialogProjectSettingsQTabStub,
-  QTabs: dialogProjectSettingsQTabsStub
+  QTabs: dialogProjectSettingsQTabsStub,
+  QTooltip: dialogProjectSettingsQTooltipStub
 }
 
 beforeEach(() => {
@@ -175,7 +188,14 @@ test('Test that DialogProjectSettings save button persists and closes the dialog
   expect(runFaActionAwait).toHaveBeenCalledWith('saveProjectSettings', {
     settings: {
       projectName: 'Snapshot Name'
-    }
+    },
+    worlds: [
+      {
+        color: '#808080',
+        displayName: 'Stub',
+        id: '550e8400-e29b-41d4-a716-446655440000'
+      }
+    ]
   })
 })
 
@@ -271,4 +291,35 @@ test('Test that DialogProjectSettings disables save for whitespace-only names', 
   await flushPromises()
 
   expect(w.find('[data-test-locator="dialogProjectSettings-button-save"]').attributes('disabled')).toBeDefined()
+})
+
+/**
+ * DialogProjectSettings
+ * Shows a negative save-errors icon with a multiline tooltip when save is blocked.
+ */
+test('Test that DialogProjectSettings shows save validation errors icon beside Save settings', async () => {
+  const w = mount(DialogProjectSettings, {
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      },
+      stubs: dialogProjectSettingsStubs
+    },
+    props: {
+      directInput: 'ProjectSettings',
+      directSettingsSnapshot: {
+        projectName: '   ',
+        schemaVersion: 1
+      }
+    }
+  })
+
+  await flushPromises()
+
+  const icon = w.find('[data-test-locator="dialogProjectSettings-saveErrorsIcon"]')
+  expect(icon.exists()).toBe(true)
+  const tooltipText = icon.attributes('data-test-tooltip-text') ?? ''
+  expect(tooltipText).toContain('dialogs.projectSettings.saveErrors.tooltipIntro')
+  expect(tooltipText).toContain('dialogs.projectSettings.fields.projectName.errorRequired')
+  expect(tooltipText.indexOf('\n- ')).toBeGreaterThan(-1)
 })

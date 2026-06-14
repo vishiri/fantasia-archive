@@ -1,4 +1,6 @@
 @use '../quasar.variables.scss' as *;
+@use '../theme/custom-components/faColorPickerQColor.scss';
+@use '../theme/custom-components/faVerticalDraggableTabs.scss';
 
 .floatingWindowComponent {
   background: $floatingWindowComponent-base-background;

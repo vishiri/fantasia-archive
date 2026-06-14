@@ -4,7 +4,10 @@ import { createPinia, setActivePinia } from 'pinia'
 
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 
-const updateProjectSettingsMock = vi.fn(async () => undefined)
+const { updateProjectSettingsMock, persistWorldsSnapshotMock } = vi.hoisted(() => ({
+  persistWorldsSnapshotMock: vi.fn(async () => undefined),
+  updateProjectSettingsMock: vi.fn(async () => undefined)
+}))
 
 vi.mock('app/i18n/externalFileLoader', () => {
   return {
@@ -15,6 +18,10 @@ vi.mock('app/i18n/externalFileLoader', () => {
     }
   }
 })
+
+vi.mock('app/src/stores/scripts/sFaProjectWorldsBridge', () => ({
+  faProjectWorldsPersistSnapshotFromDialog: persistWorldsSnapshotMock
+}))
 
 vi.mock('app/src/stores/S_FaProjectSettings', () => {
   return {
@@ -30,6 +37,7 @@ beforeEach(() => {
   setActivePinia(createPinia())
   vi.resetModules()
   updateProjectSettingsMock.mockReset()
+  persistWorldsSnapshotMock.mockReset()
   S_FaActiveProject().clearActiveProject()
 })
 
@@ -58,4 +66,30 @@ test('Test that handleSaveProjectSettings delegates to S_FaProjectSettings', asy
   const patch = { projectName: 'Renamed' }
   await handleSaveProjectSettings({ settings: patch })
   expect(updateProjectSettingsMock).toHaveBeenCalledWith(patch)
+  expect(persistWorldsSnapshotMock).not.toHaveBeenCalled()
+})
+
+/**
+ * handleSaveProjectSettings
+ * Persists an optional worlds snapshot after project settings when provided.
+ */
+test('Test that handleSaveProjectSettings persists worlds snapshot when provided', async () => {
+  const { handleSaveProjectSettings } = await import('../faActionDefinitionHandlers_manager')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const worlds = [
+    {
+      displayName: 'Realm',
+      id: '550e8400-e29b-41d4-a716-446655440000'
+    }
+  ]
+  await handleSaveProjectSettings({
+    settings: { projectName: 'Renamed' },
+    worlds
+  })
+  expect(updateProjectSettingsMock).toHaveBeenCalledWith({ projectName: 'Renamed' })
+  expect(persistWorldsSnapshotMock).toHaveBeenCalledWith(worlds)
 })

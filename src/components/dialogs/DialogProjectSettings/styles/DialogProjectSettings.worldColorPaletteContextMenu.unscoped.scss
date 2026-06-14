@@ -1,0 +1,37 @@
+.dialogProjectSettingsWorldColorPaletteSwatch__contextMenu.q-menu {
+  z-index: $dialogProjectSettings-worldColorPalette-contextMenu-zIndex !important;
+}
+
+.dialogProjectSettingsWorldColorPaletteSwatch__contextMenuList {
+  background-color: $dialogProjectSettings-worldColorPalette-contextMenu-backgroundColor;
+  color: $dialogProjectSettings-worldColorPalette-contextMenu-color;
+}
+
+.dialogProjectSettingsWorldColorPaletteSwatch__contextMenuItem {
+  min-height: $dialogProjectSettings-worldColorPalette-contextMenu-item-minHeight;
+
+  &:hover:not([aria-disabled='true']),
+  &:focus:not([aria-disabled='true']) {
+    color: $dialogProjectSettings-worldColorPalette-contextMenu-hoverColor;
+  }
+}
+
+.dialogProjectSettingsWorldColorPaletteSwatch__contextMenuItem--delete {
+  &:hover:not([aria-disabled='true']),
+  &:focus:not([aria-disabled='true']) {
+    color: $dialogProjectSettings-worldColorPalette-contextMenu-deleteHoverColor;
+  }
+}
+
+.dialogProjectSettingsWorldColorPaletteSwatch__contextMenuLabel {
+  white-space: nowrap;
+}
+
+.dialogProjectSettingsWorldColorPaletteSwatch__contextMenuIcon {
+  font-size: $dialogProjectSettings-worldColorPalette-contextMenu-icon-size;
+}
+
+.dialogProjectSettingsWorldColorPaletteSwatch__contextMenuSeparator {
+  background-color: $dialogProjectSettings-worldColorPalette-contextMenu-separatorColor;
+  height: $dialogProjectSettings-worldColorPalette-contextMenu-separator-height !important;
+}

@@ -60,6 +60,7 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
     }),
     faMenuItem('appControlMenus.project.items.projectSettings', 'mdi-book-cog-outline', {
       conditions: gate,
+      keybindCommandId: 'openProjectSettings',
       trigger: () => runFaAction('openProjectSettingsDialog', undefined)
     }),
     faMenuSeparator(),

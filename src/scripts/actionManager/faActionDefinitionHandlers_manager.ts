@@ -10,6 +10,7 @@ import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import { canOpenFloatingWindowWhileNoModal } from 'app/src/scripts/appNoteboard/appNoteboard_manager'
 import { toggleDevTools } from 'app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager'
 import { applyFaUserSettingsLanguageSelection } from 'app/src/scripts/appInternals/faAppInternalsLocale_manager'
+import { faProjectWorldsPersistSnapshotFromDialog } from 'app/src/stores/scripts/sFaProjectWorldsBridge'
 import { navigateToWorkspaceRouteForActiveProject } from 'app/src/scripts/appInternals/faAppRouterSession_manager'
 
 import { createFaActionDefinitionHandlers } from './functions/createFaActionDefinitionHandlers'
@@ -50,7 +51,8 @@ const faActionDefinitionHandlersApi = {
     S_FaProjectSettings,
     S_FaUserSettings,
     canOpenFloatingWindowWhileNoModal,
-    applyFaUserSettingsLanguageSelection
+    applyFaUserSettingsLanguageSelection,
+    faProjectWorldsPersistSnapshotFromDialog
   }),
   ...buildFaActionDefinitionHandlersWindowChrome({
     toggleDevTools

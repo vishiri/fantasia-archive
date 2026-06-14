@@ -1,22 +1,28 @@
 import { mount, flushPromises } from '@vue/test-utils'
-import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent, nextTick, reactive } from 'vue'
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import { registerDialogProjectSettingsWatchers } from '../dialogProjectSettings_manager'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 
+vi.mock('src/stores/S_Dialog', () => {
+  return {
+    S_DialogComponent: vi.fn()
+  }
+})
+
 beforeEach(() => {
-  setActivePinia(createPinia())
+  vi.mocked(S_DialogComponent).mockReset()
 })
 
 /**
  * registerDialogProjectSettingsWatchers
- * Opens ProjectSettings when the dialog store UUID changes for that dialog.
+ * Tolerates a missing Pinia dialog store when wiring store-driven opens.
  */
-test('Test that store dialogUUID change calls openDialog for ProjectSettings', async () => {
-  const dialogStore = S_DialogComponent()
-  dialogStore.dialogToOpen = 'ProjectSettings'
+test('Test that registerDialogProjectSettingsWatchers tolerates a missing dialog store', async () => {
+  vi.mocked(S_DialogComponent).mockImplementation(() => {
+    throw new Error('no pinia')
+  })
 
   const openDialog = vi.fn()
 
@@ -25,7 +31,30 @@ test('Test that store dialogUUID change calls openDialog for ProjectSettings', a
     props: {}
   })
 
-  dialogStore.generateDialogUUID()
+  await nextTick()
+
+  expect(openDialog).not.toHaveBeenCalled()
+})
+
+/**
+ * registerDialogProjectSettingsWatchers
+ * Opens ProjectSettings when the dialog store UUID changes for that dialog.
+ */
+test('Test that store dialogUUID change calls openDialog for ProjectSettings', async () => {
+  const dialogStore = reactive({
+    dialogToOpen: 'ProjectSettings',
+    dialogUUID: 'uuid-1'
+  })
+  vi.mocked(S_DialogComponent).mockReturnValue(dialogStore as never)
+
+  const openDialog = vi.fn()
+
+  registerDialogProjectSettingsWatchers({
+    openDialog,
+    props: {}
+  })
+
+  dialogStore.dialogUUID = 'uuid-2'
   await nextTick()
 
   expect(openDialog).toHaveBeenCalledWith('ProjectSettings')
@@ -36,8 +65,11 @@ test('Test that store dialogUUID change calls openDialog for ProjectSettings', a
  * Ignores UUID bumps when another dialog is targeted.
  */
 test('Test that store dialogUUID change does not open for other dialogs', async () => {
-  const dialogStore = S_DialogComponent()
-  dialogStore.dialogToOpen = 'NewProject'
+  const dialogStore = reactive({
+    dialogToOpen: 'NewProject',
+    dialogUUID: 'uuid-1'
+  })
+  vi.mocked(S_DialogComponent).mockReturnValue(dialogStore as never)
 
   const openDialog = vi.fn()
 
@@ -46,7 +78,7 @@ test('Test that store dialogUUID change does not open for other dialogs', async 
     props: {}
   })
 
-  dialogStore.generateDialogUUID()
+  dialogStore.dialogUUID = 'uuid-2'
   await nextTick()
 
   expect(openDialog).not.toHaveBeenCalled()

@@ -11,7 +11,7 @@
       <div class="row items-center no-wrap q-mb-xs">
         <div class="dialogAppSettings__settingTitle">
           <span
-            class="dialogAppSettings__settingLabel fa-text-label text-weight-regular text-body2"
+            class="dialogAppSettings__settingLabel fa-text-label text-body2"
             :data-test-locator="labelLocator"
           >{{ setting.title }}</span>
           <q-icon
@@ -76,12 +76,16 @@ function onToggle (value: boolean): void {
 .dialogAppSettings__settingTitle {
   align-items: center;
   display: flex;
-  font-weight: 500;
   justify-content: flex-start;
   margin-bottom: $dialogAppSettings-settingTitle-marginBottom;
   margin-left: $dialogAppSettings-settingTitle-marginLeft;
   margin-top: $dialogAppSettings-settingTitle-marginTop;
   width: calc(100% - #{$dialogAppSettings-settingTitle-widthSubtract});
+}
+
+.dialogAppSettings__settingLabel {
+  font-weight: $dialogAppSettings-settingLabel-fontWeight;
+  letter-spacing: $dialogAppSettings-settingLabel-letterSpacing;
 }
 
 .dialogAppSettings__settingHelpIcon {

@@ -26,6 +26,7 @@ export default {
     openAppSettings: 'Abrir configuración de la aplicación',
     openAppStyling: 'Abrir aplicación personalizada CSS',
     openProjectStyling: 'Abrir proyecto personalizado CSS',
+    openProjectSettings: 'Abrir configuración del proyecto',
     showProjectDashboard: 'Mostrar panel de proyecto',
     toggleDeveloperTools: 'Alternar herramientas de desarrollador',
     toggleAppNoteboard: 'Alternar Bloc de notas de la aplicación',

@@ -1,12 +1,47 @@
-.dialogProjectSettings__generalPanel,
-.dialogProjectSettings__worldsPanel {
-  padding: 0 $dialogProjectSettings-category-paddingX;
+.dialogProjectSettings__worldsDetail {
+  padding:
+    $dialogProjectSettings-worldsDetail-paddingTop
+    $dialogProjectSettings-category-paddingX
+    $dialogProjectSettings-worldsDetail-paddingBottom;
 }
 
 .dialogProjectSettings__panelTitle {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
   margin:
     $dialogProjectSettings-fieldTitle-marginTop
     0
-    $dialogProjectSettings-fieldTitle-marginBottom
-    0;
+    $dialogProjectSettings-fieldTitle-marginBottom;
+}
+
+.dialogProjectSettings__fieldHelpIcon {
+  align-self: flex-start;
+  margin-top: $dialogProjectSettings-fieldHelpIcon-marginTop;
+}
+
+.dialogProjectSettings__fieldHelpTooltip.q-tooltip {
+  max-width: 420px;
+  text-align: left;
+}
+
+.dialogProjectSettings__fieldHelpTooltipBullet {
+  display: block;
+}
+
+.dialogProjectSettings__fieldHelpTooltipIntro + .dialogProjectSettings__fieldHelpTooltipRightClickIntro {
+  margin-top: 8px;
+}
+
+.dialogProjectSettings__fieldHelpTooltipRightClickIntro + .dialogProjectSettings__fieldHelpTooltipBullet {
+  margin-top: 4px;
+}
+
+.dialogProjectSettings__fieldHelpTooltipBullet + .dialogProjectSettings__fieldHelpTooltipBullet {
+  margin-top: 4px;
+}
+
+.dialogProjectSettings__fieldLabel {
+  font-weight: $dialogProjectSettings-fieldLabel-fontWeight;
+  letter-spacing: $dialogProjectSettings-fieldLabel-letterSpacing;
 }

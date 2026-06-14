@@ -1,0 +1,12 @@
+.dialogProjectSettings__saveErrorTooltip.q-tooltip {
+  max-width: 420px;
+  text-align: left;
+}
+
+.dialogProjectSettings__saveErrorTooltipBullet {
+  display: block;
+}
+
+.dialogProjectSettings__saveErrorTooltipIntro + .dialogProjectSettings__saveErrorTooltipBullet {
+  margin-top: 4px;
+}

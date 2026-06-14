@@ -6,6 +6,7 @@
 @forward 'globals/paletteGlobals.variables';
 @forward 'globals/htmlAdjustments.variables';
 @forward 'globals/scrollbar.variables';
+@forward 'theme/custom-components/faVerticalDraggableTabs.variables';
 @forward 'theme/quasar-components/qCard.variables';
 @forward 'theme/quasar-components/qCheckbox.variables';
 @forward 'theme/quasar-components/qDialog.variables';
@@ -29,6 +30,7 @@
 @forward '../components/dialogs/DialogAppSettings/styles/variables';
 @forward '../components/dialogs/DialogProjectSettings/styles/variables';
 @forward '../components/elements/ErrorCard/styles/variables';
+@forward '../components/elements/FaColorPickerInput/styles/variables';
 @forward '../components/elements/SocialContactSingleButton/styles/variables';
 @forward '../components/floatingWindows/WindowAppStyling/styles/variables';
 @forward '../components/foundation/FoundationColorPalette/styles/variables';

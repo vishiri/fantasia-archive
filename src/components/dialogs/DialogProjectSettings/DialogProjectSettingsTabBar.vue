@@ -1,37 +1,45 @@
 <template>
-  <div class="dialogProjectSettings__leftColumnRoot">
+  <div class="dialogProjectSettings__tabBarRoot">
     <q-tabs
       :model-value="props.selectedCategoryTab"
-      vertical
       class="dialogProjectSettings__tabs"
       active-color="primary-bright"
       indicator-color="primary-bright"
+      align="left"
       @update:model-value="emit('update:selectedCategoryTab', $event)"
     >
       <q-tab
-        :class="{ 'fa-text-muted': props.selectedCategoryTab !== generalTabKey }"
+        :class="generalTabClassList"
         :name="generalTabKey"
         :label="$t('dialogs.projectSettings.categories.generalSettings.title')"
+        :data-test-validation-error="props.generalTabHasError ? 'true' : 'false'"
         data-test-locator="dialogProjectSettings-tab-generalSettings"
       />
       <q-tab
-        :class="{ 'fa-text-muted': props.selectedCategoryTab !== worldsTabKey }"
+        :class="worldsTabClassList"
         :name="worldsTabKey"
         :label="$t('dialogs.projectSettings.categories.worldsSettings.title')"
+        :data-test-validation-error="props.worldsTabHasError ? 'true' : 'false'"
         data-test-locator="dialogProjectSettings-tab-worldsSettings"
       />
     </q-tabs>
+
+    <q-separator />
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import {
   FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB,
   FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB
 } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDialogInput'
 
 const props = defineProps<{
+  generalTabHasError: boolean
   selectedCategoryTab: string
+  worldsTabHasError: boolean
 }>()
 
 const emit = defineEmits<{
@@ -40,14 +48,29 @@ const emit = defineEmits<{
 
 const generalTabKey = FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB
 const worldsTabKey = FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB
+
+const generalTabClassList = computed(() => {
+  const classList: Record<string, boolean> = {
+    'dialogProjectSettings__tab--error': props.generalTabHasError,
+    'fa-text-muted': !props.generalTabHasError && props.selectedCategoryTab !== generalTabKey
+  }
+  return classList
+})
+
+const worldsTabClassList = computed(() => {
+  const classList: Record<string, boolean> = {
+    'dialogProjectSettings__tab--error': props.worldsTabHasError,
+    'fa-text-muted': !props.worldsTabHasError && props.selectedCategoryTab !== worldsTabKey
+  }
+  return classList
+})
 </script>
 
-<style lang="scss" scoped>
-.dialogProjectSettings__leftColumnRoot {
-  display: contents;
-}
+<style lang="scss" src="./styles/DialogProjectSettings.tabError.unscoped.scss"></style>
 
-.dialogProjectSettings__tabs {
-  position: relative;
+<style lang="scss" scoped>
+.dialogProjectSettings__tabBarRoot {
+  flex: 0 0 auto;
+  padding: 0 $dialogProjectSettings-category-paddingX;
 }
 </style>

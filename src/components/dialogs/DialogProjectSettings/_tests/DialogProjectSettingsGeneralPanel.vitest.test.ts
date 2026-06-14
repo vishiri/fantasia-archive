@@ -37,6 +37,7 @@ const qInputStub = defineComponent({
 test('Test that DialogProjectSettingsGeneralPanel emits project name updates', async () => {
   const w = mount(DialogProjectSettingsGeneralPanel, {
     props: {
+      nameHasError: false,
       projectName: 'Before'
     },
     global: {
@@ -49,8 +50,8 @@ test('Test that DialogProjectSettingsGeneralPanel emits project name updates', a
     }
   })
 
-  expect(w.find('[data-test-locator="dialogProjectSettings-field-projectName-title"]').text()).toContain(
-    'dialogs.projectSettings.fields.projectName.title'
+  expect(w.find('.dialogProjectSettings__generalPanelTitle').text()).toContain(
+    'dialogs.projectSettings.fields.projectName.label'
   )
 
   const input = w.find('[data-test-locator="dialogProjectSettings-input-projectName"]')
@@ -66,6 +67,7 @@ test('Test that DialogProjectSettingsGeneralPanel emits project name updates', a
 test('Test that DialogProjectSettingsGeneralPanel emits empty string for null input', async () => {
   const w = mount(DialogProjectSettingsGeneralPanel, {
     props: {
+      nameHasError: false,
       projectName: 'Before'
     },
     global: {
@@ -92,6 +94,7 @@ test('Test that DialogProjectSettingsGeneralPanel emits empty string for null in
 test('Test that DialogProjectSettingsGeneralPanel emits empty string for undefined input', async () => {
   const w = mount(DialogProjectSettingsGeneralPanel, {
     props: {
+      nameHasError: false,
       projectName: 'Before'
     },
     global: {

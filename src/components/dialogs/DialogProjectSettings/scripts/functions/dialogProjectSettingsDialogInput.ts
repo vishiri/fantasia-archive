@@ -25,7 +25,7 @@ export function isDialogProjectSettingsStoreTarget (
 }
 
 /**
- * True when Save should stay disabled for the current project name draft.
+ * True when Save should stay disabled for the current project name draft only.
  */
 export function isDialogProjectSettingsSaveDisabled (projectName: string): boolean {
   return projectName.trim().length === 0

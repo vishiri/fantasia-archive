@@ -529,6 +529,7 @@ test('FA_KEYBIND_COMMAND_DEFINITIONS lists expected commands', () => {
     'openAppSettings',
     'openAppStyling',
     'openKeybindSettings',
+    'openProjectSettings',
     'openProjectStyling',
     'showProjectDashboard',
     'toggleAppNoteboard',

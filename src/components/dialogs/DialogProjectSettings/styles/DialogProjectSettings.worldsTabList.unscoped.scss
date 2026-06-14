@@ -1,0 +1,23 @@
+.faVerticalDraggableTabs.dialogProjectSettingsWorldsTabList {
+  flex: 0 0 $dialogProjectSettings-worldsTabList-width;
+  max-width: $dialogProjectSettings-worldsTabList-width;
+  min-width: $dialogProjectSettings-worldsTabList-width;
+  width: $dialogProjectSettings-worldsTabList-width;
+}
+
+.dialogProjectSettingsWorldsTabItem__colorSwatch {
+  border:
+    $dialogProjectSettings-worldsTabColorSwatch-borderWidth
+    solid
+    $dialogProjectSettings-worldsTabColorSwatch-borderColor;
+  border-radius: $dialogProjectSettings-worldsTabColorSwatch-borderRadius;
+  box-sizing: border-box;
+  height: $dialogProjectSettings-worldsTabColorSwatch-size;
+  pointer-events: none;
+  position: absolute;
+  right: $dialogProjectSettings-worldsTabColorSwatch-offsetRight;
+  top: 50%;
+  transform: translateY(-50%);
+  width: $dialogProjectSettings-worldsTabColorSwatch-size;
+  z-index: $dialogProjectSettings-worldsTabColorSwatch-zIndex;
+}

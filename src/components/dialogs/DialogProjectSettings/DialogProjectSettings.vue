@@ -16,16 +16,27 @@
         {{ $t('dialogs.projectSettings.title') }}
       </h5>
 
-      <q-card-section class="dialogProjectSettings__body row no-wrap q-pa-none">
-        <DialogProjectSettingsLeftColumn
+      <q-card-section class="dialogProjectSettings__body column no-wrap q-pa-none">
+        <DialogProjectSettingsTabBar
           v-model:selected-category-tab="selectedCategoryTab"
+          :general-tab-has-error="hasGeneralSettingsValidationError"
+          :worlds-tab-has-error="hasWorldsSettingsValidationError"
         />
 
         <DialogProjectSettingsPanelsColumn
           v-if="localSettings !== null"
+          class="col"
           :project-name="localSettings.projectName"
+          :project-name-has-error="hasGeneralSettingsValidationError"
           :selected-category-tab="selectedCategoryTab"
+          :worlds="localWorlds"
+          @add-world="addWorld"
+          @remove-world="removeWorld"
           @update:project-name="updateProjectName"
+          @update:worlds="updateWorldsOrder"
+          @update-world-color="updateWorldColor"
+          @update-world-color-pallete="updateWorldColorPallete"
+          @update-world-display-name="updateWorldDisplayName"
         />
       </q-card-section>
 
@@ -42,14 +53,45 @@
           data-test-locator="dialogProjectSettings-button-close"
         />
 
-        <q-btn
-          outline
-          :disable="isSaveDisabled"
-          :label="$t('dialogs.projectSettings.saveButton')"
-          color="primary-bright"
-          data-test-locator="dialogProjectSettings-button-save"
-          @click="void saveAndCloseDialog()"
-        />
+        <div class="dialogProjectSettings__saveRow row items-center no-wrap">
+          <q-btn
+            outline
+            :disable="isSaveDisabled"
+            :label="$t('dialogs.projectSettings.saveButton')"
+            color="primary-bright"
+            data-test-locator="dialogProjectSettings-button-save"
+            @click="void saveAndCloseDialog()"
+          />
+
+          <q-icon
+            v-if="saveValidationErrorsTooltip.flatText.length > 0"
+            name="mdi-alert-circle"
+            color="negative"
+            size="20px"
+            class="dialogProjectSettings__saveErrorIcon q-ml-sm"
+            data-test-locator="dialogProjectSettings-saveErrorsIcon"
+            :data-test-tooltip-text="saveValidationErrorsTooltip.flatText"
+          >
+            <q-tooltip
+              :delay="500"
+              anchor="top end"
+              content-class="dialogProjectSettings__saveErrorTooltip"
+              :offset="saveErrorsTooltipOffset"
+              self="bottom end"
+            >
+              <div class="dialogProjectSettings__saveErrorTooltipIntro">
+                {{ saveValidationErrorsTooltip.intro }}
+              </div>
+              <div
+                v-for="(bullet, bulletIndex) in saveValidationErrorsTooltip.bullets"
+                :key="bulletIndex"
+                class="dialogProjectSettings__saveErrorTooltipBullet"
+              >
+                {{ bullet }}
+              </div>
+            </q-tooltip>
+          </q-icon>
+        </div>
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -58,7 +100,8 @@
 <script setup lang="ts">
 import type { I_faProjectSettingsRoot } from 'app/types/I_faProjectSettingsDomain'
 import type { I_dialogProjectSettingsProps } from 'app/types/I_dialogProjectSettings'
-import DialogProjectSettingsLeftColumn from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsLeftColumn.vue'
+import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
+import DialogProjectSettingsTabBar from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsTabBar.vue'
 import DialogProjectSettingsPanelsColumn from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsPanelsColumn.vue'
 import { useDialogProjectSettings } from 'app/src/components/dialogs/DialogProjectSettings/scripts/dialogProjectSettings_manager'
 
@@ -69,13 +112,24 @@ defineOptions({
 const props = defineProps<I_dialogProjectSettingsProps>()
 
 const {
+  addWorld,
   dialogModel,
   documentName,
+  hasGeneralSettingsValidationError,
+  hasWorldsSettingsValidationError,
   isSaveDisabled,
   localSettings,
+  localWorlds,
+  removeWorld,
   saveAndCloseDialog,
-  selectedCategoryTab
+  saveValidationErrorsTooltip,
+  selectedCategoryTab,
+  updateWorldColor,
+  updateWorldColorPallete,
+  updateWorldDisplayName
 } = useDialogProjectSettings(props)
+
+const saveErrorsTooltipOffset: [number, number] = [0, 8]
 
 function updateProjectName (value: string): void {
   if (localSettings.value === null) {
@@ -87,7 +141,13 @@ function updateProjectName (value: string): void {
   }
   localSettings.value = next
 }
+
+function updateWorldsOrder (worlds: I_dialogProjectSettingsWorldDraft[]): void {
+  localWorlds.value = worlds.map((world) => ({ ...world }))
+}
 </script>
+
+<style lang="scss" src="./styles/DialogProjectSettings.saveErrorsTooltip.unscoped.scss"></style>
 
 <style lang="scss">
 .ProjectSettings {
@@ -103,6 +163,7 @@ function updateProjectName (value: string): void {
   }
 
   .dialogProjectSettings__title {
+    margin-bottom: 0;
     z-index: $dialogProjectSettings-title-zIndex;
   }
 
@@ -112,8 +173,8 @@ function updateProjectName (value: string): void {
     overflow: hidden;
   }
 
-  .q-tabs--vertical .q-tab {
-    padding: 0 $dialogProjectSettings-verticalTab-paddingX;
+  .dialogProjectSettings__tabs .q-tab {
+    padding: 0 $dialogProjectSettings-horizontalTab-paddingX;
   }
 }
 </style>
