@@ -15,8 +15,7 @@ import {
   parseFaProjectDocumentIdOnlyPayload,
   parseFaProjectDocumentTemplateIdOnlyPayload,
   parseFaProjectWorldDocumentTemplateLinkPayload,
-  parseFaProjectWorldIdOnlyPayload,
-  parseFaProjectWorldMediaLinkPayload
+  parseFaProjectWorldIdOnlyPayload
 } from '../faProjectContentLinksSchema'
 import {
   parseFaProjectDocumentTemplateCreateInput,
@@ -34,6 +33,7 @@ import {
   parseFaProjectWorldCreateInput,
   parseFaProjectWorldIdPayload,
   parseFaProjectWorldPatch,
+  parseFaProjectWorldsSnapshotPayload,
   parseFaProjectWorldUpdatePayload
 } from '../faProjectWorldContentSchema'
 
@@ -98,16 +98,12 @@ test('Test that project content schema parsers accept valid payloads', () => {
     templateId: null
   }).templateId).toBeNull()
 
-  expect(parseFaProjectWorldMediaLinkPayload({
-    worldId: SAMPLE_UUID,
-    mediaId: SAMPLE_UUID
-  }).mediaId).toBe(SAMPLE_UUID)
   expect(parseFaProjectDocumentMediaLinkPayload({
     documentId: SAMPLE_UUID,
     mediaId: SAMPLE_UUID
   }).documentId).toBe(SAMPLE_UUID)
-  expect(parseFaProjectWorldIdOnlyPayload({ worldId: SAMPLE_UUID })).toBe(SAMPLE_UUID)
   expect(parseFaProjectDocumentIdOnlyPayload({ documentId: SAMPLE_UUID })).toBe(SAMPLE_UUID)
+  expect(parseFaProjectWorldIdOnlyPayload({ worldId: SAMPLE_UUID })).toBe(SAMPLE_UUID)
   expect(parseFaProjectWorldDocumentTemplateLinkPayload({
     worldId: SAMPLE_UUID,
     documentTemplateId: SAMPLE_UUID
@@ -115,4 +111,12 @@ test('Test that project content schema parsers accept valid payloads', () => {
   expect(parseFaProjectDocumentTemplateIdOnlyPayload({
     documentTemplateId: SAMPLE_UUID
   })).toBe(SAMPLE_UUID)
+  expect(parseFaProjectWorldsSnapshotPayload({
+    items: [
+      {
+        displayName: 'Realm',
+        id: SAMPLE_UUID
+      }
+    ]
+  })).toHaveLength(1)
 })

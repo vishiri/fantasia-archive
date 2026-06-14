@@ -86,7 +86,7 @@ export function listFaProjectWorldsForDocumentTemplate (
   assertFaProjectNamedEntityExists(db, DOCUMENT_TEMPLATE_SPEC, documentTemplateId)
   const rows = db
     .prepare(
-      'SELECT w.id, w.display_name, w.color, w.sort_order, w.created_at_ms, w.updated_at_ms ' +
+      'SELECT w.id, w.display_name, w.color, w.color_pallete, w.sort_order, w.created_at_ms, w.updated_at_ms ' +
         'FROM ' + FA_PROJECT_TABLE_WORLDS + ' w ' +
         'INNER JOIN ' + FA_PROJECT_TABLE_WORLD_DOCUMENT_TEMPLATES + ' wdt ' +
         'ON wdt.world_id = w.id ' +

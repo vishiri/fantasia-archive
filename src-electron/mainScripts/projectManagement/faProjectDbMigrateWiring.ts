@@ -6,13 +6,16 @@ import {
   applyFaProjectProjectDataSchemaV1,
   FA_PROJECT_DATA_TABLE_NAME
 } from './functions/faProjectDbSchemaDdl'
+import { migrateFaProjectSchemaV1ToV2 } from './functions/faProjectDbMigrateV1ToV2'
+import { migrateFaProjectSchemaV2ToV3 } from './functions/faProjectDbMigrateV2ToV3'
+import { migrateFaProjectSchemaV3ToV4 } from './functions/faProjectDbMigrateV3ToV4'
 import { seedFaProjectDefaultWorldIfEmpty } from './projectDbContent/faProjectWorldBootstrapWiring'
 
 const OPTION_PROJECT_NAME = 'project_name'
 const OPTION_PROJECT_UUID = 'project_uuid'
 
-/** Current schema revision: project_data KV + content tables at user_version 1. */
-export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 1
+/** Current schema revision: content tables at user_version 4 (worlds.color_pallete). */
+export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 4
 
 function sqlSelectValueFromActiveTable (): string {
   return `SELECT option_value AS v FROM ${FA_PROJECT_DATA_TABLE_NAME} WHERE option_name = ?`
@@ -24,27 +27,10 @@ function readUserVersion (db: Database): number {
   return Number.isFinite(current) ? current : 0
 }
 
-/**
- * Applies SQLite migrations up to the latest supported schema.
- * Fresh files start at user_version 0, bootstrap full schema v1, seed metadata and default world.
- * Add future steps as migrateProjectDataV1ToV2 (etc.) when the schema grows.
- */
-export function applyFaProjectMigrations (
+function bootstrapFaProjectSchemaV0ToV1 (
   db: Database,
   displayProjectName: string
 ): void {
-  const startVer = readUserVersion(db)
-  if (startVer > FA_PROJECT_USER_VERSION_SUPPORTED_MAX) {
-    throw new Error('This project file requires a newer version of Fantasia Archive')
-  }
-  if (startVer === FA_PROJECT_USER_VERSION_SUPPORTED_MAX) {
-    return
-  }
-
-  if (startVer !== 0) {
-    throw new Error('Unexpected project file schema state')
-  }
-
   const runBootstrap = db.transaction(() => {
     applyFaProjectProjectDataSchemaV1(db)
     db.prepare(
@@ -59,9 +45,9 @@ export function applyFaProjectMigrations (
     db.pragma('user_version = 1')
   })
   runBootstrap()
+}
 
-  seedFaProjectDefaultWorldIfEmpty(db, displayProjectName)
-
+function verifyFaProjectMetadataAfterBootstrap (db: Database, displayProjectName: string): void {
   const verifyName = db
     .prepare(sqlSelectValueFromActiveTable())
     .get(OPTION_PROJECT_NAME) as { v?: string } | undefined
@@ -75,6 +61,58 @@ export function applyFaProjectMigrations (
   const uuidStr = uuidVerify?.v?.trim()
   if (uuidStr === undefined || uuidStr.length === 0) {
     throw new Error('Failed to verify project_uuid row after migration')
+  }
+}
+
+/**
+ * Applies SQLite migrations up to the latest supported schema.
+ * Fresh files start at user_version 0, bootstrap v1, migrate through v4, seed default world.
+ */
+export function applyFaProjectMigrations (
+  db: Database,
+  displayProjectName: string
+): void {
+  const startVer = readUserVersion(db)
+  if (startVer > FA_PROJECT_USER_VERSION_SUPPORTED_MAX) {
+    throw new Error('This project file requires a newer version of Fantasia Archive')
+  }
+  if (startVer === FA_PROJECT_USER_VERSION_SUPPORTED_MAX) {
+    return
+  }
+
+  if (startVer === 0) {
+    bootstrapFaProjectSchemaV0ToV1(db, displayProjectName)
+    verifyFaProjectMetadataAfterBootstrap(db, displayProjectName)
+    seedFaProjectDefaultWorldIfEmpty(db, displayProjectName)
+  }
+
+  const afterBootstrapVer = readUserVersion(db)
+  if (afterBootstrapVer === 1 && FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 2) {
+    const runV1ToV2 = db.transaction(() => {
+      migrateFaProjectSchemaV1ToV2(db)
+    })
+    runV1ToV2()
+  }
+
+  const afterV2Ver = readUserVersion(db)
+  if (afterV2Ver === 2 && FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 3) {
+    const runV2ToV3 = db.transaction(() => {
+      migrateFaProjectSchemaV2ToV3(db)
+    })
+    runV2ToV3()
+  }
+
+  const afterV3Ver = readUserVersion(db)
+  if (afterV3Ver === 3 && FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 4) {
+    const runV3ToV4 = db.transaction(() => {
+      migrateFaProjectSchemaV3ToV4(db)
+    })
+    runV3ToV4()
+  }
+
+  const finalVer = readUserVersion(db)
+  if (finalVer !== FA_PROJECT_USER_VERSION_SUPPORTED_MAX) {
+    throw new Error('Unexpected project file schema state')
   }
 }
 

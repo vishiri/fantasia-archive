@@ -11,11 +11,14 @@ The SQLite table **`documents`** stores **worldbuilding document entities** (row
 | Version | Contents |
 |---------|----------|
 | **0** | Uninitialized file (bootstrap target on first open/create). |
-| **1** | Full schema: **`project_data`** KV, worldbuilding **content tables**, default **world** seed on create (current max). |
+| **1** | Full schema: **`project_data`** KV, worldbuilding **content tables** (including **`world_document_templates`**), default **world** seed on create. |
+| **2** | Drops legacy **`world_media`** junction table only. |
+| **3** | Ensures **`world_document_templates`** exists (restores the junction for files that lost it at an interim **v2**). |
+| **4** | Adds **`worlds.color_pallete`** — semicolon-separated **`#RRGGBB`** hex list (max **2000** chars; default empty). Current max. |
 
-**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 1`** in **`faProjectDbMigrateWiring.ts`**.
+**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 4`** in **`faProjectDbMigrateWiring.ts`**.
 
-**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, run one bootstrap transaction (metadata rows + content DDL), set **`user_version = 1`**, then seed a default **world** named like the project. Files already at **1** are a no-op. Other versions throw until a forward migration is added.
+**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v1**, run **v1→v2** (drop **`world_media`**), **v2→v3** (ensure **`world_document_templates`**), **v3→v4** (add **`worlds.color_pallete`**), seed a default **world** when empty, then stop at **v4**. Files already at **4** are a no-op. Other versions throw until a forward migration is added.
 
 **DDL source:** **`src-electron/mainScripts/projectManagement/functions/faProjectDbSchemaDdl.ts`** (**`applyFaProjectProjectDataSchemaV1`**, **`applyFaProjectContentSchemaV1`**).
 
@@ -47,6 +50,7 @@ Primary keys are **TEXT UUID v4** on entity tables. Timestamps are **`created_at
 | `id` | TEXT PK | UUID |
 | `display_name` | TEXT | Non-empty (product “name”) |
 | `color` | TEXT | **`#RRGGBB`** hex; default **`#808080`** |
+| `color_pallete` | TEXT | Semicolon-separated **`#RRGGBB`** hex list (max **2000** chars); default empty |
 | `sort_order` | INTEGER | Zero-based GUI order; new worlds append **`MAX(sort_order) + 1`** |
 | `created_at_ms`, `updated_at_ms` | INTEGER | |
 
@@ -84,14 +88,6 @@ Typed **field definitions** on templates are **planned** — see [templateCustom
 
 **Document → template (N:1):** optional **`template_id`**. Deleting a **template** referenced by documents fails (**RESTRICT**).
 
-### `world_media` (M:N)
-
-| Column | Notes |
-|--------|--------|
-| `world_id` | FK → `worlds.id` **ON DELETE CASCADE** |
-| `media_id` | FK → `media.id` **ON DELETE CASCADE** |
-| PRIMARY KEY (`world_id`, `media_id`) | |
-
 ### `document_media` (M:N)
 
 | Column | Notes |
@@ -110,7 +106,7 @@ Typed **field definitions** on templates are **planned** — see [templateCustom
 
 A template may be linked to zero, one, or many worlds; a world may link to zero, one, or many templates. Links are independent of **`documents.template_id`** (documents still pick at most one template per row).
 
-Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_world_media_media_id`**, **`idx_document_media_media_id`**, **`idx_world_document_templates_document_template_id`**.
+Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_document_media_media_id`**, **`idx_world_document_templates_document_template_id`**, **`idx_worlds_sort_order`**.
 
 ## Relationships (summary)
 
@@ -118,7 +114,6 @@ Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_w
 |--------------|----------------|
 | World → documents | `documents.world_id` |
 | Document → template | `documents.template_id` (nullable) |
-| World ↔ media | `world_media` |
 | Document ↔ media | `document_media` |
 | World ↔ document template | `world_document_templates` (optional M:N) |
 | Template → field definitions (planned) | `template_fields` — see [templateCustomFields.md](templateCustomFields.md) |
@@ -126,7 +121,7 @@ Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_w
 
 **Link helpers (FK assignment):** **`setFaProjectDocumentWorld`**, **`setFaProjectDocumentTemplate`** in **`faProjectDocumentsPersistWiring.ts`**.
 
-## Planned extensions (after version 1)
+## Planned extensions (after version 3)
 
 Custom fields on document templates (field definitions, typed values, orphan retention) are specified in [templateCustomFields.md](templateCustomFields.md) and will land in a future migration; table detail moves into this file when that ships.
 
@@ -151,7 +146,7 @@ src-electron/mainScripts/projectManagement/
     faProjectDocumentsPersistWiring.ts
     faProjectDocumentTemplatesPersistWiring.ts
     faProjectMediaPersistWiring.ts
-    faProjectWorldMediaLinksWiring.ts
+    faProjectWorldsSnapshotWiring.ts
     faProjectDocumentMediaLinksWiring.ts
     faProjectWorldDocumentTemplateLinksWiring.ts
 ```
@@ -177,6 +172,8 @@ All content handlers wrap work in **`runWithFaProjectDatabaseForIpcAsync`**.
 | `delete-world-async` | `deleteFaProjectWorld` |
 | `get-world-by-id-async` | `getFaProjectWorldById` |
 | `list-worlds-async` | `listFaProjectWorlds` |
+| `list-worlds-for-project-settings-async` | `listFaProjectWorldsForProjectSettings` (includes per-world document counts) |
+| `save-worlds-snapshot-async` | `replaceFaProjectWorldsSnapshot` (transactional full list replace from Project Settings) |
 | `create-media-async` | `createFaProjectMedia` |
 | `update-media-async` | `updateFaProjectMedia` |
 | `delete-media-async` | `deleteFaProjectMedia` |
@@ -194,9 +191,6 @@ All content handlers wrap work in **`runWithFaProjectDatabaseForIpcAsync`**.
 | `list-documents-async` | `listFaProjectDocuments` (optional `worldId` filter) |
 | `set-document-world-async` | `setFaProjectDocumentWorld` |
 | `set-document-template-async` | `setFaProjectDocumentTemplate` |
-| `link-world-media-async` | `linkFaProjectWorldMedia` |
-| `unlink-world-media-async` | `unlinkFaProjectWorldMedia` |
-| `list-media-for-world-async` | `listFaProjectMediaForWorld` |
 | `link-document-media-async` | `linkFaProjectDocumentMedia` |
 | `unlink-document-media-async` | `unlinkFaProjectDocumentMedia` |
 | `list-document-media-async` | `listFaProjectMediaForDocument` |

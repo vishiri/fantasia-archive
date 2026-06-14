@@ -34,11 +34,11 @@ export const projectContentAPI: I_faProjectContentAPI = {
   listWorlds: async () => {
     return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.listWorldsAsync)
   },
-  listWorldsForDocumentTemplate: async (documentTemplateId) => {
-    return await invokeProjectContent(
-      FA_PROJECT_CONTENT_IPC.listWorldsForDocumentTemplateAsync,
-      { documentTemplateId }
-    )
+  listWorldsForProjectSettings: async () => {
+    return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.listWorldsForProjectSettingsAsync)
+  },
+  saveWorldsSnapshot: async (items) => {
+    await invokeProjectContent(FA_PROJECT_CONTENT_IPC.saveWorldsSnapshotAsync, { items })
   },
   createMedia: async (input) => {
     return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.createMediaAsync, input)
@@ -85,12 +85,6 @@ export const projectContentAPI: I_faProjectContentAPI = {
   listDocumentTemplates: async () => {
     return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.listDocumentTemplatesAsync)
   },
-  listDocumentTemplatesForWorld: async (worldId) => {
-    return await invokeProjectContent(
-      FA_PROJECT_CONTENT_IPC.listDocumentTemplatesForWorldAsync,
-      { worldId }
-    )
-  },
   createDocument: async (input) => {
     return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.createDocumentAsync, input)
   },
@@ -115,28 +109,31 @@ export const projectContentAPI: I_faProjectContentAPI = {
   setDocumentTemplate: async (input) => {
     return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.setDocumentTemplateAsync, input)
   },
-  linkWorldDocumentTemplate: async (input) => {
-    await invokeProjectContent(FA_PROJECT_CONTENT_IPC.linkWorldDocumentTemplateAsync, input)
-  },
-  linkWorldMedia: async (input) => {
-    await invokeProjectContent(FA_PROJECT_CONTENT_IPC.linkWorldMediaAsync, input)
-  },
-  unlinkWorldDocumentTemplate: async (input) => {
-    await invokeProjectContent(FA_PROJECT_CONTENT_IPC.unlinkWorldDocumentTemplateAsync, input)
-  },
-  unlinkWorldMedia: async (input) => {
-    await invokeProjectContent(FA_PROJECT_CONTENT_IPC.unlinkWorldMediaAsync, input)
-  },
-  listMediaForWorld: async (worldId) => {
-    return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.listMediaForWorldAsync, { worldId })
-  },
   linkDocumentMedia: async (input) => {
     await invokeProjectContent(FA_PROJECT_CONTENT_IPC.linkDocumentMediaAsync, input)
+  },
+  linkWorldDocumentTemplate: async (input) => {
+    await invokeProjectContent(FA_PROJECT_CONTENT_IPC.linkWorldDocumentTemplateAsync, input)
   },
   unlinkDocumentMedia: async (input) => {
     await invokeProjectContent(FA_PROJECT_CONTENT_IPC.unlinkDocumentMediaAsync, input)
   },
+  unlinkWorldDocumentTemplate: async (input) => {
+    await invokeProjectContent(FA_PROJECT_CONTENT_IPC.unlinkWorldDocumentTemplateAsync, input)
+  },
   listDocumentMedia: async (documentId) => {
     return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.listDocumentMediaAsync, { documentId })
+  },
+  listDocumentTemplatesForWorld: async (worldId) => {
+    return await invokeProjectContent(
+      FA_PROJECT_CONTENT_IPC.listDocumentTemplatesForWorldAsync,
+      { worldId }
+    )
+  },
+  listWorldsForDocumentTemplate: async (documentTemplateId) => {
+    return await invokeProjectContent(
+      FA_PROJECT_CONTENT_IPC.listWorldsForDocumentTemplateAsync,
+      { documentTemplateId }
+    )
   }
 }

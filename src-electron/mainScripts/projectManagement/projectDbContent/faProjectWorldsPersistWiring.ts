@@ -4,9 +4,12 @@ import {
   deleteFaProjectWorldRow,
   getFaProjectWorldRowById,
   insertFaProjectWorld,
+  listFaProjectWorldDocumentCounts,
   listFaProjectWorldRows,
   updateFaProjectWorldRow
 } from './faProjectWorldsSqlWiring'
+import { replaceFaProjectWorldsSnapshot } from './faProjectWorldsSnapshotWiring'
+import type { I_faProjectWorldsForProjectSettingsResult } from 'app/types/I_dialogProjectSettingsWorlds'
 import type {
   I_faProjectWorld,
   I_faProjectWorldCreateInput,
@@ -26,7 +29,7 @@ export function updateFaProjectWorld (
   id: string,
   patch: I_faProjectWorldPatch
 ): I_faProjectWorld {
-  return updateFaProjectWorldRow(db, id, patch.displayName)
+  return updateFaProjectWorldRow(db, id, patch)
 }
 
 export function deleteFaProjectWorld (db: Database, id: string): void {
@@ -39,4 +42,25 @@ export function getFaProjectWorldById (db: Database, id: string): I_faProjectWor
 
 export function listFaProjectWorlds (db: Database): I_faProjectWorldListResult {
   return { items: listFaProjectWorldRows(db) }
+}
+
+export function listFaProjectWorldsForProjectSettings (
+  db: Database
+): I_faProjectWorldsForProjectSettingsResult {
+  const documentCounts = listFaProjectWorldDocumentCounts(db)
+  const items = listFaProjectWorldRows(db).map((world) => ({
+    color: world.color,
+    colorPallete: world.colorPallete,
+    createdAtMs: world.createdAtMs,
+    displayName: world.displayName,
+    documentCount: documentCounts[world.id] ?? 0,
+    id: world.id,
+    sortOrder: world.sortOrder,
+    updatedAtMs: world.updatedAtMs
+  }))
+  return { items }
+}
+
+export {
+  replaceFaProjectWorldsSnapshot
 }

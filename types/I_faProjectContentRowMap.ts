@@ -1,8 +1,9 @@
-/** SQLite column layout for the worlds table (v5+ color, v6+ sort_order). */
+/** SQLite column layout for the worlds table (v5+ color, v6+ sort_order, v4+ color_pallete). */
 export interface I_faSqlWorldRow {
   id: string
   display_name: string
   color: string
+  color_pallete: string
   sort_order: number
   created_at_ms: number
   updated_at_ms: number

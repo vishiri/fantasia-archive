@@ -3,6 +3,7 @@ import { expect, test } from 'vitest'
 import {
   parseFaProjectWorldCreateInput,
   parseFaProjectWorldIdPayload,
+  parseFaProjectWorldsSnapshotPayload,
   parseFaProjectWorldUpdatePayload
 } from '../faProjectWorldContentSchema'
 
@@ -33,4 +34,36 @@ test('Test that parseFaProjectWorldUpdatePayload parses id and patch', () => {
  */
 test('Test that parseFaProjectWorldIdPayload rejects invalid uuid', () => {
   expect(() => parseFaProjectWorldIdPayload({ id: 'nope' })).toThrow()
+})
+
+/**
+ * parseFaProjectWorldsSnapshotPayload
+ * Rejects invalid color_pallete strings in snapshot items.
+ */
+test('Test that parseFaProjectWorldsSnapshotPayload rejects invalid colorPallete', () => {
+  expect(() => parseFaProjectWorldsSnapshotPayload({
+    items: [
+      {
+        colorPallete: 'not-a-palette',
+        displayName: 'Realm',
+        id: '550e8400-e29b-41d4-a716-446655440000'
+      }
+    ]
+  })).toThrow()
+})
+
+/**
+ * parseFaProjectWorldsSnapshotPayload
+ * Rejects color_pallete strings with duplicate hex values (case-insensitive).
+ */
+test('Test that parseFaProjectWorldsSnapshotPayload rejects duplicate colorPallete colors', () => {
+  expect(() => parseFaProjectWorldsSnapshotPayload({
+    items: [
+      {
+        colorPallete: '#112233;#aabbcc;#112233',
+        displayName: 'Realm',
+        id: '550e8400-e29b-41d4-a716-446655440000'
+      }
+    ]
+  })).toThrow()
 })

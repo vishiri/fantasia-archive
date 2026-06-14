@@ -10,6 +10,7 @@ export function mapFaProjectWorldRow (row: I_faSqlWorldRow): I_faProjectWorld {
     id: row.id,
     displayName: row.display_name,
     color: row.color,
+    colorPallete: row.color_pallete,
     sortOrder: row.sort_order,
     createdAtMs: row.created_at_ms,
     updatedAtMs: row.updated_at_ms

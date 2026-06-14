@@ -26,6 +26,15 @@ function applyMockUserVersionPragma (
   if (name === 'user_version = 1') {
     pragmas.user_version = 1
   }
+  if (name === 'user_version = 2') {
+    pragmas.user_version = 2
+  }
+  if (name === 'user_version = 3') {
+    pragmas.user_version = 3
+  }
+  if (name === 'user_version = 4') {
+    pragmas.user_version = 4
+  }
 }
 
 test('applyFaProjectMigrations bootstraps schema when user_version is 0', () => {
@@ -63,7 +72,7 @@ test('applyFaProjectMigrations bootstraps schema when user_version is 0', () => 
   applyFaProjectMigrations(db as never, 'Realm')
   expect(db.exec).toHaveBeenCalled()
   expect(insertRun).toHaveBeenCalledTimes(2)
-  expect(pragmas.user_version).toBe(1)
+  expect(pragmas.user_version).toBe(4)
   expect(seedFaProjectDefaultWorldIfEmptyMock).toHaveBeenCalledWith(db, 'Realm')
   expect(
     db.exec.mock.calls.some(
@@ -119,7 +128,7 @@ test('applyFaProjectMigrations is a no-op when user_version already at maximum',
     prepare: vi.fn(),
     pragma: vi.fn((name: string, opts?: { simple?: boolean }) => {
       if (name === 'user_version' && opts?.simple === true) {
-        return 1
+        return 4
       }
       return undefined
     }),

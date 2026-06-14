@@ -5,7 +5,10 @@ import { FA_PROJECT_CONTENT_IPC } from 'app/src-electron/electron-ipc-bridge'
 const { handleMock, runWithDbMock } = vi.hoisted(() => ({
   handleMock: vi.fn(),
   runWithDbMock: vi.fn(async (_event: unknown, work: (db: unknown) => unknown) => {
-    return await work({})
+    return {
+      ok: true as const,
+      value: await work({})
+    }
   })
 }))
 
@@ -26,7 +29,9 @@ vi.mock(
     updateFaProjectWorld: vi.fn(() => ({ id: 'w' })),
     deleteFaProjectWorld: vi.fn(),
     getFaProjectWorldById: vi.fn(() => ({ id: 'w' })),
-    listFaProjectWorlds: vi.fn(() => ({ items: [] }))
+    listFaProjectWorlds: vi.fn(() => ({ items: [] })),
+    listFaProjectWorldsForProjectSettings: vi.fn(() => ({ items: [] })),
+    replaceFaProjectWorldsSnapshot: vi.fn()
   })
 )
 
@@ -66,15 +71,6 @@ vi.mock(
 )
 
 vi.mock(
-  'app/src-electron/mainScripts/projectManagement/projectDbContent/faProjectWorldMediaLinksWiring',
-  () => ({
-    linkFaProjectWorldMedia: vi.fn(),
-    unlinkFaProjectWorldMedia: vi.fn(),
-    listFaProjectMediaForWorld: vi.fn(() => ({ items: [] }))
-  })
-)
-
-vi.mock(
   'app/src-electron/mainScripts/projectManagement/projectDbContent/faProjectDocumentMediaLinksWiring',
   () => ({
     linkFaProjectDocumentMedia: vi.fn(),
@@ -98,7 +94,10 @@ beforeEach(() => {
   handleMock.mockReset()
   runWithDbMock.mockReset()
   runWithDbMock.mockImplementation(async (_event: unknown, work: (db: unknown) => unknown) => {
-    return await work({})
+    return {
+      ok: true as const,
+      value: await work({})
+    }
   })
 })
 
@@ -153,6 +152,18 @@ test('Test that every project content IPC handler runs through runWithFaProjectD
   await handlerFor(FA_PROJECT_CONTENT_IPC.deleteWorldAsync)(event, { id: SAMPLE_UUID })
   await handlerFor(FA_PROJECT_CONTENT_IPC.getWorldByIdAsync)(event, { id: SAMPLE_UUID })
   await handlerFor(FA_PROJECT_CONTENT_IPC.listWorldsAsync)(event)
+  const listWorldsForSettingsResult =
+    await handlerFor(FA_PROJECT_CONTENT_IPC.listWorldsForProjectSettingsAsync)(event)
+  expect(listWorldsForSettingsResult).toEqual({ items: [] })
+  expect(listWorldsForSettingsResult).not.toHaveProperty('ok')
+  await handlerFor(FA_PROJECT_CONTENT_IPC.saveWorldsSnapshotAsync)(event, {
+    items: [
+      {
+        displayName: 'W',
+        id: SAMPLE_UUID
+      }
+    ]
+  })
 
   await handlerFor(FA_PROJECT_CONTENT_IPC.createMediaAsync)(event, { displayName: 'M' })
   await handlerFor(FA_PROJECT_CONTENT_IPC.updateMediaAsync)(event, {
@@ -192,16 +203,6 @@ test('Test that every project content IPC handler runs through runWithFaProjectD
     templateId: null
   })
 
-  await handlerFor(FA_PROJECT_CONTENT_IPC.linkWorldMediaAsync)(event, {
-    worldId: SAMPLE_UUID,
-    mediaId: SAMPLE_UUID_B
-  })
-  await handlerFor(FA_PROJECT_CONTENT_IPC.unlinkWorldMediaAsync)(event, {
-    worldId: SAMPLE_UUID,
-    mediaId: SAMPLE_UUID_B
-  })
-  await handlerFor(FA_PROJECT_CONTENT_IPC.listMediaForWorldAsync)(event, { worldId: SAMPLE_UUID })
-
   await handlerFor(FA_PROJECT_CONTENT_IPC.linkDocumentMediaAsync)(event, {
     documentId: SAMPLE_UUID,
     mediaId: SAMPLE_UUID_B
@@ -224,10 +225,10 @@ test('Test that every project content IPC handler runs through runWithFaProjectD
     worldId: SAMPLE_UUID
   })
   await handlerFor(FA_PROJECT_CONTENT_IPC.listWorldsForDocumentTemplateAsync)(event, {
-    documentTemplateId: SAMPLE_UUID_B
+    documentTemplateId: SAMPLE_UUID
   })
 
-  expect(runWithDbMock.mock.calls.length).toBeGreaterThanOrEqual(32)
+  expect(runWithDbMock.mock.calls.length).toBeGreaterThanOrEqual(31)
 })
 
 /**

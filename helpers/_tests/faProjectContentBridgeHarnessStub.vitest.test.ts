@@ -14,7 +14,13 @@ const stubNamedEntityShape = {
 const stubWorldShape = {
   ...stubNamedEntityShape,
   color: '#808080',
+  colorPallete: '',
   sortOrder: 0
+}
+
+const stubWorldForSettingsShape = {
+  ...stubWorldShape,
+  documentCount: 0
 }
 
 const stubDocumentShape = {
@@ -68,9 +74,9 @@ test('Test that createFaProjectContentBridgeHarnessStub update and set methods r
 
 /**
  * createFaProjectContentBridgeHarnessStub
- * List methods resolve to empty item arrays.
+ * List methods resolve to empty item arrays or project-settings stub rows.
  */
-test('Test that createFaProjectContentBridgeHarnessStub list methods return empty collections', async () => {
+test('Test that createFaProjectContentBridgeHarnessStub list methods return expected collections', async () => {
   const api = createFaProjectContentBridgeHarnessStub()
   const emptyList = { items: [] }
 
@@ -79,8 +85,12 @@ test('Test that createFaProjectContentBridgeHarnessStub list methods return empt
   await expect(api.listDocuments({ worldId: STUB_UUID })).resolves.toEqual(emptyList)
   await expect(api.listDocumentTemplates()).resolves.toEqual(emptyList)
   await expect(api.listMedia()).resolves.toEqual(emptyList)
-  await expect(api.listMediaForWorld(STUB_UUID)).resolves.toEqual(emptyList)
   await expect(api.listWorlds()).resolves.toEqual(emptyList)
+  await expect(api.listWorldsForProjectSettings()).resolves.toEqual({
+    items: [stubWorldForSettingsShape]
+  })
+  await expect(api.listDocumentTemplatesForWorld(STUB_UUID)).resolves.toEqual(emptyList)
+  await expect(api.listWorldsForDocumentTemplate(STUB_UUID)).resolves.toEqual(emptyList)
 })
 
 /**
@@ -99,16 +109,22 @@ test('Test that createFaProjectContentBridgeHarnessStub noop methods resolve und
     documentId: STUB_UUID,
     mediaId: STUB_UUID
   })).resolves.toBeUndefined()
-  await expect(api.linkWorldMedia({
-    worldId: STUB_UUID,
-    mediaId: STUB_UUID
-  })).resolves.toBeUndefined()
   await expect(api.unlinkDocumentMedia({
     documentId: STUB_UUID,
     mediaId: STUB_UUID
   })).resolves.toBeUndefined()
-  await expect(api.unlinkWorldMedia({
+  await expect(api.linkWorldDocumentTemplate({
     worldId: STUB_UUID,
-    mediaId: STUB_UUID
+    documentTemplateId: STUB_UUID
   })).resolves.toBeUndefined()
+  await expect(api.unlinkWorldDocumentTemplate({
+    worldId: STUB_UUID,
+    documentTemplateId: STUB_UUID
+  })).resolves.toBeUndefined()
+  await expect(api.saveWorldsSnapshot([
+    {
+      displayName: 'World',
+      id: STUB_UUID
+    }
+  ])).resolves.toBeUndefined()
 })

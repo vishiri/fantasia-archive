@@ -15,7 +15,15 @@ function stubWorld () {
   return {
     ...stubNamedEntity(),
     color: '#808080',
+    colorPallete: '',
     sortOrder: 0
+  }
+}
+
+function stubWorldForSettings () {
+  return {
+    ...stubWorld(),
+    documentCount: 0
   }
 }
 
@@ -48,20 +56,19 @@ export function createFaProjectContentBridgeHarnessStub (): I_faProjectContentAP
     getWorldById: async () => stubWorld(),
     linkDocumentMedia: noop,
     linkWorldDocumentTemplate: noop,
-    linkWorldMedia: noop,
     listDocumentMedia: emptyList,
+    listDocumentTemplatesForWorld: emptyList,
     listDocuments: emptyList,
     listDocumentTemplates: emptyList,
-    listDocumentTemplatesForWorld: emptyList,
     listMedia: emptyList,
-    listMediaForWorld: emptyList,
     listWorlds: emptyList,
+    listWorldsForProjectSettings: async () => ({ items: [stubWorldForSettings()] }),
     listWorldsForDocumentTemplate: emptyList,
+    saveWorldsSnapshot: noop,
     setDocumentTemplate: async () => stubDocument(),
     setDocumentWorld: async () => stubDocument(),
     unlinkDocumentMedia: noop,
     unlinkWorldDocumentTemplate: noop,
-    unlinkWorldMedia: noop,
     updateDocument: async () => stubDocument(),
     updateDocumentTemplate: async () => stubNamedEntity(),
     updateMedia: async () => stubNamedEntity(),

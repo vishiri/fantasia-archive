@@ -33,6 +33,8 @@ import {
   deleteFaProjectWorld,
   getFaProjectWorldById,
   listFaProjectWorlds,
+  listFaProjectWorldsForProjectSettings,
+  replaceFaProjectWorldsSnapshot,
   updateFaProjectWorld
 } from '../faProjectWorldsPersistWiring'
 import {
@@ -51,11 +53,6 @@ import {
   listFaProjectWorldsForDocumentTemplate,
   unlinkFaProjectWorldDocumentTemplate
 } from '../faProjectWorldDocumentTemplateLinksWiring'
-import {
-  linkFaProjectWorldMedia,
-  listFaProjectMediaForWorld,
-  unlinkFaProjectWorldMedia
-} from '../faProjectWorldMediaLinksWiring'
 
 type T_row = Record<string, string | number | null>
 
@@ -75,7 +72,6 @@ function makeProjectContentTestDb (): {
     prepare: ReturnType<typeof vi.fn>
   }
   tables: Record<string, Map<string, T_row>>
-  junctionWorldMedia: Set<string>
   junctionDocumentMedia: Set<string>
   junctionWorldDocumentTemplates: Set<string>
 } {
@@ -85,11 +81,15 @@ function makeProjectContentTestDb (): {
     media: new Map(),
     documents: new Map()
   }
-  const junctionWorldMedia = new Set<string>()
   const junctionDocumentMedia = new Set<string>()
   const junctionWorldDocumentTemplates = new Set<string>()
 
   const db = {
+    transaction: (fn: () => void) => {
+      return () => {
+        fn()
+      }
+    },
     prepare: vi.fn((sql: string) => {
       const normalized = sql.replace(/\s+/g, ' ').trim()
       if (normalized.includes('INSERT INTO worlds')) {
@@ -99,9 +99,10 @@ function makeProjectContentTestDb (): {
               id: args[0] as string,
               display_name: args[1] as string,
               color: args[2] as string,
-              sort_order: args[3] as number,
-              created_at_ms: args[4] as number,
-              updated_at_ms: args[5] as number
+              color_pallete: args[3] as string,
+              sort_order: args[4] as number,
+              created_at_ms: args[5] as number,
+              updated_at_ms: args[6] as number
             }
             tables.worlds.set(row.id as string, row)
           }
@@ -160,13 +161,6 @@ function makeProjectContentTestDb (): {
           }
         }
       }
-      if (normalized.includes('INSERT OR IGNORE INTO world_media')) {
-        return {
-          run: (worldId: string, mediaId: string) => {
-            junctionWorldMedia.add(`${worldId}:${mediaId}`)
-          }
-        }
-      }
       if (normalized.includes('INSERT OR IGNORE INTO document_media')) {
         return {
           run: (documentId: string, mediaId: string) => {
@@ -174,24 +168,17 @@ function makeProjectContentTestDb (): {
           }
         }
       }
-      if (normalized.includes('INSERT OR IGNORE INTO world_document_templates')) {
-        return {
-          run: (worldId: string, documentTemplateId: string) => {
-            junctionWorldDocumentTemplates.add(`${worldId}:${documentTemplateId}`)
-          }
-        }
-      }
-      if (normalized.includes('DELETE FROM world_media')) {
-        return {
-          run: (worldId: string, mediaId: string) => {
-            junctionWorldMedia.delete(`${worldId}:${mediaId}`)
-          }
-        }
-      }
       if (normalized.includes('DELETE FROM document_media')) {
         return {
           run: (documentId: string, mediaId: string) => {
             junctionDocumentMedia.delete(`${documentId}:${mediaId}`)
+          }
+        }
+      }
+      if (normalized.includes('INSERT OR IGNORE INTO world_document_templates')) {
+        return {
+          run: (worldId: string, documentTemplateId: string) => {
+            junctionWorldDocumentTemplates.add(`${worldId}:${documentTemplateId}`)
           }
         }
       }
@@ -234,19 +221,46 @@ function makeProjectContentTestDb (): {
           }
         }
       }
+      if (normalized.includes('UPDATE') && normalized.includes('worlds')) {
+        return {
+          run: (...args: Array<string | number>) => {
+            const id = args[args.length - 1] as string
+            const existing = tables.worlds.get(id)
+            if (existing === undefined) {
+              return
+            }
+            const patch: T_row = { ...existing }
+            let argIdx = 0
+            if (normalized.includes('display_name = ?')) {
+              patch.display_name = args[argIdx++] as string
+            }
+            if (normalized.includes('color = ?')) {
+              patch.color = args[argIdx++] as string
+            }
+            if (normalized.includes('color_pallete = ?')) {
+              patch.color_pallete = args[argIdx++] as string
+            }
+            if (normalized.includes('sort_order = ?')) {
+              patch.sort_order = args[argIdx++] as number
+            }
+            if (normalized.includes('updated_at_ms = ?')) {
+              patch.updated_at_ms = args[argIdx++] as number
+            }
+            tables.worlds.set(id, patch)
+          }
+        }
+      }
       if (
         normalized.includes('UPDATE') &&
         normalized.includes('SET display_name = ?')
       ) {
         return {
           run: (displayName: string, updatedAtMs: number, id: string) => {
-            const tableName = normalized.includes('worlds')
-              ? 'worlds'
-              : normalized.includes('document_templates')
-                ? 'document_templates'
-                : normalized.includes('media')
-                  ? 'media'
-                  : null
+            const tableName = normalized.includes('document_templates')
+              ? 'document_templates'
+              : normalized.includes('media')
+                ? 'media'
+                : null
             if (tableName === null) {
               return
             }
@@ -275,23 +289,6 @@ function makeProjectContentTestDb (): {
           }
         }
       }
-      if (normalized.includes('FROM media m') && normalized.includes('world_media')) {
-        return {
-          all: (worldId: string) => {
-            const rows: T_row[] = []
-            for (const key of junctionWorldMedia) {
-              const [w, m] = key.split(':')
-              if (w === worldId) {
-                const media = tables.media.get(m)
-                if (media !== undefined) {
-                  rows.push(media)
-                }
-              }
-            }
-            return rows
-          }
-        }
-      }
       if (normalized.includes('FROM media m') && normalized.includes('document_media')) {
         return {
           all: (documentId: string) => {
@@ -309,53 +306,18 @@ function makeProjectContentTestDb (): {
           }
         }
       }
-      if (
-        normalized.includes('FROM document_templates t') &&
-        normalized.includes('world_document_templates')
-      ) {
+      if (normalized.includes('GROUP BY world_id')) {
         return {
-          all: (worldId: string) => {
-            const rows: T_row[] = []
-            for (const key of junctionWorldDocumentTemplates) {
-              const [w, templateId] = key.split(':')
-              if (w === worldId) {
-                const template = tables.document_templates.get(templateId)
-                if (template !== undefined) {
-                  rows.push(template)
-                }
-              }
+          all: () => {
+            const counts = new Map<string, number>()
+            for (const row of tables.documents.values()) {
+              const worldId = row.world_id as string
+              counts.set(worldId, (counts.get(worldId) ?? 0) + 1)
             }
-            return rows
-          }
-        }
-      }
-      if (
-        normalized.includes('FROM worlds w') &&
-        normalized.includes('world_document_templates')
-      ) {
-        return {
-          all: (documentTemplateId: string) => {
-            const rows: T_row[] = []
-            for (const key of junctionWorldDocumentTemplates) {
-              const [worldId, templateId] = key.split(':')
-              if (templateId === documentTemplateId) {
-                const world = tables.worlds.get(worldId)
-                if (world !== undefined) {
-                  rows.push(world)
-                }
-              }
-            }
-            return rows.sort((left, right) => {
-              const orderDelta = (left.sort_order as number) - (right.sort_order as number)
-              if (orderDelta !== 0) {
-                return orderDelta
-              }
-              const createdDelta = (left.created_at_ms as number) - (right.created_at_ms as number)
-              if (createdDelta !== 0) {
-                return createdDelta
-              }
-              return String(left.id).localeCompare(String(right.id))
-            })
+            return [...counts.entries()].map(([world_id, c]) => ({
+              c,
+              world_id
+            }))
           }
         }
       }
@@ -413,6 +375,48 @@ function makeProjectContentTestDb (): {
         }
       }
       if (
+        normalized.includes('INNER JOIN') &&
+        normalized.includes('world_document_templates') &&
+        normalized.includes('FROM document_templates t')
+      ) {
+        return {
+          all: (worldId: string) => {
+            const rows: T_row[] = []
+            for (const key of junctionWorldDocumentTemplates) {
+              const [w, templateId] = key.split(':')
+              if (w === worldId) {
+                const template = tables.document_templates.get(templateId)
+                if (template !== undefined) {
+                  rows.push(template)
+                }
+              }
+            }
+            return rows
+          }
+        }
+      }
+      if (
+        normalized.includes('INNER JOIN') &&
+        normalized.includes('world_document_templates') &&
+        normalized.includes('FROM worlds w')
+      ) {
+        return {
+          all: (documentTemplateId: string) => {
+            const rows: T_row[] = []
+            for (const key of junctionWorldDocumentTemplates) {
+              const [worldId, templateId] = key.split(':')
+              if (templateId === documentTemplateId) {
+                const world = tables.worlds.get(worldId)
+                if (world !== undefined) {
+                  rows.push(world)
+                }
+              }
+            }
+            return rows
+          }
+        }
+      }
+      if (
         normalized.includes('SELECT') &&
         normalized.includes('document_templates') &&
         normalized.includes('ORDER BY')
@@ -453,7 +457,6 @@ function makeProjectContentTestDb (): {
     db,
     junctionDocumentMedia,
     junctionWorldDocumentTemplates,
-    junctionWorldMedia,
     tables
   }
 }
@@ -472,20 +475,8 @@ test('Test that project content persist modules create and link rows', () => {
     templateId: template.id,
     worldId: world.id
   })
-  linkFaProjectWorldMedia(db as never, world.id, media.id)
   linkFaProjectDocumentMedia(db as never, document.id, media.id)
-  linkFaProjectWorldDocumentTemplate(db as never, world.id, template.id)
-  expect(listFaProjectDocumentTemplatesForWorld(db as never, world.id).items[0]?.id).toBe(
-    template.id
-  )
-  expect(listFaProjectWorldsForDocumentTemplate(db as never, template.id).items[0]?.id).toBe(
-    world.id
-  )
-  unlinkFaProjectWorldDocumentTemplate(db as never, world.id, template.id)
-  expect(listFaProjectDocumentTemplatesForWorld(db as never, world.id).items).toHaveLength(0)
-  linkFaProjectWorldDocumentTemplate(db as never, world.id, template.id)
   expect(listFaProjectWorlds(db as never).items).toHaveLength(1)
-  expect(listFaProjectMediaForWorld(db as never, world.id).items[0]?.id).toBe(media.id)
   expect(listFaProjectMediaForDocument(db as never, document.id).items).toHaveLength(1)
   setFaProjectDocumentWorld(db as never, document.id, world.id)
   setFaProjectDocumentTemplate(db as never, document.id, null)
@@ -674,19 +665,6 @@ test('Test that updateFaProjectDocument updates display name', () => {
 })
 
 /**
- * unlinkFaProjectWorldMedia
- * Removes a world-media junction entry from the mock set.
- */
-test('Test that unlinkFaProjectWorldMedia clears linked media', () => {
-  const { db } = makeProjectContentTestDb()
-  const world = createFaProjectWorld(db as never, { displayName: 'W' })
-  const media = createFaProjectMedia(db as never, { displayName: 'M' })
-  linkFaProjectWorldMedia(db as never, world.id, media.id)
-  unlinkFaProjectWorldMedia(db as never, world.id, media.id)
-  expect(listFaProjectMediaForWorld(db as never, world.id).items).toHaveLength(0)
-})
-
-/**
  * linkFaProjectDocumentMedia
  * Throws when the document id does not exist.
  */
@@ -698,6 +676,26 @@ test('Test that linkFaProjectDocumentMedia throws for a missing document', () =>
       db as never,
       '550e8400-e29b-41d4-a716-446655440000',
       media.id
+    )
+  ).toThrow(FaProjectContentNotFoundError)
+})
+
+/**
+ * linkFaProjectDocumentMedia
+ * Throws when the media id does not exist.
+ */
+test('Test that linkFaProjectDocumentMedia throws for a missing media row', () => {
+  const { db } = makeProjectContentTestDb()
+  const world = createFaProjectWorld(db as never, { displayName: 'W' })
+  const document = createFaProjectDocument(db as never, {
+    displayName: 'D',
+    worldId: world.id
+  })
+  expect(() =>
+    linkFaProjectDocumentMedia(
+      db as never,
+      document.id,
+      '550e8400-e29b-41d4-a716-446655440000'
     )
   ).toThrow(FaProjectContentNotFoundError)
 })
@@ -819,22 +817,6 @@ test('Test that createFaProjectDocument accepts a template id', () => {
 })
 
 /**
- * linkFaProjectWorldMedia
- * Throws when the world id does not exist.
- */
-test('Test that linkFaProjectWorldMedia throws for a missing world', () => {
-  const { db } = makeProjectContentTestDb()
-  const media = createFaProjectMedia(db as never, { displayName: 'M' })
-  expect(() =>
-    linkFaProjectWorldMedia(
-      db as never,
-      '550e8400-e29b-41d4-a716-446655440000',
-      media.id
-    )
-  ).toThrow(FaProjectContentNotFoundError)
-})
-
-/**
  * createFaProjectWorld
  * Assigns default color, zero-based sort_order, and increments order for later worlds.
  */
@@ -866,9 +848,117 @@ test('Test that createFaProjectWorld assigns sortOrder and default color', () =>
   const second = createFaProjectWorld(db as never, { displayName: 'Beta' })
   expect(first.sortOrder).toBe(0)
   expect(first.color).toBe(FA_PROJECT_WORLD_DEFAULT_COLOR)
+  expect(first.colorPallete).toBe('')
   expect(second.sortOrder).toBe(1)
   expect(listFaProjectWorlds(db as never).items.map((world) => world.displayName)).toEqual([
     'Alpha',
     'Beta'
   ])
+})
+
+/**
+ * updateFaProjectWorld
+ * Persists color and sort_order patches for an existing world row.
+ */
+test('Test that updateFaProjectWorld persists color and sortOrder', () => {
+  const { db } = makeProjectContentTestDb()
+  const world = createFaProjectWorld(db as never, { displayName: 'Realm' })
+  const updated = updateFaProjectWorld(db as never, world.id, {
+    color: '#aabbcc',
+    colorPallete: '#112233;#445566',
+    displayName: 'Realm 2',
+    sortOrder: 4
+  })
+  expect(updated.displayName).toBe('Realm 2')
+  expect(updated.color).toBe('#aabbcc')
+  expect(updated.colorPallete).toBe('#112233;#445566')
+  expect(updated.sortOrder).toBe(4)
+})
+
+/**
+ * listFaProjectWorldsForProjectSettings
+ * Merges document counts into each world row for Project Settings.
+ */
+test('Test that listFaProjectWorldsForProjectSettings includes document counts', () => {
+  const { db } = makeProjectContentTestDb()
+  const emptyWorld = createFaProjectWorld(db as never, { displayName: 'Empty' })
+  const busyWorld = createFaProjectWorld(db as never, { displayName: 'Realm' })
+  createFaProjectDocument(db as never, {
+    displayName: 'Doc A',
+    worldId: busyWorld.id
+  })
+  createFaProjectDocument(db as never, {
+    displayName: 'Doc B',
+    worldId: busyWorld.id
+  })
+  const result = listFaProjectWorldsForProjectSettings(db as never)
+  expect(result.items).toHaveLength(2)
+  const emptyRow = result.items.find((item) => item.id === emptyWorld.id)
+  const busyRow = result.items.find((item) => item.id === busyWorld.id)
+  expect(emptyRow?.documentCount).toBe(0)
+  expect(busyRow?.documentCount).toBe(2)
+})
+
+const SAMPLE_WORLD_UUID = '550e8400-e29b-41d4-a716-446655440000'
+
+/**
+ * replaceFaProjectWorldsSnapshot
+ * Reorders worlds, inserts new ids, and deletes worlds omitted from the snapshot.
+ */
+test('Test that replaceFaProjectWorldsSnapshot replaces the ordered worlds list', () => {
+  const { db, tables } = makeProjectContentTestDb()
+  const first = createFaProjectWorld(db as never, { displayName: 'Keep' })
+  const second = createFaProjectWorld(db as never, { displayName: 'Remove' })
+  replaceFaProjectWorldsSnapshot(db as never, [
+    {
+      color: '#112233',
+      colorPallete: '#aabbcc;#ddeeff',
+      displayName: 'Keep renamed',
+      id: first.id
+    },
+    {
+      displayName: 'Brand new',
+      id: SAMPLE_WORLD_UUID
+    }
+  ])
+  expect(tables.worlds.has(second.id)).toBe(false)
+  expect(tables.worlds.has(SAMPLE_WORLD_UUID)).toBe(true)
+  const listed = listFaProjectWorlds(db as never).items
+  expect(listed.map((world) => world.displayName)).toEqual(['Keep renamed', 'Brand new'])
+  expect(listed[0].sortOrder).toBe(0)
+  expect(listed[1].sortOrder).toBe(1)
+  expect(listed[0].color).toBe('#112233')
+  expect(listed[0].colorPallete).toBe('#AABBCC;#DDEEFF')
+})
+
+/**
+ * replaceFaProjectWorldsSnapshot
+ * Rejects an empty snapshot because a project must retain at least one world.
+ */
+test('Test that replaceFaProjectWorldsSnapshot throws when items is empty', () => {
+  const { db } = makeProjectContentTestDb()
+  expect(() => replaceFaProjectWorldsSnapshot(db as never, [])).toThrow(
+    'Project must contain at least one world'
+  )
+})
+
+/**
+ * faProjectWorldDocumentTemplateLinksWiring
+ * Links worlds and document templates through the junction table.
+ */
+test('Test that world document template link helpers manage junction rows', () => {
+  const { db } = makeProjectContentTestDb()
+  const world = createFaProjectWorld(db as never, { displayName: 'Realm' })
+  const template = createFaProjectDocumentTemplate(db as never, { displayName: 'Tpl' })
+  linkFaProjectWorldDocumentTemplate(db as never, world.id, template.id)
+  expect(listFaProjectDocumentTemplatesForWorld(db as never, world.id).items[0]?.id).toBe(
+    template.id
+  )
+  expect(listFaProjectWorldsForDocumentTemplate(db as never, template.id).items[0]?.id).toBe(
+    world.id
+  )
+  unlinkFaProjectWorldDocumentTemplate(db as never, world.id, template.id)
+  expect(listFaProjectDocumentTemplatesForWorld(db as never, world.id).items).toHaveLength(0)
+  linkFaProjectWorldDocumentTemplate(db as never, world.id, template.id)
+  expect(listFaProjectDocumentTemplatesForWorld(db as never, world.id).items).toHaveLength(1)
 })

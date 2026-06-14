@@ -5,12 +5,17 @@ export const FA_PROJECT_TABLE_WORLDS = 'worlds'
 export const FA_PROJECT_TABLE_DOCUMENTS = 'documents'
 export const FA_PROJECT_TABLE_DOCUMENT_TEMPLATES = 'document_templates'
 export const FA_PROJECT_TABLE_MEDIA = 'media'
-export const FA_PROJECT_TABLE_WORLD_MEDIA = 'world_media'
 export const FA_PROJECT_TABLE_DOCUMENT_MEDIA = 'document_media'
 export const FA_PROJECT_TABLE_WORLD_DOCUMENT_TEMPLATES = 'world_document_templates'
 
 /** Default worlds.color hex when inserting worlds without an override. */
 export const FA_PROJECT_WORLD_DEFAULT_COLOR = '#808080'
+
+/** Max stored length for worlds.color_pallete (semicolon-separated #RRGGBB list). */
+export const FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH = 2000
+
+/** Default worlds.color_pallete when inserting worlds without an override. */
+export const FA_PROJECT_WORLD_DEFAULT_COLOR_PALETTE = ''
 
 /**
  * Creates the project_data KV table (schema version 1). Idempotent when the table already exists.
@@ -64,12 +69,6 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_DOCUMENTS} (
   updated_at_ms INTEGER NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_WORLD_MEDIA} (
-  world_id TEXT NOT NULL REFERENCES ${FA_PROJECT_TABLE_WORLDS}(id) ON DELETE CASCADE,
-  media_id TEXT NOT NULL REFERENCES ${FA_PROJECT_TABLE_MEDIA}(id) ON DELETE CASCADE,
-  PRIMARY KEY (world_id, media_id)
-);
-
 CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_DOCUMENT_MEDIA} (
   document_id TEXT NOT NULL REFERENCES ${FA_PROJECT_TABLE_DOCUMENTS}(id) ON DELETE CASCADE,
   media_id TEXT NOT NULL REFERENCES ${FA_PROJECT_TABLE_MEDIA}(id) ON DELETE CASCADE,
@@ -84,7 +83,6 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_WORLD_DOCUMENT_TEMPLATES} (
 
 CREATE INDEX IF NOT EXISTS idx_documents_world_id ON ${FA_PROJECT_TABLE_DOCUMENTS}(world_id);
 CREATE INDEX IF NOT EXISTS idx_documents_template_id ON ${FA_PROJECT_TABLE_DOCUMENTS}(template_id);
-CREATE INDEX IF NOT EXISTS idx_world_media_media_id ON ${FA_PROJECT_TABLE_WORLD_MEDIA}(media_id);
 CREATE INDEX IF NOT EXISTS idx_document_media_media_id ON ${FA_PROJECT_TABLE_DOCUMENT_MEDIA}(media_id);
 CREATE INDEX IF NOT EXISTS idx_world_document_templates_document_template_id
   ON ${FA_PROJECT_TABLE_WORLD_DOCUMENT_TEMPLATES}(document_template_id);

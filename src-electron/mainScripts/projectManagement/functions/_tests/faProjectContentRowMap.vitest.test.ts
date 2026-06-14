@@ -30,11 +30,13 @@ test('Test that mapFaProjectWorldRow maps color and sortOrder', () => {
     id: '750e8400-e29b-41d4-a716-446655440002',
     display_name: 'Realm',
     color: '#808080',
+    color_pallete: '#112233;#445566',
     sort_order: 2,
     created_at_ms: 5,
     updated_at_ms: 6
   })
   expect(mapped.color).toBe('#808080')
+  expect(mapped.colorPallete).toBe('#112233;#445566')
   expect(mapped.sortOrder).toBe(2)
 })
 

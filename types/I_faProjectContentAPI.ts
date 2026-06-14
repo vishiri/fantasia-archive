@@ -1,3 +1,4 @@
+import type { I_faProjectWorldsForProjectSettingsResult } from 'app/types/I_dialogProjectSettingsWorlds'
 import type {
   I_faProjectDocument,
   I_faProjectDocumentCreateInput,
@@ -18,9 +19,7 @@ import type {
   I_faProjectSetDocumentTemplateInput,
   I_faProjectSetDocumentWorldInput,
   I_faProjectWorldDocumentTemplateLinkInput,
-  I_faProjectWorldDocumentTemplateListResult,
-  I_faProjectWorldMediaLinkInput,
-  I_faProjectWorldMediaListResult
+  I_faProjectWorldDocumentTemplateListResult
 } from 'app/types/I_faProjectContentLinksDomain'
 import type {
   I_faProjectMedia,
@@ -32,7 +31,8 @@ import type {
   I_faProjectWorld,
   I_faProjectWorldCreateInput,
   I_faProjectWorldListResult,
-  I_faProjectWorldPatch
+  I_faProjectWorldPatch,
+  I_faProjectWorldSnapshotItem
 } from 'app/types/I_faProjectWorldDomain'
 
 /**
@@ -55,24 +55,23 @@ export interface I_faProjectContentAPI {
   getWorldById: (id: string) => Promise<I_faProjectWorld>
   linkDocumentMedia: (input: I_faProjectDocumentMediaLinkInput) => Promise<void>
   linkWorldDocumentTemplate: (input: I_faProjectWorldDocumentTemplateLinkInput) => Promise<void>
-  linkWorldMedia: (input: I_faProjectWorldMediaLinkInput) => Promise<void>
   listDocumentMedia: (documentId: string) => Promise<I_faProjectDocumentMediaListResult>
+  listDocuments: (filter?: I_faProjectDocumentListFilter) => Promise<I_faProjectDocumentListResult>
+  listDocumentTemplates: () => Promise<I_faProjectDocumentTemplateListResult>
   listDocumentTemplatesForWorld: (
     worldId: string
   ) => Promise<I_faProjectWorldDocumentTemplateListResult>
-  listDocuments: (filter?: I_faProjectDocumentListFilter) => Promise<I_faProjectDocumentListResult>
-  listDocumentTemplates: () => Promise<I_faProjectDocumentTemplateListResult>
   listMedia: () => Promise<I_faProjectMediaListResult>
-  listMediaForWorld: (worldId: string) => Promise<I_faProjectWorldMediaListResult>
   listWorlds: () => Promise<I_faProjectWorldListResult>
+  listWorldsForProjectSettings: () => Promise<I_faProjectWorldsForProjectSettingsResult>
   listWorldsForDocumentTemplate: (
     documentTemplateId: string
   ) => Promise<I_faProjectDocumentTemplateWorldListResult>
+  saveWorldsSnapshot: (items: I_faProjectWorldSnapshotItem[]) => Promise<void>
   setDocumentTemplate: (input: I_faProjectSetDocumentTemplateInput) => Promise<I_faProjectDocument>
   setDocumentWorld: (input: I_faProjectSetDocumentWorldInput) => Promise<I_faProjectDocument>
   unlinkDocumentMedia: (input: I_faProjectDocumentMediaLinkInput) => Promise<void>
   unlinkWorldDocumentTemplate: (input: I_faProjectWorldDocumentTemplateLinkInput) => Promise<void>
-  unlinkWorldMedia: (input: I_faProjectWorldMediaLinkInput) => Promise<void>
   updateDocument: (id: string, patch: I_faProjectDocumentPatch) => Promise<I_faProjectDocument>
   updateDocumentTemplate: (
     id: string,

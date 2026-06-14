@@ -27,6 +27,13 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
   await projectContentAPI.deleteWorld(SAMPLE_UUID)
   await projectContentAPI.getWorldById(SAMPLE_UUID)
   await projectContentAPI.listWorlds()
+  await projectContentAPI.listWorldsForProjectSettings()
+  await projectContentAPI.saveWorldsSnapshot([
+    {
+      displayName: 'Realm',
+      id: SAMPLE_UUID
+    }
+  ])
 
   await projectContentAPI.createMedia({ displayName: 'Art' })
   await projectContentAPI.updateMedia(SAMPLE_UUID, { displayName: 'Art 2' })
@@ -57,16 +64,6 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
     templateId: null
   })
 
-  await projectContentAPI.linkWorldMedia({
-    worldId: SAMPLE_UUID,
-    mediaId: SAMPLE_UUID_B
-  })
-  await projectContentAPI.unlinkWorldMedia({
-    worldId: SAMPLE_UUID,
-    mediaId: SAMPLE_UUID_B
-  })
-  await projectContentAPI.listMediaForWorld(SAMPLE_UUID)
-
   await projectContentAPI.linkDocumentMedia({
     documentId: SAMPLE_UUID,
     mediaId: SAMPLE_UUID_B
@@ -86,7 +83,7 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
     documentTemplateId: SAMPLE_UUID_B
   })
   await projectContentAPI.listDocumentTemplatesForWorld(SAMPLE_UUID)
-  await projectContentAPI.listWorldsForDocumentTemplate(SAMPLE_UUID_B)
+  await projectContentAPI.listWorldsForDocumentTemplate(SAMPLE_UUID)
 
   expect(invokeMock).toHaveBeenCalledWith(
     FA_PROJECT_CONTENT_IPC.createWorldAsync,
@@ -100,15 +97,33 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
     }
   )
   expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.listWorldsForProjectSettingsAsync,
+    undefined
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.saveWorldsSnapshotAsync,
+    {
+      items: [
+        {
+          displayName: 'Realm',
+          id: SAMPLE_UUID
+        }
+      ]
+    }
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
     FA_PROJECT_CONTENT_IPC.listDocumentMediaAsync,
     { documentId: SAMPLE_UUID }
   )
   expect(invokeMock).toHaveBeenCalledWith(
-    FA_PROJECT_CONTENT_IPC.listDocumentTemplatesForWorldAsync,
-    { worldId: SAMPLE_UUID }
+    FA_PROJECT_CONTENT_IPC.linkWorldDocumentTemplateAsync,
+    {
+      worldId: SAMPLE_UUID,
+      documentTemplateId: SAMPLE_UUID_B
+    }
   )
   expect(invokeMock).toHaveBeenCalledWith(
-    FA_PROJECT_CONTENT_IPC.listWorldsForDocumentTemplateAsync,
-    { documentTemplateId: SAMPLE_UUID_B }
+    FA_PROJECT_CONTENT_IPC.listDocumentTemplatesForWorldAsync,
+    { worldId: SAMPLE_UUID }
   )
 })

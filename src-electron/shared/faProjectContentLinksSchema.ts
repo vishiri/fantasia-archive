@@ -6,25 +6,13 @@ import {
 } from 'app/src-electron/shared/faProjectContentSchemaShared'
 import type {
   I_faProjectDocumentMediaLinkInput,
-  I_faProjectWorldDocumentTemplateLinkInput,
-  I_faProjectWorldMediaLinkInput
+  I_faProjectWorldDocumentTemplateLinkInput
 } from 'app/types/I_faProjectContentLinksDomain'
-
-export const faProjectWorldMediaLinkPayloadSchema = z.object({
-  mediaId: faProjectContentIdSchema,
-  worldId: faProjectContentIdSchema
-}).strict()
 
 export const faProjectDocumentMediaLinkPayloadSchema = z.object({
   documentId: faProjectContentIdSchema,
   mediaId: faProjectContentIdSchema
 }).strict()
-
-export function parseFaProjectWorldMediaLinkPayload (
-  payload: unknown
-): I_faProjectWorldMediaLinkInput {
-  return faProjectWorldMediaLinkPayloadSchema.parse(parseFaProjectContentPlainRecord(payload))
-}
 
 export function parseFaProjectDocumentMediaLinkPayload (
   payload: unknown
