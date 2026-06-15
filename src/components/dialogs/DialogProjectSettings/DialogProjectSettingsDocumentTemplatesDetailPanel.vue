@@ -62,7 +62,7 @@
         />
       </div>
 
-      <div class="dialogProjectSettingsDocumentTemplatesDetail__iconField dialogProjectSettings__field">
+      <div class="faIconPickerInput__field dialogProjectSettingsDocumentTemplatesDetail__iconField dialogProjectSettings__field">
         <div class="dialogProjectSettings__panelTitle">
           <span
             class="dialogProjectSettings__fieldLabel fa-text-label text-body2"
@@ -71,15 +71,9 @@
             {{ $t('dialogs.projectSettings.fields.documentTemplateIcon.label') }}
           </span>
         </div>
-        <q-input
+        <FaIconPickerInput
           :model-value="props.template.icon"
-          class="dialogProjectSettingsDocumentTemplatesDetail__iconInput"
-          color="primary-bright"
-          dark
-          dense
-          data-test-locator="dialogProjectSettings-documentTemplates-iconInput"
-          filled
-          outlined
+          test-locator="dialogProjectSettings-documentTemplates-iconInput"
           @update:model-value="emitIcon"
         />
       </div>
@@ -96,6 +90,7 @@
 
 <script setup lang="ts">
 import DialogProjectSettingsDocumentTemplatesDeleteButton from './DialogProjectSettingsDocumentTemplatesDeleteButton.vue'
+import FaIconPickerInput from 'app/src/components/elements/FaIconPickerInput/FaIconPickerInput.vue'
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 
 defineOptions({
@@ -139,10 +134,13 @@ function emitIcon (value: string | number | null): void {
 }
 
 .dialogProjectSettingsDocumentTemplatesDetail__nameField,
-.dialogProjectSettingsDocumentTemplatesDetail__appendixField,
-.dialogProjectSettingsDocumentTemplatesDetail__iconField {
+.dialogProjectSettingsDocumentTemplatesDetail__appendixField {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+.dialogProjectSettingsDocumentTemplatesDetail__iconField {
+  flex: 0 0 auto;
 }
 
 .dialogProjectSettingsDocumentTemplatesDetail__deleteCol {

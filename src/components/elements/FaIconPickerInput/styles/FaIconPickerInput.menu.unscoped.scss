@@ -1,0 +1,58 @@
+.faIconPickerInput__pickerMenu.q-menu {
+  z-index: $faIconPickerInput-menu-zIndex;
+}
+
+.faIconPickerInput__menuPanel {
+  background-color: $faIconPickerInput-menu-backgroundColor;
+  display: flex;
+  flex-direction: column;
+  max-height: $faIconPickerInput-menu-maxHeight;
+  width: $faIconPickerInput-menu-width;
+}
+
+.faIconPickerInput__menuHeader {
+  flex: 0 0 auto;
+  padding: 12px;
+}
+
+.faIconPickerInput__virtualScroll {
+  flex: 1 1 auto;
+  min-height: 200px;
+  padding-bottom: $faIconPickerInput-list-paddingBottom;
+  padding-left: $faIconPickerInput-list-paddingInline;
+  padding-right: $faIconPickerInput-list-paddingInline;
+}
+
+.faIconPickerInput__iconRow {
+  column-gap: $faIconPickerInput-iconRow-gap;
+  display: grid;
+  grid-template-columns: repeat($faIconPickerInput-iconsPerRow, minmax(0, 1fr));
+  height: $faIconPickerInput-virtualRow-height;
+  overflow: visible;
+  place-items: center;
+}
+
+.faIconPickerInput__iconCell.q-btn {
+  height: $faIconPickerInput-iconCell-size;
+  min-height: $faIconPickerInput-iconCell-size;
+  min-width: $faIconPickerInput-iconCell-size;
+  overflow: visible;
+  width: $faIconPickerInput-iconCell-size;
+
+  .q-icon {
+    font-size: $faIconPickerInput-menuIconFontSize;
+  }
+}
+
+.faIconPickerInput__iconCell--selected.q-btn {
+  background-color: transparent;
+
+  .q-icon {
+    color: $faIconPickerInput-selected-iconColor;
+  }
+}
+
+.faIconPickerInput__statusMessage {
+  padding: 16px 12px;
+  text-align: center;
+}

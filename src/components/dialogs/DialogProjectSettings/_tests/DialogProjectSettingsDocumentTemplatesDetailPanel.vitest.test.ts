@@ -31,6 +31,29 @@ test('Test that DialogProjectSettingsDocumentTemplatesDetailPanel renders templa
         DialogProjectSettingsDocumentTemplatesDeleteButton: defineComponent({
           template: '<button data-test-locator="delete-stub" />'
         }),
+        FaIconPickerInput: defineComponent({
+          inheritAttrs: false,
+          props: {
+            modelValue: {
+              type: String,
+              default: ''
+            },
+            testLocator: {
+              type: String,
+              required: true
+            }
+          },
+          emits: ['update:modelValue'],
+          template: `
+            <div :data-test-locator="testLocator">
+              <button
+                :data-test-locator="testLocator + '-trigger'"
+                type="button"
+                @click="$emit('update:modelValue', 'mdi-pencil')"
+              />
+            </div>
+          `
+        }),
         QInput: defineComponent({
           inheritAttrs: true,
           props: {

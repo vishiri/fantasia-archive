@@ -41,6 +41,8 @@ const selectorList = {
   documentTemplatesDeleteConfirmCountdown: 'dialogProjectSettings-documentTemplates-deleteConfirmCountdown',
   documentTemplatesEmptyState: 'dialogProjectSettings-documentTemplates-emptyState',
   documentTemplatesIconInput: 'dialogProjectSettings-documentTemplates-iconInput',
+  documentTemplatesIconMenuSearch: 'dialogProjectSettings-documentTemplates-iconInput-menu-search',
+  documentTemplatesIconTrigger: 'dialogProjectSettings-documentTemplates-iconInput-trigger',
   documentTemplatesList: 'dialogProjectSettings-documentTemplates-list',
   documentTemplatesNameInput: 'dialogProjectSettings-documentTemplates-nameInput',
   documentTemplatesRemoveButton: 'dialogProjectSettings-documentTemplates-removeButton',
@@ -222,7 +224,16 @@ test.describe.serial('Project settings dialog', () => {
     const nameInput = appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesNameInput}"]`)
     await nameInput.fill('Character sheet')
     await appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesWorldAppendixInput}"]`).fill(' of Eldoria')
-    await appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesIconInput}"]`).fill('mdi-account')
+
+    await appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesIconTrigger}"]`).click()
+    await appWindow
+      .locator(`[data-test-locator="${selectorList.documentTemplatesIconMenuSearch}"] input`)
+      .fill('account')
+    await appWindow.locator('[data-test-icon-name="mdi-account"]').first().click()
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesIconTrigger}"]`)
+    ).toHaveAttribute('data-test-icon-name', 'mdi-account')
 
     await expect(nameInput).toHaveValue('Character sheet')
 

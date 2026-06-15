@@ -1,0 +1,20 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - FA ICON PICKER INPUT */
+$faIconPickerInput-menu-width: 720px;
+$faIconPickerInput-menu-maxHeight: 60vh;
+$faIconPickerInput-menu-zIndex: 7002;
+$faIconPickerInput-menuOffsetY: 4px;
+$faIconPickerInput-row-gap: 8px;
+$faIconPickerInput-field-width: 75px;
+$faIconPickerInput-trigger-size: 40px;
+$faIconPickerInput-trigger-iconFontSize: 20px;
+$faIconPickerInput-iconsPerRow: 16;
+$faIconPickerInput-iconCell-size: 44px;
+$faIconPickerInput-menuIconFontSize: 24px;
+$faIconPickerInput-iconRow-gap: 5px;
+$faIconPickerInput-virtualRow-height: 52px;
+$faIconPickerInput-list-paddingInline: 12px;
+$faIconPickerInput-list-paddingBottom: 12px;
+$faIconPickerInput-selected-iconColor: fa-v('primary', $primary);
+$faIconPickerInput-menu-backgroundColor: fa-v('dark-lighter', $dark-lighter);
