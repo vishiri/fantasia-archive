@@ -116,7 +116,7 @@ Import global styles once per feature via **`@use`** / **`src=`** on a colocated
 | **`tabTextAlign`** | **`'left'`** | **`--fa-vertical-draggable-tabs-tab-text-align`** |
 | **`tabJustifyContent`** | **`'flex-start'`** | **`--fa-vertical-draggable-tabs-tab-justify-content`** |
 | **`tabLabelTextTransform`** | **`'none'`** | **`--fa-vertical-draggable-tabs-tab-label-text-transform`** |
-| **`tabLabelFontSize`** | **`'15px'`** | **`--fa-vertical-draggable-tabs-tab-label-font-size`** |
+| **`tabLabelFontSize`** | **`'14px'`** | **`--fa-vertical-draggable-tabs-tab-label-font-size`** |
 | **`dense`** | **`false`** (document templates TabList default **`true`**) | **`--fa-vertical-draggable-tabs-tab-min-height`** (**`36px`** when dense; SCSS fallback **`48px`**) |
 
 Types: **`types/I_faVerticalDraggableTabs.ts`**. Defaults and **`buildFaVerticalDraggableTabsRootStyle`**: **`src/scripts/faDragDrop/functions/buildFaVerticalDraggableTabsRootStyle.ts`**.

@@ -42,7 +42,7 @@ export type T_faVerticalDraggableTabsTabJustifyContent =
  * Inputs for buildFaVerticalDraggableTabsRootStyle — one object per column root.
  *
  * tabPadding is a full CSS padding shorthand string (for example '4px 40px 4px 60px').
- * tabLabelFontSize is any valid CSS font-size (for example '15px' or '1rem').
+ * tabLabelFontSize is any valid CSS font-size (for example '14px' or '1rem').
  * tabDense when true sets tab min-height to 36px (normal mode fallback is 48px).
  */
 export interface I_faVerticalDraggableTabsRootStyleInput {

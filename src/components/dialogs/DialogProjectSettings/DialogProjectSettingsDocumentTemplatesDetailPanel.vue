@@ -133,9 +133,14 @@ function emitIcon (value: string | number | null): void {
   gap: $dialogProjectSettings-worldsDetailFieldsRow-gap;
 }
 
-.dialogProjectSettingsDocumentTemplatesDetail__nameField,
+.dialogProjectSettingsDocumentTemplatesDetail__nameField {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .dialogProjectSettingsDocumentTemplatesDetail__appendixField {
   flex: 1 1 auto;
+  max-width: $dialogProjectSettings-documentTemplatesWorldAppendixField-maxWidth;
   min-width: 0;
 }
 

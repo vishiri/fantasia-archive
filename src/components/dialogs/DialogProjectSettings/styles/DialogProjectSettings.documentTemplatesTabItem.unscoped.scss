@@ -1,3 +1,29 @@
+.dialogProjectSettingsDocumentTemplatesTabItem__labelRow {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  z-index: $faVerticalDraggableTabs-tab-content-zIndex;
+}
+
+.dialogProjectSettingsDocumentTemplatesTabItem__titleRow {
+  align-items: center;
+  display: flex;
+  min-width: 0;
+}
+
+.dialogProjectSettingsDocumentTemplatesTabItem__tabIcon {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: $dialogProjectSettings-documentTemplatesTabIcon-fontSize;
+  height: $dialogProjectSettings-documentTemplatesTabIcon-boxSize;
+  justify-content: center;
+  margin-right: $dialogProjectSettings-documentTemplatesTabIcon-marginRight;
+  pointer-events: none;
+  width: $dialogProjectSettings-documentTemplatesTabIcon-boxSize;
+}
+
 .dialogProjectSettingsDocumentTemplatesTabItem__worldAppendix {
   color: $dialogProjectSettings-documentTemplatesTabWorldAppendix-color;
   display: block;
@@ -5,7 +31,7 @@
   font-style: italic;
   font-weight: 400;
   line-height: $faVerticalDraggableTabs-tab-label-lineHeight;
-  margin-top: -0.5em;
+  margin-left: $dialogProjectSettings-documentTemplatesTabWorldAppendix-marginLeft;
   text-align: var(--fa-vertical-draggable-tabs-tab-text-align, left);
   transition:
     background-color $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing,

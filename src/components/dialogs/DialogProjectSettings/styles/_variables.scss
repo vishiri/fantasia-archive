@@ -59,6 +59,13 @@ $dialogProjectSettings-worldsTabColorSwatch-size: 18px;
 $dialogProjectSettings-worldsTabColorSwatch-zIndex: 3;
 $dialogProjectSettings-worldsTabList-width: 240px;
 $dialogProjectSettings-documentTemplatesTabList-width: 360px;
+$dialogProjectSettings-documentTemplatesTabIcon-boxSize: 20px;
+$dialogProjectSettings-documentTemplatesTabIcon-fontSize: 16px;
+$dialogProjectSettings-documentTemplatesTabIcon-marginRight: 8px;
+$dialogProjectSettings-documentTemplatesTabWorldAppendix-marginLeft: calc(
+  #{$dialogProjectSettings-documentTemplatesTabIcon-boxSize} + #{$dialogProjectSettings-documentTemplatesTabIcon-marginRight}
+);
+$dialogProjectSettings-documentTemplatesWorldAppendixField-maxWidth: 250px;
 $dialogProjectSettings-documentTemplatesTabWorldAppendix-color: var(--fa-color-text-muted);
 $dialogProjectSettings-documentTemplatesEmptyButton-fontSize: 16px;
 $dialogProjectSettings-documentTemplatesEmptyButton-letterSpacing: 0.05em;

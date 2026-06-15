@@ -15,15 +15,25 @@
       class="q-focus-helper"
       tabindex="-1"
     />
-    <div class="faVerticalDraggableTabs__tabContent relative-position">
-      <span class="faVerticalDraggableTabs__tabLabel">
-        <template v-if="props.template.displayName.trim().length > 0">
-          {{ props.template.displayName }}
-        </template>
-        <template v-else>
-          {{ $t('dialogs.projectSettings.panels.documentTemplates.defaultNewTemplateName') }}
-        </template>
-      </span>
+    <div class="dialogProjectSettingsDocumentTemplatesTabItem__labelRow">
+      <div class="dialogProjectSettingsDocumentTemplatesTabItem__titleRow">
+        <q-icon
+          class="dialogProjectSettingsDocumentTemplatesTabItem__tabIcon"
+          :data-test-icon-name="tabIconName"
+          data-test-locator="dialogProjectSettings-documentTemplates-tabIcon"
+          :name="tabIconName"
+        />
+        <div class="faVerticalDraggableTabs__tabContent relative-position">
+          <span class="faVerticalDraggableTabs__tabLabel">
+            <template v-if="props.template.displayName.trim().length > 0">
+              {{ props.template.displayName }}
+            </template>
+            <template v-else>
+              {{ $t('dialogs.projectSettings.panels.documentTemplates.defaultNewTemplateName') }}
+            </template>
+          </span>
+        </div>
+      </div>
       <span
         v-if="showWorldAppendix"
         class="dialogProjectSettingsDocumentTemplatesTabItem__worldAppendix"
@@ -39,6 +49,7 @@
 import { computed, ref } from 'vue'
 
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
+import { FA_ICON_PICKER_EMPTY_PLACEHOLDER_ICON } from 'app/types/I_faIconPickerInput'
 
 defineOptions({
   name: 'DialogProjectSettingsDocumentTemplatesTabItem'
@@ -79,6 +90,15 @@ const tabBlurTargetRef = ref<HTMLDivElement | null>(null)
 const trimmedWorldAppendix = computed(() => props.template.worldAppendix.trim())
 
 const showWorldAppendix = computed(() => trimmedWorldAppendix.value.length > 0)
+
+const trimmedIcon = computed(() => props.template.icon.trim())
+
+const tabIconName = computed(() => {
+  if (trimmedIcon.value.length > 0) {
+    return trimmedIcon.value
+  }
+  return FA_ICON_PICKER_EMPTY_PLACEHOLDER_ICON
+})
 
 function onTabClick (): void {
   emit('select', props.template.id)

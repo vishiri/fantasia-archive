@@ -30,6 +30,10 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabItem renders tab label'
   expect(w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tab"]').exists()).toBe(true)
   expect(w.text()).toContain('Character')
   expect(w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tabWorldAppendix"]').exists()).toBe(false)
+  expect(w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tabIcon"]').exists()).toBe(true)
+  expect(
+    w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tabIcon"]').attributes('data-test-icon-name')
+  ).toBe('mdi-file-outline')
 })
 
 /**
@@ -60,4 +64,34 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabItem renders world appe
   expect(appendix.exists()).toBe(true)
   expect(appendix.text()).toBe('(Some world)')
   expect(appendix.classes()).toContain('dialogProjectSettingsDocumentTemplatesTabItem__worldAppendix')
+})
+
+/**
+ * DialogProjectSettingsDocumentTemplatesTabItem
+ * Renders the template icon left of the label row when icon is set.
+ */
+test('Test that DialogProjectSettingsDocumentTemplatesTabItem renders tab icon beside label block', () => {
+  const w = mount(DialogProjectSettingsDocumentTemplatesTabItem, {
+    props: {
+      isSelected: false,
+      tabHasError: false,
+      template: {
+        displayName: 'Character',
+        documentCount: 0,
+        icon: 'mdi-account',
+        id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+        worldAppendix: 'Notes'
+      }
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  const tabIcon = w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tabIcon"]')
+  expect(tabIcon.exists()).toBe(true)
+  expect(tabIcon.attributes('data-test-icon-name')).toBe('mdi-account')
+  expect(w.find('.dialogProjectSettingsDocumentTemplatesTabItem__labelRow').exists()).toBe(true)
 })

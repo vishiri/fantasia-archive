@@ -44,7 +44,7 @@ export const FA_VERTICAL_DRAGGABLE_TABS_TAB_JUSTIFY_CONTENT_DEFAULT: T_faVertica
 export const FA_VERTICAL_DRAGGABLE_TABS_TAB_LABEL_TEXT_TRANSFORM_DEFAULT: T_faVerticalDraggableTabsTabLabelTextTransform = 'none'
 
 /** Default tab label font-size for faVerticalDraggableTabs hosts. */
-export const FA_VERTICAL_DRAGGABLE_TABS_TAB_LABEL_FONT_SIZE_DEFAULT = '15px'
+export const FA_VERTICAL_DRAGGABLE_TABS_TAB_LABEL_FONT_SIZE_DEFAULT = '14px'
 
 /** Default tab min-height in pixels for faVerticalDraggableTabs rows (normal mode). */
 export const FA_VERTICAL_DRAGGABLE_TABS_TAB_MIN_HEIGHT_PX_DEFAULT = 48
