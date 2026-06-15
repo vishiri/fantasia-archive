@@ -63,6 +63,7 @@ debug-storybook.log*
 # i18n batch-translate scratch (not shipped)
 /.utility-scripts/i18nMaps/
 /.utility-scripts/__pycache__/
+/.agents/skills/caveman-compress/scripts/__pycache__/
 
 # Stray empty folder from old Playwright layout (use helpers/ at repo root)
 /playwrightHelpers/
