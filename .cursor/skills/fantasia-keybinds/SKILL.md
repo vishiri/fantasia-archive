@@ -22,6 +22,7 @@ description: >-
 - **Persistence (main)**: `src-electron/mainScripts/keybinds/` (**`keybinds_manager.ts`**, defaults, patch schema). **`registerFaKeybindsIpc.ts`** wires **`ipcMain.handle`**; channel names live in **`src-electron/electron-ipc-bridge.ts`** (**`FA_KEYBINDS_IPC`**).
 - **Preload**: `src-electron/contentBridgeAPIs/faKeybindsAPI.ts` exposes **`window.faContentBridgeAPIs.faKeybinds`**; shared shapes live in **`types/I_faKeybindsDomain.ts`** (command ids, chords, store root, snapshot, bridge **`I_faKeybindsAPI`**, capture helpers such as **`T_faKeybindTryChordFromEventResult`**).
 - **Settings UI**: `src/components/dialogs/DialogKeybindSettings/` — table rows are built from **`FA_KEYBIND_COMMAND_DEFINITIONS`** (**`dialogKeybindSettingsTable.ts`**: **`buildDialogKeybindSettingsRows`**, columns, filtered table state). Capture flow and conflict checks live in **`dialogKeybindSettingsCapture*.ts`** modules; **`dialogKeybindSettingsDialogWiring.ts`** groups open/routing plus **`registerDialogKeybindSettingsGlobalSuspend`** (pauses dispatch while the main dialog or capture sheet is open).
+- **Shipped project command**: **`openProjectSettings`** (default **Ctrl+Alt+Shift+P**, literal Control on macOS) maps to action **`openProjectSettingsDialog`** and opens **`DialogProjectSettings`** when **`S_FaActiveProject.hasActiveProject`**.
 
 ## `src/scripts/keybinds/` — avoid fragmentation
 

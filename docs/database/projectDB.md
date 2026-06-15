@@ -14,11 +14,14 @@ The SQLite table **`documents`** stores **worldbuilding document entities** (row
 | **1** | Full schema: **`project_data`** KV, worldbuilding **content tables** (including **`world_document_templates`**), default **world** seed on create. |
 | **2** | Drops legacy **`world_media`** junction table only. |
 | **3** | Ensures **`world_document_templates`** exists (restores the junction for files that lost it at an interim **v2**). |
-| **4** | Adds **`worlds.color_pallete`** — semicolon-separated **`#RRGGBB`** hex list (max **2000** chars; default empty). Current max. |
+| **4** | Adds **`worlds.color_pallete`** — semicolon-separated **`#RRGGBB`** hex list (max **2000** chars; default empty). |
+| **5** | Adds **`document_templates.sort_order`**, **`world_appendix`** (max **500** chars), and **`icon`** (max **128** chars). Current max. |
 
-**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 4`** in **`faProjectDbMigrateWiring.ts`**.
+**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 5`** in **`faProjectDbMigrateWiring.ts`**.
 
-**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v1**, run **v1→v2** (drop **`world_media`**), **v2→v3** (ensure **`world_document_templates`**), **v3→v4** (add **`worlds.color_pallete`**), seed a default **world** when empty, then stop at **v4**. Files already at **4** are a no-op. Other versions throw until a forward migration is added.
+**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v1**, run **v1→v2** (drop **`world_media`**), **v2→v3** (ensure **`world_document_templates`**), **v3→v4** (add **`worlds.color_pallete`**), **v4→v5** (add **`document_templates`** list/detail columns), seed a default **world** when empty, then stop at **v5**. Files already at **5** are a no-op. Other versions throw until a forward migration is added.
+
+**Worlds vs document templates on create:** **`seedFaProjectDefaultWorldIfEmpty`** runs after migrations and inserts one default **world** when the table is empty. **Document templates are never auto-seeded** — a new **`.faproject`** may have zero **`document_templates`** rows until the user adds them in **Project Settings**.
 
 **DDL source:** **`src-electron/mainScripts/projectManagement/functions/faProjectDbSchemaDdl.ts`** (**`applyFaProjectProjectDataSchemaV1`**, **`applyFaProjectContentSchemaV1`**).
 
@@ -62,9 +65,12 @@ Index: **`idx_worlds_sort_order`**. New **`.faproject`** files receive one defau
 |--------|------|--------|
 | `id` | TEXT PK | UUID |
 | `display_name` | TEXT | Non-empty (product “name”) |
+| `sort_order` | INTEGER | Zero-based GUI order from Project Settings draggable list |
+| `world_appendix` | TEXT | Optional product copy (max **500** chars; default empty) |
+| `icon` | TEXT | Optional icon name string (max **128** chars; default empty) |
 | `created_at_ms`, `updated_at_ms` | INTEGER | |
 
-Typed **field definitions** on templates are **planned** — see [templateCustomFields.md](templateCustomFields.md). World associations are optional and many-to-many via **`world_document_templates`** (below).
+Index: **`idx_document_templates_sort_order`**. Unlike **worlds**, new projects **do not** receive a default template row at create time.
 
 ### `media`
 
@@ -106,7 +112,7 @@ Typed **field definitions** on templates are **planned** — see [templateCustom
 
 A template may be linked to zero, one, or many worlds; a world may link to zero, one, or many templates. Links are independent of **`documents.template_id`** (documents still pick at most one template per row).
 
-Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_document_media_media_id`**, **`idx_world_document_templates_document_template_id`**, **`idx_worlds_sort_order`**.
+Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_document_media_media_id`**, **`idx_world_document_templates_document_template_id`**, **`idx_worlds_sort_order`**, **`idx_document_templates_sort_order`**.
 
 ## Relationships (summary)
 
@@ -121,7 +127,7 @@ Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_d
 
 **Link helpers (FK assignment):** **`setFaProjectDocumentWorld`**, **`setFaProjectDocumentTemplate`** in **`faProjectDocumentsPersistWiring.ts`**.
 
-## Planned extensions (after version 3)
+## Planned extensions (after version 4)
 
 Custom fields on document templates (field definitions, typed values, orphan retention) are specified in [templateCustomFields.md](templateCustomFields.md) and will land in a future migration; table detail moves into this file when that ships.
 
@@ -145,6 +151,8 @@ src-electron/mainScripts/projectManagement/
     faProjectWorldsPersistWiring.ts
     faProjectDocumentsPersistWiring.ts
     faProjectDocumentTemplatesPersistWiring.ts
+    faProjectDocumentTemplatesSqlWiring.ts
+    faProjectDocumentTemplatesSnapshotWiring.ts
     faProjectMediaPersistWiring.ts
     faProjectWorldsSnapshotWiring.ts
     faProjectDocumentMediaLinksWiring.ts
@@ -184,6 +192,8 @@ All content handlers wrap work in **`runWithFaProjectDatabaseForIpcAsync`**.
 | `delete-document-template-async` | `deleteFaProjectDocumentTemplate` |
 | `get-document-template-by-id-async` | `getFaProjectDocumentTemplateById` |
 | `list-document-templates-async` | `listFaProjectDocumentTemplates` |
+| `list-document-templates-for-project-settings-async` | `listFaProjectDocumentTemplatesForProjectSettings` (ordered rows with document counts for delete guards) |
+| `save-document-templates-snapshot-async` | `replaceFaProjectDocumentTemplatesSnapshot` (transactional full list replace from Project Settings; **empty list allowed**) |
 | `create-document-async` | `createFaProjectDocument` |
 | `update-document-async` | `updateFaProjectDocument` |
 | `delete-document-async` | `deleteFaProjectDocument` |
@@ -201,13 +211,26 @@ All content handlers wrap work in **`runWithFaProjectDatabaseForIpcAsync`**.
 
 Exact channel strings: **`src-electron/electron-ipc-bridge.ts`** (`FA_PROJECT_CONTENT_IPC`).
 
+## Project Settings (renderer ↔ SQLite)
+
+**`DialogProjectSettings`** (**`src/components/dialogs/DialogProjectSettings/`**) is the first shipped UI on **`projectContent`** IPC.
+
+| Phase | API | Main |
+|-------|-----|------|
+| **Open** | **`projectManagement.getProjectSettings`** (project name KV) + **`projectContent.listWorldsForProjectSettings`** (ordered worlds with document counts for delete guards) + **`projectContent.listDocumentTemplatesForProjectSettings`** (ordered templates with document counts) | **`readFaProjectSettingsRoot`**, **`listFaProjectWorldsForProjectSettings`**, **`listFaProjectDocumentTemplatesForProjectSettings`** |
+| **Save (project name)** | **`projectManagement.setProjectSettings`** via **`S_FaProjectSettings`** | **`faProjectSettingsPersist.ts`** → **`project_name`** KV |
+| **Save (worlds)** | **`projectContent.saveWorldsSnapshot`** with **`I_faProjectWorldSnapshotItem[]`** | **`replaceFaProjectWorldsSnapshot`** in **`faProjectWorldsSnapshotWiring.ts`** — one transaction: upsert/reorder by list index, delete removed ids (**RESTRICT** if a world still has documents) |
+| **Save (document templates)** | **`projectContent.saveDocumentTemplatesSnapshot`** with **`I_faProjectDocumentTemplateSnapshotItem[]`** | **`replaceFaProjectDocumentTemplatesSnapshot`** in **`faProjectDocumentTemplatesSnapshotWiring.ts`** — one transaction: upsert/reorder by list index, delete removed ids (**RESTRICT** if documents still reference a template); **zero templates is valid** |
+
+Renderer bridges: **`src/stores/scripts/sFaProjectWorldsBridge.ts`**, **`src/stores/scripts/sFaProjectDocumentTemplatesBridge.ts`**. Action id **`saveProjectSettings`** may include **`settings`**, **`worlds`**, and **`documentTemplates`** payloads (**`handleSaveProjectSettings`** in **`createFaActionDefinitionHandlers.ts`**). Worlds and document-templates draft validation (names, duplicate palette hex for worlds) stays in the dialog; persistence coerces hex via **`coerceFaProjectWorldColorForStorage`** and **`coerceFaProjectWorldColorPalleteForStorage`**.
+
 ## Types and validation
 
 - DTOs: **`types/I_faProjectWorldDomain.ts`**, **`I_faProjectDocumentDomain.ts`**, **`I_faProjectDocumentTemplateDomain.ts`**, **`I_faProjectMediaDomain.ts`**, **`I_faProjectContentLinksDomain.ts`**, **`I_faProjectContentAPI.ts`**
 - Zod (IPC payloads): **`src-electron/shared/faProject*ContentSchema.ts`**, **`faProjectContentLinksSchema.ts`**, **`faProjectContentSchemaShared.ts`**
 - Bridge typing: **`types/I_faElectronRendererBridgeAPIs.ts`**, **`src/globals.d.ts`**
 
-**Renderer (this release):** IPC + preload + types only — **no** Pinia stores or UI yet.
+**Renderer UI:** **`DialogProjectSettings`** (general, worlds, and **Document Template Settings** tabs), reusable **`FaColorPickerInput`**, **`sFaProjectWorldsBridge`**, and **`sFaProjectDocumentTemplatesBridge`** for list/snapshot IPC. Other content surfaces (document browser, template editor) remain IPC-only until wired.
 
 ## Errors
 

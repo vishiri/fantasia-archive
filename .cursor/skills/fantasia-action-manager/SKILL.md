@@ -35,9 +35,11 @@ The action manager is the **only** place that emits **error** toasts for registe
 
 Success notifications (Settings saved, etc.) remain in the originating store when they are user-relevant.
 
+**`saveProjectSettings`** persists the project name through **`S_FaProjectSettings`** and, when the dialog passes **`worlds`**, delegates the ordered snapshot to **`faProjectWorldsPersistSnapshotFromDialog`** (**`projectContent.saveWorldsSnapshot`**) after the KV patch succeeds. Both steps throw into the same action-manager toast on failure.
+
 ## Migrated call sites (today)
 
-- **Async** — toggle dev tools, open Keybind / App settings dialog, open Advanced Search Guide / About / Changelog / License / Tips, Tricks & Trivia dialogs, save Keybind Settings, save App settings, minimize / resize app, language switch, startup tips notification, open Action Monitor.
+- **Async** — toggle dev tools, open Keybind / App / **Project settings** dialog, open Advanced Search Guide / About / Changelog / License / Tips, Tricks & Trivia dialogs, save Keybind Settings, save App settings, **save Project settings** (project name + optional worlds snapshot), minimize / resize app, language switch, startup tips notification, open Action Monitor.
 - **Sync** — close app, refresh web contents after language change.
 - **Keybind dispatcher** — **`src/scripts/keybinds/faKeybindRunCommand.ts`** maps each **`T_faKeybindCommandId`** to a **`T_faActionId`** through **`FA_KEYBIND_COMMAND_TO_ACTION_ID`** and calls **`runFaAction`**.
 
@@ -70,7 +72,7 @@ Success notifications (Settings saved, etc.) remain in the originating store whe
 - **`src/scripts/actionManager/_tests/faActionManagerSyncQueue.vitest.test.ts`** — FIFO order, dedup, **`FA_ACTION_SYNC_QUEUE_MAX`** overflow + toast, handler throws, unknown id, idle drain.
 - **`src/scripts/actionManager/_tests/faActionManagerRun.vitest.test.ts`** — async/sync dispatch, **`runFaActionAwait`** success/failure for both kinds, unknown id reporter.
 - **`src/scripts/actionManager/_tests/faActionManagerStoreBridge.vitest.test.ts`** — **`null`** with no Pinia, resolved store with active Pinia.
-- **Migrated call sites** — Vitest coverage updated in **`src/components/globals/GlobalWindowButtons/_tests`**, **`src/components/globals/GlobalLanguageSelector/scripts/_tests`**, **`src/components/dialogs/DialogAppSettings/scripts/_tests`**, **`src/components/dialogs/DialogKeybindSettings/scripts/_tests`**, **`src/scripts/appInternals/_tests`**, and the keybind dispatcher tests above.
+- **Migrated call sites** — Vitest coverage updated in **`src/components/globals/GlobalWindowButtons/_tests`**, **`src/components/globals/GlobalLanguageSelector/scripts/_tests`**, **`src/components/dialogs/DialogAppSettings/scripts/_tests`**, **`src/components/dialogs/DialogProjectSettings/scripts/_tests`**, **`src/components/dialogs/DialogKeybindSettings/scripts/_tests`**, **`src/scripts/appInternals/_tests`**, and the keybind dispatcher tests above.
 - **Action Monitor UI** — **`src/components/dialogs/DialogActionMonitor/_tests/*.vitest.test.ts`**, **`scripts/_tests/*.vitest.test.ts`**, **`DialogActionMonitor.playwright.test.ts`**; E2E **`e2e-tests/checkActionMonitor.playwright.spec.ts`** (and flows that open the monitor, e.g. **`checkKeybinds.playwright.spec.ts`**).
 
 ## Related skills and rules

@@ -13,7 +13,7 @@ alwaysApply: false
 
 # Database documentation (`docs/database/`)
 
-When you change **`.faproject`** migrations, **`project_data`** KV keys, **content** tables, **project content** persist modules, **`FA_PROJECT_CONTENT_IPC`**, related **Zod** schemas, or **`projectContent`** preload APIs, update the matching doc in the **same commit**:
+When you change **`.faproject`** migrations, **`project_data`** KV keys, **content** tables (including **`worlds.color`**, **`worlds.color_pallete`**, **`world_document_templates`**), **project content** persist modules, **`FA_PROJECT_CONTENT_IPC`**, **Project Settings** worlds snapshot/list handlers, related **Zod** schemas, or **`projectContent`** preload APIs, update the matching doc in the **same commit**:
 
 - [docs/database/projectDB.md](../../docs/database/projectDB.md) — schema version ladder, tables, FK rules, module map, IPC table
 - [docs/database/templateCustomFields.md](../../docs/database/templateCustomFields.md) — approved custom-fields architecture; update when **design decisions change**; when **implementing**, migrate table detail into `projectDB.md` and trim duplicate DDL from the design doc

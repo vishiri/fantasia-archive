@@ -6,7 +6,7 @@ This folder is the canonical reference for **where data lives** and **how it is 
 
 | File | Scope |
 |------|--------|
-| [projectDB.md](projectDB.md) | Active **`.faproject`** SQLite files: `PRAGMA user_version` (1 today), `project_data` KV, content tables, migrations, main-process modules, and **`FA_PROJECT_CONTENT_IPC`** |
+| [projectDB.md](projectDB.md) | Active **`.faproject`** SQLite files: `PRAGMA user_version` (supported max **4** today), `project_data` KV, content tables, migrations, main-process modules, **`FA_PROJECT_CONTENT_IPC`**, and **Project Settings** worlds snapshot save |
 | [templateCustomFields.md](templateCustomFields.md) | **Approved design** (not yet in SQLite): document template field definitions, document values, orphan policy, and implementation route |
 | [appUserDataKv.md](appUserDataKv.md) | **Not** project SQLite: **`electron-store`** JSON under the app **`userData`** directory (user settings, keybinds, MRU, app-wide styling/noteboard) |
 

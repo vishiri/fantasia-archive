@@ -13,7 +13,7 @@ Whenever the renderer needs **drag-and-drop to reorder items in a list** (for ex
 - Prefer **`VueDraggable`** with **`v-model`** on the backing array, or **`useDraggable`** / **`v-draggable`** when the list root is not a plain wrapper (for example Quasar list bodies).
 - Use a dedicated **drag handle** (grip icon on **`QItemSection`**) via Sortable **`handle`** when rows also navigate or open menus on click.
 - Persist new order through existing Pinia + IPC patterns after drop; map indices to domain fields (for example **`sort_order`** on worlds).
-- Add **`data-test-locator`** on handles and list roots per [vue-template-test-hooks.mdc](vue-template-test-hooks.mdc).
+- **Vertical tab strips** (for example **Project Settings** world / document-template tabs): **`vue-draggable-plus`** with **`src/scripts/faDragDrop/`** (**`buildFaVerticalDraggableTabsRootStyle`**, sortable options, drag cursor) and **`faVerticalDraggableTabs`** SCSS. TabList hosts expose layout props (**`tabListWidthPx`**, **`tabPadding`**, **`tabTextAlign`**, **`tabJustifyContent`**, **`tabLabelTextTransform`**, **`tabLabelFontSize`**, **`dense`**) — see **`types/I_faVerticalDraggableTabs.ts`** and [fantasia-drag-drop skill](../skills/fantasia-drag-drop/SKILL.md) **Vertical draggable tab strips**.
 
 **Do not** add SortableJS, **`vuedraggable`**, **`vue-draggable-next`**, or ad hoc HTML5 **`draggable`** for list reorder unless a maintainer documents a narrow exception in review.
 

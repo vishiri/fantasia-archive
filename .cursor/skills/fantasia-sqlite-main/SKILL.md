@@ -10,8 +10,8 @@ description: >-
 
 ## Canonical schema documentation
 
-- **[docs/database/projectDB.md](../../docs/database/projectDB.md)** — **`.faproject`** `user_version` (1 today), `project_data` KV, content tables, FK/delete rules, module map, **`FA_PROJECT_CONTENT_IPC`**
-- **[docs/database/templateCustomFields.md](../../docs/database/templateCustomFields.md)** — approved design for template field definitions and document values (planned v5+; not in shipped schema yet)
+- **[docs/database/projectDB.md](../../docs/database/projectDB.md)** — **`.faproject`** `user_version` (supported max **5** today), `project_data` KV, content tables, FK/delete rules, module map, **`FA_PROJECT_CONTENT_IPC`**, **Project Settings** worlds and document-templates snapshots
+- **[docs/database/templateCustomFields.md](../../docs/database/templateCustomFields.md)** — approved design for template field definitions and document values (planned future extension; not in shipped schema yet)
 - **[docs/database/appUserDataKv.md](../../docs/database/appUserDataKv.md)** — **`electron-store`** under **`userData`** (not project SQLite)
 - **[docs/database/README.md](../../docs/database/README.md)** — index and agent routing
 
@@ -22,7 +22,7 @@ When you change migrations, persist modules, or project IPC, update the matching
 - **`better-sqlite3`** is a native Node dependency; access belongs in the **main process** only.
 - **User projects** are SQLite files with the **`.faproject`** extension. Main code lives under **`src-electron/mainScripts/projectManagement/`** (save dialog, slugging, path checks, **`PRAGMA user_version`** migrations, active connection lifecycle). The renderer calls **`window.faContentBridgeAPIs.projectManagement.createProject`** (see **`types/I_faProjectManagementDomain.ts`**, **`FA_PROJECT_MANAGEMENT_IPC`**, **`registerFaProjectManagementIpc`**).
 - **E2E**: Playwright uses **`e2eSetNextProjectCreatePath`** in **`helpers/playwrightHelpers_e2e/playwrightE2eProjectPaths.ts`** (**`TEST_ENV: 'e2e'`** only) to set the absolute path for the next create; main reads it via **`projectManagement_manager.ts`** and **`functions/faProjectManagementE2ePathOverride.ts`** (global setter keys must stay aligned with the helper).
-- Product **`.faproject`** files are the supported user-visible project containers. **`PRAGMA user_version`** **1** is the shipped schema ( **`project_data`** KV plus **worlds**, **documents**, **document_templates**, **media**, and junction tables — see **docs/database/projectDB.md** ). Typed **custom fields** on templates are a planned extension — see **docs/database/templateCustomFields.md** and [fantasia-template-custom-fields](../fantasia-template-custom-fields/SKILL.md).
+- Product **`.faproject`** files are the supported user-visible project containers. **`PRAGMA user_version`** **5** is the supported max today (bootstrap **v1** **`project_data`** KV plus **worlds**, **documents**, **document_templates**, **media**, and junction tables — see **docs/database/projectDB.md** ). **`worlds`** stores **`color`**, **`color_pallete`** (semicolon-separated hex list), and **`sort_order`**; **`document_templates`** stores **`sort_order`**, **`world_appendix`**, and **`icon`**; **Project Settings** saves full ordered lists via **`saveWorldsSnapshot`** and **`saveDocumentTemplatesSnapshot`**. Typed **custom fields** on templates are a planned extension — see **docs/database/templateCustomFields.md** and [fantasia-template-custom-fields](../fantasia-template-custom-fields/SKILL.md).
 - **Pre-release flatten:** to squash historical migration ladders during dev, use [fantasia-flatten-database-schemas](../fantasia-flatten-database-schemas/SKILL.md) (older local **`.faproject`** files are not upgraded).
 
 ## Principles
@@ -40,13 +40,13 @@ All **active `.faproject`** reads and writes in main (including project noteboar
 
 Unlike **App Settings** (**`DialogAppSettings`**, hydrated from **`S_FaUserSettings`** on open), **Project Settings** always reads SQLite on dialog open:
 
-1. **Open:** IPC **`getProjectSettings`** only (no Pinia seed without a DB read; Storybook may use **`directSettingsSnapshot`**).
-2. **Edit:** Local draft until **Save**; **Close without saving** discards it.
-3. **Save:** action manager → **`S_FaProjectSettings.updateProjectSettings`** → IPC **set** → IPC **get** read-back → **`propagateFaProjectSettingsToAppConsumers`** (header name, MRU today).
-4. **Errors:** store throws; action manager toast (same as user settings).
-5. **Main:** **`runWithFaProjectDatabaseForIpcAsync`** only; KV in **`project_data`** (**`faProjectSettingsPersist.ts`**, key **`project_name`**).
+1. **Open:** IPC **`getProjectSettings`** (project name) and **`projectContent.listWorldsForProjectSettings`** (no Pinia seed without a DB read; Storybook may use **`directSettingsSnapshot`** and worlds fixtures).
+2. **Edit:** Local draft for project name and worlds until **Save**; **Close without saving** discards it.
+3. **Save:** action manager **`saveProjectSettings`** → **`S_FaProjectSettings.updateProjectSettings`** (IPC **set** → **get** → **`propagateFaProjectSettingsToAppConsumers`** for header name, MRU) plus optional **`projectContent.saveWorldsSnapshot`** (**`replaceFaProjectWorldsSnapshot`** on main).
+4. **Errors:** store / bridge throws; action manager toast (same as user settings).
+5. **Main:** **`runWithFaProjectDatabaseForIpcAsync`** only; KV **`project_name`** in **`faProjectSettingsPersist.ts`**; worlds in **`faProjectWorldsSnapshotWiring.ts`**.
 
-Extend **`propagateFaProjectSettingsToAppConsumers`** when new settings fields need live UI updates after save.
+Extend **`propagateFaProjectSettingsToAppConsumers`** when new settings fields need live UI updates after save. See **[docs/database/projectDB.md](../../docs/database/projectDB.md)** **Project Settings (renderer ↔ SQLite)**.
 
 - **Mirrored path**: Main keeps the last known absolute **`.faproject`** path alongside the **`better-sqlite3`** handle (**`faProjectActiveDatabase.ts`**). **`replaceFaProjectActiveDatabase(db, filePath)`** runs on successful open and create; **`closeFaProjectActiveDatabase()`** clears both; **`closeFaProjectActiveDatabaseHandleOnly()`** drops only the handle so a single reconnect can reuse the path.
 - **Reconnect + retry**: One synchronous reopen from the mirrored path when the handle is null, plus at most **one** handle-only close and retry when the operation throws a classified SQLite / **better-sqlite3** error. A **single-flight** mutex avoids overlapping reconnects.

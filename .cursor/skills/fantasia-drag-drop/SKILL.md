@@ -77,6 +77,84 @@ When the sortable root is not the component root, use **`useDraggable(el, list, 
 - Reorder updates the in-memory array first; on **`@update`** / **`onEnd`**, write domain order (for example **`sort_order`**) through **`runFaActionAwait`** or store methods that call **`projectContent`** IPC.
 - Keep drag wiring in feature **`scripts/`**; thin **`.vue`** imports the composable or **`VueDraggable`** only.
 
+### Vertical tab strips (**`DialogProjectSettings`** worlds list)
+
+When reordering **vertical category tabs** (world names in **Project Settings**), reuse **`src/scripts/faDragDrop/`** helpers (**`faVerticalDraggableTabsSortableDragOptions`**, **`faVerticalDraggableTabsDocumentDragCursor`**, **`hideNativeSortableDragGhost`**) and global SCSS **`src/css/theme/custom-components/faVerticalDraggableTabs.scss`**. **`DialogProjectSettingsWorldsTabList`** uses **`vue-draggable-plus`** with a movement threshold so short clicks select a tab without starting a drag. Palette swatch reorder inside a world uses the same library in **`DialogProjectSettingsWorldColorPaletteEditor`**.
+
+#### Vertical draggable tab strips (reusable column)
+
+Shared pattern for a **left column** of draggable tabs plus an optional **Add** row (master–detail settings dialogs). Not a Quasar **`QTabs`** replacement for horizontal category tabs — only the **vertical reorderable list** chrome.
+
+**Reference implementations**
+
+| SFC | Role |
+| --- | --- |
+| **`DialogProjectSettingsWorldsTabList.vue`** | Worlds column; default width **240px** |
+| **`DialogProjectSettingsDocumentTemplatesTabList.vue`** | Document templates column; panel passes **`tab-list-width-px="360"`** |
+| **`DialogProjectSettingsWorldsTabItem.vue`** / **`DialogProjectSettingsDocumentTemplatesTabItem.vue`** | Single tab row (`faVerticalDraggableTabs__tab` BEM) |
+
+**DOM skeleton** (outer host must include class **`faVerticalDraggableTabs`**):
+
+```text
+.faVerticalDraggableTabs                    ← :style from buildFaVerticalDraggableTabsRootStyle
+  .faVerticalDraggableTabs__scroll.hasScrollbar
+    VueDraggable.faVerticalDraggableTabs__draggable
+      *TabItem × N                           ← role=button, class faVerticalDraggableTabs__tab
+    .faVerticalDraggableTabs__divider        ← q-separator
+    .faVerticalDraggableTabs__addButtonRow
+      q-btn.faVerticalDraggableTabs__addButton
+```
+
+Import global styles once per feature via **`@use`** / **`src=`** on a colocated unscoped SCSS file if the host needs a fixed column width class (see **`DialogProjectSettings.worldsTabList.unscoped.scss`**). Base tokens: **`src/css/theme/custom-components/_faVerticalDraggableTabs.variables.scss`**.
+
+**Layout props** (on the TabList host SFC; all optional with defaults):
+
+| Prop | Default | Maps to CSS variable |
+| --- | --- | --- |
+| **`tabListWidthPx`** | **`240`** | **`--fa-vertical-draggable-tabs-column-width`** |
+| **`tabPadding`** | **`'4px 40px 4px 60px'`** | **`--fa-vertical-draggable-tabs-tab-padding`** |
+| **`tabTextAlign`** | **`'left'`** | **`--fa-vertical-draggable-tabs-tab-text-align`** |
+| **`tabJustifyContent`** | **`'flex-start'`** | **`--fa-vertical-draggable-tabs-tab-justify-content`** |
+| **`tabLabelTextTransform`** | **`'none'`** | **`--fa-vertical-draggable-tabs-tab-label-text-transform`** |
+| **`tabLabelFontSize`** | **`'15px'`** | **`--fa-vertical-draggable-tabs-tab-label-font-size`** |
+| **`dense`** | **`false`** (document templates TabList default **`true`**) | **`--fa-vertical-draggable-tabs-tab-min-height`** (**`36px`** when dense; SCSS fallback **`48px`**) |
+
+Types: **`types/I_faVerticalDraggableTabs.ts`**. Defaults and **`buildFaVerticalDraggableTabsRootStyle`**: **`src/scripts/faDragDrop/functions/buildFaVerticalDraggableTabsRootStyle.ts`**.
+
+**TabList script pattern**
+
+```ts
+import {
+  FA_VERTICAL_DRAGGABLE_TABS_TAB_JUSTIFY_CONTENT_DEFAULT,
+  FA_VERTICAL_DRAGGABLE_TABS_TAB_LABEL_FONT_SIZE_DEFAULT,
+  FA_VERTICAL_DRAGGABLE_TABS_TAB_LABEL_TEXT_TRANSFORM_DEFAULT,
+  FA_VERTICAL_DRAGGABLE_TABS_TAB_PADDING_DEFAULT,
+  FA_VERTICAL_DRAGGABLE_TABS_TAB_TEXT_ALIGN_DEFAULT,
+  buildFaVerticalDraggableTabsRootStyle
+} from 'app/src/scripts/faDragDrop/functions/buildFaVerticalDraggableTabsRootStyle'
+
+const tabListRootStyle = computed(() => buildFaVerticalDraggableTabsRootStyle({
+  columnWidthPx: props.tabListWidthPx,
+  tabDense: props.dense,
+  tabJustifyContent: props.tabJustifyContent,
+  tabLabelFontSize: props.tabLabelFontSize,
+  tabLabelTextTransform: props.tabLabelTextTransform,
+  tabPadding: props.tabPadding,
+  tabTextAlign: props.tabTextAlign
+}))
+```
+
+**Drag wiring** (same on both reference TabLists):
+
+- **`faVerticalDraggableTabsSortableDragOptions`** on **`VueDraggable`**
+- **`touch-start-threshold="5"`** so tap-to-select does not start drag
+- **`@start`** → **`applyFaVerticalDraggableTabsDocumentDragCursor`**
+- **`@end`** → **`clearFaVerticalDraggableTabsDocumentDragCursor`** + emit reordered array
+- Root **`computed`** class **`faVerticalDraggableTabs--listDragging`** while dragging
+- Tab item modifiers: **`--active`**, **`--dragging`**, **`--error`**
+
+**Tests**: **`src/scripts/faDragDrop/_tests/buildFaVerticalDraggableTabsRootStyle.vitest.test.ts`**; TabList Vitest stubs **`VueDraggable`**; Playwright uses **`data-test-locator`** on list, tabs, and add button.
+
 ## `quasar-ui-q-draggable-table` (`QTable` rows)
 
 Registered globally via **`src/boot/q-draggable-table.ts`** (listed in **`quasar.config.ts`** **`boot`**).
