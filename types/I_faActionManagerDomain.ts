@@ -88,6 +88,7 @@ export interface I_faActionPayloadMap {
   openProjectSettingsDialog: void
   showProjectDashboard: void
   saveProjectSettings: {
+    documentTemplates?: import('app/types/I_faProjectDocumentTemplateDomain').I_faProjectDocumentTemplateSnapshotItem[]
     settings: import('app/types/I_faProjectSettingsDomain').I_faProjectSettingsPatch
     worlds?: import('app/types/I_faProjectWorldDomain').I_faProjectWorldSnapshotItem[]
   }

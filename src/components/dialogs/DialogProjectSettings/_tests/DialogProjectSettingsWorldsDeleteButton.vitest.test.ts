@@ -31,14 +31,16 @@ const qBtnStub = defineComponent({
 
 const qMenuStub = defineComponent({
   inheritAttrs: false,
-  emits: ['hide', 'show'],
-  setup (_, { attrs, emit, slots }) {
+  props: {
+    modelValue: {
+      type: Boolean,
+      default: false
+    }
+  },
+  emits: ['update:modelValue'],
+  setup (props, { emit, slots }) {
     onMounted(() => {
-      const onShow = attrs.onShow
-      if (typeof onShow === 'function') {
-        onShow()
-      }
-      emit('show')
+      emit('update:modelValue', true)
     })
 
     return () => h(
@@ -139,6 +141,7 @@ test('Test that DialogProjectSettingsWorldsDeleteButton ignores confirm while co
 test('Test that DialogProjectSettingsWorldsDeleteButton enables confirm after countdown', async () => {
   const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval')
   const w = mountDeleteButton(false)
+  await nextTick()
 
   vi.advanceTimersByTime(5000)
   await nextTick()
@@ -158,9 +161,10 @@ test('Test that DialogProjectSettingsWorldsDeleteButton enables confirm after co
  * DialogProjectSettingsWorldsDeleteButton
  * Clears the countdown interval when the component unmounts.
  */
-test('Test that DialogProjectSettingsWorldsDeleteButton clears countdown on unmount', () => {
+test('Test that DialogProjectSettingsWorldsDeleteButton clears countdown on unmount', async () => {
   const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval')
   const w = mountDeleteButton(false)
+  await nextTick()
 
   w.unmount()
 

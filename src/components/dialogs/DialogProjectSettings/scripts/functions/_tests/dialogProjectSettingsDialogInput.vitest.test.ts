@@ -1,7 +1,9 @@
 import { expect, test } from 'vitest'
 
 import {
+  FA_DIALOG_PROJECT_SETTINGS_DOCUMENT_TEMPLATES_TAB_LIST_WIDTH_PX,
   FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB,
+  FA_DIALOG_PROJECT_SETTINGS_VERTICAL_TAB_LIST_WIDTH_PX_DEFAULT,
   FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB,
   isDialogProjectSettingsDirectInput,
   isDialogProjectSettingsSaveDisabled,
@@ -44,4 +46,13 @@ test('Test that isDialogProjectSettingsSaveDisabled is true for blank names', ()
 test('Test that project settings tab constants are stable strings', () => {
   expect(FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB).toBe('generalSettings')
   expect(FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB).toBe('worldsSettings')
+})
+
+/**
+ * FA_DIALOG_PROJECT_SETTINGS_* tab list widths
+ * Export default and document-template column widths in pixels.
+ */
+test('Test that project settings vertical tab list width constants match layout tokens', () => {
+  expect(FA_DIALOG_PROJECT_SETTINGS_VERTICAL_TAB_LIST_WIDTH_PX_DEFAULT).toBe(240)
+  expect(FA_DIALOG_PROJECT_SETTINGS_DOCUMENT_TEMPLATES_TAB_LIST_WIDTH_PX).toBe(360)
 })

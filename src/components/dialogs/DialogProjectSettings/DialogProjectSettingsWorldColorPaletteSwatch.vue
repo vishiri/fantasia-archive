@@ -41,12 +41,13 @@
     </q-tooltip>
     <q-menu
       v-model="contextMenuOpen"
-      anchor="top left"
+      anchor="bottom left"
       class="dialogProjectSettingsWorldColorPaletteSwatch__contextMenu"
       dark
       data-test-locator="dialogProjectSettings-worlds-colorPaletteContextMenu"
       no-focus
       no-parent-event
+      :offset="menuOffset"
       role="menu"
       self="top left"
       square

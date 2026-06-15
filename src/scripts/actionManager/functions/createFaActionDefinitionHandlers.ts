@@ -2,6 +2,7 @@ import type { I_faActionPayloadMap } from 'app/types/I_faActionManagerDomain'
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import type { I_faProjectSettingsPatch } from 'app/types/I_faProjectSettingsDomain'
+import type { I_faProjectDocumentTemplateSnapshotItem } from 'app/types/I_faProjectDocumentTemplateDomain'
 import type { I_faProjectWorldSnapshotItem } from 'app/types/I_faProjectWorldDomain'
 
 type T_createFaActionDefinitionHandlersDeps = {
@@ -15,6 +16,9 @@ type T_createFaActionDefinitionHandlersDeps = {
   S_FaProjectSettings: () => { updateProjectSettings: (patch: I_faProjectSettingsPatch) => Promise<void> }
   S_FaUserSettings: () => { updateSettings: (patch: Partial<I_faUserSettings>) => Promise<void> }
   faProjectWorldsPersistSnapshotFromDialog: (items: I_faProjectWorldSnapshotItem[]) => Promise<void>
+  faProjectDocumentTemplatesPersistSnapshotFromDialog: (
+    items: I_faProjectDocumentTemplateSnapshotItem[]
+  ) => Promise<void>
   canOpenFloatingWindowWhileNoModal: () => boolean
   applyFaUserSettingsLanguageSelection: (
     updateSettings: (patch: Partial<I_faUserSettings>) => Promise<void>,
@@ -93,6 +97,7 @@ async function handleSaveAppSettings (
 async function handleSaveProjectSettings (
   deps: T_createFaActionDefinitionHandlersDeps,
   payload: {
+    documentTemplates?: I_faProjectDocumentTemplateSnapshotItem[]
     settings: I_faProjectSettingsPatch
     worlds?: I_faProjectWorldSnapshotItem[]
   }
@@ -103,6 +108,9 @@ async function handleSaveProjectSettings (
   await deps.S_FaProjectSettings().updateProjectSettings(payload.settings)
   if (payload.worlds !== undefined) {
     await deps.faProjectWorldsPersistSnapshotFromDialog(payload.worlds)
+  }
+  if (payload.documentTemplates !== undefined) {
+    await deps.faProjectDocumentTemplatesPersistSnapshotFromDialog(payload.documentTemplates)
   }
 }
 
@@ -152,6 +160,7 @@ export function createFaActionDefinitionHandlers (deps: T_createFaActionDefiniti
   handleSaveKeybindSettings: (payload: { overrides: I_faKeybindsRoot['overrides'] }) => Promise<void>
   handleSaveAppSettings: (payload: { settings: I_faUserSettings }) => Promise<void>
   handleSaveProjectSettings: (payload: {
+    documentTemplates?: I_faProjectDocumentTemplateSnapshotItem[]
     settings: I_faProjectSettingsPatch
     worlds?: I_faProjectWorldSnapshotItem[]
   }) => Promise<void>

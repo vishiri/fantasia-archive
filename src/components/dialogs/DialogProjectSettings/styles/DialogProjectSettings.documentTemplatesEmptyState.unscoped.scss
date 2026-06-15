@@ -1,0 +1,17 @@
+.dialogProjectSettingsDocumentTemplatesEmptyState {
+  align-items: center;
+  display: flex;
+  flex: 1 1 auto;
+  height: 100%;
+  justify-content: center;
+  min-height: 0;
+  min-width: 0;
+
+  &__button {
+    font-size: $dialogProjectSettings-documentTemplatesEmptyButton-fontSize;
+    letter-spacing: $dialogProjectSettings-documentTemplatesEmptyButton-letterSpacing;
+    padding:
+      $dialogProjectSettings-documentTemplatesEmptyButton-paddingY
+      $dialogProjectSettings-documentTemplatesEmptyButton-paddingX;
+  }
+}

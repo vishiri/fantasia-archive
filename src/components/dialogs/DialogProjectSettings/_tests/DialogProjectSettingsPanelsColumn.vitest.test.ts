@@ -14,6 +14,7 @@ import {
 test('Test that DialogProjectSettingsPanelsColumn forwards project name updates', async () => {
   const w = mount(DialogProjectSettingsPanelsColumn, {
     props: {
+      documentTemplates: null,
       projectName: 'Panel name',
       projectNameHasError: false,
       selectedCategoryTab: FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB,
@@ -26,6 +27,7 @@ test('Test that DialogProjectSettingsPanelsColumn forwards project name updates'
           emits: ['update:projectName'],
           template: '<button type="button" @click="$emit(\'update:projectName\', \'Updated\')" />'
         },
+        DialogProjectSettingsDocumentTemplatesPanel: true,
         DialogProjectSettingsWorldsPanel: true,
         QSeparator: { template: '<hr />' },
         QTabPanel: { template: '<div><slot /></div>' },
@@ -46,6 +48,7 @@ test('Test that DialogProjectSettingsPanelsColumn forwards project name updates'
 test('Test that DialogProjectSettingsPanelsColumn renders the worlds settings panel', () => {
   const w = mount(DialogProjectSettingsPanelsColumn, {
     props: {
+      documentTemplates: [],
       projectName: 'Panel name',
       projectNameHasError: false,
       selectedCategoryTab: FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB,
@@ -54,6 +57,7 @@ test('Test that DialogProjectSettingsPanelsColumn renders the worlds settings pa
     global: {
       stubs: {
         DialogProjectSettingsGeneralPanel: true,
+        DialogProjectSettingsDocumentTemplatesPanel: true,
         DialogProjectSettingsWorldsPanel: {
           template: '<div data-test-locator="dialogProjectSettings-worlds-panel-stub" />'
         },

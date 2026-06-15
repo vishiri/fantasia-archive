@@ -22,6 +22,13 @@
         :data-test-validation-error="props.worldsTabHasError ? 'true' : 'false'"
         data-test-locator="dialogProjectSettings-tab-worldsSettings"
       />
+      <q-tab
+        :class="documentTemplatesTabClassList"
+        :name="documentTemplatesTabKey"
+        :label="$t('dialogs.projectSettings.categories.documentTemplatesSettings.title')"
+        :data-test-validation-error="props.documentTemplatesTabHasError ? 'true' : 'false'"
+        data-test-locator="dialogProjectSettings-tab-documentTemplatesSettings"
+      />
     </q-tabs>
 
     <q-separator />
@@ -32,11 +39,13 @@
 import { computed } from 'vue'
 
 import {
+  FA_DIALOG_PROJECT_SETTINGS_DOCUMENT_TEMPLATES_TAB,
   FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB,
   FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB
 } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDialogInput'
 
 const props = defineProps<{
+  documentTemplatesTabHasError: boolean
   generalTabHasError: boolean
   selectedCategoryTab: string
   worldsTabHasError: boolean
@@ -48,6 +57,7 @@ const emit = defineEmits<{
 
 const generalTabKey = FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB
 const worldsTabKey = FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB
+const documentTemplatesTabKey = FA_DIALOG_PROJECT_SETTINGS_DOCUMENT_TEMPLATES_TAB
 
 const generalTabClassList = computed(() => {
   const classList: Record<string, boolean> = {
@@ -61,6 +71,15 @@ const worldsTabClassList = computed(() => {
   const classList: Record<string, boolean> = {
     'dialogProjectSettings__tab--error': props.worldsTabHasError,
     'fa-text-muted': !props.worldsTabHasError && props.selectedCategoryTab !== worldsTabKey
+  }
+  return classList
+})
+
+const documentTemplatesTabClassList = computed(() => {
+  const classList: Record<string, boolean> = {
+    'dialogProjectSettings__tab--error': props.documentTemplatesTabHasError,
+    'fa-text-muted': !props.documentTemplatesTabHasError &&
+      props.selectedCategoryTab !== documentTemplatesTabKey
   }
   return classList
 })

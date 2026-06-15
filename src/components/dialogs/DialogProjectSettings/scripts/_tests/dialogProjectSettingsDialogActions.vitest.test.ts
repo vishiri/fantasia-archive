@@ -3,12 +3,14 @@ import { ref } from 'vue'
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import type { I_faProjectSettingsRoot } from 'app/types/I_faProjectSettingsDomain'
+import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import { FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB } from '../functions/dialogProjectSettingsDialogInput'
 import { createDialogProjectSettingsDialogActions } from '../dialogProjectSettings_manager'
 
-const { fetchFreshMock, fetchWorldsMock, runFaActionAwaitMock } = vi.hoisted(() => ({
+const { fetchFreshMock, fetchTemplatesMock, fetchWorldsMock, runFaActionAwaitMock } = vi.hoisted(() => ({
   fetchFreshMock: vi.fn(),
+  fetchTemplatesMock: vi.fn(),
   fetchWorldsMock: vi.fn(),
   runFaActionAwaitMock: vi.fn(async () => true)
 }))
@@ -19,6 +21,10 @@ vi.mock('app/src/stores/scripts/sFaProjectSettingsBridge', () => ({
 
 vi.mock('app/src/stores/scripts/sFaProjectWorldsBridge', () => ({
   faProjectWorldsFetchFreshForDialog: fetchWorldsMock
+}))
+
+vi.mock('app/src/stores/scripts/sFaProjectDocumentTemplatesBridge', () => ({
+  faProjectDocumentTemplatesFetchFreshForDialog: fetchTemplatesMock
 }))
 
 vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => ({
@@ -40,6 +46,16 @@ const directWorlds: I_dialogProjectSettingsWorldDraft[] = [
   }
 ]
 
+const directTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] = [
+  {
+    displayName: 'Direct template',
+    documentCount: 0,
+    icon: 'mdi-file',
+    id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+    worldAppendix: 'Appendix'
+  }
+]
+
 const hydratedWorlds: I_dialogProjectSettingsWorldDraft[] = [
   {
     color: '#808080',
@@ -50,8 +66,26 @@ const hydratedWorlds: I_dialogProjectSettingsWorldDraft[] = [
   }
 ]
 
+const hydratedTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] = []
+
 const worldAId = '550e8400-e29b-41d4-a716-446655440000'
 const worldBId = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
+const templateAId = '7c9e6679-7425-40de-944b-e07fc1f90ae7'
+
+function buildActionBindings (
+  overrides?: Partial<Parameters<typeof createDialogProjectSettingsDialogActions>[0]>
+): Parameters<typeof createDialogProjectSettingsDialogActions>[0] {
+  return {
+    dialogModel: ref(false),
+    documentName: ref(''),
+    localDocumentTemplates: ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([]),
+    localSettings: ref<I_faProjectSettingsRoot | null>(null),
+    localWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>(null),
+    props: {},
+    selectedCategoryTab: ref(FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB),
+    ...overrides
+  }
+}
 
 beforeEach(() => {
   fetchFreshMock.mockReset()
@@ -61,43 +95,40 @@ beforeEach(() => {
   })
   fetchWorldsMock.mockReset()
   fetchWorldsMock.mockResolvedValue(hydratedWorlds)
+  fetchTemplatesMock.mockReset()
+  fetchTemplatesMock.mockResolvedValue(hydratedTemplates)
   runFaActionAwaitMock.mockReset()
   runFaActionAwaitMock.mockResolvedValue(true)
 })
 
 /**
  * createDialogProjectSettingsDialogActions
- * openDialog uses directSettingsSnapshot without calling the bridge fetch helper.
+ * openDialog uses direct snapshots without calling bridge fetch helpers.
  */
-test('Test that openDialog hydrates from directSettingsSnapshot when provided', async () => {
-  const dialogModel = ref(false)
-  const documentName = ref('')
-  const localSettings = ref<I_faProjectSettingsRoot | null>(null)
-  const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>(null)
-  const selectedCategoryTab = ref('other')
-
-  const { openDialog } = createDialogProjectSettingsDialogActions({
-    dialogModel,
-    documentName,
-    localSettings,
-    localWorlds,
+test('Test that openDialog hydrates from direct snapshots when provided', async () => {
+  const bindings = buildActionBindings({
+    selectedCategoryTab: ref('other'),
     props: {
+      directDocumentTemplatesSnapshot: directTemplates,
       directSettingsSnapshot: directSnapshot,
       directWorldsSnapshot: directWorlds
-    },
-    selectedCategoryTab
+    }
   })
+
+  const { openDialog } = createDialogProjectSettingsDialogActions(bindings)
 
   openDialog('ProjectSettings')
   await flushPromises()
 
-  expect(dialogModel.value).toBe(true)
-  expect(documentName.value).toBe('ProjectSettings')
-  expect(selectedCategoryTab.value).toBe(FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB)
-  expect(localSettings.value).toEqual(directSnapshot)
-  expect(localWorlds.value).toEqual(directWorlds)
+  expect(bindings.dialogModel.value).toBe(true)
+  expect(bindings.documentName.value).toBe('ProjectSettings')
+  expect(bindings.selectedCategoryTab.value).toBe(FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB)
+  expect(bindings.localSettings.value).toEqual(directSnapshot)
+  expect(bindings.localWorlds.value).toEqual(directWorlds)
+  expect(bindings.localDocumentTemplates.value).toEqual(directTemplates)
   expect(fetchFreshMock).not.toHaveBeenCalled()
   expect(fetchWorldsMock).not.toHaveBeenCalled()
+  expect(fetchTemplatesMock).not.toHaveBeenCalled()
 })
 
 /**
@@ -105,31 +136,24 @@ test('Test that openDialog hydrates from directSettingsSnapshot when provided', 
  * openDialog fetches fresh settings from SQLite when no direct snapshot is passed.
  */
 test('Test that openDialog fetches fresh settings from the bridge when needed', async () => {
-  const dialogModel = ref(false)
-  const documentName = ref('')
-  const localSettings = ref<I_faProjectSettingsRoot | null>(null)
-  const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>(null)
-  const selectedCategoryTab = ref('other')
-
-  const { openDialog } = createDialogProjectSettingsDialogActions({
-    dialogModel,
-    documentName,
-    localSettings,
-    localWorlds,
-    props: {},
-    selectedCategoryTab
+  const bindings = buildActionBindings({
+    selectedCategoryTab: ref('other')
   })
+
+  const { openDialog } = createDialogProjectSettingsDialogActions(bindings)
 
   openDialog('ProjectSettings')
   await flushPromises()
 
   expect(fetchFreshMock).toHaveBeenCalledOnce()
   expect(fetchWorldsMock).toHaveBeenCalledOnce()
-  expect(localSettings.value).toEqual({
+  expect(fetchTemplatesMock).toHaveBeenCalledOnce()
+  expect(bindings.localSettings.value).toEqual({
     projectName: 'From Db',
     schemaVersion: 1
   })
-  expect(localWorlds.value).toEqual(hydratedWorlds)
+  expect(bindings.localWorlds.value).toEqual(hydratedWorlds)
+  expect(bindings.localDocumentTemplates.value).toEqual(hydratedTemplates)
 })
 
 /**
@@ -137,29 +161,28 @@ test('Test that openDialog fetches fresh settings from the bridge when needed', 
  * addWorld, removeWorld, and field updaters mutate the local worlds draft.
  */
 test('Test that createDialogProjectSettingsDialogActions mutates local world drafts', () => {
-  const dialogModel = ref(false)
-  const documentName = ref('')
-  const localSettings = ref<I_faProjectSettingsRoot | null>({
-    projectName: 'Realm',
-    schemaVersion: 1
+  const bindings = buildActionBindings({
+    localSettings: ref<I_faProjectSettingsRoot | null>({
+      projectName: 'Realm',
+      schemaVersion: 1
+    }),
+    localWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>([
+      {
+        color: '',
+        colorPallete: '',
+        displayName: 'Alpha',
+        documentCount: 0,
+        id: worldAId
+      },
+      {
+        color: '',
+        colorPallete: '',
+        displayName: 'Beta',
+        documentCount: 0,
+        id: worldBId
+      }
+    ])
   })
-  const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([
-    {
-      color: '',
-      colorPallete: '',
-      displayName: 'Alpha',
-      documentCount: 0,
-      id: worldAId
-    },
-    {
-      color: '',
-      colorPallete: '',
-      displayName: 'Beta',
-      documentCount: 0,
-      id: worldBId
-    }
-  ])
-  const selectedCategoryTab = ref(FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB)
 
   const {
     addWorld,
@@ -167,27 +190,62 @@ test('Test that createDialogProjectSettingsDialogActions mutates local world dra
     updateWorldColor,
     updateWorldColorPallete,
     updateWorldDisplayName
-  } = createDialogProjectSettingsDialogActions({
-    dialogModel,
-    documentName,
-    localSettings,
-    localWorlds,
-    props: {},
-    selectedCategoryTab
-  })
+  } = createDialogProjectSettingsDialogActions(bindings)
 
   addWorld()
-  expect(localWorlds.value).toHaveLength(3)
+  expect(bindings.localWorlds.value).toHaveLength(3)
 
   updateWorldDisplayName(worldAId, 'Renamed')
   updateWorldColor(worldAId, '#aabbcc')
   updateWorldColorPallete(worldAId, '#112233;#445566')
-  expect(localWorlds.value?.[0]?.displayName).toBe('Renamed')
-  expect(localWorlds.value?.[0]?.color).toBe('#aabbcc')
-  expect(localWorlds.value?.[0]?.colorPallete).toBe('#112233;#445566')
+  expect(bindings.localWorlds.value?.[0]?.displayName).toBe('Renamed')
+  expect(bindings.localWorlds.value?.[0]?.color).toBe('#aabbcc')
+  expect(bindings.localWorlds.value?.[0]?.colorPallete).toBe('#112233;#445566')
 
   removeWorld(worldBId)
-  expect(localWorlds.value?.some((world) => world.id === worldBId)).toBe(false)
+  expect(bindings.localWorlds.value?.some((world) => world.id === worldBId)).toBe(false)
+})
+
+/**
+ * createDialogProjectSettingsDialogActions
+ * addDocumentTemplate and field updaters mutate the local templates draft.
+ */
+test('Test that createDialogProjectSettingsDialogActions mutates local document template drafts', () => {
+  const bindings = buildActionBindings({
+    localDocumentTemplates: ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([
+      {
+        displayName: 'Alpha',
+        documentCount: 0,
+        icon: '',
+        id: templateAId,
+        worldAppendix: ''
+      }
+    ])
+  })
+
+  const {
+    addDocumentTemplate,
+    removeDocumentTemplate,
+    updateDocumentTemplateDisplayName,
+    updateDocumentTemplateIcon,
+    updateDocumentTemplateWorldAppendix
+  } = createDialogProjectSettingsDialogActions(bindings)
+
+  addDocumentTemplate()
+  expect(bindings.localDocumentTemplates.value).toHaveLength(2)
+
+  updateDocumentTemplateDisplayName(templateAId, 'Renamed')
+  updateDocumentTemplateIcon(templateAId, 'mdi-star')
+  updateDocumentTemplateWorldAppendix(templateAId, 'Notes')
+  expect(bindings.localDocumentTemplates.value?.[0]?.displayName).toBe('Renamed')
+  expect(bindings.localDocumentTemplates.value?.[0]?.icon).toBe('mdi-star')
+  expect(bindings.localDocumentTemplates.value?.[0]?.worldAppendix).toBe('Notes')
+
+  const secondId = bindings.localDocumentTemplates.value?.[1]?.id
+  if (secondId !== undefined) {
+    removeDocumentTemplate(secondId)
+  }
+  expect(bindings.localDocumentTemplates.value).toHaveLength(1)
 })
 
 /**
@@ -195,35 +253,46 @@ test('Test that createDialogProjectSettingsDialogActions mutates local world dra
  * saveAndCloseDialog dispatches saveProjectSettings with trimmed project name.
  */
 test('Test that saveAndCloseDialog dispatches saveProjectSettings with trimmed name', async () => {
-  const dialogModel = ref(true)
-  const documentName = ref('ProjectSettings')
-  const localSettings = ref<I_faProjectSettingsRoot | null>({
-    projectName: '  Trimmed  ',
-    schemaVersion: 1
+  const bindings = buildActionBindings({
+    dialogModel: ref(true),
+    documentName: ref('ProjectSettings'),
+    localSettings: ref<I_faProjectSettingsRoot | null>({
+      projectName: '  Trimmed  ',
+      schemaVersion: 1
+    }),
+    localWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>([
+      {
+        color: '#aabbcc',
+        colorPallete: '#112233;#445566',
+        displayName: 'Realm',
+        documentCount: 0,
+        id: worldAId
+      }
+    ]),
+    localDocumentTemplates: ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([
+      {
+        displayName: 'Character',
+        documentCount: 0,
+        icon: 'mdi-account',
+        id: templateAId,
+        worldAppendix: 'World notes'
+      }
+    ])
   })
-  const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([
-    {
-      color: '#aabbcc',
-      colorPallete: '#112233;#445566',
-      displayName: 'Realm',
-      documentCount: 0,
-      id: '550e8400-e29b-41d4-a716-446655440000'
-    }
-  ])
-  const selectedCategoryTab = ref(FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB)
 
-  const { saveAndCloseDialog } = createDialogProjectSettingsDialogActions({
-    dialogModel,
-    documentName,
-    localSettings,
-    localWorlds,
-    props: {},
-    selectedCategoryTab
-  })
+  const { saveAndCloseDialog } = createDialogProjectSettingsDialogActions(bindings)
 
   await saveAndCloseDialog()
 
   expect(runFaActionAwaitMock).toHaveBeenCalledWith('saveProjectSettings', {
+    documentTemplates: [
+      {
+        displayName: 'Character',
+        icon: 'mdi-account',
+        id: templateAId,
+        worldAppendix: 'World notes'
+      }
+    ],
     settings: {
       projectName: 'Trimmed'
     },
@@ -232,11 +301,11 @@ test('Test that saveAndCloseDialog dispatches saveProjectSettings with trimmed n
         color: '#aabbcc',
         colorPallete: '#112233;#445566',
         displayName: 'Realm',
-        id: '550e8400-e29b-41d4-a716-446655440000'
+        id: worldAId
       }
     ]
   })
-  expect(dialogModel.value).toBe(false)
+  expect(bindings.dialogModel.value).toBe(false)
 })
 
 /**
@@ -244,39 +313,32 @@ test('Test that saveAndCloseDialog dispatches saveProjectSettings with trimmed n
  * saveAndCloseDialog skips dispatch when local settings are null or name is blank.
  */
 test('Test that saveAndCloseDialog no-ops without local settings or blank name', async () => {
-  const dialogModel = ref(true)
-  const documentName = ref('')
-  const localSettings = ref<I_faProjectSettingsRoot | null>(null)
-  const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([
-    {
-      color: '',
-      colorPallete: '',
-      displayName: 'Realm',
-      documentCount: 0,
-      id: '550e8400-e29b-41d4-a716-446655440000'
-    }
-  ])
-  const selectedCategoryTab = ref(FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB)
-
-  const { saveAndCloseDialog } = createDialogProjectSettingsDialogActions({
-    dialogModel,
-    documentName,
-    localSettings,
-    localWorlds,
-    props: {},
-    selectedCategoryTab
+  const bindings = buildActionBindings({
+    dialogModel: ref(true),
+    localSettings: ref<I_faProjectSettingsRoot | null>(null),
+    localWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>([
+      {
+        color: '',
+        colorPallete: '',
+        displayName: 'Realm',
+        documentCount: 0,
+        id: worldAId
+      }
+    ])
   })
+
+  const { saveAndCloseDialog } = createDialogProjectSettingsDialogActions(bindings)
 
   await saveAndCloseDialog()
   expect(runFaActionAwaitMock).not.toHaveBeenCalled()
 
-  localSettings.value = {
+  bindings.localSettings.value = {
     projectName: '   ',
     schemaVersion: 1
   }
   await saveAndCloseDialog()
   expect(runFaActionAwaitMock).not.toHaveBeenCalled()
-  expect(dialogModel.value).toBe(true)
+  expect(bindings.dialogModel.value).toBe(true)
 })
 
 /**
@@ -284,35 +346,58 @@ test('Test that saveAndCloseDialog no-ops without local settings or blank name',
  * Keeps the dialog open when saveProjectSettings returns false.
  */
 test('Test that saveAndCloseDialog keeps the dialog open when save fails', async () => {
-  const dialogModel = ref(true)
-  const documentName = ref('ProjectSettings')
-  const localSettings = ref<I_faProjectSettingsRoot | null>({
-    projectName: 'Realm',
-    schemaVersion: 1
+  const bindings = buildActionBindings({
+    dialogModel: ref(true),
+    documentName: ref('ProjectSettings'),
+    localSettings: ref<I_faProjectSettingsRoot | null>({
+      projectName: 'Realm',
+      schemaVersion: 1
+    }),
+    localWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>([
+      {
+        color: '',
+        colorPallete: '',
+        displayName: 'Alpha',
+        documentCount: 0,
+        id: worldAId
+      }
+    ])
   })
-  const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([
-    {
-      color: '',
-      colorPallete: '',
-      displayName: 'Alpha',
-      documentCount: 0,
-      id: worldAId
-    }
-  ])
-  const selectedCategoryTab = ref(FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB)
   runFaActionAwaitMock.mockResolvedValueOnce(false)
 
-  const { saveAndCloseDialog } = createDialogProjectSettingsDialogActions({
-    dialogModel,
-    documentName,
-    localSettings,
-    localWorlds,
-    props: {},
-    selectedCategoryTab
-  })
+  const { saveAndCloseDialog } = createDialogProjectSettingsDialogActions(bindings)
 
   await saveAndCloseDialog()
 
   expect(runFaActionAwaitMock).toHaveBeenCalledOnce()
-  expect(dialogModel.value).toBe(true)
+  expect(bindings.dialogModel.value).toBe(true)
+})
+
+/**
+ * createDialogProjectSettingsDialogActions
+ * saveAndCloseDialog no-ops when local document templates are still null.
+ */
+test('Test that saveAndCloseDialog no-ops when local document templates are null', async () => {
+  const bindings = buildActionBindings({
+    dialogModel: ref(true),
+    localDocumentTemplates: ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>(null),
+    localSettings: ref<I_faProjectSettingsRoot | null>({
+      projectName: 'Realm',
+      schemaVersion: 1
+    }),
+    localWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>([
+      {
+        color: '',
+        colorPallete: '',
+        displayName: 'Realm',
+        documentCount: 0,
+        id: worldAId
+      }
+    ])
+  })
+
+  const { saveAndCloseDialog } = createDialogProjectSettingsDialogActions(bindings)
+
+  await saveAndCloseDialog()
+  expect(runFaActionAwaitMock).not.toHaveBeenCalled()
 })

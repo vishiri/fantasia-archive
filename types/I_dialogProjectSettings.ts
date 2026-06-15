@@ -1,3 +1,4 @@
+import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_faProjectSettingsRoot } from 'app/types/I_faProjectSettingsDomain'
 import type { I_dialogProjectSettingsSaveValidationTooltipContent } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
@@ -8,6 +9,7 @@ import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
  * Props for DialogProjectSettings (Storybook direct open and optional snapshot override).
  */
 export interface I_dialogProjectSettingsProps {
+  directDocumentTemplatesSnapshot?: I_dialogProjectSettingsDocumentTemplateDraft[]
   directInput?: T_dialogName
   directSettingsSnapshot?: I_faProjectSettingsRoot
   directWorldsSnapshot?: I_dialogProjectSettingsWorldDraft[]
@@ -17,23 +19,30 @@ export interface I_dialogProjectSettingsProps {
 export type T_dialogProjectSettingsUseHookDeps = {
   buildDialogProjectSettingsSaveValidationTooltipForDraft: (
     projectName: string,
-    worlds: I_dialogProjectSettingsWorldDraft[] | null
+    worlds: I_dialogProjectSettingsWorldDraft[] | null,
+    documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] | null
   ) => I_dialogProjectSettingsSaveValidationTooltipContent
   computed: <T>(getter: () => T) => ComputedRef<T>
   createDialogProjectSettingsDialogActions: (
     params: {
       dialogModel: Ref<boolean>
       documentName: Ref<string>
+      localDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>
       localSettings: Ref<I_faProjectSettingsRoot | null>
       localWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>
       props: I_dialogProjectSettingsProps
       selectedCategoryTab: Ref<string>
     }
   ) => {
+    addDocumentTemplate: () => void
     addWorld: () => void
     openDialog: (input: T_dialogName) => void
+    removeDocumentTemplate: (id: string) => void
     removeWorld: (id: string) => void
     saveAndCloseDialog: () => Promise<void>
+    updateDocumentTemplateDisplayName: (id: string, displayName: string) => void
+    updateDocumentTemplateIcon: (id: string, icon: string) => void
+    updateDocumentTemplateWorldAppendix: (id: string, worldAppendix: string) => void
     updateWorldColor: (id: string, color: string) => void
     updateWorldColorPallete: (id: string, colorPallete: string) => void
     updateWorldDisplayName: (id: string, displayName: string) => void
@@ -41,19 +50,24 @@ export type T_dialogProjectSettingsUseHookDeps = {
   createDialogProjectSettingsRefs: () => {
     dialogModel: Ref<boolean>
     documentName: Ref<string>
+    localDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>
     localSettings: Ref<I_faProjectSettingsRoot | null>
     localWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>
     selectedCategoryTab: Ref<string>
   }
+  hasDialogProjectSettingsDocumentTemplateNameValidationError: (
+    templates: I_dialogProjectSettingsDocumentTemplateDraft[] | null
+  ) => boolean
   hasDialogProjectSettingsWorldColorPalleteValidationError: (
     worlds: I_dialogProjectSettingsWorldDraft[] | null
   ) => boolean
   hasDialogProjectSettingsWorldNameValidationError: (
     worlds: I_dialogProjectSettingsWorldDraft[] | null
   ) => boolean
-  isDialogProjectSettingsDialogSaveDisabled: (
+  isDialogProjectSettingsFullDialogSaveDisabled: (
     projectName: string,
-    worlds: I_dialogProjectSettingsWorldDraft[] | null
+    worlds: I_dialogProjectSettingsWorldDraft[] | null,
+    documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] | null
   ) => boolean
   isDialogProjectSettingsProjectNameInvalid: (projectName: string) => boolean
   registerComponentDialogStackGuard: (dialogModel: Ref<boolean>) => void

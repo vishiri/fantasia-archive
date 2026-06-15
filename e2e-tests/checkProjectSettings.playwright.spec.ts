@@ -49,6 +49,8 @@ const selectorList = {
   dialogNameInput: 'dialogNewProject-input-name',
   dialogProjectSettingsInput: 'dialogProjectSettings-input-projectName',
   dialogProjectSettingsSave: 'dialogProjectSettings-button-save',
+  dialogProjectSettingsTabDocumentTemplates: 'dialogProjectSettings-tab-documentTemplatesSettings',
+  dialogProjectSettingsTemplatesAddFirstButton: 'dialogProjectSettings-documentTemplates-addFirstButton',
   dialogProjectSettingsTitle: 'dialogProjectSettings-title',
   submenuItemSubMenu: 'AppControlSingleMenu-menuItem-subMenu',
   submenuItemSubMenuItem: 'AppControlSingleMenu-menuItem-subMenu-item',
@@ -269,6 +271,10 @@ test.describe.serial('Project settings E2E — rename via dialog', () => {
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.dialogProjectSettingsInput}"]`)
     ).toHaveValue(PROJECT_SETTINGS_E2E_RENAMED)
+    await appWindow.locator(`[data-test-locator="${selectorList.dialogProjectSettingsTabDocumentTemplates}"]`).click()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.dialogProjectSettingsTemplatesAddFirstButton}"]`)
+    ).toContainText(L_projectSettings.panels.documentTemplates.addFirstTemplateButton)
     await dismissOpenMenus(appWindow)
   })
 })

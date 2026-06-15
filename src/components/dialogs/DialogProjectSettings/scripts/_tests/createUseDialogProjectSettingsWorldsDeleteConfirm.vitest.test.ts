@@ -1,4 +1,4 @@
-import { computed, effectScope, ref } from 'vue'
+import { computed, effectScope, nextTick, ref, watch } from 'vue'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import { createUseDialogProjectSettingsWorldsDeleteConfirm } from '../functions/createUseDialogProjectSettingsWorldsDeleteConfirm'
@@ -22,6 +22,9 @@ function createTestUseDialogProjectSettingsWorldsDeleteConfirm (): {
     ref,
     setInterval: (handler, timeout) => {
       return setInterval(handler, timeout)
+    },
+    watch: (source, callback) => {
+      watch(source, callback)
     }
   })
 
@@ -90,6 +93,23 @@ test('Test that createUseDialogProjectSettingsWorldsDeleteConfirm blocks early c
 
   api.onMenuHide()
   expect(api.secondsRemaining.value).toBe(confirmDelaySec)
+
+  runUnmountHooks()
+})
+
+/**
+ * createUseDialogProjectSettingsWorldsDeleteConfirm
+ * Starts the countdown when menuOpen becomes true.
+ */
+test('Test that createUseDialogProjectSettingsWorldsDeleteConfirm starts countdown when menu opens', async () => {
+  const { api, runUnmountHooks } = createTestUseDialogProjectSettingsWorldsDeleteConfirm()
+
+  api.menuOpen.value = true
+  await nextTick()
+  expect(api.secondsRemaining.value).toBe(confirmDelaySec)
+
+  vi.advanceTimersByTime(1000)
+  expect(api.secondsRemaining.value).toBe(4)
 
   runUnmountHooks()
 })

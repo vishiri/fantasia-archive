@@ -1,0 +1,197 @@
+import { beforeEach, expect, test, vi } from 'vitest'
+
+const {
+  listDocumentTemplatesForProjectSettingsMock,
+  saveDocumentTemplatesSnapshotMock
+} = vi.hoisted(() => {
+  return {
+    listDocumentTemplatesForProjectSettingsMock: vi.fn(async () => ({
+      items: [
+        {
+          createdAtMs: 1,
+          displayName: 'Character',
+          documentCount: 0,
+          icon: 'mdi-account',
+          id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+          sortOrder: 0,
+          updatedAtMs: 1,
+          worldAppendix: 'Notes'
+        }
+      ]
+    })),
+    saveDocumentTemplatesSnapshotMock: vi.fn(async () => undefined)
+  }
+})
+
+beforeEach(() => {
+  listDocumentTemplatesForProjectSettingsMock.mockReset()
+  listDocumentTemplatesForProjectSettingsMock.mockResolvedValue({
+    items: [
+      {
+        createdAtMs: 1,
+        displayName: 'Character',
+        documentCount: 0,
+        icon: 'mdi-account',
+        id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+        sortOrder: 0,
+        updatedAtMs: 1,
+        worldAppendix: 'Notes'
+      }
+    ]
+  })
+  saveDocumentTemplatesSnapshotMock.mockReset()
+  saveDocumentTemplatesSnapshotMock.mockResolvedValue(undefined)
+
+  Object.defineProperty(globalThis, 'window', {
+    value: {
+      faContentBridgeAPIs: {
+        projectContent: {
+          listDocumentTemplatesForProjectSettings: listDocumentTemplatesForProjectSettingsMock,
+          saveDocumentTemplatesSnapshot: saveDocumentTemplatesSnapshotMock
+        }
+      }
+    },
+    configurable: true,
+    writable: true
+  })
+})
+
+/**
+ * faProjectDocumentTemplatesFetchFreshForDialog
+ * Maps bridge rows into Project Settings draft items.
+ */
+test('Test that faProjectDocumentTemplatesFetchFreshForDialog returns mapped draft rows', async () => {
+  const { faProjectDocumentTemplatesFetchFreshForDialog } = await import('../sFaProjectDocumentTemplatesBridge')
+  await expect(faProjectDocumentTemplatesFetchFreshForDialog()).resolves.toEqual([
+    {
+      displayName: 'Character',
+      documentCount: 0,
+      icon: 'mdi-account',
+      id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+      worldAppendix: 'Notes'
+    }
+  ])
+})
+
+/**
+ * faProjectDocumentTemplatesPersistSnapshotFromDialog
+ * Forwards the snapshot payload to the preload bridge.
+ */
+test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog calls saveDocumentTemplatesSnapshot', async () => {
+  const { faProjectDocumentTemplatesPersistSnapshotFromDialog } = await import('../sFaProjectDocumentTemplatesBridge')
+  const items = [
+    {
+      displayName: 'Character',
+      id: '7c9e6679-7425-40de-944b-e07fc1f90ae7'
+    }
+  ]
+  await faProjectDocumentTemplatesPersistSnapshotFromDialog(items)
+  expect(saveDocumentTemplatesSnapshotMock).toHaveBeenCalledWith(items)
+})
+
+/**
+ * faProjectDocumentTemplatesFetchFreshForDialog
+ * Throws bridgeMissing when listDocumentTemplatesForProjectSettings is unavailable.
+ */
+test('Test that faProjectDocumentTemplatesFetchFreshForDialog throws when bridge is missing', async () => {
+  Object.defineProperty(globalThis, 'window', {
+    value: {},
+    configurable: true,
+    writable: true
+  })
+  const { faProjectDocumentTemplatesFetchFreshForDialog } = await import('../sFaProjectDocumentTemplatesBridge')
+  await expect(faProjectDocumentTemplatesFetchFreshForDialog()).rejects.toThrow(
+    'projectContent.listDocumentTemplatesForProjectSettings is unavailable'
+  )
+})
+
+/**
+ * faProjectDocumentTemplatesFetchFreshForDialog
+ * Rethrows Error rejections from listDocumentTemplatesForProjectSettings.
+ */
+test('Test that faProjectDocumentTemplatesFetchFreshForDialog rethrows read failures', async () => {
+  listDocumentTemplatesForProjectSettingsMock.mockRejectedValueOnce(new Error('list failed'))
+  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+  const { faProjectDocumentTemplatesFetchFreshForDialog } = await import('../sFaProjectDocumentTemplatesBridge')
+  await expect(faProjectDocumentTemplatesFetchFreshForDialog()).rejects.toThrow('list failed')
+  errorSpy.mockRestore()
+})
+
+/**
+ * faProjectDocumentTemplatesFetchFreshForDialog
+ * Wraps non-Error rejections in Error instances.
+ */
+test('Test that faProjectDocumentTemplatesFetchFreshForDialog wraps non-Error read failures', async () => {
+  listDocumentTemplatesForProjectSettingsMock.mockRejectedValueOnce('list string failure')
+  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+  const { faProjectDocumentTemplatesFetchFreshForDialog } = await import('../sFaProjectDocumentTemplatesBridge')
+  await expect(faProjectDocumentTemplatesFetchFreshForDialog()).rejects.toThrow(
+    'listDocumentTemplatesForProjectSettings failed'
+  )
+  errorSpy.mockRestore()
+})
+
+/**
+ * faProjectDocumentTemplatesPersistSnapshotFromDialog
+ * Throws when saveDocumentTemplatesSnapshot is unavailable.
+ */
+test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog throws when bridge is missing', async () => {
+  Object.defineProperty(globalThis, 'window', {
+    value: {
+      faContentBridgeAPIs: {
+        projectContent: {
+          listDocumentTemplatesForProjectSettings: listDocumentTemplatesForProjectSettingsMock
+        }
+      }
+    },
+    configurable: true,
+    writable: true
+  })
+  const { faProjectDocumentTemplatesPersistSnapshotFromDialog } = await import('../sFaProjectDocumentTemplatesBridge')
+  await expect(
+    faProjectDocumentTemplatesPersistSnapshotFromDialog([
+      {
+        displayName: 'Character',
+        id: '7c9e6679-7425-40de-944b-e07fc1f90ae7'
+      }
+    ])
+  ).rejects.toThrow('projectContent.saveDocumentTemplatesSnapshot is unavailable')
+})
+
+/**
+ * faProjectDocumentTemplatesPersistSnapshotFromDialog
+ * Rethrows Error rejections from saveDocumentTemplatesSnapshot.
+ */
+test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog rethrows write failures', async () => {
+  saveDocumentTemplatesSnapshotMock.mockRejectedValueOnce(new Error('save failed'))
+  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+  const { faProjectDocumentTemplatesPersistSnapshotFromDialog } = await import('../sFaProjectDocumentTemplatesBridge')
+  await expect(
+    faProjectDocumentTemplatesPersistSnapshotFromDialog([
+      {
+        displayName: 'Character',
+        id: '7c9e6679-7425-40de-944b-e07fc1f90ae7'
+      }
+    ])
+  ).rejects.toThrow('save failed')
+  errorSpy.mockRestore()
+})
+
+/**
+ * faProjectDocumentTemplatesPersistSnapshotFromDialog
+ * Wraps non-Error rejections in Error instances.
+ */
+test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog wraps non-Error write failures', async () => {
+  saveDocumentTemplatesSnapshotMock.mockRejectedValueOnce('save string failure')
+  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+  const { faProjectDocumentTemplatesPersistSnapshotFromDialog } = await import('../sFaProjectDocumentTemplatesBridge')
+  await expect(
+    faProjectDocumentTemplatesPersistSnapshotFromDialog([
+      {
+        displayName: 'Character',
+        id: '7c9e6679-7425-40de-944b-e07fc1f90ae7'
+      }
+    ])
+  ).rejects.toThrow('saveDocumentTemplatesSnapshot failed')
+  errorSpy.mockRestore()
+})

@@ -31,10 +31,21 @@ const selectorList = {
   saveButton: 'dialogProjectSettings-button-save',
   saveErrorsIcon: 'dialogProjectSettings-saveErrorsIcon',
   tabGeneralSettings: 'dialogProjectSettings-tab-generalSettings',
+  tabDocumentTemplatesSettings: 'dialogProjectSettings-tab-documentTemplatesSettings',
   tabWorldsSettings: 'dialogProjectSettings-tab-worldsSettings',
   title: 'dialogProjectSettings-title',
   worldsAddButton: 'dialogProjectSettings-worlds-addButton',
-  worldsList: 'dialogProjectSettings-worlds-list'
+  worldsList: 'dialogProjectSettings-worlds-list',
+  documentTemplatesAddButton: 'dialogProjectSettings-documentTemplates-addButton',
+  documentTemplatesAddFirstButton: 'dialogProjectSettings-documentTemplates-addFirstButton',
+  documentTemplatesDeleteConfirmCountdown: 'dialogProjectSettings-documentTemplates-deleteConfirmCountdown',
+  documentTemplatesEmptyState: 'dialogProjectSettings-documentTemplates-emptyState',
+  documentTemplatesIconInput: 'dialogProjectSettings-documentTemplates-iconInput',
+  documentTemplatesList: 'dialogProjectSettings-documentTemplates-list',
+  documentTemplatesNameInput: 'dialogProjectSettings-documentTemplates-nameInput',
+  documentTemplatesRemoveButton: 'dialogProjectSettings-documentTemplates-removeButton',
+  documentTemplatesTab: 'dialogProjectSettings-documentTemplates-tab',
+  documentTemplatesWorldAppendixInput: 'dialogProjectSettings-documentTemplates-worldAppendixInput'
 } as const
 
 const projectSettingsDirectInput: T_dialogName = 'ProjectSettings'
@@ -58,7 +69,8 @@ test.describe.serial('Project settings dialog', () => {
         displayName: 'Component test world',
         documentCount: 0,
         id: componentFixtureWorldId
-      }]
+      }],
+      directDocumentTemplatesSnapshot: []
     })
     const launched = await launchFaPlaywrightComponentHarnessWindow({
       buildLaunchEnv (): Record<string, string> {
@@ -101,6 +113,10 @@ test.describe.serial('Project settings dialog', () => {
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.tabWorldsSettings}"]`)
     ).toHaveText(L_projectSettings.categories.worldsSettings.title)
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.tabDocumentTemplatesSettings}"]`)
+    ).toHaveText(L_projectSettings.categories.documentTemplatesSettings.title)
 
     const nameInput = appWindow.locator(`[data-test-locator="${selectorList.projectNameInput}"]`)
     await expect(nameInput).toHaveValue(componentFixtureProjectName)
@@ -173,6 +189,47 @@ test.describe.serial('Project settings dialog', () => {
     )
     const expectedTooltip = `${L_projectSettings.saveErrors.tooltipIntro}\n- ${bulletLine}`
     await expect(saveErrorsIcon).toHaveAttribute('data-test-tooltip-text', expectedTooltip)
+  })
+
+  /**
+   * Document Template Settings tab shows centered empty state when no templates exist.
+   */
+  test('Document templates settings tab shows empty state with add-first button', async () => {
+    await appWindow.locator(`[data-test-locator="${selectorList.tabDocumentTemplatesSettings}"]`).click()
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesEmptyState}"]`)
+    ).toBeVisible()
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesList}"]`)
+    ).toHaveCount(0)
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesAddFirstButton}"]`)
+    ).toContainText(L_projectSettings.panels.documentTemplates.addFirstTemplateButton)
+  })
+
+  /**
+   * Add document template exposes detail fields and delete countdown on confirm menu.
+   */
+  test('Document templates tab supports add, edit fields, and delete countdown', async () => {
+    await appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesAddFirstButton}"]`).click()
+
+    const templateTab = appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesTab}"]`).first()
+    await expect(templateTab).toContainText(L_projectSettings.panels.documentTemplates.defaultNewTemplateName)
+
+    const nameInput = appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesNameInput}"]`)
+    await nameInput.fill('Character sheet')
+    await appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesWorldAppendixInput}"]`).fill(' of Eldoria')
+    await appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesIconInput}"]`).fill('mdi-account')
+
+    await expect(nameInput).toHaveValue('Character sheet')
+
+    await appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesRemoveButton}"]`).click()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesDeleteConfirmCountdown}"]`)
+    ).toHaveText('5')
   })
 
   /**

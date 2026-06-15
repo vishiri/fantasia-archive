@@ -1,41 +1,50 @@
-.dialogProjectSettingsWorldsDeleteConfirm.q-menu {
+.dialogProjectSettingsWorldsDeleteConfirm.q-menu,
+.dialogProjectSettingsDocumentTemplatesDeleteConfirm.q-menu {
   /* Teleported q-menu; stack above modal QDialog chrome (same band as FaColorPickerInput). */
   min-width: $dialogProjectSettings-worldsDeleteConfirm-maxWidth;
   z-index: $dialogProjectSettings-worldsDeleteConfirm-menu-zIndex !important;
 }
 
-.dialogProjectSettingsWorldsDeleteConfirm {
+.dialogProjectSettingsWorldsDeleteConfirm,
+.dialogProjectSettingsDocumentTemplatesDeleteConfirm {
   background-color: $dialogProjectSettings-worldsDeleteConfirm-backgroundColor;
   max-width: $dialogProjectSettings-worldsDeleteConfirm-maxWidth;
 }
 
-.dialogProjectSettingsWorldsDeleteConfirm__inner {
+.dialogProjectSettingsWorldsDeleteConfirm__inner,
+.dialogProjectSettingsDocumentTemplatesDeleteConfirm__inner {
   padding:
     $dialogProjectSettings-worldsDeleteConfirm-paddingY
     $dialogProjectSettings-worldsDeleteConfirm-paddingX;
 }
 
-.dialogProjectSettingsWorldsDeleteConfirm__message {
+.dialogProjectSettingsWorldsDeleteConfirm__message,
+.dialogProjectSettingsDocumentTemplatesDeleteConfirm__message {
   margin: 0 0 $dialogProjectSettings-worldsDeleteConfirm-message-marginBottom;
 }
 
-.dialogProjectSettingsWorldsDeleteConfirm__actions {
+.dialogProjectSettingsWorldsDeleteConfirm__actions,
+.dialogProjectSettingsDocumentTemplatesDeleteConfirm__actions {
   display: flex;
   gap: $dialogProjectSettings-worldsDeleteConfirm-actions-gap;
   justify-content: center;
 }
 
-.dialogProjectSettingsWorldsDeleteConfirm__confirmButton .q-btn__content {
+.dialogProjectSettingsWorldsDeleteConfirm__confirmButton .q-btn__content,
+.dialogProjectSettingsDocumentTemplatesDeleteConfirm__confirmButton .q-btn__content {
   position: relative;
 }
 
-.dialogProjectSettingsWorldsDeleteConfirm__confirmButton--countdownActive {
-  .dialogProjectSettingsWorldsDeleteConfirm__confirmLabel {
+.dialogProjectSettingsWorldsDeleteConfirm__confirmButton--countdownActive,
+.dialogProjectSettingsDocumentTemplatesDeleteConfirm__confirmButton--countdownActive {
+  .dialogProjectSettingsWorldsDeleteConfirm__confirmLabel,
+  .dialogProjectSettingsDocumentTemplatesDeleteConfirm__confirmLabel {
     color: transparent;
   }
 }
 
-.dialogProjectSettingsWorldsDeleteConfirm__countdown {
+.dialogProjectSettingsWorldsDeleteConfirm__countdown,
+.dialogProjectSettingsDocumentTemplatesDeleteConfirm__countdown {
   align-items: center;
   display: flex;
   inset: 0;

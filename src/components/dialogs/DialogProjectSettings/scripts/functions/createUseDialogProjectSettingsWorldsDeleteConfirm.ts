@@ -7,6 +7,10 @@ export function createUseDialogProjectSettingsWorldsDeleteConfirm (deps: {
   onUnmounted: (hook: () => void) => void
   ref: <T>(value: T) => I_ref<T>
   setInterval: (handler: () => void, timeout: number) => ReturnType<typeof setInterval>
+  watch: (
+    source: I_ref<boolean>,
+    callback: (isOpen: boolean) => void
+  ) => void
 }): () => {
     closeMenu: () => void
     confirmDeleteDisabled: I_computedRef<boolean>
@@ -69,6 +73,14 @@ export function createUseDialogProjectSettingsWorldsDeleteConfirm (deps: {
     const confirmDeleteDisabled = deps.computed(() => secondsRemaining.value > 0)
 
     const menuOffset = deps.computed(() => [0, 4] as [number, number])
+
+    deps.watch(menuOpen, (isOpen) => {
+      if (isOpen) {
+        startCountdown()
+      } else {
+        resetCountdown()
+      }
+    })
 
     deps.onUnmounted(() => {
       clearCountdownInterval()

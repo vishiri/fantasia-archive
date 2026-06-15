@@ -1,5 +1,11 @@
 @use '../../quasar.variables.scss' as *;
 
+/* faVerticalDraggableTabs — vertical draggable tab column (vue-draggable-plus).
+ * BEM block: faVerticalDraggableTabs; tab rows use __tab, labels __tabLabel.
+ * Column width and tab chrome are overridable via CSS custom properties set from
+ * buildFaVerticalDraggableTabsRootStyle (see types/I_faVerticalDraggableTabs.ts
+ * and .cursor/skills/fantasia-drag-drop/SKILL.md). */
+
 .faVerticalDraggableTabs {
   display: flex;
   flex-direction: column;
@@ -63,15 +69,13 @@
   cursor: $faVerticalDraggableTabs-tab-cursor-default;
   display: flex;
   font: inherit;
-  justify-content: center;
-  min-height: $faVerticalDraggableTabs-tab-minHeight;
+  justify-content: var(--fa-vertical-draggable-tabs-tab-justify-content, flex-start);
+  min-height: var(--fa-vertical-draggable-tabs-tab-min-height, #{$faVerticalDraggableTabs-tab-minHeight});
   min-width: $faVerticalDraggableTabs-tab-content-minWidth;
   overflow: hidden;
-  padding:
-    $faVerticalDraggableTabs-tab-paddingY
-    $faVerticalDraggableTabs-tab-paddingX;
+  padding: var(--fa-vertical-draggable-tabs-tab-padding, #{$faVerticalDraggableTabs-tab-padding-default});
   position: relative;
-  text-align: left;
+  text-align: var(--fa-vertical-draggable-tabs-tab-text-align, left);
   transition:
     background-color $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing,
     color $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing;
@@ -136,11 +140,11 @@
 
 .faVerticalDraggableTabs__tabLabel {
   display: block;
-  font-size: $faVerticalDraggableTabs-tab-label-fontSize;
+  font-size: var(--fa-vertical-draggable-tabs-tab-label-font-size, #{$faVerticalDraggableTabs-tab-label-fontSize});
   font-weight: $faVerticalDraggableTabs-tab-label-fontWeight;
   line-height: $faVerticalDraggableTabs-tab-label-lineHeight;
-  text-align: center;
-  text-transform: uppercase;
+  text-align: var(--fa-vertical-draggable-tabs-tab-text-align, left);
+  text-transform: var(--fa-vertical-draggable-tabs-tab-label-text-transform, none);
   transition:
     background-color $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing,
     color $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing;

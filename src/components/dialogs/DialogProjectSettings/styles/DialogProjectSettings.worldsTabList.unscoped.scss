@@ -1,8 +1,9 @@
-.faVerticalDraggableTabs.dialogProjectSettingsWorldsTabList {
-  flex: 0 0 $dialogProjectSettings-worldsTabList-width;
-  max-width: $dialogProjectSettings-worldsTabList-width;
-  min-width: $dialogProjectSettings-worldsTabList-width;
-  width: $dialogProjectSettings-worldsTabList-width;
+.faVerticalDraggableTabs.dialogProjectSettingsWorldsTabList,
+.faVerticalDraggableTabs.dialogProjectSettingsDocumentTemplatesTabList {
+  flex: 0 0 var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
+  max-width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
+  min-width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
+  width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
 }
 
 .dialogProjectSettingsWorldsTabItem__colorSwatch {

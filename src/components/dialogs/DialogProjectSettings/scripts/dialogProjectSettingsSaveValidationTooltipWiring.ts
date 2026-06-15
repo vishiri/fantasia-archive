@@ -1,9 +1,12 @@
+import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type {
   I_dialogProjectSettingsSaveValidationError,
   I_dialogProjectSettingsSaveValidationTooltipContent,
   I_dialogProjectSettingsWorldDraft
 } from 'app/types/I_dialogProjectSettingsWorlds'
 
+import { resolveDialogProjectSettingsDocumentTemplateSaveErrorDisplayName } from './functions/dialogProjectSettingsDocumentTemplatesDraft'
+import { collectDialogProjectSettingsFullSaveValidationErrors } from './dialogProjectSettingsDialogSaveValidation'
 import {
   buildDialogProjectSettingsSaveValidationTooltip,
   collectDialogProjectSettingsSaveValidationErrors,
@@ -11,18 +14,32 @@ import {
 } from './functions/dialogProjectSettingsWorldsDraft'
 
 export function createBuildDialogProjectSettingsSaveValidationTooltip (deps: {
+  defaultNewTemplateName: string
   defaultNewWorldName: string
   translate: (key: string, params?: Record<string, string>) => string
 }): (
     projectName: string,
-    worlds: I_dialogProjectSettingsWorldDraft[] | null
+    worlds: I_dialogProjectSettingsWorldDraft[] | null,
+    documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] | null
   ) => I_dialogProjectSettingsSaveValidationTooltipContent {
   function resolveErrorMessage (
     error: I_dialogProjectSettingsSaveValidationError,
-    worldsList: I_dialogProjectSettingsWorldDraft[] | null
+    worldsList: I_dialogProjectSettingsWorldDraft[] | null,
+    templatesList: I_dialogProjectSettingsDocumentTemplateDraft[] | null
   ): string {
     if (error.kind === 'projectNameRequired') {
       return deps.translate('dialogs.projectSettings.fields.projectName.errorRequired')
+    }
+    if (error.kind === 'documentTemplateNameRequired') {
+      const templateIndex = error.templateIndexOneBased ?? 1
+      const template = templatesList?.[templateIndex - 1]
+      const templateLabel = resolveDialogProjectSettingsDocumentTemplateSaveErrorDisplayName(
+        template?.displayName ?? '',
+        deps.defaultNewTemplateName
+      )
+      return deps.translate('dialogs.projectSettings.saveErrors.bulletDocumentTemplateNameRequired', {
+        templateLabel
+      })
     }
     const worldIndex = error.worldIndexOneBased ?? 1
     const world = worldsList?.[worldIndex - 1]
@@ -42,14 +59,23 @@ export function createBuildDialogProjectSettingsSaveValidationTooltip (deps: {
 
   return function buildDialogProjectSettingsSaveValidationTooltipForDraft (
     projectName: string,
-    worlds: I_dialogProjectSettingsWorldDraft[] | null
+    worlds: I_dialogProjectSettingsWorldDraft[] | null,
+    documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] | null
   ): I_dialogProjectSettingsSaveValidationTooltipContent {
-    const errors = collectDialogProjectSettingsSaveValidationErrors(projectName, worlds)
+    const errors = collectDialogProjectSettingsFullSaveValidationErrors(
+      projectName,
+      worlds,
+      documentTemplates
+    )
     const introLine = deps.translate('dialogs.projectSettings.saveErrors.tooltipIntro')
     return buildDialogProjectSettingsSaveValidationTooltip(
       errors,
       introLine,
-      (error) => resolveErrorMessage(error, worlds)
+      (error) => resolveErrorMessage(error, worlds, documentTemplates)
     )
   }
+}
+
+export {
+  collectDialogProjectSettingsSaveValidationErrors
 }

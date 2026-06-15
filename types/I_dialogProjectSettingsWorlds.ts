@@ -208,6 +208,7 @@ export interface I_dialogProjectSettingsWorldColorPaletteTooltipContent {
 
 /** Save-blocking validation error kinds for Project Settings. */
 export type T_dialogProjectSettingsSaveValidationErrorKind =
+  | 'documentTemplateNameRequired'
   | 'duplicatePaletteColors'
   | 'projectNameRequired'
   | 'worldNameRequired'
@@ -215,5 +216,6 @@ export type T_dialogProjectSettingsSaveValidationErrorKind =
 /** One ordered save-validation error in the Project Settings draft. */
 export interface I_dialogProjectSettingsSaveValidationError {
   kind: T_dialogProjectSettingsSaveValidationErrorKind
+  templateIndexOneBased?: number
   worldIndexOneBased?: number
 }

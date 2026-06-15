@@ -1,0 +1,14 @@
+.dialogProjectSettingsDocumentTemplatesTabItem__worldAppendix {
+  color: $dialogProjectSettings-documentTemplatesTabWorldAppendix-color;
+  display: block;
+  font-size: calc(var(--fa-vertical-draggable-tabs-tab-label-font-size, #{$faVerticalDraggableTabs-tab-label-fontSize}) - 2px);
+  font-style: italic;
+  font-weight: 400;
+  line-height: $faVerticalDraggableTabs-tab-label-lineHeight;
+  margin-top: -0.5em;
+  text-align: var(--fa-vertical-draggable-tabs-tab-text-align, left);
+  transition:
+    background-color $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing,
+    color $faVerticalDraggableTabs-transition-duration $faVerticalDraggableTabs-transition-timing;
+  user-select: none;
+}

@@ -23,8 +23,6 @@
       self="top middle"
       transition-hide="fade"
       transition-show="fade"
-      @hide="onMenuHide"
-      @show="onMenuShow"
     >
       <div class="dialogProjectSettingsWorldsDeleteConfirm__inner">
         <p
@@ -82,8 +80,6 @@ const {
   confirmDeleteDisabled,
   menuOffset,
   menuOpen,
-  onMenuHide,
-  onMenuShow,
   onConfirmDelete,
   secondsRemaining
 } = useDialogProjectSettingsWorldsDeleteConfirm()

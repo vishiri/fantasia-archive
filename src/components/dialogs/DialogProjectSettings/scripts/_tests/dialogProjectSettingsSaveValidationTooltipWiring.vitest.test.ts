@@ -1,7 +1,10 @@
 import { expect, test, vi } from 'vitest'
 
 import { createBuildDialogProjectSettingsSaveValidationTooltip } from '../dialogProjectSettingsSaveValidationTooltipWiring'
-import * as dialogProjectSettingsWorldsDraft from '../functions/dialogProjectSettingsWorldsDraft'
+import * as dialogProjectSettingsDialogSaveValidation from '../dialogProjectSettingsDialogSaveValidation'
+
+const defaultTemplateName = 'New document template'
+const defaultWorldName = 'New world'
 
 /**
  * createBuildDialogProjectSettingsSaveValidationTooltip
@@ -9,7 +12,8 @@ import * as dialogProjectSettingsWorldsDraft from '../functions/dialogProjectSet
  */
 test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds duplicate palette tooltip', () => {
   const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewWorldName: 'New world',
+    defaultNewTemplateName: defaultTemplateName,
+    defaultNewWorldName: defaultWorldName,
     translate: (key, params) => {
       if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
         return 'Unable to save, following errors found:'
@@ -29,7 +33,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds dup
       documentCount: 0,
       id: '550e8400-e29b-41d4-a716-446655440000'
     }
-  ])
+  ], [])
 
   expect(tooltip.intro).toBe('Unable to save, following errors found:')
   expect(tooltip.bullets).toEqual([
@@ -47,7 +51,8 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds dup
  */
 test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds world name tooltip', () => {
   const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewWorldName: 'New world',
+    defaultNewTemplateName: defaultTemplateName,
+    defaultNewWorldName: defaultWorldName,
     translate: (key, params) => {
       if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
         return 'Unable to save, following errors found:'
@@ -67,7 +72,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds wor
       documentCount: 0,
       id: '550e8400-e29b-41d4-a716-446655440000'
     }
-  ])
+  ], [])
 
   expect(tooltip.bullets).toEqual([
     '- World name is required for "New world".'
@@ -80,7 +85,8 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds wor
  */
 test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds project name tooltip', () => {
   const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewWorldName: 'New world',
+    defaultNewTemplateName: defaultTemplateName,
+    defaultNewWorldName: defaultWorldName,
     translate: (key) => {
       if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
         return 'Unable to save, following errors found:'
@@ -100,10 +106,44 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds pro
       documentCount: 0,
       id: '550e8400-e29b-41d4-a716-446655440000'
     }
-  ])
+  ], [])
 
   expect(tooltip.bullets).toEqual([
     '- Project name is required.'
+  ])
+})
+
+/**
+ * createBuildDialogProjectSettingsSaveValidationTooltip
+ * Resolves document template name bullets with template labels.
+ */
+test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds document template name tooltip', () => {
+  const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
+    defaultNewTemplateName: defaultTemplateName,
+    defaultNewWorldName: defaultWorldName,
+    translate: (key, params) => {
+      if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
+        return 'Unable to save, following errors found:'
+      }
+      if (key === 'dialogs.projectSettings.saveErrors.bulletDocumentTemplateNameRequired') {
+        return `Document template name is required for "${params?.templateLabel ?? ''}".`
+      }
+      return key
+    }
+  })
+
+  const tooltip = buildTooltip('Project', [], [
+    {
+      displayName: '   ',
+      documentCount: 0,
+      icon: '',
+      id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+      worldAppendix: ''
+    }
+  ])
+
+  expect(tooltip.bullets).toEqual([
+    '- Document template name is required for "New document template".'
   ])
 })
 
@@ -113,15 +153,16 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds pro
  */
 test('Test that createBuildDialogProjectSettingsSaveValidationTooltip falls back when worlds list is missing', () => {
   const collectSpy = vi.spyOn(
-    dialogProjectSettingsWorldsDraft,
-    'collectDialogProjectSettingsSaveValidationErrors'
+    dialogProjectSettingsDialogSaveValidation,
+    'collectDialogProjectSettingsFullSaveValidationErrors'
   ).mockReturnValue([
     {
       kind: 'worldNameRequired'
     }
   ])
   const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewWorldName: 'New world',
+    defaultNewTemplateName: defaultTemplateName,
+    defaultNewWorldName: defaultWorldName,
     translate: (key, params) => {
       if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
         return 'Unable to save, following errors found:'
@@ -133,10 +174,45 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip falls back
     }
   })
 
-  const tooltip = buildTooltip('Project', null)
+  const tooltip = buildTooltip('Project', null, [])
 
   expect(tooltip.bullets).toEqual([
     '- World name is required for "New world".'
+  ])
+  collectSpy.mockRestore()
+})
+
+/**
+ * createBuildDialogProjectSettingsSaveValidationTooltip
+ * Falls back to the default template label when the templates list is unavailable.
+ */
+test('Test that createBuildDialogProjectSettingsSaveValidationTooltip falls back when templates list is missing', () => {
+  const collectSpy = vi.spyOn(
+    dialogProjectSettingsDialogSaveValidation,
+    'collectDialogProjectSettingsFullSaveValidationErrors'
+  ).mockReturnValue([
+    {
+      kind: 'documentTemplateNameRequired'
+    }
+  ])
+  const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
+    defaultNewTemplateName: defaultTemplateName,
+    defaultNewWorldName: defaultWorldName,
+    translate: (key, params) => {
+      if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
+        return 'Unable to save, following errors found:'
+      }
+      if (key === 'dialogs.projectSettings.saveErrors.bulletDocumentTemplateNameRequired') {
+        return `Document template name is required for "${params?.templateLabel ?? ''}".`
+      }
+      return key
+    }
+  })
+
+  const tooltip = buildTooltip('Project', [], null)
+
+  expect(tooltip.bullets).toEqual([
+    '- Document template name is required for "New document template".'
   ])
   collectSpy.mockRestore()
 })

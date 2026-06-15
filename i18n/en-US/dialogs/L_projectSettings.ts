@@ -3,16 +3,20 @@ export default {
   closeButton: 'Close without saving',
   saveButton: 'Save settings',
   saveErrors: {
-    tooltipIntro: 'Unable to save, following errors found:',
+    tooltipIntro: 'Unable to save. The following errors were found:',
     bulletWorldNameRequired: 'World name is required for "{worldLabel}".',
-    bulletDuplicatePalette: 'Duplicate colors found in palette of "{worldLabel}".'
+    bulletDuplicatePalette: 'Duplicate colors found in palette of "{worldLabel}".',
+    bulletDocumentTemplateNameRequired: 'Document template name is required for "{templateLabel}".'
   },
   categories: {
     generalSettings: {
       title: 'General settings'
     },
     worldsSettings: {
-      title: 'Worlds settings'
+      title: 'Worlds'
+    },
+    documentTemplatesSettings: {
+      title: 'Document Templates'
     }
   },
   fields: {
@@ -29,7 +33,7 @@ export default {
     worldColor: {
       title: 'Color',
       label: 'World color',
-      tooltip: 'This color determines how your world will be colored at various places around the project - Icons, texts, etc.'
+      tooltip: 'This color determines how your world appears in various places around the project—icons, text, and similar UI.'
     },
     worldColorPalette: {
       label: 'World color palette',
@@ -42,6 +46,20 @@ export default {
         duplicateColor: 'Duplicate color',
         deleteColor: 'Delete color'
       }
+    },
+    documentTemplateName: {
+      title: 'Document template name',
+      label: 'Document template name',
+      errorRequired: 'Document template name is required.'
+    },
+    documentTemplateWorldAppendix: {
+      title: 'World appendix',
+      label: 'World appendix',
+      tooltip: 'World appendix is a short, unique description for your document template when it is paired with individual worlds. This prevents confusion when multiple document templates share the same name across worlds. The appendix helps you tell them apart at a glance. This field appears only on the world tab when pairing templates to worlds, nowhere else.'
+    },
+    documentTemplateIcon: {
+      title: 'Icon',
+      label: 'Icon'
     }
   },
   panels: {
@@ -52,10 +70,22 @@ export default {
       deleteWorldButton: 'Delete world',
       deleteConfirm: {
         confirmDeleteButton: 'Confirm delete',
-        message: 'Are you sure you want to delete this world? Documents and settings linked to it cannot be recovered afterwards - They will be lost forever.'
+        message: 'Are you sure you want to delete this world? Documents and settings linked to it cannot be recovered afterwards. They will be lost forever.'
       },
       removeDisabledHasDocuments: 'Remove documents from this world before deleting it.',
       removeDisabledLastWorld: 'A project must have at least one world at all times. Create another first to delete this one.'
+    },
+    documentTemplates: {
+      title: 'Document Templates',
+      addFirstTemplateButton: 'Add your first template',
+      addTemplateButton: 'Add document template',
+      defaultNewTemplateName: 'New document template',
+      deleteTemplateButton: 'Delete Template',
+      deleteConfirm: {
+        confirmDeleteButton: 'Confirm delete',
+        message: 'Are you sure you want to delete this document template? All fields connected to this template in any other template will stop working. Also, all connected documents will stop showing their data if any were filled using this template. This deletion might have unintended side effects.'
+      },
+      removeDisabledHasDocuments: 'Remove documents using this template before deleting it.'
     }
   }
 }

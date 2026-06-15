@@ -19,6 +19,7 @@
       <q-card-section class="dialogProjectSettings__body column no-wrap q-pa-none">
         <DialogProjectSettingsTabBar
           v-model:selected-category-tab="selectedCategoryTab"
+          :document-templates-tab-has-error="hasDocumentTemplatesSettingsValidationError"
           :general-tab-has-error="hasGeneralSettingsValidationError"
           :worlds-tab-has-error="hasWorldsSettingsValidationError"
         />
@@ -26,14 +27,21 @@
         <DialogProjectSettingsPanelsColumn
           v-if="localSettings !== null"
           class="col"
+          :document-templates="localDocumentTemplates"
           :project-name="localSettings.projectName"
           :project-name-has-error="hasGeneralSettingsValidationError"
           :selected-category-tab="selectedCategoryTab"
           :worlds="localWorlds"
+          @add-document-template="addDocumentTemplate"
           @add-world="addWorld"
+          @remove-document-template="removeDocumentTemplate"
           @remove-world="removeWorld"
+          @update:document-templates="updateDocumentTemplatesOrder"
           @update:project-name="updateProjectName"
           @update:worlds="updateWorldsOrder"
+          @update-document-template-display-name="updateDocumentTemplateDisplayName"
+          @update-document-template-icon="updateDocumentTemplateIcon"
+          @update-document-template-world-appendix="updateDocumentTemplateWorldAppendix"
           @update-world-color="updateWorldColor"
           @update-world-color-pallete="updateWorldColorPallete"
           @update-world-display-name="updateWorldDisplayName"
@@ -100,6 +108,7 @@
 <script setup lang="ts">
 import type { I_faProjectSettingsRoot } from 'app/types/I_faProjectSettingsDomain'
 import type { I_dialogProjectSettingsProps } from 'app/types/I_dialogProjectSettings'
+import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import DialogProjectSettingsTabBar from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsTabBar.vue'
 import DialogProjectSettingsPanelsColumn from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsPanelsColumn.vue'
@@ -112,18 +121,25 @@ defineOptions({
 const props = defineProps<I_dialogProjectSettingsProps>()
 
 const {
+  addDocumentTemplate,
   addWorld,
   dialogModel,
   documentName,
+  hasDocumentTemplatesSettingsValidationError,
   hasGeneralSettingsValidationError,
   hasWorldsSettingsValidationError,
   isSaveDisabled,
+  localDocumentTemplates,
   localSettings,
   localWorlds,
+  removeDocumentTemplate,
   removeWorld,
   saveAndCloseDialog,
   saveValidationErrorsTooltip,
   selectedCategoryTab,
+  updateDocumentTemplateDisplayName,
+  updateDocumentTemplateIcon,
+  updateDocumentTemplateWorldAppendix,
   updateWorldColor,
   updateWorldColorPallete,
   updateWorldDisplayName
@@ -144,6 +160,12 @@ function updateProjectName (value: string): void {
 
 function updateWorldsOrder (worlds: I_dialogProjectSettingsWorldDraft[]): void {
   localWorlds.value = worlds.map((world) => ({ ...world }))
+}
+
+function updateDocumentTemplatesOrder (
+  templates: I_dialogProjectSettingsDocumentTemplateDraft[]
+): void {
+  localDocumentTemplates.value = templates.map((template) => ({ ...template }))
 }
 </script>
 

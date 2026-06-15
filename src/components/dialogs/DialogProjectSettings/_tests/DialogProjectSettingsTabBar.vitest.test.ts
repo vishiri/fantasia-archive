@@ -5,6 +5,7 @@ import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
 
 import {
+  FA_DIALOG_PROJECT_SETTINGS_DOCUMENT_TEMPLATES_TAB,
   FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB,
   FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB
 } from '../scripts/functions/dialogProjectSettingsDialogInput'
@@ -29,6 +30,7 @@ const qTabsStub = defineComponent({
 test('Test that DialogProjectSettingsTabBar renders the general settings tab', async () => {
   const w = mount(DialogProjectSettingsTabBar, {
     props: {
+      documentTemplatesTabHasError: false,
       generalTabHasError: false,
       selectedCategoryTab: FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB,
       worldsTabHasError: false
@@ -50,6 +52,7 @@ test('Test that DialogProjectSettingsTabBar renders the general settings tab', a
 
   expect(w.find('[data-test-locator="dialogProjectSettings-tab-generalSettings"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="dialogProjectSettings-tab-worldsSettings"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="dialogProjectSettings-tab-documentTemplatesSettings"]').exists()).toBe(true)
 
   const tabs = w.findComponent(qTabsStub)
   await tabs.vm.$emit('update:modelValue', FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB)
@@ -59,6 +62,10 @@ test('Test that DialogProjectSettingsTabBar renders the general settings tab', a
   await tabs.vm.$emit('update:modelValue', FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB)
 
   expect(w.emitted('update:selectedCategoryTab')?.[1]).toEqual([FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB])
+
+  await tabs.vm.$emit('update:modelValue', FA_DIALOG_PROJECT_SETTINGS_DOCUMENT_TEMPLATES_TAB)
+
+  expect(w.emitted('update:selectedCategoryTab')?.[2]).toEqual([FA_DIALOG_PROJECT_SETTINGS_DOCUMENT_TEMPLATES_TAB])
 })
 
 /**
@@ -68,6 +75,7 @@ test('Test that DialogProjectSettingsTabBar renders the general settings tab', a
 test('Test that DialogProjectSettingsTabBar marks the general settings tab on project name errors', () => {
   const w = mount(DialogProjectSettingsTabBar, {
     props: {
+      documentTemplatesTabHasError: false,
       generalTabHasError: true,
       selectedCategoryTab: FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB,
       worldsTabHasError: false

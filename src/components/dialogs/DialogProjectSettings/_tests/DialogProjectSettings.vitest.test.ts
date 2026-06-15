@@ -186,6 +186,7 @@ test('Test that DialogProjectSettings save button persists and closes the dialog
   await flushPromises()
 
   expect(runFaActionAwait).toHaveBeenCalledWith('saveProjectSettings', {
+    documentTemplates: [],
     settings: {
       projectName: 'Snapshot Name'
     },

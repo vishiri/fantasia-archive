@@ -18,10 +18,15 @@ test('Test that useDialogProjectSettings validation computeds tolerate null draf
     }),
     computed,
     createDialogProjectSettingsDialogActions: () => ({
+      addDocumentTemplate: vi.fn(),
       addWorld: vi.fn(),
       openDialog: vi.fn(),
+      removeDocumentTemplate: vi.fn(),
       removeWorld: vi.fn(),
       saveAndCloseDialog: vi.fn(async () => undefined),
+      updateDocumentTemplateDisplayName: vi.fn(),
+      updateDocumentTemplateIcon: vi.fn(),
+      updateDocumentTemplateWorldAppendix: vi.fn(),
       updateWorldColor: vi.fn(),
       updateWorldColorPallete: vi.fn(),
       updateWorldDisplayName: vi.fn()
@@ -29,13 +34,15 @@ test('Test that useDialogProjectSettings validation computeds tolerate null draf
     createDialogProjectSettingsRefs: () => ({
       dialogModel: ref(false),
       documentName: ref(''),
+      localDocumentTemplates: ref(null),
       localSettings: ref(null),
       localWorlds: ref(null),
       selectedCategoryTab: ref('generalSettings')
     }),
+    hasDialogProjectSettingsDocumentTemplateNameValidationError: () => true,
     hasDialogProjectSettingsWorldColorPalleteValidationError: () => false,
     hasDialogProjectSettingsWorldNameValidationError: () => false,
-    isDialogProjectSettingsDialogSaveDisabled: () => true,
+    isDialogProjectSettingsFullDialogSaveDisabled: () => true,
     isDialogProjectSettingsProjectNameInvalid: (name) => name.trim().length === 0,
     registerComponentDialogStackGuard: vi.fn(),
     registerDialogProjectSettingsWatchers: vi.fn()
@@ -46,6 +53,7 @@ test('Test that useDialogProjectSettings validation computeds tolerate null draf
 
   expect(api.hasGeneralSettingsValidationError.value).toBe(true)
   expect(api.hasWorldsSettingsValidationError.value).toBe(false)
+  expect(api.hasDocumentTemplatesSettingsValidationError.value).toBe(true)
   expect(api.isSaveDisabled.value).toBe(true)
   expect(api.saveValidationErrorsTooltip.value.flatText).toBe('')
 })
