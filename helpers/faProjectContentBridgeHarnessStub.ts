@@ -27,6 +27,15 @@ function stubWorldForSettings () {
   }
 }
 
+function stubDocumentTemplate () {
+  return {
+    ...stubNamedEntity(),
+    icon: '',
+    sortOrder: 0,
+    worldAppendix: ''
+  }
+}
+
 function stubDocument () {
   return {
     ...stubNamedEntity(),
@@ -43,7 +52,7 @@ export function createFaProjectContentBridgeHarnessStub (): I_faProjectContentAP
   const noop = async () => undefined
   return {
     createDocument: async () => stubDocument(),
-    createDocumentTemplate: async () => stubNamedEntity(),
+    createDocumentTemplate: async () => stubDocumentTemplate(),
     createMedia: async () => stubNamedEntity(),
     createWorld: async () => stubWorld(),
     deleteDocument: noop,
@@ -51,26 +60,28 @@ export function createFaProjectContentBridgeHarnessStub (): I_faProjectContentAP
     deleteMedia: noop,
     deleteWorld: noop,
     getDocumentById: async () => stubDocument(),
-    getDocumentTemplateById: async () => stubNamedEntity(),
+    getDocumentTemplateById: async () => stubDocumentTemplate(),
     getMediaById: async () => stubNamedEntity(),
     getWorldById: async () => stubWorld(),
     linkDocumentMedia: noop,
     linkWorldDocumentTemplate: noop,
     listDocumentMedia: emptyList,
+    listDocumentTemplates: emptyList,
+    listDocumentTemplatesForProjectSettings: async () => ({ items: [] }),
     listDocumentTemplatesForWorld: emptyList,
     listDocuments: emptyList,
-    listDocumentTemplates: emptyList,
     listMedia: emptyList,
     listWorlds: emptyList,
     listWorldsForProjectSettings: async () => ({ items: [stubWorldForSettings()] }),
     listWorldsForDocumentTemplate: emptyList,
+    saveDocumentTemplatesSnapshot: noop,
     saveWorldsSnapshot: noop,
     setDocumentTemplate: async () => stubDocument(),
     setDocumentWorld: async () => stubDocument(),
     unlinkDocumentMedia: noop,
     unlinkWorldDocumentTemplate: noop,
     updateDocument: async () => stubDocument(),
-    updateDocumentTemplate: async () => stubNamedEntity(),
+    updateDocumentTemplate: async () => stubDocumentTemplate(),
     updateMedia: async () => stubNamedEntity(),
     updateWorld: async () => stubWorld()
   }

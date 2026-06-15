@@ -17,6 +17,18 @@ export const FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH = 2000
 /** Default worlds.color_pallete when inserting worlds without an override. */
 export const FA_PROJECT_WORLD_DEFAULT_COLOR_PALETTE = ''
 
+/** Max stored length for document_templates.world_appendix. */
+export const FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_MAX_LENGTH = 500
+
+/** Max stored length for document_templates.icon (icon name string). */
+export const FA_PROJECT_DOCUMENT_TEMPLATE_ICON_MAX_LENGTH = 128
+
+/** Default document_templates.world_appendix when inserting without an override. */
+export const FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_WORLD_APPENDIX = ''
+
+/** Default document_templates.icon when inserting without an override. */
+export const FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_ICON = ''
+
 /**
  * Creates the project_data KV table (schema version 1). Idempotent when the table already exists.
  */
@@ -49,6 +61,11 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_WORLDS} (
 CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES} (
   id TEXT NOT NULL PRIMARY KEY,
   display_name TEXT NOT NULL CHECK (length(display_name) > 0),
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  world_appendix TEXT NOT NULL DEFAULT '${FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_WORLD_APPENDIX}'
+  CHECK (length(world_appendix) <= ${FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_MAX_LENGTH}),
+  icon TEXT NOT NULL DEFAULT '${FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_ICON}'
+  CHECK (length(icon) <= ${FA_PROJECT_DOCUMENT_TEMPLATE_ICON_MAX_LENGTH}),
   created_at_ms INTEGER NOT NULL,
   updated_at_ms INTEGER NOT NULL
 );
@@ -87,5 +104,7 @@ CREATE INDEX IF NOT EXISTS idx_document_media_media_id ON ${FA_PROJECT_TABLE_DOC
 CREATE INDEX IF NOT EXISTS idx_world_document_templates_document_template_id
   ON ${FA_PROJECT_TABLE_WORLD_DOCUMENT_TEMPLATES}(document_template_id);
 CREATE INDEX IF NOT EXISTS idx_worlds_sort_order ON ${FA_PROJECT_TABLE_WORLDS}(sort_order);
+CREATE INDEX IF NOT EXISTS idx_document_templates_sort_order
+  ON ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES}(sort_order);
 `)
 }

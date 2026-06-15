@@ -2,11 +2,11 @@ import { ipcMain } from 'electron'
 
 import {
   wireFaProjectContentDocumentIpcHandlers,
-  wireFaProjectContentDocumentTemplateIpcHandlers,
   wireFaProjectContentMediaIpcHandlers,
   wireFaProjectContentMediaLinkIpcHandlers,
   wireFaProjectContentWorldIpcHandlers
 } from './registerFaProjectContentIpcHandlersWiring'
+import { wireFaProjectContentDocumentTemplateIpcHandlers } from './registerFaProjectContentDocumentTemplateIpcHandlersWiring'
 import { wireFaProjectContentWorldDocumentTemplateLinkIpcHandlers } from './registerFaProjectContentWorldDocumentTemplateLinkIpcHandlersWiring'
 
 let registered = false

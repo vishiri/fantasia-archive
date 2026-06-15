@@ -1,21 +1,39 @@
 import { z } from 'zod'
 
 import {
+  FA_PROJECT_DOCUMENT_TEMPLATE_ICON_MAX_LENGTH,
+  FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_MAX_LENGTH
+} from 'app/src-electron/mainScripts/projectManagement/functions/faProjectDbSchemaDdl'
+import {
   faProjectContentDisplayNameSchema,
   faProjectContentIdSchema,
   parseFaProjectContentPlainRecord
 } from 'app/src-electron/shared/faProjectContentSchemaShared'
 import type {
   I_faProjectDocumentTemplateCreateInput,
-  I_faProjectDocumentTemplatePatch
+  I_faProjectDocumentTemplatePatch,
+  I_faProjectDocumentTemplateSnapshotItem
 } from 'app/types/I_faProjectDocumentTemplateDomain'
 
+const faProjectDocumentTemplateWorldAppendixSchema = z.string().max(
+  FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_MAX_LENGTH
+)
+
+const faProjectDocumentTemplateIconSchema = z.string().max(
+  FA_PROJECT_DOCUMENT_TEMPLATE_ICON_MAX_LENGTH
+)
+
 export const faProjectDocumentTemplateCreateInputSchema = z.object({
-  displayName: faProjectContentDisplayNameSchema
+  displayName: faProjectContentDisplayNameSchema,
+  icon: faProjectDocumentTemplateIconSchema.optional(),
+  worldAppendix: faProjectDocumentTemplateWorldAppendixSchema.optional()
 }).strict()
 
 export const faProjectDocumentTemplatePatchSchema = z.object({
-  displayName: faProjectContentDisplayNameSchema.optional()
+  displayName: faProjectContentDisplayNameSchema.optional(),
+  icon: faProjectDocumentTemplateIconSchema.optional(),
+  sortOrder: z.number().int().nonnegative().optional(),
+  worldAppendix: faProjectDocumentTemplateWorldAppendixSchema.optional()
 }).strict()
 
 export const faProjectDocumentTemplateIdPayloadSchema = z.object({
@@ -53,4 +71,24 @@ export function parseFaProjectDocumentTemplateUpdatePayload (
   return faProjectDocumentTemplateUpdatePayloadSchema.parse(
     parseFaProjectContentPlainRecord(payload)
   )
+}
+
+export const faProjectDocumentTemplateSnapshotItemSchema = z.object({
+  displayName: faProjectContentDisplayNameSchema,
+  icon: faProjectDocumentTemplateIconSchema.optional(),
+  id: faProjectContentIdSchema,
+  worldAppendix: faProjectDocumentTemplateWorldAppendixSchema.optional()
+}).strict()
+
+export const faProjectDocumentTemplatesSnapshotPayloadSchema = z.object({
+  items: z.array(faProjectDocumentTemplateSnapshotItemSchema)
+}).strict()
+
+export function parseFaProjectDocumentTemplatesSnapshotPayload (
+  payload: unknown
+): I_faProjectDocumentTemplateSnapshotItem[] {
+  const parsed = faProjectDocumentTemplatesSnapshotPayloadSchema.parse(
+    parseFaProjectContentPlainRecord(payload)
+  )
+  return parsed.items
 }

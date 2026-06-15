@@ -21,6 +21,7 @@ import {
   parseFaProjectDocumentTemplateCreateInput,
   parseFaProjectDocumentTemplateIdPayload,
   parseFaProjectDocumentTemplatePatch,
+  parseFaProjectDocumentTemplatesSnapshotPayload,
   parseFaProjectDocumentTemplateUpdatePayload
 } from '../faProjectDocumentTemplateContentSchema'
 import {
@@ -116,6 +117,16 @@ test('Test that project content schema parsers accept valid payloads', () => {
       {
         displayName: 'Realm',
         id: SAMPLE_UUID
+      }
+    ]
+  })).toHaveLength(1)
+  expect(parseFaProjectDocumentTemplatesSnapshotPayload({
+    items: [
+      {
+        displayName: 'Character',
+        icon: 'person',
+        id: SAMPLE_UUID,
+        worldAppendix: ' notes'
       }
     ]
   })).toHaveLength(1)

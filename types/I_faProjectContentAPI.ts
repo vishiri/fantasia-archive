@@ -1,3 +1,4 @@
+import type { I_faProjectDocumentTemplatesForProjectSettingsResult } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_faProjectWorldsForProjectSettingsResult } from 'app/types/I_dialogProjectSettingsWorlds'
 import type {
   I_faProjectDocument,
@@ -10,7 +11,8 @@ import type {
   I_faProjectDocumentTemplate,
   I_faProjectDocumentTemplateCreateInput,
   I_faProjectDocumentTemplateListResult,
-  I_faProjectDocumentTemplatePatch
+  I_faProjectDocumentTemplatePatch,
+  I_faProjectDocumentTemplateSnapshotItem
 } from 'app/types/I_faProjectDocumentTemplateDomain'
 import type {
   I_faProjectDocumentMediaListResult,
@@ -58,6 +60,7 @@ export interface I_faProjectContentAPI {
   listDocumentMedia: (documentId: string) => Promise<I_faProjectDocumentMediaListResult>
   listDocuments: (filter?: I_faProjectDocumentListFilter) => Promise<I_faProjectDocumentListResult>
   listDocumentTemplates: () => Promise<I_faProjectDocumentTemplateListResult>
+  listDocumentTemplatesForProjectSettings: () => Promise<I_faProjectDocumentTemplatesForProjectSettingsResult>
   listDocumentTemplatesForWorld: (
     worldId: string
   ) => Promise<I_faProjectWorldDocumentTemplateListResult>
@@ -67,6 +70,7 @@ export interface I_faProjectContentAPI {
   listWorldsForDocumentTemplate: (
     documentTemplateId: string
   ) => Promise<I_faProjectDocumentTemplateWorldListResult>
+  saveDocumentTemplatesSnapshot: (items: I_faProjectDocumentTemplateSnapshotItem[]) => Promise<void>
   saveWorldsSnapshot: (items: I_faProjectWorldSnapshotItem[]) => Promise<void>
   setDocumentTemplate: (input: I_faProjectSetDocumentTemplateInput) => Promise<I_faProjectDocument>
   setDocumentWorld: (input: I_faProjectSetDocumentWorldInput) => Promise<I_faProjectDocument>

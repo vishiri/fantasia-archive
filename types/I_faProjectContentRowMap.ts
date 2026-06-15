@@ -17,6 +17,17 @@ export interface I_faSqlNamedEntityRow {
   updated_at_ms: number
 }
 
+/** SQLite column layout for the document_templates table (v5+). */
+export interface I_faSqlDocumentTemplateRow {
+  id: string
+  display_name: string
+  sort_order: number
+  world_appendix: string
+  icon: string
+  created_at_ms: number
+  updated_at_ms: number
+}
+
 /** SQLite column layout for the project documents table. */
 export interface I_faSqlProjectDocumentRow {
   id: string

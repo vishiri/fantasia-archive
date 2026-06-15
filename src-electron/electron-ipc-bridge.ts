@@ -107,10 +107,13 @@ export const FA_PROJECT_CONTENT_IPC = {
   listDocumentTemplatesForWorldAsync: 'fa-project-content-list-document-templates-for-world-async',
   listDocumentsAsync: 'fa-project-content-list-documents-async',
   listDocumentTemplatesAsync: 'fa-project-content-list-document-templates-async',
+  listDocumentTemplatesForProjectSettingsAsync:
+    'fa-project-content-list-document-templates-for-project-settings-async',
   listMediaAsync: 'fa-project-content-list-media-async',
   listWorldsAsync: 'fa-project-content-list-worlds-async',
   listWorldsForProjectSettingsAsync: 'fa-project-content-list-worlds-for-project-settings-async',
   listWorldsForDocumentTemplateAsync: 'fa-project-content-list-worlds-for-document-template-async',
+  saveDocumentTemplatesSnapshotAsync: 'fa-project-content-save-document-templates-snapshot-async',
   saveWorldsSnapshotAsync: 'fa-project-content-save-worlds-snapshot-async',
   setDocumentTemplateAsync: 'fa-project-content-set-document-template-async',
   setDocumentWorldAsync: 'fa-project-content-set-document-world-async',

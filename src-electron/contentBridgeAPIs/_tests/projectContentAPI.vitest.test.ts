@@ -34,6 +34,13 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
       id: SAMPLE_UUID
     }
   ])
+  await projectContentAPI.listDocumentTemplatesForProjectSettings()
+  await projectContentAPI.saveDocumentTemplatesSnapshot([
+    {
+      displayName: 'Character',
+      id: SAMPLE_UUID_B
+    }
+  ])
 
   await projectContentAPI.createMedia({ displayName: 'Art' })
   await projectContentAPI.updateMedia(SAMPLE_UUID, { displayName: 'Art 2' })
@@ -107,6 +114,21 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
         {
           displayName: 'Realm',
           id: SAMPLE_UUID
+        }
+      ]
+    }
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.listDocumentTemplatesForProjectSettingsAsync,
+    undefined
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.saveDocumentTemplatesSnapshotAsync,
+    {
+      items: [
+        {
+          displayName: 'Character',
+          id: SAMPLE_UUID_B
         }
       ]
     }

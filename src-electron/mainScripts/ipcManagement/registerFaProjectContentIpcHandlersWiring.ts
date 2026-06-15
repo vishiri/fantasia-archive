@@ -12,13 +12,6 @@ import {
   updateFaProjectDocument
 } from 'app/src-electron/mainScripts/projectManagement/projectDbContent/faProjectDocumentsPersistWiring'
 import {
-  createFaProjectDocumentTemplate,
-  deleteFaProjectDocumentTemplate,
-  getFaProjectDocumentTemplateById,
-  listFaProjectDocumentTemplates,
-  updateFaProjectDocumentTemplate
-} from 'app/src-electron/mainScripts/projectManagement/projectDbContent/faProjectDocumentTemplatesPersistWiring'
-import {
   linkFaProjectDocumentMedia,
   listFaProjectMediaForDocument,
   unlinkFaProjectDocumentMedia
@@ -47,11 +40,6 @@ import {
   parseFaProjectSetDocumentTemplatePayload,
   parseFaProjectSetDocumentWorldPayload
 } from 'app/src-electron/shared/faProjectDocumentContentSchema'
-import {
-  parseFaProjectDocumentTemplateCreateInput,
-  parseFaProjectDocumentTemplateIdPayload,
-  parseFaProjectDocumentTemplateUpdatePayload
-} from 'app/src-electron/shared/faProjectDocumentTemplateContentSchema'
 import {
   parseFaProjectDocumentMediaLinkPayload,
   parseFaProjectDocumentIdOnlyPayload
@@ -139,56 +127,6 @@ export function wireFaProjectContentMediaIpcHandlers (ipcMain: IpcMain): void {
   ipcMain.handle(FA_PROJECT_CONTENT_IPC.listMediaAsync, async (event) => {
     return await runFaProjectContentIpcWork(event, (db) => {
       return listFaProjectMedia(db)
-    })
-  })
-}
-
-/**
- * Registers document template CRUD handlers on ipcMain for FA_PROJECT_CONTENT_IPC.
- */
-export function wireFaProjectContentDocumentTemplateIpcHandlers (ipcMain: IpcMain): void {
-  ipcMain.handle(
-    FA_PROJECT_CONTENT_IPC.createDocumentTemplateAsync,
-    async (event, payload) => {
-      return await runFaProjectContentIpcWork(event, (db) => {
-        return createFaProjectDocumentTemplate(
-          db,
-          parseFaProjectDocumentTemplateCreateInput(payload)
-        )
-      })
-    }
-  )
-  ipcMain.handle(
-    FA_PROJECT_CONTENT_IPC.updateDocumentTemplateAsync,
-    async (event, payload) => {
-      return await runFaProjectContentIpcWork(event, (db) => {
-        const parsed = parseFaProjectDocumentTemplateUpdatePayload(payload)
-        return updateFaProjectDocumentTemplate(db, parsed.id, parsed.patch)
-      })
-    }
-  )
-  ipcMain.handle(
-    FA_PROJECT_CONTENT_IPC.deleteDocumentTemplateAsync,
-    async (event, payload) => {
-      return await runFaProjectContentIpcWork(event, (db) => {
-        deleteFaProjectDocumentTemplate(db, parseFaProjectDocumentTemplateIdPayload(payload))
-      })
-    }
-  )
-  ipcMain.handle(
-    FA_PROJECT_CONTENT_IPC.getDocumentTemplateByIdAsync,
-    async (event, payload) => {
-      return await runFaProjectContentIpcWork(event, (db) => {
-        return getFaProjectDocumentTemplateById(
-          db,
-          parseFaProjectDocumentTemplateIdPayload(payload)
-        )
-      })
-    }
-  )
-  ipcMain.handle(FA_PROJECT_CONTENT_IPC.listDocumentTemplatesAsync, async (event) => {
-    return await runFaProjectContentIpcWork(event, (db) => {
-      return listFaProjectDocumentTemplates(db)
     })
   })
 }

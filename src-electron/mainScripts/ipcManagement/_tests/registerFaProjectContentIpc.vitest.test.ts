@@ -53,7 +53,9 @@ vi.mock(
     updateFaProjectDocumentTemplate: vi.fn(() => ({ id: 't' })),
     deleteFaProjectDocumentTemplate: vi.fn(),
     getFaProjectDocumentTemplateById: vi.fn(() => ({ id: 't' })),
-    listFaProjectDocumentTemplates: vi.fn(() => ({ items: [] }))
+    listFaProjectDocumentTemplates: vi.fn(() => ({ items: [] })),
+    listFaProjectDocumentTemplatesForProjectSettings: vi.fn(() => ({ items: [] })),
+    replaceFaProjectDocumentTemplatesSnapshot: vi.fn()
   })
 )
 
@@ -183,6 +185,18 @@ test('Test that every project content IPC handler runs through runWithFaProjectD
   await handlerFor(FA_PROJECT_CONTENT_IPC.getDocumentTemplateByIdAsync)(event, { id: SAMPLE_UUID })
   await handlerFor(FA_PROJECT_CONTENT_IPC.listDocumentTemplatesAsync)(event)
 
+  const listTemplatesForSettingsResult =
+    await handlerFor(FA_PROJECT_CONTENT_IPC.listDocumentTemplatesForProjectSettingsAsync)(event)
+  expect(listTemplatesForSettingsResult).toEqual({ items: [] })
+  await handlerFor(FA_PROJECT_CONTENT_IPC.saveDocumentTemplatesSnapshotAsync)(event, {
+    items: [
+      {
+        displayName: 'T',
+        id: SAMPLE_UUID
+      }
+    ]
+  })
+
   await handlerFor(FA_PROJECT_CONTENT_IPC.createDocumentAsync)(event, {
     displayName: 'D',
     worldId: SAMPLE_UUID
@@ -228,7 +242,7 @@ test('Test that every project content IPC handler runs through runWithFaProjectD
     documentTemplateId: SAMPLE_UUID
   })
 
-  expect(runWithDbMock.mock.calls.length).toBeGreaterThanOrEqual(31)
+  expect(runWithDbMock.mock.calls.length).toBeGreaterThanOrEqual(33)
 })
 
 /**

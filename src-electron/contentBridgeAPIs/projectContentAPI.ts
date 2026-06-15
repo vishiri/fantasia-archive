@@ -85,6 +85,17 @@ export const projectContentAPI: I_faProjectContentAPI = {
   listDocumentTemplates: async () => {
     return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.listDocumentTemplatesAsync)
   },
+  listDocumentTemplatesForProjectSettings: async () => {
+    return await invokeProjectContent(
+      FA_PROJECT_CONTENT_IPC.listDocumentTemplatesForProjectSettingsAsync
+    )
+  },
+  saveDocumentTemplatesSnapshot: async (items) => {
+    await invokeProjectContent(
+      FA_PROJECT_CONTENT_IPC.saveDocumentTemplatesSnapshotAsync,
+      { items }
+    )
+  },
   createDocument: async (input) => {
     return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.createDocumentAsync, input)
   },

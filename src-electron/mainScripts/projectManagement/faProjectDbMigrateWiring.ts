@@ -9,13 +9,14 @@ import {
 import { migrateFaProjectSchemaV1ToV2 } from './functions/faProjectDbMigrateV1ToV2'
 import { migrateFaProjectSchemaV2ToV3 } from './functions/faProjectDbMigrateV2ToV3'
 import { migrateFaProjectSchemaV3ToV4 } from './functions/faProjectDbMigrateV3ToV4'
+import { migrateFaProjectSchemaV4ToV5 } from './functions/faProjectDbMigrateV4ToV5'
 import { seedFaProjectDefaultWorldIfEmpty } from './projectDbContent/faProjectWorldBootstrapWiring'
 
 const OPTION_PROJECT_NAME = 'project_name'
 const OPTION_PROJECT_UUID = 'project_uuid'
 
-/** Current schema revision: content tables at user_version 4 (worlds.color_pallete). */
-export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 4
+/** Current schema revision: content tables at user_version 5 (document_templates extensions). */
+export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 5
 
 function sqlSelectValueFromActiveTable (): string {
   return `SELECT option_value AS v FROM ${FA_PROJECT_DATA_TABLE_NAME} WHERE option_name = ?`
@@ -66,7 +67,7 @@ function verifyFaProjectMetadataAfterBootstrap (db: Database, displayProjectName
 
 /**
  * Applies SQLite migrations up to the latest supported schema.
- * Fresh files start at user_version 0, bootstrap v1, migrate through v4, seed default world.
+ * Fresh files start at user_version 0, bootstrap v1, migrate through v5, seed default world.
  */
 export function applyFaProjectMigrations (
   db: Database,
@@ -108,6 +109,14 @@ export function applyFaProjectMigrations (
       migrateFaProjectSchemaV3ToV4(db)
     })
     runV3ToV4()
+  }
+
+  const afterV4Ver = readUserVersion(db)
+  if (afterV4Ver === 4 && FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 5) {
+    const runV4ToV5 = db.transaction(() => {
+      migrateFaProjectSchemaV4ToV5(db)
+    })
+    runV4ToV5()
   }
 
   const finalVer = readUserVersion(db)

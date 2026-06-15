@@ -23,6 +23,13 @@ const stubWorldForSettingsShape = {
   documentCount: 0
 }
 
+const stubDocumentTemplateShape = {
+  ...stubNamedEntityShape,
+  icon: '',
+  sortOrder: 0,
+  worldAppendix: ''
+}
+
 const stubDocumentShape = {
   ...stubNamedEntityShape,
   templateId: null,
@@ -40,12 +47,12 @@ test('Test that createFaProjectContentBridgeHarnessStub create and get methods r
     displayName: 'Doc',
     worldId: STUB_UUID
   })).resolves.toEqual(stubDocumentShape)
-  await expect(api.createDocumentTemplate({ displayName: 'Template' })).resolves.toEqual(stubNamedEntityShape)
+  await expect(api.createDocumentTemplate({ displayName: 'Template' })).resolves.toEqual(stubDocumentTemplateShape)
   await expect(api.createMedia({ displayName: 'Media' })).resolves.toEqual(stubNamedEntityShape)
   await expect(api.createWorld({ displayName: 'World' })).resolves.toEqual(stubWorldShape)
 
   await expect(api.getDocumentById(STUB_UUID)).resolves.toEqual(stubDocumentShape)
-  await expect(api.getDocumentTemplateById(STUB_UUID)).resolves.toEqual(stubNamedEntityShape)
+  await expect(api.getDocumentTemplateById(STUB_UUID)).resolves.toEqual(stubDocumentTemplateShape)
   await expect(api.getMediaById(STUB_UUID)).resolves.toEqual(stubNamedEntityShape)
   await expect(api.getWorldById(STUB_UUID)).resolves.toEqual(stubWorldShape)
 })
@@ -58,7 +65,7 @@ test('Test that createFaProjectContentBridgeHarnessStub update and set methods r
   const api = createFaProjectContentBridgeHarnessStub()
 
   await expect(api.updateDocument(STUB_UUID, { displayName: 'Updated' })).resolves.toEqual(stubDocumentShape)
-  await expect(api.updateDocumentTemplate(STUB_UUID, { displayName: 'Updated' })).resolves.toEqual(stubNamedEntityShape)
+  await expect(api.updateDocumentTemplate(STUB_UUID, { displayName: 'Updated' })).resolves.toEqual(stubDocumentTemplateShape)
   await expect(api.updateMedia(STUB_UUID, { displayName: 'Updated' })).resolves.toEqual(stubNamedEntityShape)
   await expect(api.updateWorld(STUB_UUID, { displayName: 'Updated' })).resolves.toEqual(stubWorldShape)
 
@@ -89,6 +96,7 @@ test('Test that createFaProjectContentBridgeHarnessStub list methods return expe
   await expect(api.listWorldsForProjectSettings()).resolves.toEqual({
     items: [stubWorldForSettingsShape]
   })
+  await expect(api.listDocumentTemplatesForProjectSettings()).resolves.toEqual(emptyList)
   await expect(api.listDocumentTemplatesForWorld(STUB_UUID)).resolves.toEqual(emptyList)
   await expect(api.listWorldsForDocumentTemplate(STUB_UUID)).resolves.toEqual(emptyList)
 })
@@ -124,6 +132,12 @@ test('Test that createFaProjectContentBridgeHarnessStub noop methods resolve und
   await expect(api.saveWorldsSnapshot([
     {
       displayName: 'World',
+      id: STUB_UUID
+    }
+  ])).resolves.toBeUndefined()
+  await expect(api.saveDocumentTemplatesSnapshot([
+    {
+      displayName: 'Template',
       id: STUB_UUID
     }
   ])).resolves.toBeUndefined()

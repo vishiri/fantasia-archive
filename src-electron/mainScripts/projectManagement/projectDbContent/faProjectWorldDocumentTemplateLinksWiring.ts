@@ -6,9 +6,12 @@ import {
   FA_PROJECT_TABLE_WORLDS
 } from '../functions/faProjectDbSchemaDdl'
 import {
-  mapFaProjectNamedEntityRow,
+  mapFaProjectDocumentTemplateRow,
   mapFaProjectWorldRow
 } from '../functions/faProjectContentRowMap'
+import {
+  assertFaProjectDocumentTemplateExists
+} from './faProjectDocumentTemplatesSqlWiring'
 import {
   assertFaProjectNamedEntityExists
 } from './faProjectContentNamedEntitySqlWiring'
@@ -17,7 +20,7 @@ import type {
   I_faProjectWorldDocumentTemplateListResult
 } from 'app/types/I_faProjectContentLinksDomain'
 import type {
-  I_faSqlNamedEntityRow,
+  I_faSqlDocumentTemplateRow,
   I_faSqlWorldRow
 } from 'app/types/I_faProjectContentRowMap'
 
@@ -26,10 +29,8 @@ const WORLD_SPEC = {
   tableName: FA_PROJECT_TABLE_WORLDS
 }
 
-const DOCUMENT_TEMPLATE_SPEC = {
-  entityLabel: 'Document template',
-  tableName: FA_PROJECT_TABLE_DOCUMENT_TEMPLATES
-}
+const SQL_SELECT_DOCUMENT_TEMPLATE_COLUMNS =
+  't.id, t.display_name, t.sort_order, t.world_appendix, t.icon, t.created_at_ms, t.updated_at_ms'
 
 export function linkFaProjectWorldDocumentTemplate (
   db: Database,
@@ -37,7 +38,7 @@ export function linkFaProjectWorldDocumentTemplate (
   documentTemplateId: string
 ): void {
   assertFaProjectNamedEntityExists(db, WORLD_SPEC, worldId)
-  assertFaProjectNamedEntityExists(db, DOCUMENT_TEMPLATE_SPEC, documentTemplateId)
+  assertFaProjectDocumentTemplateExists(db, documentTemplateId)
   db.prepare(
     'INSERT OR IGNORE INTO ' + FA_PROJECT_TABLE_WORLD_DOCUMENT_TEMPLATES +
       ' (world_id, document_template_id) VALUES (?, ?)'
@@ -68,22 +69,22 @@ export function listFaProjectDocumentTemplatesForWorld (
   assertFaProjectNamedEntityExists(db, WORLD_SPEC, worldId)
   const rows = db
     .prepare(
-      'SELECT t.id, t.display_name, t.created_at_ms, t.updated_at_ms ' +
+      'SELECT ' + SQL_SELECT_DOCUMENT_TEMPLATE_COLUMNS + ' ' +
         'FROM ' + FA_PROJECT_TABLE_DOCUMENT_TEMPLATES + ' t ' +
         'INNER JOIN ' + FA_PROJECT_TABLE_WORLD_DOCUMENT_TEMPLATES + ' wdt ' +
         'ON wdt.document_template_id = t.id ' +
         'WHERE wdt.world_id = ? ' +
-        'ORDER BY t.display_name COLLATE NOCASE ASC, t.created_at_ms ASC'
+        'ORDER BY t.sort_order ASC, t.created_at_ms ASC, t.id ASC'
     )
-    .all(worldId) as I_faSqlNamedEntityRow[]
-  return { items: rows.map(mapFaProjectNamedEntityRow) }
+    .all(worldId) as I_faSqlDocumentTemplateRow[]
+  return { items: rows.map(mapFaProjectDocumentTemplateRow) }
 }
 
 export function listFaProjectWorldsForDocumentTemplate (
   db: Database,
   documentTemplateId: string
 ): I_faProjectDocumentTemplateWorldListResult {
-  assertFaProjectNamedEntityExists(db, DOCUMENT_TEMPLATE_SPEC, documentTemplateId)
+  assertFaProjectDocumentTemplateExists(db, documentTemplateId)
   const rows = db
     .prepare(
       'SELECT w.id, w.display_name, w.color, w.color_pallete, w.sort_order, w.created_at_ms, w.updated_at_ms ' +

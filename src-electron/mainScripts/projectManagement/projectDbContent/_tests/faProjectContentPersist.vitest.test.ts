@@ -16,7 +16,12 @@ import {
 } from '../faProjectDocumentsPersistWiring'
 import {
   createFaProjectDocumentTemplate,
-  getFaProjectDocumentTemplateById
+  deleteFaProjectDocumentTemplate,
+  getFaProjectDocumentTemplateById,
+  listFaProjectDocumentTemplates,
+  listFaProjectDocumentTemplatesForProjectSettings,
+  replaceFaProjectDocumentTemplatesSnapshot,
+  updateFaProjectDocumentTemplate
 } from '../faProjectDocumentTemplatesPersistWiring'
 import {
   linkFaProjectDocumentMedia,
@@ -42,11 +47,7 @@ import {
   listFaProjectMedia,
   updateFaProjectMedia
 } from '../faProjectMediaPersistWiring'
-import {
-  deleteFaProjectDocumentTemplate,
-  listFaProjectDocumentTemplates,
-  updateFaProjectDocumentTemplate
-} from '../faProjectDocumentTemplatesPersistWiring'
+import { assertFaProjectDocumentTemplateExists } from '../faProjectDocumentTemplatesSqlWiring'
 import {
   linkFaProjectWorldDocumentTemplate,
   listFaProjectDocumentTemplatesForWorld,
@@ -59,6 +60,19 @@ type T_row = Record<string, string | number | null>
 function readMockWorldMaxSortOrder (worlds: Map<string, T_row>): number | null {
   let max: number | null = null
   for (const row of worlds.values()) {
+    const sortOrder = row.sort_order as number
+    if (max === null || sortOrder > max) {
+      max = sortOrder
+    }
+  }
+  return max
+}
+
+function readMockDocumentTemplateMaxSortOrder (
+  documentTemplates: Map<string, T_row>
+): number | null {
+  let max: number | null = null
+  for (const row of documentTemplates.values()) {
     const sortOrder = row.sort_order as number
     if (max === null || sortOrder > max) {
       max = sortOrder
@@ -111,6 +125,11 @@ function makeProjectContentTestDb (): {
       if (normalized.includes('MAX(sort_order)')) {
         return {
           get: () => {
+            if (normalized.includes('document_templates')) {
+              return {
+                max_sort: readMockDocumentTemplateMaxSortOrder(tables.document_templates)
+              }
+            }
             return { max_sort: readMockWorldMaxSortOrder(tables.worlds) }
           }
         }
@@ -126,8 +145,11 @@ function makeProjectContentTestDb (): {
             const row: T_row = {
               id: args[0] as string,
               display_name: args[1] as string,
-              created_at_ms: args[2] as number,
-              updated_at_ms: args[3] as number
+              sort_order: args[2] as number,
+              world_appendix: args[3] as string,
+              icon: args[4] as string,
+              created_at_ms: args[5] as number,
+              updated_at_ms: args[6] as number
             }
             tables.document_templates.set(row.id as string, row)
           }
@@ -221,6 +243,35 @@ function makeProjectContentTestDb (): {
           }
         }
       }
+      if (normalized.includes('UPDATE') && normalized.includes('document_templates')) {
+        return {
+          run: (...args: Array<string | number>) => {
+            const id = args[args.length - 1] as string
+            const existing = tables.document_templates.get(id)
+            if (existing === undefined) {
+              return
+            }
+            const patch: T_row = { ...existing }
+            let argIdx = 0
+            if (normalized.includes('display_name = ?')) {
+              patch.display_name = args[argIdx++] as string
+            }
+            if (normalized.includes('world_appendix = ?')) {
+              patch.world_appendix = args[argIdx++] as string
+            }
+            if (normalized.includes('icon = ?')) {
+              patch.icon = args[argIdx++] as string
+            }
+            if (normalized.includes('sort_order = ?')) {
+              patch.sort_order = args[argIdx++] as number
+            }
+            if (normalized.includes('updated_at_ms = ?')) {
+              patch.updated_at_ms = args[argIdx++] as number
+            }
+            tables.document_templates.set(id, patch)
+          }
+        }
+      }
       if (normalized.includes('UPDATE') && normalized.includes('worlds')) {
         return {
           run: (...args: Array<string | number>) => {
@@ -303,6 +354,24 @@ function makeProjectContentTestDb (): {
               }
             }
             return rows
+          }
+        }
+      }
+      if (normalized.includes('GROUP BY template_id')) {
+        return {
+          all: () => {
+            const counts = new Map<string, number>()
+            for (const row of tables.documents.values()) {
+              const templateId = row.template_id as string | null
+              if (templateId === null) {
+                continue
+              }
+              counts.set(templateId, (counts.get(templateId) ?? 0) + 1)
+            }
+            return [...counts.entries()].map(([template_id, c]) => ({
+              c,
+              template_id
+            }))
           }
         }
       }
@@ -416,14 +485,40 @@ function makeProjectContentTestDb (): {
           }
         }
       }
+      if (normalized === 'SELECT id FROM document_templates') {
+        return {
+          all: () => [...tables.document_templates.keys()].map((id) => ({ id }))
+        }
+      }
+      if (normalized.includes('SELECT id FROM document_templates WHERE id = ?')) {
+        return {
+          get: (id: string) => {
+            return tables.document_templates.has(id) ? { id } : undefined
+          }
+        }
+      }
       if (
         normalized.includes('SELECT') &&
         normalized.includes('document_templates') &&
         normalized.includes('ORDER BY')
       ) {
+        const sortTemplateRows = (): T_row[] => {
+          return [...tables.document_templates.values()].sort((left, right) => {
+            const orderDelta = (left.sort_order as number) - (right.sort_order as number)
+            if (orderDelta !== 0) {
+              return orderDelta
+            }
+            const createdDelta =
+              (left.created_at_ms as number) - (right.created_at_ms as number)
+            if (createdDelta !== 0) {
+              return createdDelta
+            }
+            return String(left.id).localeCompare(String(right.id))
+          })
+        }
         return {
           get: (id: string) => tables.document_templates.get(id),
-          all: () => [...tables.document_templates.values()]
+          all: () => sortTemplateRows()
         }
       }
       if (normalized.includes('SELECT') && normalized.includes('document_templates')) {
@@ -584,6 +679,28 @@ test('Test that unlinkFaProjectDocumentMedia invokes delete on the junction tabl
 })
 
 /**
+ * getFaProjectDocumentTemplateById
+ * Missing template ids throw FaProjectContentNotFoundError.
+ */
+test('Test that getFaProjectDocumentTemplateById throws for a missing template', () => {
+  const { db } = makeProjectContentTestDb()
+  expect(() =>
+    getFaProjectDocumentTemplateById(db as never, '550e8400-e29b-41d4-a716-446655440000')
+  ).toThrow(FaProjectContentNotFoundError)
+})
+
+/**
+ * assertFaProjectDocumentTemplateExists
+ * Throws when the template id is absent.
+ */
+test('Test that assertFaProjectDocumentTemplateExists throws for a missing template', () => {
+  const { db } = makeProjectContentTestDb()
+  expect(() =>
+    assertFaProjectDocumentTemplateExists(db as never, '550e8400-e29b-41d4-a716-446655440000')
+  ).toThrow(FaProjectContentNotFoundError)
+})
+
+/**
  * deleteFaProjectDocumentTemplate
  * Template delete removes the row from the mock store.
  */
@@ -614,6 +731,17 @@ test('Test that updateFaProjectMedia changes display name', () => {
   const media = createFaProjectMedia(db as never, { displayName: 'Old' })
   const updated = updateFaProjectMedia(db as never, media.id, { displayName: 'New' })
   expect(updated.displayName).toBe('New')
+})
+
+/**
+ * updateFaProjectDocumentTemplate
+ * An empty patch returns the existing row without running UPDATE.
+ */
+test('Test that updateFaProjectDocumentTemplate with an empty patch returns the existing row', () => {
+  const { db } = makeProjectContentTestDb()
+  const template = createFaProjectDocumentTemplate(db as never, { displayName: 'Stable' })
+  const updated = updateFaProjectDocumentTemplate(db as never, template.id, {})
+  expect(updated.displayName).toBe('Stable')
 })
 
 /**
@@ -961,4 +1089,113 @@ test('Test that world document template link helpers manage junction rows', () =
   expect(listFaProjectDocumentTemplatesForWorld(db as never, world.id).items).toHaveLength(0)
   linkFaProjectWorldDocumentTemplate(db as never, world.id, template.id)
   expect(listFaProjectDocumentTemplatesForWorld(db as never, world.id).items).toHaveLength(1)
+})
+
+const SAMPLE_TEMPLATE_UUID = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
+
+/**
+ * createFaProjectDocumentTemplate
+ * Persists optional world appendix and icon fields.
+ */
+test('Test that createFaProjectDocumentTemplate stores worldAppendix and icon', () => {
+  const { db } = makeProjectContentTestDb()
+  const template = createFaProjectDocumentTemplate(db as never, {
+    displayName: 'Character',
+    icon: 'person',
+    worldAppendix: ' of Middle-earth'
+  })
+  expect(template.worldAppendix).toBe('of Middle-earth')
+  expect(template.icon).toBe('person')
+  expect(template.sortOrder).toBe(0)
+})
+
+/**
+ * updateFaProjectDocumentTemplate
+ * Persists sortOrder, worldAppendix, and icon patches.
+ */
+test('Test that updateFaProjectDocumentTemplate persists extended fields', () => {
+  const { db } = makeProjectContentTestDb()
+  const template = createFaProjectDocumentTemplate(db as never, { displayName: 'Sheet' })
+  const updated = updateFaProjectDocumentTemplate(db as never, template.id, {
+    icon: 'article',
+    sortOrder: 3,
+    worldAppendix: ' notes'
+  })
+  expect(updated.icon).toBe('article')
+  expect(updated.sortOrder).toBe(3)
+  expect(updated.worldAppendix).toBe('notes')
+})
+
+/**
+ * deleteFaProjectDocumentTemplate
+ * Throws when the template id does not exist.
+ */
+test('Test that deleteFaProjectDocumentTemplate throws when the template is absent', () => {
+  const { db } = makeProjectContentTestDb()
+  expect(() =>
+    deleteFaProjectDocumentTemplate(db as never, '550e8400-e29b-41d4-a716-446655440000')
+  ).toThrow(FaProjectContentNotFoundError)
+})
+
+/**
+ * listFaProjectDocumentTemplatesForProjectSettings
+ * Merges document counts into each template row for Project Settings.
+ */
+test('Test that listFaProjectDocumentTemplatesForProjectSettings includes document counts', () => {
+  const { db } = makeProjectContentTestDb()
+  const world = createFaProjectWorld(db as never, { displayName: 'Realm' })
+  const unused = createFaProjectDocumentTemplate(db as never, { displayName: 'Unused' })
+  const busy = createFaProjectDocumentTemplate(db as never, { displayName: 'Busy' })
+  createFaProjectDocument(db as never, {
+    displayName: 'Doc',
+    templateId: busy.id,
+    worldId: world.id
+  })
+  const result = listFaProjectDocumentTemplatesForProjectSettings(db as never)
+  expect(result.items).toHaveLength(2)
+  const unusedRow = result.items.find((item) => item.id === unused.id)
+  const busyRow = result.items.find((item) => item.id === busy.id)
+  expect(unusedRow?.documentCount).toBe(0)
+  expect(busyRow?.documentCount).toBe(1)
+})
+
+/**
+ * replaceFaProjectDocumentTemplatesSnapshot
+ * Reorders templates, inserts new ids, deletes omitted rows, and allows an empty list.
+ */
+test('Test that replaceFaProjectDocumentTemplatesSnapshot replaces the ordered templates list', () => {
+  const { db, tables } = makeProjectContentTestDb()
+  const first = createFaProjectDocumentTemplate(db as never, { displayName: 'Keep' })
+  const second = createFaProjectDocumentTemplate(db as never, { displayName: 'Remove' })
+  replaceFaProjectDocumentTemplatesSnapshot(db as never, [
+    {
+      displayName: 'Keep renamed',
+      icon: 'star',
+      id: first.id,
+      worldAppendix: ' appendix'
+    },
+    {
+      displayName: 'Brand new',
+      id: SAMPLE_TEMPLATE_UUID
+    }
+  ])
+  expect(tables.document_templates.has(second.id)).toBe(false)
+  expect(tables.document_templates.has(SAMPLE_TEMPLATE_UUID)).toBe(true)
+  const listed = listFaProjectDocumentTemplates(db as never).items
+  expect(listed.map((template) => template.displayName)).toEqual(['Keep renamed', 'Brand new'])
+  expect(listed[0].sortOrder).toBe(0)
+  expect(listed[1].sortOrder).toBe(1)
+  expect(listed[0].icon).toBe('star')
+  expect(listed[0].worldAppendix).toBe('appendix')
+})
+
+/**
+ * replaceFaProjectDocumentTemplatesSnapshot
+ * Accepts an empty snapshot (unlike worlds).
+ */
+test('Test that replaceFaProjectDocumentTemplatesSnapshot allows an empty items array', () => {
+  const { db, tables } = makeProjectContentTestDb()
+  createFaProjectDocumentTemplate(db as never, { displayName: 'Gone' })
+  replaceFaProjectDocumentTemplatesSnapshot(db as never, [])
+  expect(tables.document_templates.size).toBe(0)
 })
