@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "node .cursor/hooks/cavemem-bridge.mjs session-start"
+      }
+    ],
+    "sessionEnd": [
+      {
+        "command": "node .cursor/hooks/cavemem-bridge.mjs session-end"
+      }
+    ],
+    "beforeSubmitPrompt": [
+      {
+        "command": "node .cursor/hooks/cavemem-bridge.mjs user-prompt-submit",
+        "matcher": "UserPromptSubmit"
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": "node .cursor/hooks/cavemem-bridge.mjs post-tool-use"
+      }
+    ],
+    "afterAgentResponse": [
+      {
+        "command": "node .cursor/hooks/cavemem-bridge.mjs stop"
+      }
+    ]
+  }
+}
