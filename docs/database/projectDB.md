@@ -230,7 +230,7 @@ Renderer bridges: **`src/stores/scripts/sFaProjectWorldsBridge.ts`**, **`src/sto
 - Zod (IPC payloads): **`src-electron/shared/faProject*ContentSchema.ts`**, **`faProjectContentLinksSchema.ts`**, **`faProjectContentSchemaShared.ts`**
 - Bridge typing: **`types/I_faElectronRendererBridgeAPIs.ts`**, **`src/globals.d.ts`**
 
-**Renderer UI:** **`DialogProjectSettings`** (general, worlds, and **Document Template Settings** tabs), reusable **`FaColorPickerInput`**, **`sFaProjectWorldsBridge`**, and **`sFaProjectDocumentTemplatesBridge`** for list/snapshot IPC. Other content surfaces (document browser, template editor) remain IPC-only until wired.
+**Renderer UI:** **`DialogProjectSettings`** (general, worlds, and **Document Template Settings** tabs), reusable **`FaColorPickerInput`**, **`FaIconPickerInput`** (template **icon** field), **`sFaProjectWorldsBridge`**, and **`sFaProjectDocumentTemplatesBridge`** for list/snapshot IPC. Other content surfaces (document browser, template editor) remain IPC-only until wired.
 
 ## Errors
 

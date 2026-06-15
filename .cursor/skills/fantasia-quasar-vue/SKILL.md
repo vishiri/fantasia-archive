@@ -21,7 +21,7 @@ description: >-
 - **`dialogs/`** — `Dialog*` modal SFCs. Root **`q-dialog`** **`v-model`** refs that participate in global open coordination should call **`registerComponentDialogStackGuard`** or **`registerMarkdownDialogStackGuard`** from **`src/scripts/appGlobalManagementUI/dialogManagement.ts`** (same module as **`openDialogMarkdownDocument`**) so names state the stacking rule, not metaphor-only labels.
 - **`floatingWindows/`** — `Window*` movable/resizable in-renderer surfaces (for example **`WindowAppStyling`**). Wrap the frame in **`_FaFloatingWindowBodyTeleport`** (**`Teleport to="body"`**) so **`position: fixed`** is not trapped under header/menu ancestors. Use **`useFaFloatingWindowFrame`**; do **not** use **`registerComponentDialogStackGuard`** (that guard serializes **modal** `QDialog` opens; floating windows are below modals in z-order and can coexist). Layout, resize clamp, and z-index band (**`5000`–`5999`**) live in **`src/scripts/floatingWindows/`**; the npm **`@quasar/quasar-ui-qwindow`** targets Quasar v1 / Vue 2 only. Playbook: [fantasia-floating-windows](../fantasia-floating-windows/SKILL.md); architecture: [AGENTS.md](../../../AGENTS.md) **In-renderer floating windows**.
 - **`globals/`** — app chrome (`GlobalWindowButtons`, `AppControlMenus`, `AppControlSingleMenu`, **`_FaUserCssInjector`**).
-- **`elements/`** — small reusable widgets (`FantasiaMascotImage`, `SocialContactSingleButton`, **`FaColorPickerInput`** — Quasar **`QColor`** popover with optional palette footer swatches; used by **Project Settings** world color and palette editors).
+- **`elements/`** — small reusable widgets (`FantasiaMascotImage`, `SocialContactSingleButton`, **`FaColorPickerInput`** — Quasar **`QColor`** popover with optional palette footer swatches; used by **Project Settings** world color and palette editors; **`FaIconPickerInput`** — searchable merged icon catalog for q-icon names; used by **Project Settings** document template **Icon** and intended for reuse elsewhere).
 - **`other/`** — other composites (`SocialContactButtons`).
 - **`foundation/`** — Storybook-only design catalogues (`FoundationColorPalette`, `FoundationTextList`, …): not shipped in product routes, no **`i18n/`** mirror, no Playwright component tests, stories tagged **`skip-visual`**. See [AGENTS.md](../../../AGENTS.md) **Foundation components**.
 - **Hierarchical trees** — Any nested expand/collapse tree uses **`@he-tree/vue`** (`BaseTree` / **`Draggable`**) only. **Quasar `QTree` / `q-tree` is forbidden project-wide.** Enable **`virtualization`** when lists may grow large. Playbook: [fantasia-he-tree](../fantasia-he-tree/SKILL.md).
@@ -82,6 +82,7 @@ Locale `L_*` paths: `i18n/<locale>/components/<bucket>/` mirrors `src/components
 | `data-test-locator` and other Playwright `data-test-*` template hooks | [`vue-template-test-hooks.mdc`](../../rules/vue-template-test-hooks.mdc) |
 | Hierarchical trees (`@he-tree/vue` only; `QTree` forbidden) | [`fa-he-tree.mdc`](../../rules/fa-he-tree.mdc) |
 | List / table drag-and-drop | [`fa-drag-drop-lists.mdc`](../../rules/fa-drag-drop-lists.mdc) |
+| Icon name picker (`FaIconPickerInput`, `src/scripts/faIcons/`) | [`fa-icon-picker.mdc`](../../rules/fa-icon-picker.mdc) |
 | Global SCSS / `src/css` | [`project-scss.mdc`](../../rules/project-scss.mdc) |
 
 ## Quality gates
@@ -99,6 +100,7 @@ Locale `L_*` paths: `i18n/<locale>/components/<bucket>/` mirrors `src/components
 - [fantasia-floating-windows](../fantasia-floating-windows/SKILL.md) for **`Window*`** frames, teleport, and **`src/scripts/floatingWindows/`** helpers.
 - [fantasia-he-tree](../fantasia-he-tree/SKILL.md) for **`@he-tree/vue`** hierarchical trees (virtualization, drag-and-drop).
 - [fantasia-drag-drop](../fantasia-drag-drop/SKILL.md) for **`vue-draggable-plus`** lists and **`v-draggable-table`** on **`QTable`**.
+- [fantasia-icon-picker](../fantasia-icon-picker/SKILL.md) for **`FaIconPickerInput`** and **`src/scripts/faIcons/`** catalogs.
 - [fantasia-i18n](../fantasia-i18n/SKILL.md) for user-visible strings.
 - [fantasia-testing](../fantasia-testing/SKILL.md) for component Playwright tests next to components and the **Connected tests** sweep.
 - [fantasia-action-manager](../fantasia-action-manager/SKILL.md) for the centralized dispatcher used by menus, dialogs, window controls, and keybinds (single toast + Action Monitor).

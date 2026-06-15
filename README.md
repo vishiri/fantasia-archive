@@ -88,6 +88,7 @@ Fork and pull-request workflow, required **PR labels** (`novisualchange` / `visu
 | `.utility-scripts/quasarBuildElectronSummarized.mjs` | Quiet **`yarn quasar:build:electron:summarized`** / **`testbatch:ensure:*`** build log |
 | `.utility-scripts/playwrightWithArtifactTrim.mjs` | **`yarn test:components`** / **`yarn test:e2e`** wrapper and artifact trim |
 | `.utility-scripts/auditQuasarComponentTokens.mjs` | **`yarn audit:quasar-component-tokens`** |
+| `.utility-scripts/generateFaQuasarIconCatalogs.mjs` | **`yarn generate:icon-catalogs`** — regenerate committed q-icon catalogs for **FaIconPickerInput** from **`@quasar/extras`** |
 | `.utility-scripts/policyComplianceAudit.mjs` | **`yarn audit:policy`** |
 | `.utility-scripts/auditQuasarVariablesUsage.mjs` | Optional dead feature-token report (not wired in **`package.json`**) |
 | `.utility-scripts/syncI18nLocaleTreeFromEnUs.mjs` | Maintainer: sync non-**en-US** locale tree shape from **en-US** |
@@ -104,10 +105,17 @@ Features are grouped for navigation (each still has colocated `_tests/`, optiona
 | `dialogs/` | Modal dialog SFCs (`Dialog*` components). |
 | `floatingWindows/` | Movable, resizable in-renderer windows (`Window*` components); frame teleported to **`document.body`** via **`_FaFloatingWindowBodyTeleport`**; shared logic under `src/scripts/floatingWindows/` (**`useFaFloatingWindowFrame`**, layout, resize clamp, **`faFloatingWindowPopTransition`**, **`faQuasarDialogStandardTransition`** for reference). See [AGENTS.md](AGENTS.md) **In-renderer floating windows**. |
 | `globals/` | App-chrome pieces reused across layouts (`GlobalWindowButtons`, `AppControlMenus`, `AppControlSingleMenu`, **`_FaUserCssInjector`**). |
-| `elements/` | Small reusable leaf widgets (`FantasiaMascotImage`, `SocialContactSingleButton`). |
+| `elements/` | Small reusable leaf widgets (`FantasiaMascotImage`, `SocialContactSingleButton`, **`FaColorPickerInput`**, **`FaIconPickerInput`**). |
 | `projectUI/` | Workspace home UI tied to the active project (for example **`ProjectOverview`** on **`/home`**). |
 | `other/` | Other composite or miscellaneous features (**`SplashControls`**, **`SocialContactButtons`**). |
 | `foundation/` | Design-time **Storybook** catalogues only (typography, theme colors). Not product routes; no **`i18n/`** modules; no Playwright component specs; stories use **`tags: ['skip-visual']`** so VRT skips them. See **Foundation components** in [AGENTS.md](AGENTS.md). |
+
+#### Reusable field widgets (`elements/`)
+
+| Component | Role | Playbook |
+| --- | --- | --- |
+| **`FaColorPickerInput`** | Hex color + optional per-context palette footer swatches (**`QColor`**). Used in **Project Settings** world color and palette editors. | [fantasia-quasar-vue](.cursor/skills/fantasia-quasar-vue/SKILL.md) **`elements/`** |
+| **`FaIconPickerInput`** | Single **q-icon name** via round trigger + searchable virtual-scrolled menu (merged **MDI**, **Font Awesome v6**, **Material** catalogs under **`src/scripts/faIcons/`**). First use: **Project Settings → Document Templates** optional template **Icon**. Regenerate catalogs: **`yarn generate:icon-catalogs`**. | [fantasia-icon-picker](.cursor/skills/fantasia-icon-picker/SKILL.md) |
 
 ### i18n (localisation)
 
