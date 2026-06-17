@@ -9,6 +9,8 @@ description: >-
 
 # Fantasia Archive — drag-and-drop (lists and tables)
 
+Full policy: [fa-drag-drop-lists.mdc](../../rules/fa-drag-drop-lists.mdc).
+
 ## Policy summary
 
 | Surface | Library | Notes |
@@ -18,7 +20,7 @@ description: >-
 | **Hierarchical trees** | **`@he-tree/vue`** **`Draggable`** | Built-in DnD — **do not** use vue-draggable-plus on trees |
 | **Floating / spatial move** | Custom pointer sessions | **`src/scripts/floatingWindows/`** — not this skill |
 
-Dependencies are in root **`package.json`**: **`vue-draggable-plus`**, **`quasar-ui-q-draggable-table`**.
+Deps in root **`package.json`**: **`vue-draggable-plus`**, **`quasar-ui-q-draggable-table`**.
 
 ## `vue-draggable-plus` (default lists)
 
@@ -70,27 +72,27 @@ function onWorldReorder (): void {
 
 ### Composable / target container
 
-When the sortable root is not the component root, use **`useDraggable(el, list, options)`** or **`v-draggable`** with a selector — see upstream **target container** docs.
+Sortable root not component root → **`useDraggable(el, list, options)`** or **`v-draggable`** with selector — see upstream **target container** docs.
 
 ### Persistence
 
-- Reorder updates the in-memory array first; on **`@update`** / **`onEnd`**, write domain order (for example **`sort_order`**) through **`runFaActionAwait`** or store methods that call **`projectContent`** IPC.
-- Keep drag wiring in feature **`scripts/`**; thin **`.vue`** imports the composable or **`VueDraggable`** only.
+- Reorder updates in-memory array first; on **`@update`** / **`onEnd`**, write domain order (e.g. **`sort_order`**) via **`runFaActionAwait`** or store → **`projectContent`** IPC.
+- Drag wiring in feature **`scripts/`**; thin **`.vue`** imports composable or **`VueDraggable`** only.
 
 ### Vertical tab strips (**`DialogProjectSettings`** worlds list)
 
-When reordering **vertical category tabs** (world names in **Project Settings**), reuse **`src/scripts/faDragDrop/`** helpers (**`faVerticalDraggableTabsSortableDragOptions`**, **`faVerticalDraggableTabsDocumentDragCursor`**, **`hideNativeSortableDragGhost`**) and global SCSS **`src/css/theme/custom-components/faVerticalDraggableTabs.scss`**. **`DialogProjectSettingsWorldsTabList`** uses **`vue-draggable-plus`** with a movement threshold so short clicks select a tab without starting a drag. Palette swatch reorder inside a world uses the same library in **`DialogProjectSettingsWorldColorPaletteEditor`**.
+Vertical category tabs reuse **`src/scripts/faDragDrop/`** (**`faVerticalDraggableTabsSortableDragOptions`**, **`faVerticalDraggableTabsDocumentDragCursor`**, **`hideNativeSortableDragGhost`**) + global SCSS **`src/css/theme/custom-components/faVerticalDraggableTabs.scss`**. **`DialogProjectSettingsWorldsTabList`**: **`vue-draggable-plus`** + movement threshold so short clicks select tab without drag. Palette swatch reorder: same library in **`DialogProjectSettingsWorldColorPaletteEditor`**.
 
 #### Vertical draggable tab strips (reusable column)
 
-Shared pattern for a **left column** of draggable tabs plus an optional **Add** row (master–detail settings dialogs). Not a Quasar **`QTabs`** replacement for horizontal category tabs — only the **vertical reorderable list** chrome.
+Shared pattern: **left column** draggable tabs + optional **Add** row (master–detail settings dialogs). Not horizontal **`QTabs`** replacement — vertical reorderable list chrome only.
 
 **Reference implementations**
 
 | SFC | Role |
 | --- | --- |
 | **`DialogProjectSettingsWorldsTabList.vue`** | Worlds column; default width **240px** |
-| **`DialogProjectSettingsDocumentTemplatesTabList.vue`** | Document templates column; panel passes **`tab-list-width-px="360"`** |
+| **`DialogProjectSettingsDocumentTemplatesTabList.vue`** | Document templates column; **`tab-list-width-px="360"`** |
 | **`DialogProjectSettingsWorldsTabItem.vue`** / **`DialogProjectSettingsDocumentTemplatesTabItem.vue`** | Single tab row (`faVerticalDraggableTabs__tab` BEM) |
 
 **DOM skeleton** (outer host must include class **`faVerticalDraggableTabs`**):
@@ -105,9 +107,9 @@ Shared pattern for a **left column** of draggable tabs plus an optional **Add** 
       q-btn.faVerticalDraggableTabs__addButton
 ```
 
-Import global styles once per feature via **`@use`** / **`src=`** on a colocated unscoped SCSS file if the host needs a fixed column width class (see **`DialogProjectSettings.worldsTabList.unscoped.scss`**). Base tokens: **`src/css/theme/custom-components/_faVerticalDraggableTabs.variables.scss`**.
+Import global styles once per feature via **`@use`** / **`src=`** on colocated unscoped SCSS (see **`DialogProjectSettings.worldsTabList.unscoped.scss`**). Base tokens: **`src/css/theme/custom-components/_faVerticalDraggableTabs.variables.scss`**.
 
-**Layout props** (on the TabList host SFC; all optional with defaults):
+**Layout props** (TabList host SFC; all optional with defaults):
 
 | Prop | Default | Maps to CSS variable |
 | --- | --- | --- |
@@ -119,7 +121,7 @@ Import global styles once per feature via **`@use`** / **`src=`** on a colocated
 | **`tabLabelFontSize`** | **`'14px'`** | **`--fa-vertical-draggable-tabs-tab-label-font-size`** |
 | **`dense`** | **`false`** (document templates TabList default **`true`**) | **`--fa-vertical-draggable-tabs-tab-min-height`** (**`36px`** when dense; SCSS fallback **`48px`**) |
 
-Types: **`types/I_faVerticalDraggableTabs.ts`**. Defaults and **`buildFaVerticalDraggableTabsRootStyle`**: **`src/scripts/faDragDrop/functions/buildFaVerticalDraggableTabsRootStyle.ts`**.
+Types: **`types/I_faVerticalDraggableTabs.ts`**. Defaults + **`buildFaVerticalDraggableTabsRootStyle`**: **`src/scripts/faDragDrop/functions/buildFaVerticalDraggableTabsRootStyle.ts`**.
 
 **TabList script pattern**
 
@@ -144,20 +146,20 @@ const tabListRootStyle = computed(() => buildFaVerticalDraggableTabsRootStyle({
 }))
 ```
 
-**Drag wiring** (same on both reference TabLists):
+**Drag wiring** (both reference TabLists):
 
 - **`faVerticalDraggableTabsSortableDragOptions`** on **`VueDraggable`**
-- **`touch-start-threshold="5"`** so tap-to-select does not start drag
+- **`touch-start-threshold="5"`** — tap-to-select without drag
 - **`@start`** → **`applyFaVerticalDraggableTabsDocumentDragCursor`**
 - **`@end`** → **`clearFaVerticalDraggableTabsDocumentDragCursor`** + emit reordered array
 - Root **`computed`** class **`faVerticalDraggableTabs--listDragging`** while dragging
 - Tab item modifiers: **`--active`**, **`--dragging`**, **`--error`**
 
-**Tests**: **`src/scripts/faDragDrop/_tests/buildFaVerticalDraggableTabsRootStyle.vitest.test.ts`**; TabList Vitest stubs **`VueDraggable`**; Playwright uses **`data-test-locator`** on list, tabs, and add button.
+**Tests**: **`src/scripts/faDragDrop/_tests/buildFaVerticalDraggableTabsRootStyle.vitest.test.ts`**; TabList Vitest stubs **`VueDraggable`**; Playwright uses **`data-test-locator`** on list, tabs, add button.
 
 ## `quasar-ui-q-draggable-table` (`QTable` rows)
 
-Registered globally via **`src/boot/q-draggable-table.ts`** (listed in **`quasar.config.ts`** **`boot`**).
+Registered globally via **`src/boot/q-draggable-table.ts`** (**`quasar.config.ts`** **`boot`**).
 
 ```vue
 <q-table
@@ -180,30 +182,25 @@ function onDrop (from: number, to: number): void {
 }
 ```
 
-- Import **`quasar-ui-q-draggable-table/dist/index.css`** is loaded from the boot manager (do not duplicate per SFC).
-- Avoid **`virtual-scroll`** on the same **`QTable`** when using row drag.
+- Import **`quasar-ui-q-draggable-table/dist/index.css`** from boot manager only (no per-SFC duplicate).
+- Avoid **`virtual-scroll`** on same **`QTable`** when using row drag.
 - Upstream: [github.com/bd2051/q-draggable-table](https://github.com/bd2051/q-draggable-table)
 
 ## Trees — use he-tree, not vue-draggable-plus
 
-For nested hierarchies, follow [fantasia-he-tree](../fantasia-he-tree/SKILL.md): **`Draggable`** from **`@he-tree/vue`** owns reorder semantics.
+Nested hierarchies → [fantasia-he-tree](../fantasia-he-tree/SKILL.md): **`Draggable`** from **`@he-tree/vue`** owns reorder semantics.
 
-### World template layout tree (**Project Settings**)
+### World template layout tree
 
-- **Component:** **`DialogProjectSettingsWorldTemplateLayoutTree.vue`** — controlled **`:model-value`**, **`:key`** remount on programmatic layout changes, commit only on **`@after-drop`** (not on every **`update:model-value`**).
-- **Commit policy (level 1):** **`scripts/functions/dialogProjectSettingsWorldTemplateLayoutTreeCommitPolicy.ts`** — when to accept he-tree model updates, single drag commit schedule (**`requestAnimationFrame` → double **`nextTick`**), cancel without commit.
-- **Wiring:** **`scripts/dialogProjectSettingsWorldTemplateLayoutTreeWiring.ts`** — drag session, orphan placement merge on commit, regression guard via **`shouldBlockDialogProjectSettingsWorldTemplateLayoutEmit`** in **`dialogProjectSettingsWorldTemplateLayoutTreeEmitGuard.ts`**.
-- **Save validation:** duplicate **`document_template_id`** per world — **`dialogProjectSettingsWorldTemplateLayoutDuplicateValidation.ts`**; blocks save and negative UI on tree rows and world tabs. Blank **document template** names (from **Document Templates**) highlight every world tab that still places that template and the parent **Worlds** category tab until the name is filled in.
-- **Inline rename:** right-click a group or placed template row → shared context menu with live **`q-input`** (**`dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring.ts`** + provide/inject open-target key). Renames a template by **`documentTemplateId`** and keeps **Document Templates** draft names in sync (**`dialogProjectSettingsDocumentTemplateWorldLayoutSync.ts`**). Tree resync patches labels in place when structure is unchanged so the menu stays open while typing.
-- **Tests:** Vitest under **`scripts/functions/_tests/`** and **`_tests/DialogProjectSettingsWorldTemplateLayoutTree.vitest.test.ts`**; Playwright **`_tests/DialogProjectSettingsWorldTemplateLayout.playwright.test.ts`** with **`helpers/playwrightHelpers_component/dialogProjectSettingsWorldTemplateLayoutTreeDrag.ts`**.
+**Project Settings** world template layout uses he-tree **`Draggable`** — see [fa-drag-drop-lists.mdc](../../rules/fa-drag-drop-lists.mdc) **World template layout tree** for component map, commit policy, wiring, validation, rename menu, tests. Do not duplicate that narrative here.
 
 ## Tests
 
-- **Vitest**: mock **`vue-draggable-plus`** when mount-only smoke tests do not need real drag; test reorder helpers in **`scripts/_tests`** with pure array moves.
-- **Playwright**: use **`data-test-locator`** on handles; drag with pointer APIs per [playwright-tests.mdc](../../rules/playwright-tests.mdc).
+- **Vitest**: mock **`vue-draggable-plus`** when mount-only smoke; test reorder helpers in **`scripts/_tests`** with pure array moves.
+- **Playwright**: **`data-test-locator`** on handles; pointer APIs per [playwright-tests.mdc](../../rules/playwright-tests.mdc).
 
 ## Related
 
 - [fa-drag-drop-lists.mdc](../../rules/fa-drag-drop-lists.mdc)
 - [fa-he-tree.mdc](../../rules/fa-he-tree.mdc)
-- [fantasia-floating-windows](../fantasia-floating-windows/SKILL.md) for spatial window drag
+- [fantasia-floating-windows](../fantasia-floating-windows/SKILL.md) — spatial window drag

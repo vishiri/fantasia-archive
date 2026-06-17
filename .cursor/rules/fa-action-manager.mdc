@@ -6,64 +6,59 @@ alwaysApply: false
 
 # faActionManager (`src/scripts/actionManager/`)
 
-The **renderer-side action manager** is the **single funnel** for every user-meaningful UI action: dialog opens, settings saves, window controls, language switch, dev tools, startup notifications, and similar. It removes ad-hoc **`Notify.create`** spread across stores and call sites by routing **all** failures through one console row plus one toast.
+**Renderer-side action manager** = **single funnel** for user-meaningful UI actions: dialog opens, settings saves, window controls, language switch, dev tools, startup notifications, etc. Routes **all** failures through one console row + one toast — no ad-hoc **`Notify.create`** across stores/call sites.
 
 ## Mental model
 
-- **Action ids** live in **`types/I_faActionManagerDomain.ts`** (**`FA_ACTION_IDS`**, **`T_faActionId`**, **`I_faActionPayloadMap`**). The **payload map** ties each id to its handler input (`void` for no payload).
-- **Definitions** in **`src/scripts/actionManager/faActionDefinitions.ts`** (**`FA_ACTION_DEFINITIONS`**) bind each id to a **`kind`** (**`async`** or **`sync`**), an optional **`dedup`** hint, and a **`handler`** reference. **Handler implementations** live in **`faActionDefinitionHandlers.ts`** so the definitions table stays a shallow list of identifiers.
-- **Run APIs** in **`faActionManagerRun.ts`**:
-  - **`runFaAction(id, payload)`** — fire-and-forget; the call site never sees errors.
-  - **`runFaActionAwait(id, payload): Promise<boolean>`** — same dispatch but resolves **`true`** on success, **`false`** on failure (toast + console row are still emitted).
-- **Sync queue** in **`faActionManagerSyncQueue.ts`** — **FIFO**, one-at-a-time, **30 s** per-action timeout (**`FA_ACTION_SYNC_TIMEOUT_MS`**), **soft cap of 32** (**`FA_ACTION_SYNC_QUEUE_MAX`**), opt-in **`dedup`** drops duplicates while one instance is pending or running, **`awaitSyncQueueDrain()`** waits for the queue to empty.
-- **Async path** runs immediately and tracks the entry through **`S_FaActionManager.inFlightAsyncActions`** until the handler resolves or rejects.
-- **Error surface** in **`faActionManagerErrorReporting_manager.ts`** (factory **`functions/createFaActionManagerErrorReporting.ts`**, captions in **`faActionManagerErrorReportingNormalize.ts`**) — **`reportFaActionFailure`** emits exactly **one** **`console.error`** row and **one** **`Notify.create`** per failure (**`type: 'negative'`** by default; **`FaProjectOpenFailedError`** may request **`type: 'warning'`** for softer UX while console + history stay failure-shaped); hard project-open failures use the **`.faproject`** path as the toast caption; the failure record is also written to **`S_FaActionManager.lastFailure`**.
-- **History** in **`faActionManagerHistory.ts`** — session-only ring buffer (cap **`FA_ACTION_HISTORY_MAX = 500`** in **`S_FaActionManager`**) that powers **`DialogActionMonitor`** through **`snapshotActionHistory()`** (deep-cloned, sorted descending by **`enqueuedAt`**, newest first).
-- **Store bridge** in **`faActionManagerStoreBridge.ts`** — **`resolveFaActionManagerStore()`** returns **`null`** when no Pinia is active, so the manager modules stay safe in tests and during early boot.
+- **Action ids**: **`types/I_faActionManagerDomain.ts`** (**`FA_ACTION_IDS`**, **`T_faActionId`**, **`I_faActionPayloadMap`**). Payload map ties each id to handler input (`void` = no payload).
+- **Definitions**: **`src/scripts/actionManager/faActionDefinitions.ts`** (**`FA_ACTION_DEFINITIONS`**) — each id → **`kind`** (**`async`** / **`sync`**), optional **`dedup`**, **`handler`** ref. **Handlers**: **`faActionDefinitionHandlers.ts`** so definitions table stays shallow id list.
+- **Run APIs** (**`faActionManagerRun.ts`**):
+  - **`runFaAction(id, payload)`** — fire-and-forget; call site never sees errors.
+  - **`runFaActionAwait(id, payload): Promise<boolean>`** — same dispatch; **`true`** success, **`false`** failure (toast + console still emitted).
+- **Sync queue** (**`faActionManagerSyncQueue.ts`**): **FIFO**, one-at-a-time, **30 s** timeout (**`FA_ACTION_SYNC_TIMEOUT_MS`**), **soft cap 32** (**`FA_ACTION_SYNC_QUEUE_MAX`**), opt-in **`dedup`** drops duplicates while pending/running, **`awaitSyncQueueDrain()`** waits empty.
+- **Async path**: runs immediately; tracks entry in **`S_FaActionManager.inFlightAsyncActions`** until resolve/reject.
+- **Error surface** (**`faActionManagerErrorReporting_manager.ts`**, factory **`functions/createFaActionManagerErrorReporting.ts`**, captions **`faActionManagerErrorReportingNormalize.ts`**): **`reportFaActionFailure`** → exactly **one** **`console.error`** + **one** **`Notify.create`** per failure (**`type: 'negative'`** default; **`FaProjectOpenFailedError`** may **`type: 'warning'`** for softer UX; console + history stay failure-shaped); hard project-open failures use **`.faproject`** path as toast caption; also **`S_FaActionManager.lastFailure`**.
+- **History** (**`faActionManagerHistory.ts`**): session-only ring buffer (cap **`FA_ACTION_HISTORY_MAX = 500`** in **`S_FaActionManager`**); **`DialogActionMonitor`** via **`snapshotActionHistory()`** (deep-cloned, sorted desc by **`enqueuedAt`**).
+- **Store bridge** (**`faActionManagerStoreBridge.ts`**): **`resolveFaActionManagerStore()`** → **`null`** without Pinia — safe tests + early boot.
 
 ## Single-toast rule
 
-The action manager is the **only** place that emits **error** toasts for registered actions. Stores invoked by handlers (for example **`S_FaKeybinds.updateKeybinds`** and **`S_FaUserSettings.updateSettings`**) **must throw** on failure (or return **`false`** with a console log) and must **not** emit their own negative **`Notify.create`** for save errors. Success toasts may stay in stores when they are user-relevant (for example "Settings saved").
+Action manager **only** place for **error** toasts on registered actions. Store handlers (e.g. **`S_FaKeybinds.updateKeybinds`**, **`S_FaUserSettings.updateSettings`**) **must throw** on failure (or **`false`** + console) — **no** own negative **`Notify.create`** for save errors. Success toasts may stay in stores when user-relevant (e.g. "Settings saved").
 
 ## Adding a new action (checklist)
 
-1. **`types/I_faActionManagerDomain.ts`** — append the id to **`FA_ACTION_IDS`** and add its payload entry to **`I_faActionPayloadMap`** (use **`void`** when there is no payload).
-2. **`src/scripts/actionManager/faActionDefinitionHandlers.ts`** — implement **`export async function handle…`** (or sync **`export function`** when the handler is synchronous) with the real work. **`src/scripts/actionManager/faActionDefinitions.ts`** — append one row to **`FA_ACTION_DEFINITIONS`** with the right **`kind`** (**`sync`** for ordered window controls and similar one-at-a-time flows; **`async`** for dialog opens and fire-and-forget UI). Add **`dedup: true`** for actions where rapid double-trigger should silently collapse.
-3. **Call sites** — replace direct calls to UI helpers / stores / bridges with **`runFaAction`** (or **`runFaActionAwait`** when the call site needs the boolean outcome).
-4. **Tests** — extend **`src/scripts/actionManager/_tests/`**, Vitest suites for **migrated** call sites, and **`src/scripts/keybinds/_tests/`** when **`FA_KEYBIND_COMMAND_TO_ACTION_ID`** changes. **Also** run or update **connected** UI coverage: **`src/components/dialogs/DialogActionMonitor/_tests/`** (Vitest + component Playwright), **`e2e-tests/checkActionMonitor.playwright.spec.ts`**, and any E2E flow that opens the monitor (for example **`checkKeybinds.playwright.spec.ts`**) when table columns, copy text, **`L_DialogActionMonitor`**, or history shape changes—**grep** for **`DialogActionMonitor`**, **`dialogActionMonitor`**, and the action id when unsure.
-5. **Keybind routing (optional)** — when the action should also be triggerable via a global shortcut, add a row to **`FA_KEYBIND_COMMAND_TO_ACTION_ID`** in **`src/scripts/keybinds/faKeybindRunCommand.ts`** and the matching **`I_faKeybindCommandDefinition`** (see [fantasia-keybinds](../skills/fantasia-keybinds/SKILL.md)).
-6. **Action monitor** — no extra wiring; the new id appears automatically in **`DialogActionMonitor`** rows once it executes.
+1. **`types/I_faActionManagerDomain.ts`** — append id to **`FA_ACTION_IDS`**, payload to **`I_faActionPayloadMap`** (`void` if none).
+2. **`faActionDefinitionHandlers.ts`** — **`export async function handle…`** (or sync **`export function`**). **`faActionDefinitions.ts`** — append **`FA_ACTION_DEFINITIONS`** row: **`kind`** (**`sync`** ordered window controls; **`async`** dialog opens/fire-and-forget). **`dedup: true`** when rapid double-trigger should collapse.
+3. **Call sites** — **`runFaAction`** / **`runFaActionAwait`** instead of direct UI/store/bridge calls.
+4. **Tests** — **`src/scripts/actionManager/_tests/`**, Vitest for migrated call sites, **`src/scripts/keybinds/_tests/`** when **`FA_KEYBIND_COMMAND_TO_ACTION_ID`** changes. **Connected UI**: **`DialogActionMonitor/_tests/`** (Vitest + Playwright), **`e2e-tests/checkActionMonitor.playwright.spec.ts`**, E2E opening monitor (e.g. **`checkKeybinds.playwright.spec.ts`**) when table columns, copy, **`L_DialogActionMonitor`**, history shape changes — **grep** **`DialogActionMonitor`**, **`dialogActionMonitor`**, action id.
+5. **Keybind routing (optional)** — global shortcut → **`FA_KEYBIND_COMMAND_TO_ACTION_ID`** in **`faKeybindRunCommand.ts`** + **`I_faKeybindCommandDefinition`** ([fantasia-keybinds](../skills/fantasia-keybinds/SKILL.md)).
+6. **Action monitor** — no extra wiring; new id appears in **`DialogActionMonitor`** once executed.
 
 ## Authoring constraints
 
-- **Module size and function size** — every file under **`src/scripts/actionManager/`** stays within the global **≤250 lines per `.ts` module** and **≤100 lines per function** caps from [code-size-decomposition.mdc](code-size-decomposition.mdc). Split by concern (registry vs run vs sync queue vs error vs history vs store bridge) instead of stuffing one mega module.
-- **No direct `Notify.create` for action failures** — call **`reportFaActionFailure`** (or rely on the manager's automatic path). Overflow drops in the sync queue are the one place that already emits its own dedicated toast and immediately records a synthetic **`failed`** history row.
-- **Handler errors** — handlers may **throw** or **reject**; the manager catches both, normalizes them via **`normalizeFaActionError`**, and routes them through **`reportFaActionFailure`**.
-- **Payload preview** — the manager always uses **`buildFaActionPayloadPreview`** for log/history rendering. Cycles or unserializable payloads degrade gracefully to **`[unserializable]`**; long previews are truncated to keep the monitor table readable.
-- **Pinia tolerance** — manager modules never assume the store is mounted; **`resolveFaActionManagerStore()`** returns **`null`** during early boot or tests without active Pinia, and every manager helper short-circuits cleanly.
+- **Module/function size** — **`src/scripts/actionManager/`** within global **≤250 lines/module**, **≤100 lines/function** ([code-size-decomposition.mdc](code-size-decomposition.mdc)). Split registry vs run vs sync queue vs error vs history vs store bridge.
+- **No direct `Notify.create` for action failures** — **`reportFaActionFailure`** or manager automatic path. Sync queue overflow drops = dedicated toast + synthetic **`failed`** history row.
+- **Handler errors** — throw/reject OK; manager catches, **`normalizeFaActionError`**, **`reportFaActionFailure`**.
+- **Payload preview** — always **`buildFaActionPayloadPreview`** for log/history. Cycles/unserializable → **`[unserializable]`**; long previews truncated for monitor table.
+- **Pinia tolerance** — never assume store mounted; **`resolveFaActionManagerStore()`** **`null`** early boot/tests without Pinia; helpers short-circuit cleanly.
 
 ## Tests
 
-**Cross-surface sweep:** Action definitions and history power **`DialogActionMonitor`**. When user-visible monitor behavior, **`i18n/*/dialogs/L_DialogActionMonitor.ts`**, or row JSON changes, run or extend **`DialogActionMonitor`** Vitest + **`DialogActionMonitor.playwright.test.ts`**, **`e2e-tests/checkActionMonitor.playwright.spec.ts`**, and related E2E (see [.cursor/skills/fantasia-testing/SKILL.md](../skills/fantasia-testing/SKILL.md) **Connected tests for any feature change**).
+**Cross-surface sweep:** definitions + history power **`DialogActionMonitor`**. Monitor behavior, **`i18n/*/dialogs/L_DialogActionMonitor.ts`**, row JSON changes → **`DialogActionMonitor`** Vitest + Playwright, **`checkActionMonitor.playwright.spec.ts`**, related E2E ([fantasia-testing](../skills/fantasia-testing/SKILL.md) **Connected tests for any feature change**).
 
-Vitest suites live under **`src/scripts/actionManager/_tests/`**:
+Vitest **`src/scripts/actionManager/_tests/`**:
 
-- **`faActionDefinitions.vitest.test.ts`** — every **`FA_ACTION_IDS`** entry has a definition; no duplicate ids; valid **`kind`** for every entry.
-- **`faActionManagerErrorReporting.vitest.test.ts`** — payload preview, error normalization, single console + toast, store recording.
-- **`faActionManagerHistory.vitest.test.ts`** — queued / running / success / failed transitions, overflow drop rows, snapshot ordering and deep clone.
-- **`faActionManagerSyncQueue.vitest.test.ts`** — FIFO order, dedup drops, **`FA_ACTION_SYNC_QUEUE_MAX`** overflow, handler-throw routing, unknown id reporter.
-- **`faActionManagerRun.vitest.test.ts`** — async/sync dispatch, success vs failure resolution for **`runFaActionAwait`**, unknown id handling.
-- **`faActionManagerStoreBridge.vitest.test.ts`** — null with no Pinia, resolved store with active Pinia.
+- **`faActionDefinitions.vitest.test.ts`** — every **`FA_ACTION_IDS`** has definition; no duplicate ids; valid **`kind`**.
+- **`faActionManagerErrorReporting.vitest.test.ts`** — preview, normalization, single console + toast, store recording.
+- **`faActionManagerHistory.vitest.test.ts`** — queued/running/success/failed, overflow drops, snapshot ordering + deep clone.
+- **`faActionManagerSyncQueue.vitest.test.ts`** — FIFO, dedup, **`FA_ACTION_SYNC_QUEUE_MAX`** overflow, handler-throw, unknown id.
+- **`faActionManagerRun.vitest.test.ts`** — async/sync dispatch, **`runFaActionAwait`** success/failure, unknown id.
+- **`faActionManagerStoreBridge.vitest.test.ts`** — null without Pinia, resolved with active Pinia.
 
 ## Related
 
-- [fantasia-testing](../skills/fantasia-testing/SKILL.md) — **Connected tests for any feature change** (Vitest + Playwright sweep).
-- [fantasia-action-manager](../skills/fantasia-action-manager/SKILL.md) — playbook with file map and end-to-end wiring tour.
-- [fantasia-keybinds](../skills/fantasia-keybinds/SKILL.md) — keybind command ids → action ids mapping in **`faKeybindRunCommand.ts`**.
-- [code-size-decomposition.mdc](code-size-decomposition.mdc) — module/function size caps that govern this folder.
-- [vitest-tests.mdc](vitest-tests.mdc) — JSDoc + flat **`test`** style for the suites listed above.
-
-## TypeScript interfaces and types (`types/`)
-
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+- [fantasia-testing](../skills/fantasia-testing/SKILL.md) — **Connected tests for any feature change**
+- [fantasia-action-manager](../skills/fantasia-action-manager/SKILL.md) — playbook, file map, wiring tour
+- [fantasia-keybinds](../skills/fantasia-keybinds/SKILL.md) — command ids → action ids in **`faKeybindRunCommand.ts`**
+- [code-size-decomposition.mdc](code-size-decomposition.mdc) — size caps for this folder
+- [vitest-tests.mdc](vitest-tests.mdc) — JSDoc + flat **`test`** style

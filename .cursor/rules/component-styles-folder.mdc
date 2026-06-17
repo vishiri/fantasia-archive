@@ -9,36 +9,31 @@ alwaysApply: false
 
 # Component-level `styles/` folder (`src/components/`)
 
-Use this layout when an SFC must pull in **external** styles via `<style lang="scss" src="...">` (or CSS) — typically to stay within the **250-line** `.vue` cap ([code-size-decomposition.mdc](code-size-decomposition.mdc)).
+SFC pulls **external** styles via `<style lang="scss" src="...">` (or CSS) — typically **250-line** `.vue` cap ([code-size-decomposition.mdc](code-size-decomposition.mdc)).
 
 ## Placement
 
-- Put files under **`src/components/<bucket>/<FeatureName>/styles/`** (a **`styles`** directory **inside** the same folder as the feature `.vue`).
-- **Do not** place standalone **`*.scss`** / **`*.css`** next to the **`.vue`** at the feature root (for example not `DialogFoo/DialogFoo.unscoped.scss` beside `DialogFoo.vue`).
-- **Layouts and pages** under **`src/layouts/`** and **`src/pages/`** follow the same idea if they ever need an external sheet: **`styles/`** next to that **`.vue`**, not loose sibling files.
+- Files under **`src/components/<bucket>/<FeatureName>/styles/`** (**`styles`** inside same folder as feature `.vue`).
+- **No** standalone **`*.scss`** / **`*.css`** beside **`.vue`** at feature root (not `DialogFoo/DialogFoo.unscoped.scss` beside `DialogFoo.vue`).
+- **`src/layouts/`**, **`src/pages/`**: same pattern if external sheet needed — **`styles/`** next to **`.vue`**, not loose siblings.
 
 ## Naming
 
-- Prefer a **clear, feature-scoped** basename, for example **`WindowAppStyling.unscoped.scss`**, **`WindowAppStyling.floatingWindowPopTransition.unscoped.scss`**, **`DialogKeybindSettings.unscoped.scss`**, so multiple sheets under **`styles/`** stay distinguishable.
-- **`_variables.scss`** (fixed name): holds feature-, layout-, or page-scoped **`$` theme variables** (semantic tokens for that **`src/components/**`**, **`src/layouts/**`**, or **`src/pages/**`** surface) that are re-exported through the root barrel [quasar.variables.scss](src/css/quasar.variables.scss). It is **not** a second `<style src>`: it is **`@use`d** only from other SCSS. Start the file with **`@use` … [app.palette.scss](src/css/app.palette.scss) `as *`** when definitions need palette or globals; do **not** **`@use`** the barrel from here. New tokens for this feature go here instead of the monolith. **Keep every name that the SFC (or a shared foundation catalogue) still references** — removing definitions causes **Sass undefined variable** at build time, not a Stylelint failure. See [project-scss.mdc](project-scss.mdc) **Theme token layout** and (for **`$q*`** only) **`yarn audit:quasar-component-tokens`**.
-- Scoped blocks may stay in the SFC; **unscoped** or large extracts often use a **`.unscoped.scss`** suffix when that matches existing dialogs/windows.
+- **Feature-scoped** basename, e.g. **`WindowAppStyling.unscoped.scss`**, **`WindowAppStyling.floatingWindowPopTransition.unscoped.scss`**, **`DialogKeybindSettings.unscoped.scss`** — multiple sheets under **`styles/`** stay distinguishable.
+- **`_variables.scss`** (fixed name): feature/layout/page **`$` theme variables** re-exported through [quasar.variables.scss](src/css/quasar.variables.scss). **Not** second `<style src>` — **`@use`d** from other SCSS only. Start with **`@use` … [app.palette.scss](src/css/app.palette.scss) `as *`** when needed; **no** barrel **`@use`** from here. New feature tokens here, not monolith. **Keep every name SFC/foundation catalogue still references** — removal → **Sass undefined variable** at build, not Stylelint. [project-scss.mdc](project-scss.mdc) **Theme token layout**; **`$q*`** only → **`yarn audit:quasar-component-tokens`**.
+- Scoped blocks may stay in SFC; **unscoped** or large extracts often **`.unscoped.scss`** suffix when matches dialogs/windows.
 
 ## Wiring
 
-- From the SFC, import with a **relative path into `styles/`**, for example:
+- SFC relative import into `styles/`:
 
 ```vue
 <style lang="scss" src="./styles/WindowAppStyling.unscoped.scss"></style>
 ```
 
-- Keep the usual SFC block order: **`<template>`**, **`<script>`**, then **`<style>`** last ([vue-quasar.mdc](vue-quasar.mdc)).
+- SFC block order: **`<template>`**, **`<script>`**, **`<style>`** last ([vue-quasar.mdc](vue-quasar.mdc)).
 
 ## Related
 
-- BEM and token rules for the sheet contents: [vue-bem-scss.mdc](vue-bem-scss.mdc), [project-scss.mdc](project-scss.mdc) (including **palette** vs **semantic** color tokens in consumer SCSS)
-- When to extract vs keep inline: [code-size-decomposition.mdc](code-size-decomposition.mdc)
-
-## TypeScript interfaces and types (`types/`)
-
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+- Sheet contents: [vue-bem-scss.mdc](vue-bem-scss.mdc), [project-scss.mdc](project-scss.mdc) (**palette** vs **semantic** color tokens in consumer SCSS)
+- Extract vs inline: [code-size-decomposition.mdc](code-size-decomposition.mdc)

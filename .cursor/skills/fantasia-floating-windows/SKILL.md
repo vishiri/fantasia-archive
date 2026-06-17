@@ -11,46 +11,43 @@ description: >-
 
 ## What they are
 
-**`Window*`** components under **`src/components/floatingWindows/`** are **movable, resizable** **`position: fixed`** UIs inside the **same** renderer as the main app. They are **not** extra Electron **`BrowserWindow`** instances.
+**`Window*`** under **`src/components/floatingWindows/`** — movable/resizable **`position: fixed`** in **same** renderer. Not extra Electron **`BrowserWindow`** instances.
 
 ## Architecture (checklist)
 
-1. **Teleport** — Wrap the frame root (inside **`Transition`** if used) with **`_FaFloatingWindowBodyTeleport`** so the DOM node lives under **`document.body`**. Avoids nesting under **`q-header`** / **`AppControlMenus`** where **`transform`** or stacking contexts break **`fixed`** and **`z-index`** expectations. **`Transition`**, when used, must wrap a **single** element; in **`WindowAppStyling`**, the order is **Teleport** → **Transition** → frame root **`div`**.
-2. **Composable** — **`useFaFloatingWindowFrame(visibleRef, layout?)`** from **`src/scripts/floatingWindows/useFaFloatingWindowFrame.ts`**: **`centerInViewport`**, title drag (**`useFaFloatingWindowTitleDrag`**), resize (**`useFaFloatingWindowResize`** + **`computeFaFloatingWindowResizeFrame`**), **`ResizeObserver`** sync, **`frameStyle`** with **`z-index`**.
-3. **Z-index** — Session counters in **`5000`–`5999`**, sub-bands wrap within their range. Must stay **below** **`6000`** so Quasar dialogs and app chrome (**`6000+`**, e.g. **`$mainLayout-appHeader-zIndex`**) paint above. **`standard`** uses **`5000`–`5799`** (app-wide Custom CSS); **`projectStyling`** uses **`5800`–`5899`**; app noteboard **`5900`–`5949`**; project noteboard **`5950`–`5999`**. **`raiseZ`** on open, frame **`pointerdown`**, drag start, resize start.
-4. **Layout** — **`I_FaFloatingWindowFrameLayout`** / **`FA_FLOATING_WINDOW_FRAME_DEFAULT_LAYOUT`** in **`faFloatingWindowFrameLayout.ts`**: fractions, min/max width/height, **`marginTopPx`**, **`marginRightPx`**, **`marginBottomPx`**, **`marginLeftPx`** for centering, drag bounds, and clamping.
-5. **Resize** — **`faFloatingWindowResizeGeometry.ts`**, **`faFloatingWindowResizeClamp.ts`**: per-handle viewport clamp with **anchor preservation** (west/north must not move the opposite edge incorrectly). **`_FaFloatingWindowFrameResizeHandles`** + **`FA_FLOATING_WINDOW_RESIZE_HANDLE_PX`** for hit targets.
-6. **Modals** — **Do not** use **`registerComponentDialogStackGuard`** for **`Window*`**; that guard exists so **`openDialog*`** can serialize **modal** `QDialog` instances. Floating windows sit in a lower z-index band; multiple **`Window*`** and modal dialogs can be open at once.
-7. **i18n** — Strings under **`i18n/<locale>/floatingWindows/`** (locale modules such as **`L_appStyling.ts`**; keys like **`floatingWindows.appStyling.*`**).
+1. **Teleport** — **`_FaFloatingWindowBodyTeleport`** under **`document.body`**. **`Transition`** wraps single element: Teleport → Transition → frame root
+2. **Composable** — **`useFaFloatingWindowFrame(visibleRef, layout?)`** from **`src/scripts/floatingWindows/`**: center, title drag, resize, **`ResizeObserver`**, **`frameStyle`** + z-index
+3. **Z-index** — **`5000`–`5999`** session counters; **below `6000`** (modals/chrome). Bands: **`standard` `5000`–`5799`**, **`projectStyling` `5800`–`5899`**, app noteboard **`5900`–`5949`**, project noteboard **`5950`–`5999`**. **`raiseZ`** on open/interaction
+4. **Layout** — **`I_FaFloatingWindowFrameLayout`** / **`FA_FLOATING_WINDOW_FRAME_DEFAULT_LAYOUT`**: fractions, min/max, per-edge margins
+5. **Resize** — **`faFloatingWindowResizeGeometry.ts`**, **`faFloatingWindowResizeClamp.ts`**; **`_FaFloatingWindowFrameResizeHandles`**
+6. **Modals** — **no** **`registerComponentDialogStackGuard`** for **`Window*`**
+7. **i18n** — **`i18n/<locale>/floatingWindows/`**
 
-## Open/close **Transition** (Custom app **CSS** / **`WindowAppStyling`**)
+## Open/close Transition (Custom app CSS / WindowAppStyling)
 
-- **Bindings** — **`src/scripts/floatingWindows/faFloatingWindowPopTransition.ts`**: **`FA_FLOATING_WINDOW_POP_TRANSITION_MS`**, **`FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS`** (class names **`fa-floatingWindowPop-*`**).
-- **Styles** — **`WindowAppStyling/…/WindowAppStyling.floatingWindowPopTransition.unscoped.scss`**, loaded from **`WindowAppStyling.unscoped.scss`**: opacity and **`transform: scale`** with a **non-zero** minimum (tune **`$fa-floatingWindowPop-scale-from`**), **300 ms** QDialog-style pop.
-- **Not** Quasar stock **`q-transition--scale`**: that uses **scale(0)** in enter-from and can break **Electron** and **Monaco** **Playwright** checks. **Reference** — stock **`q-transition`…** names and **300 ms** in **`faQuasarDialogStandardTransition.ts`**.
+- **`faFloatingWindowPopTransition.ts`**: **`FA_FLOATING_WINDOW_POP_TRANSITION_MS`**, class **`fa-floatingWindowPop-*`**
+- SCSS in **`WindowAppStyling.floatingWindowPopTransition.unscoped.scss`** — not stock **`q-transition--scale`** (breaks Electron/Monaco Playwright)
 
-## Project **Noteboard** ( **`WindowProjectNoteboard`** )
+## Project Noteboard (WindowProjectNoteboard)
 
-- **Text vs frame debounces** — Text persistence debounces on **`380`** ms while the frame geometry path debounces on **`280`** ms (`useWindowProjectNoteboardTextPersist` vs `useWindowProjectNoteboardFramePersist`). A frame-only save can read SQLite **before** the text debounce has written the scratch body, so **`S_FaProjectNoteboard.persistProjectNoteboardPartialSilent`** merges the **in-memory** textarea value into the read-back snapshot **when the patch omits `text`**. That keeps on-screen draft text from being replaced by an earlier empty **`project_noteboard_content`** row during the same session.
-- **Stacking** — **`floatingWindowZLayer: 'projectNoteboard'`** uses **`5950`–`5999`** so **Project Noteboard** paints above **`projectStyling`**, **App Noteboard**, and **`standard`** **`Window*`** surfaces, still **below** modal chrome (**`6000+`**). Project Custom CSS uses **`'projectStyling'`** (**`5800`–`5899`**) above **`'standard'`**.
+- Text debounce **380** ms; frame **280** ms. Frame-only save may race text debounce → **`persistProjectNoteboardPartialSilent`** merges in-memory textarea when patch omits **`text`**
+- **`floatingWindowZLayer: 'projectNoteboard'`** → **`5950`–`5999`**
 
-## Project **Custom CSS** (**`WindowProjectStyling`**)
+## Project Custom CSS (WindowProjectStyling)
 
-- **Persistence** — SQLite KV keys **`project_styling_*`** mirror the project noteboard geometry plus content pattern; frame debounce **`280`** ms, editor body debounce **`380`** ms when writing to SQLite; **`S_FaProjectStyling.persistProjectStylingPartialSilent`** merges in-memory CSS when a frame-only patch races the body debounce.
+- KV **`project_styling_*`**; frame **280** ms, body **380** ms; **`persistProjectStylingPartialSilent`** merges in-memory CSS on frame-only race
 
 ## Tests
 
-- **Geometry** — **`src/scripts/floatingWindows/_tests/faFloatingWindowResizeGeometry.vitest.test.ts`** (and related). Tests may use a **spread** of **`FA_FLOATING_WINDOW_FRAME_DEFAULT_LAYOUT`** with **smaller** **`minWidthPx` / `minHeightPx`** when assertions need resize math not dominated by production minimums.
-- **Component Vitest** — Stub the body teleport with the **same key the parent uses** (for example **`FaFloatingWindowBodyTeleport`** in **`WindowAppStyling.vitest.test.ts`**) and **`<div><slot /></div>`** so **`mount(...).find('[data-test-locator=…]')`** still finds nodes (real Teleport moves content to **`body`**).
-- **Playwright** — Locators unchanged; frame keeps **`data-test-locator`** on the teleported node.
+- Geometry: **`faFloatingWindowResizeGeometry.vitest.test.ts`**
+- Component Vitest: stub teleport binding + **`<div><slot /></div>`**
+- Playwright: **`data-test-locator`** on teleported frame
 
-## Custom app **CSS** help (**`WindowAppStyling`**)
+## Custom app CSS help (WindowAppStyling)
 
-- The **?** menu lists **`--fa-color-*`** variable names (with color swatches) for discovery while editing; logic lives in [`src/scripts/faTheme/`](../../../src/scripts/faTheme/) (**DOM** scan of parsed rules, with a [`fa-theme.scss`](../../../src/css/fa-theme.scss) text fallback). Runtime theme colors use the **`--fa-color-*`** prefix; other custom properties (for example **`--fa-fw-resize`**) use a different **`--fa-…`** family — see [AGENTS.md](../../../AGENTS.md) **Theme tokens**.
+**?** menu lists **`--fa-color-*`** names — logic in **`src/scripts/faTheme/`**
 
 ## Related docs
 
 - [AGENTS.md](../../../AGENTS.md) **In-renderer floating windows**
-- [README.md](../../../README.md) **Architecture** and **Renderer components** table
-- [.cursor/skills/fantasia-quasar-vue/SKILL.md](../fantasia-quasar-vue/SKILL.md) component buckets
-- [.cursor/rules/vue-quasar.mdc](../../rules/vue-quasar.mdc) SFC patterns
+- [fantasia-quasar-vue](../fantasia-quasar-vue/SKILL.md)

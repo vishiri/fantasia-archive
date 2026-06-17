@@ -13,16 +13,11 @@ alwaysApply: false
 
 # Database documentation (`docs/database/`)
 
-When you change **`.faproject`** migrations, **`project_data`** KV keys, **content** tables (including **`worlds.color`**, **`worlds.color_pallete`**, **`world_template_groups`**, **`world_template_placements`**), **project content** persist modules, **`FA_PROJECT_CONTENT_IPC`**, **Project Settings** worlds snapshot/list handlers, related **Zod** schemas, or **`projectContent`** preload APIs, update the matching doc in the **same commit**:
+Change **`.faproject`** migrations, **`project_data`** KV keys, **content** tables (incl. **`worlds.color`**, **`worlds.color_pallete`**, **`world_template_groups`**, **`world_template_placements`**), **project content** persist modules, **`FA_PROJECT_CONTENT_IPC`**, **Project Settings** worlds snapshot/list handlers, related **Zod** schemas, or **`projectContent`** preload APIs → update matching doc **same commit**:
 
 - [docs/database/projectDB.md](../../docs/database/projectDB.md) — schema version ladder, tables, FK rules, module map, IPC table
-- [docs/database/templateCustomFields.md](../../docs/database/templateCustomFields.md) — approved custom-fields architecture; update when **design decisions change**; when **implementing**, migrate table detail into `projectDB.md` and trim duplicate DDL from the design doc
+- [docs/database/templateCustomFields.md](../../docs/database/templateCustomFields.md) — approved custom-fields architecture; update when **design decisions change**; on **implementing**, migrate table detail into `projectDB.md`, trim duplicate DDL from design doc
 - [docs/database/README.md](../../docs/database/README.md) — index (only when file list or agent rules change)
 - [docs/database/appUserDataKv.md](../../docs/database/appUserDataKv.md) — when **`electron-store`** domains (user settings, keybinds, MRU, app styling/noteboard) change — **not** mixed into `projectDB.md`
 
-**Agents:** read [docs/database/projectDB.md](../../docs/database/projectDB.md) before editing project SQLite or **`runWithFaProjectDatabase*`** call sites. See also [fa-project-database-access.mdc](fa-project-database-access.mdc), [fantasia-sqlite-main skill](../skills/fantasia-sqlite-main/SKILL.md), and pre-release schema squash [fantasia-flatten-database-schemas skill](../skills/fantasia-flatten-database-schemas/SKILL.md).
-
-## TypeScript interfaces and types (`types/`)
-
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+**Agents:** read [docs/database/projectDB.md](../../docs/database/projectDB.md) before editing project SQLite or **`runWithFaProjectDatabase*`** call sites. See [fa-project-database-access.mdc](fa-project-database-access.mdc), [fantasia-sqlite-main skill](../skills/fantasia-sqlite-main/SKILL.md), pre-release squash [fantasia-flatten-database-schemas skill](../skills/fantasia-flatten-database-schemas/SKILL.md).

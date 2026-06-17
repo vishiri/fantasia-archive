@@ -5,20 +5,10 @@ alwaysApply: true
 
 # Plan document discipline
 
-- **Before saving a new plan**, scan `.cursor/plans/` (skip if the folder is missing or empty). Delete any plan file whose **last modified time** is **more than 30 days** older than the current moment so outdated local plans do not accumulate.
-- For every generated plan document, store it under `.cursor/plans/`.
-- If `.cursor/plans/` does not exist, create it.
-- Plan filenames must include both:
-  - current `package.json` version
-  - creation timestamp in `YYYY-MM-DD-HH-mm-ss` format
-- Each plan document body must include:
-  - `Created at: YYYY-MM-DD-HH-mm-ss`
-  - `Project version: <package.json version>`
-- Treat `.cursor/plans/` as local temporary planning context (not for repository sync).
-- Do not create top-level `docs/` (or other new doc roots) for planning artifacts unless the user explicitly asks for that location.
-- For planning artifacts (plans, rollout checklists, inventories, implementation trackers), invoke and follow `.cursor/skills/fantasia-plan-documents/SKILL.md` before creating files.
-
-## TypeScript interfaces and types (`types/`)
-
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+- **Before new plan**: scan `.cursor/plans/` (skip if missing/empty). Delete plans **>30 days** old by last modified time.
+- Store every generated plan under `.cursor/plans/`; create folder if missing.
+- Filenames: current `package.json` version + creation timestamp **`YYYY-MM-DD-HH-mm-ss`**.
+- Body must include: `Created at: YYYY-MM-DD-HH-mm-ss`, `Project version: <package.json version>`.
+- `.cursor/plans/` = local temp context (not repo sync).
+- No top-level `docs/` (or other new doc roots) for planning unless user asks.
+- Planning artifacts (plans, rollout checklists, inventories, trackers): invoke `.cursor/skills/fantasia-plan-documents/SKILL.md` before creating files.

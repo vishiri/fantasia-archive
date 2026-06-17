@@ -6,46 +6,41 @@ alwaysApply: false
 
 # `src/scripts` — modules and extraction
 
-Vue SFCs import from here when extracting **pure helpers**; see [vue-quasar.mdc](vue-quasar.mdc) and [code-size-decomposition.mdc](code-size-decomposition.mdc). **Component-owned script logic** that is not app-wide belongs under **`src/components/<bucket>/<Feature>/scripts/`**, not under `src/scripts/`. **Colocated component `_data/`** and **automated-test fixtures** (inline in `*.vitest.test.ts` / `*.playwright.test.ts`, not separate `_tests/*.ts` dump modules) are not under `src/scripts/` — follow vue-quasar and the Vitest/Playwright rules.
+Vue SFCs import **pure helpers** from here; [vue-quasar.mdc](vue-quasar.mdc), [code-size-decomposition.mdc](code-size-decomposition.mdc). **Component-owned script logic** not app-wide → **`src/components/<bucket>/<Feature>/scripts/`**, not `src/scripts/`. **Colocated `_data/`** + **test fixtures** (inline in `*.vitest.test.ts` / `*.playwright.test.ts`, not separate `_tests/*.ts` dumps) not under `src/scripts/` — vue-quasar + Vitest/Playwright rules.
 
 ## Layout
 
-- **`_utilities/`** — small, pure helpers (format conversion, parsing) with **JSDoc on each exported function** (`@param` / `@returns` where helpful), e.g. [colorFormatConvertors.ts](src/scripts/_utilities/colorFormatConvertors.ts).
-- **`appInternals/`** — cross-cutting renderer helpers wired in **`rendererAppInternals_manager.ts`** and related **`appInternals_manager.ts`** exports (Storybook canvas detection, Vite public asset paths, interface language apply/save, boot routing side effects) — not feature-dialog or keybind-specific.
-- **Feature folders** (e.g. `appGlobalManagementUI/`) — behavior tied to app features; keep files focused on one area.
-- **`keybinds/`** — global shortcut matching, chord helpers, **`faKeybindRunCommand`**, and user-visible chord labels in **`faKeybindsChordUiFormatting.ts`** (**`formatFaKeybindChordForUi`**, **`formatFaKeybindCommandLabelFromSnapshot`**); wired from **`MainLayout.vue`** with state from **`S_FaKeybinds`**. When adding app-wide shortcuts, follow [fantasia-keybinds](../skills/fantasia-keybinds/SKILL.md).
-- **`floatingWindows/`** — **`useFaFloatingWindowFrame`**, **`useFaFloatingWindowResize`**, **`useFaFloatingWindowTitleDrag`**, **`faFloatingWindowFrameLayout.ts`** (defaults and **`I_FaFloatingWindowFrameLayout`**), **`faFloatingWindowResizeGeometry.ts`**, **`faFloatingWindowResizeClamp.ts`**, Quasar **`q-transition`…** / duration reference **`faQuasarDialogStandardTransition.ts`**, and the floating-window custom pop **Transition** module **`faFloatingWindowPopTransition.ts`**. See [AGENTS.md](../../AGENTS.md) **In-renderer floating windows** and [fantasia-floating-windows](../skills/fantasia-floating-windows/SKILL.md).
-- **`faDragDrop/`** — shared **`vue-draggable-plus`** helpers for vertical tab strips and palette rows (**`buildFaVerticalDraggableTabsRootStyle`**, **`faVerticalDraggableTabsSortableDragOptions`**, drag cursor / ghost hiding). Types: **`types/I_faVerticalDraggableTabs.ts`**. Styles: **`src/css/theme/custom-components/faVerticalDraggableTabs.scss`**. Reference TabLists: **`DialogProjectSettingsWorldsTabList`**, **`DialogProjectSettingsDocumentTemplatesTabList`**. See [fantasia-drag-drop](../skills/fantasia-drag-drop/SKILL.md) **Vertical draggable tab strips**.
-- **`faColorContrast/`** — hex luminance helpers for picker swatch borders (**`faColorContrast.ts`**); used by **`FaColorPickerInput`** and **Project Settings** palette swatches.
-- **`faIcons/`** — committed q-icon catalogs (**`catalogs/*.catalog.json`**), lazy load + merge wiring, and level-1 filter/chunk/merge helpers for **`FaIconPickerInput`**. Regenerate catalogs with **`yarn generate:icon-catalogs`**. See [fantasia-icon-picker](../skills/fantasia-icon-picker/SKILL.md).
-- Leading underscore on folder names like `_utilities` signals shared non-feature helpers.
+- **`_utilities/`** — small pure helpers (format, parsing); **JSDoc** each export (`@param` / `@returns` where helpful), e.g. [colorFormatConvertors.ts](src/scripts/_utilities/colorFormatConvertors.ts).
+- **`appInternals/`** — cross-cutting renderer helpers in **`rendererAppInternals_manager.ts`**, **`appInternals_manager.ts`** (Storybook canvas detection, Vite public asset paths, interface language apply/save, boot routing) — not feature-dialog/keybind-specific.
+- **Feature folders** (e.g. `appGlobalManagementUI/`) — behavior tied to app features; one area per file group.
+- **`keybinds/`** — global shortcut matching, chord helpers, **`faKeybindRunCommand`**, user-visible chord labels in **`faKeybindsChordUiFormatting.ts`** (**`formatFaKeybindChordForUi`**, **`formatFaKeybindCommandLabelFromSnapshot`**); wired **`MainLayout.vue`** + **`S_FaKeybinds`**. New app-wide shortcuts: [fantasia-keybinds](../skills/fantasia-keybinds/SKILL.md).
+- **`floatingWindows/`** — **`useFaFloatingWindowFrame`**, **`useFaFloatingWindowResize`**, **`useFaFloatingWindowTitleDrag`**, **`faFloatingWindowFrameLayout.ts`**, **`faFloatingWindowResizeGeometry.ts`**, **`faFloatingWindowResizeClamp.ts`**, Quasar transition ref **`faQuasarDialogStandardTransition.ts`**, custom pop **Transition** **`faFloatingWindowPopTransition.ts`**. [AGENTS.md](../../AGENTS.md) **In-renderer floating windows**, [fantasia-floating-windows](../skills/fantasia-floating-windows/SKILL.md).
+- **`faDragDrop/`** — shared **`vue-draggable-plus`** for vertical tab strips/palette rows (**`buildFaVerticalDraggableTabsRootStyle`**, **`faVerticalDraggableTabsSortableDragOptions`**, drag cursor/ghost). Types: **`types/I_faVerticalDraggableTabs.ts`**. Styles: **`src/css/theme/custom-components/faVerticalDraggableTabs.scss`**. Ref TabLists: **`DialogProjectSettingsWorldsTabList`**, **`DialogProjectSettingsDocumentTemplatesTabList`**. [fantasia-drag-drop](../skills/fantasia-drag-drop/SKILL.md) **Vertical draggable tab strips**.
+- **`faColorContrast/`** — hex luminance for picker swatch borders (**`faColorContrast.ts`**); **`FaColorPickerInput`**, **Project Settings** palette swatches.
+- **`faIcons/`** — committed q-icon catalogs (**`catalogs/*.catalog.json`**), lazy load + merge, level-1 filter/chunk/merge for **`FaIconPickerInput`**. Regenerate: **`yarn generate:icon-catalogs`**. [fantasia-icon-picker](../skills/fantasia-icon-picker/SKILL.md).
+- Leading `_` on folders (e.g. `_utilities`) = shared non-feature helpers.
 
 ## When to split a file
 
-**Hard limits** (ESLint; see [code-size-decomposition.mdc](code-size-decomposition.mdc)): each **`.ts` module under `src/scripts/`** must stay **≤250 lines** and each **function ≤100 lines** (tests follow the global exemption list; shared types live under **`types/`** and are exempt there).
+**Hard limits** (ESLint; [code-size-decomposition.mdc](code-size-decomposition.mdc)): **`src/scripts/`** `.ts` **≤250 lines**, each function **≤100 lines** (tests: global exemption; shared types under **`types/`** exempt there).
 
-When a file grows hard to scan or approaches those caps:
+Hard to scan or near caps:
 
-1. **Group by domain** — e.g. color helpers vs list/array helpers; avoid one mega `utils.ts`.
-2. **Move reusable pure functions** into `_utilities/` with clear names.
-3. **Keep Electron/renderer boundaries clear** — code that assumes `window` or `faContentBridgeAPIs` belongs next to the feature that uses it, not in generic utilities unless already established.
+1. **Group by domain** — color vs list/array; no mega `utils.ts`.
+2. **Reusable pure functions** → `_utilities/` with clear names.
+3. **Electron/renderer boundaries** — `window` / `faContentBridgeAPIs` code next to feature that uses it, not generic utilities unless established.
 
-**Do not over-split:** many tiny files (each exporting one small helper) are harder to navigate than one domain module that stays **under the line cap**. Prefer **merging** related exports into the same file until **250 lines** or **100 lines per function** forces a real split; see [code-size-decomposition.mdc](code-size-decomposition.mdc) **Module count: prefer logical grouping** and **Return object literals**.
+**Do not over-split:** tiny one-helper files harder to navigate than one domain module under cap. **Merge** related exports until **250 lines** or **100 lines/function** forces split; [code-size-decomposition.mdc](code-size-decomposition.mdc) **Module count** + **Return object literals**.
 
-**Intentionally small modules are allowed** when there is a **documented** reason — for example a thin file that only holds **`faKeybindRunCommand`** so integration tests can **`vi.mock`** that module without mocking the whole keydown dispatcher, or breaking a **circular import**. Prefer solving the root cause (merge callers, invert a dependency) when that is cheap; when a thin file stays, add a brief file-top or export JSDoc note so future edits do not 'consolidate away' the seam by accident.
+**Intentionally small modules OK** with **documented** reason — e.g. thin **`faKeybindRunCommand`** file for **`vi.mock`** without mocking whole keydown dispatcher, or breaking circular import. Prefer fixing root cause when cheap; thin file stays → brief file-top/export JSDoc so future edits do not consolidate away seam.
 
-**Vitest `vitest.setup.ts`:** do **not** import **`rendererAppInternals`** there — that bundle imports **`i18n`** at module top, which runs before the hoisted **`vi.mock('app/i18n/externalFileLoader')`** factory can safely close over **`ref`**-based stubs. The setup file keeps a tiny duplicate of **`setFantasiaStorybookCanvasFlag`** next to the i18n mock (see **`vitest/vitest.setup.ts`** comments).
+**Vitest `vitest.setup.ts`:** do **not** import **`rendererAppInternals`** — imports **`i18n`** at module top before hoisted **`vi.mock('app/i18n/externalFileLoader')`** can close over **`ref`** stubs. Setup keeps tiny duplicate **`setFantasiaStorybookCanvasFlag`** next to i18n mock (see **`vitest/vitest.setup.ts`** comments).
 
 ## Style
 
-- Match existing import style (`app/...` alias where the repo already uses it).
-- Name exports for **observable behavior** (what callers achieve or what store or UI stays consistent), not metaphor-only labels such as **lease** for coordination helpers. Prefer names that state the invariant (**stack**, exclusivity between dialog families) or the concrete entry point; add a short JSDoc when the behavior spans multiple stores or open paths (see **`dialogManagement.ts`** under **`appGlobalManagementUI/`**).
-- Prefer explicit return types on public exports when surrounding code does.
-- Avoid `any` in function signatures, object shapes, and casts; use precise types (`unknown` if needed) and narrow at usage sites.
-- Unit tests are allowed and encouraged for `src/scripts/**` modules when colocated in neighboring `_tests/` folders (for example `src/scripts/_utilities/_tests/`, `src/scripts/appInternals/_tests/`, and `src/scripts/appGlobalManagementUI/_tests/`) using `*.vitest.test.ts`.
-- Keep Playwright for UI integration flows; do not move renderer interaction coverage out of existing Playwright suites when those checks depend on built app behavior.
-
-## TypeScript interfaces and types (`types/`)
-
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+- Match import style (`app/...` alias where repo uses it).
+- Name exports for **observable behavior** (what callers achieve, store/UI consistency), not metaphor-only labels (**lease** for coordination). Prefer invariant names (**stack**, exclusivity between dialog families) or concrete entry point; short JSDoc when behavior spans stores/open paths (see **`dialogManagement.ts`** under **`appGlobalManagementUI/`**).
+- Explicit return types on public exports when surrounding code does.
+- No `any` in signatures/shapes/casts; precise types (`unknown` + narrow).
+- Unit tests encouraged for `src/scripts/**` in neighboring `_tests/` (`src/scripts/_utilities/_tests/`, etc.) via `*.vitest.test.ts`.
+- Playwright for UI integration; do not move renderer interaction coverage out of Playwright when checks depend on built app behavior.

@@ -8,15 +8,15 @@ alwaysApply: false
 
 ## Reuse the shared element
 
-When the renderer needs a **q-icon name** field (template icon, document type icon, future custom fields), use **`FaIconPickerInput`** from **`src/components/elements/FaIconPickerInput/`** with **`v-model`** and a required **`test-locator`**. Do **not** duplicate **`q-menu`** + virtual-scroll icon grids in feature folders.
+Renderer **q-icon name** field (template icon, document type icon, future custom fields) → **`FaIconPickerInput`** from **`src/components/elements/FaIconPickerInput/`** with **`v-model`** + required **`test-locator`**. **No** duplicate **`q-menu`** + virtual-scroll icon grids in feature folders.
 
 Playbook: [fantasia-icon-picker skill](../skills/fantasia-icon-picker/SKILL.md).
 
 ## Stored value contract
 
-- Persist the **exact q-icon string** Quasar expects on **`q-icon`** / **`q-btn icon=`** (for example **`mdi-file-outline`**, **`fa-solid fa-dragon`**, **`person`**).
-- Empty model shows **`FA_ICON_PICKER_EMPTY_PLACEHOLDER_ICON`** (**`mdi-file-outline`**) in the trigger only; emit **`''`** when cleared unless the feature defines otherwise.
-- Icon sets available at runtime must stay aligned with **`quasar.config.ts`** **`extras`** and **`FA_ICON_PICKER_PACK_IDS`** in **`types/I_faIconPickerInput.ts`**.
+- Persist **exact q-icon string** Quasar expects on **`q-icon`** / **`q-btn icon=`** (e.g. **`mdi-file-outline`**, **`fa-solid fa-dragon`**, **`person`**).
+- Empty model shows **`FA_ICON_PICKER_EMPTY_PLACEHOLDER_ICON`** (**`mdi-file-outline`**) in trigger only; emit **`''`** when cleared unless feature defines otherwise.
+- Icon sets at runtime aligned with **`quasar.config.ts`** **`extras`** + **`FA_ICON_PICKER_PACK_IDS`** in **`types/I_faIconPickerInput.ts`**.
 
 ## Catalog pipeline
 
@@ -24,25 +24,25 @@ Playbook: [fantasia-icon-picker skill](../skills/fantasia-icon-picker/SKILL.md).
 | --- | --- |
 | **`yarn generate:icon-catalogs`** | Regenerate **`src/scripts/faIcons/catalogs/*.catalog.json`** from **`@quasar/extras`** |
 | **`faIconPickerCatalogLazyLoadWiring.ts`** | Dynamic **`import()`** of JSON per pack |
-| **`faIconPickerMergedCatalogLoadWiring.ts`** | Parallel load + merge for the picker menu |
+| **`faIconPickerMergedCatalogLoadWiring.ts`** | Parallel load + merge for picker menu |
 | **`functions/faIconPickerCatalogFilter.ts`** | Search filter + row chunking for **`QVirtualScroll`** |
 | **`types/I_faIconPickerInput.ts`** | Pack ids, **`FA_ICON_PICKER_ICONS_PER_ROW`**, **`FA_ICON_PICKER_VIRTUAL_ROW_HEIGHT_PX`** |
 
-After **`@quasar/extras`** upgrades or icon-set changes, run **`yarn generate:icon-catalogs`** and commit catalog JSON — do not hand-maintain large lists.
+After **`@quasar/extras`** upgrades or icon-set changes: run **`yarn generate:icon-catalogs`**, commit catalog JSON — no hand-maintained large lists.
 
 ## Layout constants (TS ↔ SCSS)
 
-**`FA_ICON_PICKER_ICONS_PER_ROW`** (16) and **`FA_ICON_PICKER_VIRTUAL_ROW_HEIGHT_PX`** (52) must match **`styles/_variables.scss`** (**`$faIconPickerInput-iconsPerRow`**, **`$faIconPickerInput-virtualRow-height`**) and **`FaIconPickerInputMenuPanel`** **`:virtual-scroll-item-size`**.
+**`FA_ICON_PICKER_ICONS_PER_ROW`** (16) + **`FA_ICON_PICKER_VIRTUAL_ROW_HEIGHT_PX`** (52) must match **`styles/_variables.scss`** (**`$faIconPickerInput-iconsPerRow`**, **`$faIconPickerInput-virtualRow-height`**) + **`FaIconPickerInputMenuPanel`** **`:virtual-scroll-item-size`**.
 
 ## Menu grid styling
 
-- List cells use **flat** **`q-btn`** (**`dense`**, **`flat`**) — **not** **`round`** — so wide glyphs are not clipped.
-- Set **`overflow: visible`** on row/cell rules when adjusting layout; keep **`place-items: center`** on the icon grid row.
+- List cells: **flat** **`q-btn`** (**`dense`**, **`flat`**) — **not** **`round`** — wide glyphs not clipped.
+- **`overflow: visible`** on row/cell when adjusting layout; **`place-items: center`** on icon grid row.
 
 ## i18n and Storybook
 
-- Strings live under **`i18n/<locale>/components/elements/FaIconPickerInput/`**, keyed **`faIconPickerInput`** in **`index.ts`**.
-- Add matching imports to **`.storybook-workspace/.storybook/mocks/externalFileLoader.ts`** when extending copy.
+- Strings: **`i18n/<locale>/components/elements/FaIconPickerInput/`**, keyed **`faIconPickerInput`** in **`index.ts`**.
+- Extend copy → add matching imports to **`.storybook-workspace/.storybook/mocks/externalFileLoader.ts`**.
 
 ## Two-level architecture
 
@@ -52,10 +52,5 @@ After **`@quasar/extras`** upgrades or icon-set changes, run **`yarn generate:ic
 
 ## Tests
 
-- Extend **`FaIconPickerInput`** Vitest and **`src/scripts/faIcons`** **`_tests/`** when changing catalog or menu behavior.
-- User flows: Playwright via **`data-test-locator`**, **`data-test-icon-name`**, menu search + cell click (see **`DialogProjectSettings.playwright.test.ts`**).
-
-## TypeScript interfaces and types (`types/`)
-
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+- Extend **`FaIconPickerInput`** Vitest + **`src/scripts/faIcons`** **`_tests/`** on catalog/menu behavior changes.
+- User flows: Playwright via **`data-test-locator`**, **`data-test-icon-name`**, menu search + cell click (**`DialogProjectSettings.playwright.test.ts`**).

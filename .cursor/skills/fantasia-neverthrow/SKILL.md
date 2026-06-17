@@ -10,25 +10,25 @@ description: >-
 
 ## When to follow
 
-- Editing or adding TypeScript/JavaScript/Vue logic that handles **anticipated** failures (IPC, **`JSON.parse`** / stringify edge cases, user-driven cancellation, clipboard, optional APIs).
-- Refactoring legacy **`try`** / **`catch`** or bare **`.catch(() => {})`** swallow patterns.
+- Anticipated failures: IPC, parse edge cases, cancellation, clipboard, optional APIs
+- Refactoring legacy **`try`/`catch`** or swallowed **`.catch`**
 
-See [neverthrow.mdc](../../../.cursor/rules/neverthrow.mdc) for repo policy.
+See [neverthrow.mdc](../../../.cursor/rules/neverthrow.mdc).
 
 ## Core API (Neverthrow v8)
 
-- **`ok(value)`**, **`err(error)`**: build **`Result`** values.
-- **`Result.fromThrowable(fn, mapError)`**: wrap sync code that throws; **`mapError`** maps **`unknown`** to the **`E`** type (often **`undefined`** or a string token).
-- **`ResultAsync.fromPromise(promise, mapError)`**: wrap rejecting promises; **`fromSafePromise`** when rejection is unexpected.
-- **`result.match(okFn, errFn)`**, **`unwrapOr`**, **`map`**, **`mapErr`**, **`andThen`**, **`orElse`**.
-- **`safeTry`**: generator-style **`yield* result`** for sequential **`Result`** steps (Rust **`?`**-like flow).
+- **`ok(value)`**, **`err(error)`**
+- **`Result.fromThrowable(fn, mapError)`**
+- **`ResultAsync.fromPromise(promise, mapError)`**; **`fromSafePromise`** when rejection unexpected
+- **`match`**, **`unwrapOr`**, **`map`**, **`mapErr`**, **`andThen`**, **`orElse`**
+- **`safeTry`**: generator **`yield* result`** for sequential steps
 
-Prefer **`finally`** callbacks on **`Promise`** chains when you only need side-effect cleanup, so you avoid **`try`** / **`finally`** where **`Result`** owns the branching.
+Prefer **`finally`** on **`Promise`** chains for cleanup-only side effects.
 
 ## Preload exclusion
 
-**`src-electron/contentBridgeAPIs/**`** is bundled into the sandboxed preload script. **Do not import `neverthrow` there.** Use **`Promise.then` / `.catch`**, **`URL.canParse`**, early returns, and similar plain patterns instead. **`src-electron/shared/**`** modules reachable from preload must follow the same rule. **Renderer**, **main**, and **`helpers/`** trees still prefer **`Result`** / **`ResultAsync`** per [neverthrow.mdc](../../../.cursor/rules/neverthrow.mdc).
+**`src-electron/contentBridgeAPIs/**`** — sandboxed preload bundle. **No `neverthrow` import.** Use **`Promise.then`/`.catch`**, **`URL.canParse`**, early returns. **`src-electron/shared/**`** reachable from preload: same rule. Renderer, main, **`helpers/`** still prefer **`Result`** / **`ResultAsync`**.
 
 ## Links
 
-- [neverthrow documentation](https://www.npmjs.com/package/neverthrow) (npm readme and upstream repo examples).
+- [neverthrow documentation](https://www.npmjs.com/package/neverthrow)
