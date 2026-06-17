@@ -1,6 +1,6 @@
 # Document template custom fields (approved design)
 
-**Status:** Architecture approved. **Not implemented** in SQLite, IPC, or UI. The shipped schema is **`user_version` 4** per [projectDB.md](projectDB.md) (includes **`worlds.color`**, **`worlds.color_pallete`**, **`worlds.sort_order`**, optional **world ↔ document template** links via **`world_document_templates`**, and default-world seed on create). Custom fields remain a **separate future migration** (version **5+**).
+**Status:** Architecture approved. **Not implemented** in SQLite, IPC, or UI. The shipped schema is **`user_version` 6** per [projectDB.md](projectDB.md) (includes **`worlds.color`**, **`worlds.color_pallete`**, **`worlds.sort_order`**, per-world template layout via **`world_template_groups`** / **`world_template_placements`**, and default-world seed on create). Custom fields remain a **separate future migration** (version **7+**).
 
 ## Problem
 

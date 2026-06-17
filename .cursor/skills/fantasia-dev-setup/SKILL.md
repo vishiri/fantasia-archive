@@ -84,7 +84,7 @@ quasar build -m electron
 
 | Goal | Command |
 |------|---------|
-| **Quality gate** (lint + `vue-tsc` + style + Vitest coverage: 100% `src-electron` + `helpers` corpus excluding playwright harness trees per `vitest.helpers.config.mts`; `src` `.ts` per `vitest/`; `vue` SFCs watermarks only; one terminal) | `yarn testbatch:verify` |
+| **Quality gate** (lint + `vue-tsc` + style + Vitest coverage: 99% `src-electron` + `helpers` corpus excluding playwright harness trees per `vitest.helpers.config.mts`; `src` `.ts` per `vitest/`; `vue` SFCs watermarks only; one terminal) | `yarn testbatch:verify` |
 | **Full project gate** (verify + summarized Electron build + Playwright component + E2E + Storybook smoke + VRT compare) | `yarn testbatch:ensure:nochange` |
 | **Full project gate — refresh Storybook VRT baselines** (same through smoke, then snapshot update) | `yarn testbatch:ensure:change` |
 | ESLint | `yarn lint:eslint` |

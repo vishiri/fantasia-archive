@@ -11,15 +11,16 @@ The SQLite table **`documents`** stores **worldbuilding document entities** (row
 | Version | Contents |
 |---------|----------|
 | **0** | Uninitialized file (bootstrap target on first open/create). |
-| **1** | Full schema: **`project_data`** KV, worldbuilding **content tables** (including **`world_document_templates`**), default **world** seed on create. |
+| **1** | Full schema: **`project_data`** KV, worldbuilding **content tables** (including **`world_template_groups`** / **`world_template_placements`** layout), default **world** seed on create. |
 | **2** | Drops legacy **`world_media`** junction table only. |
 | **3** | Ensures **`world_document_templates`** exists (restores the junction for files that lost it at an interim **v2**). |
 | **4** | Adds **`worlds.color_pallete`** — semicolon-separated **`#RRGGBB`** hex list (max **2000** chars; default empty). |
-| **5** | Adds **`document_templates.sort_order`**, **`world_appendix`** (max **500** chars), and **`icon`** (max **128** chars). Current max. |
+| **5** | Adds **`document_templates.sort_order`**, **`world_appendix`** (max **500** chars), and **`icon`** (max **128** chars). |
+| **6** | Replaces **`world_document_templates`** with **`world_template_groups`** and **`world_template_placements`** for per-world template layout (groups + ordered placements). |
 
-**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 5`** in **`faProjectDbMigrateWiring.ts`**.
+**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 6`** in **`faProjectDbMigrateWiring.ts`**.
 
-**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v1**, run **v1→v2** (drop **`world_media`**), **v2→v3** (ensure **`world_document_templates`**), **v3→v4** (add **`worlds.color_pallete`**), **v4→v5** (add **`document_templates`** list/detail columns), seed a default **world** when empty, then stop at **v5**. Files already at **5** are a no-op. Other versions throw until a forward migration is added.
+**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v1**, run **v1→v2** (drop **`world_media`**), **v2→v3** (ensure legacy **`world_document_templates`** when upgrading old files), **v3→v4** (add **`worlds.color_pallete`**), **v4→v5** (add **`document_templates`** list/detail columns), **v5→v6** (migrate junction rows to root placements, drop **`world_document_templates`**, create layout tables), seed a default **world** when empty, then stop at **v6**. Files already at **6** are a no-op. Other versions throw until a forward migration is added.
 
 **Worlds vs document templates on create:** **`seedFaProjectDefaultWorldIfEmpty`** runs after migrations and inserts one default **world** when the table is empty. **Document templates are never auto-seeded** — a new **`.faproject`** may have zero **`document_templates`** rows until the user adds them in **Project Settings**.
 
@@ -27,7 +28,7 @@ The SQLite table **`documents`** stores **worldbuilding document entities** (row
 
 **Pre-release flatten:** During dev, schema versions may be squashed back to **1** with no upgrade path for older local files — see **`.cursor/skills/fantasia-flatten-database-schemas/SKILL.md`**.
 
-**Product ↔ SQL naming:** UI “world name” / “template name” map to **`display_name`** on **`worlds`** and **`document_templates`**. Optional world ↔ template associations use the **`world_document_templates`** junction (many-to-many).
+**Product ↔ SQL naming:** UI “world name” / “template name” map to **`display_name`** on **`worlds`** and **`document_templates`**. Per-world template layout (groups and ordered template placements) lives in **`world_template_groups`** and **`world_template_placements`**; each template appears at most once per world. **Project Settings** enforces that invariant in the client before save (duplicate **`document_template_id`** placements block **Save settings** with validation chrome).
 
 ## Table: `project_data` (key–value)
 
@@ -102,17 +103,37 @@ Index: **`idx_document_templates_sort_order`**. Unlike **worlds**, new projects 
 | `media_id` | FK → `media.id` **ON DELETE CASCADE** |
 | PRIMARY KEY (`document_id`, `media_id`) | |
 
-### `world_document_templates` (M:N)
+### `world_template_groups` (schema v6)
 
 | Column | Notes |
 |--------|--------|
-| `world_id` | FK → `worlds.id` **ON DELETE CASCADE** |
-| `document_template_id` | FK → `document_templates.id` **ON DELETE CASCADE** |
-| PRIMARY KEY (`world_id`, `document_template_id`) | |
+| `id` | TEXT PK (UUID) |
+| `world_id` | FK → **`worlds.id`** **ON DELETE CASCADE** |
+| `display_name` | Non-empty group label |
+| `root_sort_order` | Position among root-level groups and root-level template placements |
+| `created_at_ms`, `updated_at_ms` | INTEGER |
 
-A template may be linked to zero, one, or many worlds; a world may link to zero, one, or many templates. Links are independent of **`documents.template_id`** (documents still pick at most one template per row).
+Index: **`idx_world_template_groups_world_root_sort`**.
 
-Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_document_media_media_id`**, **`idx_world_document_templates_document_template_id`**, **`idx_worlds_sort_order`**, **`idx_document_templates_sort_order`**.
+### `world_template_placements` (schema v6)
+
+| Column | Notes |
+|--------|--------|
+| `id` | TEXT PK (UUID placement id) |
+| `world_id` | FK → **`worlds.id`** **ON DELETE CASCADE** |
+| `document_template_id` | FK → **`document_templates.id`** **ON DELETE CASCADE** |
+| `group_id` | NULL for root placement; else FK → **`world_template_groups.id`** **ON DELETE SET NULL** |
+| `root_sort_order` | Set when **`group_id`** is NULL |
+| `group_sort_order` | Set when **`group_id`** is not NULL |
+| `created_at_ms`, `updated_at_ms` | INTEGER |
+
+**Constraints:** **`UNIQUE (world_id, document_template_id)`**; CHECK enforces exactly one of **`root_sort_order`** / **`group_sort_order`** matching **`group_id`**.
+
+Indexes: **`idx_world_template_placements_world_root_sort`**, **`idx_world_template_placements_group_sort`**, **`idx_world_template_placements_document_template_id`**.
+
+**Legacy (v1–v5):** **`world_document_templates`** M:N junction — removed at **v6**; existing links migrate to root **`world_template_placements`** rows ordered by template **`sort_order`**.
+
+Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_document_media_media_id`**, **`idx_worlds_sort_order`**, **`idx_document_templates_sort_order`**.
 
 ## Relationships (summary)
 
@@ -121,7 +142,7 @@ Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_d
 | World → documents | `documents.world_id` |
 | Document → template | `documents.template_id` (nullable) |
 | Document ↔ media | `document_media` |
-| World ↔ document template | `world_document_templates` (optional M:N) |
+| World template layout | **`world_template_groups`** + **`world_template_placements`** (one placement per template per world) |
 | Template → field definitions (planned) | `template_fields` — see [templateCustomFields.md](templateCustomFields.md) |
 | Document → custom field values (planned) | `document_field_values`, link tables — see [templateCustomFields.md](templateCustomFields.md) |
 
@@ -155,8 +176,10 @@ src-electron/mainScripts/projectManagement/
     faProjectDocumentTemplatesSnapshotWiring.ts
     faProjectMediaPersistWiring.ts
     faProjectWorldsSnapshotWiring.ts
+    faProjectWorldTemplateLayoutReadWiring.ts
+    faProjectWorldTemplateLayoutSnapshotWiring.ts
+    faProjectWorldTemplateLayoutSqlWiring.ts
     faProjectDocumentMediaLinksWiring.ts
-    faProjectWorldDocumentTemplateLinksWiring.ts
 ```
 
 **Barrel:** **`projectManagement_manager.ts`** re-exports lifecycle and **`runWithFaProjectDatabase*`**; content persist modules are imported directly from IPC registration.
@@ -204,10 +227,6 @@ All content handlers wrap work in **`runWithFaProjectDatabaseForIpcAsync`**.
 | `link-document-media-async` | `linkFaProjectDocumentMedia` |
 | `unlink-document-media-async` | `unlinkFaProjectDocumentMedia` |
 | `list-document-media-async` | `listFaProjectMediaForDocument` |
-| `link-world-document-template-async` | `linkFaProjectWorldDocumentTemplate` |
-| `unlink-world-document-template-async` | `unlinkFaProjectWorldDocumentTemplate` |
-| `list-document-templates-for-world-async` | `listFaProjectDocumentTemplatesForWorld` |
-| `list-worlds-for-document-template-async` | `listFaProjectWorldsForDocumentTemplate` |
 
 Exact channel strings: **`src-electron/electron-ipc-bridge.ts`** (`FA_PROJECT_CONTENT_IPC`).
 
@@ -219,7 +238,7 @@ Exact channel strings: **`src-electron/electron-ipc-bridge.ts`** (`FA_PROJECT_CO
 |-------|-----|------|
 | **Open** | **`projectManagement.getProjectSettings`** (project name KV) + **`projectContent.listWorldsForProjectSettings`** (ordered worlds with document counts for delete guards) + **`projectContent.listDocumentTemplatesForProjectSettings`** (ordered templates with document counts) | **`readFaProjectSettingsRoot`**, **`listFaProjectWorldsForProjectSettings`**, **`listFaProjectDocumentTemplatesForProjectSettings`** |
 | **Save (project name)** | **`projectManagement.setProjectSettings`** via **`S_FaProjectSettings`** | **`faProjectSettingsPersist.ts`** → **`project_name`** KV |
-| **Save (worlds)** | **`projectContent.saveWorldsSnapshot`** with **`I_faProjectWorldSnapshotItem[]`** | **`replaceFaProjectWorldsSnapshot`** in **`faProjectWorldsSnapshotWiring.ts`** — one transaction: upsert/reorder by list index, delete removed ids (**RESTRICT** if a world still has documents) |
+| **Save (worlds)** | **`projectContent.saveWorldsSnapshot`** with **`I_faProjectWorldSnapshotItem[]`** (optional **`templateLayout`** per world) | **`replaceFaProjectWorldsSnapshot`** in **`faProjectWorldsSnapshotWiring.ts`** — one transaction: upsert/reorder worlds, replace each world's template layout when provided, delete removed ids (**RESTRICT** if a world still has documents) |
 | **Save (document templates)** | **`projectContent.saveDocumentTemplatesSnapshot`** with **`I_faProjectDocumentTemplateSnapshotItem[]`** | **`replaceFaProjectDocumentTemplatesSnapshot`** in **`faProjectDocumentTemplatesSnapshotWiring.ts`** — one transaction: upsert/reorder by list index, delete removed ids (**RESTRICT** if documents still reference a template); **zero templates is valid** |
 
 Renderer bridges: **`src/stores/scripts/sFaProjectWorldsBridge.ts`**, **`src/stores/scripts/sFaProjectDocumentTemplatesBridge.ts`**. Action id **`saveProjectSettings`** may include **`settings`**, **`worlds`**, and **`documentTemplates`** payloads (**`handleSaveProjectSettings`** in **`createFaActionDefinitionHandlers.ts`**). Worlds and document-templates draft validation (names, duplicate palette hex for worlds) stays in the dialog; persistence coerces hex via **`coerceFaProjectWorldColorForStorage`** and **`coerceFaProjectWorldColorPalleteForStorage`**.

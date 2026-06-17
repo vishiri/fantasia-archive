@@ -188,6 +188,15 @@ function onDrop (from: number, to: number): void {
 
 For nested hierarchies, follow [fantasia-he-tree](../fantasia-he-tree/SKILL.md): **`Draggable`** from **`@he-tree/vue`** owns reorder semantics.
 
+### World template layout tree (**Project Settings**)
+
+- **Component:** **`DialogProjectSettingsWorldTemplateLayoutTree.vue`** — controlled **`:model-value`**, **`:key`** remount on programmatic layout changes, commit only on **`@after-drop`** (not on every **`update:model-value`**).
+- **Commit policy (level 1):** **`scripts/functions/dialogProjectSettingsWorldTemplateLayoutTreeCommitPolicy.ts`** — when to accept he-tree model updates, single drag commit schedule (**`requestAnimationFrame` → double **`nextTick`**), cancel without commit.
+- **Wiring:** **`scripts/dialogProjectSettingsWorldTemplateLayoutTreeWiring.ts`** — drag session, orphan placement merge on commit, regression guard via **`shouldBlockDialogProjectSettingsWorldTemplateLayoutEmit`** in **`dialogProjectSettingsWorldTemplateLayoutTreeEmitGuard.ts`**.
+- **Save validation:** duplicate **`document_template_id`** per world — **`dialogProjectSettingsWorldTemplateLayoutDuplicateValidation.ts`**; blocks save and negative UI on tree rows and world tabs. Blank **document template** names (from **Document Templates**) highlight every world tab that still places that template and the parent **Worlds** category tab until the name is filled in.
+- **Inline rename:** right-click a group or placed template row → shared context menu with live **`q-input`** (**`dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring.ts`** + provide/inject open-target key). Renames a template by **`documentTemplateId`** and keeps **Document Templates** draft names in sync (**`dialogProjectSettingsDocumentTemplateWorldLayoutSync.ts`**). Tree resync patches labels in place when structure is unchanged so the menu stays open while typing.
+- **Tests:** Vitest under **`scripts/functions/_tests/`** and **`_tests/DialogProjectSettingsWorldTemplateLayoutTree.vitest.test.ts`**; Playwright **`_tests/DialogProjectSettingsWorldTemplateLayout.playwright.test.ts`** with **`helpers/playwrightHelpers_component/dialogProjectSettingsWorldTemplateLayoutTreeDrag.ts`**.
+
 ## Tests
 
 - **Vitest**: mock **`vue-draggable-plus`** when mount-only smoke tests do not need real drag; test reorder helpers in **`scripts/_tests`** with pure array moves.

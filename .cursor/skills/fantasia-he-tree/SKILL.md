@@ -108,6 +108,15 @@ walkTreeData(nodes, (node, index, parent) => {
 
 Use **`walkTreeData`** for search, bulk expand, or validation instead of ad hoc recursion in many features.
 
+## Project Settings — world template layout
+
+**Project Settings → Worlds settings** uses **`Draggable`** from **`@he-tree/vue`** for the per-world **World template layout** tree (**`DialogProjectSettingsWorldTemplateLayoutTree.vue`**):
+
+- **Max depth 2:** root interleaves **groups** and **templates**; only **templates** nest under **groups** (no template-under-template, no nested groups).
+- **DnD rules** live in **`dialogProjectSettingsWorldTemplateLayoutDnD.ts`** (`eachDraggable`, `eachDroppable`, `rootDroppable`).
+- **Right column** lists global templates not yet placed in the selected world; click adds a root placement (user drags into groups afterward).
+- **Styles:** **`DialogProjectSettings.worldTemplateLayoutTree.unscoped.scss`** plus default he-tree CSS import in the tree SFC.
+
 ## Tests
 
 - **Vitest** — mount the feature SFC; stub heavy IPC; assert **`data-test-locator`** on root and sample nodes.
