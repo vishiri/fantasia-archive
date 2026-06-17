@@ -24,8 +24,9 @@ import { isDialogProjectSettingsFullDialogSaveDisabled } from './dialogProjectSe
 import {
   hasDialogProjectSettingsWorldColorPalleteValidationError,
   hasDialogProjectSettingsWorldNameValidationError,
+  hasDialogProjectSettingsWorldTemplateLayoutValidationError,
   isDialogProjectSettingsProjectNameInvalid
-} from './functions/dialogProjectSettingsWorldsDraft'
+} from './functions/dialogProjectSettingsWorldsSaveValidation'
 
 const buildDialogProjectSettingsSaveValidationTooltipForDraft =
   createBuildDialogProjectSettingsSaveValidationTooltip({
@@ -63,6 +64,7 @@ const dialogProjectSettingsApi = createDialogProjectSettings({
   hasDialogProjectSettingsDocumentTemplateNameValidationError,
   hasDialogProjectSettingsWorldColorPalleteValidationError,
   hasDialogProjectSettingsWorldNameValidationError,
+  hasDialogProjectSettingsWorldTemplateLayoutValidationError,
   isDialogProjectSettingsFullDialogSaveDisabled,
   isDialogProjectSettingsProjectNameInvalid,
   registerComponentDialogStackGuard,

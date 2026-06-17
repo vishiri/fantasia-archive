@@ -1,5 +1,6 @@
 @use '../../../../css/app.palette.scss' as *;
 @use '../../../../css/globals/paletteGlobals.variables.scss' as *;
+@use '../../../../css/globals/faQIconDisplay.variables.scss' as *;
 
 /* COMPONENT - DIALOG PROJECT SETTINGS (mirrors DialogAppSettings layout tokens) */
 $dialogProjectSettings-card-maxHeightSubtract: 48px;
@@ -30,12 +31,34 @@ $dialogProjectSettings-worldsDeleteConfirm-menu-zIndex: 7002;
 $dialogProjectSettings-worldsDeleteConfirm-message-marginBottom: 16px;
 $dialogProjectSettings-worldsDeleteConfirm-paddingX: 20px;
 $dialogProjectSettings-worldsDeleteConfirm-paddingY: 20px;
-$dialogProjectSettings-worldsDetail-paddingBottom: 40px;
+$dialogProjectSettings-worldsDetail-paddingBottom: 0px;
 $dialogProjectSettings-worldsDetail-paddingTop: 8px;
 $dialogProjectSettings-worldsDetailDeleteCol-marginBottom: 20px;
 $dialogProjectSettings-worldsDetailFieldsRow-gap: 16px;
-$dialogProjectSettings-worldsDetailPaletteSection-marginTop: 16px;
+$dialogProjectSettings-worldsDetailPaletteSection-marginTop: 8px;
+$dialogProjectSettings-worldTemplateLayout-availableListItem-minHeight: 32px;
+$dialogProjectSettings-worldTemplateLayout-availableListItem-paddingBlock: 8px;
+$dialogProjectSettings-worldTemplateLayout-availableCol-paddingInline: 25px;
+$dialogProjectSettings-worldTemplateLayout-columnsGap: 0;
+$dialogProjectSettings-worldTemplateLayout-dragPlaceholder-backgroundColor: transparent;
+$dialogProjectSettings-worldTemplateLayout-dragPlaceholder-borderColor: fa-v('primary-bright', $primary-bright);
+$dialogProjectSettings-worldTemplateLayout-emptyPadding: 12px 0;
+$dialogProjectSettings-worldTemplateLayout-layoutCol-paddingRight: 16px;
+$dialogProjectSettings-worldTemplateLayout-groupContextMenu-zIndex: 7002;
+$dialogProjectSettings-worldTemplateLayout-renameDialog-minWidth: 320px;
+$dialogProjectSettings-worldTemplateLayout-renameMenuBody-padding: 8px 12px;
+$dialogProjectSettings-worldTemplateLayout-sectionMarginTop: 8px;
+$dialogProjectSettings-worldTemplateLayout-separatorMarginLeft: 8px;
+$dialogProjectSettings-worldTemplateLayout-separatorMarginRight: 0;
+$dialogProjectSettings-worldTemplateLayout-treeIndent: 20px;
+$dialogProjectSettings-worldTemplateLayout-treeNode-appendixMaxWidth: 160px;
+$dialogProjectSettings-worldTemplateLayout-treeNode-minHeight: 37px;
+$dialogProjectSettings-worldTemplateLayout-treeNode-paddingX: 8px;
+$dialogProjectSettings-worldTemplateLayout-treeNode-paddingY: 6px;
+$dialogProjectSettings-worldTemplateLayout-treeNode-remove-fontSize: 11px;
+$dialogProjectSettings-worldTemplateLayout-treeNode-remove-size: 24px;
 $dialogProjectSettings-worldColorPalette-addButton-size: 40px;
+$dialogProjectSettings-worldColorPalette-marginBottom: 20px;
 $dialogProjectSettings-worldColorPalette-contextMenu-backgroundColor: fa-v('dark-lighter', $dark-lighter);
 $dialogProjectSettings-worldColorPalette-contextMenu-color: fa-v('white', $white);
 $dialogProjectSettings-worldColorPalette-contextMenu-deleteHoverColor: var(--fa-color-negative);
@@ -59,9 +82,8 @@ $dialogProjectSettings-worldsTabColorSwatch-size: 18px;
 $dialogProjectSettings-worldsTabColorSwatch-zIndex: 3;
 $dialogProjectSettings-worldsTabList-width: 240px;
 $dialogProjectSettings-documentTemplatesTabList-width: 360px;
-$dialogProjectSettings-documentTemplatesTabIcon-boxSize: 20px;
-$dialogProjectSettings-documentTemplatesTabIcon-fontSize: 16px;
-$dialogProjectSettings-documentTemplatesTabIcon-marginRight: 8px;
+$dialogProjectSettings-documentTemplatesTabIcon-boxSize: 21px;
+$dialogProjectSettings-documentTemplatesTabIcon-marginRight: $faQIconDisplay-iconMarginRight;
 $dialogProjectSettings-documentTemplatesTabWorldAppendix-marginLeft: calc(
   #{$dialogProjectSettings-documentTemplatesTabIcon-boxSize} + #{$dialogProjectSettings-documentTemplatesTabIcon-marginRight}
 );

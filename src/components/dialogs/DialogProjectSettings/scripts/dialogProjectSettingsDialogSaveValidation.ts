@@ -12,7 +12,7 @@ import {
   hasDialogProjectSettingsWorldNameValidationError,
   isDialogProjectSettingsDialogSaveDisabled,
   isDialogProjectSettingsProjectNameInvalid
-} from './functions/dialogProjectSettingsWorldsDraft'
+} from './functions/dialogProjectSettingsWorldsSaveValidation'
 
 /**
  * Collects template-specific save-blocking validation errors.

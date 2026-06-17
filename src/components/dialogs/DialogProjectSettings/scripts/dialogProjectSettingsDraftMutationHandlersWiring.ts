@@ -10,11 +10,15 @@ import {
   updateDialogProjectSettingsDocumentTemplateDraftWorldAppendix
 } from './dialogProjectSettingsDocumentTemplateRowMutationsWiring'
 import {
+  syncDialogProjectSettingsWorldDraftTemplateLayoutPlacementDisplayNames
+} from './dialogProjectSettingsDocumentTemplateWorldLayoutSync'
+import {
   addDialogProjectSettingsWorldDraftRow,
   removeDialogProjectSettingsWorldDraftRow,
   updateDialogProjectSettingsWorldDraftColor,
   updateDialogProjectSettingsWorldDraftColorPallete,
-  updateDialogProjectSettingsWorldDraftDisplayName
+  updateDialogProjectSettingsWorldDraftDisplayName,
+  updateDialogProjectSettingsWorldDraftTemplateLayout
 } from './dialogProjectSettingsWorldRowMutationsWiring'
 
 export function createDialogProjectSettingsDraftMutationHandlers (deps: {
@@ -34,6 +38,10 @@ export function createDialogProjectSettingsDraftMutationHandlers (deps: {
     updateWorldColor: (id: string, color: string) => void
     updateWorldColorPallete: (id: string, colorPallete: string) => void
     updateWorldDisplayName: (id: string, displayName: string) => void
+    updateWorldTemplateLayout: (
+      id: string,
+      templateLayout: I_dialogProjectSettingsWorldDraft['templateLayout']
+    ) => void
   } {
   const { localDocumentTemplates, localWorlds } = params
 
@@ -62,6 +70,13 @@ export function createDialogProjectSettingsDraftMutationHandlers (deps: {
       id,
       displayName
     )
+    if (localWorlds.value !== null) {
+      localWorlds.value = syncDialogProjectSettingsWorldDraftTemplateLayoutPlacementDisplayNames(
+        localWorlds.value,
+        id,
+        displayName
+      )
+    }
   }
 
   const updateDocumentTemplateIcon = (id: string, icon: string): void => {
@@ -88,6 +103,13 @@ export function createDialogProjectSettingsDraftMutationHandlers (deps: {
     updateDialogProjectSettingsWorldDraftDisplayName(localWorlds, id, displayName)
   }
 
+  const updateWorldTemplateLayout = (
+    id: string,
+    templateLayout: I_dialogProjectSettingsWorldDraft['templateLayout']
+  ): void => {
+    updateDialogProjectSettingsWorldDraftTemplateLayout(localWorlds, id, templateLayout)
+  }
+
   return {
     addDocumentTemplate,
     addWorld,
@@ -98,6 +120,7 @@ export function createDialogProjectSettingsDraftMutationHandlers (deps: {
     updateDocumentTemplateWorldAppendix,
     updateWorldColor,
     updateWorldColorPallete,
-    updateWorldDisplayName
+    updateWorldDisplayName,
+    updateWorldTemplateLayout
   }
 }

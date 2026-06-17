@@ -14,6 +14,10 @@ const worldsFixture = [
     colorPallete: '',
     displayName: 'Realm',
     documentCount: 0,
+    templateLayout: {
+      groups: [],
+      placements: []
+    },
     id: '550e8400-e29b-41d4-a716-446655440000'
   }
 ]
@@ -25,6 +29,7 @@ const worldsFixture = [
 test('Test that DialogProjectSettingsWorldsTabList renders add world and list hooks', () => {
   const w = mount(DialogProjectSettingsWorldsTabList, {
     props: {
+      documentTemplates: [],
       selectedWorldId: worldsFixture[0].id,
       worlds: worldsFixture
     },
@@ -59,6 +64,7 @@ test('Test that DialogProjectSettingsWorldsTabList renders add world and list ho
 test('Test that DialogProjectSettingsWorldsTabList forwards add world and reorder', async () => {
   const w = mount(DialogProjectSettingsWorldsTabList, {
     props: {
+      documentTemplates: [],
       selectedWorldId: worldsFixture[0].id,
       worlds: worldsFixture
     },
@@ -112,6 +118,7 @@ test('Test that DialogProjectSettingsWorldsTabList forwards add world and reorde
 test('Test that DialogProjectSettingsWorldsTabList tracks drag highlight state', async () => {
   const w = mount(DialogProjectSettingsWorldsTabList, {
     props: {
+      documentTemplates: [],
       selectedWorldId: worldsFixture[0].id,
       worlds: worldsFixture
     },
@@ -191,6 +198,7 @@ test('Test that DialogProjectSettingsWorldsTabList tracks drag highlight state',
 test('Test that DialogProjectSettingsWorldsTabList forwards tab selection', async () => {
   const w = mount(DialogProjectSettingsWorldsTabList, {
     props: {
+      documentTemplates: [],
       selectedWorldId: worldsFixture[0].id,
       worlds: worldsFixture
     },

@@ -1,0 +1,46 @@
+.dialogProjectSettingsWorldTemplateLayoutTree {
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+  width: 100%;
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--group),
+.dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--template) {
+  cursor: $faVerticalDraggableTabs-tab-cursor-default;
+
+  &:active {
+    cursor: $faVerticalDraggableTabs-tab-cursor-active !important;
+  }
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--group):hover,
+.dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--template):hover {
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode > .q-focus-helper {
+    opacity: $qFocusable-hoverHelper-opacity !important;
+  }
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTree--listDragging {
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode--group,
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode--template {
+    cursor: $faVerticalDraggableTabs-tab-cursor-default;
+  }
+
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode > .q-focus-helper {
+    opacity: 0 !important;
+  }
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTree .he-tree-drag-placeholder {
+  background: $dialogProjectSettings-worldTemplateLayout-dragPlaceholder-backgroundColor;
+  border-color: $dialogProjectSettings-worldTemplateLayout-dragPlaceholder-borderColor;
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTree .tree-node {
+  align-items: center;
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTree .tree-node-children {
+  padding-left: $dialogProjectSettings-worldTemplateLayout-treeIndent;
+}

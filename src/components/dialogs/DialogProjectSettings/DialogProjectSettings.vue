@@ -45,6 +45,7 @@
           @update-world-color="updateWorldColor"
           @update-world-color-pallete="updateWorldColorPallete"
           @update-world-display-name="updateWorldDisplayName"
+          @update-world-template-layout="updateWorldTemplateLayout"
         />
       </q-card-section>
 
@@ -142,7 +143,8 @@ const {
   updateDocumentTemplateWorldAppendix,
   updateWorldColor,
   updateWorldColorPallete,
-  updateWorldDisplayName
+  updateWorldDisplayName,
+  updateWorldTemplateLayout
 } = useDialogProjectSettings(props)
 
 const saveErrorsTooltipOffset: [number, number] = [0, 8]
@@ -170,6 +172,7 @@ function updateDocumentTemplatesOrder (
 </script>
 
 <style lang="scss" src="./styles/DialogProjectSettings.saveErrorsTooltip.unscoped.scss"></style>
+<style lang="scss" src="./styles/DialogProjectSettings.templateQIconDisplay.unscoped.scss"></style>
 
 <style lang="scss">
 .ProjectSettings {

@@ -1,0 +1,6 @@
+/* GLOBALS - Q-ICON DISPLAY (MDI / Font Awesome solid in lists and pickers) */
+$faQIconDisplay-iconFontSize: 21px;
+$faQIconDisplay-iconMarginRight: 12px;
+$faQIconDisplay-iconLeadingWidth: calc(#{$faQIconDisplay-iconFontSize} + #{$faQIconDisplay-iconMarginRight});
+$faQIconDisplay-faSolidBefore-fontSize: 16px;
+$faQIconDisplay-faSolidBefore-marginTop: 2px;

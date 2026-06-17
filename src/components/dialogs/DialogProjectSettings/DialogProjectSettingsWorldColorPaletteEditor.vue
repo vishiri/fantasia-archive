@@ -95,6 +95,7 @@ const {
   display: flex;
   flex-wrap: wrap;
   gap: 0;
+  margin-bottom: $dialogProjectSettings-worldColorPalette-marginBottom;
   width: 100%;
 }
 

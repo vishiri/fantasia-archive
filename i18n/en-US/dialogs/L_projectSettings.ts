@@ -6,7 +6,9 @@ export default {
     tooltipIntro: 'Unable to save. The following errors were found:',
     bulletWorldNameRequired: 'World name is required for "{worldLabel}".',
     bulletDuplicatePalette: 'Duplicate colors found in palette of "{worldLabel}".',
-    bulletDocumentTemplateNameRequired: 'Document template name is required for "{templateLabel}".'
+    bulletDocumentTemplateNameRequired: 'Document template name is required for "{templateLabel}".',
+    bulletWorldTemplateGroupNameRequired: 'Template group name is required for "{worldLabel}".',
+    bulletWorldTemplateDuplicateDocumentTemplate: 'Duplicate document template "{templateLabel}" in "{worldLabel}".'
   },
   categories: {
     generalSettings: {
@@ -45,6 +47,22 @@ export default {
       contextMenu: {
         duplicateColor: 'Duplicate color',
         deleteColor: 'Delete color'
+      }
+    },
+    worldTemplateLayout: {
+      layoutTitle: 'World template layout',
+      availableTemplatesTitle: 'Available document templates',
+      addGroupButton: 'Add group',
+      defaultNewGroupName: 'New group',
+      emptyAvailableTemplates: 'All document templates are assigned to this world.',
+      groupNameErrorRequired: 'Group name is required.',
+      contextMenu: {
+        renameGroup: 'Rename group',
+        deleteGroup: 'Delete group'
+      },
+      renameDialog: {
+        title: 'Rename group',
+        confirmButton: 'Rename'
       }
     },
     documentTemplateName: {

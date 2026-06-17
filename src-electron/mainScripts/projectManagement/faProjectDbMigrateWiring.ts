@@ -4,19 +4,22 @@ import { v4 as uuidv4, validate as validateUuid } from 'uuid'
 import {
   applyFaProjectContentSchemaV1,
   applyFaProjectProjectDataSchemaV1,
-  FA_PROJECT_DATA_TABLE_NAME
+  applyFaProjectWorldTemplateLayoutSchemaV6,
+  FA_PROJECT_DATA_TABLE_NAME,
+  FA_PROJECT_TABLE_WORLD_DOCUMENT_TEMPLATES
 } from './functions/faProjectDbSchemaDdl'
 import { migrateFaProjectSchemaV1ToV2 } from './functions/faProjectDbMigrateV1ToV2'
 import { migrateFaProjectSchemaV2ToV3 } from './functions/faProjectDbMigrateV2ToV3'
 import { migrateFaProjectSchemaV3ToV4 } from './functions/faProjectDbMigrateV3ToV4'
 import { migrateFaProjectSchemaV4ToV5 } from './functions/faProjectDbMigrateV4ToV5'
+import { migrateFaProjectSchemaV5ToV6 } from './functions/faProjectDbMigrateV5ToV6'
 import { seedFaProjectDefaultWorldIfEmpty } from './projectDbContent/faProjectWorldBootstrapWiring'
 
 const OPTION_PROJECT_NAME = 'project_name'
 const OPTION_PROJECT_UUID = 'project_uuid'
 
-/** Current schema revision: content tables at user_version 5 (document_templates extensions). */
-export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 5
+/** Current schema revision: content tables at user_version 6 (world template layout). */
+export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 6
 
 function sqlSelectValueFromActiveTable (): string {
   return `SELECT option_value AS v FROM ${FA_PROJECT_DATA_TABLE_NAME} WHERE option_name = ?`
@@ -67,7 +70,7 @@ function verifyFaProjectMetadataAfterBootstrap (db: Database, displayProjectName
 
 /**
  * Applies SQLite migrations up to the latest supported schema.
- * Fresh files start at user_version 0, bootstrap v1, migrate through v5, seed default world.
+ * Fresh files start at user_version 0, bootstrap v1, migrate through v6, seed default world.
  */
 export function applyFaProjectMigrations (
   db: Database,
@@ -117,6 +120,18 @@ export function applyFaProjectMigrations (
       migrateFaProjectSchemaV4ToV5(db)
     })
     runV4ToV5()
+  }
+
+  const afterV5Ver = readUserVersion(db)
+  if (afterV5Ver === 5 && FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 6) {
+    const runV5ToV6 = db.transaction(() => {
+      migrateFaProjectSchemaV5ToV6(db, {
+        applyLayoutSchema: applyFaProjectWorldTemplateLayoutSchemaV6,
+        createPlacementId: uuidv4,
+        junctionTableName: FA_PROJECT_TABLE_WORLD_DOCUMENT_TEMPLATES
+      })
+    })
+    runV5ToV6()
   }
 
   const finalVer = readUserVersion(db)

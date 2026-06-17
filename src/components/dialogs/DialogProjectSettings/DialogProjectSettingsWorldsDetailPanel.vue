@@ -108,6 +108,14 @@
         @update:color-pallete="emitColorPallete"
       />
     </div>
+
+    <DialogProjectSettingsWorldTemplateLayoutPanel
+      v-if="props.documentTemplates !== null"
+      :document-templates="props.documentTemplates"
+      :world="props.world"
+      @update-document-template-display-name="emitUpdateDocumentTemplateDisplayName"
+      @update:template-layout="emitTemplateLayout"
+    />
   </div>
 </template>
 
@@ -117,9 +125,12 @@ import { computed } from 'vue'
 import { i18n } from 'app/i18n/externalFileLoader'
 import DialogProjectSettingsWorldsDeleteButton from './DialogProjectSettingsWorldsDeleteButton.vue'
 import DialogProjectSettingsWorldColorPaletteEditor from './DialogProjectSettingsWorldColorPaletteEditor.vue'
+import DialogProjectSettingsWorldTemplateLayoutPanel from './DialogProjectSettingsWorldTemplateLayoutPanel.vue'
 import FaColorPickerInput from 'app/src/components/elements/FaColorPickerInput/FaColorPickerInput.vue'
 import type { I_faColorPickerPaletteAppendConfig } from 'app/types/I_faColorPickerInput'
+import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
+import type { I_dialogProjectSettingsWorldTemplateLayoutDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import { parseFaProjectWorldColorPalleteToHexList } from 'app/src/scripts/projectWorlds/functions/faProjectWorldColorPalleteHexList'
 import { buildDialogProjectSettingsWorldColorPaletteTooltipContent } from './scripts/functions/dialogProjectSettingsWorldColorPaletteTooltip'
 
@@ -128,6 +139,7 @@ defineOptions({
 })
 
 const props = defineProps<{
+  documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] | null
   nameHasError: boolean
   removeDisabled: boolean
   removeDisabledReason: 'hasDocuments' | 'lastWorld' | null
@@ -156,9 +168,11 @@ const worldColorPaletteTooltip = computed(() => {
 
 const emit = defineEmits<{
   remove: []
+  updateDocumentTemplateDisplayName: [documentTemplateId: string, displayName: string]
   'update:color': [value: string]
   'update:colorPallete': [value: string]
   'update:displayName': [value: string]
+  'update:templateLayout': [layout: I_dialogProjectSettingsWorldTemplateLayoutDraft]
 }>()
 
 function emitDisplayName (value: string | number | null): void {
@@ -172,6 +186,17 @@ function emitColor (value: string): void {
 function emitColorPallete (value: string): void {
   emit('update:colorPallete', value)
 }
+
+function emitTemplateLayout (layout: I_dialogProjectSettingsWorldTemplateLayoutDraft): void {
+  emit('update:templateLayout', layout)
+}
+
+function emitUpdateDocumentTemplateDisplayName (
+  documentTemplateId: string,
+  displayName: string
+): void {
+  emit('updateDocumentTemplateDisplayName', documentTemplateId, displayName)
+}
 </script>
 
 <style lang="scss" src="./styles/DialogProjectSettings.panelTitle.unscoped.scss"></style>
@@ -180,6 +205,7 @@ function emitColorPallete (value: string): void {
 .dialogProjectSettingsWorldsDetail__fieldsRow {
   align-items: flex-start;
   display: flex;
+  flex: 0 0 auto;
   flex-wrap: nowrap;
   gap: $dialogProjectSettings-worldsDetailFieldsRow-gap;
 }
@@ -200,7 +226,12 @@ function emitColorPallete (value: string): void {
 }
 
 .dialogProjectSettingsWorldsDetail__paletteSection {
+  flex: 0 0 auto;
   margin-top: $dialogProjectSettings-worldsDetailPaletteSection-marginTop;
   width: 100%;
+}
+
+.dialogProjectSettingsWorldsDetail__paletteSection :deep(.dialogProjectSettings__panelTitle) {
+  margin-top: 0;
 }
 </style>

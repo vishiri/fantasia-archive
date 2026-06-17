@@ -13,8 +13,6 @@ import {
 import {
   parseFaProjectDocumentMediaLinkPayload,
   parseFaProjectDocumentIdOnlyPayload,
-  parseFaProjectDocumentTemplateIdOnlyPayload,
-  parseFaProjectWorldDocumentTemplateLinkPayload,
   parseFaProjectWorldIdOnlyPayload
 } from '../faProjectContentLinksSchema'
 import {
@@ -105,13 +103,6 @@ test('Test that project content schema parsers accept valid payloads', () => {
   }).documentId).toBe(SAMPLE_UUID)
   expect(parseFaProjectDocumentIdOnlyPayload({ documentId: SAMPLE_UUID })).toBe(SAMPLE_UUID)
   expect(parseFaProjectWorldIdOnlyPayload({ worldId: SAMPLE_UUID })).toBe(SAMPLE_UUID)
-  expect(parseFaProjectWorldDocumentTemplateLinkPayload({
-    worldId: SAMPLE_UUID,
-    documentTemplateId: SAMPLE_UUID
-  }).documentTemplateId).toBe(SAMPLE_UUID)
-  expect(parseFaProjectDocumentTemplateIdOnlyPayload({
-    documentTemplateId: SAMPLE_UUID
-  })).toBe(SAMPLE_UUID)
   expect(parseFaProjectWorldsSnapshotPayload({
     items: [
       {

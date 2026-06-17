@@ -2,8 +2,54 @@ import type { Reactive } from 'vue'
 
 import type { T_faColorPickerInputPalette } from 'app/types/I_faColorPickerInput'
 import type { T_faDialogProjectSettingsWorldColorPaletteDuplicateIconColor } from 'app/types/I_faColorContrast'
+import type { I_faProjectWorldTemplateLayoutForProjectSettings } from 'app/types/I_faProjectWorldTemplateLayoutDomain'
 import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
 import type { SortableEvent } from 'sortablejs'
+
+/** One template group in a world layout draft (Project Settings). */
+export interface I_dialogProjectSettingsWorldTemplateGroupDraft {
+  id: string
+  displayName: string
+  rootSortOrder: number
+}
+
+/** One template placement in a world layout draft (Project Settings). */
+export interface I_dialogProjectSettingsWorldTemplatePlacementDraft {
+  id: string
+  documentTemplateId: string
+  displayName: string
+  worldAppendix: string
+  icon: string
+  documentCountInWorld: number
+  groupId: string | null
+  rootSortOrder: number | null
+  groupSortOrder: number | null
+}
+
+/** Per-world template layout draft (groups + placements). */
+export interface I_dialogProjectSettingsWorldTemplateLayoutDraft {
+  groups: I_dialogProjectSettingsWorldTemplateGroupDraft[]
+  placements: I_dialogProjectSettingsWorldTemplatePlacementDraft[]
+}
+
+/** he-tree node data for the world template layout tree. */
+export interface I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode {
+  children: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode[]
+  documentCountInWorld: number
+  documentTemplateId: string | null
+  icon: string
+  id: string
+  label: string
+  nodeKind: 'group' | 'template'
+  worldAppendix: string
+}
+
+/** Drag context passed to he-tree eachDroppable rules. */
+export interface I_dialogProjectSettingsWorldTemplateLayoutDragContext {
+  dragNode: {
+    data: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
+  } | null
+}
 
 /** Draft world row in Project Settings before save. */
 export interface I_dialogProjectSettingsWorldDraft {
@@ -12,6 +58,7 @@ export interface I_dialogProjectSettingsWorldDraft {
   color: string
   colorPallete: string
   documentCount: number
+  templateLayout: I_dialogProjectSettingsWorldTemplateLayoutDraft
 }
 
 /** One draggable palette swatch row in Project Settings worlds detail. */
@@ -181,6 +228,7 @@ export interface I_faProjectWorldForProjectSettings {
   createdAtMs: number
   updatedAtMs: number
   documentCount: number
+  templateLayout: I_faProjectWorldTemplateLayoutForProjectSettings
 }
 
 export interface I_faProjectWorldsForProjectSettingsResult {
@@ -212,6 +260,8 @@ export type T_dialogProjectSettingsSaveValidationErrorKind =
   | 'duplicatePaletteColors'
   | 'projectNameRequired'
   | 'worldNameRequired'
+  | 'worldTemplateDuplicateDocumentTemplate'
+  | 'worldTemplateGroupNameRequired'
 
 /** One ordered save-validation error in the Project Settings draft. */
 export interface I_dialogProjectSettingsSaveValidationError {

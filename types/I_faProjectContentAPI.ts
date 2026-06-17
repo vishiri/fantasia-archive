@@ -17,11 +17,8 @@ import type {
 import type {
   I_faProjectDocumentMediaListResult,
   I_faProjectDocumentMediaLinkInput,
-  I_faProjectDocumentTemplateWorldListResult,
   I_faProjectSetDocumentTemplateInput,
-  I_faProjectSetDocumentWorldInput,
-  I_faProjectWorldDocumentTemplateLinkInput,
-  I_faProjectWorldDocumentTemplateListResult
+  I_faProjectSetDocumentWorldInput
 } from 'app/types/I_faProjectContentLinksDomain'
 import type {
   I_faProjectMedia,
@@ -56,26 +53,18 @@ export interface I_faProjectContentAPI {
   getMediaById: (id: string) => Promise<I_faProjectMedia>
   getWorldById: (id: string) => Promise<I_faProjectWorld>
   linkDocumentMedia: (input: I_faProjectDocumentMediaLinkInput) => Promise<void>
-  linkWorldDocumentTemplate: (input: I_faProjectWorldDocumentTemplateLinkInput) => Promise<void>
   listDocumentMedia: (documentId: string) => Promise<I_faProjectDocumentMediaListResult>
   listDocuments: (filter?: I_faProjectDocumentListFilter) => Promise<I_faProjectDocumentListResult>
   listDocumentTemplates: () => Promise<I_faProjectDocumentTemplateListResult>
   listDocumentTemplatesForProjectSettings: () => Promise<I_faProjectDocumentTemplatesForProjectSettingsResult>
-  listDocumentTemplatesForWorld: (
-    worldId: string
-  ) => Promise<I_faProjectWorldDocumentTemplateListResult>
   listMedia: () => Promise<I_faProjectMediaListResult>
   listWorlds: () => Promise<I_faProjectWorldListResult>
   listWorldsForProjectSettings: () => Promise<I_faProjectWorldsForProjectSettingsResult>
-  listWorldsForDocumentTemplate: (
-    documentTemplateId: string
-  ) => Promise<I_faProjectDocumentTemplateWorldListResult>
   saveDocumentTemplatesSnapshot: (items: I_faProjectDocumentTemplateSnapshotItem[]) => Promise<void>
   saveWorldsSnapshot: (items: I_faProjectWorldSnapshotItem[]) => Promise<void>
   setDocumentTemplate: (input: I_faProjectSetDocumentTemplateInput) => Promise<I_faProjectDocument>
   setDocumentWorld: (input: I_faProjectSetDocumentWorldInput) => Promise<I_faProjectDocument>
   unlinkDocumentMedia: (input: I_faProjectDocumentMediaLinkInput) => Promise<void>
-  unlinkWorldDocumentTemplate: (input: I_faProjectWorldDocumentTemplateLinkInput) => Promise<void>
   updateDocument: (id: string, patch: I_faProjectDocumentPatch) => Promise<I_faProjectDocument>
   updateDocumentTemplate: (
     id: string,

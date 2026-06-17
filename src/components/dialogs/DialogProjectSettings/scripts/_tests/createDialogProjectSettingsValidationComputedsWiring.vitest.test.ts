@@ -23,6 +23,10 @@ test('Test that createDialogProjectSettingsValidationComputeds reflects validati
       colorPallete: '#112233;#112233',
       displayName: '   ',
       documentCount: 0,
+      templateLayout: {
+        groups: [],
+        placements: []
+      },
       id: '550e8400-e29b-41d4-a716-446655440000'
     }
   ])
@@ -42,6 +46,7 @@ test('Test that createDialogProjectSettingsValidationComputeds reflects validati
     hasDialogProjectSettingsDocumentTemplateNameValidationError: () => true,
     hasDialogProjectSettingsWorldColorPalleteValidationError: () => true,
     hasDialogProjectSettingsWorldNameValidationError: () => true,
+    hasDialogProjectSettingsWorldTemplateLayoutValidationError: () => false,
     isDialogProjectSettingsFullDialogSaveDisabled: () => true,
     isDialogProjectSettingsProjectNameInvalid: () => false,
     localDocumentTemplates,

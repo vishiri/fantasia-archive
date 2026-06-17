@@ -1,0 +1,21 @@
+.dialogProjectSettingsDocumentTemplatesTabItem__tabIcon,
+.dialogProjectSettingsWorldAvailableTemplatesList__icon,
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__icon {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: $faQIconDisplay-iconFontSize;
+  height: $faQIconDisplay-iconFontSize;
+  justify-content: center;
+  margin-right: $faQIconDisplay-iconMarginRight;
+  width: $faQIconDisplay-iconFontSize;
+
+  &.fa-solid::before {
+    font-size: $faQIconDisplay-faSolidBefore-fontSize;
+    margin-top: $faQIconDisplay-faSolidBefore-marginTop;
+  }
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__icon {
+  overflow: visible;
+}

@@ -20,7 +20,11 @@ const stubWorldShape = {
 
 const stubWorldForSettingsShape = {
   ...stubWorldShape,
-  documentCount: 0
+  documentCount: 0,
+  templateLayout: {
+    groups: [],
+    placements: []
+  }
 }
 
 const stubDocumentTemplateShape = {
@@ -97,8 +101,6 @@ test('Test that createFaProjectContentBridgeHarnessStub list methods return expe
     items: [stubWorldForSettingsShape]
   })
   await expect(api.listDocumentTemplatesForProjectSettings()).resolves.toEqual(emptyList)
-  await expect(api.listDocumentTemplatesForWorld(STUB_UUID)).resolves.toEqual(emptyList)
-  await expect(api.listWorldsForDocumentTemplate(STUB_UUID)).resolves.toEqual(emptyList)
 })
 
 /**
@@ -120,14 +122,6 @@ test('Test that createFaProjectContentBridgeHarnessStub noop methods resolve und
   await expect(api.unlinkDocumentMedia({
     documentId: STUB_UUID,
     mediaId: STUB_UUID
-  })).resolves.toBeUndefined()
-  await expect(api.linkWorldDocumentTemplate({
-    worldId: STUB_UUID,
-    documentTemplateId: STUB_UUID
-  })).resolves.toBeUndefined()
-  await expect(api.unlinkWorldDocumentTemplate({
-    worldId: STUB_UUID,
-    documentTemplateId: STUB_UUID
   })).resolves.toBeUndefined()
   await expect(api.saveWorldsSnapshot([
     {

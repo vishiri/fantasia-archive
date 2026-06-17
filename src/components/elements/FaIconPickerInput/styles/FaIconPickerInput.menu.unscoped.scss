@@ -40,7 +40,12 @@
   width: $faIconPickerInput-iconCell-size;
 
   .q-icon {
-    font-size: $faIconPickerInput-menuIconFontSize;
+    font-size: $faQIconDisplay-iconFontSize;
+  }
+
+  .fa-solid::before {
+    font-size: $faQIconDisplay-faSolidBefore-fontSize;
+    margin-top: $faQIconDisplay-faSolidBefore-marginTop;
   }
 }
 

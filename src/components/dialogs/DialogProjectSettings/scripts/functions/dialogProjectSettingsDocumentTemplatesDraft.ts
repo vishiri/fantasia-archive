@@ -2,6 +2,20 @@ import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_d
 import type { I_faProjectDocumentTemplateSnapshotItem } from 'app/types/I_faProjectDocumentTemplateDomain'
 
 /**
+ * Resolves the q-icon name shown for a document template row (empty draft uses placeholder).
+ */
+export function resolveDialogProjectSettingsDocumentTemplateDisplayIcon (
+  icon: string,
+  emptyPlaceholderIcon: string
+): string {
+  const trimmed = icon.trim()
+  if (trimmed.length > 0) {
+    return trimmed
+  }
+  return emptyPlaceholderIcon
+}
+
+/**
  * True when a document template display name field should show error styling.
  */
 export function isDialogProjectSettingsDocumentTemplateNameInvalid (
@@ -29,6 +43,24 @@ export function hasDialogProjectSettingsDocumentTemplateNameValidationError (
     return true
   }
   return templates.some((template) => template.displayName.trim().length === 0)
+}
+
+/**
+ * Document template ids whose trimmed display name is blank.
+ */
+export function collectInvalidDialogProjectSettingsDocumentTemplateIds (
+  templates: I_dialogProjectSettingsDocumentTemplateDraft[] | null
+): Set<string> {
+  const invalidIds = new Set<string>()
+  if (templates === null) {
+    return invalidIds
+  }
+  for (const template of templates) {
+    if (isDialogProjectSettingsDocumentTemplateNameInvalid(template.displayName)) {
+      invalidIds.add(template.id)
+    }
+  }
+  return invalidIds
 }
 
 /**

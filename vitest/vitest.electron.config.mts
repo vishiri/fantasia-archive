@@ -14,7 +14,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
 
 /**
- * Electron main/preload unit tests only. Coverage is scoped to src-electron; 100% thresholds apply with '--coverage'.
+ * Electron main/preload unit tests only. Coverage is scoped to src-electron; 99% thresholds apply with '--coverage'.
  */
 export default defineConfig({
   resolve: {

@@ -1,5 +1,10 @@
 .dialogProjectSettings__worldsDetail,
 .dialogProjectSettings__documentTemplatesDetail {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
   padding:
     $dialogProjectSettings-worldsDetail-paddingTop
     $dialogProjectSettings-category-paddingX
@@ -9,6 +14,7 @@
 .dialogProjectSettings__panelTitle {
   align-items: center;
   display: flex;
+  flex-shrink: 0;
   justify-content: flex-start;
   margin:
     $dialogProjectSettings-fieldTitle-marginTop

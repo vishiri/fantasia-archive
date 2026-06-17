@@ -5,13 +5,17 @@ import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
 
 import DialogProjectSettingsWorldsPanel from '../DialogProjectSettingsWorldsPanel.vue'
+import { createEmptyDialogProjectSettingsWorldTemplateLayoutDraft } from '../scripts/dialogProjectSettingsWorldTemplateLayoutDraft'
+
+const emptyLayout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
 
 const worldA = {
   color: '',
   colorPallete: '',
   displayName: 'Alpha',
   documentCount: 0,
-  id: '550e8400-e29b-41d4-a716-446655440000'
+  id: '550e8400-e29b-41d4-a716-446655440000',
+  templateLayout: emptyLayout
 }
 
 const worldB = {
@@ -19,7 +23,8 @@ const worldB = {
   colorPallete: '',
   displayName: 'Beta',
   documentCount: 2,
-  id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
+  id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+  templateLayout: emptyLayout
 }
 
 const detailPanelStub = defineComponent({
@@ -109,6 +114,7 @@ const tabListStub = defineComponent({
 function mountWorldsPanel (worlds = [worldA, worldB]) {
   return mount(DialogProjectSettingsWorldsPanel, {
     props: {
+      documentTemplates: [],
       worlds
     },
     global: {

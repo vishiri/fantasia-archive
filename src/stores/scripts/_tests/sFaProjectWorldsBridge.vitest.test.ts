@@ -10,11 +10,16 @@ const {
       items: [
         {
           color: '#808080',
+          colorPallete: '',
           createdAtMs: 1,
           displayName: 'Realm',
           documentCount: 2,
           id: '550e8400-e29b-41d4-a716-446655440000',
           sortOrder: 0,
+          templateLayout: {
+            groups: [],
+            placements: []
+          },
           updatedAtMs: 1
         }
       ]
@@ -36,11 +41,16 @@ beforeEach(() => {
     items: [
       {
         color: '#808080',
+        colorPallete: '',
         createdAtMs: 1,
         displayName: 'Realm',
         documentCount: 2,
         id: '550e8400-e29b-41d4-a716-446655440000',
         sortOrder: 0,
+        templateLayout: {
+          groups: [],
+          placements: []
+        },
         updatedAtMs: 1
       }
     ]
@@ -73,11 +83,43 @@ test('Test that faProjectWorldsFetchFreshForDialog returns mapped draft rows', a
   await expect(faProjectWorldsFetchFreshForDialog()).resolves.toEqual([
     {
       color: '#808080',
+      colorPallete: '',
       displayName: 'Realm',
       documentCount: 2,
-      id: '550e8400-e29b-41d4-a716-446655440000'
+      id: '550e8400-e29b-41d4-a716-446655440000',
+      templateLayout: {
+        groups: [],
+        placements: []
+      }
     }
   ])
+})
+
+/**
+ * faProjectWorldsFetchFreshForDialog
+ * Uses an empty layout draft when the bridge row omits templateLayout.
+ */
+test('Test that faProjectWorldsFetchFreshForDialog defaults missing templateLayout to empty draft', async () => {
+  listWorldsForProjectSettingsMock.mockResolvedValueOnce({
+    items: [
+      {
+        color: '#808080',
+        colorPallete: '',
+        createdAtMs: 1,
+        displayName: 'Realm',
+        documentCount: 0,
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        sortOrder: 0,
+        updatedAtMs: 1
+      } as never
+    ]
+  })
+  const { faProjectWorldsFetchFreshForDialog } = await import('../sFaProjectWorldsBridge')
+  const rows = await faProjectWorldsFetchFreshForDialog()
+  expect(rows[0]?.templateLayout).toEqual({
+    groups: [],
+    placements: []
+  })
 })
 
 /**

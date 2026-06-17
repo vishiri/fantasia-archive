@@ -36,6 +36,9 @@ const selectorList = {
   title: 'dialogProjectSettings-title',
   worldsAddButton: 'dialogProjectSettings-worlds-addButton',
   worldsList: 'dialogProjectSettings-worlds-list',
+  worldTemplateLayoutPanel: 'dialogProjectSettings-worldTemplateLayoutPanel',
+  worldTemplateLayoutAddGroup: 'dialogProjectSettings-worldTemplateLayoutAddGroup',
+  worldAvailableTemplatesList: 'dialogProjectSettings-worldAvailableTemplatesList',
   documentTemplatesAddButton: 'dialogProjectSettings-documentTemplates-addButton',
   documentTemplatesAddFirstButton: 'dialogProjectSettings-documentTemplates-addFirstButton',
   documentTemplatesDeleteConfirmCountdown: 'dialogProjectSettings-documentTemplates-deleteConfirmCountdown',
@@ -70,7 +73,11 @@ test.describe.serial('Project settings dialog', () => {
         colorPallete: '',
         displayName: 'Component test world',
         documentCount: 0,
-        id: componentFixtureWorldId
+        id: componentFixtureWorldId,
+        templateLayout: {
+          groups: [],
+          placements: []
+        }
       }],
       directDocumentTemplatesSnapshot: []
     })
@@ -149,6 +156,29 @@ test.describe.serial('Project settings dialog', () => {
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.projectNameInput}"]`)
     ).toHaveCount(0)
+  })
+
+  /**
+   * Worlds detail shows template layout chrome and available global templates.
+   */
+  test('Worlds detail shows template layout panel and available templates', async () => {
+    await appWindow.locator(`[data-test-locator="${selectorList.tabWorldsSettings}"]`).click()
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.worldTemplateLayoutPanel}"]`)
+    ).toBeVisible()
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.worldTemplateLayoutAddGroup}"]`)
+    ).toContainText(L_projectSettings.fields.worldTemplateLayout.addGroupButton)
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.worldAvailableTemplatesList}"]`)
+    ).toBeVisible()
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.worldAvailableTemplatesList}"]`)
+    ).toContainText(L_projectSettings.fields.worldTemplateLayout.emptyAvailableTemplates)
   })
 
   /**
@@ -241,6 +271,38 @@ test.describe.serial('Project settings dialog', () => {
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesDeleteConfirmCountdown}"]`)
     ).toHaveText('5')
+  })
+
+  /**
+   * Worlds template layout adds a global template from the available list and supports Add group.
+   */
+  test('World template layout adds available template and group rows', async () => {
+    await appWindow.locator(`[data-test-locator="${selectorList.tabDocumentTemplatesSettings}"]`).click()
+    await appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesAddFirstButton}"]`).click()
+    await appWindow
+      .locator(`[data-test-locator="${selectorList.documentTemplatesNameInput}"]`)
+      .fill('Character sheet')
+
+    await appWindow.locator(`[data-test-locator="${selectorList.tabWorldsSettings}"]`).click()
+
+    const availableTemplate = appWindow.locator(
+      '[data-test-locator^="dialogProjectSettings-worldAvailableTemplate-"]'
+    ).first()
+    await expect(availableTemplate).toContainText('Character sheet')
+    await availableTemplate.click()
+
+    const layoutTemplateNode = appWindow.locator(
+      '[data-test-locator^="dialogProjectSettings-worldTemplateLayoutTreeNode-template-"]'
+    ).first()
+    await expect(layoutTemplateNode).toContainText('Character sheet')
+
+    await appWindow.locator(`[data-test-locator="${selectorList.worldTemplateLayoutAddGroup}"]`).click()
+
+    await expect(
+      appWindow.locator('[data-test-locator^="dialogProjectSettings-worldTemplateLayoutTreeNode-group-"]').first()
+    ).toBeVisible()
+
+    await expect(availableTemplate).toHaveCount(0)
   })
 
   /**

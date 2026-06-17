@@ -3,6 +3,10 @@ import { ResultAsync } from 'neverthrow'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { I_faProjectWorldSnapshotItem } from 'app/types/I_faProjectWorldDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
+import {
+  createEmptyDialogProjectSettingsWorldTemplateLayoutDraft,
+  mapDialogProjectSettingsWorldTemplateLayoutFromApi
+} from 'app/src/components/dialogs/DialogProjectSettings/scripts/dialogProjectSettingsWorldTemplateLayoutDraft'
 
 /**
  * Loads worlds and per-world document counts for the Project Settings dialog.
@@ -26,7 +30,10 @@ export async function faProjectWorldsFetchFreshForDialog (): Promise<I_dialogPro
     colorPallete: world.colorPallete,
     displayName: world.displayName,
     documentCount: world.documentCount,
-    id: world.id
+    id: world.id,
+    templateLayout: world.templateLayout !== undefined
+      ? mapDialogProjectSettingsWorldTemplateLayoutFromApi(world.templateLayout)
+      : createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   }))
 }
 

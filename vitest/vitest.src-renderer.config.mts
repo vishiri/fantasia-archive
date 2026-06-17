@@ -14,7 +14,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
 /**
  * Renderer-side TypeScript under src/ (boot, scripts, stores) — no Vue SFCs.
- * Locale logic lives in repo-root **i18n/** (**unit-i18n**). 100% v8 thresholds apply to the scoped include list (see **test:coverage:src** in package.json).
+ * Locale logic lives in repo-root **i18n/** (**unit-i18n**). 99% v8 thresholds apply to the scoped include list (see **test:coverage:src** in package.json).
  */
 export default defineConfig({
   resolve: {

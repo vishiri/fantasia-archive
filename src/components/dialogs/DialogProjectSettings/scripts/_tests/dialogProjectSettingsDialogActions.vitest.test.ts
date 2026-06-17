@@ -42,6 +42,10 @@ const directWorlds: I_dialogProjectSettingsWorldDraft[] = [
     colorPallete: '',
     displayName: 'Direct world',
     documentCount: 0,
+    templateLayout: {
+      groups: [],
+      placements: []
+    },
     id: '550e8400-e29b-41d4-a716-446655440000'
   }
 ]
@@ -62,6 +66,10 @@ const hydratedWorlds: I_dialogProjectSettingsWorldDraft[] = [
     colorPallete: '',
     displayName: 'From Db',
     documentCount: 0,
+    templateLayout: {
+      groups: [],
+      placements: []
+    },
     id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
   }
 ]
@@ -172,6 +180,10 @@ test('Test that createDialogProjectSettingsDialogActions mutates local world dra
         colorPallete: '',
         displayName: 'Alpha',
         documentCount: 0,
+        templateLayout: {
+          groups: [],
+          placements: []
+        },
         id: worldAId
       },
       {
@@ -179,6 +191,10 @@ test('Test that createDialogProjectSettingsDialogActions mutates local world dra
         colorPallete: '',
         displayName: 'Beta',
         documentCount: 0,
+        templateLayout: {
+          groups: [],
+          placements: []
+        },
         id: worldBId
       }
     ])
@@ -266,6 +282,10 @@ test('Test that saveAndCloseDialog dispatches saveProjectSettings with trimmed n
         colorPallete: '#112233;#445566',
         displayName: 'Realm',
         documentCount: 0,
+        templateLayout: {
+          groups: [],
+          placements: []
+        },
         id: worldAId
       }
     ]),
@@ -301,7 +321,11 @@ test('Test that saveAndCloseDialog dispatches saveProjectSettings with trimmed n
         color: '#aabbcc',
         colorPallete: '#112233;#445566',
         displayName: 'Realm',
-        id: worldAId
+        id: worldAId,
+        templateLayout: {
+          groups: [],
+          placements: []
+        }
       }
     ]
   })
@@ -322,6 +346,10 @@ test('Test that saveAndCloseDialog no-ops without local settings or blank name',
         colorPallete: '',
         displayName: 'Realm',
         documentCount: 0,
+        templateLayout: {
+          groups: [],
+          placements: []
+        },
         id: worldAId
       }
     ])
@@ -359,6 +387,10 @@ test('Test that saveAndCloseDialog keeps the dialog open when save fails', async
         colorPallete: '',
         displayName: 'Alpha',
         documentCount: 0,
+        templateLayout: {
+          groups: [],
+          placements: []
+        },
         id: worldAId
       }
     ])
@@ -391,6 +423,10 @@ test('Test that saveAndCloseDialog no-ops when local document templates are null
         colorPallete: '',
         displayName: 'Realm',
         documentCount: 0,
+        templateLayout: {
+          groups: [],
+          placements: []
+        },
         id: worldAId
       }
     ])

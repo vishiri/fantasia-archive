@@ -40,6 +40,8 @@ export function useDialogProjectSettingsImpl (
     hasDialogProjectSettingsWorldColorPalleteValidationError:
       deps.hasDialogProjectSettingsWorldColorPalleteValidationError,
     hasDialogProjectSettingsWorldNameValidationError: deps.hasDialogProjectSettingsWorldNameValidationError,
+    hasDialogProjectSettingsWorldTemplateLayoutValidationError:
+      deps.hasDialogProjectSettingsWorldTemplateLayoutValidationError,
     isDialogProjectSettingsFullDialogSaveDisabled: deps.isDialogProjectSettingsFullDialogSaveDisabled,
     isDialogProjectSettingsProjectNameInvalid: deps.isDialogProjectSettingsProjectNameInvalid,
     localDocumentTemplates,
@@ -69,6 +71,7 @@ export function useDialogProjectSettingsImpl (
     updateDocumentTemplateWorldAppendix: actions.updateDocumentTemplateWorldAppendix,
     updateWorldColor: actions.updateWorldColor,
     updateWorldColorPallete: actions.updateWorldColorPallete,
-    updateWorldDisplayName: actions.updateWorldDisplayName
+    updateWorldDisplayName: actions.updateWorldDisplayName,
+    updateWorldTemplateLayout: actions.updateWorldTemplateLayout
   }
 }

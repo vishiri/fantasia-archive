@@ -46,6 +46,10 @@ export type T_dialogProjectSettingsUseHookDeps = {
     updateWorldColor: (id: string, color: string) => void
     updateWorldColorPallete: (id: string, colorPallete: string) => void
     updateWorldDisplayName: (id: string, displayName: string) => void
+    updateWorldTemplateLayout: (
+      id: string,
+      templateLayout: I_dialogProjectSettingsWorldDraft['templateLayout']
+    ) => void
   }
   createDialogProjectSettingsRefs: () => {
     dialogModel: Ref<boolean>
@@ -63,6 +67,10 @@ export type T_dialogProjectSettingsUseHookDeps = {
   ) => boolean
   hasDialogProjectSettingsWorldNameValidationError: (
     worlds: I_dialogProjectSettingsWorldDraft[] | null
+  ) => boolean
+  hasDialogProjectSettingsWorldTemplateLayoutValidationError: (
+    worlds: I_dialogProjectSettingsWorldDraft[] | null,
+    documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] | null
   ) => boolean
   isDialogProjectSettingsFullDialogSaveDisabled: (
     projectName: string,

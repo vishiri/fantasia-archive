@@ -38,6 +38,10 @@ export function createDialogProjectSettingsDialogActions (deps: {
     updateWorldColor: (id: string, color: string) => void
     updateWorldColorPallete: (id: string, colorPallete: string) => void
     updateWorldDisplayName: (id: string, displayName: string) => void
+    updateWorldTemplateLayout: (
+      id: string,
+      templateLayout: I_dialogProjectSettingsWorldDraft['templateLayout']
+    ) => void
   } {
   const {
     dialogModel,

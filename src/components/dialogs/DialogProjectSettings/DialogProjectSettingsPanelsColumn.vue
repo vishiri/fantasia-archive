@@ -29,6 +29,7 @@
           <div class="dialogProjectSettings__panelScrollInner q-py-sm">
             <DialogProjectSettingsWorldsPanel
               v-if="props.worlds !== null"
+              :document-templates="props.documentTemplates"
               :worlds="props.worlds"
               @add-world="emit('addWorld')"
               @remove-world="emit('removeWorld', $event)"
@@ -36,6 +37,8 @@
               @update-world-color="onUpdateWorldColor"
               @update-world-color-pallete="onUpdateWorldColorPallete"
               @update-world-display-name="onUpdateWorldDisplayName"
+              @update-document-template-display-name="onUpdateDocumentTemplateDisplayName"
+              @update-world-template-layout="onUpdateWorldTemplateLayout"
             />
           </div>
         </div>
@@ -66,6 +69,7 @@
 <script setup lang="ts">
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
+import type { I_dialogProjectSettingsWorldTemplateLayoutDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import DialogProjectSettingsDocumentTemplatesPanel from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsDocumentTemplatesPanel.vue'
 import DialogProjectSettingsGeneralPanel from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsGeneralPanel.vue'
 import DialogProjectSettingsWorldsPanel from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsWorldsPanel.vue'
@@ -97,6 +101,7 @@ const emit = defineEmits<{
   updateWorldColor: [id: string, color: string]
   updateWorldColorPallete: [id: string, colorPallete: string]
   updateWorldDisplayName: [id: string, displayName: string]
+  updateWorldTemplateLayout: [id: string, layout: I_dialogProjectSettingsWorldTemplateLayoutDraft]
 }>()
 
 const generalTabKey = FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB
@@ -113,6 +118,13 @@ function onUpdateWorldColorPallete (id: string, colorPallete: string): void {
 
 function onUpdateWorldDisplayName (id: string, displayName: string): void {
   emit('updateWorldDisplayName', id, displayName)
+}
+
+function onUpdateWorldTemplateLayout (
+  id: string,
+  layout: I_dialogProjectSettingsWorldTemplateLayoutDraft
+): void {
+  emit('updateWorldTemplateLayout', id, layout)
 }
 
 function onUpdateDocumentTemplateDisplayName (id: string, displayName: string): void {

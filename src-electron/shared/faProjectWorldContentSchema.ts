@@ -9,6 +9,7 @@ import {
   faProjectContentIdSchema,
   parseFaProjectContentPlainRecord
 } from 'app/src-electron/shared/faProjectContentSchemaShared'
+import { faProjectWorldTemplateLayoutSnapshotSchema } from 'app/src-electron/shared/faProjectWorldTemplateLayoutSchema'
 import type {
   I_faProjectWorldCreateInput,
   I_faProjectWorldPatch,
@@ -69,7 +70,8 @@ export const faProjectWorldSnapshotItemSchema = z.object({
   color: z.string().optional(),
   colorPallete: faProjectWorldColorPalleteSchema.optional(),
   displayName: faProjectContentDisplayNameSchema,
-  id: faProjectContentIdSchema
+  id: faProjectContentIdSchema,
+  templateLayout: faProjectWorldTemplateLayoutSnapshotSchema.optional()
 }).strict()
 
 export const faProjectWorldsSnapshotPayloadSchema = z.object({

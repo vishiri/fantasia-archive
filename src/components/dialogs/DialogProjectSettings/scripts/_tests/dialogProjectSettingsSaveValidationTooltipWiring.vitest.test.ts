@@ -2,6 +2,7 @@ import { expect, test, vi } from 'vitest'
 
 import { createBuildDialogProjectSettingsSaveValidationTooltip } from '../dialogProjectSettingsSaveValidationTooltipWiring'
 import * as dialogProjectSettingsDialogSaveValidation from '../dialogProjectSettingsDialogSaveValidation'
+import { createEmptyDialogProjectSettingsWorldTemplateLayoutDraft } from '../dialogProjectSettingsWorldTemplateLayoutDraft'
 
 const defaultTemplateName = 'New document template'
 const defaultWorldName = 'New world'
@@ -31,6 +32,10 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds dup
       colorPallete: '#112233;#112233',
       displayName: 'Realm Alpha',
       documentCount: 0,
+      templateLayout: {
+        groups: [],
+        placements: []
+      },
       id: '550e8400-e29b-41d4-a716-446655440000'
     }
   ], [])
@@ -70,6 +75,10 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds wor
       colorPallete: '',
       displayName: '   ',
       documentCount: 0,
+      templateLayout: {
+        groups: [],
+        placements: []
+      },
       id: '550e8400-e29b-41d4-a716-446655440000'
     }
   ], [])
@@ -104,6 +113,10 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds pro
       colorPallete: '',
       displayName: 'Realm',
       documentCount: 0,
+      templateLayout: {
+        groups: [],
+        placements: []
+      },
       id: '550e8400-e29b-41d4-a716-446655440000'
     }
   ], [])
@@ -215,4 +228,215 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip falls back
     '- Document template name is required for "New document template".'
   ])
   collectSpy.mockRestore()
+})
+
+/**
+ * createBuildDialogProjectSettingsSaveValidationTooltip
+ * Resolves localized blank template group name bullets with world labels.
+ */
+test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds template group name tooltip', () => {
+  const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
+    defaultNewTemplateName: defaultTemplateName,
+    defaultNewWorldName: defaultWorldName,
+    translate: (key, params) => {
+      if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
+        return 'Unable to save, following errors found:'
+      }
+      if (key === 'dialogs.projectSettings.saveErrors.bulletWorldTemplateGroupNameRequired') {
+        return `Template group name is required for "${params?.worldLabel ?? ''}".`
+      }
+      return key
+    }
+  })
+
+  const tooltip = buildTooltip('Project', [
+    {
+      color: '',
+      colorPallete: '',
+      displayName: 'Realm Alpha',
+      documentCount: 0,
+      templateLayout: {
+        groups: [
+          {
+            displayName: '   ',
+            id: 'group-a',
+            rootSortOrder: 0
+          }
+        ],
+        placements: []
+      },
+      id: '550e8400-e29b-41d4-a716-446655440000'
+    }
+  ], [])
+
+  expect(tooltip.bullets).toEqual([
+    '- Template group name is required for "Realm Alpha".'
+  ])
+})
+
+/**
+ * createBuildDialogProjectSettingsSaveValidationTooltip
+ * Resolves localized duplicate document template placement bullets with world labels.
+ */
+test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds duplicate template tooltip', () => {
+  const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
+    defaultNewTemplateName: defaultTemplateName,
+    defaultNewWorldName: defaultWorldName,
+    translate: (key, params) => {
+      if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
+        return 'Unable to save, following errors found:'
+      }
+      if (key === 'dialogs.projectSettings.saveErrors.bulletWorldTemplateDuplicateDocumentTemplate') {
+        return `Duplicate document template "${params?.templateLabel ?? ''}" in "${params?.worldLabel ?? ''}".`
+      }
+      return key
+    }
+  })
+
+  const tooltip = buildTooltip('Project', [
+    {
+      color: '',
+      colorPallete: '',
+      displayName: 'Realm Alpha',
+      documentCount: 0,
+      templateLayout: {
+        groups: [],
+        placements: [
+          {
+            displayName: 'Character',
+            documentCountInWorld: 0,
+            documentTemplateId: 'template-a',
+            groupId: null,
+            groupSortOrder: null,
+            icon: 'mdi-account',
+            id: 'placement-a',
+            rootSortOrder: 0,
+            worldAppendix: ''
+          },
+          {
+            displayName: 'Character copy',
+            documentCountInWorld: 0,
+            documentTemplateId: 'template-a',
+            groupId: null,
+            groupSortOrder: null,
+            icon: 'mdi-account',
+            id: 'placement-b',
+            rootSortOrder: 1,
+            worldAppendix: ''
+          }
+        ]
+      },
+      id: '550e8400-e29b-41d4-a716-446655440000'
+    }
+  ], [])
+
+  expect(tooltip.bullets).toEqual([
+    '- Duplicate document template "Character" in "Realm Alpha".'
+  ])
+})
+
+/**
+ * createBuildDialogProjectSettingsSaveValidationTooltip
+ * Falls back when duplicate template validation fires without a matching world row.
+ */
+test('Test that createBuildDialogProjectSettingsSaveValidationTooltip falls back for duplicate template without worlds', () => {
+  const collectSpy = vi.spyOn(
+    dialogProjectSettingsDialogSaveValidation,
+    'collectDialogProjectSettingsFullSaveValidationErrors'
+  ).mockReturnValue([
+    {
+      kind: 'worldTemplateDuplicateDocumentTemplate',
+      worldIndexOneBased: 2
+    }
+  ])
+  const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
+    defaultNewTemplateName: defaultTemplateName,
+    defaultNewWorldName: defaultWorldName,
+    translate: (key, params) => {
+      if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
+        return 'Unable to save, following errors found:'
+      }
+      if (key === 'dialogs.projectSettings.saveErrors.bulletWorldTemplateDuplicateDocumentTemplate') {
+        return `Duplicate document template "${params?.templateLabel ?? ''}" in "${params?.worldLabel ?? ''}".`
+      }
+      return key
+    }
+  })
+
+  const tooltip = buildTooltip('Project', [
+    {
+      color: '',
+      colorPallete: '',
+      displayName: 'Realm Alpha',
+      documentCount: 0,
+      templateLayout: createEmptyDialogProjectSettingsWorldTemplateLayoutDraft(),
+      id: '550e8400-e29b-41d4-a716-446655440000'
+    }
+  ], [])
+
+  expect(tooltip.bullets).toEqual([
+    '- Duplicate document template "New document template" in "New world".'
+  ])
+  collectSpy.mockRestore()
+})
+
+/**
+ * createBuildDialogProjectSettingsSaveValidationTooltip
+ * Falls back to the default template label when duplicate placement display names are blank.
+ */
+test('Test that createBuildDialogProjectSettingsSaveValidationTooltip uses default template label for blank duplicate names', () => {
+  const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
+    defaultNewTemplateName: defaultTemplateName,
+    defaultNewWorldName: defaultWorldName,
+    translate: (key, params) => {
+      if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
+        return 'Unable to save, following errors found:'
+      }
+      if (key === 'dialogs.projectSettings.saveErrors.bulletWorldTemplateDuplicateDocumentTemplate') {
+        return `Duplicate document template "${params?.templateLabel ?? ''}" in "${params?.worldLabel ?? ''}".`
+      }
+      return key
+    }
+  })
+
+  const tooltip = buildTooltip('Project', [
+    {
+      color: '',
+      colorPallete: '',
+      displayName: 'Realm Alpha',
+      documentCount: 0,
+      templateLayout: {
+        groups: [],
+        placements: [
+          {
+            displayName: '   ',
+            documentCountInWorld: 0,
+            documentTemplateId: 'template-a',
+            groupId: null,
+            groupSortOrder: null,
+            icon: 'mdi-account',
+            id: 'placement-a',
+            rootSortOrder: 0,
+            worldAppendix: ''
+          },
+          {
+            displayName: '',
+            documentCountInWorld: 0,
+            documentTemplateId: 'template-a',
+            groupId: null,
+            groupSortOrder: null,
+            icon: 'mdi-account',
+            id: 'placement-b',
+            rootSortOrder: 1,
+            worldAppendix: ''
+          }
+        ]
+      },
+      id: '550e8400-e29b-41d4-a716-446655440000'
+    }
+  ], [])
+
+  expect(tooltip.bullets).toEqual([
+    '- Duplicate document template "New document template" in "Realm Alpha".'
+  ])
 })

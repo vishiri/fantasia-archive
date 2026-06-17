@@ -7,7 +7,6 @@ import {
   wireFaProjectContentWorldIpcHandlers
 } from './registerFaProjectContentIpcHandlersWiring'
 import { wireFaProjectContentDocumentTemplateIpcHandlers } from './registerFaProjectContentDocumentTemplateIpcHandlersWiring'
-import { wireFaProjectContentWorldDocumentTemplateLinkIpcHandlers } from './registerFaProjectContentWorldDocumentTemplateLinkIpcHandlersWiring'
 
 let registered = false
 
@@ -25,5 +24,4 @@ export function registerFaProjectContentIpc (): void {
   wireFaProjectContentDocumentTemplateIpcHandlers(ipcMain)
   wireFaProjectContentDocumentIpcHandlers(ipcMain)
   wireFaProjectContentMediaLinkIpcHandlers(ipcMain)
-  wireFaProjectContentWorldDocumentTemplateLinkIpcHandlers(ipcMain)
 }

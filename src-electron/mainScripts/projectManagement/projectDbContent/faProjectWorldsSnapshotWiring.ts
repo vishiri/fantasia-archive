@@ -12,6 +12,7 @@ import {
   listFaProjectWorldIds,
   updateFaProjectWorldRow
 } from './faProjectWorldsSqlWiring'
+import { replaceFaProjectWorldTemplateLayoutSnapshot } from './faProjectWorldTemplateLayoutSnapshotWiring'
 import type { I_faProjectWorldSnapshotItem } from 'app/types/I_faProjectWorldDomain'
 
 /**
@@ -51,15 +52,18 @@ export function replaceFaProjectWorldsSnapshot (
           displayName: item.displayName,
           sortOrder: index
         })
-        return
+      } else {
+        insertFaProjectWorldWithId(db, {
+          color,
+          colorPallete,
+          displayName: item.displayName,
+          id: item.id,
+          sortOrder: index
+        })
       }
-      insertFaProjectWorldWithId(db, {
-        color,
-        colorPallete,
-        displayName: item.displayName,
-        id: item.id,
-        sortOrder: index
-      })
+      if (item.templateLayout !== undefined) {
+        replaceFaProjectWorldTemplateLayoutSnapshot(db, item.id, item.templateLayout)
+      }
     })
   })
 

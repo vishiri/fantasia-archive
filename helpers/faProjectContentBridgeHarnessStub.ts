@@ -23,7 +23,11 @@ function stubWorld () {
 function stubWorldForSettings () {
   return {
     ...stubWorld(),
-    documentCount: 0
+    documentCount: 0,
+    templateLayout: {
+      groups: [],
+      placements: []
+    }
   }
 }
 
@@ -64,22 +68,18 @@ export function createFaProjectContentBridgeHarnessStub (): I_faProjectContentAP
     getMediaById: async () => stubNamedEntity(),
     getWorldById: async () => stubWorld(),
     linkDocumentMedia: noop,
-    linkWorldDocumentTemplate: noop,
     listDocumentMedia: emptyList,
     listDocumentTemplates: emptyList,
     listDocumentTemplatesForProjectSettings: async () => ({ items: [] }),
-    listDocumentTemplatesForWorld: emptyList,
     listDocuments: emptyList,
     listMedia: emptyList,
     listWorlds: emptyList,
     listWorldsForProjectSettings: async () => ({ items: [stubWorldForSettings()] }),
-    listWorldsForDocumentTemplate: emptyList,
     saveDocumentTemplatesSnapshot: noop,
     saveWorldsSnapshot: noop,
     setDocumentTemplate: async () => stubDocument(),
     setDocumentWorld: async () => stubDocument(),
     unlinkDocumentMedia: noop,
-    unlinkWorldDocumentTemplate: noop,
     updateDocument: async () => stubDocument(),
     updateDocumentTemplate: async () => stubDocumentTemplate(),
     updateMedia: async () => stubNamedEntity(),

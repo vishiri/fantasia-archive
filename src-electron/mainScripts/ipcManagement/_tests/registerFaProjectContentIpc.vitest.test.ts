@@ -81,16 +81,6 @@ vi.mock(
   })
 )
 
-vi.mock(
-  'app/src-electron/mainScripts/projectManagement/projectDbContent/faProjectWorldDocumentTemplateLinksWiring',
-  () => ({
-    linkFaProjectWorldDocumentTemplate: vi.fn(),
-    unlinkFaProjectWorldDocumentTemplate: vi.fn(),
-    listFaProjectDocumentTemplatesForWorld: vi.fn(() => ({ items: [] })),
-    listFaProjectWorldsForDocumentTemplate: vi.fn(() => ({ items: [] }))
-  })
-)
-
 beforeEach(() => {
   vi.resetModules()
   handleMock.mockReset()
@@ -227,22 +217,7 @@ test('Test that every project content IPC handler runs through runWithFaProjectD
   })
   await handlerFor(FA_PROJECT_CONTENT_IPC.listDocumentMediaAsync)(event, { documentId: SAMPLE_UUID })
 
-  await handlerFor(FA_PROJECT_CONTENT_IPC.linkWorldDocumentTemplateAsync)(event, {
-    worldId: SAMPLE_UUID,
-    documentTemplateId: SAMPLE_UUID_B
-  })
-  await handlerFor(FA_PROJECT_CONTENT_IPC.unlinkWorldDocumentTemplateAsync)(event, {
-    worldId: SAMPLE_UUID,
-    documentTemplateId: SAMPLE_UUID_B
-  })
-  await handlerFor(FA_PROJECT_CONTENT_IPC.listDocumentTemplatesForWorldAsync)(event, {
-    worldId: SAMPLE_UUID
-  })
-  await handlerFor(FA_PROJECT_CONTENT_IPC.listWorldsForDocumentTemplateAsync)(event, {
-    documentTemplateId: SAMPLE_UUID
-  })
-
-  expect(runWithDbMock.mock.calls.length).toBeGreaterThanOrEqual(33)
+  expect(runWithDbMock.mock.calls.length).toBeGreaterThanOrEqual(29)
 })
 
 /**

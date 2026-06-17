@@ -11,6 +11,10 @@ const worldFixture = {
   colorPallete: '',
   displayName: 'Realm',
   documentCount: 0,
+  templateLayout: {
+    groups: [],
+    placements: []
+  },
   id: '550e8400-e29b-41d4-a716-446655440000'
 }
 
@@ -148,6 +152,7 @@ test('Test that DialogProjectSettingsWorldsDetailPanel emits field updates', asy
       nameHasError: false,
       removeDisabled: false,
       removeDisabledReason: null,
+      documentTemplates: [],
       world: worldFixture
     },
     global: {
@@ -266,6 +271,7 @@ test('Test that DialogProjectSettingsWorldsDetailPanel normalizes null field upd
       nameHasError: false,
       removeDisabled: false,
       removeDisabledReason: null,
+      documentTemplates: [],
       world: worldFixture
     },
     global: {
@@ -299,6 +305,7 @@ test('Test that DialogProjectSettingsWorldsDetailPanel reflects validation and r
       nameHasError: true,
       removeDisabled: true,
       removeDisabledReason: 'hasDocuments',
+      documentTemplates: [],
       world: {
         ...worldFixture,
         color: '  '

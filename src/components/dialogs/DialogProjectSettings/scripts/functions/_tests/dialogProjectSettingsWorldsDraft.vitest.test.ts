@@ -2,22 +2,29 @@ import { expect, test } from 'vitest'
 
 import {
   appendDialogProjectSettingsWorldDraft,
-  buildDialogProjectSettingsSaveValidationTooltip,
-  collectDialogProjectSettingsSaveValidationErrors,
-  resolveDialogProjectSettingsWorldSaveErrorDisplayName,
-  hasDialogProjectSettingsWorldColorPalleteValidationError,
-  hasDialogProjectSettingsWorldNameValidationError,
-  isDialogProjectSettingsDialogSaveDisabled,
   isDialogProjectSettingsWorldRemoveDisabled,
-  isDialogProjectSettingsWorldTabValidationError,
   mapDialogProjectSettingsWorldsToSnapshot
 } from '../dialogProjectSettingsWorldsDraft'
+import {
+  buildDialogProjectSettingsSaveValidationTooltip,
+  collectDialogProjectSettingsSaveValidationErrors,
+  hasDialogProjectSettingsWorldColorPalleteValidationError,
+  hasDialogProjectSettingsWorldNameValidationError,
+  hasDialogProjectSettingsWorldTemplateLayoutValidationError,
+  isDialogProjectSettingsDialogSaveDisabled,
+  isDialogProjectSettingsWorldTabValidationError,
+  resolveDialogProjectSettingsWorldSaveErrorDisplayName
+} from '../dialogProjectSettingsWorldsSaveValidation'
 
 const baseWorld = {
   color: '',
   colorPallete: '',
   displayName: 'Realm',
   documentCount: 0,
+  templateLayout: {
+    groups: [],
+    placements: []
+  },
   id: '550e8400-e29b-41d4-a716-446655440000'
 }
 
@@ -78,7 +85,11 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot trims names and optiona
       color: '#aabbcc',
       colorPallete: '#112233;#445566',
       displayName: 'Realm',
-      id: baseWorld.id
+      id: baseWorld.id,
+      templateLayout: {
+        groups: [],
+        placements: []
+      }
     }
   ])
 })
@@ -97,7 +108,11 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot dedupes duplicate palet
     {
       colorPallete: '#112233;#AABBCC',
       displayName: 'Realm',
-      id: baseWorld.id
+      id: baseWorld.id,
+      templateLayout: {
+        groups: [],
+        placements: []
+      }
     }
   ])
 })
@@ -136,7 +151,11 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot ignores invalid palette
     {
       colorPallete: '#112233;#445566',
       displayName: 'Realm',
-      id: baseWorld.id
+      id: baseWorld.id,
+      templateLayout: {
+        groups: [],
+        placements: []
+      }
     }
   ])
   expect(mapDialogProjectSettingsWorldsToSnapshot([
@@ -147,7 +166,11 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot ignores invalid palette
   ])).toEqual([
     {
       displayName: 'Realm',
-      id: baseWorld.id
+      id: baseWorld.id,
+      templateLayout: {
+        groups: [],
+        placements: []
+      }
     }
   ])
 })
@@ -297,4 +320,250 @@ test('Test that buildDialogProjectSettingsSaveValidationTooltip formats multilin
     '- Project name is required.\n' +
     '- Duplicate colors found in palette of "Realm".'
   )
+})
+
+/**
+ * hasDialogProjectSettingsWorldTemplateLayoutValidationError
+ * Blocks save when any world template group name is blank.
+ */
+test('Test that template layout validation rejects blank group names', () => {
+  expect(hasDialogProjectSettingsWorldTemplateLayoutValidationError(null)).toBe(true)
+  expect(hasDialogProjectSettingsWorldTemplateLayoutValidationError([baseWorld])).toBe(false)
+  expect(hasDialogProjectSettingsWorldTemplateLayoutValidationError([
+    {
+      ...baseWorld,
+      templateLayout: {
+        groups: [
+          {
+            displayName: '   ',
+            id: 'group-a',
+            rootSortOrder: 0
+          }
+        ],
+        placements: []
+      }
+    }
+  ])).toBe(true)
+  expect(isDialogProjectSettingsDialogSaveDisabled('Project', [
+    {
+      ...baseWorld,
+      templateLayout: {
+        groups: [
+          {
+            displayName: '   ',
+            id: 'group-a',
+            rootSortOrder: 0
+          }
+        ],
+        placements: []
+      }
+    }
+  ])).toBe(true)
+  expect(isDialogProjectSettingsWorldTabValidationError({
+    ...baseWorld,
+    templateLayout: {
+      groups: [
+        {
+          displayName: '   ',
+          id: 'group-a',
+          rootSortOrder: 0
+        }
+      ],
+      placements: []
+    }
+  })).toBe(true)
+  expect(collectDialogProjectSettingsSaveValidationErrors('Project', [
+    {
+      ...baseWorld,
+      templateLayout: {
+        groups: [
+          {
+            displayName: '   ',
+            id: 'group-a',
+            rootSortOrder: 0
+          }
+        ],
+        placements: []
+      }
+    }
+  ])).toEqual([
+    {
+      kind: 'worldTemplateGroupNameRequired',
+      worldIndexOneBased: 1
+    }
+  ])
+})
+
+/**
+ * hasDialogProjectSettingsWorldTemplateLayoutValidationError
+ * Blocks save when duplicate document template placements exist in one world layout.
+ */
+test('Test that template layout validation rejects duplicate document template placements', () => {
+  const duplicateLayout = {
+    groups: [],
+    placements: [
+      {
+        displayName: 'Character',
+        documentCountInWorld: 0,
+        documentTemplateId: 'template-a',
+        groupId: null,
+        groupSortOrder: null,
+        icon: 'mdi-account',
+        id: 'placement-a',
+        rootSortOrder: 0,
+        worldAppendix: ''
+      },
+      {
+        displayName: 'Character copy',
+        documentCountInWorld: 0,
+        documentTemplateId: 'template-a',
+        groupId: null,
+        groupSortOrder: null,
+        icon: 'mdi-account',
+        id: 'placement-b',
+        rootSortOrder: 1,
+        worldAppendix: ''
+      }
+    ]
+  }
+  expect(hasDialogProjectSettingsWorldTemplateLayoutValidationError([
+    {
+      ...baseWorld,
+      templateLayout: duplicateLayout
+    }
+  ])).toBe(true)
+  expect(isDialogProjectSettingsWorldTabValidationError({
+    ...baseWorld,
+    templateLayout: duplicateLayout
+  })).toBe(true)
+  expect(collectDialogProjectSettingsSaveValidationErrors('Project', [
+    {
+      ...baseWorld,
+      templateLayout: duplicateLayout
+    }
+  ])).toEqual([
+    {
+      kind: 'worldTemplateDuplicateDocumentTemplate',
+      worldIndexOneBased: 1
+    }
+  ])
+})
+
+/**
+ * hasDialogProjectSettingsWorldTemplateLayoutValidationError
+ * Flags worlds whose layout references a document template with a blank name.
+ */
+test('Test that template layout validation rejects invalid document template placements', () => {
+  const layoutWithTemplate = {
+    groups: [],
+    placements: [
+      {
+        displayName: 'Character',
+        documentCountInWorld: 0,
+        documentTemplateId: 'template-a',
+        groupId: null,
+        groupSortOrder: null,
+        icon: 'mdi-account',
+        id: 'placement-a',
+        rootSortOrder: 0,
+        worldAppendix: ''
+      }
+    ]
+  }
+  const documentTemplates = [
+    {
+      displayName: '   ',
+      documentCount: 0,
+      icon: '',
+      id: 'template-a',
+      worldAppendix: ''
+    }
+  ]
+  const worldWithInvalidTemplate = {
+    ...baseWorld,
+    templateLayout: layoutWithTemplate
+  }
+  const worldWithoutInvalidTemplate = {
+    ...baseWorld,
+    id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+    displayName: 'Other realm',
+    templateLayout: {
+      groups: [],
+      placements: []
+    }
+  }
+
+  expect(hasDialogProjectSettingsWorldTemplateLayoutValidationError(
+    [worldWithInvalidTemplate],
+    documentTemplates
+  )).toBe(true)
+  expect(hasDialogProjectSettingsWorldTemplateLayoutValidationError(
+    [worldWithoutInvalidTemplate],
+    documentTemplates
+  )).toBe(false)
+  expect(isDialogProjectSettingsWorldTabValidationError(
+    worldWithInvalidTemplate,
+    documentTemplates
+  )).toBe(true)
+  expect(isDialogProjectSettingsWorldTabValidationError(
+    worldWithoutInvalidTemplate,
+    documentTemplates
+  )).toBe(false)
+})
+
+/**
+ * mapDialogProjectSettingsWorldsToSnapshot
+ * Includes trimmed template layout groups and placements in the IPC payload.
+ */
+test('Test that mapDialogProjectSettingsWorldsToSnapshot maps template layout rows', () => {
+  expect(mapDialogProjectSettingsWorldsToSnapshot([
+    {
+      ...baseWorld,
+      templateLayout: {
+        groups: [
+          {
+            displayName: '  Creatures  ',
+            id: 'group-a',
+            rootSortOrder: 0
+          }
+        ],
+        placements: [
+          {
+            displayName: 'Character',
+            documentCountInWorld: 0,
+            documentTemplateId: 'template-a',
+            groupId: 'group-a',
+            groupSortOrder: 0,
+            icon: 'mdi-account',
+            id: 'placement-a',
+            rootSortOrder: null,
+            worldAppendix: 'Hero'
+          }
+        ]
+      }
+    }
+  ])).toEqual([
+    {
+      displayName: 'Realm',
+      id: baseWorld.id,
+      templateLayout: {
+        groups: [
+          {
+            displayName: 'Creatures',
+            id: 'group-a',
+            rootSortOrder: 0
+          }
+        ],
+        placements: [
+          {
+            documentTemplateId: 'template-a',
+            groupId: 'group-a',
+            groupSortOrder: 0,
+            id: 'placement-a',
+            rootSortOrder: null
+          }
+        ]
+      }
+    }
+  ])
 })

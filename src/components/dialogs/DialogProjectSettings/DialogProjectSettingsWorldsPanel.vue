@@ -1,6 +1,7 @@
 <template>
   <div class="dialogProjectSettings__worldsPanel row no-wrap">
     <DialogProjectSettingsWorldsTabList
+      :document-templates="props.documentTemplates"
       :selected-world-id="selectedWorldId"
       :worlds="props.worlds"
       @add-world="emit('addWorld')"
@@ -13,14 +14,17 @@
     <div class="dialogProjectSettings__worldsDetailHost col">
       <DialogProjectSettingsWorldsDetailPanel
         v-if="selectedWorld !== null"
+        :document-templates="props.documentTemplates"
         :name-has-error="isWorldNameInvalid(selectedWorld.displayName)"
         :remove-disabled="isWorldRemoveDisabled(selectedWorld)"
         :remove-disabled-reason="resolveRemoveDisabledReason(selectedWorld)"
         :world="selectedWorld"
         @remove="emitRemove(selectedWorld.id)"
+        @update-document-template-display-name="emitUpdateDocumentTemplateDisplayName"
         @update:color="emitUpdateColor(selectedWorld.id, $event)"
         @update:color-pallete="emitUpdateColorPallete(selectedWorld.id, $event)"
         @update:display-name="emitUpdateDisplayName(selectedWorld.id, $event)"
+        @update:template-layout="emitUpdateTemplateLayout(selectedWorld.id, $event)"
       />
     </div>
   </div>
@@ -29,11 +33,15 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
+import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
+import type { I_dialogProjectSettingsWorldTemplateLayoutDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import {
-  isDialogProjectSettingsWorldNameInvalid,
   isDialogProjectSettingsWorldRemoveDisabled
 } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldsDraft'
+import {
+  isDialogProjectSettingsWorldNameInvalid
+} from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldsSaveValidation'
 import { resolveDialogProjectSettingsWorldsPanelSelection } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldsSelection'
 import DialogProjectSettingsWorldsDetailPanel from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsWorldsDetailPanel.vue'
 import DialogProjectSettingsWorldsTabList from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsWorldsTabList.vue'
@@ -43,6 +51,7 @@ defineOptions({
 })
 
 const props = defineProps<{
+  documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] | null
   worlds: I_dialogProjectSettingsWorldDraft[]
 }>()
 
@@ -53,6 +62,8 @@ const emit = defineEmits<{
   updateWorldColor: [id: string, color: string]
   updateWorldColorPallete: [id: string, colorPallete: string]
   updateWorldDisplayName: [id: string, displayName: string]
+  updateDocumentTemplateDisplayName: [documentTemplateId: string, displayName: string]
+  updateWorldTemplateLayout: [id: string, layout: I_dialogProjectSettingsWorldTemplateLayoutDraft]
 }>()
 
 const selectedWorldId = ref<string | null>(null)
@@ -115,6 +126,20 @@ function emitUpdateColor (id: string, color: string): void {
 function emitUpdateColorPallete (id: string, colorPallete: string): void {
   emit('updateWorldColorPallete', id, colorPallete)
 }
+
+function emitUpdateTemplateLayout (
+  id: string,
+  layout: I_dialogProjectSettingsWorldTemplateLayoutDraft
+): void {
+  emit('updateWorldTemplateLayout', id, layout)
+}
+
+function emitUpdateDocumentTemplateDisplayName (
+  documentTemplateId: string,
+  displayName: string
+): void {
+  emit('updateDocumentTemplateDisplayName', documentTemplateId, displayName)
+}
 </script>
 
 <style lang="scss" scoped>
@@ -130,6 +155,6 @@ function emitUpdateColorPallete (id: string, colorPallete: string): void {
   flex-direction: column;
   min-height: 0;
   min-width: 0;
-  overflow: hidden auto;
+  overflow: hidden;
 }
 </style>

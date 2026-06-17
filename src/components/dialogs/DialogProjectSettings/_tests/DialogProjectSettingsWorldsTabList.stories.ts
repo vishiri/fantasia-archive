@@ -17,6 +17,7 @@ export default meta
 
 export const Default: StoryObj<typeof meta> = {
   args: {
+    documentTemplates: [],
     selectedWorldId: '550e8400-e29b-41d4-a716-446655440000',
     worlds: [
       {

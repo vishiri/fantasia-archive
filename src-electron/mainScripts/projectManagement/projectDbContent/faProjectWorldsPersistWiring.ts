@@ -8,6 +8,7 @@ import {
   listFaProjectWorldRows,
   updateFaProjectWorldRow
 } from './faProjectWorldsSqlWiring'
+import { listFaProjectWorldTemplateLayoutForProjectSettings } from './faProjectWorldTemplateLayoutReadWiring'
 import { replaceFaProjectWorldsSnapshot } from './faProjectWorldsSnapshotWiring'
 import type { I_faProjectWorldsForProjectSettingsResult } from 'app/types/I_dialogProjectSettingsWorlds'
 import type {
@@ -56,6 +57,7 @@ export function listFaProjectWorldsForProjectSettings (
     documentCount: documentCounts[world.id] ?? 0,
     id: world.id,
     sortOrder: world.sortOrder,
+    templateLayout: listFaProjectWorldTemplateLayoutForProjectSettings(db, world.id),
     updatedAtMs: world.updatedAtMs
   }))
   return { items }

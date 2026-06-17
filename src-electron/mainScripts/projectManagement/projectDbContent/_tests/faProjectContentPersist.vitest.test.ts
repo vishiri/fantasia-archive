@@ -48,12 +48,7 @@ import {
   updateFaProjectMedia
 } from '../faProjectMediaPersistWiring'
 import { assertFaProjectDocumentTemplateExists } from '../faProjectDocumentTemplatesSqlWiring'
-import {
-  linkFaProjectWorldDocumentTemplate,
-  listFaProjectDocumentTemplatesForWorld,
-  listFaProjectWorldsForDocumentTemplate,
-  unlinkFaProjectWorldDocumentTemplate
-} from '../faProjectWorldDocumentTemplateLinksWiring'
+import { replaceFaProjectWorldTemplateLayoutSnapshot } from '../faProjectWorldTemplateLayoutSnapshotWiring'
 
 type T_row = Record<string, string | number | null>
 
@@ -87,16 +82,16 @@ function makeProjectContentTestDb (): {
   }
   tables: Record<string, Map<string, T_row>>
   junctionDocumentMedia: Set<string>
-  junctionWorldDocumentTemplates: Set<string>
 } {
   const tables: Record<string, Map<string, T_row>> = {
-    worlds: new Map(),
     document_templates: new Map(),
+    documents: new Map(),
     media: new Map(),
-    documents: new Map()
+    world_template_groups: new Map(),
+    world_template_placements: new Map(),
+    worlds: new Map()
   }
   const junctionDocumentMedia = new Set<string>()
-  const junctionWorldDocumentTemplates = new Set<string>()
 
   const db = {
     transaction: (fn: () => void) => {
@@ -197,17 +192,88 @@ function makeProjectContentTestDb (): {
           }
         }
       }
-      if (normalized.includes('INSERT OR IGNORE INTO world_document_templates')) {
+      if (normalized.includes('INSERT INTO world_template_groups')) {
         return {
-          run: (worldId: string, documentTemplateId: string) => {
-            junctionWorldDocumentTemplates.add(`${worldId}:${documentTemplateId}`)
+          run: (...args: Array<string | number>) => {
+            const row: T_row = {
+              created_at_ms: args[4] as number,
+              display_name: args[2] as string,
+              id: args[0] as string,
+              root_sort_order: args[3] as number,
+              updated_at_ms: args[5] as number,
+              world_id: args[1] as string
+            }
+            tables.world_template_groups.set(row.id as string, row)
           }
         }
       }
-      if (normalized.includes('DELETE FROM world_document_templates')) {
+      if (normalized.includes('INSERT INTO world_template_placements')) {
         return {
-          run: (worldId: string, documentTemplateId: string) => {
-            junctionWorldDocumentTemplates.delete(`${worldId}:${documentTemplateId}`)
+          run: (...args: Array<string | number | null>) => {
+            const row: T_row = {
+              created_at_ms: args[6] as number,
+              document_template_id: args[2] as string,
+              group_id: args[3] as string | null,
+              group_sort_order: args[5] as number | null,
+              id: args[0] as string,
+              root_sort_order: args[4] as number | null,
+              updated_at_ms: args[7] as number,
+              world_id: args[1] as string
+            }
+            tables.world_template_placements.set(row.id as string, row)
+          }
+        }
+      }
+      if (normalized.includes('DELETE FROM world_template_placements')) {
+        return {
+          run: (worldId: string) => {
+            for (const [id, row] of tables.world_template_placements) {
+              if (row.world_id === worldId) {
+                tables.world_template_placements.delete(id)
+              }
+            }
+          }
+        }
+      }
+      if (normalized.includes('DELETE FROM world_template_groups')) {
+        return {
+          run: (worldId: string) => {
+            for (const [id, row] of tables.world_template_groups) {
+              if (row.world_id === worldId) {
+                tables.world_template_groups.delete(id)
+              }
+            }
+          }
+        }
+      }
+      if (normalized.includes('FROM world_template_groups')) {
+        return {
+          all: (worldId: string) => {
+            return [...tables.world_template_groups.values()]
+              .filter((row) => row.world_id === worldId)
+              .sort((left, right) => {
+                return (left.root_sort_order as number) - (right.root_sort_order as number)
+              })
+          }
+        }
+      }
+      if (
+        normalized.includes('FROM world_template_placements') &&
+        normalized.includes('INNER JOIN')
+      ) {
+        return {
+          all: (worldId: string) => {
+            return [...tables.world_template_placements.values()]
+              .filter((row) => row.world_id === worldId)
+              .map((row) => {
+                const template = tables.document_templates.get(row.document_template_id as string)
+                return {
+                  ...row,
+                  display_name: template?.display_name ?? '',
+                  icon: template?.icon ?? '',
+                  world_appendix: template?.world_appendix ?? ''
+                }
+              })
           }
         }
       }
@@ -359,9 +425,12 @@ function makeProjectContentTestDb (): {
       }
       if (normalized.includes('GROUP BY template_id')) {
         return {
-          all: () => {
+          all: (worldId?: string) => {
             const counts = new Map<string, number>()
             for (const row of tables.documents.values()) {
+              if (worldId !== undefined && row.world_id !== worldId) {
+                continue
+              }
               const templateId = row.template_id as string | null
               if (templateId === null) {
                 continue
@@ -443,48 +512,6 @@ function makeProjectContentTestDb (): {
           get: (id: string) => tables.media.get(id)
         }
       }
-      if (
-        normalized.includes('INNER JOIN') &&
-        normalized.includes('world_document_templates') &&
-        normalized.includes('FROM document_templates t')
-      ) {
-        return {
-          all: (worldId: string) => {
-            const rows: T_row[] = []
-            for (const key of junctionWorldDocumentTemplates) {
-              const [w, templateId] = key.split(':')
-              if (w === worldId) {
-                const template = tables.document_templates.get(templateId)
-                if (template !== undefined) {
-                  rows.push(template)
-                }
-              }
-            }
-            return rows
-          }
-        }
-      }
-      if (
-        normalized.includes('INNER JOIN') &&
-        normalized.includes('world_document_templates') &&
-        normalized.includes('FROM worlds w')
-      ) {
-        return {
-          all: (documentTemplateId: string) => {
-            const rows: T_row[] = []
-            for (const key of junctionWorldDocumentTemplates) {
-              const [worldId, templateId] = key.split(':')
-              if (templateId === documentTemplateId) {
-                const world = tables.worlds.get(worldId)
-                if (world !== undefined) {
-                  rows.push(world)
-                }
-              }
-            }
-            return rows
-          }
-        }
-      }
       if (normalized === 'SELECT id FROM document_templates') {
         return {
           all: () => [...tables.document_templates.keys()].map((id) => ({ id }))
@@ -551,7 +578,6 @@ function makeProjectContentTestDb (): {
   return {
     db,
     junctionDocumentMedia,
-    junctionWorldDocumentTemplates,
     tables
   }
 }
@@ -698,6 +724,16 @@ test('Test that assertFaProjectDocumentTemplateExists throws for a missing templ
   expect(() =>
     assertFaProjectDocumentTemplateExists(db as never, '550e8400-e29b-41d4-a716-446655440000')
   ).toThrow(FaProjectContentNotFoundError)
+})
+
+/**
+ * assertFaProjectDocumentTemplateExists
+ * Resolves without error when the template row exists.
+ */
+test('Test that assertFaProjectDocumentTemplateExists passes for an existing template', () => {
+  const { db } = makeProjectContentTestDb()
+  const template = createFaProjectDocumentTemplate(db as never, { displayName: 'Sheet' })
+  expect(() => assertFaProjectDocumentTemplateExists(db as never, template.id)).not.toThrow()
 })
 
 /**
@@ -1025,6 +1061,8 @@ test('Test that listFaProjectWorldsForProjectSettings includes document counts',
   const busyRow = result.items.find((item) => item.id === busyWorld.id)
   expect(emptyRow?.documentCount).toBe(0)
   expect(busyRow?.documentCount).toBe(2)
+  expect(emptyRow?.templateLayout.placements).toEqual([])
+  expect(busyRow?.templateLayout.groups).toEqual([])
 })
 
 const SAMPLE_WORLD_UUID = '550e8400-e29b-41d4-a716-446655440000'
@@ -1071,32 +1109,207 @@ test('Test that replaceFaProjectWorldsSnapshot throws when items is empty', () =
 })
 
 /**
- * faProjectWorldDocumentTemplateLinksWiring
- * Links worlds and document templates through the junction table.
+ * replaceFaProjectWorldTemplateLayoutSnapshot
+ * Persists per-world template groups and placements for Project Settings.
  */
-test('Test that world document template link helpers manage junction rows', () => {
+test('Test that replaceFaProjectWorldTemplateLayoutSnapshot persists layout rows', () => {
+  const { db, tables } = makeProjectContentTestDb()
+  const world = createFaProjectWorld(db as never, { displayName: 'Realm' })
+  const template = createFaProjectDocumentTemplate(db as never, { displayName: 'Tpl' })
+  const groupId = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
+  const placementId = '6ba7b811-9dad-11d1-80b4-00c04fd430c8'
+  replaceFaProjectWorldTemplateLayoutSnapshot(db as never, world.id, {
+    groups: [
+      {
+        displayName: 'Creatures',
+        id: groupId,
+        rootSortOrder: 0
+      }
+    ],
+    placements: [
+      {
+        documentTemplateId: template.id,
+        groupId: null,
+        groupSortOrder: null,
+        id: placementId,
+        rootSortOrder: 1
+      }
+    ]
+  })
+  expect(tables.world_template_groups.size).toBe(1)
+  expect(tables.world_template_placements.size).toBe(1)
+  const listed = listFaProjectWorldsForProjectSettings(db as never)
+  expect(listed.items[0]?.templateLayout.groups[0]?.displayName).toBe('Creatures')
+  expect(listed.items[0]?.templateLayout.placements[0]?.documentTemplateId).toBe(template.id)
+})
+
+/**
+ * replaceFaProjectWorldTemplateLayoutSnapshot
+ * Rejects invalid root and grouped placement sort fields.
+ */
+test('Test that replaceFaProjectWorldTemplateLayoutSnapshot throws on invalid placement sort fields', () => {
   const { db } = makeProjectContentTestDb()
   const world = createFaProjectWorld(db as never, { displayName: 'Realm' })
   const template = createFaProjectDocumentTemplate(db as never, { displayName: 'Tpl' })
-  linkFaProjectWorldDocumentTemplate(db as never, world.id, template.id)
-  expect(listFaProjectDocumentTemplatesForWorld(db as never, world.id).items[0]?.id).toBe(
-    template.id
-  )
-  expect(listFaProjectWorldsForDocumentTemplate(db as never, template.id).items[0]?.id).toBe(
-    world.id
-  )
-  unlinkFaProjectWorldDocumentTemplate(db as never, world.id, template.id)
-  expect(listFaProjectDocumentTemplatesForWorld(db as never, world.id).items).toHaveLength(0)
-  linkFaProjectWorldDocumentTemplate(db as never, world.id, template.id)
-  expect(listFaProjectDocumentTemplatesForWorld(db as never, world.id).items).toHaveLength(1)
+  const placementId = '6ba7b811-9dad-11d1-80b4-00c04fd430c8'
+  expect(() => replaceFaProjectWorldTemplateLayoutSnapshot(db as never, world.id, {
+    groups: [],
+    placements: [
+      {
+        documentTemplateId: template.id,
+        groupId: null,
+        groupSortOrder: 0,
+        id: placementId,
+        rootSortOrder: 0
+      }
+    ]
+  })).toThrow(/Root template placement/)
+  expect(() => replaceFaProjectWorldTemplateLayoutSnapshot(db as never, world.id, {
+    groups: [],
+    placements: [
+      {
+        documentTemplateId: template.id,
+        groupId: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+        groupSortOrder: null,
+        id: placementId,
+        rootSortOrder: null
+      }
+    ]
+  })).toThrow(/Grouped template placement/)
 })
 
-const SAMPLE_TEMPLATE_UUID = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
+/**
+ * replaceFaProjectWorldTemplateLayoutSnapshot
+ * Rejects unknown group ids and blank group names.
+ */
+test('Test that replaceFaProjectWorldTemplateLayoutSnapshot validates groups and references', () => {
+  const { db } = makeProjectContentTestDb()
+  const world = createFaProjectWorld(db as never, { displayName: 'Realm' })
+  const template = createFaProjectDocumentTemplate(db as never, { displayName: 'Tpl' })
+  const placementId = '6ba7b811-9dad-11d1-80b4-00c04fd430c8'
+  expect(() => replaceFaProjectWorldTemplateLayoutSnapshot(db as never, world.id, {
+    groups: [],
+    placements: [
+      {
+        documentTemplateId: template.id,
+        groupId: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+        groupSortOrder: 0,
+        id: placementId,
+        rootSortOrder: null
+      }
+    ]
+  })).toThrow(/unknown group id/)
+  expect(() => replaceFaProjectWorldTemplateLayoutSnapshot(db as never, world.id, {
+    groups: [
+      {
+        displayName: '   ',
+        id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+        rootSortOrder: 0
+      }
+    ],
+    placements: []
+  })).toThrow(/display name must not be empty/)
+})
 
 /**
- * createFaProjectDocumentTemplate
- * Persists optional world appendix and icon fields.
+ * replaceFaProjectWorldTemplateLayoutSnapshot
+ * Persists grouped template placements under a world group row.
  */
+test('Test that replaceFaProjectWorldTemplateLayoutSnapshot persists grouped placements', () => {
+  const { db, tables } = makeProjectContentTestDb()
+  const world = createFaProjectWorld(db as never, { displayName: 'Realm' })
+  const template = createFaProjectDocumentTemplate(db as never, { displayName: 'Tpl' })
+  const groupId = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
+  const placementId = '6ba7b811-9dad-11d1-80b4-00c04fd430c8'
+  replaceFaProjectWorldTemplateLayoutSnapshot(db as never, world.id, {
+    groups: [
+      {
+        displayName: 'Creatures',
+        id: groupId,
+        rootSortOrder: 0
+      }
+    ],
+    placements: [
+      {
+        documentTemplateId: template.id,
+        groupId,
+        groupSortOrder: 0,
+        id: placementId,
+        rootSortOrder: null
+      }
+    ]
+  })
+  expect(tables.world_template_placements.get(placementId)?.group_id).toBe(groupId)
+})
+
+/**
+ * replaceFaProjectWorldsSnapshot
+ * Persists per-world template layout when the snapshot item includes templateLayout.
+ */
+test('Test that replaceFaProjectWorldsSnapshot persists templateLayout on each world item', () => {
+  const { db } = makeProjectContentTestDb()
+  const world = createFaProjectWorld(db as never, { displayName: 'Realm' })
+  const template = createFaProjectDocumentTemplate(db as never, { displayName: 'Tpl' })
+  const groupId = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
+  const placementId = '6ba7b811-9dad-11d1-80b4-00c04fd430c8'
+  replaceFaProjectWorldsSnapshot(db as never, [
+    {
+      displayName: 'Realm',
+      id: world.id,
+      templateLayout: {
+        groups: [
+          {
+            displayName: 'Group',
+            id: groupId,
+            rootSortOrder: 0
+          }
+        ],
+        placements: [
+          {
+            documentTemplateId: template.id,
+            groupId: null,
+            groupSortOrder: null,
+            id: placementId,
+            rootSortOrder: 0
+          }
+        ]
+      }
+    }
+  ])
+  const listed = listFaProjectWorldsForProjectSettings(db as never)
+  expect(listed.items[0]?.templateLayout.groups).toHaveLength(1)
+  expect(listed.items[0]?.templateLayout.placements[0]?.documentTemplateId).toBe(template.id)
+})
+
+/**
+ * listFaProjectWorldsForProjectSettings
+ * Includes per-placement document counts for the selected world.
+ */
+test('Test that listFaProjectWorldsForProjectSettings includes placement document counts', () => {
+  const { db } = makeProjectContentTestDb()
+  const world = createFaProjectWorld(db as never, { displayName: 'Realm' })
+  const template = createFaProjectDocumentTemplate(db as never, { displayName: 'Tpl' })
+  createFaProjectDocument(db as never, {
+    displayName: 'Doc',
+    templateId: template.id,
+    worldId: world.id
+  })
+  replaceFaProjectWorldTemplateLayoutSnapshot(db as never, world.id, {
+    groups: [],
+    placements: [
+      {
+        documentTemplateId: template.id,
+        groupId: null,
+        groupSortOrder: null,
+        id: '6ba7b811-9dad-11d1-80b4-00c04fd430c8',
+        rootSortOrder: 0
+      }
+    ]
+  })
+  const listed = listFaProjectWorldsForProjectSettings(db as never)
+  expect(listed.items[0]?.templateLayout.placements[0]?.documentCountInWorld).toBe(1)
+})
+
 test('Test that createFaProjectDocumentTemplate stores worldAppendix and icon', () => {
   const { db } = makeProjectContentTestDb()
   const template = createFaProjectDocumentTemplate(db as never, {
@@ -1158,6 +1371,8 @@ test('Test that listFaProjectDocumentTemplatesForProjectSettings includes docume
   expect(unusedRow?.documentCount).toBe(0)
   expect(busyRow?.documentCount).toBe(1)
 })
+
+const SAMPLE_TEMPLATE_UUID = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
 
 /**
  * replaceFaProjectDocumentTemplatesSnapshot

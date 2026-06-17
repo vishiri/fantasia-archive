@@ -33,12 +33,15 @@ export interface I_faProjectWorldPatch {
   sortOrder?: number
 }
 
+import type { I_faProjectWorldTemplateLayoutSnapshot } from 'app/types/I_faProjectWorldTemplateLayoutDomain'
+
 /** Single row in a transactional worlds list replace from Project Settings. */
 export interface I_faProjectWorldSnapshotItem {
   id: string
   displayName: string
   color?: string
   colorPallete?: string
+  templateLayout?: I_faProjectWorldTemplateLayoutSnapshot
 }
 
 export type I_faProjectWorldListResult = I_faProjectContentListResult<I_faProjectWorld>

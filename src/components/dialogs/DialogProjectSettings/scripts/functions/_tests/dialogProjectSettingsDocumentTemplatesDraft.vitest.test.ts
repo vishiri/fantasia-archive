@@ -2,10 +2,22 @@ import { expect, test } from 'vitest'
 
 import {
   appendDialogProjectSettingsDocumentTemplateDraft,
+  collectInvalidDialogProjectSettingsDocumentTemplateIds,
   hasDialogProjectSettingsDocumentTemplateNameValidationError,
   isDialogProjectSettingsDocumentTemplateRemoveDisabled,
-  mapDialogProjectSettingsDocumentTemplatesToSnapshot
+  mapDialogProjectSettingsDocumentTemplatesToSnapshot,
+  resolveDialogProjectSettingsDocumentTemplateDisplayIcon
 } from '../dialogProjectSettingsDocumentTemplatesDraft'
+
+/**
+ * resolveDialogProjectSettingsDocumentTemplateDisplayIcon
+ * Uses the shared empty-template placeholder when icon is blank.
+ */
+test('Test that resolveDialogProjectSettingsDocumentTemplateDisplayIcon falls back to placeholder icon', () => {
+  expect(resolveDialogProjectSettingsDocumentTemplateDisplayIcon('', 'mdi-file-outline')).toBe('mdi-file-outline')
+  expect(resolveDialogProjectSettingsDocumentTemplateDisplayIcon('  ', 'mdi-file-outline')).toBe('mdi-file-outline')
+  expect(resolveDialogProjectSettingsDocumentTemplateDisplayIcon(' fa-solid fa-dragon ', 'mdi-file-outline')).toBe('fa-solid fa-dragon')
+})
 
 /**
  * mapDialogProjectSettingsDocumentTemplatesToSnapshot
@@ -71,6 +83,30 @@ test('Test that hasDialogProjectSettingsDocumentTemplateNameValidationError hand
       worldAppendix: ''
     }
   ])).toBe(true)
+})
+
+/**
+ * collectInvalidDialogProjectSettingsDocumentTemplateIds
+ * Returns ids for templates whose trimmed display name is blank.
+ */
+test('Test that collectInvalidDialogProjectSettingsDocumentTemplateIds collects blank template ids', () => {
+  expect(collectInvalidDialogProjectSettingsDocumentTemplateIds(null)).toEqual(new Set())
+  expect(collectInvalidDialogProjectSettingsDocumentTemplateIds([
+    {
+      displayName: 'Character',
+      documentCount: 0,
+      icon: '',
+      id: 'template-a',
+      worldAppendix: ''
+    },
+    {
+      displayName: '   ',
+      documentCount: 0,
+      icon: '',
+      id: 'template-b',
+      worldAppendix: ''
+    }
+  ])).toEqual(new Set(['template-b']))
 })
 
 /**

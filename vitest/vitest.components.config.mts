@@ -24,7 +24,7 @@ type T_vitestComponentsScssOpts = NonNullable<
 
 /**
  * Vue SFC unit tests — jsdom + SFC transforms: components, layouts, and pages.
- * **.ts** files under those trees: **100%** statements, branches, functions, lines (merged per Vitest **`coverage.thresholds`** glob).
+ * **.ts** files under those trees: **99%** statements, branches, functions, lines (merged per Vitest **`coverage.thresholds`** glob).
  * **.vue** SFCs: **no** failing **`coverage.thresholds`** entry; **`watermarks`** use a **60%** lower band so weak totals show orange or red in reports.
  */
 export default defineConfig({

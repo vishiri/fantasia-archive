@@ -123,28 +123,10 @@ export const projectContentAPI: I_faProjectContentAPI = {
   linkDocumentMedia: async (input) => {
     await invokeProjectContent(FA_PROJECT_CONTENT_IPC.linkDocumentMediaAsync, input)
   },
-  linkWorldDocumentTemplate: async (input) => {
-    await invokeProjectContent(FA_PROJECT_CONTENT_IPC.linkWorldDocumentTemplateAsync, input)
-  },
   unlinkDocumentMedia: async (input) => {
     await invokeProjectContent(FA_PROJECT_CONTENT_IPC.unlinkDocumentMediaAsync, input)
   },
-  unlinkWorldDocumentTemplate: async (input) => {
-    await invokeProjectContent(FA_PROJECT_CONTENT_IPC.unlinkWorldDocumentTemplateAsync, input)
-  },
   listDocumentMedia: async (documentId) => {
     return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.listDocumentMediaAsync, { documentId })
-  },
-  listDocumentTemplatesForWorld: async (worldId) => {
-    return await invokeProjectContent(
-      FA_PROJECT_CONTENT_IPC.listDocumentTemplatesForWorldAsync,
-      { worldId }
-    )
-  },
-  listWorldsForDocumentTemplate: async (documentTemplateId) => {
-    return await invokeProjectContent(
-      FA_PROJECT_CONTENT_IPC.listWorldsForDocumentTemplateAsync,
-      { documentTemplateId }
-    )
   }
 }

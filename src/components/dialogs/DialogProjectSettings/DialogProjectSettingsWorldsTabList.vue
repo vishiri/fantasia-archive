@@ -54,6 +54,7 @@ import { ref, watch, computed } from 'vue'
 import { VueDraggable } from 'vue-draggable-plus'
 import type { SortableEvent } from 'sortablejs'
 
+import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import type {
   T_faVerticalDraggableTabsTabJustifyContent,
@@ -61,7 +62,7 @@ import type {
   T_faVerticalDraggableTabsTabTextAlign
 } from 'app/types/I_faVerticalDraggableTabs'
 import { FA_DIALOG_PROJECT_SETTINGS_VERTICAL_TAB_LIST_WIDTH_PX_DEFAULT } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDialogInput'
-import { isDialogProjectSettingsWorldTabValidationError } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldsDraft'
+import { isDialogProjectSettingsWorldTabValidationError } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldsSaveValidation'
 import {
   FA_VERTICAL_DRAGGABLE_TABS_TAB_JUSTIFY_CONTENT_DEFAULT,
   FA_VERTICAL_DRAGGABLE_TABS_TAB_LABEL_FONT_SIZE_DEFAULT,
@@ -85,6 +86,7 @@ defineOptions({
 
 const props = withDefaults(defineProps<{
   dense?: boolean
+  documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] | null
   selectedWorldId: string | null
   tabJustifyContent?: T_faVerticalDraggableTabsTabJustifyContent
   tabLabelFontSize?: string
@@ -158,7 +160,7 @@ function onWorldsDragEnd (): void {
 }
 
 function isWorldTabValidationError (world: I_dialogProjectSettingsWorldDraft): boolean {
-  return isDialogProjectSettingsWorldTabValidationError(world)
+  return isDialogProjectSettingsWorldTabValidationError(world, props.documentTemplates)
 }
 </script>
 

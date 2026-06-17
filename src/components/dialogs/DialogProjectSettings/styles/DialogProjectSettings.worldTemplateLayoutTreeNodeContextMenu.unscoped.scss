@@ -1,0 +1,9 @@
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__contextMenu.q-menu {
+  z-index: $dialogProjectSettings-worldTemplateLayout-groupContextMenu-zIndex !important;
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__renameMenuBody {
+  background-color: $dialogProjectSettings-worldColorPalette-contextMenu-backgroundColor;
+  min-width: $dialogProjectSettings-worldTemplateLayout-renameDialog-minWidth;
+  padding: $dialogProjectSettings-worldTemplateLayout-renameMenuBody-padding;
+}

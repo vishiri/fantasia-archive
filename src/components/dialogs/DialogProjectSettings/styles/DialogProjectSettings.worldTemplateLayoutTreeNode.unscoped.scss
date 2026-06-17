@@ -1,0 +1,79 @@
+.dialogProjectSettingsWorldTemplateLayoutTreeNode {
+  min-height: $dialogProjectSettings-worldTemplateLayout-treeNode-minHeight;
+  padding:
+    $dialogProjectSettings-worldTemplateLayout-treeNode-paddingY
+    $dialogProjectSettings-worldTemplateLayout-treeNode-paddingX;
+  width: 100%;
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode > .q-focus-helper {
+  border-radius: 0;
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode--group {
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__icon,
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__label {
+    color: fa-v('primary-bright', $primary-bright);
+  }
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode--group,
+.dialogProjectSettingsWorldTemplateLayoutTreeNode--template {
+  cursor: $faVerticalDraggableTabs-tab-cursor-default;
+
+  &:active {
+    cursor: $faVerticalDraggableTabs-tab-cursor-active !important;
+  }
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode--error {
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__label {
+    color: $dialogProjectSettings-tabError-color;
+  }
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode--group,
+.dialogProjectSettingsWorldTemplateLayoutTreeNode--template {
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__remove {
+    font-size: $dialogProjectSettings-worldTemplateLayout-treeNode-remove-fontSize !important;
+    height: $dialogProjectSettings-worldTemplateLayout-treeNode-remove-size !important;
+    min-height: $dialogProjectSettings-worldTemplateLayout-treeNode-remove-size;
+    min-width: $dialogProjectSettings-worldTemplateLayout-treeNode-remove-size;
+    width: $dialogProjectSettings-worldTemplateLayout-treeNode-remove-size !important;
+  }
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__appendix {
+  display: block;
+  flex: 1 1 auto;
+  font-style: italic;
+  min-width: 0;
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__affixIndent {
+  flex: 0 0 auto;
+  width: $faQIconDisplay-iconLeadingWidth;
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__affixRow {
+  min-width: 0;
+  width: 100%;
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__count {
+  flex: 0 0 auto;
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__label {
+  display: block;
+  min-width: 0;
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__remove {
+  flex: 0 0 auto;
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__titleRow {
+  min-width: 0;
+  width: 100%;
+}

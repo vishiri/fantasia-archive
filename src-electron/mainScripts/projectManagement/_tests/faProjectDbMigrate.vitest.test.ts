@@ -38,6 +38,42 @@ function applyMockUserVersionPragma (
   if (name === 'user_version = 5') {
     pragmas.user_version = 5
   }
+  if (name === 'user_version = 6') {
+    pragmas.user_version = 6
+  }
+}
+
+function createFaProjectMigrationPrepareMock (
+  insertRun: ReturnType<typeof vi.fn>,
+  getProjectName: () => string,
+  getProjectUuid?: () => string | undefined
+): ReturnType<typeof vi.fn> {
+  return vi.fn((sql: string) => {
+    if (sql.includes('INSERT')) {
+      return { run: insertRun }
+    }
+    if (sql.includes('sqlite_master')) {
+      return { get: () => undefined }
+    }
+    if (sql.includes('world_document_templates')) {
+      return { all: () => [] }
+    }
+    return {
+      get: (param: string) => {
+        if (param === 'project_name') {
+          return { v: getProjectName() }
+        }
+        if (param === 'project_uuid') {
+          const uuidValue = getProjectUuid?.()
+          if (uuidValue !== undefined) {
+            return { v: uuidValue }
+          }
+          return { v: '550e8400-e29b-41d4-a716-446655440000' }
+        }
+        return { v: '550e8400-e29b-41d4-a716-446655440000' }
+      }
+    }
+  })
 }
 
 test('applyFaProjectMigrations bootstraps schema when user_version is 0', () => {
@@ -57,25 +93,13 @@ test('applyFaProjectMigrations bootstraps schema when user_version is 0', () => 
       applyMockUserVersionPragma(name, pragmas)
       return undefined
     }),
-    prepare: vi.fn((sql: string) => {
-      if (sql.includes('INSERT')) {
-        return { run: insertRun }
-      }
-      return {
-        get: (param: string) => {
-          if (param === 'project_name') {
-            return { v: 'Realm' }
-          }
-          return { v: '550e8400-e29b-41d4-a716-446655440000' }
-        }
-      }
-    }),
+    prepare: createFaProjectMigrationPrepareMock(insertRun, () => 'Realm'),
     transaction: run
   }
   applyFaProjectMigrations(db as never, 'Realm')
   expect(db.exec).toHaveBeenCalled()
   expect(insertRun).toHaveBeenCalledTimes(2)
-  expect(pragmas.user_version).toBe(5)
+  expect(pragmas.user_version).toBe(6)
   expect(seedFaProjectDefaultWorldIfEmptyMock).toHaveBeenCalledWith(db, 'Realm')
   expect(
     db.exec.mock.calls.some(
@@ -131,7 +155,7 @@ test('applyFaProjectMigrations is a no-op when user_version already at maximum',
     prepare: vi.fn(),
     pragma: vi.fn((name: string, opts?: { simple?: boolean }) => {
       if (name === 'user_version' && opts?.simple === true) {
-        return 5
+        return 6
       }
       return undefined
     }),
@@ -159,19 +183,7 @@ test('applyFaProjectMigrations throws when post-migration project_name read does
       applyMockUserVersionPragma(name, pragmas)
       return undefined
     }),
-    prepare: vi.fn((sql: string) => {
-      if (sql.includes('INSERT')) {
-        return { run: insertRun }
-      }
-      return {
-        get: (param: string) => {
-          if (param === 'project_name') {
-            return { v: 'Wrong' }
-          }
-          return { v: '550e8400-e29b-41d4-a716-446655440000' }
-        }
-      }
-    }),
+    prepare: createFaProjectMigrationPrepareMock(insertRun, () => 'Wrong'),
     transaction: run
   }
   expect(() => applyFaProjectMigrations(db as never, 'Right')).toThrow(/verify/)
@@ -194,19 +206,7 @@ test('applyFaProjectMigrations treats invalid user_version pragma as zero', () =
       applyMockUserVersionPragma(name, pragmas)
       return undefined
     }),
-    prepare: vi.fn((sql: string) => {
-      if (sql.includes('INSERT')) {
-        return { run: insertRun }
-      }
-      return {
-        get: (param: string) => {
-          if (param === 'project_name') {
-            return { v: 'Fresh' }
-          }
-          return { v: '650e8400-e29b-41d4-a716-446655440001' }
-        }
-      }
-    }),
+    prepare: createFaProjectMigrationPrepareMock(insertRun, () => 'Fresh'),
     transaction: run
   }
   applyFaProjectMigrations(db as never, 'Fresh')
@@ -245,22 +245,7 @@ test('applyFaProjectMigrations throws when final project_uuid verification is em
       applyMockUserVersionPragma(name, pragmas)
       return undefined
     }),
-    prepare: vi.fn((sql: string) => {
-      if (sql.includes('INSERT')) {
-        return { run: insertRun }
-      }
-      return {
-        get: (param: string) => {
-          if (param === 'project_name') {
-            return { v: 'Realm' }
-          }
-          if (param === 'project_uuid') {
-            return { v: '   ' }
-          }
-          return undefined
-        }
-      }
-    }),
+    prepare: createFaProjectMigrationPrepareMock(insertRun, () => 'Realm', () => '   '),
     transaction: run
   }
   expect(() => applyFaProjectMigrations(db as never, 'Realm')).toThrow(

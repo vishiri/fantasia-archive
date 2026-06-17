@@ -7,7 +7,8 @@ import {
   removeDialogProjectSettingsWorldDraftRow,
   updateDialogProjectSettingsWorldDraftColor,
   updateDialogProjectSettingsWorldDraftColorPallete,
-  updateDialogProjectSettingsWorldDraftDisplayName
+  updateDialogProjectSettingsWorldDraftDisplayName,
+  updateDialogProjectSettingsWorldDraftTemplateLayout
 } from '../dialogProjectSettingsWorldRowMutationsWiring'
 
 const baseWorld: I_dialogProjectSettingsWorldDraft = {
@@ -15,6 +16,10 @@ const baseWorld: I_dialogProjectSettingsWorldDraft = {
   colorPallete: '',
   displayName: 'Realm',
   documentCount: 0,
+  templateLayout: {
+    groups: [],
+    placements: []
+  },
   id: '550e8400-e29b-41d4-a716-446655440000'
 }
 
@@ -50,6 +55,10 @@ test('Test that removeDialogProjectSettingsWorldDraftRow removes the matching id
     colorPallete: '',
     displayName: 'Other',
     documentCount: 0,
+    templateLayout: {
+      groups: [],
+      placements: []
+    },
     id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
   }
   const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([baseWorld, otherWorld])
@@ -124,5 +133,57 @@ test('Test that updateDialogProjectSettingsWorldDraftColorPallete updates the ma
 test('Test that updateDialogProjectSettingsWorldDraftColorPallete no-ops when localWorlds is null', () => {
   const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>(null)
   updateDialogProjectSettingsWorldDraftColorPallete(localWorlds, baseWorld.id, '#112233')
+  expect(localWorlds.value).toBeNull()
+})
+
+/**
+ * updateDialogProjectSettingsWorldDraftTemplateLayout
+ * Updates template layout for the matching world id.
+ */
+test('Test that updateDialogProjectSettingsWorldDraftTemplateLayout updates the matching row', () => {
+  const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([baseWorld])
+  const nextLayout = {
+    groups: [
+      {
+        displayName: 'Creatures',
+        id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+        rootSortOrder: 0
+      }
+    ],
+    placements: []
+  }
+  updateDialogProjectSettingsWorldDraftTemplateLayout(localWorlds, baseWorld.id, nextLayout)
+  expect(localWorlds.value?.[0].templateLayout.groups).toHaveLength(1)
+})
+
+/**
+ * updateDialogProjectSettingsWorldDraftTemplateLayout
+ * Leaves non-matching world rows unchanged.
+ */
+test('Test that updateDialogProjectSettingsWorldDraftTemplateLayout ignores unknown world ids', () => {
+  const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([baseWorld])
+  updateDialogProjectSettingsWorldDraftTemplateLayout(localWorlds, 'unknown-id', {
+    groups: [
+      {
+        displayName: 'Creatures',
+        id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+        rootSortOrder: 0
+      }
+    ],
+    placements: []
+  })
+  expect(localWorlds.value?.[0].templateLayout.groups).toHaveLength(0)
+})
+
+/**
+ * updateDialogProjectSettingsWorldDraftTemplateLayout
+ * No-ops when localWorlds is null.
+ */
+test('Test that updateDialogProjectSettingsWorldDraftTemplateLayout no-ops when localWorlds is null', () => {
+  const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>(null)
+  updateDialogProjectSettingsWorldDraftTemplateLayout(localWorlds, baseWorld.id, {
+    groups: [],
+    placements: []
+  })
   expect(localWorlds.value).toBeNull()
 })

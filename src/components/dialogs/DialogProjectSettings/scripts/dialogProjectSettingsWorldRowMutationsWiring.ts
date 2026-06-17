@@ -1,4 +1,7 @@
-import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
+import type {
+  I_dialogProjectSettingsWorldDraft,
+  I_dialogProjectSettingsWorldTemplateLayoutDraft
+} from 'app/types/I_dialogProjectSettingsWorlds'
 import type { Ref } from 'app/types/I_vueCompositionRefs'
 
 import { appendDialogProjectSettingsWorldDraft } from './functions/dialogProjectSettingsWorldsDraft'
@@ -79,6 +82,25 @@ export function updateDialogProjectSettingsWorldDraftColorPallete (
     return {
       ...world,
       colorPallete
+    }
+  })
+}
+
+export function updateDialogProjectSettingsWorldDraftTemplateLayout (
+  localWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>,
+  id: string,
+  templateLayout: I_dialogProjectSettingsWorldTemplateLayoutDraft
+): void {
+  if (localWorlds.value === null) {
+    return
+  }
+  localWorlds.value = localWorlds.value.map((world) => {
+    if (world.id !== id) {
+      return world
+    }
+    return {
+      ...world,
+      templateLayout
     }
   })
 }

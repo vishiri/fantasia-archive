@@ -7,11 +7,12 @@ import type {
 
 import { resolveDialogProjectSettingsDocumentTemplateSaveErrorDisplayName } from './functions/dialogProjectSettingsDocumentTemplatesDraft'
 import { collectDialogProjectSettingsFullSaveValidationErrors } from './dialogProjectSettingsDialogSaveValidation'
+import { collectDuplicateDocumentTemplateIdsInWorldTemplateLayout } from './functions/dialogProjectSettingsWorldTemplateLayoutDuplicateValidation'
 import {
   buildDialogProjectSettingsSaveValidationTooltip,
   collectDialogProjectSettingsSaveValidationErrors,
   resolveDialogProjectSettingsWorldSaveErrorDisplayName
-} from './functions/dialogProjectSettingsWorldsDraft'
+} from './functions/dialogProjectSettingsWorldsSaveValidation'
 
 export function createBuildDialogProjectSettingsSaveValidationTooltip (deps: {
   defaultNewTemplateName: string
@@ -49,6 +50,27 @@ export function createBuildDialogProjectSettingsSaveValidationTooltip (deps: {
     )
     if (error.kind === 'worldNameRequired') {
       return deps.translate('dialogs.projectSettings.saveErrors.bulletWorldNameRequired', {
+        worldLabel
+      })
+    }
+    if (error.kind === 'worldTemplateGroupNameRequired') {
+      return deps.translate('dialogs.projectSettings.saveErrors.bulletWorldTemplateGroupNameRequired', {
+        worldLabel
+      })
+    }
+    if (error.kind === 'worldTemplateDuplicateDocumentTemplate') {
+      const duplicateIds = world === undefined
+        ? new Set<string>()
+        : collectDuplicateDocumentTemplateIdsInWorldTemplateLayout(world.templateLayout)
+      const firstDuplicateId = [...duplicateIds][0] ?? ''
+      const duplicatePlacement = world?.templateLayout.placements.find((placement) => {
+        return placement.documentTemplateId === firstDuplicateId
+      })
+      const templateLabel = duplicatePlacement?.displayName.trim().length
+        ? duplicatePlacement.displayName.trim()
+        : deps.defaultNewTemplateName
+      return deps.translate('dialogs.projectSettings.saveErrors.bulletWorldTemplateDuplicateDocumentTemplate', {
+        templateLabel,
         worldLabel
       })
     }
