@@ -19,7 +19,7 @@
 - **Project Settings**: Vertical tab labels in **Project Settings** (including **Worlds** and **Document Templates**) use 14px type with tighter line height for denser lists.
 
 ### Bugfixes & Optimizations
-- **Project Settings**: Template rows with a per-world nickname in **World's hierarchical tree** show a right-side hover tooltip with **Nickname** and **Original name** lines; edit and remove button tooltips take precedence, and the nickname tooltip returns when the pointer moves back over the row label.
+- **Project Settings**: Template rows with a per-world nickname in **World's hierarchical tree** show a right-side hover tooltip with **Nickname** and **Original name** lines across the full row height; edit and remove button tooltips take precedence, and the nickname tooltip returns when the pointer moves back over the row label or padding.
 - **Icon picker**: The selected icon in the grid uses the **primary-bright** accent instead of primary.
 - **Project Settings**: Template edit tooltip in **World's hierarchical tree** reads **Adjust template's nickname** instead of **Rename nickname**.
 - **Project Settings**: Group rename in **World's hierarchical tree** shows a **Name of the group** label on the inline rename field.

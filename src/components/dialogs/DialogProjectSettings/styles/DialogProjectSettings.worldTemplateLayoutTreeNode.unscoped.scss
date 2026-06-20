@@ -1,7 +1,8 @@
 .dialogProjectSettingsWorldTemplateLayoutTreeNode {
+  box-sizing: border-box;
   min-height: $dialogProjectSettings-worldTemplateLayout-treeNode-minHeight;
   padding:
-    $dialogProjectSettings-worldTemplateLayout-treeNode-paddingY
+    0
     $dialogProjectSettings-worldTemplateLayout-treeNode-paddingX;
   width: 100%;
 }
@@ -69,7 +70,9 @@
 }
 
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__affixRow {
+  margin-top: $dialogProjectSettings-worldTemplateLayout-treeNode-affixRow-marginTop;
   min-width: 0;
+  padding-bottom: $dialogProjectSettings-worldTemplateLayout-treeNode-paddingY;
   width: 100%;
 }
 
@@ -78,7 +81,12 @@
 }
 
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__titleRow {
+  box-sizing: border-box;
+  min-height: $dialogProjectSettings-worldTemplateLayout-treeNode-minHeight;
   min-width: 0;
+  padding:
+    $dialogProjectSettings-worldTemplateLayout-treeNode-paddingY
+    0;
   width: 100%;
 }
 
@@ -113,9 +121,4 @@
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__edit,
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__remove {
   flex: 0 0 auto;
-}
-
-.dialogProjectSettingsWorldTemplateLayoutTreeNode__titleRow {
-  min-width: 0;
-  width: 100%;
 }

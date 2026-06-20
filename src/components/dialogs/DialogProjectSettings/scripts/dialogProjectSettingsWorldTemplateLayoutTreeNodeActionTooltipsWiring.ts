@@ -15,6 +15,7 @@ type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring = {
   removeTooltipHoverEnabled: Ref<boolean>
   removeTooltipRef: Ref<QTooltip | null>
   revealPlacementNicknameHoverTooltip: () => void
+  hidePlacementNicknameHoverTooltip: () => void
   suppressPlacementNicknameHoverTooltip: () => void
 }
 
@@ -63,6 +64,10 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTool
     })
   }
 
+  function hidePlacementNicknameHoverTooltip (): void {
+    placementNicknameHoverTooltipRef.value?.hide()
+  }
+
   const armEditTooltipBinding = armEditTooltip
   const armPlacementNicknameHoverTooltipBinding = armPlacementNicknameHoverTooltip
   const armRemoveTooltipBinding = armRemoveTooltip
@@ -75,6 +80,7 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTool
   const removeTooltipHoverEnabledBinding = removeTooltipHoverEnabled
   const removeTooltipRefBinding = removeTooltipRef
   const revealPlacementNicknameHoverTooltipBinding = revealPlacementNicknameHoverTooltip
+  const hidePlacementNicknameHoverTooltipBinding = hidePlacementNicknameHoverTooltip
   const suppressPlacementNicknameHoverTooltipBinding = suppressPlacementNicknameHoverTooltip
 
   return {
@@ -90,6 +96,7 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTool
     removeTooltipHoverEnabled: removeTooltipHoverEnabledBinding,
     removeTooltipRef: removeTooltipRefBinding,
     revealPlacementNicknameHoverTooltip: revealPlacementNicknameHoverTooltipBinding,
+    hidePlacementNicknameHoverTooltip: hidePlacementNicknameHoverTooltipBinding,
     suppressPlacementNicknameHoverTooltip: suppressPlacementNicknameHoverTooltipBinding
   }
 }

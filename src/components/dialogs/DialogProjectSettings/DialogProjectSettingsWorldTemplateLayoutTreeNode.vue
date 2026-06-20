@@ -6,6 +6,8 @@
     :data-test-locator="nodeTestLocator"
     :data-test-validation-error="rowHasValidationError ? 'true' : 'false'"
     @contextmenu.prevent="onRenameContextMenu"
+    @mouseenter="revealPlacementNicknameHoverTooltip"
+    @mouseleave="hidePlacementNicknameHoverTooltip"
   >
     <div
       class="q-focus-helper"
@@ -20,13 +22,12 @@
         :display-icon-name="displayIconName"
         :node="props.node"
         :node-test-locator="nodeTestLocator"
-        @mouseenter="revealPlacementNicknameHoverTooltip"
       />
       <div
         v-if="props.node.nodeKind === 'template' || props.node.nodeKind === 'group'"
         class="dialogProjectSettingsWorldTemplateLayoutTreeNode__actions row items-center no-wrap"
         @mouseenter="suppressPlacementNicknameHoverTooltip"
-        @mouseleave="armPlacementNicknameHoverTooltip"
+        @mouseleave="revealPlacementNicknameHoverTooltip"
       >
         <q-btn
           v-if="renameMenuWiring.supportsRenameMenu"
@@ -209,12 +210,12 @@ const emit = defineEmits<{
 
 const {
   armEditTooltip,
-  armPlacementNicknameHoverTooltip,
   armRemoveTooltip,
   displayIconName,
   editTooltipHoverEnabled,
   editTooltipRef,
   editTooltipText,
+  hidePlacementNicknameHoverTooltip,
   nodeAnchorRef,
   nodeRootClassList,
   nodeTestLocator,

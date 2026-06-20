@@ -92,6 +92,9 @@ test('Test that tree node action tooltip wiring suppresses placement nickname ho
   wiring.revealPlacementNicknameHoverTooltip()
   await nextTick()
   expect(nicknameShow).toHaveBeenCalled()
+
+  wiring.hidePlacementNicknameHoverTooltip()
+  expect(nicknameHide).toHaveBeenCalled()
 })
 
 test('Test that tree node action tooltip wiring dismiss no-ops when refs are null', () => {
