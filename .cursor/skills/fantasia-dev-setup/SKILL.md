@@ -32,6 +32,8 @@ quasar dev -m electron
 
 (`yarn quasar:dev:electron`). Electron + Storybook together: **`yarn app:dev`**.
 
+Post-implementation agent gates ([dev-electron-compile-check.mdc](../rules/dev-electron-compile-check.mdc)): (1) **`yarn testbatch:verify`**, (2) **`yarn quasar:dev:electron`** ~5s compile smoke — separate terminals; before reporting substantive edits done.
+
 ## Troubleshooting
 
 ### Electron failed to install correctly

@@ -47,6 +47,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc) | Always — **`changeLog.md`** vs **`package.json` version** |
 | [plan-documents.mdc](.cursor/rules/plan-documents.mdc) | Always — **`.cursor/plans/`** |
 | [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) | Always — **`yarn testbatch:verify`** gate |
+| [dev-electron-compile-check.mdc](.cursor/rules/dev-electron-compile-check.mdc) | Always — **`yarn testbatch:verify`** Shell run after last edit, before done summary; then dev compile smoke |
 | [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc) | Always — Vue/TS/function line caps, **`return { }`** shape |
 | [fa-action-manager.mdc](.cursor/rules/fa-action-manager.mdc) | `src/scripts/actionManager/**` |
 | [fa-project-database-access.mdc](.cursor/rules/fa-project-database-access.mdc) | `src-electron/mainScripts/**` — **`faProjectDatabaseEnsureConnected.ts`** |
@@ -89,7 +90,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | **`FaIconPickerInput`** | [fa-icon-picker.mdc](.cursor/rules/fa-icon-picker.mdc), [fantasia-icon-picker](.cursor/skills/fantasia-icon-picker/SKILL.md) |
 | Vue / Quasar / SCSS | [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc), [vue-bem-scss.mdc](.cursor/rules/vue-bem-scss.mdc), [project-scss.mdc](.cursor/rules/project-scss.mdc), [fantasia-quasar-vue](.cursor/skills/fantasia-quasar-vue/SKILL.md) |
 | i18n | [fantasia-i18n](.cursor/skills/fantasia-i18n/SKILL.md), [en-us-ui-copy-capitalization.mdc](.cursor/rules/en-us-ui-copy-capitalization.mdc) |
-| Testing | [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc), [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc), [playwright-tests.mdc](.cursor/rules/playwright-tests.mdc), [fantasia-testing](.cursor/skills/fantasia-testing/SKILL.md) |
+| Testing | [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc), [dev-electron-compile-check.mdc](.cursor/rules/dev-electron-compile-check.mdc) (post-edit: verify then dev compile), [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc), [playwright-tests.mdc](.cursor/rules/playwright-tests.mdc), [fantasia-testing](.cursor/skills/fantasia-testing/SKILL.md) |
 | Storybook | [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc) |
 | Git / changelog / cleanup | [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc), [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc), [fantasia-final-cleanup](.cursor/skills/fantasia-final-cleanup/SKILL.md) |
 | Two-level architecture | [fa-two-level-architecture.mdc](.cursor/rules/fa-two-level-architecture.mdc), [fantasia-two-level-architecture](.cursor/skills/fantasia-two-level-architecture/SKILL.md) |
