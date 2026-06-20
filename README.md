@@ -162,7 +162,10 @@ yarn test:e2e:list
 | `yarn test:storybook:smoke` / `visual*` | Storybook checks. |
 | `yarn storybook:run` / `storybook:build` | Storybook dev/static. |
 | `yarn audit:policy` | Heuristic policy report (not CI). |
+| `yarn audit:scss-literals` | Consumer SCSS literal audit (not CI). |
+| `yarn audit:domain-policy` | Domain policy grep (not CI). |
 | `yarn audit:quasar-component-tokens` | **`$q*`** token audit. |
+| `yarn audit:full` | Chained local audits (not CI). |
 | `yarn generate:icon-catalogs` | Regenerate **FaIconPickerInput** catalogs. |
 
 ## Utility scripts (`.utility-scripts/`)
@@ -172,6 +175,9 @@ yarn test:e2e:list
 | `quasarBuildElectronSummarized.mjs` | Summarized Electron build |
 | `playwrightWithArtifactTrim.mjs` | Playwright wrapper + artifact trim |
 | `auditQuasarComponentTokens.mjs` | Quasar component token audit |
+| `auditScssConsumerLiterals.mjs` | Consumer SCSS literal audit |
+| `domainPolicyGrep.mjs` | Domain policy grep |
+| `runFullProjectAudit.mjs` | Chained local audits |
 | `generateFaQuasarIconCatalogs.mjs` | Icon catalog generation |
 | `policyComplianceAudit.mjs` | Policy audit |
 | `syncI18nLocaleTreeFromEnUs.mjs` | Locale tree sync (maintainer) |

@@ -15,7 +15,20 @@ Full **quality gate** — ESLint, TypeScript, Stylelint, Vitest + coverage (**99
 
 Equivalent chain: `yarn lint:eslint && yarn lint:typescript && yarn lint:stylelint && yarn test:coverage:verify`
 
-**Faster** unit pass without coverage: **`yarn test:unit`** (electron, **`src`** TS, helpers, **`i18n`**, components) while iterating; finish **`yarn testbatch:verify`** before commits.
+**Faster** unit pass without coverage: **`yarn test:unit`** (electron, **`src`** TS, helpers, **`i18n`**, components) while iterating; **never** treat as end-of-edits gate.
+
+## End of code edits (agents) — mandatory
+
+Substantive source edits in a turn → **last verification action** before done summary:
+
+1. **`yarn testbatch:verify`** — one terminal, full chain ([dev-electron-compile-check.mdc](dev-electron-compile-check.mdc)).
+2. Dev Electron compile smoke — second terminal, same rule.
+
+- **Any edit after step 1 passed** → step 1 **invalid**; re-run on current tree.
+- **Do not** report “done” / “shipped” / “fixed” without Shell **`yarn testbatch:verify`** on final tree.
+- Slice commands (`yarn eslint <path>`, `vitest run <spec>`, partial stylelint) = debug while editing only — [dev-electron-compile-check.mdc](dev-electron-compile-check.mdc) **Does not satisfy step 1**.
+
+Same **`testbatch:verify`** as commit gate; do not skip because dev is already running. Finish **`yarn testbatch:verify`** before commits **and** before reporting substantive agent work done.
 
 **Beyond default gate:** discover + run connected **Playwright** component + **E2E** specs (grep dialog name, **`data-test-locator`**, locale default export, action id). **`yarn testbatch:verify`** does **not** include those. [fantasia-testing](../skills/fantasia-testing/SKILL.md) **Connected tests for any feature change**.
 
@@ -24,6 +37,8 @@ Equivalent chain: `yarn lint:eslint && yarn lint:typescript && yarn lint:styleli
 **Exception**: **debugging** specific failing step → run command **alone** (+ narrower follow-ups) until pass, then full chained gate before commit/changelog (unless changelog-only above).
 
 By default do not extend chain with `yarn quasar:build:electron`, Playwright, or Storybook.
+
+Post-implementation agent gates (order): **`yarn testbatch:verify`** then dev compile smoke — [dev-electron-compile-check.mdc](dev-electron-compile-check.mdc). Dev step alone is **not** the quality gate.
 
 ## Full-suite gates (`testbatch:ensure:nochange` / `testbatch:ensure:change`)
 
@@ -54,4 +69,4 @@ Isolated logs → easier failure triage.
 
 ## Reporting
 
-Report progress in execution order (quality gate: one combined pass/fail OK, or first failing step if chain stopped early).
+Report progress in execution order. On substantive work: **end with verify gate result** (pass/fail from **`yarn testbatch:verify`** on current tree) — [dev-electron-compile-check.mdc](dev-electron-compile-check.mdc).
