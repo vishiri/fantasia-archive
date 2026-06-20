@@ -17,7 +17,7 @@ description: >-
 - **UI formatting**: **`faKeybindsChordUiFormatting.ts`** — settings, menus, shortcut copy
 - **Dispatch**: **`faKeybindsGlobalDispatch.ts`** → **`faKeybindRunCommand.ts`** → **`runFaAction`** via **`FA_KEYBIND_COMMAND_TO_ACTION_ID`** ([fantasia-action-manager](../fantasia-action-manager/SKILL.md))
 - **Layout**: **`MainLayout.vue`** registers after **`refreshKeybinds()`**; skipped in Storybook canvas + non-Electron
-- **Chromium Ctrl+Shift suppress**: main **`registerFaChromiumCtrlShiftShortcutSuppress`** + global forward; boot **`faChromiumForwardedKeyChord`**
+- **Chromium Ctrl+Shift suppress**: main **`registerFaChromiumCtrlShiftShortcutSuppress`** (takes **`BrowserWindow`**) → **`createFaChromiumCtrlShiftGlobalShortcutForwardController`** (`activate`/`deactivate`); **`globalShortcut`** accelerators register **only while main window focused** (activate on **`focus`**, release on **`blur`** + teardown on close) so backgrounded app never intercepts chords in other apps. **`before-input-event`** already focus-scoped. Boot **`faChromiumForwardedKeyChord`**
 - **Pinia**: **`S_FaKeybinds.ts`**
 - **Persistence**: **`src-electron/mainScripts/keybinds/`**; **`registerFaKeybindsIpc.ts`**; **`FA_KEYBINDS_IPC`**
 - **Preload**: **`faKeybindsAPI.ts`**; types **`types/I_faKeybindsDomain.ts`**
