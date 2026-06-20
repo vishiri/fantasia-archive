@@ -9,25 +9,39 @@ export function resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKin
   return null
 }
 
+export function resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftSeed (
+  node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
+): string {
+  const nodeKind = resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKind(node)
+  if (nodeKind === 'template') {
+    return node.nickname
+  }
+  return node.label
+}
+
 export function resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTestLocators (
   nodeKind: 'group' | 'template' | null
 ): {
+    canonicalNameTestLocator: string | undefined
     contextMenuTestLocator: string | undefined
     renameInputTestLocator: string | undefined
   } {
   if (nodeKind === 'group') {
     return {
+      canonicalNameTestLocator: undefined,
       contextMenuTestLocator: 'dialogProjectSettings-worldTemplateLayoutGroupContextMenu',
       renameInputTestLocator: 'dialogProjectSettings-worldTemplateLayoutGroupRenameInput'
     }
   }
   if (nodeKind === 'template') {
     return {
+      canonicalNameTestLocator: 'dialogProjectSettings-worldTemplateLayoutTemplateCanonicalName',
       contextMenuTestLocator: 'dialogProjectSettings-worldTemplateLayoutTemplateContextMenu',
       renameInputTestLocator: 'dialogProjectSettings-worldTemplateLayoutTemplateRenameInput'
     }
   }
   return {
+    canonicalNameTestLocator: undefined,
     contextMenuTestLocator: undefined,
     renameInputTestLocator: undefined
   }
@@ -36,24 +50,17 @@ export function resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTestLoc
 export function resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuValidationErrorMessage (params: {
   displayName: string
   isGroupNameInvalid: (displayName: string) => boolean
-  isTemplateNameInvalid: (displayName: string) => boolean
   nodeKind: 'group' | 'template' | null
   translateGroupNameErrorRequired: () => string
-  translateTemplateNameErrorRequired: () => string
 }): string | undefined {
   const {
     displayName,
     isGroupNameInvalid,
-    isTemplateNameInvalid,
     nodeKind,
-    translateGroupNameErrorRequired,
-    translateTemplateNameErrorRequired
+    translateGroupNameErrorRequired
   } = params
   if (nodeKind === 'group') {
     return isGroupNameInvalid(displayName) ? translateGroupNameErrorRequired() : undefined
-  }
-  if (nodeKind === 'template') {
-    return isTemplateNameInvalid(displayName) ? translateTemplateNameErrorRequired() : undefined
   }
   return undefined
 }
@@ -61,34 +68,29 @@ export function resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuValidat
 export function resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuHasError (params: {
   displayName: string
   isGroupNameInvalid: (displayName: string) => boolean
-  isTemplateNameInvalid: (displayName: string) => boolean
   nodeKind: 'group' | 'template' | null
 }): boolean {
   const {
     displayName,
     isGroupNameInvalid,
-    isTemplateNameInvalid,
     nodeKind
   } = params
   if (nodeKind === 'group') {
     return isGroupNameInvalid(displayName)
-  }
-  if (nodeKind === 'template') {
-    return isTemplateNameInvalid(displayName)
   }
   return false
 }
 
 export function emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate (params: {
   displayName: string
-  emitRenameDocumentTemplate: (documentTemplateId: string, displayName: string) => void
   emitRenameGroup: (groupId: string, displayName: string) => void
+  emitRenamePlacementNickname: (placementId: string, nickname: string) => void
   node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
 }): void {
   const {
     displayName,
-    emitRenameDocumentTemplate,
     emitRenameGroup,
+    emitRenamePlacementNickname,
     node
   } = params
   if (node.nodeKind === 'group') {
@@ -98,9 +100,5 @@ export function emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdat
   if (node.nodeKind !== 'template') {
     return
   }
-  const documentTemplateId = node.documentTemplateId
-  if (documentTemplateId === null || documentTemplateId.length === 0) {
-    return
-  }
-  emitRenameDocumentTemplate(documentTemplateId, displayName)
+  emitRenamePlacementNickname(node.id, displayName)
 }

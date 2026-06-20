@@ -4,12 +4,32 @@ import type {
   I_dialogProjectSettingsWorldTemplatePlacementDraft
 } from 'app/types/I_dialogProjectSettingsWorlds'
 
+export function resolveDialogProjectSettingsWorldTemplatePlacementUsesNickname (
+  nickname: string
+): boolean {
+  return nickname.trim().length > 0
+}
+
+export function resolveDialogProjectSettingsWorldTemplatePlacementEffectiveLabel (params: {
+  nickname: string
+  templateDisplayName: string
+}): string {
+  const trimmedNickname = params.nickname.trim()
+  if (trimmedNickname.length > 0) {
+    return trimmedNickname
+  }
+  return params.templateDisplayName
+}
+
 type T_rootLayoutItem =
   | { kind: 'group', groupId: string, rootSortOrder: number }
   | { kind: 'placement', placementId: string, rootSortOrder: number }
 
 /** Default Material icon for world template layout group rows in the he-tree. */
 export const DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_GROUP_ICON = 'mdi-database'
+
+/** he-tree Draggable indent prop (px) per nested level. */
+export const DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_INDENT_PX = 31
 
 const WORLD_TEMPLATE_LAYOUT_PERSISTED_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
@@ -55,17 +75,45 @@ function buildGroupChildNodes (
     .map((placement) => mapPlacementToHeTreeNode(placement))
 }
 
+function readPlacementDraftLabelFields (
+  placement: I_dialogProjectSettingsWorldTemplatePlacementDraft
+): {
+    nickname: string
+    templateDisplayName: string
+  } {
+  const nickname = placement.nickname ?? ''
+  const templateDisplayName = placement.templateDisplayName ??
+    (placement as { displayName?: string }).displayName ??
+    ''
+  return {
+    nickname,
+    templateDisplayName
+  }
+}
+
 function mapPlacementToHeTreeNode (
   placement: I_dialogProjectSettingsWorldTemplatePlacementDraft
 ): I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode {
+  const {
+    nickname,
+    templateDisplayName
+  } = readPlacementDraftLabelFields(placement)
+  const usesNickname = resolveDialogProjectSettingsWorldTemplatePlacementUsesNickname(nickname)
+  const label = resolveDialogProjectSettingsWorldTemplatePlacementEffectiveLabel({
+    nickname,
+    templateDisplayName
+  })
   return {
     children: [],
     documentCountInWorld: placement.documentCountInWorld,
     documentTemplateId: placement.documentTemplateId,
     icon: placement.icon,
     id: placement.id,
-    label: placement.displayName,
+    label,
+    nickname,
     nodeKind: 'template',
+    templateDisplayName,
+    usesNickname,
     worldAppendix: placement.worldAppendix
   }
 }
@@ -90,7 +138,10 @@ export function buildHeTreeNodesFromWorldTemplateLayoutDraft (
         icon: DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_GROUP_ICON,
         id: group.id,
         label: group.displayName,
+        nickname: '',
         nodeKind: 'group' as const,
+        templateDisplayName: '',
+        usesNickname: false,
         worldAppendix: ''
       }
     }
@@ -143,9 +194,19 @@ function applyPlacementDisplayFieldsToHeTreeNode (
   node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode,
   placement: I_dialogProjectSettingsWorldTemplatePlacementDraft
 ): void {
+  const {
+    nickname,
+    templateDisplayName
+  } = readPlacementDraftLabelFields(placement)
   node.documentCountInWorld = placement.documentCountInWorld
   node.icon = placement.icon
-  node.label = placement.displayName
+  node.label = resolveDialogProjectSettingsWorldTemplatePlacementEffectiveLabel({
+    nickname,
+    templateDisplayName
+  })
+  node.nickname = nickname
+  node.templateDisplayName = templateDisplayName
+  node.usesNickname = resolveDialogProjectSettingsWorldTemplatePlacementUsesNickname(nickname)
   node.worldAppendix = placement.worldAppendix
 }
 

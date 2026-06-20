@@ -177,7 +177,9 @@ test('Test that tree sync wiring rebuilds treeData from props layout', async () 
   const layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   layout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -211,7 +213,9 @@ test('Test that tree sync wiring patches labels without rebuilding tree nodes', 
   const layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   layout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -224,7 +228,7 @@ test('Test that tree sync wiring patches labels without rebuilding tree nodes', 
   ]
   const treeData = ref(buildHeTreeNodesFromWorldTemplateLayoutDraft(layout))
   const initialNodeRef = treeData.value[0]
-  layout.placements[0]!.displayName = 'Hero'
+  layout.placements[0]!.templateDisplayName = 'Hero'
   const wiring = createDialogProjectSettingsWorldTemplateLayoutTreeSyncWiring({
     emitTemplateLayout: () => {},
     getTemplateLayout: () => layout,
@@ -245,7 +249,9 @@ test('Test that tree sync wiring rebuilds when structure keys diverge', () => {
   const layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   layout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -265,6 +271,9 @@ test('Test that tree sync wiring rebuilds when structure keys diverge', () => {
       id: 'placement-b',
       label: 'Location',
       nodeKind: 'template',
+      nickname: '',
+      templateDisplayName: '',
+      usesNickname: false,
       worldAppendix: ''
     }
   ] as ReturnType<typeof buildHeTreeNodesFromWorldTemplateLayoutDraft>)
@@ -295,7 +304,9 @@ test('Test that tree sync wiring resyncs when regression guard blocks layout emi
   ]
   priorLayout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: '770e8400-e29b-41d4-a716-446655440001',
@@ -315,6 +326,9 @@ test('Test that tree sync wiring resyncs when regression guard blocks layout emi
     id: '880e8400-e29b-41d4-a716-446655440001',
     label: 'Character',
     nodeKind: 'template',
+    nickname: '',
+    templateDisplayName: '',
+    usesNickname: false,
     worldAppendix: ''
   }
   const treeData = ref([
@@ -343,7 +357,9 @@ test('Test that tree sync wiring resyncs when emit guard blocks layout emit', as
   const priorLayout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   priorLayout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,

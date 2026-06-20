@@ -134,14 +134,15 @@ function appendHeTreeGroupNodesToReverseMap (
         documentTemplateId
       )
       pushHeTreeTemplatePlacement(state, {
-        displayName: prior?.displayName ?? child.label,
         documentCountInWorld: prior?.documentCountInWorld ?? child.documentCountInWorld,
         documentTemplateId,
         groupId,
         groupSortOrder: groupIndex,
         icon: prior?.icon ?? child.icon,
         id: prior?.id ?? child.id,
+        nickname: prior?.nickname ?? child.nickname,
         rootSortOrder: null,
+        templateDisplayName: prior?.templateDisplayName ?? child.templateDisplayName,
         worldAppendix: prior?.worldAppendix ?? child.worldAppendix
       })
     })
@@ -170,14 +171,15 @@ function appendHeTreeRootTemplateNodesToReverseMap (
       documentTemplateId
     )
     pushHeTreeTemplatePlacement(state, {
-      displayName: prior?.displayName ?? node.label,
       documentCountInWorld: prior?.documentCountInWorld ?? node.documentCountInWorld,
       documentTemplateId,
       groupId: null,
       groupSortOrder: null,
       icon: prior?.icon ?? node.icon,
       id: prior?.id ?? node.id,
+      nickname: prior?.nickname ?? node.nickname,
       rootSortOrder: rootIndex,
+      templateDisplayName: prior?.templateDisplayName ?? node.templateDisplayName,
       worldAppendix: prior?.worldAppendix ?? node.worldAppendix
     })
   })

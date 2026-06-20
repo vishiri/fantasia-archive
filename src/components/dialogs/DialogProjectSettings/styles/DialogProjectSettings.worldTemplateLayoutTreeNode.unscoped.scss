@@ -34,13 +34,26 @@
 
 .dialogProjectSettingsWorldTemplateLayoutTreeNode--group,
 .dialogProjectSettingsWorldTemplateLayoutTreeNode--template {
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__edit,
   .dialogProjectSettingsWorldTemplateLayoutTreeNode__remove {
-    font-size: $dialogProjectSettings-worldTemplateLayout-treeNode-remove-fontSize !important;
     height: $dialogProjectSettings-worldTemplateLayout-treeNode-remove-size !important;
     min-height: $dialogProjectSettings-worldTemplateLayout-treeNode-remove-size;
     min-width: $dialogProjectSettings-worldTemplateLayout-treeNode-remove-size;
     width: $dialogProjectSettings-worldTemplateLayout-treeNode-remove-size !important;
   }
+
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__edit {
+    font-size: $dialogProjectSettings-worldTemplateLayout-treeNode-edit-fontSize !important;
+  }
+
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__remove {
+    font-size: $dialogProjectSettings-worldTemplateLayout-treeNode-remove-fontSize !important;
+  }
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__actions {
+  flex: 0 0 auto;
+  gap: $dialogProjectSettings-worldTemplateLayout-treeNode-actions-gap;
 }
 
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__appendix {
@@ -64,11 +77,27 @@
   flex: 0 0 auto;
 }
 
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__icon,
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__label {
+  transition:
+    color
+    $dialogProjectSettings-worldTemplateLayout-treeNode-colorTransition-duration
+    $dialogProjectSettings-worldTemplateLayout-treeNode-colorTransition-timing;
+}
+
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__label {
   display: block;
   min-width: 0;
 }
 
+.dialogProjectSettingsWorldTemplateLayoutTreeNode--template {
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__icon--nickname,
+  .dialogProjectSettingsWorldTemplateLayoutTreeNode__label--nickname {
+    color: $dialogProjectSettings-worldTemplateLayout-treeNode-nicknameLabel-color;
+  }
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__edit,
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__remove {
   flex: 0 0 auto;
 }

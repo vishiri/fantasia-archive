@@ -178,3 +178,23 @@ test('projectManagementAPI setProjectSettings invokes IPC with cloned patch', as
   )
   expect(patch.projectName).toBe('Renamed')
 })
+
+test('projectManagementAPI stageE2eNextCreatePath invokes staging IPC', async () => {
+  invokeMock.mockResolvedValueOnce(true)
+  const ok = await projectManagementAPI.stageE2eNextCreatePath('D:\\x.faproject')
+  expect(ok).toBe(true)
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.stageE2eNextProjectCreatePathAsync,
+    'D:\\x.faproject'
+  )
+})
+
+test('projectManagementAPI stageE2eNextOpenPath invokes staging IPC', async () => {
+  invokeMock.mockResolvedValueOnce(true)
+  const ok = await projectManagementAPI.stageE2eNextOpenPath('D:\\y.faproject')
+  expect(ok).toBe(true)
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.stageE2eNextProjectOpenPathAsync,
+    'D:\\y.faproject'
+  )
+})

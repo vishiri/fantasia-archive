@@ -113,7 +113,6 @@
       v-if="props.documentTemplates !== null"
       :document-templates="props.documentTemplates"
       :world="props.world"
-      @update-document-template-display-name="emitUpdateDocumentTemplateDisplayName"
       @update:template-layout="emitTemplateLayout"
     />
   </div>
@@ -168,7 +167,6 @@ const worldColorPaletteTooltip = computed(() => {
 
 const emit = defineEmits<{
   remove: []
-  updateDocumentTemplateDisplayName: [documentTemplateId: string, displayName: string]
   'update:color': [value: string]
   'update:colorPallete': [value: string]
   'update:displayName': [value: string]
@@ -189,13 +187,6 @@ function emitColorPallete (value: string): void {
 
 function emitTemplateLayout (layout: I_dialogProjectSettingsWorldTemplateLayoutDraft): void {
   emit('update:templateLayout', layout)
-}
-
-function emitUpdateDocumentTemplateDisplayName (
-  documentTemplateId: string,
-  displayName: string
-): void {
-  emit('updateDocumentTemplateDisplayName', documentTemplateId, displayName)
 }
 </script>
 

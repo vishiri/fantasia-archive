@@ -2,8 +2,10 @@ import { nextTick, watch } from 'vue'
 import type { ComputedRef, Ref } from 'vue'
 import type { QInput } from 'quasar'
 
+import { scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus } from './functions/scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus'
+
 export function wireDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWatchers (params: {
-  getNodeLabel: () => string
+  getRenameDraftSeed: () => string
   renameDraft: Ref<string>
   renameInputRef: Ref<QInput | null>
   renameMenuOpen: ComputedRef<boolean>
@@ -12,14 +14,18 @@ export function wireDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWa
     if (!open) {
       return
     }
-    void nextTick(() => {
-      params.renameInputRef.value?.focus()
+    scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus({
+      focusRenameInput: () => {
+        params.renameInputRef.value?.focus()
+      },
+      nextTick,
+      requestAnimationFrame: (callback) => window.requestAnimationFrame(callback)
     })
-  })
+  }, { flush: 'post' })
 
-  watch(() => params.getNodeLabel(), (label) => {
+  watch(() => params.getRenameDraftSeed(), (seed) => {
     if (!params.renameMenuOpen.value) {
-      params.renameDraft.value = label
+      params.renameDraft.value = seed
     }
   })
 }

@@ -57,3 +57,41 @@ export function installFaAppConfigE2ePathOverrideGlobals (): void {
     e2eNextImportPath = p
   }
 }
+
+function normalizeE2eStageFilePath (raw: unknown): string | null {
+  if (!isE2E()) {
+    return null
+  }
+  if (typeof raw !== 'string') {
+    return null
+  }
+  const trimmed = raw.trim()
+  if (trimmed.length === 0) {
+    return null
+  }
+  return trimmed
+}
+
+/**
+ * Playwright E2E: stage export path via preload IPC (not ElectronApplication.evaluate).
+ */
+export function stageFaAppConfigE2eExportPath (raw: unknown): boolean {
+  const filePath = normalizeE2eStageFilePath(raw)
+  if (filePath === null) {
+    return false
+  }
+  e2eNextExportPath = filePath
+  return true
+}
+
+/**
+ * Playwright E2E: stage import path via preload IPC (not ElectronApplication.evaluate).
+ */
+export function stageFaAppConfigE2eImportPath (raw: unknown): boolean {
+  const filePath = normalizeE2eStageFilePath(raw)
+  if (filePath === null) {
+    return false
+  }
+  e2eNextImportPath = filePath
+  return true
+}

@@ -4,11 +4,18 @@ import { createPinia, setActivePinia } from 'pinia'
 
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 
-const { updateProjectSettingsMock, persistWorldsSnapshotMock, persistDocumentTemplatesSnapshotMock } = vi.hoisted(() => ({
+const { updateProjectSettingsMock, persistWorldsSnapshotMock, persistDocumentTemplatesSnapshotMock, notifyCreateMock } = vi.hoisted(() => ({
+  notifyCreateMock: vi.fn(),
   persistDocumentTemplatesSnapshotMock: vi.fn(async () => undefined),
   persistWorldsSnapshotMock: vi.fn(async () => undefined),
   updateProjectSettingsMock: vi.fn(async () => undefined)
 }))
+
+vi.mock('quasar', () => {
+  return {
+    Notify: { create: notifyCreateMock }
+  }
+})
 
 vi.mock('app/i18n/externalFileLoader', () => {
   return {
@@ -41,6 +48,7 @@ vi.mock('app/src/stores/S_FaProjectSettings', () => {
 beforeEach(() => {
   setActivePinia(createPinia())
   vi.resetModules()
+  notifyCreateMock.mockReset()
   updateProjectSettingsMock.mockReset()
   persistWorldsSnapshotMock.mockReset()
   persistDocumentTemplatesSnapshotMock.mockReset()
@@ -123,4 +131,37 @@ test('Test that handleSaveProjectSettings persists document templates snapshot w
   })
   expect(updateProjectSettingsMock).toHaveBeenCalledWith({ projectName: 'Renamed' })
   expect(persistDocumentTemplatesSnapshotMock).toHaveBeenCalledWith(documentTemplates)
+})
+
+/**
+ * handleSaveProjectSettings
+ * Emits a success notify after all persistence steps complete.
+ */
+test('Test that handleSaveProjectSettings emits success notify after persistence', async () => {
+  const { handleSaveProjectSettings } = await import('../faActionDefinitionHandlers_manager')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  await handleSaveProjectSettings({
+    documentTemplates: [
+      {
+        displayName: 'Character',
+        id: '550e8400-e29b-41d4-a716-446655440000'
+      }
+    ],
+    settings: { projectName: 'Renamed' },
+    worlds: [
+      {
+        displayName: 'Realm',
+        id: '550e8400-e29b-41d4-a716-446655440001'
+      }
+    ]
+  })
+  expect(notifyCreateMock).toHaveBeenCalledWith({
+    group: false,
+    message: 'globalFunctionality.faProjectSettings.saveSuccess',
+    type: 'positive'
+  })
 })

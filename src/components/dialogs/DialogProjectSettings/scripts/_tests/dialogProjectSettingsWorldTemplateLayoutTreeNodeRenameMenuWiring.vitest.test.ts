@@ -17,7 +17,10 @@ const groupNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   icon: 'mdi-folder',
   id: '770e8400-e29b-41d4-a716-446655440001',
   label: 'Creatures',
+  nickname: '',
   nodeKind: 'group',
+  templateDisplayName: '',
+  usesNickname: false,
   worldAppendix: ''
 }
 
@@ -28,13 +31,16 @@ const templateNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   icon: 'mdi-account',
   id: '880e8400-e29b-41d4-a716-446655440001',
   label: 'Character',
+  nickname: 'Alias',
   nodeKind: 'template',
+  templateDisplayName: 'Character',
+  usesNickname: true,
   worldAppendix: ' of Eldoria'
 }
 
 function mountRenameMenuHarness (node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode): Promise<{
-  emitRenameDocumentTemplate: ReturnType<typeof vi.fn>
   emitRenameGroup: ReturnType<typeof vi.fn>
+  emitRenamePlacementNickname: ReturnType<typeof vi.fn>
   nodeRef: ReturnType<typeof ref<I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode>>
   openRenameMenuTarget: ReturnType<typeof ref<string | null>>
   wiring: ReturnType<typeof createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring>
@@ -42,22 +48,29 @@ function mountRenameMenuHarness (node: I_dialogProjectSettingsWorldTemplateLayou
   const nodeRef = ref(node)
   const openRenameMenuTarget = ref<string | null>(null)
   const emitRenameGroup = vi.fn()
-  const emitRenameDocumentTemplate = vi.fn()
+  const emitRenamePlacementNickname = vi.fn()
   let wiring!: ReturnType<typeof createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring>
 
   const Child = defineComponent({
     name: 'RenameMenuChild',
     setup () {
       const nodeAnchorRef = ref<HTMLElement | null>(document.createElement('div'))
+      Object.defineProperty(nodeAnchorRef.value, 'clientWidth', {
+        configurable: true,
+        value: 500
+      })
       wiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring({
-        emitRenameDocumentTemplate,
         emitRenameGroup,
+        emitRenamePlacementNickname,
         getNode: () => nodeRef.value,
         isGroupNameInvalid: (displayName) => displayName.trim().length === 0,
-        isTemplateNameInvalid: (displayName) => displayName.trim().length === 0,
         nodeAnchorRef,
         translateGroupNameErrorRequired: () => 'Group name required',
-        translateTemplateNameErrorRequired: () => 'Template name required'
+        translateGroupRenameInputLabel: () => 'Name of the group',
+        translateTemplateCanonicalNameLabel: () => 'Document template name',
+        translateTemplateCanonicalNameTooltip: () => 'Canonical tooltip',
+        translateTemplateNicknameLabel: () => 'Nickname',
+        translateTemplateNicknameTooltip: () => 'Nickname tooltip'
       })
       return () => h('div')
     }
@@ -80,8 +93,8 @@ function mountRenameMenuHarness (node: I_dialogProjectSettingsWorldTemplateLayou
     })
     void nextTick().then(() => {
       resolve({
-        emitRenameDocumentTemplate,
         emitRenameGroup,
+        emitRenamePlacementNickname,
         nodeRef,
         openRenameMenuTarget,
         wiring
@@ -102,6 +115,9 @@ test('Test that createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
   expect(harness.wiring.contextMenuTestLocator.value).toBe(
     'dialogProjectSettings-worldTemplateLayoutGroupContextMenu'
   )
+  expect(harness.wiring.showTemplateCanonicalName.value).toBe(false)
+  expect(harness.wiring.renameInputLabel.value).toBe('Name of the group')
+  expect(harness.wiring.templateCanonicalName.value).toBe('')
 
   harness.wiring.onRenameMenuBeforeShow()
   expect(harness.openRenameMenuTarget.value).toBe(targetKey)
@@ -125,27 +141,46 @@ test('Test that createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
 
 /**
  * createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring
- * Renames document templates by documentTemplateId, not placement id.
+ * openRenameMenu syncs draft and opens the shared menu target.
  */
-test('Test that createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring renames templates by documentTemplateId', async () => {
+test('Test that createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring openRenameMenu opens shared target', async () => {
+  const harness = await mountRenameMenuHarness(groupNode)
+  const targetKey = buildDialogProjectSettingsWorldTemplateLayoutRenameMenuTargetKey('group', groupNode.id)
+
+  harness.wiring.openRenameMenu()
+  expect(harness.openRenameMenuTarget.value).toBe(targetKey)
+  expect(harness.wiring.renameDraft.value).toBe('Creatures')
+  expect(harness.wiring.renameMenuOpen.value).toBe(true)
+})
+
+/**
+ * createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring
+ * Renames placements by placement id and allows empty nicknames.
+ */
+test('Test that createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring renames placement nicknames', async () => {
   const harness = await mountRenameMenuHarness(templateNode)
 
   expect(harness.wiring.supportsRenameMenu.value).toBe(true)
   expect(harness.wiring.renameInputTestLocator.value).toBe(
     'dialogProjectSettings-worldTemplateLayoutTemplateRenameInput'
   )
+  expect(harness.wiring.showTemplateCanonicalName.value).toBe(true)
+  expect(harness.wiring.templateCanonicalName.value).toBe('Character')
+  expect(harness.wiring.templateNicknameTooltipText.value).toBe('Nickname tooltip')
+  expect(harness.wiring.templateCanonicalNameTooltipText.value).toBe('Canonical tooltip')
 
   harness.wiring.onRenameMenuBeforeShow()
+  expect(harness.wiring.renameDraft.value).toBe('Alias')
   harness.wiring.onRenameDraftUpdate('Hero')
-  expect(harness.emitRenameDocumentTemplate).toHaveBeenCalledWith(
-    templateNode.documentTemplateId,
+  expect(harness.emitRenamePlacementNickname).toHaveBeenCalledWith(
+    templateNode.id,
     'Hero'
   )
 
   harness.wiring.renameMenuOpen.value = true
   harness.wiring.onRenameDraftUpdate('')
-  expect(harness.wiring.renameHasError.value).toBe(true)
-  expect(harness.wiring.renameMenuErrorMessage.value).toBe('Template name required')
+  expect(harness.wiring.renameHasError.value).toBe(false)
+  expect(harness.wiring.renameMenuErrorMessage.value).toBeUndefined()
 })
 
 /**
@@ -172,14 +207,17 @@ test('Test that rename menu wiring ignores unsupported nodes', async () => {
     name: 'UnsupportedRenameMenuChild',
     setup () {
       wiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring({
-        emitRenameDocumentTemplate: vi.fn(),
         emitRenameGroup,
+        emitRenamePlacementNickname: vi.fn(),
         getNode: () => nodeRef.value,
         isGroupNameInvalid: () => false,
-        isTemplateNameInvalid: () => false,
         nodeAnchorRef: ref(document.createElement('div')),
         translateGroupNameErrorRequired: () => 'Group required',
-        translateTemplateNameErrorRequired: () => 'Template required'
+        translateGroupRenameInputLabel: () => 'Name of the group',
+        translateTemplateCanonicalNameLabel: () => 'Document template name',
+        translateTemplateCanonicalNameTooltip: () => 'Canonical tooltip',
+        translateTemplateNicknameLabel: () => 'Nickname',
+        translateTemplateNicknameTooltip: () => 'Nickname tooltip'
       })
       return () => h('div')
     }
@@ -204,23 +242,19 @@ test('Test that rename menu wiring ignores unsupported nodes', async () => {
   wiring.onRenameMenuHide()
 })
 
-/**
- * createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring
- * Skips template rename when documentTemplateId is missing.
- */
-test('Test that createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring skips templates without documentTemplateId', async () => {
-  const missingTemplateIdNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
-    children: [],
-    documentCountInWorld: 0,
-    documentTemplateId: null,
-    icon: 'mdi-account',
-    id: '880e8400-e29b-41d4-a716-446655440099',
-    label: 'Broken',
-    nodeKind: 'template',
-    worldAppendix: ''
-  }
-  const harness = await mountRenameMenuHarness(missingTemplateIdNode)
+test('Test that rename menu draft update coalesces null model values to empty string', async () => {
+  const harness = await mountRenameMenuHarness(groupNode)
+  harness.wiring.onRenameDraftUpdate(null)
+  expect(harness.emitRenameGroup).toHaveBeenCalledWith(groupNode.id, '')
+})
 
-  harness.wiring.onRenameDraftUpdate('Hero')
-  expect(harness.emitRenameDocumentTemplate).not.toHaveBeenCalled()
+test('Test that rename menu before-show caps max width from anchor minus action buttons', async () => {
+  const harness = await mountRenameMenuHarness(groupNode)
+
+  harness.wiring.onRenameMenuBeforeShow()
+  expect(harness.wiring.renameMenuStyle.value).toEqual({
+    maxWidth: '436px',
+    minWidth: '436px',
+    width: '436px'
+  })
 })

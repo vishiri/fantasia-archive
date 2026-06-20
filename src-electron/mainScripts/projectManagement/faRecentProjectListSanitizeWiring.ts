@@ -8,7 +8,7 @@ import {
   faRecentProjectsListsEqual as faRecentProjectsListsEqualFn,
   trimAndValidateRecentProjectRow
 } from './functions/faRecentProjectListSanitize'
-import { pathLooksLikeFaProjectFile } from './projectManagement_manager'
+import { pathLooksLikeFaProjectFile } from './projectManagementSharedPathWiring'
 
 function entryRowsExistAsFiles (rows: readonly I_faRecentProjectEntry[]): I_faRecentProjectEntry[] {
   const out: I_faRecentProjectEntry[] = []

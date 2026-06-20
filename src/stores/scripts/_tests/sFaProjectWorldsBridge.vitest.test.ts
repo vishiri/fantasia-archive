@@ -197,9 +197,9 @@ test('Test that faProjectWorldsPersistSnapshotFromDialog throws when bridge is m
 
 /**
  * faProjectWorldsPersistSnapshotFromDialog
- * Rethrows Error rejections from saveWorldsSnapshot.
+ * Surfaces saveError when saveWorldsSnapshot rejects.
  */
-test('Test that faProjectWorldsPersistSnapshotFromDialog rethrows write failures', async () => {
+test('Test that faProjectWorldsPersistSnapshotFromDialog surfaces saveError on write failures', async () => {
   saveWorldsSnapshotMock.mockRejectedValueOnce(new Error('save failed'))
   const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
   const { faProjectWorldsPersistSnapshotFromDialog } = await import('../sFaProjectWorldsBridge')
@@ -210,15 +210,15 @@ test('Test that faProjectWorldsPersistSnapshotFromDialog rethrows write failures
         id: '550e8400-e29b-41d4-a716-446655440000'
       }
     ])
-  ).rejects.toThrow('save failed')
+  ).rejects.toThrow('globalFunctionality.faProjectSettings.saveError')
   errorSpy.mockRestore()
 })
 
 /**
  * faProjectWorldsPersistSnapshotFromDialog
- * Wraps non-Error rejections in Error instances.
+ * Surfaces saveError when saveWorldsSnapshot rejects with a non-Error value.
  */
-test('Test that faProjectWorldsPersistSnapshotFromDialog wraps non-Error write failures', async () => {
+test('Test that faProjectWorldsPersistSnapshotFromDialog surfaces saveError on non-Error write failures', async () => {
   saveWorldsSnapshotMock.mockRejectedValueOnce('save string failure')
   const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
   const { faProjectWorldsPersistSnapshotFromDialog } = await import('../sFaProjectWorldsBridge')
@@ -229,6 +229,6 @@ test('Test that faProjectWorldsPersistSnapshotFromDialog wraps non-Error write f
         id: '550e8400-e29b-41d4-a716-446655440000'
       }
     ])
-  ).rejects.toThrow('save string failure')
+  ).rejects.toThrow('globalFunctionality.faProjectSettings.saveError')
   errorSpy.mockRestore()
 })

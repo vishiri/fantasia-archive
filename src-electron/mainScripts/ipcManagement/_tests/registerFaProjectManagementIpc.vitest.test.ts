@@ -511,3 +511,47 @@ test('registerFaProjectManagementIpc before-quit hook closes active project data
   onQuit()
   expect(closeActiveMock).toHaveBeenCalledOnce()
 })
+
+test('stageE2eNextProjectCreatePathAsync handler stages pending create path when TEST_ENV is e2e', async () => {
+  vi.stubEnv('TEST_ENV', 'e2e')
+  const {
+    readFaE2ePendingProjectCreatePath,
+    writeFaE2ePendingProjectCreatePath
+  } = await import('../../projectManagement/functions/faProjectManagementE2ePathOverride')
+  writeFaE2ePendingProjectCreatePath(null)
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.stageE2eNextProjectCreatePathAsync)
+  expect(h(undefined as never, 'D:\\stage.faproject')).toBe(true)
+  expect(readFaE2ePendingProjectCreatePath()).toBe('D:\\stage.faproject')
+})
+
+test('stageE2eNextProjectCreatePathAsync returns false when path payload is invalid', async () => {
+  vi.stubEnv('TEST_ENV', 'e2e')
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.stageE2eNextProjectCreatePathAsync)
+  expect(h(undefined as never, '   ')).toBe(false)
+})
+
+test('stageE2eNextProjectOpenPathAsync handler stages pending open path when TEST_ENV is e2e', async () => {
+  vi.stubEnv('TEST_ENV', 'e2e')
+  const {
+    readFaE2ePendingProjectOpenPath,
+    writeFaE2ePendingProjectOpenPath
+  } = await import('../../projectManagement/functions/faProjectManagementE2ePathOverride')
+  writeFaE2ePendingProjectOpenPath(null)
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.stageE2eNextProjectOpenPathAsync)
+  expect(h(undefined as never, 'D:\\open.faproject')).toBe(true)
+  expect(readFaE2ePendingProjectOpenPath()).toBe('D:\\open.faproject')
+})
+
+test('stageE2eNextProjectOpenPathAsync returns false outside e2e', async () => {
+  vi.stubEnv('TEST_ENV', 'components')
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.stageE2eNextProjectOpenPathAsync)
+  expect(h(undefined as never, 'D:\\open.faproject')).toBe(false)
+})

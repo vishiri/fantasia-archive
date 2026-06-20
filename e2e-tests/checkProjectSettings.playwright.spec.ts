@@ -23,6 +23,7 @@ import {
   tryUnlinkE2eFaprojectFixture
 } from 'app/helpers/playwrightHelpers_e2e/playwrightE2eProjectPaths'
 import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
+import { getFaPlaywrightDefaultActionMonitorOpenPressString } from 'app/helpers/playwrightHelpers_universal/faPlaywrightKeyboardChords'
 import { dismissStartupTipsNotifyIfPresent } from 'app/helpers/playwrightHelpers_universal/playwrightDismissStartupTipsNotify'
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import projectMenu from 'app/i18n/en-US/components/globals/AppControlMenus/L_project'
@@ -30,6 +31,7 @@ import L_newProject from 'app/i18n/en-US/dialogs/L_newProject'
 import L_projectSettings from 'app/i18n/en-US/dialogs/L_projectSettings'
 import L_faProjectSettings from 'app/i18n/en-US/globalFunctionality/L_faProjectSettings'
 import L_faProjectSession from 'app/i18n/en-US/globalFunctionality/L_faProjectSession'
+import actionMonitorMessages from 'app/i18n/en-US/dialogs/L_DialogActionMonitor'
 
 /**
  * Extra env settings to trigger E2E via Playwright (isolated userData, dialog path overrides).
@@ -52,6 +54,8 @@ const selectorList = {
   dialogProjectSettingsTabDocumentTemplates: 'dialogProjectSettings-tab-documentTemplatesSettings',
   dialogProjectSettingsTemplatesAddFirstButton: 'dialogProjectSettings-documentTemplates-addFirstButton',
   dialogProjectSettingsTitle: 'dialogProjectSettings-title',
+  dialogActionMonitorTable: 'dialogActionMonitor-table',
+  monitorActionCell: 'dialogActionMonitor-cell-action',
   submenuItemSubMenu: 'AppControlSingleMenu-menuItem-subMenu',
   submenuItemSubMenuItem: 'AppControlSingleMenu-menuItem-subMenu-item',
   submenuItemSubMenuItemText: 'AppControlSingleMenu-menuItem-subMenu-item-text',
@@ -75,6 +79,37 @@ async function dismissOpenMenus (page: Page): Promise<void> {
   await page.waitForTimeout(150)
 }
 
+async function prepareRendererForGlobalShortcuts (page: Page): Promise<void> {
+  await page.bringToFront()
+  await page.evaluate(() => {
+    const root = document.querySelector('#q-app')
+    if (root instanceof HTMLElement) {
+      root.tabIndex = -1
+      root.focus()
+    }
+  })
+}
+
+async function pressDefaultOpenActionMonitorChord (page: Page): Promise<void> {
+  await prepareRendererForGlobalShortcuts(page)
+  await page.keyboard.press(getFaPlaywrightDefaultActionMonitorOpenPressString())
+}
+
+async function collectActionMonitorActionIds (page: Page): Promise<string[]> {
+  const table = page.locator(`[data-test-locator="${selectorList.dialogActionMonitorTable}"]`)
+  const rows = table.locator('tbody tr')
+  const count = await rows.count()
+  const ids: string[] = []
+  for (let index = 0; index < count; index += 1) {
+    const text = await rows.nth(index)
+      .locator(`[data-test-locator="${selectorList.monitorActionCell}"] span`)
+      .first()
+      .innerText()
+    ids.push(text.trim())
+  }
+  return ids
+}
+
 async function openProjectMenu (page: Page): Promise<void> {
   await dismissStartupTipsNotifyIfPresent(page)
   await dismissOpenMenus(page)
@@ -90,10 +125,11 @@ async function openProjectMenu (page: Page): Promise<void> {
 async function openProjectSettingsFromMenu (page: Page): Promise<void> {
   await openProjectMenu(page)
   const row = page.getByRole('menuitem', {
-    exact: true,
+    exact: false,
     name: projectMenu.items.projectSettings
   })
-  await expect(row).toBeVisible()
+  await expect(row).toBeVisible({ timeout: 15_000 })
+  await expect(row).toBeEnabled()
   await row.click()
   await dismissOpenMenus(page)
 }
@@ -224,6 +260,12 @@ test.describe.serial('Project settings E2E — rename via dialog', () => {
     ).toHaveCount(0, { timeout: 15_000 })
 
     await e2eExpectFaActiveProjectStoreName(appWindow, PROJECT_SETTINGS_E2E_RENAMED)
+
+    await pressDefaultOpenActionMonitorChord(appWindow)
+    await expect(appWindow.locator('#dialogActionMonitor-title')).toHaveText(actionMonitorMessages.title)
+    const actionIds = await collectActionMonitorActionIds(appWindow)
+    expect(actionIds).toContain('saveProjectSettings')
+    await dismissOpenMenus(appWindow)
 
     await openProjectMenu(appWindow)
     await openLoadRecentSubmenu(appWindow)

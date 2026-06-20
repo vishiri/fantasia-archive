@@ -48,7 +48,7 @@ export function listFaProjectWorldTemplateLayoutForProjectSettings (
   const placementRows = db
     .prepare(
       'SELECT p.id, p.world_id, p.document_template_id, p.group_id, p.root_sort_order, ' +
-        'p.group_sort_order, p.created_at_ms, p.updated_at_ms, ' +
+        'p.group_sort_order, p.nickname, p.created_at_ms, p.updated_at_ms, ' +
         't.display_name, t.world_appendix, t.icon ' +
         `FROM ${FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS} p ` +
         `INNER JOIN ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES} t ON t.id = p.document_template_id ` +

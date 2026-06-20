@@ -211,13 +211,14 @@ function makeProjectContentTestDb (): {
         return {
           run: (...args: Array<string | number | null>) => {
             const row: T_row = {
-              created_at_ms: args[6] as number,
+              created_at_ms: args[7] as number,
               document_template_id: args[2] as string,
               group_id: args[3] as string | null,
               group_sort_order: args[5] as number | null,
               id: args[0] as string,
+              nickname: args[6] as string,
               root_sort_order: args[4] as number | null,
-              updated_at_ms: args[7] as number,
+              updated_at_ms: args[8] as number,
               world_id: args[1] as string
             }
             tables.world_template_placements.set(row.id as string, row)
@@ -1132,7 +1133,8 @@ test('Test that replaceFaProjectWorldTemplateLayoutSnapshot persists layout rows
         groupId: null,
         groupSortOrder: null,
         id: placementId,
-        rootSortOrder: 1
+        rootSortOrder: 1,
+        nickname: ''
       }
     ]
   })
@@ -1160,7 +1162,8 @@ test('Test that replaceFaProjectWorldTemplateLayoutSnapshot throws on invalid pl
         groupId: null,
         groupSortOrder: 0,
         id: placementId,
-        rootSortOrder: 0
+        rootSortOrder: 0,
+        nickname: ''
       }
     ]
   })).toThrow(/Root template placement/)
@@ -1172,7 +1175,8 @@ test('Test that replaceFaProjectWorldTemplateLayoutSnapshot throws on invalid pl
         groupId: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
         groupSortOrder: null,
         id: placementId,
-        rootSortOrder: null
+        rootSortOrder: null,
+        nickname: ''
       }
     ]
   })).toThrow(/Grouped template placement/)
@@ -1195,7 +1199,8 @@ test('Test that replaceFaProjectWorldTemplateLayoutSnapshot validates groups and
         groupId: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
         groupSortOrder: 0,
         id: placementId,
-        rootSortOrder: null
+        rootSortOrder: null,
+        nickname: ''
       }
     ]
   })).toThrow(/unknown group id/)
@@ -1235,7 +1240,8 @@ test('Test that replaceFaProjectWorldTemplateLayoutSnapshot persists grouped pla
         groupId,
         groupSortOrder: 0,
         id: placementId,
-        rootSortOrder: null
+        rootSortOrder: null,
+        nickname: ''
       }
     ]
   })
@@ -1270,7 +1276,8 @@ test('Test that replaceFaProjectWorldsSnapshot persists templateLayout on each w
             groupId: null,
             groupSortOrder: null,
             id: placementId,
-            rootSortOrder: 0
+            rootSortOrder: 0,
+            nickname: ''
           }
         ]
       }
@@ -1302,7 +1309,8 @@ test('Test that listFaProjectWorldsForProjectSettings includes placement documen
         groupId: null,
         groupSortOrder: null,
         id: '6ba7b811-9dad-11d1-80b4-00c04fd430c8',
-        rootSortOrder: 0
+        rootSortOrder: 0,
+        nickname: ''
       }
     ]
   })

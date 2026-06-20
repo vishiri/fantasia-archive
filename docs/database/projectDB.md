@@ -17,10 +17,11 @@ SQLite **`documents`** = worldbuilding entities (world + optional template). ≠
 | **4** | Adds **`worlds.color_pallete`** — semicolon-separated **`#RRGGBB`** hex list (max **2000** chars; default empty). |
 | **5** | Adds **`document_templates.sort_order`**, **`world_appendix`** (max **500** chars), and **`icon`** (max **128** chars). |
 | **6** | Replaces **`world_document_templates`** with **`world_template_groups`** and **`world_template_placements`** for per-world template layout (groups + ordered placements). |
+| **7** | Adds **`world_template_placements.nickname`** — optional per-world placement label override (empty = use joined document template name). |
 
-**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 6`** in **`faProjectDbMigrateWiring.ts`**.
+**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 7`** in **`faProjectDbMigrateWiring.ts`**.
 
-**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v1**, run **v1→v2** (drop **`world_media`**), **v2→v3** (ensure legacy **`world_document_templates`** when upgrading old files), **v3→v4** (add **`worlds.color_pallete`**), **v4→v5** (add **`document_templates`** list/detail columns), **v5→v6** (migrate junction rows to root placements, drop **`world_document_templates`**, create layout tables), seed a default **world** when empty, then stop at **v6**. Files already at **6** are a no-op. Other versions throw until a forward migration is added.
+**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v1**, run **v1→v2** (drop **`world_media`**), **v2→v3** (ensure legacy **`world_document_templates`** when upgrading old files), **v3→v4** (add **`worlds.color_pallete`**), **v4→v5** (add **`document_templates`** list/detail columns), **v5→v6** (migrate junction rows to root placements, drop **`world_document_templates`**, create layout tables), **v6→v7** (add **`world_template_placements.nickname`**), seed a default **world** when empty, then stop at **v7**. Files already at **7** are a no-op. Other versions throw until a forward migration is added.
 
 **Worlds vs document templates on create:** **`seedFaProjectDefaultWorldIfEmpty`** runs after migrations and inserts one default **world** when the table is empty. **Document templates are never auto-seeded** — a new **`.faproject`** may have zero **`document_templates`** rows until the user adds them in **Project Settings**.
 
@@ -125,6 +126,7 @@ Index: **`idx_world_template_groups_world_root_sort`**.
 | `group_id` | NULL for root placement; else FK → **`world_template_groups.id`** **ON DELETE SET NULL** |
 | `root_sort_order` | Set when **`group_id`** is NULL |
 | `group_sort_order` | Set when **`group_id`** is not NULL |
+| `nickname` | Optional per-world placement label override (max **120** chars; default empty) |
 | `created_at_ms`, `updated_at_ms` | INTEGER |
 
 **Constraints:** **`UNIQUE (world_id, document_template_id)`**; CHECK enforces exactly one of **`root_sort_order`** / **`group_sort_order`** matching **`group_id`**.

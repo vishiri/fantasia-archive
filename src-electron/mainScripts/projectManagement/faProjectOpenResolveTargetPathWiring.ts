@@ -11,8 +11,8 @@ import type { I_faProjectOpenInputParsed } from 'app/types/I_faProjectOpenInputP
 import type { I_faProjectOpenResolveResult } from 'app/types/I_faProjectManagementElectronMain'
 
 import { faProjectSaveDialogDefaultDirectory } from './faProjectFileDialogDefaultPathsWiring'
-import { takeNextE2eProjectOpenPath } from './projectManagement_manager'
-import { pathLooksLikeFaProjectFile } from './projectManagement_manager'
+import { takeNextE2eProjectOpenPath } from './projectManagementSharedE2ePathWiring'
+import { pathLooksLikeFaProjectFile } from './projectManagementSharedPathWiring'
 
 function buildOpenDialogOptions (defaultPath: string): OpenDialogOptions {
   return {

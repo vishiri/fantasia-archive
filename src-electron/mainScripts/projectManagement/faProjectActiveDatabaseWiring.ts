@@ -4,7 +4,7 @@ import type Database from 'better-sqlite3'
 import BetterSqlite3 from 'better-sqlite3'
 import { Result } from 'neverthrow'
 
-import { pathLooksLikeFaProjectFile } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
+import { pathLooksLikeFaProjectFile } from './projectManagementSharedPathWiring'
 
 let activeDb: Database | null = null
 

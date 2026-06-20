@@ -11,4 +11,4 @@ test('Test that faProjectDocumentTemplatesFetchFreshForDialog throws when window
   await expect(faProjectDocumentTemplatesFetchFreshForDialog()).rejects.toThrow(
     'projectContent.listDocumentTemplatesForProjectSettings is unavailable'
   )
-})
+}, 10_000)

@@ -382,6 +382,7 @@ test.describe.serial('App settings dialog', () => {
 })
 
 const developerSettingsCategoryKey = 'developerSettings'
+const logFullActivityPayloadSettingKey = 'logFullActivityPayload'
 const showDocumentIDSettingKey = 'showDocumentID'
 const postSaveSettingsWaitMs = 500
 const tabSwitchSettleMs = 550
@@ -509,5 +510,80 @@ test.describe.serial('App settings showDocumentID defaults on fresh userData', (
     const toggle = settingRoot.getByRole('switch')
     await expect(toggle).toBeVisible()
     await expect(toggle).toHaveAttribute('aria-checked', 'false')
+  })
+})
+
+/**
+ * logFullActivityPayload
+ * - Developer Settings subgroup lists the toggle defaulting off; Save persists enabled state through faUserSettings.
+ */
+test.describe.serial('App settings logFullActivityPayload persists after Save', () => {
+  let electronApp: ElectronApplication
+  let appWindow: Page
+  let suiteTestInfo: TestInfo
+
+  test.beforeAll(async ({}, testInfo) => {
+    suiteTestInfo = testInfo
+    extraEnvSettings.COMPONENT_PROPS = JSON.stringify({ directInput: appSettingsDirectInput })
+    const launched = await launchFaPlaywrightComponentHarnessWindow({
+      buildLaunchEnv (): Record<string, string> {
+        return {
+          COMPONENT_NAME: extraEnvSettings.COMPONENT_NAME,
+          COMPONENT_PROPS: extraEnvSettings.COMPONENT_PROPS,
+          TEST_ENV: extraEnvSettings.TEST_ENV
+        }
+      },
+      renderDelayMs: faFrontendRenderTimer,
+      testInfo
+    })
+    electronApp = launched.electronApp
+    appWindow = launched.appWindow
+  })
+
+  test.afterAll(async ({}, afterAllTestInfo) => {
+    await tearDownFaPlaywrightElectronSerialSuite({
+      afterAllTestInfo,
+      electronApp,
+      suiteTestInfo
+    })
+  })
+
+  test('logFullActivityPayload defaults off then persists true after Save', async () => {
+    const devTab = appWindow.locator(
+      `[data-test-locator="${appSettingsSelector.tab(developerSettingsCategoryKey)}"]`
+    )
+    await expect(devTab).toHaveCount(1)
+    await devTab.click()
+    await appWindow.waitForTimeout(tabSwitchSettleMs)
+
+    const subcategoryTitle = appWindow.locator(
+      `[data-test-locator="${appSettingsSelector.subcategory(developerSettingsCategoryKey, 'documentBody')}"] [data-test-locator="${selectorList.subcategoryTitle}"]`
+    )
+    await expect(subcategoryTitle).toHaveText(
+      appSettingsMessages.appOptionsCategories.developerSettings.documentBody.subtitle
+    )
+
+    const settingRoot = appWindow.locator(
+      `[data-test-locator="${appSettingsSelector.setting(logFullActivityPayloadSettingKey)}"]`
+    )
+    await expect(settingRoot).toHaveCount(1)
+    await expect(settingRoot).toHaveAttribute(
+      selectorList.settingIdAttribute,
+      logFullActivityPayloadSettingKey
+    )
+
+    const toggle = settingRoot.getByRole('switch')
+    await expect(toggle).toHaveAttribute('aria-checked', 'false')
+    await toggle.click()
+    await expect(toggle).toHaveAttribute('aria-checked', 'true')
+
+    const saveButton = appWindow.locator(`[data-test-locator="${selectorList.saveButton}"]`)
+    await saveButton.click()
+    await appWindow.waitForTimeout(postSaveSettingsWaitMs)
+
+    const settings = await appWindow.evaluate(async () => {
+      return await window.faContentBridgeAPIs.faUserSettings.getSettings()
+    })
+    expect(settings.logFullActivityPayload).toBe(true)
   })
 })

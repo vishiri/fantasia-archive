@@ -19,14 +19,15 @@ const worldA: I_dialogProjectSettingsWorldDraft = {
     groups: [],
     placements: [
       {
-        displayName: 'Character',
         documentCountInWorld: 0,
         documentTemplateId: templateId,
         groupId: null,
         groupSortOrder: null,
         icon: '',
         id: placementAId,
+        nickname: '',
         rootSortOrder: 0,
+        templateDisplayName: 'Character',
         worldAppendix: ''
       }
     ]
@@ -41,25 +42,27 @@ const worldB: I_dialogProjectSettingsWorldDraft = {
     groups: [],
     placements: [
       {
-        displayName: 'Character',
         documentCountInWorld: 0,
         documentTemplateId: templateId,
         groupId: null,
         groupSortOrder: null,
         icon: '',
         id: placementBId,
+        nickname: '',
         rootSortOrder: 0,
+        templateDisplayName: 'Character',
         worldAppendix: ''
       },
       {
-        displayName: 'Location',
         documentCountInWorld: 0,
         documentTemplateId: otherTemplateId,
         groupId: null,
         groupSortOrder: null,
         icon: '',
         id: '880e8400-e29b-41d4-a716-446655440003',
+        nickname: '',
         rootSortOrder: 1,
+        templateDisplayName: 'Location',
         worldAppendix: ''
       }
     ]
@@ -77,9 +80,9 @@ test('Test that syncDialogProjectSettingsWorldDraftTemplateLayoutPlacementDispla
     'Hero'
   )
 
-  expect(nextWorlds[0].templateLayout.placements[0].displayName).toBe('Hero')
-  expect(nextWorlds[1].templateLayout.placements[0].displayName).toBe('Hero')
-  expect(nextWorlds[1].templateLayout.placements[1].displayName).toBe('Location')
+  expect(nextWorlds[0].templateLayout.placements[0].templateDisplayName).toBe('Hero')
+  expect(nextWorlds[1].templateLayout.placements[0].templateDisplayName).toBe('Hero')
+  expect(nextWorlds[1].templateLayout.placements[1].templateDisplayName).toBe('Location')
 })
 
 /**

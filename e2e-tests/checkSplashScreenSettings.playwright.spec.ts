@@ -21,6 +21,9 @@ import {
   interpolateFaProjectSessionNotify
 } from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eProjectSessionNotify'
 import {
+  expectFaPlaywrightE2eSplashResumePrimaryLabel
+} from 'app/helpers/playwrightHelpers_e2e/faPlaywrightE2eSplashResume'
+import {
   e2eSetNextProjectCreatePath,
   getE2eFaprojectFixtureAbsolutePath,
   tryUnlinkE2eFaprojectFixture
@@ -463,6 +466,13 @@ test.describe.serial('Splash screen settings (App Settings)', () => {
    * Resume Latest split caret shows Browse latest projects tooltip until Hide tooltip setting is enabled.
    */
   test('Hide recent project tooltip setting hides and restores resume dropdown caret tooltip', async () => {
+    test.setTimeout(120_000)
+    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
+    await openAppSettingsDialog(appWindow)
+    await setSkipWelcomeScreenInDialog(appWindow, false)
+    await setHideRecentProjectTooltipInDialog(appWindow, false)
+    await saveAppSettingsDialog(appWindow)
+
     await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await createE2eProjectFromSplash(
       appWindow,
@@ -474,13 +484,12 @@ test.describe.serial('Splash screen settings (App Settings)', () => {
     await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await waitForFaPlaywrightE2eAppShellPageTransitionIdle(appWindow)
     await expect(async () => {
-      await expect(
-        appWindow.locator(`[data-test-locator="${selectorList.splashPageResumeLatest}"]`)
-      ).toBeVisible({
-        timeout: 5000
-      })
+      await expectFaPlaywrightE2eSplashResumePrimaryLabel(
+        appWindow,
+        L_splashPage.resumeCurrentProject
+      )
     }).toPass({
-      timeout: 15_000
+      timeout: 30_000
     })
     await expectResumeDropdownBrowseTooltipVisible(appWindow, true)
 

@@ -67,14 +67,15 @@ test('Test that createDialogProjectSettingsDraftMutationHandlers mutates templat
     groups: [],
     placements: [
       {
-        displayName: 'Character',
         documentCountInWorld: 0,
         documentTemplateId: baseTemplate.id,
         groupId: null,
         groupSortOrder: null,
         icon: '',
         id: '880e8400-e29b-41d4-a716-446655440001',
+        nickname: '',
         rootSortOrder: 0,
+        templateDisplayName: 'Character',
         worldAppendix: ''
       }
     ]
@@ -82,7 +83,7 @@ test('Test that createDialogProjectSettingsDraftMutationHandlers mutates templat
   handlers.updateWorldTemplateLayout(baseWorld.id, layoutWithTemplatePlacement)
   handlers.updateDocumentTemplateDisplayName(baseTemplate.id, 'Synced template name')
 
-  expect(localWorlds.value?.[0].templateLayout.placements[0]?.displayName).toBe('Synced template name')
+  expect(localWorlds.value?.[0].templateLayout.placements[0]?.templateDisplayName).toBe('Synced template name')
 
   expect(localWorlds.value?.[1].displayName).toBe('Renamed world')
   expect(localWorlds.value?.[1].color).toBe('#aabbcc')

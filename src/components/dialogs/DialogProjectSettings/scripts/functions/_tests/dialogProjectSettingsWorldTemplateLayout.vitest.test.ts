@@ -1,5 +1,8 @@
 import type { I_faProjectWorldTemplateLayoutForProjectSettings } from 'app/types/I_faProjectWorldTemplateLayoutDomain'
-import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
+import type {
+  I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode,
+  I_dialogProjectSettingsWorldTemplatePlacementDraft
+} from 'app/types/I_dialogProjectSettingsWorlds'
 import { expect, test } from 'vitest'
 
 import {
@@ -11,14 +14,17 @@ import {
   mapDialogProjectSettingsWorldTemplateLayoutToSnapshot,
   removeDialogProjectSettingsWorldTemplateGroupDraft,
   removeDialogProjectSettingsWorldTemplatePlacementDraft,
-  renameDialogProjectSettingsWorldTemplateGroupDraft
+  renameDialogProjectSettingsWorldTemplateGroupDraft,
+  renameDialogProjectSettingsWorldTemplatePlacementNicknameDraft
 } from '../../dialogProjectSettingsWorldTemplateLayoutDraft'
 import {
   buildHeTreeNodesFromWorldTemplateLayoutDraft,
   DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_GROUP_ICON,
   isDialogProjectSettingsWorldTemplateLayoutPersistedId,
   mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey,
-  patchWorldTemplateLayoutDisplayLabelsInHeTreeNodes
+  patchWorldTemplateLayoutDisplayLabelsInHeTreeNodes,
+  resolveDialogProjectSettingsWorldTemplatePlacementEffectiveLabel,
+  resolveDialogProjectSettingsWorldTemplatePlacementUsesNickname
 } from '../dialogProjectSettingsWorldTemplateLayoutTreeData'
 import {
   mapHeTreeNodesToWorldTemplateLayoutDraft,
@@ -65,7 +71,7 @@ test('Test that he-tree mapping round-trips layout draft placements', () => {
       'Creatures'
     ),
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
       documentTemplateId: 'template-a',
       icon: 'mdi-account',
       worldAppendix: 'Hero'
@@ -95,6 +101,9 @@ test('Test that layout DnD rules reject nesting groups and template-on-template 
     id: 'group-a',
     label: 'Creatures',
     nodeKind: 'group' as const,
+    nickname: '',
+    templateDisplayName: '',
+    usesNickname: false,
     worldAppendix: ''
   }
   const templateNode = {
@@ -105,6 +114,9 @@ test('Test that layout DnD rules reject nesting groups and template-on-template 
     id: 'placement-a',
     label: 'Character',
     nodeKind: 'template' as const,
+    nickname: '',
+    templateDisplayName: '',
+    usesNickname: false,
     worldAppendix: ''
   }
   expect(isDialogProjectSettingsWorldTemplateLayoutNodeDraggable(groupNode)).toBe(true)
@@ -146,6 +158,7 @@ test('Test that layout draft helpers map API data and mutate groups or placement
       {
         createdAtMs: 1,
         displayName: 'Character',
+        nickname: '',
         documentCountInWorld: 2,
         documentTemplateId: 'template-a',
         groupId: 'group-a',
@@ -173,7 +186,7 @@ test('Test that layout draft helpers map API data and mutate groups or placement
   expect(layout.groups[0]?.displayName).toBe('Renamed')
 
   layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
-    displayName: 'Character',
+    templateDisplayName: 'Character',
     documentTemplateId: 'template-a',
     icon: 'mdi-account',
     worldAppendix: 'Hero'
@@ -186,7 +199,7 @@ test('Test that layout draft helpers map API data and mutate groups or placement
   layout = appendDialogProjectSettingsWorldTemplateGroupDraft(layout, 'Folder')
   const groupId = layout.groups[0]?.id ?? ''
   layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
-    displayName: 'Character',
+    templateDisplayName: 'Character',
     documentTemplateId: 'template-b',
     icon: 'mdi-account',
     worldAppendix: ''
@@ -243,13 +256,13 @@ test('Test that remove group draft shifts trailing root placements after promoti
   layout = appendDialogProjectSettingsWorldTemplateGroupDraft(layout, 'Creatures')
   const groupId = layout.groups[0]?.id ?? ''
   layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
-    displayName: 'Character',
+    templateDisplayName: 'Character',
     documentTemplateId: 'template-a',
     icon: 'mdi-account',
     worldAppendix: ''
   })
   layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
-    displayName: 'Location',
+    templateDisplayName: 'Location',
     documentTemplateId: 'template-b',
     icon: 'mdi-map',
     worldAppendix: ''
@@ -277,7 +290,7 @@ test('Test that remove group draft shifts trailing root placements after promoti
     })
   }
   layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
-    displayName: 'Item',
+    templateDisplayName: 'Item',
     documentTemplateId: 'template-c',
     icon: 'mdi-cube',
     worldAppendix: ''
@@ -323,6 +336,9 @@ test('Test that he-tree reverse mapping falls back to node fields without prior 
           id: 'new-placement',
           label: 'Character',
           nodeKind: 'template' as const,
+          nickname: '',
+          templateDisplayName: '',
+          usesNickname: false,
           worldAppendix: 'Hero'
         }
       ],
@@ -332,6 +348,9 @@ test('Test that he-tree reverse mapping falls back to node fields without prior 
       id: groupId,
       label: 'Creatures',
       nodeKind: 'group' as const,
+      nickname: '',
+      templateDisplayName: '',
+      usesNickname: false,
       worldAppendix: ''
     },
     {
@@ -342,6 +361,9 @@ test('Test that he-tree reverse mapping falls back to node fields without prior 
       id: 'root-placement',
       label: 'Location',
       nodeKind: 'template' as const,
+      nickname: '',
+      templateDisplayName: '',
+      usesNickname: false,
       worldAppendix: 'Map'
     }
   ]
@@ -366,7 +388,8 @@ test('Test that he-tree mapping nests grouped placements under group nodes', () 
     ],
     placements: [
       {
-        displayName: 'Character',
+        templateDisplayName: 'Character',
+        nickname: '',
         documentCountInWorld: 3,
         documentTemplateId: 'template-a',
         groupId: 'group-a',
@@ -399,7 +422,9 @@ test('Test that he-tree mapping sorts grouped placements by group sort order', (
     ],
     placements: [
       {
-        displayName: 'Second',
+        templateDisplayName: 'Second',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-b',
         groupId: 'group-a',
@@ -410,7 +435,9 @@ test('Test that he-tree mapping sorts grouped placements by group sort order', (
         worldAppendix: ''
       },
       {
-        displayName: 'First',
+        templateDisplayName: 'First',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-a',
         groupId: 'group-a',
@@ -441,7 +468,9 @@ test('Test that layout draft normalize reorders interleaved root rows with null 
     ],
     placements: [
       {
-        displayName: 'Location',
+        templateDisplayName: 'Location',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-a',
         groupId: null,
@@ -452,7 +481,8 @@ test('Test that layout draft normalize reorders interleaved root rows with null 
         worldAppendix: ''
       },
       {
-        displayName: 'Character',
+        templateDisplayName: 'Character',
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-b',
         groupId: 'group-a',
@@ -489,7 +519,9 @@ test('Test that layout draft normalize sorts multiple root groups and grouped pl
     ],
     placements: [
       {
-        displayName: 'Root template',
+        templateDisplayName: 'Root template',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-root',
         groupId: null,
@@ -500,7 +532,9 @@ test('Test that layout draft normalize sorts multiple root groups and grouped pl
         worldAppendix: ''
       },
       {
-        displayName: 'Grouped B',
+        templateDisplayName: 'Grouped B',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-b',
         groupId: 'group-a',
@@ -511,7 +545,9 @@ test('Test that layout draft normalize sorts multiple root groups and grouped pl
         worldAppendix: ''
       },
       {
-        displayName: 'Grouped A',
+        templateDisplayName: 'Grouped A',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-a',
         groupId: 'group-a',
@@ -540,14 +576,15 @@ test('Test that he-tree reverse mapping keeps prior metadata for grouped and roo
       'Creatures'
     ),
     {
-      displayName: 'Location',
+      templateDisplayName: 'Location',
       documentTemplateId: 'template-root',
       icon: 'mdi-map',
       worldAppendix: 'Map'
     }
   )
   const groupedPlacement = {
-    displayName: 'Character',
+    templateDisplayName: 'Character',
+    nickname: '',
     documentCountInWorld: 2,
     documentTemplateId: 'template-a',
     groupId: layout.groups[0]?.id ?? '',
@@ -573,9 +610,9 @@ test('Test that he-tree reverse mapping keeps prior metadata for grouped and roo
     rootTemplateNode.label = 'Changed root label'
   }
   const mapped = mapHeTreeNodesToWorldTemplateLayoutDraft(nodes, layoutWithGrouped)
-  expect(mapped.placements.find((placement) => placement.id === 'placement-grouped')?.displayName)
+  expect(mapped.placements.find((placement) => placement.id === 'placement-grouped')?.templateDisplayName)
     .toBe('Character')
-  expect(mapped.placements.find((placement) => placement.documentTemplateId === 'template-root')?.displayName)
+  expect(mapped.placements.find((placement) => placement.documentTemplateId === 'template-root')?.templateDisplayName)
     .toBe('Location')
 })
 
@@ -588,7 +625,9 @@ test('Test that layout draft normalize preserves group sort order for orphan gro
     groups: [],
     placements: [
       {
-        displayName: 'Orphan grouped',
+        templateDisplayName: 'Orphan grouped',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-a',
         groupId: 'missing-group',
@@ -620,6 +659,9 @@ test('Test that he-tree reverse mapping uses empty template ids when metadata is
           id: 'child-a',
           label: 'Child',
           nodeKind: 'template',
+          nickname: '',
+          templateDisplayName: '',
+          usesNickname: false,
           worldAppendix: ''
         }
       ],
@@ -629,6 +671,9 @@ test('Test that he-tree reverse mapping uses empty template ids when metadata is
       id: 'group-a',
       label: 'Creatures',
       nodeKind: 'group',
+      nickname: '',
+      templateDisplayName: '',
+      usesNickname: false,
       worldAppendix: ''
     }
   ], createEmptyDialogProjectSettingsWorldTemplateLayoutDraft())
@@ -649,6 +694,9 @@ test('Test that he-tree reverse mapping reads root template ids from node data',
       id: 'new-root',
       label: 'Location',
       nodeKind: 'template',
+      nickname: '',
+      templateDisplayName: '',
+      usesNickname: false,
       worldAppendix: 'Map'
     }
   ], createEmptyDialogProjectSettingsWorldTemplateLayoutDraft())
@@ -670,7 +718,9 @@ test('Test that he-tree mapping and normalize handle numeric sort keys end to en
     ],
     placements: [
       {
-        displayName: 'Second root',
+        templateDisplayName: 'Second root',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-b',
         groupId: null,
@@ -681,7 +731,9 @@ test('Test that he-tree mapping and normalize handle numeric sort keys end to en
         worldAppendix: ''
       },
       {
-        displayName: 'First root',
+        templateDisplayName: 'First root',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-a',
         groupId: null,
@@ -692,7 +744,9 @@ test('Test that he-tree mapping and normalize handle numeric sort keys end to en
         worldAppendix: ''
       },
       {
-        displayName: 'Second grouped',
+        templateDisplayName: 'Second grouped',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-d',
         groupId: 'group-a',
@@ -703,7 +757,9 @@ test('Test that he-tree mapping and normalize handle numeric sort keys end to en
         worldAppendix: ''
       },
       {
-        displayName: 'First grouped',
+        templateDisplayName: 'First grouped',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-c',
         groupId: 'group-a',
@@ -743,7 +799,9 @@ test('Test that he-tree mapping accepts null root sort order on unnormalized dra
     groups: [],
     placements: [
       {
-        displayName: 'Root template',
+        templateDisplayName: 'Root template',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-a',
         groupId: null,
@@ -767,7 +825,7 @@ test('Test that layout draft append and rename handle interleaved root rows', ()
   let layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(
     createEmptyDialogProjectSettingsWorldTemplateLayoutDraft(),
     {
-      displayName: 'Location',
+      templateDisplayName: 'Location',
       documentTemplateId: 'template-a',
       icon: 'mdi-map',
       worldAppendix: ''
@@ -782,7 +840,7 @@ test('Test that layout draft append and rename handle interleaved root rows', ()
   expect(layout.groups[0]?.displayName).toBe('Creatures')
 
   layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
-    displayName: 'Character',
+    templateDisplayName: 'Character',
     documentTemplateId: 'template-b',
     icon: 'mdi-account',
     worldAppendix: ''
@@ -802,7 +860,9 @@ test('Test that layout draft append and rename handle interleaved root rows', ()
     placements: [
       ...layout.placements,
       {
-        displayName: 'Item',
+        templateDisplayName: 'Item',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-c',
         groupId: 'group-b',
@@ -828,7 +888,7 @@ test('Test that remove group promotes nested templates to the group root slot', 
   let layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(
     createEmptyDialogProjectSettingsWorldTemplateLayoutDraft(),
     {
-      displayName: 'Root before',
+      templateDisplayName: 'Root before',
       documentTemplateId: 'template-a',
       icon: 'mdi-map',
       worldAppendix: ''
@@ -839,7 +899,7 @@ test('Test that remove group promotes nested templates to the group root slot', 
   expect(layout.groups[0]?.rootSortOrder).toBe(1)
 
   layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
-    displayName: 'Root after',
+    templateDisplayName: 'Root after',
     documentTemplateId: 'template-b',
     icon: 'mdi-map',
     worldAppendix: ''
@@ -850,7 +910,9 @@ test('Test that remove group promotes nested templates to the group root slot', 
     placements: [
       ...layout.placements.filter((placement) => placement.documentTemplateId !== 'template-b'),
       {
-        displayName: 'Nested first',
+        templateDisplayName: 'Nested first',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-c',
         groupId: creaturesGroupId,
@@ -861,7 +923,9 @@ test('Test that remove group promotes nested templates to the group root slot', 
         worldAppendix: ''
       },
       {
-        displayName: 'Nested second',
+        templateDisplayName: 'Nested second',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-d',
         groupId: creaturesGroupId,
@@ -900,6 +964,9 @@ test('Test that layout DnD rules allow drops when drag context is empty', () => 
     id: 'group-a',
     label: 'Creatures',
     nodeKind: 'group' as const,
+    nickname: '',
+    templateDisplayName: '',
+    usesNickname: false,
     worldAppendix: ''
   }
   const templateNode = {
@@ -910,6 +977,9 @@ test('Test that layout DnD rules allow drops when drag context is empty', () => 
     id: 'placement-a',
     label: 'Character',
     nodeKind: 'template' as const,
+    nickname: '',
+    templateDisplayName: '',
+    usesNickname: false,
     worldAppendix: ''
   }
   expect(isDialogProjectSettingsWorldTemplateLayoutRootDroppable({
@@ -939,14 +1009,14 @@ test('Test that append group keeps existing template placements stable', () => {
   let layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(
     createEmptyDialogProjectSettingsWorldTemplateLayoutDraft(),
     {
-      displayName: 'Template A',
+      templateDisplayName: 'Template A',
       documentTemplateId: 'template-a',
       icon: 'mdi-file',
       worldAppendix: ''
     }
   )
   layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
-    displayName: 'Template B',
+    templateDisplayName: 'Template B',
     documentTemplateId: 'template-b',
     icon: 'mdi-file',
     worldAppendix: ''
@@ -976,7 +1046,7 @@ test('Test that append group keeps nested template placements grouped', () => {
     }))
   }
   layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
-    displayName: 'Character',
+    templateDisplayName: 'Character',
     documentTemplateId: 'template-a',
     icon: 'mdi-account',
     worldAppendix: ''
@@ -1007,7 +1077,7 @@ test('Test that append group after reorder and nest keeps template under group',
   let layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(
     createEmptyDialogProjectSettingsWorldTemplateLayoutDraft(),
     {
-      displayName: 'Location',
+      templateDisplayName: 'Location',
       documentTemplateId: 'template-b',
       icon: 'mdi-map',
       worldAppendix: ''
@@ -1031,7 +1101,9 @@ test('Test that append group after reorder and nest keeps template under group',
     placements: [
       ...layout.placements.filter((placement) => placement.documentTemplateId !== 'template-b'),
       {
-        displayName: 'Location',
+        templateDisplayName: 'Location',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-b',
         groupId,
@@ -1068,7 +1140,8 @@ test('Test that grouped-to-root regression detects stale flattened he-tree nodes
     ],
     placements: [
       {
-        displayName: 'Character',
+        templateDisplayName: 'Character',
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-a',
         groupId,
@@ -1089,6 +1162,9 @@ test('Test that grouped-to-root regression detects stale flattened he-tree nodes
       id: 'placement-a',
       label: 'Character',
       nodeKind: 'template' as const,
+      nickname: '',
+      templateDisplayName: '',
+      usesNickname: false,
       worldAppendix: ''
     },
     {
@@ -1099,6 +1175,9 @@ test('Test that grouped-to-root regression detects stale flattened he-tree nodes
       id: groupId,
       label: 'Creatures',
       nodeKind: 'group' as const,
+      nickname: '',
+      templateDisplayName: '',
+      usesNickname: false,
       worldAppendix: ''
     }
   ]
@@ -1135,7 +1214,8 @@ test('Test that he-tree reverse mapping keeps nested template when root ghost pr
     ],
     placements: [
       {
-        displayName: 'Character',
+        templateDisplayName: 'Character',
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-a',
         groupId,
@@ -1146,7 +1226,9 @@ test('Test that he-tree reverse mapping keeps nested template when root ghost pr
         worldAppendix: ''
       },
       {
-        displayName: 'Location',
+        templateDisplayName: 'Location',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-b',
         groupId: null,
@@ -1166,6 +1248,9 @@ test('Test that he-tree reverse mapping keeps nested template when root ghost pr
     id: 'placement-a',
     label: 'Character',
     nodeKind: 'template' as const,
+    nickname: '',
+    templateDisplayName: '',
+    usesNickname: false,
     worldAppendix: ''
   }
   const staleNodes = [
@@ -1181,6 +1266,9 @@ test('Test that he-tree reverse mapping keeps nested template when root ghost pr
       id: groupId,
       label: 'Creatures',
       nodeKind: 'group' as const,
+      nickname: '',
+      templateDisplayName: '',
+      usesNickname: false,
       worldAppendix: ''
     },
     {
@@ -1191,6 +1279,9 @@ test('Test that he-tree reverse mapping keeps nested template when root ghost pr
       id: 'placement-b',
       label: 'Location',
       nodeKind: 'template' as const,
+      nickname: '',
+      templateDisplayName: '',
+      usesNickname: false,
       worldAppendix: ''
     },
     {
@@ -1201,6 +1292,9 @@ test('Test that he-tree reverse mapping keeps nested template when root ghost pr
       id: secondGroupId,
       label: 'New group',
       nodeKind: 'group' as const,
+      nickname: '',
+      templateDisplayName: '',
+      usesNickname: false,
       worldAppendix: ''
     }
   ]
@@ -1226,7 +1320,7 @@ test('Test that he-tree reverse mapping dedupes cloned template nodes', () => {
       'Creatures'
     ),
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
       documentTemplateId: 'template-a',
       icon: 'mdi-account',
       worldAppendix: ''
@@ -1262,6 +1356,9 @@ test('Test that he-tree reverse mapping skips duplicate root template document i
       id: '880e8400-e29b-41d4-a716-446655440001',
       label: 'Character',
       nodeKind: 'template' as const,
+      nickname: '',
+      templateDisplayName: '',
+      usesNickname: false,
       worldAppendix: ''
     },
     {
@@ -1272,6 +1369,9 @@ test('Test that he-tree reverse mapping skips duplicate root template document i
       id: '990e8400-e29b-41d4-a716-446655440002',
       label: 'Character clone',
       nodeKind: 'template' as const,
+      nickname: '',
+      templateDisplayName: '',
+      usesNickname: false,
       worldAppendix: ''
     }
   ]
@@ -1305,6 +1405,9 @@ test('Test that he-tree reverse mapping skips duplicate group child document ids
           id: '880e8400-e29b-41d4-a716-446655440001',
           label: 'Character',
           nodeKind: 'template' as const,
+          nickname: '',
+          templateDisplayName: '',
+          usesNickname: false,
           worldAppendix: ''
         },
         {
@@ -1315,6 +1418,9 @@ test('Test that he-tree reverse mapping skips duplicate group child document ids
           id: '990e8400-e29b-41d4-a716-446655440002',
           label: 'Character clone',
           nodeKind: 'template' as const,
+          nickname: '',
+          templateDisplayName: '',
+          usesNickname: false,
           worldAppendix: ''
         }
       ],
@@ -1324,6 +1430,9 @@ test('Test that he-tree reverse mapping skips duplicate group child document ids
       id: groupId,
       label: 'Creatures',
       nodeKind: 'group' as const,
+      nickname: '',
+      templateDisplayName: '',
+      usesNickname: false,
       worldAppendix: ''
     }
   ]
@@ -1340,7 +1449,7 @@ test('Test that layout draft snapshot mapping ignores display-only placement fie
   const left = appendDialogProjectSettingsWorldTemplatePlacementDraft(
     createEmptyDialogProjectSettingsWorldTemplateLayoutDraft(),
     {
-      displayName: 'Left label',
+      templateDisplayName: 'Left label',
       documentTemplateId: 'template-a',
       icon: 'mdi-file',
       worldAppendix: 'A'
@@ -1408,6 +1517,9 @@ test('Test that he-tree reverse mapping assigns UUIDs to invalid group node ids'
       id: 'he-tree-temp-group-id',
       label: 'Creatures',
       nodeKind: 'group',
+      nickname: '',
+      templateDisplayName: '',
+      usesNickname: false,
       worldAppendix: ''
     }
   ], createEmptyDialogProjectSettingsWorldTemplateLayoutDraft())
@@ -1427,7 +1539,8 @@ test('Test that tree node walk resolves grouped and root template placements', (
   const groupId = layout.groups[0]?.id ?? ''
   layout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId,
@@ -1451,7 +1564,8 @@ test('Test that orphan merge preserves placements whose group id is missing from
   const priorLayout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   priorLayout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: 'missing-group',
@@ -1483,7 +1597,8 @@ test('Test that orphan merge skips placements already mapped or rooted in surviv
   ]
   priorLayout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: 'group-a',
@@ -1494,7 +1609,9 @@ test('Test that orphan merge skips placements already mapped or rooted in surviv
       worldAppendix: ''
     },
     {
-      displayName: 'Root row',
+      templateDisplayName: 'Root row',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-b',
       groupId: null,
@@ -1527,7 +1644,8 @@ test('Test that orphan merge skips placements whose group id still exists in map
   ]
   priorLayout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: 'group-a',
@@ -1552,7 +1670,8 @@ test('Test that orphan merge skips placements when document template id is alrea
   const priorLayout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   priorLayout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: 'missing-group',
@@ -1566,7 +1685,8 @@ test('Test that orphan merge skips placements when document template id is alrea
   const mapped = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   mapped.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -1589,7 +1709,8 @@ test('Test that shouldBlockDialogProjectSettingsWorldTemplateLayoutEmit ignores 
   const priorLayout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   priorLayout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: 'group-a',
@@ -1622,7 +1743,8 @@ test('Test that shouldBlockDialogProjectSettingsWorldTemplateLayoutEmit detects 
   ]
   priorLayout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: '770e8400-e29b-41d4-a716-446655440001',
@@ -1665,7 +1787,8 @@ test('Test that grouped-to-root regression ignores removed placements', () => {
   const priorLayout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   priorLayout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: 'group-a',
@@ -1697,7 +1820,8 @@ test('Test that shouldBlockDialogProjectSettingsWorldTemplateLayoutEmit allows s
   ]
   layout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: '770e8400-e29b-41d4-a716-446655440001',
@@ -1759,6 +1883,9 @@ test('Test that label patch ignores stale he-tree nodes missing from layout draf
         id: 'missing-placement',
         label: 'Stale child',
         nodeKind: 'template',
+        nickname: '',
+        templateDisplayName: '',
+        usesNickname: false,
         worldAppendix: ''
       }
     ],
@@ -1768,6 +1895,9 @@ test('Test that label patch ignores stale he-tree nodes missing from layout draf
     id: 'missing-group',
     label: 'Stale group',
     nodeKind: 'group',
+    nickname: '',
+    templateDisplayName: '',
+    usesNickname: false,
     worldAppendix: ''
   }
   const staleRootTemplate: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
@@ -1778,6 +1908,9 @@ test('Test that label patch ignores stale he-tree nodes missing from layout draf
     id: 'missing-root-placement',
     label: 'Stale root template',
     nodeKind: 'template',
+    nickname: '',
+    templateDisplayName: '',
+    usesNickname: false,
     worldAppendix: ''
   }
   patchWorldTemplateLayoutDisplayLabelsInHeTreeNodes(
@@ -1803,7 +1936,8 @@ test('Test that label patch updates grouped template rows in existing he-tree no
   ]
   layout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+      nickname: '',
       documentCountInWorld: 2,
       documentTemplateId: 'template-a',
       groupId: '770e8400-e29b-41d4-a716-446655440001',
@@ -1815,9 +1949,158 @@ test('Test that label patch updates grouped template rows in existing he-tree no
     }
   ]
   const treeNodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout)
-  layout.placements[0]!.displayName = 'Hero'
+  layout.placements[0]!.templateDisplayName = 'Hero'
   layout.placements[0]!.worldAppendix = ' of Myth'
   patchWorldTemplateLayoutDisplayLabelsInHeTreeNodes(treeNodes, layout)
   expect(treeNodes[0]?.children[0]?.label).toBe('Hero')
   expect(treeNodes[0]?.children[0]?.worldAppendix).toBe(' of Myth')
+})
+
+test('Test that placement label helpers resolve nickname and canonical fallback', () => {
+  expect(resolveDialogProjectSettingsWorldTemplatePlacementUsesNickname('  Hero  ')).toBe(true)
+  expect(resolveDialogProjectSettingsWorldTemplatePlacementUsesNickname('   ')).toBe(false)
+  expect(resolveDialogProjectSettingsWorldTemplatePlacementEffectiveLabel({
+    nickname: '  Hero  ',
+    templateDisplayName: 'Character'
+  })).toBe('Hero')
+  expect(resolveDialogProjectSettingsWorldTemplatePlacementEffectiveLabel({
+    nickname: '',
+    templateDisplayName: 'Character'
+  })).toBe('Character')
+})
+
+test('Test that he-tree nodes use nickname label and accent flag when nickname is set', () => {
+  const layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
+  layout.placements = [
+    {
+      templateDisplayName: 'Character',
+      nickname: 'Hero',
+      documentCountInWorld: 0,
+      documentTemplateId: 'template-a',
+      groupId: null,
+      groupSortOrder: null,
+      icon: 'mdi-account',
+      id: 'placement-a',
+      rootSortOrder: 0,
+      worldAppendix: ''
+    }
+  ]
+  const nodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout)
+  expect(nodes[0]?.label).toBe('Hero')
+  expect(nodes[0]?.usesNickname).toBe(true)
+  expect(nodes[0]?.templateDisplayName).toBe('Character')
+})
+
+test('Test that patchWorldTemplateLayoutDisplayLabelsInHeTreeNodes skips unknown placement ids', () => {
+  const layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
+  layout.groups = [
+    {
+      displayName: 'Creatures',
+      id: 'group-a',
+      rootSortOrder: 0
+    }
+  ]
+  const treeNodes: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode[] = [
+    {
+      children: [
+        {
+          children: [],
+          documentCountInWorld: 0,
+          documentTemplateId: 'template-a',
+          icon: 'mdi-account',
+          id: 'missing-placement',
+          label: 'Stale',
+          nickname: '',
+          nodeKind: 'template',
+          templateDisplayName: 'Stale',
+          usesNickname: false,
+          worldAppendix: ''
+        }
+      ],
+      documentCountInWorld: 0,
+      documentTemplateId: null,
+      icon: DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_GROUP_ICON,
+      id: 'group-a',
+      label: 'Creatures',
+      nickname: '',
+      nodeKind: 'group',
+      templateDisplayName: '',
+      usesNickname: false,
+      worldAppendix: ''
+    },
+    {
+      children: [],
+      documentCountInWorld: 0,
+      documentTemplateId: 'template-b',
+      icon: 'mdi-map',
+      id: 'missing-root-placement',
+      label: 'Stale root',
+      nickname: '',
+      nodeKind: 'template',
+      templateDisplayName: 'Stale root',
+      usesNickname: false,
+      worldAppendix: ''
+    }
+  ]
+  patchWorldTemplateLayoutDisplayLabelsInHeTreeNodes(treeNodes, layout)
+  expect(treeNodes[0]?.children[0]?.label).toBe('Stale')
+  expect(treeNodes[1]?.label).toBe('Stale root')
+})
+
+test('Test that he-tree mapping reads legacy placement displayName when templateDisplayName is absent', () => {
+  const layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
+  layout.placements = [
+    {
+      displayName: 'Legacy name',
+      documentCountInWorld: 0,
+      documentTemplateId: 'template-a',
+      groupId: null,
+      groupSortOrder: null,
+      icon: 'mdi-account',
+      id: 'placement-a',
+      rootSortOrder: 0,
+      worldAppendix: ''
+    } as unknown as I_dialogProjectSettingsWorldTemplatePlacementDraft
+  ]
+  const nodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout)
+  expect(nodes[0]?.label).toBe('Legacy name')
+  expect(nodes[0]?.templateDisplayName).toBe('Legacy name')
+})
+
+test('Test that renameDialogProjectSettingsWorldTemplatePlacementNicknameDraft updates one placement', () => {
+  const layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(
+    createEmptyDialogProjectSettingsWorldTemplateLayoutDraft(),
+    {
+      templateDisplayName: 'Character',
+      documentTemplateId: 'template-a',
+      icon: 'mdi-account',
+      worldAppendix: ''
+    }
+  )
+  const renamed = renameDialogProjectSettingsWorldTemplatePlacementNicknameDraft(
+    layout,
+    layout.placements[0]!.id,
+    'Hero'
+  )
+  expect(renamed.placements[0]?.nickname).toBe('Hero')
+  expect(layout.placements[0]?.nickname).toBe('')
+})
+
+test('Test that he-tree mapping uses empty label when placement names are missing', () => {
+  const layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
+  layout.placements = [
+    {
+      documentCountInWorld: 0,
+      documentTemplateId: 'template-a',
+      groupId: null,
+      groupSortOrder: null,
+      icon: 'mdi-account',
+      id: 'placement-a',
+      rootSortOrder: 0,
+      worldAppendix: ''
+    } as unknown as I_dialogProjectSettingsWorldTemplatePlacementDraft
+  ]
+  const nodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout)
+  expect(nodes[0]?.label).toBe('')
+  expect(nodes[0]?.templateDisplayName).toBe('')
 })

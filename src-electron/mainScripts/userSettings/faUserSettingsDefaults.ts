@@ -35,6 +35,7 @@ export const FA_USER_SETTINGS_DEFAULTS: I_faUserSettings = {
   invertTreeSorting: false,
   languageCode: 'en-US',
   limitEditorHeight: false,
+  logFullActivityPayload: false,
   noProjectName: false,
   noTags: false,
   preventAutoScroll: false,

@@ -13,23 +13,24 @@ import {
 import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
 
 type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuComputedState = {
+  canonicalNameTestLocator: ComputedRef<string | undefined>
   contextMenuTestLocator: ComputedRef<string | undefined>
   renameHasError: ComputedRef<boolean>
   renameInputTestLocator: ComputedRef<string | undefined>
   renameMenuErrorMessage: ComputedRef<string | undefined>
   renameMenuOpen: WritableComputedRef<boolean>
   renameMenuTargetKey: ComputedRef<string | null>
+  showTemplateCanonicalName: ComputedRef<boolean>
   supportsRenameMenu: ComputedRef<boolean>
+  templateCanonicalName: ComputedRef<string>
 }
 
 export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuComputedState (deps: {
   getNode: () => I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
   isGroupNameInvalid: (displayName: string) => boolean
-  isTemplateNameInvalid: (displayName: string) => boolean
   openRenameMenuTarget: Ref<string | null>
   renameDraft: Ref<string>
   translateGroupNameErrorRequired: () => string
-  translateTemplateNameErrorRequired: () => string
 }): T_dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuComputedState {
   const renameMenuTargetKey = computed(() => {
     const nodeKind = resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKind(deps.getNode())
@@ -77,12 +78,28 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
       .renameInputTestLocator
   })
 
+  const canonicalNameTestLocator = computed(() => {
+    const nodeKind = resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKind(deps.getNode())
+    return resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTestLocators(nodeKind)
+      .canonicalNameTestLocator
+  })
+
+  const showTemplateCanonicalName = computed(() => {
+    return resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKind(deps.getNode()) === 'template'
+  })
+
+  const templateCanonicalName = computed(() => {
+    if (!showTemplateCanonicalName.value) {
+      return ''
+    }
+    return deps.getNode().templateDisplayName
+  })
+
   const renameHasError = computed(() => {
     const nodeKind = resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKind(deps.getNode())
     return resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuHasError({
       displayName: deps.renameDraft.value,
       isGroupNameInvalid: deps.isGroupNameInvalid,
-      isTemplateNameInvalid: deps.isTemplateNameInvalid,
       nodeKind
     })
   })
@@ -92,28 +109,21 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
     return resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuValidationErrorMessage({
       displayName: deps.renameDraft.value,
       isGroupNameInvalid: deps.isGroupNameInvalid,
-      isTemplateNameInvalid: deps.isTemplateNameInvalid,
       nodeKind,
-      translateGroupNameErrorRequired: deps.translateGroupNameErrorRequired,
-      translateTemplateNameErrorRequired: deps.translateTemplateNameErrorRequired
+      translateGroupNameErrorRequired: deps.translateGroupNameErrorRequired
     })
   })
 
-  const contextMenuTestLocatorBinding = contextMenuTestLocator
-  const renameHasErrorBinding = renameHasError
-  const renameInputTestLocatorBinding = renameInputTestLocator
-  const renameMenuErrorMessageBinding = renameMenuErrorMessage
-  const renameMenuOpenBinding = renameMenuOpen
-  const renameMenuTargetKeyBinding = renameMenuTargetKey
-  const supportsRenameMenuBinding = supportsRenameMenu
-
   return {
-    contextMenuTestLocator: contextMenuTestLocatorBinding,
-    renameHasError: renameHasErrorBinding,
-    renameInputTestLocator: renameInputTestLocatorBinding,
-    renameMenuErrorMessage: renameMenuErrorMessageBinding,
-    renameMenuOpen: renameMenuOpenBinding,
-    renameMenuTargetKey: renameMenuTargetKeyBinding,
-    supportsRenameMenu: supportsRenameMenuBinding
+    canonicalNameTestLocator,
+    contextMenuTestLocator,
+    renameHasError,
+    renameInputTestLocator,
+    renameMenuErrorMessage,
+    renameMenuOpen,
+    renameMenuTargetKey,
+    showTemplateCanonicalName,
+    supportsRenameMenu,
+    templateCanonicalName
   }
 }

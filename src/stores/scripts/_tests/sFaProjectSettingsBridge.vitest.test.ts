@@ -161,7 +161,7 @@ test('Test that faProjectSettingsFetchFreshForDialog throws when bridge is missi
 
 /**
  * faProjectSettingsPersistPatchFromStore
- * Persists patch, read-backs, propagates consumers, and emits success notify.
+ * Persists patch, read-backs, and propagates consumers without emitting success notify.
  */
 test('Test that faProjectSettingsPersistPatchFromStore saves and propagates on matching read-back', async () => {
   const applyRoot = vi.fn()
@@ -184,11 +184,7 @@ test('Test that faProjectSettingsPersistPatchFromStore saves and propagates on m
     projectName: 'Saved Name',
     schemaVersion: 1
   })
-  expect(notifyCreateMock).toHaveBeenCalledWith({
-    group: false,
-    message: 'globalFunctionality.faProjectSettings.saveSuccess',
-    type: 'positive'
-  })
+  expect(notifyCreateMock).not.toHaveBeenCalled()
 })
 
 /**

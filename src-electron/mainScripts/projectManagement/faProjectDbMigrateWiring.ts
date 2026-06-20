@@ -6,20 +6,22 @@ import {
   applyFaProjectProjectDataSchemaV1,
   applyFaProjectWorldTemplateLayoutSchemaV6,
   FA_PROJECT_DATA_TABLE_NAME,
-  FA_PROJECT_TABLE_WORLD_DOCUMENT_TEMPLATES
+  FA_PROJECT_TABLE_WORLD_DOCUMENT_TEMPLATES,
+  FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
 } from './functions/faProjectDbSchemaDdl'
 import { migrateFaProjectSchemaV1ToV2 } from './functions/faProjectDbMigrateV1ToV2'
 import { migrateFaProjectSchemaV2ToV3 } from './functions/faProjectDbMigrateV2ToV3'
 import { migrateFaProjectSchemaV3ToV4 } from './functions/faProjectDbMigrateV3ToV4'
 import { migrateFaProjectSchemaV4ToV5 } from './functions/faProjectDbMigrateV4ToV5'
 import { migrateFaProjectSchemaV5ToV6 } from './functions/faProjectDbMigrateV5ToV6'
+import { migrateFaProjectSchemaV6ToV7 } from './functions/faProjectDbMigrateV6ToV7'
 import { seedFaProjectDefaultWorldIfEmpty } from './projectDbContent/faProjectWorldBootstrapWiring'
 
 const OPTION_PROJECT_NAME = 'project_name'
 const OPTION_PROJECT_UUID = 'project_uuid'
 
-/** Current schema revision: content tables at user_version 6 (world template layout). */
-export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 6
+/** Current schema revision: content tables at user_version 7 (placement nicknames). */
+export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 7
 
 function sqlSelectValueFromActiveTable (): string {
   return `SELECT option_value AS v FROM ${FA_PROJECT_DATA_TABLE_NAME} WHERE option_name = ?`
@@ -31,7 +33,7 @@ function readUserVersion (db: Database): number {
   return Number.isFinite(current) ? current : 0
 }
 
-function bootstrapFaProjectSchemaV0ToV1 (
+function bootstrapFaProjectSchemaFresh (
   db: Database,
   displayProjectName: string
 ): void {
@@ -46,7 +48,7 @@ function bootstrapFaProjectSchemaV0ToV1 (
         '(option_name, option_value) VALUES (?, ?)'
     ).run(OPTION_PROJECT_UUID, uuidv4())
     applyFaProjectContentSchemaV1(db)
-    db.pragma('user_version = 1')
+    db.pragma(`user_version = ${FA_PROJECT_USER_VERSION_SUPPORTED_MAX}`)
   })
   runBootstrap()
 }
@@ -70,7 +72,8 @@ function verifyFaProjectMetadataAfterBootstrap (db: Database, displayProjectName
 
 /**
  * Applies SQLite migrations up to the latest supported schema.
- * Fresh files start at user_version 0, bootstrap v1, migrate through v6, seed default world.
+ * Fresh files bootstrap directly to the current revision, then seed the default world.
+ * Older files migrate stepwise from their stored user_version.
  */
 export function applyFaProjectMigrations (
   db: Database,
@@ -85,9 +88,10 @@ export function applyFaProjectMigrations (
   }
 
   if (startVer === 0) {
-    bootstrapFaProjectSchemaV0ToV1(db, displayProjectName)
+    bootstrapFaProjectSchemaFresh(db, displayProjectName)
     verifyFaProjectMetadataAfterBootstrap(db, displayProjectName)
     seedFaProjectDefaultWorldIfEmpty(db, displayProjectName)
+    return
   }
 
   const afterBootstrapVer = readUserVersion(db)
@@ -132,6 +136,16 @@ export function applyFaProjectMigrations (
       })
     })
     runV5ToV6()
+  }
+
+  const afterV6Ver = readUserVersion(db)
+  if (afterV6Ver === 6 && FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 7) {
+    const runV6ToV7 = db.transaction(() => {
+      migrateFaProjectSchemaV6ToV7(db, {
+        worldTemplatePlacementsTableName: FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
+      })
+    })
+    runV6ToV7()
   }
 
   const finalVer = readUserVersion(db)

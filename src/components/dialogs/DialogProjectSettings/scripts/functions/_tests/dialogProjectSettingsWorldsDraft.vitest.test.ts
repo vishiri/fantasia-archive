@@ -403,7 +403,9 @@ test('Test that template layout validation rejects duplicate document template p
     groups: [],
     placements: [
       {
-        displayName: 'Character',
+        templateDisplayName: 'Character',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-a',
         groupId: null,
@@ -414,7 +416,9 @@ test('Test that template layout validation rejects duplicate document template p
         worldAppendix: ''
       },
       {
-        displayName: 'Character copy',
+        templateDisplayName: 'Character copy',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-a',
         groupId: null,
@@ -458,7 +462,9 @@ test('Test that template layout validation rejects invalid document template pla
     groups: [],
     placements: [
       {
-        displayName: 'Character',
+        templateDisplayName: 'Character',
+
+        nickname: '',
         documentCountInWorld: 0,
         documentTemplateId: 'template-a',
         groupId: null,
@@ -529,7 +535,9 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot maps template layout ro
         ],
         placements: [
           {
-            displayName: 'Character',
+            templateDisplayName: 'Character',
+
+            nickname: '',
             documentCountInWorld: 0,
             documentTemplateId: 'template-a',
             groupId: 'group-a',
@@ -560,6 +568,7 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot maps template layout ro
             groupId: 'group-a',
             groupSortOrder: 0,
             id: 'placement-a',
+            nickname: '',
             rootSortOrder: null
           }
         ]

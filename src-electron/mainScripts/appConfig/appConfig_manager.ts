@@ -11,6 +11,8 @@ export {
 
 export {
   installFaAppConfigE2ePathOverrideGlobals,
+  stageFaAppConfigE2eExportPath,
+  stageFaAppConfigE2eImportPath,
   takeNextE2eAppConfigExportPath,
   takeNextE2eAppConfigImportPath
 } from './faAppConfigE2ePathOverrideWiring'

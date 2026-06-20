@@ -25,6 +25,9 @@ export const FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_MAX_LENGTH = 500
 /** Max stored length for document_templates.icon (icon name string). */
 export const FA_PROJECT_DOCUMENT_TEMPLATE_ICON_MAX_LENGTH = 128
 
+/** Max stored length for world_template_placements.nickname (matches FA_PROJECT_NAME_MAX_LEN). */
+export const FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_NICKNAME_MAX_LENGTH = 120
+
 /** Default document_templates.world_appendix when inserting without an override. */
 export const FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_WORLD_APPENDIX = ''
 
@@ -53,6 +56,8 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS} (
   group_id TEXT REFERENCES ${FA_PROJECT_TABLE_WORLD_TEMPLATE_GROUPS}(id) ON DELETE SET NULL,
   root_sort_order INTEGER,
   group_sort_order INTEGER,
+  nickname TEXT NOT NULL DEFAULT ''
+  CHECK (length(nickname) <= ${FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_NICKNAME_MAX_LENGTH}),
   created_at_ms INTEGER NOT NULL,
   updated_at_ms INTEGER NOT NULL,
   UNIQUE (world_id, document_template_id),
@@ -98,6 +103,8 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_WORLDS} (
   display_name TEXT NOT NULL CHECK (length(display_name) > 0),
   color TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_DEFAULT_COLOR}'
   CHECK (length(color) = 7 AND substr(color, 1, 1) = '#'),
+  color_pallete TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_DEFAULT_COLOR_PALETTE}'
+  CHECK (length(color_pallete) <= ${FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH}),
   sort_order INTEGER NOT NULL DEFAULT 0,
   created_at_ms INTEGER NOT NULL,
   updated_at_ms INTEGER NOT NULL

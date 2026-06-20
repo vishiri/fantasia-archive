@@ -66,7 +66,9 @@ export const FA_APP_CONFIG_IPC = {
   exportToFileAsync: 'fa-app-config-export-to-file-async',
   prepareImportAsync: 'fa-app-config-prepare-import-async',
   applyImportAsync: 'fa-app-config-apply-import-async',
-  disposeImportSessionAsync: 'fa-app-config-dispose-import-session-async'
+  disposeImportSessionAsync: 'fa-app-config-dispose-import-session-async',
+  stageE2eNextExportPathAsync: 'fa-app-config-stage-e2e-next-export-path-async',
+  stageE2eNextImportPathAsync: 'fa-app-config-stage-e2e-next-import-path-async'
 } as const
 
 /** Project database (.faproject) — async invoke/handle. */
@@ -84,7 +86,11 @@ export const FA_PROJECT_MANAGEMENT_IPC = {
   setProjectSettingsPatchAsync:
     'fa-project-management-set-project-settings-patch-async',
   setProjectStylingPatchAsync:
-    'fa-project-management-set-project-styling-patch-async'
+    'fa-project-management-set-project-styling-patch-async',
+  stageE2eNextProjectCreatePathAsync:
+    'fa-project-management-stage-e2e-next-project-create-path-async',
+  stageE2eNextProjectOpenPathAsync:
+    'fa-project-management-stage-e2e-next-project-open-path-async'
 } as const
 
 /** Active '.faproject' worldbuilding content tables — async invoke/handle. */

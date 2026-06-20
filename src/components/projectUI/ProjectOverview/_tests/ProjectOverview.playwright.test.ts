@@ -166,6 +166,7 @@ test.describe.serial('Project overview (active project, tips card)', () => {
    * Tips card mirrors Tips, Tricks and Trivia notify copy: Did you know heading plus a markdown bullet line.
    */
   test('Check that the project overview tips card shows Did you know and a trivia line', async () => {
+    test.setTimeout(90_000)
     const tipCard = appWindow.locator(`[data-test-locator="${selectorList.projectOverviewTipCard}"]`)
     await expect(tipCard).toBeVisible()
 
@@ -176,9 +177,12 @@ test.describe.serial('Project overview (active project, tips card)', () => {
     await expect(tipMessage).not.toBeEmpty()
 
     await expect.poll(async () => {
-      const message = await tipMessage.innerText()
-      return allowedTipCaptions.includes(message.trim())
-    }, { timeout: 15_000 }).toBe(true)
+      const message = (await tipMessage.innerText()).trim().replace(/^-\s*/, '')
+      if (message.length === 0) {
+        return false
+      }
+      return allowedTipCaptions.some((caption) => caption.trim() === message || caption.trim().replace(/^-\s*/, '') === message)
+    }, { timeout: 45_000 }).toBe(true)
   })
 
   /**

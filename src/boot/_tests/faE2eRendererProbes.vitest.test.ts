@@ -21,7 +21,7 @@ afterEach(() => {
 
 /**
  * faE2eRendererProbes boot
- * Registers the active-project probe only in Electron when cached TEST_ENV is 'e2e'.
+ * Registers the active-project probe only in Electron when TEST_ENV is 'e2e'.
  */
 test('Test that faE2eRendererProbes boot installs probe when TEST_ENV is e2e', async () => {
   vi.stubEnv('MODE', 'electron')
@@ -37,13 +37,44 @@ test('Test that faE2eRendererProbes boot installs probe when TEST_ENV is e2e', a
     value: {
       faContentBridgeAPIs: {
         extraEnvVariables: {
-          getCachedSnapshot
+          getCachedSnapshot,
+          getSnapshot: vi.fn()
         }
       }
     } as unknown as Window & typeof globalThis
   })
   const boot = faE2eRendererProbesBoot as unknown as () => Promise<void>
   await boot()
+  expect(registerFaE2eActiveProjectSnapshotProbeMock).toHaveBeenCalledOnce()
+})
+
+/**
+ * faE2eRendererProbes boot
+ * Awaits getSnapshot when the preload cache is still empty at boot time.
+ */
+test('Test that faE2eRendererProbes boot awaits getSnapshot when cache is empty', async () => {
+  vi.stubEnv('MODE', 'electron')
+  const getSnapshot = vi.fn(async () => ({
+    COMPONENT_NAME: '',
+    COMPONENT_PROPS: false,
+    ELECTRON_MAIN_FILEPATH: '/x',
+    FA_FRONTEND_RENDER_TIMER: 0,
+    TEST_ENV: 'e2e'
+  }))
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        extraEnvVariables: {
+          getCachedSnapshot: vi.fn(() => null),
+          getSnapshot
+        }
+      }
+    } as unknown as Window & typeof globalThis
+  })
+  const boot = faE2eRendererProbesBoot as unknown as () => Promise<void>
+  await boot()
+  expect(getSnapshot).toHaveBeenCalledOnce()
   expect(registerFaE2eActiveProjectSnapshotProbeMock).toHaveBeenCalledOnce()
 })
 
@@ -73,7 +104,8 @@ test('Test that faE2eRendererProbes boot skips probe when TEST_ENV is not e2e', 
             ELECTRON_MAIN_FILEPATH: '/x',
             FA_FRONTEND_RENDER_TIMER: 0,
             TEST_ENV: 'components'
-          }))
+          })),
+          getSnapshot: vi.fn()
         }
       }
     } as unknown as Window & typeof globalThis
@@ -100,7 +132,8 @@ test('Test that faE2eRendererProbes boot skips probe when TEST_ENV is not a stri
             ELECTRON_MAIN_FILEPATH: '/x',
             FA_FRONTEND_RENDER_TIMER: 0,
             TEST_ENV: false
-          }))
+          })),
+          getSnapshot: vi.fn()
         }
       }
     } as unknown as Window & typeof globalThis
