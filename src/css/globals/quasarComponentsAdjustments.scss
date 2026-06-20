@@ -162,7 +162,7 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 }
 
 .q-item {
-  padding: 14px 16px;
+  padding: $qItem-padding;
 }
 
 .q-layout {
@@ -425,7 +425,7 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 }
 
 div + .q-notification__caption {
-  margin-top: 4px;
+  margin-top: $qNotification-captionSibling-marginTop;
 }
 
 .q-page {

@@ -1,0 +1,87 @@
+---
+description: >-
+  After last substantive code edit in a turn, run yarn testbatch:verify before
+  any done summary; then yarn quasar:dev:electron compile smoke. Mandatory
+  end-of-edits gate — slice checks do not substitute.
+alwaysApply: true
+---
+
+# Post-implementation agent gates
+
+## When this fires
+
+**End of code edits** — any turn where agent changed compile-touching sources (`src/`, `src-electron/`, `types/`, `i18n/`, `helpers/` non-Playwright, configs, `.storybook-workspace/`, tests).
+
+| Trigger | Action |
+| --- | --- |
+| Last file edit in turn (or batch) done | Run gates below **before** user-facing “done” / “shipped” / “fixed” summary |
+| Follow-up edit after prior green verify | Prior verify **void** — re-run step 1 on **current** tree |
+| User asks question only, no edits | Skip |
+| Changelog-only / docs-only, no compile sources | Skip |
+
+**Hard rule:** **`yarn testbatch:verify`** must be a **Shell tool invocation on current tree** after the **last** substantive edit and **before** telling user work is finished. Not optional. Not deferred to commit/final-cleanup only.
+
+**Not** UI test, Playwright, E2E, Storybook, or in-app clicking. **Not** substitute for same gate before commit ([git-conventional-commits.mdc](git-conventional-commits.mdc)) — re-run if tree changed after this pass.
+
+## Mandatory order (two terminals)
+
+Run **in order**. **Do not** chain in one shell line ([testing-terminal-isolation.mdc](testing-terminal-isolation.mdc)).
+
+### 1. Quality gate — `yarn testbatch:verify`
+
+- **Dedicated terminal** — one invocation; stops on first failure.
+- **Timing:** run **immediately after** last code edit; **do not** interleave more edits between verify and done summary.
+- Includes full-repo **`yarn lint:eslint`** (**`max-lines`**, **`max-lines-per-function`**, all ESLint rules), **`yarn lint:typescript`**, **`yarn lint:stylelint`**, **`yarn test:coverage:verify`**.
+- On failure → fix sources; re-run **step 1** until green on current tree.
+- **Mid-task debug:** narrow slices OK **only while still editing**; **step 1 still required** once edit batch ends.
+
+### 2. Dev Electron compile check
+
+1. **Dedicated terminal** — separate from step 1.
+2. **Already running?** — scan **`terminals/`** for active **`yarn quasar:dev:electron`** / **`quasar dev -m electron`**. If yes: wait **~5s** after last edit for HMR recompile; read that terminal output. **Do not** spawn second dev (port lock).
+3. **Not running** — start **`yarn quasar:dev:electron`** in background; wait **~5s** for initial Vite + Quasar + **`vite-plugin-checker`** pass.
+4. **Read output** — treat as failure if any of:
+   - **`[sass] Error`**, **`Undefined variable`**
+   - **`[vite]`** internal server error / failed to compile
+   - TypeScript overlay errors in dev log
+   - **`ELIFECYCLE`**, non-zero exit before intentional stop
+5. **Agent-spawned dev only** — stop process after check (kill / Ctrl+C). Do not leave verification dev running.
+6. **On failure** — fix sources; repeat **step 1** then **step 2** until both clean.
+7. **On success** — report done. No further dev interaction.
+
+## Does **not** satisfy step 1
+
+These are **debug-only** while iterating — **never** replace **`yarn testbatch:verify`** at end of edits:
+
+| Substitute | Why insufficient |
+| --- | --- |
+| **`yarn eslint <one file>`** | Misses other files, rules, repo paths |
+| **`vitest run <one spec>`** | No ESLint, types, stylelint, full coverage tiers |
+| **`yarn lint:stylelint`** on subset | No ESLint **`max-lines`**, types, unit coverage |
+| **`yarn test:unit`** | No coverage verify thresholds |
+| **`vite-plugin-checker`** in dev | Async HMR; not full **`eslint .`**; can lag behind edits |
+| Earlier green verify + new edits since | Stale — must re-run on current tree |
+| “Will run at commit” | Gate belongs **end of edit batch**, not only commit |
+
+## Done summary requirements
+
+Before user-facing completion message on substantive work:
+
+1. Step 1 **ran** on current tree (or report fail + what blocked).
+2. Step 2 **ran** (or report fail).
+3. State **pass/fail** for verify (and dev compile if relevant). Do not imply green from slice checks alone.
+
+## Why lint / gate errors slip through
+
+| Cause | Detail |
+| --- | --- |
+| **Skipped end-of-edits verify** | Agent reported done after edits without Shell **`yarn testbatch:verify`** on final tree. |
+| **Stale verify** | Gate passed mid-batch; more edits stacked (UI polish, i18n, styles) without re-run. |
+| **Narrow checks as gate** | Single-file ESLint / Vitest / Stylelint substituted for full **`testbatch:verify`**. |
+| **Dev checker ≠ gate** | **`vite-plugin-checker`** during **`quasar dev`** helps but is not **`yarn lint:eslint`** over full repo. |
+| **HMR lag** | Long-running dev shows stale compile until recompile. |
+| **CI vs local** | GitHub **Verify** runs **`testbatch:verify`** on push/PR — local agent must match before done or commit. |
+
+## Scope
+
+Step 1 = lint, types, style, unit coverage. Step 2 = compile / bundle / dev-server health only. Passing both does not mean Playwright, Storybook VRT, or UX verified.

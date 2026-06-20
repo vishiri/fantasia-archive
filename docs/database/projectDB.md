@@ -1,10 +1,10 @@
 # `.faproject` SQLite schema and APIs
 
-Each user project is a single SQLite database file with the **`.faproject`** extension. The main process opens it with **`better-sqlite3`**, applies migrations, and serves the renderer through preload IPC. This document is the canonical schema and module map.
+User project = single SQLite **`.faproject`**. Main opens **`better-sqlite3`**, runs migrations, serves renderer via preload IPC. Canonical schema + module map.
 
 ## Naming: `documents` table vs UI markdown documents
 
-The SQLite table **`documents`** stores **worldbuilding document entities** (rows tied to a **world** and optional **template**). It is **not** the same as in-app help or license **markdown** loaded from **`i18n/.../documents/*.md`** or **`T_documentName`** dialog routing. When adding features, keep SQL/table copy separate from markdown dialog naming.
+SQLite **`documents`** = worldbuilding entities (world + optional template). ≠ help/license **markdown** from **`i18n/.../documents/*.md`** or **`T_documentName`** dialogs. Keep SQL/table copy separate from markdown dialog naming.
 
 ## Schema version (`PRAGMA user_version`)
 
@@ -17,18 +17,19 @@ The SQLite table **`documents`** stores **worldbuilding document entities** (row
 | **4** | Adds **`worlds.color_pallete`** — semicolon-separated **`#RRGGBB`** hex list (max **2000** chars; default empty). |
 | **5** | Adds **`document_templates.sort_order`**, **`world_appendix`** (max **500** chars), and **`icon`** (max **128** chars). |
 | **6** | Replaces **`world_document_templates`** with **`world_template_groups`** and **`world_template_placements`** for per-world template layout (groups + ordered placements). |
+| **7** | Adds **`world_template_placements.nickname`** — optional per-world placement label override (empty = use joined document template name). |
 
-**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 6`** in **`faProjectDbMigrateWiring.ts`**.
+**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 7`** in **`faProjectDbMigrateWiring.ts`**.
 
-**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v1**, run **v1→v2** (drop **`world_media`**), **v2→v3** (ensure legacy **`world_document_templates`** when upgrading old files), **v3→v4** (add **`worlds.color_pallete`**), **v4→v5** (add **`document_templates`** list/detail columns), **v5→v6** (migrate junction rows to root placements, drop **`world_document_templates`**, create layout tables), seed a default **world** when empty, then stop at **v6**. Files already at **6** are a no-op. Other versions throw until a forward migration is added.
+**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v1**, run **v1→v2** (drop **`world_media`**), **v2→v3** (ensure legacy **`world_document_templates`** when upgrading old files), **v3→v4** (add **`worlds.color_pallete`**), **v4→v5** (add **`document_templates`** list/detail columns), **v5→v6** (migrate junction rows to root placements, drop **`world_document_templates`**, create layout tables), **v6→v7** (add **`world_template_placements.nickname`**), seed a default **world** when empty, then stop at **v7**. Files already at **7** are a no-op. Other versions throw until a forward migration is added.
 
 **Worlds vs document templates on create:** **`seedFaProjectDefaultWorldIfEmpty`** runs after migrations and inserts one default **world** when the table is empty. **Document templates are never auto-seeded** — a new **`.faproject`** may have zero **`document_templates`** rows until the user adds them in **Project Settings**.
 
 **DDL source:** **`src-electron/mainScripts/projectManagement/functions/faProjectDbSchemaDdl.ts`** (**`applyFaProjectProjectDataSchemaV1`**, **`applyFaProjectContentSchemaV1`**).
 
-**Pre-release flatten:** During dev, schema versions may be squashed back to **1** with no upgrade path for older local files — see **`.cursor/skills/fantasia-flatten-database-schemas/SKILL.md`**.
+**Pre-release flatten:** Dev may squash schema versions back to **1**; no upgrade for older local files — **`.cursor/skills/fantasia-flatten-database-schemas/SKILL.md`**.
 
-**Product ↔ SQL naming:** UI “world name” / “template name” map to **`display_name`** on **`worlds`** and **`document_templates`**. Per-world template layout (groups and ordered template placements) lives in **`world_template_groups`** and **`world_template_placements`**; each template appears at most once per world. **Project Settings** enforces that invariant in the client before save (duplicate **`document_template_id`** placements block **Save settings** with validation chrome).
+**Product ↔ SQL naming:** UI “world name” / “template name” → **`display_name`** on **`worlds`** / **`document_templates`**. Per-world template layout in **`world_template_groups`** + **`world_template_placements`**; each template at most once per world. **Project Settings** enforces invariant client-side before save (duplicate **`document_template_id`** placements block **Save settings** with validation chrome).
 
 ## Table: `project_data` (key–value)
 
@@ -45,7 +46,7 @@ The SQLite table **`documents`** stores **worldbuilding document entities** (row
 
 ## Content tables (schema version 1)
 
-Primary keys are **TEXT UUID v4** on entity tables. Timestamps are **`created_at_ms`** / **`updated_at_ms`** (Unix ms).
+PKs **TEXT UUID v4** on entity tables. Timestamps **`created_at_ms`** / **`updated_at_ms`** (Unix ms).
 
 ### `worlds`
 
@@ -125,6 +126,7 @@ Index: **`idx_world_template_groups_world_root_sort`**.
 | `group_id` | NULL for root placement; else FK → **`world_template_groups.id`** **ON DELETE SET NULL** |
 | `root_sort_order` | Set when **`group_id`** is NULL |
 | `group_sort_order` | Set when **`group_id`** is not NULL |
+| `nickname` | Optional per-world placement label override (max **120** chars; default empty) |
 | `created_at_ms`, `updated_at_ms` | INTEGER |
 
 **Constraints:** **`UNIQUE (world_id, document_template_id)`**; CHECK enforces exactly one of **`root_sort_order`** / **`group_sort_order`** matching **`group_id`**.
@@ -150,7 +152,7 @@ Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_d
 
 ## Planned extensions (after version 4)
 
-Custom fields on document templates (field definitions, typed values, orphan retention) are specified in [templateCustomFields.md](templateCustomFields.md) and will land in a future migration; table detail moves into this file when that ships.
+Template custom fields (defs, typed values, orphan retention) in [templateCustomFields.md](templateCustomFields.md); future migration; table detail lands here when shipped.
 
 ## Main-process module map
 
@@ -182,7 +184,7 @@ src-electron/mainScripts/projectManagement/
     faProjectDocumentMediaLinksWiring.ts
 ```
 
-**Barrel:** **`projectManagement_manager.ts`** re-exports lifecycle and **`runWithFaProjectDatabase*`**; content persist modules are imported directly from IPC registration.
+**Barrel:** **`projectManagement_manager.ts`** re-exports lifecycle + **`runWithFaProjectDatabase*`**; content persist modules imported from IPC registration.
 
 ## IPC: project lifecycle vs content
 
@@ -192,9 +194,9 @@ Create/open project, recent list, **project settings / styling / noteboard** pat
 
 ### `FA_PROJECT_CONTENT_IPC`
 
-CRUD and links for **worlds**, **documents**, **document_templates**, **media**, and junction operations. Preload: **`projectContentAPI.ts`** → **`window.faContentBridgeAPIs.projectContent`**. Registrar: **`registerFaProjectContentIpc.ts`** (registered from **`ipcManagementRegistrationWiring.ts`**).
+CRUD + links for **worlds**, **documents**, **document_templates**, **media**, junction ops. Preload: **`projectContentAPI.ts`** → **`window.faContentBridgeAPIs.projectContent`**. Registrar: **`registerFaProjectContentIpc.ts`** (**`ipcManagementRegistrationWiring.ts`**).
 
-All content handlers wrap work in **`runWithFaProjectDatabaseForIpcAsync`**.
+All content handlers wrap **`runWithFaProjectDatabaseForIpcAsync`**.
 
 | IPC channel (suffix `-async`) | Persist / behavior |
 |-----------------------------|-------------------|
@@ -232,7 +234,7 @@ Exact channel strings: **`src-electron/electron-ipc-bridge.ts`** (`FA_PROJECT_CO
 
 ## Project Settings (renderer ↔ SQLite)
 
-**`DialogProjectSettings`** (**`src/components/dialogs/DialogProjectSettings/`**) is the first shipped UI on **`projectContent`** IPC.
+**`DialogProjectSettings`** (**`src/components/dialogs/DialogProjectSettings/`**) — first shipped **`projectContent`** UI.
 
 | Phase | API | Main |
 |-------|-----|------|
@@ -241,7 +243,7 @@ Exact channel strings: **`src-electron/electron-ipc-bridge.ts`** (`FA_PROJECT_CO
 | **Save (worlds)** | **`projectContent.saveWorldsSnapshot`** with **`I_faProjectWorldSnapshotItem[]`** (optional **`templateLayout`** per world) | **`replaceFaProjectWorldsSnapshot`** in **`faProjectWorldsSnapshotWiring.ts`** — one transaction: upsert/reorder worlds, replace each world's template layout when provided, delete removed ids (**RESTRICT** if a world still has documents) |
 | **Save (document templates)** | **`projectContent.saveDocumentTemplatesSnapshot`** with **`I_faProjectDocumentTemplateSnapshotItem[]`** | **`replaceFaProjectDocumentTemplatesSnapshot`** in **`faProjectDocumentTemplatesSnapshotWiring.ts`** — one transaction: upsert/reorder by list index, delete removed ids (**RESTRICT** if documents still reference a template); **zero templates is valid** |
 
-Renderer bridges: **`src/stores/scripts/sFaProjectWorldsBridge.ts`**, **`src/stores/scripts/sFaProjectDocumentTemplatesBridge.ts`**. Action id **`saveProjectSettings`** may include **`settings`**, **`worlds`**, and **`documentTemplates`** payloads (**`handleSaveProjectSettings`** in **`createFaActionDefinitionHandlers.ts`**). Worlds and document-templates draft validation (names, duplicate palette hex for worlds) stays in the dialog; persistence coerces hex via **`coerceFaProjectWorldColorForStorage`** and **`coerceFaProjectWorldColorPalleteForStorage`**.
+Bridges: **`sFaProjectWorldsBridge.ts`**, **`sFaProjectDocumentTemplatesBridge.ts`**. Action **`saveProjectSettings`** may carry **`settings`**, **`worlds`**, **`documentTemplates`** (**`handleSaveProjectSettings`** in **`createFaActionDefinitionHandlers.ts`**). Draft validation (names, duplicate palette hex) stays in dialog; persist coerces hex via **`coerceFaProjectWorldColorForStorage`**, **`coerceFaProjectWorldColorPalleteForStorage`**.
 
 ## Types and validation
 
@@ -249,11 +251,11 @@ Renderer bridges: **`src/stores/scripts/sFaProjectWorldsBridge.ts`**, **`src/sto
 - Zod (IPC payloads): **`src-electron/shared/faProject*ContentSchema.ts`**, **`faProjectContentLinksSchema.ts`**, **`faProjectContentSchemaShared.ts`**
 - Bridge typing: **`types/I_faElectronRendererBridgeAPIs.ts`**, **`src/globals.d.ts`**
 
-**Renderer UI:** **`DialogProjectSettings`** (general, worlds, and **Document Template Settings** tabs), reusable **`FaColorPickerInput`**, **`FaIconPickerInput`** (template **icon** field), **`sFaProjectWorldsBridge`**, and **`sFaProjectDocumentTemplatesBridge`** for list/snapshot IPC. Other content surfaces (document browser, template editor) remain IPC-only until wired.
+**Renderer UI:** **`DialogProjectSettings`** (general, worlds, **Document Template Settings**), **`FaColorPickerInput`**, **`FaIconPickerInput`** (template **icon**), **`sFaProjectWorldsBridge`**, **`sFaProjectDocumentTemplatesBridge`**. Other content surfaces IPC-only until wired.
 
 ## Errors
 
-Missing entity ids throw **`FaProjectContentNotFoundError`** (`faProjectContentNotFoundError.ts`); IPC **`invoke`** rejects and surfaces to callers.
+Missing entity ids → **`FaProjectContentNotFoundError`** (`faProjectContentNotFoundError.ts`); IPC **`invoke`** rejects to callers.
 
 ## Testing
 
@@ -264,4 +266,4 @@ Missing entity ids throw **`FaProjectContentNotFoundError`** (`faProjectContentN
 - Preload: **`contentBridgeAPIs/_tests/projectContentAPI.vitest.test.ts`**
 - Zod: **`shared/_tests/faProjectContentSchemas.vitest.test.ts`**
 
-Vitest uses **mock** `better-sqlite3` databases in unit tests (native ABI is validated via production Electron builds, not in **`unit-electron`**).
+Vitest uses mock **`better-sqlite3`** in unit tests; native ABI validated in production Electron builds, not **`unit-electron`**.

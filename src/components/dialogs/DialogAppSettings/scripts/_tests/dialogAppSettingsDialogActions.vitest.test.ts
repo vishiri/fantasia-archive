@@ -173,7 +173,7 @@ test('updateLocalSetting updates a toggle leaf when the tree contains the key', 
               value: false
             }
           },
-          title: 'Document body'
+          title: 'Developer Settings'
         }
       },
       title: 'Developer'
@@ -346,7 +346,7 @@ test('updateLocalAppSettingsField writes localSettings and appSettingsTree for s
               value: false
             }
           },
-          title: 'Document body'
+          title: 'Developer Settings'
         }
       },
       title: 'Developer'

@@ -66,9 +66,13 @@ export function createBuildDialogProjectSettingsSaveValidationTooltip (deps: {
       const duplicatePlacement = world?.templateLayout.placements.find((placement) => {
         return placement.documentTemplateId === firstDuplicateId
       })
-      const templateLabel = duplicatePlacement?.displayName.trim().length
-        ? duplicatePlacement.displayName.trim()
-        : deps.defaultNewTemplateName
+      const templateLabel = duplicatePlacement === undefined
+        ? deps.defaultNewTemplateName
+        : (duplicatePlacement.nickname.trim().length > 0
+            ? duplicatePlacement.nickname.trim()
+            : duplicatePlacement.templateDisplayName.trim().length > 0
+              ? duplicatePlacement.templateDisplayName.trim()
+              : deps.defaultNewTemplateName)
       return deps.translate('dialogs.projectSettings.saveErrors.bulletWorldTemplateDuplicateDocumentTemplate', {
         templateLabel,
         worldLabel

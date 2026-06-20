@@ -200,7 +200,9 @@ function resetFaVitestRendererHarness (): void {
       applyImport: vi.fn(async () => ({ appliedParts: [] })),
       disposeImportSession: vi.fn(async () => undefined),
       exportToFile: vi.fn(async () => ({ outcome: 'canceled' as const })),
-      prepareImport: vi.fn(async () => ({ outcome: 'canceled' as const }))
+      prepareImport: vi.fn(async () => ({ outcome: 'canceled' as const })),
+      stageE2eNextExportPath: vi.fn(async () => false),
+      stageE2eNextImportPath: vi.fn(async () => false)
     },
     faChromiumCtrlShiftShortcut: {
       installForwardedKeyChordListener: vi.fn()
@@ -234,7 +236,9 @@ function resetFaVitestRendererHarness (): void {
       openProject: vi.fn(async () => ({ outcome: 'canceled' as const })),
       setProjectNoteboard: vi.fn(async (): Promise<boolean> => true),
       setProjectSettings: vi.fn(async (): Promise<boolean> => true),
-      setProjectStyling: vi.fn(async (): Promise<boolean> => true)
+      setProjectStyling: vi.fn(async (): Promise<boolean> => true),
+      stageE2eNextCreatePath: vi.fn(async () => false),
+      stageE2eNextOpenPath: vi.fn(async () => false)
     }
   }
 }

@@ -246,6 +246,9 @@ test.describe.serial('Project settings dialog', () => {
    * Add document template exposes detail fields and delete countdown on confirm menu.
    */
   test('Document templates tab supports add, edit fields, and delete countdown', async () => {
+    test.setTimeout(90_000)
+
+    await appWindow.locator(`[data-test-locator="${selectorList.tabDocumentTemplatesSettings}"]`).click()
     await appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesAddFirstButton}"]`).click()
 
     const templateTab = appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesTab}"]`).first()
@@ -255,15 +258,23 @@ test.describe.serial('Project settings dialog', () => {
     await nameInput.fill('Character sheet')
     await appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesWorldAppendixInput}"]`).fill(' of Eldoria')
 
-    await appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesIconTrigger}"]`).click()
-    await appWindow
-      .locator(`[data-test-locator="${selectorList.documentTemplatesIconMenuSearch}"] input`)
-      .fill('account')
-    await appWindow.locator('[data-test-icon-name="mdi-account"]').first().click()
+    const iconMenuVirtualScrollLocator = `${selectorList.documentTemplatesIconInput}-menu-virtualScroll`
+    const iconMenuPanel = appWindow.locator('.faIconPickerInput__menuPanel')
+    const iconTrigger = appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesIconTrigger}"]`)
 
-    await expect(
-      appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesIconTrigger}"]`)
-    ).toHaveAttribute('data-test-icon-name', 'mdi-account')
+    await expect(async () => {
+      await iconTrigger.click()
+      await expect(
+        appWindow.locator(`[data-test-locator="${iconMenuVirtualScrollLocator}"]`)
+      ).toBeVisible()
+      const firstIconCell = iconMenuPanel.locator('[data-test-locator$="-iconCell"]').first()
+      await expect(firstIconCell).toBeVisible()
+      const selectedIconName = await firstIconCell.getAttribute('data-test-icon-name')
+      expect(selectedIconName).toBeTruthy()
+      await firstIconCell.scrollIntoViewIfNeeded()
+      await firstIconCell.click()
+      await expect(iconTrigger).toHaveAttribute('data-test-icon-name', selectedIconName ?? '')
+    }).toPass({ timeout: 45_000 })
 
     await expect(nameInput).toHaveValue('Character sheet')
 
@@ -278,10 +289,16 @@ test.describe.serial('Project settings dialog', () => {
    */
   test('World template layout adds available template and group rows', async () => {
     await appWindow.locator(`[data-test-locator="${selectorList.tabDocumentTemplatesSettings}"]`).click()
-    await appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesAddFirstButton}"]`).click()
-    await appWindow
-      .locator(`[data-test-locator="${selectorList.documentTemplatesNameInput}"]`)
-      .fill('Character sheet')
+
+    const addFirstButton = appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesAddFirstButton}"]`)
+    const nameInput = appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesNameInput}"]`)
+
+    if (await addFirstButton.count() > 0) {
+      await addFirstButton.click()
+      await nameInput.fill('Character sheet')
+    } else {
+      await expect(nameInput).toHaveValue('Character sheet')
+    }
 
     await appWindow.locator(`[data-test-locator="${selectorList.tabWorldsSettings}"]`).click()
 

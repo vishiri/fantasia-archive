@@ -1,4 +1,3 @@
-import { Notify } from 'quasar'
 import { ResultAsync } from 'neverthrow'
 
 import type {
@@ -53,7 +52,7 @@ export async function faProjectSettingsFetchFreshForDialog (): Promise<I_faProje
 }
 
 /**
- * Persists a validated patch, read-backs from SQLite, propagates consumers, and emits success Notify.
+ * Persists a validated patch, read-backs from SQLite, and propagates app consumers.
  */
 export async function faProjectSettingsPersistPatchFromStore (opts: {
   applyRoot: (next: I_faProjectSettingsRoot) => void
@@ -104,9 +103,4 @@ export async function faProjectSettingsPersistPatchFromStore (opts: {
 
   opts.applyRoot(retrieved)
   propagateFaProjectSettingsToAppConsumers(retrieved)
-  Notify.create({
-    group: false,
-    type: 'positive',
-    message: i18n.global.t('globalFunctionality.faProjectSettings.saveSuccess')
-  })
 }

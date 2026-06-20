@@ -61,6 +61,7 @@ export function mapDialogProjectSettingsWorldsToSnapshot (
         groupId: placement.groupId,
         groupSortOrder: placement.groupSortOrder,
         id: placement.id,
+        nickname: placement.nickname.trim(),
         rootSortOrder: placement.rootSortOrder
       }))
     }

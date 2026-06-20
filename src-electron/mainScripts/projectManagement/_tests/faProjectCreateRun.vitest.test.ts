@@ -88,12 +88,11 @@ vi.mock('../faProjectDbMigrateWiring', () => {
   }
 })
 
-vi.mock('../projectManagement_manager', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../projectManagement_manager')>()
-
+vi.mock('../projectManagementSharedE2ePathWiring', () => {
   return {
-    ...actual,
-    takeNextE2eProjectCreatePath: takeE2ePathMock
+    installFaProjectManagementE2ePathOverrideGlobals: vi.fn(),
+    takeNextE2eProjectCreatePath: takeE2ePathMock,
+    takeNextE2eProjectOpenPath: vi.fn((): string | null => null)
   }
 })
 

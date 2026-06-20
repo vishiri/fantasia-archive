@@ -2,7 +2,8 @@ import { beforeEach, expect, test, vi } from 'vitest'
 
 const {
   listDocumentTemplatesForProjectSettingsMock,
-  saveDocumentTemplatesSnapshotMock
+  saveDocumentTemplatesSnapshotMock,
+  tMock
 } = vi.hoisted(() => {
   return {
     listDocumentTemplatesForProjectSettingsMock: vi.fn(async () => ({
@@ -19,7 +20,14 @@ const {
         }
       ]
     })),
-    saveDocumentTemplatesSnapshotMock: vi.fn(async () => undefined)
+    saveDocumentTemplatesSnapshotMock: vi.fn(async () => undefined),
+    tMock: vi.fn((key: string) => key)
+  }
+})
+
+vi.mock('app/i18n/externalFileLoader', () => {
+  return {
+    i18n: { global: { t: tMock } }
   }
 })
 
@@ -41,6 +49,8 @@ beforeEach(() => {
   })
   saveDocumentTemplatesSnapshotMock.mockReset()
   saveDocumentTemplatesSnapshotMock.mockResolvedValue(undefined)
+  tMock.mockReset()
+  tMock.mockImplementation((key: string) => key)
 
   Object.defineProperty(globalThis, 'window', {
     value: {
@@ -155,14 +165,14 @@ test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog throws when 
         id: '7c9e6679-7425-40de-944b-e07fc1f90ae7'
       }
     ])
-  ).rejects.toThrow('projectContent.saveDocumentTemplatesSnapshot is unavailable')
+  ).rejects.toThrow('globalFunctionality.faProjectSettings.bridgeMissing')
 })
 
 /**
  * faProjectDocumentTemplatesPersistSnapshotFromDialog
- * Rethrows Error rejections from saveDocumentTemplatesSnapshot.
+ * Surfaces saveError when saveDocumentTemplatesSnapshot rejects.
  */
-test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog rethrows write failures', async () => {
+test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog surfaces saveError on write failures', async () => {
   saveDocumentTemplatesSnapshotMock.mockRejectedValueOnce(new Error('save failed'))
   const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
   const { faProjectDocumentTemplatesPersistSnapshotFromDialog } = await import('../sFaProjectDocumentTemplatesBridge')
@@ -173,15 +183,15 @@ test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog rethrows wri
         id: '7c9e6679-7425-40de-944b-e07fc1f90ae7'
       }
     ])
-  ).rejects.toThrow('save failed')
+  ).rejects.toThrow('globalFunctionality.faProjectSettings.saveError')
   errorSpy.mockRestore()
 })
 
 /**
  * faProjectDocumentTemplatesPersistSnapshotFromDialog
- * Wraps non-Error rejections in Error instances.
+ * Surfaces saveError when saveDocumentTemplatesSnapshot rejects with a non-Error value.
  */
-test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog wraps non-Error write failures', async () => {
+test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog surfaces saveError on non-Error write failures', async () => {
   saveDocumentTemplatesSnapshotMock.mockRejectedValueOnce('save string failure')
   const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
   const { faProjectDocumentTemplatesPersistSnapshotFromDialog } = await import('../sFaProjectDocumentTemplatesBridge')
@@ -192,6 +202,6 @@ test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog wraps non-Er
         id: '7c9e6679-7425-40de-944b-e07fc1f90ae7'
       }
     ])
-  ).rejects.toThrow('saveDocumentTemplatesSnapshot failed')
+  ).rejects.toThrow('globalFunctionality.faProjectSettings.saveError')
   errorSpy.mockRestore()
 })

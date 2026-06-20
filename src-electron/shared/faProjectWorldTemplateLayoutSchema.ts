@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { faProjectContentDisplayNameSchema, faProjectContentIdSchema } from 'app/src-electron/shared/faProjectContentSchemaShared'
+import { faProjectContentDisplayNameSchema, faProjectContentIdSchema, faProjectWorldTemplatePlacementNicknameSchema } from 'app/src-electron/shared/faProjectContentSchemaShared'
 import type { I_faProjectWorldTemplateLayoutSnapshot } from 'app/types/I_faProjectWorldTemplateLayoutDomain'
 
 export const faProjectWorldTemplateGroupSnapshotItemSchema = z.object({
@@ -14,6 +14,7 @@ export const faProjectWorldTemplatePlacementSnapshotItemSchema = z.object({
   groupId: faProjectContentIdSchema.nullable(),
   groupSortOrder: z.number().int().nonnegative().nullable(),
   id: faProjectContentIdSchema,
+  nickname: faProjectWorldTemplatePlacementNicknameSchema.default(''),
   rootSortOrder: z.number().int().nonnegative().nullable()
 }).strict().superRefine((value, ctx) => {
   if (value.groupId === null) {

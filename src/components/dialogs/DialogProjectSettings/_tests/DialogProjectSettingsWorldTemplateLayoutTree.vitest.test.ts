@@ -56,7 +56,7 @@ vi.mock('@he-tree/vue', () => {
 const baseLayout = appendDialogProjectSettingsWorldTemplatePlacementDraft(
   createEmptyDialogProjectSettingsWorldTemplateLayoutDraft(),
   {
-    displayName: 'Character',
+    templateDisplayName: 'Character',
     documentTemplateId: 'template-a',
     icon: 'mdi-account',
     worldAppendix: ''
@@ -105,14 +105,14 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTree commits once after 
     appendDialogProjectSettingsWorldTemplatePlacementDraft(
       createEmptyDialogProjectSettingsWorldTemplateLayoutDraft(),
       {
-        displayName: 'Character',
+        templateDisplayName: 'Character',
         documentTemplateId: 'template-a',
         icon: 'mdi-account',
         worldAppendix: ''
       }
     ),
     {
-      displayName: 'Location',
+      templateDisplayName: 'Location',
       documentTemplateId: 'template-b',
       icon: 'mdi-map',
       worldAppendix: ''
@@ -134,6 +134,9 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTree commits once after 
       id: secondPlacement?.id ?? 'placement-b',
       label: 'Location',
       nodeKind: 'template',
+      nickname: '',
+      templateDisplayName: '',
+      usesNickname: false,
       worldAppendix: ''
     },
     {
@@ -144,6 +147,9 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTree commits once after 
       id: firstPlacement?.id ?? 'placement-a',
       label: 'Character',
       nodeKind: 'template',
+      nickname: '',
+      templateDisplayName: '',
+      usesNickname: false,
       worldAppendix: ''
     }
   ]

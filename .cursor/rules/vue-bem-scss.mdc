@@ -6,24 +6,24 @@ alwaysApply: false
 
 # Vue SFC — BEM and scoped SCSS
 
-This rule covers **CSS class naming** and **`<style lang="scss">`** only. It does not cover `data-test-*` template hooks (see [vue-template-test-hooks.mdc](vue-template-test-hooks.mdc)) or `<script setup>` structure (see [vue-quasar.mdc](vue-quasar.mdc)).
+**CSS class naming** + **`<style lang="scss">`** only. Not `data-test-*` hooks ([vue-template-test-hooks.mdc](vue-template-test-hooks.mdc)) or `<script setup>` ([vue-quasar.mdc](vue-quasar.mdc)).
 
 ## Block and element classes (template)
 
-Follow components such as [GlobalWindowButtons.vue](src/components/globals/GlobalWindowButtons/GlobalWindowButtons.vue) and [AppControlMenus.vue](src/components/globals/AppControlMenus/AppControlMenus.vue):
+Follow [GlobalWindowButtons.vue](src/components/globals/GlobalWindowButtons/GlobalWindowButtons.vue), [AppControlMenus.vue](src/components/globals/AppControlMenus/AppControlMenus.vue):
 
-- **Block**: one root class per component, lowerCamelCase (e.g. `globalWindowButtons`, `appControlMenus`).
-- **Elements**: `blockName__element` (double underscore), e.g. `globalWindowButtons__button`, `globalWindowButtons__minimize`, `appControlMenus__inner`.
-- **Quasar / utilities**: keep existing Quasar props and utility classes (`flat`, `bg-dark`, etc.) on the same nodes when the codebase already combines them with BEM classes.
+- **Block**: one root class, lowerCamelCase (e.g. `globalWindowButtons`, `appControlMenus`).
+- **Elements**: `blockName__element` (double underscore), e.g. `globalWindowButtons__button`, `appControlMenus__inner`.
+- **Quasar / utilities**: keep existing Quasar props + utility classes (`flat`, `bg-dark`, etc.) on same nodes when codebase combines with BEM.
 
-Use **HTML comments** in the template to group sections (buttons, tooltips, regions) the way existing components do.
+Use **HTML comments** in template to group sections (buttons, tooltips, regions) like existing components.
 
 ## Scoped SCSS
 
-- Prefer `<style lang="scss" scoped>` unless unscoped styles are intentional for that file (match neighboring components in the feature).
-- Do **not** introduce new raw **colors** or **sized units** (`px`, `rem`, `vh`, etc.) in component SCSS when they belong in the shared token set. Add or reuse variables in the owning feature **`styles/_variables.scss`**, a [src/css/theme/quasar-components/](src/css/theme/quasar-components/) file (for `q-*` global overrides), or [app.palette.scss](src/css/app.palette.scss) for palette and globals, as in [project-scss.mdc](project-scss.mdc). Theme **`$` identifiers** use **hyphens** between name segments (never underscores in `$` identifiers). This rule applies to `<style>` blocks only, not to template attributes or prop strings unless policy expands.
-- Do **not** use **framework palette** Sass variables (`$primary`, `$grey`, `$white`, `$dark`, `$accent`, …) directly in component SCSS. Add a **semantic** token in the catalogue and reference that — same indirection as for raw sizes and hex (see [project-scss.mdc](project-scss.mdc) **Palette variables vs semantic color tokens**). Prefer reusing existing semantic Globals (e.g. `$aLinkColor`) when they match the role.
-- Nest element rules under the block with the parent selector:
+- Prefer `<style lang="scss" scoped>` unless unscoped intentional (match neighbors).
+- Do **not** introduce new raw **colors** or **sized units** (`px`, `rem`, `vh`, etc.) in component SCSS when they belong in shared token set. Add/reuse variables in feature **`styles/_variables.scss`**, [src/css/theme/quasar-components/](src/css/theme/quasar-components/) (for `q-*` global overrides), or [app.palette.scss](src/css/app.palette.scss). Theme **`$` identifiers**: **hyphens** between segments (never underscores in `$` identifiers). Applies to `<style>` only, not template attributes/prop strings unless policy expands.
+- Do **not** use **framework palette** Sass variables (`$primary`, `$grey`, `$white`, `$dark`, `$accent`, …) directly in component SCSS. Add **semantic** token in catalogue — same indirection as raw sizes/hex ([project-scss.mdc](project-scss.mdc) **Palette variables vs semantic color tokens**). Reuse semantic Globals (e.g. `$aLinkColor`) when role matches.
+- Nest element rules under block:
 
 ```scss
 .appControlMenus {
@@ -37,9 +37,4 @@ Use **HTML comments** in the template to group sections (buttons, tooltips, regi
 
 ## Global / shared styles
 
-Cross-app SCSS lives under [src/css](src/css) — see [project-scss.mdc](project-scss.mdc). Component-specific BEM stays in the SFC **or**, when an external sheet is required (usually for SFC size), under that feature’s **`styles/`** folder — see [component-styles-folder.mdc](component-styles-folder.mdc).
-
-## TypeScript interfaces and types (`types/`)
-
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+Cross-app SCSS under [src/css](src/css) — [project-scss.mdc](project-scss.mdc). Component BEM in SFC **or**, when external sheet required (usually SFC size), feature **`styles/`** — [component-styles-folder.mdc](component-styles-folder.mdc).

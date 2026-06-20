@@ -67,4 +67,8 @@ export interface I_faAppConfigAPI {
   prepareImport: () => Promise<I_faAppConfigPrepareResult>
   applyImport: (input: I_faAppConfigApplyInput) => Promise<I_faAppConfigApplyResult>
   disposeImportSession: (sessionId: string) => Promise<void>
+  /** Playwright E2E only: stages the next export path so main skips the native save dialog. */
+  stageE2eNextExportPath: (filePath: string) => Promise<boolean>
+  /** Playwright E2E only: stages the next import path so main skips the native open dialog. */
+  stageE2eNextImportPath: (filePath: string) => Promise<boolean>
 }

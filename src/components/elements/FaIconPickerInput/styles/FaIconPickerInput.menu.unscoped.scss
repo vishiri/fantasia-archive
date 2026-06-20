@@ -12,12 +12,12 @@
 
 .faIconPickerInput__menuHeader {
   flex: 0 0 auto;
-  padding: 12px;
+  padding: $faIconPickerInput-list-paddingInline;
 }
 
 .faIconPickerInput__virtualScroll {
   flex: 1 1 auto;
-  min-height: 200px;
+  min-height: $faIconPickerInput-virtualScroll-minHeight;
   padding-bottom: $faIconPickerInput-list-paddingBottom;
   padding-left: $faIconPickerInput-list-paddingInline;
   padding-right: $faIconPickerInput-list-paddingInline;
@@ -58,6 +58,8 @@
 }
 
 .faIconPickerInput__statusMessage {
-  padding: 16px 12px;
+  padding:
+    $faIconPickerInput-statusMessage-paddingBlock
+    $faIconPickerInput-list-paddingInline;
   text-align: center;
 }

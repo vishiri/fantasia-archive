@@ -10,28 +10,27 @@ description: >-
 
 ## Components
 
-- **`DialogMarkdownDocument.vue`**: Renders markdown via `QMarkdown` from `@quasar/quasar-ui-qmarkdown` with the package CSS imported alongside the component.
-- Dialog flow is tied to Pinia dialog state (`src/stores/S_Dialog.ts`) and helpers in **`src/scripts/appGlobalManagementUI/dialogManagement.ts`** (for example **`openDialogMarkdownDocument`**). The root `q-dialog` model calls **`registerMarkdownDialogStackGuard`** from that module so **`markdownDialogOpenCount`** stays aligned when the dialog closes or the host unmounts.
-- **Triggering opens**: User-initiated markdown dialog opens (Changelog, License, Advanced Search Guide, Tips, Tricks & Trivia) go through the **action manager** registry (**`openChangelogDialog`**, **`openLicenseDialog`**, **`openAdvancedSearchGuideDialog`**, **`openTipsTricksTriviaDialog`**) via **`runFaAction`** so failures funnel into the unified single-toast surface. See [fantasia-action-manager](../fantasia-action-manager/SKILL.md).
+- **`DialogMarkdownDocument.vue`**: **`QMarkdown`** + package CSS
+- Flow: **`S_Dialog.ts`**, **`dialogManagement.ts`** — **`openDialogMarkdownDocument`**, **`registerMarkdownDialogStackGuard`**
+- User opens (Changelog, License, guides, Tips): action manager ids (**`openChangelogDialog`**, …) via **`runFaAction`** — [fantasia-action-manager](../fantasia-action-manager/SKILL.md)
 
 ## Content source
 
-- Long-form markdown files live under `i18n/en-US/documents/` (and parallel locales) and are registered on the `documents` key in `i18n/en-US/index.ts` (often through `specialCharacterFixer`).
-- Storybook-specific runs should not import those markdown files through full locale entrypoints by default; provide placeholder `documents.*` strings in [`.storybook-workspace/.storybook/preview.ts`](../../../.storybook-workspace/.storybook/preview.ts) unless Storybook markdown loader support is explicitly configured.
+- Markdown: **`i18n/en-US/documents/`** (+ locales); registered on **`documents`** key via **`specialCharacterFixer`**
+- Storybook: placeholder **`documents.*`** in preview/mocks — not full locale entrypoints
 
 ## Conventions
 
-- Prefer updating `.md` assets and i18n wiring over hardcoding large markdown in `.vue` files.
-- Keep headings and structure readable in a modal/dialog viewport; test in the actual dialog component.
-- Markdown under **`i18n/*/documents/`** is compiled as **vue-i18n** message text: **do not** use stray **`{...}`** (for example glob **`.*.{ext1,ext2}`**) unless you follow vue-i18n placeholder rules — invalid groups break the changelog and other document dialogs at runtime. **Do not** write **CSS**-shaped rule snippets with **curly brace** delimiters (selector plus block); describe the idea in words instead. See [fantasia-changelog-en-us](../fantasia-changelog-en-us/SKILL.md) for changelog-specific wording.
+- Update **`.md`** + i18n wiring — not large markdown in **`.vue`**
+- Readable headings in modal viewport; test in dialog
+- **`i18n/*/documents/`** = vue-i18n messages: **no stray `{...}`** or CSS brace blocks — [fantasia-changelog-en-us](../fantasia-changelog-en-us/SKILL.md)
 
 ## Related
 
-- [fantasia-i18n](../fantasia-i18n/SKILL.md) for locale layout and `documents` registration.
-- [fantasia-action-manager](../fantasia-action-manager/SKILL.md) for the dispatcher that opens these dialogs from menus, keybinds, and other call sites.
-- **Inline code chip in custom HTML** (for example raw HTML beside or outside **QMarkdown**): use the app-wide **`<code class="code-token">…</code>`** hook from [`htmlAdjustments.scss`](../../../src/css/globals/htmlAdjustments.scss) — see [AGENTS.md](../../../AGENTS.md) **Global CSS: `code.code-token`** and [project-scss.mdc](../../rules/project-scss.mdc).
+- [fantasia-i18n](../fantasia-i18n/SKILL.md)
+- [fantasia-action-manager](../fantasia-action-manager/SKILL.md)
+- Inline code chip: **`<code class="code-token">`** — [project-scss.mdc](../../rules/project-scss.mdc)
 
-## TypeScript interfaces and types (`types/`)
+## Types
 
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+Shared types → **`types/`**. See [types-folder.mdc](../../rules/types-folder.mdc).

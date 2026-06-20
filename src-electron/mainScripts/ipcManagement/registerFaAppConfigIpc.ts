@@ -12,6 +12,8 @@ import {
   runApplyStagedAppConfigImport,
   runExportAppConfigToFile,
   runPrepareImportFromFaconfigFilePath,
+  stageFaAppConfigE2eExportPath,
+  stageFaAppConfigE2eImportPath,
   takeNextE2eAppConfigImportPath
 } from 'app/src-electron/mainScripts/appConfig/appConfig_manager'
 import { appWindow } from 'app/src-electron/mainScripts/windowManagement/windowManagement_manager'
@@ -112,6 +114,20 @@ export function registerFaAppConfigIpc (): void {
       if (typeof sessionId === 'string' && sessionId.length > 0) {
         faAppConfigImportStagedSessions.delete(sessionId)
       }
+    }
+  )
+
+  ipcMain.handle(
+    FA_APP_CONFIG_IPC.stageE2eNextExportPathAsync,
+    (_event, raw: unknown): boolean => {
+      return stageFaAppConfigE2eExportPath(raw)
+    }
+  )
+
+  ipcMain.handle(
+    FA_APP_CONFIG_IPC.stageE2eNextImportPathAsync,
+    (_event, raw: unknown): boolean => {
+      return stageFaAppConfigE2eImportPath(raw)
     }
   )
 

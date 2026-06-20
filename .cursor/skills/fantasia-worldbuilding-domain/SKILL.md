@@ -10,27 +10,26 @@ description: >-
 
 ## What the app is
 
-- **Fantasia Archive** is a **worldbuilding database manager** (see `package.json` / README).
-- Users organize fictional worlds as **projects** and **documents** (and related tooling: search, tree, noteboard, settings — see menu data under `src/components/globals/AppControlMenus/_data/`).
-- **Floating tool windows** (for example **App styling**, `WindowAppStyling`) are **app chrome**: movable in-renderer surfaces for editing theme/CSS and similar, not in-universe lore. Implementation: [AGENTS.md](../../../AGENTS.md) **In-renderer floating windows**.
+- **Fantasia Archive** — worldbuilding database manager (GPL-3.0)
+- Users organize fictional worlds as **projects** and **documents** (+ search, tree, noteboard, settings — **`AppControlMenus/_data/`**)
+- **Floating `Window*`** (e.g. **App styling**) = app chrome for theme/CSS — not in-universe lore. See [AGENTS.md](../../../AGENTS.md) **In-renderer floating windows**
 
 ## Vocabulary (prefer in UI and models)
 
-- **Project**: A container for a worldbuilding dataset (new / save / load / export flows in menus).
-- **Document**: A unit of worldbuilding content in the **`.faproject`** SQLite **`documents`** table (quick add, search, mass delete, etc.). Not the same as in-app help or license **markdown** under **`i18n/.../documents/`**.
-- **Template** (document template): A named form schema assigned to documents via **`template_id`**. Today v4 stores only a display name on **`document_templates`**; typed **custom fields** are specified in [docs/database/templateCustomFields.md](../../docs/database/templateCustomFields.md).
-- **Custom field**: A typed slot on a template (text, relationship, etc.) identified by a stable **`field_id`**; documents store **values** keyed by that id, merged with the template's active field list at read time.
-- **Tools / settings**: Application behavior, not “the world” itself — keep naming distinct from in-universe lore terms unless intentionally meta.
+- **Project**: worldbuilding dataset container (new/save/load/export)
+- **Document**: content unit in **`.faproject`** **`documents`** table — not i18n help/license markdown
+- **Template**: form schema via **`template_id`**; v4 = display name on **`document_templates`**; custom fields in [templateCustomFields.md](../../docs/database/templateCustomFields.md)
+- **Custom field**: typed template slot with stable **`field_id`**; document values keyed by id, merged at read
+- **Tools / settings**: app behavior — distinct from in-universe lore unless intentionally meta
 
 ## License
 
-- Project is **GPL-3.0**; third-party integration and distribution should respect that.
+**GPL-3.0** — respect for third-party integration and distribution.
 
 ## Implementation note
 
-- Many menu items are present with `trigger: undefined` / TODOs — when implementing features, keep terminology consistent with the domain above and existing i18n keys.
+Many menu items still **`trigger: undefined`** / TODO — keep terminology consistent with domain + existing i18n keys.
 
-## TypeScript interfaces and types (`types/`)
+## Types
 
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+Shared types → **`types/`**. See [types-folder.mdc](../../rules/types-folder.mdc).

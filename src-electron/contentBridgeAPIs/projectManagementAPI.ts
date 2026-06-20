@@ -96,5 +96,19 @@ export const projectManagementAPI: I_faProjectManagementAPI = {
       FA_PROJECT_MANAGEMENT_IPC.setProjectStylingPatchAsync,
       payload
     ) as boolean
+  },
+
+  async stageE2eNextCreatePath (filePath: string): Promise<boolean> {
+    return await ipcRenderer.invoke(
+      FA_PROJECT_MANAGEMENT_IPC.stageE2eNextProjectCreatePathAsync,
+      filePath
+    ) as boolean
+  },
+
+  async stageE2eNextOpenPath (filePath: string): Promise<boolean> {
+    return await ipcRenderer.invoke(
+      FA_PROJECT_MANAGEMENT_IPC.stageE2eNextProjectOpenPathAsync,
+      filePath
+    ) as boolean
   }
 }

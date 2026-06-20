@@ -19,8 +19,8 @@ export default {
       title: 'Developer settings',
       tags: 'developer, debug, diagnostics, internal',
       documentBody: {
-        subtitle: 'Document body',
-        tags: 'document id, debug metadata, internal fields'
+        subtitle: 'Developer Settings',
+        tags: 'document id, debug metadata, internal fields, activity monitor, payload'
       }
     },
     documentViewEdit: {
@@ -283,6 +283,12 @@ export default {
       title: 'TODO - Limit text editor height',
       description: 'Determines whether the text editor has limited height when not in full-screen mode.',
       tags: 'textarea height, long text, expand editor, scroll editor'
+    },
+    logFullActivityPayload: {
+      title: 'Log full activity payload',
+      description:
+        'If this is enabled, the activity will log full payloads. This can useful when doing deep debugging that needs precise logging of results.',
+      tags: 'debug, troubleshooting, dev tools, payload, activity, logging'
     },
     noProjectName: {
       title: 'TODO - Hide project name in tree',

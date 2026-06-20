@@ -21,6 +21,15 @@ vi.mock('../faActionManagerStoreBridge_manager', () => ({
   resolveFaActionManagerStore: resolveStoreMock
 }))
 
+const { resolvePayloadPreviewMaxLengthMock } = vi.hoisted(() => ({
+  resolvePayloadPreviewMaxLengthMock: vi.fn(() => 400)
+}))
+
+vi.mock('../faActionPayloadPreviewMaxLengthWiring', () => ({
+  FA_ACTION_PAYLOAD_PREVIEW_MAX_LENGTH: 400,
+  resolveFaActionPayloadPreviewMaxLength: resolvePayloadPreviewMaxLengthMock
+}))
+
 import {
   buildFaActionFailureHistoryPayloadPreview,
   buildFaActionPayloadPreview,
@@ -34,6 +43,8 @@ beforeEach(() => {
   notifyCreateMock.mockReset()
   resolveStoreMock.mockReset()
   resolveStoreMock.mockReturnValue(null)
+  resolvePayloadPreviewMaxLengthMock.mockReset()
+  resolvePayloadPreviewMaxLengthMock.mockReturnValue(400)
 })
 
 /**
@@ -101,6 +112,18 @@ test('Test that buildFaActionPayloadPreview truncates payloads longer than maxLe
   const out = buildFaActionPayloadPreview(big, 50)
   expect(out.length).toBeLessThanOrEqual(53)
   expect(out.endsWith('...')).toBe(true)
+})
+
+/**
+ * buildFaActionPayloadPreview
+ * Uses the user-settings preview cap when maxLength is omitted.
+ */
+test('Test that buildFaActionPayloadPreview uses resolveFaActionPayloadPreviewMaxLength by default', () => {
+  resolvePayloadPreviewMaxLengthMock.mockReturnValueOnce(20)
+  const out = buildFaActionPayloadPreview({ value: 'x'.repeat(100) })
+  expect(out.endsWith('...')).toBe(true)
+  expect(out.length).toBe(23)
+  expect(resolvePayloadPreviewMaxLengthMock).toHaveBeenCalledOnce()
 })
 
 /**

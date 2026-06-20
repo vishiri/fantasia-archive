@@ -2,6 +2,7 @@ import { app, ipcMain } from 'electron'
 
 import { FA_PROJECT_MANAGEMENT_IPC } from 'app/src-electron/electron-ipc-bridge'
 import { registerFaProjectManagementProjectSettingsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProjectManagementProjectSettingsIpc'
+import { registerFaProjectManagementE2eStagingIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProjectManagementE2eStagingIpc'
 import {
   closeFaProjectActiveDatabase,
   getRecentProjectsSnapshot,
@@ -168,6 +169,8 @@ export function registerFaProjectManagementIpc (): void {
       return await runFaProjectOpenFromIpc(event, raw)
     }
   )
+
+  registerFaProjectManagementE2eStagingIpc(ipcMain)
 
   installFaProjectManagementE2ePathOverrideGlobals()
 

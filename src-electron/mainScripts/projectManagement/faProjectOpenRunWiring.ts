@@ -28,7 +28,7 @@ import {
 } from './faProjectDbMigrateWiring'
 import {
   faDisplayNameFallbackFromProjectPath
-} from './projectManagement_manager'
+} from './projectManagementSharedPathWiring'
 import { resolveFaProjectOpenTargetPath } from './faProjectOpenResolveTargetPathWiring'
 import {
   recordRecentProjectEntry,

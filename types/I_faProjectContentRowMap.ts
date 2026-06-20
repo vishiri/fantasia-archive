@@ -56,6 +56,7 @@ export interface I_faSqlWorldTemplatePlacementJoinRow {
   group_id: string | null
   root_sort_order: number | null
   group_sort_order: number | null
+  nickname: string
   created_at_ms: number
   updated_at_ms: number
   display_name: string

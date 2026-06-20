@@ -4,7 +4,14 @@ import { expect, test, vi } from 'vitest'
 import type { QInput } from 'quasar'
 
 import { clearDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuFocus } from '../dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuFocusWiring'
+import { shouldClearDialogProjectSettingsWorldTemplateLayoutRenameMenuActiveElementFocus } from '../functions/shouldClearDialogProjectSettingsWorldTemplateLayoutRenameMenuActiveElementFocus'
+import { scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus } from '../functions/scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus'
 import { wireDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWatchers } from '../dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWatchWiring'
+
+const closedRenameMenuClearFocusOptions = {
+  getOpenRenameMenuTargetKey: () => null,
+  getRenameMenuTargetKey: () => null
+}
 
 /**
  * clearDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuFocus
@@ -19,14 +26,67 @@ test('Test that rename menu focus wiring clears anchor and focus helper blur sta
   document.body.appendChild(anchor)
   anchor.focus()
 
-  clearDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuFocus(ref(anchor))
+  clearDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuFocus(
+    ref(anchor),
+    closedRenameMenuClearFocusOptions
+  )
 
   expect(anchor.classList.contains('q-manual-focusable--focused')).toBe(false)
   document.body.removeChild(anchor)
 })
 
 test('Test that rename menu focus wiring no-ops when anchor ref is null', () => {
-  clearDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuFocus(ref(null))
+  clearDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuFocus(
+    ref(null),
+    closedRenameMenuClearFocusOptions
+  )
+})
+
+test('Test that rename menu hide skips active blur when another row menu is open', () => {
+  const input = document.createElement('input')
+  document.body.appendChild(input)
+  input.focus()
+
+  clearDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuFocus(ref(null), {
+    getOpenRenameMenuTargetKey: () => 'group:other-row',
+    getRenameMenuTargetKey: () => 'group:this-row'
+  })
+
+  expect(document.activeElement).toBe(input)
+  document.body.removeChild(input)
+})
+
+/**
+ * shouldClearDialogProjectSettingsWorldTemplateLayoutRenameMenuActiveElementFocus
+ * Blurs active element only when no other rename menu owns the shared target.
+ */
+test('Test that rename menu active blur guard allows blur when menu fully closed', () => {
+  expect(shouldClearDialogProjectSettingsWorldTemplateLayoutRenameMenuActiveElementFocus(null, 'group:a')).toBe(true)
+  expect(shouldClearDialogProjectSettingsWorldTemplateLayoutRenameMenuActiveElementFocus('group:a', 'group:a')).toBe(true)
+  expect(shouldClearDialogProjectSettingsWorldTemplateLayoutRenameMenuActiveElementFocus('group:b', 'group:a')).toBe(false)
+})
+
+/**
+ * scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus
+ * Retries focus after nextTick and requestAnimationFrame.
+ */
+test('Test that rename menu input focus scheduler retries after animation frame', async () => {
+  const focus = vi.fn()
+  let rafCallback: FrameRequestCallback | undefined
+  scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus({
+    focusRenameInput: focus,
+    nextTick,
+    requestAnimationFrame: (callback) => {
+      rafCallback = callback
+      return 1
+    }
+  })
+
+  await nextTick()
+  expect(focus).toHaveBeenCalledTimes(1)
+  rafCallback?.(0)
+  await nextTick()
+  expect(focus).toHaveBeenCalledTimes(2)
 })
 
 /**
@@ -42,7 +102,7 @@ test('Test that rename menu label watcher updates draft when menu is closed', as
   })
 
   wireDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWatchers({
-    getNodeLabel: () => nodeLabel.value,
+    getRenameDraftSeed: () => nodeLabel.value,
     renameDraft,
     renameInputRef: ref(null),
     renameMenuOpen
@@ -72,7 +132,7 @@ test('Test that rename menu open watcher focuses the rename input on next tick',
   } as unknown as QInput)
 
   wireDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWatchers({
-    getNodeLabel: () => 'Label',
+    getRenameDraftSeed: () => 'Label',
     renameDraft,
     renameInputRef,
     renameMenuOpen
@@ -81,6 +141,11 @@ test('Test that rename menu open watcher focuses the rename input on next tick',
   isOpen.value = true
   await nextTick()
   await nextTick()
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      void nextTick().then(resolve)
+    })
+  })
   expect(focus).toHaveBeenCalled()
 })
 
@@ -98,20 +163,26 @@ test('Test that rename menu wiring inject fallback keeps a local open target ref
     id: '770e8400-e29b-41d4-a716-446655440001',
     label: 'Creatures',
     nodeKind: 'group' as const,
+    nickname: '',
+    templateDisplayName: '',
+    usesNickname: false,
     worldAppendix: ''
   }
   let wiring!: ReturnType<typeof createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring>
   const Child = defineComponent({
     setup () {
       wiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring({
-        emitRenameDocumentTemplate: vi.fn(),
         emitRenameGroup: vi.fn(),
+        emitRenamePlacementNickname: vi.fn(),
         getNode: () => groupNode,
         isGroupNameInvalid: () => false,
-        isTemplateNameInvalid: () => false,
         nodeAnchorRef: ref(document.createElement('div')),
         translateGroupNameErrorRequired: () => 'Group required',
-        translateTemplateNameErrorRequired: () => 'Template required'
+        translateGroupRenameInputLabel: () => 'Name of the group',
+        translateTemplateCanonicalNameLabel: () => 'Document template name',
+        translateTemplateCanonicalNameTooltip: () => 'Canonical tooltip',
+        translateTemplateNicknameLabel: () => 'Nickname',
+        translateTemplateNicknameTooltip: () => 'Nickname tooltip'
       })
       return () => h('div')
     }

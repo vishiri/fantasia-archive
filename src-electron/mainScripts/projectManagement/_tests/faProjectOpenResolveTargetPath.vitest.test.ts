@@ -51,11 +51,10 @@ vi.mock('app/src-electron/mainScripts/windowManagement/windowManagement_manager'
   return resolvePathMocks.mainWindowExports
 })
 
-vi.mock('../projectManagement_manager', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../projectManagement_manager')>()
-
+vi.mock('../projectManagementSharedE2ePathWiring', () => {
   return {
-    ...actual,
+    installFaProjectManagementE2ePathOverrideGlobals: vi.fn(),
+    takeNextE2eProjectCreatePath: vi.fn((): string | null => null),
     takeNextE2eProjectOpenPath: resolvePathMocks.takeE2eOpen
   }
 })

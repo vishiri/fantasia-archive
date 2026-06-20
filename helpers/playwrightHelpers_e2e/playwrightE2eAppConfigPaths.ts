@@ -6,13 +6,6 @@ import { Result } from 'neverthrow'
 
 import { getFaPlaywrightIsolatedUserDataDir } from 'app/helpers/playwrightHelpers_universal/playwrightUserDataReset'
 
-/**
- * Keep in lockstep with 'src-electron/mainScripts/appConfig/faAppConfigE2ePathOverride.ts'
- * 'globalThis' keys (Playwright E2E main-process hooks; helpers must not import main bundles).
- */
-const FA_E2E_GLOBAL_SET_NEXT_EXPORT_PATH = '__faE2eSetNextAppConfigExportPath' as const
-const FA_E2E_GLOBAL_SET_NEXT_IMPORT_PATH = '__faE2eSetNextAppConfigImportPath' as const
-
 const BLANK_FACONFIG_PATTERN = /^blank_.*\.faconfig$/u
 
 /**
@@ -42,40 +35,50 @@ export function getPlaywrightE2eUserDataFilePath (fileName: string): string {
   return path.join(getFaPlaywrightIsolatedUserDataDir(), fileName)
 }
 
-type T_mainGlobalE2eSetterArg = { k: string, p: string }
-
-async function e2eInvokeMainPathSetter (electronApp: ElectronApplication, arg: T_mainGlobalE2eSetterArg): Promise<void> {
-  /**
-   * Playwright 'ElectronApplication.evaluate' runs in the main process; its callback receives
-   * the 'electron' module as the first parameter when present in typings.
-   */
-  await electronApp.evaluate(
-    (_crossExports: unknown, a: T_mainGlobalE2eSetterArg) => {
-      const g = globalThis as unknown as Record<string, ((v: string) => void) | undefined>
-      g[a.k]?.(a.p)
-    },
-    arg
-  )
+async function e2eStageAppConfigPathViaRendererBridge (
+  electronApp: ElectronApplication,
+  filePath: string,
+  kind: 'export' | 'import'
+): Promise<void> {
+  const page = await electronApp.firstWindow()
+  const staged = await page.evaluate(async (args: { filePath: string, kind: 'export' | 'import' }) => {
+    const api = window.faContentBridgeAPIs?.faAppConfig
+    if (api === undefined) {
+      return false
+    }
+    if (args.kind === 'export') {
+      return await api.stageE2eNextExportPath(args.filePath)
+    }
+    return await api.stageE2eNextImportPath(args.filePath)
+  }, {
+    filePath,
+    kind,
+  })
+  if (staged !== true) {
+    throw new Error(`Failed to stage E2E app-config ${kind} path in main process.`)
+  }
 }
 
 /**
  * Tells the Electron main process the absolute path of the next app-config export (E2E only).
  */
 export async function e2eSetNextAppConfigExportPath (electronApp: ElectronApplication, fileName: string): Promise<void> {
-  await e2eInvokeMainPathSetter(electronApp, {
-    k: FA_E2E_GLOBAL_SET_NEXT_EXPORT_PATH,
-    p: getPlaywrightE2eUserDataFilePath(fileName)
-  })
+  await e2eStageAppConfigPathViaRendererBridge(
+    electronApp,
+    getPlaywrightE2eUserDataFilePath(fileName),
+    'export'
+  )
 }
 
 /**
  * Tells the Electron main process the absolute path of the next app-config import pick (E2E only).
  */
 export async function e2eSetNextAppConfigImportPath (electronApp: ElectronApplication, fileName: string): Promise<void> {
-  await e2eInvokeMainPathSetter(electronApp, {
-    k: FA_E2E_GLOBAL_SET_NEXT_IMPORT_PATH,
-    p: getPlaywrightE2eUserDataFilePath(fileName)
-  })
+  await e2eStageAppConfigPathViaRendererBridge(
+    electronApp,
+    getPlaywrightE2eUserDataFilePath(fileName),
+    'import'
+  )
 }
 
 const E2E_FACONFIG_BASENAMES = [

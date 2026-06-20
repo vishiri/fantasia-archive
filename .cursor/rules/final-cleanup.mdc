@@ -7,27 +7,19 @@ alwaysApply: true
 
 # Final cleanup trigger
 
-When the user message mentions **final cleanup** or equivalent intent, treat it as an explicit end-of-batch directive. **Read and follow** [.cursor/skills/fantasia-final-cleanup/SKILL.md](../skills/fantasia-final-cleanup/SKILL.md) and execute **all steps in order** without skipping or reordering.
+User message mentions **final cleanup** or equivalent → explicit end-of-batch directive. **Read and follow** [.cursor/skills/fantasia-final-cleanup/SKILL.md](../skills/fantasia-final-cleanup/SKILL.md); execute **all steps in order** without skip/reorder.
 
 ## Trigger phrases (non-exhaustive)
 
-- final cleanup
-- doing final cleanup
-- do a final cleanup
-- run final cleanup
-- wrap up / ship it (when clearly meaning commit, changelog, and push)
+- final cleanup / doing final cleanup / do a final cleanup / run final cleanup
+- wrap up / ship it (when clearly commit + changelog + push)
 
 ## Mandatory order (summary)
 
-1. **`yarn testbatch:verify`** — fix failures until green.
-2. **Docs** — sync `README.md`, `AGENTS.md`, `.cursor/rules/`, `.cursor/skills/` from the current Git diff.
-3. **Changelog** — update `i18n/*/documents/changeLog.md` from shipped product changes (see [changelog-en-us.mdc](changelog-en-us.mdc)).
-4. **Commits** — logical conventional batches (final cleanup may commit without per-commit approval unless the user interrupts).
+1. **`yarn testbatch:verify`** — fix until green.
+2. **Docs** — sync `README.md`, `AGENTS.md`, `.cursor/rules/`, `.cursor/skills/` from Git diff.
+3. **Changelog** — update `i18n/*/documents/changeLog.md` from shipped product ([changelog-en-us.mdc](changelog-en-us.mdc)).
+4. **Commits** — logical conventional batches (final cleanup may commit without per-commit approval unless user interrupts).
 5. **`git push`** — after all commits succeed.
 
-Do **not** substitute `testbatch:ensure:nochange` or `testbatch:ensure:change` for step 1 unless the user explicitly asks for the full ensure gate in the same message.
-
-## TypeScript interfaces and types (`types/`)
-
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+Do **not** substitute `testbatch:ensure:nochange` or `testbatch:ensure:change` for step 1 unless user explicitly asks full ensure gate in same message.

@@ -25,5 +25,19 @@ export const faAppConfigAPI: I_faAppConfigAPI = {
 
   async disposeImportSession (sessionId: string): Promise<void> {
     await ipcRenderer.invoke(FA_APP_CONFIG_IPC.disposeImportSessionAsync, sessionId)
+  },
+
+  async stageE2eNextExportPath (filePath: string): Promise<boolean> {
+    return await ipcRenderer.invoke(
+      FA_APP_CONFIG_IPC.stageE2eNextExportPathAsync,
+      filePath
+    ) as boolean
+  },
+
+  async stageE2eNextImportPath (filePath: string): Promise<boolean> {
+    return await ipcRenderer.invoke(
+      FA_APP_CONFIG_IPC.stageE2eNextImportPathAsync,
+      filePath
+    ) as boolean
   }
 }

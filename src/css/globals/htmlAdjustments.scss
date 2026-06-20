@@ -56,7 +56,7 @@ p {
 }
 
 li {
-  padding-bottom: 3px;
+  padding-bottom: $globals-listItem-paddingBottom;
 }
 
 code {

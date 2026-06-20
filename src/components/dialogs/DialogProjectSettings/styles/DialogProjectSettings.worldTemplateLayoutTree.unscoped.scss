@@ -32,15 +32,17 @@
   }
 }
 
+/* Drag placeholder: inset accent + tinted fill. Revert: transparent bg + dashed primary-bright border only. */
 .dialogProjectSettingsWorldTemplateLayoutTree .he-tree-drag-placeholder {
-  background: $dialogProjectSettings-worldTemplateLayout-dragPlaceholder-backgroundColor;
-  border-color: $dialogProjectSettings-worldTemplateLayout-dragPlaceholder-borderColor;
+  background-color: $dialogProjectSettings-worldTemplateLayout-dragPlaceholder-backgroundColor;
+  border: $dialogProjectSettings-worldTemplateLayout-dragPlaceholder-borderWidth solid $dialogProjectSettings-worldTemplateLayout-dragPlaceholder-borderColor;
+  border-radius: $dialogProjectSettings-worldTemplateLayout-dragPlaceholder-borderRadius;
+  border-style: solid;
+  box-shadow: inset $dialogProjectSettings-worldTemplateLayout-dragPlaceholder-accentWidth 0 0 fa-v('primary-bright', $primary-bright);
+  min-height: $dialogProjectSettings-worldTemplateLayout-treeNode-minHeight;
 }
 
 .dialogProjectSettingsWorldTemplateLayoutTree .tree-node {
   align-items: center;
-}
-
-.dialogProjectSettingsWorldTemplateLayoutTree .tree-node-children {
-  padding-left: $dialogProjectSettings-worldTemplateLayout-treeIndent;
+  width: 100%;
 }

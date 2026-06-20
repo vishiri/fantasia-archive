@@ -89,4 +89,12 @@ export interface I_faProjectManagementAPI {
   setProjectNoteboard: (patch: I_faProjectNoteboardPatch) => Promise<boolean>
   setProjectSettings: (patch: I_faProjectSettingsPatch) => Promise<boolean>
   setProjectStyling: (patch: I_faProjectStylingPatch) => Promise<boolean>
+  /**
+   * Playwright E2E only: stages the absolute path for the next create flow so main skips the native save dialog.
+   */
+  stageE2eNextCreatePath: (filePath: string) => Promise<boolean>
+  /**
+   * Playwright E2E only: stages the absolute path for the next open flow so main skips the native open dialog.
+   */
+  stageE2eNextOpenPath: (filePath: string) => Promise<boolean>
 }

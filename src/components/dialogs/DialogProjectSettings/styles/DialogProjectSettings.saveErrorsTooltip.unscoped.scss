@@ -1,5 +1,5 @@
 .dialogProjectSettings__saveErrorTooltip.q-tooltip {
-  max-width: 420px;
+  max-width: $dialogProjectSettings-fieldHelpTooltip-maxWidth;
   text-align: left;
 }
 
@@ -8,5 +8,5 @@
 }
 
 .dialogProjectSettings__saveErrorTooltipIntro + .dialogProjectSettings__saveErrorTooltipBullet {
-  margin-top: 4px;
+  margin-top: $dialogProjectSettings-fieldHelpTooltip-bullet-marginTop;
 }

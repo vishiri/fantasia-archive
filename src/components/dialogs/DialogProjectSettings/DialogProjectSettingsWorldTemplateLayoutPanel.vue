@@ -21,19 +21,21 @@
             :template-layout="props.world.templateLayout"
             @delete-group="onDeleteGroup"
             @remove-placement="onRemovePlacement"
-            @rename-document-template="onRenameDocumentTemplate"
+            @rename-placement-nickname="onRenamePlacementNickname"
             @rename-group="onRenameGroup"
             @update:template-layout="emitTemplateLayout"
           />
         </div>
-        <q-btn
-          class="dialogProjectSettingsWorldTemplateLayoutPanel__addGroup q-mt-sm"
-          color="primary-bright"
-          data-test-locator="dialogProjectSettings-worldTemplateLayoutAddGroup"
-          flat
-          :label="$t('dialogs.projectSettings.fields.worldTemplateLayout.addGroupButton')"
-          @click="onAddGroup"
-        />
+        <div class="dialogProjectSettingsWorldTemplateLayoutPanel__addGroupRow faVerticalDraggableTabs__addButtonRow q-mt-sm">
+          <q-btn
+            outline
+            class="faVerticalDraggableTabs__addButton"
+            color="primary-bright"
+            data-test-locator="dialogProjectSettings-worldTemplateLayoutAddGroup"
+            :label="$t('dialogs.projectSettings.fields.worldTemplateLayout.addGroupButton')"
+            @click="onAddGroup"
+          />
+        </div>
       </div>
 
       <q-separator
@@ -73,7 +75,8 @@ import {
   appendDialogProjectSettingsWorldTemplatePlacementDraft,
   removeDialogProjectSettingsWorldTemplateGroupDraft,
   removeDialogProjectSettingsWorldTemplatePlacementDraft,
-  renameDialogProjectSettingsWorldTemplateGroupDraft
+  renameDialogProjectSettingsWorldTemplateGroupDraft,
+  renameDialogProjectSettingsWorldTemplatePlacementNicknameDraft
 } from './scripts/dialogProjectSettingsWorldTemplateLayoutDraft'
 import {
   collectBlankTemplateGroupIdsInWorldTemplateLayout,
@@ -95,7 +98,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  updateDocumentTemplateDisplayName: [documentTemplateId: string, displayName: string]
   'update:templateLayout': [layout: I_dialogProjectSettingsWorldTemplateLayoutDraft]
 }>()
 
@@ -153,9 +155,9 @@ function onAddTemplate (templateId: string): void {
   const nextLayout = appendDialogProjectSettingsWorldTemplatePlacementDraft(
     props.world.templateLayout,
     {
-      displayName: template.displayName,
       documentTemplateId: template.id,
       icon: template.icon,
+      templateDisplayName: template.displayName,
       worldAppendix: template.worldAppendix
     }
   )
@@ -179,8 +181,13 @@ function onRenameGroup (groupId: string, displayName: string): void {
   emitTemplateLayout(nextLayout)
 }
 
-function onRenameDocumentTemplate (documentTemplateId: string, displayName: string): void {
-  emit('updateDocumentTemplateDisplayName', documentTemplateId, displayName)
+function onRenamePlacementNickname (placementId: string, nickname: string): void {
+  const nextLayout = renameDialogProjectSettingsWorldTemplatePlacementNicknameDraft(
+    props.world.templateLayout,
+    placementId,
+    nickname
+  )
+  emitTemplateLayout(nextLayout)
 }
 
 function onRemovePlacement (placementId: string): void {
@@ -248,7 +255,7 @@ function onRemovePlacement (placementId: string): void {
   padding-right: $dialogProjectSettings-worldTemplateLayout-availableCol-paddingInline;
 }
 
-.dialogProjectSettingsWorldTemplateLayoutPanel__addGroup {
+.dialogProjectSettingsWorldTemplateLayoutPanel__addGroupRow {
   flex-shrink: 0;
 }
 </style>

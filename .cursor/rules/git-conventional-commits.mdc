@@ -5,16 +5,16 @@ alwaysApply: true
 
 # Git — conventional commits
 
-- **Format**: `type: imperative subject` — lowercase type, **space after colon**, no period at end of subject; body optional for context.
-- **Allowed types** (use the narrowest fit): `feat`, `fix`, `test`, `chore`, `refactor`, `style`, `docs`.
-- **Split commits** by logical concern (feature vs tests vs tooling vs docs vs style-only). Do not mix unrelated changes in one commit.
-- When the user asks for **staged commits** or **approval per commit**: follow the full workflow in [git-conventional-commits skill](../skills/git-conventional-commits/SKILL.md) — propose each commit, wait for explicit approval, then run `git add` + `git commit` for that chunk only.
-- **Before any commit OR changelog edit**, enforce this order (see [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) for the **changelog-only** quality-gate exception):
-  1. Run the **quality gate** in **one** terminal: `yarn testbatch:verify` (must pass; run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, or `yarn test:coverage:verify` / slice scripts individually only while debugging a failure). **Skip** this step only when committing **exclusively** files matching **`i18n/*/documents/changeLog.md`** and you **already** ran **`yarn testbatch:verify`** successfully after the latest substantive edits with **no** other pending changes since then; if **unsure**, run **`yarn testbatch:verify`** anyway. When the change touches lint-covered sources, ESLint is required — see [eslint-typescript.mdc](eslint-typescript.mdc).
-  2. Verify Storybook coverage/health for changed user-facing **`src/components/**`** and add/update missing `_tests/*.stories.ts` plus mocks/placeholders as needed. Layout/page Storybook previews (`src/layouts/**/_tests`, `src/pages/**/_tests`) stay canvas-only without Docs — see [storybook-stories.mdc](storybook-stories.mdc). **Skip** when the pending commit is **changelog-only** as in step 1 and Storybook was already satisfied for the prior work.
-  3. Update `i18n/en-US/documents/changeLog.md` for user-visible changes **before** `git commit` (follow changelog rules/skill and NEVER auto-bump versions; changelog version must follow existing `package.json` version only). **Prefer the same commit** as the substantive change; avoid a routine changelog-only follow-up after push. Mirror translations under other locales’ **`documents/changeLog.md`** when you maintain them. Do not add bullets about commits, pushes, or editing the changelog.
+- **Format**: `type: imperative subject` — lowercase type, **space after colon**, no period on subject; body optional.
+- **Allowed types** (narrowest fit): `feat`, `fix`, `test`, `chore`, `refactor`, `style`, `docs`.
+- **Split commits** by logical concern (feature vs tests vs tooling vs docs vs style-only). No unrelated mix in one commit.
+- **Staged commits** / **approval per commit**: [git-conventional-commits skill](../skills/git-conventional-commits/SKILL.md) — propose each, wait approval, `git add` + `git commit` per chunk.
+- **Before any commit OR changelog edit**, enforce order ([testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) **changelog-only** exception):
+  1. **Quality gate** in **one** terminal: `yarn testbatch:verify` (must pass; slice scripts only while debugging). **Skip** only when committing **exclusively** **`i18n/*/documents/changeLog.md`** and **`yarn testbatch:verify`** already passed after latest substantive edits with **no** other pending changes; if **unsure**, run gate. Lint-covered sources → ESLint required ([eslint-typescript.mdc](eslint-typescript.mdc)).
+  2. Storybook coverage/health for changed **`src/components/**`**; add/update `_tests/*.stories.ts` + mocks. Layout/page previews canvas-only without Docs — [storybook-stories.mdc](storybook-stories.mdc). **Skip** on changelog-only when Storybook satisfied for prior work.
+  3. Update `i18n/en-US/documents/changeLog.md` for user-visible changes **before** `git commit` (changelog rules/skill; NEVER auto-bump versions; version from `package.json` only). **Prefer same commit** as substantive change; avoid changelog-only follow-up after push. Mirror other locales’ **`documents/changeLog.md`** when maintained. No bullets about commits, pushes, or editing changelog.
   4. Commit.
-- If **any** gate fails (lint, types, stylelint, or Vitest coverage), **stop the commit flow**, do not run `git commit`, and inform the user with a concise summary that includes what failed and where (file paths and key error locations/messages).
+- Any gate fail (lint, types, stylelint, Vitest coverage) → **stop commit flow**, no `git commit`; inform user with concise summary (paths + key errors).
 
 ## Type cheat sheet
 
@@ -30,11 +30,6 @@ alwaysApply: true
 
 ## Local enforcement (commitlint + Husky)
 
-- **`commitlint.config.mjs`** at the repo root mirrors this **`type`** list; messages starting with **`Merge `** or **`Revert `** are ignored so Git merges and reverts are not blocked.
-- **`yarn install`** runs **`husky`** via the **`prepare`** script in **`package.json`**; **`.husky/commit-msg`** runs **`yarn lint:commit --edit`** so invalid subjects are rejected before **`git commit`** completes locally.
-- Try a message without committing: **`echo "feat: example" | yarn lint:commit`**. CI (**`.github/workflows/verify.yml`**) does not run commitlint unless you add a workflow step.
-
-## TypeScript interfaces and types (`types/`)
-
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+- **`commitlint.config.mjs`** mirrors **`type`** list; **`Merge `** / **`Revert `** ignored.
+- **`yarn install`** → **`husky`** via **`prepare`** in **`package.json`**; **`.husky/commit-msg`** → **`yarn lint:commit --edit`** rejects invalid subjects before **`git commit`** locally.
+- Dry-run: **`echo "feat: example" | yarn lint:commit`**. CI (**`.github/workflows/verify.yml`**) does not run commitlint unless workflow step added.

@@ -94,7 +94,7 @@ function emitAddTemplate (templateId: string): void {
 }
 
 .dialogProjectSettingsWorldAvailableTemplatesList__empty {
-  padding-block: 12px;
+  padding-block: $dialogProjectSettings-worldTemplateLayout-availableListEmpty-paddingBlock;
   padding-inline: $dialogProjectSettings-worldTemplateLayout-availableCol-paddingInline;
 }
 

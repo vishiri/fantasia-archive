@@ -9,6 +9,12 @@ export const faProjectContentDisplayNameSchema = z
   .transform((s) => s.trim())
   .refine((s) => s.length > 0, 'display name is empty after trim')
 
+/** Optional placement nickname: empty string means no override. */
+export const faProjectWorldTemplatePlacementNicknameSchema = z
+  .string()
+  .max(FA_PROJECT_NAME_MAX_LEN, 'nickname is too long')
+  .transform((s) => s.trim())
+
 export const faProjectContentIdSchema = z.string().uuid('id must be a UUID')
 
 export function parseFaProjectContentPlainRecord (value: unknown): Record<string, unknown> {

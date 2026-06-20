@@ -5,19 +5,18 @@ alwaysApply: true
 
 # TypeScript interfaces and types (`types/`)
 
-- Put shared `export interface` and `export type` declarations in repository-root **`types/`** and import them with **`app/types/...`** (for example **`app/types/I_faActionManagerDomain`**).
-- Prefer one domain-oriented module per feature area with brief JSDoc on exports (see **`types/I_appMenusDataList.ts`**). Do **not** add colocated **`<filename>.types.ts`** under **`src/`**, **`src-electron/`**, **`.storybook-workspace/`**, or **`helpers/`**.
-- Ambient augmentations for third-party modules also live under **`types/`** and are loaded with a side-effect import from the owning boot file or **`src/stores/index.ts`** (see **`types/piniaModuleAugmentation.ts`**).
-- **Do not** add modules whose only job is **`export type { … } from 'app/types/...'`** (or re-exporting types from implementation files). Import from the defining **`types/`** module at each call site instead.
-- **Managers**, **stores**, and **barrel** files may export **values** (functions, constants) but must **not** re-export types; consumers import types from **`app/types/...`** directly.
-- ESLint enforces **`types-folder/no-exported-types-outside-types`** on **`**/*.{ts,vue}`** outside **`types/**`**, **`**/*.d.ts`**, and **`i18n/**`**.
+- Shared `export interface` / `export type` → repo-root **`types/`**; import **`app/types/...`**
+- One domain module per feature; brief JSDoc (see **`types/I_appMenusDataList.ts`**)
+- No colocated **`<filename>.types.ts`** under **`src/`**, **`src-electron/`**, **`.storybook-workspace/`**, **`helpers/`**
+- Ambient augmentations → **`types/`**; side-effect import from owning boot or **`src/stores/index.ts`** (see **`types/piniaModuleAugmentation.ts`**)
+- No shim modules that only re-export types from **`app/types/...`**
+- Managers/stores/barrels export values only; consumers import types from **`app/types/...`**
+- ESLint **`types-folder/no-exported-types-outside-types`** on **`**/*.{ts,vue}`** outside **`types/**`**, **`**/*.d.ts`**, **`i18n/**`**
 
 ## Naming
 
-- **`I_`** prefix for interfaces (for example **`I_faActiveProject`**).
-- **`T_`** prefix for type aliases (for example **`T_faActionId`**).
-- Locale message modules under **`i18n/`** keep their own **`L_`** convention.
+- **`I_`** interfaces, **`T_`** type aliases; **`i18n/`** uses **`L_`**
 
 ## Level-1 `functions/`
 
-- **`functions/**`** may use **`import type`** from **`app/types/**`** only (see [fa-two-level-architecture.mdc](fa-two-level-architecture.mdc)).
+- **`import type`** from **`app/types/**`** only ([fa-two-level-architecture.mdc](fa-two-level-architecture.mdc))

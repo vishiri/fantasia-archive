@@ -86,6 +86,7 @@ export function mapFaProjectWorldTemplatePlacementForProjectSettingsRow (
     rootSortOrder: row.root_sort_order,
     groupSortOrder: row.group_sort_order,
     displayName: row.display_name,
+    nickname: row.nickname,
     worldAppendix: row.world_appendix,
     icon: row.icon,
     documentCountInWorld,

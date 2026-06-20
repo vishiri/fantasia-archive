@@ -8,13 +8,13 @@ alwaysApply: false
 
 ## When this applies
 
-Use this rule whenever the renderer shows a **hierarchical tree** (expand/collapse, nested folders, drag-reorder, checkboxes on branches, or similar). Examples: project worlds, document browsers, template hierarchies, settings trees with nested groups.
+Renderer **hierarchical tree** (expand/collapse, nested folders, drag-reorder, branch checkboxes, etc.): project worlds, document browsers, template hierarchies, settings trees with nested groups.
 
 ## Required library (full replacement)
 
-- **Use [`@he-tree/vue`](https://hetree.phphe.com/)** exclusively (`BaseTree`, `Draggable`, helpers such as `walkTreeData`).
-- **Never** use Quasar **`QTree`** / **`q-tree`** anywhere in this repository — not for small trees, not for prototypes, not in Storybook product previews. **`@he-tree/vue`** is the **only** approved tree implementation for Fantasia Archive.
-- Do not add **`QTree`** to new code and remove any legacy **`QTree`** usage when you touch that surface.
+- **Use [`@he-tree/vue`](https://hetree.phphe.com/)** only (`BaseTree`, `Draggable`, helpers e.g. `walkTreeData`).
+- **Never** Quasar **`QTree`** / **`q-tree`** anywhere — not small trees, prototypes, Storybook product previews. **`@he-tree/vue`** = **only** approved tree implementation.
+- No new **`QTree`**; remove legacy **`QTree`** when touching surface.
 
 ## Imports and styles
 
@@ -23,36 +23,31 @@ import { BaseTree, Draggable } from '@he-tree/vue'
 import '@he-tree/vue/style/default.css'
 ```
 
-- Import the default stylesheet **once** per tree surface (feature SFC or a dedicated wrapper SFC). Override visuals in feature **`styles/`** SCSS with BEM + semantic tokens — do not fork the library CSS wholesale.
-- Prefer **`Draggable`** when users may reorder nodes; **`BaseTree`** for read-only or selection-only trees.
-- **List DnD policy:** tree reorder uses **he-tree** built-in drag-and-drop only — **do not** wrap nodes with **`vue-draggable-plus`** ([fa-drag-drop-lists.mdc](fa-drag-drop-lists.mdc)).
+- Import default stylesheet **once** per tree surface (feature SFC or wrapper). Override in feature **`styles/`** SCSS with BEM + semantic tokens — do not fork library CSS wholesale.
+- **`Draggable`** when users reorder nodes; **`BaseTree`** read-only or selection-only.
+- **List DnD policy:** tree reorder = he-tree built-in only — **no** **`vue-draggable-plus`** on nodes ([fa-drag-drop-lists.mdc](fa-drag-drop-lists.mdc)).
 
 ## Virtualization (performance)
 
-- Enable **`virtualization`** when the tree may hold **roughly 50+ visible rows** or deep expand-all paths.
-- The tree or a **bounded parent** must have an explicit **`height`** or **`max-height`** (fixed pixel height or flex child with a constrained scroll area). Virtualization does not work on an unbounded auto-height container.
-- Combine virtualization with **lazy child loading** from SQLite when branches are loaded on expand (see **`.cursor/skills/fantasia-sqlite-main/SKILL.md`**).
+- Enable **`virtualization`** when tree may hold **~50+ visible rows** or deep expand-all paths.
+- Tree or **bounded parent** needs explicit **`height`** or **`max-height`** (fixed px or flex child with constrained scroll). Virtualization fails on unbounded auto-height container.
+- Combine with **lazy child loading** from SQLite on expand ([fantasia-sqlite-main](../skills/fantasia-sqlite-main/SKILL.md)).
 
 ## Project layout
 
-- **Thin Vue SFC** — template slots, `data-test-locator`, i18n **`$t`**, Quasar icons/buttons inside **`#default`** node slots.
-- **Feature `scripts/`** — tree data mapping, expand state, filter/search, DnD handlers wired to Pinia or IPC.
-- **`src/scripts/faHeTree/`** — shared pure helpers (flatten, walk, id maps) when two or more features need the same tree utilities.
-- **Types** — shared node shapes under repo-root **`types/`** (`app/types/...`); do not add colocated `*.types.ts` under **`src/`**.
+- **Thin Vue SFC** — template slots, `data-test-locator`, i18n **`$t`**, Quasar icons/buttons in **`#default`** node slots.
+- **Feature `scripts/`** — tree data mapping, expand state, filter/search, DnD handlers → Pinia/IPC.
+- **`src/scripts/faHeTree/`** — shared pure helpers (flatten, walk, id maps) when ≥2 features need same utilities.
+- Types: repo-root **`types/`** (`app/types/...`); no colocated `*.types.ts` under **`src/`**. See [types-folder.mdc](types-folder.mdc).
 
 ## Styling and Quasar
 
-- Node rows may use Quasar **`q-icon`**, **`q-checkbox`**, **`q-btn`**, and **`fa-text-*`** / **`fa-icon-*`** classes inside the **`#default`** slot.
-- Wrap the scroll region with **`hasScrollbar`** when vertical scrollbar presence may shift layout ([`scrollbar.scss`](../../src/css/globals/scrollbar.scss)).
-- Add **`data-test-locator`** on the tree root and on interactive node chrome per [vue-template-test-hooks.mdc](vue-template-test-hooks.mdc).
+- Node rows: Quasar **`q-icon`**, **`q-checkbox`**, **`q-btn`**, **`fa-text-*`** / **`fa-icon-*`** in **`#default`** slot.
+- Scroll region: **`hasScrollbar`** when vertical scrollbar may shift layout ([`scrollbar.scss`](../../src/css/globals/scrollbar.scss)).
+- **`data-test-locator`** on tree root + interactive node chrome ([vue-template-test-hooks.mdc](vue-template-test-hooks.mdc)).
 
 ## Related
 
-- Playbook: [fantasia-he-tree skill](../skills/fantasia-he-tree/SKILL.md)
-- Vue/Quasar extraction: [vue-quasar.mdc](vue-quasar.mdc)
+- [fantasia-he-tree skill](../skills/fantasia-he-tree/SKILL.md)
+- [vue-quasar.mdc](vue-quasar.mdc)
 - [AGENTS.md](../../AGENTS.md) **Hierarchical trees (he-tree)**
-
-## TypeScript interfaces and types (`types/`)
-
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

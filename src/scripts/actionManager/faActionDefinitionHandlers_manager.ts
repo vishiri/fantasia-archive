@@ -1,3 +1,5 @@
+import { Notify } from 'quasar'
+
 import { i18n } from 'app/i18n/externalFileLoader'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
@@ -43,6 +45,7 @@ import {
 const faActionDefinitionHandlersApi = {
   ...createFaActionDefinitionHandlers({
     i18n,
+    notifyCreate: (options) => Notify.create(options),
     S_FaKeybinds,
     S_FaAppNoteboard,
     S_FaProjectNoteboard,

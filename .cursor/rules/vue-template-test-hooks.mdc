@@ -6,41 +6,36 @@ alwaysApply: false
 
 # Vue template — test hooks (`data-test-*`)
 
-Use this rule when adding or changing **attributes the UI tests locate**. It pairs with [playwright-tests.mdc](playwright-tests.mdc), which defines how `selectorList` and locators are written in `*.playwright.*.ts` files (including rare **full** selector strings in `selectorList` for portaled nodes that cannot carry project hooks, such as `'[role="tooltip"]'` for Quasar tooltips).
+UI test locator attributes. Pairs with [playwright-tests.mdc](playwright-tests.mdc) (`selectorList`, locators in `*.playwright.*.ts`; rare full selector strings for portaled nodes without hooks, e.g. `'[role="tooltip"]'`).
 
 ## Do not use bare `data-test`
 
-- **Never** add `data-test="..."` on production templates. Use **`data-test-locator="..."`** (or `:data-test-locator`) for the primary stable id Playwright/Vitest select with `[data-test-locator="..."]`.
-- Add **additional** hyphenated attributes only when tests need extra semantics (examples below).
+- **Never** `data-test="..."` on production templates. Use **`data-test-locator="..."`** (or `:data-test-locator`) — primary stable id; Playwright/Vitest: `[data-test-locator="..."]`.
+- Extra hyphenated attributes only when tests need more semantics (below).
 
 ## Primary locator
 
-- **`data-test-locator`** — stable string id per node (often `componentName-role-suffix`, e.g. `dialogAppSettings-title`, `globalWindowButtons-button-minimize`). Tests store these values in `selectorList` and build locators as `appWindow.locator(\`[data-test-locator="${selectorList.someKey}"]\`)`.
+- **`data-test-locator`** — stable string per node (often `componentName-role-suffix`, e.g. `dialogAppSettings-title`, `globalWindowButtons-button-minimize`). Tests: `selectorList` + `appWindow.locator(\`[data-test-locator="${selectorList.someKey}"]\`)`.
 
 ## Other `data-test-*` hooks in this repo
 
-- **`data-test-setting-id`**, **`data-test-tags`**, **`data-test-tooltip-text`** on App settings rows and help icons ([DialogAppSettings.vue](src/components/dialogs/DialogAppSettings/DialogAppSettings.vue)).
-- **Menu bar**: **`data-test-menu-test`** and **`data-test-menu-any`** on [AppControlMenus.vue](src/components/globals/AppControlMenus/AppControlMenus.vue) (see [AppControlMenus.playwright.test.ts](src/components/globals/AppControlMenus/_tests/AppControlMenus.playwright.test.ts)); Playwright uses `[data-test-menu-test="..."]` / `[data-test-menu-any="..."]`.
-- **Metadata / flags** asserted via attributes or `dataset`: e.g. **`data-test-image`**, **`data-test-is-random`**, **`data-test-layout-width`**, **`data-test-layout-height`** ([FantasiaMascotImage.vue](src/components/elements/FantasiaMascotImage/FantasiaMascotImage.vue)); the same layout keys on **[SocialContactSingleButton](src/components/elements/SocialContactSingleButton/SocialContactSingleButton.vue)** **q-img** and on the splash **SVG** in **[index.html](index.html)**; **`data-test-error-card-width`**, **`data-test-locator="errorCard-title"`**, and **`data-test-locator="errorCard-details"`** on **[ErrorCard](src/components/elements/ErrorCard/ErrorCard.vue)** (max-width cap in CSS pixels plus title and optional body copy). **`data-test-button-number`** ([SocialContactButtons.vue](src/components/other/SocialContactButtons/SocialContactButtons.vue)), **`data-test-has-proper-data-input`** ([AppControlSingleMenu.vue](src/components/globals/AppControlSingleMenu/AppControlSingleMenu.vue)).
+- **`data-test-setting-id`**, **`data-test-tags`**, **`data-test-tooltip-text`** — App settings rows, help icons ([DialogAppSettings.vue](src/components/dialogs/DialogAppSettings/DialogAppSettings.vue)).
+- Menu bar: **`data-test-menu-test`**, **`data-test-menu-any`** on [AppControlMenus.vue](src/components/globals/AppControlMenus/AppControlMenus.vue) ([AppControlMenus.playwright.test.ts](src/components/globals/AppControlMenus/_tests/AppControlMenus.playwright.test.ts)); Playwright: `[data-test-menu-test="..."]` / `[data-test-menu-any="..."]`.
+- Metadata / flags via attributes or `dataset`: **`data-test-image`**, **`data-test-is-random`**, **`data-test-layout-width`**, **`data-test-layout-height`** ([FantasiaMascotImage.vue](src/components/elements/FantasiaMascotImage/FantasiaMascotImage.vue)); same layout keys on **[SocialContactSingleButton](src/components/elements/SocialContactSingleButton/SocialContactSingleButton.vue)** **q-img** and splash **SVG** in **[index.html](index.html)**; **`data-test-error-card-width`**, **`data-test-locator="errorCard-title"`**, **`data-test-locator="errorCard-details"`** on **[ErrorCard](src/components/elements/ErrorCard/ErrorCard.vue)** (max-width cap in CSS px + title/body). **`data-test-button-number`** ([SocialContactButtons.vue](src/components/other/SocialContactButtons/SocialContactButtons.vue)), **`data-test-has-proper-data-input`** ([AppControlSingleMenu.vue](src/components/globals/AppControlSingleMenu/AppControlSingleMenu.vue)).
 
 ## Naming
 
-- Typically **lowerCamelCase block** plus hyphen-separated segments in the **value** of `data-test-locator`, e.g. `globalWindowButtons-button-minimize`, `dialogMarkdownDocument-markdown-wrapper`.
-- Child components may use shorter or compound names consistent with that subtree (e.g. `socialContactSingleButton-image`).
-- **Stay consistent** within the component and with the existing `selectorList` in its `_tests/*.playwright.test.ts` file.
+- Value: **lowerCamelCase block** + hyphen segments, e.g. `globalWindowButtons-button-minimize`, `dialogMarkdownDocument-markdown-wrapper`.
+- Child components: shorter/compound names consistent with subtree (e.g. `socialContactSingleButton-image`).
+- **Stay consistent** with component + existing `selectorList` in `_tests/*.playwright.test.ts`.
 
 ## Workflow
 
-1. Add or update hooks on the template (`data-test-locator` plus any extra `data-test-*` needed).
-2. Update the component’s Playwright `selectorList` and tests to match ([playwright-tests.mdc](playwright-tests.mdc)); Vitest/Storybook queries use the same attribute names.
-3. Rebuild before running Playwright ([README.md](README.md)).
+1. Add/update template hooks (`data-test-locator` + extra `data-test-*` as needed).
+2. Update Playwright `selectorList` + tests ([playwright-tests.mdc](playwright-tests.mdc)); Vitest/Storybook same attribute names.
+3. Rebuild before Playwright ([README.md](README.md)).
 
 ## Not in this rule
 
-- BEM **classes** for styling → [vue-bem-scss.mdc](vue-bem-scss.mdc).
+- BEM classes → [vue-bem-scss.mdc](vue-bem-scss.mdc).
 - Quasar / Composition API / script extraction → [vue-quasar.mdc](vue-quasar.mdc).
-
-## TypeScript interfaces and types (`types/`)
-
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.

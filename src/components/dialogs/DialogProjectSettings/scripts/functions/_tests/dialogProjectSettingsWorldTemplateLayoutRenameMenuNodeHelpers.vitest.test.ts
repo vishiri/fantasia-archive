@@ -16,7 +16,10 @@ const groupNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   icon: 'mdi-folder',
   id: '770e8400-e29b-41d4-a716-446655440001',
   label: 'Creatures',
+  nickname: '',
   nodeKind: 'group',
+  templateDisplayName: '',
+  usesNickname: false,
   worldAppendix: ''
 }
 
@@ -27,7 +30,10 @@ const templateNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   icon: 'mdi-account',
   id: '880e8400-e29b-41d4-a716-446655440001',
   label: 'Character',
+  nickname: '',
   nodeKind: 'template',
+  templateDisplayName: 'Character',
+  usesNickname: false,
   worldAppendix: ''
 }
 
@@ -38,14 +44,17 @@ const templateNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
 test('Test that resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTestLocators maps group and template locators', () => {
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKind(groupNode)).toBe('group')
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTestLocators('group')).toEqual({
+    canonicalNameTestLocator: undefined,
     contextMenuTestLocator: 'dialogProjectSettings-worldTemplateLayoutGroupContextMenu',
     renameInputTestLocator: 'dialogProjectSettings-worldTemplateLayoutGroupRenameInput'
   })
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTestLocators('template')).toEqual({
+    canonicalNameTestLocator: 'dialogProjectSettings-worldTemplateLayoutTemplateCanonicalName',
     contextMenuTestLocator: 'dialogProjectSettings-worldTemplateLayoutTemplateContextMenu',
     renameInputTestLocator: 'dialogProjectSettings-worldTemplateLayoutTemplateRenameInput'
   })
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTestLocators(null)).toEqual({
+    canonicalNameTestLocator: undefined,
     contextMenuTestLocator: undefined,
     renameInputTestLocator: undefined
   })
@@ -53,69 +62,61 @@ test('Test that resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTestLoc
 
 /**
  * emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate
- * Emits group and template rename events from tree node data.
+ * Emits group rename and placement nickname events from tree node data.
  */
 test('Test that emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate emits rename events', () => {
   const emitRenameGroup = vi.fn()
-  const emitRenameDocumentTemplate = vi.fn()
+  const emitRenamePlacementNickname = vi.fn()
 
   emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate({
     displayName: 'Dragons',
-    emitRenameDocumentTemplate,
     emitRenameGroup,
+    emitRenamePlacementNickname,
     node: groupNode
   })
   expect(emitRenameGroup).toHaveBeenCalledWith(groupNode.id, 'Dragons')
 
   emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate({
     displayName: 'Hero',
-    emitRenameDocumentTemplate,
     emitRenameGroup,
+    emitRenamePlacementNickname,
     node: templateNode
   })
-  expect(emitRenameDocumentTemplate).toHaveBeenCalledWith(templateNode.documentTemplateId, 'Hero')
+  expect(emitRenamePlacementNickname).toHaveBeenCalledWith(templateNode.id, 'Hero')
 })
 
 /**
  * resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuValidationErrorMessage
- * Returns group and template validation messages only when names are invalid.
+ * Returns group validation messages only when group names are invalid.
  */
 test('Test that rename menu validation helpers surface required-name errors', () => {
   const isInvalid = (displayName: string): boolean => displayName.trim().length === 0
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuValidationErrorMessage({
     displayName: '',
     isGroupNameInvalid: isInvalid,
-    isTemplateNameInvalid: isInvalid,
     nodeKind: 'group',
-    translateGroupNameErrorRequired: () => 'Group required',
-    translateTemplateNameErrorRequired: () => 'Template required'
+    translateGroupNameErrorRequired: () => 'Group required'
   })).toBe('Group required')
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuValidationErrorMessage({
     displayName: 'OK',
     isGroupNameInvalid: isInvalid,
-    isTemplateNameInvalid: isInvalid,
     nodeKind: 'template',
-    translateGroupNameErrorRequired: () => 'Group required',
-    translateTemplateNameErrorRequired: () => 'Template required'
+    translateGroupNameErrorRequired: () => 'Group required'
   })).toBeUndefined()
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuValidationErrorMessage({
     displayName: '',
     isGroupNameInvalid: isInvalid,
-    isTemplateNameInvalid: isInvalid,
     nodeKind: 'template',
-    translateGroupNameErrorRequired: () => 'Group required',
-    translateTemplateNameErrorRequired: () => 'Template required'
-  })).toBe('Template required')
+    translateGroupNameErrorRequired: () => 'Group required'
+  })).toBeUndefined()
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuHasError({
     displayName: '',
     isGroupNameInvalid: isInvalid,
-    isTemplateNameInvalid: isInvalid,
     nodeKind: 'template'
-  })).toBe(true)
+  })).toBe(false)
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuHasError({
     displayName: '',
     isGroupNameInvalid: isInvalid,
-    isTemplateNameInvalid: isInvalid,
     nodeKind: null
   })).toBe(false)
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKind({
@@ -126,31 +127,21 @@ test('Test that rename menu validation helpers surface required-name errors', ()
 
 /**
  * emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate
- * Skips template emit when documentTemplateId is blank.
+ * Ignores unsupported node kinds.
  */
-test('Test that emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate skips blank template ids', () => {
+test('Test that emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate ignores unsupported node kinds', () => {
   const emitRenameGroup = vi.fn()
-  const emitRenameDocumentTemplate = vi.fn()
-  const blankTemplateNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
-    ...templateNode,
-    documentTemplateId: ''
-  }
-  emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate({
-    displayName: 'Hero',
-    emitRenameDocumentTemplate,
-    emitRenameGroup,
-    node: blankTemplateNode
-  })
-  expect(emitRenameDocumentTemplate).not.toHaveBeenCalled()
+  const emitRenamePlacementNickname = vi.fn()
 
   emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate({
     displayName: 'Ignored',
-    emitRenameDocumentTemplate,
     emitRenameGroup,
+    emitRenamePlacementNickname,
     node: {
       ...groupNode,
       nodeKind: 'folder'
     } as unknown as typeof groupNode
   })
   expect(emitRenameGroup).not.toHaveBeenCalled()
+  expect(emitRenamePlacementNickname).not.toHaveBeenCalled()
 })

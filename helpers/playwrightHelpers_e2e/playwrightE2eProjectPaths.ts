@@ -10,21 +10,32 @@ function resolveE2eIsolatedUserDataFaprojectPath (baseName: string): string {
   return path.join(getFaPlaywrightIsolatedUserDataDir(), baseName)
 }
 
-import {
-  FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH,
-  FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH
-} from 'app/src-electron/mainScripts/projectManagement/functions/faProjectManagementE2ePathOverride'
-
-type T_mainGlobalE2eSetterArg = { k: string, p: string }
-
-async function e2eInvokeMainPathSetter (electronApp: ElectronApplication, arg: T_mainGlobalE2eSetterArg): Promise<void> {
-  await electronApp.evaluate(
-    (_crossExports: unknown, a: T_mainGlobalE2eSetterArg) => {
-      const g = globalThis as unknown as Record<string, ((v: string) => void) | undefined>
-      g[a.k]?.(a.p)
-    },
-    arg
-  )
+/**
+ * Stages the next create/open path through the renderer bridge so main-process IPC handlers
+ * receive it (Playwright 'ElectronApplication.evaluate' does not share real main 'globalThis').
+ */
+async function e2eStageProjectPathViaRendererBridge (
+  electronApp: ElectronApplication,
+  filePath: string,
+  kind: 'create' | 'open'
+): Promise<void> {
+  const page = await electronApp.firstWindow()
+  const staged = await page.evaluate(async (args: { filePath: string, kind: 'create' | 'open' }) => {
+    const api = window.faContentBridgeAPIs?.projectManagement
+    if (api === undefined) {
+      return false
+    }
+    if (args.kind === 'create') {
+      return await api.stageE2eNextCreatePath(args.filePath)
+    }
+    return await api.stageE2eNextOpenPath(args.filePath)
+  }, {
+    filePath,
+    kind,
+  })
+  if (staged !== true) {
+    throw new Error(`Failed to stage E2E project ${kind} path in main process.`)
+  }
 }
 
 /**
@@ -32,10 +43,7 @@ async function e2eInvokeMainPathSetter (electronApp: ElectronApplication, arg: T
  */
 export async function e2eSetNextProjectCreatePath (electronApp: ElectronApplication, baseName: string): Promise<void> {
   const abs = resolveE2eIsolatedUserDataFaprojectPath(baseName)
-  await e2eInvokeMainPathSetter(electronApp, {
-    k: FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH,
-    p: abs
-  })
+  await e2eStageProjectPathViaRendererBridge(electronApp, abs, 'create')
 }
 
 /**
@@ -43,10 +51,7 @@ export async function e2eSetNextProjectCreatePath (electronApp: ElectronApplicat
  */
 export async function e2eSetNextProjectOpenPath (electronApp: ElectronApplication, baseName: string): Promise<void> {
   const abs = resolveE2eIsolatedUserDataFaprojectPath(baseName)
-  await e2eInvokeMainPathSetter(electronApp, {
-    k: FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH,
-    p: abs
-  })
+  await e2eStageProjectPathViaRendererBridge(electronApp, abs, 'open')
 }
 
 /**

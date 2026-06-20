@@ -8,17 +8,12 @@ alwaysApply: false
 
 # Flatten database schemas
 
-When the user asks to **flatten** (squash, reset) **`.faproject`** schema versions or migrations during pre-release development:
+User asks to **flatten** (squash, reset) **`.faproject`** schema versions/migrations during pre-release dev:
 
-1. Invoke [fantasia-flatten-database-schemas skill](../skills/fantasia-flatten-database-schemas/SKILL.md) and follow its checklist end to end.
-2. Merge all table DDL into **`applyFaProjectProjectDataSchemaV1`** and **`applyFaProjectContentSchemaV1`** in **`faProjectDbSchemaDdl.ts`**; remove superseded **`applyFaProjectContentSchemaV*`** / incremental migration helpers.
-3. Set **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX`** to the new single version (**1** today) and simplify **`applyFaProjectMigrations`** to bootstrap-from-zero plus no-op at max only.
-4. Update **`docs/database/projectDB.md`**, migration tests, and user-facing changelog when the flatten ships product-visible behavior (for example dev files must be recreated).
-5. Resume normal **vN→vN+1** migration steps only when adding the **next** schema change after the flatten — do not restore obsolete historical ladders.
+1. Invoke [fantasia-flatten-database-schemas skill](../skills/fantasia-flatten-database-schemas/SKILL.md); follow checklist end to end.
+2. Merge all table DDL into **`applyFaProjectProjectDataSchemaV1`** + **`applyFaProjectContentSchemaV1`** in **`faProjectDbSchemaDdl.ts`**; remove superseded **`applyFaProjectContentSchemaV*`** / incremental migration helpers.
+3. Set **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX`** to new single version (**1** today); simplify **`applyFaProjectMigrations`** to bootstrap-from-zero + no-op at max only.
+4. Update **`docs/database/projectDB.md`**, migration tests, user-facing changelog when flatten ships product-visible behavior (e.g. dev files must be recreated).
+5. Resume normal **vN→vN+1** migration steps only when adding **next** schema change after flatten — do not restore obsolete historical ladders.
 
-**Agents:** mention [fantasia-flatten-database-schemas](../skills/fantasia-flatten-database-schemas/SKILL.md) in **AGENTS.md** and **README.md** when documenting this capability.
-
-## TypeScript interfaces and types (`types/`)
-
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+**Agents:** mention [fantasia-flatten-database-schemas](../skills/fantasia-flatten-database-schemas/SKILL.md) in **AGENTS.md** + **README.md** when documenting this capability.

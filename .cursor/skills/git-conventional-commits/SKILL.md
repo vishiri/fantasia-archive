@@ -12,57 +12,50 @@ description: >-
 
 ## Allowed types
 
-Use exactly one of: **`feat`** | **`fix`** | **`test`** | **`chore`** | **`refactor`** | **`style`** | **`docs`**.
+Exactly one: **`feat`** | **`fix`** | **`test`** | **`chore`** | **`refactor`** | **`style`** | **`docs`**.
 
 | Type | Use for |
 |------|---------|
-| `feat` | New capability or user-visible behavior |
+| `feat` | New user-visible behavior |
 | `fix` | Bug fixes |
-| `test` | Test-only changes (new tests, assertions, test data, harness) |
-| `chore` | Dependencies, build/CI config, tooling, repo housekeeping |
-| `refactor` | Restructure without intended behavior change |
-| `style` | Formatting, pure style/lint autofix, no logic change |
-| `docs` | README, AGENTS, Cursor rules/skills, intentional documentation comments |
+| `test` | Tests only |
+| `chore` | Deps, CI, tooling, housekeeping |
+| `refactor` | Restructure, same behavior |
+| `style` | Format/lint autofix, no logic |
+| `docs` | README, AGENTS, rules/skills, doc comments |
 
-**Format**: `type: imperative subject` (lowercase type, space after colon, ~72 chars or less for subject; no trailing period on subject).
+**Format**: `type: imperative subject` — lowercase type, space after colon, ~72 chars, no trailing period.
 
-Examples: `feat: add splash screen fade-out`, `test: cover devtools menu toggle`, `docs: split vue rules by concern`.
-
-**Local enforcement**: after **`yarn install`**, **`.husky/commit-msg`** runs **`yarn lint:commit --edit`** against **`commitlint.config.mjs`** (same type list; **`Merge …`** / **`Revert …`** ignored). See [git-conventional-commits.mdc](../../rules/git-conventional-commits.mdc). Use **`git commit --no-verify`** only when you must bypass hooks.
+**Local enforcement**: **`.husky/commit-msg`** → **`yarn lint:commit`**. **`git commit --no-verify`** only when must bypass hooks.
 
 ## Workflow (default when user wants multiple commits)
 
-1. **Inspect**: Run `git status` and review `git diff` (and `git diff --staged` if anything is already staged).
-2. **Quality gate** ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)): in **one** terminal, `yarn testbatch:verify` (stop on first failure; run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, or `yarn test:coverage:verify` / `yarn test:coverage:electron` / `yarn test:coverage:helpers` / `yarn test:coverage:src` individually only while debugging). See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) and [vitest-tests.mdc](../../rules/vitest-tests.mdc) for layered Vitest coverage. **Skip** this step when the **only** paths you will commit match **`i18n/*/documents/changeLog.md`** and **`yarn testbatch:verify` already passed** after the latest substantive edits with **no** other uncommitted changes since then; if **unsure**, run **`yarn testbatch:verify`** anyway.
-3. **Storybook gate (before changelog/commit for UI work)**: For changed user-facing **`src/components/**`**, verify Storybook coverage/health and add/update missing `_tests/<Component>.stories.ts` plus required mocks/placeholders. Touching only **`src/layouts/**/_tests` or `src/pages/**/_tests` Storybook previews** does not require Docs/autodocs (canvas-only); see [storybook-stories.mdc](../../rules/storybook-stories.mdc). **Skip** when the commit is **changelog-only** as in step 2 and Storybook was already satisfied for the prior work.
-4. **Changelog gate (before commit, same batch)**: Review `i18n/en-US/documents/changeLog.md` and add release-note lines **before** `git commit`. **Prefer staging changelog alongside** the substantive files in the **same** commit; avoid a habitual second “docs: changelog” commit after pushing—that clutters history. Reserve changelog-only commits for rare typo/section fixes ([fantasia-changelog-en-us](../fantasia-changelog-en-us/SKILL.md) **Changelog timing vs Git**). Do not write changelog bullets about committing, pushing, or updating the log. Mirror other locales’ **`documents/changeLog.md`** when you maintain them.
-5. **Plan**: Propose an **ordered list** of commits. Each item: **type + subject**, bullet list of **paths** (or path patterns) to include. Order so dependencies make sense (e.g. chore before feat if needed).
-6. **Approval loop** (mandatory when user asked for per-commit approval or “step through” commits):
-   - Present **only the next** commit: message + exact paths.
-   - **Stop and wait** for explicit user confirmation (e.g. “yes”, “go ahead”, “approved”) for that commit.
-   - Then run `git add` with **only** those paths and `git commit -m "type: subject"`.
-   - Repeat until the list is done or the user stops.
-7. If the user asked for a **single** commit or did not ask for step-by-step approval, still use a valid `type:` message; you may commit in one shot after listing what will be included (still after the gates in step 2).
+1. **Inspect**: `git status`, `git diff`, `git diff --staged`
+2. **Quality gate**: **`yarn testbatch:verify`** one terminal ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)). **Changelog-only** exception: only **`i18n/*/documents/changeLog.md`** + gate already passed after substantive edits
+3. **Storybook gate**: changed **`src/components/**`** — stories/mocks. Skip changelog-only repair
+4. **Changelog gate**: update **`changeLog.md`** before commit; prefer same commit as product work — [fantasia-changelog-en-us](../fantasia-changelog-en-us/SKILL.md)
+5. **Plan**: ordered commits — type + subject + paths
+6. **Approval loop** (when user asked per-commit approval): present next commit → wait explicit OK → `git add` those paths only → `git commit`
+7. Single commit / no step-by-step: valid **`type:`** message after gates
 
 ## Rules
 
-- **Never** `git commit` without user confirmation if they requested approval per commit.
-- **Never** mix unrelated concerns in one commit (e.g. don’t combine `docs:` rule edits with `feat:` app code unless the user explicitly overrides).
-- Prefer **small, reviewable** chunks over one huge commit when splitting.
-- If unsure between `chore` and `refactor`, prefer **`refactor`** for production code moves/renames and **`chore`** for repo/meta/tooling.
-- Do not skip changelog review before committing substantive work; missing release-note updates should be handled **in the same commit or batch** before `git push`, not as a trailing docs-only commit after the fact. An **exceptional** second commit that adjusts **only** **`i18n/*/documents/changeLog.md`** (typo repair) may skip **`yarn testbatch:verify`** per [testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)—do not treat that as the default workflow.
-- Do not skip Storybook review for changed user-facing **`src/components/**`** before you finish the **product** commit; an **exceptional changelog-only** repair commit skips Storybook when the prior verified work already covered UI.
+- Never commit without approval when user requested per-commit approval
+- Never mix unrelated concerns in one commit
+- Prefer small reviewable chunks
+- **`refactor`** for production moves; **`chore`** for repo/meta
+- No skipping changelog for substantive work
+- No skipping Storybook for **`src/components/**`** product commits
 
 ## Final cleanup override
 
-When the user invokes **final cleanup** (see [fantasia-final-cleanup](../fantasia-final-cleanup/SKILL.md)), run **`yarn testbatch:verify`** first, then changelog and logical commits, then **`git push`**. That workflow may commit each planned batch without waiting for per-commit approval unless the user interrupts.
+**Final cleanup** → [fantasia-final-cleanup](../fantasia-final-cleanup/SKILL.md): verify, changelog, logical commits, push — may commit without per-commit approval unless user interrupts.
 
 ## Related
 
-- Short reminder rule: `.cursor/rules/git-conventional-commits.mdc` (always on).
-- End-of-batch ship: [fantasia-final-cleanup](../fantasia-final-cleanup/SKILL.md)
+- [git-conventional-commits.mdc](../../rules/git-conventional-commits.mdc)
+- [fantasia-final-cleanup](../fantasia-final-cleanup/SKILL.md)
 
-## TypeScript interfaces and types (`types/`)
+## Types
 
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+Shared types → **`types/`**. See [types-folder.mdc](../../rules/types-folder.mdc).

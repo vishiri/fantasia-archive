@@ -7,6 +7,7 @@
     :each-draggable="eachDraggableHandler"
     :each-droppable="eachDroppableHandler"
     data-test-locator="dialogProjectSettings-worldTemplateLayoutTree"
+    :indent="DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_INDENT_PX"
     :max-level="2"
     :root-droppable="rootDroppableHandler"
     :style="treeStyle"
@@ -24,7 +25,7 @@
         :node="node"
         @delete-group="emitDeleteGroup"
         @remove-placement="emitRemovePlacement"
-        @rename-document-template="emitRenameDocumentTemplate"
+        @rename-placement-nickname="emitRenamePlacementNickname"
         @rename-group="emitRenameGroup"
       />
     </template>
@@ -40,6 +41,7 @@ import DialogProjectSettingsWorldTemplateLayoutTreeNode from './DialogProjectSet
 import type { I_dialogProjectSettingsWorldTemplateLayoutDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
 import {
+  DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_INDENT_PX,
   mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey
 } from './scripts/functions/dialogProjectSettingsWorldTemplateLayoutTreeData'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeWiring } from './scripts/dialogProjectSettingsWorldTemplateLayoutTreeWiring'
@@ -67,7 +69,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   deleteGroup: [groupId: string]
   removePlacement: [placementId: string]
-  renameDocumentTemplate: [documentTemplateId: string, displayName: string]
+  renamePlacementNickname: [placementId: string, nickname: string]
   renameGroup: [groupId: string, displayName: string]
   'update:templateLayout': [layout: I_dialogProjectSettingsWorldTemplateLayoutDraft]
 }>()
@@ -149,8 +151,8 @@ function emitRenameGroup (groupId: string, displayName: string): void {
   emit('renameGroup', groupId, displayName)
 }
 
-function emitRenameDocumentTemplate (documentTemplateId: string, displayName: string): void {
-  emit('renameDocumentTemplate', documentTemplateId, displayName)
+function emitRenamePlacementNickname (placementId: string, nickname: string): void {
+  emit('renamePlacementNickname', placementId, nickname)
 }
 
 function emitRemovePlacement (placementId: string): void {

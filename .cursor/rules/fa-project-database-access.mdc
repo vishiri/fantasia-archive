@@ -8,40 +8,35 @@ alwaysApply: false
 
 ## Rule
 
-Do **not** call **`getFaProjectActiveDatabase()`**, **`getFaProjectLastKnownActiveProjectFilePath()`**, or **`replaceFaProjectActiveDatabase()`** from arbitrary main-process modules. ESLint **`no-restricted-imports`** blocks those imports outside the small allowlisted files (see **`eslint.config.mjs`**).
+Do **not** call **`getFaProjectActiveDatabase()`**, **`getFaProjectLastKnownActiveProjectFilePath()`**, or **`replaceFaProjectActiveDatabase()`** from arbitrary main-process modules. ESLint **`no-restricted-imports`** blocks outside allowlisted files (see **`eslint.config.mjs`**).
 
-- **IPC handlers and other call sites** that operate on the **currently loaded** project file must use **`runWithFaProjectDatabaseForIpcAsync`** (when `IpcMainInvokeEvent` is available) or **`runWithFaProjectDatabaseSync`** from **`src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected.ts`**. These helpers reconnect once from the mirrored path, retry once after a recoverable SQLite error, and may ask the renderer for the path via **`FA_PROJECT_FAILSAFE_IPC`** when main lost both handle and path mirror.
-- **Opening or creating** a project continues to use **`runFaProjectOpenFromIpc`**, **`runFaProjectCreateFromIpc`**, and internal **`replaceFaProjectActiveDatabase(..., filePath)`** inside **`faProjectOpenRun.ts`** / **`faProjectCreateRun.ts`**. **Reconnect-only** paths use **`reconnectFaProjectDatabaseAtKnownPathSync`** in **`faProjectReconnectAtKnownPath.ts`**.
-- **`faProjectActiveDatabase.ts`** owns the handle, mirrored absolute path, **closeFaProjectActiveDatabase** (full clear), and **closeFaProjectActiveDatabaseHandleOnly** (keep path for reconnect).
+- **IPC handlers + call sites** on **currently loaded** project → **`runWithFaProjectDatabaseForIpcAsync`** (when `IpcMainInvokeEvent` available) or **`runWithFaProjectDatabaseSync`** from **`src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected.ts`**. Reconnect once from mirrored path, retry once after recoverable SQLite error, may ask renderer for path via **`FA_PROJECT_FAILSAFE_IPC`** when main lost handle + path mirror.
+- **Open/create** project → **`runFaProjectOpenFromIpc`**, **`runFaProjectCreateFromIpc`**, internal **`replaceFaProjectActiveDatabase(..., filePath)`** in **`faProjectOpenRun.ts`** / **`faProjectCreateRun.ts`**. **Reconnect-only** → **`reconnectFaProjectDatabaseAtKnownPathSync`** in **`faProjectReconnectAtKnownPath.ts`**.
+- **`faProjectActiveDatabase.ts`** owns handle, mirrored absolute path, **closeFaProjectActiveDatabase** (full clear), **closeFaProjectActiveDatabaseHandleOnly** (keep path for reconnect).
 
 ## Main window session reset
 
-On the first real loading pass, **`faMainWindowWebContentsSessionReset`** listens for **`did-start-navigation`** and calls **`closeFaProjectActiveDatabase()`** only when **`details.isMainFrame && !details.isSameDocument`**, so internal same-document or subframe activity does not clear the mirrored path and handle the way a full document navigation does.
+**`faMainWindowWebContentsSessionReset`**: **`did-start-navigation`** → **`closeFaProjectActiveDatabase()`** only when **`details.isMainFrame && !details.isSameDocument`** — internal same-document/subframe activity does not clear mirrored path/handle like full document navigation.
 
 ## Renderer bridge
 
-- Preload exposes **`window.faContentBridgeAPIs.faProjectFailsafe.installActiveProjectPathReply`**. **`src/boot/faProjectFailsafePathReply.ts`** registers the callback that reads **`S_FaActiveProject`**. Main installs **`installFaProjectFailsafePathReplyListener`** from **`appManagement`** startup.
+- Preload: **`window.faContentBridgeAPIs.faProjectFailsafe.installActiveProjectPathReply`**. **`src/boot/faProjectFailsafePathReply.ts`** registers callback reading **`S_FaActiveProject`**. Main: **`installFaProjectFailsafePathReplyListener`** from **`appManagement`** startup.
 
 ## Project settings refresh contract (renderer)
 
-Unlike **Fantasia Archive Settings**, which hydrates its editor from **`S_FaUserSettings`** on open, **Project Settings** must always read the active **`.faproject`** when the dialog opens:
+Unlike **Fantasia Archive Settings** (hydrates from **`S_FaUserSettings`** on open), **Project Settings** always reads active **`.faproject`** on dialog open:
 
-1. **Open:** **`DialogProjectSettings`** calls IPC **`getProjectSettings`** (project name), **`projectContent.listWorldsForProjectSettings`** (ordered worlds + per-world document counts), and **`projectContent.listDocumentTemplatesForProjectSettings`** (ordered document templates); never seed the editor from Pinia without a fresh DB read (Storybook / component harness may pass **`directSettingsSnapshot`**, worlds fixtures, and document-template fixtures). Bridge: **`sFaProjectWorldsBridge.ts`**.
-2. **Edit:** Local draft for project name, worlds, and document templates until **Save**; **Close without saving** discards the draft.
-3. **Save:** **`faActionManager`** → **`saveProjectSettings`** → **`handleSaveProjectSettings`**: (a) **`S_FaProjectSettings.updateProjectSettings`** → IPC **`setProjectSettings`** (Zod-validated patch) → IPC **`getProjectSettings`** read-back → apply to **`S_FaProjectSettings`** → **`propagateFaProjectSettingsToAppConsumers`** (today: **`S_FaActiveProject`** display name and **`S_FaRecentProjects.refreshRecentProjects()`**; extend that helper when new KV fields ship); (b) when the payload includes **`worlds`**, **`faProjectWorldsPersistSnapshotFromDialog`** → **`projectContent.saveWorldsSnapshot`** → main **`replaceFaProjectWorldsSnapshot`** (transactional full list replace of **`worlds`** **`sort_order`**, **`color`**, **`color_pallete`**); (c) when the payload includes **`documentTemplates`**, **`projectContent.saveDocumentTemplatesSnapshot`** → main **`replaceFaProjectDocumentTemplatesSnapshot`** (transactional full list replace of **`document_templates`** **`sort_order`**, **`world_appendix`**, **`icon`**).
-4. **Errors:** The store / bridge throws; the action manager owns the failure toast (same pattern as **`S_FaUserSettings`**).
-5. **Main access:** All DB work through **`runWithFaProjectDatabaseForIpcAsync`** (see above).
-6. **Storage:** Project display name in **`project_data`** via **`readFaProjectDataKv`** / **`upsertFaProjectDataKv`** (**`project_name`** key, **`faProjectSettingsPersist.ts`**); worlds rows in **`worlds`** table via **`faProjectWorldsSnapshotWiring.ts`**; document-template rows in **`document_templates`** table via **`faProjectDocumentTemplatesSnapshotWiring.ts`**.
+1. **Open:** **`DialogProjectSettings`** IPC **`getProjectSettings`** (project name), **`projectContent.listWorldsForProjectSettings`**, **`projectContent.listDocumentTemplatesForProjectSettings`**; never seed editor from Pinia without fresh DB read (Storybook/component harness may pass **`directSettingsSnapshot`**, worlds fixtures, document-template fixtures). Bridge: **`sFaProjectWorldsBridge.ts`**.
+2. **Edit:** Local draft for project name, worlds, document templates until **Save**; **Close without saving** discards draft.
+3. **Save:** **`faActionManager`** → **`saveProjectSettings`** → **`handleSaveProjectSettings`**: (a) **`S_FaProjectSettings.updateProjectSettings`** → IPC **`setProjectSettings`** (Zod patch) → **`getProjectSettings`** read-back → **`S_FaProjectSettings`** → **`propagateFaProjectSettingsToAppConsumers`** (today **`S_FaActiveProject`** display name, **`S_FaRecentProjects.refreshRecentProjects()`**; extend when new KV fields ship); (b) payload includes **`worlds`** → **`faProjectWorldsPersistSnapshotFromDialog`** → **`projectContent.saveWorldsSnapshot`** → main **`replaceFaProjectWorldsSnapshot`** (transactional full list replace **`worlds`** **`sort_order`**, **`color`**, **`color_pallete`**); (c) payload includes **`documentTemplates`** → **`projectContent.saveDocumentTemplatesSnapshot`** → main **`replaceFaProjectDocumentTemplatesSnapshot`** (transactional full list replace **`document_templates`** **`sort_order`**, **`world_appendix`**, **`icon`**).
+4. **Errors:** Store/bridge throws; action manager owns failure toast (same as **`S_FaUserSettings`**).
+5. **Main access:** All DB work via **`runWithFaProjectDatabaseForIpcAsync`** (above).
+6. **Storage:** Display name **`project_data`** via **`readFaProjectDataKv`** / **`upsertFaProjectDataKv`** (**`project_name`**, **`faProjectSettingsPersist.ts`**); worlds **`worlds`** via **`faProjectWorldsSnapshotWiring.ts`**; document templates **`document_templates`** via **`faProjectDocumentTemplatesSnapshotWiring.ts`**.
 
-When adding project-settings fields, extend **`types/I_faProjectSettingsDomain.ts`**, the Zod patch schema, persist module, propagation helper, dialog panel, and connected tests in the same change. Worlds-specific shapes live in **`types/I_faProjectWorldDomain.ts`** and **`types/I_dialogProjectSettingsWorlds.ts`**; document-template shapes live in **`types/I_faProjectDocumentTemplateDomain.ts`**; update **[docs/database/projectDB.md](../../docs/database/projectDB.md)** when schema or snapshot IPC changes.
+New project-settings fields → extend **`types/I_faProjectSettingsDomain.ts`**, Zod patch schema, persist module, propagation helper, dialog panel, connected tests same change. Worlds: **`types/I_faProjectWorldDomain.ts`**, **`types/I_dialogProjectSettingsWorlds.ts`**; document templates: **`types/I_faProjectDocumentTemplateDomain.ts`**; update **[docs/database/projectDB.md](../../docs/database/projectDB.md)** on schema/snapshot IPC changes. Types: see [types-folder.mdc](types-folder.mdc).
 
 ## See also
 
-- [docs/database/projectDB.md](../../docs/database/projectDB.md) — canonical **`.faproject`** schema, migrations, content CRUD IPC
-- [docs/database/README.md](../../docs/database/README.md) — documentation index
-- [docs-database.mdc](docs-database.mdc) — keep docs in sync with code changes
-
-## TypeScript interfaces and types (`types/`)
-
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+- [docs/database/projectDB.md](../../docs/database/projectDB.md) — **`.faproject`** schema, migrations, content CRUD IPC
+- [docs/database/README.md](../../docs/database/README.md) — doc index
+- [docs-database.mdc](docs-database.mdc) — keep docs in sync with code

@@ -10,109 +10,93 @@ description: >-
 
 ## Stack
 
-- **Node.js 22.22.0 or newer** for local dev and CLI (`package.json` `engines.node`).
-- **Vue 3** with **Quasar** (`quasar` v2, `@quasar/app-vite`).
-- **Pinia** for state (`src/stores/`); router in `src/router/`.
-- **TypeScript** throughout; path alias `app/` maps to project root (see imports like `app/types/...`).
+- **Node.js 22.22.0+** (`package.json` `engines.node`)
+- **Vue 3** + **Quasar** (`quasar` v2, `@quasar/app-vite`)
+- **Pinia** (`src/stores/`); router `src/router/`
+- **TypeScript**; alias **`app/`** → project root
 
 ## Component folders (`src/components/`)
 
-- **Helper / wrapper SFCs** — Only three cross-feature infrastructure **`.vue`** features use **`_<PascalCase>`** on the folder and **`.vue`** file; see the numbered list in [AGENTS.md](../../../AGENTS.md) **Helper / wrapper SFC naming (`_` prefix)**. Do not use the prefix for dialog sub-panels or other feature-local **`.vue`** files.
-- **`dialogs/`** — `Dialog*` modal SFCs. Root **`q-dialog`** **`v-model`** refs that participate in global open coordination should call **`registerComponentDialogStackGuard`** or **`registerMarkdownDialogStackGuard`** from **`src/scripts/appGlobalManagementUI/dialogManagement.ts`** (same module as **`openDialogMarkdownDocument`**) so names state the stacking rule, not metaphor-only labels.
-- **`floatingWindows/`** — `Window*` movable/resizable in-renderer surfaces (for example **`WindowAppStyling`**). Wrap the frame in **`_FaFloatingWindowBodyTeleport`** (**`Teleport to="body"`**) so **`position: fixed`** is not trapped under header/menu ancestors. Use **`useFaFloatingWindowFrame`**; do **not** use **`registerComponentDialogStackGuard`** (that guard serializes **modal** `QDialog` opens; floating windows are below modals in z-order and can coexist). Layout, resize clamp, and z-index band (**`5000`–`5999`**) live in **`src/scripts/floatingWindows/`**; the npm **`@quasar/quasar-ui-qwindow`** targets Quasar v1 / Vue 2 only. Playbook: [fantasia-floating-windows](../fantasia-floating-windows/SKILL.md); architecture: [AGENTS.md](../../../AGENTS.md) **In-renderer floating windows**.
-- **`globals/`** — app chrome (`GlobalWindowButtons`, `AppControlMenus`, `AppControlSingleMenu`, **`_FaUserCssInjector`**).
-- **`elements/`** — small reusable widgets (`FantasiaMascotImage`, `SocialContactSingleButton`, **`FaColorPickerInput`** — Quasar **`QColor`** popover with optional palette footer swatches; used by **Project Settings** world color and palette editors; **`FaIconPickerInput`** — searchable merged icon catalog for q-icon names; used by **Project Settings** document template **Icon** and intended for reuse elsewhere).
-- **`other/`** — other composites (`SocialContactButtons`).
-- **`foundation/`** — Storybook-only design catalogues (`FoundationColorPalette`, `FoundationTextList`, …): not shipped in product routes, no **`i18n/`** mirror, no Playwright component tests, stories tagged **`skip-visual`**. See [AGENTS.md](../../../AGENTS.md) **Foundation components**.
-- **Hierarchical trees** — Any nested expand/collapse tree uses **`@he-tree/vue`** (`BaseTree` / **`Draggable`**) only. **Quasar `QTree` / `q-tree` is forbidden project-wide.** Enable **`virtualization`** when lists may grow large. Playbook: [fantasia-he-tree](../fantasia-he-tree/SKILL.md).
-- **List / table reorder** — Flat lists: **`vue-draggable-plus`**. **`QTable`** rows: **`v-draggable-table`** (`quasar-ui-q-draggable-table`, boot **`q-draggable-table`**). Trees keep **he-tree** DnD. Playbook: [fantasia-drag-drop](../fantasia-drag-drop/SKILL.md).
+- **Helper / wrapper SFCs** — three infrastructure features use **`_<PascalCase>`** folder + file — see [AGENTS.md](../../../AGENTS.md) **Helper / wrapper SFC naming**. Not for dialog sub-panels.
+- **`dialogs/`** — `Dialog*` modals. Root **`q-dialog`** refs in global open coordination → **`registerComponentDialogStackGuard`** or **`registerMarkdownDialogStackGuard`** from **`dialogManagement.ts`**.
+- **`floatingWindows/`** — `Window*` movable/resizable surfaces. **`_FaFloatingWindowBodyTeleport`**; **`useFaFloatingWindowFrame`**; **no** dialog stack guard. Z-index **`5000`–`5999`**. Playbook: [fantasia-floating-windows](../fantasia-floating-windows/SKILL.md).
+- **`globals/`** — chrome (`GlobalWindowButtons`, `AppControlMenus`, **`_FaUserCssInjector`**, …)
+- **`elements/`** — reusable widgets (`FaColorPickerInput`, **`FaIconPickerInput`**, …)
+- **`other/`** — composites (`SocialContactButtons`)
+- **`foundation/`** — Storybook-only catalogues; no product routes, no Playwright
+- **Hierarchical trees** — **`@he-tree/vue`** only; **`QTree` forbidden** — [fantasia-he-tree](../fantasia-he-tree/SKILL.md)
+- **List / table reorder** — **`vue-draggable-plus`** / **`v-draggable-table`** — [fantasia-drag-drop](../fantasia-drag-drop/SKILL.md)
 
-Locale `L_*` paths: `i18n/<locale>/components/<bucket>/` mirrors `src/components/` buckets (**`foundation/`** excluded). **`i18n/<locale>/dialogs/`** and **`i18n/<locale>/floatingWindows/`** sit next to **`components/`** for modal vs floating-window copy. See [README](../../../README.md) and [AGENTS.md](../../../AGENTS.md).
+Locale **`L_*`**: `i18n/<locale>/components/<bucket>/` mirrors buckets (**`foundation/`** excluded). **`dialogs/`**, **`floatingWindows/`** beside **`components/`**.
 
 ## Layout and pages
 
-- Default app chrome: `src/layouts/MainLayout.vue` and routes in `src/router/routes.ts`.
-- **Global keyboard shortcuts (Electron)**: `MainLayout.vue` registers the app-wide **`keydown`** listener after **`S_FaKeybinds`** loads from preload; matching and actions live under **`src/scripts/keybinds/`**; user-visible chord strings use **`faKeybindsChordUiFormatting.ts`**. **Tools → Keybind settings** edits chords (**`src/components/dialogs/DialogKeybindSettings/`**). Extension checklist: [fantasia-keybinds](../fantasia-keybinds/SKILL.md) and [AGENTS.md](../../../AGENTS.md) **Global keyboard shortcuts (faKeybinds)**.
-- **Component playground**: `src/pages/ComponentTesting.vue` with `src/layouts/ComponentTestingLayout.vue` — use for isolated UI experiments before wiring into main flows.
-- **Storybook**: primary stories live under `src/components/**/_tests/<Component>.stories.ts` with **`meta.title`** **`Components/<bucket>/<ComponentName>`** (**`dialogs`**, **`floatingWindows`**, **`elements`**, **`foundation`**, **`globals`**, **`other`** — same as **`src/components/`** folders; **`<ComponentName>`** matches the folder — **`_<PascalCase>`** only for the three infrastructure helpers). **`foundation/`** stories are reference pages only (**`skip-visual`**, docs disabled). Optional **canvas-only** stories may exist for `src/layouts/**/_tests/*.stories.ts` and `src/pages/**/_tests/*.stories.ts` (router previews); for those, **do not** add autodocs, Docs tab content, or `parameters.docs.description` — keep `parameters.docs.disable: true` (see [`storybook-stories.mdc`](../../rules/storybook-stories.mdc)). Storybook runs from [`.storybook-workspace/`](../../../.storybook-workspace/) (config under `.storybook-workspace/.storybook/`, static build `storybook-static/`, VRT under `visual-tests/` + `playwright.storybook-visual.config.ts`) so `staticDirs` and Vite can mirror the Quasar app’s `public/` layout. Root scripts: `yarn storybook:run`, `yarn storybook:build`, `yarn test:storybook:visual*`.
+- Default chrome: **`MainLayout.vue`**, **`src/router/routes.ts`**
+- **Global keybinds**: **`MainLayout.vue`** registers **`keydown`** after **`S_FaKeybinds`** loads — [fantasia-keybinds](../fantasia-keybinds/SKILL.md)
+- **Playground**: **`ComponentTesting.vue`** + **`ComponentTestingLayout.vue`**
+- **Storybook**: `src/components/**/_tests/<Component>.stories.ts`, **`meta.title`** **`Components/<bucket>/<ComponentName>`**. Layout/page stories canvas-only — [storybook-stories.mdc](../../rules/storybook-stories.mdc). Workspace: [`.storybook-workspace/`](../../../.storybook-workspace/)
 
-## Single-file component block order
+## Single-file component block order (MUST)
 
-- Every **`.vue`** SFC must list top-level blocks in this order only: **`<template>`**, then **`<script>`** (or **`<script setup>`**), then **`<style>`** (all style blocks last). Do not open **`<script>`** or **`<style>`** before **`<template>`**.
+Every **`.vue`** SFC: **`<template>`** → **`<script>`** / **`<script setup>`** → **`<style>`**. Never open script or style before template.
 
 ## Quasar patterns
 
-- Prefer Quasar components (`q-*`) and existing spacing/typography patterns in sibling components.
-- **Theme tokens**: add or reuse variables in the owning feature **`styles/_variables.scss`** (see [component-styles-folder.mdc](../../rules/component-styles-folder.mdc)), a [`src/css/theme/quasar-components/`](../../../src/css/theme/quasar-components/) partial, [`paletteGlobals.variables.scss`](../../../src/css/globals/paletteGlobals.variables.scss), [`htmlAdjustments.variables.scss`](../../../src/css/globals/htmlAdjustments.variables.scss) / [`scrollbar.variables.scss`](../../../src/css/globals/scrollbar.variables.scss) for other global partials, or [`src/css/app.palette.scss`](../../../src/css/app.palette.scss), as in [project-scss.mdc](../../rules/project-scss.mdc). [`src/css/fa-theme.scss`](../../../src/css/fa-theme.scss) defines default **`--fa-color-*` CSS** custom properties on **`:root`** (direct color codes); use the **`fa-v`** helper from the palette for emitted colors so **Custom app CSS** can override **`--fa-color-*`**. For non-color runtime custom properties, use a different **`--fa-…`** family (for example **`--fa-fw-resize`**) and document the convention in [project-scss.mdc](../../rules/project-scss.mdc) / [AGENTS.md](../../../AGENTS.md). [`src/css/globals/faSemanticText.scss`](../../../src/css/globals/faSemanticText.scss) (pulled from [`app.scss`](../../../src/css/app.scss) after [`customColors.scss`](../../../src/css/globals/customColors.scss)) supplies **`fa-text-*`**, **`fa-icon-*`**, **`fa-separator-*`**, and overrides **Quasar** **`.text-white` / `.text-black`** so copy and icons follow **`--fa-color-*`** instead of fixed Material **`text-grey-N`**, **`text-red-N`**, or **#fff**. **CSS variables** use **`--fa-color-…`**; **utility class** names are whatever **`faSemanticText.scss`** defines (**`fa-icon-spellcheck-refresh`**, not a made-up **`fa-color-icon-…`** class). Add new roles as **`$…`** under **`/* APP COLORS - SEMANTIC TEXT & ACCENTS */`** in the palette, mirror them on **`:root`** in **`fa-theme.scss`**, then add a small utility class in **`faSemanticText.scss`**. [`src/css/quasar.variables.scss`](../../../src/css/quasar.variables.scss) is the barrel **`@forward`ed** from those files; **Quasar Vite** and **Storybook** prepend **`@use "…/quasar.variables.scss" as *`** to project SCSS ([`.storybook-workspace/.storybook/main.ts`](../../../.storybook-workspace/.storybook/main.ts)), so you usually do **not** add **`@use`** in every SFC for the catalogue. Keep every **`$`** name that [quasarComponentsAdjustments.scss](../../../src/css/globals/quasarComponentsAdjustments.scss) or an SFC references **defined** in the right partial — truncating token files causes **Sass undefined variable** at build time. After changing **`src/css/theme/quasar-components/`**, run **`yarn audit:quasar-component-tokens`**. Use hyphens between segments in every **`$` name** (e.g. `$globalWindowButtons-zIndex`), never underscores. Do **not** reference **palette** colors directly in `<style>` (`$primary`, `$grey`, `$white`, …); bind them through **semantic** token variables in the same way you avoid raw `px` and hex (see [project-scss.mdc](../../rules/project-scss.mdc) **Palette variables vs semantic color tokens**). **Quasar** **`color="primary"`**, **`text-primary`**, **`color="negative"`**, and similar **brand** utilities already resolve through **`var(--q-*)`** once [`fa-quasar-public-vars-bridge.scss`](../../../src/css/fa-quasar-public-vars-bridge.scss) runs; keep using those for brand roles. Reserve **`fa-text-*`** and **`fa-icon-*`** for former **Material** shade roles and one-off surfaces (separators, spellcheck icon) that are not on the core **--q-** list.
-- **Scrollable areas**: use the global class **`hasScrollbar`** on the scroll container when content may sometimes overflow and show a vertical scrollbar (and sometimes not), so **`scrollbar-gutter: stable`** prevents horizontal layout jitter. Defined in [`src/css/globals/scrollbar.scss`](../../../src/css/globals/scrollbar.scss); see [project-scss.mdc](../../rules/project-scss.mdc) and [AGENTS.md](../../../AGENTS.md).
-- **Inline code tokens**: use **`<code class="code-token">…</code>`** for the app-wide **code chip** look (styles in [`htmlAdjustments.scss`](../../../src/css/globals/htmlAdjustments.scss), **`$globals-codeToken-*`** in [`htmlAdjustments.variables.scss`](../../../src/css/globals/htmlAdjustments.variables.scss)). Prefer it over new one-off inline-code styles when the default token treatment is enough. [AGENTS.md](../../../AGENTS.md) **Global CSS: `code.code-token`**, [project-scss.mdc](../../rules/project-scss.mdc).
-- Boot files in `src/boot/` run at app init (e.g. axios, external links).
-- When importing shared project types, keep `I_` / `T_` prefixes and use descriptive singular/collection naming (e.g. `T_documentName`, `I_appMenuList`).
-- In TypeScript and Vue SFC TS scripts, use `import type` for type-only imports.
-- In `.vue` SFCs, prefer template `$t('...')` translation calls; avoid importing `useI18n` only for `t(...)` when a template binding can express the same text.
+- Prefer **`q-*`** + sibling spacing/typography patterns
+- **Theme tokens**: feature **`styles/_variables.scss`**, [`src/css/theme/quasar-components/`](../../../src/css/theme/quasar-components/), globals partials, [`app.palette.scss`](../../../src/css/app.palette.scss) — see [project-scss.mdc](../../rules/project-scss.mdc). **`--fa-color-*`** on **`:root`** in **`fa-theme.scss`**; semantic utilities in **`faSemanticText.scss`**. **Do not** reference raw palette **`$primary`**, **`$grey`**, … in **`<style>`** — use semantic tokens. After **`quasar-components/`** edits: **`yarn audit:quasar-component-tokens`**. **`$`** names use hyphens, not underscores.
+- **Scrollable areas**: class **`hasScrollbar`** — [`scrollbar.scss`](../../../src/css/globals/scrollbar.scss)
+- **Inline code**: **`<code class="code-token">`**
+- Boot: `src/boot/`
+- **`import type`** for type-only imports
+- Templates: **`$t('...')`** — avoid **`useI18n`** only for **`t`** when template binding works
 
-## `public/` assets and Electron (`file://`)
+## `public/` assets and Electron (`file://`) (MUST)
 
-- Quasar + Vite often expose `import.meta.env.BASE_URL` as `'/'` or `''` for the Electron renderer. URLs such as `/images/foo.png` then resolve to the **filesystem root** under `file://`, not next to `index.html`, and images or other `public/` files may fail to load in packaged builds (and break Playwright assertions that expect a loaded `<img>`).
-- For anything served from `public/`, build href/src with a **relative** base when `BASE_URL` is `'/'` or empty (e.g. `./images/...`). Example: [`SocialContactSingleButton.vue`](../../../src/components/elements/SocialContactSingleButton/SocialContactSingleButton.vue).
+When **`import.meta.env.BASE_URL`** is **`'/'`** or empty, **`/images/...`** resolves to filesystem root under **`file://`**. Build **`public/`** URLs with relative base (e.g. **`./images/...`**). Example: **`SocialContactSingleButton.vue`**.
 
 ## Component `_data/` (production structured payloads)
 
-- When a `.vue` file would hold a **large production data object** (menus, multi-part configs, long lists), move pieces under **`src/components/<Feature>/_data/`**.
-- Use **several locally named `.ts` files** inside `_data/` instead of one giant file when it aids navigation (mirror [AppControlMenus/_data](src/components/globals/AppControlMenus/_data/)).
-- Those files may still use **translations** (`i18n`), **imported copy helpers**, and **functions** on items (e.g. `trigger` handlers); they are not limited to string literals.
-- **Automated-test fixture data** does **not** live in `_data/` or in **`_tests/<fixture>.ts`** modules: Vitest keeps it inside `*.vitest.test.ts`; Playwright keeps mount payloads inline in `*.playwright.test.ts` and passes them via `COMPONENT_PROPS`. If a parent SFC must embed a component-mode-only blob, keep it as a **`const` inside that `.vue`**. See [vue-quasar.mdc](../../rules/vue-quasar.mdc) for split vs `src/scripts/` boundaries.
+Large production data objects → **`src/components/<Feature>/_data/`** (several **`.ts`** files OK). May use **`i18n`**, copy helpers, **`trigger`** handlers. **Test fixtures** stay inside test files — not **`_data/`** or **`_tests/_data/`**.
 
-## Component `scripts/` and SFC size
+## Component `scripts/` and SFC size (MUST)
 
-- **Enforced limits** (ESLint): **`.vue` ≤250 lines**, **functions ≤100 lines**, **non-exempt `.ts` ≤250 lines** — see [code-size-decomposition.mdc](../../rules/code-size-decomposition.mdc). When a feature would exceed them, extract into **`src/components/<bucket>/<Feature>/scripts/*.ts`**, add **subcomponents**, and/or move shared pure logic to **`src/scripts/`**. Do not park feature-owned **`.ts`** extractions next to the `.vue` at the feature root. **Separate SCSS/CSS** for that feature goes only under **`src/components/<bucket>/<Feature>/styles/`** — see [component-styles-folder.mdc](../../rules/component-styles-folder.mdc).
-- **Return object literals** (`return { ... }`, project-wide): each property value must be a **simple identifier or literal** declared **before** the return — **no** inline arrow functions, ternaries, or other logic **inside** the returned object. Bind helpers to **`const`** / **`function`** first, then **`return { push, pop, … }`**. See [code-size-decomposition.mdc](../../rules/code-size-decomposition.mdc) **Return object literals**.
-- **How to split `scripts/`:** limits are **maximums**. Prefer **fewer TypeScript modules** that each hold a **whole concern** (for example one file for table rows + columns + filtered state, one for dialog open + routing + global suspend) until a file approaches **250 lines** or a single function approaches **100 lines**. **Avoid** a long list of **10–20 line** files with one export each when grouping would stay within ESLint caps — see [code-size-decomposition.mdc](../../rules/code-size-decomposition.mdc) **Module count: prefer logical grouping**. After merging production modules, merge or rename colocated **`scripts/_tests/*.vitest.test.ts`** so tests stay easy to find.
-- **Shared `src/scripts/<feature>/`:** same anti-fragmentation rule as component **`scripts/`** — batch by subsystem (see [typescript-scripts.mdc](../../rules/typescript-scripts.mdc)); add a **thin** extra file only for a documented boundary (mock target, circular import, public shim).
-- **External `<style src>`** files: place under **`styles/`** inside the feature folder ([component-styles-folder.mdc](../../rules/component-styles-folder.mdc)); never as a loose **`*.scss`** sibling of the **`.vue`**.
-- Distinct from **`_data/`** (production structured payloads) and from **`src/scripts/`** (shared app-wide helpers). See [vue-quasar.mdc](../../rules/vue-quasar.mdc).
+- **ESLint limits**: **`.vue` ≤250**, **functions ≤100**, **`.ts` ≤250** — [code-size-decomposition.mdc](../../rules/code-size-decomposition.mdc)
+- Extract to **`scripts/*.ts`**, subcomponents, **`src/scripts/`** when over limit. SCSS only under **`styles/`** — [component-styles-folder.mdc](../../rules/component-styles-folder.mdc)
+- **Return object literals**: identifiers/literals only in **`return { ... }`**
+- **Fewer modules per concern** until near caps — avoid 10–20 line one-export files
+- Distinct from **`_data/`** and shared **`src/scripts/`** — [vue-quasar.mdc](../../rules/vue-quasar.mdc)
 
-## Cursor rules for `.vue` files (split by topic)
+## Cursor rules for `.vue` files
 
 | Topic | Rule |
 |-------|------|
-| Quasar, Composition API, i18n, script size / extraction | [`vue-quasar.mdc`](../../rules/vue-quasar.mdc) |
-| BEM classes and scoped SCSS | [`vue-bem-scss.mdc`](../../rules/vue-bem-scss.mdc) |
-| Extracted styles (`styles/` folder) | [`component-styles-folder.mdc`](../../rules/component-styles-folder.mdc) |
-| `data-test-locator` and other Playwright `data-test-*` template hooks | [`vue-template-test-hooks.mdc`](../../rules/vue-template-test-hooks.mdc) |
-| Hierarchical trees (`@he-tree/vue` only; `QTree` forbidden) | [`fa-he-tree.mdc`](../../rules/fa-he-tree.mdc) |
-| List / table drag-and-drop | [`fa-drag-drop-lists.mdc`](../../rules/fa-drag-drop-lists.mdc) |
-| Icon name picker (`FaIconPickerInput`, `src/scripts/faIcons/`) | [`fa-icon-picker.mdc`](../../rules/fa-icon-picker.mdc) |
-| Global SCSS / `src/css` | [`project-scss.mdc`](../../rules/project-scss.mdc) |
+| Quasar, Composition API, i18n, extraction | [`vue-quasar.mdc`](../../rules/vue-quasar.mdc) |
+| BEM + scoped SCSS | [`vue-bem-scss.mdc`](../../rules/vue-bem-scss.mdc) |
+| Extracted styles | [`component-styles-folder.mdc`](../../rules/component-styles-folder.mdc) |
+| `data-test-*` hooks | [`vue-template-test-hooks.mdc`](../../rules/vue-template-test-hooks.mdc) |
+| Trees | [`fa-he-tree.mdc`](../../rules/fa-he-tree.mdc) |
+| DnD | [`fa-drag-drop-lists.mdc`](../../rules/fa-drag-drop-lists.mdc) |
+| Icon picker | [`fa-icon-picker.mdc`](../../rules/fa-icon-picker.mdc) |
+| Global SCSS | [`project-scss.mdc`](../../rules/project-scss.mdc) |
 
 ## Quality gates
 
-- Before commits or substantial UI refactors, run the **quality gate** in one terminal: `yarn testbatch:verify` ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)) — see [eslint-typescript.mdc](../../rules/eslint-typescript.mdc). **TSLint** is not used.
-- Give **`yarn lint:stylelint`** extra attention when changing Vue `<style>` blocks or `src/**/*.scss`.
-- **`quasar.config.ts`**: match Quasar typings (e.g. PWA `workboxMode: 'GenerateSW' | 'InjectManifest'`; `bex` uses `QuasarBexConfiguration`, not legacy `contentScripts`). Duplicate **Vite** `Plugin` types vs `@quasar/app-vite` may require a documented **`@ts-expect-error`** on `defineConfig`.
-- **`src/boot/i18n.ts`**: vue-i18n module augmentation may use **`@ts-expect-error` (TS2665)** because the package `module` entry targets the ESM bundle under `tsc`.
-- Keep TypeScript strict in Vue code: avoid `any`; prefer explicit prop/emits/interfaces, `unknown`, and narrowing.
-- Keep Vitest SFC parity in **`src/components/**`**, **`src/layouts/**`**, and **`src/pages/**`**: each feature `.vue` should have a colocated **`_tests/<Name>.vitest.test.ts`** (presence baseline; not a claim of exhaustive line/branch coverage).
-- After material SFC or **`i18n`** edits, follow [fantasia-testing](../fantasia-testing/SKILL.md) **Connected tests for any feature change** (grep for locators and dialog keys; run implicated Vitest paths, then component and E2E Playwright after **`yarn quasar:build:electron`** when the feature has matching specs).
+- Before commits: **`yarn testbatch:verify`** ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc), [eslint-typescript.mdc](../../rules/eslint-typescript.mdc))
+- Extra attention on **`yarn lint:stylelint`** when changing **`<style>`** or **`src/**/*.scss`**
+- **`quasar.config.ts`**: match Quasar typings (PWA **`workboxMode`**, BEX **`QuasarBexConfiguration`**)
+- Vitest SFC parity: **`_tests/<Name>.vitest.test.ts`** per feature **`.vue`**
+- Material SFC/**`i18n`** edits → [fantasia-testing](../fantasia-testing/SKILL.md) **Connected tests**
 
 ## Related
 
-- [fantasia-floating-windows](../fantasia-floating-windows/SKILL.md) for **`Window*`** frames, teleport, and **`src/scripts/floatingWindows/`** helpers.
-- [fantasia-he-tree](../fantasia-he-tree/SKILL.md) for **`@he-tree/vue`** hierarchical trees (virtualization, drag-and-drop).
-- [fantasia-drag-drop](../fantasia-drag-drop/SKILL.md) for **`vue-draggable-plus`** lists and **`v-draggable-table`** on **`QTable`**.
-- [fantasia-icon-picker](../fantasia-icon-picker/SKILL.md) for **`FaIconPickerInput`** and **`src/scripts/faIcons/`** catalogs.
-- [fantasia-i18n](../fantasia-i18n/SKILL.md) for user-visible strings.
-- [fantasia-testing](../fantasia-testing/SKILL.md) for component Playwright tests next to components and the **Connected tests** sweep.
-- [fantasia-action-manager](../fantasia-action-manager/SKILL.md) for the centralized dispatcher used by menus, dialogs, window controls, and keybinds (single toast + Action Monitor).
+- [fantasia-floating-windows](../fantasia-floating-windows/SKILL.md), [fantasia-he-tree](../fantasia-he-tree/SKILL.md), [fantasia-drag-drop](../fantasia-drag-drop/SKILL.md), [fantasia-icon-picker](../fantasia-icon-picker/SKILL.md), [fantasia-i18n](../fantasia-i18n/SKILL.md), [fantasia-testing](../fantasia-testing/SKILL.md), [fantasia-action-manager](../fantasia-action-manager/SKILL.md)
 
 ## Storybook i18n caution
 
-- In Storybook-specific loaders/mocks, avoid importing full locale entrypoints (`i18n/index.ts` or `i18n/en-US/index.ts`) because they import markdown `documents/*.md`.
-- Prefer importing focused non-markdown `L_*` locale modules (for example menu/button translation modules) and provide explicit placeholder copy for markdown-backed `documents.*` keys used by dialogs.
-- Do **not** create Storybook stories under the `A11y/*` category for this project.
-- Do **not** create Storybook stories that only exercise `TEST_ENV === 'components'` branches; validate those paths in Playwright/component-test harnesses instead.
+- Storybook mocks: focused **`L_*`** imports — not full locale roots (markdown **`documents/*.md`** break import analysis)
+- Placeholder **`documents.*`** in **`externalFileLoader.ts`**
+- No **`A11y/*`** stories; no stories that only exercise **`TEST_ENV === 'components'`** branches
 
-## TypeScript interfaces and types (`types/`)
+## Types
 
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+Shared types → **`types/`** (**`app/types/...`**). See [types-folder.mdc](../../rules/types-folder.mdc).

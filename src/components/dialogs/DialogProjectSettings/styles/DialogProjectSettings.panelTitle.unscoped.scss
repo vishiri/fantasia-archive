@@ -28,7 +28,7 @@
 }
 
 .dialogProjectSettings__fieldHelpTooltip.q-tooltip {
-  max-width: 420px;
+  max-width: $dialogProjectSettings-fieldHelpTooltip-maxWidth;
   text-align: left;
 }
 
@@ -37,15 +37,15 @@
 }
 
 .dialogProjectSettings__fieldHelpTooltipIntro + .dialogProjectSettings__fieldHelpTooltipRightClickIntro {
-  margin-top: 8px;
+  margin-top: $dialogProjectSettings-fieldHelpTooltip-intro-marginTop;
 }
 
 .dialogProjectSettings__fieldHelpTooltipRightClickIntro + .dialogProjectSettings__fieldHelpTooltipBullet {
-  margin-top: 4px;
+  margin-top: $dialogProjectSettings-fieldHelpTooltip-bullet-marginTop;
 }
 
 .dialogProjectSettings__fieldHelpTooltipBullet + .dialogProjectSettings__fieldHelpTooltipBullet {
-  margin-top: 4px;
+  margin-top: $dialogProjectSettings-fieldHelpTooltip-bullet-marginTop;
 }
 
 .dialogProjectSettings__fieldLabel {

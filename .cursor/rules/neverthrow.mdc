@@ -2,24 +2,19 @@
 
 ## Policy
 
-- Prefer the **Neverthrow** library (`neverthrow` npm package) for **expected** failure paths: return **`Result`** / **`ResultAsync`** (**`ok`** / **`err`**) instead of **`throw`** where the API allows it.
-- Do **not** use JavaScript **`try`** / **`catch`** for control flow when a Neverthrow **`Result`**, **`Result.fromThrowable`**, **`ResultAsync.fromPromise`**, or **`safeTry`** can express the same outcome. This applies to **application and test code** under **`src/`**, **`src-electron/`**, **`helpers/`**, **`.utility-scripts/`**, **`.storybook-workspace/`**, **`e2e-tests/`**, and other first-party trees.
-- For cleanup that must run after success or failure, prefer **`.finally`** on a **`Promise`**, or **`Result`** composition, instead of **`try` / `finally` / `catch`** when that keeps the flow in Neverthrow.
-- **Rare exceptions** — only when Neverthrow cannot model the boundary without unacceptable churn (for example **generated** code, or a **third-party** API that *must* be wrapped with no project control). Document the reason in a brief line comment near the site.
-- **Preload / sandboxed bundle** — do **not** **`import`** **`neverthrow`** from **`src-electron/contentBridgeAPIs/**`** (they ship inside **Electron** preload). Use **`Promise`** + **`.catch`**, **`URL.canParse`**, or other plain control flow. Shared **`src-electron/shared/**`** modules pulled into preload must obey the same rule.
+- Prefer **Neverthrow** (`neverthrow` npm) for **expected** failures: **`Result`** / **`ResultAsync`** (**`ok`** / **`err`**) instead of **`throw`** where API allows.
+- Do **not** use **`try`** / **`catch`** for control flow when **`Result`**, **`Result.fromThrowable`**, **`ResultAsync.fromPromise`**, or **`safeTry`** can express same outcome. Applies to **application and test code** under **`src/`**, **`src-electron/`**, **`helpers/`**, **`.utility-scripts/`**, **`.storybook-workspace/`**, **`e2e-tests/`**, other first-party trees.
+- Cleanup after success/failure: prefer **`.finally`** on **`Promise`**, or **`Result`** composition, instead of **`try` / `finally` / `catch`** when flow stays in Neverthrow.
+- **Rare exceptions** — only when Neverthrow cannot model boundary without unacceptable churn (e.g. **generated** code, **third-party** API that *must* be wrapped with no project control). Brief line comment at site.
+- **Preload / sandboxed bundle** — do **not** **`import`** **`neverthrow`** from **`src-electron/contentBridgeAPIs/**`** (ships inside Electron preload). Use **`Promise`** + **`.catch`**, **`URL.canParse`**, or plain control flow. Shared **`src-electron/shared/**`** modules pulled into preload obey same rule.
 
 ## Imports and patterns
 
 - Import from **`'neverthrow'`** (**`ok`**, **`err`**, **`Result`**, **`ResultAsync`**, **`okAsync`**, **`errAsync`**, **`safeTry`** as needed).
-- **Sync code that may throw**: **`Result.fromThrowable(fn, mapError)`** then **`()`** to invoke when wrapping a zero-arg thunk, or use the wrapped function semantics from the typings.
-- **Promises that may reject**: **`ResultAsync.fromPromise(promise, mapError)`** / **`fromSafePromise`**; avoid ad hoc **`.catch(() => {})`** for swallowing errors when **`Result`** conveys intent more clearly.
+- **Sync code that may throw**: **`Result.fromThrowable(fn, mapError)`** then **`()`** to invoke zero-arg thunk, or wrapped function semantics from typings.
+- **Promises that may reject**: **`ResultAsync.fromPromise(promise, mapError)`** / **`fromSafePromise`**; avoid ad hoc **`.catch(() => {})`** for swallowing when **`Result`** conveys intent clearer.
 
 ## References
 
-- Upstream docs: [`neverthrow` on npm](https://www.npmjs.com/package/neverthrow) and repository examples for **`safeTry`** (`?`-style chaining).
-- Maintainer playbook: `.cursor/skills/fantasia-neverthrow/SKILL.md`
-
-## TypeScript interfaces and types (`types/`)
-
-- Put shared **`interface`** / **`type`** declarations in repository-root **`types/`** (import with **`app/types/...`**). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see **`types/I_appMenusDataList.ts`**). Do not add colocated **`<filename>.types.ts`** under **`src/`**, **`src-electron/`**, or **`.storybook-workspace/`**. Ambient augmentations for third-party modules also live under **`types/`** and are loaded with a side-effect import from the owning boot file or **`src/stores/index.ts`** (see **`types/piniaModuleAugmentation.ts`**).
-- For JavaScript (**`.js`**), TypeScript (**`.ts`**), Vue (**`.vue`**), and JSON (**`.json`**, **`.jsonc`**, **`.json5`**), enforce expanded multi-line object literals via ESLint (**`object-curly-newline`** + **`object-property-newline`**) and keep files auto-fixable with **`eslint --fix`**.
+- Upstream: [`neverthrow` on npm](https://www.npmjs.com/package/neverthrow); repo examples for **`safeTry`** (`?`-style chaining).
+- Playbook: `.cursor/skills/fantasia-neverthrow/SKILL.md`

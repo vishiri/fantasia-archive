@@ -1,5 +1,8 @@
+import { ResultAsync } from 'neverthrow'
+
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_faProjectDocumentTemplateSnapshotItem } from 'app/types/I_faProjectDocumentTemplateDomain'
+import { i18n } from 'app/i18n/externalFileLoader'
 
 function resolveProjectContentBridge (): {
   listDocumentTemplatesForProjectSettings?: () => Promise<{
@@ -55,15 +58,15 @@ export async function faProjectDocumentTemplatesPersistSnapshotFromDialog (
 ): Promise<void> {
   const api = resolveProjectContentBridge()
   if (typeof api?.saveDocumentTemplatesSnapshot !== 'function') {
-    throw new Error('projectContent.saveDocumentTemplatesSnapshot is unavailable')
+    throw new Error(i18n.global.t('globalFunctionality.faProjectSettings.bridgeMissing'))
   }
-  try {
-    await api.saveDocumentTemplatesSnapshot(items)
-  } catch (error: unknown) {
+  const writeResult = await ResultAsync.fromPromise(
+    api.saveDocumentTemplatesSnapshot(items),
+    (error): unknown => error
+  )
+  if (writeResult.isErr()) {
+    const error = writeResult.error
     console.error('[Project Settings] saveDocumentTemplatesSnapshot failed', error)
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error('saveDocumentTemplatesSnapshot failed')
+    throw new Error(i18n.global.t('globalFunctionality.faProjectSettings.saveError'))
   }
 }

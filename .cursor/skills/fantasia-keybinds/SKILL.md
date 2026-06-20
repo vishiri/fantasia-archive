@@ -11,50 +11,41 @@ description: >-
 
 ## What exists today
 
-- **App-wide shortcuts** run in the **renderer** on a **window** **keydown** listener (**capture** phase) so they can call existing dialog and app helpers without widening the preload surface beyond **`getKeybinds`** / **`setKeybinds`**.
-- **Definitions**: `src/scripts/keybinds/faKeybindCommandDefinitions.ts` (**`FA_KEYBIND_COMMAND_DEFINITIONS`**) list each command’s **`id`**, optional **`defaultChord`**, **`editable`**, **`firesInEditableFields`**, and **`messageKey`** (i18n path for the settings table).
-- **Chord logic**: `src/scripts/keybinds/faKeybindsChordFromEvent.ts` (**`faKeybindTryChordFromEvent`**, **`faKeybindEventToChord`**, key-code rules), **`faKeybindsChordEqualityAndResolve.ts`** (**`sortFaKeybindMods`**, **`faKeybindChordsEqual`**, expand/resolve effective chords), and **`faKeybindsChordDisplayAndConflict.ts`** (**`faKeybindFindChordConflict`**).
-- **UI formatting (renderer)**: `src/scripts/keybinds/faKeybindsChordUiFormatting.ts` — **`formatFaKeybindChordForUi`** (serialized chord → label) and **`formatFaKeybindCommandLabelFromSnapshot`** (command id + **`I_faKeybindsSnapshot`** → label or `null`). Use this module for keybind settings, app menus, and any future shortcut copy.
-- **Dispatch**: `src/scripts/keybinds/faKeybindsGlobalDispatch.ts` builds **`createFaKeybindKeydownHandler(getFaKeybindKeydownContext)`**, reads **`S_FaKeybinds`** for snapshot and **`suspendGlobalKeybindDispatch`**, and calls **`faKeybindRunCommand`** from **`faKeybindRunCommand.ts`** for the first chord match (kept as its own module so Vitest can **`vi.mock`** it from integration tests). **`faKeybindRunCommand`** itself does not run UI helpers directly — it maps each **`T_faKeybindCommandId`** to a **`T_faActionId`** via **`FA_KEYBIND_COMMAND_TO_ACTION_ID`** and delegates to **`runFaAction`** in the **action manager** (see [fantasia-action-manager](../fantasia-action-manager/SKILL.md)).
-- **Layout wiring**: `src/layouts/MainLayout.vue` — after **`refreshKeybinds()`** in Electron, registers the listener; removes it on unmount. Skipped in **`isFantasiaStorybookCanvas()`** (from **`app/src/scripts/appInternals/appInternals_manager`**) and non-Electron **`MODE`**.
-- **Chromium Ctrl+Shift suppress (main → renderer)**: **`registerFaChromiumCtrlShiftShortcutSuppress`** plus **`registerFaChromiumCtrlShiftGlobalShortcutForward`** ( **`globalShortcut`** — primary on Windows so Chromium bookmark UI does not run). **`before-input-event`** still **`preventDefault`s** denylisted chords; IPC forward uses **`FA_CHROMIUM_CTRL_SHIFT_SHORTCUT_IPC`**. Boot **`faChromiumForwardedKeyChord`** polls for preload **`faChromiumCtrlShiftShortcutAPI`**, then **`dispatchFaChromiumForwardedKeyChord`**. Denylist and resolver: **`types/I_faChromiumCtrlShiftSuppress.ts`**, **`resolveFaChromiumCtrlShiftShortcutToForward`**, **`normalizeFaChromiumBeforeInputDomCode`**.
-- **Pinia**: `src/stores/S_FaKeybinds.ts` holds **`snapshot`**, **`suspendGlobalKeybindDispatch`**, **`refreshKeybinds`**, **`updateKeybinds`** (bridge **`invoke`**, success/error **`Notify`**).
-- **Persistence (main)**: `src-electron/mainScripts/keybinds/` (**`keybinds_manager.ts`**, defaults, patch schema). **`registerFaKeybindsIpc.ts`** wires **`ipcMain.handle`**; channel names live in **`src-electron/electron-ipc-bridge.ts`** (**`FA_KEYBINDS_IPC`**).
-- **Preload**: `src-electron/contentBridgeAPIs/faKeybindsAPI.ts` exposes **`window.faContentBridgeAPIs.faKeybinds`**; shared shapes live in **`types/I_faKeybindsDomain.ts`** (command ids, chords, store root, snapshot, bridge **`I_faKeybindsAPI`**, capture helpers such as **`T_faKeybindTryChordFromEventResult`**).
-- **Settings UI**: `src/components/dialogs/DialogKeybindSettings/` — table rows are built from **`FA_KEYBIND_COMMAND_DEFINITIONS`** (**`dialogKeybindSettingsTable.ts`**: **`buildDialogKeybindSettingsRows`**, columns, filtered table state). Capture flow and conflict checks live in **`dialogKeybindSettingsCapture*.ts`** modules; **`dialogKeybindSettingsDialogWiring.ts`** groups open/routing plus **`registerDialogKeybindSettingsGlobalSuspend`** (pauses dispatch while the main dialog or capture sheet is open).
-- **Shipped project command**: **`openProjectSettings`** (default **Ctrl+Alt+Shift+P**, literal Control on macOS) maps to action **`openProjectSettingsDialog`** and opens **`DialogProjectSettings`** when **`S_FaActiveProject.hasActiveProject`**.
+- **Renderer** **`keydown`** listener (capture) — calls dialog/app helpers without widening preload beyond **`getKeybinds`** / **`setKeybinds`**
+- **Definitions**: **`faKeybindCommandDefinitions.ts`** (**`FA_KEYBIND_COMMAND_DEFINITIONS`**)
+- **Chord logic**: **`faKeybindsChordFromEvent.ts`**, **`faKeybindsChordEqualityAndResolve.ts`**, **`faKeybindsChordDisplayAndConflict.ts`**
+- **UI formatting**: **`faKeybindsChordUiFormatting.ts`** — settings, menus, shortcut copy
+- **Dispatch**: **`faKeybindsGlobalDispatch.ts`** → **`faKeybindRunCommand.ts`** → **`runFaAction`** via **`FA_KEYBIND_COMMAND_TO_ACTION_ID`** ([fantasia-action-manager](../fantasia-action-manager/SKILL.md))
+- **Layout**: **`MainLayout.vue`** registers after **`refreshKeybinds()`**; skipped in Storybook canvas + non-Electron
+- **Chromium Ctrl+Shift suppress**: main **`registerFaChromiumCtrlShiftShortcutSuppress`** + global forward; boot **`faChromiumForwardedKeyChord`**
+- **Pinia**: **`S_FaKeybinds.ts`**
+- **Persistence**: **`src-electron/mainScripts/keybinds/`**; **`registerFaKeybindsIpc.ts`**; **`FA_KEYBINDS_IPC`**
+- **Preload**: **`faKeybindsAPI.ts`**; types **`types/I_faKeybindsDomain.ts`**
+- **Settings UI**: **`DialogKeybindSettings/`** — table from definitions; capture in **`dialogKeybindSettingsCapture*.ts`**
+- **Shipped**: **`openProjectSettings`** → **`openProjectSettingsDialog`** when active project
 
 ## `src/scripts/keybinds/` — avoid fragmentation
 
-- **Prefer a few domain modules** over many one-function files: chord parsing and physical-key rules stay together; equality, default expansion, and effective-chord resolution stay together; display formatting and conflict detection stay together; global keydown wiring stays together.
-- **`faKeybindRunCommand.ts`** is deliberately **thin** so **`faKeybinds.integration.vitest.test.ts`** can **`vi.mock`** it without mocking the whole dispatcher (mocking only the dispatch module does not replace the import the handler closes over). When adding shortcuts, extend that file or merge only if you preserve an equivalent test seam — see [typescript-scripts.mdc](../../rules/typescript-scripts.mdc) **Intentionally small modules**.
+Few domain modules: chord parse, equality/resolve, display/conflict, dispatch wiring. **`faKeybindRunCommand.ts`** stays thin for **`vi.mock`** seam — [typescript-scripts.mdc](../../rules/typescript-scripts.mdc).
 
 ## Adding a new global command (checklist)
 
-1. **`types/I_faKeybindsDomain.ts`** — append the new **`id`** string to **`FA_KEYBIND_COMMAND_IDS`** and ensure the exported **`T_faKeybindCommandId`** union updates.
-2. **`src/scripts/keybinds/faKeybindCommandDefinitions.ts`** — add one **`I_faKeybindCommandDefinition`** entry (**`defaultChord`**, **`editable`**, **`firesInEditableFields`**, **`id`**, **`messageKey`**). The table and capture UI pick this up automatically.
-3. **`i18n/*/dialogs/L_dialogKeybindSettings.ts`** — add **`commands.<camelCaseId>`** under the existing **`commands`** object for each maintained locale (same key path as **`messageKey`**).
-4. **`src/scripts/keybinds/faKeybindRunCommand.ts`** — add a row to **`FA_KEYBIND_COMMAND_TO_ACTION_ID`** mapping the new **`T_faKeybindCommandId`** to the **`T_faActionId`** that already exists (or that you add) in the action manager registry; **do not** call dialog helpers / stores from this file directly. Register the matching action in **`src/scripts/actionManager/faActionDefinitions.ts`** if it is not there yet, following [fantasia-action-manager](../fantasia-action-manager/SKILL.md).
-5. **Tests** — extend **`faKeybindRunCommand`**, **`createFaKeybindKeydownHandler`** / **`faKeybinds.integration.vitest.test`**, **`faKeybindsGlobalDispatch.getFaKeybindKeydownContext.vitest.test`**, command-definition, **`S_FaKeybinds`**, **`dialogKeybindSettingsTable`** / **`dialogKeybindSettings.integration.vitest.test`**, Electron **`keybinds_manager`** / IPC / preload tests as needed so **`yarn testbatch:verify`** coverage stays green.
+1. **`types/I_faKeybindsDomain.ts`** — append **`FA_KEYBIND_COMMAND_IDS`**
+2. **`faKeybindCommandDefinitions.ts`** — one definition row
+3. **`i18n/*/dialogs/L_dialogKeybindSettings.ts`** — **`commands.<camelCaseId>`**
+4. **`faKeybindRunCommand.ts`** — **`FA_KEYBIND_COMMAND_TO_ACTION_ID`** row; register action in **`faActionDefinitions.ts`**
+5. Tests — run command, dispatch integration, definitions, store, dialog, Electron IPC/preload
 
-If the command needs **new persisted fields** or **schema** changes beyond **`overrides`**, extend **`src-electron/shared/`** Zod schemas and **`keybinds_manager`** with the same discipline as user settings; keep **`electron-ipc-bridge`** and **`registerFaKeybindsIpc`** in sync.
+Persisted schema changes → Zod in **`src-electron/shared/`** + **`keybinds_manager`** + bridge sync.
 
-## Playwright and component/E2E tests (`keyboard.press`)
+## Playwright (`keyboard.press`)
 
-Automated tests that simulate global shortcuts or keybind capture must use the same **primary** vs **literal Control** behavior as the renderer (**`faKeybindExpandDefaultChord`** in **`faKeybindsChordEqualityAndResolve.ts`**).
+Use **`faPlaywrightKeyboardChords.ts`** — primary vs literal Control per **`faKeybindExpandDefaultChord`**. Docs: [playwright-tests.mdc](../../rules/playwright-tests.mdc), [fantasia-testing](../fantasia-testing/SKILL.md).
 
-- **Shared helpers**: [`helpers/playwrightHelpers_universal/faPlaywrightKeyboardChords.ts`](../../helpers/playwrightHelpers_universal/faPlaywrightKeyboardChords.ts) — defaults for Toggle developer tools (**F12**), Open Action monitor (**F11**), **Monaco** select all, and fixed **Control+Shift+…** strings for capture tests. Import from Playwright specs with the **`app`** alias; extend the module when a new default shortcut needs a matching getter (no **`unit-helpers`** Vitest target for **`playwrightHelpers_*`** trees).
-- **Docs**: [playwright-tests.mdc](../../rules/playwright-tests.mdc) **Keyboard strings**, [fantasia-testing](../fantasia-testing/SKILL.md) **Playwright keyboard.press and app keybinds**, [AGENTS.md](../../AGENTS.md) **Global keyboard shortcuts** and **Testing expectations** (**Playwright keyboard vs keybinds**).
+## Related
 
-## Related skills and rules
+- [fantasia-action-manager](../fantasia-action-manager/SKILL.md), [fantasia-electron-preload](../fantasia-electron-preload/SKILL.md), [fantasia-electron-main](../fantasia-electron-main/SKILL.md), [fantasia-quasar-vue](../fantasia-quasar-vue/SKILL.md), [fantasia-i18n](../fantasia-i18n/SKILL.md)
 
-- [fantasia-action-manager](../fantasia-action-manager/SKILL.md) — every keybind dispatches through **`runFaAction`** via **`FA_KEYBIND_COMMAND_TO_ACTION_ID`**; new shortcuts that need new actions register here too.
-- [fantasia-electron-preload](../fantasia-electron-preload/SKILL.md) — **`faKeybindsAPI`** and **`globals.d.ts`**.
-- [fantasia-electron-main](../fantasia-electron-main/SKILL.md) — **`registerFaKeybindsIpc`**, **`keybinds_manager`**.
-- [fantasia-quasar-vue](../fantasia-quasar-vue/SKILL.md) — **`MainLayout.vue`**, dialogs under **`src/components/dialogs/`**.
-- [fantasia-i18n](../fantasia-i18n/SKILL.md) — **`L_dialogKeybindSettings`** command labels.
+## Types
 
-## TypeScript interfaces and types (`types/`)
-
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+Shared types → **`types/`**. See [types-folder.mdc](../../rules/types-folder.mdc).

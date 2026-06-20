@@ -12,6 +12,7 @@ export interface I_faProjectWorldTemplatePlacementSnapshotItem {
   groupId: string | null
   rootSortOrder: number | null
   groupSortOrder: number | null
+  nickname: string
 }
 
 /** Full per-world template layout persisted with Project Settings worlds save. */
@@ -39,6 +40,7 @@ export interface I_faProjectWorldTemplatePlacementForProjectSettings {
   rootSortOrder: number | null
   groupSortOrder: number | null
   displayName: string
+  nickname: string
   worldAppendix: string
   icon: string
   documentCountInWorld: number

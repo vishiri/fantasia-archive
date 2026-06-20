@@ -72,7 +72,7 @@ const isDisabled = computed(() => props.disabled === true)
 }
 
 .q-checkbox {
-  margin: 0 8px;
+  margin: 0 $dialogImportExportAppConfig-checkbox-marginInline;
 }
 
 .importExportAppConfig__label {

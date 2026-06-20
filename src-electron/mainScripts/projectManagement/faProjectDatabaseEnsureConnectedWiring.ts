@@ -7,7 +7,7 @@ import {
   getFaProjectLastKnownActiveProjectFilePath
 } from 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabaseWiring'
 import { reconnectFaProjectDatabaseAtKnownPathSync } from 'app/src-electron/mainScripts/projectManagement/faProjectReconnectAtKnownPathWiring'
-import { pathLooksLikeFaProjectFile } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
+import { pathLooksLikeFaProjectFile } from './projectManagementSharedPathWiring'
 import { requestRendererActiveProjectPathForFailsafe } from 'app/src-electron/mainScripts/ipcManagement/faProjectFailsafePathFromRendererWiring'
 
 function ensureActiveDatabaseAttachedSync (): boolean {

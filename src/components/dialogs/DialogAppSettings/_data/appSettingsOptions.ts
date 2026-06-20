@@ -137,6 +137,10 @@ I_appSettingsStaticOption
     category: 'documentViewEdit',
     subcategory: 'documentBody'
   },
+  logFullActivityPayload: {
+    category: 'developerSettings',
+    subcategory: 'documentBody'
+  },
   noProjectName: {
     category: 'hierarchicalTree',
     subcategory: 'treeBehavior'

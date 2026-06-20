@@ -11,10 +11,10 @@ description: >-
 
 ## Toolchain
 
-- **Package manager**: Yarn 1.x (**`.github/workflows/verify.yml`** installs **`yarn@1.22.19`** for CI; match locally when practical). Avoid npm-only workflows for day-to-day work.
-- **Node.js**: **22.22.0 or newer** (`package.json` `engines.node` is `>=22.22.0`; Quasar `@quasar/app-vite` v2 aligns with this). Use `nvm` / `fnm` to pin (e.g. `nvm use 22.22`).
-- **Quasar CLI** (recommended): `yarn global add @quasar/cli` — ensure the global Yarn bin is on `PATH`.
-- **CI (push/PR)**: [`.github/workflows/verify.yml`](../../../.github/workflows/verify.yml) runs **`yarn testbatch:verify`** only (installs **`.storybook-workspace`** for ESLint). **Storybook** VRT (`yarn test:storybook:visual*`) is **not** run in **GitHub Actions** — use **`yarn testbatch:ensure:nochange`** or the individual scripts locally.
+- **Package manager**: Yarn 1.x (CI: **`yarn@1.22.19`**)
+- **Node.js**: **22.22.0+** (`package.json` `engines.node` **`>=22.22.0`**)
+- **Quasar CLI** (optional global): `yarn global add @quasar/cli`
+- **CI**: [`.github/workflows/verify.yml`](../../../.github/workflows/verify.yml) — **`yarn testbatch:verify`** only; Storybook VRT local only
 
 ## Install
 
@@ -22,27 +22,23 @@ description: >-
 yarn
 ```
 
-Renderer drag-and-drop libraries (**`vue-draggable-plus`**, **`quasar-ui-q-draggable-table`**) ship in root **`package.json`** **`dependencies`**. **`quasar-ui-q-draggable-table`** registers via boot **`q-draggable-table`** in **`quasar.config.ts`**. Policy: [fantasia-drag-drop](../fantasia-drag-drop/SKILL.md).
+DnD libs (**`vue-draggable-plus`**, **`quasar-ui-q-draggable-table`**) in **`package.json`**; boot **`q-draggable-table`**. Policy: [fantasia-drag-drop](../fantasia-drag-drop/SKILL.md).
 
 ## Run (development)
-
-Hot reload and Electron debugging:
 
 ```bash
 quasar dev -m electron
 ```
 
-(`package.json` also exposes `yarn quasar:dev:electron`.)
+(`yarn quasar:dev:electron`). Electron + Storybook together: **`yarn app:dev`**.
 
-To run **Electron** dev and **Storybook** together in one terminal, use **`yarn app:dev`** (**`concurrently`**: prefixed logs; stopping one process stops both when **`-k`** applies).
+Post-implementation agent gates ([dev-electron-compile-check.mdc](../rules/dev-electron-compile-check.mdc)): (1) **`yarn testbatch:verify`**, (2) **`yarn quasar:dev:electron`** ~5s compile smoke — separate terminals; before reporting substantive edits done.
 
 ## Troubleshooting
 
-### `Electron failed to install correctly` (missing `node_modules/electron/dist`)
+### Electron failed to install correctly
 
-The `electron` package downloads its binary in a **postinstall** step. **`npm install --ignore-scripts`** (or any install that skips lifecycle scripts) leaves `path.txt` / `dist/` missing and Quasar will crash when spawning Electron.
-
-**Fix:** remove the broken folder and reinstall **with scripts enabled** (close running Electron/Quasar first if Windows reports `EBUSY`):
+Postinstall skipped → missing **`node_modules/electron/dist`**.
 
 ```bash
 rm -rf node_modules/electron   # PowerShell: Remove-Item -Recurse -Force node_modules/electron
@@ -50,55 +46,52 @@ yarn install
 # or: node node_modules/electron/install.js
 ```
 
-### DevTools `Autofill.enable` / `Autofill.setAddresses` in the terminal
+### DevTools Autofill CDP noise
 
-Bundled DevTools call Chrome CDP domains that Electron does not implement; Chromium logs harmless failures to stderr. The app filters those specific lines in the Electron **main** process so the dev terminal stays readable (they can still appear inside the DevTools console itself).
+Harmless stderr; main process filters specific lines.
 
-### `Could not locate the bindings file` when opening a `.faproject`
+### better-sqlite3 bindings missing
 
-**better-sqlite3** is a native addon. It must be compiled for the **Electron** Node ABI, not only system **Node**. A missing **`node_modules/better-sqlite3/build`** tree or a bindings error on **Load existing project** / **Resume Latest Project** usually means native deps were not rebuilt.
-
-**Fix** (close **quasar dev** / Electron first if Windows reports file locks):
+Native addon must match Electron ABI.
 
 ```bash
 yarn rebuild:native
 ```
 
-That runs **`electron-builder install-app-deps`** (also hooked from **`yarn install`** via **`postinstall`**). If it still fails, remove **`node_modules/better-sqlite3`**, run **`yarn install`** with lifecycle scripts enabled (do not use **`npm install --ignore-scripts`**), then **`yarn rebuild:native`** again.
+Close quasar dev first on Windows file locks. If still fails: remove **`node_modules/better-sqlite3`**, **`yarn install`** (scripts enabled), **`yarn rebuild:native`** again.
 
 ## Production build
 
-Required for packaged app behavior and **before Playwright** component/e2e runs:
+Required for packaged behavior + **before Playwright**:
 
 ```bash
 quasar build -m electron
 ```
 
-(`yarn quasar:build:electron` maps to `quasar build -m electron --publish never`.)
+(`yarn quasar:build:electron` = `quasar build -m electron --publish never`).
 
-**Quieter / chained runs:** **`yarn quasar:build:electron:summarized`** runs the same build via **`.utility-scripts/quasarBuildElectronSummarized.mjs`**: one success line, full log under **`test-results/quasar-build-electron-last.log`** (printed on failure). **`yarn testbatch:ensure:nochange`** and **`yarn testbatch:ensure:change`** use this script.
+**Quieter**: **`yarn quasar:build:electron:summarized`** — log in **`test-results/quasar-build-electron-last.log`**.
 
-**Playwright `userData`:** With **`TEST_ENV`** **`components`** or **`e2e`**, Electron **`userData`** is **`%APPDATA%/<package.json name>/playwright-user-data`** (here: **`Roaming\fantasia-archive\playwright-user-data`**), **not** **`fantasia-archive-dev`** (that folder is for **`quasar dev`** when **`DEBUGGING`** is set). See [`appIdentity_manager.ts`](../../../src-electron/mainScripts/appIdentity/appIdentity_manager.ts) for main-process wiring and [`playwrightIsolatedUserDataDirName.ts`](../../../src-electron/mainScripts/appIdentity/playwrightIsolatedUserDataDirName.ts) for the shared folder-name constant (Electron-free, used by **`playwrightUserDataReset`**). Component and E2E specs group tests in **`test.describe.serial`**; each group's **`test.beforeAll`** **`await`**s **`launchFaPlaywrightComponentHarnessWindow`** / **`launchFaPlaywrightE2eAppWindow`**, which call **`resetFaPlaywrightIsolatedUserData()`** ([`helpers/playwrightHelpers_universal/playwrightUserDataReset.ts`](../../../helpers/playwrightHelpers_universal/playwrightUserDataReset.ts)) before **`electron.launch`**, **not** in **`test.beforeEach`** — a per-test reset would wipe **`playwright-user-data`** on disk while the shared **`ElectronApplication`** still holds the old profile, diverging the running process from disk. Shared Playwright packages: **`helpers/playwrightHelpers_universal/`**, **`helpers/playwrightHelpers_e2e/`**, **`helpers/playwrightHelpers_component/`**; future **non-Playwright** helper packages belong as siblings under **`helpers/<name>/`**. Keep the repo root for config, **`README`**, lockfiles, and **`scripts/`**, not new loose harness **`.ts`** files. Rebuild the production Electron app after changing **`fixAppName`** path logic or **`playwrightIsolatedUserDataDirName`**.
+**Playwright `userData`**: **`TEST_ENV`** **`components`**/**`e2e`** → **`%APPDATA%/fantasia-archive/playwright-user-data`**. Serial suites reset in **`test.beforeAll`** only — see [fantasia-testing](../fantasia-testing/SKILL.md).
 
 ## Quick reference
 
 | Goal | Command |
 |------|---------|
-| **Quality gate** (lint + `vue-tsc` + style + Vitest coverage: 99% `src-electron` + `helpers` corpus excluding playwright harness trees per `vitest.helpers.config.mts`; `src` `.ts` per `vitest/`; `vue` SFCs watermarks only; one terminal) | `yarn testbatch:verify` |
-| **Full project gate** (verify + summarized Electron build + Playwright component + E2E + Storybook smoke + VRT compare) | `yarn testbatch:ensure:nochange` |
-| **Full project gate — refresh Storybook VRT baselines** (same through smoke, then snapshot update) | `yarn testbatch:ensure:change` |
+| Quality gate | `yarn testbatch:verify` |
+| Full project gate | `yarn testbatch:ensure:nochange` |
+| Refresh Storybook VRT | `yarn testbatch:ensure:change` |
 | ESLint | `yarn lint:eslint` |
-| TypeScript (`vue-tsc`, no emit; includes `.vue` SFCs) | `yarn lint:typescript` |
-| Stylelint (Vue/CSS/SCSS/Sass + Storybook `.storybook` sources) | `yarn lint:stylelint` (autofix: `yarn lint:stylelint:fix`) |
+| TypeScript | `yarn lint:typescript` |
+| Stylelint | `yarn lint:stylelint` |
 | Unit tests | `yarn test:unit` |
-| Component tests (Playwright) | `yarn test:components` (after production build) |
-| E2E tests (Playwright) | `yarn test:e2e` (after production build) |
+| Component tests | `yarn test:components` (after prod build) |
+| E2E | `yarn test:e2e` (after prod build) |
 
-**Storybook** nested package: run **`yarn`** at the repo root, then **`yarn --cwd .storybook-workspace install`** so **`yarn storybook:run`** / **`yarn storybook:build`** / **`yarn test:storybook:visual*`** (Playwright VRT) resolve their dependencies.
+**Storybook**: `yarn --cwd .storybook-workspace install` after root **`yarn`**.
 
-See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc) for ESLint vs TSLint, `tsconfig` / `vue-tsc`, and Vitest env typing. See [fantasia-testing](../fantasia-testing/SKILL.md) and [vitest-tests.mdc](../../rules/vitest-tests.mdc) for Playwright rebuild rules and **layered Vitest coverage**. **Yarn 1.x** reserves `yarn check` for dependency verification — use **`yarn testbatch:verify`** for the lint, types, stylelint, and Vitest-coverage gate ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
+See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc), [fantasia-testing](../fantasia-testing/SKILL.md). **Yarn 1.x**: **`yarn check`** ≠ quality gate — use **`yarn testbatch:verify`**.
 
-## TypeScript interfaces and types (`types/`)
+## Types
 
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+Shared types → **`types/`**. See [types-folder.mdc](../../rules/types-folder.mdc).

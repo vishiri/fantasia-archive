@@ -1,0 +1,23 @@
+import path from 'node:path'
+
+import { createProjectManagementManagerSurface } from './projectManagementManagerSurface'
+
+const projectManagementPathSurface = createProjectManagementManagerSurface({ path })
+
+export const pathLooksLikeFaProjectFile = projectManagementPathSurface.pathLooksLikeFaProjectFile
+
+export const ensureFaProjectExtension = projectManagementPathSurface.ensureFaProjectExtension
+
+export const faDisplayNameFallbackFromProjectPath =
+  projectManagementPathSurface.faDisplayNameFallbackFromProjectPath
+
+export const faProjectSlugFromDisplayName = projectManagementPathSurface.faProjectSlugFromDisplayName
+
+export const extractFaProjectPathsFromArgv = projectManagementPathSurface.extractFaProjectPathsFromArgv
+
+export const dedupeFaProjectPathsLastWins = projectManagementPathSurface.dedupeFaProjectPathsLastWins
+
+export const pickLastFaProjectPathForOsOpen = projectManagementPathSurface.pickLastFaProjectPathForOsOpen
+
+export const resolveOsOpenFaProjectPathFromArgv =
+  projectManagementPathSurface.resolveOsOpenFaProjectPathFromArgv

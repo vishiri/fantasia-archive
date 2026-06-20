@@ -17,7 +17,9 @@ test('Test that duplicate validation collects repeated document template ids', (
   const layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   layout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -28,7 +30,9 @@ test('Test that duplicate validation collects repeated document template ids', (
       worldAppendix: ''
     },
     {
-      displayName: 'Character copy',
+      templateDisplayName: 'Character copy',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -52,7 +56,9 @@ test('Test that duplicate validation ignores unique document template ids', () =
   const layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   layout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -63,7 +69,9 @@ test('Test that duplicate validation ignores unique document template ids', () =
       worldAppendix: ''
     },
     {
-      displayName: 'Location',
+      templateDisplayName: 'Location',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-b',
       groupId: null,
@@ -86,7 +94,9 @@ test('Test that duplicate validation ignores blank document template ids', () =>
   const layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   layout.placements = [
     {
-      displayName: 'Blank',
+      templateDisplayName: 'Blank',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: '',
       groupId: null,
@@ -110,7 +120,9 @@ test('Test that duplicate validation flags repeated ids but not unique placement
   const layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   layout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -121,7 +133,9 @@ test('Test that duplicate validation flags repeated ids but not unique placement
       worldAppendix: ''
     },
     {
-      displayName: 'Character copy',
+      templateDisplayName: 'Character copy',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -132,7 +146,9 @@ test('Test that duplicate validation flags repeated ids but not unique placement
       worldAppendix: ''
     },
     {
-      displayName: 'Location',
+      templateDisplayName: 'Location',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-b',
       groupId: null,
@@ -155,7 +171,9 @@ test('Test that duplicate validation ignores third repeats of the same document 
   const layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   layout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -166,7 +184,9 @@ test('Test that duplicate validation ignores third repeats of the same document 
       worldAppendix: ''
     },
     {
-      displayName: 'Character copy',
+      templateDisplayName: 'Character copy',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -177,7 +197,9 @@ test('Test that duplicate validation ignores third repeats of the same document 
       worldAppendix: ''
     },
     {
-      displayName: 'Character copy 2',
+      templateDisplayName: 'Character copy 2',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -205,7 +227,9 @@ test('Test that duplicate validation ignores blank placement ids even when layou
   const layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   layout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -216,7 +240,9 @@ test('Test that duplicate validation ignores blank placement ids even when layou
       worldAppendix: ''
     },
     {
-      displayName: 'Character copy',
+      templateDisplayName: 'Character copy',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -227,7 +253,9 @@ test('Test that duplicate validation ignores blank placement ids even when layou
       worldAppendix: ''
     },
     {
-      displayName: 'Blank',
+      templateDisplayName: 'Blank',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: '',
       groupId: null,
@@ -275,7 +303,9 @@ test('Test that invalid document template placement validation detects bad templ
   const layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   layout.placements = [
     {
-      displayName: 'Character',
+      templateDisplayName: 'Character',
+
+      nickname: '',
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,

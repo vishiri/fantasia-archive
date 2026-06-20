@@ -5,38 +5,89 @@
     :class="nodeRootClassList"
     :data-test-locator="nodeTestLocator"
     :data-test-validation-error="rowHasValidationError ? 'true' : 'false'"
+    @contextmenu.prevent="onRenameContextMenu"
   >
     <div
       class="q-focus-helper"
       tabindex="-1"
     />
-    <div class="dialogProjectSettingsWorldTemplateLayoutTreeNode__titleRow row items-center no-wrap">
-      <q-icon
-        class="dialogProjectSettingsWorldTemplateLayoutTreeNode__icon"
-        :name="displayIconName"
+    <div
+      class="dialogProjectSettingsWorldTemplateLayoutTreeNode__titleRow row items-center no-wrap"
+      :data-test-locator="`${nodeTestLocator}-titleRow`"
+      :data-test-tooltip-text="placementNicknameHoverTooltipTestText"
+    >
+      <DialogProjectSettingsWorldTemplateLayoutTreeNodeLabelArea
+        :display-icon-name="displayIconName"
+        :node="props.node"
+        :node-test-locator="nodeTestLocator"
+        @mouseenter="revealPlacementNicknameHoverTooltip"
       />
-      <span class="dialogProjectSettingsWorldTemplateLayoutTreeNode__label col ellipsis">
-        {{ props.node.label }}
-      </span>
-      <span
-        v-if="props.node.nodeKind === 'template' && props.node.documentCountInWorld > 0"
-        class="dialogProjectSettingsWorldTemplateLayoutTreeNode__count fa-text-muted q-mr-sm"
-        :data-test-locator="`${nodeTestLocator}-count`"
-      >
-        ({{ props.node.documentCountInWorld }})
-      </span>
-      <q-btn
+      <div
         v-if="props.node.nodeKind === 'template' || props.node.nodeKind === 'group'"
-        class="dialogProjectSettingsWorldTemplateLayoutTreeNode__remove"
-        color="negative"
-        dense
-        flat
-        icon="mdi-close"
-        round
-        size="sm"
-        :data-test-locator="`${nodeTestLocator}-remove`"
-        @click.stop="onRemoveClick"
-      />
+        class="dialogProjectSettingsWorldTemplateLayoutTreeNode__actions row items-center no-wrap"
+        @mouseenter="suppressPlacementNicknameHoverTooltip"
+        @mouseleave="armPlacementNicknameHoverTooltip"
+      >
+        <q-btn
+          v-if="renameMenuWiring.supportsRenameMenu"
+          class="dialogProjectSettingsWorldTemplateLayoutTreeNode__edit"
+          color="primary-bright"
+          dense
+          flat
+          icon="edit"
+          round
+          size="sm"
+          :data-test-locator="`${nodeTestLocator}-edit`"
+          :data-test-tooltip-text="editTooltipText"
+          @click.stop="onEditClick"
+          @mouseleave="armEditTooltip"
+        >
+          <q-tooltip
+            ref="editTooltipRef"
+            :delay="300"
+            :disable="!editTooltipHoverEnabled"
+          >
+            {{ editTooltipText }}
+          </q-tooltip>
+        </q-btn>
+        <q-btn
+          class="dialogProjectSettingsWorldTemplateLayoutTreeNode__remove"
+          color="negative"
+          dense
+          flat
+          icon="mdi-close"
+          round
+          size="sm"
+          :data-test-locator="`${nodeTestLocator}-remove`"
+          :data-test-tooltip-text="removeTooltipText"
+          @click.stop="onRemoveClick"
+          @mouseleave="armRemoveTooltip"
+        >
+          <q-tooltip
+            ref="removeTooltipRef"
+            :delay="300"
+            :disable="!removeTooltipHoverEnabled"
+          >
+            {{ removeTooltipText }}
+          </q-tooltip>
+        </q-btn>
+      </div>
+      <q-tooltip
+        v-if="showPlacementNicknameHoverTooltip"
+        ref="placementNicknameHoverTooltipRef"
+        anchor="center right"
+        self="center left"
+        :delay="300"
+        :disable="!placementNicknameHoverTooltipEnabled"
+        :offset="placementNicknameHoverTooltipOffset"
+      >
+        <div class="dialogProjectSettingsWorldTemplateLayoutTreeNode__placementNicknameTooltipLine">
+          {{ placementNicknameHoverTooltipNicknameLine }}
+        </div>
+        <div class="dialogProjectSettingsWorldTemplateLayoutTreeNode__placementNicknameTooltipLine">
+          {{ placementNicknameHoverTooltipOriginalNameLine }}
+        </div>
+      </q-tooltip>
     </div>
     <div
       v-if="props.node.worldAppendix.trim().length > 0"
@@ -57,10 +108,12 @@
       v-model="renameMenuOpen"
       anchor="bottom left"
       class="dialogProjectSettingsWorldTemplateLayoutTreeNode__contextMenu"
-      context-menu
       dark
       :data-test-locator="renameMenuWiring.contextMenuTestLocator"
       :offset="renameMenuWiring.menuOffset"
+      :content-style="renameMenuStyle"
+      :style="renameMenuStyle"
+      no-parent-event
       no-refocus
       self="top left"
       square
@@ -68,11 +121,13 @@
       transition-hide="fade"
       transition-show="fade"
       @before-show="renameMenuWiring.onRenameMenuBeforeShow"
+      @show="renameMenuWiring.onRenameMenuShow"
       @hide="renameMenuWiring.onRenameMenuHide"
       @keydown.esc.stop="renameMenuWiring.closeRenameMenu"
     >
       <div
         class="dialogProjectSettingsWorldTemplateLayoutTreeNode__renameMenuBody"
+        :style="renameMenuStyle"
         @keydown.enter.stop.prevent="renameMenuWiring.closeRenameMenu"
         @keydown.esc.stop="renameMenuWiring.closeRenameMenu"
       >
@@ -80,6 +135,7 @@
           ref="renameInputRef"
           v-model="renameDraft"
           autofocus
+          class="full-width"
           color="primary-bright"
           dark
           dense
@@ -88,9 +144,39 @@
           :error-message="renameMenuErrorMessage"
           :data-test-locator="renameMenuWiring.renameInputTestLocator"
           hide-bottom-space
+          :label="renameInputLabel"
           @keydown.enter.stop.prevent="renameMenuWiring.closeRenameMenu"
           @keydown.esc.stop="renameMenuWiring.closeRenameMenu"
           @update:model-value="renameMenuWiring.onRenameDraftUpdate"
+        >
+          <template
+            v-if="showTemplateCanonicalName"
+            #append
+          >
+            <q-icon
+              class="dialogProjectSettingsWorldTemplateLayoutTreeNode__inputHelpIcon"
+              data-test-locator="dialogProjectSettings-worldTemplateLayoutTemplateNicknameTooltipIcon"
+              :data-test-tooltip-text="templateNicknameTooltipText"
+              name="mdi-help-circle"
+              size="16px"
+              @click.stop
+            >
+              <q-tooltip
+                :delay="500"
+                content-class="dialogProjectSettings__fieldHelpTooltip"
+              >
+                {{ templateNicknameTooltipText }}
+              </q-tooltip>
+            </q-icon>
+          </template>
+        </q-input>
+        <DialogProjectSettingsWorldTemplateLayoutTreeNodeCanonicalNameField
+          v-if="showTemplateCanonicalName"
+          :canonical-name-test-locator="canonicalNameTestLocator"
+          canonical-name-tooltip-icon-test-locator="dialogProjectSettings-worldTemplateLayoutTemplateCanonicalNameTooltipIcon"
+          :template-canonical-name="templateCanonicalName"
+          :template-canonical-name-label="templateCanonicalNameLabel"
+          :template-canonical-name-tooltip-text="templateCanonicalNameTooltipText"
         />
       </div>
     </q-menu>
@@ -98,15 +184,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRef } from 'vue'
-
-import { i18n } from 'app/i18n/externalFileLoader'
-import {
-  isDialogProjectSettingsDocumentTemplateNameInvalid,
-  resolveDialogProjectSettingsDocumentTemplateDisplayIcon
-} from './scripts/functions/dialogProjectSettingsDocumentTemplatesDraft'
-import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring } from './scripts/dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring'
-import { FA_ICON_PICKER_EMPTY_PLACEHOLDER_ICON } from 'app/types/I_faIconPickerInput'
+import DialogProjectSettingsWorldTemplateLayoutTreeNodeCanonicalNameField from './DialogProjectSettingsWorldTemplateLayoutTreeNodeCanonicalNameField.vue'
+import DialogProjectSettingsWorldTemplateLayoutTreeNodeLabelArea from './DialogProjectSettingsWorldTemplateLayoutTreeNodeLabelArea.vue'
+import { useDialogProjectSettingsWorldTemplateLayoutTreeNode } from './scripts/dialogProjectSettingsWorldTemplateLayoutTreeNode_manager'
 import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
 
 defineOptions({
@@ -123,93 +203,52 @@ const props = defineProps<{
 const emit = defineEmits<{
   deleteGroup: [groupId: string]
   removePlacement: [placementId: string]
-  renameDocumentTemplate: [documentTemplateId: string, displayName: string]
+  renamePlacementNickname: [placementId: string, nickname: string]
   renameGroup: [groupId: string, displayName: string]
 }>()
 
-const nodeAnchorRef = ref<HTMLElement | null>(null)
-const nodeRef = toRef(props, 'node')
-
-const renameMenuWiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring({
-  emitRenameDocumentTemplate: (documentTemplateId, displayName) => {
-    emit('renameDocumentTemplate', documentTemplateId, displayName)
-  },
-  emitRenameGroup: (groupId, displayName) => {
-    emit('renameGroup', groupId, displayName)
-  },
-  getNode: () => nodeRef.value,
-  isGroupNameInvalid: (displayName) => displayName.trim().length === 0,
-  isTemplateNameInvalid: isDialogProjectSettingsDocumentTemplateNameInvalid,
+const {
+  armEditTooltip,
+  armPlacementNicknameHoverTooltip,
+  armRemoveTooltip,
+  displayIconName,
+  editTooltipHoverEnabled,
+  editTooltipRef,
+  editTooltipText,
   nodeAnchorRef,
-  translateGroupNameErrorRequired: () => {
-    return i18n.global.t('dialogs.projectSettings.fields.worldTemplateLayout.groupNameErrorRequired')
-  },
-  translateTemplateNameErrorRequired: () => {
-    return i18n.global.t('dialogs.projectSettings.fields.documentTemplateName.errorRequired')
-  }
-})
-
-const renameDraft = renameMenuWiring.renameDraft
-const renameHasError = renameMenuWiring.renameHasError
-const renameInputRef = renameMenuWiring.renameInputRef
-const renameMenuErrorMessage = renameMenuWiring.renameMenuErrorMessage
-const renameMenuOpen = renameMenuWiring.renameMenuOpen
-
-const nodeTestLocator = computed(() => {
-  const suffix = props.node.nodeKind === 'group' ? 'group' : 'template'
-  return `dialogProjectSettings-worldTemplateLayoutTreeNode-${suffix}-${props.node.id}`
-})
-
-const displayIconName = computed(() => {
-  if (props.node.nodeKind === 'group') {
-    return props.node.icon
-  }
-  return resolveDialogProjectSettingsDocumentTemplateDisplayIcon(
-    props.node.icon,
-    FA_ICON_PICKER_EMPTY_PLACEHOLDER_ICON
-  )
-})
-
-const rowHasValidationError = computed(() => {
-  if (props.node.nodeKind === 'group') {
-    return props.blankGroupIds?.has(props.node.id) ?? false
-  }
-  if (props.node.nodeKind !== 'template') {
-    return false
-  }
-  const templateId = props.node.documentTemplateId
-  if (templateId === null || templateId.length === 0) {
-    return false
-  }
-  if (props.invalidDocumentTemplateIds?.has(templateId) ?? false) {
-    return true
-  }
-  return props.duplicateDocumentTemplateIds?.has(templateId) ?? false
-})
-
-const nodeRootClassList = computed(() => {
-  return {
-    'dialogProjectSettingsWorldTemplateLayoutTreeNode--error': rowHasValidationError.value,
-    'dialogProjectSettingsWorldTemplateLayoutTreeNode--group': props.node.nodeKind === 'group',
-    'dialogProjectSettingsWorldTemplateLayoutTreeNode--template': props.node.nodeKind === 'template'
-  }
-})
-
-function emitDeleteGroup (): void {
-  emit('deleteGroup', props.node.id)
-}
-
-function onRemoveClick (): void {
-  if (props.node.nodeKind === 'group') {
-    emitDeleteGroup()
-    return
-  }
-  emitRemovePlacement()
-}
-
-function emitRemovePlacement (): void {
-  emit('removePlacement', props.node.id)
-}
+  nodeRootClassList,
+  nodeTestLocator,
+  onEditClick,
+  onRemoveClick,
+  onRenameContextMenu,
+  placementNicknameHoverTooltipEnabled,
+  placementNicknameHoverTooltipNicknameLine,
+  placementNicknameHoverTooltipOffset,
+  placementNicknameHoverTooltipOriginalNameLine,
+  placementNicknameHoverTooltipRef,
+  placementNicknameHoverTooltipTestText,
+  removeTooltipHoverEnabled,
+  removeTooltipRef,
+  removeTooltipText,
+  renameDraft,
+  renameHasError,
+  renameInputLabel,
+  renameInputRef,
+  renameMenuErrorMessage,
+  renameMenuOpen,
+  renameMenuStyle,
+  renameMenuWiring,
+  rowHasValidationError,
+  revealPlacementNicknameHoverTooltip,
+  showPlacementNicknameHoverTooltip,
+  suppressPlacementNicknameHoverTooltip,
+  showTemplateCanonicalName,
+  templateCanonicalName,
+  templateCanonicalNameLabel,
+  templateCanonicalNameTooltipText,
+  templateNicknameTooltipText,
+  canonicalNameTestLocator
+} = useDialogProjectSettingsWorldTemplateLayoutTreeNode(props, emit)
 </script>
 
 <style lang="scss" src="./styles/DialogProjectSettings.worldTemplateLayoutTreeNode.unscoped.scss"></style>

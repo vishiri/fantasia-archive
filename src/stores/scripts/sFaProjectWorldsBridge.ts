@@ -54,6 +54,6 @@ export async function faProjectWorldsPersistSnapshotFromDialog (
   if (writeResult.isErr()) {
     const error = writeResult.error
     console.error('[Project Settings] saveWorldsSnapshot failed', error)
-    throw error instanceof Error ? error : new Error(String(error))
+    throw new Error(i18n.global.t('globalFunctionality.faProjectSettings.saveError'))
   }
 }

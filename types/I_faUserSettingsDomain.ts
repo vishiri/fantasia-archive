@@ -53,6 +53,7 @@ export interface I_faUserSettings {
   invertTreeSorting: boolean
   languageCode: T_faUserSettingsLanguageCode
   limitEditorHeight: boolean
+  logFullActivityPayload: boolean
   noProjectName: boolean
   noTags: boolean
   preventAutoScroll: boolean

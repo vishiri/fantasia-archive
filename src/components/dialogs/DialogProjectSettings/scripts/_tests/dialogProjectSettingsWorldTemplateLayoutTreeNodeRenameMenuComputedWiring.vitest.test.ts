@@ -11,7 +11,10 @@ const groupNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   icon: 'mdi-folder',
   id: '770e8400-e29b-41d4-a716-446655440001',
   label: 'Creatures',
+  nickname: '',
   nodeKind: 'group',
+  templateDisplayName: '',
+  usesNickname: false,
   worldAppendix: ''
 }
 
@@ -28,11 +31,9 @@ test('Test that rename menu computed state ignores unsupported node kinds', () =
   const computedState = createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuComputedState({
     getNode: () => unsupportedNode,
     isGroupNameInvalid: () => false,
-    isTemplateNameInvalid: () => false,
     openRenameMenuTarget,
     renameDraft: ref(''),
-    translateGroupNameErrorRequired: () => 'Group required',
-    translateTemplateNameErrorRequired: () => 'Template required'
+    translateGroupNameErrorRequired: () => 'Group required'
   })
 
   expect(computedState.supportsRenameMenu.value).toBe(false)
@@ -50,11 +51,9 @@ test('Test that rename menu computed state closes only the active open target', 
   const computedState = createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuComputedState({
     getNode: () => groupNode,
     isGroupNameInvalid: (displayName) => displayName.trim().length === 0,
-    isTemplateNameInvalid: (displayName) => displayName.trim().length === 0,
     openRenameMenuTarget,
     renameDraft: ref('Creatures'),
-    translateGroupNameErrorRequired: () => 'Group required',
-    translateTemplateNameErrorRequired: () => 'Template required'
+    translateGroupNameErrorRequired: () => 'Group required'
   })
 
   computedState.renameMenuOpen.value = false

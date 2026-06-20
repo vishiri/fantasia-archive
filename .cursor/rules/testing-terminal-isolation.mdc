@@ -7,56 +7,66 @@ alwaysApply: true
 
 ## Quality gate (the **default** chained verification)
 
-When running the full **quality gate** — ESLint, TypeScript check, Stylelint, and Vitest with coverage (**99%** on all four v8 metrics for **`src-electron`**, for **`helpers/**/*.ts`** that **`unit-helpers`** actually instruments (**`helpers/playwrightHelpers_*`** excluded), and scoped **`i18n/`** (**`unit-i18n`**), **99%** on all four for renderer **`src`** **`.ts`** in **`unit-src-renderer`**, **99%** on all four for **`.ts`** under **`src/components`**, **`src/layouts`**, and **`src/pages`** in **`unit-components`**, **`.vue`** SFCs reported with **~60%** watermarks only) — use **one** terminal invocation. Prefer the **`yarn testbatch:verify`** script in `package.json` (same steps, stops on the first failure):
+Full **quality gate** — ESLint, TypeScript, Stylelint, Vitest + coverage (**99%** all four v8 metrics: **`src-electron`**; **`helpers/**/*.ts`** **`unit-helpers`** instruments (**`helpers/playwrightHelpers_*`** excluded); scoped **`i18n/`** (**`unit-i18n`**); renderer **`src`** **`.ts`** (**`unit-src-renderer`**); **`.ts`** under **`src/components`**, **`src/layouts`**, **`src/pages`** (**`unit-components`**); **`.vue`** SFCs **~60%** watermarks only) — **one** terminal invocation. Prefer **`yarn testbatch:verify`** in `package.json` (same steps, stops first failure):
 
 `yarn testbatch:verify`
 
-**Yarn 1.x**: do **not** use `yarn check` for this — it is a built-in that validates the dependency tree, not this script.
+**Yarn 1.x**: do **not** use `yarn check` — built-in validates dependency tree, not this script.
 
-Equivalent explicit chain (for context or copy-paste without the script): `yarn lint:eslint && yarn lint:typescript && yarn lint:stylelint && yarn test:coverage:verify`
+Equivalent chain: `yarn lint:eslint && yarn lint:typescript && yarn lint:stylelint && yarn test:coverage:verify`
 
-For a **faster** unit pass without coverage instrumentation, run **`yarn test:unit`** (Vitest workspace: electron, **`src`** TS, helpers, **`i18n`**, components) while iterating; finish with **`yarn testbatch:verify`** before commits.
+**Faster** unit pass without coverage: **`yarn test:unit`** (electron, **`src`** TS, helpers, **`i18n`**, components) while iterating; **never** treat as end-of-edits gate.
 
-**Feature work beyond the default gate:** also **discover and run** connected **Playwright** component specs and **E2E** specs (grep by dialog name, **`data-test-locator`**, locale default export, action id). **`yarn testbatch:verify`** does **not** include those suites. See [fantasia-testing](../skills/fantasia-testing/SKILL.md) **Connected tests for any feature change**.
+## End of code edits (agents) — mandatory
 
-**Changelog-only exception** (rare): If the **only** files you are about to commit are locale changelog Markdown under **`i18n/*/documents/changeLog.md`** (for example **`i18n/en-US/documents/changeLog.md`** and **`i18n/fr/documents/changeLog.md`**) and **`yarn testbatch:verify` already passed** after your last substantive code or product edits with **no other uncommitted changes** since then, you may **skip** running **`yarn testbatch:verify`** again immediately before that commit. **Default workflow** is to include those changelog edits in the **same commit** as the substantive work (before any push), not to add a separate changelog commit after a batch or push. If anything is **uncertain** (mixed edits, parallel work, or you are not sure the gate ran on the current tree), run **`yarn testbatch:verify`** anyway.
+Substantive source edits in a turn → **last verification action** before done summary:
 
-**Exception**: if you are **debugging** a specific failing step, run that command **alone** (and any narrower follow-ups) until it passes, then re-run the full chained gate before commit or changelog edits (unless the **changelog-only** exception above applies).
+1. **`yarn testbatch:verify`** — one terminal, full chain ([dev-electron-compile-check.mdc](dev-electron-compile-check.mdc)).
+2. Dev Electron compile smoke — second terminal, same rule.
 
-By default, do not extend this chain with `yarn quasar:build:electron`, Playwright, or Storybook.
+- **Any edit after step 1 passed** → step 1 **invalid**; re-run on current tree.
+- **Do not** report “done” / “shipped” / “fixed” without Shell **`yarn testbatch:verify`** on final tree.
+- Slice commands (`yarn eslint <path>`, `vitest run <spec>`, partial stylelint) = debug while editing only — [dev-electron-compile-check.mdc](dev-electron-compile-check.mdc) **Does not satisfy step 1**.
+
+Same **`testbatch:verify`** as commit gate; do not skip because dev is already running. Finish **`yarn testbatch:verify`** before commits **and** before reporting substantive agent work done.
+
+**Beyond default gate:** discover + run connected **Playwright** component + **E2E** specs (grep dialog name, **`data-test-locator`**, locale default export, action id). **`yarn testbatch:verify`** does **not** include those. [fantasia-testing](../skills/fantasia-testing/SKILL.md) **Connected tests for any feature change**.
+
+**Changelog-only exception** (rare): **only** files to commit = locale changelog Markdown **`i18n/*/documents/changeLog.md`** **and** **`yarn testbatch:verify` already passed** after last substantive edits with **no** other uncommitted changes → may **skip** gate immediately before that commit. **Default**: changelog in **same commit** as substantive work (before push), not separate changelog commit after batch/push. **Uncertain** (mixed edits, parallel work, unsure gate ran on current tree) → run **`yarn testbatch:verify`**.
+
+**Exception**: **debugging** specific failing step → run command **alone** (+ narrower follow-ups) until pass, then full chained gate before commit/changelog (unless changelog-only above).
+
+By default do not extend chain with `yarn quasar:build:electron`, Playwright, or Storybook.
+
+Post-implementation agent gates (order): **`yarn testbatch:verify`** then dev compile smoke — [dev-electron-compile-check.mdc](dev-electron-compile-check.mdc). Dev step alone is **not** the quality gate.
 
 ## Full-suite gates (`testbatch:ensure:nochange` / `testbatch:ensure:change`)
 
-When you explicitly need the full project gate in one command, use one of:
+Explicit full project gate in one command:
 
-- **`yarn testbatch:ensure:nochange`** — `testbatch:verify`, **`yarn quasar:build:electron:summarized`** (captures Quasar/electron-builder output; on success prints one line; on failure dumps the full log—by default written under **`test-results/quasar-build-electron-last.log`**, gitignored with **`test-results/`**), Playwright component + E2E, **`yarn test:storybook:smoke`**, then **`yarn test:storybook:visual`** (compare committed Storybook VRT snapshots; fails on drift). **`yarn test:storybook:visual`** also fails when a captured story’s iframe still has neither element children under **`#storybook-root`** nor **`#root`** nor visible portaled dialog/menu chrome after the waiter (those two mount ids are inspected separately—not only the first **`querySelector('#storybook-root, #root')`** match) unless that story opts out with **`tags: ['skip-visual-render-check']`** or its **id** is listed in **`EXCLUDED_STORY_IDS`** in **`.storybook-workspace/visual-tests/storybook.visual.playwright.test.ts`**. If **`yarn test:storybook:visual`** fails only on **GitHub** **`windows-latest`** with **`toHaveScreenshot`** pixel counts just above **`maxDiffPixels`**, see **README** **Storybook visual baseline policy** ( **`maxDiffPixels`** is a whole-image differing-pixel cap, not width).
-- **`yarn testbatch:ensure:change`** — same chain through E2E and smoke, then **`yarn test:storybook:visual:update`** to refresh Storybook VRT baselines. Use only when intentional UI changes are approved and you will commit the updated snapshots.
+- **`yarn testbatch:ensure:nochange`** — `testbatch:verify`, **`yarn quasar:build:electron:summarized`** (Quasar/electron-builder output; success one line; failure full log — default **`test-results/quasar-build-electron-last.log`**, gitignored with **`test-results/`**), Playwright component + E2E, **`yarn test:storybook:smoke`**, **`yarn test:storybook:visual`** (committed VRT snapshots; fails on drift). **`yarn test:storybook:visual`** also fails when story iframe has neither element children under **`#storybook-root`** nor **`#root`** nor visible portaled dialog/menu chrome after waiter (mount ids inspected separately — not only first **`querySelector('#storybook-root, #root')`**) unless **`tags: ['skip-visual-render-check']`** or **id** in **`EXCLUDED_STORY_IDS`** in **`.storybook-workspace/visual-tests/storybook.visual.playwright.test.ts`**. **`yarn test:storybook:visual`** fails only on **GitHub** **`windows-latest`** with **`toHaveScreenshot`** pixel counts just above **`maxDiffPixels`** → **README** **Storybook visual baseline policy** (**`maxDiffPixels`** = whole-image differing-pixel cap, not width).
+- **`yarn testbatch:ensure:change`** — same through E2E + smoke, then **`yarn test:storybook:visual:update`** for intentional UI baseline refresh. Use only when UI changes approved + commit updated snapshots.
 
-Treat these as the intentional exception to the isolation rule. **Do not** run **`testbatch:ensure:change`** in CI or to validate an unchanged baseline.
+Intentional exception to isolation rule. **Do not** run **`testbatch:ensure:change`** in CI or validate unchanged baseline.
 
-The default **GitHub Actions** **Verify** workflow (`.github/workflows/verify.yml`) runs **`yarn testbatch:verify`** only — not Storybook smoke/visual, Electron production build, or Playwright component/E2E. Run **`yarn test:storybook:visual`** / **`yarn testbatch:ensure:nochange`** locally when you need VRT.
+Default **GitHub Actions** **Verify** (`.github/workflows/verify.yml`) runs **`yarn testbatch:verify`** only — not Storybook smoke/visual, Electron production build, Playwright component/E2E. Run **`yarn test:storybook:visual`** / **`yarn testbatch:ensure:nochange`** locally for VRT.
 
 ## Everything else — one command per terminal
 
-Run each of these in its **own** terminal invocation (do not chain them with each other or with the quality gate in the same line) unless you are intentionally running **`yarn testbatch:ensure:nochange`** or **`yarn testbatch:ensure:change`**:
+Each in **own** terminal (no chain with each other or quality gate) unless **`yarn testbatch:ensure:nochange`** or **`yarn testbatch:ensure:change`**:
 
-- `yarn quasar:build:electron` (full build log to the terminal; use when you want streaming output)
+- `yarn quasar:build:electron` (full build log; streaming output)
 - `yarn test:components`
 - `yarn test:e2e`
 - `yarn test:storybook:smoke`
 - `yarn test:storybook:visual` / `yarn test:storybook:visual:update` (and other `test:storybook:visual*` variants)
 
-Keep logs isolated for readability and easier failure triage.
+Isolated logs → easier failure triage.
 
-**Playwright Electron `userData`:** Component and E2E runs set `TEST_ENV`; the main process then uses **`%APPDATA%/<package.json name>/playwright-user-data`** (this repo: **`Roaming\fantasia-archive\playwright-user-data`**), **not** **`fantasia-archive-dev`**. Specs use **`test.describe.serial`**; each group’s **`test.beforeAll`** **`await`**s **`launchFaPlaywrightComponentHarnessWindow`** / **`launchFaPlaywrightE2eAppWindow`**, which run **`resetFaPlaywrightIsolatedUserData()`** from **`helpers/playwrightHelpers_universal/playwrightUserDataReset.ts`** before **`electron.launch`**. See **`src-electron/mainScripts/appIdentity/appIdentity_manager.ts`**, **`src-electron/mainScripts/appIdentity/playwrightIsolatedUserDataDirName.ts`**, and [playwright-tests.mdc](playwright-tests.mdc).
+**Playwright Electron `userData`:** Component/E2E set `TEST_ENV`; main uses **`%APPDATA%/<package.json name>/playwright-user-data`** (repo: **`Roaming\fantasia-archive\playwright-user-data`**), **not** **`fantasia-archive-dev`**. Specs: **`test.describe.serial`**; each group **`test.beforeAll`** **`await`**s **`launchFaPlaywrightComponentHarnessWindow`** / **`launchFaPlaywrightE2eAppWindow`**, which run **`resetFaPlaywrightIsolatedUserData()`** from **`helpers/playwrightHelpers_universal/playwrightUserDataReset.ts`** before **`electron.launch`**. See **`src-electron/mainScripts/appIdentity/appIdentity_manager.ts`**, **`playwrightIsolatedUserDataDirName.ts`**, [playwright-tests.mdc](playwright-tests.mdc).
 
-**Playwright `keyboard.press` (cross-OS keybinds):** Component and E2E specs that drive global shortcuts or keybind capture must match how the app resolves **primary** (Command on macOS, Control on Windows/Linux) vs **literal Control** in saved overrides. Use **`helpers/playwrightHelpers_universal/faPlaywrightKeyboardChords.ts`** and the **Keyboard strings** section in [playwright-tests.mdc](playwright-tests.mdc); see [fantasia-testing](../skills/fantasia-testing/SKILL.md) **Playwright keyboard.press and app keybinds**.
+**Playwright `keyboard.press` (cross-OS keybinds):** Component/E2E driving global shortcuts or keybind capture must match app **primary** (Command macOS, Control Windows/Linux) vs **literal Control** in saved overrides. **`helpers/playwrightHelpers_universal/faPlaywrightKeyboardChords.ts`** + **Keyboard strings** in [playwright-tests.mdc](playwright-tests.mdc); [fantasia-testing](../skills/fantasia-testing/SKILL.md) **Playwright keyboard.press and app keybinds**.
 
 ## Reporting
 
-When reporting progress, list results in execution order (for the quality gate, you may report one combined pass/fail, or break out the first failing step if the chain stopped early).
-
-## TypeScript interfaces and types (`types/`)
-
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+Report progress in execution order. On substantive work: **end with verify gate result** (pass/fail from **`yarn testbatch:verify`** on current tree) — [dev-electron-compile-check.mdc](dev-electron-compile-check.mdc).

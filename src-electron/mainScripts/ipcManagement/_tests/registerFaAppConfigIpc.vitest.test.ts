@@ -313,3 +313,19 @@ test('Test that registerFaAppConfigIpc is idempotent on second call', async () =
     ipcMainHandleMock.mock.calls.filter((c) => c[0] === FA_APP_CONFIG_IPC.exportToFileAsync).length
   ).toBe(1)
 })
+
+test('Test that stageE2eNextExportPathAsync handler stages export path in e2e', async () => {
+  vi.stubEnv('TEST_ENV', 'e2e')
+  const { registerFaAppConfigIpc } = await import('../registerFaAppConfigIpc')
+  registerFaAppConfigIpc()
+  const h = handlerFor(FA_APP_CONFIG_IPC.stageE2eNextExportPathAsync)
+  expect(h(undefined as never, 'C:\\tmp\\export.faconfig')).toBe(true)
+})
+
+test('Test that stageE2eNextImportPathAsync handler rejects invalid payloads', async () => {
+  vi.stubEnv('TEST_ENV', 'e2e')
+  const { registerFaAppConfigIpc } = await import('../registerFaAppConfigIpc')
+  registerFaAppConfigIpc()
+  const h = handlerFor(FA_APP_CONFIG_IPC.stageE2eNextImportPathAsync)
+  expect(h(undefined as never, null)).toBe(false)
+})

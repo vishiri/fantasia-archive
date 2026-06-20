@@ -6,6 +6,7 @@ import type { I_faProjectDocumentTemplateSnapshotItem } from 'app/types/I_faProj
 import type { I_faProjectWorldSnapshotItem } from 'app/types/I_faProjectWorldDomain'
 
 type T_createFaActionDefinitionHandlersDeps = {
+  notifyCreate: (options: { group: boolean, message: string, type: string }) => void
   i18n: { global: { t: (key: string) => string } }
   S_FaKeybinds: () => { updateKeybinds: (patch: { overrides: I_faKeybindsRoot['overrides']; replaceAllOverrides: boolean }) => Promise<boolean> }
   S_FaAppNoteboard: () => { isWindowOpen: boolean; setWindowOpen: (open: boolean) => void }
@@ -112,6 +113,11 @@ async function handleSaveProjectSettings (
   if (payload.documentTemplates !== undefined) {
     await deps.faProjectDocumentTemplatesPersistSnapshotFromDialog(payload.documentTemplates)
   }
+  deps.notifyCreate({
+    group: false,
+    type: 'positive',
+    message: deps.i18n.global.t('globalFunctionality.faProjectSettings.saveSuccess')
+  })
 }
 
 async function handleSaveAppStyling (

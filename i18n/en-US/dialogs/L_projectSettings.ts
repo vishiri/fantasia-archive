@@ -50,12 +50,23 @@ export default {
       }
     },
     worldTemplateLayout: {
-      layoutTitle: 'World template layout',
+      layoutTitle: "World's hierarchical tree",
       availableTemplatesTitle: 'Available document templates',
       addGroupButton: 'Add group',
       defaultNewGroupName: 'New group',
+      editGroupTooltip: 'Rename group',
+      editTemplateTooltip: "Adjust template's nickname",
       emptyAvailableTemplates: 'All document templates are assigned to this world.',
       groupNameErrorRequired: 'Group name is required.',
+      groupRenameInputLabel: 'Name of the group',
+      placementNicknameHoverOriginalNameLabel: 'Original name',
+      placementNicknameHoverNicknameLabel: 'Nickname',
+      removeGroupTooltip: 'Remove group',
+      removeTemplateTooltip: 'Remove document template',
+      templateCanonicalNameLabel: 'Document template name',
+      templateCanonicalNameTooltip: 'In order to properly rename a whole document template, please go to the "Document Templates" section of this edit dialog and adjust it there.',
+      templateNicknameLabel: 'Nickname inside this world',
+      templateNicknameTooltip: 'Setting a nickname allows you to quick-rename a document template inside a specific world without changing its real name across the whole project.',
       contextMenu: {
         renameGroup: 'Rename group',
         deleteGroup: 'Delete group'

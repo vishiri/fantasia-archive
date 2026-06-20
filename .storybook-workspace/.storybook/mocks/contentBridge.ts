@@ -226,7 +226,9 @@ const baseBridge = () => {
           keybinds: 'ok'
         },
         sessionId: 'storybook-import-session'
-      })
+      }),
+      stageE2eNextExportPath: async () => false,
+      stageE2eNextImportPath: async () => false
     },
     faChromiumCtrlShiftShortcut: {
       installForwardedKeyChordListener: () => undefined
@@ -253,7 +255,9 @@ const baseBridge = () => {
       }),
       setProjectNoteboard,
       setProjectSettings,
-      setProjectStyling
+      setProjectStyling,
+      stageE2eNextCreatePath: async () => false,
+      stageE2eNextOpenPath: async () => false
     }
   }
 }

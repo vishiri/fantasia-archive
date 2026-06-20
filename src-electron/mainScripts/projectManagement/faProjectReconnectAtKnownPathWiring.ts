@@ -9,7 +9,7 @@ import {
   applyFaProjectMigrations,
   assertFaProjectDatabaseQuickCheck
 } from 'app/src-electron/mainScripts/projectManagement/faProjectDbMigrateWiring'
-import { faDisplayNameFallbackFromProjectPath } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
+import { faDisplayNameFallbackFromProjectPath } from './projectManagementSharedPathWiring'
 
 function closeAttemptDb (db: Database | null): void {
   if (db === null) {

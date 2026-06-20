@@ -17,7 +17,8 @@ export interface I_dialogProjectSettingsWorldTemplateGroupDraft {
 export interface I_dialogProjectSettingsWorldTemplatePlacementDraft {
   id: string
   documentTemplateId: string
-  displayName: string
+  templateDisplayName: string
+  nickname: string
   worldAppendix: string
   icon: string
   documentCountInWorld: number
@@ -40,7 +41,10 @@ export interface I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode {
   icon: string
   id: string
   label: string
+  nickname: string
   nodeKind: 'group' | 'template'
+  templateDisplayName: string
+  usesNickname: boolean
   worldAppendix: string
 }
 

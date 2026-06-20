@@ -43,7 +43,10 @@
     "testbatch:ensure:change": "yarn testbatch:verify && yarn quasar:build:electron:summarized && yarn test:components && yarn test:e2e && yarn test:storybook:smoke && yarn test:storybook:visual:update",
     "testbatch:ensure:nochange": "yarn testbatch:verify && yarn quasar:build:electron:summarized && yarn test:components && yarn test:e2e && yarn test:storybook:smoke && yarn test:storybook:visual",
     "audit:policy": "node .utility-scripts/policyComplianceAudit.mjs",
+    "audit:scss-literals": "node .utility-scripts/auditScssConsumerLiterals.mjs",
     "audit:quasar-component-tokens": "node .utility-scripts/auditQuasarComponentTokens.mjs",
+    "audit:domain-policy": "node .utility-scripts/domainPolicyGrep.mjs",
+    "audit:full": "node .utility-scripts/runFullProjectAudit.mjs",
     "generate:icon-catalogs": "node .utility-scripts/generateFaQuasarIconCatalogs.mjs",
     "postinstall": "electron-builder install-app-deps",
     "prepare": "husky",
@@ -119,7 +122,9 @@
     "vue-tsc": "^2.2.0"
   },
   "resolutions": {
-    "dompurify": "3.4.2"
+    "dompurify": "3.4.7",
+    "shell-quote": "1.8.4",
+    "ws": "8.21.0"
   },
   "engines": {
     "node": ">=22.22.0",

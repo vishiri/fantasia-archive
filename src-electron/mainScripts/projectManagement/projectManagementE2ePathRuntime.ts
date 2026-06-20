@@ -2,7 +2,11 @@ import {
   FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH,
   FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH,
   isFaProjectManagementE2eTestEnv,
-  takePendingE2ePath
+  readFaE2ePendingProjectCreatePath,
+  readFaE2ePendingProjectOpenPath,
+  takePendingE2ePath,
+  writeFaE2ePendingProjectCreatePath,
+  writeFaE2ePendingProjectOpenPath
 } from './functions/faProjectManagementE2ePathOverride'
 
 import type { I_projectManagementE2ePathRuntimeDeps } from 'app/types/I_faProjectManagementElectronMain'
@@ -14,15 +18,12 @@ export function createProjectManagementE2ePathRuntime (
     takeNextE2eProjectCreatePath: () => string | null
     takeNextE2eProjectOpenPath: () => string | null
   } {
-  let e2eNextCreatePath: string | null = null
-  let e2eNextOpenPath: string | null = null
-
   const takeNextE2eProjectCreatePath = (): string | null => {
     if (!isFaProjectManagementE2eTestEnv(deps.getTestEnv())) {
       return null
     }
-    const p = e2eNextCreatePath
-    e2eNextCreatePath = null
+    const p = readFaE2ePendingProjectCreatePath()
+    writeFaE2ePendingProjectCreatePath(null)
     return takePendingE2ePath(p)
   }
 
@@ -30,23 +31,23 @@ export function createProjectManagementE2ePathRuntime (
     if (!isFaProjectManagementE2eTestEnv(deps.getTestEnv())) {
       return null
     }
-    const p = e2eNextOpenPath
-    e2eNextOpenPath = null
+    const p = readFaE2ePendingProjectOpenPath()
+    writeFaE2ePendingProjectOpenPath(null)
     return takePendingE2ePath(p)
   }
 
   const installFaProjectManagementE2ePathOverrideGlobals = (): void => {
     if (!isFaProjectManagementE2eTestEnv(deps.getTestEnv())) {
-      e2eNextCreatePath = null
-      e2eNextOpenPath = null
+      writeFaE2ePendingProjectCreatePath(null)
+      writeFaE2ePendingProjectOpenPath(null)
       return
     }
     const g = globalThis as Record<string, unknown>
     g[FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH] = (p: string) => {
-      e2eNextCreatePath = p
+      writeFaE2ePendingProjectCreatePath(p)
     }
     g[FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH] = (p: string) => {
-      e2eNextOpenPath = p
+      writeFaE2ePendingProjectOpenPath(p)
     }
   }
 

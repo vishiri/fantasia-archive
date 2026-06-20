@@ -11,45 +11,39 @@ description: >-
 
 ## Scope
 
-Use this skill whenever creating or updating a planning document.
-This includes rollout inventories, implementation checklists, migration trackers, and other planning artifacts.
+Planning artifacts: rollout inventories, checklists, migration trackers, etc.
 
 ## Prune stale plans before saving
 
-- **Before** writing a new plan file, list `.cursor/plans/` when it exists.
-- For each file there, if its **last modified time** is **more than 30 days** before now, **delete** it. Skip this step when the folder is missing or has no files.
-- Judgment uses filesystem modification time (mtime), not only the timestamp in the filename.
+- List **`.cursor/plans/`** before new plan
+- Delete files with mtime **>30 days** old
+- Skip if folder missing/empty
 
 ## Required location
 
-- Store plans in `.cursor/plans/`.
-- If the folder does not exist, create it.
-- Do not create top-level `docs/` (or other new documentation roots) for planning artifacts unless the user explicitly requests a different location.
+- **`.cursor/plans/`** — create if missing
+- No top-level **`docs/`** for plans unless user requests elsewhere
 
 ## Required filename format
 
-- Include the base topic, current version, and timestamp.
-- Timestamp format: `YYYY-MM-DD-HH-mm-ss`.
-- Example: `feature-x-plan_v2.1.0_2026-03-30-20-10-39.plan.md`
+Topic + version + timestamp **`YYYY-MM-DD-HH-mm-ss`**.
+
+Example: `feature-x-plan_v2.1.0_2026-03-30-20-10-39.plan.md`
 
 ## Required in-file metadata
-
-At the top of each plan document, include:
 
 - `Created at: YYYY-MM-DD-HH-mm-ss`
 - `Project version: <package.json version>`
 
 ## Version source
 
-- Read version from `package.json`.
-- Use that exact value in both filename and file body metadata.
+Read **`package.json`** — same value in filename + body.
 
 ## Notes
 
-- `.cursor/plans` is a local temporary workspace and may be gitignored.
-- If a planning artifact is initially drafted elsewhere, move it into `.cursor/plans/` and normalize filename/body metadata to this skill's format.
+- Local temporary workspace; may be gitignored
+- Drafts elsewhere → move into **`.cursor/plans/`** + normalize metadata
 
-## TypeScript interfaces and types (`types/`)
+## Types
 
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+Shared types → **`types/`**. See [types-folder.mdc](../../rules/types-folder.mdc).

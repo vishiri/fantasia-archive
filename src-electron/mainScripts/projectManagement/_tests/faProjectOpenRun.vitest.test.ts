@@ -106,12 +106,10 @@ vi.mock('../faProjectDbMigrateWiring', () => {
   }
 })
 
-vi.mock('../projectManagementE2ePathRuntime', () => ({
-  createProjectManagementE2ePathRuntime: vi.fn(() => ({
-    installFaProjectManagementE2ePathOverrideGlobals: vi.fn(),
-    takeNextE2eProjectCreatePath: vi.fn(() => null),
-    takeNextE2eProjectOpenPath: takeE2eOpenMock
-  }))
+vi.mock('../projectManagementSharedE2ePathWiring', () => ({
+  installFaProjectManagementE2ePathOverrideGlobals: vi.fn(),
+  takeNextE2eProjectCreatePath: vi.fn(() => null),
+  takeNextE2eProjectOpenPath: takeE2eOpenMock
 }))
 
 vi.mock('../faRecentProjectListRuntimeWiring', () => {

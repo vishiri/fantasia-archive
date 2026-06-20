@@ -33,6 +33,7 @@ const selectorList = {
   saveErrorsIcon: 'dialogProjectSettings-saveErrorsIcon',
   tabDocumentTemplatesSettings: 'dialogProjectSettings-tab-documentTemplatesSettings',
   tabWorldsSettings: 'dialogProjectSettings-tab-worldsSettings',
+  templateCanonicalName: 'dialogProjectSettings-worldTemplateLayoutTemplateCanonicalName',
   templateContextMenu: 'dialogProjectSettings-worldTemplateLayoutTemplateContextMenu',
   templateRenameInput: 'dialogProjectSettings-worldTemplateLayoutTemplateRenameInput',
   worldTemplateLayoutAddGroup: 'dialogProjectSettings-worldTemplateLayoutAddGroup',
@@ -50,11 +51,11 @@ function treeNodeShellLocator (kind: 'group' | 'template', nodeId: string): stri
 }
 
 function treeGroupRowLocator (): string {
-  return '[data-test-locator^="dialogProjectSettings-worldTemplateLayoutTreeNode-group-"]:not([data-test-locator$="-remove"])'
+  return '[data-test-locator^="dialogProjectSettings-worldTemplateLayoutTreeNode-group-"]:not([data-test-locator$="-remove"]):not([data-test-locator$="-edit"])'
 }
 
 function treeTemplateRowLocator (): string {
-  return '[data-test-locator^="dialogProjectSettings-worldTemplateLayoutTreeNode-template-"]:not([data-test-locator$="-remove"]):not([data-test-locator$="-count"])'
+  return '[data-test-locator^="dialogProjectSettings-worldTemplateLayoutTreeNode-template-"]:not([data-test-locator$="-remove"]):not([data-test-locator$="-edit"]):not([data-test-locator$="-count"])'
 }
 
 function buildLayoutHarnessProps (templateLayout: Record<string, unknown>): string {
@@ -93,25 +94,27 @@ const rootTemplatesLayout = {
   groups: [],
   placements: [
     {
-      displayName: 'Character',
       documentCountInWorld: 0,
       documentTemplateId: fixtureTemplateAId,
       groupId: null,
       groupSortOrder: null,
       icon: 'mdi-account',
       id: fixturePlacementAId,
+      nickname: '',
       rootSortOrder: 0,
+      templateDisplayName: 'Character',
       worldAppendix: ''
     },
     {
-      displayName: 'Location',
       documentCountInWorld: 0,
       documentTemplateId: fixtureTemplateBId,
       groupId: null,
       groupSortOrder: null,
       icon: 'mdi-map',
       id: fixturePlacementBId,
+      nickname: '',
       rootSortOrder: 1,
+      templateDisplayName: 'Location',
       worldAppendix: ''
     }
   ]
@@ -125,25 +128,27 @@ const nestedTemplatesLayout = {
   }],
   placements: [
     {
-      displayName: 'Character',
       documentCountInWorld: 0,
       documentTemplateId: fixtureTemplateAId,
       groupId: fixtureGroupId,
       groupSortOrder: 0,
       icon: 'mdi-account',
       id: fixturePlacementAId,
+      nickname: '',
       rootSortOrder: null,
+      templateDisplayName: 'Character',
       worldAppendix: ''
     },
     {
-      displayName: 'Location',
       documentCountInWorld: 0,
       documentTemplateId: fixtureTemplateBId,
       groupId: null,
       groupSortOrder: null,
       icon: 'mdi-map',
       id: fixturePlacementBId,
+      nickname: '',
       rootSortOrder: 1,
+      templateDisplayName: 'Location',
       worldAppendix: ''
     }
   ]
@@ -324,25 +329,27 @@ test.describe.serial('Project settings duplicate template layout validation', ()
       groups: [],
       placements: [
         {
-          displayName: 'Character',
           documentCountInWorld: 0,
           documentTemplateId: fixtureTemplateAId,
           groupId: null,
           groupSortOrder: null,
           icon: 'mdi-account',
           id: fixturePlacementAId,
+          nickname: '',
           rootSortOrder: 0,
+          templateDisplayName: 'Character',
           worldAppendix: ''
         },
         {
-          displayName: 'Character copy',
           documentCountInWorld: 0,
           documentTemplateId: fixtureTemplateAId,
           groupId: null,
           groupSortOrder: null,
           icon: 'mdi-account',
           id: fixturePlacementBId,
+          nickname: '',
           rootSortOrder: 1,
+          templateDisplayName: 'Character copy',
           worldAppendix: ''
         }
       ]
@@ -493,6 +500,17 @@ test.describe.serial('Project settings group rename menu dismiss', () => {
   })
 
   /**
+   * Edit button opens the inline group rename menu.
+   */
+  test('Edit button opens the group rename menu', async () => {
+    await appWindow.locator(`[data-test-locator="${selectorList.tabWorldsSettings}"]`).click()
+    const groupRow = appWindow.locator(treeNodeLocator('group', fixtureGroupId))
+    const renameInput = appWindow.locator(`[data-test-locator="${selectorList.groupRenameInput}"]`)
+    await groupRow.locator('[data-test-locator$="-edit"]').click()
+    await expect(renameInput).toBeVisible()
+  })
+
+  /**
    * Escape, Enter, and outside click close the inline group rename menu.
    */
   test('Escape Enter and outside click close the group rename menu', async () => {
@@ -561,31 +579,37 @@ test.describe.serial('Project settings template inline rename sync', () => {
   })
 
   /**
-   * Clearing a template name from the layout tree highlights the active world tab and Worlds category tab.
+   * Edit button opens the inline template rename menu.
    */
-  test('Blank template name from inline rename highlights world tabs and Worlds category tab', async () => {
+  test('Edit button opens the template rename menu', async () => {
+    await appWindow.locator(`[data-test-locator="${selectorList.tabWorldsSettings}"]`).click()
+    const templateRow = appWindow.locator(treeNodeLocator('template', fixturePlacementAId))
+    const renameInput = appWindow.locator(`[data-test-locator="${selectorList.templateRenameInput}"]`)
+    await templateRow.locator('[data-test-locator$="-edit"]').click()
+    await expect(renameInput).toBeVisible()
+  })
+
+  /**
+   * Clearing a placement nickname from the layout tree does not block save.
+   */
+  test('Blank placement nickname from inline rename does not block save', async () => {
     await appWindow.locator(`[data-test-locator="${selectorList.tabWorldsSettings}"]`).click()
     const templateRow = appWindow.locator(treeNodeLocator('template', fixturePlacementAId))
     await templateRow.click({ button: 'right' })
     const renameInput = appWindow.locator(`[data-test-locator="${selectorList.templateRenameInput}"]`)
     await expect(renameInput).toBeVisible()
+    await renameInput.fill('Hero')
     await renameInput.fill('')
-    await expect(templateRow).toHaveAttribute('data-test-validation-error', 'true')
-    await expect(
-      appWindow.locator(`[data-test-locator="${selectorList.worldsTab}"]`)
-    ).toHaveAttribute('data-test-validation-error', 'true')
-    await expect(
-      appWindow.locator(`[data-test-locator="${selectorList.tabWorldsSettings}"]`)
-    ).toHaveAttribute('data-test-validation-error', 'true')
+    await expect(templateRow).not.toHaveAttribute('data-test-validation-error', 'true')
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.saveButton}"]`)
-    ).toBeDisabled()
+    ).toBeEnabled()
   })
 
   /**
-   * Renaming a template from the layout tree updates the Document Templates settings name field.
+   * Setting a placement nickname updates the layout tree without changing Document Templates settings.
    */
-  test('Layout tree template rename syncs to Document Templates settings', async () => {
+  test('Layout tree placement nickname does not change Document Templates settings name', async () => {
     await appWindow.locator(`[data-test-locator="${selectorList.tabWorldsSettings}"]`).click()
     const templateRow = appWindow.locator(treeNodeLocator('template', fixturePlacementAId))
     await templateRow.click({ button: 'right' })
@@ -594,21 +618,32 @@ test.describe.serial('Project settings template inline rename sync', () => {
     await renameInput.fill('Hero')
     await renameInput.press('Enter')
     await expect(templateRow).toContainText('Hero')
+    await templateRow.locator('[data-test-locator$="-edit"]').click()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.templateCanonicalName}"] input`)
+    ).toHaveValue('Character')
+    await renameInput.press('Escape')
     await appWindow.locator(`[data-test-locator="${selectorList.tabDocumentTemplatesSettings}"]`).click()
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesNameInput}"]`)
-    ).toHaveValue('Hero')
+    ).toHaveValue('Character')
   })
 
   /**
-   * Renaming a template from Document Templates settings updates the layout tree label.
+   * Renaming a template from Document Templates settings updates the layout tree when no nickname is set.
    */
-  test('Document Templates settings rename syncs to layout tree template label', async () => {
+  test('Document Templates settings rename syncs to layout tree when placement nickname is empty', async () => {
+    await appWindow.locator(`[data-test-locator="${selectorList.tabWorldsSettings}"]`).click()
+    const templateRow = appWindow.locator(treeNodeLocator('template', fixturePlacementAId))
+    await templateRow.click({ button: 'right' })
+    const renameInput = appWindow.locator(`[data-test-locator="${selectorList.templateRenameInput}"]`)
+    await expect(renameInput).toBeVisible()
+    await renameInput.fill('')
+    await renameInput.press('Enter')
     await appWindow.locator(`[data-test-locator="${selectorList.tabDocumentTemplatesSettings}"]`).click()
     const nameInput = appWindow.locator(`[data-test-locator="${selectorList.documentTemplatesNameInput}"]`)
     await nameInput.fill('Protagonist')
     await appWindow.locator(`[data-test-locator="${selectorList.tabWorldsSettings}"]`).click()
-    const templateRow = appWindow.locator(treeNodeLocator('template', fixturePlacementAId))
     await expect(templateRow).toContainText('Protagonist')
   })
 })

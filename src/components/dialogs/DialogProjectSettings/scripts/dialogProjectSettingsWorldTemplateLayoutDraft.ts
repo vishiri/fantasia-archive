@@ -28,14 +28,15 @@ export function mapDialogProjectSettingsWorldTemplateLayoutFromApi (
       rootSortOrder: group.rootSortOrder
     })),
     placements: layout.placements.map((placement) => ({
-      displayName: placement.displayName,
       documentCountInWorld: placement.documentCountInWorld,
       documentTemplateId: placement.documentTemplateId,
       groupId: placement.groupId,
       groupSortOrder: placement.groupSortOrder,
       icon: placement.icon,
       id: placement.id,
+      nickname: placement.nickname,
       rootSortOrder: placement.rootSortOrder,
+      templateDisplayName: placement.displayName,
       worldAppendix: placement.worldAppendix
     }))
   }
@@ -55,6 +56,7 @@ export function mapDialogProjectSettingsWorldTemplateLayoutToSnapshot (
       groupId: placement.groupId,
       groupSortOrder: placement.groupSortOrder,
       id: placement.id,
+      nickname: placement.nickname.trim(),
       rootSortOrder: placement.rootSortOrder
     }))
   }
@@ -99,10 +101,29 @@ export function renameDialogProjectSettingsWorldTemplateGroupDraft (
   }
 }
 
-export function renameDocumentTemplatePlacementsInWorldTemplateLayoutDraft (
+export function renameDialogProjectSettingsWorldTemplatePlacementNicknameDraft (
+  layout: I_dialogProjectSettingsWorldTemplateLayoutDraft,
+  placementId: string,
+  nickname: string
+): I_dialogProjectSettingsWorldTemplateLayoutDraft {
+  return {
+    groups: layout.groups,
+    placements: layout.placements.map((placement) => {
+      if (placement.id !== placementId) {
+        return placement
+      }
+      return {
+        ...placement,
+        nickname
+      }
+    })
+  }
+}
+
+export function syncDialogProjectSettingsWorldTemplatePlacementTemplateDisplayNames (
   layout: I_dialogProjectSettingsWorldTemplateLayoutDraft,
   documentTemplateId: string,
-  displayName: string
+  templateDisplayName: string
 ): I_dialogProjectSettingsWorldTemplateLayoutDraft {
   return {
     groups: layout.groups,
@@ -112,7 +133,7 @@ export function renameDocumentTemplatePlacementsInWorldTemplateLayoutDraft (
       }
       return {
         ...placement,
-        displayName
+        templateDisplayName
       }
     })
   }
@@ -176,9 +197,9 @@ export function removeDialogProjectSettingsWorldTemplateGroupDraft (
 export function appendDialogProjectSettingsWorldTemplatePlacementDraft (
   layout: I_dialogProjectSettingsWorldTemplateLayoutDraft,
   template: {
-    displayName: string
     documentTemplateId: string
     icon: string
+    templateDisplayName: string
     worldAppendix: string
   }
 ): I_dialogProjectSettingsWorldTemplateLayoutDraft {
@@ -190,14 +211,15 @@ export function appendDialogProjectSettingsWorldTemplatePlacementDraft (
     placements: [
       ...layout.placements,
       {
-        displayName: template.displayName,
         documentCountInWorld: 0,
         documentTemplateId: template.documentTemplateId,
         groupId: null,
         groupSortOrder: null,
         icon: template.icon,
         id: crypto.randomUUID(),
+        nickname: '',
         rootSortOrder: rootCount,
+        templateDisplayName: template.templateDisplayName,
         worldAppendix: template.worldAppendix
       }
     ]

@@ -4,6 +4,8 @@ import { Result } from 'neverthrow'
 import { i18n } from 'app/i18n/externalFileLoader'
 
 import * as faActionManagerStoreBridge from './faActionManagerStoreBridge_manager'
+import { createBuildFaActionPayloadPreviewWithUserSettingsCap } from './faActionPayloadPreviewBuildWiring'
+import { resolveFaActionPayloadPreviewMaxLength } from './faActionPayloadPreviewMaxLengthWiring'
 import { createFaActionManagerErrorReporting } from './functions/createFaActionManagerErrorReporting'
 import {
   normalizeFaActionError as normalizeFaActionErrorImpl,
@@ -24,10 +26,13 @@ const faActionManagerErrorReportingApi = createFaActionManagerErrorReporting({
     })
 })
 
+export const buildFaActionPayloadPreview = createBuildFaActionPayloadPreviewWithUserSettingsCap({
+  buildFaActionPayloadPreview: faActionManagerErrorReportingApi.buildFaActionPayloadPreview,
+  resolveFaActionPayloadPreviewMaxLength
+})
+
 export const buildFaActionFailureHistoryPayloadPreview =
   faActionManagerErrorReportingApi.buildFaActionFailureHistoryPayloadPreview
-
-export const buildFaActionPayloadPreview = faActionManagerErrorReportingApi.buildFaActionPayloadPreview
 
 export const normalizeFaActionError = faActionManagerErrorReportingApi.normalizeFaActionError
 

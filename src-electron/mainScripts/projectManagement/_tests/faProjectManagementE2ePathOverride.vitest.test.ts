@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, expect, test } from 'vitest'
 
 import {
+  FA_E2E_GLOBAL_PENDING_PROJECT_CREATE_PATH,
+  FA_E2E_GLOBAL_PENDING_PROJECT_OPEN_PATH,
   FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH,
   FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH
 } from '../functions/faProjectManagementE2ePathOverride'
@@ -9,17 +11,24 @@ import {
   takeNextE2eProjectCreatePath,
   takeNextE2eProjectOpenPath
 } from '../projectManagement_manager'
+import { createProjectManagementE2ePathRuntime } from '../projectManagementE2ePathRuntime'
 
 beforeEach(() => {
   delete process.env.TEST_ENV
-  delete (globalThis as Record<string, unknown>)[FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH]
-  delete (globalThis as Record<string, unknown>)[FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH]
+  const g = globalThis as Record<string, unknown>
+  delete g[FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH]
+  delete g[FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH]
+  delete g[FA_E2E_GLOBAL_PENDING_PROJECT_CREATE_PATH]
+  delete g[FA_E2E_GLOBAL_PENDING_PROJECT_OPEN_PATH]
 })
 
 afterEach(() => {
   delete process.env.TEST_ENV
-  delete (globalThis as Record<string, unknown>)[FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH]
-  delete (globalThis as Record<string, unknown>)[FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH]
+  const g = globalThis as Record<string, unknown>
+  delete g[FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH]
+  delete g[FA_E2E_GLOBAL_SET_NEXT_PROJECT_OPEN_PATH]
+  delete g[FA_E2E_GLOBAL_PENDING_PROJECT_CREATE_PATH]
+  delete g[FA_E2E_GLOBAL_PENDING_PROJECT_OPEN_PATH]
 })
 
 test('takeNextE2eProjectCreatePath returns null outside e2e', () => {
@@ -99,4 +108,20 @@ test('install clears pending create path when leaving e2e mode', () => {
   process.env.TEST_ENV = 'components'
   installFaProjectManagementE2ePathOverrideGlobals()
   expect(takeNextE2eProjectCreatePath()).toBeNull()
+})
+
+test('e2e pending create path round-trips across separate runtime instances', () => {
+  process.env.TEST_ENV = 'e2e'
+  const runtimeA = createProjectManagementE2ePathRuntime({
+    getTestEnv: () => process.env.TEST_ENV
+  })
+  runtimeA.installFaProjectManagementE2ePathOverrideGlobals()
+  const setter = (globalThis as Record<string, unknown>)[FA_E2E_GLOBAL_SET_NEXT_PROJECT_CREATE_PATH] as (
+    p: string
+  ) => void
+  setter('D:\\e2e\\bundle-split.faproject')
+  const runtimeB = createProjectManagementE2ePathRuntime({
+    getTestEnv: () => process.env.TEST_ENV
+  })
+  expect(runtimeB.takeNextE2eProjectCreatePath()).toBe('D:\\e2e\\bundle-split.faproject')
 })

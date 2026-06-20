@@ -10,57 +10,56 @@ description: >-
 
 ## Canonical schema documentation
 
-- **[docs/database/projectDB.md](../../docs/database/projectDB.md)** — **`.faproject`** `user_version` (supported max **5** today), `project_data` KV, content tables, FK/delete rules, module map, **`FA_PROJECT_CONTENT_IPC`**, **Project Settings** worlds and document-templates snapshots
-- **[docs/database/templateCustomFields.md](../../docs/database/templateCustomFields.md)** — approved design for template field definitions and document values (planned future extension; not in shipped schema yet)
-- **[docs/database/appUserDataKv.md](../../docs/database/appUserDataKv.md)** — **`electron-store`** under **`userData`** (not project SQLite)
-- **[docs/database/README.md](../../docs/database/README.md)** — index and agent routing
+- **[docs/database/projectDB.md](../../docs/database/projectDB.md)** — **`.faproject`** `user_version` (supported max **5** today), tables, IPC, Project Settings
+- **[docs/database/templateCustomFields.md](../../docs/database/templateCustomFields.md)** — planned custom fields (not shipped)
+- **[docs/database/appUserDataKv.md](../../docs/database/appUserDataKv.md)** — **`electron-store`** in **`userData`**
+- **[docs/database/README.md](../../docs/database/README.md)** — index
 
-When you change migrations, persist modules, or project IPC, update the matching doc in the **same commit** (see **`.cursor/rules/docs-database.mdc`**).
+Schema/IPC changes → update docs same commit ([docs-database.mdc](../../rules/docs-database.mdc)).
 
 ## Current state
 
-- **`better-sqlite3`** is a native Node dependency; access belongs in the **main process** only.
-- **User projects** are SQLite files with the **`.faproject`** extension. Main code lives under **`src-electron/mainScripts/projectManagement/`** (save dialog, slugging, path checks, **`PRAGMA user_version`** migrations, active connection lifecycle). The renderer calls **`window.faContentBridgeAPIs.projectManagement.createProject`** (see **`types/I_faProjectManagementDomain.ts`**, **`FA_PROJECT_MANAGEMENT_IPC`**, **`registerFaProjectManagementIpc`**).
-- **E2E**: Playwright uses **`e2eSetNextProjectCreatePath`** in **`helpers/playwrightHelpers_e2e/playwrightE2eProjectPaths.ts`** (**`TEST_ENV: 'e2e'`** only) to set the absolute path for the next create; main reads it via **`projectManagement_manager.ts`** and **`functions/faProjectManagementE2ePathOverride.ts`** (global setter keys must stay aligned with the helper).
-- Product **`.faproject`** files are the supported user-visible project containers. **`PRAGMA user_version`** **5** is the supported max today (bootstrap **v1** **`project_data`** KV plus **worlds**, **documents**, **document_templates**, **media**, and junction tables — see **docs/database/projectDB.md** ). **`worlds`** stores **`color`**, **`color_pallete`** (semicolon-separated hex list), and **`sort_order`**; **`document_templates`** stores **`sort_order`**, **`world_appendix`**, and **`icon`**; **Project Settings** saves full ordered lists via **`saveWorldsSnapshot`** and **`saveDocumentTemplatesSnapshot`**. Typed **custom fields** on templates are a planned extension — see **docs/database/templateCustomFields.md** and [fantasia-template-custom-fields](../fantasia-template-custom-fields/SKILL.md).
-- **Pre-release flatten:** to squash historical migration ladders during dev, use [fantasia-flatten-database-schemas](../fantasia-flatten-database-schemas/SKILL.md) (older local **`.faproject`** files are not upgraded).
+- **`better-sqlite3`** — main process only
+- **`.faproject`** SQLite under **`src-electron/mainScripts/projectManagement/`**; renderer via **`window.faContentBridgeAPIs.projectManagement`**
+- **E2E paths**: **`e2eSetNextProjectCreatePath`** / **`e2eSetNextProjectOpenPath`** in **`playwrightE2eProjectPaths.ts`**
+- **`user_version` 5** max today — worlds, documents, templates, media, junctions; Project Settings snapshots via **`saveWorldsSnapshot`**, **`saveDocumentTemplatesSnapshot`**
+- **Pre-release flatten**: [fantasia-flatten-database-schemas](../fantasia-flatten-database-schemas/SKILL.md)
 
 ## Principles
 
-1. **Never open arbitrary SQL from the renderer** — expose narrow, validated operations via preload APIs if the UI needs data. If those APIs use main-process IPC, add channel names to `electron-ipc-bridge.ts` and register handlers in `mainScripts/ipcManagement/register*Ipc.ts` (see [fantasia-electron-preload](../fantasia-electron-preload/SKILL.md)).
-2. **Paths**: Use `app.getPath('userData')` (or other `app.getPath` variants) for per-user storage; create directories before opening the DB.
-3. **Native builds**: `better-sqlite3` must compile for the Electron/Node ABI used by the packaged app; verify `yarn quasar:build:electron` and packaged runs after upgrades.
-4. **Lifecycle**: Open/close or pool connections deliberately; avoid leaking handles on window reload during dev.
+1. **No arbitrary SQL from renderer** — narrow validated preload APIs + IPC ([fantasia-electron-preload](../fantasia-electron-preload/SKILL.md))
+2. **Paths**: **`app.getPath('userData')`**; mkdir before open
+3. **Native builds**: verify **`yarn quasar:build:electron`** after upgrades
+4. **Lifecycle**: deliberate open/close; no leaked handles on dev reload
 
 ## Active project DB access (mandatory failsafe)
 
-All **active `.faproject`** reads and writes in main (including project noteboard, styling, **project settings**, and any new IPC that touches the open project file) must go through **`runWithFaProjectDatabaseForIpcAsync`** or **`runWithFaProjectDatabaseSync`** from **`src-electron/mainScripts/projectManagement/faProjectDatabaseEnsureConnected.ts`**, not direct **`getFaProjectActiveDatabase()`** calls. ESLint restricts **`getFaProjectActiveDatabase`**, **`getFaProjectLastKnownActiveProjectFilePath`**, and **`replaceFaProjectActiveDatabase`** imports outside the allowlisted modules; see **`.cursor/rules/fa-project-database-access.mdc`**.
+All active **`.faproject`** reads/writes → **`runWithFaProjectDatabaseForIpcAsync`** / **`runWithFaProjectDatabaseSync`** from **`faProjectDatabaseEnsureConnected.ts`**. ESLint restricts direct **`getFaProjectActiveDatabase`** imports ([fa-project-database-access.mdc](../../rules/fa-project-database-access.mdc)).
 
 ### Project settings refresh contract (renderer)
 
-Unlike **App Settings** (**`DialogAppSettings`**, hydrated from **`S_FaUserSettings`** on open), **Project Settings** always reads SQLite on dialog open:
+Unlike App Settings (Pinia seed on open), **Project Settings** always reads SQLite on open:
 
-1. **Open:** IPC **`getProjectSettings`** (project name) and **`projectContent.listWorldsForProjectSettings`** (no Pinia seed without a DB read; Storybook may use **`directSettingsSnapshot`** and worlds fixtures).
-2. **Edit:** Local draft for project name and worlds until **Save**; **Close without saving** discards it.
-3. **Save:** action manager **`saveProjectSettings`** → **`S_FaProjectSettings.updateProjectSettings`** (IPC **set** → **get** → **`propagateFaProjectSettingsToAppConsumers`** for header name, MRU) plus optional **`projectContent.saveWorldsSnapshot`** (**`replaceFaProjectWorldsSnapshot`** on main).
-4. **Errors:** store / bridge throws; action manager toast (same as user settings).
-5. **Main:** **`runWithFaProjectDatabaseForIpcAsync`** only; KV **`project_name`** in **`faProjectSettingsPersist.ts`**; worlds in **`faProjectWorldsSnapshotWiring.ts`**.
+1. **Open**: **`getProjectSettings`** + **`listWorldsForProjectSettings`**
+2. **Edit**: local draft until Save
+3. **Save**: **`saveProjectSettings`** → KV patch + optional **`saveWorldsSnapshot`**
+4. **Errors**: throw → action manager toast
+5. **Main**: **`runWithFaProjectDatabaseForIpcAsync`** only
 
-Extend **`propagateFaProjectSettingsToAppConsumers`** when new settings fields need live UI updates after save. See **[docs/database/projectDB.md](../../docs/database/projectDB.md)** **Project Settings (renderer ↔ SQLite)**.
+Extend **`propagateFaProjectSettingsToAppConsumers`** when new fields need live UI after save. See **projectDB.md** **Project Settings (renderer ↔ SQLite)**.
 
-- **Mirrored path**: Main keeps the last known absolute **`.faproject`** path alongside the **`better-sqlite3`** handle (**`faProjectActiveDatabase.ts`**). **`replaceFaProjectActiveDatabase(db, filePath)`** runs on successful open and create; **`closeFaProjectActiveDatabase()`** clears both; **`closeFaProjectActiveDatabaseHandleOnly()`** drops only the handle so a single reconnect can reuse the path.
-- **Reconnect + retry**: One synchronous reopen from the mirrored path when the handle is null, plus at most **one** handle-only close and retry when the operation throws a classified SQLite / **better-sqlite3** error. A **single-flight** mutex avoids overlapping reconnects.
-- **Optional renderer path**: If main has no mirrored path after reconnect, async IPC paths may request the active path from the renderer via **`FA_PROJECT_FAILSAFE_IPC`** (**`electron-ipc-bridge.ts`**); the boot script registers **`faProjectFailsafeAPI.installActiveProjectPathReply`** with Pinia **`S_FaActiveProject`**. Replied paths are validated with **`pathLooksLikeFaProjectFile`** before open.
-- **Session reset**: Main window session cleanup uses **`did-start-navigation`** with **`isMainFrame && !details.isSameDocument`** so spurious navigations do not drop the connection ( **`faMainWindowWebContentsSessionReset.ts`** ).
+- **Mirrored path**: **`faProjectActiveDatabase.ts`** — **`replaceFaProjectActiveDatabase`**, **`closeFaProjectActiveDatabase`**, handle-only close for reconnect
+- **Reconnect + retry**: one sync reopen + one handle-only retry on classified SQLite errors; single-flight mutex
+- **Optional renderer path**: **`FA_PROJECT_FAILSAFE_IPC`** when main has no mirrored path
+- **Session reset**: **`did-start-navigation`** main frame, not same-document — **`faMainWindowWebContentsSessionReset.ts`**
 
-When adding new project-DB IPC handlers, wire them through the ensure layer and extend tests under **`src-electron/mainScripts/projectManagement/_tests/`** and **`registerFaProjectManagementIpc` Vitest** as needed.
+New project-DB IPC → ensure layer + tests under **`projectManagement/_tests/`**.
 
 ## Evolution
 
-- When replacing the stub, add a dedicated module under `src-electron/` (e.g. `mainScripts/db/` or `database/`) and keep `electron-main.ts` thin.
-- Plan migrations and backup/export consistent with the product’s “worldbuilding database” model (see [fantasia-worldbuilding-domain](../fantasia-worldbuilding-domain/SKILL.md)).
+- Dedicated module under **`mainScripts/`** when replacing stubs; keep **`electron-main.ts`** thin
+- Migrations/backup aligned with worldbuilding model — [fantasia-worldbuilding-domain](../fantasia-worldbuilding-domain/SKILL.md)
 
-## TypeScript interfaces and types (`types/`)
+## Types
 
-- Put shared `interface` / `type` declarations in repository-root `types/` (import with `app/types/...`). Prefer one domain-oriented module per feature area with brief JSDoc on exports (see `types/I_appMenusDataList.ts`). Do not add colocated `<filename>.types.ts` under `src/`, `src-electron/`, or `.storybook-workspace/`. Ambient augmentations for third-party modules also live under `types/` and are loaded with a side-effect import from the owning boot file or `src/stores/index.ts` (see `types/piniaModuleAugmentation.ts`).
-- For JavaScript (`.js`), TypeScript (`.ts`), Vue (`.vue`), and JSON (`.json`, `.jsonc`, `.json5`) files, enforce expanded multi-line object literals via ESLint (`object-curly-newline` + `object-property-newline`) and keep files auto-fixable with `eslint --fix`.
+Shared types → **`types/`**. See [types-folder.mdc](../../rules/types-folder.mdc).

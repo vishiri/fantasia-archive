@@ -67,3 +67,34 @@ test('Test that migrateFaProjectSchemaV5ToV6 migrates junction rows and bumps us
   expect(execCalls.some((sql) => sql.includes('DROP TABLE IF EXISTS world_document_templates'))).toBe(true)
   expect(db.pragma).toHaveBeenCalledWith('user_version = 6')
 })
+
+test('Test that migrateFaProjectSchemaV5ToV6 skips junction migration when table is absent', () => {
+  const execCalls: string[] = []
+  const db = {
+    exec: (sql: string) => {
+      execCalls.push(sql)
+    },
+    prepare: (sql: string) => {
+      const normalized = sql.replace(/\s+/g, ' ').trim()
+      if (normalized.includes('sqlite_master')) {
+        return {
+          get: () => undefined
+        }
+      }
+      throw new Error(`unexpected prepare: ${normalized}`)
+    },
+    pragma: vi.fn()
+  }
+
+  migrateFaProjectSchemaV5ToV6(db as never, {
+    applyLayoutSchema: (targetDb) => {
+      targetDb.exec('CREATE TABLE world_template_groups')
+    },
+    createPlacementId: () => 'placement-id-1',
+    junctionTableName: 'world_document_templates'
+  })
+
+  expect(execCalls.some((sql) => sql.includes('world_template_groups'))).toBe(true)
+  expect(execCalls.some((sql) => sql.includes('DROP TABLE'))).toBe(false)
+  expect(db.pragma).toHaveBeenCalledWith('user_version = 6')
+})
