@@ -1,6 +1,6 @@
 import { beforeEach, expect, test, vi } from 'vitest'
 
-import type { WebContents } from 'electron'
+import type { BrowserWindow } from 'electron'
 
 const forwardFaChromiumForwardedKeyChordInPageMock = vi.hoisted(() => vi.fn())
 
@@ -10,43 +10,93 @@ vi.mock('../faChromiumForwardedKeyChordPageDispatchWiring', () => {
   }
 })
 
-const registerFaChromiumCtrlShiftGlobalShortcutForwardMock = vi.hoisted(() => vi.fn(() => ({
-  globallyForwardedDomCodes: new Set<string>(),
-  unregister: vi.fn(),
-  usesGlobalShortcutForward: false
-})))
+const activateMock = vi.hoisted(() => vi.fn())
+const deactivateMock = vi.hoisted(() => vi.fn())
+const globallyForwardedDomCodesRef = vi.hoisted(() => ({ current: new Set<string>() }))
+const createFaChromiumCtrlShiftGlobalShortcutForwardControllerMock = vi.hoisted(() =>
+  vi.fn(() => ({
+    activate: activateMock,
+    deactivate: deactivateMock,
+    globallyForwardedDomCodes: globallyForwardedDomCodesRef.current
+  }))
+)
 
 vi.mock('../faChromiumCtrlShiftGlobalShortcutWiring', () => {
   return {
-    registerFaChromiumCtrlShiftGlobalShortcutForward: registerFaChromiumCtrlShiftGlobalShortcutForwardMock
+    createFaChromiumCtrlShiftGlobalShortcutForwardController:
+      createFaChromiumCtrlShiftGlobalShortcutForwardControllerMock
   }
 })
 
 import { registerFaChromiumCtrlShiftShortcutSuppress } from '../faChromiumCtrlShiftShortcutSuppressWiring'
 
-beforeEach(() => {
-  forwardFaChromiumForwardedKeyChordInPageMock.mockClear()
-  registerFaChromiumCtrlShiftGlobalShortcutForwardMock.mockReset()
-  registerFaChromiumCtrlShiftGlobalShortcutForwardMock.mockReturnValue({
-    globallyForwardedDomCodes: new Set<string>(),
-    unregister: vi.fn(),
-    usesGlobalShortcutForward: false
-  })
-})
+type BeforeInputHandler = (
+  event: { preventDefault: () => void },
+  input: Record<string, unknown>
+) => void
 
-test('registerFaChromiumCtrlShiftShortcutSuppress preventDefaults and forwards Ctrl+Shift+O', () => {
-  const beforeInputHandlers: Array<
-    (event: { preventDefault: () => void }, input: Record<string, unknown>) => void
-  > = []
-  const wc = {
-    on: vi.fn((eventName: string, handler: typeof beforeInputHandlers[number]) => {
+type WindowEventHandler = () => void
+
+interface FaSuppressWindowMock {
+  win: BrowserWindow
+  beforeInputHandlers: BeforeInputHandler[]
+  windowHandlers: Record<string, WindowEventHandler>
+  webContentsRemoveListener: ReturnType<typeof vi.fn>
+  windowRemoveListener: ReturnType<typeof vi.fn>
+}
+
+/**
+ * Builds a BrowserWindow stub that records its 'before-input-event', 'focus', and 'blur' handlers
+ * so tests can invoke them directly. 'isFocused' controls the initial-activate branch.
+ */
+function buildFaSuppressWindowMock (isFocused: boolean): FaSuppressWindowMock {
+  const beforeInputHandlers: BeforeInputHandler[] = []
+  const windowHandlers: Record<string, WindowEventHandler> = {}
+  const webContentsRemoveListener = vi.fn()
+  const windowRemoveListener = vi.fn()
+
+  const webContents = {
+    on: vi.fn((eventName: string, handler: BeforeInputHandler) => {
       if (eventName === 'before-input-event') {
         beforeInputHandlers.push(handler)
       }
-    })
+    }),
+    removeListener: webContentsRemoveListener
+  }
+  const win = {
+    webContents,
+    on: vi.fn((eventName: string, handler: WindowEventHandler) => {
+      windowHandlers[eventName] = handler
+    }),
+    removeListener: windowRemoveListener,
+    isFocused: vi.fn(() => isFocused)
   }
 
-  registerFaChromiumCtrlShiftShortcutSuppress(wc as unknown as WebContents)
+  return {
+    win: win as unknown as BrowserWindow,
+    beforeInputHandlers,
+    windowHandlers,
+    webContentsRemoveListener,
+    windowRemoveListener
+  }
+}
+
+beforeEach(() => {
+  forwardFaChromiumForwardedKeyChordInPageMock.mockClear()
+  activateMock.mockClear()
+  deactivateMock.mockClear()
+  createFaChromiumCtrlShiftGlobalShortcutForwardControllerMock.mockClear()
+  globallyForwardedDomCodesRef.current = new Set<string>()
+})
+
+/**
+ * registerFaChromiumCtrlShiftShortcutSuppress
+ * The before-input path preventDefaults and forwards Ctrl+Shift+O when globalShortcut did not claim it.
+ */
+test('Test that registerFaChromiumCtrlShiftShortcutSuppress preventDefaults and forwards Ctrl+Shift+O', () => {
+  const { win, beforeInputHandlers } = buildFaSuppressWindowMock(false)
+
+  registerFaChromiumCtrlShiftShortcutSuppress(win)
   expect(beforeInputHandlers).toHaveLength(1)
 
   const preventDefault = vi.fn()
@@ -66,22 +116,17 @@ test('registerFaChromiumCtrlShiftShortcutSuppress preventDefaults and forwards C
   )
 
   expect(preventDefault).toHaveBeenCalledOnce()
-  expect(forwardFaChromiumForwardedKeyChordInPageMock).toHaveBeenCalledWith(wc, 'KeyO')
+  expect(forwardFaChromiumForwardedKeyChordInPageMock).toHaveBeenCalledWith(win.webContents, 'KeyO')
 })
 
-test('registerFaChromiumCtrlShiftShortcutSuppress forwards when code is empty but key is o', () => {
-  const beforeInputHandlers: Array<
-    (event: { preventDefault: () => void }, input: Record<string, unknown>) => void
-  > = []
-  const wc = {
-    on: vi.fn((eventName: string, handler: typeof beforeInputHandlers[number]) => {
-      if (eventName === 'before-input-event') {
-        beforeInputHandlers.push(handler)
-      }
-    })
-  }
+/**
+ * registerFaChromiumCtrlShiftShortcutSuppress
+ * The before-input path falls back to the DOM key when Chromium reports an empty 'code'.
+ */
+test('Test that registerFaChromiumCtrlShiftShortcutSuppress forwards when code is empty but key is o', () => {
+  const { win, beforeInputHandlers } = buildFaSuppressWindowMock(false)
 
-  registerFaChromiumCtrlShiftShortcutSuppress(wc as unknown as WebContents)
+  registerFaChromiumCtrlShiftShortcutSuppress(win)
 
   const preventDefault = vi.fn()
   beforeInputHandlers[0](
@@ -100,22 +145,17 @@ test('registerFaChromiumCtrlShiftShortcutSuppress forwards when code is empty bu
   )
 
   expect(preventDefault).toHaveBeenCalledOnce()
-  expect(forwardFaChromiumForwardedKeyChordInPageMock).toHaveBeenCalledWith(wc, 'KeyO')
+  expect(forwardFaChromiumForwardedKeyChordInPageMock).toHaveBeenCalledWith(win.webContents, 'KeyO')
 })
 
-test('registerFaChromiumCtrlShiftShortcutSuppress ignores non-denylisted chords', () => {
-  const beforeInputHandlers: Array<
-    (event: { preventDefault: () => void }, input: Record<string, unknown>) => void
-  > = []
-  const wc = {
-    on: vi.fn((eventName: string, handler: typeof beforeInputHandlers[number]) => {
-      if (eventName === 'before-input-event') {
-        beforeInputHandlers.push(handler)
-      }
-    })
-  }
+/**
+ * registerFaChromiumCtrlShiftShortcutSuppress
+ * Non-denylisted chords are left untouched for Chromium and the renderer.
+ */
+test('Test that registerFaChromiumCtrlShiftShortcutSuppress ignores non-denylisted chords', () => {
+  const { win, beforeInputHandlers } = buildFaSuppressWindowMock(false)
 
-  registerFaChromiumCtrlShiftShortcutSuppress(wc as unknown as WebContents)
+  registerFaChromiumCtrlShiftShortcutSuppress(win)
 
   const preventDefault = vi.fn()
   beforeInputHandlers[0](
@@ -137,26 +177,17 @@ test('registerFaChromiumCtrlShiftShortcutSuppress ignores non-denylisted chords'
   expect(forwardFaChromiumForwardedKeyChordInPageMock).not.toHaveBeenCalled()
 })
 
-test('registerFaChromiumCtrlShiftShortcutSuppress preventDefaults without IPC when globalShortcut forwards', () => {
-  registerFaChromiumCtrlShiftGlobalShortcutForwardMock.mockReturnValueOnce({
-    globallyForwardedDomCodes: new Set([
-      'KeyO'
-    ]),
-    unregister: vi.fn(),
-    usesGlobalShortcutForward: true
-  })
-  const beforeInputHandlers: Array<
-    (event: { preventDefault: () => void }, input: Record<string, unknown>) => void
-  > = []
-  const wc = {
-    on: vi.fn((eventName: string, handler: typeof beforeInputHandlers[number]) => {
-      if (eventName === 'before-input-event') {
-        beforeInputHandlers.push(handler)
-      }
-    })
-  }
+/**
+ * registerFaChromiumCtrlShiftShortcutSuppress
+ * When globalShortcut already forwards a chord, before-input only preventDefaults (no double forward).
+ */
+test('Test that registerFaChromiumCtrlShiftShortcutSuppress preventDefaults without forwarding when globalShortcut claims the chord', () => {
+  globallyForwardedDomCodesRef.current = new Set([
+    'KeyO'
+  ])
+  const { win, beforeInputHandlers } = buildFaSuppressWindowMock(false)
 
-  registerFaChromiumCtrlShiftShortcutSuppress(wc as unknown as WebContents)
+  registerFaChromiumCtrlShiftShortcutSuppress(win)
 
   const preventDefault = vi.fn()
   beforeInputHandlers[0](
@@ -178,27 +209,18 @@ test('registerFaChromiumCtrlShiftShortcutSuppress preventDefaults without IPC wh
   expect(forwardFaChromiumForwardedKeyChordInPageMock).not.toHaveBeenCalled()
 })
 
-test('registerFaChromiumCtrlShiftShortcutSuppress forwards via before-input when globalShortcut omitted KeyO', () => {
-  registerFaChromiumCtrlShiftGlobalShortcutForwardMock.mockReturnValueOnce({
-    globallyForwardedDomCodes: new Set([
-      'KeyB',
-      'KeyD'
-    ]),
-    unregister: vi.fn(),
-    usesGlobalShortcutForward: true
-  })
-  const beforeInputHandlers: Array<
-    (event: { preventDefault: () => void }, input: Record<string, unknown>) => void
-  > = []
-  const wc = {
-    on: vi.fn((eventName: string, handler: typeof beforeInputHandlers[number]) => {
-      if (eventName === 'before-input-event') {
-        beforeInputHandlers.push(handler)
-      }
-    })
-  }
+/**
+ * registerFaChromiumCtrlShiftShortcutSuppress
+ * before-input forwards a chord that globalShortcut could not claim while others are claimed.
+ */
+test('Test that registerFaChromiumCtrlShiftShortcutSuppress forwards via before-input when globalShortcut omitted KeyO', () => {
+  globallyForwardedDomCodesRef.current = new Set([
+    'KeyB',
+    'KeyD'
+  ])
+  const { win, beforeInputHandlers } = buildFaSuppressWindowMock(false)
 
-  registerFaChromiumCtrlShiftShortcutSuppress(wc as unknown as WebContents)
+  registerFaChromiumCtrlShiftShortcutSuppress(win)
 
   const preventDefault = vi.fn()
   beforeInputHandlers[0](
@@ -217,5 +239,55 @@ test('registerFaChromiumCtrlShiftShortcutSuppress forwards via before-input when
   )
 
   expect(preventDefault).toHaveBeenCalledOnce()
-  expect(forwardFaChromiumForwardedKeyChordInPageMock).toHaveBeenCalledWith(wc, 'KeyO')
+  expect(forwardFaChromiumForwardedKeyChordInPageMock).toHaveBeenCalledWith(win.webContents, 'KeyO')
+})
+
+/**
+ * registerFaChromiumCtrlShiftShortcutSuppress
+ * Window focus activates the global shortcuts and blur releases them so other apps regain the chords.
+ */
+test('Test that registerFaChromiumCtrlShiftShortcutSuppress activates on focus and deactivates on blur', () => {
+  const { win, windowHandlers } = buildFaSuppressWindowMock(false)
+
+  registerFaChromiumCtrlShiftShortcutSuppress(win)
+
+  expect(activateMock).not.toHaveBeenCalled()
+  expect(windowHandlers.focus).toBeTypeOf('function')
+  expect(windowHandlers.blur).toBeTypeOf('function')
+
+  windowHandlers.focus()
+  expect(activateMock).toHaveBeenCalledOnce()
+
+  windowHandlers.blur()
+  expect(deactivateMock).toHaveBeenCalledOnce()
+})
+
+/**
+ * registerFaChromiumCtrlShiftShortcutSuppress
+ * A window that is already focused at wiring time activates the global shortcuts immediately.
+ */
+test('Test that registerFaChromiumCtrlShiftShortcutSuppress activates immediately when the window is already focused', () => {
+  const { win } = buildFaSuppressWindowMock(true)
+
+  registerFaChromiumCtrlShiftShortcutSuppress(win)
+
+  expect(activateMock).toHaveBeenCalledOnce()
+})
+
+/**
+ * registerFaChromiumCtrlShiftShortcutSuppress
+ * The returned teardown removes every listener and releases the global shortcuts.
+ */
+test('Test that registerFaChromiumCtrlShiftShortcutSuppress teardown removes listeners and deactivates', () => {
+  const { win, windowRemoveListener, webContentsRemoveListener } = buildFaSuppressWindowMock(false)
+
+  const teardown = registerFaChromiumCtrlShiftShortcutSuppress(win)
+  deactivateMock.mockClear()
+
+  teardown()
+
+  expect(windowRemoveListener).toHaveBeenCalledWith('focus', expect.any(Function))
+  expect(windowRemoveListener).toHaveBeenCalledWith('blur', expect.any(Function))
+  expect(webContentsRemoveListener).toHaveBeenCalledWith('before-input-event', expect.any(Function))
+  expect(deactivateMock).toHaveBeenCalledOnce()
 })

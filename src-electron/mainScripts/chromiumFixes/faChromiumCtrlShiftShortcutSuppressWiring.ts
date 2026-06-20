@@ -1,4 +1,4 @@
-import type { WebContents } from 'electron'
+import type { BrowserWindow, Event as ElectronEvent, Input, WebContents } from 'electron'
 
 import {
   FA_CHROMIUM_CTRL_SHIFT_SUPPRESS_KEY_CODES
@@ -6,7 +6,7 @@ import {
 import type { T_faChromiumCtrlShiftSuppressKeyCode } from 'app/types/I_faChromiumCtrlShiftSuppress'
 
 import { forwardFaChromiumForwardedKeyChordInPage } from './faChromiumForwardedKeyChordPageDispatchWiring'
-import { registerFaChromiumCtrlShiftGlobalShortcutForward } from './faChromiumCtrlShiftGlobalShortcutWiring'
+import { createFaChromiumCtrlShiftGlobalShortcutForwardController } from './faChromiumCtrlShiftGlobalShortcutWiring'
 import { resolveFaChromiumCtrlShiftShortcutToForward } from './functions/resolveFaChromiumCtrlShiftShortcutToForward'
 
 const FA_CHROMIUM_CTRL_SHIFT_SUPPRESS_CODE_SET = new Set<string>(
@@ -14,18 +14,21 @@ const FA_CHROMIUM_CTRL_SHIFT_SUPPRESS_CODE_SET = new Set<string>(
 )
 
 /**
- * Blocks Chromium default handling for reserved Ctrl+Shift+key chords and forwards DOM 'code'
- * to the renderer so capture listeners and global faKeybind dispatch run.
+ * Blocks Chromium default handling for reserved Ctrl+Shift+key chords and forwards the DOM 'code'
+ * to the renderer so capture listeners and global faKeybind dispatch run. The app-wide
+ * globalShortcut handlers are registered only while the main window is focused and released on
+ * blur or teardown, so a backgrounded Fantasia Archive never intercepts these chords from other
+ * applications. The 'before-input-event' path already fires only for the focused window.
+ * Returns a teardown that removes every listener and releases the global shortcuts.
  */
 export function registerFaChromiumCtrlShiftShortcutSuppress (
-  wc: WebContents,
-  onUnregisterGlobalShortcuts?: (unregister: () => void) => void
-): void {
-  const globalShortcutForward = registerFaChromiumCtrlShiftGlobalShortcutForward(wc)
-  onUnregisterGlobalShortcuts?.(globalShortcutForward.unregister)
-  const globallyForwardedDomCodes = globalShortcutForward.globallyForwardedDomCodes
+  win: BrowserWindow
+): () => void {
+  const wc: WebContents = win.webContents
+  const globalShortcutController = createFaChromiumCtrlShiftGlobalShortcutForwardController(wc)
+  const globallyForwardedDomCodes = globalShortcutController.globallyForwardedDomCodes
 
-  wc.on('before-input-event', (event, input) => {
+  const handleBeforeInput = (event: ElectronEvent, input: Input): void => {
     const domCode = resolveFaChromiumCtrlShiftShortcutToForward(
       {
         alt: input.alt,
@@ -45,9 +48,30 @@ export function registerFaChromiumCtrlShiftShortcutSuppress (
     if (globallyForwardedDomCodes.has(domCode as T_faChromiumCtrlShiftSuppressKeyCode)) {
       return
     }
-    forwardFaChromiumForwardedKeyChordInPage(
-      wc,
-      domCode as T_faChromiumCtrlShiftSuppressKeyCode
-    )
-  })
+    forwardFaChromiumForwardedKeyChordInPage(wc, domCode as T_faChromiumCtrlShiftSuppressKeyCode)
+  }
+
+  const handleWindowFocus = (): void => {
+    globalShortcutController.activate()
+  }
+  const handleWindowBlur = (): void => {
+    globalShortcutController.deactivate()
+  }
+
+  wc.on('before-input-event', handleBeforeInput)
+  win.on('focus', handleWindowFocus)
+  win.on('blur', handleWindowBlur)
+
+  if (win.isFocused()) {
+    globalShortcutController.activate()
+  }
+
+  const teardown = (): void => {
+    win.removeListener('focus', handleWindowFocus)
+    win.removeListener('blur', handleWindowBlur)
+    wc.removeListener('before-input-event', handleBeforeInput)
+    globalShortcutController.deactivate()
+  }
+
+  return teardown
 }

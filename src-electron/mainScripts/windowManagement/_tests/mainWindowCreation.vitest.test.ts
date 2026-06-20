@@ -91,6 +91,7 @@ vi.mock('app/src-electron/mainScripts/userSettings/userSettings_manager', () => 
 
 beforeEach(() => {
   registerFaChromiumCtrlShiftShortcutSuppressMock.mockReset()
+  registerFaChromiumCtrlShiftShortcutSuppressMock.mockReturnValue(vi.fn())
   registerFaProjectOsOpenMainWindowMock.mockReset()
   BrowserWindowMock.mockReset()
   appMock.requestSingleInstanceLock.mockReset()
@@ -188,10 +189,8 @@ test('Test that second-instance handler no-ops when preventSecondaryAppInstance 
  * Test BrowserWindow construction, event handlers, and delayed maximize flow.
  */
 test('Test that the main window is created successfully', async () => {
-  const unregisterGlobalShortcutsMock = vi.fn()
-  registerFaChromiumCtrlShiftShortcutSuppressMock.mockImplementation((_wc, onUnregister) => {
-    onUnregister?.(unregisterGlobalShortcutsMock)
-  })
+  const disposeFaChromiumCtrlShiftSuppressMock = vi.fn()
+  registerFaChromiumCtrlShiftShortcutSuppressMock.mockReturnValue(disposeFaChromiumCtrlShiftSuppressMock)
   const onceHandlers: Record<string, () => void> = {}
   const onHandlers: Record<string, () => void> = {}
   const spellSession = {}
@@ -251,8 +250,7 @@ test('Test that the main window is created successfully', async () => {
   expect(setupSpellCheckerMock).toHaveBeenCalledWith(expect.anything())
   expect(applyFaSpellCheckerLanguagesToSessionMock).toHaveBeenCalledWith(spellSession, 'en-US')
   expect(registerFaChromiumCtrlShiftShortcutSuppressMock).toHaveBeenCalledWith(
-    browserWindowInstance.webContents,
-    expect.any(Function)
+    browserWindowInstance
   )
 
   onceHandlers['ready-to-show']()
@@ -264,7 +262,7 @@ test('Test that the main window is created successfully', async () => {
   expect(browserWindowInstance.maximize).toHaveBeenCalledTimes(2)
 
   onHandlers.closed()
-  expect(unregisterGlobalShortcutsMock).toHaveBeenCalledOnce()
+  expect(disposeFaChromiumCtrlShiftSuppressMock).toHaveBeenCalledOnce()
   expect(appWindow).toBeUndefined()
 })
 

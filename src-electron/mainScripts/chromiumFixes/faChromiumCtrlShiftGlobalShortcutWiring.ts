@@ -3,7 +3,7 @@ import type { WebContents } from 'electron'
 
 import { FA_CHROMIUM_CTRL_SHIFT_SUPPRESS_KEY_CODES } from 'app/types/I_faChromiumCtrlShiftSuppress'
 import type {
-  I_faChromiumCtrlShiftGlobalShortcutForwardRegistration,
+  I_faChromiumCtrlShiftGlobalShortcutForwardController,
   T_faChromiumCtrlShiftSuppressKeyCode
 } from 'app/types/I_faChromiumCtrlShiftSuppress'
 
@@ -23,61 +23,65 @@ function sendFaChromiumForwardedKeyChord (
   forwardFaChromiumForwardedKeyChordInPage(wc, domCode)
 }
 
+const globalShortcutApi = {
+  isRegistered: (accelerator: string): boolean => globalShortcut.isRegistered(accelerator),
+  register: (accelerator: string, onPressed: () => void): boolean =>
+    globalShortcut.register(accelerator, onPressed),
+  unregister: (accelerator: string): void => {
+    globalShortcut.unregister(accelerator)
+  }
+}
+
 /**
- * Registers app-wide shortcuts so Chromium cannot consume denylisted Ctrl+Shift chords first.
- * Returns unregister cleanup (no-op when Playwright harness skips registration).
+ * Builds a focus-gated controller for the app-wide shortcuts that keep Chromium from consuming
+ * denylisted Ctrl+Shift chords first. Nothing is registered until 'activate' runs (called when the
+ * main window gains focus); 'deactivate' releases every claimed accelerator so a backgrounded
+ * window never blocks these chords in other applications. The Playwright harness skips registration.
  */
-export function registerFaChromiumCtrlShiftGlobalShortcutForward (
+export function createFaChromiumCtrlShiftGlobalShortcutForwardController (
   wc: WebContents
-): I_faChromiumCtrlShiftGlobalShortcutForwardRegistration {
-  if (!shouldRegisterFaChromiumCtrlShiftGlobalShortcuts()) {
-    return {
-      globallyForwardedDomCodes: new Set(),
-      unregister: () => undefined,
-      usesGlobalShortcutForward: false
-    }
-  }
-
-  const registeredAccelerators: string[] = []
+): I_faChromiumCtrlShiftGlobalShortcutForwardController {
   const globallyForwardedDomCodes = new Set<T_faChromiumCtrlShiftSuppressKeyCode>()
-  const globalShortcutApi = {
-    isRegistered: (accelerator: string): boolean => globalShortcut.isRegistered(accelerator),
-    register: (accelerator: string, onPressed: () => void): boolean =>
-      globalShortcut.register(accelerator, onPressed),
-    unregister: (accelerator: string): void => {
-      globalShortcut.unregister(accelerator)
-    }
-  }
+  const registeredAccelerators: string[] = []
+  const canRegister = shouldRegisterFaChromiumCtrlShiftGlobalShortcuts()
 
-  for (const domCode of FA_CHROMIUM_CTRL_SHIFT_SUPPRESS_KEY_CODES) {
-    const accelerator = faChromiumDomCodeToGlobalShortcutAccelerator(domCode)
-    if (accelerator === null) {
-      continue
-    }
-    const didRegister = registerFaChromiumGlobalShortcutAccelerator(
-      globalShortcutApi,
-      accelerator,
-      () => {
-        sendFaChromiumForwardedKeyChord(wc, domCode)
-      }
-    )
-    if (didRegister) {
-      registeredAccelerators.push(accelerator)
-      globallyForwardedDomCodes.add(domCode)
-    }
-  }
-
-  const unregisterAccelerators = (): void => {
+  const deactivate = (): void => {
     for (const accelerator of registeredAccelerators) {
       if (globalShortcut.isRegistered(accelerator)) {
         globalShortcut.unregister(accelerator)
       }
     }
+    registeredAccelerators.length = 0
+    globallyForwardedDomCodes.clear()
+  }
+
+  const activate = (): void => {
+    if (!canRegister) {
+      return
+    }
+    deactivate()
+    for (const domCode of FA_CHROMIUM_CTRL_SHIFT_SUPPRESS_KEY_CODES) {
+      const accelerator = faChromiumDomCodeToGlobalShortcutAccelerator(domCode)
+      if (accelerator === null) {
+        continue
+      }
+      const registeredAccelerator = registerFaChromiumGlobalShortcutAccelerator(
+        globalShortcutApi,
+        accelerator,
+        () => {
+          sendFaChromiumForwardedKeyChord(wc, domCode)
+        }
+      )
+      if (registeredAccelerator !== null) {
+        registeredAccelerators.push(registeredAccelerator)
+        globallyForwardedDomCodes.add(domCode)
+      }
+    }
   }
 
   return {
-    globallyForwardedDomCodes,
-    unregister: unregisterAccelerators,
-    usesGlobalShortcutForward: globallyForwardedDomCodes.size > 0
+    activate,
+    deactivate,
+    globallyForwardedDomCodes
   }
 }

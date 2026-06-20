@@ -44,10 +44,14 @@ export interface I_faChromiumForwardedKeyChordPayload {
 }
 
 /**
- * Result of registering Electron globalShortcut handlers for denylisted Ctrl+Shift chords.
+ * Focus-gated controller for the Electron globalShortcut handlers that intercept denylisted
+ * Ctrl+Shift chords. Accelerators register only while the main window is focused ('activate')
+ * and are released on blur or teardown ('deactivate'), so a backgrounded Fantasia Archive never
+ * steals these chords from other applications. 'globallyForwardedDomCodes' lists the DOM codes
+ * currently claimed by globalShortcut and is repopulated on each 'activate'.
  */
-export interface I_faChromiumCtrlShiftGlobalShortcutForwardRegistration {
+export interface I_faChromiumCtrlShiftGlobalShortcutForwardController {
+  activate: () => void
+  deactivate: () => void
   globallyForwardedDomCodes: ReadonlySet<T_faChromiumCtrlShiftSuppressKeyCode>
-  unregister: () => void
-  usesGlobalShortcutForward: boolean
 }

@@ -21,7 +21,7 @@ vi.mock('electron', () => {
 })
 
 import * as faChromiumDomCodeToGlobalShortcutAcceleratorModule from '../functions/faChromiumDomCodeToGlobalShortcutAccelerator'
-import { registerFaChromiumCtrlShiftGlobalShortcutForward } from '../faChromiumCtrlShiftGlobalShortcutWiring'
+import { createFaChromiumCtrlShiftGlobalShortcutForwardController } from '../faChromiumCtrlShiftGlobalShortcutWiring'
 
 afterEach(() => {
   vi.unstubAllEnvs()
@@ -31,16 +31,24 @@ afterEach(() => {
   globalShortcutIsRegisteredMock.mockReturnValue(false)
 })
 
-test('registerFaChromiumCtrlShiftGlobalShortcutForward registers accelerators and forwards on press', () => {
+/**
+ * createFaChromiumCtrlShiftGlobalShortcutForwardController
+ * Nothing is registered before 'activate'; 'activate' claims accelerators and forwards on press.
+ */
+test('Test that activate registers accelerators and forwards the DOM code on press', () => {
   const executeJavaScript = vi.fn<(script: string) => Promise<unknown>>(() => Promise.resolve(undefined))
   const wc = {
     executeJavaScript,
     isDestroyed: () => false
   }
-  const result = registerFaChromiumCtrlShiftGlobalShortcutForward(wc as unknown as WebContents)
+  const controller = createFaChromiumCtrlShiftGlobalShortcutForwardController(wc as unknown as WebContents)
 
-  expect(result.usesGlobalShortcutForward).toBe(true)
-  expect(result.globallyForwardedDomCodes.has('KeyO')).toBe(true)
+  expect(controller.globallyForwardedDomCodes.size).toBe(0)
+  expect(globalShortcutRegisterMock).not.toHaveBeenCalled()
+
+  controller.activate()
+
+  expect(controller.globallyForwardedDomCodes.has('KeyO')).toBe(true)
   expect(globalShortcutRegisterMock.mock.calls.some((call) => call[0] === 'CommandOrControl+Shift+O')).toBe(
     true
   )
@@ -56,40 +64,60 @@ test('registerFaChromiumCtrlShiftGlobalShortcutForward registers accelerators an
   expect(String(executeJavaScript.mock.calls[0][0])).toContain('KeyO')
 })
 
-test('registerFaChromiumCtrlShiftGlobalShortcutForward skips registration in Playwright harness', () => {
+/**
+ * createFaChromiumCtrlShiftGlobalShortcutForwardController
+ * activate is a no-op inside the Playwright harness so component/e2e specs never claim shortcuts.
+ */
+test('Test that activate skips registration in the Playwright harness', () => {
   vi.stubEnv('TEST_ENV', 'e2e')
-  const result = registerFaChromiumCtrlShiftGlobalShortcutForward({} as WebContents)
-  expect(result.usesGlobalShortcutForward).toBe(false)
+  const controller = createFaChromiumCtrlShiftGlobalShortcutForwardController({} as WebContents)
+  controller.activate()
+  expect(controller.globallyForwardedDomCodes.size).toBe(0)
   expect(globalShortcutRegisterMock).not.toHaveBeenCalled()
-  expect(() => result.unregister()).not.toThrow()
+  expect(() => controller.deactivate()).not.toThrow()
 })
 
-test('registerFaChromiumCtrlShiftGlobalShortcutForward reports no forward when globalShortcut.register fails', () => {
+/**
+ * createFaChromiumCtrlShiftGlobalShortcutForwardController
+ * No DOM codes are forwarded when every globalShortcut.register call fails.
+ */
+test('Test that activate reports no forwarded codes when globalShortcut.register fails', () => {
   globalShortcutRegisterMock.mockReturnValue(false)
-  const result = registerFaChromiumCtrlShiftGlobalShortcutForward({
+  const controller = createFaChromiumCtrlShiftGlobalShortcutForwardController({
     isDestroyed: () => false,
     send: vi.fn()
   } as unknown as WebContents)
 
-  expect(result.usesGlobalShortcutForward).toBe(false)
-  expect(result.globallyForwardedDomCodes.size).toBe(0)
+  controller.activate()
+
+  expect(controller.globallyForwardedDomCodes.size).toBe(0)
 })
 
-test('registerFaChromiumCtrlShiftGlobalShortcutForward omits KeyO when CommandOrControl+Shift+O is taken', () => {
+/**
+ * createFaChromiumCtrlShiftGlobalShortcutForwardController
+ * A chord whose accelerator is taken by another app is omitted while the rest still register.
+ */
+test('Test that activate omits KeyO when CommandOrControl+Shift+O is taken', () => {
   globalShortcutRegisterMock.mockImplementation((accelerator: string) => {
     return accelerator !== 'CommandOrControl+Shift+O' && accelerator !== 'Control+Shift+O'
   })
-  const result = registerFaChromiumCtrlShiftGlobalShortcutForward({
+  const controller = createFaChromiumCtrlShiftGlobalShortcutForwardController({
     isDestroyed: () => false,
     send: vi.fn()
   } as unknown as WebContents)
 
-  expect(result.globallyForwardedDomCodes.size).toBe(11)
-  expect(result.globallyForwardedDomCodes.has('KeyO')).toBe(false)
-  expect(result.globallyForwardedDomCodes.has('KeyB')).toBe(true)
+  controller.activate()
+
+  expect(controller.globallyForwardedDomCodes.size).toBe(11)
+  expect(controller.globallyForwardedDomCodes.has('KeyO')).toBe(false)
+  expect(controller.globallyForwardedDomCodes.has('KeyB')).toBe(true)
 })
 
-test('registerFaChromiumCtrlShiftGlobalShortcutForward skips accelerators that do not map from DOM code', () => {
+/**
+ * createFaChromiumCtrlShiftGlobalShortcutForwardController
+ * DOM codes that do not map to an accelerator are skipped entirely.
+ */
+test('Test that activate skips accelerators that do not map from a DOM code', () => {
   const acceleratorSpy = vi
     .spyOn(
       faChromiumDomCodeToGlobalShortcutAcceleratorModule,
@@ -102,10 +130,11 @@ test('registerFaChromiumCtrlShiftGlobalShortcutForward skips accelerators that d
       return null
     })
 
-  registerFaChromiumCtrlShiftGlobalShortcutForward({
+  const controller = createFaChromiumCtrlShiftGlobalShortcutForwardController({
     isDestroyed: () => false,
     send: vi.fn()
   } as unknown as WebContents)
+  controller.activate()
 
   expect(globalShortcutRegisterMock).toHaveBeenCalledTimes(1)
   expect(globalShortcutRegisterMock.mock.calls[0][0]).toBe('CommandOrControl+Shift+O')
@@ -113,14 +142,19 @@ test('registerFaChromiumCtrlShiftGlobalShortcutForward skips accelerators that d
   acceleratorSpy.mockRestore()
 })
 
-test('registerFaChromiumCtrlShiftGlobalShortcutForward ignores press when webContents is destroyed', () => {
+/**
+ * createFaChromiumCtrlShiftGlobalShortcutForwardController
+ * A globalShortcut press is ignored when the webContents is already destroyed.
+ */
+test('Test that a globalShortcut press is ignored when webContents is destroyed', () => {
   const executeJavaScript = vi.fn()
   const wc = {
     executeJavaScript,
     isDestroyed: () => true
   }
 
-  registerFaChromiumCtrlShiftGlobalShortcutForward(wc as unknown as WebContents)
+  const controller = createFaChromiumCtrlShiftGlobalShortcutForwardController(wc as unknown as WebContents)
+  controller.activate()
 
   const registration = globalShortcutRegisterMock.mock.calls.find(
     (call) => call[0] === 'CommandOrControl+Shift+O'
@@ -130,31 +164,49 @@ test('registerFaChromiumCtrlShiftGlobalShortcutForward ignores press when webCon
   expect(executeJavaScript).not.toHaveBeenCalled()
 })
 
-test('registerFaChromiumCtrlShiftGlobalShortcutForward unregisters accelerators on cleanup', () => {
-  globalShortcutIsRegisteredMock.mockReturnValue(true)
-  const result = registerFaChromiumCtrlShiftGlobalShortcutForward({
+/**
+ * createFaChromiumCtrlShiftGlobalShortcutForwardController
+ * deactivate releases every claimed accelerator and clears the forwarded DOM-code set.
+ */
+test('Test that deactivate unregisters claimed accelerators and clears the forwarded set', () => {
+  const controller = createFaChromiumCtrlShiftGlobalShortcutForwardController({
     isDestroyed: () => false,
     send: vi.fn()
   } as unknown as WebContents)
 
-  result.unregister()
+  controller.activate()
+  expect(controller.globallyForwardedDomCodes.size).toBeGreaterThan(0)
+
+  globalShortcutIsRegisteredMock.mockReturnValue(true)
+  controller.deactivate()
 
   expect(globalShortcutUnregisterMock).toHaveBeenCalled()
+  expect(controller.globallyForwardedDomCodes.size).toBe(0)
 })
 
-test('registerFaChromiumCtrlShiftGlobalShortcutForward skips unregister when accelerator is not registered', () => {
-  globalShortcutIsRegisteredMock.mockReturnValue(false)
-  const result = registerFaChromiumCtrlShiftGlobalShortcutForward({
+/**
+ * createFaChromiumCtrlShiftGlobalShortcutForwardController
+ * deactivate does not unregister accelerators that are no longer registered.
+ */
+test('Test that deactivate skips unregister when an accelerator is not registered', () => {
+  const controller = createFaChromiumCtrlShiftGlobalShortcutForwardController({
     isDestroyed: () => false,
     send: vi.fn()
   } as unknown as WebContents)
 
-  result.unregister()
+  controller.activate()
+  globalShortcutUnregisterMock.mockClear()
+  globalShortcutIsRegisteredMock.mockReturnValue(false)
+  controller.deactivate()
 
   expect(globalShortcutUnregisterMock).not.toHaveBeenCalled()
 })
 
-test('registerFaChromiumCtrlShiftGlobalShortcutForward retries Control+ accelerator when CommandOrControl+ fails', () => {
+/**
+ * createFaChromiumCtrlShiftGlobalShortcutForwardController
+ * The literal Control+ fallback is claimed when CommandOrControl+ cannot register.
+ */
+test('Test that activate retries the Control+ accelerator when CommandOrControl+ fails', () => {
   globalShortcutIsRegisteredMock.mockImplementation((accelerator: string) => {
     return accelerator === 'Control+Shift+O'
   })
@@ -167,9 +219,10 @@ test('registerFaChromiumCtrlShiftGlobalShortcutForward retries Control+ accelera
     isDestroyed: () => false
   }
 
-  const result = registerFaChromiumCtrlShiftGlobalShortcutForward(wc as unknown as WebContents)
+  const controller = createFaChromiumCtrlShiftGlobalShortcutForwardController(wc as unknown as WebContents)
+  controller.activate()
 
-  expect(result.globallyForwardedDomCodes.has('KeyO')).toBe(true)
+  expect(controller.globallyForwardedDomCodes.has('KeyO')).toBe(true)
   expect(globalShortcutRegisterMock).toHaveBeenCalledWith(
     'CommandOrControl+Shift+O',
     expect.any(Function)
@@ -180,13 +233,40 @@ test('registerFaChromiumCtrlShiftGlobalShortcutForward retries Control+ accelera
   )
 })
 
-test('registerFaChromiumCtrlShiftGlobalShortcutForward unregisters an existing accelerator before register', () => {
+/**
+ * createFaChromiumCtrlShiftGlobalShortcutForwardController
+ * An already-registered accelerator is unregistered before activate re-registers it.
+ */
+test('Test that activate unregisters an existing accelerator before registering', () => {
   globalShortcutIsRegisteredMock.mockReturnValue(true)
 
-  registerFaChromiumCtrlShiftGlobalShortcutForward({
+  const controller = createFaChromiumCtrlShiftGlobalShortcutForwardController({
+    executeJavaScript: vi.fn(),
+    isDestroyed: () => false
+  } as unknown as WebContents)
+  controller.activate()
+
+  expect(globalShortcutUnregisterMock).toHaveBeenCalled()
+})
+
+/**
+ * createFaChromiumCtrlShiftGlobalShortcutForwardController
+ * Re-running activate releases the previous claim first so accelerators never accumulate.
+ */
+test('Test that activate is idempotent and releases the previous registration first', () => {
+  const controller = createFaChromiumCtrlShiftGlobalShortcutForwardController({
     executeJavaScript: vi.fn(),
     isDestroyed: () => false
   } as unknown as WebContents)
 
+  controller.activate()
+  const firstSize = controller.globallyForwardedDomCodes.size
+  expect(firstSize).toBeGreaterThan(0)
+
+  globalShortcutIsRegisteredMock.mockReturnValue(true)
+  globalShortcutUnregisterMock.mockClear()
+  controller.activate()
+
   expect(globalShortcutUnregisterMock).toHaveBeenCalled()
+  expect(controller.globallyForwardedDomCodes.size).toBe(firstSize)
 })

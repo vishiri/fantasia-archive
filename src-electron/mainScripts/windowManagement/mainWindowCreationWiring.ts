@@ -84,10 +84,9 @@ async function loadAndWireMainWindow (win: BrowserWindow): Promise<void> {
   win.setMenu(null)
 
   registerFaMainWindowWebContentsSessionReset(win.webContents)
-  let unregisterFaChromiumCtrlShiftGlobalShortcuts: (() => void) | undefined
-  registerFaChromiumCtrlShiftShortcutSuppress(win.webContents, (unregister) => {
-    unregisterFaChromiumCtrlShiftGlobalShortcuts = unregister
-  })
+  // Ctrl+Shift chord suppression registers app-wide globalShortcut handlers only while this window
+  // is focused; the returned teardown releases them so a backgrounded app never blocks other apps.
+  const disposeFaChromiumCtrlShiftSuppress = registerFaChromiumCtrlShiftShortcutSuppress(win)
 
   // Load the basic app URL (dev server) or packaged index.html via the privileged 'app://' scheme.
   // Using 'app://' instead of 'file://' for packaged builds keeps web workers (Monaco editor.worker / css.worker, etc.) on a standard, secure origin.
@@ -108,8 +107,7 @@ async function loadAndWireMainWindow (win: BrowserWindow): Promise<void> {
 
   // Make sure the app window properly closes when it is closed in any way, shape or form
   win.on('closed', () => {
-    unregisterFaChromiumCtrlShiftGlobalShortcuts?.()
-    unregisterFaChromiumCtrlShiftGlobalShortcuts = undefined
+    disposeFaChromiumCtrlShiftSuppress()
     appWindow = undefined
   })
 
