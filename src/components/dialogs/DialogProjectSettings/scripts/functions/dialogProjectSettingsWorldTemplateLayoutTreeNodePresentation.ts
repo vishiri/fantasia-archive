@@ -72,3 +72,27 @@ export function resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeRemoveToo
   }
   return 'dialogs.projectSettings.fields.worldTemplateLayout.removeTemplateTooltip'
 }
+
+export function resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeShowsPlacementNicknameHoverTooltip (
+  node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
+): boolean {
+  return node.nodeKind === 'template' && node.usesNickname
+}
+
+export function resolveDialogProjectSettingsWorldTemplateLayoutTreeNodePlacementNicknameHoverTooltipLines (params: {
+  nicknameLabel: string
+  node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
+  originalNameLabel: string
+}): { nicknameLine: string, originalNameLine: string } | null {
+  if (!resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeShowsPlacementNicknameHoverTooltip(params.node)) {
+    return null
+  }
+  const nickname = params.node.nickname.trim()
+  const originalName = params.node.templateDisplayName
+  const nicknameLine = `${params.nicknameLabel} - ${nickname}`
+  const originalNameLine = `${params.originalNameLabel} - ${originalName}`
+  return {
+    nicknameLine,
+    originalNameLine
+  }
+}

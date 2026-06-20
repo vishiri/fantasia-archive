@@ -120,6 +120,43 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNode accentuates nic
   ).toBe(true)
 })
 
+test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNode shows placement nickname hover tooltip text', () => {
+  const w = mount(DialogProjectSettingsWorldTemplateLayoutTreeNode, {
+    props: {
+      node: {
+        ...templateNode,
+        label: 'Nickname of doom',
+        nickname: 'Nickname of doom',
+        templateDisplayName: 'Character',
+        usesNickname: true
+      }
+    },
+    global: {
+      stubs: treeNodeStubs
+    }
+  })
+
+  const labelArea = w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-titleRow"]')
+  expect(labelArea.exists()).toBe(true)
+  expect(labelArea.attributes('data-test-tooltip-text')).toBe(
+    'dialogs.projectSettings.fields.worldTemplateLayout.placementNicknameHoverNicknameLabel - Nickname of doom\ndialogs.projectSettings.fields.worldTemplateLayout.placementNicknameHoverOriginalNameLabel - Character'
+  )
+  expect(labelArea.find('.q-tooltip-stub').exists()).toBe(true)
+})
+
+test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNode omits placement nickname hover tooltip without nickname', () => {
+  const w = mount(DialogProjectSettingsWorldTemplateLayoutTreeNode, {
+    props: {
+      node: templateNode
+    },
+    global: {
+      stubs: treeNodeStubs
+    }
+  })
+
+  expect(w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-titleRow"]').attributes('data-test-tooltip-text')).toBeUndefined()
+})
+
 /**
  * DialogProjectSettingsWorldTemplateLayoutTreeNode
  * Renders template node with document count and emits removePlacement.

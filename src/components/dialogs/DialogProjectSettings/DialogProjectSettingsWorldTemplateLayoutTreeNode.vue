@@ -11,28 +11,22 @@
       class="q-focus-helper"
       tabindex="-1"
     />
-    <div class="dialogProjectSettingsWorldTemplateLayoutTreeNode__titleRow row items-center no-wrap">
-      <q-icon
-        class="dialogProjectSettingsWorldTemplateLayoutTreeNode__icon"
-        :class="{ 'dialogProjectSettingsWorldTemplateLayoutTreeNode__icon--nickname': props.node.usesNickname }"
-        :name="displayIconName"
+    <div
+      class="dialogProjectSettingsWorldTemplateLayoutTreeNode__titleRow row items-center no-wrap"
+      :data-test-locator="`${nodeTestLocator}-titleRow`"
+      :data-test-tooltip-text="placementNicknameHoverTooltipTestText"
+    >
+      <DialogProjectSettingsWorldTemplateLayoutTreeNodeLabelArea
+        :display-icon-name="displayIconName"
+        :node="props.node"
+        :node-test-locator="nodeTestLocator"
+        @mouseenter="revealPlacementNicknameHoverTooltip"
       />
-      <span
-        class="dialogProjectSettingsWorldTemplateLayoutTreeNode__label col ellipsis"
-        :class="{ 'dialogProjectSettingsWorldTemplateLayoutTreeNode__label--nickname': props.node.usesNickname }"
-      >
-        {{ props.node.label }}
-      </span>
-      <span
-        v-if="props.node.nodeKind === 'template' && props.node.documentCountInWorld > 0"
-        class="dialogProjectSettingsWorldTemplateLayoutTreeNode__count fa-text-muted q-mr-sm"
-        :data-test-locator="`${nodeTestLocator}-count`"
-      >
-        ({{ props.node.documentCountInWorld }})
-      </span>
       <div
         v-if="props.node.nodeKind === 'template' || props.node.nodeKind === 'group'"
         class="dialogProjectSettingsWorldTemplateLayoutTreeNode__actions row items-center no-wrap"
+        @mouseenter="suppressPlacementNicknameHoverTooltip"
+        @mouseleave="armPlacementNicknameHoverTooltip"
       >
         <q-btn
           v-if="renameMenuWiring.supportsRenameMenu"
@@ -78,6 +72,22 @@
           </q-tooltip>
         </q-btn>
       </div>
+      <q-tooltip
+        v-if="showPlacementNicknameHoverTooltip"
+        ref="placementNicknameHoverTooltipRef"
+        anchor="center right"
+        self="center left"
+        :delay="300"
+        :disable="!placementNicknameHoverTooltipEnabled"
+        :offset="placementNicknameHoverTooltipOffset"
+      >
+        <div class="dialogProjectSettingsWorldTemplateLayoutTreeNode__placementNicknameTooltipLine">
+          {{ placementNicknameHoverTooltipNicknameLine }}
+        </div>
+        <div class="dialogProjectSettingsWorldTemplateLayoutTreeNode__placementNicknameTooltipLine">
+          {{ placementNicknameHoverTooltipOriginalNameLine }}
+        </div>
+      </q-tooltip>
     </div>
     <div
       v-if="props.node.worldAppendix.trim().length > 0"
@@ -175,6 +185,7 @@
 
 <script setup lang="ts">
 import DialogProjectSettingsWorldTemplateLayoutTreeNodeCanonicalNameField from './DialogProjectSettingsWorldTemplateLayoutTreeNodeCanonicalNameField.vue'
+import DialogProjectSettingsWorldTemplateLayoutTreeNodeLabelArea from './DialogProjectSettingsWorldTemplateLayoutTreeNodeLabelArea.vue'
 import { useDialogProjectSettingsWorldTemplateLayoutTreeNode } from './scripts/dialogProjectSettingsWorldTemplateLayoutTreeNode_manager'
 import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
 
@@ -198,6 +209,7 @@ const emit = defineEmits<{
 
 const {
   armEditTooltip,
+  armPlacementNicknameHoverTooltip,
   armRemoveTooltip,
   displayIconName,
   editTooltipHoverEnabled,
@@ -209,6 +221,12 @@ const {
   onEditClick,
   onRemoveClick,
   onRenameContextMenu,
+  placementNicknameHoverTooltipEnabled,
+  placementNicknameHoverTooltipNicknameLine,
+  placementNicknameHoverTooltipOffset,
+  placementNicknameHoverTooltipOriginalNameLine,
+  placementNicknameHoverTooltipRef,
+  placementNicknameHoverTooltipTestText,
   removeTooltipHoverEnabled,
   removeTooltipRef,
   removeTooltipText,
@@ -221,6 +239,9 @@ const {
   renameMenuStyle,
   renameMenuWiring,
   rowHasValidationError,
+  revealPlacementNicknameHoverTooltip,
+  showPlacementNicknameHoverTooltip,
+  suppressPlacementNicknameHoverTooltip,
   showTemplateCanonicalName,
   templateCanonicalName,
   templateCanonicalNameLabel,

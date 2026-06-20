@@ -77,6 +77,19 @@
   flex: 0 0 auto;
 }
 
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__titleRow {
+  min-width: 0;
+  width: 100%;
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__labelArea {
+  min-width: 0;
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__placementNicknameTooltipLine + .dialogProjectSettingsWorldTemplateLayoutTreeNode__placementNicknameTooltipLine {
+  margin-top: $dialogProjectSettings-fieldHelpTooltip-bullet-marginTop;
+}
+
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__icon,
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__label {
   transition:

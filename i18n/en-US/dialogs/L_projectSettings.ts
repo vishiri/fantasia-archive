@@ -59,6 +59,8 @@ export default {
       emptyAvailableTemplates: 'All document templates are assigned to this world.',
       groupNameErrorRequired: 'Group name is required.',
       groupRenameInputLabel: 'Name of the group',
+      placementNicknameHoverOriginalNameLabel: 'Original name',
+      placementNicknameHoverNicknameLabel: 'Nickname',
       removeGroupTooltip: 'Remove group',
       removeTemplateTooltip: 'Remove document template',
       templateCanonicalNameLabel: 'Document template name',

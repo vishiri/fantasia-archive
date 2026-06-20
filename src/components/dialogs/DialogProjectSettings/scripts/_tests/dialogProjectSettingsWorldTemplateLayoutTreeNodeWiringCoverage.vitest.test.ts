@@ -10,7 +10,9 @@ import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuStyleWi
 import { clearDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuFocus } from '../dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuFocusWiring'
 import { createUseDialogProjectSettingsWorldTemplateLayoutTreeNode } from '../dialogProjectSettingsWorldTemplateLayoutTreeNodeUseWiring'
 import {
-  resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeHasValidationError
+  resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeHasValidationError,
+  resolveDialogProjectSettingsWorldTemplateLayoutTreeNodePlacementNicknameHoverTooltipLines,
+  resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeShowsPlacementNicknameHoverTooltip
 } from '../functions/dialogProjectSettingsWorldTemplateLayoutTreeNodePresentation'
 import {
   createEmptyDialogProjectSettingsWorldTemplateLayoutDraft,
@@ -69,6 +71,27 @@ test('Test that tree node action tooltip wiring dismisses and arms tooltips', ()
   wiring.armRemoveTooltip()
   expect(wiring.editTooltipHoverEnabled.value).toBe(true)
   expect(wiring.removeTooltipHoverEnabled.value).toBe(true)
+})
+
+test('Test that tree node action tooltip wiring suppresses placement nickname hover tooltip', async () => {
+  const wiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring()
+  const nicknameHide = vi.fn()
+  const nicknameShow = vi.fn()
+  wiring.placementNicknameHoverTooltipRef.value = {
+    hide: nicknameHide,
+    show: nicknameShow
+  } as unknown as QTooltip
+
+  wiring.suppressPlacementNicknameHoverTooltip()
+  expect(nicknameHide).toHaveBeenCalled()
+  expect(wiring.placementNicknameHoverTooltipEnabled.value).toBe(false)
+
+  wiring.armPlacementNicknameHoverTooltip()
+  expect(wiring.placementNicknameHoverTooltipEnabled.value).toBe(true)
+
+  wiring.revealPlacementNicknameHoverTooltip()
+  await nextTick()
+  expect(nicknameShow).toHaveBeenCalled()
 })
 
 test('Test that tree node action tooltip wiring dismiss no-ops when refs are null', () => {
@@ -306,6 +329,34 @@ test('Test that tree node validation helper handles group blank and template dup
     duplicateDocumentTemplateIds: new Set(['template-a']),
     node: missingTemplateIdNode
   })).toBe(false)
+})
+
+/**
+ * resolveDialogProjectSettingsWorldTemplateLayoutTreeNodePlacementNicknameHoverTooltipLines
+ * Builds nickname hover tooltip lines only when placement uses a nickname.
+ */
+test('Test that placement nickname hover tooltip helper formats lines only for nicknamed templates', () => {
+  expect(resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeShowsPlacementNicknameHoverTooltip(templateNode)).toBe(false)
+  expect(resolveDialogProjectSettingsWorldTemplateLayoutTreeNodePlacementNicknameHoverTooltipLines({
+    nicknameLabel: 'Nickname',
+    node: templateNode,
+    originalNameLabel: 'Original name'
+  })).toBeNull()
+
+  const nicknamedNode = {
+    ...templateNode,
+    nickname: 'Alias',
+    usesNickname: true
+  }
+  expect(resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeShowsPlacementNicknameHoverTooltip(nicknamedNode)).toBe(true)
+  expect(resolveDialogProjectSettingsWorldTemplateLayoutTreeNodePlacementNicknameHoverTooltipLines({
+    nicknameLabel: 'Nickname',
+    node: nicknamedNode,
+    originalNameLabel: 'Original name'
+  })).toEqual({
+    nicknameLine: 'Nickname - Alias',
+    originalNameLine: 'Original name - Character'
+  })
 })
 
 test('Test that rename placement nickname draft leaves non-matching placements unchanged', () => {
