@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 import { launchFaPlaywrightComponentHarnessWindow } from 'app/helpers/playwrightHelpers_component/faPlaywrightComponentHarnessLifecycle'
 import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
+import { FA_Q_TOOLTIP_DELAY_MS } from 'app/src/scripts/appGlobalManagementUI/faQTooltipDelay_manager'
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import appStylingMessages from 'app/i18n/en-US/floatingWindows/L_appStyling'
 import { FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS } from 'app/src/scripts/floatingWindows/functions/faQuasarDialogStandardTransition'
@@ -29,10 +30,9 @@ const faFrontendRenderTimer: number = FA_FRONTEND_RENDER_TIMER
 const monacoMountSettleMs = 2500
 
 /**
- * Help `QMenu` opens after a hover delay on the icon; hover at least this long before asserting.
- * (Implementation uses 500 ms; one second of hover keeps the spec stable under load.)
+ * Help QMenu opens after the shared tooltip hover delay on the icon; hover at least this long before asserting.
  */
-const appStylingHelpMenuHoverMs = 1000
+const appStylingHelpMenuHoverMs = FA_Q_TOOLTIP_DELAY_MS + 700
 
 /**
  * Theme variable rows asserted in the help panel (sorted names from `fa-theme.scss` / DOM scan).

@@ -34,7 +34,6 @@
     <q-tooltip
       v-if="!props.isListDragging"
       anchor="top middle"
-      :delay="500"
       self="bottom middle"
     >
       {{ tooltipHex }}

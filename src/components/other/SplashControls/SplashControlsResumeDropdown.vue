@@ -55,7 +55,6 @@
       v-if="showResumeDropdownArrowTooltip"
       anchor="center right"
       self="center left"
-      :delay="300"
       :offset="[10, 0]"
       :target="resumeDropdownArrowTarget"
       transition-hide="fade"

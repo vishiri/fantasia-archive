@@ -12,6 +12,7 @@ import { createI18n } from 'vue-i18n'
 import type { Plugin } from 'vue'
 import * as QuasarAll from 'quasar'
 import { ClosePopup, Dark, Dialog, Notify, Quasar, Ripple } from 'quasar'
+import { runTooltipDefaultsBoot } from 'app/src/boot/scripts/tooltipDefaultsBoot_manager'
 import QMarkdownPlugin from '@quasar/quasar-ui-qmarkdown'
 
 import type { Preview } from '@storybook/vue3-vite'
@@ -133,6 +134,8 @@ setup((app) => {
    * 'isFantasiaStorybookCanvas()' match production Storybook while MainLayout hides language chrome on the canvas.
    */
   setFantasiaStorybookCanvasFlag(true)
+
+  runTooltipDefaultsBoot()
 
   app.use(storybookPinia)
   app.use(storybookI18n)

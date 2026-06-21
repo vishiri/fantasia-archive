@@ -4,6 +4,7 @@ import { ResultAsync } from 'neverthrow'
 import { test, expect, vi } from 'vitest'
 
 import { useWindowAppStylingHelpMenu } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStyling_manager'
+import { FA_Q_TOOLTIP_DELAY_MS } from 'app/src/scripts/appGlobalManagementUI/faQTooltipDelay_manager'
 
 const HelpMenuTestHarness = defineComponent({
   setup () {
@@ -29,7 +30,7 @@ const HelpMenuTestHarness = defineComponent({
 
 /**
  * useWindowAppStylingHelpMenu
- * Hover with the prior tooltip delay flips the menu model on; leave-before-delay cancels.
+ * Hover with FA_Q_TOOLTIP_DELAY_MS flips the menu model on; leave-before-delay cancels.
  */
 test('Test that useWindowAppStylingHelpMenu opens after the hover delay', async () => {
   vi.useFakeTimers()
@@ -38,7 +39,7 @@ test('Test that useWindowAppStylingHelpMenu opens after the hover delay', async 
     (async (): Promise<void> => {
       expect(w.get('[data-test-locator="helpMenuOpenState"]').text()).toBe('0')
       await w.get('[data-test-locator="helpMenuHoverTarget"]').trigger('mouseenter')
-      vi.advanceTimersByTime(499)
+      vi.advanceTimersByTime(FA_Q_TOOLTIP_DELAY_MS - 1)
       await nextTick()
       expect(w.get('[data-test-locator="helpMenuOpenState"]').text()).toBe('0')
       vi.advanceTimersByTime(1)
@@ -66,7 +67,7 @@ test('Test that useWindowAppStylingHelpMenu cancels a pending open on mouse leav
       const t = w.get('[data-test-locator="helpMenuHoverTarget"]')
       await t.trigger('mouseenter')
       await t.trigger('mouseleave')
-      vi.advanceTimersByTime(500)
+      vi.advanceTimersByTime(FA_Q_TOOLTIP_DELAY_MS)
       await nextTick()
       expect(w.get('[data-test-locator="helpMenuOpenState"]').text()).toBe('0')
     })(),
@@ -89,7 +90,7 @@ test('Test that useWindowAppStylingHelpMenu clears the hover timer on unmount', 
   await w.get('[data-test-locator="helpMenuHoverTarget"]').trigger('mouseenter')
   w.unmount()
   expect(() => {
-    vi.advanceTimersByTime(500)
+    vi.advanceTimersByTime(FA_Q_TOOLTIP_DELAY_MS)
   }).not.toThrow()
   vi.useRealTimers()
 })

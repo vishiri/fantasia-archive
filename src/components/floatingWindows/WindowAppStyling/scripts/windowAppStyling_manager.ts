@@ -17,6 +17,7 @@ import {
   useFaFloatingWindowFrame,
   useFaFloatingWindowFramePersist
 } from 'app/src/scripts/floatingWindows/floatingWindows_manager'
+import { FA_Q_TOOLTIP_DELAY_MS } from 'app/src/scripts/appGlobalManagementUI/faQTooltipDelay_manager'
 import * as faThemeModule from 'app/src/scripts/faTheme/faTheme_manager'
 import { runFaActionAwait } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
 import * as dialogStoreModule from 'src/stores/S_Dialog'
@@ -32,6 +33,7 @@ const windowAppStylingApi = createWindowAppStyling({
   FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
   FA_FLOATING_WINDOW_POP_TRANSITION_MS,
   FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS,
+  faQTooltipDelayMs: FA_Q_TOOLTIP_DELAY_MS,
   Result,
   ResultAsync,
   S_DialogComponent: () => dialogStoreModule.S_DialogComponent(),

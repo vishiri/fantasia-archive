@@ -42,7 +42,6 @@
           v-if="!isLanguageMenuOpen"
           anchor="bottom middle"
           self="top middle"
-          :delay="300"
           transition-hide="fade"
           :transition-duration="280"
         >

@@ -46,7 +46,7 @@ Every **`.vue`** SFC: **`<template>`** → **`<script>`** / **`<script setup>`**
 - **Theme tokens**: feature **`styles/_variables.scss`**, [`src/css/theme/quasar-components/`](../../../src/css/theme/quasar-components/), globals partials, [`app.palette.scss`](../../../src/css/app.palette.scss) — see [project-scss.mdc](../../rules/project-scss.mdc). **`--fa-color-*`** on **`:root`** in **`fa-theme.scss`**; semantic utilities in **`faSemanticText.scss`**. **Do not** reference raw palette **`$primary`**, **`$grey`**, … in **`<style>`** — use semantic tokens. After **`quasar-components/`** edits: **`yarn audit:quasar-component-tokens`**. **`$`** names use hyphens, not underscores.
 - **Scrollable areas**: class **`hasScrollbar`** — [`scrollbar.scss`](../../../src/css/globals/scrollbar.scss)
 - **Inline code**: **`<code class="code-token">`**
-- Boot: `src/boot/`
+- Boot: `src/boot/` — **`tooltip-defaults`** sets global **`q-tooltip`** **`delay`** (**`FA_Q_TOOLTIP_DELAY_MS`**, 500 ms)
 - **`import type`** for type-only imports
 - Templates: **`$t('...')`** — avoid **`useI18n`** only for **`t`** when template binding works
 

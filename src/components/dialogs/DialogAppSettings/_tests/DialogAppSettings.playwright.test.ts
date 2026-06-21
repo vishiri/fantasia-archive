@@ -2,7 +2,10 @@ import type { ElectronApplication, Page } from 'playwright'
 import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 import { launchFaPlaywrightComponentHarnessWindow } from 'app/helpers/playwrightHelpers_component/faPlaywrightComponentHarnessLifecycle'
-import { FA_FRONTEND_RENDER_TIMER } from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
+import {
+  FA_FRONTEND_RENDER_TIMER,
+  FA_PLAYWRIGHT_Q_TOOLTIP_OPEN_SETTLE_MS
+} from 'app/helpers/playwrightHelpers_universal/faPlaywrightElectronLaunchConstants'
 import { tearDownFaPlaywrightElectronSerialSuite } from 'app/helpers/playwrightHelpers_universal/faPlaywrightSerialSuiteLifecycleTeardown'
 import { APP_SETTINGS_OPTIONS } from 'app/src/components/dialogs/DialogAppSettings/_data/appSettingsOptions'
 
@@ -27,9 +30,9 @@ const extraEnvSettings = {
 const faFrontendRenderTimer:number = FA_FRONTEND_RENDER_TIMER
 
 /**
- * q-tooltip open delay on the help icon is 500ms; allow extra slack for Electron, dialog layout, and tab-panel paint.
+ * q-tooltip open delay uses FA_Q_TOOLTIP_DELAY_MS; allow extra slack for Electron, dialog layout, and tab-panel paint.
  */
-const appSettingsTooltipOpenDelayMs = 1400
+const appSettingsTooltipOpenDelayMs = FA_PLAYWRIGHT_Q_TOOLTIP_OPEN_SETTLE_MS
 
 /**
  * Timeout for the single live q-tooltip visibility check (first setting row only).

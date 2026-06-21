@@ -32,7 +32,6 @@
               :aria-label="$t('dialogs.keybindSettings.captureHelpAria')"
             >
               <q-tooltip
-                :delay="500"
                 class="dialogKeybindSettingsCapture__tooltip"
               >
                 <div class="dialogKeybindSettingsCapture__tooltipShell">

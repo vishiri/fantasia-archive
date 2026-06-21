@@ -20,9 +20,7 @@
             class="dialogAppSettings__settingHelpIcon q-ml-md"
             :data-test-tooltip-text="setting.description"
           >
-            <q-tooltip
-              :delay="500"
-            >
+            <q-tooltip>
               {{ setting.description }}
             </q-tooltip>
           </q-icon>

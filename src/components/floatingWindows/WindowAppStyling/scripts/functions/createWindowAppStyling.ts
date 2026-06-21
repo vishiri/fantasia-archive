@@ -19,6 +19,7 @@ export function createWindowAppStyling (deps: {
   FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS: Record<string, string | boolean>
   FA_FLOATING_WINDOW_POP_TRANSITION_MS: number
   FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS: number
+  faQTooltipDelayMs: number
   Result: T_injectedResult
   ResultAsync: T_injectedResultAsync
   S_DialogComponent: () => { dialogToOpen?: unknown; dialogUUID?: unknown }
@@ -91,9 +92,6 @@ export function createWindowAppStyling (deps: {
     }
     useWindowAppStylingSurface: (props: { directInput?: T_dialogName }) => I_WindowAppStylingSurface
   } {
-/** Matches the previous QTooltip delay on the styling help icon (ms). */
-  const WINDOW_APP_STYLING_HELP_HOVER_OPEN_DELAY_MS = 500
-
   type T_resolvedDialogComponentStore = ReturnType<typeof deps.S_DialogComponent> | null
 
   function resolveDialogComponentStore (): T_resolvedDialogComponentStore {
@@ -457,7 +455,7 @@ export function createWindowAppStyling (deps: {
       helpMenuHoverTimer = setTimeout(() => {
         helpMenuHoverTimer = undefined
         helpKeybindMenuOpen.value = true
-      }, WINDOW_APP_STYLING_HELP_HOVER_OPEN_DELAY_MS)
+      }, deps.faQTooltipDelayMs)
     }
 
     function onHelpIconMouseLeave (): void {

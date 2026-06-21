@@ -26,6 +26,7 @@ Every **`.vue`** SFC: top-level blocks **only** in order: **`<template>`**, **`<
 - **Hierarchical trees**: **`@he-tree/vue`** (`BaseTree`, `Draggable`) only — **never** **`QTree`** / **`q-tree`**. Import **`@he-tree/vue/style/default.css`**; Quasar node chrome in slots; **`virtualization`** when lists may grow large. [fa-he-tree.mdc](fa-he-tree.mdc), [fantasia-he-tree skill](../skills/fantasia-he-tree/SKILL.md).
 - **List / table DnD**: Flat lists **`vue-draggable-plus`**; **`QTable`** rows **`v-draggable-table`** from **`quasar-ui-q-draggable-table`** (boot **`q-draggable-table`**). **No** vue-draggable-plus on **`QTable`** or he-tree nodes. [fa-drag-drop-lists.mdc](fa-drag-drop-lists.mdc), [fantasia-drag-drop skill](../skills/fantasia-drag-drop/SKILL.md).
 - Storybook mocks: import specific non-markdown `L_*` locale modules directly — never full `en-US/index.ts`; placeholder strings for `documents.*`. [fantasia-i18n skill](../skills/fantasia-i18n/SKILL.md).
+- **`q-tooltip` hover delay**: default **`FA_Q_TOOLTIP_DELAY_MS`** (**500** ms) via boot **`tooltip-defaults`** — patches Quasar **`QTooltip`** default **`delay`**. **Do not** set **`:delay`** on **`q-tooltip`** unless intentionally different; use **`FA_Q_TOOLTIP_DELAY_MS`** from **`faQTooltipDelay_manager`** for custom hover timers (e.g. **`QMenu`** mirroring tooltip timing, or **`QTooltip.show()`** after **`mouseenter`**). Playwright: **`FA_PLAYWRIGHT_Q_TOOLTIP_OPEN_SETTLE_MS`** in **`faPlaywrightElectronLaunchConstants`**.
 
 ## After UI changes
 

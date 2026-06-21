@@ -37,6 +37,7 @@ export default defineConfig((ctx) => {
       'axios',
       'externalLinkManagement',
       'notify-defaults',
+      'tooltip-defaults',
       'q-draggable-table',
       'qmarkdown',
       'faProjectFailsafePathReply',

@@ -70,6 +70,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Desktop | Electron |
 | State | Pinia, Vue Router |
 | i18n | vue-i18n — repo-root **`i18n/`** |
+| Boot | **`src/boot/`** — **`tooltip-defaults`** patches global **`q-tooltip`** delay (**`FA_Q_TOOLTIP_DELAY_MS`**, 500 ms) |
 | Lint/types | ESLint, **`vue-tsc`**, Stylelint |
 | Unit | Vitest — **`yarn test:unit`**; gate **`yarn testbatch:verify`** |
 | UI/E2E | Playwright — rebuild Electron before runs |

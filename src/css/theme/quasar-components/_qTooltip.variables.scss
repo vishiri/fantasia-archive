@@ -7,3 +7,4 @@ $qTooltip-fontSize: 13px;
 $qTooltip-fontWeight: 600;
 $qTooltip-maxWidth: 400px;
 $qTooltip-zIndex: 999999999;
+/* Open delay: FA_Q_TOOLTIP_DELAY_MS (500) in src/scripts/appGlobalManagementUI/functions/faQTooltipDelay.ts — boot tooltip-defaults patches QTooltip. */
