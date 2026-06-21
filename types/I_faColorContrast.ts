@@ -1,5 +1,5 @@
 /** Default app negative hex aligned with --fa-color-negative in fa-theme.scss. */
-export const FA_COLOR_CONTRAST_NEGATIVE_HEX = '#fb2929'
+export const FA_COLOR_CONTRAST_NEGATIVE_HEX = '#ff4040'
 
 /** Black foreground candidate for low-contrast icon overlays. */
 export const FA_COLOR_CONTRAST_BLACK_HEX = '#000000'
