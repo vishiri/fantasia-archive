@@ -43,6 +43,12 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
       submenu: hasRecent ? buildLoadRecentSubmenu(recent) : undefined
     }),
     faMenuSeparator(),
+    faMenuItem('appControlMenus.project.items.showProjectDashboard', 'mdi-chart-bar', {
+      conditions: gate,
+      keybindCommandId: 'showProjectDashboard',
+      trigger: () => runFaAction('showProjectDashboard', undefined)
+    }),
+    faMenuSeparator(),
     faMenuItem('appControlMenus.project.items.toggleProjectNoteboard', 'mdi-note-text-outline', {
       conditions: gate,
       keybindCommandId: 'toggleProjectNoteboard',
@@ -52,11 +58,6 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
       conditions: gate,
       keybindCommandId: 'openProjectStyling',
       trigger: () => runFaAction('openProjectStylingDialog', undefined)
-    }),
-    faMenuItem('appControlMenus.project.items.showProjectDashboard', 'mdi-chart-bar', {
-      conditions: gate,
-      keybindCommandId: 'showProjectDashboard',
-      trigger: () => runFaAction('showProjectDashboard', undefined)
     }),
     faMenuItem('appControlMenus.project.items.projectSettings', 'mdi-book-cog-outline', {
       conditions: gate,

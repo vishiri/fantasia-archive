@@ -57,23 +57,23 @@ test('Test that buildProjectMenu load existing project row dispatches loadExisti
 test('Test that buildProjectMenu toggle noteboard row dispatches toggleProjectNoteboardWindow', () => {
   const menu = buildProjectMenu(emptyRecentSession(true))
   const items = menu.data.filter((row) => row.mode === 'item')
-  items[3]!.trigger?.()
+  items[4]!.trigger?.()
   expect(runFaActionMock).toHaveBeenCalledWith('toggleProjectNoteboardWindow', undefined)
 })
 
 test('Test that buildProjectMenu custom Project CSS row dispatches openProjectStylingDialog', () => {
   const menu = buildProjectMenu(emptyRecentSession(true))
   const items = menu.data.filter((row) => row.mode === 'item')
-  expect(items[4]!.keybindCommandId).toBe('openProjectStyling')
-  items[4]!.trigger?.()
+  expect(items[5]!.keybindCommandId).toBe('openProjectStyling')
+  items[5]!.trigger?.()
   expect(runFaActionMock).toHaveBeenCalledWith('openProjectStylingDialog', undefined)
 })
 
 test('Test that buildProjectMenu show project dashboard row dispatches showProjectDashboard', () => {
   const menu = buildProjectMenu(emptyRecentSession(true))
   const items = menu.data.filter((row) => row.mode === 'item')
-  expect(items[5]!.keybindCommandId).toBe('showProjectDashboard')
-  items[5]!.trigger?.()
+  expect(items[3]!.keybindCommandId).toBe('showProjectDashboard')
+  items[3]!.trigger?.()
   expect(runFaActionMock).toHaveBeenCalledWith('showProjectDashboard', undefined)
 })
 
