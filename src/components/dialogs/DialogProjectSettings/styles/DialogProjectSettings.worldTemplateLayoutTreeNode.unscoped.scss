@@ -1,3 +1,5 @@
+@use './variables' as *;
+
 .dialogProjectSettingsWorldTemplateLayoutTreeNode {
   box-sizing: border-box;
   min-height: $dialogProjectSettings-worldTemplateLayout-treeNode-minHeight;

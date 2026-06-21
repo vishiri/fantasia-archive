@@ -1,4 +1,4 @@
-import { computed, ref, toRef } from 'vue'
+import { computed, ref, toRef, watch } from 'vue'
 
 import { i18n } from 'app/i18n/externalFileLoader'
 
@@ -9,5 +9,6 @@ export const useDialogProjectSettingsWorldTemplateLayoutTreeNode =
     computed,
     i18n,
     ref,
-    toRef
+    toRef,
+    watch
   })

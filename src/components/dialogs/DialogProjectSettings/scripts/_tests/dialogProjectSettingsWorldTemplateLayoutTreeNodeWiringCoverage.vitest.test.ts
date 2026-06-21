@@ -1,9 +1,10 @@
-import { computed, defineComponent, h, nextTick, ref, toRef } from 'vue'
+import { computed, defineComponent, h, nextTick, ref, toRef, watch } from 'vue'
 import { mount } from '@vue/test-utils'
 import { expect, test, vi } from 'vitest'
 import type { QTooltip } from 'quasar'
 
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring } from '../dialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring'
+import { FA_Q_TOOLTIP_DELAY_MS } from 'app/src/scripts/appGlobalManagementUI/faQTooltipDelay_manager'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeInteractionWiring } from '../dialogProjectSettingsWorldTemplateLayoutTreeNodeInteractionWiring'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuLabelsWiring } from '../dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuLabelsWiring'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuStyleWiring } from '../dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuStyleWiring'
@@ -74,6 +75,7 @@ test('Test that tree node action tooltip wiring dismisses and arms tooltips', ()
 })
 
 test('Test that tree node action tooltip wiring suppresses placement nickname hover tooltip', async () => {
+  vi.useFakeTimers()
   const wiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring()
   const nicknameHide = vi.fn()
   const nicknameShow = vi.fn()
@@ -90,11 +92,32 @@ test('Test that tree node action tooltip wiring suppresses placement nickname ho
   expect(wiring.placementNicknameHoverTooltipEnabled.value).toBe(true)
 
   wiring.revealPlacementNicknameHoverTooltip()
+  expect(nicknameShow).not.toHaveBeenCalled()
+  await vi.advanceTimersByTimeAsync(FA_Q_TOOLTIP_DELAY_MS)
   await nextTick()
   expect(nicknameShow).toHaveBeenCalled()
 
   wiring.hidePlacementNicknameHoverTooltip()
   expect(nicknameHide).toHaveBeenCalled()
+  vi.useRealTimers()
+})
+
+test('Test that tree node action tooltip wiring skips reveal while rename menu is open', async () => {
+  vi.useFakeTimers()
+  const wiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring({
+    getRenameMenuOpen: () => true
+  })
+  const nicknameShow = vi.fn()
+  wiring.placementNicknameHoverTooltipRef.value = {
+    hide: vi.fn(),
+    show: nicknameShow
+  } as unknown as QTooltip
+
+  wiring.revealPlacementNicknameHoverTooltip()
+  await vi.advanceTimersByTimeAsync(FA_Q_TOOLTIP_DELAY_MS)
+  await nextTick()
+  expect(nicknameShow).not.toHaveBeenCalled()
+  vi.useRealTimers()
 })
 
 test('Test that tree node action tooltip wiring dismiss no-ops when refs are null', () => {
@@ -403,7 +426,8 @@ test('Test that tree node use wiring composes presentation and rename handlers',
       }
     },
     ref,
-    toRef
+    toRef,
+    watch
   })
 
   let api!: ReturnType<typeof useTreeNode>

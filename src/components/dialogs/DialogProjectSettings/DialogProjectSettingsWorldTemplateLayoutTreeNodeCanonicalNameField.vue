@@ -11,28 +11,20 @@
       :data-test-locator="props.canonicalNameTestLocator"
       :label="props.templateCanonicalNameLabel"
       :model-value="props.templateCanonicalName"
+      stack-label
     />
     <div class="dialogProjectSettingsWorldTemplateLayoutTreeNode__canonicalNameFieldHelp">
-      <q-icon
-        class="dialogProjectSettingsWorldTemplateLayoutTreeNode__inputHelpIcon"
-        :data-test-locator="props.canonicalNameTooltipIconTestLocator"
-        :data-test-tooltip-text="props.templateCanonicalNameTooltipText"
-        name="mdi-help-circle"
-        size="16px"
-        @click.stop
-      >
-        <q-tooltip
-          :delay="500"
-          content-class="dialogProjectSettings__fieldHelpTooltip"
-        >
-          {{ props.templateCanonicalNameTooltipText }}
-        </q-tooltip>
-      </q-icon>
+      <DialogProjectSettingsWorldTemplateLayoutTreeNodeInputHelpIcon
+        :test-locator="props.canonicalNameTooltipIconTestLocator"
+        :tooltip-text="props.templateCanonicalNameTooltipText"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import DialogProjectSettingsWorldTemplateLayoutTreeNodeInputHelpIcon from './DialogProjectSettingsWorldTemplateLayoutTreeNodeInputHelpIcon.vue'
+
 defineOptions({
   name: 'DialogProjectSettingsWorldTemplateLayoutTreeNodeCanonicalNameField'
 })

@@ -136,12 +136,36 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNode shows placement
     }
   })
 
-  const labelArea = w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-titleRow"]')
-  expect(labelArea.exists()).toBe(true)
-  expect(labelArea.attributes('data-test-tooltip-text')).toBe(
+  const titleRow = w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-titleRow"]')
+  expect(titleRow.exists()).toBe(true)
+  expect(titleRow.attributes('data-test-tooltip-text')).toBe(
     'dialogs.projectSettings.fields.worldTemplateLayout.placementNicknameHoverNicknameLabel - Nickname of doom\ndialogs.projectSettings.fields.worldTemplateLayout.placementNicknameHoverOriginalNameLabel - Character'
   )
-  expect(labelArea.find('.q-tooltip-stub').exists()).toBe(true)
+  expect(titleRow.find('.q-tooltip-stub').exists()).toBe(true)
+})
+
+test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNode suppresses placement nickname hover tooltip over action buttons', () => {
+  const w = mount(DialogProjectSettingsWorldTemplateLayoutTreeNode, {
+    props: {
+      node: {
+        ...templateNode,
+        label: 'Nickname of doom',
+        nickname: 'Nickname of doom',
+        templateDisplayName: 'Character',
+        usesNickname: true
+      }
+    },
+    global: {
+      stubs: treeNodeStubs
+    }
+  })
+
+  const editButton = w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-edit"]')
+  const actions = editButton.element.parentElement
+  expect(actions?.classList.contains('dialogProjectSettingsWorldTemplateLayoutTreeNode__actions')).toBe(true)
+  expect(editButton.attributes('data-test-tooltip-text')).toBe(
+    'dialogs.projectSettings.fields.worldTemplateLayout.editTemplateTooltip'
+  )
 })
 
 test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNode omits placement nickname hover tooltip without nickname', () => {

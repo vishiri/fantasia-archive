@@ -1,0 +1,11 @@
+@use './variables' as *;
+
+.dialogProjectSettingsVerticalTabListFilterInput {
+  flex: 0 0 $dialogProjectSettings-worldTemplateLayout-availableFilterInput-width;
+  width: $dialogProjectSettings-worldTemplateLayout-availableFilterInput-width;
+
+  &--stretchToColumnEdge {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+}

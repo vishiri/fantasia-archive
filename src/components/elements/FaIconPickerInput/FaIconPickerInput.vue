@@ -14,7 +14,7 @@
       round
       @click="openPickerMenu"
     >
-      <q-tooltip :delay="500">
+      <q-tooltip>
         <div>{{ $t('faIconPickerInput.triggerTooltipClick') }}</div>
         <div>
           {{ $t('faIconPickerInput.triggerTooltipCurrentIcon', { iconName: previewIconName }) }}

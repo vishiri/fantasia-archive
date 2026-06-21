@@ -1,5 +1,6 @@
 <template>
   <Draggable
+    ref="treeScrollRef"
     :key="treeLayoutSyncKey"
     :model-value="treeData"
     class="dialogProjectSettingsWorldTemplateLayoutTree hasScrollbar"
@@ -42,10 +43,14 @@ import type { I_dialogProjectSettingsWorldTemplateLayoutDraft } from 'app/types/
 import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
 import {
   DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_INDENT_PX,
+  DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_NODE_ITEM_SELECTOR,
+  countDialogProjectSettingsWorldTemplateLayoutDraftNodes,
   mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey
 } from './scripts/functions/dialogProjectSettingsWorldTemplateLayoutTreeData'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeWiring } from './scripts/dialogProjectSettingsWorldTemplateLayoutTreeWiring'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeSyncWiring } from './scripts/dialogProjectSettingsWorldTemplateLayoutTreeSyncWiring'
+import { createDialogProjectSettingsScrollOnAppendWatch } from './scripts/dialogProjectSettingsScrollOnAppendWiring'
+import { resolveVueComponentRootElement } from 'app/src/scripts/dom/functions/resolveVueComponentRootElement'
 import {
   isDialogProjectSettingsWorldTemplateLayoutNodeDraggable,
   isDialogProjectSettingsWorldTemplateLayoutNodeDroppable,
@@ -75,6 +80,7 @@ const emit = defineEmits<{
 }>()
 
 const treeData = ref<I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode[]>([])
+const treeScrollRef = ref<unknown>(null)
 const suppressTreeEmit = ref(false)
 const isTreeDragActive = ref(false)
 const dragCommitPending = ref(false)
@@ -125,6 +131,15 @@ watch(() => props.templateLayout, () => {
 }, {
   deep: true,
   immediate: true
+})
+
+createDialogProjectSettingsScrollOnAppendWatch({
+  getCount: () => countDialogProjectSettingsWorldTemplateLayoutDraftNodes(props.templateLayout),
+  getScrollContainer: () => resolveVueComponentRootElement(treeScrollRef.value),
+  itemSelector: DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_NODE_ITEM_SELECTOR,
+  nextTick,
+  requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
+  watch
 })
 
 function eachDraggableHandler (stat: { data: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode }): boolean {

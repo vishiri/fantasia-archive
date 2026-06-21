@@ -15,6 +15,7 @@
         class="dialogProjectSettingsWorldAvailableTemplatesList__item"
         :data-test-locator="`dialogProjectSettings-worldAvailableTemplate-${template.id}`"
         @click="emitAddTemplate(template.id)"
+        @contextmenu.prevent="onItemContextMenu"
       >
         <q-item-section>
           <div class="dialogProjectSettingsWorldAvailableTemplatesList__itemBody column">
@@ -50,6 +51,13 @@
       </q-item>
     </q-list>
     <div
+      v-else-if="props.showFilterEmpty"
+      class="dialogProjectSettingsWorldAvailableTemplatesList__empty fa-text-muted"
+      data-test-locator="dialogProjectSettings-worldAvailableTemplatesFilterEmpty"
+    >
+      {{ $t('dialogs.projectSettings.fields.worldTemplateLayout.emptyFilteredAvailableTemplates') }}
+    </div>
+    <div
       v-else
       class="dialogProjectSettingsWorldAvailableTemplatesList__empty fa-text-muted"
       data-test-locator="dialogProjectSettings-worldAvailableTemplatesEmpty"
@@ -62,6 +70,7 @@
 <script setup lang="ts">
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import { FA_ICON_PICKER_EMPTY_PLACEHOLDER_ICON } from 'app/types/I_faIconPickerInput'
+import { clearQuasarHoverableFocusState } from 'app/src/scripts/dom/functions/clearQuasarHoverableFocusState'
 import { resolveDialogProjectSettingsDocumentTemplateDisplayIcon } from './scripts/functions/dialogProjectSettingsDocumentTemplatesDraft'
 
 defineOptions({
@@ -69,6 +78,7 @@ defineOptions({
 })
 
 const props = defineProps<{
+  showFilterEmpty?: boolean
   templates: I_dialogProjectSettingsDocumentTemplateDraft[]
 }>()
 
@@ -79,7 +89,14 @@ const emit = defineEmits<{
 function emitAddTemplate (templateId: string): void {
   emit('addTemplate', templateId)
 }
+
+function onItemContextMenu (event: MouseEvent): void {
+  const target = event.currentTarget
+  clearQuasarHoverableFocusState(target instanceof HTMLElement ? target : null)
+}
 </script>
+
+<style lang="scss" src="./styles/DialogProjectSettings.worldAvailableTemplatesList.unscoped.scss"></style>
 
 <style lang="scss" scoped>
 .dialogProjectSettingsWorldAvailableTemplatesList {
@@ -99,6 +116,7 @@ function emitAddTemplate (templateId: string): void {
 }
 
 .dialogProjectSettingsWorldAvailableTemplatesList__item {
+  cursor: pointer;
   min-height: $dialogProjectSettings-worldTemplateLayout-availableListItem-minHeight;
   padding:
     $dialogProjectSettings-worldTemplateLayout-availableListItem-paddingBlock

@@ -73,7 +73,7 @@
           :icon="iconName"
           @click="emitIconSelect(iconName)"
         >
-          <q-tooltip :delay="400">
+          <q-tooltip>
             {{ iconName }}
           </q-tooltip>
         </q-btn>

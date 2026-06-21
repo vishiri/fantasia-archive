@@ -1,9 +1,58 @@
+@use './variables' as *;
+
 .faVerticalDraggableTabs.dialogProjectSettingsWorldsTabList,
 .faVerticalDraggableTabs.dialogProjectSettingsDocumentTemplatesTabList {
+  align-self: stretch;
   flex: 0 0 var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
+  max-height: 100%;
   max-width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
+  min-height: 0;
   min-width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
+  overflow: hidden;
   width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
+
+  .faVerticalDraggableTabs__scroll {
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .faVerticalDraggableTabs__divider,
+  .faVerticalDraggableTabs__addButtonRow,
+  .faVerticalDraggableTabs__filterRow {
+    flex: 0 0 auto;
+  }
+
+  .faVerticalDraggableTabs__filterRow {
+    box-sizing: border-box;
+    display: flex;
+    padding-left: $dialogProjectSettings-verticalTabListFilterRow-paddingInline;
+    padding-right: $dialogProjectSettings-verticalTabListFilterRow-paddingInline;
+    width: 100%;
+  }
+
+  .dialogProjectSettingsWorldsTabList__filterEmpty,
+  .dialogProjectSettingsDocumentTemplatesTabList__filterEmpty {
+    padding:
+      $dialogProjectSettings-worldTemplateLayout-availableListEmpty-paddingBlock
+      $dialogProjectSettings-worldTemplateLayout-availableCol-paddingInline;
+    text-align: center;
+  }
+}
+
+.faVerticalDraggableTabs.dialogProjectSettingsDocumentTemplatesTabList {
+  flex-basis: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-documentTemplatesTabList-width});
+  max-width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-documentTemplatesTabList-width});
+  min-width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-documentTemplatesTabList-width});
+  width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-documentTemplatesTabList-width});
+
+  .faVerticalDraggableTabs__filterRow {
+    padding-bottom: $dialogProjectSettings-documentTemplatesTabListFilterRow-paddingBottom;
+  }
 }
 
 .dialogProjectSettingsWorldsTabItem__colorSwatch {

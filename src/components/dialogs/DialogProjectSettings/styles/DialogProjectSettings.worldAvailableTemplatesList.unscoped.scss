@@ -1,0 +1,16 @@
+@use './variables' as *;
+
+.dialogProjectSettingsWorldAvailableTemplatesList__item {
+  &.q-hoverable:hover > .q-focus-helper {
+    opacity: $qFocusable-hoverHelper-opacity !important;
+  }
+
+  &:not(:hover) > .q-focus-helper {
+    opacity: 0 !important;
+
+    &::before,
+    &::after {
+      opacity: 0 !important;
+    }
+  }
+}

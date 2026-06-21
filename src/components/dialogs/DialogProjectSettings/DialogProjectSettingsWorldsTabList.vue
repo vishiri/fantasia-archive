@@ -5,13 +5,26 @@
     class="faVerticalDraggableTabs dialogProjectSettingsWorldsTabList"
     :data-test-layout-width="String(props.tabListWidthPx)"
   >
+    <div class="faVerticalDraggableTabs__filterRow">
+      <DialogProjectSettingsVerticalTabListFilterInput
+        v-model="filterQuery"
+        stretch-to-column-edge
+        aria-label-key="dialogs.projectSettings.panels.worlds.filterAriaLabel"
+        clear-aria-label-key="dialogs.projectSettings.panels.worlds.filterClearAriaLabel"
+        placeholder-key="dialogs.projectSettings.panels.worlds.filterPlaceholder"
+        test-locator-clear="dialogProjectSettings-worldsFilterClear"
+        test-locator-input="dialogProjectSettings-worldsFilterInput"
+      />
+    </div>
+
     <div
-      class="faVerticalDraggableTabs__scroll hasScrollbar"
+      ref="tabListScrollRef"
+      class="faVerticalDraggableTabs__scroll"
       data-test-locator="dialogProjectSettings-worlds-list"
     >
       <VueDraggable
         v-bind="faVerticalDraggableTabsSortableDragOptions"
-        v-model="draggableWorlds"
+        v-model="sortableWorlds"
         :animation="150"
         :set-data="hideNativeSortableDragGhost"
         :touch-start-threshold="5"
@@ -20,7 +33,7 @@
         @start="onWorldsDragStart"
       >
         <DialogProjectSettingsWorldsTabItem
-          v-for="world in draggableWorlds"
+          v-for="world in sortableWorlds"
           :key="world.id"
           :is-being-dragged="world.id === draggingWorldId"
           :is-list-dragging="draggingWorldId !== null"
@@ -30,19 +43,26 @@
           @select="emit('select', $event)"
         />
       </VueDraggable>
-
-      <q-separator class="faVerticalDraggableTabs__divider" />
-
-      <div class="faVerticalDraggableTabs__addButtonRow">
-        <q-btn
-          outline
-          class="faVerticalDraggableTabs__addButton"
-          color="primary-bright"
-          :label="$t('dialogs.projectSettings.panels.worlds.addWorldButton')"
-          data-test-locator="dialogProjectSettings-worlds-addButton"
-          @click="emit('addWorld')"
-        />
+      <div
+        v-if="showFilterEmpty"
+        class="dialogProjectSettingsWorldsTabList__filterEmpty fa-text-muted"
+        data-test-locator="dialogProjectSettings-worldsFilterEmpty"
+      >
+        {{ $t('dialogs.projectSettings.panels.worlds.emptyFilteredWorlds') }}
       </div>
+    </div>
+
+    <q-separator class="faVerticalDraggableTabs__divider" />
+
+    <div class="faVerticalDraggableTabs__addButtonRow">
+      <q-btn
+        outline
+        class="faVerticalDraggableTabs__addButton"
+        color="primary-bright"
+        :label="$t('dialogs.projectSettings.panels.worlds.addWorldButton')"
+        data-test-locator="dialogProjectSettings-worlds-addButton"
+        @click="emit('addWorld')"
+      />
     </div>
   </div>
 </template>
@@ -50,7 +70,7 @@
 <script setup lang="ts">
 // faVerticalDraggableTabs column host — layout props and drag wiring documented in
 // .cursor/skills/fantasia-drag-drop/SKILL.md (Vertical draggable tab strips).
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, nextTick } from 'vue'
 import { VueDraggable } from 'vue-draggable-plus'
 import type { SortableEvent } from 'sortablejs'
 
@@ -71,7 +91,10 @@ import {
   FA_VERTICAL_DRAGGABLE_TABS_TAB_TEXT_ALIGN_DEFAULT,
   buildFaVerticalDraggableTabsRootStyle
 } from 'app/src/scripts/faDragDrop/functions/buildFaVerticalDraggableTabsRootStyle'
+import DialogProjectSettingsVerticalTabListFilterInput from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsVerticalTabListFilterInput.vue'
 import DialogProjectSettingsWorldsTabItem from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsWorldsTabItem.vue'
+import { filterDialogProjectSettingsWorldsByQuery } from './scripts/functions/filterDialogProjectSettingsWorldsByQuery'
+import { createDialogProjectSettingsFilteredVerticalTabListSortableWiring } from './scripts/dialogProjectSettingsFilteredVerticalTabListSortableWiring'
 import { hideNativeSortableDragGhost } from 'app/src/scripts/faDragDrop/functions/hideNativeSortableDragGhost'
 import {
   applyFaVerticalDraggableTabsDocumentDragCursor,
@@ -79,6 +102,7 @@ import {
 } from 'app/src/scripts/faDragDrop/functions/faVerticalDraggableTabsDocumentDragCursor'
 import { faVerticalDraggableTabsSortableDragOptions } from 'app/src/scripts/faDragDrop/functions/faVerticalDraggableTabsSortableDragOptions'
 import { readFaSortableDragItemDataAttribute } from 'app/src/scripts/faDragDrop/functions/readFaSortableDragItemDataAttribute'
+import { createDialogProjectSettingsScrollOnAppendWatch } from './scripts/dialogProjectSettingsScrollOnAppendWiring'
 
 defineOptions({
   name: 'DialogProjectSettingsWorldsTabList'
@@ -121,7 +145,23 @@ const draggableWorlds = ref<I_dialogProjectSettingsWorldDraft[]>(
   cloneWorldDraftList(props.worlds)
 )
 
+const tabListScrollRef = ref<HTMLElement | null>(null)
+
 const draggingWorldId = ref<string | null>(null)
+
+const filterQuery = ref('')
+
+const {
+  applySortableListToFull,
+  showFilterEmpty,
+  sortableList: sortableWorlds,
+  syncSortableListFromFull
+} = createDialogProjectSettingsFilteredVerticalTabListSortableWiring({
+  cloneList: cloneWorldDraftList,
+  filterItems: filterDialogProjectSettingsWorldsByQuery,
+  filterQuery,
+  fullList: draggableWorlds
+})
 
 const faVerticalDraggableTabsRootClassList = computed(() => ({
   'faVerticalDraggableTabs--listDragging': draggingWorldId.value !== null
@@ -141,9 +181,19 @@ watch(
   () => props.worlds,
   (nextWorlds) => {
     draggableWorlds.value = cloneWorldDraftList(nextWorlds)
+    syncSortableListFromFull()
   },
   { deep: true }
 )
+
+createDialogProjectSettingsScrollOnAppendWatch({
+  getCount: () => props.worlds.length,
+  getScrollContainer: () => tabListScrollRef.value,
+  itemSelector: '.faVerticalDraggableTabs__tab',
+  nextTick,
+  requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
+  watch
+})
 
 function onWorldsDragStart (event: SortableEvent): void {
   draggingWorldId.value = readFaSortableDragItemDataAttribute(
@@ -156,6 +206,7 @@ function onWorldsDragStart (event: SortableEvent): void {
 function onWorldsDragEnd (): void {
   draggingWorldId.value = null
   clearFaVerticalDraggableTabsDocumentDragCursor()
+  applySortableListToFull()
   emit('update:worlds', cloneWorldDraftList(draggableWorlds.value))
 }
 

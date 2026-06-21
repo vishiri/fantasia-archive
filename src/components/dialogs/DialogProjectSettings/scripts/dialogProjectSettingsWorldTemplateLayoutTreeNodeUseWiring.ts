@@ -11,6 +11,7 @@ type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeUseDeps = {
   }
   ref: typeof import('vue').ref
   toRef: typeof import('vue').toRef
+  watch: typeof import('vue').watch
 }
 
 export function createUseDialogProjectSettingsWorldTemplateLayoutTreeNode (

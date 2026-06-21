@@ -2,6 +2,8 @@ import { nextTick, ref } from 'vue'
 import type { Ref } from 'vue'
 import type { QTooltip } from 'quasar'
 
+import { FA_Q_TOOLTIP_DELAY_MS } from 'app/src/scripts/appGlobalManagementUI/faQTooltipDelay_manager'
+
 type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring = {
   armEditTooltip: () => void
   armPlacementNicknameHoverTooltip: () => void
@@ -19,13 +21,25 @@ type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring = {
   suppressPlacementNicknameHoverTooltip: () => void
 }
 
-export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring (): T_dialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring {
+export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring (deps?: {
+  getRenameMenuOpen?: () => boolean
+}): T_dialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring {
   const editTooltipRef = ref<QTooltip | null>(null)
   const removeTooltipRef = ref<QTooltip | null>(null)
   const placementNicknameHoverTooltipRef = ref<QTooltip | null>(null)
   const editTooltipHoverEnabled = ref(true)
   const removeTooltipHoverEnabled = ref(true)
   const placementNicknameHoverTooltipEnabled = ref(true)
+
+  let placementNicknameHoverRevealTimerId: ReturnType<typeof setTimeout> | undefined
+
+  function clearPlacementNicknameHoverRevealTimer (): void {
+    if (placementNicknameHoverRevealTimerId === undefined) {
+      return
+    }
+    clearTimeout(placementNicknameHoverRevealTimerId)
+    placementNicknameHoverRevealTimerId = undefined
+  }
 
   function dismissEditTooltip (): void {
     editTooltipRef.value?.hide()
@@ -38,6 +52,7 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTool
   }
 
   function suppressPlacementNicknameHoverTooltip (): void {
+    clearPlacementNicknameHoverRevealTimer()
     placementNicknameHoverTooltipRef.value?.hide()
     placementNicknameHoverTooltipEnabled.value = false
   }
@@ -55,16 +70,24 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTool
   }
 
   function revealPlacementNicknameHoverTooltip (): void {
+    if (deps?.getRenameMenuOpen?.()) {
+      return
+    }
     armPlacementNicknameHoverTooltip()
-    void nextTick(() => {
-      if (!placementNicknameHoverTooltipEnabled.value) {
-        return
-      }
-      placementNicknameHoverTooltipRef.value?.show()
-    })
+    clearPlacementNicknameHoverRevealTimer()
+    placementNicknameHoverRevealTimerId = setTimeout(() => {
+      placementNicknameHoverRevealTimerId = undefined
+      void nextTick(() => {
+        if (!placementNicknameHoverTooltipEnabled.value) {
+          return
+        }
+        placementNicknameHoverTooltipRef.value?.show()
+      })
+    }, FA_Q_TOOLTIP_DELAY_MS)
   }
 
   function hidePlacementNicknameHoverTooltip (): void {
+    clearPlacementNicknameHoverRevealTimer()
     placementNicknameHoverTooltipRef.value?.hide()
   }
 

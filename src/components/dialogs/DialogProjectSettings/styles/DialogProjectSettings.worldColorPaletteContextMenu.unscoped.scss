@@ -9,6 +9,7 @@
 
 .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuItem {
   min-height: $dialogProjectSettings-worldColorPalette-contextMenu-item-minHeight;
+  text-shadow: 0 0 3px var(--fa-color-black, #000);
 
   &:hover:not([aria-disabled='true']),
   &:focus:not([aria-disabled='true']) {

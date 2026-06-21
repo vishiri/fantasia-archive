@@ -1,5 +1,6 @@
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeInteractionWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeInteractionWiring'
+import { wireDialogProjectSettingsWorldTemplateLayoutTreeNodePlacementNicknameTooltipRenameMenu } from './dialogProjectSettingsWorldTemplateLayoutTreeNodePlacementNicknameTooltipRenameMenuWiring'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuNodeWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuNodeWiring'
 import { bindDialogProjectSettingsWorldTemplateLayoutTreeNodeUseApi } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeUseApiWiring'
@@ -15,6 +16,7 @@ export function useDialogProjectSettingsWorldTemplateLayoutTreeNodeImpl (
     }
     ref: typeof import('vue').ref
     toRef: typeof import('vue').toRef
+    watch: typeof import('vue').watch
   },
   props: {
     blankGroupIds?: ReadonlySet<string>
@@ -31,7 +33,10 @@ export function useDialogProjectSettingsWorldTemplateLayoutTreeNodeImpl (
 ): ReturnType<typeof bindDialogProjectSettingsWorldTemplateLayoutTreeNodeUseApi> {
   const nodeAnchorRef = deps.ref<HTMLElement | null>(null)
   const nodeRef = deps.toRef(props, 'node')
-  const actionTooltipsWiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring()
+  let getRenameMenuOpen = (): boolean => false
+  const actionTooltipsWiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring({
+    getRenameMenuOpen: () => getRenameMenuOpen()
+  })
   const presentationWiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring({
     computed: deps.computed,
     i18n: deps.i18n,
@@ -48,6 +53,14 @@ export function useDialogProjectSettingsWorldTemplateLayoutTreeNodeImpl (
     getNode: () => nodeRef.value,
     i18n: deps.i18n,
     nodeAnchorRef
+  })
+
+  getRenameMenuOpen = (): boolean => renameMenuWiring.renameMenuOpen.value
+
+  wireDialogProjectSettingsWorldTemplateLayoutTreeNodePlacementNicknameTooltipRenameMenu({
+    actionTooltipsWiring,
+    renameMenuOpen: renameMenuWiring.renameMenuOpen,
+    watch: deps.watch
   })
 
   const interactionWiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeInteractionWiring({

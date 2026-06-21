@@ -54,6 +54,7 @@ test('Test that DialogProjectSettingsWorldsTabList renders add world and list ho
 
   expect(w.find('[data-test-locator="dialogProjectSettings-worlds-addButton"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="dialogProjectSettings-worlds-list"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="dialogProjectSettings-worldsFilterInput"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="dialogProjectSettings-worlds-tab-stub"]').exists()).toBe(true)
 })
 
@@ -220,4 +221,188 @@ test('Test that DialogProjectSettingsWorldsTabList forwards tab selection', asyn
 
   await w.find('[data-test-locator="dialogProjectSettings-worlds-tab"]').trigger('click')
   expect(w.emitted('select')?.[0]).toEqual([worldsFixture[0].id])
+})
+
+const worldsFilterFixture = [
+  {
+    color: '',
+    colorPallete: '',
+    displayName: 'Gungala',
+    documentCount: 0,
+    templateLayout: {
+      groups: [],
+      placements: []
+    },
+    id: '550e8400-e29b-41d4-a716-446655440001'
+  },
+  {
+    color: '',
+    colorPallete: '',
+    displayName: 'New world',
+    documentCount: 0,
+    templateLayout: {
+      groups: [],
+      placements: []
+    },
+    id: '550e8400-e29b-41d4-a716-446655440002'
+  }
+]
+
+/**
+ * DialogProjectSettingsWorldsTabList
+ * Filters visible world tabs by display name while filter text is entered.
+ */
+test('Test that DialogProjectSettingsWorldsTabList filters world tabs by display name', async () => {
+  const w = mount(DialogProjectSettingsWorldsTabList, {
+    props: {
+      documentTemplates: [],
+      selectedWorldId: worldsFilterFixture[0].id,
+      worlds: worldsFilterFixture
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      },
+      stubs: {
+        DialogProjectSettingsWorldsTabItem: defineComponent({
+          props: {
+            world: {
+              required: true,
+              type: Object
+            }
+          },
+          template: '<div class="world-tab-stub" :data-test-world-name="world.displayName" />'
+        }),
+        DialogProjectSettingsVerticalTabListFilterInput: defineComponent({
+          props: {
+            modelValue: {
+              default: '',
+              type: String
+            }
+          },
+          emits: ['update:modelValue'],
+          template: '<input class="worlds-filter-stub" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />'
+        }),
+        QBtn: defineComponent({
+          inheritAttrs: true,
+          template: '<button type="button" v-bind="$attrs"><slot /></button>'
+        }),
+        VueDraggable: defineComponent({
+          template: '<div class="vue-draggable-stub"><slot /></div>'
+        })
+      }
+    }
+  })
+
+  expect(w.findAll('.world-tab-stub')).toHaveLength(2)
+
+  await w.find('.worlds-filter-stub').setValue('gung')
+  expect(w.findAll('.world-tab-stub')).toHaveLength(1)
+  expect(w.find('.world-tab-stub').attributes('data-test-world-name')).toBe('Gungala')
+
+  await w.find('.worlds-filter-stub').setValue('missing')
+  expect(w.find('[data-test-locator="dialogProjectSettings-worldsFilterEmpty"]').exists()).toBe(true)
+})
+
+const worldsFilteredReorderFixture = [
+  {
+    color: '',
+    colorPallete: '',
+    displayName: 'Alpha',
+    documentCount: 0,
+    templateLayout: {
+      groups: [],
+      placements: []
+    },
+    id: '550e8400-e29b-41d4-a716-446655440010'
+  },
+  {
+    color: '',
+    colorPallete: '',
+    displayName: 'Middle',
+    documentCount: 0,
+    templateLayout: {
+      groups: [],
+      placements: []
+    },
+    id: '550e8400-e29b-41d4-a716-446655440011'
+  },
+  {
+    color: '',
+    colorPallete: '',
+    displayName: 'Gamma',
+    documentCount: 0,
+    templateLayout: {
+      groups: [],
+      placements: []
+    },
+    id: '550e8400-e29b-41d4-a716-446655440012'
+  }
+]
+
+/**
+ * DialogProjectSettingsWorldsTabList
+ * Merges filtered drag reorder back into the full worlds list.
+ */
+test('Test that DialogProjectSettingsWorldsTabList merges filtered drag reorder into full list', async () => {
+  const w = mount(DialogProjectSettingsWorldsTabList, {
+    props: {
+      documentTemplates: [],
+      selectedWorldId: worldsFilteredReorderFixture[0].id,
+      worlds: worldsFilteredReorderFixture
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      },
+      stubs: {
+        DialogProjectSettingsWorldsTabItem: true,
+        DialogProjectSettingsVerticalTabListFilterInput: defineComponent({
+          props: {
+            modelValue: {
+              default: '',
+              type: String
+            }
+          },
+          emits: ['update:modelValue'],
+          template: '<input class="worlds-filter-stub" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />'
+        }),
+        QBtn: defineComponent({
+          inheritAttrs: true,
+          template: '<button type="button" v-bind="$attrs"><slot /></button>'
+        }),
+        VueDraggable: defineComponent({
+          props: {
+            modelValue: {
+              required: true,
+              type: Array
+            }
+          },
+          emits: ['end', 'update:modelValue'],
+          template: `
+            <div>
+              <slot />
+              <button
+                type="button"
+                data-test-locator="emit-filtered-reorder"
+                @click="
+                  $emit('update:modelValue', [...modelValue].reverse());
+                  $emit('end');
+                "
+              />
+            </div>
+          `
+        })
+      }
+    }
+  })
+
+  await w.find('.worlds-filter-stub').setValue('a')
+  await w.find('[data-test-locator="emit-filtered-reorder"]').trigger('click')
+
+  expect(w.emitted('update:worlds')?.[0]?.[0]).toEqual([
+    worldsFilteredReorderFixture[2],
+    worldsFilteredReorderFixture[1],
+    worldsFilteredReorderFixture[0]
+  ])
 })

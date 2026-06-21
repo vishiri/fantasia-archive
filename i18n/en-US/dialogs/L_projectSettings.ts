@@ -52,6 +52,10 @@ export default {
     worldTemplateLayout: {
       layoutTitle: "World's hierarchical tree",
       availableTemplatesTitle: 'Available document templates',
+      availableTemplatesFilterAriaLabel: 'Filter available document templates',
+      availableTemplatesFilterClearAriaLabel: 'Clear available document templates filter',
+      availableTemplatesFilterPlaceholder: 'Search...',
+      emptyFilteredAvailableTemplates: 'No document templates match your search.',
       addGroupButton: 'Add group',
       defaultNewGroupName: 'New group',
       editGroupTooltip: 'Rename group',
@@ -97,6 +101,10 @@ export default {
       addWorldButton: 'Add world',
       defaultNewWorldName: 'New world',
       deleteWorldButton: 'Delete world',
+      emptyFilteredWorlds: 'No worlds match your search.',
+      filterAriaLabel: 'Filter worlds',
+      filterClearAriaLabel: 'Clear worlds filter',
+      filterPlaceholder: 'Search...',
       deleteConfirm: {
         confirmDeleteButton: 'Confirm delete',
         message: 'Are you sure you want to delete this world? Documents and settings linked to it cannot be recovered afterwards. They will be lost forever.'
@@ -110,6 +118,10 @@ export default {
       addTemplateButton: 'Add document template',
       defaultNewTemplateName: 'New document template',
       deleteTemplateButton: 'Delete Template',
+      emptyFilteredTemplates: 'No document templates match your search.',
+      filterAriaLabel: 'Filter document templates',
+      filterClearAriaLabel: 'Clear document templates filter',
+      filterPlaceholder: 'Search...',
       deleteConfirm: {
         confirmDeleteButton: 'Confirm delete',
         message: 'Are you sure you want to delete this document template? All fields connected to this template in any other template will stop working. Also, all connected documents will stop showing their data if any were filled using this template. This deletion might have unintended side effects.'

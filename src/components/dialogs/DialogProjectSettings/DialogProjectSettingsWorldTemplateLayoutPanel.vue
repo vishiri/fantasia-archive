@@ -44,16 +44,22 @@
       />
 
       <div class="dialogProjectSettingsWorldTemplateLayoutPanel__availableCol col">
-        <div class="dialogProjectSettings__panelTitle">
+        <div
+          class="dialogProjectSettings__panelTitle dialogProjectSettingsWorldTemplateLayoutPanel__availableTitleRow"
+        >
           <span
             class="dialogProjectSettings__fieldLabel fa-text-label text-body2"
             data-test-locator="dialogProjectSettings-worldAvailableTemplatesTitle"
           >
             {{ $t('dialogs.projectSettings.fields.worldTemplateLayout.availableTemplatesTitle') }}
           </span>
+          <DialogProjectSettingsVerticalTabListFilterInput
+            v-model="availableTemplatesFilterQuery"
+          />
         </div>
         <DialogProjectSettingsWorldAvailableTemplatesList
-          :templates="availableTemplates"
+          :show-filter-empty="showAvailableTemplatesFilterEmpty"
+          :templates="filteredAvailableTemplates"
           @add-template="onAddTemplate"
         />
       </div>
@@ -62,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import { i18n } from 'app/i18n/externalFileLoader'
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
@@ -85,6 +91,8 @@ import {
 import {
   isDialogProjectSettingsDocumentTemplateNameInvalid
 } from './scripts/functions/dialogProjectSettingsDocumentTemplatesDraft'
+import { filterDialogProjectSettingsWorldAvailableTemplatesByQuery } from './scripts/functions/filterDialogProjectSettingsWorldAvailableTemplatesByQuery'
+import DialogProjectSettingsVerticalTabListFilterInput from './DialogProjectSettingsVerticalTabListFilterInput.vue'
 import DialogProjectSettingsWorldAvailableTemplatesList from './DialogProjectSettingsWorldAvailableTemplatesList.vue'
 import DialogProjectSettingsWorldTemplateLayoutTree from './DialogProjectSettingsWorldTemplateLayoutTree.vue'
 
@@ -129,10 +137,25 @@ const invalidDocumentTemplateIds = computed(() => {
   return invalid
 })
 
+const availableTemplatesFilterQuery = ref('')
+
 const availableTemplates = computed(() => {
   return props.documentTemplates.filter((template) => {
     return !assignedTemplateIds.value.has(template.id)
   })
+})
+
+const filteredAvailableTemplates = computed(() => {
+  return filterDialogProjectSettingsWorldAvailableTemplatesByQuery(
+    availableTemplates.value,
+    availableTemplatesFilterQuery.value
+  )
+})
+
+const showAvailableTemplatesFilterEmpty = computed(() => {
+  return availableTemplatesFilterQuery.value.trim().length > 0 &&
+    filteredAvailableTemplates.value.length === 0 &&
+    availableTemplates.value.length > 0
 })
 
 function emitTemplateLayout (layout: I_dialogProjectSettingsWorldTemplateLayoutDraft): void {
@@ -200,62 +223,4 @@ function onRemovePlacement (placementId: string): void {
 </script>
 
 <style lang="scss" src="./styles/DialogProjectSettings.panelTitle.unscoped.scss"></style>
-
-<style lang="scss" scoped>
-.dialogProjectSettingsWorldTemplateLayoutPanel {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  margin-top: $dialogProjectSettings-worldTemplateLayout-sectionMarginTop;
-  min-height: 0;
-  width: 100%;
-}
-
-.dialogProjectSettingsWorldTemplateLayoutPanel__columns {
-  flex: 1 1 auto;
-  gap: $dialogProjectSettings-worldTemplateLayout-columnsGap;
-  min-height: 0;
-  min-width: 0;
-}
-
-.dialogProjectSettingsWorldTemplateLayoutPanel__layoutCol {
-  padding-right: $dialogProjectSettings-worldTemplateLayout-layoutCol-paddingRight;
-}
-
-.dialogProjectSettingsWorldTemplateLayoutPanel__layoutCol,
-.dialogProjectSettingsWorldTemplateLayoutPanel__availableCol {
-  display: flex;
-  flex: 1 1 0;
-  flex-direction: column;
-  min-height: 0;
-  min-width: 0;
-}
-
-.dialogProjectSettingsWorldTemplateLayoutPanel__separator {
-  align-self: stretch;
-  margin:
-    0
-    $dialogProjectSettings-worldTemplateLayout-separatorMarginRight
-    0
-    $dialogProjectSettings-worldTemplateLayout-separatorMarginLeft;
-}
-
-.dialogProjectSettingsWorldTemplateLayoutPanel__treeHost {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.dialogProjectSettingsWorldTemplateLayoutPanel :deep(.dialogProjectSettings__panelTitle) {
-  margin-top: 0;
-}
-
-.dialogProjectSettingsWorldTemplateLayoutPanel__availableCol :deep(.dialogProjectSettings__panelTitle) {
-  padding-left: $dialogProjectSettings-worldTemplateLayout-availableCol-paddingInline;
-  padding-right: $dialogProjectSettings-worldTemplateLayout-availableCol-paddingInline;
-}
-
-.dialogProjectSettingsWorldTemplateLayoutPanel__addGroupRow {
-  flex-shrink: 0;
-}
-</style>
+<style lang="scss" src="./styles/DialogProjectSettings.worldTemplateLayoutPanel.unscoped.scss"></style>

@@ -42,7 +42,6 @@
             :data-test-tooltip-text="$t('dialogs.projectSettings.fields.worldColor.tooltip')"
           >
             <q-tooltip
-              :delay="500"
               content-class="dialogProjectSettings__fieldHelpTooltip"
             >
               {{ $t('dialogs.projectSettings.fields.worldColor.tooltip') }}
@@ -84,7 +83,6 @@
           :data-test-tooltip-text="worldColorPaletteTooltip.flatText"
         >
           <q-tooltip
-            :delay="500"
             content-class="dialogProjectSettings__fieldHelpTooltip"
           >
             <div class="dialogProjectSettings__fieldHelpTooltipIntro">

@@ -45,7 +45,6 @@
         >
           <q-tooltip
             ref="editTooltipRef"
-            :delay="300"
             :disable="!editTooltipHoverEnabled"
           >
             {{ editTooltipText }}
@@ -66,7 +65,6 @@
         >
           <q-tooltip
             ref="removeTooltipRef"
-            :delay="300"
             :disable="!removeTooltipHoverEnabled"
           >
             {{ removeTooltipText }}
@@ -74,11 +72,11 @@
         </q-btn>
       </div>
       <q-tooltip
-        v-if="showPlacementNicknameHoverTooltip"
+        v-if="showPlacementNicknameHoverTooltip && !renameMenuOpen"
         ref="placementNicknameHoverTooltipRef"
         anchor="center right"
+        no-parent-event
         self="center left"
-        :delay="300"
         :disable="!placementNicknameHoverTooltipEnabled"
         :offset="placementNicknameHoverTooltipOffset"
       >
@@ -146,6 +144,7 @@
           :data-test-locator="renameMenuWiring.renameInputTestLocator"
           hide-bottom-space
           :label="renameInputLabel"
+          stack-label
           @keydown.enter.stop.prevent="renameMenuWiring.closeRenameMenu"
           @keydown.esc.stop="renameMenuWiring.closeRenameMenu"
           @update:model-value="renameMenuWiring.onRenameDraftUpdate"
@@ -154,21 +153,10 @@
             v-if="showTemplateCanonicalName"
             #append
           >
-            <q-icon
-              class="dialogProjectSettingsWorldTemplateLayoutTreeNode__inputHelpIcon"
-              data-test-locator="dialogProjectSettings-worldTemplateLayoutTemplateNicknameTooltipIcon"
-              :data-test-tooltip-text="templateNicknameTooltipText"
-              name="mdi-help-circle"
-              size="16px"
-              @click.stop
-            >
-              <q-tooltip
-                :delay="500"
-                content-class="dialogProjectSettings__fieldHelpTooltip"
-              >
-                {{ templateNicknameTooltipText }}
-              </q-tooltip>
-            </q-icon>
+            <DialogProjectSettingsWorldTemplateLayoutTreeNodeInputHelpIcon
+              test-locator="dialogProjectSettings-worldTemplateLayoutTemplateNicknameTooltipIcon"
+              :tooltip-text="templateNicknameTooltipText"
+            />
           </template>
         </q-input>
         <DialogProjectSettingsWorldTemplateLayoutTreeNodeCanonicalNameField
@@ -186,6 +174,7 @@
 
 <script setup lang="ts">
 import DialogProjectSettingsWorldTemplateLayoutTreeNodeCanonicalNameField from './DialogProjectSettingsWorldTemplateLayoutTreeNodeCanonicalNameField.vue'
+import DialogProjectSettingsWorldTemplateLayoutTreeNodeInputHelpIcon from './DialogProjectSettingsWorldTemplateLayoutTreeNodeInputHelpIcon.vue'
 import DialogProjectSettingsWorldTemplateLayoutTreeNodeLabelArea from './DialogProjectSettingsWorldTemplateLayoutTreeNodeLabelArea.vue'
 import { useDialogProjectSettingsWorldTemplateLayoutTreeNode } from './scripts/dialogProjectSettingsWorldTemplateLayoutTreeNode_manager'
 import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'

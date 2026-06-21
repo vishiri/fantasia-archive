@@ -77,7 +77,7 @@
       size="sm"
       @click="onPaletteAppendClick"
     >
-      <q-tooltip :delay="500">
+      <q-tooltip>
         {{ $t(paletteAppendTooltipKey) }}
       </q-tooltip>
     </q-btn>

@@ -42,7 +42,6 @@
             :data-test-tooltip-text="$t('dialogs.projectSettings.fields.documentTemplateWorldAppendix.tooltip')"
           >
             <q-tooltip
-              :delay="500"
               content-class="dialogProjectSettings__fieldHelpTooltip"
             >
               {{ $t('dialogs.projectSettings.fields.documentTemplateWorldAppendix.tooltip') }}

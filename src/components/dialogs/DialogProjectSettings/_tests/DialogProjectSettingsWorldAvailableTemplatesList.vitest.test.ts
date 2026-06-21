@@ -27,7 +27,7 @@ const listStubs = {
 
 /**
  * DialogProjectSettingsWorldAvailableTemplatesList
- * Renders clickable rows for each available template.
+ * Renders clickable rows with hover-only highlight for each available template.
  */
 test('Test that DialogProjectSettingsWorldAvailableTemplatesList renders template rows', async () => {
   const w = mount(DialogProjectSettingsWorldAvailableTemplatesList, {
@@ -86,4 +86,22 @@ test('Test that DialogProjectSettingsWorldAvailableTemplatesList shows empty sta
 
   expect(w.find('[data-test-locator="dialogProjectSettings-worldAvailableTemplatesEmpty"]').exists()).toBe(true)
   expect(w.text()).toContain('dialogs.projectSettings.fields.worldTemplateLayout.emptyAvailableTemplates')
+})
+
+test('Test that DialogProjectSettingsWorldAvailableTemplatesList shows filter empty state', () => {
+  const w = mount(DialogProjectSettingsWorldAvailableTemplatesList, {
+    props: {
+      showFilterEmpty: true,
+      templates: []
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      },
+      stubs: listStubs
+    }
+  })
+
+  expect(w.find('[data-test-locator="dialogProjectSettings-worldAvailableTemplatesFilterEmpty"]').exists()).toBe(true)
+  expect(w.text()).toContain('dialogs.projectSettings.fields.worldTemplateLayout.emptyFilteredAvailableTemplates')
 })

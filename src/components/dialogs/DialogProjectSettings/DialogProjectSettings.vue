@@ -82,7 +82,6 @@
             :data-test-tooltip-text="saveValidationErrorsTooltip.flatText"
           >
             <q-tooltip
-              :delay="500"
               anchor="top end"
               content-class="dialogProjectSettings__saveErrorTooltip"
               :offset="saveErrorsTooltipOffset"
@@ -175,13 +174,17 @@ function updateDocumentTemplatesOrder (
 <style lang="scss" src="./styles/DialogProjectSettings.templateQIconDisplay.unscoped.scss"></style>
 
 <style lang="scss">
-.ProjectSettings {
-  &.dialogComponent__wrapper {
+.q-dialog.dialogComponent.ProjectSettings {
+  > .q-dialog__inner > .q-card.dialogComponent__wrapper {
     display: flex;
     flex-direction: column;
     height: 100%;
     max-height: calc(100vh - #{$dialogProjectSettings-card-maxHeightSubtract});
-    max-width: calc(100vw - #{$dialogProjectSettings-card-maxWidthViewportSubtract});
+    max-width:
+      min(
+        #{$dialogProjectSettings-card-width},
+        calc(100vw - #{$dialogProjectSettings-card-maxWidthViewportSubtract})
+      );
     overflow: hidden;
     position: relative;
     width: $dialogProjectSettings-card-width;

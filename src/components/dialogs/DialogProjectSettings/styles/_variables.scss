@@ -5,7 +5,7 @@
 /* COMPONENT - DIALOG PROJECT SETTINGS (mirrors DialogAppSettings layout tokens) */
 $dialogProjectSettings-card-maxHeightSubtract: 48px;
 $dialogProjectSettings-card-maxWidthViewportSubtract: 100px;
-$dialogProjectSettings-card-width: 1400px;
+$dialogProjectSettings-card-width: 1800px;
 $dialogProjectSettings-category-paddingTop: 30px;
 $dialogProjectSettings-category-paddingX: 40px;
 $dialogProjectSettings-category-paddingY: 20px;
@@ -43,6 +43,9 @@ $dialogProjectSettings-worldTemplateLayout-availableListItem-minHeight: 32px;
 $dialogProjectSettings-worldTemplateLayout-availableListItem-paddingBlock: 8px;
 $dialogProjectSettings-worldTemplateLayout-availableListEmpty-paddingBlock: 12px;
 $dialogProjectSettings-worldTemplateLayout-availableCol-paddingInline: 25px;
+$dialogProjectSettings-worldTemplateLayout-availableFilterInput-width: 150px;
+$dialogProjectSettings-worldTemplateLayout-availableTitleRow-paddingRight: 10px;
+$dialogProjectSettings-worldTemplateLayout-availableTitleRow-gap: 12px;
 $dialogProjectSettings-worldTemplateLayout-columnsGap: 0;
 $dialogProjectSettings-worldTemplateLayout-dragPlaceholder-accentWidth: 3px;
 $dialogProjectSettings-worldTemplateLayout-dragPlaceholder-backgroundColor: color-mix(in srgb, fa-v('primary-bright', $primary-bright) 10%, transparent);
@@ -95,7 +98,9 @@ $dialogProjectSettings-worldsTabColorSwatch-offsetRight: 10px;
 $dialogProjectSettings-worldsTabColorSwatch-size: 18px;
 $dialogProjectSettings-worldsTabColorSwatch-zIndex: 3;
 $dialogProjectSettings-worldsTabList-width: 240px;
+$dialogProjectSettings-verticalTabListFilterRow-paddingInline: 45px;
 $dialogProjectSettings-documentTemplatesTabList-width: 360px;
+$dialogProjectSettings-documentTemplatesTabListFilterRow-paddingBottom: 10px;
 $dialogProjectSettings-documentTemplatesTabIcon-boxSize: 21px;
 $dialogProjectSettings-documentTemplatesTabIcon-marginRight: $faQIconDisplay-iconMarginRight;
 $dialogProjectSettings-documentTemplatesTabWorldAppendix-marginLeft: calc(
