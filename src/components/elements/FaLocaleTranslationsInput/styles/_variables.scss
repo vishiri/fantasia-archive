@@ -1,0 +1,9 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - FA LOCALE TRANSLATIONS INPUT */
+$faLocaleTranslationsInput-menu-zIndex: 7002;
+$faLocaleTranslationsInput-menu-maxWidth: 500px;
+$faLocaleTranslationsInput-menu-body-padding: 8px 12px;
+$faLocaleTranslationsInput-menu-backgroundColor: fa-v('dark-lighter', $dark-lighter);
+$faLocaleTranslationsInput-menuRow-gap: 12px;
+$faLocaleTranslationsInput-fallbackWarning-marginLeft: 8px;

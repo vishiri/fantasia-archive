@@ -1,0 +1,67 @@
+---
+description: FaLocaleTranslationsInput reusable element and locale string translation helpers
+globs: "src/components/elements/FaLocaleTranslationsInput/**/*,src/scripts/localeTranslations/**/*,src/scripts/worlds/**/*,src/scripts/documentTemplates/**/*,types/I_faLocaleStringTranslations.ts,types/I_faLocaleTranslationsInput.ts,types/I_faProjectWorldDisplayNameTranslations.ts,types/I_faProjectDocumentTemplateWorldAppendixTranslations.ts"
+alwaysApply: false
+---
+
+# FaLocaleTranslationsInput and locale translations
+
+## Reuse the shared element
+
+Per-locale string field → **`FaLocaleTranslationsInput`** from **`src/components/elements/FaLocaleTranslationsInput/`** with **`v-model`** on **`I_faLocaleStringTranslations`**, **`current-language-code`**, required **`test-locator`**. **No** duplicate translate menus or fallback-warning wiring in feature folders.
+
+**Project Settings today:** world **`displayNameTranslations`**, document template **`titleTranslations`**, template **`worldAppendixTranslations`**.
+
+## Stored value contract
+
+- Model: **`Partial<Record<T_faUserSettingsLanguageCode, string>>`** — **`types/I_faLocaleStringTranslations.ts`**
+- Readonly main field shows **resolved** text for active UI language (preferred → **en-US** → sorted locales)
+- Empty locale keys omitted on save/edit (trim + delete when blank)
+- Domain max length: pass **`max-length`** prop; normalize at persist via domain **`createNormalize…`** helpers
+
+## Resolver pipeline
+
+| Piece | Role |
+| --- | --- |
+| **`src/scripts/localeTranslations/functions/resolveFaLocaleStringTranslation.ts`** | Display value + fallback language code |
+| **`src/scripts/localeTranslations/faLocaleStringTranslations_manager.ts`** | Wired with **`FA_USER_SETTINGS_LANGUAGE_CODES`** |
+| **`src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager.ts`** | Template title alias + max length |
+| World display name / world appendix managers under **`src/scripts/projectWorlds/`**, **`src/scripts/documentTemplates/`** | Project Settings draft + snapshot normalize |
+
+## Placement vs template draft (do not mix)
+
+| Shape | **`worldAppendix`** | **`worldAppendixTranslations`** |
+| --- | --- | --- |
+| Document template **draft** / snapshot item | — | yes |
+| World template layout **placement** / he-tree node | yes (resolved string) | no |
+| Layout **group** row | **`displayName: string`** only | — |
+
+## Element API (short)
+
+- **`inputMode`**: **`singleLine`** (default) \| **`multiline`**
+- Click readonly field or translate button → locale menu; tooltip **only** on button
+- **`#after`** fallback warning when resolved locale ≠ current UI language
+- Test locators: **`{testLocator}`**, **`{testLocator}-translationsButton`**, **`{testLocator}-translationsMenu`**, **`{testLocator}-translationsInput-<code>`**, **`{testLocator}-fallbackWarning`**
+
+## i18n and Storybook
+
+- Strings: **`i18n/<locale>/components/elements/FaLocaleTranslationsInput/`**, keyed **`faLocaleTranslationsInput`** in **`index.ts`**
+- Field labels stay in feature i18n (e.g. **`dialogs.projectSettings.fields.worldName.label`**)
+- Storybook: **`_tests/*.stories.ts`**; extend **`.storybook-workspace/.storybook/mocks/externalFileLoader.ts`** when adding copy
+
+## Two-level architecture
+
+- **`src/scripts/localeTranslations/functions/`** — level-1 pure helpers only
+- **`FaLocaleTranslationsInput/scripts/functions/createUseFaLocaleTranslationsInput.ts`** — level-1 composable factory (types from **`app/types/**`** only)
+- **`faLocaleTranslationsInput_manager.ts`** — wiring-only **`useFaLocaleTranslationsInput`**
+
+## Tests
+
+- **`FaLocaleTranslationsInput/_tests/*.vitest.test.ts`** — resolve, fallback, menu emit, click-to-open
+- **`src/scripts/localeTranslations/functions/_tests/`** — resolver + menu geometry
+- Feature panels stub **`FaLocaleTranslationsInput`**; keep integration in element tests
+
+## Related
+
+- [fantasia-locale-translations-input](../skills/fantasia-locale-translations-input/SKILL.md)
+- [projectDB.md](../../docs/database/projectDB.md) — schema **v9** JSON columns

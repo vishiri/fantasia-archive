@@ -1,0 +1,45 @@
+@use './variables' as *;
+
+.faLocaleTranslationsInput__menu.q-menu {
+  box-sizing: border-box;
+  max-width: $faLocaleTranslationsInput-menu-maxWidth;
+  z-index: $faLocaleTranslationsInput-menu-zIndex !important;
+}
+
+.faLocaleTranslationsInput__menu--locked.q-menu {
+  max-height: var(--fa-locale-translations-menu-max-height) !important;
+  max-width: var(--fa-locale-translations-menu-width) !important;
+  min-width: var(--fa-locale-translations-menu-width) !important;
+  width: var(--fa-locale-translations-menu-width) !important;
+}
+
+.faLocaleTranslationsInput__menuBody {
+  background-color: $faLocaleTranslationsInput-menu-backgroundColor;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  max-height: inherit;
+  padding: $faLocaleTranslationsInput-menu-body-padding;
+  width: 100%;
+}
+
+.faLocaleTranslationsInput__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden auto;
+  width: 100%;
+}
+
+.faLocaleTranslationsInput__rows {
+  display: flex;
+  flex-direction: column;
+  gap: $faLocaleTranslationsInput-menuRow-gap;
+}
+
+.faLocaleTranslationsInput__row {
+  width: 100%;
+}
+
+.faLocaleTranslationsInput__menuInput {
+  width: 100%;
+}
