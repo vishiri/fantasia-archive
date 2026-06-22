@@ -3,6 +3,13 @@
 
 ## 2.4.14 - Versione bump
 
+### Nuove funzionalità
+- **Impostazioni progetto**: **Salva senza chiudere** salva come **Salva impostazioni** ma lascia aperto il dialogo.
+
+### Correzioni di bug e ottimizzazioni
+- **Impostazioni progetto**: **Elimina mondo** nella riga dettaglio **Mondi** si allinea verticalmente con **Nome mondo** e **Colore mondo**.
+- **Selettore lingua**: **Svenska** mostra ora la bandiera della Svezia invece di quella di El Salvador.
+
 ## 2.4.13 - Versione bump
 
 ### Nuove funzionalità

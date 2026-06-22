@@ -3,6 +3,13 @@
 
 ## 2.4.14 - Versjonsbump
 
+### Nye funksjoner
+- **Prosjektinnstillinger**: **Lagre uten å lukke** lagrer som **Lagre innstillinger**, men holder dialogen åpen.
+
+### Feilrettinger og optimaliseringer
+- **Prosjektinnstillinger**: **Slett verden** på **Verdener**-detaljraden er vertikalt på linje med **Verdensnavn** og **Verdensfarge**.
+- **Språkvelger**: **Svenska** viser nå Sveriges flagg i stedet for El Salvadors.
+
 ## 2.4.13 - Versjonsbump
 
 ### Nye funksjoner

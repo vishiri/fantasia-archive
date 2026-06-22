@@ -3,6 +3,13 @@
 
 ## 2.4.14 - Aumento da versão
 
+### Novos recursos
+- **Configurações do projeto**: **Salvar sem fechar** salva como **Salvar configurações**, mas mantém o diálogo aberto.
+
+### Correções de bugs e otimizações
+- **Configurações do projeto**: **Excluir mundo** na linha de detalhes **Mundos** alinha verticalmente com **Nome do mundo** e **Cor do mundo**.
+- **Seletor de idioma**: **Svenska** agora mostra a bandeira da Suécia em vez de El Salvador.
+
 ## 2.4.13 - Aumento da versão
 
 ### Novos recursos

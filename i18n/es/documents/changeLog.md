@@ -3,6 +3,13 @@
 
 ## 2.4.14 - Mejora de versión
 
+### Nuevas funciones
+- **Configuración del proyecto**: **Guardar sin cerrar** guarda como **Guardar configuración** pero mantiene el diálogo abierto para seguir editando.
+
+### Correcciones de errores y optimizaciones
+- **Configuración del proyecto**: **Eliminar mundo** en la fila de detalle **Mundos** se alinea verticalmente con **Nombre del mundo** y **Color del mundo**.
+- **Selector de idioma**: **Svenska** muestra ahora la bandera de Suecia en lugar de la de El Salvador.
+
 ## 2.4.13 - Mejora de versión
 
 ### Nuevas funciones

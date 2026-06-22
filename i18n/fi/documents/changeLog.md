@@ -3,6 +3,13 @@
 
 ## 2.4.14 - Versiovirhe
 
+### Uusia ominaisuuksia
+- **Projektiasetukset**: **Tallenna sulkematta** tallentaa kuten **Tallenna asetukset**, mutta jättää valintaikkunan auki.
+
+### Virhekorjaukset ja optimoinnit
+- **Projektiasetukset**: **Poista maailma** **Maailmat**-tietorivillä kohdistuu pystysuunnassa **Maailman nimi**- ja **Maailman väri** -kenttiin.
+- **Kielenvalitsin**: **Svenska** näyttää nyt Ruotsin lipun El Salvadorin lipun sijaan.
+
 ## 2.4.13 - Versiovirhe
 
 ### Uusia ominaisuuksia

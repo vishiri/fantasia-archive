@@ -3,6 +3,13 @@
 
 ## 2.4.14 - Version bump
 
+### Nya funktioner
+- **Projektinställningar**: **Spara utan att stänga** sparar som **Spara inställningar** men håller dialogen öppen.
+
+### Buggfixar och optimeringar
+- **Projektinställningar**: **Ta bort värld** i **Världar**-detaljraden linjerar vertikalt med **Världens namn** och **Världens färg**.
+- **Språkväljare**: **Svenska** visar nu Sveriges flagga i stället för El Salvadors flagga.
+
 ## 2.4.13 - Version bump
 
 ### Nya funktioner

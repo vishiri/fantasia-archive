@@ -31,6 +31,7 @@
 - **Project database**: Document templates and placement nicknames persist optional per-locale singular forms in **`title_singular_translations_json`** and **`nickname_singular_translations_json`** (schema **v11**); existing **`title_translations_json`** and **`nickname_translations_json`** remain plural storage with no data copy on upgrade.
 - **FaLocaleTranslationsInput**: **`translationForms="singularPlural"`** shows **Singular** and **Plural** columns per locale (wider menu). Summary field uses the combined plural-then-singular resolver for the active language.
 - **Project Settings**: Missing-translation warning tooltips for document template tabs, **Available document templates**, and **World template layout** template rows now list which singular and/or plural forms are missing for the active language and name the fallback locale when another language supplies the shown label.
+- **Project Settings**: **Save without closing** persists project settings like **Save settings** but keeps the dialog open so you can keep editing.
 
 ### Bugfixes & Optimizations
 - **Project Settings**: **World's hierarchical tree** and **Available document templates** now show document template titles and **World appendix** text for the active interface language when translations exist, including after opening the dialog or switching language while it stays open. **Available document templates** rows also show the missing-translation warning icon when the active language has no document template title translation.
@@ -47,6 +48,8 @@
 - **FaLocaleTranslationsInput**: **`translationForms="singularPlural"`** menus keep at least **650** pixels wide so **Singular** and **Plural** columns stay readable; locale labels stack above each input inside a vertical scrollbar.
 - **FaLocaleTranslationsInput**: Pinned-aside rename menus align the read-only reference column with the first locale input row instead of the **Singular** / **Plural** header row.
 - **Tooltips**: Missing-translation and spellcheck-reload help tooltips that use line breaks now render each line on its own row instead of collapsing into one line.
+- **Project Settings**: **Delete world** in the **Worlds** detail row aligns vertically with the **World name** and **World color** fields.
+- **Language selector**: **Svenska** now shows the Sweden flag instead of the El Salvador flag.
 - **Project Settings**: Hovering edit or remove on nickname template rows in **World's hierarchical tree** shows only the button tooltip, not the nickname and original-name popup.
 - **Project Settings**: Nickname hover tooltip in **World's hierarchical tree** again covers the full row height, including top and bottom padding beside the label.
 - **Project Settings**: Nickname hover tooltip in **World's hierarchical tree** stays hidden while the inline rename menu is open.
