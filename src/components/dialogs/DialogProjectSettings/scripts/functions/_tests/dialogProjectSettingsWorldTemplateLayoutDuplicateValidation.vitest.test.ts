@@ -19,7 +19,8 @@ test('Test that duplicate validation collects repeated document template ids', (
     {
       templateDisplayName: 'Character',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -32,7 +33,8 @@ test('Test that duplicate validation collects repeated document template ids', (
     {
       templateDisplayName: 'Character copy',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -58,7 +60,8 @@ test('Test that duplicate validation ignores unique document template ids', () =
     {
       templateDisplayName: 'Character',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -71,7 +74,8 @@ test('Test that duplicate validation ignores unique document template ids', () =
     {
       templateDisplayName: 'Location',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-b',
       groupId: null,
@@ -96,7 +100,8 @@ test('Test that duplicate validation ignores blank document template ids', () =>
     {
       templateDisplayName: 'Blank',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: '',
       groupId: null,
@@ -122,7 +127,8 @@ test('Test that duplicate validation flags repeated ids but not unique placement
     {
       templateDisplayName: 'Character',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -135,7 +141,8 @@ test('Test that duplicate validation flags repeated ids but not unique placement
     {
       templateDisplayName: 'Character copy',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -148,7 +155,8 @@ test('Test that duplicate validation flags repeated ids but not unique placement
     {
       templateDisplayName: 'Location',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-b',
       groupId: null,
@@ -173,7 +181,8 @@ test('Test that duplicate validation ignores third repeats of the same document 
     {
       templateDisplayName: 'Character',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -186,7 +195,8 @@ test('Test that duplicate validation ignores third repeats of the same document 
     {
       templateDisplayName: 'Character copy',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -199,7 +209,8 @@ test('Test that duplicate validation ignores third repeats of the same document 
     {
       templateDisplayName: 'Character copy 2',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -229,7 +240,8 @@ test('Test that duplicate validation ignores blank placement ids even when layou
     {
       templateDisplayName: 'Character',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -242,7 +254,8 @@ test('Test that duplicate validation ignores blank placement ids even when layou
     {
       templateDisplayName: 'Character copy',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -255,7 +268,8 @@ test('Test that duplicate validation ignores blank placement ids even when layou
     {
       templateDisplayName: 'Blank',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: '',
       groupId: null,
@@ -277,17 +291,17 @@ test('Test that blank group validation collects empty group display names', () =
   const layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   layout.groups = [
     {
-      displayName: 'Creatures',
+      displayNameTranslations: { 'en-US': 'Creatures' },
       id: 'group-a',
       rootSortOrder: 0
     },
     {
-      displayName: '   ',
+      displayNameTranslations: { 'en-US': '   ' },
       id: 'group-b',
       rootSortOrder: 1
     },
     {
-      displayName: '',
+      displayNameTranslations: { 'en-US': '' },
       id: 'group-c',
       rootSortOrder: 2
     }
@@ -305,7 +319,8 @@ test('Test that invalid document template placement validation detects bad templ
     {
       templateDisplayName: 'Character',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,

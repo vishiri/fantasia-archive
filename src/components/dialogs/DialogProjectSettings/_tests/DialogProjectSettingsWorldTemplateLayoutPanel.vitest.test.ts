@@ -109,7 +109,8 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutPanel filters available 
         buildDialogProjectSettingsDocumentTemplateDraft({
           icon: 'mdi-map',
           id: 'template-b',
-          titleTranslations: { 'en-US': 'Locations' },
+          titlePluralTranslations: { 'en-US': 'Locations' },
+          titleSingularTranslations: {},
           worldAppendixTranslations: { 'en-US': 'atlas' }
         })
       ],
@@ -134,7 +135,8 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutPanel filters available 
   await w.find('.available-templates-filter-stub').setValue('atlas')
   expect(availableListProps.value.templates).toEqual([
     expect.objectContaining({
-      titleTranslations: { 'en-US': 'Locations' }
+      titlePluralTranslations: { 'en-US': 'Locations' },
+      titleSingularTranslations: {},
     })
   ])
   expect(availableListProps.value.showFilterEmpty).toBe(false)
@@ -176,7 +178,9 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutPanel emits update:templ
   expect(w.emitted('update:templateLayout')?.[0]?.[0]).toMatchObject({
     groups: expect.arrayContaining([
       expect.objectContaining({
-        displayName: 'dialogs.projectSettings.fields.worldTemplateLayout.defaultNewGroupName'
+        displayNameTranslations: {
+          'en-US': 'dialogs.projectSettings.fields.worldTemplateLayout.defaultNewGroupName'
+        }
       })
     ])
   })

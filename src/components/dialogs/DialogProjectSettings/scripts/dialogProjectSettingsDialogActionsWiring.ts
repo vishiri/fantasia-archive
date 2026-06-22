@@ -10,7 +10,7 @@ import { hydrateDialogProjectSettingsDrafts } from './dialogProjectSettingsDialo
 import { saveDialogProjectSettingsDraftAndClose } from './dialogProjectSettingsDialogSaveWiring'
 
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
-import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
 import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
 import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
 
@@ -41,7 +41,7 @@ export function createDialogProjectSettingsDialogActions (deps: {
     updateDocumentTemplateIcon: (id: string, icon: string) => void
     updateDocumentTemplateTitleTranslations: (
       id: string,
-      titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+      titleTranslations: I_faLocaleSingularPluralTranslations
     ) => void
     updateDocumentTemplateWorldAppendixTranslations: (
       id: string,

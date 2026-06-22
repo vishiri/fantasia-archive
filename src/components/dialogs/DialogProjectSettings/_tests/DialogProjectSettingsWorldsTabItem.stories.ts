@@ -44,3 +44,18 @@ export const Selected: StoryObj<typeof meta> = {
     }
   }
 }
+
+export const MissingActiveLocaleTranslation: StoryObj<typeof meta> = {
+  args: {
+    currentLanguageCode: 'de',
+    isSelected: false,
+    tabHasError: false,
+    world: {
+      color: '#9c27b0',
+      colorPallete: '',
+      displayNameTranslations: { 'en-US': 'Falala' },
+      documentCount: 0,
+      id: '550e8400-e29b-41d4-a716-446655440000'
+    }
+  }
+}

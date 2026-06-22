@@ -1,29 +1,76 @@
 import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
+import { FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_SINGULAR_TRANSLATION_MAX_LENGTH } from 'app/types/I_faProjectDocumentTemplateTitleSingularTranslations'
 import { FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_TRANSLATION_MAX_LENGTH } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
 
 import { createNormalizeFaLocaleStringTranslations } from 'app/src/scripts/localeTranslations/functions/normalizeFaLocaleStringTranslations'
+import { createResolveFaLocaleSingularPluralTranslation } from 'app/src/scripts/localeTranslations/functions/resolveFaLocaleSingularPluralTranslation'
 import { createResolveFaLocaleStringTranslation } from 'app/src/scripts/localeTranslations/functions/resolveFaLocaleStringTranslation'
 
-const resolveApi = createResolveFaLocaleStringTranslation({
+import {
+  buildFaProjectDocumentTemplateTitleSingularPluralTranslations,
+  createNormalizeFaProjectDocumentTemplateTitleSingularPluralTranslations,
+  createResolveFaProjectDocumentTemplateDisplayTitleFromFields
+} from './functions/faProjectDocumentTemplateTitleSingularPlural'
+
+export { buildFaProjectDocumentTemplateTitleSingularPluralTranslations } from './functions/faProjectDocumentTemplateTitleSingularPlural'
+
+const pluralResolveApi = createResolveFaLocaleStringTranslation({
   languageCodes: FA_USER_SETTINGS_LANGUAGE_CODES
 })
 
-const normalizeFaProjectDocumentTemplateTitleTranslations =
+const singularPluralResolveApi = createResolveFaLocaleSingularPluralTranslation({
+  languageCodes: FA_USER_SETTINGS_LANGUAGE_CODES
+})
+
+const normalizeFaProjectDocumentTemplateTitlePluralTranslationsInternal =
   createNormalizeFaLocaleStringTranslations({
     languageCodes: FA_USER_SETTINGS_LANGUAGE_CODES,
     maxLength: FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_TRANSLATION_MAX_LENGTH
   })
 
-export const {
-  hasFaLocaleStringTranslation: hasFaProjectDocumentTemplateTitleTranslation,
-  resolveFaLocaleStringTranslation: resolveFaProjectDocumentTemplateTitle,
-  resolveFaLocaleStringTranslationForStorage: resolveFaProjectDocumentTemplateTitleForStorage,
-  resolveFaLocaleStringTranslationLanguageCode: resolveFaProjectDocumentTemplateTitleDisplayLanguageCode
-} = resolveApi
+const normalizeFaProjectDocumentTemplateTitleSingularTranslationsInternal =
+  createNormalizeFaLocaleStringTranslations({
+    languageCodes: FA_USER_SETTINGS_LANGUAGE_CODES,
+    maxLength: FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_SINGULAR_TRANSLATION_MAX_LENGTH
+  })
 
-export const hasFaProjectDocumentTemplateTitle = hasFaProjectDocumentTemplateTitleTranslation
-export const normalizeFaProjectDocumentTemplateTitles = normalizeFaProjectDocumentTemplateTitleTranslations
-export const resolveFaProjectDocumentTemplateDisplayTitle = resolveFaProjectDocumentTemplateTitle
-export const resolveFaProjectDocumentTemplateDisplayTitleLanguageCode =
-  resolveFaProjectDocumentTemplateTitleDisplayLanguageCode
-export const resolveFaProjectDocumentTemplateStorageTitle = resolveFaProjectDocumentTemplateTitleForStorage
+export const {
+  hasFaLocaleStringTranslation: hasFaProjectDocumentTemplateTitlePluralTranslation,
+  resolveFaLocaleStringTranslationForStorage: resolveFaProjectDocumentTemplatePluralTitleForStorage
+} = pluralResolveApi
+
+export const {
+  hasFaLocaleSingularPluralTranslation: hasFaProjectDocumentTemplateTitleTranslation,
+  resolveFaLocaleSingularPluralDisplayTranslation: resolveFaProjectDocumentTemplateDisplayTitle,
+  resolveFaLocaleSingularPluralDisplayTranslationForStorage: resolveFaProjectDocumentTemplateStorageTitle,
+  resolveFaLocaleSingularPluralDisplayTranslationLanguageCode:
+    resolveFaProjectDocumentTemplateDisplayTitleLanguageCode,
+  resolveFaLocaleSingularPluralDisplayTranslationResolution:
+    resolveFaProjectDocumentTemplateDisplayTitleResolution,
+  resolveFaLocaleSingularPluralMissingTranslationWarning:
+    resolveFaProjectDocumentTemplateTitleMissingTranslationWarning
+} = singularPluralResolveApi
+
+export const normalizeFaProjectDocumentTemplateTitlePluralTranslations =
+  normalizeFaProjectDocumentTemplateTitlePluralTranslationsInternal
+export const normalizeFaProjectDocumentTemplateTitleSingularTranslations =
+  normalizeFaProjectDocumentTemplateTitleSingularTranslationsInternal
+export const normalizeFaProjectDocumentTemplateTitles = normalizeFaProjectDocumentTemplateTitlePluralTranslations
+
+export const normalizeFaProjectDocumentTemplateTitleSingularPluralTranslations =
+  createNormalizeFaProjectDocumentTemplateTitleSingularPluralTranslations({
+    normalizePlural: normalizeFaProjectDocumentTemplateTitlePluralTranslationsInternal,
+    normalizeSingular: normalizeFaProjectDocumentTemplateTitleSingularTranslationsInternal
+  })
+
+export const hasFaProjectDocumentTemplateTitlePluralInAnyLocale =
+  hasFaProjectDocumentTemplateTitlePluralTranslation
+
+export const resolveFaProjectDocumentTemplateTitleForStorage =
+  resolveFaProjectDocumentTemplatePluralTitleForStorage
+
+export const resolveFaProjectDocumentTemplateDisplayTitleFromFields =
+  createResolveFaProjectDocumentTemplateDisplayTitleFromFields({
+    buildSingularPlural: buildFaProjectDocumentTemplateTitleSingularPluralTranslations,
+    resolveDisplayTitle: singularPluralResolveApi.resolveFaLocaleSingularPluralDisplayTranslation
+  })

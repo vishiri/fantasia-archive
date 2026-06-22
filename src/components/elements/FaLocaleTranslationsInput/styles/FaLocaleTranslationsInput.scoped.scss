@@ -1,0 +1,61 @@
+@use './variables' as *;
+
+.faLocaleTranslationsInput__root {
+  display: block;
+  width: 100%;
+}
+
+.faLocaleTranslationsInput__field {
+  width: 100%;
+}
+
+.faLocaleTranslationsInput__field--openTranslations {
+  cursor: pointer;
+
+  /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+  :deep(.q-field__control),
+  /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+  :deep(.q-field__native),
+  /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+  :deep(input),
+  /* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+  :deep(textarea) {
+    cursor: pointer;
+  }
+}
+
+.faLocaleTranslationsInput__fallbackWarning {
+  flex: 0 0 auto;
+  margin-left: $faLocaleTranslationsInput-fallbackWarning-marginLeft;
+}
+
+.faLocaleTranslationsInput__root--menuPanel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  overflow: hidden;
+
+  .faLocaleTranslationsInput__menuBody {
+    background-color: transparent;
+    flex: 1 1 auto;
+    max-height: 100%;
+    max-width: 100%;
+    min-height: 0;
+    padding: 0;
+  }
+
+  .faLocaleTranslationsInput__menuBody--pinnedAside {
+    flex: 1 1 auto;
+    max-height: 100%;
+    min-height: 0;
+  }
+
+  .faLocaleTranslationsInput__singularPluralPanel {
+    flex: 1 1 auto;
+    max-height: 100%;
+    min-height: 0;
+  }
+}

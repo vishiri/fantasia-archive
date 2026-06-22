@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest'
 
 import {
+  isDialogProjectSettingsWorldMissingCurrentLanguageTranslations,
   isDialogProjectSettingsWorldNameInvalid,
   isDialogProjectSettingsWorldResolvedDisplayNameUsingFallback,
   normalizeDialogProjectSettingsWorldDisplayNameTranslations,
@@ -64,4 +65,24 @@ test('Test that normalizeDialogProjectSettingsWorldDisplayNameTranslations trims
   })).toEqual({
     'en-US': 'Realm'
   })
+})
+
+test('Test that isDialogProjectSettingsWorldMissingCurrentLanguageTranslations detects missing active locale', () => {
+  expect(isDialogProjectSettingsWorldMissingCurrentLanguageTranslations(
+    { displayNameTranslations: { 'en-US': 'Realm' } },
+    'de'
+  )).toBe(true)
+  expect(isDialogProjectSettingsWorldMissingCurrentLanguageTranslations(
+    {
+      displayNameTranslations: {
+        de: 'Reich',
+        'en-US': 'Realm'
+      }
+    },
+    'de'
+  )).toBe(false)
+  expect(isDialogProjectSettingsWorldMissingCurrentLanguageTranslations(
+    { displayNameTranslations: { de: '   ' } },
+    'de'
+  )).toBe(true)
 })

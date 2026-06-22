@@ -66,6 +66,8 @@ const baseLayout = appendDialogProjectSettingsWorldTemplatePlacementDraft(
 function mountTree (templateLayout = baseLayout): ReturnType<typeof mount> {
   return mount(DialogProjectSettingsWorldTemplateLayoutTree, {
     props: {
+      currentLanguageCode: 'en-US',
+      documentTemplates: [],
       templateLayout
     },
     global: {
@@ -134,7 +136,8 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTree commits once after 
       id: secondPlacement?.id ?? 'placement-b',
       label: 'Location',
       nodeKind: 'template',
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       templateDisplayName: '',
       usesNickname: false,
       worldAppendix: ''
@@ -147,7 +150,8 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTree commits once after 
       id: firstPlacement?.id ?? 'placement-a',
       label: 'Character',
       nodeKind: 'template',
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       templateDisplayName: '',
       usesNickname: false,
       worldAppendix: ''

@@ -1,11 +1,19 @@
 import type { Ref } from 'vue'
 
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring'
+import {
+  isDialogProjectSettingsWorldTemplateLayoutGroupNameTranslationsInvalid
+} from './functions/dialogProjectSettingsWorldTemplateLayoutRenameMenuNodeHelpers'
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
+import type { I_faLocaleStringTranslations } from 'app/types/I_faLocaleStringTranslations'
 import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
 
 export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuNodeWiring (deps: {
-  emitRenameGroup: (groupId: string, displayName: string) => void
-  emitRenamePlacementNickname: (placementId: string, nickname: string) => void
+  emitRenameGroup: (groupId: string, displayNameTranslations: I_faLocaleStringTranslations) => void
+  emitRenamePlacementNickname: (
+    placementId: string,
+    nicknameTranslations: I_faLocaleSingularPluralTranslations
+  ) => void
   getNode: () => I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
   i18n: {
     global: {
@@ -18,7 +26,7 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
     emitRenameGroup: deps.emitRenameGroup,
     emitRenamePlacementNickname: deps.emitRenamePlacementNickname,
     getNode: deps.getNode,
-    isGroupNameInvalid: (displayName) => displayName.trim().length === 0,
+    isGroupNameInvalid: isDialogProjectSettingsWorldTemplateLayoutGroupNameTranslationsInvalid,
     nodeAnchorRef: deps.nodeAnchorRef,
     translateGroupNameErrorRequired: () => {
       return deps.i18n.global.t('dialogs.projectSettings.fields.worldTemplateLayout.groupNameErrorRequired')
@@ -40,7 +48,5 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
     }
   })
 
-  const renameMenuWiringBinding = renameMenuWiring
-
-  return renameMenuWiringBinding
+  return renameMenuWiring
 }

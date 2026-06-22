@@ -1,6 +1,5 @@
 import { inject, ref } from 'vue'
 import type { Ref } from 'vue'
-import type { QInput } from 'quasar'
 
 import {
   createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuComputedState
@@ -10,26 +9,30 @@ import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuStyleWi
 import { wireDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWatchers } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWatchWiring'
 import { dialogProjectSettingsWorldTemplateLayoutOpenRenameMenuTargetKey } from './dialogProjectSettingsWorldTemplateLayoutRenameMenuProvide'
 import {
-  resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftSeed
-} from './functions/dialogProjectSettingsWorldTemplateLayoutRenameMenuNodeHelpers'
+  resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTranslationsDraftSeed
+} from './dialogProjectSettingsWorldTemplateLayoutRenameMenuTranslationsWiring'
+import type { T_dialogProjectSettingsWorldTemplateLayoutRenameTranslationsDraft } from 'app/types/T_dialogProjectSettingsWorldTemplateLayoutRenameTranslationsDraft'
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
+import type { I_faLocaleStringTranslations } from 'app/types/I_faLocaleStringTranslations'
 import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
 
 export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuSessionWiring (deps: {
-  emitRenameGroup: (groupId: string, displayName: string) => void
-  emitRenamePlacementNickname: (placementId: string, nickname: string) => void
+  emitRenameGroup: (groupId: string, displayNameTranslations: I_faLocaleStringTranslations) => void
+  emitRenamePlacementNickname: (
+    placementId: string,
+    nicknameTranslations: I_faLocaleSingularPluralTranslations
+  ) => void
   getNode: () => I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
-  isGroupNameInvalid: (displayName: string) => boolean
+  isGroupNameInvalid: (displayNameTranslations: I_faLocaleStringTranslations) => boolean
   nodeAnchorRef: Ref<HTMLElement | null>
   translateGroupNameErrorRequired: () => string
 }): {
     computedState: ReturnType<typeof createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuComputedState>
     handlersWiring: ReturnType<typeof createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuHandlersWiring>
     menuStyleWiring: ReturnType<typeof createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuStyleWiring>
-    renameDraft: Ref<string>
-    renameInputRef: Ref<QInput | null>
+    renameTranslationsDraft: Ref<T_dialogProjectSettingsWorldTemplateLayoutRenameTranslationsDraft>
   } {
-  const renameDraft = ref('')
-  const renameInputRef = ref<QInput | null>(null)
+  const renameTranslationsDraft = ref<T_dialogProjectSettingsWorldTemplateLayoutRenameTranslationsDraft>({})
 
   const openRenameMenuTarget = inject(
     dialogProjectSettingsWorldTemplateLayoutOpenRenameMenuTargetKey,
@@ -41,11 +44,13 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
     getNode: deps.getNode,
     isGroupNameInvalid: deps.isGroupNameInvalid,
     openRenameMenuTarget,
-    renameDraft,
+    renameTranslationsDraft,
     translateGroupNameErrorRequired: deps.translateGroupNameErrorRequired
   })
 
   const menuStyleWiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuStyleWiring({
+    getHasMenuPinnedAside: () => computedState.hasMenuPinnedAside.value,
+    getUsesSingularPluralRenameMenu: () => deps.getNode().nodeKind === 'template',
     nodeAnchorRef: deps.nodeAnchorRef
   })
 
@@ -56,8 +61,7 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
     getRenameMenuTargetKey: () => computedState.renameMenuTargetKey.value,
     nodeAnchorRef: deps.nodeAnchorRef,
     openRenameMenuTarget,
-    renameDraft,
-    renameInputRef,
+    renameTranslationsDraft,
     setRenameMenuOpen: (open) => {
       computedState.renameMenuOpen.value = open
     },
@@ -65,17 +69,17 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
   })
 
   wireDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWatchers({
-    getRenameDraftSeed: () => resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftSeed(deps.getNode()),
-    renameDraft,
-    renameInputRef,
-    renameMenuOpen: computedState.renameMenuOpen
+    getRenameTranslationsDraftSeed: () => {
+      return resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTranslationsDraftSeed(deps.getNode())
+    },
+    renameMenuOpen: computedState.renameMenuOpen,
+    renameTranslationsDraft
   })
 
   return {
     computedState,
     handlersWiring,
     menuStyleWiring,
-    renameDraft,
-    renameInputRef
+    renameTranslationsDraft
   }
 }

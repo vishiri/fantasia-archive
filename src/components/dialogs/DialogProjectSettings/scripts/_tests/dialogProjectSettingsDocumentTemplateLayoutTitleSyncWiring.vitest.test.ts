@@ -11,7 +11,7 @@ import { buildDialogProjectSettingsDocumentTemplateDraft } from '../../_tests/di
 test('Test that syncDialogProjectSettingsDocumentTemplateLayoutTitles updates placement display names', () => {
   const template = buildDialogProjectSettingsDocumentTemplateDraft({
     id: 'template-a',
-    titleTranslations: {
+    titlePluralTranslations: {
       'en-US': 'Character',
       de: 'Held'
     }
@@ -34,7 +34,8 @@ test('Test that syncDialogProjectSettingsDocumentTemplateLayoutTitles updates pl
             groupSortOrder: null,
             icon: '',
             id: 'placement-a',
-            nickname: '',
+            nicknamePluralTranslations: {},
+            nicknameSingularTranslations: {},
             rootSortOrder: 0,
             templateDisplayName: 'Character',
             worldAppendix: ''

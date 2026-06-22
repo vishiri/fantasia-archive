@@ -1,6 +1,8 @@
 const FA_LOCALE_TRANSLATIONS_MENU_DEFAULT_MAX_WIDTH_PX = 500
 
-const FA_LOCALE_TRANSLATIONS_MENU_DEFAULT_MAX_HEIGHT_PX = 600
+const FA_LOCALE_TRANSLATIONS_MENU_DEFAULT_MIN_WIDTH_PX = 350
+
+const FA_LOCALE_TRANSLATIONS_MENU_DEFAULT_MAX_HEIGHT_PX = 450
 
 const FA_LOCALE_TRANSLATIONS_MENU_DEFAULT_VIEWPORT_MARGIN_PX = 16
 
@@ -11,6 +13,7 @@ export function resolveFaLocaleTranslationsMenuPresentation (input: {
   anchorRect: DOMRectReadOnly
   maxHeightPx?: number
   maxWidthPx?: number
+  minWidthPx?: number
   viewportHeightPx: number
   viewportMarginPx?: number
   viewportWidthPx: number
@@ -19,13 +22,27 @@ export function resolveFaLocaleTranslationsMenuPresentation (input: {
     widthPx: number
   } {
   const maxWidthPx = input.maxWidthPx ?? FA_LOCALE_TRANSLATIONS_MENU_DEFAULT_MAX_WIDTH_PX
+  const minWidthPx = input.minWidthPx ?? FA_LOCALE_TRANSLATIONS_MENU_DEFAULT_MIN_WIDTH_PX
   const maxHeightPx = input.maxHeightPx ?? FA_LOCALE_TRANSLATIONS_MENU_DEFAULT_MAX_HEIGHT_PX
   const viewportMarginPx =
     input.viewportMarginPx ?? FA_LOCALE_TRANSLATIONS_MENU_DEFAULT_VIEWPORT_MARGIN_PX
   const availableWidthPx = input.viewportWidthPx - input.anchorRect.left - viewportMarginPx
-  const widthPx = Math.min(maxWidthPx, Math.max(0, Math.round(availableWidthPx)))
+  const preferredWidthPx = Math.max(
+    minWidthPx,
+    Math.round(input.anchorRect.width)
+  )
+  const fittedWidthPx = Math.min(
+    maxWidthPx,
+    Math.max(0, Math.round(availableWidthPx)),
+    preferredWidthPx
+  )
+  const widthPx = Math.max(minWidthPx, fittedWidthPx)
   const availableBelowPx = input.viewportHeightPx - input.anchorRect.bottom - viewportMarginPx
-  const resolvedMaxHeightPx = Math.min(maxHeightPx, Math.max(0, Math.round(availableBelowPx)))
+  const resolvedMaxHeightPx = Math.min(
+    maxHeightPx,
+    FA_LOCALE_TRANSLATIONS_MENU_DEFAULT_MAX_HEIGHT_PX,
+    Math.max(0, Math.round(availableBelowPx))
+  )
   return {
     maxHeightPx: resolvedMaxHeightPx,
     widthPx

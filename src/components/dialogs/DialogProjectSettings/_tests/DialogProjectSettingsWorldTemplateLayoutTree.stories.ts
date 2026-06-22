@@ -35,12 +35,16 @@ const layoutWithGroupAndTemplate = appendDialogProjectSettingsWorldTemplatePlace
 
 export const Default: StoryObj<typeof meta> = {
   args: {
+    currentLanguageCode: 'en-US',
+    documentTemplates: [],
     templateLayout: layoutWithGroupAndTemplate
   }
 }
 
 export const Empty: StoryObj<typeof meta> = {
   args: {
+    currentLanguageCode: 'en-US',
+    documentTemplates: [],
     templateLayout: createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   }
 }

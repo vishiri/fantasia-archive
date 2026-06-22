@@ -52,6 +52,7 @@ export function createFaLocaleTranslationsInputMenuState (
       anchorRect: anchorElement.getBoundingClientRect(),
       maxHeightPx: deps.FA_LOCALE_TRANSLATIONS_INPUT_MENU_MAX_HEIGHT_PX,
       maxWidthPx: deps.FA_LOCALE_TRANSLATIONS_INPUT_MENU_MAX_WIDTH_PX,
+      minWidthPx: deps.FA_LOCALE_TRANSLATIONS_INPUT_MENU_MIN_WIDTH_PX,
       viewportHeightPx: window.innerHeight,
       viewportMarginPx: deps.FA_LOCALE_TRANSLATIONS_INPUT_MENU_VIEWPORT_MARGIN_PX,
       viewportWidthPx: window.innerWidth

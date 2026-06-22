@@ -2,8 +2,16 @@
 
 /* COMPONENT - FA LOCALE TRANSLATIONS INPUT */
 $faLocaleTranslationsInput-menu-zIndex: 7002;
+$faLocaleTranslationsInput-menu-minWidth: 350px;
+$faLocaleTranslationsInput-menu-singularPluralMinWidth: 650px;
+$faLocaleTranslationsInput-menu-singularPluralMaxWidth: 700px;
 $faLocaleTranslationsInput-menu-maxWidth: 500px;
-$faLocaleTranslationsInput-menu-body-padding: 8px 12px;
+$faLocaleTranslationsInput-menu-maxHeight: 450px;
+$faLocaleTranslationsInput-menu-body-padding-y: 8px;
+$faLocaleTranslationsInput-menu-body-padding-x: 12px;
+$faLocaleTranslationsInput-menu-body-padding: $faLocaleTranslationsInput-menu-body-padding-y $faLocaleTranslationsInput-menu-body-padding-x;
 $faLocaleTranslationsInput-menu-backgroundColor: fa-v('dark-lighter', $dark-lighter);
 $faLocaleTranslationsInput-menuRow-gap: 12px;
 $faLocaleTranslationsInput-fallbackWarning-marginLeft: 8px;
+$faLocaleTranslationsInput-pinnedAside-width: 200px;
+$faLocaleTranslationsInput-pinnedAside-gap: 12px;

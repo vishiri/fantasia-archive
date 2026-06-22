@@ -3,6 +3,9 @@ import type { Reactive } from 'vue'
 import type { T_faColorPickerInputPalette } from 'app/types/I_faColorPickerInput'
 import type { T_faDialogProjectSettingsWorldColorPaletteDuplicateIconColor } from 'app/types/I_faColorContrast'
 import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
+import type { I_faProjectWorldTemplateGroupDisplayNameTranslations } from 'app/types/I_faProjectWorldTemplateGroupDisplayNameTranslations'
+import type { I_faProjectWorldTemplatePlacementNicknameSingularTranslations } from 'app/types/I_faProjectWorldTemplatePlacementNicknameSingularTranslations'
+import type { I_faProjectWorldTemplatePlacementNicknameTranslations } from 'app/types/I_faProjectWorldTemplatePlacementNicknameTranslations'
 import type { I_faProjectWorldTemplateLayoutForProjectSettings } from 'app/types/I_faProjectWorldTemplateLayoutDomain'
 import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
 import type { SortableEvent } from 'sortablejs'
@@ -10,7 +13,7 @@ import type { SortableEvent } from 'sortablejs'
 /** One template group in a world layout draft (Project Settings). */
 export interface I_dialogProjectSettingsWorldTemplateGroupDraft {
   id: string
-  displayName: string
+  displayNameTranslations: I_faProjectWorldTemplateGroupDisplayNameTranslations
   rootSortOrder: number
 }
 
@@ -19,7 +22,8 @@ export interface I_dialogProjectSettingsWorldTemplatePlacementDraft {
   id: string
   documentTemplateId: string
   templateDisplayName: string
-  nickname: string
+  nicknamePluralTranslations: I_faProjectWorldTemplatePlacementNicknameTranslations,
+  nicknameSingularTranslations: I_faProjectWorldTemplatePlacementNicknameSingularTranslations
   worldAppendix: string
   icon: string
   documentCountInWorld: number
@@ -42,7 +46,9 @@ export interface I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode {
   icon: string
   id: string
   label: string
-  nickname: string
+  displayNameTranslations: I_faProjectWorldTemplateGroupDisplayNameTranslations
+  nicknamePluralTranslations: I_faProjectWorldTemplatePlacementNicknameTranslations,
+  nicknameSingularTranslations: I_faProjectWorldTemplatePlacementNicknameSingularTranslations
   nodeKind: 'group' | 'template'
   templateDisplayName: string
   usesNickname: boolean

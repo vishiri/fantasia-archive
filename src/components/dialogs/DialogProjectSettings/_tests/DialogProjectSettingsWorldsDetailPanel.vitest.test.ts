@@ -5,6 +5,7 @@ import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
 
 import DialogProjectSettingsWorldsDetailPanel from '../DialogProjectSettingsWorldsDetailPanel.vue'
+import { mergeDialogProjectSettingsVitestGlobal } from 'app/helpers/dialogProjectSettingsVitestI18n'
 
 const worldFixture = {
   color: '',
@@ -154,10 +155,7 @@ test('Test that DialogProjectSettingsWorldsDetailPanel emits field updates', asy
       documentTemplates: [],
       world: worldFixture
     },
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
+    global: mergeDialogProjectSettingsVitestGlobal({
       stubs: {
         DialogProjectSettingsWorldColorPaletteEditor: paletteEditorStub,
         DialogProjectSettingsWorldsDeleteButton: deleteButtonStub,
@@ -170,7 +168,7 @@ test('Test that DialogProjectSettingsWorldsDetailPanel emits field updates', asy
         QIcon: qIconStub,
         QTooltip: defineComponent({ template: '<span><slot /></span>' })
       }
-    }
+    })
   })
 
   expect(w.find('[data-test-locator="dialogProjectSettings-worlds-nameLabel"]').text()).toBe(
@@ -274,10 +272,7 @@ test('Test that DialogProjectSettingsWorldsDetailPanel normalizes null field upd
       documentTemplates: [],
       world: worldFixture
     },
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
+    global: mergeDialogProjectSettingsVitestGlobal({
       stubs: {
         DialogProjectSettingsWorldsDeleteButton: deleteButtonStub,
         FaColorPickerInput: nullEmitColorPickerStub,
@@ -285,7 +280,7 @@ test('Test that DialogProjectSettingsWorldsDetailPanel normalizes null field upd
         QIcon: qIconStub,
         QTooltip: true
       }
-    }
+    })
   })
 
   await w.find('.fa-locale-translations-input-null-stub').trigger('click')
@@ -312,10 +307,7 @@ test('Test that DialogProjectSettingsWorldsDetailPanel reflects validation and r
         color: '  '
       }
     },
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
+    global: mergeDialogProjectSettingsVitestGlobal({
       stubs: {
         DialogProjectSettingsWorldColorPaletteEditor: true,
         DialogProjectSettingsWorldsDeleteButton: deleteButtonStub,
@@ -324,7 +316,7 @@ test('Test that DialogProjectSettingsWorldsDetailPanel reflects validation and r
         QIcon: qIconStub,
         QTooltip: true
       }
-    }
+    })
   })
 
   expect(

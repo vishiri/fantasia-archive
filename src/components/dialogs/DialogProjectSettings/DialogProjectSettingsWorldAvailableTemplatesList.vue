@@ -30,6 +30,20 @@
               <q-item-label class="dialogProjectSettingsWorldAvailableTemplatesList__label col">
                 {{ resolveTemplateLabel(template) }}
               </q-item-label>
+              <q-icon
+                v-if="isTemplateMissingCurrentLanguageTranslations(template)"
+                class="dialogProjectSettingsWorldAvailableTemplatesList__missingTranslationsWarning"
+                color="warning"
+                data-test-locator="dialogProjectSettings-worldAvailableTemplates-missingTranslationsWarning"
+                :data-test-tooltip-text="resolveTemplateMissingTranslationsTooltip(template)"
+                name="mdi-alert"
+                size="16px"
+                @click.stop
+              >
+                <q-tooltip content-class="dialogProjectSettings__fieldHelpTooltip">
+                  <FaMultilineTooltipBody :text="resolveTemplateMissingTranslationsTooltip(template)" />
+                </q-tooltip>
+              </q-icon>
             </div>
             <div
               v-if="resolveTemplateWorldAppendix(template).length > 0"
@@ -68,16 +82,28 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+import FaMultilineTooltipBody from 'app/src/components/elements/FaMultilineTooltipBody/FaMultilineTooltipBody.vue'
+import { FA_USER_SETTINGS_LANGUAGE_DISPLAY_NAMES } from 'app/i18n/faUserSettingsLanguageDisplayNames'
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
+import { faUserSettingsLanguageCodeToNamesKey } from 'app/types/faUserSettingsLanguageRegistry'
 import { FA_ICON_PICKER_EMPTY_PLACEHOLDER_ICON } from 'app/types/I_faIconPickerInput'
 import { clearQuasarHoverableFocusState } from 'app/src/scripts/dom/functions/clearQuasarHoverableFocusState'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
-import { resolveDialogProjectSettingsDocumentTemplateResolvedTitle, resolveDialogProjectSettingsDocumentTemplateDisplayIcon } from './scripts/dialogProjectSettingsDocumentTemplatesDraft'
+import {
+  resolveDialogProjectSettingsDocumentTemplateResolvedTitle,
+  resolveDialogProjectSettingsDocumentTemplateDisplayIcon,
+  isDialogProjectSettingsDocumentTemplateMissingCurrentLanguageTranslations,
+  resolveDialogProjectSettingsDocumentTemplateMissingTranslationWarningTooltip
+} from './scripts/dialogProjectSettingsDocumentTemplatesDraft'
 import { resolveDialogProjectSettingsDocumentTemplateResolvedWorldAppendix } from './scripts/dialogProjectSettingsDocumentTemplateWorldAppendixDraft'
 
 defineOptions({
   name: 'DialogProjectSettingsWorldAvailableTemplatesList'
 })
+
+const { t } = useI18n()
 
 const props = defineProps<{
   currentLanguageCode: T_faUserSettingsLanguageCode
@@ -98,6 +124,28 @@ function resolveTemplateLabel (template: I_dialogProjectSettingsDocumentTemplate
 
 function resolveTemplateWorldAppendix (template: I_dialogProjectSettingsDocumentTemplateDraft): string {
   return resolveDialogProjectSettingsDocumentTemplateResolvedWorldAppendix(
+    template,
+    props.currentLanguageCode
+  )
+}
+
+function resolveTemplateMissingTranslationsTooltip (
+  template: I_dialogProjectSettingsDocumentTemplateDraft
+): string {
+  return resolveDialogProjectSettingsDocumentTemplateMissingTranslationWarningTooltip({
+    activeLanguageCode: props.currentLanguageCode,
+    readFallbackLanguageName: (languageCode) => {
+      return FA_USER_SETTINGS_LANGUAGE_DISPLAY_NAMES[faUserSettingsLanguageCodeToNamesKey(languageCode)]
+    },
+    template,
+    translate: (key, params) => t(key, params ?? {})
+  })
+}
+
+function isTemplateMissingCurrentLanguageTranslations (
+  template: I_dialogProjectSettingsDocumentTemplateDraft
+): boolean {
+  return isDialogProjectSettingsDocumentTemplateMissingCurrentLanguageTranslations(
     template,
     props.currentLanguageCode
   )
@@ -165,7 +213,13 @@ function onItemContextMenu (event: MouseEvent): void {
 }
 
 .dialogProjectSettingsWorldAvailableTemplatesList__titleRow {
+  gap: $dialogProjectSettings-documentTemplatesTabMissingTranslationsWarning-gap;
   min-width: 0;
   width: 100%;
+}
+
+.dialogProjectSettingsWorldAvailableTemplatesList__missingTranslationsWarning {
+  flex: 0 0 auto;
+  margin-left: $dialogProjectSettings-documentTemplatesTabMissingTranslationsWarning-marginLeft;
 }
 </style>

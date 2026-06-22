@@ -1,5 +1,5 @@
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
-import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
 import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import type { Ref } from 'app/types/I_vueCompositionRefs'
@@ -36,7 +36,7 @@ export function removeDialogProjectSettingsDocumentTemplateDraftRow (
 export function updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations (
   localDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>,
   id: string,
-  titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+  titleTranslations: I_faLocaleSingularPluralTranslations
 ): void {
   if (localDocumentTemplates.value === null) {
     return
@@ -47,7 +47,8 @@ export function updateDialogProjectSettingsDocumentTemplateDraftTitleTranslation
     }
     return {
       ...template,
-      titleTranslations
+      titlePluralTranslations: titleTranslations.plural,
+      titleSingularTranslations: titleTranslations.singular
     }
   })
 }

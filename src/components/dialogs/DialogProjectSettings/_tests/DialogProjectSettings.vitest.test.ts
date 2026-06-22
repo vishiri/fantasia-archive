@@ -6,6 +6,7 @@ import { defineComponent } from 'vue'
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import DialogProjectSettings from '../DialogProjectSettings.vue'
+import { mergeDialogProjectSettingsVitestGlobal } from 'app/helpers/dialogProjectSettingsVitestI18n'
 
 vi.mock('app/src/stores/scripts/sFaProjectSettingsBridge', () => ({
   faProjectSettingsFetchFreshForDialog: vi.fn(async () => ({
@@ -161,12 +162,9 @@ beforeEach(() => {
  */
 test('Test that DialogProjectSettings mounts with direct snapshot and shows project name field', async () => {
   const w = mount(DialogProjectSettings, {
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
+    global: mergeDialogProjectSettingsVitestGlobal({
       stubs: dialogProjectSettingsStubs
-    },
+    }),
     props: {
       directInput: 'ProjectSettings',
       directSettingsSnapshot: {
@@ -196,12 +194,9 @@ test('Test that DialogProjectSettings save button persists and closes the dialog
   )
 
   const w = mount(DialogProjectSettings, {
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
+    global: mergeDialogProjectSettingsVitestGlobal({
       stubs: dialogProjectSettingsStubs
-    },
+    }),
     props: {
       directInput: 'ProjectSettings',
       directSettingsSnapshot: {
@@ -241,12 +236,9 @@ test('Test that DialogProjectSettings save button persists and closes the dialog
  */
 test('Test that DialogProjectSettings updates the local project name draft', async () => {
   const w = mount(DialogProjectSettings, {
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
+    global: mergeDialogProjectSettingsVitestGlobal({
       stubs: dialogProjectSettingsStubs
-    },
+    }),
     props: {
       directInput: 'ProjectSettings',
       directSettingsSnapshot: {
@@ -281,12 +273,9 @@ test('Test that DialogProjectSettings hides panels before local settings hydrate
   })
 
   const w = mount(DialogProjectSettings, {
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
+    global: mergeDialogProjectSettingsVitestGlobal({
       stubs: dialogProjectSettingsStubs
-    },
+    }),
     props: {
       directInput: 'ProjectSettings'
     }
@@ -309,12 +298,9 @@ test('Test that DialogProjectSettings hides panels before local settings hydrate
  */
 test('Test that DialogProjectSettings disables save for whitespace-only names', async () => {
   const w = mount(DialogProjectSettings, {
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
+    global: mergeDialogProjectSettingsVitestGlobal({
       stubs: dialogProjectSettingsStubs
-    },
+    }),
     props: {
       directInput: 'ProjectSettings',
       directSettingsSnapshot: {
@@ -335,12 +321,9 @@ test('Test that DialogProjectSettings disables save for whitespace-only names', 
  */
 test('Test that DialogProjectSettings shows save validation errors icon beside Save settings', async () => {
   const w = mount(DialogProjectSettings, {
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
+    global: mergeDialogProjectSettingsVitestGlobal({
       stubs: dialogProjectSettingsStubs
-    },
+    }),
     props: {
       directInput: 'ProjectSettings',
       directSettingsSnapshot: {

@@ -8,6 +8,19 @@ import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_d
 
 import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
 
+import type { I_faLocaleStringTranslations } from 'app/types/I_faLocaleStringTranslations'
+
+function hasAnyLocaleStringTranslation (
+  translations: I_faLocaleStringTranslations
+): boolean {
+  for (const value of Object.values(translations)) {
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return true
+    }
+  }
+  return false
+}
+
 const HEX_COLOR_SEGMENT = /^#[0-9a-fA-F]{6}$/
 
 function hasDialogProjectSettingsColorPalleteCaseInsensitiveDuplicates (
@@ -60,7 +73,9 @@ function worldTemplateLayoutHasDocumentTemplatePlacementValidationError (
     return false
   }
   for (const template of documentTemplates) {
-    if (Object.values(template.titleTranslations).some((value) => (value ?? '').trim().length > 0)) {
+    if (Object.values(template.titlePluralTranslations).some(
+      (value) => typeof value === 'string' && value.trim().length > 0
+    )) {
       continue
     }
     for (const placement of templateLayout.placements) {
@@ -75,7 +90,9 @@ function worldTemplateLayoutHasDocumentTemplatePlacementValidationError (
 function worldTemplateLayoutHasValidationError (
   templateLayout: I_dialogProjectSettingsWorldTemplateLayoutDraft
 ): boolean {
-  if (templateLayout.groups.some((group) => group.displayName.trim().length === 0)) {
+  if (templateLayout.groups.some(
+    (group) => !hasAnyLocaleStringTranslation(group.displayNameTranslations)
+  )) {
     return true
   }
   return worldTemplateLayoutHasDuplicateDocumentTemplatePlacements(templateLayout)
@@ -135,7 +152,9 @@ export function collectDialogProjectSettingsSaveValidationErrors (
         worldIndexOneBased
       })
     }
-    if (world.templateLayout.groups.some((group) => group.displayName.trim().length === 0)) {
+    if (world.templateLayout.groups.some(
+      (group) => !hasAnyLocaleStringTranslation(group.displayNameTranslations)
+    )) {
       errors.push({
         kind: 'worldTemplateGroupNameRequired',
         worldIndexOneBased

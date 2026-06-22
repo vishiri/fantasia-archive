@@ -28,7 +28,8 @@ test('Test that collectDialogProjectSettingsDocumentTemplateSaveValidationErrors
     templateRow,
     buildDialogProjectSettingsDocumentTemplateDraft({
       id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
-      titleTranslations: { 'en-US': '   ' }
+      titlePluralTranslations: { 'en-US': '   ' },
+      titleSingularTranslations: {},
     })
   ])).toEqual([
     {
@@ -56,7 +57,8 @@ test('Test that isDialogProjectSettingsFullDialogSaveDisabled blocks invalid tem
   expect(isDialogProjectSettingsFullDialogSaveDisabled('Project', [], [])).toBe(false)
   expect(isDialogProjectSettingsFullDialogSaveDisabled('Project', [], [
     buildDialogProjectSettingsDocumentTemplateDraft({
-      titleTranslations: { 'en-US': '   ' }
+      titlePluralTranslations: { 'en-US': '   ' },
+      titleSingularTranslations: {},
     })
   ])).toBe(true)
 })
@@ -80,7 +82,8 @@ test('Test that collectDialogProjectSettingsFullSaveValidationErrors merges all 
     }
   ], [
     buildDialogProjectSettingsDocumentTemplateDraft({
-      titleTranslations: { 'en-US': '   ' }
+      titlePluralTranslations: { 'en-US': '   ' },
+      titleSingularTranslations: {},
     })
   ])
   expect(errors.map((error) => error.kind)).toEqual([

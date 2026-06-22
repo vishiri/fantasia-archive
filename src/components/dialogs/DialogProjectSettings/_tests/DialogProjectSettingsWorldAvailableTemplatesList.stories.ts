@@ -22,7 +22,8 @@ export const WithTemplates: StoryObj<typeof meta> = {
       documentCount: 0,
       icon: 'mdi-account',
       id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-      titleTranslations: { 'en-US': 'Character' },
+      titlePluralTranslations: { 'en-US': 'Character' },
+      titleSingularTranslations: {},
       worldAppendixTranslations: { 'en-US': 'sheet' }
     }]
   }
@@ -32,5 +33,19 @@ export const Empty: StoryObj<typeof meta> = {
   args: {
     currentLanguageCode: 'en-US',
     templates: []
+  }
+}
+
+export const MissingActiveLocaleTranslation: StoryObj<typeof meta> = {
+  args: {
+    currentLanguageCode: 'de',
+    templates: [{
+      documentCount: 0,
+      icon: 'mdi-account',
+      id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+      titlePluralTranslations: { 'en-US': 'Character' },
+      titleSingularTranslations: {},
+      worldAppendixTranslations: { 'en-US': 'sheet' }
+    }]
   }
 }

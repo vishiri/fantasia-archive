@@ -17,6 +17,8 @@ export default meta
 
 export const GroupNode: StoryObj<typeof meta> = {
   args: {
+    currentLanguageCode: 'en-US',
+    documentTemplates: [],
     node: {
       children: [],
       documentCountInWorld: 0,
@@ -32,6 +34,8 @@ export const GroupNode: StoryObj<typeof meta> = {
 
 export const TemplateNode: StoryObj<typeof meta> = {
   args: {
+    currentLanguageCode: 'en-US',
+    documentTemplates: [],
     node: {
       children: [],
       documentCountInWorld: 2,
@@ -48,6 +52,8 @@ export const TemplateNode: StoryObj<typeof meta> = {
 export const ValidationError: StoryObj<typeof meta> = {
   args: {
     blankGroupIds: new Set(['group-a']),
+    currentLanguageCode: 'en-US',
+    documentTemplates: [],
     node: {
       children: [],
       documentCountInWorld: 0,

@@ -1,0 +1,51 @@
+import { computed, nextTick, ref } from 'vue'
+
+import {
+  FA_LOCALE_TRANSLATIONS_INPUT_MENU_MAX_HEIGHT_PX,
+  FA_LOCALE_TRANSLATIONS_INPUT_MENU_SINGULAR_PLURAL_MAX_WIDTH_PX,
+  FA_LOCALE_TRANSLATIONS_INPUT_MENU_SINGULAR_PLURAL_MIN_WIDTH_PX,
+  FA_LOCALE_TRANSLATIONS_INPUT_MENU_OFFSET_Y_PX,
+  FA_LOCALE_TRANSLATIONS_INPUT_MENU_VIEWPORT_MARGIN_PX
+} from 'app/types/I_faLocaleTranslationsInput'
+
+import { isFaLocaleStringTranslationUsingFallback } from 'app/src/scripts/localeTranslations/functions/isFaLocaleStringTranslationUsingFallback'
+import {
+  buildFaLocaleTranslationsMenuContentStyle,
+  resolveFaLocaleTranslationsMenuPresentation
+} from 'app/src/scripts/localeTranslations/functions/resolveFaLocaleTranslationsMenuPresentation'
+import { resolveFaLocaleTranslationsMenuAnchorElement } from 'app/src/scripts/localeTranslations/functions/resolveFaLocaleTranslationsMenuAnchorElement'
+import { scheduleFaLocaleTranslationsMenuInputFocus } from 'app/src/scripts/localeTranslations/functions/scheduleFaLocaleTranslationsMenuInputFocus'
+import {
+  resolveFaLocaleSingularPluralDisplayTranslation,
+  resolveFaLocaleSingularPluralDisplayTranslationLanguageCode,
+  resolveFaLocaleSingularPluralMissingFormsForLanguage
+} from 'app/src/scripts/localeTranslations/faLocaleSingularPluralTranslations_manager'
+import {
+  resolveFaLocaleStringTranslation,
+  resolveFaLocaleStringTranslationLanguageCode
+} from 'app/src/scripts/localeTranslations/faLocaleStringTranslations_manager'
+
+import { buildFaLocaleTranslationsInputLocaleRows } from './faLocaleTranslationsInputLocaleRowsWiring'
+import { createUseFaLocaleTranslationsInputSingularPlural } from './faLocaleTranslationsInputSingularPluralComposableWiring'
+
+export const useFaLocaleTranslationsInputSingularPlural = createUseFaLocaleTranslationsInputSingularPlural({
+  FA_LOCALE_TRANSLATIONS_INPUT_MENU_MAX_HEIGHT_PX,
+  FA_LOCALE_TRANSLATIONS_INPUT_MENU_MAX_WIDTH_PX: FA_LOCALE_TRANSLATIONS_INPUT_MENU_SINGULAR_PLURAL_MAX_WIDTH_PX,
+  FA_LOCALE_TRANSLATIONS_INPUT_MENU_MIN_WIDTH_PX: FA_LOCALE_TRANSLATIONS_INPUT_MENU_SINGULAR_PLURAL_MIN_WIDTH_PX,
+  FA_LOCALE_TRANSLATIONS_INPUT_MENU_OFFSET_Y_PX,
+  FA_LOCALE_TRANSLATIONS_INPUT_MENU_VIEWPORT_MARGIN_PX,
+  buildFaLocaleTranslationsMenuContentStyle,
+  buildLocaleRows: buildFaLocaleTranslationsInputLocaleRows,
+  computed,
+  isFaLocaleStringTranslationUsingFallback,
+  nextTick,
+  ref,
+  resolveFaLocaleSingularPluralDisplayTranslation,
+  resolveFaLocaleSingularPluralDisplayTranslationLanguageCode,
+  resolveFaLocaleSingularPluralMissingFormsForLanguage,
+  resolveFaLocaleStringTranslation,
+  resolveFaLocaleStringTranslationLanguageCode,
+  resolveFaLocaleTranslationsMenuAnchorElement,
+  resolveFaLocaleTranslationsMenuPresentation,
+  scheduleFaLocaleTranslationsMenuInputFocus
+})

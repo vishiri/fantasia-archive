@@ -2,6 +2,7 @@ import type { I_dialogProjectSettingsProps } from 'app/types/I_dialogProjectSett
 import type { T_dialogProjectSettingsUseHookDeps } from 'app/types/I_dialogProjectSettings'
 
 import { createDialogProjectSettingsValidationComputeds } from './createDialogProjectSettingsValidationComputedsWiring'
+import { registerDialogProjectSettingsLanguageLayoutLabelsSyncWatcher } from './dialogProjectSettingsLanguageLayoutLabelsSyncWatcher'
 
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 
@@ -53,6 +54,13 @@ export function useDialogProjectSettingsImpl (
 
   const currentLanguageCode = deps.computed(() => {
     return S_FaUserSettings().settings?.languageCode ?? 'en-US'
+  })
+
+  registerDialogProjectSettingsLanguageLayoutLabelsSyncWatcher({
+    getCurrentLanguageCode: () => currentLanguageCode.value,
+    localDocumentTemplates,
+    localWorlds,
+    watch: deps.watch
   })
 
   return {

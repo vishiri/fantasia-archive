@@ -29,7 +29,7 @@ export function collectDialogProjectSettingsDocumentTemplateSaveValidationErrors
     if (template === undefined) {
       continue
     }
-    if (isDialogProjectSettingsDocumentTemplateNameInvalid(template.titleTranslations)) {
+    if (isDialogProjectSettingsDocumentTemplateNameInvalid(template.titlePluralTranslations)) {
       errors.push({
         kind: 'documentTemplateNameRequired',
         templateIndexOneBased: index + 1

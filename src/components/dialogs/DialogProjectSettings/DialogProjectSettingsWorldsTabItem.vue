@@ -15,15 +15,33 @@
       class="q-focus-helper"
       tabindex="-1"
     />
-    <div class="faVerticalDraggableTabs__tabContent relative-position">
-      <span class="faVerticalDraggableTabs__tabLabel">
-        <template v-if="resolvedDisplayName.length > 0">
-          {{ resolvedDisplayName }}
-        </template>
-        <template v-else>
-          {{ $t('dialogs.projectSettings.panels.worlds.defaultNewWorldName') }}
-        </template>
-      </span>
+    <div class="dialogProjectSettingsWorldsTabItem__titleRow">
+      <div class="dialogProjectSettingsWorldsTabItem__titleContent relative-position">
+        <div class="faVerticalDraggableTabs__tabContent relative-position">
+          <span class="faVerticalDraggableTabs__tabLabel">
+            <template v-if="resolvedDisplayName.length > 0">
+              {{ resolvedDisplayName }}
+            </template>
+            <template v-else>
+              {{ $t('dialogs.projectSettings.panels.worlds.defaultNewWorldName') }}
+            </template>
+          </span>
+        </div>
+      </div>
+      <q-icon
+        v-if="showMissingTranslationsWarning"
+        class="dialogProjectSettingsWorldsTabItem__missingTranslationsWarning"
+        color="warning"
+        data-test-locator="dialogProjectSettings-worlds-tabMissingTranslationsWarning"
+        :data-test-tooltip-text="$t('dialogs.projectSettings.panels.worlds.missingTranslationsTabTooltip')"
+        name="mdi-alert"
+        size="16px"
+        @click.stop
+      >
+        <q-tooltip content-class="dialogProjectSettings__fieldHelpTooltip">
+          {{ $t('dialogs.projectSettings.panels.worlds.missingTranslationsTabTooltip') }}
+        </q-tooltip>
+      </q-icon>
     </div>
     <span
       v-if="showWorldColorSwatch"
@@ -40,7 +58,10 @@ import { computed, ref } from 'vue'
 
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
-import { resolveDialogProjectSettingsWorldResolvedDisplayName } from './scripts/dialogProjectSettingsWorldsDisplayNameDraft'
+import {
+  isDialogProjectSettingsWorldMissingCurrentLanguageTranslations,
+  resolveDialogProjectSettingsWorldResolvedDisplayName
+} from './scripts/dialogProjectSettingsWorldsDisplayNameDraft'
 
 defineOptions({
   name: 'DialogProjectSettingsWorldsTabItem'
@@ -86,6 +107,13 @@ const resolvedDisplayName = computed(() => {
   )
 })
 
+const showMissingTranslationsWarning = computed(() => {
+  return isDialogProjectSettingsWorldMissingCurrentLanguageTranslations(
+    props.world,
+    props.currentLanguageCode
+  )
+})
+
 const trimmedWorldColor = computed(() => props.world.color.trim())
 
 const showWorldColorSwatch = computed(() => trimmedWorldColor.value.length > 0)
@@ -121,3 +149,5 @@ const tabClassList = computed(() => {
   return classList
 })
 </script>
+
+<style lang="scss" src="./styles/DialogProjectSettings.worldsTabItem.unscoped.scss"></style>

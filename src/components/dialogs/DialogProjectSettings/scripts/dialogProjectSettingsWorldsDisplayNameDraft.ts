@@ -34,6 +34,20 @@ export function isDialogProjectSettingsWorldResolvedDisplayNameUsingFallback (
   return resolvedLanguageCode !== null && resolvedLanguageCode !== languageCode
 }
 
+/**
+ * True when the world display name lacks a value for the active UI language.
+ */
+export function isDialogProjectSettingsWorldMissingCurrentLanguageTranslations (
+  world: Pick<I_dialogProjectSettingsWorldDraft, 'displayNameTranslations'>,
+  languageCode: T_faUserSettingsLanguageCode
+): boolean {
+  const displayNameTranslation = world.displayNameTranslations[languageCode] ?? ''
+  if (displayNameTranslation.trim().length === 0) {
+    return true
+  }
+  return false
+}
+
 export function isDialogProjectSettingsWorldNameInvalid (
   displayNameTranslations: I_faProjectWorldDisplayNameTranslations
 ): boolean {

@@ -340,7 +340,7 @@ test('Test that template layout validation rejects blank group names', () => {
       templateLayout: {
         groups: [
           {
-            displayName: '   ',
+            displayNameTranslations: { 'en-US': '   ' },
             id: 'group-a',
             rootSortOrder: 0
           }
@@ -355,7 +355,7 @@ test('Test that template layout validation rejects blank group names', () => {
       templateLayout: {
         groups: [
           {
-            displayName: '   ',
+            displayNameTranslations: { 'en-US': '   ' },
             id: 'group-a',
             rootSortOrder: 0
           }
@@ -369,7 +369,7 @@ test('Test that template layout validation rejects blank group names', () => {
     templateLayout: {
       groups: [
         {
-          displayName: '   ',
+          displayNameTranslations: { 'en-US': '   ' },
           id: 'group-a',
           rootSortOrder: 0
         }
@@ -383,7 +383,7 @@ test('Test that template layout validation rejects blank group names', () => {
       templateLayout: {
         groups: [
           {
-            displayName: '   ',
+            displayNameTranslations: { 'en-US': '   ' },
             id: 'group-a',
             rootSortOrder: 0
           }
@@ -410,7 +410,8 @@ test('Test that template layout validation rejects duplicate document template p
       {
         templateDisplayName: 'Character',
 
-        nickname: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {},
         documentCountInWorld: 0,
         documentTemplateId: 'template-a',
         groupId: null,
@@ -423,7 +424,8 @@ test('Test that template layout validation rejects duplicate document template p
       {
         templateDisplayName: 'Character copy',
 
-        nickname: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {},
         documentCountInWorld: 0,
         documentTemplateId: 'template-a',
         groupId: null,
@@ -469,7 +471,8 @@ test('Test that template layout validation rejects invalid document template pla
       {
         templateDisplayName: 'Character',
 
-        nickname: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {},
         documentCountInWorld: 0,
         documentTemplateId: 'template-a',
         groupId: null,
@@ -484,7 +487,8 @@ test('Test that template layout validation rejects invalid document template pla
   const documentTemplates = [
     buildDialogProjectSettingsDocumentTemplateDraft({
       id: 'template-a',
-      titleTranslations: { 'en-US': '   ' }
+      titlePluralTranslations: { 'en-US': '   ' },
+      titleSingularTranslations: {},
     })
   ]
   const worldWithInvalidTemplate = {
@@ -509,12 +513,74 @@ test('Test that template layout validation rejects invalid document template pla
     [worldWithoutInvalidTemplate],
     documentTemplates
   )).toBe(false)
+
+  const documentTemplatesWithNonStringTitle = [
+    buildDialogProjectSettingsDocumentTemplateDraft({
+      id: 'template-a',
+      titlePluralTranslations: { 'en-US': 1 as unknown as string },
+      titleSingularTranslations: {},
+    })
+  ]
+  expect(hasDialogProjectSettingsWorldTemplateLayoutValidationError(
+    [worldWithInvalidTemplate],
+    documentTemplatesWithNonStringTitle
+  )).toBe(true)
+
   expect(isDialogProjectSettingsWorldTabValidationError(
     worldWithInvalidTemplate,
     documentTemplates
   )).toBe(true)
   expect(isDialogProjectSettingsWorldTabValidationError(
     worldWithoutInvalidTemplate,
+    documentTemplates
+  )).toBe(false)
+})
+
+test('Test that template layout validation ignores empty placement template ids and named templates', () => {
+  const layout = {
+    groups: [],
+    placements: [
+      {
+        templateDisplayName: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {},
+        documentCountInWorld: 0,
+        documentTemplateId: '',
+        groupId: null,
+        groupSortOrder: null,
+        icon: 'mdi-account',
+        id: 'placement-empty-template',
+        rootSortOrder: 0,
+        worldAppendix: ''
+      },
+      {
+        templateDisplayName: 'Character',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {},
+        documentCountInWorld: 0,
+        documentTemplateId: 'template-named',
+        groupId: null,
+        groupSortOrder: null,
+        icon: 'mdi-account',
+        id: 'placement-named-template',
+        rootSortOrder: 1,
+        worldAppendix: ''
+      }
+    ]
+  }
+  const documentTemplates = [
+    buildDialogProjectSettingsDocumentTemplateDraft({
+      id: 'template-named',
+      titlePluralTranslations: { 'en-US': 'Character' },
+      titleSingularTranslations: {}
+    })
+  ]
+
+  expect(hasDialogProjectSettingsWorldTemplateLayoutValidationError(
+    [{
+      ...baseWorld,
+      templateLayout: layout
+    }],
     documentTemplates
   )).toBe(false)
 })
@@ -530,7 +596,7 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot maps template layout ro
       templateLayout: {
         groups: [
           {
-            displayName: '  Creatures  ',
+            displayNameTranslations: { 'en-US': '  Creatures  ' },
             id: 'group-a',
             rootSortOrder: 0
           }
@@ -539,7 +605,8 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot maps template layout ro
           {
             templateDisplayName: 'Character',
 
-            nickname: '',
+            nicknamePluralTranslations: {},
+            nicknameSingularTranslations: {},
             documentCountInWorld: 0,
             documentTemplateId: 'template-a',
             groupId: 'group-a',
@@ -560,6 +627,7 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot maps template layout ro
         groups: [
           {
             displayName: 'Creatures',
+            displayNameTranslations: { 'en-US': 'Creatures' },
             id: 'group-a',
             rootSortOrder: 0
           }
@@ -571,6 +639,8 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot maps template layout ro
             groupSortOrder: 0,
             id: 'placement-a',
             nickname: '',
+            nicknamePluralTranslations: {},
+            nicknameSingularTranslations: {},
             rootSortOrder: null
           }
         ]

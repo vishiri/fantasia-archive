@@ -1,3 +1,4 @@
+import type { I_faProjectDocumentTemplateTitleSingularTranslations } from 'app/types/I_faProjectDocumentTemplateTitleSingularTranslations'
 import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
 import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
 
@@ -7,7 +8,8 @@ export const FA_DIALOG_PROJECT_SETTINGS_DELETE_CONFIRM_DELAY_SEC = 5
 /** Draft document template row in Project Settings before save. */
 export interface I_dialogProjectSettingsDocumentTemplateDraft {
   id: string
-  titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+  titlePluralTranslations: I_faProjectDocumentTemplateTitleTranslations,
+  titleSingularTranslations: I_faProjectDocumentTemplateTitleSingularTranslations
   worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
   icon: string
   documentCount: number
@@ -16,7 +18,8 @@ export interface I_dialogProjectSettingsDocumentTemplateDraft {
 /** List row returned by listDocumentTemplatesForProjectSettings IPC. */
 export interface I_faProjectDocumentTemplateForProjectSettingsItem {
   createdAtMs: number
-  titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+  titlePluralTranslations: I_faProjectDocumentTemplateTitleTranslations,
+  titleSingularTranslations: I_faProjectDocumentTemplateTitleSingularTranslations
   documentCount: number
   icon: string
   id: string

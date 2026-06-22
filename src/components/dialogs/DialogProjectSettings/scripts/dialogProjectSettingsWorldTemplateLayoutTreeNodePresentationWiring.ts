@@ -1,20 +1,23 @@
 import type { ComputedRef } from 'vue'
 
+import { FA_ICON_PICKER_EMPTY_PLACEHOLDER_ICON } from 'app/types/I_faIconPickerInput'
+import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
+import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
+
 import {
   resolveDialogProjectSettingsDocumentTemplateDisplayIcon
 } from './dialogProjectSettingsDocumentTemplatesDraft'
+import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeHoverTooltipWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeHoverTooltipWiring'
+import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeMissingTranslationsWarningWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeMissingTranslationsWarningWiring'
 import {
   resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeDisplayIcon,
   resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeEditTooltipI18nKey,
   resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeHasValidationError,
-  resolveDialogProjectSettingsWorldTemplateLayoutTreeNodePlacementNicknameHoverTooltipLines,
   resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeRemoveTooltipI18nKey,
   resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeRootClassList,
-  resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeShowsPlacementNicknameHoverTooltip,
   resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeTestLocator
 } from './functions/dialogProjectSettingsWorldTemplateLayoutTreeNodePresentation'
-import { FA_ICON_PICKER_EMPTY_PLACEHOLDER_ICON } from 'app/types/I_faIconPickerInput'
-import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
 
 type T_dialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring = {
   displayIconName: ComputedRef<string>
@@ -27,6 +30,9 @@ type T_dialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring = {
   placementNicknameHoverTooltipTestText: ComputedRef<string | undefined>
   removeTooltipText: ComputedRef<string>
   rowHasValidationError: ComputedRef<boolean>
+  showMissingTranslationsWarning: ComputedRef<boolean>
+  missingTranslationsWarningTestLocator: ComputedRef<string>
+  missingTranslationsWarningTooltipText: ComputedRef<string>
   showPlacementNicknameHoverTooltip: ComputedRef<boolean>
 }
 
@@ -39,6 +45,8 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodePresentati
   }
   props: {
     blankGroupIds?: ReadonlySet<string>
+    currentLanguageCode: T_faUserSettingsLanguageCode
+    documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[]
     duplicateDocumentTemplateIds?: ReadonlySet<string>
     invalidDocumentTemplateIds?: ReadonlySet<string>
     node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
@@ -49,6 +57,16 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodePresentati
   const nodeTestLocator = deps.computed(() => {
     return resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeTestLocator(deps.props.node)
   })
+
+  const missingTranslationsWarningWiring =
+    createDialogProjectSettingsWorldTemplateLayoutTreeNodeMissingTranslationsWarningWiring({
+      computed: deps.computed,
+      i18n: deps.i18n,
+      readCurrentLanguageCode: () => deps.props.currentLanguageCode,
+      readDocumentTemplates: () => deps.props.documentTemplates,
+      readNode: () => deps.props.node,
+      readNodeTestLocator: () => nodeTestLocator.value
+    })
 
   const displayIconName = deps.computed(() => {
     return resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeDisplayIcon({
@@ -86,57 +104,27 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodePresentati
     )
   })
 
-  const showPlacementNicknameHoverTooltip = deps.computed(() => {
-    return resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeShowsPlacementNicknameHoverTooltip(deps.props.node)
+  const hoverTooltipWiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeHoverTooltipWiring({
+    computed: deps.computed,
+    i18n: deps.i18n,
+    readCurrentLanguageCode: () => deps.props.currentLanguageCode,
+    readNode: () => deps.props.node
   })
-
-  const placementNicknameHoverTooltipLines = deps.computed(() => {
-    return resolveDialogProjectSettingsWorldTemplateLayoutTreeNodePlacementNicknameHoverTooltipLines({
-      nicknameLabel: deps.i18n.global.t('dialogs.projectSettings.fields.worldTemplateLayout.placementNicknameHoverNicknameLabel'),
-      node: deps.props.node,
-      originalNameLabel: deps.i18n.global.t('dialogs.projectSettings.fields.worldTemplateLayout.placementNicknameHoverOriginalNameLabel')
-    })
-  })
-
-  const placementNicknameHoverTooltipNicknameLine = deps.computed(() => {
-    return placementNicknameHoverTooltipLines.value?.nicknameLine
-  })
-
-  const placementNicknameHoverTooltipOriginalNameLine = deps.computed(() => {
-    return placementNicknameHoverTooltipLines.value?.originalNameLine
-  })
-
-  const placementNicknameHoverTooltipTestText = deps.computed(() => {
-    const lines = placementNicknameHoverTooltipLines.value
-    if (lines === null) {
-      return undefined
-    }
-    return `${lines.nicknameLine}\n${lines.originalNameLine}`
-  })
-
-  const displayIconNameBinding = displayIconName
-  const editTooltipTextBinding = editTooltipText
-  const nodeRootClassListBinding = nodeRootClassList
-  const nodeTestLocatorBinding = nodeTestLocator
-  const placementNicknameHoverTooltipNicknameLineBinding = placementNicknameHoverTooltipNicknameLine
-  const placementNicknameHoverTooltipOffsetBinding = placementNicknameHoverTooltipOffset
-  const placementNicknameHoverTooltipOriginalNameLineBinding = placementNicknameHoverTooltipOriginalNameLine
-  const placementNicknameHoverTooltipTestTextBinding = placementNicknameHoverTooltipTestText
-  const removeTooltipTextBinding = removeTooltipText
-  const rowHasValidationErrorBinding = rowHasValidationError
-  const showPlacementNicknameHoverTooltipBinding = showPlacementNicknameHoverTooltip
 
   return {
-    displayIconName: displayIconNameBinding,
-    editTooltipText: editTooltipTextBinding,
-    nodeRootClassList: nodeRootClassListBinding,
-    nodeTestLocator: nodeTestLocatorBinding,
-    placementNicknameHoverTooltipNicknameLine: placementNicknameHoverTooltipNicknameLineBinding,
-    placementNicknameHoverTooltipOffset: placementNicknameHoverTooltipOffsetBinding,
-    placementNicknameHoverTooltipOriginalNameLine: placementNicknameHoverTooltipOriginalNameLineBinding,
-    placementNicknameHoverTooltipTestText: placementNicknameHoverTooltipTestTextBinding,
-    removeTooltipText: removeTooltipTextBinding,
-    rowHasValidationError: rowHasValidationErrorBinding,
-    showPlacementNicknameHoverTooltip: showPlacementNicknameHoverTooltipBinding
+    displayIconName,
+    editTooltipText,
+    missingTranslationsWarningTestLocator: missingTranslationsWarningWiring.missingTranslationsWarningTestLocator,
+    missingTranslationsWarningTooltipText: missingTranslationsWarningWiring.missingTranslationsWarningTooltipText,
+    nodeRootClassList,
+    nodeTestLocator,
+    placementNicknameHoverTooltipNicknameLine: hoverTooltipWiring.placementNicknameHoverTooltipNicknameLine,
+    placementNicknameHoverTooltipOffset,
+    placementNicknameHoverTooltipOriginalNameLine: hoverTooltipWiring.placementNicknameHoverTooltipOriginalNameLine,
+    placementNicknameHoverTooltipTestText: hoverTooltipWiring.placementNicknameHoverTooltipTestText,
+    removeTooltipText,
+    rowHasValidationError,
+    showMissingTranslationsWarning: missingTranslationsWarningWiring.showMissingTranslationsWarning,
+    showPlacementNicknameHoverTooltip: hoverTooltipWiring.showPlacementNicknameHoverTooltip
   }
 }

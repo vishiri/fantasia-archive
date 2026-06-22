@@ -2,6 +2,18 @@ import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjec
 import type { I_faProjectWorldSnapshotItem } from 'app/types/I_faProjectWorldDomain'
 
 import { normalizeFaProjectWorldDisplayNameTranslations } from 'app/src/scripts/projectWorlds/faProjectWorldDisplayName_manager'
+import { normalizeFaProjectWorldTemplateGroupDisplayNameTranslations } from 'app/src/scripts/projectWorlds/faProjectWorldTemplateGroupDisplayName_manager'
+import {
+  buildFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations,
+  normalizeFaProjectWorldTemplatePlacementNicknameSingularTranslations,
+  normalizeFaProjectWorldTemplatePlacementNicknameTranslations
+} from 'app/src/scripts/projectWorlds/faProjectWorldTemplatePlacementNickname_manager'
+import {
+  resolveFaProjectWorldTemplateGroupDisplayNameForStorage
+} from 'app/src/scripts/projectWorlds/faProjectWorldTemplateGroupDisplayName_manager'
+import {
+  resolveFaProjectWorldTemplatePlacementNicknameForStorage
+} from 'app/src/scripts/projectWorlds/faProjectWorldTemplatePlacementNickname_manager'
 
 const HEX_COLOR_SEGMENT = /^#[0-9a-fA-F]{6}$/
 
@@ -50,19 +62,40 @@ export function mapDialogProjectSettingsWorldsToSnapshot (
       item.colorPallete = normalizedPallete
     }
     item.templateLayout = {
-      groups: world.templateLayout.groups.map((group) => ({
-        displayName: group.displayName.trim(),
-        id: group.id,
-        rootSortOrder: group.rootSortOrder
-      })),
-      placements: world.templateLayout.placements.map((placement) => ({
-        documentTemplateId: placement.documentTemplateId,
-        groupId: placement.groupId,
-        groupSortOrder: placement.groupSortOrder,
-        id: placement.id,
-        nickname: placement.nickname.trim(),
-        rootSortOrder: placement.rootSortOrder
-      }))
+      groups: world.templateLayout.groups.map((group) => {
+        const displayNameTranslations = normalizeFaProjectWorldTemplateGroupDisplayNameTranslations(
+          group.displayNameTranslations
+        )
+        return {
+          displayName: resolveFaProjectWorldTemplateGroupDisplayNameForStorage(displayNameTranslations),
+          displayNameTranslations,
+          id: group.id,
+          rootSortOrder: group.rootSortOrder
+        }
+      }),
+      placements: world.templateLayout.placements.map((placement) => {
+        const nicknamePluralTranslations = normalizeFaProjectWorldTemplatePlacementNicknameTranslations(
+          placement.nicknamePluralTranslations
+        )
+        const nicknameSingularTranslations = normalizeFaProjectWorldTemplatePlacementNicknameSingularTranslations(
+          placement.nicknameSingularTranslations
+        )
+        return {
+          documentTemplateId: placement.documentTemplateId,
+          groupId: placement.groupId,
+          groupSortOrder: placement.groupSortOrder,
+          id: placement.id,
+          nickname: resolveFaProjectWorldTemplatePlacementNicknameForStorage(
+            buildFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations({
+              nicknamePluralTranslations,
+              nicknameSingularTranslations
+            })
+          ),
+          nicknamePluralTranslations,
+          nicknameSingularTranslations,
+          rootSortOrder: placement.rootSortOrder
+        }
+      })
     }
     return item
   })

@@ -145,7 +145,7 @@ test('Test that updateDialogProjectSettingsWorldDraftTemplateLayout updates the 
   const nextLayout = {
     groups: [
       {
-        displayName: 'Creatures',
+        displayNameTranslations: { 'en-US': 'Creatures' },
         id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
         rootSortOrder: 0
       }
@@ -165,7 +165,7 @@ test('Test that updateDialogProjectSettingsWorldDraftTemplateLayout ignores unkn
   updateDialogProjectSettingsWorldDraftTemplateLayout(localWorlds, 'unknown-id', {
     groups: [
       {
-        displayName: 'Creatures',
+        displayNameTranslations: { 'en-US': 'Creatures' },
         id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
         rootSortOrder: 0
       }

@@ -8,6 +8,7 @@ import type {
 import { resolveDialogProjectSettingsDocumentTemplateSaveErrorDisplayName } from './dialogProjectSettingsDocumentTemplatesDraft'
 import { collectDialogProjectSettingsFullSaveValidationErrors } from './dialogProjectSettingsDialogSaveValidation'
 import { resolveDialogProjectSettingsWorldSaveErrorDisplayName } from './dialogProjectSettingsWorldsDisplayNameDraft'
+import { resolveFaProjectWorldTemplatePlacementNicknameFromFields } from 'app/src/scripts/projectWorlds/faProjectWorldTemplatePlacementNickname_manager'
 import { collectDuplicateDocumentTemplateIdsInWorldTemplateLayout } from './functions/dialogProjectSettingsWorldTemplateLayoutDuplicateValidation'
 import {
   buildDialogProjectSettingsSaveValidationTooltip,
@@ -38,7 +39,8 @@ export function createBuildDialogProjectSettingsSaveValidationTooltip (deps: {
       const templateIndex = error.templateIndexOneBased ?? 1
       const template = templatesList?.[templateIndex - 1]
       const templateLabel = resolveDialogProjectSettingsDocumentTemplateSaveErrorDisplayName(
-        template?.titleTranslations ?? {},
+        template?.titlePluralTranslations ?? {},
+        template?.titleSingularTranslations ?? {},
         deps.getCurrentLanguageCode(),
         deps.resolveDefaultNewTemplateName()
       )
@@ -71,10 +73,17 @@ export function createBuildDialogProjectSettingsSaveValidationTooltip (deps: {
       const duplicatePlacement = world?.templateLayout.placements.find((placement) => {
         return placement.documentTemplateId === firstDuplicateId
       })
+      const resolvedNickname = duplicatePlacement === undefined
+        ? ''
+        : resolveFaProjectWorldTemplatePlacementNicknameFromFields(
+          duplicatePlacement.nicknamePluralTranslations,
+          duplicatePlacement.nicknameSingularTranslations,
+          deps.getCurrentLanguageCode()
+        ).trim()
       const templateLabel = duplicatePlacement === undefined
         ? deps.resolveDefaultNewTemplateName()
-        : (duplicatePlacement.nickname.trim().length > 0
-            ? duplicatePlacement.nickname.trim()
+        : (resolvedNickname.length > 0
+            ? resolvedNickname
             : duplicatePlacement.templateDisplayName.trim().length > 0
               ? duplicatePlacement.templateDisplayName.trim()
               : deps.resolveDefaultNewTemplateName())

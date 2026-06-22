@@ -3,11 +3,15 @@ import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_d
 import type { I_dialogProjectSettingsProps } from 'app/types/I_dialogProjectSettings'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { Ref } from 'app/types/I_vueCompositionRefs'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
+
+import { syncDialogProjectSettingsAllWorldTemplateLayoutLocalizedPlacementLabels } from './dialogProjectSettingsDocumentTemplateLayoutTitleSyncWiring'
 
 export async function hydrateDialogProjectSettingsDrafts (deps: {
   faProjectDocumentTemplatesFetchFreshForDialog: () => Promise<I_dialogProjectSettingsDocumentTemplateDraft[]>
   faProjectSettingsFetchFreshForDialog: () => Promise<I_faProjectSettingsRoot>
   faProjectWorldsFetchFreshForDialog: () => Promise<I_dialogProjectSettingsWorldDraft[]>
+  getCurrentLanguageCode: () => T_faUserSettingsLanguageCode
 }, params: {
   localDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>
   localSettings: Ref<I_faProjectSettingsRoot | null>
@@ -35,4 +39,9 @@ export async function hydrateDialogProjectSettingsDrafts (deps: {
     const templates = await deps.faProjectDocumentTemplatesFetchFreshForDialog()
     localDocumentTemplates.value = templates.map((template) => ({ ...template }))
   }
+  syncDialogProjectSettingsAllWorldTemplateLayoutLocalizedPlacementLabels({
+    getCurrentLanguageCode: deps.getCurrentLanguageCode,
+    localDocumentTemplates,
+    localWorlds
+  })
 }

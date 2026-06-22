@@ -72,7 +72,7 @@
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { I_dialogProjectSettingsWorldTemplateLayoutDraft } from 'app/types/I_dialogProjectSettingsWorlds'
-import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
 import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
 import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
@@ -105,7 +105,7 @@ const emit = defineEmits<{
   updateDocumentTemplateIcon: [id: string, icon: string]
   updateDocumentTemplateTitleTranslations: [
     id: string,
-    titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+    titleTranslations: I_faLocaleSingularPluralTranslations
   ]
   updateDocumentTemplateWorldAppendixTranslations: [
     id: string,
@@ -145,7 +145,7 @@ function onUpdateWorldTemplateLayout (
 
 function onUpdateDocumentTemplateTitleTranslations (
   id: string,
-  titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+  titleTranslations: I_faLocaleSingularPluralTranslations
 ): void {
   emit('updateDocumentTemplateTitleTranslations', id, titleTranslations)
 }

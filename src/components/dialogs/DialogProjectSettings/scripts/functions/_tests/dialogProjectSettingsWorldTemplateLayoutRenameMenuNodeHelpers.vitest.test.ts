@@ -2,6 +2,7 @@ import { expect, test, vi } from 'vitest'
 
 import {
   emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate,
+  isDialogProjectSettingsWorldTemplateLayoutGroupNameTranslationsInvalid,
   resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuHasError,
   resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKind,
   resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTestLocators,
@@ -11,12 +12,14 @@ import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/t
 
 const groupNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   children: [],
+  displayNameTranslations: { 'en-US': 'Creatures' },
   documentCountInWorld: 0,
   documentTemplateId: null,
   icon: 'mdi-folder',
   id: '770e8400-e29b-41d4-a716-446655440001',
   label: 'Creatures',
-  nickname: '',
+  nicknamePluralTranslations: {},
+  nicknameSingularTranslations: {},
   nodeKind: 'group',
   templateDisplayName: '',
   usesNickname: false,
@@ -25,12 +28,14 @@ const groupNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
 
 const templateNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   children: [],
+  displayNameTranslations: {},
   documentCountInWorld: 0,
   documentTemplateId: '660e8400-e29b-41d4-a716-446655440001',
   icon: 'mdi-account',
   id: '880e8400-e29b-41d4-a716-446655440001',
   label: 'Character',
-  nickname: '',
+  nicknamePluralTranslations: {},
+  nicknameSingularTranslations: {},
   nodeKind: 'template',
   templateDisplayName: 'Character',
   usesNickname: false,
@@ -44,17 +49,14 @@ const templateNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
 test('Test that resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTestLocators maps group and template locators', () => {
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKind(groupNode)).toBe('group')
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTestLocators('group')).toEqual({
-    canonicalNameTestLocator: undefined,
     contextMenuTestLocator: 'dialogProjectSettings-worldTemplateLayoutGroupContextMenu',
     renameInputTestLocator: 'dialogProjectSettings-worldTemplateLayoutGroupRenameInput'
   })
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTestLocators('template')).toEqual({
-    canonicalNameTestLocator: 'dialogProjectSettings-worldTemplateLayoutTemplateCanonicalName',
     contextMenuTestLocator: 'dialogProjectSettings-worldTemplateLayoutTemplateContextMenu',
     renameInputTestLocator: 'dialogProjectSettings-worldTemplateLayoutTemplateRenameInput'
   })
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTestLocators(null)).toEqual({
-    canonicalNameTestLocator: undefined,
     contextMenuTestLocator: undefined,
     renameInputTestLocator: undefined
   })
@@ -69,20 +71,27 @@ test('Test that emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdat
   const emitRenamePlacementNickname = vi.fn()
 
   emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate({
-    displayName: 'Dragons',
+    displayNameTranslations: { 'en-US': 'Dragons' },
     emitRenameGroup,
     emitRenamePlacementNickname,
     node: groupNode
   })
-  expect(emitRenameGroup).toHaveBeenCalledWith(groupNode.id, 'Dragons')
+  expect(emitRenameGroup).toHaveBeenCalledWith(groupNode.id, { 'en-US': 'Dragons' })
 
   emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate({
-    displayName: 'Hero',
+    displayNameTranslations: { 'en-US': 'Hero' },
     emitRenameGroup,
     emitRenamePlacementNickname,
+    nicknameTranslations: {
+      plural: { 'en-US': 'Hero' },
+      singular: {}
+    },
     node: templateNode
   })
-  expect(emitRenamePlacementNickname).toHaveBeenCalledWith(templateNode.id, 'Hero')
+  expect(emitRenamePlacementNickname).toHaveBeenCalledWith(templateNode.id, {
+    plural: { 'en-US': 'Hero' },
+    singular: {}
+  })
 })
 
 /**
@@ -90,32 +99,34 @@ test('Test that emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdat
  * Returns group validation messages only when group names are invalid.
  */
 test('Test that rename menu validation helpers surface required-name errors', () => {
-  const isInvalid = (displayName: string): boolean => displayName.trim().length === 0
+  const isInvalid = (displayNameTranslations: { 'en-US'?: string }): boolean => {
+    return (displayNameTranslations['en-US'] ?? '').trim().length === 0
+  }
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuValidationErrorMessage({
-    displayName: '',
+    displayNameTranslations: {},
     isGroupNameInvalid: isInvalid,
     nodeKind: 'group',
     translateGroupNameErrorRequired: () => 'Group required'
   })).toBe('Group required')
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuValidationErrorMessage({
-    displayName: 'OK',
+    displayNameTranslations: { 'en-US': 'OK' },
     isGroupNameInvalid: isInvalid,
     nodeKind: 'template',
     translateGroupNameErrorRequired: () => 'Group required'
   })).toBeUndefined()
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuValidationErrorMessage({
-    displayName: '',
+    displayNameTranslations: {},
     isGroupNameInvalid: isInvalid,
     nodeKind: 'template',
     translateGroupNameErrorRequired: () => 'Group required'
   })).toBeUndefined()
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuHasError({
-    displayName: '',
+    displayNameTranslations: {},
     isGroupNameInvalid: isInvalid,
     nodeKind: 'template'
   })).toBe(false)
   expect(resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuHasError({
-    displayName: '',
+    displayNameTranslations: {},
     isGroupNameInvalid: isInvalid,
     nodeKind: null
   })).toBe(false)
@@ -134,7 +145,7 @@ test('Test that emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdat
   const emitRenamePlacementNickname = vi.fn()
 
   emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate({
-    displayName: 'Ignored',
+    displayNameTranslations: { 'en-US': 'Ignored' },
     emitRenameGroup,
     emitRenamePlacementNickname,
     node: {
@@ -144,4 +155,18 @@ test('Test that emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdat
   })
   expect(emitRenameGroup).not.toHaveBeenCalled()
   expect(emitRenamePlacementNickname).not.toHaveBeenCalled()
+})
+
+/**
+ * isDialogProjectSettingsWorldTemplateLayoutGroupNameTranslationsInvalid
+ * Treats non-string locale values as empty translations.
+ */
+test('Test that group name translation invalid helper ignores non-string locale values', () => {
+  expect(isDialogProjectSettingsWorldTemplateLayoutGroupNameTranslationsInvalid({})).toBe(true)
+  expect(isDialogProjectSettingsWorldTemplateLayoutGroupNameTranslationsInvalid({
+    'en-US': 1 as unknown as string
+  })).toBe(true)
+  expect(isDialogProjectSettingsWorldTemplateLayoutGroupNameTranslationsInvalid({
+    'en-US': 'Creatures'
+  })).toBe(false)
 })

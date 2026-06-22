@@ -18,7 +18,19 @@ const elementI18n = createI18n({
       faLocaleTranslationsInput: {
         fallbackWarningTooltip:
           "This field lacks current language's translation.\nFallback used: {fallbackLanguageName}",
+        pluralColumnLabel: 'Plural',
+        singularColumnLabel: 'Singular',
         translateButtonTooltip: 'Edit translations'
+      },
+      dialogs: {
+        projectSettings: {
+          singularPluralMissing: {
+            bothIntro: 'Missing translations for current language:',
+            pluralBullet: 'Plural form missing',
+            singularBullet: 'Singular form missing',
+            usingFallback: 'Using fallback of {fallbackLanguageName}'
+          }
+        }
       }
     }
   }
@@ -194,6 +206,64 @@ test('Test that FaLocaleTranslationsInput opens translations menu when readonly 
 
   await w.find(`[data-test-locator="${testLocator}"]`).trigger('click')
   expect(w.find(`[data-test-locator="${testLocator}-translationsMenu"]`).exists()).toBe(true)
+})
+
+test('Test that FaLocaleTranslationsInput menuPanel presentation renders locale rows without summary field', () => {
+  const w = mount(FaLocaleTranslationsInput, {
+    props: {
+      currentLanguageCode: 'en-US',
+      modelValue: { 'en-US': 'Character' },
+      presentation: 'menuPanel',
+      testLocator
+    },
+    global: mountGlobal
+  })
+
+  expect(w.find(`[data-test-locator="${testLocator}-translationsMenu"]`).exists()).toBe(false)
+  expect(w.find(`[data-test-locator="${testLocator}-translationsInput-en-US"]`).exists()).toBe(true)
+  expect(w.find(`[data-test-locator="${testLocator}-translationsButton"]`).exists()).toBe(false)
+})
+
+test('Test that FaLocaleTranslationsInput exposes focusPreferredLanguageInput for menuPanel', () => {
+  const w = mount(FaLocaleTranslationsInput, {
+    props: {
+      currentLanguageCode: 'en-US',
+      modelValue: { 'en-US': 'Character' },
+      presentation: 'menuPanel',
+      testLocator
+    },
+    global: mountGlobal
+  })
+
+  expect(typeof (w.vm as { focusPreferredLanguageInput?: () => void }).focusPreferredLanguageInput).toBe('function')
+})
+
+test('Test that FaLocaleTranslationsInput singularPlural mode emits paired maps', async () => {
+  const w = mount(FaLocaleTranslationsInput, {
+    props: {
+      currentLanguageCode: 'en-US',
+      modelValue: {
+        plural: { 'en-US': 'Characters' },
+        singular: { 'en-US': 'Character' }
+      },
+      presentation: 'menuPanel',
+      testLocator,
+      translationForms: 'singularPlural'
+    },
+    global: mountGlobal
+  })
+
+  expect(w.find(`[data-test-locator="${testLocator}-singularColumnHeader"]`).exists()).toBe(true)
+  expect(w.find(`[data-test-locator="${testLocator}-pluralColumnHeader"]`).exists()).toBe(true)
+
+  const pluralInput = w.find(`[data-test-locator="${testLocator}-translationsPluralInput-en-US"] input`)
+  await pluralInput.setValue('Creatures')
+
+  const emitted = w.emitted('update:modelValue')
+  expect(emitted?.at(-1)?.[0]).toEqual({
+    plural: { 'en-US': 'Creatures' },
+    singular: { 'en-US': 'Character' }
+  })
 })
 
 test('Test that resolveFaLocaleTranslationsMenuAnchorElement prefers q-field host', () => {

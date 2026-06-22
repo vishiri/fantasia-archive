@@ -118,7 +118,7 @@ function appendHeTreeGroupNodesToReverseMap (
       groupNodeIndex
     )
     state.groups.push({
-      displayName: node.label,
+      displayNameTranslations: priorGroup?.displayNameTranslations ?? node.displayNameTranslations,
       id: groupId,
       rootSortOrder: rootIndex
     })
@@ -140,7 +140,8 @@ function appendHeTreeGroupNodesToReverseMap (
         groupSortOrder: groupIndex,
         icon: prior?.icon ?? child.icon,
         id: prior?.id ?? child.id,
-        nickname: prior?.nickname ?? child.nickname,
+        nicknamePluralTranslations: prior?.nicknamePluralTranslations ?? child.nicknamePluralTranslations,
+        nicknameSingularTranslations: {},
         rootSortOrder: null,
         templateDisplayName: prior?.templateDisplayName ?? child.templateDisplayName,
         worldAppendix: prior?.worldAppendix ?? child.worldAppendix
@@ -177,7 +178,8 @@ function appendHeTreeRootTemplateNodesToReverseMap (
       groupSortOrder: null,
       icon: prior?.icon ?? node.icon,
       id: prior?.id ?? node.id,
-      nickname: prior?.nickname ?? node.nickname,
+      nicknamePluralTranslations: prior?.nicknamePluralTranslations ?? node.nicknamePluralTranslations,
+      nicknameSingularTranslations: {},
       rootSortOrder: rootIndex,
       templateDisplayName: prior?.templateDisplayName ?? node.templateDisplayName,
       worldAppendix: prior?.worldAppendix ?? node.worldAppendix

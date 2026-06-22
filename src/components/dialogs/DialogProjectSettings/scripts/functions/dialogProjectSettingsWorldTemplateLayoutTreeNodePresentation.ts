@@ -83,11 +83,12 @@ export function resolveDialogProjectSettingsWorldTemplateLayoutTreeNodePlacement
   nicknameLabel: string
   node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
   originalNameLabel: string
+  resolvedNickname: string
 }): { nicknameLine: string, originalNameLine: string } | null {
   if (!resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeShowsPlacementNicknameHoverTooltip(params.node)) {
     return null
   }
-  const nickname = params.node.nickname.trim()
+  const nickname = params.resolvedNickname.trim()
   const originalName = params.node.templateDisplayName
   const nicknameLine = `${params.nicknameLabel} - ${nickname}`
   const originalNameLine = `${params.originalNameLabel} - ${originalName}`

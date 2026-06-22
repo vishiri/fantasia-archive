@@ -23,7 +23,8 @@ export const Default: StoryObj<typeof meta> = {
         documentCount: 0,
         icon: 'person',
         id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
-        titleTranslations: { 'en-US': 'Character' },
+        titlePluralTranslations: { 'en-US': 'Character' },
+        titleSingularTranslations: {},
         worldAppendixTranslations: { 'en-US': 'sheet' }
       }
     ],

@@ -32,7 +32,8 @@ const stubDocumentTemplateShape = {
   ...stubNamedEntityShape,
   icon: '',
   sortOrder: 0,
-  titleTranslations: { 'en-US': 'Stub' },
+  titlePluralTranslations: { 'en-US': 'Stub' },
+  titleSingularTranslations: {},
   worldAppendix: '',
   worldAppendixTranslations: {}
 }
@@ -135,7 +136,8 @@ test('Test that createFaProjectContentBridgeHarnessStub noop methods resolve und
   await expect(api.saveDocumentTemplatesSnapshot([
     {
       id: STUB_UUID,
-      titleTranslations: { 'en-US': 'Template' }
+      titlePluralTranslations: { 'en-US': 'Template' },
+      titleSingularTranslations: {},
     }
   ])).resolves.toBeUndefined()
 })

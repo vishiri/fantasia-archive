@@ -79,6 +79,7 @@ const dialogProjectSettingsApi = createDialogProjectSettings({
   isDialogProjectSettingsFullDialogSaveDisabled,
   isDialogProjectSettingsProjectNameInvalid,
   registerComponentDialogStackGuard,
+  watch,
   registerDialogProjectSettingsWatchers: createDialogProjectSettingsWatchersWiring({
     isDialogProjectSettingsDirectInput,
     isDialogProjectSettingsStoreTarget,

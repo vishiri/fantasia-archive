@@ -1,5 +1,5 @@
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
-import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
 import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
 import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
 import type { I_faProjectSettingsRoot } from 'app/types/I_faProjectSettingsDomain'
@@ -45,7 +45,7 @@ export type T_dialogProjectSettingsUseHookDeps = {
     saveAndCloseDialog: () => Promise<void>
     updateDocumentTemplateTitleTranslations: (
       id: string,
-      titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+      titleTranslations: I_faLocaleSingularPluralTranslations
     ) => void
     updateDocumentTemplateIcon: (id: string, icon: string) => void
     updateDocumentTemplateWorldAppendixTranslations: (
@@ -95,4 +95,5 @@ export type T_dialogProjectSettingsUseHookDeps = {
     openDialog: (input: T_dialogName) => void
     props: I_dialogProjectSettingsProps
   }) => void
+  watch: (source: () => unknown, effect: () => void) => void
 }

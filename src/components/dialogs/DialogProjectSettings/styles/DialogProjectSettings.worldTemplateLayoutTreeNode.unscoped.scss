@@ -59,6 +59,16 @@
   gap: $dialogProjectSettings-worldTemplateLayout-treeNode-actions-gap;
 }
 
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__missingTranslationsWarningHost {
+  flex: 0 0 auto;
+  margin-right: $dialogProjectSettings-worldTemplateLayout-treeNode-missingTranslationsWarning-marginRight;
+  pointer-events: auto;
+}
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__missingTranslationsWarningHost.dialogProjectSettingsWorldTemplateLayoutTreeNode__missingTranslationsWarning {
+  pointer-events: auto;
+}
+
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__appendix {
   display: block;
   flex: 1 1 auto;

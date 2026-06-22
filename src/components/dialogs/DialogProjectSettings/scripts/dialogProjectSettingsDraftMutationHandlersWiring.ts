@@ -1,8 +1,8 @@
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { Ref } from 'app/types/I_vueCompositionRefs'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
-import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
 import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
 import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
 
@@ -14,6 +14,7 @@ import {
   updateDialogProjectSettingsDocumentTemplateDraftWorldAppendixTranslations
 } from './dialogProjectSettingsDocumentTemplateRowMutationsWiring'
 import {
+  syncDialogProjectSettingsAllWorldTemplateLayoutLocalizedPlacementLabels,
   syncDialogProjectSettingsDocumentTemplateLayoutTitles
 } from './dialogProjectSettingsDocumentTemplateLayoutTitleSyncWiring'
 import { createDialogProjectSettingsWorldDraftMutationHandlers } from './dialogProjectSettingsWorldDraftMutationHandlersWiring'
@@ -33,7 +34,7 @@ export function createDialogProjectSettingsDraftMutationHandlers (deps: {
     updateDocumentTemplateIcon: (id: string, icon: string) => void
     updateDocumentTemplateTitleTranslations: (
       id: string,
-      titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+      titleTranslations: I_faLocaleSingularPluralTranslations
     ) => void
     updateDocumentTemplateWorldAppendixTranslations: (
       id: string,
@@ -67,7 +68,7 @@ export function createDialogProjectSettingsDraftMutationHandlers (deps: {
 
   const updateDocumentTemplateTitleTranslations = (
     id: string,
-    titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+    titleTranslations: I_faLocaleSingularPluralTranslations
   ): void => {
     updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations(
       localDocumentTemplates,
@@ -95,6 +96,11 @@ export function createDialogProjectSettingsDraftMutationHandlers (deps: {
       id,
       worldAppendixTranslations
     )
+    syncDialogProjectSettingsAllWorldTemplateLayoutLocalizedPlacementLabels({
+      getCurrentLanguageCode: deps.getCurrentLanguageCode,
+      localDocumentTemplates,
+      localWorlds
+    })
   }
 
   return {

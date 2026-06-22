@@ -16,6 +16,8 @@
         <div class="dialogProjectSettingsWorldTemplateLayoutPanel__treeHost">
           <DialogProjectSettingsWorldTemplateLayoutTree
             :blank-group-ids="blankGroupIds"
+            :current-language-code="props.currentLanguageCode"
+            :document-templates="props.documentTemplates"
             :duplicate-document-template-ids="duplicateDocumentTemplateIds"
             :invalid-document-template-ids="invalidDocumentTemplateIds"
             :template-layout="props.world.templateLayout"
@@ -82,8 +84,8 @@ import {
   appendDialogProjectSettingsWorldTemplatePlacementDraft,
   removeDialogProjectSettingsWorldTemplateGroupDraft,
   removeDialogProjectSettingsWorldTemplatePlacementDraft,
-  renameDialogProjectSettingsWorldTemplateGroupDraft,
-  renameDialogProjectSettingsWorldTemplatePlacementNicknameDraft
+  renameDialogProjectSettingsWorldTemplateGroupDisplayNameTranslationsDraft,
+  renameDialogProjectSettingsWorldTemplatePlacementNicknameTranslationsDraft
 } from './scripts/dialogProjectSettingsWorldTemplateLayoutDraft'
 import {
   collectBlankTemplateGroupIdsInWorldTemplateLayout,
@@ -95,6 +97,8 @@ import {
 } from './scripts/dialogProjectSettingsDocumentTemplatesDraft'
 import { resolveDialogProjectSettingsDocumentTemplateResolvedWorldAppendix } from './scripts/dialogProjectSettingsDocumentTemplateWorldAppendixDraft'
 import { filterDialogProjectSettingsDocumentTemplatesByQuery } from './scripts/filterDialogProjectSettingsDocumentTemplatesByQuery'
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
+import type { I_faLocaleStringTranslations } from 'app/types/I_faLocaleStringTranslations'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import DialogProjectSettingsVerticalTabListFilterInput from './DialogProjectSettingsVerticalTabListFilterInput.vue'
 import DialogProjectSettingsWorldAvailableTemplatesList from './DialogProjectSettingsWorldAvailableTemplatesList.vue'
@@ -135,7 +139,7 @@ const blankGroupIds = computed(() => {
 const invalidDocumentTemplateIds = computed(() => {
   const invalid = new Set<string>()
   for (const template of props.documentTemplates) {
-    if (isDialogProjectSettingsDocumentTemplateNameInvalid(template.titleTranslations)) {
+    if (isDialogProjectSettingsDocumentTemplateNameInvalid(template.titlePluralTranslations)) {
       invalid.add(template.id)
     }
   }
@@ -171,6 +175,7 @@ function emitTemplateLayout (layout: I_dialogProjectSettingsWorldTemplateLayoutD
 function onAddGroup (): void {
   const nextLayout = appendDialogProjectSettingsWorldTemplateGroupDraft(
     props.world.templateLayout,
+    props.currentLanguageCode,
     defaultNewGroupName
   )
   emitTemplateLayout(nextLayout)
@@ -207,20 +212,26 @@ function onDeleteGroup (groupId: string): void {
   emitTemplateLayout(nextLayout)
 }
 
-function onRenameGroup (groupId: string, displayName: string): void {
-  const nextLayout = renameDialogProjectSettingsWorldTemplateGroupDraft(
+function onRenameGroup (
+  groupId: string,
+  displayNameTranslations: I_faLocaleStringTranslations
+): void {
+  const nextLayout = renameDialogProjectSettingsWorldTemplateGroupDisplayNameTranslationsDraft(
     props.world.templateLayout,
     groupId,
-    displayName
+    displayNameTranslations
   )
   emitTemplateLayout(nextLayout)
 }
 
-function onRenamePlacementNickname (placementId: string, nickname: string): void {
-  const nextLayout = renameDialogProjectSettingsWorldTemplatePlacementNicknameDraft(
+function onRenamePlacementNickname (
+  placementId: string,
+  nicknameTranslations: I_faLocaleSingularPluralTranslations
+): void {
+  const nextLayout = renameDialogProjectSettingsWorldTemplatePlacementNicknameTranslationsDraft(
     props.world.templateLayout,
     placementId,
-    nickname
+    nicknameTranslations
   )
   emitTemplateLayout(nextLayout)
 }

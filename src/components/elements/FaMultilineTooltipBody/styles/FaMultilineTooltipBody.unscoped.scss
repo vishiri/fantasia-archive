@@ -1,0 +1,11 @@
+.faMultilineTooltipBody__bullet {
+  display: block;
+}
+
+.faMultilineTooltipBody__intro + .faMultilineTooltipBody__bullet {
+  margin-top: 4px;
+}
+
+.faMultilineTooltipBody__bullet + .faMultilineTooltipBody__bullet {
+  margin-top: 4px;
+}

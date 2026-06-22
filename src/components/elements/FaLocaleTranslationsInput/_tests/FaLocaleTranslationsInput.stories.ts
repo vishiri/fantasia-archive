@@ -57,3 +57,69 @@ export const Multiline: StoryObj<typeof meta> = {
     testLocator: 'storybook-faLocaleTranslationsInput-multiline'
   }
 }
+
+export const PinnedAsideMenu: StoryObj<typeof meta> = {
+  args: {
+    currentLanguageCode: 'en-US',
+    menuPinnedAsideLabel: 'Document template name',
+    menuPinnedAsideTestLocator: 'storybook-faLocaleTranslationsInput-pinnedAside',
+    menuPinnedAsideTooltip: 'Canonical template title for the active language.',
+    menuPinnedAsideValue: 'Character',
+    modelValue: {
+      'en-US': 'Hero',
+      de: 'Held'
+    },
+    testLocator: 'storybook-faLocaleTranslationsInput-pinnedAside'
+  }
+}
+
+export const SingularPlural: StoryObj<typeof meta> = {
+  args: {
+    currentLanguageCode: 'en-US',
+    modelValue: {
+      plural: {
+        'en-US': 'Characters',
+        de: 'Charaktere'
+      },
+      singular: {
+        'en-US': 'Character',
+        de: 'Charakter'
+      }
+    },
+    testLocator: 'storybook-faLocaleTranslationsInput-singularPlural',
+    translationForms: 'singularPlural'
+  }
+}
+
+export const SingularPluralPinnedAsideMenuPanel: StoryObj<typeof meta> = {
+  args: {
+    currentLanguageCode: 'en-US',
+    menuPinnedAsideLabel: 'Document template name',
+    menuPinnedAsideTestLocator: 'storybook-faLocaleTranslationsInput-singularPluralPinnedAside',
+    menuPinnedAsideTooltip: 'Canonical template title for the active language.',
+    menuPinnedAsideValue: 'Character',
+    modelValue: {
+      plural: {
+        'en-US': 'Heroes'
+      },
+      singular: {
+        'en-US': 'Hero'
+      }
+    },
+    presentation: 'menuPanel',
+    testLocator: 'storybook-faLocaleTranslationsInput-singularPluralPinnedAside',
+    translationForms: 'singularPlural'
+  }
+}
+
+export const MenuPanelPresentation: StoryObj<typeof meta> = {
+  args: {
+    currentLanguageCode: 'en-US',
+    modelValue: {
+      'en-US': 'New group',
+      de: 'Neue Gruppe'
+    },
+    presentation: 'menuPanel',
+    testLocator: 'storybook-faLocaleTranslationsInput-menuPanel'
+  }
+}

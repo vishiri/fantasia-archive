@@ -1,35 +1,53 @@
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_faProjectDocumentTemplateSnapshotItem } from 'app/types/I_faProjectDocumentTemplateDomain'
+import type { I_faProjectDocumentTemplateTitleSingularTranslations } from 'app/types/I_faProjectDocumentTemplateTitleSingularTranslations'
 import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 
 import {
-  hasFaProjectDocumentTemplateTitleTranslation,
-  normalizeFaProjectDocumentTemplateTitles,
-  resolveFaProjectDocumentTemplateDisplayTitle,
-  resolveFaProjectDocumentTemplateDisplayTitleLanguageCode
+  hasFaProjectDocumentTemplateTitlePluralTranslation,
+  normalizeFaProjectDocumentTemplateTitlePluralTranslations,
+  normalizeFaProjectDocumentTemplateTitleSingularTranslations,
+  resolveFaProjectDocumentTemplateDisplayTitleFromFields,
+  resolveFaProjectDocumentTemplateDisplayTitleLanguageCode,
+  buildFaProjectDocumentTemplateTitleSingularPluralTranslations,
+  resolveFaProjectDocumentTemplateTitleMissingTranslationWarning
 } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager'
 import { normalizeDialogProjectSettingsDocumentTemplateWorldAppendixTranslations } from './dialogProjectSettingsDocumentTemplateWorldAppendixDraft'
+import { formatFaLocaleSingularPluralMissingTranslationWarningTooltip } from 'app/src/scripts/localeTranslations/functions/formatFaLocaleSingularPluralMissingTranslationWarningTooltip'
 
 /**
  * Resolves the document template title shown in Project Settings for the active UI language.
  */
 export function resolveDialogProjectSettingsDocumentTemplateResolvedTitle (
-  template: Pick<I_dialogProjectSettingsDocumentTemplateDraft, 'titleTranslations'>,
+  template: Pick<
+    I_dialogProjectSettingsDocumentTemplateDraft,
+    'titlePluralTranslations' | 'titleSingularTranslations'
+  >,
   languageCode: T_faUserSettingsLanguageCode
 ): string {
-  return resolveFaProjectDocumentTemplateDisplayTitle(template.titleTranslations, languageCode)
+  return resolveFaProjectDocumentTemplateDisplayTitleFromFields(
+    template.titlePluralTranslations,
+    template.titleSingularTranslations,
+    languageCode
+  )
 }
 
 /**
  * Language code whose translation supplies the resolved title, or null when no title exists.
  */
 export function resolveDialogProjectSettingsDocumentTemplateResolvedTitleLanguageCode (
-  template: Pick<I_dialogProjectSettingsDocumentTemplateDraft, 'titleTranslations'>,
+  template: Pick<
+    I_dialogProjectSettingsDocumentTemplateDraft,
+    'titlePluralTranslations' | 'titleSingularTranslations'
+  >,
   languageCode: T_faUserSettingsLanguageCode
 ): T_faUserSettingsLanguageCode | null {
   return resolveFaProjectDocumentTemplateDisplayTitleLanguageCode(
-    template.titleTranslations,
+    buildFaProjectDocumentTemplateTitleSingularPluralTranslations({
+      titlePluralTranslations: template.titlePluralTranslations,
+      titleSingularTranslations: template.titleSingularTranslations
+    }),
     languageCode
   )
 }
@@ -38,7 +56,10 @@ export function resolveDialogProjectSettingsDocumentTemplateResolvedTitleLanguag
  * True when the active UI language has no title and a fallback locale supplies the shown name.
  */
 export function isDialogProjectSettingsDocumentTemplateResolvedTitleUsingFallback (
-  template: Pick<I_dialogProjectSettingsDocumentTemplateDraft, 'titleTranslations'>,
+  template: Pick<
+    I_dialogProjectSettingsDocumentTemplateDraft,
+    'titlePluralTranslations' | 'titleSingularTranslations'
+  >,
   languageCode: T_faUserSettingsLanguageCode
 ): boolean {
   const resolvedLanguageCode = resolveDialogProjectSettingsDocumentTemplateResolvedTitleLanguageCode(
@@ -49,17 +70,49 @@ export function isDialogProjectSettingsDocumentTemplateResolvedTitleUsingFallbac
 }
 
 /**
- * True when any document template field that supports translations lacks a value for the active UI language.
+ * True when the active UI language is missing singular and/or plural title forms.
  */
 export function isDialogProjectSettingsDocumentTemplateMissingCurrentLanguageTranslations (
-  template: Pick<I_dialogProjectSettingsDocumentTemplateDraft, 'titleTranslations'>,
+  template: Pick<
+    I_dialogProjectSettingsDocumentTemplateDraft,
+    'titlePluralTranslations' | 'titleSingularTranslations'
+  >,
   languageCode: T_faUserSettingsLanguageCode
 ): boolean {
-  const titleTranslation = template.titleTranslations[languageCode] ?? ''
-  if (titleTranslation.trim().length === 0) {
-    return true
+  return resolveFaProjectDocumentTemplateTitleMissingTranslationWarning(
+    buildFaProjectDocumentTemplateTitleSingularPluralTranslations({
+      titlePluralTranslations: template.titlePluralTranslations,
+      titleSingularTranslations: template.titleSingularTranslations
+    }),
+    languageCode
+  ) !== null
+}
+
+export function resolveDialogProjectSettingsDocumentTemplateMissingTranslationWarningTooltip (params: {
+  activeLanguageCode: T_faUserSettingsLanguageCode
+  readFallbackLanguageName: (languageCode: T_faUserSettingsLanguageCode) => string
+  template: Pick<
+    I_dialogProjectSettingsDocumentTemplateDraft,
+    'titlePluralTranslations' | 'titleSingularTranslations'
+  >
+  translate: (key: string, translateParams?: Record<string, string>) => string
+}): string {
+  const warning = resolveFaProjectDocumentTemplateTitleMissingTranslationWarning(
+    buildFaProjectDocumentTemplateTitleSingularPluralTranslations({
+      titlePluralTranslations: params.template.titlePluralTranslations,
+      titleSingularTranslations: params.template.titleSingularTranslations
+    }),
+    params.activeLanguageCode
+  )
+  if (warning === null) {
+    return ''
   }
-  return false
+  return formatFaLocaleSingularPluralMissingTranslationWarningTooltip({
+    activeLanguageCode: params.activeLanguageCode,
+    readFallbackLanguageName: params.readFallbackLanguageName,
+    translate: params.translate,
+    warning
+  })
 }
 
 /**
@@ -80,9 +133,9 @@ export function resolveDialogProjectSettingsDocumentTemplateDisplayIcon (
  * True when a document template has no non-empty title translation in any locale.
  */
 export function isDialogProjectSettingsDocumentTemplateNameInvalid (
-  titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+  titlePluralTranslations: I_faProjectDocumentTemplateTitleTranslations
 ): boolean {
-  return !hasFaProjectDocumentTemplateTitleTranslation(titleTranslations)
+  return !hasFaProjectDocumentTemplateTitlePluralTranslation(titlePluralTranslations)
 }
 
 /**
@@ -91,7 +144,7 @@ export function isDialogProjectSettingsDocumentTemplateNameInvalid (
 export function isDialogProjectSettingsDocumentTemplateTabValidationError (
   template: I_dialogProjectSettingsDocumentTemplateDraft
 ): boolean {
-  return isDialogProjectSettingsDocumentTemplateNameInvalid(template.titleTranslations)
+  return isDialogProjectSettingsDocumentTemplateNameInvalid(template.titlePluralTranslations)
 }
 
 /**
@@ -104,7 +157,7 @@ export function hasDialogProjectSettingsDocumentTemplateNameValidationError (
     return true
   }
   return templates.some((template) => {
-    return isDialogProjectSettingsDocumentTemplateNameInvalid(template.titleTranslations)
+    return isDialogProjectSettingsDocumentTemplateNameInvalid(template.titlePluralTranslations)
   })
 }
 
@@ -119,7 +172,7 @@ export function collectInvalidDialogProjectSettingsDocumentTemplateIds (
     return invalidIds
   }
   for (const template of templates) {
-    if (isDialogProjectSettingsDocumentTemplateNameInvalid(template.titleTranslations)) {
+    if (isDialogProjectSettingsDocumentTemplateNameInvalid(template.titlePluralTranslations)) {
       invalidIds.add(template.id)
     }
   }
@@ -130,12 +183,16 @@ export function collectInvalidDialogProjectSettingsDocumentTemplateIds (
  * Resolves the quoted template name used in save-validation messages.
  */
 export function resolveDialogProjectSettingsDocumentTemplateSaveErrorDisplayName (
-  titleTranslations: I_faProjectDocumentTemplateTitleTranslations,
+  titlePluralTranslations: I_faProjectDocumentTemplateTitleTranslations,
+  titleSingularTranslations: I_faProjectDocumentTemplateTitleSingularTranslations,
   languageCode: T_faUserSettingsLanguageCode,
   defaultNewTemplateName: string
 ): string {
   const resolved = resolveDialogProjectSettingsDocumentTemplateResolvedTitle(
-    { titleTranslations },
+    {
+      titlePluralTranslations,
+      titleSingularTranslations
+    },
     languageCode
   )
   return resolved.length > 0 ? resolved : defaultNewTemplateName
@@ -150,7 +207,12 @@ export function mapDialogProjectSettingsDocumentTemplatesToSnapshot (
   return templates.map((template) => {
     const item: I_faProjectDocumentTemplateSnapshotItem = {
       id: template.id,
-      titleTranslations: normalizeFaProjectDocumentTemplateTitles(template.titleTranslations)
+      titlePluralTranslations: normalizeFaProjectDocumentTemplateTitlePluralTranslations(
+        template.titlePluralTranslations
+      ),
+      titleSingularTranslations: normalizeFaProjectDocumentTemplateTitleSingularTranslations(
+        template.titleSingularTranslations
+      )
     }
     const normalizedAppendixTranslations =
       normalizeDialogProjectSettingsDocumentTemplateWorldAppendixTranslations(
@@ -176,7 +238,7 @@ export function appendDialogProjectSettingsDocumentTemplateDraft (
   defaultDisplayName: string
 ): I_dialogProjectSettingsDocumentTemplateDraft[] {
   const id = crypto.randomUUID()
-  const titleTranslations: I_faProjectDocumentTemplateTitleTranslations = {
+  const titlePluralTranslations: I_faProjectDocumentTemplateTitleTranslations = {
     [languageCode]: defaultDisplayName
   }
   return [
@@ -185,7 +247,8 @@ export function appendDialogProjectSettingsDocumentTemplateDraft (
       documentCount: 0,
       icon: '',
       id,
-      titleTranslations,
+      titlePluralTranslations,
+      titleSingularTranslations: {},
       worldAppendixTranslations: {}
     }
   ]

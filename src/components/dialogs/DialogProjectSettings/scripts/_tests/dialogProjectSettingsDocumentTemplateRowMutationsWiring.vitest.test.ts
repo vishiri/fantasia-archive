@@ -24,13 +24,13 @@ test('Test that addDialogProjectSettingsDocumentTemplateDraftRow appends a new t
   addDialogProjectSettingsDocumentTemplateDraftRow(localDocumentTemplates, 'en-US', 'New template')
   expect(localDocumentTemplates.value).toHaveLength(2)
   expect(localDocumentTemplates.value?.[0].id).toBe(baseTemplate.id)
-  expect(localDocumentTemplates.value?.[1].titleTranslations).toEqual({ 'en-US': 'New template' })
+  expect(localDocumentTemplates.value?.[1].titlePluralTranslations).toEqual({ 'en-US': 'New template' })
 })
 
 test('Test that addDialogProjectSettingsDocumentTemplateDraftRow seeds the active UI language only', () => {
   const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([])
   addDialogProjectSettingsDocumentTemplateDraftRow(localDocumentTemplates, 'de', 'Neue Vorlage')
-  expect(localDocumentTemplates.value?.[0].titleTranslations).toEqual({ de: 'Neue Vorlage' })
+  expect(localDocumentTemplates.value?.[0].titlePluralTranslations).toEqual({ de: 'Neue Vorlage' })
 })
 
 /**
@@ -50,7 +50,8 @@ test('Test that addDialogProjectSettingsDocumentTemplateDraftRow no-ops when loc
 test('Test that removeDialogProjectSettingsDocumentTemplateDraftRow removes the matching id', () => {
   const otherTemplate = buildDialogProjectSettingsDocumentTemplateDraft({
     id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
-    titleTranslations: { 'en-US': 'Other' }
+    titlePluralTranslations: { 'en-US': 'Other' },
+    titleSingularTranslations: {},
   })
   const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([
     baseTemplate,
@@ -78,20 +79,24 @@ test('Test that updateDialogProjectSettingsDocumentTemplateDraftTitleTranslation
   const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([baseTemplate])
   updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations(
     localDocumentTemplates,
-    baseTemplate.id,
-    { 'en-US': 'Renamed' }
+    baseTemplate.id, {
+      plural: { 'en-US': 'Renamed' },
+      singular: {}
+    }
   )
-  expect(localDocumentTemplates.value?.[0].titleTranslations).toEqual({ 'en-US': 'Renamed' })
+  expect(localDocumentTemplates.value?.[0].titlePluralTranslations).toEqual({ 'en-US': 'Renamed' })
 })
 
 test('Test that updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations ignores unknown ids', () => {
   const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([baseTemplate])
   updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations(
     localDocumentTemplates,
-    'missing-id',
-    { 'en-US': 'Renamed' }
+    'missing-id', {
+      plural: { 'en-US': 'Renamed' },
+      singular: {}
+    }
   )
-  expect(localDocumentTemplates.value?.[0].titleTranslations).toEqual({ 'en-US': 'Character' })
+  expect(localDocumentTemplates.value?.[0].titlePluralTranslations).toEqual({ 'en-US': 'Character' })
 })
 
 /**
@@ -102,8 +107,10 @@ test('Test that updateDialogProjectSettingsDocumentTemplateDraftTitleTranslation
   const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>(null)
   updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations(
     localDocumentTemplates,
-    baseTemplate.id,
-    { 'en-US': 'Renamed' }
+    baseTemplate.id, {
+      plural: { 'en-US': 'Renamed' },
+      singular: {}
+    }
   )
   expect(localDocumentTemplates.value).toBeNull()
 })

@@ -1,0 +1,21 @@
+@use './variables' as *;
+
+.dialogProjectSettingsWorldsTabItem__titleRow {
+  align-items: center;
+  display: flex;
+  flex-grow: 1;
+  gap: $dialogProjectSettings-worldsTabMissingTranslationsWarning-gap;
+  min-width: 0;
+  z-index: $faVerticalDraggableTabs-tab-content-zIndex;
+}
+
+.dialogProjectSettingsWorldsTabItem__titleContent {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dialogProjectSettingsWorldsTabItem__missingTranslationsWarning {
+  flex: 0 0 auto;
+  margin-left: $dialogProjectSettings-worldsTabMissingTranslationsWarning-marginLeft;
+  pointer-events: auto;
+}

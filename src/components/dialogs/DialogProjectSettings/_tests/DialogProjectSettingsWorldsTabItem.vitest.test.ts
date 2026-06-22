@@ -212,3 +212,74 @@ test('Test that DialogProjectSettingsWorldsTabItem selects on Enter and Space ke
   await tab.trigger('keydown', { key: 'Tab' })
   expect(w.emitted('select')).toHaveLength(2)
 })
+
+/**
+ * DialogProjectSettingsWorldsTabItem
+ * Shows missing translations warning when active locale has no display name.
+ */
+test('Test that DialogProjectSettingsWorldsTabItem shows missing translations warning for active locale', () => {
+  const w = mount(DialogProjectSettingsWorldsTabItem, {
+    props: {
+      currentLanguageCode: 'de',
+      isSelected: false,
+      tabHasError: false,
+      world: {
+        ...worldFixture,
+        displayNameTranslations: { 'en-US': 'Realm' }
+      }
+    },
+    global: {
+      directives: {
+        ripple: () => {}
+      },
+      mocks: {
+        $t: (key: string) => {
+          if (key === 'dialogs.projectSettings.panels.worlds.missingTranslationsTabTooltip') {
+            return 'Some of the translations for the currently selected language are missing from this world.'
+          }
+          return key
+        }
+      },
+      stubs: {
+        QTooltip: { template: '<span><slot /></span>' }
+      }
+    }
+  })
+
+  const warningIcon = w.find('[data-test-locator="dialogProjectSettings-worlds-tabMissingTranslationsWarning"]')
+  expect(warningIcon.exists()).toBe(true)
+  expect(warningIcon.attributes('data-test-tooltip-text')).toBe(
+    'Some of the translations for the currently selected language are missing from this world.'
+  )
+})
+
+/**
+ * DialogProjectSettingsWorldsTabItem
+ * Hides missing translations warning when active locale has a display name.
+ */
+test('Test that DialogProjectSettingsWorldsTabItem hides missing translations warning when active locale is present', () => {
+  const w = mount(DialogProjectSettingsWorldsTabItem, {
+    props: {
+      currentLanguageCode: 'de',
+      isSelected: false,
+      tabHasError: false,
+      world: {
+        ...worldFixture,
+        displayNameTranslations: {
+          de: 'Reich',
+          'en-US': 'Realm'
+        }
+      }
+    },
+    global: {
+      directives: {
+        ripple: () => {}
+      },
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  expect(w.find('[data-test-locator="dialogProjectSettings-worlds-tabMissingTranslationsWarning"]').exists()).toBe(false)
+})

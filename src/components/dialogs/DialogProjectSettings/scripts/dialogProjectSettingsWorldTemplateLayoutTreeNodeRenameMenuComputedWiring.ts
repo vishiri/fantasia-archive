@@ -10,26 +10,28 @@ import {
   resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTestLocators,
   resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuValidationErrorMessage
 } from './functions/dialogProjectSettingsWorldTemplateLayoutRenameMenuNodeHelpers'
+import type { T_dialogProjectSettingsWorldTemplateLayoutRenameTranslationsDraft } from 'app/types/T_dialogProjectSettingsWorldTemplateLayoutRenameTranslationsDraft'
+import type { I_faLocaleStringTranslations } from 'app/types/I_faLocaleStringTranslations'
 import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
 
 type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuComputedState = {
-  canonicalNameTestLocator: ComputedRef<string | undefined>
   contextMenuTestLocator: ComputedRef<string | undefined>
+  hasMenuPinnedAside: ComputedRef<boolean>
   renameHasError: ComputedRef<boolean>
   renameInputTestLocator: ComputedRef<string | undefined>
   renameMenuErrorMessage: ComputedRef<string | undefined>
   renameMenuOpen: WritableComputedRef<boolean>
   renameMenuTargetKey: ComputedRef<string | null>
-  showTemplateCanonicalName: ComputedRef<boolean>
+  showTemplatePinnedAside: ComputedRef<boolean>
   supportsRenameMenu: ComputedRef<boolean>
   templateCanonicalName: ComputedRef<string>
 }
 
 export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuComputedState (deps: {
   getNode: () => I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
-  isGroupNameInvalid: (displayName: string) => boolean
+  isGroupNameInvalid: (displayNameTranslations: I_faLocaleStringTranslations) => boolean
   openRenameMenuTarget: Ref<string | null>
-  renameDraft: Ref<string>
+  renameTranslationsDraft: Ref<T_dialogProjectSettingsWorldTemplateLayoutRenameTranslationsDraft>
   translateGroupNameErrorRequired: () => string
 }): T_dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuComputedState {
   const renameMenuTargetKey = computed(() => {
@@ -78,18 +80,14 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
       .renameInputTestLocator
   })
 
-  const canonicalNameTestLocator = computed(() => {
-    const nodeKind = resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKind(deps.getNode())
-    return resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTestLocators(nodeKind)
-      .canonicalNameTestLocator
-  })
-
-  const showTemplateCanonicalName = computed(() => {
+  const showTemplatePinnedAside = computed(() => {
     return resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKind(deps.getNode()) === 'template'
   })
 
+  const hasMenuPinnedAside = computed(() => showTemplatePinnedAside.value)
+
   const templateCanonicalName = computed(() => {
-    if (!showTemplateCanonicalName.value) {
+    if (!showTemplatePinnedAside.value) {
       return ''
     }
     return deps.getNode().templateDisplayName
@@ -97,8 +95,10 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
 
   const renameHasError = computed(() => {
     const nodeKind = resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKind(deps.getNode())
+    const draft = deps.renameTranslationsDraft.value
+    const displayNameTranslations = 'plural' in draft ? draft.plural : draft
     return resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuHasError({
-      displayName: deps.renameDraft.value,
+      displayNameTranslations,
       isGroupNameInvalid: deps.isGroupNameInvalid,
       nodeKind
     })
@@ -106,8 +106,10 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
 
   const renameMenuErrorMessage = computed(() => {
     const nodeKind = resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKind(deps.getNode())
+    const draft = deps.renameTranslationsDraft.value
+    const displayNameTranslations = 'plural' in draft ? draft.plural : draft
     return resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuValidationErrorMessage({
-      displayName: deps.renameDraft.value,
+      displayNameTranslations,
       isGroupNameInvalid: deps.isGroupNameInvalid,
       nodeKind,
       translateGroupNameErrorRequired: deps.translateGroupNameErrorRequired
@@ -115,14 +117,14 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
   })
 
   return {
-    canonicalNameTestLocator,
     contextMenuTestLocator,
+    hasMenuPinnedAside,
     renameHasError,
     renameInputTestLocator,
     renameMenuErrorMessage,
     renameMenuOpen,
     renameMenuTargetKey,
-    showTemplateCanonicalName,
+    showTemplatePinnedAside,
     supportsRenameMenu,
     templateCanonicalName
   }

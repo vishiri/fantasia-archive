@@ -14,7 +14,8 @@ const {
           icon: 'mdi-account',
           id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
           sortOrder: 0,
-          titleTranslations: { 'en-US': 'Character' },
+          titlePluralTranslations: { 'en-US': 'Character' },
+          titleSingularTranslations: {},
           updatedAtMs: 1,
           worldAppendixTranslations: { 'en-US': 'Notes' }
         }
@@ -41,7 +42,8 @@ beforeEach(() => {
         icon: 'mdi-account',
         id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
         sortOrder: 0,
-        titleTranslations: { 'en-US': 'Character' },
+        titlePluralTranslations: { 'en-US': 'Character' },
+        titleSingularTranslations: {},
         updatedAtMs: 1,
         worldAppendixTranslations: { 'en-US': 'Notes' }
       }
@@ -77,7 +79,8 @@ test('Test that faProjectDocumentTemplatesFetchFreshForDialog returns mapped dra
       documentCount: 0,
       icon: 'mdi-account',
       id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-      titleTranslations: { 'en-US': 'Character' },
+      titlePluralTranslations: { 'en-US': 'Character' },
+      titleSingularTranslations: {},
       worldAppendixTranslations: { 'en-US': 'Notes' }
     }
   ])
@@ -92,7 +95,8 @@ test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog calls saveDo
   const items = [
     {
       id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-      titleTranslations: { 'en-US': 'Character' }
+      titlePluralTranslations: { 'en-US': 'Character' },
+      titleSingularTranslations: {},
     }
   ]
   await faProjectDocumentTemplatesPersistSnapshotFromDialog(items)
@@ -162,7 +166,8 @@ test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog throws when 
     faProjectDocumentTemplatesPersistSnapshotFromDialog([
       {
         id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-        titleTranslations: { 'en-US': 'Character' }
+        titlePluralTranslations: { 'en-US': 'Character' },
+        titleSingularTranslations: {},
       }
     ])
   ).rejects.toThrow('globalFunctionality.faProjectSettings.bridgeMissing')
@@ -180,7 +185,8 @@ test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog surfaces sav
     faProjectDocumentTemplatesPersistSnapshotFromDialog([
       {
         id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-        titleTranslations: { 'en-US': 'Character' }
+        titlePluralTranslations: { 'en-US': 'Character' },
+        titleSingularTranslations: {},
       }
     ])
   ).rejects.toThrow('globalFunctionality.faProjectSettings.saveError')
@@ -199,7 +205,8 @@ test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog surfaces sav
     faProjectDocumentTemplatesPersistSnapshotFromDialog([
       {
         id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-        titleTranslations: { 'en-US': 'Character' }
+        titlePluralTranslations: { 'en-US': 'Character' },
+        titleSingularTranslations: {},
       }
     ])
   ).rejects.toThrow('globalFunctionality.faProjectSettings.saveError')

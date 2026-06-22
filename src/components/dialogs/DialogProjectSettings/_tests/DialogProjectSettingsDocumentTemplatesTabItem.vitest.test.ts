@@ -2,7 +2,17 @@ import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
 
 import DialogProjectSettingsDocumentTemplatesTabItem from '../DialogProjectSettingsDocumentTemplatesTabItem.vue'
+import {
+  buildDialogProjectSettingsSingularPluralMissingTooltip,
+  mergeDialogProjectSettingsVitestGlobal
+} from 'app/helpers/dialogProjectSettingsVitestI18n'
 import { buildDialogProjectSettingsDocumentTemplateDraft } from './dialogProjectSettingsDocumentTemplateDraftFixtures'
+
+const tabItemMountGlobal = mergeDialogProjectSettingsVitestGlobal({
+  stubs: {
+    QTooltip: { template: '<span><slot /></span>' }
+  }
+})
 
 /**
  * DialogProjectSettingsDocumentTemplatesTabItem
@@ -16,11 +26,7 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabItem renders tab label'
       tabHasError: false,
       template: buildDialogProjectSettingsDocumentTemplateDraft()
     },
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      }
-    }
+    global: tabItemMountGlobal
   })
 
   expect(w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tab"]').exists()).toBe(true)
@@ -43,15 +49,12 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabItem renders world appe
       isSelected: false,
       tabHasError: false,
       template: buildDialogProjectSettingsDocumentTemplateDraft({
-        titleTranslations: { 'en-US': 'Lalala' },
+        titlePluralTranslations: { 'en-US': 'Lalala' },
+        titleSingularTranslations: {},
         worldAppendixTranslations: { 'en-US': 'Some world' }
       })
     },
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      }
-    }
+    global: tabItemMountGlobal
   })
 
   const appendix = w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tabWorldAppendix"]')
@@ -75,11 +78,7 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabItem renders tab icon b
         worldAppendixTranslations: { 'en-US': 'Notes' }
       })
     },
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      }
-    }
+    global: tabItemMountGlobal
   })
 
   const tabIcon = w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tabIcon"]')
@@ -95,28 +94,20 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabItem shows missing tran
       isSelected: false,
       tabHasError: false,
       template: buildDialogProjectSettingsDocumentTemplateDraft({
-        titleTranslations: { 'en-US': 'Races' }
+        titlePluralTranslations: { 'en-US': 'Races' },
+        titleSingularTranslations: {}
       })
     },
-    global: {
-      mocks: {
-        $t: (key: string) => {
-          if (key === 'dialogs.projectSettings.panels.documentTemplates.missingTranslationsTabTooltip') {
-            return 'Some of the translations for the currently selected language are missing from this document template.'
-          }
-          return key
-        }
-      },
-      stubs: {
-        QTooltip: { template: '<span><slot /></span>' }
-      }
-    }
+    global: tabItemMountGlobal
   })
 
   const warningIcon = w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tabMissingTranslationsWarning"]')
   expect(warningIcon.exists()).toBe(true)
   expect(warningIcon.attributes('data-test-tooltip-text')).toBe(
-    'Some of the translations for the currently selected language are missing from this document template.'
+    buildDialogProjectSettingsSingularPluralMissingTooltip({
+      fallbackLanguageCode: 'en-US',
+      missingForm: 'both'
+    })
   )
 })
 
@@ -127,17 +118,16 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabItem hides missing tran
       isSelected: false,
       tabHasError: false,
       template: buildDialogProjectSettingsDocumentTemplateDraft({
-        titleTranslations: {
+        titlePluralTranslations: {
           de: 'Rassen',
           'en-US': 'Races'
+        },
+        titleSingularTranslations: {
+          de: 'Rasse'
         }
       })
     },
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      }
-    }
+    global: tabItemMountGlobal
   })
 
   expect(w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tabMissingTranslationsWarning"]').exists()).toBe(

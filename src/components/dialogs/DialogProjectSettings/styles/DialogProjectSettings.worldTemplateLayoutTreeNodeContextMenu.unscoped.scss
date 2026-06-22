@@ -1,13 +1,23 @@
 @use './variables' as *;
+@use '../../../elements/FaLocaleTranslationsInput/styles/variables' as faLocaleTranslationsInput;
 
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__contextMenu.q-menu {
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  max-height: faLocaleTranslationsInput.$faLocaleTranslationsInput-menu-maxHeight;
+  overflow: hidden;
   z-index: $dialogProjectSettings-worldTemplateLayout-groupContextMenu-zIndex !important;
 }
 
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__contextMenu.q-menu .dialogProjectSettingsWorldTemplateLayoutTreeNode__renameMenuBody {
   background-color: $dialogProjectSettings-worldColorPalette-contextMenu-backgroundColor;
   box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
   padding: $dialogProjectSettings-worldTemplateLayout-renameMenuBody-padding;
   width: 100%;
 }
@@ -42,6 +52,10 @@
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__renameMenuBody {
   background-color: $dialogProjectSettings-worldColorPalette-contextMenu-backgroundColor;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
   padding: $dialogProjectSettings-worldTemplateLayout-renameMenuBody-padding;
   width: 100%;
 
@@ -57,9 +71,4 @@
     display: flex;
     margin-top: 0;
   }
-}
-
-.dialogProjectSettings__fieldHelpTooltip.q-tooltip {
-  max-width: $dialogProjectSettings-fieldHelpTooltip-maxWidth;
-  text-align: left;
 }

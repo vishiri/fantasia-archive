@@ -1,4 +1,17 @@
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
+import type { I_faLocaleStringTranslations } from 'app/types/I_faLocaleStringTranslations'
 import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
+
+function hasAnyLocaleStringTranslation (
+  translations: I_faLocaleStringTranslations
+): boolean {
+  for (const value of Object.values(translations)) {
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return true
+    }
+  }
+  return false
+}
 
 export function resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKind (
   node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
@@ -9,96 +22,99 @@ export function resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKin
   return null
 }
 
-export function resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftSeed (
-  node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
-): string {
-  const nodeKind = resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuNodeKind(node)
-  if (nodeKind === 'template') {
-    return node.nickname
-  }
-  return node.label
-}
-
 export function resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTestLocators (
   nodeKind: 'group' | 'template' | null
 ): {
-    canonicalNameTestLocator: string | undefined
     contextMenuTestLocator: string | undefined
     renameInputTestLocator: string | undefined
   } {
   if (nodeKind === 'group') {
     return {
-      canonicalNameTestLocator: undefined,
       contextMenuTestLocator: 'dialogProjectSettings-worldTemplateLayoutGroupContextMenu',
       renameInputTestLocator: 'dialogProjectSettings-worldTemplateLayoutGroupRenameInput'
     }
   }
   if (nodeKind === 'template') {
     return {
-      canonicalNameTestLocator: 'dialogProjectSettings-worldTemplateLayoutTemplateCanonicalName',
       contextMenuTestLocator: 'dialogProjectSettings-worldTemplateLayoutTemplateContextMenu',
       renameInputTestLocator: 'dialogProjectSettings-worldTemplateLayoutTemplateRenameInput'
     }
   }
   return {
-    canonicalNameTestLocator: undefined,
     contextMenuTestLocator: undefined,
     renameInputTestLocator: undefined
   }
 }
 
 export function resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuValidationErrorMessage (params: {
-  displayName: string
-  isGroupNameInvalid: (displayName: string) => boolean
+  displayNameTranslations: I_faLocaleStringTranslations
+  isGroupNameInvalid: (displayNameTranslations: I_faLocaleStringTranslations) => boolean
   nodeKind: 'group' | 'template' | null
   translateGroupNameErrorRequired: () => string
 }): string | undefined {
   const {
-    displayName,
+    displayNameTranslations,
     isGroupNameInvalid,
     nodeKind,
     translateGroupNameErrorRequired
   } = params
   if (nodeKind === 'group') {
-    return isGroupNameInvalid(displayName) ? translateGroupNameErrorRequired() : undefined
+    return isGroupNameInvalid(displayNameTranslations) ? translateGroupNameErrorRequired() : undefined
   }
   return undefined
 }
 
 export function resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuHasError (params: {
-  displayName: string
-  isGroupNameInvalid: (displayName: string) => boolean
+  displayNameTranslations: I_faLocaleStringTranslations
+  isGroupNameInvalid: (displayNameTranslations: I_faLocaleStringTranslations) => boolean
   nodeKind: 'group' | 'template' | null
 }): boolean {
   const {
-    displayName,
+    displayNameTranslations,
     isGroupNameInvalid,
     nodeKind
   } = params
   if (nodeKind === 'group') {
-    return isGroupNameInvalid(displayName)
+    return isGroupNameInvalid(displayNameTranslations)
   }
   return false
 }
 
 export function emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate (params: {
-  displayName: string
-  emitRenameGroup: (groupId: string, displayName: string) => void
-  emitRenamePlacementNickname: (placementId: string, nickname: string) => void
+  displayNameTranslations?: I_faLocaleStringTranslations
+  emitRenameGroup: (groupId: string, displayNameTranslations: I_faLocaleStringTranslations) => void
+  emitRenamePlacementNickname: (
+    placementId: string,
+    nicknameTranslations: I_faLocaleSingularPluralTranslations
+  ) => void
+  nicknameTranslations?: I_faLocaleSingularPluralTranslations
   node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
 }): void {
   const {
-    displayName,
+    displayNameTranslations,
     emitRenameGroup,
     emitRenamePlacementNickname,
+    nicknameTranslations,
     node
   } = params
   if (node.nodeKind === 'group') {
-    emitRenameGroup(node.id, displayName)
+    if (displayNameTranslations === undefined) {
+      return
+    }
+    emitRenameGroup(node.id, displayNameTranslations)
     return
   }
   if (node.nodeKind !== 'template') {
     return
   }
-  emitRenamePlacementNickname(node.id, displayName)
+  if (nicknameTranslations === undefined) {
+    return
+  }
+  emitRenamePlacementNickname(node.id, nicknameTranslations)
+}
+
+export function isDialogProjectSettingsWorldTemplateLayoutGroupNameTranslationsInvalid (
+  displayNameTranslations: I_faLocaleStringTranslations
+): boolean {
+  return !hasAnyLocaleStringTranslation(displayNameTranslations)
 }

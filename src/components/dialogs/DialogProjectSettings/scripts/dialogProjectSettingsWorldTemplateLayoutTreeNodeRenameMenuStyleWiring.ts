@@ -30,7 +30,15 @@ function buildRenameMenuWidthStyle (widthPx: number): CSSProperties {
   }
 }
 
+/** Extra width when template nickname menu shows pinned canonical aside. */
+const DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_RENAME_MENU_PINNED_ASIDE_EXTRA_WIDTH_PX = 212
+
+/** Extra width when template nickname menu uses singular/plural columns. */
+const DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_RENAME_MENU_SINGULAR_PLURAL_EXTRA_WIDTH_PX = 140
+
 export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuStyleWiring (deps: {
+  getHasMenuPinnedAside: () => boolean
+  getUsesSingularPluralRenameMenu: () => boolean
   nodeAnchorRef: Ref<HTMLElement | null>
 }): T_dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuStyleWiring {
   const renameMenuStyle = ref<CSSProperties | undefined>(undefined)
@@ -48,7 +56,7 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
     const actionsLeftPx = actionsElement instanceof HTMLElement
       ? actionsElement.getBoundingClientRect().left
       : null
-    const widthPx = resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuWidthPx({
+    let widthPx = resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuWidthPx({
       actionButtonSizePx: DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_NODE_ACTION_BUTTON_SIZE_PX,
       actionButtonsCount: DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_RENAME_MENU_ACTION_BUTTONS_COUNT,
       actionButtonsGapPx: DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_NODE_ACTION_BUTTONS_GAP_PX,
@@ -59,6 +67,12 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
         actionsLeftPx
       }
     })
+    if (deps.getHasMenuPinnedAside()) {
+      widthPx += DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_RENAME_MENU_PINNED_ASIDE_EXTRA_WIDTH_PX
+    }
+    if (deps.getUsesSingularPluralRenameMenu()) {
+      widthPx += DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_RENAME_MENU_SINGULAR_PLURAL_EXTRA_WIDTH_PX
+    }
     renameMenuStyle.value = buildRenameMenuWidthStyle(widthPx)
   }
 

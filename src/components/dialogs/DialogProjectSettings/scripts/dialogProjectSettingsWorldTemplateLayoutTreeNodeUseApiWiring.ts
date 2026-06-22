@@ -1,5 +1,9 @@
 import type { ComputedRef, CSSProperties, Ref, WritableComputedRef } from 'vue'
-import type { QInput, QTooltip } from 'quasar'
+import type { QTooltip } from 'quasar'
+
+import type { T_dialogProjectSettingsWorldTemplateLayoutRenameTranslationsDraft } from 'app/types/T_dialogProjectSettingsWorldTemplateLayoutRenameTranslationsDraft'
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
+import type { I_faLocaleStringTranslations } from 'app/types/I_faLocaleStringTranslations'
 
 import type { createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring'
 import type { createDialogProjectSettingsWorldTemplateLayoutTreeNodeInteractionWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeInteractionWiring'
@@ -15,17 +19,25 @@ type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeUseApi = {
   armEditTooltip: () => void
   armPlacementNicknameHoverTooltip: () => void
   armRemoveTooltip: () => void
-  canonicalNameTestLocator: ComputedRef<string | undefined>
   displayIconName: ComputedRef<string>
   editTooltipHoverEnabled: Ref<boolean>
   editTooltipRef: Ref<QTooltip | null>
   editTooltipText: ComputedRef<string>
+  hasMenuPinnedAside: ComputedRef<boolean>
   nodeAnchorRef: Ref<HTMLElement | null>
   nodeRootClassList: ComputedRef<Record<string, boolean>>
   nodeTestLocator: ComputedRef<string>
+  menuPinnedAsideLabelValue: ComputedRef<string | undefined>
+  menuPinnedAsideTooltipValue: ComputedRef<string | undefined>
+  menuPinnedAsideValue: ComputedRef<string | undefined>
+  missingTranslationsWarningTestLocator: ComputedRef<string>
+  missingTranslationsWarningTooltipText: ComputedRef<string>
   onEditClick: () => void
   onRemoveClick: () => void
   onRenameContextMenu: () => void
+  onRenameTranslationsDraftUpdate: (
+    value: I_faLocaleStringTranslations | I_faLocaleSingularPluralTranslations
+  ) => void
   placementNicknameHoverTooltipEnabled: Ref<boolean>
   placementNicknameHoverTooltipNicknameLine: ComputedRef<string | undefined>
   placementNicknameHoverTooltipOffset: [number, number]
@@ -37,18 +49,20 @@ type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeUseApi = {
   removeTooltipHoverEnabled: Ref<boolean>
   removeTooltipRef: Ref<QTooltip | null>
   removeTooltipText: ComputedRef<string>
-  renameDraft: Ref<string>
   renameHasError: ComputedRef<boolean>
-  renameInputLabel: ComputedRef<string | undefined>
-  renameInputRef: Ref<QInput | null>
+  renameInputLabel: ComputedRef<string>
+  renameInputTestLocator: ComputedRef<string | undefined>
+  renameInputTestLocatorValue: ComputedRef<string>
   renameMenuErrorMessage: ComputedRef<string | undefined>
   renameMenuOpen: WritableComputedRef<boolean>
   renameMenuStyle: Ref<CSSProperties | undefined>
   renameMenuWiring: T_renameMenuWiring
+  renameTranslationsDraft: Ref<T_dialogProjectSettingsWorldTemplateLayoutRenameTranslationsDraft>
   rowHasValidationError: ComputedRef<boolean>
+  showMissingTranslationsWarning: ComputedRef<boolean>
   showPlacementNicknameHoverTooltip: ComputedRef<boolean>
+  showTemplatePinnedAside: ComputedRef<boolean>
   suppressPlacementNicknameHoverTooltip: () => void
-  showTemplateCanonicalName: ComputedRef<boolean>
   templateCanonicalName: ComputedRef<string>
   templateCanonicalNameLabel: ComputedRef<string>
   templateCanonicalNameTooltipText: ComputedRef<string>
@@ -72,17 +86,24 @@ export function bindDialogProjectSettingsWorldTemplateLayoutTreeNodeUseApi (para
     armEditTooltip: actionTooltipsWiring.armEditTooltip,
     armPlacementNicknameHoverTooltip: actionTooltipsWiring.armPlacementNicknameHoverTooltip,
     armRemoveTooltip: actionTooltipsWiring.armRemoveTooltip,
-    canonicalNameTestLocator: renameMenuWiring.canonicalNameTestLocator,
     displayIconName: presentationWiring.displayIconName,
     editTooltipHoverEnabled: actionTooltipsWiring.editTooltipHoverEnabled,
     editTooltipRef: actionTooltipsWiring.editTooltipRef,
     editTooltipText: presentationWiring.editTooltipText,
+    hasMenuPinnedAside: renameMenuWiring.hasMenuPinnedAside,
+    menuPinnedAsideLabelValue: renameMenuWiring.menuPinnedAsideLabelValue,
+    menuPinnedAsideTooltipValue: renameMenuWiring.menuPinnedAsideTooltipValue,
+    menuPinnedAsideValue: renameMenuWiring.menuPinnedAsideValue,
+    hidePlacementNicknameHoverTooltip: actionTooltipsWiring.hidePlacementNicknameHoverTooltip,
+    missingTranslationsWarningTestLocator: presentationWiring.missingTranslationsWarningTestLocator,
+    missingTranslationsWarningTooltipText: presentationWiring.missingTranslationsWarningTooltipText,
     nodeAnchorRef,
     nodeRootClassList: presentationWiring.nodeRootClassList,
     nodeTestLocator: presentationWiring.nodeTestLocator,
     onEditClick: interactionWiring.onEditClick,
     onRemoveClick: interactionWiring.onRemoveClick,
     onRenameContextMenu: interactionWiring.onRenameContextMenu,
+    onRenameTranslationsDraftUpdate: renameMenuWiring.onRenameTranslationsDraftUpdate,
     placementNicknameHoverTooltipEnabled: actionTooltipsWiring.placementNicknameHoverTooltipEnabled,
     placementNicknameHoverTooltipNicknameLine: presentationWiring.placementNicknameHoverTooltipNicknameLine,
     placementNicknameHoverTooltipOffset: presentationWiring.placementNicknameHoverTooltipOffset,
@@ -92,20 +113,21 @@ export function bindDialogProjectSettingsWorldTemplateLayoutTreeNodeUseApi (para
     removeTooltipHoverEnabled: actionTooltipsWiring.removeTooltipHoverEnabled,
     removeTooltipRef: actionTooltipsWiring.removeTooltipRef,
     removeTooltipText: presentationWiring.removeTooltipText,
-    renameDraft: renameMenuWiring.renameDraft,
     renameHasError: renameMenuWiring.renameHasError,
     renameInputLabel: renameMenuWiring.renameInputLabel,
-    renameInputRef: renameMenuWiring.renameInputRef,
+    renameInputTestLocator: renameMenuWiring.renameInputTestLocator,
+    renameInputTestLocatorValue: renameMenuWiring.renameInputTestLocatorValue,
     renameMenuErrorMessage: renameMenuWiring.renameMenuErrorMessage,
     renameMenuOpen: renameMenuWiring.renameMenuOpen,
     renameMenuStyle: renameMenuWiring.renameMenuStyle,
     renameMenuWiring,
+    renameTranslationsDraft: renameMenuWiring.renameTranslationsDraft,
     revealPlacementNicknameHoverTooltip: actionTooltipsWiring.revealPlacementNicknameHoverTooltip,
-    hidePlacementNicknameHoverTooltip: actionTooltipsWiring.hidePlacementNicknameHoverTooltip,
     rowHasValidationError: presentationWiring.rowHasValidationError,
+    showMissingTranslationsWarning: presentationWiring.showMissingTranslationsWarning,
     showPlacementNicknameHoverTooltip: presentationWiring.showPlacementNicknameHoverTooltip,
+    showTemplatePinnedAside: renameMenuWiring.showTemplatePinnedAside,
     suppressPlacementNicknameHoverTooltip: actionTooltipsWiring.suppressPlacementNicknameHoverTooltip,
-    showTemplateCanonicalName: renameMenuWiring.showTemplateCanonicalName,
     templateCanonicalName: renameMenuWiring.templateCanonicalName,
     templateCanonicalNameLabel: renameMenuWiring.templateCanonicalNameLabel,
     templateCanonicalNameTooltipText: renameMenuWiring.templateCanonicalNameTooltipText,

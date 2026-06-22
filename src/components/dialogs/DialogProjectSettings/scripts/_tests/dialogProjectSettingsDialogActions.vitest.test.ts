@@ -55,7 +55,8 @@ const directTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] = [
     documentCount: 0,
     icon: 'mdi-file',
     id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-    titleTranslations: { 'en-US': 'Direct template' },
+    titlePluralTranslations: { 'en-US': 'Direct template' },
+    titleSingularTranslations: {},
     worldAppendixTranslations: { 'en-US': 'Appendix' }
   }
 ]
@@ -233,7 +234,8 @@ test('Test that createDialogProjectSettingsDialogActions mutates local document 
         documentCount: 0,
         icon: '',
         id: templateAId,
-        titleTranslations: { 'en-US': 'Alpha' },
+        titlePluralTranslations: { 'en-US': 'Alpha' },
+        titleSingularTranslations: {},
         worldAppendixTranslations: {}
       }
     ])
@@ -250,10 +252,13 @@ test('Test that createDialogProjectSettingsDialogActions mutates local document 
   addDocumentTemplate()
   expect(bindings.localDocumentTemplates.value).toHaveLength(2)
 
-  updateDocumentTemplateTitleTranslations(templateAId, { 'en-US': 'Renamed' })
+  updateDocumentTemplateTitleTranslations(templateAId, {
+    plural: { 'en-US': 'Renamed' },
+    singular: {}
+  })
   updateDocumentTemplateIcon(templateAId, 'mdi-star')
   updateDocumentTemplateWorldAppendixTranslations(templateAId, { 'en-US': 'Notes' })
-  expect(bindings.localDocumentTemplates.value?.[0]?.titleTranslations).toEqual({ 'en-US': 'Renamed' })
+  expect(bindings.localDocumentTemplates.value?.[0]?.titlePluralTranslations).toEqual({ 'en-US': 'Renamed' })
   expect(bindings.localDocumentTemplates.value?.[0]?.icon).toBe('mdi-star')
   expect(bindings.localDocumentTemplates.value?.[0]?.worldAppendixTranslations).toEqual({ 'en-US': 'Notes' })
 
@@ -294,7 +299,8 @@ test('Test that saveAndCloseDialog dispatches saveProjectSettings with trimmed n
         documentCount: 0,
         icon: 'mdi-account',
         id: templateAId,
-        titleTranslations: { 'en-US': 'Character' },
+        titlePluralTranslations: { 'en-US': 'Character' },
+        titleSingularTranslations: {},
         worldAppendixTranslations: { 'en-US': 'World notes' }
       }
     ])
@@ -309,7 +315,8 @@ test('Test that saveAndCloseDialog dispatches saveProjectSettings with trimmed n
       {
         icon: 'mdi-account',
         id: templateAId,
-        titleTranslations: { 'en-US': 'Character' },
+        titlePluralTranslations: { 'en-US': 'Character' },
+        titleSingularTranslations: {},
         worldAppendixTranslations: { 'en-US': 'World notes' }
       }
     ],

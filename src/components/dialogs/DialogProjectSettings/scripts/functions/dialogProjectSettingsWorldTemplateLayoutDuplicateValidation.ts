@@ -2,6 +2,18 @@ import type {
   I_dialogProjectSettingsWorldTemplateLayoutDraft,
   I_dialogProjectSettingsWorldTemplatePlacementDraft
 } from 'app/types/I_dialogProjectSettingsWorlds'
+import type { I_faLocaleStringTranslations } from 'app/types/I_faLocaleStringTranslations'
+
+function hasAnyLocaleStringTranslation (
+  translations: I_faLocaleStringTranslations
+): boolean {
+  for (const value of Object.values(translations)) {
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return true
+    }
+  }
+  return false
+}
 
 export function collectDuplicateDocumentTemplateIdsInWorldTemplateLayout (
   layout: I_dialogProjectSettingsWorldTemplateLayoutDraft
@@ -44,7 +56,7 @@ export function collectBlankTemplateGroupIdsInWorldTemplateLayout (
 ): Set<string> {
   const blanks = new Set<string>()
   for (const group of layout.groups) {
-    if (group.displayName.trim().length === 0) {
+    if (!hasAnyLocaleStringTranslation(group.displayNameTranslations)) {
       blanks.add(group.id)
     }
   }

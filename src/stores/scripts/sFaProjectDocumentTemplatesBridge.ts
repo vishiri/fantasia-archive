@@ -10,7 +10,8 @@ function resolveProjectContentBridge (): {
       documentCount: number
       icon: string
       id: string
-      titleTranslations: I_dialogProjectSettingsDocumentTemplateDraft['titleTranslations']
+      titlePluralTranslations: I_dialogProjectSettingsDocumentTemplateDraft['titlePluralTranslations'],
+      titleSingularTranslations: I_dialogProjectSettingsDocumentTemplateDraft['titleSingularTranslations']
       worldAppendixTranslations: I_dialogProjectSettingsDocumentTemplateDraft['worldAppendixTranslations']
     }>
   }>
@@ -38,7 +39,8 @@ export async function faProjectDocumentTemplatesFetchFreshForDialog (): Promise<
       documentCount: template.documentCount,
       icon: template.icon,
       id: template.id,
-      titleTranslations: template.titleTranslations,
+      titlePluralTranslations: template.titlePluralTranslations,
+      titleSingularTranslations: template.titleSingularTranslations,
       worldAppendixTranslations: template.worldAppendixTranslations
     }))
   } catch (error: unknown) {

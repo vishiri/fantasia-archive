@@ -12,12 +12,14 @@ import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/t
 
 const groupNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   children: [],
+  displayNameTranslations: { 'en-US': 'Creatures' },
   documentCountInWorld: 0,
   documentTemplateId: null,
   icon: 'mdi-folder',
   id: '770e8400-e29b-41d4-a716-446655440001',
   label: 'Creatures',
-  nickname: '',
+  nicknamePluralTranslations: {},
+  nicknameSingularTranslations: {},
   nodeKind: 'group',
   templateDisplayName: '',
   usesNickname: false,
@@ -26,12 +28,14 @@ const groupNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
 
 const templateNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   children: [],
+  displayNameTranslations: {},
   documentCountInWorld: 0,
   documentTemplateId: '660e8400-e29b-41d4-a716-446655440001',
   icon: 'mdi-account',
   id: '880e8400-e29b-41d4-a716-446655440001',
   label: 'Character',
-  nickname: 'Alias',
+  nicknamePluralTranslations: { 'en-US': 'Alias' },
+  nicknameSingularTranslations: {},
   nodeKind: 'template',
   templateDisplayName: 'Character',
   usesNickname: true,
@@ -63,7 +67,7 @@ function mountRenameMenuHarness (node: I_dialogProjectSettingsWorldTemplateLayou
         emitRenameGroup,
         emitRenamePlacementNickname,
         getNode: () => nodeRef.value,
-        isGroupNameInvalid: (displayName) => displayName.trim().length === 0,
+        isGroupNameInvalid: (displayNameTranslations) => (displayNameTranslations['en-US'] ?? '').trim().length === 0,
         nodeAnchorRef,
         translateGroupNameErrorRequired: () => 'Group name required',
         translateGroupRenameInputLabel: () => 'Name of the group',
@@ -115,24 +119,24 @@ test('Test that createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
   expect(harness.wiring.contextMenuTestLocator.value).toBe(
     'dialogProjectSettings-worldTemplateLayoutGroupContextMenu'
   )
-  expect(harness.wiring.showTemplateCanonicalName.value).toBe(false)
+  expect(harness.wiring.showTemplatePinnedAside.value).toBe(false)
   expect(harness.wiring.renameInputLabel.value).toBe('Name of the group')
   expect(harness.wiring.templateCanonicalName.value).toBe('')
 
   harness.wiring.onRenameMenuBeforeShow()
   expect(harness.openRenameMenuTarget.value).toBe(targetKey)
-  expect(harness.wiring.renameDraft.value).toBe('Creatures')
+  expect(harness.wiring.renameTranslationsDraft.value).toEqual({ 'en-US': 'Creatures' })
 
   harness.wiring.renameMenuOpen.value = true
-  harness.wiring.onRenameDraftUpdate('Dragons')
-  expect(harness.emitRenameGroup).toHaveBeenCalledWith(groupNode.id, 'Dragons')
+  harness.wiring.onRenameTranslationsDraftUpdate({ 'en-US': 'Dragons' })
+  expect(harness.emitRenameGroup).toHaveBeenCalledWith(groupNode.id, { 'en-US': 'Dragons' })
 
   harness.nodeRef.value = {
     ...groupNode,
     label: 'Updated label'
   }
   await nextTick()
-  expect(harness.wiring.renameDraft.value).toBe('Dragons')
+  expect(harness.wiring.renameTranslationsDraft.value).toEqual({ 'en-US': 'Dragons' })
 
   harness.wiring.closeRenameMenu()
   expect(harness.openRenameMenuTarget.value).toBeNull()
@@ -149,7 +153,7 @@ test('Test that createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
 
   harness.wiring.openRenameMenu()
   expect(harness.openRenameMenuTarget.value).toBe(targetKey)
-  expect(harness.wiring.renameDraft.value).toBe('Creatures')
+  expect(harness.wiring.renameTranslationsDraft.value).toEqual({ 'en-US': 'Creatures' })
   expect(harness.wiring.renameMenuOpen.value).toBe(true)
 })
 
@@ -164,21 +168,33 @@ test('Test that createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
   expect(harness.wiring.renameInputTestLocator.value).toBe(
     'dialogProjectSettings-worldTemplateLayoutTemplateRenameInput'
   )
-  expect(harness.wiring.showTemplateCanonicalName.value).toBe(true)
+  expect(harness.wiring.showTemplatePinnedAside.value).toBe(true)
   expect(harness.wiring.templateCanonicalName.value).toBe('Character')
   expect(harness.wiring.templateNicknameTooltipText.value).toBe('Nickname tooltip')
   expect(harness.wiring.templateCanonicalNameTooltipText.value).toBe('Canonical tooltip')
 
   harness.wiring.onRenameMenuBeforeShow()
-  expect(harness.wiring.renameDraft.value).toBe('Alias')
-  harness.wiring.onRenameDraftUpdate('Hero')
+  expect(harness.wiring.renameTranslationsDraft.value).toEqual({
+    plural: { 'en-US': 'Alias' },
+    singular: {}
+  })
+  harness.wiring.onRenameTranslationsDraftUpdate({
+    plural: { 'en-US': 'Hero' },
+    singular: {}
+  })
   expect(harness.emitRenamePlacementNickname).toHaveBeenCalledWith(
     templateNode.id,
-    'Hero'
+    {
+      plural: { 'en-US': 'Hero' },
+      singular: {}
+    }
   )
 
   harness.wiring.renameMenuOpen.value = true
-  harness.wiring.onRenameDraftUpdate('')
+  harness.wiring.onRenameTranslationsDraftUpdate({
+    plural: {},
+    singular: {}
+  })
   expect(harness.wiring.renameHasError.value).toBe(false)
   expect(harness.wiring.renameMenuErrorMessage.value).toBeUndefined()
 })
@@ -236,7 +252,10 @@ test('Test that rename menu wiring ignores unsupported nodes', async () => {
 
   wiring.onRenameMenuBeforeShow()
   expect(openRenameMenuTarget.value).toBeNull()
-  wiring.onRenameDraftUpdate('Ignored')
+  expect(wiring.renameInputTestLocatorValue.value).toBe(
+    'dialogProjectSettings-worldTemplateLayoutRenameInput'
+  )
+  wiring.onRenameTranslationsDraftUpdate({ 'en-US': 'Ignored' })
   expect(emitRenameGroup).not.toHaveBeenCalled()
   wiring.closeRenameMenu()
   wiring.onRenameMenuHide()
@@ -244,8 +263,8 @@ test('Test that rename menu wiring ignores unsupported nodes', async () => {
 
 test('Test that rename menu draft update coalesces null model values to empty string', async () => {
   const harness = await mountRenameMenuHarness(groupNode)
-  harness.wiring.onRenameDraftUpdate(null)
-  expect(harness.emitRenameGroup).toHaveBeenCalledWith(groupNode.id, '')
+  harness.wiring.onRenameTranslationsDraftUpdate({})
+  expect(harness.emitRenameGroup).toHaveBeenCalledWith(groupNode.id, {})
 })
 
 test('Test that rename menu before-show caps max width from anchor minus action buttons', async () => {

@@ -122,7 +122,8 @@ test('Test that handleSaveProjectSettings persists document templates snapshot w
   const documentTemplates = [
     {
       id: '550e8400-e29b-41d4-a716-446655440000',
-      titleTranslations: { 'en-US': 'Character' }
+      titlePluralTranslations: { 'en-US': 'Character' },
+      titleSingularTranslations: {},
     }
   ]
   await handleSaveProjectSettings({
@@ -148,7 +149,8 @@ test('Test that handleSaveProjectSettings emits success notify after persistence
     documentTemplates: [
       {
         id: '550e8400-e29b-41d4-a716-446655440000',
-        titleTranslations: { 'en-US': 'Character' }
+        titlePluralTranslations: { 'en-US': 'Character' },
+        titleSingularTranslations: {},
       }
     ],
     settings: { projectName: 'Renamed' },

@@ -89,7 +89,8 @@ const templatesFilterFixture = [
   buildDialogProjectSettingsDocumentTemplateDraft({
     icon: 'mdi-map',
     id: 'template-b',
-    titleTranslations: { 'en-US': 'Locations' },
+    titlePluralTranslations: { 'en-US': 'Locations' },
+    titleSingularTranslations: {},
     worldAppendixTranslations: { 'en-US': 'atlas' }
   })
 ]
@@ -117,7 +118,7 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabList filters template t
               type: Object
             }
           },
-          template: '<div class="template-tab-stub" :data-test-template-name="template.titleTranslations[\'en-US\']" />'
+          template: '<div class="template-tab-stub" :data-test-template-name="template.titlePluralTranslations[\'en-US\']" />'
         }),
         DialogProjectSettingsVerticalTabListFilterInput: defineComponent({
           props: {
@@ -159,13 +160,15 @@ const templatesFilteredReorderFixture = [
   buildDialogProjectSettingsDocumentTemplateDraft({
     icon: 'mdi-map',
     id: 'template-b',
-    titleTranslations: { 'en-US': 'Locations' },
+    titlePluralTranslations: { 'en-US': 'Locations' },
+    titleSingularTranslations: {},
     worldAppendixTranslations: { 'en-US': 'atlas' }
   }),
   buildDialogProjectSettingsDocumentTemplateDraft({
     icon: 'mdi-note',
     id: 'template-c',
-    titleTranslations: { 'en-US': 'Notes' },
+    titlePluralTranslations: { 'en-US': 'Notes' },
+    titleSingularTranslations: {},
     worldAppendixTranslations: { 'en-US': 'pad' }
   })
 ]

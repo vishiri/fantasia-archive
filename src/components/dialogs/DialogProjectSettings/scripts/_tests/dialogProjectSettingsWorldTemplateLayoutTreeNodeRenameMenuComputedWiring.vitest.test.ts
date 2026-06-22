@@ -6,12 +6,14 @@ import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/t
 
 const groupNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   children: [],
+  displayNameTranslations: { 'en-US': 'Creatures' },
   documentCountInWorld: 0,
   documentTemplateId: null,
   icon: 'mdi-folder',
   id: '770e8400-e29b-41d4-a716-446655440001',
   label: 'Creatures',
-  nickname: '',
+  nicknamePluralTranslations: {},
+  nicknameSingularTranslations: {},
   nodeKind: 'group',
   templateDisplayName: '',
   usesNickname: false,
@@ -32,7 +34,7 @@ test('Test that rename menu computed state ignores unsupported node kinds', () =
     getNode: () => unsupportedNode,
     isGroupNameInvalid: () => false,
     openRenameMenuTarget,
-    renameDraft: ref(''),
+    renameTranslationsDraft: ref({}),
     translateGroupNameErrorRequired: () => 'Group required'
   })
 
@@ -50,9 +52,9 @@ test('Test that rename menu computed state closes only the active open target', 
   const openRenameMenuTarget = ref<string | null>('group:other-id')
   const computedState = createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuComputedState({
     getNode: () => groupNode,
-    isGroupNameInvalid: (displayName) => displayName.trim().length === 0,
+    isGroupNameInvalid: (displayNameTranslations) => (displayNameTranslations['en-US'] ?? '').trim().length === 0,
     openRenameMenuTarget,
-    renameDraft: ref('Creatures'),
+    renameTranslationsDraft: ref({ 'en-US': 'Creatures' }),
     translateGroupNameErrorRequired: () => 'Group required'
   })
 

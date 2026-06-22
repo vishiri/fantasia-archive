@@ -65,14 +65,16 @@ function buildLayoutHarnessProps (templateLayout: Record<string, unknown>): stri
         documentCount: 0,
         icon: 'mdi-account',
         id: fixtureTemplateAId,
-        titleTranslations: { 'en-US': 'Character' },
+        titlePluralTranslations: { 'en-US': 'Character' },
+        titleSingularTranslations: {},
         worldAppendixTranslations: {}
       },
       {
         documentCount: 0,
         icon: 'mdi-map',
         id: fixtureTemplateBId,
-        titleTranslations: { 'en-US': 'Location' },
+        titlePluralTranslations: { 'en-US': 'Location' },
+        titleSingularTranslations: {},
         worldAppendixTranslations: {}
       }
     ],

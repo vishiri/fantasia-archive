@@ -21,6 +21,8 @@
     <template #default="{ node }">
       <DialogProjectSettingsWorldTemplateLayoutTreeNode
         :blank-group-ids="props.blankGroupIds"
+        :current-language-code="props.currentLanguageCode"
+        :document-templates="props.documentTemplates"
         :duplicate-document-template-ids="props.duplicateDocumentTemplateIds"
         :invalid-document-template-ids="props.invalidDocumentTemplateIds"
         :node="node"
@@ -39,8 +41,14 @@ import { Draggable, dragContext } from '@he-tree/vue'
 import '@he-tree/vue/style/default.css'
 
 import DialogProjectSettingsWorldTemplateLayoutTreeNode from './DialogProjectSettingsWorldTemplateLayoutTreeNode.vue'
-import type { I_dialogProjectSettingsWorldTemplateLayoutDraft } from 'app/types/I_dialogProjectSettingsWorlds'
-import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
+import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
+import type { I_faLocaleStringTranslations } from 'app/types/I_faLocaleStringTranslations'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
+import type {
+  I_dialogProjectSettingsWorldTemplateLayoutDraft,
+  I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
+} from 'app/types/I_dialogProjectSettingsWorlds'
 import {
   DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_INDENT_PX,
   DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_NODE_ITEM_SELECTOR,
@@ -66,6 +74,8 @@ defineOptions({
 
 const props = defineProps<{
   blankGroupIds?: ReadonlySet<string>
+  currentLanguageCode: T_faUserSettingsLanguageCode
+  documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[]
   duplicateDocumentTemplateIds?: ReadonlySet<string>
   invalidDocumentTemplateIds?: ReadonlySet<string>
   templateLayout: I_dialogProjectSettingsWorldTemplateLayoutDraft
@@ -74,8 +84,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   deleteGroup: [groupId: string]
   removePlacement: [placementId: string]
-  renamePlacementNickname: [placementId: string, nickname: string]
-  renameGroup: [groupId: string, displayName: string]
+  renamePlacementNickname: [placementId: string, nicknameTranslations: I_faLocaleSingularPluralTranslations]
+  renameGroup: [groupId: string, displayNameTranslations: I_faLocaleStringTranslations]
   'update:templateLayout': [layout: I_dialogProjectSettingsWorldTemplateLayoutDraft]
 }>()
 
@@ -92,6 +102,7 @@ provide(dialogProjectSettingsWorldTemplateLayoutOpenRenameMenuTargetKey, openRen
 
 const treeSyncWiring = createDialogProjectSettingsWorldTemplateLayoutTreeSyncWiring({
   emitTemplateLayout: (layout) => emit('update:templateLayout', layout),
+  getCurrentLanguageCode: () => props.currentLanguageCode,
   getTemplateLayout: () => props.templateLayout,
   nextTick,
   suppressTreeEmit,
@@ -126,7 +137,7 @@ const treeStyle = computed(() => {
   }
 })
 
-watch(() => props.templateLayout, () => {
+watch(() => [props.templateLayout, props.currentLanguageCode], () => {
   treeWiring.resyncTreeDataFromProps()
 }, {
   deep: true,
@@ -162,12 +173,18 @@ function emitDeleteGroup (groupId: string): void {
   emit('deleteGroup', groupId)
 }
 
-function emitRenameGroup (groupId: string, displayName: string): void {
-  emit('renameGroup', groupId, displayName)
+function emitRenameGroup (
+  groupId: string,
+  displayNameTranslations: I_faLocaleStringTranslations
+): void {
+  emit('renameGroup', groupId, displayNameTranslations)
 }
 
-function emitRenamePlacementNickname (placementId: string, nickname: string): void {
-  emit('renamePlacementNickname', placementId, nickname)
+function emitRenamePlacementNickname (
+  placementId: string,
+  nicknameTranslations: I_faLocaleSingularPluralTranslations
+): void {
+  emit('renamePlacementNickname', placementId, nicknameTranslations)
 }
 
 function emitRemovePlacement (placementId: string): void {

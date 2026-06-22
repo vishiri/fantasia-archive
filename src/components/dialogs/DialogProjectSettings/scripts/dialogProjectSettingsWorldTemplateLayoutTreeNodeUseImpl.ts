@@ -1,3 +1,8 @@
+import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
+import type { I_faLocaleStringTranslations } from 'app/types/I_faLocaleStringTranslations'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
+
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeInteractionWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeInteractionWiring'
 import { wireDialogProjectSettingsWorldTemplateLayoutTreeNodePlacementNicknameTooltipRenameMenu } from './dialogProjectSettingsWorldTemplateLayoutTreeNodePlacementNicknameTooltipRenameMenuWiring'
@@ -20,6 +25,8 @@ export function useDialogProjectSettingsWorldTemplateLayoutTreeNodeImpl (
   },
   props: {
     blankGroupIds?: ReadonlySet<string>
+    currentLanguageCode: T_faUserSettingsLanguageCode
+    documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[]
     duplicateDocumentTemplateIds?: ReadonlySet<string>
     invalidDocumentTemplateIds?: ReadonlySet<string>
     node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
@@ -27,8 +34,8 @@ export function useDialogProjectSettingsWorldTemplateLayoutTreeNodeImpl (
   emit: {
     (event: 'deleteGroup', groupId: string): void
     (event: 'removePlacement', placementId: string): void
-    (event: 'renamePlacementNickname', placementId: string, nickname: string): void
-    (event: 'renameGroup', groupId: string, displayName: string): void
+    (event: 'renamePlacementNickname', placementId: string, nicknameTranslations: I_faLocaleSingularPluralTranslations): void
+    (event: 'renameGroup', groupId: string, displayNameTranslations: I_faLocaleStringTranslations): void
   }
 ): ReturnType<typeof bindDialogProjectSettingsWorldTemplateLayoutTreeNodeUseApi> {
   const nodeAnchorRef = deps.ref<HTMLElement | null>(null)
@@ -44,11 +51,11 @@ export function useDialogProjectSettingsWorldTemplateLayoutTreeNodeImpl (
   })
 
   const renameMenuWiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuNodeWiring({
-    emitRenameGroup: (groupId, displayName) => {
-      emit('renameGroup', groupId, displayName)
+    emitRenameGroup: (groupId, displayNameTranslations) => {
+      emit('renameGroup', groupId, displayNameTranslations)
     },
-    emitRenamePlacementNickname: (placementId, nickname) => {
-      emit('renamePlacementNickname', placementId, nickname)
+    emitRenamePlacementNickname: (placementId, nicknameTranslations) => {
+      emit('renamePlacementNickname', placementId, nicknameTranslations)
     },
     getNode: () => nodeRef.value,
     i18n: deps.i18n,

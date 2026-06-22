@@ -40,7 +40,8 @@ test('Test that hydrateDialogProjectSettingsDrafts mixes direct snapshots with b
   await hydrateDialogProjectSettingsDrafts({
     faProjectDocumentTemplatesFetchFreshForDialog: fetchTemplates,
     faProjectSettingsFetchFreshForDialog: fetchSettings,
-    faProjectWorldsFetchFreshForDialog: fetchWorlds
+    faProjectWorldsFetchFreshForDialog: fetchWorlds,
+    getCurrentLanguageCode: () => 'en-US'
   }, {
     localDocumentTemplates,
     localSettings,
@@ -72,7 +73,8 @@ test('Test that hydrateDialogProjectSettingsDrafts fetches document templates fr
       projectName: 'Realm',
       schemaVersion: 1 as const
     })),
-    faProjectWorldsFetchFreshForDialog: vi.fn(async () => [])
+    faProjectWorldsFetchFreshForDialog: vi.fn(async () => []),
+    getCurrentLanguageCode: () => 'en-US'
   }, {
     localDocumentTemplates,
     localSettings: ref<I_faProjectSettingsRoot | null>(null),
@@ -88,4 +90,66 @@ test('Test that hydrateDialogProjectSettingsDrafts fetches document templates fr
 
   expect(fetchTemplates).toHaveBeenCalledOnce()
   expect(localDocumentTemplates.value).toEqual([templateRow])
+})
+
+test('Test that hydrateDialogProjectSettingsDrafts localizes world template layout placement labels', async () => {
+  const localizedTemplate = buildDialogProjectSettingsDocumentTemplateDraft({
+    id: 'template-a',
+    titlePluralTranslations: {
+      de: 'Rassen',
+      'en-US': 'Races'
+    },
+    worldAppendixTranslations: {
+      de: 'yugghm',
+      'en-US': 'notes'
+    }
+  })
+  const fetchWorlds = vi.fn(async () => [
+    {
+      color: '',
+      colorPallete: '',
+      displayNameTranslations: { 'en-US': 'Realm' },
+      documentCount: 0,
+      id: '550e8400-e29b-41d4-a716-446655440000',
+      templateLayout: {
+        groups: [],
+        placements: [
+          {
+            documentCountInWorld: 0,
+            documentTemplateId: 'template-a',
+            groupId: null,
+            groupSortOrder: null,
+            icon: '',
+            id: '880e8400-e29b-41d4-a716-446655440001',
+            nicknamePluralTranslations: {},
+            nicknameSingularTranslations: {},
+            rootSortOrder: 0,
+            templateDisplayName: 'Races',
+            worldAppendix: 'notes'
+          }
+        ]
+      }
+    }
+  ])
+
+  const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>(null)
+  const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>(null)
+
+  await hydrateDialogProjectSettingsDrafts({
+    faProjectDocumentTemplatesFetchFreshForDialog: vi.fn(async () => [localizedTemplate]),
+    faProjectSettingsFetchFreshForDialog: vi.fn(async () => ({
+      projectName: 'Realm',
+      schemaVersion: 1 as const
+    })),
+    faProjectWorldsFetchFreshForDialog: fetchWorlds,
+    getCurrentLanguageCode: () => 'de'
+  }, {
+    localDocumentTemplates,
+    localSettings: ref<I_faProjectSettingsRoot | null>(null),
+    localWorlds,
+    props: {}
+  })
+
+  expect(localWorlds.value?.[0]?.templateLayout.placements[0]?.templateDisplayName).toBe('Rassen')
+  expect(localWorlds.value?.[0]?.templateLayout.placements[0]?.worldAppendix).toBe('yugghm')
 })

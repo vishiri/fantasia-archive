@@ -1,7 +1,6 @@
 import { computed, defineComponent, h, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { expect, test, vi } from 'vitest'
-import type { QInput } from 'quasar'
 
 import { clearDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuFocus } from '../dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuFocusWiring'
 import { shouldClearDialogProjectSettingsWorldTemplateLayoutRenameMenuActiveElementFocus } from '../functions/shouldClearDialogProjectSettingsWorldTemplateLayoutRenameMenuActiveElementFocus'
@@ -94,23 +93,22 @@ test('Test that rename menu input focus scheduler retries after animation frame'
  * Resets rename draft from node label when the rename menu is closed.
  */
 test('Test that rename menu label watcher updates draft when menu is closed', async () => {
-  const nodeLabel = ref('Old')
-  const renameDraft = ref('Old')
+  const nodeLabel = ref({ 'en-US': 'Old' })
+  const renameTranslationsDraft = ref({ 'en-US': 'Old' })
   const renameMenuOpen = computed({
     get: () => false,
     set: () => {}
   })
 
   wireDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWatchers({
-    getRenameDraftSeed: () => nodeLabel.value,
-    renameDraft,
-    renameInputRef: ref(null),
+    getRenameTranslationsDraftSeed: () => nodeLabel.value,
+    renameTranslationsDraft,
     renameMenuOpen
   })
 
-  nodeLabel.value = 'Updated label'
+  nodeLabel.value = { 'en-US': 'Updated label' }
   await nextTick()
-  expect(renameDraft.value).toBe('Updated label')
+  expect(renameTranslationsDraft.value).toEqual({ 'en-US': 'Updated label' })
 })
 
 /**
@@ -118,35 +116,25 @@ test('Test that rename menu label watcher updates draft when menu is closed', as
  * Focuses rename input when menu opens.
  */
 test('Test that rename menu open watcher focuses the rename input on next tick', async () => {
-  const renameDraft = ref('')
+  const renameTranslationsDraft = ref<Record<string, string>>({})
   const isOpen = ref(false)
+  const seed = ref<Record<string, string>>({ 'en-US': 'Initial' })
   const renameMenuOpen = computed({
     get: () => isOpen.value,
     set: (value: boolean) => {
       isOpen.value = value
     }
   })
-  const focus = vi.fn()
-  const renameInputRef = ref({
-    focus
-  } as unknown as QInput)
 
   wireDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWatchers({
-    getRenameDraftSeed: () => 'Label',
-    renameDraft,
-    renameInputRef,
+    getRenameTranslationsDraftSeed: () => seed.value,
+    renameTranslationsDraft,
     renameMenuOpen
   })
 
-  isOpen.value = true
+  seed.value = { 'en-US': 'Label' }
   await nextTick()
-  await nextTick()
-  await new Promise<void>((resolve) => {
-    requestAnimationFrame(() => {
-      void nextTick().then(resolve)
-    })
-  })
-  expect(focus).toHaveBeenCalled()
+  expect(renameTranslationsDraft.value).toEqual({ 'en-US': 'Label' })
 })
 
 /**
@@ -157,13 +145,15 @@ test('Test that rename menu wiring inject fallback keeps a local open target ref
   const { createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring } = await import('../dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring')
   const groupNode = {
     children: [],
+    displayNameTranslations: { 'en-US': 'Creatures' },
     documentCountInWorld: 0,
     documentTemplateId: null,
     icon: 'mdi-folder',
     id: '770e8400-e29b-41d4-a716-446655440001',
     label: 'Creatures',
     nodeKind: 'group' as const,
-    nickname: '',
+    nicknamePluralTranslations: {},
+    nicknameSingularTranslations: {},
     templateDisplayName: '',
     usesNickname: false,
     worldAppendix: ''

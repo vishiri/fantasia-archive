@@ -35,7 +35,8 @@ function stubDocumentTemplate () {
     ...stubNamedEntity(),
     icon: '',
     sortOrder: 0,
-    titleTranslations: { 'en-US': 'Stub' },
+    titlePluralTranslations: { 'en-US': 'Stub' },
+    titleSingularTranslations: {},
     worldAppendix: '',
     worldAppendixTranslations: {}
   }

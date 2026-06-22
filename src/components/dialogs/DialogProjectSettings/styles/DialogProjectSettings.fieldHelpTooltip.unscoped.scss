@@ -1,0 +1,26 @@
+@use './variables' as *;
+
+.dialogProjectSettings__fieldHelpTooltip.q-tooltip {
+  max-width: $dialogProjectSettings-fieldHelpTooltip-maxWidth;
+  text-align: left;
+}
+
+.dialogProjectSettings__fieldHelpTooltipBullet {
+  display: block;
+}
+
+.dialogProjectSettings__fieldHelpTooltipIntro + .dialogProjectSettings__fieldHelpTooltipRightClickIntro {
+  margin-top: $dialogProjectSettings-fieldHelpTooltip-intro-marginTop;
+}
+
+.dialogProjectSettings__fieldHelpTooltipIntro + .dialogProjectSettings__fieldHelpTooltipBullet {
+  margin-top: $dialogProjectSettings-fieldHelpTooltip-bullet-marginTop;
+}
+
+.dialogProjectSettings__fieldHelpTooltipRightClickIntro + .dialogProjectSettings__fieldHelpTooltipBullet {
+  margin-top: $dialogProjectSettings-fieldHelpTooltip-bullet-marginTop;
+}
+
+.dialogProjectSettings__fieldHelpTooltipBullet + .dialogProjectSettings__fieldHelpTooltipBullet {
+  margin-top: $dialogProjectSettings-fieldHelpTooltip-bullet-marginTop;
+}

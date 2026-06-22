@@ -35,7 +35,8 @@ test('Test that createDialogProjectSettingsValidationComputeds reflects validati
       documentCount: 0,
       icon: '',
       id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-      titleTranslations: { 'en-US': '   ' },
+      titlePluralTranslations: { 'en-US': '   ' },
+      titleSingularTranslations: {},
       worldAppendixTranslations: {}
     }
   ])

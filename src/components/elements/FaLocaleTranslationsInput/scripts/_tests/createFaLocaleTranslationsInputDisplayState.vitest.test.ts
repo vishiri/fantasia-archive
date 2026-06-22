@@ -7,8 +7,9 @@ import { createFaLocaleTranslationsInputDisplayState } from '../functions/create
 
 function buildDisplayStateDeps (): I_faLocaleTranslationsInputComposableDeps {
   return {
-    FA_LOCALE_TRANSLATIONS_INPUT_MENU_MAX_HEIGHT_PX: 600,
+    FA_LOCALE_TRANSLATIONS_INPUT_MENU_MAX_HEIGHT_PX: 450,
     FA_LOCALE_TRANSLATIONS_INPUT_MENU_MAX_WIDTH_PX: 500,
+    FA_LOCALE_TRANSLATIONS_INPUT_MENU_MIN_WIDTH_PX: 350,
     FA_LOCALE_TRANSLATIONS_INPUT_MENU_OFFSET_Y_PX: 4,
     FA_LOCALE_TRANSLATIONS_INPUT_MENU_VIEWPORT_MARGIN_PX: 16,
     buildFaLocaleTranslationsMenuContentStyle: () => ({}),
@@ -113,4 +114,24 @@ test('Test that createFaLocaleTranslationsInputDisplayState keeps values when ma
 
   api.updateLocaleValue('en-US', 42)
   expect(emitModelValue).toHaveBeenCalledWith({ 'en-US': '42' })
+})
+
+test('Test that createFaLocaleTranslationsInputDisplayState exposes fallback warning state', () => {
+  const deps = buildDisplayStateDeps()
+  deps.isFaLocaleStringTranslationUsingFallback = () => true
+  const api = createFaLocaleTranslationsInputDisplayState(deps, {
+    currentLanguageCode: ref('en-US'),
+    emitModelValue: vi.fn(),
+    inputMode: ref('singleLine'),
+    modelValue: ref({ de: 'Fallback' }),
+    readPreferredLanguageInputFocus: () => null,
+    readTriggerElement: () => null,
+    requestAnimationFrame: (callback) => {
+      callback()
+      return 1
+    }
+  })
+
+  expect(api.showFallbackWarning.value).toBe(true)
+  expect(api.resolvedValue.value).toBe('')
 })

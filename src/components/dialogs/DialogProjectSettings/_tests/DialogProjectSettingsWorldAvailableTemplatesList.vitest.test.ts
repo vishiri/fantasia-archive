@@ -5,6 +5,10 @@ import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
 
 import DialogProjectSettingsWorldAvailableTemplatesList from '../DialogProjectSettingsWorldAvailableTemplatesList.vue'
+import {
+  buildDialogProjectSettingsSingularPluralMissingTooltip,
+  mergeDialogProjectSettingsVitestGlobal
+} from 'app/helpers/dialogProjectSettingsVitestI18n'
 import { buildDialogProjectSettingsDocumentTemplateDraft } from './dialogProjectSettingsDocumentTemplateDraftFixtures'
 
 const templateFixture = buildDialogProjectSettingsDocumentTemplateDraft({
@@ -23,6 +27,10 @@ const listStubs = {
   QList: defineComponent({ template: '<div class="q-list-stub"><slot /></div>' })
 }
 
+const listMountGlobal = mergeDialogProjectSettingsVitestGlobal({
+  stubs: listStubs
+})
+
 /**
  * DialogProjectSettingsWorldAvailableTemplatesList
  * Renders clickable rows with hover-only highlight for each available template.
@@ -33,9 +41,7 @@ test('Test that DialogProjectSettingsWorldAvailableTemplatesList renders templat
       currentLanguageCode: 'en-US',
       templates: [templateFixture]
     },
-    global: {
-      stubs: listStubs
-    }
+    global: listMountGlobal
   })
 
   expect(w.find('[data-test-locator="dialogProjectSettings-worldAvailableTemplatesList"]').exists()).toBe(true)
@@ -56,9 +62,7 @@ test('Test that DialogProjectSettingsWorldAvailableTemplatesList emits addTempla
       currentLanguageCode: 'en-US',
       templates: [templateFixture]
     },
-    global: {
-      stubs: listStubs
-    }
+    global: listMountGlobal
   })
 
   await w
@@ -77,12 +81,7 @@ test('Test that DialogProjectSettingsWorldAvailableTemplatesList shows empty sta
       currentLanguageCode: 'en-US',
       templates: []
     },
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
-      stubs: listStubs
-    }
+    global: listMountGlobal
   })
 
   expect(w.find('[data-test-locator="dialogProjectSettings-worldAvailableTemplatesEmpty"]').exists()).toBe(true)
@@ -96,14 +95,62 @@ test('Test that DialogProjectSettingsWorldAvailableTemplatesList shows filter em
       showFilterEmpty: true,
       templates: []
     },
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
-      stubs: listStubs
-    }
+    global: listMountGlobal
   })
 
   expect(w.find('[data-test-locator="dialogProjectSettings-worldAvailableTemplatesFilterEmpty"]').exists()).toBe(true)
   expect(w.text()).toContain('dialogs.projectSettings.fields.worldTemplateLayout.emptyFilteredAvailableTemplates')
+})
+
+test('Test that DialogProjectSettingsWorldAvailableTemplatesList shows missing translations warning for active locale', () => {
+  const w = mount(DialogProjectSettingsWorldAvailableTemplatesList, {
+    props: {
+      currentLanguageCode: 'de',
+      templates: [
+        buildDialogProjectSettingsDocumentTemplateDraft({
+          titlePluralTranslations: { 'en-US': 'Character' },
+          titleSingularTranslations: {}
+        })
+      ]
+    },
+    global: mergeDialogProjectSettingsVitestGlobal({
+      stubs: {
+        ...listStubs,
+        QTooltip: { template: '<span><slot /></span>' }
+      }
+    })
+  })
+
+  const warningIcon = w.find('[data-test-locator="dialogProjectSettings-worldAvailableTemplates-missingTranslationsWarning"]')
+  expect(warningIcon.exists()).toBe(true)
+  expect(warningIcon.attributes('data-test-tooltip-text')).toBe(
+    buildDialogProjectSettingsSingularPluralMissingTooltip({
+      fallbackLanguageCode: 'en-US',
+      missingForm: 'both'
+    })
+  )
+})
+
+test('Test that DialogProjectSettingsWorldAvailableTemplatesList hides missing translations warning when active locale is present', () => {
+  const w = mount(DialogProjectSettingsWorldAvailableTemplatesList, {
+    props: {
+      currentLanguageCode: 'de',
+      templates: [
+        buildDialogProjectSettingsDocumentTemplateDraft({
+          titlePluralTranslations: {
+            de: 'Charakter',
+            'en-US': 'Character'
+          },
+          titleSingularTranslations: {
+            de: 'Charakter'
+          }
+        })
+      ]
+    },
+    global: listMountGlobal
+  })
+
+  expect(w.find('[data-test-locator="dialogProjectSettings-worldAvailableTemplates-missingTranslationsWarning"]').exists()).toBe(
+    false
+  )
 })

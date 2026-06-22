@@ -1,7 +1,11 @@
 import { expect, test } from 'vitest'
 
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
-import { syncDialogProjectSettingsWorldDraftTemplateLayoutPlacementDisplayNames } from '../dialogProjectSettingsDocumentTemplateWorldLayoutSync'
+import {
+  syncDialogProjectSettingsWorldDraftTemplateLayoutPlacementDisplayNames,
+  syncDialogProjectSettingsWorldTemplateLayoutPlacementLocalizedLabels,
+  syncDialogProjectSettingsWorldsTemplateLayoutPlacementLocalizedLabels
+} from '../dialogProjectSettingsDocumentTemplateWorldLayoutSync'
 import { createEmptyDialogProjectSettingsWorldTemplateLayoutDraft } from '../dialogProjectSettingsWorldTemplateLayoutDraft'
 
 const templateId = '660e8400-e29b-41d4-a716-446655440001'
@@ -25,7 +29,8 @@ const worldA: I_dialogProjectSettingsWorldDraft = {
         groupSortOrder: null,
         icon: '',
         id: placementAId,
-        nickname: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {},
         rootSortOrder: 0,
         templateDisplayName: 'Character',
         worldAppendix: ''
@@ -48,7 +53,8 @@ const worldB: I_dialogProjectSettingsWorldDraft = {
         groupSortOrder: null,
         icon: '',
         id: placementBId,
-        nickname: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {},
         rootSortOrder: 0,
         templateDisplayName: 'Character',
         worldAppendix: ''
@@ -60,7 +66,8 @@ const worldB: I_dialogProjectSettingsWorldDraft = {
         groupSortOrder: null,
         icon: '',
         id: '880e8400-e29b-41d4-a716-446655440003',
-        nickname: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {},
         rootSortOrder: 1,
         templateDisplayName: 'Location',
         worldAppendix: ''
@@ -101,4 +108,73 @@ test('Test that syncDialogProjectSettingsWorldDraftTemplateLayoutPlacementDispla
   )
 
   expect(nextWorlds[0].templateLayout.placements).toHaveLength(0)
+})
+
+test('Test that syncDialogProjectSettingsWorldTemplateLayoutPlacementLocalizedLabels resolves active locale labels', () => {
+  const nextLayout = syncDialogProjectSettingsWorldTemplateLayoutPlacementLocalizedLabels(
+    worldA.templateLayout,
+    [{
+      documentCount: 0,
+      icon: '',
+      id: templateId,
+      titlePluralTranslations: {
+        de: 'Held',
+        'en-US': 'Character'
+      },
+      titleSingularTranslations: {},
+      worldAppendixTranslations: {
+        de: 'Anhang',
+        'en-US': 'Appendix'
+      }
+    }],
+    'de'
+  )
+
+  expect(nextLayout.placements[0].templateDisplayName).toBe('Held')
+  expect(nextLayout.placements[0].worldAppendix).toBe('Anhang')
+})
+
+test('Test that syncDialogProjectSettingsWorldsTemplateLayoutPlacementLocalizedLabels updates every world layout', () => {
+  const nextWorlds = syncDialogProjectSettingsWorldsTemplateLayoutPlacementLocalizedLabels(
+    [worldA, worldB],
+    [{
+      documentCount: 0,
+      icon: '',
+      id: templateId,
+      titlePluralTranslations: {
+        de: 'Held',
+        'en-US': 'Character'
+      },
+      titleSingularTranslations: {},
+      worldAppendixTranslations: {
+        de: 'Anhang',
+        'en-US': 'Appendix'
+      }
+    }, {
+      documentCount: 0,
+      icon: '',
+      id: otherTemplateId,
+      titlePluralTranslations: {
+        de: 'Ort',
+        'en-US': 'Location'
+      },
+      titleSingularTranslations: {},
+      worldAppendixTranslations: {}
+    }],
+    'de'
+  )
+
+  expect(nextWorlds[0].templateLayout.placements[0].templateDisplayName).toBe('Held')
+  expect(nextWorlds[1].templateLayout.placements[0].worldAppendix).toBe('Anhang')
+  expect(nextWorlds[1].templateLayout.placements[1].templateDisplayName).toBe('Ort')
+})
+
+test('Test that syncDialogProjectSettingsWorldTemplateLayoutPlacementLocalizedLabels keeps unknown template placements unchanged', () => {
+  const nextLayout = syncDialogProjectSettingsWorldTemplateLayoutPlacementLocalizedLabels(
+    worldA.templateLayout,
+    [],
+    'de'
+  )
+
+  expect(nextLayout.placements[0]).toEqual(worldA.templateLayout.placements[0])
 })

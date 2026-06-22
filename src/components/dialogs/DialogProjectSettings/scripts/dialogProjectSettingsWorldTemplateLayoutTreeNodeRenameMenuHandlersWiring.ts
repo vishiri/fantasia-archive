@@ -1,34 +1,38 @@
-import { nextTick } from 'vue'
 import type { Ref } from 'vue'
-import type { QInput } from 'quasar'
 
 import { clearDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuFocus } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuFocusWiring'
 import {
-  emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate,
-  resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftSeed
-} from './functions/dialogProjectSettingsWorldTemplateLayoutRenameMenuNodeHelpers'
-import { scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus } from './dialogProjectSettingsWorldTemplateLayoutRenameMenuFocusWiring'
+  emitDialogProjectSettingsWorldTemplateLayoutRenameMenuTranslationsUpdate,
+  resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTranslationsDraftSeed
+} from './dialogProjectSettingsWorldTemplateLayoutRenameMenuTranslationsWiring'
+import type { T_dialogProjectSettingsWorldTemplateLayoutRenameTranslationsDraft } from 'app/types/T_dialogProjectSettingsWorldTemplateLayoutRenameTranslationsDraft'
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
+import type { I_faLocaleStringTranslations } from 'app/types/I_faLocaleStringTranslations'
 import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
 
 type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuHandlersWiring = {
   clearRenameMenuFocus: () => void
   closeRenameMenu: () => void
-  onRenameDraftUpdate: (value: string | number | null) => void
   onRenameMenuBeforeShow: () => void
   onRenameMenuHide: () => void
   onRenameMenuShow: () => void
+  onRenameTranslationsDraftUpdate: (
+    value: I_faLocaleStringTranslations | I_faLocaleSingularPluralTranslations
+  ) => void
   openRenameMenu: () => void
 }
 
 export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuHandlersWiring (deps: {
-  emitRenameGroup: (groupId: string, displayName: string) => void
-  emitRenamePlacementNickname: (placementId: string, nickname: string) => void
+  emitRenameGroup: (groupId: string, displayNameTranslations: I_faLocaleStringTranslations) => void
+  emitRenamePlacementNickname: (
+    placementId: string,
+    nicknameTranslations: I_faLocaleSingularPluralTranslations
+  ) => void
   getNode: () => I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
   getRenameMenuTargetKey: () => string | null
   nodeAnchorRef: Ref<HTMLElement | null>
   openRenameMenuTarget: Ref<string | null>
-  renameDraft: Ref<string>
-  renameInputRef: Ref<QInput | null>
+  renameTranslationsDraft: Ref<T_dialogProjectSettingsWorldTemplateLayoutRenameTranslationsDraft>
   setRenameMenuOpen: (open: boolean) => void
   syncRenameMenuMaxWidth: () => void
 }): T_dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuHandlersWiring {
@@ -38,29 +42,17 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
     if (renameMenuTargetKey !== null) {
       deps.openRenameMenuTarget.value = renameMenuTargetKey
     }
-    deps.renameDraft.value = resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftSeed(deps.getNode())
+    deps.renameTranslationsDraft.value =
+      resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuTranslationsDraftSeed(deps.getNode())
   }
 
   function closeRenameMenu (): void {
     deps.setRenameMenuOpen(false)
   }
 
-  function focusRenameMenuInput (): void {
-    deps.renameInputRef.value?.focus()
-  }
-
-  function scheduleRenameMenuInputFocus (): void {
-    scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus({
-      focusRenameInput: focusRenameMenuInput,
-      nextTick,
-      requestAnimationFrame: (callback) => window.requestAnimationFrame(callback)
-    })
-  }
-
   function openRenameMenu (): void {
     onRenameMenuBeforeShow()
     deps.setRenameMenuOpen(true)
-    scheduleRenameMenuInputFocus()
   }
 
   function clearRenameMenuFocus (): void {
@@ -75,27 +67,28 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
   }
 
   function onRenameMenuShow (): void {
-    scheduleRenameMenuInputFocus()
+    // Tree node SFC calls focusPreferredLanguageInput on FaLocaleTranslationsInput after show.
   }
 
-  function onRenameDraftUpdate (value: string | number | null): void {
-    const next = String(value ?? '')
-    deps.renameDraft.value = next
-    emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate({
-      displayName: next,
+  function onRenameTranslationsDraftUpdate (
+    value: I_faLocaleStringTranslations | I_faLocaleSingularPluralTranslations
+  ): void {
+    deps.renameTranslationsDraft.value = value
+    emitDialogProjectSettingsWorldTemplateLayoutRenameMenuTranslationsUpdate({
       emitRenameGroup: deps.emitRenameGroup,
       emitRenamePlacementNickname: deps.emitRenamePlacementNickname,
-      node: deps.getNode()
+      node: deps.getNode(),
+      translationsDraft: value
     })
   }
 
   return {
     clearRenameMenuFocus,
     closeRenameMenu,
-    onRenameDraftUpdate,
     onRenameMenuBeforeShow,
     onRenameMenuHide,
     onRenameMenuShow,
+    onRenameTranslationsDraftUpdate,
     openRenameMenu
   }
 }

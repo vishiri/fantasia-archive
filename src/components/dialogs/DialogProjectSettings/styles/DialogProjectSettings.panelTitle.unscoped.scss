@@ -27,28 +27,6 @@
   margin-top: $dialogProjectSettings-fieldHelpIcon-marginTop;
 }
 
-.dialogProjectSettings__fieldHelpTooltip.q-tooltip {
-  max-width: $dialogProjectSettings-fieldHelpTooltip-maxWidth;
-  text-align: left;
-  white-space: pre-line;
-}
-
-.dialogProjectSettings__fieldHelpTooltipBullet {
-  display: block;
-}
-
-.dialogProjectSettings__fieldHelpTooltipIntro + .dialogProjectSettings__fieldHelpTooltipRightClickIntro {
-  margin-top: $dialogProjectSettings-fieldHelpTooltip-intro-marginTop;
-}
-
-.dialogProjectSettings__fieldHelpTooltipRightClickIntro + .dialogProjectSettings__fieldHelpTooltipBullet {
-  margin-top: $dialogProjectSettings-fieldHelpTooltip-bullet-marginTop;
-}
-
-.dialogProjectSettings__fieldHelpTooltipBullet + .dialogProjectSettings__fieldHelpTooltipBullet {
-  margin-top: $dialogProjectSettings-fieldHelpTooltip-bullet-marginTop;
-}
-
 .dialogProjectSettings__fieldLabel {
   font-weight: $dialogProjectSettings-fieldLabel-fontWeight;
   letter-spacing: $dialogProjectSettings-fieldLabel-letterSpacing;

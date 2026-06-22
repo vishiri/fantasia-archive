@@ -8,7 +8,7 @@ import { createDialogProjectSettingsWorldTemplateLayoutTreeWiring } from '../dia
 import * as emitGuard from '../dialogProjectSettingsWorldTemplateLayoutTreeEmitGuard'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeSyncWiring } from '../dialogProjectSettingsWorldTemplateLayoutTreeSyncWiring'
 import { createEmptyDialogProjectSettingsWorldTemplateLayoutDraft } from '../dialogProjectSettingsWorldTemplateLayoutDraft'
-import { buildHeTreeNodesFromWorldTemplateLayoutDraft } from '../functions/dialogProjectSettingsWorldTemplateLayoutTreeData'
+import { buildHeTreeNodesFromWorldTemplateLayoutDraft } from '../dialogProjectSettingsWorldTemplateLayoutTreeBuildWiring'
 
 /**
  * dialogProjectSettingsWorldTemplateLayoutTreeDragCancelWiring
@@ -179,7 +179,8 @@ test('Test that tree sync wiring rebuilds treeData from props layout', async () 
     {
       templateDisplayName: 'Character',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -194,6 +195,7 @@ test('Test that tree sync wiring rebuilds treeData from props layout', async () 
   const suppressTreeEmit = ref(false)
   const wiring = createDialogProjectSettingsWorldTemplateLayoutTreeSyncWiring({
     emitTemplateLayout: () => {},
+    getCurrentLanguageCode: () => 'en-US',
     getTemplateLayout: () => layout,
     nextTick,
     suppressTreeEmit,
@@ -215,7 +217,8 @@ test('Test that tree sync wiring patches labels without rebuilding tree nodes', 
     {
       templateDisplayName: 'Character',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -226,11 +229,12 @@ test('Test that tree sync wiring patches labels without rebuilding tree nodes', 
       worldAppendix: ''
     }
   ]
-  const treeData = ref(buildHeTreeNodesFromWorldTemplateLayoutDraft(layout))
+  const treeData = ref(buildHeTreeNodesFromWorldTemplateLayoutDraft(layout, 'en-US'))
   const initialNodeRef = treeData.value[0]
   layout.placements[0]!.templateDisplayName = 'Hero'
   const wiring = createDialogProjectSettingsWorldTemplateLayoutTreeSyncWiring({
     emitTemplateLayout: () => {},
+    getCurrentLanguageCode: () => 'en-US',
     getTemplateLayout: () => layout,
     nextTick,
     suppressTreeEmit: ref(false),
@@ -251,7 +255,8 @@ test('Test that tree sync wiring rebuilds when structure keys diverge', () => {
     {
       templateDisplayName: 'Character',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -270,8 +275,10 @@ test('Test that tree sync wiring rebuilds when structure keys diverge', () => {
       icon: 'mdi-map',
       id: 'placement-b',
       label: 'Location',
+      displayNameTranslations: {},
       nodeKind: 'template',
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       templateDisplayName: '',
       usesNickname: false,
       worldAppendix: ''
@@ -279,6 +286,7 @@ test('Test that tree sync wiring rebuilds when structure keys diverge', () => {
   ] as ReturnType<typeof buildHeTreeNodesFromWorldTemplateLayoutDraft>)
   const wiring = createDialogProjectSettingsWorldTemplateLayoutTreeSyncWiring({
     emitTemplateLayout: () => {},
+    getCurrentLanguageCode: () => 'en-US',
     getTemplateLayout: () => layout,
     nextTick,
     suppressTreeEmit: ref(false),
@@ -297,7 +305,7 @@ test('Test that tree sync wiring resyncs when regression guard blocks layout emi
   const priorLayout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   priorLayout.groups = [
     {
-      displayName: 'Creatures',
+      displayNameTranslations: { 'en-US': 'Creatures' },
       id: '770e8400-e29b-41d4-a716-446655440001',
       rootSortOrder: 0
     }
@@ -306,7 +314,8 @@ test('Test that tree sync wiring resyncs when regression guard blocks layout emi
     {
       templateDisplayName: 'Character',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: '770e8400-e29b-41d4-a716-446655440001',
@@ -317,7 +326,7 @@ test('Test that tree sync wiring resyncs when regression guard blocks layout emi
       worldAppendix: ''
     }
   ]
-  const groupedNodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(priorLayout)
+  const groupedNodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(priorLayout, 'en-US')
   const staleRootNode = {
     children: [],
     documentCountInWorld: 0,
@@ -325,8 +334,10 @@ test('Test that tree sync wiring resyncs when regression guard blocks layout emi
     icon: 'mdi-account',
     id: '880e8400-e29b-41d4-a716-446655440001',
     label: 'Character',
+    displayNameTranslations: {},
     nodeKind: 'template',
-    nickname: '',
+    nicknamePluralTranslations: {},
+    nicknameSingularTranslations: {},
     templateDisplayName: '',
     usesNickname: false,
     worldAppendix: ''
@@ -340,6 +351,7 @@ test('Test that tree sync wiring resyncs when regression guard blocks layout emi
     emitTemplateLayout: () => {
       emitCount += 1
     },
+    getCurrentLanguageCode: () => 'en-US',
     getTemplateLayout: () => priorLayout,
     nextTick,
     suppressTreeEmit: ref(false),
@@ -359,7 +371,8 @@ test('Test that tree sync wiring resyncs when emit guard blocks layout emit', as
     {
       templateDisplayName: 'Character',
 
-      nickname: '',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
       documentCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
@@ -379,6 +392,7 @@ test('Test that tree sync wiring resyncs when emit guard blocks layout emit', as
     emitTemplateLayout: () => {
       emitCount += 1
     },
+    getCurrentLanguageCode: () => 'en-US',
     getTemplateLayout: () => priorLayout,
     nextTick,
     suppressTreeEmit,

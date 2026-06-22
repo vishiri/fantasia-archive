@@ -1,4 +1,5 @@
 import type { Ref } from 'vue'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 
 import type {
   I_dialogProjectSettingsWorldTemplateLayoutDraft,
@@ -11,8 +12,10 @@ import {
 import { normalizeDialogProjectSettingsWorldTemplateLayoutRootOrder } from './dialogProjectSettingsWorldTemplateLayoutRootOrder'
 import {
   buildHeTreeNodesFromWorldTemplateLayoutDraft,
-  mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey,
   patchWorldTemplateLayoutDisplayLabelsInHeTreeNodes
+} from './dialogProjectSettingsWorldTemplateLayoutTreeBuildWiring'
+import {
+  mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey
 } from './functions/dialogProjectSettingsWorldTemplateLayoutTreeData'
 import {
   mapHeTreeNodesToWorldTemplateLayoutDraft
@@ -35,6 +38,7 @@ function areTemplateLayoutDraftSnapshotsEqual (
 
 export function createDialogProjectSettingsWorldTemplateLayoutTreeSyncWiring (deps: {
   emitTemplateLayout: (layout: I_dialogProjectSettingsWorldTemplateLayoutDraft) => void
+  getCurrentLanguageCode: () => T_faUserSettingsLanguageCode
   getTemplateLayout: () => I_dialogProjectSettingsWorldTemplateLayoutDraft
   nextTick: () => Promise<void>
   suppressTreeEmit: Ref<boolean>
@@ -42,6 +46,7 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeSyncWiring (de
 }) {
   function resyncTreeDataFromProps (): void {
     const layout = deps.getTemplateLayout()
+    const languageCode = deps.getCurrentLanguageCode()
     if (deps.treeData.value.length > 0) {
       const mappedFromTree = mapHeTreeNodesToWorldTemplateLayoutDraft(
         deps.treeData.value,
@@ -50,12 +55,16 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeSyncWiring (de
       const layoutStructureKey = mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey(layout)
       const treeStructureKey = mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey(mappedFromTree)
       if (layoutStructureKey === treeStructureKey) {
-        patchWorldTemplateLayoutDisplayLabelsInHeTreeNodes(deps.treeData.value, layout)
+        patchWorldTemplateLayoutDisplayLabelsInHeTreeNodes(
+          deps.treeData.value,
+          layout,
+          languageCode
+        )
         return
       }
     }
     deps.suppressTreeEmit.value = true
-    deps.treeData.value = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout)
+    deps.treeData.value = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout, languageCode)
     void deps.nextTick().then(() => {
       return deps.nextTick()
     }).then(() => {

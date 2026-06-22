@@ -43,3 +43,20 @@ test('Test that mergeFilteredDragOrderIntoFullList leaves non-filtered items in 
     itemB
   ])
 })
+
+test('Test that mergeFilteredDragOrderIntoFullList keeps original item when reorder queue is exhausted', () => {
+  const duplicateAFirst = {
+    displayName: 'Alpha first',
+    id: 'a'
+  }
+  const duplicateASecond = {
+    displayName: 'Alpha second',
+    id: 'a'
+  }
+  const fullList = [duplicateAFirst, itemB, duplicateASecond]
+  expect(mergeFilteredDragOrderIntoFullList(fullList, [duplicateASecond])).toEqual([
+    duplicateASecond,
+    itemB,
+    duplicateASecond
+  ])
+})

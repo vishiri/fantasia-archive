@@ -15,12 +15,14 @@ const templateA = buildDialogProjectSettingsDocumentTemplateDraft({
 
 const templateB = buildDialogProjectSettingsDocumentTemplateDraft({
   id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
-  titleTranslations: { 'en-US': 'Location' }
+  titlePluralTranslations: { 'en-US': 'Location' },
+  titleSingularTranslations: {},
 })
 
 const templateC = buildDialogProjectSettingsDocumentTemplateDraft({
   id: '6ba7b811-9dad-11d1-80b4-00c04fd430c8',
-  titleTranslations: { 'en-US': 'Event' }
+  titlePluralTranslations: { 'en-US': 'Event' },
+  titleSingularTranslations: {},
 })
 
 /**
@@ -86,7 +88,8 @@ test('Test that resolveDialogProjectSettingsDocumentTemplateIdAfterRemove select
 test('Test that findDialogProjectSettingsNewlyAppendedDocumentTemplateId returns the appended template id', () => {
   const newTemplate = buildDialogProjectSettingsDocumentTemplateDraft({
     id: '7ba7b811-9dad-11d1-80b4-00c04fd430c8',
-    titleTranslations: { 'en-US': 'New template' }
+    titlePluralTranslations: { 'en-US': 'New template' },
+    titleSingularTranslations: {},
   })
   const previous = [templateA, templateB]
   const next = [templateA, templateB, newTemplate]
@@ -142,7 +145,8 @@ test('Test that resolveDialogProjectSettingsDocumentTemplateIdAfterRemove handle
 test('Test that resolveDialogProjectSettingsDocumentTemplatesPanelSelection selects an appended template', () => {
   const newTemplate = buildDialogProjectSettingsDocumentTemplateDraft({
     id: '7ba7b811-9dad-11d1-80b4-00c04fd430c8',
-    titleTranslations: { 'en-US': 'New template' }
+    titlePluralTranslations: { 'en-US': 'New template' },
+    titleSingularTranslations: {},
   })
 
   expect(resolveDialogProjectSettingsDocumentTemplatesPanelSelection(
@@ -171,7 +175,8 @@ test('Test that resolveDialogProjectSettingsDocumentTemplatesPanelSelection keep
 test('Test that resolveDialogProjectSettingsDocumentTemplatesPanelSelection reselects after replacement', () => {
   const replacement = buildDialogProjectSettingsDocumentTemplateDraft({
     id: '7ba7b811-9dad-11d1-80b4-00c04fd430c8',
-    titleTranslations: { 'en-US': 'Replacement' }
+    titlePluralTranslations: { 'en-US': 'Replacement' },
+    titleSingularTranslations: {},
   })
 
   expect(resolveDialogProjectSettingsDocumentTemplatesPanelSelection(
@@ -184,7 +189,8 @@ test('Test that resolveDialogProjectSettingsDocumentTemplatesPanelSelection rese
 test('Test that findDialogProjectSettingsNewlyAppendedDocumentTemplateId returns null when append is not at the end', () => {
   const insertedMiddle = buildDialogProjectSettingsDocumentTemplateDraft({
     id: '7ba7b811-9dad-11d1-80b4-00c04fd430c8',
-    titleTranslations: { 'en-US': 'Inserted' }
+    titlePluralTranslations: { 'en-US': 'Inserted' },
+    titleSingularTranslations: {},
   })
 
   expect(findDialogProjectSettingsNewlyAppendedDocumentTemplateId(

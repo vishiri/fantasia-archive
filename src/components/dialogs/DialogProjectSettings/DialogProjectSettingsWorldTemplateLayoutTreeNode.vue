@@ -23,6 +23,13 @@
         :node="props.node"
         :node-test-locator="nodeTestLocator"
       />
+      <DialogProjectSettingsWorldTemplateLayoutTreeNodeMissingTranslationsWarning
+        v-if="(props.node.nodeKind === 'template' || props.node.nodeKind === 'group') && showMissingTranslationsWarning"
+        :test-locator="missingTranslationsWarningTestLocator"
+        :tooltip-text="missingTranslationsWarningTooltipText"
+        @mouseenter="suppressPlacementNicknameHoverTooltip"
+        @mouseleave="revealPlacementNicknameHoverTooltip"
+      />
       <div
         v-if="props.node.nodeKind === 'template' || props.node.nodeKind === 'group'"
         class="dialogProjectSettingsWorldTemplateLayoutTreeNode__actions row items-center no-wrap"
@@ -102,82 +109,46 @@
         ({{ props.node.worldAppendix.trim() }})
       </span>
     </div>
-    <q-menu
+    <DialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
       v-if="renameMenuWiring.supportsRenameMenu"
-      v-model="renameMenuOpen"
-      anchor="bottom left"
-      class="dialogProjectSettingsWorldTemplateLayoutTreeNode__contextMenu"
-      dark
-      :data-test-locator="renameMenuWiring.contextMenuTestLocator"
-      :offset="renameMenuWiring.menuOffset"
-      :content-style="renameMenuStyle"
-      :style="renameMenuStyle"
-      no-parent-event
-      no-refocus
-      self="top left"
-      square
-      :target="nodeAnchorRef ?? undefined"
-      transition-hide="fade"
-      transition-show="fade"
-      @before-show="renameMenuWiring.onRenameMenuBeforeShow"
-      @show="renameMenuWiring.onRenameMenuShow"
-      @hide="renameMenuWiring.onRenameMenuHide"
-      @keydown.esc.stop="renameMenuWiring.closeRenameMenu"
-    >
-      <div
-        class="dialogProjectSettingsWorldTemplateLayoutTreeNode__renameMenuBody"
-        :style="renameMenuStyle"
-        @keydown.enter.stop.prevent="renameMenuWiring.closeRenameMenu"
-        @keydown.esc.stop="renameMenuWiring.closeRenameMenu"
-      >
-        <q-input
-          ref="renameInputRef"
-          v-model="renameDraft"
-          autofocus
-          class="full-width"
-          color="primary-bright"
-          dark
-          dense
-          filled
-          :error="renameHasError"
-          :error-message="renameMenuErrorMessage"
-          :data-test-locator="renameMenuWiring.renameInputTestLocator"
-          hide-bottom-space
-          :label="renameInputLabel"
-          stack-label
-          @keydown.enter.stop.prevent="renameMenuWiring.closeRenameMenu"
-          @keydown.esc.stop="renameMenuWiring.closeRenameMenu"
-          @update:model-value="renameMenuWiring.onRenameDraftUpdate"
-        >
-          <template
-            v-if="showTemplateCanonicalName"
-            #append
-          >
-            <DialogProjectSettingsWorldTemplateLayoutTreeNodeInputHelpIcon
-              test-locator="dialogProjectSettings-worldTemplateLayoutTemplateNicknameTooltipIcon"
-              :tooltip-text="templateNicknameTooltipText"
-            />
-          </template>
-        </q-input>
-        <DialogProjectSettingsWorldTemplateLayoutTreeNodeCanonicalNameField
-          v-if="showTemplateCanonicalName"
-          :canonical-name-test-locator="canonicalNameTestLocator"
-          canonical-name-tooltip-icon-test-locator="dialogProjectSettings-worldTemplateLayoutTemplateCanonicalNameTooltipIcon"
-          :template-canonical-name="templateCanonicalName"
-          :template-canonical-name-label="templateCanonicalNameLabel"
-          :template-canonical-name-tooltip-text="templateCanonicalNameTooltipText"
-        />
-      </div>
-    </q-menu>
+      v-model:rename-menu-open="renameMenuOpen"
+      v-model:translations-draft="renameTranslationsDraft"
+      :context-menu-test-locator="renameMenuContextMenuTestLocator"
+      :current-language-code="props.currentLanguageCode"
+      :error-message="renameMenuErrorMessageText"
+      :has-error="renameHasError"
+      :input-test-locator="renameInputTestLocatorValue"
+      :max-length="renameTranslationMaxLength"
+      :menu-offset="renameMenuWiring.menuOffset"
+      :menu-pinned-aside-label="menuPinnedAsideLabelValue"
+      :menu-pinned-aside-test-locator="showTemplatePinnedAside ? 'dialogProjectSettings-worldTemplateLayoutTemplateCanonicalName' : undefined"
+      :menu-pinned-aside-tooltip="menuPinnedAsideTooltipValue"
+      :menu-pinned-aside-value="menuPinnedAsideValue"
+      :menu-style="renameMenuStyleValue"
+      :menu-target="nodeAnchorRef"
+      :on-before-show="renameMenuWiring.onRenameMenuBeforeShow"
+      :on-close="renameMenuWiring.closeRenameMenu"
+      :on-hide="renameMenuWiring.onRenameMenuHide"
+      :on-show="renameMenuWiring.onRenameMenuShow"
+      :on-translations-draft-update="onRenameTranslationsDraftUpdate"
+      :translation-forms="props.node.nodeKind === 'template' ? 'singularPlural' : 'single'"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import DialogProjectSettingsWorldTemplateLayoutTreeNodeCanonicalNameField from './DialogProjectSettingsWorldTemplateLayoutTreeNodeCanonicalNameField.vue'
-import DialogProjectSettingsWorldTemplateLayoutTreeNodeInputHelpIcon from './DialogProjectSettingsWorldTemplateLayoutTreeNodeInputHelpIcon.vue'
 import DialogProjectSettingsWorldTemplateLayoutTreeNodeLabelArea from './DialogProjectSettingsWorldTemplateLayoutTreeNodeLabelArea.vue'
+import DialogProjectSettingsWorldTemplateLayoutTreeNodeMissingTranslationsWarning from './DialogProjectSettingsWorldTemplateLayoutTreeNodeMissingTranslationsWarning.vue'
+import DialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu from './DialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu.vue'
 import { useDialogProjectSettingsWorldTemplateLayoutTreeNode } from './scripts/dialogProjectSettingsWorldTemplateLayoutTreeNode_manager'
+import { FA_PROJECT_WORLD_TEMPLATE_GROUP_DISPLAY_NAME_TRANSLATION_MAX_LENGTH } from 'app/types/I_faProjectWorldTemplateGroupDisplayNameTranslations'
+import { FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_NICKNAME_TRANSLATION_MAX_LENGTH } from 'app/types/I_faProjectWorldTemplatePlacementNicknameTranslations'
+import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
+import type { I_faLocaleStringTranslations } from 'app/types/I_faLocaleStringTranslations'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
+import { computed, type CSSProperties } from 'vue'
 
 defineOptions({
   name: 'DialogProjectSettingsWorldTemplateLayoutTreeNode'
@@ -185,6 +156,8 @@ defineOptions({
 
 const props = defineProps<{
   blankGroupIds?: ReadonlySet<string>
+  currentLanguageCode: T_faUserSettingsLanguageCode
+  documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[]
   duplicateDocumentTemplateIds?: ReadonlySet<string>
   invalidDocumentTemplateIds?: ReadonlySet<string>
   node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
@@ -193,8 +166,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   deleteGroup: [groupId: string]
   removePlacement: [placementId: string]
-  renamePlacementNickname: [placementId: string, nickname: string]
-  renameGroup: [groupId: string, displayName: string]
+  renamePlacementNickname: [placementId: string, nicknameTranslations: I_faLocaleSingularPluralTranslations]
+  renameGroup: [groupId: string, displayNameTranslations: I_faLocaleStringTranslations]
 }>()
 
 const {
@@ -205,12 +178,15 @@ const {
   editTooltipRef,
   editTooltipText,
   hidePlacementNicknameHoverTooltip,
+  missingTranslationsWarningTestLocator,
+  missingTranslationsWarningTooltipText,
   nodeAnchorRef,
   nodeRootClassList,
   nodeTestLocator,
   onEditClick,
   onRemoveClick,
   onRenameContextMenu,
+  onRenameTranslationsDraftUpdate,
   placementNicknameHoverTooltipEnabled,
   placementNicknameHoverTooltipNicknameLine,
   placementNicknameHoverTooltipOffset,
@@ -220,25 +196,34 @@ const {
   removeTooltipHoverEnabled,
   removeTooltipRef,
   removeTooltipText,
-  renameDraft,
   renameHasError,
-  renameInputLabel,
-  renameInputRef,
   renameMenuErrorMessage,
   renameMenuOpen,
   renameMenuStyle,
   renameMenuWiring,
+  renameTranslationsDraft,
+  renameInputTestLocatorValue,
+  menuPinnedAsideLabelValue,
+  menuPinnedAsideTooltipValue,
+  menuPinnedAsideValue,
   rowHasValidationError,
+  showMissingTranslationsWarning,
   revealPlacementNicknameHoverTooltip,
   showPlacementNicknameHoverTooltip,
-  suppressPlacementNicknameHoverTooltip,
-  showTemplateCanonicalName,
-  templateCanonicalName,
-  templateCanonicalNameLabel,
-  templateCanonicalNameTooltipText,
-  templateNicknameTooltipText,
-  canonicalNameTestLocator
+  showTemplatePinnedAside,
+  suppressPlacementNicknameHoverTooltip
 } = useDialogProjectSettingsWorldTemplateLayoutTreeNode(props, emit)
+
+const renameMenuErrorMessageText = computed((): string | undefined => renameMenuErrorMessage.value)
+const renameMenuStyleValue = computed((): CSSProperties | undefined => renameMenuStyle.value)
+const renameMenuContextMenuTestLocator = computed((): string => renameMenuWiring.contextMenuTestLocator.value ?? '')
+
+const renameTranslationMaxLength = computed(() => {
+  if (props.node.nodeKind === 'group') {
+    return FA_PROJECT_WORLD_TEMPLATE_GROUP_DISPLAY_NAME_TRANSLATION_MAX_LENGTH
+  }
+  return FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_NICKNAME_TRANSLATION_MAX_LENGTH
+})
 </script>
 
 <style lang="scss" src="./styles/DialogProjectSettings.worldTemplateLayoutTreeNode.unscoped.scss"></style>

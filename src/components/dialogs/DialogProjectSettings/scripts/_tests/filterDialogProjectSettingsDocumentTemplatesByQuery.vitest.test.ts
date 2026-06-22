@@ -12,7 +12,8 @@ const templateA = buildDialogProjectSettingsDocumentTemplateDraft({
 const templateB = buildDialogProjectSettingsDocumentTemplateDraft({
   icon: 'mdi-map',
   id: 'template-b',
-  titleTranslations: { 'en-US': 'Locations' },
+  titlePluralTranslations: { 'en-US': 'Locations' },
+  titleSingularTranslations: {},
   worldAppendixTranslations: { 'en-US': 'atlas' }
 })
 
@@ -38,7 +39,8 @@ test('Test that available templates filter excludes rows without name or appendi
 test('Test that available templates filter resolves titles for the active UI language', () => {
   const germanTemplate = buildDialogProjectSettingsDocumentTemplateDraft({
     id: 'template-de',
-    titleTranslations: { de: 'Held' }
+    titlePluralTranslations: { de: 'Held' },
+    titleSingularTranslations: {},
   })
   expect(filterDialogProjectSettingsDocumentTemplatesByQuery(
     [germanTemplate],

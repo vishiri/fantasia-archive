@@ -21,7 +21,7 @@
           :hide-bottom-space="!props.nameHasError"
           :max-length="FA_PROJECT_WORLD_DISPLAY_NAME_TRANSLATION_MAX_LENGTH"
           test-locator="dialogProjectSettings-worlds-nameInput"
-          @update:model-value="emitDisplayNameTranslations"
+          @update:model-value="(value) => emitDisplayNameTranslations(value as I_faProjectWorldDisplayNameTranslations)"
         />
       </div>
 

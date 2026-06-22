@@ -9,6 +9,7 @@ import {
   resolveDialogProjectSettingsDocumentTemplateDisplayIcon,
   isDialogProjectSettingsDocumentTemplateResolvedTitleUsingFallback,
   isDialogProjectSettingsDocumentTemplateMissingCurrentLanguageTranslations,
+  resolveDialogProjectSettingsDocumentTemplateMissingTranslationWarningTooltip,
   resolveDialogProjectSettingsDocumentTemplateResolvedTitle,
   resolveDialogProjectSettingsDocumentTemplateResolvedTitleLanguageCode
 } from '../dialogProjectSettingsDocumentTemplatesDraft'
@@ -20,10 +21,11 @@ import {
 test('Test that resolveDialogProjectSettingsDocumentTemplateResolvedTitle uses language fallback', () => {
   expect(resolveDialogProjectSettingsDocumentTemplateResolvedTitle(
     {
-      titleTranslations: {
+      titlePluralTranslations: {
         de: 'German',
         fr: 'French'
-      }
+      },
+      titleSingularTranslations: {}
     },
     'ja'
   )).toBe('German')
@@ -31,27 +33,51 @@ test('Test that resolveDialogProjectSettingsDocumentTemplateResolvedTitle uses l
 
 test('Test that isDialogProjectSettingsDocumentTemplateResolvedTitleUsingFallback detects missing active locale', () => {
   const template = {
-    titleTranslations: {
+    titlePluralTranslations: {
       'en-US': 'Races'
-    }
+    },
+    titleSingularTranslations: {}
   }
   expect(isDialogProjectSettingsDocumentTemplateResolvedTitleUsingFallback(template, 'de')).toBe(true)
   expect(resolveDialogProjectSettingsDocumentTemplateResolvedTitleLanguageCode(template, 'de')).toBe('en-US')
   expect(isDialogProjectSettingsDocumentTemplateResolvedTitleUsingFallback(template, 'en-US')).toBe(false)
 })
 
+test('Test that isDialogProjectSettingsDocumentTemplateResolvedTitleUsingFallback is false when no title resolves', () => {
+  expect(isDialogProjectSettingsDocumentTemplateResolvedTitleUsingFallback({
+    titlePluralTranslations: {},
+    titleSingularTranslations: {}
+  }, 'en-US')).toBe(false)
+})
+
 test('Test that isDialogProjectSettingsDocumentTemplateMissingCurrentLanguageTranslations detects empty active locale', () => {
   const template = {
-    titleTranslations: {
+    titlePluralTranslations: {
       'en-US': 'Races'
-    }
+    },
+    titleSingularTranslations: {}
   }
   expect(isDialogProjectSettingsDocumentTemplateMissingCurrentLanguageTranslations(template, 'de')).toBe(true)
-  expect(isDialogProjectSettingsDocumentTemplateMissingCurrentLanguageTranslations(template, 'en-US')).toBe(false)
+  expect(isDialogProjectSettingsDocumentTemplateMissingCurrentLanguageTranslations(template, 'en-US')).toBe(true)
   expect(isDialogProjectSettingsDocumentTemplateMissingCurrentLanguageTranslations(
-    { titleTranslations: { de: 'Rassen' } },
+    {
+      titlePluralTranslations: { de: 'Rassen' },
+      titleSingularTranslations: {}
+    },
     'de'
-  )).toBe(false)
+  )).toBe(true)
+})
+
+test('Test that resolveDialogProjectSettingsDocumentTemplateMissingTranslationWarningTooltip returns empty when complete', () => {
+  expect(resolveDialogProjectSettingsDocumentTemplateMissingTranslationWarningTooltip({
+    activeLanguageCode: 'en-US',
+    readFallbackLanguageName: () => 'English (US)',
+    template: {
+      titlePluralTranslations: { 'en-US': 'Races' },
+      titleSingularTranslations: { 'en-US': 'Race' }
+    },
+    translate: (key) => key
+  })).toBe('')
 })
 
 /**
@@ -74,7 +100,8 @@ test('Test that mapDialogProjectSettingsDocumentTemplatesToSnapshot trims option
       documentCount: 0,
       icon: '  ',
       id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-      titleTranslations: { 'en-US': '  Character  ' },
+      titlePluralTranslations: { 'en-US': '  Character  ' },
+      titleSingularTranslations: {},
       worldAppendixTranslations: { 'en-US': 'Notes' }
     }
   ])
@@ -82,7 +109,8 @@ test('Test that mapDialogProjectSettingsDocumentTemplatesToSnapshot trims option
   expect(snapshot).toEqual([
     {
       id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-      titleTranslations: { 'en-US': 'Character' },
+      titlePluralTranslations: { 'en-US': 'Character' },
+      titleSingularTranslations: {},
       worldAppendixTranslations: { 'en-US': 'Notes' }
     }
   ])
@@ -97,14 +125,16 @@ test('Test that isDialogProjectSettingsDocumentTemplateRemoveDisabled respects d
     documentCount: 0,
     icon: '',
     id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-    titleTranslations: { 'en-US': 'Tpl' },
+    titlePluralTranslations: { 'en-US': 'Tpl' },
+    titleSingularTranslations: {},
     worldAppendixTranslations: {}
   })).toBe(false)
   expect(isDialogProjectSettingsDocumentTemplateRemoveDisabled({
     documentCount: 1,
     icon: '',
     id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-    titleTranslations: { 'en-US': 'Tpl' },
+    titlePluralTranslations: { 'en-US': 'Tpl' },
+    titleSingularTranslations: {},
     worldAppendixTranslations: {}
   })).toBe(true)
 })
@@ -124,7 +154,8 @@ test('Test that hasDialogProjectSettingsDocumentTemplateNameValidationError hand
       documentCount: 0,
       icon: '',
       id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-      titleTranslations: { 'en-US': '   ' },
+      titlePluralTranslations: { 'en-US': '   ' },
+      titleSingularTranslations: {},
       worldAppendixTranslations: {}
     }
   ])).toBe(true)
@@ -141,14 +172,16 @@ test('Test that collectInvalidDialogProjectSettingsDocumentTemplateIds collects 
       documentCount: 0,
       icon: '',
       id: 'template-a',
-      titleTranslations: { 'en-US': 'Character' },
+      titlePluralTranslations: { 'en-US': 'Character' },
+      titleSingularTranslations: {},
       worldAppendixTranslations: {}
     },
     {
       documentCount: 0,
       icon: '',
       id: 'template-b',
-      titleTranslations: { 'en-US': '   ' },
+      titlePluralTranslations: { 'en-US': '   ' },
+      titleSingularTranslations: {},
       worldAppendixTranslations: {}
     }
   ])).toEqual(new Set(['template-b']))
@@ -168,16 +201,17 @@ test('Test that isDialogProjectSettingsDocumentTemplateTabValidationError flags 
     documentCount: 0,
     icon: '',
     id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-    titleTranslations: { 'en-US': '   ' },
+    titlePluralTranslations: { 'en-US': '   ' },
+    titleSingularTranslations: {},
     worldAppendixTranslations: {}
   })).toBe(true)
-  expect(resolveDialogProjectSettingsDocumentTemplateSaveErrorDisplayName(
-    { 'en-US': '  Hero  ' },
+  expect(resolveDialogProjectSettingsDocumentTemplateSaveErrorDisplayName({ 'en-US': '  Hero  ' },
+    {},
     'en-US',
     'Default'
   )).toBe('Hero')
-  expect(resolveDialogProjectSettingsDocumentTemplateSaveErrorDisplayName(
-    { 'en-US': '   ' },
+  expect(resolveDialogProjectSettingsDocumentTemplateSaveErrorDisplayName({ 'en-US': '   ' },
+    {},
     'en-US',
     'Default'
   )).toBe('Default')
@@ -193,7 +227,8 @@ test('Test that mapDialogProjectSettingsDocumentTemplatesToSnapshot includes ico
       documentCount: 0,
       icon: ' person ',
       id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-      titleTranslations: { 'en-US': 'Character' },
+      titlePluralTranslations: { 'en-US': 'Character' },
+      titleSingularTranslations: {},
       worldAppendixTranslations: {}
     }
   ])

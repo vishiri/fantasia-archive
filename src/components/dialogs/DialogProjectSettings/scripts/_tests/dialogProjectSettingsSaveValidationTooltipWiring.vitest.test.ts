@@ -154,7 +154,8 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds doc
       documentCount: 0,
       icon: '',
       id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-      titleTranslations: { 'en-US': '   ' },
+      titlePluralTranslations: { 'en-US': '   ' },
+      titleSingularTranslations: {},
       worldAppendixTranslations: {}
     }
   ])
@@ -265,7 +266,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds tem
       templateLayout: {
         groups: [
           {
-            displayName: '   ',
+            displayNameTranslations: { 'en-US': '   ' },
             id: 'group-a',
             rootSortOrder: 0
           }
@@ -313,7 +314,8 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds dup
           {
             templateDisplayName: 'Character',
 
-            nickname: '',
+            nicknamePluralTranslations: {},
+            nicknameSingularTranslations: {},
             documentCountInWorld: 0,
             documentTemplateId: 'template-a',
             groupId: null,
@@ -326,7 +328,8 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds dup
           {
             templateDisplayName: 'Character copy',
 
-            nickname: '',
+            nicknamePluralTranslations: {},
+            nicknameSingularTranslations: {},
             documentCountInWorld: 0,
             documentTemplateId: 'template-a',
             groupId: null,
@@ -374,7 +377,8 @@ test('Test that duplicate template tooltip prefers placement nickname over canon
         placements: [
           {
             templateDisplayName: 'Character',
-            nickname: 'Hero alias',
+            nicknamePluralTranslations: { 'en-US': 'Hero alias' },
+            nicknameSingularTranslations: {},
             documentCountInWorld: 0,
             documentTemplateId: 'template-a',
             groupId: null,
@@ -386,7 +390,8 @@ test('Test that duplicate template tooltip prefers placement nickname over canon
           },
           {
             templateDisplayName: 'Character copy',
-            nickname: '',
+            nicknamePluralTranslations: {},
+            nicknameSingularTranslations: {},
             documentCountInWorld: 0,
             documentTemplateId: 'template-a',
             groupId: null,
@@ -434,7 +439,8 @@ test('Test that duplicate template tooltip falls back to default name when label
         placements: [
           {
             templateDisplayName: '   ',
-            nickname: '   ',
+            nicknamePluralTranslations: { 'en-US': '   ' },
+            nicknameSingularTranslations: {},
             documentCountInWorld: 0,
             documentTemplateId: 'template-a',
             groupId: null,
@@ -446,7 +452,8 @@ test('Test that duplicate template tooltip falls back to default name when label
           },
           {
             templateDisplayName: '',
-            nickname: '',
+            nicknamePluralTranslations: {},
+            nicknameSingularTranslations: {},
             documentCountInWorld: 0,
             documentTemplateId: 'template-a',
             groupId: null,
@@ -545,7 +552,8 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip uses defau
           {
             templateDisplayName: '   ',
 
-            nickname: '',
+            nicknamePluralTranslations: {},
+            nicknameSingularTranslations: {},
             documentCountInWorld: 0,
             documentTemplateId: 'template-a',
             groupId: null,
@@ -558,7 +566,8 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip uses defau
           {
             templateDisplayName: '',
 
-            nickname: '',
+            nicknamePluralTranslations: {},
+            nicknameSingularTranslations: {},
             documentCountInWorld: 0,
             documentTemplateId: 'template-a',
             groupId: null,

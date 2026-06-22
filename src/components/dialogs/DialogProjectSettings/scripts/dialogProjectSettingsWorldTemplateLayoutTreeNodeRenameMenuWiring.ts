@@ -1,31 +1,40 @@
+import { computed } from 'vue'
 import type { ComputedRef, Ref, WritableComputedRef } from 'vue'
 import type { CSSProperties } from 'vue'
-import type { QInput } from 'quasar'
 
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuLabelsWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuLabelsWiring'
+import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuPinnedAsideWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuPinnedAsideWiring'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuSessionWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuSessionWiring'
+import type { T_dialogProjectSettingsWorldTemplateLayoutRenameTranslationsDraft } from 'app/types/T_dialogProjectSettingsWorldTemplateLayoutRenameTranslationsDraft'
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
+import type { I_faLocaleStringTranslations } from 'app/types/I_faLocaleStringTranslations'
 import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
 
 type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring = {
-  canonicalNameTestLocator: ComputedRef<string | undefined>
   clearRenameMenuFocus: () => void
   closeRenameMenu: () => void
   contextMenuTestLocator: ComputedRef<string | undefined>
-  openRenameMenu: () => void
+  hasMenuPinnedAside: ComputedRef<boolean>
+  menuPinnedAsideLabelValue: ComputedRef<string | undefined>
+  menuPinnedAsideTooltipValue: ComputedRef<string | undefined>
+  menuPinnedAsideValue: ComputedRef<string | undefined>
   menuOffset: [number, number]
-  onRenameDraftUpdate: (value: string | number | null) => void
   onRenameMenuBeforeShow: () => void
   onRenameMenuHide: () => void
   onRenameMenuShow: () => void
-  renameDraft: Ref<string>
+  onRenameTranslationsDraftUpdate: (
+    value: I_faLocaleStringTranslations | I_faLocaleSingularPluralTranslations
+  ) => void
+  openRenameMenu: () => void
   renameHasError: ComputedRef<boolean>
   renameInputLabel: ComputedRef<string>
-  renameInputRef: Ref<QInput | null>
   renameInputTestLocator: ComputedRef<string | undefined>
+  renameInputTestLocatorValue: ComputedRef<string>
   renameMenuErrorMessage: ComputedRef<string | undefined>
   renameMenuOpen: WritableComputedRef<boolean>
   renameMenuStyle: Ref<CSSProperties | undefined>
-  showTemplateCanonicalName: ComputedRef<boolean>
+  renameTranslationsDraft: Ref<T_dialogProjectSettingsWorldTemplateLayoutRenameTranslationsDraft>
+  showTemplatePinnedAside: ComputedRef<boolean>
   supportsRenameMenu: ComputedRef<boolean>
   templateCanonicalName: ComputedRef<string>
   templateCanonicalNameLabel: ComputedRef<string>
@@ -34,10 +43,13 @@ type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring = {
 }
 
 export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWiring (deps: {
-  emitRenameGroup: (groupId: string, displayName: string) => void
-  emitRenamePlacementNickname: (placementId: string, nickname: string) => void
+  emitRenameGroup: (groupId: string, displayNameTranslations: I_faLocaleStringTranslations) => void
+  emitRenamePlacementNickname: (
+    placementId: string,
+    nicknameTranslations: I_faLocaleSingularPluralTranslations
+  ) => void
   getNode: () => I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
-  isGroupNameInvalid: (displayName: string) => boolean
+  isGroupNameInvalid: (displayNameTranslations: I_faLocaleStringTranslations) => boolean
   nodeAnchorRef: Ref<HTMLElement | null>
   translateGroupNameErrorRequired: () => string
   translateGroupRenameInputLabel: () => string
@@ -58,7 +70,7 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
   })
 
   const labelsWiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuLabelsWiring({
-    getShowTemplateCanonicalName: () => sessionWiring.computedState.showTemplateCanonicalName.value,
+    getShowTemplateCanonicalName: () => sessionWiring.computedState.showTemplatePinnedAside.value,
     translateGroupRenameInputLabel: deps.translateGroupRenameInputLabel,
     translateTemplateCanonicalNameLabel: deps.translateTemplateCanonicalNameLabel,
     translateTemplateCanonicalNameTooltip: deps.translateTemplateCanonicalNameTooltip,
@@ -66,50 +78,65 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu
     translateTemplateNicknameTooltip: deps.translateTemplateNicknameTooltip
   })
 
-  const canonicalNameTestLocator = sessionWiring.computedState.canonicalNameTestLocator
   const clearRenameMenuFocus = sessionWiring.handlersWiring.clearRenameMenuFocus
   const closeRenameMenu = sessionWiring.handlersWiring.closeRenameMenu
   const contextMenuTestLocator = sessionWiring.computedState.contextMenuTestLocator
-  const onRenameDraftUpdate = sessionWiring.handlersWiring.onRenameDraftUpdate
+  const hasMenuPinnedAside = sessionWiring.computedState.hasMenuPinnedAside
   const onRenameMenuBeforeShow = sessionWiring.handlersWiring.onRenameMenuBeforeShow
   const onRenameMenuHide = sessionWiring.handlersWiring.onRenameMenuHide
   const onRenameMenuShow = sessionWiring.handlersWiring.onRenameMenuShow
+  const onRenameTranslationsDraftUpdate = sessionWiring.handlersWiring.onRenameTranslationsDraftUpdate
   const openRenameMenu = sessionWiring.handlersWiring.openRenameMenu
-  const renameDraft = sessionWiring.renameDraft
   const renameHasError = sessionWiring.computedState.renameHasError
   const renameInputLabel = labelsWiring.renameInputLabel
-  const renameInputRef = sessionWiring.renameInputRef
   const renameInputTestLocator = sessionWiring.computedState.renameInputTestLocator
   const renameMenuErrorMessage = sessionWiring.computedState.renameMenuErrorMessage
   const renameMenuOpen = sessionWiring.computedState.renameMenuOpen
   const renameMenuStyle = sessionWiring.menuStyleWiring.renameMenuStyle
-  const showTemplateCanonicalName = sessionWiring.computedState.showTemplateCanonicalName
+  const renameTranslationsDraft = sessionWiring.renameTranslationsDraft
+  const showTemplatePinnedAside = sessionWiring.computedState.showTemplatePinnedAside
   const supportsRenameMenu = sessionWiring.computedState.supportsRenameMenu
   const templateCanonicalName = sessionWiring.computedState.templateCanonicalName
   const templateCanonicalNameLabel = labelsWiring.templateCanonicalNameLabel
   const templateCanonicalNameTooltipText = labelsWiring.templateCanonicalNameTooltipText
   const templateNicknameTooltipText = labelsWiring.templateNicknameTooltipText
 
+  const pinnedAsideWiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuPinnedAsideWiring({
+    computed,
+    showTemplatePinnedAside,
+    templateCanonicalName,
+    templateCanonicalNameLabel,
+    templateCanonicalNameTooltipText
+  })
+
+  const renameInputTestLocatorValue = computed(() => {
+    return renameInputTestLocator.value ??
+      'dialogProjectSettings-worldTemplateLayoutRenameInput'
+  })
+
   return {
-    canonicalNameTestLocator,
     clearRenameMenuFocus,
     closeRenameMenu,
     contextMenuTestLocator,
+    hasMenuPinnedAside,
     menuOffset,
-    onRenameDraftUpdate,
+    menuPinnedAsideLabelValue: pinnedAsideWiring.menuPinnedAsideLabelValue,
+    menuPinnedAsideTooltipValue: pinnedAsideWiring.menuPinnedAsideTooltipValue,
+    menuPinnedAsideValue: pinnedAsideWiring.menuPinnedAsideValue,
     onRenameMenuBeforeShow,
     onRenameMenuHide,
     onRenameMenuShow,
+    onRenameTranslationsDraftUpdate,
     openRenameMenu,
-    renameDraft,
     renameHasError,
     renameInputLabel,
-    renameInputRef,
     renameInputTestLocator,
+    renameInputTestLocatorValue,
     renameMenuErrorMessage,
     renameMenuOpen,
     renameMenuStyle,
-    showTemplateCanonicalName,
+    renameTranslationsDraft,
+    showTemplatePinnedAside,
     supportsRenameMenu,
     templateCanonicalName,
     templateCanonicalNameLabel,

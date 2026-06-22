@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { expect, test, vi } from 'vitest'
 
 import type { I_dialogProjectSettingsProps } from 'app/types/I_dialogProjectSettings'
@@ -47,7 +47,8 @@ test('Test that useDialogProjectSettings validation computeds tolerate null draf
     isDialogProjectSettingsFullDialogSaveDisabled: () => true,
     isDialogProjectSettingsProjectNameInvalid: (name) => name.trim().length === 0,
     registerComponentDialogStackGuard: vi.fn(),
-    registerDialogProjectSettingsWatchers: vi.fn()
+    registerDialogProjectSettingsWatchers: vi.fn(),
+    watch
   })
 
   const props: I_dialogProjectSettingsProps = {}

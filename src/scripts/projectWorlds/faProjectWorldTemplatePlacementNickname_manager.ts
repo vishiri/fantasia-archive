@@ -1,0 +1,72 @@
+import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
+import { FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_NICKNAME_SINGULAR_TRANSLATION_MAX_LENGTH } from 'app/types/I_faProjectWorldTemplatePlacementNicknameSingularTranslations'
+import { FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_NICKNAME_TRANSLATION_MAX_LENGTH } from 'app/types/I_faProjectWorldTemplatePlacementNicknameTranslations'
+
+import { createNormalizeFaLocaleStringTranslations } from 'app/src/scripts/localeTranslations/functions/normalizeFaLocaleStringTranslations'
+import { createResolveFaLocaleSingularPluralTranslation } from 'app/src/scripts/localeTranslations/functions/resolveFaLocaleSingularPluralTranslation'
+import { createResolveFaLocaleStringTranslation } from 'app/src/scripts/localeTranslations/functions/resolveFaLocaleStringTranslation'
+
+import {
+  buildFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations,
+  createNormalizeFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations,
+  createResolveFaProjectWorldTemplatePlacementNicknameFromFields
+} from './functions/faProjectWorldTemplatePlacementNicknameSingularPlural'
+
+export { buildFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations } from './functions/faProjectWorldTemplatePlacementNicknameSingularPlural'
+
+const pluralResolveApi = createResolveFaLocaleStringTranslation({
+  languageCodes: FA_USER_SETTINGS_LANGUAGE_CODES
+})
+
+const singularPluralResolveApi = createResolveFaLocaleSingularPluralTranslation({
+  languageCodes: FA_USER_SETTINGS_LANGUAGE_CODES
+})
+
+const normalizeFaProjectWorldTemplatePlacementNicknamePluralTranslationsInternal =
+  createNormalizeFaLocaleStringTranslations({
+    languageCodes: FA_USER_SETTINGS_LANGUAGE_CODES,
+    maxLength: FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_NICKNAME_TRANSLATION_MAX_LENGTH
+  })
+
+const normalizeFaProjectWorldTemplatePlacementNicknameSingularTranslationsInternal =
+  createNormalizeFaLocaleStringTranslations({
+    languageCodes: FA_USER_SETTINGS_LANGUAGE_CODES,
+    maxLength: FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_NICKNAME_SINGULAR_TRANSLATION_MAX_LENGTH
+  })
+
+export const {
+  hasFaLocaleStringTranslation: hasFaProjectWorldTemplatePlacementNicknamePluralTranslation,
+  resolveFaLocaleStringTranslationForStorage: resolveFaProjectWorldTemplatePlacementNicknamePluralForStorage
+} = pluralResolveApi
+
+export const {
+  hasFaLocaleSingularPluralTranslation: hasFaProjectWorldTemplatePlacementNicknameTranslation,
+  resolveFaLocaleSingularPluralDisplayTranslation: resolveFaProjectWorldTemplatePlacementNickname,
+  resolveFaLocaleSingularPluralDisplayTranslationForStorage:
+    resolveFaProjectWorldTemplatePlacementNicknameForStorage,
+  resolveFaLocaleSingularPluralDisplayTranslationLanguageCode:
+    resolveFaProjectWorldTemplatePlacementNicknameLanguageCode,
+  resolveFaLocaleSingularPluralDisplayTranslationResolution:
+    resolveFaProjectWorldTemplatePlacementNicknameResolution,
+  resolveFaLocaleSingularPluralMissingTranslationWarning:
+    resolveFaProjectWorldTemplatePlacementNicknameMissingTranslationWarning
+} = singularPluralResolveApi
+
+export const normalizeFaProjectWorldTemplatePlacementNicknamePluralTranslations =
+  normalizeFaProjectWorldTemplatePlacementNicknamePluralTranslationsInternal
+export const normalizeFaProjectWorldTemplatePlacementNicknameSingularTranslations =
+  normalizeFaProjectWorldTemplatePlacementNicknameSingularTranslationsInternal
+export const normalizeFaProjectWorldTemplatePlacementNicknameTranslations =
+  normalizeFaProjectWorldTemplatePlacementNicknamePluralTranslations
+
+export const normalizeFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations =
+  createNormalizeFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations({
+    normalizePlural: normalizeFaProjectWorldTemplatePlacementNicknamePluralTranslationsInternal,
+    normalizeSingular: normalizeFaProjectWorldTemplatePlacementNicknameSingularTranslationsInternal
+  })
+
+export const resolveFaProjectWorldTemplatePlacementNicknameFromFields =
+  createResolveFaProjectWorldTemplatePlacementNicknameFromFields({
+    buildSingularPlural: buildFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations,
+    resolveNickname: singularPluralResolveApi.resolveFaLocaleSingularPluralDisplayTranslation
+  })

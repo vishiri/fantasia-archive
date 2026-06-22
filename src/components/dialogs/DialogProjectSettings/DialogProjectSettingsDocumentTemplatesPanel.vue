@@ -23,7 +23,7 @@
         <DialogProjectSettingsDocumentTemplatesDetailPanel
           v-if="selectedTemplate !== null"
           :current-language-code="props.currentLanguageCode"
-          :name-has-error="isTemplateNameInvalid(selectedTemplate.titleTranslations)"
+          :name-has-error="isTemplateNameInvalid(selectedTemplate.titlePluralTranslations)"
           :remove-disabled="isTemplateRemoveDisabled(selectedTemplate)"
           :template="selectedTemplate"
           @remove="emitRemove(selectedTemplate.id)"
@@ -40,7 +40,7 @@
 import { computed, ref, watch } from 'vue'
 
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
-import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
 import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import {
@@ -67,7 +67,7 @@ const emit = defineEmits<{
   removeTemplate: [id: string]
   'update:templates': [templates: I_dialogProjectSettingsDocumentTemplateDraft[]]
   updateTemplateIcon: [id: string, icon: string]
-  updateTemplateTitleTranslations: [id: string, titleTranslations: I_faProjectDocumentTemplateTitleTranslations]
+  updateTemplateTitleTranslations: [id: string, titleTranslations: I_faLocaleSingularPluralTranslations]
   updateTemplateWorldAppendixTranslations: [
     id: string,
     worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
@@ -96,9 +96,9 @@ watch(() => props.templates, (nextTemplates) => {
 })
 
 function isTemplateNameInvalid (
-  titleTranslations: I_dialogProjectSettingsDocumentTemplateDraft['titleTranslations']
+  titlePluralTranslations: I_dialogProjectSettingsDocumentTemplateDraft['titlePluralTranslations']
 ): boolean {
-  return isDialogProjectSettingsDocumentTemplateNameInvalid(titleTranslations)
+  return isDialogProjectSettingsDocumentTemplateNameInvalid(titlePluralTranslations)
 }
 
 function isTemplateRemoveDisabled (
@@ -117,7 +117,7 @@ function emitRemove (id: string): void {
 
 function emitUpdateTitleTranslations (
   id: string,
-  titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+  titleTranslations: I_faLocaleSingularPluralTranslations
 ): void {
   emit('updateTemplateTitleTranslations', id, titleTranslations)
 }

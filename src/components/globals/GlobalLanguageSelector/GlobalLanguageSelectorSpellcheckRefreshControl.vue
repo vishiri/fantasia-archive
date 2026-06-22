@@ -27,9 +27,7 @@
           transition-hide="fade"
           :transition-duration="300"
         >
-          <span class="globalLanguageSelectorSpellcheckRefreshControl__tooltipMultiline">
-            {{ $t('globalLanguageSelector.spellcheckRefreshTooltip') }}
-          </span>
+          <FaMultilineTooltipBody :text="$t('globalLanguageSelector.spellcheckRefreshTooltip')" />
         </q-tooltip>
       </q-btn>
     </span>
@@ -37,6 +35,8 @@
 </template>
 
 <script setup lang="ts">
+import FaMultilineTooltipBody from 'app/src/components/elements/FaMultilineTooltipBody/FaMultilineTooltipBody.vue'
+
 import { useGlobalLanguageSelectorSpellcheckRefreshControl } from './scripts/globalLanguageSelectorSpellcheckRefreshControl_manager'
 
 const props = defineProps<{
@@ -112,7 +112,4 @@ const { tooltipOpen } = useGlobalLanguageSelectorSpellcheckRefreshControl(props)
   }
 }
 
-.globalLanguageSelectorSpellcheckRefreshControl__tooltipMultiline {
-  white-space: pre-line;
-}
 </style>

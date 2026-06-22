@@ -172,6 +172,7 @@ function updateDocumentTemplatesOrder (
 }
 </script>
 
+<style lang="scss" src="./styles/DialogProjectSettings.fieldHelpTooltip.unscoped.scss"></style>
 <style lang="scss" src="./styles/DialogProjectSettings.saveErrorsTooltip.unscoped.scss"></style>
 <style lang="scss" src="./styles/DialogProjectSettings.templateQIconDisplay.unscoped.scss"></style>
 

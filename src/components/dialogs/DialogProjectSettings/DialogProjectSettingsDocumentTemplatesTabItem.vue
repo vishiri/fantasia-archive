@@ -40,13 +40,13 @@
           class="dialogProjectSettingsDocumentTemplatesTabItem__missingTranslationsWarning"
           color="warning"
           data-test-locator="dialogProjectSettings-documentTemplates-tabMissingTranslationsWarning"
-          :data-test-tooltip-text="$t('dialogs.projectSettings.panels.documentTemplates.missingTranslationsTabTooltip')"
+          :data-test-tooltip-text="missingTranslationsWarningTooltip"
           name="mdi-alert"
           size="16px"
           @click.stop
         >
           <q-tooltip content-class="dialogProjectSettings__fieldHelpTooltip">
-            {{ $t('dialogs.projectSettings.panels.documentTemplates.missingTranslationsTabTooltip') }}
+            <FaMultilineTooltipBody :text="missingTranslationsWarningTooltip" />
           </q-tooltip>
         </q-icon>
       </div>
@@ -63,12 +63,17 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
+import FaMultilineTooltipBody from 'app/src/components/elements/FaMultilineTooltipBody/FaMultilineTooltipBody.vue'
+import { FA_USER_SETTINGS_LANGUAGE_DISPLAY_NAMES } from 'app/i18n/faUserSettingsLanguageDisplayNames'
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
+import { faUserSettingsLanguageCodeToNamesKey } from 'app/types/faUserSettingsLanguageRegistry'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import { FA_ICON_PICKER_EMPTY_PLACEHOLDER_ICON } from 'app/types/I_faIconPickerInput'
 import {
   isDialogProjectSettingsDocumentTemplateMissingCurrentLanguageTranslations,
+  resolveDialogProjectSettingsDocumentTemplateMissingTranslationWarningTooltip,
   resolveDialogProjectSettingsDocumentTemplateResolvedTitle
 } from './scripts/dialogProjectSettingsDocumentTemplatesDraft'
 import { resolveDialogProjectSettingsDocumentTemplateResolvedWorldAppendix } from './scripts/dialogProjectSettingsDocumentTemplateWorldAppendixDraft'
@@ -76,6 +81,8 @@ import { resolveDialogProjectSettingsDocumentTemplateResolvedWorldAppendix } fro
 defineOptions({
   name: 'DialogProjectSettingsDocumentTemplatesTabItem'
 })
+
+const { t } = useI18n()
 
 const props = withDefaults(
   defineProps<{
@@ -129,6 +136,17 @@ const showMissingTranslationsWarning = computed(() => {
     props.template,
     props.currentLanguageCode
   )
+})
+
+const missingTranslationsWarningTooltip = computed(() => {
+  return resolveDialogProjectSettingsDocumentTemplateMissingTranslationWarningTooltip({
+    activeLanguageCode: props.currentLanguageCode,
+    readFallbackLanguageName: (languageCode) => {
+      return FA_USER_SETTINGS_LANGUAGE_DISPLAY_NAMES[faUserSettingsLanguageCodeToNamesKey(languageCode)]
+    },
+    template: props.template,
+    translate: (key, params) => t(key, params ?? {})
+  })
 })
 
 const showWorldAppendix = computed(() => trimmedWorldAppendix.value.length > 0)

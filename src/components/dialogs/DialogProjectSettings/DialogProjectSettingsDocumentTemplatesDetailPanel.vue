@@ -11,7 +11,11 @@
           </span>
         </div>
         <FaLocaleTranslationsInput
-          :model-value="props.template.titleTranslations"
+          translation-forms="singularPlural"
+          :model-value="{
+            singular: props.template.titleSingularTranslations,
+            plural: props.template.titlePluralTranslations
+          }"
           class="dialogProjectSettingsDocumentTemplatesDetail__nameInput"
           :current-language-code="props.currentLanguageCode"
           :data-test-validation-error="props.nameHasError ? 'true' : 'false'"
@@ -21,7 +25,7 @@
           :hide-bottom-space="!props.nameHasError"
           :max-length="FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_TRANSLATION_MAX_LENGTH"
           test-locator="dialogProjectSettings-documentTemplates-nameInput"
-          @update:model-value="emitTitleTranslations"
+          @update:model-value="(value) => emitTitleTranslations(value as I_faLocaleSingularPluralTranslations)"
         />
       </div>
 
@@ -54,7 +58,7 @@
           dense
           :max-length="FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_TRANSLATION_MAX_LENGTH"
           test-locator="dialogProjectSettings-documentTemplates-worldAppendixInput"
-          @update:model-value="emitWorldAppendixTranslations"
+          @update:model-value="(value) => emitWorldAppendixTranslations(value as I_faProjectDocumentTemplateWorldAppendixTranslations)"
         />
       </div>
 
@@ -93,7 +97,7 @@ import FaIconPickerInput from 'app/src/components/elements/FaIconPickerInput/FaI
 import FaLocaleTranslationsInput from 'app/src/components/elements/FaLocaleTranslationsInput/FaLocaleTranslationsInput.vue'
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
-import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
 import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
 
 defineOptions({
@@ -110,12 +114,12 @@ const props = defineProps<{
 const emit = defineEmits<{
   remove: []
   'update:icon': [value: string]
-  'update:titleTranslations': [value: I_faProjectDocumentTemplateTitleTranslations]
+  'update:title-translations': [value: I_faLocaleSingularPluralTranslations]
   'update:worldAppendixTranslations': [value: I_faProjectDocumentTemplateWorldAppendixTranslations]
 }>()
 
-function emitTitleTranslations (value: I_faProjectDocumentTemplateTitleTranslations): void {
-  emit('update:titleTranslations', value)
+function emitTitleTranslations (value: I_faLocaleSingularPluralTranslations): void {
+  emit('update:title-translations', value)
 }
 
 function emitWorldAppendixTranslations (

@@ -86,13 +86,13 @@ test('Test that resolveFaLocaleTranslationsMenuPresentation uses configured max 
       bottom: 200,
       height: 40,
       left: 100,
-      right: 300,
+      right: 700,
       top: 160,
-      width: 200,
+      width: 600,
       x: 100,
       y: 160
     } as DOMRectReadOnly,
-    maxHeightPx: 600,
+    maxHeightPx: 450,
     maxWidthPx: 500,
     viewportHeightPx: 900,
     viewportMarginPx: 16,
@@ -100,9 +100,55 @@ test('Test that resolveFaLocaleTranslationsMenuPresentation uses configured max 
   })
 
   expect(presentation).toEqual({
-    maxHeightPx: 600,
+    maxHeightPx: 450,
     widthPx: 500
   })
+})
+
+test('Test that resolveFaLocaleTranslationsMenuPresentation enforces minimum menu width', () => {
+  const presentation = resolveFaLocaleTranslationsMenuPresentation({
+    anchorRect: {
+      bottom: 200,
+      height: 40,
+      left: 100,
+      right: 220,
+      top: 160,
+      width: 120,
+      x: 100,
+      y: 160
+    } as DOMRectReadOnly,
+    maxHeightPx: 450,
+    maxWidthPx: 500,
+    minWidthPx: 350,
+    viewportHeightPx: 900,
+    viewportMarginPx: 16,
+    viewportWidthPx: 1200
+  })
+
+  expect(presentation.widthPx).toBe(350)
+})
+
+test('Test that resolveFaLocaleTranslationsMenuPresentation keeps singular plural minimum width above narrow anchor', () => {
+  const presentation = resolveFaLocaleTranslationsMenuPresentation({
+    anchorRect: {
+      bottom: 200,
+      height: 40,
+      left: 100,
+      right: 280,
+      top: 160,
+      width: 180,
+      x: 100,
+      y: 160
+    } as DOMRectReadOnly,
+    maxHeightPx: 450,
+    maxWidthPx: 700,
+    minWidthPx: 650,
+    viewportHeightPx: 900,
+    viewportMarginPx: 16,
+    viewportWidthPx: 1200
+  })
+
+  expect(presentation.widthPx).toBe(650)
 })
 
 test('Test that buildFaLocaleTranslationsMenuContentStyle emits locked menu CSS variables', () => {
@@ -169,9 +215,9 @@ test('Test that resolveFaLocaleTranslationsMenuPresentation uses built-in defaul
       bottom: 400,
       height: 40,
       left: 40,
-      right: 240,
+      right: 640,
       top: 360,
-      width: 200,
+      width: 600,
       x: 40,
       y: 360
     } as DOMRectReadOnly,
@@ -180,7 +226,28 @@ test('Test that resolveFaLocaleTranslationsMenuPresentation uses built-in defaul
   })
 
   expect(presentation).toEqual({
-    maxHeightPx: 484,
+    maxHeightPx: 450,
     widthPx: 500
   })
+})
+
+test('Test that resolveFaLocaleTranslationsMenuPresentation never exceeds global menu max height', () => {
+  const presentation = resolveFaLocaleTranslationsMenuPresentation({
+    anchorRect: {
+      bottom: 100,
+      height: 40,
+      left: 40,
+      right: 240,
+      top: 60,
+      width: 200,
+      x: 40,
+      y: 60
+    } as DOMRectReadOnly,
+    maxHeightPx: 9999,
+    viewportHeightPx: 2000,
+    viewportMarginPx: 16,
+    viewportWidthPx: 1200
+  })
+
+  expect(presentation.maxHeightPx).toBe(450)
 })
