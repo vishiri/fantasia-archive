@@ -18,11 +18,12 @@ export interface I_faSqlNamedEntityRow {
   updated_at_ms: number
 }
 
-/** SQLite column layout for the document_templates table (v5+, v8+ title_translations_json, v9+ world_appendix_translations_json). */
+/** SQLite column layout for the document_templates table (v5+, v8+ title_translations_json plural, v11+ title_singular_translations_json, v9+ world_appendix_translations_json). */
 export interface I_faSqlDocumentTemplateRow {
   id: string
   display_name: string
   title_translations_json: string
+  title_singular_translations_json: string
   sort_order: number
   world_appendix: string
   world_appendix_translations_json: string
@@ -41,11 +42,12 @@ export interface I_faSqlProjectDocumentRow {
   updated_at_ms: number
 }
 
-/** SQLite column layout for world_template_groups. */
+/** SQLite column layout for world_template_groups (v10+ display_name_translations_json). */
 export interface I_faSqlWorldTemplateGroupRow {
   id: string
   world_id: string
   display_name: string
+  display_name_translations_json: string
   root_sort_order: number
   created_at_ms: number
   updated_at_ms: number
@@ -60,6 +62,8 @@ export interface I_faSqlWorldTemplatePlacementJoinRow {
   root_sort_order: number | null
   group_sort_order: number | null
   nickname: string
+  nickname_translations_json: string
+  nickname_singular_translations_json: string
   created_at_ms: number
   updated_at_ms: number
   display_name: string

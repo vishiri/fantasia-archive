@@ -182,7 +182,8 @@ test('Test that every project content IPC handler runs through runWithFaProjectD
     items: [
       {
         id: SAMPLE_UUID,
-        titleTranslations: { 'en-US': 'T' }
+        titlePluralTranslations: { 'en-US': 'T' },
+        titleSingularTranslations: {},
       }
     ]
   })

@@ -20,10 +20,12 @@ SQLite **`documents`** = worldbuilding entities (world + optional template). ≠
 | **7** | Adds **`world_template_placements.nickname`** — optional per-world placement label override (empty = use joined document template name). |
 | **8** | Adds **`document_templates.title_translations_json`** — per-locale template titles (JSON keyed by interface language code). **`display_name`** remains a denormalized cache for stable sort (canonical **en-US** title with alphabetical fallback). |
 | **9** | Adds **`worlds.display_name_translations_json`** and **`document_templates.world_appendix_translations_json`** — per-locale world names and template **World appendix** copy. Existing **`display_name`** / **`world_appendix`** values backfill **en-US** on upgrade; denormalized columns remain write-through caches for sort and legacy readers. |
+| **10** | Adds **`world_template_groups.display_name_translations_json`** and **`world_template_placements.nickname_translations_json`** — per-locale group labels and placement nickname overrides in the per-world template layout. Existing **`display_name`** / **`nickname`** values backfill **en-US** on upgrade; denormalized columns remain write-through caches. |
+| **11** | Adds **`document_templates.title_singular_translations_json`** and **`world_template_placements.nickname_singular_translations_json`** — optional per-locale singular forms for document template titles and placement nicknames. Existing **`title_translations_json`** / **`nickname_translations_json`** remain **plural** storage (no data copy). |
 
-**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 9`** in **`faProjectDbMigrateWiring.ts`**.
+**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 11`** in **`faProjectDbMigrateWiring.ts`**.
 
-**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v1**, run **v1→v2** (drop **`world_media`**), **v2→v3** (ensure legacy **`world_document_templates`** when upgrading old files), **v3→v4** (add **`worlds.color_pallete`**), **v4→v5** (add **`document_templates`** list/detail columns), **v5→v6** (migrate junction rows to root placements, drop **`world_document_templates`**, create layout tables), **v6→v7** (add **`world_template_placements.nickname`**), **v7→v8** (add **`title_translations_json`**, backfill **`en-US`** from existing **`display_name`**), **v8→v9** (add **`display_name_translations_json`** + **`world_appendix_translations_json`**, backfill **en-US**), seed a default **world** when empty, then stop at **v9**. Files already at **9** are a no-op. Other versions throw until a forward migration is added.
+**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v1**, run **v1→v2** (drop **`world_media`**), **v2→v3** (ensure legacy **`world_document_templates`** when upgrading old files), **v3→v4** (add **`worlds.color_pallete`**), **v4→v5** (add **`document_templates`** list/detail columns), **v5→v6** (migrate junction rows to root placements, drop **`world_document_templates`**, create layout tables), **v6→v7** (add **`world_template_placements.nickname`**), **v7→v8** (add **`title_translations_json`**, backfill **`en-US`** from existing **`display_name`**), **v8→v9** (add **`display_name_translations_json`** + **`world_appendix_translations_json`**, backfill **en-US**), **v9→v10** (add layout group **`display_name_translations_json`** + placement **`nickname_translations_json`**, backfill **en-US**), **v10→v11** (add **`title_singular_translations_json`** + **`nickname_singular_translations_json`**, default empty), seed a default **world** when empty, then stop at **v11**. Files already at **v11** are a no-op. Other versions throw until a forward migration is added.
 
 **Worlds vs document templates on create:** **`seedFaProjectDefaultWorldIfEmpty`** runs after migrations and inserts one default **world** when the table is empty. **Document templates are never auto-seeded** — a new **`.faproject`** may have zero **`document_templates`** rows until the user adds them in **Project Settings**.
 
@@ -31,7 +33,7 @@ SQLite **`documents`** = worldbuilding entities (world + optional template). ≠
 
 **Pre-release flatten:** Dev may squash schema versions back to **1**; no upgrade for older local files — **`.cursor/skills/fantasia-flatten-database-schemas/SKILL.md`**.
 
-**Product ↔ SQL naming:** UI world name → **`display_name_translations_json`** on **`worlds`** (denormalized **`display_name`** cache for sort). Document template titles → **`title_translations_json`**; **`display_name`** on **`document_templates`** = write-through **en-US** title cache. Template **World appendix** → **`world_appendix_translations_json`** (denormalized **`world_appendix`** cache). Per-world template layout in **`world_template_groups`** + **`world_template_placements`**; each template at most once per world. **Project Settings** enforces invariant client-side before save (duplicate **`document_template_id`** placements block **Save settings** with validation chrome).
+**Product ↔ SQL naming:** UI world name → **`display_name_translations_json`** on **`worlds`** (denormalized **`display_name`** cache for sort). Document template titles → **`title_translations_json`** (**plural**) + **`title_singular_translations_json`**; **`display_name`** on **`document_templates`** = write-through **en-US** plural title cache. Template **World appendix** → **`world_appendix_translations_json`** (denormalized **`world_appendix`** cache). Per-world template layout group labels → **`world_template_groups.display_name_translations_json`** (denormalized **`display_name`** cache). Placement nicknames → **`world_template_placements.nickname_translations_json`** (**plural**) + **`nickname_singular_translations_json`** (denormalized **`nickname`** cache from **en-US** plural resolution; empty active locale = use joined template title). Per-world template layout in **`world_template_groups`** + **`world_template_placements`**; each template at most once per world. **Project Settings** enforces invariant client-side before save (duplicate **`document_template_id`** placements block **Save settings** with validation chrome).
 
 ## Table: `project_data` (key–value)
 
@@ -69,8 +71,9 @@ Index: **`idx_worlds_sort_order`**. New **`.faproject`** files receive one defau
 | Column | Type | Notes |
 |--------|------|--------|
 | `id` | TEXT PK | UUID |
-| `display_name` | TEXT | Denormalized canonical title cache (non-empty after save; **en-US** resolution) |
-| `title_translations_json` | TEXT | JSON object keyed by interface language code; at least one non-empty locale required on save |
+| `display_name` | TEXT | Denormalized canonical title cache (non-empty after save; **en-US** plural resolution) |
+| `title_translations_json` | TEXT | JSON object keyed by interface language code (**plural** forms); at least one non-empty locale required on save |
+| `title_singular_translations_json` | TEXT | JSON object keyed by interface language code (**singular** forms); optional on save |
 | `sort_order` | INTEGER | Zero-based GUI order from Project Settings draggable list |
 | `world_appendix` | TEXT | Denormalized canonical appendix cache (max **500** chars; default empty) |
 | `world_appendix_translations_json` | TEXT | JSON keyed by interface language code; empty object when no appendix copy |
@@ -115,7 +118,8 @@ Index: **`idx_document_templates_sort_order`**. Unlike **worlds**, new projects 
 |--------|--------|
 | `id` | TEXT PK (UUID) |
 | `world_id` | FK → **`worlds.id`** **ON DELETE CASCADE** |
-| `display_name` | Non-empty group label |
+| `display_name` | Denormalized canonical group label cache (non-empty after save; **en-US** resolution) |
+| `display_name_translations_json` | TEXT | JSON keyed by interface language code; at least one non-empty locale required on save |
 | `root_sort_order` | Position among root-level groups and root-level template placements |
 | `created_at_ms`, `updated_at_ms` | INTEGER |
 
@@ -131,7 +135,9 @@ Index: **`idx_world_template_groups_world_root_sort`**.
 | `group_id` | NULL for root placement; else FK → **`world_template_groups.id`** **ON DELETE SET NULL** |
 | `root_sort_order` | Set when **`group_id`** is NULL |
 | `group_sort_order` | Set when **`group_id`** is not NULL |
-| `nickname` | Optional per-world placement label override (max **120** chars; default empty) |
+| `nickname` | Denormalized canonical nickname cache (max **120** chars; default empty; **en-US** resolution) |
+| `nickname_translations_json` | TEXT | JSON keyed by interface language code (**plural** nickname overrides); empty object when no nickname overrides |
+| `nickname_singular_translations_json` | TEXT | JSON keyed by interface language code (**singular** nickname overrides); optional on save |
 | `created_at_ms`, `updated_at_ms` | INTEGER |
 
 **Constraints:** **`UNIQUE (world_id, document_template_id)`**; CHECK enforces exactly one of **`root_sort_order`** / **`group_sort_order`** matching **`group_id`**.

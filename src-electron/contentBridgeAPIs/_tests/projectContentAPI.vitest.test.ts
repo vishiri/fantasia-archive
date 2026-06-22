@@ -38,7 +38,8 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
   await projectContentAPI.saveDocumentTemplatesSnapshot([
     {
       id: SAMPLE_UUID_B,
-      titleTranslations: { 'en-US': 'Character' }
+      titlePluralTranslations: { 'en-US': 'Character' },
+      titleSingularTranslations: {},
     }
   ])
 
@@ -117,7 +118,8 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
       items: [
         {
           id: SAMPLE_UUID_B,
-          titleTranslations: { 'en-US': 'Character' }
+          titlePluralTranslations: { 'en-US': 'Character' },
+          titleSingularTranslations: {},
         }
       ]
     }

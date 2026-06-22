@@ -16,6 +16,7 @@ test('Test that parseFaProjectWorldTemplateLayoutSnapshot accepts valid layout p
     groups: [
       {
         displayName: 'Creatures',
+        displayNameTranslations: { 'en-US': 'Creatures' },
         id: SAMPLE_UUID,
         rootSortOrder: 0
       }
@@ -26,6 +27,8 @@ test('Test that parseFaProjectWorldTemplateLayoutSnapshot accepts valid layout p
         groupId: null,
         groupSortOrder: null,
         id: SAMPLE_UUID,
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {},
         rootSortOrder: 1
       },
       {
@@ -33,6 +36,8 @@ test('Test that parseFaProjectWorldTemplateLayoutSnapshot accepts valid layout p
         groupId: SAMPLE_UUID,
         groupSortOrder: 0,
         id: SAMPLE_UUID_B,
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {},
         rootSortOrder: null
       }
     ]
@@ -69,5 +74,39 @@ test('Test that parseFaProjectWorldTemplateLayoutSnapshot rejects invalid placem
         rootSortOrder: 0
       }
     ]
+  })).toThrow()
+})
+
+/**
+ * parseFaProjectWorldTemplateLayoutSnapshot
+ * Rejects layout groups without any display name translation.
+ */
+test('Test that parseFaProjectWorldTemplateLayoutSnapshot rejects blank group translation maps', () => {
+  expect(() => parseFaProjectWorldTemplateLayoutSnapshot({
+    groups: [
+      {
+        displayNameTranslations: {},
+        id: SAMPLE_UUID,
+        rootSortOrder: 0
+      }
+    ],
+    placements: []
+  })).toThrow()
+})
+
+/**
+ * parseFaProjectWorldTemplateLayoutSnapshot
+ * Rejects layout groups without any display name translation.
+ */
+test('Test that parseFaProjectWorldTemplateLayoutSnapshot rejects blank group translation maps', () => {
+  expect(() => parseFaProjectWorldTemplateLayoutSnapshot({
+    groups: [
+      {
+        displayNameTranslations: {},
+        id: SAMPLE_UUID,
+        rootSortOrder: 0
+      }
+    ],
+    placements: []
   })).toThrow()
 })

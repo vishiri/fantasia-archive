@@ -34,6 +34,12 @@ export const FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_WORLD_APPENDIX = ''
 /** Default document_templates.icon when inserting without an override. */
 export const FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_ICON = ''
 
+/** Default document_templates.title_singular_translations_json for fresh rows. */
+export const FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_TITLE_SINGULAR_TRANSLATIONS_JSON = '{}'
+
+/** Max stored JSON length for document_templates.title_singular_translations_json. */
+export const FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_SINGULAR_TRANSLATIONS_JSON_MAX_LENGTH = 4096
+
 /** Default document_templates.title_translations_json for fresh rows. */
 export const FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_TITLE_TRANSLATIONS_JSON = '{}'
 
@@ -52,6 +58,24 @@ export const FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_WORLD_APPENDIX_TRANSLATIONS_JS
 /** Max stored JSON length for document_templates.world_appendix_translations_json. */
 export const FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_TRANSLATIONS_JSON_MAX_LENGTH = 8192
 
+/** Default world_template_groups.display_name_translations_json for fresh rows. */
+export const FA_PROJECT_WORLD_TEMPLATE_GROUP_DEFAULT_DISPLAY_NAME_TRANSLATIONS_JSON = '{}'
+
+/** Max stored JSON length for world_template_groups.display_name_translations_json. */
+export const FA_PROJECT_WORLD_TEMPLATE_GROUP_DISPLAY_NAME_TRANSLATIONS_JSON_MAX_LENGTH = 4096
+
+/** Default world_template_placements.nickname_singular_translations_json for fresh rows. */
+export const FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_DEFAULT_NICKNAME_SINGULAR_TRANSLATIONS_JSON = '{}'
+
+/** Max stored JSON length for world_template_placements.nickname_singular_translations_json. */
+export const FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_NICKNAME_SINGULAR_TRANSLATIONS_JSON_MAX_LENGTH = 4096
+
+/** Default world_template_placements.nickname_translations_json for fresh rows. */
+export const FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_DEFAULT_NICKNAME_TRANSLATIONS_JSON = '{}'
+
+/** Max stored JSON length for world_template_placements.nickname_translations_json. */
+export const FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_NICKNAME_TRANSLATIONS_JSON_MAX_LENGTH = 4096
+
 /**
  * Creates world_template_groups and world_template_placements (schema v6).
  * Idempotent when tables already exist.
@@ -62,6 +86,8 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_WORLD_TEMPLATE_GROUPS} (
   id TEXT NOT NULL PRIMARY KEY,
   world_id TEXT NOT NULL REFERENCES ${FA_PROJECT_TABLE_WORLDS}(id) ON DELETE CASCADE,
   display_name TEXT NOT NULL CHECK (length(display_name) > 0),
+  display_name_translations_json TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_TEMPLATE_GROUP_DEFAULT_DISPLAY_NAME_TRANSLATIONS_JSON}'
+  CHECK (length(display_name_translations_json) <= ${FA_PROJECT_WORLD_TEMPLATE_GROUP_DISPLAY_NAME_TRANSLATIONS_JSON_MAX_LENGTH}),
   root_sort_order INTEGER NOT NULL,
   created_at_ms INTEGER NOT NULL,
   updated_at_ms INTEGER NOT NULL
@@ -76,6 +102,10 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS} (
   group_sort_order INTEGER,
   nickname TEXT NOT NULL DEFAULT ''
   CHECK (length(nickname) <= ${FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_NICKNAME_MAX_LENGTH}),
+  nickname_translations_json TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_DEFAULT_NICKNAME_TRANSLATIONS_JSON}'
+  CHECK (length(nickname_translations_json) <= ${FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_NICKNAME_TRANSLATIONS_JSON_MAX_LENGTH}),
+  nickname_singular_translations_json TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_DEFAULT_NICKNAME_SINGULAR_TRANSLATIONS_JSON}'
+  CHECK (length(nickname_singular_translations_json) <= ${FA_PROJECT_WORLD_TEMPLATE_PLACEMENT_NICKNAME_SINGULAR_TRANSLATIONS_JSON_MAX_LENGTH}),
   created_at_ms INTEGER NOT NULL,
   updated_at_ms INTEGER NOT NULL,
   UNIQUE (world_id, document_template_id),
@@ -135,6 +165,8 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES} (
   display_name TEXT NOT NULL CHECK (length(display_name) > 0),
   title_translations_json TEXT NOT NULL DEFAULT '${FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_TITLE_TRANSLATIONS_JSON}'
   CHECK (length(title_translations_json) <= ${FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_TRANSLATIONS_JSON_MAX_LENGTH}),
+  title_singular_translations_json TEXT NOT NULL DEFAULT '${FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_TITLE_SINGULAR_TRANSLATIONS_JSON}'
+  CHECK (length(title_singular_translations_json) <= ${FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_SINGULAR_TRANSLATIONS_JSON_MAX_LENGTH}),
   sort_order INTEGER NOT NULL DEFAULT 0,
   world_appendix TEXT NOT NULL DEFAULT '${FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_WORLD_APPENDIX}'
   CHECK (length(world_appendix) <= ${FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_MAX_LENGTH}),

@@ -6,10 +6,10 @@ import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/t
 export function buildFaProjectDocumentTemplateTitleTranslationsJsonFromDisplayName (
   displayName: string
 ): string {
-  const titleTranslations: I_faProjectDocumentTemplateTitleTranslations = {
+  const titlePluralTranslations: I_faProjectDocumentTemplateTitleTranslations = {
     'en-US': displayName
   }
-  return serializeFaProjectDocumentTemplateTitleTranslationsJson(titleTranslations)
+  return serializeFaProjectDocumentTemplateTitleTranslationsJson(titlePluralTranslations)
 }
 
 export function buildFaProjectDocumentTemplateWorldAppendixTranslationsJsonFromText (

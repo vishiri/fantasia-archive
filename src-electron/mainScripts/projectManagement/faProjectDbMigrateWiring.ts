@@ -7,6 +7,7 @@ import {
   applyFaProjectWorldTemplateLayoutSchemaV6,
   FA_PROJECT_DATA_TABLE_NAME,
   FA_PROJECT_TABLE_WORLD_DOCUMENT_TEMPLATES,
+  FA_PROJECT_TABLE_WORLD_TEMPLATE_GROUPS,
   FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS,
   FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
   FA_PROJECT_TABLE_WORLDS
@@ -19,22 +20,23 @@ import { migrateFaProjectSchemaV5ToV6 } from './functions/faProjectDbMigrateV5To
 import { migrateFaProjectSchemaV6ToV7 } from './functions/faProjectDbMigrateV6ToV7'
 import { migrateFaProjectSchemaV7ToV8 } from './functions/faProjectDbMigrateV7ToV8'
 import { migrateFaProjectSchemaV8ToV9 } from './functions/faProjectDbMigrateV8ToV9'
+import { migrateFaProjectSchemaV9ToV10 } from './functions/faProjectDbMigrateV9ToV10'
+import { migrateFaProjectSchemaV10ToV11 } from './functions/faProjectDbMigrateV10ToV11'
+import { readFaProjectDbUserVersion, runFaProjectDbMigrationStep } from './faProjectDbRunMigrationStepWiring'
 import { seedFaProjectDefaultWorldIfEmpty } from './projectDbContent/faProjectWorldBootstrapWiring'
 
 const OPTION_PROJECT_NAME = 'project_name'
 const OPTION_PROJECT_UUID = 'project_uuid'
 
-/** Current schema revision: content tables at user_version 9 (world + appendix translations). */
-export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 9
+/** Current schema revision: content tables at user_version 11 (singular title + nickname translations). */
+export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 11
 
 function sqlSelectValueFromActiveTable (): string {
   return `SELECT option_value AS v FROM ${FA_PROJECT_DATA_TABLE_NAME} WHERE option_name = ?`
 }
 
 function readUserVersion (db: Database): number {
-  const rawVer = db.pragma('user_version', { simple: true })
-  const current = typeof rawVer === 'number' ? rawVer : Number(rawVer)
-  return Number.isFinite(current) ? current : 0
+  return readFaProjectDbUserVersion(db)
 }
 
 function bootstrapFaProjectSchemaFresh (
@@ -98,80 +100,53 @@ export function applyFaProjectMigrations (
     return
   }
 
-  const afterBootstrapVer = readUserVersion(db)
-  if (afterBootstrapVer === 1 && FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 2) {
-    const runV1ToV2 = db.transaction(() => {
-      migrateFaProjectSchemaV1ToV2(db)
+  runFaProjectDbMigrationStep(db, 1, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
+    migrateFaProjectSchemaV1ToV2(db)
+  })
+  runFaProjectDbMigrationStep(db, 2, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
+    migrateFaProjectSchemaV2ToV3(db)
+  })
+  runFaProjectDbMigrationStep(db, 3, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
+    migrateFaProjectSchemaV3ToV4(db)
+  })
+  runFaProjectDbMigrationStep(db, 4, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
+    migrateFaProjectSchemaV4ToV5(db)
+  })
+  runFaProjectDbMigrationStep(db, 5, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
+    migrateFaProjectSchemaV5ToV6(db, {
+      applyLayoutSchema: applyFaProjectWorldTemplateLayoutSchemaV6,
+      createPlacementId: uuidv4,
+      junctionTableName: FA_PROJECT_TABLE_WORLD_DOCUMENT_TEMPLATES
     })
-    runV1ToV2()
-  }
-
-  const afterV2Ver = readUserVersion(db)
-  if (afterV2Ver === 2 && FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 3) {
-    const runV2ToV3 = db.transaction(() => {
-      migrateFaProjectSchemaV2ToV3(db)
+  })
+  runFaProjectDbMigrationStep(db, 6, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
+    migrateFaProjectSchemaV6ToV7(db, {
+      worldTemplatePlacementsTableName: FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
     })
-    runV2ToV3()
-  }
-
-  const afterV3Ver = readUserVersion(db)
-  if (afterV3Ver === 3 && FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 4) {
-    const runV3ToV4 = db.transaction(() => {
-      migrateFaProjectSchemaV3ToV4(db)
+  })
+  runFaProjectDbMigrationStep(db, 7, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
+    migrateFaProjectSchemaV7ToV8(db, {
+      documentTemplatesTableName: FA_PROJECT_TABLE_DOCUMENT_TEMPLATES
     })
-    runV3ToV4()
-  }
-
-  const afterV4Ver = readUserVersion(db)
-  if (afterV4Ver === 4 && FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 5) {
-    const runV4ToV5 = db.transaction(() => {
-      migrateFaProjectSchemaV4ToV5(db)
+  })
+  runFaProjectDbMigrationStep(db, 8, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
+    migrateFaProjectSchemaV8ToV9(db, {
+      documentTemplatesTableName: FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
+      worldsTableName: FA_PROJECT_TABLE_WORLDS
     })
-    runV4ToV5()
-  }
-
-  const afterV5Ver = readUserVersion(db)
-  if (afterV5Ver === 5 && FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 6) {
-    const runV5ToV6 = db.transaction(() => {
-      migrateFaProjectSchemaV5ToV6(db, {
-        applyLayoutSchema: applyFaProjectWorldTemplateLayoutSchemaV6,
-        createPlacementId: uuidv4,
-        junctionTableName: FA_PROJECT_TABLE_WORLD_DOCUMENT_TEMPLATES
-      })
+  })
+  runFaProjectDbMigrationStep(db, 9, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
+    migrateFaProjectSchemaV9ToV10(db, {
+      worldTemplateGroupsTableName: FA_PROJECT_TABLE_WORLD_TEMPLATE_GROUPS,
+      worldTemplatePlacementsTableName: FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
     })
-    runV5ToV6()
-  }
-
-  const afterV6Ver = readUserVersion(db)
-  if (afterV6Ver === 6 && FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 7) {
-    const runV6ToV7 = db.transaction(() => {
-      migrateFaProjectSchemaV6ToV7(db, {
-        worldTemplatePlacementsTableName: FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
-      })
+  })
+  runFaProjectDbMigrationStep(db, 10, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
+    migrateFaProjectSchemaV10ToV11(db, {
+      documentTemplatesTableName: FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
+      worldTemplatePlacementsTableName: FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
     })
-    runV6ToV7()
-  }
-
-  const afterV7Ver = readUserVersion(db)
-  if (afterV7Ver === 7 && FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 8) {
-    const runV7ToV8 = db.transaction(() => {
-      migrateFaProjectSchemaV7ToV8(db, {
-        documentTemplatesTableName: FA_PROJECT_TABLE_DOCUMENT_TEMPLATES
-      })
-    })
-    runV7ToV8()
-  }
-
-  const afterV8Ver = readUserVersion(db)
-  if (afterV8Ver === 8 && FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 9) {
-    const runV8ToV9 = db.transaction(() => {
-      migrateFaProjectSchemaV8ToV9(db, {
-        documentTemplatesTableName: FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
-        worldsTableName: FA_PROJECT_TABLE_WORLDS
-      })
-    })
-    runV8ToV9()
-  }
+  })
 
   const finalVer = readUserVersion(db)
   if (finalVer !== FA_PROJECT_USER_VERSION_SUPPORTED_MAX) {

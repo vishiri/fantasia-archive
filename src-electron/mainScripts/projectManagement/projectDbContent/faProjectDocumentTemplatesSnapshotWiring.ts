@@ -11,9 +11,14 @@ import {
   listFaProjectDocumentTemplateIds,
   updateFaProjectDocumentTemplateRow
 } from './faProjectDocumentTemplatesSqlWiring'
+import {
+  serializeFaProjectDocumentTemplateTitleSingularTranslationsJson
+} from 'app/src-electron/shared/faProjectDocumentTemplateTitleSingularTranslationsSchema'
 import { serializeFaProjectDocumentTemplateTitleTranslationsJson } from 'app/src-electron/shared/faProjectDocumentTemplateTitleTranslationsSchema'
 import { serializeFaProjectDocumentTemplateWorldAppendixTranslationsJson } from 'app/src-electron/shared/faProjectDocumentTemplateWorldAppendixTranslationsSchema'
-import { resolveFaProjectDocumentTemplateTitleForStorage } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager'
+import {
+  resolveFaProjectDocumentTemplateTitleForStorage
+} from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager'
 import { resolveFaProjectDocumentTemplateWorldAppendixForStorage } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateWorldAppendix_manager'
 import type { I_faProjectDocumentTemplateSnapshotItem } from 'app/types/I_faProjectDocumentTemplateDomain'
 
@@ -46,16 +51,21 @@ export function replaceFaProjectDocumentTemplatesSnapshot (
         item.icon ?? FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_ICON,
         FA_PROJECT_DOCUMENT_TEMPLATE_ICON_MAX_LENGTH
       )
-      const titleTranslationsJson = serializeFaProjectDocumentTemplateTitleTranslationsJson(
-        item.titleTranslations
+      const titlePluralTranslations = item.titlePluralTranslations
+      const titleSingularTranslations = item.titleSingularTranslations ?? {}
+      const titlePluralTranslationsJson = serializeFaProjectDocumentTemplateTitleTranslationsJson(
+        titlePluralTranslations
       )
-      const displayName = resolveFaProjectDocumentTemplateTitleForStorage(item.titleTranslations)
+      const titleSingularTranslationsJson =
+        serializeFaProjectDocumentTemplateTitleSingularTranslationsJson(titleSingularTranslations)
+      const displayName = resolveFaProjectDocumentTemplateTitleForStorage(titlePluralTranslations)
       if (existingIds.has(item.id)) {
         updateFaProjectDocumentTemplateRow(db, item.id, {
           displayName,
           icon,
           sortOrder: index,
-          titleTranslationsJson,
+          titlePluralTranslationsJson,
+          titleSingularTranslationsJson,
           worldAppendix,
           worldAppendixTranslationsJson
         })
@@ -66,7 +76,8 @@ export function replaceFaProjectDocumentTemplatesSnapshot (
         icon,
         id: item.id,
         sortOrder: index,
-        titleTranslationsJson,
+        titlePluralTranslationsJson,
+        titleSingularTranslationsJson,
         worldAppendix,
         worldAppendixTranslationsJson
       })

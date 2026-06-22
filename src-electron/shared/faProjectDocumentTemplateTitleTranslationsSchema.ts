@@ -6,7 +6,7 @@ import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLangu
 
 import { FA_PROJECT_NAME_MAX_LEN } from './faProjectConstants'
 import {
-  hasFaProjectDocumentTemplateTitleTranslation,
+  hasFaProjectDocumentTemplateTitlePluralTranslation,
   normalizeFaProjectDocumentTemplateTitles
 } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager'
 
@@ -40,9 +40,9 @@ export function parseFaProjectDocumentTemplateTitleTranslationsJson (
 }
 
 export function serializeFaProjectDocumentTemplateTitleTranslationsJson (
-  titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+  titlePluralTranslations: I_faProjectDocumentTemplateTitleTranslations
 ): string {
-  const normalized = normalizeFaProjectDocumentTemplateTitles(titleTranslations)
+  const normalized = normalizeFaProjectDocumentTemplateTitles(titlePluralTranslations)
   const serialized = JSON.stringify(normalized)
   if (serialized.length > FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_TRANSLATIONS_JSON_MAX_LENGTH) {
     throw new Error('Document template title translations exceed storage limit')
@@ -52,7 +52,7 @@ export function serializeFaProjectDocumentTemplateTitleTranslationsJson (
 
 export const faProjectDocumentTemplateTitleTranslationsSnapshotSchema =
   faProjectDocumentTemplateTitleTranslationsRecordSchema.superRefine((value, ctx) => {
-    if (!hasFaProjectDocumentTemplateTitleTranslation(value)) {
+    if (!hasFaProjectDocumentTemplateTitlePluralTranslation(value)) {
       ctx.addIssue({
         code: 'custom',
         message: 'At least one document template title translation is required'

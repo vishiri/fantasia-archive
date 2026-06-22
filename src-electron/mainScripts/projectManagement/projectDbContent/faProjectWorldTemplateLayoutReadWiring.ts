@@ -3,7 +3,7 @@ import type Database from 'better-sqlite3'
 import {
   mapFaProjectWorldTemplateGroupRow,
   mapFaProjectWorldTemplatePlacementForProjectSettingsRow
-} from '../functions/faProjectContentRowMap'
+} from '../faProjectContentRowMap_manager'
 import {
   FA_PROJECT_TABLE_DOCUMENTS,
   FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
@@ -39,7 +39,8 @@ export function listFaProjectWorldTemplateLayoutForProjectSettings (
 ): I_faProjectWorldTemplateLayoutForProjectSettings {
   const groupRows = db
     .prepare(
-      'SELECT id, world_id, display_name, root_sort_order, created_at_ms, updated_at_ms ' +
+      'SELECT id, world_id, display_name, display_name_translations_json, root_sort_order, ' +
+        'created_at_ms, updated_at_ms ' +
         `FROM ${FA_PROJECT_TABLE_WORLD_TEMPLATE_GROUPS} WHERE world_id = ? ` +
         'ORDER BY root_sort_order ASC, created_at_ms ASC, id ASC'
     )
@@ -48,8 +49,8 @@ export function listFaProjectWorldTemplateLayoutForProjectSettings (
   const placementRows = db
     .prepare(
       'SELECT p.id, p.world_id, p.document_template_id, p.group_id, p.root_sort_order, ' +
-        'p.group_sort_order, p.nickname, p.created_at_ms, p.updated_at_ms, ' +
-        't.display_name, t.world_appendix, t.icon ' +
+        'p.group_sort_order, p.nickname, p.nickname_translations_json, p.nickname_singular_translations_json, p.created_at_ms, ' +
+        'p.updated_at_ms, t.display_name, t.world_appendix, t.icon ' +
         `FROM ${FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS} p ` +
         `INNER JOIN ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES} t ON t.id = p.document_template_id ` +
         'WHERE p.world_id = ? ' +

@@ -1,20 +1,34 @@
 import { z } from 'zod'
 
-import { faProjectContentDisplayNameSchema, faProjectContentIdSchema, faProjectWorldTemplatePlacementNicknameSchema } from 'app/src-electron/shared/faProjectContentSchemaShared'
+import { faProjectContentIdSchema, faProjectWorldTemplatePlacementNicknameSchema } from 'app/src-electron/shared/faProjectContentSchemaShared'
+import { faProjectWorldTemplateGroupDisplayNameTranslationsSnapshotSchema } from 'app/src-electron/shared/faProjectWorldTemplateGroupDisplayNameTranslationsSchema'
+import { faProjectWorldTemplatePlacementNicknameSingularTranslationsSnapshotSchema } from 'app/src-electron/shared/faProjectWorldTemplatePlacementNicknameSingularTranslationsSchema'
+import { faProjectWorldTemplatePlacementNicknameTranslationsSnapshotSchema } from 'app/src-electron/shared/faProjectWorldTemplatePlacementNicknameTranslationsSchema'
 import type { I_faProjectWorldTemplateLayoutSnapshot } from 'app/types/I_faProjectWorldTemplateLayoutDomain'
 
-export const faProjectWorldTemplateGroupSnapshotItemSchema = z.object({
-  displayName: faProjectContentDisplayNameSchema,
+import {
+  resolveFaProjectWorldTemplateGroupDisplayNameForStorage
+} from 'app/src/scripts/projectWorlds/faProjectWorldTemplateGroupDisplayName_manager'
+import {
+  buildFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations,
+  resolveFaProjectWorldTemplatePlacementNicknameForStorage
+} from 'app/src/scripts/projectWorlds/faProjectWorldTemplatePlacementNickname_manager'
+
+const faProjectWorldTemplateGroupSnapshotItemInputSchema = z.object({
+  displayName: z.string().optional(),
+  displayNameTranslations: faProjectWorldTemplateGroupDisplayNameTranslationsSnapshotSchema,
   id: faProjectContentIdSchema,
   rootSortOrder: z.number().int().nonnegative()
 }).strict()
 
-export const faProjectWorldTemplatePlacementSnapshotItemSchema = z.object({
+const faProjectWorldTemplatePlacementSnapshotItemInputSchema = z.object({
   documentTemplateId: faProjectContentIdSchema,
   groupId: faProjectContentIdSchema.nullable(),
   groupSortOrder: z.number().int().nonnegative().nullable(),
   id: faProjectContentIdSchema,
-  nickname: faProjectWorldTemplatePlacementNicknameSchema.default(''),
+  nickname: faProjectWorldTemplatePlacementNicknameSchema.optional(),
+  nicknamePluralTranslations: faProjectWorldTemplatePlacementNicknameTranslationsSnapshotSchema,
+  nicknameSingularTranslations: faProjectWorldTemplatePlacementNicknameSingularTranslationsSnapshotSchema.optional(),
   rootSortOrder: z.number().int().nonnegative().nullable()
 }).strict().superRefine((value, ctx) => {
   if (value.groupId === null) {
@@ -35,12 +49,42 @@ export const faProjectWorldTemplatePlacementSnapshotItemSchema = z.object({
 })
 
 export const faProjectWorldTemplateLayoutSnapshotSchema = z.object({
-  groups: z.array(faProjectWorldTemplateGroupSnapshotItemSchema),
-  placements: z.array(faProjectWorldTemplatePlacementSnapshotItemSchema)
+  groups: z.array(faProjectWorldTemplateGroupSnapshotItemInputSchema),
+  placements: z.array(faProjectWorldTemplatePlacementSnapshotItemInputSchema)
 }).strict()
 
 export function parseFaProjectWorldTemplateLayoutSnapshot (
   payload: unknown
 ): I_faProjectWorldTemplateLayoutSnapshot {
-  return faProjectWorldTemplateLayoutSnapshotSchema.parse(payload)
+  const parsed = faProjectWorldTemplateLayoutSnapshotSchema.parse(payload)
+  return {
+    groups: parsed.groups.map((group) => {
+      const displayNameTranslations = group.displayNameTranslations
+      return {
+        displayName: resolveFaProjectWorldTemplateGroupDisplayNameForStorage(displayNameTranslations),
+        displayNameTranslations,
+        id: group.id,
+        rootSortOrder: group.rootSortOrder
+      }
+    }),
+    placements: parsed.placements.map((placement) => {
+      const nicknamePluralTranslations = placement.nicknamePluralTranslations
+      const nicknameSingularTranslations = placement.nicknameSingularTranslations ?? {}
+      return {
+        documentTemplateId: placement.documentTemplateId,
+        groupId: placement.groupId,
+        groupSortOrder: placement.groupSortOrder,
+        id: placement.id,
+        nickname: resolveFaProjectWorldTemplatePlacementNicknameForStorage(
+          buildFaProjectWorldTemplatePlacementNicknameSingularPluralTranslations({
+            nicknamePluralTranslations,
+            nicknameSingularTranslations
+          })
+        ),
+        nicknamePluralTranslations,
+        nicknameSingularTranslations,
+        rootSortOrder: placement.rootSortOrder
+      }
+    })
+  }
 }

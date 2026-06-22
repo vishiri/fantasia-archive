@@ -10,6 +10,7 @@ import {
   parseFaProjectContentPlainRecord
 } from 'app/src-electron/shared/faProjectContentSchemaShared'
 
+import { parseFaProjectDocumentTemplateTitleSingularTranslationsSnapshot } from 'app/src-electron/shared/faProjectDocumentTemplateTitleSingularTranslationsSchema'
 import { parseFaProjectDocumentTemplateTitleTranslationsSnapshot } from 'app/src-electron/shared/faProjectDocumentTemplateTitleTranslationsSchema'
 import { parseFaProjectDocumentTemplateWorldAppendixTranslationsSnapshot } from 'app/src-electron/shared/faProjectDocumentTemplateWorldAppendixTranslationsSchema'
 import type {
@@ -79,7 +80,8 @@ export function parseFaProjectDocumentTemplateUpdatePayload (
 export const faProjectDocumentTemplateSnapshotItemSchema = z.object({
   icon: faProjectDocumentTemplateIconSchema.optional(),
   id: faProjectContentIdSchema,
-  titleTranslations: z.unknown(),
+  titlePluralTranslations: z.unknown(),
+  titleSingularTranslations: z.unknown().optional(),
   worldAppendixTranslations: z.unknown().optional()
 }).strict()
 
@@ -96,7 +98,15 @@ export function parseFaProjectDocumentTemplatesSnapshotPayload (
   return parsed.items.map((item) => {
     const snapshotItem: I_faProjectDocumentTemplateSnapshotItem = {
       id: item.id,
-      titleTranslations: parseFaProjectDocumentTemplateTitleTranslationsSnapshot(item.titleTranslations)
+      titlePluralTranslations: parseFaProjectDocumentTemplateTitleTranslationsSnapshot(
+        item.titlePluralTranslations
+      )
+    }
+    if (item.titleSingularTranslations !== undefined) {
+      snapshotItem.titleSingularTranslations =
+        parseFaProjectDocumentTemplateTitleSingularTranslationsSnapshot(
+          item.titleSingularTranslations
+        )
     }
     if (item.worldAppendixTranslations !== undefined) {
       snapshotItem.worldAppendixTranslations =

@@ -47,18 +47,18 @@ export function updateFaProjectDocumentTemplate (
     displayName?: string
     icon?: string
     sortOrder?: number
-    titleTranslationsJson?: string
+    titlePluralTranslationsJson?: string
     worldAppendix?: string
     worldAppendixTranslationsJson?: string
   } = {}
   if (patch.displayName !== undefined) {
     rowPatch.displayName = patch.displayName
   }
-  if (patch.titleTranslations !== undefined) {
-    rowPatch.titleTranslationsJson = serializeFaProjectDocumentTemplateTitleTranslationsJson(
-      patch.titleTranslations
+  if (patch.titlePluralTranslations !== undefined) {
+    rowPatch.titlePluralTranslationsJson = serializeFaProjectDocumentTemplateTitleTranslationsJson(
+      patch.titlePluralTranslations
     )
-    rowPatch.displayName = resolveFaProjectDocumentTemplateTitleForStorage(patch.titleTranslations)
+    rowPatch.displayName = resolveFaProjectDocumentTemplateTitleForStorage(patch.titlePluralTranslations)
   }
   if (patch.worldAppendix !== undefined) {
     rowPatch.worldAppendix = coerceFaProjectDocumentTemplateOptionalTextForStorage(
@@ -110,7 +110,8 @@ export function listFaProjectDocumentTemplatesForProjectSettings (
   const documentCounts = listFaProjectDocumentTemplateDocumentCounts(db)
   const items = listFaProjectDocumentTemplateRows(db).map((template) => ({
     createdAtMs: template.createdAtMs,
-    titleTranslations: template.titleTranslations,
+    titlePluralTranslations: template.titlePluralTranslations,
+    titleSingularTranslations: template.titleSingularTranslations,
     documentCount: documentCounts[template.id] ?? 0,
     icon: template.icon,
     id: template.id,

@@ -9,7 +9,7 @@ import {
   faProjectContentIdSchema,
   parseFaProjectContentPlainRecord
 } from 'app/src-electron/shared/faProjectContentSchemaShared'
-import { faProjectWorldTemplateLayoutSnapshotSchema } from 'app/src-electron/shared/faProjectWorldTemplateLayoutSchema'
+import { faProjectWorldTemplateLayoutSnapshotSchema, parseFaProjectWorldTemplateLayoutSnapshot } from 'app/src-electron/shared/faProjectWorldTemplateLayoutSchema'
 import { parseFaProjectWorldDisplayNameTranslationsSnapshot } from 'app/src-electron/shared/faProjectWorldDisplayNameTranslationsSchema'
 import type {
   I_faProjectWorldCreateInput,
@@ -93,7 +93,9 @@ export function parseFaProjectWorldsSnapshotPayload (
         item.displayNameTranslations
       ),
       id: item.id,
-      templateLayout: item.templateLayout
+      templateLayout: item.templateLayout === undefined
+        ? undefined
+        : parseFaProjectWorldTemplateLayoutSnapshot(item.templateLayout)
     }
   })
 }

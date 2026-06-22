@@ -142,12 +142,13 @@ function makeProjectContentTestDb (): {
               id: args[0] as string,
               display_name: args[1] as string,
               title_translations_json: args[2] as string,
-              sort_order: args[3] as number,
-              world_appendix: args[4] as string,
-              world_appendix_translations_json: args[5] as string,
-              icon: args[6] as string,
-              created_at_ms: args[7] as number,
-              updated_at_ms: args[8] as number
+              title_singular_translations_json: args[3] as string,
+              sort_order: args[4] as number,
+              world_appendix: args[5] as string,
+              world_appendix_translations_json: args[6] as string,
+              icon: args[7] as string,
+              created_at_ms: args[8] as number,
+              updated_at_ms: args[9] as number
             }
             tables.document_templates.set(row.id as string, row)
           }
@@ -199,11 +200,12 @@ function makeProjectContentTestDb (): {
         return {
           run: (...args: Array<string | number>) => {
             const row: T_row = {
-              created_at_ms: args[4] as number,
+              created_at_ms: args[5] as number,
               display_name: args[2] as string,
+              display_name_translations_json: args[3] as string,
               id: args[0] as string,
-              root_sort_order: args[3] as number,
-              updated_at_ms: args[5] as number,
+              root_sort_order: args[4] as number,
+              updated_at_ms: args[6] as number,
               world_id: args[1] as string
             }
             tables.world_template_groups.set(row.id as string, row)
@@ -214,14 +216,15 @@ function makeProjectContentTestDb (): {
         return {
           run: (...args: Array<string | number | null>) => {
             const row: T_row = {
-              created_at_ms: args[7] as number,
+              created_at_ms: args[8] as number,
               document_template_id: args[2] as string,
               group_id: args[3] as string | null,
               group_sort_order: args[5] as number | null,
               id: args[0] as string,
               nickname: args[6] as string,
+              nickname_translations_json: args[7] as string,
               root_sort_order: args[4] as number | null,
-              updated_at_ms: args[8] as number,
+              updated_at_ms: args[9] as number,
               world_id: args[1] as string
             }
             tables.world_template_placements.set(row.id as string, row)
@@ -328,6 +331,9 @@ function makeProjectContentTestDb (): {
             }
             if (normalized.includes('title_translations_json = ?')) {
               patch.title_translations_json = args[argIdx++] as string
+            }
+            if (normalized.includes('title_singular_translations_json = ?')) {
+              patch.title_singular_translations_json = args[argIdx++] as string
             }
             if (normalized.includes('world_appendix = ?')) {
               patch.world_appendix = args[argIdx++] as string
@@ -1135,6 +1141,7 @@ test('Test that replaceFaProjectWorldTemplateLayoutSnapshot persists layout rows
     groups: [
       {
         displayName: 'Creatures',
+        displayNameTranslations: { 'en-US': 'Creatures' },
         id: groupId,
         rootSortOrder: 0
       }
@@ -1146,7 +1153,9 @@ test('Test that replaceFaProjectWorldTemplateLayoutSnapshot persists layout rows
         groupSortOrder: null,
         id: placementId,
         rootSortOrder: 1,
-        nickname: ''
+        nickname: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {},
       }
     ]
   })
@@ -1175,7 +1184,9 @@ test('Test that replaceFaProjectWorldTemplateLayoutSnapshot throws on invalid pl
         groupSortOrder: 0,
         id: placementId,
         rootSortOrder: 0,
-        nickname: ''
+        nickname: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {},
       }
     ]
   })).toThrow(/Root template placement/)
@@ -1188,7 +1199,9 @@ test('Test that replaceFaProjectWorldTemplateLayoutSnapshot throws on invalid pl
         groupSortOrder: null,
         id: placementId,
         rootSortOrder: null,
-        nickname: ''
+        nickname: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {},
       }
     ]
   })).toThrow(/Grouped template placement/)
@@ -1212,7 +1225,9 @@ test('Test that replaceFaProjectWorldTemplateLayoutSnapshot validates groups and
         groupSortOrder: 0,
         id: placementId,
         rootSortOrder: null,
-        nickname: ''
+        nickname: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {},
       }
     ]
   })).toThrow(/unknown group id/)
@@ -1220,6 +1235,7 @@ test('Test that replaceFaProjectWorldTemplateLayoutSnapshot validates groups and
     groups: [
       {
         displayName: '   ',
+        displayNameTranslations: { 'en-US': '   ' },
         id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
         rootSortOrder: 0
       }
@@ -1242,6 +1258,7 @@ test('Test that replaceFaProjectWorldTemplateLayoutSnapshot persists grouped pla
     groups: [
       {
         displayName: 'Creatures',
+        displayNameTranslations: { 'en-US': 'Creatures' },
         id: groupId,
         rootSortOrder: 0
       }
@@ -1253,7 +1270,9 @@ test('Test that replaceFaProjectWorldTemplateLayoutSnapshot persists grouped pla
         groupSortOrder: 0,
         id: placementId,
         rootSortOrder: null,
-        nickname: ''
+        nickname: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {},
       }
     ]
   })
@@ -1278,6 +1297,7 @@ test('Test that replaceFaProjectWorldsSnapshot persists templateLayout on each w
         groups: [
           {
             displayName: 'Group',
+            displayNameTranslations: { 'en-US': 'Group' },
             id: groupId,
             rootSortOrder: 0
           }
@@ -1289,7 +1309,9 @@ test('Test that replaceFaProjectWorldsSnapshot persists templateLayout on each w
             groupSortOrder: null,
             id: placementId,
             rootSortOrder: 0,
-            nickname: ''
+            nickname: '',
+            nicknamePluralTranslations: {},
+            nicknameSingularTranslations: {},
           }
         ]
       }
@@ -1322,7 +1344,9 @@ test('Test that listFaProjectWorldsForProjectSettings includes placement documen
         groupSortOrder: null,
         id: '6ba7b811-9dad-11d1-80b4-00c04fd430c8',
         rootSortOrder: 0,
-        nickname: ''
+        nickname: '',
+        nicknamePluralTranslations: {},
+        nicknameSingularTranslations: {},
       }
     ]
   })
@@ -1361,17 +1385,18 @@ test('Test that updateFaProjectDocumentTemplate persists extended fields', () =>
 
 /**
  * updateFaProjectDocumentTemplate
- * Persists titleTranslations and worldAppendixTranslations patches.
+ * Persists titlePluralTranslations and worldAppendixTranslations patches.
  */
 test('Test that updateFaProjectDocumentTemplate persists translation map patches', () => {
   const { db } = makeProjectContentTestDb()
   const template = createFaProjectDocumentTemplate(db as never, { displayName: 'Sheet' })
   const updated = updateFaProjectDocumentTemplate(db as never, template.id, {
-    titleTranslations: { 'en-US': 'Renamed template' },
+    titlePluralTranslations: { 'en-US': 'Renamed template' },
+    titleSingularTranslations: {},
     worldAppendixTranslations: { 'en-US': ' appendix' }
   })
   expect(updated.displayName).toBe('Renamed template')
-  expect(updated.titleTranslations).toEqual({ 'en-US': 'Renamed template' })
+  expect(updated.titlePluralTranslations).toEqual({ 'en-US': 'Renamed template' })
   expect(updated.worldAppendix).toBe('appendix')
   expect(updated.worldAppendixTranslations).toEqual({ 'en-US': 'appendix' })
 })
@@ -1423,12 +1448,14 @@ test('Test that replaceFaProjectDocumentTemplatesSnapshot replaces the ordered t
     {
       icon: 'star',
       id: first.id,
-      titleTranslations: { 'en-US': 'Keep renamed' },
+      titlePluralTranslations: { 'en-US': 'Keep renamed' },
+      titleSingularTranslations: {},
       worldAppendixTranslations: { 'en-US': 'appendix' }
     },
     {
       id: SAMPLE_TEMPLATE_UUID,
-      titleTranslations: { 'en-US': 'Brand new' }
+      titlePluralTranslations: { 'en-US': 'Brand new' },
+      titleSingularTranslations: {},
     }
   ])
   expect(tables.document_templates.has(second.id)).toBe(false)

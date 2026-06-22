@@ -116,7 +116,8 @@ test('Test that project content schema parsers accept valid payloads', () => {
       {
         icon: 'person',
         id: SAMPLE_UUID,
-        titleTranslations: { 'en-US': 'Character' },
+        titlePluralTranslations: { 'en-US': 'Character' },
+        titleSingularTranslations: {},
         worldAppendixTranslations: { 'en-US': 'notes' }
       }
     ]

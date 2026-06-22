@@ -23,7 +23,7 @@ import type { I_faSqlDocumentTemplateRow } from 'app/types/I_faProjectContentRow
 const DOCUMENT_TEMPLATE_ENTITY_LABEL = 'Document template'
 
 const SQL_SELECT_DOCUMENT_TEMPLATE_COLUMNS =
-  'id, display_name, title_translations_json, sort_order, world_appendix, world_appendix_translations_json, icon, created_at_ms, updated_at_ms'
+  'id, display_name, title_translations_json, title_singular_translations_json, sort_order, world_appendix, world_appendix_translations_json, icon, created_at_ms, updated_at_ms'
 
 function assertDocumentTemplateRowExists (
   row: I_faSqlDocumentTemplateRow | undefined,
@@ -100,12 +100,13 @@ export function insertFaProjectDocumentTemplate (
   )
   db.prepare(
     `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES} ` +
-      '(id, display_name, title_translations_json, sort_order, world_appendix, world_appendix_translations_json, icon, created_at_ms, updated_at_ms) ' +
-      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      '(id, display_name, title_translations_json, title_singular_translations_json, sort_order, world_appendix, world_appendix_translations_json, icon, created_at_ms, updated_at_ms) ' +
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(
     id,
     displayName,
     buildFaProjectDocumentTemplateTitleTranslationsJsonFromDisplayName(displayName),
+    '{}',
     sortOrder,
     worldAppendix,
     buildFaProjectDocumentTemplateWorldAppendixTranslationsJsonFromText(worldAppendix),
@@ -129,12 +130,13 @@ export function insertFaProjectDocumentTemplateWithId (
   const nowMs = Date.now()
   db.prepare(
     `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES} ` +
-      '(id, display_name, title_translations_json, sort_order, world_appendix, world_appendix_translations_json, icon, created_at_ms, updated_at_ms) ' +
-      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      '(id, display_name, title_translations_json, title_singular_translations_json, sort_order, world_appendix, world_appendix_translations_json, icon, created_at_ms, updated_at_ms) ' +
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(
     fields.id,
     fields.displayName,
-    fields.titleTranslationsJson,
+    fields.titlePluralTranslationsJson,
+    fields.titleSingularTranslationsJson,
     fields.sortOrder,
     fields.worldAppendix,
     fields.worldAppendixTranslationsJson,
@@ -158,7 +160,8 @@ export function updateFaProjectDocumentTemplateRow (
     displayName?: string
     icon?: string
     sortOrder?: number
-    titleTranslationsJson?: string
+    titlePluralTranslationsJson?: string
+    titleSingularTranslationsJson?: string
     worldAppendix?: string
     worldAppendixTranslationsJson?: string
   }
@@ -177,9 +180,13 @@ export function updateFaProjectDocumentTemplateRow (
     sets.push('display_name = ?')
     values.push(patch.displayName)
   }
-  if (patch.titleTranslationsJson !== undefined) {
+  if (patch.titlePluralTranslationsJson !== undefined) {
     sets.push('title_translations_json = ?')
-    values.push(patch.titleTranslationsJson)
+    values.push(patch.titlePluralTranslationsJson)
+  }
+  if (patch.titleSingularTranslationsJson !== undefined) {
+    sets.push('title_singular_translations_json = ?')
+    values.push(patch.titleSingularTranslationsJson)
   }
   if (patch.worldAppendix !== undefined) {
     sets.push('world_appendix = ?')

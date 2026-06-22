@@ -1,24 +1,39 @@
+import { parseFaProjectDocumentTemplateTitleSingularTranslationsJson } from 'app/src-electron/shared/faProjectDocumentTemplateTitleSingularTranslationsSchema'
 import { parseFaProjectDocumentTemplateTitleTranslationsJson } from 'app/src-electron/shared/faProjectDocumentTemplateTitleTranslationsSchema'
 import { parseFaProjectDocumentTemplateWorldAppendixTranslationsJson } from 'app/src-electron/shared/faProjectDocumentTemplateWorldAppendixTranslationsSchema'
 import { parseFaProjectWorldDisplayNameTranslationsJson } from 'app/src-electron/shared/faProjectWorldDisplayNameTranslationsSchema'
+import { parseFaProjectWorldTemplateGroupDisplayNameTranslationsJson } from 'app/src-electron/shared/faProjectWorldTemplateGroupDisplayNameTranslationsSchema'
+import { parseFaProjectWorldTemplatePlacementNicknameSingularTranslationsJson } from 'app/src-electron/shared/faProjectWorldTemplatePlacementNicknameSingularTranslationsSchema'
+import { parseFaProjectWorldTemplatePlacementNicknameTranslationsJson } from 'app/src-electron/shared/faProjectWorldTemplatePlacementNicknameTranslationsSchema'
 
 import {
   createMapFaProjectDocumentTemplateRow,
-  createMapFaProjectWorldRow
+  createMapFaProjectWorldRow,
+  createMapFaProjectWorldTemplateGroupRow,
+  createMapFaProjectWorldTemplatePlacementForProjectSettingsRow
 } from './functions/faProjectContentRowMap'
 
 export {
   mapFaProjectDocumentRow,
-  mapFaProjectNamedEntityRow,
-  mapFaProjectWorldTemplateGroupRow,
-  mapFaProjectWorldTemplatePlacementForProjectSettingsRow
+  mapFaProjectNamedEntityRow
 } from './functions/faProjectContentRowMap'
 
 export const mapFaProjectDocumentTemplateRow = createMapFaProjectDocumentTemplateRow({
-  parseTitleTranslationsJson: parseFaProjectDocumentTemplateTitleTranslationsJson,
+  parseTitlePluralTranslationsJson: parseFaProjectDocumentTemplateTitleTranslationsJson,
+  parseTitleSingularTranslationsJson: parseFaProjectDocumentTemplateTitleSingularTranslationsJson,
   parseWorldAppendixTranslationsJson: parseFaProjectDocumentTemplateWorldAppendixTranslationsJson
 })
 
 export const mapFaProjectWorldRow = createMapFaProjectWorldRow({
   parseDisplayNameTranslationsJson: parseFaProjectWorldDisplayNameTranslationsJson
 })
+
+export const mapFaProjectWorldTemplateGroupRow = createMapFaProjectWorldTemplateGroupRow({
+  parseDisplayNameTranslationsJson: parseFaProjectWorldTemplateGroupDisplayNameTranslationsJson
+})
+
+export const mapFaProjectWorldTemplatePlacementForProjectSettingsRow =
+  createMapFaProjectWorldTemplatePlacementForProjectSettingsRow({
+    parseNicknamePluralTranslationsJson: parseFaProjectWorldTemplatePlacementNicknameTranslationsJson,
+    parseNicknameSingularTranslationsJson: parseFaProjectWorldTemplatePlacementNicknameSingularTranslationsJson
+  })
