@@ -2,6 +2,7 @@ export default {
   title: 'Configurações do projeto',
   closeButton: 'Fechar sem salvar',
   saveButton: 'Salvar configurações',
+  saveWithoutClosingButton: 'Salvar sem fechar',
   saveErrors: {
     tooltipIntro: 'Não foi possível salvar. Foram encontrados os seguintes erros:',
     bulletWorldNameRequired: 'O nome do mundo é obrigatório para «{worldLabel}».',

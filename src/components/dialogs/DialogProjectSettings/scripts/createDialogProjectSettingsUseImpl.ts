@@ -79,6 +79,7 @@ export function useDialogProjectSettingsImpl (
     removeDocumentTemplate: actions.removeDocumentTemplate,
     removeWorld: actions.removeWorld,
     saveAndCloseDialog: actions.saveAndCloseDialog,
+    saveWithoutClosingDialog: actions.saveWithoutClosingDialog,
     saveValidationErrorsTooltip: validation.saveValidationErrorsTooltip,
     selectedCategoryTab,
     updateDocumentTemplateIcon: actions.updateDocumentTemplateIcon,

@@ -2,6 +2,7 @@ export default {
   title: 'Prosjektinnstillinger',
   closeButton: 'Lukk uten å lagre',
   saveButton: 'Lagre innstillinger',
+  saveWithoutClosingButton: 'Lagre uten å lukke',
   saveErrors: {
     tooltipIntro: 'Kan ikke lagre. Følgende feil ble funnet:',
     bulletWorldNameRequired: 'Verdensnavn er påkrevd for «{worldLabel}».',

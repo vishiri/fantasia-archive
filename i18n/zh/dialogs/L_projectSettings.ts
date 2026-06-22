@@ -2,6 +2,7 @@ export default {
   title: '项目设置',
   closeButton: '关闭而不保存',
   saveButton: '保存设置',
+  saveWithoutClosingButton: '保存而不关闭',
   saveErrors: {
     tooltipIntro: '无法保存。发现以下错误：',
     bulletWorldNameRequired: '“{worldLabel}” 需要世界名称。',

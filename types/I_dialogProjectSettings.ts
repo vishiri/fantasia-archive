@@ -43,6 +43,7 @@ export type T_dialogProjectSettingsUseHookDeps = {
     removeDocumentTemplate: (id: string) => void
     removeWorld: (id: string) => void
     saveAndCloseDialog: () => Promise<void>
+    saveWithoutClosingDialog: () => Promise<void>
     updateDocumentTemplateTitleTranslations: (
       id: string,
       titleTranslations: I_faLocaleSingularPluralTranslations

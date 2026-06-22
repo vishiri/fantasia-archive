@@ -2,6 +2,7 @@ export default {
   title: 'Projektinställningar',
   closeButton: 'Stäng utan att spara',
   saveButton: 'Spara inställningar',
+  saveWithoutClosingButton: 'Spara utan att stänga',
   saveErrors: {
     tooltipIntro: 'Kan inte spara. Följande fel hittades:',
     bulletWorldNameRequired: 'Världsnamn krävs för «{worldLabel}».',

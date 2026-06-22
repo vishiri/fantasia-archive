@@ -2,6 +2,7 @@ export default {
   title: 'Настройки проекта',
   closeButton: 'Закрыть без сохранения',
   saveButton: 'Сохранить настройки',
+  saveWithoutClosingButton: 'Сохранить без закрытия',
   saveErrors: {
     tooltipIntro: 'Не удалось сохранить. Обнаружены следующие ошибки:',
     bulletWorldNameRequired: 'Для «{worldLabel}» требуется имя мира.',

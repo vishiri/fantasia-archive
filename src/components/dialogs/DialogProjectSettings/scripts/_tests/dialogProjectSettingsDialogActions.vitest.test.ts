@@ -444,3 +444,75 @@ test('Test that saveAndCloseDialog no-ops when local document templates are null
   await saveAndCloseDialog()
   expect(runFaActionAwaitMock).not.toHaveBeenCalled()
 })
+
+/**
+ * createDialogProjectSettingsDialogActions
+ * saveWithoutClosingDialog dispatches saveProjectSettings but keeps the dialog open.
+ */
+test('Test that saveWithoutClosingDialog persists without closing the dialog', async () => {
+  const bindings = buildActionBindings({
+    dialogModel: ref(true),
+    documentName: ref('ProjectSettings'),
+    localSettings: ref<I_faProjectSettingsRoot | null>({
+      projectName: 'Realm',
+      schemaVersion: 1
+    }),
+    localWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>([
+      {
+        color: '',
+        colorPallete: '',
+        displayNameTranslations: { 'en-US': 'Alpha' },
+        documentCount: 0,
+        templateLayout: {
+          groups: [],
+          placements: []
+        },
+        id: worldAId
+      }
+    ]),
+    localDocumentTemplates: ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([])
+  })
+
+  const { saveWithoutClosingDialog } = createDialogProjectSettingsDialogActions(bindings)
+
+  await saveWithoutClosingDialog()
+
+  expect(runFaActionAwaitMock).toHaveBeenCalledOnce()
+  expect(bindings.dialogModel.value).toBe(true)
+})
+
+/**
+ * createDialogProjectSettingsDialogActions
+ * saveWithoutClosingDialog dispatches saveProjectSettings but keeps the dialog open.
+ */
+test('Test that saveWithoutClosingDialog persists without closing the dialog', async () => {
+  const bindings = buildActionBindings({
+    dialogModel: ref(true),
+    documentName: ref('ProjectSettings'),
+    localSettings: ref<I_faProjectSettingsRoot | null>({
+      projectName: 'Realm',
+      schemaVersion: 1
+    }),
+    localWorlds: ref<I_dialogProjectSettingsWorldDraft[] | null>([
+      {
+        color: '',
+        colorPallete: '',
+        displayNameTranslations: { 'en-US': 'Alpha' },
+        documentCount: 0,
+        templateLayout: {
+          groups: [],
+          placements: []
+        },
+        id: worldAId
+      }
+    ]),
+    localDocumentTemplates: ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([])
+  })
+
+  const { saveWithoutClosingDialog } = createDialogProjectSettingsDialogActions(bindings)
+
+  await saveWithoutClosingDialog()
+
+  expect(runFaActionAwaitMock).toHaveBeenCalledOnce()
+  expect(bindings.dialogModel.value).toBe(true)
+})

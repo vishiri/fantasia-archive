@@ -2,6 +2,7 @@ export default {
   title: 'Ρυθμίσεις έργου',
   closeButton: 'Κλείσιμο χωρίς αποθήκευση',
   saveButton: 'Αποθήκευση ρυθμίσεων',
+  saveWithoutClosingButton: 'Αποθήκευση χωρίς κλείσιμο',
   saveErrors: {
     tooltipIntro: 'Δεν είναι δυνατή η αποθήκευση. Βρέθηκαν τα ακόλουθα σφάλματα:',
     bulletWorldNameRequired: 'Το όνομα κόσμου απαιτείται για «{worldLabel}».',

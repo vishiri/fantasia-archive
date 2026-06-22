@@ -2,6 +2,7 @@ export default {
   title: 'Paramètres du projet',
   closeButton: 'Fermer sans enregistrer',
   saveButton: 'Enregistrer les paramètres',
+  saveWithoutClosingButton: 'Enregistrer sans fermer',
   saveErrors: {
     tooltipIntro: "Impossible d'enregistrer. Les erreurs suivantes ont été détectées :",
     bulletWorldNameRequired: 'Le nom du monde est requis pour « {worldLabel} ».',

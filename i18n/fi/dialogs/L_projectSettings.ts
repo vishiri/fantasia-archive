@@ -2,6 +2,7 @@ export default {
   title: 'Projektiasetukset',
   closeButton: 'Sulje tallentamatta',
   saveButton: 'Tallenna asetukset',
+  saveWithoutClosingButton: 'Tallenna sulkematta',
   saveErrors: {
     tooltipIntro: 'Tallennus epäonnistui. Seuraavat virheet löytyivät:',
     bulletWorldNameRequired: 'Maailman nimi vaaditaan kohteelle «{worldLabel}».',

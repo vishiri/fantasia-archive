@@ -2,6 +2,7 @@ export default {
   title: 'Параметри проекту',
   closeButton: 'Закрити без збереження',
   saveButton: 'Зберегти налаштування',
+  saveWithoutClosingButton: 'Зберегти без закриття',
   saveErrors: {
     tooltipIntro: 'Не вдалося зберегти. Виявлено такі помилки:',
     bulletWorldNameRequired: 'Для «{worldLabel}» потрібна назва світу.',

@@ -2,6 +2,7 @@ export default {
   title: 'Configuración del proyecto',
   closeButton: 'Cerrar sin guardar',
   saveButton: 'Guardar configuración',
+  saveWithoutClosingButton: 'Guardar sin cerrar',
   saveErrors: {
     tooltipIntro: 'No se puede guardar. Se encontraron los siguientes errores:',
     bulletWorldNameRequired: 'El nombre del mundo es obligatorio para «{worldLabel}».',

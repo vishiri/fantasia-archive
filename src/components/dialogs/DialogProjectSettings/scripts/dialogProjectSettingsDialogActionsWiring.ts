@@ -7,7 +7,10 @@ import type { Ref } from 'app/types/I_vueCompositionRefs'
 
 import { createDialogProjectSettingsDraftMutationHandlers } from './dialogProjectSettingsDraftMutationHandlersWiring'
 import { hydrateDialogProjectSettingsDrafts } from './dialogProjectSettingsDialogHydrateWiring'
-import { saveDialogProjectSettingsDraftAndClose } from './dialogProjectSettingsDialogSaveWiring'
+import {
+  saveDialogProjectSettingsDraftAndClose,
+  saveDialogProjectSettingsDraftWithoutClosing
+} from './dialogProjectSettingsDialogSaveWiring'
 
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import type { I_faLocaleSingularPluralTranslations } from 'app/types/I_faLocaleSingularPluralTranslations'
@@ -38,6 +41,7 @@ export function createDialogProjectSettingsDialogActions (deps: {
     removeDocumentTemplate: (id: string) => void
     removeWorld: (id: string) => void
     saveAndCloseDialog: () => Promise<void>
+    saveWithoutClosingDialog: () => Promise<void>
     updateDocumentTemplateIcon: (id: string, icon: string) => void
     updateDocumentTemplateTitleTranslations: (
       id: string,
@@ -94,9 +98,18 @@ export function createDialogProjectSettingsDialogActions (deps: {
     })
   }
 
+  async function saveWithoutClosingDialog (): Promise<void> {
+    await saveDialogProjectSettingsDraftWithoutClosing(deps, {
+      localDocumentTemplates,
+      localSettings,
+      localWorlds
+    })
+  }
+
   return {
     openDialog,
     saveAndCloseDialog,
+    saveWithoutClosingDialog,
     ...mutationHandlers
   }
 }

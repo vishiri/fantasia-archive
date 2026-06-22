@@ -2,6 +2,7 @@ export default {
   title: 'プロジェクト設定',
   closeButton: '保存せずに閉じる',
   saveButton: '設定を保存',
+  saveWithoutClosingButton: '閉じずに保存',
   saveErrors: {
     tooltipIntro: '保存できません。次のエラーが見つかりました:',
     bulletWorldNameRequired: '"{worldLabel}" のワールド名は必須です。',

@@ -63,7 +63,16 @@
           data-test-locator="dialogProjectSettings-button-close"
         />
 
-        <div class="dialogProjectSettings__saveRow row items-center no-wrap">
+        <div class="dialogProjectSettings__saveRow row items-center no-wrap q-gutter-sm">
+          <q-btn
+            outline
+            :disable="isSaveDisabled"
+            :label="$t('dialogs.projectSettings.saveWithoutClosingButton')"
+            color="primary-bright"
+            data-test-locator="dialogProjectSettings-button-saveWithoutClosing"
+            @click="void saveWithoutClosingDialog()"
+          />
+
           <q-btn
             outline
             :disable="isSaveDisabled"
@@ -137,6 +146,7 @@ const {
   removeDocumentTemplate,
   removeWorld,
   saveAndCloseDialog,
+  saveWithoutClosingDialog,
   saveValidationErrorsTooltip,
   selectedCategoryTab,
   updateDocumentTemplateTitleTranslations,

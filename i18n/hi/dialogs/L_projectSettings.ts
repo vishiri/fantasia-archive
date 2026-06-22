@@ -2,6 +2,7 @@ export default {
   title: 'परियोजना सेटिंग्स',
   closeButton: 'बिना सहेजे बंद करें',
   saveButton: 'सेटिंग्स सहेजें',
+  saveWithoutClosingButton: 'बिना बंद किए सहेजें',
   saveErrors: {
     tooltipIntro: 'सहेजा नहीं जा सका। निम्नलिखित त्रुटियाँ मिलीं:',
     bulletWorldNameRequired: '"{worldLabel}" के लिए विश्व का नाम आवश्यक है।',

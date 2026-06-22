@@ -2,6 +2,7 @@ export default {
   title: 'إعدادات المشروع',
   closeButton: 'إغلاق بدون حفظ',
   saveButton: 'حفظ الإعدادات',
+  saveWithoutClosingButton: 'حفظ دون إغلاق',
   saveErrors: {
     tooltipIntro: 'تعذر الحفظ. تم العثور على الأخطاء التالية:',
     bulletWorldNameRequired: 'اسم العالم مطلوب لـ "{worldLabel}".',

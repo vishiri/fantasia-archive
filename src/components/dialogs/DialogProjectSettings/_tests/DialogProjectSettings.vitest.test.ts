@@ -232,6 +232,53 @@ test('Test that DialogProjectSettings save button persists and closes the dialog
 
 /**
  * DialogProjectSettings
+ * Save without closing dispatches saveProjectSettings and keeps the dialog open.
+ */
+test('Test that DialogProjectSettings save without closing button persists and stays open', async () => {
+  const runFaActionAwait = vi.mocked(
+    (await import('app/src/scripts/actionManager/faActionManagerRun_manager')).runFaActionAwait
+  )
+
+  const w = mount(DialogProjectSettings, {
+    global: mergeDialogProjectSettingsVitestGlobal({
+      stubs: dialogProjectSettingsStubs
+    }),
+    props: {
+      directInput: 'ProjectSettings',
+      directSettingsSnapshot: {
+        projectName: 'Snapshot Name',
+        schemaVersion: 1
+      }
+    }
+  })
+
+  await flushPromises()
+
+  await w.find('[data-test-locator="dialogProjectSettings-button-saveWithoutClosing"]').trigger('click')
+  await flushPromises()
+
+  expect(runFaActionAwait).toHaveBeenCalledWith('saveProjectSettings', {
+    documentTemplates: [],
+    settings: {
+      projectName: 'Snapshot Name'
+    },
+    worlds: [
+      {
+        color: '#808080',
+        displayNameTranslations: { 'en-US': 'Stub' },
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        templateLayout: {
+          groups: [],
+          placements: []
+        }
+      }
+    ]
+  })
+  expect(w.find('[data-test-locator="dialogProjectSettings-title"]').exists()).toBe(true)
+})
+
+/**
+ * DialogProjectSettings
  * Editing the project name updates the local draft used for save.
  */
 test('Test that DialogProjectSettings updates the local project name draft', async () => {
