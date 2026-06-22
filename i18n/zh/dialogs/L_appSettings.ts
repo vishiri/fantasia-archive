@@ -283,6 +283,11 @@ export default {
       description: '确定文本编辑器在非全屏模式下是否有高度限制。',
       tags: '文本区域高度、长文本、展开编辑器、滚动编辑器',
     },
+    logFullActivityPayload: {
+      title: '记录完整活动负载',
+      description: '启用后，活动将记录完整负载。在需要精确记录结果的深度调试时可能有用。',
+      tags: '调试、故障排除、DevTools、负载、活动、日志',
+    },
     noProjectName: {
       title: '在树中隐藏项目名称',
       description: '确定项目名称是否完全显示在层次结构树中。',

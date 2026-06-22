@@ -11,6 +11,8 @@ export default {
     openAdvancedSearchGuideDialog: 'Åpne Advanced Search Guide',
     openChangelogDialog: 'Åpne endringslogg',
     openKeybindSettingsDialog: 'Åpne Keybinding Settings',
+    openProjectSettingsDialog: 'Åpne prosjektinnstillinger',
+    saveProjectSettings: 'Lagre prosjektinnstillinger',
     openLicenseDialog: 'Åpne lisens',
     openAppSettingsDialog: 'Åpne appinnstillinger',
     openAppStylingWindow: 'Åpne egendefinert app CSS',

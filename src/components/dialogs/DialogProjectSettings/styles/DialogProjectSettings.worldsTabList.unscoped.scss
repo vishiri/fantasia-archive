@@ -12,6 +12,7 @@
   width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
 
   .faVerticalDraggableTabs__scroll {
+    flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
     scrollbar-width: none;

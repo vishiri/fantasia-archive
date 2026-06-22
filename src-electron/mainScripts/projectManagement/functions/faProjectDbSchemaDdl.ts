@@ -34,6 +34,24 @@ export const FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_WORLD_APPENDIX = ''
 /** Default document_templates.icon when inserting without an override. */
 export const FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_ICON = ''
 
+/** Default document_templates.title_translations_json for fresh rows. */
+export const FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_TITLE_TRANSLATIONS_JSON = '{}'
+
+/** Max stored JSON length for document_templates.title_translations_json. */
+export const FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_TRANSLATIONS_JSON_MAX_LENGTH = 4096
+
+/** Default worlds.display_name_translations_json for fresh rows. */
+export const FA_PROJECT_WORLD_DEFAULT_DISPLAY_NAME_TRANSLATIONS_JSON = '{}'
+
+/** Max stored JSON length for worlds.display_name_translations_json. */
+export const FA_PROJECT_WORLD_DISPLAY_NAME_TRANSLATIONS_JSON_MAX_LENGTH = 4096
+
+/** Default document_templates.world_appendix_translations_json for fresh rows. */
+export const FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_WORLD_APPENDIX_TRANSLATIONS_JSON = '{}'
+
+/** Max stored JSON length for document_templates.world_appendix_translations_json. */
+export const FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_TRANSLATIONS_JSON_MAX_LENGTH = 8192
+
 /**
  * Creates world_template_groups and world_template_placements (schema v6).
  * Idempotent when tables already exist.
@@ -101,6 +119,8 @@ export function applyFaProjectContentSchemaV1 (db: I_faProjectDbExec): void {
 CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_WORLDS} (
   id TEXT NOT NULL PRIMARY KEY,
   display_name TEXT NOT NULL CHECK (length(display_name) > 0),
+  display_name_translations_json TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_DEFAULT_DISPLAY_NAME_TRANSLATIONS_JSON}'
+  CHECK (length(display_name_translations_json) <= ${FA_PROJECT_WORLD_DISPLAY_NAME_TRANSLATIONS_JSON_MAX_LENGTH}),
   color TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_DEFAULT_COLOR}'
   CHECK (length(color) = 7 AND substr(color, 1, 1) = '#'),
   color_pallete TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_DEFAULT_COLOR_PALETTE}'
@@ -113,9 +133,13 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_WORLDS} (
 CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES} (
   id TEXT NOT NULL PRIMARY KEY,
   display_name TEXT NOT NULL CHECK (length(display_name) > 0),
+  title_translations_json TEXT NOT NULL DEFAULT '${FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_TITLE_TRANSLATIONS_JSON}'
+  CHECK (length(title_translations_json) <= ${FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_TRANSLATIONS_JSON_MAX_LENGTH}),
   sort_order INTEGER NOT NULL DEFAULT 0,
   world_appendix TEXT NOT NULL DEFAULT '${FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_WORLD_APPENDIX}'
   CHECK (length(world_appendix) <= ${FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_MAX_LENGTH}),
+  world_appendix_translations_json TEXT NOT NULL DEFAULT '${FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_WORLD_APPENDIX_TRANSLATIONS_JSON}'
+  CHECK (length(world_appendix_translations_json) <= ${FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_TRANSLATIONS_JSON_MAX_LENGTH}),
   icon TEXT NOT NULL DEFAULT '${FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_ICON}'
   CHECK (length(icon) <= ${FA_PROJECT_DOCUMENT_TEMPLATE_ICON_MAX_LENGTH}),
   created_at_ms INTEGER NOT NULL,

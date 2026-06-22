@@ -283,6 +283,11 @@ export default {
       description: 'Bestimmt, ob der Texteditor eine begrenzte Höhe hat, wenn er sich nicht im Vollbildmodus befindet.',
       tags: 'Textbereichshöhe, Langtext, Expand-Editor, Scroll-Editor',
     },
+    logFullActivityPayload: {
+      title: 'Vollständige Aktivitätsnutzlast protokollieren',
+      description: 'Wenn aktiviert, protokolliert die Aktivität vollständige Nutzlasten. Dies kann bei der Fehlersuche nützlich sein, wenn präzise Protokollierung von Ergebnissen erforderlich ist.',
+      tags: 'Debug, Fehlersuche, DevTools, Nutzlast, Aktivität, Protokollierung',
+    },
     noProjectName: {
       title: 'Projektnamen im Baum ausblenden',
       description: 'Legt fest, ob der Projektname überhaupt im hierarchischen Baum angezeigt wird.',

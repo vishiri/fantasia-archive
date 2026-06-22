@@ -71,7 +71,7 @@ test.describe.serial('Project settings dialog', () => {
       directWorldsSnapshot: [{
         color: '',
         colorPallete: '',
-        displayName: 'Component test world',
+        displayNameTranslations: { 'en-US': 'Component test world' },
         documentCount: 0,
         id: componentFixtureWorldId,
         templateLayout: {

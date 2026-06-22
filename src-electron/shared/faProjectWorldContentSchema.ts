@@ -10,6 +10,7 @@ import {
   parseFaProjectContentPlainRecord
 } from 'app/src-electron/shared/faProjectContentSchemaShared'
 import { faProjectWorldTemplateLayoutSnapshotSchema } from 'app/src-electron/shared/faProjectWorldTemplateLayoutSchema'
+import { parseFaProjectWorldDisplayNameTranslationsSnapshot } from 'app/src-electron/shared/faProjectWorldDisplayNameTranslationsSchema'
 import type {
   I_faProjectWorldCreateInput,
   I_faProjectWorldPatch,
@@ -69,7 +70,7 @@ export function parseFaProjectWorldUpdatePayload (
 export const faProjectWorldSnapshotItemSchema = z.object({
   color: z.string().optional(),
   colorPallete: faProjectWorldColorPalleteSchema.optional(),
-  displayName: faProjectContentDisplayNameSchema,
+  displayNameTranslations: z.unknown(),
   id: faProjectContentIdSchema,
   templateLayout: faProjectWorldTemplateLayoutSnapshotSchema.optional()
 }).strict()
@@ -84,5 +85,15 @@ export function parseFaProjectWorldsSnapshotPayload (
   const parsed = faProjectWorldsSnapshotPayloadSchema.parse(
     parseFaProjectContentPlainRecord(payload)
   )
-  return parsed.items
+  return parsed.items.map((item) => {
+    return {
+      color: item.color,
+      colorPallete: item.colorPallete,
+      displayNameTranslations: parseFaProjectWorldDisplayNameTranslationsSnapshot(
+        item.displayNameTranslations
+      ),
+      id: item.id,
+      templateLayout: item.templateLayout
+    }
+  })
 }

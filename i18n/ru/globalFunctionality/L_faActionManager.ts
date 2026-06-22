@@ -11,6 +11,8 @@ export default {
     openAdvancedSearchGuideDialog: 'Открыть руководство по расширенному поиску',
     openChangelogDialog: 'Открыть журнал изменений',
     openKeybindSettingsDialog: 'Открыть настройки привязки клавиш',
+    openProjectSettingsDialog: 'Открыть настройки проекта',
+    saveProjectSettings: 'Сохранить настройки проекта',
     openLicenseDialog: 'Открытая лицензия',
     openAppSettingsDialog: 'Откройте настройки приложения',
     openAppStylingWindow: 'Откройте пользовательское приложение CSS',

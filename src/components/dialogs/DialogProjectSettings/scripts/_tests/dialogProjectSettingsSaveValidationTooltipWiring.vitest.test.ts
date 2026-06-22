@@ -13,8 +13,9 @@ const defaultWorldName = 'New world'
  */
 test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds duplicate palette tooltip', () => {
   const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewTemplateName: defaultTemplateName,
-    defaultNewWorldName: defaultWorldName,
+    resolveDefaultNewTemplateName: () => defaultTemplateName,
+    resolveDefaultNewWorldName: () => defaultWorldName,
+    getCurrentLanguageCode: () => 'en-US',
     translate: (key, params) => {
       if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
         return 'Unable to save, following errors found:'
@@ -30,7 +31,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds dup
     {
       color: '',
       colorPallete: '#112233;#112233',
-      displayName: 'Realm Alpha',
+      displayNameTranslations: { 'en-US': 'Realm Alpha' },
       documentCount: 0,
       templateLayout: {
         groups: [],
@@ -56,8 +57,9 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds dup
  */
 test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds world name tooltip', () => {
   const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewTemplateName: defaultTemplateName,
-    defaultNewWorldName: defaultWorldName,
+    resolveDefaultNewTemplateName: () => defaultTemplateName,
+    resolveDefaultNewWorldName: () => defaultWorldName,
+    getCurrentLanguageCode: () => 'en-US',
     translate: (key, params) => {
       if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
         return 'Unable to save, following errors found:'
@@ -73,7 +75,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds wor
     {
       color: '',
       colorPallete: '',
-      displayName: '   ',
+      displayNameTranslations: { 'en-US': '   ' },
       documentCount: 0,
       templateLayout: {
         groups: [],
@@ -94,8 +96,9 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds wor
  */
 test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds project name tooltip', () => {
   const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewTemplateName: defaultTemplateName,
-    defaultNewWorldName: defaultWorldName,
+    resolveDefaultNewTemplateName: () => defaultTemplateName,
+    resolveDefaultNewWorldName: () => defaultWorldName,
+    getCurrentLanguageCode: () => 'en-US',
     translate: (key) => {
       if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
         return 'Unable to save, following errors found:'
@@ -111,7 +114,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds pro
     {
       color: '',
       colorPallete: '',
-      displayName: 'Realm',
+      displayNameTranslations: { 'en-US': 'Realm' },
       documentCount: 0,
       templateLayout: {
         groups: [],
@@ -132,8 +135,9 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds pro
  */
 test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds document template name tooltip', () => {
   const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewTemplateName: defaultTemplateName,
-    defaultNewWorldName: defaultWorldName,
+    resolveDefaultNewTemplateName: () => defaultTemplateName,
+    resolveDefaultNewWorldName: () => defaultWorldName,
+    getCurrentLanguageCode: () => 'en-US',
     translate: (key, params) => {
       if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
         return 'Unable to save, following errors found:'
@@ -147,11 +151,11 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds doc
 
   const tooltip = buildTooltip('Project', [], [
     {
-      displayName: '   ',
       documentCount: 0,
       icon: '',
       id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-      worldAppendix: ''
+      titleTranslations: { 'en-US': '   ' },
+      worldAppendixTranslations: {}
     }
   ])
 
@@ -174,8 +178,9 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip falls back
     }
   ])
   const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewTemplateName: defaultTemplateName,
-    defaultNewWorldName: defaultWorldName,
+    resolveDefaultNewTemplateName: () => defaultTemplateName,
+    resolveDefaultNewWorldName: () => defaultWorldName,
+    getCurrentLanguageCode: () => 'en-US',
     translate: (key, params) => {
       if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
         return 'Unable to save, following errors found:'
@@ -209,8 +214,9 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip falls back
     }
   ])
   const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewTemplateName: defaultTemplateName,
-    defaultNewWorldName: defaultWorldName,
+    resolveDefaultNewTemplateName: () => defaultTemplateName,
+    resolveDefaultNewWorldName: () => defaultWorldName,
+    getCurrentLanguageCode: () => 'en-US',
     translate: (key, params) => {
       if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
         return 'Unable to save, following errors found:'
@@ -236,8 +242,9 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip falls back
  */
 test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds template group name tooltip', () => {
   const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewTemplateName: defaultTemplateName,
-    defaultNewWorldName: defaultWorldName,
+    resolveDefaultNewTemplateName: () => defaultTemplateName,
+    resolveDefaultNewWorldName: () => defaultWorldName,
+    getCurrentLanguageCode: () => 'en-US',
     translate: (key, params) => {
       if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
         return 'Unable to save, following errors found:'
@@ -253,7 +260,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds tem
     {
       color: '',
       colorPallete: '',
-      displayName: 'Realm Alpha',
+      displayNameTranslations: { 'en-US': 'Realm Alpha' },
       documentCount: 0,
       templateLayout: {
         groups: [
@@ -280,8 +287,9 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds tem
  */
 test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds duplicate template tooltip', () => {
   const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewTemplateName: defaultTemplateName,
-    defaultNewWorldName: defaultWorldName,
+    resolveDefaultNewTemplateName: () => defaultTemplateName,
+    resolveDefaultNewWorldName: () => defaultWorldName,
+    getCurrentLanguageCode: () => 'en-US',
     translate: (key, params) => {
       if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
         return 'Unable to save, following errors found:'
@@ -297,7 +305,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds dup
     {
       color: '',
       colorPallete: '',
-      displayName: 'Realm Alpha',
+      displayNameTranslations: { 'en-US': 'Realm Alpha' },
       documentCount: 0,
       templateLayout: {
         groups: [],
@@ -341,8 +349,9 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip builds dup
 
 test('Test that duplicate template tooltip prefers placement nickname over canonical name', () => {
   const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewTemplateName: defaultTemplateName,
-    defaultNewWorldName: defaultWorldName,
+    resolveDefaultNewTemplateName: () => defaultTemplateName,
+    resolveDefaultNewWorldName: () => defaultWorldName,
+    getCurrentLanguageCode: () => 'en-US',
     translate: (key, params) => {
       if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
         return 'Unable to save, following errors found:'
@@ -358,7 +367,7 @@ test('Test that duplicate template tooltip prefers placement nickname over canon
     {
       color: '',
       colorPallete: '',
-      displayName: 'Realm Alpha',
+      displayNameTranslations: { 'en-US': 'Realm Alpha' },
       documentCount: 0,
       templateLayout: {
         groups: [],
@@ -400,8 +409,9 @@ test('Test that duplicate template tooltip prefers placement nickname over canon
 
 test('Test that duplicate template tooltip falls back to default name when labels are blank', () => {
   const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewTemplateName: defaultTemplateName,
-    defaultNewWorldName: defaultWorldName,
+    resolveDefaultNewTemplateName: () => defaultTemplateName,
+    resolveDefaultNewWorldName: () => defaultWorldName,
+    getCurrentLanguageCode: () => 'en-US',
     translate: (key, params) => {
       if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
         return 'Unable to save, following errors found:'
@@ -417,7 +427,7 @@ test('Test that duplicate template tooltip falls back to default name when label
     {
       color: '',
       colorPallete: '',
-      displayName: 'Realm Alpha',
+      displayNameTranslations: { 'en-US': 'Realm Alpha' },
       documentCount: 0,
       templateLayout: {
         groups: [],
@@ -472,8 +482,9 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip falls back
     }
   ])
   const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewTemplateName: defaultTemplateName,
-    defaultNewWorldName: defaultWorldName,
+    resolveDefaultNewTemplateName: () => defaultTemplateName,
+    resolveDefaultNewWorldName: () => defaultWorldName,
+    getCurrentLanguageCode: () => 'en-US',
     translate: (key, params) => {
       if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
         return 'Unable to save, following errors found:'
@@ -489,7 +500,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip falls back
     {
       color: '',
       colorPallete: '',
-      displayName: 'Realm Alpha',
+      displayNameTranslations: { 'en-US': 'Realm Alpha' },
       documentCount: 0,
       templateLayout: createEmptyDialogProjectSettingsWorldTemplateLayoutDraft(),
       id: '550e8400-e29b-41d4-a716-446655440000'
@@ -508,8 +519,9 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip falls back
  */
 test('Test that createBuildDialogProjectSettingsSaveValidationTooltip uses default template label for blank duplicate names', () => {
   const buildTooltip = createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewTemplateName: defaultTemplateName,
-    defaultNewWorldName: defaultWorldName,
+    resolveDefaultNewTemplateName: () => defaultTemplateName,
+    resolveDefaultNewWorldName: () => defaultWorldName,
+    getCurrentLanguageCode: () => 'en-US',
     translate: (key, params) => {
       if (key === 'dialogs.projectSettings.saveErrors.tooltipIntro') {
         return 'Unable to save, following errors found:'
@@ -525,7 +537,7 @@ test('Test that createBuildDialogProjectSettingsSaveValidationTooltip uses defau
     {
       color: '',
       colorPallete: '',
-      displayName: 'Realm Alpha',
+      displayNameTranslations: { 'en-US': 'Realm Alpha' },
       documentCount: 0,
       templateLayout: {
         groups: [],

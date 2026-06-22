@@ -1,10 +1,12 @@
 import { expect, test } from 'vitest'
 
+import { buildDialogProjectSettingsDocumentTemplateDraft } from '../../../_tests/dialogProjectSettingsDocumentTemplateDraftFixtures'
 import {
   appendDialogProjectSettingsWorldDraft,
-  isDialogProjectSettingsWorldRemoveDisabled,
-  mapDialogProjectSettingsWorldsToSnapshot
+  isDialogProjectSettingsWorldRemoveDisabled
 } from '../dialogProjectSettingsWorldsDraft'
+import { mapDialogProjectSettingsWorldsToSnapshot } from '../../dialogProjectSettingsWorldsSnapshotDraft'
+import { resolveDialogProjectSettingsWorldSaveErrorDisplayName } from '../../dialogProjectSettingsWorldsDisplayNameDraft'
 import {
   buildDialogProjectSettingsSaveValidationTooltip,
   collectDialogProjectSettingsSaveValidationErrors,
@@ -12,14 +14,13 @@ import {
   hasDialogProjectSettingsWorldNameValidationError,
   hasDialogProjectSettingsWorldTemplateLayoutValidationError,
   isDialogProjectSettingsDialogSaveDisabled,
-  isDialogProjectSettingsWorldTabValidationError,
-  resolveDialogProjectSettingsWorldSaveErrorDisplayName
+  isDialogProjectSettingsWorldTabValidationError
 } from '../dialogProjectSettingsWorldsSaveValidation'
 
 const baseWorld = {
   color: '',
   colorPallete: '',
-  displayName: 'Realm',
+  displayNameTranslations: { 'en-US': 'Realm' },
   documentCount: 0,
   templateLayout: {
     groups: [],
@@ -38,7 +39,7 @@ test('Test that isDialogProjectSettingsDialogSaveDisabled combines project and w
   expect(isDialogProjectSettingsDialogSaveDisabled('Project', [
     {
       ...baseWorld,
-      displayName: '   '
+      displayNameTranslations: { 'en-US': '   ' }
     }
   ])).toBe(true)
 })
@@ -78,13 +79,13 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot trims names and optiona
       ...baseWorld,
       color: ' #aabbcc ',
       colorPallete: ' #112233;#445566 ',
-      displayName: '  Realm  '
+      displayNameTranslations: { 'en-US': '  Realm  ' }
     }
   ])).toEqual([
     {
       color: '#aabbcc',
       colorPallete: '#112233;#445566',
-      displayName: 'Realm',
+      displayNameTranslations: { 'en-US': 'Realm' },
       id: baseWorld.id,
       templateLayout: {
         groups: [],
@@ -107,7 +108,7 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot dedupes duplicate palet
   ])).toEqual([
     {
       colorPallete: '#112233;#AABBCC',
-      displayName: 'Realm',
+      displayNameTranslations: { 'en-US': 'Realm' },
       id: baseWorld.id,
       templateLayout: {
         groups: [],
@@ -150,7 +151,7 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot ignores invalid palette
   ])).toEqual([
     {
       colorPallete: '#112233;#445566',
-      displayName: 'Realm',
+      displayNameTranslations: { 'en-US': 'Realm' },
       id: baseWorld.id,
       templateLayout: {
         groups: [],
@@ -165,7 +166,7 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot ignores invalid palette
     }
   ])).toEqual([
     {
-      displayName: 'Realm',
+      displayNameTranslations: { 'en-US': 'Realm' },
       id: baseWorld.id,
       templateLayout: {
         groups: [],
@@ -185,7 +186,7 @@ test('Test that isDialogProjectSettingsWorldRemoveDisabled enforces last-world a
 
   const secondWorld = {
     ...baseWorld,
-    displayName: 'Other',
+    displayNameTranslations: { 'en-US': 'Other' },
     id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
   }
   const twoWorlds = [baseWorld, secondWorld]
@@ -201,10 +202,10 @@ test('Test that isDialogProjectSettingsWorldRemoveDisabled enforces last-world a
  * Appends a new draft row with a generated id at the bottom of the list.
  */
 test('Test that appendDialogProjectSettingsWorldDraft appends a new world row', () => {
-  const next = appendDialogProjectSettingsWorldDraft([baseWorld], 'New world')
+  const next = appendDialogProjectSettingsWorldDraft([baseWorld], 'en-US', 'New world')
   expect(next).toHaveLength(2)
   expect(next[0]?.id).toBe(baseWorld.id)
-  expect(next[1]?.displayName).toBe('New world')
+  expect(next[1]?.displayNameTranslations).toEqual({ 'en-US': 'New world' })
   expect(hasDialogProjectSettingsWorldNameValidationError(next)).toBe(false)
 })
 
@@ -216,7 +217,7 @@ test('Test that isDialogProjectSettingsWorldTabValidationError covers name and p
   expect(isDialogProjectSettingsWorldTabValidationError(baseWorld)).toBe(false)
   expect(isDialogProjectSettingsWorldTabValidationError({
     ...baseWorld,
-    displayName: '   '
+    displayNameTranslations: { 'en-US': '   ' }
   })).toBe(true)
   expect(isDialogProjectSettingsWorldTabValidationError({
     ...baseWorld,
@@ -229,12 +230,16 @@ test('Test that isDialogProjectSettingsWorldTabValidationError covers name and p
  * Uses trimmed display name or the default new-world label.
  */
 test('Test that resolveDialogProjectSettingsWorldSaveErrorDisplayName resolves world names', () => {
-  expect(resolveDialogProjectSettingsWorldSaveErrorDisplayName('Realm Alpha', 'New world')).toBe(
-    'Realm Alpha'
-  )
-  expect(resolveDialogProjectSettingsWorldSaveErrorDisplayName('   ', 'New world')).toBe(
+  expect(resolveDialogProjectSettingsWorldSaveErrorDisplayName(
+    { 'en-US': 'Realm Alpha' },
+    'en-US',
     'New world'
-  )
+  )).toBe('Realm Alpha')
+  expect(resolveDialogProjectSettingsWorldSaveErrorDisplayName(
+    { 'en-US': '   ' },
+    'en-US',
+    'New world'
+  )).toBe('New world')
 })
 
 /**
@@ -251,7 +256,7 @@ test('Test that collectDialogProjectSettingsSaveValidationErrors lists all block
   expect(collectDialogProjectSettingsSaveValidationErrors('Project', [
     {
       ...baseWorld,
-      displayName: '   '
+      displayNameTranslations: { 'en-US': '   ' }
     }
   ])).toEqual([
     {
@@ -281,7 +286,7 @@ test('Test that collectDialogProjectSettingsSaveValidationErrors ignores undefin
   sparseWorlds[1] = undefined
   sparseWorlds[2] = {
     ...baseWorld,
-    displayName: 'Second realm',
+    displayNameTranslations: { 'en-US': 'Second realm' },
     id: '660e8400-e29b-41d4-a716-446655440001'
   }
   expect(collectDialogProjectSettingsSaveValidationErrors('Project', sparseWorlds as never)).toEqual([])
@@ -477,13 +482,10 @@ test('Test that template layout validation rejects invalid document template pla
     ]
   }
   const documentTemplates = [
-    {
-      displayName: '   ',
-      documentCount: 0,
-      icon: '',
+    buildDialogProjectSettingsDocumentTemplateDraft({
       id: 'template-a',
-      worldAppendix: ''
-    }
+      titleTranslations: { 'en-US': '   ' }
+    })
   ]
   const worldWithInvalidTemplate = {
     ...baseWorld,
@@ -492,7 +494,7 @@ test('Test that template layout validation rejects invalid document template pla
   const worldWithoutInvalidTemplate = {
     ...baseWorld,
     id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
-    displayName: 'Other realm',
+    displayNameTranslations: { 'en-US': 'Other realm' },
     templateLayout: {
       groups: [],
       placements: []
@@ -552,7 +554,7 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot maps template layout ro
     }
   ])).toEqual([
     {
-      displayName: 'Realm',
+      displayNameTranslations: { 'en-US': 'Realm' },
       id: baseWorld.id,
       templateLayout: {
         groups: [

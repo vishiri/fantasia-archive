@@ -9,7 +9,7 @@ import DialogProjectSettingsWorldsDetailPanel from '../DialogProjectSettingsWorl
 const worldFixture = {
   color: '',
   colorPallete: '',
-  displayName: 'Realm',
+  displayNameTranslations: { 'en-US': 'Realm' },
   documentCount: 0,
   templateLayout: {
     groups: [],
@@ -18,32 +18,30 @@ const worldFixture = {
   id: '550e8400-e29b-41d4-a716-446655440000'
 }
 
-const qInputStub = defineComponent({
-  name: 'QInput',
-  inheritAttrs: true,
+const faLocaleTranslationsInputStub = defineComponent({
+  name: 'FaLocaleTranslationsInput',
   props: {
-    modelValue: {
+    currentLanguageCode: {
       type: String,
-      default: ''
+      required: true
+    },
+    modelValue: {
+      type: Object,
+      required: true
+    },
+    testLocator: {
+      type: String,
+      required: true
     }
   },
   emits: ['update:modelValue'],
-  methods: {
-    onInput (event: Event): void {
-      const target = event.target
-      const value = target instanceof HTMLInputElement ? target.value : ''
-      this.$emit('update:modelValue', value)
-    }
-  },
   template: `
-    <div class="q-input-stub-host">
-      <input
-        class="q-input-stub"
-        :value="modelValue"
-        v-bind="$attrs"
-        @input="onInput"
-      />
-    </div>
+    <button
+      type="button"
+      class="fa-locale-translations-input-stub"
+      :data-test-locator="testLocator"
+      @click="$emit('update:modelValue', { 'en-US': 'Renamed' })"
+    />
   `
 })
 
@@ -149,6 +147,7 @@ const faColorPickerInputStub = defineComponent({
 test('Test that DialogProjectSettingsWorldsDetailPanel emits field updates', async () => {
   const w = mount(DialogProjectSettingsWorldsDetailPanel, {
     props: {
+      currentLanguageCode: 'en-US',
       nameHasError: false,
       removeDisabled: false,
       removeDisabledReason: null,
@@ -163,12 +162,12 @@ test('Test that DialogProjectSettingsWorldsDetailPanel emits field updates', asy
         DialogProjectSettingsWorldColorPaletteEditor: paletteEditorStub,
         DialogProjectSettingsWorldsDeleteButton: deleteButtonStub,
         FaColorPickerInput: faColorPickerInputStub,
+        FaLocaleTranslationsInput: faLocaleTranslationsInputStub,
         QBtn: defineComponent({
           inheritAttrs: true,
           template: '<button type="button" v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'
         }),
         QIcon: qIconStub,
-        QInput: qInputStub,
         QTooltip: defineComponent({ template: '<span><slot /></span>' })
       }
     }
@@ -196,9 +195,9 @@ test('Test that DialogProjectSettingsWorldsDetailPanel emits field updates', asy
     ].join('\n')
   )
 
-  await w.find('input.q-input-stub').setValue('Renamed')
+  await w.find('.fa-locale-translations-input-stub').trigger('click')
   await w.find('.fa-color-picker-input-stub-field').setValue('#112233')
-  expect(w.emitted('update:displayName')?.[0]).toEqual(['Renamed'])
+  expect(w.emitted('update:displayNameTranslations')?.[0]).toEqual([{ 'en-US': 'Renamed' }])
   expect(w.emitted('update:color')?.[0]).toEqual(['#112233'])
 
   await w.setProps({
@@ -206,7 +205,7 @@ test('Test that DialogProjectSettingsWorldsDetailPanel emits field updates', asy
       ...worldFixture,
       color: '#112233',
       colorPallete: '',
-      displayName: 'Renamed'
+      displayNameTranslations: { 'en-US': 'Renamed' }
     }
   })
   expect(w.find('[data-test-locator="dialogProjectSettings-worlds-colorInput-swatch"]').attributes('style')).toContain(
@@ -227,7 +226,7 @@ test('Test that DialogProjectSettingsWorldsDetailPanel emits field updates', asy
       ...worldFixture,
       color: '#112233',
       colorPallete: '#112233;#445566',
-      displayName: 'Renamed'
+      displayNameTranslations: { 'en-US': 'Renamed' }
     }
   })
   expect(colorPicker.props('palette')).toEqual(['#112233', '#445566'])
@@ -241,6 +240,19 @@ test('Test that DialogProjectSettingsWorldsDetailPanel emits field updates', asy
  * Normalizes null model updates to empty strings.
  */
 test('Test that DialogProjectSettingsWorldsDetailPanel normalizes null field updates', async () => {
+  const nullEmitFaLocaleTranslationsInputStub = defineComponent({
+    name: 'FaLocaleTranslationsInput',
+    inheritAttrs: true,
+    template: `
+      <button
+        type="button"
+        class="fa-locale-translations-input-null-stub"
+        v-bind="$attrs"
+        @click="$emit('update:modelValue', { 'en-US': '' })"
+      />
+    `
+  })
+
   const nullEmitColorPickerStub = defineComponent({
     name: 'FaColorPickerInput',
     emits: ['update:modelValue'],
@@ -253,21 +265,9 @@ test('Test that DialogProjectSettingsWorldsDetailPanel normalizes null field upd
     `
   })
 
-  const nullEmitInputStub = defineComponent({
-    name: 'QInput',
-    inheritAttrs: true,
-    template: `
-      <button
-        type="button"
-        class="q-input-null-stub"
-        v-bind="$attrs"
-        @click="$emit('update:modelValue', null)"
-      />
-    `
-  })
-
   const w = mount(DialogProjectSettingsWorldsDetailPanel, {
     props: {
+      currentLanguageCode: 'en-US',
       nameHasError: false,
       removeDisabled: false,
       removeDisabledReason: null,
@@ -281,17 +281,17 @@ test('Test that DialogProjectSettingsWorldsDetailPanel normalizes null field upd
       stubs: {
         DialogProjectSettingsWorldsDeleteButton: deleteButtonStub,
         FaColorPickerInput: nullEmitColorPickerStub,
+        FaLocaleTranslationsInput: nullEmitFaLocaleTranslationsInputStub,
         QIcon: qIconStub,
-        QInput: nullEmitInputStub,
         QTooltip: true
       }
     }
   })
 
-  await w.find('.q-input-null-stub').trigger('click')
+  await w.find('.fa-locale-translations-input-null-stub').trigger('click')
   await w.find('.fa-color-picker-input-null-stub').trigger('click')
 
-  expect(w.emitted('update:displayName')?.[0]).toEqual([''])
+  expect(w.emitted('update:displayNameTranslations')?.[0]).toEqual([{ 'en-US': '' }])
   expect(w.emitted('update:color')?.[0]).toEqual([''])
 })
 
@@ -302,6 +302,7 @@ test('Test that DialogProjectSettingsWorldsDetailPanel normalizes null field upd
 test('Test that DialogProjectSettingsWorldsDetailPanel reflects validation and remove-disabled state', () => {
   const w = mount(DialogProjectSettingsWorldsDetailPanel, {
     props: {
+      currentLanguageCode: 'en-US',
       nameHasError: true,
       removeDisabled: true,
       removeDisabledReason: 'hasDocuments',
@@ -319,8 +320,8 @@ test('Test that DialogProjectSettingsWorldsDetailPanel reflects validation and r
         DialogProjectSettingsWorldColorPaletteEditor: true,
         DialogProjectSettingsWorldsDeleteButton: deleteButtonStub,
         FaColorPickerInput: true,
+        FaLocaleTranslationsInput: faLocaleTranslationsInputStub,
         QIcon: qIconStub,
-        QInput: qInputStub,
         QTooltip: true
       }
     }

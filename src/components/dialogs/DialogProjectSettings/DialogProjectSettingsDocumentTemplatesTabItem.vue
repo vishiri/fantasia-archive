@@ -23,16 +23,32 @@
           data-test-locator="dialogProjectSettings-documentTemplates-tabIcon"
           :name="tabIconName"
         />
-        <div class="faVerticalDraggableTabs__tabContent relative-position">
-          <span class="faVerticalDraggableTabs__tabLabel">
-            <template v-if="props.template.displayName.trim().length > 0">
-              {{ props.template.displayName }}
-            </template>
-            <template v-else>
-              {{ $t('dialogs.projectSettings.panels.documentTemplates.defaultNewTemplateName') }}
-            </template>
-          </span>
+        <div class="dialogProjectSettingsDocumentTemplatesTabItem__titleContent relative-position">
+          <div class="faVerticalDraggableTabs__tabContent relative-position">
+            <span class="faVerticalDraggableTabs__tabLabel">
+              <template v-if="resolvedTitle.length > 0">
+                {{ resolvedTitle }}
+              </template>
+              <template v-else>
+                {{ $t('dialogs.projectSettings.panels.documentTemplates.defaultNewTemplateName') }}
+              </template>
+            </span>
+          </div>
         </div>
+        <q-icon
+          v-if="showMissingTranslationsWarning"
+          class="dialogProjectSettingsDocumentTemplatesTabItem__missingTranslationsWarning"
+          color="warning"
+          data-test-locator="dialogProjectSettings-documentTemplates-tabMissingTranslationsWarning"
+          :data-test-tooltip-text="$t('dialogs.projectSettings.panels.documentTemplates.missingTranslationsTabTooltip')"
+          name="mdi-alert"
+          size="16px"
+          @click.stop
+        >
+          <q-tooltip content-class="dialogProjectSettings__fieldHelpTooltip">
+            {{ $t('dialogs.projectSettings.panels.documentTemplates.missingTranslationsTabTooltip') }}
+          </q-tooltip>
+        </q-icon>
       </div>
       <span
         v-if="showWorldAppendix"
@@ -49,7 +65,13 @@
 import { computed, ref } from 'vue'
 
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import { FA_ICON_PICKER_EMPTY_PLACEHOLDER_ICON } from 'app/types/I_faIconPickerInput'
+import {
+  isDialogProjectSettingsDocumentTemplateMissingCurrentLanguageTranslations,
+  resolveDialogProjectSettingsDocumentTemplateResolvedTitle
+} from './scripts/dialogProjectSettingsDocumentTemplatesDraft'
+import { resolveDialogProjectSettingsDocumentTemplateResolvedWorldAppendix } from './scripts/dialogProjectSettingsDocumentTemplateWorldAppendixDraft'
 
 defineOptions({
   name: 'DialogProjectSettingsDocumentTemplatesTabItem'
@@ -57,6 +79,7 @@ defineOptions({
 
 const props = withDefaults(
   defineProps<{
+    currentLanguageCode: T_faUserSettingsLanguageCode
     isBeingDragged?: boolean
     isListDragging?: boolean
     isSelected: boolean
@@ -87,7 +110,26 @@ const templatesTabRippleBinding = computed(() => {
 
 const tabBlurTargetRef = ref<HTMLDivElement | null>(null)
 
-const trimmedWorldAppendix = computed(() => props.template.worldAppendix.trim())
+const trimmedWorldAppendix = computed(() => {
+  return resolveDialogProjectSettingsDocumentTemplateResolvedWorldAppendix(
+    props.template,
+    props.currentLanguageCode
+  )
+})
+
+const resolvedTitle = computed(() => {
+  return resolveDialogProjectSettingsDocumentTemplateResolvedTitle(
+    props.template,
+    props.currentLanguageCode
+  )
+})
+
+const showMissingTranslationsWarning = computed(() => {
+  return isDialogProjectSettingsDocumentTemplateMissingCurrentLanguageTranslations(
+    props.template,
+    props.currentLanguageCode
+  )
+})
 
 const showWorldAppendix = computed(() => trimmedWorldAppendix.value.length > 0)
 

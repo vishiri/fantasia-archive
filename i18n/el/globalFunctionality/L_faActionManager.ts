@@ -11,6 +11,8 @@ export default {
     openAdvancedSearchGuideDialog: 'Ανοίξτε τον Οδηγό σύνθετης αναζήτησης',
     openChangelogDialog: 'Ανοίξτε το Changelog',
     openKeybindSettingsDialog: 'Ανοίξτε τις Ρυθμίσεις Keybind',
+    openProjectSettingsDialog: 'Άνοιγμα ρυθμίσεων έργου',
+    saveProjectSettings: 'Αποθήκευση ρυθμίσεων έργου',
     openLicenseDialog: 'Ανοιχτή άδεια',
     openAppSettingsDialog: 'Ανοίξτε τις Ρυθμίσεις εφαρμογής',
     openAppStylingWindow: 'Άνοιγμα προσαρμοσμένης εφαρμογής CSS',

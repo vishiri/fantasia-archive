@@ -11,6 +11,8 @@ export default {
     openAdvancedSearchGuideDialog: 'افتح دليل البحث المتقدم',
     openChangelogDialog: 'افتح سجل التغيير',
     openKeybindSettingsDialog: 'افتح إعدادات Keybind',
+    openProjectSettingsDialog: 'فتح إعدادات المشروع',
+    saveProjectSettings: 'حفظ إعدادات المشروع',
     openLicenseDialog: 'فتح الترخيص',
     openAppSettingsDialog: 'افتح إعدادات التطبيق',
     openAppStylingWindow: 'افتح التطبيق المخصص CSS',

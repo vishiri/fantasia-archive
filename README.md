@@ -193,7 +193,7 @@ After Electron/Node version changes: clean **`yarn install`** (**`postinstall`**
 
 ## Project databases (`.faproject`)
 
-SQLite per project; schema **`user_version` max 6** — [docs/database/projectDB.md](docs/database/projectDB.md). Template custom fields design: [templateCustomFields.md](docs/database/templateCustomFields.md).
+SQLite per project; schema **`user_version` max 9** — [docs/database/projectDB.md](docs/database/projectDB.md). Template custom fields design: [templateCustomFields.md](docs/database/templateCustomFields.md).
 
 **Project settings refresh:** **`DialogProjectSettings`** IPC-reads on open (**`getProjectSettings`**, **`listWorldsForProjectSettings`**, **`listDocumentTemplatesForProjectSettings`**); save via **`saveProjectSettings`**. No Pinia-only seed. See [fa-project-database-access.mdc](.cursor/rules/fa-project-database-access.mdc), [fantasia-sqlite-main](.cursor/skills/fantasia-sqlite-main/SKILL.md).
 

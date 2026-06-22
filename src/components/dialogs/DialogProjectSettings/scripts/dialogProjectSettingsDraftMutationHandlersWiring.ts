@@ -1,29 +1,27 @@
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { Ref } from 'app/types/I_vueCompositionRefs'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
+import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
+import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
 
 import {
   addDialogProjectSettingsDocumentTemplateDraftRow,
   removeDialogProjectSettingsDocumentTemplateDraftRow,
-  updateDialogProjectSettingsDocumentTemplateDraftDisplayName,
   updateDialogProjectSettingsDocumentTemplateDraftIcon,
-  updateDialogProjectSettingsDocumentTemplateDraftWorldAppendix
+  updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations,
+  updateDialogProjectSettingsDocumentTemplateDraftWorldAppendixTranslations
 } from './dialogProjectSettingsDocumentTemplateRowMutationsWiring'
 import {
-  syncDialogProjectSettingsWorldDraftTemplateLayoutPlacementDisplayNames
-} from './dialogProjectSettingsDocumentTemplateWorldLayoutSync'
-import {
-  addDialogProjectSettingsWorldDraftRow,
-  removeDialogProjectSettingsWorldDraftRow,
-  updateDialogProjectSettingsWorldDraftColor,
-  updateDialogProjectSettingsWorldDraftColorPallete,
-  updateDialogProjectSettingsWorldDraftDisplayName,
-  updateDialogProjectSettingsWorldDraftTemplateLayout
-} from './dialogProjectSettingsWorldRowMutationsWiring'
+  syncDialogProjectSettingsDocumentTemplateLayoutTitles
+} from './dialogProjectSettingsDocumentTemplateLayoutTitleSyncWiring'
+import { createDialogProjectSettingsWorldDraftMutationHandlers } from './dialogProjectSettingsWorldDraftMutationHandlersWiring'
 
 export function createDialogProjectSettingsDraftMutationHandlers (deps: {
-  newTemplateDefaultDisplayName: string
-  newWorldDefaultDisplayName: string
+  getCurrentLanguageCode: () => T_faUserSettingsLanguageCode
+  resolveNewTemplateDefaultDisplayName: () => string
+  resolveNewWorldDefaultDisplayName: () => string
 }, params: {
   localDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>
   localWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>
@@ -32,95 +30,84 @@ export function createDialogProjectSettingsDraftMutationHandlers (deps: {
     addWorld: () => void
     removeDocumentTemplate: (id: string) => void
     removeWorld: (id: string) => void
-    updateDocumentTemplateDisplayName: (id: string, displayName: string) => void
     updateDocumentTemplateIcon: (id: string, icon: string) => void
-    updateDocumentTemplateWorldAppendix: (id: string, worldAppendix: string) => void
+    updateDocumentTemplateTitleTranslations: (
+      id: string,
+      titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+    ) => void
+    updateDocumentTemplateWorldAppendixTranslations: (
+      id: string,
+      worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
+    ) => void
     updateWorldColor: (id: string, color: string) => void
     updateWorldColorPallete: (id: string, colorPallete: string) => void
-    updateWorldDisplayName: (id: string, displayName: string) => void
+    updateWorldDisplayNameTranslations: (
+      id: string,
+      displayNameTranslations: I_faProjectWorldDisplayNameTranslations
+    ) => void
     updateWorldTemplateLayout: (
       id: string,
       templateLayout: I_dialogProjectSettingsWorldDraft['templateLayout']
     ) => void
   } {
   const { localDocumentTemplates, localWorlds } = params
+  const worldHandlers = createDialogProjectSettingsWorldDraftMutationHandlers(deps, { localWorlds })
 
   const addDocumentTemplate = (): void => {
     addDialogProjectSettingsDocumentTemplateDraftRow(
       localDocumentTemplates,
-      deps.newTemplateDefaultDisplayName
+      deps.getCurrentLanguageCode(),
+      deps.resolveNewTemplateDefaultDisplayName()
     )
-  }
-
-  const addWorld = (): void => {
-    addDialogProjectSettingsWorldDraftRow(localWorlds, deps.newWorldDefaultDisplayName)
   }
 
   const removeDocumentTemplate = (id: string): void => {
     removeDialogProjectSettingsDocumentTemplateDraftRow(localDocumentTemplates, id)
   }
 
-  const removeWorld = (id: string): void => {
-    removeDialogProjectSettingsWorldDraftRow(localWorlds, id)
-  }
-
-  const updateDocumentTemplateDisplayName = (id: string, displayName: string): void => {
-    updateDialogProjectSettingsDocumentTemplateDraftDisplayName(
+  const updateDocumentTemplateTitleTranslations = (
+    id: string,
+    titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+  ): void => {
+    updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations(
       localDocumentTemplates,
       id,
-      displayName
+      titleTranslations
     )
-    if (localWorlds.value !== null) {
-      localWorlds.value = syncDialogProjectSettingsWorldDraftTemplateLayoutPlacementDisplayNames(
-        localWorlds.value,
-        id,
-        displayName
-      )
-    }
+    syncDialogProjectSettingsDocumentTemplateLayoutTitles({
+      documentTemplateId: id,
+      getCurrentLanguageCode: deps.getCurrentLanguageCode,
+      localDocumentTemplates,
+      localWorlds
+    })
   }
 
   const updateDocumentTemplateIcon = (id: string, icon: string): void => {
     updateDialogProjectSettingsDocumentTemplateDraftIcon(localDocumentTemplates, id, icon)
   }
 
-  const updateDocumentTemplateWorldAppendix = (id: string, worldAppendix: string): void => {
-    updateDialogProjectSettingsDocumentTemplateDraftWorldAppendix(
+  const updateDocumentTemplateWorldAppendixTranslations = (
+    id: string,
+    worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
+  ): void => {
+    updateDialogProjectSettingsDocumentTemplateDraftWorldAppendixTranslations(
       localDocumentTemplates,
       id,
-      worldAppendix
+      worldAppendixTranslations
     )
-  }
-
-  const updateWorldColor = (id: string, color: string): void => {
-    updateDialogProjectSettingsWorldDraftColor(localWorlds, id, color)
-  }
-
-  const updateWorldColorPallete = (id: string, colorPallete: string): void => {
-    updateDialogProjectSettingsWorldDraftColorPallete(localWorlds, id, colorPallete)
-  }
-
-  const updateWorldDisplayName = (id: string, displayName: string): void => {
-    updateDialogProjectSettingsWorldDraftDisplayName(localWorlds, id, displayName)
-  }
-
-  const updateWorldTemplateLayout = (
-    id: string,
-    templateLayout: I_dialogProjectSettingsWorldDraft['templateLayout']
-  ): void => {
-    updateDialogProjectSettingsWorldDraftTemplateLayout(localWorlds, id, templateLayout)
   }
 
   return {
     addDocumentTemplate,
-    addWorld,
+    addWorld: worldHandlers.addWorld,
     removeDocumentTemplate,
-    removeWorld,
-    updateDocumentTemplateDisplayName,
+    removeWorld: worldHandlers.removeWorld,
     updateDocumentTemplateIcon,
-    updateDocumentTemplateWorldAppendix,
-    updateWorldColor,
-    updateWorldColorPallete,
-    updateWorldDisplayName,
-    updateWorldTemplateLayout
+    updateDocumentTemplateTitleTranslations,
+    updateDocumentTemplateWorldAppendixTranslations,
+    updateWorldColor: worldHandlers.updateWorldColor,
+    updateWorldColorPallete: worldHandlers.updateWorldColorPallete,
+    updateWorldDisplayNameTranslations: worldHandlers.updateWorldDisplayNameTranslations,
+    updateWorldTemplateLayout: worldHandlers.updateWorldTemplateLayout
   }
 }

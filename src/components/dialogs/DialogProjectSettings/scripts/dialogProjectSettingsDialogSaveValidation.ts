@@ -5,7 +5,7 @@ import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjec
 import {
   hasDialogProjectSettingsDocumentTemplateNameValidationError,
   isDialogProjectSettingsDocumentTemplateNameInvalid
-} from './functions/dialogProjectSettingsDocumentTemplatesDraft'
+} from './dialogProjectSettingsDocumentTemplatesDraft'
 import {
   collectDialogProjectSettingsSaveValidationErrors,
   hasDialogProjectSettingsWorldColorPalleteValidationError,
@@ -29,7 +29,7 @@ export function collectDialogProjectSettingsDocumentTemplateSaveValidationErrors
     if (template === undefined) {
       continue
     }
-    if (isDialogProjectSettingsDocumentTemplateNameInvalid(template.displayName)) {
+    if (isDialogProjectSettingsDocumentTemplateNameInvalid(template.titleTranslations)) {
       errors.push({
         kind: 'documentTemplateNameRequired',
         templateIndexOneBased: index + 1

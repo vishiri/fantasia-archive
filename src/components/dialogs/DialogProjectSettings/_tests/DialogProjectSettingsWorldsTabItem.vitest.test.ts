@@ -6,7 +6,7 @@ import DialogProjectSettingsWorldsTabItem from '../DialogProjectSettingsWorldsTa
 const worldFixture = {
   color: '',
   colorPallete: '',
-  displayName: 'Realm',
+  displayNameTranslations: { 'en-US': 'Realm' },
   documentCount: 0,
   templateLayout: {
     groups: [],
@@ -22,6 +22,7 @@ const worldFixture = {
 test('Test that DialogProjectSettingsWorldsTabItem emits select with the world id', async () => {
   const w = mount(DialogProjectSettingsWorldsTabItem, {
     props: {
+      currentLanguageCode: 'en-US',
       isSelected: false,
       tabHasError: false,
       world: worldFixture
@@ -47,6 +48,7 @@ test('Test that DialogProjectSettingsWorldsTabItem emits select with the world i
 test('Test that DialogProjectSettingsWorldsTabItem shows a color swatch only when the world has a color', () => {
   const withoutColor = mount(DialogProjectSettingsWorldsTabItem, {
     props: {
+      currentLanguageCode: 'en-US',
       isSelected: false,
       tabHasError: false,
       world: worldFixture
@@ -65,6 +67,7 @@ test('Test that DialogProjectSettingsWorldsTabItem shows a color swatch only whe
 
   const withColor = mount(DialogProjectSettingsWorldsTabItem, {
     props: {
+      currentLanguageCode: 'en-US',
       isSelected: false,
       tabHasError: false,
       world: {
@@ -94,6 +97,7 @@ test('Test that DialogProjectSettingsWorldsTabItem shows a color swatch only whe
 test('Test that DialogProjectSettingsWorldsTabItem applies drag highlight classes', () => {
   const w = mount(DialogProjectSettingsWorldsTabItem, {
     props: {
+      currentLanguageCode: 'en-US',
       isBeingDragged: true,
       isListDragging: true,
       isSelected: false,
@@ -123,11 +127,12 @@ test('Test that DialogProjectSettingsWorldsTabItem applies drag highlight classe
 test('Test that DialogProjectSettingsWorldsTabItem marks invalid names on the tab', () => {
   const w = mount(DialogProjectSettingsWorldsTabItem, {
     props: {
+      currentLanguageCode: 'en-US',
       isSelected: false,
       tabHasError: true,
       world: {
         ...worldFixture,
-        displayName: '   '
+        displayNameTranslations: { 'en-US': '   ' }
       }
     },
     global: {
@@ -152,6 +157,7 @@ test('Test that DialogProjectSettingsWorldsTabItem marks invalid names on the ta
 test('Test that DialogProjectSettingsWorldsTabItem marks duplicate palette errors on the tab', () => {
   const w = mount(DialogProjectSettingsWorldsTabItem, {
     props: {
+      currentLanguageCode: 'en-US',
       isSelected: true,
       tabHasError: true,
       world: {
@@ -181,6 +187,7 @@ test('Test that DialogProjectSettingsWorldsTabItem marks duplicate palette error
 test('Test that DialogProjectSettingsWorldsTabItem selects on Enter and Space keydown', async () => {
   const w = mount(DialogProjectSettingsWorldsTabItem, {
     props: {
+      currentLanguageCode: 'en-US',
       isSelected: false,
       tabHasError: false,
       world: worldFixture

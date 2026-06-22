@@ -20,7 +20,7 @@ export default {
     title: 'Εγγραφείτε στον διακομιστή FA Discord',
   },
   buttonReddit: {
-    label: '',
+    label: 'Reddit',
     title: 'Εγγραφείτε στο FA subreddit',
   },
   buttonTwitter: {

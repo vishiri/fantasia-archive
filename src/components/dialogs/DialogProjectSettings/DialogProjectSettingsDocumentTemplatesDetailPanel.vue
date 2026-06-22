@@ -10,19 +10,18 @@
             {{ $t('dialogs.projectSettings.fields.documentTemplateName.label') }}
           </span>
         </div>
-        <q-input
-          :model-value="props.template.displayName"
+        <FaLocaleTranslationsInput
+          :model-value="props.template.titleTranslations"
           class="dialogProjectSettingsDocumentTemplatesDetail__nameInput"
-          color="primary-bright"
-          dark
-          dense
+          :current-language-code="props.currentLanguageCode"
           :data-test-validation-error="props.nameHasError ? 'true' : 'false'"
-          data-test-locator="dialogProjectSettings-documentTemplates-nameInput"
-          filled
+          dense
           :error="props.nameHasError"
           :error-message="props.nameHasError ? $t('dialogs.projectSettings.fields.documentTemplateName.errorRequired') : undefined"
-          outlined
-          @update:model-value="emitDisplayName"
+          :hide-bottom-space="!props.nameHasError"
+          :max-length="FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_TRANSLATION_MAX_LENGTH"
+          test-locator="dialogProjectSettings-documentTemplates-nameInput"
+          @update:model-value="emitTitleTranslations"
         />
       </div>
 
@@ -48,16 +47,14 @@
             </q-tooltip>
           </q-icon>
         </div>
-        <q-input
-          :model-value="props.template.worldAppendix"
+        <FaLocaleTranslationsInput
+          :model-value="props.template.worldAppendixTranslations"
           class="dialogProjectSettingsDocumentTemplatesDetail__appendixInput"
-          color="primary-bright"
-          dark
+          :current-language-code="props.currentLanguageCode"
           dense
-          data-test-locator="dialogProjectSettings-documentTemplates-worldAppendixInput"
-          filled
-          outlined
-          @update:model-value="emitWorldAppendix"
+          :max-length="FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_TRANSLATION_MAX_LENGTH"
+          test-locator="dialogProjectSettings-documentTemplates-worldAppendixInput"
+          @update:model-value="emitWorldAppendixTranslations"
         />
       </div>
 
@@ -88,15 +85,23 @@
 </template>
 
 <script setup lang="ts">
+import { FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_TRANSLATION_MAX_LENGTH } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+import { FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_TRANSLATION_MAX_LENGTH } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
+
 import DialogProjectSettingsDocumentTemplatesDeleteButton from './DialogProjectSettingsDocumentTemplatesDeleteButton.vue'
 import FaIconPickerInput from 'app/src/components/elements/FaIconPickerInput/FaIconPickerInput.vue'
+import FaLocaleTranslationsInput from 'app/src/components/elements/FaLocaleTranslationsInput/FaLocaleTranslationsInput.vue'
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
+import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
 
 defineOptions({
   name: 'DialogProjectSettingsDocumentTemplatesDetailPanel'
 })
 
 const props = defineProps<{
+  currentLanguageCode: T_faUserSettingsLanguageCode
   nameHasError: boolean
   removeDisabled: boolean
   template: I_dialogProjectSettingsDocumentTemplateDraft
@@ -104,17 +109,19 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   remove: []
-  'update:displayName': [value: string]
   'update:icon': [value: string]
-  'update:worldAppendix': [value: string]
+  'update:titleTranslations': [value: I_faProjectDocumentTemplateTitleTranslations]
+  'update:worldAppendixTranslations': [value: I_faProjectDocumentTemplateWorldAppendixTranslations]
 }>()
 
-function emitDisplayName (value: string | number | null): void {
-  emit('update:displayName', value === null || value === undefined ? '' : String(value))
+function emitTitleTranslations (value: I_faProjectDocumentTemplateTitleTranslations): void {
+  emit('update:titleTranslations', value)
 }
 
-function emitWorldAppendix (value: string | number | null): void {
-  emit('update:worldAppendix', value === null || value === undefined ? '' : String(value))
+function emitWorldAppendixTranslations (
+  value: I_faProjectDocumentTemplateWorldAppendixTranslations
+): void {
+  emit('update:worldAppendixTranslations', value)
 }
 
 function emitIcon (value: string | number | null): void {
@@ -126,13 +133,18 @@ function emitIcon (value: string | number | null): void {
 
 <style lang="scss" scoped>
 .dialogProjectSettingsDocumentTemplatesDetail__fieldsRow {
-  align-items: flex-start;
+  align-items: flex-end;
   display: flex;
   flex-wrap: nowrap;
   gap: $dialogProjectSettings-worldsDetailFieldsRow-gap;
 }
 
 .dialogProjectSettingsDocumentTemplatesDetail__nameField {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dialogProjectSettingsDocumentTemplatesDetail__nameInput {
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -148,8 +160,6 @@ function emitIcon (value: string | number | null): void {
 }
 
 .dialogProjectSettingsDocumentTemplatesDetail__deleteCol {
-  align-self: flex-end;
   flex: 0 0 auto;
-  margin-bottom: $dialogProjectSettings-worldsDetailDeleteCol-marginBottom;
 }
 </style>

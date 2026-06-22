@@ -6,6 +6,7 @@ import { expect, test } from 'vitest'
 
 import DialogProjectSettingsDocumentTemplatesTabList from '../DialogProjectSettingsDocumentTemplatesTabList.vue'
 import { FA_DIALOG_PROJECT_SETTINGS_DOCUMENT_TEMPLATES_TAB_LIST_WIDTH_PX } from '../scripts/functions/dialogProjectSettingsDialogInput'
+import { buildDialogProjectSettingsDocumentTemplateDraft } from './dialogProjectSettingsDocumentTemplateDraftFixtures'
 
 /**
  * DialogProjectSettingsDocumentTemplatesTabList
@@ -14,6 +15,7 @@ import { FA_DIALOG_PROJECT_SETTINGS_DOCUMENT_TEMPLATES_TAB_LIST_WIDTH_PX } from 
 test('Test that DialogProjectSettingsDocumentTemplatesTabList renders add button', () => {
   const w = mount(DialogProjectSettingsDocumentTemplatesTabList, {
     props: {
+      currentLanguageCode: 'en-US',
       selectedTemplateId: null,
       templates: []
     },
@@ -48,6 +50,7 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabList renders add button
 test('Test that DialogProjectSettingsDocumentTemplatesTabList binds tabListWidthPx on the list root', () => {
   const w = mount(DialogProjectSettingsDocumentTemplatesTabList, {
     props: {
+      currentLanguageCode: 'en-US',
       selectedTemplateId: null,
       tabListWidthPx: FA_DIALOG_PROJECT_SETTINGS_DOCUMENT_TEMPLATES_TAB_LIST_WIDTH_PX,
       templates: []
@@ -78,20 +81,17 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabList binds tabListWidth
 })
 
 const templatesFilterFixture = [
-  {
-    displayName: 'Character',
-    documentCount: 0,
+  buildDialogProjectSettingsDocumentTemplateDraft({
     icon: 'mdi-account',
     id: 'template-a',
-    worldAppendix: ' sheet'
-  },
-  {
-    displayName: 'Locations',
-    documentCount: 0,
+    worldAppendixTranslations: { 'en-US': 'sheet' }
+  }),
+  buildDialogProjectSettingsDocumentTemplateDraft({
     icon: 'mdi-map',
     id: 'template-b',
-    worldAppendix: ' atlas'
-  }
+    titleTranslations: { 'en-US': 'Locations' },
+    worldAppendixTranslations: { 'en-US': 'atlas' }
+  })
 ]
 
 /**
@@ -101,6 +101,7 @@ const templatesFilterFixture = [
 test('Test that DialogProjectSettingsDocumentTemplatesTabList filters template tabs by name and appendix', async () => {
   const w = mount(DialogProjectSettingsDocumentTemplatesTabList, {
     props: {
+      currentLanguageCode: 'en-US',
       selectedTemplateId: templatesFilterFixture[0].id,
       templates: templatesFilterFixture
     },
@@ -116,7 +117,7 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabList filters template t
               type: Object
             }
           },
-          template: '<div class="template-tab-stub" :data-test-template-name="template.displayName" />'
+          template: '<div class="template-tab-stub" :data-test-template-name="template.titleTranslations[\'en-US\']" />'
         }),
         DialogProjectSettingsVerticalTabListFilterInput: defineComponent({
           props: {
@@ -150,27 +151,23 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabList filters template t
 })
 
 const templatesFilteredReorderFixture = [
-  {
-    displayName: 'Character',
-    documentCount: 0,
+  buildDialogProjectSettingsDocumentTemplateDraft({
     icon: 'mdi-account',
     id: 'template-a',
-    worldAppendix: ' sheet'
-  },
-  {
-    displayName: 'Locations',
-    documentCount: 0,
+    worldAppendixTranslations: { 'en-US': 'sheet' }
+  }),
+  buildDialogProjectSettingsDocumentTemplateDraft({
     icon: 'mdi-map',
     id: 'template-b',
-    worldAppendix: ' atlas'
-  },
-  {
-    displayName: 'Notes',
-    documentCount: 0,
+    titleTranslations: { 'en-US': 'Locations' },
+    worldAppendixTranslations: { 'en-US': 'atlas' }
+  }),
+  buildDialogProjectSettingsDocumentTemplateDraft({
     icon: 'mdi-note',
     id: 'template-c',
-    worldAppendix: ' pad'
-  }
+    titleTranslations: { 'en-US': 'Notes' },
+    worldAppendixTranslations: { 'en-US': 'pad' }
+  })
 ]
 
 /**
@@ -180,6 +177,7 @@ const templatesFilteredReorderFixture = [
 test('Test that DialogProjectSettingsDocumentTemplatesTabList merges filtered drag reorder into full list', async () => {
   const w = mount(DialogProjectSettingsDocumentTemplatesTabList, {
     props: {
+      currentLanguageCode: 'en-US',
       selectedTemplateId: templatesFilteredReorderFixture[0].id,
       templates: templatesFilteredReorderFixture
     },

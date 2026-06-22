@@ -1,4 +1,7 @@
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
+import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
+import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
 import type { I_faProjectSettingsRoot } from 'app/types/I_faProjectSettingsDomain'
 import type { I_dialogProjectSettingsSaveValidationTooltipContent } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
@@ -40,12 +43,21 @@ export type T_dialogProjectSettingsUseHookDeps = {
     removeDocumentTemplate: (id: string) => void
     removeWorld: (id: string) => void
     saveAndCloseDialog: () => Promise<void>
-    updateDocumentTemplateDisplayName: (id: string, displayName: string) => void
+    updateDocumentTemplateTitleTranslations: (
+      id: string,
+      titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+    ) => void
     updateDocumentTemplateIcon: (id: string, icon: string) => void
-    updateDocumentTemplateWorldAppendix: (id: string, worldAppendix: string) => void
+    updateDocumentTemplateWorldAppendixTranslations: (
+      id: string,
+      worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
+    ) => void
     updateWorldColor: (id: string, color: string) => void
     updateWorldColorPallete: (id: string, colorPallete: string) => void
-    updateWorldDisplayName: (id: string, displayName: string) => void
+    updateWorldDisplayNameTranslations: (
+      id: string,
+      displayNameTranslations: I_faProjectWorldDisplayNameTranslations
+    ) => void
     updateWorldTemplateLayout: (
       id: string,
       templateLayout: I_dialogProjectSettingsWorldDraft['templateLayout']

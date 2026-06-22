@@ -20,7 +20,7 @@ export default {
     title: 'FA Discord サーバーに参加します',
   },
   buttonReddit: {
-    label: '',
+    label: 'Reddit',
     title: 'FA サブレディットに登録してください',
   },
   buttonTwitter: {

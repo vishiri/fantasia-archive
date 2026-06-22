@@ -17,12 +17,13 @@ export default meta
 
 export const Default: StoryObj<typeof meta> = {
   args: {
+    currentLanguageCode: 'en-US',
     isSelected: false,
     tabHasError: false,
     world: {
       color: '',
       colorPallete: '',
-      displayName: 'Falala',
+      displayNameTranslations: { 'en-US': 'Falala' },
       documentCount: 0,
       id: '550e8400-e29b-41d4-a716-446655440000'
     }
@@ -31,12 +32,13 @@ export const Default: StoryObj<typeof meta> = {
 
 export const Selected: StoryObj<typeof meta> = {
   args: {
+    currentLanguageCode: 'en-US',
     isSelected: true,
     tabHasError: false,
     world: {
       color: '',
       colorPallete: '',
-      displayName: 'Falala',
+      displayNameTranslations: { 'en-US': 'Falala' },
       documentCount: 0,
       id: '550e8400-e29b-41d4-a716-446655440000'
     }

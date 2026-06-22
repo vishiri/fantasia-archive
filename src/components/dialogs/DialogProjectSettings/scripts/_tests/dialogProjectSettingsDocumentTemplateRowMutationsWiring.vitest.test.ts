@@ -2,21 +2,18 @@ import { ref } from 'vue'
 import { expect, test } from 'vitest'
 
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
+import { buildDialogProjectSettingsDocumentTemplateDraft } from '../../_tests/dialogProjectSettingsDocumentTemplateDraftFixtures'
 import {
   addDialogProjectSettingsDocumentTemplateDraftRow,
   removeDialogProjectSettingsDocumentTemplateDraftRow,
-  updateDialogProjectSettingsDocumentTemplateDraftDisplayName,
   updateDialogProjectSettingsDocumentTemplateDraftIcon,
-  updateDialogProjectSettingsDocumentTemplateDraftWorldAppendix
+  updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations,
+  updateDialogProjectSettingsDocumentTemplateDraftWorldAppendixTranslations
 } from '../dialogProjectSettingsDocumentTemplateRowMutationsWiring'
 
-const baseTemplate: I_dialogProjectSettingsDocumentTemplateDraft = {
-  displayName: 'Character',
-  documentCount: 0,
-  icon: '',
-  id: '550e8400-e29b-41d4-a716-446655440000',
-  worldAppendix: ''
-}
+const baseTemplate = buildDialogProjectSettingsDocumentTemplateDraft({
+  id: '550e8400-e29b-41d4-a716-446655440000'
+})
 
 /**
  * addDialogProjectSettingsDocumentTemplateDraftRow
@@ -24,10 +21,16 @@ const baseTemplate: I_dialogProjectSettingsDocumentTemplateDraft = {
  */
 test('Test that addDialogProjectSettingsDocumentTemplateDraftRow appends a new template draft', () => {
   const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([baseTemplate])
-  addDialogProjectSettingsDocumentTemplateDraftRow(localDocumentTemplates, 'New template')
+  addDialogProjectSettingsDocumentTemplateDraftRow(localDocumentTemplates, 'en-US', 'New template')
   expect(localDocumentTemplates.value).toHaveLength(2)
   expect(localDocumentTemplates.value?.[0].id).toBe(baseTemplate.id)
-  expect(localDocumentTemplates.value?.[1].displayName).toBe('New template')
+  expect(localDocumentTemplates.value?.[1].titleTranslations).toEqual({ 'en-US': 'New template' })
+})
+
+test('Test that addDialogProjectSettingsDocumentTemplateDraftRow seeds the active UI language only', () => {
+  const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([])
+  addDialogProjectSettingsDocumentTemplateDraftRow(localDocumentTemplates, 'de', 'Neue Vorlage')
+  expect(localDocumentTemplates.value?.[0].titleTranslations).toEqual({ de: 'Neue Vorlage' })
 })
 
 /**
@@ -36,7 +39,7 @@ test('Test that addDialogProjectSettingsDocumentTemplateDraftRow appends a new t
  */
 test('Test that addDialogProjectSettingsDocumentTemplateDraftRow no-ops when localDocumentTemplates is null', () => {
   const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>(null)
-  addDialogProjectSettingsDocumentTemplateDraftRow(localDocumentTemplates, 'New template')
+  addDialogProjectSettingsDocumentTemplateDraftRow(localDocumentTemplates, 'en-US', 'New template')
   expect(localDocumentTemplates.value).toBeNull()
 })
 
@@ -45,13 +48,10 @@ test('Test that addDialogProjectSettingsDocumentTemplateDraftRow no-ops when loc
  * Filters out the matching template id.
  */
 test('Test that removeDialogProjectSettingsDocumentTemplateDraftRow removes the matching id', () => {
-  const otherTemplate: I_dialogProjectSettingsDocumentTemplateDraft = {
-    displayName: 'Other',
-    documentCount: 0,
-    icon: '',
+  const otherTemplate = buildDialogProjectSettingsDocumentTemplateDraft({
     id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
-    worldAppendix: ''
-  }
+    titleTranslations: { 'en-US': 'Other' }
+  })
   const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([
     baseTemplate,
     otherTemplate
@@ -71,42 +71,60 @@ test('Test that removeDialogProjectSettingsDocumentTemplateDraftRow no-ops when 
 })
 
 /**
- * updateDialogProjectSettingsDocumentTemplateDraftDisplayName
- * Updates the display name for the matching template id.
+ * updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations
+ * Updates title translations for the matching template id.
  */
-test('Test that updateDialogProjectSettingsDocumentTemplateDraftDisplayName updates the matching row', () => {
+test('Test that updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations updates the matching row', () => {
   const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([baseTemplate])
-  updateDialogProjectSettingsDocumentTemplateDraftDisplayName(localDocumentTemplates, baseTemplate.id, 'Renamed')
-  expect(localDocumentTemplates.value?.[0].displayName).toBe('Renamed')
+  updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations(
+    localDocumentTemplates,
+    baseTemplate.id,
+    { 'en-US': 'Renamed' }
+  )
+  expect(localDocumentTemplates.value?.[0].titleTranslations).toEqual({ 'en-US': 'Renamed' })
+})
+
+test('Test that updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations ignores unknown ids', () => {
+  const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([baseTemplate])
+  updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations(
+    localDocumentTemplates,
+    'missing-id',
+    { 'en-US': 'Renamed' }
+  )
+  expect(localDocumentTemplates.value?.[0].titleTranslations).toEqual({ 'en-US': 'Character' })
 })
 
 /**
- * updateDialogProjectSettingsDocumentTemplateDraftDisplayName
+ * updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations
  * No-ops when localDocumentTemplates is null.
  */
-test('Test that updateDialogProjectSettingsDocumentTemplateDraftDisplayName no-ops when localDocumentTemplates is null', () => {
+test('Test that updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations no-ops when localDocumentTemplates is null', () => {
   const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>(null)
-  updateDialogProjectSettingsDocumentTemplateDraftDisplayName(localDocumentTemplates, baseTemplate.id, 'Renamed')
+  updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations(
+    localDocumentTemplates,
+    baseTemplate.id,
+    { 'en-US': 'Renamed' }
+  )
   expect(localDocumentTemplates.value).toBeNull()
 })
 
 /**
- * updateDialogProjectSettingsDocumentTemplateDraftWorldAppendix
+ * updateDialogProjectSettingsDocumentTemplateDraftWorldAppendixTranslations
  * Updates world appendix for the matching template id.
  */
-test('Test that updateDialogProjectSettingsDocumentTemplateDraftWorldAppendix updates the matching row', () => {
+test('Test that updateDialogProjectSettingsDocumentTemplateDraftWorldAppendixTranslations updates the matching row', () => {
   const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([baseTemplate])
-  updateDialogProjectSettingsDocumentTemplateDraftWorldAppendix(localDocumentTemplates, baseTemplate.id, 'Notes')
-  expect(localDocumentTemplates.value?.[0].worldAppendix).toBe('Notes')
+  updateDialogProjectSettingsDocumentTemplateDraftWorldAppendixTranslations(localDocumentTemplates, baseTemplate.id, { 'en-US': 'Notes' })
+  expect(localDocumentTemplates.value?.[0].worldAppendixTranslations).toEqual({ 'en-US': 'Notes' })
 })
 
 /**
- * updateDialogProjectSettingsDocumentTemplateDraftWorldAppendix
+ * updateDialogProjectSettingsDocumentTemplateDraftWorldAppendixTranslations
  * No-ops when localDocumentTemplates is null.
  */
-test('Test that updateDialogProjectSettingsDocumentTemplateDraftWorldAppendix no-ops when localDocumentTemplates is null', () => {
+test('Test that updateDialogProjectSettingsDocumentTemplateDraftWorldAppendixTranslations no-ops when localDocumentTemplates is null', () => {
   const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>(null)
-  updateDialogProjectSettingsDocumentTemplateDraftWorldAppendix(localDocumentTemplates, baseTemplate.id, 'Notes')
+  updateDialogProjectSettingsDocumentTemplateDraftWorldAppendixTranslations(localDocumentTemplates, baseTemplate.id, { 'en-US': 'Notes' })
   expect(localDocumentTemplates.value).toBeNull()
 })
 

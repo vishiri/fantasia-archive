@@ -1,0 +1,29 @@
+import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
+import { FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_TRANSLATION_MAX_LENGTH } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+
+import { createNormalizeFaLocaleStringTranslations } from 'app/src/scripts/localeTranslations/functions/normalizeFaLocaleStringTranslations'
+import { createResolveFaLocaleStringTranslation } from 'app/src/scripts/localeTranslations/functions/resolveFaLocaleStringTranslation'
+
+const resolveApi = createResolveFaLocaleStringTranslation({
+  languageCodes: FA_USER_SETTINGS_LANGUAGE_CODES
+})
+
+const normalizeFaProjectDocumentTemplateTitleTranslations =
+  createNormalizeFaLocaleStringTranslations({
+    languageCodes: FA_USER_SETTINGS_LANGUAGE_CODES,
+    maxLength: FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_TRANSLATION_MAX_LENGTH
+  })
+
+export const {
+  hasFaLocaleStringTranslation: hasFaProjectDocumentTemplateTitleTranslation,
+  resolveFaLocaleStringTranslation: resolveFaProjectDocumentTemplateTitle,
+  resolveFaLocaleStringTranslationForStorage: resolveFaProjectDocumentTemplateTitleForStorage,
+  resolveFaLocaleStringTranslationLanguageCode: resolveFaProjectDocumentTemplateTitleDisplayLanguageCode
+} = resolveApi
+
+export const hasFaProjectDocumentTemplateTitle = hasFaProjectDocumentTemplateTitleTranslation
+export const normalizeFaProjectDocumentTemplateTitles = normalizeFaProjectDocumentTemplateTitleTranslations
+export const resolveFaProjectDocumentTemplateDisplayTitle = resolveFaProjectDocumentTemplateTitle
+export const resolveFaProjectDocumentTemplateDisplayTitleLanguageCode =
+  resolveFaProjectDocumentTemplateTitleDisplayLanguageCode
+export const resolveFaProjectDocumentTemplateStorageTitle = resolveFaProjectDocumentTemplateTitleForStorage

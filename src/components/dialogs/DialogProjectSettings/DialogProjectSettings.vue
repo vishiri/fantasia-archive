@@ -27,6 +27,7 @@
         <DialogProjectSettingsPanelsColumn
           v-if="localSettings !== null"
           class="col"
+          :current-language-code="currentLanguageCode"
           :document-templates="localDocumentTemplates"
           :project-name="localSettings.projectName"
           :project-name-has-error="hasGeneralSettingsValidationError"
@@ -39,12 +40,12 @@
           @update:document-templates="updateDocumentTemplatesOrder"
           @update:project-name="updateProjectName"
           @update:worlds="updateWorldsOrder"
-          @update-document-template-display-name="updateDocumentTemplateDisplayName"
+          @update-document-template-title-translations="updateDocumentTemplateTitleTranslations"
           @update-document-template-icon="updateDocumentTemplateIcon"
-          @update-document-template-world-appendix="updateDocumentTemplateWorldAppendix"
+          @update-document-template-world-appendix-translations="updateDocumentTemplateWorldAppendixTranslations"
           @update-world-color="updateWorldColor"
           @update-world-color-pallete="updateWorldColorPallete"
-          @update-world-display-name="updateWorldDisplayName"
+          @update-world-display-name-translations="updateWorldDisplayNameTranslations"
           @update-world-template-layout="updateWorldTemplateLayout"
         />
       </q-card-section>
@@ -121,6 +122,7 @@ defineOptions({
 const props = defineProps<I_dialogProjectSettingsProps>()
 
 const {
+  currentLanguageCode,
   addDocumentTemplate,
   addWorld,
   dialogModel,
@@ -137,12 +139,12 @@ const {
   saveAndCloseDialog,
   saveValidationErrorsTooltip,
   selectedCategoryTab,
-  updateDocumentTemplateDisplayName,
+  updateDocumentTemplateTitleTranslations,
   updateDocumentTemplateIcon,
-  updateDocumentTemplateWorldAppendix,
+  updateDocumentTemplateWorldAppendixTranslations,
   updateWorldColor,
   updateWorldColorPallete,
-  updateWorldDisplayName,
+  updateWorldDisplayNameTranslations,
   updateWorldTemplateLayout
 } = useDialogProjectSettings(props)
 

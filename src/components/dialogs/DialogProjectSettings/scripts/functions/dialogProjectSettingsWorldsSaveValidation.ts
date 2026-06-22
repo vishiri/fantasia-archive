@@ -6,6 +6,8 @@ import type {
 } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 
+import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
+
 const HEX_COLOR_SEGMENT = /^#[0-9a-fA-F]{6}$/
 
 function hasDialogProjectSettingsColorPalleteCaseInsensitiveDuplicates (
@@ -58,7 +60,7 @@ function worldTemplateLayoutHasDocumentTemplatePlacementValidationError (
     return false
   }
   for (const template of documentTemplates) {
-    if (template.displayName.trim().length > 0) {
+    if (Object.values(template.titleTranslations).some((value) => (value ?? '').trim().length > 0)) {
       continue
     }
     for (const placement of templateLayout.placements) {
@@ -79,18 +81,27 @@ function worldTemplateLayoutHasValidationError (
   return worldTemplateLayoutHasDuplicateDocumentTemplatePlacements(templateLayout)
 }
 
+function dialogProjectSettingsWorldNameTranslationsHasValue (
+  displayNameTranslations: I_faProjectWorldDisplayNameTranslations
+): boolean {
+  for (const value of Object.values(displayNameTranslations)) {
+    if ((value ?? '').trim().length > 0) {
+      return true
+    }
+  }
+  return false
+}
+
+export function isDialogProjectSettingsWorldNameInvalid (
+  displayNameTranslations: I_faProjectWorldDisplayNameTranslations
+): boolean {
+  return !dialogProjectSettingsWorldNameTranslationsHasValue(displayNameTranslations)
+}
+
 export function isDialogProjectSettingsWorldColorPalleteInvalid (
   colorPallete: string
 ): boolean {
   return hasDialogProjectSettingsColorPalleteCaseInsensitiveDuplicates(colorPallete)
-}
-
-export function resolveDialogProjectSettingsWorldSaveErrorDisplayName (
-  displayName: string,
-  defaultNewWorldName: string
-): string {
-  const trimmed = displayName.trim()
-  return trimmed.length > 0 ? trimmed : defaultNewWorldName
 }
 
 export function collectDialogProjectSettingsSaveValidationErrors (
@@ -112,7 +123,7 @@ export function collectDialogProjectSettingsSaveValidationErrors (
       continue
     }
     const worldIndexOneBased = index + 1
-    if (isDialogProjectSettingsWorldNameInvalid(world.displayName)) {
+    if (isDialogProjectSettingsWorldNameInvalid(world.displayNameTranslations)) {
       errors.push({
         kind: 'worldNameRequired',
         worldIndexOneBased
@@ -173,14 +184,14 @@ export function hasDialogProjectSettingsWorldNameValidationError (
   if (worlds === null) {
     return true
   }
-  return worlds.some((world) => world.displayName.trim().length === 0)
+  return worlds.some((world) => isDialogProjectSettingsWorldNameInvalid(world.displayNameTranslations))
 }
 
 export function isDialogProjectSettingsWorldTabValidationError (
   world: I_dialogProjectSettingsWorldDraft,
   documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] | null = null
 ): boolean {
-  return isDialogProjectSettingsWorldNameInvalid(world.displayName) ||
+  return isDialogProjectSettingsWorldNameInvalid(world.displayNameTranslations) ||
     isDialogProjectSettingsWorldColorPalleteInvalid(world.colorPallete) ||
     worldTemplateLayoutHasValidationError(world.templateLayout) ||
     worldTemplateLayoutHasDocumentTemplatePlacementValidationError(
@@ -188,11 +199,6 @@ export function isDialogProjectSettingsWorldTabValidationError (
       documentTemplates
     )
 }
-
-export function isDialogProjectSettingsWorldNameInvalid (displayName: string): boolean {
-  return displayName.trim().length === 0
-}
-
 export function hasDialogProjectSettingsWorldTemplateLayoutValidationError (
   worlds: I_dialogProjectSettingsWorldDraft[] | null,
   documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] | null = null

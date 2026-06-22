@@ -1,6 +1,7 @@
 import L_documents from 'app/i18n/en-US/components/globals/AppControlMenus/L_documents'
 import L_FaColorPickerInput from 'app/i18n/en-US/components/elements/FaColorPickerInput/L_FaColorPickerInput'
 import L_FaIconPickerInput from 'app/i18n/en-US/components/elements/FaIconPickerInput/L_FaIconPickerInput'
+import L_FaLocaleTranslationsInput from 'app/i18n/en-US/components/elements/FaLocaleTranslationsInput/L_FaLocaleTranslationsInput'
 import L_FantasiaMascotImage from 'app/i18n/en-US/components/elements/FantasiaMascotImage/L_FantasiaMascotImage'
 import L_GlobalLanguageSelector from 'app/i18n/en-US/components/globals/GlobalLanguageSelector/L_GlobalLanguageSelector'
 import L_GlobalWindowButtons from 'app/i18n/en-US/components/globals/GlobalWindowButtons/L_GlobalWindowButtons'
@@ -95,6 +96,7 @@ const defaultMessages: Record<string, unknown> = {
   fantasiaMascotImage: L_FantasiaMascotImage,
   faColorPickerInput: L_FaColorPickerInput,
   faIconPickerInput: L_FaIconPickerInput,
+  faLocaleTranslationsInput: L_FaLocaleTranslationsInput,
   projectUI: {
     projectOverview: L_projectOverview
   },

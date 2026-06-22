@@ -1,10 +1,14 @@
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
+import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import type { Ref } from 'app/types/I_vueCompositionRefs'
 
-import { appendDialogProjectSettingsDocumentTemplateDraft } from './functions/dialogProjectSettingsDocumentTemplatesDraft'
+import { appendDialogProjectSettingsDocumentTemplateDraft } from './dialogProjectSettingsDocumentTemplatesDraft'
 
 export function addDialogProjectSettingsDocumentTemplateDraftRow (
   localDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>,
+  languageCode: T_faUserSettingsLanguageCode,
   defaultDisplayName: string
 ): void {
   if (localDocumentTemplates.value === null) {
@@ -12,6 +16,7 @@ export function addDialogProjectSettingsDocumentTemplateDraftRow (
   }
   localDocumentTemplates.value = appendDialogProjectSettingsDocumentTemplateDraft(
     localDocumentTemplates.value,
+    languageCode,
     defaultDisplayName
   )
 }
@@ -28,10 +33,10 @@ export function removeDialogProjectSettingsDocumentTemplateDraftRow (
   )
 }
 
-export function updateDialogProjectSettingsDocumentTemplateDraftDisplayName (
+export function updateDialogProjectSettingsDocumentTemplateDraftTitleTranslations (
   localDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>,
   id: string,
-  displayName: string
+  titleTranslations: I_faProjectDocumentTemplateTitleTranslations
 ): void {
   if (localDocumentTemplates.value === null) {
     return
@@ -42,15 +47,15 @@ export function updateDialogProjectSettingsDocumentTemplateDraftDisplayName (
     }
     return {
       ...template,
-      displayName
+      titleTranslations
     }
   })
 }
 
-export function updateDialogProjectSettingsDocumentTemplateDraftWorldAppendix (
+export function updateDialogProjectSettingsDocumentTemplateDraftWorldAppendixTranslations (
   localDocumentTemplates: Ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>,
   id: string,
-  worldAppendix: string
+  worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
 ): void {
   if (localDocumentTemplates.value === null) {
     return
@@ -61,7 +66,7 @@ export function updateDialogProjectSettingsDocumentTemplateDraftWorldAppendix (
     }
     return {
       ...template,
-      worldAppendix
+      worldAppendixTranslations
     }
   })
 }

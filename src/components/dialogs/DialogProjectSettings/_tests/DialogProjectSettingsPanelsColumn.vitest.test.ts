@@ -14,6 +14,7 @@ import {
 test('Test that DialogProjectSettingsPanelsColumn forwards project name updates', async () => {
   const w = mount(DialogProjectSettingsPanelsColumn, {
     props: {
+      currentLanguageCode: 'en-US',
       documentTemplates: null,
       projectName: 'Panel name',
       projectNameHasError: false,
@@ -48,6 +49,7 @@ test('Test that DialogProjectSettingsPanelsColumn forwards project name updates'
 test('Test that DialogProjectSettingsPanelsColumn renders the worlds settings panel', () => {
   const w = mount(DialogProjectSettingsPanelsColumn, {
     props: {
+      currentLanguageCode: 'en-US',
       documentTemplates: [],
       projectName: 'Panel name',
       projectNameHasError: false,

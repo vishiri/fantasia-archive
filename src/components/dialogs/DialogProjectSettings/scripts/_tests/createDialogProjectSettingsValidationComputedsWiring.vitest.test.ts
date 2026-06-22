@@ -21,7 +21,7 @@ test('Test that createDialogProjectSettingsValidationComputeds reflects validati
     {
       color: '',
       colorPallete: '#112233;#112233',
-      displayName: '   ',
+      displayNameTranslations: { 'en-US': '   ' },
       documentCount: 0,
       templateLayout: {
         groups: [],
@@ -32,11 +32,11 @@ test('Test that createDialogProjectSettingsValidationComputeds reflects validati
   ])
   const localDocumentTemplates = ref([
     {
-      displayName: '   ',
       documentCount: 0,
       icon: '',
       id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-      worldAppendix: ''
+      titleTranslations: { 'en-US': '   ' },
+      worldAppendixTranslations: {}
     }
   ])
 

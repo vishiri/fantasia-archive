@@ -5,14 +5,9 @@ import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
 
 import DialogProjectSettingsDocumentTemplatesPanel from '../DialogProjectSettingsDocumentTemplatesPanel.vue'
+import { buildDialogProjectSettingsDocumentTemplateDraft } from './dialogProjectSettingsDocumentTemplateDraftFixtures'
 
-const templateA = {
-  displayName: 'Character',
-  documentCount: 0,
-  icon: '',
-  id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-  worldAppendix: ''
-}
+const templateA = buildDialogProjectSettingsDocumentTemplateDraft()
 
 /**
  * DialogProjectSettingsDocumentTemplatesPanel
@@ -21,6 +16,7 @@ const templateA = {
 test('Test that DialogProjectSettingsDocumentTemplatesPanel renders empty state when templates list is empty', () => {
   const w = mount(DialogProjectSettingsDocumentTemplatesPanel, {
     props: {
+      currentLanguageCode: 'en-US',
       templates: []
     },
     global: {
@@ -50,6 +46,7 @@ test('Test that DialogProjectSettingsDocumentTemplatesPanel renders empty state 
 test('Test that DialogProjectSettingsDocumentTemplatesPanel renders list and detail for selection', async () => {
   const w = mount(DialogProjectSettingsDocumentTemplatesPanel, {
     props: {
+      currentLanguageCode: 'en-US',
       templates: [templateA]
     },
     global: {

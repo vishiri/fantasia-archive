@@ -5,9 +5,9 @@ import type { I_faProjectDocumentTemplateSnapshotItem } from 'app/types/I_faProj
 import type { I_faProjectWorldSnapshotItem } from 'app/types/I_faProjectWorldDomain'
 import type { Ref } from 'app/types/I_vueCompositionRefs'
 
-import { mapDialogProjectSettingsDocumentTemplatesToSnapshot } from './functions/dialogProjectSettingsDocumentTemplatesDraft'
+import { mapDialogProjectSettingsDocumentTemplatesToSnapshot } from './dialogProjectSettingsDocumentTemplatesDraft'
 import { isDialogProjectSettingsFullDialogSaveDisabled } from './dialogProjectSettingsDialogSaveValidation'
-import { mapDialogProjectSettingsWorldsToSnapshot } from './functions/dialogProjectSettingsWorldsDraft'
+import { mapDialogProjectSettingsWorldsToSnapshot } from './dialogProjectSettingsWorldsSnapshotDraft'
 
 export async function saveDialogProjectSettingsDraftAndClose (deps: {
   runFaActionAwait: (

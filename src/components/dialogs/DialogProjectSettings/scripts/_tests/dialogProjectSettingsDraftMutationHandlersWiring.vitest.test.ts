@@ -3,25 +3,20 @@ import { expect, test } from 'vitest'
 
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
+import { buildDialogProjectSettingsDocumentTemplateDraft } from '../../_tests/dialogProjectSettingsDocumentTemplateDraftFixtures'
 import { createEmptyDialogProjectSettingsWorldTemplateLayoutDraft } from '../dialogProjectSettingsWorldTemplateLayoutDraft'
 import { createDialogProjectSettingsDraftMutationHandlers } from '../dialogProjectSettingsDraftMutationHandlersWiring'
 
 const baseWorld: I_dialogProjectSettingsWorldDraft = {
   color: '',
   colorPallete: '',
-  displayName: 'Realm',
+  displayNameTranslations: { 'en-US': 'Realm' },
   documentCount: 0,
   id: '550e8400-e29b-41d4-a716-446655440000',
   templateLayout: createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
 }
 
-const baseTemplate: I_dialogProjectSettingsDocumentTemplateDraft = {
-  displayName: 'Character',
-  documentCount: 0,
-  icon: '',
-  id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-  worldAppendix: ''
-}
+const baseTemplate = buildDialogProjectSettingsDocumentTemplateDraft()
 
 /**
  * createDialogProjectSettingsDraftMutationHandlers
@@ -31,8 +26,9 @@ test('Test that createDialogProjectSettingsDraftMutationHandlers mutates templat
   const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([baseWorld])
   const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([baseTemplate])
   const handlers = createDialogProjectSettingsDraftMutationHandlers({
-    newTemplateDefaultDisplayName: 'New template',
-    newWorldDefaultDisplayName: 'New world'
+    getCurrentLanguageCode: () => 'en-US',
+    resolveNewTemplateDefaultDisplayName: () => 'New template',
+    resolveNewWorldDefaultDisplayName: () => 'New world'
   }, {
     localDocumentTemplates,
     localWorlds
@@ -46,7 +42,7 @@ test('Test that createDialogProjectSettingsDraftMutationHandlers mutates templat
   const addedWorldId = localWorlds.value?.[1].id as string
   const addedTemplateId = localDocumentTemplates.value?.[1].id as string
 
-  handlers.updateWorldDisplayName(addedWorldId, 'Renamed world')
+  handlers.updateWorldDisplayNameTranslations(addedWorldId, { 'en-US': 'Renamed world' })
   handlers.updateWorldColor(addedWorldId, '#aabbcc')
   handlers.updateWorldColorPallete(addedWorldId, '#112233')
   handlers.updateWorldTemplateLayout(addedWorldId, {
@@ -59,9 +55,9 @@ test('Test that createDialogProjectSettingsDraftMutationHandlers mutates templat
     ],
     placements: []
   })
-  handlers.updateDocumentTemplateDisplayName(addedTemplateId, 'Renamed template')
+  handlers.updateDocumentTemplateTitleTranslations(addedTemplateId, { 'en-US': 'Renamed template' })
   handlers.updateDocumentTemplateIcon(addedTemplateId, 'person')
-  handlers.updateDocumentTemplateWorldAppendix(addedTemplateId, 'Notes')
+  handlers.updateDocumentTemplateWorldAppendixTranslations(addedTemplateId, { 'en-US': 'Notes' })
 
   const layoutWithTemplatePlacement: I_dialogProjectSettingsWorldDraft['templateLayout'] = {
     groups: [],
@@ -81,21 +77,52 @@ test('Test that createDialogProjectSettingsDraftMutationHandlers mutates templat
     ]
   }
   handlers.updateWorldTemplateLayout(baseWorld.id, layoutWithTemplatePlacement)
-  handlers.updateDocumentTemplateDisplayName(baseTemplate.id, 'Synced template name')
+  handlers.updateDocumentTemplateTitleTranslations(baseTemplate.id, { 'en-US': 'Synced template name' })
 
   expect(localWorlds.value?.[0].templateLayout.placements[0]?.templateDisplayName).toBe('Synced template name')
 
-  expect(localWorlds.value?.[1].displayName).toBe('Renamed world')
+  expect(localWorlds.value?.[1].displayNameTranslations).toEqual({ 'en-US': 'Renamed world' })
   expect(localWorlds.value?.[1].color).toBe('#aabbcc')
   expect(localWorlds.value?.[1].colorPallete).toBe('#112233')
   expect(localWorlds.value?.[1].templateLayout.groups).toHaveLength(1)
-  expect(localDocumentTemplates.value?.[1].displayName).toBe('Renamed template')
+  expect(localDocumentTemplates.value?.[1].titleTranslations).toEqual({ 'en-US': 'Renamed template' })
   expect(localDocumentTemplates.value?.[1].icon).toBe('person')
-  expect(localDocumentTemplates.value?.[1].worldAppendix).toBe('Notes')
-  expect(localDocumentTemplates.value?.[0].displayName).toBe('Synced template name')
+  expect(localDocumentTemplates.value?.[1].worldAppendixTranslations).toEqual({ 'en-US': 'Notes' })
+  expect(localDocumentTemplates.value?.[0].titleTranslations).toEqual({ 'en-US': 'Synced template name' })
 
   handlers.removeWorld(baseWorld.id)
   handlers.removeDocumentTemplate(baseTemplate.id)
   expect(localWorlds.value?.map((world) => world.id)).toEqual([addedWorldId])
   expect(localDocumentTemplates.value?.map((template) => template.id)).toEqual([addedTemplateId])
+})
+
+test('Test that createDialogProjectSettingsDraftMutationHandlers resolves default names when rows are added', () => {
+  const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([])
+  const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([])
+  let worldDefault = 'Neue Welt'
+  let templateDefault = 'Neue Dokumentvorlage'
+  const handlers = createDialogProjectSettingsDraftMutationHandlers({
+    getCurrentLanguageCode: () => 'de',
+    resolveNewTemplateDefaultDisplayName: () => templateDefault,
+    resolveNewWorldDefaultDisplayName: () => worldDefault
+  }, {
+    localDocumentTemplates,
+    localWorlds
+  })
+
+  handlers.addWorld()
+  handlers.addDocumentTemplate()
+  expect(localWorlds.value?.[0]?.displayNameTranslations).toEqual({ de: 'Neue Welt' })
+  expect(localDocumentTemplates.value?.[0]?.titleTranslations).toEqual({
+    de: 'Neue Dokumentvorlage'
+  })
+
+  worldDefault = 'Zweite Welt'
+  templateDefault = 'Zweite Vorlage'
+  handlers.addWorld()
+  handlers.addDocumentTemplate()
+  expect(localWorlds.value?.[1]?.displayNameTranslations).toEqual({ de: 'Zweite Welt' })
+  expect(localDocumentTemplates.value?.[1]?.titleTranslations).toEqual({
+    de: 'Zweite Vorlage'
+  })
 })

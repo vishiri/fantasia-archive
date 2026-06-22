@@ -3,6 +3,8 @@ import type { T_dialogProjectSettingsUseHookDeps } from 'app/types/I_dialogProje
 
 import { createDialogProjectSettingsValidationComputeds } from './createDialogProjectSettingsValidationComputedsWiring'
 
+import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
+
 export function useDialogProjectSettingsImpl (
   deps: T_dialogProjectSettingsUseHookDeps,
   props: I_dialogProjectSettingsProps
@@ -49,9 +51,14 @@ export function useDialogProjectSettingsImpl (
     localWorlds
   })
 
+  const currentLanguageCode = deps.computed(() => {
+    return S_FaUserSettings().settings?.languageCode ?? 'en-US'
+  })
+
   return {
     addDocumentTemplate: actions.addDocumentTemplate,
     addWorld: actions.addWorld,
+    currentLanguageCode,
     dialogModel,
     documentName,
     hasDocumentTemplatesSettingsValidationError: validation.hasDocumentTemplatesSettingsValidationError,
@@ -66,12 +73,12 @@ export function useDialogProjectSettingsImpl (
     saveAndCloseDialog: actions.saveAndCloseDialog,
     saveValidationErrorsTooltip: validation.saveValidationErrorsTooltip,
     selectedCategoryTab,
-    updateDocumentTemplateDisplayName: actions.updateDocumentTemplateDisplayName,
     updateDocumentTemplateIcon: actions.updateDocumentTemplateIcon,
-    updateDocumentTemplateWorldAppendix: actions.updateDocumentTemplateWorldAppendix,
+    updateDocumentTemplateTitleTranslations: actions.updateDocumentTemplateTitleTranslations,
+    updateDocumentTemplateWorldAppendixTranslations: actions.updateDocumentTemplateWorldAppendixTranslations,
     updateWorldColor: actions.updateWorldColor,
     updateWorldColorPallete: actions.updateWorldColorPallete,
-    updateWorldDisplayName: actions.updateWorldDisplayName,
+    updateWorldDisplayNameTranslations: actions.updateWorldDisplayNameTranslations,
     updateWorldTemplateLayout: actions.updateWorldTemplateLayout
   }
 }

@@ -9,13 +9,19 @@ import { createDialogProjectSettingsDraftMutationHandlers } from './dialogProjec
 import { hydrateDialogProjectSettingsDrafts } from './dialogProjectSettingsDialogHydrateWiring'
 import { saveDialogProjectSettingsDraftAndClose } from './dialogProjectSettingsDialogSaveWiring'
 
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
+import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
+import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
+
 export function createDialogProjectSettingsDialogActions (deps: {
   FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB: string
   faProjectDocumentTemplatesFetchFreshForDialog: () => Promise<I_dialogProjectSettingsDocumentTemplateDraft[]>
   faProjectSettingsFetchFreshForDialog: () => Promise<I_faProjectSettingsRoot>
   faProjectWorldsFetchFreshForDialog: () => Promise<I_dialogProjectSettingsWorldDraft[]>
-  newTemplateDefaultDisplayName: string
-  newWorldDefaultDisplayName: string
+  getCurrentLanguageCode: () => T_faUserSettingsLanguageCode
+  resolveNewTemplateDefaultDisplayName: () => string
+  resolveNewWorldDefaultDisplayName: () => string
   runFaActionAwait: Parameters<typeof saveDialogProjectSettingsDraftAndClose>[0]['runFaActionAwait']
 }, params: {
   dialogModel: Ref<boolean>
@@ -32,12 +38,21 @@ export function createDialogProjectSettingsDialogActions (deps: {
     removeDocumentTemplate: (id: string) => void
     removeWorld: (id: string) => void
     saveAndCloseDialog: () => Promise<void>
-    updateDocumentTemplateDisplayName: (id: string, displayName: string) => void
     updateDocumentTemplateIcon: (id: string, icon: string) => void
-    updateDocumentTemplateWorldAppendix: (id: string, worldAppendix: string) => void
+    updateDocumentTemplateTitleTranslations: (
+      id: string,
+      titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+    ) => void
+    updateDocumentTemplateWorldAppendixTranslations: (
+      id: string,
+      worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
+    ) => void
     updateWorldColor: (id: string, color: string) => void
     updateWorldColorPallete: (id: string, colorPallete: string) => void
-    updateWorldDisplayName: (id: string, displayName: string) => void
+    updateWorldDisplayNameTranslations: (
+      id: string,
+      displayNameTranslations: I_faProjectWorldDisplayNameTranslations
+    ) => void
     updateWorldTemplateLayout: (
       id: string,
       templateLayout: I_dialogProjectSettingsWorldDraft['templateLayout']

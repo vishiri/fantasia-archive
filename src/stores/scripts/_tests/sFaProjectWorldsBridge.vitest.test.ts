@@ -12,7 +12,7 @@ const {
           color: '#808080',
           colorPallete: '',
           createdAtMs: 1,
-          displayName: 'Realm',
+          displayNameTranslations: { 'en-US': 'Realm' },
           documentCount: 2,
           id: '550e8400-e29b-41d4-a716-446655440000',
           sortOrder: 0,
@@ -43,7 +43,7 @@ beforeEach(() => {
         color: '#808080',
         colorPallete: '',
         createdAtMs: 1,
-        displayName: 'Realm',
+        displayNameTranslations: { 'en-US': 'Realm' },
         documentCount: 2,
         id: '550e8400-e29b-41d4-a716-446655440000',
         sortOrder: 0,
@@ -84,7 +84,7 @@ test('Test that faProjectWorldsFetchFreshForDialog returns mapped draft rows', a
     {
       color: '#808080',
       colorPallete: '',
-      displayName: 'Realm',
+      displayNameTranslations: { 'en-US': 'Realm' },
       documentCount: 2,
       id: '550e8400-e29b-41d4-a716-446655440000',
       templateLayout: {
@@ -106,7 +106,7 @@ test('Test that faProjectWorldsFetchFreshForDialog defaults missing templateLayo
         color: '#808080',
         colorPallete: '',
         createdAtMs: 1,
-        displayName: 'Realm',
+        displayNameTranslations: { 'en-US': 'Realm' },
         documentCount: 0,
         id: '550e8400-e29b-41d4-a716-446655440000',
         sortOrder: 0,
@@ -165,7 +165,7 @@ test('Test that faProjectWorldsFetchFreshForDialog wraps non-Error read failures
 test('Test that faProjectWorldsPersistSnapshotFromDialog saves the snapshot', async () => {
   const items = [
     {
-      displayName: 'Realm',
+      displayNameTranslations: { 'en-US': 'Realm' },
       id: '550e8400-e29b-41d4-a716-446655440000'
     }
   ]
@@ -188,7 +188,7 @@ test('Test that faProjectWorldsPersistSnapshotFromDialog throws when bridge is m
   await expect(
     faProjectWorldsPersistSnapshotFromDialog([
       {
-        displayName: 'Realm',
+        displayNameTranslations: { 'en-US': 'Realm' },
         id: '550e8400-e29b-41d4-a716-446655440000'
       }
     ])
@@ -206,7 +206,7 @@ test('Test that faProjectWorldsPersistSnapshotFromDialog surfaces saveError on w
   await expect(
     faProjectWorldsPersistSnapshotFromDialog([
       {
-        displayName: 'Realm',
+        displayNameTranslations: { 'en-US': 'Realm' },
         id: '550e8400-e29b-41d4-a716-446655440000'
       }
     ])
@@ -225,7 +225,7 @@ test('Test that faProjectWorldsPersistSnapshotFromDialog surfaces saveError on n
   await expect(
     faProjectWorldsPersistSnapshotFromDialog([
       {
-        displayName: 'Realm',
+        displayNameTranslations: { 'en-US': 'Realm' },
         id: '550e8400-e29b-41d4-a716-446655440000'
       }
     ])

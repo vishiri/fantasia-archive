@@ -11,6 +11,8 @@ export default {
     openAdvancedSearchGuideDialog: 'उन्नत खोज मार्गदर्शिका खोलें',
     openChangelogDialog: 'चेंजलॉग खोलें',
     openKeybindSettingsDialog: 'कीबाइंड सेटिंग्स खोलें',
+    openProjectSettingsDialog: 'परियोजना सेटिंग्स खोलें',
+    saveProjectSettings: 'परियोजना सेटिंग्स सहेजें',
     openLicenseDialog: 'लाइसेंस खोलें',
     openAppSettingsDialog: 'ऐप सेटिंग खोलें',
     openAppStylingWindow: 'कस्टम ऐप खोलें CSS',

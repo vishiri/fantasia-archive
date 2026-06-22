@@ -30,6 +30,7 @@
 .dialogProjectSettings__fieldHelpTooltip.q-tooltip {
   max-width: $dialogProjectSettings-fieldHelpTooltip-maxWidth;
   text-align: left;
+  white-space: pre-line;
 }
 
 .dialogProjectSettings__fieldHelpTooltipBullet {

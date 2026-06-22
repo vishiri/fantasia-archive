@@ -283,6 +283,11 @@ export default {
       description: 'Bestemmer om tekstredigereren har begrenset høyde når den ikke er i fullskjermmodus.',
       tags: 'tekstområde høyde, lang tekst, utvide editor, rulle editor',
     },
+    logFullActivityPayload: {
+      title: 'Logg full aktivitetsnyttelast',
+      description: 'Hvis dette er aktivert, logger aktiviteten fullstendige nyttelaster. Dette kan være nyttig ved dyp feilsøking som krever presis logging av resultater.',
+      tags: 'feilsøking, feilretting, DevTools, nyttelast, aktivitet, logging',
+    },
     noProjectName: {
       title: 'Skjul prosjektnavn i treet',
       description: 'Bestemmer om prosjektnavnet i det hele tatt skal vises i det hierarkiske treet.',

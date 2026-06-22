@@ -1,6 +1,9 @@
 import type { I_faProjectContentNamedEntity } from 'app/types/I_faProjectContentShared'
 import type { I_faProjectDocument } from 'app/types/I_faProjectDocumentDomain'
 import type { I_faProjectDocumentTemplate } from 'app/types/I_faProjectDocumentTemplateDomain'
+import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
+import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
 import type { I_faProjectWorld } from 'app/types/I_faProjectWorldDomain'
 import type {
   I_faProjectWorldTemplateGroup,
@@ -13,15 +16,47 @@ import type { I_faSqlWorldRow } from 'app/types/I_faProjectContentRowMap'
 import type { I_faSqlWorldTemplateGroupRow } from 'app/types/I_faProjectContentRowMap'
 import type { I_faSqlWorldTemplatePlacementJoinRow } from 'app/types/I_faProjectContentRowMap'
 
-export function mapFaProjectWorldRow (row: I_faSqlWorldRow): I_faProjectWorld {
-  return {
-    id: row.id,
-    displayName: row.display_name,
-    color: row.color,
-    colorPallete: row.color_pallete,
-    sortOrder: row.sort_order,
-    createdAtMs: row.created_at_ms,
-    updatedAtMs: row.updated_at_ms
+export function createMapFaProjectDocumentTemplateRow (deps: {
+  parseTitleTranslationsJson: (raw: string) => I_faProjectDocumentTemplateTitleTranslations
+  parseWorldAppendixTranslationsJson: (
+    raw: string
+  ) => I_faProjectDocumentTemplateWorldAppendixTranslations
+}): (row: I_faSqlDocumentTemplateRow) => I_faProjectDocumentTemplate {
+  return function mapFaProjectDocumentTemplateRow (
+    row: I_faSqlDocumentTemplateRow
+  ): I_faProjectDocumentTemplate {
+    return {
+      id: row.id,
+      displayName: row.display_name,
+      titleTranslations: deps.parseTitleTranslationsJson(row.title_translations_json),
+      sortOrder: row.sort_order,
+      worldAppendix: row.world_appendix,
+      worldAppendixTranslations: deps.parseWorldAppendixTranslationsJson(
+        row.world_appendix_translations_json
+      ),
+      icon: row.icon,
+      createdAtMs: row.created_at_ms,
+      updatedAtMs: row.updated_at_ms
+    }
+  }
+}
+
+export function createMapFaProjectWorldRow (deps: {
+  parseDisplayNameTranslationsJson: (raw: string) => I_faProjectWorldDisplayNameTranslations
+}): (row: I_faSqlWorldRow) => I_faProjectWorld {
+  return function mapFaProjectWorldRow (row: I_faSqlWorldRow): I_faProjectWorld {
+    return {
+      id: row.id,
+      displayName: row.display_name,
+      displayNameTranslations: deps.parseDisplayNameTranslationsJson(
+        row.display_name_translations_json
+      ),
+      color: row.color,
+      colorPallete: row.color_pallete,
+      sortOrder: row.sort_order,
+      createdAtMs: row.created_at_ms,
+      updatedAtMs: row.updated_at_ms
+    }
   }
 }
 
@@ -31,20 +66,6 @@ export function mapFaProjectNamedEntityRow (
   return {
     id: row.id,
     displayName: row.display_name,
-    createdAtMs: row.created_at_ms,
-    updatedAtMs: row.updated_at_ms
-  }
-}
-
-export function mapFaProjectDocumentTemplateRow (
-  row: I_faSqlDocumentTemplateRow
-): I_faProjectDocumentTemplate {
-  return {
-    id: row.id,
-    displayName: row.display_name,
-    sortOrder: row.sort_order,
-    worldAppendix: row.world_appendix,
-    icon: row.icon,
     createdAtMs: row.created_at_ms,
     updatedAtMs: row.updated_at_ms
   }

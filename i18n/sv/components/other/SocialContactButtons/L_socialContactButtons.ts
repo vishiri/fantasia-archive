@@ -20,7 +20,7 @@ export default {
     title: 'Gå med i servern FA Discord',
   },
   buttonReddit: {
-    label: '',
+    label: 'Reddit',
     title: 'Prenumerera på FA subreddit',
   },
   buttonTwitter: {

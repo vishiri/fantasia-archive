@@ -28,11 +28,11 @@
                 )"
               />
               <q-item-label class="dialogProjectSettingsWorldAvailableTemplatesList__label col">
-                {{ template.displayName }}
+                {{ resolveTemplateLabel(template) }}
               </q-item-label>
             </div>
             <div
-              v-if="template.worldAppendix.trim().length > 0"
+              v-if="resolveTemplateWorldAppendix(template).length > 0"
               class="dialogProjectSettingsWorldAvailableTemplatesList__affixRow row no-wrap"
             >
               <span
@@ -43,7 +43,7 @@
                 caption
                 class="dialogProjectSettingsWorldAvailableTemplatesList__appendix fa-text-muted col"
               >
-                ({{ template.worldAppendix.trim() }})
+                ({{ resolveTemplateWorldAppendix(template) }})
               </q-item-label>
             </div>
           </div>
@@ -71,13 +71,16 @@
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import { FA_ICON_PICKER_EMPTY_PLACEHOLDER_ICON } from 'app/types/I_faIconPickerInput'
 import { clearQuasarHoverableFocusState } from 'app/src/scripts/dom/functions/clearQuasarHoverableFocusState'
-import { resolveDialogProjectSettingsDocumentTemplateDisplayIcon } from './scripts/functions/dialogProjectSettingsDocumentTemplatesDraft'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
+import { resolveDialogProjectSettingsDocumentTemplateResolvedTitle, resolveDialogProjectSettingsDocumentTemplateDisplayIcon } from './scripts/dialogProjectSettingsDocumentTemplatesDraft'
+import { resolveDialogProjectSettingsDocumentTemplateResolvedWorldAppendix } from './scripts/dialogProjectSettingsDocumentTemplateWorldAppendixDraft'
 
 defineOptions({
   name: 'DialogProjectSettingsWorldAvailableTemplatesList'
 })
 
 const props = defineProps<{
+  currentLanguageCode: T_faUserSettingsLanguageCode
   showFilterEmpty?: boolean
   templates: I_dialogProjectSettingsDocumentTemplateDraft[]
 }>()
@@ -85,6 +88,20 @@ const props = defineProps<{
 const emit = defineEmits<{
   addTemplate: [templateId: string]
 }>()
+
+function resolveTemplateLabel (template: I_dialogProjectSettingsDocumentTemplateDraft): string {
+  return resolveDialogProjectSettingsDocumentTemplateResolvedTitle(
+    template,
+    props.currentLanguageCode
+  )
+}
+
+function resolveTemplateWorldAppendix (template: I_dialogProjectSettingsDocumentTemplateDraft): string {
+  return resolveDialogProjectSettingsDocumentTemplateResolvedWorldAppendix(
+    template,
+    props.currentLanguageCode
+  )
+}
 
 function emitAddTemplate (templateId: string): void {
   emit('addTemplate', templateId)

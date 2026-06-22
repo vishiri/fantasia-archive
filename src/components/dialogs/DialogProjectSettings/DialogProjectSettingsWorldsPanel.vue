@@ -1,6 +1,7 @@
 <template>
   <div class="dialogProjectSettings__worldsPanel row no-wrap">
     <DialogProjectSettingsWorldsTabList
+      :current-language-code="props.currentLanguageCode"
       :document-templates="props.documentTemplates"
       :selected-world-id="selectedWorldId"
       :worlds="props.worlds"
@@ -14,16 +15,16 @@
     <div class="dialogProjectSettings__worldsDetailHost col">
       <DialogProjectSettingsWorldsDetailPanel
         v-if="selectedWorld !== null"
+        :current-language-code="props.currentLanguageCode"
         :document-templates="props.documentTemplates"
-        :name-has-error="isWorldNameInvalid(selectedWorld.displayName)"
+        :name-has-error="isWorldNameInvalid(selectedWorld.displayNameTranslations)"
         :remove-disabled="isWorldRemoveDisabled(selectedWorld)"
         :remove-disabled-reason="resolveRemoveDisabledReason(selectedWorld)"
         :world="selectedWorld"
         @remove="emitRemove(selectedWorld.id)"
-        @update-document-template-display-name="emitUpdateDocumentTemplateDisplayName"
         @update:color="emitUpdateColor(selectedWorld.id, $event)"
         @update:color-pallete="emitUpdateColorPallete(selectedWorld.id, $event)"
-        @update:display-name="emitUpdateDisplayName(selectedWorld.id, $event)"
+        @update:display-name-translations="emitUpdateDisplayNameTranslations(selectedWorld.id, $event)"
         @update:template-layout="emitUpdateTemplateLayout(selectedWorld.id, $event)"
       />
     </div>
@@ -34,8 +35,10 @@
 import { computed, ref, watch } from 'vue'
 
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
-import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { I_dialogProjectSettingsWorldTemplateLayoutDraft } from 'app/types/I_dialogProjectSettingsWorlds'
+import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
+import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import {
   isDialogProjectSettingsWorldRemoveDisabled
 } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldsDraft'
@@ -51,6 +54,7 @@ defineOptions({
 })
 
 const props = defineProps<{
+  currentLanguageCode: T_faUserSettingsLanguageCode
   documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] | null
   worlds: I_dialogProjectSettingsWorldDraft[]
 }>()
@@ -61,8 +65,7 @@ const emit = defineEmits<{
   'update:worlds': [worlds: I_dialogProjectSettingsWorldDraft[]]
   updateWorldColor: [id: string, color: string]
   updateWorldColorPallete: [id: string, colorPallete: string]
-  updateWorldDisplayName: [id: string, displayName: string]
-  updateDocumentTemplateDisplayName: [documentTemplateId: string, displayName: string]
+  updateWorldDisplayNameTranslations: [id: string, displayNameTranslations: I_faProjectWorldDisplayNameTranslations]
   updateWorldTemplateLayout: [id: string, layout: I_dialogProjectSettingsWorldTemplateLayoutDraft]
 }>()
 
@@ -87,8 +90,10 @@ watch(() => props.worlds, (nextWorlds) => {
   immediate: true
 })
 
-function isWorldNameInvalid (displayName: string): boolean {
-  return isDialogProjectSettingsWorldNameInvalid(displayName)
+function isWorldNameInvalid (
+  displayNameTranslations: I_faProjectWorldDisplayNameTranslations
+): boolean {
+  return isDialogProjectSettingsWorldNameInvalid(displayNameTranslations)
 }
 
 function isWorldRemoveDisabled (world: I_dialogProjectSettingsWorldDraft): boolean {
@@ -115,8 +120,11 @@ function emitRemove (id: string): void {
   emit('removeWorld', id)
 }
 
-function emitUpdateDisplayName (id: string, displayName: string): void {
-  emit('updateWorldDisplayName', id, displayName)
+function emitUpdateDisplayNameTranslations (
+  id: string,
+  displayNameTranslations: I_faProjectWorldDisplayNameTranslations
+): void {
+  emit('updateWorldDisplayNameTranslations', id, displayNameTranslations)
 }
 
 function emitUpdateColor (id: string, color: string): void {
@@ -133,17 +141,11 @@ function emitUpdateTemplateLayout (
 ): void {
   emit('updateWorldTemplateLayout', id, layout)
 }
-
-function emitUpdateDocumentTemplateDisplayName (
-  documentTemplateId: string,
-  displayName: string
-): void {
-  emit('updateDocumentTemplateDisplayName', documentTemplateId, displayName)
-}
 </script>
 
 <style lang="scss" scoped>
 .dialogProjectSettings__worldsPanel {
+  align-self: stretch;
   flex: 1 1 auto;
   min-height: 0;
   min-width: 0;
@@ -155,6 +157,6 @@ function emitUpdateDocumentTemplateDisplayName (
   flex-direction: column;
   min-height: 0;
   min-width: 0;
-  overflow: hidden;
+  overflow: hidden auto;
 }
 </style>

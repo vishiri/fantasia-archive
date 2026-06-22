@@ -1,11 +1,14 @@
+import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
+
 /** Seconds before delete confirm is enabled in Project Settings destructive menus. */
 export const FA_DIALOG_PROJECT_SETTINGS_DELETE_CONFIRM_DELAY_SEC = 5
 
 /** Draft document template row in Project Settings before save. */
 export interface I_dialogProjectSettingsDocumentTemplateDraft {
   id: string
-  displayName: string
-  worldAppendix: string
+  titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+  worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
   icon: string
   documentCount: number
 }
@@ -13,13 +16,13 @@ export interface I_dialogProjectSettingsDocumentTemplateDraft {
 /** List row returned by listDocumentTemplatesForProjectSettings IPC. */
 export interface I_faProjectDocumentTemplateForProjectSettingsItem {
   createdAtMs: number
-  displayName: string
+  titleTranslations: I_faProjectDocumentTemplateTitleTranslations
   documentCount: number
   icon: string
   id: string
   sortOrder: number
   updatedAtMs: number
-  worldAppendix: string
+  worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
 }
 
 export interface I_faProjectDocumentTemplatesForProjectSettingsResult {

@@ -1,0 +1,24 @@
+import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
+import { FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_TRANSLATION_MAX_LENGTH } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
+
+import { createNormalizeFaLocaleStringTranslations } from 'app/src/scripts/localeTranslations/functions/normalizeFaLocaleStringTranslations'
+import { createResolveFaLocaleStringTranslation } from 'app/src/scripts/localeTranslations/functions/resolveFaLocaleStringTranslation'
+
+const resolveApi = createResolveFaLocaleStringTranslation({
+  languageCodes: FA_USER_SETTINGS_LANGUAGE_CODES
+})
+
+const normalizeFaProjectDocumentTemplateWorldAppendixes = createNormalizeFaLocaleStringTranslations({
+  languageCodes: FA_USER_SETTINGS_LANGUAGE_CODES,
+  maxLength: FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_TRANSLATION_MAX_LENGTH
+})
+
+export const {
+  hasFaLocaleStringTranslation: hasFaProjectDocumentTemplateWorldAppendixTranslation,
+  resolveFaLocaleStringTranslation: resolveFaProjectDocumentTemplateWorldAppendix,
+  resolveFaLocaleStringTranslationForStorage: resolveFaProjectDocumentTemplateWorldAppendixForStorage,
+  resolveFaLocaleStringTranslationLanguageCode: resolveFaProjectDocumentTemplateWorldAppendixLanguageCode
+} = resolveApi
+
+export const normalizeFaProjectDocumentTemplateWorldAppendixTranslations =
+  normalizeFaProjectDocumentTemplateWorldAppendixes

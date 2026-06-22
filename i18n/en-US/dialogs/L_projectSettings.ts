@@ -83,7 +83,7 @@ export default {
     documentTemplateName: {
       title: 'Document template name',
       label: 'Document template name',
-      errorRequired: 'Document template name is required.'
+      errorRequired: 'At least one document template title translation is required.'
     },
     documentTemplateWorldAppendix: {
       title: 'World appendix',
@@ -122,6 +122,8 @@ export default {
       filterAriaLabel: 'Filter document templates',
       filterClearAriaLabel: 'Clear document templates filter',
       filterPlaceholder: 'Search...',
+      missingTranslationsTabTooltip:
+        'Some of the translations for the currently selected language are missing from this document template.',
       deleteConfirm: {
         confirmDeleteButton: 'Confirm delete',
         message: 'Are you sure you want to delete this document template? All fields connected to this template in any other template will stop working. Also, all connected documents will stop showing their data if any were filled using this template. This deletion might have unintended side effects.'

@@ -7,6 +7,9 @@ import license from '../en-US/documents/license.md?raw'
 import tipsTricksTrivia from './documents/tipsTricksTrivia.md?raw'
 
 import L_FantasiaMascotImage from './components/elements/FantasiaMascotImage/L_FantasiaMascotImage'
+import L_FaColorPickerInput from './components/elements/FaColorPickerInput/L_FaColorPickerInput'
+import L_FaIconPickerInput from './components/elements/FaIconPickerInput/L_FaIconPickerInput'
+import L_FaLocaleTranslationsInput from './components/elements/FaLocaleTranslationsInput/L_FaLocaleTranslationsInput'
 import L_helpInfo from './components/globals/AppControlMenus/L_helpInfo'
 import L_project from './components/globals/AppControlMenus/L_project'
 import L_tools from './components/globals/AppControlMenus/L_tools'
@@ -23,6 +26,7 @@ import L_newProject from './dialogs/L_newProject'
 import L_dialogKeybindSettings from './dialogs/L_dialogKeybindSettings'
 import L_importExportAppConfig from './dialogs/L_importExportAppConfig'
 import L_appSettings from './dialogs/L_appSettings'
+import L_projectSettings from './dialogs/L_projectSettings'
 import L_appNoteboard from './floatingWindows/L_appNoteboard'
 import L_projectNoteboard from './floatingWindows/L_projectNoteboard'
 import L_appStylingFloating from './floatingWindows/L_appStyling'
@@ -36,11 +40,13 @@ import L_faAppStyling from './globalFunctionality/L_faAppStyling'
 import L_faProjectStyling from './globalFunctionality/L_faProjectStyling'
 import L_faProjectSession from './globalFunctionality/L_faProjectSession'
 import L_faUserSettings from './globalFunctionality/L_faUserSettings'
+import L_faProjectSettings from './globalFunctionality/L_faProjectSettings'
 import L_spellChecker from './globalFunctionality/L_spellChecker'
 import L_unsortedAppTexts from './globalFunctionality/L_unsortedAppTexts'
 
 import L_mainLayout from './layouts/L_mainLayout'
 import L_ErrorNotFound from './pages/L_ErrorNotFound'
+import L_projectOverview from './components/projectUI/ProjectOverview/L_projectOverview'
 import L_splashPage from './pages/L_splashPage'
 
 export default {
@@ -70,7 +76,8 @@ export default {
     keybindSettings: L_dialogKeybindSettings,
     markdownDocument: L_markdownDocument,
     newProject: L_newProject,
-    appSettings: L_appSettings
+    appSettings: L_appSettings,
+    projectSettings: L_projectSettings
   },
 
   // FLOATING WINDOWS (in-renderer movable / resizable surfaces)
@@ -101,6 +108,20 @@ export default {
   // COMPONENT - FANTASIA MASCOT IMAGE
   fantasiaMascotImage: L_FantasiaMascotImage,
 
+  // COMPONENT - FA COLOR PICKER INPUT
+  faColorPickerInput: L_FaColorPickerInput,
+
+  // COMPONENT - FA ICON PICKER INPUT
+  faIconPickerInput: L_FaIconPickerInput,
+
+  // COMPONENT - FA LOCALE TRANSLATIONS INPUT
+  faLocaleTranslationsInput: L_FaLocaleTranslationsInput,
+
+  // COMPONENT - PROJECT UI
+  projectUI: {
+    projectOverview: L_projectOverview
+  },
+
   // GLOBAL FUNCTIONALITY
   globalFunctionality: {
     faActionManager: L_faActionManager,
@@ -110,6 +131,7 @@ export default {
     faAppStyling: L_faAppStyling,
     faProjectStyling: L_faProjectStyling,
     faProjectSession: L_faProjectSession,
+    faProjectSettings: L_faProjectSettings,
     faUserSettings: L_faUserSettings,
     spellChecker: L_spellChecker,
     unsortedAppTexts: L_unsortedAppTexts

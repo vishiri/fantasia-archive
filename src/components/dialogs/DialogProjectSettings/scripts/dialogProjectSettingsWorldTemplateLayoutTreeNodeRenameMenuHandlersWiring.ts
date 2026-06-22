@@ -7,7 +7,7 @@ import {
   emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate,
   resolveDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftSeed
 } from './functions/dialogProjectSettingsWorldTemplateLayoutRenameMenuNodeHelpers'
-import { scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus } from './functions/scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus'
+import { scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus } from './dialogProjectSettingsWorldTemplateLayoutRenameMenuFocusWiring'
 import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
 
 type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuHandlersWiring = {

@@ -20,7 +20,7 @@ export default {
     title: 'انضم إلى خادم FA Discord',
   },
   buttonReddit: {
-    label: '',
+    label: 'Reddit',
     title: 'اشترك في FA subreddit',
   },
   buttonTwitter: {

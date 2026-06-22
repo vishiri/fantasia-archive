@@ -61,6 +61,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | [fa-he-tree.mdc](.cursor/rules/fa-he-tree.mdc) | **`@he-tree/vue` only**; **`QTree` forbidden** |
 | [fa-drag-drop-lists.mdc](.cursor/rules/fa-drag-drop-lists.mdc) | List/table DnD policy |
 | [fa-icon-picker.mdc](.cursor/rules/fa-icon-picker.mdc) | **`FaIconPickerInput`**, **`yarn generate:icon-catalogs`** |
+| [fa-locale-translations-input.mdc](.cursor/rules/fa-locale-translations-input.mdc) | **`FaLocaleTranslationsInput`**, **`src/scripts/localeTranslations/`**, Project Settings world name + world appendix |
 
 ## Stack (short)
 
@@ -75,7 +76,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Unit | Vitest — **`yarn test:unit`**; gate **`yarn testbatch:verify`** |
 | UI/E2E | Playwright — rebuild Electron before runs |
 | Storybook | 10 — **`.storybook-workspace/`** |
-| DB | **`better-sqlite3`**; **`.faproject`** SQLite **`user_version` max 6** — see [projectDB.md](docs/database/projectDB.md) |
+| DB | **`better-sqlite3`**; **`.faproject`** SQLite **`user_version` max 9** — see [projectDB.md](docs/database/projectDB.md) |
 
 ## Subsystems (pointers)
 
@@ -89,6 +90,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Floating **`Window*`** | [fantasia-floating-windows](.cursor/skills/fantasia-floating-windows/SKILL.md) |
 | Trees / DnD | [fa-he-tree.mdc](.cursor/rules/fa-he-tree.mdc), [fa-drag-drop-lists.mdc](.cursor/rules/fa-drag-drop-lists.mdc), skills **fantasia-he-tree**, **fantasia-drag-drop** |
 | **`FaIconPickerInput`** | [fa-icon-picker.mdc](.cursor/rules/fa-icon-picker.mdc), [fantasia-icon-picker](.cursor/skills/fantasia-icon-picker/SKILL.md) |
+| **`FaLocaleTranslationsInput`** | [fa-locale-translations-input.mdc](.cursor/rules/fa-locale-translations-input.mdc), [fantasia-locale-translations-input](.cursor/skills/fantasia-locale-translations-input/SKILL.md) |
 | Vue / Quasar / SCSS | [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc), [vue-bem-scss.mdc](.cursor/rules/vue-bem-scss.mdc), [project-scss.mdc](.cursor/rules/project-scss.mdc), [fantasia-quasar-vue](.cursor/skills/fantasia-quasar-vue/SKILL.md) |
 | i18n | [fantasia-i18n](.cursor/skills/fantasia-i18n/SKILL.md), [en-us-ui-copy-capitalization.mdc](.cursor/rules/en-us-ui-copy-capitalization.mdc) |
 | Testing | [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc), [dev-electron-compile-check.mdc](.cursor/rules/dev-electron-compile-check.mdc) (post-edit: verify then dev compile), [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc), [playwright-tests.mdc](.cursor/rules/playwright-tests.mdc), [fantasia-testing](.cursor/skills/fantasia-testing/SKILL.md) |
@@ -137,6 +139,7 @@ No Markdown bold/italic in comments. Single quotes for inline refs. No mid-sente
 | `fantasia-he-tree` | **`@he-tree/vue`** |
 | `fantasia-drag-drop` | List/table DnD |
 | `fantasia-icon-picker` | **`FaIconPickerInput`** |
+| `fantasia-locale-translations-input` | **`FaLocaleTranslationsInput`**, per-locale strings in Project Settings |
 | `fantasia-i18n` | Locale trees |
 | `fantasia-sqlite-main` | Main-process SQLite |
 | `fantasia-flatten-database-schemas` | Schema squash |

@@ -1,6 +1,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 
 import { i18n } from 'app/i18n/externalFileLoader'
+import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import { faProjectDocumentTemplatesFetchFreshForDialog } from 'app/src/stores/scripts/sFaProjectDocumentTemplatesBridge'
 import { faProjectSettingsFetchFreshForDialog } from 'app/src/stores/scripts/sFaProjectSettingsBridge'
 import { faProjectWorldsFetchFreshForDialog } from 'app/src/stores/scripts/sFaProjectWorldsBridge'
@@ -19,7 +20,7 @@ import {
   isDialogProjectSettingsDirectInput,
   isDialogProjectSettingsStoreTarget
 } from './functions/dialogProjectSettingsDialogInput'
-import { hasDialogProjectSettingsDocumentTemplateNameValidationError } from './functions/dialogProjectSettingsDocumentTemplatesDraft'
+import { hasDialogProjectSettingsDocumentTemplateNameValidationError } from './dialogProjectSettingsDocumentTemplatesDraft'
 import { isDialogProjectSettingsFullDialogSaveDisabled } from './dialogProjectSettingsDialogSaveValidation'
 import {
   hasDialogProjectSettingsWorldColorPalleteValidationError,
@@ -30,10 +31,15 @@ import {
 
 const buildDialogProjectSettingsSaveValidationTooltipForDraft =
   createBuildDialogProjectSettingsSaveValidationTooltip({
-    defaultNewTemplateName: i18n.global.t(
-      'dialogs.projectSettings.panels.documentTemplates.defaultNewTemplateName'
-    ),
-    defaultNewWorldName: i18n.global.t('dialogs.projectSettings.panels.worlds.defaultNewWorldName'),
+    resolveDefaultNewTemplateName: () => {
+      return i18n.global.t('dialogs.projectSettings.panels.documentTemplates.defaultNewTemplateName')
+    },
+    resolveDefaultNewWorldName: () => {
+      return i18n.global.t('dialogs.projectSettings.panels.worlds.defaultNewWorldName')
+    },
+    getCurrentLanguageCode: () => {
+      return S_FaUserSettings().settings?.languageCode ?? 'en-US'
+    },
     translate: (key, params) => i18n.global.t(key, params ?? {})
   })
 
@@ -47,10 +53,15 @@ const dialogProjectSettingsApi = createDialogProjectSettings({
       faProjectDocumentTemplatesFetchFreshForDialog,
       faProjectSettingsFetchFreshForDialog,
       faProjectWorldsFetchFreshForDialog,
-      newTemplateDefaultDisplayName: i18n.global.t(
-        'dialogs.projectSettings.panels.documentTemplates.defaultNewTemplateName'
-      ),
-      newWorldDefaultDisplayName: i18n.global.t('dialogs.projectSettings.panels.worlds.defaultNewWorldName'),
+      getCurrentLanguageCode: () => {
+        return S_FaUserSettings().settings?.languageCode ?? 'en-US'
+      },
+      resolveNewTemplateDefaultDisplayName: () => {
+        return i18n.global.t('dialogs.projectSettings.panels.documentTemplates.defaultNewTemplateName')
+      },
+      resolveNewWorldDefaultDisplayName: () => {
+        return i18n.global.t('dialogs.projectSettings.panels.worlds.defaultNewWorldName')
+      },
       runFaActionAwait
     }, params)
   },

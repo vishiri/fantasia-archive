@@ -151,7 +151,7 @@ test('Test that every project content IPC handler runs through runWithFaProjectD
   await handlerFor(FA_PROJECT_CONTENT_IPC.saveWorldsSnapshotAsync)(event, {
     items: [
       {
-        displayName: 'W',
+        displayNameTranslations: { 'en-US': 'W' },
         id: SAMPLE_UUID
       }
     ]
@@ -181,8 +181,8 @@ test('Test that every project content IPC handler runs through runWithFaProjectD
   await handlerFor(FA_PROJECT_CONTENT_IPC.saveDocumentTemplatesSnapshotAsync)(event, {
     items: [
       {
-        displayName: 'T',
-        id: SAMPLE_UUID
+        id: SAMPLE_UUID,
+        titleTranslations: { 'en-US': 'T' }
       }
     ]
   })

@@ -6,14 +6,11 @@ import { expect, test } from 'vitest'
 
 import DialogProjectSettingsWorldTemplateLayoutPanel from '../DialogProjectSettingsWorldTemplateLayoutPanel.vue'
 import { dialogProjectSettingsWorldDraftFixture } from './dialogProjectSettingsWorldDraftFixtures'
+import { buildDialogProjectSettingsDocumentTemplateDraft } from './dialogProjectSettingsDocumentTemplateDraftFixtures'
 
-const documentTemplateFixture = {
-  displayName: 'Character',
-  documentCount: 0,
-  icon: 'mdi-account',
-  id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-  worldAppendix: ''
-}
+const documentTemplateFixture = buildDialogProjectSettingsDocumentTemplateDraft({
+  icon: 'mdi-account'
+})
 
 const layoutTreeStub = defineComponent({
   name: 'DialogProjectSettingsWorldTemplateLayoutTree',
@@ -73,6 +70,7 @@ const filterInputStub = defineComponent({
 test('Test that DialogProjectSettingsWorldTemplateLayoutPanel renders layout panel chrome', () => {
   const w = mount(DialogProjectSettingsWorldTemplateLayoutPanel, {
     props: {
+      currentLanguageCode: 'en-US',
       documentTemplates: [documentTemplateFixture],
       world: dialogProjectSettingsWorldDraftFixture()
     },
@@ -105,15 +103,15 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutPanel renders layout pan
 test('Test that DialogProjectSettingsWorldTemplateLayoutPanel filters available templates by query', async () => {
   const w = mount(DialogProjectSettingsWorldTemplateLayoutPanel, {
     props: {
+      currentLanguageCode: 'en-US',
       documentTemplates: [
         documentTemplateFixture,
-        {
-          displayName: 'Locations',
-          documentCount: 0,
+        buildDialogProjectSettingsDocumentTemplateDraft({
           icon: 'mdi-map',
           id: 'template-b',
-          worldAppendix: ' atlas'
-        }
+          titleTranslations: { 'en-US': 'Locations' },
+          worldAppendixTranslations: { 'en-US': 'atlas' }
+        })
       ],
       world: dialogProjectSettingsWorldDraftFixture()
     },
@@ -136,7 +134,7 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutPanel filters available 
   await w.find('.available-templates-filter-stub').setValue('atlas')
   expect(availableListProps.value.templates).toEqual([
     expect.objectContaining({
-      displayName: 'Locations'
+      titleTranslations: { 'en-US': 'Locations' }
     })
   ])
   expect(availableListProps.value.showFilterEmpty).toBe(false)
@@ -153,6 +151,7 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutPanel filters available 
 test('Test that DialogProjectSettingsWorldTemplateLayoutPanel emits update:templateLayout on add group', async () => {
   const w = mount(DialogProjectSettingsWorldTemplateLayoutPanel, {
     props: {
+      currentLanguageCode: 'en-US',
       documentTemplates: [documentTemplateFixture],
       world: dialogProjectSettingsWorldDraftFixture()
     },

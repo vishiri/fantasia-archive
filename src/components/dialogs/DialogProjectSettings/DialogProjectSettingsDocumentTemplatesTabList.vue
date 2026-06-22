@@ -35,6 +35,7 @@
         <DialogProjectSettingsDocumentTemplatesTabItem
           v-for="template in sortableTemplates"
           :key="template.id"
+          :current-language-code="props.currentLanguageCode"
           :is-being-dragged="template.id === draggingTemplateId"
           :is-list-dragging="draggingTemplateId !== null"
           :is-selected="template.id === props.selectedTemplateId"
@@ -75,13 +76,14 @@ import { VueDraggable } from 'vue-draggable-plus'
 import type { SortableEvent } from 'sortablejs'
 
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import type {
   T_faVerticalDraggableTabsTabJustifyContent,
   T_faVerticalDraggableTabsTabLabelTextTransform,
   T_faVerticalDraggableTabsTabTextAlign
 } from 'app/types/I_faVerticalDraggableTabs'
 import { FA_DIALOG_PROJECT_SETTINGS_VERTICAL_TAB_LIST_WIDTH_PX_DEFAULT } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDialogInput'
-import { isDialogProjectSettingsDocumentTemplateTabValidationError } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDocumentTemplatesDraft'
+import { isDialogProjectSettingsDocumentTemplateTabValidationError } from 'app/src/components/dialogs/DialogProjectSettings/scripts/dialogProjectSettingsDocumentTemplatesDraft'
 import {
   FA_VERTICAL_DRAGGABLE_TABS_TAB_JUSTIFY_CONTENT_DEFAULT,
   FA_VERTICAL_DRAGGABLE_TABS_TAB_LABEL_FONT_SIZE_DEFAULT,
@@ -92,7 +94,7 @@ import {
 } from 'app/src/scripts/faDragDrop/functions/buildFaVerticalDraggableTabsRootStyle'
 import DialogProjectSettingsDocumentTemplatesTabItem from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsDocumentTemplatesTabItem.vue'
 import DialogProjectSettingsVerticalTabListFilterInput from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsVerticalTabListFilterInput.vue'
-import { filterDialogProjectSettingsWorldAvailableTemplatesByQuery } from './scripts/functions/filterDialogProjectSettingsWorldAvailableTemplatesByQuery'
+import { filterDialogProjectSettingsDocumentTemplatesByQuery } from './scripts/filterDialogProjectSettingsDocumentTemplatesByQuery'
 import { createDialogProjectSettingsFilteredVerticalTabListSortableWiring } from './scripts/dialogProjectSettingsFilteredVerticalTabListSortableWiring'
 import { hideNativeSortableDragGhost } from 'app/src/scripts/faDragDrop/functions/hideNativeSortableDragGhost'
 import {
@@ -108,6 +110,7 @@ defineOptions({
 })
 
 const props = withDefaults(defineProps<{
+  currentLanguageCode: T_faUserSettingsLanguageCode
   dense?: boolean
   selectedTemplateId: string | null
   tabJustifyContent?: T_faVerticalDraggableTabsTabJustifyContent
@@ -156,7 +159,13 @@ const {
   syncSortableListFromFull
 } = createDialogProjectSettingsFilteredVerticalTabListSortableWiring({
   cloneList: cloneTemplateDraftList,
-  filterItems: filterDialogProjectSettingsWorldAvailableTemplatesByQuery,
+  filterItems: (list, query) => {
+    return filterDialogProjectSettingsDocumentTemplatesByQuery(
+      list,
+      query,
+      props.currentLanguageCode
+    )
+  },
   filterQuery,
   fullList: draggableTemplates
 })

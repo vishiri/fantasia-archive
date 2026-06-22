@@ -9,7 +9,19 @@
 .dialogProjectSettingsDocumentTemplatesTabItem__titleRow {
   align-items: center;
   display: flex;
+  gap: $dialogProjectSettings-documentTemplatesTabMissingTranslationsWarning-gap;
   min-width: 0;
+}
+
+.dialogProjectSettingsDocumentTemplatesTabItem__titleContent {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dialogProjectSettingsDocumentTemplatesTabItem__missingTranslationsWarning {
+  flex: 0 0 auto;
+  margin-left: $dialogProjectSettings-documentTemplatesTabMissingTranslationsWarning-marginLeft;
+  pointer-events: auto;
 }
 
 .dialogProjectSettingsDocumentTemplatesTabItem__tabIcon {

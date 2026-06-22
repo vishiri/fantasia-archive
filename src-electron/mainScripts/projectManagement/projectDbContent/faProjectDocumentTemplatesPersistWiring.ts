@@ -23,6 +23,10 @@ import {
 import {
   coerceFaProjectDocumentTemplateOptionalTextForStorage
 } from './faProjectDocumentTemplatesSqlWiring'
+import { serializeFaProjectDocumentTemplateTitleTranslationsJson } from 'app/src-electron/shared/faProjectDocumentTemplateTitleTranslationsSchema'
+import { serializeFaProjectDocumentTemplateWorldAppendixTranslationsJson } from 'app/src-electron/shared/faProjectDocumentTemplateWorldAppendixTranslationsSchema'
+import { resolveFaProjectDocumentTemplateTitleForStorage } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager'
+import { resolveFaProjectDocumentTemplateWorldAppendixForStorage } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateWorldAppendix_manager'
 
 export function createFaProjectDocumentTemplate (
   db: Database,
@@ -43,15 +47,32 @@ export function updateFaProjectDocumentTemplate (
     displayName?: string
     icon?: string
     sortOrder?: number
+    titleTranslationsJson?: string
     worldAppendix?: string
+    worldAppendixTranslationsJson?: string
   } = {}
   if (patch.displayName !== undefined) {
     rowPatch.displayName = patch.displayName
+  }
+  if (patch.titleTranslations !== undefined) {
+    rowPatch.titleTranslationsJson = serializeFaProjectDocumentTemplateTitleTranslationsJson(
+      patch.titleTranslations
+    )
+    rowPatch.displayName = resolveFaProjectDocumentTemplateTitleForStorage(patch.titleTranslations)
   }
   if (patch.worldAppendix !== undefined) {
     rowPatch.worldAppendix = coerceFaProjectDocumentTemplateOptionalTextForStorage(
       patch.worldAppendix,
       FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_MAX_LENGTH
+    )
+  }
+  if (patch.worldAppendixTranslations !== undefined) {
+    rowPatch.worldAppendixTranslationsJson =
+      serializeFaProjectDocumentTemplateWorldAppendixTranslationsJson(
+        patch.worldAppendixTranslations
+      )
+    rowPatch.worldAppendix = resolveFaProjectDocumentTemplateWorldAppendixForStorage(
+      patch.worldAppendixTranslations
     )
   }
   if (patch.icon !== undefined) {
@@ -89,13 +110,13 @@ export function listFaProjectDocumentTemplatesForProjectSettings (
   const documentCounts = listFaProjectDocumentTemplateDocumentCounts(db)
   const items = listFaProjectDocumentTemplateRows(db).map((template) => ({
     createdAtMs: template.createdAtMs,
-    displayName: template.displayName,
+    titleTranslations: template.titleTranslations,
     documentCount: documentCounts[template.id] ?? 0,
     icon: template.icon,
     id: template.id,
     sortOrder: template.sortOrder,
     updatedAtMs: template.updatedAtMs,
-    worldAppendix: template.worldAppendix
+    worldAppendixTranslations: template.worldAppendixTranslations
   }))
   return { items }
 }

@@ -283,6 +283,11 @@ export default {
       description: 'Määrittää, onko tekstieditorilla rajoitettu korkeus, kun se ei ole koko näytön tilassa.',
       tags: 'tekstialueen korkeus, pitkä teksti, laajennuseditori, vierityseditori',
     },
+    logFullActivityPayload: {
+      title: 'Kirjaa täydellinen aktiviteettikuorma',
+      description: 'Jos tämä on käytössä, aktiviteetti kirjaa täydelliset kuormat. Tästä voi olla hyötyä syvässä virheenkorjauksessa, jossa tarvitaan tarkkaa tulosten kirjaamista.',
+      tags: 'virheenkorjaus, vianmääritys, DevTools, kuorma, aktiviteetti, kirjaus',
+    },
     noProjectName: {
       title: 'Piilota projektin nimi puussa',
       description: 'Määrittää, näkyykö projektin nimi hierarkkisessa puussa ollenkaan.',

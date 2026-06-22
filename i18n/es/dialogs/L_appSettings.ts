@@ -283,6 +283,11 @@ export default {
       description: 'Determina si el editor de texto tiene una altura limitada cuando no está en modo de pantalla completa.',
       tags: 'altura del área de texto, texto largo, editor expandido, editor de desplazamiento',
     },
+    logFullActivityPayload: {
+      title: 'Registrar carga útil completa de actividad',
+      description: 'Si está habilitado, la actividad registrará cargas útiles completas. Esto puede ser útil al depurar en profundidad y necesitar un registro preciso de los resultados.',
+      tags: 'depuración, solución de problemas, DevTools, carga útil, actividad, registro',
+    },
     noProjectName: {
       title: 'Ocultar el nombre del proyecto en el árbol',
       description: 'Determina si el nombre del proyecto se muestra en el árbol jerárquico.',

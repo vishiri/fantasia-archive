@@ -11,7 +11,7 @@ import {
 const worldA = {
   color: '',
   colorPallete: '',
-  displayName: 'Alpha',
+  displayNameTranslations: { 'en-US': 'Alpha' },
   documentCount: 0,
   templateLayout: {
     groups: [],
@@ -23,7 +23,7 @@ const worldA = {
 const worldB = {
   color: '',
   colorPallete: '',
-  displayName: 'Beta',
+  displayNameTranslations: { 'en-US': 'Beta' },
   documentCount: 0,
   templateLayout: {
     groups: [],
@@ -35,7 +35,7 @@ const worldB = {
 const worldC = {
   color: '',
   colorPallete: '',
-  displayName: 'Gamma',
+  displayNameTranslations: { 'en-US': 'Gamma' },
   documentCount: 0,
   templateLayout: {
     groups: [],
@@ -107,7 +107,7 @@ test('Test that resolveDialogProjectSettingsWorldIdAfterRemove selects a neighbo
 test('Test that findDialogProjectSettingsNewlyAppendedWorldId returns the appended world id', () => {
   const newWorld = {
     ...worldA,
-    displayName: 'New world',
+    displayNameTranslations: { 'en-US': 'New world' },
     id: '7ba7b811-9dad-11d1-80b4-00c04fd430c8'
   }
   const previous = [worldA, worldB]
@@ -164,7 +164,7 @@ test('Test that resolveDialogProjectSettingsWorldIdAfterRemove handles edge remo
 test('Test that resolveDialogProjectSettingsWorldsPanelSelection selects an appended world', () => {
   const newWorld = {
     ...worldA,
-    displayName: 'New world',
+    displayNameTranslations: { 'en-US': 'New world' },
     id: '7ba7b811-9dad-11d1-80b4-00c04fd430c8'
   }
 
@@ -194,7 +194,7 @@ test('Test that resolveDialogProjectSettingsWorldsPanelSelection keeps a valid s
 test('Test that resolveDialogProjectSettingsWorldsPanelSelection reselects after replacement', () => {
   const replacement = {
     ...worldA,
-    displayName: 'Replacement',
+    displayNameTranslations: { 'en-US': 'Replacement' },
     id: '7ba7b811-9dad-11d1-80b4-00c04fd430c8'
   }
 
@@ -208,7 +208,7 @@ test('Test that resolveDialogProjectSettingsWorldsPanelSelection reselects after
 test('Test that findDialogProjectSettingsNewlyAppendedWorldId returns null when append is not at the end', () => {
   const insertedMiddle = {
     ...worldA,
-    displayName: 'Inserted',
+    displayNameTranslations: { 'en-US': 'Inserted' },
     id: '7ba7b811-9dad-11d1-80b4-00c04fd430c8'
   }
 

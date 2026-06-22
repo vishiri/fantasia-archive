@@ -16,6 +16,7 @@ import L_GlobalWindowButtons from './components/globals/GlobalWindowButtons/L_Gl
 import L_FantasiaMascotImage from './components/elements/FantasiaMascotImage/L_FantasiaMascotImage'
 import L_FaColorPickerInput from './components/elements/FaColorPickerInput/L_FaColorPickerInput'
 import L_FaIconPickerInput from './components/elements/FaIconPickerInput/L_FaIconPickerInput'
+import L_FaLocaleTranslationsInput from './components/elements/FaLocaleTranslationsInput/L_FaLocaleTranslationsInput'
 import L_socialContactButtons from './components/other/SocialContactButtons/L_socialContactButtons'
 
 import L_aboutFantasiaArchive from './dialogs/L_aboutFantasiaArchive'
@@ -112,6 +113,9 @@ export default {
 
   // COMPONENT - FA ICON PICKER INPUT
   faIconPickerInput: L_FaIconPickerInput,
+
+  // COMPONENT - FA LOCALE TRANSLATIONS INPUT
+  faLocaleTranslationsInput: L_FaLocaleTranslationsInput,
 
   // COMPONENT - PROJECT UI
   projectUI: {

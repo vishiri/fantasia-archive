@@ -10,13 +10,13 @@ const {
       items: [
         {
           createdAtMs: 1,
-          displayName: 'Character',
           documentCount: 0,
           icon: 'mdi-account',
           id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
           sortOrder: 0,
+          titleTranslations: { 'en-US': 'Character' },
           updatedAtMs: 1,
-          worldAppendix: 'Notes'
+          worldAppendixTranslations: { 'en-US': 'Notes' }
         }
       ]
     })),
@@ -37,13 +37,13 @@ beforeEach(() => {
     items: [
       {
         createdAtMs: 1,
-        displayName: 'Character',
         documentCount: 0,
         icon: 'mdi-account',
         id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
         sortOrder: 0,
+        titleTranslations: { 'en-US': 'Character' },
         updatedAtMs: 1,
-        worldAppendix: 'Notes'
+        worldAppendixTranslations: { 'en-US': 'Notes' }
       }
     ]
   })
@@ -74,11 +74,11 @@ test('Test that faProjectDocumentTemplatesFetchFreshForDialog returns mapped dra
   const { faProjectDocumentTemplatesFetchFreshForDialog } = await import('../sFaProjectDocumentTemplatesBridge')
   await expect(faProjectDocumentTemplatesFetchFreshForDialog()).resolves.toEqual([
     {
-      displayName: 'Character',
       documentCount: 0,
       icon: 'mdi-account',
       id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-      worldAppendix: 'Notes'
+      titleTranslations: { 'en-US': 'Character' },
+      worldAppendixTranslations: { 'en-US': 'Notes' }
     }
   ])
 })
@@ -91,8 +91,8 @@ test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog calls saveDo
   const { faProjectDocumentTemplatesPersistSnapshotFromDialog } = await import('../sFaProjectDocumentTemplatesBridge')
   const items = [
     {
-      displayName: 'Character',
-      id: '7c9e6679-7425-40de-944b-e07fc1f90ae7'
+      id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+      titleTranslations: { 'en-US': 'Character' }
     }
   ]
   await faProjectDocumentTemplatesPersistSnapshotFromDialog(items)
@@ -161,8 +161,8 @@ test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog throws when 
   await expect(
     faProjectDocumentTemplatesPersistSnapshotFromDialog([
       {
-        displayName: 'Character',
-        id: '7c9e6679-7425-40de-944b-e07fc1f90ae7'
+        id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+        titleTranslations: { 'en-US': 'Character' }
       }
     ])
   ).rejects.toThrow('globalFunctionality.faProjectSettings.bridgeMissing')
@@ -179,8 +179,8 @@ test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog surfaces sav
   await expect(
     faProjectDocumentTemplatesPersistSnapshotFromDialog([
       {
-        displayName: 'Character',
-        id: '7c9e6679-7425-40de-944b-e07fc1f90ae7'
+        id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+        titleTranslations: { 'en-US': 'Character' }
       }
     ])
   ).rejects.toThrow('globalFunctionality.faProjectSettings.saveError')
@@ -198,8 +198,8 @@ test('Test that faProjectDocumentTemplatesPersistSnapshotFromDialog surfaces sav
   await expect(
     faProjectDocumentTemplatesPersistSnapshotFromDialog([
       {
-        displayName: 'Character',
-        id: '7c9e6679-7425-40de-944b-e07fc1f90ae7'
+        id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+        titleTranslations: { 'en-US': 'Character' }
       }
     ])
   ).rejects.toThrow('globalFunctionality.faProjectSettings.saveError')

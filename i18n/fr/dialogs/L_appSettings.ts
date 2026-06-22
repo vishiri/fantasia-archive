@@ -283,6 +283,11 @@ export default {
       description: 'Détermine si l\'éditeur de texte a une hauteur limitée lorsqu\'il n\'est pas en mode plein écran.',
       tags: 'hauteur de la zone de texte, texte long, éditeur d\'extension, éditeur de défilement',
     },
+    logFullActivityPayload: {
+      title: "Journaliser la charge utile complète de l'activité",
+      description: "Si activé, l'activité journalisera les charges utiles complètes. Cela peut être utile pour un débogage approfondi nécessitant une journalisation précise des résultats.",
+      tags: 'débogage, dépannage, DevTools, charge utile, activité, journalisation',
+    },
     noProjectName: {
       title: 'Masquer le nom du projet dans l\'arborescence',
       description: 'Détermine si le nom du projet est affiché dans l\'arborescence hiérarchique.',

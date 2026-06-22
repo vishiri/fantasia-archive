@@ -1,19 +1,14 @@
 import { expect, test } from 'vitest'
 
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
+import { buildDialogProjectSettingsDocumentTemplateDraft } from '../../_tests/dialogProjectSettingsDocumentTemplateDraftFixtures'
 import {
   collectDialogProjectSettingsDocumentTemplateSaveValidationErrors,
   collectDialogProjectSettingsFullSaveValidationErrors,
   isDialogProjectSettingsFullDialogSaveDisabled
 } from '../dialogProjectSettingsDialogSaveValidation'
 
-const templateRow = {
-  displayName: 'Character',
-  documentCount: 0,
-  icon: '',
-  id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-  worldAppendix: ''
-}
+const templateRow = buildDialogProjectSettingsDocumentTemplateDraft()
 
 /**
  * collectDialogProjectSettingsDocumentTemplateSaveValidationErrors
@@ -31,11 +26,10 @@ test('Test that collectDialogProjectSettingsDocumentTemplateSaveValidationErrors
 test('Test that collectDialogProjectSettingsDocumentTemplateSaveValidationErrors reports blank names', () => {
   expect(collectDialogProjectSettingsDocumentTemplateSaveValidationErrors([
     templateRow,
-    {
-      ...templateRow,
-      displayName: '   ',
-      id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
-    }
+    buildDialogProjectSettingsDocumentTemplateDraft({
+      id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+      titleTranslations: { 'en-US': '   ' }
+    })
   ])).toEqual([
     {
       kind: 'documentTemplateNameRequired',
@@ -61,10 +55,9 @@ test('Test that collectDialogProjectSettingsDocumentTemplateSaveValidationErrors
 test('Test that isDialogProjectSettingsFullDialogSaveDisabled blocks invalid template names', () => {
   expect(isDialogProjectSettingsFullDialogSaveDisabled('Project', [], [])).toBe(false)
   expect(isDialogProjectSettingsFullDialogSaveDisabled('Project', [], [
-    {
-      ...templateRow,
-      displayName: '   '
-    }
+    buildDialogProjectSettingsDocumentTemplateDraft({
+      titleTranslations: { 'en-US': '   ' }
+    })
   ])).toBe(true)
 })
 
@@ -77,7 +70,7 @@ test('Test that collectDialogProjectSettingsFullSaveValidationErrors merges all 
     {
       color: '',
       colorPallete: '',
-      displayName: '   ',
+      displayNameTranslations: { 'en-US': '   ' },
       documentCount: 0,
       templateLayout: {
         groups: [],
@@ -86,10 +79,9 @@ test('Test that collectDialogProjectSettingsFullSaveValidationErrors merges all 
       id: '550e8400-e29b-41d4-a716-446655440000'
     }
   ], [
-    {
-      ...templateRow,
-      displayName: '   '
-    }
+    buildDialogProjectSettingsDocumentTemplateDraft({
+      titleTranslations: { 'en-US': '   ' }
+    })
   ])
   expect(errors.map((error) => error.kind)).toEqual([
     'projectNameRequired',

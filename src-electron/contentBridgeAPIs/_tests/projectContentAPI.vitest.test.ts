@@ -30,15 +30,15 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
   await projectContentAPI.listWorldsForProjectSettings()
   await projectContentAPI.saveWorldsSnapshot([
     {
-      displayName: 'Realm',
+      displayNameTranslations: { 'en-US': 'Realm' },
       id: SAMPLE_UUID
     }
   ])
   await projectContentAPI.listDocumentTemplatesForProjectSettings()
   await projectContentAPI.saveDocumentTemplatesSnapshot([
     {
-      displayName: 'Character',
-      id: SAMPLE_UUID_B
+      id: SAMPLE_UUID_B,
+      titleTranslations: { 'en-US': 'Character' }
     }
   ])
 
@@ -101,7 +101,7 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
     {
       items: [
         {
-          displayName: 'Realm',
+          displayNameTranslations: { 'en-US': 'Realm' },
           id: SAMPLE_UUID
         }
       ]
@@ -116,8 +116,8 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
     {
       items: [
         {
-          displayName: 'Character',
-          id: SAMPLE_UUID_B
+          id: SAMPLE_UUID_B,
+          titleTranslations: { 'en-US': 'Character' }
         }
       ]
     }

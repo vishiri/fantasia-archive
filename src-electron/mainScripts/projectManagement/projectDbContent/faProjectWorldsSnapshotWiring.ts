@@ -13,6 +13,8 @@ import {
   updateFaProjectWorldRow
 } from './faProjectWorldsSqlWiring'
 import { replaceFaProjectWorldTemplateLayoutSnapshot } from './faProjectWorldTemplateLayoutSnapshotWiring'
+import { serializeFaProjectWorldDisplayNameTranslationsJson } from 'app/src-electron/shared/faProjectWorldDisplayNameTranslationsSchema'
+import { resolveFaProjectWorldDisplayNameForStorage } from 'app/src/scripts/projectWorlds/faProjectWorldDisplayName_manager'
 import type { I_faProjectWorldSnapshotItem } from 'app/types/I_faProjectWorldDomain'
 
 /**
@@ -45,18 +47,24 @@ export function replaceFaProjectWorldsSnapshot (
         item.colorPallete,
         FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH
       )
+      const displayNameTranslationsJson = serializeFaProjectWorldDisplayNameTranslationsJson(
+        item.displayNameTranslations
+      )
+      const displayName = resolveFaProjectWorldDisplayNameForStorage(item.displayNameTranslations)
       if (existingIds.has(item.id)) {
         updateFaProjectWorldRow(db, item.id, {
           color,
           colorPallete,
-          displayName: item.displayName,
+          displayName,
+          displayNameTranslationsJson,
           sortOrder: index
         })
       } else {
         insertFaProjectWorldWithId(db, {
           color,
           colorPallete,
-          displayName: item.displayName,
+          displayName,
+          displayNameTranslationsJson,
           id: item.id,
           sortOrder: index
         })

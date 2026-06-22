@@ -7,14 +7,14 @@ import {
   removeDialogProjectSettingsWorldDraftRow,
   updateDialogProjectSettingsWorldDraftColor,
   updateDialogProjectSettingsWorldDraftColorPallete,
-  updateDialogProjectSettingsWorldDraftDisplayName,
+  updateDialogProjectSettingsWorldDraftDisplayNameTranslations,
   updateDialogProjectSettingsWorldDraftTemplateLayout
 } from '../dialogProjectSettingsWorldRowMutationsWiring'
 
 const baseWorld: I_dialogProjectSettingsWorldDraft = {
   color: '',
   colorPallete: '',
-  displayName: 'Realm',
+  displayNameTranslations: { 'en-US': 'Realm' },
   documentCount: 0,
   templateLayout: {
     groups: [],
@@ -29,10 +29,10 @@ const baseWorld: I_dialogProjectSettingsWorldDraft = {
  */
 test('Test that addDialogProjectSettingsWorldDraftRow appends a new world draft', () => {
   const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([baseWorld])
-  addDialogProjectSettingsWorldDraftRow(localWorlds, 'New World')
+  addDialogProjectSettingsWorldDraftRow(localWorlds, 'en-US', 'New World')
   expect(localWorlds.value).toHaveLength(2)
   expect(localWorlds.value?.[0].id).toBe(baseWorld.id)
-  expect(localWorlds.value?.[1].displayName).toBe('New World')
+  expect(localWorlds.value?.[1].displayNameTranslations).toEqual({ 'en-US': 'New World' })
 })
 
 /**
@@ -41,7 +41,7 @@ test('Test that addDialogProjectSettingsWorldDraftRow appends a new world draft'
  */
 test('Test that addDialogProjectSettingsWorldDraftRow no-ops when localWorlds is null', () => {
   const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>(null)
-  addDialogProjectSettingsWorldDraftRow(localWorlds, 'New World')
+  addDialogProjectSettingsWorldDraftRow(localWorlds, 'en-US', 'New World')
   expect(localWorlds.value).toBeNull()
 })
 
@@ -53,7 +53,7 @@ test('Test that removeDialogProjectSettingsWorldDraftRow removes the matching id
   const otherWorld: I_dialogProjectSettingsWorldDraft = {
     color: '',
     colorPallete: '',
-    displayName: 'Other',
+    displayNameTranslations: { 'en-US': 'Other' },
     documentCount: 0,
     templateLayout: {
       groups: [],
@@ -77,22 +77,22 @@ test('Test that removeDialogProjectSettingsWorldDraftRow no-ops when localWorlds
 })
 
 /**
- * updateDialogProjectSettingsWorldDraftDisplayName
+ * updateDialogProjectSettingsWorldDraftDisplayNameTranslations
  * Updates the display name for the matching world id.
  */
-test('Test that updateDialogProjectSettingsWorldDraftDisplayName updates the matching row', () => {
+test('Test that updateDialogProjectSettingsWorldDraftDisplayNameTranslations updates the matching row', () => {
   const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([baseWorld])
-  updateDialogProjectSettingsWorldDraftDisplayName(localWorlds, baseWorld.id, 'Renamed')
-  expect(localWorlds.value?.[0].displayName).toBe('Renamed')
+  updateDialogProjectSettingsWorldDraftDisplayNameTranslations(localWorlds, baseWorld.id, { 'en-US': 'Renamed' })
+  expect(localWorlds.value?.[0].displayNameTranslations).toEqual({ 'en-US': 'Renamed' })
 })
 
 /**
- * updateDialogProjectSettingsWorldDraftDisplayName
+ * updateDialogProjectSettingsWorldDraftDisplayNameTranslations
  * No-ops when localWorlds is null.
  */
-test('Test that updateDialogProjectSettingsWorldDraftDisplayName no-ops when localWorlds is null', () => {
+test('Test that updateDialogProjectSettingsWorldDraftDisplayNameTranslations no-ops when localWorlds is null', () => {
   const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>(null)
-  updateDialogProjectSettingsWorldDraftDisplayName(localWorlds, baseWorld.id, 'Renamed')
+  updateDialogProjectSettingsWorldDraftDisplayNameTranslations(localWorlds, baseWorld.id, { 'en-US': 'Renamed' })
   expect(localWorlds.value).toBeNull()
 })
 

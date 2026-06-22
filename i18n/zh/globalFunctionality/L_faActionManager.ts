@@ -11,6 +11,8 @@ export default {
     openAdvancedSearchGuideDialog: '打开高级搜索指南',
     openChangelogDialog: '打开变更日志',
     openKeybindSettingsDialog: '打开按键绑定设置',
+    openProjectSettingsDialog: '打开项目设置',
+    saveProjectSettings: '保存项目设置',
     openLicenseDialog: '开放许可证',
     openAppSettingsDialog: '打开应用程序设置',
     openAppStylingWindow: '打开自定义应用程序 CSS',

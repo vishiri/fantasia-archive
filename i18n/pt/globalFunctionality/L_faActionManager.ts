@@ -11,6 +11,8 @@ export default {
     openAdvancedSearchGuideDialog: 'Abra o Guia de Pesquisa Avançada',
     openChangelogDialog: 'Abra o registro de alterações',
     openKeybindSettingsDialog: 'Abra as configurações de atalho de teclado',
+    openProjectSettingsDialog: 'Abrir configurações do projeto',
+    saveProjectSettings: 'Salvar configurações do projeto',
     openLicenseDialog: 'Licença Aberta',
     openAppSettingsDialog: 'Abra as configurações do aplicativo',
     openAppStylingWindow: 'Abra o aplicativo personalizado CSS',

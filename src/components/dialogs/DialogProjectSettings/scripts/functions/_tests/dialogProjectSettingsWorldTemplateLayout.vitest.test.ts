@@ -1945,7 +1945,7 @@ test('Test that label patch updates grouped template rows in existing he-tree no
       icon: 'mdi-account',
       id: '880e8400-e29b-41d4-a716-446655440001',
       rootSortOrder: null,
-      worldAppendix: ' of Eldoria'
+      worldAppendix: 'of Eldoria'
     }
   ]
   const treeNodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout)

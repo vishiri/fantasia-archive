@@ -4,15 +4,10 @@ import { expect, test, vi } from 'vitest'
 import type { I_faProjectSettingsRoot } from 'app/types/I_faProjectSettingsDomain'
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
+import { buildDialogProjectSettingsDocumentTemplateDraft } from '../../_tests/dialogProjectSettingsDocumentTemplateDraftFixtures'
 import { hydrateDialogProjectSettingsDrafts } from '../dialogProjectSettingsDialogHydrateWiring'
 
-const templateRow = {
-  displayName: 'Character',
-  documentCount: 0,
-  icon: '',
-  id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-  worldAppendix: ''
-}
+const templateRow = buildDialogProjectSettingsDocumentTemplateDraft()
 
 /**
  * hydrateDialogProjectSettingsDrafts
@@ -27,7 +22,7 @@ test('Test that hydrateDialogProjectSettingsDrafts mixes direct snapshots with b
     {
       color: '',
       colorPallete: '',
-      displayName: 'Fetched world',
+      displayNameTranslations: { 'en-US': 'Fetched world' },
       documentCount: 0,
       templateLayout: {
         groups: [],
@@ -60,7 +55,7 @@ test('Test that hydrateDialogProjectSettingsDrafts mixes direct snapshots with b
   expect(fetchTemplates).not.toHaveBeenCalled()
   expect(localDocumentTemplates.value).toEqual([templateRow])
   expect(localSettings.value?.projectName).toBe('Fetched')
-  expect(localWorlds.value?.[0]?.displayName).toBe('Fetched world')
+  expect(localWorlds.value?.[0]?.displayNameTranslations).toEqual({ 'en-US': 'Fetched world' })
 })
 
 /**

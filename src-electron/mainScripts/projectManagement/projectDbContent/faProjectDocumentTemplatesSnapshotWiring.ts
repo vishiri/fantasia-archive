@@ -2,9 +2,7 @@ import type Database from 'better-sqlite3'
 
 import {
   FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_ICON,
-  FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_WORLD_APPENDIX,
-  FA_PROJECT_DOCUMENT_TEMPLATE_ICON_MAX_LENGTH,
-  FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_MAX_LENGTH
+  FA_PROJECT_DOCUMENT_TEMPLATE_ICON_MAX_LENGTH
 } from '../functions/faProjectDbSchemaDdl'
 import {
   coerceFaProjectDocumentTemplateOptionalTextForStorage,
@@ -13,6 +11,10 @@ import {
   listFaProjectDocumentTemplateIds,
   updateFaProjectDocumentTemplateRow
 } from './faProjectDocumentTemplatesSqlWiring'
+import { serializeFaProjectDocumentTemplateTitleTranslationsJson } from 'app/src-electron/shared/faProjectDocumentTemplateTitleTranslationsSchema'
+import { serializeFaProjectDocumentTemplateWorldAppendixTranslationsJson } from 'app/src-electron/shared/faProjectDocumentTemplateWorldAppendixTranslationsSchema'
+import { resolveFaProjectDocumentTemplateTitleForStorage } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager'
+import { resolveFaProjectDocumentTemplateWorldAppendixForStorage } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateWorldAppendix_manager'
 import type { I_faProjectDocumentTemplateSnapshotItem } from 'app/types/I_faProjectDocumentTemplateDomain'
 
 /**
@@ -34,21 +36,28 @@ export function replaceFaProjectDocumentTemplatesSnapshot (
     }
 
     items.forEach((item, index) => {
-      const worldAppendix = coerceFaProjectDocumentTemplateOptionalTextForStorage(
-        item.worldAppendix ?? FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_WORLD_APPENDIX,
-        FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_MAX_LENGTH
+      const worldAppendixTranslations = item.worldAppendixTranslations ?? {}
+      const worldAppendixTranslationsJson =
+        serializeFaProjectDocumentTemplateWorldAppendixTranslationsJson(worldAppendixTranslations)
+      const worldAppendix = resolveFaProjectDocumentTemplateWorldAppendixForStorage(
+        worldAppendixTranslations
       )
       const icon = coerceFaProjectDocumentTemplateOptionalTextForStorage(
         item.icon ?? FA_PROJECT_DOCUMENT_TEMPLATE_DEFAULT_ICON,
         FA_PROJECT_DOCUMENT_TEMPLATE_ICON_MAX_LENGTH
       )
-      const displayName = item.displayName.trim()
+      const titleTranslationsJson = serializeFaProjectDocumentTemplateTitleTranslationsJson(
+        item.titleTranslations
+      )
+      const displayName = resolveFaProjectDocumentTemplateTitleForStorage(item.titleTranslations)
       if (existingIds.has(item.id)) {
         updateFaProjectDocumentTemplateRow(db, item.id, {
           displayName,
           icon,
           sortOrder: index,
-          worldAppendix
+          titleTranslationsJson,
+          worldAppendix,
+          worldAppendixTranslationsJson
         })
         return
       }
@@ -57,7 +66,9 @@ export function replaceFaProjectDocumentTemplatesSnapshot (
         icon,
         id: item.id,
         sortOrder: index,
-        worldAppendix
+        titleTranslationsJson,
+        worldAppendix,
+        worldAppendixTranslationsJson
       })
     })
   })

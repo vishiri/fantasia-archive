@@ -29,6 +29,7 @@
           <div class="dialogProjectSettings__panelScrollInner q-py-sm">
             <DialogProjectSettingsWorldsPanel
               v-if="props.worlds !== null"
+              :current-language-code="props.currentLanguageCode"
               :document-templates="props.documentTemplates"
               :worlds="props.worlds"
               @add-world="emit('addWorld')"
@@ -36,8 +37,8 @@
               @update:worlds="emit('update:worlds', $event)"
               @update-world-color="onUpdateWorldColor"
               @update-world-color-pallete="onUpdateWorldColorPallete"
-              @update-world-display-name="onUpdateWorldDisplayName"
-              @update-document-template-display-name="onUpdateDocumentTemplateDisplayName"
+              @update-world-display-name-translations="onUpdateWorldDisplayNameTranslations"
+              @update-document-template-title-translations="onUpdateDocumentTemplateTitleTranslations"
               @update-world-template-layout="onUpdateWorldTemplateLayout"
             />
           </div>
@@ -51,13 +52,14 @@
           <div class="dialogProjectSettings__panelScrollInner q-py-sm">
             <DialogProjectSettingsDocumentTemplatesPanel
               v-if="props.documentTemplates !== null"
+              :current-language-code="props.currentLanguageCode"
               :templates="props.documentTemplates"
               @add-template="emit('addDocumentTemplate')"
               @remove-template="emit('removeDocumentTemplate', $event)"
               @update:templates="emit('update:documentTemplates', $event)"
-              @update-template-display-name="onUpdateDocumentTemplateDisplayName"
+              @update-template-title-translations="onUpdateDocumentTemplateTitleTranslations"
               @update-template-icon="onUpdateDocumentTemplateIcon"
-              @update-template-world-appendix="onUpdateDocumentTemplateWorldAppendix"
+              @update-template-world-appendix-translations="onUpdateDocumentTemplateWorldAppendixTranslations"
             />
           </div>
         </div>
@@ -70,6 +72,10 @@
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { I_dialogProjectSettingsWorldTemplateLayoutDraft } from 'app/types/I_dialogProjectSettingsWorlds'
+import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
+import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import DialogProjectSettingsDocumentTemplatesPanel from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsDocumentTemplatesPanel.vue'
 import DialogProjectSettingsGeneralPanel from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsGeneralPanel.vue'
 import DialogProjectSettingsWorldsPanel from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsWorldsPanel.vue'
@@ -80,6 +86,7 @@ import {
 } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDialogInput'
 
 const props = defineProps<{
+  currentLanguageCode: T_faUserSettingsLanguageCode
   documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] | null
   projectName: string
   projectNameHasError: boolean
@@ -95,12 +102,18 @@ const emit = defineEmits<{
   'update:documentTemplates': [templates: I_dialogProjectSettingsDocumentTemplateDraft[]]
   'update:projectName': [value: string]
   'update:worlds': [worlds: I_dialogProjectSettingsWorldDraft[]]
-  updateDocumentTemplateDisplayName: [id: string, displayName: string]
   updateDocumentTemplateIcon: [id: string, icon: string]
-  updateDocumentTemplateWorldAppendix: [id: string, worldAppendix: string]
+  updateDocumentTemplateTitleTranslations: [
+    id: string,
+    titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+  ]
+  updateDocumentTemplateWorldAppendixTranslations: [
+    id: string,
+    worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
+  ]
   updateWorldColor: [id: string, color: string]
   updateWorldColorPallete: [id: string, colorPallete: string]
-  updateWorldDisplayName: [id: string, displayName: string]
+  updateWorldDisplayNameTranslations: [id: string, displayNameTranslations: I_faProjectWorldDisplayNameTranslations]
   updateWorldTemplateLayout: [id: string, layout: I_dialogProjectSettingsWorldTemplateLayoutDraft]
 }>()
 
@@ -116,8 +129,11 @@ function onUpdateWorldColorPallete (id: string, colorPallete: string): void {
   emit('updateWorldColorPallete', id, colorPallete)
 }
 
-function onUpdateWorldDisplayName (id: string, displayName: string): void {
-  emit('updateWorldDisplayName', id, displayName)
+function onUpdateWorldDisplayNameTranslations (
+  id: string,
+  displayNameTranslations: I_faProjectWorldDisplayNameTranslations
+): void {
+  emit('updateWorldDisplayNameTranslations', id, displayNameTranslations)
 }
 
 function onUpdateWorldTemplateLayout (
@@ -127,16 +143,22 @@ function onUpdateWorldTemplateLayout (
   emit('updateWorldTemplateLayout', id, layout)
 }
 
-function onUpdateDocumentTemplateDisplayName (id: string, displayName: string): void {
-  emit('updateDocumentTemplateDisplayName', id, displayName)
+function onUpdateDocumentTemplateTitleTranslations (
+  id: string,
+  titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+): void {
+  emit('updateDocumentTemplateTitleTranslations', id, titleTranslations)
 }
 
 function onUpdateDocumentTemplateIcon (id: string, icon: string): void {
   emit('updateDocumentTemplateIcon', id, icon)
 }
 
-function onUpdateDocumentTemplateWorldAppendix (id: string, worldAppendix: string): void {
-  emit('updateDocumentTemplateWorldAppendix', id, worldAppendix)
+function onUpdateDocumentTemplateWorldAppendixTranslations (
+  id: string,
+  worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
+): void {
+  emit('updateDocumentTemplateWorldAppendixTranslations', id, worldAppendixTranslations)
 }
 </script>
 
@@ -157,16 +179,13 @@ function onUpdateDocumentTemplateWorldAppendix (id: string, worldAppendix: strin
   flex-direction: column;
   min-height: 0;
   min-width: 0;
-}
 
-.dialogProjectSettings__panelScrollInner {
-  height: 100%;
-  overflow: hidden;
-}
-
-.dialogProjectSettings__worldsPanel,
-.dialogProjectSettings__documentTemplatesPanel {
-  height: 100%;
+  :deep(.q-panel) {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+  }
 }
 
 .dialogProjectSettings__tabPanel {
@@ -175,14 +194,26 @@ function onUpdateDocumentTemplateWorldAppendix (id: string, worldAppendix: strin
   flex-direction: column;
   max-height: 100%;
   min-height: 0;
+  min-width: 0;
   overflow: hidden;
   padding: 0;
 }
 
 .dialogProjectSettings__panelScroll {
+  display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
   height: 100%;
   min-height: 0;
-  overflow: hidden auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.dialogProjectSettings__panelScrollInner {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
 }
 </style>

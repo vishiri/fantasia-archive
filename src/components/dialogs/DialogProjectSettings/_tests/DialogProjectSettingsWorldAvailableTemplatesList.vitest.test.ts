@@ -5,14 +5,12 @@ import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
 
 import DialogProjectSettingsWorldAvailableTemplatesList from '../DialogProjectSettingsWorldAvailableTemplatesList.vue'
+import { buildDialogProjectSettingsDocumentTemplateDraft } from './dialogProjectSettingsDocumentTemplateDraftFixtures'
 
-const templateFixture = {
-  displayName: 'Character',
-  documentCount: 0,
+const templateFixture = buildDialogProjectSettingsDocumentTemplateDraft({
   icon: 'mdi-account',
-  id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-  worldAppendix: ' sheet'
-}
+  worldAppendixTranslations: { 'en-US': 'sheet' }
+})
 
 const listStubs = {
   QIcon: defineComponent({ template: '<span class="q-icon-stub" />' }),
@@ -32,6 +30,7 @@ const listStubs = {
 test('Test that DialogProjectSettingsWorldAvailableTemplatesList renders template rows', async () => {
   const w = mount(DialogProjectSettingsWorldAvailableTemplatesList, {
     props: {
+      currentLanguageCode: 'en-US',
       templates: [templateFixture]
     },
     global: {
@@ -54,6 +53,7 @@ test('Test that DialogProjectSettingsWorldAvailableTemplatesList renders templat
 test('Test that DialogProjectSettingsWorldAvailableTemplatesList emits addTemplate on row click', async () => {
   const w = mount(DialogProjectSettingsWorldAvailableTemplatesList, {
     props: {
+      currentLanguageCode: 'en-US',
       templates: [templateFixture]
     },
     global: {
@@ -74,6 +74,7 @@ test('Test that DialogProjectSettingsWorldAvailableTemplatesList emits addTempla
 test('Test that DialogProjectSettingsWorldAvailableTemplatesList shows empty state', () => {
   const w = mount(DialogProjectSettingsWorldAvailableTemplatesList, {
     props: {
+      currentLanguageCode: 'en-US',
       templates: []
     },
     global: {
@@ -91,6 +92,7 @@ test('Test that DialogProjectSettingsWorldAvailableTemplatesList shows empty sta
 test('Test that DialogProjectSettingsWorldAvailableTemplatesList shows filter empty state', () => {
   const w = mount(DialogProjectSettingsWorldAvailableTemplatesList, {
     props: {
+      currentLanguageCode: 'en-US',
       showFilterEmpty: true,
       templates: []
     },

@@ -35,7 +35,7 @@ const templateNode = {
   nodeKind: 'template' as const,
   templateDisplayName: 'Character',
   usesNickname: false,
-  worldAppendix: ' sheet'
+  worldAppendix: 'sheet'
 }
 
 const treeNodeStubs = {

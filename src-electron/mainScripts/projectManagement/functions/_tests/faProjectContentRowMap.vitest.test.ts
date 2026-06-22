@@ -1,10 +1,14 @@
 import { expect, test } from 'vitest'
 
 import {
+  createMapFaProjectWorldRow,
   mapFaProjectDocumentRow,
-  mapFaProjectNamedEntityRow,
-  mapFaProjectWorldRow
+  mapFaProjectNamedEntityRow
 } from '../faProjectContentRowMap'
+
+const mapFaProjectWorldRow = createMapFaProjectWorldRow({
+  parseDisplayNameTranslationsJson: (raw) => JSON.parse(raw) as { 'en-US': string }
+})
 
 /**
  * mapFaProjectNamedEntityRow
@@ -23,12 +27,13 @@ test('Test that mapFaProjectNamedEntityRow maps snake_case columns', () => {
 
 /**
  * mapFaProjectWorldRow
- * Maps worlds color and sort_order columns.
+ * Maps worlds color, sort_order, and display name translations columns.
  */
 test('Test that mapFaProjectWorldRow maps color and sortOrder', () => {
   const mapped = mapFaProjectWorldRow({
     id: '750e8400-e29b-41d4-a716-446655440002',
     display_name: 'Realm',
+    display_name_translations_json: '{"en-US":"Realm"}',
     color: '#808080',
     color_pallete: '#112233;#445566',
     sort_order: 2,
@@ -38,6 +43,7 @@ test('Test that mapFaProjectWorldRow maps color and sortOrder', () => {
   expect(mapped.color).toBe('#808080')
   expect(mapped.colorPallete).toBe('#112233;#445566')
   expect(mapped.sortOrder).toBe(2)
+  expect(mapped.displayNameTranslations).toEqual({ 'en-US': 'Realm' })
 })
 
 /**

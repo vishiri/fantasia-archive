@@ -24,12 +24,12 @@ test('Test that useDialogProjectSettings validation computeds tolerate null draf
       removeDocumentTemplate: vi.fn(),
       removeWorld: vi.fn(),
       saveAndCloseDialog: vi.fn(async () => undefined),
-      updateDocumentTemplateDisplayName: vi.fn(),
+      updateDocumentTemplateTitleTranslations: vi.fn(),
       updateDocumentTemplateIcon: vi.fn(),
-      updateDocumentTemplateWorldAppendix: vi.fn(),
+      updateDocumentTemplateWorldAppendixTranslations: vi.fn(),
       updateWorldColor: vi.fn(),
       updateWorldColorPallete: vi.fn(),
-      updateWorldDisplayName: vi.fn(),
+      updateWorldDisplayNameTranslations: vi.fn(),
       updateWorldTemplateLayout: vi.fn()
     }),
     createDialogProjectSettingsRefs: () => ({

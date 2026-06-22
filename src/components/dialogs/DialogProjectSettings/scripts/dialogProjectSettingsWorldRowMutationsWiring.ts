@@ -2,12 +2,15 @@ import type {
   I_dialogProjectSettingsWorldDraft,
   I_dialogProjectSettingsWorldTemplateLayoutDraft
 } from 'app/types/I_dialogProjectSettingsWorlds'
+import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import type { Ref } from 'app/types/I_vueCompositionRefs'
 
 import { appendDialogProjectSettingsWorldDraft } from './functions/dialogProjectSettingsWorldsDraft'
 
 export function addDialogProjectSettingsWorldDraftRow (
   localWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>,
+  languageCode: T_faUserSettingsLanguageCode,
   defaultDisplayName: string
 ): void {
   if (localWorlds.value === null) {
@@ -15,6 +18,7 @@ export function addDialogProjectSettingsWorldDraftRow (
   }
   localWorlds.value = appendDialogProjectSettingsWorldDraft(
     localWorlds.value,
+    languageCode,
     defaultDisplayName
   )
 }
@@ -29,10 +33,10 @@ export function removeDialogProjectSettingsWorldDraftRow (
   localWorlds.value = localWorlds.value.filter((world) => world.id !== id)
 }
 
-export function updateDialogProjectSettingsWorldDraftDisplayName (
+export function updateDialogProjectSettingsWorldDraftDisplayNameTranslations (
   localWorlds: Ref<I_dialogProjectSettingsWorldDraft[] | null>,
   id: string,
-  displayName: string
+  displayNameTranslations: I_faProjectWorldDisplayNameTranslations
 ): void {
   if (localWorlds.value === null) {
     return
@@ -43,7 +47,7 @@ export function updateDialogProjectSettingsWorldDraftDisplayName (
     }
     return {
       ...world,
-      displayName
+      displayNameTranslations
     }
   })
 }

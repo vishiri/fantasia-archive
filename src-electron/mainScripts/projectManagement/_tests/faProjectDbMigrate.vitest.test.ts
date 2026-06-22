@@ -11,6 +11,8 @@ const seedFaProjectDefaultWorldIfEmptyMock = vi.hoisted(() => vi.fn())
 const migrateV4ToV5Mock = vi.hoisted(() => vi.fn())
 const migrateV5ToV6Mock = vi.hoisted(() => vi.fn())
 const migrateV6ToV7Mock = vi.hoisted(() => vi.fn())
+const migrateV7ToV8Mock = vi.hoisted(() => vi.fn())
+const migrateV8ToV9Mock = vi.hoisted(() => vi.fn())
 
 vi.mock('../projectDbContent/faProjectWorldBootstrapWiring', () => {
   return {
@@ -30,11 +32,21 @@ vi.mock('../functions/faProjectDbMigrateV6ToV7', () => ({
   migrateFaProjectSchemaV6ToV7: (...args: unknown[]) => migrateV6ToV7Mock(...args)
 }))
 
+vi.mock('../functions/faProjectDbMigrateV7ToV8', () => ({
+  migrateFaProjectSchemaV7ToV8: (...args: unknown[]) => migrateV7ToV8Mock(...args)
+}))
+
+vi.mock('../functions/faProjectDbMigrateV8ToV9', () => ({
+  migrateFaProjectSchemaV8ToV9: (...args: unknown[]) => migrateV8ToV9Mock(...args)
+}))
+
 beforeEach(() => {
   seedFaProjectDefaultWorldIfEmptyMock.mockClear()
   migrateV4ToV5Mock.mockReset()
   migrateV5ToV6Mock.mockReset()
   migrateV6ToV7Mock.mockReset()
+  migrateV7ToV8Mock.mockReset()
+  migrateV8ToV9Mock.mockReset()
 })
 
 function applyMockUserVersionPragma (
@@ -61,6 +73,12 @@ function applyMockUserVersionPragma (
   }
   if (name === 'user_version = 7') {
     pragmas.user_version = 7
+  }
+  if (name === 'user_version = 8') {
+    pragmas.user_version = 8
+  }
+  if (name === 'user_version = 9') {
+    pragmas.user_version = 9
   }
 }
 
@@ -120,7 +138,7 @@ test('applyFaProjectMigrations bootstraps schema when user_version is 0', () => 
   applyFaProjectMigrations(db as never, 'Realm')
   expect(db.exec).toHaveBeenCalled()
   expect(insertRun).toHaveBeenCalledTimes(2)
-  expect(pragmas.user_version).toBe(7)
+  expect(pragmas.user_version).toBe(9)
   expect(seedFaProjectDefaultWorldIfEmptyMock).toHaveBeenCalledWith(db, 'Realm')
   expect(
     db.exec.mock.calls.some(
@@ -181,7 +199,7 @@ test('applyFaProjectMigrations is a no-op when user_version already at maximum',
     prepare: vi.fn(),
     pragma: vi.fn((name: string, opts?: { simple?: boolean }) => {
       if (name === 'user_version' && opts?.simple === true) {
-        return 7
+        return 9
       }
       return undefined
     }),
@@ -339,7 +357,7 @@ test('Test that readFaProjectStoredProjectUuid throws when project_uuid row is a
   expect(() => readFaProjectStoredProjectUuid(db as never)).toThrow(/missing project_uuid/)
 })
 
-test('applyFaProjectMigrations runs v4->v5->v6->v7 ladder when user_version starts at 4', () => {
+test('applyFaProjectMigrations runs v4->v5->v6->v7->v8->v9 ladder when user_version starts at 4', () => {
   const pragmas: Record<string, unknown> = { user_version: 4 }
   migrateV4ToV5Mock.mockImplementation(() => {
     pragmas.user_version = 5
@@ -349,6 +367,12 @@ test('applyFaProjectMigrations runs v4->v5->v6->v7 ladder when user_version star
   })
   migrateV6ToV7Mock.mockImplementation(() => {
     pragmas.user_version = 7
+  })
+  migrateV7ToV8Mock.mockImplementation(() => {
+    pragmas.user_version = 8
+  })
+  migrateV8ToV9Mock.mockImplementation(() => {
+    pragmas.user_version = 9
   })
   const db = {
     exec: vi.fn(),
@@ -368,16 +392,24 @@ test('applyFaProjectMigrations runs v4->v5->v6->v7 ladder when user_version star
   expect(migrateV4ToV5Mock).toHaveBeenCalledOnce()
   expect(migrateV5ToV6Mock).toHaveBeenCalledOnce()
   expect(migrateV6ToV7Mock).toHaveBeenCalledOnce()
-  expect(pragmas.user_version).toBe(7)
+  expect(migrateV7ToV8Mock).toHaveBeenCalledOnce()
+  expect(migrateV8ToV9Mock).toHaveBeenCalledOnce()
+  expect(pragmas.user_version).toBe(9)
 })
 
-test('applyFaProjectMigrations runs v5->v6->v7 ladder when user_version starts at 5', () => {
+test('applyFaProjectMigrations runs v5->v6->v7->v8->v9 ladder when user_version starts at 5', () => {
   const pragmas: Record<string, unknown> = { user_version: 5 }
   migrateV5ToV6Mock.mockImplementation(() => {
     pragmas.user_version = 6
   })
   migrateV6ToV7Mock.mockImplementation(() => {
     pragmas.user_version = 7
+  })
+  migrateV7ToV8Mock.mockImplementation(() => {
+    pragmas.user_version = 8
+  })
+  migrateV8ToV9Mock.mockImplementation(() => {
+    pragmas.user_version = 9
   })
   const db = {
     exec: vi.fn(),
@@ -397,13 +429,21 @@ test('applyFaProjectMigrations runs v5->v6->v7 ladder when user_version starts a
   expect(migrateV4ToV5Mock).not.toHaveBeenCalled()
   expect(migrateV5ToV6Mock).toHaveBeenCalledOnce()
   expect(migrateV6ToV7Mock).toHaveBeenCalledOnce()
-  expect(pragmas.user_version).toBe(7)
+  expect(migrateV7ToV8Mock).toHaveBeenCalledOnce()
+  expect(migrateV8ToV9Mock).toHaveBeenCalledOnce()
+  expect(pragmas.user_version).toBe(9)
 })
 
-test('applyFaProjectMigrations runs v6->v7 ladder when user_version starts at 6', () => {
+test('applyFaProjectMigrations runs v6->v7->v8->v9 ladder when user_version starts at 6', () => {
   const pragmas: Record<string, unknown> = { user_version: 6 }
   migrateV6ToV7Mock.mockImplementation(() => {
     pragmas.user_version = 7
+  })
+  migrateV7ToV8Mock.mockImplementation(() => {
+    pragmas.user_version = 8
+  })
+  migrateV8ToV9Mock.mockImplementation(() => {
+    pragmas.user_version = 9
   })
   const db = {
     exec: vi.fn(),
@@ -423,5 +463,66 @@ test('applyFaProjectMigrations runs v6->v7 ladder when user_version starts at 6'
   expect(migrateV4ToV5Mock).not.toHaveBeenCalled()
   expect(migrateV5ToV6Mock).not.toHaveBeenCalled()
   expect(migrateV6ToV7Mock).toHaveBeenCalledOnce()
-  expect(pragmas.user_version).toBe(7)
+  expect(migrateV7ToV8Mock).toHaveBeenCalledOnce()
+  expect(migrateV8ToV9Mock).toHaveBeenCalledOnce()
+  expect(pragmas.user_version).toBe(9)
+})
+
+test('applyFaProjectMigrations runs v7->v8->v9 ladder when user_version starts at 7', () => {
+  const pragmas: Record<string, unknown> = { user_version: 7 }
+  migrateV7ToV8Mock.mockImplementation(() => {
+    pragmas.user_version = 8
+  })
+  migrateV8ToV9Mock.mockImplementation(() => {
+    pragmas.user_version = 9
+  })
+  const db = {
+    exec: vi.fn(),
+    prepare: vi.fn(),
+    pragma: vi.fn((name: string, opts?: { simple?: boolean }) => {
+      if (name === 'user_version' && opts?.simple === true) {
+        return pragmas.user_version
+      }
+      applyMockUserVersionPragma(name, pragmas)
+      return undefined
+    }),
+    transaction: vi.fn((fn: () => void) => () => {
+      fn()
+    })
+  }
+  applyFaProjectMigrations(db as never, 'Legacy')
+  expect(migrateV4ToV5Mock).not.toHaveBeenCalled()
+  expect(migrateV5ToV6Mock).not.toHaveBeenCalled()
+  expect(migrateV6ToV7Mock).not.toHaveBeenCalled()
+  expect(migrateV7ToV8Mock).toHaveBeenCalledOnce()
+  expect(migrateV8ToV9Mock).toHaveBeenCalledOnce()
+  expect(pragmas.user_version).toBe(9)
+})
+
+test('applyFaProjectMigrations runs v8->v9 ladder when user_version starts at 8', () => {
+  const pragmas: Record<string, unknown> = { user_version: 8 }
+  migrateV8ToV9Mock.mockImplementation(() => {
+    pragmas.user_version = 9
+  })
+  const db = {
+    exec: vi.fn(),
+    prepare: vi.fn(),
+    pragma: vi.fn((name: string, opts?: { simple?: boolean }) => {
+      if (name === 'user_version' && opts?.simple === true) {
+        return pragmas.user_version
+      }
+      applyMockUserVersionPragma(name, pragmas)
+      return undefined
+    }),
+    transaction: vi.fn((fn: () => void) => () => {
+      fn()
+    })
+  }
+  applyFaProjectMigrations(db as never, 'Legacy')
+  expect(migrateV4ToV5Mock).not.toHaveBeenCalled()
+  expect(migrateV5ToV6Mock).not.toHaveBeenCalled()
+  expect(migrateV6ToV7Mock).not.toHaveBeenCalled()
+  expect(migrateV7ToV8Mock).not.toHaveBeenCalled()
+  expect(migrateV8ToV9Mock).toHaveBeenCalledOnce()
+  expect(pragmas.user_version).toBe(9)
 })

@@ -40,7 +40,7 @@ export const TemplateNode: StoryObj<typeof meta> = {
       id: 'placement-a',
       label: 'Character',
       nodeKind: 'template',
-      worldAppendix: ' sheet'
+      worldAppendix: 'sheet'
     }
   }
 }

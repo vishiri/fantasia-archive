@@ -106,7 +106,7 @@ test('Test that project content schema parsers accept valid payloads', () => {
   expect(parseFaProjectWorldsSnapshotPayload({
     items: [
       {
-        displayName: 'Realm',
+        displayNameTranslations: { 'en-US': 'Realm' },
         id: SAMPLE_UUID
       }
     ]
@@ -114,10 +114,10 @@ test('Test that project content schema parsers accept valid payloads', () => {
   expect(parseFaProjectDocumentTemplatesSnapshotPayload({
     items: [
       {
-        displayName: 'Character',
         icon: 'person',
         id: SAMPLE_UUID,
-        worldAppendix: ' notes'
+        titleTranslations: { 'en-US': 'Character' },
+        worldAppendixTranslations: { 'en-US': 'notes' }
       }
     ]
   })).toHaveLength(1)

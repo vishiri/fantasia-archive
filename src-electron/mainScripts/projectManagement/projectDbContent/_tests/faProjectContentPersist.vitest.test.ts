@@ -107,11 +107,12 @@ function makeProjectContentTestDb (): {
             const row: T_row = {
               id: args[0] as string,
               display_name: args[1] as string,
-              color: args[2] as string,
-              color_pallete: args[3] as string,
-              sort_order: args[4] as number,
-              created_at_ms: args[5] as number,
-              updated_at_ms: args[6] as number
+              display_name_translations_json: args[2] as string,
+              color: args[3] as string,
+              color_pallete: args[4] as string,
+              sort_order: args[5] as number,
+              created_at_ms: args[6] as number,
+              updated_at_ms: args[7] as number
             }
             tables.worlds.set(row.id as string, row)
           }
@@ -140,11 +141,13 @@ function makeProjectContentTestDb (): {
             const row: T_row = {
               id: args[0] as string,
               display_name: args[1] as string,
-              sort_order: args[2] as number,
-              world_appendix: args[3] as string,
-              icon: args[4] as string,
-              created_at_ms: args[5] as number,
-              updated_at_ms: args[6] as number
+              title_translations_json: args[2] as string,
+              sort_order: args[3] as number,
+              world_appendix: args[4] as string,
+              world_appendix_translations_json: args[5] as string,
+              icon: args[6] as string,
+              created_at_ms: args[7] as number,
+              updated_at_ms: args[8] as number
             }
             tables.document_templates.set(row.id as string, row)
           }
@@ -323,8 +326,14 @@ function makeProjectContentTestDb (): {
             if (normalized.includes('display_name = ?')) {
               patch.display_name = args[argIdx++] as string
             }
+            if (normalized.includes('title_translations_json = ?')) {
+              patch.title_translations_json = args[argIdx++] as string
+            }
             if (normalized.includes('world_appendix = ?')) {
               patch.world_appendix = args[argIdx++] as string
+            }
+            if (normalized.includes('world_appendix_translations_json = ?')) {
+              patch.world_appendix_translations_json = args[argIdx++] as string
             }
             if (normalized.includes('icon = ?')) {
               patch.icon = args[argIdx++] as string
@@ -351,6 +360,9 @@ function makeProjectContentTestDb (): {
             let argIdx = 0
             if (normalized.includes('display_name = ?')) {
               patch.display_name = args[argIdx++] as string
+            }
+            if (normalized.includes('display_name_translations_json = ?')) {
+              patch.display_name_translations_json = args[argIdx++] as string
             }
             if (normalized.includes('color = ?')) {
               patch.color = args[argIdx++] as string
@@ -1031,7 +1043,7 @@ test('Test that updateFaProjectWorld persists color and sortOrder', () => {
   const updated = updateFaProjectWorld(db as never, world.id, {
     color: '#aabbcc',
     colorPallete: '#112233;#445566',
-    displayName: 'Realm 2',
+    displayNameTranslations: { 'en-US': 'Realm 2' },
     sortOrder: 4
   })
   expect(updated.displayName).toBe('Realm 2')
@@ -1080,11 +1092,11 @@ test('Test that replaceFaProjectWorldsSnapshot replaces the ordered worlds list'
     {
       color: '#112233',
       colorPallete: '#aabbcc;#ddeeff',
-      displayName: 'Keep renamed',
+      displayNameTranslations: { 'en-US': 'Keep renamed' },
       id: first.id
     },
     {
-      displayName: 'Brand new',
+      displayNameTranslations: { 'en-US': 'Brand new' },
       id: SAMPLE_WORLD_UUID
     }
   ])
@@ -1260,7 +1272,7 @@ test('Test that replaceFaProjectWorldsSnapshot persists templateLayout on each w
   const placementId = '6ba7b811-9dad-11d1-80b4-00c04fd430c8'
   replaceFaProjectWorldsSnapshot(db as never, [
     {
-      displayName: 'Realm',
+      displayNameTranslations: { 'en-US': 'Realm' },
       id: world.id,
       templateLayout: {
         groups: [
@@ -1348,6 +1360,23 @@ test('Test that updateFaProjectDocumentTemplate persists extended fields', () =>
 })
 
 /**
+ * updateFaProjectDocumentTemplate
+ * Persists titleTranslations and worldAppendixTranslations patches.
+ */
+test('Test that updateFaProjectDocumentTemplate persists translation map patches', () => {
+  const { db } = makeProjectContentTestDb()
+  const template = createFaProjectDocumentTemplate(db as never, { displayName: 'Sheet' })
+  const updated = updateFaProjectDocumentTemplate(db as never, template.id, {
+    titleTranslations: { 'en-US': 'Renamed template' },
+    worldAppendixTranslations: { 'en-US': ' appendix' }
+  })
+  expect(updated.displayName).toBe('Renamed template')
+  expect(updated.titleTranslations).toEqual({ 'en-US': 'Renamed template' })
+  expect(updated.worldAppendix).toBe('appendix')
+  expect(updated.worldAppendixTranslations).toEqual({ 'en-US': 'appendix' })
+})
+
+/**
  * deleteFaProjectDocumentTemplate
  * Throws when the template id does not exist.
  */
@@ -1392,14 +1421,14 @@ test('Test that replaceFaProjectDocumentTemplatesSnapshot replaces the ordered t
   const second = createFaProjectDocumentTemplate(db as never, { displayName: 'Remove' })
   replaceFaProjectDocumentTemplatesSnapshot(db as never, [
     {
-      displayName: 'Keep renamed',
       icon: 'star',
       id: first.id,
-      worldAppendix: ' appendix'
+      titleTranslations: { 'en-US': 'Keep renamed' },
+      worldAppendixTranslations: { 'en-US': 'appendix' }
     },
     {
-      displayName: 'Brand new',
-      id: SAMPLE_TEMPLATE_UUID
+      id: SAMPLE_TEMPLATE_UUID,
+      titleTranslations: { 'en-US': 'Brand new' }
     }
   ])
   expect(tables.document_templates.has(second.id)).toBe(false)

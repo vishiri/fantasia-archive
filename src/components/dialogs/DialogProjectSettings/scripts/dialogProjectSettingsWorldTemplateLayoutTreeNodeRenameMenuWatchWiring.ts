@@ -2,7 +2,7 @@ import { nextTick, watch } from 'vue'
 import type { ComputedRef, Ref } from 'vue'
 import type { QInput } from 'quasar'
 
-import { scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus } from './functions/scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus'
+import { scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus } from './dialogProjectSettingsWorldTemplateLayoutRenameMenuFocusWiring'
 
 export function wireDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWatchers (params: {
   getRenameDraftSeed: () => string

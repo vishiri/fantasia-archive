@@ -7,6 +7,7 @@ const STUB_UUID = '550e8400-e29b-41d4-a716-446655440000'
 const stubNamedEntityShape = {
   id: STUB_UUID,
   displayName: 'Stub',
+  displayNameTranslations: { 'en-US': 'Stub' },
   createdAtMs: 0,
   updatedAtMs: 0
 }
@@ -31,7 +32,9 @@ const stubDocumentTemplateShape = {
   ...stubNamedEntityShape,
   icon: '',
   sortOrder: 0,
-  worldAppendix: ''
+  titleTranslations: { 'en-US': 'Stub' },
+  worldAppendix: '',
+  worldAppendixTranslations: {}
 }
 
 const stubDocumentShape = {
@@ -125,14 +128,14 @@ test('Test that createFaProjectContentBridgeHarnessStub noop methods resolve und
   })).resolves.toBeUndefined()
   await expect(api.saveWorldsSnapshot([
     {
-      displayName: 'World',
+      displayNameTranslations: { 'en-US': 'World' },
       id: STUB_UUID
     }
   ])).resolves.toBeUndefined()
   await expect(api.saveDocumentTemplatesSnapshot([
     {
-      displayName: 'Template',
-      id: STUB_UUID
+      id: STUB_UUID,
+      titleTranslations: { 'en-US': 'Template' }
     }
   ])).resolves.toBeUndefined()
 })

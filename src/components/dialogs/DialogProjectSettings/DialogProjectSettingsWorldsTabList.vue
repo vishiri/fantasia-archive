@@ -35,6 +35,7 @@
         <DialogProjectSettingsWorldsTabItem
           v-for="world in sortableWorlds"
           :key="world.id"
+          :current-language-code="props.currentLanguageCode"
           :is-being-dragged="world.id === draggingWorldId"
           :is-list-dragging="draggingWorldId !== null"
           :is-selected="world.id === props.selectedWorldId"
@@ -76,6 +77,7 @@ import type { SortableEvent } from 'sortablejs'
 
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import type {
   T_faVerticalDraggableTabsTabJustifyContent,
   T_faVerticalDraggableTabsTabLabelTextTransform,
@@ -93,7 +95,7 @@ import {
 } from 'app/src/scripts/faDragDrop/functions/buildFaVerticalDraggableTabsRootStyle'
 import DialogProjectSettingsVerticalTabListFilterInput from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsVerticalTabListFilterInput.vue'
 import DialogProjectSettingsWorldsTabItem from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsWorldsTabItem.vue'
-import { filterDialogProjectSettingsWorldsByQuery } from './scripts/functions/filterDialogProjectSettingsWorldsByQuery'
+import { filterDialogProjectSettingsWorldsByQuery } from './scripts/filterDialogProjectSettingsWorldsByQuery'
 import { createDialogProjectSettingsFilteredVerticalTabListSortableWiring } from './scripts/dialogProjectSettingsFilteredVerticalTabListSortableWiring'
 import { hideNativeSortableDragGhost } from 'app/src/scripts/faDragDrop/functions/hideNativeSortableDragGhost'
 import {
@@ -109,6 +111,7 @@ defineOptions({
 })
 
 const props = withDefaults(defineProps<{
+  currentLanguageCode: T_faUserSettingsLanguageCode
   dense?: boolean
   documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] | null
   selectedWorldId: string | null
@@ -158,7 +161,13 @@ const {
   syncSortableListFromFull
 } = createDialogProjectSettingsFilteredVerticalTabListSortableWiring({
   cloneList: cloneWorldDraftList,
-  filterItems: filterDialogProjectSettingsWorldsByQuery,
+  filterItems: (list, query) => {
+    return filterDialogProjectSettingsWorldsByQuery(
+      list,
+      query,
+      props.currentLanguageCode
+    )
+  },
   filterQuery,
   fullList: draggableWorlds
 })

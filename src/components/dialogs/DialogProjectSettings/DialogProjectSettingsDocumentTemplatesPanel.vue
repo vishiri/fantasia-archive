@@ -8,6 +8,7 @@
 
     <template v-else>
       <DialogProjectSettingsDocumentTemplatesTabList
+        :current-language-code="props.currentLanguageCode"
         :selected-template-id="selectedTemplateId"
         :tab-list-width-px="FA_DIALOG_PROJECT_SETTINGS_DOCUMENT_TEMPLATES_TAB_LIST_WIDTH_PX"
         :templates="props.templates"
@@ -21,13 +22,14 @@
       <div class="dialogProjectSettings__documentTemplatesDetailHost col">
         <DialogProjectSettingsDocumentTemplatesDetailPanel
           v-if="selectedTemplate !== null"
-          :name-has-error="isTemplateNameInvalid(selectedTemplate.displayName)"
+          :current-language-code="props.currentLanguageCode"
+          :name-has-error="isTemplateNameInvalid(selectedTemplate.titleTranslations)"
           :remove-disabled="isTemplateRemoveDisabled(selectedTemplate)"
           :template="selectedTemplate"
           @remove="emitRemove(selectedTemplate.id)"
-          @update:display-name="emitUpdateDisplayName(selectedTemplate.id, $event)"
           @update:icon="emitUpdateIcon(selectedTemplate.id, $event)"
-          @update:world-appendix="emitUpdateWorldAppendix(selectedTemplate.id, $event)"
+          @update:title-translations="emitUpdateTitleTranslations(selectedTemplate.id, $event)"
+          @update:world-appendix-translations="emitUpdateWorldAppendixTranslations(selectedTemplate.id, $event)"
         />
       </div>
     </template>
@@ -38,10 +40,13 @@
 import { computed, ref, watch } from 'vue'
 
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
+import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+import type { I_faProjectDocumentTemplateWorldAppendixTranslations } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import {
   isDialogProjectSettingsDocumentTemplateNameInvalid,
   isDialogProjectSettingsDocumentTemplateRemoveDisabled
-} from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDocumentTemplatesDraft'
+} from 'app/src/components/dialogs/DialogProjectSettings/scripts/dialogProjectSettingsDocumentTemplatesDraft'
 import { resolveDialogProjectSettingsDocumentTemplatesPanelSelection } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDocumentTemplatesSelection'
 import { FA_DIALOG_PROJECT_SETTINGS_DOCUMENT_TEMPLATES_TAB_LIST_WIDTH_PX } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDialogInput'
 import DialogProjectSettingsDocumentTemplatesDetailPanel from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsDocumentTemplatesDetailPanel.vue'
@@ -53,6 +58,7 @@ defineOptions({
 })
 
 const props = defineProps<{
+  currentLanguageCode: T_faUserSettingsLanguageCode
   templates: I_dialogProjectSettingsDocumentTemplateDraft[]
 }>()
 
@@ -60,9 +66,12 @@ const emit = defineEmits<{
   addTemplate: []
   removeTemplate: [id: string]
   'update:templates': [templates: I_dialogProjectSettingsDocumentTemplateDraft[]]
-  updateTemplateDisplayName: [id: string, displayName: string]
   updateTemplateIcon: [id: string, icon: string]
-  updateTemplateWorldAppendix: [id: string, worldAppendix: string]
+  updateTemplateTitleTranslations: [id: string, titleTranslations: I_faProjectDocumentTemplateTitleTranslations]
+  updateTemplateWorldAppendixTranslations: [
+    id: string,
+    worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
+  ]
 }>()
 
 const selectedTemplateId = ref<string | null>(null)
@@ -86,8 +95,10 @@ watch(() => props.templates, (nextTemplates) => {
   immediate: true
 })
 
-function isTemplateNameInvalid (displayName: string): boolean {
-  return isDialogProjectSettingsDocumentTemplateNameInvalid(displayName)
+function isTemplateNameInvalid (
+  titleTranslations: I_dialogProjectSettingsDocumentTemplateDraft['titleTranslations']
+): boolean {
+  return isDialogProjectSettingsDocumentTemplateNameInvalid(titleTranslations)
 }
 
 function isTemplateRemoveDisabled (
@@ -104,12 +115,18 @@ function emitRemove (id: string): void {
   emit('removeTemplate', id)
 }
 
-function emitUpdateDisplayName (id: string, displayName: string): void {
-  emit('updateTemplateDisplayName', id, displayName)
+function emitUpdateTitleTranslations (
+  id: string,
+  titleTranslations: I_faProjectDocumentTemplateTitleTranslations
+): void {
+  emit('updateTemplateTitleTranslations', id, titleTranslations)
 }
 
-function emitUpdateWorldAppendix (id: string, worldAppendix: string): void {
-  emit('updateTemplateWorldAppendix', id, worldAppendix)
+function emitUpdateWorldAppendixTranslations (
+  id: string,
+  worldAppendixTranslations: I_faProjectDocumentTemplateWorldAppendixTranslations
+): void {
+  emit('updateTemplateWorldAppendixTranslations', id, worldAppendixTranslations)
 }
 
 function emitUpdateIcon (id: string, icon: string): void {
@@ -119,6 +136,7 @@ function emitUpdateIcon (id: string, icon: string): void {
 
 <style lang="scss" scoped>
 .dialogProjectSettings__documentTemplatesPanel {
+  align-self: stretch;
   flex: 1 1 auto;
   min-height: 0;
   min-width: 0;

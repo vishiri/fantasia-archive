@@ -10,19 +10,18 @@
             {{ $t('dialogs.projectSettings.fields.worldName.label') }}
           </span>
         </div>
-        <q-input
-          :model-value="props.world.displayName"
+        <FaLocaleTranslationsInput
+          :model-value="props.world.displayNameTranslations"
           class="dialogProjectSettingsWorldsDetail__nameInput"
-          color="primary-bright"
-          dark
-          dense
+          :current-language-code="props.currentLanguageCode"
           :data-test-validation-error="props.nameHasError ? 'true' : 'false'"
-          data-test-locator="dialogProjectSettings-worlds-nameInput"
-          filled
+          dense
           :error="props.nameHasError"
           :error-message="props.nameHasError ? $t('dialogs.projectSettings.fields.worldName.errorRequired') : undefined"
-          outlined
-          @update:model-value="emitDisplayName"
+          :hide-bottom-space="!props.nameHasError"
+          :max-length="FA_PROJECT_WORLD_DISPLAY_NAME_TRANSLATION_MAX_LENGTH"
+          test-locator="dialogProjectSettings-worlds-nameInput"
+          @update:model-value="emitDisplayNameTranslations"
         />
       </div>
 
@@ -109,6 +108,7 @@
 
     <DialogProjectSettingsWorldTemplateLayoutPanel
       v-if="props.documentTemplates !== null"
+      :current-language-code="props.currentLanguageCode"
       :document-templates="props.documentTemplates"
       :world="props.world"
       @update:template-layout="emitTemplateLayout"
@@ -124,10 +124,14 @@ import DialogProjectSettingsWorldsDeleteButton from './DialogProjectSettingsWorl
 import DialogProjectSettingsWorldColorPaletteEditor from './DialogProjectSettingsWorldColorPaletteEditor.vue'
 import DialogProjectSettingsWorldTemplateLayoutPanel from './DialogProjectSettingsWorldTemplateLayoutPanel.vue'
 import FaColorPickerInput from 'app/src/components/elements/FaColorPickerInput/FaColorPickerInput.vue'
+import FaLocaleTranslationsInput from 'app/src/components/elements/FaLocaleTranslationsInput/FaLocaleTranslationsInput.vue'
+import { FA_PROJECT_WORLD_DISPLAY_NAME_TRANSLATION_MAX_LENGTH } from 'app/types/I_faProjectWorldDisplayNameTranslations'
+import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
 import type { I_faColorPickerPaletteAppendConfig } from 'app/types/I_faColorPickerInput'
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { I_dialogProjectSettingsWorldTemplateLayoutDraft } from 'app/types/I_dialogProjectSettingsWorlds'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import { parseFaProjectWorldColorPalleteToHexList } from 'app/src/scripts/projectWorlds/functions/faProjectWorldColorPalleteHexList'
 import { buildDialogProjectSettingsWorldColorPaletteTooltipContent } from './scripts/functions/dialogProjectSettingsWorldColorPaletteTooltip'
 
@@ -136,6 +140,7 @@ defineOptions({
 })
 
 const props = defineProps<{
+  currentLanguageCode: T_faUserSettingsLanguageCode
   documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] | null
   nameHasError: boolean
   removeDisabled: boolean
@@ -167,12 +172,12 @@ const emit = defineEmits<{
   remove: []
   'update:color': [value: string]
   'update:colorPallete': [value: string]
-  'update:displayName': [value: string]
+  'update:displayNameTranslations': [value: I_faProjectWorldDisplayNameTranslations]
   'update:templateLayout': [layout: I_dialogProjectSettingsWorldTemplateLayoutDraft]
 }>()
 
-function emitDisplayName (value: string | number | null): void {
-  emit('update:displayName', value === null || value === undefined ? '' : String(value))
+function emitDisplayNameTranslations (value: I_faProjectWorldDisplayNameTranslations): void {
+  emit('update:displayNameTranslations', value)
 }
 
 function emitColor (value: string): void {

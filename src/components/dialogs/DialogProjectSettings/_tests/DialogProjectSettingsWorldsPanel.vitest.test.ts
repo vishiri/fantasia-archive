@@ -12,7 +12,7 @@ const emptyLayout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
 const worldA = {
   color: '',
   colorPallete: '',
-  displayName: 'Alpha',
+  displayNameTranslations: { 'en-US': 'Alpha' },
   documentCount: 0,
   id: '550e8400-e29b-41d4-a716-446655440000',
   templateLayout: emptyLayout
@@ -21,7 +21,7 @@ const worldA = {
 const worldB = {
   color: '#aabbcc',
   colorPallete: '',
-  displayName: 'Beta',
+  displayNameTranslations: { 'en-US': 'Beta' },
   documentCount: 2,
   id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
   templateLayout: emptyLayout
@@ -46,7 +46,7 @@ const detailPanelStub = defineComponent({
       required: true
     }
   },
-  emits: ['remove', 'update:color', 'update:colorPallete', 'update:displayName'],
+  emits: ['remove', 'update:color', 'update:colorPallete', 'update:displayNameTranslations'],
   template: `
     <div
       class="dialog-project-settings-worlds-detail-stub"
@@ -72,7 +72,7 @@ const detailPanelStub = defineComponent({
       <button
         type="button"
         data-test-locator="dialogProjectSettings-worlds-detail-name"
-        @click="$emit('update:displayName', 'Renamed')"
+        @click="$emit('update:displayNameTranslations', { 'en-US': 'Renamed' })"
       />
     </div>
   `
@@ -114,6 +114,7 @@ const tabListStub = defineComponent({
 function mountWorldsPanel (worlds = [worldA, worldB]) {
   return mount(DialogProjectSettingsWorldsPanel, {
     props: {
+      currentLanguageCode: 'en-US',
       documentTemplates: [],
       worlds
     },
@@ -161,7 +162,7 @@ test('Test that DialogProjectSettingsWorldsPanel forwards add world and detail u
   expect(w.emitted('updateWorldColorPallete')?.[0]).toEqual([worldA.id, '#112233;#445566'])
 
   await w.find('[data-test-locator="dialogProjectSettings-worlds-detail-name"]').trigger('click')
-  expect(w.emitted('updateWorldDisplayName')?.[0]).toEqual([worldA.id, 'Renamed'])
+  expect(w.emitted('updateWorldDisplayNameTranslations')?.[0]).toEqual([worldA.id, { 'en-US': 'Renamed' }])
 })
 
 /**

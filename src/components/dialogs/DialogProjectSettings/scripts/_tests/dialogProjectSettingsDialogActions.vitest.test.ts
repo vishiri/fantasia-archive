@@ -40,7 +40,7 @@ const directWorlds: I_dialogProjectSettingsWorldDraft[] = [
   {
     color: '',
     colorPallete: '',
-    displayName: 'Direct world',
+    displayNameTranslations: { 'en-US': 'Direct world' },
     documentCount: 0,
     templateLayout: {
       groups: [],
@@ -52,11 +52,11 @@ const directWorlds: I_dialogProjectSettingsWorldDraft[] = [
 
 const directTemplates: I_dialogProjectSettingsDocumentTemplateDraft[] = [
   {
-    displayName: 'Direct template',
     documentCount: 0,
     icon: 'mdi-file',
     id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-    worldAppendix: 'Appendix'
+    titleTranslations: { 'en-US': 'Direct template' },
+    worldAppendixTranslations: { 'en-US': 'Appendix' }
   }
 ]
 
@@ -64,7 +64,7 @@ const hydratedWorlds: I_dialogProjectSettingsWorldDraft[] = [
   {
     color: '#808080',
     colorPallete: '',
-    displayName: 'From Db',
+    displayNameTranslations: { 'en-US': 'From Db' },
     documentCount: 0,
     templateLayout: {
       groups: [],
@@ -178,7 +178,7 @@ test('Test that createDialogProjectSettingsDialogActions mutates local world dra
       {
         color: '',
         colorPallete: '',
-        displayName: 'Alpha',
+        displayNameTranslations: { 'en-US': 'Alpha' },
         documentCount: 0,
         templateLayout: {
           groups: [],
@@ -189,7 +189,7 @@ test('Test that createDialogProjectSettingsDialogActions mutates local world dra
       {
         color: '',
         colorPallete: '',
-        displayName: 'Beta',
+        displayNameTranslations: { 'en-US': 'Beta' },
         documentCount: 0,
         templateLayout: {
           groups: [],
@@ -205,16 +205,16 @@ test('Test that createDialogProjectSettingsDialogActions mutates local world dra
     removeWorld,
     updateWorldColor,
     updateWorldColorPallete,
-    updateWorldDisplayName
+    updateWorldDisplayNameTranslations
   } = createDialogProjectSettingsDialogActions(bindings)
 
   addWorld()
   expect(bindings.localWorlds.value).toHaveLength(3)
 
-  updateWorldDisplayName(worldAId, 'Renamed')
+  updateWorldDisplayNameTranslations(worldAId, { 'en-US': 'Renamed' })
   updateWorldColor(worldAId, '#aabbcc')
   updateWorldColorPallete(worldAId, '#112233;#445566')
-  expect(bindings.localWorlds.value?.[0]?.displayName).toBe('Renamed')
+  expect(bindings.localWorlds.value?.[0]?.displayNameTranslations).toEqual({ 'en-US': 'Renamed' })
   expect(bindings.localWorlds.value?.[0]?.color).toBe('#aabbcc')
   expect(bindings.localWorlds.value?.[0]?.colorPallete).toBe('#112233;#445566')
 
@@ -230,11 +230,11 @@ test('Test that createDialogProjectSettingsDialogActions mutates local document 
   const bindings = buildActionBindings({
     localDocumentTemplates: ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([
       {
-        displayName: 'Alpha',
         documentCount: 0,
         icon: '',
         id: templateAId,
-        worldAppendix: ''
+        titleTranslations: { 'en-US': 'Alpha' },
+        worldAppendixTranslations: {}
       }
     ])
   })
@@ -242,20 +242,20 @@ test('Test that createDialogProjectSettingsDialogActions mutates local document 
   const {
     addDocumentTemplate,
     removeDocumentTemplate,
-    updateDocumentTemplateDisplayName,
+    updateDocumentTemplateTitleTranslations,
     updateDocumentTemplateIcon,
-    updateDocumentTemplateWorldAppendix
+    updateDocumentTemplateWorldAppendixTranslations
   } = createDialogProjectSettingsDialogActions(bindings)
 
   addDocumentTemplate()
   expect(bindings.localDocumentTemplates.value).toHaveLength(2)
 
-  updateDocumentTemplateDisplayName(templateAId, 'Renamed')
+  updateDocumentTemplateTitleTranslations(templateAId, { 'en-US': 'Renamed' })
   updateDocumentTemplateIcon(templateAId, 'mdi-star')
-  updateDocumentTemplateWorldAppendix(templateAId, 'Notes')
-  expect(bindings.localDocumentTemplates.value?.[0]?.displayName).toBe('Renamed')
+  updateDocumentTemplateWorldAppendixTranslations(templateAId, { 'en-US': 'Notes' })
+  expect(bindings.localDocumentTemplates.value?.[0]?.titleTranslations).toEqual({ 'en-US': 'Renamed' })
   expect(bindings.localDocumentTemplates.value?.[0]?.icon).toBe('mdi-star')
-  expect(bindings.localDocumentTemplates.value?.[0]?.worldAppendix).toBe('Notes')
+  expect(bindings.localDocumentTemplates.value?.[0]?.worldAppendixTranslations).toEqual({ 'en-US': 'Notes' })
 
   const secondId = bindings.localDocumentTemplates.value?.[1]?.id
   if (secondId !== undefined) {
@@ -280,7 +280,7 @@ test('Test that saveAndCloseDialog dispatches saveProjectSettings with trimmed n
       {
         color: '#aabbcc',
         colorPallete: '#112233;#445566',
-        displayName: 'Realm',
+        displayNameTranslations: { 'en-US': 'Realm' },
         documentCount: 0,
         templateLayout: {
           groups: [],
@@ -291,11 +291,11 @@ test('Test that saveAndCloseDialog dispatches saveProjectSettings with trimmed n
     ]),
     localDocumentTemplates: ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([
       {
-        displayName: 'Character',
         documentCount: 0,
         icon: 'mdi-account',
         id: templateAId,
-        worldAppendix: 'World notes'
+        titleTranslations: { 'en-US': 'Character' },
+        worldAppendixTranslations: { 'en-US': 'World notes' }
       }
     ])
   })
@@ -307,10 +307,10 @@ test('Test that saveAndCloseDialog dispatches saveProjectSettings with trimmed n
   expect(runFaActionAwaitMock).toHaveBeenCalledWith('saveProjectSettings', {
     documentTemplates: [
       {
-        displayName: 'Character',
         icon: 'mdi-account',
         id: templateAId,
-        worldAppendix: 'World notes'
+        titleTranslations: { 'en-US': 'Character' },
+        worldAppendixTranslations: { 'en-US': 'World notes' }
       }
     ],
     settings: {
@@ -320,7 +320,7 @@ test('Test that saveAndCloseDialog dispatches saveProjectSettings with trimmed n
       {
         color: '#aabbcc',
         colorPallete: '#112233;#445566',
-        displayName: 'Realm',
+        displayNameTranslations: { 'en-US': 'Realm' },
         id: worldAId,
         templateLayout: {
           groups: [],
@@ -344,7 +344,7 @@ test('Test that saveAndCloseDialog no-ops without local settings or blank name',
       {
         color: '',
         colorPallete: '',
-        displayName: 'Realm',
+        displayNameTranslations: { 'en-US': 'Realm' },
         documentCount: 0,
         templateLayout: {
           groups: [],
@@ -385,7 +385,7 @@ test('Test that saveAndCloseDialog keeps the dialog open when save fails', async
       {
         color: '',
         colorPallete: '',
-        displayName: 'Alpha',
+        displayNameTranslations: { 'en-US': 'Alpha' },
         documentCount: 0,
         templateLayout: {
           groups: [],
@@ -421,7 +421,7 @@ test('Test that saveAndCloseDialog no-ops when local document templates are null
       {
         color: '',
         colorPallete: '',
-        displayName: 'Realm',
+        displayNameTranslations: { 'en-US': 'Realm' },
         documentCount: 0,
         templateLayout: {
           groups: [],

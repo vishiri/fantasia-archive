@@ -283,6 +283,11 @@ export default {
       description: 'Determina se l\'editor di testo ha un\'altezza limitata quando non è in modalità a schermo intero.',
       tags: 'altezza dell\'area di testo, testo lungo, editor di espansione, editor di scorrimento',
     },
+    logFullActivityPayload: {
+      title: "Registra payload completo dell'attività",
+      description: "Se abilitato, l'attività registrerà payload completi. Può essere utile per un debug approfondito che richiede una registrazione precisa dei risultati.",
+      tags: 'debug, risoluzione problemi, DevTools, payload, attività, registrazione',
+    },
     noProjectName: {
       title: 'Nascondi il nome del progetto nell\'albero',
       description: 'Determina se il nome del progetto viene visualizzato nell\'albero gerarchico.',

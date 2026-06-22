@@ -12,7 +12,7 @@ const placementBId = '880e8400-e29b-41d4-a716-446655440002'
 const worldA: I_dialogProjectSettingsWorldDraft = {
   color: '',
   colorPallete: '',
-  displayName: 'Realm A',
+  displayNameTranslations: { 'en-US': 'Realm A' },
   documentCount: 0,
   id: '550e8400-e29b-41d4-a716-446655440000',
   templateLayout: {
@@ -36,7 +36,7 @@ const worldA: I_dialogProjectSettingsWorldDraft = {
 
 const worldB: I_dialogProjectSettingsWorldDraft = {
   ...worldA,
-  displayName: 'Realm B',
+  displayNameTranslations: { 'en-US': 'Realm B' },
   id: '550e8400-e29b-41d4-a716-446655440099',
   templateLayout: {
     groups: [],

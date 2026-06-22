@@ -9,7 +9,7 @@ export function dialogProjectSettingsWorldDraftFixture (
   return {
     color: '',
     colorPallete: '',
-    displayName: 'World',
+    displayNameTranslations: { 'en-US': 'World' },
     documentCount: 0,
     id: 'world-id-1',
     templateLayout: createEmptyDialogProjectSettingsWorldTemplateLayoutDraft(),

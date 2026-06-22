@@ -1,7 +1,8 @@
-/** SQLite column layout for the worlds table (v5+ color, v6+ sort_order, v4+ color_pallete). */
+/** SQLite column layout for the worlds table (v5+ color, v6+ sort_order, v4+ color_pallete, v9+ display_name_translations_json). */
 export interface I_faSqlWorldRow {
   id: string
   display_name: string
+  display_name_translations_json: string
   color: string
   color_pallete: string
   sort_order: number
@@ -17,12 +18,14 @@ export interface I_faSqlNamedEntityRow {
   updated_at_ms: number
 }
 
-/** SQLite column layout for the document_templates table (v5+). */
+/** SQLite column layout for the document_templates table (v5+, v8+ title_translations_json, v9+ world_appendix_translations_json). */
 export interface I_faSqlDocumentTemplateRow {
   id: string
   display_name: string
+  title_translations_json: string
   sort_order: number
   world_appendix: string
+  world_appendix_translations_json: string
   icon: string
   created_at_ms: number
   updated_at_ms: number

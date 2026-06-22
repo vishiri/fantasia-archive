@@ -14,6 +14,26 @@ vi.mock('app/src/stores/scripts/sFaProjectSettingsBridge', () => ({
   }))
 }))
 
+vi.mock('app/src/stores/scripts/sFaProjectWorldsBridge', () => ({
+  faProjectWorldsFetchFreshForDialog: vi.fn(async () => ([
+    {
+      color: '#808080',
+      colorPallete: '',
+      displayNameTranslations: { 'en-US': 'Stub' },
+      documentCount: 0,
+      id: '550e8400-e29b-41d4-a716-446655440000',
+      templateLayout: {
+        groups: [],
+        placements: []
+      }
+    }
+  ]))
+}))
+
+vi.mock('app/src/stores/scripts/sFaProjectDocumentTemplatesBridge', () => ({
+  faProjectDocumentTemplatesFetchFreshForDialog: vi.fn(async () => ([]))
+}))
+
 vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => ({
   runFaActionAwait: vi.fn(async () => true)
 }))
@@ -99,6 +119,17 @@ const dialogProjectSettingsQTabStub = defineComponent({
 })
 
 const dialogProjectSettingsStubs = {
+  FaLocaleTranslationsInput: defineComponent({
+    name: 'FaLocaleTranslationsInput',
+    props: {
+      modelValue: {
+        type: Object,
+        required: true
+      }
+    },
+    emits: ['update:modelValue'],
+    template: '<div class="fa-locale-translations-input-stub" />'
+  }),
   QBtn: dialogProjectSettingsQBtnStub,
   QCard: defineComponent({
     name: 'QCard',
@@ -193,7 +224,7 @@ test('Test that DialogProjectSettings save button persists and closes the dialog
     worlds: [
       {
         color: '#808080',
-        displayName: 'Stub',
+        displayNameTranslations: { 'en-US': 'Stub' },
         id: '550e8400-e29b-41d4-a716-446655440000',
         templateLayout: {
           groups: [],

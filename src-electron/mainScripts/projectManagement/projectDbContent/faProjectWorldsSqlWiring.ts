@@ -1,7 +1,7 @@
 import type Database from 'better-sqlite3'
 import { v4 as uuidv4 } from 'uuid'
 
-import { mapFaProjectWorldRow } from '../functions/faProjectContentRowMap'
+import { mapFaProjectWorldRow } from '../faProjectContentRowMap_manager'
 import {
   FA_PROJECT_TABLE_DOCUMENTS,
   FA_PROJECT_TABLE_WORLDS,
@@ -10,16 +10,25 @@ import {
 } from '../functions/faProjectDbSchemaDdl'
 import { computeNextFaProjectWorldSortOrder } from '../functions/faProjectWorldSortOrder'
 import { FaProjectContentNotFoundError } from './faProjectContentNotFoundError'
+import { serializeFaProjectWorldDisplayNameTranslationsJson } from 'app/src-electron/shared/faProjectWorldDisplayNameTranslationsSchema'
 import type {
   I_faProjectWorld,
   I_faProjectWorldRowUpsertFields
 } from 'app/types/I_faProjectWorldDomain'
+import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
 import type { I_faSqlWorldRow } from 'app/types/I_faProjectContentRowMap'
 
 const WORLD_ENTITY_LABEL = 'World'
 
 const SQL_SELECT_WORLD_COLUMNS =
-  'id, display_name, color, color_pallete, sort_order, created_at_ms, updated_at_ms'
+  'id, display_name, display_name_translations_json, color, color_pallete, sort_order, created_at_ms, updated_at_ms'
+
+function buildDisplayNameTranslationsJsonFromDisplayName (displayName: string): string {
+  const displayNameTranslations: I_faProjectWorldDisplayNameTranslations = {
+    'en-US': displayName
+  }
+  return serializeFaProjectWorldDisplayNameTranslationsJson(displayNameTranslations)
+}
 
 function assertWorldRowExists (
   row: I_faSqlWorldRow | undefined,
@@ -75,11 +84,12 @@ export function insertFaProjectWorld (
   const sortOrder = computeNextFaProjectWorldSortOrder(readFaProjectWorldMaxSortOrder(db))
   db.prepare(
     `INSERT INTO ${FA_PROJECT_TABLE_WORLDS} ` +
-      '(id, display_name, color, color_pallete, sort_order, created_at_ms, updated_at_ms) ' +
-      'VALUES (?, ?, ?, ?, ?, ?, ?)'
+      '(id, display_name, display_name_translations_json, color, color_pallete, sort_order, created_at_ms, updated_at_ms) ' +
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(
     id,
     displayName,
+    buildDisplayNameTranslationsJsonFromDisplayName(displayName),
     FA_PROJECT_WORLD_DEFAULT_COLOR,
     FA_PROJECT_WORLD_DEFAULT_COLOR_PALETTE,
     sortOrder,
@@ -101,11 +111,12 @@ export function insertFaProjectWorldWithId (
   const nowMs = Date.now()
   db.prepare(
     `INSERT INTO ${FA_PROJECT_TABLE_WORLDS} ` +
-      '(id, display_name, color, color_pallete, sort_order, created_at_ms, updated_at_ms) ' +
-      'VALUES (?, ?, ?, ?, ?, ?, ?)'
+      '(id, display_name, display_name_translations_json, color, color_pallete, sort_order, created_at_ms, updated_at_ms) ' +
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(
     fields.id,
     fields.displayName,
+    fields.displayNameTranslationsJson,
     fields.color,
     fields.colorPallete,
     fields.sortOrder,
@@ -127,6 +138,7 @@ export function updateFaProjectWorldRow (
     color?: string
     colorPallete?: string
     displayName?: string
+    displayNameTranslationsJson?: string
     sortOrder?: number
   }
 ): I_faProjectWorld {
@@ -142,6 +154,10 @@ export function updateFaProjectWorldRow (
   if (patch.displayName !== undefined) {
     sets.push('display_name = ?')
     values.push(patch.displayName)
+  }
+  if (patch.displayNameTranslationsJson !== undefined) {
+    sets.push('display_name_translations_json = ?')
+    values.push(patch.displayNameTranslationsJson)
   }
   if (patch.color !== undefined) {
     sets.push('color = ?')

@@ -2,9 +2,115 @@
 
 import { defineComponent } from 'vue'
 import { mount } from '@vue/test-utils'
+import { createI18n } from 'vue-i18n'
 import { expect, test } from 'vitest'
 
 import DialogProjectSettingsDocumentTemplatesDetailPanel from '../DialogProjectSettingsDocumentTemplatesDetailPanel.vue'
+import { buildDialogProjectSettingsDocumentTemplateDraft } from './dialogProjectSettingsDocumentTemplateDraftFixtures'
+
+const detailPanelI18n = createI18n({
+  legacy: false,
+  locale: 'en-US',
+  messages: {
+    'en-US': {
+      dialogs: {
+        projectSettings: {
+          fields: {
+            documentTemplateIcon: {
+              label: 'Icon'
+            },
+            documentTemplateName: {
+              errorRequired: 'At least one document template title translation is required.',
+              label: 'Document template name'
+            },
+            documentTemplateWorldAppendix: {
+              label: 'World appendix',
+              tooltip: 'World appendix tooltip'
+            }
+          }
+        }
+      }
+    }
+  }
+})
+
+const detailPanelMountGlobal = {
+  plugins: [detailPanelI18n],
+  stubs: {
+    DialogProjectSettingsDocumentTemplatesDeleteButton: defineComponent({
+      template: '<button data-test-locator="delete-stub" />'
+    }),
+    FaIconPickerInput: defineComponent({
+      inheritAttrs: false,
+      props: {
+        modelValue: {
+          type: String,
+          default: ''
+        },
+        testLocator: {
+          type: String,
+          required: true
+        }
+      },
+      emits: ['update:modelValue'],
+      template: `
+        <div :data-test-locator="testLocator">
+          <button
+            :data-test-locator="testLocator + '-trigger'"
+            type="button"
+            @click="$emit('update:modelValue', 'mdi-pencil')"
+          />
+        </div>
+      `
+    }),
+    FaLocaleTranslationsInput: defineComponent({
+      inheritAttrs: false,
+      props: {
+        currentLanguageCode: {
+          type: String,
+          required: true
+        },
+        modelValue: {
+          type: Object,
+          required: true
+        },
+        testLocator: {
+          type: String,
+          required: true
+        }
+      },
+      emits: ['update:modelValue'],
+      template: `
+        <div
+          :data-test-locator="testLocator"
+          :data-test-current-language-code="currentLanguageCode"
+        />
+      `
+    }),
+    QInput: defineComponent({
+      inheritAttrs: true,
+      props: {
+        modelValue: {
+          type: String,
+          default: ''
+        }
+      },
+      emits: ['update:modelValue'],
+      template: `
+        <div v-bind="$attrs">
+          <input :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" />
+        </div>
+      `
+    }),
+    QIcon: defineComponent({
+      inheritAttrs: true,
+      template: '<span v-bind="$attrs"><slot /></span>'
+    }),
+    QTooltip: defineComponent({
+      template: '<span><slot /></span>'
+    })
+  }
+}
 
 /**
  * DialogProjectSettingsDocumentTemplatesDetailPanel
@@ -13,66 +119,37 @@ import DialogProjectSettingsDocumentTemplatesDetailPanel from '../DialogProjectS
 test('Test that DialogProjectSettingsDocumentTemplatesDetailPanel renders template fields', () => {
   const w = mount(DialogProjectSettingsDocumentTemplatesDetailPanel, {
     props: {
+      currentLanguageCode: 'en-US',
       nameHasError: false,
       removeDisabled: false,
-      template: {
-        displayName: 'Character',
-        documentCount: 0,
+      template: buildDialogProjectSettingsDocumentTemplateDraft({
         icon: 'mdi-account',
-        id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-        worldAppendix: 'Notes'
-      }
+        worldAppendixTranslations: { 'en-US': 'Notes' }
+      })
     },
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
-      stubs: {
-        DialogProjectSettingsDocumentTemplatesDeleteButton: defineComponent({
-          template: '<button data-test-locator="delete-stub" />'
-        }),
-        FaIconPickerInput: defineComponent({
-          inheritAttrs: false,
-          props: {
-            modelValue: {
-              type: String,
-              default: ''
-            },
-            testLocator: {
-              type: String,
-              required: true
-            }
-          },
-          emits: ['update:modelValue'],
-          template: `
-            <div :data-test-locator="testLocator">
-              <button
-                :data-test-locator="testLocator + '-trigger'"
-                type="button"
-                @click="$emit('update:modelValue', 'mdi-pencil')"
-              />
-            </div>
-          `
-        }),
-        QInput: defineComponent({
-          inheritAttrs: true,
-          props: {
-            modelValue: {
-              type: String,
-              default: ''
-            }
-          },
-          emits: ['update:modelValue'],
-          template: '<input v-bind="$attrs" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />'
-        })
-      }
-    }
+    global: detailPanelMountGlobal
   })
 
   expect(w.find('[data-test-locator="dialogProjectSettings-documentTemplates-nameInput"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="dialogProjectSettings-documentTemplates-worldAppendixInput"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="dialogProjectSettings-documentTemplates-worldAppendixTooltipIcon"]').attributes('data-test-tooltip-text')).toBe(
-    'dialogs.projectSettings.fields.documentTemplateWorldAppendix.tooltip'
+    'World appendix tooltip'
   )
   expect(w.find('[data-test-locator="dialogProjectSettings-documentTemplates-iconInput"]').exists()).toBe(true)
+})
+
+test('Test that DialogProjectSettingsDocumentTemplatesDetailPanel wires locale translations input to current language', () => {
+  const w = mount(DialogProjectSettingsDocumentTemplatesDetailPanel, {
+    props: {
+      currentLanguageCode: 'de',
+      nameHasError: false,
+      removeDisabled: false,
+      template: buildDialogProjectSettingsDocumentTemplateDraft()
+    },
+    global: detailPanelMountGlobal
+  })
+
+  expect(
+    w.find('[data-test-locator="dialogProjectSettings-documentTemplates-nameInput"]').attributes('data-test-current-language-code')
+  ).toBe('de')
 })

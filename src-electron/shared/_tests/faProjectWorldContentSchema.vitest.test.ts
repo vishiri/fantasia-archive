@@ -45,7 +45,7 @@ test('Test that parseFaProjectWorldsSnapshotPayload rejects invalid colorPallete
     items: [
       {
         colorPallete: 'not-a-palette',
-        displayName: 'Realm',
+        displayNameTranslations: { 'en-US': 'Realm' },
         id: '550e8400-e29b-41d4-a716-446655440000'
       }
     ]
@@ -61,7 +61,7 @@ test('Test that parseFaProjectWorldsSnapshotPayload rejects duplicate colorPalle
     items: [
       {
         colorPallete: '#112233;#aabbcc;#112233',
-        displayName: 'Realm',
+        displayNameTranslations: { 'en-US': 'Realm' },
         id: '550e8400-e29b-41d4-a716-446655440000'
       }
     ]

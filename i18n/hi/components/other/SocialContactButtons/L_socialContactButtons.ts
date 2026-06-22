@@ -20,7 +20,7 @@ export default {
     title: 'FA Discord सर्वर से जुड़ें',
   },
   buttonReddit: {
-    label: '',
+    label: 'Reddit',
     title: 'FA सबरेडिट की सदस्यता लें',
   },
   buttonTwitter: {

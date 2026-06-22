@@ -1,7 +1,7 @@
 import type Database from 'better-sqlite3'
 import { v4 as uuidv4 } from 'uuid'
 
-import { mapFaProjectDocumentTemplateRow } from '../functions/faProjectContentRowMap'
+import { mapFaProjectDocumentTemplateRow } from '../faProjectContentRowMap_manager'
 import {
   FA_PROJECT_DOCUMENT_TEMPLATE_ICON_MAX_LENGTH,
   FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_MAX_LENGTH,
@@ -10,6 +10,10 @@ import {
 } from '../functions/faProjectDbSchemaDdl'
 import { computeNextFaProjectWorldSortOrder } from '../functions/faProjectWorldSortOrder'
 import { FaProjectContentNotFoundError } from './faProjectContentNotFoundError'
+import {
+  buildFaProjectDocumentTemplateTitleTranslationsJsonFromDisplayName,
+  buildFaProjectDocumentTemplateWorldAppendixTranslationsJsonFromText
+} from './faProjectDocumentTemplateTranslationJsonSqlWiring'
 import type {
   I_faProjectDocumentTemplate,
   I_faProjectDocumentTemplateRowUpsertFields
@@ -19,7 +23,7 @@ import type { I_faSqlDocumentTemplateRow } from 'app/types/I_faProjectContentRow
 const DOCUMENT_TEMPLATE_ENTITY_LABEL = 'Document template'
 
 const SQL_SELECT_DOCUMENT_TEMPLATE_COLUMNS =
-  'id, display_name, sort_order, world_appendix, icon, created_at_ms, updated_at_ms'
+  'id, display_name, title_translations_json, sort_order, world_appendix, world_appendix_translations_json, icon, created_at_ms, updated_at_ms'
 
 function assertDocumentTemplateRowExists (
   row: I_faSqlDocumentTemplateRow | undefined,
@@ -96,13 +100,15 @@ export function insertFaProjectDocumentTemplate (
   )
   db.prepare(
     `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES} ` +
-      '(id, display_name, sort_order, world_appendix, icon, created_at_ms, updated_at_ms) ' +
-      'VALUES (?, ?, ?, ?, ?, ?, ?)'
+      '(id, display_name, title_translations_json, sort_order, world_appendix, world_appendix_translations_json, icon, created_at_ms, updated_at_ms) ' +
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(
     id,
     displayName,
+    buildFaProjectDocumentTemplateTitleTranslationsJsonFromDisplayName(displayName),
     sortOrder,
     worldAppendix,
+    buildFaProjectDocumentTemplateWorldAppendixTranslationsJsonFromText(worldAppendix),
     icon,
     nowMs,
     nowMs
@@ -123,13 +129,15 @@ export function insertFaProjectDocumentTemplateWithId (
   const nowMs = Date.now()
   db.prepare(
     `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES} ` +
-      '(id, display_name, sort_order, world_appendix, icon, created_at_ms, updated_at_ms) ' +
-      'VALUES (?, ?, ?, ?, ?, ?, ?)'
+      '(id, display_name, title_translations_json, sort_order, world_appendix, world_appendix_translations_json, icon, created_at_ms, updated_at_ms) ' +
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(
     fields.id,
     fields.displayName,
+    fields.titleTranslationsJson,
     fields.sortOrder,
     fields.worldAppendix,
+    fields.worldAppendixTranslationsJson,
     fields.icon,
     nowMs,
     nowMs
@@ -150,7 +158,9 @@ export function updateFaProjectDocumentTemplateRow (
     displayName?: string
     icon?: string
     sortOrder?: number
+    titleTranslationsJson?: string
     worldAppendix?: string
+    worldAppendixTranslationsJson?: string
   }
 ): I_faProjectDocumentTemplate {
   const existing = db
@@ -167,9 +177,17 @@ export function updateFaProjectDocumentTemplateRow (
     sets.push('display_name = ?')
     values.push(patch.displayName)
   }
+  if (patch.titleTranslationsJson !== undefined) {
+    sets.push('title_translations_json = ?')
+    values.push(patch.titleTranslationsJson)
+  }
   if (patch.worldAppendix !== undefined) {
     sets.push('world_appendix = ?')
     values.push(patch.worldAppendix)
+  }
+  if (patch.worldAppendixTranslationsJson !== undefined) {
+    sets.push('world_appendix_translations_json = ?')
+    values.push(patch.worldAppendixTranslationsJson)
   }
   if (patch.icon !== undefined) {
     sets.push('icon = ?')

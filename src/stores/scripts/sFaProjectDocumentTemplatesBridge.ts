@@ -7,11 +7,11 @@ import { i18n } from 'app/i18n/externalFileLoader'
 function resolveProjectContentBridge (): {
   listDocumentTemplatesForProjectSettings?: () => Promise<{
     items: Array<{
-      displayName: string
       documentCount: number
       icon: string
       id: string
-      worldAppendix: string
+      titleTranslations: I_dialogProjectSettingsDocumentTemplateDraft['titleTranslations']
+      worldAppendixTranslations: I_dialogProjectSettingsDocumentTemplateDraft['worldAppendixTranslations']
     }>
   }>
   saveDocumentTemplatesSnapshot?: (items: I_faProjectDocumentTemplateSnapshotItem[]) => Promise<void>
@@ -35,11 +35,11 @@ export async function faProjectDocumentTemplatesFetchFreshForDialog (): Promise<
   try {
     const result = await api.listDocumentTemplatesForProjectSettings()
     return result.items.map((template) => ({
-      displayName: template.displayName,
       documentCount: template.documentCount,
       icon: template.icon,
       id: template.id,
-      worldAppendix: template.worldAppendix
+      titleTranslations: template.titleTranslations,
+      worldAppendixTranslations: template.worldAppendixTranslations
     }))
   } catch (error: unknown) {
     console.error('[Project Settings] listDocumentTemplatesForProjectSettings failed', error)

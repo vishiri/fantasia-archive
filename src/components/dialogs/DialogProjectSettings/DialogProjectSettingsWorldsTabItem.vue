@@ -17,8 +17,8 @@
     />
     <div class="faVerticalDraggableTabs__tabContent relative-position">
       <span class="faVerticalDraggableTabs__tabLabel">
-        <template v-if="props.world.displayName.trim().length > 0">
-          {{ props.world.displayName }}
+        <template v-if="resolvedDisplayName.length > 0">
+          {{ resolvedDisplayName }}
         </template>
         <template v-else>
           {{ $t('dialogs.projectSettings.panels.worlds.defaultNewWorldName') }}
@@ -39,6 +39,8 @@
 import { computed, ref } from 'vue'
 
 import type { I_dialogProjectSettingsWorldDraft } from 'app/types/I_dialogProjectSettingsWorlds'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
+import { resolveDialogProjectSettingsWorldResolvedDisplayName } from './scripts/dialogProjectSettingsWorldsDisplayNameDraft'
 
 defineOptions({
   name: 'DialogProjectSettingsWorldsTabItem'
@@ -46,6 +48,7 @@ defineOptions({
 
 const props = withDefaults(
   defineProps<{
+    currentLanguageCode: T_faUserSettingsLanguageCode
     isBeingDragged?: boolean
     isListDragging?: boolean
     isSelected: boolean
@@ -75,6 +78,13 @@ const worldsTabRippleBinding = computed(() => {
 })
 
 const tabBlurTargetRef = ref<HTMLDivElement | null>(null)
+
+const resolvedDisplayName = computed(() => {
+  return resolveDialogProjectSettingsWorldResolvedDisplayName(
+    props.world,
+    props.currentLanguageCode
+  )
+})
 
 const trimmedWorldColor = computed(() => props.world.color.trim())
 

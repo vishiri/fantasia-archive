@@ -58,6 +58,7 @@
           />
         </div>
         <DialogProjectSettingsWorldAvailableTemplatesList
+          :current-language-code="props.currentLanguageCode"
           :show-filter-empty="showAvailableTemplatesFilterEmpty"
           :templates="filteredAvailableTemplates"
           @add-template="onAddTemplate"
@@ -89,9 +90,12 @@ import {
   collectDuplicateDocumentTemplateIdsInWorldTemplateLayout
 } from './scripts/functions/dialogProjectSettingsWorldTemplateLayoutDuplicateValidation'
 import {
-  isDialogProjectSettingsDocumentTemplateNameInvalid
-} from './scripts/functions/dialogProjectSettingsDocumentTemplatesDraft'
-import { filterDialogProjectSettingsWorldAvailableTemplatesByQuery } from './scripts/functions/filterDialogProjectSettingsWorldAvailableTemplatesByQuery'
+  isDialogProjectSettingsDocumentTemplateNameInvalid,
+  resolveDialogProjectSettingsDocumentTemplateResolvedTitle
+} from './scripts/dialogProjectSettingsDocumentTemplatesDraft'
+import { resolveDialogProjectSettingsDocumentTemplateResolvedWorldAppendix } from './scripts/dialogProjectSettingsDocumentTemplateWorldAppendixDraft'
+import { filterDialogProjectSettingsDocumentTemplatesByQuery } from './scripts/filterDialogProjectSettingsDocumentTemplatesByQuery'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import DialogProjectSettingsVerticalTabListFilterInput from './DialogProjectSettingsVerticalTabListFilterInput.vue'
 import DialogProjectSettingsWorldAvailableTemplatesList from './DialogProjectSettingsWorldAvailableTemplatesList.vue'
 import DialogProjectSettingsWorldTemplateLayoutTree from './DialogProjectSettingsWorldTemplateLayoutTree.vue'
@@ -101,6 +105,7 @@ defineOptions({
 })
 
 const props = defineProps<{
+  currentLanguageCode: T_faUserSettingsLanguageCode
   documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[]
   world: I_dialogProjectSettingsWorldDraft
 }>()
@@ -130,7 +135,7 @@ const blankGroupIds = computed(() => {
 const invalidDocumentTemplateIds = computed(() => {
   const invalid = new Set<string>()
   for (const template of props.documentTemplates) {
-    if (isDialogProjectSettingsDocumentTemplateNameInvalid(template.displayName)) {
+    if (isDialogProjectSettingsDocumentTemplateNameInvalid(template.titleTranslations)) {
       invalid.add(template.id)
     }
   }
@@ -146,9 +151,10 @@ const availableTemplates = computed(() => {
 })
 
 const filteredAvailableTemplates = computed(() => {
-  return filterDialogProjectSettingsWorldAvailableTemplatesByQuery(
+  return filterDialogProjectSettingsDocumentTemplatesByQuery(
     availableTemplates.value,
-    availableTemplatesFilterQuery.value
+    availableTemplatesFilterQuery.value,
+    props.currentLanguageCode
   )
 })
 
@@ -180,8 +186,14 @@ function onAddTemplate (templateId: string): void {
     {
       documentTemplateId: template.id,
       icon: template.icon,
-      templateDisplayName: template.displayName,
-      worldAppendix: template.worldAppendix
+      templateDisplayName: resolveDialogProjectSettingsDocumentTemplateResolvedTitle(
+        template,
+        props.currentLanguageCode
+      ),
+      worldAppendix: resolveDialogProjectSettingsDocumentTemplateResolvedWorldAppendix(
+        template,
+        props.currentLanguageCode
+      )
     }
   )
   emitTemplateLayout(nextLayout)

@@ -18,10 +18,12 @@ SQLite **`documents`** = worldbuilding entities (world + optional template). ≠
 | **5** | Adds **`document_templates.sort_order`**, **`world_appendix`** (max **500** chars), and **`icon`** (max **128** chars). |
 | **6** | Replaces **`world_document_templates`** with **`world_template_groups`** and **`world_template_placements`** for per-world template layout (groups + ordered placements). |
 | **7** | Adds **`world_template_placements.nickname`** — optional per-world placement label override (empty = use joined document template name). |
+| **8** | Adds **`document_templates.title_translations_json`** — per-locale template titles (JSON keyed by interface language code). **`display_name`** remains a denormalized cache for stable sort (canonical **en-US** title with alphabetical fallback). |
+| **9** | Adds **`worlds.display_name_translations_json`** and **`document_templates.world_appendix_translations_json`** — per-locale world names and template **World appendix** copy. Existing **`display_name`** / **`world_appendix`** values backfill **en-US** on upgrade; denormalized columns remain write-through caches for sort and legacy readers. |
 
-**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 7`** in **`faProjectDbMigrateWiring.ts`**.
+**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 9`** in **`faProjectDbMigrateWiring.ts`**.
 
-**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v1**, run **v1→v2** (drop **`world_media`**), **v2→v3** (ensure legacy **`world_document_templates`** when upgrading old files), **v3→v4** (add **`worlds.color_pallete`**), **v4→v5** (add **`document_templates`** list/detail columns), **v5→v6** (migrate junction rows to root placements, drop **`world_document_templates`**, create layout tables), **v6→v7** (add **`world_template_placements.nickname`**), seed a default **world** when empty, then stop at **v7**. Files already at **7** are a no-op. Other versions throw until a forward migration is added.
+**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v1**, run **v1→v2** (drop **`world_media`**), **v2→v3** (ensure legacy **`world_document_templates`** when upgrading old files), **v3→v4** (add **`worlds.color_pallete`**), **v4→v5** (add **`document_templates`** list/detail columns), **v5→v6** (migrate junction rows to root placements, drop **`world_document_templates`**, create layout tables), **v6→v7** (add **`world_template_placements.nickname`**), **v7→v8** (add **`title_translations_json`**, backfill **`en-US`** from existing **`display_name`**), **v8→v9** (add **`display_name_translations_json`** + **`world_appendix_translations_json`**, backfill **en-US**), seed a default **world** when empty, then stop at **v9**. Files already at **9** are a no-op. Other versions throw until a forward migration is added.
 
 **Worlds vs document templates on create:** **`seedFaProjectDefaultWorldIfEmpty`** runs after migrations and inserts one default **world** when the table is empty. **Document templates are never auto-seeded** — a new **`.faproject`** may have zero **`document_templates`** rows until the user adds them in **Project Settings**.
 
@@ -29,7 +31,7 @@ SQLite **`documents`** = worldbuilding entities (world + optional template). ≠
 
 **Pre-release flatten:** Dev may squash schema versions back to **1**; no upgrade for older local files — **`.cursor/skills/fantasia-flatten-database-schemas/SKILL.md`**.
 
-**Product ↔ SQL naming:** UI “world name” / “template name” → **`display_name`** on **`worlds`** / **`document_templates`**. Per-world template layout in **`world_template_groups`** + **`world_template_placements`**; each template at most once per world. **Project Settings** enforces invariant client-side before save (duplicate **`document_template_id`** placements block **Save settings** with validation chrome).
+**Product ↔ SQL naming:** UI world name → **`display_name_translations_json`** on **`worlds`** (denormalized **`display_name`** cache for sort). Document template titles → **`title_translations_json`**; **`display_name`** on **`document_templates`** = write-through **en-US** title cache. Template **World appendix** → **`world_appendix_translations_json`** (denormalized **`world_appendix`** cache). Per-world template layout in **`world_template_groups`** + **`world_template_placements`**; each template at most once per world. **Project Settings** enforces invariant client-side before save (duplicate **`document_template_id`** placements block **Save settings** with validation chrome).
 
 ## Table: `project_data` (key–value)
 
@@ -53,7 +55,8 @@ PKs **TEXT UUID v4** on entity tables. Timestamps **`created_at_ms`** / **`updat
 | Column | Type | Notes |
 |--------|------|--------|
 | `id` | TEXT PK | UUID |
-| `display_name` | TEXT | Non-empty (product “name”) |
+| `display_name` | TEXT | Denormalized canonical name cache (non-empty after save; **en-US** resolution) |
+| `display_name_translations_json` | TEXT | JSON keyed by interface language code; at least one non-empty locale required on save |
 | `color` | TEXT | **`#RRGGBB`** hex; default **`#808080`** |
 | `color_pallete` | TEXT | Semicolon-separated **`#RRGGBB`** hex list (max **2000** chars); default empty |
 | `sort_order` | INTEGER | Zero-based GUI order; new worlds append **`MAX(sort_order) + 1`** |
@@ -66,9 +69,11 @@ Index: **`idx_worlds_sort_order`**. New **`.faproject`** files receive one defau
 | Column | Type | Notes |
 |--------|------|--------|
 | `id` | TEXT PK | UUID |
-| `display_name` | TEXT | Non-empty (product “name”) |
+| `display_name` | TEXT | Denormalized canonical title cache (non-empty after save; **en-US** resolution) |
+| `title_translations_json` | TEXT | JSON object keyed by interface language code; at least one non-empty locale required on save |
 | `sort_order` | INTEGER | Zero-based GUI order from Project Settings draggable list |
-| `world_appendix` | TEXT | Optional product copy (max **500** chars; default empty) |
+| `world_appendix` | TEXT | Denormalized canonical appendix cache (max **500** chars; default empty) |
+| `world_appendix_translations_json` | TEXT | JSON keyed by interface language code; empty object when no appendix copy |
 | `icon` | TEXT | Optional icon name string (max **128** chars; default empty) |
 | `created_at_ms`, `updated_at_ms` | INTEGER | |
 

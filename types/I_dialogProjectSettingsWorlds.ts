@@ -2,6 +2,7 @@ import type { Reactive } from 'vue'
 
 import type { T_faColorPickerInputPalette } from 'app/types/I_faColorPickerInput'
 import type { T_faDialogProjectSettingsWorldColorPaletteDuplicateIconColor } from 'app/types/I_faColorContrast'
+import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
 import type { I_faProjectWorldTemplateLayoutForProjectSettings } from 'app/types/I_faProjectWorldTemplateLayoutDomain'
 import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
 import type { SortableEvent } from 'sortablejs'
@@ -58,7 +59,7 @@ export interface I_dialogProjectSettingsWorldTemplateLayoutDragContext {
 /** Draft world row in Project Settings before save. */
 export interface I_dialogProjectSettingsWorldDraft {
   id: string
-  displayName: string
+  displayNameTranslations: I_faProjectWorldDisplayNameTranslations
   color: string
   colorPallete: string
   documentCount: number
@@ -225,7 +226,7 @@ export type T_dialogProjectSettingsWorldColorPaletteEditorUseDeps = {
 /** Worlds list hydrated for Project Settings (includes per-world document counts). */
 export interface I_faProjectWorldForProjectSettings {
   id: string
-  displayName: string
+  displayNameTranslations: I_faProjectWorldDisplayNameTranslations
   color: string
   colorPallete: string
   sortOrder: number

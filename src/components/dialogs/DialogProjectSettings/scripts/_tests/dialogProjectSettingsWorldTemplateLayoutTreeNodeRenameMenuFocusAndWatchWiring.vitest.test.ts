@@ -5,7 +5,7 @@ import type { QInput } from 'quasar'
 
 import { clearDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuFocus } from '../dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuFocusWiring'
 import { shouldClearDialogProjectSettingsWorldTemplateLayoutRenameMenuActiveElementFocus } from '../functions/shouldClearDialogProjectSettingsWorldTemplateLayoutRenameMenuActiveElementFocus'
-import { scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus } from '../functions/scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus'
+import { scheduleDialogProjectSettingsWorldTemplateLayoutRenameMenuInputFocus } from '../dialogProjectSettingsWorldTemplateLayoutRenameMenuFocusWiring'
 import { wireDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWatchers } from '../dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuWatchWiring'
 
 const closedRenameMenuClearFocusOptions = {

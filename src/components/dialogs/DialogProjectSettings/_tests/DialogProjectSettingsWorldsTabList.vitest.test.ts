@@ -12,7 +12,7 @@ const worldsFixture = [
   {
     color: '',
     colorPallete: '',
-    displayName: 'Realm',
+    displayNameTranslations: { 'en-US': 'Realm' },
     documentCount: 0,
     templateLayout: {
       groups: [],
@@ -29,6 +29,7 @@ const worldsFixture = [
 test('Test that DialogProjectSettingsWorldsTabList renders add world and list hooks', () => {
   const w = mount(DialogProjectSettingsWorldsTabList, {
     props: {
+      currentLanguageCode: 'en-US',
       documentTemplates: [],
       selectedWorldId: worldsFixture[0].id,
       worlds: worldsFixture
@@ -65,6 +66,7 @@ test('Test that DialogProjectSettingsWorldsTabList renders add world and list ho
 test('Test that DialogProjectSettingsWorldsTabList forwards add world and reorder', async () => {
   const w = mount(DialogProjectSettingsWorldsTabList, {
     props: {
+      currentLanguageCode: 'en-US',
       documentTemplates: [],
       selectedWorldId: worldsFixture[0].id,
       worlds: worldsFixture
@@ -119,6 +121,7 @@ test('Test that DialogProjectSettingsWorldsTabList forwards add world and reorde
 test('Test that DialogProjectSettingsWorldsTabList tracks drag highlight state', async () => {
   const w = mount(DialogProjectSettingsWorldsTabList, {
     props: {
+      currentLanguageCode: 'en-US',
       documentTemplates: [],
       selectedWorldId: worldsFixture[0].id,
       worlds: worldsFixture
@@ -199,6 +202,7 @@ test('Test that DialogProjectSettingsWorldsTabList tracks drag highlight state',
 test('Test that DialogProjectSettingsWorldsTabList forwards tab selection', async () => {
   const w = mount(DialogProjectSettingsWorldsTabList, {
     props: {
+      currentLanguageCode: 'en-US',
       documentTemplates: [],
       selectedWorldId: worldsFixture[0].id,
       worlds: worldsFixture
@@ -227,7 +231,7 @@ const worldsFilterFixture = [
   {
     color: '',
     colorPallete: '',
-    displayName: 'Gungala',
+    displayNameTranslations: { 'en-US': 'Gungala' },
     documentCount: 0,
     templateLayout: {
       groups: [],
@@ -238,7 +242,7 @@ const worldsFilterFixture = [
   {
     color: '',
     colorPallete: '',
-    displayName: 'New world',
+    displayNameTranslations: { 'en-US': 'New world' },
     documentCount: 0,
     templateLayout: {
       groups: [],
@@ -255,6 +259,7 @@ const worldsFilterFixture = [
 test('Test that DialogProjectSettingsWorldsTabList filters world tabs by display name', async () => {
   const w = mount(DialogProjectSettingsWorldsTabList, {
     props: {
+      currentLanguageCode: 'en-US',
       documentTemplates: [],
       selectedWorldId: worldsFilterFixture[0].id,
       worlds: worldsFilterFixture
@@ -271,7 +276,7 @@ test('Test that DialogProjectSettingsWorldsTabList filters world tabs by display
               type: Object
             }
           },
-          template: '<div class="world-tab-stub" :data-test-world-name="world.displayName" />'
+          template: '<div class="world-tab-stub" :data-test-world-name="world.displayNameTranslations[\'en-US\']" />'
         }),
         DialogProjectSettingsVerticalTabListFilterInput: defineComponent({
           props: {
@@ -308,7 +313,7 @@ const worldsFilteredReorderFixture = [
   {
     color: '',
     colorPallete: '',
-    displayName: 'Alpha',
+    displayNameTranslations: { 'en-US': 'Alpha' },
     documentCount: 0,
     templateLayout: {
       groups: [],
@@ -319,7 +324,7 @@ const worldsFilteredReorderFixture = [
   {
     color: '',
     colorPallete: '',
-    displayName: 'Middle',
+    displayNameTranslations: { 'en-US': 'Middle' },
     documentCount: 0,
     templateLayout: {
       groups: [],
@@ -330,7 +335,7 @@ const worldsFilteredReorderFixture = [
   {
     color: '',
     colorPallete: '',
-    displayName: 'Gamma',
+    displayNameTranslations: { 'en-US': 'Gamma' },
     documentCount: 0,
     templateLayout: {
       groups: [],
@@ -347,6 +352,7 @@ const worldsFilteredReorderFixture = [
 test('Test that DialogProjectSettingsWorldsTabList merges filtered drag reorder into full list', async () => {
   const w = mount(DialogProjectSettingsWorldsTabList, {
     props: {
+      currentLanguageCode: 'en-US',
       documentTemplates: [],
       selectedWorldId: worldsFilteredReorderFixture[0].id,
       worlds: worldsFilteredReorderFixture

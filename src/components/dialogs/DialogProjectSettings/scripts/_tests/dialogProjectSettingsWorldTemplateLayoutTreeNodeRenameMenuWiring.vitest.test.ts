@@ -35,7 +35,7 @@ const templateNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   nodeKind: 'template',
   templateDisplayName: 'Character',
   usesNickname: true,
-  worldAppendix: ' of Eldoria'
+  worldAppendix: 'of Eldoria'
 }
 
 function mountRenameMenuHarness (node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode): Promise<{

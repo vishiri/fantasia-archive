@@ -11,6 +11,8 @@ export default {
     openAdvancedSearchGuideDialog: '詳細検索ガイドを開く',
     openChangelogDialog: '変更履歴を開く',
     openKeybindSettingsDialog: 'キーバインド設定を開く',
+    openProjectSettingsDialog: 'プロジェクト設定を開く',
+    saveProjectSettings: 'プロジェクト設定を保存',
     openLicenseDialog: 'オープンライセンス',
     openAppSettingsDialog: 'アプリ設定を開く',
     openAppStylingWindow: 'カスタム アプリ CSS を開く',

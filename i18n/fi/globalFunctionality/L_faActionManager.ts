@@ -11,6 +11,8 @@ export default {
     openAdvancedSearchGuideDialog: 'Avaa Tarkennettu hakuopas',
     openChangelogDialog: 'Avaa muutosloki',
     openKeybindSettingsDialog: 'Avaa Näppäimistön asetukset',
+    openProjectSettingsDialog: 'Avaa projektiasetukset',
+    saveProjectSettings: 'Tallenna projektiasetukset',
     openLicenseDialog: 'Avaa Lisenssi',
     openAppSettingsDialog: 'Avaa Sovellusasetukset',
     openAppStylingWindow: 'Avaa mukautettu sovellus CSS',

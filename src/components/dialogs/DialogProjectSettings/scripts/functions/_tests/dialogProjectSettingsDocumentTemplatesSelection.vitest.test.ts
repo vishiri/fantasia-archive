@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
 
+import { buildDialogProjectSettingsDocumentTemplateDraft } from '../../../_tests/dialogProjectSettingsDocumentTemplateDraftFixtures'
 import {
   findDialogProjectSettingsNewlyAppendedDocumentTemplateId,
   isDialogProjectSettingsDocumentTemplateSelectionInvalid,
@@ -8,29 +9,19 @@ import {
   resolveDialogProjectSettingsInitialDocumentTemplateId
 } from '../dialogProjectSettingsDocumentTemplatesSelection'
 
-const templateA = {
-  displayName: 'Character',
-  documentCount: 0,
-  icon: '',
-  id: '550e8400-e29b-41d4-a716-446655440000',
-  worldAppendix: ''
-}
+const templateA = buildDialogProjectSettingsDocumentTemplateDraft({
+  id: '550e8400-e29b-41d4-a716-446655440000'
+})
 
-const templateB = {
-  displayName: 'Location',
-  documentCount: 0,
-  icon: '',
+const templateB = buildDialogProjectSettingsDocumentTemplateDraft({
   id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
-  worldAppendix: ''
-}
+  titleTranslations: { 'en-US': 'Location' }
+})
 
-const templateC = {
-  displayName: 'Event',
-  documentCount: 0,
-  icon: '',
+const templateC = buildDialogProjectSettingsDocumentTemplateDraft({
   id: '6ba7b811-9dad-11d1-80b4-00c04fd430c8',
-  worldAppendix: ''
-}
+  titleTranslations: { 'en-US': 'Event' }
+})
 
 /**
  * resolveDialogProjectSettingsInitialDocumentTemplateId
@@ -93,11 +84,10 @@ test('Test that resolveDialogProjectSettingsDocumentTemplateIdAfterRemove select
  * Detects a new id at the end after append.
  */
 test('Test that findDialogProjectSettingsNewlyAppendedDocumentTemplateId returns the appended template id', () => {
-  const newTemplate = {
-    ...templateA,
-    displayName: 'New template',
-    id: '7ba7b811-9dad-11d1-80b4-00c04fd430c8'
-  }
+  const newTemplate = buildDialogProjectSettingsDocumentTemplateDraft({
+    id: '7ba7b811-9dad-11d1-80b4-00c04fd430c8',
+    titleTranslations: { 'en-US': 'New template' }
+  })
   const previous = [templateA, templateB]
   const next = [templateA, templateB, newTemplate]
 
@@ -150,11 +140,10 @@ test('Test that resolveDialogProjectSettingsDocumentTemplateIdAfterRemove handle
  * Selects an appended template when add inserts at the bottom.
  */
 test('Test that resolveDialogProjectSettingsDocumentTemplatesPanelSelection selects an appended template', () => {
-  const newTemplate = {
-    ...templateA,
-    displayName: 'New template',
-    id: '7ba7b811-9dad-11d1-80b4-00c04fd430c8'
-  }
+  const newTemplate = buildDialogProjectSettingsDocumentTemplateDraft({
+    id: '7ba7b811-9dad-11d1-80b4-00c04fd430c8',
+    titleTranslations: { 'en-US': 'New template' }
+  })
 
   expect(resolveDialogProjectSettingsDocumentTemplatesPanelSelection(
     [templateA, newTemplate],
@@ -180,11 +169,10 @@ test('Test that resolveDialogProjectSettingsDocumentTemplatesPanelSelection keep
  * Reselects when the templates list is replaced with new ids.
  */
 test('Test that resolveDialogProjectSettingsDocumentTemplatesPanelSelection reselects after replacement', () => {
-  const replacement = {
-    ...templateA,
-    displayName: 'Replacement',
-    id: '7ba7b811-9dad-11d1-80b4-00c04fd430c8'
-  }
+  const replacement = buildDialogProjectSettingsDocumentTemplateDraft({
+    id: '7ba7b811-9dad-11d1-80b4-00c04fd430c8',
+    titleTranslations: { 'en-US': 'Replacement' }
+  })
 
   expect(resolveDialogProjectSettingsDocumentTemplatesPanelSelection(
     [replacement],
@@ -194,11 +182,10 @@ test('Test that resolveDialogProjectSettingsDocumentTemplatesPanelSelection rese
 })
 
 test('Test that findDialogProjectSettingsNewlyAppendedDocumentTemplateId returns null when append is not at the end', () => {
-  const insertedMiddle = {
-    ...templateA,
-    displayName: 'Inserted',
-    id: '7ba7b811-9dad-11d1-80b4-00c04fd430c8'
-  }
+  const insertedMiddle = buildDialogProjectSettingsDocumentTemplateDraft({
+    id: '7ba7b811-9dad-11d1-80b4-00c04fd430c8',
+    titleTranslations: { 'en-US': 'Inserted' }
+  })
 
   expect(findDialogProjectSettingsNewlyAppendedDocumentTemplateId(
     [templateA, templateB],

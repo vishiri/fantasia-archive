@@ -283,6 +283,11 @@ export default {
       description: 'Avgör om textredigeraren har begränsad höjd när den inte är i helskärmsläge.',
       tags: 'textarea höjd, lång text, expandera editor, scroll editor',
     },
+    logFullActivityPayload: {
+      title: 'Logga fullständig aktivitetsnyttolast',
+      description: 'Om detta är aktiverat loggar aktiviteten fullständiga nyttolaster. Det kan vara användbart vid djup felsökning som kräver exakt loggning av resultat.',
+      tags: 'felsökning, felsökning av problem, DevTools, nyttolast, aktivitet, loggning',
+    },
     noProjectName: {
       title: 'Göm projektnamnet i trädet',
       description: 'Bestämmer om projektnamnet överhuvudtaget visas i det hierarkiska trädet.',

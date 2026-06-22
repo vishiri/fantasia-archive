@@ -17,13 +17,14 @@ export default meta
 
 export const Default: StoryObj<typeof meta> = {
   args: {
+    currentLanguageCode: 'en-US',
     documentTemplates: [
       {
-        displayName: 'Character',
         documentCount: 0,
         icon: 'person',
         id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
-        worldAppendix: ' sheet'
+        titleTranslations: { 'en-US': 'Character' },
+        worldAppendixTranslations: { 'en-US': 'sheet' }
       }
     ],
     nameHasError: false,
@@ -32,7 +33,7 @@ export const Default: StoryObj<typeof meta> = {
     world: {
       color: '#112233',
       colorPallete: '#112233;#445566;#AABBCC',
-      displayName: 'Falala',
+      displayNameTranslations: { 'en-US': 'Falala' },
       documentCount: 0,
       id: '550e8400-e29b-41d4-a716-446655440000',
       templateLayout: {
@@ -49,7 +50,7 @@ export const DuplicatePalette: StoryObj<typeof meta> = {
     world: {
       color: '#112233',
       colorPallete: '#112233;#AABBCC;#aabbcc',
-      displayName: 'Falala',
+      displayNameTranslations: { 'en-US': 'Falala' },
       documentCount: 0,
       id: '550e8400-e29b-41d4-a716-446655440000',
       templateLayout: {

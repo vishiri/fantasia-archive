@@ -11,6 +11,8 @@ export default {
     openAdvancedSearchGuideDialog: 'Відкрийте посібник із розширеного пошуку',
     openChangelogDialog: 'Відкрийте журнал змін',
     openKeybindSettingsDialog: 'Відкрийте налаштування Keybind',
+    openProjectSettingsDialog: 'Відкрити параметри проекту',
+    saveProjectSettings: 'Зберегти параметри проекту',
     openLicenseDialog: 'Відкрита ліцензія',
     openAppSettingsDialog: 'Відкрийте налаштування програми',
     openAppStylingWindow: 'Відкрити спеціальну програму CSS',

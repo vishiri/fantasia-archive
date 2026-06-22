@@ -96,7 +96,7 @@ test('Test that handleSaveProjectSettings persists worlds snapshot when provided
   })
   const worlds = [
     {
-      displayName: 'Realm',
+      displayNameTranslations: { 'en-US': 'Realm' },
       id: '550e8400-e29b-41d4-a716-446655440000'
     }
   ]
@@ -121,8 +121,8 @@ test('Test that handleSaveProjectSettings persists document templates snapshot w
   })
   const documentTemplates = [
     {
-      displayName: 'Character',
-      id: '550e8400-e29b-41d4-a716-446655440000'
+      id: '550e8400-e29b-41d4-a716-446655440000',
+      titleTranslations: { 'en-US': 'Character' }
     }
   ]
   await handleSaveProjectSettings({
@@ -147,14 +147,14 @@ test('Test that handleSaveProjectSettings emits success notify after persistence
   await handleSaveProjectSettings({
     documentTemplates: [
       {
-        displayName: 'Character',
-        id: '550e8400-e29b-41d4-a716-446655440000'
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        titleTranslations: { 'en-US': 'Character' }
       }
     ],
     settings: { projectName: 'Renamed' },
     worlds: [
       {
-        displayName: 'Realm',
+        displayNameTranslations: { 'en-US': 'Realm' },
         id: '550e8400-e29b-41d4-a716-446655440001'
       }
     ]

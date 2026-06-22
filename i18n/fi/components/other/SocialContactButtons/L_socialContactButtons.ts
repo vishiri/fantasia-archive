@@ -20,7 +20,7 @@ export default {
     title: 'Liity FA Discord -palvelimeen',
   },
   buttonReddit: {
-    label: '',
+    label: 'Reddit',
     title: 'Tilaa subreddit FA',
   },
   buttonTwitter: {

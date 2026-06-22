@@ -20,7 +20,7 @@ export default {
     title: '加入 FA Discord 服务器',
   },
   buttonReddit: {
-    label: '',
+    label: 'Reddit',
     title: '订阅 FA subreddit',
   },
   buttonTwitter: {

@@ -11,6 +11,8 @@ export default {
     openAdvancedSearchGuideDialog: 'Ouvrir le guide de recherche avancée',
     openChangelogDialog: 'Ouvrir le journal des modifications',
     openKeybindSettingsDialog: 'Ouvrir les paramètres de raccourci clavier',
+    openProjectSettingsDialog: 'Ouvrir les paramètres du projet',
+    saveProjectSettings: 'Enregistrer les paramètres du projet',
     openLicenseDialog: 'Licence ouverte',
     openAppSettingsDialog: 'Ouvrir les paramètres de l\'application',
     openAppStylingWindow: 'Ouvrez l\'application personnalisée CSS',

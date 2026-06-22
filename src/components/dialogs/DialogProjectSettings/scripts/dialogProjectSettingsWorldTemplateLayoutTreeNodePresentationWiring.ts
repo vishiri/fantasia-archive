@@ -2,7 +2,7 @@ import type { ComputedRef } from 'vue'
 
 import {
   resolveDialogProjectSettingsDocumentTemplateDisplayIcon
-} from './functions/dialogProjectSettingsDocumentTemplatesDraft'
+} from './dialogProjectSettingsDocumentTemplatesDraft'
 import {
   resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeDisplayIcon,
   resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeEditTooltipI18nKey,

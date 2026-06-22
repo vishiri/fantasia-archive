@@ -62,16 +62,18 @@ function buildLayoutHarnessProps (templateLayout: Record<string, unknown>): stri
   return JSON.stringify({
     directDocumentTemplatesSnapshot: [
       {
-        displayName: 'Character',
+        documentCount: 0,
         icon: 'mdi-account',
         id: fixtureTemplateAId,
-        worldAppendix: ''
+        titleTranslations: { 'en-US': 'Character' },
+        worldAppendixTranslations: {}
       },
       {
-        displayName: 'Location',
+        documentCount: 0,
         icon: 'mdi-map',
         id: fixtureTemplateBId,
-        worldAppendix: ''
+        titleTranslations: { 'en-US': 'Location' },
+        worldAppendixTranslations: {}
       }
     ],
     directInput: projectSettingsDirectInput,
@@ -82,7 +84,7 @@ function buildLayoutHarnessProps (templateLayout: Record<string, unknown>): stri
     directWorldsSnapshot: [{
       color: '',
       colorPallete: '',
-      displayName: 'Layout harness world',
+      displayNameTranslations: { 'en-US': 'Layout harness world' },
       documentCount: 0,
       id: fixtureWorldId,
       templateLayout
@@ -338,7 +340,7 @@ test.describe.serial('Project settings duplicate template layout validation', ()
           nickname: '',
           rootSortOrder: 0,
           templateDisplayName: 'Character',
-          worldAppendix: ''
+          worldAppendixTranslations: {}
         },
         {
           documentCountInWorld: 0,
@@ -350,7 +352,7 @@ test.describe.serial('Project settings duplicate template layout validation', ()
           nickname: '',
           rootSortOrder: 1,
           templateDisplayName: 'Character copy',
-          worldAppendix: ''
+          worldAppendixTranslations: {}
         }
       ]
     })

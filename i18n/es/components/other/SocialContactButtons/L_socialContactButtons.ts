@@ -20,7 +20,7 @@ export default {
     title: 'Únase al servidor FA Discord',
   },
   buttonReddit: {
-    label: '',
+    label: 'Reddit',
     title: 'Suscríbete al subreddit FA',
   },
   buttonTwitter: {
