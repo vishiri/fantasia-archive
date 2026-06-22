@@ -10,6 +10,12 @@ export default {
     bulletWorldTemplateGroupNameRequired: 'Для «{worldLabel}» требуется имя группы шаблонов.',
     bulletWorldTemplateDuplicateDocumentTemplate: 'Дубликат шаблона документа «{templateLabel}» в «{worldLabel}».'
   },
+  singularPluralMissing: {
+    bothIntro: 'Отсутствуют переводы для выбранного языка:',
+    singularBullet: 'Отсутствует форма единственного числа',
+    pluralBullet: 'Отсутствует форма множественного числа',
+    usingFallback: 'Используется резервный вариант: {fallbackLanguageName}'
+  },
   categories: {
     generalSettings: {
       title: 'Общие настройки'
@@ -71,6 +77,12 @@ export default {
       templateCanonicalNameTooltip: 'Чтобы переименовать весь шаблон документа, перейдите в раздел «Шаблоны документов» этого диалога редактирования и измените его там.',
       templateNicknameLabel: 'Псевдоним в этом мире',
       templateNicknameTooltip: 'Псевдоним позволяет быстро переименовать шаблон документа в конкретном мире, не меняя его настоящее имя во всём проекте.',
+      missingGroupDisplayNameTreeTooltip:
+        'Для выбранного языка отсутствуют некоторые переводы в названии этой группы.',
+      missingPlacementNicknameTreeTooltip:
+        'Для выбранного языка отсутствуют некоторые переводы в псевдониме этого размещения.',
+      missingDocumentTemplateTitleTreeTooltip:
+        'Для выбранного языка отсутствуют некоторые переводы в названии этого шаблона документа.',
       contextMenu: {
         renameGroup: 'Переименовать группу',
         deleteGroup: 'Удалить группу'
@@ -105,6 +117,7 @@ export default {
       filterAriaLabel: 'Фильтровать миры',
       filterClearAriaLabel: 'Очистить фильтр миров',
       filterPlaceholder: 'Поиск...',
+      missingTranslationsTabTooltip: 'Некоторые переводы для выбранного языка отсутствуют в этом мире.',
       deleteConfirm: {
         confirmDeleteButton: 'Подтвердить удаление',
         message: 'Вы уверены, что хотите удалить этот мир? Документы и настройки, связанные с ним, нельзя будет восстановить. Они будут потеряны навсегда.'

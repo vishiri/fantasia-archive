@@ -10,6 +10,12 @@ export default {
     bulletWorldTemplateGroupNameRequired: '"{worldLabel}" のテンプレートグループ名は必須です。',
     bulletWorldTemplateDuplicateDocumentTemplate: '"{worldLabel}" に重複するドキュメントテンプレート "{templateLabel}" があります。'
   },
+  singularPluralMissing: {
+    bothIntro: '現在の言語の翻訳が不足しています:',
+    singularBullet: '単数形がありません',
+    pluralBullet: '複数形がありません',
+    usingFallback: 'フォールバックを使用: {fallbackLanguageName}'
+  },
   categories: {
     generalSettings: {
       title: '一般設定'
@@ -71,6 +77,12 @@ export default {
       templateCanonicalNameTooltip: 'ドキュメントテンプレート全体の名前を正しく変更するには、この編集ダイアログの「ドキュメントテンプレート」セクションで調整してください。',
       templateNicknameLabel: 'このワールド内のニックネーム',
       templateNicknameTooltip: 'ニックネームを設定すると、プロジェクト全体の実名を変えずに、特定のワールド内でドキュメントテンプレートを素早く改名できます。',
+      missingGroupDisplayNameTreeTooltip:
+        '現在選択されている言語の一部の翻訳が、このグループ名にありません。',
+      missingPlacementNicknameTreeTooltip:
+        '現在選択されている言語の一部の翻訳が、この配置ニックネームにありません。',
+      missingDocumentTemplateTitleTreeTooltip:
+        '現在選択されている言語の一部の翻訳が、このドキュメントテンプレートのタイトルにありません。',
       contextMenu: {
         renameGroup: 'グループ名を変更',
         deleteGroup: 'グループを削除'
@@ -105,6 +117,7 @@ export default {
       filterAriaLabel: 'ワールドをフィルター',
       filterClearAriaLabel: 'ワールドのフィルターをクリア',
       filterPlaceholder: '検索...',
+      missingTranslationsTabTooltip: '現在選択中の言語の翻訳の一部が、この世界に不足しています。',
       deleteConfirm: {
         confirmDeleteButton: '削除を確認',
         message: 'このワールドを削除してもよろしいですか？リンクされたドキュメントと設定は後から復元できません。永久に失われます。'

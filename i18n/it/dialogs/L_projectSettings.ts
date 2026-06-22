@@ -10,6 +10,12 @@ export default {
     bulletWorldTemplateGroupNameRequired: 'Il nome del gruppo di modelli è obbligatorio per «{worldLabel}».',
     bulletWorldTemplateDuplicateDocumentTemplate: 'Modello di documento duplicato «{templateLabel}» in «{worldLabel}».'
   },
+  singularPluralMissing: {
+    bothIntro: 'Traduzioni mancanti per la lingua attuale:',
+    singularBullet: 'Forma singolare mancante',
+    pluralBullet: 'Forma plurale mancante',
+    usingFallback: 'Usato fallback di {fallbackLanguageName}'
+  },
   categories: {
     generalSettings: {
       title: 'Impostazioni generali'
@@ -71,6 +77,12 @@ export default {
       templateCanonicalNameTooltip: 'Per rinominare correttamente un intero modello di documento, andare alla sezione «Modelli di documento» di questa finestra di modifica e modificarlo lì.',
       templateNicknameLabel: 'Soprannome in questo mondo',
       templateNicknameTooltip: "Impostare un soprannome consente di rinominare rapidamente un modello di documento all'interno di un mondo specifico senza modificarne il nome reale in tutto il progetto.",
+      missingGroupDisplayNameTreeTooltip:
+        'Alcune traduzioni per la lingua attualmente selezionata mancano per questo nome di gruppo.',
+      missingPlacementNicknameTreeTooltip:
+        'Alcune traduzioni per la lingua attualmente selezionata mancano per questo soprannome di posizionamento.',
+      missingDocumentTemplateTitleTreeTooltip:
+        'Alcune traduzioni per la lingua attualmente selezionata mancano per il titolo di questo modello di documento.',
       contextMenu: {
         renameGroup: 'Rinomina gruppo',
         deleteGroup: 'Elimina gruppo'
@@ -105,6 +117,7 @@ export default {
       filterAriaLabel: 'Filtra mondi',
       filterClearAriaLabel: 'Cancella filtro mondi',
       filterPlaceholder: 'Cerca…',
+      missingTranslationsTabTooltip: 'Mancano alcune traduzioni per la lingua attualmente selezionata in questo mondo.',
       deleteConfirm: {
         confirmDeleteButton: 'Conferma eliminazione',
         message: 'Eliminare davvero questo mondo? I documenti e le impostazioni collegati non potranno essere recuperati in seguito. Andranno persi per sempre.'

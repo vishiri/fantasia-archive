@@ -10,6 +10,12 @@ export default {
     bulletWorldTemplateGroupNameRequired: 'El nombre del grupo de plantillas es obligatorio para «{worldLabel}».',
     bulletWorldTemplateDuplicateDocumentTemplate: 'Plantilla de documento duplicada «{templateLabel}» en «{worldLabel}».'
   },
+  singularPluralMissing: {
+    bothIntro: 'Faltan traducciones para el idioma actual:',
+    singularBullet: 'Falta la forma singular',
+    pluralBullet: 'Falta la forma plural',
+    usingFallback: 'Se usa el respaldo de {fallbackLanguageName}'
+  },
   categories: {
     generalSettings: {
       title: 'Configuración general'
@@ -71,6 +77,12 @@ export default {
       templateCanonicalNameTooltip: 'Para renombrar correctamente una plantilla de documento completa, vaya a la sección «Plantillas de documentos» de este cuadro de diálogo de edición y ajústela allí.',
       templateNicknameLabel: 'Apodo dentro de este mundo',
       templateNicknameTooltip: 'Establecer un apodo le permite renombrar rápidamente una plantilla de documento dentro de un mundo específico sin cambiar su nombre real en todo el proyecto.',
+      missingGroupDisplayNameTreeTooltip:
+        'Faltan algunas traducciones para el idioma seleccionado actualmente en este nombre de grupo.',
+      missingPlacementNicknameTreeTooltip:
+        'Faltan algunas traducciones para el idioma seleccionado actualmente en este apodo de ubicación.',
+      missingDocumentTemplateTitleTreeTooltip:
+        'Faltan algunas traducciones para el idioma seleccionado actualmente en el título de esta plantilla de documento.',
       contextMenu: {
         renameGroup: 'Renombrar grupo',
         deleteGroup: 'Eliminar grupo'
@@ -105,6 +117,7 @@ export default {
       filterAriaLabel: 'Filtrar mundos',
       filterClearAriaLabel: 'Borrar filtro de mundos',
       filterPlaceholder: 'Buscar…',
+      missingTranslationsTabTooltip: 'Faltan algunas traducciones para el idioma seleccionado actualmente en este mundo.',
       deleteConfirm: {
         confirmDeleteButton: 'Confirmar eliminación',
         message: '¿Está seguro de que desea eliminar este mundo? Los documentos y la configuración vinculados a él no se podrán recuperar después. Se perderán para siempre.'

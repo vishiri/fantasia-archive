@@ -10,6 +10,12 @@ export default {
     bulletWorldTemplateGroupNameRequired: 'اسم مجموعة القالب مطلوب لـ "{worldLabel}".',
     bulletWorldTemplateDuplicateDocumentTemplate: 'قالب مستند مكرر "{templateLabel}" في "{worldLabel}".'
   },
+  singularPluralMissing: {
+    bothIntro: 'ترجمات مفقودة للغة الحالية:',
+    singularBullet: 'صيغة المفرد مفقودة',
+    pluralBullet: 'صيغة الجمع مفقودة',
+    usingFallback: 'يتم استخدام البديل: {fallbackLanguageName}'
+  },
   categories: {
     generalSettings: {
       title: 'الإعدادات العامة'
@@ -71,6 +77,12 @@ export default {
       templateCanonicalNameTooltip: 'لإعادة تسمية قالب مستند بالكامل بشكل صحيح، يرجى الانتقال إلى قسم "قوالب المستندات" في مربع حوار التحرير هذا وتعديله هناك.',
       templateNicknameLabel: 'الاسم المستعار داخل هذا العالم',
       templateNicknameTooltip: 'يتيح لك تعيين اسم مستعار إعادة تسمية سريعة لقالب مستند داخل عالم معين دون تغيير اسمه الحقيقي عبر المشروع بأكمله.',
+      missingGroupDisplayNameTreeTooltip:
+        'توجد ترجمات ناقصة للغة المحددة حاليًا في اسم هذه المجموعة.',
+      missingPlacementNicknameTreeTooltip:
+        'توجد ترجمات ناقصة للغة المحددة حاليًا في اسم مستعار لهذا الموضع.',
+      missingDocumentTemplateTitleTreeTooltip:
+        'توجد ترجمات ناقصة للغة المحددة حاليًا في عنوان قالب المستند هذا.',
       contextMenu: {
         renameGroup: 'إعادة تسمية المجموعة',
         deleteGroup: 'حذف المجموعة'
@@ -105,6 +117,7 @@ export default {
       filterAriaLabel: 'تصفية العوالم',
       filterClearAriaLabel: 'مسح تصفية العوالم',
       filterPlaceholder: 'بحث...',
+      missingTranslationsTabTooltip: 'بعض الترجمات للغة المحددة حاليًا مفقودة من هذا العالم.',
       deleteConfirm: {
         confirmDeleteButton: 'تأكيد الحذف',
         message: 'هل أنت متأكد أنك تريد حذف هذا العالم؟ لا يمكن استرداد المستندات والإعدادات المرتبطة به لاحقًا. ستُفقد إلى الأبد.'

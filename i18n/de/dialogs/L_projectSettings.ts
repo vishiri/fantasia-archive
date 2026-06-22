@@ -10,6 +10,12 @@ export default {
     bulletWorldTemplateGroupNameRequired: 'Vorlagengruppenname ist für „{worldLabel}" erforderlich.',
     bulletWorldTemplateDuplicateDocumentTemplate: 'Doppelte Dokumentvorlage „{templateLabel}" in „{worldLabel}".'
   },
+  singularPluralMissing: {
+    bothIntro: 'Fehlende Übersetzungen für die aktuelle Sprache:',
+    singularBullet: 'Singularform fehlt',
+    pluralBullet: 'Pluralform fehlt',
+    usingFallback: 'Fallback verwendet: {fallbackLanguageName}'
+  },
   categories: {
     generalSettings: {
       title: 'Allgemeine Einstellungen'
@@ -71,6 +77,12 @@ export default {
       templateCanonicalNameTooltip: 'Um eine gesamte Dokumentvorlage ordnungsgemäß umzubenennen, gehen Sie bitte zum Abschnitt „Dokumentvorlagen" dieses Bearbeitungsdialogs und passen Sie sie dort an.',
       templateNicknameLabel: 'Spitzname in dieser Welt',
       templateNicknameTooltip: 'Mit einem Spitznamen können Sie eine Dokumentvorlage innerhalb einer bestimmten Welt schnell umbenennen, ohne ihren echten Namen im gesamten Projekt zu ändern.',
+      missingGroupDisplayNameTreeTooltip:
+        'Einige Übersetzungen für die aktuell ausgewählte Sprache fehlen bei diesem Gruppennamen.',
+      missingPlacementNicknameTreeTooltip:
+        'Einige Übersetzungen für die aktuell ausgewählte Sprache fehlen bei diesem Platzierungs-Spitznamen.',
+      missingDocumentTemplateTitleTreeTooltip:
+        'Einige Übersetzungen für die aktuell ausgewählte Sprache fehlen beim Titel dieser Dokumentvorlage.',
       contextMenu: {
         renameGroup: 'Gruppe umbenennen',
         deleteGroup: 'Gruppe löschen'
@@ -105,6 +117,7 @@ export default {
       filterAriaLabel: 'Welten filtern',
       filterClearAriaLabel: 'Weltenfilter löschen',
       filterPlaceholder: 'Suchen…',
+      missingTranslationsTabTooltip: 'Einige Übersetzungen für die aktuell ausgewählte Sprache fehlen in dieser Welt.',
       deleteConfirm: {
         confirmDeleteButton: 'Löschen bestätigen',
         message: 'Möchten Sie diese Welt wirklich löschen? Dokumente und Einstellungen, die mit ihr verknüpft sind, können danach nicht wiederhergestellt werden. Sie gehen für immer verloren.'

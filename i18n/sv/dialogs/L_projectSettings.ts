@@ -10,6 +10,12 @@ export default {
     bulletWorldTemplateGroupNameRequired: 'Mallgruppnamn krävs för «{worldLabel}».',
     bulletWorldTemplateDuplicateDocumentTemplate: 'Dubblett av dokumentmallen «{templateLabel}» i «{worldLabel}».'
   },
+  singularPluralMissing: {
+    bothIntro: 'Saknade översättningar för det valda språket:',
+    singularBullet: 'Singularform saknas',
+    pluralBullet: 'Pluralform saknas',
+    usingFallback: 'Använder reserv av {fallbackLanguageName}'
+  },
   categories: {
     generalSettings: {
       title: 'Allmänna inställningar'
@@ -71,6 +77,12 @@ export default {
       templateCanonicalNameTooltip: 'För att byta namn på en hel dokumentmall, gå till avsnittet «Dokumentmallar» i den här redigeringsdialogen och justera den där.',
       templateNicknameLabel: 'Smeknamn i den här världen',
       templateNicknameTooltip: 'Ett smeknamn låter dig snabbt byta namn på en dokumentmall i en specifik värld utan att ändra det riktiga namnet i hela projektet.',
+      missingGroupDisplayNameTreeTooltip:
+        'Vissa översättningar för det valda språket saknas för detta gruppnamn.',
+      missingPlacementNicknameTreeTooltip:
+        'Vissa översättningar för det valda språket saknas för detta placerings-smeknamn.',
+      missingDocumentTemplateTitleTreeTooltip:
+        'Vissa översättningar för det valda språket saknas för titeln på denna dokumentmall.',
       contextMenu: {
         renameGroup: 'Byt namn på grupp',
         deleteGroup: 'Radera grupp'
@@ -105,6 +117,7 @@ export default {
       filterAriaLabel: 'Filtrera världar',
       filterClearAriaLabel: 'Rensa filter för världar',
       filterPlaceholder: 'Sök...',
+      missingTranslationsTabTooltip: 'Vissa översättningar för det valda språket saknas i den här världen.',
       deleteConfirm: {
         confirmDeleteButton: 'Bekräfta radering',
         message: 'Är du säker på att du vill radera den här världen? Dokument och inställningar kopplade till den kan inte återställas efteråt. De går förlorade för alltid.'

@@ -10,6 +10,12 @@ export default {
     bulletWorldTemplateGroupNameRequired: '"{worldLabel}" के लिए टेम्प्लेट समूह का नाम आवश्यक है।',
     bulletWorldTemplateDuplicateDocumentTemplate: '"{worldLabel}" में डुप्लिकेट दस्तावेज़ टेम्प्लेट "{templateLabel}".'
   },
+  singularPluralMissing: {
+    bothIntro: 'वर्तमान भाषा के लिए अनुवाद अनुपलब्ध हैं:',
+    singularBullet: 'एकवचन रूप अनुपलब्ध है',
+    pluralBullet: 'बहुवचन रूप अनुपलब्ध है',
+    usingFallback: 'फ़ॉलबैक उपयोग किया गया: {fallbackLanguageName}'
+  },
   categories: {
     generalSettings: {
       title: 'सामान्य सेटिंग्स'
@@ -71,6 +77,12 @@ export default {
       templateCanonicalNameTooltip: 'पूरे दस्तावेज़ टेम्प्लेट का सही ढंग से नाम बदलने के लिए, कृपया इस संपादन संवाद के "दस्तावेज़ टेम्प्लेट" अनुभाग में जाएँ और वहाँ समायोजित करें।',
       templateNicknameLabel: 'इस विश्व के भीतर उपनाम',
       templateNicknameTooltip: 'उपनाम सेट करने से आप किसी विशेष विश्व के भीतर दस्तावेज़ टेम्प्लेट का त्वरित नाम बदल सकते हैं बिना पूरे प्रोजेक्ट में उसके वास्तविक नाम को बदले।',
+      missingGroupDisplayNameTreeTooltip:
+        'वर्तमान में चयनित भाषा के कुछ अनुवाद इस समूह नाम में अनुपस्थित हैं।',
+      missingPlacementNicknameTreeTooltip:
+        'वर्तमान में चयनित भाषा के कुछ अनुवाद इस प्लेसमेंट उपनाम में अनुपस्थित हैं।',
+      missingDocumentTemplateTitleTreeTooltip:
+        'वर्तमान में चयनित भाषा के कुछ अनुवाद इस दस्तावेज़ टेम्प्लेट शीर्षक में अनुपस्थित हैं।',
       contextMenu: {
         renameGroup: 'समूह का नाम बदलें',
         deleteGroup: 'समूह हटाएँ'
@@ -105,6 +117,7 @@ export default {
       filterAriaLabel: 'विश्व फ़िल्टर करें',
       filterClearAriaLabel: 'विश्व फ़िल्टर साफ़ करें',
       filterPlaceholder: 'खोजें...',
+      missingTranslationsTabTooltip: 'वर्तमान में चयनित भाषा के कुछ अनुवाद इस विश्व में अनुपलब्ध हैं।',
       deleteConfirm: {
         confirmDeleteButton: 'हटाने की पुष्टि करें',
         message: 'क्या आप वाकई इस विश्व को हटाना चाहते हैं? इससे जुड़े दस्तावेज़ और सेटिंग्स बाद में पुनर्प्राप्त नहीं की जा सकतीं। वे हमेशा के लिए खो जाएँगे।'

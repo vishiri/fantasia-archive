@@ -10,6 +10,12 @@ export default {
     bulletWorldTemplateGroupNameRequired: 'O nome do grupo de modelos é obrigatório para «{worldLabel}».',
     bulletWorldTemplateDuplicateDocumentTemplate: 'Modelo de documento duplicado «{templateLabel}» em «{worldLabel}».'
   },
+  singularPluralMissing: {
+    bothIntro: 'Faltam traduções para o idioma atual:',
+    singularBullet: 'Forma singular em falta',
+    pluralBullet: 'Forma plural em falta',
+    usingFallback: 'Usando fallback de {fallbackLanguageName}'
+  },
   categories: {
     generalSettings: {
       title: 'Configurações gerais'
@@ -71,6 +77,12 @@ export default {
       templateCanonicalNameTooltip: 'Para renomear corretamente um modelo de documento inteiro, acesse a seção «Modelos de documento» desta caixa de diálogo de edição e ajuste-o lá.',
       templateNicknameLabel: 'Apelido neste mundo',
       templateNicknameTooltip: 'Definir um apelido permite renomear rapidamente um modelo de documento dentro de um mundo específico sem alterar o nome real em todo o projeto.',
+      missingGroupDisplayNameTreeTooltip:
+        'Algumas traduções para o idioma selecionado estão em falta neste nome de grupo.',
+      missingPlacementNicknameTreeTooltip:
+        'Algumas traduções para o idioma selecionado estão em falta neste apelido de posicionamento.',
+      missingDocumentTemplateTitleTreeTooltip:
+        'Algumas traduções para o idioma selecionado estão em falta no título deste modelo de documento.',
       contextMenu: {
         renameGroup: 'Renomear grupo',
         deleteGroup: 'Excluir grupo'
@@ -105,6 +117,7 @@ export default {
       filterAriaLabel: 'Filtrar mundos',
       filterClearAriaLabel: 'Limpar filtro de mundos',
       filterPlaceholder: 'Pesquisar…',
+      missingTranslationsTabTooltip: 'Algumas traduções para o idioma selecionado atualmente estão ausentes neste mundo.',
       deleteConfirm: {
         confirmDeleteButton: 'Confirmar exclusão',
         message: 'Tem certeza de que deseja excluir este mundo? Documentos e configurações vinculados a ele não poderão ser recuperados depois. Serão perdidos para sempre.'

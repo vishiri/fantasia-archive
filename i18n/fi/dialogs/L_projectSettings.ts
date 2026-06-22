@@ -10,6 +10,12 @@ export default {
     bulletWorldTemplateGroupNameRequired: 'Malliryhmän nimi vaaditaan kohteelle «{worldLabel}».',
     bulletWorldTemplateDuplicateDocumentTemplate: 'Päällekkäinen asiakirjamalli «{templateLabel}» maailmassa «{worldLabel}».'
   },
+  singularPluralMissing: {
+    bothIntro: 'Puuttuvia käännöksiä nykyiselle kielelle:',
+    singularBullet: 'Yksikkömuoto puuttuu',
+    pluralBullet: 'Monikkomuoto puuttuu',
+    usingFallback: 'Käytetään varalla olevaa: {fallbackLanguageName}'
+  },
   categories: {
     generalSettings: {
       title: 'Yleiset asetukset'
@@ -71,6 +77,12 @@ export default {
       templateCanonicalNameTooltip: 'Jos haluat nimetä koko asiakirjamallin uudelleen, siirry tämän muokkausikkunan osioon «Asiakirjamallit» ja muokkaa sitä siellä.',
       templateNicknameLabel: 'Lempinimi tässä maailmassa',
       templateNicknameTooltip: 'Lempinimen avulla voit nopeasti nimetä asiakirjamallin uudelleen tietyssä maailmassa muuttamatta sen oikeaa nimeä koko projektissa.',
+      missingGroupDisplayNameTreeTooltip:
+        'Joitakin käännöksiä valitulle kielelle puuttuu tästä ryhmän nimestä.',
+      missingPlacementNicknameTreeTooltip:
+        'Joitakin käännöksiä valitulle kielelle puuttuu tästä sijoituksen lempinimestä.',
+      missingDocumentTemplateTitleTreeTooltip:
+        'Joitakin käännöksiä valitulle kielelle puuttuu tästä asiakirjamallin otsikosta.',
       contextMenu: {
         renameGroup: 'Nimeä ryhmä uudelleen',
         deleteGroup: 'Poista ryhmä'
@@ -105,6 +117,7 @@ export default {
       filterAriaLabel: 'Suodata maailmat',
       filterClearAriaLabel: 'Tyhjennä maailmojen suodatin',
       filterPlaceholder: 'Hae...',
+      missingTranslationsTabTooltip: 'Joitakin valitun kielen käännöksiä puuttuu tästä maailmasta.',
       deleteConfirm: {
         confirmDeleteButton: 'Vahvista poisto',
         message: 'Haluatko varmasti poistaa tämän maailman? Siihen liittyviä asiakirjoja ja asetuksia ei voi palauttaa myöhemmin. Ne katoavat pysyvästi.'

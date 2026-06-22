@@ -10,6 +10,12 @@ export default {
     bulletWorldTemplateGroupNameRequired: 'Malgruppenavn er påkrevd for «{worldLabel}».',
     bulletWorldTemplateDuplicateDocumentTemplate: 'Duplisert dokumentmal «{templateLabel}» i «{worldLabel}».'
   },
+  singularPluralMissing: {
+    bothIntro: 'Manglende oversettelser for gjeldende språk:',
+    singularBullet: 'Entallsform mangler',
+    pluralBullet: 'Flertallsform mangler',
+    usingFallback: 'Bruker reserveversjon: {fallbackLanguageName}'
+  },
   categories: {
     generalSettings: {
       title: 'Generelle innstillinger'
@@ -71,6 +77,12 @@ export default {
       templateCanonicalNameTooltip: 'For å gi hele dokumentmalen et nytt navn, gå til delen «Dokumentmaler» i denne redigeringsdialogen og endre den der.',
       templateNicknameLabel: 'Kallenavn i denne verdenen',
       templateNicknameTooltip: 'Et kallenavn lar deg raskt gi dokumentmalen et annet navn i én bestemt verden uten å endre det virkelige navnet i hele prosjektet.',
+      missingGroupDisplayNameTreeTooltip:
+        'Noen oversettelser for det valgte språket mangler for dette gruppenavnet.',
+      missingPlacementNicknameTreeTooltip:
+        'Noen oversettelser for det valgte språket mangler for dette plasseringskallenavnet.',
+      missingDocumentTemplateTitleTreeTooltip:
+        'Noen oversettelser for det valgte språket mangler for tittelen på denne dokumentmalen.',
       contextMenu: {
         renameGroup: 'Gi gruppen nytt navn',
         deleteGroup: 'Slett gruppe'
@@ -105,6 +117,7 @@ export default {
       filterAriaLabel: 'Filtrer verdener',
       filterClearAriaLabel: 'Tøm filter for verdener',
       filterPlaceholder: 'Søk...',
+      missingTranslationsTabTooltip: 'Noen av oversettelsene for det valgte språket mangler i denne verden.',
       deleteConfirm: {
         confirmDeleteButton: 'Bekreft sletting',
         message: 'Er du sikker på at du vil slette denne verdenen? Dokumenter og innstillinger knyttet til den kan ikke gjenopprettes etterpå. De vil gå tapt for alltid.'

@@ -10,6 +10,12 @@ export default {
     bulletWorldTemplateGroupNameRequired: 'Το όνομα ομάδας προτύπων απαιτείται για «{worldLabel}».',
     bulletWorldTemplateDuplicateDocumentTemplate: 'Διπλότυπο πρότυπο εγγράφου «{templateLabel}» στον «{worldLabel}».'
   },
+  singularPluralMissing: {
+    bothIntro: 'Λείπουν μεταφράσεις για την τρέχουσα γλώσσα:',
+    singularBullet: 'Λείπει η ενικός τύπος',
+    pluralBullet: 'Λείπει ο πληθυντικός τύπος',
+    usingFallback: 'Χρησιμοποιείται εφεδρική: {fallbackLanguageName}'
+  },
   categories: {
     generalSettings: {
       title: 'Γενικές ρυθμίσεις'
@@ -71,6 +77,12 @@ export default {
       templateCanonicalNameTooltip: 'Για να μετονομάσετε ολόκληρο ένα πρότυπο εγγράφου, μεταβείτε στην ενότητα «Πρότυπα εγγράφων» αυτού του διαλόγου επεξεργασίας και προσαρμόστε το εκεί.',
       templateNicknameLabel: 'Ψευδώνυμο μέσα σε αυτόν τον κόσμο',
       templateNicknameTooltip: 'Ένα ψευδώνυμο σάς επιτρέπει να μετονομάσετε γρήγορα ένα πρότυπο εγγράφου μέσα σε έναν συγκεκριμένο κόσμο χωρίς να αλλάξετε το πραγματικό του όνομα σε όλο το έργο.',
+      missingGroupDisplayNameTreeTooltip:
+        'Λείπουν ορισμένες μεταφράσεις για την τρέχουσα επιλεγμένη γλώσσα από αυτό το όνομα ομάδας.',
+      missingPlacementNicknameTreeTooltip:
+        'Λείπουν ορισμένες μεταφράσεις για την τρέχουσα επιλεγμένη γλώσσα από αυτό το ψευδώνυμο τοποθέτησης.',
+      missingDocumentTemplateTitleTreeTooltip:
+        'Λείπουν ορισμένες μεταφράσεις για την τρέχουσα επιλεγμένη γλώσσα από τον τίτλο αυτού του προτύπου εγγράφου.',
       contextMenu: {
         renameGroup: 'Μετονομασία ομάδας',
         deleteGroup: 'Διαγραφή ομάδας'
@@ -105,6 +117,7 @@ export default {
       filterAriaLabel: 'Φιλτράρισμα κόσμων',
       filterClearAriaLabel: 'Εκκαθάριση φίλτρου κόσμων',
       filterPlaceholder: 'Αναζήτηση...',
+      missingTranslationsTabTooltip: 'Μερικές από τις μεταφράσεις για την επιλεγμένη γλώσσα λείπουν από αυτόν τον κόσμο.',
       deleteConfirm: {
         confirmDeleteButton: 'Επιβεβαίωση διαγραφής',
         message: 'Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτόν τον κόσμο; Τα έγγραφα και οι ρυθμίσεις που συνδέονται με αυτόν δεν μπορούν να ανακτηθούν μετά. Θα χαθούν για πάντα.'

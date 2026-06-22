@@ -10,6 +10,12 @@ export default {
     bulletWorldTemplateGroupNameRequired: 'Le nom du groupe de modèles est requis pour « {worldLabel} ».',
     bulletWorldTemplateDuplicateDocumentTemplate: 'Modèle de document en double « {templateLabel} » dans « {worldLabel} ».'
   },
+  singularPluralMissing: {
+    bothIntro: 'Traductions manquantes pour la langue actuelle :',
+    singularBullet: 'Forme singulière manquante',
+    pluralBullet: 'Forme plurielle manquante',
+    usingFallback: 'Solution de repli utilisée : {fallbackLanguageName}'
+  },
   categories: {
     generalSettings: {
       title: 'Paramètres généraux'
@@ -71,6 +77,12 @@ export default {
       templateCanonicalNameTooltip: "Pour renommer correctement un modèle de document entier, veuillez vous rendre dans la section « Modèles de documents » de cette boîte de dialogue de modification et l'ajuster là-bas.",
       templateNicknameLabel: 'Surnom dans ce monde',
       templateNicknameTooltip: "Définir un surnom vous permet de renommer rapidement un modèle de document dans un monde spécifique sans modifier son vrai nom dans l'ensemble du projet.",
+      missingGroupDisplayNameTreeTooltip:
+        'Certaines traductions pour la langue actuellement sélectionnée manquent pour ce nom de groupe.',
+      missingPlacementNicknameTreeTooltip:
+        'Certaines traductions pour la langue actuellement sélectionnée manquent pour ce surnom de placement.',
+      missingDocumentTemplateTitleTreeTooltip:
+        'Certaines traductions pour la langue actuellement sélectionnée manquent pour le titre de ce modèle de document.',
       contextMenu: {
         renameGroup: 'Renommer le groupe',
         deleteGroup: 'Supprimer le groupe'
@@ -105,6 +117,7 @@ export default {
       filterAriaLabel: 'Filtrer les mondes',
       filterClearAriaLabel: 'Effacer le filtre des mondes',
       filterPlaceholder: 'Rechercher…',
+      missingTranslationsTabTooltip: 'Certaines traductions pour la langue actuellement sélectionnée manquent dans ce monde.',
       deleteConfirm: {
         confirmDeleteButton: 'Confirmer la suppression',
         message: 'Voulez-vous vraiment supprimer ce monde ? Les documents et paramètres qui y sont liés ne pourront pas être récupérés par la suite. Ils seront perdus à jamais.'

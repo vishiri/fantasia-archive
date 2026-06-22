@@ -10,7 +10,11 @@ alwaysApply: false
 
 Per-locale string field → **`FaLocaleTranslationsInput`** from **`src/components/elements/FaLocaleTranslationsInput/`** with **`v-model`** on **`I_faLocaleStringTranslations`**, **`current-language-code`**, required **`test-locator`**. **No** duplicate translate menus or fallback-warning wiring in feature folders.
 
-**Project Settings today:** world **`displayNameTranslations`**, document template **`titleTranslations`**, template **`worldAppendixTranslations`**.
+**Project Settings today:** world **`displayNameTranslations`**, document template **`titleTranslations`**, template **`worldAppendixTranslations`**, world template layout group **`displayNameTranslations`**, placement **`nicknameTranslations`**.
+
+## Pinned-aside translations menu
+
+Optional props **`menuPinnedAsideLabel`**, **`menuPinnedAsideValue`**, **`menuPinnedAsideTooltip`**, **`menuPinnedAsideTestLocator`** — read-only reference column pinned left; locale rows scroll right (placement nickname rename: canonical template title).
 
 ## Stored value contract
 
@@ -26,18 +30,21 @@ Per-locale string field → **`FaLocaleTranslationsInput`** from **`src/componen
 | **`src/scripts/localeTranslations/functions/resolveFaLocaleStringTranslation.ts`** | Display value + fallback language code |
 | **`src/scripts/localeTranslations/faLocaleStringTranslations_manager.ts`** | Wired with **`FA_USER_SETTINGS_LANGUAGE_CODES`** |
 | **`src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager.ts`** | Template title alias + max length |
-| World display name / world appendix managers under **`src/scripts/projectWorlds/`**, **`src/scripts/documentTemplates/`** | Project Settings draft + snapshot normalize |
+| World display name / world appendix / layout group display name / placement nickname managers under **`src/scripts/projectWorlds/`**, **`src/scripts/documentTemplates/`** | Project Settings draft + snapshot normalize |
 
-## Placement vs template draft (do not mix)
+## Placement vs template draft
 
-| Shape | **`worldAppendix`** | **`worldAppendixTranslations`** |
-| --- | --- | --- |
-| Document template **draft** / snapshot item | — | yes |
-| World template layout **placement** / he-tree node | yes (resolved string) | no |
-| Layout **group** row | **`displayName: string`** only | — |
+| Shape | **`worldAppendix`** | **`worldAppendixTranslations`** | **`nicknameTranslations`** |
+| --- | --- | --- | --- |
+| Document template **draft** / snapshot item | — | yes | — |
+| World template layout **placement** / he-tree node | yes (resolved string) | no | yes |
+| Layout **group** row | — | — | **`displayNameTranslations`** |
+
+Denormalized SQL caches: group **`display_name`**, placement **`nickname`** (schema **v10** JSON columns).
 
 ## Element API (short)
 
+- **`presentation`**: **`field`** (default) — readonly summary + nested locale menu; **`menuPanel`** — locale rows only for embedding in an outer menu (template layout tree rename)
 - **`inputMode`**: **`singleLine`** (default) \| **`multiline`**
 - Click readonly field or translate button → locale menu; tooltip **only** on button
 - **`#after`** fallback warning when resolved locale ≠ current UI language
@@ -64,4 +71,4 @@ Per-locale string field → **`FaLocaleTranslationsInput`** from **`src/componen
 ## Related
 
 - [fantasia-locale-translations-input](../skills/fantasia-locale-translations-input/SKILL.md)
-- [projectDB.md](../../docs/database/projectDB.md) — schema **v9** JSON columns
+- [projectDB.md](../../docs/database/projectDB.md) — schema **v9**–**v10** JSON columns

@@ -10,6 +10,12 @@ export default {
     bulletWorldTemplateGroupNameRequired: 'Для «{worldLabel}» потрібна назва групи шаблонів.',
     bulletWorldTemplateDuplicateDocumentTemplate: 'Дублікат шаблону документа «{templateLabel}» у «{worldLabel}».'
   },
+  singularPluralMissing: {
+    bothIntro: 'Переклади для вибраної мови відсутні:',
+    singularBullet: 'Відсутня форма однини',
+    pluralBullet: 'Відсутня форма множини',
+    usingFallback: 'Використовується резервний варіант: {fallbackLanguageName}'
+  },
   categories: {
     generalSettings: {
       title: 'Загальні налаштування'
@@ -71,6 +77,12 @@ export default {
       templateCanonicalNameTooltip: 'Щоб перейменувати весь шаблон документа, перейдіть до розділу «Шаблони документів» цього діалогового вікна редагування та змініть його там.',
       templateNicknameLabel: 'Псевдонім у цьому світі',
       templateNicknameTooltip: 'Псевдонім дозволяє швидко перейменувати шаблон документа в конкретному світі, не змінюючи його справжню назву в усьому проекті.',
+      missingGroupDisplayNameTreeTooltip:
+        'Деякі переклади для вибраної мови відсутні в цій назві групи.',
+      missingPlacementNicknameTreeTooltip:
+        'Деякі переклади для вибраної мови відсутні в цьому псевдонімі розміщення.',
+      missingDocumentTemplateTitleTreeTooltip:
+        'Деякі переклади для вибраної мови відсутні в назві цього шаблону документа.',
       contextMenu: {
         renameGroup: 'Перейменувати групу',
         deleteGroup: 'Видалити групу'
@@ -105,6 +117,7 @@ export default {
       filterAriaLabel: 'Фільтрувати світи',
       filterClearAriaLabel: 'Очистити фільтр світів',
       filterPlaceholder: 'Пошук...',
+      missingTranslationsTabTooltip: 'Деякі переклади для вибраної мови відсутні в цьому світі.',
       deleteConfirm: {
         confirmDeleteButton: 'Підтвердити видалення',
         message: 'Ви впевнені, що хочете видалити цей світ? Документи та налаштування, пов’язані з ним, не можна буде відновити. Вони будуть втрачені назавжди.'

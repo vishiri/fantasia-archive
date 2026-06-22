@@ -10,6 +10,12 @@ export default {
     bulletWorldTemplateGroupNameRequired: '“{worldLabel}” 需要模板组名称。',
     bulletWorldTemplateDuplicateDocumentTemplate: '“{worldLabel}” 中存在重复的文档模板 “{templateLabel}”。'
   },
+  singularPluralMissing: {
+    bothIntro: '当前语言缺少翻译:',
+    singularBullet: '缺少单数形式',
+    pluralBullet: '缺少复数形式',
+    usingFallback: '使用回退: {fallbackLanguageName}'
+  },
   categories: {
     generalSettings: {
       title: '常规设置'
@@ -71,6 +77,12 @@ export default {
       templateCanonicalNameTooltip: '若要正确重命名整个文档模板，请前往此编辑对话框的“文档模板”部分并在那里调整。',
       templateNicknameLabel: '此世界内的昵称',
       templateNicknameTooltip: '设置昵称可让您在特定世界内快速重命名文档模板，而无需更改整个项目中的真实名称。',
+      missingGroupDisplayNameTreeTooltip:
+        '当前所选语言的部分翻译在此组名称中缺失。',
+      missingPlacementNicknameTreeTooltip:
+        '当前所选语言的部分翻译在此放置昵称中缺失。',
+      missingDocumentTemplateTitleTreeTooltip:
+        '当前所选语言的部分翻译在此文档模板标题中缺失。',
       contextMenu: {
         renameGroup: '重命名组',
         deleteGroup: '删除组'
@@ -105,6 +117,7 @@ export default {
       filterAriaLabel: '筛选世界',
       filterClearAriaLabel: '清除世界筛选',
       filterPlaceholder: '搜索...',
+      missingTranslationsTabTooltip: '当前所选语言的部分翻译在此世界中缺失。',
       deleteConfirm: {
         confirmDeleteButton: '确认删除',
         message: '确定要删除此世界吗？与其关联的文档和设置之后无法恢复。它们将永久丢失。'
