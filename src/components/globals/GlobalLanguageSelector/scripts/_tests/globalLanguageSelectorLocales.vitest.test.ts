@@ -1,9 +1,16 @@
 import { expect, test } from 'vitest'
+import fs from 'node:fs'
+import path from 'node:path'
 
 import { FA_USER_SETTINGS_LANGUAGE_DISPLAY_NAMES } from 'app/i18n/faUserSettingsLanguageDisplayNames'
-import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
+import {
+  buildFaUserSettingsLanguageSelectorLocales,
+  FA_USER_SETTINGS_LANGUAGE_CODES
+} from 'app/types/faUserSettingsLanguageRegistry'
 
 import { GLOBAL_LANGUAGE_SELECTOR_LOCALES } from '../globalLanguageSelectorLocales_manager'
+
+const repoRoot = path.resolve(import.meta.dirname, '../../../../../..')
 
 const latinDisplayNameCollator = new Intl.Collator('en', {
   sensitivity: 'base',
@@ -34,4 +41,25 @@ test('Test that GLOBAL_LANGUAGE_SELECTOR_LOCALES is sorted by Latin display name
   })
 
   expect(displayNames).toEqual(expectedSortedDisplayNames)
+})
+
+/**
+ * GLOBAL_LANGUAGE_SELECTOR_LOCALES
+ * Each interface locale points at an on-disk countryFlags SVG asset.
+ */
+test('Test that GLOBAL_LANGUAGE_SELECTOR_LOCALES flag assets exist on disk', () => {
+  for (const row of buildFaUserSettingsLanguageSelectorLocales()) {
+    const relativePath = row.flagSrc.replace(/^\//, '')
+    const absolutePath = path.join(repoRoot, 'public', relativePath)
+    expect(fs.existsSync(absolutePath), `${row.code} → ${row.flagSrc}`).toBe(true)
+  }
+})
+
+/**
+ * GLOBAL_LANGUAGE_SELECTOR_LOCALES
+ * Swedish uses Sweden ISO 3166-1 alpha-2 se, not El Salvador sv.
+ */
+test('Test that Swedish locale uses the Sweden flag asset', () => {
+  const swedishRow = GLOBAL_LANGUAGE_SELECTOR_LOCALES.find((row) => row.code === 'sv')
+  expect(swedishRow?.flagSrc).toBe('/countryFlags/se.svg')
 })

@@ -46,7 +46,7 @@ const FLAG_BY_CODE: Record<T_faUserSettingsLanguageCode, string> = {
   nb: '/countryFlags/no.svg',
   pt: '/countryFlags/pt.svg',
   ru: '/countryFlags/ru.svg',
-  sv: '/countryFlags/sv.svg',
+  sv: '/countryFlags/se.svg',
   uk: '/countryFlags/ua.svg',
   zh: '/countryFlags/cn.svg'
 }
