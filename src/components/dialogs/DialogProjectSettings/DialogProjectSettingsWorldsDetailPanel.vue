@@ -197,7 +197,7 @@ function emitTemplateLayout (layout: I_dialogProjectSettingsWorldTemplateLayoutD
 
 <style lang="scss" scoped>
 .dialogProjectSettingsWorldsDetail__fieldsRow {
-  align-items: flex-start;
+  align-items: flex-end;
   display: flex;
   flex: 0 0 auto;
   flex-wrap: nowrap;
@@ -214,9 +214,7 @@ function emitTemplateLayout (layout: I_dialogProjectSettingsWorldTemplateLayoutD
 }
 
 .dialogProjectSettingsWorldsDetail__deleteCol {
-  align-self: flex-end;
   flex: 0 0 auto;
-  margin-bottom: $dialogProjectSettings-worldsDetailDeleteCol-marginBottom;
 }
 
 .dialogProjectSettingsWorldsDetail__paletteSection {
