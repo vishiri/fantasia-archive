@@ -19,6 +19,7 @@ import {
   clickPaletteFooterColorByHex,
   clickWorldTabByLabel,
   dragLayoutTreeNode,
+  dragPaletteSwatch,
   dragVerticalTab,
   openWorldColorPickerMenu,
   setPaletteSwatchHex
@@ -424,6 +425,51 @@ test.describe.serial('DialogProjectSettings functional flow', () => {
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.colorPaletteSwatch}"]`)
     ).toHaveCount(1)
+  })
+
+  /**
+   * World color palette supports drag-reorder of swatch rows within the active world.
+   */
+  test('World color palette swatch drag-reorder updates displayed order', async () => {
+    await appWindow.locator(`[data-test-locator="${selectorList.tabWorldsSettings}"]`).click()
+    const worldTabs = appWindow.locator(`[data-test-locator="${selectorList.worldsTab}"]`)
+    const addWorldButton = appWindow.locator(`[data-test-locator="${selectorList.worldsAddButton}"]`)
+    while (await worldTabs.count() < 2) {
+      await addWorldButton.click()
+    }
+    await worldTabs.nth(1).click()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.colorPaletteEditor}"]`)
+    ).toBeVisible()
+
+    const paletteAdd = appWindow.locator(`[data-test-locator="${selectorList.colorPaletteAddButton}"]`)
+    for (let index = 0; index < 3; index += 1) {
+      await paletteAdd.click()
+    }
+
+    const expectedInitialHexes = ['#111111', '#222222', '#333333']
+    for (let index = 0; index < expectedInitialHexes.length; index += 1) {
+      await setPaletteSwatchHex(appWindow, index, expectedInitialHexes[index] ?? '')
+    }
+
+    const swatches = appWindow.locator(`[data-test-locator="${selectorList.colorPaletteSwatch}"]`)
+    await expect(swatches).toHaveCount(3)
+    await expect(async () => {
+      for (let index = 0; index < expectedInitialHexes.length; index += 1) {
+        await expect(swatches.nth(index)).toHaveAttribute(
+          'data-test-tooltip-text',
+          expectedInitialHexes[index] ?? ''
+        )
+      }
+    }).toPass({ timeout: 10_000 })
+
+    await dragPaletteSwatch(appWindow, 2, 0)
+
+    await expect(async () => {
+      await expect(swatches.nth(0)).toHaveAttribute('data-test-tooltip-text', '#333333')
+      await expect(swatches.nth(1)).toHaveAttribute('data-test-tooltip-text', '#111111')
+      await expect(swatches.nth(2)).toHaveAttribute('data-test-tooltip-text', '#222222')
+    }).toPass({ timeout: 15_000 })
   })
 
   /**

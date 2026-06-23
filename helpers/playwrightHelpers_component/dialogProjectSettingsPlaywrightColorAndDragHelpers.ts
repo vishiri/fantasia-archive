@@ -100,6 +100,35 @@ function backgroundColorMatchesHex (backgroundColor: string, hex: string): boole
 }
 
 /**
+ * Drags a palette swatch row from one index to another.
+ * Uses mouse steps so Sortable forceFallback (8px tolerance) registers the drag.
+ */
+export async function dragPaletteSwatch (
+  page: Page,
+  fromIndex: number,
+  toIndex: number
+): Promise<void> {
+  const swatchLocator = '[data-test-locator="dialogProjectSettings-worlds-colorPaletteSwatch"]'
+  const source = page.locator(swatchLocator).nth(fromIndex)
+  const target = page.locator(swatchLocator).nth(toIndex)
+  await source.scrollIntoViewIfNeeded()
+  await target.scrollIntoViewIfNeeded()
+  const sourceBox = await source.boundingBox()
+  const targetBox = await target.boundingBox()
+  expect(sourceBox).not.toBeNull()
+  expect(targetBox).not.toBeNull()
+  const startX = sourceBox!.x + sourceBox!.width / 2
+  const startY = sourceBox!.y + sourceBox!.height / 2
+  const endX = targetBox!.x + targetBox!.width / 2
+  const endY = targetBox!.y + targetBox!.height / 2
+  await page.mouse.move(startX, startY)
+  await page.mouse.down()
+  await page.mouse.move(endX, endY, { steps: 24 })
+  await page.mouse.up()
+  await page.waitForTimeout(400)
+}
+
+/**
  * Drags a vertical tab row identified by a data-test attribute value.
  */
 export async function dragVerticalTab (
@@ -115,6 +144,8 @@ export async function dragVerticalTab (
   const target = page.locator(
     `[data-test-locator="${tabLocator}"][${idAttribute}="${toId}"]`
   )
+  await source.scrollIntoViewIfNeeded()
+  await target.scrollIntoViewIfNeeded()
   await source.dragTo(target, {
     force: true,
     steps: 16

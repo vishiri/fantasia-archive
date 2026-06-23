@@ -126,7 +126,21 @@ export async function setLocaleTranslation (
   text: string
 ): Promise<void> {
   const displayName = resolveLocaleDisplayName(localeCode)
+  const menu = page.locator(`[data-test-locator="${testLocatorPrefix}-translationsMenu"]`)
   await expect(async () => {
+    if (await menu.isVisible()) {
+      const field = menu.locator(`[data-test-locale-code="${localeCode}"]`).locator('input, textarea').first()
+      await expect(field).toBeVisible()
+      await field.fill(text)
+      return
+    }
+    const pinnedInput = page.locator(
+      `[data-test-locator="${testLocatorPrefix}-translationsInput-${localeCode}"]`
+    ).locator('input, textarea').first()
+    if (await pinnedInput.count() > 0 && await pinnedInput.isVisible()) {
+      await pinnedInput.fill(text)
+      return
+    }
     const byLabel = page.getByRole('textbox', {
       exact: true,
       name: displayName
@@ -135,9 +149,9 @@ export async function setLocaleTranslation (
       await byLabel.first().fill(text)
       return
     }
-    const menu = page.locator(`[data-test-locator="${testLocatorPrefix}-translationsMenu"]`)
-    const scope = await menu.isVisible() ? menu : page
-    const field = scope.locator(`[data-test-locale-code="${localeCode}"]`).locator('input, textarea').first()
+    const field = page.locator(
+      `[data-test-locator="${testLocatorPrefix}-translationsRow"][data-test-locale-code="${localeCode}"]`
+    ).locator('input, textarea').first()
     await expect(field).toBeVisible()
     await field.fill(text)
   }).toPass({ timeout: 10_000 })
@@ -153,7 +167,44 @@ export async function setSingularPluralTranslation (
   values: { singular?: string, plural?: string }
 ): Promise<void> {
   const displayName = resolveLocaleDisplayName(localeCode)
+  const menu = page.locator(`[data-test-locator="${testLocatorPrefix}-translationsMenu"]`)
   await expect(async () => {
+    if (await menu.isVisible()) {
+      const row = menu.locator(`[data-test-locale-code="${localeCode}"]`)
+      if (values.singular !== undefined) {
+        const singularInput = row.locator(
+          `[data-test-locator="${testLocatorPrefix}-translationsSingularInput-${localeCode}"]`
+        ).locator('input, textarea').first()
+        if (await singularInput.count() > 0) {
+          await expect(singularInput).toBeVisible()
+          await singularInput.fill(values.singular)
+        } else {
+          const textboxes = row.getByRole('textbox', {
+            exact: true,
+            name: displayName
+          })
+          await expect(textboxes.nth(0)).toBeVisible()
+          await textboxes.nth(0).fill(values.singular)
+        }
+      }
+      if (values.plural !== undefined) {
+        const pluralInput = row.locator(
+          `[data-test-locator="${testLocatorPrefix}-translationsPluralInput-${localeCode}"]`
+        ).locator('input, textarea').first()
+        if (await pluralInput.count() > 0) {
+          await expect(pluralInput).toBeVisible()
+          await pluralInput.fill(values.plural)
+        } else {
+          const textboxes = row.getByRole('textbox', {
+            exact: true,
+            name: displayName
+          })
+          await expect(textboxes.nth(1)).toBeVisible()
+          await textboxes.nth(1).fill(values.plural)
+        }
+      }
+      return
+    }
     const textboxes = page.getByRole('textbox', {
       exact: true,
       name: displayName
