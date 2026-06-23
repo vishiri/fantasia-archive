@@ -140,6 +140,18 @@ test('Test that isDialogProjectSettingsDocumentTemplateRemoveDisabled respects d
 })
 
 /**
+ * appendDialogProjectSettingsDocumentTemplateDraft
+ * Seeds plural and singular title translations for the active UI language.
+ */
+test('Test that appendDialogProjectSettingsDocumentTemplateDraft seeds plural and singular for active language', () => {
+  const templates = appendDialogProjectSettingsDocumentTemplateDraft([], 'en-US', 'New document template')
+  expect(templates).toHaveLength(1)
+  expect(templates[0]?.titlePluralTranslations).toEqual({ 'en-US': 'New document template' })
+  expect(templates[0]?.titleSingularTranslations).toEqual({ 'en-US': 'New document template' })
+  expect(isDialogProjectSettingsDocumentTemplateMissingCurrentLanguageTranslations(templates[0]!, 'en-US')).toBe(false)
+})
+
+/**
  * hasDialogProjectSettingsDocumentTemplateNameValidationError
  * Treats null as invalid and allows an empty template list.
  */

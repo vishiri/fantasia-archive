@@ -123,6 +123,9 @@ test('Test that createDialogProjectSettingsDraftMutationHandlers resolves defaul
   expect(localDocumentTemplates.value?.[0]?.titlePluralTranslations).toEqual({
     de: 'Neue Dokumentvorlage'
   })
+  expect(localDocumentTemplates.value?.[0]?.titleSingularTranslations).toEqual({
+    de: 'Neue Dokumentvorlage'
+  })
 
   worldDefault = 'Zweite Welt'
   templateDefault = 'Zweite Vorlage'
@@ -130,6 +133,9 @@ test('Test that createDialogProjectSettingsDraftMutationHandlers resolves defaul
   handlers.addDocumentTemplate()
   expect(localWorlds.value?.[1]?.displayNameTranslations).toEqual({ de: 'Zweite Welt' })
   expect(localDocumentTemplates.value?.[1]?.titlePluralTranslations).toEqual({
+    de: 'Zweite Vorlage'
+  })
+  expect(localDocumentTemplates.value?.[1]?.titleSingularTranslations).toEqual({
     de: 'Zweite Vorlage'
   })
 })

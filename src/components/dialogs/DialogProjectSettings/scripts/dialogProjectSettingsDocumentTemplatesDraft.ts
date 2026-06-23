@@ -241,6 +241,9 @@ export function appendDialogProjectSettingsDocumentTemplateDraft (
   const titlePluralTranslations: I_faProjectDocumentTemplateTitleTranslations = {
     [languageCode]: defaultDisplayName
   }
+  const titleSingularTranslations: I_faProjectDocumentTemplateTitleSingularTranslations = {
+    [languageCode]: defaultDisplayName
+  }
   return [
     ...templates,
     {
@@ -248,7 +251,7 @@ export function appendDialogProjectSettingsDocumentTemplateDraft (
       icon: '',
       id,
       titlePluralTranslations,
-      titleSingularTranslations: {},
+      titleSingularTranslations,
       worldAppendixTranslations: {}
     }
   ]

@@ -75,6 +75,8 @@
 - **Project load failures**: When **loadExistingProject** fails, the error toast caption shows only the **`.faproject`** path that could not be opened (including **Load existing project** after the file picker); technical backend messages stay in the console and **Action Monitor** history.
 - **Desktop development**: **`yarn install`** now runs **`electron-builder install-app-deps`** so **better-sqlite3** native bindings match the bundled **Electron** runtime; use **`yarn rebuild:native`** after changing **Electron** or **Node** if project open still reports missing bindings.
 - **Global shortcuts**: Fantasia Archive no longer intercepts or blocks its reserved **Ctrl+Shift** keyboard shortcuts in other applications while its window is in the background. The app-wide shortcut handlers now register only while the **Fantasia Archive** window is focused and release the moment it loses focus or closes, so those key combinations stay available to other programs whenever Fantasia Archive is not the active window.
+- **Project Settings**: Adding a document template pre-fills both singular and plural title for the active interface language, so a new tab no longer shows a missing-translation warning before you edit titles.
+- **Project Settings**: **Save settings**, **Save without closing**, and the save validation error icon sit in one footer row with consistent spacing so button labels stay on one line on wide layouts.
 
 ## 2.4.13 - Version bump
 

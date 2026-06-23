@@ -3,6 +3,10 @@
 @use '../../../../css/globals/faQIconDisplay.variables.scss' as *;
 
 /* COMPONENT - DIALOG PROJECT SETTINGS (mirrors DialogAppSettings layout tokens) */
+$dialogProjectSettings-cardActions-button-minHeight: 36px;
+$dialogProjectSettings-cardActions-button-paddingX: 16px;
+$dialogProjectSettings-cardActions-button-paddingY: 8px;
+$dialogProjectSettings-cardActions-gap: 16px;
 $dialogProjectSettings-card-maxHeightSubtract: 48px;
 $dialogProjectSettings-card-maxWidthViewportSubtract: 100px;
 $dialogProjectSettings-card-width: 1800px;

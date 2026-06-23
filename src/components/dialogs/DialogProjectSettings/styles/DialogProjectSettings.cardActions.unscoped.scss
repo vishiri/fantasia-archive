@@ -1,0 +1,20 @@
+@use './variables' as *;
+
+.q-dialog.dialogComponent.ProjectSettings {
+  .dialogProjectSettings__cardActions {
+    align-items: center;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: $dialogProjectSettings-cardActions-gap;
+    justify-content: flex-end;
+
+    .dialogProjectSettings__cardActionButton {
+      min-height: $dialogProjectSettings-cardActions-button-minHeight;
+      padding: $dialogProjectSettings-cardActions-button-paddingY $dialogProjectSettings-cardActions-button-paddingX;
+
+      .q-btn__content {
+        white-space: nowrap;
+      }
+    }
+  }
+}

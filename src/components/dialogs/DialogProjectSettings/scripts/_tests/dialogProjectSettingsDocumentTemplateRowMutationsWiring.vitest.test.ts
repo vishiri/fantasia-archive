@@ -25,12 +25,14 @@ test('Test that addDialogProjectSettingsDocumentTemplateDraftRow appends a new t
   expect(localDocumentTemplates.value).toHaveLength(2)
   expect(localDocumentTemplates.value?.[0].id).toBe(baseTemplate.id)
   expect(localDocumentTemplates.value?.[1].titlePluralTranslations).toEqual({ 'en-US': 'New template' })
+  expect(localDocumentTemplates.value?.[1].titleSingularTranslations).toEqual({ 'en-US': 'New template' })
 })
 
 test('Test that addDialogProjectSettingsDocumentTemplateDraftRow seeds the active UI language only', () => {
   const localDocumentTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[] | null>([])
   addDialogProjectSettingsDocumentTemplateDraftRow(localDocumentTemplates, 'de', 'Neue Vorlage')
   expect(localDocumentTemplates.value?.[0].titlePluralTranslations).toEqual({ de: 'Neue Vorlage' })
+  expect(localDocumentTemplates.value?.[0].titleSingularTranslations).toEqual({ de: 'Neue Vorlage' })
 })
 
 /**

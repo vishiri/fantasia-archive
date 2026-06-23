@@ -52,64 +52,67 @@
 
       <q-card-actions
         align="right"
-        class="q-mb-lg q-px-md q-gutter-sm dialogProjectSettings__cardActions"
+        class="q-mb-lg q-px-md dialogProjectSettings__cardActions"
       >
         <q-btn
           v-close-popup
           flat
+          no-wrap
           :label="$t('dialogs.projectSettings.closeButton')"
-          class="q-mr-xl"
+          class="dialogProjectSettings__cardActionButton"
           color="accent"
           data-test-locator="dialogProjectSettings-button-close"
         />
 
-        <div class="dialogProjectSettings__saveRow row items-center no-wrap q-gutter-sm">
-          <q-btn
-            outline
-            :disable="isSaveDisabled"
-            :label="$t('dialogs.projectSettings.saveWithoutClosingButton')"
-            color="primary-bright"
-            data-test-locator="dialogProjectSettings-button-saveWithoutClosing"
-            @click="void saveWithoutClosingDialog()"
-          />
+        <q-btn
+          outline
+          no-wrap
+          :disable="isSaveDisabled"
+          :label="$t('dialogs.projectSettings.saveWithoutClosingButton')"
+          class="dialogProjectSettings__cardActionButton"
+          color="primary-bright"
+          data-test-locator="dialogProjectSettings-button-saveWithoutClosing"
+          @click="void saveWithoutClosingDialog()"
+        />
 
-          <q-btn
-            outline
-            :disable="isSaveDisabled"
-            :label="$t('dialogs.projectSettings.saveButton')"
-            color="primary-bright"
-            data-test-locator="dialogProjectSettings-button-save"
-            @click="void saveAndCloseDialog()"
-          />
+        <q-btn
+          outline
+          no-wrap
+          :disable="isSaveDisabled"
+          :label="$t('dialogs.projectSettings.saveButton')"
+          class="dialogProjectSettings__cardActionButton"
+          color="primary-bright"
+          data-test-locator="dialogProjectSettings-button-save"
+          @click="void saveAndCloseDialog()"
+        />
 
-          <q-icon
-            v-if="saveValidationErrorsTooltip.flatText.length > 0"
-            name="mdi-alert-circle"
-            color="negative"
-            size="20px"
-            class="dialogProjectSettings__saveErrorIcon q-ml-sm"
-            data-test-locator="dialogProjectSettings-saveErrorsIcon"
-            :data-test-tooltip-text="saveValidationErrorsTooltip.flatText"
+        <q-icon
+          v-if="saveValidationErrorsTooltip.flatText.length > 0"
+          name="mdi-alert-circle"
+          color="negative"
+          size="20px"
+          class="dialogProjectSettings__saveErrorIcon"
+          data-test-locator="dialogProjectSettings-saveErrorsIcon"
+          :data-test-tooltip-text="saveValidationErrorsTooltip.flatText"
+        >
+          <q-tooltip
+            anchor="top end"
+            content-class="dialogProjectSettings__saveErrorTooltip"
+            :offset="saveErrorsTooltipOffset"
+            self="bottom end"
           >
-            <q-tooltip
-              anchor="top end"
-              content-class="dialogProjectSettings__saveErrorTooltip"
-              :offset="saveErrorsTooltipOffset"
-              self="bottom end"
+            <div class="dialogProjectSettings__saveErrorTooltipIntro">
+              {{ saveValidationErrorsTooltip.intro }}
+            </div>
+            <div
+              v-for="(bullet, bulletIndex) in saveValidationErrorsTooltip.bullets"
+              :key="bulletIndex"
+              class="dialogProjectSettings__saveErrorTooltipBullet"
             >
-              <div class="dialogProjectSettings__saveErrorTooltipIntro">
-                {{ saveValidationErrorsTooltip.intro }}
-              </div>
-              <div
-                v-for="(bullet, bulletIndex) in saveValidationErrorsTooltip.bullets"
-                :key="bulletIndex"
-                class="dialogProjectSettings__saveErrorTooltipBullet"
-              >
-                {{ bullet }}
-              </div>
-            </q-tooltip>
-          </q-icon>
-        </div>
+              {{ bullet }}
+            </div>
+          </q-tooltip>
+        </q-icon>
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -182,6 +185,7 @@ function updateDocumentTemplatesOrder (
 }
 </script>
 
+<style lang="scss" src="./styles/DialogProjectSettings.cardActions.unscoped.scss"></style>
 <style lang="scss" src="./styles/DialogProjectSettings.fieldHelpTooltip.unscoped.scss"></style>
 <style lang="scss" src="./styles/DialogProjectSettings.saveErrorsTooltip.unscoped.scss"></style>
 <style lang="scss" src="./styles/DialogProjectSettings.templateQIconDisplay.unscoped.scss"></style>
