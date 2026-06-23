@@ -26,7 +26,8 @@ import {
 import {
   DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_GROUP_ICON,
   isDialogProjectSettingsWorldTemplateLayoutPersistedId,
-  mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey
+  mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey,
+  resolveDialogProjectSettingsWorldTemplateLayoutTreeScrollContainer
 } from '../dialogProjectSettingsWorldTemplateLayoutTreeData'
 import {
   mapHeTreeNodesToWorldTemplateLayoutDraft,
@@ -1906,6 +1907,85 @@ test('Test that tree structure key is stable when only group display names chang
   const beforeKey = mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey(layout)
   layout = renameDialogProjectSettingsWorldTemplateGroupDisplayNameTranslationsDraft(layout, groupId, { 'en-US': 'Renamed creatures' })
   expect(mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey(layout)).toBe(beforeKey)
+})
+
+/**
+ * dialogProjectSettingsWorldTemplateLayoutTreeData
+ * Tree structure key ignores sort order so drag reorder does not remount he-tree.
+ */
+test('Test that tree structure key is stable when only root sort orders change', () => {
+  let layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
+  layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
+    documentTemplateId: 'template-a',
+    icon: 'mdi-account',
+    templateDisplayName: 'Character',
+    worldAppendix: ''
+  })
+  layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
+    documentTemplateId: 'template-b',
+    icon: 'mdi-map',
+    templateDisplayName: 'Location',
+    worldAppendix: ''
+  })
+  const beforeKey = mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey(layout)
+  layout.placements[0]!.rootSortOrder = 1
+  layout.placements[1]!.rootSortOrder = 0
+  expect(mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey(layout)).toBe(beforeKey)
+})
+
+/**
+ * dialogProjectSettingsWorldTemplateLayoutTreeData
+ * Tree structure key ignores draft array order when topology is unchanged.
+ */
+test('Test that tree structure key is stable when draft array order differs', () => {
+  let layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
+  layout = appendDialogProjectSettingsWorldTemplateGroupDraft(layout, 'en-US', 'Creatures')
+  layout = appendDialogProjectSettingsWorldTemplateGroupDraft(layout, 'en-US', 'Locations')
+  layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
+    documentTemplateId: 'template-a',
+    icon: 'mdi-account',
+    templateDisplayName: 'Character',
+    worldAppendix: ''
+  })
+  layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
+    documentTemplateId: 'template-b',
+    icon: 'mdi-map',
+    templateDisplayName: 'Place',
+    worldAppendix: ''
+  })
+  const beforeKey = mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey(layout)
+  const reversedLayout = {
+    groups: [...layout.groups].reverse(),
+    placements: [...layout.placements].reverse()
+  }
+  const treeMappedLayout = mapHeTreeNodesToWorldTemplateLayoutDraft(
+    buildHeTreeNodesFromWorldTemplateLayoutDraft(layout, 'en-US'),
+    layout
+  )
+  expect(mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey(reversedLayout)).toBe(beforeKey)
+  expect(mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey(treeMappedLayout)).toBe(beforeKey)
+})
+
+/**
+ * dialogProjectSettingsWorldTemplateLayoutTreeData
+ * Scroll helper resolves the he-tree root inside the layout tree host wrapper.
+ */
+test('Test that tree scroll container resolver finds he-tree root inside host', () => {
+  const host = document.createElement('div')
+  const tree = document.createElement('div')
+  tree.className = 'dialogProjectSettingsWorldTemplateLayoutTree'
+  host.append(tree)
+  document.body.append(host)
+
+  expect(resolveDialogProjectSettingsWorldTemplateLayoutTreeScrollContainer(host)).toBe(tree)
+  expect(resolveDialogProjectSettingsWorldTemplateLayoutTreeScrollContainer(tree)).toBe(tree)
+  expect(resolveDialogProjectSettingsWorldTemplateLayoutTreeScrollContainer(null)).toBeNull()
+})
+
+test('Test that tree scroll container resolver falls back to host when tree root is missing', () => {
+  const host = document.createElement('div')
+  document.body.append(host)
+  expect(resolveDialogProjectSettingsWorldTemplateLayoutTreeScrollContainer(host)).toBe(host)
 })
 
 /**

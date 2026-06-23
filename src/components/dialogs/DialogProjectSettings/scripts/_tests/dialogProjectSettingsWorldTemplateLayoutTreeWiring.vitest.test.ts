@@ -247,6 +247,59 @@ test('Test that tree sync wiring patches labels without rebuilding tree nodes', 
 
 /**
  * dialogProjectSettingsWorldTemplateLayoutTreeSyncWiring
+ * Patches labels when props layout array order differs from he-tree reverse map order.
+ */
+test('Test that tree sync wiring patches labels when draft array order differs from tree map', () => {
+  const layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
+  layout.groups = [
+    {
+      displayNameTranslations: { 'en-US': 'Creatures' },
+      id: 'group-a',
+      rootSortOrder: 0
+    },
+    {
+      displayNameTranslations: { 'en-US': 'Locations' },
+      id: 'group-b',
+      rootSortOrder: 1
+    }
+  ]
+  layout.placements = [
+    {
+      templateDisplayName: 'Character',
+      nicknamePluralTranslations: {},
+      nicknameSingularTranslations: {},
+      documentCountInWorld: 0,
+      documentTemplateId: 'template-a',
+      groupId: null,
+      groupSortOrder: null,
+      icon: 'mdi-account',
+      id: 'placement-a',
+      rootSortOrder: 2,
+      worldAppendix: ''
+    }
+  ]
+  const treeData = ref(buildHeTreeNodesFromWorldTemplateLayoutDraft(layout, 'en-US'))
+  const initialNodeRef = treeData.value[0]
+  const propsLayout = {
+    groups: [...layout.groups].reverse(),
+    placements: [...layout.placements]
+  }
+  propsLayout.placements[0]!.templateDisplayName = 'Hero'
+  const wiring = createDialogProjectSettingsWorldTemplateLayoutTreeSyncWiring({
+    emitTemplateLayout: () => {},
+    getCurrentLanguageCode: () => 'en-US',
+    getTemplateLayout: () => propsLayout,
+    nextTick,
+    suppressTreeEmit: ref(false),
+    treeData
+  })
+  wiring.resyncTreeDataFromProps()
+  expect(treeData.value[0]).toBe(initialNodeRef)
+  expect(treeData.value[0]?.label).toBe('Creatures')
+})
+
+/**
+ * dialogProjectSettingsWorldTemplateLayoutTreeSyncWiring
  * Rebuilds tree nodes when structure keys diverge even if treeData is populated.
  */
 test('Test that tree sync wiring rebuilds when structure keys diverge', () => {

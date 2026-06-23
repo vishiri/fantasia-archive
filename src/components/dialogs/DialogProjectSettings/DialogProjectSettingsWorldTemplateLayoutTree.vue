@@ -1,38 +1,41 @@
 <template>
-  <Draggable
+  <div
     ref="treeScrollRef"
-    :key="treeLayoutSyncKey"
-    :model-value="treeData"
-    class="dialogProjectSettingsWorldTemplateLayoutTree hasScrollbar"
-    :class="treeRootClassList"
-    :each-draggable="eachDraggableHandler"
-    :each-droppable="eachDroppableHandler"
-    data-test-locator="dialogProjectSettings-worldTemplateLayoutTree"
-    :indent="DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_INDENT_PX"
-    :max-level="2"
-    :root-droppable="rootDroppableHandler"
-    :style="treeStyle"
-    virtualization
-    @after-drop="treeWiring.onTreeAfterDrop"
-    @before-drag-start="treeWiring.onBeforeDragStart"
-    @dragend="treeWiring.onTreeDragEndCleanup"
-    @update:model-value="treeWiring.onTreeDataUpdate"
+    class="dialogProjectSettingsWorldTemplateLayoutTreeHost hasScrollbar"
   >
-    <template #default="{ node }">
-      <DialogProjectSettingsWorldTemplateLayoutTreeNode
-        :blank-group-ids="props.blankGroupIds"
-        :current-language-code="props.currentLanguageCode"
-        :document-templates="props.documentTemplates"
-        :duplicate-document-template-ids="props.duplicateDocumentTemplateIds"
-        :invalid-document-template-ids="props.invalidDocumentTemplateIds"
-        :node="node"
-        @delete-group="emitDeleteGroup"
-        @remove-placement="emitRemovePlacement"
-        @rename-placement-nickname="emitRenamePlacementNickname"
-        @rename-group="emitRenameGroup"
-      />
-    </template>
-  </Draggable>
+    <Draggable
+      :model-value="treeData"
+      class="dialogProjectSettingsWorldTemplateLayoutTree hasScrollbar"
+      :class="treeRootClassList"
+      :each-draggable="eachDraggableHandler"
+      :each-droppable="eachDroppableHandler"
+      data-test-locator="dialogProjectSettings-worldTemplateLayoutTree"
+      :indent="DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_INDENT_PX"
+      :max-level="2"
+      :root-droppable="rootDroppableHandler"
+      :style="treeStyle"
+      virtualization
+      @after-drop="treeWiring.onTreeAfterDrop"
+      @before-drag-start="treeWiring.onBeforeDragStart"
+      @dragend="treeWiring.onTreeDragEndCleanup"
+      @update:model-value="treeWiring.onTreeDataUpdate"
+    >
+      <template #default="{ node }">
+        <DialogProjectSettingsWorldTemplateLayoutTreeNode
+          :blank-group-ids="props.blankGroupIds"
+          :current-language-code="props.currentLanguageCode"
+          :document-templates="props.documentTemplates"
+          :duplicate-document-template-ids="props.duplicateDocumentTemplateIds"
+          :invalid-document-template-ids="props.invalidDocumentTemplateIds"
+          :node="node"
+          @delete-group="emitDeleteGroup"
+          @remove-placement="emitRemovePlacement"
+          @rename-placement-nickname="emitRenamePlacementNickname"
+          @rename-group="emitRenameGroup"
+        />
+      </template>
+    </Draggable>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -53,12 +56,11 @@ import {
   DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_INDENT_PX,
   DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_NODE_ITEM_SELECTOR,
   countDialogProjectSettingsWorldTemplateLayoutDraftNodes,
-  mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey
+  resolveDialogProjectSettingsWorldTemplateLayoutTreeScrollContainer
 } from './scripts/functions/dialogProjectSettingsWorldTemplateLayoutTreeData'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeWiring } from './scripts/dialogProjectSettingsWorldTemplateLayoutTreeWiring'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeSyncWiring } from './scripts/dialogProjectSettingsWorldTemplateLayoutTreeSyncWiring'
 import { createDialogProjectSettingsScrollOnAppendWatch } from './scripts/dialogProjectSettingsScrollOnAppendWiring'
-import { resolveVueComponentRootElement } from 'app/src/scripts/dom/functions/resolveVueComponentRootElement'
 import {
   isDialogProjectSettingsWorldTemplateLayoutNodeDraggable,
   isDialogProjectSettingsWorldTemplateLayoutNodeDroppable,
@@ -90,7 +92,7 @@ const emit = defineEmits<{
 }>()
 
 const treeData = ref<I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode[]>([])
-const treeScrollRef = ref<unknown>(null)
+const treeScrollRef = ref<HTMLElement | null>(null)
 const suppressTreeEmit = ref(false)
 const isTreeDragActive = ref(false)
 const dragCommitPending = ref(false)
@@ -121,10 +123,6 @@ const treeWiring = createDialogProjectSettingsWorldTemplateLayoutTreeWiring({
   treeData
 })
 
-const treeLayoutSyncKey = computed(() => {
-  return mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey(props.templateLayout)
-})
-
 const treeRootClassList = computed(() => {
   return {
     'dialogProjectSettingsWorldTemplateLayoutTree--listDragging': isTreeDragActive.value
@@ -146,7 +144,7 @@ watch(() => [props.templateLayout, props.currentLanguageCode], () => {
 
 createDialogProjectSettingsScrollOnAppendWatch({
   getCount: () => countDialogProjectSettingsWorldTemplateLayoutDraftNodes(props.templateLayout),
-  getScrollContainer: () => resolveVueComponentRootElement(treeScrollRef.value),
+  getScrollContainer: () => resolveDialogProjectSettingsWorldTemplateLayoutTreeScrollContainer(treeScrollRef.value),
   itemSelector: DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_NODE_ITEM_SELECTOR,
   nextTick,
   requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),

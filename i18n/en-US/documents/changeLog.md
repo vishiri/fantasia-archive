@@ -38,6 +38,7 @@
 - **Project Management**: menu rows regrouped — **Create new project**; **Load existing project** and **Load Recent Project**; **Show Project Dashboard**; **Toggle Project Noteboard**, **Custom Project CSS**, and **Project Settings**; **Advanced Project Tools** — with separators between each group.
 - **Project Settings**: **Worlds** and **Document Templates** tab lists hide the vertical scrollbar on the tab column while the list remains scrollable; **Add world** and **Add document template** stay pinned below the scroll area.
 - **Project Settings**: **World's hierarchical tree**, **Document Templates** tab list, and **Worlds** tab list scroll to reveal the newly appended row when you add a group, place a template from **Available document templates**, add a document template, or add a world.
+- **Project Settings**: Dragging rows in **World's hierarchical tree** no longer resets scroll to the top after reorder when the list is scrolled; adding groups, templates, or worlds still scrolls the tree to show the new row.
 - **Project Settings**: **Available document templates** rows keep hover highlight; right-click no longer leaves a row highlighted after the pointer leaves.
 - **Theme**: The **negative** accent color (errors, delete controls, validation highlights) is now **#ff4040**.
 - **Tooltips**: hover tooltips across the app now open after a consistent **0.5 s** delay. The per-world nickname row tooltip in **World's hierarchical tree** follows the same delay when opened programmatically.

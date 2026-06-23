@@ -5,14 +5,11 @@ import type {
 type T_worldTemplateLayoutTreeStructureSnapshot = {
   groups: Array<{
     id: string
-    rootSortOrder: number
   }>
   placements: Array<{
     documentTemplateId: string
     groupId: string | null
-    groupSortOrder: number | null
     id: string
-    rootSortOrder: number | null
   }>
 }
 
@@ -24,6 +21,26 @@ export const DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_INDENT_PX = 31
 
 /** Selector for he-tree row wrappers inside the world template layout tree. */
 export const DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_NODE_ITEM_SELECTOR = '.tree-node'
+
+/** Root class on the he-tree Draggable scroll container. */
+export const DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_ROOT_CLASS =
+  'dialogProjectSettingsWorldTemplateLayoutTree'
+
+export function resolveDialogProjectSettingsWorldTemplateLayoutTreeScrollContainer (
+  host: HTMLElement | null | undefined
+): HTMLElement | null {
+  if (host == null) {
+    return null
+  }
+  if (host.classList.contains(DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_ROOT_CLASS)) {
+    return host
+  }
+  const tree = host.querySelector(`.${DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_TREE_ROOT_CLASS}`)
+  if (tree instanceof HTMLElement) {
+    return tree
+  }
+  return host
+}
 
 export function countDialogProjectSettingsWorldTemplateLayoutDraftNodes (
   layout: I_dialogProjectSettingsWorldTemplateLayoutDraft
@@ -40,26 +57,36 @@ export function isDialogProjectSettingsWorldTemplateLayoutPersistedId (
   return WORLD_TEMPLATE_LAYOUT_PERSISTED_ID_PATTERN.test(value.trim())
 }
 
+function compareWorldTemplateLayoutTreeStructureIds (
+  left: { id: string },
+  right: { id: string }
+): number {
+  return left.id.localeCompare(right.id)
+}
+
 function buildWorldTemplateLayoutTreeStructureSnapshot (
   layout: I_dialogProjectSettingsWorldTemplateLayoutDraft
 ): T_worldTemplateLayoutTreeStructureSnapshot {
-  return {
-    groups: layout.groups.map((group) => ({
-      id: group.id,
-      rootSortOrder: group.rootSortOrder
-    })),
-    placements: layout.placements.map((placement) => ({
+  const groups = layout.groups
+    .map((group) => ({
+      id: group.id
+    }))
+    .sort(compareWorldTemplateLayoutTreeStructureIds)
+  const placements = layout.placements
+    .map((placement) => ({
       documentTemplateId: placement.documentTemplateId,
       groupId: placement.groupId,
-      groupSortOrder: placement.groupSortOrder,
-      id: placement.id,
-      rootSortOrder: placement.rootSortOrder
+      id: placement.id
     }))
+    .sort(compareWorldTemplateLayoutTreeStructureIds)
+  return {
+    groups,
+    placements
   }
 }
 
 /**
- * Stable Draggable key and resync guard: layout shape only, not display labels.
+ * Stable Draggable key and resync guard: canonical topology (ids + group membership), not order or labels.
  */
 export function mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey (
   layout: I_dialogProjectSettingsWorldTemplateLayoutDraft
