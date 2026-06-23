@@ -136,7 +136,7 @@ No Markdown bold/italic in comments. Single quotes for inline refs. No mid-sente
 | `fantasia-quasar-vue` | Vue/Quasar structure |
 | `fantasia-two-level-architecture` | **`functions/`** + **`*_manager.ts`** |
 | `fantasia-floating-windows` | In-renderer **`Window*`** |
-| `fantasia-he-tree` | **`@he-tree/vue`** |
+| `fantasia-he-tree` | **`@he-tree/vue`**; DnD scroll playbook **`.cursor/plans/he-tree-dnd-scroll-playbook_*.plan.md`** |
 | `fantasia-drag-drop` | List/table DnD |
 | `fantasia-icon-picker` | **`FaIconPickerInput`** |
 | `fantasia-locale-translations-input` | **`FaLocaleTranslationsInput`**, per-locale strings in Project Settings |

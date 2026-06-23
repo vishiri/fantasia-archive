@@ -80,6 +80,24 @@ Related props: **`virtualization`**, **`virtualizationPrerenderCount`**.
 - Tune **`dragOverThrottleInterval`** on large trees.
 - Persist via Pinia + IPC after drop; validate in main with Zod where structured.
 
+### DnD + scroll preservation (layout tree playbook)
+
+Full postmortem: [`.cursor/plans/he-tree-dnd-scroll-playbook_v2.4.14_2026-06-24-00-00-17.plan.md`](../../plans/he-tree-dnd-scroll-playbook_v2.4.14_2026-06-24-00-00-17.plan.md). Reference: **`DialogProjectSettingsWorldTemplateLayoutTree.vue`**.
+
+**Symptom:** drop moves data OK; **`scrollTop`** jumps (often top). Or add row does not scroll into view.
+
+| Cause | Fix |
+| --- | --- |
+| **`:key` on `Draggable`** changes on reorder/remount | No `:key` for sort; **`resyncTreeDataFromProps`** updates **`treeData`** |
+| Topology key uses draft **array order** or **sort fields** | Canonical key: sorted ids + **`groupId`** only — **`mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey`** |
+| Resync rebuilds **`treeData`** when topology unchanged | Match keys → **`patchWorldTemplateLayoutDisplayLabelsInHeTreeNodes`** only |
+| **`overflow: auto`** on wrapper, not he-tree root | Scroll on **`.dialogProjectSettingsWorldTemplateLayoutTree`**; host sizing only — **`resolveDialogProjectSettingsWorldTemplateLayoutTreeScrollContainer`** |
+| Post-drop **`scrollTop` restore** | **Do not** — fights virtualization; fix remount/rebuild instead |
+
+**Pipeline:** `@before-drag-start` → v-model during drag → `@after-drop` → deferred **`emitLayoutFromTreeDataIfChanged`** → props watch **`resyncTreeDataFromProps`**. Append: separate count watch → **`scheduleScrollContainerToRevealLastItem`**.
+
+**Debug:** compare topology keys layout vs **`mapHeTreeNodesToWorldTemplateLayoutDraft(treeData)`** after drop; check resync rebuild vs patch; find real scroll element in DevTools.
+
 ## Data and architecture
 
 | Concern | Location |
@@ -111,7 +129,7 @@ Use **`walkTreeData`** for search, bulk expand, validation — not ad hoc recurs
 
 ## Project Settings — world template layout
 
-**`DialogProjectSettingsWorldTemplateLayoutTree.vue`** — **`Draggable`**, max depth 2, DnD rules in **`dialogProjectSettingsWorldTemplateLayoutDnD.ts`**, commit policy + wiring in feature **`scripts/`**. Full map: [fa-he-tree.mdc](../../rules/fa-he-tree.mdc) and [fa-drag-drop-lists.mdc](../../rules/fa-drag-drop-lists.mdc).
+**`DialogProjectSettingsWorldTemplateLayoutTree.vue`** — **`Draggable`**, max depth 2, DnD rules in **`dialogProjectSettingsWorldTemplateLayoutDnD.ts`**, commit policy + wiring in feature **`scripts/`**. DnD scroll playbook: [he-tree-dnd-scroll-playbook plan](../plans/he-tree-dnd-scroll-playbook_v2.4.14_2026-06-24-00-00-17.plan.md). Full map: [fa-he-tree.mdc](../../rules/fa-he-tree.mdc) and [fa-drag-drop-lists.mdc](../../rules/fa-drag-drop-lists.mdc).
 
 ## Tests
 

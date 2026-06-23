@@ -31,7 +31,18 @@ import '@he-tree/vue/style/default.css'
 
 - Enable **`virtualization`** when tree may hold **~50+ visible rows** or deep expand-all paths.
 - Tree or **bounded parent** needs explicit **`height`** or **`max-height`** (fixed px or flex child with constrained scroll). Virtualization fails on unbounded auto-height container.
+- **`overflow: auto`** on **Draggable root** (scroll grows with content), not passive wrapper — see DnD scroll below.
 - Combine with **lazy child loading** from SQLite on expand ([fantasia-sqlite-main](../skills/fantasia-sqlite-main/SKILL.md)).
+
+## DnD + scroll (do not remount on reorder)
+
+Playbook: [`.cursor/plans/he-tree-dnd-scroll-playbook_v2.4.14_2026-06-24-00-00-17.plan.md`](../plans/he-tree-dnd-scroll-playbook_v2.4.14_2026-06-24-00-00-17.plan.md). Reference: **`DialogProjectSettingsWorldTemplateLayoutTree`**.
+
+- **No `:key` on `Draggable`** for sort-only changes — remount resets **`scrollTop`**; use **`treeData` + resync**.
+- **Topology key** for resync: canonical sorted ids + membership — not draft array order or sort fields (**`mapDialogProjectSettingsWorldTemplateLayoutToTreeStructureKey`**).
+- Topology match → label patch in place; mismatch → rebuild **`treeData`**.
+- **No post-drop scroll restore** — fights **`virtualization`**; fix rebuild/remount instead.
+- Append scroll: separate count watch; scroll container = he-tree root (**`resolveDialogProjectSettingsWorldTemplateLayoutTreeScrollContainer`**).
 
 ## Project layout
 
