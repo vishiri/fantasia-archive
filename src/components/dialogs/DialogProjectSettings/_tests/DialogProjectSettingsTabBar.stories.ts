@@ -8,12 +8,7 @@ import DialogProjectSettingsTabBar from '../DialogProjectSettingsTabBar.vue'
 
 const meta = {
   component: DialogProjectSettingsTabBar,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogProjectSettingsTabBar'
 } satisfies Meta<typeof DialogProjectSettingsTabBar>
 

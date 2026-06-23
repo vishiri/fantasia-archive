@@ -4,12 +4,7 @@ import DialogProjectSettingsWorldsTabItem from '../DialogProjectSettingsWorldsTa
 
 const meta = {
   component: DialogProjectSettingsWorldsTabItem,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogProjectSettingsWorldsTabItem'
 } satisfies Meta<typeof DialogProjectSettingsWorldsTabItem>
 

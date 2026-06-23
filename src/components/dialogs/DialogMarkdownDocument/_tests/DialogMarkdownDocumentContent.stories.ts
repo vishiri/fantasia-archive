@@ -4,12 +4,7 @@ import DialogMarkdownDocumentContent from '../DialogMarkdownDocumentContent.vue'
 
 const meta = {
   component: DialogMarkdownDocumentContent,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogMarkdownDocumentContent'
 } satisfies Meta<typeof DialogMarkdownDocumentContent>
 

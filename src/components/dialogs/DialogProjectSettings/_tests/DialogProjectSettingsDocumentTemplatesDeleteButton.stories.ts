@@ -4,12 +4,7 @@ import DialogProjectSettingsDocumentTemplatesDeleteButton from '../DialogProject
 
 const meta = {
   component: DialogProjectSettingsDocumentTemplatesDeleteButton,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogProjectSettingsDocumentTemplatesDeleteButton'
 } satisfies Meta<typeof DialogProjectSettingsDocumentTemplatesDeleteButton>
 

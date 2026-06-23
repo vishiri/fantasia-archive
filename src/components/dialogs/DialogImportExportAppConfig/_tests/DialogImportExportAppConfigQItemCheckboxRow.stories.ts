@@ -4,12 +4,7 @@ import DialogImportExportAppConfigQItemCheckboxRow from '../DialogImportExportAp
 
 const meta = {
   component: DialogImportExportAppConfigQItemCheckboxRow,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogImportExportAppConfigQItemCheckboxRow'
 } satisfies Meta<typeof DialogImportExportAppConfigQItemCheckboxRow>
 

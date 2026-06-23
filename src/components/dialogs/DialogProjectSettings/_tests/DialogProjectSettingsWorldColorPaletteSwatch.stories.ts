@@ -4,12 +4,7 @@ import DialogProjectSettingsWorldColorPaletteSwatch from '../DialogProjectSettin
 
 const meta = {
   component: DialogProjectSettingsWorldColorPaletteSwatch,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogProjectSettingsWorldColorPaletteSwatch'
 } satisfies Meta<typeof DialogProjectSettingsWorldColorPaletteSwatch>
 

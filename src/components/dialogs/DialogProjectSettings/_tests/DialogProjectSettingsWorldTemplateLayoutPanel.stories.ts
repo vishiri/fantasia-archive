@@ -7,12 +7,7 @@ import { dialogProjectSettingsWorldDraftFixture } from './dialogProjectSettingsW
 
 const meta = {
   component: DialogProjectSettingsWorldTemplateLayoutPanel,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogProjectSettingsWorldTemplateLayoutPanel'
 } satisfies Meta<typeof DialogProjectSettingsWorldTemplateLayoutPanel>
 

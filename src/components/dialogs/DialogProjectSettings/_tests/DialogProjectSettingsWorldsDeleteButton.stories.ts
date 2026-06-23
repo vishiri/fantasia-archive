@@ -4,12 +4,7 @@ import DialogProjectSettingsWorldsDeleteButton from '../DialogProjectSettingsWor
 
 const meta = {
   component: DialogProjectSettingsWorldsDeleteButton,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogProjectSettingsWorldsDeleteButton'
 } satisfies Meta<typeof DialogProjectSettingsWorldsDeleteButton>
 

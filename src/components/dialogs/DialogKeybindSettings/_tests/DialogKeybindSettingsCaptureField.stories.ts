@@ -4,12 +4,7 @@ import DialogKeybindSettingsCaptureField from '../DialogKeybindSettingsCaptureFi
 
 const meta = {
   component: DialogKeybindSettingsCaptureField,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogKeybindSettingsCaptureField'
 } satisfies Meta<typeof DialogKeybindSettingsCaptureField>
 

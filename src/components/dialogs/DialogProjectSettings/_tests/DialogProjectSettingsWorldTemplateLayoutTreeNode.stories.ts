@@ -4,12 +4,7 @@ import DialogProjectSettingsWorldTemplateLayoutTreeNode from '../DialogProjectSe
 
 const meta = {
   component: DialogProjectSettingsWorldTemplateLayoutTreeNode,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogProjectSettingsWorldTemplateLayoutTreeNode'
 } satisfies Meta<typeof DialogProjectSettingsWorldTemplateLayoutTreeNode>
 

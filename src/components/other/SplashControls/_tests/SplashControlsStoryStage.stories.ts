@@ -24,12 +24,9 @@ const meta = {
   component: SplashControlsStoryStage,
   decorators: [splashStoryStageCanvasDecorator],
   parameters: {
-    docs: {
-      disable: true
-    },
     layout: 'fullscreen'
   },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/other/SplashControlsStoryStage'
 } satisfies Meta<typeof SplashControlsStoryStage>
 

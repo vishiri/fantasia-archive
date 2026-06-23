@@ -4,12 +4,7 @@ import DialogProjectSettingsWorldAvailableTemplatesList from '../DialogProjectSe
 
 const meta = {
   component: DialogProjectSettingsWorldAvailableTemplatesList,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogProjectSettingsWorldAvailableTemplatesList'
 } satisfies Meta<typeof DialogProjectSettingsWorldAvailableTemplatesList>
 

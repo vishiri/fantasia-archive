@@ -4,12 +4,7 @@ import FaFloatingWindowBodyTeleport from '../_FaFloatingWindowBodyTeleport.vue'
 
 const meta = {
   component: FaFloatingWindowBodyTeleport,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/floatingWindows/_FaFloatingWindowBodyTeleport'
 } satisfies Meta<typeof FaFloatingWindowBodyTeleport>
 

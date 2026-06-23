@@ -4,12 +4,7 @@ import DialogProjectSettingsDocumentTemplatesEmptyState from '../DialogProjectSe
 
 const meta = {
   component: DialogProjectSettingsDocumentTemplatesEmptyState,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogProjectSettingsDocumentTemplatesEmptyState'
 } satisfies Meta<typeof DialogProjectSettingsDocumentTemplatesEmptyState>
 

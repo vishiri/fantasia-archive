@@ -9,12 +9,7 @@ import {
 
 const meta = {
   component: DialogProjectSettingsWorldTemplateLayoutTree,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogProjectSettingsWorldTemplateLayoutTree'
 } satisfies Meta<typeof DialogProjectSettingsWorldTemplateLayoutTree>
 

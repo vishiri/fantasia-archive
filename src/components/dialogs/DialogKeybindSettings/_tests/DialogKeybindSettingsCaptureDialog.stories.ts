@@ -6,14 +6,13 @@ const meta = {
   component: DialogKeybindSettingsCaptureDialog,
   parameters: {
     docs: {
-      disable: true,
       story: {
         iframeHeight: '420px',
         inline: false
       }
     }
   },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogKeybindSettingsCaptureDialog'
 } satisfies Meta<typeof DialogKeybindSettingsCaptureDialog>
 

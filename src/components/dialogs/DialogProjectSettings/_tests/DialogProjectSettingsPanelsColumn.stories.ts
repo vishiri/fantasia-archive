@@ -7,14 +7,13 @@ const meta = {
   component: DialogProjectSettingsPanelsColumn,
   parameters: {
     docs: {
-      disable: true,
       story: {
         iframeHeight: '420px'
       }
     },
     layout: 'padded'
   },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogProjectSettingsPanelsColumn'
 } satisfies Meta<typeof DialogProjectSettingsPanelsColumn>
 

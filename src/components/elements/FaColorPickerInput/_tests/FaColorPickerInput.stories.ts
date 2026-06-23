@@ -6,11 +6,7 @@ import FaColorPickerInput from '../FaColorPickerInput.vue'
 const meta = {
   title: 'Components/elements/FaColorPickerInput',
   component: FaColorPickerInput,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
+  tags: ['autodocs'],
   args: {
     modelValue: '#b81212',
     testLocator: 'faColorPickerInput-story'

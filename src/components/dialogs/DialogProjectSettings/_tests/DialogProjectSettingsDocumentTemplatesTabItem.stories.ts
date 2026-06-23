@@ -4,12 +4,7 @@ import DialogProjectSettingsDocumentTemplatesTabItem from '../DialogProjectSetti
 
 const meta = {
   component: DialogProjectSettingsDocumentTemplatesTabItem,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogProjectSettingsDocumentTemplatesTabItem'
 } satisfies Meta<typeof DialogProjectSettingsDocumentTemplatesTabItem>
 

@@ -4,12 +4,7 @@ import FaLocaleTranslationsInput from '../FaLocaleTranslationsInput.vue'
 
 const meta = {
   component: FaLocaleTranslationsInput,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/elements/FaLocaleTranslationsInput'
 } satisfies Meta<typeof FaLocaleTranslationsInput>
 

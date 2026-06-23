@@ -5,12 +5,7 @@ import { FA_DIALOG_PROJECT_SETTINGS_DOCUMENT_TEMPLATES_TAB_LIST_WIDTH_PX } from 
 
 const meta = {
   component: DialogProjectSettingsDocumentTemplatesTabList,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogProjectSettingsDocumentTemplatesTabList'
 } satisfies Meta<typeof DialogProjectSettingsDocumentTemplatesTabList>
 

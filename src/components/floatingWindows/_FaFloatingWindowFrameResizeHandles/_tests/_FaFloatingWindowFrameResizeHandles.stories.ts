@@ -5,12 +5,9 @@ import FaFloatingWindowFrameResizeHandles from '../_FaFloatingWindowFrameResizeH
 const meta = {
   component: FaFloatingWindowFrameResizeHandles,
   parameters: {
-    docs: {
-      disable: true
-    },
     layout: 'fullscreen'
   },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/floatingWindows/_FaFloatingWindowFrameResizeHandles'
 } satisfies Meta<typeof FaFloatingWindowFrameResizeHandles>
 

@@ -26,12 +26,7 @@ const sampleHistory: I_faActionHistoryEntry[] = [
 
 const meta = {
   component: DialogActionMonitorHistoryTable,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogActionMonitorHistoryTable'
 } satisfies Meta<typeof DialogActionMonitorHistoryTable>
 

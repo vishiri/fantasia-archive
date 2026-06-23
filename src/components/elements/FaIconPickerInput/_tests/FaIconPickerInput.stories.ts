@@ -6,11 +6,7 @@ import FaIconPickerInput from '../FaIconPickerInput.vue'
 const meta = {
   title: 'Components/elements/FaIconPickerInput',
   component: FaIconPickerInput,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
+  tags: ['autodocs'],
   args: {
     modelValue: 'mdi-account',
     testLocator: 'faIconPickerInput-story'

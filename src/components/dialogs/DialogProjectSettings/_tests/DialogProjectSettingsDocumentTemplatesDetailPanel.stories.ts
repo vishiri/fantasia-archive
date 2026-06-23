@@ -4,12 +4,7 @@ import DialogProjectSettingsDocumentTemplatesDetailPanel from '../DialogProjectS
 
 const meta = {
   component: DialogProjectSettingsDocumentTemplatesDetailPanel,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogProjectSettingsDocumentTemplatesDetailPanel'
 } satisfies Meta<typeof DialogProjectSettingsDocumentTemplatesDetailPanel>
 

@@ -12,12 +12,7 @@ const meta = {
       return story()
     }
   ],
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogAppSettingsLeftColumn'
 } satisfies Meta<typeof DialogAppSettingsLeftColumn>
 

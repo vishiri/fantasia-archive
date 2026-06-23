@@ -4,12 +4,7 @@ import DialogProjectSettingsWorldsPanel from '../DialogProjectSettingsWorldsPane
 
 const meta = {
   component: DialogProjectSettingsWorldsPanel,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogProjectSettingsWorldsPanel'
 } satisfies Meta<typeof DialogProjectSettingsWorldsPanel>
 

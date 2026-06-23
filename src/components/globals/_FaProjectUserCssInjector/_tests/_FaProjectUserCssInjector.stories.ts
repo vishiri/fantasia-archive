@@ -4,12 +4,7 @@ import FaProjectUserCssInjector from '../_FaProjectUserCssInjector.vue'
 
 const meta = {
   component: FaProjectUserCssInjector,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/globals/_FaProjectUserCssInjector'
 } satisfies Meta<typeof FaProjectUserCssInjector>
 

@@ -4,12 +4,7 @@ import DialogProjectSettingsGeneralPanel from '../DialogProjectSettingsGeneralPa
 
 const meta = {
   component: DialogProjectSettingsGeneralPanel,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogProjectSettingsGeneralPanel'
 } satisfies Meta<typeof DialogProjectSettingsGeneralPanel>
 

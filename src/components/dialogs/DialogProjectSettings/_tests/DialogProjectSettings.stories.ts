@@ -5,10 +5,9 @@ import DialogProjectSettings from '../DialogProjectSettings.vue'
 const meta = {
   title: 'Components/dialogs/DialogProjectSettings',
   component: DialogProjectSettings,
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   parameters: {
     docs: {
-      disable: true,
       story: {
         inline: false,
         iframeHeight: '760px'

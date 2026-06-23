@@ -4,12 +4,7 @@ import DialogImportExportAppConfigExportStep from '../DialogImportExportAppConfi
 
 const meta = {
   component: DialogImportExportAppConfigExportStep,
-  parameters: {
-    docs: {
-      disable: true
-    }
-  },
-  tags: ['skip-visual'],
+  tags: ['autodocs', 'skip-visual'],
   title: 'Components/dialogs/DialogImportExportAppConfigExportStep'
 } satisfies Meta<typeof DialogImportExportAppConfigExportStep>
 
