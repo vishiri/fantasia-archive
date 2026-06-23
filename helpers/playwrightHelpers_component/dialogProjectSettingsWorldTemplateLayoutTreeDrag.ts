@@ -1,10 +1,10 @@
 import type { Page } from 'playwright'
 
-const HE_TREE_DEFAULT_INDENT_PX = 20
+const HE_TREE_NEST_INTO_TARGET_INDENT_PX = 31
 
 /**
  * Drags a world template layout he-tree node using Playwright HTML5 dragTo.
- * nest-into-target offsets horizontally past one indent so he-tree nests under a group.
+ * nest-into-target drops past one indent on the target inner tree node so he-tree nests under a group.
  */
 export async function dragWorldTemplateLayoutTreeNode (
   page: Page,
@@ -17,10 +17,11 @@ export async function dragWorldTemplateLayoutTreeNode (
   await source.scrollIntoViewIfNeeded()
   await target.scrollIntoViewIfNeeded()
 
+  const targetBox = await target.boundingBox()
   const targetPosition = mode === 'nest-into-target'
     ? {
-        x: HE_TREE_DEFAULT_INDENT_PX + 12,
-        y: 12
+        x: HE_TREE_NEST_INTO_TARGET_INDENT_PX + 20,
+        y: targetBox === null ? 12 : Math.max(8, Math.floor(targetBox.height / 2))
       }
     : {
         x: 12,
@@ -29,7 +30,7 @@ export async function dragWorldTemplateLayoutTreeNode (
 
   await source.dragTo(target, {
     force: true,
-    steps: 20,
+    steps: mode === 'nest-into-target' ? 30 : 20,
     sourcePosition: {
       x: 16,
       y: 12
