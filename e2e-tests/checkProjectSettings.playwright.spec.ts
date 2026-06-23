@@ -4,6 +4,15 @@ import type { ElectronApplication, Page } from 'playwright'
 import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 import {
+  assertProjectSettingsManifest,
+  E2E_PROJECT_SETTINGS_PHASE1_MANIFEST,
+  E2E_PROJECT_SETTINGS_PHASE2_MANIFEST,
+  E2E_PROJECT_SETTINGS_SELECTOR_LIST,
+  mutateProjectSettingsPhase2,
+  seedProjectSettingsPhase1
+} from 'app/helpers/playwrightHelpers_e2e/e2eDialogProjectSettingsManifest.playwright'
+import { assertSaveEnabledWithoutErrorsIcon } from 'app/helpers/playwrightHelpers_component/dialogProjectSettingsPlaywrightHelpers'
+import {
   e2eExpectFaActiveProjectStoreEmpty,
   e2eExpectFaActiveProjectStoreName
 } from 'app/helpers/playwrightHelpers_e2e/e2eExpectFaActiveProjectStore'
@@ -43,23 +52,17 @@ const extraEnvSettings = {
 const MENU_ANIMATION_MS = 600
 
 const PROJECT_SETTINGS_E2E_FAPROJECT = 'e2e-project-settings.faproject'
-const PROJECT_SETTINGS_E2E_INITIAL_NAME = 'E2E Project Settings initial'
-const PROJECT_SETTINGS_E2E_RENAMED = 'E2E Project Settings renamed'
+const PROJECT_SETTINGS_E2E_CREATE_NAME = 'E2E PS Alpha'
 
 const selectorList = {
+  ...E2E_PROJECT_SETTINGS_SELECTOR_LIST,
+  dialogActionMonitorTable: 'dialogActionMonitor-table',
   dialogCreateBtn: 'dialogNewProject-button-create',
   dialogNameInput: 'dialogNewProject-input-name',
-  dialogProjectSettingsInput: 'dialogProjectSettings-input-projectName',
-  dialogProjectSettingsSave: 'dialogProjectSettings-button-save',
-  dialogProjectSettingsTabDocumentTemplates: 'dialogProjectSettings-tab-documentTemplatesSettings',
-  dialogProjectSettingsTemplatesAddFirstButton: 'dialogProjectSettings-documentTemplates-addFirstButton',
-  dialogProjectSettingsTitle: 'dialogProjectSettings-title',
-  dialogActionMonitorTable: 'dialogActionMonitor-table',
   monitorActionCell: 'dialogActionMonitor-cell-action',
   submenuItemSubMenu: 'AppControlSingleMenu-menuItem-subMenu',
   submenuItemSubMenuItem: 'AppControlSingleMenu-menuItem-subMenu-item',
-  submenuItemSubMenuItemText: 'AppControlSingleMenu-menuItem-subMenu-item-text',
-  splashNew: 'splashPage-btn-new'
+  submenuItemSubMenuItemText: 'AppControlSingleMenu-menuItem-subMenu-item-text'
 } as const
 
 function interpolateFaProjectSessionNotify (template: string, projectName: string): string {
@@ -191,12 +194,51 @@ async function relaunchE2eAppWindowKeepingUserData (
   appWindow = launched.appWindow
 }
 
+async function resumeProjectFromSplash (page: Page, projectName: string): Promise<void> {
+  await navigateFaPlaywrightE2eToSplashRoute(page)
+  await e2eExpectFaActiveProjectStoreEmpty(page)
+  await clickFaPlaywrightE2eSplashResumePrimarySegment(page)
+  await e2eExpectFaActiveProjectStoreName(page, projectName)
+  await expect(page.getByText(interpolateFaProjectSessionNotify(
+    L_faProjectSession.notifyProjectLoaded,
+    projectName
+  ))).toBeVisible()
+  await navigateFaPlaywrightE2eToHomeRoute(page)
+}
+
+async function assertActionMonitorSaveCount (page: Page, expectedSaveCount: number): Promise<void> {
+  await expect(async () => {
+    await pressDefaultOpenActionMonitorChord(page)
+    await expect(page.locator('#dialogActionMonitor-title')).toHaveText(actionMonitorMessages.title)
+  }).toPass({ timeout: 30_000 })
+  const actionIds = await collectActionMonitorActionIds(page)
+  const saveCount = actionIds.filter((id) => id === 'saveProjectSettings').length
+  expect(saveCount).toBe(expectedSaveCount)
+  await dismissOpenMenus(page)
+}
+
+async function assertShellPersistence (
+  page: Page,
+  projectName: string
+): Promise<void> {
+  await openProjectMenu(page)
+  await openLoadRecentSubmenu(page)
+  await expectLoadRecentSubmenuFirstLabel(page, projectName)
+  await dismissOpenMenus(page)
+
+  await navigateFaPlaywrightE2eToSplashRoute(page)
+  await openFaPlaywrightE2eSplashResumeDropdown(page)
+  await expectFaPlaywrightE2eSplashResumeDropdownLabelsOrdered(page, [projectName])
+  await dismissOpenMenus(page)
+  await navigateFaPlaywrightE2eToHomeRoute(page)
+}
+
 let electronApp: ElectronApplication
 let appWindow: Page
 let suiteTestInfo: TestInfo
 
-test.describe.serial('Project settings E2E — rename via dialog', () => {
-  test.describe.configure({ timeout: 240_000 })
+test.describe.serial('Project settings E2E — full persistence journey', () => {
+  test.describe.configure({ timeout: 600_000 })
 
   test.beforeAll(async ({}, testInfo) => {
     suiteTestInfo = testInfo
@@ -229,94 +271,103 @@ test.describe.serial('Project settings E2E — rename via dialog', () => {
   })
 
   /**
-   * Creates a project, renames it through Project Settings, and asserts Pinia name, MRU submenu, and splash resume dropdown.
+   * Phase 1: seed all Project Settings inputs, save without closing, same-session smoke.
    */
-  test('Create project, rename via Project Settings, assert same-session UI sync', async () => {
+  test('Phase 1 seed, save without closing, same-session smoke', async () => {
     await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await createProjectViaMenu(
       appWindow,
       electronApp,
-      PROJECT_SETTINGS_E2E_INITIAL_NAME,
+      PROJECT_SETTINGS_E2E_CREATE_NAME,
       PROJECT_SETTINGS_E2E_FAPROJECT
     )
     assertE2eFaprojectFixtureHasContentOnDisk(PROJECT_SETTINGS_E2E_FAPROJECT)
 
     await navigateFaPlaywrightE2eToHomeRoute(appWindow)
-    await e2eExpectFaActiveProjectStoreName(appWindow, PROJECT_SETTINGS_E2E_INITIAL_NAME)
-
     await openProjectSettingsFromMenu(appWindow)
     await expect(
-      appWindow.locator(`[data-test-locator="${selectorList.dialogProjectSettingsTitle}"]`)
+      appWindow.locator(`[data-test-locator="${selectorList.title}"]`)
     ).toContainText(L_projectSettings.title)
-    const nameField = appWindow.locator(`[data-test-locator="${selectorList.dialogProjectSettingsInput}"]`)
-    await expect(nameField).toHaveValue(PROJECT_SETTINGS_E2E_INITIAL_NAME)
-    await nameField.fill(PROJECT_SETTINGS_E2E_RENAMED)
-    await appWindow.locator(`[data-test-locator="${selectorList.dialogProjectSettingsSave}"]`).click()
+
+    await seedProjectSettingsPhase1(appWindow, E2E_PROJECT_SETTINGS_PHASE1_MANIFEST)
+
+    await appWindow.locator('.dialogProjectSettings__cardActions').scrollIntoViewIfNeeded()
+    await assertSaveEnabledWithoutErrorsIcon(appWindow)
+    await appWindow.locator(`[data-test-locator="${selectorList.saveWithoutClosingButton}"]`).evaluate((element) => {
+      if (element instanceof HTMLElement) {
+        element.click()
+      }
+    })
+
+    await expect(async () => {
+      const toast = appWindow.getByText(L_faProjectSettings.saveSuccess)
+      if (await toast.isVisible()) {
+        return
+      }
+      await pressDefaultOpenActionMonitorChord(appWindow)
+      const actionIds = await collectActionMonitorActionIds(appWindow)
+      expect(actionIds).toContain('saveProjectSettings')
+      await dismissOpenMenus(appWindow)
+    }).toPass({ timeout: 60_000 })
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.title}"]`)
+    ).toHaveCount(1, { timeout: 15_000 })
+
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_SETTINGS_PHASE1_MANIFEST.projectName)
+
+    await appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`).click()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.title}"]`)
+    ).toHaveCount(0, { timeout: 15_000 })
+  })
+
+  /**
+   * Cold restart: assert Phase 1 manifest + shell, Phase 2 mutations, save with closing.
+   */
+  test('Restart, verify Phase 1, mutate Phase 2, save with closing', async ({}, testInfo) => {
+    await relaunchE2eAppWindowKeepingUserData(suiteTestInfo, testInfo, true)
+    await resumeProjectFromSplash(appWindow, E2E_PROJECT_SETTINGS_PHASE1_MANIFEST.projectName)
+
+    await openProjectSettingsFromMenu(appWindow)
+    await assertProjectSettingsManifest(appWindow, E2E_PROJECT_SETTINGS_PHASE1_MANIFEST)
+    await appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`).click()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.title}"]`)
+    ).toHaveCount(0, { timeout: 15_000 })
+    await assertShellPersistence(appWindow, E2E_PROJECT_SETTINGS_PHASE1_MANIFEST.projectName)
+
+    await openProjectSettingsFromMenu(appWindow)
+    await mutateProjectSettingsPhase2(appWindow, E2E_PROJECT_SETTINGS_PHASE2_MANIFEST)
+
+    await appWindow.locator(`[data-test-locator="${selectorList.saveButton}"]`).click()
     await expect(
       appWindow.getByText(L_faProjectSettings.saveSuccess)
     ).toBeVisible({ timeout: 15_000 })
     await expect(
-      appWindow.locator(`[data-test-locator="${selectorList.dialogProjectSettingsTitle}"]`)
+      appWindow.locator(`[data-test-locator="${selectorList.title}"]`)
     ).toHaveCount(0, { timeout: 15_000 })
 
-    await e2eExpectFaActiveProjectStoreName(appWindow, PROJECT_SETTINGS_E2E_RENAMED)
+    await e2eExpectFaActiveProjectStoreName(appWindow, E2E_PROJECT_SETTINGS_PHASE2_MANIFEST.projectName)
 
-    await pressDefaultOpenActionMonitorChord(appWindow)
-    await expect(appWindow.locator('#dialogActionMonitor-title')).toHaveText(actionMonitorMessages.title)
-    const actionIds = await collectActionMonitorActionIds(appWindow)
-    expect(actionIds).toContain('saveProjectSettings')
-    await dismissOpenMenus(appWindow)
-
-    await openProjectMenu(appWindow)
-    await openLoadRecentSubmenu(appWindow)
-    await expectLoadRecentSubmenuFirstLabel(appWindow, PROJECT_SETTINGS_E2E_RENAMED)
-    await dismissOpenMenus(appWindow)
-
-    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
-    await openFaPlaywrightE2eSplashResumeDropdown(appWindow)
-    await expectFaPlaywrightE2eSplashResumeDropdownLabelsOrdered(appWindow, [
-      PROJECT_SETTINGS_E2E_RENAMED
-    ])
-    await dismissOpenMenus(appWindow)
+    await assertActionMonitorSaveCount(appWindow, 1)
   })
 
   /**
-   * After relaunch without resetting userData, splash and menu MRU show the renamed label before load; reopening settings reads SQLite.
+   * Cold restart: assert Phase 2 manifest + shell (MRU label = final project name).
    */
-  test('Cold restart: persisted rename in SQLite and MRU; fresh DB read on reopen', async ({}, testInfo) => {
+  test('Restart and verify Phase 2 persistence', async ({}, testInfo) => {
+    test.setTimeout(240_000)
+
     await relaunchE2eAppWindowKeepingUserData(suiteTestInfo, testInfo, true)
-    await navigateFaPlaywrightE2eToSplashRoute(appWindow)
-    await e2eExpectFaActiveProjectStoreEmpty(appWindow)
-
-    await openFaPlaywrightE2eSplashResumeDropdown(appWindow)
-    await expectFaPlaywrightE2eSplashResumeDropdownLabelsOrdered(appWindow, [
-      PROJECT_SETTINGS_E2E_RENAMED
-    ])
-    await dismissOpenMenus(appWindow)
-
-    await openProjectMenu(appWindow)
-    await openLoadRecentSubmenu(appWindow)
-    await expectLoadRecentSubmenuFirstLabel(appWindow, PROJECT_SETTINGS_E2E_RENAMED)
-    await dismissOpenMenus(appWindow)
-
-    await clickFaPlaywrightE2eSplashResumePrimarySegment(appWindow)
-    await e2eExpectFaActiveProjectStoreName(appWindow, PROJECT_SETTINGS_E2E_RENAMED)
-    await expect(appWindow.getByText(interpolateFaProjectSessionNotify(
-      L_faProjectSession.notifyProjectLoaded,
-      PROJECT_SETTINGS_E2E_RENAMED
-    ))).toBeVisible()
-
-    await navigateFaPlaywrightE2eToHomeRoute(appWindow)
-    await e2eExpectFaActiveProjectStoreName(appWindow, PROJECT_SETTINGS_E2E_RENAMED)
+    await resumeProjectFromSplash(appWindow, E2E_PROJECT_SETTINGS_PHASE2_MANIFEST.projectName)
 
     await openProjectSettingsFromMenu(appWindow)
+    await assertProjectSettingsManifest(appWindow, E2E_PROJECT_SETTINGS_PHASE2_MANIFEST)
+    await appWindow.locator(`[data-test-locator="${selectorList.closeButton}"]`).click()
     await expect(
-      appWindow.locator(`[data-test-locator="${selectorList.dialogProjectSettingsInput}"]`)
-    ).toHaveValue(PROJECT_SETTINGS_E2E_RENAMED)
-    await appWindow.locator(`[data-test-locator="${selectorList.dialogProjectSettingsTabDocumentTemplates}"]`).click()
-    await expect(
-      appWindow.locator(`[data-test-locator="${selectorList.dialogProjectSettingsTemplatesAddFirstButton}"]`)
-    ).toContainText(L_projectSettings.panels.documentTemplates.addFirstTemplateButton)
+      appWindow.locator(`[data-test-locator="${selectorList.title}"]`)
+    ).toHaveCount(0, { timeout: 15_000 })
+    await assertShellPersistence(appWindow, E2E_PROJECT_SETTINGS_PHASE2_MANIFEST.projectName)
     await dismissOpenMenus(appWindow)
   })
 })
