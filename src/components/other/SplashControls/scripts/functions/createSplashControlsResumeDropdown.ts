@@ -18,6 +18,9 @@ type T_createSplashControlsResumeDropdownDeps = {
     instance: { $el?: unknown } | null,
     tooltipText: string
   ) => HTMLElement | null
+  resolveSplashResumeDropdownPrimaryElement: (
+    instance: { $el?: unknown } | null
+  ) => HTMLElement | null
   runFaAction: (
     id: 'loadExistingProject',
     payload: { filePath: string } | { filePath: string; resumeActiveSession: boolean }
@@ -43,12 +46,19 @@ function syncSplashControlsResumeDropdownArrowTarget (
     resumeDropdownRef
   } = params
 
-  if (hasRecentProjects.value !== true || hideRecentProjectTooltip.value === true) {
+  if (hasRecentProjects.value !== true) {
     resumeDropdownArrowEl.value = null
     return
   }
 
   void deps.nextTick(() => {
+    deps.resolveSplashResumeDropdownPrimaryElement(resumeDropdownRef.value)
+
+    if (hideRecentProjectTooltip.value === true) {
+      resumeDropdownArrowEl.value = null
+      return
+    }
+
     const tooltipText = deps.i18n.global.t('splashPage.browseLatestProjects')
     resumeDropdownArrowEl.value = deps.resolveSplashResumeDropdownArrowElement(
       resumeDropdownRef.value,
@@ -143,6 +153,14 @@ function useSplashControlsResumeDropdown (deps: T_createSplashControlsResumeDrop
   }, { flush: 'post' })
 
   deps.watch(() => hideRecentProjectTooltip.value, () => {
+    syncResumeDropdownArrowTarget()
+  }, { flush: 'post' })
+
+  deps.watch(() => activeProject.value, () => {
+    syncResumeDropdownArrowTarget()
+  }, { flush: 'post' })
+
+  deps.watch(() => recentProjectEntries.value.length, () => {
     syncResumeDropdownArrowTarget()
   }, { flush: 'post' })
 

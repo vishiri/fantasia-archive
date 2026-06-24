@@ -19,6 +19,9 @@ import {
   resolveSplashResumeDropdownArrowElement as resolveSplashResumeDropdownArrowElementFn
 } from './functions/resolveSplashResumeDropdownArrowElement'
 import {
+  resolveSplashResumeDropdownPrimaryElement as resolveSplashResumeDropdownPrimaryElementFn
+} from './functions/resolveSplashResumeDropdownPrimaryElement'
+import {
   splashRecentProjectRowTestLocator as splashRecentProjectRowTestLocatorFn
 } from './functions/splashRecentProjectRowTestLocator'
 
@@ -34,6 +37,7 @@ const splashControlsResumeDropdownApi = createSplashControlsResumeDropdown({
   openWelcomeScreenAutoLoadProject,
   ref,
   resolveSplashResumeDropdownArrowElement: resolveSplashResumeDropdownArrowElementFn,
+  resolveSplashResumeDropdownPrimaryElement: resolveSplashResumeDropdownPrimaryElementFn,
   runFaAction,
   splashRecentProjectRowTestLocator: splashRecentProjectRowTestLocatorFn,
   storeToRefs,

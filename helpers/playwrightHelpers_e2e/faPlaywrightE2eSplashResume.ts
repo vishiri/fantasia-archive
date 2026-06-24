@@ -6,6 +6,9 @@ import { waitForFaPlaywrightE2eAppShellPageTransitionIdle } from 'app/helpers/pl
 /** data-test-locator on the splash Resume split button root. */
 export const FA_PLAYWRIGHT_E2E_SPLASH_RESUME_DROPDOWN_LOCATOR = 'splashPage-btn-resume-latest'
 
+/** data-test-locator on the splash Resume split primary segment (set at runtime). */
+export const FA_PLAYWRIGHT_E2E_SPLASH_RESUME_PRIMARY_LOCATOR = 'splashPage-btn-resume-latest-primary'
+
 /** Quasar menu open slack for the resume split caret (matches AppControlMenus specs). */
 export const FA_PLAYWRIGHT_E2E_SPLASH_RESUME_MENU_ANIMATION_MS = 600
 
@@ -17,7 +20,7 @@ export async function expectFaPlaywrightE2eSplashResumePrimaryLabel (
   expectedLabel: string
 ): Promise<void> {
   const primary = page.locator(
-    `[data-test-locator="${FA_PLAYWRIGHT_E2E_SPLASH_RESUME_DROPDOWN_LOCATOR}"] .q-btn-dropdown--current`
+    `[data-test-locator="${FA_PLAYWRIGHT_E2E_SPLASH_RESUME_PRIMARY_LOCATOR}"]`
   )
   await expect(primary).toBeVisible()
   await expect(primary).toHaveText(expectedLabel)
@@ -29,7 +32,7 @@ export async function expectFaPlaywrightE2eSplashResumePrimaryLabel (
 export async function clickFaPlaywrightE2eSplashResumePrimarySegment (page: Page): Promise<void> {
   await waitForFaPlaywrightE2eAppShellPageTransitionIdle(page)
   await page.locator(
-    `[data-test-locator="${FA_PLAYWRIGHT_E2E_SPLASH_RESUME_DROPDOWN_LOCATOR}"] .q-btn-dropdown--current`
+    `[data-test-locator="${FA_PLAYWRIGHT_E2E_SPLASH_RESUME_PRIMARY_LOCATOR}"]`
   ).click()
   await waitForFaPlaywrightE2eAppShellPageTransitionIdle(page)
 }

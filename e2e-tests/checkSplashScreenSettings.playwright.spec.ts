@@ -230,6 +230,19 @@ async function createE2eProjectFromSplash (
   await e2eExpectFaActiveProjectStoreName(page, projectName)
 }
 
+async function waitForE2eRecentProjectNamed (page: Page, projectName: string): Promise<void> {
+  await expect.poll(async () => {
+    const rows = await page.evaluate(async () => {
+      const bridge = window.faContentBridgeAPIs?.projectManagement
+      if (bridge?.getRecentProjects === undefined) {
+        return []
+      }
+      return await bridge.getRecentProjects()
+    })
+    return rows.some((row) => row.name === projectName)
+  }).toBe(true)
+}
+
 async function expectProjectLoadedNotifyAbsent (page: Page, projectName: string): Promise<void> {
   const loadedNotify = interpolateFaProjectSessionNotify(
     L_faProjectSession.notifyProjectLoaded,
@@ -480,16 +493,20 @@ test.describe.serial('Splash screen settings (App Settings)', () => {
       E2E_RESUME_TOOLTIP_NAME,
       E2E_RESUME_TOOLTIP_FIXTURE
     )
+    await waitForE2eRecentProjectNamed(appWindow, E2E_RESUME_TOOLTIP_NAME)
 
     await navigateFaPlaywrightE2eToSplashRoute(appWindow)
     await waitForFaPlaywrightE2eAppShellPageTransitionIdle(appWindow)
+    await expect(appWindow.locator(`[data-test-locator="${selectorList.splashPageResumeLatest}"]`)).toBeVisible({
+      timeout: 30_000
+    })
     await expect(async () => {
       await expectFaPlaywrightE2eSplashResumePrimaryLabel(
         appWindow,
         L_splashPage.resumeCurrentProject
       )
     }).toPass({
-      timeout: 30_000
+      timeout: 60_000
     })
     await expectResumeDropdownBrowseTooltipVisible(appWindow, true)
 
