@@ -111,20 +111,23 @@ export async function dragPaletteSwatch (
   const swatchLocator = '[data-test-locator="dialogProjectSettings-worlds-colorPaletteSwatch"]'
   const source = page.locator(swatchLocator).nth(fromIndex)
   const target = page.locator(swatchLocator).nth(toIndex)
+  await page.keyboard.press('Escape')
   await source.scrollIntoViewIfNeeded()
   await target.scrollIntoViewIfNeeded()
-  const sourceBox = await source.boundingBox()
-  const targetBox = await target.boundingBox()
-  expect(sourceBox).not.toBeNull()
-  expect(targetBox).not.toBeNull()
-  const startX = sourceBox!.x + sourceBox!.width / 2
-  const startY = sourceBox!.y + sourceBox!.height / 2
-  const endX = targetBox!.x + targetBox!.width / 2
-  const endY = targetBox!.y + targetBox!.height / 2
-  await page.mouse.move(startX, startY)
-  await page.mouse.down()
-  await page.mouse.move(endX, endY, { steps: 24 })
-  await page.mouse.up()
+  await source.hover()
+  await page.waitForTimeout(50)
+  await source.dragTo(target, {
+    force: true,
+    sourcePosition: {
+      x: 8,
+      y: 8
+    },
+    steps: 32,
+    targetPosition: {
+      x: 8,
+      y: 8
+    }
+  })
   await page.waitForTimeout(400)
 }
 

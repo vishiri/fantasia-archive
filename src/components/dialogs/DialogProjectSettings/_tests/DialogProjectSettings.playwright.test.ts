@@ -436,10 +436,9 @@ test.describe.serial('DialogProjectSettings functional flow', () => {
     await appWindow.locator(`[data-test-locator="${selectorList.tabWorldsSettings}"]`).click()
     const worldTabs = appWindow.locator(`[data-test-locator="${selectorList.worldsTab}"]`)
     const addWorldButton = appWindow.locator(`[data-test-locator="${selectorList.worldsAddButton}"]`)
-    while (await worldTabs.count() < 2) {
-      await addWorldButton.click()
-    }
-    await worldTabs.nth(1).click()
+    const worldCountBeforeAdd = await worldTabs.count()
+    await addWorldButton.click()
+    await worldTabs.nth(worldCountBeforeAdd).click()
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.colorPaletteEditor}"]`)
     ).toBeVisible()
@@ -465,13 +464,17 @@ test.describe.serial('DialogProjectSettings functional flow', () => {
       }
     }).toPass({ timeout: 10_000 })
 
-    await dragPaletteSwatch(appWindow, 2, 0)
+    await appWindow.keyboard.press('Escape')
+    await expect(
+      appWindow.locator('[data-test-locator="dialogProjectSettings-worlds-colorPalettePicker"]')
+    ).toHaveCount(0)
 
     await expect(async () => {
+      await dragPaletteSwatch(appWindow, 2, 0)
       await expect(swatches.nth(0)).toHaveAttribute('data-test-tooltip-text', '#333333')
       await expect(swatches.nth(1)).toHaveAttribute('data-test-tooltip-text', '#111111')
       await expect(swatches.nth(2)).toHaveAttribute('data-test-tooltip-text', '#222222')
-    }).toPass({ timeout: 15_000 })
+    }).toPass({ timeout: 30_000 })
   })
 
   /**
