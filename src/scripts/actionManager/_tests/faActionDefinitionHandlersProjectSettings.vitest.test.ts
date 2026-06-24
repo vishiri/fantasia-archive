@@ -136,6 +136,40 @@ test('Test that handleSaveProjectSettings persists document templates snapshot w
 
 /**
  * handleSaveProjectSettings
+ * Persists document templates before worlds when both snapshots are provided.
+ */
+test('Test that handleSaveProjectSettings persists document templates before worlds snapshot', async () => {
+  const { handleSaveProjectSettings } = await import('../faActionDefinitionHandlers_manager')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const documentTemplates = [
+    {
+      id: '550e8400-e29b-41d4-a716-446655440000',
+      titlePluralTranslations: { 'en-US': 'Character' },
+      titleSingularTranslations: {},
+    }
+  ]
+  const worlds = [
+    {
+      displayNameTranslations: { 'en-US': 'Realm' },
+      id: '550e8400-e29b-41d4-a716-446655440001'
+    }
+  ]
+  await handleSaveProjectSettings({
+    documentTemplates,
+    settings: { projectName: 'Renamed' },
+    worlds
+  })
+  expect(persistDocumentTemplatesSnapshotMock.mock.invocationCallOrder[0]).toBeLessThan(
+    persistWorldsSnapshotMock.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY
+  )
+})
+
+/**
+ * handleSaveProjectSettings
  * Emits a success notify after all persistence steps complete.
  */
 test('Test that handleSaveProjectSettings emits success notify after persistence', async () => {

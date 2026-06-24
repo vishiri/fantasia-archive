@@ -107,11 +107,11 @@ async function handleSaveProjectSettings (
     throw new Error(deps.i18n.global.t('globalFunctionality.faProjectSettings.saveError'))
   }
   await deps.S_FaProjectSettings().updateProjectSettings(payload.settings)
-  if (payload.worlds !== undefined) {
-    await deps.faProjectWorldsPersistSnapshotFromDialog(payload.worlds)
-  }
   if (payload.documentTemplates !== undefined) {
     await deps.faProjectDocumentTemplatesPersistSnapshotFromDialog(payload.documentTemplates)
+  }
+  if (payload.worlds !== undefined) {
+    await deps.faProjectWorldsPersistSnapshotFromDialog(payload.worlds)
   }
   deps.notifyCreate({
     group: false,
