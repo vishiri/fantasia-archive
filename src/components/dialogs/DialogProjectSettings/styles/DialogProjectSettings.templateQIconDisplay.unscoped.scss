@@ -1,6 +1,10 @@
+@use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
+
 .dialogProjectSettingsDocumentTemplatesTabItem__tabIcon,
 .dialogProjectSettingsWorldAvailableTemplatesList__icon,
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__icon {
+  @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
+
   align-items: center;
   display: inline-flex;
   flex: 0 0 auto;
@@ -9,13 +13,4 @@
   justify-content: center;
   margin-right: $faQIconDisplay-iconMarginRight;
   width: $faQIconDisplay-iconFontSize;
-
-  &.fa-solid::before {
-    font-size: $faQIconDisplay-faSolidBefore-fontSize;
-    margin-top: $faQIconDisplay-faSolidBefore-marginTop;
-  }
-}
-
-.dialogProjectSettingsWorldTemplateLayoutTreeNode__icon {
-  overflow: visible;
 }

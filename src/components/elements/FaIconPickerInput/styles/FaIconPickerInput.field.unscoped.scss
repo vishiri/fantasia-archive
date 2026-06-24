@@ -1,5 +1,18 @@
+@use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
+
 .faIconPickerInput__field {
   flex: 0 0 auto;
   max-width: $faIconPickerInput-field-width;
   width: $faIconPickerInput-field-width;
+}
+
+.faIconPickerInput__trigger.q-btn .q-icon {
+  @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
+
+  flex: 0 0 auto;
+  font-size: $faQIconDisplay-iconFontSize;
+  height: $faQIconDisplay-iconFontSize;
+  max-height: $faQIconDisplay-iconFontSize;
+  max-width: $faQIconDisplay-iconFontSize;
+  width: $faQIconDisplay-iconFontSize;
 }

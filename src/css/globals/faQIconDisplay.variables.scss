@@ -1,6 +1,13 @@
-/* GLOBALS - Q-ICON DISPLAY (MDI / Font Awesome solid in lists and pickers) */
-$faQIconDisplay-iconFontSize: 21px;
+/* GLOBALS - Q-ICON DISPLAY (MDI / Font Awesome font icons in lists and pickers) */
+$faQIconDisplay-iconFontSize: 26px;
 $faQIconDisplay-iconMarginRight: 12px;
-$faQIconDisplay-iconLeadingWidth: calc(#{$faQIconDisplay-iconFontSize} + #{$faQIconDisplay-iconMarginRight});
-$faQIconDisplay-faSolidBefore-fontSize: 16px;
+$faQIconDisplay-iconLeadingExtraOffset: 5px;
+$faQIconDisplay-iconLeadingWidth: calc(
+  #{$faQIconDisplay-iconFontSize} + #{$faQIconDisplay-iconMarginRight} + #{$faQIconDisplay-iconLeadingExtraOffset}
+);
+$faQIconDisplay-faFontGlyph-fontSize: 22px;
+$faQIconDisplay-faSolidBefore-fontSize: $faQIconDisplay-faFontGlyph-fontSize;
 $faQIconDisplay-faSolidBefore-marginTop: 2px;
+$faQIconDisplay-faBrandsGlyph-fitScale: 0.83;
+$faQIconDisplay-faSolidGlyph-fitScale: 0.86;
+$faQIconDisplay-faWideSolidGlyph-fitScale: 0.64;

@@ -195,7 +195,7 @@ function onItemContextMenu (event: MouseEvent): void {
 
 .dialogProjectSettingsWorldAvailableTemplatesList__affixIndent {
   flex: 0 0 auto;
-  width: $faQIconDisplay-iconLeadingWidth;
+  width: $dialogProjectSettings-worldTemplateLayout-availableTemplatesAffixIndent-width;
 }
 
 .dialogProjectSettingsWorldAvailableTemplatesList__affixRow {

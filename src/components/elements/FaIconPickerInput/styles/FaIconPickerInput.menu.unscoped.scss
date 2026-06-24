@@ -1,3 +1,5 @@
+@use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
+
 .faIconPickerInput__pickerMenu.q-menu {
   z-index: $faIconPickerInput-menu-zIndex;
 }
@@ -40,12 +42,14 @@
   width: $faIconPickerInput-iconCell-size;
 
   .q-icon {
-    font-size: $faQIconDisplay-iconFontSize;
-  }
+    @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
 
-  .fa-solid::before {
-    font-size: $faQIconDisplay-faSolidBefore-fontSize;
-    margin-top: $faQIconDisplay-faSolidBefore-marginTop;
+    flex: 0 0 auto;
+    font-size: $faQIconDisplay-iconFontSize;
+    height: $faQIconDisplay-iconFontSize;
+    max-height: $faQIconDisplay-iconFontSize;
+    max-width: $faQIconDisplay-iconFontSize;
+    width: $faQIconDisplay-iconFontSize;
   }
 }
 

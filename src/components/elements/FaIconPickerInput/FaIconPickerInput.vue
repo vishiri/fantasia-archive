@@ -144,14 +144,5 @@ function onMenuShown (): void {
   min-height: $faIconPickerInput-trigger-size;
   min-width: $faIconPickerInput-trigger-size;
   width: $faIconPickerInput-trigger-size;
-
-  :deep(.q-icon) {
-    font-size: $faQIconDisplay-iconFontSize;
-  }
-
-  :deep(.fa-solid::before) {
-    font-size: $faQIconDisplay-faSolidBefore-fontSize;
-    margin-top: $faQIconDisplay-faSolidBefore-marginTop;
-  }
 }
 </style>

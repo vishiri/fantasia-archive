@@ -1,0 +1,30 @@
+@use 'faQIconDisplay.variables.scss' as *;
+
+// Sizes Font Awesome ::before glyphs inside fixed q-icon boxes (MDI keeps parent font-size).
+@mixin fa-q-icon-display-constrain-glyph-in-box {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  line-height: 0;
+  text-align: center;
+
+  &.fa-brands::before,
+  &.fa-regular::before,
+  &.fa-solid::before {
+    display: block;
+    font-size: var(--fa-q-icon-display-glyph-font-size, #{$faQIconDisplay-faFontGlyph-fontSize});
+    line-height: 1;
+    margin-top: $faQIconDisplay-faSolidBefore-marginTop;
+    transform: scale(var(--fa-q-icon-display-glyph-fit-scale, #{$faQIconDisplay-faSolidGlyph-fitScale}));
+    transform-origin: center center;
+  }
+
+  &.fa-brands::before {
+    --fa-q-icon-display-glyph-fit-scale: #{$faQIconDisplay-faBrandsGlyph-fitScale};
+  }
+
+  // Wide solid glyphs (e.g. fa-dragon) draw larger than letter icons at the same em size.
+  &.fa-solid.fa-dragon {
+    --fa-q-icon-display-glyph-fit-scale: #{$faQIconDisplay-faWideSolidGlyph-fitScale};
+  }
+}
