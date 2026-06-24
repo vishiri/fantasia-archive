@@ -1,11 +1,13 @@
+@use './variables' as *;
+
 .faMultilineTooltipBody__bullet {
   display: block;
 }
 
 .faMultilineTooltipBody__intro + .faMultilineTooltipBody__bullet {
-  margin-top: 4px;
+  margin-top: $faMultilineTooltipBody-bullet-marginTop;
 }
 
 .faMultilineTooltipBody__bullet + .faMultilineTooltipBody__bullet {
-  margin-top: 4px;
+  margin-top: $faMultilineTooltipBody-bullet-marginTop;
 }

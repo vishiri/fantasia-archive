@@ -124,19 +124,19 @@
   align-items: flex-start;
   display: flex;
   flex-wrap: nowrap;
-  gap: 8px;
+  gap: $faLocaleTranslationsInput-singularPlural-row-gap;
 }
 
 .faLocaleTranslationsInput__columnHeaders {
   flex-shrink: 0;
-  gap: 8px;
-  margin-bottom: 8px;
-  padding: 0 4px;
+  gap: $faLocaleTranslationsInput-columnHeaders-gap;
+  margin-bottom: $faLocaleTranslationsInput-columnHeaders-marginBottom;
+  padding: 0 $faLocaleTranslationsInput-columnHeaders-paddingX;
 }
 
 .faLocaleTranslationsInput__formHeader {
   color: rgba(255, 255, 255, 0.7);
-  font-size: 11px;
+  font-size: $faLocaleTranslationsInput-formHeader-fontSize;
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: uppercase;
