@@ -139,10 +139,12 @@ async function openDocumentTemplatesCategory (
   page: Page,
   expectedTabCount: number
 ): Promise<void> {
-  await page.locator(`[data-test-locator="${selectorList.tabDocumentTemplatesSettings}"]`).click()
-  await expect(
-    page.locator('[data-test-locator="dialogProjectSettings-documentTemplates-list"]')
-  ).toBeVisible({ timeout: 30_000 })
+  const categoryTab = page.locator(`[data-test-locator="${selectorList.tabDocumentTemplatesSettings}"]`)
+  const list = page.locator('[data-test-locator="dialogProjectSettings-documentTemplates-list"]')
+  await expect(async () => {
+    await categoryTab.click()
+    await expect(list).toBeVisible({ timeout: 2000 })
+  }).toPass({ timeout: 30_000 })
   const filterClear = page.locator(`[data-test-locator="${selectorList.documentTemplatesFilterClear}"]`)
   if (await filterClear.isVisible()) {
     await clearVerticalTabFilter(page, selectorList.documentTemplatesFilterClear)
