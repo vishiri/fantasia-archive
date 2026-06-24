@@ -248,17 +248,17 @@ test('Test that registerFaDevToolsIpc closeAsync returns false without a window'
 
 /**
  * registerFaDevToolsIpc
- * Packaged builds reject DevTools IPC before touching webContents.
+ * Packaged builds still toggle DevTools over IPC.
  */
-test('Test that registerFaDevToolsIpc handlers return false when the app is packaged', async () => {
+test('Test that registerFaDevToolsIpc toggleAsync opens DevTools when the app is packaged', async () => {
   appPackagedState.isPackaged = true
+  mocks.isDevToolsOpenedMock.mockReturnValueOnce(false).mockReturnValueOnce(true)
   const { registerFaDevToolsIpc } = await import('../registerFaDevToolsIpc')
   registerFaDevToolsIpc()
 
-  expect(handlerFor(FA_DEVTOOLS_IPC.statusAsync)({ sender: fakeSender })).toBe(false)
-  await expect(handlerFor(FA_DEVTOOLS_IPC.toggleAsync)({ sender: fakeSender })).resolves.toBe(false)
-  await expect(handlerFor(FA_DEVTOOLS_IPC.openAsync)({ sender: fakeSender })).resolves.toBe(false)
-  expect(handlerFor(FA_DEVTOOLS_IPC.closeAsync)({ sender: fakeSender })).toBe(false)
-  expect(mocks.openDevToolsMock).not.toHaveBeenCalled()
-  expect(mocks.closeDevToolsMock).not.toHaveBeenCalled()
+  const result = await handlerFor(FA_DEVTOOLS_IPC.toggleAsync)({ sender: fakeSender })
+
+  expect(mocks.openDevToolsMock).toHaveBeenCalledTimes(1)
+  expect(revealElectronDevToolsConsoleBestEffortMock).toHaveBeenCalledWith(mocks.webContents)
+  expect(result).toBe(true)
 })
