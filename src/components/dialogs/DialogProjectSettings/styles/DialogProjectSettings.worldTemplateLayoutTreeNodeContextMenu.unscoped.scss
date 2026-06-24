@@ -22,33 +22,6 @@
   width: 100%;
 }
 
-.dialogProjectSettingsWorldTemplateLayoutTreeNode__canonicalNameField {
-  position: relative;
-  width: 100%;
-}
-
-.dialogProjectSettingsWorldTemplateLayoutTreeNode__canonicalNameField .dialogProjectSettingsWorldTemplateLayoutTreeNode__canonicalNameInput .q-field__control {
-  padding-right: $dialogProjectSettings-worldTemplateLayout-treeNode-canonicalNameControl-paddingRight;
-}
-
-.dialogProjectSettingsWorldTemplateLayoutTreeNode__canonicalNameFieldHelp {
-  align-items: center;
-  bottom: 0;
-  display: flex;
-  justify-content: flex-end;
-  opacity: 0.7;
-  padding-right: $dialogProjectSettings-worldTemplateLayout-treeNode-canonicalNameHelp-paddingRight;
-  pointer-events: none;
-  position: absolute;
-  right: 0;
-  top: 0;
-  z-index: 1;
-
-  .dialogProjectSettingsWorldTemplateLayoutTreeNode__inputHelpIcon {
-    pointer-events: auto;
-  }
-}
-
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__renameMenuBody {
   background-color: $dialogProjectSettings-worldColorPalette-contextMenu-backgroundColor;
   box-sizing: border-box;
@@ -64,11 +37,5 @@
     align-self: stretch;
     display: flex;
     padding-right: 0;
-  }
-
-  .dialogProjectSettingsWorldTemplateLayoutTreeNode__inputHelpIcon {
-    cursor: default;
-    display: flex;
-    margin-top: 0;
   }
 }

@@ -5,10 +5,8 @@ import { createPinia, setActivePinia } from 'pinia'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 
-import {
-  FA_ACTION_PAYLOAD_PREVIEW_MAX_LENGTH,
-  resolveFaActionPayloadPreviewMaxLength
-} from '../faActionPayloadPreviewMaxLengthWiring'
+import { FA_ACTION_PAYLOAD_PREVIEW_MAX_LENGTH } from '../functions/faActionPayloadPreviewLimits'
+import { resolveFaActionPayloadPreviewMaxLength } from '../faActionPayloadPreviewMaxLengthWiring'
 
 beforeEach(() => {
   setActivePinia(createPinia())

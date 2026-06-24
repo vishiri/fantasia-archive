@@ -2,7 +2,7 @@ import ElectronStore from 'electron-store'
 
 import { buildSanitizedFaUserSettings } from './functions/faUserSettingsStoreCleanup'
 import { createFaUserSettingsStoreApi } from './functions/faUserSettingsStoreApi'
-import { createLazySingleton } from './functions/lazySingleton'
+import { createLazySingleton } from 'app/src-electron/shared/createLazySingleton'
 import { FA_USER_SETTINGS_DEFAULTS } from './faUserSettingsDefaults'
 
 const faUserSettingsStoreApi = createFaUserSettingsStoreApi({

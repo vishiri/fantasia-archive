@@ -4,7 +4,7 @@ import { FA_KEYBIND_COMMAND_IDS } from 'app/types/I_faKeybindsDomain'
 import { createIsFaKeybindCommandId } from './functions/faKeybindCommandIdGuard'
 import { buildCleanFaKeybindsRoot } from './functions/faKeybindsStoreCleanup'
 import { createFaKeybindsStoreApi } from './functions/faKeybindsStoreApi'
-import { createLazySingleton } from './functions/lazySingleton'
+import { createLazySingleton } from 'app/src-electron/shared/createLazySingleton'
 import { FA_KEYBINDS_STORE_DEFAULTS } from './keybinds_managerDefaults'
 
 const isFaKeybindCommandId = createIsFaKeybindCommandId(FA_KEYBIND_COMMAND_IDS)

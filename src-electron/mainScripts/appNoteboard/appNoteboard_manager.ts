@@ -6,7 +6,7 @@ import {
 
 import { buildCleanFaAppNoteboardRoot } from './functions/faAppNoteboardStoreCleanup'
 import { createFaAppNoteboardStoreApi } from './functions/faAppNoteboardStoreApi'
-import { createLazySingleton } from './functions/lazySingleton'
+import { createLazySingleton } from 'app/src-electron/shared/createLazySingleton'
 import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from './appNoteboard_managerDefaults'
 
 const faAppNoteboardStoreApi = createFaAppNoteboardStoreApi({

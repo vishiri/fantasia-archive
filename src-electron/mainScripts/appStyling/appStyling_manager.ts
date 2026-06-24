@@ -6,7 +6,7 @@ import {
 
 import { buildCleanFaAppStylingRoot } from './functions/faAppStylingStoreCleanup'
 import { createFaAppStylingStoreApi } from './functions/faAppStylingStoreApi'
-import { createLazySingleton } from './functions/lazySingleton'
+import { createLazySingleton } from 'app/src-electron/shared/createLazySingleton'
 import { FA_APP_STYLING_STORE_DEFAULTS } from './appStyling_managerDefaults'
 
 const faAppStylingStoreApi = createFaAppStylingStoreApi({

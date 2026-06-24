@@ -2,8 +2,6 @@ import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 
 import { FA_ACTION_PAYLOAD_PREVIEW_MAX_LENGTH } from './functions/faActionPayloadPreviewLimits'
 
-export { FA_ACTION_PAYLOAD_PREVIEW_MAX_LENGTH } from './functions/faActionPayloadPreviewLimits'
-
 /**
  * Action Monitor history preview cap unless Fantasia Archive Settings enables full payload logging.
  */

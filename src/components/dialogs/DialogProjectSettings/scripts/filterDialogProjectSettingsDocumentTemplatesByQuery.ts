@@ -27,7 +27,3 @@ export function filterDialogProjectSettingsDocumentTemplatesByQuery (
     return resolvedTitle.includes(needle) || worldAppendix.includes(needle)
   })
 }
-
-/** @deprecated Use filterDialogProjectSettingsDocumentTemplatesByQuery */
-export const filterDialogProjectSettingsWorldAvailableTemplatesByQuery =
-  filterDialogProjectSettingsDocumentTemplatesByQuery
