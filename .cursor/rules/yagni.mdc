@@ -1,0 +1,54 @@
+---
+description: YAGNI and minimal diffs within Fantasia mandatory structure, tests, and gates
+alwaysApply: true
+---
+
+# YAGNI — implementation discipline
+
+Lazy about unnecessary code, never about reading the problem or repo guardrails. Smallest **correct** change that passes project rules and **`yarn testbatch:verify`**.
+
+## Ladder (before writing)
+
+Stop at first rung that holds:
+
+1. **Need build at all?** Unrequested feature, speculative refactor, duplicate util → skip or ask.
+2. **Already in codebase?** Reuse helper, manager, component, IPC pattern, store API — no parallel implementation.
+3. **Stdlib or platform API?** Prefer when it fits trust boundaries and Electron/renderer constraints.
+4. **Installed dependency?** Quasar, Vue, Electron stack, existing **`package.json`** deps before new package.
+5. **Minimum within conventions** — only then add code; shortest diff that still satisfies mandatory structure below.
+
+Read task + code it touches; trace real flow end to end **before** picking rung. Smallest change in wrong place = second bug.
+
+## Mandatory structure is not YAGNI violation
+
+Do **not** skip for brevity when rules/skills require:
+
+- Two-level **`functions/`** + **`*_manager.ts`** ([fa-two-level-architecture.mdc](fa-two-level-architecture.mdc))
+- Shared types in **`types/`** ([types-folder.mdc](types-folder.mdc))
+- Vitest / Playwright / Storybook / coverage tiers ([vitest-tests.mdc](vitest-tests.mdc), [fantasia-testing](../skills/fantasia-testing/SKILL.md))
+- i18n user strings, **`data-test-*`**, BEM, connected tests for feature changes
+- **`Result`** / **`ResultAsync`** where [neverthrow.mdc](neverthrow.mdc) applies
+- ESLint line caps and **`return { }`** shape ([code-size-decomposition.mdc](code-size-decomposition.mdc)) — split when caps force it; prefer **fewer** logical modules until then
+
+**Precedence:** **`.cursor/rules/*`**, **`.cursor/skills/fantasia-*`**, and quality gates override generic minimalism. YAGNI applies **inside** those guardrails.
+
+## YAGNI applies to
+
+- Unrequested features, abstractions, or refactors
+- New npm dependency when stack already covers need
+- Duplicate utilities alongside existing domain scripts
+- Boilerplate nobody asked for (extra config, wrapper layers, speculative "future-proof" APIs)
+- Golfing past validation, error handling, security, accessibility, or data-loss guards
+
+## Bug fixes
+
+Fix root cause at shared function when one guard beats N caller patches. Grep callers of code you touch; symptom-only patch on one path may leave siblings broken.
+
+## Question complex requests
+
+When user asks for X, check whether existing Y in repo already covers it — propose reuse before greenfield build.
+
+## Related (orthogonal layers)
+
+- **Agent replies:** [caveman-default.mdc](caveman-default.mdc) + **`.agents/skills/caveman/`** — terse prose only; does not govern code shape.
+- **Playbook:** [fantasia-yagni](../skills/fantasia-yagni/SKILL.md)

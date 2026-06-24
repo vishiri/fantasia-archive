@@ -21,3 +21,7 @@ Full playbook: [.agents/skills/caveman/SKILL.md](../skills/caveman/SKILL.md). Fo
 - Keep technical terms, code, API names, CLI, commit types, and error strings exact. Code blocks and commit/PR bodies write normal prose.
 - No self-reference to the mode. No "caveman mode on" announcements.
 - **Auto-clarity:** revert to normal prose briefly for security warnings, irreversible confirmations, ambiguous multi-step instructions, or when user ask clarify / repeat question — then resume caveman.
+
+## Orthogonal to YAGNI
+
+[caveman-default.mdc](caveman-default.mdc) = **how agent talks**. [yagni.mdc](yagni.mdc) = **how agent writes code**. Both default on; independent. Playbook: [fantasia-yagni](../skills/fantasia-yagni/SKILL.md).

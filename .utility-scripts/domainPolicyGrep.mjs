@@ -164,6 +164,10 @@ for (const file of walk(path.join(repoRoot, 'src'))) {
   if (!file.endsWith('.ts')) {
     continue
   }
+  const rel = path.relative(repoRoot, file).replace(/\\/g, '/')
+  if (rel.endsWith('_manager.ts')) {
+    continue
+  }
   const text = fs.readFileSync(file, 'utf8').trim()
   if (/^export \{[^}]+\} from ['"]/.test(text) && !text.includes('export type') && text.split('\n').length <= 3) {
     allHits.push({

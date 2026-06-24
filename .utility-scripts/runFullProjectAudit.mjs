@@ -27,9 +27,9 @@ const steps = [
   },
   {
     id: 0,
-    name: 'audit:policy',
+    name: 'audit:yagni',
     cmd: 'yarn',
-    args: ['audit:policy'],
+    args: ['audit:yagni'],
     optional: true
   },
   {
