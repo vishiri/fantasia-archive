@@ -28,7 +28,7 @@ yarn
 
 ## Optional: Caveman ecosystem (AI)
 
-Not required to build/run app. **caveman** compressed agent replies — on by default via [`.cursor/rules/caveman-default.mdc`](.cursor/rules/caveman-default.mdc). **cavemem** cross-session memory — global install + [`.cursor/hooks.json`](.cursor/hooks.json). Setup:
+Not required to build/run app. **caveman** compressed agent replies — [`.cursor/rules/caveman-default.mdc`](.cursor/rules/caveman-default.mdc). **YAGNI** minimal implementation — [`.cursor/rules/yagni.mdc`](.cursor/rules/yagni.mdc). **cavemem** cross-session memory — global install + [`.cursor/hooks.json`](.cursor/hooks.json). Setup:
 
 ```bash
 npm install -g cavemem
@@ -47,6 +47,7 @@ Restart Cursor. Details: [AGENTS.md](AGENTS.md).
 | Topic | Where |
 | --- | --- |
 | Two-level **`functions/`** + **`*_manager.ts`** | [fa-two-level-architecture.mdc](.cursor/rules/fa-two-level-architecture.mdc), [fantasia-two-level-architecture](.cursor/skills/fantasia-two-level-architecture/SKILL.md) |
+| YAGNI / minimal diffs | [yagni.mdc](.cursor/rules/yagni.mdc), [fantasia-yagni](.cursor/skills/fantasia-yagni/SKILL.md) |
 | Trees (**`@he-tree/vue` only**; **`QTree` forbidden**) | [fa-he-tree.mdc](.cursor/rules/fa-he-tree.mdc), [fantasia-he-tree](.cursor/skills/fantasia-he-tree/SKILL.md) |
 | List/table DnD | [fa-drag-drop-lists.mdc](.cursor/rules/fa-drag-drop-lists.mdc), [fantasia-drag-drop](.cursor/skills/fantasia-drag-drop/SKILL.md) |
 | Electron / IPC / preload | [AGENTS.md](AGENTS.md), [fantasia-electron-preload](.cursor/skills/fantasia-electron-preload/SKILL.md) |
@@ -166,6 +167,9 @@ yarn test:e2e:list
 | `yarn audit:domain-policy` | Domain policy grep (not CI). |
 | `yarn audit:quasar-component-tokens` | **`$q*`** token audit. |
 | `yarn audit:full` | Chained local audits (not CI). |
+| `yarn audit:yagni` | YAGNI inventory + heuristic scan (not CI). |
+| `yarn audit:yagni:full` | YAGNI scan + optional jscpd/depcheck. |
+| `yarn audit:yagni:triage` | Mechanical per-file YAGNI triage JSON. |
 | `yarn generate:icon-catalogs` | Regenerate **FaIconPickerInput** catalogs. |
 
 ## Utility scripts (`.utility-scripts/`)
@@ -180,6 +184,7 @@ yarn test:e2e:list
 | `runFullProjectAudit.mjs` | Chained local audits |
 | `generateFaQuasarIconCatalogs.mjs` | Icon catalog generation |
 | `policyComplianceAudit.mjs` | Policy audit |
+| `auditYagni.mjs` / `auditYagniFullTriage.mjs` | YAGNI scan + full triage |
 | `syncI18nLocaleTreeFromEnUs.mjs` | Locale tree sync (maintainer) |
 | `batchTranslateI18nLocales.mjs` | Batch translate (maintainer) |
 

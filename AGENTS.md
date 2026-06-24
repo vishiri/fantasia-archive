@@ -19,7 +19,7 @@ Human install for optional AI tooling: [README.md](README.md) **Optional: Cavema
 
 ## Caveman ecosystem (optional)
 
-Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.mdc`](.cursor/rules/caveman-default.mdc). **cavemem** → global CLI + [`.cursor/hooks.json`](.cursor/hooks.json). Hooks **fail-open**.
+Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.mdc`](.cursor/rules/caveman-default.mdc). **YAGNI** minimal code inside repo guardrails → [`.cursor/rules/yagni.mdc`](.cursor/rules/yagni.mdc), [fantasia-yagni](.cursor/skills/fantasia-yagni/SKILL.md). **cavemem** → global CLI + [`.cursor/hooks.json`](.cursor/hooks.json). Hooks **fail-open**.
 
 ## Repository layout (repo root)
 
@@ -49,6 +49,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) | Always — **`yarn testbatch:verify`** gate |
 | [dev-electron-compile-check.mdc](.cursor/rules/dev-electron-compile-check.mdc) | Always — **`yarn testbatch:verify`** Shell run after last edit, before done summary; then dev compile smoke |
 | [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc) | Always — Vue/TS/function line caps, **`return { }`** shape |
+| [yagni.mdc](.cursor/rules/yagni.mdc) | Always — reuse ladder, minimal diff inside mandatory structure + gates |
 | [fa-action-manager.mdc](.cursor/rules/fa-action-manager.mdc) | `src/scripts/actionManager/**` |
 | [fa-project-database-access.mdc](.cursor/rules/fa-project-database-access.mdc) | `src-electron/mainScripts/**` — **`faProjectDatabaseEnsureConnected.ts`** |
 | [docs-database.mdc](.cursor/rules/docs-database.mdc) | `docs/database/**`, project IPC |
@@ -83,6 +84,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Topic | Rule / skill |
 | --- | --- |
 | Neverthrow | [neverthrow.mdc](.cursor/rules/neverthrow.mdc), [fantasia-neverthrow](.cursor/skills/fantasia-neverthrow/SKILL.md) |
+| YAGNI / minimal diffs | [yagni.mdc](.cursor/rules/yagni.mdc), [fantasia-yagni](.cursor/skills/fantasia-yagni/SKILL.md) — orthogonal to [caveman-default.mdc](.cursor/rules/caveman-default.mdc) |
 | Electron preload + IPC | [electron-preload.mdc](.cursor/rules/electron-preload.mdc), [fantasia-electron-preload](.cursor/skills/fantasia-electron-preload/SKILL.md), [fantasia-electron-main](.cursor/skills/fantasia-electron-main/SKILL.md) |
 | Global keybinds | [fantasia-keybinds](.cursor/skills/fantasia-keybinds/SKILL.md) |
 | Action manager | [fa-action-manager.mdc](.cursor/rules/fa-action-manager.mdc), [fantasia-action-manager](.cursor/skills/fantasia-action-manager/SKILL.md) |
@@ -151,6 +153,7 @@ No Markdown bold/italic in comments. Single quotes for inline refs. No mid-sente
 | `fantasia-changelog-en-us` | In-app changelog |
 | `fantasia-plan-documents` | **`.cursor/plans/`** |
 | `fantasia-neverthrow` | **`Result`** patterns |
+| `fantasia-yagni` | YAGNI ladder, minimal diff inside gates |
 | `fantasia-final-cleanup` | Verify → docs → changelog → commit → push |
 
 Types policy: [types-folder.mdc](.cursor/rules/types-folder.mdc). Contributor commands: [README.md](README.md).
