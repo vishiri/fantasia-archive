@@ -9,10 +9,13 @@
 .faIconPickerInput__trigger.q-btn .q-icon {
   @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
 
+  --fa-q-icon-display-glyph-font-size: #{$faIconPickerInput-triggerIcon-glyphFontSize};
+  --fa-q-icon-display-mdi-font-size: #{$faIconPickerInput-triggerIcon-glyphFontSize};
+
   flex: 0 0 auto;
-  font-size: $faQIconDisplay-iconFontSize;
-  height: $faQIconDisplay-iconFontSize;
-  max-height: $faQIconDisplay-iconFontSize;
-  max-width: $faQIconDisplay-iconFontSize;
-  width: $faQIconDisplay-iconFontSize;
+  font-size: $faIconPickerInput-triggerIcon-boxSize;
+  height: $faIconPickerInput-triggerIcon-boxSize;
+  max-height: $faIconPickerInput-triggerIcon-boxSize;
+  max-width: $faIconPickerInput-triggerIcon-boxSize;
+  width: $faIconPickerInput-triggerIcon-boxSize;
 }

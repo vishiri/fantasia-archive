@@ -1,12 +1,20 @@
 @use 'faQIconDisplay.variables.scss' as *;
 
-// Sizes Font Awesome ::before glyphs inside fixed q-icon boxes (MDI keeps parent font-size).
+// Sizes Font Awesome ::before glyphs and MDI ligatures inside fixed q-icon boxes.
 @mixin fa-q-icon-display-constrain-glyph-in-box {
   align-items: center;
   display: inline-flex;
   justify-content: center;
   line-height: 0;
   text-align: center;
+
+  &:not(.fa-brands, .fa-regular, .fa-solid) {
+    font-size: var(--fa-q-icon-display-mdi-font-size, #{$faQIconDisplay-mdiGlyph-fontSize});
+    line-height: 1;
+    margin-top: $faQIconDisplay-mdiGlyph-marginTop;
+    transform: scale(var(--fa-q-icon-display-mdi-fit-scale, #{$faQIconDisplay-mdiGlyph-fitScale}));
+    transform-origin: center center;
+  }
 
   &.fa-brands::before,
   &.fa-regular::before,

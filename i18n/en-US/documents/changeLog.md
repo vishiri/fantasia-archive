@@ -109,6 +109,8 @@
 - **Project Settings**: **Icon picker** trigger and icon grid show Font Awesome and brand icons at the same fixed size as document-template tab icons instead of filling the whole button.
 - **Project Settings**: Document-template tab icons and rows in **Available document templates** and **World's hierarchical tree** scale wide Font Awesome glyphs inside a fixed icon box so brand and solid icons no longer overflow their column.
 - **Project Settings**: Document-template icon columns in the available-templates list and layout tree use a wider leading indent so icons align with row labels and **World appendix** lines on document-template tabs.
+- **Project Settings**: Default Material Design outline icons in document-template lists and the **Icon picker** grid match Font Awesome icon scale inside the shared fixed icon box.
+- **Icon picker**: The trigger button shows the selected icon slightly larger than list icons for easier preview; the grid and document-template tab rows stay unchanged.
 - **Project Settings**: **Save settings** writes document templates before the worlds snapshot when both change in one save, preventing a database error when world template placements reference templates being saved in the same session.
 - **Developer tools**: **Help & Info → Toggle Developer Tools** and the default **F12** shortcut open Chromium DevTools again in packaged desktop builds.
 - **English copy**: **App Settings** option titles and descriptions, import/export guidance, keybind and action-monitor labels, and help markdown were proofread in **English, US**; staging **TODO** prefixes were removed from setting labels.
