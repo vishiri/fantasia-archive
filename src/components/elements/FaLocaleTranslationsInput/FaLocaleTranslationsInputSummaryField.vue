@@ -109,6 +109,7 @@ import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLangu
 
 import FaLocaleTranslationsInputMenuPanel from './FaLocaleTranslationsInputMenuPanel.vue'
 import FaMultilineTooltipBody from 'app/src/components/elements/FaMultilineTooltipBody/FaMultilineTooltipBody.vue'
+import { resolveFaLocaleTranslationsSummaryButtonElement } from './scripts/functions/resolveFaLocaleTranslationsSummaryButtonElement'
 
 defineOptions({
   name: 'FaLocaleTranslationsInputSummaryField',
@@ -184,15 +185,7 @@ const translationsMenuOpenModel = computed({
 
 defineExpose({
   readTranslationsButtonElement: (): HTMLElement | null => {
-    const buttonComponent = translationsButtonRef.value
-    if (buttonComponent === null) {
-      return null
-    }
-    const buttonElement = buttonComponent.$el
-    if (buttonElement instanceof HTMLElement) {
-      return buttonElement
-    }
-    return null
+    return resolveFaLocaleTranslationsSummaryButtonElement(translationsButtonRef.value)
   }
 })
 </script>
