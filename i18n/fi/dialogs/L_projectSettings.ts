@@ -42,7 +42,8 @@ export default {
     worldColor: {
       title: 'Väri',
       label: 'Maailman väri',
-      tooltip: 'Tämä väri määrittää, miltä maailmasi näyttää eri paikoissa projektissa — kuvakkeet, teksti ja vastaava käyttöliittymä.'
+      tooltip: 'Tämä väri määrittää, miltä maailmasi näyttää eri paikoissa projektissa — kuvakkeet, teksti ja vastaava käyttöliittymä.',
+      helpAriaLabel: 'Ohje maailman väriin'
     },
     worldColorPalette: {
       label: 'Maailman väripaletti',
@@ -51,6 +52,8 @@ export default {
       tooltipRightClickDeletion: 'Poisto',
       tooltipRightClickDuplication: 'Monistus',
       addButton: 'Lisää väri',
+      helpAriaLabel: 'Ohje maailman väripalettiin',
+      swatchAriaLabel: 'Muokkaa värimallia {hex}',
       contextMenu: {
         duplicateColor: 'Monista väri',
         deleteColor: 'Poista väri'
@@ -101,7 +104,8 @@ export default {
     documentTemplateWorldAppendix: {
       title: 'Maailmaliite',
       label: 'Maailmaliite',
-      tooltip: 'Maailmaliite on lyhyt, yksilöllinen kuvaus asiakirjamallillesi, kun se yhdistetään yksittäisiin maailmoihin. Se estää sekaannusta, kun useat asiakirjamallit jakavat saman nimen eri maailmoissa. Liite auttaa erottamaan ne yhdellä silmäyksellä. Tämä kenttä näkyy vain maailma-välilehdellä, kun malleja yhdistetään maailmoihin, ei muualla.'
+      tooltip: 'Maailmaliite on lyhyt, yksilöllinen kuvaus asiakirjamallillesi, kun se yhdistetään yksittäisiin maailmoihin. Se estää sekaannusta, kun useat asiakirjamallit jakavat saman nimen eri maailmoissa. Liite auttaa erottamaan ne yhdellä silmäyksellä. Tämä kenttä näkyy vain maailma-välilehdellä, kun malleja yhdistetään maailmoihin, ei muualla.',
+      helpAriaLabel: 'Ohje maailman liitteeseen'
     },
     documentTemplateIcon: {
       title: 'Kuvake',

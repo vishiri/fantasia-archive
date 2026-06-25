@@ -42,7 +42,8 @@ export default {
     worldColor: {
       title: 'Farge',
       label: 'Verdensfarge',
-      tooltip: 'Denne fargen bestemmer hvordan verdenen din vises ulike steder i prosjektet — ikoner, tekst og lignende grensesnitt.'
+      tooltip: 'Denne fargen bestemmer hvordan verdenen din vises ulike steder i prosjektet — ikoner, tekst og lignende grensesnitt.',
+      helpAriaLabel: 'Hjelp for verdensfarge'
     },
     worldColorPalette: {
       label: 'Verdens fargepalett',
@@ -51,6 +52,8 @@ export default {
       tooltipRightClickDeletion: 'Sletting',
       tooltipRightClickDuplication: 'Duplisering',
       addButton: 'Legg til farge',
+      helpAriaLabel: 'Hjelp for verdensfargepalett',
+      swatchAriaLabel: 'Rediger fargeprøve {hex}',
       contextMenu: {
         duplicateColor: 'Dupliser farge',
         deleteColor: 'Slett farge'
@@ -101,7 +104,8 @@ export default {
     documentTemplateWorldAppendix: {
       title: 'Verdenstillegg',
       label: 'Verdenstillegg',
-      tooltip: 'Verdenstillegg er en kort, unik beskrivelse for dokumentmalen din når den er koblet til enkeltverdener. Dette hindrer forvirring når flere dokumentmaler deler samme navn på tvers av verdener. Tillegget hjelper deg å skille dem med ett blikk. Dette feltet vises bare på verden-fanen når maler kobles til verdener, ingen andre steder.'
+      tooltip: 'Verdenstillegg er en kort, unik beskrivelse for dokumentmalen din når den er koblet til enkeltverdener. Dette hindrer forvirring når flere dokumentmaler deler samme navn på tvers av verdener. Tillegget hjelper deg å skille dem med ett blikk. Dette feltet vises bare på verden-fanen når maler kobles til verdener, ingen andre steder.',
+      helpAriaLabel: 'Hjelp for verdensvedlegg'
     },
     documentTemplateIcon: {
       title: 'Ikon',

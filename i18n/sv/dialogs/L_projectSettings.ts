@@ -42,7 +42,8 @@ export default {
     worldColor: {
       title: 'Färg',
       label: 'Världsfärg',
-      tooltip: 'Den här färgen avgör hur din värld visas på olika ställen i projektet — ikoner, text och liknande gränssnitt.'
+      tooltip: 'Den här färgen avgör hur din värld visas på olika ställen i projektet — ikoner, text och liknande gränssnitt.',
+      helpAriaLabel: 'Hjälp om världsfärg'
     },
     worldColorPalette: {
       label: 'Världens färgpalett',
@@ -51,6 +52,8 @@ export default {
       tooltipRightClickDeletion: 'Radering',
       tooltipRightClickDuplication: 'Duplicering',
       addButton: 'Lägg till färg',
+      helpAriaLabel: 'Hjälp om världens färgpalett',
+      swatchAriaLabel: 'Redigera färgruta {hex}',
       contextMenu: {
         duplicateColor: 'Duplicera färg',
         deleteColor: 'Radera färg'
@@ -101,7 +104,8 @@ export default {
     documentTemplateWorldAppendix: {
       title: 'Världstillägg',
       label: 'Världstillägg',
-      tooltip: 'Världstillägg är en kort, unik beskrivning för din dokumentmall när den kopplas till enskilda världar. Det förhindrar förvirring när flera dokumentmallar delar samma namn mellan världar. Tillägget hjälper dig att skilja dem åt med en blick. Det här fältet visas bara på världsfliken när mallar kopplas till världar, ingen annanstans.'
+      tooltip: 'Världstillägg är en kort, unik beskrivning för din dokumentmall när den kopplas till enskilda världar. Det förhindrar förvirring när flera dokumentmallar delar samma namn mellan världar. Tillägget hjälper dig att skilja dem åt med en blick. Det här fältet visas bara på världsfliken när mallar kopplas till världar, ingen annanstans.',
+      helpAriaLabel: 'Hjälp om världsbilaga'
     },
     documentTemplateIcon: {
       title: 'Ikon',

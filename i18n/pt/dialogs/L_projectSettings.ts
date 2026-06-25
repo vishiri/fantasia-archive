@@ -42,7 +42,8 @@ export default {
     worldColor: {
       title: 'Cor',
       label: 'Cor do mundo',
-      tooltip: 'Esta cor determina como o seu mundo aparece em vários lugares do projeto — ícones, texto e elementos de interface semelhantes.'
+      tooltip: 'Esta cor determina como o seu mundo aparece em vários lugares do projeto — ícones, texto e elementos de interface semelhantes.',
+      helpAriaLabel: 'Ajuda sobre a cor do mundo'
     },
     worldColorPalette: {
       label: 'Paleta de cores do mundo',
@@ -51,6 +52,8 @@ export default {
       tooltipRightClickDeletion: 'Exclusão',
       tooltipRightClickDuplication: 'Duplicação',
       addButton: 'Adicionar cor',
+      helpAriaLabel: 'Ajuda sobre a paleta de cores do mundo',
+      swatchAriaLabel: 'Editar amostra de cor {hex}',
       contextMenu: {
         duplicateColor: 'Duplicar cor',
         deleteColor: 'Excluir cor'
@@ -101,7 +104,8 @@ export default {
     documentTemplateWorldAppendix: {
       title: 'Apêndice do mundo',
       label: 'Apêndice do mundo',
-      tooltip: 'O apêndice do mundo é uma descrição curta e única para o seu modelo de documento quando ele é associado a mundos individuais. Isso evita confusão quando vários modelos de documento compartilham o mesmo nome em mundos diferentes. O apêndice ajuda a distingui-los rapidamente. Este campo aparece apenas na aba Mundos ao associar modelos a mundos, em nenhum outro lugar.'
+      tooltip: 'O apêndice do mundo é uma descrição curta e única para o seu modelo de documento quando ele é associado a mundos individuais. Isso evita confusão quando vários modelos de documento compartilham o mesmo nome em mundos diferentes. O apêndice ajuda a distingui-los rapidamente. Este campo aparece apenas na aba Mundos ao associar modelos a mundos, em nenhum outro lugar.',
+      helpAriaLabel: 'Ajuda sobre o apêndice do mundo'
     },
     documentTemplateIcon: {
       title: 'Ícone',

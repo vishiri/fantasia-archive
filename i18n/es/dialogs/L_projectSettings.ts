@@ -42,7 +42,8 @@ export default {
     worldColor: {
       title: 'Color',
       label: 'Color del mundo',
-      tooltip: 'Este color determina cómo aparece su mundo en varios lugares del proyecto: iconos, texto y elementos de interfaz similares.'
+      tooltip: 'Este color determina cómo aparece su mundo en varios lugares del proyecto: iconos, texto y elementos de interfaz similares.',
+      helpAriaLabel: 'Ayuda sobre el color del mundo'
     },
     worldColorPalette: {
       label: 'Paleta de colores del mundo',
@@ -51,6 +52,8 @@ export default {
       tooltipRightClickDeletion: 'Eliminación',
       tooltipRightClickDuplication: 'Duplicación',
       addButton: 'Agregar color',
+      helpAriaLabel: 'Ayuda sobre la paleta de colores del mundo',
+      swatchAriaLabel: 'Editar muestra de color {hex}',
       contextMenu: {
         duplicateColor: 'Duplicar color',
         deleteColor: 'Eliminar color'
@@ -101,7 +104,8 @@ export default {
     documentTemplateWorldAppendix: {
       title: 'Apéndice del mundo',
       label: 'Apéndice del mundo',
-      tooltip: 'El apéndice del mundo es una descripción breve y única para su plantilla de documento cuando se empareja con mundos individuales. Esto evita confusiones cuando varias plantillas de documentos comparten el mismo nombre en distintos mundos. El apéndice le ayuda a distinguirlas de un vistazo. Este campo aparece solo en la pestaña de mundos al emparejar plantillas con mundos, en ningún otro lugar.'
+      tooltip: 'El apéndice del mundo es una descripción breve y única para su plantilla de documento cuando se empareja con mundos individuales. Esto evita confusiones cuando varias plantillas de documentos comparten el mismo nombre en distintos mundos. El apéndice le ayuda a distinguirlas de un vistazo. Este campo aparece solo en la pestaña de mundos al emparejar plantillas con mundos, en ningún otro lugar.',
+      helpAriaLabel: 'Ayuda sobre el apéndice del mundo'
     },
     documentTemplateIcon: {
       title: 'Icono',

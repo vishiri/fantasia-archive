@@ -42,7 +42,8 @@ export default {
     worldColor: {
       title: 'Color',
       label: 'World color',
-      tooltip: 'This color determines how your world appears in various places around the project—icons, text, and similar UI.'
+      tooltip: 'This color determines how your world appears in various places around the project—icons, text, and similar UI.',
+      helpAriaLabel: 'Help for world color'
     },
     worldColorPalette: {
       label: 'World color palette',
@@ -51,6 +52,8 @@ export default {
       tooltipRightClickDeletion: 'Deletion',
       tooltipRightClickDuplication: 'Duplication',
       addButton: 'Add Color',
+      helpAriaLabel: 'Help for world color palette',
+      swatchAriaLabel: 'Edit color swatch {hex}',
       contextMenu: {
         duplicateColor: 'Duplicate color',
         deleteColor: 'Delete color'
@@ -101,7 +104,8 @@ export default {
     documentTemplateWorldAppendix: {
       title: 'World appendix',
       label: 'World appendix',
-      tooltip: 'World appendix is a short, unique description for your document template when it is paired with individual worlds. This prevents confusion when multiple document templates share the same name across worlds. The appendix helps you tell them apart at a glance. This field appears only on the world tab when pairing templates to worlds, nowhere else.'
+      tooltip: 'World appendix is a short, unique description for your document template when it is paired with individual worlds. This prevents confusion when multiple document templates share the same name across worlds. The appendix helps you tell them apart at a glance. This field appears only on the world tab when pairing templates to worlds, nowhere else.',
+      helpAriaLabel: 'Help for world appendix'
     },
     documentTemplateIcon: {
       title: 'Icon',

@@ -42,7 +42,8 @@ export default {
     worldColor: {
       title: '颜色',
       label: '世界颜色',
-      tooltip: '此颜色决定您的世界在项目各处（图标、文本及类似界面元素）中的显示方式。'
+      tooltip: '此颜色决定您的世界在项目各处（图标、文本及类似界面元素）中的显示方式。',
+      helpAriaLabel: '世界颜色帮助'
     },
     worldColorPalette: {
       label: '世界调色板',
@@ -51,6 +52,8 @@ export default {
       tooltipRightClickDeletion: '删除',
       tooltipRightClickDuplication: '复制',
       addButton: '添加颜色',
+      helpAriaLabel: '世界调色板帮助',
+      swatchAriaLabel: '编辑色样 {hex}',
       contextMenu: {
         duplicateColor: '复制颜色',
         deleteColor: '删除颜色'
@@ -101,7 +104,8 @@ export default {
     documentTemplateWorldAppendix: {
       title: '世界附录',
       label: '世界附录',
-      tooltip: '世界附录是文档模板与各个世界配对时的简短唯一描述。当多个世界中的文档模板同名时可避免混淆。附录帮助您一眼区分它们。此字段仅在将模板与世界配对的世界选项卡上显示，其他地方不显示。'
+      tooltip: '世界附录是文档模板与各个世界配对时的简短唯一描述。当多个世界中的文档模板同名时可避免混淆。附录帮助您一眼区分它们。此字段仅在将模板与世界配对的世界选项卡上显示，其他地方不显示。',
+      helpAriaLabel: '世界附录帮助'
     },
     documentTemplateIcon: {
       title: '图标',

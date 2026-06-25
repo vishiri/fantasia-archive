@@ -42,7 +42,8 @@ export default {
     worldColor: {
       title: 'Couleur',
       label: 'Couleur du monde',
-      tooltip: "Cette couleur détermine l'apparence de votre monde à divers endroits du projet — icônes, texte et éléments d'interface similaires."
+      tooltip: "Cette couleur détermine l'apparence de votre monde à divers endroits du projet — icônes, texte et éléments d'interface similaires.",
+      helpAriaLabel: 'Aide sur la couleur du monde'
     },
     worldColorPalette: {
       label: 'Palette de couleurs du monde',
@@ -51,6 +52,8 @@ export default {
       tooltipRightClickDeletion: 'Suppression',
       tooltipRightClickDuplication: 'Duplication',
       addButton: 'Ajouter une couleur',
+      helpAriaLabel: 'Aide sur la palette de couleurs du monde',
+      swatchAriaLabel: 'Modifier l\'échantillon de couleur {hex}',
       contextMenu: {
         duplicateColor: 'Dupliquer la couleur',
         deleteColor: 'Supprimer la couleur'
@@ -101,7 +104,8 @@ export default {
     documentTemplateWorldAppendix: {
       title: 'Annexe du monde',
       label: 'Annexe du monde',
-      tooltip: "L'annexe du monde est une courte description unique pour votre modèle de document lorsqu'il est associé à des mondes individuels. Cela évite la confusion lorsque plusieurs modèles de documents portent le même nom dans différents mondes. L'annexe vous aide à les distinguer d'un coup d'œil. Ce champ n'apparaît que dans l'onglet Mondes lors de l'association des modèles aux mondes, nulle part ailleurs."
+      tooltip: "L'annexe du monde est une courte description unique pour votre modèle de document lorsqu'il est associé à des mondes individuels. Cela évite la confusion lorsque plusieurs modèles de documents portent le même nom dans différents mondes. L'annexe vous aide à les distinguer d'un coup d'œil. Ce champ n'apparaît que dans l'onglet Mondes lors de l'association des modèles aux mondes, nulle part ailleurs.",
+      helpAriaLabel: 'Aide sur l\'annexe du monde'
     },
     documentTemplateIcon: {
       title: 'Icône',

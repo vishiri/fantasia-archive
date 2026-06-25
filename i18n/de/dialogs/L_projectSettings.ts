@@ -42,7 +42,8 @@ export default {
     worldColor: {
       title: 'Farbe',
       label: 'Weltenfarbe',
-      tooltip: 'Diese Farbe bestimmt, wie Ihre Welt an verschiedenen Stellen im Projekt erscheint — Symbole, Text und ähnliche UI-Elemente.'
+      tooltip: 'Diese Farbe bestimmt, wie Ihre Welt an verschiedenen Stellen im Projekt erscheint — Symbole, Text und ähnliche UI-Elemente.',
+      helpAriaLabel: 'Hilfe zur Weltfarbe'
     },
     worldColorPalette: {
       label: 'Welten-Farbpalette',
@@ -51,6 +52,8 @@ export default {
       tooltipRightClickDeletion: 'Löschen',
       tooltipRightClickDuplication: 'Duplizieren',
       addButton: 'Farbe hinzufügen',
+      helpAriaLabel: 'Hilfe zur Weltfarbpalette',
+      swatchAriaLabel: 'Farbfeld {hex} bearbeiten',
       contextMenu: {
         duplicateColor: 'Farbe duplizieren',
         deleteColor: 'Farbe löschen'
@@ -101,7 +104,8 @@ export default {
     documentTemplateWorldAppendix: {
       title: 'Welt-Anhang',
       label: 'Welt-Anhang',
-      tooltip: 'Der Welt-Anhang ist eine kurze, eindeutige Beschreibung für Ihre Dokumentvorlage, wenn sie einzelnen Welten zugeordnet ist. Dies verhindert Verwechslungen, wenn mehrere Dokumentvorlagen in verschiedenen Welten denselben Namen tragen. Der Anhang hilft Ihnen, sie auf einen Blick zu unterscheiden. Dieses Feld erscheint nur auf dem Welten-Tab bei der Zuordnung von Vorlagen zu Welten, sonst nirgends.'
+      tooltip: 'Der Welt-Anhang ist eine kurze, eindeutige Beschreibung für Ihre Dokumentvorlage, wenn sie einzelnen Welten zugeordnet ist. Dies verhindert Verwechslungen, wenn mehrere Dokumentvorlagen in verschiedenen Welten denselben Namen tragen. Der Anhang hilft Ihnen, sie auf einen Blick zu unterscheiden. Dieses Feld erscheint nur auf dem Welten-Tab bei der Zuordnung von Vorlagen zu Welten, sonst nirgends.',
+      helpAriaLabel: 'Hilfe zum Weltanhang'
     },
     documentTemplateIcon: {
       title: 'Symbol',

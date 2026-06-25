@@ -42,7 +42,8 @@ export default {
     worldColor: {
       title: '色',
       label: 'ワールドの色',
-      tooltip: 'この色は、プロジェクト内のさまざまな場所—アイコン、テキスト、類似の UI—でワールドがどのように表示されるかを決定します。'
+      tooltip: 'この色は、プロジェクト内のさまざまな場所—アイコン、テキスト、類似の UI—でワールドがどのように表示されるかを決定します。',
+      helpAriaLabel: 'ワールドカラーのヘルプ'
     },
     worldColorPalette: {
       label: 'ワールドカラーパレット',
@@ -51,6 +52,8 @@ export default {
       tooltipRightClickDeletion: '削除',
       tooltipRightClickDuplication: '複製',
       addButton: '色を追加',
+      helpAriaLabel: 'ワールドカラーパレットのヘルプ',
+      swatchAriaLabel: 'カラースウォッチ {hex} を編集',
       contextMenu: {
         duplicateColor: '色を複製',
         deleteColor: '色を削除'
@@ -101,7 +104,8 @@ export default {
     documentTemplateWorldAppendix: {
       title: 'ワールド付録',
       label: 'ワールド付録',
-      tooltip: 'ワールド付録は、個々のワールドと組み合わせたときのドキュメントテンプレートの短く一意な説明です。複数のワールドで同じ名前のテンプレートがある場合の混乱を防ぎます。付録により一目で区別できます。このフィールドはワールドタブでテンプレートをワールドに割り当てるときのみ表示され、他では表示されません。'
+      tooltip: 'ワールド付録は、個々のワールドと組み合わせたときのドキュメントテンプレートの短く一意な説明です。複数のワールドで同じ名前のテンプレートがある場合の混乱を防ぎます。付録により一目で区別できます。このフィールドはワールドタブでテンプレートをワールドに割り当てるときのみ表示され、他では表示されません。',
+      helpAriaLabel: 'ワールド付録のヘルプ'
     },
     documentTemplateIcon: {
       title: 'アイコン',
