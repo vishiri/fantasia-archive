@@ -4,6 +4,7 @@
 ## 2.4.15
 
 ### Bugfixes & Optimizations
+- **Project database**: The **`.faproject`** schema is flattened to a single **`user_version` 1** for this development cycle. Older pre-release **`.faproject`** files from previous dev builds are not upgraded automatically; recreate those projects after updating.
 - **Project Settings**: Screen reader users get labeled controls throughout the dialog. The **Worlds** and **Document Templates** filter fields, their clear controls, the **Available document templates** filter, **World color** and **World color palette** help icons, each palette swatch, and the **World appendix** help icon now expose accessible names in every supported interface language.
 - **Project Settings**: The shared delete confirmation button used by **Worlds** and **Document Templates** exposes its label, confirmation prompt, and countdown to assistive technology.
 
