@@ -94,9 +94,9 @@ beforeEach(() => {
 })
 
 function handlerFor (channel: string): (...args: unknown[]) => unknown {
-  const call = handleMock.mock.calls.find((c) => c[0] === channel)
+  const call = handleMock.mock.calls.find((c) => c[0]! === channel)
   expect(call).toBeDefined()
-  return call?.[1] as (...args: unknown[]) => unknown
+  return call?.[1]! as (...args: unknown[]) => unknown
 }
 
 /**
@@ -106,7 +106,7 @@ function handlerFor (channel: string): (...args: unknown[]) => unknown {
 test('Test that registerFaProjectContentIpc registers all project content channels', async () => {
   const { registerFaProjectContentIpc } = await import('../registerFaProjectContentIpc')
   registerFaProjectContentIpc()
-  const channels = handleMock.mock.calls.map((call) => call[0])
+  const channels = handleMock.mock.calls.map((call) => call[0]!)
   expect(channels).toContain(FA_PROJECT_CONTENT_IPC.createWorldAsync)
   expect(channels).toContain(FA_PROJECT_CONTENT_IPC.listDocumentMediaAsync)
   expect(channels.length).toBeGreaterThan(20)

@@ -142,7 +142,7 @@ test('Test that app window does not start if another instance is already running
   preventSecondaryAppInstance(appWindowMock as unknown as BrowserWindow)
   expect(appEventHandlers['second-instance']).toBeTypeOf('function')
 
-  appEventHandlers['second-instance']()
+  appEventHandlers['second-instance']!()
   expect(appWindowMock.restore).toHaveBeenCalledOnce()
   expect(appWindowMock.focus).toHaveBeenCalledOnce()
 })
@@ -169,7 +169,7 @@ test('Test that second-instance focuses without restore when window is not minim
   }
   preventSecondaryAppInstance(appWindowMock as unknown as BrowserWindow)
   expect(appEventHandlers['second-instance']).toBeTypeOf('function')
-  appEventHandlers['second-instance']()
+  appEventHandlers['second-instance']!()
   expect(appWindowMock.restore).not.toHaveBeenCalled()
   expect(appWindowMock.focus).toHaveBeenCalledOnce()
 })
@@ -181,7 +181,7 @@ test('Test that second-instance focuses without restore when window is not minim
 test('Test that second-instance handler no-ops when preventSecondaryAppInstance was given undefined', () => {
   preventSecondaryAppInstance(undefined)
   expect(appEventHandlers['second-instance']).toBeTypeOf('function')
-  expect(() => appEventHandlers['second-instance']()).not.toThrow()
+  expect(() => appEventHandlers['second-instance']!()).not.toThrow()
 })
 
 /**
@@ -193,13 +193,21 @@ test('Test that the main window is created successfully', async () => {
   registerFaChromiumCtrlShiftShortcutSuppressMock.mockReturnValue(disposeFaChromiumCtrlShiftSuppressMock)
   const onceHandlers: Record<string, () => void> = {}
   const onHandlers: Record<string, () => void> = {}
+  const willNavigateHandlers: Array<(event: { preventDefault: () => void }, url: string) => void> = []
+  const setWindowOpenHandlerMock = vi.fn()
   const spellSession = {}
   const browserWindowInstance = {
     webContents: {
-      on: vi.fn(),
+      on: vi.fn((eventName: string, handler: (event: { preventDefault: () => void }, url: string) => void) => {
+        if (eventName === 'will-navigate') {
+          willNavigateHandlers.push(handler)
+        }
+        onHandlers[eventName] = handler as () => void
+      }),
       once: vi.fn(),
       openDevTools: vi.fn(),
-      session: spellSession
+      session: spellSession,
+      setWindowOpenHandler: setWindowOpenHandlerMock
     },
     once: vi.fn((eventName: string, handler: () => void) => {
       onceHandlers[eventName] = handler
@@ -229,14 +237,14 @@ test('Test that the main window is created successfully', async () => {
 
   expect(registerFaProjectOsOpenMainWindowMock).toHaveBeenCalledOnce()
   expect(BrowserWindowMock).toHaveBeenCalledOnce()
-  expect(BrowserWindowMock.mock.calls[0][0]).toMatchObject({
+  expect(BrowserWindowMock.mock.calls[0]![0]!).toMatchObject({
     frame: false,
     height: 1080,
     show: false,
     width: 1920
   })
   expect(
-    (BrowserWindowMock.mock.calls[0][0] as { webPreferences: Record<string, unknown> })
+    (BrowserWindowMock.mock.calls[0]![0]! as { webPreferences: Record<string, unknown> })
       .webPreferences
   ).toMatchObject({
     contextIsolation: true,
@@ -252,8 +260,16 @@ test('Test that the main window is created successfully', async () => {
   expect(registerFaChromiumCtrlShiftShortcutSuppressMock).toHaveBeenCalledWith(
     browserWindowInstance
   )
+  expect(setWindowOpenHandlerMock).toHaveBeenCalledOnce()
+  expect(setWindowOpenHandlerMock.mock.calls[0]![0]!()).toEqual({ action: 'deny' })
+  const blockedNavEvent = { preventDefault: vi.fn() }
+  willNavigateHandlers[0]!(blockedNavEvent, 'file:///etc/passwd')
+  expect(blockedNavEvent.preventDefault).toHaveBeenCalledOnce()
+  const allowedNavEvent = { preventDefault: vi.fn() }
+  willNavigateHandlers[0]!(allowedNavEvent, 'https://example.com/page')
+  expect(allowedNavEvent.preventDefault).not.toHaveBeenCalled()
 
-  onceHandlers['ready-to-show']()
+  onceHandlers['ready-to-show']!()
   expect(browserWindowInstance.show).toHaveBeenCalledOnce()
   expect(browserWindowInstance.focus).toHaveBeenCalledTimes(1)
   expect(browserWindowInstance.maximize).toHaveBeenCalledTimes(1)
@@ -261,7 +277,7 @@ test('Test that the main window is created successfully', async () => {
   vi.runAllTimers()
   expect(browserWindowInstance.maximize).toHaveBeenCalledTimes(2)
 
-  onHandlers.closed()
+  onHandlers.closed!()
   expect(disposeFaChromiumCtrlShiftSuppressMock).toHaveBeenCalledOnce()
   expect(appWindow).toBeUndefined()
 })
@@ -405,7 +421,7 @@ test('Test that main window preload path uses Quasar defaults when preload env v
   await mainWindowCreation()
 
   expect(registerFaProjectOsOpenMainWindowMock).toHaveBeenCalledOnce()
-  const windowOpts = BrowserWindowMock.mock.calls[0][0] as {
+  const windowOpts = BrowserWindowMock.mock.calls[0]![0]! as {
     webPreferences: { preload: string }
   }
   expect(windowOpts.webPreferences.preload).toMatch(/preload[\\/]electron-preload\.cjs$/)
@@ -449,11 +465,11 @@ test('Test that ready-to-show and delayed maximize no-op after closed when appWi
   await mainWindowCreation()
 
   expect(registerFaProjectOsOpenMainWindowMock).toHaveBeenCalledOnce()
-  onceHandlers['ready-to-show']()
+  onceHandlers['ready-to-show']!()
   expect(browserWindowInstance.maximize).toHaveBeenCalledTimes(1)
 
-  onHandlers.closed()
-  onceHandlers['ready-to-show']()
+  onHandlers.closed!()
+  onceHandlers['ready-to-show']!()
   expect(browserWindowInstance.show).toHaveBeenCalledTimes(1)
 
   vi.runAllTimers()
@@ -496,7 +512,7 @@ test('Test that ready-to-show no-ops when appWindow is undefined before the hand
 
   expect(registerFaProjectOsOpenMainWindowMock).toHaveBeenCalledOnce()
   assignAppWindowRefForTesting(undefined)
-  onceHandlers['ready-to-show']()
+  onceHandlers['ready-to-show']!()
 
   expect(browserWindowInstance.show).not.toHaveBeenCalled()
   expect(browserWindowInstance.maximize).not.toHaveBeenCalled()

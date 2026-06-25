@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron'
+import { ipcMain, app } from 'electron'
 import { Result } from 'neverthrow'
 
 import { FA_EXTRA_ENV_IPC } from 'app/src-electron/electron-ipc-bridge'
@@ -33,16 +33,20 @@ function parseComponentProps (): I_extraEnvVariablesAPI['COMPONENT_PROPS'] {
 function buildExtraEnvSnapshot (): I_extraEnvVariablesAPI {
   const COMPONENT_NAME = optionalTruthyEnv('COMPONENT_NAME')
   const COMPONENT_PROPS = parseComponentProps()
-  const ELECTRON_MAIN_FILEPATH = resolveFaElectronMainJsPath()
+  const ELECTRON_MAIN_FILEPATH = app.isPackaged
+    ? null
+    : resolveFaElectronMainJsPath()
   const FA_FRONTEND_RENDER_TIMER = FA_FRONTEND_RENDER_TIMER_MS
   const TEST_ENV = optionalTruthyEnv('TEST_ENV')
-  return {
+  const snapshot: I_extraEnvVariablesAPI = {
     COMPONENT_NAME,
-    COMPONENT_PROPS,
+    COMPONENT_PROPS: COMPONENT_PROPS === undefined ? false : COMPONENT_PROPS,
     ELECTRON_MAIN_FILEPATH,
     FA_FRONTEND_RENDER_TIMER,
     TEST_ENV
   }
+
+  return snapshot
 }
 
 /**

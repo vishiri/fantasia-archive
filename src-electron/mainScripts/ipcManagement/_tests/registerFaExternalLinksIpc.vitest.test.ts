@@ -33,10 +33,10 @@ beforeEach(async () => {
 async function handlerFor (
   channel: string
 ): Promise<(event: unknown, url: unknown) => Promise<void>> {
-  const call = mocks.ipcMainHandleMock.mock.calls.find((c) => c[0] === channel)
+  const call = mocks.ipcMainHandleMock.mock.calls.find((c) => c[0]! === channel)
   expect(call).toBeDefined()
 
-  return call?.[1] as (event: unknown, url: unknown) => Promise<void>
+  return call?.[1]! as (event: unknown, url: unknown) => Promise<void>
 }
 
 /**
@@ -48,7 +48,7 @@ test('Test that registerFaExternalLinksIpc registers openExternalAsync channel o
   registerFaExternalLinksIpc()
 
   expect(mocks.ipcMainHandleMock).toHaveBeenCalledOnce()
-  expect(mocks.ipcMainHandleMock.mock.calls[0][0]).toBe(
+  expect(mocks.ipcMainHandleMock.mock.calls[0]![0]!).toBe(
     FA_EXTERNAL_LINKS_IPC.openExternalAsync
   )
 })
@@ -119,4 +119,35 @@ test('Test that registerFaExternalLinksIpc does not open 127.0.0.1 URL', async (
   await handler({}, 'http://127.0.0.1:8080/')
 
   expect(mocks.openExternalMock).not.toHaveBeenCalled()
+})
+
+/**
+ * registerFaExternalLinksIpc
+ * RFC1918 private IPv4 is not opened.
+ */
+test('Test that registerFaExternalLinksIpc does not open private IPv4 URL', async () => {
+  const { registerFaExternalLinksIpc } = await import('../registerFaExternalLinksIpc')
+  registerFaExternalLinksIpc()
+
+  const handler = await handlerFor(FA_EXTERNAL_LINKS_IPC.openExternalAsync)
+  await handler({}, 'http://192.168.1.1/')
+
+  expect(mocks.openExternalMock).not.toHaveBeenCalled()
+})
+
+/**
+ * registerFaExternalLinksIpc
+ * shell.openExternal failures are logged without throwing.
+ */
+test('Test that registerFaExternalLinksIpc logs openExternal failures', async () => {
+  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  mocks.openExternalMock.mockRejectedValueOnce(new Error('shell failed'))
+  const { registerFaExternalLinksIpc } = await import('../registerFaExternalLinksIpc')
+  registerFaExternalLinksIpc()
+
+  const handler = await handlerFor(FA_EXTERNAL_LINKS_IPC.openExternalAsync)
+  await handler({}, 'https://www.example.com/')
+
+  expect(errorSpy).toHaveBeenCalledWith('[faExternalLinks] openExternal failed', expect.any(Error))
+  errorSpy.mockRestore()
 })

@@ -174,18 +174,24 @@ test('Test that checkIfExternalUrl rejects malformed URL', () => {
 
 /**
  * checkIfExternalUrl
- * Private IPv4 is still allowed (only loopback and all-zero are blocked).
+ * Private IPv4 RFC1918 is blocked.
  */
-test('Test that checkIfExternalUrl allows RFC1918 IPv4', () => {
-  expect(checkIfExternalUrl('http://192.168.1.1/')).toBe(true)
+test('Test that checkIfExternalUrl blocks RFC1918 IPv4', () => {
+  expect(checkIfExternalUrl('http://192.168.1.1/')).toBe(false)
+  expect(checkIfExternalUrl('http://10.0.0.1/')).toBe(false)
+  expect(checkIfExternalUrl('http://172.16.0.1/')).toBe(false)
+  expect(checkIfExternalUrl('http://169.254.1.1/')).toBe(false)
 })
 
 /**
  * checkIfExternalUrl
- * IPv4-mapped private IPv4 is allowed.
+ * IPv4-mapped private IPv4 is blocked.
  */
-test('Test that checkIfExternalUrl allows IPv4-mapped private IPv4', () => {
-  expect(checkIfExternalUrl('http://[::ffff:192.0.2.1]/')).toBe(true)
+test('Test that checkIfExternalUrl blocks IPv4-mapped private IPv4', () => {
+  expect(checkIfExternalUrl('http://[::ffff:192.168.1.1]/')).toBe(false)
+  expect(checkIfExternalUrl('http://[::ffff:a00:1]/')).toBe(false)
+  expect(checkIfExternalUrl('http://[::ffff:ac10:1]/')).toBe(false)
+  expect(checkIfExternalUrl('http://[::ffff:a9fe:101]/')).toBe(false)
 })
 
 /**
@@ -196,10 +202,11 @@ test('Test that checkIfExternalUrl blocks single-hextet IPv4-mapped IPv6', () =>
   expect(checkIfExternalUrl('http://[::ffff:7f00]/')).toBe(false)
 })
 
+test('Test that checkIfExternalUrl allows public IPv4-mapped IPv6', () => {
+  expect(checkIfExternalUrl('http://[::ffff:808:808]/')).toBe(true)
+})
+
 /**
- * isSafeExternalHttpUrl
- * Rejects empty hostname even when protocol is allowlisted.
- */
 test('Test that isSafeExternalHttpUrl rejects empty hostname', () => {
   expect(isSafeExternalHttpUrl('https:', '')).toBe(false)
 })

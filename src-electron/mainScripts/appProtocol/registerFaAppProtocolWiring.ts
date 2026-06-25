@@ -16,6 +16,28 @@ export const FA_APP_PROTOCOL_SCHEME = 'app'
  */
 export const FA_APP_PROTOCOL_HOST = '.'
 
+/**
+ * True when 'resolved' is 'rendererRoot' or a descendant (separator-safe; avoids Windows prefix traps).
+ */
+export function isFaAppProtocolPathWithinRendererRoot (
+  rendererRoot: string,
+  resolved: string
+): boolean {
+  const root = path.resolve(rendererRoot)
+  const target = path.resolve(resolved)
+  const rel = path.relative(root, target)
+
+  if (rel === '') {
+    return true
+  }
+
+  if (rel.startsWith('..') || path.isAbsolute(rel)) {
+    return false
+  }
+
+  return true
+}
+
 let registeredAsPrivileged = false
 let handlerInstalled = false
 
@@ -63,17 +85,21 @@ export function installFaAppProtocolHandler (): void {
   }
   handlerInstalled = true
 
-  const rendererRoot = resolveRendererRoot()
+  const rendererRoot = path.resolve(resolveRendererRoot())
 
   protocol.handle(FA_APP_PROTOCOL_SCHEME, (request) => {
     const url = new URL(request.url)
+
+    if (url.host !== FA_APP_PROTOCOL_HOST) {
+      return new Response('Forbidden', { status: 403 })
+    }
+
     const rawPath = decodeURIComponent(url.pathname)
     // Strip leading slashes so 'path.join' resolves relative to 'rendererRoot' instead of escaping it.
     const normalized = rawPath.replace(/^\/+/, '')
-    const resolved = path.normalize(path.join(rendererRoot, normalized || 'index.html'))
+    const resolved = path.resolve(rendererRoot, normalized || 'index.html')
 
-    // Defense in depth: refuse traversal outside the renderer root.
-    if (!resolved.startsWith(rendererRoot)) {
+    if (!isFaAppProtocolPathWithinRendererRoot(rendererRoot, resolved)) {
       return new Response('Forbidden', { status: 403 })
     }
 

@@ -6,6 +6,7 @@ import { FA_PROJECT_FAILSAFE_IPC } from 'app/src-electron/electron-ipc-bridge'
 import { pathLooksLikeFaProjectFile } from 'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
 
 type T_pending = {
+  expectedWebContentsId: number
   resolve: (value: string | null) => void
   timeoutId: ReturnType<typeof setTimeout>
 }
@@ -21,7 +22,7 @@ function installReplyListenerOnce (): void {
   replyListenerInstalled = true
   ipcMain.on(
     FA_PROJECT_FAILSAFE_IPC.replyActiveProjectPathToMain,
-    (_event, payload: unknown) => {
+    (event, payload: unknown) => {
       if (typeof payload !== 'object' || payload === null) {
         return
       }
@@ -29,6 +30,9 @@ function installReplyListenerOnce (): void {
       const id = typeof rec.correlationId === 'string' ? rec.correlationId : ''
       const entry = pendingByCorrelationId.get(id)
       if (entry === undefined) {
+        return
+      }
+      if (event.sender.id !== entry.expectedWebContentsId) {
         return
       }
       clearTimeout(entry.timeoutId)
@@ -61,6 +65,7 @@ export function requestRendererActiveProjectPathForFailsafe (wc: WebContents): P
       stuck?.resolve(null)
     }, 2000)
     pendingByCorrelationId.set(correlationId, {
+      expectedWebContentsId: wc.id,
       resolve,
       timeoutId
     })

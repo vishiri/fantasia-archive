@@ -38,9 +38,9 @@ beforeEach(async () => {
 })
 
 function handlerFor (channel: string): (...args: unknown[]) => unknown {
-  const call = ipcMainHandleMock.mock.calls.find((c) => c[0] === channel)
+  const call = ipcMainHandleMock.mock.calls.find((c) => c[0]! === channel)
   expect(call).toBeDefined()
-  return call![1] as (...args: unknown[]) => unknown
+  return call![1]! as (...args: unknown[]) => unknown
 }
 
 /**

@@ -105,7 +105,7 @@ test('Test that installFaAppProtocolHandler installs the app scheme handler once
   mod.installFaAppProtocolHandler()
 
   expect(protocolHandleMock).toHaveBeenCalledTimes(1)
-  expect(protocolHandleMock.mock.calls[0]?.[0]).toBe('app')
+  expect(protocolHandleMock.mock.calls[0]!?.[0]!).toBe('app')
 })
 
 /**
@@ -116,14 +116,14 @@ test('Test that installFaAppProtocolHandler forwards in-root requests to net.fet
   const mod = await import('../registerFaAppProtocolWiring')
   mod.installFaAppProtocolHandler()
 
-  const handler = protocolHandleMock.mock.calls[0]?.[1] as (request: { url: string }) => Promise<Response>
+  const handler = protocolHandleMock.mock.calls[0]!?.[1]! as (request: { url: string }) => Promise<Response>
   expect(typeof handler).toBe('function')
 
   const response = await handler({ url: 'app://./index.html' })
 
   expect(response).toBeInstanceOf(Response)
   expect(netFetchMock).toHaveBeenCalledTimes(1)
-  const fetchedUrl = netFetchMock.mock.calls[0]?.[0]
+  const fetchedUrl = netFetchMock.mock.calls[0]!?.[0]!
   expect(typeof fetchedUrl).toBe('string')
   expect(String(fetchedUrl).startsWith('file://')).toBe(true)
   expect(String(fetchedUrl).endsWith('/index.html')).toBe(true)
@@ -137,11 +137,26 @@ test('Test that installFaAppProtocolHandler refuses traversal outside renderer r
   const mod = await import('../registerFaAppProtocolWiring')
   mod.installFaAppProtocolHandler()
 
-  const handler = protocolHandleMock.mock.calls[0]?.[1] as (request: { url: string }) => Promise<Response>
+  const handler = protocolHandleMock.mock.calls[0]!?.[1]! as (request: { url: string }) => Promise<Response>
   // Percent-encoded slashes survive URL parsing and become '..' segments only after decodeURIComponent runs, so they reach 'path.join' as real traversal.
   const response = await handler({ url: 'app://./..%2F..%2F..%2Fetc/passwd' })
 
   expect(response).toBeInstanceOf(Response)
+  expect(response.status).toBe(403)
+  expect(netFetchMock).not.toHaveBeenCalled()
+})
+
+/**
+ * installFaAppProtocolHandler
+ * Returns 403 when URL host does not match FA_APP_PROTOCOL_HOST.
+ */
+test('Test that installFaAppProtocolHandler refuses mismatched app protocol host', async () => {
+  const mod = await import('../registerFaAppProtocolWiring')
+  mod.installFaAppProtocolHandler()
+
+  const handler = protocolHandleMock.mock.calls[0]!?.[1]! as (request: { url: string }) => Promise<Response>
+  const response = await handler({ url: 'app://evil-host/index.html' })
+
   expect(response.status).toBe(403)
   expect(netFetchMock).not.toHaveBeenCalled()
 })
@@ -154,11 +169,11 @@ test('Test that installFaAppProtocolHandler defaults missing pathname to index.h
   const mod = await import('../registerFaAppProtocolWiring')
   mod.installFaAppProtocolHandler()
 
-  const handler = protocolHandleMock.mock.calls[0]?.[1] as (request: { url: string }) => Promise<Response>
+  const handler = protocolHandleMock.mock.calls[0]!?.[1]! as (request: { url: string }) => Promise<Response>
   await handler({ url: 'app://./' })
 
   expect(netFetchMock).toHaveBeenCalledTimes(1)
-  expect(String(netFetchMock.mock.calls[0]?.[0]).endsWith('/index.html')).toBe(true)
+  expect(String(netFetchMock.mock.calls[0]!?.[0]!).endsWith('/index.html')).toBe(true)
 })
 
 /**

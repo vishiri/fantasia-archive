@@ -11,6 +11,7 @@ export const faExternalLinksManagerAPI: I_faExternalLinksManagerAPI = {
   },
 
   openExternal (url: string) {
+    // Preload sandbox: failures are non-fatal; main logs openExternal errors.
     void ipcRenderer
       .invoke(FA_EXTERNAL_LINKS_IPC.openExternalAsync, url)
       .catch(() => undefined)

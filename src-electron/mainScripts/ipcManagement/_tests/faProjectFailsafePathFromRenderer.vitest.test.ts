@@ -30,28 +30,39 @@ beforeEach(async () => {
   installModule = await import('../faProjectFailsafePathFromRendererWiring')
 })
 
+function makeWebContents (id = 42): WebContents {
+  return {
+    id,
+    send: vi.fn()
+  } as unknown as WebContents
+}
+
+function makeReplyEvent (wc: WebContents): IpcMainEvent {
+  return { sender: wc } as IpcMainEvent
+}
+
 function getReplyHandler (): (event: IpcMainEvent, payload: unknown) => void {
   const entry = ipcMainOnMock.mock.calls.find((c) => {
-    return c[0] === FA_PROJECT_FAILSAFE_IPC.replyActiveProjectPathToMain
+    return c[0]! === FA_PROJECT_FAILSAFE_IPC.replyActiveProjectPathToMain
   })
   expect(entry).toBeDefined()
-  return entry?.[1] as (event: IpcMainEvent, payload: unknown) => void
+  return entry?.[1]! as (event: IpcMainEvent, payload: unknown) => void
 }
 
 test('installFaProjectFailsafePathReplyListener registers the reply channel once', () => {
   installModule.installFaProjectFailsafePathReplyListener()
   installModule.installFaProjectFailsafePathReplyListener()
   expect(ipcMainOnMock).toHaveBeenCalledTimes(1)
-  expect(ipcMainOnMock.mock.calls[0][0]).toBe(FA_PROJECT_FAILSAFE_IPC.replyActiveProjectPathToMain)
+  expect(ipcMainOnMock.mock.calls[0]![0]!).toBe(FA_PROJECT_FAILSAFE_IPC.replyActiveProjectPathToMain)
 })
 
 test('request resolves null when payload is not an object, after timeout', async () => {
   vi.useFakeTimers()
   try {
-    const wc = { send: vi.fn() } as unknown as WebContents
+    const wc = makeWebContents()
     const p = installModule.requestRendererActiveProjectPathForFailsafe(wc)
     const handler = getReplyHandler()
-    handler({} as IpcMainEvent, null)
+    handler(makeReplyEvent(wc), null)
     await vi.advanceTimersByTimeAsync(2000)
     await expect(p).resolves.toBeNull()
   } finally {
@@ -61,10 +72,10 @@ test('request resolves null when payload is not an object, after timeout', async
 
 test('request resolves trimmed valid absolute path from renderer reply', async () => {
   const absolutePath = 'D:\\world\\p.faproject'
-  const wc = { send: vi.fn() } as unknown as WebContents
+  const wc = makeWebContents()
   const pending = installModule.requestRendererActiveProjectPathForFailsafe(wc)
   const handler = getReplyHandler()
-  handler({} as IpcMainEvent, {
+  handler(makeReplyEvent(wc), {
     correlationId: 'corr-uuid-fixed',
     filePath: `  ${absolutePath}  `
   })
@@ -72,23 +83,41 @@ test('request resolves trimmed valid absolute path from renderer reply', async (
 })
 
 test('request resolves null when filePath fails pathLooksLikeFaProjectFile', async () => {
-  const wc = { send: vi.fn() } as unknown as WebContents
+  const wc = makeWebContents()
   const pending = installModule.requestRendererActiveProjectPathForFailsafe(wc)
   const handler = getReplyHandler()
-  handler({} as IpcMainEvent, {
+  handler(makeReplyEvent(wc), {
     correlationId: 'corr-uuid-fixed',
     filePath: 'relative-only.faproject'
   })
   await expect(pending).resolves.toBeNull()
 })
 
+test('request ignores reply from mismatched webContents sender', async () => {
+  vi.useFakeTimers()
+  try {
+    const wc = makeWebContents(42)
+    const pending = installModule.requestRendererActiveProjectPathForFailsafe(wc)
+    const handler = getReplyHandler()
+    const foreignSender = makeWebContents(99)
+    handler(makeReplyEvent(foreignSender), {
+      correlationId: 'corr-uuid-fixed',
+      filePath: 'D:\\world\\p.faproject'
+    })
+    await vi.advanceTimersByTimeAsync(2000)
+    await expect(pending).resolves.toBeNull()
+  } finally {
+    vi.useRealTimers()
+  }
+})
+
 test('unknown correlation id times out with null', async () => {
   vi.useFakeTimers()
   try {
-    const wc = { send: vi.fn() } as unknown as WebContents
+    const wc = makeWebContents()
     const pending = installModule.requestRendererActiveProjectPathForFailsafe(wc)
     const handler = getReplyHandler()
-    handler({} as IpcMainEvent, {
+    handler(makeReplyEvent(wc), {
       correlationId: 'wrong-id',
       filePath: 'D:\\x\\y.faproject'
     })
@@ -102,10 +131,10 @@ test('unknown correlation id times out with null', async () => {
 test('non-string correlation id in reply is treated as empty and does not clear the pending request', async () => {
   vi.useFakeTimers()
   try {
-    const wc = { send: vi.fn() } as unknown as WebContents
+    const wc = makeWebContents()
     const pending = installModule.requestRendererActiveProjectPathForFailsafe(wc)
     const handler = getReplyHandler()
-    handler({} as IpcMainEvent, {
+    handler(makeReplyEvent(wc), {
       correlationId: 999,
       filePath: 'D:\\world\\p.faproject'
     })
@@ -119,7 +148,7 @@ test('non-string correlation id in reply is treated as empty and does not clear 
 test('timeout deletes pending entry so stuck resolve is skipped safely', async () => {
   vi.useFakeTimers()
   try {
-    const wc = { send: vi.fn() } as unknown as WebContents
+    const wc = makeWebContents()
     const pending = installModule.requestRendererActiveProjectPathForFailsafe(wc)
     getReplyHandler()
     await vi.advanceTimersByTimeAsync(2000)
@@ -130,10 +159,10 @@ test('timeout deletes pending entry so stuck resolve is skipped safely', async (
 })
 
 test('request resolves null when correlation matches but filePath is empty', async () => {
-  const wc = { send: vi.fn() } as unknown as WebContents
+  const wc = makeWebContents()
   const pending = installModule.requestRendererActiveProjectPathForFailsafe(wc)
   const handler = getReplyHandler()
-  handler({} as IpcMainEvent, {
+  handler(makeReplyEvent(wc), {
     correlationId: 'corr-uuid-fixed',
     filePath: ''
   })
@@ -141,10 +170,10 @@ test('request resolves null when correlation matches but filePath is empty', asy
 })
 
 test('request resolves null when filePath is not a string', async () => {
-  const wc = { send: vi.fn() } as unknown as WebContents
+  const wc = makeWebContents()
   const pending = installModule.requestRendererActiveProjectPathForFailsafe(wc)
   const handler = getReplyHandler()
-  handler({} as IpcMainEvent, {
+  handler(makeReplyEvent(wc), {
     correlationId: 'corr-uuid-fixed',
     filePath: 12345
   })
@@ -154,10 +183,10 @@ test('request resolves null when filePath is not a string', async () => {
 test('timeout fires after reply without rejecting a settled request', async () => {
   vi.useFakeTimers()
   try {
-    const wc = { send: vi.fn() } as unknown as WebContents
+    const wc = makeWebContents()
     const pending = installModule.requestRendererActiveProjectPathForFailsafe(wc)
     const handler = getReplyHandler()
-    handler({} as IpcMainEvent, {
+    handler(makeReplyEvent(wc), {
       correlationId: 'corr-uuid-fixed',
       filePath: 'D:\\world\\p.faproject'
     })

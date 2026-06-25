@@ -83,10 +83,10 @@ beforeEach(async () => {
 })
 
 function handlerFor (channel: string): (event: { sender: unknown }, ...args: unknown[]) => unknown {
-  const call = mocks.ipcMainHandleMock.mock.calls.find((c) => c[0] === channel)
+  const call = mocks.ipcMainHandleMock.mock.calls.find((c) => c[0]! === channel)
   expect(call).toBeDefined()
 
-  return call?.[1] as (event: { sender: unknown }, ...args: unknown[]) => unknown
+  return call?.[1]! as (event: { sender: unknown }, ...args: unknown[]) => unknown
 }
 
 const fakeSender = {}
@@ -99,7 +99,7 @@ test('Test that registerFaWindowControlIpc registers each window control async c
   const { registerFaWindowControlIpc } = await import('../registerFaWindowControlIpc')
   registerFaWindowControlIpc()
 
-  const channels = mocks.ipcMainHandleMock.mock.calls.map((c) => c[0])
+  const channels = mocks.ipcMainHandleMock.mock.calls.map((c) => c[0]!)
   expect(channels).toEqual([
     FA_WINDOW_CONTROL_IPC.checkMaximizedAsync,
     FA_WINDOW_CONTROL_IPC.minimizeAsync,

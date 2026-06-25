@@ -5,6 +5,7 @@ import { registerFaProjectOsOpenMainWindow } from 'app/src-electron/mainScripts/
 import { applyFaSpellCheckerLanguagesToSession } from 'app/src-electron/mainScripts/windowManagement/faSpellCheckerSessionWiring'
 import { registerFaChromiumCtrlShiftShortcutSuppress } from 'app/src-electron/mainScripts/chromiumFixes/faChromiumCtrlShiftShortcutSuppressWiring'
 import { registerFaMainWindowWebContentsSessionReset } from 'app/src-electron/mainScripts/windowManagement/faMainWindowWebContentsSessionResetWiring'
+import { isFaMainWindowNavigationAllowed } from 'app/src-electron/mainScripts/windowManagement/functions/faMainWindowNavigationAllowlist'
 import { setupSpellChecker } from 'app/src-electron/mainScripts/windowManagement/spellCheckerWiring'
 import { getFaUserSettings } from 'app/src-electron/mainScripts/userSettings/userSettings_manager'
 
@@ -64,6 +65,15 @@ function resolvePreloadPath (): string {
 }
 
 async function loadAndWireMainWindow (win: BrowserWindow): Promise<void> {
+  win.webContents.on('will-navigate', (event, url) => {
+    if (!isFaMainWindowNavigationAllowed(url)) {
+      event.preventDefault()
+    }
+  })
+  if (typeof win.webContents.setWindowOpenHandler === 'function') {
+    win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+  }
+
   // Show the windows once electron is ready to show the actual HTML content
   win.once('ready-to-show', () => {
     if (appWindow) {

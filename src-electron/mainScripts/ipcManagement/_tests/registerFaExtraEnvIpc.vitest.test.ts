@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => {
   const ipcMainHandleMock = vi.fn()
 
   return {
+    appPackagedState: { isPackaged: false },
     ipcMainHandleMock,
     resolveMainMock: vi.fn(() => '/unpackaged/electron-main.js')
   }
@@ -19,6 +20,7 @@ vi.mock('app/src-electron/mainScripts/windowManagement/windowManagement_manager'
 
 vi.mock('electron', () => {
   return {
+    app: mocks.appPackagedState,
     ipcMain: {
       handle: mocks.ipcMainHandleMock
     }
@@ -30,6 +32,7 @@ beforeEach(() => {
   mocks.ipcMainHandleMock.mockReset()
   mocks.resolveMainMock.mockClear()
   mocks.resolveMainMock.mockReturnValue('/unpackaged/electron-main.js')
+  mocks.appPackagedState.isPackaged = false
   vi.unstubAllEnvs()
 })
 
@@ -38,10 +41,10 @@ afterEach(() => {
 })
 
 function handlerFor (channel: string): (...args: unknown[]) => unknown {
-  const call = mocks.ipcMainHandleMock.mock.calls.find((c) => c[0] === channel)
+  const call = mocks.ipcMainHandleMock.mock.calls.find((c) => c[0]! === channel)
   expect(call).toBeDefined()
 
-  return call?.[1] as (...args: unknown[]) => unknown
+  return call?.[1]! as (...args: unknown[]) => unknown
 }
 
 /**
@@ -53,7 +56,7 @@ test('Test that registerFaExtraEnvIpc registers snapshotAsync channel once', asy
   registerFaExtraEnvIpc()
 
   expect(mocks.ipcMainHandleMock).toHaveBeenCalledOnce()
-  expect(mocks.ipcMainHandleMock.mock.calls[0][0]).toBe(FA_EXTRA_ENV_IPC.snapshotAsync)
+  expect(mocks.ipcMainHandleMock.mock.calls[0]![0]!).toBe(FA_EXTRA_ENV_IPC.snapshotAsync)
 })
 
 /**
@@ -172,5 +175,22 @@ test('Test that registerFaExtraEnvIpc snapshot treats invalid COMPONENT_PROPS JS
 
   expect(result).toMatchObject({
     COMPONENT_PROPS: false
+  })
+})
+
+/**
+ * registerFaExtraEnvIpc
+ * Packaged builds omit ELECTRON_MAIN_FILEPATH from the renderer snapshot.
+ */
+test('Test that registerFaExtraEnvIpc snapshot omits main path when packaged', async () => {
+  mocks.appPackagedState.isPackaged = true
+  const { registerFaExtraEnvIpc } = await import('../registerFaExtraEnvIpc')
+  registerFaExtraEnvIpc()
+
+  const result = handlerFor(FA_EXTRA_ENV_IPC.snapshotAsync)()
+
+  expect(mocks.resolveMainMock).not.toHaveBeenCalled()
+  expect(result).toMatchObject({
+    ELECTRON_MAIN_FILEPATH: null
   })
 })

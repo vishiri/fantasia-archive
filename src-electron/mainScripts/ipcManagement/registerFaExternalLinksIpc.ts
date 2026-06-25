@@ -27,7 +27,11 @@ export function registerFaExternalLinksIpc (): void {
         return
       }
 
-      await shell.openExternal(url)
+      try {
+        await shell.openExternal(url)
+      } catch (error: unknown) {
+        console.error('[faExternalLinks] openExternal failed', error)
+      }
     }
   )
 }

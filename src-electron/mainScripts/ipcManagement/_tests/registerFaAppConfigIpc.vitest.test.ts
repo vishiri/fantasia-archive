@@ -67,15 +67,15 @@ beforeEach(() => {
 })
 
 function handlerFor (channel: string): (...args: unknown[]) => unknown {
-  const call = ipcMainHandleMock.mock.calls.find((c) => c[0] === channel)
+  const call = ipcMainHandleMock.mock.calls.find((c) => c[0]! === channel)
   expect(call).toBeDefined()
-  return call![1] as (...args: unknown[]) => unknown
+  return call![1]! as (...args: unknown[]) => unknown
 }
 
 test('Test that registerFaAppConfigIpc registers all four app config channels', async () => {
   const { registerFaAppConfigIpc } = await import('../registerFaAppConfigIpc')
   registerFaAppConfigIpc()
-  const channels = ipcMainHandleMock.mock.calls.map((c) => c[0])
+  const channels = ipcMainHandleMock.mock.calls.map((c) => c[0]!)
   expect(channels).toContain(FA_APP_CONFIG_IPC.exportToFileAsync)
   expect(channels).toContain(FA_APP_CONFIG_IPC.prepareImportAsync)
   expect(channels).toContain(FA_APP_CONFIG_IPC.applyImportAsync)
@@ -310,7 +310,7 @@ test('Test that registerFaAppConfigIpc is idempotent on second call', async () =
   registerFaAppConfigIpc()
   registerFaAppConfigIpc()
   expect(
-    ipcMainHandleMock.mock.calls.filter((c) => c[0] === FA_APP_CONFIG_IPC.exportToFileAsync).length
+    ipcMainHandleMock.mock.calls.filter((c) => c[0]! === FA_APP_CONFIG_IPC.exportToFileAsync).length
   ).toBe(1)
 })
 

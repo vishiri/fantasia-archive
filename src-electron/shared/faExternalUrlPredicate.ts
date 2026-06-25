@@ -22,7 +22,7 @@ function isIpv4DottedDecimalHost (host: string): boolean {
   }
 
   for (let i = 1; i <= 4; i++) {
-    const s = m[i]
+    const s = m[i]!
     const n = Number(s)
 
     if (Number.isNaN(n) || n > 255) {
@@ -64,6 +64,40 @@ function isIpv4LoopbackOrAllZero (ipv4: string): boolean {
 }
 
 /**
+ * True for RFC1918 private IPv4, link-local 169.254.0.0/16, loopback, and all-zero.
+ */
+function isBlockedPrivateOrLocalIpv4 (ipv4: string): boolean {
+  if (isIpv4LoopbackOrAllZero(ipv4)) {
+    return true
+  }
+
+  const [a, b] = partsFromIpv4(ipv4)
+
+  if (a === 10) {
+    return true
+  }
+
+  if (a === 172 && b >= 16 && b <= 31) {
+    return true
+  }
+
+  if (a === 192 && b === 168) {
+    return true
+  }
+
+  if (a === 169 && b === 254) {
+    return true
+  }
+
+  return false
+}
+
+function partsFromIpv4 (ipv4: string): [number, number, number, number] {
+  const parts = ipv4.split('.').map((x) => Number.parseInt(x, 10))
+  return [parts[0]!, parts[1]!, parts[2]!, parts[3]!]
+}
+
+/**
  * IPv4-mapped IPv6 tail after '::ffff:' (WHATWG serializes mapped IPv4 as two hextets).
  * Malformed tails are treated as blocked so 'openExternal' never sees odd '::ffff' shapes.
  */
@@ -74,8 +108,8 @@ function isBlockedIpv4MappedIpv6Tail (tail: string): boolean {
     return true
   }
 
-  const high = Number.parseInt(hexParts[0], 16)
-  const low = Number.parseInt(hexParts[1], 16)
+  const high = Number.parseInt(hexParts[0]!, 16)
+  const low = Number.parseInt(hexParts[1]!, 16)
 
   if (
     Number.isNaN(high) ||
@@ -88,12 +122,29 @@ function isBlockedIpv4MappedIpv6Tail (tail: string): boolean {
 
   const combined = (high << 16) | low
   const firstOctet = (combined >>> 24) & 0xff
+  const secondOctet = (combined >>> 16) & 0xff
 
   if (firstOctet === 127) {
     return true
   }
 
   if (combined === 0) {
+    return true
+  }
+
+  if (firstOctet === 10) {
+    return true
+  }
+
+  if (firstOctet === 172 && secondOctet >= 16 && secondOctet <= 31) {
+    return true
+  }
+
+  if (firstOctet === 192 && secondOctet === 168) {
+    return true
+  }
+
+  if (firstOctet === 169 && secondOctet === 254) {
     return true
   }
 
@@ -113,7 +164,7 @@ function isBlockedIpv6 (inner: string): boolean {
     return false
   }
 
-  return isBlockedIpv4MappedIpv6Tail(mapped[1])
+  return isBlockedIpv4MappedIpv6Tail(mapped[1]!)
 }
 
 function isBlockedHost (rawHostname: string): boolean {
@@ -124,7 +175,7 @@ function isBlockedHost (rawHostname: string): boolean {
   }
 
   if (isIpv4DottedDecimalHost(hostname)) {
-    return isIpv4LoopbackOrAllZero(hostname)
+    return isBlockedPrivateOrLocalIpv4(hostname)
   }
 
   if (hostname.includes(':')) {

@@ -164,9 +164,9 @@ beforeEach(async () => {
 })
 
 function handlerFor (channel: string): (...args: unknown[]) => unknown {
-  const call = ipcMainHandleMock.mock.calls.find((c) => c[0] === channel)
+  const call = ipcMainHandleMock.mock.calls.find((c) => c[0]! === channel)
   expect(call).toBeDefined()
-  return call?.[1] as (...args: unknown[]) => unknown
+  return call?.[1]! as (...args: unknown[]) => unknown
 }
 
 test('registerFaProjectManagementIpc registers project-noteboard and project-styling IPC handlers with create, recent, open, and before-quit hook once', async () => {
@@ -505,9 +505,9 @@ test('setProjectSettingsPatchAsync returns false without an active project datab
 test('registerFaProjectManagementIpc before-quit hook closes active project database', async () => {
   const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
   registerFaProjectManagementIpc()
-  const quitCall = appOnMock.mock.calls.find((c) => c[0] === 'before-quit')
+  const quitCall = appOnMock.mock.calls.find((c) => c[0]! === 'before-quit')
   expect(quitCall).toBeDefined()
-  const onQuit = quitCall?.[1] as () => void
+  const onQuit = quitCall?.[1]! as () => void
   onQuit()
   expect(closeActiveMock).toHaveBeenCalledOnce()
 })
