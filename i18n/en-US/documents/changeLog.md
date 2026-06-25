@@ -3,6 +3,13 @@
 
 ## 2.4.15
 
+### Bugfixes & Optimizations
+- **Project Settings**: Screen reader users get labeled controls throughout the dialog. The **Worlds** and **Document Templates** filter fields, their clear controls, the **Available document templates** filter, **World color** and **World color palette** help icons, each palette swatch, and the **World appendix** help icon now expose accessible names in every supported interface language.
+- **Project Settings**: The shared delete confirmation button used by **Worlds** and **Document Templates** exposes its label, confirmation prompt, and countdown to assistive technology.
+
+### Known issues
+- **Fantasia Archive Settings** still lists many experimental toggles marked as planned work in their titles; those options are not shipped yet and have no effect when enabled.
+
 ## 2.4.14 - Version bump
 
 ### New features

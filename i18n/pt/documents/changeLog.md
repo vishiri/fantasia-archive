@@ -3,6 +3,10 @@
 
 ## 2.4.15
 
+### Correções de bugs e otimizações
+- **Configurações do projeto**: usuários de leitores de tela recebem controles rotulados em todo o diálogo. Os campos de filtro **Mundos** e **Modelos de documento**, seus controles de limpeza, o filtro **Modelos de documento disponíveis**, os ícones de ajuda **Cor do mundo** e **Paleta de cores do mundo**, cada amostra da paleta e o ícone de ajuda **Apêndice do mundo** agora expõem nomes acessíveis em cada idioma de interface suportado.
+- **Configurações do projeto**: o botão compartilhado de confirmação de exclusão usado por **Mundos** e **Modelos de documento** expõe seu rótulo, prompt de confirmação e contagem regressiva à tecnologia assistiva.
+
 ## 2.4.14 - Aumento da versão
 
 ### Novos recursos

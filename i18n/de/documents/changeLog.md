@@ -3,6 +3,10 @@
 
 ## 2.4.15
 
+### Fehlerbehebungen und Optimierungen
+- **Projekteinstellungen**: Nutzer von Bildschirmleseprogrammen erhalten im gesamten Dialog beschriftete Steuerelemente. Die Filterfelder **Welten** und **Dokumentvorlagen**, ihre Löschelemente, der Filter **Verfügbare Dokumentvorlagen**, die Hilfssymbole **Weltfarbe** und **Weltfarbpalette**, jeder Palettenmuster und das Hilfssymbol **Weltanhang** stellen nun in jeder unterstützten Oberflächensprache barrierefreie Namen bereit.
+- **Projekteinstellungen**: Die gemeinsame Bestätigungsschaltfläche zum Löschen, die von **Welten** und **Dokumentvorlagen** verwendet wird, stellt ihre Beschriftung, die Bestätigungsaufforderung und den Countdown für Hilfstechnologien bereit.
+
 ## 2.4.14 – Versionssprung
 
 ### Fehlerbehebungen und Optimierungen

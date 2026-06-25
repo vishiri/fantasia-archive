@@ -3,6 +3,10 @@
 
 ## 2.4.15
 
+### Correcciones de errores y optimizaciones
+- **Configuración del proyecto**: los usuarios de lectores de pantalla obtienen controles etiquetados en todo el diálogo. Los campos de filtro **Mundos** y **Plantillas de documento**, sus controles de borrado, el filtro **Plantillas de documento disponibles**, los iconos de ayuda **Color del mundo** y **Paleta de colores del mundo**, cada muestra de la paleta y el icono de ayuda **Apéndice del mundo** ahora exponen nombres accesibles en cada idioma de interfaz admitido.
+- **Configuración del proyecto**: el botón compartido de confirmación de eliminación usado por **Mundos** y **Plantillas de documento** expone su etiqueta, su aviso de confirmación y su cuenta regresiva a la tecnología de asistencia.
+
 ## 2.4.14 - Mejora de versión
 
 ### Nuevas funciones

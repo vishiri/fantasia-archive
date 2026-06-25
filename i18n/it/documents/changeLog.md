@@ -3,6 +3,10 @@
 
 ## 2.4.15
 
+### Correzioni di bug e ottimizzazioni
+- **Impostazioni progetto**: gli utenti di lettori di schermo ottengono controlli etichettati in tutto il dialogo. I campi di filtro **Mondi** e **Modelli di documento**, i loro controlli di cancellazione, il filtro **Modelli di documento disponibili**, le icone di aiuto **Colore mondo** e **Tavolozza colori mondo**, ogni campione della tavolozza e l'icona di aiuto **Appendice del mondo** ora espongono nomi accessibili in ogni lingua di interfaccia supportata.
+- **Impostazioni progetto**: il pulsante condiviso di conferma eliminazione usato da **Mondi** e **Modelli di documento** espone la sua etichetta, la richiesta di conferma e il conto alla rovescia alle tecnologie assistive.
+
 ## 2.4.14 - Versione bump
 
 ### Nuove funzionalità

@@ -3,6 +3,10 @@
 
 ## 2.4.15
 
+### Feilrettinger og optimaliseringer
+- **Prosjektinnstillinger**: Skjermleserbrukere får merkede kontroller i hele dialogen. Filterfeltene **Verdener** og **Dokumentmaler**, deres nullstillingskontroller, filteret **Tilgjengelige dokumentmaler**, hjelpeikonene **Verdensfarge** og **Verdensfargepalett**, hvert palettfargevalg og hjelpeikonet **Verdensvedlegg** eksponerer nå tilgjengelige navn på hvert støttet grensesnittspråk.
+- **Prosjektinnstillinger**: Den delte bekreftelsesknappen for sletting som brukes av **Verdener** og **Dokumentmaler**, eksponerer etiketten, bekreftelsesforespørselen og nedtellingen for hjelpeteknologi.
+
 ## 2.4.14 - Versjonsbump
 
 ### Nye funksjoner

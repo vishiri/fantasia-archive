@@ -3,6 +3,10 @@
 
 ## 2.4.15
 
+### Corrections de bugs et optimisations
+- **Paramètres du projet** : les utilisateurs de lecteurs d'écran bénéficient de contrôles étiquetés dans toute la boîte de dialogue. Les champs de filtre **Mondes** et **Modèles de document**, leurs contrôles d'effacement, le filtre **Modèles de document disponibles**, les icônes d'aide **Couleur du monde** et **Palette de couleurs du monde**, chaque échantillon de palette et l'icône d'aide **Appendice du monde** exposent désormais des noms accessibles dans chaque langue d'interface prise en charge.
+- **Paramètres du projet** : le bouton partagé de confirmation de suppression utilisé par **Mondes** et **Modèles de document** expose son étiquette, sa demande de confirmation et son compte à rebours aux technologies d'assistance.
+
 ## 2.4.14 - Changement de version
 
 ### Nouvelles fonctionnalités

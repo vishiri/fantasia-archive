@@ -3,6 +3,10 @@
 
 ## 2.4.15
 
+### Buggfixar och optimeringar
+- **Projektinställningar**: Skärmläsaranvändare får etiketterade kontroller i hela dialogen. Filterfälten **Världar** och **Dokumentmallar**, deras rensningskontroller, filtret **Tillgängliga dokumentmallar**, hjälpikonerna **Världens färg** och **Världens färgpalett**, varje palettfärgprov och hjälpikonen **Världens appendix** exponerar nu tillgängliga namn på varje gränssnittsspråk som stöds.
+- **Projektinställningar**: Den delade knappen för borttagningsbekräftelse som används av **Världar** och **Dokumentmallar** exponerar sin etikett, bekräftelsefråga och nedräkning för hjälpmedelsteknik.
+
 ## 2.4.14 - Version bump
 
 ### Nya funktioner

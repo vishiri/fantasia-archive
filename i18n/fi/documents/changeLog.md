@@ -3,6 +3,10 @@
 
 ## 2.4.15
 
+### Virhekorjaukset ja optimoinnit
+- **Projektiasetukset**: Ruudunlukuohjelman käyttäjät saavat nimettyjä ohjausobjekteja koko valintaikkunassa. **Maailmat**- ja **Asiakirjamallit**-suodattimen kentät, niiden tyhjennyspainikkeet, **Käytettävissä olevat asiakirjamallit** -suodatin, **Maailman väri**- ja **Maailman väripaletti**-ohjekuvakkeet, jokainen paletin värinäyte ja **Maailman liite**-ohjekuvake paljastavat nyt saavutettavat nimet jokaisella tuetulla käyttöliittymän kielellä.
+- **Projektiasetukset**: Jaettu poiston vahvistuspainike, jota **Maailmat** ja **Asiakirjamallit** käyttävät, paljastaa nimikkeensä, vahvistuskehotteensa ja vastalaskennan apuvälineille.
+
 ## 2.4.14 - Versiovirhe
 
 ### Uusia ominaisuuksia
