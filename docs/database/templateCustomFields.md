@@ -1,6 +1,6 @@
 # Document template custom fields (approved design)
 
-**Status:** Architecture approved. **Not implemented** in SQLite, IPC, or UI. The shipped schema is **`user_version` 6** per [projectDB.md](projectDB.md) (includes **`worlds.color`**, **`worlds.color_pallete`**, **`worlds.sort_order`**, per-world template layout via **`world_template_groups`** / **`world_template_placements`**, and default-world seed on create). Custom fields remain a **separate future migration** (version **7+**).
+**Status:** Architecture approved. **Not implemented** in SQLite, IPC, or UI. The shipped schema is the flattened **`user_version` 1** per [projectDB.md](projectDB.md) (includes **`worlds.color`**, **`worlds.color_pallete`**, **`worlds.sort_order`**, per-world template layout via **`world_template_groups`** / **`world_template_placements`**, per-locale translations, and default-world seed on create). Custom fields remain a **separate future migration** (the next **v2**).
 
 ## Problem
 
@@ -190,11 +190,13 @@ Phases are ordered for future work. Update [projectDB.md](projectDB.md) in the *
 
 ### Phase 1 — Schema v2+ (custom fields)
 
+Baseline is the flattened single-version schema (**`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 1`**); see [projectDB.md](projectDB.md).
+
 - **`src-electron/mainScripts/projectManagement/functions/faProjectDbSchemaDdl.ts`** — add DDL for `template_fields`, `document_field_values`, link tables, indexes.
-- **`src-electron/mainScripts/projectManagement/faProjectDbMigrateWiring.ts`** — v1→v2 step; bump **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX`**.
+- **`src-electron/mainScripts/projectManagement/faProjectDbMigrateWiring.ts`** — add the first **v1→v2** migration step; bump **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX`**; chain in **`applyFaProjectMigrations`** (see [fantasia-flatten-database-schemas](../../.cursor/skills/fantasia-flatten-database-schemas/SKILL.md) **Adding migrations again**).
 - Fold resulting tables into **`projectDB.md`**; relabel sections here from **proposed** to **implemented**.
 
-**Note:** Shipped schema **v3** includes **`worlds.color`**, **`worlds.sort_order`**, and optional **world ↔ document template** links — see [projectDB.md](projectDB.md).
+**Note:** Shipped schema **v1** includes **`worlds.color`**, **`worlds.sort_order`**, per-world template layout, and per-locale translations — see [projectDB.md](projectDB.md).
 
 ### Phase 2 — Main persist
 

@@ -10,7 +10,7 @@ description: >-
 
 ## Canonical schema documentation
 
-- **[docs/database/projectDB.md](../../docs/database/projectDB.md)** — **`.faproject`** `user_version` (supported max **5** today), tables, IPC, Project Settings
+- **[docs/database/projectDB.md](../../docs/database/projectDB.md)** — **`.faproject`** `user_version` (supported max **1** today, flattened), tables, IPC, Project Settings
 - **[docs/database/templateCustomFields.md](../../docs/database/templateCustomFields.md)** — planned custom fields (not shipped)
 - **[docs/database/appUserDataKv.md](../../docs/database/appUserDataKv.md)** — **`electron-store`** in **`userData`**
 - **[docs/database/README.md](../../docs/database/README.md)** — index
@@ -22,7 +22,7 @@ Schema/IPC changes → update docs same commit ([docs-database.mdc](../../rules/
 - **`better-sqlite3`** — main process only
 - **`.faproject`** SQLite under **`src-electron/mainScripts/projectManagement/`**; renderer via **`window.faContentBridgeAPIs.projectManagement`**
 - **E2E paths**: **`e2eSetNextProjectCreatePath`** / **`e2eSetNextProjectOpenPath`** in **`playwrightE2eProjectPaths.ts`**
-- **`user_version` 5** max today — worlds, documents, templates, media, junctions; Project Settings snapshots via **`saveWorldsSnapshot`**, **`saveDocumentTemplatesSnapshot`**
+- **`user_version` 1** max today (flattened pre-release) — worlds, documents, templates, media, junctions, per-world template layout, per-locale translations; Project Settings snapshots via **`saveWorldsSnapshot`**, **`saveDocumentTemplatesSnapshot`**
 - **Pre-release flatten**: [fantasia-flatten-database-schemas](../fantasia-flatten-database-schemas/SKILL.md)
 
 ## Principles

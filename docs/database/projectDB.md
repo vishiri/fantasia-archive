@@ -8,28 +8,20 @@ SQLite **`documents`** = worldbuilding entities (world + optional template). ≠
 
 ## Schema version (`PRAGMA user_version`)
 
+Flattened to a single bootstrap revision during pre-release dev. No upgrade ladder ships.
+
 | Version | Contents |
 |---------|----------|
 | **0** | Uninitialized file (bootstrap target on first open/create). |
-| **1** | Full schema: **`project_data`** KV, worldbuilding **content tables** (including **`world_template_groups`** / **`world_template_placements`** layout), default **world** seed on create. |
-| **2** | Drops legacy **`world_media`** junction table only. |
-| **3** | Ensures **`world_document_templates`** exists (restores the junction for files that lost it at an interim **v2**). |
-| **4** | Adds **`worlds.color_pallete`** — semicolon-separated **`#RRGGBB`** hex list (max **2000** chars; default empty). |
-| **5** | Adds **`document_templates.sort_order`**, **`world_appendix`** (max **500** chars), and **`icon`** (max **128** chars). |
-| **6** | Replaces **`world_document_templates`** with **`world_template_groups`** and **`world_template_placements`** for per-world template layout (groups + ordered placements). |
-| **7** | Adds **`world_template_placements.nickname`** — optional per-world placement label override (empty = use joined document template name). |
-| **8** | Adds **`document_templates.title_translations_json`** — per-locale template titles (JSON keyed by interface language code). **`display_name`** remains a denormalized cache for stable sort (canonical **en-US** title with alphabetical fallback). |
-| **9** | Adds **`worlds.display_name_translations_json`** and **`document_templates.world_appendix_translations_json`** — per-locale world names and template **World appendix** copy. Existing **`display_name`** / **`world_appendix`** values backfill **en-US** on upgrade; denormalized columns remain write-through caches for sort and legacy readers. |
-| **10** | Adds **`world_template_groups.display_name_translations_json`** and **`world_template_placements.nickname_translations_json`** — per-locale group labels and placement nickname overrides in the per-world template layout. Existing **`display_name`** / **`nickname`** values backfill **en-US** on upgrade; denormalized columns remain write-through caches. |
-| **11** | Adds **`document_templates.title_singular_translations_json`** and **`world_template_placements.nickname_singular_translations_json`** — optional per-locale singular forms for document template titles and placement nicknames. Existing **`title_translations_json`** / **`nickname_translations_json`** remain **plural** storage (no data copy). |
+| **1** | Full schema: **`project_data`** KV, worldbuilding **content tables** (**`worlds`** incl. **`color_pallete`** + **`display_name_translations_json`**, **`document_templates`** incl. **`sort_order`**, **`world_appendix`**, **`icon`**, **`title_translations_json`** + **`title_singular_translations_json`** + **`world_appendix_translations_json`**, **`documents`**, **`media`**, **`document_media`**, **`world_template_groups`** + **`world_template_placements`** layout incl. **`nickname`** + **`nickname_translations_json`** + **`nickname_singular_translations_json`** + **`display_name_translations_json`**), default **world** seed on create. |
 
-**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 11`** in **`faProjectDbMigrateWiring.ts`**.
+**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 1`** in **`faProjectDbMigrateWiring.ts`**.
 
-**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v1**, run **v1→v2** (drop **`world_media`**), **v2→v3** (ensure legacy **`world_document_templates`** when upgrading old files), **v3→v4** (add **`worlds.color_pallete`**), **v4→v5** (add **`document_templates`** list/detail columns), **v5→v6** (migrate junction rows to root placements, drop **`world_document_templates`**, create layout tables), **v6→v7** (add **`world_template_placements.nickname`**), **v7→v8** (add **`title_translations_json`**, backfill **`en-US`** from existing **`display_name`**), **v8→v9** (add **`display_name_translations_json`** + **`world_appendix_translations_json`**, backfill **en-US**), **v9→v10** (add layout group **`display_name_translations_json`** + placement **`nickname_translations_json`**, backfill **en-US**), **v10→v11** (add **`title_singular_translations_json`** + **`nickname_singular_translations_json`**, default empty), seed a default **world** when empty, then stop at **v11**. Files already at **v11** are a no-op. Other versions throw until a forward migration is added.
+**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v1** + seed a default **world** when empty; files at **v1** are a no-op. Any other version is unsupported and throws. Older pre-release dev **`.faproject`** files must be recreated after a flatten.
 
-**Worlds vs document templates on create:** **`seedFaProjectDefaultWorldIfEmpty`** runs after migrations and inserts one default **world** when the table is empty. **Document templates are never auto-seeded** — a new **`.faproject`** may have zero **`document_templates`** rows until the user adds them in **Project Settings**.
+**Worlds vs document templates on create:** **`seedFaProjectDefaultWorldIfEmpty`** runs after bootstrap and inserts one default **world** when the table is empty. **Document templates are never auto-seeded** — a new **`.faproject`** may have zero **`document_templates`** rows until the user adds them in **Project Settings**.
 
-**DDL source:** **`src-electron/mainScripts/projectManagement/functions/faProjectDbSchemaDdl.ts`** (**`applyFaProjectProjectDataSchemaV1`**, **`applyFaProjectContentSchemaV1`**).
+**DDL source:** **`src-electron/mainScripts/projectManagement/functions/faProjectDbSchemaDdl.ts`** (**`applyFaProjectProjectDataSchemaV1`**, **`applyFaProjectContentSchemaV1`** — single exec block with all content tables, layout tables, and indexes).
 
 **Pre-release flatten:** Dev may squash schema versions back to **1**; no upgrade for older local files — **`.cursor/skills/fantasia-flatten-database-schemas/SKILL.md`**.
 
@@ -112,7 +104,7 @@ Index: **`idx_document_templates_sort_order`**. Unlike **worlds**, new projects 
 | `media_id` | FK → `media.id` **ON DELETE CASCADE** |
 | PRIMARY KEY (`document_id`, `media_id`) | |
 
-### `world_template_groups` (schema v6)
+### `world_template_groups`
 
 | Column | Notes |
 |--------|--------|
@@ -125,7 +117,7 @@ Index: **`idx_document_templates_sort_order`**. Unlike **worlds**, new projects 
 
 Index: **`idx_world_template_groups_world_root_sort`**.
 
-### `world_template_placements` (schema v6)
+### `world_template_placements`
 
 | Column | Notes |
 |--------|--------|
@@ -144,7 +136,7 @@ Index: **`idx_world_template_groups_world_root_sort`**.
 
 Indexes: **`idx_world_template_placements_world_root_sort`**, **`idx_world_template_placements_group_sort`**, **`idx_world_template_placements_document_template_id`**.
 
-**Legacy (v1–v5):** **`world_document_templates`** M:N junction — removed at **v6**; existing links migrate to root **`world_template_placements`** rows ordered by template **`sort_order`**.
+**Pre-release history:** A legacy **`world_document_templates`** M:N junction existed in flattened-away schema revisions; it is gone and existing links are not migrated.
 
 Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_document_media_media_id`**, **`idx_worlds_sort_order`**, **`idx_document_templates_sort_order`**.
 
@@ -169,7 +161,7 @@ Template custom fields (defs, typed values, orphan retention) in [templateCustom
 
 ```
 src-electron/mainScripts/projectManagement/
-  faProjectDbMigrateWiring.ts          # migrations, metadata read helpers
+  faProjectDbMigrateWiring.ts          # flattened single-version migrations, metadata read helpers
   faProjectDatabaseEnsureConnectedWiring.ts  # runWithFaProjectDatabase* (required entry)
   faProjectDataKvWiring.ts
   faProjectSettingsPersistWiring.ts

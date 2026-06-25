@@ -77,7 +77,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Unit | Vitest — **`yarn test:unit`**; gate **`yarn testbatch:verify`** |
 | UI/E2E | Playwright — rebuild Electron before runs |
 | Storybook | 10 — **`.storybook-workspace/`** |
-| DB | **`better-sqlite3`**; **`.faproject`** SQLite **`user_version` max 11** — see [projectDB.md](docs/database/projectDB.md) |
+| DB | **`better-sqlite3`**; **`.faproject`** SQLite **`user_version` max 1** (flattened) — see [projectDB.md](docs/database/projectDB.md) |
 
 ## Subsystems (pointers)
 
