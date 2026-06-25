@@ -37,6 +37,7 @@ import {
   dialogProjectSettingsWorldTemplateLayoutOpenRenameMenuTargetKey
 } from '../scripts/dialogProjectSettingsWorldTemplateLayoutRenameMenuProvide'
 import DialogProjectSettingsWorldTemplateLayoutTreeNode from '../DialogProjectSettingsWorldTemplateLayoutTreeNode.vue'
+import * as actionTooltipsWiringModule from '../scripts/dialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring'
 import { buildDialogProjectSettingsDocumentTemplateDraft } from './dialogProjectSettingsDocumentTemplateDraftFixtures'
 import {
   buildDialogProjectSettingsSingularPluralMissingTooltip,
@@ -165,7 +166,7 @@ const treeNodeStubs = {
   FaLocaleTranslationsInput: faLocaleTranslationsInputStub,
   QBtn: defineComponent({
     inheritAttrs: true,
-    template: '<button type="button" v-bind="$attrs" @click="$emit(\'click\', $event)" />'
+    template: '<button type="button" v-bind="$attrs" @click="$emit(\'click\', $event)"><slot /></button>'
   }),
   QIcon: defineComponent({
     inheritAttrs: true,
@@ -607,4 +608,80 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNode hides template 
   expect(
     w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-missingTranslationsWarning"]').exists()
   ).toBe(false)
+})
+
+/**
+ * DialogProjectSettingsWorldTemplateLayoutTreeNode
+ * Reveals and hides placement nickname hover tooltip on row hover.
+ */
+test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNode toggles nickname hover tooltip on mouse enter and leave', async () => {
+  const w = mountTreeNode({
+    node: {
+      ...templateNode,
+      label: 'Nickname of doom',
+      nicknamePluralTranslations: { 'en-US': 'Nickname of doom' },
+      nicknameSingularTranslations: {},
+      templateDisplayName: 'Character',
+      usesNickname: true
+    }
+  })
+
+  const root = w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a"]')
+  await root.trigger('mouseenter')
+  await root.trigger('mouseleave')
+
+  const actions = w.find('.dialogProjectSettingsWorldTemplateLayoutTreeNode__actions')
+  await actions.trigger('mouseenter')
+  await actions.trigger('mouseleave')
+
+  const warning = w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-missingTranslationsWarning"]')
+  if (warning.exists()) {
+    await warning.trigger('mouseenter')
+    await warning.trigger('mouseleave')
+  }
+
+  await w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-edit"]').trigger('mouseleave')
+  await w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-remove"]').trigger('mouseleave')
+  expect(root.exists()).toBe(true)
+})
+
+/**
+ * DialogProjectSettingsWorldTemplateLayoutTreeNode
+ * Wires the initial rename-menu-open guard before rename menu state binds.
+ */
+test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNode wires initial getRenameMenuOpen false', () => {
+  const originalCreateActionTooltips =
+    actionTooltipsWiringModule.createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring
+  const spy = vi.spyOn(
+    actionTooltipsWiringModule,
+    'createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring'
+  )
+  spy.mockImplementation((deps) => {
+    expect(deps?.getRenameMenuOpen?.()).toBe(false)
+    return originalCreateActionTooltips(deps)
+  })
+
+  mountTreeNode({
+    node: templateNode
+  })
+
+  spy.mockRestore()
+})
+
+/**
+ * DialogProjectSettingsWorldTemplateLayoutTreeNode
+ * Wires rename menu open and translations draft v-model bindings.
+ */
+test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNode wires rename menu v-model bindings', async () => {
+  const w = mountTreeNode({
+    node: groupNode
+  })
+
+  const renameMenu = w.findComponent({ name: 'DialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenu' })
+  expect(renameMenu.exists()).toBe(true)
+
+  await renameMenu.vm.$emit('update:renameMenuOpen', true)
+  await renameMenu.vm.$emit('update:translationsDraft', { 'en-US': 'Renamed Group' })
+  expect(renameMenu.emitted('update:renameMenuOpen')).toBeTruthy()
+  expect(renameMenu.emitted('update:translationsDraft')).toBeTruthy()
 })

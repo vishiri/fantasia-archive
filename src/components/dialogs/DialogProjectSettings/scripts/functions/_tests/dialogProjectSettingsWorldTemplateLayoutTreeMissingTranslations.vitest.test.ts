@@ -166,3 +166,13 @@ test('Test that resolveDialogProjectSettingsWorldTemplateLayoutTreeMissingTransl
     }
   })).toBeNull()
 })
+
+test('Test that resolveDialogProjectSettingsWorldTemplatePlacementTreeMissingTranslationWarning returns null when title is complete', () => {
+  expect(resolveDialogProjectSettingsWorldTemplatePlacementTreeMissingTranslationWarning({
+    documentTemplateTitlePluralTranslations: { de: 'Charakter' },
+    documentTemplateTitleSingularTranslations: { de: 'Charakter' },
+    languageCode: 'de',
+    nicknamePluralTranslations: {},
+    nicknameSingularTranslations: {}
+  })).toBeNull()
+})

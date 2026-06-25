@@ -21,3 +21,11 @@ test('Test that clearQuasarHoverableFocusState blurs the hoverable element and i
   expect(blurSpy).toHaveBeenCalledTimes(1)
   expect(helperBlurSpy).toHaveBeenCalledTimes(1)
 })
+
+/**
+ * clearQuasarHoverableFocusState
+ * No-ops when the element is null or undefined.
+ */
+test('Test that clearQuasarHoverableFocusState no-ops for null', () => {
+  expect(() => clearQuasarHoverableFocusState(null)).not.toThrow()
+})

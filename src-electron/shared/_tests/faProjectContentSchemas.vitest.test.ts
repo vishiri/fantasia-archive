@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
 
+import { faProjectWorldTemplatePlacementNicknameSchema } from '../faProjectContentSchemaShared'
 import { parseFaProjectContentPlainRecord } from '../faProjectContentSchemaShared'
 import {
   parseFaProjectDocumentCreateInput,
@@ -44,6 +45,14 @@ const SAMPLE_UUID = '550e8400-e29b-41d4-a716-446655440000'
  */
 test('Test that parseFaProjectContentPlainRecord rejects array payloads', () => {
   expect(() => parseFaProjectContentPlainRecord([])).toThrow(/plain object/)
+})
+
+/**
+ * faProjectWorldTemplatePlacementNicknameSchema
+ * Trims optional placement nickname strings at IPC boundaries.
+ */
+test('Test that faProjectWorldTemplatePlacementNicknameSchema trims nickname values', () => {
+  expect(faProjectWorldTemplatePlacementNicknameSchema.parse('  alias  ')).toBe('alias')
 })
 
 /**

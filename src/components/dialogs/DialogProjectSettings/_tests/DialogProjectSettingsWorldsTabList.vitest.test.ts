@@ -1,8 +1,8 @@
 /* eslint-disable vue/one-component-per-file -- colocated Quasar stub components for Vue Test Utils mounts */
 
 import { defineComponent } from 'vue'
-import { mount } from '@vue/test-utils'
-import { expect, test } from 'vitest'
+import { flushPromises, mount } from '@vue/test-utils'
+import { expect, test, vi } from 'vitest'
 
 import { FA_VERTICAL_DRAGGABLE_TABS_DOCUMENT_DRAGGING_BODY_CLASS } from 'app/src/scripts/faDragDrop/functions/faVerticalDraggableTabsDocumentDragCursor'
 
@@ -411,4 +411,91 @@ test('Test that DialogProjectSettingsWorldsTabList merges filtered drag reorder 
     worldsFilteredReorderFixture[1],
     worldsFilteredReorderFixture[0]
   ])
+})
+
+/**
+ * DialogProjectSettingsWorldsTabList
+ * Resyncs draggable worlds when the worlds prop changes.
+ */
+test('Test that DialogProjectSettingsWorldsTabList resyncs when worlds prop changes', async () => {
+  const w = mount(DialogProjectSettingsWorldsTabList, {
+    props: {
+      currentLanguageCode: 'en-US',
+      documentTemplates: [],
+      selectedWorldId: worldsFilterFixture[0].id,
+      worlds: worldsFilterFixture
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      },
+      stubs: {
+        DialogProjectSettingsWorldsTabItem: true,
+        DialogProjectSettingsVerticalTabListFilterInput: true,
+        QBtn: defineComponent({
+          inheritAttrs: true,
+          template: '<button type="button" v-bind="$attrs"><slot /></button>'
+        }),
+        VueDraggable: defineComponent({ template: '<div><slot /></div>' })
+      }
+    }
+  })
+
+  await w.setProps({ worlds: [...worldsFilterFixture].reverse() })
+  expect(w.props('worlds')[0]?.id).toBe(worldsFilterFixture[1].id)
+})
+
+/**
+ * DialogProjectSettingsWorldsTabList
+ * Scrolls the world tab list when a new world row is appended.
+ */
+test('Test that DialogProjectSettingsWorldsTabList scrolls when worlds append', async () => {
+  const scrollIntoView = vi.fn()
+  vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+    const frameTime = 0
+    callback(frameTime)
+    return 1
+  })
+
+  const firstWorld = worldsFixture[0]
+  const secondWorld = {
+    ...worldsFixture[0],
+    displayNameTranslations: { 'en-US': 'Second Realm' },
+    id: '550e8400-e29b-41d4-a716-446655440099'
+  }
+
+  const w = mount(DialogProjectSettingsWorldsTabList, {
+    props: {
+      currentLanguageCode: 'en-US',
+      documentTemplates: [],
+      selectedWorldId: firstWorld.id,
+      worlds: [firstWorld]
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      },
+      stubs: {
+        DialogProjectSettingsWorldsTabItem: defineComponent({
+          mounted (): void {
+            this.$el.scrollIntoView = scrollIntoView
+          },
+          template: '<div class="faVerticalDraggableTabs__tab world-tab-stub" />'
+        }),
+        QBtn: defineComponent({
+          inheritAttrs: true,
+          template: '<button type="button" v-bind="$attrs" @click="$emit(\'click\')" />'
+        }),
+        VueDraggable: defineComponent({
+          template: '<div class="vue-draggable-stub"><slot /></div>'
+        })
+      }
+    }
+  })
+
+  await w.setProps({ worlds: [firstWorld, secondWorld] })
+  await flushPromises()
+
+  expect(scrollIntoView).toHaveBeenCalled()
+  vi.unstubAllGlobals()
 })

@@ -8,6 +8,9 @@ import {
 } from '../faProjectDbMigrateWiring'
 
 const seedFaProjectDefaultWorldIfEmptyMock = vi.hoisted(() => vi.fn())
+const migrateV1ToV2Mock = vi.hoisted(() => vi.fn())
+const migrateV2ToV3Mock = vi.hoisted(() => vi.fn())
+const migrateV3ToV4Mock = vi.hoisted(() => vi.fn())
 const migrateV4ToV5Mock = vi.hoisted(() => vi.fn())
 const migrateV5ToV6Mock = vi.hoisted(() => vi.fn())
 const migrateV6ToV7Mock = vi.hoisted(() => vi.fn())
@@ -21,6 +24,18 @@ vi.mock('../projectDbContent/faProjectWorldBootstrapWiring', () => {
     seedFaProjectDefaultWorldIfEmpty: seedFaProjectDefaultWorldIfEmptyMock
   }
 })
+
+vi.mock('../functions/faProjectDbMigrateV1ToV2', () => ({
+  migrateFaProjectSchemaV1ToV2: (...args: unknown[]) => migrateV1ToV2Mock(...args)
+}))
+
+vi.mock('../functions/faProjectDbMigrateV2ToV3', () => ({
+  migrateFaProjectSchemaV2ToV3: (...args: unknown[]) => migrateV2ToV3Mock(...args)
+}))
+
+vi.mock('../functions/faProjectDbMigrateV3ToV4', () => ({
+  migrateFaProjectSchemaV3ToV4: (...args: unknown[]) => migrateV3ToV4Mock(...args)
+}))
 
 vi.mock('../functions/faProjectDbMigrateV4ToV5', () => ({
   migrateFaProjectSchemaV4ToV5: (...args: unknown[]) => migrateV4ToV5Mock(...args)
@@ -52,6 +67,9 @@ vi.mock('../functions/faProjectDbMigrateV10ToV11', () => ({
 
 beforeEach(() => {
   seedFaProjectDefaultWorldIfEmptyMock.mockClear()
+  migrateV1ToV2Mock.mockReset()
+  migrateV2ToV3Mock.mockReset()
+  migrateV3ToV4Mock.mockReset()
   migrateV4ToV5Mock.mockReset()
   migrateV5ToV6Mock.mockReset()
   migrateV6ToV7Mock.mockReset()
@@ -373,6 +391,59 @@ test('Test that readFaProjectStoredProjectUuid throws when project_uuid row is a
     prepare: vi.fn(() => ({ get: vi.fn(() => undefined) }))
   }
   expect(() => readFaProjectStoredProjectUuid(db as never)).toThrow(/missing project_uuid/)
+})
+
+test('applyFaProjectMigrations runs v1->v2->v3->v4 ladder when user_version starts at 1', () => {
+  const pragmas: Record<string, unknown> = { user_version: 1 }
+  migrateV1ToV2Mock.mockImplementation(() => {
+    pragmas.user_version = 2
+  })
+  migrateV2ToV3Mock.mockImplementation(() => {
+    pragmas.user_version = 3
+  })
+  migrateV3ToV4Mock.mockImplementation(() => {
+    pragmas.user_version = 4
+  })
+  migrateV4ToV5Mock.mockImplementation(() => {
+    pragmas.user_version = 5
+  })
+  migrateV5ToV6Mock.mockImplementation(() => {
+    pragmas.user_version = 6
+  })
+  migrateV6ToV7Mock.mockImplementation(() => {
+    pragmas.user_version = 7
+  })
+  migrateV7ToV8Mock.mockImplementation(() => {
+    pragmas.user_version = 8
+  })
+  migrateV8ToV9Mock.mockImplementation(() => {
+    pragmas.user_version = 9
+  })
+  migrateV9ToV10Mock.mockImplementation(() => {
+    pragmas.user_version = 10
+  })
+  migrateV10ToV11Mock.mockImplementation(() => {
+    pragmas.user_version = 11
+  })
+  const db = {
+    exec: vi.fn(),
+    prepare: vi.fn(),
+    pragma: vi.fn((name: string, opts?: { simple?: boolean }) => {
+      if (name === 'user_version' && opts?.simple === true) {
+        return pragmas.user_version
+      }
+      applyMockUserVersionPragma(name, pragmas)
+      return undefined
+    }),
+    transaction: vi.fn((fn: () => void) => () => {
+      fn()
+    })
+  }
+  applyFaProjectMigrations(db as never, 'Legacy')
+  expect(migrateV1ToV2Mock).toHaveBeenCalledOnce()
+  expect(migrateV2ToV3Mock).toHaveBeenCalledOnce()
+  expect(migrateV3ToV4Mock).toHaveBeenCalledOnce()
+  expect(pragmas.user_version).toBe(11)
 })
 
 test('applyFaProjectMigrations runs v4->v5->v6->v7->v8->v9 ladder when user_version starts at 4', () => {

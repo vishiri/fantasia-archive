@@ -1,4 +1,5 @@
 /** @vitest-environment jsdom */
+import { defineComponent } from 'vue'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { ref } from 'vue'
@@ -77,6 +78,40 @@ vi.mock('app/src/components/floatingWindows/WindowProjectStyling/scripts/windowP
 
 import WindowProjectStyling from '../WindowProjectStyling.vue'
 
+const windowProjectStylingQMenuStub = defineComponent({
+  name: 'QMenu',
+  props: {
+    modelValue: {
+      type: Boolean,
+      default: false
+    }
+  },
+  emits: ['update:modelValue'],
+  template: '<div class="q-menu-stub" v-bind="$attrs"><slot /></div>'
+})
+
+const windowProjectStylingMountStubs = {
+  FaFloatingWindowBodyTeleport: {
+    template: '<div><slot /></div>'
+  },
+  QBtn: {
+    inheritAttrs: true,
+    props: {
+      label: {
+        default: '',
+        type: String
+      }
+    },
+    template: '<button type="button" v-bind="$attrs"><span>{{ label }}</span></button>'
+  },
+  QCard: { template: '<div><slot /></div>' },
+  QCardActions: { template: '<div><slot /></div>' },
+  QCardSection: { template: '<div><slot /></div>' },
+  QIcon: { template: '<i><slot /></i>' },
+  QMenu: windowProjectStylingQMenuStub,
+  QSpinnerDots: { template: '<span />' }
+}
+
 const injectMinimalFaRootVarsForList = (): void => {
   const s = document.createElement('style')
   s.setAttribute('data-fa-vitest-theme-stub', 'project-styling')
@@ -144,27 +179,7 @@ test('Test that WindowProjectStyling surfaces title and action button locators',
   const w = mount(WindowProjectStyling, {
     global: {
       mocks: { $t: stylingT },
-      stubs: {
-        FaFloatingWindowBodyTeleport: {
-          template: '<div><slot /></div>'
-        },
-        QBtn: {
-          inheritAttrs: true,
-          props: {
-            label: {
-              default: '',
-              type: String
-            }
-          },
-          template: '<button type="button" v-bind="$attrs"><span>{{ label }}</span></button>'
-        },
-        QCard: { template: '<div><slot /></div>' },
-        QCardActions: { template: '<div><slot /></div>' },
-        QCardSection: { template: '<div><slot /></div>' },
-        QIcon: { template: '<i><slot /></i>' },
-        QMenu: { template: '<div class="q-menu-stub"><slot /></div>' },
-        QSpinnerDots: { template: '<span />' }
-      }
+      stubs: windowProjectStylingMountStubs
     }
   })
 
@@ -189,27 +204,7 @@ test('Test that WindowProjectStyling forwards frame and title-bar pointerdown ha
   const w = mount(WindowProjectStyling, {
     global: {
       mocks: { $t: stylingT },
-      stubs: {
-        FaFloatingWindowBodyTeleport: {
-          template: '<div><slot /></div>'
-        },
-        QBtn: {
-          inheritAttrs: true,
-          props: {
-            label: {
-              default: '',
-              type: String
-            }
-          },
-          template: '<button type="button" v-bind="$attrs"><span>{{ label }}</span></button>'
-        },
-        QCard: { template: '<div><slot /></div>' },
-        QCardActions: { template: '<div><slot /></div>' },
-        QCardSection: { template: '<div><slot /></div>' },
-        QIcon: { template: '<i><slot /></i>' },
-        QMenu: { template: '<div class="q-menu-stub"><slot /></div>' },
-        QSpinnerDots: { template: '<span />' }
-      }
+      stubs: windowProjectStylingMountStubs
     }
   })
 
@@ -228,27 +223,7 @@ test('Test that WindowProjectStyling shows loading and load-error overlays from 
   const wLoading = mount(WindowProjectStyling, {
     global: {
       mocks: { $t: stylingT },
-      stubs: {
-        FaFloatingWindowBodyTeleport: {
-          template: '<div><slot /></div>'
-        },
-        QBtn: {
-          inheritAttrs: true,
-          props: {
-            label: {
-              default: '',
-              type: String
-            }
-          },
-          template: '<button type="button" v-bind="$attrs"><span>{{ label }}</span></button>'
-        },
-        QCard: { template: '<div><slot /></div>' },
-        QCardActions: { template: '<div><slot /></div>' },
-        QCardSection: { template: '<div><slot /></div>' },
-        QIcon: { template: '<i><slot /></i>' },
-        QMenu: { template: '<div class="q-menu-stub"><slot /></div>' },
-        QSpinnerDots: { template: '<span />' }
-      }
+      stubs: windowProjectStylingMountStubs
     }
   })
 
@@ -262,27 +237,7 @@ test('Test that WindowProjectStyling shows loading and load-error overlays from 
   const wError = mount(WindowProjectStyling, {
     global: {
       mocks: { $t: stylingT },
-      stubs: {
-        FaFloatingWindowBodyTeleport: {
-          template: '<div><slot /></div>'
-        },
-        QBtn: {
-          inheritAttrs: true,
-          props: {
-            label: {
-              default: '',
-              type: String
-            }
-          },
-          template: '<button type="button" v-bind="$attrs"><span>{{ label }}</span></button>'
-        },
-        QCard: { template: '<div><slot /></div>' },
-        QCardActions: { template: '<div><slot /></div>' },
-        QCardSection: { template: '<div><slot /></div>' },
-        QIcon: { template: '<i><slot /></i>' },
-        QMenu: { template: '<div class="q-menu-stub"><slot /></div>' },
-        QSpinnerDots: { template: '<span />' }
-      }
+      stubs: windowProjectStylingMountStubs
     }
   })
 
@@ -290,4 +245,24 @@ test('Test that WindowProjectStyling shows loading and load-error overlays from 
     'Monaco failed to load'
   )
   wError.unmount()
+})
+
+test('Test that WindowProjectStyling syncs help keybind menu open state', async () => {
+  const w = mount(WindowProjectStyling, {
+    global: {
+      mocks: { $t: stylingT },
+      stubs: windowProjectStylingMountStubs
+    }
+  })
+
+  const helpMenu = w.findComponent({ name: 'QMenu' })
+  expect(helpMenu.props('modelValue')).toBe(false)
+
+  await helpMenu.vm.$emit('update:modelValue', true)
+  await w.vm.$nextTick()
+
+  expect(helpMenu.props('modelValue')).toBe(true)
+  expect(w.find('[data-test-locator="windowProjectStyling-helpMenu"]').exists()).toBe(true)
+
+  w.unmount()
 })

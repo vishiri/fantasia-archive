@@ -58,7 +58,20 @@ const qMenuStub = defineComponent({
       }
     }
   },
-  template: '<div v-if="modelValue" class="q-menu-stub" v-bind="$attrs"><slot /></div>'
+  template: `
+    <div
+      v-if="modelValue"
+      class="q-menu-stub"
+      v-bind="$attrs"
+    >
+      <slot />
+      <button
+        class="q-menu-stub-close"
+        type="button"
+        @click="$emit('update:modelValue', false)"
+      />
+    </div>
+  `
 })
 
 const qBtnStub = defineComponent({
@@ -281,4 +294,25 @@ test('Test that resolveFaLocaleTranslationsMenuAnchorElement prefers q-field hos
 test('Test that resolveFaLocaleTranslationsMenuAnchorElement falls back to trigger element', () => {
   const trigger = document.createElement('button')
   expect(resolveFaLocaleTranslationsMenuAnchorElement(trigger)).toBe(trigger)
+})
+
+/**
+ * FaLocaleTranslationsInput
+ * Syncs translations menu open state through the summary field binding.
+ */
+test('Test that FaLocaleTranslationsInput syncs translations menu open state from the summary field', async () => {
+  const w = mount(FaLocaleTranslationsInput, {
+    props: {
+      currentLanguageCode: 'en-US',
+      modelValue: { 'en-US': 'Character' },
+      testLocator
+    },
+    global: mountGlobal
+  })
+
+  await w.find(`[data-test-locator="${testLocator}-translationsButton"]`).trigger('click')
+  expect(w.find(`[data-test-locator="${testLocator}-translationsMenu"]`).exists()).toBe(true)
+
+  await w.find('.q-menu-stub-close').trigger('click')
+  expect(w.find(`[data-test-locator="${testLocator}-translationsMenu"]`).exists()).toBe(false)
 })

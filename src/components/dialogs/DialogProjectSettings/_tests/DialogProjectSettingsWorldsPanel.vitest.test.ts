@@ -46,7 +46,7 @@ const detailPanelStub = defineComponent({
       required: true
     }
   },
-  emits: ['remove', 'update:color', 'update:colorPallete', 'update:displayNameTranslations'],
+  emits: ['remove', 'update:color', 'update:colorPallete', 'update:displayNameTranslations', 'update:templateLayout'],
   template: `
     <div
       class="dialog-project-settings-worlds-detail-stub"
@@ -73,6 +73,11 @@ const detailPanelStub = defineComponent({
         type="button"
         data-test-locator="dialogProjectSettings-worlds-detail-name"
         @click="$emit('update:displayNameTranslations', { 'en-US': 'Renamed' })"
+      />
+      <button
+        type="button"
+        data-test-locator="dialogProjectSettings-worlds-detail-layout"
+        @click="$emit('update:templateLayout', { groups: [], placements: [] })"
       />
     </div>
   `
@@ -163,6 +168,12 @@ test('Test that DialogProjectSettingsWorldsPanel forwards add world and detail u
 
   await w.find('[data-test-locator="dialogProjectSettings-worlds-detail-name"]').trigger('click')
   expect(w.emitted('updateWorldDisplayNameTranslations')?.[0]).toEqual([worldA.id, { 'en-US': 'Renamed' }])
+
+  await w.find('[data-test-locator="dialogProjectSettings-worlds-detail-layout"]').trigger('click')
+  expect(w.emitted('updateWorldTemplateLayout')?.[0]).toEqual([worldA.id, {
+    groups: [],
+    placements: []
+  }])
 })
 
 /**
@@ -228,4 +239,33 @@ test('Test that DialogProjectSettingsWorldsPanel passes the selected world to th
     ...worldA,
     colorPallete: '#112233;#445566'
   })
+})
+
+/**
+ * DialogProjectSettingsWorldsPanel
+ * Hides the detail panel when no world is selected.
+ */
+test('Test that DialogProjectSettingsWorldsPanel hides detail when selection is empty', async () => {
+  const w = mount(DialogProjectSettingsWorldsPanel, {
+    props: {
+      currentLanguageCode: 'en-US',
+      documentTemplates: [],
+      worlds: []
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      },
+      stubs: {
+        DialogProjectSettingsWorldsDetailPanel: detailPanelStub,
+        DialogProjectSettingsWorldsTabList: defineComponent({
+          emits: ['addWorld', 'select', 'update:worlds'],
+          template: '<div class="empty-worlds-tab-list-stub" />'
+        }),
+        QSeparator: { template: '<hr />' }
+      }
+    }
+  })
+
+  expect(w.find('.dialog-project-settings-worlds-detail-stub').exists()).toBe(false)
 })

@@ -279,6 +279,28 @@ test('Test that collectDialogProjectSettingsSaveValidationErrors lists all block
 
 /**
  * collectDialogProjectSettingsSaveValidationErrors
+ * Accepts worlds whose template layout groups have named translations.
+ */
+test('Test that collectDialogProjectSettingsSaveValidationErrors accepts named template layout groups', () => {
+  expect(collectDialogProjectSettingsSaveValidationErrors('Project', [
+    {
+      ...baseWorld,
+      templateLayout: {
+        groups: [
+          {
+            displayNameTranslations: { 'en-US': 'Creatures' },
+            id: 'group-a',
+            rootSortOrder: 0
+          }
+        ],
+        placements: []
+      }
+    }
+  ])).toEqual([])
+})
+
+/**
+ * collectDialogProjectSettingsSaveValidationErrors
  * Skips sparse array holes when iterating worlds.
  */
 test('Test that collectDialogProjectSettingsSaveValidationErrors ignores undefined world slots', () => {

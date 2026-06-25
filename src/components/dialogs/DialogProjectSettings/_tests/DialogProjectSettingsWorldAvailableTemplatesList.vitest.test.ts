@@ -20,7 +20,7 @@ const listStubs = {
   QIcon: defineComponent({ template: '<span class="q-icon-stub" />' }),
   QItem: defineComponent({
     inheritAttrs: true,
-    template: '<div class="q-item-stub" v-bind="$attrs" @click="$emit(\'click\')"><slot /></div>'
+    template: '<div class="q-item-stub" v-bind="$attrs" @click="$emit(\'click\')" @contextmenu="$emit(\'contextmenu\', $event)"><slot /></div>'
   }),
   QItemLabel: defineComponent({ template: '<span><slot /></span>' }),
   QItemSection: defineComponent({ template: '<div><slot /></div>' }),
@@ -153,4 +153,61 @@ test('Test that DialogProjectSettingsWorldAvailableTemplatesList hides missing t
   expect(w.find('[data-test-locator="dialogProjectSettings-worldAvailableTemplates-missingTranslationsWarning"]').exists()).toBe(
     false
   )
+})
+
+/**
+ * DialogProjectSettingsWorldAvailableTemplatesList
+ * Renders multiline tooltip body for missing translation warnings.
+ */
+test('Test that DialogProjectSettingsWorldAvailableTemplatesList renders multiline missing translation tooltip', () => {
+  const w = mount(DialogProjectSettingsWorldAvailableTemplatesList, {
+    props: {
+      currentLanguageCode: 'de',
+      templates: [
+        buildDialogProjectSettingsDocumentTemplateDraft({
+          titlePluralTranslations: { 'en-US': 'Character' },
+          titleSingularTranslations: {}
+        })
+      ]
+    },
+    global: mergeDialogProjectSettingsVitestGlobal({
+      stubs: {
+        ...listStubs,
+        QIcon: defineComponent({ template: '<span class="q-icon-stub"><slot /></span>' }),
+        FaMultilineTooltipBody: defineComponent({
+          props: {
+            text: {
+              type: String,
+              required: true
+            }
+          },
+          template: '<span class="multiline-tooltip-stub">{{ text }}</span>'
+        }),
+        QTooltip: { template: '<span><slot /></span>' }
+      }
+    })
+  })
+
+  expect(w.find('.multiline-tooltip-stub').exists()).toBe(true)
+})
+
+/**
+ * DialogProjectSettingsWorldAvailableTemplatesList
+ * Clears hover focus state when a row receives context menu.
+ */
+test('Test that DialogProjectSettingsWorldAvailableTemplatesList clears hover focus on context menu', async () => {
+  const w = mount(DialogProjectSettingsWorldAvailableTemplatesList, {
+    props: {
+      currentLanguageCode: 'en-US',
+      templates: [templateFixture]
+    },
+    global: listMountGlobal
+  })
+
+  const row = w.find(
+    '[data-test-locator="dialogProjectSettings-worldAvailableTemplate-7c9e6679-7425-40de-944b-e07fc1f90ae7"]'
+  )
+  row.element.classList.add('q-hoverable', 'q-manual-focusable--focused')
+  await row.trigger('contextmenu')
+  expect(row.element.classList.contains('q-manual-focusable--focused')).toBe(false)
 })

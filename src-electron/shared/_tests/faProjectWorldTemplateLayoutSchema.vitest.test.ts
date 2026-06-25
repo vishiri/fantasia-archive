@@ -59,6 +59,7 @@ test('Test that parseFaProjectWorldTemplateLayoutSnapshot rejects invalid placem
         groupId: null,
         groupSortOrder: 0,
         id: SAMPLE_UUID_B,
+        nicknamePluralTranslations: {},
         rootSortOrder: 0
       }
     ]
@@ -71,26 +72,10 @@ test('Test that parseFaProjectWorldTemplateLayoutSnapshot rejects invalid placem
         groupId: SAMPLE_UUID_B,
         groupSortOrder: null,
         id: SAMPLE_UUID,
+        nicknamePluralTranslations: {},
         rootSortOrder: 0
       }
     ]
-  })).toThrow()
-})
-
-/**
- * parseFaProjectWorldTemplateLayoutSnapshot
- * Rejects layout groups without any display name translation.
- */
-test('Test that parseFaProjectWorldTemplateLayoutSnapshot rejects blank group translation maps', () => {
-  expect(() => parseFaProjectWorldTemplateLayoutSnapshot({
-    groups: [
-      {
-        displayNameTranslations: {},
-        id: SAMPLE_UUID,
-        rootSortOrder: 0
-      }
-    ],
-    placements: []
   })).toThrow()
 })
 

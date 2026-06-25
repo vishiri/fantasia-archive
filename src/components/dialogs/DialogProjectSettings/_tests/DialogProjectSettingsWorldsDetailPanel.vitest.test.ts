@@ -329,3 +329,43 @@ test('Test that DialogProjectSettingsWorldsDetailPanel reflects validation and r
     'dialogs.projectSettings.panels.worlds.removeDisabledHasDocuments'
   )
 })
+
+/**
+ * DialogProjectSettingsWorldsDetailPanel
+ * Forwards template layout updates from the world layout panel.
+ */
+test('Test that DialogProjectSettingsWorldsDetailPanel forwards template layout updates', async () => {
+  const layoutPanelStub = defineComponent({
+    name: 'DialogProjectSettingsWorldTemplateLayoutPanel',
+    emits: ['update:templateLayout'],
+    template: '<button type="button" data-test-locator="emit-template-layout" @click="$emit(\'update:templateLayout\', { groups: [], placements: [] })" />'
+  })
+
+  const w = mount(DialogProjectSettingsWorldsDetailPanel, {
+    props: {
+      currentLanguageCode: 'en-US',
+      documentTemplates: [],
+      nameHasError: false,
+      removeDisabled: false,
+      removeDisabledReason: null,
+      world: worldFixture
+    },
+    global: mergeDialogProjectSettingsVitestGlobal({
+      stubs: {
+        DialogProjectSettingsWorldColorPaletteEditor: true,
+        DialogProjectSettingsWorldTemplateLayoutPanel: layoutPanelStub,
+        DialogProjectSettingsWorldsDeleteButton: deleteButtonStub,
+        FaColorPickerInput: true,
+        FaLocaleTranslationsInput: faLocaleTranslationsInputStub,
+        QIcon: qIconStub,
+        QTooltip: true
+      }
+    })
+  })
+
+  await w.find('[data-test-locator="emit-template-layout"]').trigger('click')
+  expect(w.emitted('update:templateLayout')?.[0]).toEqual([{
+    groups: [],
+    placements: []
+  }])
+})

@@ -7,6 +7,8 @@ import { beforeEach, expect, test, vi } from 'vitest'
 
 import DialogProjectSettings from '../DialogProjectSettings.vue'
 import { mergeDialogProjectSettingsVitestGlobal } from 'app/helpers/dialogProjectSettingsVitestI18n'
+import { buildDialogProjectSettingsDocumentTemplateDraft } from './dialogProjectSettingsDocumentTemplateDraftFixtures'
+import { FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB } from '../scripts/functions/dialogProjectSettingsDialogInput'
 
 vi.mock('app/src/stores/scripts/sFaProjectSettingsBridge', () => ({
   faProjectSettingsFetchFreshForDialog: vi.fn(async () => ({
@@ -45,10 +47,14 @@ const dialogProjectSettingsQDialogStub = defineComponent({
     modelValue: {
       type: Boolean,
       default: false
+    },
+    persistent: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['update:modelValue'],
-  template: '<div class="q-dialog-stub"><slot v-if="modelValue" /></div>'
+  template: '<div class="q-dialog-stub" :data-persistent="String(persistent)"><slot v-if="modelValue" /></div>'
 })
 
 const dialogProjectSettingsQInputStub = defineComponent({
@@ -86,7 +92,23 @@ const dialogProjectSettingsQBtnStub = defineComponent({
       default: false
     }
   },
-  template: '<button type="button" v-bind="$attrs" :disabled="disable" @click="$emit(\'click\')"><slot /></button>'
+  emits: ['click'],
+  methods: {
+    onClick (): void {
+      if (this.$attrs['data-test-locator'] === 'dialogProjectSettings-button-close') {
+        let parent = this.$parent
+        while (parent !== null) {
+          if (parent.$options.name === 'QDialog') {
+            parent.$emit('update:modelValue', false)
+            return
+          }
+          parent = parent.$parent
+        }
+      }
+      this.$emit('click')
+    }
+  },
+  template: '<button type="button" v-bind="$attrs" :disabled="disable" @click="onClick"><slot /></button>'
 })
 
 const dialogProjectSettingsQIconStub = defineComponent({
@@ -116,7 +138,13 @@ const dialogProjectSettingsQTabsStub = defineComponent({
 const dialogProjectSettingsQTabStub = defineComponent({
   name: 'QTab',
   inheritAttrs: true,
-  template: '<div class="q-tab-stub" />'
+  props: {
+    name: {
+      type: String,
+      required: true
+    }
+  },
+  template: '<button type="button" class="q-tab-stub" v-bind="$attrs" @click="$parent.$emit(\'update:modelValue\', name)" />'
 })
 
 const dialogProjectSettingsStubs = {
@@ -176,6 +204,7 @@ test('Test that DialogProjectSettings mounts with direct snapshot and shows proj
 
   await flushPromises()
 
+  expect(w.find('.q-dialog-stub').attributes('data-persistent')).toBe('true')
   expect(w.find('[data-test-locator="dialogProjectSettings-title"]').text()).toContain(
     'dialogs.projectSettings.title'
   )
@@ -388,4 +417,164 @@ test('Test that DialogProjectSettings shows save validation errors icon beside S
   expect(tooltipText).toContain('dialogs.projectSettings.saveErrors.tooltipIntro')
   expect(tooltipText).toContain('dialogs.projectSettings.fields.projectName.errorRequired')
   expect(tooltipText.indexOf('\n- ')).toBeGreaterThan(-1)
+})
+
+/**
+ * DialogProjectSettings
+ * Close button dismisses the dialog through v-model on QDialog.
+ */
+test('Test that DialogProjectSettings close button dismisses the dialog', async () => {
+  const w = mount(DialogProjectSettings, {
+    global: mergeDialogProjectSettingsVitestGlobal({
+      stubs: dialogProjectSettingsStubs
+    }),
+    props: {
+      directInput: 'ProjectSettings',
+      directSettingsSnapshot: {
+        projectName: 'Snapshot Name',
+        schemaVersion: 1
+      }
+    }
+  })
+
+  await flushPromises()
+
+  expect(w.find('[data-test-locator="dialogProjectSettings-title"]').exists()).toBe(true)
+  await w.find('[data-test-locator="dialogProjectSettings-button-close"]').trigger('click')
+  expect(w.find('[data-test-locator="dialogProjectSettings-title"]').exists()).toBe(false)
+})
+
+/**
+ * DialogProjectSettings
+ * Tab bar category changes update the selected settings panel tab.
+ */
+test('Test that DialogProjectSettings switches category tabs from the tab bar', async () => {
+  const w = mount(DialogProjectSettings, {
+    global: mergeDialogProjectSettingsVitestGlobal({
+      stubs: dialogProjectSettingsStubs
+    }),
+    props: {
+      directInput: 'ProjectSettings',
+      directSettingsSnapshot: {
+        projectName: 'Snapshot Name',
+        schemaVersion: 1
+      }
+    }
+  })
+
+  await flushPromises()
+
+  const tabBar = w.findComponent({ name: 'DialogProjectSettingsTabBar' })
+  await tabBar.vm.$emit('update:selectedCategoryTab', FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB)
+  await flushPromises()
+
+  expect(tabBar.props('selectedCategoryTab')).toBe(FA_DIALOG_PROJECT_SETTINGS_WORLDS_TAB)
+  expect(w.find('[data-test-locator="dialogProjectSettings-worlds-addButton"]').exists()).toBe(true)
+})
+
+/**
+ * DialogProjectSettings
+ * Reordered worlds and document templates update local draft clones.
+ */
+test('Test that DialogProjectSettings updates local order drafts from panels column', async () => {
+  const reorderedWorld = {
+    color: '',
+    colorPallete: '',
+    displayNameTranslations: { 'en-US': 'Beta' },
+    documentCount: 0,
+    id: 'world-b',
+    templateLayout: {
+      groups: [],
+      placements: []
+    }
+  }
+  const reorderedTemplate = buildDialogProjectSettingsDocumentTemplateDraft({
+    id: 'template-b',
+    titlePluralTranslations: { 'en-US': 'Location' },
+    titleSingularTranslations: {}
+  })
+
+  const panelsColumnStub = defineComponent({
+    name: 'DialogProjectSettingsPanelsColumn',
+    emits: ['update:worlds', 'update:documentTemplates'],
+    setup () {
+      return {
+        reorderedTemplate,
+        reorderedWorld
+      }
+    },
+    template: `
+      <div>
+        <button
+          type="button"
+          data-test-locator="emit-worlds-order"
+          @click="$emit('update:worlds', [reorderedWorld])"
+        />
+        <button
+          type="button"
+          data-test-locator="emit-templates-order"
+          @click="$emit('update:documentTemplates', [reorderedTemplate])"
+        />
+      </div>
+    `
+  })
+
+  const runFaActionAwait = vi.mocked(
+    (await import('app/src/scripts/actionManager/faActionManagerRun_manager')).runFaActionAwait
+  )
+
+  const w = mount(DialogProjectSettings, {
+    global: mergeDialogProjectSettingsVitestGlobal({
+      stubs: {
+        ...dialogProjectSettingsStubs,
+        DialogProjectSettingsPanelsColumn: panelsColumnStub
+      }
+    }),
+    props: {
+      directInput: 'ProjectSettings',
+      directSettingsSnapshot: {
+        projectName: 'Snapshot Name',
+        schemaVersion: 1
+      }
+    }
+  })
+
+  await flushPromises()
+
+  await w.find('[data-test-locator="emit-templates-order"]').trigger('click')
+  await w.find('[data-test-locator="emit-worlds-order"]').trigger('click')
+  await w.find('[data-test-locator="dialogProjectSettings-button-save"]').trigger('click')
+  await flushPromises()
+
+  const savePayload = runFaActionAwait.mock.calls.at(-1)?.[1] as {
+    documentTemplates: { id: string }[]
+    worlds: { id: string }[]
+  }
+  expect(savePayload.worlds.map((row) => row.id)).toEqual(['world-b'])
+  expect(savePayload.documentTemplates.map((row) => row.id)).toEqual(['template-b'])
+})
+
+/**
+ * DialogProjectSettings
+ * Ignores project name updates while local settings are not hydrated.
+ */
+test('Test that DialogProjectSettings ignores project name updates without local settings', async () => {
+  const w = mount(DialogProjectSettings, {
+    global: mergeDialogProjectSettingsVitestGlobal({
+      stubs: dialogProjectSettingsStubs
+    }),
+    props: {
+      directInput: 'ProjectSettings'
+    }
+  })
+
+  await flushPromises()
+
+  const vm = w.vm as unknown as {
+    localSettings: { projectName: string } | null
+    updateProjectName: (value: string) => void
+  }
+  vm.localSettings = null
+  vm.updateProjectName('Ignored')
+  expect(vm.localSettings).toBeNull()
 })

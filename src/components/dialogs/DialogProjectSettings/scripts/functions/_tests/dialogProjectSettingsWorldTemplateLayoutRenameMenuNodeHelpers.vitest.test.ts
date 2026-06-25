@@ -158,6 +158,30 @@ test('Test that emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdat
 })
 
 /**
+ * emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate
+ * Returns early when required translation payloads are missing.
+ */
+test('Test that emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate ignores missing translation payloads', () => {
+  const emitRenameGroup = vi.fn()
+  const emitRenamePlacementNickname = vi.fn()
+
+  emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate({
+    emitRenameGroup,
+    emitRenamePlacementNickname,
+    node: groupNode
+  })
+  expect(emitRenameGroup).not.toHaveBeenCalled()
+
+  emitDialogProjectSettingsWorldTemplateLayoutRenameMenuDraftUpdate({
+    displayNameTranslations: { 'en-US': 'Hero' },
+    emitRenameGroup,
+    emitRenamePlacementNickname,
+    node: templateNode
+  })
+  expect(emitRenamePlacementNickname).not.toHaveBeenCalled()
+})
+
+/**
  * isDialogProjectSettingsWorldTemplateLayoutGroupNameTranslationsInvalid
  * Treats non-string locale values as empty translations.
  */

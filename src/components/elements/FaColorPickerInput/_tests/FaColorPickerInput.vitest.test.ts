@@ -62,7 +62,15 @@ const qMenuStub = defineComponent({
     }
   },
   emits: ['hide', 'update:modelValue'],
-  template: '<div v-if="modelValue" class="q-menu-stub"><slot /></div>'
+  template: `
+    <div
+      v-if="modelValue"
+      class="q-menu-stub"
+      @click="$emit('update:modelValue', false); $emit('hide')"
+    >
+      <slot />
+    </div>
+  `
 })
 
 async function openFaColorPickerInputMenu (
@@ -428,4 +436,31 @@ test('Test that FaColorPickerInput disables append for duplicate palette colors'
   expect(appendButton.attributes('data-test-tooltip-text')).toBe(
     'faColorPickerInput.appendToWorldPaletteDuplicateTooltip'
   )
+})
+
+/**
+ * FaColorPickerInput
+ * Closes the picker menu when the menu hide handler runs.
+ */
+test('Test that FaColorPickerInput closes the picker menu on hide', async () => {
+  const w = mount(FaColorPickerInput, {
+    props: {
+      modelValue: '#aabbcc',
+      testLocator
+    },
+    global: {
+      stubs: {
+        QColor: true,
+        QIcon: qIconStub,
+        QInput: qInputStub,
+        QMenu: qMenuStub
+      }
+    }
+  })
+
+  await openFaColorPickerInputMenu(w)
+  expect(w.find('.q-menu-stub').exists()).toBe(true)
+
+  await w.find('.q-menu-stub').trigger('click')
+  expect(w.find('.q-menu-stub').exists()).toBe(false)
 })

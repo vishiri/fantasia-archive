@@ -298,3 +298,134 @@ test('Test that DialogProjectSettingsWorldColorPaletteSwatch disables duplicate 
   const duplicateRow = w.find('[data-test-locator="dialogProjectSettings-worlds-colorPaletteContextMenu-duplicate"]')
   expect(duplicateRow.attributes('aria-disabled')).toBe('true')
 })
+
+/**
+ * DialogProjectSettingsWorldColorPaletteSwatch
+ * Emits picker-close when the picker menu hides.
+ */
+test('Test that DialogProjectSettingsWorldColorPaletteSwatch emits picker-close when picker menu hides', async () => {
+  const hideMenuStub = defineComponent({
+    name: 'QMenu',
+    inheritAttrs: false,
+    props: {
+      modelValue: {
+        type: Boolean,
+        default: false
+      }
+    },
+    emits: ['hide', 'update:modelValue'],
+    template: '<div v-if="modelValue" class="q-menu-stub" v-bind="$attrs" @click="$emit(\'hide\')" />'
+  })
+
+  const w = mount(DialogProjectSettingsWorldColorPaletteSwatch, {
+    props: {
+      ...defaultSwatchProps,
+      pickerOpen: true,
+      worldPickerPalette: []
+    },
+    global: {
+      stubs: {
+        ...defaultSwatchStubs,
+        QMenu: hideMenuStub,
+        QTooltip: true
+      }
+    }
+  })
+
+  await w.find('[data-test-locator="dialogProjectSettings-worlds-colorPalettePickerMenu"]').trigger('click')
+  expect(w.emitted('picker-close')).toBeTruthy()
+})
+
+/**
+ * DialogProjectSettingsWorldColorPaletteSwatch
+ * Exposes hover tooltip text on the swatch when not dragging.
+ */
+test('Test that DialogProjectSettingsWorldColorPaletteSwatch exposes hover tooltip text', () => {
+  const w = mount(DialogProjectSettingsWorldColorPaletteSwatch, {
+    props: defaultSwatchProps,
+    global: {
+      stubs: defaultSwatchStubs
+    }
+  })
+
+  expect(
+    w.find('[data-test-locator="dialogProjectSettings-worlds-colorPaletteSwatch"]').attributes('data-test-tooltip-text')
+  ).toBe('#112233')
+})
+
+/**
+ * DialogProjectSettingsWorldColorPaletteSwatch
+ * Renders duplicate warning icon when hex collides with another palette entry.
+ */
+test('Test that DialogProjectSettingsWorldColorPaletteSwatch renders duplicate warning icon', () => {
+  const w = mount(DialogProjectSettingsWorldColorPaletteSwatch, {
+    props: {
+      ...defaultSwatchProps,
+      duplicateHexKeys: new Set(['#112233'])
+    },
+    global: {
+      stubs: {
+        ...defaultSwatchStubs,
+        QIcon: defineComponent({
+          inheritAttrs: true,
+          template: '<span class="q-icon-stub" v-bind="$attrs"><slot /></span>'
+        })
+      }
+    }
+  })
+
+  expect(w.find('[data-test-locator="dialogProjectSettings-worlds-colorPaletteDuplicateIcon"]').exists()).toBe(true)
+  expect(w.classes()).toContain('dialogProjectSettingsWorldColorPaletteSwatch--duplicate')
+})
+
+/**
+ * DialogProjectSettingsWorldColorPaletteSwatch
+ * Opens the picker menu through click and binds picker menu v-model.
+ */
+test('Test that DialogProjectSettingsWorldColorPaletteSwatch opens picker menu on click', async () => {
+  const w = mount(DialogProjectSettingsWorldColorPaletteSwatch, {
+    props: defaultSwatchProps,
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      },
+      stubs: defaultSwatchStubs
+    }
+  })
+
+  await w.find('[data-test-locator="dialogProjectSettings-worlds-colorPaletteSwatch"]').trigger('click')
+  expect(w.emitted('picker-open')).toBeTruthy()
+  expect(
+    w.find('[data-test-locator="dialogProjectSettings-worlds-colorPalettePickerMenu"]').exists()
+  ).toBe(true)
+})
+
+/**
+ * DialogProjectSettingsWorldColorPaletteSwatch
+ * Closes context and picker menus when QMenu v-model emits false.
+ */
+test('Test that DialogProjectSettingsWorldColorPaletteSwatch syncs QMenu v-model close events', async () => {
+  const w = mount(DialogProjectSettingsWorldColorPaletteSwatch, {
+    props: defaultSwatchProps,
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      },
+      stubs: defaultSwatchStubs
+    }
+  })
+
+  await w.trigger('contextmenu')
+  const menus = w.findAllComponents({ name: 'QMenu' })
+  expect(menus.length).toBeGreaterThanOrEqual(1)
+  await menus[0].vm.$emit('update:modelValue', false)
+
+  await w.trigger('click')
+  const menusAfterClick = w.findAllComponents({ name: 'QMenu' })
+  const pickerMenu = menusAfterClick.find(
+    (menu) => menu.attributes('data-test-locator') === 'dialogProjectSettings-worlds-colorPalettePickerMenu'
+  )
+  expect(pickerMenu).toBeDefined()
+  await pickerMenu!.vm.$emit('update:modelValue', false)
+  expect(w.emitted('picker-close')).toBeTruthy()
+})

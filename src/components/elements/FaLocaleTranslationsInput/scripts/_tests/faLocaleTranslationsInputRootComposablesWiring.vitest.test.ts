@@ -265,3 +265,53 @@ test('Test that createFaLocaleTranslationsInputRootActiveComposable wires singul
 
   expect(capturedReadTriggers[1]?.()).toBe(button)
 })
+
+/**
+ * createFaLocaleTranslationsInputRootActiveComposable
+ * Forwards window requestAnimationFrame into singular-plural composable options.
+ */
+test('Test that createFaLocaleTranslationsInputRootActiveComposable forwards requestAnimationFrame to singular plural composable', () => {
+  const requestAnimationFrameSpy = vi
+    .spyOn(window, 'requestAnimationFrame')
+    .mockImplementation((callback) => {
+      const frameTime = 0
+      callback(frameTime)
+      return 1
+    })
+  let capturedRequestAnimationFrame: typeof window.requestAnimationFrame | undefined
+
+  createFaLocaleTranslationsInputRootActiveComposable({
+    computed,
+    createFaLocaleTranslationsInputViewWiring: (deps) => createFaLocaleTranslationsInputViewWiring(deps),
+    emit: vi.fn(),
+    isSingularPluralForms: computed(() => true),
+    preferredLanguageInputRef: ref(null),
+    props: {
+      ...baseProps,
+      modelValue: {
+        plural: { 'en-US': 'Cats' },
+        singular: { 'en-US': 'Cat' }
+      },
+      translationForms: 'singularPlural'
+    },
+    singularPluralModelValueRef: computed(() => ({
+      plural: { 'en-US': 'Cats' },
+      singular: { 'en-US': 'Cat' }
+    })),
+    singleModelValueRef: computed(() => ({})),
+    summaryFieldRef: ref(null),
+    toRef,
+    useFaLocaleTranslationsInput: () => ({ id: 'single' }) as never,
+    useFaLocaleTranslationsInputSingularPlural: (options) => {
+      capturedRequestAnimationFrame = options.requestAnimationFrame as typeof window.requestAnimationFrame
+      return { id: 'singularPlural' } as never
+    }
+  })
+
+  const frameCallback: FrameRequestCallback = (time) => {
+    void time
+  }
+  capturedRequestAnimationFrame?.(frameCallback)
+  expect(requestAnimationFrameSpy).toHaveBeenCalled()
+  requestAnimationFrameSpy.mockRestore()
+})

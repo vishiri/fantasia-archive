@@ -33,13 +33,32 @@ const qMenuStub = defineComponent({
       default: false
     }
   },
-  template: '<div v-if="modelValue" class="q-menu-stub" v-bind="$attrs"><slot /></div>'
+  emits: ['update:modelValue'],
+  template: `
+    <div v-if="modelValue" class="q-menu-stub" v-bind="$attrs">
+      <slot />
+      <button
+        class="q-menu-stub-close"
+        type="button"
+        @click="$emit('update:modelValue', false)"
+      />
+    </div>
+  `
+})
+
+const qTooltipStub = defineComponent({
+  template: '<span class="q-tooltip-stub"><slot /></span>'
 })
 
 const qBtnStub = defineComponent({
+  name: 'QBtn',
   inheritAttrs: true,
   emits: ['click'],
-  template: '<button type="button" class="q-btn-stub" v-bind="$attrs" @click="$emit(\'click\', $event)" />'
+  template: `
+    <button type="button" class="q-btn-stub" v-bind="$attrs" @click="$emit('click', $event)">
+      <slot />
+    </button>
+  `
 })
 
 const qInputStub = defineComponent({
@@ -97,11 +116,224 @@ test('Test that FaLocaleTranslationsInputSummaryField renders readonly field and
         QBtn: qBtnStub,
         QInput: qInputStub,
         QMenu: qMenuStub,
-        QTooltip: true
+        QTooltip: qTooltipStub
       }
     }
   })
 
   expect(wrapper.find('[data-test-locator="faLocaleTranslationsInput-summaryField"]').exists()).toBe(true)
   expect(wrapper.find('[data-test-locator="faLocaleTranslationsInput-summaryField-translationsButton"]').exists()).toBe(true)
+})
+
+/**
+ * FaLocaleTranslationsInputSummaryField
+ * Renders translate-button tooltip copy from props.
+ */
+test('Test that FaLocaleTranslationsInputSummaryField renders translate button tooltip text', () => {
+  const wrapper = mount(FaLocaleTranslationsInputSummaryField, {
+    props: {
+      autogrow: false,
+      color: 'primary-bright',
+      dark: true,
+      dense: true,
+      error: false,
+      fallbackWarningTooltip: 'Fallback used',
+      hideBottomSpace: true,
+      isMenuPresentationLocked: false,
+      isMultilineInput: false,
+      localeRows,
+      lockedMenuContentStyle: undefined,
+      menuOffset: [0, 4],
+      menuTarget: undefined,
+      onTranslationsMenuBeforeShow: () => {},
+      onTranslationsMenuHide: () => {},
+      onTranslationsMenuShow: () => {},
+      openTranslationsMenu: () => {},
+      readLocaleValue: () => 'Character',
+      resolvedLanguageCode: 'en-US',
+      resolvedTextareaRows: 1,
+      resolvedValue: 'Character',
+      setPreferredLanguageInputRef: () => {},
+      showFallbackWarning: false,
+      testLocator: 'faLocaleTranslationsInput-summaryField',
+      translateButtonTooltip: 'Edit translations',
+      translationsMenuOpen: false,
+      updateLocaleValue: () => {}
+    },
+    global: {
+      stubs: {
+        FaLocaleTranslationsInputMenuPanel: faLocaleTranslationsInputMenuPanelStub,
+        FaMultilineTooltipBody: true,
+        QBtn: qBtnStub,
+        QInput: qInputStub,
+        QMenu: qMenuStub,
+        QTooltip: qTooltipStub
+      }
+    }
+  })
+
+  expect(wrapper.find('.q-tooltip-stub').text()).toBe('Edit translations')
+})
+
+/**
+ * FaLocaleTranslationsInputSummaryField
+ * Emits menu-open updates when the translations menu closes.
+ */
+test('Test that FaLocaleTranslationsInputSummaryField emits translations menu open updates', async () => {
+  const wrapper = mount(FaLocaleTranslationsInputSummaryField, {
+    props: {
+      autogrow: false,
+      color: 'primary-bright',
+      dark: true,
+      dense: true,
+      error: false,
+      fallbackWarningTooltip: 'Fallback used',
+      hideBottomSpace: true,
+      isMenuPresentationLocked: false,
+      isMultilineInput: false,
+      localeRows,
+      lockedMenuContentStyle: undefined,
+      menuOffset: [0, 4],
+      menuTarget: undefined,
+      onTranslationsMenuBeforeShow: () => {},
+      onTranslationsMenuHide: () => {},
+      onTranslationsMenuShow: () => {},
+      openTranslationsMenu: () => {},
+      readLocaleValue: () => 'Character',
+      resolvedLanguageCode: 'en-US',
+      resolvedTextareaRows: 1,
+      resolvedValue: 'Character',
+      setPreferredLanguageInputRef: () => {},
+      showFallbackWarning: false,
+      testLocator: 'faLocaleTranslationsInput-summaryField',
+      translateButtonTooltip: 'Edit translations',
+      translationsMenuOpen: true,
+      updateLocaleValue: () => {}
+    },
+    global: {
+      stubs: {
+        FaLocaleTranslationsInputMenuPanel: faLocaleTranslationsInputMenuPanelStub,
+        FaMultilineTooltipBody: true,
+        QBtn: qBtnStub,
+        QInput: qInputStub,
+        QMenu: qMenuStub,
+        QTooltip: qTooltipStub
+      }
+    }
+  })
+
+  await wrapper.find('.q-menu-stub-close').trigger('click')
+
+  const emitted = wrapper.emitted('update:translationsMenuOpen')
+  expect(emitted?.[0]).toEqual([false])
+})
+
+/**
+ * FaLocaleTranslationsInputSummaryField
+ * Exposes the translate button element for menu anchoring.
+ */
+test('Test that FaLocaleTranslationsInputSummaryField exposes the translate button element', () => {
+  const wrapper = mount(FaLocaleTranslationsInputSummaryField, {
+    props: {
+      autogrow: false,
+      color: 'primary-bright',
+      dark: true,
+      dense: true,
+      error: false,
+      fallbackWarningTooltip: 'Fallback used',
+      hideBottomSpace: true,
+      isMenuPresentationLocked: false,
+      isMultilineInput: false,
+      localeRows,
+      lockedMenuContentStyle: undefined,
+      menuOffset: [0, 4],
+      menuTarget: undefined,
+      onTranslationsMenuBeforeShow: () => {},
+      onTranslationsMenuHide: () => {},
+      onTranslationsMenuShow: () => {},
+      openTranslationsMenu: () => {},
+      readLocaleValue: () => 'Character',
+      resolvedLanguageCode: 'en-US',
+      resolvedTextareaRows: 1,
+      resolvedValue: 'Character',
+      setPreferredLanguageInputRef: () => {},
+      showFallbackWarning: false,
+      testLocator: 'faLocaleTranslationsInput-summaryField',
+      translateButtonTooltip: 'Edit translations',
+      translationsMenuOpen: false,
+      updateLocaleValue: () => {}
+    },
+    global: {
+      stubs: {
+        FaLocaleTranslationsInputMenuPanel: faLocaleTranslationsInputMenuPanelStub,
+        FaMultilineTooltipBody: true,
+        QBtn: qBtnStub,
+        QInput: qInputStub,
+        QMenu: qMenuStub,
+        QTooltip: qTooltipStub
+      }
+    }
+  })
+
+  const exposed = wrapper.vm as {
+    readTranslationsButtonElement?: () => HTMLElement | null
+  }
+  const buttonElement = exposed.readTranslationsButtonElement?.()
+  expect(buttonElement).toBeInstanceOf(HTMLElement)
+  expect(buttonElement?.classList.contains('q-btn-stub')).toBe(true)
+})
+
+/**
+ * FaLocaleTranslationsInputSummaryField
+ * Returns null from readTranslationsButtonElement after the field is unmounted.
+ */
+test('Test that FaLocaleTranslationsInputSummaryField returns null after unmount', () => {
+  const wrapper = mount(FaLocaleTranslationsInputSummaryField, {
+    props: {
+      autogrow: false,
+      color: 'primary-bright',
+      dark: true,
+      dense: true,
+      error: false,
+      fallbackWarningTooltip: 'Fallback used',
+      hideBottomSpace: true,
+      isMenuPresentationLocked: false,
+      isMultilineInput: false,
+      localeRows,
+      lockedMenuContentStyle: undefined,
+      menuOffset: [0, 4],
+      menuTarget: undefined,
+      onTranslationsMenuBeforeShow: () => {},
+      onTranslationsMenuHide: () => {},
+      onTranslationsMenuShow: () => {},
+      openTranslationsMenu: () => {},
+      readLocaleValue: () => 'Character',
+      resolvedLanguageCode: 'en-US',
+      resolvedTextareaRows: 1,
+      resolvedValue: 'Character',
+      setPreferredLanguageInputRef: () => {},
+      showFallbackWarning: false,
+      testLocator: 'faLocaleTranslationsInput-summaryField',
+      translateButtonTooltip: 'Edit translations',
+      translationsMenuOpen: false,
+      updateLocaleValue: () => {}
+    },
+    global: {
+      stubs: {
+        FaLocaleTranslationsInputMenuPanel: faLocaleTranslationsInputMenuPanelStub,
+        FaMultilineTooltipBody: true,
+        QBtn: qBtnStub,
+        QInput: qInputStub,
+        QMenu: qMenuStub,
+        QTooltip: qTooltipStub
+      }
+    }
+  })
+
+  const exposed = wrapper.vm as {
+    readTranslationsButtonElement?: () => HTMLElement | null
+  }
+  const readTranslationsButtonElement = exposed.readTranslationsButtonElement
+  wrapper.unmount()
+  expect(readTranslationsButtonElement?.()).toBeNull()
 })

@@ -26,16 +26,26 @@ const qMenuStub = defineComponent({
   emits: [
     'before-show',
     'hide',
+    'show',
     'update:modelValue'
   ],
   watch: {
     modelValue (value: boolean): void {
       if (value) {
         this.$emit('before-show')
+        this.$emit('show')
       }
     }
   },
-  template: '<div v-if="modelValue" class="q-menu-stub"><slot /></div>'
+  template: `
+    <div
+      v-if="modelValue"
+      class="q-menu-stub"
+      @click="$emit('update:modelValue', false)"
+    >
+      <slot />
+    </div>
+  `
 })
 
 const qBtnStub = defineComponent({
@@ -47,9 +57,17 @@ const qBtnStub = defineComponent({
       class="q-btn-stub"
       v-bind="$attrs"
       @click="$emit('click')"
-    />
+    >
+      <slot />
+    </button>
   `
 })
+
+const qTooltipStub = defineComponent({
+  template: '<span class="q-tooltip-stub"><slot /></span>'
+})
+
+const focusSearchInputSpy = vi.fn()
 
 const qInputStub = defineComponent({
   inheritAttrs: true,
@@ -59,7 +77,13 @@ const qInputStub = defineComponent({
       default: ''
     }
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'focus'],
+  methods: {
+    focus (): void {
+      focusSearchInputSpy()
+      this.$emit('focus')
+    }
+  },
   template: `
     <input
       class="q-input-stub"
@@ -98,7 +122,7 @@ function mountFaIconPickerInput (modelValue: string): ReturnType<typeof mount> {
         QInput: qInputStub,
         QMenu: qMenuStub,
         QSpinner: true,
-        QTooltip: true,
+        QTooltip: qTooltipStub,
         QVirtualScroll: qVirtualScrollStub
       }
     }
@@ -141,4 +165,44 @@ test('Test that FaIconPickerInput omits the selected-icon hook when unset', () =
   expect(
     w.find('[data-test-locator="faIconPickerInput-test-trigger"]').attributes('data-test-icon-name')
   ).toBeUndefined()
+})
+
+/**
+ * FaIconPickerInput
+ * Renders trigger tooltip copy for click and current icon name.
+ */
+test('Test that FaIconPickerInput renders trigger tooltip copy', () => {
+  const w = mountFaIconPickerInput('mdi-account')
+
+  expect(w.find('.q-tooltip-stub').text()).toContain('faIconPickerInput.triggerTooltipClick')
+  expect(w.find('.q-tooltip-stub').text()).toContain('faIconPickerInput.triggerTooltipCurrentIcon')
+})
+
+/**
+ * FaIconPickerInput
+ * Focuses the menu search input after the picker menu is shown.
+ */
+test('Test that FaIconPickerInput focuses the menu search input after show', async () => {
+  focusSearchInputSpy.mockClear()
+  const w = mountFaIconPickerInput('')
+
+  await w.find('[data-test-locator="faIconPickerInput-test-trigger"]').trigger('click')
+  await w.vm.$nextTick()
+  await w.vm.$nextTick()
+
+  expect(focusSearchInputSpy).toHaveBeenCalled()
+})
+
+/**
+ * FaIconPickerInput
+ * Closes the picker menu when the menu v-model updates to false.
+ */
+test('Test that FaIconPickerInput closes the picker menu from menu v-model updates', async () => {
+  const w = mountFaIconPickerInput('mdi-account')
+
+  await w.find('[data-test-locator="faIconPickerInput-test-trigger"]').trigger('click')
+  expect(w.find('.q-menu-stub').exists()).toBe(true)
+
+  await w.find('.q-menu-stub').trigger('click')
+  expect(w.find('.q-menu-stub').exists()).toBe(false)
 })

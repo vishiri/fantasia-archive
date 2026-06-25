@@ -78,3 +78,29 @@ test('Test that faAppConfigAPI disposeImportSession invokes dispose channel', as
     'abc'
   )
 })
+
+/**
+ * faAppConfigAPI
+ * 'stageE2eNextExportPath' delegates to the E2E staging IPC.
+ */
+test('Test that faAppConfigAPI stageE2eNextExportPath invokes stageE2eNextExportPathAsync', async () => {
+  invokeMock.mockResolvedValueOnce(true)
+  await expect(faAppConfigAPI.stageE2eNextExportPath('C:\\export.faconfig')).resolves.toBe(true)
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_APP_CONFIG_IPC.stageE2eNextExportPathAsync,
+    'C:\\export.faconfig'
+  )
+})
+
+/**
+ * faAppConfigAPI
+ * 'stageE2eNextImportPath' delegates to the E2E staging IPC.
+ */
+test('Test that faAppConfigAPI stageE2eNextImportPath invokes stageE2eNextImportPathAsync', async () => {
+  invokeMock.mockResolvedValueOnce(false)
+  await expect(faAppConfigAPI.stageE2eNextImportPath('C:\\import.faconfig')).resolves.toBe(false)
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_APP_CONFIG_IPC.stageE2eNextImportPathAsync,
+    'C:\\import.faconfig'
+  )
+})

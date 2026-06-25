@@ -106,3 +106,24 @@ test('Test that DialogProjectSettingsVerticalTabListFilterInput binds custom tes
   expect(w.find('[data-test-locator="dialogProjectSettings-worldsFilterInput"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="dialogProjectSettings-worldsFilterClear"]').exists()).toBe(true)
 })
+
+/**
+ * DialogProjectSettingsVerticalTabListFilterInput
+ * Forwards typed query updates through v-model.
+ */
+test('Test that DialogProjectSettingsVerticalTabListFilterInput forwards typed filter query', async () => {
+  const w = mount(DialogProjectSettingsVerticalTabListFilterInput, {
+    props: {
+      modelValue: ''
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      },
+      stubs: inputStubs
+    }
+  })
+
+  await w.find('.q-input-stub-field').setValue('dragon')
+  expect(w.emitted('update:modelValue')?.at(-1)).toEqual(['dragon'])
+})

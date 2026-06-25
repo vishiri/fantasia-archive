@@ -40,6 +40,46 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabItem renders tab label'
 
 /**
  * DialogProjectSettingsDocumentTemplatesTabItem
+ * Falls back to the default new-template label when resolved title is empty.
+ */
+test('Test that DialogProjectSettingsDocumentTemplatesTabItem shows default label when title is empty', () => {
+  const w = mount(DialogProjectSettingsDocumentTemplatesTabItem, {
+    props: {
+      currentLanguageCode: 'de',
+      isSelected: false,
+      tabHasError: true,
+      template: buildDialogProjectSettingsDocumentTemplateDraft({
+        titlePluralTranslations: {},
+        titleSingularTranslations: {}
+      })
+    },
+    global: tabItemMountGlobal
+  })
+
+  expect(w.text()).toContain('dialogs.projectSettings.panels.documentTemplates.defaultNewTemplateName')
+})
+
+/**
+ * DialogProjectSettingsDocumentTemplatesTabItem
+ * Ignores keyboard events other than Enter and Space.
+ */
+test('Test that DialogProjectSettingsDocumentTemplatesTabItem ignores unrelated keydown events', async () => {
+  const w = mount(DialogProjectSettingsDocumentTemplatesTabItem, {
+    props: {
+      currentLanguageCode: 'en-US',
+      isSelected: false,
+      tabHasError: false,
+      template: buildDialogProjectSettingsDocumentTemplateDraft()
+    },
+    global: tabItemMountGlobal
+  })
+
+  await w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tab"]').trigger('keydown', { key: 'a' })
+  expect(w.emitted('select')).toBeUndefined()
+})
+
+/**
+ * DialogProjectSettingsDocumentTemplatesTabItem
  * Shows trimmed world appendix under the tab title when present.
  */
 test('Test that DialogProjectSettingsDocumentTemplatesTabItem renders world appendix under tab label', () => {
@@ -133,4 +173,47 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabItem hides missing tran
   expect(w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tabMissingTranslationsWarning"]').exists()).toBe(
     false
   )
+})
+
+/**
+ * DialogProjectSettingsDocumentTemplatesTabItem
+ * Emits select on click and keyboard activation while list is not dragging.
+ */
+test('Test that DialogProjectSettingsDocumentTemplatesTabItem emits select on click and keyboard', async () => {
+  const template = buildDialogProjectSettingsDocumentTemplateDraft()
+  const w = mount(DialogProjectSettingsDocumentTemplatesTabItem, {
+    props: {
+      currentLanguageCode: 'en-US',
+      isListDragging: false,
+      isSelected: false,
+      tabHasError: false,
+      template
+    },
+    global: tabItemMountGlobal
+  })
+
+  await w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tab"]').trigger('click')
+  expect(w.emitted('select')?.[0]).toEqual([template.id])
+
+  await w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tab"]').trigger('keydown', { key: 'Enter' })
+  expect(w.emitted('select')?.[1]).toEqual([template.id])
+})
+
+/**
+ * DialogProjectSettingsDocumentTemplatesTabItem
+ * Disables ripple binding while the parent list is dragging.
+ */
+test('Test that DialogProjectSettingsDocumentTemplatesTabItem disables ripple while list dragging', () => {
+  const w = mount(DialogProjectSettingsDocumentTemplatesTabItem, {
+    props: {
+      currentLanguageCode: 'en-US',
+      isListDragging: true,
+      isSelected: false,
+      tabHasError: false,
+      template: buildDialogProjectSettingsDocumentTemplateDraft()
+    },
+    global: tabItemMountGlobal
+  })
+
+  expect(w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tab"]').exists()).toBe(true)
 })

@@ -153,3 +153,91 @@ test('Test that DialogProjectSettingsDocumentTemplatesDetailPanel wires locale t
     w.find('[data-test-locator="dialogProjectSettings-documentTemplates-nameInput"]').attributes('data-test-current-language-code')
   ).toBe('de')
 })
+
+/**
+ * DialogProjectSettingsDocumentTemplatesDetailPanel
+ * Forwards title, appendix, icon, and remove events from child inputs.
+ */
+test('Test that DialogProjectSettingsDocumentTemplatesDetailPanel forwards field updates and remove', async () => {
+  const emitFaLocaleTranslationsInputStub = defineComponent({
+    name: 'FaLocaleTranslationsInput',
+    inheritAttrs: false,
+    props: {
+      modelValue: {
+        type: Object,
+        required: true
+      },
+      testLocator: {
+        type: String,
+        required: true
+      },
+      translationForms: {
+        type: String,
+        default: 'single'
+      }
+    },
+    emits: ['update:modelValue'],
+    template: `
+      <button
+        type="button"
+        :data-test-locator="testLocator + '-emit'"
+        @click="
+          $emit(
+            'update:modelValue',
+            translationForms === 'singularPlural'
+              ? { plural: { 'en-US': 'Hero' }, singular: {} }
+              : { 'en-US': 'Notes' }
+          )
+        "
+      />
+    `
+  })
+
+  const emitIconPickerStub = defineComponent({
+    name: 'FaIconPickerInput',
+    emits: ['update:modelValue'],
+    template: '<button type="button" data-test-locator="emit-icon" @click="$emit(\'update:modelValue\', null)" />'
+  })
+
+  const w = mount(DialogProjectSettingsDocumentTemplatesDetailPanel, {
+    props: {
+      currentLanguageCode: 'en-US',
+      nameHasError: true,
+      removeDisabled: false,
+      template: buildDialogProjectSettingsDocumentTemplateDraft()
+    },
+    global: {
+      plugins: [detailPanelI18n],
+      stubs: {
+        DialogProjectSettingsDocumentTemplatesDeleteButton: defineComponent({
+          emits: ['confirm'],
+          template: '<button type="button" data-test-locator="emit-remove" @click="$emit(\'confirm\')" />'
+        }),
+        FaIconPickerInput: emitIconPickerStub,
+        FaLocaleTranslationsInput: emitFaLocaleTranslationsInputStub,
+        QIcon: defineComponent({
+          inheritAttrs: true,
+          template: '<span v-bind="$attrs"><slot /></span>'
+        }),
+        QTooltip: defineComponent({ template: '<span><slot /></span>' })
+      }
+    }
+  })
+
+  await w.find('[data-test-locator="dialogProjectSettings-documentTemplates-nameInput-emit"]').trigger('click')
+  expect(w.emitted('update:title-translations')?.[0]).toEqual([
+    {
+      plural: { 'en-US': 'Hero' },
+      singular: {}
+    }
+  ])
+
+  await w.find('[data-test-locator="dialogProjectSettings-documentTemplates-worldAppendixInput-emit"]').trigger('click')
+  expect(w.emitted('update:worldAppendixTranslations')?.[0]).toEqual([{ 'en-US': 'Notes' }])
+
+  await w.find('[data-test-locator="emit-icon"]').trigger('click')
+  expect(w.emitted('update:icon')?.[0]).toEqual([''])
+
+  await w.find('[data-test-locator="emit-remove"]').trigger('click')
+  expect(w.emitted('remove')).toBeTruthy()
+})

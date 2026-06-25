@@ -1,8 +1,8 @@
 /* eslint-disable vue/one-component-per-file -- colocated Quasar stub components for Vue Test Utils mounts */
 
 import { defineComponent } from 'vue'
-import { mount } from '@vue/test-utils'
-import { expect, test } from 'vitest'
+import { flushPromises, mount } from '@vue/test-utils'
+import { expect, test, vi } from 'vitest'
 
 import DialogProjectSettingsDocumentTemplatesTabList from '../DialogProjectSettingsDocumentTemplatesTabList.vue'
 import { FA_DIALOG_PROJECT_SETTINGS_DOCUMENT_TEMPLATES_TAB_LIST_WIDTH_PX } from '../scripts/functions/dialogProjectSettingsDialogInput'
@@ -238,4 +238,170 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabList merges filtered dr
     templatesFilteredReorderFixture[1],
     templatesFilteredReorderFixture[0]
   ])
+})
+
+/**
+ * DialogProjectSettingsDocumentTemplatesTabList
+ * Forwards add-template, tab selection, and external templates prop updates.
+ */
+test('Test that DialogProjectSettingsDocumentTemplatesTabList forwards add and select events', async () => {
+  const w = mount(DialogProjectSettingsDocumentTemplatesTabList, {
+    props: {
+      currentLanguageCode: 'en-US',
+      selectedTemplateId: templatesFilterFixture[0].id,
+      templates: templatesFilterFixture
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      },
+      stubs: {
+        DialogProjectSettingsDocumentTemplatesTabItem: defineComponent({
+          props: {
+            template: {
+              required: true,
+              type: Object
+            }
+          },
+          emits: ['select'],
+          template: '<button type="button" data-test-locator="emit-select" @click="$emit(\'select\', template.id)" />'
+        }),
+        DialogProjectSettingsVerticalTabListFilterInput: true,
+        QBtn: defineComponent({
+          inheritAttrs: true,
+          template: '<button type="button" v-bind="$attrs" @click="$emit(\'click\')" />'
+        }),
+        VueDraggable: defineComponent({ template: '<div><slot /></div>' })
+      }
+    }
+  })
+
+  await w.find('[data-test-locator="dialogProjectSettings-documentTemplates-addButton"]').trigger('click')
+  expect(w.emitted('addTemplate')).toBeTruthy()
+
+  await w.find('[data-test-locator="emit-select"]').trigger('click')
+  expect(w.emitted('select')?.[0]).toEqual([templatesFilterFixture[0].id])
+
+  await w.setProps({ templates: [...templatesFilterFixture].reverse() })
+  expect(w.props('templates')[0]?.id).toBe(templatesFilterFixture[1].id)
+})
+
+/**
+ * DialogProjectSettingsDocumentTemplatesTabList
+ * Tracks drag start and end while reordering the full template list.
+ */
+test('Test that DialogProjectSettingsDocumentTemplatesTabList handles unfiltered drag reorder', async () => {
+  const w = mount(DialogProjectSettingsDocumentTemplatesTabList, {
+    props: {
+      currentLanguageCode: 'en-US',
+      selectedTemplateId: templatesFilterFixture[0].id,
+      templates: templatesFilterFixture
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      },
+      stubs: {
+        DialogProjectSettingsDocumentTemplatesTabItem: true,
+        DialogProjectSettingsVerticalTabListFilterInput: true,
+        QBtn: defineComponent({
+          inheritAttrs: true,
+          template: '<button type="button" v-bind="$attrs" @click="$emit(\'click\')" />'
+        }),
+        VueDraggable: defineComponent({
+          props: {
+            modelValue: {
+              required: true,
+              type: Array
+            }
+          },
+          emits: ['end', 'start', 'update:modelValue'],
+          setup (_props, { emit }) {
+            function emitDragStart (): void {
+              const item = document.createElement('div')
+              item.setAttribute('data-test-template-id', templatesFilterFixture[0].id)
+              emit('start', { item })
+            }
+
+            return { emitDragStart }
+          },
+          template: `
+            <div>
+              <slot />
+              <button type="button" data-test-locator="emit-drag-start" @click="emitDragStart" />
+              <button
+                type="button"
+                data-test-locator="emit-drag-end"
+                @click="
+                  $emit('update:modelValue', [...modelValue].reverse());
+                  $emit('end');
+                "
+              />
+            </div>
+          `
+        })
+      }
+    }
+  })
+
+  await w.find('[data-test-locator="emit-drag-start"]').trigger('click')
+  expect(w.find('.dialogProjectSettingsDocumentTemplatesTabList').classes()).toContain(
+    'faVerticalDraggableTabs--listDragging'
+  )
+
+  await w.find('[data-test-locator="emit-drag-end"]').trigger('click')
+  expect(w.emitted('update:templates')?.[0]?.[0]).toEqual([...templatesFilterFixture].reverse())
+})
+
+/**
+ * DialogProjectSettingsDocumentTemplatesTabList
+ * Scrolls the tab list when a new template row is appended.
+ */
+test('Test that DialogProjectSettingsDocumentTemplatesTabList scrolls when templates append', async () => {
+  const scrollIntoView = vi.fn()
+  vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+    const frameTime = 0
+    callback(frameTime)
+    return 1
+  })
+
+  const firstTemplate = buildDialogProjectSettingsDocumentTemplateDraft({ id: 'template-scroll-a' })
+  const secondTemplate = buildDialogProjectSettingsDocumentTemplateDraft({
+    id: 'template-scroll-b',
+    titlePluralTranslations: { 'en-US': 'Location' }
+  })
+
+  const w = mount(DialogProjectSettingsDocumentTemplatesTabList, {
+    props: {
+      currentLanguageCode: 'en-US',
+      selectedTemplateId: null,
+      templates: [firstTemplate]
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      },
+      stubs: {
+        DialogProjectSettingsDocumentTemplatesTabItem: defineComponent({
+          mounted (): void {
+            this.$el.scrollIntoView = scrollIntoView
+          },
+          template: '<div class="faVerticalDraggableTabs__tab tab-item-stub" />'
+        }),
+        QBtn: defineComponent({
+          inheritAttrs: true,
+          template: '<button type="button" v-bind="$attrs" @click="$emit(\'click\')" />'
+        }),
+        VueDraggable: defineComponent({
+          template: '<div class="draggable-stub"><slot /></div>'
+        })
+      }
+    }
+  })
+
+  await w.setProps({ templates: [firstTemplate, secondTemplate] })
+  await flushPromises()
+
+  expect(scrollIntoView).toHaveBeenCalled()
+  vi.unstubAllGlobals()
 })

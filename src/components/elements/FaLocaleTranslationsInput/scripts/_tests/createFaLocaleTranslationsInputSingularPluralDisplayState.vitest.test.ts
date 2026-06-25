@@ -70,6 +70,7 @@ test('Test that createFaLocaleTranslationsInputSingularPluralDisplayState update
   })
 
   expect(api.resolvedValue.value).toBe('English')
+  expect(api.resolvedLanguageCode.value).toBe('en-US')
   expect(api.readSingularLocaleValue('de')).toBe('Katze')
   expect(api.readPluralLocaleValue('en-US')).toBe('Cats')
   expect(api.showFallbackWarning.value).toBe(true)

@@ -12,6 +12,7 @@ vi.mock('#q-app/wrappers', () => {
   }
 })
 
+import { resolveFaRendererProbeTestEnvFromBridge } from '../scripts/functions/createRunFaE2eRendererProbesBoot'
 import faE2eRendererProbesBoot from '../faE2eRendererProbes'
 
 afterEach(() => {
@@ -76,6 +77,15 @@ test('Test that faE2eRendererProbes boot awaits getSnapshot when cache is empty'
   await boot()
   expect(getSnapshot).toHaveBeenCalledOnce()
   expect(registerFaE2eActiveProjectSnapshotProbeMock).toHaveBeenCalledOnce()
+})
+
+/**
+ * resolveFaRendererProbeTestEnvFromBridge
+ * Returns undefined when the preload bridge does not expose getSnapshot.
+ */
+test('Test that resolveFaRendererProbeTestEnvFromBridge returns undefined without getSnapshot', async () => {
+  await expect(resolveFaRendererProbeTestEnvFromBridge({})).resolves.toBeUndefined()
+  await expect(resolveFaRendererProbeTestEnvFromBridge(undefined)).resolves.toBeUndefined()
 })
 
 /**

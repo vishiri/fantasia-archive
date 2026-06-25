@@ -2,7 +2,11 @@
 
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { scrollContainerToRevealLastItem, scrollElementToMaxScrollTop } from '../scrollContainerToRevealLastItem'
+import {
+  scheduleScrollContainerToRevealLastItem,
+  scrollContainerToRevealLastItem,
+  scrollElementToMaxScrollTop
+} from '../scrollContainerToRevealLastItem'
 
 describe('scrollElementToMaxScrollTop', () => {
   let container: HTMLDivElement
@@ -66,5 +70,45 @@ describe('scrollContainerToRevealLastItem', () => {
     scrollContainerToRevealLastItem(container, '.missing')
 
     expect(container.scrollTop).toBe(120)
+  })
+
+  test('Test that scrollContainerToRevealLastItem no-ops for null container', () => {
+    expect(() => scrollContainerToRevealLastItem(null, '.item')).not.toThrow()
+  })
+})
+
+describe('scheduleScrollContainerToRevealLastItem', () => {
+  test('Test that scheduleScrollContainerToRevealLastItem reveals the last item after tick and animation frames', async () => {
+    const container = document.createElement('div')
+    const item = document.createElement('div')
+    item.className = 'item'
+    const scrollIntoView = vi.fn()
+    item.scrollIntoView = scrollIntoView
+    container.append(item)
+    document.body.appendChild(container)
+
+    const rafCallbacks: FrameRequestCallback[] = []
+    const requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
+      rafCallbacks.push(callback)
+      return rafCallbacks.length
+    })
+
+    scheduleScrollContainerToRevealLastItem({
+      getContainer: () => container,
+      itemSelector: '.item',
+      nextTick: async () => {},
+      requestAnimationFrame
+    })
+
+    expect(rafCallbacks).toHaveLength(0)
+    await Promise.resolve()
+    expect(requestAnimationFrame).toHaveBeenCalledTimes(1)
+
+    rafCallbacks[0]?.(0)
+    expect(scrollIntoView).toHaveBeenCalledTimes(1)
+    expect(requestAnimationFrame).toHaveBeenCalledTimes(2)
+
+    rafCallbacks[1]?.(0)
+    expect(scrollIntoView).toHaveBeenCalledTimes(2)
   })
 })
