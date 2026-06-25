@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+
 import { FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX } from 'app/src/scripts/floatingWindows/faFloatingWindowPersistedGeometry_manager'
 import type { I_faAppStylingPatch } from 'app/types/I_faAppStylingDomain'
 
@@ -45,5 +47,5 @@ export function parseFaAppStylingPatch (patch: unknown): I_faAppStylingPatch {
     throw new TypeError('App styling patch must be a plain object')
   }
 
-  return faAppStylingPatchSchema.parse(patch)
+  return dropUndefinedRecordValues(faAppStylingPatchSchema.parse(patch)) as I_faAppStylingPatch
 }

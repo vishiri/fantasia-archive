@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+
 import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
 import type { I_faProjectWorldTemplatePlacementNicknameTranslations } from 'app/types/I_faProjectWorldTemplatePlacementNicknameTranslations'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
@@ -35,7 +37,7 @@ export function parseFaProjectWorldTemplatePlacementNicknameTranslationsJson (
   if (!recordResult.success) {
     return {}
   }
-  return normalizeFaProjectWorldTemplatePlacementNicknameTranslations(recordResult.data)
+  return normalizeFaProjectWorldTemplatePlacementNicknameTranslations(dropUndefinedRecordValues(recordResult.data) as I_faProjectWorldTemplatePlacementNicknameTranslations)
 }
 
 export function serializeFaProjectWorldTemplatePlacementNicknameTranslationsJson (
@@ -53,7 +55,7 @@ export function parseFaProjectWorldTemplatePlacementNicknameTranslationsSnapshot
   payload: unknown
 ): I_faProjectWorldTemplatePlacementNicknameTranslations {
   const parsed = faProjectWorldTemplatePlacementNicknameTranslationsRecordSchema.parse(payload)
-  return normalizeFaProjectWorldTemplatePlacementNicknameTranslations(parsed)
+  return normalizeFaProjectWorldTemplatePlacementNicknameTranslations(dropUndefinedRecordValues(parsed) as I_faProjectWorldTemplatePlacementNicknameTranslations)
 }
 
 export const faProjectWorldTemplatePlacementNicknameTranslationsSnapshotSchema =

@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+
 import type { I_faProjectStylingPatch } from 'app/types/I_faProjectStylingDomain'
 import { FA_APP_STYLING_MAX_CSS_LENGTH } from 'app/src-electron/shared/faAppStylingPatchSchema'
 import { FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX } from 'app/src/scripts/floatingWindows/faFloatingWindowPersistedGeometry_manager'
@@ -36,5 +38,5 @@ export function parseFaProjectStylingPatch (patch: unknown): I_faProjectStylingP
     throw new TypeError('Project styling patch must be a plain object')
   }
 
-  return faProjectStylingPatchSchema.parse(patch)
+  return dropUndefinedRecordValues(faProjectStylingPatchSchema.parse(patch)) as I_faProjectStylingPatch
 }

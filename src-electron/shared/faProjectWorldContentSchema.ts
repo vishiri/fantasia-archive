@@ -11,6 +11,7 @@ import {
 } from 'app/src-electron/shared/faProjectContentSchemaShared'
 import { faProjectWorldTemplateLayoutSnapshotSchema, parseFaProjectWorldTemplateLayoutSnapshot } from 'app/src-electron/shared/faProjectWorldTemplateLayoutSchema'
 import { parseFaProjectWorldDisplayNameTranslationsSnapshot } from 'app/src-electron/shared/faProjectWorldDisplayNameTranslationsSchema'
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
 import type {
   I_faProjectWorldCreateInput,
   I_faProjectWorldPatch,
@@ -49,7 +50,8 @@ export function parseFaProjectWorldCreateInput (
 }
 
 export function parseFaProjectWorldPatch (payload: unknown): I_faProjectWorldPatch {
-  return faProjectWorldPatchSchema.parse(parseFaProjectContentPlainRecord(payload))
+  const parsed = faProjectWorldPatchSchema.parse(parseFaProjectContentPlainRecord(payload))
+  return dropUndefinedRecordValues(parsed) as I_faProjectWorldPatch
 }
 
 export function parseFaProjectWorldIdPayload (payload: unknown): string {
@@ -64,7 +66,11 @@ export const faProjectWorldUpdatePayloadSchema = z.object({
 export function parseFaProjectWorldUpdatePayload (
   payload: unknown
 ): { id: string, patch: I_faProjectWorldPatch } {
-  return faProjectWorldUpdatePayloadSchema.parse(parseFaProjectContentPlainRecord(payload))
+  const parsed = faProjectWorldUpdatePayloadSchema.parse(parseFaProjectContentPlainRecord(payload))
+  return {
+    id: parsed.id,
+    patch: dropUndefinedRecordValues(parsed.patch) as I_faProjectWorldPatch
+  }
 }
 
 export const faProjectWorldSnapshotItemSchema = z.object({
@@ -86,16 +92,25 @@ export function parseFaProjectWorldsSnapshotPayload (
     parseFaProjectContentPlainRecord(payload)
   )
   return parsed.items.map((item) => {
-    return {
-      color: item.color,
-      colorPallete: item.colorPallete,
+    const snapshotItem: I_faProjectWorldSnapshotItem = {
       displayNameTranslations: parseFaProjectWorldDisplayNameTranslationsSnapshot(
         item.displayNameTranslations
       ),
-      id: item.id,
-      templateLayout: item.templateLayout === undefined
-        ? undefined
-        : parseFaProjectWorldTemplateLayoutSnapshot(item.templateLayout)
+      id: item.id
     }
+
+    if (item.color !== undefined) {
+      snapshotItem.color = item.color
+    }
+
+    if (item.colorPallete !== undefined) {
+      snapshotItem.colorPallete = item.colorPallete
+    }
+
+    if (item.templateLayout !== undefined) {
+      snapshotItem.templateLayout = parseFaProjectWorldTemplateLayoutSnapshot(item.templateLayout)
+    }
+
+    return snapshotItem
   })
 }

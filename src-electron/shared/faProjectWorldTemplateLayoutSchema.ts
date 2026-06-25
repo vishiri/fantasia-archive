@@ -1,10 +1,15 @@
 import { z } from 'zod'
 
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+
 import { faProjectContentIdSchema, faProjectWorldTemplatePlacementNicknameSchema } from 'app/src-electron/shared/faProjectContentSchemaShared'
 import { faProjectWorldTemplateGroupDisplayNameTranslationsSnapshotSchema } from 'app/src-electron/shared/faProjectWorldTemplateGroupDisplayNameTranslationsSchema'
 import { faProjectWorldTemplatePlacementNicknameSingularTranslationsSnapshotSchema } from 'app/src-electron/shared/faProjectWorldTemplatePlacementNicknameSingularTranslationsSchema'
 import { faProjectWorldTemplatePlacementNicknameTranslationsSnapshotSchema } from 'app/src-electron/shared/faProjectWorldTemplatePlacementNicknameTranslationsSchema'
 import type { I_faProjectWorldTemplateLayoutSnapshot } from 'app/types/I_faProjectWorldTemplateLayoutDomain'
+import type { I_faProjectWorldTemplateGroupDisplayNameTranslations } from 'app/types/I_faProjectWorldTemplateGroupDisplayNameTranslations'
+import type { I_faProjectWorldTemplatePlacementNicknameSingularTranslations } from 'app/types/I_faProjectWorldTemplatePlacementNicknameSingularTranslations'
+import type { I_faProjectWorldTemplatePlacementNicknameTranslations } from 'app/types/I_faProjectWorldTemplatePlacementNicknameTranslations'
 
 import {
   resolveFaProjectWorldTemplateGroupDisplayNameForStorage
@@ -59,7 +64,9 @@ export function parseFaProjectWorldTemplateLayoutSnapshot (
   const parsed = faProjectWorldTemplateLayoutSnapshotSchema.parse(payload)
   return {
     groups: parsed.groups.map((group) => {
-      const displayNameTranslations = group.displayNameTranslations
+      const displayNameTranslations = dropUndefinedRecordValues(
+        group.displayNameTranslations
+      ) as I_faProjectWorldTemplateGroupDisplayNameTranslations
       return {
         displayName: resolveFaProjectWorldTemplateGroupDisplayNameForStorage(displayNameTranslations),
         displayNameTranslations,
@@ -68,8 +75,12 @@ export function parseFaProjectWorldTemplateLayoutSnapshot (
       }
     }),
     placements: parsed.placements.map((placement) => {
-      const nicknamePluralTranslations = placement.nicknamePluralTranslations
-      const nicknameSingularTranslations = placement.nicknameSingularTranslations ?? {}
+      const nicknamePluralTranslations = dropUndefinedRecordValues(
+        placement.nicknamePluralTranslations
+      ) as I_faProjectWorldTemplatePlacementNicknameTranslations
+      const nicknameSingularTranslations = dropUndefinedRecordValues(
+        placement.nicknameSingularTranslations ?? {}
+      ) as I_faProjectWorldTemplatePlacementNicknameSingularTranslations
       return {
         documentTemplateId: placement.documentTemplateId,
         groupId: placement.groupId,

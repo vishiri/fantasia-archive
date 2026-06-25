@@ -5,6 +5,7 @@ import {
   faProjectContentIdSchema,
   parseFaProjectContentPlainRecord
 } from 'app/src-electron/shared/faProjectContentSchemaShared'
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
 import type {
   I_faProjectMediaCreateInput,
   I_faProjectMediaPatch
@@ -29,7 +30,8 @@ export function parseFaProjectMediaCreateInput (
 }
 
 export function parseFaProjectMediaPatch (payload: unknown): I_faProjectMediaPatch {
-  return faProjectMediaPatchSchema.parse(parseFaProjectContentPlainRecord(payload))
+  const parsed = faProjectMediaPatchSchema.parse(parseFaProjectContentPlainRecord(payload))
+  return dropUndefinedRecordValues(parsed) as I_faProjectMediaPatch
 }
 
 export function parseFaProjectMediaIdPayload (payload: unknown): string {
@@ -44,5 +46,9 @@ export const faProjectMediaUpdatePayloadSchema = z.object({
 export function parseFaProjectMediaUpdatePayload (
   payload: unknown
 ): { id: string, patch: I_faProjectMediaPatch } {
-  return faProjectMediaUpdatePayloadSchema.parse(parseFaProjectContentPlainRecord(payload))
+  const parsed = faProjectMediaUpdatePayloadSchema.parse(parseFaProjectContentPlainRecord(payload))
+  return {
+    id: parsed.id,
+    patch: dropUndefinedRecordValues(parsed.patch) as I_faProjectMediaPatch
+  }
 }

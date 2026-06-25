@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+
 import type { I_faProjectSettingsPatch } from 'app/types/I_faProjectSettingsDomain'
 import { FA_PROJECT_NAME_MAX_LEN } from 'app/src-electron/shared/faProjectConstants'
 
@@ -31,5 +33,5 @@ export function parseFaProjectSettingsPatch (patch: unknown): I_faProjectSetting
     throw new TypeError('Project settings patch must be a plain object')
   }
 
-  return faProjectSettingsPatchSchema.parse(patch)
+  return dropUndefinedRecordValues(faProjectSettingsPatchSchema.parse(patch)) as I_faProjectSettingsPatch
 }

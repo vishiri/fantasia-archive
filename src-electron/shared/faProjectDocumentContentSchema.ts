@@ -5,6 +5,7 @@ import {
   faProjectContentIdSchema,
   parseFaProjectContentPlainRecord
 } from 'app/src-electron/shared/faProjectContentSchemaShared'
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
 import type {
   I_faProjectDocumentCreateInput,
   I_faProjectDocumentListFilter,
@@ -49,11 +50,13 @@ export const faProjectSetDocumentTemplatePayloadSchema = z.object({
 export function parseFaProjectDocumentCreateInput (
   payload: unknown
 ): I_faProjectDocumentCreateInput {
-  return faProjectDocumentCreateInputSchema.parse(parseFaProjectContentPlainRecord(payload))
+  const parsed = faProjectDocumentCreateInputSchema.parse(parseFaProjectContentPlainRecord(payload))
+  return dropUndefinedRecordValues(parsed) as I_faProjectDocumentCreateInput
 }
 
 export function parseFaProjectDocumentPatch (payload: unknown): I_faProjectDocumentPatch {
-  return faProjectDocumentPatchSchema.parse(parseFaProjectContentPlainRecord(payload))
+  const parsed = faProjectDocumentPatchSchema.parse(parseFaProjectContentPlainRecord(payload))
+  return dropUndefinedRecordValues(parsed) as I_faProjectDocumentPatch
 }
 
 export function parseFaProjectDocumentIdPayload (payload: unknown): string {
@@ -66,7 +69,8 @@ export function parseFaProjectDocumentListFilter (
   if (payload === undefined) {
     return undefined
   }
-  return faProjectDocumentListFilterSchema.parse(parseFaProjectContentPlainRecord(payload))
+  const parsed = faProjectDocumentListFilterSchema.parse(parseFaProjectContentPlainRecord(payload))
+  return dropUndefinedRecordValues(parsed) as I_faProjectDocumentListFilter
 }
 
 export function parseFaProjectSetDocumentWorldPayload (
@@ -89,5 +93,9 @@ export const faProjectDocumentUpdatePayloadSchema = z.object({
 export function parseFaProjectDocumentUpdatePayload (
   payload: unknown
 ): { id: string, patch: I_faProjectDocumentPatch } {
-  return faProjectDocumentUpdatePayloadSchema.parse(parseFaProjectContentPlainRecord(payload))
+  const parsed = faProjectDocumentUpdatePayloadSchema.parse(parseFaProjectContentPlainRecord(payload))
+  return {
+    id: parsed.id,
+    patch: dropUndefinedRecordValues(parsed.patch) as I_faProjectDocumentPatch
+  }
 }

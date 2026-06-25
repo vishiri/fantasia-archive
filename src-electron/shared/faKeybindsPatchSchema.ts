@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import { FA_KEYBIND_COMMAND_IDS } from 'app/types/I_faKeybindsDomain'
 
@@ -59,5 +61,19 @@ export function parseFaKeybindsPatch (patch: unknown): {
     throw new TypeError('Keybinds patch must be a plain object')
   }
 
-  return faKeybindsPatchSchema.parse(patch)
+  const parsed = faKeybindsPatchSchema.parse(patch)
+  const result: {
+    overrides?: I_faKeybindsRoot['overrides']
+    replaceAllOverrides?: boolean
+  } = {}
+
+  if (parsed.replaceAllOverrides !== undefined) {
+    result.replaceAllOverrides = parsed.replaceAllOverrides
+  }
+
+  if (parsed.overrides !== undefined) {
+    result.overrides = dropUndefinedRecordValues(parsed.overrides)
+  }
+
+  return result
 }

@@ -13,6 +13,7 @@ import {
 import { parseFaProjectDocumentTemplateTitleSingularTranslationsSnapshot } from 'app/src-electron/shared/faProjectDocumentTemplateTitleSingularTranslationsSchema'
 import { parseFaProjectDocumentTemplateTitleTranslationsSnapshot } from 'app/src-electron/shared/faProjectDocumentTemplateTitleTranslationsSchema'
 import { parseFaProjectDocumentTemplateWorldAppendixTranslationsSnapshot } from 'app/src-electron/shared/faProjectDocumentTemplateWorldAppendixTranslationsSchema'
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
 import type {
   I_faProjectDocumentTemplateCreateInput,
   I_faProjectDocumentTemplatePatch,
@@ -47,15 +48,17 @@ export const faProjectDocumentTemplateIdPayloadSchema = z.object({
 export function parseFaProjectDocumentTemplateCreateInput (
   payload: unknown
 ): I_faProjectDocumentTemplateCreateInput {
-  return faProjectDocumentTemplateCreateInputSchema.parse(
+  const parsed = faProjectDocumentTemplateCreateInputSchema.parse(
     parseFaProjectContentPlainRecord(payload)
   )
+  return dropUndefinedRecordValues(parsed) as I_faProjectDocumentTemplateCreateInput
 }
 
 export function parseFaProjectDocumentTemplatePatch (
   payload: unknown
 ): I_faProjectDocumentTemplatePatch {
-  return faProjectDocumentTemplatePatchSchema.parse(parseFaProjectContentPlainRecord(payload))
+  const parsed = faProjectDocumentTemplatePatchSchema.parse(parseFaProjectContentPlainRecord(payload))
+  return dropUndefinedRecordValues(parsed) as I_faProjectDocumentTemplatePatch
 }
 
 export function parseFaProjectDocumentTemplateIdPayload (payload: unknown): string {
@@ -72,9 +75,13 @@ export const faProjectDocumentTemplateUpdatePayloadSchema = z.object({
 export function parseFaProjectDocumentTemplateUpdatePayload (
   payload: unknown
 ): { id: string, patch: I_faProjectDocumentTemplatePatch } {
-  return faProjectDocumentTemplateUpdatePayloadSchema.parse(
+  const parsed = faProjectDocumentTemplateUpdatePayloadSchema.parse(
     parseFaProjectContentPlainRecord(payload)
   )
+  return {
+    id: parsed.id,
+    patch: dropUndefinedRecordValues(parsed.patch) as I_faProjectDocumentTemplatePatch
+  }
 }
 
 export const faProjectDocumentTemplateSnapshotItemSchema = z.object({

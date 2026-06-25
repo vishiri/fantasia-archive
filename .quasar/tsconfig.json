@@ -14,6 +14,12 @@
       "dom",
       "dom.iterable"
     ],
+    "strict": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
     "paths": {
       "src": [
         "./../src"

@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+
 import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
 import type { I_faProjectWorldTemplateGroupDisplayNameTranslations } from 'app/types/I_faProjectWorldTemplateGroupDisplayNameTranslations'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
@@ -38,7 +40,7 @@ export function parseFaProjectWorldTemplateGroupDisplayNameTranslationsJson (
   if (!recordResult.success) {
     return {}
   }
-  return normalizeFaProjectWorldTemplateGroupDisplayNameTranslations(recordResult.data)
+  return normalizeFaProjectWorldTemplateGroupDisplayNameTranslations(dropUndefinedRecordValues(recordResult.data) as I_faProjectWorldTemplateGroupDisplayNameTranslations)
 }
 
 export function serializeFaProjectWorldTemplateGroupDisplayNameTranslationsJson (
@@ -54,7 +56,7 @@ export function serializeFaProjectWorldTemplateGroupDisplayNameTranslationsJson 
 
 export const faProjectWorldTemplateGroupDisplayNameTranslationsSnapshotSchema =
   faProjectWorldTemplateGroupDisplayNameTranslationsRecordSchema.superRefine((value, ctx) => {
-    if (!hasFaProjectWorldTemplateGroupDisplayNameTranslation(value)) {
+    if (!hasFaProjectWorldTemplateGroupDisplayNameTranslation(dropUndefinedRecordValues(value) as I_faProjectWorldTemplateGroupDisplayNameTranslations)) {
       ctx.addIssue({
         code: 'custom',
         message: 'At least one world template group display name translation is required'
@@ -66,5 +68,5 @@ export function parseFaProjectWorldTemplateGroupDisplayNameTranslationsSnapshot 
   payload: unknown
 ): I_faProjectWorldTemplateGroupDisplayNameTranslations {
   const parsed = faProjectWorldTemplateGroupDisplayNameTranslationsSnapshotSchema.parse(payload)
-  return normalizeFaProjectWorldTemplateGroupDisplayNameTranslations(parsed)
+  return normalizeFaProjectWorldTemplateGroupDisplayNameTranslations(dropUndefinedRecordValues(parsed) as I_faProjectWorldTemplateGroupDisplayNameTranslations)
 }

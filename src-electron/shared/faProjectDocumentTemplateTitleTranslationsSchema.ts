@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+
 import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
 import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
@@ -36,7 +38,7 @@ export function parseFaProjectDocumentTemplateTitleTranslationsJson (
   if (!recordResult.success) {
     return {}
   }
-  return normalizeFaProjectDocumentTemplateTitles(recordResult.data)
+  return normalizeFaProjectDocumentTemplateTitles(dropUndefinedRecordValues(recordResult.data) as I_faProjectDocumentTemplateTitleTranslations)
 }
 
 export function serializeFaProjectDocumentTemplateTitleTranslationsJson (
@@ -52,7 +54,7 @@ export function serializeFaProjectDocumentTemplateTitleTranslationsJson (
 
 export const faProjectDocumentTemplateTitleTranslationsSnapshotSchema =
   faProjectDocumentTemplateTitleTranslationsRecordSchema.superRefine((value, ctx) => {
-    if (!hasFaProjectDocumentTemplateTitlePluralTranslation(value)) {
+    if (!hasFaProjectDocumentTemplateTitlePluralTranslation(dropUndefinedRecordValues(value) as I_faProjectDocumentTemplateTitleTranslations)) {
       ctx.addIssue({
         code: 'custom',
         message: 'At least one document template title translation is required'
@@ -64,5 +66,5 @@ export function parseFaProjectDocumentTemplateTitleTranslationsSnapshot (
   payload: unknown
 ): I_faProjectDocumentTemplateTitleTranslations {
   const parsed = faProjectDocumentTemplateTitleTranslationsSnapshotSchema.parse(payload)
-  return normalizeFaProjectDocumentTemplateTitles(parsed)
+  return normalizeFaProjectDocumentTemplateTitles(dropUndefinedRecordValues(parsed) as I_faProjectDocumentTemplateTitleTranslations)
 }

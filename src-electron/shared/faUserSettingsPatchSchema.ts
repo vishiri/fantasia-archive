@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
@@ -44,5 +46,5 @@ export function parseFaUserSettingsPatch (patch: unknown): Partial<I_faUserSetti
     throw new TypeError('User settings patch must be a plain object')
   }
 
-  return faUserSettingsPatchSchema.parse(patch)
+  return dropUndefinedRecordValues(faUserSettingsPatchSchema.parse(patch)) as Partial<I_faUserSettings>
 }

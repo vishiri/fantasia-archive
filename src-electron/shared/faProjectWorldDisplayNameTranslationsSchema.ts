@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+
 import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
 import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
@@ -36,7 +38,9 @@ export function parseFaProjectWorldDisplayNameTranslationsJson (
   if (!recordResult.success) {
     return {}
   }
-  return normalizeFaProjectWorldDisplayNameTranslations(recordResult.data)
+  return normalizeFaProjectWorldDisplayNameTranslations(
+    dropUndefinedRecordValues(recordResult.data) as I_faProjectWorldDisplayNameTranslations as I_faProjectWorldDisplayNameTranslations
+  )
 }
 
 export function serializeFaProjectWorldDisplayNameTranslationsJson (
@@ -52,7 +56,7 @@ export function serializeFaProjectWorldDisplayNameTranslationsJson (
 
 export const faProjectWorldDisplayNameTranslationsSnapshotSchema =
   faProjectWorldDisplayNameTranslationsRecordSchema.superRefine((value, ctx) => {
-    if (!hasFaProjectWorldDisplayNameTranslation(value)) {
+    if (!hasFaProjectWorldDisplayNameTranslation(dropUndefinedRecordValues(value) as I_faProjectWorldDisplayNameTranslations)) {
       ctx.addIssue({
         code: 'custom',
         message: 'At least one world display name translation is required'
@@ -64,5 +68,5 @@ export function parseFaProjectWorldDisplayNameTranslationsSnapshot (
   payload: unknown
 ): I_faProjectWorldDisplayNameTranslations {
   const parsed = faProjectWorldDisplayNameTranslationsSnapshotSchema.parse(payload)
-  return normalizeFaProjectWorldDisplayNameTranslations(parsed)
+  return normalizeFaProjectWorldDisplayNameTranslations(dropUndefinedRecordValues(parsed) as I_faProjectWorldDisplayNameTranslations)
 }

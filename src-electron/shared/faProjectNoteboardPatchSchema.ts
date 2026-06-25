@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+
 import { FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX } from 'app/src/scripts/floatingWindows/faFloatingWindowPersistedGeometry_manager'
 import { FA_APP_NOTEBOARD_MAX_TEXT_LENGTH } from './faAppNoteboardPatchSchema'
 import type { I_faProjectNoteboardPatch } from 'app/types/I_faProjectNoteboardDomain'
@@ -36,5 +38,5 @@ export function parseFaProjectNoteboardPatch (patch: unknown): I_faProjectNotebo
     throw new TypeError('Project noteboard patch must be a plain object')
   }
 
-  return faProjectNoteboardPatchSchema.parse(patch)
+  return dropUndefinedRecordValues(faProjectNoteboardPatchSchema.parse(patch)) as I_faProjectNoteboardPatch
 }

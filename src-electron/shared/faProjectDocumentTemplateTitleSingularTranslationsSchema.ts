@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
+
 import { FA_USER_SETTINGS_LANGUAGE_CODES } from 'app/types/faUserSettingsLanguageRegistry'
 import type { I_faProjectDocumentTemplateTitleSingularTranslations } from 'app/types/I_faProjectDocumentTemplateTitleSingularTranslations'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
@@ -33,7 +35,7 @@ export function parseFaProjectDocumentTemplateTitleSingularTranslationsJson (
   if (!recordResult.success) {
     return {}
   }
-  return normalizeFaProjectDocumentTemplateTitleSingularTranslations(recordResult.data)
+  return normalizeFaProjectDocumentTemplateTitleSingularTranslations(dropUndefinedRecordValues(recordResult.data) as I_faProjectDocumentTemplateTitleSingularTranslations)
 }
 
 export function serializeFaProjectDocumentTemplateTitleSingularTranslationsJson (
@@ -51,7 +53,7 @@ export function parseFaProjectDocumentTemplateTitleSingularTranslationsSnapshot 
   payload: unknown
 ): I_faProjectDocumentTemplateTitleSingularTranslations {
   const parsed = faProjectDocumentTemplateTitleSingularTranslationsRecordSchema.parse(payload)
-  return normalizeFaProjectDocumentTemplateTitleSingularTranslations(parsed)
+  return normalizeFaProjectDocumentTemplateTitleSingularTranslations(dropUndefinedRecordValues(parsed) as I_faProjectDocumentTemplateTitleSingularTranslations)
 }
 
 export const faProjectDocumentTemplateTitleSingularTranslationsSnapshotSchema =
