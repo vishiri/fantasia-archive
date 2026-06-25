@@ -21,7 +21,7 @@ description: >-
 - **`dialogs/`** — `Dialog*` modals. Root **`q-dialog`** refs in global open coordination → **`registerComponentDialogStackGuard`** or **`registerMarkdownDialogStackGuard`** from **`dialogManagement.ts`**.
 - **`floatingWindows/`** — `Window*` movable/resizable surfaces. **`_FaFloatingWindowBodyTeleport`**; **`useFaFloatingWindowFrame`**; **no** dialog stack guard. Z-index **`5000`–`5999`**. Playbook: [fantasia-floating-windows](../fantasia-floating-windows/SKILL.md).
 - **`globals/`** — chrome (`GlobalWindowButtons`, `AppControlMenus`, **`_FaUserCssInjector`**, …)
-- **`elements/`** — reusable widgets (`FaColorPickerInput`, **`FaIconPickerInput`**, …)
+- **`elements/`** — reusable widgets (`FaColorPickerInput`, **`FaIconPickerInput`**, **`FaVerticalDraggableTabList`**, **`FaDeleteConfirmButton`**, …)
 - **`other/`** — composites (`SocialContactButtons`)
 - **`foundation/`** — Storybook-only catalogues; no product routes, no Playwright
 - **Hierarchical trees** — **`@he-tree/vue`** only; **`QTree` forbidden** — [fantasia-he-tree](../fantasia-he-tree/SKILL.md)

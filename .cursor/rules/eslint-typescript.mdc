@@ -43,6 +43,7 @@ Run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn tes
 
 ## `quasar.config.ts` typing notes
 
+- **TypeScript strict**: **`build.typescript.strict: true`** — Quasar also enables **`exactOptionalPropertyTypes`**, **`noUncheckedIndexedAccess`**, etc. Optional props: omit keys or type as **`| undefined`**; avoid assigning explicit **`undefined`** where **`satisfies`** / exact optional rejects it. Gate: **`yarn lint:typescript`** (**`vue-tsc`**).
 - **PWA**: `pwa.workboxMode` matches Quasar types (**`GenerateSW`** | **`InjectManifest`**, PascalCase), not legacy lowercase.
 - **BEX**: **`QuasarBexConfiguration`** fields (e.g. `extraScripts`); no removed placeholders like `contentScripts` in `bex`.
 - **Vite plugins**: repo may carry **`@ts-expect-error`** on `defineConfig` when hoisted **`vite`** vs **`@quasar/app-vite`** nested **`vite`** disagree on `Plugin` types; config valid at runtime.

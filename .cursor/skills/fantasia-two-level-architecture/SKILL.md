@@ -30,6 +30,24 @@ description: >-
 | manager-wiring-only | Bodies in **`functions/`** or **`*Wiring.ts`** |
 | manager-wiring-only (class) | Class in non-manager sibling |
 | manager-wiring-only (arrow const) | Factory arg object or **`*Wiring.ts`** |
+| functions-only-type-imports | Keep orchestration in **`scripts/`** sibling — not **`functions/`** |
+| Vue imports `functions/` | Use domain barrel (**`faDragDrop_manager`**, **`dom_manager`**) when present |
+
+## `*Wiring.ts` vs `*_manager.ts`
+
+- **`*_manager.ts`** — factory + **`export const`** only.
+- **`*Wiring.ts`** — **`export function`** + **`document`** / **`window`** / **`fs`**; examples: **`faInterfaceTextDirectionApplyWiring.ts`**, **`faDragDropDocumentDragCursorWiring.ts`**, **`faProjectFilePathHardeningWiring.ts`**.
+- **`MainLayout`**: **`attachWindowKeydownListener`** / **`detachWindowKeydownListener`** injected from **`mainLayout_manager.ts`** into **`createMainLayout`**.
+
+## Domain barrels (`src/scripts/<domain>/`)
+
+**`faDragDrop_manager.ts`**, **`dom_manager.ts`** — public API for Vue; re-export **`functions/`** + wiring.
+
+## Pinia stores
+
+**`src/stores/S_*.ts`** = manager. Pure logic in **`src/stores/functions/`**. Bridge scripts may import **`stores/functions/`**.
+- Return **`readonly(ref)`** for external session state; mutate in actions only.
+- **`S_FaActiveProject`**: **`openGeneration`** mutex; stale open → **`'superseded'`** (**`T_faActiveProjectOpenFlowOutcome`**).
 
 ## Audit checklist (all `*_manager.ts`)
 
@@ -37,14 +55,11 @@ description: >-
 2. **`yarn lint:eslint`** — **`fa-two-level/manager-wiring-only`**
 3. Factory arg property arrows OK
 4. Classes + **`sessionDeps`** in **`*Session.ts`**, **`*Wiring.ts`**, **`*Bound.ts`**
+5. Electron Node **`fs`** bind: factory in **`functions/`**, **`export const`** in **`*Wiring.ts`** (e.g. **`faProjectFilePathHardeningWiring.ts`**)
 
 ## Shared types (`types/`)
 
 Level-1 **`functions/**`**: **`import type`** from **`app/types/**`** only. Managers export values; types from **`app/types/...`**. See [types-folder.mdc](../../rules/types-folder.mdc).
-
-## Pinia stores
-
-**`src/stores/S_*.ts`** = manager. Pure logic in **`src/stores/functions/`**. Bridge scripts may import **`stores/functions/`**.
 
 ## Electron
 

@@ -48,6 +48,14 @@ description: >-
 - **`registerFaWindowControlIpc`**, **`registerFaAppDetailsIpc`** — **`BrowserWindow.fromWebContents(event.sender)`**
 - **Preload path**: **`path.resolve(currentDir, …)`** from bundled main chunk — no extra **`..`** assuming subfolder of **`mainScripts/`**
 
+## Security hardening (main)
+
+- **`app://`** — **`registerFaAppProtocolWiring`**: host allowlist + **`path.relative`** guard against traversal outside app root.
+- **IPC sender** — invoke handlers validate **`event.sender.id`** matches registered main window (failsafe path reply, OS-open, packaged DevTools no-op).
+- **Navigation** — **`will-navigate`** + **`setWindowOpenHandler`** allowlist on main **`BrowserWindow`** (**`mainWindowCreationWiring.ts`**).
+- **`openExternal`** — **`faExternalUrlPredicate`**: block RFC1918 + link-local targets.
+- **Project paths** — **`createResolveHardenedFaProjectFilePath`** (**`functions/`**) + **`faProjectFilePathHardeningWiring.ts`** before open/reconnect; packaged builds omit dev **`ELECTRON_MAIN_FILEPATH`** leak.
+
 ## Keybind persistence
 
 **`mainScripts/keybinds/`** — overrides, Zod patch, **`registerFaKeybindsIpc`**. See [fantasia-keybinds](../fantasia-keybinds/SKILL.md).

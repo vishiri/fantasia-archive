@@ -23,6 +23,12 @@ description: >-
 6. **Modals** — **no** **`registerComponentDialogStackGuard`** for **`Window*`**
 7. **i18n** — **`i18n/<locale>/floatingWindows/`**
 
+## Shared window families (`_shared*`)
+
+- **`_sharedWindowStyling/`** — **`createWindowStylingFrame`**, Monaco session, color panel, keybind help, persist; **`WindowAppStyling`** / **`WindowProjectStyling`** bind app vs project state only.
+- **`_sharedWindowNoteboard/`** — **`createAssembledWindowNoteboard`**, persist, factory bind; **`WindowAppNoteboard`** / **`WindowProjectNoteboard`** thin over shared assembly.
+- Extend shared **`functions/`** + per-window **`*_manager.ts`** — no monolithic **`createWindowAppStyling`** / **`createWindowProjectStyling`**.
+
 ## Open/close Transition (Custom app CSS / WindowAppStyling)
 
 - **`faFloatingWindowPopTransition.ts`**: **`FA_FLOATING_WINDOW_POP_TRANSITION_MS`**, class **`fa-floatingWindowPop-*`**

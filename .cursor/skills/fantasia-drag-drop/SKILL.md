@@ -81,7 +81,7 @@ Sortable root not component root → **`useDraggable(el, list, options)`** or **
 
 ### Vertical tab strips (**`DialogProjectSettings`** worlds list)
 
-Vertical category tabs reuse **`src/scripts/faDragDrop/`** (**`faVerticalDraggableTabsSortableDragOptions`**, **`faVerticalDraggableTabsDocumentDragCursor`**, **`hideNativeSortableDragGhost`**) + global SCSS **`src/css/theme/custom-components/faVerticalDraggableTabs.scss`**. **`DialogProjectSettingsWorldsTabList`**: **`vue-draggable-plus`** + movement threshold so short clicks select tab without drag. Palette swatch reorder: same library in **`DialogProjectSettingsWorldColorPaletteEditor`**.
+Vertical category tabs reuse **`faDragDrop_manager`** (**`faVerticalDraggableTabsSortableDragOptions`**, document drag cursor from **`faDragDropDocumentDragCursorWiring.ts`**, **`hideNativeSortableDragGhost`**) + global SCSS **`src/css/theme/custom-components/faVerticalDraggableTabs.scss`**. Reusable element **`FaVerticalDraggableTabList`**. **`DialogProjectSettingsWorldsTabList`**: **`vue-draggable-plus`** + movement threshold so short clicks select tab without drag. Palette swatch reorder: same library in **`DialogProjectSettingsWorldColorPaletteEditor`**.
 
 #### Vertical draggable tab strips (reusable column)
 
@@ -121,7 +121,7 @@ Import global styles once per feature via **`@use`** / **`src=`** on colocated u
 | **`tabLabelFontSize`** | **`'14px'`** | **`--fa-vertical-draggable-tabs-tab-label-font-size`** |
 | **`dense`** | **`false`** (document templates TabList default **`true`**) | **`--fa-vertical-draggable-tabs-tab-min-height`** (**`36px`** when dense; SCSS fallback **`48px`**) |
 
-Types: **`types/I_faVerticalDraggableTabs.ts`**. Defaults + **`buildFaVerticalDraggableTabsRootStyle`**: **`src/scripts/faDragDrop/functions/buildFaVerticalDraggableTabsRootStyle.ts`**.
+Types: **`types/I_faVerticalDraggableTabs.ts`**. Defaults + **`buildFaVerticalDraggableTabsRootStyle`**: import from **`faDragDrop_manager`**.
 
 **TabList script pattern**
 
@@ -133,7 +133,7 @@ import {
   FA_VERTICAL_DRAGGABLE_TABS_TAB_PADDING_DEFAULT,
   FA_VERTICAL_DRAGGABLE_TABS_TAB_TEXT_ALIGN_DEFAULT,
   buildFaVerticalDraggableTabsRootStyle
-} from 'app/src/scripts/faDragDrop/functions/buildFaVerticalDraggableTabsRootStyle'
+} from 'app/src/scripts/faDragDrop/faDragDrop_manager'
 
 const tabListRootStyle = computed(() => buildFaVerticalDraggableTabsRootStyle({
   columnWidthPx: props.tabListWidthPx,
@@ -150,7 +150,7 @@ const tabListRootStyle = computed(() => buildFaVerticalDraggableTabsRootStyle({
 
 - **`faVerticalDraggableTabsSortableDragOptions`** on **`VueDraggable`**
 - **`touch-start-threshold="5"`** — tap-to-select without drag
-- **`@start`** → **`applyFaVerticalDraggableTabsDocumentDragCursor`**
+- **`@start`** → **`applyFaVerticalDraggableTabsDocumentDragCursor`** (from **`faDragDrop_manager`**)
 - **`@end`** → **`clearFaVerticalDraggableTabsDocumentDragCursor`** + emit reordered array
 - Root **`computed`** class **`faVerticalDraggableTabs--listDragging`** while dragging
 - Tab item modifiers: **`--active`**, **`--dragging`**, **`--error`**

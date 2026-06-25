@@ -31,6 +31,32 @@ Do **not** add module whose only job is `export { … } from './someOther_manage
 
 **Renderer wiring siblings:** Level-1 `functions/` cannot import `window`, Pinia, project modules → colocated `*Wiring.ts` (or `*Session.ts` / `*Bound.ts`) next to manager; same as Electron `*Surface.ts` / `*Api.ts` next to `*_manager.ts`.
 
+## `*Wiring.ts` vs `*_manager.ts`
+
+- **`*_manager.ts`** — wiring-only: factory calls + **`export const`** bindings; **no** top-level **`export function`**, arrow **`const`**, or **`class`** ([`manager-wiring-only`](../../eslint-rules/faTwoLevelPlugin.mjs)).
+- **`*Wiring.ts`** — when module must **`export function`** and touches **`document`**, **`window`**, **`fs`**, or other non-injectable globals. **Not** named **`*_manager.ts`**.
+- Examples: **`faInterfaceTextDirectionApplyWiring.ts`**, **`faDragDropDocumentDragCursorWiring.ts`**, **`faProjectFilePathHardeningWiring.ts`**; **`MainLayout`** injects **`attachWindowKeydownListener`** / **`detachWindowKeydownListener`** from **`mainLayout_manager.ts`** into **`createMainLayout`**.
+
+## Domain barrel managers (`src/scripts/<domain>/`)
+
+- **`faDragDrop_manager.ts`**, **`dom_manager.ts`** — re-export pure **`functions/`** + wiring; **Vue SFCs and managers import the barrel**, not **`functions/`** directly when barrel exists.
+- Barrel may re-export from **`*Wiring.ts`**; body still obeys **`manager-wiring-only`**.
+
+## Component `scripts/` vs `functions/` (level-2 colocated)
+
+- Modules under **`scripts/`** that value-import managers, **`i18n`**, or multi-file orchestration **stay in `scripts/`** — do not move into **`functions/`** for folder hygiene (**`fa-two-level/functions-only-type-imports`** fails).
+- Examples: **`dialogProjectSettingsWorldTemplateLayoutDraft.ts`**, **`filterDialogProjectSettingsWorldsByQuery.ts`**, **`faActionManagerRunApi.ts`** (sibling of **`actionManager/functions/`**).
+
+## Electron `functions/` + Node APIs
+
+- Pure logic + DI factory in **`functions/`** (e.g. **`createResolveHardenedFaProjectFilePath`**).
+- Bind **`fs`** / domain helpers in sibling **`*Wiring.ts`**; **`export const resolveHardened… = api.…`**.
+
+## Pinia stores (`S_*.ts`)
+
+- Expose session refs with **`readonly()`** on store return; mutate only inside store actions.
+- **`S_FaActiveProject`**: **`openGeneration`** mutex; stale open IPC → **`'superseded'`** (**`T_faActiveProjectOpenFlowOutcome`**); action handlers treat like cancel.
+
 Composable managers: `export const useFeature = createUseFeature({ ref, computed, i18n, … })` with `createUseFeature` under `functions/`.
 
 ## Layout per feature

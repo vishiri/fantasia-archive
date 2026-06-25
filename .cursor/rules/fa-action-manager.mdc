@@ -41,6 +41,7 @@ Action manager **only** place for **error** toasts on registered actions. Store 
 - **Handler errors** — throw/reject OK; manager catches, **`normalizeFaActionError`**, **`reportFaActionFailure`**.
 - **Payload preview** — always **`buildFaActionPayloadPreview`** for log/history. Cycles/unserializable → **`[unserializable]`**; long previews truncated for monitor table.
 - **Pinia tolerance** — never assume store mounted; **`resolveFaActionManagerStore()`** **`null`** early boot/tests without Pinia; helpers short-circuit cleanly.
+- **Handler deps typing** — **`satisfies I_createFaActionDefinitionHandlers…Deps`** on deps objects; use **`DeepReadonly<Ref<…>>`** in dep interfaces when stores expose **`readonly()`** refs.
 
 ## Tests
 

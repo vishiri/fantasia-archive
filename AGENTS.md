@@ -73,7 +73,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | State | Pinia, Vue Router |
 | i18n | vue-i18n — repo-root **`i18n/`** |
 | Boot | **`src/boot/`** — **`tooltip-defaults`** patches global **`q-tooltip`** delay (**`FA_Q_TOOLTIP_DELAY_MS`**, 500 ms) |
-| Lint/types | ESLint, **`vue-tsc`**, Stylelint |
+| Lint/types | ESLint, **`vue-tsc`** (**`quasar.config.ts`** **`typescript.strict: true`**), Stylelint |
 | Unit | Vitest — **`yarn test:unit`**; gate **`yarn testbatch:verify`** |
 | UI/E2E | Playwright — rebuild Electron before runs |
 | Storybook | 10 — **`.storybook-workspace/`** |
@@ -85,11 +85,12 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | --- | --- |
 | Neverthrow | [neverthrow.mdc](.cursor/rules/neverthrow.mdc), [fantasia-neverthrow](.cursor/skills/fantasia-neverthrow/SKILL.md) |
 | YAGNI / minimal diffs | [yagni.mdc](.cursor/rules/yagni.mdc), [fantasia-yagni](.cursor/skills/fantasia-yagni/SKILL.md) — orthogonal to [caveman-default.mdc](.cursor/rules/caveman-default.mdc) |
-| Electron preload + IPC | [electron-preload.mdc](.cursor/rules/electron-preload.mdc), [fantasia-electron-preload](.cursor/skills/fantasia-electron-preload/SKILL.md), [fantasia-electron-main](.cursor/skills/fantasia-electron-main/SKILL.md) |
+| Electron preload + IPC | [electron-preload.mdc](.cursor/rules/electron-preload.mdc), [fantasia-electron-preload](.cursor/skills/fantasia-electron-preload/SKILL.md), [fantasia-electron-main](.cursor/skills/fantasia-electron-main/SKILL.md) — security hardening: **`app://`**, IPC sender, navigation allowlist, path hardening |
+| Domain script barrels | **`faDragDrop_manager`**, **`dom_manager`** — [typescript-scripts.mdc](.cursor/rules/typescript-scripts.mdc), [fa-two-level-architecture.mdc](.cursor/rules/fa-two-level-architecture.mdc) |
 | Global keybinds | [fantasia-keybinds](.cursor/skills/fantasia-keybinds/SKILL.md) |
 | Action manager | [fa-action-manager.mdc](.cursor/rules/fa-action-manager.mdc), [fantasia-action-manager](.cursor/skills/fantasia-action-manager/SKILL.md) |
 | Project Settings | [fantasia-sqlite-main](.cursor/skills/fantasia-sqlite-main/SKILL.md), [projectDB.md](docs/database/projectDB.md) — IPC-read on open; **`saveProjectSettings`**; worlds + template layout + document templates |
-| Floating **`Window*`** | [fantasia-floating-windows](.cursor/skills/fantasia-floating-windows/SKILL.md) |
+| Floating **`Window*`** | [fantasia-floating-windows](.cursor/skills/fantasia-floating-windows/SKILL.md) — shared **`_sharedWindowStyling/`**, **`_sharedWindowNoteboard/`** |
 | Trees / DnD | [fa-he-tree.mdc](.cursor/rules/fa-he-tree.mdc), [fa-drag-drop-lists.mdc](.cursor/rules/fa-drag-drop-lists.mdc), skills **fantasia-he-tree**, **fantasia-drag-drop** |
 | **`FaIconPickerInput`** | [fa-icon-picker.mdc](.cursor/rules/fa-icon-picker.mdc), [fantasia-icon-picker](.cursor/skills/fantasia-icon-picker/SKILL.md) |
 | **`FaLocaleTranslationsInput`** | [fa-locale-translations-input.mdc](.cursor/rules/fa-locale-translations-input.mdc), [fantasia-locale-translations-input](.cursor/skills/fantasia-locale-translations-input/SKILL.md) |
@@ -103,7 +104,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 
 ## Renderer components (`src/components/`)
 
-Buckets: **`dialogs/`**, **`floatingWindows/`**, **`globals/`**, **`elements/`**, **`projectUI/`**, **`other/`**, **`foundation/`** (Storybook-only). Three infrastructure helpers use **`_` prefix**: **`_FaFloatingWindowBodyTeleport`**, **`_FaFloatingWindowFrameResizeHandles`**, **`_FaUserCssInjector`**. SFC order: **`<template>`**, **`<script>`**, **`<style>`**. Size limits: [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc).
+Buckets: **`dialogs/`**, **`floatingWindows/`** (incl. **`_sharedWindowStyling/`**, **`_sharedWindowNoteboard/`**), **`globals/`**, **`elements/`** (e.g. **`FaVerticalDraggableTabList`**, **`FaDeleteConfirmButton`**), **`projectUI/`**, **`other/`**, **`foundation/`** (Storybook-only). Three infrastructure helpers use **`_` prefix**: **`_FaFloatingWindowBodyTeleport`**, **`_FaFloatingWindowFrameResizeHandles`**, **`_FaUserCssInjector`**. SFC order: **`<template>`**, **`<script>`**, **`<style>`**. Size limits: [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc).
 
 ## Code comments
 
