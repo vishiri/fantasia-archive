@@ -287,7 +287,7 @@ export default {
     logFullActivityPayload: {
       title: 'Log full activity payload',
       description:
-        'If this is enabled, the activity will log full payloads. This can useful when doing deep debugging that needs precise logging of results.',
+        'If this is enabled, the activity will log full payloads in all situations (normally it log only in non-error and non-warning situations). This can useful when doing deep debugging that needs precise logging of results.',
       tags: 'debug, troubleshooting, dev tools, payload, activity, logging'
     },
     noProjectName: {

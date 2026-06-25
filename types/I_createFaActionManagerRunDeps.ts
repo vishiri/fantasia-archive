@@ -8,6 +8,7 @@ import type { T_injectedResultAsync } from 'app/types/I_injectedNeverthrow'
 
 export type T_createFaActionManagerRunDeps = {
   ResultAsync: T_injectedResultAsync
+  buildFaActionErrorOrWarningPayloadPreview: (payload: unknown) => string
   buildFaActionFailureHistoryPayloadPreview: (error: unknown) => string | undefined
   enqueueSyncAction: (
     entry: I_faActionQueueEntry,

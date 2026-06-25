@@ -303,3 +303,22 @@ test('Test that reportFaActionFailure records the failure on the store when pres
   expect(recordFailure.mock.calls[0][0].payloadPreview).toBe('{"foo":"bar"}')
   consoleSpy.mockRestore()
 })
+
+/**
+ * reportFaActionFailure
+ * Logs the full enqueue payload preview even when full payload logging is disabled.
+ */
+test('Test that reportFaActionFailure keeps the full payload preview when logging is off', () => {
+  resolvePayloadPreviewMaxLengthMock.mockReturnValue(400)
+  const recordFailure = vi.fn()
+  resolveStoreMock.mockReturnValue({
+    recordFailure
+  } as unknown as ReturnType<typeof import('app/src/stores/S_FaActionManager').S_FaActionManager>)
+  const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  const bigPayload = { value: 'x'.repeat(500) }
+  reportFaActionFailure(buildEntry('saveAppSettings', bigPayload), new Error('persist failed'))
+  const preview = recordFailure.mock.calls[0]?.[0]?.payloadPreview as string | undefined
+  expect(preview?.endsWith('...')).toBe(false)
+  expect((preview?.length ?? 0)).toBeGreaterThan(400)
+  consoleSpy.mockRestore()
+})

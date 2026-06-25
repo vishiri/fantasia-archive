@@ -66,7 +66,7 @@ function buildFaActionFailureHistoryPayloadPreview (
   if (projectOpenFailed.attemptedFilePath !== undefined) {
     row.filePath = projectOpenFailed.attemptedFilePath
   }
-  return buildFaActionPayloadPreview(deps, row)
+  return buildFaActionPayloadPreview(deps, row, Number.POSITIVE_INFINITY)
 }
 
 function reportFaActionFailure (
@@ -75,7 +75,11 @@ function reportFaActionFailure (
   error: unknown
 ): I_faActionFailureLog {
   const normalized = deps.normalizeFaActionError(error)
-  const payloadPreview = buildFaActionPayloadPreview(deps, entry.payload)
+  const payloadPreview = buildFaActionPayloadPreview(
+    deps,
+    entry.payload,
+    Number.POSITIVE_INFINITY
+  )
 
   console.error('[faActionManager]', {
     error: normalized,

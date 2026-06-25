@@ -4,7 +4,7 @@
 ## 2.4.14 - Version bump
 
 ### New features
-- **Fantasia Archive Settings**: Under **Developer settings**, the **Developer Settings** group includes **Log full activity payload**. When enabled, **Action Monitor** records full action payloads instead of the default 400-character preview.
+- **Fantasia Archive Settings**: Under **Developer settings**, the **Developer Settings** group includes **Log full activity payload**. When enabled, **Action Monitor** records full action payloads for every activity; when disabled, only non-error and non-warning rows use the default preview cap (errors and warnings always log the full payload).
 - **Project Settings**: The **Worlds** tab uses a draggable world list on the left and a detail editor on the right for the selected world's name, optional hex **color**, and remove control. **Add world** inserts a new row at the top of the list. **Save settings** persists the project name and the full worlds list together; at least one world must remain, and worlds that still contain documents cannot be deleted.
 - **Project Settings**: Each world's **World color palette** editor supports **Add Color**, drag reorder, and per-swatch color editing; duplicate palette entries show a warning border and block **Save settings** until resolved.
 - **Project Settings**: When **Save settings** is blocked, an error icon beside the button lists what must be fixed (blank project name, missing world names, or duplicate palette colors) in a structured tooltip; **General settings**, **Worlds**, and individual world tabs highlight in the negative accent color while those errors remain.
@@ -34,6 +34,7 @@
 - **Project Settings**: **Save without closing** persists project settings like **Save settings** but keeps the dialog open so you can keep editing.
 
 ### Bugfixes & Optimizations
+- **Action Monitor**: Failed and warning activities always store the full action payload in session history; **Log full activity payload** now applies only to successful and in-progress rows.
 - **Project Settings**: **World's hierarchical tree** and **Available document templates** now show document template titles and **World appendix** text for the active interface language when translations exist, including after opening the dialog or switching language while it stays open. **Available document templates** rows also show the missing-translation warning icon when the active language has no document template title translation.
 - **Project Management**: menu rows regrouped — **Create new project**; **Load existing project** and **Load Recent Project**; **Show Project Dashboard**; **Toggle Project Noteboard**, **Custom Project CSS**, and **Project Settings**; **Advanced Project Tools** — with separators between each group.
 - **Project Settings**: **Worlds** and **Document Templates** tab lists hide the vertical scrollbar on the tab column while the list remains scrollable; **Add world** and **Add document template** stay pinned below the scroll area.

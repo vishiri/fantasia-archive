@@ -38,6 +38,18 @@ test('Test that resolveFaActionPayloadPreviewMaxLength returns Infinity when log
 
 /**
  * resolveFaActionPayloadPreviewMaxLength
+ * Error and warning rows always bypass the preview cap even when logging is disabled.
+ */
+test('Test that resolveFaActionPayloadPreviewMaxLength returns Infinity for error or warning rows when logging is off', () => {
+  S_FaUserSettings().settings = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    logFullActivityPayload: false
+  }
+  expect(resolveFaActionPayloadPreviewMaxLength(true)).toBe(Number.POSITIVE_INFINITY)
+})
+
+/**
+ * resolveFaActionPayloadPreviewMaxLength
  * Falls back to the default cap when settings have not been loaded yet.
  */
 test('Test that resolveFaActionPayloadPreviewMaxLength falls back when settings are null', () => {

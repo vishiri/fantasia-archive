@@ -15,6 +15,7 @@ type T_faActionManagerHistoryStore = {
 function buildHistoryEntryFromQueue (
   entry: I_faActionQueueEntry,
   buildFaActionPayloadPreview: (payload: unknown, maxLength?: number) => string,
+  buildFaActionErrorOrWarningPayloadPreview: (payload: unknown) => string,
   status: I_faActionHistoryEntry['status'],
   startedAt?: number
 ): I_faActionHistoryEntry {
@@ -26,7 +27,10 @@ function buildHistoryEntryFromQueue (
     uid: entry.uid,
     ...(startedAt !== undefined ? { startedAt } : {})
   }
-  const preview = buildFaActionPayloadPreview(entry.payload)
+  const buildPreview = status === 'failed'
+    ? buildFaActionErrorOrWarningPayloadPreview
+    : buildFaActionPayloadPreview
+  const preview = buildPreview(entry.payload)
   if (preview !== '') {
     historyEntry.payloadPreview = preview
   }
@@ -34,6 +38,7 @@ function buildHistoryEntryFromQueue (
 }
 
 type T_createFaActionManagerHistoryDeps = {
+  buildFaActionErrorOrWarningPayloadPreview: (payload: unknown) => string
   buildFaActionPayloadPreview: (payload: unknown, maxLength?: number) => string
   resolveFaActionManagerStore: () => T_faActionManagerHistoryStore | null
 }
@@ -49,6 +54,7 @@ function recordFaActionHistoryEnqueued (
   store.appendHistoryEntry(buildHistoryEntryFromQueue(
     entry,
     deps.buildFaActionPayloadPreview,
+    deps.buildFaActionErrorOrWarningPayloadPreview,
     'queued'
   ))
 }
@@ -80,6 +86,7 @@ function recordFaActionHistoryStartedFromEntry (
   store.appendHistoryEntry(buildHistoryEntryFromQueue(
     entry,
     deps.buildFaActionPayloadPreview,
+    deps.buildFaActionErrorOrWarningPayloadPreview,
     'running',
     startedAt
   ))
@@ -117,6 +124,7 @@ function recordFaActionHistoryOverflowDrop (
   const historyEntry = buildHistoryEntryFromQueue(
     entry,
     deps.buildFaActionPayloadPreview,
+    deps.buildFaActionErrorOrWarningPayloadPreview,
     'failed',
     now
   )

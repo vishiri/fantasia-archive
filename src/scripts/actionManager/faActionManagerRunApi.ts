@@ -9,6 +9,8 @@ import type {
   T_createFaActionManagerRunDeps
 } from 'app/types/I_createFaActionManagerRunDeps'
 
+import { resolveFaActionFailureHistoryPayloadPreviewMerge } from './functions/resolveFaActionFailureHistoryPayloadPreviewMerge'
+
 function buildFaActionManagerRunEntry<Id extends T_faActionId> (
   deps: T_createFaActionManagerRunDeps,
   id: Id,
@@ -63,6 +65,10 @@ async function dispatchFaActionManagerAsyncEntry (
         return false
       }
       const failure = deps.reportFaActionFailure(entry, error)
+      const failurePayloadPreview = resolveFaActionFailureHistoryPayloadPreviewMerge(
+        deps.buildFaActionFailureHistoryPayloadPreview(error),
+        deps.buildFaActionErrorOrWarningPayloadPreview(entry.payload)
+      )
       deps.recordHistoryCompleted(
         entry.uid,
         {
@@ -70,7 +76,7 @@ async function dispatchFaActionManagerAsyncEntry (
           kind: 'failed'
         },
         deps.nowMs(),
-        deps.buildFaActionFailureHistoryPayloadPreview(error)
+        failurePayloadPreview
       )
       return false
     }

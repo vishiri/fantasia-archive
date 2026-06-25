@@ -9,6 +9,7 @@ import {
 } from './faActionManagerHistory_manager'
 import { enqueueSyncAction } from './faActionManagerSyncQueue_manager'
 import {
+  buildFaActionErrorOrWarningPayloadPreview,
   buildFaActionFailureHistoryPayloadPreview,
   reportFaActionFailure
 } from './faActionManagerErrorReporting_manager'
@@ -20,6 +21,7 @@ import { wireFaActionManagerRunForward } from './faActionManagerRunForward_manag
 const faActionManagerRun = createFaActionManagerRun({
   FaActionUserCanceledError,
   ResultAsync,
+  buildFaActionErrorOrWarningPayloadPreview,
   buildFaActionFailureHistoryPayloadPreview,
   enqueueSyncAction,
   findFaActionDefinition: (id) => faActionDefinitionsModule.findFaActionDefinition(id),

@@ -26,10 +26,15 @@ const faActionManagerErrorReportingApi = createFaActionManagerErrorReporting({
     })
 })
 
-export const buildFaActionPayloadPreview = createBuildFaActionPayloadPreviewWithUserSettingsCap({
+const faActionPayloadPreviewApi = createBuildFaActionPayloadPreviewWithUserSettingsCap({
   buildFaActionPayloadPreview: faActionManagerErrorReportingApi.buildFaActionPayloadPreview,
   resolveFaActionPayloadPreviewMaxLength
 })
+
+export const buildFaActionPayloadPreview = faActionPayloadPreviewApi.buildFaActionPayloadPreview
+
+export const buildFaActionErrorOrWarningPayloadPreview =
+  faActionPayloadPreviewApi.buildFaActionErrorOrWarningPayloadPreview
 
 export const buildFaActionFailureHistoryPayloadPreview =
   faActionManagerErrorReportingApi.buildFaActionFailureHistoryPayloadPreview

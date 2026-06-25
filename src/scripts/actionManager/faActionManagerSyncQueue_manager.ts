@@ -9,11 +9,13 @@ import {
   recordHistoryStarted
 } from './faActionManagerHistory_manager'
 import {
+  buildFaActionErrorOrWarningPayloadPreview,
   buildFaActionFailureHistoryPayloadPreview,
   reportFaActionFailure
 } from './faActionManagerErrorReporting_manager'
 import * as faActionManagerStoreBridge from './faActionManagerStoreBridge_manager'
 import { createFaActionManagerSyncQueue } from './functions/createFaActionManagerSyncQueue'
+import { resolveFaActionFailureHistoryPayloadPreviewMerge } from './functions/resolveFaActionFailureHistoryPayloadPreviewMerge'
 
 const faActionSyncTimeoutMs = 30_000
 const faActionSyncQueueMax = 32
@@ -24,12 +26,14 @@ const faActionManagerSyncQueueApi = createFaActionManagerSyncQueue({
   Notify,
   Result,
   ResultAsync,
+  buildFaActionErrorOrWarningPayloadPreview,
   buildFaActionFailureHistoryPayloadPreview,
   i18n,
   recordHistoryCompleted,
   recordHistoryOverflowDrop,
   recordHistoryStarted,
   reportFaActionFailure,
+  resolveFaActionFailureHistoryPayloadPreviewMerge,
   resolveFaActionManagerStore: () => faActionManagerStoreBridge.resolveFaActionManagerStore()
 })
 

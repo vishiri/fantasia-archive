@@ -7,8 +7,13 @@ export type T_createFaActionManagerSyncQueueDeps = {
   Notify: { create: (opts: Record<string, unknown>) => void }
   Result: T_injectedResult
   ResultAsync: T_injectedResultAsync
+  buildFaActionErrorOrWarningPayloadPreview: (payload: unknown) => string
   buildFaActionFailureHistoryPayloadPreview: (error: unknown) => string | undefined
   i18n: { global: { t: (key: string) => string } }
+  resolveFaActionFailureHistoryPayloadPreviewMerge: (
+    failureShapePreview: string | undefined,
+    entryPayloadPreview: string
+  ) => string | undefined
   recordHistoryCompleted: (
     uid: string,
     outcome: { kind: 'success' } | { kind: 'failed'; errorMessage: string },

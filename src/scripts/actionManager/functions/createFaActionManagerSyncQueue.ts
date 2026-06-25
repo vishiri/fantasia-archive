@@ -72,6 +72,10 @@ async function executeFaActionSyncQueueEntry (
       () => deps.recordHistoryCompleted(entry.uid, { kind: 'success' }, Date.now()),
       (error) => {
         const failure = deps.reportFaActionFailure(entry, error)
+        const failurePayloadPreview = deps.resolveFaActionFailureHistoryPayloadPreviewMerge(
+          deps.buildFaActionFailureHistoryPayloadPreview(error),
+          deps.buildFaActionErrorOrWarningPayloadPreview(entry.payload)
+        )
         deps.recordHistoryCompleted(
           entry.uid,
           {
@@ -79,7 +83,7 @@ async function executeFaActionSyncQueueEntry (
             kind: 'failed'
           },
           Date.now(),
-          deps.buildFaActionFailureHistoryPayloadPreview(error)
+          failurePayloadPreview
         )
       }
     )
