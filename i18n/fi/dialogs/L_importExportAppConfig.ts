@@ -29,5 +29,10 @@ export default {
   toasts: {
     exportSuccess: 'Kokoonpanon vienti onnistui',
     importSuccess: 'Kokoonpanon tuonti onnistui',
+  },
+  errors: {
+    desktopOnly: 'Sovelluksen määritykset ovat käytettävissä vain työpöytäsovelluksessa.',
+    exportToFileFailed: 'Vienti tiedostoon epäonnistui',
+    importValidationFailed: 'Tuonnin vahvistus epäonnistui'
   }
 }

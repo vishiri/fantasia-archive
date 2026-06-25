@@ -4,6 +4,7 @@
 ## 2.4.14 - Version bump
 
 ### Nya funktioner
+- **Lokalisering**: Åtgärdshanteraren sparar misslyckanden, projektöppning/skapa felfallbackar och **Importera/exportera appkonfiguration** feltoaster använder nu språkfiler på alla språk som stöds. **Fantasia Archive Settings** **Logga full aktivitetsnyttolast** hjälptext matchar engelska på alla språk.
 - **Projektinställningar**: **Spara utan att stänga** sparar som **Spara inställningar** men håller dialogen öppen.
 
 ### Buggfixar och optimeringar

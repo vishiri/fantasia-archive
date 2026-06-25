@@ -113,7 +113,7 @@ const buildSampleHistory = (): I_faActionHistoryEntry[] => [
   },
   {
     enqueuedAt: 1_700_000_002_000,
-    errorMessage: 'Failed to save keybind settings.',
+    errorMessage: 'Could not save keybind settings.',
     finishedAt: 1_700_000_003_000,
     id: 'saveKeybindSettings',
     kind: 'async',

@@ -40,4 +40,5 @@ export interface I_createFaActionDefinitionHandlersDialogsDeps {
   notifyFaProjectCreatedPositive: () => void
   notifyFaProjectLoadedPositive: () => void
   tipsTricksTriviaNotification: (force: boolean) => void
+  i18n: { global: { t: (key: string) => string } }
 }

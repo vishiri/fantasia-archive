@@ -4,6 +4,7 @@
 ## 2.4.14 - Versjonsbump
 
 ### Nye funksjoner
+- **Lokalisering**: Handlingsbehandler lagrer feil, prosjekt åpne/opprett feilreserver og **Importer/eksporter appkonfigurasjon** feiltoaster bruker nå lokalitetsfiler på alle støttede språk. **Fantasia Archive Settings** **Logg full aktivitetsnyttelast** hjelpetekst samsvarer med engelsk på alle språk.
 - **Prosjektinnstillinger**: **Lagre uten å lukke** lagrer som **Lagre innstillinger**, men holder dialogen åpen.
 
 ### Feilrettinger og optimaliseringer

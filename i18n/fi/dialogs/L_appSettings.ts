@@ -285,7 +285,7 @@ export default {
     },
     logFullActivityPayload: {
       title: 'Kirjaa täydellinen aktiviteettikuorma',
-      description: 'Jos tämä on käytössä, aktiviteetti kirjaa täydelliset kuormat. Tästä voi olla hyötyä syvässä virheenkorjauksessa, jossa tarvitaan tarkkaa tulosten kirjaamista.',
+      description: 'Jos tämä on käytössä, aktiviteetti kirjaa kaikki hyötykuormat kaikissa tilanteissa (normaalisti se kirjaa vain ei-virhe- ja ei-varoitustilanteissa). Tästä voi olla hyötyä, kun teet syvällistä virheenkorjausta, joka vaatii tarkan tulosten kirjaamisen.',
       tags: 'virheenkorjaus, vianmääritys, DevTools, kuorma, aktiviteetti, kirjaus',
     },
     noProjectName: {

@@ -4,6 +4,7 @@
 ## 2.4.14 – Versionssprung
 
 ### Fehlerbehebungen und Optimierungen
+- **Lokalisierung**: Aktionsmanager-Speicherfehler, Projekt-Öffnungs-/Erstellungsfehler-Fallbacks und **App-Konfiguration importieren/exportieren**-Fehlermeldungen verwenden jetzt Gebietsschemadateien in jeder unterstützten Sprache. **Fantasia-Archiveinstellungen** **Vollständige Aktivitätsnutzlast protokollieren** Der Hilfetext stimmt in allen Regionen mit Englisch überein.
 - **Sprachauswahl**: **Svenska** zeigt jetzt die Schwedenflagge statt der Flagge von El Salvador.
 - **Projekteinstellungen**: **Welt löschen** in der Detailzeile **Welten** ist vertikal mit **Weltname** und **Weltfarbe** ausgerichtet.
 - **Willkommensbildschirm**: **Letztes Projekt fortsetzen** zeigt wieder den Fehler-Toast des Aktionsmanagers, wenn das zuletzt verwendete Projekt nicht geöffnet werden kann (zum Beispiel eine fehlende **`.faproject`**-Datei), statt nach einem Konsolenfehler still zu scheitern.

@@ -29,5 +29,10 @@ export default {
   toasts: {
     exportSuccess: 'Konfiguration erfolgreich exportiert',
     importSuccess: 'Konfiguration erfolgreich importiert',
+  },
+  errors: {
+    desktopOnly: 'Die App-Konfiguration ist nur in der Desktop-App verfügbar.',
+    exportToFileFailed: 'Der Export in eine Datei ist fehlgeschlagen',
+    importValidationFailed: 'Die Importvalidierung ist fehlgeschlagen'
   }
 }

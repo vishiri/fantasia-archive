@@ -4,6 +4,7 @@
 ## 2.4.14 - Mejora de versión
 
 ### Nuevas funciones
+- **Localización**: los errores de guardado del administrador de acciones, los errores de apertura/creación de proyectos y los mensajes de error de **Importación/exportación de configuración de aplicaciones** ahora usan archivos locales en todos los idiomas admitidos. **Configuración de Fantasia Archive** **Registrar carga útil de actividad completa** El texto de ayuda coincide con el inglés en todas las configuraciones regionales.
 - **Configuración del proyecto**: **Guardar sin cerrar** guarda como **Guardar configuración** pero mantiene el diálogo abierto para seguir editando.
 
 ### Correcciones de errores y optimizaciones

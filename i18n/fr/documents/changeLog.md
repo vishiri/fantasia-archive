@@ -4,6 +4,7 @@
 ## 2.4.14 - Changement de version
 
 ### Nouvelles fonctionnalités
+- **Localisation** : les échecs d'enregistrement du gestionnaire d'actions, les erreurs d'ouverture/création de projet et les toasts d'erreur d'importation/exportation de configuration d'application** utilisent désormais les fichiers de paramètres régionaux dans toutes les langues prises en charge. **Paramètres des archives Fantasia** **Consignez la charge utile complète de l'activité** Le texte d'aide correspond à l'anglais dans toutes les régions.
 - **Paramètres du projet** : **Enregistrer sans fermer** enregistre comme **Enregistrer les paramètres** mais garde la boîte de dialogue ouverte.
 - **Paramètres du projet** : un onglet **Mondes** ouvre une section provisoire **Mondes du projet** (style de titre de panneau partagé avec **Paramètres généraux**) ; le câblage de gestion des mondes suivra dans une version ultérieure.
 - **Base de données projet** : les **mondes** et les **modèles de document** peuvent être liés de façon optionnelle en relation plusieurs-à-plusieurs (un modèle peut s'appliquer à plusieurs mondes et un monde peut utiliser plusieurs modèles) ; les liens sont stockés dans SQLite avec des API IPC preload (pas encore d'interface pour les modifier). Chaque **monde** stocke aussi une **couleur** hex pour une future interface.

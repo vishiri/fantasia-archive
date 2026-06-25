@@ -29,5 +29,10 @@ export default {
   toasts: {
     exportSuccess: 'Конфігурацію успішно експортовано',
     importSuccess: 'Конфігурацію успішно імпортовано',
+  },
+  errors: {
+    desktopOnly: 'Конфігурація програми доступна лише в настільній програмі.',
+    exportToFileFailed: 'Не вдалося експортувати у файл',
+    importValidationFailed: 'Помилка перевірки імпорту'
   }
 }

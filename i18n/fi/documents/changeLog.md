@@ -4,6 +4,7 @@
 ## 2.4.14 - Versiovirhe
 
 ### Uusia ominaisuuksia
+- **Lokalisointi**: Toimintojenhallinnan tallennusvirheet, projektin avaus-/luovirhevaroitukset ja **Import / Export App Configuration** -virheilmoitukset käyttävät nyt kielialuetiedostoja kaikilla tuetuilla kielillä. **Fantasia-arkiston asetukset** **Loki koko toiminnan hyötykuorma** ohjeteksti vastaa englantia kaikilla kielillä.
 - **Projektiasetukset**: **Tallenna sulkematta** tallentaa kuten **Tallenna asetukset**, mutta jättää valintaikkunan auki.
 
 ### Virhekorjaukset ja optimoinnit

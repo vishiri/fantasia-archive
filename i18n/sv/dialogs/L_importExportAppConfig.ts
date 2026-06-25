@@ -29,5 +29,10 @@ export default {
   toasts: {
     exportSuccess: 'Konfigurationen har exporterats',
     importSuccess: 'Konfigurationen har importerats',
+  },
+  errors: {
+    desktopOnly: 'Appkonfiguration är endast tillgänglig i skrivbordsappen.',
+    exportToFileFailed: 'Export till fil misslyckades',
+    importValidationFailed: 'Importvalideringen misslyckades'
   }
 }

@@ -4,6 +4,7 @@
 ## 2.4.14 - Versione bump
 
 ### Nuove funzionalità
+- **Localizzazione**: gli errori di salvataggio di Action Manager, i fallback degli errori di apertura/creazione del progetto e gli avvisi di errore di **Importa/Esporta configurazione app** ora utilizzano file locali in ogni lingua supportata. **Impostazioni archivio Fantasia** **Registra il payload completo dell'attività** il testo della guida corrisponde all'inglese in tutte le lingue.
 - **Impostazioni progetto**: **Salva senza chiudere** salva come **Salva impostazioni** ma lascia aperto il dialogo.
 
 ### Correzioni di bug e ottimizzazioni

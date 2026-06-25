@@ -14,7 +14,7 @@ export function buildFaActionDefinitionHandlersDialogsAppConfig (
   ): Promise<void> {
     const api = window.faContentBridgeAPIs?.faAppConfig
     if (api === undefined) {
-      throw new Error('App configuration is only available in the desktop app.')
+      throw new Error(deps.i18n.global.t('dialogs.importExportAppConfig.errors.desktopOnly'))
     }
     const result = await api.exportToFile(payload)
     if (result.outcome === 'canceled') {
@@ -27,7 +27,7 @@ export function buildFaActionDefinitionHandlersDialogsAppConfig (
         errorName: result.errorName,
         status: 'error'
       })
-      throw new Error(result.errorMessage ?? result.errorName ?? 'Export to file failed')
+      throw new Error(result.errorMessage ?? result.errorName ?? deps.i18n.global.t('dialogs.importExportAppConfig.errors.exportToFileFailed'))
     }
     void deps.runFaAction('exportAppConfigSaveResult', {
       filePath: result.filePath,
@@ -39,7 +39,7 @@ export function buildFaActionDefinitionHandlersDialogsAppConfig (
     payload: I_faActionPayloadMap['exportAppConfigSaveResult']
   ): Promise<void> {
     if (payload.status === 'error') {
-      throw new Error(payload.errorMessage ?? payload.errorName ?? 'Export to file failed')
+      throw new Error(payload.errorMessage ?? payload.errorName ?? deps.i18n.global.t('dialogs.importExportAppConfig.errors.exportToFileFailed'))
     }
   }
 
@@ -47,7 +47,7 @@ export function buildFaActionDefinitionHandlersDialogsAppConfig (
     payload: I_faActionPayloadMap['importAppConfigStageResult']
   ): Promise<void> {
     if (payload.status === 'fail') {
-      throw new Error(payload.errorMessage ?? 'Import validation failed')
+      throw new Error(payload.errorMessage ?? deps.i18n.global.t('dialogs.importExportAppConfig.errors.importValidationFailed'))
     }
   }
 
@@ -56,7 +56,7 @@ export function buildFaActionDefinitionHandlersDialogsAppConfig (
   ): Promise<void> {
     const api = window.faContentBridgeAPIs?.faAppConfig
     if (api === undefined) {
-      throw new Error('App configuration is only available in the desktop app.')
+      throw new Error(deps.i18n.global.t('dialogs.importExportAppConfig.errors.desktopOnly'))
     }
     await api.applyImport(payload)
     await Promise.all([

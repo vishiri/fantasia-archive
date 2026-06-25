@@ -34,6 +34,7 @@
 - **Project Settings**: **Save without closing** persists project settings like **Save settings** but keeps the dialog open so you can keep editing.
 
 ### Bugfixes & Optimizations
+- **Localization**: Action manager save failures, project open/create error fallbacks, and **Import / Export App Configuration** error toasts now use locale files in every supported language. **Fantasia Archive Settings** **Log full activity payload** help text matches English in all locales.
 - **Action Monitor**: Failed and warning activities always store the full action payload in session history; **Log full activity payload** now applies only to successful and in-progress rows.
 - **Project Settings**: **World's hierarchical tree** and **Available document templates** now show document template titles and **World appendix** text for the active interface language when translations exist, including after opening the dialog or switching language while it stays open. **Available document templates** rows also show the missing-translation warning icon when the active language has no document template title translation.
 - **Project Management**: menu rows regrouped — **Create new project**; **Load existing project** and **Load Recent Project**; **Show Project Dashboard**; **Toggle Project Noteboard**, **Custom Project CSS**, and **Project Settings**; **Advanced Project Tools** — with separators between each group.

@@ -285,7 +285,7 @@ export default {
     },
     logFullActivityPayload: {
       title: 'Vollständige Aktivitätsnutzlast protokollieren',
-      description: 'Wenn aktiviert, protokolliert die Aktivität vollständige Nutzlasten. Dies kann bei der Fehlersuche nützlich sein, wenn präzise Protokollierung von Ergebnissen erforderlich ist.',
+      description: 'Wenn dies aktiviert ist, protokolliert die Aktivität in allen Situationen die vollständigen Nutzlasten (normalerweise protokolliert sie nur in Situationen, in denen es sich nicht um einen Fehler oder eine Warnung handelt). Dies kann nützlich sein, wenn Sie ein umfassendes Debugging durchführen, das eine präzise Protokollierung der Ergebnisse erfordert.',
       tags: 'Debug, Fehlersuche, DevTools, Nutzlast, Aktivität, Protokollierung',
     },
     noProjectName: {

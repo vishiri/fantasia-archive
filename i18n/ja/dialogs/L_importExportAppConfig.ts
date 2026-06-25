@@ -29,5 +29,10 @@ export default {
   toasts: {
     exportSuccess: '設定が正常にエクスポートされました',
     importSuccess: '構成が正常にインポートされました',
+  },
+  errors: {
+    desktopOnly: 'アプリ構成はデスクトップ アプリでのみ使用できます。',
+    exportToFileFailed: 'ファイルへのエクスポートに失敗しました',
+    importValidationFailed: 'インポートの検証に失敗しました'
   }
 }

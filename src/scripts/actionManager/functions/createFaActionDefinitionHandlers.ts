@@ -84,7 +84,7 @@ async function handleSaveKeybindSettings (
     replaceAllOverrides: true
   })
   if (!ok) {
-    throw new Error('Failed to save keybind settings.')
+    throw new Error(deps.i18n.global.t('globalFunctionality.faKeybinds.saveError'))
   }
 }
 
@@ -126,7 +126,7 @@ async function handleSaveAppStyling (
 ): Promise<void> {
   const ok = await deps.S_FaAppStyling().updateAppStyling({ css: payload.css })
   if (!ok) {
-    throw new Error('Failed to save app styling.')
+    throw new Error(deps.i18n.global.t('globalFunctionality.faAppStyling.saveError'))
   }
 }
 

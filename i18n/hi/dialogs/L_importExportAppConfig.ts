@@ -29,5 +29,10 @@ export default {
   toasts: {
     exportSuccess: 'कॉन्फ़िगरेशन सफलतापूर्वक निर्यात किया गया',
     importSuccess: 'कॉन्फ़िगरेशन सफलतापूर्वक आयात किया गया',
+  },
+  errors: {
+    desktopOnly: 'ऐप कॉन्फ़िगरेशन केवल डेस्कटॉप ऐप में उपलब्ध है।',
+    exportToFileFailed: 'फ़ाइल में निर्यात विफल रहा',
+    importValidationFailed: 'आयात सत्यापन विफल रहा'
   }
 }

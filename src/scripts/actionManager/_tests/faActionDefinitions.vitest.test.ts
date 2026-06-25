@@ -417,7 +417,7 @@ test('Test that saveAppStyling handler throws when updateAppStyling returns fals
   updateAppStylingMock.mockResolvedValueOnce(false)
   await expect(
     (definitionFor('saveAppStyling').handler({ css: 'broken' }) as Promise<unknown>)
-  ).rejects.toThrow(/Failed to save app styling/)
+  ).rejects.toThrow(/globalFunctionality\.faAppStyling\.saveError/)
 })
 
 /**
@@ -627,7 +627,7 @@ test('Test that importAppConfigApply throws when the app config bridge is missin
           applyAppStyling: true,
           sessionId: 's'
         }) as Promise<unknown>)
-      ).rejects.toThrow(/only available in the desktop app/)
+      ).rejects.toThrow(/dialogs\.importExportAppConfig\.errors\.desktopOnly/)
     })(),
     (e): unknown => e
   )
@@ -652,7 +652,7 @@ test('Test that exportAppConfigSaveResult throws on error status and resolves ot
   ).rejects.toThrow('Ename')
   await expect(
     (definitionFor('exportAppConfigSaveResult').handler({ status: 'error' }) as Promise<unknown>)
-  ).rejects.toThrow('Export to file failed')
+  ).rejects.toThrow('dialogs.importExportAppConfig.errors.exportToFileFailed')
   await expect(
     (definitionFor('exportAppConfigSaveResult').handler({ status: 'saved' }) as Promise<unknown>)
   ).resolves.toBeUndefined()
@@ -670,7 +670,7 @@ test('Test that importAppConfigStageResult throws on fail and resolves on pass',
   ).rejects.toThrow('bad')
   await expect(
     (definitionFor('importAppConfigStageResult').handler({ status: 'fail' }) as Promise<unknown>)
-  ).rejects.toThrow('Import validation failed')
+  ).rejects.toThrow('dialogs.importExportAppConfig.errors.importValidationFailed')
   await expect(
     (definitionFor('importAppConfigStageResult').handler({ status: 'pass' }) as Promise<unknown>)
   ).resolves.toBeUndefined()
@@ -724,7 +724,7 @@ test('Test that exportAppConfigPackage handler throws when the bridge is missing
       includeAppSettings: false,
       includeAppStyling: true
     }) as Promise<unknown>)
-  ).rejects.toThrow('App configuration is only available in the desktop app.')
+  ).rejects.toThrow('dialogs.importExportAppConfig.errors.desktopOnly')
   window.faContentBridgeAPIs = prev
 })
 
@@ -813,7 +813,7 @@ test('Test that exportAppConfigPackage handler uses default export failure messa
       includeAppSettings: false,
       includeAppStyling: true
     }) as Promise<unknown>)
-  ).rejects.toThrow('Export to file failed')
+  ).rejects.toThrow('dialogs.importExportAppConfig.errors.exportToFileFailed')
   window.faContentBridgeAPIs = prev
 })
 
@@ -878,7 +878,7 @@ test('Test that saveKeybindSettings handler throws when updateKeybinds returns f
   updateKeybindsMock.mockResolvedValueOnce(false)
   await expect(
     (definitionFor('saveKeybindSettings').handler({ overrides: [] }) as Promise<unknown>)
-  ).rejects.toThrow(/Failed to save keybind settings/)
+  ).rejects.toThrow(/globalFunctionality\.faKeybinds\.saveError/)
 })
 
 test('Test that saveKeybindSettings handler resolves when updateKeybinds succeeds', async () => {

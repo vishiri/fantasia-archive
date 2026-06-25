@@ -4,6 +4,7 @@
 ## 2.4.14 - Aumento da versão
 
 ### Novos recursos
+- **Localização**: falhas de salvamento do gerenciador de ações, fallbacks de erros de abertura/criação de projetos e alertas de erro de **Importar/exportar configuração de aplicativo** agora usam arquivos de localidade em todos os idiomas suportados. **Configurações do Fantasy Archive** **Registrar a carga útil completa da atividade** o texto de ajuda corresponde ao inglês em todas as localidades.
 - **Configurações do projeto**: **Salvar sem fechar** salva como **Salvar configurações**, mas mantém o diálogo aberto.
 
 ### Correções de bugs e otimizações

@@ -26,7 +26,7 @@ const sampleHistory: I_faActionHistoryEntry[] = [
   {
     enqueuedAt: Date.now() - 7_500,
     finishedAt: Date.now() - 7_000,
-    errorMessage: 'Failed to save keybind settings.',
+    errorMessage: 'Could not save keybind settings.',
     id: 'saveKeybindSettings',
     kind: 'async',
     payloadPreview: '{"overrides":{}}',

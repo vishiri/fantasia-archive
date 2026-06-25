@@ -285,7 +285,7 @@ export default {
     },
     logFullActivityPayload: {
       title: 'Logg full aktivitetsnyttelast',
-      description: 'Hvis dette er aktivert, logger aktiviteten fullstendige nyttelaster. Dette kan være nyttig ved dyp feilsøking som krever presis logging av resultater.',
+      description: 'Hvis dette er aktivert, vil aktiviteten logge full nyttelast i alle situasjoner (normalt logger den kun i ikke-feil- og ikke-varslingssituasjoner). Dette kan være nyttig når du utfører dyp feilsøking som krever nøyaktig logging av resultater.',
       tags: 'feilsøking, feilretting, DevTools, nyttelast, aktivitet, logging',
     },
     noProjectName: {

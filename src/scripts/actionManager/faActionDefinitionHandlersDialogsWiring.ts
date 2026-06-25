@@ -12,6 +12,7 @@ import {
   tipsTricksTriviaNotification
 } from 'app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager'
 import { canOpenFloatingWindowWhileNoModal } from 'app/src/scripts/appNoteboard/appNoteboard_manager'
+import { i18n } from 'app/i18n/externalFileLoader'
 import type { I_createFaActionDefinitionHandlersDialogsDeps } from 'app/types/I_createFaActionDefinitionHandlersDialogsDeps'
 import type { I_faActionPayloadMap, T_faActionId } from 'app/types/I_faActionManagerDomain'
 
@@ -44,5 +45,6 @@ export const faActionDefinitionHandlersDialogsDeps = {
   notifyFaProjectAlreadyActiveWarning,
   notifyFaProjectCreatedPositive,
   notifyFaProjectLoadedPositive,
-  tipsTricksTriviaNotification
+  tipsTricksTriviaNotification,
+  i18n
 } as unknown as I_createFaActionDefinitionHandlersDialogsDeps

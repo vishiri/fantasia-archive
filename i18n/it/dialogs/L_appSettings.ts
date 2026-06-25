@@ -285,7 +285,7 @@ export default {
     },
     logFullActivityPayload: {
       title: "Registra payload completo dell'attività",
-      description: "Se abilitato, l'attività registrerà payload completi. Può essere utile per un debug approfondito che richiede una registrazione precisa dei risultati.",
+      description: "Se questa opzione è abilitata, l'attività registrerà i payload completi in tutte le situazioni (normalmente registra solo in situazioni senza errori e senza avvisi). Ciò può essere utile quando si esegue un debug approfondito che richiede una registrazione precisa dei risultati.",
       tags: 'debug, risoluzione problemi, DevTools, payload, attività, registrazione',
     },
     noProjectName: {

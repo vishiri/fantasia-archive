@@ -29,5 +29,10 @@ export default {
   toasts: {
     exportSuccess: 'Конфигурация успешно экспортирована.',
     importSuccess: 'Конфигурация успешно импортирована',
+  },
+  errors: {
+    desktopOnly: 'Конфигурация приложения доступна только в настольном приложении.',
+    exportToFileFailed: 'Экспортировать в файл не удалось',
+    importValidationFailed: 'Проверка импорта не удалась'
   }
 }

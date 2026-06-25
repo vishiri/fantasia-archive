@@ -285,7 +285,7 @@ export default {
     },
     logFullActivityPayload: {
       title: '记录完整活动负载',
-      description: '启用后，活动将记录完整负载。在需要精确记录结果的深度调试时可能有用。',
+      description: '如果启用此功能，活动将在所有情况下记录完整的有效负载（通常仅在非错误和非警告情况下记录）。当进行需要精确记录结果的深度调试时，这非常有用。',
       tags: '调试、故障排除、DevTools、负载、活动、日志',
     },
     noProjectName: {

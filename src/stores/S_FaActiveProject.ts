@@ -3,6 +3,8 @@ import type { ComputedRef, Ref } from 'vue'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
+import { i18n } from 'app/i18n/externalFileLoader'
+
 import type { I_faActiveProject } from 'app/types/I_faActiveProjectDomain'
 
 import { navigateToWorkspaceRouteForActiveProject } from 'app/src/scripts/appInternals/faAppRouterSession_manager'
@@ -57,14 +59,14 @@ export const S_FaActiveProject = defineStore('S_FaActiveProject', () => {
   async function createProjectFromUserInput (projectName: string): Promise<'created' | 'canceled'> {
     const api = window.faContentBridgeAPIs?.projectManagement
     if (api === undefined) {
-      throw new Error('Project management is not available in this environment.')
+      throw new Error(i18n.global.t('globalFunctionality.faProjectSession.bridgeUnavailable'))
     }
     const result = await api.createProject({ projectName })
     if (result.outcome === 'canceled') {
       return 'canceled'
     }
     if (result.outcome === 'error') {
-      throw new Error(result.errorMessage ?? 'Failed to create project.')
+      throw new Error(result.errorMessage ?? i18n.global.t('globalFunctionality.faProjectSession.createErrorFallback'))
     }
     const p = result.project
     if (p === undefined) {
@@ -77,7 +79,7 @@ export const S_FaActiveProject = defineStore('S_FaActiveProject', () => {
   async function openProjectFromUserDialog (): Promise<T_faActiveProjectOpenFlowOutcome> {
     const api = window.faContentBridgeAPIs?.projectManagement
     if (api === undefined) {
-      throw new Error('Project management is not available in this environment.')
+      throw new Error(i18n.global.t('globalFunctionality.faProjectSession.bridgeUnavailable'))
     }
     const result = await api.openProject()
     return await finalizeFaActiveProjectOpenResult(result, openFlowHandlers)
@@ -97,7 +99,7 @@ export const S_FaActiveProject = defineStore('S_FaActiveProject', () => {
 
     const api = window.faContentBridgeAPIs?.projectManagement
     if (api === undefined) {
-      throw new Error('Project management is not available in this environment.')
+      throw new Error(i18n.global.t('globalFunctionality.faProjectSession.bridgeUnavailable'))
     }
     const result = await api.openProject({ filePath })
     return await finalizeFaActiveProjectOpenResult(result, openFlowHandlers)

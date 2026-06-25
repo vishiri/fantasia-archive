@@ -29,5 +29,10 @@ export default {
   toasts: {
     exportSuccess: 'Η διαμόρφωση εξήχθη με επιτυχία',
     importSuccess: 'Η διαμόρφωση εισήχθη με επιτυχία',
+  },
+  errors: {
+    desktopOnly: 'Η διαμόρφωση εφαρμογής είναι διαθέσιμη μόνο στην εφαρμογή για υπολογιστές.',
+    exportToFileFailed: 'Η εξαγωγή σε αρχείο απέτυχε',
+    importValidationFailed: 'Η επικύρωση εισαγωγής απέτυχε'
   }
 }

@@ -12,6 +12,7 @@ export function createFaActiveProjectOpenFlow (deps: {
     notifyType?: 'negative' | 'warning'
   ) => Error
   faActiveProjectFilePathsMatch: (activePath: string, filePath: string) => boolean
+  translateOpenErrorFallback: () => string
 }): {
     finalizeFaActiveProjectOpenResult: (
       result: I_faProjectOpenResult,
@@ -31,7 +32,7 @@ export function createFaActiveProjectOpenFlow (deps: {
       return 'canceled'
     }
     if (result.outcome === 'error') {
-      const localized = result.errorMessage ?? 'Failed to open project.'
+      const localized = result.errorMessage ?? deps.translateOpenErrorFallback()
       throw new deps.FaProjectOpenFailedError(
         localized,
         result.attemptedFilePath,

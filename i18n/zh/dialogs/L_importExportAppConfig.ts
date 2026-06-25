@@ -29,5 +29,10 @@ export default {
   toasts: {
     exportSuccess: '配置成功导出',
     importSuccess: '配置已成功导入',
+  },
+  errors: {
+    desktopOnly: '应用程序配置仅在桌面应用程序中可用。',
+    exportToFileFailed: '导出到文件失败',
+    importValidationFailed: '导入验证失败'
   }
 }

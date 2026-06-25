@@ -285,7 +285,7 @@ export default {
     },
     logFullActivityPayload: {
       title: "Journaliser la charge utile complète de l'activité",
-      description: "Si activé, l'activité journalisera les charges utiles complètes. Cela peut être utile pour un débogage approfondi nécessitant une journalisation précise des résultats.",
+      description: "Si cette option est activée, l'activité enregistrera les charges utiles complètes dans toutes les situations (normalement, elle n'enregistrera que dans les situations sans erreur et sans avertissement). Cela peut être utile lors d'un débogage approfondi nécessitant une journalisation précise des résultats.",
       tags: 'débogage, dépannage, DevTools, charge utile, activité, journalisation',
     },
     noProjectName: {

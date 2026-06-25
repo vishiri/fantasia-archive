@@ -29,5 +29,10 @@ export default {
   toasts: {
     exportSuccess: 'تم تصدير التكوين بنجاح',
     importSuccess: 'تم استيراد التكوين بنجاح',
+  },
+  errors: {
+    desktopOnly: 'تكوين التطبيق متاح فقط في تطبيق سطح المكتب.',
+    exportToFileFailed: 'فشل التصدير إلى الملف',
+    importValidationFailed: 'فشل التحقق من صحة الاستيراد'
   }
 }

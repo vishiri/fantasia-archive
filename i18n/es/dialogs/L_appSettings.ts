@@ -285,7 +285,7 @@ export default {
     },
     logFullActivityPayload: {
       title: 'Registrar carga útil completa de actividad',
-      description: 'Si está habilitado, la actividad registrará cargas útiles completas. Esto puede ser útil al depurar en profundidad y necesitar un registro preciso de los resultados.',
+      description: 'Si esto está habilitado, la actividad registrará cargas útiles completas en todas las situaciones (normalmente se registra solo en situaciones sin errores ni advertencias). Esto puede resultar útil cuando se realiza una depuración profunda que necesita un registro preciso de los resultados.',
       tags: 'depuración, solución de problemas, DevTools, carga útil, actividad, registro',
     },
     noProjectName: {
