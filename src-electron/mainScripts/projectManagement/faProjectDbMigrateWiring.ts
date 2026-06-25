@@ -4,39 +4,24 @@ import { v4 as uuidv4, validate as validateUuid } from 'uuid'
 import {
   applyFaProjectContentSchemaV1,
   applyFaProjectProjectDataSchemaV1,
-  applyFaProjectWorldTemplateLayoutSchemaV6,
-  FA_PROJECT_DATA_TABLE_NAME,
-  FA_PROJECT_TABLE_WORLD_DOCUMENT_TEMPLATES,
-  FA_PROJECT_TABLE_WORLD_TEMPLATE_GROUPS,
-  FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS,
-  FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
-  FA_PROJECT_TABLE_WORLDS
+  FA_PROJECT_DATA_TABLE_NAME
 } from './functions/faProjectDbSchemaDdl'
-import { migrateFaProjectSchemaV1ToV2 } from './functions/faProjectDbMigrateV1ToV2'
-import { migrateFaProjectSchemaV2ToV3 } from './functions/faProjectDbMigrateV2ToV3'
-import { migrateFaProjectSchemaV3ToV4 } from './functions/faProjectDbMigrateV3ToV4'
-import { migrateFaProjectSchemaV4ToV5 } from './functions/faProjectDbMigrateV4ToV5'
-import { migrateFaProjectSchemaV5ToV6 } from './functions/faProjectDbMigrateV5ToV6'
-import { migrateFaProjectSchemaV6ToV7 } from './functions/faProjectDbMigrateV6ToV7'
-import { migrateFaProjectSchemaV7ToV8 } from './functions/faProjectDbMigrateV7ToV8'
-import { migrateFaProjectSchemaV8ToV9 } from './functions/faProjectDbMigrateV8ToV9'
-import { migrateFaProjectSchemaV9ToV10 } from './functions/faProjectDbMigrateV9ToV10'
-import { migrateFaProjectSchemaV10ToV11 } from './functions/faProjectDbMigrateV10ToV11'
-import { readFaProjectDbUserVersion, runFaProjectDbMigrationStep } from './faProjectDbRunMigrationStepWiring'
 import { seedFaProjectDefaultWorldIfEmpty } from './projectDbContent/faProjectWorldBootstrapWiring'
 
 const OPTION_PROJECT_NAME = 'project_name'
 const OPTION_PROJECT_UUID = 'project_uuid'
 
-/** Current schema revision: content tables at user_version 11 (singular title + nickname translations). */
-export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 11
+/** Current schema revision: flattened to a single bootstrap version. */
+export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 1
+
+function readUserVersion (db: Database): number {
+  const rawVer = db.pragma('user_version', { simple: true })
+  const current = typeof rawVer === 'number' ? rawVer : Number(rawVer)
+  return Number.isFinite(current) ? current : 0
+}
 
 function sqlSelectValueFromActiveTable (): string {
   return `SELECT option_value AS v FROM ${FA_PROJECT_DATA_TABLE_NAME} WHERE option_name = ?`
-}
-
-function readUserVersion (db: Database): number {
-  return readFaProjectDbUserVersion(db)
 }
 
 function bootstrapFaProjectSchemaFresh (
@@ -77,9 +62,9 @@ function verifyFaProjectMetadataAfterBootstrap (db: Database, displayProjectName
 }
 
 /**
- * Applies SQLite migrations up to the latest supported schema.
- * Fresh files bootstrap directly to the current revision, then seed the default world.
- * Older files migrate stepwise from their stored user_version.
+ * Applies the flattened single-version schema. Fresh files bootstrap to the
+ * current revision and seed the default world. Files already at the supported
+ * version are a no-op. Any other version is unsupported (throws).
  */
 export function applyFaProjectMigrations (
   db: Database,
@@ -92,66 +77,13 @@ export function applyFaProjectMigrations (
   if (startVer === FA_PROJECT_USER_VERSION_SUPPORTED_MAX) {
     return
   }
-
   if (startVer === 0) {
     bootstrapFaProjectSchemaFresh(db, displayProjectName)
     verifyFaProjectMetadataAfterBootstrap(db, displayProjectName)
     seedFaProjectDefaultWorldIfEmpty(db, displayProjectName)
     return
   }
-
-  runFaProjectDbMigrationStep(db, 1, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
-    migrateFaProjectSchemaV1ToV2(db)
-  })
-  runFaProjectDbMigrationStep(db, 2, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
-    migrateFaProjectSchemaV2ToV3(db)
-  })
-  runFaProjectDbMigrationStep(db, 3, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
-    migrateFaProjectSchemaV3ToV4(db)
-  })
-  runFaProjectDbMigrationStep(db, 4, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
-    migrateFaProjectSchemaV4ToV5(db)
-  })
-  runFaProjectDbMigrationStep(db, 5, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
-    migrateFaProjectSchemaV5ToV6(db, {
-      applyLayoutSchema: applyFaProjectWorldTemplateLayoutSchemaV6,
-      createPlacementId: uuidv4,
-      junctionTableName: FA_PROJECT_TABLE_WORLD_DOCUMENT_TEMPLATES
-    })
-  })
-  runFaProjectDbMigrationStep(db, 6, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
-    migrateFaProjectSchemaV6ToV7(db, {
-      worldTemplatePlacementsTableName: FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
-    })
-  })
-  runFaProjectDbMigrationStep(db, 7, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
-    migrateFaProjectSchemaV7ToV8(db, {
-      documentTemplatesTableName: FA_PROJECT_TABLE_DOCUMENT_TEMPLATES
-    })
-  })
-  runFaProjectDbMigrationStep(db, 8, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
-    migrateFaProjectSchemaV8ToV9(db, {
-      documentTemplatesTableName: FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
-      worldsTableName: FA_PROJECT_TABLE_WORLDS
-    })
-  })
-  runFaProjectDbMigrationStep(db, 9, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
-    migrateFaProjectSchemaV9ToV10(db, {
-      worldTemplateGroupsTableName: FA_PROJECT_TABLE_WORLD_TEMPLATE_GROUPS,
-      worldTemplatePlacementsTableName: FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
-    })
-  })
-  runFaProjectDbMigrationStep(db, 10, FA_PROJECT_USER_VERSION_SUPPORTED_MAX, () => {
-    migrateFaProjectSchemaV10ToV11(db, {
-      documentTemplatesTableName: FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
-      worldTemplatePlacementsTableName: FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
-    })
-  })
-
-  const finalVer = readUserVersion(db)
-  if (finalVer !== FA_PROJECT_USER_VERSION_SUPPORTED_MAX) {
-    throw new Error('Unexpected project file schema state')
-  }
+  throw new Error('Unexpected project file schema state')
 }
 
 /**
