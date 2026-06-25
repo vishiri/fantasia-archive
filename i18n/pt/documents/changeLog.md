@@ -1,6 +1,8 @@
 # Registro de alterações
 ----------
 
+## 2.4.15
+
 ## 2.4.14 - Aumento da versão
 
 ### Novos recursos

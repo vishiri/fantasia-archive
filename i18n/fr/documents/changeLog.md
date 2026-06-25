@@ -1,6 +1,8 @@
 # Journal des modifications
 ----------
 
+## 2.4.15
+
 ## 2.4.14 - Changement de version
 
 ### Nouvelles fonctionnalités

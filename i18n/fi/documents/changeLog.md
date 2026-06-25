@@ -1,6 +1,8 @@
 # Muutosloki
 -----------
 
+## 2.4.15
+
 ## 2.4.14 - Versiovirhe
 
 ### Uusia ominaisuuksia

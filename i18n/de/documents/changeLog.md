@@ -1,6 +1,8 @@
 # Änderungsprotokoll
 ----------
 
+## 2.4.15
+
 ## 2.4.14 – Versionssprung
 
 ### Fehlerbehebungen und Optimierungen

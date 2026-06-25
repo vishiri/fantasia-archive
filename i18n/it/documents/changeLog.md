@@ -1,6 +1,8 @@
 # Registro delle modifiche
 ----------
 
+## 2.4.15
+
 ## 2.4.14 - Versione bump
 
 ### Nuove funzionalità
