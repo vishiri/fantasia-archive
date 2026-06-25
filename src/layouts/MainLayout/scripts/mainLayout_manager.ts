@@ -35,6 +35,12 @@ import {
 } from './functions/mainLayoutWorkspaceShell'
 
 const mainLayoutApi = createMainLayout({
+  attachWindowKeydownListener: (handler) => {
+    window.addEventListener('keydown', handler, true)
+  },
+  detachWindowKeydownListener: (handler) => {
+    window.removeEventListener('keydown', handler, true)
+  },
   awaitWelcomeScreenAutoLoadBootCompletion,
   FA_APP_SHELL_DRAWER_TRANSITION_MS,
   FA_APP_SHELL_PAGE_TRANSITION_BINDINGS,

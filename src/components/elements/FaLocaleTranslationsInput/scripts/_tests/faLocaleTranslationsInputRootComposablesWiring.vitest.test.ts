@@ -110,7 +110,7 @@ test('Test that createFaLocaleTranslationsInputRootActiveComposable uses singula
   expect(focus).toHaveBeenCalled()
 
   wiring.setPreferredLanguageInputRef(document.createElement('input'))
-  capturedViewWirings[1]?.emitUpdate({ 'en-US': 'Updated' })
+  capturedViewWirings[1]!?.emitUpdate({ 'en-US': 'Updated' })
   expect(emit).toHaveBeenCalledWith('update:modelValue', {
     plural: { 'en-US': 'Updated' },
     singular: { 'en-US': 'Cat' }
@@ -150,7 +150,7 @@ test('Test that createFaLocaleTranslationsInputRootActiveComposable reads trigge
     useFaLocaleTranslationsInputSingularPlural: () => ({ id: 'singularPlural' }) as never
   })
 
-  expect(capturedReadTrigger[0]?.()).toBe(button)
+  expect(capturedReadTrigger[0]!?.()).toBe(button)
   expect(wiring.readPreferredLanguageInputFocus()).toBeNull()
 })
 
@@ -185,7 +185,7 @@ test('Test that createFaLocaleTranslationsInputRootActiveComposable returns null
     useFaLocaleTranslationsInputSingularPlural: () => ({ id: 'singularPlural' }) as never
   })
 
-  expect(capturedReadTrigger[0]?.()).toBeNull()
+  expect(capturedReadTrigger[0]!?.()).toBeNull()
 })
 
 test('Test that createFaLocaleTranslationsInputRootActiveComposable forwards singularPlural composable emits', () => {
@@ -263,7 +263,7 @@ test('Test that createFaLocaleTranslationsInputRootActiveComposable wires singul
     useFaLocaleTranslationsInputSingularPlural: () => ({ id: 'singularPlural' }) as never
   })
 
-  expect(capturedReadTriggers[1]?.()).toBe(button)
+  expect(capturedReadTriggers[1]!?.()).toBe(button)
 })
 
 /**

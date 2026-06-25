@@ -14,7 +14,7 @@ const MOD_ORDER: T_faKeybindModifierLiteral[] = [
 /**
  * Stable modifier order for equality and display.
  */
-export function sortFaKeybindMods (mods: T_faKeybindModifierLiteral[]): T_faKeybindModifierLiteral[] {
+export function sortFaKeybindMods (mods: readonly T_faKeybindModifierLiteral[]): T_faKeybindModifierLiteral[] {
   const unique = [...new Set(mods)]
   return MOD_ORDER.filter((m) => unique.includes(m))
 }

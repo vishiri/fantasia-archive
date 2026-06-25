@@ -54,7 +54,7 @@ test('Test that DialogAppSettingsCategoryPanel forwards update-setting from chil
   await flushPromises()
   await w.get('button').trigger('click')
 
-  expect(w.emitted('update-setting')?.[0]).toEqual(['darkMode', true])
+  expect(w.emitted('update-setting')?.[0]!).toEqual(['darkMode', true])
   w.unmount()
 })
 

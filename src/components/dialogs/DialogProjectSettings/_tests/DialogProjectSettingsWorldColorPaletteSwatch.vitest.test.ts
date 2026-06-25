@@ -63,6 +63,26 @@ const defaultSwatchStubs = {
   QTooltip: defineComponent({ template: '<span><slot /></span>' })
 }
 
+const defaultSwatchGlobal = {
+  mocks: {
+    $t: (key: string, params?: { hex?: string }) => {
+      if (params?.hex !== undefined) {
+        return `${key}:${params.hex}`
+      }
+      return key
+    }
+  },
+  stubs: defaultSwatchStubs
+}
+
+const defaultSwatchGlobalTooltipStub = {
+  ...defaultSwatchGlobal,
+  stubs: {
+    ...defaultSwatchStubs,
+    QTooltip: true
+  }
+}
+
 /**
  * DialogProjectSettingsWorldColorPaletteSwatch
  * Opens the picker menu and emits picker-open when the swatch is clicked.
@@ -70,12 +90,7 @@ const defaultSwatchStubs = {
 test('Test that DialogProjectSettingsWorldColorPaletteSwatch emits picker-open on click', async () => {
   const w = mount(DialogProjectSettingsWorldColorPaletteSwatch, {
     props: defaultSwatchProps,
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
-      stubs: defaultSwatchStubs
-    }
+    global: defaultSwatchGlobal
   })
 
   expect(w.find('[data-test-locator="dialogProjectSettings-worlds-colorPaletteSwatch"]').exists()).toBe(true)
@@ -94,12 +109,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteSwatch shows duplicate ove
       duplicateHexKeys: new Set(['#112233']),
       worldPickerPalette: []
     },
-    global: {
-      stubs: {
-        ...defaultSwatchStubs,
-        QTooltip: true
-      }
-    }
+    global: defaultSwatchGlobalTooltipStub
   })
 
   expect(w.classes()).toContain('dialogProjectSettingsWorldColorPaletteSwatch--duplicate')
@@ -124,12 +134,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteSwatch uses black duplicat
       hex: '#ff0000',
       worldPickerPalette: []
     },
-    global: {
-      stubs: {
-        ...defaultSwatchStubs,
-        QTooltip: true
-      }
-    }
+    global: defaultSwatchGlobalTooltipStub
   })
 
   expect(
@@ -150,12 +155,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteSwatch uses negative dupli
       hex: '#ffffff',
       worldPickerPalette: []
     },
-    global: {
-      stubs: {
-        ...defaultSwatchStubs,
-        QTooltip: true
-      }
-    }
+    global: defaultSwatchGlobalTooltipStub
   })
 
   expect(
@@ -174,12 +174,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteSwatch hides duplicate ove
       ...defaultSwatchProps,
       worldPickerPalette: []
     },
-    global: {
-      stubs: {
-        ...defaultSwatchStubs,
-        QTooltip: true
-      }
-    }
+    global: defaultSwatchGlobalTooltipStub
   })
 
   expect(w.classes()).not.toContain('dialogProjectSettingsWorldColorPaletteSwatch--duplicate')
@@ -199,12 +194,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteSwatch syncs picker menu w
       pickerOpen: true,
       worldPickerPalette: []
     },
-    global: {
-      stubs: {
-        ...defaultSwatchStubs,
-        QTooltip: true
-      }
-    }
+    global: defaultSwatchGlobalTooltipStub
   })
 
   expect(
@@ -223,12 +213,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteSwatch syncs picker menu w
 test('Test that DialogProjectSettingsWorldColorPaletteSwatch opens context menu and emits actions', async () => {
   const w = mount(DialogProjectSettingsWorldColorPaletteSwatch, {
     props: defaultSwatchProps,
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
-      stubs: defaultSwatchStubs
-    }
+    global: defaultSwatchGlobal
   })
 
   await w.trigger('contextmenu')
@@ -262,12 +247,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteSwatch blocks context menu
       ...defaultSwatchProps,
       isListDragging: true
     },
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
-      stubs: defaultSwatchStubs
-    }
+    global: defaultSwatchGlobal
   })
 
   await w.trigger('contextmenu')
@@ -286,12 +266,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteSwatch disables duplicate 
       ...defaultSwatchProps,
       duplicateDisabled: true
     },
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
-      stubs: defaultSwatchStubs
-    }
+    global: defaultSwatchGlobal
   })
 
   await w.trigger('contextmenu')
@@ -324,6 +299,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteSwatch emits picker-close 
       worldPickerPalette: []
     },
     global: {
+      mocks: defaultSwatchGlobal.mocks,
       stubs: {
         ...defaultSwatchStubs,
         QMenu: hideMenuStub,
@@ -343,9 +319,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteSwatch emits picker-close 
 test('Test that DialogProjectSettingsWorldColorPaletteSwatch exposes hover tooltip text', () => {
   const w = mount(DialogProjectSettingsWorldColorPaletteSwatch, {
     props: defaultSwatchProps,
-    global: {
-      stubs: defaultSwatchStubs
-    }
+    global: defaultSwatchGlobal
   })
 
   expect(
@@ -364,6 +338,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteSwatch renders duplicate w
       duplicateHexKeys: new Set(['#112233'])
     },
     global: {
+      mocks: defaultSwatchGlobal.mocks,
       stubs: {
         ...defaultSwatchStubs,
         QIcon: defineComponent({
@@ -385,12 +360,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteSwatch renders duplicate w
 test('Test that DialogProjectSettingsWorldColorPaletteSwatch opens picker menu on click', async () => {
   const w = mount(DialogProjectSettingsWorldColorPaletteSwatch, {
     props: defaultSwatchProps,
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
-      stubs: defaultSwatchStubs
-    }
+    global: defaultSwatchGlobal
   })
 
   await w.find('[data-test-locator="dialogProjectSettings-worlds-colorPaletteSwatch"]').trigger('click')
@@ -407,18 +377,13 @@ test('Test that DialogProjectSettingsWorldColorPaletteSwatch opens picker menu o
 test('Test that DialogProjectSettingsWorldColorPaletteSwatch syncs QMenu v-model close events', async () => {
   const w = mount(DialogProjectSettingsWorldColorPaletteSwatch, {
     props: defaultSwatchProps,
-    global: {
-      mocks: {
-        $t: (key: string) => key
-      },
-      stubs: defaultSwatchStubs
-    }
+    global: defaultSwatchGlobal
   })
 
   await w.trigger('contextmenu')
   const menus = w.findAllComponents({ name: 'QMenu' })
   expect(menus.length).toBeGreaterThanOrEqual(1)
-  await menus[0].vm.$emit('update:modelValue', false)
+  await menus[0]!.vm.$emit('update:modelValue', false)
 
   await w.trigger('click')
   const menusAfterClick = w.findAllComponents({ name: 'QMenu' })

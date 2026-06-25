@@ -106,11 +106,11 @@ function useSplashControlsResumeDropdown (deps: T_createSplashControlsResumeDrop
   const resumeDropdownRef = deps.ref<{ $el?: unknown } | null>(null)
   const resumeDropdownArrowEl = deps.ref<HTMLElement | null>(null)
   const activeProjectStore = deps.S_FaActiveProject()
-  const { activeProject } = deps.storeToRefs(activeProjectStore)
+  const activeProject = deps.storeToRefs(activeProjectStore).activeProject!
   const faUserSettingsStore = deps.S_FaUserSettings()
-  const { settings: faUserSettings } = deps.storeToRefs(faUserSettingsStore)
+  const faUserSettings = deps.storeToRefs(faUserSettingsStore).settings!
   const recentProjectsStore = deps.S_FaRecentProjects()
-  const { entries: recentProjectEntries } = deps.storeToRefs(recentProjectsStore)
+  const recentProjectEntries = deps.storeToRefs(recentProjectsStore).entries!
 
   const hideRecentProjectTooltip = deps.computed(() => {
     return faUserSettings.value?.hideRecentProjectTooltip ??

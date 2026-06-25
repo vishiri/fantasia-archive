@@ -28,7 +28,7 @@ function buildToolsMenuData (_session: I_appMenuBuildSession): I_appMenuItem[] {
       keybindCommandId: 'openAppSettings',
       trigger: () => runFaAction('openAppSettingsDialog', undefined)
     }),
-    faMenuSeparator(),
+    faMenuSeparator('tools-sep-before-import-export'),
     faMenuItem('appControlMenus.tools.items.importExportAppConfig', 'mdi-cog-transfer', {
       trigger: () => runFaAction('openImportExportAppConfigDialog', undefined)
     })

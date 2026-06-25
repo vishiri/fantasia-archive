@@ -45,7 +45,7 @@ export function resolveDialogProjectSettingsWorldIdAfterRemove (
     return resolveDialogProjectSettingsInitialWorldId(worldsAfterRemove)
   }
   if (removedIndex < worldsAfterRemove.length) {
-    return worldsAfterRemove[removedIndex].id
+    return worldsAfterRemove[removedIndex]!.id
   }
   return worldsAfterRemove[removedIndex - 1]?.id ??
     resolveDialogProjectSettingsInitialWorldId(worldsAfterRemove)
@@ -63,7 +63,7 @@ export function findDialogProjectSettingsNewlyAppendedWorldId (
   if (newWorlds.length !== 1) {
     return null
   }
-  const appendedWorld = newWorlds[0]
+  const appendedWorld = newWorlds[0]!
   const lastWorld = nextWorlds[nextWorlds.length - 1]
   if (lastWorld?.id !== appendedWorld.id) {
     return null

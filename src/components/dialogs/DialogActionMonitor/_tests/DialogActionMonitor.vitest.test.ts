@@ -376,11 +376,11 @@ test('Test that clicking a DialogActionMonitor row dispatches the clipboard help
 
   const rows = w.findAll('[data-test-locator="stub-q-table-row"]')
   expect(rows.length).toBeGreaterThan(0)
-  await rows[0]?.trigger('click')
+  await rows[0]!?.trigger('click')
   await flushPromises()
 
   expect(copyToClipboardMock).toHaveBeenCalledOnce()
-  const payload = copyToClipboardMock.mock.calls[0]?.[0] as string | undefined
+  const payload = copyToClipboardMock.mock.calls[0]!?.[0]! as string | undefined
   expect(payload).toContain('uid-running')
   w.unmount()
 })

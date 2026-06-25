@@ -63,7 +63,7 @@ test('Test that replaceDialogProjectSettingsWorldColorPaletteEntryHex updates on
     '#AABBCC'
   )
 
-  expect(entries[0]?.hex).toBe('#AABBCC')
+  expect(entries[0]!?.hex).toBe('#AABBCC')
   expect(replaceDialogProjectSettingsWorldColorPaletteEntryHex(
     [{
       hex: '#112233',
@@ -71,7 +71,7 @@ test('Test that replaceDialogProjectSettingsWorldColorPaletteEntryHex updates on
     }],
     'missing',
     '#AABBCC'
-  )[0]?.hex).toBe('#112233')
+  )[0]!?.hex).toBe('#112233')
 })
 
 test('Test that isDialogProjectSettingsWorldColorPaletteSwatchDuplicate matches duplicate keys case-insensitively', () => {

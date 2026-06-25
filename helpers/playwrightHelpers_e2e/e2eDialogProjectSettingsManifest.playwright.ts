@@ -221,8 +221,8 @@ async function configureDocumentTemplate (
   })
   if (entry.titles.de?.singular !== undefined || entry.titles.de?.plural !== undefined) {
     await setSingularPluralTranslation(page, selectorList.documentTemplatesNameInput, 'de', {
-      plural: entry.titles.de.plural,
-      singular: entry.titles.de.singular
+      ...(entry.titles.de.plural !== undefined ? { plural: entry.titles.de.plural } : {}),
+      ...(entry.titles.de.singular !== undefined ? { singular: entry.titles.de.singular } : {})
     })
   }
   await page.keyboard.press('Escape')
@@ -296,8 +296,8 @@ async function setPlacementNickname (
   })
   if (nickname.de?.singular !== undefined || nickname.de?.plural !== undefined) {
     await setSingularPluralTranslation(page, selectorList.templateRenameInput, 'de', {
-      plural: nickname.de.plural,
-      singular: nickname.de.singular
+      ...(nickname.de.plural !== undefined ? { plural: nickname.de.plural } : {}),
+      ...(nickname.de.singular !== undefined ? { singular: nickname.de.singular } : {})
     })
   }
   await page.getByRole('textbox', {
@@ -541,8 +541,8 @@ async function updateTemplateAtIndex (
   })
   if (entry.titles.de?.singular !== undefined || entry.titles.de?.plural !== undefined) {
     await setSingularPluralTranslation(page, selectorList.documentTemplatesNameInput, 'de', {
-      plural: entry.titles.de.plural,
-      singular: entry.titles.de.singular
+      ...(entry.titles.de.plural !== undefined ? { plural: entry.titles.de.plural } : {}),
+      ...(entry.titles.de.singular !== undefined ? { singular: entry.titles.de.singular } : {})
     })
   }
   await page.keyboard.press('Escape')

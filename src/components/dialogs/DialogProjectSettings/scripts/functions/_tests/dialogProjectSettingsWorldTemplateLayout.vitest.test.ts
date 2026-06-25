@@ -56,7 +56,7 @@ import {
 test('Test that hasDialogProjectSettingsWorldTemplateGroupNameValidationError detects blank names', () => {
   const layout = appendDialogProjectSettingsWorldTemplateGroupDraft(createEmptyDialogProjectSettingsWorldTemplateLayoutDraft(), 'en-US', 'Creatures')
   expect(hasDialogProjectSettingsWorldTemplateGroupNameValidationError(layout)).toBe(false)
-  layout.groups[0].displayNameTranslations = { 'en-US': '   ' }
+  layout.groups[0]!.displayNameTranslations = { 'en-US': '   ' }
   expect(hasDialogProjectSettingsWorldTemplateGroupNameValidationError(layout)).toBe(true)
 })
 
@@ -76,9 +76,9 @@ test('Test that he-tree mapping round-trips layout draft placements', () => {
   )
   const nodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout, 'en-US')
   expect(nodes).toHaveLength(2)
-  expect(nodes[0]?.nodeKind).toBe('group')
-  expect(nodes[0]?.icon).toBe(DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_GROUP_ICON)
-  expect(nodes[1]?.nodeKind).toBe('template')
+  expect(nodes[0]!?.nodeKind).toBe('group')
+  expect(nodes[0]!?.icon).toBe(DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_GROUP_ICON)
+  expect(nodes[1]!?.nodeKind).toBe('template')
   const roundTrip = mapHeTreeNodesToWorldTemplateLayoutDraft(nodes, layout)
   expect(mapDialogProjectSettingsWorldTemplateLayoutToSnapshot(roundTrip)).toEqual(
     mapDialogProjectSettingsWorldTemplateLayoutToSnapshot(layout)
@@ -176,15 +176,15 @@ test('Test that layout draft helpers map API data and mutate groups or placement
       }
     ]
   } satisfies I_faProjectWorldTemplateLayoutForProjectSettings)
-  expect(fromApi.placements[0]?.documentCountInWorld).toBe(2)
+  expect(fromApi.placements[0]!?.documentCountInWorld).toBe(2)
 
   let layout = appendDialogProjectSettingsWorldTemplateGroupDraft(createEmptyDialogProjectSettingsWorldTemplateLayoutDraft(), 'en-US', 'Creatures')
   layout = renameDialogProjectSettingsWorldTemplateGroupDisplayNameTranslationsDraft(
     layout,
-    layout.groups[0].id,
+    layout.groups[0]!.id,
     { 'en-US': 'Renamed' }
   )
-  expect(layout.groups[0]?.displayNameTranslations['en-US']).toBe('Renamed')
+  expect(layout.groups[0]!?.displayNameTranslations['en-US']).toBe('Renamed')
 
   layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
     templateDisplayName: 'Character',
@@ -192,13 +192,13 @@ test('Test that layout draft helpers map API data and mutate groups or placement
     icon: 'mdi-account',
     worldAppendix: 'Hero'
   })
-  const placementId = layout.placements[0]?.id ?? ''
+  const placementId = layout.placements[0]!?.id ?? ''
   layout = removeDialogProjectSettingsWorldTemplatePlacementDraft(layout, placementId)
   expect(layout.placements).toHaveLength(0)
 
   layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   layout = appendDialogProjectSettingsWorldTemplateGroupDraft(layout, 'en-US', 'Folder')
-  const groupId = layout.groups[0]?.id ?? ''
+  const groupId = layout.groups[0]!?.id ?? ''
   layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
     templateDisplayName: 'Character',
     documentTemplateId: 'template-b',
@@ -209,7 +209,7 @@ test('Test that layout draft helpers map API data and mutate groups or placement
     ...layout,
     placements: [
       {
-        ...layout.placements[0],
+        ...layout.placements[0]!,
         groupId,
         groupSortOrder: 0,
         rootSortOrder: null
@@ -218,7 +218,7 @@ test('Test that layout draft helpers map API data and mutate groups or placement
   }
   layout = removeDialogProjectSettingsWorldTemplateGroupDraft(layout, groupId)
   expect(layout.groups).toHaveLength(0)
-  expect(layout.placements[0]?.groupId).toBeNull()
+  expect(layout.placements[0]!?.groupId).toBeNull()
 })
 
 /**
@@ -239,10 +239,10 @@ test('Test that remove group draft leaves lower root-order groups unchanged', ()
   let layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   layout = appendDialogProjectSettingsWorldTemplateGroupDraft(layout, 'en-US', 'First')
   layout = appendDialogProjectSettingsWorldTemplateGroupDraft(layout, 'en-US', 'Second')
-  const secondGroupId = layout.groups[1]?.id ?? ''
+  const secondGroupId = layout.groups[1]!?.id ?? ''
   layout = removeDialogProjectSettingsWorldTemplateGroupDraft(layout, secondGroupId)
   expect(layout.groups).toHaveLength(1)
-  expect(layout.groups[0]?.rootSortOrder).toBe(0)
+  expect(layout.groups[0]!?.rootSortOrder).toBe(0)
 })
 
 /**
@@ -252,7 +252,7 @@ test('Test that remove group draft leaves lower root-order groups unchanged', ()
 test('Test that remove group draft shifts trailing root placements after promotion', () => {
   let layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   layout = appendDialogProjectSettingsWorldTemplateGroupDraft(layout, 'en-US', 'Creatures')
-  const groupId = layout.groups[0]?.id ?? ''
+  const groupId = layout.groups[0]!?.id ?? ''
   layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
     templateDisplayName: 'Character',
     documentTemplateId: 'template-a',
@@ -373,8 +373,8 @@ test('Test that he-tree reverse mapping falls back to node fields without prior 
   ]
   const mapped = mapHeTreeNodesToWorldTemplateLayoutDraft(nodes, priorLayout)
   expect(mapped.placements).toHaveLength(2)
-  expect(mapped.placements[0]?.groupId).toBe(groupId)
-  expect(mapped.placements[1]?.rootSortOrder).toBe(1)
+  expect(mapped.placements[0]!?.groupId).toBe(groupId)
+  expect(mapped.placements[1]!?.rootSortOrder).toBe(1)
 })
 
 /**
@@ -408,8 +408,8 @@ test('Test that he-tree mapping nests grouped placements under group nodes', () 
   }
   const nodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout, 'en-US')
   expect(nodes).toHaveLength(1)
-  expect(nodes[0]?.children).toHaveLength(1)
-  expect(nodes[0]?.children[0]?.documentCountInWorld).toBe(3)
+  expect(nodes[0]!?.children).toHaveLength(1)
+  expect(nodes[0]!?.children[0]!?.documentCountInWorld).toBe(3)
 })
 
 /**
@@ -457,7 +457,7 @@ test('Test that he-tree mapping sorts grouped placements by group sort order', (
     ]
   }
   const nodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout, 'en-US')
-  expect(nodes[0]?.children.map((child) => child.label)).toEqual(['First', 'Second'])
+  expect(nodes[0]!?.children.map((child) => child.label)).toEqual(['First', 'Second'])
 })
 
 /**
@@ -505,7 +505,7 @@ test('Test that layout draft normalize reorders interleaved root rows with null 
   }
   const normalized = removeDialogProjectSettingsWorldTemplatePlacementDraft(layout, 'missing-id')
   expect(normalized.placements.find((placement) => placement.id === 'placement-root')?.rootSortOrder).toBe(0)
-  expect(normalized.groups[0]?.rootSortOrder).toBe(1)
+  expect(normalized.groups[0]!?.rootSortOrder).toBe(1)
 })
 
 /**
@@ -612,8 +612,8 @@ test('Test that he-tree reverse mapping keeps prior metadata for grouped and roo
     ]
   }
   const nodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(layoutWithGrouped, 'en-US')
-  if (nodes[0]?.nodeKind === 'group') {
-    nodes[0].children[0].label = 'Changed grouped label'
+  if (nodes[0]!?.nodeKind === 'group') {
+    nodes[0]!.children[0]!.label = 'Changed grouped label'
   }
   const rootTemplateNode = nodes.find((node) => node.nodeKind === 'template')
   if (rootTemplateNode !== undefined) {
@@ -651,7 +651,7 @@ test('Test that layout draft normalize preserves group sort order for orphan gro
     ]
   }
   const normalized = removeDialogProjectSettingsWorldTemplatePlacementDraft(layout, 'missing-id')
-  expect(normalized.placements[0]?.groupSortOrder).toBe(4)
+  expect(normalized.placements[0]!?.groupSortOrder).toBe(4)
 })
 
 /**
@@ -692,7 +692,7 @@ test('Test that he-tree reverse mapping uses empty template ids when metadata is
       worldAppendix: ''
     }
   ], createEmptyDialogProjectSettingsWorldTemplateLayoutDraft())
-  expect(mapped.placements[0]?.documentTemplateId).toBe('')
+  expect(mapped.placements[0]!?.documentTemplateId).toBe('')
 })
 
 /**
@@ -717,7 +717,7 @@ test('Test that he-tree reverse mapping reads root template ids from node data',
       worldAppendix: 'Map'
     }
   ], createEmptyDialogProjectSettingsWorldTemplateLayoutDraft())
-  expect(mapped.placements[0]?.documentTemplateId).toBe('template-from-node')
+  expect(mapped.placements[0]!?.documentTemplateId).toBe('template-from-node')
 })
 
 /**
@@ -803,8 +803,8 @@ test('Test that he-tree mapping and normalize handle numeric sort keys end to en
   const nodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(normalized, 'en-US')
   const rootNode = nodes.find((node) => node.id === 'placement-root-a')
   expect(rootNode?.label).toBe('First root')
-  if (nodes[0]?.nodeKind === 'group') {
-    expect(nodes[0].children.map((child) => child.label)).toEqual(['First grouped', 'Second grouped'])
+  if (nodes[0]!?.nodeKind === 'group') {
+    expect(nodes[0]!.children.map((child) => child.label)).toEqual(['First grouped', 'Second grouped'])
   }
   const mapped = mapHeTreeNodesToWorldTemplateLayoutDraft(nodes, normalized)
   expect(mapped.placements.find((placement) => placement.id === 'placement-root-a')?.documentTemplateId)
@@ -836,7 +836,7 @@ test('Test that he-tree mapping accepts null root sort order on unnormalized dra
     ]
   }, 'en-US')
   expect(nodes).toHaveLength(1)
-  expect(nodes[0]?.nodeKind).toBe('template')
+  expect(nodes[0]!?.nodeKind).toBe('template')
 })
 
 /**
@@ -854,12 +854,12 @@ test('Test that layout draft append and rename handle interleaved root rows', ()
     }
   )
   layout = appendDialogProjectSettingsWorldTemplateGroupDraft(layout, 'en-US', 'Creatures')
-  const creaturesGroupId = layout.groups[0]?.id ?? ''
+  const creaturesGroupId = layout.groups[0]!?.id ?? ''
   expect(layout.groups).toHaveLength(1)
-  expect(layout.placements[0]?.rootSortOrder).toBe(0)
+  expect(layout.placements[0]!?.rootSortOrder).toBe(0)
 
   layout = renameDialogProjectSettingsWorldTemplateGroupDisplayNameTranslationsDraft(layout, 'missing-group', { 'en-US': 'Ignored' })
-  expect(layout.groups[0]?.displayNameTranslations['en-US']).toBe('Creatures')
+  expect(layout.groups[0]!?.displayNameTranslations['en-US']).toBe('Creatures')
 
   layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
     templateDisplayName: 'Character',
@@ -899,7 +899,7 @@ test('Test that layout draft append and rename handle interleaved root rows', ()
   }
   layout = removeDialogProjectSettingsWorldTemplateGroupDraft(layout, creaturesGroupId)
   expect(layout.groups).toHaveLength(1)
-  expect(layout.groups[0]?.id).toBe('group-b')
+  expect(layout.groups[0]!?.id).toBe('group-b')
   expect(layout.placements.some((placement) => placement.groupId === 'group-b')).toBe(true)
 })
 
@@ -918,8 +918,8 @@ test('Test that remove group promotes nested templates to the group root slot', 
     }
   )
   layout = appendDialogProjectSettingsWorldTemplateGroupDraft(layout, 'en-US', 'Creatures')
-  const creaturesGroupId = layout.groups[0]?.id ?? ''
-  expect(layout.groups[0]?.rootSortOrder).toBe(1)
+  const creaturesGroupId = layout.groups[0]!?.id ?? ''
+  expect(layout.groups[0]!?.rootSortOrder).toBe(1)
 
   layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
     templateDisplayName: 'Root after',
@@ -1377,7 +1377,7 @@ test('Test that he-tree reverse mapping dedupes cloned template nodes', () => {
   ]
   const mapped = mapHeTreeNodesToWorldTemplateLayoutDraft(corruptedNodes, layout)
   expect(mapped.placements).toHaveLength(1)
-  expect(mapped.placements[0]?.documentTemplateId).toBe('template-a')
+  expect(mapped.placements[0]!?.documentTemplateId).toBe('template-a')
 })
 
 /**
@@ -1420,7 +1420,7 @@ test('Test that he-tree reverse mapping skips duplicate root template document i
   ]
   const mapped = mapHeTreeNodesToWorldTemplateLayoutDraft(nodes, priorLayout)
   expect(mapped.placements).toHaveLength(1)
-  expect(mapped.placements[0]?.id).toBe('880e8400-e29b-41d4-a716-446655440001')
+  expect(mapped.placements[0]!?.id).toBe('880e8400-e29b-41d4-a716-446655440001')
 })
 
 /**
@@ -1487,7 +1487,7 @@ test('Test that he-tree reverse mapping skips duplicate group child document ids
   ]
   const mapped = mapHeTreeNodesToWorldTemplateLayoutDraft(nodes, priorLayout)
   expect(mapped.placements).toHaveLength(1)
-  expect(mapped.placements[0]?.documentTemplateId).toBe('template-a')
+  expect(mapped.placements[0]!?.documentTemplateId).toBe('template-a')
 })
 
 /**
@@ -1534,7 +1534,7 @@ test('Test that he-tree group id resolution accepts UUIDs and rejects ad hoc ids
  */
 test('Test that he-tree reverse mapping dedupes cloned group nodes by id', () => {
   const layout = appendDialogProjectSettingsWorldTemplateGroupDraft(createEmptyDialogProjectSettingsWorldTemplateLayoutDraft(), 'en-US', 'Creatures')
-  const groupId = layout.groups[0]?.id ?? ''
+  const groupId = layout.groups[0]!?.id ?? ''
   const nodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout, 'en-US')
   const groupNode = nodes.find((node) => node.nodeKind === 'group')
   expect(groupNode).toBeDefined()
@@ -1546,7 +1546,7 @@ test('Test that he-tree reverse mapping dedupes cloned group nodes by id', () =>
     }
   ], layout)
   expect(mapped.groups).toHaveLength(1)
-  expect(mapped.groups[0]?.id).toBe(groupId)
+  expect(mapped.groups[0]!?.id).toBe(groupId)
 })
 
 /**
@@ -1572,7 +1572,7 @@ test('Test that he-tree reverse mapping assigns UUIDs to invalid group node ids'
     }
   ], createEmptyDialogProjectSettingsWorldTemplateLayoutDraft())
   expect(mapped.groups).toHaveLength(1)
-  expect(isDialogProjectSettingsWorldTemplateLayoutPersistedId(mapped.groups[0]?.id ?? '')).toBe(true)
+  expect(isDialogProjectSettingsWorldTemplateLayoutPersistedId(mapped.groups[0]!?.id ?? '')).toBe(true)
 })
 
 /**
@@ -1581,7 +1581,7 @@ test('Test that he-tree reverse mapping assigns UUIDs to invalid group node ids'
  */
 test('Test that tree node walk resolves grouped and root template placements', () => {
   const layout = appendDialogProjectSettingsWorldTemplateGroupDraft(createEmptyDialogProjectSettingsWorldTemplateLayoutDraft(), 'en-US', 'Creatures')
-  const groupId = layout.groups[0]?.id ?? ''
+  const groupId = layout.groups[0]!?.id ?? ''
   layout.placements = [
     {
       templateDisplayName: 'Character',
@@ -1626,7 +1626,7 @@ test('Test that orphan merge preserves placements whose group id is missing from
   const mapped = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   const merged = mergeOrphanPlacementsFromPriorWorldTemplateLayout(mapped, priorLayout)
   expect(merged.placements).toHaveLength(1)
-  expect(merged.placements[0]?.groupId).toBe('missing-group')
+  expect(merged.placements[0]!?.groupId).toBe('missing-group')
 })
 
 /**
@@ -1999,7 +1999,7 @@ test('Test that label patch updates group names in existing he-tree nodes', () =
   const treeNodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout, 'en-US')
   layout = renameDialogProjectSettingsWorldTemplateGroupDisplayNameTranslationsDraft(layout, groupId, { 'en-US': 'Renamed creatures' })
   patchWorldTemplateLayoutDisplayLabelsInHeTreeNodes(treeNodes, layout, 'en-US')
-  expect(treeNodes[0]?.label).toBe('Renamed creatures')
+  expect(treeNodes[0]!?.label).toBe('Renamed creatures')
 })
 
 /**
@@ -2095,8 +2095,8 @@ test('Test that label patch updates grouped template rows in existing he-tree no
   layout.placements[0]!.templateDisplayName = 'Hero'
   layout.placements[0]!.worldAppendix = ' of Myth'
   patchWorldTemplateLayoutDisplayLabelsInHeTreeNodes(treeNodes, layout, 'en-US')
-  expect(treeNodes[0]?.children[0]?.label).toBe('Hero')
-  expect(treeNodes[0]?.children[0]?.worldAppendix).toBe(' of Myth')
+  expect(treeNodes[0]!?.children[0]!?.label).toBe('Hero')
+  expect(treeNodes[0]!?.children[0]!?.worldAppendix).toBe(' of Myth')
 })
 
 test('Test that placement label helpers resolve nickname and canonical fallback', () => {
@@ -2142,9 +2142,9 @@ test('Test that he-tree nodes use nickname label and accent flag when nickname i
     }
   ]
   const nodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout, 'en-US')
-  expect(nodes[0]?.label).toBe('Hero')
-  expect(nodes[0]?.usesNickname).toBe(true)
-  expect(nodes[0]?.templateDisplayName).toBe('Character')
+  expect(nodes[0]!?.label).toBe('Hero')
+  expect(nodes[0]!?.usesNickname).toBe(true)
+  expect(nodes[0]!?.templateDisplayName).toBe('Character')
 })
 
 test('Test that patchWorldTemplateLayoutDisplayLabelsInHeTreeNodes skips unknown placement ids', () => {
@@ -2205,8 +2205,8 @@ test('Test that patchWorldTemplateLayoutDisplayLabelsInHeTreeNodes skips unknown
     }
   ]
   patchWorldTemplateLayoutDisplayLabelsInHeTreeNodes(treeNodes, layout, 'en-US')
-  expect(treeNodes[0]?.children[0]?.label).toBe('Stale')
-  expect(treeNodes[1]?.label).toBe('Stale root')
+  expect(treeNodes[0]!?.children[0]!?.label).toBe('Stale')
+  expect(treeNodes[1]!?.label).toBe('Stale root')
 })
 
 test('Test that he-tree mapping reads legacy placement displayName when templateDisplayName is absent', () => {
@@ -2225,8 +2225,8 @@ test('Test that he-tree mapping reads legacy placement displayName when template
     } as unknown as I_dialogProjectSettingsWorldTemplatePlacementDraft
   ]
   const nodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout, 'en-US')
-  expect(nodes[0]?.label).toBe('Legacy name')
-  expect(nodes[0]?.templateDisplayName).toBe('Legacy name')
+  expect(nodes[0]!?.label).toBe('Legacy name')
+  expect(nodes[0]!?.templateDisplayName).toBe('Legacy name')
 })
 
 test('Test that renameDialogProjectSettingsWorldTemplatePlacementNicknameTranslationsDraft updates one placement', () => {
@@ -2243,8 +2243,8 @@ test('Test that renameDialogProjectSettingsWorldTemplatePlacementNicknameTransla
     plural: { 'en-US': 'Hero' },
     singular: {}
   })
-  expect(renamed.placements[0]?.nicknamePluralTranslations['en-US']).toBe('Hero')
-  expect(layout.placements[0]?.nicknamePluralTranslations).toEqual({})
+  expect(renamed.placements[0]!?.nicknamePluralTranslations['en-US']).toBe('Hero')
+  expect(layout.placements[0]!?.nicknamePluralTranslations).toEqual({})
 })
 
 test('Test that he-tree mapping uses empty label when placement names are missing', () => {
@@ -2262,6 +2262,6 @@ test('Test that he-tree mapping uses empty label when placement names are missin
     } as unknown as I_dialogProjectSettingsWorldTemplatePlacementDraft
   ]
   const nodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout, 'en-US')
-  expect(nodes[0]?.label).toBe('')
-  expect(nodes[0]?.templateDisplayName).toBe('')
+  expect(nodes[0]!?.label).toBe('')
+  expect(nodes[0]!?.templateDisplayName).toBe('')
 })

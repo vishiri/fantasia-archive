@@ -1,5 +1,7 @@
 import { expect, test } from 'vitest'
 
+import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
+
 import { readAppControlMenusTestingTypeFromCachedSnapshot } from '../appControlMenusTestingType'
 
 /**
@@ -18,7 +20,7 @@ test('Test that readAppControlMenusTestingTypeFromCachedSnapshot returns empty s
 test('Test that readAppControlMenusTestingTypeFromCachedSnapshot preserves false TEST_ENV', () => {
   expect(readAppControlMenusTestingTypeFromCachedSnapshot({
     TEST_ENV: false
-  })).toBe(false)
+  } as I_extraEnvVariablesAPI)).toBe(false)
 })
 
 /**
@@ -28,6 +30,6 @@ test('Test that readAppControlMenusTestingTypeFromCachedSnapshot preserves false
 test('Test that readAppControlMenusTestingTypeFromCachedSnapshot maps string TEST_ENV values', () => {
   expect(readAppControlMenusTestingTypeFromCachedSnapshot({
     TEST_ENV: 'components'
-  })).toBe('components')
-  expect(readAppControlMenusTestingTypeFromCachedSnapshot({})).toBe('')
+  } as I_extraEnvVariablesAPI)).toBe('components')
+  expect(readAppControlMenusTestingTypeFromCachedSnapshot({} as I_extraEnvVariablesAPI)).toBe('')
 })

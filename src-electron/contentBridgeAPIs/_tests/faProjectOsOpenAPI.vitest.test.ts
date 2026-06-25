@@ -36,7 +36,7 @@ test('Test that installOsOpenListener is idempotent and invokes callback on payl
     FA_PROJECT_OS_OPEN_IPC.openFromOsToRenderer,
     expect.any(Function)
   )
-  const handler = ipcRendererOnMock.mock.calls[0][1] as (
+  const handler = ipcRendererOnMock.mock.calls[0]![1]! as (
     event: unknown,
     payload: unknown
   ) => void

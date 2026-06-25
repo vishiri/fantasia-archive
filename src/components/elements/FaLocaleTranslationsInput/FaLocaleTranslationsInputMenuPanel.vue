@@ -82,7 +82,7 @@
             :data-test-locator="`${props.testLocator}-translationsRow`"
           >
             <q-input
-              :ref="localeRowIndex === 0 ? props.setPreferredLanguageInputRef : undefined"
+              v-bind="{ ...qInputSizeAttrs, ...localeRowInputRefBinding(localeRowIndex) }"
               :autogrow="props.isMultilineInput && props.autogrow"
               class="faLocaleTranslationsInput__menuInput col"
               color="primary-bright"
@@ -91,9 +91,7 @@
               filled
               hide-bottom-space
               :label="localeRow.displayName"
-              :maxlength="props.maxLength"
               outlined
-              :rows="props.isMultilineInput ? props.rows : undefined"
               stack-label
               :data-test-locale-code="localeRow.code"
               :data-test-locale-label="localeRow.displayName"
@@ -103,6 +101,7 @@
               @update:model-value="(value) => props.updateSingularLocaleValue!(localeRow.code, value)"
             />
             <q-input
+              v-bind="qInputSizeAttrs"
               :autogrow="props.isMultilineInput && props.autogrow"
               class="faLocaleTranslationsInput__menuInput col"
               color="primary-bright"
@@ -111,9 +110,7 @@
               filled
               hide-bottom-space
               :label="localeRow.displayName"
-              :maxlength="props.maxLength"
               outlined
-              :rows="props.isMultilineInput ? props.rows : undefined"
               stack-label
               :data-test-locale-code="localeRow.code"
               :data-test-locale-label="localeRow.displayName"
@@ -139,7 +136,7 @@
           :data-test-locator="`${props.testLocator}-translationsRow`"
         >
           <q-input
-            :ref="localeRowIndex === 0 ? props.setPreferredLanguageInputRef : undefined"
+            v-bind="{ ...qInputSizeAttrs, ...localeRowInputRefBinding(localeRowIndex) }"
             :autogrow="props.isMultilineInput && props.autogrow"
             class="faLocaleTranslationsInput__menuInput"
             color="primary-bright"
@@ -148,9 +145,7 @@
             filled
             hide-bottom-space
             :label="localeRow.displayName"
-            :maxlength="props.maxLength"
             outlined
-            :rows="props.isMultilineInput ? props.rows : undefined"
             stack-label
             :data-test-locale-code="localeRow.code"
             :data-test-locale-label="localeRow.displayName"
@@ -178,14 +173,14 @@ defineOptions({
 const props = defineProps<{
   autogrow: boolean
   isMultilineInput: boolean
-  isSingularPluralMode?: boolean
+  isSingularPluralMode?: boolean | undefined
   localeRows: I_faLocaleTranslationsInputLocaleRow[]
-  maxLength?: number
-  pinnedAsideLabel?: string
-  pinnedAsideTestLocator?: string
-  pinnedAsideTooltip?: string
-  pinnedAsideValue?: string
-  pluralColumnLabel?: string
+  maxLength?: number | undefined
+  pinnedAsideLabel?: string | undefined
+  pinnedAsideTestLocator?: string | undefined
+  pinnedAsideTooltip?: string | undefined
+  pinnedAsideValue?: string | undefined
+  pluralColumnLabel?: string | undefined
   readLocaleValue: (languageCode: T_faUserSettingsLanguageCode) => string
   readPluralLocaleValue?: (languageCode: T_faUserSettingsLanguageCode) => string
   readSingularLocaleValue?: (languageCode: T_faUserSettingsLanguageCode) => string
@@ -193,7 +188,7 @@ const props = defineProps<{
   setPreferredLanguageInputRef: (
     component: Element | ComponentPublicInstance | null
   ) => void
-  singularColumnLabel?: string
+  singularColumnLabel?: string | undefined
   testLocator: string
   updateLocaleValue: (
     languageCode: T_faUserSettingsLanguageCode,
@@ -212,4 +207,30 @@ const props = defineProps<{
 const hasPinnedAside = computed(() => {
   return props.pinnedAsideLabel !== undefined && props.pinnedAsideValue !== undefined
 })
+
+const qInputSizeAttrs = computed(() => {
+  const attrs: { maxlength?: number; rows?: number } = {}
+
+  if (props.maxLength !== undefined) {
+    attrs.maxlength = props.maxLength
+  }
+
+  if (props.isMultilineInput) {
+    attrs.rows = props.rows
+  }
+
+  return attrs
+})
+
+function localeRowInputRefBinding (localeRowIndex: number): {
+  ref?: (component: Element | ComponentPublicInstance | null) => void
+} {
+  if (localeRowIndex !== 0) {
+    return {}
+  }
+
+  return {
+    ref: props.setPreferredLanguageInputRef
+  }
+}
 </script>

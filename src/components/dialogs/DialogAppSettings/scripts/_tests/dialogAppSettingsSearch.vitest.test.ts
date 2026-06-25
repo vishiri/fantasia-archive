@@ -129,8 +129,8 @@ test('Test that filterAppSettingsTreeForSearch with empty query clones full tree
 
   expect(out).toEqual(tree)
   expect(out).not.toBe(tree)
-  expect(out.cat).not.toBe(tree.cat)
-  expect(out.cat.subCategories.sub).not.toBe(tree.cat.subCategories.sub)
+  expect(out.cat!).not.toBe(tree.cat!)
+  expect(out.cat!.subCategories.sub!).not.toBe(tree.cat!.subCategories.sub!)
 })
 
 test('Test that filterAppSettingsTreeForSearch keeps only matching settings', () => {
@@ -161,7 +161,7 @@ test('Test that filterAppSettingsTreeForSearch keeps only matching settings', ()
 
   const out = filterAppSettingsTreeForSearch(tree, 'findme')
 
-  expect(Object.keys(out.cat.subCategories.sub.settingsList)).toEqual(['keep'])
+  expect(Object.keys(out.cat!.subCategories.sub!.settingsList)).toEqual(['keep'])
 })
 
 test('Test that filterAppSettingsTreeForSearch omits empty sub-categories and categories', () => {
@@ -257,7 +257,7 @@ test('Test that filterAppSettingsTreeForSearch preserves category and sub-catego
   const out = filterAppSettingsTreeForSearch(tree, 'hit')
 
   expect(Object.keys(out)).toEqual(['z', 'y'])
-  expect(Object.keys(out.z.subCategories)).toEqual(['b', 'a'])
+  expect(Object.keys(out.z!.subCategories)).toEqual(['b', 'a'])
 })
 
 /**

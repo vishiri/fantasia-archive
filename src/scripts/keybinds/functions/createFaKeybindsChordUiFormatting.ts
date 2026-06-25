@@ -55,7 +55,7 @@ function codeLabel (code: string): string {
 function formatFaKeybindChordForUiWithSort (
   chord: I_faChordSerialized,
   platform: NodeJS.Platform,
-  sortFaKeybindMods: (mods: T_faKeybindModifierLiteral[]) => T_faKeybindModifierLiteral[]
+  sortFaKeybindMods: (mods: readonly T_faKeybindModifierLiteral[]) => T_faKeybindModifierLiteral[]
 ): string {
   const mods = sortFaKeybindMods(chord.mods)
   const prefix = mods.map((m) => `${modifierLabel(m, platform)} + `).join('')
@@ -72,7 +72,7 @@ export function createFaKeybindsChordUiFormatting (deps: {
   findFaKeybindCommandDefinition: (
     commandId: T_faKeybindCommandId
   ) => I_faKeybindCommandDefinition | undefined
-  sortFaKeybindMods: (mods: T_faKeybindModifierLiteral[]) => T_faKeybindModifierLiteral[]
+  sortFaKeybindMods: (mods: readonly T_faKeybindModifierLiteral[]) => T_faKeybindModifierLiteral[]
 }): {
     formatFaKeybindChordForUi: (chord: I_faChordSerialized, platform: NodeJS.Platform) => string
     formatFaKeybindCommandLabelFromSnapshot: (params: {

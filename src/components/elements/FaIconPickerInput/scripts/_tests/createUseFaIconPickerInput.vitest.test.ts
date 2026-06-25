@@ -49,8 +49,8 @@ describe('createUseFaIconPickerInput', () => {
     await Promise.resolve()
 
     expect(loadFaIconPickerMergedCatalogAsync).toHaveBeenCalledTimes(1)
-    expect(api.catalogRows.value[0]).toContain('mdi-account')
-    expect(api.catalogRows.value[0]).toContain('fa-solid fa-user')
+    expect(api.catalogRows.value[0]!).toContain('mdi-account')
+    expect(api.catalogRows.value[0]!).toContain('fa-solid fa-user')
 
     api.onSearchQueryUpdate('account')
     expect(api.catalogRows.value.flat()).toContain('mdi-home')

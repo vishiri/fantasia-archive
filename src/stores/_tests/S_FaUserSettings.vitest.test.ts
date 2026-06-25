@@ -216,7 +216,7 @@ test('Test that updateSettings throws without emitting notify when saved values 
 
   expect(notifyCreateMock).not.toHaveBeenCalled()
   expect(consoleErrorSpy).toHaveBeenCalledOnce()
-  expect(consoleErrorSpy.mock.calls[0][0]).toContain('globalFunctionality.faUserSettings.saveMismatchLog')
+  expect(consoleErrorSpy.mock.calls[0]![0]!).toContain('globalFunctionality.faUserSettings.saveMismatchLog')
   consoleErrorSpy.mockRestore()
 })
 
@@ -295,7 +295,7 @@ test('Test that updateSettings throws without emitting notify when setSettings r
   expect(store.settings).toBeNull()
   expect(notifyCreateMock).not.toHaveBeenCalled()
   expect(consoleErrorSpy).toHaveBeenCalledOnce()
-  expect(consoleErrorSpy.mock.calls[0][0]).toContain('[S_FaUserSettings] setSettings failed')
+  expect(consoleErrorSpy.mock.calls[0]![0]!).toContain('[S_FaUserSettings] setSettings failed')
   consoleErrorSpy.mockRestore()
 })
 

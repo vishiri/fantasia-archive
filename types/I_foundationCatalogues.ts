@@ -7,7 +7,7 @@ export interface I_foundationCustomSwatch {
   /** Resolved hex for the swatch (must stay aligned with the SCSS source). */
   hex: string
   /** Optional note when the value is derived in SCSS (for example color.adjust). */
-  note?: string
+  note?: string | undefined
 }
 
 /**

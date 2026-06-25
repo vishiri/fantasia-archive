@@ -20,7 +20,7 @@ test('Test that migrateFaProjectSchemaV7ToV8 adds title translations column and 
   })
 
   expect(exec).toHaveBeenCalledTimes(2)
-  expect(exec.mock.calls[0][0]).toContain('ADD COLUMN title_translations_json')
-  expect(exec.mock.calls[1][0]).toContain("json_object('en-US', display_name)")
+  expect(exec.mock.calls[0]![0]!).toContain('ADD COLUMN title_translations_json')
+  expect(exec.mock.calls[1]![0]!).toContain("json_object('en-US', display_name)")
   expect(pragma).toHaveBeenCalledWith('user_version = 8')
 })

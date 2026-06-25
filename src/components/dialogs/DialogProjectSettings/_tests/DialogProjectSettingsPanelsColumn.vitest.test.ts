@@ -135,22 +135,22 @@ test('Test that DialogProjectSettingsPanelsColumn forwards worlds panel updates'
   expect(w.emitted('addWorld')).toBeTruthy()
 
   await w.find('[data-test-locator="emit-remove-world"]').trigger('click')
-  expect(w.emitted('removeWorld')?.[0]).toEqual([world.id])
+  expect(w.emitted('removeWorld')?.[0]!).toEqual([world.id])
 
   await w.find('[data-test-locator="emit-update-worlds"]').trigger('click')
   expect(w.emitted('update:worlds')?.[0]).toEqual([worlds])
 
   await w.find('[data-test-locator="emit-world-color"]').trigger('click')
-  expect(w.emitted('updateWorldColor')?.[0]).toEqual([world.id, '#112233'])
+  expect(w.emitted('updateWorldColor')?.[0]!).toEqual([world.id, '#112233'])
 
   await w.find('[data-test-locator="emit-world-palette"]').trigger('click')
-  expect(w.emitted('updateWorldColorPallete')?.[0]).toEqual([world.id, '#112233;#445566'])
+  expect(w.emitted('updateWorldColorPallete')?.[0]!).toEqual([world.id, '#112233;#445566'])
 
   await w.find('[data-test-locator="emit-world-name"]').trigger('click')
-  expect(w.emitted('updateWorldDisplayNameTranslations')?.[0]).toEqual([world.id, { 'en-US': 'Renamed' }])
+  expect(w.emitted('updateWorldDisplayNameTranslations')?.[0]!).toEqual([world.id, { 'en-US': 'Renamed' }])
 
   await w.find('[data-test-locator="emit-template-title"]').trigger('click')
-  expect(w.emitted('updateDocumentTemplateTitleTranslations')?.[0]).toEqual([
+  expect(w.emitted('updateDocumentTemplateTitleTranslations')?.[0]!).toEqual([
     'template-id',
     {
       plural: {},
@@ -159,7 +159,7 @@ test('Test that DialogProjectSettingsPanelsColumn forwards worlds panel updates'
   ])
 
   await w.find('[data-test-locator="emit-world-layout"]').trigger('click')
-  expect(w.emitted('updateWorldTemplateLayout')?.[0]).toEqual([world.id, layout])
+  expect(w.emitted('updateWorldTemplateLayout')?.[0]!).toEqual([world.id, layout])
 })
 
 /**
@@ -214,14 +214,14 @@ test('Test that DialogProjectSettingsPanelsColumn forwards document templates pa
   expect(w.emitted('addDocumentTemplate')).toBeTruthy()
 
   await w.find('[data-test-locator="emit-remove-template"]').trigger('click')
-  expect(w.emitted('removeDocumentTemplate')?.[0]).toEqual([templates[0].id])
+  expect(w.emitted('removeDocumentTemplate')?.[0]!).toEqual([templates[0]!.id])
 
   await w.find('[data-test-locator="emit-update-templates"]').trigger('click')
   expect(w.emitted('update:documentTemplates')?.[0]).toEqual([templates])
 
   await w.find('[data-test-locator="emit-template-title"]').trigger('click')
-  expect(w.emitted('updateDocumentTemplateTitleTranslations')?.[0]).toEqual([
-    templates[0].id,
+  expect(w.emitted('updateDocumentTemplateTitleTranslations')?.[0]!).toEqual([
+    templates[0]!.id,
     {
       plural: {},
       singular: {}
@@ -229,11 +229,11 @@ test('Test that DialogProjectSettingsPanelsColumn forwards document templates pa
   ])
 
   await w.find('[data-test-locator="emit-template-icon"]').trigger('click')
-  expect(w.emitted('updateDocumentTemplateIcon')?.[0]).toEqual([templates[0].id, 'mdi-pencil'])
+  expect(w.emitted('updateDocumentTemplateIcon')?.[0]!).toEqual([templates[0]!.id, 'mdi-pencil'])
 
   await w.find('[data-test-locator="emit-template-appendix"]').trigger('click')
-  expect(w.emitted('updateDocumentTemplateWorldAppendixTranslations')?.[0]).toEqual([
-    templates[0].id,
+  expect(w.emitted('updateDocumentTemplateWorldAppendixTranslations')?.[0]!).toEqual([
+    templates[0]!.id,
     { 'en-US': 'Notes' }
   ])
 })

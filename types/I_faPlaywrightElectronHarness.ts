@@ -15,10 +15,10 @@ export interface I_faLaunchFaPlaywrightElectronSerialSuiteWindowOptions {
   /**
    * Extra strings appended after packaged main-process entry (cold OS-open tests pass an absolute '.faproject' path).
    */
-  electronLaunchAdditionalArgs?: readonly string[]
-  electronMainJsPath?: string
-  resetUserData?: boolean
-  dismissStartupTips?: T_faPlaywrightDismissStartupTips
+  electronLaunchAdditionalArgs?: readonly string[] | undefined
+  electronMainJsPath?: string | undefined
+  resetUserData?: boolean | undefined
+  dismissStartupTips?: T_faPlaywrightDismissStartupTips | undefined
   beforeIsolationReset?: () => void | Promise<void>
   afterIsolationResetBeforeLaunch?: () => void | Promise<void>
 }

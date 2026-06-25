@@ -59,7 +59,7 @@ const props = defineProps<{
   /**
    * Custom input directly fed to the component in case it doesn't get triggered from the global store
    */
-  directInput?: T_dialogName
+  directInput?: T_dialogName | undefined
 }>()
 
 const {

@@ -18,7 +18,7 @@ export const buildFaLocaleTranslationsInputLocaleRows = (
   if (preferredIndex <= 0) {
     return rows
   }
-  const preferredRow = rows[preferredIndex]
+  const preferredRow = rows[preferredIndex]!
   const remainingRows = rows.filter((localeRow) => localeRow.code !== currentLanguageCode)
   return [preferredRow, ...remainingRows]
 }

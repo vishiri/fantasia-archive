@@ -136,7 +136,7 @@ import DialogImportExportAppConfigExportStep from './DialogImportExportAppConfig
 import DialogImportExportAppConfigImportStep from './DialogImportExportAppConfigImportStep.vue'
 
 const props = defineProps<{
-  directInput?: T_dialogName
+  directInput?: T_dialogName | undefined
 }>()
 
 const documentName: T_dialogName = 'ImportExportAppConfig'

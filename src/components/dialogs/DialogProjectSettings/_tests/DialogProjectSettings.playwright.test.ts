@@ -118,8 +118,8 @@ async function extractTreeNodeIdFromRow (
 ): Promise<string> {
   const locatorValue = await row.getAttribute('data-test-locator')
   const match = locatorValue?.match(new RegExp(`${kind}-(.+)$`))
-  expect(match?.[1]).toBeTruthy()
-  return match?.[1] ?? ''
+  expect(match?.[1]!).toBeTruthy()
+  return match?.[1]! ?? ''
 }
 
 async function readTemplateTabIds (page: Page): Promise<string[]> {
@@ -850,8 +850,8 @@ test.describe.serial('DialogProjectSettings functional flow', () => {
     await dragVerticalTab(
       appWindow,
       'data-test-template-id',
-      templateIds[1] ?? templateIds[0],
-      templateIds[0] ?? templateIds[1],
+      templateIds[1]! ?? templateIds[0]!,
+      templateIds[0]! ?? templateIds[1]!,
       selectorList.documentTemplatesTab
     )
 

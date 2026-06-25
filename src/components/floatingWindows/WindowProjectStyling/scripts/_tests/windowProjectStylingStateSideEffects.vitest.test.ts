@@ -316,7 +316,7 @@ test('wireProjectStylingWindowOpenFromMenuAndProps opens when reactive directInp
   const openSpy = vi.fn()
 
   type T_propsReactive = {
-    directInput?: T_dialogName
+    directInput?: T_dialogName | undefined
   }
 
   const propsReactive: T_propsReactive = reactive({})

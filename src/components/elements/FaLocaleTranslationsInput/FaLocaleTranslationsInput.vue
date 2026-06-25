@@ -46,26 +46,27 @@ defineOptions({
 })
 
 const props = withDefaults(
+  /* eslint-disable vue/require-default-prop -- exactOptionalPropertyTypes: omit undefined from withDefaults */
   defineProps<{
-    autogrow?: boolean
-    color?: string
+    autogrow?: boolean | undefined
+    color?: string | undefined
     currentLanguageCode: T_faUserSettingsLanguageCode
-    dark?: boolean
-    dense?: boolean
-    error?: boolean
-    errorMessage?: string
-    hideBottomSpace?: boolean
-    inputMode?: T_faLocaleTranslationsInputMode
-    maxLength?: number
-    menuPinnedAsideLabel?: string
-    menuPinnedAsideTestLocator?: string
-    menuPinnedAsideTooltip?: string
-    menuPinnedAsideValue?: string
+    dark?: boolean | undefined
+    dense?: boolean | undefined
+    error?: boolean | undefined
+    errorMessage?: string | undefined
+    hideBottomSpace?: boolean | undefined
+    inputMode?: T_faLocaleTranslationsInputMode | undefined
+    maxLength?: number | undefined
+    menuPinnedAsideLabel?: string | undefined
+    menuPinnedAsideTestLocator?: string | undefined
+    menuPinnedAsideTooltip?: string | undefined
+    menuPinnedAsideValue?: string | undefined
     modelValue: I_faLocaleStringTranslations | I_faLocaleSingularPluralTranslations
-    presentation?: T_faLocaleTranslationsInputPresentation
-    rows?: number
+    presentation?: T_faLocaleTranslationsInputPresentation | undefined
+    rows?: number | undefined
     testLocator: string
-    translationForms?: T_faLocaleTranslationsInputTranslationForms
+    translationForms?: T_faLocaleTranslationsInputTranslationForms | undefined
   }>(),
   {
     autogrow: false,
@@ -73,16 +74,9 @@ const props = withDefaults(
     dark: true,
     dense: true,
     error: false,
-    errorMessage: undefined,
     hideBottomSpace: true,
     inputMode: 'singleLine',
-    maxLength: undefined,
-    menuPinnedAsideLabel: undefined,
-    menuPinnedAsideTestLocator: undefined,
-    menuPinnedAsideTooltip: undefined,
-    menuPinnedAsideValue: undefined,
     presentation: 'field',
-    rows: undefined,
     translationForms: 'single'
   }
 )

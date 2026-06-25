@@ -20,29 +20,29 @@ export interface I_faProjectDocumentTemplate {
 
 export interface I_faProjectDocumentTemplateCreateInput {
   displayName: string
-  titlePluralTranslations?: I_faProjectDocumentTemplateTitleTranslations
-  titleSingularTranslations?: I_faProjectDocumentTemplateTitleSingularTranslations
-  icon?: string
-  worldAppendix?: string
+  titlePluralTranslations?: I_faProjectDocumentTemplateTitleTranslations | undefined
+  titleSingularTranslations?: I_faProjectDocumentTemplateTitleSingularTranslations | undefined
+  icon?: string | undefined
+  worldAppendix?: string | undefined
 }
 
 export interface I_faProjectDocumentTemplatePatch {
-  displayName?: string
-  titlePluralTranslations?: I_faProjectDocumentTemplateTitleTranslations
-  titleSingularTranslations?: I_faProjectDocumentTemplateTitleSingularTranslations
-  icon?: string
-  sortOrder?: number
-  worldAppendix?: string
-  worldAppendixTranslations?: I_faProjectDocumentTemplateWorldAppendixTranslations
+  displayName?: string | undefined
+  titlePluralTranslations?: I_faProjectDocumentTemplateTitleTranslations | undefined
+  titleSingularTranslations?: I_faProjectDocumentTemplateTitleSingularTranslations | undefined
+  icon?: string | undefined
+  sortOrder?: number | undefined
+  worldAppendix?: string | undefined
+  worldAppendixTranslations?: I_faProjectDocumentTemplateWorldAppendixTranslations | undefined
 }
 
 /** Single row in a transactional document-templates list replace from Project Settings. */
 export interface I_faProjectDocumentTemplateSnapshotItem {
   id: string
   titlePluralTranslations: I_faProjectDocumentTemplateTitleTranslations
-  titleSingularTranslations?: I_faProjectDocumentTemplateTitleSingularTranslations
-  icon?: string
-  worldAppendixTranslations?: I_faProjectDocumentTemplateWorldAppendixTranslations
+  titleSingularTranslations?: I_faProjectDocumentTemplateTitleSingularTranslations | undefined
+  icon?: string | undefined
+  worldAppendixTranslations?: I_faProjectDocumentTemplateWorldAppendixTranslations | undefined
 }
 
 export type I_faProjectDocumentTemplateListResult =

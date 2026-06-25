@@ -2,7 +2,7 @@ import { nextTick, ref } from 'vue'
 import type { Ref } from 'vue'
 import type { QTooltip } from 'quasar'
 
-import { FA_Q_TOOLTIP_DELAY_MS } from 'app/src/scripts/appGlobalManagementUI/faQTooltipDelay_manager'
+import { FA_Q_TOOLTIP_DELAY_MS } from 'app/src/scripts/appGlobalManagementUI/functions/faQTooltipDelay'
 
 type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring = {
   armEditTooltip: () => void
@@ -23,6 +23,7 @@ type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring = {
 
 export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring (deps?: {
   getRenameMenuOpen?: () => boolean
+  onBeforeUnmount?: (hook: () => void) => void
 }): T_dialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring {
   const editTooltipRef = ref<QTooltip | null>(null)
   const removeTooltipRef = ref<QTooltip | null>(null)
@@ -90,6 +91,10 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTool
     clearPlacementNicknameHoverRevealTimer()
     placementNicknameHoverTooltipRef.value?.hide()
   }
+
+  deps?.onBeforeUnmount?.(() => {
+    clearPlacementNicknameHoverRevealTimer()
+  })
 
   const armEditTooltipBinding = armEditTooltip
   const armPlacementNicknameHoverTooltipBinding = armPlacementNicknameHoverTooltip

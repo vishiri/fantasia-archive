@@ -38,7 +38,7 @@ test('Test that DialogProjectSettingsWorldsTabItem emits select with the world i
   })
 
   await w.find('[data-test-locator="dialogProjectSettings-worlds-tab"]').trigger('click')
-  expect(w.emitted('select')?.[0]).toEqual([worldFixture.id])
+  expect(w.emitted('select')?.[0]!).toEqual([worldFixture.id])
 })
 
 /**

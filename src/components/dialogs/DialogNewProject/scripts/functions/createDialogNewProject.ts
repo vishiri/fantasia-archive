@@ -62,7 +62,7 @@ function dialogNewProjectCloseDialog (dialogModel: I_ref<boolean>): void {
 
 function useDialogNewProject (
   deps: T_createDialogNewProjectDeps,
-  props: { directInput?: T_dialogName }
+  props: { directInput?: T_dialogName | undefined }
 ): {
     createDisabled: I_computedRef<boolean>
     dialogModel: I_ref<boolean>
@@ -146,7 +146,7 @@ export function createDialogNewProject (deps: T_createDialogNewProjectDeps): {
     projectName: string,
     closeDialog: () => void
   ) => Promise<void>
-  useDialogNewProject: (props: { directInput?: T_dialogName }) => ReturnType<typeof useDialogNewProject>
+  useDialogNewProject: (props: { directInput?: T_dialogName | undefined }) => ReturnType<typeof useDialogNewProject>
 } {
   return {
     resolveDialogComponentStoreOrNull: deps.resolveDialogComponentStoreOrNull,

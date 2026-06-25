@@ -16,12 +16,12 @@ export function buildDocumentsMenu (_session: I_appMenuBuildSession): I_appMenuL
       faMenuItem('appControlMenus.documents.items.quickSearchDocument', 'mdi-database-search', {
         conditions: false
       }),
-      faMenuSeparator(),
+      faMenuSeparator('documents-sep-after-search'),
       faMenuItem('appControlMenus.documents.items.massDeleteDocument', 'mdi-text-box-remove-outline', {
         conditions: false,
         specialColor: 'secondary'
       }),
-      faMenuSeparator(),
+      faMenuSeparator('documents-sep-before-export'),
       faMenuItem('appControlMenus.documents.items.exportProjectDocuments', 'mdi-database-export-outline', {
         conditions: false
       })

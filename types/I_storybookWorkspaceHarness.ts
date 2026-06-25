@@ -19,7 +19,7 @@ export interface I_storybookEntry {
   title: string
   name: string
   type: string
-  tags?: string[]
+  tags?: string[] | undefined
 }
 
 /**

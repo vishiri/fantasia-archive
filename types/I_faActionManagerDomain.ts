@@ -67,8 +67,8 @@ export type T_faActionKind = 'sync' | 'async'
  * resumeActiveSession: true for **Resume Current Project** (404) or splash **Resume Latest Project** primary segment — navigates without the already-active warning toast on idempotent reopen.
  */
 export interface I_faLoadExistingProjectPayload {
-  filePath?: string
-  resumeActiveSession?: boolean
+  filePath?: string | undefined
+  resumeActiveSession?: boolean | undefined
 }
 
 /**
@@ -88,9 +88,9 @@ export interface I_faActionPayloadMap {
   openProjectSettingsDialog: void
   showProjectDashboard: void
   saveProjectSettings: {
-    documentTemplates?: import('app/types/I_faProjectDocumentTemplateDomain').I_faProjectDocumentTemplateSnapshotItem[]
+    documentTemplates?: import('app/types/I_faProjectDocumentTemplateDomain').I_faProjectDocumentTemplateSnapshotItem[] | undefined
     settings: import('app/types/I_faProjectSettingsDomain').I_faProjectSettingsPatch
-    worlds?: import('app/types/I_faProjectWorldDomain').I_faProjectWorldSnapshotItem[]
+    worlds?: import('app/types/I_faProjectWorldDomain').I_faProjectWorldSnapshotItem[] | undefined
   }
   saveAppStyling: { css: string }
   saveProjectStyling: { css: string }
@@ -122,15 +122,15 @@ export interface I_faActionPayloadMap {
     includeAppStyling: boolean
   }
   exportAppConfigSaveResult: {
-    errorMessage?: string
-    errorName?: string
-    filePath?: string
+    errorMessage?: string | undefined
+    errorName?: string | undefined
+    filePath?: string | undefined
     status: 'canceled' | 'error' | 'saved'
   }
   importAppConfigStageResult: {
-    errorCode?: string
-    errorMessage?: string
-    sessionId?: string
+    errorCode?: string | undefined
+    errorMessage?: string | undefined
+    sessionId?: string | undefined
     status: 'canceled' | 'fail' | 'pass'
   }
   importAppConfigApply: I_faAppConfigApplyInput
@@ -157,7 +157,7 @@ export interface I_faActionDefinition<Id extends T_faActionId> {
    * When 'true', repeated sync enqueues for this action while another instance is already pending or running are silently dropped.
    * Async actions ignore this flag.
    */
-  dedup?: boolean
+  dedup?: boolean | undefined
 }
 
 /**
@@ -199,20 +199,20 @@ export interface I_faActionHistoryEntry {
   id: T_faActionId
   kind: T_faActionKind
   status: T_faActionHistoryStatus
-  payloadPreview?: string
+  payloadPreview?: string | undefined
   enqueuedAt: number
-  startedAt?: number
-  finishedAt?: number
-  errorMessage?: string
+  startedAt?: number | undefined
+  finishedAt?: number | undefined
+  errorMessage?: string | undefined
 }
 
 /** Partial status fields applied to an existing action history row. */
 export interface I_faActionHistoryEntryStatusPatch {
-  errorMessage?: string
-  finishedAt?: number
-  payloadPreview?: string
-  startedAt?: number
-  status?: T_faActionHistoryStatus
+  errorMessage?: string | undefined
+  finishedAt?: number | undefined
+  payloadPreview?: string | undefined
+  startedAt?: number | undefined
+  status?: T_faActionHistoryStatus | undefined
 }
 
 /** Terminal outcome recorded when an action history row completes. */

@@ -105,9 +105,9 @@ export interface I_faWindowControlAPI {
 export interface I_extraEnvVariablesAPI {
 
   /**
-   * Full path to "electron-main.js" file in the dist, unpackaged form
+   * Full path to "electron-main.js" file in the dist, unpackaged form; null in packaged builds.
    */
-  ELECTRON_MAIN_FILEPATH: string
+  ELECTRON_MAIN_FILEPATH: string | null
 
   /**
    * Extra render timer buffer for tests to start after loading the app.
@@ -122,18 +122,18 @@ export interface I_extraEnvVariablesAPI {
    * - 'components'
    * - 'e2e'
    */
-  TEST_ENV?: string | false
+  TEST_ENV?: string | false | undefined
 
   /**
    * Name of the component being tested.
    * - MUST match the file name of the vue file being tested (including the capital letter at the start).
    */
-  COMPONENT_NAME?: string | false
+  COMPONENT_NAME?: string | false | undefined
 
   /**
    * Component props, assuming they have any (parsed JSON from COMPONENT_PROPS env in main).
    */
-  COMPONENT_PROPS?: Record<string, unknown> | false
+  COMPONENT_PROPS?: Record<string, unknown> | false | undefined
 
 }
 

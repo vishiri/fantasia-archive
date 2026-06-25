@@ -103,6 +103,7 @@ defineOptions({
 })
 
 const props = withDefaults(
+  /* eslint-disable vue/require-default-prop -- exactOptionalPropertyTypes: omit undefined from withDefaults */
   defineProps<{
     color?: string
     dark?: boolean
@@ -110,16 +111,14 @@ const props = withDefaults(
     dense?: boolean
     modelValue: string
     palette?: T_faColorPickerInputPalette
-    paletteAppend?: I_faColorPickerPaletteAppendConfig
+    paletteAppend?: I_faColorPickerPaletteAppendConfig | undefined
     testLocator: string
   }>(),
   {
     color: 'primary-bright',
     dark: true,
     defaultHex: FA_COLOR_PICKER_INPUT_DEFAULT_HEX,
-    dense: true,
-    palette: undefined,
-    paletteAppend: undefined
+    dense: true
   }
 )
 

@@ -11,6 +11,19 @@ import type {
   I_faLocaleTranslationsInputSingularPluralComposableApi
 } from 'app/types/I_faLocaleTranslationsInputComposable'
 
+function assignDefinedOptionalFields<T extends Record<string, unknown>> (
+  target: T,
+  source: Partial<T>
+): void {
+  for (const key of Object.keys(source) as Array<keyof T>) {
+    const value = source[key]
+
+    if (value !== undefined) {
+      target[key] = value
+    }
+  }
+}
+
 export function buildFaLocaleTranslationsInputMenuPanelBindings (params: {
   activeComposable: T_faLocaleTranslationsInputActiveComposableApi
   isSingularPluralForms: boolean
@@ -25,21 +38,40 @@ export function buildFaLocaleTranslationsInputMenuPanelBindings (params: {
     isMultilineInput: params.activeComposable.isMultilineInput.value,
     isSingularPluralMode: params.isSingularPluralForms,
     localeRows: params.activeComposable.localeRows.value,
-    maxLength: params.props.maxLength,
-    pinnedAsideLabel: params.props.menuPinnedAsideLabel,
-    pinnedAsideTestLocator: params.props.menuPinnedAsideTestLocator,
-    pinnedAsideTooltip: params.props.menuPinnedAsideTooltip,
-    pinnedAsideValue: params.props.menuPinnedAsideValue,
     pluralColumnLabel: params.pluralColumnLabel,
     rows: params.resolvedTextareaRows,
     setPreferredLanguageInputRef: params.setPreferredLanguageInputRef,
     singularColumnLabel: params.singularColumnLabel,
     testLocator: params.props.testLocator
-  }
+  } satisfies Omit<
+    I_faLocaleTranslationsInputMenuPanelBindings,
+    | 'maxLength'
+    | 'pinnedAsideLabel'
+    | 'pinnedAsideTestLocator'
+    | 'pinnedAsideTooltip'
+    | 'pinnedAsideValue'
+    | 'readLocaleValue'
+    | 'readPluralLocaleValue'
+    | 'readSingularLocaleValue'
+    | 'updateLocaleValue'
+    | 'updatePluralLocaleValue'
+    | 'updateSingularLocaleValue'
+  >
+
+  const optionalBindings: Partial<I_faLocaleTranslationsInputMenuPanelBindings> = {}
+  assignDefinedOptionalFields(optionalBindings, {
+    maxLength: params.props.maxLength,
+    pinnedAsideLabel: params.props.menuPinnedAsideLabel,
+    pinnedAsideTestLocator: params.props.menuPinnedAsideTestLocator,
+    pinnedAsideTooltip: params.props.menuPinnedAsideTooltip,
+    pinnedAsideValue: params.props.menuPinnedAsideValue
+  })
+
   if (params.isSingularPluralForms) {
     const singularPluralComposable = params.activeComposable as I_faLocaleTranslationsInputSingularPluralComposableApi
     return {
       ...baseBindings,
+      ...optionalBindings,
       readLocaleValue: () => '',
       readPluralLocaleValue: singularPluralComposable.readPluralLocaleValue,
       readSingularLocaleValue: singularPluralComposable.readSingularLocaleValue,
@@ -51,6 +83,7 @@ export function buildFaLocaleTranslationsInputMenuPanelBindings (params: {
   const singleComposable = params.activeComposable as I_faLocaleTranslationsInputComposableApi
   return {
     ...baseBindings,
+    ...optionalBindings,
     readLocaleValue: singleComposable.readLocaleValue,
     updateLocaleValue: singleComposable.updateLocaleValue
   }
@@ -73,7 +106,6 @@ export function buildFaLocaleTranslationsInputSummaryFieldBindings (params: {
     dark: params.props.dark ?? true,
     dense: params.props.dense ?? true,
     error: params.props.error ?? false,
-    errorMessage: params.props.errorMessage,
     fallbackWarningTooltip: params.fallbackWarningTooltip,
     hideBottomSpace: params.props.hideBottomSpace ?? true,
     isMenuPresentationLocked: params.activeComposable.isMenuPresentationLocked.value,
@@ -81,12 +113,7 @@ export function buildFaLocaleTranslationsInputSummaryFieldBindings (params: {
     isSingularPluralMode: params.isSingularPluralForms,
     localeRows: params.activeComposable.localeRows.value,
     lockedMenuContentStyle: params.activeComposable.lockedMenuContentStyle.value,
-    maxLength: params.props.maxLength,
     menuOffset: params.activeComposable.menuOffset,
-    menuPinnedAsideLabel: params.props.menuPinnedAsideLabel,
-    menuPinnedAsideTestLocator: params.props.menuPinnedAsideTestLocator,
-    menuPinnedAsideTooltip: params.props.menuPinnedAsideTooltip,
-    menuPinnedAsideValue: params.props.menuPinnedAsideValue,
     menuTarget: params.activeComposable.menuTarget.value,
     onTranslationsMenuBeforeShow: params.activeComposable.onTranslationsMenuBeforeShow,
     onTranslationsMenuHide: params.activeComposable.onTranslationsMenuHide,
@@ -101,11 +128,37 @@ export function buildFaLocaleTranslationsInputSummaryFieldBindings (params: {
     singularColumnLabel: params.singularColumnLabel,
     testLocator: params.props.testLocator,
     translateButtonTooltip: params.translateButtonTooltip
-  }
+  } satisfies Omit<
+    I_faLocaleTranslationsInputSummaryFieldBindings,
+    | 'errorMessage'
+    | 'maxLength'
+    | 'menuPinnedAsideLabel'
+    | 'menuPinnedAsideTestLocator'
+    | 'menuPinnedAsideTooltip'
+    | 'menuPinnedAsideValue'
+    | 'readLocaleValue'
+    | 'readPluralLocaleValue'
+    | 'readSingularLocaleValue'
+    | 'updateLocaleValue'
+    | 'updatePluralLocaleValue'
+    | 'updateSingularLocaleValue'
+  >
+
+  const optionalBindings: Partial<I_faLocaleTranslationsInputSummaryFieldBindings> = {}
+  assignDefinedOptionalFields(optionalBindings, {
+    errorMessage: params.props.errorMessage,
+    maxLength: params.props.maxLength,
+    menuPinnedAsideLabel: params.props.menuPinnedAsideLabel,
+    menuPinnedAsideTestLocator: params.props.menuPinnedAsideTestLocator,
+    menuPinnedAsideTooltip: params.props.menuPinnedAsideTooltip,
+    menuPinnedAsideValue: params.props.menuPinnedAsideValue
+  })
+
   if (params.isSingularPluralForms) {
     const singularPluralComposable = params.activeComposable as I_faLocaleTranslationsInputSingularPluralComposableApi
     return {
       ...baseBindings,
+      ...optionalBindings,
       readLocaleValue: () => '',
       readPluralLocaleValue: singularPluralComposable.readPluralLocaleValue,
       readSingularLocaleValue: singularPluralComposable.readSingularLocaleValue,
@@ -117,6 +170,7 @@ export function buildFaLocaleTranslationsInputSummaryFieldBindings (params: {
   const singleComposable = params.activeComposable as I_faLocaleTranslationsInputComposableApi
   return {
     ...baseBindings,
+    ...optionalBindings,
     readLocaleValue: singleComposable.readLocaleValue,
     updateLocaleValue: singleComposable.updateLocaleValue
   }

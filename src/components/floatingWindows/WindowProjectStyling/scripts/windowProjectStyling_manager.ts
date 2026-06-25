@@ -6,7 +6,6 @@ import {
   ref,
   watch
 } from 'vue'
-import { Result } from 'neverthrow'
 import debounce from 'lodash-es/debounce.js'
 
 import {
@@ -25,6 +24,24 @@ import {
 import * as dialogStoreModule from 'src/stores/S_Dialog'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
+import { createWindowStylingFrame } from 'app/src/components/floatingWindows/_sharedWindowStyling/scripts/functions/createWindowStylingFrame'
+import { createWindowStylingColorPanel } from 'app/src/components/floatingWindows/_sharedWindowStyling/scripts/functions/windowStylingColorPanel'
+import { createWindowStylingFrameLifecycle } from 'app/src/components/floatingWindows/_sharedWindowStyling/scripts/functions/windowStylingFrameLifecycle'
+import { createWindowProjectStylingUse } from 'app/src/components/floatingWindows/_sharedWindowStyling/scripts/functions/windowStylingProjectState'
+import { createWindowStylingEditorSession } from 'app/src/components/floatingWindows/_sharedWindowStyling/scripts/functions/windowStylingEditorSession'
+import { createWireWindowStylingSession } from 'app/src/components/floatingWindows/_sharedWindowStyling/scripts/functions/windowStylingSessionWiring'
+import {
+  createClearProjectStylingLivePreviewAndRefreshFromKv,
+  createRefreshPersistedProjectStylingAndCloseWindow,
+  createRegisterProjectStylingActiveProjectWatch,
+  createWindowProjectStylingCssPersist
+} from 'app/src/components/floatingWindows/_sharedWindowStyling/scripts/functions/windowStylingProjectPersist'
+import {
+  createReadFaDialogComponentStoreOrNull,
+  createWatchStylingEditorCssLivePreview,
+  createWireStylingPersistedCssIntoOpenEditor,
+  createWireStylingWindowOpenFromMenuAndProps
+} from 'app/src/components/floatingWindows/_sharedWindowStyling/scripts/functions/windowStylingPersistEffects'
 
 import {
   getMonacoKeybindHelpItems,
@@ -33,61 +50,149 @@ import {
 } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStyling_manager'
 import { buildFaColorVarSwatchStyle } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/functions/faColorVarSwatchStyle'
 import { reconcileMountedMonacoWithWorkingCss } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/functions/windowStylingMonacoReconcile'
-import { createWindowProjectStyling } from './functions/createWindowProjectStyling'
+import {
+  createUseWindowProjectStylingSurface,
+  createWindowProjectStylingFramePersist,
+  createGetFaProjectStylingStore
+} from './functions/windowProjectStylingSurfaceWiring'
+import {
+  createRegisterProjectStylingUnmount,
+  createWatchProjectStylingEditorCssLivePreview,
+  createWireProjectStylingWindowOpenFromMenuAndProps
+} from './functions/windowProjectStylingWiring'
 
-const windowProjectStylingApi = createWindowProjectStyling({
-  FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
-  FA_FLOATING_WINDOW_POP_TRANSITION_MS,
-  FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS,
-  Result,
-  S_DialogComponent: () => dialogStoreModule.S_DialogComponent(),
-  buildFaColorVarSwatchStyle,
-  computed,
-  createDebounced: debounce,
-  getFaActiveProjectStore: () => S_FaActiveProject(),
-  getFaColorCustomPropertyNamesForHelpPanel: () =>
-    faThemeModule.getFaColorCustomPropertyNamesForHelpPanel(),
-  getFaProjectStylingStore: () => S_FaProjectStyling() as import('app/types/I_faStylingWindowStoreFacade').I_faProjectStylingStylingWindowStore,
-  getMonacoKeybindHelpItems,
-  nextTick,
-  onBeforeUnmount,
+const getFaProjectStylingStore = createGetFaProjectStylingStore({
+  getStore: () => S_FaProjectStyling() as import('app/types/I_faStylingWindowStoreFacade').I_faProjectStylingStylingWindowStore
+})
+
+const readFaDialogComponentStoreOrNull = createReadFaDialogComponentStoreOrNull({
+  S_DialogComponent: () => dialogStoreModule.S_DialogComponent()
+})
+
+const watchStylingEditorCssLivePreview = createWatchStylingEditorCssLivePreview({ watch })
+
+const wireStylingPersistedCssIntoOpenEditor = createWireStylingPersistedCssIntoOpenEditor({ watch })
+
+const wireStylingWindowOpenFromMenuAndProps = createWireStylingWindowOpenFromMenuAndProps({
   onMounted,
-  reconcileMountedMonacoWithWorkingCss,
-  ref,
-  runFaAction,
-  runFaActionAwait,
-  scheduleFaFloatingWindowDelayedHide,
-  useFaFloatingWindowFrame,
-  useFaFloatingWindowFramePersist,
-  useMonacoMount,
-  useWindowAppStylingHelpMenu,
+  readFaDialogComponentStoreOrNull,
   watch
 })
 
-export const readFaDialogComponentStoreOrNull = windowProjectStylingApi.readFaDialogComponentStoreOrNull
+const frameLifecycleApi = createWindowStylingFrameLifecycle({
+  FA_QUASAR_DIALOG_STANDARD_TRANSITION_MS,
+  nextTick,
+  onBeforeUnmount,
+  scheduleFaFloatingWindowDelayedHide,
+  watch
+})
 
-export const watchProjectStylingEditorCssLivePreview = windowProjectStylingApi.watchProjectStylingEditorCssLivePreview
+const clearProjectStylingLivePreviewAndRefreshFromKv = createClearProjectStylingLivePreviewAndRefreshFromKv({
+  getFaProjectStylingStore
+})
 
-export const wireProjectStylingPersistedCssIntoOpenEditor = windowProjectStylingApi.wireProjectStylingPersistedCssIntoOpenEditor
+const refreshPersistedProjectStylingAndCloseWindow = createRefreshPersistedProjectStylingAndCloseWindow({
+  getFaProjectStylingStore
+})
 
-export const refreshPersistedProjectStylingAndCloseWindow = windowProjectStylingApi.refreshPersistedProjectStylingAndCloseWindow
+const useWindowProjectStylingCssPersist = createWindowProjectStylingCssPersist({
+  createDebounced: debounce,
+  getFaProjectStylingStore,
+  runFaAction,
+  watch
+})
 
-export const clearProjectStylingLivePreviewAndRefreshFromKv = windowProjectStylingApi.clearProjectStylingLivePreviewAndRefreshFromKv
+const useWindowProjectStylingFramePersist = createWindowProjectStylingFramePersist({
+  getFaProjectStylingStore,
+  useFaFloatingWindowFramePersist
+})
 
-export const wireProjectStylingWindowOpenFromMenuAndProps = windowProjectStylingApi.wireProjectStylingWindowOpenFromMenuAndProps
+const colorPanelApi = createWindowStylingColorPanel({
+  computed,
+  getFaColorCustomPropertyNamesForHelpPanel: () =>
+    faThemeModule.getFaColorCustomPropertyNamesForHelpPanel(),
+  getMonacoKeybindHelpItems,
+  nextTick,
+  ref,
+  watch
+})
 
-export const registerProjectStylingWindowModelWatch = windowProjectStylingApi.registerProjectStylingWindowModelWatch
+const stylingFrameApi = createWindowStylingFrame({
+  FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
+  FA_FLOATING_WINDOW_POP_TRANSITION_MS,
+  buildFaColorVarSwatchStyle,
+  computed,
+  useFaFloatingWindowFrame,
+  useWindowStylingFramePersist: useWindowProjectStylingFramePersist,
+  useWindowStylingHelpMenu: useWindowAppStylingHelpMenu,
+  useWindowStylingHelpPanel: colorPanelApi.useWindowStylingHelpPanel
+})
 
-export const registerProjectStylingUnmount = windowProjectStylingApi.registerProjectStylingUnmount
+const registerProjectStylingActiveProjectWatch = createRegisterProjectStylingActiveProjectWatch({
+  getFaActiveProjectStore: () => S_FaActiveProject(),
+  refreshPersistedProjectStylingAndCloseWindow,
+  watch
+})
 
-export const registerProjectStylingActiveProjectWatch = windowProjectStylingApi.registerProjectStylingActiveProjectWatch
+const useWindowProjectStyling = createWindowProjectStylingUse({
+  clearProjectStylingLivePreviewAndRefreshFromKv,
+  createWindowStylingEditorSession,
+  getFaProjectStylingStore,
+  reconcileMountedMonacoWithWorkingCss,
+  ref,
+  refreshPersistedProjectStylingAndCloseWindow,
+  registerProjectStylingActiveProjectWatch,
+  registerStylingUnmount: frameLifecycleApi.registerStylingUnmount,
+  registerStylingWindowModelWatch: frameLifecycleApi.registerStylingWindowModelWatch,
+  runFaActionAwait,
+  shouldSkipOpenWhenAlreadyVisible: true,
+  useMonacoMount,
+  watchStylingEditorCssLivePreview,
+  wireStylingPersistedCssIntoOpenEditor,
+  wireStylingWindowOpenFromMenuAndProps,
+  wireWindowStylingSession: createWireWindowStylingSession
+})
 
-export const useWindowProjectStyling = windowProjectStylingApi.useWindowProjectStyling
+const useWindowProjectStylingSurface = createUseWindowProjectStylingSurface({
+  getFaProjectStylingStore,
+  useWindowProjectStyling,
+  useWindowProjectStylingCssPersist,
+  useWindowStylingSurface: stylingFrameApi.useWindowStylingSurface
+})
 
-export const useWindowProjectStylingCssPersist = windowProjectStylingApi.useWindowProjectStylingCssPersist
+const watchProjectStylingEditorCssLivePreview = createWatchProjectStylingEditorCssLivePreview({
+  getFaProjectStylingStore,
+  watchStylingEditorCssLivePreview
+})
 
-export const useWindowProjectStylingFramePersist = windowProjectStylingApi.useWindowProjectStylingFramePersist
+const wireProjectStylingWindowOpenFromMenuAndProps = createWireProjectStylingWindowOpenFromMenuAndProps({
+  wireStylingWindowOpenFromMenuAndProps
+})
 
-export const useWindowProjectStylingHelpPanel = windowProjectStylingApi.useWindowProjectStylingHelpPanel
+const registerProjectStylingUnmount = createRegisterProjectStylingUnmount({
+  clearProjectStylingLivePreviewAndRefreshFromKv,
+  registerStylingUnmount: frameLifecycleApi.registerStylingUnmount
+})
 
-export const useWindowProjectStylingSurface = windowProjectStylingApi.useWindowProjectStylingSurface
+const registerProjectStylingWindowModelWatch = frameLifecycleApi.registerStylingWindowModelWatch
+
+const useWindowProjectStylingHelpPanel = colorPanelApi.useWindowStylingHelpPanel
+
+export {
+  readFaDialogComponentStoreOrNull,
+  watchProjectStylingEditorCssLivePreview,
+  wireStylingPersistedCssIntoOpenEditor as wireProjectStylingPersistedCssIntoOpenEditor,
+  refreshPersistedProjectStylingAndCloseWindow,
+  clearProjectStylingLivePreviewAndRefreshFromKv,
+  wireProjectStylingWindowOpenFromMenuAndProps,
+  registerProjectStylingWindowModelWatch,
+  registerProjectStylingUnmount,
+  registerProjectStylingActiveProjectWatch,
+  useWindowProjectStyling,
+  useWindowProjectStylingCssPersist,
+  useWindowProjectStylingFramePersist,
+  useWindowProjectStylingHelpPanel,
+  useWindowProjectStylingSurface
+}
+
+export { getMonacoKeybindHelpItems, useMonacoMount, useWindowAppStylingHelpMenu }

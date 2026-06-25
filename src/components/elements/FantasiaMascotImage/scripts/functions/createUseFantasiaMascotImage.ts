@@ -6,7 +6,7 @@ export function createUseFantasiaMascotImage (deps: {
     imageList: { [key: string]: string },
     isRandom: boolean,
     fantasiaImage: string
-  ) => string
+  ) => string | undefined
   fantasiaImageList: { [key: string]: string }
   fantasiaMascotImageIsRandom: (fantasiaImage: string) => boolean
   fantasiaMascotVariantName: (fantasiaImage: string) => string
@@ -19,7 +19,7 @@ export function createUseFantasiaMascotImage (deps: {
     height: string
     width: string
   }) => {
-    currentMascotImage: string
+    currentMascotImage: string | undefined
     fantasiaImage: I_ref<string>
     height: I_ref<string>
     isRandom: boolean

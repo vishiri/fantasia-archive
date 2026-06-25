@@ -59,7 +59,7 @@ test('Test that getFaRecentProjectListStore is a lazy singleton', async () => {
   const second = getFaRecentProjectListStore()
   expect(first).toBe(second)
   expect(ElectronStoreMock).toHaveBeenCalledTimes(1)
-  expect(ElectronStoreMock.mock.calls[0][0]).toMatchObject({ name: 'faRecentProjectList' })
+  expect(ElectronStoreMock.mock.calls[0]![0]!).toMatchObject({ name: 'faRecentProjectList' })
 })
 
 test('Test that getRecentProjectsSnapshot returns sanitized rows and persists repairs', async () => {
@@ -98,7 +98,7 @@ test('Test that recordRecentProjectEntry prepends and re-sanitizes', async () =>
     filePath: string
     name: string
   }>
-  expect(rows[0]).toEqual({
+  expect(rows[0]!).toEqual({
     filePath: 'D:\\new.faproject',
     name: 'New'
   })
@@ -239,5 +239,5 @@ test('Test that resolveRecentProjectMruHeadForOpen returns missing for absent MR
     filePath: string
   }>
   expect(rows.some((r) => r.filePath.includes('gone.faproject'))).toBe(false)
-  expect(rows[0]?.filePath).toContain('next.faproject')
+  expect(rows[0]!?.filePath).toContain('next.faproject')
 })

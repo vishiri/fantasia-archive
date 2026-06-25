@@ -44,6 +44,7 @@ afterEach(() => {
 
 beforeEach(() => {
   absoluteProject = path.join(os.tmpdir(), `fa-reconnect-${Date.now()}.faproject`)
+  fs.writeFileSync(absoluteProject, '')
   BetterSqlite3Mock.mockImplementation(function () {
     return {
       close: vi.fn(),

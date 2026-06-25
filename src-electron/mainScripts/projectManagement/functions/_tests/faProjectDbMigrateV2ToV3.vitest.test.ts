@@ -17,7 +17,7 @@ test('Test that migrateFaProjectSchemaV2ToV3 restores world_document_templates a
   migrateFaProjectSchemaV2ToV3(db as never)
 
   expect(exec).toHaveBeenCalledOnce()
-  const sql = exec.mock.calls[0][0] as string
+  const sql = exec.mock.calls[0]![0]! as string
   expect(sql).toContain('CREATE TABLE IF NOT EXISTS world_document_templates')
   expect(sql).toContain('idx_world_document_templates_document_template_id')
   expect(pragma).toHaveBeenCalledWith('user_version = 3')

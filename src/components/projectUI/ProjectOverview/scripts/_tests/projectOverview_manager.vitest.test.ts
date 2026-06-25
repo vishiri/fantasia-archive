@@ -33,11 +33,10 @@ beforeEach(() => {
  * Manager wiring exposes active project display name and loads a tip on mount.
  */
 test('Test that useProjectOverview from the manager reads Pinia and loads a tip', async () => {
-  S_FaActiveProject().$patch({
-    activeProject: {
-      name: 'Wired Project',
-      filePath: 'C:\\fixture.faproject'
-    }
+  S_FaActiveProject().setActiveProject({
+    name: 'Wired Project',
+    filePath: 'C:\\fixture.faproject',
+    id: 'fixture-id'
   })
 
   const Harness = defineComponent({

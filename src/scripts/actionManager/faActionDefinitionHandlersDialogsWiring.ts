@@ -47,4 +47,4 @@ export const faActionDefinitionHandlersDialogsDeps = {
   notifyFaProjectLoadedPositive,
   tipsTricksTriviaNotification,
   i18n
-} as unknown as I_createFaActionDefinitionHandlersDialogsDeps
+} satisfies I_createFaActionDefinitionHandlersDialogsDeps

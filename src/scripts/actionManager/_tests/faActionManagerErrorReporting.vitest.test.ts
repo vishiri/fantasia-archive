@@ -300,7 +300,7 @@ test('Test that reportFaActionFailure records the failure on the store when pres
   const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
   reportFaActionFailure(buildEntry('toggleDeveloperTools', { foo: 'bar' }), new Error('oops'))
   expect(recordFailure).toHaveBeenCalledOnce()
-  expect(recordFailure.mock.calls[0][0].payloadPreview).toBe('{"foo":"bar"}')
+  expect(recordFailure.mock.calls[0]![0]!.payloadPreview).toBe('{"foo":"bar"}')
   consoleSpy.mockRestore()
 })
 
@@ -317,7 +317,7 @@ test('Test that reportFaActionFailure keeps the full payload preview when loggin
   const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
   const bigPayload = { value: 'x'.repeat(500) }
   reportFaActionFailure(buildEntry('saveAppSettings', bigPayload), new Error('persist failed'))
-  const preview = recordFailure.mock.calls[0]?.[0]?.payloadPreview as string | undefined
+  const preview = recordFailure.mock.calls[0]!?.[0]!?.payloadPreview as string | undefined
   expect(preview?.endsWith('...')).toBe(false)
   expect((preview?.length ?? 0)).toBeGreaterThan(400)
   consoleSpy.mockRestore()

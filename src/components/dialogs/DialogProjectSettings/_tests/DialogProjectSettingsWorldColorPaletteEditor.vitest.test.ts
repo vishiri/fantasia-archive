@@ -71,7 +71,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteEditor emits palette updat
   expect(w.emitted('update:colorPallete')?.length).toBeGreaterThan(0)
 
   await w.find('.palette-swatch-stub').trigger('click')
-  expect(w.emitted('update:colorPallete')?.slice(-1)[0]?.[0]).toContain('#AABBCC')
+  expect(w.emitted('update:colorPallete')?.slice(-1)[0]?.[0]!).toContain('#AABBCC')
 })
 
 /**

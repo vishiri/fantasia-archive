@@ -103,7 +103,7 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabList filters template t
   const w = mount(DialogProjectSettingsDocumentTemplatesTabList, {
     props: {
       currentLanguageCode: 'en-US',
-      selectedTemplateId: templatesFilterFixture[0].id,
+      selectedTemplateId: templatesFilterFixture[0]!.id,
       templates: templatesFilterFixture
     },
     global: {
@@ -181,7 +181,7 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabList merges filtered dr
   const w = mount(DialogProjectSettingsDocumentTemplatesTabList, {
     props: {
       currentLanguageCode: 'en-US',
-      selectedTemplateId: templatesFilteredReorderFixture[0].id,
+      selectedTemplateId: templatesFilteredReorderFixture[0]!.id,
       templates: templatesFilteredReorderFixture
     },
     global: {
@@ -233,10 +233,10 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabList merges filtered dr
   await w.find('.templates-filter-stub').setValue('e')
   await w.find('[data-test-locator="emit-filtered-reorder"]').trigger('click')
 
-  expect(w.emitted('update:templates')?.[0]?.[0]).toEqual([
-    templatesFilteredReorderFixture[2],
-    templatesFilteredReorderFixture[1],
-    templatesFilteredReorderFixture[0]
+  expect(w.emitted('update:templates')?.[0]?.[0]!).toEqual([
+    templatesFilteredReorderFixture[2]!,
+    templatesFilteredReorderFixture[1]!,
+    templatesFilteredReorderFixture[0]!
   ])
 })
 
@@ -248,7 +248,7 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabList forwards add and s
   const w = mount(DialogProjectSettingsDocumentTemplatesTabList, {
     props: {
       currentLanguageCode: 'en-US',
-      selectedTemplateId: templatesFilterFixture[0].id,
+      selectedTemplateId: templatesFilterFixture[0]!.id,
       templates: templatesFilterFixture
     },
     global: {
@@ -280,10 +280,10 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabList forwards add and s
   expect(w.emitted('addTemplate')).toBeTruthy()
 
   await w.find('[data-test-locator="emit-select"]').trigger('click')
-  expect(w.emitted('select')?.[0]).toEqual([templatesFilterFixture[0].id])
+  expect(w.emitted('select')?.[0]!).toEqual([templatesFilterFixture[0]!.id])
 
   await w.setProps({ templates: [...templatesFilterFixture].reverse() })
-  expect(w.props('templates')[0]?.id).toBe(templatesFilterFixture[1].id)
+  expect(w.props('templates')[0]!?.id).toBe(templatesFilterFixture[1]!.id)
 })
 
 /**
@@ -294,7 +294,7 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabList handles unfiltered
   const w = mount(DialogProjectSettingsDocumentTemplatesTabList, {
     props: {
       currentLanguageCode: 'en-US',
-      selectedTemplateId: templatesFilterFixture[0].id,
+      selectedTemplateId: templatesFilterFixture[0]!.id,
       templates: templatesFilterFixture
     },
     global: {
@@ -319,7 +319,7 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabList handles unfiltered
           setup (_props, { emit }) {
             function emitDragStart (): void {
               const item = document.createElement('div')
-              item.setAttribute('data-test-template-id', templatesFilterFixture[0].id)
+              item.setAttribute('data-test-template-id', templatesFilterFixture[0]!.id)
               emit('start', { item })
             }
 
@@ -350,7 +350,7 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabList handles unfiltered
   )
 
   await w.find('[data-test-locator="emit-drag-end"]').trigger('click')
-  expect(w.emitted('update:templates')?.[0]?.[0]).toEqual([...templatesFilterFixture].reverse())
+  expect(w.emitted('update:templates')?.[0]?.[0]!).toEqual([...templatesFilterFixture].reverse())
 })
 
 /**

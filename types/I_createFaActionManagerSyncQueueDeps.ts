@@ -18,7 +18,7 @@ export type T_createFaActionManagerSyncQueueDeps = {
     uid: string,
     outcome: { kind: 'success' } | { kind: 'failed'; errorMessage: string },
     finishedAt: number,
-    failurePreview?: string
+    failurePreview?: string | undefined
   ) => void
   recordHistoryOverflowDrop: (entry: I_faActionQueueEntry, errorMessage: string) => void
   recordHistoryStarted: (uid: string, startedAt: number) => void
@@ -29,7 +29,7 @@ export type T_createFaActionManagerSyncQueueDeps = {
     setCurrent: (entry: I_faActionQueueEntry | null) => void
     popSync: () => I_faActionQueueEntry | null
     pushSync: (entry: I_faActionQueueEntry) => void
-    pendingSyncQueue: I_faActionQueueEntry[]
+    pendingSyncQueue: readonly I_faActionQueueEntry[]
     currentSyncAction: I_faActionQueueEntry | null
   } | null
 }

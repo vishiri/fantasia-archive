@@ -4,7 +4,7 @@ import { defineComponent } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { expect, test, vi } from 'vitest'
 
-import { FA_VERTICAL_DRAGGABLE_TABS_DOCUMENT_DRAGGING_BODY_CLASS } from 'app/src/scripts/faDragDrop/functions/faVerticalDraggableTabsDocumentDragCursor'
+import { FA_VERTICAL_DRAGGABLE_TABS_DOCUMENT_DRAGGING_BODY_CLASS } from 'app/src/scripts/faDragDrop/faDragDrop_manager'
 
 import DialogProjectSettingsWorldsTabList from '../DialogProjectSettingsWorldsTabList.vue'
 
@@ -31,7 +31,7 @@ test('Test that DialogProjectSettingsWorldsTabList renders add world and list ho
     props: {
       currentLanguageCode: 'en-US',
       documentTemplates: [],
-      selectedWorldId: worldsFixture[0].id,
+      selectedWorldId: worldsFixture[0]!.id,
       worlds: worldsFixture
     },
     global: {
@@ -68,7 +68,7 @@ test('Test that DialogProjectSettingsWorldsTabList forwards add world and reorde
     props: {
       currentLanguageCode: 'en-US',
       documentTemplates: [],
-      selectedWorldId: worldsFixture[0].id,
+      selectedWorldId: worldsFixture[0]!.id,
       worlds: worldsFixture
     },
     global: {
@@ -111,7 +111,7 @@ test('Test that DialogProjectSettingsWorldsTabList forwards add world and reorde
   expect(w.emitted('addWorld')).toBeTruthy()
 
   await w.find('[data-test-locator="emit-reorder"]').trigger('click')
-  expect(w.emitted('update:worlds')?.[0]?.[0]).toEqual([...worldsFixture].reverse())
+  expect(w.emitted('update:worlds')?.[0]?.[0]!).toEqual([...worldsFixture].reverse())
 })
 
 /**
@@ -123,7 +123,7 @@ test('Test that DialogProjectSettingsWorldsTabList tracks drag highlight state',
     props: {
       currentLanguageCode: 'en-US',
       documentTemplates: [],
-      selectedWorldId: worldsFixture[0].id,
+      selectedWorldId: worldsFixture[0]!.id,
       worlds: worldsFixture
     },
     global: {
@@ -147,7 +147,7 @@ test('Test that DialogProjectSettingsWorldsTabList tracks drag highlight state',
           setup (_props, { emit }) {
             function emitDragStart (): void {
               const item = document.createElement('div')
-              item.setAttribute('data-test-world-id', worldsFixture[0].id)
+              item.setAttribute('data-test-world-id', worldsFixture[0]!.id)
               emit('start', { item })
             }
 
@@ -204,7 +204,7 @@ test('Test that DialogProjectSettingsWorldsTabList forwards tab selection', asyn
     props: {
       currentLanguageCode: 'en-US',
       documentTemplates: [],
-      selectedWorldId: worldsFixture[0].id,
+      selectedWorldId: worldsFixture[0]!.id,
       worlds: worldsFixture
     },
     global: {
@@ -224,7 +224,7 @@ test('Test that DialogProjectSettingsWorldsTabList forwards tab selection', asyn
   })
 
   await w.find('[data-test-locator="dialogProjectSettings-worlds-tab"]').trigger('click')
-  expect(w.emitted('select')?.[0]).toEqual([worldsFixture[0].id])
+  expect(w.emitted('select')?.[0]!).toEqual([worldsFixture[0]!.id])
 })
 
 const worldsFilterFixture = [
@@ -261,7 +261,7 @@ test('Test that DialogProjectSettingsWorldsTabList filters world tabs by display
     props: {
       currentLanguageCode: 'en-US',
       documentTemplates: [],
-      selectedWorldId: worldsFilterFixture[0].id,
+      selectedWorldId: worldsFilterFixture[0]!.id,
       worlds: worldsFilterFixture
     },
     global: {
@@ -354,7 +354,7 @@ test('Test that DialogProjectSettingsWorldsTabList merges filtered drag reorder 
     props: {
       currentLanguageCode: 'en-US',
       documentTemplates: [],
-      selectedWorldId: worldsFilteredReorderFixture[0].id,
+      selectedWorldId: worldsFilteredReorderFixture[0]!.id,
       worlds: worldsFilteredReorderFixture
     },
     global: {
@@ -406,10 +406,10 @@ test('Test that DialogProjectSettingsWorldsTabList merges filtered drag reorder 
   await w.find('.worlds-filter-stub').setValue('a')
   await w.find('[data-test-locator="emit-filtered-reorder"]').trigger('click')
 
-  expect(w.emitted('update:worlds')?.[0]?.[0]).toEqual([
-    worldsFilteredReorderFixture[2],
-    worldsFilteredReorderFixture[1],
-    worldsFilteredReorderFixture[0]
+  expect(w.emitted('update:worlds')?.[0]?.[0]!).toEqual([
+    worldsFilteredReorderFixture[2]!,
+    worldsFilteredReorderFixture[1]!,
+    worldsFilteredReorderFixture[0]!
   ])
 })
 
@@ -422,7 +422,7 @@ test('Test that DialogProjectSettingsWorldsTabList resyncs when worlds prop chan
     props: {
       currentLanguageCode: 'en-US',
       documentTemplates: [],
-      selectedWorldId: worldsFilterFixture[0].id,
+      selectedWorldId: worldsFilterFixture[0]!.id,
       worlds: worldsFilterFixture
     },
     global: {
@@ -442,7 +442,7 @@ test('Test that DialogProjectSettingsWorldsTabList resyncs when worlds prop chan
   })
 
   await w.setProps({ worlds: [...worldsFilterFixture].reverse() })
-  expect(w.props('worlds')[0]?.id).toBe(worldsFilterFixture[1].id)
+  expect(w.props('worlds')[0]!?.id).toBe(worldsFilterFixture[1]!.id)
 })
 
 /**
@@ -457,9 +457,9 @@ test('Test that DialogProjectSettingsWorldsTabList scrolls when worlds append', 
     return 1
   })
 
-  const firstWorld = worldsFixture[0]
+  const firstWorld = worldsFixture[0]!
   const secondWorld = {
-    ...worldsFixture[0],
+    ...worldsFixture[0]!,
     displayNameTranslations: { 'en-US': 'Second Realm' },
     id: '550e8400-e29b-41d4-a716-446655440099'
   }

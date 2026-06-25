@@ -40,7 +40,7 @@ test('Test that qmarkdown boot installs the QMarkdown plugin on the app', () => 
   } as never)
 
   expect(appUseMock).toHaveBeenCalledOnce()
-  expect(appUseMock.mock.calls[0][0]).toMatchObject({
+  expect(appUseMock.mock.calls[0]![0]!).toMatchObject({
     install: vuePluginInstallMock
   })
 })

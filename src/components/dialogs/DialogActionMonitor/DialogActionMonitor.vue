@@ -88,7 +88,7 @@ const props = defineProps<{
   /**
    * Component-test / Storybook hook that opens the dialog without going through the Pinia dialog store.
    */
-  directInput?: T_dialogName
+  directInput?: T_dialogName | undefined
   /**
    * Optional pre-built snapshot; when present the table renders these rows instead of calling 'snapshotActionHistory'.
    */

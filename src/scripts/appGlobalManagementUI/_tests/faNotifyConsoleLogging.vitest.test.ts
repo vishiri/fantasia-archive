@@ -1,6 +1,6 @@
 import { beforeEach, expect, test, vi } from 'vitest'
 
-import type { Notify } from 'quasar'
+import type { I_faNotifyLike } from 'app/types/I_faNotifyConsoleLogging'
 
 beforeEach(() => {
   vi.resetModules()
@@ -238,9 +238,9 @@ test('Test that installFaNotifyConsoleLogging does not double-wrap Notify.create
   const originalCreate = vi.fn(() => (): void => {})
   const notify = { create: originalCreate }
   const { installFaNotifyConsoleLogging } = await import('../faNotifyConsoleLogging_manager')
-  installFaNotifyConsoleLogging(notify as unknown as Notify)
+  installFaNotifyConsoleLogging(notify as I_faNotifyLike)
   const wrapped = notify.create
-  installFaNotifyConsoleLogging(notify as unknown as Notify)
+  installFaNotifyConsoleLogging(notify as I_faNotifyLike)
   expect(notify.create).toBe(wrapped)
 })
 
@@ -258,8 +258,8 @@ test('Test that installFaNotifyConsoleLogging does not mutate a second notify ob
     create: inner2
   }
   const { installFaNotifyConsoleLogging } = await import('../faNotifyConsoleLogging_manager')
-  installFaNotifyConsoleLogging(n1 as unknown as Notify)
-  installFaNotifyConsoleLogging(n2 as unknown as Notify)
+  installFaNotifyConsoleLogging(n1 as I_faNotifyLike)
+  installFaNotifyConsoleLogging(n2 as I_faNotifyLike)
   expect(n2.create).toBe(inner2)
 })
 
@@ -272,8 +272,10 @@ test('Test that installFaNotifyConsoleLogging logs then calls the original notif
   const originalCreate = vi.fn(() => (): void => {})
   const notify = { create: originalCreate }
   const { installFaNotifyConsoleLogging } = await import('../faNotifyConsoleLogging_manager')
-  installFaNotifyConsoleLogging(notify as unknown as Notify)
-  const callCreate = notify.create as (opts: Parameters<Notify['create']>[0]) => ReturnType<Notify['create']>
+  installFaNotifyConsoleLogging(notify as I_faNotifyLike)
+  const callCreate = notify.create as (
+    opts: Parameters<I_faNotifyLike['create']>[0]
+  ) => ReturnType<I_faNotifyLike['create']>
   callCreate({
     message: 'toast',
     type: 'positive'
@@ -301,8 +303,10 @@ test('Test that installFaNotifyConsoleLogging honors faSkipNotifyConsoleLog', as
   const originalCreate = vi.fn(() => (): void => {})
   const notify = { create: originalCreate }
   const { installFaNotifyConsoleLogging } = await import('../faNotifyConsoleLogging_manager')
-  installFaNotifyConsoleLogging(notify as unknown as Notify)
-  const callCreate = notify.create as (opts: Parameters<Notify['create']>[0]) => ReturnType<Notify['create']>
+  installFaNotifyConsoleLogging(notify as I_faNotifyLike)
+  const callCreate = notify.create as (
+    opts: Parameters<I_faNotifyLike['create']>[0]
+  ) => ReturnType<I_faNotifyLike['create']>
   callCreate({
     faSkipNotifyConsoleLog: true,
     message: 'hidden',

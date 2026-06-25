@@ -104,7 +104,7 @@ test('Test that mountInto creates a Monaco editor and forwards content changes',
   await handle.mountInto(host, 'a { color: red; }')
 
   expect(monacoEditorCreateMock).toHaveBeenCalledTimes(1)
-  expect(monacoEditorCreateMock.mock.calls[0]?.[0]).toBe(host)
+  expect(monacoEditorCreateMock.mock.calls[0]!?.[0]!).toBe(host)
   expect(handle.editor.value).not.toBeNull()
   expect(handle.isLoading.value).toBe(false)
   expect(handle.loadError.value).toBeNull()

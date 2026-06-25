@@ -47,7 +47,7 @@ test('faAppStylingAPI setAppStyling invokes IPC set channel with cloned patch', 
   await faAppStylingAPI.setAppStyling(patch)
 
   expect(invokeMock).toHaveBeenCalledTimes(1)
-  const [channel, sentPatch] = invokeMock.mock.calls[0] as [string, { css: string }]
+  const [channel, sentPatch] = invokeMock.mock.calls[0]! as [string, { css: string }]
   expect(channel).toBe(FA_APP_STYLING_IPC.setAsync)
   expect(sentPatch).toEqual(patch)
   expect(sentPatch).not.toBe(patch)

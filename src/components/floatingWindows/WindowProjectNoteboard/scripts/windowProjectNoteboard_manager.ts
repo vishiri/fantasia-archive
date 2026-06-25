@@ -9,30 +9,39 @@ import {
   useFaFloatingWindowTextPersist
 } from 'app/src/scripts/floatingWindows/floatingWindows_manager'
 import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/keybinds_manager'
+import { createWindowNoteboard } from 'app/src/components/floatingWindows/_sharedWindowNoteboard/scripts/windowNoteboard_manager'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
 
-import { createWindowProjectNoteboard } from './functions/createWindowProjectNoteboard'
-
-const windowProjectNoteboardApi = createWindowProjectNoteboard({
+const windowProjectNoteboardApi = createWindowNoteboard({
   FA_FLOATING_WINDOW_POP_TRANSITION_BINDINGS,
   FA_FLOATING_WINDOW_POP_TRANSITION_MS,
   computed,
   formatFaKeybindCommandLabelFromSnapshot,
   getFaKeybindsStore: () => S_FaKeybinds(),
-  getFaProjectNoteboardStore: () => S_FaProjectNoteboard(),
+  getNoteboardStore: () => S_FaProjectNoteboard(),
   onMounted,
   storeToRefs,
   useFaFloatingWindowFrame,
   useFaFloatingWindowFramePersist,
   useFaFloatingWindowTextPersist,
+  variant: {
+    directInputDialogName: 'WindowProjectNoteboard',
+    documentNameClass: 'WindowProjectNoteboard',
+    floatingWindowZLayer: 'projectNoteboard',
+    persistFrameSilent: async (frame) => {
+      await S_FaProjectNoteboard().persistProjectNoteboardPartialSilent({ frame })
+    },
+    saveFailureActionId: 'reportProjectNoteboardSaveFailure',
+    toggleKeybindCommandId: 'toggleProjectNoteboard'
+  },
   watch
 })
 
-export const wireWindowProjectNoteboardDirectInput = windowProjectNoteboardApi.wireWindowProjectNoteboardDirectInput
+export const wireWindowProjectNoteboardDirectInput = windowProjectNoteboardApi.wireWindowNoteboardDirectInput
 
-export const useWindowProjectNoteboardFramePersist = windowProjectNoteboardApi.useWindowProjectNoteboardFramePersist
+export const useWindowProjectNoteboardFramePersist = windowProjectNoteboardApi.useWindowNoteboardFramePersist
 
-export const useWindowProjectNoteboardTextPersist = windowProjectNoteboardApi.useWindowProjectNoteboardTextPersist
+export const useWindowProjectNoteboardTextPersist = windowProjectNoteboardApi.useWindowNoteboardTextPersist
 
-export const useWindowProjectNoteboard = windowProjectNoteboardApi.useWindowProjectNoteboard
+export const useWindowProjectNoteboard = windowProjectNoteboardApi.useWindowNoteboard

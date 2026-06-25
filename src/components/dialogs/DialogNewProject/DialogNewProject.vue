@@ -74,7 +74,7 @@ defineOptions({
 })
 
 const props = defineProps<{
-  directInput?: T_dialogName
+  directInput?: T_dialogName | undefined
 }>()
 
 const {

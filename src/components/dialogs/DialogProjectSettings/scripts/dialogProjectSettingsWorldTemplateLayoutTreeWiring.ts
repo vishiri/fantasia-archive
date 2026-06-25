@@ -3,7 +3,7 @@ import type { Ref } from 'vue'
 import {
   applyFaVerticalDraggableTabsDocumentDragCursor,
   clearFaVerticalDraggableTabsDocumentDragCursor
-} from 'app/src/scripts/faDragDrop/functions/faVerticalDraggableTabsDocumentDragCursor'
+} from 'app/src/scripts/faDragDrop/faDragDrop_manager'
 import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/types/I_dialogProjectSettingsWorlds'
 import type { I_dialogProjectSettingsWorldTemplateLayoutTreeWiringApi } from 'app/types/I_dialogProjectSettingsWorldTemplateLayoutTreeWiring'
 

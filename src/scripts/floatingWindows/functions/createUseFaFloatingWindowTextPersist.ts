@@ -13,7 +13,7 @@ export function createUseFaFloatingWindowTextPersist (deps: {
     options?: { immediate?: boolean }
   ) => void
 }): (opts: {
-    debounceMs?: number
+    debounceMs?: number | undefined
     failureActionId: T_faActionId
     persistText: () => Promise<void>
     text: I_ref<string>

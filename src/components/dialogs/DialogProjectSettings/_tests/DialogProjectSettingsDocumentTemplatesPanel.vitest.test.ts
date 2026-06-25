@@ -199,7 +199,7 @@ test('Test that DialogProjectSettingsDocumentTemplatesPanel forwards update temp
   const w = mount(DialogProjectSettingsDocumentTemplatesPanel, {
     props: {
       currentLanguageCode: 'en-US',
-      templates: [templateA, reordered[0]]
+      templates: [templateA, reordered[0]!]
     },
     global: {
       mocks: {
@@ -291,13 +291,13 @@ test('Test that DialogProjectSettingsDocumentTemplatesPanel forwards detail and 
   expect(w.emitted('addTemplate')).toBeTruthy()
 
   await w.find('[data-test-locator="emit-remove"]').trigger('click')
-  expect(w.emitted('removeTemplate')?.[0]).toEqual([templateA.id])
+  expect(w.emitted('removeTemplate')?.[0]!).toEqual([templateA.id])
 
   await w.find('[data-test-locator="emit-icon"]').trigger('click')
-  expect(w.emitted('updateTemplateIcon')?.[0]).toEqual([templateA.id, 'mdi-pencil'])
+  expect(w.emitted('updateTemplateIcon')?.[0]!).toEqual([templateA.id, 'mdi-pencil'])
 
   await w.find('[data-test-locator="emit-title"]').trigger('click')
-  expect(w.emitted('updateTemplateTitleTranslations')?.[0]).toEqual([
+  expect(w.emitted('updateTemplateTitleTranslations')?.[0]!).toEqual([
     templateA.id,
     {
       plural: { 'en-US': 'Hero' },
@@ -306,7 +306,7 @@ test('Test that DialogProjectSettingsDocumentTemplatesPanel forwards detail and 
   ])
 
   await w.find('[data-test-locator="emit-appendix"]').trigger('click')
-  expect(w.emitted('updateTemplateWorldAppendixTranslations')?.[0]).toEqual([
+  expect(w.emitted('updateTemplateWorldAppendixTranslations')?.[0]!).toEqual([
     templateA.id,
     { 'en-US': 'Notes' }
   ])

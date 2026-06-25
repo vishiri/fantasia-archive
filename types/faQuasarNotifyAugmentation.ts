@@ -7,7 +7,7 @@ declare module 'quasar' {
     /**
      * Skip the boot-time console mirror when this notification is paired with a caller-owned console line.
      */
-    faSkipNotifyConsoleLog?: boolean
+    faSkipNotifyConsoleLog?: boolean | undefined
   }
 }
 

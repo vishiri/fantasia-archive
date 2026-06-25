@@ -394,7 +394,7 @@ test('Test that WindowAppStyling help menu opens after hover delay and closes vi
   expect(menu.props('modelValue')).toBe(true)
 
   await menu.find('.window-app-styling-q-menu-close').trigger('click')
-  expect(menu.emitted('update:modelValue')?.some((row) => row[0] === false)).toBe(true)
+  expect(menu.emitted('update:modelValue')?.some((row) => row[0]! === false)).toBe(true)
 
   w.unmount()
   vi.useRealTimers()

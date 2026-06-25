@@ -123,7 +123,7 @@ test('directInput watcher does not call openDialog for a different dialog name',
   const openDialog = vi.fn()
   const appSettingsTree = ref<T_appSettingsRenderTree>({})
   const selectedCategoryTab = ref('')
-  const props = reactive<{ directInput?: T_dialogName }>({})
+  const props = reactive<{ directInput?: T_dialogName | undefined }>({})
 
   registerDialogAppSettingsWatchers({
     openDialog,
@@ -154,7 +154,7 @@ test('directInput watcher ignores empty string directInput', async () => {
   const openDialog = vi.fn()
   const appSettingsTree = ref<T_appSettingsRenderTree>({})
   const selectedCategoryTab = ref('')
-  const props = reactive<{ directInput?: T_dialogName }>({})
+  const props = reactive<{ directInput?: T_dialogName | undefined }>({})
 
   registerDialogAppSettingsWatchers({
     openDialog,

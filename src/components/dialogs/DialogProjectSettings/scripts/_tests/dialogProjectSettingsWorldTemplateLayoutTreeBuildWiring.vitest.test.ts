@@ -34,8 +34,8 @@ test('Test that tree build wiring resolves placement labels from nickname transl
   }
 
   const nodes = buildHeTreeNodesFromWorldTemplateLayoutDraft(layout, 'en-US')
-  expect(nodes[0]?.label).toBe('Creatures')
-  expect(nodes[1]?.label).toBe('Hero')
+  expect(nodes[0]!?.label).toBe('Creatures')
+  expect(nodes[1]!?.label).toBe('Hero')
   expect(resolveDialogProjectSettingsWorldTemplatePlacementUsesNickname({
     languageCode: 'en-US',
     nicknamePluralTranslations: { 'en-US': 'Hero' },

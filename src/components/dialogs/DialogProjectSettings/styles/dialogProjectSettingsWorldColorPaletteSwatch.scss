@@ -1,0 +1,33 @@
+.dialogProjectSettingsWorldColorPaletteSwatch {
+  box-sizing: border-box;
+  cursor: grab;
+  flex: 0 0 auto;
+  height: $dialogProjectSettings-worldColorPalette-swatch-size;
+  position: relative;
+  width: $dialogProjectSettings-worldColorPalette-swatch-size;
+}
+
+.dialogProjectSettingsWorldColorPaletteSwatch--beingDragged {
+  opacity: 0.45;
+}
+
+.dialogProjectSettingsWorldColorPaletteSwatch__color {
+  border:
+    $dialogProjectSettings-worldColorPalette-swatch-borderWidth
+    solid
+    $dialogProjectSettings-worldColorPalette-swatch-borderColor;
+  box-sizing: border-box;
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.dialogProjectSettingsWorldColorPaletteSwatch__duplicateIcon {
+  font-size: $dialogProjectSettings-worldColorPalette-duplicateIcon-size;
+  left: 50%;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}

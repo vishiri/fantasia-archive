@@ -116,7 +116,7 @@ test('Test that faProjectWorldsFetchFreshForDialog defaults missing templateLayo
   })
   const { faProjectWorldsFetchFreshForDialog } = await import('../sFaProjectWorldsBridge')
   const rows = await faProjectWorldsFetchFreshForDialog()
-  expect(rows[0]?.templateLayout).toEqual({
+  expect(rows[0]!?.templateLayout).toEqual({
     groups: [],
     placements: []
   })

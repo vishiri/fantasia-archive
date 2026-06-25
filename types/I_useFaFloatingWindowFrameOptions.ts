@@ -13,6 +13,6 @@ export interface I_UseFaFloatingWindowFrameOptions {
    * 'standard' uses band 5000–5799 (for example app-wide Custom CSS).
    * 'projectStyling' uses band 5800–5899 above app-wide styling but below noteboards.
    */
-  floatingWindowZLayer?: 'noteboard' | 'projectNoteboard' | 'projectStyling' | 'standard'
+  floatingWindowZLayer?: 'noteboard' | 'projectNoteboard' | 'projectStyling' | 'standard' | undefined
   persistedFrame?: Ref<I_faFloatingWindowPersistedRect | null | undefined>
 }

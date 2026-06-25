@@ -35,8 +35,8 @@
         role="none"
       >
         <template
-          v-for="(menuItem,index) in menuData"
-          :key="index"
+          v-for="(menuItem, index) in menuData"
+          :key="menuItem.itemKey ?? `menu-row-${index}`"
         >
           <q-separator
             v-if="menuItem.mode === 'separator'"
@@ -114,8 +114,8 @@
                 role="none"
               >
                 <template
-                  v-for="(submenuItem,subIndex) in menuItem.submenu"
-                  :key="subIndex"
+                  v-for="(submenuItem, subIndex) in menuItem.submenu"
+                  :key="submenuItem.itemKey ?? `submenu-row-${subIndex}`"
                 >
                   <q-separator
                     v-if="submenuItem.mode === 'separator'"

@@ -17,7 +17,6 @@
         :maxlength="FA_PROJECT_NAME_MAX_LEN"
         :error="props.nameHasError"
         :error-message="props.nameHasError ? $t('dialogs.projectSettings.fields.projectName.errorRequired') : undefined"
-        outlined
         @update:model-value="emitProjectName"
       />
     </div>

@@ -28,7 +28,7 @@ test('dispatchFaChromiumForwardedKeyChord dispatches keydown with ctrl shift and
   )
 
   expect(dispatchEvent).toHaveBeenCalledOnce()
-  const dispatched = vi.mocked(dispatchEvent).mock.calls[0][0]
+  const dispatched = vi.mocked(dispatchEvent).mock.calls[0]![0]!
   expect(dispatched).toBeInstanceOf(FakeKeyboardEvent)
   const event = dispatched as FakeKeyboardEvent
   expect(event.type).toBe('keydown')

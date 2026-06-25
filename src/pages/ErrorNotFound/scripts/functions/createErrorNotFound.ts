@@ -39,7 +39,7 @@ export function createErrorNotFound (deps: {
 
   function useErrorNotFound () {
     const activeProjectStore = deps.S_FaActiveProject()
-    const { activeProject, hasActiveProject } = deps.storeToRefs(activeProjectStore)
+    const { activeProject, hasActiveProject } = deps.storeToRefs(activeProjectStore)!
 
     const errorCardDetails = deps.computed(() => {
       return deps.resolveErrorNotFoundCardDetails((key) => deps.i18n.global.t(key))
@@ -47,8 +47,8 @@ export function createErrorNotFound (deps: {
 
     const showResumeCurrentProject = deps.computed(() => {
       return deps.resolveErrorNotFoundShowResumeCurrentProject(
-        hasActiveProject.value === true,
-        activeProject.value?.filePath
+        hasActiveProject!.value === true,
+        activeProject!.value?.filePath
       )
     })
 
@@ -57,7 +57,7 @@ export function createErrorNotFound (deps: {
     })
 
     function onResumeCurrentProjectClick (): void {
-      errorNotFoundResumeCurrentProjectClick(activeProject.value?.filePath)
+      errorNotFoundResumeCurrentProjectClick(activeProject!.value?.filePath)
     }
 
     return {

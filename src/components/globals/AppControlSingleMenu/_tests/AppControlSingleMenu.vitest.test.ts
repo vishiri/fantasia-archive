@@ -1,13 +1,24 @@
 import { flushPromises, mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent } from 'vue'
-import { expect, test, vi } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/keybinds_managerDefaults'
 import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/keybinds_manager'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
+import type { I_faKeybindsSnapshot } from 'app/types/I_faKeybindsDomain'
 import type { I_appMenuList } from 'app/types/I_appMenusDataList'
 
 import AppControlSingleMenu from '../AppControlSingleMenu.vue'
+
+beforeEach(() => {
+  setActivePinia(createPinia())
+})
+
+async function seedKeybindsSnapshot (snapshot: I_faKeybindsSnapshot): Promise<void> {
+  vi.mocked(window.faContentBridgeAPIs.faKeybinds.getKeybinds).mockResolvedValue(snapshot)
+  await S_FaKeybinds().refreshKeybinds()
+}
 
 const minimalMenu: I_appMenuList = {
   title: 'Unit menu',
@@ -41,7 +52,7 @@ test('Test that AppControlSingleMenu renders menu title and first item text from
     '[data-test-locator="AppControlSingleMenu-menuItem-text"]'
   )
   expect(menuTexts.length).toBeGreaterThan(0)
-  expect(menuTexts[0]?.textContent?.trim()).toBe('Item one')
+  expect(menuTexts[0]!?.textContent?.trim()).toBe('Item one')
   expect(document.body.querySelectorAll('[data-test-locator="AppControlSingleMenu-menuItem-keybind"]').length)
     .toBe(0)
   w.unmount()
@@ -173,10 +184,10 @@ test('Test that AppControlSingleMenu renders separatorAlt between two item rows 
  */
 test('Test that AppControlSingleMenu shows keybind hint from S_FaKeybinds snapshot', async () => {
   const keybinds = S_FaKeybinds()
-  keybinds.snapshot = {
+  await seedKeybindsSnapshot({
     platform: 'win32',
     store: { ...FA_KEYBINDS_STORE_DEFAULTS }
-  }
+  })
 
   const w = mount(AppControlSingleMenu, {
     attachTo: document.body,
@@ -217,10 +228,10 @@ test('Test that AppControlSingleMenu shows keybind hint from S_FaKeybinds snapsh
  */
 test('Test that AppControlSingleMenu shows submenu keybind hint when configured', async () => {
   const keybinds = S_FaKeybinds()
-  keybinds.snapshot = {
+  await seedKeybindsSnapshot({
     platform: 'win32',
     store: { ...FA_KEYBINDS_STORE_DEFAULTS }
-  }
+  })
 
   const w = mount(AppControlSingleMenu, {
     attachTo: document.body,

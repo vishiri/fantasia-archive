@@ -17,7 +17,7 @@ export function createTipsTricksTriviaNotification (deps: {
     imageList: { [key: string]: string },
     isRandom: boolean,
     fantasiaImage: string
-  ) => string
+  ) => string | undefined
   fantasiaImageList: { [key: string]: string }
   mdListArrayConverter: (markdown: string) => string[]
   randomIndex: (length: number) => number
@@ -43,10 +43,10 @@ export function createTipsTricksTriviaNotification (deps: {
         color: 'dark',
         icon: 'mdi-close'
       }],
-      avatar,
+      ...(avatar !== undefined ? { avatar } : {}),
       caption: randomMessage,
       color: 'info',
-      icon,
+      ...(icon !== undefined ? { icon } : {}),
       message: deps.t('globalFunctionality.unsortedAppTexts.didYouKnow'),
       timeout: 15000
     })

@@ -49,7 +49,7 @@ test('Test that faProjectOsOpen registers listener and sends ready in electron m
   await (faProjectOsOpen as () => Promise<void>)()
   expect(installOsOpenListener).toHaveBeenCalledOnce()
   expect(sendRendererReady).toHaveBeenCalledOnce()
-  const cb = installOsOpenListener.mock.calls[0][0] as (filePath: string) => void
+  const cb = installOsOpenListener.mock.calls[0]![0]! as (filePath: string) => void
   const fp = 'D:\\x\\p.faproject'
   cb(fp)
   expect(runFaActionAwaitMock).toHaveBeenCalledWith(

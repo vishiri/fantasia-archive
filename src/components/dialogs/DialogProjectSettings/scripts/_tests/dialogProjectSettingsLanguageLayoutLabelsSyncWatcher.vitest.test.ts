@@ -62,8 +62,8 @@ test('Test that registerDialogProjectSettingsLanguageLayoutLabelsSyncWatcher res
   languageCode = 'de'
   watchEffect!()
 
-  expect(localWorlds.value?.[0]?.templateLayout.placements[0]?.templateDisplayName).toBe('Rassen')
-  expect(localWorlds.value?.[0]?.templateLayout.placements[0]?.worldAppendix).toBe('yugghm')
+  expect(localWorlds.value?.[0]!?.templateLayout.placements[0]!?.templateDisplayName).toBe('Rassen')
+  expect(localWorlds.value?.[0]!?.templateLayout.placements[0]!?.worldAppendix).toBe('yugghm')
 })
 
 test('Test that registerDialogProjectSettingsLanguageLayoutLabelsSyncWatcher no-ops when drafts are null', () => {

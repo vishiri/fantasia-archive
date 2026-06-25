@@ -44,5 +44,5 @@ test('Test that trimFaActionHistoryRingBuffer drops oldest rows at the cap', () 
   }
   trimFaActionHistoryRingBuffer(rows)
   expect(rows).toHaveLength(FA_ACTION_HISTORY_MAX)
-  expect(rows[0]?.uid).toBe('uid-3')
+  expect(rows[0]!?.uid).toBe('uid-3')
 })

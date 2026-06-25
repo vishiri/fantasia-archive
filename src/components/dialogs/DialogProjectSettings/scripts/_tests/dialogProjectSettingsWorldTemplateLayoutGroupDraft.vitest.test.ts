@@ -14,7 +14,7 @@ import { removeDialogProjectSettingsWorldTemplateGroupDraft } from '../dialogPro
 test('Test that remove group draft shifts later root placements after group removal', () => {
   let layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   layout = appendDialogProjectSettingsWorldTemplateGroupDraft(layout, 'en-US', 'Creatures')
-  const groupId = layout.groups[0]?.id ?? ''
+  const groupId = layout.groups[0]!?.id ?? ''
   layout = appendDialogProjectSettingsWorldTemplatePlacementDraft(layout, {
     documentTemplateId: '660e8400-e29b-41d4-a716-446655440001',
     icon: 'mdi-account',
@@ -27,7 +27,7 @@ test('Test that remove group draft shifts later root placements after group remo
     templateDisplayName: 'Location',
     worldAppendix: ''
   })
-  const trailingRootPlacementId = layout.placements[1]?.id ?? ''
+  const trailingRootPlacementId = layout.placements[1]!?.id ?? ''
   layout = {
     ...layout,
     placements: layout.placements.map((placement, index) => {
@@ -58,9 +58,9 @@ test('Test that remove group draft leaves earlier root placements unchanged', ()
     worldAppendix: ''
   })
   layout = appendDialogProjectSettingsWorldTemplateGroupDraft(layout, 'en-US', 'Creatures')
-  const earlyRootPlacementId = layout.placements[0]?.id ?? ''
-  const earlyRootSortOrder = layout.placements[0]?.rootSortOrder ?? 0
-  const groupId = layout.groups[0]?.id ?? ''
+  const earlyRootPlacementId = layout.placements[0]!?.id ?? ''
+  const earlyRootSortOrder = layout.placements[0]!?.rootSortOrder ?? 0
+  const groupId = layout.groups[0]!?.id ?? ''
 
   const nextLayout = removeDialogProjectSettingsWorldTemplateGroupDraft(layout, groupId)
   const earlyPlacement = nextLayout.placements.find((placement) => placement.id === earlyRootPlacementId)
@@ -76,7 +76,7 @@ test('Test that remove group draft no-ops for unknown group id', () => {
 test('Test that remove group draft shifts later groups when removed group had children', () => {
   let layout = createEmptyDialogProjectSettingsWorldTemplateLayoutDraft()
   layout = appendDialogProjectSettingsWorldTemplateGroupDraft(layout, 'en-US', 'First')
-  const firstGroupId = layout.groups[0]?.id ?? ''
+  const firstGroupId = layout.groups[0]!?.id ?? ''
   layout = {
     ...layout,
     placements: [
@@ -109,7 +109,7 @@ test('Test that remove group draft shifts later groups when removed group had ch
     ]
   }
   layout = appendDialogProjectSettingsWorldTemplateGroupDraft(layout, 'en-US', 'Second')
-  const secondGroupId = layout.groups[1]?.id ?? ''
+  const secondGroupId = layout.groups[1]!?.id ?? ''
   const secondGroupRootBefore = layout.groups.find((group) => group.id === secondGroupId)?.rootSortOrder ?? 0
 
   const nextLayout = removeDialogProjectSettingsWorldTemplateGroupDraft(layout, firstGroupId)

@@ -90,7 +90,10 @@ export async function faProjectSettingsPersistPatchFromStore (opts: {
   }
   const retrieved = afterSaveResult.value
 
-  if (!didObjectPatchPersist(opts.patch, retrieved)) {
+  if (!didObjectPatchPersist(
+    opts.patch as Partial<import('app/types/I_faProjectSettingsDomain').I_faProjectSettingsRoot>,
+    retrieved
+  )) {
     console.error(
       `[S_FaProjectSettings] ${i18n.global.t('globalFunctionality.faProjectSettings.saveMismatchLog')}`,
       {

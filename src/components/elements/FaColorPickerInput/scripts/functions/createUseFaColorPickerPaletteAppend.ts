@@ -8,7 +8,7 @@ export function createUseFaColorPickerPaletteAppend (
   deps: T_createUseFaColorPickerPaletteAppendDeps
 ): (props: {
     modelValue: string
-    paletteAppend?: I_faColorPickerPaletteAppendConfig
+    paletteAppend?: I_faColorPickerPaletteAppendConfig | undefined
   }, emitAppendToWorldPalette: (colorPallete: string) => void, resolveLiveColorString: () => string, refreshProjectColorPalette?: () => Promise<void>) => {
     isPaletteAppendDisabled: I_computedRef<boolean>
     isPaletteAppendDuplicate: I_computedRef<boolean>
@@ -18,7 +18,7 @@ export function createUseFaColorPickerPaletteAppend (
   return function useFaColorPickerPaletteAppend (
     props: {
       modelValue: string
-      paletteAppend?: I_faColorPickerPaletteAppendConfig
+      paletteAppend?: I_faColorPickerPaletteAppendConfig | undefined
     },
     emitAppendToWorldPalette: (colorPallete: string) => void,
     resolveLiveColorString: () => string,

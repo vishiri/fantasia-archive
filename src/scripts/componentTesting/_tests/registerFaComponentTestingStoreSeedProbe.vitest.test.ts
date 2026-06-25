@@ -68,12 +68,10 @@ test('Test that registerFaComponentTestingStoreSeedProbe patches Pinia stores fr
  */
 test('Test that registerFaComponentTestingStoreSeedProbe clears active project when seeded null', () => {
   registerFaComponentTestingStoreSeedProbe()
-  S_FaActiveProject().$patch({
-    activeProject: {
-      filePath: 'C:\\temp.faproject',
-      id: 'temp',
-      name: 'Temp'
-    }
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\temp.faproject',
+    id: 'temp',
+    name: 'Temp'
   })
 
   window.__faComponentTestingPatchStores?.({

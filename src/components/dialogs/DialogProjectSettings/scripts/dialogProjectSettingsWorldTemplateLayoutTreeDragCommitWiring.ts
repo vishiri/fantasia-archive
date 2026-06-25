@@ -20,6 +20,9 @@ export function scheduleDialogProjectSettingsWorldTemplateLayoutTreeDragCommit (
     return
   }
   deps.dragCommitScheduled.value = true
+  const logNextTickFailure = (err: unknown): void => {
+    console.error('[dialogProjectSettingsWorldTemplateLayoutTree] drag commit nextTick chain failed', err)
+  }
   window.requestAnimationFrame(() => {
     void deps.nextTick().then(() => {
       return deps.nextTick()
@@ -33,6 +36,6 @@ export function scheduleDialogProjectSettingsWorldTemplateLayoutTreeDragCommit (
         return
       }
       deps.emitLayoutFromTreeDataIfChanged()
-    })
+    }).catch(logNextTickFailure)
   })
 }

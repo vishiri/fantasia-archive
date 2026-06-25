@@ -95,7 +95,7 @@ const props = defineProps<{
   /**
    * Storybook / harness: open without the menu action when set to 'WindowProjectNoteboard'.
    */
-  directInput?: T_dialogName
+  directInput?: T_dialogName | undefined
 }>()
 
 const {

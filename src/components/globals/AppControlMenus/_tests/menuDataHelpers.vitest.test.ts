@@ -15,7 +15,10 @@ vi.mock('app/i18n/externalFileLoader', () => ({
  * faMenuSeparator returns a separator row for top-level menus.
  */
 test('Test that faMenuSeparator returns separator mode', () => {
-  expect(faMenuSeparator()).toEqual({ mode: 'separator' })
+  expect(faMenuSeparator('test-separator')).toEqual({
+    itemKey: 'test-separator',
+    mode: 'separator'
+  })
 })
 
 /**
@@ -23,7 +26,10 @@ test('Test that faMenuSeparator returns separator mode', () => {
  * faMenuSubSeparator returns a separator row for submenu lists.
  */
 test('Test that faMenuSubSeparator returns separator mode', () => {
-  expect(faMenuSubSeparator()).toEqual({ mode: 'separator' })
+  expect(faMenuSubSeparator('test-sub-separator')).toEqual({
+    itemKey: 'test-sub-separator',
+    mode: 'separator'
+  })
 })
 
 /**
@@ -35,6 +41,7 @@ test('Test that faMenuItem without patch uses base shape only', () => {
   expect(row).toEqual({
     conditions: true,
     icon: 'mdi-home',
+    itemKey: 'menus.foo',
     mode: 'item',
     specialColor: undefined,
     submenu: undefined,
@@ -64,6 +71,7 @@ test('Test that faMenuSubItem without patch uses base shape only', () => {
   expect(row).toEqual({
     conditions: true,
     icon: 'mdi-cog',
+    itemKey: 'menus.baz',
     mode: 'item',
     specialColor: undefined,
     text: 'mocked:menus.baz',

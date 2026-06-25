@@ -67,7 +67,7 @@ test('Test that getFaKeybinds creates the store once with expected name and defa
 
   expect(first).toBe(second)
   expect(ElectronStoreMock).toHaveBeenCalledTimes(1)
-  expect(constructCalls[0]).toEqual({
+  expect(constructCalls[0]!).toEqual({
     name: 'faKeybinds',
     defaults: { ...FA_KEYBINDS_STORE_DEFAULTS }
   })

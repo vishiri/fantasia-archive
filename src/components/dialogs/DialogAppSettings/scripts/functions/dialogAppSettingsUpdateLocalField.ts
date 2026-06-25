@@ -21,7 +21,7 @@ export function updateLocalAppSettingsField (
   const settingsRecord = localSettings as unknown as Record<string, boolean | string>
   settingsRecord[settingKey] = updatedValue
 
-  const settingMetadata = appSettingsOptions[settingKey]
+  const settingMetadata = appSettingsOptions[settingKey]!
   const categoryEntry = appSettingsTree[settingMetadata.category]
   if (categoryEntry === undefined) {
     return

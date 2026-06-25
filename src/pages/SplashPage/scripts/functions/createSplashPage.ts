@@ -35,21 +35,21 @@ export function createSplashPage (deps: {
   } {
   function useSplashPage () {
     const faUserSettingsStore = deps.S_FaUserSettings()
-    const { settings } = deps.storeToRefs(faUserSettingsStore)
+    const { settings } = deps.storeToRefs(faUserSettingsStore)!
 
     const hideWelcomeScreenSocials = deps.computed(() => {
-      return settings.value?.hideWelcomeScreenSocials ??
+      return settings!.value?.hideWelcomeScreenSocials ??
         deps.FA_USER_SETTINGS_DEFAULTS.hideWelcomeScreenSocials
     })
 
     const resolveSkipWelcomeScreenEnabled = (): boolean => {
-      return settings.value?.skipWelcomeScreen ??
+      return settings!.value?.skipWelcomeScreen ??
         deps.FA_USER_SETTINGS_DEFAULTS.skipWelcomeScreen
     }
 
     deps.bindSplashPageSkipWelcomeScreenLifecycle(
       resolveSkipWelcomeScreenEnabled,
-      () => settings.value?.skipWelcomeScreen,
+      () => settings!.value?.skipWelcomeScreen,
       {
         getCurrentPath: deps.resolveFaAppRouterCurrentPath,
         hasWelcomeScreenAutoLoadBootBeenAttempted: deps.hasWelcomeScreenAutoLoadBootBeenAttempted,

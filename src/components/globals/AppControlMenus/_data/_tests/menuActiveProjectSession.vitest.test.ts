@@ -139,7 +139,7 @@ test('Test that buildProjectMenu recent row dispatches loadExistingProject with 
     }]
   })
   const items = menu.data.filter((row) => row.mode === 'item')
-  const recentParent = items[2]
+  const recentParent = items[2]!
   expect(recentParent?.conditions).not.toBe(false)
   expect(recentParent?.icon).toBe('keyboard_arrow_right')
   expect(recentParent?.specialColor).toBe('grey')
@@ -163,7 +163,7 @@ test('Test that buildProjectMenu recent row dispatches loadExistingProject with 
 test('Test that buildProjectMenu treats omitted recentProjects as no recent entries', () => {
   const menu = buildProjectMenu({ hasActiveProject: false })
   const items = menu.data.filter((row) => row.mode === 'item')
-  const recentParent = items[2]
+  const recentParent = items[2]!
   expect(recentParent?.conditions).toBe(false)
   expect(recentParent?.submenu).toBeUndefined()
   expect(recentParent?.icon).toBe('keyboard_arrow_right')

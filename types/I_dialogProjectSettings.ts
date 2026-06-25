@@ -12,10 +12,10 @@ import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
  * Props for DialogProjectSettings (Storybook direct open and optional snapshot override).
  */
 export interface I_dialogProjectSettingsProps {
-  directDocumentTemplatesSnapshot?: I_dialogProjectSettingsDocumentTemplateDraft[]
-  directInput?: T_dialogName
-  directSettingsSnapshot?: I_faProjectSettingsRoot
-  directWorldsSnapshot?: I_dialogProjectSettingsWorldDraft[]
+  directDocumentTemplatesSnapshot?: I_dialogProjectSettingsDocumentTemplateDraft[] | undefined
+  directInput?: T_dialogName | undefined
+  directSettingsSnapshot?: I_faProjectSettingsRoot | undefined
+  directWorldsSnapshot?: I_dialogProjectSettingsWorldDraft[] | undefined
 }
 
 /** Injected dependencies for createDialogProjectSettingsUseHook. */

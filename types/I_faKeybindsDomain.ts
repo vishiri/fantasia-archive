@@ -35,7 +35,7 @@ export type T_faKeybindModifierDefault = T_faKeybindModifierLiteral | 'primary'
  */
 export interface I_faChordDefault {
   code: string
-  mods: T_faKeybindModifierDefault[]
+  mods: readonly T_faKeybindModifierDefault[]
 }
 
 /**
@@ -43,7 +43,7 @@ export interface I_faChordDefault {
  */
 export interface I_faChordSerialized {
   code: string
-  mods: T_faKeybindModifierLiteral[]
+  mods: readonly T_faKeybindModifierLiteral[]
 }
 
 /**
@@ -79,8 +79,8 @@ export interface I_faKeybindsSnapshot {
 export interface I_faKeybindsAPI {
   getKeybinds: () => Promise<I_faKeybindsSnapshot>
   setKeybinds: (patch: {
-    overrides?: I_faKeybindsRoot['overrides']
-    replaceAllOverrides?: boolean
+    overrides?: I_faKeybindsRoot['overrides'] | undefined
+    replaceAllOverrides?: boolean | undefined
   }) => Promise<void>
 }
 

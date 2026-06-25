@@ -86,22 +86,22 @@ test('Test that spellChecker works correctly', () => {
   setupSpellChecker(appWindow as unknown as BrowserWindow)
   expect(onMock).toHaveBeenCalledOnce()
 
-  const contextMenuHandler = onMock.mock.calls[0][1]
+  const contextMenuHandler = onMock.mock.calls[0]![1]!
   contextMenuHandler({}, {
     dictionarySuggestions: ['hello', 'world'],
     misspelledWord: 'helo'
   })
 
-  const activeMenu = menuInstances[0]
+  const activeMenu = menuInstances[0]!
   expect(MenuItemMock).toHaveBeenCalledTimes(3)
   expect(activeMenu.append).toHaveBeenCalledTimes(3)
   expect(activeMenu.popup).toHaveBeenCalledOnce()
 
-  const replaceWordItem = MenuItemMock.mock.calls[0][0]
+  const replaceWordItem = MenuItemMock.mock.calls[0]![0]!
   replaceWordItem.click()
   expect(replaceMisspelling).toHaveBeenCalledWith('hello')
 
-  const addWordItem = MenuItemMock.mock.calls[2][0]
+  const addWordItem = MenuItemMock.mock.calls[2]![0]!
   addWordItem.click()
   expect(addWordToSpellCheckerDictionary).toHaveBeenCalledWith('helo')
 })
@@ -130,14 +130,14 @@ test('Test that spellChecker shows popup with suggestions only', () => {
     }
   }
   setupSpellChecker(appWindow as unknown as BrowserWindow)
-  const contextMenuHandler = onMock.mock.calls[0][1]
+  const contextMenuHandler = onMock.mock.calls[0]![1]!
   menuInstances.length = 0
   contextMenuHandler({}, {
     dictionarySuggestions: ['fix'],
     misspelledWord: ''
   })
 
-  const activeMenu = menuInstances[0]
+  const activeMenu = menuInstances[0]!
   expect(activeMenu.popup).toHaveBeenCalledOnce()
   expect(MenuItemMock.mock.calls.length).toBe(1)
 })
@@ -158,14 +158,14 @@ test('Test that spellChecker shows popup with misspelled word only', () => {
     }
   }
   setupSpellChecker(appWindow as unknown as BrowserWindow)
-  const contextMenuHandler = onMock.mock.calls[0][1]
+  const contextMenuHandler = onMock.mock.calls[0]![1]!
   menuInstances.length = 0
   contextMenuHandler({}, {
     dictionarySuggestions: [],
     misspelledWord: 'typo'
   })
 
-  const activeMenu = menuInstances[0]
+  const activeMenu = menuInstances[0]!
   expect(activeMenu.popup).toHaveBeenCalledOnce()
   expect(MenuItemMock.mock.calls.length).toBe(1)
 })
@@ -186,14 +186,14 @@ test('Test that spellChecker does not popup when there is nothing to show', () =
     }
   }
   setupSpellChecker(appWindow as unknown as BrowserWindow)
-  const contextMenuHandler = onMock.mock.calls[0][1]
+  const contextMenuHandler = onMock.mock.calls[0]![1]!
   menuInstances.length = 0
   contextMenuHandler({}, {
     dictionarySuggestions: [],
     misspelledWord: ''
   })
 
-  const activeMenu = menuInstances[0]
+  const activeMenu = menuInstances[0]!
   expect(activeMenu.popup).not.toHaveBeenCalled()
 })
 
@@ -221,7 +221,7 @@ test('Test that spellChecker uses English add-to-dictionary label when languageC
     }
   }
   setupSpellChecker(appWindow as unknown as BrowserWindow)
-  const contextMenuHandler = onMock.mock.calls[0][1]
+  const contextMenuHandler = onMock.mock.calls[0]![1]!
   menuInstances.length = 0
   MenuItemMock.mockClear()
 
@@ -230,7 +230,7 @@ test('Test that spellChecker uses English add-to-dictionary label when languageC
     misspelledWord: 'typo'
   })
 
-  const addWordItem = MenuItemMock.mock.calls[0][0]
+  const addWordItem = MenuItemMock.mock.calls[0]![0]!
   expect(addWordItem.label).toBe(L_spellChecker_enUS.addToDictionary)
 })
 
@@ -258,7 +258,7 @@ test('Test that spellChecker uses French add-to-dictionary label when languageCo
     }
   }
   setupSpellChecker(appWindow as unknown as BrowserWindow)
-  const contextMenuHandler = onMock.mock.calls[0][1]
+  const contextMenuHandler = onMock.mock.calls[0]![1]!
   menuInstances.length = 0
   MenuItemMock.mockClear()
 
@@ -267,7 +267,7 @@ test('Test that spellChecker uses French add-to-dictionary label when languageCo
     misspelledWord: 'mot'
   })
 
-  const addWordItem = MenuItemMock.mock.calls[0][0]
+  const addWordItem = MenuItemMock.mock.calls[0]![0]!
   expect(addWordItem.label).toBe(L_spellChecker_fr.addToDictionary)
 })
 
@@ -295,7 +295,7 @@ test('Test that spellChecker uses German add-to-dictionary label when languageCo
     }
   }
   setupSpellChecker(appWindow as unknown as BrowserWindow)
-  const contextMenuHandler = onMock.mock.calls[0][1]
+  const contextMenuHandler = onMock.mock.calls[0]![1]!
   menuInstances.length = 0
   MenuItemMock.mockClear()
 
@@ -304,6 +304,6 @@ test('Test that spellChecker uses German add-to-dictionary label when languageCo
     misspelledWord: 'Wort'
   })
 
-  const addWordItem = MenuItemMock.mock.calls[0][0]
+  const addWordItem = MenuItemMock.mock.calls[0]![0]!
   expect(addWordItem.label).toBe(L_spellChecker_de.addToDictionary)
 })

@@ -13,6 +13,6 @@ export interface I_faProjectNoteboardRoot {
  * Partial update merged into 'project_noteboard_*' KV rows by the main-process IPC handler.
  */
 export interface I_faProjectNoteboardPatch {
-  frame?: I_faFloatingWindowPersistedRect | null
-  text?: string
+  frame?: I_faFloatingWindowPersistedRect | null | undefined
+  text?: string | undefined
 }

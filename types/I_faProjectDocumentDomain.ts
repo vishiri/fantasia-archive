@@ -13,17 +13,17 @@ export interface I_faProjectDocument {
 export interface I_faProjectDocumentCreateInput {
   worldId: string
   displayName: string
-  templateId?: string | null
+  templateId?: string | null | undefined
 }
 
 export interface I_faProjectDocumentPatch {
-  displayName?: string
-  worldId?: string
-  templateId?: string | null
+  displayName?: string | undefined
+  worldId?: string | undefined
+  templateId?: string | null | undefined
 }
 
 export interface I_faProjectDocumentListFilter {
-  worldId?: string
+  worldId?: string | undefined
 }
 
 export type I_faProjectDocumentListResult = I_faProjectContentListResult<I_faProjectDocument>

@@ -67,8 +67,8 @@ export type T_dialogKeybindSettingsCaptureHandlersFactoryDeps =
   }
 
 export interface I_dialogKeybindSettingsComponentStoreLike {
-  dialogToOpen?: unknown
-  dialogUUID?: unknown
+  dialogToOpen?: unknown | undefined
+  dialogUUID?: unknown | undefined
 }
 
 export type T_dialogKeybindSettingsDialogOpenFactoryDeps = {
@@ -95,7 +95,7 @@ export type T_dialogKeybindSettingsDialogRoutingFactoryDeps =
     watch: (
       source: (() => unknown) | I_ref<unknown>,
       effect: (value: unknown, oldValue?: unknown) => void,
-      options?: { immediate?: boolean }
+      options?: { immediate?: boolean } | undefined
     ) => void
   }
 
@@ -107,7 +107,7 @@ export type T_dialogKeybindSettingsDialogSuspendFactoryDeps = {
   watch: (
     source: () => boolean,
     effect: (active: boolean) => void,
-    options?: { immediate?: boolean }
+    options?: { immediate?: boolean } | undefined
   ) => void
 }
 
@@ -137,7 +137,7 @@ export type T_dialogKeybindSettingsDialogWiringApi = {
       snapshot: { platform: NodeJS.Platform } | null
     }
     onSaveMain: () => Promise<boolean>
-    props: { directInput?: T_dialogName }
+    props: { directInput?: T_dialogName | undefined }
   }) => {
     formatChord: (chord: I_faChordSerialized) => string
     saveMain: () => Promise<void>
@@ -174,7 +174,7 @@ export type T_dialogKeybindSettingsDialogWiringFactoryBindings = {
         snapshot: { platform: NodeJS.Platform } | null
       }
       onSaveMain: () => Promise<boolean>
-      props: { directInput?: T_dialogName }
+      props: { directInput?: T_dialogName | undefined }
     }
   ) => {
     formatChord: (chord: I_faChordSerialized) => string
@@ -348,7 +348,7 @@ export type T_useDialogKeybindSettingsViewResult = {
 export type T_dialogKeybindSettingsViewFactoryBindings = {
   useDialogKeybindSettingsViewFromDeps: (
     deps: T_dialogKeybindSettingsViewFactoryDeps,
-    props: { directInput?: T_dialogName }
+    props: { directInput?: T_dialogName | undefined }
   ) => T_useDialogKeybindSettingsViewResult
   viewDeps: T_dialogKeybindSettingsViewFactoryDeps
 }
@@ -401,7 +401,7 @@ export type T_dialogKeybindTableLayoutRun = {
 export type T_dialogKeybindSettingsTableLayoutObserveFactoryDeps = {
   computeDialogKeybindSettingsTableMaxHeightPx: (
     sectionElement: HTMLElement,
-    minPx?: number
+    minPx?: number | undefined
   ) => number
   computed: <T>(getter: () => T) => I_computedRef<T>
   nextTick: () => Promise<void>
@@ -410,7 +410,7 @@ export type T_dialogKeybindSettingsTableLayoutObserveFactoryDeps = {
   watch: (
     source: () => boolean,
     effect: (open: boolean) => void | Promise<void>,
-    options?: { immediate?: boolean }
+    options?: { immediate?: boolean } | undefined
   ) => void
 }
 
@@ -459,7 +459,7 @@ export type T_dialogKeybindSettingsViewFactoryDeps = {
       snapshot: { platform: NodeJS.Platform } | null
     }
     onSaveMain: () => Promise<boolean>
-    props: { directInput?: T_dialogName }
+    props: { directInput?: T_dialogName | undefined }
   }) => {
     formatChord: (chord: I_faChordSerialized) => string
     saveMain: () => Promise<void>

@@ -43,8 +43,8 @@ test('Test that recordHistoryEnqueued appends a queued history row with payload 
   const store = S_FaActionManager()
   recordHistoryEnqueued(buildEntry('closeApp', 'u1', { reason: 'menu' }))
   expect(store.actionHistory).toHaveLength(1)
-  expect(store.actionHistory[0]?.status).toBe('queued')
-  expect(store.actionHistory[0]?.payloadPreview).toBe('{"reason":"menu"}')
+  expect(store.actionHistory[0]!?.status).toBe('queued')
+  expect(store.actionHistory[0]!?.payloadPreview).toBe('{"reason":"menu"}')
 })
 
 /**
@@ -54,7 +54,7 @@ test('Test that recordHistoryEnqueued appends a queued history row with payload 
 test('Test that recordHistoryEnqueued omits payload preview when payload is undefined', () => {
   const store = S_FaActionManager()
   recordHistoryEnqueued(buildEntry('closeApp', 'u1'))
-  expect(store.actionHistory[0]?.payloadPreview).toBeUndefined()
+  expect(store.actionHistory[0]!?.payloadPreview).toBeUndefined()
 })
 
 /**
@@ -65,8 +65,8 @@ test('Test that recordHistoryStarted promotes a queued entry to running', () => 
   const store = S_FaActionManager()
   recordHistoryEnqueued(buildEntry('closeApp', 'u1'))
   recordHistoryStarted('u1', 12345)
-  expect(store.actionHistory[0]?.status).toBe('running')
-  expect(store.actionHistory[0]?.startedAt).toBe(12345)
+  expect(store.actionHistory[0]!?.status).toBe('running')
+  expect(store.actionHistory[0]!?.startedAt).toBe(12345)
 })
 
 /**
@@ -77,8 +77,8 @@ test('Test that recordHistoryStartedFromEntry appends a running entry directly',
   const store = S_FaActionManager()
   recordHistoryStartedFromEntry(buildEntry('toggleDeveloperTools', 'u1'), 222)
   expect(store.actionHistory).toHaveLength(1)
-  expect(store.actionHistory[0]?.status).toBe('running')
-  expect(store.actionHistory[0]?.startedAt).toBe(222)
+  expect(store.actionHistory[0]!?.status).toBe('running')
+  expect(store.actionHistory[0]!?.startedAt).toBe(222)
 })
 
 /**
@@ -89,8 +89,8 @@ test('Test that recordHistoryCompleted writes a success terminal status', () => 
   const store = S_FaActionManager()
   recordHistoryStartedFromEntry(buildEntry('toggleDeveloperTools', 'u1'), 1)
   recordHistoryCompleted('u1', { kind: 'success' }, 99)
-  expect(store.actionHistory[0]?.status).toBe('success')
-  expect(store.actionHistory[0]?.finishedAt).toBe(99)
+  expect(store.actionHistory[0]!?.status).toBe('success')
+  expect(store.actionHistory[0]!?.finishedAt).toBe(99)
 })
 
 /**
@@ -104,8 +104,8 @@ test('Test that recordHistoryCompleted writes a failed terminal status with erro
     kind: 'failed',
     errorMessage: 'no bridge'
   }, 77)
-  expect(store.actionHistory[0]?.status).toBe('failed')
-  expect(store.actionHistory[0]?.errorMessage).toBe('no bridge')
+  expect(store.actionHistory[0]!?.status).toBe('failed')
+  expect(store.actionHistory[0]!?.errorMessage).toBe('no bridge')
 })
 
 /**
@@ -117,7 +117,7 @@ test('Test that recordHistoryCompleted merges payloadPreview on success', () => 
   recordHistoryEnqueued(buildEntry('loadExistingProject', 'u-prev', {}))
   recordHistoryStarted('u-prev', 1)
   recordHistoryCompleted('u-prev', { kind: 'success' }, 2, '{"filePath":"x.faproject","projectName":"P"}')
-  const row = store.actionHistory[0]
+  const row = store.actionHistory[0]!
   expect(row?.status).toBe('success')
   expect(row?.payloadPreview).toBe('{"filePath":"x.faproject","projectName":"P"}')
 })
@@ -130,7 +130,7 @@ test('Test that recordHistoryOverflowDrop appends a failed row stamped with the 
   const store = S_FaActionManager()
   recordHistoryOverflowDrop(buildEntry('closeApp', 'u-drop'), 'queue overflow')
   expect(store.actionHistory).toHaveLength(1)
-  const row = store.actionHistory[0]
+  const row = store.actionHistory[0]!
   expect(row?.status).toBe('failed')
   expect(row?.errorMessage).toBe('queue overflow')
   expect(row?.startedAt).toBeDefined()
@@ -179,7 +179,7 @@ test('Test that snapshotActionHistory returns an empty array when Pinia is missi
 test('Test that recordHistoryStartedFromEntry stores payload preview when payload is present', () => {
   const store = S_FaActionManager()
   recordHistoryStartedFromEntry(buildEntry('languageSwitch', 'u-pp', { code: 'en-US' }), 1)
-  expect(store.actionHistory[0]?.payloadPreview).toBe('{"code":"en-US"}')
+  expect(store.actionHistory[0]!?.payloadPreview).toBe('{"code":"en-US"}')
 })
 
 /**
@@ -189,7 +189,7 @@ test('Test that recordHistoryStartedFromEntry stores payload preview when payloa
 test('Test that recordHistoryOverflowDrop stores payload preview when payload is present', () => {
   const store = S_FaActionManager()
   recordHistoryOverflowDrop(buildEntry('closeApp', 'u-of', { reason: 'menu' }), 'overflow')
-  expect(store.actionHistory[0]?.payloadPreview).toBe('{"reason":"menu"}')
+  expect(store.actionHistory[0]!?.payloadPreview).toBe('{"reason":"menu"}')
 })
 
 /**
@@ -231,7 +231,7 @@ test('Test that appendHistoryEntry trims the history buffer at FA_ACTION_HISTORY
     })
   }
   expect(store.actionHistory).toHaveLength(FA_ACTION_HISTORY_MAX)
-  expect(store.actionHistory[0]?.uid).toBe('u-5')
+  expect(store.actionHistory[0]!?.uid).toBe('u-5')
 })
 
 /**

@@ -180,7 +180,7 @@ test.describe.serial('App settings dialog', () => {
     const settingIdsSeenAcrossTabs = new Set<string>()
 
     for (const categoryKey of Object.keys(expectedTree)) {
-      const category = expectedTree[categoryKey]
+      const category = expectedTree[categoryKey]!
       const tab = appWindow.locator(`[data-test-locator="${appSettingsSelector.tab(categoryKey)}"]`)
       await expect(tab).toHaveCount(1)
       await tab.click()

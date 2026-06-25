@@ -15,8 +15,8 @@ export interface I_faAppStylingRoot {
  * Patch payload accepted by the main-process IPC handler when saving user CSS and/or window frame.
  */
 export interface I_faAppStylingPatch {
-  css?: string
-  frame?: I_faFloatingWindowPersistedRect | null
+  css?: string | undefined
+  frame?: I_faFloatingWindowPersistedRect | null | undefined
 }
 
 /**

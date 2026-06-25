@@ -395,7 +395,7 @@ test('Test that DialogAppSettings updates selected category tab from QTabs emit'
     APP_SETTINGS_OPTIONS,
     { ...FA_USER_SETTINGS_DEFAULTS }
   ))
-  const nextTab = keys.length > 1 ? keys[1] : keys[0]
+  const nextTab = keys.length > 1 ? keys[1]! : keys[0]
   const tabs = w.findComponent({ name: 'QTabs' })
   await tabs.vm.$emit('update:modelValue', nextTab)
   await flushPromises()
@@ -418,7 +418,7 @@ test('Test that DialogAppSettings toggles a setting via QToggle stand-in', async
 
   const toggles = w.findAllComponents({ name: 'QToggle' })
   expect(toggles.length).toBeGreaterThan(0)
-  await toggles[0].trigger('click')
+  await toggles[0]!.trigger('click')
   await flushPromises()
 
   w.unmount()

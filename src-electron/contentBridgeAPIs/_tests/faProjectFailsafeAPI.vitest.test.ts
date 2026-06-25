@@ -30,7 +30,7 @@ test('faProjectFailsafeAPI installActiveProjectPathReply registers once and repl
     FA_PROJECT_FAILSAFE_IPC.requestActiveProjectPathFromRenderer,
     expect.any(Function)
   )
-  const listener = ipcRendererOnMock.mock.calls[0][1] as (
+  const listener = ipcRendererOnMock.mock.calls[0]![1]! as (
     event: unknown,
     correlationId: unknown
   ) => void

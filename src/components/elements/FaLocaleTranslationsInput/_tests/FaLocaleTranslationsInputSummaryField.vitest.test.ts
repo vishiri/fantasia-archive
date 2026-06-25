@@ -225,7 +225,7 @@ test('Test that FaLocaleTranslationsInputSummaryField emits translations menu op
   await wrapper.find('.q-menu-stub-close').trigger('click')
 
   const emitted = wrapper.emitted('update:translationsMenuOpen')
-  expect(emitted?.[0]).toEqual([false])
+  expect(emitted?.[0]!).toEqual([false])
 })
 
 /**

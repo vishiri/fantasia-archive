@@ -546,7 +546,7 @@ test('Test that DialogProjectSettings updates local order drafts from panels col
   await w.find('[data-test-locator="dialogProjectSettings-button-save"]').trigger('click')
   await flushPromises()
 
-  const savePayload = runFaActionAwait.mock.calls.at(-1)?.[1] as {
+  const savePayload = runFaActionAwait.mock.calls.at(-1)?.[1]! as {
     documentTemplates: { id: string }[]
     worlds: { id: string }[]
   }

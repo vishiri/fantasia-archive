@@ -259,7 +259,7 @@ test('Test that DialogKeybindSettings table body covers default column, non-edit
 
   const userButtons = w.findAll('[data-test-locator="dialogKeybindSettings-userKeybind-button"]')
   expect(userButtons.length).toBeGreaterThan(0)
-  await userButtons[0].trigger('click')
+  await userButtons[0]!.trigger('click')
   await flushPromises()
 
   expect(w.find('[data-test-locator="dialogKeybindSettings-capture-dialog-stub"]').exists()).toBe(true)
@@ -272,7 +272,7 @@ test('Test that DialogKeybindSettings table body covers default column, non-edit
 
   const flatKeybindButtons = w.findAll('.fa-btn-keybind-dim--flat')
   expect(flatKeybindButtons.length).toBeGreaterThan(0)
-  await flatKeybindButtons[0].trigger('click')
+  await flatKeybindButtons[0]!.trigger('click')
   await flushPromises()
   expect(w.find('[data-test-locator="dialogKeybindSettings-capture-dialog-stub"]').exists()).toBe(true)
 
@@ -316,7 +316,7 @@ test('Test that DialogKeybindSettings forwards q-dialog v-model and filter input
   const filterInputs = w.findAll('input')
   expect(filterInputs.length).toBeGreaterThan(0)
   expect(w.get('.q-icon-search-stub').text()).toBe('search')
-  await filterInputs[0].setValue('app')
+  await filterInputs[0]!.setValue('app')
   await flushPromises()
 
   w.unmount()
@@ -335,7 +335,7 @@ test('Test that DialogKeybindSettings shows filter empty ErrorCard when filter m
   await flushPromises()
 
   const filterInputs = w.findAll('input')
-  await filterInputs[0].setValue('zzzz-no-matching-keybind-label-zzzz')
+  await filterInputs[0]!.setValue('zzzz-no-matching-keybind-label-zzzz')
   await new Promise((resolve) => {
     setTimeout(resolve, 350)
   })

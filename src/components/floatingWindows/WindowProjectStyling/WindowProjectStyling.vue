@@ -185,7 +185,7 @@ const props = defineProps<{
   /**
    * Storybook / Playwright harness: opens when already set to WindowProjectStyling during setup.
    */
-  directInput?: T_dialogName
+  directInput?: T_dialogName | undefined
 }>()
 
 const {

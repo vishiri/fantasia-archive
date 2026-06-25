@@ -18,18 +18,3 @@ export function resolveFaInterfaceTextDirectionFromLanguageCode (
 
   return 'ltr'
 }
-
-/**
- * Applies resolved direction to the root HTML element for app-wide layout.
- */
-export function applyFaInterfaceTextDirectionFromLanguageCode (
-  code: T_faUserSettingsLanguageCode
-): void {
-  if (typeof document === 'undefined') {
-    return
-  }
-
-  const direction = resolveFaInterfaceTextDirectionFromLanguageCode(code)
-  document.documentElement.dir = direction
-  document.documentElement.style.direction = direction
-}

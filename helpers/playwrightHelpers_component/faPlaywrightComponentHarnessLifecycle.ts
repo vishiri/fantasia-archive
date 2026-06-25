@@ -39,14 +39,18 @@ export async function launchFaPlaywrightComponentHarnessWindow (
   const afterIsolationResetBeforeLaunchBinding = options.afterIsolationResetBeforeLaunch
 
   return launchFaPlaywrightElectronSerialSuiteWindow({
-    afterIsolationResetBeforeLaunch: afterIsolationResetBeforeLaunchBinding,
-    beforeIsolationReset: beforeIsolationResetBinding,
     buildLaunchEnv: buildLaunchEnvBinding,
     dismissStartupTips: dismissStartupTipsResolved,
     electronMainJsPath: electronMainJsPathBinding,
     readiness: 'component',
     renderDelayMs,
     resetUserData: resetUserDataBinding,
-    testInfo: testInfoBinding
+    testInfo: testInfoBinding,
+    ...(beforeIsolationResetBinding !== undefined
+      ? { beforeIsolationReset: beforeIsolationResetBinding }
+      : {}),
+    ...(afterIsolationResetBeforeLaunchBinding !== undefined
+      ? { afterIsolationResetBeforeLaunch: afterIsolationResetBeforeLaunchBinding }
+      : {})
   })
 }

@@ -8,9 +8,12 @@ export function patchFaComponentTestingStores (
   seed: I_faComponentTestingStoreSeed
 ): void {
   if (seed.activeProject !== undefined) {
-    S_FaActiveProject(pinia).$patch({
-      activeProject: seed.activeProject
-    })
+    const activeProjectStore = S_FaActiveProject(pinia)
+    if (seed.activeProject === null) {
+      activeProjectStore.clearActiveProject()
+    } else {
+      activeProjectStore.setActiveProject(seed.activeProject)
+    }
   }
 
   if (seed.hidePlushes !== undefined || seed.hideTooltipsProject !== undefined) {

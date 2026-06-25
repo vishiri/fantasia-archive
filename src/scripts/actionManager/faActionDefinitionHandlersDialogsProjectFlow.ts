@@ -35,7 +35,7 @@ export function buildFaActionDefinitionHandlersDialogsProjectFlow (
       pathArg !== undefined && pathArg.length > 0
         ? await deps.S_FaActiveProject().openProjectFromKnownPath(pathArg)
         : await deps.S_FaActiveProject().openProjectFromUserDialog()
-      if (outcome === 'canceled') {
+      if (outcome === 'canceled' || outcome === 'superseded') {
         throw new deps.FaActionUserCanceledError()
       }
       if (outcome === 'opened') {

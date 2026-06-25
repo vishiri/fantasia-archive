@@ -350,6 +350,31 @@ test('Test that openProjectFromKnownPath invokes openProject with filePath', asy
   expect(openProjectMock).toHaveBeenCalledWith({ filePath: 'D:\\by-path.faproject' })
 })
 
+test('Test that openProjectFromUserDialog returns superseded when a newer open starts first', async () => {
+  let resolveFirst: (value: unknown) => void = () => {}
+  const firstPending = new Promise((resolve) => {
+    resolveFirst = resolve
+  })
+  openProjectMock.mockImplementationOnce(() => firstPending)
+  openProjectMock.mockResolvedValueOnce({ outcome: 'canceled' as const })
+
+  const firstOpen = store.openProjectFromUserDialog()
+  const secondOpen = store.openProjectFromUserDialog()
+
+  resolveFirst({
+    outcome: 'opened' as const,
+    project: {
+      filePath: 'C:\\stale.faproject',
+      id: 'stale',
+      name: 'Stale'
+    }
+  })
+
+  expect(await firstOpen).toBe('superseded')
+  expect(store.activeProject).toBeNull()
+  expect(await secondOpen).toBe('canceled')
+})
+
 test('Test that openProjectFromKnownPath throws when bridge is unavailable', async () => {
   vi.stubGlobal('window', {
     faContentBridgeAPIs: {}

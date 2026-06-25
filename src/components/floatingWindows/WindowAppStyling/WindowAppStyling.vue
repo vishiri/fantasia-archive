@@ -186,7 +186,7 @@ const props = defineProps<{
   /**
    * Allows direct mounting of this window (Storybook / Playwright component test) without going through the global dialog store.
    */
-  directInput?: T_dialogName
+  directInput?: T_dialogName | undefined
 }>()
 
 const {

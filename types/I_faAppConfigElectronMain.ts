@@ -11,10 +11,10 @@ import type { T_faAppConfigInnerKey } from 'app/types/I_faAppConfigDomain'
  */
 export interface I_faStagedImportSession {
   data: {
-    keybinds?: I_faKeybindsRoot
-    appNoteboard?: I_faAppNoteboardRoot
-    appSettings?: I_faUserSettings
-    appStyling?: I_faAppStylingRoot
+    keybinds?: I_faKeybindsRoot | undefined
+    appNoteboard?: I_faAppNoteboardRoot | undefined
+    appSettings?: I_faUserSettings | undefined
+    appStyling?: I_faAppStylingRoot | undefined
   }
   parts: I_faAppConfigImportPartsUi
   expiresAt: number
@@ -22,10 +22,10 @@ export interface I_faStagedImportSession {
 
 /** Snapshots zipped into a '.faconfig' archive. */
 export interface I_faAppConfigZipInputs {
-  keybinds?: I_faKeybindsRoot
-  appNoteboard?: I_faAppNoteboardRoot
-  appStyling?: I_faAppStylingRoot
-  userSettings?: I_faUserSettings
+  keybinds?: I_faKeybindsRoot | undefined
+  appNoteboard?: I_faAppNoteboardRoot | undefined
+  appStyling?: I_faAppStylingRoot | undefined
+  userSettings?: I_faUserSettings | undefined
 }
 
 /** Parsed allowlisted entries from an app config unzip. */

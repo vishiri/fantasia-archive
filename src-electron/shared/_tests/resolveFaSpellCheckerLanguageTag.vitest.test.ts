@@ -116,7 +116,7 @@ test('Test that resolveFaSpellCheckerLanguageTag matches fr family prefix when f
  */
 test('Test that resolveFaSpellCheckerLanguageTag returns null for de when only unrelated tags after a hole', () => {
   const holey: string[] = []
-  holey[1] = 'pl'
+  holey[1]! = 'pl'
   expect(resolveFaSpellCheckerLanguageTag('de', holey)).toBeNull()
 })
 
@@ -144,7 +144,7 @@ test('Test that resolveFaSpellCheckerLanguageTag falls back to first string for 
  */
 test('Test that resolveFaSpellCheckerLanguageTag family match skips holes before fr variant', () => {
   const holey: string[] = []
-  holey[1] = 'fr-BE'
+  holey[1]! = 'fr-BE'
   expect(resolveFaSpellCheckerLanguageTag('fr', holey)).toBe('fr-BE')
 })
 

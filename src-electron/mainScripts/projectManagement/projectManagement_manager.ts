@@ -81,6 +81,7 @@ export { faProjectCreateMapParseFailure } from './faProjectCreateIpcParseFailure
 export {
   enqueueFaProjectOsOpenPath,
   installFaProjectOsOpenListeners,
+  isFaProjectOsOpenRendererReadySender,
   onFaProjectOsOpenRendererReady,
   registerFaProjectOsOpenMainWindow
 } from './faProjectOsOpenDeliveryWiring'

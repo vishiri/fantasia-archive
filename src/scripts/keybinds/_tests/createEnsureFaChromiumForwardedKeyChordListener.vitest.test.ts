@@ -20,7 +20,7 @@ test('createEnsureFaChromiumForwardedKeyChordListener installs once when bridge 
   ensure()
 
   expect(installForwardedKeyChordListener).toHaveBeenCalledOnce()
-  const handler = installForwardedKeyChordListener.mock.calls[0][0] as (payload: {
+  const handler = installForwardedKeyChordListener.mock.calls[0]![0]! as (payload: {
     code: string
   }) => void
   handler({

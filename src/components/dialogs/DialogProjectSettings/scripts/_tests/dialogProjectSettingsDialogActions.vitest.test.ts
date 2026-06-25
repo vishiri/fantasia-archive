@@ -215,9 +215,9 @@ test('Test that createDialogProjectSettingsDialogActions mutates local world dra
   updateWorldDisplayNameTranslations(worldAId, { 'en-US': 'Renamed' })
   updateWorldColor(worldAId, '#aabbcc')
   updateWorldColorPallete(worldAId, '#112233;#445566')
-  expect(bindings.localWorlds.value?.[0]?.displayNameTranslations).toEqual({ 'en-US': 'Renamed' })
-  expect(bindings.localWorlds.value?.[0]?.color).toBe('#aabbcc')
-  expect(bindings.localWorlds.value?.[0]?.colorPallete).toBe('#112233;#445566')
+  expect(bindings.localWorlds.value?.[0]!?.displayNameTranslations).toEqual({ 'en-US': 'Renamed' })
+  expect(bindings.localWorlds.value?.[0]!?.color).toBe('#aabbcc')
+  expect(bindings.localWorlds.value?.[0]!?.colorPallete).toBe('#112233;#445566')
 
   removeWorld(worldBId)
   expect(bindings.localWorlds.value?.some((world) => world.id === worldBId)).toBe(false)
@@ -258,11 +258,11 @@ test('Test that createDialogProjectSettingsDialogActions mutates local document 
   })
   updateDocumentTemplateIcon(templateAId, 'mdi-star')
   updateDocumentTemplateWorldAppendixTranslations(templateAId, { 'en-US': 'Notes' })
-  expect(bindings.localDocumentTemplates.value?.[0]?.titlePluralTranslations).toEqual({ 'en-US': 'Renamed' })
-  expect(bindings.localDocumentTemplates.value?.[0]?.icon).toBe('mdi-star')
-  expect(bindings.localDocumentTemplates.value?.[0]?.worldAppendixTranslations).toEqual({ 'en-US': 'Notes' })
+  expect(bindings.localDocumentTemplates.value?.[0]!?.titlePluralTranslations).toEqual({ 'en-US': 'Renamed' })
+  expect(bindings.localDocumentTemplates.value?.[0]!?.icon).toBe('mdi-star')
+  expect(bindings.localDocumentTemplates.value?.[0]!?.worldAppendixTranslations).toEqual({ 'en-US': 'Notes' })
 
-  const secondId = bindings.localDocumentTemplates.value?.[1]?.id
+  const secondId = bindings.localDocumentTemplates.value?.[1]!?.id
   if (secondId !== undefined) {
     removeDocumentTemplate(secondId)
   }

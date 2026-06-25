@@ -2,16 +2,31 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_PROJECT_OS_OPEN_IPC } from 'app/src-electron/electron-ipc-bridge'
 
-const existsSyncMock = vi.hoisted(() => vi.fn(() => true))
+const existsSyncMock = vi.hoisted(() => vi.fn<(path: string) => boolean>(() => true))
 const webContentsSendMock = vi.hoisted(() => vi.fn())
 const isDestroyedMock = vi.hoisted(() => vi.fn(() => false))
 
-vi.mock('node:fs', () => {
+vi.mock('node:fs', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('node:fs')>()
+  const statSync = (p: string): { isFile: () => boolean } => {
+    if (!existsSyncMock(p)) {
+      const err = new Error('ENOENT') as NodeJS.ErrnoException
+      err.code = 'ENOENT'
+      throw err
+    }
+    return { isFile: () => true }
+  }
   return {
+    ...actual,
     default: {
-      existsSync: existsSyncMock
+      ...actual,
+      existsSync: existsSyncMock,
+      realpathSync: (p: string) => p,
+      statSync
     },
-    existsSync: existsSyncMock
+    existsSync: existsSyncMock,
+    realpathSync: (p: string) => p,
+    statSync
   }
 })
 
@@ -109,8 +124,8 @@ test('Test that did-finish-load handler runs tryFlush before renderer ready', as
   const fp = absFaProjectFixture('did-finish')
   mod.registerFaProjectOsOpenMainWindow(win as never)
   const didFinishLoad = win.webContents.on.mock.calls.find(
-    (call) => call[0] === 'did-finish-load'
-  )?.[1] as () => void
+    (call) => call[0]! === 'did-finish-load'
+  )?.[1]! as () => void
   expect(didFinishLoad).toBeTypeOf('function')
   mod.enqueueFaProjectOsOpenPath(fp)
   didFinishLoad()
@@ -407,4 +422,42 @@ test('Test that direct enqueue is ignored in DEV without FA_DEV_OPEN_FAPROJECT',
   mod.registerFaProjectOsOpenMainWindow(win as never)
   mod.onFaProjectOsOpenRendererReady()
   expect(webContentsSendMock).not.toHaveBeenCalled()
+})
+
+/**
+ * isFaProjectOsOpenRendererReadySender
+ * Accepts only the registered main window webContents id.
+ */
+test('Test that isFaProjectOsOpenRendererReadySender matches registered main webContents id', async () => {
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
+  const win = {
+    webContents: {
+      id: 42,
+      isDestroyed: isDestroyedMock,
+      on: vi.fn(),
+      send: webContentsSendMock
+    }
+  }
+  mod.registerFaProjectOsOpenMainWindow(win as never)
+  expect(mod.isFaProjectOsOpenRendererReadySender({ id: 42 } as never)).toBe(true)
+  expect(mod.isFaProjectOsOpenRendererReadySender({ id: 7 } as never)).toBe(false)
+})
+
+/**
+ * isFaProjectOsOpenRendererReadySender
+ * Rejects senders when the main webContents was destroyed.
+ */
+test('Test that isFaProjectOsOpenRendererReadySender rejects destroyed main webContents', async () => {
+  isDestroyedMock.mockReturnValue(true)
+  const mod = await import('../faProjectOsOpenDeliveryWiring')
+  const win = {
+    webContents: {
+      id: 42,
+      isDestroyed: isDestroyedMock,
+      on: vi.fn(),
+      send: webContentsSendMock
+    }
+  }
+  mod.registerFaProjectOsOpenMainWindow(win as never)
+  expect(mod.isFaProjectOsOpenRendererReadySender({ id: 42 } as never)).toBe(false)
 })

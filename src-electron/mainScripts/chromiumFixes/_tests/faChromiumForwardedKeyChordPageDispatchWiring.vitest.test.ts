@@ -14,7 +14,7 @@ test('forwardFaChromiumForwardedKeyChordInPage runs page dispatch script when we
   forwardFaChromiumForwardedKeyChordInPage(wc as unknown as WebContents, 'KeyO')
 
   expect(executeJavaScript).toHaveBeenCalledOnce()
-  expect(String(executeJavaScript.mock.calls[0][0])).toContain('KeyO')
+  expect(String(executeJavaScript.mock.calls[0]![0]!)).toContain('KeyO')
 })
 
 test('forwardFaChromiumForwardedKeyChordInPage skips destroyed webContents', () => {

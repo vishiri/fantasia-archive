@@ -148,7 +148,7 @@ test('Test that FaLocaleTranslationsInput emits updated locale map when a menu i
   await enInput.setValue('Hero')
 
   const emitted = w.emitted('update:modelValue')
-  expect(emitted?.[0]?.[0]).toEqual({ 'en-US': 'Hero' })
+  expect(emitted?.[0]!?.[0]!).toEqual({ 'en-US': 'Hero' })
 })
 
 test('Test that FaLocaleTranslationsInput removes empty locale keys', async () => {
@@ -170,7 +170,7 @@ test('Test that FaLocaleTranslationsInput removes empty locale keys', async () =
   await deInput.setValue('')
 
   const emitted = w.emitted('update:modelValue')
-  expect(emitted?.[0]?.[0]).toEqual({ 'en-US': 'Character' })
+  expect(emitted?.[0]!?.[0]!).toEqual({ 'en-US': 'Character' })
 })
 
 test('Test that FaLocaleTranslationsInput shows fallback warning when active locale is missing', () => {
@@ -273,7 +273,7 @@ test('Test that FaLocaleTranslationsInput singularPlural mode emits paired maps'
   await pluralInput.setValue('Creatures')
 
   const emitted = w.emitted('update:modelValue')
-  expect(emitted?.at(-1)?.[0]).toEqual({
+  expect(emitted?.at(-1)?.[0]!).toEqual({
     plural: { 'en-US': 'Creatures' },
     singular: { 'en-US': 'Character' }
   })

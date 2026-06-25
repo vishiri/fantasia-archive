@@ -13,6 +13,7 @@ type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeUseDeps = {
       t: (key: string) => string
     }
   }
+  onBeforeUnmount: typeof import('vue').onBeforeUnmount
   ref: typeof import('vue').ref
   toRef: typeof import('vue').toRef
   watch: typeof import('vue').watch
@@ -22,11 +23,11 @@ export function createUseDialogProjectSettingsWorldTemplateLayoutTreeNode (
   deps: T_dialogProjectSettingsWorldTemplateLayoutTreeNodeUseDeps
 ): (
     props: {
-      blankGroupIds?: ReadonlySet<string>
+      blankGroupIds?: ReadonlySet<string> | undefined
       currentLanguageCode: T_faUserSettingsLanguageCode
       documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[]
-      duplicateDocumentTemplateIds?: ReadonlySet<string>
-      invalidDocumentTemplateIds?: ReadonlySet<string>
+      duplicateDocumentTemplateIds?: ReadonlySet<string> | undefined
+      invalidDocumentTemplateIds?: ReadonlySet<string> | undefined
       node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
     },
     emit: {

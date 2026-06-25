@@ -89,7 +89,7 @@ const props = defineProps<{
   /**
    * Custom input directly fed to the component in case it doesn't get triggered from the global store
    */
-  directInput?: T_dialogName
+  directInput?: T_dialogName | undefined
   /**
    * When set (for example in Storybook), builds the toggle tree from this snapshot instead of calling the user-settings bridge.
    */

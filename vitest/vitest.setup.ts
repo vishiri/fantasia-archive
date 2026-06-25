@@ -8,6 +8,7 @@ import { FA_APP_NOTEBOARD_STORE_DEFAULTS } from 'app/src-electron/mainScripts/ap
 import { FA_APP_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appStyling/appStyling_managerDefaults'
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import { createFaProjectContentBridgeHarnessStub } from 'app/helpers/faProjectContentBridgeHarnessStub'
+import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
 
 const originalConsoleWarn = console.warn.bind(console)
 
@@ -166,12 +167,9 @@ function resetFaVitestRendererHarness (): void {
     },
     extraEnvVariables: {
       getCachedSnapshot: vi.fn(() => null),
-      getSnapshot: vi.fn(async () => ({
-        COMPONENT_NAME: undefined,
-        COMPONENT_PROPS: undefined,
+      getSnapshot: vi.fn(async (): Promise<I_extraEnvVariablesAPI> => ({
         ELECTRON_MAIN_FILEPATH: '/fake/electron-main.js',
-        FA_FRONTEND_RENDER_TIMER: 0,
-        TEST_ENV: undefined
+        FA_FRONTEND_RENDER_TIMER: 0
       }))
     },
     appDetails: {

@@ -11,11 +11,11 @@ const FA_LOCALE_TRANSLATIONS_MENU_DEFAULT_VIEWPORT_MARGIN_PX = 16
  */
 export function resolveFaLocaleTranslationsMenuPresentation (input: {
   anchorRect: DOMRectReadOnly
-  maxHeightPx?: number
-  maxWidthPx?: number
-  minWidthPx?: number
+  maxHeightPx?: number | undefined
+  maxWidthPx?: number | undefined
+  minWidthPx?: number | undefined
   viewportHeightPx: number
-  viewportMarginPx?: number
+  viewportMarginPx?: number | undefined
   viewportWidthPx: number
 }): {
     maxHeightPx: number

@@ -178,17 +178,17 @@ test('applyFaProjectMigrations bootstraps schema when user_version is 0', () => 
   expect(seedFaProjectDefaultWorldIfEmptyMock).toHaveBeenCalledWith(db, 'Realm')
   expect(
     db.exec.mock.calls.some(
-      (call) => typeof call[0] === 'string' && call[0].includes('worlds')
+      (call) => typeof call[0]! === 'string' && call[0]!.includes('worlds')
     )
   ).toBe(true)
   expect(
     db.exec.mock.calls.some(
-      (call) => typeof call[0] === 'string' && call[0].includes('project_data')
+      (call) => typeof call[0]! === 'string' && call[0]!.includes('project_data')
     )
   ).toBe(true)
   expect(
     db.exec.mock.calls.some(
-      (call) => typeof call[0] === 'string' && call[0].includes('ADD COLUMN')
+      (call) => typeof call[0]! === 'string' && call[0]!.includes('ADD COLUMN')
     )
   ).toBe(false)
 })

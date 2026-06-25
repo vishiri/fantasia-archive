@@ -16,7 +16,7 @@ import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun_ma
 function buildLoadRecentSubmenu (recent: readonly I_faRecentProjectEntry[]): I_appMenuSubItem[] {
   return recent.map((entry) => {
     return faMenuSubItem('appControlMenus.project.items.recentProjectRow', '', {
-      icon: undefined,
+      itemKey: `recent-project-${entry.filePath}`,
       secondaryHintText: entry.filePath,
       text: entry.name,
       trigger: () => runFaAction('loadExistingProject', { filePath: entry.filePath })
@@ -33,22 +33,22 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
     faMenuItem('appControlMenus.project.items.newProject', 'mdi-plus', {
       trigger: () => runFaAction('openNewProjectDialog', undefined)
     }),
-    faMenuSeparator(),
+    faMenuSeparator('project-sep-after-new'),
     faMenuItem('appControlMenus.project.items.loadProject', 'mdi-package-variant', {
       trigger: () => runFaAction('loadExistingProject', {})
     }),
     faMenuItem('appControlMenus.project.items.loadRecentProject', 'keyboard_arrow_right', {
       conditions: hasRecent,
       specialColor: 'grey',
-      submenu: hasRecent ? buildLoadRecentSubmenu(recent) : undefined
+      ...(hasRecent ? { submenu: buildLoadRecentSubmenu(recent) } : {})
     }),
-    faMenuSeparator(),
+    faMenuSeparator('project-sep-after-recent'),
     faMenuItem('appControlMenus.project.items.showProjectDashboard', 'mdi-chart-bar', {
       conditions: gate,
       keybindCommandId: 'showProjectDashboard',
       trigger: () => runFaAction('showProjectDashboard', undefined)
     }),
-    faMenuSeparator(),
+    faMenuSeparator('project-sep-before-noteboard'),
     faMenuItem('appControlMenus.project.items.toggleProjectNoteboard', 'mdi-note-text-outline', {
       conditions: gate,
       keybindCommandId: 'toggleProjectNoteboard',
@@ -64,14 +64,14 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
       keybindCommandId: 'openProjectSettings',
       trigger: () => runFaAction('openProjectSettingsDialog', undefined)
     }),
-    faMenuSeparator(),
+    faMenuSeparator('project-sep-before-advanced'),
     faMenuItem('appControlMenus.project.items.advancedProjectTools', 'keyboard_arrow_right', {
       specialColor: 'grey',
       submenu: [
         faMenuSubItem('appControlMenus.project.items.aptMerge', 'mdi-folder-plus-outline', {
           conditions: false
         }),
-        faMenuSubSeparator(),
+        faMenuSubSeparator('project-apt-sep-merge-convert'),
         faMenuSubItem('appControlMenus.project.items.aptConvertOld', 'mdi-wrench', {
           conditions: false
         })

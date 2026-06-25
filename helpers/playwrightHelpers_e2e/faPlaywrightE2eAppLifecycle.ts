@@ -24,8 +24,6 @@ export async function launchFaPlaywrightE2eAppWindow (
   const afterIsolationResetBeforeLaunchBinding = options.afterIsolationResetBeforeLaunch
 
   return launchFaPlaywrightElectronSerialSuiteWindow({
-    afterIsolationResetBeforeLaunch: afterIsolationResetBeforeLaunchBinding,
-    beforeIsolationReset: beforeIsolationResetBinding,
     buildLaunchEnv: buildLaunchEnvBinding,
     dismissStartupTips,
     electronLaunchAdditionalArgs: electronLaunchAdditionalArgsBinding,
@@ -33,6 +31,12 @@ export async function launchFaPlaywrightE2eAppWindow (
     readiness: 'e2e',
     renderDelayMs: renderDelayMsBinding,
     resetUserData: resetUserDataBinding,
-    testInfo: testInfoBinding
+    testInfo: testInfoBinding,
+    ...(beforeIsolationResetBinding !== undefined
+      ? { beforeIsolationReset: beforeIsolationResetBinding }
+      : {}),
+    ...(afterIsolationResetBeforeLaunchBinding !== undefined
+      ? { afterIsolationResetBeforeLaunch: afterIsolationResetBeforeLaunchBinding }
+      : {})
   })
 }

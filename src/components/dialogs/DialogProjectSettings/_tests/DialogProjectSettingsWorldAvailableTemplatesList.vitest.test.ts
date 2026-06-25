@@ -68,7 +68,7 @@ test('Test that DialogProjectSettingsWorldAvailableTemplatesList emits addTempla
   await w
     .find('[data-test-locator="dialogProjectSettings-worldAvailableTemplate-7c9e6679-7425-40de-944b-e07fc1f90ae7"]')
     .trigger('click')
-  expect(w.emitted('addTemplate')?.[0]).toEqual(['7c9e6679-7425-40de-944b-e07fc1f90ae7'])
+  expect(w.emitted('addTemplate')?.[0]!).toEqual(['7c9e6679-7425-40de-944b-e07fc1f90ae7'])
 })
 
 /**

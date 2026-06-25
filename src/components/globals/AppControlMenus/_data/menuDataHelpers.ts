@@ -5,12 +5,18 @@ import type {
   I_appMenuSubItem
 } from 'app/types/I_appMenusDataList'
 
-export function faMenuSeparator (): I_appMenuItem {
-  return { mode: 'separator' }
+export function faMenuSeparator (itemKey: string): I_appMenuItem {
+  return {
+    itemKey,
+    mode: 'separator'
+  }
 }
 
-export function faMenuSubSeparator (): I_appMenuSubItem {
-  return { mode: 'separator' }
+export function faMenuSubSeparator (itemKey: string): I_appMenuSubItem {
+  return {
+    itemKey,
+    mode: 'separator'
+  }
 }
 
 export function faMenuItem (
@@ -21,13 +27,13 @@ export function faMenuItem (
   const text = i18n.global.t(textKey)
   const base: I_appMenuItem = {
     conditions: true,
-    icon,
+    itemKey: textKey,
     mode: 'item',
-    specialColor: undefined,
-    submenu: undefined,
-    text,
-    trigger: undefined,
-    triggerArguments: undefined
+    text
+  }
+
+  if (icon.length > 0) {
+    base.icon = icon
   }
   if (patch === undefined) {
     return base
@@ -47,12 +53,13 @@ export function faMenuSubItem (
   const text = i18n.global.t(textKey)
   const base: I_appMenuSubItem = {
     conditions: true,
-    icon,
+    itemKey: textKey,
     mode: 'item',
-    specialColor: undefined,
-    text,
-    trigger: undefined,
-    triggerArguments: undefined
+    text
+  }
+
+  if (icon.length > 0) {
+    base.icon = icon
   }
   if (patch === undefined) {
     return base

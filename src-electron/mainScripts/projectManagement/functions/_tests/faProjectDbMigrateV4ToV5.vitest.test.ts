@@ -17,7 +17,7 @@ test('Test that migrateFaProjectSchemaV4ToV5 adds template columns and bumps use
   migrateFaProjectSchemaV4ToV5(db as never)
 
   expect(exec).toHaveBeenCalledOnce()
-  const sql = exec.mock.calls[0][0] as string
+  const sql = exec.mock.calls[0]![0]! as string
   expect(sql).toContain('ADD COLUMN sort_order')
   expect(sql).toContain('ADD COLUMN world_appendix')
   expect(sql).toContain('ADD COLUMN icon')

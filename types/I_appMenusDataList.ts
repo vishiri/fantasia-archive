@@ -17,10 +17,15 @@ export interface I_appMenuBuildSession {
    */
   hasActiveProject: boolean
 
-  recentProjects?: readonly I_faRecentProjectEntry[]
+  recentProjects?: readonly I_faRecentProjectEntry[] | undefined
 }
 
 export interface I_appMenuSubItem {
+  /**
+   * Stable Vue list key for menu rendering.
+   */
+  itemKey?: string | undefined
+
   /**
    * Determines whether the item is a separator or a regular menu item.
    */
@@ -29,45 +34,50 @@ export interface I_appMenuSubItem {
   /**
    * Title of the submenu item.
    */
-  text?: string
+  text?: string | undefined
 
   /**
    * Icon/avatar of the submenu item.
    */
-  icon?: string
+  icon?: string | undefined
 
   /**
    * Trigger function for the submenu item click.
    */
-  trigger?: T_menuItemTrigger
+  trigger?: T_menuItemTrigger | undefined
 
   /**
    * Extra arguments for the trigger, if needed.
    */
-  triggerArguments?: unknown[]
+  triggerArguments?: unknown[] | undefined
 
   /**
    * When false, the row is disabled. When true or unset, the row is enabled.
    */
-  conditions?: boolean
+  conditions?: boolean | undefined
 
   /**
    * Special color class for the submenu item.
    */
-  specialColor?: string
+  specialColor?: string | undefined
 
   /**
    * When set, menu chrome may show the current global shortcut for this command (from `S_FaKeybinds`).
    */
-  keybindCommandId?: T_faKeybindCommandId
+  keybindCommandId?: T_faKeybindCommandId | undefined
 
   /**
    * Optional second line under the title using the same typography as shortcut hints (for example a file path).
    */
-  secondaryHintText?: string
+  secondaryHintText?: string | undefined
 }
 
 export interface I_appMenuItem {
+  /**
+   * Stable Vue list key for menu rendering.
+   */
+  itemKey?: string | undefined
+
   /**
    * Determines whether the item is a separator or a regular menu item.
    */
@@ -76,47 +86,47 @@ export interface I_appMenuItem {
   /**
    * Title of the menu item.
    */
-  text?: string
+  text?: string | undefined
 
   /**
    * Icon/avatar of the menu item.
    */
-  icon?: string
+  icon?: string | undefined
 
   /**
    * Trigger function for the item click.
    */
-  trigger?: T_menuItemTrigger
+  trigger?: T_menuItemTrigger | undefined
 
   /**
    * Extra arguments for the trigger, if needed.
    */
-  triggerArguments?: unknown[]
+  triggerArguments?: unknown[] | undefined
 
   /**
    * When false, the row is disabled (Quasar `q-item` `disable`). When true or unset, the row is enabled.
    */
-  conditions?: boolean
+  conditions?: boolean | undefined
 
   /**
    * Special color class for the menu item.
    */
-  specialColor?: string
+  specialColor?: string | undefined
 
   /**
    * Optional submenu items.
    */
-  submenu?: I_appMenuSubItem[]
+  submenu?: I_appMenuSubItem[] | undefined
 
   /**
    * When set, menu chrome may show the current global shortcut for this command (from `S_FaKeybinds`).
    */
-  keybindCommandId?: T_faKeybindCommandId
+  keybindCommandId?: T_faKeybindCommandId | undefined
 
   /**
    * Optional second line under the title using the same typography as shortcut hints (for example a file path).
    */
-  secondaryHintText?: string
+  secondaryHintText?: string | undefined
 }
 
 export interface I_appMenuList {

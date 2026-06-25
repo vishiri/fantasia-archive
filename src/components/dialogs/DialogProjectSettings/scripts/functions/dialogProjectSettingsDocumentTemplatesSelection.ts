@@ -45,7 +45,7 @@ export function resolveDialogProjectSettingsDocumentTemplateIdAfterRemove (
     return resolveDialogProjectSettingsInitialDocumentTemplateId(templatesAfterRemove)
   }
   if (removedIndex < templatesAfterRemove.length) {
-    return templatesAfterRemove[removedIndex].id
+    return templatesAfterRemove[removedIndex]!.id
   }
   return templatesAfterRemove[removedIndex - 1]?.id ??
     resolveDialogProjectSettingsInitialDocumentTemplateId(templatesAfterRemove)
@@ -63,7 +63,7 @@ export function findDialogProjectSettingsNewlyAppendedDocumentTemplateId (
   if (newTemplates.length !== 1) {
     return null
   }
-  const appendedTemplate = newTemplates[0]
+  const appendedTemplate = newTemplates[0]!
   const lastTemplate = nextTemplates[nextTemplates.length - 1]
   if (lastTemplate?.id !== appendedTemplate.id) {
     return null

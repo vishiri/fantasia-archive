@@ -2,7 +2,7 @@ import type { Ref } from 'vue'
 
 import {
   clearFaVerticalDraggableTabsDocumentDragCursor
-} from 'app/src/scripts/faDragDrop/functions/faVerticalDraggableTabsDocumentDragCursor'
+} from 'app/src/scripts/faDragDrop/faDragDrop_manager'
 
 import {
   shouldClearDragSessionWithoutCommit
@@ -32,6 +32,8 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeDragCancelWiri
         return
       }
       finishDragSessionWithoutCommit()
+    }).catch((err: unknown) => {
+      console.error('[dialogProjectSettingsWorldTemplateLayoutTree] drag cancel nextTick chain failed', err)
     })
   }
 

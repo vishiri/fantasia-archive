@@ -27,7 +27,7 @@ test('faChromiumCtrlShiftShortcutAPI installForwardedKeyChordListener registers 
     FA_CHROMIUM_CTRL_SHIFT_SHORTCUT_IPC.forwardKeyChordToRenderer,
     expect.any(Function)
   )
-  const listener = ipcRendererOnMock.mock.calls[0][1] as (
+  const listener = ipcRendererOnMock.mock.calls[0]![1]! as (
     event: unknown,
     payload: unknown
   ) => void

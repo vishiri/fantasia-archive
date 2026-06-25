@@ -58,7 +58,7 @@ import {
 import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/keybinds_managerDefaults'
 import { S_DialogComponent } from 'app/src/stores/S_Dialog'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
-import type { I_faChordSerialized, I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
+import type { I_faChordSerialized, I_faKeybindsRoot, I_faKeybindsSnapshot } from 'app/types/I_faKeybindsDomain'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import type { T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
 
@@ -233,8 +233,7 @@ test('createDialogKeybindSettingsSync onSaveMain syncs after success and onClose
   setActivePinia(createPinia())
   runFaActionAwaitMock.mockReset()
   runFaActionAwaitMock.mockResolvedValue(true)
-  const keybindsStore = S_FaKeybinds()
-  keybindsStore.snapshot = {
+  const keybindSnapshot: I_faKeybindsSnapshot = {
     platform: 'win32',
     store: {
       overrides: {
@@ -246,6 +245,9 @@ test('createDialogKeybindSettingsSync onSaveMain syncs after success and onClose
       schemaVersion: 1
     }
   }
+  vi.mocked(window.faContentBridgeAPIs.faKeybinds.getKeybinds).mockResolvedValue(keybindSnapshot)
+  const keybindsStore = S_FaKeybinds()
+  await keybindsStore.refreshKeybinds()
   const workingOverrides = ref<I_faKeybindsRoot['overrides']>({})
   const filter = ref<string | null | undefined>('typed-filter')
   const { onSaveMain, onCloseMain, syncWorkingFromStore, initializeForOpen } = createDialogKeybindSettingsSync({
@@ -272,7 +274,14 @@ test('createDialogKeybindSettingsSync onSaveMain syncs after success and onClose
   expect(workingOverrides.value.openAppSettings?.code).toBe('KeyZ')
   initializeForOpen()
   expect(workingOverrides.value.openAppSettings?.code).toBe('KeyZ')
-  keybindsStore.snapshot = null
+  vi.mocked(window.faContentBridgeAPIs.faKeybinds.getKeybinds).mockResolvedValue({
+    platform: 'win32',
+    store: {
+      overrides: {},
+      schemaVersion: 1
+    }
+  })
+  await keybindsStore.refreshKeybinds()
   syncWorkingFromStore()
   expect(workingOverrides.value).toEqual({})
 })
@@ -1036,7 +1045,7 @@ test('setupDialogKeybindSettingsDialogRouting opens on UUID and directInput, and
   }
   const initializeForOpen = vi.fn()
   const onSaveMain = vi.fn(async () => false)
-  const props = reactive<{ directInput?: T_dialogName }>({})
+  const props = reactive<{ directInput?: T_dialogName | undefined }>({})
   const { formatChord, saveMain } = setupDialogKeybindSettingsDialogRouting({
     dialogModel,
     documentName,
@@ -1086,7 +1095,7 @@ test('setupDialogKeybindSettingsDialogRouting directInput watch ignores non-Keyb
     platform: 'win32',
     store: { ...FA_KEYBINDS_STORE_DEFAULTS }
   }
-  const props = reactive<{ directInput?: T_dialogName }>({})
+  const props = reactive<{ directInput?: T_dialogName | undefined }>({})
   setupDialogKeybindSettingsDialogRouting({
     dialogModel,
     documentName,

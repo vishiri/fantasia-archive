@@ -23,7 +23,7 @@ test('buildAppSettingsStorybookAppOptionsTitlePatch covers every persisted app s
   expect(patchKeys).toEqual(managedKeys)
 
   for (const key of patchKeys) {
-    expect(patch[key].title).not.toMatch(/^\s*TODO\s*-/i)
+    expect(patch[key]!.title).not.toMatch(/^\s*TODO\s*-/i)
   }
 })
 

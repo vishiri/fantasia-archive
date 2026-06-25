@@ -21,7 +21,7 @@ const {
   return {
     applyMigrationsMock: vi.fn(),
     browserWindowStub: browserWindowStubInner,
-    existsSyncMock: vi.fn(() => true),
+    existsSyncMock: vi.fn<(path: string) => boolean>(() => true),
     getActiveDbMock: vi.fn(() => null),
     getLastKnownPathMock: vi.fn(() => 'D:\\dl\\open.faproject'),
     mainWindowExports: {
@@ -45,12 +45,27 @@ const {
   }
 })
 
-vi.mock('node:fs', () => {
+vi.mock('node:fs', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('node:fs')>()
+  const statSync = (p: string): { isFile: () => boolean } => {
+    if (!existsSyncMock(p)) {
+      const err = new Error('ENOENT') as NodeJS.ErrnoException
+      err.code = 'ENOENT'
+      throw err
+    }
+    return { isFile: () => true }
+  }
   return {
+    ...actual,
     default: {
-      existsSync: existsSyncMock
+      ...actual,
+      existsSync: existsSyncMock,
+      realpathSync: (p: string) => p,
+      statSync
     },
-    existsSync: existsSyncMock
+    existsSync: existsSyncMock,
+    realpathSync: (p: string) => p,
+    statSync
   }
 })
 
@@ -289,7 +304,7 @@ test('Test that runFaProjectOpenFromIpc calls showOpenDialog without window when
   windowDialogState.attachWindow = false
   await runFaProjectOpenFromIpc({} as never, {})
   expect(showOpenDialogMock).toHaveBeenCalledTimes(1)
-  expect(showOpenDialogMock.mock.calls[0].length).toBe(1)
+  expect(showOpenDialogMock.mock.calls[0]!.length).toBe(1)
 })
 
 /**
@@ -301,8 +316,8 @@ test('Test that runFaProjectOpenFromIpc uses appWindow for showOpenDialog when i
   mainWindowExports.appWindow = browserWindowStub
   await runFaProjectOpenFromIpc({} as never, {})
   expect(showOpenDialogMock).toHaveBeenCalledTimes(1)
-  expect(showOpenDialogMock.mock.calls[0][0]).toBe(browserWindowStub)
-  expect(showOpenDialogMock.mock.calls[0][1]).toMatchObject({
+  expect(showOpenDialogMock.mock.calls[0]![0]!).toBe(browserWindowStub)
+  expect(showOpenDialogMock.mock.calls[0]![1]!).toMatchObject({
     title: 'Open Fantasia Archive project'
   })
 })
@@ -316,7 +331,7 @@ test('Test that runFaProjectOpenFromIpc calls showOpenDialog without window when
   mainWindowExports.appWindow = null as unknown as typeof browserWindowStub
   await runFaProjectOpenFromIpc({} as never, {})
   expect(showOpenDialogMock).toHaveBeenCalledTimes(1)
-  expect(showOpenDialogMock.mock.calls[0].length).toBe(1)
+  expect(showOpenDialogMock.mock.calls[0]!.length).toBe(1)
 })
 
 /**
@@ -432,7 +447,7 @@ test('Test that runFaProjectOpenFromIpc returns error when E2E path points at mi
   existsSyncMock.mockReturnValueOnce(false)
   const r = await runFaProjectOpenFromIpc({} as never, {})
   expect(r.outcome).toBe('error')
-  expect(r.errorMessage).toMatch(/does not exist/)
+  expect(r.errorMessage).toMatch(/absolute regular \.faproject file/)
 })
 
 /**

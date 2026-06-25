@@ -102,9 +102,9 @@ test('Test that suppressChromiumDevtoolsAutofillStderrNoise forwards payload wit
     const cb = vi.fn()
     process.stderr.write('keep me', 'utf8', cb)
     expect(forwarded.length).toBe(1)
-    expect(forwarded[0]?.args[0]).toBe('keep me')
-    expect(forwarded[0]?.args[1]).toBe('utf8')
-    expect(forwarded[0]?.args[2]).toBe(cb)
+    expect(forwarded[0]!?.args[0]!).toBe('keep me')
+    expect(forwarded[0]!?.args[1]!).toBe('utf8')
+    expect(forwarded[0]!?.args[2]!).toBe(cb)
   })
 })
 
@@ -130,7 +130,7 @@ test('Test that suppressChromiumDevtoolsAutofillStderrNoise forwards numeric chu
     suppressChromiumDevtoolsAutofillStderrNoise()
 
     process.stderr.write(404 as unknown as string, () => {})
-    expect(forwarded).toEqual([404])
+    expect(forwarded).toEqual([404]!)
   })
 })
 
@@ -157,9 +157,9 @@ test('Test that suppressChromiumDevtoolsAutofillStderrNoise forwards write with 
 
     const cb = vi.fn()
     process.stderr.write('payload-only-callback', cb)
-    expect(forwarded[0]).toBe('payload-only-callback')
-    expect(forwarded[1]).toBe(cb)
-    expect(forwarded[2]).toBeUndefined()
+    expect(forwarded[0]!).toBe('payload-only-callback')
+    expect(forwarded[1]!).toBe(cb)
+    expect(forwarded[2]!).toBeUndefined()
   })
 })
 
@@ -180,9 +180,9 @@ test('Test that suppressChromiumDevtoolsAutofillStderrNoise forwards encoding wi
     suppressChromiumDevtoolsAutofillStderrNoise()
 
     process.stderr.write('enc-only', 'utf8')
-    expect(forwarded[0]).toBe('enc-only')
-    expect(forwarded[1]).toBe('utf8')
-    expect(forwarded[2]).toBeUndefined()
+    expect(forwarded[0]!).toBe('enc-only')
+    expect(forwarded[1]!).toBe('utf8')
+    expect(forwarded[2]!).toBeUndefined()
   })
 })
 
@@ -203,8 +203,8 @@ test('Test that suppressChromiumDevtoolsAutofillStderrNoise forwards single-argu
     suppressChromiumDevtoolsAutofillStderrNoise()
 
     process.stderr.write('single-arg-line\n')
-    expect(forwarded[0]).toBe('single-arg-line\n')
-    expect(forwarded[1]).toBeUndefined()
-    expect(forwarded[2]).toBeUndefined()
+    expect(forwarded[0]!).toBe('single-arg-line\n')
+    expect(forwarded[1]!).toBeUndefined()
+    expect(forwarded[2]!).toBeUndefined()
   })
 })

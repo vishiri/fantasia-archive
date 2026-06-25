@@ -65,11 +65,11 @@ test('Test that tipsTricksTriviaNotification uses mascot avatar payload by defau
   tipsTricksTriviaNotification(false)
 
   expect(notifyCreateMock).toHaveBeenCalledOnce()
-  expect(notifyCreateMock.mock.calls[0][0]).toMatchObject({
-    icon: undefined,
+  expect(notifyCreateMock.mock.calls[0]![0]!).toMatchObject({
     avatar: 'image://mascot',
     caption: 'Tip one'
   })
+  expect(notifyCreateMock.mock.calls[0]![0]!).not.toHaveProperty('icon')
 })
 
 /**
@@ -81,11 +81,11 @@ test('Test that tipsTricksTriviaNotification uses icon payload when mascot is hi
   tipsTricksTriviaNotification(true)
 
   expect(notifyCreateMock).toHaveBeenCalledOnce()
-  expect(notifyCreateMock.mock.calls[0][0]).toMatchObject({
+  expect(notifyCreateMock.mock.calls[0]![0]!).toMatchObject({
     icon: 'mdi-help',
-    avatar: undefined,
     caption: 'Tip two'
   })
+  expect(notifyCreateMock.mock.calls[0]![0]!).not.toHaveProperty('avatar')
 })
 
 /**
@@ -98,7 +98,7 @@ test('Test that tipsTricksTriviaNotification invokes Notify when the tip list is
   tipsTricksTriviaNotification(false)
 
   expect(notifyCreateMock).toHaveBeenCalledOnce()
-  expect(notifyCreateMock.mock.calls[0][0]).toMatchObject({
+  expect(notifyCreateMock.mock.calls[0]![0]!).toMatchObject({
     caption: ''
   })
 })

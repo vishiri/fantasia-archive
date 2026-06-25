@@ -82,7 +82,7 @@ test('Test that collectFaColorCustomPropertyNamesFromDocument lists --fa-color- 
  */
 test('Test that collectFaColorCustomPropertyNamesFromDocument follows a nested styleSheet on a rule', () => {
   appendStyle(':root { --fa-color-duck-nested: 1; }')
-  const targetSheet = appended[0]?.sheet
+  const targetSheet = appended[0]!?.sheet
   if (!targetSheet) {
     throw new Error('expected sheet')
   }
@@ -222,7 +222,7 @@ test('Test that collectFaColorCustomPropertyNamesFromDocument skips a null entry
  */
 test('Test that collectFaColorCustomPropertyNamesFromDocument skips a stylesheet that throws on cssRules', () => {
   appendStyle(':root { --fa-color-ok-skip: 1; }')
-  const good = appended[0]?.sheet
+  const good = appended[0]!?.sheet
   if (!good) {
     throw new Error('expected sheet')
   }
@@ -260,11 +260,11 @@ test('Test that collectFaColorCustomPropertyNamesFromDocument swallows a media b
       '}'
     ].join(' ')
   )
-  const good = appended[0]?.sheet
+  const good = appended[0]!?.sheet
   if (!good) {
     throw new Error('expected sheet')
   }
-  const r0 = good.cssRules[0] as CSSMediaRule
+  const r0 = good.cssRules[0]! as CSSMediaRule
   if (!r0 || r0.cssRules.length < 1) {
     return
   }

@@ -1,7 +1,7 @@
 import type { ComputedRef, Ref } from 'vue'
 
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, readonly, ref } from 'vue'
 
 import { i18n } from 'app/i18n/externalFileLoader'
 
@@ -24,6 +24,7 @@ import {
  */
 export const S_FaActiveProject = defineStore('S_FaActiveProject', () => {
   const activeProject: Ref<I_faActiveProject | null> = ref(null)
+  let openGeneration = 0
 
   const hasActiveProject: ComputedRef<boolean> = computed(() => {
     return activeProject.value !== null
@@ -77,17 +78,22 @@ export const S_FaActiveProject = defineStore('S_FaActiveProject', () => {
   }
 
   async function openProjectFromUserDialog (): Promise<T_faActiveProjectOpenFlowOutcome> {
+    const generation = ++openGeneration
     const api = window.faContentBridgeAPIs?.projectManagement
     if (api === undefined) {
       throw new Error(i18n.global.t('globalFunctionality.faProjectSession.bridgeUnavailable'))
     }
     const result = await api.openProject()
+    if (generation !== openGeneration) {
+      return 'superseded'
+    }
     return await finalizeFaActiveProjectOpenResult(result, openFlowHandlers)
   }
 
   async function openProjectFromKnownPath (
     filePath: string
   ): Promise<T_faActiveProjectOpenFlowOutcome> {
+    const generation = ++openGeneration
     const reused = tryReuseFaActiveProjectKnownPath(
       activeProject.value,
       filePath,
@@ -102,11 +108,14 @@ export const S_FaActiveProject = defineStore('S_FaActiveProject', () => {
       throw new Error(i18n.global.t('globalFunctionality.faProjectSession.bridgeUnavailable'))
     }
     const result = await api.openProject({ filePath })
+    if (generation !== openGeneration) {
+      return 'superseded'
+    }
     return await finalizeFaActiveProjectOpenResult(result, openFlowHandlers)
   }
 
   return {
-    activeProject,
+    activeProject: readonly(activeProject),
     clearActiveProject,
     createProjectFromUserInput,
     hasActiveProject,

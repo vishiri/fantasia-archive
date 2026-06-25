@@ -65,8 +65,13 @@ beforeEach(() => {
   quickCheckMock.mockImplementation(() => {})
 })
 
+function seedTestProjectFile (filePath: string): void {
+  fs.writeFileSync(filePath, '')
+}
+
 test('recoverable sqlite error closes handle only, reconnects, then work succeeds', () => {
   testPath = path.join(os.tmpdir(), `fa-ensure-sqlite-retry-${Date.now()}.faproject`)
+  seedTestProjectFile(testPath)
   expect(reconnectFaProjectDatabaseAtKnownPathSync(testPath)).toBe(true)
   let calls = 0
   const out = runWithFaProjectDatabaseSync(() => {
@@ -87,6 +92,7 @@ test('recoverable sqlite error closes handle only, reconnects, then work succeed
 
 test('SQLITE_CORRUPT errors are not retried', () => {
   testPath = path.join(os.tmpdir(), `fa-ensure-corrupt-${Date.now()}.faproject`)
+  seedTestProjectFile(testPath)
   expect(reconnectFaProjectDatabaseAtKnownPathSync(testPath)).toBe(true)
   expect(() => {
     runWithFaProjectDatabaseSync(() => {
@@ -99,6 +105,7 @@ test('SQLITE_CORRUPT errors are not retried', () => {
 
 test('malformed disk image message is not retried', () => {
   testPath = path.join(os.tmpdir(), `fa-ensure-malformed-${Date.now()}.faproject`)
+  seedTestProjectFile(testPath)
   expect(reconnectFaProjectDatabaseAtKnownPathSync(testPath)).toBe(true)
   expect(() => {
     runWithFaProjectDatabaseSync(() => {
@@ -132,6 +139,7 @@ test('no database when last-known file is missing returns ok false', () => {
 
 test('getFaProjectLastKnownActiveProjectFilePath survives handle-only close for reconnect', () => {
   testPath = path.join(os.tmpdir(), `fa-ensure-path-${Date.now()}.faproject`)
+  seedTestProjectFile(testPath)
   expect(reconnectFaProjectDatabaseAtKnownPathSync(testPath)).toBe(true)
   const stored = getFaProjectLastKnownActiveProjectFilePath()
   expect(stored).toBe(testPath)
@@ -147,6 +155,7 @@ test('getFaProjectLastKnownActiveProjectFilePath survives handle-only close for 
 
 test('runWithFaProjectDatabaseForIpcAsync returns false when renderer-driven reconnect fails', async () => {
   testPath = path.join(os.tmpdir(), `fa-ensure-ipc-fail-${Date.now()}.faproject`)
+  seedTestProjectFile(testPath)
   closeFaProjectActiveDatabase()
   requestPathMock.mockResolvedValueOnce(testPath)
   applyMigrationsMock.mockImplementationOnce(() => {

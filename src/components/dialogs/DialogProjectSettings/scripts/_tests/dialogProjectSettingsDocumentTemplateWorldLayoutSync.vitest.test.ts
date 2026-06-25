@@ -87,9 +87,9 @@ test('Test that syncDialogProjectSettingsWorldDraftTemplateLayoutPlacementDispla
     'Hero'
   )
 
-  expect(nextWorlds[0].templateLayout.placements[0].templateDisplayName).toBe('Hero')
-  expect(nextWorlds[1].templateLayout.placements[0].templateDisplayName).toBe('Hero')
-  expect(nextWorlds[1].templateLayout.placements[1].templateDisplayName).toBe('Location')
+  expect(nextWorlds[0]!.templateLayout.placements[0]!.templateDisplayName).toBe('Hero')
+  expect(nextWorlds[1]!.templateLayout.placements[0]!.templateDisplayName).toBe('Hero')
+  expect(nextWorlds[1]!.templateLayout.placements[1]!.templateDisplayName).toBe('Location')
 })
 
 /**
@@ -107,7 +107,7 @@ test('Test that syncDialogProjectSettingsWorldDraftTemplateLayoutPlacementDispla
     'Hero'
   )
 
-  expect(nextWorlds[0].templateLayout.placements).toHaveLength(0)
+  expect(nextWorlds[0]!.templateLayout.placements).toHaveLength(0)
 })
 
 test('Test that syncDialogProjectSettingsWorldTemplateLayoutPlacementLocalizedLabels resolves active locale labels', () => {
@@ -130,8 +130,8 @@ test('Test that syncDialogProjectSettingsWorldTemplateLayoutPlacementLocalizedLa
     'de'
   )
 
-  expect(nextLayout.placements[0].templateDisplayName).toBe('Held')
-  expect(nextLayout.placements[0].worldAppendix).toBe('Anhang')
+  expect(nextLayout.placements[0]!.templateDisplayName).toBe('Held')
+  expect(nextLayout.placements[0]!.worldAppendix).toBe('Anhang')
 })
 
 test('Test that syncDialogProjectSettingsWorldsTemplateLayoutPlacementLocalizedLabels updates every world layout', () => {
@@ -164,9 +164,9 @@ test('Test that syncDialogProjectSettingsWorldsTemplateLayoutPlacementLocalizedL
     'de'
   )
 
-  expect(nextWorlds[0].templateLayout.placements[0].templateDisplayName).toBe('Held')
-  expect(nextWorlds[1].templateLayout.placements[0].worldAppendix).toBe('Anhang')
-  expect(nextWorlds[1].templateLayout.placements[1].templateDisplayName).toBe('Ort')
+  expect(nextWorlds[0]!.templateLayout.placements[0]!.templateDisplayName).toBe('Held')
+  expect(nextWorlds[1]!.templateLayout.placements[0]!.worldAppendix).toBe('Anhang')
+  expect(nextWorlds[1]!.templateLayout.placements[1]!.templateDisplayName).toBe('Ort')
 })
 
 test('Test that syncDialogProjectSettingsWorldTemplateLayoutPlacementLocalizedLabels keeps unknown template placements unchanged', () => {
@@ -176,5 +176,5 @@ test('Test that syncDialogProjectSettingsWorldTemplateLayoutPlacementLocalizedLa
     'de'
   )
 
-  expect(nextLayout.placements[0]).toEqual(worldA.templateLayout.placements[0])
+  expect(nextLayout.placements[0]!).toEqual(worldA.templateLayout.placements[0]!)
 })

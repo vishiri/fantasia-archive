@@ -19,8 +19,8 @@ export type T_createDialogActionMonitorApi = {
     tableScrollHostRef: I_ref<HTMLElement | null>
   }
   useDialogActionMonitor: (props: {
-    directInput?: T_dialogName
-    directHistorySnapshot?: I_faActionHistoryEntry[]
+    directInput?: T_dialogName | undefined
+    directHistorySnapshot?: I_faActionHistoryEntry[] | undefined
   }) => {
     columns: T_dialogActionMonitorTableColumn[]
     dialogActionMonitorTableHeightStyle: I_computedRef<Record<string, string> | undefined>

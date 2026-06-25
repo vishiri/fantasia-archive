@@ -158,19 +158,19 @@ test('Test that DialogProjectSettingsWorldsPanel forwards add world and detail u
   expect(w.emitted('addWorld')).toBeTruthy()
 
   await w.find('[data-test-locator="dialogProjectSettings-worlds-detail-remove"]').trigger('click')
-  expect(w.emitted('removeWorld')?.[0]).toEqual([worldA.id])
+  expect(w.emitted('removeWorld')?.[0]!).toEqual([worldA.id])
 
   await w.find('[data-test-locator="dialogProjectSettings-worlds-detail-color"]').trigger('click')
-  expect(w.emitted('updateWorldColor')?.[0]).toEqual([worldA.id, '#112233'])
+  expect(w.emitted('updateWorldColor')?.[0]!).toEqual([worldA.id, '#112233'])
 
   await w.find('[data-test-locator="dialogProjectSettings-worlds-detail-colorPallete"]').trigger('click')
-  expect(w.emitted('updateWorldColorPallete')?.[0]).toEqual([worldA.id, '#112233;#445566'])
+  expect(w.emitted('updateWorldColorPallete')?.[0]!).toEqual([worldA.id, '#112233;#445566'])
 
   await w.find('[data-test-locator="dialogProjectSettings-worlds-detail-name"]').trigger('click')
-  expect(w.emitted('updateWorldDisplayNameTranslations')?.[0]).toEqual([worldA.id, { 'en-US': 'Renamed' }])
+  expect(w.emitted('updateWorldDisplayNameTranslations')?.[0]!).toEqual([worldA.id, { 'en-US': 'Renamed' }])
 
   await w.find('[data-test-locator="dialogProjectSettings-worlds-detail-layout"]').trigger('click')
-  expect(w.emitted('updateWorldTemplateLayout')?.[0]).toEqual([worldA.id, {
+  expect(w.emitted('updateWorldTemplateLayout')?.[0]!).toEqual([worldA.id, {
     groups: [],
     placements: []
   }])

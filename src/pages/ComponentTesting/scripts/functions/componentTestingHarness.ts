@@ -15,7 +15,7 @@ export function resolveComponentTestingSfcByName (
   componentName: string
 ): T_componentTestingSfcDefault | null {
   for (const loopPath in componentList) {
-    const loopComponent = componentList[loopPath].default
+    const loopComponent = componentList[loopPath]!.default
     if (loopComponent.__name === componentName) {
       return loopComponent
     }

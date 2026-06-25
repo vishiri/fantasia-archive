@@ -21,9 +21,9 @@ test('Test that migrateFaProjectSchemaV8ToV9 adds translation JSON columns and b
   )
 
   expect(exec).toHaveBeenCalledTimes(4)
-  expect(exec.mock.calls[0][0]).toContain('display_name_translations_json')
-  expect(exec.mock.calls[1][0]).toContain("json_object('en-US', display_name)")
-  expect(exec.mock.calls[2][0]).toContain('world_appendix_translations_json')
-  expect(exec.mock.calls[3][0]).toContain("json_object('en-US', world_appendix)")
+  expect(exec.mock.calls[0]![0]!).toContain('display_name_translations_json')
+  expect(exec.mock.calls[1]![0]!).toContain("json_object('en-US', display_name)")
+  expect(exec.mock.calls[2]![0]!).toContain('world_appendix_translations_json')
+  expect(exec.mock.calls[3]![0]!).toContain("json_object('en-US', world_appendix)")
   expect(pragma).toHaveBeenCalledWith('user_version = 9')
 })

@@ -52,7 +52,7 @@ test('Test that syncDialogProjectSettingsDocumentTemplateLayoutTitles updates pl
     localWorlds
   })
 
-  expect(localWorlds.value?.[0]?.templateLayout.placements[0]?.templateDisplayName).toBe('Held')
+  expect(localWorlds.value?.[0]!?.templateLayout.placements[0]!?.templateDisplayName).toBe('Held')
 })
 
 test('Test that syncDialogProjectSettingsDocumentTemplateLayoutTitles no-ops when drafts are null', () => {
@@ -92,7 +92,7 @@ test('Test that syncDialogProjectSettingsDocumentTemplateLayoutTitles no-ops whe
     localWorlds
   })
 
-  expect(localWorlds.value?.[0]?.templateLayout.placements).toEqual([])
+  expect(localWorlds.value?.[0]!?.templateLayout.placements).toEqual([])
 })
 
 test('Test that syncDialogProjectSettingsDocumentTemplateLayoutTitles no-ops when template id is missing', () => {
@@ -120,5 +120,5 @@ test('Test that syncDialogProjectSettingsDocumentTemplateLayoutTitles no-ops whe
     localWorlds
   })
 
-  expect(localWorlds.value?.[0]?.templateLayout.placements).toEqual([])
+  expect(localWorlds.value?.[0]!?.templateLayout.placements).toEqual([])
 })

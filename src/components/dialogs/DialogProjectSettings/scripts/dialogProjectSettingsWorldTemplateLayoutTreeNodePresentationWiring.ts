@@ -1,5 +1,6 @@
 import type { ComputedRef } from 'vue'
 
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
 import { FA_ICON_PICKER_EMPTY_PLACEHOLDER_ICON } from 'app/types/I_faIconPickerInput'
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
@@ -44,11 +45,11 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodePresentati
     }
   }
   props: {
-    blankGroupIds?: ReadonlySet<string>
+    blankGroupIds?: ReadonlySet<string> | undefined
     currentLanguageCode: T_faUserSettingsLanguageCode
     documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[]
-    duplicateDocumentTemplateIds?: ReadonlySet<string>
-    invalidDocumentTemplateIds?: ReadonlySet<string>
+    duplicateDocumentTemplateIds?: ReadonlySet<string> | undefined
+    invalidDocumentTemplateIds?: ReadonlySet<string> | undefined
     node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
   }
 }): T_dialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring {
@@ -77,12 +78,19 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodePresentati
   })
 
   const rowHasValidationError = deps.computed(() => {
-    return resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeHasValidationError({
-      blankGroupIds: deps.props.blankGroupIds,
-      duplicateDocumentTemplateIds: deps.props.duplicateDocumentTemplateIds,
-      invalidDocumentTemplateIds: deps.props.invalidDocumentTemplateIds,
-      node: deps.props.node
-    })
+    return resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeHasValidationError(
+      dropUndefinedRecordValues({
+        blankGroupIds: deps.props.blankGroupIds,
+        duplicateDocumentTemplateIds: deps.props.duplicateDocumentTemplateIds,
+        invalidDocumentTemplateIds: deps.props.invalidDocumentTemplateIds,
+        node: deps.props.node
+      }) as {
+        blankGroupIds?: ReadonlySet<string>
+        duplicateDocumentTemplateIds?: ReadonlySet<string>
+        invalidDocumentTemplateIds?: ReadonlySet<string>
+        node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
+      }
+    )
   })
 
   const nodeRootClassList = deps.computed(() => {

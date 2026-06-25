@@ -73,7 +73,7 @@ function mountTreeNode (
 ): ReturnType<typeof mount> {
   const globalOptions = options?.global ?? {}
   return mount(DialogProjectSettingsWorldTemplateLayoutTreeNode, {
-    attachTo: options?.attachTo,
+    ...(options?.attachTo !== undefined ? { attachTo: options.attachTo } : {}),
     props: {
       currentLanguageCode: 'en-US',
       documentTemplates: documentTemplatesFixture,
@@ -326,7 +326,7 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNode renders templat
   expect(w.text()).toContain('(sheet)')
 
   await w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-remove"]').trigger('click')
-  expect(w.emitted('removePlacement')?.[0]).toEqual(['placement-a'])
+  expect(w.emitted('removePlacement')?.[0]!).toEqual(['placement-a'])
 })
 
 /**

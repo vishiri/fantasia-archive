@@ -7,7 +7,7 @@ import {
   getFaProjectLastKnownActiveProjectFilePath
 } from 'app/src-electron/mainScripts/projectManagement/faProjectActiveDatabaseWiring'
 import { reconnectFaProjectDatabaseAtKnownPathSync } from 'app/src-electron/mainScripts/projectManagement/faProjectReconnectAtKnownPathWiring'
-import { pathLooksLikeFaProjectFile } from './projectManagementSharedPathWiring'
+import { resolveHardenedFaProjectFilePath } from 'app/src-electron/mainScripts/projectManagement/faProjectFilePathHardeningWiring'
 import { requestRendererActiveProjectPathForFailsafe } from 'app/src-electron/mainScripts/ipcManagement/faProjectFailsafePathFromRendererWiring'
 
 function ensureActiveDatabaseAttachedSync (): boolean {
@@ -15,10 +15,14 @@ function ensureActiveDatabaseAttachedSync (): boolean {
     return true
   }
   const p = getFaProjectLastKnownActiveProjectFilePath()
-  if (p === null || !pathLooksLikeFaProjectFile(p)) {
+  if (p === null) {
     return false
   }
-  return reconnectFaProjectDatabaseAtKnownPathSync(p)
+  const hardened = resolveHardenedFaProjectFilePath(p)
+  if (hardened === null) {
+    return false
+  }
+  return reconnectFaProjectDatabaseAtKnownPathSync(hardened)
 }
 
 function isLikelyRecoverableProjectSqliteError (e: unknown): boolean {
@@ -64,7 +68,8 @@ export function runWithFaProjectDatabaseSync<T> (work: (db: Database) => T): { o
     }
     closeFaProjectActiveDatabaseHandleOnly()
     const p = getFaProjectLastKnownActiveProjectFilePath()
-    if (p === null || !pathLooksLikeFaProjectFile(p) || !reconnectFaProjectDatabaseAtKnownPathSync(p)) {
+    const hardened = p === null ? null : resolveHardenedFaProjectFilePath(p)
+    if (hardened === null || !reconnectFaProjectDatabaseAtKnownPathSync(hardened)) {
       throw firstErr
     }
     const db1 = getFaProjectActiveDatabase()
@@ -90,10 +95,10 @@ export async function runWithFaProjectDatabaseForIpcAsync<T> (
     return first
   }
   const fromRenderer = await requestRendererActiveProjectPathForFailsafe(event.sender)
+  const hardened = fromRenderer === null ? null : resolveHardenedFaProjectFilePath(fromRenderer)
   if (
-    fromRenderer === null ||
-    !pathLooksLikeFaProjectFile(fromRenderer) ||
-    !reconnectFaProjectDatabaseAtKnownPathSync(fromRenderer)
+    hardened === null ||
+    !reconnectFaProjectDatabaseAtKnownPathSync(hardened)
   ) {
     return { ok: false }
   }

@@ -16,7 +16,7 @@ import { hideNativeSortableDragGhost } from 'app/src/scripts/faDragDrop/function
 import {
   applyFaVerticalDraggableTabsDocumentDragCursor,
   clearFaVerticalDraggableTabsDocumentDragCursor
-} from 'app/src/scripts/faDragDrop/functions/faVerticalDraggableTabsDocumentDragCursor'
+} from 'app/src/scripts/faDragDrop/faDragDrop_manager'
 import { faVerticalDraggableTabsSortableDragOptions } from 'app/src/scripts/faDragDrop/functions/faVerticalDraggableTabsSortableDragOptions'
 import { readFaSortableDragItemDataAttribute } from 'app/src/scripts/faDragDrop/functions/readFaSortableDragItemDataAttribute'
 

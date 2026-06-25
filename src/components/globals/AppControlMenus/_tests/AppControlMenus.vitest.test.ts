@@ -175,7 +175,7 @@ test('Test that AppControlMenus component-testing menu triggers openDialogMarkdo
 
   const itemTexts = document.body.querySelectorAll('[data-test-locator="AppControlSingleMenu-menuItem-text"]')
   expect(itemTexts.length).toBeGreaterThan(0)
-  ;(itemTexts[0] as HTMLElement).click()
+  ;(itemTexts[0]! as HTMLElement).click()
   await flushPromises()
 
   expect(spy).toHaveBeenCalledWith('changeLog')

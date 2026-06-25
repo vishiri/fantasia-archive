@@ -19,6 +19,8 @@ type T_faAppShellPageTransitionBindings = {
 }
 
 type T_createMainLayoutDeps = {
+  attachWindowKeydownListener: (handler: (event: KeyboardEvent) => void) => void
+  detachWindowKeydownListener: (handler: (event: KeyboardEvent) => void) => void
   awaitWelcomeScreenAutoLoadBootCompletion: () => Promise<void>
   FA_APP_SHELL_DRAWER_TRANSITION_MS: number
   FA_APP_SHELL_PAGE_TRANSITION_BINDINGS: T_faAppShellPageTransitionBindings
@@ -107,7 +109,7 @@ function useMainLayout (
       await deps.hydrateFromBridgeOrReport(() => faKeybindsStore.refreshKeybinds())
       deps.ensureFaChromiumForwardedKeyChordListener()
       faKeybindKeydownHandler = deps.createFaKeybindKeydownHandler(deps.getFaKeybindKeydownContext)
-      window.addEventListener('keydown', faKeybindKeydownHandler, true)
+      deps.attachWindowKeydownListener(faKeybindKeydownHandler)
     }
     // Hydrate app-wide floating-window stores before skip-welcome boot completes so reopen uses persisted frame geometry.
     if (window.faContentBridgeAPIs?.faAppStyling !== undefined) {
@@ -126,7 +128,7 @@ function useMainLayout (
 
   deps.onUnmounted(() => {
     if (faKeybindKeydownHandler !== undefined) {
-      window.removeEventListener('keydown', faKeybindKeydownHandler, true)
+      deps.detachWindowKeydownListener(faKeybindKeydownHandler)
     }
   })
 

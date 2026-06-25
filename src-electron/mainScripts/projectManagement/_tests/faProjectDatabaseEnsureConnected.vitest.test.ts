@@ -43,6 +43,7 @@ beforeEach(() => {
   requestPathMock.mockResolvedValue(null)
   getPathMock.mockReturnValue(null)
   reconnectMock.mockReturnValue(false)
+  fs.writeFileSync(absoluteProjectPath, '')
 })
 
 afterEach(() => {
@@ -238,6 +239,32 @@ test('runWithFaProjectDatabaseSync retries when the error mentions sqlite withou
     ok: true,
     value: 'fixed'
   })
+})
+
+test('runWithFaProjectDatabaseSync throws when recoverable sqlite error fires but known path is cleared', () => {
+  const fakeDb = { k: 11 }
+  getDbMock.mockReturnValue(fakeDb as never)
+  getPathMock.mockReturnValue(null)
+  const busy = new Error('locked')
+  ;(busy as Error & { code?: string }).code = 'SQLITE_BUSY'
+  expect(() => {
+    runWithFaProjectDatabaseSync(() => {
+      throw busy
+    })
+  }).toThrow('locked')
+  expect(closeHandleOnlyMock).toHaveBeenCalledOnce()
+  expect(reconnectMock).not.toHaveBeenCalled()
+})
+
+test('runWithFaProjectDatabaseForIpcAsync returns false when renderer supplies no path', async () => {
+  getDbMock.mockReturnValue(null)
+  getPathMock.mockReturnValue(null)
+  requestPathMock.mockResolvedValueOnce(null)
+  const out = await runWithFaProjectDatabaseForIpcAsync({ sender: {} } as never, () => {
+    return 1
+  })
+  expect(out).toEqual({ ok: false })
+  expect(reconnectMock).not.toHaveBeenCalled()
 })
 
 test('runWithFaProjectDatabaseForIpcAsync returns false when renderer path reconnect fails', async () => {

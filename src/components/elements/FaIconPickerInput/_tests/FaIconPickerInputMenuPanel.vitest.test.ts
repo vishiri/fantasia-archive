@@ -112,7 +112,7 @@ test('Test that FaIconPickerInputMenuPanel emits icon-select on cell click', asy
   })
 
   await w.find('[data-test-icon-name="mdi-account"]').trigger('click')
-  expect(w.emitted('icon-select')?.[0]).toEqual(['mdi-account'])
+  expect(w.emitted('icon-select')?.[0]!).toEqual(['mdi-account'])
 })
 
 /**
@@ -223,5 +223,5 @@ test('Test that FaIconPickerInputMenuPanel focuses search input and emits search
   expect(focus).toHaveBeenCalled()
 
   await w.find(`[data-test-locator="${menuTestLocator}-search"]`).setValue('home')
-  expect(w.emitted('search-update')?.[0]).toEqual(['home'])
+  expect(w.emitted('search-update')?.[0]!).toEqual(['home'])
 })

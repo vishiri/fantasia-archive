@@ -4,14 +4,14 @@ export type T_e2eLocaleSingularPlural = {
     singular: string
   }
   de?: {
-    plural?: string
-    singular?: string
-  }
+    plural?: string | undefined
+    singular?: string | undefined
+  } | undefined
 }
 
 export type T_e2eLocaleString = {
   enUS: string
-  de?: string
+  de?: string | undefined
 }
 
 export type T_e2eTemplateManifestEntry = {
@@ -25,7 +25,7 @@ export type T_e2eTemplateManifestEntry = {
 export type T_e2eLayoutTemplateNode = {
   type: 'template'
   tabLabel: string
-  nickname?: T_e2eLocaleSingularPlural
+  nickname?: T_e2eLocaleSingularPlural | undefined
 }
 
 export type T_e2eLayoutGroupNode = {

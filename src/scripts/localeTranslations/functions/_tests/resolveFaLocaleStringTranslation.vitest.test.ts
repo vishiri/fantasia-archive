@@ -204,7 +204,7 @@ test('Test that scheduleFaLocaleTranslationsMenuInputFocus focuses menu input af
   })
   await Promise.resolve()
   expect(focusMenuInput).toHaveBeenCalledTimes(1)
-  rafCallbacks[0]?.()
+  rafCallbacks[0]!?.()
   await Promise.resolve()
   expect(focusMenuInput).toHaveBeenCalledTimes(2)
 })

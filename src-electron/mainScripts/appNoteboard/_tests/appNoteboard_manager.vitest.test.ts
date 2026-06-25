@@ -67,7 +67,7 @@ test('Test that getFaAppNoteboard creates the store once with expected name and 
 
   expect(first).toBe(second)
   expect(ElectronStoreMock).toHaveBeenCalledTimes(1)
-  expect(constructCalls[0]).toEqual({
+  expect(constructCalls[0]!).toEqual({
     name: 'faAppNoteboard',
     defaults: { ...FA_APP_NOTEBOARD_STORE_DEFAULTS }
   })
@@ -177,7 +177,7 @@ test('Test that cleanupFaAppNoteboard handles null store snapshot', async () => 
   })
   cleanupFaAppNoteboard(fake)
   expect(written.length).toBeGreaterThan(0)
-  expect(written[0]).toEqual({
+  expect(written[0]!).toEqual({
     frame: null,
     schemaVersion: 1,
     text: ''

@@ -14,7 +14,7 @@ export function createUseFaFloatingWindowFramePersist (deps: {
     options?: { immediate?: boolean }
   ) => void
 }): (opts: {
-    debounceMs?: number
+    debounceMs?: number | undefined
     failureActionId: T_faActionId
     h: I_ref<number>
     persistFrame: () => Promise<void>

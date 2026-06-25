@@ -91,14 +91,14 @@ const dataToolsAndHelpStyleWithHints: I_appMenuList = {
   title: 'Tools (storybook fixture)',
   data: [
     faMenuItem('appControlMenus.documents.items.quickAddNewDocument', 'mdi-text-box-plus-outline'),
-    faMenuSeparator(),
+    faMenuSeparator('storybook-tools-sep-1'),
     faMenuItem('appControlMenus.tools.items.keybindSettings', 'mdi-keyboard-settings', {
       keybindCommandId: 'openKeybindSettings'
     }),
     faMenuItem('appControlMenus.tools.items.appSettings', 'mdi-tune', {
       keybindCommandId: 'openAppSettings'
     }),
-    faMenuSeparator(),
+    faMenuSeparator('storybook-tools-sep-2'),
     faMenuItem('appControlMenus.helpInfo.items.advancedSearchGuide', 'mdi-file-question', {
       keybindCommandId: 'openAdvancedSearchGuide'
     }),

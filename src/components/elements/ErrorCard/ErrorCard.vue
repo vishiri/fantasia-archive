@@ -37,6 +37,7 @@ import type { T_errorCardImageName } from 'app/types/T_errorCardImage'
 import { useErrorCard } from './scripts/errorCard_manager'
 
 const props = withDefaults(
+  /* eslint-disable vue/require-default-prop -- exactOptionalPropertyTypes: omit undefined from withDefaults */
   defineProps<{
     /**
      * Primary heading shown above the mascot.
@@ -56,7 +57,6 @@ const props = withDefaults(
     width?: number
   }>(),
   {
-    details: undefined,
     width: 600
   }
 )

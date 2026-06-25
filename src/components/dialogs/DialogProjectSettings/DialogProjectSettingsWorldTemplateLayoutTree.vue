@@ -75,11 +75,11 @@ defineOptions({
 })
 
 const props = defineProps<{
-  blankGroupIds?: ReadonlySet<string>
+  blankGroupIds?: ReadonlySet<string> | undefined
   currentLanguageCode: T_faUserSettingsLanguageCode
   documentTemplates: I_dialogProjectSettingsDocumentTemplateDraft[]
-  duplicateDocumentTemplateIds?: ReadonlySet<string>
-  invalidDocumentTemplateIds?: ReadonlySet<string>
+  duplicateDocumentTemplateIds?: ReadonlySet<string> | undefined
+  invalidDocumentTemplateIds?: ReadonlySet<string> | undefined
   templateLayout: I_dialogProjectSettingsWorldTemplateLayoutDraft
 }>()
 

@@ -230,7 +230,7 @@ test('Test that tree sync wiring patches labels without rebuilding tree nodes', 
     }
   ]
   const treeData = ref(buildHeTreeNodesFromWorldTemplateLayoutDraft(layout, 'en-US'))
-  const initialNodeRef = treeData.value[0]
+  const initialNodeRef = treeData.value[0]!
   layout.placements[0]!.templateDisplayName = 'Hero'
   const wiring = createDialogProjectSettingsWorldTemplateLayoutTreeSyncWiring({
     emitTemplateLayout: () => {},
@@ -241,8 +241,8 @@ test('Test that tree sync wiring patches labels without rebuilding tree nodes', 
     treeData
   })
   wiring.resyncTreeDataFromProps()
-  expect(treeData.value[0]).toBe(initialNodeRef)
-  expect(treeData.value[0]?.label).toBe('Hero')
+  expect(treeData.value[0]!).toBe(initialNodeRef)
+  expect(treeData.value[0]!?.label).toBe('Hero')
 })
 
 /**
@@ -279,7 +279,7 @@ test('Test that tree sync wiring patches labels when draft array order differs f
     }
   ]
   const treeData = ref(buildHeTreeNodesFromWorldTemplateLayoutDraft(layout, 'en-US'))
-  const initialNodeRef = treeData.value[0]
+  const initialNodeRef = treeData.value[0]!
   const propsLayout = {
     groups: [...layout.groups].reverse(),
     placements: [...layout.placements]
@@ -294,8 +294,8 @@ test('Test that tree sync wiring patches labels when draft array order differs f
     treeData
   })
   wiring.resyncTreeDataFromProps()
-  expect(treeData.value[0]).toBe(initialNodeRef)
-  expect(treeData.value[0]?.label).toBe('Creatures')
+  expect(treeData.value[0]!).toBe(initialNodeRef)
+  expect(treeData.value[0]!?.label).toBe('Creatures')
 })
 
 /**
@@ -347,7 +347,7 @@ test('Test that tree sync wiring rebuilds when structure keys diverge', () => {
   })
   wiring.resyncTreeDataFromProps()
   expect(treeData.value).toHaveLength(1)
-  expect(treeData.value[0]?.label).toBe('Character')
+  expect(treeData.value[0]!?.label).toBe('Character')
 })
 
 /**

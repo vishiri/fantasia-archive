@@ -8,7 +8,7 @@ export function createDialogKeybindSettingsView (
   bindings: T_dialogKeybindSettingsViewFactoryBindings
 ): {
     useDialogKeybindSettingsView: (props: {
-      directInput?: T_dialogName
+      directInput?: T_dialogName | undefined
     }) => T_useDialogKeybindSettingsViewResult
   } {
   const {
@@ -17,7 +17,7 @@ export function createDialogKeybindSettingsView (
   } = bindings
 
   const useView = (props: {
-    directInput?: T_dialogName
+    directInput?: T_dialogName | undefined
   }): T_useDialogKeybindSettingsViewResult => {
     return useViewImpl(viewDeps, props)
   }

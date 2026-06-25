@@ -80,7 +80,7 @@ test('Test that updateProjectSettings persists via bridge helper', async () => {
   const patch = { projectName: 'Next' }
   await store.updateProjectSettings(patch)
   expect(persistPatchFromStoreMock).toHaveBeenCalledOnce()
-  const callArg = persistPatchFromStoreMock.mock.calls[0]![0] as {
+  const callArg = persistPatchFromStoreMock.mock.calls[0]![0]! as {
     applyRoot: (next: I_faProjectSettingsRoot) => void
     patch: typeof patch
   }

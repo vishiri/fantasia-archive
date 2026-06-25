@@ -39,7 +39,7 @@ function registerDialogKeybindSettingsStoreUuidWatch (
 
 function registerDialogKeybindSettingsDirectInputOpeners (
   deps: T_dialogKeybindSettingsDialogWiringModuleDeps,
-  props: { directInput?: T_dialogName },
+  props: { directInput?: T_dialogName | undefined },
   openDialog: () => void
 ): void {
   deps.watch(
@@ -68,7 +68,7 @@ export function setupDialogKeybindSettingsDialogRouting (
       snapshot: { platform: NodeJS.Platform } | null
     }
     onSaveMain: () => Promise<boolean>
-    props: { directInput?: T_dialogName }
+    props: { directInput?: T_dialogName | undefined }
   }
 ): {
     formatChord: (chord: I_faChordSerialized) => string

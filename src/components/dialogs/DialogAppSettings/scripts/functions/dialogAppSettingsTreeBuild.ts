@@ -118,7 +118,7 @@ function appendOneSnapshotKeyToUnsortedTree (
   }
 
   const normalizedSettingKey = settingKey as keyof I_faUserSettings
-  const settingOption = appSettingsOptions[settingKey]
+  const settingOption = appSettingsOptions[settingKey]!
   const categoryKey = settingOption.category
   const subCategoryKey = settingOption.subcategory
 

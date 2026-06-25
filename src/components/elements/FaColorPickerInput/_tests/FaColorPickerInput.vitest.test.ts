@@ -399,7 +399,7 @@ test('Test that FaColorPickerInput appends the current color to a draft world pa
 
   await appendButton.trigger('click')
 
-  expect(w.emitted('append-to-world-palette')?.[0]).toEqual(['#112233;#AABBCC'])
+  expect(w.emitted('append-to-world-palette')?.[0]!).toEqual(['#112233;#AABBCC'])
 })
 
 /**

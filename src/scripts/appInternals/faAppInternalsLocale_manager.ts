@@ -1,6 +1,6 @@
 import { i18n } from 'app/i18n/externalFileLoader'
 
-import { applyFaInterfaceTextDirectionFromLanguageCode } from './functions/faInterfaceTextDirection'
+import { applyFaInterfaceTextDirectionFromLanguageCode } from './faInterfaceTextDirectionApplyWiring'
 import { createFaAppInternalsLocale } from './functions/createFaAppInternalsLocale'
 
 const faAppInternalsLocaleApi = createFaAppInternalsLocale({

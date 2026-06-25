@@ -63,7 +63,7 @@ test('Test that getFaUserSettings creates the store once with expected name and 
 
   expect(first).toBe(second)
   expect(ElectronStoreMock).toHaveBeenCalledTimes(1)
-  expect(constructCalls[0]).toEqual({
+  expect(constructCalls[0]!).toEqual({
     name: 'faUserSettings',
     defaults: { ...FA_USER_SETTINGS_DEFAULTS }
   })

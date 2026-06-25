@@ -143,12 +143,17 @@ export async function runFaProjectOpenFromIpc (
     if (target.ipcExplicitPathFailed === true && target.attemptedFilePath !== undefined) {
       removeRecentProjectEntryByPath(target.attemptedFilePath)
     }
-    return {
-      attemptedFilePath: target.attemptedFilePath,
+    const errorResult: I_faProjectOpenResult = {
       errorMessage: target.errorMessage,
       errorName: target.errorName,
       outcome: 'error'
     }
+
+    if (target.attemptedFilePath !== undefined) {
+      errorResult.attemptedFilePath = target.attemptedFilePath
+    }
+
+    return errorResult
   }
 
   if (!('filePath' in target)) {

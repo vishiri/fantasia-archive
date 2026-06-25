@@ -6,7 +6,7 @@ import {
   applyFaVerticalDraggableTabsDocumentDragCursor,
   clearFaVerticalDraggableTabsDocumentDragCursor,
   FA_VERTICAL_DRAGGABLE_TABS_DOCUMENT_DRAGGING_BODY_CLASS
-} from '../functions/faVerticalDraggableTabsDocumentDragCursor'
+} from '../faDragDrop_manager'
 
 /**
  * faVerticalDraggableTabsDocumentDragCursor

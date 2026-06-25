@@ -17,7 +17,7 @@ test('Test that migrateFaProjectSchemaV1ToV2 drops world_media and bumps user_ve
   migrateFaProjectSchemaV1ToV2(db as never)
 
   expect(exec).toHaveBeenCalledOnce()
-  const sql = exec.mock.calls[0][0] as string
+  const sql = exec.mock.calls[0]![0]! as string
   expect(sql).toContain('DROP TABLE IF EXISTS world_media')
   expect(sql).not.toContain('world_document_templates')
   expect(pragma).toHaveBeenCalledWith('user_version = 2')

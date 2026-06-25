@@ -48,11 +48,11 @@ export type I_faLocaleTranslationsInputComposableDeps = {
   ) => HTMLElement | null
   resolveFaLocaleTranslationsMenuPresentation: (input: {
     anchorRect: DOMRectReadOnly
-    maxHeightPx?: number
-    maxWidthPx?: number
-    minWidthPx?: number
+    maxHeightPx?: number | undefined
+    maxWidthPx?: number | undefined
+    minWidthPx?: number | undefined
     viewportHeightPx: number
-    viewportMarginPx?: number
+    viewportMarginPx?: number | undefined
     viewportWidthPx: number
   }) => {
     maxHeightPx: number
@@ -85,7 +85,7 @@ export type I_faLocaleTranslationsInputComposableOptions = {
   readPreferredLanguageInputFocus: () => (() => void) | null
   readTriggerElement: () => HTMLElement | null
   requestAnimationFrame: (callback: () => void) => number
-  translationForms?: I_ref<T_faLocaleTranslationsInputTranslationForms>
+  translationForms?: I_ref<T_faLocaleTranslationsInputTranslationForms> | undefined
 }
 
 export type I_faLocaleTranslationsInputComposableApi = {

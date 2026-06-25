@@ -1,0 +1,46 @@
+.faDeleteConfirmButton__confirmMenu.q-menu {
+  /* Teleported q-menu; stack above modal QDialog chrome (same band as FaColorPickerInput). */
+  min-width: $dialogProjectSettings-worldsDeleteConfirm-maxWidth;
+  z-index: $dialogProjectSettings-worldsDeleteConfirm-menu-zIndex !important;
+}
+
+.faDeleteConfirmButton__confirmMenu {
+  background-color: $dialogProjectSettings-worldsDeleteConfirm-backgroundColor;
+  max-width: $dialogProjectSettings-worldsDeleteConfirm-maxWidth;
+}
+
+.faDeleteConfirmButton__confirmInner {
+  padding:
+    $dialogProjectSettings-worldsDeleteConfirm-paddingY
+    $dialogProjectSettings-worldsDeleteConfirm-paddingX;
+}
+
+.faDeleteConfirmButton__confirmMessage {
+  margin: 0 0 $dialogProjectSettings-worldsDeleteConfirm-message-marginBottom;
+}
+
+.faDeleteConfirmButton__confirmActions {
+  display: flex;
+  gap: $dialogProjectSettings-worldsDeleteConfirm-actions-gap;
+  justify-content: center;
+}
+
+.faDeleteConfirmButton__confirmButton .q-btn__content {
+  position: relative;
+}
+
+.faDeleteConfirmButton__confirmButton--countdownActive {
+  .faDeleteConfirmButton__confirmLabel {
+    color: transparent;
+  }
+}
+
+.faDeleteConfirmButton__countdown {
+  align-items: center;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  line-height: $dialogProjectSettings-worldsDeleteConfirm-countdown-lineHeight;
+  pointer-events: none;
+  position: absolute;
+}

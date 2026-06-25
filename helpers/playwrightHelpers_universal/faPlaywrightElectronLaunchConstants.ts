@@ -1,7 +1,7 @@
 import appRoot from 'app-root-path'
 
 import { FA_FRONTEND_RENDER_TIMER_MS } from 'app/src-electron/shared/faFrontendRenderTimerMs'
-import { FA_Q_TOOLTIP_DELAY_MS } from 'app/src/scripts/appGlobalManagementUI/faQTooltipDelay_manager'
+import { FA_Q_TOOLTIP_DELAY_MS } from 'app/src/scripts/appGlobalManagementUI/functions/faQTooltipDelay'
 
 /**
  * Absolute path to unpackaged electron-main.js for Playwright 'electron.launch' args (Node test runner only).

@@ -73,11 +73,11 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor emits pale
   })
 
   api.onAddColor()
-  expect(emitted[0]).toBe('#112233;#FFFFFF')
+  expect(emitted[0]!).toBe('#112233;#FFFFFF')
 
-  const firstEntryId = api.colorPaletteEntries.value[0]?.id ?? ''
+  const firstEntryId = api.colorPaletteEntries.value[0]!?.id ?? ''
   api.onSwatchColorUpdate(firstEntryId, '#AABBCC')
-  expect(emitted[1]).toContain('#AABBCC')
+  expect(emitted[1]!).toContain('#AABBCC')
 
   api.onDragStart({
     item: document.createElement('div')
@@ -253,7 +253,7 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor skips bloc
       emitted.push(value)
     }
   })
-  const firstEntryId = api.colorPaletteEntries.value[0]?.id ?? ''
+  const firstEntryId = api.colorPaletteEntries.value[0]!?.id ?? ''
 
   api.onSwatchDuplicate(firstEntryId)
   expect(wouldDuplicateExceed).toHaveBeenCalled()
@@ -312,7 +312,7 @@ test('Test that createUseDialogProjectSettingsWorldColorPaletteEditor skips dupl
       emitted.push(value)
     }
   })
-  const firstEntryId = api.colorPaletteEntries.value[0]?.id ?? ''
+  const firstEntryId = api.colorPaletteEntries.value[0]!?.id ?? ''
   api.onSwatchDuplicate(firstEntryId)
   expect(duplicateAfter).toHaveBeenCalled()
   expect(emitted).toHaveLength(0)

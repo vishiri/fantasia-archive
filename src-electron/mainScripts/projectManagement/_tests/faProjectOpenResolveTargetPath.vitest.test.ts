@@ -11,12 +11,27 @@ const resolvePathMocks = vi.hoisted(() => ({
   windowDialogState: { attachWindow: true as boolean }
 }))
 
-vi.mock('node:fs', () => {
+vi.mock('node:fs', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('node:fs')>()
+  const statSync = (p: string): { isFile: () => boolean } => {
+    if (!resolvePathMocks.existsSync(p)) {
+      const err = new Error('ENOENT') as NodeJS.ErrnoException
+      err.code = 'ENOENT'
+      throw err
+    }
+    return { isFile: () => true }
+  }
   return {
+    ...actual,
     default: {
-      existsSync: (...args: unknown[]) => resolvePathMocks.existsSync(...args)
+      ...actual,
+      existsSync: (...args: unknown[]) => resolvePathMocks.existsSync(...args),
+      realpathSync: (p: string) => p,
+      statSync
     },
-    existsSync: (...args: unknown[]) => resolvePathMocks.existsSync(...args)
+    existsSync: (...args: unknown[]) => resolvePathMocks.existsSync(...args),
+    realpathSync: (p: string) => p,
+    statSync
   }
 })
 
@@ -132,6 +147,16 @@ test('Test that explicit ipc path errors trigger ipcExplicitPathFailed', async (
   expect('ipcExplicitPathFailed' in r && r.ipcExplicitPathFailed).toBe(true)
 })
 
+test('Test that explicit blank ipc path reports extension error', async () => {
+  const r = await resolveFaProjectOpenTargetPath({} as never, {
+    filePath: '   '
+  })
+  expect(r).toMatchObject({
+    errorMessage: 'Selected file must be a .faproject file',
+    ipcExplicitPathFailed: true
+  })
+})
+
 test('Test that dialog cancel returns canceled', async () => {
   resolvePathMocks.showOpenDialog.mockResolvedValueOnce({
     canceled: true,
@@ -156,5 +181,5 @@ test('Test that dialog uses one-argument showOpenDialog when no window is availa
   resolvePathMocks.mainWindowExports.appWindow = undefined
   await resolveFaProjectOpenTargetPath({} as never, {})
   expect(resolvePathMocks.showOpenDialog).toHaveBeenCalledTimes(1)
-  expect(resolvePathMocks.showOpenDialog.mock.calls[0].length).toBe(1)
+  expect(resolvePathMocks.showOpenDialog.mock.calls[0]!.length).toBe(1)
 })

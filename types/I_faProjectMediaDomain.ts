@@ -10,7 +10,7 @@ export interface I_faProjectMediaCreateInput {
 }
 
 export interface I_faProjectMediaPatch {
-  displayName?: string
+  displayName?: string | undefined
 }
 
 export type I_faProjectMediaListResult = I_faProjectContentListResult<I_faProjectMedia>

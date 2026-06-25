@@ -104,7 +104,7 @@ test('Test that the electron app window opens properly after start-up', async ()
   expect(mainWindowCreationMock).toHaveBeenCalledTimes(1)
   expect(appOnHandlers.activate).toBeTypeOf('function')
 
-  appOnHandlers.activate()
+  appOnHandlers.activate!()
   expect(mainWindowCreationMock).toHaveBeenCalledTimes(2)
 })
 
@@ -116,11 +116,11 @@ test('Test that the electron app properly closes', () => {
   closeAppManager('win32')
   expect(appOnHandlers['window-all-closed']).toBeTypeOf('function')
 
-  appOnHandlers['window-all-closed']()
+  appOnHandlers['window-all-closed']!()
   expect(appMock.quit).toHaveBeenCalledOnce()
 
   appMock.quit.mockReset()
   closeAppManager('darwin')
-  appOnHandlers['window-all-closed']()
+  appOnHandlers['window-all-closed']!()
   expect(appMock.quit).not.toHaveBeenCalled()
 })

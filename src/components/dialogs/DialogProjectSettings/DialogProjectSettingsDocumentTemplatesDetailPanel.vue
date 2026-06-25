@@ -43,6 +43,7 @@
             class="dialogProjectSettings__fieldHelpIcon q-ml-md"
             data-test-locator="dialogProjectSettings-documentTemplates-worldAppendixTooltipIcon"
             :data-test-tooltip-text="$t('dialogs.projectSettings.fields.documentTemplateWorldAppendix.tooltip')"
+            :aria-label="$t('dialogs.projectSettings.fields.documentTemplateWorldAppendix.helpAriaLabel')"
           >
             <q-tooltip
               content-class="dialogProjectSettings__fieldHelpTooltip"

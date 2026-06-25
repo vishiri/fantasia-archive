@@ -9,7 +9,7 @@ export interface I_appSettingsSettingRenderItem {
   description: string
   value: boolean
   tags: string
-  note?: string
+  note?: string | undefined
 }
 
 /**
@@ -37,8 +37,8 @@ export type T_appSettingsRenderTree = Record<string, I_appSettingsCategoryRender
  * Optional props for opening App settings with a preselected dialog or settings snapshot (tests and harness).
  */
 export interface I_dialogAppSettingsProps {
-  directInput?: T_dialogName
-  directSettingsSnapshot?: I_faUserSettings
+  directInput?: T_dialogName | undefined
+  directSettingsSnapshot?: I_faUserSettings | undefined
 }
 
 /**

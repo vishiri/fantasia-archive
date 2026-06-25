@@ -48,7 +48,7 @@ async function copyDialogActionMonitorRowToClipboard (
 
 function dialogActionMonitorRefreshRows (
   deps: T_createDialogActionMonitorDeps,
-  props: { directHistorySnapshot?: I_faActionHistoryEntry[] },
+  props: { directHistorySnapshot?: I_faActionHistoryEntry[] | undefined },
   rows: I_ref<I_faActionHistoryEntry[]>
 ): void {
   if (props.directHistorySnapshot !== undefined) {
@@ -103,8 +103,8 @@ function useDialogActionMonitorTableLayout (
 function useDialogActionMonitor (
   deps: T_createDialogActionMonitorDeps,
   props: {
-    directInput?: T_dialogName
-    directHistorySnapshot?: I_faActionHistoryEntry[]
+    directInput?: T_dialogName | undefined
+    directHistorySnapshot?: I_faActionHistoryEntry[] | undefined
   },
   resolveDialogComponentStore: () => { dialogToOpen?: unknown; dialogUUID?: unknown } | null,
   buildDialogActionMonitorColumns: () => T_dialogActionMonitorTableColumn[]

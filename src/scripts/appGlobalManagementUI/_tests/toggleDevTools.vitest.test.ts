@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest'
-import { toggleDevTools } from '../functions/toggleDevTools'
+import { toggleDevTools } from '../faToggleDevTools_manager'
 
 const originalWindow = globalThis.window
 

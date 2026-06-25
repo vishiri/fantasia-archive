@@ -16,7 +16,7 @@ export type T_faColorPickerPaletteAppendMode = 'draft' | 'persist'
 export interface I_faColorPickerPaletteAppendConfig {
   mode: T_faColorPickerPaletteAppendMode
   worldColorPalette: string
-  worldId?: string
+  worldId?: string | undefined
 }
 
 /** Injected dependencies for createUseFaColorPickerPaletteAppend. */

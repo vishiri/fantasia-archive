@@ -22,11 +22,11 @@ export function createUseProjectOverview (deps: {
   return function useProjectOverview () {
     const randomTipCaption = deps.ref('')
 
-    const { activeProject } = deps.storeToRefs(deps.S_FaActiveProject())
-    const { settings } = deps.storeToRefs(deps.S_FaUserSettings())
+    const { activeProject } = deps.storeToRefs(deps.S_FaActiveProject())!
+    const { settings } = deps.storeToRefs(deps.S_FaUserSettings())!
 
     const projectDisplayName = deps.computed(() => {
-      const name = activeProject.value?.name?.trim()
+      const name = activeProject!.value?.name?.trim()
 
       if (name) {
         return name
@@ -36,11 +36,11 @@ export function createUseProjectOverview (deps: {
     })
 
     const showTipCard = deps.computed(() => {
-      return settings.value?.hideTooltipsProject !== true
+      return settings!.value?.hideTooltipsProject !== true
     })
 
     const showMascotInTipCard = deps.computed(() => {
-      return settings.value?.hidePlushes !== true
+      return settings!.value?.hidePlushes !== true
     })
 
     deps.onMounted(() => {

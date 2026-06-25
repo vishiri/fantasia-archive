@@ -6,7 +6,7 @@ import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 export function useDialogKeybindSettingsViewFromDeps (
   deps: T_dialogKeybindSettingsViewModuleDeps,
   props: {
-    directInput?: T_dialogName
+    directInput?: T_dialogName | undefined
   }
 ): T_useDialogKeybindSettingsViewResult {
   const state = deps.useDialogKeybindSettings()

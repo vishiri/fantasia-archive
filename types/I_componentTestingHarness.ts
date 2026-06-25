@@ -1,5 +1,5 @@
 export type T_componentTestingSfcDefault = {
-  __name?: string
+  __name?: string | undefined
 }
 
 export type T_componentTestingSfcModule = {

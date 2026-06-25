@@ -16,7 +16,7 @@ test('Test that applyFaProjectProjectDataSchemaV1 runs exec with project_data DD
   const exec = vi.fn()
   applyFaProjectProjectDataSchemaV1({ exec })
   expect(exec).toHaveBeenCalledOnce()
-  const sql = exec.mock.calls[0][0] as string
+  const sql = exec.mock.calls[0]![0]! as string
   expect(sql).toContain('project_data')
 })
 
@@ -28,7 +28,7 @@ test('Test that applyFaProjectContentSchemaV1 runs exec with worlds and related 
   const exec = vi.fn()
   applyFaProjectContentSchemaV1({ exec })
   expect(exec).toHaveBeenCalledTimes(3)
-  const sql = exec.mock.calls.map((call) => call[0] as string).join('\n')
+  const sql = exec.mock.calls.map((call) => call[0]! as string).join('\n')
   expect(sql).toContain(FA_PROJECT_TABLE_DOCUMENTS)
   expect(sql).toContain(FA_PROJECT_TABLE_WORLDS)
   expect(sql).toContain('color_pallete')

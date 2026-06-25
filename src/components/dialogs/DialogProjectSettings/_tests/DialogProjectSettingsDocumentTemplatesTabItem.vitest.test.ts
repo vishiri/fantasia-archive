@@ -193,10 +193,10 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabItem emits select on cl
   })
 
   await w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tab"]').trigger('click')
-  expect(w.emitted('select')?.[0]).toEqual([template.id])
+  expect(w.emitted('select')?.[0]!).toEqual([template.id])
 
   await w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tab"]').trigger('keydown', { key: 'Enter' })
-  expect(w.emitted('select')?.[1]).toEqual([template.id])
+  expect(w.emitted('select')?.[1]!).toEqual([template.id])
 })
 
 /**

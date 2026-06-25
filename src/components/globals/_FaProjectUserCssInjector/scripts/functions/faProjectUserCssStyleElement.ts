@@ -7,7 +7,7 @@ export const FA_PROJECT_USER_CSS_ELEMENT_ID = 'faProjectUserCss'
  * Exported for Vitest parity with production cascade ordering rules.
  */
 export function faProjectUserCssHeadIsUnset (documentRoot: {
-  head?: HTMLHeadElement | null
+  head?: HTMLHeadElement | null | undefined
 }): boolean {
   const headMaybe = documentRoot.head
   return typeof headMaybe === 'undefined' || headMaybe === null

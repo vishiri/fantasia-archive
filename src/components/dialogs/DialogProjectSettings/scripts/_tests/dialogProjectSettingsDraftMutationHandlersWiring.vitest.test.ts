@@ -39,8 +39,8 @@ test('Test that createDialogProjectSettingsDraftMutationHandlers mutates templat
   expect(localWorlds.value).toHaveLength(2)
   expect(localDocumentTemplates.value).toHaveLength(2)
 
-  const addedWorldId = localWorlds.value?.[1].id as string
-  const addedTemplateId = localDocumentTemplates.value?.[1].id as string
+  const addedWorldId = localWorlds.value?.[1]!.id as string
+  const addedTemplateId = localDocumentTemplates.value?.[1]!.id as string
 
   handlers.updateWorldDisplayNameTranslations(addedWorldId, { 'en-US': 'Renamed world' })
   handlers.updateWorldColor(addedWorldId, '#aabbcc')
@@ -86,16 +86,16 @@ test('Test that createDialogProjectSettingsDraftMutationHandlers mutates templat
     singular: {}
   })
 
-  expect(localWorlds.value?.[0].templateLayout.placements[0]?.templateDisplayName).toBe('Synced template name')
+  expect(localWorlds.value?.[0]!.templateLayout.placements[0]!?.templateDisplayName).toBe('Synced template name')
 
-  expect(localWorlds.value?.[1].displayNameTranslations).toEqual({ 'en-US': 'Renamed world' })
-  expect(localWorlds.value?.[1].color).toBe('#aabbcc')
-  expect(localWorlds.value?.[1].colorPallete).toBe('#112233')
-  expect(localWorlds.value?.[1].templateLayout.groups).toHaveLength(1)
-  expect(localDocumentTemplates.value?.[1].titlePluralTranslations).toEqual({ 'en-US': 'Renamed template' })
-  expect(localDocumentTemplates.value?.[1].icon).toBe('person')
-  expect(localDocumentTemplates.value?.[1].worldAppendixTranslations).toEqual({ 'en-US': 'Notes' })
-  expect(localDocumentTemplates.value?.[0].titlePluralTranslations).toEqual({ 'en-US': 'Synced template name' })
+  expect(localWorlds.value?.[1]!.displayNameTranslations).toEqual({ 'en-US': 'Renamed world' })
+  expect(localWorlds.value?.[1]!.color).toBe('#aabbcc')
+  expect(localWorlds.value?.[1]!.colorPallete).toBe('#112233')
+  expect(localWorlds.value?.[1]!.templateLayout.groups).toHaveLength(1)
+  expect(localDocumentTemplates.value?.[1]!.titlePluralTranslations).toEqual({ 'en-US': 'Renamed template' })
+  expect(localDocumentTemplates.value?.[1]!.icon).toBe('person')
+  expect(localDocumentTemplates.value?.[1]!.worldAppendixTranslations).toEqual({ 'en-US': 'Notes' })
+  expect(localDocumentTemplates.value?.[0]!.titlePluralTranslations).toEqual({ 'en-US': 'Synced template name' })
 
   handlers.removeWorld(baseWorld.id)
   handlers.removeDocumentTemplate(baseTemplate.id)
@@ -119,11 +119,11 @@ test('Test that createDialogProjectSettingsDraftMutationHandlers resolves defaul
 
   handlers.addWorld()
   handlers.addDocumentTemplate()
-  expect(localWorlds.value?.[0]?.displayNameTranslations).toEqual({ de: 'Neue Welt' })
-  expect(localDocumentTemplates.value?.[0]?.titlePluralTranslations).toEqual({
+  expect(localWorlds.value?.[0]!?.displayNameTranslations).toEqual({ de: 'Neue Welt' })
+  expect(localDocumentTemplates.value?.[0]!?.titlePluralTranslations).toEqual({
     de: 'Neue Dokumentvorlage'
   })
-  expect(localDocumentTemplates.value?.[0]?.titleSingularTranslations).toEqual({
+  expect(localDocumentTemplates.value?.[0]!?.titleSingularTranslations).toEqual({
     de: 'Neue Dokumentvorlage'
   })
 
@@ -131,11 +131,11 @@ test('Test that createDialogProjectSettingsDraftMutationHandlers resolves defaul
   templateDefault = 'Zweite Vorlage'
   handlers.addWorld()
   handlers.addDocumentTemplate()
-  expect(localWorlds.value?.[1]?.displayNameTranslations).toEqual({ de: 'Zweite Welt' })
-  expect(localDocumentTemplates.value?.[1]?.titlePluralTranslations).toEqual({
+  expect(localWorlds.value?.[1]!?.displayNameTranslations).toEqual({ de: 'Zweite Welt' })
+  expect(localDocumentTemplates.value?.[1]!?.titlePluralTranslations).toEqual({
     de: 'Zweite Vorlage'
   })
-  expect(localDocumentTemplates.value?.[1]?.titleSingularTranslations).toEqual({
+  expect(localDocumentTemplates.value?.[1]!?.titleSingularTranslations).toEqual({
     de: 'Zweite Vorlage'
   })
 })

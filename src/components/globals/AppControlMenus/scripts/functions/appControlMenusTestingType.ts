@@ -1,8 +1,10 @@
 /**
  * Reads TEST_ENV from a cached extra-env snapshot when the bridge has not hydrated yet.
  */
+import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
+
 export function readAppControlMenusTestingTypeFromCachedSnapshot (
-  snap: { TEST_ENV?: string | false } | null | undefined
+  snap: I_extraEnvVariablesAPI | null | undefined
 ): string | false {
   if (!snap) {
     return ''

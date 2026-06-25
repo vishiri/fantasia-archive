@@ -56,7 +56,7 @@ test('Test that hydrateDialogProjectSettingsDrafts mixes direct snapshots with b
   expect(fetchTemplates).not.toHaveBeenCalled()
   expect(localDocumentTemplates.value).toEqual([templateRow])
   expect(localSettings.value?.projectName).toBe('Fetched')
-  expect(localWorlds.value?.[0]?.displayNameTranslations).toEqual({ 'en-US': 'Fetched world' })
+  expect(localWorlds.value?.[0]!?.displayNameTranslations).toEqual({ 'en-US': 'Fetched world' })
 })
 
 /**
@@ -150,6 +150,6 @@ test('Test that hydrateDialogProjectSettingsDrafts localizes world template layo
     props: {}
   })
 
-  expect(localWorlds.value?.[0]?.templateLayout.placements[0]?.templateDisplayName).toBe('Rassen')
-  expect(localWorlds.value?.[0]?.templateLayout.placements[0]?.worldAppendix).toBe('yugghm')
+  expect(localWorlds.value?.[0]!?.templateLayout.placements[0]!?.templateDisplayName).toBe('Rassen')
+  expect(localWorlds.value?.[0]!?.templateLayout.placements[0]!?.worldAppendix).toBe('yugghm')
 })

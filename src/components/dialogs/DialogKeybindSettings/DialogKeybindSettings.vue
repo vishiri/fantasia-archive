@@ -165,7 +165,7 @@ import ErrorCard from 'app/src/components/elements/ErrorCard/ErrorCard.vue'
 import { useDialogKeybindSettingsView } from './scripts/dialogKeybindSettings_manager'
 
 const props = defineProps<{
-  directInput?: T_dialogName
+  directInput?: T_dialogName | undefined
 }>()
 
 const {

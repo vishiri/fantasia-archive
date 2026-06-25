@@ -137,7 +137,7 @@ interface I_TestHarness {
   directInput: ReturnType<typeof ref<T_dialogName | undefined>>
 }
 
-function mountUseWindow (initialDirectInput?: T_dialogName) {
+function mountUseWindow (initialDirectInput?: T_dialogName | undefined) {
   const harness: { current: I_TestHarness | null } = { current: null }
 
   const Harness = defineComponent({
@@ -282,7 +282,7 @@ test('Test that onWindowShow mounts Monaco when editorHostRef is set', async () 
   await harness.current!.state.onWindowShow()
 
   expect(monacoEditorCreateMock).toHaveBeenCalledTimes(1)
-  expect(monacoEditorCreateMock.mock.calls[0]?.[0]).toBe(host)
+  expect(monacoEditorCreateMock.mock.calls[0]!?.[0]!).toBe(host)
 })
 
 /**

@@ -39,6 +39,7 @@
             class="dialogProjectSettings__fieldHelpIcon q-ml-md"
             data-test-locator="dialogProjectSettings-worlds-colorTooltipIcon"
             :data-test-tooltip-text="$t('dialogs.projectSettings.fields.worldColor.tooltip')"
+            :aria-label="$t('dialogs.projectSettings.fields.worldColor.helpAriaLabel')"
           >
             <q-tooltip
               content-class="dialogProjectSettings__fieldHelpTooltip"
@@ -80,6 +81,7 @@
           class="dialogProjectSettings__fieldHelpIcon q-ml-md"
           data-test-locator="dialogProjectSettings-worlds-colorPaletteTooltipIcon"
           :data-test-tooltip-text="worldColorPaletteTooltip.flatText"
+          :aria-label="$t('dialogs.projectSettings.fields.worldColorPalette.helpAriaLabel')"
         >
           <q-tooltip
             content-class="dialogProjectSettings__fieldHelpTooltip"

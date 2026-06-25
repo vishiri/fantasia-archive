@@ -1,7 +1,9 @@
 import { afterEach, expect, test, vi } from 'vitest'
 
 import {
-  applyFaInterfaceTextDirectionFromLanguageCode,
+  applyFaInterfaceTextDirectionFromLanguageCode
+} from '../faInterfaceTextDirectionApplyWiring'
+import {
   resolveFaInterfaceTextDirectionFromLanguageCode
 } from '../functions/faInterfaceTextDirection'
 

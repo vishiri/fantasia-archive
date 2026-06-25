@@ -1,7 +1,7 @@
-export const FA_VERTICAL_DRAGGABLE_TABS_DOCUMENT_DRAGGING_BODY_CLASS =
-  'faVerticalDraggableTabs--documentDragging'
-
-const FA_VERTICAL_DRAGGABLE_TABS_DRAG_CURSOR = 'grab'
+import {
+  FA_VERTICAL_DRAGGABLE_TABS_DOCUMENT_DRAGGING_BODY_CLASS,
+  FA_VERTICAL_DRAGGABLE_TABS_DRAG_CURSOR
+} from './functions/faVerticalDraggableTabsDocumentDragCursorConstants'
 
 /**
  * Applies the vertical draggable tabs grab cursor for the duration of a Sortable drag.

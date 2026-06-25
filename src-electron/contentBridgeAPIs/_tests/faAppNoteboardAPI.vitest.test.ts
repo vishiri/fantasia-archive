@@ -47,7 +47,7 @@ test('Test that faAppNoteboardAPI setNoteboard invokes IPC set channel with clon
   await faAppNoteboardAPI.setNoteboard(patch)
 
   expect(invokeMock).toHaveBeenCalledTimes(1)
-  const [channel, sentPatch] = invokeMock.mock.calls[0] as [string, { text: string }]
+  const [channel, sentPatch] = invokeMock.mock.calls[0]! as [string, { text: string }]
   expect(channel).toBe(FA_APP_NOTEBOARD_IPC.setAsync)
   expect(sentPatch).toEqual(patch)
   expect(sentPatch).not.toBe(patch)

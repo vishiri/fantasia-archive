@@ -71,7 +71,7 @@ test('Test that DialogAppSettingsSettingBlock emits update-setting when toggled'
   await flushPromises()
   await w.get('.q-toggle-stub').trigger('click')
 
-  expect(w.emitted('update-setting')?.[0]).toEqual(['darkMode', true])
+  expect(w.emitted('update-setting')?.[0]!).toEqual(['darkMode', true])
   w.unmount()
 })
 

@@ -10,7 +10,7 @@ export interface I_faProjectSettingsRoot {
 
 /** Partial update merged into project settings KV rows by the main-process IPC handler. */
 export interface I_faProjectSettingsPatch {
-  projectName?: string
+  projectName?: string | undefined
 }
 
 /** Empty fallback when no active project database is attached at IPC read time. */

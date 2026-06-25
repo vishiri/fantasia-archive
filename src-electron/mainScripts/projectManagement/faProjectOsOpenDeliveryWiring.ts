@@ -1,13 +1,11 @@
-import fs from 'node:fs'
-
 import { type BrowserWindow, type WebContents, app } from 'electron'
 
 import { FA_PROJECT_OS_OPEN_IPC } from 'app/src-electron/electron-ipc-bridge'
 
 import {
-  pathLooksLikeFaProjectFile,
   resolveOsOpenFaProjectPathFromArgv
 } from './projectManagementSharedPathWiring'
+import { resolveHardenedFaProjectFilePath } from './faProjectFilePathHardeningWiring'
 
 let pendingOsOpenPath: string | null = null
 let rendererReportedReady = false
@@ -31,14 +29,7 @@ function isFaProjectOsOpenEnvironmentDisabled (): boolean {
 }
 
 function normalizeEnqueueCandidate (raw: string): string | null {
-  const trimmed = raw.trim()
-  if (!pathLooksLikeFaProjectFile(trimmed)) {
-    return null
-  }
-  if (!fs.existsSync(trimmed)) {
-    return null
-  }
-  return trimmed
+  return resolveHardenedFaProjectFilePath(raw)
 }
 
 function tryFlushPendingOsOpenToRenderer (): void {
@@ -77,6 +68,17 @@ export function enqueueFaProjectOsOpenPath (rawPath: string): void {
 export function onFaProjectOsOpenRendererReady (): void {
   rendererReportedReady = true
   tryFlushPendingOsOpenToRenderer()
+}
+
+/**
+ * True when 'sender' is the registered main window webContents (OS-open handshake).
+ */
+export function isFaProjectOsOpenRendererReadySender (sender: WebContents): boolean {
+  if (mainWebContents === null || mainWebContents.isDestroyed()) {
+    return false
+  }
+
+  return sender.id === mainWebContents.id
 }
 
 /**

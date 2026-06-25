@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
 
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { readonly, ref } from 'vue'
 
 import type {
   I_faActionFailureLog,
@@ -122,9 +122,19 @@ export const S_FaActionManager = defineStore('S_FaActionManager', () => {
   }
 
   return {
-    ...queueState,
-    ...historyState,
-    lastFailure,
+    actionHistory: readonly(historyState.actionHistory),
+    appendHistoryEntry: historyState.appendHistoryEntry,
+    findHistoryEntry: historyState.findHistoryEntry,
+    updateHistoryEntryStatus: historyState.updateHistoryEntryStatus,
+    addAsync: queueState.addAsync,
+    currentSyncAction: readonly(queueState.currentSyncAction),
+    inFlightAsyncActions: readonly(queueState.inFlightAsyncActions),
+    pendingSyncQueue: readonly(queueState.pendingSyncQueue),
+    popSync: queueState.popSync,
+    pushSync: queueState.pushSync,
+    removeAsync: queueState.removeAsync,
+    setCurrent: queueState.setCurrent,
+    lastFailure: readonly(lastFailure),
     recordFailure
   }
 })

@@ -8,6 +8,6 @@ export type I_faLaunchFaPlaywrightE2eAppWindowOptions = Omit<
 I_faLaunchFaPlaywrightElectronSerialSuiteWindowOptions,
 'readiness' | 'renderDelayMs'
 > & {
-  dismissStartupTips?: T_faPlaywrightDismissStartupTips
-  renderDelayMs?: number
+  dismissStartupTips?: T_faPlaywrightDismissStartupTips | undefined
+  renderDelayMs?: number | undefined
 }

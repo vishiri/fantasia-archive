@@ -163,8 +163,8 @@ test('Test that handleSaveProjectSettings persists document templates before wor
     settings: { projectName: 'Renamed' },
     worlds
   })
-  expect(persistDocumentTemplatesSnapshotMock.mock.invocationCallOrder[0]).toBeLessThan(
-    persistWorldsSnapshotMock.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY
+  expect(persistDocumentTemplatesSnapshotMock.mock.invocationCallOrder[0]!).toBeLessThan(
+    persistWorldsSnapshotMock.mock.invocationCallOrder[0]! ?? Number.POSITIVE_INFINITY
   )
 })
 

@@ -16,7 +16,7 @@ export function createDialogAboutFantasiaArchive (deps: {
   watch: (source: () => unknown, effect: () => void) => void
 }): {
     resolveDialogComponentStore: () => I_dialogComponentStoreLike | null
-    useDialogAboutFantasiaArchive: (props: { directInput?: T_dialogName }) => {
+    useDialogAboutFantasiaArchive: (props: { directInput?: T_dialogName | undefined }) => {
       appVersion: I_ref<string>
       dialogModel: I_ref<boolean>
       documentName: I_ref<string>
@@ -25,7 +25,7 @@ export function createDialogAboutFantasiaArchive (deps: {
   const resolveDialogComponentStore = deps.resolveDialogComponentStore
 
   const useDialogAboutFantasiaArchive = (props: {
-    directInput?: T_dialogName
+    directInput?: T_dialogName | undefined
   }) => {
     const dialogModel = deps.ref(false)
     deps.registerComponentDialogStackGuard(dialogModel)

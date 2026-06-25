@@ -38,9 +38,9 @@ test('Test that createUseFaFloatingWindowFramePersist flushes debounce when the 
 
   windowModel.value = false
 
-  const modelWatch = watch.mock.calls.find((call) => typeof call[0] === 'function')
+  const modelWatch = watch.mock.calls.find((call) => typeof call[0]! === 'function')
   expect(modelWatch).toBeDefined()
-  const onModelChange = modelWatch?.[1] as (open: boolean, wasOpen: boolean) => void
+  const onModelChange = modelWatch?.[1]! as (open: boolean, wasOpen: boolean) => void
   onModelChange(false, true)
 
   expect(flushed).toHaveBeenCalledOnce()
@@ -79,8 +79,8 @@ test('Test that createUseFaFloatingWindowFramePersist persists on close when the
     y: ref(0)
   })
 
-  const modelWatch = watch.mock.calls.find((call) => typeof call[0] === 'function')
-  const onModelChange = modelWatch?.[1] as (open: boolean, wasOpen: boolean) => void
+  const modelWatch = watch.mock.calls.find((call) => typeof call[0]! === 'function')
+  const onModelChange = modelWatch?.[1]! as (open: boolean, wasOpen: boolean) => void
   onModelChange(false, true)
   await flushPromises()
 

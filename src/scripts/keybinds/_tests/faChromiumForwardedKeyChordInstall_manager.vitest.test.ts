@@ -36,7 +36,7 @@ test('ensureFaChromiumForwardedKeyChordListener dispatches a synthetic keydown f
   })
 
   ensureFaChromiumForwardedKeyChordListener()
-  const handler = installMock.mock.calls[0][0] as (payload: { code: string }) => void
+  const handler = installMock.mock.calls[0]![0]! as (payload: { code: string }) => void
   handler({
     code: 'KeyO'
   })

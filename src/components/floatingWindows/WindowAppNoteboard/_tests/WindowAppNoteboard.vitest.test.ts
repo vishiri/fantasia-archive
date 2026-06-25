@@ -94,14 +94,15 @@ afterEach(() => {
   document.body.innerHTML = ''
 })
 
-test('Test that WindowAppNoteboard shows title, editor, and close when opened via directInput', () => {
-  const keybinds = S_FaKeybinds()
-  keybinds.snapshot = {
+test('Test that WindowAppNoteboard shows title, editor, and close when opened via directInput', async () => {
+  vi.mocked(window.faContentBridgeAPIs.faKeybinds.getKeybinds).mockResolvedValue({
     platform: 'win32',
     store: {
       ...FA_KEYBINDS_STORE_DEFAULTS
     }
-  }
+  })
+  const keybinds = S_FaKeybinds()
+  await keybinds.refreshKeybinds()
 
   const w = mount(WindowAppNoteboard, {
     global: windowAppNoteboardTestGlobalMount,
@@ -125,7 +126,7 @@ test('Test that WindowAppNoteboard shows title, editor, and close when opened vi
 
 test('Test that WindowAppNoteboard hides close keybind hint when keybind snapshot is not loaded', () => {
   const keybinds = S_FaKeybinds()
-  keybinds.snapshot = null
+  expect(keybinds.snapshot).toBeNull()
 
   const w = mount(WindowAppNoteboard, {
     global: windowAppNoteboardTestGlobalMount,

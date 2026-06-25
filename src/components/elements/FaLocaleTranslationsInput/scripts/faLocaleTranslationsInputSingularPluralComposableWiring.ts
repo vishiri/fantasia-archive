@@ -40,7 +40,7 @@ export const createUseFaLocaleTranslationsInputSingularPlural = (
         })
       },
       inputMode: options.inputMode,
-      maxLength: options.maxLength,
+      ...(options.maxLength !== undefined ? { maxLength: options.maxLength } : {}),
       modelValue: pluralOnlyModelValue,
       readPreferredLanguageInputFocus: options.readPreferredLanguageInputFocus,
       readTriggerElement: options.readTriggerElement,

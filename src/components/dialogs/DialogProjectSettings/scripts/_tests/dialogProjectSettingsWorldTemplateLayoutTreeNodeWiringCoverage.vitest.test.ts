@@ -1,12 +1,12 @@
 /* eslint-disable vue/one-component-per-file -- colocated harness components for composable mounts */
 
-import { computed, defineComponent, h, nextTick, ref, toRef, watch } from 'vue'
+import { computed, defineComponent, h, nextTick, onBeforeUnmount, ref, toRef, watch } from 'vue'
 import { mount } from '@vue/test-utils'
 import { expect, test, vi } from 'vitest'
 import type { QTooltip } from 'quasar'
 
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring } from '../dialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring'
-import { FA_Q_TOOLTIP_DELAY_MS } from 'app/src/scripts/appGlobalManagementUI/faQTooltipDelay_manager'
+import { FA_Q_TOOLTIP_DELAY_MS } from 'app/src/scripts/appGlobalManagementUI/functions/faQTooltipDelay'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeInteractionWiring } from '../dialogProjectSettingsWorldTemplateLayoutTreeNodeInteractionWiring'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuLabelsWiring } from '../dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuLabelsWiring'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuStyleWiring } from '../dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuStyleWiring'
@@ -154,6 +154,28 @@ test('Test that tree node action tooltip wiring clears pending reveal timer on h
 
   wiring.revealPlacementNicknameHoverTooltip()
   wiring.hidePlacementNicknameHoverTooltip()
+  await vi.advanceTimersByTimeAsync(FA_Q_TOOLTIP_DELAY_MS)
+  await nextTick()
+  expect(nicknameShow).not.toHaveBeenCalled()
+  vi.useRealTimers()
+})
+
+test('Test that tree node action tooltip wiring clears reveal timer on before unmount', async () => {
+  vi.useFakeTimers()
+  const unmountHooks: Array<() => void> = []
+  const wiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring({
+    onBeforeUnmount: (hook) => {
+      unmountHooks.push(hook)
+    }
+  })
+  const nicknameShow = vi.fn()
+  wiring.placementNicknameHoverTooltipRef.value = {
+    hide: vi.fn(),
+    show: nicknameShow
+  } as unknown as QTooltip
+
+  wiring.revealPlacementNicknameHoverTooltip()
+  unmountHooks.forEach((hook) => hook())
   await vi.advanceTimersByTimeAsync(FA_Q_TOOLTIP_DELAY_MS)
   await nextTick()
   expect(nicknameShow).not.toHaveBeenCalled()
@@ -537,7 +559,7 @@ test('Test that rename placement nickname draft leaves non-matching placements u
     plural: { 'en-US': 'Ignored' },
     singular: {}
   })
-  expect(renamed.placements[0]?.nicknamePluralTranslations).toEqual({})
+  expect(renamed.placements[0]!?.nicknamePluralTranslations).toEqual({})
 })
 
 /**
@@ -555,6 +577,7 @@ test('Test that tree node use wiring composes presentation and rename handlers',
         t: (key: string) => key
       }
     },
+    onBeforeUnmount,
     ref,
     toRef,
     watch
@@ -609,6 +632,7 @@ test('Test that tree node use wiring emits placement nickname rename for templat
         t: (key: string) => key
       }
     },
+    onBeforeUnmount,
     ref,
     toRef,
     watch
@@ -662,6 +686,7 @@ test('Test that tree node use wiring suppresses nickname hover tooltip while ren
         t: (key: string) => key
       }
     },
+    onBeforeUnmount,
     ref,
     toRef,
     watch

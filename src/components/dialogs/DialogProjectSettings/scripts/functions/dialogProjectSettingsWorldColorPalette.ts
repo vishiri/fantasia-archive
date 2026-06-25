@@ -53,7 +53,7 @@ export function duplicateDialogProjectSettingsWorldColorPaletteEntryAfter (
   if (sourceIndex === -1) {
     return null
   }
-  const sourceEntry = entries[sourceIndex]
+  const sourceEntry = entries[sourceIndex]!
   const duplicatedEntry: I_dialogProjectSettingsWorldColorPaletteEntry = {
     hex: sourceEntry.hex,
     id: createEntryId()

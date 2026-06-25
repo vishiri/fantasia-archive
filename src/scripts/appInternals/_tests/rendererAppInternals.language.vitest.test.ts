@@ -4,7 +4,7 @@ import { i18n } from 'app/i18n/externalFileLoader'
 
 const applyFaInterfaceTextDirectionFromLanguageCodeMock = vi.hoisted(() => vi.fn())
 
-vi.mock('../functions/faInterfaceTextDirection', () => ({
+vi.mock('../faInterfaceTextDirectionApplyWiring', () => ({
   applyFaInterfaceTextDirectionFromLanguageCode: applyFaInterfaceTextDirectionFromLanguageCodeMock
 }))
 

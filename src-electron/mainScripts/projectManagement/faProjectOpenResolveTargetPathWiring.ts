@@ -1,5 +1,3 @@
-import fs from 'node:fs'
-
 import type { IpcMainInvokeEvent } from 'electron'
 import type { OpenDialogOptions } from 'electron'
 import { dialog } from 'electron'
@@ -13,6 +11,7 @@ import type { I_faProjectOpenResolveResult } from 'app/types/I_faProjectManageme
 import { faProjectSaveDialogDefaultDirectory } from './faProjectFileDialogDefaultPathsWiring'
 import { takeNextE2eProjectOpenPath } from './projectManagementSharedE2ePathWiring'
 import { pathLooksLikeFaProjectFile } from './projectManagementSharedPathWiring'
+import { resolveHardenedFaProjectFilePath } from './faProjectFilePathHardeningWiring'
 
 function buildOpenDialogOptions (defaultPath: string): OpenDialogOptions {
   return {
@@ -31,24 +30,19 @@ function buildOpenDialogOptions (defaultPath: string): OpenDialogOptions {
 function resolveExplicitIpcOpenPath (
   ipcPath: string
 ): I_faProjectOpenResolveResult {
-  if (!pathLooksLikeFaProjectFile(ipcPath)) {
+  const hardened = resolveHardenedFaProjectFilePath(ipcPath)
+  if (hardened === null) {
     return {
       attemptedFilePath: ipcPath,
-      errorMessage: 'Selected file must be a .faproject file',
-      errorName: 'FileError',
-      ipcExplicitPathFailed: true
-    }
-  }
-  if (!fs.existsSync(ipcPath)) {
-    return {
-      attemptedFilePath: ipcPath,
-      errorMessage: 'Project file does not exist',
+      errorMessage: ipcPath.trim().length === 0 || !pathLooksLikeFaProjectFile(ipcPath)
+        ? 'Selected file must be a .faproject file'
+        : 'Project file does not exist or is not a regular file',
       errorName: 'FileError',
       ipcExplicitPathFailed: true
     }
   }
   return {
-    filePath: ipcPath,
+    filePath: hardened,
     ipcExplicitPath: true
   }
 }
@@ -67,20 +61,15 @@ export async function resolveFaProjectOpenTargetPath (
 
   const e2ePath = takeNextE2eProjectOpenPath()
   if (e2ePath != null) {
-    if (!pathLooksLikeFaProjectFile(e2ePath)) {
+    const hardened = resolveHardenedFaProjectFilePath(e2ePath)
+    if (hardened === null) {
       return {
-        errorMessage: 'E2E project path must be an absolute .faproject file',
-        errorName: 'FileError'
-      }
-    }
-    if (!fs.existsSync(e2ePath)) {
-      return {
-        errorMessage: 'E2E project file does not exist',
+        errorMessage: 'E2E project path must be an absolute regular .faproject file',
         errorName: 'FileError'
       }
     }
     return {
-      filePath: e2ePath,
+      filePath: hardened,
       ipcExplicitPath: false
     }
   }
@@ -98,20 +87,17 @@ export async function resolveFaProjectOpenTargetPath (
   if (first === undefined || first.length === 0) {
     return { canceled: true }
   }
-  if (!pathLooksLikeFaProjectFile(first)) {
+  const hardened = resolveHardenedFaProjectFilePath(first)
+  if (hardened === null) {
     return {
-      errorMessage: 'Selected file must be a .faproject file',
-      errorName: 'FileError'
-    }
-  }
-  if (!fs.existsSync(first)) {
-    return {
-      errorMessage: 'Project file does not exist',
+      errorMessage: !pathLooksLikeFaProjectFile(first)
+        ? 'Selected file must be a .faproject file'
+        : 'Project file does not exist or is not a regular file',
       errorName: 'FileError'
     }
   }
   return {
-    filePath: first,
+    filePath: hardened,
     ipcExplicitPath: false
   }
 }

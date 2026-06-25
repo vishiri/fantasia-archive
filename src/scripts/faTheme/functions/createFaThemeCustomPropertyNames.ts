@@ -15,7 +15,7 @@ export function createFaThemeCustomPropertyNames (deps: {
       }
       const match = trimmed.match(/^(--fa-color-[a-z0-9]+(?:-[a-z0-9]+)*)\s*:/i)
       if (match) {
-        found.add(match[1])
+        found.add(match[1]!)
       }
     }
     return Array.from(found).sort()

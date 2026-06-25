@@ -10,6 +10,7 @@
     :data-test-palette-entry-id="props.entryId"
     :data-test-palette-index="String(props.index)"
     :data-test-tooltip-text="props.isListDragging ? undefined : tooltipHex"
+    :aria-label="$t('dialogs.projectSettings.fields.worldColorPalette.swatchAriaLabel', { hex: tooltipHex })"
     role="button"
     tabindex="0"
     @click="onSwatchClick"
@@ -220,39 +221,4 @@ function onDeleteColor (): void {
 
 <style lang="scss" src="./styles/DialogProjectSettings.worldColorPalette.unscoped.scss"></style>
 <style lang="scss" src="./styles/DialogProjectSettings.worldColorPaletteContextMenu.unscoped.scss"></style>
-
-<style lang="scss" scoped>
-.dialogProjectSettingsWorldColorPaletteSwatch {
-  box-sizing: border-box;
-  cursor: grab;
-  flex: 0 0 auto;
-  height: $dialogProjectSettings-worldColorPalette-swatch-size;
-  position: relative;
-  width: $dialogProjectSettings-worldColorPalette-swatch-size;
-}
-
-.dialogProjectSettingsWorldColorPaletteSwatch--beingDragged {
-  opacity: 0.45;
-}
-
-.dialogProjectSettingsWorldColorPaletteSwatch__color {
-  border:
-    $dialogProjectSettings-worldColorPalette-swatch-borderWidth
-    solid
-    $dialogProjectSettings-worldColorPalette-swatch-borderColor;
-  box-sizing: border-box;
-  display: block;
-  height: 100%;
-  width: 100%;
-}
-
-.dialogProjectSettingsWorldColorPaletteSwatch__duplicateIcon {
-  font-size: $dialogProjectSettings-worldColorPalette-duplicateIcon-size;
-  left: 50%;
-  pointer-events: none;
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-}
-</style>
+<style lang="scss" src="./styles/dialogProjectSettingsWorldColorPaletteSwatch.scss"></style>

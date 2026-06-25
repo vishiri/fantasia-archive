@@ -26,9 +26,9 @@ test('Test that electron preload exposes faContentBridgeAPIs with expected API k
   await import('../electron-preload')
 
   expect(exposeInMainWorldMock).toHaveBeenCalledOnce()
-  expect(exposeInMainWorldMock.mock.calls[0][0]).toBe('faContentBridgeAPIs')
+  expect(exposeInMainWorldMock.mock.calls[0]![0]!).toBe('faContentBridgeAPIs')
 
-  const apiObject = exposeInMainWorldMock.mock.calls[0][1]
+  const apiObject = exposeInMainWorldMock.mock.calls[0]![1]!
   expect(Object.keys(apiObject).sort()).toEqual(
     [
       'appDetails',

@@ -204,8 +204,8 @@ test('Test that isDialogProjectSettingsWorldRemoveDisabled enforces last-world a
 test('Test that appendDialogProjectSettingsWorldDraft appends a new world row', () => {
   const next = appendDialogProjectSettingsWorldDraft([baseWorld], 'en-US', 'New world')
   expect(next).toHaveLength(2)
-  expect(next[0]?.id).toBe(baseWorld.id)
-  expect(next[1]?.displayNameTranslations).toEqual({ 'en-US': 'New world' })
+  expect(next[0]!?.id).toBe(baseWorld.id)
+  expect(next[1]!?.displayNameTranslations).toEqual({ 'en-US': 'New world' })
   expect(hasDialogProjectSettingsWorldNameValidationError(next)).toBe(false)
 })
 
@@ -304,13 +304,15 @@ test('Test that collectDialogProjectSettingsSaveValidationErrors accepts named t
  * Skips sparse array holes when iterating worlds.
  */
 test('Test that collectDialogProjectSettingsSaveValidationErrors ignores undefined world slots', () => {
-  const sparseWorlds = [baseWorld] as Array<typeof baseWorld | undefined>
-  sparseWorlds[1] = undefined
-  sparseWorlds[2] = {
-    ...baseWorld,
-    displayNameTranslations: { 'en-US': 'Second realm' },
-    id: '660e8400-e29b-41d4-a716-446655440001'
-  }
+  const sparseWorlds: Array<typeof baseWorld | undefined> = [
+    baseWorld,
+    undefined,
+    {
+      ...baseWorld,
+      displayNameTranslations: { 'en-US': 'Second realm' },
+      id: '660e8400-e29b-41d4-a716-446655440001'
+    }
+  ]
   expect(collectDialogProjectSettingsSaveValidationErrors('Project', sparseWorlds as never)).toEqual([])
 })
 

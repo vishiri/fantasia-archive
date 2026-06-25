@@ -47,7 +47,7 @@ export type T_faVerticalDraggableTabsTabJustifyContent =
  */
 export interface I_faVerticalDraggableTabsRootStyleInput {
   columnWidthPx: number
-  tabDense?: boolean
+  tabDense?: boolean | undefined
   tabJustifyContent: T_faVerticalDraggableTabsTabJustifyContent
   tabLabelFontSize: string
   tabLabelTextTransform: T_faVerticalDraggableTabsTabLabelTextTransform

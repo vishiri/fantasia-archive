@@ -15,10 +15,10 @@ export interface I_faProjectPathApi {
 export type I_faProjectOpenResolveResult =
   | { canceled: true }
   | {
-    attemptedFilePath?: string
+    attemptedFilePath?: string | undefined
     errorMessage: string
     errorName: string
-    ipcExplicitPathFailed?: boolean
+    ipcExplicitPathFailed?: boolean | undefined
   }
   | { filePath: string, ipcExplicitPath: boolean }
 

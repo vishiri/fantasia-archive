@@ -40,7 +40,7 @@ test('Test that q-draggable-table boot installs the draggable table plugin on th
   } as never)
 
   expect(appUseMock).toHaveBeenCalledOnce()
-  expect(appUseMock.mock.calls[0][0]).toMatchObject({
+  expect(appUseMock.mock.calls[0]![0]!).toMatchObject({
     install: vuePluginInstallMock
   })
 })

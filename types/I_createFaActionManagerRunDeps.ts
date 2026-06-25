@@ -24,7 +24,7 @@ export type T_createFaActionManagerRunDeps = {
     uid: string,
     outcome: { kind: 'success' } | { errorMessage: string, kind: 'failed' },
     completedAt: number,
-    payloadPreview?: string
+    payloadPreview?: string | undefined
   ) => void
   recordHistoryEnqueued: (entry: I_faActionQueueEntry) => void
   recordHistoryStartedFromEntry: (

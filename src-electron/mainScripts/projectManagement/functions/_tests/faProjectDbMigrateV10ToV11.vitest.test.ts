@@ -21,7 +21,7 @@ test('Test that migrateFaProjectSchemaV10ToV11 adds singular JSON columns and bu
   )
 
   expect(exec).toHaveBeenCalledTimes(2)
-  expect(exec.mock.calls[0][0]).toContain('title_singular_translations_json')
-  expect(exec.mock.calls[1][0]).toContain('nickname_singular_translations_json')
+  expect(exec.mock.calls[0]![0]!).toContain('title_singular_translations_json')
+  expect(exec.mock.calls[1]![0]!).toContain('nickname_singular_translations_json')
   expect(pragma).toHaveBeenCalledWith('user_version = 11')
 })

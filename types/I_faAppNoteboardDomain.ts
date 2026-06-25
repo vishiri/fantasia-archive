@@ -13,8 +13,8 @@ export interface I_faAppNoteboardRoot {
  * Partial update merged into the persisted root by the main-process IPC handler.
  */
 export interface I_faAppNoteboardPatch {
-  frame?: I_faFloatingWindowPersistedRect | null
-  text?: string
+  frame?: I_faFloatingWindowPersistedRect | null | undefined
+  text?: string | undefined
 }
 
 /**

@@ -2,12 +2,12 @@
  * Subset of Quasar Notify options used by console-mirror helpers.
  */
 export interface I_faQNotifyCreateOptions {
-  caption?: string
-  color?: string
-  faSkipNotifyConsoleLog?: boolean
-  message?: string
-  timeout?: number
-  type?: string
+  caption?: string | undefined
+  color?: string | undefined
+  faSkipNotifyConsoleLog?: boolean | undefined
+  message?: string | undefined
+  timeout?: number | undefined
+  type?: string | undefined
 }
 
 export type T_faQNotifyCreateOptionsInput = I_faQNotifyCreateOptions | string

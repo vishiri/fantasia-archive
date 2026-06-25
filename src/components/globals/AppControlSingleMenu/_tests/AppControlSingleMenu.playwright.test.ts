@@ -231,7 +231,7 @@ test.describe.serial('App control single menu', () => {
 
     const firstMenuItemTextElement = menuItems.locator(`[data-test-locator="${selectorList.menuItemText}"]`).first()
     const firstMenuItemIconElement = menuItems.locator(`[data-test-locator="${selectorList.menuItemIcon}"]`).first()
-    const firstDataItem = dataItems[0]
+    const firstDataItem = dataItems[0]!
 
     await expect(firstMenuItemTextElement).toHaveCount(1)
     await expect(firstMenuItemIconElement).toHaveCount(1)
@@ -331,7 +331,7 @@ test.describe.serial('App control single menu', () => {
     await expect(subMenuWrapper).toHaveCount(1)
 
     const firstSubMenuItem = appWindow.locator(`[data-test-locator="${selectorList.menuItemSubMenuItem}"]`).nth(0)
-    const firstDataSubmenuItem = (dataElement?.submenu !== undefined) ? dataElement.submenu.filter(item => item.mode === 'item')[0] : false as unknown as { icon: string, text: string }
+    const firstDataSubmenuItem = (dataElement?.submenu !== undefined) ? dataElement.submenu.filter(item => item.mode === 'item')[0]! : false as unknown as { icon: string, text: string }
 
     await expect(firstSubMenuItem).toHaveCount(1)
     expect(firstDataSubmenuItem).not.toBe(false)

@@ -61,9 +61,9 @@ test('Test that migrateFaProjectSchemaV5ToV6 migrates junction rows and bumps us
 
   expect(execCalls.some((sql) => sql.includes('world_template_groups'))).toBe(true)
   expect(placementRuns).toHaveLength(2)
-  expect(placementRuns[0]?.[0]).toBe('placement-id-1')
-  expect(placementRuns[0]?.[3]).toBe(0)
-  expect(typeof placementRuns[1]?.[5]).toBe('number')
+  expect(placementRuns[0]!?.[0]!).toBe('placement-id-1')
+  expect(placementRuns[0]!?.[3]!).toBe(0)
+  expect(typeof placementRuns[1]!?.[5]!).toBe('number')
   expect(execCalls.some((sql) => sql.includes('DROP TABLE IF EXISTS world_document_templates'))).toBe(true)
   expect(db.pragma).toHaveBeenCalledWith('user_version = 6')
 })

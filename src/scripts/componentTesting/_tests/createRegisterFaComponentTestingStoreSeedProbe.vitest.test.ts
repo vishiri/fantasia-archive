@@ -20,7 +20,7 @@ test('Test that createRegisterFaComponentTestingStoreSeedProbe no-ops without ac
 
   api.registerFaComponentTestingStoreSeedProbe()
 
-  const patch = setStoreSeedPatch.mock.calls[0][0] as (seed: I_faComponentTestingStoreSeed) => void
+  const patch = setStoreSeedPatch.mock.calls[0]![0]! as (seed: I_faComponentTestingStoreSeed) => void
   patch({
     activeProject: {
       filePath: 'C:\\fixture.faproject',
@@ -51,7 +51,7 @@ test('Test that createRegisterFaComponentTestingStoreSeedProbe patches stores th
   const seed: I_faComponentTestingStoreSeed = {
     hideTooltipsProject: true
   }
-  const patch = setStoreSeedPatch.mock.calls[0][0] as (payload: I_faComponentTestingStoreSeed) => void
+  const patch = setStoreSeedPatch.mock.calls[0]![0]! as (payload: I_faComponentTestingStoreSeed) => void
   patch(seed)
 
   expect(patchStores).toHaveBeenCalledWith(pinia, seed)

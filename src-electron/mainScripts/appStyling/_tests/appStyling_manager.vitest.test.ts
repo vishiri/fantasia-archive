@@ -67,7 +67,7 @@ test('Test that getFaAppStyling creates the store once with expected name and de
 
   expect(first).toBe(second)
   expect(ElectronStoreMock).toHaveBeenCalledTimes(1)
-  expect(constructCalls[0]).toEqual({
+  expect(constructCalls[0]!).toEqual({
     name: 'faAppStyling',
     defaults: { ...FA_APP_STYLING_STORE_DEFAULTS }
   })
@@ -168,7 +168,7 @@ test('Test that cleanupFaAppStyling handles null store snapshot', async () => {
   })
   cleanupFaAppStyling(fake)
   expect(written.length).toBeGreaterThan(0)
-  expect(written[0]).toEqual({
+  expect(written[0]!).toEqual({
     css: '',
     frame: null,
     schemaVersion: 1

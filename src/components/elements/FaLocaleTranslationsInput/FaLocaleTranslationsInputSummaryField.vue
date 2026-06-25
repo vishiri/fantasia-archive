@@ -76,26 +76,7 @@
     @show="props.onTranslationsMenuShow"
   >
     <FaLocaleTranslationsInputMenuPanel
-      :autogrow="props.autogrow"
-      :is-multiline-input="props.isMultilineInput"
-      :is-singular-plural-mode="props.isSingularPluralMode"
-      :locale-rows="props.localeRows"
-      :max-length="props.maxLength"
-      :pinned-aside-label="props.menuPinnedAsideLabel"
-      :pinned-aside-test-locator="props.menuPinnedAsideTestLocator"
-      :pinned-aside-tooltip="props.menuPinnedAsideTooltip"
-      :pinned-aside-value="props.menuPinnedAsideValue"
-      :plural-column-label="props.pluralColumnLabel"
-      :read-locale-value="props.readLocaleValue"
-      :read-plural-locale-value="props.readPluralLocaleValue"
-      :read-singular-locale-value="props.readSingularLocaleValue"
-      :rows="props.resolvedTextareaRows"
-      :set-preferred-language-input-ref="props.setPreferredLanguageInputRef"
-      :singular-column-label="props.singularColumnLabel"
-      :test-locator="props.testLocator"
-      :update-locale-value="props.updateLocaleValue"
-      :update-plural-locale-value="props.updatePluralLocaleValue"
-      :update-singular-locale-value="props.updateSingularLocaleValue"
+      v-bind="menuPanelChildBindings"
     />
   </q-menu>
 </template>
@@ -122,26 +103,26 @@ const props = defineProps<{
   dark: boolean
   dense: boolean
   error: boolean
-  errorMessage?: string
+  errorMessage?: string | undefined
   fallbackWarningTooltip: string
   hideBottomSpace: boolean
   isMenuPresentationLocked: boolean
   isMultilineInput: boolean
-  isSingularPluralMode?: boolean
+  isSingularPluralMode?: boolean | undefined
   localeRows: I_faLocaleTranslationsInputLocaleRow[]
   lockedMenuContentStyle: Record<string, string> | undefined
-  maxLength?: number
+  maxLength?: number | undefined
   menuOffset: [number, number]
-  menuPinnedAsideLabel?: string
-  menuPinnedAsideTestLocator?: string
-  menuPinnedAsideTooltip?: string
-  menuPinnedAsideValue?: string
+  menuPinnedAsideLabel?: string | undefined
+  menuPinnedAsideTestLocator?: string | undefined
+  menuPinnedAsideTooltip?: string | undefined
+  menuPinnedAsideValue?: string | undefined
   menuTarget: HTMLElement | undefined
   onTranslationsMenuBeforeShow: () => void
   onTranslationsMenuHide: () => void
   onTranslationsMenuShow: () => void
   openTranslationsMenu: () => void
-  pluralColumnLabel?: string
+  pluralColumnLabel?: string | undefined
   readLocaleValue: (languageCode: T_faUserSettingsLanguageCode) => string
   readPluralLocaleValue?: (languageCode: T_faUserSettingsLanguageCode) => string
   readSingularLocaleValue?: (languageCode: T_faUserSettingsLanguageCode) => string
@@ -152,7 +133,7 @@ const props = defineProps<{
     component: import('vue').ComponentPublicInstance | Element | null
   ) => void
   showFallbackWarning: boolean
-  singularColumnLabel?: string
+  singularColumnLabel?: string | undefined
   testLocator: string
   translateButtonTooltip: string
   translationsMenuOpen: boolean
@@ -181,6 +162,37 @@ const translationsMenuOpenModel = computed({
   set: (open: boolean) => {
     emit('update:translationsMenuOpen', open)
   }
+})
+
+const menuPanelChildBindings = computed(() => {
+  const bindings = {
+    autogrow: props.autogrow,
+    isMultilineInput: props.isMultilineInput,
+    localeRows: props.localeRows,
+    readLocaleValue: props.readLocaleValue,
+    rows: props.resolvedTextareaRows,
+    setPreferredLanguageInputRef: props.setPreferredLanguageInputRef,
+    testLocator: props.testLocator,
+    updateLocaleValue: props.updateLocaleValue,
+    ...(props.isSingularPluralMode !== undefined ? { isSingularPluralMode: props.isSingularPluralMode } : {}),
+    ...(props.maxLength !== undefined ? { maxLength: props.maxLength } : {}),
+    ...(props.menuPinnedAsideLabel !== undefined ? { pinnedAsideLabel: props.menuPinnedAsideLabel } : {}),
+    ...(props.menuPinnedAsideTestLocator !== undefined
+      ? { pinnedAsideTestLocator: props.menuPinnedAsideTestLocator }
+      : {}),
+    ...(props.menuPinnedAsideTooltip !== undefined ? { pinnedAsideTooltip: props.menuPinnedAsideTooltip } : {}),
+    ...(props.menuPinnedAsideValue !== undefined ? { pinnedAsideValue: props.menuPinnedAsideValue } : {}),
+    ...(props.pluralColumnLabel !== undefined ? { pluralColumnLabel: props.pluralColumnLabel } : {}),
+    ...(props.readPluralLocaleValue !== undefined ? { readPluralLocaleValue: props.readPluralLocaleValue } : {}),
+    ...(props.readSingularLocaleValue !== undefined ? { readSingularLocaleValue: props.readSingularLocaleValue } : {}),
+    ...(props.singularColumnLabel !== undefined ? { singularColumnLabel: props.singularColumnLabel } : {}),
+    ...(props.updatePluralLocaleValue !== undefined ? { updatePluralLocaleValue: props.updatePluralLocaleValue } : {}),
+    ...(props.updateSingularLocaleValue !== undefined
+      ? { updateSingularLocaleValue: props.updateSingularLocaleValue }
+      : {})
+  }
+
+  return bindings
 })
 
 defineExpose({

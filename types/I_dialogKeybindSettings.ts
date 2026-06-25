@@ -140,8 +140,8 @@ export type T_dialogKeybindSettingsDialogWiringModuleDeps = {
   formatFaKeybindChordForUi: (chord: I_faChordSerialized, platform: NodeJS.Platform) => string
   fromThrowable: T_injectedResultFromThrowable
   getDialogComponentStore: () => {
-    dialogToOpen?: unknown
-    dialogUUID?: unknown
+    dialogToOpen?: unknown | undefined
+    dialogUUID?: unknown | undefined
   }
   getKeybindsStore: () => {
     setSuspendGlobalKeybindDispatch: (active: boolean) => void
@@ -162,7 +162,7 @@ export type T_dialogKeybindSettingsDialogWiringModuleDeps = {
   watch: (
     source: (() => unknown) | Ref<unknown>,
     effect: (value: unknown, oldValue?: unknown) => void,
-    options?: { immediate?: boolean }
+    options?: { immediate?: boolean } | undefined
   ) => void
 }
 
@@ -205,7 +205,7 @@ export type T_dialogKeybindSettingsStateModuleDeps = {
 export type T_dialogKeybindSettingsTableLayoutObserveModuleDeps = {
   computeDialogKeybindSettingsTableMaxHeightPx: (
     sectionElement: HTMLElement,
-    minPx?: number
+    minPx?: number | undefined
   ) => number
   computed: <T>(getter: () => T) => ComputedRef<T>
   nextTick: () => Promise<void>
@@ -214,7 +214,7 @@ export type T_dialogKeybindSettingsTableLayoutObserveModuleDeps = {
   watch: (
     source: () => boolean,
     effect: (open: boolean) => void | Promise<void>,
-    options?: { immediate?: boolean }
+    options?: { immediate?: boolean } | undefined
   ) => void
 }
 

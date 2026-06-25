@@ -31,8 +31,8 @@ test('Test that addDialogProjectSettingsWorldDraftRow appends a new world draft'
   const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([baseWorld])
   addDialogProjectSettingsWorldDraftRow(localWorlds, 'en-US', 'New World')
   expect(localWorlds.value).toHaveLength(2)
-  expect(localWorlds.value?.[0].id).toBe(baseWorld.id)
-  expect(localWorlds.value?.[1].displayNameTranslations).toEqual({ 'en-US': 'New World' })
+  expect(localWorlds.value?.[0]!.id).toBe(baseWorld.id)
+  expect(localWorlds.value?.[1]!.displayNameTranslations).toEqual({ 'en-US': 'New World' })
 })
 
 /**
@@ -83,7 +83,7 @@ test('Test that removeDialogProjectSettingsWorldDraftRow no-ops when localWorlds
 test('Test that updateDialogProjectSettingsWorldDraftDisplayNameTranslations updates the matching row', () => {
   const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([baseWorld])
   updateDialogProjectSettingsWorldDraftDisplayNameTranslations(localWorlds, baseWorld.id, { 'en-US': 'Renamed' })
-  expect(localWorlds.value?.[0].displayNameTranslations).toEqual({ 'en-US': 'Renamed' })
+  expect(localWorlds.value?.[0]!.displayNameTranslations).toEqual({ 'en-US': 'Renamed' })
 })
 
 /**
@@ -103,7 +103,7 @@ test('Test that updateDialogProjectSettingsWorldDraftDisplayNameTranslations no-
 test('Test that updateDialogProjectSettingsWorldDraftColor updates the matching row', () => {
   const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([baseWorld])
   updateDialogProjectSettingsWorldDraftColor(localWorlds, baseWorld.id, '#aabbcc')
-  expect(localWorlds.value?.[0].color).toBe('#aabbcc')
+  expect(localWorlds.value?.[0]!.color).toBe('#aabbcc')
 })
 
 /**
@@ -123,7 +123,7 @@ test('Test that updateDialogProjectSettingsWorldDraftColor no-ops when localWorl
 test('Test that updateDialogProjectSettingsWorldDraftColorPallete updates the matching row', () => {
   const localWorlds = ref<I_dialogProjectSettingsWorldDraft[] | null>([baseWorld])
   updateDialogProjectSettingsWorldDraftColorPallete(localWorlds, baseWorld.id, '#112233;#445566')
-  expect(localWorlds.value?.[0].colorPallete).toBe('#112233;#445566')
+  expect(localWorlds.value?.[0]!.colorPallete).toBe('#112233;#445566')
 })
 
 /**
@@ -153,7 +153,7 @@ test('Test that updateDialogProjectSettingsWorldDraftTemplateLayout updates the 
     placements: []
   }
   updateDialogProjectSettingsWorldDraftTemplateLayout(localWorlds, baseWorld.id, nextLayout)
-  expect(localWorlds.value?.[0].templateLayout.groups).toHaveLength(1)
+  expect(localWorlds.value?.[0]!.templateLayout.groups).toHaveLength(1)
 })
 
 /**
@@ -172,7 +172,7 @@ test('Test that updateDialogProjectSettingsWorldDraftTemplateLayout ignores unkn
     ],
     placements: []
   })
-  expect(localWorlds.value?.[0].templateLayout.groups).toHaveLength(0)
+  expect(localWorlds.value?.[0]!.templateLayout.groups).toHaveLength(0)
 })
 
 /**

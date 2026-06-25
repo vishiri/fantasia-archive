@@ -99,7 +99,7 @@ test('Test that click handler opens external links via faExternalLinksManager', 
 
   setWindowLinksStub()
 
-  eventHandlers.click({
+  eventHandlers.click!({
     target: targetAnchor,
     type: 'click',
     preventDefault: preventDefaultMock
@@ -134,7 +134,7 @@ test('Test that click handler leaves internal links to normal navigation', () =>
 
   setWindowLinksStub()
 
-  eventHandlers.click({
+  eventHandlers.click!({
     target: targetAnchor,
     type: 'click',
     preventDefault: preventDefaultMock
@@ -173,7 +173,7 @@ test('Test that auxclick prevents default behavior', () => {
 
   setWindowLinksStub()
 
-  eventHandlers.auxclick({
+  eventHandlers.auxclick!({
     target: targetAnchor,
     type: 'auxclick',
     preventDefault: preventDefaultMock
@@ -229,7 +229,7 @@ test('Test that auxclick on internal link sets location href when not external',
 
   const preventDefaultMock = vi.fn()
 
-  eventHandlers.auxclick({
+  eventHandlers.auxclick!({
     target: targetAnchor,
     type: 'auxclick',
     preventDefault: preventDefaultMock
@@ -259,7 +259,7 @@ test('Test that click handler returns early when event target is null', () => {
 
   const preventDefaultMock = vi.fn()
 
-  eventHandlers.click({
+  eventHandlers.click!({
     target: null,
     type: 'click',
     preventDefault: preventDefaultMock
@@ -298,7 +298,7 @@ test('Test that click handler uses closest anchor when target is a nested elemen
 
   const preventDefaultMock = vi.fn()
 
-  eventHandlers.click({
+  eventHandlers.click!({
     target: innerSpan,
     type: 'click',
     preventDefault: preventDefaultMock
@@ -330,7 +330,7 @@ test('Test that click handler returns when nested target has no anchor ancestor'
   checkIfExternalMock.mockReset()
   setWindowLinksStub()
 
-  eventHandlers.click({
+  eventHandlers.click!({
     target: orphanSpan,
     type: 'click',
     preventDefault: vi.fn()
@@ -369,7 +369,7 @@ test('Test that click handler returns when faExternalLinksManager is missing', (
 
   const preventDefaultMock = vi.fn()
 
-  eventHandlers.click({
+  eventHandlers.click!({
     target: targetAnchor,
     type: 'click',
     preventDefault: preventDefaultMock
@@ -412,7 +412,7 @@ test('Test that click handler returns when checkIfExternal is not a function', (
 
   const preventDefaultMock = vi.fn()
 
-  eventHandlers.click({
+  eventHandlers.click!({
     target: targetAnchor,
     type: 'click',
     preventDefault: preventDefaultMock
@@ -455,7 +455,7 @@ test('Test that click handler returns when openExternal is not a function', () =
 
   const preventDefaultMock = vi.fn()
 
-  eventHandlers.click({
+  eventHandlers.click!({
     target: targetAnchor,
     type: 'click',
     preventDefault: preventDefaultMock

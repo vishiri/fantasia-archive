@@ -100,7 +100,7 @@ test('Test that registerFaChromiumCtrlShiftShortcutSuppress preventDefaults and 
   expect(beforeInputHandlers).toHaveLength(1)
 
   const preventDefault = vi.fn()
-  beforeInputHandlers[0](
+  beforeInputHandlers[0]!(
     {
       preventDefault
     },
@@ -129,7 +129,7 @@ test('Test that registerFaChromiumCtrlShiftShortcutSuppress forwards when code i
   registerFaChromiumCtrlShiftShortcutSuppress(win)
 
   const preventDefault = vi.fn()
-  beforeInputHandlers[0](
+  beforeInputHandlers[0]!(
     {
       preventDefault
     },
@@ -158,7 +158,7 @@ test('Test that registerFaChromiumCtrlShiftShortcutSuppress ignores non-denylist
   registerFaChromiumCtrlShiftShortcutSuppress(win)
 
   const preventDefault = vi.fn()
-  beforeInputHandlers[0](
+  beforeInputHandlers[0]!(
     {
       preventDefault
     },
@@ -190,7 +190,7 @@ test('Test that registerFaChromiumCtrlShiftShortcutSuppress preventDefaults with
   registerFaChromiumCtrlShiftShortcutSuppress(win)
 
   const preventDefault = vi.fn()
-  beforeInputHandlers[0](
+  beforeInputHandlers[0]!(
     {
       preventDefault
     },
@@ -223,7 +223,7 @@ test('Test that registerFaChromiumCtrlShiftShortcutSuppress forwards via before-
   registerFaChromiumCtrlShiftShortcutSuppress(win)
 
   const preventDefault = vi.fn()
-  beforeInputHandlers[0](
+  beforeInputHandlers[0]!(
     {
       preventDefault
     },
@@ -255,10 +255,10 @@ test('Test that registerFaChromiumCtrlShiftShortcutSuppress activates on focus a
   expect(windowHandlers.focus).toBeTypeOf('function')
   expect(windowHandlers.blur).toBeTypeOf('function')
 
-  windowHandlers.focus()
+  windowHandlers.focus!()
   expect(activateMock).toHaveBeenCalledOnce()
 
-  windowHandlers.blur()
+  windowHandlers.blur!()
   expect(deactivateMock).toHaveBeenCalledOnce()
 })
 

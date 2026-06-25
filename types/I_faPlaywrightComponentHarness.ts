@@ -12,6 +12,6 @@ export type I_faLaunchFaPlaywrightComponentHarnessWindowOptions =
   I_faLaunchFaPlaywrightElectronSerialSuiteWindowOptions,
   'readiness' | 'renderDelayMs' | 'dismissStartupTips'
   > & {
-    dismissStartupTips?: T_faPlaywrightComponentHarnessDismissTips
-    renderDelayMs?: number
+    dismissStartupTips?: T_faPlaywrightComponentHarnessDismissTips | undefined
+    renderDelayMs?: number | undefined
   }

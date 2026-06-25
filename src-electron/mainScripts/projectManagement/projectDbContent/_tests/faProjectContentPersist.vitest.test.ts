@@ -76,14 +76,23 @@ function readMockDocumentTemplateMaxSortOrder (
   return max
 }
 
+type T_projectContentTestTables = {
+  document_templates: Map<string, T_row>
+  documents: Map<string, T_row>
+  media: Map<string, T_row>
+  world_template_groups: Map<string, T_row>
+  world_template_placements: Map<string, T_row>
+  worlds: Map<string, T_row>
+}
+
 function makeProjectContentTestDb (): {
   db: {
     prepare: ReturnType<typeof vi.fn>
   }
-  tables: Record<string, Map<string, T_row>>
+  tables: T_projectContentTestTables
   junctionDocumentMedia: Set<string>
 } {
-  const tables: Record<string, Map<string, T_row>> = {
+  const tables: T_projectContentTestTables = {
     document_templates: new Map(),
     documents: new Map(),
     media: new Map(),
@@ -432,7 +441,7 @@ function makeProjectContentTestDb (): {
             for (const key of junctionDocumentMedia) {
               const [d, m] = key.split(':')
               if (d === documentId) {
-                const media = tables.media.get(m)
+                const media = tables.media.get(m!)
                 if (media !== undefined) {
                   rows.push(media)
                 }
@@ -575,7 +584,7 @@ function makeProjectContentTestDb (): {
       if (normalized.includes('UPDATE documents')) {
         return {
           run: (...args: Array<string | number | null>) => {
-            const id = args[4] as string
+            const id = args[4]! as string
             const existing = tables.documents.get(id)
             if (existing !== undefined) {
               tables.documents.set(id, {
@@ -1110,10 +1119,10 @@ test('Test that replaceFaProjectWorldsSnapshot replaces the ordered worlds list'
   expect(tables.worlds.has(SAMPLE_WORLD_UUID)).toBe(true)
   const listed = listFaProjectWorlds(db as never).items
   expect(listed.map((world) => world.displayName)).toEqual(['Keep renamed', 'Brand new'])
-  expect(listed[0].sortOrder).toBe(0)
-  expect(listed[1].sortOrder).toBe(1)
-  expect(listed[0].color).toBe('#112233')
-  expect(listed[0].colorPallete).toBe('#AABBCC;#DDEEFF')
+  expect(listed[0]!.sortOrder).toBe(0)
+  expect(listed[1]!.sortOrder).toBe(1)
+  expect(listed[0]!.color).toBe('#112233')
+  expect(listed[0]!.colorPallete).toBe('#AABBCC;#DDEEFF')
 })
 
 /**
@@ -1162,8 +1171,8 @@ test('Test that replaceFaProjectWorldTemplateLayoutSnapshot persists layout rows
   expect(tables.world_template_groups.size).toBe(1)
   expect(tables.world_template_placements.size).toBe(1)
   const listed = listFaProjectWorldsForProjectSettings(db as never)
-  expect(listed.items[0]?.templateLayout.groups[0]?.displayName).toBe('Creatures')
-  expect(listed.items[0]?.templateLayout.placements[0]?.documentTemplateId).toBe(template.id)
+  expect(listed.items[0]!?.templateLayout.groups[0]!?.displayName).toBe('Creatures')
+  expect(listed.items[0]!?.templateLayout.placements[0]!?.documentTemplateId).toBe(template.id)
 })
 
 /**
@@ -1318,8 +1327,8 @@ test('Test that replaceFaProjectWorldsSnapshot persists templateLayout on each w
     }
   ])
   const listed = listFaProjectWorldsForProjectSettings(db as never)
-  expect(listed.items[0]?.templateLayout.groups).toHaveLength(1)
-  expect(listed.items[0]?.templateLayout.placements[0]?.documentTemplateId).toBe(template.id)
+  expect(listed.items[0]!?.templateLayout.groups).toHaveLength(1)
+  expect(listed.items[0]!?.templateLayout.placements[0]!?.documentTemplateId).toBe(template.id)
 })
 
 /**
@@ -1351,7 +1360,7 @@ test('Test that listFaProjectWorldsForProjectSettings includes placement documen
     ]
   })
   const listed = listFaProjectWorldsForProjectSettings(db as never)
-  expect(listed.items[0]?.templateLayout.placements[0]?.documentCountInWorld).toBe(1)
+  expect(listed.items[0]!?.templateLayout.placements[0]!?.documentCountInWorld).toBe(1)
 })
 
 test('Test that createFaProjectDocumentTemplate stores worldAppendix and icon', () => {
@@ -1462,10 +1471,10 @@ test('Test that replaceFaProjectDocumentTemplatesSnapshot replaces the ordered t
   expect(tables.document_templates.has(SAMPLE_TEMPLATE_UUID)).toBe(true)
   const listed = listFaProjectDocumentTemplates(db as never).items
   expect(listed.map((template) => template.displayName)).toEqual(['Keep renamed', 'Brand new'])
-  expect(listed[0].sortOrder).toBe(0)
-  expect(listed[1].sortOrder).toBe(1)
-  expect(listed[0].icon).toBe('star')
-  expect(listed[0].worldAppendix).toBe('appendix')
+  expect(listed[0]!.sortOrder).toBe(0)
+  expect(listed[1]!.sortOrder).toBe(1)
+  expect(listed[0]!.icon).toBe('star')
+  expect(listed[0]!.worldAppendix).toBe('appendix')
 })
 
 /**

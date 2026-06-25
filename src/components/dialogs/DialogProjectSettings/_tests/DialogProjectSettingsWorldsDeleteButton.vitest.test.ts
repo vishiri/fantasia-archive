@@ -120,7 +120,7 @@ test('Test that DialogProjectSettingsWorldsDeleteButton renders delete confirmat
   expect((confirmButton.element as HTMLButtonElement).disabled).toBe(true)
   expect(confirmButton.text()).toContain('dialogs.projectSettings.panels.worlds.deleteConfirm.confirmDeleteButton')
   expect(w.find('[data-test-locator="dialogProjectSettings-worlds-deleteConfirmCountdown"]').text()).toBe('5')
-  expect(confirmButton.classes()).toContain('dialogProjectSettingsWorldsDeleteConfirm__confirmButton--countdownActive')
+  expect(confirmButton.classes()).toContain('faDeleteConfirmButton__confirmButton--countdownActive')
 })
 
 /**

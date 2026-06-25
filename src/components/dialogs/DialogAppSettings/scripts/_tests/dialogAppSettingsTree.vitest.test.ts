@@ -46,7 +46,7 @@ const dialogAppSettingsTreeTranslate = {
     }
     const categoryTitleMatch = /^dialogs\.appSettings\.appOptionsCategories\.([^.]+)\.title$/.exec(key)
     if (categoryTitleMatch !== null) {
-      const categoryKey = categoryTitleMatch[1]
+      const categoryKey = categoryTitleMatch[1]!
       return appSettingsCategoryTitleByKey[categoryKey] ?? key
     }
     return key

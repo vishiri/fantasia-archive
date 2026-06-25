@@ -53,7 +53,7 @@ test('Test that copyDialogActionMonitorRowToClipboard copies JSON and emits a po
   copyToClipboardMock.mockResolvedValueOnce(undefined)
   await copyDialogActionMonitorRowToClipboard(buildRow())
   expect(copyToClipboardMock).toHaveBeenCalledOnce()
-  const copiedPayload = copyToClipboardMock.mock.calls[0]?.[0] as string
+  const copiedPayload = copyToClipboardMock.mock.calls[0]!?.[0]! as string
   expect(typeof copiedPayload).toBe('string')
   const parsed = JSON.parse(copiedPayload) as Record<string, unknown>
   expect(parsed.id).toBe('languageSwitch')

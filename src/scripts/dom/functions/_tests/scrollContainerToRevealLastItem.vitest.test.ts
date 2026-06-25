@@ -104,11 +104,11 @@ describe('scheduleScrollContainerToRevealLastItem', () => {
     await Promise.resolve()
     expect(requestAnimationFrame).toHaveBeenCalledTimes(1)
 
-    rafCallbacks[0]?.(0)
+    rafCallbacks[0]!?.(0)
     expect(scrollIntoView).toHaveBeenCalledTimes(1)
     expect(requestAnimationFrame).toHaveBeenCalledTimes(2)
 
-    rafCallbacks[1]?.(0)
+    rafCallbacks[1]!?.(0)
     expect(scrollIntoView).toHaveBeenCalledTimes(2)
   })
 })

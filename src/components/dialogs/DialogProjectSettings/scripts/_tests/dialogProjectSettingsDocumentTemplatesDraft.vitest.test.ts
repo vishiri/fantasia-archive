@@ -146,8 +146,8 @@ test('Test that isDialogProjectSettingsDocumentTemplateRemoveDisabled respects d
 test('Test that appendDialogProjectSettingsDocumentTemplateDraft seeds plural and singular for active language', () => {
   const templates = appendDialogProjectSettingsDocumentTemplateDraft([], 'en-US', 'New document template')
   expect(templates).toHaveLength(1)
-  expect(templates[0]?.titlePluralTranslations).toEqual({ 'en-US': 'New document template' })
-  expect(templates[0]?.titleSingularTranslations).toEqual({ 'en-US': 'New document template' })
+  expect(templates[0]!?.titlePluralTranslations).toEqual({ 'en-US': 'New document template' })
+  expect(templates[0]!?.titleSingularTranslations).toEqual({ 'en-US': 'New document template' })
   expect(isDialogProjectSettingsDocumentTemplateMissingCurrentLanguageTranslations(templates[0]!, 'en-US')).toBe(false)
 })
 
@@ -244,5 +244,5 @@ test('Test that mapDialogProjectSettingsDocumentTemplatesToSnapshot includes ico
       worldAppendixTranslations: {}
     }
   ])
-  expect(snapshot[0]?.icon).toBe('person')
+  expect(snapshot[0]!?.icon).toBe('person')
 })

@@ -15,10 +15,11 @@ export const fantasiaImageList: { [key: string]: string } = {
  * @param list - The list of all available Fantasia mascot images
  * @return A random image URL from the list
  */
-export const randomMascotImage = (list: { [key: string]: string }) => {
+export const randomMascotImage = (list: { [key: string]: string }): string => {
   // Cryptic code from SO: https://stackoverflow.com/a/15106541
   const keys = Object.keys(list)
-  return list[keys[keys.length * Math.random() << 0]]
+  const key = keys[keys.length * Math.random() << 0]!
+  return list[key]!
 }
 
 /**
@@ -29,7 +30,11 @@ export const randomMascotImage = (list: { [key: string]: string }) => {
  * @param id - The specific image URL to return if isRandom is false
  * @return A URL string representing the current image to be rendered
  */
-export const determineCurrentImage = (list: { [key: string]: string }, isRandom: boolean, id: string) => {
+export const determineCurrentImage = (
+  list: { [key: string]: string },
+  isRandom: boolean,
+  id: string
+): string | undefined => {
   if (isRandom) {
     return randomMascotImage(list)
   } else {

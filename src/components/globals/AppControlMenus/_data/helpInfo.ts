@@ -17,7 +17,7 @@ function buildHelpInfoMenuData (): I_appMenuItem[] {
     faMenuItem('appControlMenus.helpInfo.items.tipsTricksTrivia', 'mdi-fire-alert', {
       trigger: () => runFaAction('openTipsTricksTriviaDialog', undefined)
     }),
-    faMenuSeparator(),
+    faMenuSeparator('helpInfo-sep-after-tips'),
     faMenuItem('appControlMenus.helpInfo.items.aboutFantasiaArchive', 'mdi-information-variant', {
       trigger: () => runFaAction('openAboutFantasiaArchiveDialog', undefined)
     }),
@@ -27,7 +27,7 @@ function buildHelpInfoMenuData (): I_appMenuItem[] {
     faMenuItem('appControlMenus.helpInfo.items.license', 'mdi-script-text-outline', {
       trigger: () => runFaAction('openLicenseDialog', undefined)
     }),
-    faMenuSeparator(),
+    faMenuSeparator('helpInfo-sep-before-action-monitor'),
     faMenuItem('appControlMenus.helpInfo.items.actionMonitor', 'mdi-pulse', {
       keybindCommandId: 'openActionMonitor',
       trigger: () => runFaAction('openActionMonitorDialog', undefined)

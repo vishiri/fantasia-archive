@@ -21,7 +21,7 @@ export function createDialogMarkdownDocument (deps: {
   watch: (source: () => unknown, effect: () => void) => void
 }): {
     resolveDialogMarkdownStore: () => I_dialogMarkdownStoreLike | null
-    useDialogMarkdownDocument: (props: { directInput?: T_documentName }) => {
+    useDialogMarkdownDocument: (props: { directInput?: T_documentName | undefined }) => {
       dialogAriaLabel: { value: string }
       dialogModel: I_ref<boolean>
       documentName: I_ref<string>
@@ -30,7 +30,7 @@ export function createDialogMarkdownDocument (deps: {
   const resolveDialogMarkdownStore = deps.resolveDialogMarkdownStore
 
   const useDialogMarkdownDocument = (props: {
-    directInput?: T_documentName
+    directInput?: T_documentName | undefined
   }) => {
     const dialogModel = deps.ref(false)
     deps.registerMarkdownDialogStackGuard(dialogModel)

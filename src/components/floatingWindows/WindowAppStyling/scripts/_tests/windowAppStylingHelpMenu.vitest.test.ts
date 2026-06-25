@@ -4,7 +4,7 @@ import { ResultAsync } from 'neverthrow'
 import { test, expect, vi } from 'vitest'
 
 import { useWindowAppStylingHelpMenu } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStyling_manager'
-import { FA_Q_TOOLTIP_DELAY_MS } from 'app/src/scripts/appGlobalManagementUI/faQTooltipDelay_manager'
+import { FA_Q_TOOLTIP_DELAY_MS } from 'app/src/scripts/appGlobalManagementUI/functions/faQTooltipDelay'
 
 const HelpMenuTestHarness = defineComponent({
   setup () {

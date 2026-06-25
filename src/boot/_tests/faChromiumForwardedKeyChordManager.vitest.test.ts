@@ -40,12 +40,12 @@ test('runFaChromiumForwardedKeyChordBoot installs listener and dispatches synthe
   await runFaChromiumForwardedKeyChordBoot()
 
   expect(installMock).toHaveBeenCalledOnce()
-  const handler = installMock.mock.calls[0][0] as (payload: { code: string }) => void
+  const handler = installMock.mock.calls[0]![0]! as (payload: { code: string }) => void
   handler({
     code: 'KeyO'
   })
   expect(dispatchEvent).toHaveBeenCalledOnce()
-  const event = vi.mocked(dispatchEvent).mock.calls[0][0]
+  const event = vi.mocked(dispatchEvent).mock.calls[0]![0]!
   expect(event).toBeInstanceOf(TestKeyboardEvent)
   const keyEvent = event as TestKeyboardEvent
   expect(keyEvent.type).toBe('keydown')

@@ -38,7 +38,7 @@ export function buildExpectedAppSettingsTreeFromEnUsMessages (): T_appSettingsRe
     .sort((keyA, keyB) => String(keyA).localeCompare(String(keyB)))
 
   for (const settingKey of settingKeys) {
-    const meta = APP_SETTINGS_OPTIONS[settingKey]
+    const meta = APP_SETTINGS_OPTIONS[settingKey]!
     const categoryKey = meta.category
     const subCategoryKey = meta.subcategory
 
@@ -56,14 +56,14 @@ export function buildExpectedAppSettingsTreeFromEnUsMessages (): T_appSettingsRe
       const catBlock = cats[categoryKey as keyof typeof cats] as Record<string, {
         subtitle?: string
       }>
-      const subBlock = catBlock[subCategoryKey]
+      const subBlock = catBlock[subCategoryKey]!
       unsortedTree[categoryKey].subCategories[subCategoryKey] = {
         title: subBlock.subtitle ?? '',
         settingsList: {}
       }
     }
 
-    const optBlock = appOpts[settingKey]
+    const optBlock = appOpts[settingKey]!
     const note = optBlock.note
 
     unsortedTree[categoryKey].subCategories[subCategoryKey].settingsList[settingKey] = {

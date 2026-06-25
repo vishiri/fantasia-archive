@@ -23,15 +23,26 @@ test('Test that getFaKeybindKeydownContext falls back when snapshot is missing',
  * getFaKeybindKeydownContext
  * Reads live snapshot platform and suspend flag from S_FaKeybinds.
  */
-test('Test that getFaKeybindKeydownContext reads snapshot and suspend flag from Pinia', () => {
+test('Test that getFaKeybindKeydownContext reads snapshot and suspend flag from Pinia', async () => {
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      faContentBridgeAPIs: {
+        faKeybinds: {
+          getKeybinds: async () => ({
+            platform: 'linux',
+            store: {
+              overrides: {},
+              schemaVersion: 1
+            }
+          })
+        }
+      }
+    } as Window & typeof globalThis
+  })
+
   const store = S_FaKeybinds()
-  store.snapshot = {
-    platform: 'linux',
-    store: {
-      overrides: {},
-      schemaVersion: 1
-    }
-  }
+  await store.refreshKeybinds()
   store.setSuspendGlobalKeybindDispatch(true)
   const ctx = getFaKeybindKeydownContext()
   expect(ctx.platform).toBe('linux')

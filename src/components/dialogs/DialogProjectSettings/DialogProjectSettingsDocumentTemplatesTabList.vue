@@ -1,80 +1,46 @@
 <template>
-  <div
-    :class="faVerticalDraggableTabsRootClassList"
-    :style="tabListRootStyle"
-    class="faVerticalDraggableTabs dialogProjectSettingsDocumentTemplatesTabList"
-    :data-test-layout-width="String(props.tabListWidthPx)"
+  <FaVerticalDraggableTabList
+    add-button-label-key="dialogs.projectSettings.panels.documentTemplates.addTemplateButton"
+    block-class-suffix="dialogProjectSettingsDocumentTemplatesTabList"
+    :clone-list="cloneTemplateDraftList"
+    :current-language-code="props.currentLanguageCode"
+    :dense="props.dense"
+    drag-id-data-attribute="data-test-template-id"
+    empty-filtered-key="dialogs.projectSettings.panels.documentTemplates.emptyFilteredTemplates"
+    filter-aria-label-key="dialogs.projectSettings.panels.documentTemplates.filterAriaLabel"
+    filter-clear-aria-label-key="dialogs.projectSettings.panels.documentTemplates.filterClearAriaLabel"
+    :filter-items="filterTemplatesByQuery"
+    filter-placeholder-key="dialogs.projectSettings.panels.documentTemplates.filterPlaceholder"
+    :items="props.templates"
+    :tab-justify-content="props.tabJustifyContent"
+    :tab-label-font-size="props.tabLabelFontSize"
+    :tab-label-text-transform="props.tabLabelTextTransform"
+    :tab-list-width-px="props.tabListWidthPx"
+    :tab-padding="props.tabPadding"
+    :tab-text-align="props.tabTextAlign"
+    test-locator-add-button="dialogProjectSettings-documentTemplates-addButton"
+    test-locator-filter-clear="dialogProjectSettings-documentTemplatesFilterClear"
+    test-locator-filter-empty="dialogProjectSettings-documentTemplatesFilterEmpty"
+    test-locator-filter-input="dialogProjectSettings-documentTemplatesFilterInput"
+    test-locator-list="dialogProjectSettings-documentTemplates-list"
+    @add="emit('addTemplate')"
+    @update:items="emit('update:templates', $event)"
   >
-    <div class="faVerticalDraggableTabs__filterRow">
-      <DialogProjectSettingsVerticalTabListFilterInput
-        v-model="filterQuery"
-        stretch-to-column-edge
-        aria-label-key="dialogs.projectSettings.panels.documentTemplates.filterAriaLabel"
-        clear-aria-label-key="dialogs.projectSettings.panels.documentTemplates.filterClearAriaLabel"
-        placeholder-key="dialogs.projectSettings.panels.documentTemplates.filterPlaceholder"
-        test-locator-clear="dialogProjectSettings-documentTemplatesFilterClear"
-        test-locator-input="dialogProjectSettings-documentTemplatesFilterInput"
+    <template #tab="{ item, isBeingDragged, isListDragging }">
+      <DialogProjectSettingsDocumentTemplatesTabItem
+        :current-language-code="props.currentLanguageCode"
+        :is-being-dragged="isBeingDragged"
+        :is-list-dragging="isListDragging"
+        :is-selected="item.id === props.selectedTemplateId"
+        :tab-has-error="isTemplateTabValidationError(item)"
+        :template="item"
+        @select="emit('select', $event)"
       />
-    </div>
-
-    <div
-      ref="tabListScrollRef"
-      class="faVerticalDraggableTabs__scroll"
-      data-test-locator="dialogProjectSettings-documentTemplates-list"
-    >
-      <VueDraggable
-        v-bind="faVerticalDraggableTabsSortableDragOptions"
-        v-model="sortableTemplates"
-        :animation="150"
-        :set-data="hideNativeSortableDragGhost"
-        :touch-start-threshold="5"
-        class="faVerticalDraggableTabs__draggable column"
-        @end="onTemplatesDragEnd"
-        @start="onTemplatesDragStart"
-      >
-        <DialogProjectSettingsDocumentTemplatesTabItem
-          v-for="template in sortableTemplates"
-          :key="template.id"
-          :current-language-code="props.currentLanguageCode"
-          :is-being-dragged="template.id === draggingTemplateId"
-          :is-list-dragging="draggingTemplateId !== null"
-          :is-selected="template.id === props.selectedTemplateId"
-          :tab-has-error="isTemplateTabValidationError(template)"
-          :template="template"
-          @select="emit('select', $event)"
-        />
-      </VueDraggable>
-      <div
-        v-if="showFilterEmpty"
-        class="dialogProjectSettingsDocumentTemplatesTabList__filterEmpty fa-text-muted"
-        data-test-locator="dialogProjectSettings-documentTemplatesFilterEmpty"
-      >
-        {{ $t('dialogs.projectSettings.panels.documentTemplates.emptyFilteredTemplates') }}
-      </div>
-    </div>
-
-    <q-separator class="faVerticalDraggableTabs__divider" />
-
-    <div class="faVerticalDraggableTabs__addButtonRow">
-      <q-btn
-        outline
-        class="faVerticalDraggableTabs__addButton"
-        color="primary-bright"
-        :label="$t('dialogs.projectSettings.panels.documentTemplates.addTemplateButton')"
-        data-test-locator="dialogProjectSettings-documentTemplates-addButton"
-        @click="emit('addTemplate')"
-      />
-    </div>
-  </div>
+    </template>
+  </FaVerticalDraggableTabList>
 </template>
 
 <script setup lang="ts">
-// faVerticalDraggableTabs column host — layout props and drag wiring documented in
-// .cursor/skills/fantasia-drag-drop/SKILL.md (Vertical draggable tab strips).
-import { computed, nextTick, ref, watch } from 'vue'
-import { VueDraggable } from 'vue-draggable-plus'
-import type { SortableEvent } from 'sortablejs'
-
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import type {
@@ -89,21 +55,11 @@ import {
   FA_VERTICAL_DRAGGABLE_TABS_TAB_LABEL_FONT_SIZE_DEFAULT,
   FA_VERTICAL_DRAGGABLE_TABS_TAB_LABEL_TEXT_TRANSFORM_DEFAULT,
   FA_VERTICAL_DRAGGABLE_TABS_TAB_PADDING_DEFAULT,
-  FA_VERTICAL_DRAGGABLE_TABS_TAB_TEXT_ALIGN_DEFAULT,
-  buildFaVerticalDraggableTabsRootStyle
-} from 'app/src/scripts/faDragDrop/functions/buildFaVerticalDraggableTabsRootStyle'
-import DialogProjectSettingsDocumentTemplatesTabItem from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsDocumentTemplatesTabItem.vue'
-import DialogProjectSettingsVerticalTabListFilterInput from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsVerticalTabListFilterInput.vue'
+  FA_VERTICAL_DRAGGABLE_TABS_TAB_TEXT_ALIGN_DEFAULT
+} from 'app/src/scripts/faDragDrop/faDragDrop_manager'
+import FaVerticalDraggableTabList from 'app/src/components/elements/FaVerticalDraggableTabList/FaVerticalDraggableTabList.vue'
+import DialogProjectSettingsDocumentTemplatesTabItem from './DialogProjectSettingsDocumentTemplatesTabItem.vue'
 import { filterDialogProjectSettingsDocumentTemplatesByQuery } from './scripts/filterDialogProjectSettingsDocumentTemplatesByQuery'
-import { createDialogProjectSettingsFilteredVerticalTabListSortableWiring } from './scripts/dialogProjectSettingsFilteredVerticalTabListSortableWiring'
-import { hideNativeSortableDragGhost } from 'app/src/scripts/faDragDrop/functions/hideNativeSortableDragGhost'
-import {
-  applyFaVerticalDraggableTabsDocumentDragCursor,
-  clearFaVerticalDraggableTabsDocumentDragCursor
-} from 'app/src/scripts/faDragDrop/functions/faVerticalDraggableTabsDocumentDragCursor'
-import { faVerticalDraggableTabsSortableDragOptions } from 'app/src/scripts/faDragDrop/functions/faVerticalDraggableTabsSortableDragOptions'
-import { readFaSortableDragItemDataAttribute } from 'app/src/scripts/faDragDrop/functions/readFaSortableDragItemDataAttribute'
-import { createDialogProjectSettingsScrollOnAppendWatch } from './scripts/dialogProjectSettingsScrollOnAppendWiring'
 
 defineOptions({
   name: 'DialogProjectSettingsDocumentTemplatesTabList'
@@ -142,79 +98,15 @@ function cloneTemplateDraftList (
   return templates.map((template) => ({ ...template }))
 }
 
-const draggableTemplates = ref<I_dialogProjectSettingsDocumentTemplateDraft[]>(
-  cloneTemplateDraftList(props.templates)
-)
-
-const tabListScrollRef = ref<HTMLElement | null>(null)
-
-const draggingTemplateId = ref<string | null>(null)
-
-const filterQuery = ref('')
-
-const {
-  applySortableListToFull,
-  showFilterEmpty,
-  sortableList: sortableTemplates,
-  syncSortableListFromFull
-} = createDialogProjectSettingsFilteredVerticalTabListSortableWiring({
-  cloneList: cloneTemplateDraftList,
-  filterItems: (list, query) => {
-    return filterDialogProjectSettingsDocumentTemplatesByQuery(
-      list,
-      query,
-      props.currentLanguageCode
-    )
-  },
-  filterQuery,
-  fullList: draggableTemplates
-})
-
-const faVerticalDraggableTabsRootClassList = computed(() => ({
-  'faVerticalDraggableTabs--listDragging': draggingTemplateId.value !== null
-}))
-
-const tabListRootStyle = computed(() => buildFaVerticalDraggableTabsRootStyle({
-  columnWidthPx: props.tabListWidthPx,
-  tabDense: props.dense,
-  tabJustifyContent: props.tabJustifyContent,
-  tabLabelFontSize: props.tabLabelFontSize,
-  tabLabelTextTransform: props.tabLabelTextTransform,
-  tabPadding: props.tabPadding,
-  tabTextAlign: props.tabTextAlign
-}))
-
-watch(
-  () => props.templates,
-  (nextTemplates) => {
-    draggableTemplates.value = cloneTemplateDraftList(nextTemplates)
-    syncSortableListFromFull()
-  },
-  { deep: true }
-)
-
-createDialogProjectSettingsScrollOnAppendWatch({
-  getCount: () => props.templates.length,
-  getScrollContainer: () => tabListScrollRef.value,
-  itemSelector: '.faVerticalDraggableTabs__tab',
-  nextTick,
-  requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
-  watch
-})
-
-function onTemplatesDragStart (event: SortableEvent): void {
-  draggingTemplateId.value = readFaSortableDragItemDataAttribute(
-    event.item,
-    'data-test-template-id'
+function filterTemplatesByQuery (
+  list: I_dialogProjectSettingsDocumentTemplateDraft[],
+  query: string
+): I_dialogProjectSettingsDocumentTemplateDraft[] {
+  return filterDialogProjectSettingsDocumentTemplatesByQuery(
+    list,
+    query,
+    props.currentLanguageCode
   )
-  applyFaVerticalDraggableTabsDocumentDragCursor()
-}
-
-function onTemplatesDragEnd (): void {
-  draggingTemplateId.value = null
-  clearFaVerticalDraggableTabsDocumentDragCursor()
-  applySortableListToFull()
-  emit('update:templates', cloneTemplateDraftList(draggableTemplates.value))
 }
 
 function isTemplateTabValidationError (
@@ -223,5 +115,3 @@ function isTemplateTabValidationError (
   return isDialogProjectSettingsDocumentTemplateTabValidationError(template)
 }
 </script>
-
-<style lang="scss" src="./styles/DialogProjectSettings.worldsTabList.unscoped.scss"></style>

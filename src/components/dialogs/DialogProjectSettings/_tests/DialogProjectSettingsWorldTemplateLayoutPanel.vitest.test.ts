@@ -256,7 +256,7 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutPanel emits update:templ
   })
 
   await w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutAddGroup"]').trigger('click')
-  expect(w.emitted('update:templateLayout')?.[0]?.[0]).toMatchObject({
+  expect(w.emitted('update:templateLayout')?.[0]?.[0]!).toMatchObject({
     groups: expect.arrayContaining([
       expect.objectContaining({
         displayNameTranslations: {

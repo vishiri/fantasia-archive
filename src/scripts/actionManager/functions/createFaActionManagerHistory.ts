@@ -9,7 +9,7 @@ type T_faActionManagerHistoryStore = {
     uid: string,
     patch: Partial<I_faActionHistoryEntry>
   ) => void
-  actionHistory: I_faActionHistoryEntry[]
+  actionHistory: readonly I_faActionHistoryEntry[]
 }
 
 function buildHistoryEntryFromQueue (

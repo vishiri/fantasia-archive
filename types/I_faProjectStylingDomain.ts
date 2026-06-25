@@ -13,6 +13,6 @@ export interface I_faProjectStylingRoot {
  * Partial update merged into 'project_styling_*' KV rows by the main-process IPC handler.
  */
 export interface I_faProjectStylingPatch {
-  css?: string
-  frame?: I_faFloatingWindowPersistedRect | null
+  css?: string | undefined
+  frame?: I_faFloatingWindowPersistedRect | null | undefined
 }

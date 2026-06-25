@@ -35,11 +35,8 @@ import type {
 import { createFaProjectContentBridgeHarnessStub } from 'app/helpers/faProjectContentBridgeHarnessStub'
 
 const defaultExtraEnvSnapshot: I_extraEnvVariablesAPI = {
-  COMPONENT_NAME: undefined,
-  COMPONENT_PROPS: undefined,
   ELECTRON_MAIN_FILEPATH: '/storybook/electron-main.js',
-  FA_FRONTEND_RENDER_TIMER: 0,
-  TEST_ENV: undefined
+  FA_FRONTEND_RENDER_TIMER: 0
 }
 
 function resolveExtraEnvVariables (

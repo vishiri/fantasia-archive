@@ -235,7 +235,7 @@ test('Test that useFaFloatingWindowFrame wires ResizeObserver observe and discon
   await wrapper.vm.$nextTick()
   await wrapper.vm.$nextTick()
   expect(observe).toHaveBeenCalledTimes(1)
-  const node = observe.mock.calls[0][0] as HTMLElement
+  const node = observe.mock.calls[0]![0]! as HTMLElement
   expect(node).toBe(wrapper.find('[data-test-locator="floating-frame-harness"]').element)
 
   visible.value = false

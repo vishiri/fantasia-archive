@@ -16,7 +16,7 @@ import { mountMainLayoutForVitest } from './mainLayoutVitestMount'
 
 function countKeydownCaptureAdds (spy: { mock: { calls: unknown[][] } }): number {
   return spy.mock.calls.filter((call) => {
-    return call[0] === 'keydown' && call[2] === true
+    return call[0]! === 'keydown' && call[2]! === true
   }).length
 }
 
@@ -458,14 +458,14 @@ test('Test that MainLayout removes capture keydown listener on unmount after key
   await flushPromises()
 
   const keydownRemoves = removeSpy.mock.calls.filter((call) => {
-    return call[0] === 'keydown' && call[2] === true
+    return call[0]! === 'keydown' && call[2]! === true
   })
   expect(keydownRemoves.length).toBe(0)
 
   w.unmount()
 
   const afterUnmount = removeSpy.mock.calls.filter((call) => {
-    return call[0] === 'keydown' && call[2] === true
+    return call[0]! === 'keydown' && call[2]! === true
   })
   expect(afterUnmount.length).toBe(1)
 

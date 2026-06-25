@@ -49,19 +49,19 @@ test('Test that activate registers accelerators and forwards the DOM code on pre
   controller.activate()
 
   expect(controller.globallyForwardedDomCodes.has('KeyO')).toBe(true)
-  expect(globalShortcutRegisterMock.mock.calls.some((call) => call[0] === 'CommandOrControl+Shift+O')).toBe(
+  expect(globalShortcutRegisterMock.mock.calls.some((call) => call[0]! === 'CommandOrControl+Shift+O')).toBe(
     true
   )
 
   const oRegistrationIndex = globalShortcutRegisterMock.mock.calls.findIndex(
-    (call) => call[0] === 'CommandOrControl+Shift+O'
+    (call) => call[0]! === 'CommandOrControl+Shift+O'
   )
   expect(oRegistrationIndex).toBeGreaterThanOrEqual(0)
-  const onPress = globalShortcutRegisterMock.mock.calls[oRegistrationIndex][1]
+  const onPress = globalShortcutRegisterMock.mock.calls[oRegistrationIndex]![1]!
   onPress()
 
   expect(executeJavaScript).toHaveBeenCalledOnce()
-  expect(String(executeJavaScript.mock.calls[0][0])).toContain('KeyO')
+  expect(String(executeJavaScript.mock.calls[0]![0]!)).toContain('KeyO')
 })
 
 /**
@@ -137,7 +137,7 @@ test('Test that activate skips accelerators that do not map from a DOM code', ()
   controller.activate()
 
   expect(globalShortcutRegisterMock).toHaveBeenCalledTimes(1)
-  expect(globalShortcutRegisterMock.mock.calls[0][0]).toBe('CommandOrControl+Shift+O')
+  expect(globalShortcutRegisterMock.mock.calls[0]![0]!).toBe('CommandOrControl+Shift+O')
 
   acceleratorSpy.mockRestore()
 })
@@ -157,9 +157,9 @@ test('Test that a globalShortcut press is ignored when webContents is destroyed'
   controller.activate()
 
   const registration = globalShortcutRegisterMock.mock.calls.find(
-    (call) => call[0] === 'CommandOrControl+Shift+O'
+    (call) => call[0]! === 'CommandOrControl+Shift+O'
   )
-  registration?.[1]()
+  registration?.[1]!()
 
   expect(executeJavaScript).not.toHaveBeenCalled()
 })

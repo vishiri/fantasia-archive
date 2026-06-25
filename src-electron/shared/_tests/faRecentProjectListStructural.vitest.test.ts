@@ -52,7 +52,7 @@ test('Test that normalize drops invalid rows and caps length', () => {
     ...many
   ])
   expect(out.length).toBe(FA_RECENT_PROJECTS_MAX)
-  expect(out[0]?.name).toBe('N0')
+  expect(out[0]!?.name).toBe('N0')
 })
 
 test('Test that normalize trims fields', () => {

@@ -1,4 +1,5 @@
 import type {
+  I_faChordSerialized,
   I_faKeybindsRoot,
   T_faKeybindCommandId
 } from 'app/types/I_faKeybindsDomain'
@@ -25,7 +26,7 @@ export function buildCleanFaKeybindsRoot (
     if (v === null) {
       overrides[id] = null
     } else if (v !== undefined && typeof v === 'object' && !Array.isArray(v)) {
-      overrides[id] = v as I_faKeybindsRoot['overrides'][typeof id]
+      overrides[id] = v as I_faChordSerialized
     }
   }
 

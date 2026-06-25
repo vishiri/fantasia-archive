@@ -54,7 +54,7 @@ test('faProjectFailsafePathReply installs bridge callback in electron mode', () 
   const run = faProjectFailsafePathReply as () => void
   run()
   expect(installMock).toHaveBeenCalledOnce()
-  const getPath = installMock.mock.calls[0][0] as () => string | null
+  const getPath = installMock.mock.calls[0]![0]! as () => string | null
   expect(getPath()).toBe('D:\\t\\p.faproject')
 })
 
@@ -110,6 +110,6 @@ test('faProjectFailsafePathReply supplies null when no active project is open', 
   })
   const run = faProjectFailsafePathReply as () => void
   run()
-  const getPath = installMock.mock.calls[0][0] as () => string | null
+  const getPath = installMock.mock.calls[0]![0]! as () => string | null
   expect(getPath()).toBeNull()
 })

@@ -207,7 +207,7 @@ export type T_dialogProjectSettingsWorldColorPaletteEditorUseDeps = {
   watch: (
     source: () => string,
     effect: (value: string) => void,
-    options?: { immediate?: boolean }
+    options?: { immediate?: boolean } | undefined
   ) => void
   wouldDuplicateDialogProjectSettingsWorldColorPaletteEntryExceedMaxLength: (
     entries: readonly I_dialogProjectSettingsWorldColorPaletteEntry[],
@@ -277,6 +277,6 @@ export type T_dialogProjectSettingsSaveValidationErrorKind =
 /** One ordered save-validation error in the Project Settings draft. */
 export interface I_dialogProjectSettingsSaveValidationError {
   kind: T_dialogProjectSettingsSaveValidationErrorKind
-  templateIndexOneBased?: number
-  worldIndexOneBased?: number
+  templateIndexOneBased?: number | undefined
+  worldIndexOneBased?: number | undefined
 }

@@ -30,11 +30,11 @@ export interface I_faProjectWorldCreateInput {
 }
 
 export interface I_faProjectWorldPatch {
-  color?: string
-  colorPallete?: string
-  displayName?: string
-  displayNameTranslations?: I_faProjectWorldDisplayNameTranslations
-  sortOrder?: number
+  color?: string | undefined
+  colorPallete?: string | undefined
+  displayName?: string | undefined
+  displayNameTranslations?: I_faProjectWorldDisplayNameTranslations | undefined
+  sortOrder?: number | undefined
 }
 
 import type { I_faProjectWorldTemplateLayoutSnapshot } from 'app/types/I_faProjectWorldTemplateLayoutDomain'
@@ -43,9 +43,9 @@ import type { I_faProjectWorldTemplateLayoutSnapshot } from 'app/types/I_faProje
 export interface I_faProjectWorldSnapshotItem {
   id: string
   displayNameTranslations: I_faProjectWorldDisplayNameTranslations
-  color?: string
-  colorPallete?: string
-  templateLayout?: I_faProjectWorldTemplateLayoutSnapshot
+  color?: string | undefined
+  colorPallete?: string | undefined
+  templateLayout?: I_faProjectWorldTemplateLayoutSnapshot | undefined
 }
 
 export type I_faProjectWorldListResult = I_faProjectContentListResult<I_faProjectWorld>

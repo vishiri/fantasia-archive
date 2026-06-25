@@ -64,16 +64,16 @@ defineOptions({
 const props = defineProps<{
   contextMenuTestLocator: string
   currentLanguageCode: T_faUserSettingsLanguageCode
-  errorMessage: string | undefined
+  errorMessage?: string | undefined
   hasError: boolean
   inputTestLocator: string
   maxLength: number
   menuOffset: [number, number]
-  menuPinnedAsideLabel: string | undefined
-  menuPinnedAsideTestLocator: string | undefined
-  menuPinnedAsideTooltip: string | undefined
-  menuPinnedAsideValue: string | undefined
-  menuStyle?: CSSProperties
+  menuPinnedAsideLabel?: string | undefined
+  menuPinnedAsideTestLocator?: string | undefined
+  menuPinnedAsideTooltip?: string | undefined
+  menuPinnedAsideValue?: string | undefined
+  menuStyle?: CSSProperties | undefined
   menuTarget: HTMLElement | null
   onBeforeShow: () => void
   onClose: () => void

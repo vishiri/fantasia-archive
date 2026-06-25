@@ -33,7 +33,7 @@ export function createComponentTesting (deps: {
     const currentComponent = deps.computed((): I_vueComponent | null => {
       const componentNameParam = route.params?.componentName
       const componentName = Array.isArray(componentNameParam)
-        ? componentNameParam[0]
+        ? (componentNameParam[0] ?? '')
         : (componentNameParam ?? '')
 
       const resolved = deps.resolveComponentTestingSfcByName(componentList, componentName)

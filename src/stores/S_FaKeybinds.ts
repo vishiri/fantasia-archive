@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
 
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { readonly, ref } from 'vue'
 
 import type { I_faKeybindsSnapshot } from 'app/types/I_faKeybindsDomain'
 import type { I_faKeybindsUpdatePatch } from 'app/types/I_faKeybindsBridgeUpdate'
@@ -28,8 +28,8 @@ export const S_FaKeybinds = defineStore('S_FaKeybinds', () => {
   return {
     refreshKeybinds,
     setSuspendGlobalKeybindDispatch,
-    snapshot,
-    suspendGlobalKeybindDispatch,
+    snapshot: readonly(snapshot),
+    suspendGlobalKeybindDispatch: readonly(suspendGlobalKeybindDispatch),
     updateKeybinds
   }
 })

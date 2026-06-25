@@ -4,14 +4,14 @@ import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLangu
 export type I_faLocaleTranslationsInputMenuPanelBindings = {
   autogrow: boolean
   isMultilineInput: boolean
-  isSingularPluralMode?: boolean
+  isSingularPluralMode?: boolean | undefined
   localeRows: I_faLocaleTranslationsInputLocaleRow[]
-  maxLength?: number
-  pinnedAsideLabel?: string
-  pinnedAsideTestLocator?: string
-  pinnedAsideTooltip?: string
-  pinnedAsideValue?: string
-  pluralColumnLabel?: string
+  maxLength?: number | undefined
+  pinnedAsideLabel?: string | undefined
+  pinnedAsideTestLocator?: string | undefined
+  pinnedAsideTooltip?: string | undefined
+  pinnedAsideValue?: string | undefined
+  pluralColumnLabel?: string | undefined
   readLocaleValue: (languageCode: T_faUserSettingsLanguageCode) => string
   readPluralLocaleValue?: (languageCode: T_faUserSettingsLanguageCode) => string
   readSingularLocaleValue?: (languageCode: T_faUserSettingsLanguageCode) => string
@@ -19,7 +19,7 @@ export type I_faLocaleTranslationsInputMenuPanelBindings = {
   setPreferredLanguageInputRef: (
     component: import('vue').ComponentPublicInstance | Element | null
   ) => void
-  singularColumnLabel?: string
+  singularColumnLabel?: string | undefined
   testLocator: string
   updateLocaleValue: (
     languageCode: T_faUserSettingsLanguageCode,
@@ -41,26 +41,26 @@ export type I_faLocaleTranslationsInputSummaryFieldBindings = {
   dark: boolean
   dense: boolean
   error: boolean
-  errorMessage?: string
+  errorMessage?: string | undefined
   fallbackWarningTooltip: string
   hideBottomSpace: boolean
   isMenuPresentationLocked: boolean
   isMultilineInput: boolean
-  isSingularPluralMode?: boolean
+  isSingularPluralMode?: boolean | undefined
   localeRows: I_faLocaleTranslationsInputLocaleRow[]
   lockedMenuContentStyle: Record<string, string> | undefined
-  maxLength?: number
+  maxLength?: number | undefined
   menuOffset: [number, number]
-  menuPinnedAsideLabel?: string
-  menuPinnedAsideTestLocator?: string
-  menuPinnedAsideTooltip?: string
-  menuPinnedAsideValue?: string
+  menuPinnedAsideLabel?: string | undefined
+  menuPinnedAsideTestLocator?: string | undefined
+  menuPinnedAsideTooltip?: string | undefined
+  menuPinnedAsideValue?: string | undefined
   menuTarget: HTMLElement | undefined
   onTranslationsMenuBeforeShow: () => void
   onTranslationsMenuHide: () => void
   onTranslationsMenuShow: () => void
   openTranslationsMenu: () => void
-  pluralColumnLabel?: string
+  pluralColumnLabel?: string | undefined
   readLocaleValue: (languageCode: T_faUserSettingsLanguageCode) => string
   readPluralLocaleValue?: (languageCode: T_faUserSettingsLanguageCode) => string
   readSingularLocaleValue?: (languageCode: T_faUserSettingsLanguageCode) => string
@@ -71,7 +71,7 @@ export type I_faLocaleTranslationsInputSummaryFieldBindings = {
     component: import('vue').ComponentPublicInstance | Element | null
   ) => void
   showFallbackWarning: boolean
-  singularColumnLabel?: string
+  singularColumnLabel?: string | undefined
   testLocator: string
   translateButtonTooltip: string
   updateLocaleValue: (

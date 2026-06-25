@@ -227,7 +227,7 @@ test.describe.serial('Action monitor end-to-end', () => {
       await expect(bodyRows).toHaveCount(5)
 
       for (let index = 0; index < expectedActionIdsNewestFirst.length; index += 1) {
-        const expectedId = expectedActionIdsNewestFirst[index]
+        const expectedId = expectedActionIdsNewestFirst[index]!
         const actionCell = bodyRows.nth(index).locator(`[data-test-locator="${selectorList.monitorActionCell}"] span`).first()
         await expect(actionCell).toHaveText(expectedId)
       }

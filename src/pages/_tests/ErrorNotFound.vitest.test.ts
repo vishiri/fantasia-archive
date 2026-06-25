@@ -50,12 +50,10 @@ test('Test that ErrorNotFound renders ErrorCard title hook, details block, and e
 test('Test that ErrorNotFound shows resume current project when session is active', () => {
   const pinia = createPinia()
   setActivePinia(pinia)
-  S_FaActiveProject().$patch({
-    activeProject: {
-      filePath: 'C:\\Projects\\demo.faproject',
-      id: 'project-uuid-1',
-      name: 'Demo project'
-    }
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\Projects\\demo.faproject',
+    id: 'project-uuid-1',
+    name: 'Demo project'
   })
 
   const w = mount(ErrorNotFound, {

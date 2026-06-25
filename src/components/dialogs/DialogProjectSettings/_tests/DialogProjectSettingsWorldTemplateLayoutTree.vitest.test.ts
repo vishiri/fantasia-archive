@@ -139,8 +139,8 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTree commits once after 
   await nextTick()
   await nextTick()
   heTreeEmitters.beforeDragStart?.()
-  const firstPlacement = twoTemplateLayout.placements[0]
-  const secondPlacement = twoTemplateLayout.placements[1]
+  const firstPlacement = twoTemplateLayout.placements[0]!
+  const secondPlacement = twoTemplateLayout.placements[1]!
   const treeNodes = [
     {
       children: [],
@@ -239,16 +239,16 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTree forwards node event
   await flushPromises()
 
   await wrapper.find('[data-test-locator="emit-delete-group"]').trigger('click')
-  expect(wrapper.emitted('deleteGroup')?.[0]).toEqual(['group-a'])
+  expect(wrapper.emitted('deleteGroup')?.[0]!).toEqual(['group-a'])
 
   await wrapper.find('[data-test-locator="emit-remove-placement"]').trigger('click')
-  expect(wrapper.emitted('removePlacement')?.[0]).toEqual(['placement-a'])
+  expect(wrapper.emitted('removePlacement')?.[0]!).toEqual(['placement-a'])
 
   await wrapper.find('[data-test-locator="emit-rename-group"]').trigger('click')
-  expect(wrapper.emitted('renameGroup')?.[0]).toEqual(['group-a', { 'en-US': 'Group' }])
+  expect(wrapper.emitted('renameGroup')?.[0]!).toEqual(['group-a', { 'en-US': 'Group' }])
 
   await wrapper.find('[data-test-locator="emit-rename-placement"]').trigger('click')
-  expect(wrapper.emitted('renamePlacementNickname')?.[0]).toEqual([
+  expect(wrapper.emitted('renamePlacementNickname')?.[0]!).toEqual([
     'placement-a',
     {
       plural: { 'en-US': 'Alias' },
@@ -332,8 +332,8 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTree forwards validation
   await flushPromises()
 
   expect(capturedNodeProps.length).toBeGreaterThan(0)
-  expect(capturedNodeProps[0]?.currentLanguageCode).toBe('de')
-  expect(capturedNodeProps[0]?.blankGroupIds).toEqual(new Set(['blank-group']))
+  expect(capturedNodeProps[0]!?.currentLanguageCode).toBe('de')
+  expect(capturedNodeProps[0]!?.blankGroupIds).toEqual(new Set(['blank-group']))
   expect(wrapper.find('[data-test-locator="tree-node-props-capture"]').exists()).toBe(true)
 })
 

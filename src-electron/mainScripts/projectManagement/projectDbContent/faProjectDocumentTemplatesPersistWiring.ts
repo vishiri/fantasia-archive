@@ -25,6 +25,7 @@ import {
 } from './faProjectDocumentTemplatesSqlWiring'
 import { serializeFaProjectDocumentTemplateTitleTranslationsJson } from 'app/src-electron/shared/faProjectDocumentTemplateTitleTranslationsSchema'
 import { serializeFaProjectDocumentTemplateWorldAppendixTranslationsJson } from 'app/src-electron/shared/faProjectDocumentTemplateWorldAppendixTranslationsSchema'
+import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOptionalRecordCompat'
 import { resolveFaProjectDocumentTemplateTitleForStorage } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager'
 import { resolveFaProjectDocumentTemplateWorldAppendixForStorage } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateWorldAppendix_manager'
 
@@ -32,10 +33,10 @@ export function createFaProjectDocumentTemplate (
   db: Database,
   input: I_faProjectDocumentTemplateCreateInput
 ): I_faProjectDocumentTemplate {
-  return insertFaProjectDocumentTemplate(db, input.displayName, {
+  return insertFaProjectDocumentTemplate(db, input.displayName, dropUndefinedRecordValues({
     icon: input.icon,
     worldAppendix: input.worldAppendix
-  })
+  }) as { icon?: string; worldAppendix?: string })
 }
 
 export function updateFaProjectDocumentTemplate (

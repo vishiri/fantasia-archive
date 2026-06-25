@@ -21,7 +21,7 @@ export function createUseFaColorPickerInput (deps: {
 }): (props: {
     defaultHex: string
     modelValue: string
-    palette?: T_faColorPickerInputPalette
+    palette?: T_faColorPickerInputPalette | undefined
   }, emitModelValue: (value: string) => void) => {
     colorSwatchStyle: I_computedRef<{ backgroundColor: string }>
     displayHex: I_computedRef<string>
@@ -39,7 +39,7 @@ export function createUseFaColorPickerInput (deps: {
     props: {
       defaultHex: string
       modelValue: string
-      palette?: T_faColorPickerInputPalette
+      palette?: T_faColorPickerInputPalette | undefined
     },
     emitModelValue: (value: string) => void
   ) {

@@ -6,8 +6,8 @@ import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import type { I_faKeybindsSnapshot } from 'app/types/I_faKeybindsDomain'
 
 type T_faKeybindsSetPatch = {
-  overrides?: I_faKeybindsRoot['overrides']
-  replaceAllOverrides?: boolean
+  overrides?: I_faKeybindsRoot['overrides'] | undefined
+  replaceAllOverrides?: boolean | undefined
 }
 
 /**

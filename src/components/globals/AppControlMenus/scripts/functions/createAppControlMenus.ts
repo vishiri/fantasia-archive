@@ -3,6 +3,7 @@ import type { I_appMenuBuildSession, I_appMenuList } from 'app/types/I_appMenusD
 import type { StoreGeneric, T_piniaStoreToRefs } from 'app/types/I_vuePiniaInjected'
 import type { ComputedRef, Ref } from 'app/types/I_vueCompositionRefs'
 import type { T_documentName } from 'app/types/T_appDialogsAndDocuments'
+import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
 
 export function createAppControlMenus (deps: {
   buildDocumentsMenu: (session: I_appMenuBuildSession) => I_appMenuList
@@ -17,7 +18,7 @@ export function createAppControlMenus (deps: {
   onMounted: (hook: () => void | Promise<void>) => void
   openDialogMarkdownDocument: (documentName: T_documentName) => void
   readAppControlMenusTestingTypeFromCachedSnapshot: (
-    snap: { TEST_ENV?: string | false } | null | undefined
+    snap: I_extraEnvVariablesAPI | null | undefined
   ) => string | false
   ref: <T>(value: T) => Ref<T>
   storeToRefs: T_piniaStoreToRefs
@@ -45,20 +46,15 @@ export function createAppControlMenus (deps: {
           mode: 'item',
           text: 'Test Button 1 - Open Dialog with Markdown document',
           icon: 'mdi-text-box-plus-outline',
-          submenu: undefined,
           trigger: () => deps.openDialogMarkdownDocument('changeLog'),
-          conditions: true,
-          specialColor: undefined
+          conditions: true
         },
         {
           mode: 'item',
           text: 'Test Button 2 - Keybind Settings (hint)',
           icon: 'mdi-keyboard-settings',
           keybindCommandId: 'openKeybindSettings',
-          submenu: undefined,
-          trigger: undefined,
-          conditions: true,
-          specialColor: undefined
+          conditions: true
         },
         {
           mode: 'separator'
@@ -67,8 +63,6 @@ export function createAppControlMenus (deps: {
           mode: 'item',
           text: 'Test Button 3 - Secondary',
           icon: 'mdi-text-box-remove-outline',
-          submenu: undefined,
-          trigger: undefined,
           conditions: true,
           specialColor: 'secondary'
         },
@@ -79,19 +73,13 @@ export function createAppControlMenus (deps: {
           mode: 'item',
           text: 'Test Button 4',
           icon: 'mdi-page-layout-sidebar-left',
-          submenu: undefined,
-          trigger: undefined,
-          conditions: true,
-          specialColor: undefined
+          conditions: true
         },
         {
           mode: 'item',
           text: 'Test Button 5',
           icon: 'mdi-clipboard-text-outline',
-          submenu: undefined,
-          trigger: undefined,
-          conditions: true,
-          specialColor: undefined
+          conditions: true
         },
         {
           mode: 'separator'
@@ -100,7 +88,6 @@ export function createAppControlMenus (deps: {
           mode: 'item',
           text: 'Test Button 6 - Grey, Submenu',
           icon: 'keyboard_arrow_right',
-          trigger: undefined,
           conditions: true,
           specialColor: 'grey',
           submenu: [
@@ -109,9 +96,7 @@ export function createAppControlMenus (deps: {
               text: 'Submenu-Test Button 1 - Advanced Search Guide (hint)',
               icon: 'mdi-file-question',
               keybindCommandId: 'openAdvancedSearchGuide',
-              trigger: undefined,
-              conditions: true,
-              specialColor: undefined
+              conditions: true
             },
             {
               mode: 'separator'
@@ -120,7 +105,6 @@ export function createAppControlMenus (deps: {
               mode: 'item',
               text: 'Submenu-Test Button 2 - Secondary',
               icon: 'mdi-wrench',
-              trigger: undefined,
               conditions: true,
               specialColor: 'secondary'
             }
@@ -133,8 +117,8 @@ export function createAppControlMenus (deps: {
   const componentTestingMenuList = buildComponentTestingMenuList()
 
   function useAppControlMenus () {
-    const { hasActiveProject } = deps.storeToRefs(deps.getFaActiveProjectStore())
-    const { entries: recentProjectEntries } = deps.storeToRefs(deps.getFaRecentProjectsStore())
+    const hasActiveProject = deps.storeToRefs(deps.getFaActiveProjectStore()).hasActiveProject!
+    const recentProjectEntries = deps.storeToRefs(deps.getFaRecentProjectsStore()).entries!
 
     const testingType = deps.ref<string | false>(readInitialTestingType())
 

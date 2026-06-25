@@ -166,7 +166,7 @@ interface I_TestHarness {
 }
 
 function mountUseWindowProject (
-  initialDirectInput?: T_dialogName
+  initialDirectInput?: T_dialogName | undefined
 ): { harness: { current: I_TestHarness | null }, wrapper: ReturnType<typeof mount> } {
   const harness = { current: null as I_TestHarness | null }
 

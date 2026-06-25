@@ -8,8 +8,8 @@ import {
 
 test('foundation typography headings cover Quasar scale entries', () => {
   expect(FOUNDATION_TYPOGRAPHY_HEADINGS.length).toBe(12)
-  expect(FOUNDATION_TYPOGRAPHY_HEADINGS[0]?.className).toBe('text-h1')
-  expect(FOUNDATION_TYPOGRAPHY_HEADINGS[11]?.className).toBe('text-overline')
+  expect(FOUNDATION_TYPOGRAPHY_HEADINGS[0]!?.className).toBe('text-h1')
+  expect(FOUNDATION_TYPOGRAPHY_HEADINGS[11]!?.className).toBe('text-overline')
 })
 
 test('foundation typography weights list six Quasar helpers', () => {

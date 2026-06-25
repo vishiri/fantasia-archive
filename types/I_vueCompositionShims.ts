@@ -26,9 +26,9 @@ export interface I_vuePlugin {
  * Minimal component type for dynamic component maps in tests/pages.
  */
 export interface I_vueComponent {
-  name?: string
+  name?: string | undefined
 }
 
 export interface I_vueComponentPublicInstance {
-  $el?: Element
+  $el?: Element | undefined
 }
