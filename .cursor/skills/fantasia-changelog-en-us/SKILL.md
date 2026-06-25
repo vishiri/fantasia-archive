@@ -14,7 +14,7 @@ description: >-
 ## Files
 
 - **Changelog**: [changeLog.md](../../../i18n/en-US/documents/changeLog.md) — in-app via **`documents.changeLog`**
-- **Other locales**: mirror path (e.g. [fr changeLog.md](../../../i18n/fr/documents/changeLog.md))
+- **Other locales**: mirror path (e.g. [fr changeLog.md](../../../i18n/fr/documents/changeLog.md)) — **edit only when user explicitly asks to mirror**; default = **`en-US`** only
 - **Canonical semver**: [package.json](../../../package.json) **`version`**
 - **Planning context**: `.cursor/plans/` matching current version
 
@@ -75,6 +75,13 @@ Verification belongs in commits/PRs — not changelog. Dependency refresh bullet
 
 - One line, **`- `** prefix; product-facing wording
 - Add **`###`** only when adding bullets under it
+
+## Translated changelogs (strict)
+
+- **Never** edit **`i18n/<locale>/documents/changeLog.md`** for any non-**`en-US`** locale unless user **explicitly** asks to mirror
+- Default scope = **`en-US`** only
+- Translations, i18n key work, or other locale edits do **not** trigger changelog mirror
+- When user does ask: mirror only maintained locale changelogs, reuse each locale's existing section heading + product-name translations
 
 ## vue-i18n and `changeLog.md` (required)
 

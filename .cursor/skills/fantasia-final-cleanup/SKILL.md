@@ -58,7 +58,7 @@ Before product commit:
 3. User-facing **`src/components/**`**: Storybook aligned ([storybook-stories.mdc](../../rules/storybook-stories.mdc))
 4. Prefer **same commit** as substantive work; user bullets only — no QA/Git meta
 
-Mirror **`i18n/*/documents/changeLog.md`** in other locales when maintained.
+Mirror **`i18n/*/documents/changeLog.md`** in other locales **only when user explicitly asks**; default = **`en-US`** only.
 
 ## Step 5 — Commit in logical batches
 
