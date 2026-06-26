@@ -1,8 +1,7 @@
-# Manually triggered release build. Storybook VRT baselines are win32-only (see CONTRIBUTING.md),
-# so the full `yarn testbatch:ensure:nochange` gate runs on windows-latest only; that job reuses the
-# Quasar production build from the gate (same command as `yarn quasar:build:electron`, via summarized
-# logging) and uploads the Windows installer. Linux and macOS jobs run packaging builds after
-# the gate passes. Linux uses a matrix so each installer format installs only the tooling it needs.
+# Manually triggered release build. Packages the production Electron app for
+# Windows, macOS, and Linux with no CI test gate (testing runs in the separate
+# verify.yml and pr-full-suite-* workflows). Linux uses a matrix so each
+# installer format installs only the tooling it needs.
 
 name: Build App - FA Rewrite
 
@@ -17,8 +16,8 @@ permissions:
   contents: read
 
 jobs:
-  release-gate:
-    name: Full gate and Windows package
+  build-windows:
+    name: Windows package
     runs-on: windows-latest
     environment: production
     timeout-minutes: 120
@@ -34,9 +33,7 @@ jobs:
         with:
           node-version: '22.22'
           cache: yarn
-          cache-dependency-path: |
-            yarn.lock
-            .storybook-workspace/yarn.lock
+          cache-dependency-path: yarn.lock
 
       - name: Install Yarn 1.x
         run: npm install -g yarn@1.22.19
@@ -44,14 +41,8 @@ jobs:
       - name: Install root dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Install Storybook workspace dependencies
-        run: yarn --cwd .storybook-workspace install --frozen-lockfile
-
-      - name: Install Playwright Chromium (Electron component, E2E, Storybook visual)
-        run: yarn playwright install chromium --with-deps
-
-      - name: Full ensure nochange (verify, production Electron build, Playwright, Storybook)
-        run: yarn testbatch:ensure:nochange
+      - name: Production Electron build
+        run: yarn quasar:build:electron
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v5
@@ -59,17 +50,8 @@ jobs:
           name: Windows_FA ${{ github.event.inputs.version }}
           path: dist/electron/Packaged/*.exe
 
-      - name: Upload Playwright HTML report on failure
-        if: failure()
-        uses: actions/upload-artifact@v5
-        with:
-          name: playwright-report-build-${{ github.event.inputs.version }}
-          path: test-results/playwright-report
-          if-no-files-found: ignore
-
   build-linux:
     name: Linux (${{ matrix.linux_pkg }})
-    needs: release-gate
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 120
@@ -117,9 +99,9 @@ jobs:
 
   build-macos:
     name: macOS package
-    needs: release-gate
     runs-on: macOS-latest
     environment: production
+    timeout-minutes: 120
     steps:
       - name: Check out the code
         uses: actions/checkout@v5

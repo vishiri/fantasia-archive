@@ -26,6 +26,13 @@ description: >-
 3. Playwright after same build — [fantasia-testing](../fantasia-testing/SKILL.md)
 4. Full chain: **`yarn testbatch:ensure:nochange`** or separate Storybook scripts
 
+## CI release build (`.github/workflows/build.yml`)
+
+- Manual **`workflow_dispatch`** with a **`version`** input; packages **Windows**, **macOS**, **Linux** (AppImage/deb/rpm) and uploads installers
+- **No CI test gate** — verify, Playwright, Storybook VRT do **not** run in the build workflow
+- Run the local checklist above (esp. **`yarn testbatch:ensure:nochange`**) on your own machine **before** triggering the CI build
+- Push/PR testing stays in **`verify.yml`** and the **`pr-full-suite-*`** labeled-PR workflows
+
 ## Versioning
 
 - **NEVER** auto-bump version during release/build

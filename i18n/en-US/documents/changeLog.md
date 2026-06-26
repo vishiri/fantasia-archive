@@ -4,6 +4,7 @@
 ## 2.4.15
 
 ### Bugfixes & Optimizations
+- **Contributor maintenance**: the manual **Build App** **GitHub Actions** workflow (**.github/workflows/build.yml**) now only packages the production **Electron** app for **Windows**, **macOS**, and **Linux** (AppImage, Debian package, RPM) and uploads the installers. It no longer runs the **verify**, **Playwright**, or **Storybook** test gate in CI — run **yarn testbatch:ensure:nochange** on your own machine before triggering a build. Push and pull-request testing in the separate **verify** and **pr-full-suite** workflows is unchanged.
 - **Dependencies**: Updated the bundled **DOMPurify** sanitizer (used by the code editor) to **3.4.11**, closing several sanitizer bypass advisories.
 - **Project database**: The **`.faproject`** schema is flattened to a single **`user_version` 1** for this development cycle. Older pre-release **`.faproject`** files from previous dev builds are not upgraded automatically; recreate those projects after updating.
 - **Project Settings**: Screen reader users get labeled controls throughout the dialog. The **Worlds** and **Document Templates** filter fields, their clear controls, the **Available document templates** filter, **World color** and **World color palette** help icons, each palette swatch, and the **World appendix** help icon now expose accessible names in every supported interface language.

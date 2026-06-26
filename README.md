@@ -85,6 +85,14 @@ Electron + Storybook in one terminal:
 yarn app:dev
 ```
 
+**Release build (CI):** the manual **Build App** workflow (`.github/workflows/build.yml`, `workflow_dispatch` with a `version` input) packages the production Electron app for **Windows**, **macOS**, and **Linux** (AppImage, deb, rpm) and uploads the installers. It runs **no test gate** — verify, Playwright, and Storybook VRT are not executed in CI. Run the full local gate first:
+
+```
+yarn testbatch:ensure:nochange   # or testbatch:ensure:change when refreshing VRT baselines
+```
+
+Only trigger the CI build after that passes on your machine. Push/PR testing stays in `.github/workflows/verify.yml` (`yarn testbatch:verify`) and the `pr-full-suite-*` labeled-PR workflows.
+
 ## Storybook
 
 ```

@@ -1,6 +1,6 @@
 # AI and agent notes — Fantasia Archive
 
-**Fantasia Archive** — worldbuilding DB manager; **Quasar + Vue 3 + Electron** (GPL-3.0). **Yarn 1.x**, **Node 22.22.0+** (`package.json` `engines.node`). CI: **Node 22.22**, **`yarn testbatch:verify`** on push/PR ([`.github/workflows/verify.yml`](.github/workflows/verify.yml)).
+**Fantasia Archive** — worldbuilding DB manager; **Quasar + Vue 3 + Electron** (GPL-3.0). **Yarn 1.x**, **Node 22.22.0+** (`package.json` `engines.node`). CI: **Node 22.22**, **`yarn testbatch:verify`** on push/PR ([`.github/workflows/verify.yml`](.github/workflows/verify.yml)). Manual **Build App** workflow ([`.github/workflows/build.yml`](.github/workflows/build.yml)) packages **Windows**/**macOS**/**Linux** only — **no CI test gate**; run **`yarn testbatch:ensure:nochange`** locally first.
 
 ## Where guidance lives
 
