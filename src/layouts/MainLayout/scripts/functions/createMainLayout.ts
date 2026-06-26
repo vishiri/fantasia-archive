@@ -28,6 +28,7 @@ type T_createMainLayoutDeps = {
   S_FaAppStyling: () => StoreGeneric
   S_FaKeybinds: () => StoreGeneric
   S_FaProjectNoteboard: () => StoreGeneric
+  S_FaProjectSidebar: () => StoreGeneric
   S_FaProjectStyling: () => StoreGeneric
   S_FaRecentProjects: () => StoreGeneric
   S_FaUserSettings: () => StoreGeneric
@@ -39,12 +40,6 @@ type T_createMainLayoutDeps = {
   createMainLayoutDrawerRail: (
     drawerDeps: {
       computed: <T>(getter: () => T) => I_ref<T>
-      ref: <T>(value: T) => I_ref<T>
-      watch: (
-        source: I_ref<boolean>,
-        effect: (show: boolean) => void,
-        options?: { immediate?: boolean }
-      ) => void
     }
   ) => (showWorkspaceDrawer: I_ref<boolean>) => { appShellLayoutQuasarView: I_ref<string> }
   getFaKeybindKeydownContext: () => T_faKeybindKeydownContext
@@ -122,6 +117,7 @@ function useMainLayout (
       await deps.awaitWelcomeScreenAutoLoadBootCompletion()
       await deps.S_FaRecentProjects().refreshRecentProjects()
       await deps.hydrateFromBridgeOrReport(() => deps.S_FaProjectNoteboard().refreshProjectNoteboard())
+      await deps.hydrateFromBridgeOrReport(() => deps.S_FaProjectSidebar().refreshProjectSidebar())
       await deps.hydrateFromBridgeOrReport(() => deps.S_FaProjectStyling().refreshProjectStyling())
     }
   })
@@ -148,13 +144,7 @@ export function createMainLayout (deps: T_createMainLayoutDeps): {
   useMainLayout: () => ReturnType<typeof useMainLayout>
 } {
   const useAppShellLayoutDrawerRail = deps.createMainLayoutDrawerRail({
-    computed: deps.computed,
-    ref: deps.ref,
-    watch: deps.watch as (
-      source: I_ref<boolean>,
-      effect: (show: boolean) => void,
-      options?: { immediate?: boolean }
-    ) => void
+    computed: deps.computed
   })
 
   return {

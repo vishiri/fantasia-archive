@@ -18,6 +18,8 @@ const {
   upsertProjectSettingsKvMock,
   readProjectStylingRootMock,
   upsertProjectStylingKvMock,
+  readProjectSidebarRootMock,
+  upsertProjectSidebarKvMock,
   readMirroredActiveProjectFilePathSyncMock,
   getFaProjectActiveDbMock,
   runWithForIpcMock
@@ -36,12 +38,14 @@ const {
     readProjectNoteboardRootMock: vi.fn(),
     readProjectSettingsRootMock: vi.fn(),
     readProjectStylingRootMock: vi.fn(),
+    readProjectSidebarRootMock: vi.fn(),
     runCreateMock: vi.fn(async () => ({ outcome: 'canceled' as const })),
     runOpenMock: vi.fn(async () => ({ outcome: 'canceled' as const })),
     runWithForIpcMock: vi.fn(),
     upsertProjectNoteboardKvMock: vi.fn(),
     upsertProjectSettingsKvMock: vi.fn(),
-    upsertProjectStylingKvMock: vi.fn()
+    upsertProjectStylingKvMock: vi.fn(),
+    upsertProjectSidebarKvMock: vi.fn()
   }
 })
 
@@ -112,6 +116,16 @@ vi.mock(
     return {
       readFaProjectStylingRoot: readProjectStylingRootMock,
       upsertFaProjectStylingKv: upsertProjectStylingKvMock
+    }
+  }
+)
+
+vi.mock(
+  'app/src-electron/mainScripts/projectManagement/faProjectSidebarPersistWiring',
+  () => {
+    return {
+      readFaProjectSidebarRoot: readProjectSidebarRootMock,
+      upsertFaProjectSidebarKv: upsertProjectSidebarKvMock
     }
   }
 )
@@ -198,6 +212,14 @@ test('registerFaProjectManagementIpc registers project-noteboard and project-sty
   )
   expect(ipcMainHandleMock).toHaveBeenCalledWith(
     FA_PROJECT_MANAGEMENT_IPC.setProjectSettingsPatchAsync,
+    expect.any(Function)
+  )
+  expect(ipcMainHandleMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.getProjectSidebarAsync,
+    expect.any(Function)
+  )
+  expect(ipcMainHandleMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.setProjectSidebarPatchAsync,
     expect.any(Function)
   )
   expect(ipcMainHandleMock).toHaveBeenCalledWith(
@@ -510,6 +532,27 @@ test('registerFaProjectManagementIpc before-quit hook closes active project data
   const onQuit = quitCall?.[1]! as () => void
   onQuit()
   expect(closeActiveMock).toHaveBeenCalledOnce()
+})
+
+test('getProjectSidebarAsync returns default snapshot when active database handle is absent', async () => {
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.getProjectSidebarAsync)
+  expect(readProjectSidebarRootMock).not.toHaveBeenCalled()
+  await expect(h({} as never, undefined as never)).resolves.toEqual({
+    schemaVersion: 1,
+    widthPx: 375
+  })
+})
+
+test('setProjectSidebarPatchAsync upserts sidebar_width against the active SQLite handle', async () => {
+  const fakeDb = { tag: 'db' } as unknown
+  getFaProjectActiveDbMock.mockReturnValue(fakeDb)
+  const { registerFaProjectManagementIpc } = await import('../registerFaProjectManagementIpc')
+  registerFaProjectManagementIpc()
+  const h = handlerFor(FA_PROJECT_MANAGEMENT_IPC.setProjectSidebarPatchAsync)
+  await expect(h({} as never, { widthPx: 480 })).resolves.toBe(true)
+  expect(upsertProjectSidebarKvMock).toHaveBeenCalledWith(fakeDb, { widthPx: 480 })
 })
 
 test('stageE2eNextProjectCreatePathAsync handler stages pending create path when TEST_ENV is e2e', async () => {

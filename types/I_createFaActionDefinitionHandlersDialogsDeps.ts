@@ -25,6 +25,9 @@ export interface I_createFaActionDefinitionHandlersDialogsDeps {
   S_FaProjectNoteboard: () => {
     refreshProjectNoteboard: () => Promise<boolean>
   }
+  S_FaProjectSidebar: () => {
+    refreshProjectSidebar: () => Promise<boolean>
+  }
   S_FaProjectStyling: () => {
     refreshProjectStyling: () => Promise<boolean>
   }

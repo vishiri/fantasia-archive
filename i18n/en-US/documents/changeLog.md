@@ -3,7 +3,14 @@
 
 ## 2.4.15
 
+### New features
+- **Workspace sidebar**: Drag the splitter beside the left panel on the **home** workspace route to resize it. Width saves per **`.faproject`** when you release the drag (minimum **375px**; no upper limit; sidebar cannot collapse to zero).
+
 ### Bugfixes & Optimizations
+- **Workspace sidebar**: Resizing the workspace splitter now saves **sidebar_width** to the active **`.faproject`** again after you stop dragging.
+- **Theme**: The **`dark-lighter`** surface color (header bar, menu dropdowns, noteboard panels, and similar chrome) is now **#194456** instead of **#234655**.
+- **Top bar**: The menu strip (**Project**, **Content**, **App controls**, **Help**) has a **375px** minimum width on a **dark** background and can grow wider when translated labels need more room; the rest of the header bar and window controls use **dark-lighter**.
+- **Top bar menus** (**English**): The four primary **`AppControlMenus`** **`title`** strings read **Project**, **Content**, **App controls**, and **Help** (replacing **Project Management**, **Documents & Content**, **Settings & Tools**, and **Help & Info**).
 - **Contributor maintenance**: the manual **Build App** **GitHub Actions** workflow (**.github/workflows/build.yml**) now only packages the production **Electron** app for **Windows**, **macOS**, and **Linux** (AppImage, Debian package, RPM) and uploads the installers. It no longer runs the **verify**, **Playwright**, or **Storybook** test gate in CI — run **yarn testbatch:ensure:nochange** on your own machine before triggering a build. Push and pull-request testing in the separate **verify** and **pr-full-suite** workflows is unchanged.
 - **Dependencies**: Updated the bundled **DOMPurify** sanitizer (used by the code editor) to **3.4.11**, closing several sanitizer bypass advisories.
 - **Project database**: The **`.faproject`** schema is flattened to a single **`user_version` 1** for this development cycle. Older pre-release **`.faproject`** files from previous dev builds are not upgraded automatically; recreate those projects after updating.

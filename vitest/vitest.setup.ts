@@ -139,6 +139,41 @@ function buildVitestProjectContentApiMock (): ReturnType<typeof createFaProjectC
   }
 }
 
+function buildVitestProjectManagementApiMock (): NonNullable<
+  typeof window.faContentBridgeAPIs
+>['projectManagement'] {
+  return {
+    createProject: vi.fn(async () => ({ outcome: 'canceled' as const })),
+    getProjectNoteboard: vi.fn(async () => ({
+      frame: null,
+      schemaVersion: 1 as const,
+      text: ''
+    })),
+    getProjectSettings: vi.fn(async () => ({
+      projectName: '',
+      schemaVersion: 1 as const
+    })),
+    getProjectSidebar: vi.fn(async () => ({
+      schemaVersion: 1 as const,
+      widthPx: 375
+    })),
+    getProjectStyling: vi.fn(async () => ({
+      css: '',
+      frame: null,
+      schemaVersion: 1 as const
+    })),
+    getRecentProjects: vi.fn(async () => []),
+    resolveRecentProjectMruHeadForOpen: vi.fn(async () => ({ outcome: 'empty' as const })),
+    openProject: vi.fn(async () => ({ outcome: 'canceled' as const })),
+    setProjectNoteboard: vi.fn(async (): Promise<boolean> => true),
+    setProjectSettings: vi.fn(async (): Promise<boolean> => true),
+    setProjectSidebar: vi.fn(async (): Promise<boolean> => true),
+    setProjectStyling: vi.fn(async (): Promise<boolean> => true),
+    stageE2eNextCreatePath: vi.fn(async () => false),
+    stageE2eNextOpenPath: vi.fn(async () => false)
+  }
+}
+
 /**
  * Minimal 'window.faContentBridgeAPIs' for Vitest runs that mount '.vue' components.
  */
@@ -213,31 +248,7 @@ function resetFaVitestRendererHarness (): void {
       sendRendererReady: vi.fn()
     },
     projectContent: buildVitestProjectContentApiMock(),
-    projectManagement: {
-      createProject: vi.fn(async () => ({ outcome: 'canceled' as const })),
-      getProjectNoteboard: vi.fn(async () => ({
-        frame: null,
-        schemaVersion: 1 as const,
-        text: ''
-      })),
-      getProjectSettings: vi.fn(async () => ({
-        projectName: '',
-        schemaVersion: 1 as const
-      })),
-      getProjectStyling: vi.fn(async () => ({
-        css: '',
-        frame: null,
-        schemaVersion: 1 as const
-      })),
-      getRecentProjects: vi.fn(async () => []),
-      resolveRecentProjectMruHeadForOpen: vi.fn(async () => ({ outcome: 'empty' as const })),
-      openProject: vi.fn(async () => ({ outcome: 'canceled' as const })),
-      setProjectNoteboard: vi.fn(async (): Promise<boolean> => true),
-      setProjectSettings: vi.fn(async (): Promise<boolean> => true),
-      setProjectStyling: vi.fn(async (): Promise<boolean> => true),
-      stageE2eNextCreatePath: vi.fn(async () => false),
-      stageE2eNextOpenPath: vi.fn(async () => false)
-    }
+    projectManagement: buildVitestProjectManagementApiMock()
   }
 }
 

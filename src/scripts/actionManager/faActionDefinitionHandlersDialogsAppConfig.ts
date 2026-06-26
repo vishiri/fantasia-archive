@@ -63,6 +63,7 @@ export function buildFaActionDefinitionHandlersDialogsAppConfig (
       deps.S_FaKeybinds().refreshKeybinds(),
       deps.S_FaAppNoteboard().refreshNoteboard(),
       deps.S_FaProjectNoteboard().refreshProjectNoteboard(),
+      deps.S_FaProjectSidebar().refreshProjectSidebar(),
       deps.S_FaProjectStyling().refreshProjectStyling(),
       deps.S_FaAppStyling().refreshAppStyling(),
       deps.S_FaUserSettings().refreshSettings()

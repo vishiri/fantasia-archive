@@ -1,0 +1,26 @@
+@use './variables' as *;
+
+.appShellLayout--workspace > .mainLayoutSidebarSplitter {
+  height: calc(100vh - #{$mainLayout-appHeader-heightPx});
+  max-height: calc(100vh - #{$mainLayout-appHeader-heightPx});
+}
+
+.mainLayoutSidebarSplitter {
+  .q-splitter__before {
+    overflow: hidden;
+  }
+
+  .q-splitter__separator {
+    background-color: transparent;
+    cursor: col-resize;
+    z-index: $mainLayout-sidebarSplitterSeparator-zIndex;
+  }
+
+  &__panel {
+    background-color: $mainLayout-sidebarPanel-backgroundColor;
+    height: 100%;
+    overflow: hidden auto;
+    user-select: none;
+    width: 100%;
+  }
+}

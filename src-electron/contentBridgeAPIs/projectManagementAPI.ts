@@ -13,6 +13,10 @@ import type {
   I_faProjectNoteboardRoot
 } from 'app/types/I_faProjectNoteboardDomain'
 import type {
+  I_faProjectSidebarPatch,
+  I_faProjectSidebarRoot
+} from 'app/types/I_faProjectSidebarDomain'
+import type {
   I_faProjectStylingPatch,
   I_faProjectStylingRoot
 } from 'app/types/I_faProjectStylingDomain'
@@ -44,6 +48,12 @@ export const projectManagementAPI: I_faProjectManagementAPI = {
     return await ipcRenderer.invoke(
       FA_PROJECT_MANAGEMENT_IPC.getProjectSettingsAsync
     ) as I_faProjectSettingsRoot
+  },
+
+  async getProjectSidebar (): Promise<I_faProjectSidebarRoot> {
+    return await ipcRenderer.invoke(
+      FA_PROJECT_MANAGEMENT_IPC.getProjectSidebarAsync
+    ) as I_faProjectSidebarRoot
   },
 
   async getProjectStyling (): Promise<I_faProjectStylingRoot> {
@@ -86,6 +96,14 @@ export const projectManagementAPI: I_faProjectManagementAPI = {
     const payload = JSON.parse(JSON.stringify(patch)) as I_faProjectSettingsPatch
     return await ipcRenderer.invoke(
       FA_PROJECT_MANAGEMENT_IPC.setProjectSettingsPatchAsync,
+      payload
+    ) as boolean
+  },
+
+  async setProjectSidebar (patch: I_faProjectSidebarPatch): Promise<boolean> {
+    const payload = JSON.parse(JSON.stringify(patch)) as I_faProjectSidebarPatch
+    return await ipcRenderer.invoke(
+      FA_PROJECT_MANAGEMENT_IPC.setProjectSidebarPatchAsync,
       payload
     ) as boolean
   },

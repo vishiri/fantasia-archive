@@ -1,2 +1,9 @@
+@use '../../../css/app.palette.scss' as *;
+
 /* LAYOUT - MAIN LAYOUT */
+$mainLayout-appHeader-backgroundColor: fa-v('dark-lighter', $dark-lighter);
 $mainLayout-appHeader-zIndex: 7000;
+$mainLayout-appHeader-heightPx: 50px;
+$mainLayout-sidebarMinWidthPx: 375px;
+$mainLayout-sidebarPanel-backgroundColor: fa-v('dark', $dark);
+$mainLayout-sidebarSplitterSeparator-zIndex: 6000;

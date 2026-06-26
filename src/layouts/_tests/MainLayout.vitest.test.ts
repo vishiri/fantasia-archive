@@ -8,10 +8,12 @@ import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
+import { S_FaProjectSidebar } from 'app/src/stores/S_FaProjectSidebar'
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
+import { FA_PROJECT_SIDEBAR_MIN_WIDTH_PX } from 'app/types/I_faProjectSidebarDomain'
 import { mountMainLayoutForVitest } from './mainLayoutVitestMount'
 
 function countKeydownCaptureAdds (spy: { mock: { calls: unknown[][] } }): number {
@@ -34,7 +36,8 @@ test('Test that MainLayout on welcome route hides the workspace drawer', async (
 
   expect(w.find('[data-test-locator="mainLayout"]').exists()).toBe(true)
   expect(w.find('.appShellLayout--welcome').exists()).toBe(true)
-  expect(w.find('[data-test-locator="mainLayout-drawer"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="mainLayout-sidebarSplitter"]').exists()).toBe(false)
+  expect(w.find('[data-test-locator="mainLayout-drawer"]').exists()).toBe(false)
   expect(w.find('[data-test-locator="mainLayout-vitest-leaf"]').exists()).toBe(true)
   w.unmount()
   vi.unstubAllEnvs()
@@ -53,7 +56,23 @@ test('Test that MainLayout on workspace route shows the workspace drawer chrome'
   await flushPromises()
 
   expect(w.find('.appShellLayout--workspace').exists()).toBe(true)
+  expect(w.find('[data-test-locator="mainLayout-sidebarSplitter"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="mainLayout-drawer"]').exists()).toBe(true)
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+test('Test that MainLayout workspace splitter enforces the 375px minimum width constant', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'spa')
+
+  const w = await mountMainLayoutForVitest('/home')
+  await flushPromises()
+
+  const splitter = w.find('[data-test-locator="mainLayout-sidebarSplitter"]')
+  expect(splitter.exists()).toBe(true)
+  expect(splitter.attributes('limits')).toBe(`${FA_PROJECT_SIDEBAR_MIN_WIDTH_PX},Infinity`)
+
   w.unmount()
   vi.unstubAllEnvs()
 })
@@ -119,20 +138,19 @@ test('Test that MainLayout hides GlobalLanguageSelector when isFantasiaStorybook
 })
 
 /**
- * MainLayout / workspace drawer
- * Desktop drawer stays in the layout flow (no overlay band) at every viewport width.
+ * MainLayout / workspace sidebar
+ * Sidebar panel is a splitter child, not a layout-level q-drawer.
  */
-test('Test that MainLayout uses desktop non-overlay drawer on workspace route', async () => {
+test('Test that MainLayout uses an in-flow sidebar panel on workspace route', async () => {
   setFantasiaStorybookCanvasFlag(false)
   vi.stubEnv('MODE', 'spa')
 
   const w = await mountMainLayoutForVitest('/home')
   await flushPromises()
 
-  const drawer = w.find('[data-test-locator="mainLayout-drawer"]')
-  expect(drawer.exists()).toBe(true)
-  expect(drawer.attributes('behavior')).toBe('desktop')
-  expect(drawer.attributes('overlay')).toBe('false')
+  const panel = w.find('[data-test-locator="mainLayout-drawer"]')
+  expect(panel.exists()).toBe(true)
+  expect(panel.classes()).toContain('mainLayoutSidebarSplitter__panel')
 
   w.unmount()
   vi.unstubAllEnvs()
@@ -231,22 +249,26 @@ test('Test that MainLayout skips recent projects refresh when projectManagement 
  * MainLayout / onMounted
  * Refreshes persisted project KV surfaces alongside recent projects when projectManagement bridge is present.
  */
-test('Test that MainLayout refreshes project noteboard and project styling when projectManagement bridge exists', async () => {
+test('Test that MainLayout refreshes project noteboard, sidebar, and project styling when projectManagement bridge exists', async () => {
   setFantasiaStorybookCanvasFlag(false)
   vi.stubEnv('MODE', 'electron')
 
   const pn = S_FaProjectNoteboard()
+  const psb = S_FaProjectSidebar()
   const ps = S_FaProjectStyling()
   const spyNoteboard = vi.spyOn(pn, 'refreshProjectNoteboard').mockResolvedValue(true)
+  const spySidebar = vi.spyOn(psb, 'refreshProjectSidebar').mockResolvedValue(true)
   const spyStyling = vi.spyOn(ps, 'refreshProjectStyling').mockResolvedValue(true)
 
   const w = await mountMainLayoutForVitest()
   await flushPromises()
 
   expect(spyNoteboard).toHaveBeenCalledTimes(1)
+  expect(spySidebar).toHaveBeenCalledTimes(1)
   expect(spyStyling).toHaveBeenCalledTimes(1)
 
   spyNoteboard.mockRestore()
+  spySidebar.mockRestore()
   spyStyling.mockRestore()
   w.unmount()
   vi.unstubAllEnvs()
@@ -256,13 +278,15 @@ test('Test that MainLayout refreshes project noteboard and project styling when 
  * MainLayout / onMounted
  * Skips project noteboard and styling refresh when projectManagement bridge is absent.
  */
-test('Test that MainLayout skips project noteboard and styling refresh without projectManagement', async () => {
+test('Test that MainLayout skips project noteboard, sidebar, and styling refresh without projectManagement', async () => {
   setFantasiaStorybookCanvasFlag(false)
   vi.stubEnv('MODE', 'electron')
 
   const pn = S_FaProjectNoteboard()
+  const psb = S_FaProjectSidebar()
   const ps = S_FaProjectStyling()
   const spyNoteboard = vi.spyOn(pn, 'refreshProjectNoteboard').mockResolvedValue(true)
+  const spySidebar = vi.spyOn(psb, 'refreshProjectSidebar').mockResolvedValue(true)
   const spyStyling = vi.spyOn(ps, 'refreshProjectStyling').mockResolvedValue(true)
 
   const prev = window.faContentBridgeAPIs.projectManagement
@@ -272,10 +296,12 @@ test('Test that MainLayout skips project noteboard and styling refresh without p
   await flushPromises()
 
   expect(spyNoteboard).not.toHaveBeenCalled()
+  expect(spySidebar).not.toHaveBeenCalled()
   expect(spyStyling).not.toHaveBeenCalled()
 
   window.faContentBridgeAPIs.projectManagement = prev
   spyNoteboard.mockRestore()
+  spySidebar.mockRestore()
   spyStyling.mockRestore()
   w.unmount()
   vi.unstubAllEnvs()

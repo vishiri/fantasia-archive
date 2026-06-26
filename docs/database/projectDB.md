@@ -37,8 +37,9 @@ Flattened to a single bootstrap revision during pre-release dev. No upgrade ladd
 | **`project_noteboard_x`**, **`project_noteboard_y`**, **`project_noteboard_width`**, **`project_noteboard_height`** | Project noteboard frame (pixels) |
 | **`project_styling_content`** | Per-project custom CSS |
 | **`project_styling_x`**, **`project_styling_y`**, **`project_styling_width`**, **`project_styling_height`** | Project styling floating window frame |
+| **`sidebar_width`** | Workspace left sidebar width (pixels, integer) |
 
-**Modules:** **`faProjectDataKvWiring.ts`**, **`faProjectSettingsPersistWiring.ts`**, **`faProjectNoteboardPersistWiring.ts`**, **`faProjectStylingPersistWiring.ts`**.
+**Modules:** **`faProjectDataKvWiring.ts`**, **`faProjectSettingsPersistWiring.ts`**, **`faProjectNoteboardPersistWiring.ts`**, **`faProjectStylingPersistWiring.ts`**, **`faProjectSidebarPersistWiring.ts`**.
 
 ## Content tables (schema version 1)
 

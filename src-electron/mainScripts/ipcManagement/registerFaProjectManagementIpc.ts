@@ -2,6 +2,7 @@ import { app, ipcMain } from 'electron'
 
 import { FA_PROJECT_MANAGEMENT_IPC } from 'app/src-electron/electron-ipc-bridge'
 import { registerFaProjectManagementProjectSettingsIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProjectManagementProjectSettingsIpc'
+import { registerFaProjectManagementProjectSidebarIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProjectManagementProjectSidebarIpc'
 import { registerFaProjectManagementE2eStagingIpc } from 'app/src-electron/mainScripts/ipcManagement/registerFaProjectManagementE2eStagingIpc'
 import {
   closeFaProjectActiveDatabase,
@@ -131,6 +132,8 @@ export function registerFaProjectManagementIpc (): void {
   )
 
   registerFaProjectManagementProjectSettingsIpc()
+
+  registerFaProjectManagementProjectSidebarIpc()
 
   ipcMain.handle(
     FA_PROJECT_MANAGEMENT_IPC.getProjectStylingAsync,

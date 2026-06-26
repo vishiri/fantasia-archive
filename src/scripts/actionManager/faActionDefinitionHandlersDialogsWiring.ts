@@ -3,6 +3,7 @@ import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
+import { S_FaProjectSidebar } from 'app/src/stores/S_FaProjectSidebar'
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
@@ -31,6 +32,7 @@ export const faActionDefinitionHandlersDialogsDeps = {
   S_FaKeybinds: () => S_FaKeybinds(),
   S_FaAppNoteboard: () => S_FaAppNoteboard(),
   S_FaProjectNoteboard: () => S_FaProjectNoteboard(),
+  S_FaProjectSidebar: () => S_FaProjectSidebar(),
   S_FaProjectStyling: () => S_FaProjectStyling(),
   S_FaAppStyling: () => S_FaAppStyling(),
   S_FaUserSettings: () => S_FaUserSettings(),

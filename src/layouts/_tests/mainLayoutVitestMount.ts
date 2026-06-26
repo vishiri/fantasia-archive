@@ -73,6 +73,19 @@ export async function mountMainLayoutForVitest (
         },
         GlobalWindowButtons: {
           template: '<div data-test-stub="global-window-buttons" />'
+        },
+        QSplitter: {
+          props: ['modelValue', 'unit', 'limits'],
+          template: `
+            <div
+              data-test-locator="mainLayout-sidebarSplitter"
+              :limits="Array.isArray(limits) ? limits.join(',') : limits"
+            >
+              <slot name="before" />
+              <slot name="separator" />
+              <slot name="after" />
+            </div>
+          `
         }
       }
     }

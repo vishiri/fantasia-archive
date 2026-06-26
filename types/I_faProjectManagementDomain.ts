@@ -3,6 +3,10 @@ import type {
   I_faProjectNoteboardRoot
 } from 'app/types/I_faProjectNoteboardDomain'
 import type {
+  I_faProjectSidebarPatch,
+  I_faProjectSidebarRoot
+} from 'app/types/I_faProjectSidebarDomain'
+import type {
   I_faProjectStylingPatch,
   I_faProjectStylingRoot
 } from 'app/types/I_faProjectStylingDomain'
@@ -75,6 +79,7 @@ export interface I_faProjectManagementAPI {
   createProject: (input: I_faProjectCreateInput) => Promise<I_faProjectCreateResult>
   getProjectNoteboard: () => Promise<I_faProjectNoteboardRoot>
   getProjectSettings: () => Promise<I_faProjectSettingsRoot>
+  getProjectSidebar: () => Promise<I_faProjectSidebarRoot>
   getProjectStyling: () => Promise<I_faProjectStylingRoot>
   getRecentProjects: () => Promise<I_faRecentProjectEntry[]>
   /**
@@ -88,6 +93,7 @@ export interface I_faProjectManagementAPI {
    */
   setProjectNoteboard: (patch: I_faProjectNoteboardPatch) => Promise<boolean>
   setProjectSettings: (patch: I_faProjectSettingsPatch) => Promise<boolean>
+  setProjectSidebar: (patch: I_faProjectSidebarPatch) => Promise<boolean>
   setProjectStyling: (patch: I_faProjectStylingPatch) => Promise<boolean>
   /**
    * Playwright E2E only: stages the absolute path for the next create flow so main skips the native save dialog.

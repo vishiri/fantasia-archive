@@ -64,6 +64,11 @@ export {
 } from './faProjectStylingPersistWiring'
 
 export {
+  readFaProjectSidebarRoot,
+  upsertFaProjectSidebarKv
+} from './faProjectSidebarPersistWiring'
+
+export {
   readFaProjectSettingsRoot,
   readFaProjectSettingsProjectNameRaw,
   upsertFaProjectSettingsKv

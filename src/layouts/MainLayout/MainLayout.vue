@@ -8,7 +8,7 @@
     <q-header
       elevated
       dark
-      class="bg-dark appHeader"
+      class="appHeader"
     >
       <div class="row items-center no-wrap full-width">
         <AppControlMenus class="col-auto" />
@@ -19,26 +19,54 @@
 
     <GlobalWindowButtons />
 
-    <q-drawer
-      :model-value="showWorkspaceDrawer"
-      behavior="desktop"
-      data-test-locator="mainLayout-drawer"
-      dark
-      :overlay="false"
-      :transition-duration="FA_APP_SHELL_DRAWER_TRANSITION_MS"
-      transition-hide="slide-left"
-      transition-show="slide-right"
+    <q-splitter
+      v-if="showWorkspaceDrawer"
+      v-model="sidebarWidthModel"
+      unit="px"
+      :limits="[sidebarMinWidthPx, Infinity]"
+      class="mainLayoutSidebarSplitter"
+      data-test-locator="mainLayout-sidebarSplitter"
+      @update:model-value="onSidebarSplitterWidthUpdate"
     >
-      <q-list>
-        <q-item-label
-          header
+      <template #before>
+        <div
+          class="mainLayoutSidebarSplitter__panel"
+          data-test-locator="mainLayout-drawer"
         >
-          {{ $t('mainLayout.drawer.essentialLinksHeader') }}
-        </q-item-label>
-      </q-list>
-    </q-drawer>
+          <q-list dark>
+            <q-item-label
+              header
+            >
+              {{ $t('mainLayout.drawer.essentialLinksHeader') }}
+            </q-item-label>
+          </q-list>
+        </div>
+      </template>
 
-    <q-page-container class="appShellLayout__pageContainer">
+      <template #after>
+        <q-page-container class="appShellLayout__pageContainer">
+          <div class="appShellLayout__pageTransitionHost">
+            <router-view v-slot="{ Component, route: childRoute }">
+              <Transition
+                v-bind="FA_APP_SHELL_PAGE_TRANSITION_BINDINGS"
+                mode="out-in"
+              >
+                <component
+                  :is="Component"
+                  v-if="Component !== null && childRoute !== undefined"
+                  :key="resolveMainLayoutOutletKeyFromRoute(childRoute)"
+                />
+              </Transition>
+            </router-view>
+          </div>
+        </q-page-container>
+      </template>
+    </q-splitter>
+
+    <q-page-container
+      v-else
+      class="appShellLayout__pageContainer"
+    >
       <div class="appShellLayout__pageTransitionHost">
         <router-view v-slot="{ Component, route: childRoute }">
           <Transition
@@ -62,14 +90,13 @@ import AppControlMenus from 'app/src/components/globals/AppControlMenus/AppContr
 import GlobalLanguageSelector from 'app/src/components/globals/GlobalLanguageSelector/GlobalLanguageSelector.vue'
 import GlobalWindowButtons from 'app/src/components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
 
-import { useMainLayout } from './scripts/mainLayout_manager'
+import { useMainLayout, useMainLayoutWorkspaceSidebar } from './scripts/mainLayout_manager'
 
 defineOptions({
   name: 'MainLayout'
 })
 
 const {
-  FA_APP_SHELL_DRAWER_TRANSITION_MS,
   FA_APP_SHELL_PAGE_TRANSITION_BINDINGS,
   appShellLayoutQuasarView,
   appShellLayoutRouteClass,
@@ -77,11 +104,20 @@ const {
   resolveMainLayoutOutletKeyFromRoute,
   showWorkspaceDrawer
 } = useMainLayout()
+
+const {
+  onSidebarSplitterWidthUpdate,
+  sidebarMinWidthPx,
+  sidebarWidthModel
+} = useMainLayoutWorkspaceSidebar()
 </script>
 
 <style lang="scss" scoped>
+@use './styles/variables' as *;
+
 .appHeader {
   -webkit-app-region: drag;
+  background-color: $mainLayout-appHeader-backgroundColor;
   z-index: $mainLayout-appHeader-zIndex;
 }
 
@@ -98,3 +134,4 @@ const {
 </style>
 
 <style lang="scss" src="./styles/AppShellLayout.pageTransition.unscoped.scss"></style>
+<style lang="scss" src="./styles/MainLayoutSidebarSplitter.unscoped.scss"></style>

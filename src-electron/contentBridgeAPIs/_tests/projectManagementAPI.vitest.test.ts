@@ -130,6 +130,30 @@ test('projectManagementAPI setProjectNoteboard invokes IPC with cloned patch', a
   expect(patch.text).toBe('y')
 })
 
+test('projectManagementAPI getProjectSidebar invokes IPC', async () => {
+  const snapshot = {
+    schemaVersion: 1 as const,
+    widthPx: 420
+  }
+
+  invokeMock.mockResolvedValueOnce(snapshot)
+  const r = await projectManagementAPI.getProjectSidebar()
+  expect(r).toEqual(snapshot)
+  expect(invokeMock).toHaveBeenCalledWith(FA_PROJECT_MANAGEMENT_IPC.getProjectSidebarAsync)
+})
+
+test('projectManagementAPI setProjectSidebar invokes IPC with cloned patch', async () => {
+  invokeMock.mockResolvedValueOnce(true)
+  const patch = { widthPx: 512 }
+  const persisted = await projectManagementAPI.setProjectSidebar(patch)
+  expect(persisted).toBe(true)
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.setProjectSidebarPatchAsync,
+    { widthPx: 512 }
+  )
+  expect(patch.widthPx).toBe(512)
+})
+
 test('projectManagementAPI getProjectStyling invokes IPC', async () => {
   const snapshot = {
     css: 'p{}',

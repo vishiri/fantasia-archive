@@ -20,6 +20,7 @@ export function buildFaActionDefinitionHandlersDialogsProjectFlow (
       }
       deps.notifyFaProjectCreatedPositive()
       await deps.S_FaProjectNoteboard().refreshProjectNoteboard()
+      await deps.S_FaProjectSidebar().refreshProjectSidebar()
       await deps.S_FaProjectStyling().refreshProjectStyling()
     } finally {
       await deps.S_FaRecentProjects().refreshRecentProjects()
@@ -41,6 +42,7 @@ export function buildFaActionDefinitionHandlersDialogsProjectFlow (
       if (outcome === 'opened') {
         deps.notifyFaProjectLoadedPositive()
         await deps.S_FaProjectNoteboard().refreshProjectNoteboard()
+        await deps.S_FaProjectSidebar().refreshProjectSidebar()
         await deps.S_FaProjectStyling().refreshProjectStyling()
       }
       if (outcome === 'reused' && payload.resumeActiveSession !== true) {

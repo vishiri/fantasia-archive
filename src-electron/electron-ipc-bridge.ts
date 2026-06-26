@@ -79,12 +79,15 @@ export const FA_PROJECT_MANAGEMENT_IPC = {
     'fa-project-management-resolve-recent-project-mru-head-for-open-async',
   getProjectNoteboardAsync: 'fa-project-management-get-project-noteboard-async',
   getProjectSettingsAsync: 'fa-project-management-get-project-settings-async',
+  getProjectSidebarAsync: 'fa-project-management-get-project-sidebar-async',
   getProjectStylingAsync: 'fa-project-management-get-project-styling-async',
   openProjectAsync: 'fa-project-management-open-project-async',
   setProjectNoteboardPatchAsync:
     'fa-project-management-set-project-noteboard-patch-async',
   setProjectSettingsPatchAsync:
     'fa-project-management-set-project-settings-patch-async',
+  setProjectSidebarPatchAsync:
+    'fa-project-management-set-project-sidebar-patch-async',
   setProjectStylingPatchAsync:
     'fa-project-management-set-project-styling-patch-async',
   stageE2eNextProjectCreatePathAsync:

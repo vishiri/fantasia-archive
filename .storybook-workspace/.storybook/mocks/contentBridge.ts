@@ -29,6 +29,10 @@ import type {
   I_faProjectSettingsRoot
 } from 'app/types/I_faProjectSettingsDomain'
 import type {
+  I_faProjectSidebarPatch,
+  I_faProjectSidebarRoot
+} from 'app/types/I_faProjectSidebarDomain'
+import type {
   I_faProjectStylingPatch,
   I_faProjectStylingRoot
 } from 'app/types/I_faProjectStylingDomain'
@@ -162,6 +166,25 @@ const baseBridge = () => {
     return true
   }
 
+  let storybookProjectSidebarRoot: I_faProjectSidebarRoot = {
+    schemaVersion: 1,
+    widthPx: 375
+  }
+
+  const getProjectSidebar = async (): Promise<I_faProjectSidebarRoot> => {
+    return { ...storybookProjectSidebarRoot }
+  }
+
+  const setProjectSidebar = async (patch: I_faProjectSidebarPatch): Promise<boolean> => {
+    if (patch.widthPx !== undefined) {
+      storybookProjectSidebarRoot = {
+        ...storybookProjectSidebarRoot,
+        widthPx: patch.widthPx
+      }
+    }
+    return true
+  }
+
   return {
     faWindowControl: {
       checkWindowMaximized: async () => false,
@@ -244,6 +267,7 @@ const baseBridge = () => {
       }),
       getProjectNoteboard,
       getProjectSettings,
+      getProjectSidebar,
       getProjectStyling,
       getRecentProjects: async () => [],
       resolveRecentProjectMruHeadForOpen: async () => ({ outcome: 'empty' as const }),
@@ -252,6 +276,7 @@ const baseBridge = () => {
       }),
       setProjectNoteboard,
       setProjectSettings,
+      setProjectSidebar,
       setProjectStyling,
       stageE2eNextCreatePath: async () => false,
       stageE2eNextOpenPath: async () => false
