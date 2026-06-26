@@ -94,6 +94,7 @@ See [vitest-tests.mdc](../../rules/vitest-tests.mdc) **Vitest coverage tiers (CI
 
 - **Structure**: same serial pattern; **`TEST_ENV: 'e2e'`**
 - **Project management**: [`checkProjectManagementFlow.playwright.spec.ts`](../../../e2e-tests/checkProjectManagementFlow.playwright.spec.ts); path staging via **`playwrightE2eProjectPaths.ts`**
+- **Workspace sidebar**: [`checkWorkspaceSidebar.playwright.spec.ts`](../../../e2e-tests/checkWorkspaceSidebar.playwright.spec.ts); drag + **`sidebar_width`** cold restart via **`faPlaywrightE2eWorkspaceSidebar.ts`**
 - **Command**: `yarn test:e2e` — own terminal
 - **Single**: `yarn test:e2e:single --spec=<stem>` (no suffix) or **`yarn test:e2e:single:ci --spec=<full file>`**
 - **Picker**: `yarn test:e2e:list`

@@ -90,6 +90,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Global keybinds | [fantasia-keybinds](.cursor/skills/fantasia-keybinds/SKILL.md) |
 | Action manager | [fa-action-manager.mdc](.cursor/rules/fa-action-manager.mdc), [fantasia-action-manager](.cursor/skills/fantasia-action-manager/SKILL.md) |
 | Project Settings | [fantasia-sqlite-main](.cursor/skills/fantasia-sqlite-main/SKILL.md), [projectDB.md](docs/database/projectDB.md) — IPC-read on open; **`saveProjectSettings`**; worlds + template layout + document templates |
+| Workspace sidebar | **`/home`** **`QSplitter`**, **`S_FaProjectSidebar`**, **`project_data.sidebar_width`** — [projectDB.md](docs/database/projectDB.md); E2E [checkWorkspaceSidebar.playwright.spec.ts](e2e-tests/checkWorkspaceSidebar.playwright.spec.ts) |
 | Floating **`Window*`** | [fantasia-floating-windows](.cursor/skills/fantasia-floating-windows/SKILL.md) — shared **`_sharedWindowStyling/`**, **`_sharedWindowNoteboard/`** |
 | Trees / DnD | [fa-he-tree.mdc](.cursor/rules/fa-he-tree.mdc), [fa-drag-drop-lists.mdc](.cursor/rules/fa-drag-drop-lists.mdc), skills **fantasia-he-tree**, **fantasia-drag-drop** |
 | **`FaIconPickerInput`** | [fa-icon-picker.mdc](.cursor/rules/fa-icon-picker.mdc), [fantasia-icon-picker](.cursor/skills/fantasia-icon-picker/SKILL.md) |
