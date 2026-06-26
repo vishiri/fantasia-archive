@@ -1,5 +1,5 @@
 export default {
-  title: 'Settings & Tools',
+  title: 'App controls',
   items: {
     appNoteBoard: 'Toggle App Noteboard',
     keybindSettings: 'Keybind Settings',

@@ -2,7 +2,7 @@
   <!-- App base-control button-group -->
   <q-btn-group
     flat
-    class="globalWindowButtons bg-dark"
+    class="globalWindowButtons"
   >
     <!-- Minimize button -->
     <q-btn
@@ -73,6 +73,7 @@ const {
 <style lang="scss" scoped>
 .globalWindowButtons {
   -webkit-app-region: no-drag;
+  background-color: $globalWindowButtons-backgroundColor;
   border-radius: 0;
   color: $globalWindowButtons-color;
   height: $globalWindowButtons-height;

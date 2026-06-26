@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test'
 
 import { FA_KEYBINDS_STORE_DEFAULTS } from 'app/src-electron/mainScripts/keybinds/keybinds_managerDefaults'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
+import L_helpInfo from 'app/i18n/en-US/components/globals/AppControlMenus/L_helpInfo'
 
 import AppControlMenus from '../AppControlMenus.vue'
 
@@ -21,7 +22,7 @@ const meta = {
       },
       description: {
         component:
-          'Top menu composition: four `AppControlSingleMenu` groups (**Project Management**, **Documents & Content**, **Settings & Tools**, **Help & Info**) from `_data/` builders. **Project Management** lists **Create new project**, then **Load existing project** and **Load Recent Project**, then **Show Project Dashboard**, then **Toggle Project Noteboard**, **Custom Project CSS**, and **Project Settings**, then **Advanced Project Tools** (merge / convert submenu), with separators between those groups. **Documents & Content** lists Quick-Add, Quick-Search, Mass Delete, and Export Project / Documents (last row); **Settings & Tools** lists **Toggle App Noteboard**, custom **CSS**, keybinds, App Settings, then **Import / Export App Configuration** (final row below a separator). Those rows may set `keybindCommandId` for live shortcut hints when `S_FaKeybinds.snapshot` is populated (**Help & Info** includes **Action Monitor** and **Toggle Developer Tools** hints when defaults load). Set `embedDialogs` true to mount markdown and settings dialogs used by menu triggers (they stay closed until an action runs).'
+          'Top menu composition: four `AppControlSingleMenu` groups (**Project**, **Content**, **App controls**, **Help**) from `_data/` builders. **Project** lists **Create new project**, then **Load existing project** and **Load Recent Project**, then **Show Project Dashboard**, then **Toggle Project Noteboard**, **Custom Project CSS**, and **Project Settings**, then **Advanced Project Tools** (merge / convert submenu), with separators between those groups. **Content** lists Quick-Add, Quick-Search, Mass Delete, and Export Project / Documents (last row); **App controls** lists **Toggle App Noteboard**, custom **CSS**, keybinds, App Settings, then **Import / Export App Configuration** (final row below a separator). Those rows may set `keybindCommandId` for live shortcut hints when `S_FaKeybinds.snapshot` is populated (**Help** includes **Action Monitor** and **Toggle Developer Tools** hints when defaults load). Set `embedDialogs` true to mount markdown and settings dialogs used by menu triggers (they stay closed until an action runs).'
       }
     }
   }
@@ -44,7 +45,7 @@ export const CompositionProductionMenuContract: StoryObj<typeof meta> = {
       store: { ...FA_KEYBINDS_STORE_DEFAULTS }
     }
 
-    await userEvent.click(canvas.getByRole('button', { name: 'Help & Info' }))
+    await userEvent.click(canvas.getByRole('button', { name: L_helpInfo.title }))
     await waitFor(async () => {
       const hints = document.body.querySelectorAll('[data-test-locator="AppControlSingleMenu-menuItem-keybind"]')
       await expect(hints.length).toBeGreaterThan(0)

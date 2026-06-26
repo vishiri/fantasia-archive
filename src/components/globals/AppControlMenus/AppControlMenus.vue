@@ -1,6 +1,6 @@
 <template>
   <div
-    class="appControlMenus bg-dark"
+    class="appControlMenus"
   >
     <q-btn-group
       flat
@@ -82,6 +82,10 @@ withDefaults(
 
 <style lang="scss" scoped>
 .appControlMenus {
+  background-color: $appControlMenus-barBackgroundColor;
+  flex-shrink: 0;
+  min-width: $appControlMenus-barMinWidth;
+
   &__inner {
     -webkit-app-region: no-drag;
 

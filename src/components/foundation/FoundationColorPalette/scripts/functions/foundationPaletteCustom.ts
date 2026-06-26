@@ -15,7 +15,7 @@ export const FOUNDATION_CUSTOM_SWATCHES: I_foundationCustomSwatch[] = [
   },
   {
     sassVar: '$dark-lighter',
-    hex: '#234655'
+    hex: '#194456'
   },
   {
     sassVar: '$dark-page',

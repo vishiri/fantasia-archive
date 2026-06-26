@@ -1,6 +1,8 @@
 @use '../../../../css/app.palette.scss' as *;
 
 /* COMPONENT - APP CONTROL MENUS */
+$appControlMenus-barBackgroundColor: fa-v('dark', $dark);
+$appControlMenus-barMinWidth: 375px;
 $appControlMenus-bgColor: fa-v('dark-lighter', $dark-lighter);
 $appControlMenus-color: fa-v('accent', $accent);
 $appControlMenus-inner-marginLeft: -1px;
