@@ -1,5 +1,5 @@
 export default {
-  title: 'Projektinhallinta',
+  title: 'Projekti',
   items: {
     newProject: 'Luo uusi projekti',
     loadProject: 'Lataa olemassa oleva projekti',

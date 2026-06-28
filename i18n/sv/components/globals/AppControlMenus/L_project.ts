@@ -1,5 +1,5 @@
 export default {
-  title: 'Projektledning',
+  title: 'Projekt',
   items: {
     newProject: 'Skapa nytt projekt',
     loadProject: 'Ladda befintligt projekt',

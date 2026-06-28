@@ -1,4 +1,6 @@
 .appControlSingleMenu {
+  flex-grow: 1;
+
   &:hover,
   &:focus {
     color: $appControlMenus-singleHover;

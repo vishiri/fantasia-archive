@@ -1,5 +1,5 @@
 export default {
-  title: 'Ρυθμίσεις & Εργαλεία',
+  title: 'Έλεγχοι εφαρμογής',
   items: {
     appNoteBoard: 'Εναλλαγή σημειωματάριου εφαρμογής',
     keybindSettings: 'Ρυθμίσεις Keybind',

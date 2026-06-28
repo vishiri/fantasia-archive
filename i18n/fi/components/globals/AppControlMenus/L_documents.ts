@@ -1,5 +1,5 @@
 export default {
-  title: 'Asiakirjat ja sisältö',
+  title: 'Sisältö',
   items: {
     quickAddNewDocument: 'Pikalisää uusi asiakirja',
     quickSearchDocument: 'Pikahaku olemassa olevasta asiakirjasta',

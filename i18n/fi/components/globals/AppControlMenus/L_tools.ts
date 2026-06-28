@@ -1,5 +1,5 @@
 export default {
-  title: 'Asetukset ja työkalut',
+  title: 'Sovelluksen ohjaus',
   items: {
     appNoteBoard: 'Vaihda sovellusmuistio',
     keybindSettings: 'Näppäimistön asetukset',

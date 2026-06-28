@@ -1,5 +1,5 @@
 export default {
-  title: 'दस्तावेज़ एवं सामग्री',
+  title: 'सामग्री',
   items: {
     quickAddNewDocument: 'त्वरित-नया दस्तावेज़ जोड़ें',
     quickSearchDocument: 'त्वरित-खोज मौजूदा दस्तावेज़',

@@ -1,5 +1,5 @@
 export default {
-  title: 'Inställningar & Verktyg',
+  title: 'Appkontroller',
   items: {
     appNoteBoard: 'Växla App Noteboard',
     keybindSettings: 'Inställningar för nyckelbindning',

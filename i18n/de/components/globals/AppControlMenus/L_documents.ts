@@ -1,5 +1,5 @@
 export default {
-  title: 'Dokumente und Inhalte',
+  title: 'Inhalt',
   items: {
     quickAddNewDocument: 'Neues Dokument schnell hinzufügen',
     quickSearchDocument: 'Vorhandenes Dokument schnell durchsuchen',

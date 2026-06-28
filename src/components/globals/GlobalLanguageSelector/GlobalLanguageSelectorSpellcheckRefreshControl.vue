@@ -9,7 +9,7 @@
         flat
         dense
         :ripple="false"
-        class="globalLanguageSelectorSpellcheckRefreshControl__button bg-dark"
+        class="globalLanguageSelectorSpellcheckRefreshControl__button"
         :aria-label="$t('globalLanguageSelector.spellcheckRefreshAriaLabel')"
         :data-test-tooltip-text="$t('globalLanguageSelector.spellcheckRefreshTooltip')"
         data-test-locator="globalLanguageSelector-spellcheckRefresh"
@@ -96,6 +96,7 @@ const { tooltipOpen } = useGlobalLanguageSelectorSpellcheckRefreshControl(props)
 }
 
 .globalLanguageSelectorSpellcheckRefreshControl__button {
+  background-color: $globalLanguageSelector-spellcheckRefresh-backgroundColor;
   border-radius: 50%;
   height: $globalLanguageSelector-diameter;
   margin-top: $globalLanguageSelector-spellcheckRefresh-button-marginTop;

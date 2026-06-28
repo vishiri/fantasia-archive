@@ -1,5 +1,5 @@
 export default {
-  title: 'Dokumenter og innhold',
+  title: 'Innhold',
   items: {
     quickAddNewDocument: 'Hurtiglegg til nytt dokument',
     quickSearchDocument: 'Hurtigsøk i eksisterende dokument',

@@ -1,5 +1,5 @@
 export default {
-  title: '帮助和信息',
+  title: '帮助',
   items: {
     advancedSearchGuide: '高级搜索指南',
     tipsTricksTrivia: '提示、技巧和琐事',

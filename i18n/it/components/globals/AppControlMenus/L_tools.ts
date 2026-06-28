@@ -1,5 +1,5 @@
 export default {
-  title: 'Impostazioni e strumenti',
+  title: 'Controlli app',
   items: {
     appNoteBoard: 'Attiva/disattiva Blocco note dell\'app',
     keybindSettings: 'Impostazioni delle combinazioni di tasti',

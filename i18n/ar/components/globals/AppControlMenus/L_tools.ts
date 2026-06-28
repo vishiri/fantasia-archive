@@ -1,5 +1,5 @@
 export default {
-  title: 'الإعدادات والأدوات',
+  title: 'تحكم التطبيق',
   items: {
     appNoteBoard: 'تبديل التطبيق المفكرة',
     keybindSettings: 'إعدادات ربط المفاتيح',

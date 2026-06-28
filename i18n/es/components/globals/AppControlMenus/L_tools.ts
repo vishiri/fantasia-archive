@@ -1,5 +1,5 @@
 export default {
-  title: 'Configuración y herramientas',
+  title: 'Controles de la app',
   items: {
     appNoteBoard: 'Alternar Bloc de notas de la aplicación',
     keybindSettings: 'Configuración de combinación de teclas',

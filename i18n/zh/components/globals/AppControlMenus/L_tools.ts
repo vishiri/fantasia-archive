@@ -1,5 +1,5 @@
 export default {
-  title: '设置和工具',
+  title: '应用控制',
   items: {
     appNoteBoard: '切换应用程序记事板',
     keybindSettings: '按键绑定设置',

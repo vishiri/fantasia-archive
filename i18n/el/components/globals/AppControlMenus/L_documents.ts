@@ -1,5 +1,5 @@
 export default {
-  title: 'Έγγραφα & Περιεχόμενο',
+  title: 'Περιεχόμενο',
   items: {
     quickAddNewDocument: 'Γρήγορη προσθήκη νέου εγγράφου',
     quickSearchDocument: 'Γρήγορη αναζήτηση υπάρχοντος εγγράφου',

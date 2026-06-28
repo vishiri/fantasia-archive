@@ -1,5 +1,5 @@
 export default {
-  title: 'Настройки и инструменты',
+  title: 'Управление приложением',
   items: {
     appNoteBoard: 'Переключить блокнот приложения',
     keybindSettings: 'Настройки привязки клавиш',

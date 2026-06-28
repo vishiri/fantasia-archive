@@ -1,5 +1,5 @@
 export default {
-  title: 'Ohjeet ja tiedot',
+  title: 'Ohje',
   items: {
     advancedSearchGuide: 'Tarkennettu hakuopas',
     tipsTricksTrivia: 'Vinkkejä, temppuja ja triviaa',

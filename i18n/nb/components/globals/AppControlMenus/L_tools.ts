@@ -1,5 +1,5 @@
 export default {
-  title: 'Innstillinger og verktøy',
+  title: 'App-kontroller',
   items: {
     appNoteBoard: 'Slå på app-noteboard',
     keybindSettings: 'Innstillinger for nøkkelbinding',

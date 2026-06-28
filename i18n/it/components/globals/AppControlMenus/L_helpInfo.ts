@@ -1,5 +1,5 @@
 export default {
-  title: 'Aiuto e informazioni',
+  title: 'Aiuto',
   items: {
     advancedSearchGuide: 'Guida alla ricerca avanzata',
     tipsTricksTrivia: 'Suggerimenti, trucchi e curiosità',

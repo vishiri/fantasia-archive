@@ -1,5 +1,5 @@
 export default {
-  title: 'ヘルプと情報',
+  title: 'ヘルプ',
   items: {
     advancedSearchGuide: '高度な検索ガイド',
     tipsTricksTrivia: 'ヒント、トリック、雑学',

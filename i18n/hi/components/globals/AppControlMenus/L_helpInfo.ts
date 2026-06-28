@@ -1,5 +1,5 @@
 export default {
-  title: 'सहायता एवं जानकारी',
+  title: 'सहायता',
   items: {
     advancedSearchGuide: 'उन्नत खोज मार्गदर्शिका',
     tipsTricksTrivia: 'टिप्स, ट्रिक्स और सामान्य ज्ञान',

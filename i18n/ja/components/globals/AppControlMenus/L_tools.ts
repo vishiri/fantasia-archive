@@ -1,5 +1,5 @@
 export default {
-  title: '設定とツール',
+  title: 'アプリ操作',
   items: {
     appNoteBoard: 'アプリノートボードの切り替え',
     keybindSettings: 'キーバインド設定',

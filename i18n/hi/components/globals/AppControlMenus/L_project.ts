@@ -1,5 +1,5 @@
 export default {
-  title: 'परियोजना प्रबंधन',
+  title: 'परियोजना',
   items: {
     newProject: 'नया प्रोजेक्ट बनाएं',
     loadProject: 'मौजूदा प्रोजेक्ट लोड करें',

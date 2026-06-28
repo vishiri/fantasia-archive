@@ -1,5 +1,5 @@
 export default {
-  title: 'सेटिंग्स और उपकरण',
+  title: 'ऐप नियंत्रण',
   items: {
     appNoteBoard: 'ऐप नोटबोर्ड टॉगल करें',
     keybindSettings: 'कीबाइंड सेटिंग्स',

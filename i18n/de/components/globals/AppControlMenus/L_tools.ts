@@ -1,5 +1,5 @@
 export default {
-  title: 'Einstellungen und Tools',
+  title: 'App-Steuerung',
   items: {
     appNoteBoard: 'App-Noteboard umschalten',
     keybindSettings: 'Tastenkombinationseinstellungen',

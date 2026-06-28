@@ -1,5 +1,5 @@
 export default {
-  title: 'Βοήθεια & Πληροφορίες',
+  title: 'Βοήθεια',
   items: {
     advancedSearchGuide: 'Οδηγός σύνθετης αναζήτησης',
     tipsTricksTrivia: 'Συμβουλές, κόλπα & Trivia',

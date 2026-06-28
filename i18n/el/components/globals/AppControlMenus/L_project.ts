@@ -1,5 +1,5 @@
 export default {
-  title: 'Διαχείριση Έργου',
+  title: 'Έργο',
   items: {
     newProject: 'Δημιουργία νέου έργου',
     loadProject: 'Φόρτωση υπάρχοντος έργου',

@@ -1,5 +1,5 @@
 export default {
-  title: 'プロジェクト管理',
+  title: 'プロジェクト',
   items: {
     newProject: '新しいプロジェクトを作成する',
     loadProject: '既存のプロジェクトをロードする',

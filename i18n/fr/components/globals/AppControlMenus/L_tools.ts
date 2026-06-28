@@ -1,5 +1,5 @@
 export default {
-  title: 'Paramètres et outils',
+  title: 'Contrôles de l\'app',
   items: {
     appNoteBoard: 'Basculer le bloc-notes de l\'application',
     keybindSettings: 'Paramètres de raccourci clavier',

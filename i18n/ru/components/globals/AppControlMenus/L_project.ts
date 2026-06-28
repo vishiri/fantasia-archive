@@ -1,5 +1,5 @@
 export default {
-  title: 'Управление проектом',
+  title: 'Проект',
   items: {
     newProject: 'Создать новый проект',
     loadProject: 'Загрузить существующий проект',

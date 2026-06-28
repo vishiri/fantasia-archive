@@ -1,5 +1,5 @@
 export default {
-  title: 'إدارة المشاريع',
+  title: 'المشروع',
   items: {
     newProject: 'إنشاء مشروع جديد',
     loadProject: 'تحميل المشروع الحالي',

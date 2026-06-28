@@ -83,6 +83,7 @@ withDefaults(
 <style lang="scss" scoped>
 .appControlMenus {
   background-color: $appControlMenus-barBackgroundColor;
+  flex-grow: 0;
   flex-shrink: 0;
   min-width: $appControlMenus-barMinWidth;
 
@@ -91,6 +92,7 @@ withDefaults(
 
     // Adjust for global window chrome offset in order to make the menu clickable when mouse hover the left top corner of the window
     margin-left: $appControlMenus-inner-marginLeft;
+    width: calc(100% + #{-$appControlMenus-inner-marginLeft});
   }
 }
 </style>

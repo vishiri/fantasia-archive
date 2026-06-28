@@ -1,5 +1,5 @@
 export default {
-  title: 'Gestione del progetto',
+  title: 'Progetto',
   items: {
     newProject: 'Crea nuovo progetto',
     loadProject: 'Carica progetto esistente',

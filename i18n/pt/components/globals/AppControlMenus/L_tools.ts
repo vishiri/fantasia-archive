@@ -1,5 +1,5 @@
 export default {
-  title: 'Configurações e ferramentas',
+  title: 'Controles do app',
   items: {
     appNoteBoard: 'Alternar bloco de notas do aplicativo',
     keybindSettings: 'Configurações de atalho de teclado',
