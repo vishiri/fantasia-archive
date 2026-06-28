@@ -9,11 +9,6 @@ import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 import { S_DialogComponent } from 'src/stores/S_Dialog'
 
 import { createDialogAppSettings } from './functions/createDialogAppSettings'
-import {
-  applyAppSettingsLivePreviewPatch,
-  cloneFaUserSettingsSnapshot,
-  restoreAppSettingsLivePreviewSnapshot
-} from './functions/dialogAppSettingsLivePreview'
 import { buildAppSettingsRenderTree } from './functions/dialogAppSettingsTreeBuild'
 import { filterAppSettingsTreeForSearch } from './functions/dialogAppSettingsSearch'
 import { updateLocalAppSettingsField } from './functions/dialogAppSettingsUpdateLocalField'
@@ -22,16 +17,13 @@ const dialogAppSettingsApi = createDialogAppSettings({
   APP_SETTINGS_OPTIONS,
   S_DialogComponent,
   S_FaUserSettings,
-  applyAppSettingsLivePreviewPatch,
   buildAppSettingsRenderTree,
-  cloneFaUserSettingsSnapshot,
   computed,
   filterAppSettingsTreeForSearch,
   i18n,
   onMounted,
   ref,
   registerComponentDialogStackGuard,
-  restoreAppSettingsLivePreviewSnapshot,
   Result,
   runFaActionAwait,
   toRaw,
@@ -44,12 +36,6 @@ export const resolveDialogComponentStore = dialogAppSettingsApi.resolveDialogCom
 export const syncLocalAppSettingsFromStore = dialogAppSettingsApi.syncLocalAppSettingsFromStore
 
 export const registerDialogAppSettingsWatchers = dialogAppSettingsApi.registerDialogAppSettingsWatchers
-
-export const captureAppSettingsLivePreviewSnapshotIfNeeded =
-  dialogAppSettingsApi.captureAppSettingsLivePreviewSnapshotIfNeeded
-
-export const registerDialogAppSettingsLivePreviewWatcher =
-  dialogAppSettingsApi.registerDialogAppSettingsLivePreviewWatcher
 
 export const useDialogAppSettingsSearchComputed = dialogAppSettingsApi.useDialogAppSettingsSearchComputed
 

@@ -15,16 +15,6 @@ export function createDialogAppSettings (deps: {
   APP_SETTINGS_OPTIONS: Record<string, { category: string; subcategory: string }>
   S_DialogComponent: () => I_dialogComponentStoreLike
   S_FaUserSettings: () => T_appSettingsFaUserSettingsStoreForSync
-  applyAppSettingsLivePreviewPatch: (
-    store: T_appSettingsFaUserSettingsStoreForSync,
-    settingKey: keyof I_faUserSettings,
-    updatedValue: boolean
-  ) => void
-  cloneFaUserSettingsSnapshot: (settings: I_faUserSettings) => I_faUserSettings
-  restoreAppSettingsLivePreviewSnapshot: (
-    store: T_appSettingsFaUserSettingsStoreForSync,
-    snapshot: I_faUserSettings
-  ) => void
   buildAppSettingsRenderTree: (
     translate: { t: (key: string) => string; te: (key: string) => boolean },
     options: Record<string, { category: string; subcategory: string }>,
@@ -73,16 +63,6 @@ export function createDialogAppSettings (deps: {
       props: I_dialogAppSettingsProps
       selectedCategoryTab: Ref<string>
     }) => void
-    captureAppSettingsLivePreviewSnapshotIfNeeded: (
-      props: I_dialogAppSettingsProps,
-      appSettingsLivePreviewSnapshot: Ref<I_faUserSettings | null>
-    ) => void
-    registerDialogAppSettingsLivePreviewWatcher: (params: {
-      appSettingsClosedViaSave: Ref<boolean>
-      appSettingsLivePreviewSnapshot: Ref<I_faUserSettings | null>
-      dialogModel: Ref<boolean>
-      props: I_dialogAppSettingsProps
-    }) => void
     useDialogAppSettingsSearchComputed: (params: {
       appSettingsTree: Ref<T_appSettingsRenderTree>
       searchSettingsQuery: Ref<string | null>
@@ -92,8 +72,6 @@ export function createDialogAppSettings (deps: {
       searchFilteredAppSettingsTree: ComputedRef<T_appSettingsRenderTree>
     }
     createDialogAppSettingsDialogActions: (params: {
-      appSettingsClosedViaSave: Ref<boolean>
-      appSettingsLivePreviewSnapshot: Ref<I_faUserSettings | null>
       dialogModel: Ref<boolean>
       documentName: Ref<string>
       localSettings: Ref<I_faUserSettings | null>
@@ -285,69 +263,7 @@ export function createDialogAppSettings (deps: {
     }
   }
 
-  function captureAppSettingsLivePreviewSnapshotIfNeeded (
-    props: I_dialogAppSettingsProps,
-    appSettingsLivePreviewSnapshot: Ref<I_faUserSettings | null>
-  ): void {
-    if (props.directSettingsSnapshot !== undefined) {
-      appSettingsLivePreviewSnapshot.value = null
-      return
-    }
-
-    const faUserSettingsStore = tryResolveFaUserSettingsStoreForSync()
-    if (faUserSettingsStore?.settings !== null && faUserSettingsStore?.settings !== undefined) {
-      appSettingsLivePreviewSnapshot.value = deps.cloneFaUserSettingsSnapshot(
-        faUserSettingsStore.settings
-      )
-    }
-  }
-
-  function registerDialogAppSettingsLivePreviewWatcher (params: {
-    appSettingsClosedViaSave: Ref<boolean>
-    appSettingsLivePreviewSnapshot: Ref<I_faUserSettings | null>
-    dialogModel: Ref<boolean>
-    props: I_dialogAppSettingsProps
-  }): void {
-    const {
-      appSettingsClosedViaSave,
-      appSettingsLivePreviewSnapshot,
-      dialogModel,
-      props
-    } = params
-
-    deps.watch(dialogModel, (isOpen, wasOpen) => {
-      if (wasOpen !== true || isOpen !== false) {
-        return
-      }
-
-      if (appSettingsClosedViaSave.value) {
-        appSettingsLivePreviewSnapshot.value = null
-        appSettingsClosedViaSave.value = false
-        return
-      }
-
-      if (
-        props.directSettingsSnapshot !== undefined ||
-        appSettingsLivePreviewSnapshot.value === null
-      ) {
-        return
-      }
-
-      const faUserSettingsStore = tryResolveFaUserSettingsStoreForSync()
-      if (faUserSettingsStore !== null) {
-        deps.restoreAppSettingsLivePreviewSnapshot(
-          faUserSettingsStore,
-          appSettingsLivePreviewSnapshot.value
-        )
-      }
-
-      appSettingsLivePreviewSnapshot.value = null
-    })
-  }
-
   function createDialogAppSettingsDialogActions (params: {
-    appSettingsClosedViaSave: Ref<boolean>
-    appSettingsLivePreviewSnapshot: Ref<I_faUserSettings | null>
     dialogModel: Ref<boolean>
     documentName: Ref<string>
     localSettings: Ref<I_faUserSettings | null>
@@ -360,8 +276,6 @@ export function createDialogAppSettings (deps: {
       updateLocalSetting: (settingKey: string, updatedValue: boolean) => void
     } {
     const {
-      appSettingsClosedViaSave,
-      appSettingsLivePreviewSnapshot,
       dialogModel,
       documentName,
       localSettings,
@@ -374,7 +288,6 @@ export function createDialogAppSettings (deps: {
       documentName.value = input
       dialogModel.value = true
       searchSettingsQuery.value = ''
-      appSettingsClosedViaSave.value = false
       const directSnapshot = props.directSettingsSnapshot
       if (directSnapshot !== undefined) {
         const nextSettings: I_faUserSettings = { ...directSnapshot }
@@ -384,13 +297,10 @@ export function createDialogAppSettings (deps: {
           deps.APP_SETTINGS_OPTIONS,
           nextSettings
         )
-        appSettingsLivePreviewSnapshot.value = null
         return
       }
 
-      void syncLocalAppSettingsFromStore(localSettings, appSettingsTree).then(() => {
-        captureAppSettingsLivePreviewSnapshotIfNeeded(props, appSettingsLivePreviewSnapshot)
-      })
+      void syncLocalAppSettingsFromStore(localSettings, appSettingsTree)
     }
 
     async function saveAndCloseDialog (): Promise<void> {
@@ -399,7 +309,6 @@ export function createDialogAppSettings (deps: {
         await deps.runFaActionAwait('saveAppSettings', { settings: plainSettingsSnapshot })
       }
 
-      appSettingsClosedViaSave.value = true
       dialogModel.value = false
     }
 
@@ -415,21 +324,6 @@ export function createDialogAppSettings (deps: {
         settingKey,
         updatedValue
       )
-
-      if (props.directSettingsSnapshot !== undefined) {
-        return
-      }
-
-      const faUserSettingsStore = tryResolveFaUserSettingsStoreForSync()
-      if (faUserSettingsStore === null) {
-        return
-      }
-
-      deps.applyAppSettingsLivePreviewPatch(
-        faUserSettingsStore,
-        settingKey as keyof I_faUserSettings,
-        updatedValue
-      )
     }
 
     return {
@@ -442,8 +336,6 @@ export function createDialogAppSettings (deps: {
   function useDialogAppSettings (props: I_dialogAppSettingsProps) {
     const refs = createDialogAppSettingsRefs()
     deps.registerComponentDialogStackGuard(refs.dialogModel)
-    const appSettingsLivePreviewSnapshot = deps.ref<I_faUserSettings | null>(null)
-    const appSettingsClosedViaSave = deps.ref(false)
     const {
       dialogModel,
       documentName,
@@ -457,8 +349,6 @@ export function createDialogAppSettings (deps: {
       searchSettingsQuery
     })
     const actions = createDialogAppSettingsDialogActions({
-      appSettingsClosedViaSave,
-      appSettingsLivePreviewSnapshot,
       dialogModel,
       documentName,
       localSettings,
@@ -471,12 +361,6 @@ export function createDialogAppSettings (deps: {
       appSettingsTree,
       props,
       selectedCategoryTab
-    })
-    registerDialogAppSettingsLivePreviewWatcher({
-      appSettingsClosedViaSave,
-      appSettingsLivePreviewSnapshot,
-      dialogModel,
-      props
     })
     return {
       dialogModel,
@@ -497,8 +381,6 @@ export function createDialogAppSettings (deps: {
     resolveDialogComponentStore,
     syncLocalAppSettingsFromStore,
     registerDialogAppSettingsWatchers,
-    captureAppSettingsLivePreviewSnapshotIfNeeded,
-    registerDialogAppSettingsLivePreviewWatcher,
     useDialogAppSettingsSearchComputed,
     createDialogAppSettingsDialogActions,
     useDialogAppSettings

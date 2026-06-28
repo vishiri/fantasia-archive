@@ -149,7 +149,7 @@ export default {
       tags: 'keep open, multiple results, batch open, quick search stays open'
     },
     disableDocumentControlBar: {
-      title: 'TODO - Disable document control bar',
+      title: 'Disable document control bar',
       description: 'If you want to maximize your working space on the document, you can disable the top button bar with this setting. The necessary control buttons will be moved to the top of the main document body, while the rest of the functionality will be accessible via keybinds or through the app menu on the top left.',
       tags: 'toolbar hide, maximize space, full width, document header'
     },

@@ -33,16 +33,9 @@ beforeEach(() => {
 })
 
 function createDialogAppSettingsDialogActionsParams (
-  params: Omit<
-    Parameters<typeof createDialogAppSettingsDialogActions>[0],
-    'appSettingsClosedViaSave' | 'appSettingsLivePreviewSnapshot'
-  >
+  params: Parameters<typeof createDialogAppSettingsDialogActions>[0]
 ): Parameters<typeof createDialogAppSettingsDialogActions>[0] {
-  return {
-    appSettingsClosedViaSave: ref(false),
-    appSettingsLivePreviewSnapshot: ref(null),
-    ...params
-  }
+  return params
 }
 
 /**
@@ -226,9 +219,9 @@ test('updateLocalSetting returns early when localSettings is null', () => {
 
 /**
  * createDialogAppSettingsDialogActions
- * updateLocalSetting mirrors boolean toggles into S_FaUserSettings for live preview on open surfaces.
+ * updateLocalSetting updates the dialog draft only; persisted user settings stay unchanged until Save.
  */
-test('updateLocalSetting patches hideTooltipsProject on the user settings store', () => {
+test('updateLocalSetting does not patch hideTooltipsProject on the user settings store', () => {
   const store: T_appSettingsFaUserSettingsStoreForSync = {
     settings: {
       ...FA_USER_SETTINGS_DEFAULTS,
@@ -258,15 +251,15 @@ test('updateLocalSetting patches hideTooltipsProject on the user settings store'
 
   updateLocalSetting('hideTooltipsProject', true)
 
-  expect(store.settings?.hideTooltipsProject).toBe(true)
+  expect(store.settings?.hideTooltipsProject).toBe(false)
   expect(localSettings.value?.hideTooltipsProject).toBe(true)
 })
 
 /**
  * createDialogAppSettingsDialogActions
- * updateLocalSetting skips live preview when directSettingsSnapshot is provided.
+ * updateLocalSetting still updates the local draft when directSettingsSnapshot props are used.
  */
-test('updateLocalSetting does not patch the user settings store for directSettingsSnapshot props', () => {
+test('updateLocalSetting updates local draft for directSettingsSnapshot props without touching the store', () => {
   const store: T_appSettingsFaUserSettingsStoreForSync = {
     settings: {
       ...FA_USER_SETTINGS_DEFAULTS,
