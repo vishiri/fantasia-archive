@@ -1,0 +1,48 @@
+---
+description: Ask for clarification before assuming product/UX/scope/implementation choices; especially when planning
+alwaysApply: true
+---
+
+# Clarify before assume
+
+All agents (plan mode, agent mode, subagents): **do not guess** product behavior, UX, scope, or implementation choices. **Ask first** when prompt unclear or proposed work adds unstated logic.
+
+## When to ask (mandatory)
+
+- Prompt unclear, contradictory, or missing acceptance criteria
+- Plan or code path would add behavior, UX, scope, or technical approach user did not describe
+- Multiple valid implementations; user did not choose
+- Before **`CreatePlan`** or substantive implementation: list unstated decisions; if any remain → **`AskQuestion`** (plain ask if tool unavailable)
+
+## Not an assumption (no re-ask)
+
+- Repo rules, skills, mandatory structure ([yagni.mdc](yagni.mdc) guardrails)
+- Patterns already established in touched code — match surrounding file
+- User explicitly delegated ("your choice", "use best judgment")
+
+## Planning mode
+
+- Do **not** ship plan with silent "we will assume X" bullets
+- Ask first, or mark open decisions **blocked pending user answer** — stop before implementation steps
+- Plan file location/metadata: [plan-documents.mdc](plan-documents.mdc)
+
+## How to ask
+
+- **1–2** critical questions per turn
+- Prefer **`AskQuestion`** when choices enumerable
+- State what repo rules already fix vs what is still unknown
+
+## Example triggers
+
+| Situation | Ask |
+| --- | --- |
+| "Add export button" — format/location/menu unspecified | Yes |
+| "Fix sidebar bug" — no repro steps | Yes |
+| New dialog — user didn't say modal vs floating window | Yes |
+| New feature module — use **`functions/`** + **`*_manager.ts`** | No (repo law) |
+| Run **`yarn testbatch:verify`** after edits | No (repo law) |
+
+## Related
+
+- [yagni.mdc](yagni.mdc) — minimal code; ladder step 1 "skip or ask" = scope gate; this rule = product/UX gate
+- [caveman-default.mdc](caveman-default.mdc) — auto-clarity for ambiguous instructions in replies

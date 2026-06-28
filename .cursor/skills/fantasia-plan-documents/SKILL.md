@@ -13,6 +13,8 @@ description: >-
 
 Planning artifacts: rollout inventories, checklists, migration trackers, etc.
 
+Resolve open product/UX/scope decisions per [clarify-before-assume.mdc](../../rules/clarify-before-assume.mdc) before saving plan.
+
 ## Prune stale plans before saving
 
 - List **`.cursor/plans/`** before new plan

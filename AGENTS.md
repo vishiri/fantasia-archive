@@ -45,6 +45,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | [eslint-typescript.mdc](.cursor/rules/eslint-typescript.mdc) | Always — ESLint, **`vue-tsc`** |
 | [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc) | Always — commits |
 | [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc) | Always — **`changeLog.md`** vs **`package.json` version** |
+| [clarify-before-assume.mdc](.cursor/rules/clarify-before-assume.mdc) | Always — ask before product/UX/scope/implementation assumptions; planning emphasis |
 | [plan-documents.mdc](.cursor/rules/plan-documents.mdc) | Always — **`.cursor/plans/`** |
 | [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) | Always — **`yarn testbatch:verify`** gate |
 | [dev-electron-compile-check.mdc](.cursor/rules/dev-electron-compile-check.mdc) | Always — **`yarn testbatch:verify`** Shell run after last edit, before done summary; then dev compile smoke |
@@ -90,7 +91,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Global keybinds | [fantasia-keybinds](.cursor/skills/fantasia-keybinds/SKILL.md) |
 | Action manager | [fa-action-manager.mdc](.cursor/rules/fa-action-manager.mdc), [fantasia-action-manager](.cursor/skills/fantasia-action-manager/SKILL.md) |
 | Project Settings | [fantasia-sqlite-main](.cursor/skills/fantasia-sqlite-main/SKILL.md), [projectDB.md](docs/database/projectDB.md) — IPC-read on open; **`saveProjectSettings`**; worlds + template layout + document templates |
-| Workspace sidebar | **`/home`** **`QSplitter`**, **`S_FaProjectSidebar`**, **`project_data.sidebar_width`** — [projectDB.md](docs/database/projectDB.md); E2E [checkWorkspaceSidebar.playwright.spec.ts](e2e-tests/checkWorkspaceSidebar.playwright.spec.ts) |
+| Workspace sidebar | **`/home`** **`QSplitter`**, **`S_FaProjectSidebar`**, **`project_data.sidebar_width`** — **`ProjectHierarchyTreeSearch`**, **`ProjectDocumentControlBar`**, **`ProjectWorkspaceWorldList`**, **`S_FaProjectWorkspaceWorlds`**; [projectDB.md](docs/database/projectDB.md); E2E [checkWorkspaceSidebar.playwright.spec.ts](e2e-tests/checkWorkspaceSidebar.playwright.spec.ts) |
 | Floating **`Window*`** | [fantasia-floating-windows](.cursor/skills/fantasia-floating-windows/SKILL.md) — shared **`_sharedWindowStyling/`**, **`_sharedWindowNoteboard/`** |
 | Trees / DnD | [fa-he-tree.mdc](.cursor/rules/fa-he-tree.mdc), [fa-drag-drop-lists.mdc](.cursor/rules/fa-drag-drop-lists.mdc), skills **fantasia-he-tree**, **fantasia-drag-drop** |
 | **`FaIconPickerInput`** | [fa-icon-picker.mdc](.cursor/rules/fa-icon-picker.mdc), [fantasia-icon-picker](.cursor/skills/fantasia-icon-picker/SKILL.md) |

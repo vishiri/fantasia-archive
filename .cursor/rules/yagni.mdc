@@ -50,5 +50,6 @@ When user asks for X, check whether existing Y in repo already covers it — pro
 
 ## Related (orthogonal layers)
 
+- **Clarify before assume:** [clarify-before-assume.mdc](clarify-before-assume.mdc) — ask on product/UX/scope/implementation gaps; ladder step 1 "skip or ask" = scope gate; clarify rule = product/UX gate
 - **Agent replies:** [caveman-default.mdc](caveman-default.mdc) + **`.agents/skills/caveman/`** — terse prose only; does not govern code shape.
 - **Playbook:** [fantasia-yagni](../skills/fantasia-yagni/SKILL.md)

@@ -41,7 +41,7 @@ Token in **palette** or **`globals/*.variables.scss`** when shared by global par
 
 **Framework palette** Sass variables = raw hex in **consumer** stylesheets (global partials `src/css/globals/`, feature `styles/*.scss`, Vue **`<style lang="scss">`**).
 
-- **Palette** = shared Quasar/app colors under **`/* QUASAR COLORS - … */`** in [app.palette.scss](src/css/app.palette.scss): `$primary`, `$primary-bright`, `$secondary`, `$accent`, `$positive`, `$negative`, `$info`, `$warning`, `$dark`, `$white`, `$grey`, `$grey-lighter`, other `$` naming palette not UI role.
+- **Palette** = shared Quasar/app colors under **`/* QUASAR COLORS - … */`** in [app.palette.scss](src/css/app.palette.scss): `$primary`, `$primary-bright`, `$secondary`, `$accent`, `$positive`, `$negative`, `$info`, `$warning`, `$dark`, `$dark-middle`, `$dark-lighter`, `$white`, `$grey`, `$grey-lighter`, other `$` naming palette not UI role.
 - **Consumer** uses **semantic** tokens (Globals, `theme/quasar-components/`, feature **`styles/_variables.scss`**) — values **may** bind palette on RHS in token file (e.g. `$qTooltip-color: $dark;`) — same as abstracting `8px` → `$qFoo-bar-width`.
 - **Palette names may appear**: defining under **`/* QUASAR COLORS - … */`**, RHS when assigning semantic token in Quasar/feature token file. **Not** as rule value in `quasarComponentsAdjustments.scss` or component stylesheet when semantic token expresses role.
 - **Already-semantic** Globals (`$aLinkColor`, **`$globals-codeToken-textColor`**) not “palette”; reuse or add semantic name in right token file.

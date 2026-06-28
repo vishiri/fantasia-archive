@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Plan document discipline
 
-- **Before new plan**: scan `.cursor/plans/` (skip if missing/empty). Delete plans **>30 days** old by last modified time.
+- **Before new plan**: resolve product/UX/scope gaps per [clarify-before-assume.mdc](clarify-before-assume.mdc); then scan `.cursor/plans/` (skip if missing/empty). Delete plans **>30 days** old by last modified time.
 - Store every generated plan under `.cursor/plans/`; create folder if missing.
 - Filenames: current `package.json` version + creation timestamp **`YYYY-MM-DD-HH-mm-ss`**.
 - Body must include: `Created at: YYYY-MM-DD-HH-mm-ss`, `Project version: <package.json version>`.
