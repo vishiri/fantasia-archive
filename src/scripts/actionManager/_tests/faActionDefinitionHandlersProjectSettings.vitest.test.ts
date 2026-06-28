@@ -4,10 +4,11 @@ import { createPinia, setActivePinia } from 'pinia'
 
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 
-const { updateProjectSettingsMock, persistWorldsSnapshotMock, persistDocumentTemplatesSnapshotMock, notifyCreateMock } = vi.hoisted(() => ({
+const { updateProjectSettingsMock, persistWorldsSnapshotMock, persistDocumentTemplatesSnapshotMock, notifyCreateMock, refreshWorkspaceWorldsMock } = vi.hoisted(() => ({
   notifyCreateMock: vi.fn(),
   persistDocumentTemplatesSnapshotMock: vi.fn(async () => undefined),
   persistWorldsSnapshotMock: vi.fn(async () => undefined),
+  refreshWorkspaceWorldsMock: vi.fn(async () => undefined),
   updateProjectSettingsMock: vi.fn(async () => undefined)
 }))
 
@@ -45,6 +46,16 @@ vi.mock('app/src/stores/S_FaProjectSettings', () => {
   }
 })
 
+vi.mock('app/src/stores/S_FaProjectWorkspaceWorlds', () => {
+  return {
+    S_FaProjectWorkspaceWorlds: () => {
+      return {
+        refreshWorkspaceWorlds: refreshWorkspaceWorldsMock
+      }
+    }
+  }
+})
+
 beforeEach(() => {
   setActivePinia(createPinia())
   vi.resetModules()
@@ -52,6 +63,7 @@ beforeEach(() => {
   updateProjectSettingsMock.mockReset()
   persistWorldsSnapshotMock.mockReset()
   persistDocumentTemplatesSnapshotMock.mockReset()
+  refreshWorkspaceWorldsMock.mockReset()
   S_FaActiveProject().clearActiveProject()
 })
 
@@ -106,6 +118,7 @@ test('Test that handleSaveProjectSettings persists worlds snapshot when provided
   })
   expect(updateProjectSettingsMock).toHaveBeenCalledWith({ projectName: 'Renamed' })
   expect(persistWorldsSnapshotMock).toHaveBeenCalledWith(worlds)
+  expect(refreshWorkspaceWorldsMock).toHaveBeenCalledTimes(1)
 })
 
 /**

@@ -1,0 +1,9 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - PROJECT HIERARCHY TREE SEARCH */
+$projectHierarchyTreeSearch-appendIconScale: 0.85;
+$projectHierarchyTreeSearch-backgroundColor: fa-v('dark-middle', $dark-middle);
+$projectHierarchyTreeSearch-fixedZIndex: 555;
+$projectHierarchyTreeSearch-focusedZIndex: 1000;
+$projectHierarchyTreeSearch-rowHeightPx: 48px;
+$projectHierarchyTreeSearch-topOffsetPx: 2.5px;

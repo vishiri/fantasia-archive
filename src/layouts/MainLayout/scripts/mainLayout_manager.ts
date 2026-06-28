@@ -23,6 +23,7 @@ import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
 import { S_FaProjectSidebar } from 'app/src/stores/S_FaProjectSidebar'
+import { S_FaProjectWorkspaceWorlds } from 'app/src/stores/S_FaProjectWorkspaceWorlds'
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
@@ -37,6 +38,7 @@ import {
 import { createMainLayout } from './functions/createMainLayout'
 import { createMainLayoutDrawerRail } from './functions/createMainLayoutDrawerRail'
 import { createMainLayoutWorkspaceSidebar } from './functions/createMainLayoutWorkspaceSidebar'
+import { attachFaWorkspaceSidebarLiveWidthSync, bindFaWorkspaceSidebarLiveWidthSync } from './faWorkspaceSidebarLiveWidthSyncWiring'
 import { resolveMainLayoutOutletKey } from './functions/mainLayoutOutletKey'
 import {
   resolveMainLayoutRouteClass,
@@ -85,6 +87,9 @@ const mainLayoutApi = createMainLayout({
 export const useMainLayoutWorkspaceSidebar = createMainLayoutWorkspaceSidebar({
   S_FaActiveProject,
   S_FaProjectSidebar,
+  S_FaProjectWorkspaceWorlds,
+  attachWorkspaceSidebarLiveWidthSync: attachFaWorkspaceSidebarLiveWidthSync,
+  bindWorkspaceSidebarLiveWidthSync: bindFaWorkspaceSidebarLiveWidthSync,
   debounceSidebarWidthPersist: debounce,
   nextTick,
   onMounted,
@@ -93,10 +98,7 @@ export const useMainLayoutWorkspaceSidebar = createMainLayoutWorkspaceSidebar({
   sidebarDefaultWidthPx: FA_PROJECT_SIDEBAR_DEFAULT_WIDTH_PX,
   sidebarMinWidthPx: FA_PROJECT_SIDEBAR_MIN_WIDTH_PX,
   sidebarWidthPersistDebounceMs: 150,
-  watch: watch as (
-    source: () => string | null,
-    effect: (projectId: string | null) => void | Promise<void>
-  ) => void
+  watch
 })
 
 export const useAppShellLayoutDrawerRail = mainLayoutApi.useAppShellLayoutDrawerRail

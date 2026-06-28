@@ -30,21 +30,20 @@
     >
       <template #before>
         <div
+          ref="workspaceSidebarPanelRef"
           class="mainLayoutSidebarSplitter__panel"
           data-test-locator="mainLayout-drawer"
         >
-          <q-list dark>
-            <q-item-label
-              header
-            >
-              {{ $t('mainLayout.drawer.essentialLinksHeader') }}
-            </q-item-label>
-          </q-list>
+          <ProjectHierarchyTreeSearch />
+          <div class="mainLayoutSidebarSplitter__panelBody hasScrollbar">
+            <ProjectWorkspaceWorldList />
+          </div>
         </div>
       </template>
 
       <template #after>
         <q-page-container class="appShellLayout__pageContainer">
+          <ProjectDocumentControlBar />
           <div class="appShellLayout__pageTransitionHost">
             <router-view v-slot="{ Component, route: childRoute }">
               <Transition
@@ -89,6 +88,9 @@
 import AppControlMenus from 'app/src/components/globals/AppControlMenus/AppControlMenus.vue'
 import GlobalLanguageSelector from 'app/src/components/globals/GlobalLanguageSelector/GlobalLanguageSelector.vue'
 import GlobalWindowButtons from 'app/src/components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
+import ProjectDocumentControlBar from 'app/src/components/projectUI/ProjectDocumentControlBar/ProjectDocumentControlBar.vue'
+import ProjectHierarchyTreeSearch from 'app/src/components/projectUI/ProjectHierarchyTreeSearch/ProjectHierarchyTreeSearch.vue'
+import ProjectWorkspaceWorldList from 'app/src/components/projectUI/ProjectWorkspaceWorldList/ProjectWorkspaceWorldList.vue'
 
 import { useMainLayout, useMainLayoutWorkspaceSidebar } from './scripts/mainLayout_manager'
 
@@ -108,7 +110,8 @@ const {
 const {
   onSidebarSplitterWidthUpdate,
   sidebarMinWidthPx,
-  sidebarWidthModel
+  sidebarWidthModel,
+  workspaceSidebarPanelRef
 } = useMainLayoutWorkspaceSidebar()
 </script>
 

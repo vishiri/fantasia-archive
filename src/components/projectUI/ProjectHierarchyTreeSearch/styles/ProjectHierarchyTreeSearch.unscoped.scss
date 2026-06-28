@@ -1,0 +1,64 @@
+@use './variables' as *;
+@use '../../../../layouts/MainLayout/styles/variables' as *;
+
+.projectHierarchyTreeSearch {
+  background-color: $projectHierarchyTreeSearch-backgroundColor;
+  height: $projectHierarchyTreeSearch-rowHeightPx;
+  left: 0;
+  min-height: $projectHierarchyTreeSearch-rowHeightPx;
+  position: fixed;
+  top: calc(#{$mainLayout-appHeader-heightPx} + #{$projectHierarchyTreeSearch-topOffsetPx});
+  z-index: $projectHierarchyTreeSearch-fixedZIndex;
+
+  &--layoutFixed375 {
+    max-width: #{$mainLayout-sidebarMinWidthPx};
+    min-width: #{$mainLayout-sidebarMinWidthPx};
+    width: #{$mainLayout-sidebarMinWidthPx};
+  }
+
+  &--layoutFullViewport {
+    z-index: $projectHierarchyTreeSearch-focusedZIndex;
+  }
+
+  &__appendIcon {
+    font-size: calc(1em * #{$projectHierarchyTreeSearch-appendIconScale});
+  }
+
+  &__inputHost {
+    height: 100%;
+    width: 100%;
+  }
+
+  .q-field--dense .q-field__after,
+  .q-field--dense .q-field__append,
+  .q-field--dense .q-field__before {
+    height: $projectHierarchyTreeSearch-rowHeightPx;
+  }
+
+  .q-field--dense .q-field__control {
+    height: $projectHierarchyTreeSearch-rowHeightPx;
+    min-height: $projectHierarchyTreeSearch-rowHeightPx;
+  }
+
+  .q-field--dense .q-field__label {
+    top: calc((#{$projectHierarchyTreeSearch-rowHeightPx} - 1rem) / 2);
+  }
+
+  .q-field__append {
+    cursor: text;
+  }
+
+  .q-field__control {
+    background-color: $projectHierarchyTreeSearch-backgroundColor;
+    cursor: text;
+
+    &::before {
+      background-color: transparent !important;
+    }
+  }
+
+  .q-field--focused {
+    max-width: inherit;
+    width: 100%;
+  }
+}

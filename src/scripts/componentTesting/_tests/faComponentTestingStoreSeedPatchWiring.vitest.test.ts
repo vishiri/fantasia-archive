@@ -71,3 +71,27 @@ test('Test that patchFaComponentTestingStores merges hidePlushes only', () => {
   expect(mergedSettings.hidePlushes).toBe(false)
   expect(mergedSettings.hideTooltipsProject).toBe(priorHideTooltipsProject)
 })
+
+test('Test that patchFaComponentTestingStores merges disableDocumentControlBar only', () => {
+  const pinia = getActivePinia()
+  if (pinia === undefined) {
+    throw new Error('Expected active Pinia in test')
+  }
+  const settings = S_FaUserSettings()
+  const priorSettings = settings.settings
+  if (priorSettings === null) {
+    throw new Error('Expected user settings in test')
+  }
+  const priorHideTooltipsProject = priorSettings.hideTooltipsProject
+
+  patchFaComponentTestingStores(pinia, {
+    disableDocumentControlBar: true
+  })
+
+  const mergedSettings = settings.settings
+  if (mergedSettings === null) {
+    throw new Error('Expected user settings after patch')
+  }
+  expect(mergedSettings.disableDocumentControlBar).toBe(true)
+  expect(mergedSettings.hideTooltipsProject).toBe(priorHideTooltipsProject)
+})

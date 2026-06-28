@@ -1,13 +1,14 @@
 @use './variables' as *;
 
 .appShellLayout--workspace > .mainLayoutSidebarSplitter {
-  height: calc(100vh - #{$mainLayout-appHeader-heightPx});
-  max-height: calc(100vh - #{$mainLayout-appHeader-heightPx});
+  height: 100vh;
+  max-height: 100vh;
 }
 
 .mainLayoutSidebarSplitter {
   .q-splitter__before {
     overflow: hidden;
+    z-index: inherit !important;
   }
 
   .q-splitter__separator {
@@ -18,9 +19,18 @@
 
   &__panel {
     background-color: $mainLayout-sidebarPanel-backgroundColor;
+    display: flex;
+    flex-direction: column;
     height: 100%;
-    overflow: hidden auto;
+    overflow: hidden;
     user-select: none;
     width: 100%;
+  }
+
+  &__panelBody {
+    flex: 1 1 auto;
+    height: calc(100% - #{$mainLayout-sidebarPanelBodyMarginTopPx});
+    margin-top: $mainLayout-sidebarPanelBodyMarginTopPx;
+    overflow: hidden auto;
   }
 }

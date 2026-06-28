@@ -1,0 +1,9 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - PROJECT DOCUMENT CONTROL BAR */
+$projectDocumentControlBar-backgroundColor: fa-v('dark', $dark);
+$projectDocumentControlBar-bottomBorderColor: rgba($grey-lighter, 0.2);
+$projectDocumentControlBar-minHeightPx: 48px;
+$projectDocumentControlBar-topOffsetPx: 2.5px;
+$projectDocumentControlBar-widthOffsetPx: 375px;
+$projectDocumentControlBar-zIndex: 999;

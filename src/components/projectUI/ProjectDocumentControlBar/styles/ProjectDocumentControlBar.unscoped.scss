@@ -1,0 +1,21 @@
+@use './variables' as *;
+@use '../../../../layouts/MainLayout/styles/variables' as mainLayout;
+
+.projectDocumentControlBar {
+  background-color: $projectDocumentControlBar-backgroundColor;
+  border-bottom: 1px solid $projectDocumentControlBar-bottomBorderColor;
+  left: $projectDocumentControlBar-widthOffsetPx;
+  min-height: $projectDocumentControlBar-minHeightPx;
+  min-width: calc(100vw - #{$projectDocumentControlBar-widthOffsetPx});
+  position: fixed;
+  right: 0;
+  top: calc(#{mainLayout.$mainLayout-appHeader-heightPx} + #{$projectDocumentControlBar-topOffsetPx});
+  z-index: $projectDocumentControlBar-zIndex;
+}
+
+.projectDocumentControlBar__flowSpacer {
+  flex-shrink: 0;
+  min-height: $projectDocumentControlBar-minHeightPx;
+  pointer-events: none;
+  width: 100%;
+}

@@ -20,4 +20,9 @@ export interface I_faComponentTestingStoreSeed {
    * When defined, patches hideTooltipsProject on S_FaUserSettings (merged with the current settings object).
    */
   hideTooltipsProject?: boolean | undefined
+
+  /**
+   * When defined, patches disableDocumentControlBar on S_FaUserSettings (merged with the current settings object).
+   */
+  disableDocumentControlBar?: boolean | undefined
 }

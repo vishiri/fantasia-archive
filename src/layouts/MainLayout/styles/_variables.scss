@@ -1,9 +1,14 @@
 @use '../../../css/app.palette.scss' as *;
 
 /* LAYOUT - MAIN LAYOUT */
-$mainLayout-appHeader-backgroundColor: fa-v('dark-lighter', $dark-lighter);
+$mainLayout-appHeader-backgroundColor: fa-v('dark-middle', $dark-middle);
 $mainLayout-appHeader-zIndex: 7000;
-$mainLayout-appHeader-heightPx: 50px;
+$mainLayout-appHeader-heightPx: 33px;
 $mainLayout-sidebarMinWidthPx: 375px;
 $mainLayout-sidebarPanel-backgroundColor: fa-v('dark', $dark);
-$mainLayout-sidebarSplitterSeparator-zIndex: 6000;
+$mainLayout-sidebarSplitterSeparator-zIndex: 500;
+$mainLayout-sidebarSearchRowHeightPx: 48px;
+$mainLayout-sidebarSearchRowTopOffsetPx: 2.5px;
+$mainLayout-sidebarPanelBodyMarginTopPx: calc(
+  #{$mainLayout-appHeader-heightPx} + #{$mainLayout-sidebarSearchRowTopOffsetPx} + #{$mainLayout-sidebarSearchRowHeightPx}
+);

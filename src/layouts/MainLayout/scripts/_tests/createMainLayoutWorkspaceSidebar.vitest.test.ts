@@ -1,11 +1,16 @@
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import { createMainLayoutWorkspaceSidebar } from '../functions/createMainLayoutWorkspaceSidebar'
 
 const persistSidebarWidthMock = vi.fn(async (): Promise<boolean> => true)
 const refreshProjectSidebarMock = vi.fn(async (): Promise<boolean> => true)
+const refreshWorkspaceWorldsMock = vi.fn(async (): Promise<void> => undefined)
 const resetToDefaultMock = vi.fn()
+const setLiveWorkspaceSidebarWidthPxMock = vi.fn()
+const attachWorkspaceSidebarLiveWidthSyncMock = vi.fn((): (() => void) => {
+  return () => undefined
+})
 
 let activeProjectId: string | null = 'project-a'
 let sidebarWidthPx = 375
@@ -34,20 +39,7 @@ function debounceSidebarWidthPersist<T extends (...args: never[]) => void> (
   return debounced
 }
 
-beforeEach(() => {
-  persistSidebarWidthMock.mockReset()
-  persistSidebarWidthMock.mockResolvedValue(true)
-  refreshProjectSidebarMock.mockReset()
-  refreshProjectSidebarMock.mockResolvedValue(true)
-  resetToDefaultMock.mockReset()
-  activeProjectId = 'project-a'
-  sidebarWidthPx = 375
-  vi.useFakeTimers()
-})
-
-test('Test that splitter width updates persist ceiled width through the sidebar store', async () => {
-  const unmountedHooks: Array<() => void> = []
-
+function buildUseSidebar (): ReturnType<ReturnType<typeof createMainLayoutWorkspaceSidebar>> {
   const useSidebar = createMainLayoutWorkspaceSidebar({
     S_FaActiveProject: () => ({
       activeProject: activeProjectId === null ? null : { id: activeProjectId },
@@ -57,8 +49,48 @@ test('Test that splitter width updates persist ceiled width through the sidebar 
       persistSidebarWidth: persistSidebarWidthMock,
       refreshProjectSidebar: refreshProjectSidebarMock,
       resetToDefault: resetToDefaultMock,
+      setLiveWorkspaceSidebarWidthPx: setLiveWorkspaceSidebarWidthPxMock,
       widthPx: sidebarWidthPx
     }) as never,
+    S_FaProjectWorkspaceWorlds: () => ({
+      refreshWorkspaceWorlds: refreshWorkspaceWorldsMock
+    }) as never,
+    attachWorkspaceSidebarLiveWidthSync: attachWorkspaceSidebarLiveWidthSyncMock,
+    bindWorkspaceSidebarLiveWidthSync: ({
+      attachWorkspaceSidebarLiveWidthSync,
+      onUnmounted,
+      ref: refFactory,
+      setLiveWorkspaceSidebarWidthPx,
+      watch: watchFn
+    }) => {
+      const workspaceSidebarPanelRef = refFactory<HTMLElement | null>(null)
+      let detachLiveWidthSync: (() => void) | undefined
+
+      watchFn(
+        () => workspaceSidebarPanelRef.value,
+        (panelElement) => {
+          if (detachLiveWidthSync !== undefined) {
+            detachLiveWidthSync()
+            detachLiveWidthSync = undefined
+          }
+          if (panelElement === null) {
+            return
+          }
+          detachLiveWidthSync = attachWorkspaceSidebarLiveWidthSync({
+            onWidthPx: setLiveWorkspaceSidebarWidthPx,
+            panelElement
+          })
+        }
+      )
+
+      onUnmounted(() => {
+        if (detachLiveWidthSync !== undefined) {
+          detachLiveWidthSync()
+        }
+      })
+
+      return workspaceSidebarPanelRef
+    },
     debounceSidebarWidthPersist,
     nextTick: async (fn) => {
       await Promise.resolve()
@@ -72,13 +104,39 @@ test('Test that splitter width updates persist ceiled width through the sidebar 
     sidebarDefaultWidthPx: 375,
     sidebarMinWidthPx: 375,
     sidebarWidthPersistDebounceMs: 150,
-    watch: () => undefined
+    watch: watch as never
   })
 
-  const api = useSidebar()
+  return useSidebar()
+}
+
+const unmountedHooks: Array<() => void> = []
+
+beforeEach(() => {
+  persistSidebarWidthMock.mockReset()
+  persistSidebarWidthMock.mockResolvedValue(true)
+  refreshProjectSidebarMock.mockReset()
+  refreshProjectSidebarMock.mockResolvedValue(true)
+  resetToDefaultMock.mockReset()
+  setLiveWorkspaceSidebarWidthPxMock.mockReset()
+  attachWorkspaceSidebarLiveWidthSyncMock.mockReset()
+  attachWorkspaceSidebarLiveWidthSyncMock.mockImplementation(() => {
+    return () => undefined
+  })
+  activeProjectId = 'project-a'
+  sidebarWidthPx = 375
+  unmountedHooks.length = 0
+  vi.useFakeTimers()
+})
+
+test('Test that splitter width updates persist ceiled width through the sidebar store', async () => {
+  const api = buildUseSidebar()
 
   api.sidebarWidthModel.value = 512.4
   api.onSidebarSplitterWidthUpdate(512.4)
+
+  expect(setLiveWorkspaceSidebarWidthPxMock).not.toHaveBeenCalled()
+  expect(persistSidebarWidthMock).not.toHaveBeenCalled()
 
   await vi.advanceTimersByTimeAsync(150)
 
@@ -93,32 +151,7 @@ test('Test that splitter width updates persist ceiled width through the sidebar 
 test('Test that splitter width updates skip persist when no active project is loaded', async () => {
   activeProjectId = null
 
-  const useSidebar = createMainLayoutWorkspaceSidebar({
-    S_FaActiveProject: () => ({
-      activeProject: null,
-      hasActiveProject: false
-    }) as never,
-    S_FaProjectSidebar: () => ({
-      persistSidebarWidth: persistSidebarWidthMock,
-      refreshProjectSidebar: refreshProjectSidebarMock,
-      resetToDefault: resetToDefaultMock,
-      widthPx: sidebarWidthPx
-    }) as never,
-    debounceSidebarWidthPersist,
-    nextTick: async (fn) => {
-      await Promise.resolve()
-      fn?.()
-    },
-    onMounted: () => undefined,
-    onUnmounted: () => undefined,
-    ref,
-    sidebarDefaultWidthPx: 375,
-    sidebarMinWidthPx: 375,
-    sidebarWidthPersistDebounceMs: 150,
-    watch: () => undefined
-  })
-
-  const api = useSidebar()
+  const api = buildUseSidebar()
 
   api.sidebarWidthModel.value = 500
   api.onSidebarSplitterWidthUpdate(500)
@@ -127,4 +160,17 @@ test('Test that splitter width updates skip persist when no active project is lo
 
   expect(persistSidebarWidthMock).not.toHaveBeenCalled()
   vi.useRealTimers()
+})
+
+test('Test that workspace sidebar panel ref attaches live width sync', async () => {
+  const api = buildUseSidebar()
+  const panelElement = document.createElement('div')
+
+  api.workspaceSidebarPanelRef.value = panelElement
+  await Promise.resolve()
+
+  expect(attachWorkspaceSidebarLiveWidthSyncMock).toHaveBeenCalledWith({
+    onWidthPx: expect.any(Function),
+    panelElement
+  })
 })

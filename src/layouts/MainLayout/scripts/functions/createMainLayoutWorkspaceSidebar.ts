@@ -10,8 +10,29 @@ type T_createMainLayoutWorkspaceSidebarDeps = {
     persistSidebarWidth: (widthPx: number) => Promise<boolean>
     refreshProjectSidebar: () => Promise<boolean>
     resetToDefault: () => void
+    setLiveWorkspaceSidebarWidthPx: (widthPx: number) => void
     widthPx: number
   }
+  S_FaProjectWorkspaceWorlds: () => StoreGeneric & {
+    refreshWorkspaceWorlds: () => Promise<void>
+  }
+  attachWorkspaceSidebarLiveWidthSync: (input: {
+    onWidthPx: (widthPx: number) => void
+    panelElement: HTMLElement
+  }) => () => void
+  bindWorkspaceSidebarLiveWidthSync: (input: {
+    attachWorkspaceSidebarLiveWidthSync: (options: {
+      onWidthPx: (widthPx: number) => void
+      panelElement: HTMLElement
+    }) => () => void
+    onUnmounted: (hook: () => void) => void
+    ref: <T>(value: T) => I_ref<T>
+    setLiveWorkspaceSidebarWidthPx: (widthPx: number) => void
+    watch: (
+      source: () => HTMLElement | null,
+      effect: (panelElement: HTMLElement | null) => void
+    ) => void
+  }) => I_ref<HTMLElement | null>
   debounceSidebarWidthPersist: <T extends (...args: never[]) => void>(
     fn: T,
     waitMs: number
@@ -23,10 +44,16 @@ type T_createMainLayoutWorkspaceSidebarDeps = {
   sidebarDefaultWidthPx: number
   sidebarMinWidthPx: number
   sidebarWidthPersistDebounceMs: number
-  watch: (
-    source: () => string | null,
-    effect: (projectId: string | null) => void | Promise<void>
-  ) => void
+  watch: {
+    (
+      source: () => string | null,
+      effect: (projectId: string | null) => void | Promise<void>
+    ): void
+    (
+      source: () => HTMLElement | null,
+      effect: (panelElement: HTMLElement | null) => void
+    ): void
+  }
 }
 
 export function createMainLayoutWorkspaceSidebar (
@@ -35,11 +62,25 @@ export function createMainLayoutWorkspaceSidebar (
     onSidebarSplitterWidthUpdate: (widthPx: number) => void
     sidebarMinWidthPx: number
     sidebarWidthModel: I_ref<number>
+    workspaceSidebarPanelRef: I_ref<HTMLElement | null>
   } {
   return function useMainLayoutWorkspaceSidebar () {
     const sidebarWidthModel = deps.ref(deps.sidebarDefaultWidthPx)
     const sidebarMinWidthPx = deps.sidebarMinWidthPx
     let suppressSidebarWidthPersist = false
+
+    const workspaceSidebarPanelRef = deps.bindWorkspaceSidebarLiveWidthSync({
+      attachWorkspaceSidebarLiveWidthSync: deps.attachWorkspaceSidebarLiveWidthSync,
+      onUnmounted: deps.onUnmounted,
+      ref: deps.ref,
+      setLiveWorkspaceSidebarWidthPx: (widthPx) => {
+        deps.S_FaProjectSidebar().setLiveWorkspaceSidebarWidthPx(widthPx)
+      },
+      watch: deps.watch as (
+        source: () => HTMLElement | null,
+        effect: (panelElement: HTMLElement | null) => void
+      ) => void
+    })
 
     function syncSidebarWidthFromStore (): void {
       suppressSidebarWidthPersist = true
@@ -76,12 +117,20 @@ export function createMainLayoutWorkspaceSidebar (
       scheduleSidebarWidthPersist.flush()
     })
 
+    deps.onMounted(() => {
+      const projectId = deps.S_FaActiveProject().activeProject?.id ?? null
+      if (projectId !== null) {
+        void deps.S_FaProjectWorkspaceWorlds().refreshWorkspaceWorlds()
+      }
+    })
+
     deps.watch(
       () => deps.S_FaActiveProject().activeProject?.id ?? null,
       async (projectId) => {
         scheduleSidebarWidthPersist.flush()
         if (projectId === null) {
           deps.S_FaProjectSidebar().resetToDefault()
+          await deps.S_FaProjectWorkspaceWorlds().refreshWorkspaceWorlds()
           suppressSidebarWidthPersist = true
           sidebarWidthModel.value = deps.sidebarDefaultWidthPx
           void deps.nextTick(() => {
@@ -90,6 +139,7 @@ export function createMainLayoutWorkspaceSidebar (
           return
         }
         await deps.S_FaProjectSidebar().refreshProjectSidebar()
+        await deps.S_FaProjectWorkspaceWorlds().refreshWorkspaceWorlds()
         syncSidebarWidthFromStore()
       }
     )
@@ -97,7 +147,8 @@ export function createMainLayoutWorkspaceSidebar (
     return {
       onSidebarSplitterWidthUpdate,
       sidebarMinWidthPx,
-      sidebarWidthModel
+      sidebarWidthModel,
+      workspaceSidebarPanelRef
     }
   }
 }

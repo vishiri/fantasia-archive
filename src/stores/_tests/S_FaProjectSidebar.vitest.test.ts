@@ -46,7 +46,27 @@ beforeEach(async () => {
   store = stores.S_FaProjectSidebar()
 })
 
-test('Test that refreshProjectSidebar returns false when the bridge is missing', async () => {
+test('Test that setLiveWorkspaceSidebarWidthPx mirrors panel width without persisting', () => {
+  store.setLiveWorkspaceSidebarWidthPx(512.4)
+  expect(store.liveWidthPx).toBe(512.4)
+  expect(setProjectSidebarMock).not.toHaveBeenCalled()
+})
+
+test('Test that persistSidebarWidth still writes after setLiveWorkspaceSidebarWidthPx changed the live width', async () => {
+  getProjectSidebarMock.mockResolvedValueOnce({
+    schemaVersion: 1,
+    widthPx: 375
+  })
+  await store.refreshProjectSidebar()
+  store.setLiveWorkspaceSidebarWidthPx(512.4)
+  expect(store.liveWidthPx).toBe(512.4)
+  const ok = await store.persistSidebarWidth(513)
+  expect(ok).toBe(true)
+  expect(setProjectSidebarMock).toHaveBeenCalledWith({ widthPx: 513 })
+  expect(store.liveWidthPx).toBe(513)
+})
+
+test('Test that refreshProjectSidebar mirrors widthPx from the bridge', async () => {
   Object.assign(window.faContentBridgeAPIs, { projectManagement: undefined as never })
   const ok = await store.refreshProjectSidebar()
   expect(ok).toBe(false)
@@ -60,6 +80,7 @@ test('Test that refreshProjectSidebar mirrors widthPx from the bridge', async ()
   const ok = await store.refreshProjectSidebar()
   expect(ok).toBe(true)
   expect(store.widthPx).toBe(512)
+  expect(store.liveWidthPx).toBe(512)
 })
 
 test('Test that persistSidebarWidth skips IPC when the ceiled width is unchanged', async () => {

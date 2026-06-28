@@ -74,6 +74,15 @@ export async function mountMainLayoutForVitest (
         GlobalWindowButtons: {
           template: '<div data-test-stub="global-window-buttons" />'
         },
+        ProjectDocumentControlBar: {
+          template: '<div data-test-locator="projectDocumentControlBar" />'
+        },
+        ProjectHierarchyTreeSearch: {
+          template: '<div data-test-locator="projectHierarchyTreeSearch" />'
+        },
+        ProjectWorkspaceWorldList: {
+          template: '<div data-test-locator="projectWorkspaceWorldList" />'
+        },
         QSplitter: {
           props: ['modelValue', 'unit', 'limits'],
           template: `
