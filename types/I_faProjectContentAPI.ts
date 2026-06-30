@@ -27,6 +27,14 @@ import type {
   I_faProjectMediaPatch
 } from 'app/types/I_faProjectMediaDomain'
 import type {
+  I_faProjectHierarchyTreeDocumentChild,
+  I_faProjectHierarchyTreeListPlacementChildrenInput,
+  I_faProjectHierarchyTreeListPlacementChildrenResult,
+  I_faProjectHierarchyTreeMoveDocumentInput,
+  I_faProjectHierarchyTreeSearchResult,
+  I_faProjectHierarchyTreeWorkspaceLayoutResult
+} from 'app/types/I_faProjectHierarchyTreeDomain'
+import type {
   I_faProjectWorld,
   I_faProjectWorldCreateInput,
   I_faProjectWorldListResult,
@@ -60,6 +68,14 @@ export interface I_faProjectContentAPI {
   listMedia: () => Promise<I_faProjectMediaListResult>
   listWorlds: () => Promise<I_faProjectWorldListResult>
   listWorldsForProjectSettings: () => Promise<I_faProjectWorldsForProjectSettingsResult>
+  listWorkspaceHierarchyLayout: () => Promise<I_faProjectHierarchyTreeWorkspaceLayoutResult>
+  listPlacementDocumentChildren: (
+    input: I_faProjectHierarchyTreeListPlacementChildrenInput
+  ) => Promise<I_faProjectHierarchyTreeListPlacementChildrenResult>
+  moveDocumentInHierarchy: (
+    input: I_faProjectHierarchyTreeMoveDocumentInput
+  ) => Promise<I_faProjectHierarchyTreeDocumentChild>
+  searchProjectHierarchy: (query: string) => Promise<I_faProjectHierarchyTreeSearchResult>
   saveDocumentTemplatesSnapshot: (items: I_faProjectDocumentTemplateSnapshotItem[]) => Promise<void>
   saveWorldsSnapshot: (items: I_faProjectWorldSnapshotItem[]) => Promise<void>
   setDocumentTemplate: (input: I_faProjectSetDocumentTemplateInput) => Promise<I_faProjectDocument>

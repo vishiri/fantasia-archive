@@ -5,9 +5,16 @@
 
 ### New features
 - **Workspace sidebar**: Drag the splitter beside the left panel on the **home** workspace route to resize it. Width saves per **`.faproject`** when you release the drag (minimum **375px**; no upper limit; sidebar cannot collapse to zero).
-- **Workspace sidebar**: A **Search...** field sits above the hierarchy area (visual only for now). When focused it stretches across the full window width; when the **Disable document control bar** app setting is off, a blank document control strip appears beside it on the main pane. World names from the open project list below the search field in project priority order.
+- **Workspace sidebar**: Virtualized hierarchy tree lists each world's template layout (groups and placements) with lazy-loaded documents. Expand and collapse state plus scroll position persist per project. Drag documents to reorder within the same template placement. Click a document row to emit its id for future editor wiring.
+- **Workspace sidebar**: **Search...** filters documents in the open project and reveals the first match in the hierarchy tree. When focused it stretches across the full window width; when the **Disable document control bar** app setting is off, a blank document control strip appears beside it on the main pane.
 
 ### Bugfixes & Optimizations
+- **Project Settings**: Saving worlds and document templates no longer fails when the hierarchy tree already has documents in template placements (layout rows update in place instead of delete-and-reinsert).
+- **Project Settings**: Saving a world layout that removes template placements (for example moving all templates back to **Available document templates**) no longer fails when those placements still had hierarchy documents; those documents are deleted with the removed placements.
+- **Workspace sidebar**: The hierarchy tree refreshes after **Project Settings** save and reloads document rows under template placements (including dev test documents seeded on save).
+- **Workspace sidebar**: Expanding a template placement in the hierarchy tree now lazy-loads and displays document rows from the project database.
+- **Workspace sidebar**: Dragging a document in the hierarchy tree no longer changes which worlds, groups, or template placements stay expanded; collapse now clears hidden descendant expand ids, drag restore snapshots live open state (not stale persist rows), and reopen no longer walks orphan placement ids left under a collapsed parent.
+- **Workspace sidebar**: The hierarchy tree shows expand and collapse controls on rows with children; template placements that contain documents open by default on first visit so seeded test documents appear without an extra click.
 - **Workspace sidebar**: The hierarchy **Search...** row and document control strip share **48px** height; the dense search field keeps its label and icons aligned within that row.
 - **Workspace sidebar**: With **Disable document control bar** on, the hierarchy **Search...** row tracks the sidebar panel width in real time while you drag the splitter (via a live width observer); saving **sidebar_width** to the project database still happens only after you release the drag.
 - **App Settings**: Toggles in **Fantasia Archive Settings** update the dialog draft only until you choose **Save**; they no longer change the running app (for example the document control bar or project overview tips) while the dialog stays open.

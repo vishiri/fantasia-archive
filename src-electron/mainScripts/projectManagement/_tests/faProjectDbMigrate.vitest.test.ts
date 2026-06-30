@@ -8,6 +8,7 @@ import {
 } from '../faProjectDbMigrateWiring'
 
 const seedFaProjectDefaultWorldIfEmptyMock = vi.hoisted(() => vi.fn())
+const hierarchySchemaPatchMock = vi.hoisted(() => vi.fn())
 
 vi.mock('../projectDbContent/faProjectWorldBootstrapWiring', () => {
   return {
@@ -15,8 +16,15 @@ vi.mock('../projectDbContent/faProjectWorldBootstrapWiring', () => {
   }
 })
 
+vi.mock('../functions/faProjectDocumentsHierarchySchemaPatch', () => {
+  return {
+    createApplyFaProjectDocumentsHierarchySchemaPatch: () => hierarchySchemaPatchMock
+  }
+})
+
 beforeEach(() => {
   seedFaProjectDefaultWorldIfEmptyMock.mockClear()
+  hierarchySchemaPatchMock.mockClear()
 })
 
 function applyMockUserVersionPragma (
@@ -136,7 +144,7 @@ test('assertFaProjectDatabaseQuickCheck passes when pragma reports ok', () => {
   assertFaProjectDatabaseQuickCheck(db as never)
 })
 
-test('applyFaProjectMigrations is a no-op when user_version already at maximum', () => {
+test('applyFaProjectMigrations applies hierarchy patch when user_version already at maximum', () => {
   const db = {
     exec: vi.fn(),
     prepare: vi.fn(),
@@ -149,7 +157,7 @@ test('applyFaProjectMigrations is a no-op when user_version already at maximum',
     transaction: vi.fn()
   }
   applyFaProjectMigrations(db as never, 'Idle')
-  expect(db.exec).not.toHaveBeenCalled()
+  expect(hierarchySchemaPatchMock).toHaveBeenCalledWith(db)
   expect(seedFaProjectDefaultWorldIfEmptyMock).not.toHaveBeenCalled()
 })
 

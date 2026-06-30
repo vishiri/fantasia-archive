@@ -46,7 +46,10 @@ function stubDocument () {
   return {
     ...stubNamedEntity(),
     templateId: null,
-    worldId: '550e8400-e29b-41d4-a716-446655440000'
+    worldId: '550e8400-e29b-41d4-a716-446655440000',
+    placementId: null,
+    parentDocumentId: null,
+    sortOrder: 0
   }
 }
 
@@ -77,6 +80,22 @@ export function createFaProjectContentBridgeHarnessStub (): I_faProjectContentAP
     listMedia: emptyList,
     listWorlds: emptyList,
     listWorldsForProjectSettings: async () => ({ items: [stubWorldForSettings()] }),
+    listWorkspaceHierarchyLayout: async () => ({ worlds: [] }),
+    listPlacementDocumentChildren: emptyList,
+    moveDocumentInHierarchy: async () => ({
+      id: '550e8400-e29b-41d4-a716-446655440000',
+      displayName: 'Stub',
+      placementId: 'placement-stub',
+      parentDocumentId: null,
+      sortOrder: 0,
+      hasChildren: false
+    }),
+    searchProjectHierarchy: async (query) => {
+      return {
+        hits: [],
+        query
+      }
+    },
     saveDocumentTemplatesSnapshot: noop,
     saveWorldsSnapshot: noop,
     setDocumentTemplate: async () => stubDocument(),

@@ -4,10 +4,11 @@ import { createPinia, setActivePinia } from 'pinia'
 
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 
-const { updateProjectSettingsMock, persistWorldsSnapshotMock, persistDocumentTemplatesSnapshotMock, notifyCreateMock, refreshWorkspaceWorldsMock } = vi.hoisted(() => ({
+const { updateProjectSettingsMock, persistWorldsSnapshotMock, persistDocumentTemplatesSnapshotMock, notifyCreateMock, refreshWorkspaceWorldsMock, refreshHierarchyLayoutMock } = vi.hoisted(() => ({
   notifyCreateMock: vi.fn(),
   persistDocumentTemplatesSnapshotMock: vi.fn(async () => undefined),
   persistWorldsSnapshotMock: vi.fn(async () => undefined),
+  refreshHierarchyLayoutMock: vi.fn(async () => undefined),
   refreshWorkspaceWorldsMock: vi.fn(async () => undefined),
   updateProjectSettingsMock: vi.fn(async () => undefined)
 }))
@@ -56,6 +57,16 @@ vi.mock('app/src/stores/S_FaProjectWorkspaceWorlds', () => {
   }
 })
 
+vi.mock('app/src/stores/S_FaProjectHierarchyTree', () => {
+  return {
+    S_FaProjectHierarchyTree: () => {
+      return {
+        refreshLayout: refreshHierarchyLayoutMock
+      }
+    }
+  }
+})
+
 beforeEach(() => {
   setActivePinia(createPinia())
   vi.resetModules()
@@ -64,6 +75,7 @@ beforeEach(() => {
   persistWorldsSnapshotMock.mockReset()
   persistDocumentTemplatesSnapshotMock.mockReset()
   refreshWorkspaceWorldsMock.mockReset()
+  refreshHierarchyLayoutMock.mockReset()
   S_FaActiveProject().clearActiveProject()
 })
 
@@ -119,6 +131,7 @@ test('Test that handleSaveProjectSettings persists worlds snapshot when provided
   expect(updateProjectSettingsMock).toHaveBeenCalledWith({ projectName: 'Renamed' })
   expect(persistWorldsSnapshotMock).toHaveBeenCalledWith(worlds)
   expect(refreshWorkspaceWorldsMock).toHaveBeenCalledTimes(1)
+  expect(refreshHierarchyLayoutMock).toHaveBeenCalledTimes(1)
 })
 
 /**

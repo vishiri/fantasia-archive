@@ -13,6 +13,7 @@ import {
   updateFaProjectWorldRow
 } from './faProjectWorldsSqlWiring'
 import { replaceFaProjectWorldTemplateLayoutSnapshot } from './faProjectWorldTemplateLayoutSnapshotWiring'
+import { seedFaProjectHierarchyTestDocumentsForPlacements } from './faProjectHierarchyTestDocumentSeedWiring'
 import { serializeFaProjectWorldDisplayNameTranslationsJson } from 'app/src-electron/shared/faProjectWorldDisplayNameTranslationsSchema'
 import { resolveFaProjectWorldDisplayNameForStorage } from 'app/src/scripts/projectWorlds/faProjectWorldDisplayName_manager'
 import type { I_faProjectWorldSnapshotItem } from 'app/types/I_faProjectWorldDomain'
@@ -73,6 +74,7 @@ export function replaceFaProjectWorldsSnapshot (
         replaceFaProjectWorldTemplateLayoutSnapshot(db, item.id, item.templateLayout)
       }
     })
+    seedFaProjectHierarchyTestDocumentsForPlacements(db)
   })
 
   runReplace()

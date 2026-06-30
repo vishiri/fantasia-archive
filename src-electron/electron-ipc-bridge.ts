@@ -88,6 +88,10 @@ export const FA_PROJECT_MANAGEMENT_IPC = {
     'fa-project-management-set-project-settings-patch-async',
   setProjectSidebarPatchAsync:
     'fa-project-management-set-project-sidebar-patch-async',
+  getHierarchyTreeUiStateAsync:
+    'fa-project-management-get-hierarchy-tree-ui-state-async',
+  setHierarchyTreeUiStatePatchAsync:
+    'fa-project-management-set-hierarchy-tree-ui-state-patch-async',
   setProjectStylingPatchAsync:
     'fa-project-management-set-project-styling-patch-async',
   stageE2eNextProjectCreatePathAsync:
@@ -127,7 +131,11 @@ export const FA_PROJECT_CONTENT_IPC = {
   updateDocumentAsync: 'fa-project-content-update-document-async',
   updateDocumentTemplateAsync: 'fa-project-content-update-document-template-async',
   updateMediaAsync: 'fa-project-content-update-media-async',
-  updateWorldAsync: 'fa-project-content-update-world-async'
+  updateWorldAsync: 'fa-project-content-update-world-async',
+  listWorkspaceHierarchyLayoutAsync: 'fa-project-content-list-workspace-hierarchy-layout-async',
+  listPlacementDocumentChildrenAsync: 'fa-project-content-list-placement-document-children-async',
+  moveDocumentInHierarchyAsync: 'fa-project-content-move-document-in-hierarchy-async',
+  searchProjectHierarchyAsync: 'fa-project-content-search-project-hierarchy-async'
 } as const
 
 /**

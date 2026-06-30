@@ -89,10 +89,9 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_DATA_TABLE_NAME} (
 }
 
 /**
- * Creates worldbuilding content tables and indexes for schema version 1.
- * Idempotent when tables already exist.
+ * Creates worldbuilding content tables through media (schema version 1).
  */
-export function applyFaProjectContentSchemaV1 (db: I_faProjectDbExec): void {
+function applyFaProjectContentSchemaV1CoreTables (db: I_faProjectDbExec): void {
   db.exec(`
 CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_WORLDS} (
   id TEXT NOT NULL PRIMARY KEY,
@@ -132,11 +131,21 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_MEDIA} (
   created_at_ms INTEGER NOT NULL,
   updated_at_ms INTEGER NOT NULL
 );
+`)
+}
 
+/**
+ * Creates documents, layout, and content indexes for schema version 1.
+ */
+function applyFaProjectContentSchemaV1DocumentsAndIndexes (db: I_faProjectDbExec): void {
+  db.exec(`
 CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_DOCUMENTS} (
   id TEXT NOT NULL PRIMARY KEY,
   world_id TEXT NOT NULL REFERENCES ${FA_PROJECT_TABLE_WORLDS}(id) ON DELETE RESTRICT,
   template_id TEXT REFERENCES ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES}(id) ON DELETE RESTRICT,
+  placement_id TEXT REFERENCES ${FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS}(id) ON DELETE RESTRICT,
+  parent_document_id TEXT REFERENCES ${FA_PROJECT_TABLE_DOCUMENTS}(id) ON DELETE CASCADE,
+  sort_order INTEGER NOT NULL DEFAULT 0,
   display_name TEXT NOT NULL CHECK (length(display_name) > 0),
   created_at_ms INTEGER NOT NULL,
   updated_at_ms INTEGER NOT NULL
@@ -192,9 +201,20 @@ CREATE INDEX IF NOT EXISTS idx_world_template_placements_document_template_id
   ON ${FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS}(document_template_id);
 CREATE INDEX IF NOT EXISTS idx_documents_world_id ON ${FA_PROJECT_TABLE_DOCUMENTS}(world_id);
 CREATE INDEX IF NOT EXISTS idx_documents_template_id ON ${FA_PROJECT_TABLE_DOCUMENTS}(template_id);
+CREATE INDEX IF NOT EXISTS idx_documents_placement_parent_sort
+  ON ${FA_PROJECT_TABLE_DOCUMENTS}(placement_id, parent_document_id, sort_order);
 CREATE INDEX IF NOT EXISTS idx_document_media_media_id ON ${FA_PROJECT_TABLE_DOCUMENT_MEDIA}(media_id);
 CREATE INDEX IF NOT EXISTS idx_worlds_sort_order ON ${FA_PROJECT_TABLE_WORLDS}(sort_order);
 CREATE INDEX IF NOT EXISTS idx_document_templates_sort_order
   ON ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES}(sort_order);
 `)
+}
+
+/**
+ * Creates worldbuilding content tables and indexes for schema version 1.
+ * Idempotent when tables already exist.
+ */
+export function applyFaProjectContentSchemaV1 (db: I_faProjectDbExec): void {
+  applyFaProjectContentSchemaV1CoreTables(db)
+  applyFaProjectContentSchemaV1DocumentsAndIndexes(db)
 }

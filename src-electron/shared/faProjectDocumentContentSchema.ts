@@ -20,13 +20,19 @@ const nullableTemplateIdSchema = z.union([
 export const faProjectDocumentCreateInputSchema = z.object({
   displayName: faProjectContentDisplayNameSchema,
   templateId: nullableTemplateIdSchema.optional(),
-  worldId: faProjectContentIdSchema
+  worldId: faProjectContentIdSchema,
+  placementId: nullableTemplateIdSchema.optional(),
+  parentDocumentId: nullableTemplateIdSchema.optional(),
+  sortOrder: z.number().int().min(0).optional()
 }).strict()
 
 export const faProjectDocumentPatchSchema = z.object({
   displayName: faProjectContentDisplayNameSchema.optional(),
   templateId: nullableTemplateIdSchema.optional(),
-  worldId: faProjectContentIdSchema.optional()
+  worldId: faProjectContentIdSchema.optional(),
+  placementId: nullableTemplateIdSchema.optional(),
+  parentDocumentId: nullableTemplateIdSchema.optional(),
+  sortOrder: z.number().int().min(0).optional()
 }).strict()
 
 export const faProjectDocumentIdPayloadSchema = z.object({

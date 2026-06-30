@@ -142,6 +142,31 @@ test('projectManagementAPI getProjectSidebar invokes IPC', async () => {
   expect(invokeMock).toHaveBeenCalledWith(FA_PROJECT_MANAGEMENT_IPC.getProjectSidebarAsync)
 })
 
+test('projectManagementAPI getHierarchyTreeUiState invokes IPC', async () => {
+  const snapshot = {
+    schemaVersion: 1 as const,
+    expandedNodeIds: ['world-1'],
+    scrollTopPx: 12
+  }
+
+  invokeMock.mockResolvedValueOnce(snapshot)
+  const r = await projectManagementAPI.getHierarchyTreeUiState()
+  expect(r).toEqual(snapshot)
+  expect(invokeMock).toHaveBeenCalledWith(FA_PROJECT_MANAGEMENT_IPC.getHierarchyTreeUiStateAsync)
+})
+
+test('projectManagementAPI setHierarchyTreeUiState invokes IPC with cloned patch', async () => {
+  invokeMock.mockResolvedValueOnce(true)
+  const patch = { scrollTopPx: 48 }
+  const persisted = await projectManagementAPI.setHierarchyTreeUiState(patch)
+  expect(persisted).toBe(true)
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.setHierarchyTreeUiStatePatchAsync,
+    { scrollTopPx: 48 }
+  )
+  expect(patch.scrollTopPx).toBe(48)
+})
+
 test('projectManagementAPI setProjectSidebar invokes IPC with cloned patch', async () => {
   invokeMock.mockResolvedValueOnce(true)
   const patch = { widthPx: 512 }

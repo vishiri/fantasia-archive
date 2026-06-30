@@ -1,0 +1,108 @@
+@use '../../../../css/app.palette.scss' as *;
+@use '../../../../css/theme/quasar-components/qFocusable.variables' as *;
+
+.projectHierarchyTreeHost {
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+}
+
+.projectHierarchyTree {
+  height: 100%;
+  overflow: auto;
+  width: 100%;
+
+  &--listDragging {
+    user-select: none;
+  }
+}
+
+.projectHierarchyTreeHost .tree-node {
+  align-items: center;
+  display: flex;
+  width: 100%;
+}
+
+.projectHierarchyTreeHost .tree-node-inner {
+  flex-grow: 1;
+}
+
+/* he-tree row kind hooks: projectHierarchyTree-treeNode--world|group|placement|document */
+
+.projectHierarchyTree__nodeRow {
+  min-height: 28px;
+  position: relative;
+  width: 100%;
+}
+
+.projectHierarchyTree__nodeContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.projectHierarchyTree__dragHandle {
+  cursor: grab;
+}
+
+.projectHierarchyTree--listDragging .projectHierarchyTree__dragHandle {
+  cursor: grabbing;
+}
+
+.projectHierarchyTree .tree-node:hover {
+  .projectHierarchyTreeNode > .q-focus-helper {
+    opacity: $qFocusable-hoverHelper-opacity !important;
+  }
+}
+
+.projectHierarchyTree--listDragging .projectHierarchyTreeNode > .q-focus-helper {
+  opacity: 0 !important;
+}
+
+.projectHierarchyTree__openIcon {
+  box-sizing: content-box;
+  color: fa-v('text-muted', $text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 16px;
+  height: 16px;
+  padding: 4px 4px 4px 4px;
+  transition: transform 0.3s;
+  width: 16px;
+
+  &--open {
+    transform: rotate(90deg);
+  }
+}
+
+.projectHierarchyTree-treeNode--world {
+  cursor: pointer;
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0.0125em;
+  line-height: 2rem;
+  margin: 0 0 -5px 0;
+  padding: 5px 0 0 5px !important;
+
+  .projectHierarchyTree__openIcon {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+  }
+
+  .projectHierarchyTreeNode--world {
+    border-radius: 3px;
+    padding: 0 35px 0 10px !important;
+  }
+}
+
+.projectHierarchyTree-treeNode--group{
+
+}
+
+.projectHierarchyTree-treeNode--documentTemplate{
+
+}
+
+.projectHierarchyTree-treeNode--document{
+
+}

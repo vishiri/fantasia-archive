@@ -127,3 +127,20 @@ test('Test that createUseDialogProjectSettingsWorldsDeleteConfirm closeMenu dism
 
   runUnmountHooks()
 })
+
+/**
+ * createUseDialogProjectSettingsWorldsDeleteConfirm
+ * Resets countdown when menuOpen becomes false via watch.
+ */
+test('Test that createUseDialogProjectSettingsWorldsDeleteConfirm resets countdown when menu closes', async () => {
+  const { api, runUnmountHooks } = createTestUseDialogProjectSettingsWorldsDeleteConfirm()
+
+  api.menuOpen.value = true
+  await nextTick()
+  vi.advanceTimersByTime(2000)
+  api.menuOpen.value = false
+  await nextTick()
+  expect(api.secondsRemaining.value).toBe(confirmDelaySec)
+
+  runUnmountHooks()
+})

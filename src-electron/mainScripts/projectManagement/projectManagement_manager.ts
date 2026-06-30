@@ -69,6 +69,11 @@ export {
 } from './faProjectSidebarPersistWiring'
 
 export {
+  readFaProjectHierarchyTreeUiState,
+  upsertFaProjectHierarchyTreeUiStateKv
+} from './faProjectHierarchyTreeUiStatePersistWiring'
+
+export {
   readFaProjectSettingsRoot,
   readFaProjectSettingsProjectNameRaw,
   upsertFaProjectSettingsKv

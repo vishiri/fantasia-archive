@@ -14,7 +14,10 @@ import {
  */
 test('Test that applyFaProjectProjectDataSchemaV1 runs exec with project_data DDL', () => {
   const exec = vi.fn()
-  applyFaProjectProjectDataSchemaV1({ exec })
+  applyFaProjectProjectDataSchemaV1({
+    exec,
+    pragma: vi.fn()
+  })
   expect(exec).toHaveBeenCalledOnce()
   const sql = exec.mock.calls[0]![0]! as string
   expect(sql).toContain('project_data')
@@ -26,9 +29,12 @@ test('Test that applyFaProjectProjectDataSchemaV1 runs exec with project_data DD
  */
 test('Test that applyFaProjectContentSchemaV1 runs exec with worlds and related tables', () => {
   const exec = vi.fn()
-  applyFaProjectContentSchemaV1({ exec })
-  expect(exec).toHaveBeenCalledOnce()
-  const sql = exec.mock.calls[0]![0]! as string
+  applyFaProjectContentSchemaV1({
+    exec,
+    pragma: vi.fn()
+  })
+  expect(exec).toHaveBeenCalledTimes(2)
+  const sql = `${exec.mock.calls[0]![0] as string}${exec.mock.calls[1]![0] as string}`
   expect(sql).toContain(FA_PROJECT_TABLE_DOCUMENTS)
   expect(sql).toContain(FA_PROJECT_TABLE_WORLDS)
   expect(sql).toContain('color_pallete')
@@ -39,6 +45,9 @@ test('Test that applyFaProjectContentSchemaV1 runs exec with worlds and related 
   expect(sql).toContain('world_template_groups')
   expect(sql).toContain('world_template_placements')
   expect(sql).toContain('nickname')
+  expect(sql).toContain('placement_id')
+  expect(sql).toContain('parent_document_id')
+  expect(sql).toContain('idx_documents_placement_parent_sort')
   expect(sql).not.toContain('world_document_templates')
   expect(sql).not.toContain('world_media')
 })

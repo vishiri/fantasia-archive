@@ -4,8 +4,11 @@ import { v4 as uuidv4, validate as validateUuid } from 'uuid'
 import {
   applyFaProjectContentSchemaV1,
   applyFaProjectProjectDataSchemaV1,
-  FA_PROJECT_DATA_TABLE_NAME
+  FA_PROJECT_DATA_TABLE_NAME,
+  FA_PROJECT_TABLE_DOCUMENTS,
+  FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
 } from './functions/faProjectDbSchemaDdl'
+import { createApplyFaProjectDocumentsHierarchySchemaPatch } from './functions/faProjectDocumentsHierarchySchemaPatch'
 import { seedFaProjectDefaultWorldIfEmpty } from './projectDbContent/faProjectWorldBootstrapWiring'
 
 const OPTION_PROJECT_NAME = 'project_name'
@@ -13,6 +16,11 @@ const OPTION_PROJECT_UUID = 'project_uuid'
 
 /** Current schema revision: flattened to a single bootstrap version. */
 export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 1
+
+const applyFaProjectDocumentsHierarchySchemaPatch = createApplyFaProjectDocumentsHierarchySchemaPatch({
+  documentsTableName: FA_PROJECT_TABLE_DOCUMENTS,
+  placementsTableName: FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
+})
 
 function readUserVersion (db: Database): number {
   const rawVer = db.pragma('user_version', { simple: true })
@@ -75,6 +83,7 @@ export function applyFaProjectMigrations (
     throw new Error('This project file requires a newer version of Fantasia Archive')
   }
   if (startVer === FA_PROJECT_USER_VERSION_SUPPORTED_MAX) {
+    applyFaProjectDocumentsHierarchySchemaPatch(db)
     return
   }
   if (startVer === 0) {

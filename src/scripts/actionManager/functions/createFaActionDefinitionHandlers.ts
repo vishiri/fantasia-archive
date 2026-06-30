@@ -16,6 +16,7 @@ type T_createFaActionDefinitionHandlersDeps = {
   S_FaProjectStyling: () => { savePersistedCssFromEditor: (css: string) => Promise<boolean> }
   S_FaProjectSettings: () => { updateProjectSettings: (patch: I_faProjectSettingsPatch) => Promise<void> }
   S_FaProjectWorkspaceWorlds: () => { refreshWorkspaceWorlds: () => Promise<void> }
+  S_FaProjectHierarchyTree: () => { refreshLayout: () => Promise<void> }
   S_FaUserSettings: () => { updateSettings: (patch: Partial<I_faUserSettings>) => Promise<void> }
   faProjectWorldsPersistSnapshotFromDialog: (items: I_faProjectWorldSnapshotItem[]) => Promise<void>
   faProjectDocumentTemplatesPersistSnapshotFromDialog: (
@@ -114,6 +115,7 @@ async function handleSaveProjectSettings (
   if (payload.worlds !== undefined) {
     await deps.faProjectWorldsPersistSnapshotFromDialog(payload.worlds)
     await deps.S_FaProjectWorkspaceWorlds().refreshWorkspaceWorlds()
+    await deps.S_FaProjectHierarchyTree().refreshLayout()
   }
   deps.notifyCreate({
     group: false,

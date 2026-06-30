@@ -9,6 +9,7 @@ import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 import { S_FaProjectSettings } from 'app/src/stores/S_FaProjectSettings'
 import { S_FaProjectWorkspaceWorlds } from 'app/src/stores/S_FaProjectWorkspaceWorlds'
+import { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTree'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import { canOpenFloatingWindowWhileNoModal } from 'app/src/scripts/appNoteboard/appNoteboard_manager'
 import { toggleDevTools } from 'app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager'
@@ -55,6 +56,7 @@ const faActionDefinitionHandlersApi = {
     S_FaProjectStyling,
     S_FaProjectSettings,
     S_FaProjectWorkspaceWorlds,
+    S_FaProjectHierarchyTree,
     S_FaUserSettings,
     canOpenFloatingWindowWhileNoModal,
     applyFaUserSettingsLanguageSelection,

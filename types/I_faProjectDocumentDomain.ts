@@ -5,6 +5,9 @@ export interface I_faProjectDocument {
   id: string
   worldId: string
   templateId: string | null
+  placementId: string | null
+  parentDocumentId: string | null
+  sortOrder: number
   displayName: string
   createdAtMs: number
   updatedAtMs: number
@@ -14,12 +17,18 @@ export interface I_faProjectDocumentCreateInput {
   worldId: string
   displayName: string
   templateId?: string | null | undefined
+  placementId?: string | null | undefined
+  parentDocumentId?: string | null | undefined
+  sortOrder?: number | undefined
 }
 
 export interface I_faProjectDocumentPatch {
   displayName?: string | undefined
   worldId?: string | undefined
   templateId?: string | null | undefined
+  placementId?: string | null | undefined
+  parentDocumentId?: string | null | undefined
+  sortOrder?: number | undefined
 }
 
 export interface I_faProjectDocumentListFilter {

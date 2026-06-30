@@ -13,7 +13,7 @@ Flattened to a single bootstrap revision during pre-release dev. No upgrade ladd
 | Version | Contents |
 |---------|----------|
 | **0** | Uninitialized file (bootstrap target on first open/create). |
-| **1** | Full schema: **`project_data`** KV, worldbuilding **content tables** (**`worlds`** incl. **`color_pallete`** + **`display_name_translations_json`**, **`document_templates`** incl. **`sort_order`**, **`world_appendix`**, **`icon`**, **`title_translations_json`** + **`title_singular_translations_json`** + **`world_appendix_translations_json`**, **`documents`**, **`media`**, **`document_media`**, **`world_template_groups`** + **`world_template_placements`** layout incl. **`nickname`** + **`nickname_translations_json`** + **`nickname_singular_translations_json`** + **`display_name_translations_json`**), default **world** seed on create. |
+| **1** | Full schema: **`project_data`** KV, worldbuilding **content tables** (**`worlds`** incl. **`color_pallete`** + **`display_name_translations_json`**, **`document_templates`** incl. **`sort_order`**, **`world_appendix`**, **`icon`**, **`title_translations_json`** + **`title_singular_translations_json`** + **`world_appendix_translations_json`**, **`documents`** incl. **`placement_id`** + **`parent_document_id`** + **`sort_order`**, **`media`**, **`document_media`**, **`world_template_groups`** + **`world_template_placements`** layout incl. **`nickname`** + **`nickname_translations_json`** + **`nickname_singular_translations_json`** + **`display_name_translations_json`**), default **world** seed on create. Idempotent **`applyFaProjectDocumentsHierarchySchemaPatch`** runs on every open at version **1** for legacy files missing hierarchy columns. |
 
 **Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 1`** in **`faProjectDbMigrateWiring.ts`**.
 
@@ -38,8 +38,9 @@ Flattened to a single bootstrap revision during pre-release dev. No upgrade ladd
 | **`project_styling_content`** | Per-project custom CSS |
 | **`project_styling_x`**, **`project_styling_y`**, **`project_styling_width`**, **`project_styling_height`** | Project styling floating window frame |
 | **`sidebar_width`** | Workspace left sidebar width (pixels, integer) |
+| **`hierarchy_tree_ui_state`** | Workspace hierarchy tree expand/collapse + scroll JSON (`expandedNodeIds`, `scrollTopPx`) |
 
-**Modules:** **`faProjectDataKvWiring.ts`**, **`faProjectSettingsPersistWiring.ts`**, **`faProjectNoteboardPersistWiring.ts`**, **`faProjectStylingPersistWiring.ts`**, **`faProjectSidebarPersistWiring.ts`**.
+**Modules:** **`faProjectDataKvWiring.ts`**, **`faProjectSettingsPersistWiring.ts`**, **`faProjectNoteboardPersistWiring.ts`**, **`faProjectStylingPersistWiring.ts`**, **`faProjectSidebarPersistWiring.ts`**, **`faProjectHierarchyTreeUiStatePersistWiring.ts`**.
 
 ## Content tables (schema version 1)
 
@@ -90,12 +91,17 @@ Index: **`idx_document_templates_sort_order`**. Unlike **worlds**, new projects 
 | `id` | TEXT PK | UUID |
 | `world_id` | TEXT FK → `worlds.id` | **ON DELETE RESTRICT** |
 | `template_id` | TEXT FK → `document_templates.id`, nullable | **ON DELETE RESTRICT** |
+| `placement_id` | TEXT FK → `world_template_placements.id`, nullable | **ON DELETE RESTRICT**; denormalized anchor for hierarchy queries and DnD fence |
+| `parent_document_id` | TEXT FK → `documents.id`, nullable | **ON DELETE CASCADE**; NULL = top-level under placement |
+| `sort_order` | INTEGER | Sibling order under same parent (or under placement when `parent_document_id` NULL); default **0** |
 | `display_name` | TEXT | |
 | `created_at_ms`, `updated_at_ms` | INTEGER | |
 
 **World → documents (1:N):** enforced by required **`world_id`**. Deleting a **world** that still has **documents** fails at the database (**RESTRICT**).
 
 **Document → template (N:1):** optional **`template_id`**. Deleting a **template** referenced by documents fails (**RESTRICT**).
+
+**Document hierarchy (within placement):** **`parent_document_id`** + **`sort_order`**; **`placement_id`** must match the placement for the document's world/template assignment. Cross-placement moves are rejected in main.
 
 ### `document_media` (M:N)
 
@@ -139,7 +145,7 @@ Indexes: **`idx_world_template_placements_world_root_sort`**, **`idx_world_templ
 
 **Pre-release history:** A legacy **`world_document_templates`** M:N junction existed in flattened-away schema revisions; it is gone and existing links are not migrated.
 
-Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_document_media_media_id`**, **`idx_worlds_sort_order`**, **`idx_document_templates_sort_order`**.
+Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_documents_placement_parent_sort`**, **`idx_document_media_media_id`**, **`idx_worlds_sort_order`**, **`idx_document_templates_sort_order`**.
 
 ## Relationships (summary)
 
@@ -168,8 +174,10 @@ src-electron/mainScripts/projectManagement/
   faProjectSettingsPersistWiring.ts
   faProjectNoteboardPersistWiring.ts
   faProjectStylingPersistWiring.ts
+  faProjectHierarchyTreeUiStatePersistWiring.ts
   functions/
     faProjectDbSchemaDdl.ts             # schema v1 DDL
+    faProjectDocumentsHierarchySchemaPatch.ts  # idempotent v1 documents hierarchy patch
     faProjectContentRowMap.ts           # row → DTO mappers
   projectDbContent/
     faProjectContentNamedEntitySqlWiring.ts
@@ -177,6 +185,8 @@ src-electron/mainScripts/projectManagement/
     faProjectWorldBootstrapWiring.ts
     faProjectWorldsPersistWiring.ts
     faProjectDocumentsPersistWiring.ts
+    faProjectHierarchyTreePersistWiring.ts
+    faProjectHierarchyTestDocumentSeedWiring.ts
     faProjectDocumentTemplatesPersistWiring.ts
     faProjectDocumentTemplatesSqlWiring.ts
     faProjectDocumentTemplatesSnapshotWiring.ts
@@ -194,7 +204,7 @@ src-electron/mainScripts/projectManagement/
 
 ### `FA_PROJECT_MANAGEMENT_IPC`
 
-Create/open project, recent list, **project settings / styling / noteboard** patches. Preload: **`projectManagementAPI.ts`**. Registrar: **`registerFaProjectManagementIpc.ts`**.
+Create/open project, recent list, **project settings / styling / noteboard / sidebar / hierarchy tree UI state** patches. Preload: **`projectManagementAPI.ts`**. Registrar: **`registerFaProjectManagementIpc.ts`**, **`registerFaProjectManagementHierarchyTreeUiStateIpc.ts`**.
 
 ### `FA_PROJECT_CONTENT_IPC`
 
@@ -233,6 +243,12 @@ All content handlers wrap **`runWithFaProjectDatabaseForIpcAsync`**.
 | `link-document-media-async` | `linkFaProjectDocumentMedia` |
 | `unlink-document-media-async` | `unlinkFaProjectDocumentMedia` |
 | `list-document-media-async` | `listFaProjectMediaForDocument` |
+| `list-workspace-hierarchy-layout-async` | `listFaProjectWorkspaceHierarchyLayout` |
+| `list-placement-document-children-async` | `listFaProjectPlacementDocumentChildren` |
+| `move-document-in-hierarchy-async` | `moveFaProjectDocumentInHierarchy` |
+| `search-project-hierarchy-async` | `searchFaProjectHierarchy` |
+
+**`FA_PROJECT_MANAGEMENT_IPC`** (hierarchy UI state): **`get-hierarchy-tree-ui-state-async`** → **`readFaProjectHierarchyTreeUiState`**; **`set-hierarchy-tree-ui-state-patch-async`** → **`upsertFaProjectHierarchyTreeUiStateKv`**.
 
 Exact channel strings: **`src-electron/electron-ipc-bridge.ts`** (`FA_PROJECT_CONTENT_IPC`).
 
@@ -244,15 +260,15 @@ Exact channel strings: **`src-electron/electron-ipc-bridge.ts`** (`FA_PROJECT_CO
 |-------|-----|------|
 | **Open** | **`projectManagement.getProjectSettings`** (project name KV) + **`projectContent.listWorldsForProjectSettings`** (ordered worlds with document counts for delete guards) + **`projectContent.listDocumentTemplatesForProjectSettings`** (ordered templates with document counts) | **`readFaProjectSettingsRoot`**, **`listFaProjectWorldsForProjectSettings`**, **`listFaProjectDocumentTemplatesForProjectSettings`** |
 | **Save (project name)** | **`projectManagement.setProjectSettings`** via **`S_FaProjectSettings`** | **`faProjectSettingsPersist.ts`** → **`project_name`** KV |
-| **Save (worlds)** | **`projectContent.saveWorldsSnapshot`** with **`I_faProjectWorldSnapshotItem[]`** (optional **`templateLayout`** per world) | **`replaceFaProjectWorldsSnapshot`** in **`faProjectWorldsSnapshotWiring.ts`** — one transaction: upsert/reorder worlds, replace each world's template layout when provided, delete removed ids (**RESTRICT** if a world still has documents) |
+| **Save (worlds)** | **`projectContent.saveWorldsSnapshot`** with **`I_faProjectWorldSnapshotItem[]`** (optional **`templateLayout`** per world) | **`replaceFaProjectWorldsSnapshot`** in **`faProjectWorldsSnapshotWiring.ts`** — one transaction: upsert/reorder worlds, merge each world's template layout (upsert groups/placements, delete removed ids; **documents in removed placements are deleted first**), delete removed world ids (**RESTRICT** if a world still has documents) |
 | **Save (document templates)** | **`projectContent.saveDocumentTemplatesSnapshot`** with **`I_faProjectDocumentTemplateSnapshotItem[]`** | **`replaceFaProjectDocumentTemplatesSnapshot`** in **`faProjectDocumentTemplatesSnapshotWiring.ts`** — one transaction: upsert/reorder by list index, delete removed ids (**RESTRICT** if documents still reference a template); **zero templates is valid** |
 
 Bridges: **`sFaProjectWorldsBridge.ts`**, **`sFaProjectDocumentTemplatesBridge.ts`**. Action **`saveProjectSettings`** may carry **`settings`**, **`worlds`**, **`documentTemplates`** (**`handleSaveProjectSettings`** in **`createFaActionDefinitionHandlers.ts`**). **Save order:** document templates snapshot **before** worlds snapshot when both present — **`world_template_placements.document_template_id`** FK requires template rows exist first. Draft validation (names, duplicate palette hex) stays in dialog; persist coerces hex via **`coerceFaProjectWorldColorForStorage`**, **`coerceFaProjectWorldColorPalleteForStorage`**.
 
 ## Types and validation
 
-- DTOs: **`types/I_faProjectWorldDomain.ts`**, **`I_faProjectDocumentDomain.ts`**, **`I_faProjectDocumentTemplateDomain.ts`**, **`I_faProjectMediaDomain.ts`**, **`I_faProjectContentLinksDomain.ts`**, **`I_faProjectContentAPI.ts`**
-- Zod (IPC payloads): **`src-electron/shared/faProject*ContentSchema.ts`**, **`faProjectContentLinksSchema.ts`**, **`faProjectContentSchemaShared.ts`**
+- DTOs: **`types/I_faProjectWorldDomain.ts`**, **`I_faProjectDocumentDomain.ts`**, **`I_faProjectDocumentTemplateDomain.ts`**, **`I_faProjectMediaDomain.ts`**, **`I_faProjectContentLinksDomain.ts`**, **`I_faProjectHierarchyTreeDomain.ts`**, **`I_faProjectContentAPI.ts`**
+- Zod (IPC payloads): **`src-electron/shared/faProject*ContentSchema.ts`**, **`faProjectHierarchyTreeContentSchema.ts`**, **`faProjectHierarchyTreeUiStateSchema.ts`**, **`faProjectContentLinksSchema.ts`**, **`faProjectContentSchemaShared.ts`**
 - Bridge typing: **`types/I_faElectronRendererBridgeAPIs.ts`**, **`src/globals.d.ts`**
 
 **Renderer UI:** **`DialogProjectSettings`** (general, worlds, **Document Template Settings**), **`FaColorPickerInput`**, **`FaIconPickerInput`** (template **icon**), **`sFaProjectWorldsBridge`**, **`sFaProjectDocumentTemplatesBridge`**. Other content surfaces IPC-only until wired.

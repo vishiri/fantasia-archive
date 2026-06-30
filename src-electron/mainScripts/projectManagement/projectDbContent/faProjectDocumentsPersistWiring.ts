@@ -1,7 +1,10 @@
 import type Database from 'better-sqlite3'
 import { v4 as uuidv4 } from 'uuid'
 
-import { FA_PROJECT_TABLE_DOCUMENTS } from '../functions/faProjectDbSchemaDdl'
+import {
+  FA_PROJECT_TABLE_DOCUMENTS,
+  FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
+} from '../functions/faProjectDbSchemaDdl'
 import { mapFaProjectDocumentRow } from '../functions/faProjectContentRowMap'
 import { FaProjectContentNotFoundError } from './faProjectContentNotFoundError'
 import {
@@ -32,7 +35,8 @@ const TEMPLATE_SPEC = {
 
 function selectDocumentSql (): string {
   return (
-    'SELECT id, world_id, template_id, display_name, created_at_ms, updated_at_ms ' +
+    'SELECT id, world_id, template_id, placement_id, parent_document_id, sort_order, ' +
+    'display_name, created_at_ms, updated_at_ms ' +
     `FROM ${FA_PROJECT_TABLE_DOCUMENTS}`
   )
 }
@@ -58,22 +62,91 @@ function validateDocumentForeignKeys (
   }
 }
 
+function resolveFaProjectDocumentPlacementId (
+  db: Database,
+  worldId: string,
+  templateId: string | null,
+  placementId: string | null | undefined
+): string | null {
+  if (placementId !== undefined && placementId !== null) {
+    return placementId
+  }
+  if (templateId === null) {
+    return null
+  }
+  const row = db
+    .prepare(
+      `SELECT id FROM ${FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS} ` +
+        'WHERE world_id = ? AND document_template_id = ?'
+    )
+    .get(worldId, templateId) as { id: string } | undefined
+  return row?.id ?? null
+}
+
+function readFaProjectDocumentSiblingMaxSortOrder (
+  db: Database,
+  placementId: string | null,
+  parentDocumentId: string | null
+): number | null {
+  if (placementId === null) {
+    return null
+  }
+  const row = db
+    .prepare(
+      `SELECT MAX(sort_order) AS max_sort FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
+        'WHERE placement_id = ? AND ' +
+        '(parent_document_id IS ? OR (parent_document_id IS NULL AND ? IS NULL))'
+    )
+    .get(placementId, parentDocumentId, parentDocumentId) as { max_sort: number | null } | undefined
+  return row?.max_sort ?? null
+}
+
+function resolveFaProjectDocumentSortOrderForCreate (
+  db: Database,
+  placementId: string | null,
+  parentDocumentId: string | null,
+  sortOrder: number | undefined
+): number {
+  if (sortOrder !== undefined) {
+    return sortOrder
+  }
+  const maxSort = readFaProjectDocumentSiblingMaxSortOrder(db, placementId, parentDocumentId)
+  return maxSort === null ? 0 : maxSort + 1
+}
+
 export function createFaProjectDocument (
   db: Database,
   input: I_faProjectDocumentCreateInput
 ): I_faProjectDocument {
   const templateId = input.templateId ?? null
   validateDocumentForeignKeys(db, input.worldId, templateId)
+  const parentDocumentId = input.parentDocumentId ?? null
+  const placementId = resolveFaProjectDocumentPlacementId(
+    db,
+    input.worldId,
+    templateId,
+    input.placementId
+  )
+  const sortOrder = resolveFaProjectDocumentSortOrderForCreate(
+    db,
+    placementId,
+    parentDocumentId,
+    input.sortOrder
+  )
   const nowMs = Date.now()
   const id = uuidv4()
   db.prepare(
     `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-      '(id, world_id, template_id, display_name, created_at_ms, updated_at_ms) ' +
-      'VALUES (?, ?, ?, ?, ?, ?)'
+      '(id, world_id, template_id, placement_id, parent_document_id, sort_order, ' +
+      'display_name, created_at_ms, updated_at_ms) ' +
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(
     id,
     input.worldId,
     templateId,
+    placementId,
+    parentDocumentId,
+    sortOrder,
     input.displayName,
     nowMs,
     nowMs
@@ -97,14 +170,30 @@ export function updateFaProjectDocument (
     ? patch.templateId
     : existingRow.template_id
   validateDocumentForeignKeys(db, nextWorldId, nextTemplateId)
+  const nextPlacementId = patch.placementId !== undefined
+    ? patch.placementId
+    : resolveFaProjectDocumentPlacementId(
+      db,
+      nextWorldId,
+      nextTemplateId,
+      existingRow.placement_id
+    )
+  const nextParentDocumentId = patch.parentDocumentId !== undefined
+    ? patch.parentDocumentId
+    : existingRow.parent_document_id
+  const nextSortOrder = patch.sortOrder ?? existingRow.sort_order
   const nextDisplayName = patch.displayName ?? existingRow.display_name
   const nowMs = Date.now()
   db.prepare(
     `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET world_id = ?, template_id = ?, ` +
+      'placement_id = ?, parent_document_id = ?, sort_order = ?, ' +
       'display_name = ?, updated_at_ms = ? WHERE id = ?'
   ).run(
     nextWorldId,
     nextTemplateId,
+    nextPlacementId,
+    nextParentDocumentId,
+    nextSortOrder,
     nextDisplayName,
     nowMs,
     id
@@ -141,13 +230,14 @@ export function listFaProjectDocuments (
     rows = db
       .prepare(
         `${selectDocumentSql()} WHERE world_id = ? ` +
-          'ORDER BY display_name COLLATE NOCASE ASC, created_at_ms ASC'
+          'ORDER BY sort_order ASC, display_name COLLATE NOCASE ASC, created_at_ms ASC'
       )
       .all(worldId) as I_faSqlProjectDocumentRow[]
   } else {
     rows = db
       .prepare(
-        `${selectDocumentSql()} ORDER BY display_name COLLATE NOCASE ASC, created_at_ms ASC`
+        `${selectDocumentSql()} ORDER BY sort_order ASC, ` +
+          'display_name COLLATE NOCASE ASC, created_at_ms ASC'
       )
       .all() as I_faSqlProjectDocumentRow[]
   }

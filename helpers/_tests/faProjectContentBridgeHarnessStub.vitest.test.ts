@@ -41,7 +41,10 @@ const stubDocumentTemplateShape = {
 const stubDocumentShape = {
   ...stubNamedEntityShape,
   templateId: null,
-  worldId: STUB_UUID
+  worldId: STUB_UUID,
+  placementId: null,
+  parentDocumentId: null,
+  sortOrder: 0
 }
 
 /**
@@ -140,4 +143,33 @@ test('Test that createFaProjectContentBridgeHarnessStub noop methods resolve und
       titleSingularTranslations: {},
     }
   ])).resolves.toBeUndefined()
+})
+
+/**
+ * createFaProjectContentBridgeHarnessStub
+ * Hierarchy tree methods return empty layout, lists, and search results.
+ */
+test('Test that createFaProjectContentBridgeHarnessStub hierarchy methods return stub shapes', async () => {
+  const api = createFaProjectContentBridgeHarnessStub()
+
+  await expect(api.listWorkspaceHierarchyLayout()).resolves.toEqual({ worlds: [] })
+  await expect(api.listPlacementDocumentChildren({
+    placementId: STUB_UUID
+  })).resolves.toEqual({ items: [] })
+  await expect(api.moveDocumentInHierarchy({
+    documentId: STUB_UUID,
+    targetParentDocumentId: null,
+    targetSortOrder: 0
+  })).resolves.toEqual({
+    id: STUB_UUID,
+    displayName: 'Stub',
+    placementId: 'placement-stub',
+    parentDocumentId: null,
+    sortOrder: 0,
+    hasChildren: false
+  })
+  await expect(api.searchProjectHierarchy('hero')).resolves.toEqual({
+    hits: [],
+    query: 'hero'
+  })
 })

@@ -128,5 +128,26 @@ export const projectContentAPI: I_faProjectContentAPI = {
   },
   listDocumentMedia: async (documentId) => {
     return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.listDocumentMediaAsync, { documentId })
+  },
+  listWorkspaceHierarchyLayout: async () => {
+    return await invokeProjectContent(FA_PROJECT_CONTENT_IPC.listWorkspaceHierarchyLayoutAsync)
+  },
+  listPlacementDocumentChildren: async (input) => {
+    return await invokeProjectContent(
+      FA_PROJECT_CONTENT_IPC.listPlacementDocumentChildrenAsync,
+      input
+    )
+  },
+  moveDocumentInHierarchy: async (input) => {
+    return await invokeProjectContent(
+      FA_PROJECT_CONTENT_IPC.moveDocumentInHierarchyAsync,
+      input
+    )
+  },
+  searchProjectHierarchy: async (query) => {
+    return await invokeProjectContent(
+      FA_PROJECT_CONTENT_IPC.searchProjectHierarchyAsync,
+      { query }
+    )
   }
 }

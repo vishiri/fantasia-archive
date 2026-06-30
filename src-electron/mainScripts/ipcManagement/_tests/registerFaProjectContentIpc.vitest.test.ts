@@ -2,14 +2,15 @@ import { beforeEach, expect, test, vi } from 'vitest'
 
 import { FA_PROJECT_CONTENT_IPC } from 'app/src-electron/electron-ipc-bridge'
 
-const { handleMock, runWithDbMock } = vi.hoisted(() => ({
+const { handleMock, runWithDbMock, SAMPLE_UUID_HOISTED } = vi.hoisted(() => ({
   handleMock: vi.fn(),
   runWithDbMock: vi.fn(async (_event: unknown, work: (db: unknown) => unknown) => {
     return {
       ok: true as const,
       value: await work({})
     }
-  })
+  }),
+  SAMPLE_UUID_HOISTED: '550e8400-e29b-41d4-a716-446655440000'
 }))
 
 vi.mock('electron', () => ({
@@ -81,6 +82,29 @@ vi.mock(
   })
 )
 
+vi.mock(
+  'app/src-electron/mainScripts/projectManagement/projectDbContent/faProjectHierarchyTreePersistWiring',
+  () => ({
+    listFaProjectWorkspaceHierarchyLayout: vi.fn(() => ({ worlds: [] })),
+    listFaProjectPlacementDocumentChildren: vi.fn(() => ({ items: [] })),
+    moveFaProjectDocumentInHierarchy: vi.fn(() => ({
+      id: 'd',
+      displayName: 'D',
+      placementId: SAMPLE_UUID_HOISTED,
+      parentDocumentId: null,
+      sortOrder: 0,
+      hasChildren: false
+    })),
+    searchFaProjectHierarchy: vi.fn(() => ({
+      query: 'q',
+      hits: []
+    }))
+  })
+)
+
+const SAMPLE_UUID = '550e8400-e29b-41d4-a716-446655440000'
+const SAMPLE_UUID_B = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
+
 beforeEach(() => {
   vi.resetModules()
   handleMock.mockReset()
@@ -123,9 +147,6 @@ test('Test that createWorldAsync handler uses runWithFaProjectDatabaseForIpcAsyn
   await handler({}, { displayName: 'A' })
   expect(runWithDbMock).toHaveBeenCalled()
 })
-
-const SAMPLE_UUID = '550e8400-e29b-41d4-a716-446655440000'
-const SAMPLE_UUID_B = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
 
 /**
  * registerFaProjectContentIpc
@@ -218,7 +239,18 @@ test('Test that every project content IPC handler runs through runWithFaProjectD
   })
   await handlerFor(FA_PROJECT_CONTENT_IPC.listDocumentMediaAsync)(event, { documentId: SAMPLE_UUID })
 
-  expect(runWithDbMock.mock.calls.length).toBeGreaterThanOrEqual(29)
+  await handlerFor(FA_PROJECT_CONTENT_IPC.listWorkspaceHierarchyLayoutAsync)(event)
+  await handlerFor(FA_PROJECT_CONTENT_IPC.listPlacementDocumentChildrenAsync)(event, {
+    placementId: SAMPLE_UUID
+  })
+  await handlerFor(FA_PROJECT_CONTENT_IPC.moveDocumentInHierarchyAsync)(event, {
+    documentId: SAMPLE_UUID,
+    targetParentDocumentId: null,
+    targetSortOrder: 0
+  })
+  await handlerFor(FA_PROJECT_CONTENT_IPC.searchProjectHierarchyAsync)(event, { query: 'hero' })
+
+  expect(runWithDbMock.mock.calls.length).toBeGreaterThanOrEqual(33)
 })
 
 /**

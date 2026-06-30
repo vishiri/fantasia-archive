@@ -35,8 +35,8 @@
           data-test-locator="mainLayout-drawer"
         >
           <ProjectHierarchyTreeSearch />
-          <div class="mainLayoutSidebarSplitter__panelBody hasScrollbar">
-            <ProjectWorkspaceWorldList />
+          <div class="mainLayoutSidebarSplitter__panelBody">
+            <ProjectHierarchyTree />
           </div>
         </div>
       </template>
@@ -89,8 +89,8 @@ import AppControlMenus from 'app/src/components/globals/AppControlMenus/AppContr
 import GlobalLanguageSelector from 'app/src/components/globals/GlobalLanguageSelector/GlobalLanguageSelector.vue'
 import GlobalWindowButtons from 'app/src/components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
 import ProjectDocumentControlBar from 'app/src/components/projectUI/ProjectDocumentControlBar/ProjectDocumentControlBar.vue'
+import ProjectHierarchyTree from 'app/src/components/projectUI/ProjectHierarchyTree/ProjectHierarchyTree.vue'
 import ProjectHierarchyTreeSearch from 'app/src/components/projectUI/ProjectHierarchyTreeSearch/ProjectHierarchyTreeSearch.vue'
-import ProjectWorkspaceWorldList from 'app/src/components/projectUI/ProjectWorkspaceWorldList/ProjectWorkspaceWorldList.vue'
 
 import { useMainLayout, useMainLayoutWorkspaceSidebar } from './scripts/mainLayout_manager'
 

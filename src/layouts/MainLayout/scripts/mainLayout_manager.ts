@@ -23,6 +23,7 @@ import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
 import { S_FaProjectNoteboard } from 'app/src/stores/S_FaProjectNoteboard'
 import { S_FaProjectSidebar } from 'app/src/stores/S_FaProjectSidebar'
+import { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTree'
 import { S_FaProjectWorkspaceWorlds } from 'app/src/stores/S_FaProjectWorkspaceWorlds'
 import { S_FaProjectStyling } from 'app/src/stores/S_FaProjectStyling'
 import { S_FaAppStyling } from 'app/src/stores/S_FaAppStyling'
@@ -86,6 +87,7 @@ const mainLayoutApi = createMainLayout({
 
 export const useMainLayoutWorkspaceSidebar = createMainLayoutWorkspaceSidebar({
   S_FaActiveProject,
+  S_FaProjectHierarchyTree,
   S_FaProjectSidebar,
   S_FaProjectWorkspaceWorlds,
   attachWorkspaceSidebarLiveWidthSync: attachFaWorkspaceSidebarLiveWidthSync,

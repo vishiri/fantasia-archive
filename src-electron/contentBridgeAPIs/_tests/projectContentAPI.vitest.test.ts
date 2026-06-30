@@ -82,6 +82,17 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
   })
   await projectContentAPI.listDocumentMedia(SAMPLE_UUID)
 
+  await projectContentAPI.listWorkspaceHierarchyLayout()
+  await projectContentAPI.listPlacementDocumentChildren({
+    placementId: SAMPLE_UUID
+  })
+  await projectContentAPI.moveDocumentInHierarchy({
+    documentId: SAMPLE_UUID,
+    targetParentDocumentId: null,
+    targetSortOrder: 0
+  })
+  await projectContentAPI.searchProjectHierarchy('hero')
+
   expect(invokeMock).toHaveBeenCalledWith(
     FA_PROJECT_CONTENT_IPC.createWorldAsync,
     { displayName: 'Realm' }
@@ -127,5 +138,25 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
   expect(invokeMock).toHaveBeenCalledWith(
     FA_PROJECT_CONTENT_IPC.listDocumentMediaAsync,
     { documentId: SAMPLE_UUID }
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.listWorkspaceHierarchyLayoutAsync,
+    undefined
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.listPlacementDocumentChildrenAsync,
+    { placementId: SAMPLE_UUID }
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.moveDocumentInHierarchyAsync,
+    {
+      documentId: SAMPLE_UUID,
+      targetParentDocumentId: null,
+      targetSortOrder: 0
+    }
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.searchProjectHierarchyAsync,
+    { query: 'hero' }
   )
 })

@@ -59,7 +59,7 @@ test('Test that MainLayout on workspace route shows the workspace drawer chrome'
   expect(w.find('[data-test-locator="mainLayout-sidebarSplitter"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="mainLayout-drawer"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="projectHierarchyTreeSearch"]').exists()).toBe(true)
-  expect(w.find('[data-test-locator="projectWorkspaceWorldList"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="projectHierarchyTree"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="projectDocumentControlBar"]').exists()).toBe(true)
   w.unmount()
   vi.unstubAllEnvs()

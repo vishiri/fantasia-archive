@@ -80,8 +80,8 @@ export async function mountMainLayoutForVitest (
         ProjectHierarchyTreeSearch: {
           template: '<div data-test-locator="projectHierarchyTreeSearch" />'
         },
-        ProjectWorkspaceWorldList: {
-          template: '<div data-test-locator="projectWorkspaceWorldList" />'
+        ProjectHierarchyTree: {
+          template: '<div data-test-locator="projectHierarchyTree" />'
         },
         QSplitter: {
           props: ['modelValue', 'unit', 'limits'],

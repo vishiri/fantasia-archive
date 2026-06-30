@@ -6,6 +6,9 @@ import { createMainLayoutWorkspaceSidebar } from '../functions/createMainLayoutW
 const persistSidebarWidthMock = vi.fn(async (): Promise<boolean> => true)
 const refreshProjectSidebarMock = vi.fn(async (): Promise<boolean> => true)
 const refreshWorkspaceWorldsMock = vi.fn(async (): Promise<void> => undefined)
+const refreshHierarchyLayoutMock = vi.fn(async (): Promise<void> => undefined)
+const flushHierarchyUiStateMock = vi.fn()
+const resetHierarchyTreeMock = vi.fn()
 const resetToDefaultMock = vi.fn()
 const setLiveWorkspaceSidebarWidthPxMock = vi.fn()
 const attachWorkspaceSidebarLiveWidthSyncMock = vi.fn((): (() => void) => {
@@ -44,6 +47,11 @@ function buildUseSidebar (): ReturnType<ReturnType<typeof createMainLayoutWorksp
     S_FaActiveProject: () => ({
       activeProject: activeProjectId === null ? null : { id: activeProjectId },
       hasActiveProject: activeProjectId !== null
+    }) as never,
+    S_FaProjectHierarchyTree: () => ({
+      flushUiStatePersist: flushHierarchyUiStateMock,
+      refreshLayout: refreshHierarchyLayoutMock,
+      resetOnProjectClose: resetHierarchyTreeMock
     }) as never,
     S_FaProjectSidebar: () => ({
       persistSidebarWidth: persistSidebarWidthMock,
@@ -117,6 +125,10 @@ beforeEach(() => {
   persistSidebarWidthMock.mockResolvedValue(true)
   refreshProjectSidebarMock.mockReset()
   refreshProjectSidebarMock.mockResolvedValue(true)
+  refreshWorkspaceWorldsMock.mockReset()
+  refreshHierarchyLayoutMock.mockReset()
+  flushHierarchyUiStateMock.mockReset()
+  resetHierarchyTreeMock.mockReset()
   resetToDefaultMock.mockReset()
   setLiveWorkspaceSidebarWidthPxMock.mockReset()
   attachWorkspaceSidebarLiveWidthSyncMock.mockReset()

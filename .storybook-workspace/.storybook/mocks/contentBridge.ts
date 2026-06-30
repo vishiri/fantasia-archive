@@ -29,6 +29,10 @@ import type {
   I_faProjectSettingsRoot
 } from 'app/types/I_faProjectSettingsDomain'
 import type {
+  I_faProjectHierarchyTreeUiState,
+  I_faProjectHierarchyTreeUiStatePatch
+} from 'app/types/I_faProjectHierarchyTreeDomain'
+import type {
   I_faProjectSidebarPatch,
   I_faProjectSidebarRoot
 } from 'app/types/I_faProjectSidebarDomain'
@@ -185,6 +189,30 @@ const baseBridge = () => {
     return true
   }
 
+  let storybookHierarchyTreeUiState: I_faProjectHierarchyTreeUiState = {
+    schemaVersion: 1,
+    expandedNodeIds: [],
+    scrollTopPx: 0
+  }
+
+  const getHierarchyTreeUiState = async (): Promise<I_faProjectHierarchyTreeUiState> => {
+    return {
+      ...storybookHierarchyTreeUiState,
+      expandedNodeIds: [...storybookHierarchyTreeUiState.expandedNodeIds]
+    }
+  }
+
+  const setHierarchyTreeUiState = async (
+    patch: I_faProjectHierarchyTreeUiStatePatch
+  ): Promise<boolean> => {
+    storybookHierarchyTreeUiState = {
+      schemaVersion: 1,
+      expandedNodeIds: patch.expandedNodeIds ?? storybookHierarchyTreeUiState.expandedNodeIds,
+      scrollTopPx: patch.scrollTopPx ?? storybookHierarchyTreeUiState.scrollTopPx
+    }
+    return true
+  }
+
   return {
     faWindowControl: {
       checkWindowMaximized: async () => false,
@@ -268,6 +296,7 @@ const baseBridge = () => {
       getProjectNoteboard,
       getProjectSettings,
       getProjectSidebar,
+      getHierarchyTreeUiState,
       getProjectStyling,
       getRecentProjects: async () => [],
       resolveRecentProjectMruHeadForOpen: async () => ({ outcome: 'empty' as const }),
@@ -277,6 +306,7 @@ const baseBridge = () => {
       setProjectNoteboard,
       setProjectSettings,
       setProjectSidebar,
+      setHierarchyTreeUiState,
       setProjectStyling,
       stageE2eNextCreatePath: async () => false,
       stageE2eNextOpenPath: async () => false

@@ -13,6 +13,10 @@ import type {
   I_faProjectNoteboardRoot
 } from 'app/types/I_faProjectNoteboardDomain'
 import type {
+  I_faProjectHierarchyTreeUiState,
+  I_faProjectHierarchyTreeUiStatePatch
+} from 'app/types/I_faProjectHierarchyTreeDomain'
+import type {
   I_faProjectSidebarPatch,
   I_faProjectSidebarRoot
 } from 'app/types/I_faProjectSidebarDomain'
@@ -54,6 +58,12 @@ export const projectManagementAPI: I_faProjectManagementAPI = {
     return await ipcRenderer.invoke(
       FA_PROJECT_MANAGEMENT_IPC.getProjectSidebarAsync
     ) as I_faProjectSidebarRoot
+  },
+
+  async getHierarchyTreeUiState (): Promise<I_faProjectHierarchyTreeUiState> {
+    return await ipcRenderer.invoke(
+      FA_PROJECT_MANAGEMENT_IPC.getHierarchyTreeUiStateAsync
+    ) as I_faProjectHierarchyTreeUiState
   },
 
   async getProjectStyling (): Promise<I_faProjectStylingRoot> {
@@ -104,6 +114,14 @@ export const projectManagementAPI: I_faProjectManagementAPI = {
     const payload = JSON.parse(JSON.stringify(patch)) as I_faProjectSidebarPatch
     return await ipcRenderer.invoke(
       FA_PROJECT_MANAGEMENT_IPC.setProjectSidebarPatchAsync,
+      payload
+    ) as boolean
+  },
+
+  async setHierarchyTreeUiState (patch: I_faProjectHierarchyTreeUiStatePatch): Promise<boolean> {
+    const payload = JSON.parse(JSON.stringify(patch)) as I_faProjectHierarchyTreeUiStatePatch
+    return await ipcRenderer.invoke(
+      FA_PROJECT_MANAGEMENT_IPC.setHierarchyTreeUiStatePatchAsync,
       payload
     ) as boolean
   },
