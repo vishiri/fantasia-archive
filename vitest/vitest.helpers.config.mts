@@ -47,6 +47,7 @@ export default defineConfig({
     passWithNoTests: true,
     reporters: [...vitestTerminalReporters],
     outputFile: 'test-results/vitest-report/test-results-vitest-helpers.json',
+    globalSetup: [path.resolve(__dirname, 'vitest.coverageTmpSetup.mts')],
     coverage: {
       provider: 'v8',
       skipFull: vitestCoverageSkipFull,

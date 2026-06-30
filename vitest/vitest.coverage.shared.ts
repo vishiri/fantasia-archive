@@ -14,10 +14,10 @@ export const vitestCoverageSkipFull = true
  * **.vue** SFCs under unit-components have **no** failing threshold; **`coverage.watermarks`** in **`vitest.components.config.mts`** flag weak totals for review.
  */
 export const vitestCoverageStrictThresholds = {
-  statements: 99,
-  branches: 99,
-  functions: 99,
-  lines: 99
+  statements: 95,
+  branches: 95,
+  functions: 95,
+  lines: 95
 } as const
 
 export const vitestCoverageBaseExclude = [

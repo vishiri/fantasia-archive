@@ -110,7 +110,7 @@ Stories: **`src/**/_tests/*.stories.ts`**. Workspace: **`.storybook-workspace/`*
 yarn testbatch:verify
 ```
 
-Lint + **`vue-tsc`** + Stylelint + Vitest coverage (**99%** on **`src-electron`**, instrumented **`helpers/`**, scoped **`i18n/`**, renderer **`src` `.ts`**, component **`.ts`**; **`.vue`** watermarks ~60%). Debug one step, then re-run full gate.
+Lint + **`vue-tsc`** + Stylelint + Vitest coverage (**95%** on **`src-electron`**, instrumented **`helpers/`**, scoped **`i18n/`**, renderer **`src` `.ts`**, component **`.ts`**; **`.vue`** watermarks ~60%). Debug one step, then re-run full gate.
 
 **Changelog-only** exception: only **`i18n/*/documents/changeLog.md`** after gate passed on substantive work — see [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc).
 

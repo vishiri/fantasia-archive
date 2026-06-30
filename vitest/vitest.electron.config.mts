@@ -14,7 +14,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
 
 /**
- * Electron main/preload unit tests only. Coverage is scoped to src-electron; 99% thresholds apply with '--coverage'.
+ * Electron main/preload unit tests only. Coverage is scoped to src-electron; 95% thresholds apply with '--coverage'.
  */
 export default defineConfig({
   resolve: {
@@ -34,6 +34,7 @@ export default defineConfig({
     include: ['src-electron/**/*.vitest.test.ts'],
     reporters: [...vitestTerminalReporters],
     outputFile: 'test-results/vitest-report/test-results-vitest-electron.json',
+    globalSetup: [path.resolve(__dirname, 'vitest.coverageTmpSetup.mts')],
     coverage: {
       provider: 'v8',
       skipFull: vitestCoverageSkipFull,

@@ -9,8 +9,11 @@ import { FA_APP_STYLING_STORE_DEFAULTS } from 'app/src-electron/mainScripts/appS
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import { createFaProjectContentBridgeHarnessStub } from 'app/helpers/faProjectContentBridgeHarnessStub'
 import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
+import { ensureVitestCoverageTmpDir } from './vitest.ensureCoverageTmp'
 
 const originalConsoleWarn = console.warn.bind(console)
+
+ensureVitestCoverageTmpDir()
 
 const i18nLocaleRef = ref('en-US')
 
@@ -127,6 +130,10 @@ function buildVitestProjectContentApiMock (): ReturnType<typeof createFaProjectC
     listMedia: vi.fn(stub.listMedia),
     listWorlds: vi.fn(stub.listWorlds),
     listWorldsForProjectSettings: vi.fn(stub.listWorldsForProjectSettings),
+    listWorkspaceHierarchyLayout: vi.fn(stub.listWorkspaceHierarchyLayout),
+    listPlacementDocumentChildren: vi.fn(stub.listPlacementDocumentChildren),
+    moveDocumentInHierarchy: vi.fn(stub.moveDocumentInHierarchy),
+    searchProjectHierarchy: vi.fn(stub.searchProjectHierarchy),
     saveDocumentTemplatesSnapshot: vi.fn(stub.saveDocumentTemplatesSnapshot),
     saveWorldsSnapshot: vi.fn(stub.saveWorldsSnapshot),
     setDocumentTemplate: vi.fn(stub.setDocumentTemplate),
@@ -157,6 +164,11 @@ function buildVitestProjectManagementApiMock (): NonNullable<
       schemaVersion: 1 as const,
       widthPx: 375
     })),
+    getHierarchyTreeUiState: vi.fn(async () => ({
+      schemaVersion: 1 as const,
+      expandedNodeIds: [],
+      scrollTopPx: 0
+    })),
     getProjectStyling: vi.fn(async () => ({
       css: '',
       frame: null,
@@ -168,6 +180,7 @@ function buildVitestProjectManagementApiMock (): NonNullable<
     setProjectNoteboard: vi.fn(async (): Promise<boolean> => true),
     setProjectSettings: vi.fn(async (): Promise<boolean> => true),
     setProjectSidebar: vi.fn(async (): Promise<boolean> => true),
+    setHierarchyTreeUiState: vi.fn(async (): Promise<boolean> => true),
     setProjectStyling: vi.fn(async (): Promise<boolean> => true),
     stageE2eNextCreatePath: vi.fn(async () => false),
     stageE2eNextOpenPath: vi.fn(async () => false)
@@ -253,6 +266,7 @@ function resetFaVitestRendererHarness (): void {
 }
 
 beforeEach(() => {
+  ensureVitestCoverageTmpDir()
   vi.spyOn(console, 'warn').mockImplementation(forwardVueTestUtilsWarnUnlessFiltered)
   setFantasiaStorybookCanvasFlag(false)
   resetFaVitestRendererHarness()

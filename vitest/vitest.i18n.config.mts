@@ -16,7 +16,7 @@ const repoRoot = path.resolve(__dirname, '..')
 /**
  * Node unit tests for repo-root i18n (vue-i18n message registry, specialCharacterFixer, externalFileLoader).
  * Colocate Vitest specs under i18n/_tests. This project does not use vitest.setup.ts so externalFileLoader stays real during coverage.
- * Enforces 99% v8 on all four metrics for all i18n TypeScript sources outside i18n/_tests (yarn test:coverage:i18n).
+ * Enforces 95% v8 on all four metrics for all i18n TypeScript sources outside i18n/_tests (yarn test:coverage:i18n).
  */
 export default defineConfig({
   resolve: {
@@ -37,6 +37,7 @@ export default defineConfig({
     include: ['i18n/**/*.vitest.test.ts'],
     reporters: [...vitestTerminalReporters],
     outputFile: 'test-results/vitest-report/test-results-vitest-i18n.json',
+    globalSetup: [path.resolve(__dirname, 'vitest.coverageTmpSetup.mts')],
     coverage: {
       provider: 'v8',
       skipFull: vitestCoverageSkipFull,

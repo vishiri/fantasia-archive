@@ -53,7 +53,10 @@
     "generate:icon-catalogs": "node .utility-scripts/generateFaQuasarIconCatalogs.mjs",
     "postinstall": "electron-builder install-app-deps",
     "prepare": "husky",
-    "rebuild:native": "electron-builder install-app-deps"
+    "pretest:coverage:electron": "npm rebuild better-sqlite3",
+    "posttest:coverage:electron": "yarn rebuild:native",
+    "rebuild:native": "electron-builder install-app-deps && npx --yes @electron/rebuild -f -w better-sqlite3",
+    "rebuild:native:node": "npm rebuild better-sqlite3"
   },
   "dependencies": {
     "@he-tree/vue": "^2.10.5",

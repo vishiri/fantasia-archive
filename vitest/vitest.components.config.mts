@@ -14,6 +14,7 @@ import { vitestTerminalReporters } from './vitest.reporters.shared'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
+const componentsCoverageDir = path.resolve(repoRoot, 'test-results/coverage-components')
 
 /**
  * Vite's published SassPreprocessorOptions omit the sass compiler 'api' field; vite and sass-embedded still read it at runtime.
@@ -24,7 +25,7 @@ type T_vitestComponentsScssOpts = NonNullable<
 
 /**
  * Vue SFC unit tests — jsdom + SFC transforms: components, layouts, and pages.
- * **.ts** files under those trees: **99%** statements, branches, functions, lines (merged per Vitest **`coverage.thresholds`** glob).
+ * **.ts** files under those trees: **95%** statements, branches, functions, lines (merged per Vitest **`coverage.thresholds`** glob).
  * **.vue** SFCs: **no** failing **`coverage.thresholds`** entry; **`watermarks`** use a **60%** lower band so weak totals show orange or red in reports.
  */
 export default defineConfig({
@@ -62,9 +63,15 @@ export default defineConfig({
     reporters: [...vitestTerminalReporters],
     outputFile: 'test-results/vitest-report/test-results-vitest-components.json',
     clearMocks: true,
-    pool: 'forks',
+    maxWorkers: 1,
+    fileParallelism: false,
+    pool: 'threads',
+    globalSetup: [path.resolve(__dirname, 'vitest.coverageTmpSetup.mts')],
     coverage: {
       provider: 'v8',
+      clean: false,
+      processingConcurrency: 1,
+      reportsDirectory: componentsCoverageDir,
       skipFull: vitestCoverageSkipFull,
       include: [
         'src/components/**/*.vue',

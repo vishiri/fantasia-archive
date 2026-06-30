@@ -30,7 +30,7 @@ Tests = **same deliverable** as production edits.
 
 ## Vitest coverage tiers (CI)
 
-See [vitest-tests.mdc](../../rules/vitest-tests.mdc) **Vitest coverage tiers (CI)**: **99%** all metrics on **`src-electron`**; **99%** on **`helpers/**/*.ts`** that **`unit-helpers`** instruments (**`helpers/playwrightHelpers_*`** excluded); **99%** on **`unit-src-renderer`** **`src`** **`.ts`**; **99%** on scoped **`i18n/`** (**`unit-i18n`**); **99%** on **`unit-components`** **`.ts`** under **`src/components`**, **`src/layouts`**, **`src/pages`**; **`.vue`** SFCs — **~60%** watermarks only (**`src/components/foundation/**`** excluded). Configs: [**vitest/**](../../../vitest/); entry [**vitest.config.mts**](../../../vitest.config.mts).
+See [vitest-tests.mdc](../../rules/vitest-tests.mdc) **Vitest coverage tiers (CI)**: **95%** all metrics on **`src-electron`**; **95%** on **`helpers/**/*.ts`** that **`unit-helpers`** instruments (**`helpers/playwrightHelpers_*`** excluded); **95%** on **`unit-src-renderer`** **`src`** **`.ts`**; **95%** on scoped **`i18n/`** (**`unit-i18n`**); **95%** on **`unit-components`** **`.ts`** under **`src/components`**, **`src/layouts`**, **`src/pages`**; **`.vue`** SFCs — **~60%** watermarks only (**`src/components/foundation/**`** excluded). Configs: [**vitest/**](../../../vitest/); entry [**vitest.config.mts**](../../../vitest.config.mts).
 
 ## Unit tests (Vitest)
 

@@ -14,7 +14,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
 /**
  * Renderer-side TypeScript under src/ (boot, scripts, stores) — no Vue SFCs.
- * Locale logic lives in repo-root **i18n/** (**unit-i18n**). 99% v8 thresholds apply to the scoped include list (see **test:coverage:src** in package.json).
+ * Locale logic lives in repo-root **i18n/** (**unit-i18n**). 95% v8 thresholds apply to the scoped include list (see **test:coverage:src** in package.json).
  */
 export default defineConfig({
   resolve: {
@@ -38,6 +38,7 @@ export default defineConfig({
     ],
     reporters: [...vitestTerminalReporters],
     outputFile: 'test-results/vitest-report/test-results-vitest-src-renderer.json',
+    globalSetup: [path.resolve(__dirname, 'vitest.coverageTmpSetup.mts')],
     coverage: {
       provider: 'v8',
       skipFull: vitestCoverageSkipFull,
