@@ -59,6 +59,7 @@ debug-storybook.log*
 
 # Local agent planning documents (temporary)
 /.cursor/plans/
+/.cursor/debug-*.log
 
 # i18n batch-translate scratch (not shipped)
 /.utility-scripts/i18nMaps/
