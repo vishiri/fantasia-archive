@@ -1,3 +1,4 @@
+@use './variables' as *;
 @use '../../../../css/app.palette.scss' as *;
 @use '../../../../css/theme/quasar-components/qFocusable.variables' as *;
 
@@ -20,6 +21,8 @@
 .projectHierarchyTreeHost .tree-node {
   align-items: center;
   display: flex;
+  margin-top: $projectHierarchyTree-node-marginTop;
+  outline: none;
   width: 100%;
 }
 
@@ -27,10 +30,15 @@
   flex-grow: 1;
 }
 
+.projectHierarchyTreeHost .vtlist-inner {
+  padding-left: 0;
+  padding-right: 4px;
+}
+
 /* he-tree row kind hooks: projectHierarchyTree-treeNode--world|group|placement|document */
 
 .projectHierarchyTree__nodeRow {
-  min-height: 28px;
+  min-height: $projectHierarchyTree-node-minHeight;
   position: relative;
   width: 100%;
 }
@@ -66,12 +74,10 @@
   font-size: 16px;
   height: 16px;
   padding: 4px 4px 4px 4px;
+  transform: rotate(0deg);
   transition: transform 0.3s;
   width: 16px;
-
-  &--open {
-    transform: rotate(90deg);
-  }
+  z-index: 10;
 }
 
 .projectHierarchyTree-treeNode--world {
@@ -87,11 +93,15 @@
     position: absolute;
     right: 5px;
     top: 5px;
+
+    &.projectHierarchyTree__openIcon--open {
+      transform: rotate(90deg);
+    }
   }
 
   .projectHierarchyTreeNode--world {
     border-radius: 3px;
-    padding: 0 35px 0 10px !important;
+    padding: 0 35px 0 0 !important;
   }
 }
 
@@ -105,4 +115,40 @@
 
 .projectHierarchyTree-treeNode--document{
 
+}
+
+.projectHierarchyTree-treeNode--group,
+.projectHierarchyTree-treeNode--documentTemplate,
+.projectHierarchyTree-treeNode--document {
+  cursor: pointer;
+
+  .projectHierarchyTree__nodeRow.projectHierarchyTree__dragHandle {
+    cursor: grab;
+  }
+
+  .projectHierarchyTreeNode {
+    margin-left: -20px;
+    padding: 4px 20px 4px 25px;
+  }
+
+  .projectHierarchyTree__openIcon {
+    left: -20px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%) rotate(0deg);
+
+    &.projectHierarchyTree__openIcon--open {
+      transform: translateY(-50%) rotate(90deg);
+    }
+  }
+}
+
+/* Drag placeholder: matches Project Settings world template layout tree; hierarchy row height. */
+.projectHierarchyTree .he-tree-drag-placeholder {
+  background-color: $projectHierarchyTree-dragPlaceholder-backgroundColor;
+  border: $projectHierarchyTree-dragPlaceholder-borderWidth solid $projectHierarchyTree-dragPlaceholder-borderColor;
+  border-radius: $projectHierarchyTree-dragPlaceholder-borderRadius;
+  border-style: solid;
+  box-shadow: inset $projectHierarchyTree-dragPlaceholder-accentWidth 0 0 fa-v('primary-bright', $primary-bright);
+  min-height: $projectHierarchyTree-node-minHeight;
 }

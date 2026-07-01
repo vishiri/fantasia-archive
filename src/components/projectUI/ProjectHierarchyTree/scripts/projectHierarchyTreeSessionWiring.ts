@@ -9,10 +9,9 @@ import type {
 
 import { createProjectHierarchyTreeSessionHandlersWiring } from './projectHierarchyTreeSessionHandlersWiring'
 import { createProjectHierarchyTreeSessionHydrateWiring } from './projectHierarchyTreeSessionHydrateWiring'
-import { createProjectHierarchyTreeSessionRefs } from './projectHierarchyTreeSessionRefsWiring'
-import { createProjectHierarchyTreeSessionSubWiring } from './projectHierarchyTreeSessionSubWiring'
 import { bindProjectHierarchyTreeSessionLifecycle } from './projectHierarchyTreeSessionLifecycleBindWiring'
 import { buildProjectHierarchyTreeSessionApi } from './projectHierarchyTreeSessionApiWiring'
+import { createProjectHierarchyTreeSessionEarlyWiring } from './projectHierarchyTreeSessionEarlyWiring'
 
 type T_hierarchyStore = {
   clearPendingRevealPath: () => void
@@ -47,64 +46,57 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
   watch: typeof watchFn
   worlds: Ref<I_faProjectHierarchyTreeWorkspaceWorld[]>
 }) {
-  const sessionRefs = createProjectHierarchyTreeSessionRefs({ ref: deps.ref })
-
-  const subWiring = createProjectHierarchyTreeSessionSubWiring({
+  const earlyWiring = createProjectHierarchyTreeSessionEarlyWiring({
     computed: deps.computed,
-    dragCommitPending: sessionRefs.dragCommitPending,
-    dragCommitScheduled: sessionRefs.dragCommitScheduled,
-    dragDropCommitted: sessionRefs.dragDropCommitted,
-    dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    dragContext: deps.dragContext,
     hierarchyStore: deps.hierarchyStore,
-    isTreeDragActive: sessionRefs.isTreeDragActive,
     nextTick: deps.nextTick,
-    openNodeIds: sessionRefs.openNodeIds,
+    onUnmounted: deps.onUnmounted,
     pendingRevealPath: deps.pendingRevealPath,
     ref: deps.ref,
-    suppressTreeEmit: sessionRefs.suppressTreeEmit,
-    treeComponentRef: sessionRefs.treeComponentRef,
     treeData: deps.treeData,
-    treeMountKey: sessionRefs.treeMountKey,
-    treeScrollHostRef: sessionRefs.treeScrollHostRef,
     uiState: deps.uiState,
+    watch: deps.watch,
     worlds: deps.worlds
   })
 
   const handlersWiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: earlyWiring.documentRowDragHoldWiring,
+    documentRowExpandClickGesture: earlyWiring.bootstrap.documentRowExpandClickGesture,
     dragContext: deps.dragContext,
-    dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
-    lazyLoadWiring: subWiring.lazyLoadWiring,
+    dragExpandUiFrozen: earlyWiring.bootstrap.sessionRefs.dragExpandUiFrozen,
+    lazyLoadWiring: earlyWiring.subWiring.lazyLoadWiring,
     onDocumentClick: deps.onDocumentClick,
-    suppressTreeEmit: sessionRefs.suppressTreeEmit,
-    treeComponentRef: sessionRefs.treeComponentRef,
+    suppressTreeEmit: earlyWiring.bootstrap.sessionRefs.suppressTreeEmit,
+    treeComponentRef: earlyWiring.bootstrap.sessionRefs.treeComponentRef,
     treeData: deps.treeData,
-    treeScrollHostRef: sessionRefs.treeScrollHostRef,
-    uiStateWiring: subWiring.uiStateWiring
+    treeScrollHostRef: earlyWiring.bootstrap.sessionRefs.treeScrollHostRef,
+    uiStateWiring: earlyWiring.subWiring.uiStateWiring
   })
 
   const hydrateWiring = createProjectHierarchyTreeSessionHydrateWiring({
-    dndWiring: subWiring.dndWiring,
+    dndWiring: earlyWiring.subWiring.dndWiring,
     hierarchyStore: deps.hierarchyStore,
-    syncWiring: subWiring.syncWiring,
-    uiStateWiring: subWiring.uiStateWiring
+    syncWiring: earlyWiring.subWiring.syncWiring,
+    uiStateWiring: earlyWiring.subWiring.uiStateWiring
   })
 
   bindProjectHierarchyTreeSessionLifecycle({
     S_FaActiveProject: deps.S_FaActiveProject,
     clearPendingRevealPath: () => deps.hierarchyStore.clearPendingRevealPath(),
-    dragCommitPending: sessionRefs.dragCommitPending,
-    dragCommitScheduled: sessionRefs.dragCommitScheduled,
-    dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    dragCommitPending: earlyWiring.bootstrap.sessionRefs.dragCommitPending,
+    dragCommitScheduled: earlyWiring.bootstrap.sessionRefs.dragCommitScheduled,
+    dragExpandUiFrozen: earlyWiring.bootstrap.sessionRefs.dragExpandUiFrozen,
     flushUiStatePersist: () => deps.hierarchyStore.flushUiStatePersist(),
     hydrateTreeSession: hydrateWiring.hydrateTreeSession,
     onMounted: deps.onMounted,
     onUnmounted: deps.onUnmounted,
-    openNodeIds: sessionRefs.openNodeIds,
+    openNodeIds: earlyWiring.bootstrap.sessionRefs.openNodeIds,
     pendingRevealPath: deps.pendingRevealPath,
     resetOnProjectClose: () => deps.hierarchyStore.resetOnProjectClose(),
-    resyncTreeDataFromLayout: subWiring.syncWiring.resyncTreeDataFromLayout,
-    restoreUiStateFromStore: subWiring.uiStateWiring.restoreUiStateFromStore,
-    revealPendingPath: subWiring.uiStateWiring.revealPendingPath,
+    resyncTreeDataFromLayout: earlyWiring.subWiring.syncWiring.resyncTreeDataFromLayout,
+    restoreUiStateFromStore: earlyWiring.subWiring.uiStateWiring.restoreUiStateFromStore,
+    revealPendingPath: earlyWiring.subWiring.uiStateWiring.revealPendingPath,
     teardown: hydrateWiring.teardown,
     watch: deps.watch,
     worlds: deps.worlds
@@ -112,8 +104,9 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
 
   return buildProjectHierarchyTreeSessionApi({
     handlersWiring,
-    subWiring,
+    isTreeDragActive: earlyWiring.bootstrap.sessionRefs.isTreeDragActive,
+    subWiring: earlyWiring.subWiring,
     treeData: deps.treeData,
-    treeMountKey: sessionRefs.treeMountKey
+    treeMountKey: earlyWiring.bootstrap.sessionRefs.treeMountKey
   })
 }

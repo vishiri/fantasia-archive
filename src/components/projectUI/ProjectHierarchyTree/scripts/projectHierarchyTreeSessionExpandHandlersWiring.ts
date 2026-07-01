@@ -8,9 +8,12 @@ import {
   tryOpenHeTreeNodeAndParents
 } from './projectHierarchyTreeHeTreeOpenSafeWiring'
 import { createProjectHierarchyTreeExpandRowClickRouting } from './projectHierarchyTreeExpandRowClickRoutingWiring'
-import { logProjectHierarchyTreeDebugSession } from './projectHierarchyTreeDebugSessionLogWiring'
+import type { createProjectHierarchyTreeDocumentRowDragHoldWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
+import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowExpandClickGestureWiring'
 
 export function createProjectHierarchyTreeSessionExpandHandlersWiring (deps: {
+  documentRowDragHoldWiring: ReturnType<typeof createProjectHierarchyTreeDocumentRowDragHoldWiring>
+  documentRowExpandClickGesture: ReturnType<typeof createProjectHierarchyTreeDocumentRowExpandClickGestureWiring>
   dragExpandUiFrozen: Ref<boolean>
   lazyLoadWiring: {
     loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
@@ -53,16 +56,6 @@ export function createProjectHierarchyTreeSessionExpandHandlersWiring (deps: {
           }
       tryOpenHeTreeNodeAndParents(openArgs)
     }
-    logProjectHierarchyTreeDebugSession({
-      data: {
-        nodeId: stat.data.id,
-        nodeKind: stat.data.nodeKind
-      },
-      hypothesisId: 'D2',
-      location: 'projectHierarchyTreeSessionExpandHandlersWiring.ts:onNodeOpen',
-      message: 'node opened after lazy load',
-      runId: 'doc-nested-open'
-    })
   }
 
   function onNodeOpenIconPointerDown (stat: { open: boolean }): void {
@@ -91,6 +84,8 @@ export function createProjectHierarchyTreeSessionExpandHandlersWiring (deps: {
   }
 
   const expandRowClickRouting = createProjectHierarchyTreeExpandRowClickRouting({
+    documentRowDragHoldWiring: deps.documentRowDragHoldWiring,
+    documentRowExpandClickGesture: deps.documentRowExpandClickGesture,
     onNodeOpenIconClick,
     onNodeOpenIconPointerDown
   })

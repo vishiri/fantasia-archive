@@ -14,7 +14,6 @@ import {
   collectProjectHierarchyTreeLazyLoadIdsAlongExpandedPaths,
   sortProjectHierarchyTreeExpandedNodeIdsForRestore
 } from './projectHierarchyTreeExpandedRestoreOrder'
-import { logProjectHierarchyTreeDebugSession } from './projectHierarchyTreeDebugSessionLogWiring'
 
 type T_treeRef = I_faProjectHierarchyTreeHeTreeInstance | null
 
@@ -78,16 +77,6 @@ export async function restoreProjectHierarchyTreeExpandedSnapshot (deps: {
   await deps.flushDeferredTreeRevisionPublish()
 
   const treeRef = deps.getTreeRef()
-  logProjectHierarchyTreeDebugSession({
-    data: {
-      inputExpandedNodeIds: deps.expandedNodeIds,
-      pruned,
-      treeRefPresent: treeRef !== null
-    },
-    hypothesisId: 'H3',
-    location: 'projectHierarchyTreeExpandedSnapshotWiring.ts:restore',
-    message: 'snapshot restore pruned ids'
-  })
   if (treeRef === null) {
     return
   }

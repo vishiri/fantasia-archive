@@ -47,6 +47,62 @@ test('Test that ProjectHierarchyTreeNode renders world row chrome', () => {
   expect(wrapper.find('.q-focus-helper').exists()).toBe(true)
   expect((wrapper.element as HTMLElement).style.color).toBe('rgb(17, 34, 51)')
   expect(wrapper.find('.projectHierarchyTreeNode__label').exists()).toBe(true)
+  expect(wrapper.find('.projectHierarchyTreeNode__icon--layoutKind').exists()).toBe(false)
+})
+
+/**
+ * ProjectHierarchyTreeNode constrains group, placement, and document icons to layout sizing.
+ */
+test('Test that ProjectHierarchyTreeNode applies layout icon sizing for non-world rows', () => {
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    global: {
+      stubs: {
+        QIcon: {
+          props: ['name'],
+          template: '<i class="q-icon" :name="name" />'
+        }
+      }
+    },
+    props: {
+      node: {
+        ...baseNode,
+        nodeKind: 'templatePlacement'
+      },
+      stat: {
+        open: false
+      }
+    }
+  })
+  expect(wrapper.find('.projectHierarchyTreeNode__icon--layoutKind').exists()).toBe(true)
+})
+
+/**
+ * ProjectHierarchyTreeNode shows document rows with their placement template icon.
+ */
+test('Test that ProjectHierarchyTreeNode shows document rows with placement icon', () => {
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    global: {
+      stubs: {
+        QIcon: {
+          props: ['name'],
+          template: '<i class="q-icon" :name="name" />'
+        }
+      }
+    },
+    props: {
+      node: {
+        ...baseNode,
+        documentId: 'doc-1',
+        icon: 'mdi-account',
+        nodeKind: 'document'
+      },
+      stat: {
+        open: false
+      }
+    }
+  })
+  expect(wrapper.find('.q-icon').attributes('name')).toBe('mdi-account')
+  expect(wrapper.find('.projectHierarchyTreeNode__icon--layoutKind').exists()).toBe(true)
 })
 
 /**
@@ -85,7 +141,7 @@ test('Test that ProjectHierarchyTreeNode applies document row class', () => {
     }
   })
   expect(wrapper.classes()).toContain('projectHierarchyTreeNode--document')
-  expect(wrapper.classes()).toContain('projectHierarchyTree__dragHandle')
+  expect(wrapper.classes()).not.toContain('projectHierarchyTree__dragHandle')
 })
 
 /**

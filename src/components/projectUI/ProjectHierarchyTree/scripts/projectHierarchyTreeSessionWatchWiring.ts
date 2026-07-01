@@ -1,8 +1,6 @@
 import type { Ref } from 'vue'
 import type { watch as watchFn } from 'vue'
 
-import { logProjectHierarchyTreeDebugSession } from './projectHierarchyTreeDebugSessionLogWiring'
-
 export function wireProjectHierarchyTreeSessionLifecycle (deps: {
   S_FaActiveProject: () => {
     activeProject: { id: string } | null
@@ -44,18 +42,7 @@ export function wireProjectHierarchyTreeSessionLifecycle (deps: {
     () => deps.worlds.value,
     async () => {
       deps.resyncTreeDataFromLayout()
-      const deferred = deps.shouldDeferWorldsExpandRestore()
-      logProjectHierarchyTreeDebugSession({
-        data: {
-          deferred,
-          worldsCount: deps.worlds.value.length
-        },
-        hypothesisId: 'H2-H4',
-        location: 'projectHierarchyTreeSessionWatchWiring.ts:worldsWatch',
-        message: deferred ? 'worlds changed while drag restore deferred' : 'worlds changed — restoreUiStateFromStore',
-        runId: 'post-fix'
-      })
-      if (deferred) {
+      if (deps.shouldDeferWorldsExpandRestore()) {
         return
       }
       await deps.restoreUiStateFromStore()

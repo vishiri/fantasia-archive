@@ -30,6 +30,10 @@
 - **Project database**: The **`.faproject`** schema is flattened to a single **`user_version` 1** for this development cycle. Older pre-release **`.faproject`** files from previous dev builds are not upgraded automatically; recreate those projects after updating.
 - **Project Settings**: Screen reader users get labeled controls throughout the dialog. The **Worlds** and **Document Templates** filter fields, their clear controls, the **Available document templates** filter, **World color** and **World color palette** help icons, each palette swatch, and the **World appendix** help icon now expose accessible names in every supported interface language.
 - **Project Settings**: The shared delete confirmation button used by **Worlds** and **Document Templates** exposes its label, confirmation prompt, and countdown to assistive technology.
+- **Workspace sidebar**: Dragging documents in the hierarchy tree no longer errors in the console when hover auto-expands a closed row for nesting.
+- **Workspace sidebar**: You can nest a document under a sibling document row in the same template placement again.
+- **Workspace sidebar**: Document rows use a short press-and-hold before drag starts, so quick clicks expand or collapse folders without starting a drag.
+- **Workspace sidebar**: Nesting into a document whose children were not yet loaded opens that parent row after the drop so the moved document stays visible.
 
 ### Known issues
 - **Fantasia Archive Settings** still lists many experimental toggles marked as planned work in their titles; those options are not shipped yet and have no effect when enabled.

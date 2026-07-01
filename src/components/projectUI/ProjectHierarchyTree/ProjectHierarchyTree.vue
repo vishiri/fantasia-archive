@@ -12,7 +12,7 @@
       class="projectHierarchyTree hasScrollbar"
       :class="treeRootClassList"
       :default-open="false"
-      :drag-open="true"
+      :drag-open="isTreeDragActive"
       :drag-open-delay="PROJECT_HIERARCHY_TREE_DRAG_OPEN_DELAY_MS"
       :each-draggable="eachDraggableHandler"
       :each-droppable="eachDroppableHandler"
@@ -86,6 +86,7 @@ const treeComponentRef = ref<I_faProjectHierarchyTreeHeTreeInstance | null>(null
 const {
   eachDraggableHandler,
   eachDroppableHandler,
+  isTreeDragActive,
   onNodeClick,
   onNodeClose,
   onNodeOpen,

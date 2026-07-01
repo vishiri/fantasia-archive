@@ -1,0 +1,15 @@
+@use '../../../../css/app.palette.scss' as *;
+@use '../../../../css/globals/paletteGlobals.variables.scss' as *;
+
+/* COMPONENT - PROJECT HIERARCHY TREE */
+$projectHierarchyTree-documentRow-color: #dcdcdc;
+$projectHierarchyTree-dragPlaceholder-accentWidth: 3px;
+$projectHierarchyTree-dragPlaceholder-backgroundColor: color-mix(in srgb, fa-v('primary-bright', $primary-bright) 10%, transparent);
+$projectHierarchyTree-dragPlaceholder-borderColor: color-mix(in srgb, fa-v('primary-bright', $primary-bright) 28%, transparent);
+$projectHierarchyTree-dragPlaceholder-borderRadius: 4px;
+$projectHierarchyTree-dragPlaceholder-borderWidth: 1px;
+$projectHierarchyTree-groupRow-color: fa-v('primary-bright', $primary-bright);
+$projectHierarchyTree-nodeIcon-boxSize: $iconSize;
+$projectHierarchyTree-nodeIcon-marginRight: 8px;
+$projectHierarchyTree-node-marginTop: 3px;
+$projectHierarchyTree-node-minHeight: 29px;

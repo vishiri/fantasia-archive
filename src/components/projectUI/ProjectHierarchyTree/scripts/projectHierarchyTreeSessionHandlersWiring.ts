@@ -5,10 +5,14 @@ import type { I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHe
 import {
   isProjectHierarchyTreeNodeDraggable
 } from '../functions/projectHierarchyTreeDnD'
+import type { createProjectHierarchyTreeDocumentRowDragHoldWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
+import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowExpandClickGestureWiring'
 import { createProjectHierarchyTreeDroppableHandlers } from './projectHierarchyTreeDroppableHandlerWiring'
 import { createProjectHierarchyTreeSessionExpandHandlersWiring } from './projectHierarchyTreeSessionExpandHandlersWiring'
 
 export function createProjectHierarchyTreeSessionHandlersWiring (deps: {
+  documentRowDragHoldWiring: ReturnType<typeof createProjectHierarchyTreeDocumentRowDragHoldWiring>
+  documentRowExpandClickGesture: ReturnType<typeof createProjectHierarchyTreeDocumentRowExpandClickGestureWiring>
   dragContext: {
     dragNode: {
       data: I_faProjectHierarchyTreeHeTreeNode
@@ -29,6 +33,8 @@ export function createProjectHierarchyTreeSessionHandlersWiring (deps: {
   }
 }) {
   const expandHandlersWiring = createProjectHierarchyTreeSessionExpandHandlersWiring({
+    documentRowDragHoldWiring: deps.documentRowDragHoldWiring,
+    documentRowExpandClickGesture: deps.documentRowExpandClickGesture,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     lazyLoadWiring: deps.lazyLoadWiring,
     suppressTreeEmit: deps.suppressTreeEmit,

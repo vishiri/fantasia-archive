@@ -9,12 +9,8 @@ import type {
 /** Default Material icon for template group rows. */
 const PROJECT_HIERARCHY_TREE_GROUP_ICON = 'mdi-database'
 
-type T_rootLayoutItem =
-  | { kind: 'group', groupId: string, rootSortOrder: number }
-  | { kind: 'placement', placementId: string, rootSortOrder: number }
-
 function createLazyPlaceholderChild (
-  parent: Pick<I_faProjectHierarchyTreeHeTreeNode, 'id' | 'placementId' | 'worldColor' | 'worldId'>
+  parent: Pick<I_faProjectHierarchyTreeHeTreeNode, 'icon' | 'id' | 'placementId' | 'worldColor' | 'worldId'>
 ): I_faProjectHierarchyTreeHeTreeNode {
   return {
     children: [],
@@ -22,7 +18,7 @@ function createLazyPlaceholderChild (
     documentId: null,
     groupId: null,
     hasChildren: false,
-    icon: '',
+    icon: parent.icon,
     id: `${parent.id}__lazy`,
     label: '',
     nodeKind: 'document',
@@ -41,13 +37,25 @@ function resolveLazyChildren (
   return [createLazyPlaceholderChild(parent)]
 }
 
+function patchDocumentSubtreeIconsInPlace (
+  nodes: I_faProjectHierarchyTreeHeTreeNode[],
+  placementIcon: string
+): void {
+  for (const node of nodes) {
+    if (node.nodeKind !== 'document') {
+      continue
+    }
+    node.icon = placementIcon
+    if (node.childrenLoaded && node.children.length > 0) {
+      patchDocumentSubtreeIconsInPlace(node.children, placementIcon)
+    }
+  }
+}
+
 function syncProjectHierarchyTreeNodeLazyChildren (
   node: I_faProjectHierarchyTreeHeTreeNode
 ): void {
-  if (node.nodeKind === 'world' || node.nodeKind === 'group') {
-    return
-  }
-  if (node.childrenLoaded) {
+  if (node.nodeKind === 'world' || node.nodeKind === 'group' || node.childrenLoaded) {
     return
   }
   if (!node.hasChildren) {
@@ -61,18 +69,11 @@ function syncProjectHierarchyTreeNodeLazyChildren (
   }
 }
 
-function resolvePlacementLabel (placement: I_faProjectHierarchyTreeWorkspacePlacement): string {
-  const nickname = placement.nickname.trim()
-  if (nickname.length > 0) {
-    return nickname
-  }
-  return placement.displayName
-}
-
 function mapPlacementToNode (
   world: I_faProjectHierarchyTreeWorkspaceWorld,
   placement: I_faProjectHierarchyTreeWorkspacePlacement
 ): I_faProjectHierarchyTreeHeTreeNode {
+  const nickname = placement.nickname.trim()
   const node: I_faProjectHierarchyTreeHeTreeNode = {
     children: [],
     childrenLoaded: false,
@@ -81,7 +82,7 @@ function mapPlacementToNode (
     hasChildren: placement.hasChildren,
     icon: placement.icon,
     id: placement.id,
-    label: resolvePlacementLabel(placement),
+    label: nickname.length > 0 ? nickname : placement.displayName,
     nodeKind: 'templatePlacement',
     placementId: placement.id,
     worldColor: world.color,
@@ -91,22 +92,16 @@ function mapPlacementToNode (
   return node
 }
 
-function buildGroupChildNodes (
-  world: I_faProjectHierarchyTreeWorkspaceWorld,
-  groupId: string
-): I_faProjectHierarchyTreeHeTreeNode[] {
-  return world.placements
-    .filter((placement) => placement.groupId === groupId)
-    .sort((left, right) => (left.groupSortOrder ?? 0) - (right.groupSortOrder ?? 0))
-    .map((placement) => mapPlacementToNode(world, placement))
-}
-
 function mapGroupToNode (
   world: I_faProjectHierarchyTreeWorkspaceWorld,
   group: I_faProjectHierarchyTreeWorkspaceGroup
 ): I_faProjectHierarchyTreeHeTreeNode {
+  const children = world.placements
+    .filter((placement) => placement.groupId === group.id)
+    .sort((left, right) => (left.groupSortOrder ?? 0) - (right.groupSortOrder ?? 0))
+    .map((placement) => mapPlacementToNode(world, placement))
   return {
-    children: buildGroupChildNodes(world, group.id),
+    children,
     childrenLoaded: true,
     documentId: null,
     groupId: group.id,
@@ -121,10 +116,12 @@ function mapGroupToNode (
   }
 }
 
-function buildRootLayoutItems (
+function mapWorldToNode (
   world: I_faProjectHierarchyTreeWorkspaceWorld
-): T_rootLayoutItem[] {
-  const items: T_rootLayoutItem[] = [
+): I_faProjectHierarchyTreeHeTreeNode {
+  const groupById = new Map(world.groups.map((group) => [group.id, group]))
+  const placementById = new Map(world.placements.map((placement) => [placement.id, placement]))
+  const rootItems = [
     ...world.groups.map((group) => ({
       groupId: group.id,
       kind: 'group' as const,
@@ -137,38 +134,19 @@ function buildRootLayoutItems (
         placementId: placement.id,
         rootSortOrder: placement.rootSortOrder ?? 0
       }))
-  ]
-  items.sort((left, right) => left.rootSortOrder - right.rootSortOrder)
-  return items
-}
-
-function resolveWorldHasChildren (world: I_faProjectHierarchyTreeWorkspaceWorld): boolean {
-  if (world.groups.length > 0) {
-    return true
-  }
-  return world.placements.length > 0
-}
-
-function mapWorldToNode (
-  world: I_faProjectHierarchyTreeWorkspaceWorld
-): I_faProjectHierarchyTreeHeTreeNode {
-  const groupById = new Map(world.groups.map((group) => [group.id, group]))
-  const placementById = new Map(world.placements.map((placement) => [placement.id, placement]))
-  const rootItems = buildRootLayoutItems(world)
-
+  ].sort((left, right) => left.rootSortOrder - right.rootSortOrder)
   const children = rootItems.map((item) => {
     if (item.kind === 'group') {
       return mapGroupToNode(world, groupById.get(item.groupId)!)
     }
     return mapPlacementToNode(world, placementById.get(item.placementId)!)
   })
-
   return {
     children,
     childrenLoaded: true,
     documentId: null,
     groupId: null,
-    hasChildren: resolveWorldHasChildren(world),
+    hasChildren: world.groups.length > 0 || world.placements.length > 0,
     icon: '',
     id: world.id,
     label: world.displayName,
@@ -177,6 +155,18 @@ function mapWorldToNode (
     worldColor: world.color,
     worldId: world.id
   }
+}
+
+function patchPlacementNodeInPlace (
+  placementNode: I_faProjectHierarchyTreeHeTreeNode,
+  placement: I_faProjectHierarchyTreeWorkspacePlacement
+): void {
+  const nickname = placement.nickname.trim()
+  placementNode.label = nickname.length > 0 ? nickname : placement.displayName
+  placementNode.icon = placement.icon
+  placementNode.hasChildren = placement.hasChildren
+  patchDocumentSubtreeIconsInPlace(placementNode.children, placement.icon)
+  syncProjectHierarchyTreeNodeLazyChildren(placementNode)
 }
 
 /**
@@ -207,7 +197,7 @@ export function patchHierarchyTreeSkeletonLabelsInPlace (
     }
     worldNode.label = world.displayName
     worldNode.worldColor = world.color
-    worldNode.hasChildren = resolveWorldHasChildren(world)
+    worldNode.hasChildren = world.groups.length > 0 || world.placements.length > 0
 
     for (const child of worldNode.children) {
       if (child.nodeKind === 'group') {
@@ -222,10 +212,7 @@ export function patchHierarchyTreeSkeletonLabelsInPlace (
           if (placement === undefined) {
             continue
           }
-          placementNode.label = resolvePlacementLabel(placement)
-          placementNode.icon = placement.icon
-          placementNode.hasChildren = placement.hasChildren
-          syncProjectHierarchyTreeNodeLazyChildren(placementNode)
+          patchPlacementNodeInPlace(placementNode, placement)
         }
         continue
       }
@@ -233,10 +220,7 @@ export function patchHierarchyTreeSkeletonLabelsInPlace (
       if (placement === undefined) {
         continue
       }
-      child.label = resolvePlacementLabel(placement)
-      child.icon = placement.icon
-      child.hasChildren = placement.hasChildren
-      syncProjectHierarchyTreeNodeLazyChildren(child)
+      patchPlacementNodeInPlace(child, placement)
     }
   }
 }
@@ -246,6 +230,7 @@ export function patchHierarchyTreeSkeletonLabelsInPlace (
  */
 export function mapHierarchyDocumentChildrenToTreeNodes (input: {
   items: I_faProjectHierarchyTreeDocumentChild[]
+  placementIcon: string
   worldColor: string
   worldId: string
 }): I_faProjectHierarchyTreeHeTreeNode[] {
@@ -256,7 +241,7 @@ export function mapHierarchyDocumentChildrenToTreeNodes (input: {
       documentId: item.id,
       groupId: null,
       hasChildren: item.hasChildren,
-      icon: '',
+      icon: input.placementIcon,
       id: item.id,
       label: item.displayName,
       nodeKind: 'document',

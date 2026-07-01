@@ -37,6 +37,7 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
       onTreeAfterDrop: vi.fn(),
       onTreeDataUpdate: vi.fn(),
       onTreeDragEndCleanup: vi.fn(),
+      isTreeDragActive: ref(false),
       rootDroppableHandler: () => false,
       setTreeComponentRef: vi.fn(),
       setTreeScrollHostRef: vi.fn(),

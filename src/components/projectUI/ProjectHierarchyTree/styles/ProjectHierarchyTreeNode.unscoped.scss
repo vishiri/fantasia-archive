@@ -1,3 +1,46 @@
+@use './variables' as *;
+@use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
+
+.projectHierarchyTreeNode {
+  min-height: $projectHierarchyTree-node-minHeight;
+  width: 100%;
+}
+
 .projectHierarchyTreeNode > .q-focus-helper {
   border-radius: 0;
+}
+
+.projectHierarchyTreeNode--document,
+.projectHierarchyTreeNode--documentTemplate {
+  color: $projectHierarchyTree-documentRow-color;
+}
+
+.projectHierarchyTreeNode--group {
+  color: $projectHierarchyTree-groupRow-color;
+}
+
+.projectHierarchyTreeNode--world .projectHierarchyTreeNode__icon {
+  margin-right: $projectHierarchyTree-nodeIcon-marginRight;
+}
+
+.projectHierarchyTreeNode__icon--layoutKind {
+  @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
+
+  --fa-q-icon-display-glyph-fit-scale: 1;
+  --fa-q-icon-display-glyph-font-size: #{$projectHierarchyTree-nodeIcon-boxSize};
+  --fa-q-icon-display-mdi-fit-scale: 1;
+  --fa-q-icon-display-mdi-font-size: #{$projectHierarchyTree-nodeIcon-boxSize};
+
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: $projectHierarchyTree-nodeIcon-boxSize;
+  height: $projectHierarchyTree-nodeIcon-boxSize;
+  justify-content: center;
+  margin-right: $projectHierarchyTree-nodeIcon-marginRight;
+  width: $projectHierarchyTree-nodeIcon-boxSize;
+
+  &:not(.fa-brands, .fa-regular, .fa-solid) {
+    margin-top: 0;
+  }
 }

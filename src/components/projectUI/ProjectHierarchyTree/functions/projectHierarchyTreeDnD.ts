@@ -120,8 +120,7 @@ export function isProjectHierarchyTreeDocumentDropParentValid (input: {
 
 /**
  * Document drops are allowed only on rows sharing the same placementId.
- * Direct parent documents are not droppable so pull-left outdent uses sibling slots
- * (same policy shape as template layout tree: template cannot nest on template).
+ * Direct parent documents are not droppable so pull-left outdent uses sibling slots.
  */
 export function isProjectHierarchyTreeNodeDroppable (
   targetNode: I_faProjectHierarchyTreeHeTreeNode,
@@ -135,6 +134,7 @@ export function isProjectHierarchyTreeNodeDroppable (
   if (dragged.placementId === null) {
     return false
   }
+  const treeNodesSafe = Array.isArray(treeNodes) ? treeNodes : []
   if (targetNode.nodeKind === 'document') {
     if (!isProjectHierarchyTreeDocumentSiblingRow(targetNode)) {
       return false
@@ -146,7 +146,7 @@ export function isProjectHierarchyTreeNodeDroppable (
       return false
     }
     const parentDocumentId = resolveProjectHierarchyTreeDocumentParentDocumentId(
-      Array.isArray(treeNodes) ? treeNodes : [],
+      treeNodesSafe,
       dragged.id
     )
     if (

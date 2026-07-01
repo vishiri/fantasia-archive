@@ -60,6 +60,7 @@ export function createProjectHierarchyTreeLazyLoadWiring (deps: {
       })
       const children = mapHierarchyDocumentChildrenToTreeNodes({
         items: result.items,
+        placementIcon: node.icon,
         worldColor: node.worldColor,
         worldId: node.worldId
       })
@@ -79,6 +80,7 @@ export function createProjectHierarchyTreeLazyLoadWiring (deps: {
       })
       const children = mapHierarchyDocumentChildrenToTreeNodes({
         items: result.items,
+        placementIcon: node.icon,
         worldColor: node.worldColor,
         worldId: node.worldId
       })

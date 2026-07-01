@@ -9,7 +9,6 @@ import {
   isProjectHierarchyTreeDocumentSiblingRow
 } from '../functions/projectHierarchyTreeDnD'
 import { syncProjectHierarchyTreeDocumentHasChildrenFlags } from '../functions/projectHierarchyTreeDocumentHasChildrenSync'
-import { logProjectHierarchyTreeDebugSession } from './projectHierarchyTreeDebugSessionLogWiring'
 
 type T_parentBucket = {
   children: I_faProjectHierarchyTreeHeTreeNode[]
@@ -95,23 +94,6 @@ export async function commitProjectHierarchyTreeDraggedDocumentMove (deps: {
     parentDocumentId: parentBucket.parentDocumentId,
     parentNode: parentBucket.parentNode
   })
-  // #region agent log
-  logProjectHierarchyTreeDebugSession({
-    data: {
-      documentId,
-      dropParentValid,
-      parentNodeId: parentBucket.parentNode?.id ?? null,
-      parentNodeKind: parentBucket.parentNode?.nodeKind ?? null,
-      siblingCount: siblings.length,
-      targetParentDocumentId: parentBucket.parentDocumentId,
-      targetSortOrder
-    },
-    hypothesisId: 'F1-F2',
-    location: 'projectHierarchyTreeDnDCommitWiring.ts:commitProjectHierarchyTreeDraggedDocumentMove',
-    message: 'drag commit move payload',
-    runId: 'first-level-drop'
-  })
-  // #endregion
   if (!dropParentValid) {
     deps.resyncTreeDataFromLayout()
     await deps.refreshLayout()
@@ -128,18 +110,6 @@ export async function commitProjectHierarchyTreeDraggedDocumentMove (deps: {
       targetSortOrder
     })
     const emptiedParentDocumentIds = syncProjectHierarchyTreeDocumentHasChildrenFlags(deps.treeData)
-    // #region agent log
-    logProjectHierarchyTreeDebugSession({
-      data: {
-        documentId,
-        emptiedParentDocumentIds
-      },
-      hypothesisId: 'C1',
-      location: 'projectHierarchyTreeDnDCommitWiring.ts:commitProjectHierarchyTreeDraggedDocumentMove',
-      message: 'synced document hasChildren after drag commit',
-      runId: 'empty-parent-caret'
-    })
-    // #endregion
     return {
       committed: true,
       emptiedParentDocumentIds,

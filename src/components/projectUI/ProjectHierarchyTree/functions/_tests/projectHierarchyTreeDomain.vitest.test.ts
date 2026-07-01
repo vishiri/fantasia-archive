@@ -253,6 +253,7 @@ test('Test that mergeLoadedChildrenIntoNode attaches lazy children under a targe
         sortOrder: 0
       }
     ],
+    placementIcon: 'mdi-account',
     worldColor: '#000',
     worldId: 'world-1'
   })
@@ -473,10 +474,10 @@ test('Test that projectHierarchyTreeDnD blocks drop on direct parent document', 
     id: 'doc-sibling',
     label: 'Sibling'
   }
-  parentDocument.children = [childDocument]
+  parentDocument.children = [childDocument, siblingDocument]
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   const placement = tree[0]!.children[0]!
-  placement.children = [parentDocument, siblingDocument]
+  placement.children = [parentDocument]
   placement.childrenLoaded = true
   const dragContext = {
     dragNode: {
@@ -485,6 +486,62 @@ test('Test that projectHierarchyTreeDnD blocks drop on direct parent document', 
   }
   expect(isProjectHierarchyTreeNodeDroppable(parentDocument, dragContext, tree)).toBe(false)
   expect(isProjectHierarchyTreeNodeDroppable(siblingDocument, dragContext, tree)).toBe(true)
+})
+
+test('Test that projectHierarchyTreeDnD allows nest on non-sibling section documents', () => {
+  const parentDocument = {
+    children: [] as I_faProjectHierarchyTreeHeTreeNode[],
+    childrenLoaded: true,
+    documentId: 'doc-parent',
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'doc-parent',
+    label: 'Parent',
+    nodeKind: 'document' as const,
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const childDocument = {
+    children: [],
+    childrenLoaded: true,
+    documentId: 'doc-child',
+    groupId: null,
+    hasChildren: false,
+    icon: '',
+    id: 'doc-child',
+    label: 'Child',
+    nodeKind: 'document' as const,
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const cousinSection = {
+    children: [],
+    childrenLoaded: true,
+    documentId: 'doc-cousin',
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'doc-cousin',
+    label: 'Cousin',
+    nodeKind: 'document' as const,
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  parentDocument.children = [childDocument]
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const placement = tree[0]!.children[0]!
+  placement.children = [parentDocument, cousinSection]
+  placement.childrenLoaded = true
+  const dragContext = {
+    dragNode: {
+      data: childDocument
+    }
+  }
+  expect(isProjectHierarchyTreeNodeDroppable(cousinSection, dragContext, tree)).toBe(true)
 })
 
 test('Test that projectHierarchyTreeDnD tolerates missing children during parent resolve', () => {
@@ -965,6 +1022,7 @@ test('Test that patchHierarchyTreeSkeletonLabelsInPlace keeps loaded children wh
         sortOrder: 0
       }
     ],
+    placementIcon: 'mdi-account',
     worldColor: '#ff0000',
     worldId: 'world-1'
   })[0]!
@@ -1017,6 +1075,28 @@ test('Test that projectHierarchyTreeLayoutStructureMatchesTree rejects unknown w
 })
 
 /**
+ * mapHierarchyDocumentChildrenToTreeNodes copies the placement icon onto document rows.
+ */
+test('Test that mapHierarchyDocumentChildrenToTreeNodes copies placement icon onto documents', () => {
+  const nodes = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [
+      {
+        displayName: 'Doc 1',
+        hasChildren: false,
+        id: 'doc-1',
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        sortOrder: 0
+      }
+    ],
+    placementIcon: 'mdi-account',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  expect(nodes[0]?.icon).toBe('mdi-account')
+})
+
+/**
  * mapHierarchyDocumentChildrenToTreeNodes adds lazy placeholders for expandable documents.
  */
 test('Test that mapHierarchyDocumentChildrenToTreeNodes adds lazy placeholders', () => {
@@ -1031,6 +1111,7 @@ test('Test that mapHierarchyDocumentChildrenToTreeNodes adds lazy placeholders',
         sortOrder: 0
       }
     ],
+    placementIcon: 'mdi-account',
     worldColor: '#000',
     worldId: 'world-1'
   })
@@ -1054,6 +1135,7 @@ test('Test that mergeLoadedChildrenIntoNode merges into nested placement nodes',
         sortOrder: 0
       }
     ],
+    placementIcon: 'mdi-account',
     worldColor: '#000',
     worldId: 'world-1'
   })

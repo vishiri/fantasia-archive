@@ -11,7 +11,6 @@ import { commitProjectHierarchyTreeDraggedDocumentMove } from './projectHierarch
 import { openProjectHierarchyTreeNestParentAfterDragDrop } from './projectHierarchyTreeNestParentOpenWiring'
 import { remountProjectHierarchyTreeAndRestoreExpandedSnapshot } from './projectHierarchyTreeMountRemountWiring'
 import { findProjectHierarchyTreeNodeById } from '../functions/projectHierarchyTreeExpandState'
-import { logProjectHierarchyTreeDebugSession } from './projectHierarchyTreeDebugSessionLogWiring'
 
 type T_projectHierarchyTreeDragCommitScheduleDeps = {
   bumpTreeMountKey: () => void
@@ -20,6 +19,7 @@ type T_projectHierarchyTreeDragCommitScheduleDeps = {
   dragExpandUiFrozen: Ref<boolean>
   dragExpandedSnapshot: () => string[] | null
   draggedDocumentId: () => string | null
+  flushDeferredTreeRevisionPublish: () => void | Promise<void>
   getTreeRef: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeInstance | null
   loadChildrenForNode: (node: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   markNodeClosed: (nodeId: string, node: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeNode) => void
@@ -52,16 +52,6 @@ async function finishProjectHierarchyTreeDragCommit (
     return
   }
   const expandedSnapshot = deps.dragExpandedSnapshot() ?? []
-  logProjectHierarchyTreeDebugSession({
-    data: {
-      dragExpandUiFrozen: deps.dragExpandUiFrozen.value,
-      expandedSnapshot,
-      suppressTreeEmit: deps.suppressTreeEmit.value
-    },
-    hypothesisId: 'H2-H3',
-    location: 'projectHierarchyTreeDnDScheduleWiring.ts:beforeRemount',
-    message: 'drag commit restore starting'
-  })
   const commitResult = await commitProjectHierarchyTreeDraggedDocumentMove({
     documentId: deps.draggedDocumentId(),
     moveDocumentInHierarchy: deps.moveDocumentInHierarchy,
@@ -86,6 +76,7 @@ async function finishProjectHierarchyTreeDragCommit (
     commitResult.nestParentDocumentId !== null
   ) {
     await openProjectHierarchyTreeNestParentAfterDragDrop({
+      flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
       getTreeRef: deps.getTreeRef,
       loadChildrenForNode: deps.loadChildrenForNode,
       markNodeOpen: deps.markNodeOpen,
@@ -97,15 +88,6 @@ async function finishProjectHierarchyTreeDragCommit (
   await deps.nextTick()
   await deps.nextTick()
   deps.dragExpandUiFrozen.value = false
-  logProjectHierarchyTreeDebugSession({
-    data: {
-      dragExpandUiFrozen: false,
-      expandedSnapshot
-    },
-    hypothesisId: 'H2',
-    location: 'projectHierarchyTreeDnDScheduleWiring.ts:afterUnfreeze',
-    message: 'drag expand UI unfrozen'
-  })
 }
 
 export function scheduleProjectHierarchyTreeDragCommit (

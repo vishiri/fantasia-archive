@@ -10,6 +10,7 @@ type T_subWiring = ReturnType<typeof createProjectHierarchyTreeSessionSubWiring>
 
 export function buildProjectHierarchyTreeSessionApi (deps: {
   handlersWiring: T_handlersWiring
+  isTreeDragActive: Ref<boolean>
   subWiring: T_subWiring
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   treeMountKey: Ref<number>
@@ -17,6 +18,7 @@ export function buildProjectHierarchyTreeSessionApi (deps: {
   return {
     eachDraggableHandler: deps.handlersWiring.eachDraggableHandler,
     eachDroppableHandler: deps.handlersWiring.eachDroppableHandler,
+    isTreeDragActive: deps.isTreeDragActive,
     onNodeClick: deps.handlersWiring.onNodeClick,
     onNodeClose: deps.handlersWiring.onNodeClose,
     onNodeOpen: deps.handlersWiring.onNodeOpen,

@@ -1,9 +1,34 @@
 import { expect, test, vi } from 'vitest'
 import { ref } from 'vue'
 
-import type { I_faProjectHierarchyTreeHeTreeInstance } from 'app/types/I_faProjectHierarchyTreeDomain'
+import type { I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 import { mapWorkspaceLayoutToHierarchyTreeSkeleton } from '../../functions/mapWorkspaceLayoutToHierarchyTreeSkeleton'
 import { createProjectHierarchyTreeSessionHandlersWiring } from '../projectHierarchyTreeSessionHandlersWiring'
+import { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from '../projectHierarchyTreeDocumentRowExpandClickGestureWiring'
+
+function createTestDocumentRowExpandClickGesture () {
+  return createProjectHierarchyTreeDocumentRowExpandClickGestureWiring({
+    isTreeDragActive: ref(false)
+  })
+}
+
+function createTestDocumentRowDragHoldWiring () {
+  return {
+    clearHoldSession: vi.fn(),
+    getIsDragHoldArmed: () => true,
+    handleDocumentRowPointerDown: vi.fn(),
+    handleTreeDragStartCapture: vi.fn(),
+    markDragStartedFromHold: vi.fn()
+  }
+}
+
+function buildPointerLikeEvent (clientX: number, clientY: number) {
+  return {
+    clientX,
+    clientY,
+    stopPropagation: vi.fn()
+  }
+}
 
 const sampleWorld = {
   color: '#ff0000',
@@ -36,6 +61,8 @@ test('Test that session handlers open nodes and load children', async () => {
   const loadChildrenForNode = vi.fn(async () => undefined)
   const markNodeOpen = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },
@@ -68,6 +95,8 @@ test('Test that session handlers load children when the open icon expands a row'
   const markNodeOpen = vi.fn()
   const markNodeClosed = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },
@@ -104,6 +133,8 @@ test('Test that session handlers collapse rows via the open icon', async () => {
   const placement = tree[0]!.children[0]!
   const markNodeClosed = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },
@@ -140,6 +171,8 @@ test('Test that session handlers expand world rows from row click routing', asyn
   const loadChildrenForNode = vi.fn(async () => undefined)
   const markNodeOpen = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },
@@ -175,6 +208,232 @@ test('Test that session handlers expand world rows from row click routing', asyn
 })
 
 /**
+ * createProjectHierarchyTreeSessionHandlersWiring expands group rows from row click routing.
+ */
+test('Test that session handlers expand group rows from row click routing', async () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([{
+    ...sampleWorld,
+    groups: [
+      {
+        displayName: 'Group A',
+        hasChildren: true,
+        id: 'group-1',
+        rootSortOrder: 0,
+        worldId: 'world-1'
+      }
+    ],
+    placements: []
+  }])
+  const worldNode = tree[0]!
+  const groupNode = worldNode.children[0]!
+  const markNodeOpen = vi.fn()
+  const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
+    dragContext: {
+      dragNode: null
+    },
+    dragExpandUiFrozen: ref(false),
+    lazyLoadWiring: {
+      loadChildrenForNode: vi.fn(async () => undefined)
+    },
+    onDocumentClick: vi.fn(),
+    suppressTreeEmit: ref(false),
+    treeComponentRef: ref(null),
+    treeData: ref([]),
+    treeScrollHostRef: ref(null),
+    uiStateWiring: {
+      markNodeClosed: vi.fn(),
+      markNodeOpen
+    }
+  })
+  const stat = {
+    children: [],
+    open: false
+  }
+  const stopPropagation = vi.fn()
+  wiring.onWorldNodeRowPointerDown(groupNode, stat, {
+    stopPropagation
+  } as unknown as PointerEvent)
+  await wiring.onWorldNodeRowClick(groupNode, stat, {
+    stopPropagation
+  } as unknown as MouseEvent)
+  expect(stopPropagation).toHaveBeenCalledTimes(2)
+  expect(stat.open).toBe(true)
+  expect(markNodeOpen).toHaveBeenCalledWith('group-1')
+})
+
+/**
+ * createProjectHierarchyTreeSessionHandlersWiring expands document rows with children from row click routing.
+ */
+test('Test that session handlers expand document rows with children from row click routing', async () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const placement = tree[0]!.children[0]!
+  const documentNode = {
+    children: [],
+    childrenLoaded: false,
+    documentId: 'doc-parent',
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-file',
+    id: 'doc-parent',
+    label: 'Parent Doc',
+    nodeKind: 'document' as const,
+    placementId: 'placement-1',
+    worldColor: '#ff0000',
+    worldId: 'world-1'
+  }
+  placement.children = [documentNode]
+  const markNodeOpen = vi.fn()
+  const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
+    dragContext: {
+      dragNode: null
+    },
+    dragExpandUiFrozen: ref(false),
+    lazyLoadWiring: {
+      loadChildrenForNode: vi.fn(async () => undefined)
+    },
+    onDocumentClick: vi.fn(),
+    suppressTreeEmit: ref(false),
+    treeComponentRef: ref(null),
+    treeData: ref([]),
+    treeScrollHostRef: ref(null),
+    uiStateWiring: {
+      markNodeClosed: vi.fn(),
+      markNodeOpen
+    }
+  })
+  const stat = {
+    children: [],
+    open: false
+  }
+  const stopPropagation = vi.fn()
+  const pointerDownEvent = buildPointerLikeEvent(20, 30)
+  const clickEvent = buildPointerLikeEvent(20, 30)
+  pointerDownEvent.stopPropagation = stopPropagation
+  clickEvent.stopPropagation = stopPropagation
+  wiring.onWorldNodeRowPointerDown(documentNode, stat, pointerDownEvent as unknown as PointerEvent)
+  await wiring.onWorldNodeRowClick(documentNode, stat, clickEvent as unknown as MouseEvent)
+  expect(stopPropagation).toHaveBeenCalledTimes(1)
+  expect(stat.open).toBe(true)
+  expect(markNodeOpen).toHaveBeenCalledWith('doc-parent')
+})
+
+/**
+ * createProjectHierarchyTreeSessionHandlersWiring ignores leaf document row click routing.
+ */
+test('Test that session handlers ignore leaf document row click routing', async () => {
+  const documentNode = {
+    children: [],
+    childrenLoaded: true,
+    documentId: 'doc-1',
+    groupId: null,
+    hasChildren: false,
+    icon: '',
+    id: 'doc-1',
+    label: 'Doc',
+    nodeKind: 'document' as const,
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const markNodeOpen = vi.fn()
+  const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
+    dragContext: {
+      dragNode: null
+    },
+    dragExpandUiFrozen: ref(false),
+    lazyLoadWiring: {
+      loadChildrenForNode: vi.fn(async () => undefined)
+    },
+    onDocumentClick: vi.fn(),
+    suppressTreeEmit: ref(false),
+    treeComponentRef: ref(null),
+    treeData: ref([]),
+    treeScrollHostRef: ref(null),
+    uiStateWiring: {
+      markNodeClosed: vi.fn(),
+      markNodeOpen
+    }
+  })
+  const stat = {
+    children: [],
+    open: false
+  }
+  const stopPropagation = vi.fn()
+  wiring.onWorldNodeRowPointerDown(documentNode, stat, {
+    stopPropagation
+  } as unknown as PointerEvent)
+  await wiring.onWorldNodeRowClick(documentNode, stat, {
+    stopPropagation
+  } as unknown as MouseEvent)
+  expect(stopPropagation).not.toHaveBeenCalled()
+  expect(markNodeOpen).not.toHaveBeenCalled()
+})
+
+/**
+ * createProjectHierarchyTreeSessionHandlersWiring ignores document row click after drag movement.
+ */
+test('Test that session handlers ignore document row click after drag movement', async () => {
+  const documentNode = {
+    children: [],
+    childrenLoaded: false,
+    documentId: 'doc-parent',
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-file',
+    id: 'doc-parent',
+    label: 'Parent Doc',
+    nodeKind: 'document' as const,
+    placementId: 'placement-1',
+    worldColor: '#ff0000',
+    worldId: 'world-1'
+  }
+  const markNodeOpen = vi.fn()
+  const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
+    dragContext: {
+      dragNode: null
+    },
+    dragExpandUiFrozen: ref(false),
+    lazyLoadWiring: {
+      loadChildrenForNode: vi.fn(async () => undefined)
+    },
+    onDocumentClick: vi.fn(),
+    suppressTreeEmit: ref(false),
+    treeComponentRef: ref(null),
+    treeData: ref([]),
+    treeScrollHostRef: ref(null),
+    uiStateWiring: {
+      markNodeClosed: vi.fn(),
+      markNodeOpen
+    }
+  })
+  const stat = {
+    children: [],
+    open: false
+  }
+  const stopPropagation = vi.fn()
+  wiring.onWorldNodeRowPointerDown(
+    documentNode,
+    stat,
+    buildPointerLikeEvent(0, 0) as unknown as PointerEvent
+  )
+  await wiring.onWorldNodeRowClick(
+    documentNode,
+    stat,
+    buildPointerLikeEvent(20, 0) as unknown as MouseEvent
+  )
+  expect(stopPropagation).not.toHaveBeenCalled()
+  expect(markNodeOpen).not.toHaveBeenCalled()
+})
+
+/**
  * createProjectHierarchyTreeSessionHandlersWiring ignores non-world open icon routing on world rows.
  */
 test('Test that session handlers ignore non-world open icon routing on world rows', async () => {
@@ -182,6 +441,8 @@ test('Test that session handlers ignore non-world open icon routing on world row
   const worldNode = tree[0]!
   const markNodeOpen = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },
@@ -213,6 +474,8 @@ test('Test that session handlers reopen he-tree row after lazy load when tree re
   const placement = tree[0]!.children[0]!
   const openNodeAndParents = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },
@@ -242,6 +505,8 @@ test('Test that session handlers ignore close events while suppressTreeEmit is s
   const placement = tree[0]!.children[0]!
   const markNodeClosed = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },
@@ -266,6 +531,8 @@ test('Test that session handlers ignore close events while suppressTreeEmit is s
 test('Test that session handlers emit document clicks for document rows', () => {
   const onDocumentClick = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },
@@ -310,6 +577,20 @@ test('Test that session handlers emit document clicks for document rows', () => 
  * createProjectHierarchyTreeSessionHandlersWiring wires draggable and droppable handlers.
  */
 test('Test that session handlers expose draggable and droppable handlers', () => {
+  const parentDocument = {
+    children: [] as I_faProjectHierarchyTreeHeTreeNode[],
+    childrenLoaded: true,
+    documentId: 'doc-parent',
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'doc-parent',
+    label: 'Parent',
+    nodeKind: 'document' as const,
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
   const documentNode = {
     children: [],
     childrenLoaded: true,
@@ -324,7 +605,20 @@ test('Test that session handlers expose draggable and droppable handlers', () =>
     worldColor: '#000',
     worldId: 'world-1'
   }
+  const siblingDocument = {
+    ...documentNode,
+    documentId: 'doc-2',
+    id: 'doc-2',
+    label: 'Doc 2'
+  }
+  parentDocument.children = [documentNode, siblingDocument]
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const placement = tree[0]!.children[0]!
+  placement.children = [parentDocument]
+  placement.childrenLoaded = true
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: {
         data: documentNode
@@ -337,7 +631,7 @@ test('Test that session handlers expose draggable and droppable handlers', () =>
     onDocumentClick: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: ref(null),
-    treeData: ref([]),
+    treeData: ref(tree),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
       markNodeClosed: vi.fn(),
@@ -347,13 +641,15 @@ test('Test that session handlers expose draggable and droppable handlers', () =>
   expect(wiring.eachDraggableHandler({ data: documentNode })).toBe(true)
   expect(wiring.rootDroppableHandler()).toBe(true)
   expect(wiring.eachDroppableHandler({ data: documentNode })).toBe(false)
-  const siblingDocument = {
-    ...documentNode,
-    documentId: 'doc-2',
-    id: 'doc-2',
-    label: 'Doc 2'
-  }
   expect(wiring.eachDroppableHandler({ data: siblingDocument })).toBe(true)
+  const siblingSection = {
+    ...documentNode,
+    documentId: 'doc-section',
+    hasChildren: true,
+    id: 'doc-section',
+    label: 'Section'
+  }
+  expect(wiring.eachDroppableHandler({ data: siblingSection })).toBe(true)
 })
 
 /**
@@ -362,6 +658,8 @@ test('Test that session handlers expose draggable and droppable handlers', () =>
 test('Test that session handlers do not restore UI state when tree ref attaches', () => {
   const treeComponentRef = ref<I_faProjectHierarchyTreeHeTreeInstance | null>(null)
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },
@@ -397,6 +695,8 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
   const markNodeClosed = vi.fn()
   const loadChildrenForNode = vi.fn(async () => undefined)
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },
@@ -430,6 +730,8 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
 
 test('Test that session handlers skip restore when tree ref attaches during drag expand freeze', () => {
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },
@@ -458,6 +760,8 @@ test('Test that session handlers skip restore when tree ref attaches during drag
  */
 test('Test that session handlers skip restore when tree ref clears', () => {
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },
@@ -496,6 +800,8 @@ test('Test that session handlers ignore open icon clicks on empty loaded documen
   const markNodeOpen = vi.fn()
   const loadChildrenForNode = vi.fn(async () => undefined)
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },
@@ -536,6 +842,8 @@ test('Test that session handlers recover when he-tree openNodeAndParents stat is
     throw error
   })
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },

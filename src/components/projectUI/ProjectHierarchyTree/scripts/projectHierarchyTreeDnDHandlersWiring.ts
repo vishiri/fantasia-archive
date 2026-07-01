@@ -3,7 +3,6 @@ import type { Ref } from 'vue'
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { resolveProjectHierarchyTreeDragExpandedSnapshot } from './projectHierarchyTreeDragExpandSnapshotWiring'
-import { logProjectHierarchyTreeDebugSession } from './projectHierarchyTreeDebugSessionLogWiring'
 import { collectProjectHierarchyTreeLiveExpandStateFromDom } from './projectHierarchyTreeLiveExpandDomWiring'
 import {
   applyFaVerticalDraggableTabsDocumentDragCursor,
@@ -14,12 +13,16 @@ import {
   shouldClearDragSessionWithoutCommit
 } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldTemplateLayoutTreeCommitPolicy'
 import type { createProjectHierarchyTreeDragCancelWiring } from './projectHierarchyTreeDragCancelWiring'
+import type { createProjectHierarchyTreeDocumentRowDragHoldWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
+import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowExpandClickGestureWiring'
 import { scheduleProjectHierarchyTreeDragCommit } from './projectHierarchyTreeDnDScheduleWiring'
 import { syncProjectHierarchyTreeDocumentHasChildrenFlags } from '../functions/projectHierarchyTreeDocumentHasChildrenSync'
 
 type T_projectHierarchyTreeDnDHandlerDeps = {
   bumpTreeMountKey: () => void
   clearDragSessionFlags: () => void
+  documentRowDragHoldWiring: ReturnType<typeof createProjectHierarchyTreeDocumentRowDragHoldWiring>
+  documentRowExpandClickGesture: ReturnType<typeof createProjectHierarchyTreeDocumentRowExpandClickGestureWiring>
   dragCancelWiring: ReturnType<typeof createProjectHierarchyTreeDragCancelWiring>
   dragCommitPending: Ref<boolean>
   dragCommitScheduled: Ref<boolean>
@@ -36,6 +39,7 @@ type T_projectHierarchyTreeDnDHandlerDeps = {
   isTreeDragActive: Ref<boolean>
   getTreeRef: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeInstance | null
   getTreeScrollHost: () => HTMLElement | null
+  flushDeferredTreeRevisionPublish: () => void | Promise<void>
   loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   markNodeClosed: (nodeId: string, node: I_faProjectHierarchyTreeHeTreeNode) => void
   markNodeOpen: (nodeId: string) => void
@@ -62,6 +66,8 @@ function onBeforeDragStartImpl (
   if (stat.data.nodeKind !== 'document' || stat.data.documentId === null) {
     return
   }
+  deps.documentRowDragHoldWiring.markDragStartedFromHold()
+  deps.documentRowExpandClickGesture.markDragStartedForGesture()
   deps.draggedDocumentId.set(stat.data.documentId)
   const liveExpandState = collectProjectHierarchyTreeLiveExpandStateFromDom(
     deps.getTreeScrollHost()
@@ -76,21 +82,6 @@ function onBeforeDragStartImpl (
   deps.dragExpandedSnapshot.set([...snapshot])
   deps.openNodeIds.value = new Set(snapshot)
   deps.queuePersistExpandedNodeIds(snapshot)
-  logProjectHierarchyTreeDebugSession({
-    data: {
-      collapsedVisibleNodeIds: liveExpandState.collapsedVisibleNodeIds,
-      documentId: stat.data.documentId,
-      liveExpandedNodeIds: liveExpandState.expandedNodeIds,
-      openNodeIds: [...deps.openNodeIds.value],
-      rowCount: liveExpandState.rowCount,
-      scrollHostPresent: liveExpandState.scrollHostPresent,
-      snapshot
-    },
-    hypothesisId: 'H1-H6',
-    location: 'projectHierarchyTreeDnDHandlersWiring.ts:onBeforeDragStart',
-    message: 'drag start expand snapshot',
-    runId: 'post-fix'
-  })
   deps.dragDropCommitted.value = false
   deps.dragCommitScheduled.value = false
   deps.isTreeDragActive.value = true
@@ -110,6 +101,7 @@ function onTreeAfterDropImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void 
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     dragExpandedSnapshot: deps.dragExpandedSnapshot.get,
     draggedDocumentId: deps.draggedDocumentId.get,
+    flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
     getTreeRef: deps.getTreeRef,
     loadChildrenForNode: deps.loadChildrenForNode,
     markNodeClosed: deps.markNodeClosed,
@@ -126,6 +118,7 @@ function onTreeAfterDropImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void 
 }
 
 function onTreeDragEndCleanupImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void {
+  deps.documentRowDragHoldWiring.clearHoldSession()
   deps.isTreeDragActive.value = false
   clearFaVerticalDraggableTabsDocumentDragCursor()
   if (shouldClearDragSessionWithoutCommit({
@@ -151,20 +144,7 @@ function onTreeDataUpdateImpl (
     return
   }
   deps.treeData.value = nextNodes
-  const emptiedParentDocumentIds = syncProjectHierarchyTreeDocumentHasChildrenFlags(deps.treeData.value)
-  if (emptiedParentDocumentIds.length > 0) {
-    // #region agent log
-    logProjectHierarchyTreeDebugSession({
-      data: {
-        emptiedParentDocumentIds
-      },
-      hypothesisId: 'S3',
-      location: 'projectHierarchyTreeDnDHandlersWiring.ts:onTreeDataUpdate',
-      message: 'synced hasChildren after optimistic drag tree update',
-      runId: 'stat-not-found'
-    })
-    // #endregion
-  }
+  syncProjectHierarchyTreeDocumentHasChildrenFlags(deps.treeData.value)
 }
 
 function onUnmountedCleanupImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void {
@@ -177,7 +157,22 @@ function onUnmountedCleanupImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): vo
 export function createProjectHierarchyTreeDnDHandlers (
   deps: T_projectHierarchyTreeDnDHandlerDeps
 ) {
+  function commitAllowedDocumentRowDragSessionStart (dragContext: {
+    dragNode: {
+      data: I_faProjectHierarchyTreeHeTreeNode
+    } | null
+  }): void {
+    const dragNode = dragContext.dragNode
+    if (dragNode === null) {
+      return
+    }
+    onBeforeDragStartImpl(deps, { data: dragNode.data })
+  }
+
   function onBeforeDragStart (stat: { data: I_faProjectHierarchyTreeHeTreeNode }): void {
+    if (!deps.documentRowDragHoldWiring.getIsDragHoldArmed()) {
+      return
+    }
     onBeforeDragStartImpl(deps, stat)
   }
 
@@ -198,6 +193,7 @@ export function createProjectHierarchyTreeDnDHandlers (
   }
 
   return {
+    commitAllowedDocumentRowDragSessionStart,
     onBeforeDragStart,
     onTreeAfterDrop,
     onTreeDataUpdate,

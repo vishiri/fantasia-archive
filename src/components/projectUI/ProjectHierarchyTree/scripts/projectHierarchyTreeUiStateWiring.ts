@@ -20,7 +20,6 @@ import {
   pruneProjectHierarchyTreeExpandedNodeIdsToAncestors
 } from '../functions/projectHierarchyTreeExpandState'
 import { resolveProjectHierarchyTreeScrollContainer } from '../functions/projectHierarchyTreeScrollContainer'
-import { logProjectHierarchyTreeDebugSession } from './projectHierarchyTreeDebugSessionLogWiring'
 
 type T_treeRef = I_faProjectHierarchyTreeHeTreeInstance | null
 
@@ -40,16 +39,6 @@ export function reapplyProjectHierarchyTreeHeTreeOpenState (deps: {
     deps.treeData.value,
     deps.openNodeIds.value
   )
-  logProjectHierarchyTreeDebugSession({
-    data: {
-      expandedNodeIds,
-      openNodeIds: [...deps.openNodeIds.value]
-    },
-    hypothesisId: 'P1',
-    location: 'projectHierarchyTreeUiStateWiring.ts:reapplyHeTreeOpenState',
-    message: 'reapply he-tree open rows after lazy-load publish',
-    runId: 'doc-nested-open'
-  })
   for (const nodeId of expandedNodeIds) {
     const node = findProjectHierarchyTreeNodeById(deps.treeData.value, nodeId)
     if (node === null) {
@@ -90,20 +79,6 @@ export async function restoreProjectHierarchyTreeUiState (deps: {
       expandedNodeIds
     )
   )
-  logProjectHierarchyTreeDebugSession({
-    data: {
-      expandedNodeIds,
-      mergeRan: shouldRunProjectHierarchyTreePlacementExpandMerge(
-        persistedExpandedNodeIds,
-        worlds
-      ),
-      persistedExpandedNodeIds,
-      pruned
-    },
-    hypothesisId: 'H2-H4-H5',
-    location: 'projectHierarchyTreeUiStateWiring.ts:restoreUiState',
-    message: 'full restore from store'
-  })
   deps.openNodeIds.value = new Set(pruned)
   deps.onExpandedNodeIdsChange(pruned)
 
@@ -243,15 +218,5 @@ export function markProjectHierarchyTreeNodeClosed (deps: {
     openNodeIds: deps.openNodeIds,
     queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
     treeData: deps.treeData
-  })
-  logProjectHierarchyTreeDebugSession({
-    data: {
-      nodeId: deps.nodeId,
-      nodeKind: deps.node.nodeKind,
-      openNodeIdsAfter: [...deps.openNodeIds.value]
-    },
-    hypothesisId: 'H1',
-    location: 'projectHierarchyTreeUiStateWiring.ts:markNodeClosed',
-    message: 'node collapsed'
   })
 }

@@ -3,7 +3,6 @@ import type { Ref } from 'vue'
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { publishProjectHierarchyTreeRootRevision } from '../functions/projectHierarchyTreeExpandState'
-import { logProjectHierarchyTreeDebugSession } from './projectHierarchyTreeDebugSessionLogWiring'
 
 type T_lazyLoadPublishDeps = {
   nextTick: () => Promise<void>
@@ -13,33 +12,21 @@ type T_lazyLoadPublishDeps = {
 }
 
 async function notifyAfterProjectHierarchyTreeRevisionPublished (
-  deps: T_lazyLoadPublishDeps,
-  nodeKind: I_faProjectHierarchyTreeHeTreeNode['nodeKind'],
-  nodeId: string
+  deps: T_lazyLoadPublishDeps
 ): Promise<void> {
-  logProjectHierarchyTreeDebugSession({
-    data: {
-      nodeId,
-      nodeKind
-    },
-    hypothesisId: 'D1',
-    location: 'projectHierarchyTreeLazyLoadPublishWiring.ts:publishTreeRevision',
-    message: 'lazy-load tree revision published',
-    runId: 'doc-nested-open'
-  })
   await deps.nextTick()
   await deps.onAfterTreeRevisionPublished()
 }
 
 export async function publishProjectHierarchyTreeLazyLoadRevision (
   deps: T_lazyLoadPublishDeps,
-  nodeKind: I_faProjectHierarchyTreeHeTreeNode['nodeKind'],
-  nodeId: string
+  _nodeKind: I_faProjectHierarchyTreeHeTreeNode['nodeKind'],
+  _nodeId: string
 ): Promise<void> {
   deps.suppressTreeEmit.value = true
   try {
     deps.treeData.value = publishProjectHierarchyTreeRootRevision(deps.treeData.value)
-    await notifyAfterProjectHierarchyTreeRevisionPublished(deps, nodeKind, nodeId)
+    await notifyAfterProjectHierarchyTreeRevisionPublished(deps)
   } finally {
     deps.suppressTreeEmit.value = false
   }

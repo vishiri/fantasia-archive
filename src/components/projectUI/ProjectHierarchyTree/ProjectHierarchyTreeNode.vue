@@ -16,6 +16,7 @@
     <q-icon
       v-if="displayIcon !== ''"
       class="projectHierarchyTreeNode__icon"
+      :class="{ 'projectHierarchyTreeNode__icon--layoutKind': props.node.nodeKind !== 'world' }"
       :name="displayIcon"
     />
     <span
@@ -73,8 +74,7 @@ const nodeRootClassList = computed(() => {
     'projectHierarchyTreeNode--document': props.node.nodeKind === 'document',
     'projectHierarchyTreeNode--group': props.node.nodeKind === 'group',
     'projectHierarchyTreeNode--documentTemplate': props.node.nodeKind === 'templatePlacement',
-    'projectHierarchyTreeNode--world': props.node.nodeKind === 'world',
-    'projectHierarchyTree__dragHandle': props.node.nodeKind === 'document'
+    'projectHierarchyTreeNode--world': props.node.nodeKind === 'world'
   }
 })
 
@@ -99,17 +99,10 @@ const worldNodeStyle = computed(() => {
 
 <style lang="scss" scoped>
 .projectHierarchyTreeNode {
-  min-height: 28px;
-  width: 100%;
-
-  &__icon {
-    margin-right: 6px;
-  }
-
   &__label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
   }
 }
 </style>

@@ -6,15 +6,21 @@ import type {
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { createProjectHierarchyTreeDragCancelWiring } from './projectHierarchyTreeDragCancelWiring'
+import { createProjectHierarchyTreeDragSessionState } from './projectHierarchyTreeDragSessionStateWiring'
+import type { createProjectHierarchyTreeDocumentRowDragHoldWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
+import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowExpandClickGestureWiring'
 import { createProjectHierarchyTreeDnDHandlers } from './projectHierarchyTreeDnDHandlersWiring'
 
 export function createProjectHierarchyTreeDnDWiring (deps: {
   bumpTreeMountKey: () => void
+  documentRowDragHoldWiring: ReturnType<typeof createProjectHierarchyTreeDocumentRowDragHoldWiring>
+  documentRowExpandClickGesture: ReturnType<typeof createProjectHierarchyTreeDocumentRowExpandClickGestureWiring>
   dragCommitPending: Ref<boolean>
   dragCommitScheduled: Ref<boolean>
   dragDropCommitted: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
   isTreeDragActive: Ref<boolean>
+  flushDeferredTreeRevisionPublish: () => void | Promise<void>
   getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
   getTreeScrollHost: () => HTMLElement | null
   loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
@@ -34,17 +40,12 @@ export function createProjectHierarchyTreeDnDWiring (deps: {
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }) {
-  let draggedDocumentId: string | null = null
-  let dragExpandedSnapshot: string[] | null = null
-
-  function clearDragSessionFlags (): void {
-    deps.isTreeDragActive.value = false
-    deps.dragCommitPending.value = false
-    deps.dragCommitScheduled.value = false
-    deps.dragDropCommitted.value = false
-    draggedDocumentId = null
-    dragExpandedSnapshot = null
-  }
+  const dragSessionState = createProjectHierarchyTreeDragSessionState({
+    dragCommitPending: deps.dragCommitPending,
+    dragCommitScheduled: deps.dragCommitScheduled,
+    dragDropCommitted: deps.dragDropCommitted,
+    isTreeDragActive: deps.isTreeDragActive
+  })
 
   function removeDragCancelListeners (): void {
     window.removeEventListener('pointerup', dragCancelWiring.onWindowPointerUpDuringDrag)
@@ -53,11 +54,11 @@ export function createProjectHierarchyTreeDnDWiring (deps: {
 
   const dragCancelWiring = createProjectHierarchyTreeDragCancelWiring({
     bumpTreeMountKey: deps.bumpTreeMountKey,
-    clearDragSessionFlags,
+    clearDragSessionFlags: dragSessionState.clearDragSessionFlags,
     dragCommitPending: deps.dragCommitPending,
     dragDropCommitted: deps.dragDropCommitted,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
-    dragExpandedSnapshot: () => dragExpandedSnapshot,
+    dragExpandedSnapshot: dragSessionState.dragExpandedSnapshot.get,
     nextTick: deps.nextTick,
     removeDragCancelListeners,
     resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
@@ -66,24 +67,17 @@ export function createProjectHierarchyTreeDnDWiring (deps: {
 
   return createProjectHierarchyTreeDnDHandlers({
     bumpTreeMountKey: deps.bumpTreeMountKey,
-    clearDragSessionFlags,
+    clearDragSessionFlags: dragSessionState.clearDragSessionFlags,
+    documentRowDragHoldWiring: deps.documentRowDragHoldWiring,
+    documentRowExpandClickGesture: deps.documentRowExpandClickGesture,
     dragCancelWiring,
     dragCommitPending: deps.dragCommitPending,
     dragCommitScheduled: deps.dragCommitScheduled,
     dragDropCommitted: deps.dragDropCommitted,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
-    draggedDocumentId: {
-      get: () => draggedDocumentId,
-      set: (value) => {
-        draggedDocumentId = value
-      }
-    },
-    dragExpandedSnapshot: {
-      get: () => dragExpandedSnapshot,
-      set: (value) => {
-        dragExpandedSnapshot = value
-      }
-    },
+    draggedDocumentId: dragSessionState.draggedDocumentId,
+    dragExpandedSnapshot: dragSessionState.dragExpandedSnapshot,
+    flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
     getTreeRef: deps.getTreeRef,
     getTreeScrollHost: deps.getTreeScrollHost,
     isTreeDragActive: deps.isTreeDragActive,

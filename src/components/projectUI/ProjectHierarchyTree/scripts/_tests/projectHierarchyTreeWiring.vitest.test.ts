@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
-import { computed, ref } from 'vue'
+import { computed, ref, type Ref } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
@@ -46,6 +46,7 @@ import {
   findProjectHierarchyTreeDocumentParentBucket
 } from '../projectHierarchyTreeDnDCommitWiring'
 import { createProjectHierarchyTreeSessionHandlersWiring } from '../projectHierarchyTreeSessionHandlersWiring'
+import { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from '../projectHierarchyTreeDocumentRowExpandClickGestureWiring'
 import { createProjectHierarchyTreeSessionHydrateWiring } from '../projectHierarchyTreeSessionHydrateWiring'
 import { createProjectHierarchyTreeSessionRefs } from '../projectHierarchyTreeSessionRefsWiring'
 import { createProjectHierarchyTreeSessionSubWiring } from '../projectHierarchyTreeSessionSubWiring'
@@ -130,18 +131,41 @@ function buildDocumentNode (overrides: Partial<import('app/types/I_faProjectHier
   }
 }
 
+function createTestDocumentRowExpandClickGesture (
+  isTreeDragActive: Ref<boolean> = ref(false)
+) {
+  return createProjectHierarchyTreeDocumentRowExpandClickGestureWiring({
+    isTreeDragActive
+  })
+}
+
+function createTestDocumentRowDragHoldWiring () {
+  return {
+    clearHoldSession: vi.fn(),
+    getIsDragHoldArmed: () => true,
+    handleDocumentRowPointerDown: vi.fn(),
+    handleTreeDragStartCapture: vi.fn(),
+    markDragStartedFromHold: vi.fn()
+  }
+}
+
 function buildProjectHierarchyTreeDnDWiringTestDeps (
   overrides: Partial<Parameters<typeof createProjectHierarchyTreeDnDWiring>[0]> = {}
 ): Parameters<typeof createProjectHierarchyTreeDnDWiring>[0] {
+  const isTreeDragActive = overrides.isTreeDragActive ?? ref(false)
   return {
     bumpTreeMountKey: vi.fn(),
+    documentRowDragHoldWiring: overrides.documentRowDragHoldWiring ?? createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: overrides.documentRowExpandClickGesture ??
+      createTestDocumentRowExpandClickGesture(isTreeDragActive),
     dragCommitPending: ref(false),
     dragCommitScheduled: ref(false),
     dragDropCommitted: ref(false),
     dragExpandUiFrozen: ref(false),
+    flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
     getTreeRef: () => null,
     getTreeScrollHost: () => null,
-    isTreeDragActive: ref(false),
+    isTreeDragActive,
     loadChildrenForNode: vi.fn(async () => undefined),
     markNodeClosed: vi.fn(),
     markNodeOpen: vi.fn(),
@@ -186,6 +210,7 @@ function buildScheduleDragCommitTestDeps (
     dragExpandUiFrozen: ref(false),
     dragExpandedSnapshot: () => ['world-1'],
     draggedDocumentId: () => null,
+    flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
     getTreeRef: () => null,
     loadChildrenForNode: vi.fn(async () => undefined),
     markNodeClosed: vi.fn(),
@@ -564,6 +589,7 @@ test('Test that commitProjectHierarchyTreeDraggedDocumentMove persists reorder',
         sortOrder: 0
       }
     ],
+    placementIcon: 'mdi-account',
     worldColor: '#000',
     worldId: 'world-1'
   })
@@ -615,6 +641,7 @@ test('Test that commitProjectHierarchyTreeDraggedDocumentMove returns nest paren
         sortOrder: 0
       }
     ],
+    placementIcon: 'mdi-account',
     worldColor: '#000',
     worldId: 'world-1'
   })
@@ -630,6 +657,7 @@ test('Test that commitProjectHierarchyTreeDraggedDocumentMove returns nest paren
         sortOrder: 0
       }
     ],
+    placementIcon: 'mdi-account',
     worldColor: '#000',
     worldId: 'world-1'
   })
@@ -669,6 +697,7 @@ test('Test that commitProjectHierarchyTreeDraggedDocumentMove reports emptied pa
         sortOrder: 1
       }
     ],
+    placementIcon: 'mdi-account',
     worldColor: '#000',
     worldId: 'world-1'
   })
@@ -708,6 +737,7 @@ test('Test that openProjectHierarchyTreeNestParentAfterDragDrop opens parent row
         sortOrder: 0
       }
     ],
+    placementIcon: 'mdi-account',
     worldColor: '#000',
     worldId: 'world-1'
   })
@@ -715,7 +745,9 @@ test('Test that openProjectHierarchyTreeNestParentAfterDragDrop opens parent row
   const openNodeAndParents = vi.fn()
   const markNodeOpen = vi.fn()
   const loadChildrenForNode = vi.fn(async () => undefined)
+  const flushDeferredTreeRevisionPublish = vi.fn(async () => undefined)
   await openProjectHierarchyTreeNestParentAfterDragDrop({
+    flushDeferredTreeRevisionPublish,
     getTreeRef: () => ({
       closeAll: vi.fn(),
       openNodeAndParents
@@ -726,6 +758,7 @@ test('Test that openProjectHierarchyTreeNestParentAfterDragDrop opens parent row
     nextTick: async () => undefined,
     treeData: tree
   })
+  expect(flushDeferredTreeRevisionPublish).toHaveBeenCalledTimes(1)
   expect(loadChildrenForNode).toHaveBeenCalledTimes(1)
   expect(markNodeOpen).toHaveBeenCalledWith('doc-parent')
   expect(openNodeAndParents).toHaveBeenCalledTimes(1)
@@ -736,6 +769,8 @@ test('Test that session handlers wiring emits document clicks', async () => {
   const treeScrollHostRef = ref<HTMLElement | null>(null)
   const onDocumentClick = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },
@@ -814,6 +849,7 @@ test('Test that createProjectHierarchyTreeDnDWiring runs drag lifecycle', async 
 })
 
 test('Test that createProjectHierarchyTreeDragCancelWiring finishes cancelled drag sessions', async () => {
+  vi.useFakeTimers()
   const clearDragSessionFlags = vi.fn()
   const removeDragCancelListeners = vi.fn()
   const resyncTreeDataFromLayout = vi.fn()
@@ -827,6 +863,7 @@ test('Test that createProjectHierarchyTreeDragCancelWiring finishes cancelled dr
     restoreExpandedSnapshot
   }))
   wiring.finishDragSessionWithoutCommit()
+  await vi.advanceTimersByTimeAsync(500)
   for (let tick = 0; tick < 8; tick += 1) {
     await Promise.resolve()
   }
@@ -835,19 +872,23 @@ test('Test that createProjectHierarchyTreeDragCancelWiring finishes cancelled dr
   expect(restoreExpandedSnapshot).toHaveBeenCalledWith(['world-1'])
   expect(dragExpandUiFrozen.value).toBe(false)
   expect(clearDragSessionFlags).toHaveBeenCalled()
+  vi.useRealTimers()
 })
 
 test('Test that createProjectHierarchyTreeDragCancelWiring restores empty snapshot when drag snapshot missing', async () => {
+  vi.useFakeTimers()
   const restoreExpandedSnapshot = vi.fn(async () => undefined)
   const wiring = createProjectHierarchyTreeDragCancelWiring(buildProjectHierarchyTreeDragCancelTestDeps({
     dragExpandedSnapshot: () => null,
     restoreExpandedSnapshot
   }))
   wiring.finishDragSessionWithoutCommit()
+  await vi.advanceTimersByTimeAsync(500)
   for (let tick = 0; tick < 8; tick += 1) {
     await Promise.resolve()
   }
   expect(restoreExpandedSnapshot).toHaveBeenCalledWith([])
+  vi.useRealTimers()
 })
 
 test('Test that createProjectHierarchyTreeDragCancelWiring skips finish after committed drop', () => {
@@ -967,6 +1008,8 @@ test('Test that createProjectHierarchyTreeDnDHandlers covers drag handler branch
   const handlers = createProjectHierarchyTreeDnDHandlers({
     bumpTreeMountKey: vi.fn(),
     clearDragSessionFlags,
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(isTreeDragActive),
     dragCancelWiring,
     dragCommitPending,
     dragCommitScheduled,
@@ -984,6 +1027,7 @@ test('Test that createProjectHierarchyTreeDnDHandlers covers drag handler branch
         dragExpandedSnapshot.current = value
       }
     },
+    flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
     isTreeDragActive,
     getTreeRef: () => null,
     getTreeScrollHost: () => null,
@@ -1179,6 +1223,8 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
   const loadChildrenForNode = vi.fn(async () => undefined)
   const dragExpandUiFrozen = ref(true)
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },
@@ -1306,6 +1352,8 @@ test('Test that createProjectHierarchyTreeSessionSubWiring builds tree session d
   const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
   const subWiring = createProjectHierarchyTreeSessionSubWiring({
     computed,
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(sessionRefs.isTreeDragActive),
     dragCommitPending: sessionRefs.dragCommitPending,
     dragCommitScheduled: sessionRefs.dragCommitScheduled,
     dragDropCommitted: sessionRefs.dragDropCommitted,
@@ -1399,6 +1447,8 @@ test('Test that createProjectHierarchyTreeSessionSubWiring calls bridge APIs for
   } as never
   const subWiring = createProjectHierarchyTreeSessionSubWiring({
     computed,
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(sessionRefs.isTreeDragActive),
     dragCommitPending: sessionRefs.dragCommitPending,
     dragCommitScheduled: sessionRefs.dragCommitScheduled,
     dragDropCommitted: sessionRefs.dragDropCommitted,
@@ -1579,7 +1629,8 @@ test('Test that remountProjectHierarchyTreeAndRestoreExpandedSnapshot bumps key 
     nextTick: async () => {
       tickCount += 1
     },
-    restoreExpandedSnapshot
+    restoreExpandedSnapshot,
+    waitBeforeRemount: async () => undefined
   })
   expect(bumpTreeMountKey).toHaveBeenCalledTimes(1)
   expect(tickCount).toBe(4)
@@ -1701,6 +1752,7 @@ test('Test that createProjectHierarchyTreeLazyLoadWiring loads nested document c
         sortOrder: 0
       }
     ],
+    placementIcon: 'mdi-account',
     worldColor: '#000',
     worldId: 'world-1'
   })
@@ -1904,6 +1956,8 @@ test('Test that createProjectHierarchyTreeSessionSubWiring handles missing bridg
   } as never as never
   const subWiring = createProjectHierarchyTreeSessionSubWiring({
     computed,
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(sessionRefs.isTreeDragActive),
     dragCommitPending: sessionRefs.dragCommitPending,
     dragCommitScheduled: sessionRefs.dragCommitScheduled,
     dragDropCommitted: sessionRefs.dragDropCommitted,
@@ -2137,6 +2191,8 @@ test('Test that createProjectHierarchyTreeSessionSubWiring delegates UI state st
   const flushUiStatePersist = vi.fn()
   const subWiring = createProjectHierarchyTreeSessionSubWiring({
     computed,
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(sessionRefs.isTreeDragActive),
     dragCommitPending: sessionRefs.dragCommitPending,
     dragCommitScheduled: sessionRefs.dragCommitScheduled,
     dragDropCommitted: sessionRefs.dragDropCommitted,
@@ -2204,6 +2260,8 @@ test('Test that createProjectHierarchyTreeSessionSubWiring propagates move failu
   } as never
   const subWiring = createProjectHierarchyTreeSessionSubWiring({
     computed,
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(sessionRefs.isTreeDragActive),
     dragCommitPending: sessionRefs.dragCommitPending,
     dragCommitScheduled: sessionRefs.dragCommitScheduled,
     dragDropCommitted: sessionRefs.dragDropCommitted,
@@ -2271,6 +2329,7 @@ test('Test that commitProjectHierarchyTreeDraggedDocumentMove ignores documents 
         sortOrder: 0
       }
     ],
+    placementIcon: 'mdi-account',
     worldColor: '#000',
     worldId: 'world-1'
   })
@@ -2452,6 +2511,8 @@ test('Test that createProjectHierarchyTreeSessionSubWiring reflects drag state i
   const sessionRefs = createProjectHierarchyTreeSessionRefs({ ref })
   const subWiring = createProjectHierarchyTreeSessionSubWiring({
     computed,
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(sessionRefs.isTreeDragActive),
     dragCommitPending: sessionRefs.dragCommitPending,
     dragCommitScheduled: sessionRefs.dragCommitScheduled,
     dragDropCommitted: sessionRefs.dragDropCommitted,
@@ -2536,6 +2597,8 @@ test('Test that createProjectHierarchyTreeSessionSubWiring restores UI state via
   } as never
   const subWiring = createProjectHierarchyTreeSessionSubWiring({
     computed,
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(sessionRefs.isTreeDragActive),
     dragCommitPending: sessionRefs.dragCommitPending,
     dragCommitScheduled: sessionRefs.dragCommitScheduled,
     dragDropCommitted: sessionRefs.dragDropCommitted,
@@ -2617,6 +2680,8 @@ test('Test that createProjectHierarchyTreeSessionSubWiring handles missing prelo
   } as never
   const subWiring = createProjectHierarchyTreeSessionSubWiring({
     computed,
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(sessionRefs.isTreeDragActive),
     dragCommitPending: sessionRefs.dragCommitPending,
     dragCommitScheduled: sessionRefs.dragCommitScheduled,
     dragDropCommitted: sessionRefs.dragDropCommitted,
@@ -2726,4 +2791,46 @@ test('Test that revealProjectHierarchyTreePendingPath skips scroll when focus ro
     },
     treeData
   })
+})
+
+/**
+ * he-tree roving tabindex keeps one .tree-node at tabindex 0; guard forces tab order skip.
+ */
+test('Test that clearProjectHierarchyTreeHeTreeNodeTabIndex forces he-tree rows out of tab order', async () => {
+  const { clearProjectHierarchyTreeHeTreeNodeTabIndexForTests } = await import(
+    '../projectHierarchyTreeHeTreeNodeTabIndexWiring'
+  )
+  const host = document.createElement('div')
+  const tree = document.createElement('div')
+  tree.className = 'projectHierarchyTree'
+  const row = document.createElement('div')
+  row.className = 'tree-node'
+  row.tabIndex = 0
+  tree.appendChild(row)
+  host.appendChild(tree)
+
+  clearProjectHierarchyTreeHeTreeNodeTabIndexForTests(host)
+
+  expect(row.tabIndex).toBe(-1)
+})
+
+/**
+ * he-tree roving tabindex keeps one .tree-node at tabindex 0; guard forces tab order skip.
+ */
+test('Test that clearProjectHierarchyTreeHeTreeNodeTabIndex forces he-tree rows out of tab order', async () => {
+  const { clearProjectHierarchyTreeHeTreeNodeTabIndexForTests } = await import(
+    '../projectHierarchyTreeHeTreeNodeTabIndexWiring'
+  )
+  const host = document.createElement('div')
+  const tree = document.createElement('div')
+  tree.className = 'projectHierarchyTree'
+  const row = document.createElement('div')
+  row.className = 'tree-node'
+  row.tabIndex = 0
+  tree.appendChild(row)
+  host.appendChild(tree)
+
+  clearProjectHierarchyTreeHeTreeNodeTabIndexForTests(host)
+
+  expect(row.tabIndex).toBe(-1)
 })

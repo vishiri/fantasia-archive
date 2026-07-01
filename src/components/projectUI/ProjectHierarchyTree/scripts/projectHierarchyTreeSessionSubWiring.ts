@@ -7,6 +7,8 @@ import type {
   I_faProjectHierarchyTreeWorkspaceWorld
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
+import type { createProjectHierarchyTreeDocumentRowDragHoldWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
+import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowExpandClickGestureWiring'
 import { createProjectHierarchyTreeDnDWiring } from './projectHierarchyTreeDnDWiring'
 import { createProjectHierarchyTreeBeforeDragOpenWiring } from './projectHierarchyTreeBeforeDragOpenWiring'
 import { createProjectHierarchyTreeLazyLoadSessionWiring } from './projectHierarchyTreeLazyLoadSessionWiring'
@@ -21,6 +23,8 @@ type T_hierarchyStore = {
 
 export function createProjectHierarchyTreeSessionSubWiring (deps: {
   computed: <T>(getter: () => T) => { value: T }
+  documentRowDragHoldWiring: ReturnType<typeof createProjectHierarchyTreeDocumentRowDragHoldWiring>
+  documentRowExpandClickGesture: ReturnType<typeof createProjectHierarchyTreeDocumentRowExpandClickGestureWiring>
   dragCommitPending: Ref<boolean>
   dragCommitScheduled: Ref<boolean>
   dragDropCommitted: Ref<boolean>
@@ -63,21 +67,22 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: {
     suppressTreeEmit: deps.suppressTreeEmit,
     treeData: deps.treeData
   })
-  const lazyLoadWiring = loadSessionWiring.lazyLoadWiring
-  const uiStateWiring = loadSessionWiring.uiStateWiring
+  const { lazyLoadWiring, uiStateWiring } = loadSessionWiring
 
   const beforeDragOpenWiring = createProjectHierarchyTreeBeforeDragOpenWiring({
     lazyLoadWiring
   })
-
   const dndWiring = createProjectHierarchyTreeDnDWiring({
     bumpTreeMountKey: () => {
       deps.treeMountKey.value += 1
     },
+    documentRowDragHoldWiring: deps.documentRowDragHoldWiring,
+    documentRowExpandClickGesture: deps.documentRowExpandClickGesture,
     dragCommitPending: deps.dragCommitPending,
     dragCommitScheduled: deps.dragCommitScheduled,
     dragDropCommitted: deps.dragDropCommitted,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
+    flushDeferredTreeRevisionPublish: () => lazyLoadWiring.flushDeferredTreeRevisionPublish(),
     getTreeRef: () => deps.treeComponentRef.value,
     isTreeDragActive: deps.isTreeDragActive,
     getTreeScrollHost: () => deps.treeScrollHostRef.value,
@@ -109,11 +114,7 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: {
     }
   })
 
-  const treeStyle = deps.computed(() => {
-    return {
-      height: '100%'
-    }
-  })
+  const treeStyle = deps.computed(() => ({ height: '100%' }))
 
   return {
     beforeDragOpenWiring,
