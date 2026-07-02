@@ -34,6 +34,7 @@
 - **Workspace sidebar**: You can nest a document under a sibling document row in the same template placement again.
 - **Workspace sidebar**: Document rows use a short press-and-hold before drag starts, so quick clicks expand or collapse folders without starting a drag.
 - **Workspace sidebar**: Nesting into a document whose children were not yet loaded opens that parent row after the drop so the moved document stays visible.
+- **Workspace sidebar**: Expanding a template placement or document row for the first time waits until child rows load before the row opens, which removes flicker from empty placeholder children.
 
 ### Known issues
 - **Fantasia Archive Settings** still lists many experimental toggles marked as planned work in their titles; those options are not shipped yet and have no effect when enabled.

@@ -26,6 +26,7 @@ export function createProjectHierarchyTreeSessionExpandHandlersWiring (deps: {
   }
 }) {
   let openIconPointerWasOpen: boolean | null = null
+  const expandOpenInFlight = new Set<string>()
 
   function shouldIgnoreExpandPersistMutation (): boolean {
     return isProjectHierarchyTreeDragExpandUiFrozen({
@@ -40,21 +41,30 @@ export function createProjectHierarchyTreeSessionExpandHandlersWiring (deps: {
     if (shouldIgnoreExpandPersistMutation()) {
       return
     }
-    deps.uiStateWiring.markNodeOpen(stat.data.id)
-    await deps.lazyLoadWiring.loadChildrenForNode(stat.data)
-    const treeRef = deps.treeComponentRef.value
-    if (treeRef !== null) {
-      const openArgs = options?.statOpen === undefined
-        ? {
-            node: stat.data,
-            treeRef
-          }
-        : {
-            node: stat.data,
-            statOpen: options.statOpen,
-            treeRef
-          }
-      tryOpenHeTreeNodeAndParents(openArgs)
+    const nodeId = stat.data.id
+    if (expandOpenInFlight.has(nodeId)) {
+      return
+    }
+    expandOpenInFlight.add(nodeId)
+    try {
+      deps.uiStateWiring.markNodeOpen(nodeId)
+      await deps.lazyLoadWiring.loadChildrenForNode(stat.data)
+      const treeRef = deps.treeComponentRef.value
+      if (treeRef !== null) {
+        const openArgs = options?.statOpen === undefined
+          ? {
+              node: stat.data,
+              treeRef
+            }
+          : {
+              node: stat.data,
+              statOpen: options.statOpen,
+              treeRef
+            }
+        tryOpenHeTreeNodeAndParents(openArgs)
+      }
+    } finally {
+      expandOpenInFlight.delete(nodeId)
     }
   }
 

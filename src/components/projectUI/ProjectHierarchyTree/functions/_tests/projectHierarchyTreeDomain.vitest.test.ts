@@ -12,7 +12,8 @@ import {
   collectProjectHierarchyTreeDescendantIds,
   evictCollapsedNodeChildren,
   findProjectHierarchyTreeNodeById,
-  mergeLoadedChildrenIntoNode
+  mergeLoadedChildrenIntoNode,
+  needsProjectHierarchyTreeLazyLoadBeforeOpen
 } from '../projectHierarchyTreeExpandState'
 import {
   isProjectHierarchyTreeNodeDraggable,
@@ -195,6 +196,39 @@ test('Test that evictCollapsedNodeChildren clears lazy-loaded document children'
   evictCollapsedNodeChildren(placementNode)
   expect(placementNode.children).toEqual([])
   expect(placementNode.childrenLoaded).toBe(false)
+})
+
+test('Test that needsProjectHierarchyTreeLazyLoadBeforeOpen is true only for unloaded lazy rows', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([
+    {
+      color: '#ff0000',
+      displayName: 'World A',
+      groups: [],
+      id: 'world-1',
+      placements: [
+        {
+          displayName: 'Character',
+          documentTemplateId: 'template-1',
+          groupId: null,
+          groupSortOrder: null,
+          hasChildren: true,
+          icon: 'mdi-account',
+          id: 'placement-1',
+          nickname: '',
+          rootSortOrder: 0,
+          worldId: 'world-1'
+        }
+      ],
+      sortOrder: 0
+    }
+  ])
+  const placement = tree[0]!.children[0]!
+  expect(needsProjectHierarchyTreeLazyLoadBeforeOpen(placement)).toBe(true)
+  placement.childrenLoaded = true
+  expect(needsProjectHierarchyTreeLazyLoadBeforeOpen(placement)).toBe(false)
+  placement.childrenLoaded = false
+  placement.hasChildren = false
+  expect(needsProjectHierarchyTreeLazyLoadBeforeOpen(placement)).toBe(false)
 })
 
 /**

@@ -13,6 +13,9 @@ export function tryOpenHeTreeNodeAndParents (deps: {
 }): boolean {
   try {
     deps.treeRef.openNodeAndParents(deps.node)
+    if (deps.statOpen !== undefined) {
+      deps.statOpen.open = true
+    }
     return true
   } catch (error) {
     if (!isHeTreeStatNotFoundError(error)) {
@@ -52,6 +55,5 @@ export async function handleProjectHierarchyTreeOpenIconClick (deps: {
     deps.onNodeClose({ data: deps.node })
     return
   }
-  deps.stat.open = true
   await deps.onNodeOpen({ data: deps.node }, { statOpen: deps.stat })
 }

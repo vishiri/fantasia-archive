@@ -139,6 +139,15 @@ export function mergeLoadedChildrenIntoNode (
 }
 
 /**
+ * True when expand must await IPC child load before he-tree should open the row.
+ */
+export function needsProjectHierarchyTreeLazyLoadBeforeOpen (
+  node: I_faProjectHierarchyTreeHeTreeNode
+): boolean {
+  return node.hasChildren && !node.childrenLoaded
+}
+
+/**
  * Shallow-clones the tree root so he-tree picks up lazy-loaded child rows.
  */
 export function publishProjectHierarchyTreeRootRevision (

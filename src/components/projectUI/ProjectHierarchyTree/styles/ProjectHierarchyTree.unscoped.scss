@@ -86,7 +86,7 @@
   font-weight: 500;
   letter-spacing: 0.0125em;
   line-height: 2rem;
-  margin: 0 0 -5px 0;
+  margin: 0;
   padding: 5px 0 0 5px !important;
 
   .projectHierarchyTree__openIcon {
@@ -100,8 +100,8 @@
   }
 
   .projectHierarchyTreeNode--world {
-    border-radius: 3px;
-    padding: 0 35px 0 0 !important;
+    border-radius: 4px;
+    padding: 0 35px 0 5px !important;
   }
 }
 

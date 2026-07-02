@@ -30,6 +30,13 @@ function buildPointerLikeEvent (clientX: number, clientY: number) {
   }
 }
 
+function createTestTreeComponentRef () {
+  return ref({
+    closeAll: vi.fn(),
+    openNodeAndParents: vi.fn()
+  } as unknown as I_faProjectHierarchyTreeHeTreeInstance)
+}
+
 const sampleWorld = {
   color: '#ff0000',
   displayName: 'World A',
@@ -72,7 +79,7 @@ test('Test that session handlers open nodes and load children', async () => {
     },
     onDocumentClick: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: ref(null),
+    treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
@@ -106,7 +113,7 @@ test('Test that session handlers load children when the open icon expands a row'
     },
     onDocumentClick: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: ref(null),
+    treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
@@ -123,6 +130,57 @@ test('Test that session handlers load children when the open icon expands a row'
   expect(stat.open).toBe(true)
   expect(markNodeOpen).toHaveBeenCalledWith('placement-1')
   expect(loadChildrenForNode).toHaveBeenCalledWith(placement)
+})
+
+/**
+ * Open icon expand keeps he-tree stat closed until lazy load finishes.
+ */
+test('Test that open icon expand keeps stat closed until lazy load finishes', async () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const placement = tree[0]!.children[0]!
+  let resolveLoad: () => void = () => undefined
+  const loadChildrenForNode = vi.fn(() => {
+    return new Promise<void>((resolve) => {
+      resolveLoad = resolve
+    })
+  })
+  const openNodeAndParents = vi.fn()
+  const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
+    dragContext: {
+      dragNode: null
+    },
+    dragExpandUiFrozen: ref(false),
+    lazyLoadWiring: {
+      loadChildrenForNode
+    },
+    onDocumentClick: vi.fn(),
+    suppressTreeEmit: ref(false),
+    treeComponentRef: ref({
+      closeAll: vi.fn(),
+      openNodeAndParents
+    } as unknown as I_faProjectHierarchyTreeHeTreeInstance),
+    treeData: ref(tree),
+    treeScrollHostRef: ref(null),
+    uiStateWiring: {
+      markNodeClosed: vi.fn(),
+      markNodeOpen: vi.fn()
+    }
+  })
+  const stat = {
+    children: placement.children,
+    open: false
+  }
+  wiring.onNodeOpenIconPointerDown(stat)
+  const clickPromise = wiring.onNodeOpenIconClick(placement, stat)
+  await Promise.resolve()
+  expect(stat.open).toBe(false)
+  expect(openNodeAndParents).not.toHaveBeenCalled()
+  resolveLoad()
+  await clickPromise
+  expect(stat.open).toBe(true)
+  expect(openNodeAndParents).toHaveBeenCalledWith(placement)
 })
 
 /**
@@ -144,7 +202,7 @@ test('Test that session handlers collapse rows via the open icon', async () => {
     },
     onDocumentClick: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: ref(null),
+    treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
@@ -182,7 +240,7 @@ test('Test that session handlers expand world rows from row click routing', asyn
     },
     onDocumentClick: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: ref(null),
+    treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
@@ -239,7 +297,7 @@ test('Test that session handlers expand group rows from row click routing', asyn
     },
     onDocumentClick: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: ref(null),
+    treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
@@ -297,7 +355,7 @@ test('Test that session handlers expand document rows with children from row cli
     },
     onDocumentClick: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: ref(null),
+    treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
@@ -352,7 +410,7 @@ test('Test that session handlers ignore leaf document row click routing', async 
     },
     onDocumentClick: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: ref(null),
+    treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
@@ -406,7 +464,7 @@ test('Test that session handlers ignore document row click after drag movement',
     },
     onDocumentClick: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: ref(null),
+    treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
@@ -452,7 +510,7 @@ test('Test that session handlers ignore non-world open icon routing on world row
     },
     onDocumentClick: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: ref(null),
+    treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
@@ -516,7 +574,7 @@ test('Test that session handlers ignore close events while suppressTreeEmit is s
     },
     onDocumentClick: vi.fn(),
     suppressTreeEmit: ref(true),
-    treeComponentRef: ref(null),
+    treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
@@ -542,7 +600,7 @@ test('Test that session handlers emit document clicks for document rows', () => 
     },
     onDocumentClick,
     suppressTreeEmit: ref(false),
-    treeComponentRef: ref(null),
+    treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
@@ -630,7 +688,7 @@ test('Test that session handlers expose draggable and droppable handlers', () =>
     },
     onDocumentClick: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: ref(null),
+    treeComponentRef: createTestTreeComponentRef(),
     treeData: ref(tree),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
@@ -706,7 +764,7 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
     },
     onDocumentClick: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: ref(null),
+    treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
@@ -741,7 +799,7 @@ test('Test that session handlers skip restore when tree ref attaches during drag
     },
     onDocumentClick: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: ref(null),
+    treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
@@ -771,7 +829,7 @@ test('Test that session handlers skip restore when tree ref clears', () => {
     },
     onDocumentClick: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: ref(null),
+    treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
@@ -811,7 +869,7 @@ test('Test that session handlers ignore open icon clicks on empty loaded documen
     },
     onDocumentClick: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: ref(null),
+    treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
