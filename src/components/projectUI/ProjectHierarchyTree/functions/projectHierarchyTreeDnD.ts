@@ -22,32 +22,6 @@ function readDraggedDocumentNode (
   return dragged
 }
 
-function resolveProjectHierarchyTreeDocumentParentDocumentId (
-  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
-  documentId: string,
-  parentDocumentId: string | null = null
-): string | null | undefined {
-  if (!Array.isArray(treeNodes)) {
-    return undefined
-  }
-  for (const node of treeNodes) {
-    if (node.nodeKind === 'document' && node.id === documentId) {
-      return parentDocumentId
-    }
-    const childNodes = Array.isArray(node.children) ? node.children : []
-    const nestedParentDocumentId = node.nodeKind === 'document' ? node.documentId : parentDocumentId
-    const nested = resolveProjectHierarchyTreeDocumentParentDocumentId(
-      childNodes,
-      documentId,
-      nestedParentDocumentId
-    )
-    if (nested !== undefined) {
-      return nested
-    }
-  }
-  return undefined
-}
-
 /**
  * True for persisted document rows; excludes lazy-load placeholder children.
  */
@@ -95,14 +69,13 @@ export function isProjectHierarchyTreeNodeDraggable (
 }
 
 /**
- * he-tree uses rootDroppable for empty-root insert slots (e.g. first row under a parent).
- * Allow during document drags so outdent to template placement level works; invalid tree-root
- * drops are rejected at commit via isProjectHierarchyTreeDocumentDropParentValid.
+ * Root insert targets he-tree top-level stats (world rows). Never allow for document drags.
+ * Sibling reorder under placement or document parents uses eachDroppable + fe() walk-up.
  */
 export function isProjectHierarchyTreeRootDroppable (
-  dragContext: T_heTreeDragContext
+  _dragContext: T_heTreeDragContext
 ): boolean {
-  return readDraggedDocumentNode(dragContext) !== null
+  return false
 }
 
 /**
@@ -120,12 +93,12 @@ export function isProjectHierarchyTreeDocumentDropParentValid (input: {
 
 /**
  * Document drops are allowed only on rows sharing the same placementId.
- * Direct parent documents are not droppable so pull-left outdent uses sibling slots.
+ * Direct parent documents stay droppable so he-tree fe() can resolve sibling insert parents.
  */
 export function isProjectHierarchyTreeNodeDroppable (
   targetNode: I_faProjectHierarchyTreeHeTreeNode,
   dragContext: T_heTreeDragContext,
-  treeNodes: I_faProjectHierarchyTreeHeTreeNode[] = []
+  _treeNodes: I_faProjectHierarchyTreeHeTreeNode[] = []
 ): boolean {
   const dragged = readDraggedDocumentNode(dragContext)
   if (dragged === null) {
@@ -134,7 +107,6 @@ export function isProjectHierarchyTreeNodeDroppable (
   if (dragged.placementId === null) {
     return false
   }
-  const treeNodesSafe = Array.isArray(treeNodes) ? treeNodes : []
   if (targetNode.nodeKind === 'document') {
     if (!isProjectHierarchyTreeDocumentSiblingRow(targetNode)) {
       return false
@@ -143,17 +115,6 @@ export function isProjectHierarchyTreeNodeDroppable (
       return false
     }
     if (targetNode.id === dragged.id) {
-      return false
-    }
-    const parentDocumentId = resolveProjectHierarchyTreeDocumentParentDocumentId(
-      treeNodesSafe,
-      dragged.id
-    )
-    if (
-      parentDocumentId !== undefined &&
-      parentDocumentId !== null &&
-      targetNode.documentId === parentDocumentId
-    ) {
       return false
     }
     return true

@@ -697,7 +697,7 @@ test('Test that session handlers expose draggable and droppable handlers', () =>
     }
   })
   expect(wiring.eachDraggableHandler({ data: documentNode })).toBe(true)
-  expect(wiring.rootDroppableHandler()).toBe(true)
+  expect(wiring.rootDroppableHandler()).toBe(false)
   expect(wiring.eachDroppableHandler({ data: documentNode })).toBe(false)
   expect(wiring.eachDroppableHandler({ data: siblingDocument })).toBe(true)
   const siblingSection = {

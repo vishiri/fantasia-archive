@@ -410,7 +410,7 @@ test('Test that projectHierarchyTree DnD helpers cover drag context branches', (
     dragNode: {
       data: documentA
     }
-  })).toBe(true)
+  })).toBe(false)
   expect(isProjectHierarchyTreeNodeDraggable(documentA)).toBe(true)
   expect(isProjectHierarchyTreeDocumentSiblingRow({
     ...documentA,

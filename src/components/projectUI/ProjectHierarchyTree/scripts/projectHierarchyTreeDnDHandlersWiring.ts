@@ -17,6 +17,7 @@ import type { createProjectHierarchyTreeDocumentRowDragHoldWiring } from './proj
 import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowExpandClickGestureWiring'
 import { scheduleProjectHierarchyTreeDragCommit } from './projectHierarchyTreeDnDScheduleWiring'
 import { syncProjectHierarchyTreeDocumentHasChildrenFlags } from '../functions/projectHierarchyTreeDocumentHasChildrenSync'
+import { findProjectHierarchyTreeDocumentsWithInvalidPlacementParent } from '../functions/projectHierarchyTreeDocumentPlacementGuard'
 
 type T_projectHierarchyTreeDnDHandlerDeps = {
   bumpTreeMountKey: () => void
@@ -141,6 +142,10 @@ function onTreeDataUpdateImpl (
     isTreeDragActive: deps.isTreeDragActive.value,
     suppressTreeEmit: deps.suppressTreeEmit.value
   })) {
+    return
+  }
+  const escapedDocuments = findProjectHierarchyTreeDocumentsWithInvalidPlacementParent(nextNodes)
+  if (escapedDocuments.length > 0) {
     return
   }
   deps.treeData.value = nextNodes

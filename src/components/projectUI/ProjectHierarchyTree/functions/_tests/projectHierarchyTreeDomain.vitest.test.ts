@@ -22,6 +22,7 @@ import {
   resolvePlacementIdFromHeTreeNode,
   resolveProjectHierarchyTreeDragContext
 } from '../projectHierarchyTreeDnD'
+import { findProjectHierarchyTreeDocumentsWithInvalidPlacementParent } from '../projectHierarchyTreeDocumentPlacementGuard'
 import { resolveProjectHierarchyTreeDragExpandedSnapshot } from '../../scripts/projectHierarchyTreeDragExpandSnapshotWiring'
 import { mapProjectHierarchyTreeToTopologyKey } from '../projectHierarchyTreeTopologyKey'
 import { projectHierarchyTreeLayoutStructureMatchesTree } from '../../scripts/projectHierarchyTreeLayoutStructureMatch'
@@ -144,7 +145,7 @@ test('Test that projectHierarchyTreeDnD fences document drag to same placement',
     dragNode: {
       data: documentA
     }
-  })).toBe(true)
+  })).toBe(false)
   expect(isProjectHierarchyTreeRootDroppable({
     dragNode: null
   })).toBe(false)
@@ -473,7 +474,7 @@ test('Test that projectHierarchyTreeDnD rejects invalid drag targets', () => {
   })).toBe(false)
 })
 
-test('Test that projectHierarchyTreeDnD blocks drop on direct parent document', () => {
+test('Test that projectHierarchyTreeDnD allows direct parent droppable for nested sibling reorder', () => {
   const parentDocument = {
     children: [] as I_faProjectHierarchyTreeHeTreeNode[],
     childrenLoaded: true,
@@ -518,7 +519,7 @@ test('Test that projectHierarchyTreeDnD blocks drop on direct parent document', 
       data: childDocument
     }
   }
-  expect(isProjectHierarchyTreeNodeDroppable(parentDocument, dragContext, tree)).toBe(false)
+  expect(isProjectHierarchyTreeNodeDroppable(parentDocument, dragContext, tree)).toBe(true)
   expect(isProjectHierarchyTreeNodeDroppable(siblingDocument, dragContext, tree)).toBe(true)
 })
 
@@ -578,7 +579,7 @@ test('Test that projectHierarchyTreeDnD allows nest on non-sibling section docum
   expect(isProjectHierarchyTreeNodeDroppable(cousinSection, dragContext, tree)).toBe(true)
 })
 
-test('Test that projectHierarchyTreeDnD tolerates missing children during parent resolve', () => {
+test('Test that projectHierarchyTreeDnD allows parent droppable without tree parent walk', () => {
   const childDocument = {
     children: undefined as unknown as I_faProjectHierarchyTreeHeTreeNode[],
     childrenLoaded: true,
@@ -616,7 +617,7 @@ test('Test that projectHierarchyTreeDnD tolerates missing children during parent
       data: childDocument
     }
   }
-  expect(isProjectHierarchyTreeNodeDroppable(parentDocument, dragContext, tree)).toBe(false)
+  expect(isProjectHierarchyTreeNodeDroppable(parentDocument, dragContext, tree)).toBe(true)
 })
 
 /**
@@ -1321,4 +1322,72 @@ test('Test that resolveProjectHierarchyTreeTreeNodeKindClass maps node kinds', (
   expect(resolveProjectHierarchyTreeTreeNodeKindClass('templatePlacement')).toBe('projectHierarchyTree-treeNode--documentTemplate')
   expect(resolveProjectHierarchyTreeTreeNodeKindClass('document')).toBe('projectHierarchyTree-treeNode--document')
   expect(PROJECT_HIERARCHY_TREE_TREE_NODE_KIND_CLASS_LIST).toHaveLength(4)
+})
+
+test('Test that findProjectHierarchyTreeDocumentsWithInvalidPlacementParent flags world-level documents', () => {
+  const escapedDocument: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: true,
+    documentId: 'doc-escaped',
+    groupId: null,
+    hasChildren: false,
+    icon: '',
+    id: 'doc-escaped',
+    label: 'Escaped',
+    nodeKind: 'document',
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const worldNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [escapedDocument],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'world-1',
+    label: 'World',
+    nodeKind: 'world',
+    placementId: null,
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  expect(findProjectHierarchyTreeDocumentsWithInvalidPlacementParent([worldNode])).toEqual([{
+    documentId: 'doc-escaped',
+    parentNodeId: 'world-1',
+    parentNodeKind: 'world'
+  }])
+})
+
+test('Test that findProjectHierarchyTreeDocumentsWithInvalidPlacementParent accepts placement children', () => {
+  const documentNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: true,
+    documentId: 'doc-1',
+    groupId: null,
+    hasChildren: false,
+    icon: '',
+    id: 'doc-1',
+    label: 'Doc',
+    nodeKind: 'document',
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const placementNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [documentNode],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'placement-1',
+    label: 'Placement',
+    nodeKind: 'templatePlacement',
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  expect(findProjectHierarchyTreeDocumentsWithInvalidPlacementParent([placementNode])).toEqual([])
 })

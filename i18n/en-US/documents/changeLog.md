@@ -35,6 +35,8 @@
 - **Workspace sidebar**: Document rows use a short press-and-hold before drag starts, so quick clicks expand or collapse folders without starting a drag.
 - **Workspace sidebar**: Nesting into a document whose children were not yet loaded opens that parent row after the drop so the moved document stays visible.
 - **Workspace sidebar**: Expanding a template placement or document row for the first time waits until child rows load before the row opens, which removes flicker from empty placeholder children.
+- **Workspace sidebar**: Dragging a document in the hierarchy tree no longer moves it outside its template placement (for example beside the placement row at world level).
+- **Workspace sidebar**: Reordering nested documents that share the same parent document row in the hierarchy tree works again when you drop on the gap between sibling rows.
 
 ### Known issues
 - **Fantasia Archive Settings** still lists many experimental toggles marked as planned work in their titles; those options are not shipped yet and have no effect when enabled.

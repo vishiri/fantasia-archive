@@ -6,6 +6,7 @@ import {
   mapWorkspaceLayoutToHierarchyTreeSkeleton,
   patchHierarchyTreeSkeletonLabelsInPlace
 } from '../functions/mapWorkspaceLayoutToHierarchyTreeSkeleton'
+import { findProjectHierarchyTreeDocumentsWithInvalidPlacementParent } from '../functions/projectHierarchyTreeDocumentPlacementGuard'
 import { projectHierarchyTreeLayoutStructureMatchesTree } from './projectHierarchyTreeLayoutStructureMatch'
 
 export function createProjectHierarchyTreeSyncWiring (deps: {
@@ -21,10 +22,13 @@ export function createProjectHierarchyTreeSyncWiring (deps: {
       return
     }
     const nextSkeleton = mapWorkspaceLayoutToHierarchyTreeSkeleton(worlds)
-    if (
-      deps.treeData.value.length > 0 &&
+    const escapedDocuments = findProjectHierarchyTreeDocumentsWithInvalidPlacementParent(
+      deps.treeData.value
+    )
+    const structureMatches = deps.treeData.value.length > 0 &&
+      escapedDocuments.length === 0 &&
       projectHierarchyTreeLayoutStructureMatchesTree(deps.treeData.value, worlds)
-    ) {
+    if (structureMatches) {
       patchHierarchyTreeSkeletonLabelsInPlace(deps.treeData.value, worlds)
       return
     }

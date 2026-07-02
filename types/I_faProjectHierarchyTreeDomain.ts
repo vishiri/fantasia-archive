@@ -128,6 +128,13 @@ export interface I_faProjectHierarchyTreeHeTreeInstance {
   openNodeAndParents: (nodeOrStat: I_faProjectHierarchyTreeHeTreeNode) => void
 }
 
+/** Document row whose parent is not templatePlacement or document (invalid escape). */
+export interface I_faProjectHierarchyTreeDocumentInvalidPlacementParent {
+  documentId: string
+  parentNodeId: string | null
+  parentNodeKind: T_faProjectHierarchyTreeNodeKind | 'none'
+}
+
 /** he-tree node data for the workspace hierarchy sidebar tree. */
 export interface I_faProjectHierarchyTreeHeTreeNode {
   children: I_faProjectHierarchyTreeHeTreeNode[]
