@@ -32,7 +32,7 @@ description: >-
 5. Rewrite **`_tests/faProjectDbMigrate.vitest.test.ts`**; update DDL tests
 6. Docs: **projectDB.md**, **templateCustomFields.md**, **AGENTS.md**, **README.md** if needed
 7. Changelog: older dev **`.faproject`** must be recreated (current **`package.json`** version only)
-8. **`yarn testbatch:verify`**
+8. **Full** **`yarn testbatch:verify`** before commit (schema squash touches electron + docs + broad tests)
 
 ## Adding migrations again (after flatten)
 

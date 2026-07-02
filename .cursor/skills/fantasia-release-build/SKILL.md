@@ -21,7 +21,7 @@ description: >-
 
 ## Checklist before release candidate
 
-1. **`yarn testbatch:verify`** one terminal
+1. **Full** **`yarn testbatch:verify`** one terminal (not dev scoped gate alone)
 2. **`yarn quasar:build:electron`** separate terminal; smoke packaged app
 3. Playwright after same build — [fantasia-testing](../fantasia-testing/SKILL.md)
 4. Full chain: **`yarn testbatch:ensure:nochange`** or separate Storybook scripts

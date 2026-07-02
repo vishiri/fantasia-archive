@@ -1,6 +1,6 @@
 # AI and agent notes — Fantasia Archive
 
-**Fantasia Archive** — worldbuilding DB manager; **Quasar + Vue 3 + Electron** (GPL-3.0). **Yarn 1.x**, **Node 22.22.0+** (`package.json` `engines.node`). CI: **Node 22.22**, **`yarn testbatch:verify`** on push/PR ([`.github/workflows/verify.yml`](.github/workflows/verify.yml)). Manual **Build App** workflow ([`.github/workflows/build.yml`](.github/workflows/build.yml)) packages **Windows**/**macOS**/**Linux** only — **no CI test gate**; run **`yarn testbatch:ensure:nochange`** locally first.
+**Fantasia Archive** — worldbuilding DB manager; **Quasar + Vue 3 + Electron** (GPL-3.0). **Yarn 1.x**, **Node 22.22.0+** (`package.json` `engines.node`). CI: **Node 22.22**, **`yarn testbatch:verify`** on push/PR ([`.github/workflows/verify.yml`](.github/workflows/verify.yml)). Agents: dev scoped gate during edits ([dev-scoped-verify.mdc](.cursor/rules/dev-scoped-verify.mdc)); full verify at commit/final cleanup. Manual **Build App** workflow ([`.github/workflows/build.yml`](.github/workflows/build.yml)) packages **Windows**/**macOS**/**Linux** only — **no CI test gate**; run **`yarn testbatch:ensure:nochange`** locally first.
 
 ## Where guidance lives
 
@@ -47,8 +47,9 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc) | Always — **`changeLog.md`** vs **`package.json` version** |
 | [clarify-before-assume.mdc](.cursor/rules/clarify-before-assume.mdc) | Always — ask before product/UX/scope/implementation assumptions; planning emphasis |
 | [plan-documents.mdc](.cursor/rules/plan-documents.mdc) | Always — **`.cursor/plans/`** |
-| [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) | Always — **`yarn testbatch:verify`** gate |
-| [dev-electron-compile-check.mdc](.cursor/rules/dev-electron-compile-check.mdc) | Always — **`yarn testbatch:verify`** Shell run after last edit, before done summary; then dev compile smoke |
+| [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) | Always — dev scoped gate default; full **`testbatch:verify`** for cleanup/commit/explicit |
+| [dev-scoped-verify.mdc](.cursor/rules/dev-scoped-verify.mdc) | Always — touched lint + connected Vitest after ordinary edits |
+| [dev-electron-compile-check.mdc](.cursor/rules/dev-electron-compile-check.mdc) | Always — scoped gate after edits; **20s** dev compile smoke (kill agent-spawned dev) |
 | [code-size-decomposition.mdc](.cursor/rules/code-size-decomposition.mdc) | Always — Vue/TS/function line caps, **`return { }`** shape |
 | [yagni.mdc](.cursor/rules/yagni.mdc) | Always — reuse ladder, minimal diff inside mandatory structure + gates |
 | [fa-action-manager.mdc](.cursor/rules/fa-action-manager.mdc) | `src/scripts/actionManager/**` |
@@ -75,7 +76,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | i18n | vue-i18n — repo-root **`i18n/`** |
 | Boot | **`src/boot/`** — **`tooltip-defaults`** patches global **`q-tooltip`** delay (**`FA_Q_TOOLTIP_DELAY_MS`**, 500 ms) |
 | Lint/types | ESLint, **`vue-tsc`** (**`quasar.config.ts`** **`typescript.strict: true`**), Stylelint |
-| Unit | Vitest — **`yarn test:unit`**; gate **`yarn testbatch:verify`** |
+| Unit | Vitest — **`yarn test:unit`**; dev edits → [fantasia-dev-scoped-verify](.cursor/skills/fantasia-dev-scoped-verify/SKILL.md); full **`yarn testbatch:verify`** at cleanup/commit |
 | UI/E2E | Playwright — rebuild Electron before runs |
 | Storybook | 10 — **`.storybook-workspace/`** |
 | DB | **`better-sqlite3`**; **`.faproject`** SQLite **`user_version` max 1** (flattened) — see [projectDB.md](docs/database/projectDB.md) |
@@ -98,7 +99,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | **`FaLocaleTranslationsInput`** | [fa-locale-translations-input.mdc](.cursor/rules/fa-locale-translations-input.mdc), [fantasia-locale-translations-input](.cursor/skills/fantasia-locale-translations-input/SKILL.md) |
 | Vue / Quasar / SCSS | [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc), [vue-bem-scss.mdc](.cursor/rules/vue-bem-scss.mdc), [project-scss.mdc](.cursor/rules/project-scss.mdc), [fantasia-quasar-vue](.cursor/skills/fantasia-quasar-vue/SKILL.md) |
 | i18n | [fantasia-i18n](.cursor/skills/fantasia-i18n/SKILL.md), [en-us-ui-copy-capitalization.mdc](.cursor/rules/en-us-ui-copy-capitalization.mdc) |
-| Testing | [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc), [dev-electron-compile-check.mdc](.cursor/rules/dev-electron-compile-check.mdc) (post-edit: verify then dev compile), [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc), [playwright-tests.mdc](.cursor/rules/playwright-tests.mdc), [fantasia-testing](.cursor/skills/fantasia-testing/SKILL.md) |
+| Testing | [dev-scoped-verify.mdc](.cursor/rules/dev-scoped-verify.mdc), [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc), [dev-electron-compile-check.mdc](.cursor/rules/dev-electron-compile-check.mdc), [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc), [playwright-tests.mdc](.cursor/rules/playwright-tests.mdc), [fantasia-dev-scoped-verify](.cursor/skills/fantasia-dev-scoped-verify/SKILL.md), [fantasia-testing](.cursor/skills/fantasia-testing/SKILL.md) |
 | Storybook | [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc) |
 | Git / changelog / cleanup | [git-conventional-commits.mdc](.cursor/rules/git-conventional-commits.mdc), [changelog-en-us.mdc](.cursor/rules/changelog-en-us.mdc), [fantasia-final-cleanup](.cursor/skills/fantasia-final-cleanup/SKILL.md) |
 | Two-level architecture | [fa-two-level-architecture.mdc](.cursor/rules/fa-two-level-architecture.mdc), [fantasia-two-level-architecture](.cursor/skills/fantasia-two-level-architecture/SKILL.md) |
@@ -133,6 +134,7 @@ No Markdown bold/italic in comments. Single quotes for inline refs. No mid-sente
 | Skill | Role |
 | --- | --- |
 | `fantasia-dev-setup` | Install, dev, build |
+| `fantasia-dev-scoped-verify` | Default post-edit gate — connected Vitest + touched lint |
 | `fantasia-testing` | Vitest, Playwright |
 | `fantasia-electron-preload` | Preload, IPC names |
 | `fantasia-electron-main` | Main process, **`mainScripts/`** |

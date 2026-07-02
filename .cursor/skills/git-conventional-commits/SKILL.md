@@ -31,7 +31,7 @@ Exactly one: **`feat`** | **`fix`** | **`test`** | **`chore`** | **`refactor`** 
 ## Workflow (default when user wants multiple commits)
 
 1. **Inspect**: `git status`, `git diff`, `git diff --staged`
-2. **Quality gate**: **`yarn testbatch:verify`** one terminal ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)). **Changelog-only** exception: only **`i18n/*/documents/changeLog.md`** + gate already passed after substantive edits
+2. **Full quality gate**: **`yarn testbatch:verify`** one terminal ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)). Dev scoped gate during edits does **not** substitute. **Changelog-only** exception: only **`i18n/*/documents/changeLog.md`** + full gate already passed after substantive edits
 3. **Storybook gate**: changed **`src/components/**`** — stories/mocks. Skip changelog-only repair
 4. **Changelog gate**: update **`changeLog.md`** before commit; prefer same commit as product work — [fantasia-changelog-en-us](../fantasia-changelog-en-us/SKILL.md)
 5. **Plan**: ordered commits — type + subject + paths

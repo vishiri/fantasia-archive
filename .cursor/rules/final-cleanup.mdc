@@ -16,7 +16,7 @@ User message mentions **final cleanup** or equivalent → explicit end-of-batch 
 
 ## Mandatory order (summary)
 
-1. **`yarn testbatch:verify`** — fix until green.
+1. **Full** **`yarn testbatch:verify`** — fix until green (not dev scoped gate — [dev-scoped-verify.mdc](dev-scoped-verify.mdc)).
 2. **Docs** — sync `README.md`, `AGENTS.md`, `.cursor/rules/`, `.cursor/skills/` from Git diff.
 3. **Changelog** — update `i18n/*/documents/changeLog.md` from shipped product ([changelog-en-us.mdc](changelog-en-us.mdc)).
 4. **Commits** — logical conventional batches (final cleanup may commit without per-commit approval unless user interrupts).

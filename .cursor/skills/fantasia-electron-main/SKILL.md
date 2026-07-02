@@ -37,7 +37,7 @@ description: >-
 ## Testing
 
 - Vitest: **`mainScripts/_tests/`**, per-area **`_tests/`**, **`contentBridgeAPIs/_tests/`**
-- After main changes: **`yarn testbatch:verify`** when TS/sources touched
+- After main changes: dev scoped gate + connected **`src-electron/**/_tests`** during edits; **full** **`yarn testbatch:verify`** before commit ([fantasia-dev-scoped-verify](../fantasia-dev-scoped-verify/SKILL.md))
 
 ## Renderer sandbox
 

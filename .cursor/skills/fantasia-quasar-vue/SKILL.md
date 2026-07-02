@@ -81,7 +81,8 @@ Large production data objects → **`src/components/<Feature>/_data/`** (several
 
 ## Quality gates
 
-- Before commits: **`yarn testbatch:verify`** ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc), [eslint-typescript.mdc](../../rules/eslint-typescript.mdc))
+- **During edits:** dev scoped gate — [dev-scoped-verify.mdc](../../rules/dev-scoped-verify.mdc), [fantasia-dev-scoped-verify](../fantasia-dev-scoped-verify/SKILL.md)
+- **Before commit / final cleanup:** full **`yarn testbatch:verify`** ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc), [eslint-typescript.mdc](../../rules/eslint-typescript.mdc))
 - Extra attention on **`yarn lint:stylelint`** when changing **`<style>`** or **`src/**/*.scss`**
 - **`quasar.config.ts`**: match Quasar typings (PWA **`workboxMode`**, BEX **`QuasarBexConfiguration`**)
 - Vitest SFC parity: **`_tests/<Name>.vitest.test.ts`** per feature **`.vue`**

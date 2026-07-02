@@ -1,0 +1,46 @@
+---
+description: >-
+  Default agent post-edit gate: lint/types/style on touched tree + connected
+  Vitest only. Full yarn testbatch:verify reserved for final cleanup, commits,
+  and explicit user/manual full-gate requests.
+alwaysApply: true
+---
+
+# Dev scoped verify (default agent gate)
+
+Ordinary substantive edits → **dev scoped gate** before done summary. **Not** full **`yarn testbatch:verify`**.
+
+Full gate ([testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) **Full quality gate**) only when:
+
+- [final-cleanup.mdc](final-cleanup.mdc) / [fantasia-final-cleanup](../skills/fantasia-final-cleanup/SKILL.md)
+- User explicitly asks: **`yarn testbatch:verify`**, full verify, full gate, **`testbatch:ensure:*`**, or equivalent
+- **`git commit`** ([git-conventional-commits.mdc](git-conventional-commits.mdc)) — changelog-only exception unchanged
+
+CI / push still **`yarn testbatch:verify`** ([`.github/workflows/verify.yml`](../../.github/workflows/verify.yml)).
+
+## Dev scoped gate (one terminal chain)
+
+Playbook: [fantasia-dev-scoped-verify](../skills/fantasia-dev-scoped-verify/SKILL.md). Order:
+
+1. **ESLint** — **`yarn eslint`** on touched compile paths (**`src/`**, **`src-electron/`**, **`types/`**, **`i18n/`**, **`helpers/`** non-Playwright, configs, **`.storybook-workspace/`**, tests). Expand to parent feature folder when SFC + colocated **`scripts/`** both edited.
+2. **TypeScript** — **`yarn lint:typescript`** (full **`vue-tsc`**; cross-file breaks).
+3. **Stylelint** — touched **`src/**/*.{vue,css,scss,sass}`** + **`.storybook-workspace/.storybook/**/*.{vue,css,scss,sass}`** only; skip when no style files touched.
+4. **Connected Vitest** — **`yarn vitest run`** explicit **`*.vitest.test.ts`** paths from discovery; **no** **`yarn test:coverage:verify`**.
+
+Stop on first failure; fix; re-run failed slice + connected specs on current tree.
+
+**Escalate to full `yarn testbatch:verify`** (same turn) when batch touches: root **`eslint.config.mjs`**, **`vitest.config.mts`**, **`vitest/**`**, coverage thresholds, **`package.json`** deps/scripts affecting test/lint toolchain, or repo-wide refactor spanning many Vitest projects without obvious connected set.
+
+## With dev compile smoke
+
+After scoped gate passes → **20s** Electron compile smoke per [dev-electron-compile-check.mdc](dev-electron-compile-check.mdc) step 2 (separate terminal).
+
+## Reporting
+
+Done summary on substantive work: scoped gate **pass/fail** (which steps + spec paths) + dev compile **pass/fail**. Do not claim full verify green from scoped gate alone.
+
+## Related
+
+- [dev-electron-compile-check.mdc](dev-electron-compile-check.mdc) — when gate fires; compile smoke
+- [testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) — full gate + terminal isolation
+- [fantasia-testing](../skills/fantasia-testing/SKILL.md) — connected Playwright (not in scoped gate)

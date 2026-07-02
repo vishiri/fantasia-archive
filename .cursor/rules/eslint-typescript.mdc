@@ -30,9 +30,11 @@ Line/block comments + JSDoc above APIs/tests: no Markdown `**bold**` or `*italic
 
 ## Pre-commit / pre-changelog quality gate
 
-Before commits/changelog tied to product/test work: four checks **in order** **one** terminal via **`yarn testbatch:verify`** ([testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) **changelog-only** exception, [git-conventional-commits.mdc](git-conventional-commits.mdc)). Vitest step: **`src-electron`** **95%** all four; **`helpers/**/*.ts`** **`unit-helpers`** instruments (**`helpers/playwrightHelpers_*`** excluded) **95%** when non-empty; **`src`** renderer **`.ts`** **`unit-src-renderer`** **95%**; **`.ts`** under **`src/components`**, **`src/layouts`**, **`src/pages`** **`unit-components`** **95%**; **`.vue`** no failing threshold (**watermarks** only) ([vitest-tests.mdc](vitest-tests.mdc), **Vitest coverage tiers (CI)**).
+**During edits:** [dev-scoped-verify.mdc](dev-scoped-verify.mdc) — touched eslint, **`yarn lint:typescript`**, connected Vitest.
 
-Run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, `yarn test:coverage:verify` individually only while debugging specific failure.
+**Before commits/changelog** tied to product/test work: full **`yarn testbatch:verify`** one terminal ([testing-terminal-isolation.mdc](testing-terminal-isolation.mdc) **changelog-only** exception, [git-conventional-commits.mdc](git-conventional-commits.mdc)). Vitest step: **`src-electron`** **95%** all four; **`helpers/**/*.ts`** **`unit-helpers`** instruments (**`helpers/playwrightHelpers_*`** excluded) **95%** when non-empty; **`src`** renderer **`.ts`** **`unit-src-renderer`** **95%**; **`.ts`** under **`src/components`**, **`src/layouts`**, **`src/pages`** **`unit-components`** **95%**; **`.vue`** no failing threshold (**watermarks** only) ([vitest-tests.mdc](vitest-tests.mdc), **Vitest coverage tiers (CI)**).
+
+Run `yarn lint:eslint`, `yarn lint:typescript`, `yarn lint:stylelint`, `yarn test:unit`, `yarn test:coverage:verify` individually only while debugging specific failure. **During edits:** dev scoped gate ([dev-scoped-verify.mdc](dev-scoped-verify.mdc)).
 
 **Dev server**: `vite-plugin-checker` runs ESLint during `quasar dev` same **`--max-warnings 0`** as `yarn lint:eslint`; keep `@typescript-eslint` major in sync with TypeScript — avoid unsupported-TS-version warnings from `typescript-estree`.
 

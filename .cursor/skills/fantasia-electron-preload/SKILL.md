@@ -30,7 +30,7 @@ description: >-
 3. Implement **`contentBridgeAPIs/<name>.ts`**
 4. Add to **`apiObject`** in **`electron-preload.ts`**
 5. Extend **`globals.d.ts`**
-6. Vitest: **`contentBridgeAPIs/_tests/`**, **`ipcManagement/_tests/`** — **`yarn testbatch:verify`** enforces **95%** on **`src-electron`**
+6. Vitest: **`contentBridgeAPIs/_tests/`**, **`ipcManagement/_tests/`** — dev scoped connected specs during edits; **full** **`yarn testbatch:verify`** enforces **95%** on **`src-electron`** before commit
 
 ## Security and boundaries
 

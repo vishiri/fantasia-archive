@@ -39,7 +39,7 @@ Verification belongs in commits/PRs — not changelog. Dependency refresh bullet
 
 ## Pre-changelog workflow gate
 
-1. **`yarn testbatch:verify`** in one terminal ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)). **Changelog-only** follow-up touching only **`i18n/*/documents/changeLog.md`**: may skip if gate already passed after substantive edits and tree otherwise unchanged.
+1. **Full quality gate** — **`yarn testbatch:verify`** in one terminal ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)). Dev scoped gate during edits does **not** substitute. **Changelog-only** follow-up touching only **`i18n/*/documents/changeLog.md`**: may skip if full gate already passed after substantive edits and tree otherwise unchanged.
 2. Affected **`src/components/**`**: Storybook stories/mocks aligned (**`yarn storybook:run`**). Skip for changelog-only repair.
 3. Draft/update entries.
 

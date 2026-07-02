@@ -74,7 +74,7 @@ After **`@quasar/extras`** or **`quasar.config.ts`** icon set changes:
 
 1. **`yarn generate:icon-catalogs`**
 2. Commit **`src/scripts/faIcons/catalogs/*.catalog.json`**
-3. **`yarn testbatch:verify`**
+3. **Full** **`yarn testbatch:verify`** before commit (catalog regen touches broad lint/coverage surface)
 
 Prefer regenerate over hand-editing thousands of lines.
 

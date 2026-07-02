@@ -1,48 +1,59 @@
 ---
-description: Quality gate (lint + types + style + unit tests) in one terminal; heavier steps stay isolated
+description: >-
+  Dev scoped verify by default; full testbatch:verify for final cleanup, commits,
+  and explicit requests. Heavier steps stay isolated per terminal.
 alwaysApply: true
 ---
 
 # Testing and verification — terminal use
 
-## Quality gate (the **default** chained verification)
+## Two agent gate tiers
 
-Full **quality gate** — ESLint, TypeScript, Stylelint, Vitest + coverage (**95%** all four v8 metrics: **`src-electron`**; **`helpers/**/*.ts`** **`unit-helpers`** instruments (**`helpers/playwrightHelpers_*`** excluded); scoped **`i18n/`** (**`unit-i18n`**); renderer **`src`** **`.ts`** (**`unit-src-renderer`**); **`.ts`** under **`src/components`**, **`src/layouts`**, **`src/pages`** (**`unit-components`**); **`.vue`** SFCs **~60%** watermarks only) — **one** terminal invocation. Prefer **`yarn testbatch:verify`** in `package.json` (same steps, stops first failure):
+| Tier | When | Command |
+| --- | --- | --- |
+| **Dev scoped** (default) | Ordinary substantive edits done | [dev-scoped-verify.mdc](dev-scoped-verify.mdc) + [fantasia-dev-scoped-verify](../skills/fantasia-dev-scoped-verify/SKILL.md) |
+| **Full quality gate** | Final cleanup, **`git commit`**, user asks full verify/ensure | **`yarn testbatch:verify`** |
+
+## Full quality gate
+
+ESLint (repo), TypeScript, Stylelint, Vitest + coverage (**95%** all four v8 metrics: **`src-electron`**; **`helpers/**/*.ts`** **`unit-helpers`** (**`helpers/playwrightHelpers_*`** excluded); scoped **`i18n/`** (**`unit-i18n`**); renderer **`src`** **`.ts`** (**`unit-src-renderer`**); **`.ts`** under **`src/components`**, **`src/layouts`**, **`src/pages`** (**`unit-components`**); **`.vue`** SFCs **~60%** watermarks only) — **one** terminal. Prefer **`yarn testbatch:verify`** (stops first failure):
 
 `yarn testbatch:verify`
 
-**Yarn 1.x**: do **not** use `yarn check` — built-in validates dependency tree, not this script.
+**Yarn 1.x**: do **not** use `yarn check` — validates dependency tree, not this script.
 
-Equivalent chain: `yarn lint:eslint && yarn lint:typescript && yarn lint:stylelint && yarn test:coverage:verify`
+Equivalent: `yarn lint:eslint && yarn lint:typescript && yarn lint:stylelint && yarn test:coverage:verify`
 
-**Faster** unit pass without coverage: **`yarn test:unit`** (electron, **`src`** TS, helpers, **`i18n`**, components) while iterating; **never** treat as end-of-edits gate.
+**Run full gate when:**
 
-## End of code edits (agents) — mandatory
+- [final-cleanup.mdc](final-cleanup.mdc) / [fantasia-final-cleanup](../skills/fantasia-final-cleanup/SKILL.md)
+- User explicitly requests **`yarn testbatch:verify`**, full verify, full gate, **`testbatch:ensure:*`**
+- **`git commit`** ([git-conventional-commits.mdc](git-conventional-commits.mdc)) — changelog-only exception below
 
-Substantive source edits in a turn → **last verification action** before done summary:
+**Do not** run full gate after every ordinary edit batch — use dev scoped gate instead.
 
-1. **`yarn testbatch:verify`** — one terminal, full chain ([dev-electron-compile-check.mdc](dev-electron-compile-check.mdc)).
-2. Dev Electron compile smoke — second terminal, same rule.
+## End of code edits (agents) — default
+
+Substantive source edits in a turn → **last verification** before done summary:
+
+1. **Dev scoped gate** — one terminal ([dev-scoped-verify.mdc](dev-scoped-verify.mdc)): eslint touched paths, **`yarn lint:typescript`**, stylelint touched styles, **`yarn vitest run`** connected specs only.
+2. Dev Electron compile smoke (**20s**; kill agent-spawned dev after pass) — second terminal, [dev-electron-compile-check.mdc](dev-electron-compile-check.mdc).
 
 - **Any edit after step 1 passed** → step 1 **invalid**; re-run on current tree.
-- **Do not** report “done” / “shipped” / “fixed” without Shell **`yarn testbatch:verify`** on final tree.
-- Slice commands (`yarn eslint <path>`, `vitest run <spec>`, partial stylelint) = debug while editing only — [dev-electron-compile-check.mdc](dev-electron-compile-check.mdc) **Does not satisfy step 1**.
+- **Do not** report “done” / “shipped” / “fixed” without Shell scoped gate on final tree.
+- **Do not** substitute scoped gate for full verify before **commit** or **final cleanup**.
 
-Same **`testbatch:verify`** as commit gate; do not skip because dev is already running. Finish **`yarn testbatch:verify`** before commits **and** before reporting substantive agent work done.
+**Beyond scoped gate:** connected **Playwright** component + **E2E** per [fantasia-testing](../skills/fantasia-testing/SKILL.md). Full gate does **not** include those.
 
-**Beyond default gate:** discover + run connected **Playwright** component + **E2E** specs (grep dialog name, **`data-test-locator`**, locale default export, action id). **`yarn testbatch:verify`** does **not** include those. [fantasia-testing](../skills/fantasia-testing/SKILL.md) **Connected tests for any feature change**.
+**Changelog-only exception** (rare): commit **only** **`i18n/*/documents/changeLog.md`** **and** full **`yarn testbatch:verify`** already passed after latest substantive edits with **no** other uncommitted changes → may skip gate before that commit. **Default**: changelog in **same commit** as substantive work. **Uncertain** → run full gate.
 
-**Changelog-only exception** (rare): **only** files to commit = locale changelog Markdown **`i18n/*/documents/changeLog.md`** **and** **`yarn testbatch:verify` already passed** after last substantive edits with **no** other uncommitted changes → may **skip** gate immediately before that commit. **Default**: changelog in **same commit** as substantive work (before push), not separate changelog commit after batch/push. **Uncertain** (mixed edits, parallel work, unsure gate ran on current tree) → run **`yarn testbatch:verify`**.
+**Debug** specific failing step → run command alone until pass; then scoped gate (or full gate if committing / final cleanup).
 
-**Exception**: **debugging** specific failing step → run command **alone** (+ narrower follow-ups) until pass, then full chained gate before commit/changelog (unless changelog-only above).
-
-By default do not extend chain with `yarn quasar:build:electron`, Playwright, or Storybook.
-
-Post-implementation agent gates (order): **`yarn testbatch:verify`** then dev compile smoke — [dev-electron-compile-check.mdc](dev-electron-compile-check.mdc). Dev step alone is **not** the quality gate.
+By default do not chain scoped/full gate with `yarn quasar:build:electron`, Playwright, or Storybook in one shell line.
 
 ## Full-suite gates (`testbatch:ensure:nochange` / `testbatch:ensure:change`)
 
-Explicit full project gate in one command:
+Explicit full project gate in one command (user/manual or explicit agent request):
 
 - **`yarn testbatch:ensure:nochange`** — `testbatch:verify`, **`yarn quasar:build:electron:summarized`** (Quasar/electron-builder output; success one line; failure full log — default **`test-results/quasar-build-electron-last.log`**, gitignored with **`test-results/`**), Playwright component + E2E, **`yarn test:storybook:smoke`**, **`yarn test:storybook:visual`** (committed VRT snapshots; fails on drift). **`yarn test:storybook:visual`** also fails when story iframe has neither element children under **`#storybook-root`** nor **`#root`** nor visible portaled dialog/menu chrome after waiter (mount ids inspected separately — not only first **`querySelector('#storybook-root, #root')`**) unless **`tags: ['skip-visual-render-check']`** or **id** in **`EXCLUDED_STORY_IDS`** in **`.storybook-workspace/visual-tests/storybook.visual.playwright.test.ts`**. **`yarn test:storybook:visual`** fails only on **GitHub** **`windows-latest`** with **`toHaveScreenshot`** pixel counts just above **`maxDiffPixels`** → **README** **Storybook visual baseline policy** (**`maxDiffPixels`** = whole-image differing-pixel cap, not width).
 - **`yarn testbatch:ensure:change`** — same through E2E + smoke, then **`yarn test:storybook:visual:update`** for intentional UI baseline refresh. Use only when UI changes approved + commit updated snapshots.
@@ -53,7 +64,7 @@ Default **GitHub Actions** **Verify** (`.github/workflows/verify.yml`) runs **`y
 
 ## Everything else — one command per terminal
 
-Each in **own** terminal (no chain with each other or quality gate) unless **`yarn testbatch:ensure:nochange`** or **`yarn testbatch:ensure:change`**:
+Each in **own** terminal (no chain with scoped/full gate) unless **`yarn testbatch:ensure:nochange`** or **`yarn testbatch:ensure:change`**:
 
 - `yarn quasar:build:electron` (full build log; streaming output)
 - `yarn test:components`
@@ -69,4 +80,4 @@ Isolated logs → easier failure triage.
 
 ## Reporting
 
-Report progress in execution order. On substantive work: **end with verify gate result** (pass/fail from **`yarn testbatch:verify`** on current tree) — [dev-electron-compile-check.mdc](dev-electron-compile-check.mdc).
+Substantive work: end with scoped gate result (steps + vitest paths) or full verify when applicable — [dev-electron-compile-check.mdc](dev-electron-compile-check.mdc).

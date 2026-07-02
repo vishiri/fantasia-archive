@@ -6,13 +6,15 @@ Commit messages are enforced by **Husky** and **commitlint** (see [commitlint.co
 
 ## Quality checks before you push
 
-For substantive code or test changes, run the full quality gate in **one** terminal from the repo root:
+**While iterating:** dev scoped gate — touched eslint, **`yarn lint:typescript`**, connected **`yarn vitest run`** ([fantasia-dev-scoped-verify](.cursor/skills/fantasia-dev-scoped-verify/SKILL.md), [dev-scoped-verify.mdc](.cursor/rules/dev-scoped-verify.mdc)). Faster than full suite; does **not** replace pre-commit verify.
+
+**Before commit or push** (substantive code or test changes), run the **full** quality gate in **one** terminal from the repo root:
 
 ```bash
 yarn testbatch:verify
 ```
 
-See [.cursor/rules/testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) for when to use faster commands while iterating. Playwright component and E2E tests need a production Electron build first; see [README.md](README.md) and [.cursor/skills/fantasia-testing/SKILL.md](.cursor/skills/fantasia-testing/SKILL.md).
+See [.cursor/rules/testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc) for gate tiers and debug slices. Playwright component and E2E tests need a production Electron build first; see [README.md](README.md) and [.cursor/skills/fantasia-testing/SKILL.md](.cursor/skills/fantasia-testing/SKILL.md).
 
 ## Pull request labels (required)
 

@@ -1,11 +1,11 @@
 ---
 name: fantasia-final-cleanup
 description: >-
-  End-of-batch ship workflow for Fantasia Archive: run yarn testbatch:verify and
-  fix failures, sync README/AGENTS/rules/skills from Git changes, update in-app
-  changelog, split conventional commits, and git push. Use when the user says
-  final cleanup, doing final cleanup, run final cleanup, wrap up and ship, or
-  similar end-of-session handoff language.
+  End-of-batch ship workflow for Fantasia Archive: run full yarn testbatch:verify
+  (not dev scoped gate), fix failures, sync README/AGENTS/rules/skills from Git
+  changes, update in-app changelog, split conventional commits, and git push. Use
+  when the user says final cleanup, doing final cleanup, run final cleanup,
+  wrap up and ship, or similar end-of-session handoff language.
 ---
 
 # Final cleanup — ship the current batch
@@ -14,9 +14,9 @@ Execute **in this exact order**. Do not skip, merge, or reorder unless user inte
 
 Final cleanup = explicit handoff: may **commit and push** without per-commit approval (unlike default in [git-conventional-commits](../git-conventional-commits/SKILL.md)). Still conventional **`type: subject`** + logical splits.
 
-## Step 1 — Verify quality gate
+## Step 1 — Full verify quality gate
 
-One terminal:
+One terminal — **full** gate only here (not default after ordinary edits; see [dev-scoped-verify.mdc](../../rules/dev-scoped-verify.mdc)):
 
 ```bash
 yarn testbatch:verify
@@ -85,6 +85,7 @@ Summarize in execution order: verify gate → fixes → docs/changelog touched �
 
 ## Related
 
+- [dev-scoped-verify.mdc](../../rules/dev-scoped-verify.mdc) — default during edits; **not** step 1 here
 - [final-cleanup.mdc](../../rules/final-cleanup.mdc)
 - [testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)
 - [git-conventional-commits](../git-conventional-commits/SKILL.md)

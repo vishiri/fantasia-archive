@@ -22,7 +22,7 @@ Always-on rule: [yagni.mdc](../../rules/yagni.mdc). **Precedence:** other **`.cu
 2. Already in codebase?
 3. Stdlib / platform?
 4. Installed **`package.json`** dep?
-5. Minimum inside conventions — then shortest diff that passes **`yarn testbatch:verify`**
+5. Minimum inside conventions — shortest diff passing dev scoped gate ([dev-scoped-verify.mdc](../../rules/dev-scoped-verify.mdc)); full **`yarn testbatch:verify`** at commit/final cleanup
 
 Trace real flow before picking rung. Mandatory two-level, **`types/`**, Vitest/Playwright/Storybook, neverthrow, line caps — **not** skippable for brevity.
 
@@ -39,4 +39,5 @@ Both can stay on. YAGNI does not replace caveman or **cavemem** hooks.
 
 - [code-size-decomposition.mdc](../../rules/code-size-decomposition.mdc) — fewer modules until line caps force split
 - [fa-two-level-architecture.mdc](../../rules/fa-two-level-architecture.mdc)
-- [fantasia-testing](fantasia-testing/SKILL.md) — connected tests + gates
+- [fantasia-dev-scoped-verify](../fantasia-dev-scoped-verify/SKILL.md) — default post-edit gate
+- [fantasia-testing](fantasia-testing/SKILL.md) — connected tests + full gate at ship

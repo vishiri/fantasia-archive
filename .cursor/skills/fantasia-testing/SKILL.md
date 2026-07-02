@@ -22,7 +22,7 @@ Match **existing** tests when adding or editing:
 Tests = **same deliverable** as production edits.
 
 1. **Discover** — ripgrep component/dialog folder, helpers, **`data-test-locator`**, **`T_dialogName`**, **`COMPONENT_NAME`**, action/keybind ids, store symbols, **`i18n`** keys you changed. Follow imports + menu **`_data/`** entries.
-2. **Vitest** — **`yarn vitest run`** with explicit paths for **every** matching **`*.vitest.test.ts`** (feature **`_tests/`**, **`scripts/_tests/`**, **`src/scripts/**/_tests`**, **`src/stores/_tests`**, **`src-electron/**/_tests`**, **`helpers/**/_tests`**, **`i18n/_tests`** when implicated). Before commits: **`yarn test:unit`** or **`yarn testbatch:verify`**.
+2. **Vitest** — **`yarn vitest run`** with explicit paths for **every** matching **`*.vitest.test.ts`** (feature **`_tests/`**, **`scripts/_tests/`**, **`src/scripts/**/_tests`**, **`src/stores/_tests`**, **`src-electron/**/_tests`**, **`helpers/**/_tests`**, **`i18n/_tests`** when implicated). **During edits:** [fantasia-dev-scoped-verify](../fantasia-dev-scoped-verify/SKILL.md). **Before commit / final cleanup:** **`yarn testbatch:verify`**.
 3. **Playwright (component)** — each matching **`src/**/_tests/*.playwright.test.ts`**: **`yarn test:components:single --component=<bucket>/<ComponentFolder>`** or **`yarn test:components`** in **own** terminal **after** **`yarn quasar:build:electron`** when bundle exercises changed renderer code ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)).
 4. **Playwright (E2E)** — each matching **`e2e-tests/*.playwright.spec.ts`**: **`yarn test:e2e:single --spec=…`** or **`yarn test:e2e`** with same rebuild rule.
 
@@ -35,7 +35,7 @@ See [vitest-tests.mdc](../../rules/vitest-tests.mdc) **Vitest coverage tiers (CI
 ## Unit tests (Vitest)
 
 - **Commands**: **`yarn test:unit`** — multi-project root ([vitest.config.mts](../../vitest.config.mts): **`unit-electron`**, **`unit-src-renderer`**, **`unit-helpers`**, **`unit-i18n`**, **`unit-components`**) without coverage. **`yarn testbatch:verify`** ends with **`yarn test:coverage:verify`**. Debug slices: **`yarn test:coverage:electron`**, **`yarn test:coverage:helpers`**, **`yarn test:coverage:i18n`**, **`yarn test:coverage:src`**. Full tier detail: [vitest-tests.mdc](../../rules/vitest-tests.mdc).
-- **Execution**: **`yarn test:unit`** while iterating; **`yarn testbatch:verify`** before commits ([testing-terminal-isolation.mdc](../../rules/testing-terminal-isolation.mdc)). Do not chain unit/coverage with `yarn quasar:build:electron` or Playwright in one shell line.
+- **Execution**: **Dev edits** — [fantasia-dev-scoped-verify](../fantasia-dev-scoped-verify/SKILL.md). **Commit / final cleanup** — **`yarn testbatch:verify`**. Do not chain unit/coverage with `yarn quasar:build:electron` or Playwright in one shell line.
 - **Reports**: `test-results/vitest-report/test-results-vitest-*.json` per project.
 - **Scope**: `src/` + `src-electron/` with `*.vitest.test.ts` under `_tests/`; component mounts use `@vue/test-utils` + [vitest.setup.ts](../../../vitest/vitest.setup.ts).
 - **`helpers/`**: **`playwrightHelpers_*`** = Playwright harness only — extend with **`yarn test:components`** / **`yarn test:e2e`** after **`yarn quasar:build:electron`**; **no** **`*.vitest.test.ts`** there. Non-Playwright **`helpers/<name>/`**: colocate **`_tests/*.vitest.test.ts`**.
@@ -105,11 +105,16 @@ See [vitest-tests.mdc](../../rules/vitest-tests.mdc) **Vitest coverage tiers (CI
 
 ## Checklist when changing UI or Electron shell
 
+**During edits** ([fantasia-dev-scoped-verify](../fantasia-dev-scoped-verify/SKILL.md)):
+
+1. Dev scoped gate — touched eslint, **`yarn lint:typescript`**, connected **`yarn vitest run`**
+2. **20s** dev compile smoke — [dev-electron-compile-check.mdc](../../rules/dev-electron-compile-check.mdc)
+
+**Ship / commit / final cleanup:**
+
 1. **`yarn testbatch:verify`** — one terminal
-2. **Connected test sweep** — grep + run implicated Vitest, then Playwright after rebuild
-3. **`yarn quasar:build:electron`** — own terminal
-4. **`yarn test:components`** / **`yarn test:e2e`** as needed — own terminals
-5. Storybook in scope: **`yarn test:storybook:smoke`** + **`yarn test:storybook:visual`** (or **`testbatch:ensure:*`**)
+2. Connected Playwright after **`yarn quasar:build:electron`** — own terminals
+3. Storybook in scope: **`yarn test:storybook:smoke`** + **`yarn test:storybook:visual`** (or **`testbatch:ensure:*`**)
 
 ## Choosing Vitest vs Playwright
 

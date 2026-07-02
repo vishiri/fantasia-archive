@@ -16,7 +16,7 @@ description: >-
 3. Thin **`.vue`**: props, child imports, one **`use…`** from manager
 4. Delete legacy **`scripts/*.ts`** beside **`functions/`**
 5. Update **`_tests`**; add **`functions/_tests`**
-6. **`yarn lint:eslint`** on feature, then **`yarn testbatch:verify`**
+6. **Dev scoped gate** on feature ([fantasia-dev-scoped-verify](../fantasia-dev-scoped-verify/SKILL.md)); **full** **`yarn testbatch:verify`** before commit
 
 ## Fix common ESLint messages
 

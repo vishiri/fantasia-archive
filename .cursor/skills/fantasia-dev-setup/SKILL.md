@@ -32,7 +32,7 @@ quasar dev -m electron
 
 (`yarn quasar:dev:electron`). Electron + Storybook together: **`yarn app:dev`**.
 
-Post-implementation agent gates ([dev-electron-compile-check.mdc](../rules/dev-electron-compile-check.mdc)): (1) **`yarn testbatch:verify`**, (2) **`yarn quasar:dev:electron`** ~5s compile smoke — separate terminals; before reporting substantive edits done.
+Post-implementation agent gates ([dev-electron-compile-check.mdc](../rules/dev-electron-compile-check.mdc)): (1) **dev scoped gate** ([fantasia-dev-scoped-verify](../fantasia-dev-scoped-verify/SKILL.md)), (2) **`yarn quasar:dev:electron`** **20s** compile smoke — separate terminals; kill agent-spawned dev after pass. Full **`yarn testbatch:verify`** only at final cleanup, commit, or explicit user request.
 
 ## Troubleshooting
 
@@ -78,7 +78,8 @@ quasar build -m electron
 
 | Goal | Command |
 |------|---------|
-| Quality gate | `yarn testbatch:verify` |
+| Dev scoped gate (agents) | [fantasia-dev-scoped-verify](../fantasia-dev-scoped-verify/SKILL.md) |
+| Full quality gate | `yarn testbatch:verify` |
 | Full project gate | `yarn testbatch:ensure:nochange` |
 | Refresh Storybook VRT | `yarn testbatch:ensure:change` |
 | ESLint | `yarn lint:eslint` |
@@ -90,7 +91,7 @@ quasar build -m electron
 
 **Storybook**: `yarn --cwd .storybook-workspace install` after root **`yarn`**.
 
-See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc), [fantasia-testing](../fantasia-testing/SKILL.md). **Yarn 1.x**: **`yarn check`** ≠ quality gate — use **`yarn testbatch:verify`**.
+See [eslint-typescript.mdc](../../rules/eslint-typescript.mdc), [fantasia-dev-scoped-verify](../fantasia-dev-scoped-verify/SKILL.md), [fantasia-testing](../fantasia-testing/SKILL.md). **Yarn 1.x**: **`yarn check`** ≠ quality gate — full **`yarn testbatch:verify`** at commit; dev scoped gate while iterating.
 
 ## Types
 

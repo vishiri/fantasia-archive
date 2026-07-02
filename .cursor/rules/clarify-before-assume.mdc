@@ -40,7 +40,8 @@ All agents (plan mode, agent mode, subagents): **do not guess** product behavior
 | "Fix sidebar bug" — no repro steps | Yes |
 | New dialog — user didn't say modal vs floating window | Yes |
 | New feature module — use **`functions/`** + **`*_manager.ts`** | No (repo law) |
-| Run **`yarn testbatch:verify`** after edits | No (repo law) |
+| Run dev scoped gate after edits | No (repo law — [dev-scoped-verify.mdc](dev-scoped-verify.mdc)) |
+| Run full **`yarn testbatch:verify`** before commit | No (repo law) |
 
 ## Related
 

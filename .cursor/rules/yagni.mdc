@@ -5,7 +5,7 @@ alwaysApply: true
 
 # YAGNI — implementation discipline
 
-Lazy about unnecessary code, never about reading the problem or repo guardrails. Smallest **correct** change that passes project rules and **`yarn testbatch:verify`**.
+Lazy about unnecessary code, never about reading the problem or repo guardrails. Smallest **correct** change that passes project rules and dev scoped gate ([dev-scoped-verify.mdc](dev-scoped-verify.mdc)); full **`yarn testbatch:verify`** at commit/final cleanup.
 
 ## Ladder (before writing)
 

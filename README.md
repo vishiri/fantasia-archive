@@ -104,15 +104,25 @@ yarn test:storybook:visual:update
 
 Stories: **`src/**/_tests/*.stories.ts`**. Workspace: **`.storybook-workspace/`**. VRT policy: [fantasia-testing](.cursor/skills/fantasia-testing/SKILL.md), [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc).
 
-## Quality gate (before commit)
+## Quality gates
+
+### During development (agents and fast iteration)
+
+Default after substantive edits: **dev scoped gate** — eslint on touched paths, **`yarn lint:typescript`**, stylelint on touched styles, **`yarn vitest run`** on connected specs only. Playbook: [fantasia-dev-scoped-verify](.cursor/skills/fantasia-dev-scoped-verify/SKILL.md), [dev-scoped-verify.mdc](.cursor/rules/dev-scoped-verify.mdc).
+
+Agents also run **20s** **`yarn quasar:dev:electron`** compile smoke after scoped gate ([dev-electron-compile-check.mdc](.cursor/rules/dev-electron-compile-check.mdc)).
+
+### Full gate (before commit / final cleanup / CI)
 
 ```
 yarn testbatch:verify
 ```
 
-Lint + **`vue-tsc`** + Stylelint + Vitest coverage (**95%** on **`src-electron`**, instrumented **`helpers/`**, scoped **`i18n/`**, renderer **`src` `.ts`**, component **`.ts`**; **`.vue`** watermarks ~60%). Debug one step, then re-run full gate.
+Lint (repo) + **`vue-tsc`** + Stylelint + Vitest coverage (**95%** on **`src-electron`**, instrumented **`helpers/`**, scoped **`i18n/`**, renderer **`src` `.ts`**, component **`.ts`**; **`.vue`** watermarks ~60%). Debug one step, then re-run full gate.
 
-**Changelog-only** exception: only **`i18n/*/documents/changeLog.md`** after gate passed on substantive work — see [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc).
+**When required:** **`git commit`**, [fantasia-final-cleanup](.cursor/skills/fantasia-final-cleanup/SKILL.md), explicit full-verify request, push/PR CI. Dev scoped gate does **not** substitute.
+
+**Changelog-only** exception: only **`i18n/*/documents/changeLog.md`** after full gate passed on substantive work — see [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc).
 
 **CI Verify** (`.github/workflows/verify.yml`): **`yarn testbatch:verify`** only — not Playwright, Electron prod build, or Storybook VRT.
 
@@ -156,6 +166,7 @@ yarn test:e2e:list
 
 | Script | Purpose |
 | --- | --- |
+| Dev scoped gate (agents) | [fantasia-dev-scoped-verify](.cursor/skills/fantasia-dev-scoped-verify/SKILL.md) — touched lint + connected Vitest; not one yarn script |
 | `yarn quasar:build:electron` | Production Electron build (full log). |
 | `yarn quasar:build:electron:summarized` | Same; quiet success; log file on failure. |
 | `yarn quasar:dev:electron` | Electron dev mode. |
@@ -163,7 +174,7 @@ yarn test:e2e:list
 | `yarn lint:eslint` | ESLint. |
 | `yarn lint:stylelint` / `lint:stylelint:fix` | Stylelint on `src/` + Storybook SCSS. |
 | `yarn lint:typescript` | **`vue-tsc`** project check. |
-| `yarn testbatch:verify` | Default pre-commit gate. |
+| `yarn testbatch:verify` | Full pre-commit / CI gate (lint + types + style + coverage). |
 | `yarn testbatch:ensure:nochange` | Full gate + build + Playwright + Storybook VRT compare. |
 | `yarn testbatch:ensure:change` | Same; update VRT snapshots. |
 | `yarn test:unit` | Vitest (no coverage). |
