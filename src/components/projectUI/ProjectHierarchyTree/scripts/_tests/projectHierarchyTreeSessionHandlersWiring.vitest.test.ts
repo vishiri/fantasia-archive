@@ -30,6 +30,22 @@ function buildPointerLikeEvent (clientX: number, clientY: number) {
   }
 }
 
+function createTestUiStateWiring (overrides: {
+  markNodeClosed?: ReturnType<typeof vi.fn>
+  markNodeOpen?: ReturnType<typeof vi.fn>
+  reapplyLatentDescendantExpandState?: ReturnType<typeof vi.fn>
+} = {}): Parameters<typeof createProjectHierarchyTreeSessionHandlersWiring>[0]['uiStateWiring'] {
+  const markNodeClosed = overrides.markNodeClosed ?? vi.fn()
+  const markNodeOpen = overrides.markNodeOpen ?? vi.fn()
+  const reapplyLatentDescendantExpandState =
+    overrides.reapplyLatentDescendantExpandState ?? vi.fn(async () => undefined)
+  return {
+    markNodeClosed,
+    markNodeOpen,
+    reapplyLatentDescendantExpandState
+  } as Parameters<typeof createProjectHierarchyTreeSessionHandlersWiring>[0]['uiStateWiring']
+}
+
 function createTestTreeComponentRef () {
   return ref({
     closeAll: vi.fn(),
@@ -73,7 +89,9 @@ test('Test that session handlers open nodes and load children', async () => {
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode
     },
@@ -82,10 +100,7 @@ test('Test that session handlers open nodes and load children', async () => {
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
-      markNodeClosed: vi.fn(),
-      markNodeOpen,
-    }
+    uiStateWiring: createTestUiStateWiring({ markNodeOpen })
   })
   await wiring.onNodeOpen({ data: placement })
   expect(markNodeOpen).toHaveBeenCalledWith('placement-1')
@@ -107,7 +122,9 @@ test('Test that session handlers load children when the open icon expands a row'
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode
     },
@@ -116,10 +133,10 @@ test('Test that session handlers load children when the open icon expands a row'
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
+    uiStateWiring: createTestUiStateWiring({
       markNodeClosed,
-      markNodeOpen,
-    }
+      markNodeOpen
+    })
   })
   const stat = {
     children: [],
@@ -151,7 +168,9 @@ test('Test that open icon expand keeps stat closed until lazy load finishes', as
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode
     },
@@ -163,10 +182,7 @@ test('Test that open icon expand keeps stat closed until lazy load finishes', as
     } as unknown as I_faProjectHierarchyTreeHeTreeInstance),
     treeData: ref(tree),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
-      markNodeClosed: vi.fn(),
-      markNodeOpen: vi.fn()
-    }
+    uiStateWiring: createTestUiStateWiring()
   })
   const stat = {
     children: placement.children,
@@ -196,7 +212,9 @@ test('Test that session handlers collapse rows via the open icon', async () => {
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
@@ -205,10 +223,10 @@ test('Test that session handlers collapse rows via the open icon', async () => {
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
+    uiStateWiring: createTestUiStateWiring({
       markNodeClosed,
-      markNodeOpen: vi.fn(),
-    }
+      markNodeOpen: vi.fn()
+    })
   })
   const stat = {
     children: [],
@@ -228,13 +246,16 @@ test('Test that session handlers expand world rows from row click routing', asyn
   const worldNode = tree[0]!
   const loadChildrenForNode = vi.fn(async () => undefined)
   const markNodeOpen = vi.fn()
+  const reapplyLatentDescendantExpandState = vi.fn(async () => undefined)
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode
     },
@@ -243,10 +264,10 @@ test('Test that session handlers expand world rows from row click routing', asyn
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
-      markNodeClosed: vi.fn(),
-      markNodeOpen
-    }
+    uiStateWiring: createTestUiStateWiring({
+      markNodeOpen,
+      reapplyLatentDescendantExpandState
+    })
   })
   const stat = {
     children: [],
@@ -263,6 +284,7 @@ test('Test that session handlers expand world rows from row click routing', asyn
   expect(stat.open).toBe(true)
   expect(markNodeOpen).toHaveBeenCalledWith('world-1')
   expect(loadChildrenForNode).toHaveBeenCalledWith(worldNode)
+  expect(reapplyLatentDescendantExpandState).toHaveBeenCalledTimes(1)
 })
 
 /**
@@ -291,7 +313,9 @@ test('Test that session handlers expand group rows from row click routing', asyn
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
@@ -300,10 +324,7 @@ test('Test that session handlers expand group rows from row click routing', asyn
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
-      markNodeClosed: vi.fn(),
-      markNodeOpen
-    }
+    uiStateWiring: createTestUiStateWiring({ markNodeOpen })
   })
   const stat = {
     children: [],
@@ -349,7 +370,9 @@ test('Test that session handlers expand document rows with children from row cli
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
@@ -358,10 +381,7 @@ test('Test that session handlers expand document rows with children from row cli
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
-      markNodeClosed: vi.fn(),
-      markNodeOpen
-    }
+    uiStateWiring: createTestUiStateWiring({ markNodeOpen })
   })
   const stat = {
     children: [],
@@ -404,7 +424,9 @@ test('Test that session handlers ignore leaf document row click routing', async 
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
@@ -413,10 +435,7 @@ test('Test that session handlers ignore leaf document row click routing', async 
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
-      markNodeClosed: vi.fn(),
-      markNodeOpen
-    }
+    uiStateWiring: createTestUiStateWiring({ markNodeOpen })
   })
   const stat = {
     children: [],
@@ -458,7 +477,9 @@ test('Test that session handlers ignore document row click after drag movement',
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
@@ -467,10 +488,7 @@ test('Test that session handlers ignore document row click after drag movement',
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
-      markNodeClosed: vi.fn(),
-      markNodeOpen
-    }
+    uiStateWiring: createTestUiStateWiring({ markNodeOpen })
   })
   const stat = {
     children: [],
@@ -504,7 +522,9 @@ test('Test that session handlers ignore non-world open icon routing on world row
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
@@ -513,10 +533,7 @@ test('Test that session handlers ignore non-world open icon routing on world row
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
-      markNodeClosed: vi.fn(),
-      markNodeOpen
-    }
+    uiStateWiring: createTestUiStateWiring({ markNodeOpen })
   })
   const stat = {
     children: [],
@@ -537,7 +554,9 @@ test('Test that session handlers reopen he-tree row after lazy load when tree re
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
@@ -549,10 +568,7 @@ test('Test that session handlers reopen he-tree row after lazy load when tree re
     }),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
-      markNodeClosed: vi.fn(),
-      markNodeOpen: vi.fn()
-    }
+    uiStateWiring: createTestUiStateWiring()
   })
   await wiring.onNodeOpen({ data: placement })
   expect(openNodeAndParents).toHaveBeenCalledWith(placement)
@@ -568,7 +584,9 @@ test('Test that session handlers ignore close events while suppressTreeEmit is s
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
@@ -577,10 +595,10 @@ test('Test that session handlers ignore close events while suppressTreeEmit is s
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
+    uiStateWiring: createTestUiStateWiring({
       markNodeClosed,
       markNodeOpen: vi.fn()
-    }
+    })
   })
   wiring.onNodeClose({ data: placement })
   expect(markNodeClosed).not.toHaveBeenCalled()
@@ -594,7 +612,9 @@ test('Test that session handlers emit document clicks for document rows', () => 
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
@@ -603,10 +623,7 @@ test('Test that session handlers emit document clicks for document rows', () => 
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
-      markNodeClosed: vi.fn(),
-      markNodeOpen: vi.fn(),
-    }
+    uiStateWiring: createTestUiStateWiring()
   })
   wiring.onNodeClick({
     data: {
@@ -682,7 +699,9 @@ test('Test that session handlers expose draggable and droppable handlers', () =>
         data: documentNode
       }
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
@@ -691,10 +710,7 @@ test('Test that session handlers expose draggable and droppable handlers', () =>
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref(tree),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
-      markNodeClosed: vi.fn(),
-      markNodeOpen: vi.fn(),
-    }
+    uiStateWiring: createTestUiStateWiring()
   })
   expect(wiring.eachDraggableHandler({ data: documentNode })).toBe(true)
   expect(wiring.rootDroppableHandler()).toBe(false)
@@ -721,7 +737,9 @@ test('Test that session handlers do not restore UI state when tree ref attaches'
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
@@ -730,10 +748,7 @@ test('Test that session handlers do not restore UI state when tree ref attaches'
     treeComponentRef,
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
-      markNodeClosed: vi.fn(),
-      markNodeOpen: vi.fn()
-    }
+    uiStateWiring: createTestUiStateWiring()
   })
   const treeRef = {
     closeAll: vi.fn(),
@@ -759,6 +774,8 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
       dragNode: null
     },
     dragExpandUiFrozen: ref(true),
+    dragExpandPostCommitGuard: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode
     },
@@ -767,10 +784,10 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
+    uiStateWiring: createTestUiStateWiring({
       markNodeClosed,
-      markNodeOpen,
-    }
+      markNodeOpen
+    })
   })
   await wiring.onNodeOpen({ data: placement })
   wiring.onNodeClose({ data: placement })
@@ -794,6 +811,8 @@ test('Test that session handlers skip restore when tree ref attaches during drag
       dragNode: null
     },
     dragExpandUiFrozen: ref(true),
+    dragExpandPostCommitGuard: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode: async () => undefined
     },
@@ -802,10 +821,7 @@ test('Test that session handlers skip restore when tree ref attaches during drag
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
-      markNodeClosed: vi.fn(),
-      markNodeOpen: vi.fn()
-    }
+    uiStateWiring: createTestUiStateWiring()
   })
   wiring.setTreeComponentRef({
     closeAll: vi.fn(),
@@ -823,7 +839,9 @@ test('Test that session handlers skip restore when tree ref clears', () => {
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
@@ -832,10 +850,7 @@ test('Test that session handlers skip restore when tree ref clears', () => {
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
-      markNodeClosed: vi.fn(),
-      markNodeOpen: vi.fn()
-    }
+    uiStateWiring: createTestUiStateWiring()
   })
   wiring.setTreeComponentRef(null)
 })
@@ -863,7 +878,9 @@ test('Test that session handlers ignore open icon clicks on empty loaded documen
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode
     },
@@ -872,10 +889,7 @@ test('Test that session handlers ignore open icon clicks on empty loaded documen
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
-      markNodeClosed: vi.fn(),
-      markNodeOpen
-    }
+    uiStateWiring: createTestUiStateWiring({ markNodeOpen })
   })
   const stat = {
     children: [],
@@ -905,7 +919,9 @@ test('Test that session handlers recover when he-tree openNodeAndParents stat is
     dragContext: {
       dragNode: null
     },
+    dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
@@ -917,10 +933,7 @@ test('Test that session handlers recover when he-tree openNodeAndParents stat is
     }),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: {
-      markNodeClosed: vi.fn(),
-      markNodeOpen: vi.fn()
-    }
+    uiStateWiring: createTestUiStateWiring()
   })
   wiring.onNodeOpenIconPointerDown(stat)
   await wiring.onNodeOpenIconClick(placement, stat)

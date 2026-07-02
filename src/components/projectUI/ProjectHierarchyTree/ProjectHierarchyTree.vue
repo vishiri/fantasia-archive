@@ -18,10 +18,10 @@
       :each-droppable="eachDroppableHandler"
       data-test-locator="projectHierarchyTree"
       :indent="PROJECT_HIERARCHY_TREE_INDENT_PX"
+      :node-key="heTreeNodeKey"
       :root-droppable="rootDroppableHandler"
       :style="treeStyle"
       :trigger-class="PROJECT_HIERARCHY_TREE_DRAG_HANDLE_CLASS"
-      virtualization
       @after-drop="onTreeAfterDrop"
       @before-drag-open="onBeforeDragOpen"
       @before-drag-start="onBeforeDragStart"
@@ -34,6 +34,7 @@
       <template #default="{ node, stat }">
         <div
           class="projectHierarchyTree__nodeRow row items-center no-wrap"
+          :class="resolveProjectHierarchyTreeNodeRowKindClass(node.nodeKind)"
           @click="onWorldNodeRowClick(node, stat, $event)"
           @pointerdown="onWorldNodeRowPointerDown(node, stat, $event)"
         >
@@ -70,6 +71,7 @@ import {
   PROJECT_HIERARCHY_TREE_INDENT_PX
 } from './functions/projectHierarchyTreeConstants'
 import { projectHierarchyTreeNodeShowsOpenIcon } from './functions/projectHierarchyTreeDocumentHasChildrenSync'
+import { resolveProjectHierarchyTreeNodeRowKindClass } from './functions/projectHierarchyTreeTreeNodeKindClass'
 import { useProjectHierarchyTree } from './scripts/projectHierarchyTree_manager'
 
 defineOptions({
@@ -86,6 +88,7 @@ const treeComponentRef = ref<I_faProjectHierarchyTreeHeTreeInstance | null>(null
 const {
   eachDraggableHandler,
   eachDroppableHandler,
+  heTreeNodeKey,
   isTreeDragActive,
   onNodeClick,
   onNodeClose,

@@ -41,10 +41,11 @@ export function wireProjectHierarchyTreeSessionLifecycle (deps: {
   deps.watch(
     () => deps.worlds.value,
     async () => {
-      deps.resyncTreeDataFromLayout()
-      if (deps.shouldDeferWorldsExpandRestore()) {
+      const deferRestore = deps.shouldDeferWorldsExpandRestore()
+      if (deferRestore) {
         return
       }
+      deps.resyncTreeDataFromLayout()
       await deps.restoreUiStateFromStore()
     },
     {

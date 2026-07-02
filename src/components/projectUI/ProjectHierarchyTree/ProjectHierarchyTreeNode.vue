@@ -34,7 +34,8 @@ import { computed, onBeforeUnmount, onMounted, onUpdated, ref, watch } from 'vue
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 import {
   applyProjectHierarchyTreeTreeNodeKindClass,
-  clearProjectHierarchyTreeTreeNodeKindClass
+  clearProjectHierarchyTreeTreeNodeKindClass,
+  resolveProjectHierarchyTreePlacementDisplayIcon
 } from './scripts/projectHierarchyTree_manager'
 
 defineOptions({
@@ -81,6 +82,9 @@ const nodeRootClassList = computed(() => {
 const displayIcon = computed(() => {
   if (props.node.nodeKind === 'world') {
     return 'mdi-earth'
+  }
+  if (props.node.nodeKind === 'templatePlacement' || props.node.nodeKind === 'document') {
+    return resolveProjectHierarchyTreePlacementDisplayIcon(props.node.icon)
   }
   return props.node.icon
 })

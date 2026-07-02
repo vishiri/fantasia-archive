@@ -5,6 +5,8 @@ import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHi
 import type { createProjectHierarchyTreeSessionHandlersWiring } from './projectHierarchyTreeSessionHandlersWiring'
 import type { createProjectHierarchyTreeSessionSubWiring } from './projectHierarchyTreeSessionSubWiring'
 
+import { resolveProjectHierarchyTreeHeTreeNodeKey } from '../functions/projectHierarchyTreeHeTreeNodeKey'
+
 type T_handlersWiring = ReturnType<typeof createProjectHierarchyTreeSessionHandlersWiring>
 type T_subWiring = ReturnType<typeof createProjectHierarchyTreeSessionSubWiring>
 
@@ -33,6 +35,7 @@ export function buildProjectHierarchyTreeSessionApi (deps: {
     onBeforeDragStart: deps.subWiring.dndWiring.onBeforeDragStart,
     onTreeDataUpdate: deps.subWiring.dndWiring.onTreeDataUpdate,
     onTreeDragEndCleanup: deps.subWiring.dndWiring.onTreeDragEndCleanup,
+    heTreeNodeKey: resolveProjectHierarchyTreeHeTreeNodeKey,
     rootDroppableHandler: deps.handlersWiring.rootDroppableHandler,
     setTreeComponentRef: deps.handlersWiring.setTreeComponentRef,
     setTreeScrollHostRef: deps.handlersWiring.setTreeScrollHostRef,

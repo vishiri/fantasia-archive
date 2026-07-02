@@ -18,7 +18,9 @@ export function createProjectHierarchyTreeSessionHandlersWiring (deps: {
       data: I_faProjectHierarchyTreeHeTreeNode
     } | null
   }
+  dragExpandPostCommitGuard: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
+  getDragExpandedSnapshotNodeIds: () => string[] | null
   lazyLoadWiring: {
     loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   }
@@ -30,15 +32,19 @@ export function createProjectHierarchyTreeSessionHandlersWiring (deps: {
   uiStateWiring: {
     markNodeClosed: (nodeId: string, node: I_faProjectHierarchyTreeHeTreeNode) => void
     markNodeOpen: (nodeId: string) => void
+    reapplyLatentDescendantExpandState: () => Promise<void>
   }
 }) {
   const expandHandlersWiring = createProjectHierarchyTreeSessionExpandHandlersWiring({
     documentRowDragHoldWiring: deps.documentRowDragHoldWiring,
     documentRowExpandClickGesture: deps.documentRowExpandClickGesture,
+    dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
+    getDragExpandedSnapshotNodeIds: deps.getDragExpandedSnapshotNodeIds,
     lazyLoadWiring: deps.lazyLoadWiring,
     suppressTreeEmit: deps.suppressTreeEmit,
     treeComponentRef: deps.treeComponentRef,
+    treeData: deps.treeData,
     uiStateWiring: deps.uiStateWiring
   })
   const droppableHandlers = createProjectHierarchyTreeDroppableHandlers({

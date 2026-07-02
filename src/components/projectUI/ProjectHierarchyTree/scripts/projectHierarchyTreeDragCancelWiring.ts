@@ -10,16 +10,19 @@ import {
 import { remountProjectHierarchyTreeAndRestoreExpandedSnapshot } from './projectHierarchyTreeMountRemountWiring'
 
 export function createProjectHierarchyTreeDragCancelWiring (deps: {
-  bumpTreeMountKey: () => void
   clearDragSessionFlags: () => void
   dragCommitPending: Ref<boolean>
   dragDropCommitted: Ref<boolean>
+  dragExpandPostCommitGuard: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
   dragExpandedSnapshot: () => string[] | null
   nextTick: () => Promise<void>
   removeDragCancelListeners: () => void
   resyncTreeDataFromLayout: () => void
-  restoreExpandedSnapshot: (expandedNodeIds: string[]) => Promise<void>
+  restoreExpandedSnapshot: (
+    expandedNodeIds: string[],
+    restoreOptions?: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
+  ) => Promise<void>
 }) {
   function finishDragSessionWithoutCommit (): void {
     if (!shouldClearDragSessionWithoutCommit({
@@ -32,11 +35,11 @@ export function createProjectHierarchyTreeDragCancelWiring (deps: {
     deps.resyncTreeDataFromLayout()
     const expandedSnapshot = deps.dragExpandedSnapshot() ?? []
     void remountProjectHierarchyTreeAndRestoreExpandedSnapshot({
-      bumpTreeMountKey: deps.bumpTreeMountKey,
       expandedNodeIds: expandedSnapshot,
       nextTick: deps.nextTick,
       restoreExpandedSnapshot: deps.restoreExpandedSnapshot
     }).finally(() => {
+      deps.dragExpandPostCommitGuard.value = false
       deps.dragExpandUiFrozen.value = false
       deps.clearDragSessionFlags()
     })

@@ -20,7 +20,6 @@ import { syncProjectHierarchyTreeDocumentHasChildrenFlags } from '../functions/p
 import { findProjectHierarchyTreeDocumentsWithInvalidPlacementParent } from '../functions/projectHierarchyTreeDocumentPlacementGuard'
 
 type T_projectHierarchyTreeDnDHandlerDeps = {
-  bumpTreeMountKey: () => void
   clearDragSessionFlags: () => void
   documentRowDragHoldWiring: ReturnType<typeof createProjectHierarchyTreeDocumentRowDragHoldWiring>
   documentRowExpandClickGesture: ReturnType<typeof createProjectHierarchyTreeDocumentRowExpandClickGestureWiring>
@@ -28,6 +27,7 @@ type T_projectHierarchyTreeDnDHandlerDeps = {
   dragCommitPending: Ref<boolean>
   dragCommitScheduled: Ref<boolean>
   dragDropCommitted: Ref<boolean>
+  dragExpandPostCommitGuard: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
   draggedDocumentId: {
     get: () => string | null
@@ -41,6 +41,7 @@ type T_projectHierarchyTreeDnDHandlerDeps = {
   getTreeRef: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeInstance | null
   getTreeScrollHost: () => HTMLElement | null
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
+  flushUiStatePersist: () => void
   loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   markNodeClosed: (nodeId: string, node: I_faProjectHierarchyTreeHeTreeNode) => void
   markNodeOpen: (nodeId: string) => void
@@ -50,12 +51,17 @@ type T_projectHierarchyTreeDnDHandlerDeps = {
     targetSortOrder: number
   }) => Promise<unknown>
   nextTick: () => Promise<void>
+  reapplyHeTreeOpenState: () => void
+  reapplyLatentDescendantExpandState: () => Promise<void>
   openNodeIds: Ref<Set<string>>
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   refreshLayout: () => Promise<void>
   removeDragCancelListeners: () => void
   resyncTreeDataFromLayout: () => void
-  restoreExpandedSnapshot: (expandedNodeIds: string[]) => Promise<void>
+  restoreExpandedSnapshot: (
+    expandedNodeIds: string[],
+    restoreOptions?: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
+  ) => Promise<void>
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }
@@ -87,6 +93,7 @@ function onBeforeDragStartImpl (
   deps.dragCommitScheduled.value = false
   deps.isTreeDragActive.value = true
   deps.dragCommitPending.value = true
+  deps.dragExpandPostCommitGuard.value = true
   deps.dragExpandUiFrozen.value = true
   applyFaVerticalDraggableTabsDocumentDragCursor()
   window.addEventListener('pointerup', deps.dragCancelWiring.onWindowPointerUpDuringDrag)
@@ -96,21 +103,26 @@ function onBeforeDragStartImpl (
 function onTreeAfterDropImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void {
   deps.dragDropCommitted.value = true
   scheduleProjectHierarchyTreeDragCommit({
-    bumpTreeMountKey: deps.bumpTreeMountKey,
+    clearDragSessionFlags: deps.clearDragSessionFlags,
     dragCommitPending: deps.dragCommitPending,
     dragCommitScheduled: deps.dragCommitScheduled,
+    dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     dragExpandedSnapshot: deps.dragExpandedSnapshot.get,
     draggedDocumentId: deps.draggedDocumentId.get,
     flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
+    flushUiStatePersist: deps.flushUiStatePersist,
     getTreeRef: deps.getTreeRef,
     loadChildrenForNode: deps.loadChildrenForNode,
     markNodeClosed: deps.markNodeClosed,
     markNodeOpen: deps.markNodeOpen,
     moveDocumentInHierarchy: deps.moveDocumentInHierarchy,
     nextTick: deps.nextTick,
+    reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,
+    reapplyLatentDescendantExpandState: deps.reapplyLatentDescendantExpandState,
     refreshLayout: deps.refreshLayout,
     removeDragCancelListeners: deps.removeDragCancelListeners,
+    requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
     resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
     restoreExpandedSnapshot: deps.restoreExpandedSnapshot,
     suppressTreeEmit: deps.suppressTreeEmit,
@@ -155,6 +167,7 @@ function onTreeDataUpdateImpl (
 function onUnmountedCleanupImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void {
   deps.removeDragCancelListeners()
   clearFaVerticalDraggableTabsDocumentDragCursor()
+  deps.dragExpandPostCommitGuard.value = false
   deps.dragExpandUiFrozen.value = false
   deps.clearDragSessionFlags()
 }
@@ -199,6 +212,7 @@ export function createProjectHierarchyTreeDnDHandlers (
 
   return {
     commitAllowedDocumentRowDragSessionStart,
+    getDragExpandedSnapshotNodeIds: () => deps.dragExpandedSnapshot.get(),
     onBeforeDragStart,
     onTreeAfterDrop,
     onTreeDataUpdate,

@@ -115,20 +115,22 @@ export const S_FaProjectHierarchyTree = defineStore('S_FaProjectHierarchyTree', 
       return
     }
     const nextExpanded = patch.expandedNodeIds ?? uiState.value.expandedNodeIds
+    const plainExpandedNodeIds = [...nextExpanded]
     const nextScrollTop = patch.scrollTopPx ?? uiState.value.scrollTopPx
-    const expandedJson = JSON.stringify(nextExpanded)
+    const expandedJson = JSON.stringify(plainExpandedNodeIds)
     if (expandedJson === lastPersistedExpandedNodeIdsJson && nextScrollTop === lastPersistedScrollTopPx) {
       return
     }
-    const wrote = await faProjectHierarchyTreePersistUiStatePatchFromBridge({
-      expandedNodeIds: nextExpanded,
+    const bridgePayload = {
+      expandedNodeIds: plainExpandedNodeIds,
       scrollTopPx: nextScrollTop
-    })
+    }
+    const wrote = await faProjectHierarchyTreePersistUiStatePatchFromBridge(bridgePayload)
     if (!wrote) {
       return
     }
     uiState.value = {
-      expandedNodeIds: [...nextExpanded],
+      expandedNodeIds: plainExpandedNodeIds,
       schemaVersion: 1,
       scrollTopPx: nextScrollTop
     }

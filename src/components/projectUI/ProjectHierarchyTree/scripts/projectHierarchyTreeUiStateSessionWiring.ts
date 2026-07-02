@@ -1,16 +1,19 @@
-import type { Ref } from 'vue'
+import type { Ref, watch as WatchFn } from 'vue'
 
-import type { I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHeTreeNode, I_faProjectHierarchyTreeWorkspaceWorld } from 'app/types/I_faProjectHierarchyTreeDomain'
+import type {
+  I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions,
+  I_faProjectHierarchyTreeHeTreeInstance,
+  I_faProjectHierarchyTreeHeTreeNode,
+  I_faProjectHierarchyTreeWorkspaceWorld
+} from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import {
-  attachProjectHierarchyTreeScrollPersist,
-  markProjectHierarchyTreeNodeClosed,
-  markProjectHierarchyTreeNodeOpen,
-  reapplyProjectHierarchyTreeHeTreeOpenState,
   restoreProjectHierarchyTreeUiState,
   revealProjectHierarchyTreePendingPath
 } from './projectHierarchyTreeUiStateWiring'
 import { restoreProjectHierarchyTreeExpandedSnapshot } from './projectHierarchyTreeExpandedSnapshotWiring'
+import { createProjectHierarchyTreeUiStateSessionExpandWiring } from './projectHierarchyTreeUiStateSessionExpandWiring'
+import { attachProjectHierarchyTreeUiStateScrollListeners } from './projectHierarchyTreeUiStateScrollAttachWiring'
 
 export function createProjectHierarchyTreeUiStateSessionWiring (deps: {
   flushUiStatePersist: () => void
@@ -29,27 +32,29 @@ export function createProjectHierarchyTreeUiStateSessionWiring (deps: {
   queuePersistScrollTopPx: (scrollTopPx: number) => void
   requestAnimationFrame: (callback: () => void) => number
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
+  treeMountKey: Ref<number>
+  watch: typeof WatchFn
+  windowClearTimeout: (timeoutId: number) => void
+  windowSetTimeout: (handler: () => void, delayMs: number) => number
 }) {
-  function markNodeOpen (nodeId: string): void {
-    markProjectHierarchyTreeNodeOpen({
-      nodeId,
-      openNodeIds: deps.openNodeIds,
-      queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
-      treeData: deps.treeData
-    })
-  }
+  const expandWiring = createProjectHierarchyTreeUiStateSessionExpandWiring({
+    getTreeRef: deps.getTreeRef,
+    loadChildrenAlongRevealPath: deps.loadChildrenAlongRevealPath,
+    openNodeIds: deps.openNodeIds,
+    queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
+    treeData: deps.treeData
+  })
+  const {
+    markNodeClosed,
+    markNodeOpen,
+    reapplyHeTreeOpenState,
+    reapplyLatentDescendantExpandState
+  } = expandWiring
 
-  function markNodeClosed (nodeId: string, node: I_faProjectHierarchyTreeHeTreeNode): void {
-    markProjectHierarchyTreeNodeClosed({
-      node,
-      nodeId,
-      openNodeIds: deps.openNodeIds,
-      queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
-      treeData: deps.treeData
-    })
-  }
-
-  async function restoreExpandedSnapshot (expandedNodeIds: string[]): Promise<void> {
+  async function restoreExpandedSnapshot (
+    expandedNodeIds: string[],
+    restoreOptions?: I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
+  ): Promise<void> {
     await restoreProjectHierarchyTreeExpandedSnapshot({
       expandedNodeIds,
       flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
@@ -59,7 +64,8 @@ export function createProjectHierarchyTreeUiStateSessionWiring (deps: {
       onExpandedNodeIdsChange: deps.queuePersistExpandedNodeIds,
       openNodeIds: deps.openNodeIds,
       requestAnimationFrame: deps.requestAnimationFrame,
-      treeData: deps.treeData
+      treeData: deps.treeData,
+      ...(restoreOptions === undefined ? {} : { restoreOptions })
     })
   }
 
@@ -92,27 +98,18 @@ export function createProjectHierarchyTreeUiStateSessionWiring (deps: {
     })
   }
 
-  function attachScrollPersist (): () => void {
-    return attachProjectHierarchyTreeScrollPersist({
+  return {
+    attachScrollPersist: () => attachProjectHierarchyTreeUiStateScrollListeners({
       getTreeScrollHost: deps.getTreeScrollHost,
       queuePersistScrollTopPx: deps.queuePersistScrollTopPx
-    })
-  }
-
-  return {
-    attachScrollPersist,
+    }),
     markNodeClosed,
     markNodeOpen,
     onUnmountedCleanup: () => {
       deps.flushUiStatePersist()
     },
-    reapplyHeTreeOpenState: () => {
-      reapplyProjectHierarchyTreeHeTreeOpenState({
-        getTreeRef: deps.getTreeRef,
-        openNodeIds: deps.openNodeIds,
-        treeData: deps.treeData
-      })
-    },
+    reapplyHeTreeOpenState,
+    reapplyLatentDescendantExpandState,
     restoreExpandedSnapshot,
     restoreUiStateFromStore,
     revealPendingPath

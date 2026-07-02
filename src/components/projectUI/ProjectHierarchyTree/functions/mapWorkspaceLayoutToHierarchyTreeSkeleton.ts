@@ -6,6 +6,17 @@ import type {
   I_faProjectHierarchyTreeWorkspaceWorld
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
+/** Sync with PROJECT_HIERARCHY_TREE_DOCUMENT_TEMPLATE_DEFAULT_ICON in projectHierarchyTreeConstants.ts */
+const DEFAULT_PLACEMENT_ICON = 'mdi-file-outline'
+
+function resolvePlacementDisplayIcon (icon: string): string {
+  const trimmed = icon.trim()
+  if (trimmed.length > 0) {
+    return trimmed
+  }
+  return DEFAULT_PLACEMENT_ICON
+}
+
 /** Default Material icon for template group rows. */
 const PROJECT_HIERARCHY_TREE_GROUP_ICON = 'mdi-database'
 
@@ -74,13 +85,14 @@ function mapPlacementToNode (
   placement: I_faProjectHierarchyTreeWorkspacePlacement
 ): I_faProjectHierarchyTreeHeTreeNode {
   const nickname = placement.nickname.trim()
+  const placementIcon = resolvePlacementDisplayIcon(placement.icon)
   const node: I_faProjectHierarchyTreeHeTreeNode = {
     children: [],
     childrenLoaded: false,
     documentId: null,
     groupId: placement.groupId,
     hasChildren: placement.hasChildren,
-    icon: placement.icon,
+    icon: placementIcon,
     id: placement.id,
     label: nickname.length > 0 ? nickname : placement.displayName,
     nodeKind: 'templatePlacement',
@@ -162,10 +174,11 @@ function patchPlacementNodeInPlace (
   placement: I_faProjectHierarchyTreeWorkspacePlacement
 ): void {
   const nickname = placement.nickname.trim()
+  const placementIcon = resolvePlacementDisplayIcon(placement.icon)
   placementNode.label = nickname.length > 0 ? nickname : placement.displayName
-  placementNode.icon = placement.icon
+  placementNode.icon = placementIcon
   placementNode.hasChildren = placement.hasChildren
-  patchDocumentSubtreeIconsInPlace(placementNode.children, placement.icon)
+  patchDocumentSubtreeIconsInPlace(placementNode.children, placementIcon)
   syncProjectHierarchyTreeNodeLazyChildren(placementNode)
 }
 
@@ -234,6 +247,7 @@ export function mapHierarchyDocumentChildrenToTreeNodes (input: {
   worldColor: string
   worldId: string
 }): I_faProjectHierarchyTreeHeTreeNode[] {
+  const placementIcon = resolvePlacementDisplayIcon(input.placementIcon)
   return input.items.map((item) => {
     const node: I_faProjectHierarchyTreeHeTreeNode = {
       children: [],
@@ -241,7 +255,7 @@ export function mapHierarchyDocumentChildrenToTreeNodes (input: {
       documentId: item.id,
       groupId: null,
       hasChildren: item.hasChildren,
-      icon: input.placementIcon,
+      icon: placementIcon,
       id: item.id,
       label: item.displayName,
       nodeKind: 'document',

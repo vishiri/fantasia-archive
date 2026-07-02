@@ -26,6 +26,7 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
     useProjectHierarchyTree: () => ({
       eachDraggableHandler: () => true,
       eachDroppableHandler: () => true,
+      heTreeNodeKey: (_stat: { data: { id: string } }) => 'doc-1',
       onBeforeDragStart: vi.fn(),
       onNodeClick: vi.fn(),
       onNodeClose: vi.fn(),

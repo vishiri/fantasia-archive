@@ -12,8 +12,10 @@ export function bindProjectHierarchyTreeSessionLifecycle (deps: {
   clearPendingRevealPath: () => void
   dragCommitPending: Ref<boolean>
   dragCommitScheduled: Ref<boolean>
+  dragExpandPostCommitGuard: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
   flushUiStatePersist: () => void
+  getDragExpandedSnapshotNodeIds: () => string[] | null
   hydrateTreeSession: () => Promise<void>
   onMounted: (hook: () => void) => void
   onUnmounted: (hook: () => void) => void
@@ -43,7 +45,9 @@ export function bindProjectHierarchyTreeSessionLifecycle (deps: {
     shouldDeferWorldsExpandRestore: () => shouldDeferProjectHierarchyTreeWorldsExpandRestore({
       dragCommitPending: deps.dragCommitPending.value,
       dragCommitScheduled: deps.dragCommitScheduled.value,
-      dragExpandUiFrozen: deps.dragExpandUiFrozen.value
+      dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard.value,
+      dragExpandUiFrozen: deps.dragExpandUiFrozen.value,
+      dragExpandedSnapshotNodeIds: deps.getDragExpandedSnapshotNodeIds()
     }),
     teardown: deps.teardown,
     watch: deps.watch,

@@ -1,4 +1,4 @@
-import type { Ref } from 'vue'
+import type { Ref, watch as WatchFn } from 'vue'
 
 import type {
   I_faProjectHierarchyTreeHeTreeInstance,
@@ -9,7 +9,7 @@ import type {
 
 import type { createProjectHierarchyTreeDocumentRowDragHoldWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
 import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowExpandClickGestureWiring'
-import { createProjectHierarchyTreeDnDWiring } from './projectHierarchyTreeDnDWiring'
+import { createProjectHierarchyTreeSessionDnDSubWiring } from './projectHierarchyTreeSessionDnDSubWiring'
 import { createProjectHierarchyTreeBeforeDragOpenWiring } from './projectHierarchyTreeBeforeDragOpenWiring'
 import { createProjectHierarchyTreeLazyLoadSessionWiring } from './projectHierarchyTreeLazyLoadSessionWiring'
 import { createProjectHierarchyTreeSyncWiring } from './projectHierarchyTreeSyncWiring'
@@ -28,6 +28,7 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: {
   dragCommitPending: Ref<boolean>
   dragCommitScheduled: Ref<boolean>
   dragDropCommitted: Ref<boolean>
+  dragExpandPostCommitGuard: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
   hierarchyStore: T_hierarchyStore
   isTreeDragActive: Ref<boolean>
@@ -41,6 +42,7 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: {
   treeMountKey: Ref<number>
   treeScrollHostRef: Ref<HTMLElement | null>
   uiState: Ref<I_faProjectHierarchyTreeUiState>
+  watch: typeof WatchFn
   worlds: Ref<I_faProjectHierarchyTreeWorkspaceWorld[]>
 }) {
   const syncWiring = createProjectHierarchyTreeSyncWiring({
@@ -65,57 +67,45 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: {
     pendingRevealPath: deps.pendingRevealPath,
     requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
     suppressTreeEmit: deps.suppressTreeEmit,
-    treeData: deps.treeData
+    treeData: deps.treeData,
+    treeMountKey: deps.treeMountKey,
+    watch: deps.watch
   })
   const { lazyLoadWiring, uiStateWiring } = loadSessionWiring
-
   const beforeDragOpenWiring = createProjectHierarchyTreeBeforeDragOpenWiring({
     lazyLoadWiring
   })
-  const dndWiring = createProjectHierarchyTreeDnDWiring({
-    bumpTreeMountKey: () => {
-      deps.treeMountKey.value += 1
-    },
+  const dndWiring = createProjectHierarchyTreeSessionDnDSubWiring({
     documentRowDragHoldWiring: deps.documentRowDragHoldWiring,
     documentRowExpandClickGesture: deps.documentRowExpandClickGesture,
     dragCommitPending: deps.dragCommitPending,
     dragCommitScheduled: deps.dragCommitScheduled,
     dragDropCommitted: deps.dragDropCommitted,
+    dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     flushDeferredTreeRevisionPublish: () => lazyLoadWiring.flushDeferredTreeRevisionPublish(),
+    flushUiStatePersist: () => deps.hierarchyStore.flushUiStatePersist(),
     getTreeRef: () => deps.treeComponentRef.value,
-    isTreeDragActive: deps.isTreeDragActive,
     getTreeScrollHost: () => deps.treeScrollHostRef.value,
+    hierarchyStore: deps.hierarchyStore,
+    isTreeDragActive: deps.isTreeDragActive,
     loadChildrenForNode: lazyLoadWiring.loadChildrenForNode,
     markNodeClosed: uiStateWiring.markNodeClosed,
     markNodeOpen: uiStateWiring.markNodeOpen,
-    moveDocumentInHierarchy: async (input) => {
-      const api = window.faContentBridgeAPIs?.projectContent
-      if (typeof api?.moveDocumentInHierarchy !== 'function') {
-        throw new Error('moveDocumentInHierarchy unavailable')
-      }
-      return await api.moveDocumentInHierarchy(input)
-    },
     nextTick: deps.nextTick,
     openNodeIds: deps.openNodeIds,
-    queuePersistExpandedNodeIds: (expandedNodeIds) => {
-      deps.hierarchyStore.queuePersistExpandedNodeIds(expandedNodeIds)
-    },
-    refreshLayout: () => deps.hierarchyStore.refreshLayout(),
+    reapplyHeTreeOpenState: uiStateWiring.reapplyHeTreeOpenState,
+    reapplyLatentDescendantExpandState: uiStateWiring.reapplyLatentDescendantExpandState,
     resyncTreeDataFromLayout: syncWiring.resyncTreeDataFromLayout,
     restoreExpandedSnapshot: uiStateWiring.restoreExpandedSnapshot,
     suppressTreeEmit: deps.suppressTreeEmit,
     treeData: deps.treeData
   })
 
-  const treeRootClassList = deps.computed(() => {
-    return {
-      'projectHierarchyTree--listDragging': deps.isTreeDragActive.value
-    }
-  })
-
+  const treeRootClassList = deps.computed(() => ({
+    'projectHierarchyTree--listDragging': deps.isTreeDragActive.value
+  }))
   const treeStyle = deps.computed(() => ({ height: '100%' }))
-
   return {
     beforeDragOpenWiring,
     dndWiring,

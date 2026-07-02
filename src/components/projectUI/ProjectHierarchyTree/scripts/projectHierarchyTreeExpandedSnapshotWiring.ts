@@ -5,37 +5,36 @@ import type {
   I_faProjectHierarchyTreeHeTreeNode
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
+import type { I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions } from 'app/types/I_faProjectHierarchyTreeDomain'
+
 import {
   applyExpandedNodeIdsToTree,
+  expandProjectHierarchyTreeExpandedNodeIdsWithAncestors,
   findProjectHierarchyTreeNodeById,
-  pruneProjectHierarchyTreeExpandedNodeIdsToAncestors
+  pruneProjectHierarchyTreeExpandedNodeIdsToAncestors,
+  publishProjectHierarchyTreeRootRevision
 } from '../functions/projectHierarchyTreeExpandState'
 import {
   collectProjectHierarchyTreeLazyLoadIdsAlongExpandedPaths,
   sortProjectHierarchyTreeExpandedNodeIdsForRestore
 } from './projectHierarchyTreeExpandedRestoreOrder'
+import { reapplyProjectHierarchyTreeHeTreeOpenState } from './projectHierarchyTreeUiStateWiring'
 
 type T_treeRef = I_faProjectHierarchyTreeHeTreeInstance | null
 
-async function applyProjectHierarchyTreeExpandedOpenState (deps: {
-  expandedNodeIds: string[]
+async function reapplyExpandedSnapshotToHeTree (deps: {
   getTreeRef: () => T_treeRef
   nextTick: () => Promise<void>
+  openNodeIds: Ref<Set<string>>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }): Promise<void> {
-  const treeRef = deps.getTreeRef()
-  if (treeRef === null) {
-    return
-  }
-  treeRef.closeAll()
+  deps.treeData.value = publishProjectHierarchyTreeRootRevision(deps.treeData.value)
   await deps.nextTick()
-  for (const nodeId of deps.expandedNodeIds) {
-    const node = findProjectHierarchyTreeNodeById(deps.treeData.value, nodeId)
-    if (node === null) {
-      continue
-    }
-    treeRef.openNodeAndParents(node)
-  }
+  reapplyProjectHierarchyTreeHeTreeOpenState({
+    getTreeRef: deps.getTreeRef,
+    openNodeIds: deps.openNodeIds,
+    treeData: deps.treeData
+  })
 }
 
 export async function restoreProjectHierarchyTreeExpandedSnapshot (deps: {
@@ -47,15 +46,25 @@ export async function restoreProjectHierarchyTreeExpandedSnapshot (deps: {
   onExpandedNodeIdsChange: (expandedNodeIds: string[]) => void
   openNodeIds: Ref<Set<string>>
   requestAnimationFrame: (callback: () => void) => number
+  restoreOptions?: I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }): Promise<void> {
-  const pruned = pruneProjectHierarchyTreeExpandedNodeIdsToAncestors(
+  const knownBeforePrune = applyExpandedNodeIdsToTree(
     deps.treeData.value,
-    applyExpandedNodeIdsToTree(
-      deps.treeData.value,
-      deps.expandedNodeIds
-    )
+    deps.expandedNodeIds
   )
+  const withAncestors = deps.restoreOptions?.includeAncestorClosure === true
+    ? expandProjectHierarchyTreeExpandedNodeIdsWithAncestors(
+      deps.treeData.value,
+      knownBeforePrune
+    )
+    : knownBeforePrune
+  const pruned = deps.restoreOptions?.skipAncestorPrune === true
+    ? withAncestors
+    : pruneProjectHierarchyTreeExpandedNodeIdsToAncestors(
+      deps.treeData.value,
+      withAncestors
+    )
   deps.openNodeIds.value = new Set(pruned)
   deps.onExpandedNodeIdsChange(pruned)
 
@@ -81,18 +90,18 @@ export async function restoreProjectHierarchyTreeExpandedSnapshot (deps: {
     return
   }
 
-  const openStateDeps = {
-    expandedNodeIds: sortedExpandedNodeIds,
+  const reapplyDeps = {
     getTreeRef: deps.getTreeRef,
     nextTick: deps.nextTick,
+    openNodeIds: deps.openNodeIds,
     treeData: deps.treeData
   }
-  await applyProjectHierarchyTreeExpandedOpenState(openStateDeps)
+  await reapplyExpandedSnapshotToHeTree(reapplyDeps)
   await deps.nextTick()
   await new Promise<void>((resolve) => {
     deps.requestAnimationFrame(() => {
       resolve()
     })
   })
-  await applyProjectHierarchyTreeExpandedOpenState(openStateDeps)
+  await reapplyExpandedSnapshotToHeTree(reapplyDeps)
 }

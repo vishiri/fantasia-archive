@@ -1,6 +1,9 @@
 /**
- * Remounts he-tree after drag so internal stat.open state cannot desync from openNodeIds.
+ * Restores he-tree expand snapshot after drag quiet period so drag-open timers
+ * cannot call beforeDragOpen on a torn-down Draggable instance.
  */
+import type { I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions } from 'app/types/I_faProjectHierarchyTreeDomain'
+
 import { PROJECT_HIERARCHY_TREE_DRAG_OPEN_REMOUNT_QUIET_MS } from '../functions/projectHierarchyTreeConstants'
 
 function waitForProjectHierarchyTreeDragOpenRemountQuietPeriod (): Promise<void> {
@@ -10,18 +13,18 @@ function waitForProjectHierarchyTreeDragOpenRemountQuietPeriod (): Promise<void>
 }
 
 export async function remountProjectHierarchyTreeAndRestoreExpandedSnapshot (deps: {
-  bumpTreeMountKey: () => void
   expandedNodeIds: string[]
   nextTick: () => Promise<void>
-  restoreExpandedSnapshot: (expandedNodeIds: string[]) => Promise<void>
+  restoreExpandedSnapshot: (
+    expandedNodeIds: string[],
+    restoreOptions?: I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
+  ) => Promise<void>
+  restoreOptions?: I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
   waitBeforeRemount?: () => Promise<void>
 }): Promise<void> {
   const waitBeforeRemount = deps.waitBeforeRemount ?? waitForProjectHierarchyTreeDragOpenRemountQuietPeriod
   await waitBeforeRemount()
-  deps.bumpTreeMountKey()
-  await deps.nextTick()
-  await deps.nextTick()
-  await deps.restoreExpandedSnapshot(deps.expandedNodeIds)
+  await deps.restoreExpandedSnapshot(deps.expandedNodeIds, deps.restoreOptions)
   await deps.nextTick()
   await deps.nextTick()
 }

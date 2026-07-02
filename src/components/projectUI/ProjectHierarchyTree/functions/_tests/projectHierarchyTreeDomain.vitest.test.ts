@@ -7,14 +7,19 @@ import {
   mapWorkspaceLayoutToHierarchyTreeSkeleton,
   patchHierarchyTreeSkeletonLabelsInPlace
 } from '../mapWorkspaceLayoutToHierarchyTreeSkeleton'
+import { PROJECT_HIERARCHY_TREE_DOCUMENT_TEMPLATE_DEFAULT_ICON } from '../projectHierarchyTreeConstants'
+import { createResolveProjectHierarchyTreePlacementDisplayIcon } from '../projectHierarchyTreePlacementDisplayIcon'
 import {
+  applyPersistedProjectHierarchyTreeOpenNodeIds,
+  buildProjectHierarchyTreeVisibleFlatVirtualScrollKey,
   collectProjectHierarchyTreeAncestorIds,
   collectProjectHierarchyTreeDescendantIds,
+  collectProjectHierarchyTreePersistedExpandedNodeIds,
   evictCollapsedNodeChildren,
   findProjectHierarchyTreeNodeById,
-  mergeLoadedChildrenIntoNode,
   needsProjectHierarchyTreeLazyLoadBeforeOpen
 } from '../projectHierarchyTreeExpandState'
+import { mergeLoadedChildrenIntoNode } from '../projectHierarchyTreeMergeLoadedChildren'
 import {
   isProjectHierarchyTreeNodeDraggable,
   isProjectHierarchyTreeNodeDroppable,
@@ -42,9 +47,28 @@ import {
   syncProjectHierarchyTreeDocumentHasChildrenFlags
 } from '../projectHierarchyTreeDocumentHasChildrenSync'
 import {
+  PROJECT_HIERARCHY_TREE_NODE_ROW_KIND_CLASS_LIST,
   PROJECT_HIERARCHY_TREE_TREE_NODE_KIND_CLASS_LIST,
+  resolveProjectHierarchyTreeNodeRowKindClass,
   resolveProjectHierarchyTreeTreeNodeKindClass
 } from '../projectHierarchyTreeTreeNodeKindClass'
+import { resolveProjectHierarchyTreeHeTreeNodeKey } from '../projectHierarchyTreeHeTreeNodeKey'
+import {
+  shouldDeferProjectHierarchyTreeWorldsExpandRestore
+} from '../projectHierarchyTreeDragExpandFreeze'
+import {
+  expandProjectHierarchyTreeExpandedNodeIdsWithAncestors
+} from '../projectHierarchyTreeExpandState'
+import {
+  clampProjectHierarchyTreeScrollTopToLastDomRow,
+  readProjectHierarchyTreeLastDomRowViewportGapPx,
+  readProjectHierarchyTreeVtlistInnerMetrics,
+  shouldClampProjectHierarchyTreeVirtualScrollTail
+} from '../projectHierarchyTreeVirtualScrollClamp'
+
+const resolveProjectHierarchyTreePlacementDisplayIcon = createResolveProjectHierarchyTreePlacementDisplayIcon({
+  defaultPlacementIcon: PROJECT_HIERARCHY_TREE_DOCUMENT_TEMPLATE_DEFAULT_ICON
+})
 
 const sampleWorld = {
   color: '#ff0000',
@@ -699,6 +723,33 @@ test('Test that evictCollapsedNodeChildren no-ops for world and group nodes', ()
   expect(world.children.length).toBe(childCount)
   expect(placement.children).toEqual([])
 })
+
+/**
+ * applyPersistedProjectHierarchyTreeOpenNodeIds keeps descendants when only the world row is absent.
+ */
+test('Test that applyPersistedProjectHierarchyTreeOpenNodeIds keeps descendants under collapsed world', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  expect(
+    applyPersistedProjectHierarchyTreeOpenNodeIds(tree, ['group-1', 'placement-1'])
+  ).toEqual(['group-1', 'placement-1'])
+  expect(
+    applyPersistedProjectHierarchyTreeOpenNodeIds(tree, ['world-1', 'placement-1'])
+  ).toEqual(['world-1'])
+})
+
+/**
+ * collectProjectHierarchyTreePersistedExpandedNodeIds mirrors latent descendant ids from the open set.
+ */
+test('Test that collectProjectHierarchyTreePersistedExpandedNodeIds keeps latent descendant ids', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  expect(
+    collectProjectHierarchyTreePersistedExpandedNodeIds(
+      tree,
+      new Set(['group-1', 'placement-1'])
+    )
+  ).toEqual(['group-1', 'placement-1'])
+})
+
 test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton omits lazy placeholders without children', () => {
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([
     {
@@ -960,7 +1011,12 @@ test('Test that resolveProjectHierarchyTreeDragExpandedSnapshot prefers live DOM
   const openIds = new Set(['world-1', 'group-1', 'placement-1', 'placement-2'])
   expect(
     resolveProjectHierarchyTreeDragExpandedSnapshot(tree, ['world-1'], [], openIds, true)
-  ).toEqual(['world-1'])
+  ).toEqual([
+    'world-1',
+    'group-1',
+    'placement-1',
+    'placement-2'
+  ])
   expect(
     resolveProjectHierarchyTreeDragExpandedSnapshot(tree, [], [], openIds, false)
   ).toEqual([
@@ -981,6 +1037,25 @@ test('Test that resolveProjectHierarchyTreeDragExpandedSnapshot prefers live DOM
       true
     )
   ).toEqual(['world-1'])
+})
+
+test('Test that resolveProjectHierarchyTreeDragExpandedSnapshot keeps nested persisted opens when live DOM is partial during drag', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const openIds = new Set(['world-1', 'group-1', 'placement-1', 'placement-2'])
+  expect(
+    resolveProjectHierarchyTreeDragExpandedSnapshot(
+      tree,
+      ['world-1', 'group-1'],
+      [],
+      openIds,
+      true
+    )
+  ).toEqual([
+    'world-1',
+    'group-1',
+    'placement-1',
+    'placement-2'
+  ])
 })
 
 test('Test that collectProjectHierarchyTreeDescendantIds walks nested children', () => {
@@ -1110,6 +1185,40 @@ test('Test that projectHierarchyTreeLayoutStructureMatchesTree rejects unknown w
 })
 
 /**
+ * resolveProjectHierarchyTreePlacementDisplayIcon falls back to default document icon.
+ */
+test('Test that resolveProjectHierarchyTreePlacementDisplayIcon falls back for empty icon', () => {
+  expect(resolveProjectHierarchyTreePlacementDisplayIcon('')).toBe('mdi-file-outline')
+  expect(resolveProjectHierarchyTreePlacementDisplayIcon('  ')).toBe('mdi-file-outline')
+  expect(resolveProjectHierarchyTreePlacementDisplayIcon('mdi-account')).toBe('mdi-account')
+})
+
+/**
+ * mapWorkspaceLayoutToHierarchyTreeSkeleton applies default icon for unset template placements.
+ */
+test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton applies default placement icon', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([{
+    ...sampleWorld,
+    placements: [
+      {
+        displayName: 'Untitled template',
+        documentTemplateId: 'template-empty',
+        groupId: null,
+        groupSortOrder: null,
+        hasChildren: false,
+        icon: '',
+        id: 'placement-empty',
+        nickname: '',
+        rootSortOrder: 0,
+        worldId: 'world-1'
+      }
+    ],
+    groups: []
+  }])
+  expect(tree[0]?.children[0]?.icon).toBe('mdi-file-outline')
+})
+
+/**
  * mapHierarchyDocumentChildrenToTreeNodes copies the placement icon onto document rows.
  */
 test('Test that mapHierarchyDocumentChildrenToTreeNodes copies placement icon onto documents', () => {
@@ -1129,6 +1238,25 @@ test('Test that mapHierarchyDocumentChildrenToTreeNodes copies placement icon on
     worldId: 'world-1'
   })
   expect(nodes[0]?.icon).toBe('mdi-account')
+})
+
+test('Test that mapHierarchyDocumentChildrenToTreeNodes applies default icon when placement icon unset', () => {
+  const nodes = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [
+      {
+        displayName: 'Doc 1',
+        hasChildren: false,
+        id: 'doc-1',
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        sortOrder: 0
+      }
+    ],
+    placementIcon: '',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  expect(nodes[0]?.icon).toBe('mdi-file-outline')
 })
 
 /**
@@ -1324,6 +1452,17 @@ test('Test that resolveProjectHierarchyTreeTreeNodeKindClass maps node kinds', (
   expect(PROJECT_HIERARCHY_TREE_TREE_NODE_KIND_CLASS_LIST).toHaveLength(4)
 })
 
+/**
+ * resolveProjectHierarchyTreeNodeRowKindClass maps each node kind to a row-slot class.
+ */
+test('Test that resolveProjectHierarchyTreeNodeRowKindClass maps node kinds', () => {
+  expect(resolveProjectHierarchyTreeNodeRowKindClass('world')).toBe('projectHierarchyTree__nodeRow--world')
+  expect(resolveProjectHierarchyTreeNodeRowKindClass('group')).toBe('projectHierarchyTree__nodeRow--group')
+  expect(resolveProjectHierarchyTreeNodeRowKindClass('templatePlacement')).toBe('projectHierarchyTree__nodeRow--documentTemplate')
+  expect(resolveProjectHierarchyTreeNodeRowKindClass('document')).toBe('projectHierarchyTree__nodeRow--document')
+  expect(PROJECT_HIERARCHY_TREE_NODE_ROW_KIND_CLASS_LIST).toHaveLength(4)
+})
+
 test('Test that findProjectHierarchyTreeDocumentsWithInvalidPlacementParent flags world-level documents', () => {
   const escapedDocument: I_faProjectHierarchyTreeHeTreeNode = {
     children: [],
@@ -1390,4 +1529,314 @@ test('Test that findProjectHierarchyTreeDocumentsWithInvalidPlacementParent acce
     worldId: 'world-1'
   }
   expect(findProjectHierarchyTreeDocumentsWithInvalidPlacementParent([placementNode])).toEqual([])
+})
+
+test('Test that clampProjectHierarchyTreeScrollTopToLastDomRow removes viewport gap below last row', () => {
+  const scrollContainer = document.createElement('div')
+  scrollContainer.className = 'projectHierarchyTree'
+  Object.defineProperty(scrollContainer, 'clientHeight', {
+    value: 400,
+    configurable: true
+  })
+  Object.defineProperty(scrollContainer, 'scrollHeight', {
+    value: 900,
+    configurable: true
+  })
+  Object.defineProperty(scrollContainer, 'scrollTop', {
+    value: 500,
+    writable: true,
+    configurable: true
+  })
+  scrollContainer.getBoundingClientRect = () => ({
+    bottom: 400,
+    height: 400,
+    left: 0,
+    right: 200,
+    top: 0,
+    width: 200,
+    x: 0,
+    y: 0,
+    toJSON: () => ({})
+  })
+  const inner = document.createElement('div')
+  inner.className = 'vtlist-inner'
+  const row = document.createElement('div')
+  row.className = 'tree-node'
+  row.getBoundingClientRect = () => ({
+    bottom: 200,
+    height: 32,
+    left: 0,
+    right: 200,
+    top: 168,
+    width: 200,
+    x: 0,
+    y: 168,
+    toJSON: () => ({})
+  })
+  inner.append(row)
+  scrollContainer.append(inner)
+  const clampResult = clampProjectHierarchyTreeScrollTopToLastDomRow(scrollContainer)
+  expect(clampResult.adjusted).toBe(true)
+  expect(clampResult.gapBelowLastRowPx).toBeGreaterThan(190)
+  expect(scrollContainer.scrollTop).toBeLessThan(500)
+})
+
+test('Test that resolveProjectHierarchyTreeHeTreeNodeKey uses stable node id', () => {
+  expect(resolveProjectHierarchyTreeHeTreeNodeKey({
+    data: {
+      id: 'world-1'
+    } as I_faProjectHierarchyTreeHeTreeNode
+  }, 99)).toBe('world-1')
+})
+
+test('Test that buildProjectHierarchyTreeVisibleFlatVirtualScrollKey joins visible flat ids', () => {
+  const worldNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [{
+      children: [],
+      childrenLoaded: true,
+      documentId: null,
+      groupId: 'group-1',
+      hasChildren: false,
+      icon: '',
+      id: 'group-1',
+      label: 'Group',
+      nodeKind: 'group',
+      placementId: null,
+      worldColor: '#aabbcc',
+      worldId: 'world-1'
+    }],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'world-1',
+    label: 'World',
+    nodeKind: 'world',
+    placementId: null,
+    worldColor: '#aabbcc',
+    worldId: 'world-1'
+  }
+  expect(buildProjectHierarchyTreeVisibleFlatVirtualScrollKey(
+    [worldNode],
+    new Set(['world-1', 'group-1'])
+  )).toBe('world-1|group-1')
+})
+
+test('Test that shouldDeferProjectHierarchyTreeWorldsExpandRestore covers drag guard flags', () => {
+  const base = {
+    dragCommitPending: false,
+    dragCommitScheduled: false,
+    dragExpandPostCommitGuard: false,
+    dragExpandUiFrozen: false,
+    dragExpandedSnapshotNodeIds: null as string[] | null
+  }
+  expect(shouldDeferProjectHierarchyTreeWorldsExpandRestore(base)).toBe(false)
+  expect(shouldDeferProjectHierarchyTreeWorldsExpandRestore({
+    ...base,
+    dragExpandUiFrozen: true
+  })).toBe(true)
+  expect(shouldDeferProjectHierarchyTreeWorldsExpandRestore({
+    ...base,
+    dragCommitPending: true
+  })).toBe(true)
+  expect(shouldDeferProjectHierarchyTreeWorldsExpandRestore({
+    ...base,
+    dragCommitScheduled: true
+  })).toBe(true)
+  expect(shouldDeferProjectHierarchyTreeWorldsExpandRestore({
+    ...base,
+    dragExpandPostCommitGuard: true
+  })).toBe(true)
+  expect(shouldDeferProjectHierarchyTreeWorldsExpandRestore({
+    ...base,
+    dragExpandedSnapshotNodeIds: ['world-1']
+  })).toBe(true)
+  expect(shouldDeferProjectHierarchyTreeWorldsExpandRestore({
+    ...base,
+    dragExpandedSnapshotNodeIds: []
+  })).toBe(false)
+})
+
+test('Test that expandProjectHierarchyTreeExpandedNodeIdsWithAncestors adds ancestor ids', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const placementChildren = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [{
+      displayName: 'Nested',
+      hasChildren: true,
+      id: 'doc-nested',
+      parentDocumentId: null,
+      placementId: 'placement-1',
+      sortOrder: 0
+    }],
+    placementIcon: 'mdi-account',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  mergeLoadedChildrenIntoNode(tree, 'placement-1', placementChildren)
+  const nestedChildren = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [{
+      displayName: 'Child',
+      hasChildren: false,
+      id: 'doc-child',
+      parentDocumentId: 'doc-nested',
+      placementId: 'placement-1',
+      sortOrder: 0
+    }],
+    placementIcon: 'mdi-account',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  mergeLoadedChildrenIntoNode(tree, 'doc-nested', nestedChildren)
+  const expanded = expandProjectHierarchyTreeExpandedNodeIdsWithAncestors(
+    tree,
+    ['doc-child']
+  )
+  expect(expanded).toContain('doc-child')
+  expect(expanded).toContain('doc-nested')
+  expect(expanded).toContain('placement-1')
+  expect(expanded).toContain('world-1')
+})
+
+test('Test that mergeLoadedChildrenIntoNode preserves loaded document subtrees on remerge', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const firstLoad = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [{
+      displayName: 'Parent',
+      hasChildren: true,
+      id: 'doc-parent',
+      parentDocumentId: null,
+      placementId: 'placement-1',
+      sortOrder: 0
+    }],
+    placementIcon: 'mdi-account',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  mergeLoadedChildrenIntoNode(tree, 'placement-1', firstLoad)
+  const nestedLoad = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [{
+      displayName: 'Child',
+      hasChildren: false,
+      id: 'doc-child',
+      parentDocumentId: 'doc-parent',
+      placementId: 'placement-1',
+      sortOrder: 0
+    }],
+    placementIcon: 'mdi-account',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  mergeLoadedChildrenIntoNode(tree, 'doc-parent', nestedLoad)
+  const parentBefore = findProjectHierarchyTreeNodeById(tree, 'doc-parent')
+  expect(parentBefore?.children.map((child) => child.id)).toEqual(['doc-child'])
+  const refreshLoad = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [{
+      displayName: 'Parent refreshed',
+      hasChildren: true,
+      id: 'doc-parent',
+      parentDocumentId: null,
+      placementId: 'placement-1',
+      sortOrder: 0
+    }],
+    placementIcon: 'mdi-account',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  mergeLoadedChildrenIntoNode(tree, 'placement-1', refreshLoad)
+  const parentAfter = findProjectHierarchyTreeNodeById(tree, 'doc-parent')
+  expect(parentAfter?.label).toBe('Parent refreshed')
+  expect(parentAfter?.children.map((child) => child.id)).toEqual(['doc-child'])
+})
+
+test('Test that shouldClampProjectHierarchyTreeVirtualScrollTail detects tail scroll', () => {
+  const scrollContainer = document.createElement('div')
+  Object.defineProperty(scrollContainer, 'scrollTop', {
+    value: 90,
+    writable: true
+  })
+  Object.defineProperty(scrollContainer, 'clientHeight', {
+    value: 100
+  })
+  Object.defineProperty(scrollContainer, 'scrollHeight', {
+    value: 190
+  })
+  expect(shouldClampProjectHierarchyTreeVirtualScrollTail(scrollContainer)).toBe(true)
+  scrollContainer.scrollTop = 0
+  expect(shouldClampProjectHierarchyTreeVirtualScrollTail(scrollContainer)).toBe(false)
+})
+
+test('Test that readProjectHierarchyTreeLastDomRowViewportGapPx handles missing inner rows', () => {
+  const scrollContainer = document.createElement('div')
+  expect(readProjectHierarchyTreeLastDomRowViewportGapPx(scrollContainer)).toBeNull()
+  const inner = document.createElement('div')
+  inner.className = 'vtlist-inner'
+  scrollContainer.appendChild(inner)
+  expect(readProjectHierarchyTreeLastDomRowViewportGapPx(scrollContainer)).toBeNull()
+})
+
+test('Test that readProjectHierarchyTreeVtlistInnerMetrics reads inner margins', () => {
+  const scrollContainer = document.createElement('div')
+  expect(readProjectHierarchyTreeVtlistInnerMetrics(scrollContainer)).toBeNull()
+  const inner = document.createElement('div')
+  inner.className = 'vtlist-inner'
+  inner.style.marginTop = '4px'
+  inner.style.marginBottom = '8px'
+  Object.defineProperty(inner, 'offsetHeight', {
+    value: 120
+  })
+  const row = document.createElement('div')
+  row.className = 'tree-node'
+  inner.appendChild(row)
+  scrollContainer.appendChild(inner)
+  Object.defineProperty(scrollContainer, 'clientHeight', {
+    value: 200
+  })
+  Object.defineProperty(scrollContainer, 'scrollTop', {
+    value: 0,
+    writable: true
+  })
+  Object.defineProperty(scrollContainer, 'getBoundingClientRect', {
+    value: () => ({
+      bottom: 200,
+      height: 200,
+      left: 0,
+      right: 100,
+      top: 0,
+      width: 100,
+      x: 0,
+      y: 0,
+      toJSON: () => ({})
+    })
+  })
+  Object.defineProperty(row, 'getBoundingClientRect', {
+    value: () => ({
+      bottom: 40,
+      height: 40,
+      left: 0,
+      right: 100,
+      top: 0,
+      width: 100,
+      x: 0,
+      y: 0,
+      toJSON: () => ({})
+    })
+  })
+  const metrics = readProjectHierarchyTreeVtlistInnerMetrics(scrollContainer)
+  expect(metrics).not.toBeNull()
+  expect(metrics?.marginTopPx).toBe(4)
+  expect(metrics?.marginBottomPx).toBe(8)
+  expect(metrics?.mountedNodeCount).toBe(1)
+  expect(metrics?.innerOffsetHeight).toBe(120)
+})
+
+test('Test that clampProjectHierarchyTreeScrollTopToLastDomRow skips when no gap', () => {
+  const scrollContainer = document.createElement('div')
+  Object.defineProperty(scrollContainer, 'scrollTop', {
+    value: 12,
+    writable: true
+  })
+  const result = clampProjectHierarchyTreeScrollTopToLastDomRow(scrollContainer)
+  expect(result.adjusted).toBe(false)
+  expect(result.nextScrollTopPx).toBe(12)
 })

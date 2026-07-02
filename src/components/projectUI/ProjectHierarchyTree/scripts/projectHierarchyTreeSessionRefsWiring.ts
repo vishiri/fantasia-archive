@@ -11,6 +11,7 @@ export function createProjectHierarchyTreeSessionRefs (deps: {
   const dragCommitScheduled = deps.ref(false)
   const dragDropCommitted = deps.ref(false)
   const dragExpandUiFrozen = deps.ref(false)
+  const dragExpandPostCommitGuard = deps.ref(false)
   const openNodeIds = deps.ref<Set<string>>(new Set())
   const treeComponentRef = deps.ref<I_faProjectHierarchyTreeHeTreeInstance | null>(null)
   const treeMountKey = deps.ref(0)
@@ -20,6 +21,7 @@ export function createProjectHierarchyTreeSessionRefs (deps: {
     dragCommitPending,
     dragCommitScheduled,
     dragDropCommitted,
+    dragExpandPostCommitGuard,
     dragExpandUiFrozen,
     isTreeDragActive,
     openNodeIds,

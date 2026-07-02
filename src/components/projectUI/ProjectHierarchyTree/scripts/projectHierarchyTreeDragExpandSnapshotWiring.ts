@@ -28,7 +28,8 @@ function pruneOpenNodeIdsByCollapsedVisibleRows (
 }
 
 /**
- * Prefers live DOM expand icons over the persisted open set when building a drag snapshot.
+ * Builds drag expand snapshot from live DOM plus persisted open set.
+ * Live rows win for visible collapse; persisted ids fill gaps when drag hides nested rows.
  */
 export function resolveProjectHierarchyTreeDragExpandedSnapshot (
   treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
@@ -38,9 +39,18 @@ export function resolveProjectHierarchyTreeDragExpandedSnapshot (
   scrollHostPresent: boolean
 ): string[] {
   if (liveExpandedNodeIds.length > 0) {
+    const prunedOpenNodeIds = pruneOpenNodeIdsByCollapsedVisibleRows(
+      treeNodes,
+      openNodeIds,
+      collapsedVisibleNodeIds
+    )
+    const mergedExpandedNodeIds = applyExpandedNodeIdsToTree(
+      treeNodes,
+      [...new Set([...liveExpandedNodeIds, ...prunedOpenNodeIds])]
+    )
     return pruneProjectHierarchyTreeExpandedNodeIdsToAncestors(
       treeNodes,
-      applyExpandedNodeIdsToTree(treeNodes, liveExpandedNodeIds)
+      mergedExpandedNodeIds
     )
   }
   if (scrollHostPresent) {

@@ -1,5 +1,24 @@
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
+/**
+ * Finds a node reference by id in the current tree model.
+ */
+export function findProjectHierarchyTreeNodeById (
+  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
+  nodeId: string
+): I_faProjectHierarchyTreeHeTreeNode | null {
+  for (const node of treeNodes) {
+    if (node.id === nodeId) {
+      return node
+    }
+    const nested = findProjectHierarchyTreeNodeById(node.children, nodeId)
+    if (nested !== null) {
+      return nested
+    }
+  }
+  return null
+}
+
 function isProjectHierarchyTreeNodeEffectivelyExpanded (
   treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
   nodeId: string,
@@ -41,6 +60,41 @@ export function collectExpandedNodeIdsFromTree (
   const output: string[] = []
   collectExpandedNodeIdsFromSubtree(treeNodes, treeNodes, openNodeIds, output)
   return output
+}
+
+/**
+ * Flat preorder of hierarchy rows currently visible in the sidebar tree (respects expand state).
+ */
+export function collectProjectHierarchyTreeVisibleFlatNodes (
+  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
+  openNodeIds: ReadonlySet<string>
+): I_faProjectHierarchyTreeHeTreeNode[] {
+  const output: I_faProjectHierarchyTreeHeTreeNode[] = []
+  function walk (nodes: I_faProjectHierarchyTreeHeTreeNode[]): void {
+    for (const node of nodes) {
+      output.push(node)
+      if (
+        node.children.length > 0 &&
+        isProjectHierarchyTreeNodeEffectivelyExpanded(treeNodes, node.id, openNodeIds)
+      ) {
+        walk(node.children)
+      }
+    }
+  }
+  walk(treeNodes)
+  return output
+}
+
+/**
+ * Join of visible flat row ids — virtual-list size cache invalidates when this changes.
+ */
+export function buildProjectHierarchyTreeVisibleFlatVirtualScrollKey (
+  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
+  openNodeIds: ReadonlySet<string>
+): string {
+  return collectProjectHierarchyTreeVisibleFlatNodes(treeNodes, openNodeIds)
+    .map((node) => node.id)
+    .join('|')
 }
 
 /**
@@ -92,6 +146,74 @@ export function pruneProjectHierarchyTreeExpandedNodeIdsToAncestors (
   })
 }
 
+function isMissingWorldAncestorOnly (
+  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
+  ancestorId: string,
+  openSet: ReadonlySet<string>
+): boolean {
+  if (openSet.has(ancestorId)) {
+    return false
+  }
+  const ancestor = findProjectHierarchyTreeNodeById(treeNodes, ancestorId)
+  return ancestor?.nodeKind === 'world'
+}
+
+/**
+ * True when a node id may stay in the persisted open set (world row may be absent while descendants remain).
+ */
+export function isProjectHierarchyTreeNodePersistableInOpenSet (
+  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
+  nodeId: string,
+  openSet: ReadonlySet<string>
+): boolean {
+  const ancestors = collectProjectHierarchyTreeAncestorIds(treeNodes, nodeId)
+  if (ancestors === null) {
+    return false
+  }
+  for (const ancestorId of ancestors) {
+    if (openSet.has(ancestorId)) {
+      continue
+    }
+    if (!isMissingWorldAncestorOnly(treeNodes, ancestorId, openSet)) {
+      return false
+    }
+  }
+  return true
+}
+
+/**
+ * Filters persisted expanded ids to known nodes, keeping latent descendants under a collapsed world row.
+ */
+export function applyPersistedProjectHierarchyTreeOpenNodeIds (
+  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
+  expandedNodeIds: string[]
+): string[] {
+  const knownNodeIds = applyExpandedNodeIdsToTree(treeNodes, expandedNodeIds)
+  const knownSet = new Set(knownNodeIds)
+  return knownNodeIds.filter((nodeId) => {
+    return isProjectHierarchyTreeNodePersistableInOpenSet(treeNodes, nodeId, knownSet)
+  })
+}
+
+/**
+ * Queues expanded ids from the in-memory open set, including descendants remembered under a collapsed world.
+ */
+export function collectProjectHierarchyTreePersistedExpandedNodeIds (
+  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
+  openNodeIds: ReadonlySet<string>
+): string[] {
+  const knownNodeIds: string[] = []
+  for (const nodeId of openNodeIds) {
+    if (findProjectHierarchyTreeNodeById(treeNodes, nodeId) !== null) {
+      knownNodeIds.push(nodeId)
+    }
+  }
+  const knownSet = new Set(knownNodeIds)
+  return knownNodeIds.filter((nodeId) => {
+    return isProjectHierarchyTreeNodePersistableInOpenSet(treeNodes, nodeId, knownSet)
+  })
+}
+
 /**
  * Filters persisted expanded ids to nodes that still exist in the current skeleton.
  */
@@ -105,6 +227,24 @@ export function applyExpandedNodeIdsToTree (
 }
 
 /**
+ * Expands a restore id list with ancestor rows required for nested expand paths.
+ */
+export function expandProjectHierarchyTreeExpandedNodeIdsWithAncestors (
+  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
+  expandedNodeIds: string[]
+): string[] {
+  const knownNodeIds = applyExpandedNodeIdsToTree(treeNodes, expandedNodeIds)
+  const expandedSet = new Set(knownNodeIds)
+  for (const nodeId of knownNodeIds) {
+    const ancestors = collectProjectHierarchyTreeAncestorIds(treeNodes, nodeId) ?? []
+    for (const ancestorId of ancestors) {
+      expandedSet.add(ancestorId)
+    }
+  }
+  return [...expandedSet]
+}
+
+/**
  * Clears loaded document subtrees when a node collapses.
  */
 export function evictCollapsedNodeChildren (
@@ -115,27 +255,6 @@ export function evictCollapsedNodeChildren (
   }
   node.children = []
   node.childrenLoaded = false
-}
-
-/**
- * Merges lazy-loaded child rows into a matching node by id.
- */
-export function mergeLoadedChildrenIntoNode (
-  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
-  nodeId: string,
-  children: I_faProjectHierarchyTreeHeTreeNode[]
-): boolean {
-  for (const node of treeNodes) {
-    if (node.id === nodeId) {
-      node.children = children
-      node.childrenLoaded = true
-      return true
-    }
-    if (mergeLoadedChildrenIntoNode(node.children, nodeId, children)) {
-      return true
-    }
-  }
-  return false
 }
 
 /**
@@ -154,25 +273,6 @@ export function publishProjectHierarchyTreeRootRevision (
   treeNodes: I_faProjectHierarchyTreeHeTreeNode[]
 ): I_faProjectHierarchyTreeHeTreeNode[] {
   return treeNodes.slice()
-}
-
-/**
- * Finds a node reference by id in the current tree model.
- */
-export function findProjectHierarchyTreeNodeById (
-  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
-  nodeId: string
-): I_faProjectHierarchyTreeHeTreeNode | null {
-  for (const node of treeNodes) {
-    if (node.id === nodeId) {
-      return node
-    }
-    const nested = findProjectHierarchyTreeNodeById(node.children, nodeId)
-    if (nested !== null) {
-      return nested
-    }
-  }
-  return null
 }
 
 /**

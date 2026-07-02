@@ -6,7 +6,7 @@ import type {
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { mapHierarchyDocumentChildrenToTreeNodes } from '../functions/mapWorkspaceLayoutToHierarchyTreeSkeleton'
-import { mergeLoadedChildrenIntoNode } from '../functions/projectHierarchyTreeExpandState'
+import { mergeLoadedChildrenIntoNode } from '../functions/projectHierarchyTreeMergeLoadedChildren'
 import { publishProjectHierarchyTreeLazyLoadRevision } from './projectHierarchyTreeLazyLoadPublishWiring'
 
 export function createProjectHierarchyTreeLazyLoadWiring (deps: {

@@ -77,6 +77,33 @@ test('Test that ProjectHierarchyTreeNode applies layout icon sizing for non-worl
 })
 
 /**
+ * ProjectHierarchyTreeNode shows default document icon when template placement icon unset.
+ */
+test('Test that ProjectHierarchyTreeNode shows default icon for unset template placement', () => {
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    global: {
+      stubs: {
+        QIcon: {
+          props: ['name'],
+          template: '<i class="q-icon" :name="name" />'
+        }
+      }
+    },
+    props: {
+      node: {
+        ...baseNode,
+        icon: '',
+        nodeKind: 'templatePlacement'
+      },
+      stat: {
+        open: false
+      }
+    }
+  })
+  expect(wrapper.find('.q-icon').attributes('name')).toBe('mdi-file-outline')
+})
+
+/**
  * ProjectHierarchyTreeNode shows document rows with their placement template icon.
  */
 test('Test that ProjectHierarchyTreeNode shows document rows with placement icon', () => {

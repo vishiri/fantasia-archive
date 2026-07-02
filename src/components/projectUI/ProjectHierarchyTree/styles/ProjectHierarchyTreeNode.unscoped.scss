@@ -7,16 +7,22 @@
 }
 
 .projectHierarchyTreeNode > .q-focus-helper {
-  border-radius: 0;
+  border-radius: 4px !important;
 }
 
 .projectHierarchyTreeNode--document,
 .projectHierarchyTreeNode--documentTemplate {
   color: $projectHierarchyTree-documentRow-color;
+
+  .projectHierarchyTreeNode__icon,
+  .projectHierarchyTreeNode__label {
+    color: $projectHierarchyTree-documentRow-color;
+  }
 }
 
 .projectHierarchyTreeNode--group {
   color: $projectHierarchyTree-groupRow-color;
+  font-weight: 700;
 }
 
 .projectHierarchyTreeNode--world .projectHierarchyTreeNode__icon {

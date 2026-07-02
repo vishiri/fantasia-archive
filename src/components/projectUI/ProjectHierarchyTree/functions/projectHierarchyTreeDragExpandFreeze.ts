@@ -14,9 +14,13 @@ export function isProjectHierarchyTreeDragExpandUiFrozen (input: {
 export function shouldDeferProjectHierarchyTreeWorldsExpandRestore (input: {
   dragCommitPending: boolean
   dragCommitScheduled: boolean
+  dragExpandPostCommitGuard: boolean
   dragExpandUiFrozen: boolean
+  dragExpandedSnapshotNodeIds: string[] | null
 }): boolean {
   return input.dragExpandUiFrozen ||
     input.dragCommitPending ||
-    input.dragCommitScheduled
+    input.dragCommitScheduled ||
+    input.dragExpandPostCommitGuard ||
+    (input.dragExpandedSnapshotNodeIds !== null && input.dragExpandedSnapshotNodeIds.length > 0)
 }

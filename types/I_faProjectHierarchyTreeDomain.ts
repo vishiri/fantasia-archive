@@ -26,6 +26,12 @@ export interface I_faProjectHierarchyTreeLiveExpandDomState {
   scrollHostPresent: boolean
 }
 
+/** Options for drag post-commit expanded snapshot restore. */
+export interface I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions {
+  includeAncestorClosure?: boolean
+  skipAncestorPrune?: boolean
+}
+
 /** One template group row in the workspace hierarchy skeleton. */
 export interface I_faProjectHierarchyTreeWorkspaceGroup {
   id: string

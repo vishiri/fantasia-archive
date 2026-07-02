@@ -75,6 +75,7 @@ export function createProjectHierarchyTreeSessionEarlyWiring (deps: {
     dragCommitPending: bootstrap.sessionRefs.dragCommitPending,
     dragCommitScheduled: bootstrap.sessionRefs.dragCommitScheduled,
     dragDropCommitted: bootstrap.sessionRefs.dragDropCommitted,
+    dragExpandPostCommitGuard: bootstrap.sessionRefs.dragExpandPostCommitGuard,
     dragExpandUiFrozen: bootstrap.sessionRefs.dragExpandUiFrozen,
     hierarchyStore: deps.hierarchyStore,
     isTreeDragActive: bootstrap.sessionRefs.isTreeDragActive,
@@ -88,6 +89,7 @@ export function createProjectHierarchyTreeSessionEarlyWiring (deps: {
     treeMountKey: bootstrap.sessionRefs.treeMountKey,
     treeScrollHostRef: bootstrap.sessionRefs.treeScrollHostRef,
     uiState: deps.uiState,
+    watch: deps.watch,
     worlds: deps.worlds
   })
   subWiringHolder.subWiring = subWiring

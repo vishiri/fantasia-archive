@@ -7,19 +7,24 @@ import {
   shouldScheduleDragLayoutCommit
 } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldTemplateLayoutTreeCommitPolicy'
 import { clearFaVerticalDraggableTabsDocumentDragCursor } from 'app/src/scripts/faDragDrop/faDragDrop_manager'
+import { syncProjectHierarchyTreeDocumentHasChildrenFlags } from '../functions/projectHierarchyTreeDocumentHasChildrenSync'
+import { PROJECT_HIERARCHY_TREE_DRAG_EXPAND_SNAPSHOT_RESTORE_OPTIONS } from '../functions/projectHierarchyTreeConstants'
 import { commitProjectHierarchyTreeDraggedDocumentMove } from './projectHierarchyTreeDnDCommitWiring'
 import { openProjectHierarchyTreeNestParentAfterDragDrop } from './projectHierarchyTreeNestParentOpenWiring'
 import { remountProjectHierarchyTreeAndRestoreExpandedSnapshot } from './projectHierarchyTreeMountRemountWiring'
+import { finalizeProjectHierarchyTreeDragCommitExpandState } from './projectHierarchyTreeDnDCommitFinalizeWiring'
 import { findProjectHierarchyTreeNodeById } from '../functions/projectHierarchyTreeExpandState'
 
 type T_projectHierarchyTreeDragCommitScheduleDeps = {
-  bumpTreeMountKey: () => void
+  clearDragSessionFlags: () => void
   dragCommitPending: Ref<boolean>
   dragCommitScheduled: Ref<boolean>
+  dragExpandPostCommitGuard: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
   dragExpandedSnapshot: () => string[] | null
   draggedDocumentId: () => string | null
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
+  flushUiStatePersist: () => void
   getTreeRef: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeInstance | null
   loadChildrenForNode: (node: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   markNodeClosed: (nodeId: string, node: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeNode) => void
@@ -30,10 +35,16 @@ type T_projectHierarchyTreeDragCommitScheduleDeps = {
     targetSortOrder: number
   }) => Promise<unknown>
   nextTick: () => Promise<void>
+  reapplyHeTreeOpenState: () => void
+  reapplyLatentDescendantExpandState: () => Promise<void>
   refreshLayout: () => Promise<void>
   removeDragCancelListeners: () => void
+  requestAnimationFrame: (callback: () => void) => number
   resyncTreeDataFromLayout: () => void
-  restoreExpandedSnapshot: (expandedNodeIds: string[]) => Promise<void>
+  restoreExpandedSnapshot: (
+    expandedNodeIds: string[],
+    restoreOptions?: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
+  ) => Promise<void>
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }
@@ -52,6 +63,7 @@ async function finishProjectHierarchyTreeDragCommit (
     return
   }
   const expandedSnapshot = deps.dragExpandedSnapshot() ?? []
+  const expandedSnapshotSet = new Set(expandedSnapshot)
   const commitResult = await commitProjectHierarchyTreeDraggedDocumentMove({
     documentId: deps.draggedDocumentId(),
     moveDocumentInHierarchy: deps.moveDocumentInHierarchy,
@@ -59,18 +71,24 @@ async function finishProjectHierarchyTreeDragCommit (
     resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
     treeData: deps.treeData.value
   })
-  for (const nodeId of commitResult.emptiedParentDocumentIds) {
+  await remountProjectHierarchyTreeAndRestoreExpandedSnapshot({
+    expandedNodeIds: expandedSnapshot,
+    nextTick: deps.nextTick,
+    restoreExpandedSnapshot: deps.restoreExpandedSnapshot,
+    restoreOptions: PROJECT_HIERARCHY_TREE_DRAG_EXPAND_SNAPSHOT_RESTORE_OPTIONS
+  })
+  const emptiedParentDocumentIds = syncProjectHierarchyTreeDocumentHasChildrenFlags(
+    deps.treeData.value
+  )
+  for (const nodeId of emptiedParentDocumentIds) {
+    if (expandedSnapshotSet.has(nodeId)) {
+      continue
+    }
     const node = findProjectHierarchyTreeNodeById(deps.treeData.value, nodeId)
     if (node !== null) {
       deps.markNodeClosed(nodeId, node)
     }
   }
-  await remountProjectHierarchyTreeAndRestoreExpandedSnapshot({
-    bumpTreeMountKey: deps.bumpTreeMountKey,
-    expandedNodeIds: expandedSnapshot,
-    nextTick: deps.nextTick,
-    restoreExpandedSnapshot: deps.restoreExpandedSnapshot
-  })
   if (
     commitResult.committed &&
     commitResult.nestParentDocumentId !== null
@@ -85,9 +103,19 @@ async function finishProjectHierarchyTreeDragCommit (
       treeData: deps.treeData
     })
   }
-  await deps.nextTick()
-  await deps.nextTick()
-  deps.dragExpandUiFrozen.value = false
+  await deps.reapplyLatentDescendantExpandState()
+  await finalizeProjectHierarchyTreeDragCommitExpandState({
+    clearDragSessionFlags: deps.clearDragSessionFlags,
+    dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
+    dragExpandUiFrozen: deps.dragExpandUiFrozen,
+    expandedSnapshot,
+    flushUiStatePersist: deps.flushUiStatePersist,
+    nextTick: deps.nextTick,
+    reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,
+    reapplyLatentDescendantExpandState: deps.reapplyLatentDescendantExpandState,
+    requestAnimationFrame: deps.requestAnimationFrame,
+    restoreExpandedSnapshot: deps.restoreExpandedSnapshot
+  })
 }
 
 export function scheduleProjectHierarchyTreeDragCommit (

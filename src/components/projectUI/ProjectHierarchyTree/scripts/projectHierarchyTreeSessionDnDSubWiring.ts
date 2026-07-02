@@ -5,13 +5,11 @@ import type {
   I_faProjectHierarchyTreeHeTreeNode
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { createProjectHierarchyTreeDragCancelWiring } from './projectHierarchyTreeDragCancelWiring'
-import { createProjectHierarchyTreeDragSessionState } from './projectHierarchyTreeDragSessionStateWiring'
 import type { createProjectHierarchyTreeDocumentRowDragHoldWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
 import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowExpandClickGestureWiring'
-import { createProjectHierarchyTreeDnDHandlers } from './projectHierarchyTreeDnDHandlersWiring'
+import { createProjectHierarchyTreeDnDWiring } from './projectHierarchyTreeDnDWiring'
 
-export function createProjectHierarchyTreeDnDWiring (deps: {
+type T_sessionDnDSubDeps = {
   documentRowDragHoldWiring: ReturnType<typeof createProjectHierarchyTreeDocumentRowDragHoldWiring>
   documentRowExpandClickGesture: ReturnType<typeof createProjectHierarchyTreeDocumentRowExpandClickGestureWiring>
   dragCommitPending: Ref<boolean>
@@ -19,25 +17,23 @@ export function createProjectHierarchyTreeDnDWiring (deps: {
   dragDropCommitted: Ref<boolean>
   dragExpandPostCommitGuard: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
-  isTreeDragActive: Ref<boolean>
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
   flushUiStatePersist: () => void
   getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
   getTreeScrollHost: () => HTMLElement | null
+  hierarchyStore: {
+    flushUiStatePersist: () => void
+    queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
+    refreshLayout: () => Promise<void>
+  }
+  isTreeDragActive: Ref<boolean>
   loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   markNodeClosed: (nodeId: string, node: I_faProjectHierarchyTreeHeTreeNode) => void
   markNodeOpen: (nodeId: string) => void
-  moveDocumentInHierarchy: (input: {
-    documentId: string
-    targetParentDocumentId: string | null
-    targetSortOrder: number
-  }) => Promise<unknown>
   nextTick: () => Promise<void>
+  openNodeIds: Ref<Set<string>>
   reapplyHeTreeOpenState: () => void
   reapplyLatentDescendantExpandState: () => Promise<void>
-  openNodeIds: Ref<Set<string>>
-  queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
-  refreshLayout: () => Promise<void>
   resyncTreeDataFromLayout: () => void
   restoreExpandedSnapshot: (
     expandedNodeIds: string[],
@@ -45,44 +41,17 @@ export function createProjectHierarchyTreeDnDWiring (deps: {
   ) => Promise<void>
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-}) {
-  const dragSessionState = createProjectHierarchyTreeDragSessionState({
-    dragCommitPending: deps.dragCommitPending,
-    dragCommitScheduled: deps.dragCommitScheduled,
-    dragDropCommitted: deps.dragDropCommitted,
-    isTreeDragActive: deps.isTreeDragActive
-  })
+}
 
-  function removeDragCancelListeners (): void {
-    window.removeEventListener('pointerup', dragCancelWiring.onWindowPointerUpDuringDrag)
-    window.removeEventListener('keydown', dragCancelWiring.onWindowKeydownDuringDrag)
-  }
-
-  const dragCancelWiring = createProjectHierarchyTreeDragCancelWiring({
-    clearDragSessionFlags: dragSessionState.clearDragSessionFlags,
-    dragCommitPending: deps.dragCommitPending,
-    dragDropCommitted: deps.dragDropCommitted,
-    dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
-    dragExpandUiFrozen: deps.dragExpandUiFrozen,
-    dragExpandedSnapshot: dragSessionState.dragExpandedSnapshot.get,
-    nextTick: deps.nextTick,
-    removeDragCancelListeners,
-    resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
-    restoreExpandedSnapshot: deps.restoreExpandedSnapshot
-  })
-
-  return createProjectHierarchyTreeDnDHandlers({
-    clearDragSessionFlags: dragSessionState.clearDragSessionFlags,
+export function createProjectHierarchyTreeSessionDnDSubWiring (deps: T_sessionDnDSubDeps) {
+  return createProjectHierarchyTreeDnDWiring({
     documentRowDragHoldWiring: deps.documentRowDragHoldWiring,
     documentRowExpandClickGesture: deps.documentRowExpandClickGesture,
-    dragCancelWiring,
     dragCommitPending: deps.dragCommitPending,
     dragCommitScheduled: deps.dragCommitScheduled,
     dragDropCommitted: deps.dragDropCommitted,
     dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
-    draggedDocumentId: dragSessionState.draggedDocumentId,
-    dragExpandedSnapshot: dragSessionState.dragExpandedSnapshot,
     flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
     flushUiStatePersist: deps.flushUiStatePersist,
     getTreeRef: deps.getTreeRef,
@@ -91,14 +60,21 @@ export function createProjectHierarchyTreeDnDWiring (deps: {
     loadChildrenForNode: deps.loadChildrenForNode,
     markNodeClosed: deps.markNodeClosed,
     markNodeOpen: deps.markNodeOpen,
-    moveDocumentInHierarchy: deps.moveDocumentInHierarchy,
+    moveDocumentInHierarchy: async (input) => {
+      const api = window.faContentBridgeAPIs?.projectContent
+      if (typeof api?.moveDocumentInHierarchy !== 'function') {
+        throw new Error('moveDocumentInHierarchy unavailable')
+      }
+      return await api.moveDocumentInHierarchy(input)
+    },
     nextTick: deps.nextTick,
     reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,
     reapplyLatentDescendantExpandState: deps.reapplyLatentDescendantExpandState,
     openNodeIds: deps.openNodeIds,
-    queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
-    refreshLayout: deps.refreshLayout,
-    removeDragCancelListeners,
+    queuePersistExpandedNodeIds: (expandedNodeIds) => {
+      deps.hierarchyStore.queuePersistExpandedNodeIds(expandedNodeIds)
+    },
+    refreshLayout: () => deps.hierarchyStore.refreshLayout(),
     resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
     restoreExpandedSnapshot: deps.restoreExpandedSnapshot,
     suppressTreeEmit: deps.suppressTreeEmit,

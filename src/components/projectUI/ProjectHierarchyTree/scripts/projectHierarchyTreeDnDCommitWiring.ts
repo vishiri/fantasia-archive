@@ -8,7 +8,6 @@ import {
   isProjectHierarchyTreeDocumentDropParentValid,
   isProjectHierarchyTreeDocumentSiblingRow
 } from '../functions/projectHierarchyTreeDnD'
-import { syncProjectHierarchyTreeDocumentHasChildrenFlags } from '../functions/projectHierarchyTreeDocumentHasChildrenSync'
 
 type T_parentBucket = {
   children: I_faProjectHierarchyTreeHeTreeNode[]
@@ -109,10 +108,9 @@ export async function commitProjectHierarchyTreeDraggedDocumentMove (deps: {
       targetParentDocumentId: nestParentDocumentId,
       targetSortOrder
     })
-    const emptiedParentDocumentIds = syncProjectHierarchyTreeDocumentHasChildrenFlags(deps.treeData)
     return {
       committed: true,
-      emptiedParentDocumentIds,
+      emptiedParentDocumentIds: [],
       nestParentDocumentId
     }
   } catch (error) {

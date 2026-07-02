@@ -1,4 +1,4 @@
-import type { Ref } from 'vue'
+import type { Ref, watch as WatchFn } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
@@ -37,6 +37,8 @@ export function createProjectHierarchyTreeLazyLoadSessionWiring (deps: {
   requestAnimationFrame: (callback: () => void) => number
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
+  treeMountKey: Ref<number>
+  watch: typeof WatchFn
 }) {
   const treeRevisionPublishHooks: {
     reapplyHeTreeOpenState: (() => void) | null
@@ -71,7 +73,15 @@ export function createProjectHierarchyTreeLazyLoadSessionWiring (deps: {
     queuePersistExpandedNodeIds: deps.hierarchyStore.queuePersistExpandedNodeIds,
     queuePersistScrollTopPx: deps.hierarchyStore.queuePersistScrollTopPx,
     requestAnimationFrame: deps.requestAnimationFrame,
-    treeData: deps.treeData
+    treeData: deps.treeData,
+    treeMountKey: deps.treeMountKey,
+    watch: deps.watch,
+    windowClearTimeout: (timeoutId) => {
+      window.clearTimeout(timeoutId)
+    },
+    windowSetTimeout: (handler, delayMs) => {
+      return window.setTimeout(handler, delayMs)
+    }
   })
   treeRevisionPublishHooks.reapplyHeTreeOpenState = () => {
     uiStateWiring.reapplyHeTreeOpenState()
