@@ -9,15 +9,15 @@ import {
   clearFaVerticalDraggableTabsDocumentDragCursor
 } from 'app/src/scripts/faDragDrop/faDragDrop_manager'
 import {
-  shouldAcceptHeTreeModelValueUpdate,
   shouldClearDragSessionWithoutCommit
 } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldTemplateLayoutTreeCommitPolicy'
 import type { createProjectHierarchyTreeDragCancelWiring } from './projectHierarchyTreeDragCancelWiring'
 import type { createProjectHierarchyTreeDocumentRowDragHoldWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
 import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowExpandClickGestureWiring'
 import { scheduleProjectHierarchyTreeDragCommit } from './projectHierarchyTreeDnDScheduleWiring'
-import { syncProjectHierarchyTreeDocumentHasChildrenFlags } from '../functions/projectHierarchyTreeDocumentHasChildrenSync'
-import { findProjectHierarchyTreeDocumentsWithInvalidPlacementParent } from '../functions/projectHierarchyTreeDocumentPlacementGuard'
+import { applyProjectHierarchyTreeHeTreeModelValueUpdate } from './projectHierarchyTreeDnDModelValueUpdateWiring'
+import { syncProjectHierarchyTreeSiblingOrderAfterDrop } from './projectHierarchyTreeDragAfterDropSiblingOrderSyncWiring'
+import { resolveProjectHierarchyTreeDragSiblingOrderAtDragStart } from './projectHierarchyTreeDragSiblingOrderResolveWiring'
 
 type T_projectHierarchyTreeDnDHandlerDeps = {
   clearDragSessionFlags: () => void
@@ -37,18 +37,32 @@ type T_projectHierarchyTreeDnDHandlerDeps = {
     get: () => string[] | null
     set: (value: string[] | null) => void
   }
+  dragSiblingOrderSnapshot: {
+    get: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
+    set: (
+      value: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
+    ) => void
+  }
+  captureDragModelValueRevisionAtDrop: () => void
+  captureDragSiblingOrderAtDragStart: (orderedDocumentIds: string[] | null) => void
+  incrementDragModelValueRevision: () => void
+  readDragSiblingOrderAtDragStart: () => string[] | null
+  readDragModelValueSettledForCommit: () => boolean
+  resetDragModelValueRevisionForDragStart: () => void
   isTreeDragActive: Ref<boolean>
   getTreeRef: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeInstance | null
   getTreeScrollHost: () => HTMLElement | null
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
   flushUiStatePersist: () => void
   loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
+  refreshNodeChildrenFromDatabase: (nodeId: string) => Promise<void>
   markNodeClosed: (nodeId: string, node: I_faProjectHierarchyTreeHeTreeNode) => void
   markNodeOpen: (nodeId: string) => void
-  moveDocumentInHierarchy: (input: {
-    documentId: string
-    targetParentDocumentId: string | null
-    targetSortOrder: number
+  reindexDocumentSiblingsInHierarchy: (input: {
+    movedDocumentId: string
+    orderedDocumentIds: string[]
+    parentDocumentId: string | null
+    placementId: string
   }) => Promise<unknown>
   nextTick: () => Promise<void>
   reapplyHeTreeOpenState: () => void
@@ -76,6 +90,14 @@ function onBeforeDragStartImpl (
   deps.documentRowDragHoldWiring.markDragStartedFromHold()
   deps.documentRowExpandClickGesture.markDragStartedForGesture()
   deps.draggedDocumentId.set(stat.data.documentId)
+  deps.resetDragModelValueRevisionForDragStart()
+  const dragStartOrder = resolveProjectHierarchyTreeDragSiblingOrderAtDragStart({
+    documentId: stat.data.documentId,
+    getTreeRef: deps.getTreeRef,
+    getTreeScrollHost: deps.getTreeScrollHost,
+    treeData: deps.treeData.value
+  })
+  deps.captureDragSiblingOrderAtDragStart(dragStartOrder.orderedDocumentIds)
   const liveExpandState = collectProjectHierarchyTreeLiveExpandStateFromDom(
     deps.getTreeScrollHost()
   )
@@ -87,6 +109,7 @@ function onBeforeDragStartImpl (
     liveExpandState.scrollHostPresent
   )
   deps.dragExpandedSnapshot.set([...snapshot])
+  deps.dragSiblingOrderSnapshot.set(null)
   deps.openNodeIds.value = new Set(snapshot)
   deps.queuePersistExpandedNodeIds(snapshot)
   deps.dragDropCommitted.value = false
@@ -96,27 +119,39 @@ function onBeforeDragStartImpl (
   deps.dragExpandPostCommitGuard.value = true
   deps.dragExpandUiFrozen.value = true
   applyFaVerticalDraggableTabsDocumentDragCursor()
-  window.addEventListener('pointerup', deps.dragCancelWiring.onWindowPointerUpDuringDrag)
-  window.addEventListener('keydown', deps.dragCancelWiring.onWindowKeydownDuringDrag)
+  deps.dragCancelWiring.attachDragCancelListeners()
 }
 
 function onTreeAfterDropImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void {
   deps.dragDropCommitted.value = true
+  deps.captureDragModelValueRevisionAtDrop()
+  syncProjectHierarchyTreeSiblingOrderAfterDrop({
+    dragStartOrderedDocumentIds: deps.readDragSiblingOrderAtDragStart(),
+    draggedDocumentId: deps.draggedDocumentId.get(),
+    getTreeRef: deps.getTreeRef,
+    getTreeScrollHost: deps.getTreeScrollHost,
+    setDragSiblingOrderSnapshot: deps.dragSiblingOrderSnapshot.set,
+    treeData: deps.treeData.value
+  })
   scheduleProjectHierarchyTreeDragCommit({
     clearDragSessionFlags: deps.clearDragSessionFlags,
     dragCommitPending: deps.dragCommitPending,
     dragCommitScheduled: deps.dragCommitScheduled,
     dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
-    dragExpandedSnapshot: deps.dragExpandedSnapshot.get,
     draggedDocumentId: deps.draggedDocumentId.get,
+    dragExpandedSnapshot: deps.dragExpandedSnapshot.get,
+    dragSiblingOrderAtDragStart: deps.readDragSiblingOrderAtDragStart,
+    readDragSiblingOrderSnapshot: deps.dragSiblingOrderSnapshot.get,
     flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
     flushUiStatePersist: deps.flushUiStatePersist,
     getTreeRef: deps.getTreeRef,
+    getTreeScrollHost: deps.getTreeScrollHost,
     loadChildrenForNode: deps.loadChildrenForNode,
+    refreshNodeChildrenFromDatabase: deps.refreshNodeChildrenFromDatabase,
     markNodeClosed: deps.markNodeClosed,
     markNodeOpen: deps.markNodeOpen,
-    moveDocumentInHierarchy: deps.moveDocumentInHierarchy,
+    reindexDocumentSiblingsInHierarchy: deps.reindexDocumentSiblingsInHierarchy,
     nextTick: deps.nextTick,
     reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,
     reapplyLatentDescendantExpandState: deps.reapplyLatentDescendantExpandState,
@@ -125,6 +160,7 @@ function onTreeAfterDropImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void 
     requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
     resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
     restoreExpandedSnapshot: deps.restoreExpandedSnapshot,
+    setDragSiblingOrderSnapshot: deps.dragSiblingOrderSnapshot.set,
     suppressTreeEmit: deps.suppressTreeEmit,
     treeData: deps.treeData
   })
@@ -142,6 +178,7 @@ function onTreeDragEndCleanupImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): 
     deps.dragCommitScheduled.value = false
     deps.draggedDocumentId.set(null)
     deps.dragExpandedSnapshot.set(null)
+    deps.dragSiblingOrderSnapshot.set(null)
   }
 }
 
@@ -149,19 +186,7 @@ function onTreeDataUpdateImpl (
   deps: T_projectHierarchyTreeDnDHandlerDeps,
   nextNodes: I_faProjectHierarchyTreeHeTreeNode[]
 ): void {
-  if (!shouldAcceptHeTreeModelValueUpdate({
-    dragCommitPending: deps.dragCommitPending.value,
-    isTreeDragActive: deps.isTreeDragActive.value,
-    suppressTreeEmit: deps.suppressTreeEmit.value
-  })) {
-    return
-  }
-  const escapedDocuments = findProjectHierarchyTreeDocumentsWithInvalidPlacementParent(nextNodes)
-  if (escapedDocuments.length > 0) {
-    return
-  }
-  deps.treeData.value = nextNodes
-  syncProjectHierarchyTreeDocumentHasChildrenFlags(deps.treeData.value)
+  applyProjectHierarchyTreeHeTreeModelValueUpdate(deps, nextNodes)
 }
 
 function onUnmountedCleanupImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void {

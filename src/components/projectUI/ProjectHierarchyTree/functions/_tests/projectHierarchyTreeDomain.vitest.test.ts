@@ -1,12 +1,25 @@
 /** @vitest-environment jsdom */
 import { expect, test } from 'vitest'
 
-import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
+import type {
+  I_faProjectHierarchyTreeDragSiblingOrderSnapshot,
+  I_faProjectHierarchyTreeHeTreeNode
+} from 'app/types/I_faProjectHierarchyTreeDomain'
 import {
-  mapHierarchyDocumentChildrenToTreeNodes,
   mapWorkspaceLayoutToHierarchyTreeSkeleton,
   patchHierarchyTreeSkeletonLabelsInPlace
 } from '../mapWorkspaceLayoutToHierarchyTreeSkeleton'
+import { mapHierarchyDocumentChildrenToTreeNodes } from '../mapHierarchyDocumentChildrenToTreeNodes'
+import { applyProjectHierarchyTreeSiblingOrderToTreeData } from '../../scripts/projectHierarchyTreeSiblingOrderPatchWiring'
+import { isProjectHierarchyTreeSameBucketSiblingReorder } from '../projectHierarchyTreeSameBucketSiblingReorder'
+import { createWaitForProjectHierarchyTreeDragCommitWindow } from '../waitForProjectHierarchyTreeDragCommitWindow'
+import { createWaitForProjectHierarchyTreeDragGetDataOrderStable } from '../../scripts/projectHierarchyTreeDragGetDataOrderStableWiring'
+import { areProjectHierarchyTreeOrderedDocumentIdsEqual } from '../projectHierarchyTreeOrderedDocumentIdsEqual'
+import { computeProjectHierarchyTreePostDropSiblingOrder } from '../computeProjectHierarchyTreePostDropSiblingOrder'
+import {
+  finalizeProjectHierarchyTreeDragSiblingOrderSnapshot,
+  resolveProjectHierarchyTreeDragSiblingOrderSnapshot
+} from '../../scripts/projectHierarchyTreeDragSiblingOrderSnapshotWiring'
 import { PROJECT_HIERARCHY_TREE_DOCUMENT_TEMPLATE_DEFAULT_ICON } from '../projectHierarchyTreeConstants'
 import { createResolveProjectHierarchyTreePlacementDisplayIcon } from '../projectHierarchyTreePlacementDisplayIcon'
 import {
@@ -1531,6 +1544,249 @@ test('Test that findProjectHierarchyTreeDocumentsWithInvalidPlacementParent acce
   expect(findProjectHierarchyTreeDocumentsWithInvalidPlacementParent([placementNode])).toEqual([])
 })
 
+test('Test that mapHierarchyDocumentChildrenToTreeNodes sorts rows by sortOrder', () => {
+  const nodes = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [
+      {
+        displayName: 'Test Document - Buildings 07',
+        hasChildren: false,
+        id: 'doc-7',
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        sortOrder: 6
+      },
+      {
+        displayName: 'Test Document - Buildings 01',
+        hasChildren: false,
+        id: 'doc-1',
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        sortOrder: 0
+      },
+      {
+        displayName: 'Test Document - Buildings 04',
+        hasChildren: false,
+        id: 'doc-4',
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        sortOrder: 3
+      }
+    ],
+    placementIcon: 'mdi-account',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  expect(nodes.map((node) => node.label)).toEqual([
+    'Test Document - Buildings 01',
+    'Test Document - Buildings 04',
+    'Test Document - Buildings 07'
+  ])
+})
+
+test('Test that waitForProjectHierarchyTreeDragCommitWindow polls until suppress clears', async () => {
+  let suppressTreeEmit = true
+  let tickCount = 0
+  const waitForDragCommitWindow = createWaitForProjectHierarchyTreeDragCommitWindow({
+    maxAttempts: 5,
+    nextTick: async () => {
+      tickCount += 1
+      if (tickCount >= 2) {
+        suppressTreeEmit = false
+      }
+    },
+    readSuppressTreeEmit: () => suppressTreeEmit
+  })
+  const result = await waitForDragCommitWindow()
+  expect(result.ready).toBe(true)
+  expect(result.attempts).toBe(2)
+})
+
+test('Test that waitForProjectHierarchyTreeDragCommitWindow returns not ready after max attempts', async () => {
+  const waitForDragCommitWindow = createWaitForProjectHierarchyTreeDragCommitWindow({
+    maxAttempts: 2,
+    nextTick: async () => undefined,
+    readSuppressTreeEmit: () => true
+  })
+  const result = await waitForDragCommitWindow()
+  expect(result.ready).toBe(false)
+  expect(result.attempts).toBe(2)
+})
+
+test('Test that waitForProjectHierarchyTreeDragCommitWindow returns immediately when ready', async () => {
+  const waitForDragCommitWindow = createWaitForProjectHierarchyTreeDragCommitWindow({
+    nextTick: async () => undefined,
+    readSuppressTreeEmit: () => false
+  })
+  const result = await waitForDragCommitWindow()
+  expect(result.ready).toBe(true)
+  expect(result.attempts).toBe(0)
+})
+
+test('Test that waitForProjectHierarchyTreeDragGetDataOrderStable polls until order is stable', async () => {
+  let tickCount = 0
+  const orders = [['doc-2', 'doc-1'], ['doc-1', 'doc-2'], ['doc-1', 'doc-2']]
+  const waitForGetDataOrderStable = createWaitForProjectHierarchyTreeDragGetDataOrderStable({
+    maxAttempts: 5,
+    nextTick: async () => {
+      tickCount += 1
+    },
+    readSiblingOrderFromGetData: () => orders.shift() ?? ['doc-1', 'doc-2']
+  })
+  const result = await waitForGetDataOrderStable()
+  expect(result.settled).toBe(true)
+  expect(result.orderedDocumentIds).toEqual(['doc-1', 'doc-2'])
+  expect(result.attempts).toBe(3)
+  expect(tickCount).toBe(2)
+})
+
+test('Test that waitForProjectHierarchyTreeDragGetDataOrderStable returns not settled after max attempts', async () => {
+  const waitForGetDataOrderStable = createWaitForProjectHierarchyTreeDragGetDataOrderStable({
+    maxAttempts: 2,
+    nextTick: async () => undefined,
+    readSiblingOrderFromGetData: () => null
+  })
+  const result = await waitForGetDataOrderStable()
+  expect(result.settled).toBe(false)
+  expect(result.attempts).toBe(2)
+  expect(result.orderedDocumentIds).toBeNull()
+})
+
+test('Test that areProjectHierarchyTreeOrderedDocumentIdsEqual compares sibling ids', () => {
+  expect(areProjectHierarchyTreeOrderedDocumentIdsEqual(['doc-1'], ['doc-1'])).toBe(true)
+  expect(areProjectHierarchyTreeOrderedDocumentIdsEqual(['doc-1', 'doc-2'], ['doc-2', 'doc-1'])).toBe(false)
+})
+
+test('Test that computeProjectHierarchyTreePostDropSiblingOrder applies he-tree same-parent index adjust', () => {
+  expect(computeProjectHierarchyTreePostDropSiblingOrder({
+    dragStartIndex: 0,
+    dragStartOrderedDocumentIds: ['doc-a', 'doc-b', 'doc-c', 'doc-d'],
+    movedDocumentId: 'doc-a',
+    sameParentReorder: true,
+    targetIndexBeforeDrop: 3
+  })).toEqual(['doc-b', 'doc-c', 'doc-a', 'doc-d'])
+  expect(computeProjectHierarchyTreePostDropSiblingOrder({
+    dragStartIndex: 3,
+    dragStartOrderedDocumentIds: ['doc-a', 'doc-b', 'doc-c', 'doc-d'],
+    movedDocumentId: 'doc-d',
+    sameParentReorder: true,
+    targetIndexBeforeDrop: 0
+  })).toEqual(['doc-d', 'doc-a', 'doc-b', 'doc-c'])
+})
+
+test('Test that mapProjectHierarchyTreeDocumentLabelsForOrderedIds resolves labels from tree nodes', async () => {
+  const { mapProjectHierarchyTreeDocumentLabelsForOrderedIds } = await import(
+    '../mapProjectHierarchyTreeDocumentLabelsForOrderedIds'
+  )
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const placement = tree[0]?.children[0]
+  expect(placement).toBeDefined()
+  if (placement !== undefined) {
+    placement.children = [
+      {
+        children: [],
+        childrenLoaded: true,
+        documentId: 'doc-1',
+        groupId: null,
+        hasChildren: false,
+        icon: '',
+        id: 'doc-1',
+        label: 'First',
+        nodeKind: 'document',
+        placementId: 'placement-1',
+        worldColor: '#000',
+        worldId: 'world-1'
+      },
+      {
+        children: [],
+        childrenLoaded: true,
+        documentId: 'doc-2',
+        groupId: null,
+        hasChildren: false,
+        icon: '',
+        id: 'doc-2',
+        label: 'Second',
+        nodeKind: 'document',
+        placementId: 'placement-1',
+        worldColor: '#000',
+        worldId: 'world-1'
+      }
+    ]
+    placement.childrenLoaded = true
+  }
+  expect(mapProjectHierarchyTreeDocumentLabelsForOrderedIds(tree, ['doc-2', 'doc-1'])).toEqual([
+    'Second',
+    'First'
+  ])
+})
+
+test('Test that waitForProjectHierarchyTreeDragModelSettle polls until model settled', async () => {
+  let tickCount = 0
+  let settled = false
+  const { createWaitForProjectHierarchyTreeDragModelSettle } = await import('../waitForProjectHierarchyTreeDragModelSettle')
+  const waitForModelSettle = createWaitForProjectHierarchyTreeDragModelSettle({
+    maxAttempts: 5,
+    nextTick: async () => {
+      tickCount += 1
+      if (tickCount >= 2) {
+        settled = true
+      }
+    },
+    readModelSettled: () => settled
+  })
+  const result = await waitForModelSettle()
+  expect(result.settled).toBe(true)
+  expect(result.attempts).toBe(3)
+  expect(tickCount).toBe(2)
+})
+
+test('Test that waitForProjectHierarchyTreeDragModelSettle returns not settled after max attempts', async () => {
+  const { createWaitForProjectHierarchyTreeDragModelSettle } = await import('../waitForProjectHierarchyTreeDragModelSettle')
+  const waitForModelSettle = createWaitForProjectHierarchyTreeDragModelSettle({
+    maxAttempts: 2,
+    nextTick: async () => undefined,
+    readModelSettled: () => false
+  })
+  const result = await waitForModelSettle()
+  expect(result.settled).toBe(false)
+  expect(result.attempts).toBe(2)
+})
+
+test('Test that resolveProjectHierarchyTreeDragSiblingOrderSnapshot reads sibling ids in tree order', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const children = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [
+      {
+        displayName: 'Doc 2',
+        hasChildren: false,
+        id: 'doc-2',
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        sortOrder: 1
+      },
+      {
+        displayName: 'Doc 1',
+        hasChildren: false,
+        id: 'doc-1',
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        sortOrder: 0
+      }
+    ],
+    placementIcon: 'mdi-account',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  mergeLoadedChildrenIntoNode(tree, 'placement-1', children)
+  const placement = findProjectHierarchyTreeNodeById(tree, 'placement-1')!
+  placement.children = [placement.children[1]!, placement.children[0]!]
+  const snapshot = resolveProjectHierarchyTreeDragSiblingOrderSnapshot(tree, 'doc-1')
+  expect(snapshot).toEqual({
+    orderedDocumentIds: ['doc-2', 'doc-1'],
+    parentDocumentId: null,
+    placementId: 'placement-1'
+  })
+})
+
 test('Test that clampProjectHierarchyTreeScrollTopToLastDomRow removes viewport gap below last row', () => {
   const scrollContainer = document.createElement('div')
   scrollContainer.className = 'projectHierarchyTree'
@@ -1839,4 +2095,161 @@ test('Test that clampProjectHierarchyTreeScrollTopToLastDomRow skips when no gap
   const result = clampProjectHierarchyTreeScrollTopToLastDomRow(scrollContainer)
   expect(result.adjusted).toBe(false)
   expect(result.nextScrollTopPx).toBe(12)
+})
+
+test('Test that applyProjectHierarchyTreeSiblingOrderToTreeData reorders loaded siblings in place', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const children = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [
+      {
+        displayName: 'Doc 1',
+        hasChildren: false,
+        id: 'doc-1',
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        sortOrder: 0
+      },
+      {
+        displayName: 'Doc 2',
+        hasChildren: false,
+        id: 'doc-2',
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        sortOrder: 1
+      }
+    ],
+    placementIcon: 'mdi-account',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  mergeLoadedChildrenIntoNode(tree, 'placement-1', children)
+  const patched = applyProjectHierarchyTreeSiblingOrderToTreeData(tree, 'doc-2', ['doc-2', 'doc-1'])
+  expect(patched).toBe(true)
+  const placement = findProjectHierarchyTreeNodeById(tree, 'placement-1')
+  expect(placement?.children.map((row) => row.id)).toEqual(['doc-2', 'doc-1'])
+})
+
+test('Test that isProjectHierarchyTreeSameBucketSiblingReorder matches snapshot parent', () => {
+  expect(isProjectHierarchyTreeSameBucketSiblingReorder({
+    snapshot: {
+      orderedDocumentIds: ['doc-1'],
+      parentDocumentId: null,
+      placementId: 'placement-1'
+    },
+    treeParentDocumentId: null
+  })).toBe(true)
+  expect(isProjectHierarchyTreeSameBucketSiblingReorder({
+    snapshot: {
+      orderedDocumentIds: ['doc-1'],
+      parentDocumentId: 'doc-parent',
+      placementId: 'placement-1'
+    },
+    treeParentDocumentId: null
+  })).toBe(false)
+})
+
+test('Test that areProjectHierarchyTreeOrderedDocumentIdsEqual compares sibling id lists', () => {
+  expect(areProjectHierarchyTreeOrderedDocumentIdsEqual(['doc-a', 'doc-b'], ['doc-a', 'doc-b'])).toBe(true)
+  expect(areProjectHierarchyTreeOrderedDocumentIdsEqual(['doc-a'], ['doc-a', 'doc-b'])).toBe(false)
+  expect(areProjectHierarchyTreeOrderedDocumentIdsEqual(['doc-b', 'doc-a'], ['doc-a', 'doc-b'])).toBe(false)
+})
+
+test('Test that mapProjectHierarchyTreeDocumentLabelsForOrderedIds maps labels and falls back to ids', async () => {
+  const { mapProjectHierarchyTreeDocumentLabelsForOrderedIds } = await import('../mapProjectHierarchyTreeDocumentLabelsForOrderedIds')
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  expect(mapProjectHierarchyTreeDocumentLabelsForOrderedIds(tree, null)).toBeNull()
+  const children = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [{
+      displayName: 'Doc Alpha',
+      hasChildren: false,
+      id: 'doc-alpha',
+      parentDocumentId: null,
+      placementId: 'placement-1',
+      sortOrder: 0
+    }],
+    placementIcon: 'mdi-account',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  mergeLoadedChildrenIntoNode(tree, 'placement-1', children)
+  expect(mapProjectHierarchyTreeDocumentLabelsForOrderedIds(tree, ['doc-alpha', 'doc-missing'])).toEqual([
+    'Doc Alpha',
+    'doc-missing'
+  ])
+})
+
+test('Test that finalizeProjectHierarchyTreeDragSiblingOrderSnapshot clears null document id', () => {
+  let snapshot: I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null = {
+    orderedDocumentIds: ['doc-a'],
+    parentDocumentId: null,
+    placementId: 'placement-1'
+  }
+  expect(finalizeProjectHierarchyTreeDragSiblingOrderSnapshot({
+    documentId: null,
+    setDragSiblingOrderSnapshot: (value) => {
+      snapshot = value
+    },
+    treeNodes: []
+  })).toBeNull()
+  expect(snapshot).toBeNull()
+})
+
+test('Test that createWaitForProjectHierarchyTreeDragCommitWindow waits for suppress clear', async () => {
+  let suppress = true
+  const waitForCommitWindow = createWaitForProjectHierarchyTreeDragCommitWindow({
+    maxAttempts: 3,
+    nextTick: async () => {
+      suppress = false
+    },
+    readSuppressTreeEmit: () => suppress
+  })
+  const ready = await waitForCommitWindow()
+  expect(ready.ready).toBe(true)
+  const waitForTimeout = createWaitForProjectHierarchyTreeDragCommitWindow({
+    maxAttempts: 2,
+    nextTick: async () => undefined,
+    readSuppressTreeEmit: () => true
+  })
+  const timedOut = await waitForTimeout()
+  expect(timedOut.ready).toBe(false)
+  expect(timedOut.attempts).toBe(2)
+})
+
+test('Test that createWaitForProjectHierarchyTreeDragModelSettle resolves when model settles', async () => {
+  const { createWaitForProjectHierarchyTreeDragModelSettle } = await import('../waitForProjectHierarchyTreeDragModelSettle')
+  let settled = false
+  const waitForModelSettle = createWaitForProjectHierarchyTreeDragModelSettle({
+    maxAttempts: 3,
+    nextTick: async () => {
+      settled = true
+    },
+    readModelSettled: () => settled
+  })
+  const result = await waitForModelSettle()
+  expect(result.settled).toBe(true)
+})
+
+test('Test that createProjectHierarchyTreeDragSessionState tracks drag session bindings', async () => {
+  const { ref } = await import('vue')
+  const { createProjectHierarchyTreeDragSessionState } = await import('../../scripts/projectHierarchyTreeDragSessionStateWiring')
+  const session = createProjectHierarchyTreeDragSessionState({
+    dragCommitPending: ref(false),
+    dragCommitScheduled: ref(false),
+    dragDropCommitted: ref(false),
+    isTreeDragActive: ref(true)
+  })
+  session.captureDragSiblingOrderAtDragStart(['doc-a', 'doc-b'])
+  expect(session.readDragSiblingOrderAtDragStart()).toEqual(['doc-a', 'doc-b'])
+  session.captureDragSiblingOrderAtDragStart(null)
+  expect(session.readDragSiblingOrderAtDragStart()).toBeNull()
+  session.draggedDocumentId.set('doc-a')
+  expect(session.draggedDocumentId.get()).toBe('doc-a')
+  session.dragSiblingOrderSnapshot.set({
+    orderedDocumentIds: ['doc-a'],
+    parentDocumentId: null,
+    placementId: 'placement-1'
+  })
+  expect(session.dragSiblingOrderSnapshot.get()?.placementId).toBe('placement-1')
+  session.clearDragSessionFlags()
+  expect(session.draggedDocumentId.get()).toBeNull()
 })

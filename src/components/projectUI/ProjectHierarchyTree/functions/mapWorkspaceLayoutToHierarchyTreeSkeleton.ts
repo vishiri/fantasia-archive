@@ -1,5 +1,4 @@
 import type {
-  I_faProjectHierarchyTreeDocumentChild,
   I_faProjectHierarchyTreeHeTreeNode,
   I_faProjectHierarchyTreeWorkspaceGroup,
   I_faProjectHierarchyTreeWorkspacePlacement,
@@ -236,34 +235,4 @@ export function patchHierarchyTreeSkeletonLabelsInPlace (
       patchPlacementNodeInPlace(child, placement)
     }
   }
-}
-
-/**
- * Maps lazy-loaded document child rows into he-tree document nodes.
- */
-export function mapHierarchyDocumentChildrenToTreeNodes (input: {
-  items: I_faProjectHierarchyTreeDocumentChild[]
-  placementIcon: string
-  worldColor: string
-  worldId: string
-}): I_faProjectHierarchyTreeHeTreeNode[] {
-  const placementIcon = resolvePlacementDisplayIcon(input.placementIcon)
-  return input.items.map((item) => {
-    const node: I_faProjectHierarchyTreeHeTreeNode = {
-      children: [],
-      childrenLoaded: false,
-      documentId: item.id,
-      groupId: null,
-      hasChildren: item.hasChildren,
-      icon: placementIcon,
-      id: item.id,
-      label: item.displayName,
-      nodeKind: 'document',
-      placementId: item.placementId,
-      worldColor: input.worldColor,
-      worldId: input.worldId
-    }
-    node.children = resolveLazyChildren(node)
-    return node
-  })
 }

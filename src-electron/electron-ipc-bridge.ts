@@ -135,6 +135,8 @@ export const FA_PROJECT_CONTENT_IPC = {
   listWorkspaceHierarchyLayoutAsync: 'fa-project-content-list-workspace-hierarchy-layout-async',
   listPlacementDocumentChildrenAsync: 'fa-project-content-list-placement-document-children-async',
   moveDocumentInHierarchyAsync: 'fa-project-content-move-document-in-hierarchy-async',
+  reindexDocumentSiblingsInHierarchyAsync:
+    'fa-project-content-reindex-document-siblings-in-hierarchy-async',
   searchProjectHierarchyAsync: 'fa-project-content-search-project-hierarchy-async'
 } as const
 

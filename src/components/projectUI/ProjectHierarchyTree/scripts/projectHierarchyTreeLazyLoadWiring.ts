@@ -1,17 +1,13 @@
 import type { Ref } from 'vue'
 
-import type {
-  I_faProjectHierarchyTreeHeTreeNode,
-  I_faProjectHierarchyTreeListPlacementChildrenInput
-} from 'app/types/I_faProjectHierarchyTreeDomain'
+import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { mapHierarchyDocumentChildrenToTreeNodes } from '../functions/mapWorkspaceLayoutToHierarchyTreeSkeleton'
-import { mergeLoadedChildrenIntoNode } from '../functions/projectHierarchyTreeMergeLoadedChildren'
+import { loadProjectHierarchyTreeNodeChildren, refreshProjectHierarchyTreeNodeChildrenFromDatabase } from './projectHierarchyTreeLazyLoadChildrenWiring'
 import { publishProjectHierarchyTreeLazyLoadRevision } from './projectHierarchyTreeLazyLoadPublishWiring'
 
 export function createProjectHierarchyTreeLazyLoadWiring (deps: {
   listPlacementDocumentChildren: (
-    input: I_faProjectHierarchyTreeListPlacementChildrenInput
+    input: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeListPlacementChildrenInput
   ) => Promise<{ items: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDocumentChild[] }>
   nextTick: () => Promise<void>
   onAfterTreeRevisionPublished: () => void | Promise<void>
@@ -51,43 +47,12 @@ export function createProjectHierarchyTreeLazyLoadWiring (deps: {
   async function loadChildrenForNode (
     node: I_faProjectHierarchyTreeHeTreeNode
   ): Promise<void> {
-    if (!node.hasChildren || node.childrenLoaded) {
-      return
-    }
-    if (node.nodeKind === 'templatePlacement' && node.placementId !== null) {
-      const result = await deps.listPlacementDocumentChildren({
-        placementId: node.placementId
-      })
-      const children = mapHierarchyDocumentChildrenToTreeNodes({
-        items: result.items,
-        placementIcon: node.icon,
-        worldColor: node.worldColor,
-        worldId: node.worldId
-      })
-      if (mergeLoadedChildrenIntoNode(deps.treeData.value, node.id, children)) {
-        await publishTreeRevision(node.nodeKind, node.id)
-      }
-      return
-    }
-    if (
-      node.nodeKind === 'document' &&
-      node.placementId !== null &&
-      node.documentId !== null
-    ) {
-      const result = await deps.listPlacementDocumentChildren({
-        parentDocumentId: node.documentId,
-        placementId: node.placementId
-      })
-      const children = mapHierarchyDocumentChildrenToTreeNodes({
-        items: result.items,
-        placementIcon: node.icon,
-        worldColor: node.worldColor,
-        worldId: node.worldId
-      })
-      if (mergeLoadedChildrenIntoNode(deps.treeData.value, node.id, children)) {
-        await publishTreeRevision(node.nodeKind, node.id)
-      }
-    }
+    await loadProjectHierarchyTreeNodeChildren({
+      listPlacementDocumentChildren: deps.listPlacementDocumentChildren,
+      node,
+      publishTreeRevision,
+      treeData: deps.treeData
+    })
   }
 
   async function loadChildrenAlongRevealPath (nodeIds: string[]): Promise<void> {
@@ -103,7 +68,15 @@ export function createProjectHierarchyTreeLazyLoadWiring (deps: {
   return {
     flushDeferredTreeRevisionPublish,
     loadChildrenAlongRevealPath,
-    loadChildrenForNode
+    loadChildrenForNode,
+    refreshNodeChildrenFromDatabase: (
+      nodeId: string
+    ) => refreshProjectHierarchyTreeNodeChildrenFromDatabase({
+      listPlacementDocumentChildren: deps.listPlacementDocumentChildren,
+      nodeId,
+      publishTreeRevision,
+      treeData: deps.treeData
+    })
   }
 }
 

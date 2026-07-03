@@ -31,6 +31,16 @@ test('Test that document row click outside tolerance is rejected', () => {
   expect(withinTolerance).toBe(false)
 })
 
+test('Test that document row click tolerance rejects null pointer sample', () => {
+  const withinTolerance = isProjectHierarchyTreeDocumentRowClickWithinDragTolerance({
+    clickClientX: 10,
+    clickClientY: 10,
+    pointerDownSample: null,
+    tolerancePx: 8
+  })
+  expect(withinTolerance).toBe(false)
+})
+
 test('Test that document row click toggle is blocked while drag is active', () => {
   const shouldToggle = shouldProjectHierarchyTreeDocumentRowClickToggleExpand({
     clickClientX: 10,

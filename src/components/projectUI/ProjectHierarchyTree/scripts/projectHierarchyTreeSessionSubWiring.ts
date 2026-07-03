@@ -90,6 +90,7 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: {
     hierarchyStore: deps.hierarchyStore,
     isTreeDragActive: deps.isTreeDragActive,
     loadChildrenForNode: lazyLoadWiring.loadChildrenForNode,
+    refreshNodeChildrenFromDatabase: lazyLoadWiring.refreshNodeChildrenFromDatabase,
     markNodeClosed: uiStateWiring.markNodeClosed,
     markNodeOpen: uiStateWiring.markNodeOpen,
     nextTick: deps.nextTick,

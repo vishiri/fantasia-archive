@@ -8,6 +8,7 @@ import { dropUndefinedRecordValues } from 'app/src-electron/shared/faExactOption
 import type {
   I_faProjectHierarchyTreeListPlacementChildrenInput,
   I_faProjectHierarchyTreeMoveDocumentInput,
+  I_faProjectHierarchyTreeReindexDocumentSiblingsInput,
   I_faProjectHierarchyTreeSearchInput
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
@@ -25,6 +26,13 @@ export const faProjectHierarchyTreeMoveDocumentInputSchema = z.object({
   documentId: faProjectContentIdSchema,
   targetParentDocumentId: nullableParentDocumentIdSchema,
   targetSortOrder: z.number().int().min(0)
+}).strict()
+
+export const faProjectHierarchyTreeReindexDocumentSiblingsInputSchema = z.object({
+  movedDocumentId: faProjectContentIdSchema,
+  orderedDocumentIds: z.array(faProjectContentIdSchema).min(1),
+  parentDocumentId: nullableParentDocumentIdSchema,
+  placementId: faProjectContentIdSchema
 }).strict()
 
 export const faProjectHierarchyTreeSearchInputSchema = z.object({
@@ -46,6 +54,14 @@ export function parseFaProjectHierarchyTreeMoveDocumentInput (
   return faProjectHierarchyTreeMoveDocumentInputSchema.parse(
     parseFaProjectContentPlainRecord(payload)
   ) as I_faProjectHierarchyTreeMoveDocumentInput
+}
+
+export function parseFaProjectHierarchyTreeReindexDocumentSiblingsInput (
+  payload: unknown
+): I_faProjectHierarchyTreeReindexDocumentSiblingsInput {
+  return faProjectHierarchyTreeReindexDocumentSiblingsInputSchema.parse(
+    parseFaProjectContentPlainRecord(payload)
+  ) as I_faProjectHierarchyTreeReindexDocumentSiblingsInput
 }
 
 export function parseFaProjectHierarchyTreeSearchInput (

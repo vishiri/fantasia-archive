@@ -8,3 +8,5 @@ export {
   moveFaProjectDocumentInHierarchy,
   searchFaProjectHierarchy
 } from './faProjectHierarchyTreeDocumentsWiring'
+
+export { reindexFaProjectHierarchyDocumentSiblings } from './faProjectHierarchyTreeDocumentSiblingReindexWiring'

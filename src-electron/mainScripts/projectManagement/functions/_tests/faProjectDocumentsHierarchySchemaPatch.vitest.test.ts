@@ -117,6 +117,62 @@ test('Test that applyFaProjectDocumentsHierarchySchemaPatch backfills placement_
 })
 
 /**
+ * applyFaProjectDocumentsHierarchySchemaPatch
+ * Re-open idempotent pass must not rewrite persisted sibling sort_order values.
+ */
+test('Test that applyFaProjectDocumentsHierarchySchemaPatch preserves existing sort_order on re-apply', () => {
+  db = new Database(':memory:')
+  applyFaProjectContentSchemaV1(db)
+  const now = Date.now()
+  db.prepare(
+    `INSERT INTO ${FA_PROJECT_TABLE_WORLDS} ` +
+      '(id, display_name, created_at_ms, updated_at_ms) VALUES (?, ?, ?, ?)'
+  ).run('world-1', 'Realm', now, now)
+  db.prepare(
+    `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES} ` +
+      '(id, display_name, created_at_ms, updated_at_ms) VALUES (?, ?, ?, ?)'
+  ).run('tpl-1', 'Building', now, now)
+  db.prepare(
+    `INSERT INTO ${FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS} ` +
+      '(id, world_id, document_template_id, root_sort_order, created_at_ms, updated_at_ms) ' +
+      'VALUES (?, ?, ?, ?, ?, ?)'
+  ).run('place-1', 'world-1', 'tpl-1', 0, now, now)
+  db.prepare(
+    `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENTS} ` +
+      '(id, world_id, template_id, placement_id, parent_document_id, sort_order, display_name, created_at_ms, updated_at_ms) ' +
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+  ).run('doc-a', 'world-1', 'tpl-1', 'place-1', null, 2, 'Building 03', now + 3, now + 3)
+  db.prepare(
+    `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENTS} ` +
+      '(id, world_id, template_id, placement_id, parent_document_id, sort_order, display_name, created_at_ms, updated_at_ms) ' +
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+  ).run('doc-b', 'world-1', 'tpl-1', 'place-1', null, 0, 'Building 01', now + 1, now + 1)
+  db.prepare(
+    `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENTS} ` +
+      '(id, world_id, template_id, placement_id, parent_document_id, sort_order, display_name, created_at_ms, updated_at_ms) ' +
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+  ).run('doc-c', 'world-1', 'tpl-1', 'place-1', null, 1, 'Building 02', now + 2, now + 2)
+
+  const applyFaProjectDocumentsHierarchySchemaPatch =
+    createApplyFaProjectDocumentsHierarchySchemaPatch({
+      documentsTableName: FA_PROJECT_TABLE_DOCUMENTS,
+      placementsTableName: FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
+    })
+
+  applyFaProjectDocumentsHierarchySchemaPatch(db)
+  applyFaProjectDocumentsHierarchySchemaPatch(db)
+
+  const rows = db
+    .prepare(
+      `SELECT id, sort_order FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
+        'WHERE placement_id = ? ORDER BY sort_order ASC'
+    )
+    .all('place-1') as Array<{ id: string, sort_order: number }>
+  expect(rows.map((row) => row.id)).toEqual(['doc-b', 'doc-c', 'doc-a'])
+  expect(rows.map((row) => row.sort_order)).toEqual([0, 1, 2])
+})
+
+/**
  * applyFaProjectContentSchemaV1
  * Fresh bootstrap includes hierarchy columns on documents.
  */

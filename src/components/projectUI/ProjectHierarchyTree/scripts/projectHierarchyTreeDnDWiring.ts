@@ -25,12 +25,14 @@ export function createProjectHierarchyTreeDnDWiring (deps: {
   getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
   getTreeScrollHost: () => HTMLElement | null
   loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
+  refreshNodeChildrenFromDatabase: (nodeId: string) => Promise<void>
   markNodeClosed: (nodeId: string, node: I_faProjectHierarchyTreeHeTreeNode) => void
   markNodeOpen: (nodeId: string) => void
-  moveDocumentInHierarchy: (input: {
-    documentId: string
-    targetParentDocumentId: string | null
-    targetSortOrder: number
+  reindexDocumentSiblingsInHierarchy: (input: {
+    movedDocumentId: string
+    orderedDocumentIds: string[]
+    parentDocumentId: string | null
+    placementId: string
   }) => Promise<unknown>
   nextTick: () => Promise<void>
   reapplyHeTreeOpenState: () => void
@@ -53,11 +55,6 @@ export function createProjectHierarchyTreeDnDWiring (deps: {
     isTreeDragActive: deps.isTreeDragActive
   })
 
-  function removeDragCancelListeners (): void {
-    window.removeEventListener('pointerup', dragCancelWiring.onWindowPointerUpDuringDrag)
-    window.removeEventListener('keydown', dragCancelWiring.onWindowKeydownDuringDrag)
-  }
-
   const dragCancelWiring = createProjectHierarchyTreeDragCancelWiring({
     clearDragSessionFlags: dragSessionState.clearDragSessionFlags,
     dragCommitPending: deps.dragCommitPending,
@@ -66,10 +63,10 @@ export function createProjectHierarchyTreeDnDWiring (deps: {
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     dragExpandedSnapshot: dragSessionState.dragExpandedSnapshot.get,
     nextTick: deps.nextTick,
-    removeDragCancelListeners,
     resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
     restoreExpandedSnapshot: deps.restoreExpandedSnapshot
   })
+  const removeDragCancelListeners = dragCancelWiring.removeDragCancelListeners
 
   return createProjectHierarchyTreeDnDHandlers({
     clearDragSessionFlags: dragSessionState.clearDragSessionFlags,
@@ -83,15 +80,23 @@ export function createProjectHierarchyTreeDnDWiring (deps: {
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     draggedDocumentId: dragSessionState.draggedDocumentId,
     dragExpandedSnapshot: dragSessionState.dragExpandedSnapshot,
+    dragSiblingOrderSnapshot: dragSessionState.dragSiblingOrderSnapshot,
+    captureDragModelValueRevisionAtDrop: dragSessionState.captureDragModelValueRevisionAtDrop,
+    captureDragSiblingOrderAtDragStart: dragSessionState.captureDragSiblingOrderAtDragStart,
+    incrementDragModelValueRevision: dragSessionState.incrementDragModelValueRevision,
+    readDragSiblingOrderAtDragStart: dragSessionState.readDragSiblingOrderAtDragStart,
+    readDragModelValueSettledForCommit: dragSessionState.readDragModelValueSettledForCommit,
+    resetDragModelValueRevisionForDragStart: dragSessionState.resetDragModelValueRevisionForDragStart,
     flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
     flushUiStatePersist: deps.flushUiStatePersist,
     getTreeRef: deps.getTreeRef,
     getTreeScrollHost: deps.getTreeScrollHost,
     isTreeDragActive: deps.isTreeDragActive,
     loadChildrenForNode: deps.loadChildrenForNode,
+    refreshNodeChildrenFromDatabase: deps.refreshNodeChildrenFromDatabase,
     markNodeClosed: deps.markNodeClosed,
     markNodeOpen: deps.markNodeOpen,
-    moveDocumentInHierarchy: deps.moveDocumentInHierarchy,
+    reindexDocumentSiblingsInHierarchy: deps.reindexDocumentSiblingsInHierarchy,
     nextTick: deps.nextTick,
     reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,
     reapplyLatentDescendantExpandState: deps.reapplyLatentDescendantExpandState,

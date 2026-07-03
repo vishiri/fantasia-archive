@@ -82,6 +82,14 @@ export function createFaProjectContentBridgeHarnessStub (): I_faProjectContentAP
     listWorldsForProjectSettings: async () => ({ items: [stubWorldForSettings()] }),
     listWorkspaceHierarchyLayout: async () => ({ worlds: [] }),
     listPlacementDocumentChildren: emptyList,
+    reindexDocumentSiblingsInHierarchy: async () => ({
+      id: '550e8400-e29b-41d4-a716-446655440000',
+      displayName: 'Stub',
+      placementId: 'placement-stub',
+      parentDocumentId: null,
+      sortOrder: 0,
+      hasChildren: false
+    }),
     moveDocumentInHierarchy: async () => ({
       id: '550e8400-e29b-41d4-a716-446655440000',
       displayName: 'Stub',

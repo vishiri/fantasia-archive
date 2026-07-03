@@ -3,17 +3,23 @@ import type { Ref } from 'vue'
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import {
-  shouldRunDragLayoutCommit,
   shouldScheduleDragLayoutCommit
 } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldTemplateLayoutTreeCommitPolicy'
 import { clearFaVerticalDraggableTabsDocumentDragCursor } from 'app/src/scripts/faDragDrop/faDragDrop_manager'
-import { syncProjectHierarchyTreeDocumentHasChildrenFlags } from '../functions/projectHierarchyTreeDocumentHasChildrenSync'
-import { PROJECT_HIERARCHY_TREE_DRAG_EXPAND_SNAPSHOT_RESTORE_OPTIONS } from '../functions/projectHierarchyTreeConstants'
+import { createWaitForProjectHierarchyTreeDragGetDataOrderStable } from './projectHierarchyTreeDragGetDataOrderStableWiring'
+import { applyProjectHierarchyTreeDragCommitSiblingOrderPatch } from './projectHierarchyTreeSiblingOrderPatchWiring'
+import {
+  PROJECT_HIERARCHY_TREE_DRAG_COMMIT_SUPPRESS_WAIT_MAX_ATTEMPTS,
+  PROJECT_HIERARCHY_TREE_DRAG_MODEL_SETTLE_MAX_ATTEMPTS
+} from '../functions/projectHierarchyTreeConstants'
+import { createWaitForProjectHierarchyTreeDragCommitWindow } from '../functions/waitForProjectHierarchyTreeDragCommitWindow'
+import { finalizeProjectHierarchyTreeDragCommitAfterPersist } from './projectHierarchyTreeDnDCommitAfterPersistWiring'
 import { commitProjectHierarchyTreeDraggedDocumentMove } from './projectHierarchyTreeDnDCommitWiring'
-import { openProjectHierarchyTreeNestParentAfterDragDrop } from './projectHierarchyTreeNestParentOpenWiring'
-import { remountProjectHierarchyTreeAndRestoreExpandedSnapshot } from './projectHierarchyTreeMountRemountWiring'
-import { finalizeProjectHierarchyTreeDragCommitExpandState } from './projectHierarchyTreeDnDCommitFinalizeWiring'
-import { findProjectHierarchyTreeNodeById } from '../functions/projectHierarchyTreeExpandState'
+import {
+  prepareProjectHierarchyTreeDragCommitOrderSnapshot,
+  readProjectHierarchyTreeDragSiblingOrderFromGetData
+} from './projectHierarchyTreeDragCommitOrderCaptureWiring'
+import { areProjectHierarchyTreeOrderedDocumentIdsEqual } from '../functions/projectHierarchyTreeOrderedDocumentIdsEqual'
 
 type T_projectHierarchyTreeDragCommitScheduleDeps = {
   clearDragSessionFlags: () => void
@@ -22,17 +28,22 @@ type T_projectHierarchyTreeDragCommitScheduleDeps = {
   dragExpandPostCommitGuard: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
   dragExpandedSnapshot: () => string[] | null
+  dragSiblingOrderAtDragStart: () => string[] | null
+  readDragSiblingOrderSnapshot: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
   draggedDocumentId: () => string | null
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
   flushUiStatePersist: () => void
   getTreeRef: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeInstance | null
+  getTreeScrollHost: () => HTMLElement | null
   loadChildrenForNode: (node: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
+  refreshNodeChildrenFromDatabase: (nodeId: string) => Promise<void>
   markNodeClosed: (nodeId: string, node: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeNode) => void
   markNodeOpen: (nodeId: string) => void
-  moveDocumentInHierarchy: (input: {
-    documentId: string
-    targetParentDocumentId: string | null
-    targetSortOrder: number
+  reindexDocumentSiblingsInHierarchy: (input: {
+    movedDocumentId: string
+    orderedDocumentIds: string[]
+    parentDocumentId: string | null
+    placementId: string
   }) => Promise<unknown>
   nextTick: () => Promise<void>
   reapplyHeTreeOpenState: () => void
@@ -45,76 +56,135 @@ type T_projectHierarchyTreeDragCommitScheduleDeps = {
     expandedNodeIds: string[],
     restoreOptions?: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
   ) => Promise<void>
+  setDragSiblingOrderSnapshot: (
+    value: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
+  ) => void
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
+}
+
+async function runProjectHierarchyTreeDragCommitPersistPhase (deps: {
+  dragSiblingOrderSnapshot: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
+  draggedDocumentId: string | null
+  getDataSettle: { attempts: number, settled: boolean }
+  refreshNodeChildrenFromDatabase: (nodeId: string) => Promise<void>
+  suppressWait: { attempts: number, ready: boolean }
+  suppressTreeEmit: boolean
+  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
+} & Pick<T_projectHierarchyTreeDragCommitScheduleDeps,
+  'reindexDocumentSiblingsInHierarchy' | 'refreshLayout' | 'resyncTreeDataFromLayout'
+>): Promise<import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragCommitResult> {
+  const commitResult = await commitProjectHierarchyTreeDraggedDocumentMove({
+    documentId: deps.draggedDocumentId,
+    dragCommitSuppressWaitAttempts: deps.suppressWait.attempts,
+    dragCommitSuppressWaitReady: deps.suppressWait.ready,
+    dragSiblingOrderSnapshot: deps.dragSiblingOrderSnapshot,
+    modelSettleAttempts: deps.getDataSettle.attempts,
+    modelSettleReady: deps.getDataSettle.settled,
+    reindexDocumentSiblingsInHierarchy: deps.reindexDocumentSiblingsInHierarchy,
+    refreshLayout: deps.refreshLayout,
+    resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
+    suppressTreeEmit: deps.suppressTreeEmit,
+    treeData: deps.treeData.value
+  })
+  if (
+    commitResult.committed &&
+    commitResult.reloadChildrenNodeId !== null
+  ) {
+    await deps.refreshNodeChildrenFromDatabase(commitResult.reloadChildrenNodeId)
+  }
+  applyProjectHierarchyTreeDragCommitSiblingOrderPatch({
+    committed: commitResult.committed,
+    draggedDocumentId: deps.draggedDocumentId,
+    dragSiblingOrderSnapshot: deps.dragSiblingOrderSnapshot,
+    treeData: deps.treeData.value
+  })
+  return commitResult
 }
 
 async function finishProjectHierarchyTreeDragCommit (
   deps: T_projectHierarchyTreeDragCommitScheduleDeps
 ): Promise<void> {
-  deps.dragCommitPending.value = false
   deps.dragCommitScheduled.value = false
   deps.removeDragCancelListeners()
   clearFaVerticalDraggableTabsDocumentDragCursor()
-  if (!shouldRunDragLayoutCommit({
-    suppressTreeEmit: deps.suppressTreeEmit.value
-  })) {
-    deps.dragExpandUiFrozen.value = false
-    return
-  }
+  const waitForDragCommitWindow = createWaitForProjectHierarchyTreeDragCommitWindow({
+    maxAttempts: PROJECT_HIERARCHY_TREE_DRAG_COMMIT_SUPPRESS_WAIT_MAX_ATTEMPTS,
+    nextTick: deps.nextTick,
+    readSuppressTreeEmit: () => deps.suppressTreeEmit.value
+  })
+  const suppressWait = await waitForDragCommitWindow()
+  const draggedDocumentId = deps.draggedDocumentId()
+  const waitForGetDataOrderStable = createWaitForProjectHierarchyTreeDragGetDataOrderStable({
+    maxAttempts: PROJECT_HIERARCHY_TREE_DRAG_MODEL_SETTLE_MAX_ATTEMPTS,
+    nextTick: deps.nextTick,
+    readSiblingOrderFromGetData: () => readProjectHierarchyTreeDragSiblingOrderFromGetData({
+      documentId: draggedDocumentId,
+      getTreeRef: deps.getTreeRef
+    })
+  })
+  const getDataSettle = await waitForGetDataOrderStable()
   const expandedSnapshot = deps.dragExpandedSnapshot() ?? []
   const expandedSnapshotSet = new Set(expandedSnapshot)
-  const commitResult = await commitProjectHierarchyTreeDraggedDocumentMove({
-    documentId: deps.draggedDocumentId(),
-    moveDocumentInHierarchy: deps.moveDocumentInHierarchy,
-    refreshLayout: deps.refreshLayout,
-    resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
+  const dragSiblingOrderSnapshot = prepareProjectHierarchyTreeDragCommitOrderSnapshot({
+    dragSiblingOrderAtDragStart: deps.dragSiblingOrderAtDragStart(),
+    draggedDocumentId,
+    existingDragSiblingOrderSnapshot: deps.readDragSiblingOrderSnapshot(),
+    getDataOrderReady: getDataSettle.settled,
+    getDataSettleAttempts: getDataSettle.attempts,
+    getTreeRef: deps.getTreeRef,
+    getTreeScrollHost: deps.getTreeScrollHost,
+    setDragSiblingOrderSnapshot: deps.setDragSiblingOrderSnapshot,
     treeData: deps.treeData.value
   })
-  await remountProjectHierarchyTreeAndRestoreExpandedSnapshot({
-    expandedNodeIds: expandedSnapshot,
-    nextTick: deps.nextTick,
-    restoreExpandedSnapshot: deps.restoreExpandedSnapshot,
-    restoreOptions: PROJECT_HIERARCHY_TREE_DRAG_EXPAND_SNAPSHOT_RESTORE_OPTIONS
-  })
-  const emptiedParentDocumentIds = syncProjectHierarchyTreeDocumentHasChildrenFlags(
-    deps.treeData.value
-  )
-  for (const nodeId of emptiedParentDocumentIds) {
-    if (expandedSnapshotSet.has(nodeId)) {
-      continue
-    }
-    const node = findProjectHierarchyTreeNodeById(deps.treeData.value, nodeId)
-    if (node !== null) {
-      deps.markNodeClosed(nodeId, node)
-    }
-  }
-  if (
-    commitResult.committed &&
-    commitResult.nestParentDocumentId !== null
-  ) {
-    await openProjectHierarchyTreeNestParentAfterDragDrop({
-      flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
-      getTreeRef: deps.getTreeRef,
-      loadChildrenForNode: deps.loadChildrenForNode,
-      markNodeOpen: deps.markNodeOpen,
-      nestParentDocumentId: commitResult.nestParentDocumentId,
-      nextTick: deps.nextTick,
+  const dragStartOrder = deps.dragSiblingOrderAtDragStart()
+  const orderChangedFromDragStart = dragSiblingOrderSnapshot !== null &&
+    (dragStartOrder === null ||
+      !areProjectHierarchyTreeOrderedDocumentIdsEqual(
+        dragSiblingOrderSnapshot.orderedDocumentIds,
+        dragStartOrder
+      ))
+  let commitResult: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragCommitResult
+  if (orderChangedFromDragStart) {
+    commitResult = await runProjectHierarchyTreeDragCommitPersistPhase({
+      dragSiblingOrderSnapshot,
+      draggedDocumentId,
+      getDataSettle,
+      refreshNodeChildrenFromDatabase: deps.refreshNodeChildrenFromDatabase,
+      reindexDocumentSiblingsInHierarchy: deps.reindexDocumentSiblingsInHierarchy,
+      refreshLayout: deps.refreshLayout,
+      resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
+      suppressTreeEmit: deps.suppressTreeEmit.value,
+      suppressWait,
       treeData: deps.treeData
     })
+  } else {
+    commitResult = {
+      committed: false,
+      emptiedParentDocumentIds: [],
+      nestParentDocumentId: null,
+      reloadChildrenNodeId: null
+    }
   }
-  await deps.reapplyLatentDescendantExpandState()
-  await finalizeProjectHierarchyTreeDragCommitExpandState({
+  await finalizeProjectHierarchyTreeDragCommitAfterPersist({
     clearDragSessionFlags: deps.clearDragSessionFlags,
+    commitResult,
     dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     expandedSnapshot,
+    expandedSnapshotSet,
+    flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
     flushUiStatePersist: deps.flushUiStatePersist,
+    getTreeRef: deps.getTreeRef,
+    loadChildrenForNode: deps.loadChildrenForNode,
+    markNodeClosed: deps.markNodeClosed,
+    markNodeOpen: deps.markNodeOpen,
     nextTick: deps.nextTick,
     reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,
     reapplyLatentDescendantExpandState: deps.reapplyLatentDescendantExpandState,
     requestAnimationFrame: deps.requestAnimationFrame,
-    restoreExpandedSnapshot: deps.restoreExpandedSnapshot
+    restoreExpandedSnapshot: deps.restoreExpandedSnapshot,
+    treeData: deps.treeData
   })
 }
 

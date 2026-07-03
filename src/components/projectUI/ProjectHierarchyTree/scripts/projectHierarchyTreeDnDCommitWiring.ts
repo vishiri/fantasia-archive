@@ -1,126 +1,57 @@
 import type {
   I_faProjectHierarchyTreeDragCommitResult,
+  I_faProjectHierarchyTreeDragSiblingOrderSnapshot,
   I_faProjectHierarchyTreeHeTreeNode
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { resolveProjectHierarchyTreeSiblingSortOrder } from '../functions/projectHierarchyTreeMoveFromTree'
-import {
-  isProjectHierarchyTreeDocumentDropParentValid,
-  isProjectHierarchyTreeDocumentSiblingRow
-} from '../functions/projectHierarchyTreeDnD'
+import { persistProjectHierarchyTreeDraggedDocumentMove } from './projectHierarchyTreeDnDCommitPersistWiring'
 
-type T_parentBucket = {
-  children: I_faProjectHierarchyTreeHeTreeNode[]
-  parentDocumentId: string | null
-  parentNode: I_faProjectHierarchyTreeHeTreeNode | null
-}
-
-export function findProjectHierarchyTreeDocumentParentBucket (
-  nodes: I_faProjectHierarchyTreeHeTreeNode[],
-  documentId: string,
-  parentContext: {
-    parentDocumentId: string | null
-    parentNode: I_faProjectHierarchyTreeHeTreeNode | null
-  } = {
-    parentDocumentId: null,
-    parentNode: null
-  }
-): T_parentBucket | null {
-  for (const node of nodes) {
-    if (node.nodeKind === 'document' && node.id === documentId) {
-      return {
-        children: nodes,
-        parentDocumentId: parentContext.parentDocumentId,
-        parentNode: parentContext.parentNode
-      }
-    }
-    const parentDocumentId = node.nodeKind === 'document' ? node.documentId : null
-    const nested = findProjectHierarchyTreeDocumentParentBucket(
-      node.children,
-      documentId,
-      {
-        parentDocumentId,
-        parentNode: node
-      }
-    )
-    if (nested !== null) {
-      return nested
-    }
-  }
-  return null
-}
+export { findProjectHierarchyTreeDocumentParentBucket } from '../functions/projectHierarchyTreeDocumentParentBucket'
 
 export async function commitProjectHierarchyTreeDraggedDocumentMove (deps: {
   documentId: string | null
-  moveDocumentInHierarchy: (input: {
-    documentId: string
-    targetParentDocumentId: string | null
-    targetSortOrder: number
+  dragCommitSuppressWaitAttempts?: number
+  dragCommitSuppressWaitReady?: boolean
+  dragSiblingOrderSnapshot?: I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
+  modelSettleAttempts?: number
+  modelSettleReady?: boolean
+  reindexDocumentSiblingsInHierarchy: (input: {
+    movedDocumentId: string
+    orderedDocumentIds: string[]
+    parentDocumentId: string | null
+    placementId: string
   }) => Promise<unknown>
   refreshLayout: () => Promise<void>
   resyncTreeDataFromLayout: () => void
+  suppressTreeEmit?: boolean
   treeData: I_faProjectHierarchyTreeHeTreeNode[]
 }): Promise<I_faProjectHierarchyTreeDragCommitResult> {
   const documentId = deps.documentId
+  const suppressWaitAttempts = deps.dragCommitSuppressWaitAttempts ?? 0
+  const suppressWaitReady = deps.dragCommitSuppressWaitReady ?? true
+  const suppressTreeEmit = deps.suppressTreeEmit ?? false
+  const modelSettleAttempts = deps.modelSettleAttempts ?? 0
+  const modelSettleReady = deps.modelSettleReady
+  const dragSiblingOrderSnapshot = deps.dragSiblingOrderSnapshot ?? null
   if (documentId === null) {
     return {
       committed: false,
       emptiedParentDocumentIds: [],
-      nestParentDocumentId: null
+      nestParentDocumentId: null,
+      reloadChildrenNodeId: null
     }
   }
-  const parentBucket = findProjectHierarchyTreeDocumentParentBucket(deps.treeData, documentId)
-  if (parentBucket === null) {
-    await deps.refreshLayout()
-    return {
-      committed: false,
-      emptiedParentDocumentIds: [],
-      nestParentDocumentId: null
-    }
-  }
-  const siblings = parentBucket.children.filter((row) => isProjectHierarchyTreeDocumentSiblingRow(row))
-  const targetSortOrder = resolveProjectHierarchyTreeSiblingSortOrder(siblings, documentId)
-  const movedNode = siblings.find((row) => row.id === documentId)
-  if (movedNode === undefined || movedNode.placementId === null) {
-    return {
-      committed: false,
-      emptiedParentDocumentIds: [],
-      nestParentDocumentId: null
-    }
-  }
-  const nestParentDocumentId = parentBucket.parentDocumentId
-  const dropParentValid = isProjectHierarchyTreeDocumentDropParentValid({
-    parentDocumentId: parentBucket.parentDocumentId,
-    parentNode: parentBucket.parentNode
+  return await persistProjectHierarchyTreeDraggedDocumentMove({
+    documentId,
+    dragCommitSuppressWaitAttempts: suppressWaitAttempts,
+    dragCommitSuppressWaitReady: suppressWaitReady,
+    dragSiblingOrderSnapshot,
+    modelSettleAttempts,
+    reindexDocumentSiblingsInHierarchy: deps.reindexDocumentSiblingsInHierarchy,
+    refreshLayout: deps.refreshLayout,
+    resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
+    suppressTreeEmit,
+    treeData: deps.treeData,
+    ...(modelSettleReady !== undefined ? { modelSettleReady } : {})
   })
-  if (!dropParentValid) {
-    deps.resyncTreeDataFromLayout()
-    await deps.refreshLayout()
-    return {
-      committed: false,
-      emptiedParentDocumentIds: [],
-      nestParentDocumentId: null
-    }
-  }
-  try {
-    await deps.moveDocumentInHierarchy({
-      documentId,
-      targetParentDocumentId: nestParentDocumentId,
-      targetSortOrder
-    })
-    return {
-      committed: true,
-      emptiedParentDocumentIds: [],
-      nestParentDocumentId
-    }
-  } catch (error) {
-    console.error('[ProjectHierarchyTree] moveDocumentInHierarchy failed', error)
-    deps.resyncTreeDataFromLayout()
-    await deps.refreshLayout()
-    return {
-      committed: false,
-      emptiedParentDocumentIds: [],
-      nestParentDocumentId: null
-    }
-  }
 }

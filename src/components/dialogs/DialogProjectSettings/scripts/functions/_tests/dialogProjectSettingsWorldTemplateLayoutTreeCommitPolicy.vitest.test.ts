@@ -36,6 +36,13 @@ test('Test that shouldAcceptHeTreeModelValueUpdate accepts drag and pending comm
   })).toBe(true)
   expect(shouldAcceptHeTreeModelValueUpdate({
     dragCommitPending: false,
+    dragDropCommitted: true,
+    isTreeDragActive: false,
+    suppressTreeEmit: false
+  })).toBe(true)
+  expect(shouldAcceptHeTreeModelValueUpdate({
+    dragCommitPending: false,
+    dragDropCommitted: false,
     isTreeDragActive: false,
     suppressTreeEmit: false
   })).toBe(false)

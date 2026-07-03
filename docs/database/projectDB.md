@@ -13,7 +13,7 @@ Flattened to a single bootstrap revision during pre-release dev. No upgrade ladd
 | Version | Contents |
 |---------|----------|
 | **0** | Uninitialized file (bootstrap target on first open/create). |
-| **1** | Full schema: **`project_data`** KV, worldbuilding **content tables** (**`worlds`** incl. **`color_pallete`** + **`display_name_translations_json`**, **`document_templates`** incl. **`sort_order`**, **`world_appendix`**, **`icon`**, **`title_translations_json`** + **`title_singular_translations_json`** + **`world_appendix_translations_json`**, **`documents`** incl. **`placement_id`** + **`parent_document_id`** + **`sort_order`**, **`media`**, **`document_media`**, **`world_template_groups`** + **`world_template_placements`** layout incl. **`nickname`** + **`nickname_translations_json`** + **`nickname_singular_translations_json`** + **`display_name_translations_json`**), default **world** seed on create. Idempotent **`applyFaProjectDocumentsHierarchySchemaPatch`** runs on every open at version **1** for legacy files missing hierarchy columns. |
+| **1** | Full schema: **`project_data`** KV, worldbuilding **content tables** (**`worlds`** incl. **`color_pallete`** + **`display_name_translations_json`**, **`document_templates`** incl. **`sort_order`**, **`world_appendix`**, **`icon`**, **`title_translations_json`** + **`title_singular_translations_json`** + **`world_appendix_translations_json`**, **`documents`** incl. **`placement_id`** + **`parent_document_id`** + **`sort_order`**, **`media`**, **`document_media`**, **`world_template_groups`** + **`world_template_placements`** layout incl. **`nickname`** + **`nickname_translations_json`** + **`nickname_singular_translations_json`** + **`display_name_translations_json`**), default **world** seed on create. Idempotent **`applyFaProjectDocumentsHierarchySchemaPatch`** runs on every open at version **1** for legacy files missing hierarchy columns; **`sort_order`** creation-time backfill runs **only when that column is first added**, not on re-apply. |
 
 **Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 1`** in **`faProjectDbMigrateWiring.ts`**.
 
@@ -246,6 +246,7 @@ All content handlers wrap **`runWithFaProjectDatabaseForIpcAsync`**.
 | `list-workspace-hierarchy-layout-async` | `listFaProjectWorkspaceHierarchyLayout` |
 | `list-placement-document-children-async` | `listFaProjectPlacementDocumentChildren` |
 | `move-document-in-hierarchy-async` | `moveFaProjectDocumentInHierarchy` |
+| `reindex-document-siblings-in-hierarchy-async` | `reindexFaProjectDocumentSiblingsInHierarchy` (same parent bucket sibling **`sort_order`** rewrite after drag reorder) |
 | `search-project-hierarchy-async` | `searchFaProjectHierarchy` |
 
 **`FA_PROJECT_MANAGEMENT_IPC`** (hierarchy UI state): **`get-hierarchy-tree-ui-state-async`** → **`readFaProjectHierarchyTreeUiState`**; **`set-hierarchy-tree-ui-state-patch-async`** → **`upsertFaProjectHierarchyTreeUiStateKv`**.

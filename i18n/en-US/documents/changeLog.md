@@ -39,6 +39,7 @@
 - **Workspace sidebar**: Reordering nested documents that share the same parent document row in the hierarchy tree works again when you drop on the gap between sibling rows.
 - **Workspace sidebar**: Dragging an expanded document subtree to nest under another document no longer collapses open folders about a second after the drop; expanded branches stay open through the move.
 - **Workspace sidebar**: The hierarchy tree list has **8px** bottom padding so the last document row is not flush against the panel edge when scrolled to the end.
+- **Workspace sidebar**: Dragging documents to reorder within a template placement now saves sibling order to the project database and keeps that order after you quit and reopen the project.
 
 ### Known issues
 - **Fantasia Archive Settings** still lists many experimental toggles marked as planned work in their titles; those options are not shipped yet and have no effect when enabled.

@@ -96,6 +96,14 @@ export interface I_faProjectHierarchyTreeMoveDocumentInput {
   targetSortOrder: number
 }
 
+/** Persists full sibling bucket order after hierarchy tree drag-and-drop. */
+export interface I_faProjectHierarchyTreeReindexDocumentSiblingsInput {
+  movedDocumentId: string
+  orderedDocumentIds: string[]
+  parentDocumentId: string | null
+  placementId: string
+}
+
 /** One hierarchy search hit with ancestor document ids for reveal. */
 export interface I_faProjectHierarchyTreeSearchHit {
   documentId: string
@@ -121,16 +129,32 @@ export interface I_faProjectHierarchyTreeDragContext {
   documentId: string
 }
 
+/** Captured sibling order during drag before async SQLite commit. */
+export interface I_faProjectHierarchyTreeDragSiblingOrderSnapshot {
+  orderedDocumentIds: string[]
+  parentDocumentId: string | null
+  placementId: string
+}
+
+export interface I_faProjectHierarchyTreeDocumentParentBucket {
+  children: I_faProjectHierarchyTreeHeTreeNode[]
+  parentDocumentId: string | null
+  parentNode: I_faProjectHierarchyTreeHeTreeNode | null
+}
+
 /** Outcome of persisting a hierarchy tree document drag move. */
 export interface I_faProjectHierarchyTreeDragCommitResult {
   committed: boolean
   emptiedParentDocumentIds: string[]
   nestParentDocumentId: string | null
+  /** Parent row whose lazy-loaded children should refresh from SQLite after commit. */
+  reloadChildrenNodeId: string | null
 }
 
 /** Minimal he-tree Draggable instance API used by workspace hierarchy tree wiring. */
 export interface I_faProjectHierarchyTreeHeTreeInstance {
   closeAll: () => void
+  getData?: () => I_faProjectHierarchyTreeHeTreeNode[]
   openNodeAndParents: (nodeOrStat: I_faProjectHierarchyTreeHeTreeNode) => void
 }
 

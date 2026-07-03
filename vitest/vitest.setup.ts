@@ -132,6 +132,7 @@ function buildVitestProjectContentApiMock (): ReturnType<typeof createFaProjectC
     listWorldsForProjectSettings: vi.fn(stub.listWorldsForProjectSettings),
     listWorkspaceHierarchyLayout: vi.fn(stub.listWorkspaceHierarchyLayout),
     listPlacementDocumentChildren: vi.fn(stub.listPlacementDocumentChildren),
+    reindexDocumentSiblingsInHierarchy: vi.fn(stub.reindexDocumentSiblingsInHierarchy),
     moveDocumentInHierarchy: vi.fn(stub.moveDocumentInHierarchy),
     searchProjectHierarchy: vi.fn(stub.searchProjectHierarchy),
     saveDocumentTemplatesSnapshot: vi.fn(stub.saveDocumentTemplatesSnapshot),

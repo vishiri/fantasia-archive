@@ -6,11 +6,13 @@ import {
   listFaProjectPlacementDocumentChildren,
   listFaProjectWorkspaceHierarchyLayout,
   moveFaProjectDocumentInHierarchy,
+  reindexFaProjectHierarchyDocumentSiblings,
   searchFaProjectHierarchy
 } from 'app/src-electron/mainScripts/projectManagement/projectDbContent/faProjectHierarchyTreePersistWiring'
 import {
   parseFaProjectHierarchyTreeListPlacementChildrenInput,
   parseFaProjectHierarchyTreeMoveDocumentInput,
+  parseFaProjectHierarchyTreeReindexDocumentSiblingsInput,
   parseFaProjectHierarchyTreeSearchQueryPayload
 } from 'app/src-electron/shared/faProjectHierarchyTreeContentSchema'
 
@@ -40,6 +42,16 @@ export function wireFaProjectContentHierarchyTreeIpcHandlers (ipcMain: IpcMain):
       return moveFaProjectDocumentInHierarchy(db, input)
     })
   })
+
+  ipcMain.handle(
+    FA_PROJECT_CONTENT_IPC.reindexDocumentSiblingsInHierarchyAsync,
+    async (event, payload) => {
+      return await runFaProjectContentIpcWork(event, (db) => {
+        const input = parseFaProjectHierarchyTreeReindexDocumentSiblingsInput(payload)
+        return reindexFaProjectHierarchyDocumentSiblings(db, input)
+      })
+    }
+  )
 
   ipcMain.handle(FA_PROJECT_CONTENT_IPC.searchProjectHierarchyAsync, async (event, payload) => {
     return await runFaProjectContentIpcWork(event, (db) => {

@@ -36,6 +36,12 @@ export const PROJECT_HIERARCHY_TREE_DOCUMENT_TEMPLATE_DEFAULT_ICON = 'mdi-file-o
 export const PROJECT_HIERARCHY_TREE_DRAG_OPEN_REMOUNT_QUIET_MS =
   PROJECT_HIERARCHY_TREE_DRAG_OPEN_DELAY_MS + 50
 
+/** nextTick polls while suppressTreeEmit blocks drag commit persist. */
+export const PROJECT_HIERARCHY_TREE_DRAG_COMMIT_SUPPRESS_WAIT_MAX_ATTEMPTS = 30
+
+/** nextTick polls after suppress clears so deferred he-tree model-value can land. */
+export const PROJECT_HIERARCHY_TREE_DRAG_MODEL_SETTLE_MAX_ATTEMPTS = 30
+
 /**
  * Press-and-hold delay (ms) on a document row before he-tree drag may start.
  */

@@ -1,12 +1,15 @@
 export function shouldAcceptHeTreeModelValueUpdate (input: {
   dragCommitPending: boolean
+  dragDropCommitted?: boolean
   isTreeDragActive: boolean
   suppressTreeEmit: boolean
 }): boolean {
   if (input.suppressTreeEmit) {
     return false
   }
-  return input.isTreeDragActive || input.dragCommitPending
+  return input.isTreeDragActive ||
+    input.dragCommitPending ||
+    input.dragDropCommitted === true
 }
 
 export function shouldScheduleDragLayoutCommit (input: {

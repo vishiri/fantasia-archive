@@ -8,6 +8,7 @@ import type {
 import type { createProjectHierarchyTreeDocumentRowDragHoldWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
 import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowExpandClickGestureWiring'
 import { createProjectHierarchyTreeDnDWiring } from './projectHierarchyTreeDnDWiring'
+import type { I_faProjectHierarchyTreeDocumentChild } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 type T_sessionDnDSubDeps = {
   documentRowDragHoldWiring: ReturnType<typeof createProjectHierarchyTreeDocumentRowDragHoldWiring>
@@ -28,6 +29,7 @@ type T_sessionDnDSubDeps = {
   }
   isTreeDragActive: Ref<boolean>
   loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
+  refreshNodeChildrenFromDatabase: (nodeId: string) => Promise<void>
   markNodeClosed: (nodeId: string, node: I_faProjectHierarchyTreeHeTreeNode) => void
   markNodeOpen: (nodeId: string) => void
   nextTick: () => Promise<void>
@@ -58,14 +60,15 @@ export function createProjectHierarchyTreeSessionDnDSubWiring (deps: T_sessionDn
     getTreeScrollHost: deps.getTreeScrollHost,
     isTreeDragActive: deps.isTreeDragActive,
     loadChildrenForNode: deps.loadChildrenForNode,
+    refreshNodeChildrenFromDatabase: deps.refreshNodeChildrenFromDatabase,
     markNodeClosed: deps.markNodeClosed,
     markNodeOpen: deps.markNodeOpen,
-    moveDocumentInHierarchy: async (input) => {
+    reindexDocumentSiblingsInHierarchy: async (input) => {
       const api = window.faContentBridgeAPIs?.projectContent
-      if (typeof api?.moveDocumentInHierarchy !== 'function') {
-        throw new Error('moveDocumentInHierarchy unavailable')
+      if (typeof api?.reindexDocumentSiblingsInHierarchy !== 'function') {
+        throw new Error('reindexDocumentSiblingsInHierarchy unavailable')
       }
-      return await api.moveDocumentInHierarchy(input)
+      return await api.reindexDocumentSiblingsInHierarchy(input) as I_faProjectHierarchyTreeDocumentChild
     },
     nextTick: deps.nextTick,
     reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,

@@ -39,6 +39,7 @@ export function createApplyFaProjectDocumentsHierarchySchemaPatch (
 ): (db: I_faProjectDbExec) => void {
   return function applyFaProjectDocumentsHierarchySchemaPatch (db: I_faProjectDbExec): void {
     const columnNames = readFaProjectTableColumnNames(db, deps.documentsTableName)
+    const sortOrderColumnExisted = columnNames.has('sort_order')
 
     addFaProjectDocumentsColumnIfMissing(
       db,
@@ -70,18 +71,20 @@ export function createApplyFaProjectDocumentsHierarchySchemaPatch (
         ') WHERE placement_id IS NULL AND template_id IS NOT NULL'
     )
 
-    db.exec(
-      'WITH ranked AS (' +
-        'SELECT id, ROW_NUMBER() OVER (' +
-        'PARTITION BY placement_id, parent_document_id ' +
-        'ORDER BY created_at_ms ASC, id ASC' +
-        ') - 1 AS new_sort ' +
-        `FROM ${deps.documentsTableName}` +
-        ') ' +
-        `UPDATE ${deps.documentsTableName} SET sort_order = (` +
-        'SELECT new_sort FROM ranked WHERE ranked.id = documents.id' +
-        ')'
-    )
+    if (!sortOrderColumnExisted) {
+      db.exec(
+        'WITH ranked AS (' +
+          'SELECT id, ROW_NUMBER() OVER (' +
+          'PARTITION BY placement_id, parent_document_id ' +
+          'ORDER BY created_at_ms ASC, id ASC' +
+          ') - 1 AS new_sort ' +
+          `FROM ${deps.documentsTableName}` +
+          ') ' +
+          `UPDATE ${deps.documentsTableName} SET sort_order = (` +
+          'SELECT new_sort FROM ranked WHERE ranked.id = documents.id' +
+          ')'
+      )
+    }
 
     db.exec(
       'CREATE INDEX IF NOT EXISTS idx_documents_placement_parent_sort ' +

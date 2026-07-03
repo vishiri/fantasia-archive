@@ -144,6 +144,12 @@ export const projectContentAPI: I_faProjectContentAPI = {
       input
     )
   },
+  reindexDocumentSiblingsInHierarchy: async (input) => {
+    return await invokeProjectContent(
+      FA_PROJECT_CONTENT_IPC.reindexDocumentSiblingsInHierarchyAsync,
+      input
+    )
+  },
   searchProjectHierarchy: async (query) => {
     return await invokeProjectContent(
       FA_PROJECT_CONTENT_IPC.searchProjectHierarchyAsync,

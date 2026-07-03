@@ -17,20 +17,28 @@ export function createProjectHierarchyTreeDragCancelWiring (deps: {
   dragExpandUiFrozen: Ref<boolean>
   dragExpandedSnapshot: () => string[] | null
   nextTick: () => Promise<void>
-  removeDragCancelListeners: () => void
   resyncTreeDataFromLayout: () => void
   restoreExpandedSnapshot: (
     expandedNodeIds: string[],
     restoreOptions?: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
   ) => Promise<void>
 }) {
+  function removeDragCancelListeners (): void {
+    window.removeEventListener('pointerup', onWindowPointerUpDuringDrag)
+    window.removeEventListener('keydown', onWindowKeydownDuringDrag)
+  }
+
+  function attachDragCancelListeners (): void {
+    window.addEventListener('pointerup', onWindowPointerUpDuringDrag)
+    window.addEventListener('keydown', onWindowKeydownDuringDrag)
+  }
   function finishDragSessionWithoutCommit (): void {
     if (!shouldClearDragSessionWithoutCommit({
       dragDropCommitted: deps.dragDropCommitted.value
     })) {
       return
     }
-    deps.removeDragCancelListeners()
+    removeDragCancelListeners()
     clearFaVerticalDraggableTabsDocumentDragCursor()
     deps.resyncTreeDataFromLayout()
     const expandedSnapshot = deps.dragExpandedSnapshot() ?? []
@@ -64,8 +72,10 @@ export function createProjectHierarchyTreeDragCancelWiring (deps: {
   }
 
   return {
+    attachDragCancelListeners,
     finishDragSessionWithoutCommit,
     onWindowKeydownDuringDrag,
-    onWindowPointerUpDuringDrag
+    onWindowPointerUpDuringDrag,
+    removeDragCancelListeners
   }
 }

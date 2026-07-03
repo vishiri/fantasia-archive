@@ -11,6 +11,7 @@ import {
   listFaProjectPlacementDocumentChildren,
   listFaProjectWorkspaceHierarchyLayout,
   moveFaProjectDocumentInHierarchy,
+  reindexFaProjectHierarchyDocumentSiblings,
   readFaProjectPlacementDocumentChildCount,
   searchFaProjectHierarchy
 } from '../faProjectHierarchyTreePersistWiring'
@@ -147,6 +148,46 @@ test('Test that moveFaProjectDocumentInHierarchy updates sort_order within place
   })
   expect(children.items[0]?.displayName).toBe('Second')
   expect(children.items[1]?.displayName).toBe('First')
+})
+
+/**
+ * reindexFaProjectHierarchyDocumentSiblings
+ * Persists full sibling bucket order from tree drag-and-drop.
+ */
+test('Test that reindexFaProjectHierarchyDocumentSiblings applies ordered sibling ids', () => {
+  db = openHierarchyTestDb()
+  const seeded = seedWorldPlacement(db, 'Realm', 'Buildings')
+  const first = createFaProjectDocument(db, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'First',
+    sortOrder: 0
+  })
+  const second = createFaProjectDocument(db, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Second',
+    sortOrder: 1
+  })
+  const third = createFaProjectDocument(db, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Third',
+    sortOrder: 2
+  })
+  reindexFaProjectHierarchyDocumentSiblings(db, {
+    movedDocumentId: first.id,
+    orderedDocumentIds: [third.id, first.id, second.id],
+    parentDocumentId: null,
+    placementId: seeded.placementId
+  })
+  const children = listFaProjectPlacementDocumentChildren(db, {
+    placementId: seeded.placementId
+  })
+  expect(children.items.map((item) => item.displayName)).toEqual(['Third', 'First', 'Second'])
 })
 
 /**

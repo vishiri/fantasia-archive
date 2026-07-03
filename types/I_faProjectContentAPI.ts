@@ -31,6 +31,7 @@ import type {
   I_faProjectHierarchyTreeListPlacementChildrenInput,
   I_faProjectHierarchyTreeListPlacementChildrenResult,
   I_faProjectHierarchyTreeMoveDocumentInput,
+  I_faProjectHierarchyTreeReindexDocumentSiblingsInput,
   I_faProjectHierarchyTreeSearchResult,
   I_faProjectHierarchyTreeWorkspaceLayoutResult
 } from 'app/types/I_faProjectHierarchyTreeDomain'
@@ -74,6 +75,9 @@ export interface I_faProjectContentAPI {
   ) => Promise<I_faProjectHierarchyTreeListPlacementChildrenResult>
   moveDocumentInHierarchy: (
     input: I_faProjectHierarchyTreeMoveDocumentInput
+  ) => Promise<I_faProjectHierarchyTreeDocumentChild>
+  reindexDocumentSiblingsInHierarchy: (
+    input: I_faProjectHierarchyTreeReindexDocumentSiblingsInput
   ) => Promise<I_faProjectHierarchyTreeDocumentChild>
   searchProjectHierarchy: (query: string) => Promise<I_faProjectHierarchyTreeSearchResult>
   saveDocumentTemplatesSnapshot: (items: I_faProjectDocumentTemplateSnapshotItem[]) => Promise<void>
