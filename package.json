@@ -129,6 +129,7 @@
   },
   "resolutions": {
     "dompurify": "3.4.11",
+    "linkify-it": "5.0.1",
     "shell-quote": "1.8.4",
     "ws": "8.21.0"
   },
