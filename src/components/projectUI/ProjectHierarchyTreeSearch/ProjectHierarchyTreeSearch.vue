@@ -5,7 +5,10 @@
     data-test-locator="projectHierarchyTreeSearch"
     :style="searchWrapperStyle"
   >
-    <div class="projectHierarchyTreeSearch__inputHost">
+    <div
+      class="projectHierarchyTreeSearch__inputHost"
+      data-test-locator="projectHierarchyTreeSearch-input"
+    >
       <q-input
         v-model="searchQuery"
         filled
@@ -14,7 +17,6 @@
         hide-bottom-space
         color="primary-bright"
         :label="$t('projectUI.projectHierarchyTreeSearch.label')"
-        data-test-locator="projectHierarchyTreeSearch-input"
         @blur="isSearchFocused = false"
         @focus="isSearchFocused = true"
       >

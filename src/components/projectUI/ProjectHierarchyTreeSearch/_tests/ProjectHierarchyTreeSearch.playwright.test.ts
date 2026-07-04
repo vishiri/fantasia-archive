@@ -112,6 +112,9 @@ test.describe.serial('Project hierarchy tree search layout', () => {
     await input.click()
     const search = appWindow.locator(`[data-test-locator="${selectorList.projectHierarchyTreeSearch}"]`)
     await expect(search).toHaveClass(/projectHierarchyTreeSearch--layoutFullViewport/)
-    await expect(search).toHaveCSS('width', '100vw')
+    const viewportWidthPx = await appWindow.evaluate(() => {
+      return window.innerWidth
+    })
+    await expect(search).toHaveCSS('width', `${viewportWidthPx}px`)
   })
 })
