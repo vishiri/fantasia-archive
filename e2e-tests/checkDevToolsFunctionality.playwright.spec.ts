@@ -28,6 +28,8 @@ const menuAnimationTimer = 600
  * Object of string data selectors for the component
  */
 const selectorList = {
+  helpMenuTitle: 'AppControlSingleMenu-title',
+  helpMenuWrapper: 'AppControlSingleMenu-wrapper',
   menuButton: L_helpInfo.title,
   menuItemButton: L_helpInfo.items.toggleDeveloperTools
 }
@@ -66,7 +68,13 @@ test.describe.serial('Developer tools menu', () => {
   test('Dev tools toggle properly', async () => {
     await navigateFaPlaywrightE2eToHomeRoute(appWindow)
 
-    const menuWrapper = appWindow.getByText(selectorList.menuButton)
+    const menuWrapper = appWindow
+      .locator(`[data-test-locator="${selectorList.helpMenuWrapper}"]`)
+      .filter({
+        has: appWindow.locator(`[data-test-locator="${selectorList.helpMenuTitle}"]`, {
+          hasText: selectorList.menuButton
+        })
+      })
 
     const menuButton = appWindow.getByText(selectorList.menuItemButton)
 
