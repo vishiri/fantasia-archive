@@ -1,26 +1,40 @@
 import type { Ref } from 'vue'
 
 import type {
+  I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions,
   I_faProjectHierarchyTreeHeTreeInstance,
   I_faProjectHierarchyTreeHeTreeNode
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import type { I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions } from 'app/types/I_faProjectHierarchyTreeDomain'
-
 import {
-  applyExpandedNodeIdsToTree,
+  applyPersistedProjectHierarchyTreeOpenNodeIds,
+  collectProjectHierarchyTreePersistedExpandedNodeIds
+} from '../functions/projectHierarchyTreePersistedOpenNodeIds'
+import {
   expandProjectHierarchyTreeExpandedNodeIdsWithAncestors,
   findProjectHierarchyTreeNodeById,
   pruneProjectHierarchyTreeExpandedNodeIdsToAncestors,
   publishProjectHierarchyTreeRootRevision
 } from '../functions/projectHierarchyTreeExpandState'
-import {
-  collectProjectHierarchyTreeLazyLoadIdsAlongExpandedPaths,
-  sortProjectHierarchyTreeExpandedNodeIdsForRestore
-} from './projectHierarchyTreeExpandedRestoreOrder'
+import { reapplyProjectHierarchyTreeLatentDescendantExpandState } from './projectHierarchyTreeLatentExpandReapplyWiring'
 import { reapplyProjectHierarchyTreeHeTreeOpenState } from './projectHierarchyTreeUiStateWiring'
 
 type T_treeRef = I_faProjectHierarchyTreeHeTreeInstance | null
+
+function createLoadChildrenAlongRevealPath (deps: {
+  loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
+  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
+}): (nodeIds: string[]) => Promise<void> {
+  return async (nodeIds: string[]) => {
+    for (const nodeId of nodeIds) {
+      const node = findProjectHierarchyTreeNodeById(deps.treeData.value, nodeId)
+      if (node === null) {
+        continue
+      }
+      await deps.loadChildrenForNode(node)
+    }
+  }
+}
 
 async function reapplyExpandedSnapshotToHeTree (deps: {
   getTreeRef: () => T_treeRef
@@ -49,40 +63,39 @@ export async function restoreProjectHierarchyTreeExpandedSnapshot (deps: {
   restoreOptions?: I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }): Promise<void> {
-  const knownBeforePrune = applyExpandedNodeIdsToTree(
-    deps.treeData.value,
-    deps.expandedNodeIds
-  )
   const withAncestors = deps.restoreOptions?.includeAncestorClosure === true
     ? expandProjectHierarchyTreeExpandedNodeIdsWithAncestors(
       deps.treeData.value,
-      knownBeforePrune
+      deps.expandedNodeIds
     )
-    : knownBeforePrune
-  const pruned = deps.restoreOptions?.skipAncestorPrune === true
+    : deps.expandedNodeIds
+  const ancestorPruned = deps.restoreOptions?.skipAncestorPrune === true
     ? withAncestors
     : pruneProjectHierarchyTreeExpandedNodeIdsToAncestors(
       deps.treeData.value,
       withAncestors
     )
+  const pruned = applyPersistedProjectHierarchyTreeOpenNodeIds(
+    deps.treeData.value,
+    ancestorPruned
+  )
   deps.openNodeIds.value = new Set(pruned)
-  deps.onExpandedNodeIdsChange(pruned)
+  const persistedExpandedNodeIds = collectProjectHierarchyTreePersistedExpandedNodeIds(
+    deps.treeData.value,
+    deps.openNodeIds.value
+  )
+  deps.onExpandedNodeIdsChange(persistedExpandedNodeIds)
 
-  const sortedExpandedNodeIds = sortProjectHierarchyTreeExpandedNodeIdsForRestore(
-    deps.treeData.value,
-    pruned
-  )
-  const lazyLoadNodeIds = collectProjectHierarchyTreeLazyLoadIdsAlongExpandedPaths(
-    deps.treeData.value,
-    sortedExpandedNodeIds
-  )
-  for (const nodeId of lazyLoadNodeIds) {
-    const node = findProjectHierarchyTreeNodeById(deps.treeData.value, nodeId)
-    if (node === null) {
-      continue
-    }
-    await deps.loadChildrenForNode(node)
-  }
+  const loadChildrenAlongRevealPath = createLoadChildrenAlongRevealPath({
+    loadChildrenForNode: deps.loadChildrenForNode,
+    treeData: deps.treeData
+  })
+  await reapplyProjectHierarchyTreeLatentDescendantExpandState({
+    getTreeRef: deps.getTreeRef,
+    loadChildrenAlongRevealPath,
+    openNodeIds: deps.openNodeIds,
+    treeData: deps.treeData
+  })
   await deps.flushDeferredTreeRevisionPublish()
 
   const treeRef = deps.getTreeRef()

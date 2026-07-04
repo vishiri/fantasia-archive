@@ -8,9 +8,33 @@ import type {
 import { syncProjectHierarchyTreeDocumentHasChildrenFlags } from '../functions/projectHierarchyTreeDocumentHasChildrenSync'
 import { PROJECT_HIERARCHY_TREE_DRAG_EXPAND_SNAPSHOT_RESTORE_OPTIONS } from '../functions/projectHierarchyTreeConstants'
 import { finalizeProjectHierarchyTreeDragCommitExpandState } from './projectHierarchyTreeDnDCommitFinalizeWiring'
-import { openProjectHierarchyTreeNestParentAfterDragDrop } from './projectHierarchyTreeNestParentOpenWiring'
 import { remountProjectHierarchyTreeAndRestoreExpandedSnapshot } from './projectHierarchyTreeMountRemountWiring'
 import { findProjectHierarchyTreeNodeById } from '../functions/projectHierarchyTreeExpandState'
+import { syncProjectHierarchyTreeOpenSetToPersist } from './projectHierarchyTreeUiStateWiring'
+
+function resolveProjectHierarchyTreeDragCommitExpandedSnapshot (input: {
+  commitResult: I_faProjectHierarchyTreeDragCommitResult
+  expandedSnapshot: string[]
+  expandedSnapshotSet: Set<string>
+}): {
+    effectiveExpandedSnapshot: string[]
+    nestParentDocumentId: string | null
+    shouldOpenNestParentAfterDragDrop: boolean
+  } {
+  const nestParentDocumentId = input.commitResult.nestParentDocumentId
+  const shouldOpenNestParentAfterDragDrop =
+    input.commitResult.committed &&
+    nestParentDocumentId !== null &&
+    !input.expandedSnapshotSet.has(nestParentDocumentId)
+  const effectiveExpandedSnapshot = shouldOpenNestParentAfterDragDrop
+    ? [...new Set([...input.expandedSnapshot, nestParentDocumentId])]
+    : input.expandedSnapshot
+  return {
+    effectiveExpandedSnapshot,
+    nestParentDocumentId,
+    shouldOpenNestParentAfterDragDrop
+  }
+}
 
 function closeProjectHierarchyTreeEmptiedParentNodes (deps: {
   expandedSnapshotSet: Set<string>
@@ -40,8 +64,9 @@ export async function finalizeProjectHierarchyTreeDragCommitAfterPersist (deps: 
   getTreeRef: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeInstance | null
   loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   markNodeClosed: (nodeId: string, node: I_faProjectHierarchyTreeHeTreeNode) => void
-  markNodeOpen: (nodeId: string) => void
   nextTick: () => Promise<void>
+  openNodeIds: Ref<Set<string>>
+  queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   reapplyHeTreeOpenState: () => void
   reapplyLatentDescendantExpandState: () => Promise<void>
   requestAnimationFrame: (callback: () => void) => number
@@ -51,8 +76,14 @@ export async function finalizeProjectHierarchyTreeDragCommitAfterPersist (deps: 
   ) => Promise<void>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }): Promise<void> {
+  const { effectiveExpandedSnapshot } = resolveProjectHierarchyTreeDragCommitExpandedSnapshot({
+    commitResult: deps.commitResult,
+    expandedSnapshot: deps.expandedSnapshot,
+    expandedSnapshotSet: deps.expandedSnapshotSet
+  })
+  const effectiveExpandedSnapshotSet = new Set(effectiveExpandedSnapshot)
   await remountProjectHierarchyTreeAndRestoreExpandedSnapshot({
-    expandedNodeIds: deps.expandedSnapshot,
+    expandedNodeIds: effectiveExpandedSnapshot,
     nextTick: deps.nextTick,
     restoreExpandedSnapshot: deps.restoreExpandedSnapshot,
     restoreOptions: PROJECT_HIERARCHY_TREE_DRAG_EXPAND_SNAPSHOT_RESTORE_OPTIONS
@@ -61,30 +92,16 @@ export async function finalizeProjectHierarchyTreeDragCommitAfterPersist (deps: 
     deps.treeData.value
   )
   closeProjectHierarchyTreeEmptiedParentNodes({
-    expandedSnapshotSet: deps.expandedSnapshotSet,
+    expandedSnapshotSet: effectiveExpandedSnapshotSet,
     markNodeClosed: deps.markNodeClosed,
     treeData: deps.treeData
   }, emptiedParentDocumentIds)
-  if (
-    deps.commitResult.committed &&
-    deps.commitResult.nestParentDocumentId !== null
-  ) {
-    await openProjectHierarchyTreeNestParentAfterDragDrop({
-      flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
-      getTreeRef: deps.getTreeRef,
-      loadChildrenForNode: deps.loadChildrenForNode,
-      markNodeOpen: deps.markNodeOpen,
-      nestParentDocumentId: deps.commitResult.nestParentDocumentId,
-      nextTick: deps.nextTick,
-      treeData: deps.treeData
-    })
-  }
   await deps.reapplyLatentDescendantExpandState()
   await finalizeProjectHierarchyTreeDragCommitExpandState({
     clearDragSessionFlags: deps.clearDragSessionFlags,
     dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
-    expandedSnapshot: deps.expandedSnapshot,
+    expandedSnapshot: effectiveExpandedSnapshot,
     flushUiStatePersist: deps.flushUiStatePersist,
     nextTick: deps.nextTick,
     reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,
@@ -92,4 +109,12 @@ export async function finalizeProjectHierarchyTreeDragCommitAfterPersist (deps: 
     requestAnimationFrame: deps.requestAnimationFrame,
     restoreExpandedSnapshot: deps.restoreExpandedSnapshot
   })
+  if (deps.commitResult.committed) {
+    syncProjectHierarchyTreeOpenSetToPersist({
+      openNodeIds: deps.openNodeIds,
+      queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
+      treeData: deps.treeData
+    })
+    deps.flushUiStatePersist()
+  }
 }

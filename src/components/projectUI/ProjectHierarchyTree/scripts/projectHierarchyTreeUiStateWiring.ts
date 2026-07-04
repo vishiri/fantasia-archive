@@ -12,13 +12,16 @@ import {
 } from '../functions/projectHierarchyTreeDefaultExpand'
 import {
   applyPersistedProjectHierarchyTreeOpenNodeIds,
+  collectProjectHierarchyTreePersistedExpandedNodeIds
+} from '../functions/projectHierarchyTreePersistedOpenNodeIds'
+import {
   collectExpandedNodeIdsFromTree,
   collectProjectHierarchyTreeAncestorIds,
   collectProjectHierarchyTreeDescendantIds,
-  collectProjectHierarchyTreePersistedExpandedNodeIds,
   evictCollapsedNodeChildren,
   findProjectHierarchyTreeNodeById
 } from '../functions/projectHierarchyTreeExpandState'
+import { reapplyProjectHierarchyTreeLatentDescendantExpandState } from './projectHierarchyTreeLatentExpandReapplyWiring'
 import { resolveProjectHierarchyTreeScrollContainer } from '../functions/projectHierarchyTreeScrollContainer'
 
 type T_treeRef = I_faProjectHierarchyTreeHeTreeInstance | null
@@ -77,21 +80,19 @@ export async function restoreProjectHierarchyTreeUiState (deps: {
     expandedNodeIds
   )
   deps.openNodeIds.value = new Set(pruned)
-  deps.onExpandedNodeIdsChange(pruned)
-
-  const treeRef = deps.getTreeRef()
-  const effectivelyExpandedNodeIds = collectExpandedNodeIdsFromTree(
+  const expandedNodeIdsForPersist = collectProjectHierarchyTreePersistedExpandedNodeIds(
     deps.treeData.value,
     deps.openNodeIds.value
   )
-  for (const nodeId of effectivelyExpandedNodeIds) {
-    const node = findProjectHierarchyTreeNodeById(deps.treeData.value, nodeId)
-    if (node === null) {
-      continue
-    }
-    await deps.loadChildrenAlongRevealPath([nodeId])
-    treeRef?.openNodeAndParents(node)
-  }
+  deps.onExpandedNodeIdsChange(expandedNodeIdsForPersist)
+
+  const treeRef = deps.getTreeRef()
+  await reapplyProjectHierarchyTreeLatentDescendantExpandState({
+    getTreeRef: deps.getTreeRef,
+    loadChildrenAlongRevealPath: deps.loadChildrenAlongRevealPath,
+    openNodeIds: deps.openNodeIds,
+    treeData: deps.treeData
+  })
 
   if (treeRef === null) {
     return
@@ -201,26 +202,6 @@ export function markProjectHierarchyTreeNodeClosed (deps: {
   syncProjectHierarchyTreeOpenSetToPersist({
     openNodeIds: deps.openNodeIds,
     queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
-    treeData: deps.treeData
-  })
-}
-
-export async function reapplyProjectHierarchyTreeLatentDescendantExpandState (deps: {
-  getTreeRef: () => T_treeRef
-  loadChildrenAlongRevealPath: (nodeIds: string[]) => Promise<void>
-  openNodeIds: Ref<Set<string>>
-  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-}): Promise<void> {
-  const effectivelyExpandedNodeIds = collectExpandedNodeIdsFromTree(
-    deps.treeData.value,
-    deps.openNodeIds.value
-  )
-  for (const nodeId of effectivelyExpandedNodeIds) {
-    await deps.loadChildrenAlongRevealPath([nodeId])
-  }
-  reapplyProjectHierarchyTreeHeTreeOpenState({
-    getTreeRef: deps.getTreeRef,
-    openNodeIds: deps.openNodeIds,
     treeData: deps.treeData
   })
 }

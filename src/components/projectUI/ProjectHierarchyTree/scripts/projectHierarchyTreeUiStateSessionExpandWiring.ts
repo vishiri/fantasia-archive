@@ -5,9 +5,9 @@ import type { I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHe
 import {
   markProjectHierarchyTreeNodeClosed,
   markProjectHierarchyTreeNodeOpen,
-  reapplyProjectHierarchyTreeHeTreeOpenState,
-  reapplyProjectHierarchyTreeLatentDescendantExpandState
+  reapplyProjectHierarchyTreeHeTreeOpenState
 } from './projectHierarchyTreeUiStateWiring'
+import { reapplyProjectHierarchyTreeLatentDescendantExpandState } from './projectHierarchyTreeLatentExpandReapplyWiring'
 
 export function createProjectHierarchyTreeUiStateSessionExpandWiring (deps: {
   getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null

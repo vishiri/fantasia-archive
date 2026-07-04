@@ -12,6 +12,7 @@ export function createProjectHierarchyTreeDragSessionState (deps: {
   let dragExpandedSnapshot: string[] | null = null
   let dragSiblingOrderSnapshot: I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null = null
   let dragSiblingOrderAtDragStart: string[] | null = null
+  let dragParentDocumentIdAtDragStart: string | null = null
   let dragModelValueRevision = 0
   let dragModelValueRevisionAtDragStart = 0
   let dragModelValueRevisionAtDrop = 0
@@ -25,6 +26,7 @@ export function createProjectHierarchyTreeDragSessionState (deps: {
     dragExpandedSnapshot = null
     dragSiblingOrderSnapshot = null
     dragSiblingOrderAtDragStart = null
+    dragParentDocumentIdAtDragStart = null
     dragModelValueRevision = 0
     dragModelValueRevisionAtDragStart = 0
     dragModelValueRevisionAtDrop = 0
@@ -54,6 +56,14 @@ export function createProjectHierarchyTreeDragSessionState (deps: {
 
   function readDragModelValueRevisionAtDrop (): number {
     return dragModelValueRevisionAtDrop
+  }
+
+  function captureDragParentDocumentIdAtDragStart (parentDocumentId: string | null): void {
+    dragParentDocumentIdAtDragStart = parentDocumentId
+  }
+
+  function readDragParentDocumentIdAtDragStart (): string | null {
+    return dragParentDocumentIdAtDragStart
   }
 
   function captureDragSiblingOrderAtDragStart (orderedDocumentIds: string[] | null): void {
@@ -88,6 +98,7 @@ export function createProjectHierarchyTreeDragSessionState (deps: {
   }
 
   return {
+    captureDragParentDocumentIdAtDragStart,
     captureDragSiblingOrderAtDragStart,
     captureDragModelValueRevisionAtDrop,
     clearDragSessionFlags,
@@ -95,6 +106,7 @@ export function createProjectHierarchyTreeDragSessionState (deps: {
     draggedDocumentId: draggedDocumentIdBinding,
     dragSiblingOrderSnapshot: dragSiblingOrderSnapshotBinding,
     incrementDragModelValueRevision,
+    readDragParentDocumentIdAtDragStart,
     readDragSiblingOrderAtDragStart,
     readDragModelValueRevision,
     readDragModelValueRevisionAtDragStart,

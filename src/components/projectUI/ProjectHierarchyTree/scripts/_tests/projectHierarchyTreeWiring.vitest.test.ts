@@ -219,6 +219,7 @@ function buildScheduleDragCommitTestDeps (
     dragExpandUiFrozen: ref(false),
     dragExpandedSnapshot: () => ['world-1'],
     dragSiblingOrderAtDragStart: () => null,
+    readDragParentDocumentIdAtDragStart: () => null,
     readDragSiblingOrderSnapshot: () => null,
     setDragSiblingOrderSnapshot: () => {},
     draggedDocumentId: () => null,
@@ -229,7 +230,8 @@ function buildScheduleDragCommitTestDeps (
     loadChildrenForNode: vi.fn(async () => undefined),
     refreshNodeChildrenFromDatabase: vi.fn(async () => undefined),
     markNodeClosed: vi.fn(),
-    markNodeOpen: vi.fn(),
+    openNodeIds: ref(new Set<string>()),
+    queuePersistExpandedNodeIds: vi.fn(),
     reindexDocumentSiblingsInHierarchy: vi.fn(async () => undefined),
     nextTick: async () => undefined,
     reapplyHeTreeOpenState: vi.fn(),
@@ -1090,6 +1092,7 @@ test('Test that createProjectHierarchyTreeDnDHandlers covers drag handler branch
   }
   const removeDragCancelListeners = vi.fn()
   const clearDragSessionFlags = vi.fn()
+  const queuePersistExpandedNodeIds = vi.fn()
   const dragCancelWiring = createProjectHierarchyTreeDragCancelWiring(buildProjectHierarchyTreeDragCancelTestDeps({
     clearDragSessionFlags,
     dragCommitPending,
@@ -1124,8 +1127,10 @@ test('Test that createProjectHierarchyTreeDnDHandlers covers drag handler branch
       set: () => undefined
     },
     captureDragModelValueRevisionAtDrop: vi.fn(),
+    captureDragParentDocumentIdAtDragStart: vi.fn(),
     captureDragSiblingOrderAtDragStart: vi.fn(),
     incrementDragModelValueRevision: vi.fn(),
+    readDragParentDocumentIdAtDragStart: () => null,
     readDragSiblingOrderAtDragStart: () => null,
     readDragModelValueSettledForCommit: () => true,
     resetDragModelValueRevisionForDragStart: vi.fn(),
@@ -1142,7 +1147,7 @@ test('Test that createProjectHierarchyTreeDnDHandlers covers drag handler branch
     reapplyHeTreeOpenState: vi.fn(),
     reapplyLatentDescendantExpandState: vi.fn(async () => undefined),
     openNodeIds: ref(new Set(['world-1'])),
-    queuePersistExpandedNodeIds: vi.fn(),
+    queuePersistExpandedNodeIds,
     refreshLayout: vi.fn(async () => undefined),
     refreshNodeChildrenFromDatabase: vi.fn(async () => undefined),
     removeDragCancelListeners,
@@ -1156,6 +1161,7 @@ test('Test that createProjectHierarchyTreeDnDHandlers covers drag handler branch
   })
   expect(draggedDocumentId.current).toBe('doc-a')
   expect(dragExpandedSnapshot.current).toEqual(['world-1'])
+  expect(queuePersistExpandedNodeIds).not.toHaveBeenCalled()
   handlers.onTreeDataUpdate([])
   expect(treeData.value).toEqual([])
   suppressTreeEmit.value = true
@@ -1929,7 +1935,7 @@ test('Test that restoreProjectHierarchyTreeExpandedSnapshot reapplies he-tree op
   }))
   expect(flushDeferredTreeRevisionPublish).toHaveBeenCalledTimes(1)
   expect(treeRef.closeAll).not.toHaveBeenCalled()
-  expect(treeRef.openNodeAndParents).toHaveBeenCalledTimes(2)
+  expect(treeRef.openNodeAndParents).toHaveBeenCalledTimes(3)
   expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['world-1'])
 })
 
@@ -2292,7 +2298,7 @@ test('Test that restoreProjectHierarchyTreeUiState skips missing nodes during re
       openNodeAndParents: vi.fn()
     }),
     getTreeScrollHost: () => null,
-    getWorlds: () => [sampleWorld],
+    getWorlds: () => [],
     loadChildrenAlongRevealPath,
     nextTick: async () => undefined,
     onExpandedNodeIdsChange: vi.fn(),
@@ -2303,7 +2309,7 @@ test('Test that restoreProjectHierarchyTreeUiState skips missing nodes during re
     },
     treeData
   })
-  expect(loadChildrenAlongRevealPath).not.toHaveBeenCalled()
+  expect(loadChildrenAlongRevealPath).toHaveBeenCalledWith(['world-1'])
   findSpy.mockRestore()
 })
 

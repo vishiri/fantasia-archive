@@ -63,41 +63,6 @@ export function collectExpandedNodeIdsFromTree (
 }
 
 /**
- * Flat preorder of hierarchy rows currently visible in the sidebar tree (respects expand state).
- */
-export function collectProjectHierarchyTreeVisibleFlatNodes (
-  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
-  openNodeIds: ReadonlySet<string>
-): I_faProjectHierarchyTreeHeTreeNode[] {
-  const output: I_faProjectHierarchyTreeHeTreeNode[] = []
-  function walk (nodes: I_faProjectHierarchyTreeHeTreeNode[]): void {
-    for (const node of nodes) {
-      output.push(node)
-      if (
-        node.children.length > 0 &&
-        isProjectHierarchyTreeNodeEffectivelyExpanded(treeNodes, node.id, openNodeIds)
-      ) {
-        walk(node.children)
-      }
-    }
-  }
-  walk(treeNodes)
-  return output
-}
-
-/**
- * Join of visible flat row ids — virtual-list size cache invalidates when this changes.
- */
-export function buildProjectHierarchyTreeVisibleFlatVirtualScrollKey (
-  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
-  openNodeIds: ReadonlySet<string>
-): string {
-  return collectProjectHierarchyTreeVisibleFlatNodes(treeNodes, openNodeIds)
-    .map((node) => node.id)
-    .join('|')
-}
-
-/**
  * Collects descendant node ids for collapse pruning (direct and nested children).
  */
 export function collectProjectHierarchyTreeDescendantIds (
@@ -143,74 +108,6 @@ export function pruneProjectHierarchyTreeExpandedNodeIdsToAncestors (
   const expandedSet = new Set(expandedNodeIds)
   return expandedNodeIds.filter((nodeId) => {
     return isProjectHierarchyTreeNodeEffectivelyExpanded(treeNodes, nodeId, expandedSet)
-  })
-}
-
-function isMissingWorldAncestorOnly (
-  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
-  ancestorId: string,
-  openSet: ReadonlySet<string>
-): boolean {
-  if (openSet.has(ancestorId)) {
-    return false
-  }
-  const ancestor = findProjectHierarchyTreeNodeById(treeNodes, ancestorId)
-  return ancestor?.nodeKind === 'world'
-}
-
-/**
- * True when a node id may stay in the persisted open set (world row may be absent while descendants remain).
- */
-export function isProjectHierarchyTreeNodePersistableInOpenSet (
-  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
-  nodeId: string,
-  openSet: ReadonlySet<string>
-): boolean {
-  const ancestors = collectProjectHierarchyTreeAncestorIds(treeNodes, nodeId)
-  if (ancestors === null) {
-    return false
-  }
-  for (const ancestorId of ancestors) {
-    if (openSet.has(ancestorId)) {
-      continue
-    }
-    if (!isMissingWorldAncestorOnly(treeNodes, ancestorId, openSet)) {
-      return false
-    }
-  }
-  return true
-}
-
-/**
- * Filters persisted expanded ids to known nodes, keeping latent descendants under a collapsed world row.
- */
-export function applyPersistedProjectHierarchyTreeOpenNodeIds (
-  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
-  expandedNodeIds: string[]
-): string[] {
-  const knownNodeIds = applyExpandedNodeIdsToTree(treeNodes, expandedNodeIds)
-  const knownSet = new Set(knownNodeIds)
-  return knownNodeIds.filter((nodeId) => {
-    return isProjectHierarchyTreeNodePersistableInOpenSet(treeNodes, nodeId, knownSet)
-  })
-}
-
-/**
- * Queues expanded ids from the in-memory open set, including descendants remembered under a collapsed world.
- */
-export function collectProjectHierarchyTreePersistedExpandedNodeIds (
-  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
-  openNodeIds: ReadonlySet<string>
-): string[] {
-  const knownNodeIds: string[] = []
-  for (const nodeId of openNodeIds) {
-    if (findProjectHierarchyTreeNodeById(treeNodes, nodeId) !== null) {
-      knownNodeIds.push(nodeId)
-    }
-  }
-  const knownSet = new Set(knownNodeIds)
-  return knownNodeIds.filter((nodeId) => {
-    return isProjectHierarchyTreeNodePersistableInOpenSet(treeNodes, nodeId, knownSet)
   })
 }
 

@@ -24,14 +24,21 @@ import { PROJECT_HIERARCHY_TREE_DOCUMENT_TEMPLATE_DEFAULT_ICON } from '../projec
 import { createResolveProjectHierarchyTreePlacementDisplayIcon } from '../projectHierarchyTreePlacementDisplayIcon'
 import {
   applyPersistedProjectHierarchyTreeOpenNodeIds,
-  buildProjectHierarchyTreeVisibleFlatVirtualScrollKey,
+  collectProjectHierarchyTreeLatentDocumentOpenNodeIds,
+  collectProjectHierarchyTreePersistedExpandedNodeIds,
+  isProjectHierarchyTreeNodePersistableInOpenSet
+} from '../projectHierarchyTreePersistedOpenNodeIds'
+import {
   collectProjectHierarchyTreeAncestorIds,
   collectProjectHierarchyTreeDescendantIds,
-  collectProjectHierarchyTreePersistedExpandedNodeIds,
   evictCollapsedNodeChildren,
   findProjectHierarchyTreeNodeById,
   needsProjectHierarchyTreeLazyLoadBeforeOpen
 } from '../projectHierarchyTreeExpandState'
+import {
+  buildProjectHierarchyTreeVisibleFlatVirtualScrollKey,
+  collectProjectHierarchyTreeVisibleFlatNodes
+} from '../projectHierarchyTreeVisibleFlatNodes'
 import { mergeLoadedChildrenIntoNode } from '../projectHierarchyTreeMergeLoadedChildren'
 import {
   isProjectHierarchyTreeNodeDraggable,
@@ -41,7 +48,7 @@ import {
   resolveProjectHierarchyTreeDragContext
 } from '../projectHierarchyTreeDnD'
 import { findProjectHierarchyTreeDocumentsWithInvalidPlacementParent } from '../projectHierarchyTreeDocumentPlacementGuard'
-import { resolveProjectHierarchyTreeDragExpandedSnapshot } from '../../scripts/projectHierarchyTreeDragExpandSnapshotWiring'
+import { resolveProjectHierarchyTreeDragExpandedSnapshot, captureProjectHierarchyTreeDragExpandSnapshots } from '../../scripts/projectHierarchyTreeDragExpandSnapshotWiring'
 import { mapProjectHierarchyTreeToTopologyKey } from '../projectHierarchyTreeTopologyKey'
 import { projectHierarchyTreeLayoutStructureMatchesTree } from '../../scripts/projectHierarchyTreeLayoutStructureMatch'
 import {
@@ -750,6 +757,35 @@ test('Test that applyPersistedProjectHierarchyTreeOpenNodeIds keeps descendants 
   ).toEqual(['world-1'])
 })
 
+test('Test that applyPersistedProjectHierarchyTreeOpenNodeIds keeps latent document ids before lazy load', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  expect(
+    applyPersistedProjectHierarchyTreeOpenNodeIds(tree, [
+      'world-1',
+      'group-1',
+      'placement-1',
+      'doc-parent',
+      'doc-child'
+    ])
+  ).toEqual([
+    'world-1',
+    'group-1',
+    'placement-1',
+    'doc-parent',
+    'doc-child'
+  ])
+})
+
+test('Test that collectProjectHierarchyTreePersistedExpandedNodeIds keeps latent document ids', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  expect(
+    collectProjectHierarchyTreePersistedExpandedNodeIds(
+      tree,
+      new Set(['world-1', 'group-1', 'placement-1', 'doc-a', 'doc-b'])
+    )
+  ).toEqual(['world-1', 'group-1', 'placement-1', 'doc-a', 'doc-b'])
+})
+
 /**
  * collectProjectHierarchyTreePersistedExpandedNodeIds mirrors latent descendant ids from the open set.
  */
@@ -761,6 +797,85 @@ test('Test that collectProjectHierarchyTreePersistedExpandedNodeIds keeps latent
       new Set(['group-1', 'placement-1'])
     )
   ).toEqual(['group-1', 'placement-1'])
+})
+
+test('Test that collectProjectHierarchyTreeVisibleFlatNodes skips collapsed descendants', () => {
+  const worldNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [{
+      children: [{
+        children: [],
+        childrenLoaded: true,
+        documentId: 'doc-nested',
+        groupId: 'group-1',
+        hasChildren: false,
+        icon: '',
+        id: 'doc-nested',
+        label: 'Nested doc',
+        nodeKind: 'document',
+        placementId: 'placement-1',
+        worldColor: '#aabbcc',
+        worldId: 'world-1'
+      }],
+      childrenLoaded: true,
+      documentId: null,
+      groupId: 'group-1',
+      hasChildren: true,
+      icon: '',
+      id: 'group-1',
+      label: 'Group',
+      nodeKind: 'group',
+      placementId: null,
+      worldColor: '#aabbcc',
+      worldId: 'world-1'
+    }],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'world-1',
+    label: 'World',
+    nodeKind: 'world',
+    placementId: null,
+    worldColor: '#aabbcc',
+    worldId: 'world-1'
+  }
+  const collapsed = collectProjectHierarchyTreeVisibleFlatNodes(
+    [worldNode],
+    new Set(['world-1'])
+  )
+  expect(collapsed.map((node) => node.id)).toEqual(['world-1', 'group-1'])
+  const expanded = collectProjectHierarchyTreeVisibleFlatNodes(
+    [worldNode],
+    new Set(['world-1', 'group-1'])
+  )
+  expect(expanded.map((node) => node.id)).toEqual(['world-1', 'group-1', 'doc-nested'])
+})
+
+test('Test that collectProjectHierarchyTreeLatentDocumentOpenNodeIds rejects lazy placeholders and known nodes', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const latentIds = collectProjectHierarchyTreeLatentDocumentOpenNodeIds(tree, [
+    'placement-1',
+    'placement-1__lazy',
+    'group-1',
+    'doc-latent',
+    'not-a-document'
+  ])
+  expect(latentIds).toEqual(['doc-latent'])
+})
+
+test('Test that isProjectHierarchyTreeNodePersistableInOpenSet rejects unknown nodes', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  expect(
+    isProjectHierarchyTreeNodePersistableInOpenSet(tree, 'missing-node', new Set())
+  ).toBe(false)
+})
+
+test('Test that applyPersistedProjectHierarchyTreeOpenNodeIds drops ids with collapsed non-world ancestors', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  expect(
+    applyPersistedProjectHierarchyTreeOpenNodeIds(tree, ['placement-1'])
+  ).toEqual([])
 })
 
 test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton omits lazy placeholders without children', () => {
@@ -1069,6 +1184,20 @@ test('Test that resolveProjectHierarchyTreeDragExpandedSnapshot keeps nested per
     'placement-1',
     'placement-2'
   ])
+})
+
+test('Test that drag restore snapshot keeps latent ids when ui freeze snapshot drops collapsed world descendants', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const openIds = new Set(['group-1', 'placement-1'])
+  const snapshots = captureProjectHierarchyTreeDragExpandSnapshots({
+    collapsedVisibleNodeIds: ['world-1'],
+    liveExpandedNodeIds: [],
+    openNodeIds: openIds,
+    scrollHostPresent: true,
+    treeNodes: tree
+  })
+  expect(snapshots.persistedExpandSnapshot).toEqual(['group-1', 'placement-1'])
+  expect(snapshots.uiFreezeSnapshot).toEqual([])
 })
 
 test('Test that collectProjectHierarchyTreeDescendantIds walks nested children', () => {

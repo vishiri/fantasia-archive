@@ -7,6 +7,7 @@ import {
   findProjectHierarchyTreeNodeById,
   pruneProjectHierarchyTreeExpandedNodeIdsToAncestors
 } from '../functions/projectHierarchyTreeExpandState'
+import { collectProjectHierarchyTreePersistedExpandedNodeIds } from '../functions/projectHierarchyTreePersistedOpenNodeIds'
 
 function pruneOpenNodeIdsByCollapsedVisibleRows (
   treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
@@ -62,4 +63,31 @@ export function resolveProjectHierarchyTreeDragExpandedSnapshot (
     return collectExpandedNodeIdsFromTree(treeNodes, prunedOpenNodeIds)
   }
   return collectExpandedNodeIdsFromTree(treeNodes, openNodeIds)
+}
+
+export function captureProjectHierarchyTreeDragExpandSnapshots (input: {
+  collapsedVisibleNodeIds: string[]
+  liveExpandedNodeIds: string[]
+  openNodeIds: ReadonlySet<string>
+  scrollHostPresent: boolean
+  treeNodes: I_faProjectHierarchyTreeHeTreeNode[]
+}): {
+    persistedExpandSnapshot: string[]
+    uiFreezeSnapshot: string[]
+  } {
+  const persistedExpandSnapshot = collectProjectHierarchyTreePersistedExpandedNodeIds(
+    input.treeNodes,
+    input.openNodeIds
+  )
+  const uiFreezeSnapshot = resolveProjectHierarchyTreeDragExpandedSnapshot(
+    input.treeNodes,
+    input.liveExpandedNodeIds,
+    input.collapsedVisibleNodeIds,
+    input.openNodeIds,
+    input.scrollHostPresent
+  )
+  return {
+    persistedExpandSnapshot,
+    uiFreezeSnapshot
+  }
 }

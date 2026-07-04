@@ -29,6 +29,7 @@ type T_projectHierarchyTreeDragCommitScheduleDeps = {
   dragExpandUiFrozen: Ref<boolean>
   dragExpandedSnapshot: () => string[] | null
   dragSiblingOrderAtDragStart: () => string[] | null
+  readDragParentDocumentIdAtDragStart: () => string | null
   readDragSiblingOrderSnapshot: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
   draggedDocumentId: () => string | null
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
@@ -38,7 +39,8 @@ type T_projectHierarchyTreeDragCommitScheduleDeps = {
   loadChildrenForNode: (node: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   refreshNodeChildrenFromDatabase: (nodeId: string) => Promise<void>
   markNodeClosed: (nodeId: string, node: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeNode) => void
-  markNodeOpen: (nodeId: string) => void
+  openNodeIds: Ref<Set<string>>
+  queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   reindexDocumentSiblingsInHierarchy: (input: {
     movedDocumentId: string
     orderedDocumentIds: string[]
@@ -102,6 +104,29 @@ async function runProjectHierarchyTreeDragCommitPersistPhase (deps: {
   return commitResult
 }
 
+function resolveProjectHierarchyTreeDragCommitGate (input: {
+  dragParentDocumentIdAtDragStart: string | null
+  dragSiblingOrderSnapshot: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
+  dragStartOrder: string[] | null
+}): {
+    orderChangedFromDragStart: boolean
+    parentChangedFromDragStart: boolean
+  } {
+  const parentChangedFromDragStart = input.dragSiblingOrderSnapshot !== null &&
+    input.dragParentDocumentIdAtDragStart !== input.dragSiblingOrderSnapshot.parentDocumentId
+  const orderChangedFromDragStart = input.dragSiblingOrderSnapshot !== null &&
+    (input.dragStartOrder === null ||
+      parentChangedFromDragStart ||
+      !areProjectHierarchyTreeOrderedDocumentIdsEqual(
+        input.dragSiblingOrderSnapshot.orderedDocumentIds,
+        input.dragStartOrder
+      ))
+  return {
+    orderChangedFromDragStart,
+    parentChangedFromDragStart
+  }
+}
+
 async function finishProjectHierarchyTreeDragCommit (
   deps: T_projectHierarchyTreeDragCommitScheduleDeps
 ): Promise<void> {
@@ -138,12 +163,12 @@ async function finishProjectHierarchyTreeDragCommit (
     treeData: deps.treeData.value
   })
   const dragStartOrder = deps.dragSiblingOrderAtDragStart()
-  const orderChangedFromDragStart = dragSiblingOrderSnapshot !== null &&
-    (dragStartOrder === null ||
-      !areProjectHierarchyTreeOrderedDocumentIdsEqual(
-        dragSiblingOrderSnapshot.orderedDocumentIds,
-        dragStartOrder
-      ))
+  const dragParentDocumentIdAtDragStart = deps.readDragParentDocumentIdAtDragStart()
+  const { orderChangedFromDragStart } = resolveProjectHierarchyTreeDragCommitGate({
+    dragParentDocumentIdAtDragStart,
+    dragSiblingOrderSnapshot,
+    dragStartOrder
+  })
   let commitResult: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragCommitResult
   if (orderChangedFromDragStart) {
     commitResult = await runProjectHierarchyTreeDragCommitPersistPhase({
@@ -178,8 +203,9 @@ async function finishProjectHierarchyTreeDragCommit (
     getTreeRef: deps.getTreeRef,
     loadChildrenForNode: deps.loadChildrenForNode,
     markNodeClosed: deps.markNodeClosed,
-    markNodeOpen: deps.markNodeOpen,
     nextTick: deps.nextTick,
+    openNodeIds: deps.openNodeIds,
+    queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
     reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,
     reapplyLatentDescendantExpandState: deps.reapplyLatentDescendantExpandState,
     requestAnimationFrame: deps.requestAnimationFrame,

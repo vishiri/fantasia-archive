@@ -76,7 +76,9 @@ vi.mock('@he-tree/vue', () => ({
 
 import {
   computeProjectHierarchyTreeDragSiblingOrderFromHeTreeDropContext,
-  readProjectHierarchyTreeDragSiblingOrderFromHeTreeParentStats
+  readProjectHierarchyTreeDragSiblingOrderFromHeTreeParentStats,
+  resolveProjectHierarchyTreeDragDropTargetParentDocumentId,
+  resolveProjectHierarchyTreeDragSiblingOrderSnapshotParentDocumentId
 } from '../projectHierarchyTreeDragPostDropOrderWiring'
 import {
   loadProjectHierarchyTreeNodeChildren,
@@ -260,6 +262,100 @@ test('Test that drag post-drop order wiring reads he-tree parent stats and drop 
   })).toBeNull()
   dragContextState.startInfo = undefined
   dragContextState.targetInfo = undefined
+})
+
+test('Test that drop target parent document id resolves from he-tree dragContext', () => {
+  dragContextState.targetInfo = undefined
+  expect(resolveProjectHierarchyTreeDragDropTargetParentDocumentId()).toEqual({ resolved: false })
+  const parentDoc = buildDocumentNode({
+    documentId: 'doc-parent',
+    hasChildren: true,
+    id: 'doc-parent',
+    label: 'Parent'
+  })
+  dragContextState.targetInfo = {
+    indexBeforeDrop: 0,
+    parent: {
+      children: [{
+        data: buildDocumentNode({
+          documentId: 'doc-child',
+          id: 'doc-child'
+        })
+      }],
+      data: parentDoc
+    },
+    tree: {}
+  }
+  expect(resolveProjectHierarchyTreeDragDropTargetParentDocumentId()).toEqual({
+    parentDocumentId: 'doc-parent',
+    resolved: true
+  })
+  expect(resolveProjectHierarchyTreeDragSiblingOrderSnapshotParentDocumentId({
+    treeDataParentDocumentId: null
+  })).toBe('doc-parent')
+  dragContextState.targetInfo = undefined
+})
+
+test('Test that syncProjectHierarchyTreeSiblingOrderAfterDrop uses drop target parent when treeData lags', () => {
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  const parentDoc = buildDocumentNode({
+    childrenLoaded: false,
+    documentId: 'doc-parent',
+    hasChildren: true,
+    id: 'doc-parent',
+    label: 'Parent'
+  })
+  const placement = findProjectHierarchyTreeNodeById(treeData, 'placement-1')
+  expect(placement).not.toBeNull()
+  if (placement !== null) {
+    placement.children.push(parentDoc)
+  }
+  dragContextState.targetInfo = {
+    indexBeforeDrop: 0,
+    parent: {
+      children: [{
+        data: buildDocumentNode({
+          documentId: 'doc-c',
+          id: 'doc-c'
+        })
+      }],
+      data: parentDoc
+    },
+    tree: {}
+  }
+  const synced = syncProjectHierarchyTreeSiblingOrderAfterDrop({
+    dragStartOrderedDocumentIds: ['doc-a', 'doc-b', 'doc-c'],
+    draggedDocumentId: 'doc-c',
+    getTreeRef: () => null,
+    getTreeScrollHost: () => null,
+    setDragSiblingOrderSnapshot: () => undefined,
+    treeData
+  })
+  expect(synced.snapshot?.parentDocumentId).toBe('doc-parent')
+  dragContextState.targetInfo = undefined
+})
+
+test('Test that persistProjectHierarchyTreeDraggedDocumentMove uses snapshot parent for nest open id', async () => {
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  const result = await persistProjectHierarchyTreeDraggedDocumentMove({
+    documentId: 'doc-c',
+    dragCommitSuppressWaitAttempts: 0,
+    dragCommitSuppressWaitReady: true,
+    dragSiblingOrderSnapshot: {
+      orderedDocumentIds: ['doc-c'],
+      parentDocumentId: 'doc-parent',
+      placementId: 'placement-1'
+    },
+    modelSettleAttempts: 0,
+    reindexDocumentSiblingsInHierarchy: vi.fn(async () => undefined),
+    refreshLayout: vi.fn(async () => undefined),
+    resyncTreeDataFromLayout: vi.fn(),
+    suppressTreeEmit: false,
+    treeData
+  })
+  expect(result.nestParentDocumentId).toBe('doc-parent')
 })
 
 test('Test that resolveProjectHierarchyTreeDragCommitOrderFallback prefers dom sibling order', () => {
@@ -474,7 +570,7 @@ test('Test that drag sibling order resolve and after-drop sync capture commit sn
   })).toEqual(['doc-a', 'doc-b', 'doc-c'])
 })
 
-test('Test that finalizeProjectHierarchyTreeDragCommitAfterPersist opens nest parent after commit', async () => {
+test('Test that finalizeProjectHierarchyTreeDragCommitAfterPersist merges nest parent into expanded snapshot restore', async () => {
   const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
   seedPlacementDocuments(treeData.value)
   mergeLoadedChildrenIntoNode(treeData.value, 'placement-1', [
@@ -486,8 +582,10 @@ test('Test that finalizeProjectHierarchyTreeDragCommitAfterPersist opens nest pa
       label: 'Parent'
     })
   ])
-  const markNodeOpen = vi.fn()
-  const loadChildrenForNode = vi.fn(async () => undefined)
+  const flushUiStatePersist = vi.fn()
+  const queuePersistExpandedNodeIds = vi.fn()
+  const openNodeIds = ref(new Set(['world-1', 'group-1', 'placement-1', 'doc-parent']))
+  const restoreExpandedSnapshot = vi.fn(async () => undefined)
   await finalizeProjectHierarchyTreeDragCommitAfterPersist({
     clearDragSessionFlags: vi.fn(),
     commitResult: {
@@ -501,15 +599,73 @@ test('Test that finalizeProjectHierarchyTreeDragCommitAfterPersist opens nest pa
     expandedSnapshot: ['world-1', 'placement-1'],
     expandedSnapshotSet: new Set(['world-1', 'placement-1']),
     flushDeferredTreeRevisionPublish: vi.fn(),
-    flushUiStatePersist: vi.fn(),
+    flushUiStatePersist,
     getTreeRef: () => ({
       closeAll: () => undefined,
       openNodeAndParents: () => undefined
     }),
-    loadChildrenForNode,
+    loadChildrenForNode: vi.fn(async () => undefined),
     markNodeClosed: vi.fn(),
-    markNodeOpen,
     nextTick: async () => undefined,
+    openNodeIds,
+    queuePersistExpandedNodeIds,
+    reapplyHeTreeOpenState: vi.fn(),
+    reapplyLatentDescendantExpandState: vi.fn(async () => undefined),
+    requestAnimationFrame: (callback) => {
+      callback()
+      return 1
+    },
+    restoreExpandedSnapshot,
+    treeData
+  })
+  expect(restoreExpandedSnapshot).toHaveBeenCalledWith(
+    ['world-1', 'placement-1', 'doc-parent'],
+    expect.any(Object)
+  )
+  expect(restoreExpandedSnapshot).toHaveBeenCalledTimes(2)
+  expect(queuePersistExpandedNodeIds).toHaveBeenCalled()
+  expect(flushUiStatePersist).toHaveBeenCalled()
+})
+
+test('Test that finalizeProjectHierarchyTreeDragCommitAfterPersist skips nest persist sync when parent was expanded at drag start', async () => {
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  seedPlacementDocuments(treeData.value)
+  mergeLoadedChildrenIntoNode(treeData.value, 'placement-1', [
+    buildDocumentNode({
+      childrenLoaded: false,
+      documentId: 'doc-parent',
+      hasChildren: true,
+      id: 'doc-parent',
+      label: 'Parent'
+    })
+  ])
+  const markNodeOpen = vi.fn()
+  const flushUiStatePersist = vi.fn()
+  const queuePersistExpandedNodeIds = vi.fn()
+  const openNodeIds = ref(new Set(['world-1', 'placement-1', 'doc-parent']))
+  await finalizeProjectHierarchyTreeDragCommitAfterPersist({
+    clearDragSessionFlags: vi.fn(),
+    commitResult: {
+      committed: true,
+      emptiedParentDocumentIds: [],
+      nestParentDocumentId: 'doc-parent',
+      reloadChildrenNodeId: null
+    },
+    dragExpandPostCommitGuard: ref(false),
+    dragExpandUiFrozen: ref(false),
+    expandedSnapshot: ['world-1', 'placement-1', 'doc-parent'],
+    expandedSnapshotSet: new Set(['world-1', 'placement-1', 'doc-parent']),
+    flushDeferredTreeRevisionPublish: vi.fn(),
+    flushUiStatePersist,
+    getTreeRef: () => ({
+      closeAll: () => undefined,
+      openNodeAndParents: () => undefined
+    }),
+    loadChildrenForNode: vi.fn(async () => undefined),
+    markNodeClosed: vi.fn(),
+    nextTick: async () => undefined,
+    openNodeIds,
+    queuePersistExpandedNodeIds,
     reapplyHeTreeOpenState: vi.fn(),
     reapplyLatentDescendantExpandState: vi.fn(async () => undefined),
     requestAnimationFrame: (callback) => {
@@ -519,7 +675,8 @@ test('Test that finalizeProjectHierarchyTreeDragCommitAfterPersist opens nest pa
     restoreExpandedSnapshot: vi.fn(async () => undefined),
     treeData
   })
-  expect(markNodeOpen).toHaveBeenCalledWith('doc-parent')
+  expect(markNodeOpen).not.toHaveBeenCalled()
+  expect(queuePersistExpandedNodeIds).toHaveBeenCalled()
 })
 
 test('Test that persistProjectHierarchyTreeDraggedDocumentMove resyncs after reindex failure', async () => {
@@ -705,8 +862,9 @@ test('Test that finalizeProjectHierarchyTreeDragCommitAfterPersist closes emptie
     getTreeRef: () => null,
     loadChildrenForNode: vi.fn(async () => undefined),
     markNodeClosed,
-    markNodeOpen: vi.fn(),
     nextTick: async () => undefined,
+    openNodeIds: ref(new Set(['world-1', 'placement-1'])),
+    queuePersistExpandedNodeIds: vi.fn(),
     reapplyHeTreeOpenState: vi.fn(),
     reapplyLatentDescendantExpandState: vi.fn(async () => undefined),
     requestAnimationFrame: (callback) => {

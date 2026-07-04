@@ -6,6 +6,7 @@ import type {
 
 import { applyProjectHierarchyTreeSiblingOrderToTreeData } from './projectHierarchyTreeSiblingOrderPatchWiring'
 import { resolveProjectHierarchyTreeDragSiblingOrderAfterDrop } from './projectHierarchyTreeDragSiblingOrderResolveWiring'
+import { resolveProjectHierarchyTreeDragSiblingOrderSnapshotParentDocumentId } from './projectHierarchyTreeDragPostDropOrderWiring'
 import { resolveProjectHierarchyTreeDragSiblingOrderSnapshot } from './projectHierarchyTreeDragSiblingOrderSnapshotWiring'
 
 function buildDragSiblingOrderSnapshot (input: {
@@ -20,9 +21,12 @@ function buildDragSiblingOrderSnapshot (input: {
   if (treeDataSnapshot === null) {
     return null
   }
+  const parentDocumentId = resolveProjectHierarchyTreeDragSiblingOrderSnapshotParentDocumentId({
+    treeDataParentDocumentId: treeDataSnapshot.parentDocumentId
+  })
   return {
     orderedDocumentIds: input.orderedDocumentIds,
-    parentDocumentId: treeDataSnapshot.parentDocumentId,
+    parentDocumentId,
     placementId: treeDataSnapshot.placementId
   }
 }

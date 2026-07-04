@@ -10,7 +10,6 @@ import {
 } from '../functions/projectHierarchyTreeDnD'
 import { isProjectHierarchyTreeSameBucketSiblingReorder } from '../functions/projectHierarchyTreeSameBucketSiblingReorder'
 import { findProjectHierarchyTreeDocumentParentBucket } from '../functions/projectHierarchyTreeDocumentParentBucket'
-
 type T_persistDragMoveDeps = {
   documentId: string
   dragCommitSuppressWaitAttempts: number
@@ -65,13 +64,14 @@ export async function persistProjectHierarchyTreeDraggedDocumentMove (
       reloadChildrenNodeId: null
     }
   }
-  const nestParentDocumentId = parentBucket.parentDocumentId
+  const treeParentDocumentId = parentBucket.parentDocumentId
   const snapshotParentDocumentId = deps.dragSiblingOrderSnapshot?.parentDocumentId ?? null
-  const reindexParentDocumentId = snapshotParentDocumentId ?? nestParentDocumentId
+  const reindexParentDocumentId = snapshotParentDocumentId ?? treeParentDocumentId
+  const nestParentDocumentId = reindexParentDocumentId
   const placementId = deps.dragSiblingOrderSnapshot?.placementId ?? movedNode.placementId
   const sameBucketSiblingReorder = isProjectHierarchyTreeSameBucketSiblingReorder({
     snapshot: deps.dragSiblingOrderSnapshot,
-    treeParentDocumentId: nestParentDocumentId
+    treeParentDocumentId
   })
   const reloadChildrenNodeId = sameBucketSiblingReorder
     ? null
@@ -98,12 +98,13 @@ export async function persistProjectHierarchyTreeDraggedDocumentMove (
       parentDocumentId: reindexParentDocumentId,
       placementId
     })
-    return {
+    const commitResult = {
       committed: true,
       emptiedParentDocumentIds: [],
       nestParentDocumentId,
       reloadChildrenNodeId
     }
+    return commitResult
   } catch (error) {
     console.error('[ProjectHierarchyTree] reindexDocumentSiblingsInHierarchy failed', error)
     deps.resyncTreeDataFromLayout()

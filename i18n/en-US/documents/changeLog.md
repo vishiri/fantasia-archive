@@ -40,6 +40,8 @@
 - **Workspace sidebar**: Dragging an expanded document subtree to nest under another document no longer collapses open folders about a second after the drop; expanded branches stay open through the move.
 - **Workspace sidebar**: The hierarchy tree list has **8px** bottom padding so the last document row is not flush against the panel edge when scrolled to the end.
 - **Workspace sidebar**: Dragging documents to reorder within a template placement now saves sibling order to the project database and keeps that order after you quit and reopen the project.
+- **Workspace sidebar**: Lazy-loaded document rows nested under a collapsed world, group, or placement stay in saved expand state and reopen once their parent branches load, instead of being forgotten on project reopen or after a document drag.
+- **Workspace sidebar**: The hierarchy tree virtual list recalculates scroll height when nested rows expand or collapse, which keeps the bottom of long document lists reachable without a stale scrollbar.
 
 ### Known issues
 - **Fantasia Archive Settings** still lists many experimental toggles marked as planned work in their titles; those options are not shipped yet and have no effect when enabled.

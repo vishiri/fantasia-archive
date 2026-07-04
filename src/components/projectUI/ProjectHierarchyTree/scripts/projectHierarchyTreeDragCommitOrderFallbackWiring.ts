@@ -8,7 +8,8 @@ import { areProjectHierarchyTreeOrderedDocumentIdsEqual } from '../functions/pro
 import { applyProjectHierarchyTreeSiblingOrderToTreeData } from './projectHierarchyTreeSiblingOrderPatchWiring'
 import {
   computeProjectHierarchyTreeDragSiblingOrderFromHeTreeDropContext,
-  readProjectHierarchyTreeDragSiblingOrderFromHeTreeParentStats
+  readProjectHierarchyTreeDragSiblingOrderFromHeTreeParentStats,
+  resolveProjectHierarchyTreeDragSiblingOrderSnapshotParentDocumentId
 } from './projectHierarchyTreeDragPostDropOrderWiring'
 import { readProjectHierarchyTreeDragSiblingOrderFromDom } from './projectHierarchyTreeDragSiblingDomOrderWiring'
 import { resolveProjectHierarchyTreeDragSiblingOrderSnapshot } from './projectHierarchyTreeDragSiblingOrderSnapshotWiring'
@@ -25,9 +26,12 @@ function buildSiblingOrderSnapshotFromOrderedDocumentIds (input: {
   ) {
     return input.treeDataSnapshot
   }
+  const parentDocumentId = resolveProjectHierarchyTreeDragSiblingOrderSnapshotParentDocumentId({
+    treeDataParentDocumentId: input.treeDataSnapshot.parentDocumentId
+  })
   return {
     orderedDocumentIds: input.orderedDocumentIds,
-    parentDocumentId: input.treeDataSnapshot.parentDocumentId,
+    parentDocumentId,
     placementId: input.treeDataSnapshot.placementId
   }
 }

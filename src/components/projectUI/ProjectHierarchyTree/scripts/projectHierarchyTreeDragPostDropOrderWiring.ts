@@ -35,6 +35,42 @@ function readDocumentIdsFromHeTreeDragStats (stats: T_heTreeDragStat[] | undefin
   return orderedDocumentIds
 }
 
+type T_projectHierarchyTreeDragDropTargetParentDocumentId =
+  | { parentDocumentId: string | null, resolved: true }
+  | { resolved: false }
+
+/**
+ * Resolves drop-target parent document id from he-tree dragContext when treeData lags modify-mode drops.
+ */
+export function resolveProjectHierarchyTreeDragDropTargetParentDocumentId (
+): T_projectHierarchyTreeDragDropTargetParentDocumentId {
+  const targetInfo = dragContext.targetInfo as T_heTreeDragDropInfo | undefined
+  if (targetInfo === undefined || targetInfo.parent === null) {
+    return { resolved: false }
+  }
+  const parentData = targetInfo.parent.data
+  if (parentData.nodeKind === 'document' && parentData.documentId !== null) {
+    return {
+      parentDocumentId: parentData.documentId,
+      resolved: true
+    }
+  }
+  return {
+    parentDocumentId: null,
+    resolved: true
+  }
+}
+
+export function resolveProjectHierarchyTreeDragSiblingOrderSnapshotParentDocumentId (input: {
+  treeDataParentDocumentId: string | null
+}): string | null {
+  const dropTargetParentDocumentId = resolveProjectHierarchyTreeDragDropTargetParentDocumentId()
+  if (dropTargetParentDocumentId.resolved) {
+    return dropTargetParentDocumentId.parentDocumentId
+  }
+  return input.treeDataParentDocumentId
+}
+
 /**
  * Reads post-drop sibling document ids from he-tree parent stat children (stats order).
  */

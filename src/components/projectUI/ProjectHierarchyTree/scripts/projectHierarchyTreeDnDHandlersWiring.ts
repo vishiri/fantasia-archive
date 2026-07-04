@@ -2,22 +2,19 @@ import type { Ref } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { resolveProjectHierarchyTreeDragExpandedSnapshot } from './projectHierarchyTreeDragExpandSnapshotWiring'
-import { collectProjectHierarchyTreeLiveExpandStateFromDom } from './projectHierarchyTreeLiveExpandDomWiring'
-import {
-  applyFaVerticalDraggableTabsDocumentDragCursor,
-  clearFaVerticalDraggableTabsDocumentDragCursor
-} from 'app/src/scripts/faDragDrop/faDragDrop_manager'
 import {
   shouldClearDragSessionWithoutCommit
 } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldTemplateLayoutTreeCommitPolicy'
+import {
+  clearFaVerticalDraggableTabsDocumentDragCursor
+} from 'app/src/scripts/faDragDrop/faDragDrop_manager'
 import type { createProjectHierarchyTreeDragCancelWiring } from './projectHierarchyTreeDragCancelWiring'
 import type { createProjectHierarchyTreeDocumentRowDragHoldWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
 import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowExpandClickGestureWiring'
+import { runProjectHierarchyTreeBeforeDragStart } from './projectHierarchyTreeDragStartHandlerWiring'
 import { scheduleProjectHierarchyTreeDragCommit } from './projectHierarchyTreeDnDScheduleWiring'
 import { applyProjectHierarchyTreeHeTreeModelValueUpdate } from './projectHierarchyTreeDnDModelValueUpdateWiring'
 import { syncProjectHierarchyTreeSiblingOrderAfterDrop } from './projectHierarchyTreeDragAfterDropSiblingOrderSyncWiring'
-import { resolveProjectHierarchyTreeDragSiblingOrderAtDragStart } from './projectHierarchyTreeDragSiblingOrderResolveWiring'
 
 type T_projectHierarchyTreeDnDHandlerDeps = {
   clearDragSessionFlags: () => void
@@ -44,8 +41,10 @@ type T_projectHierarchyTreeDnDHandlerDeps = {
     ) => void
   }
   captureDragModelValueRevisionAtDrop: () => void
+  captureDragParentDocumentIdAtDragStart: (parentDocumentId: string | null) => void
   captureDragSiblingOrderAtDragStart: (orderedDocumentIds: string[] | null) => void
   incrementDragModelValueRevision: () => void
+  readDragParentDocumentIdAtDragStart: () => string | null
   readDragSiblingOrderAtDragStart: () => string[] | null
   readDragModelValueSettledForCommit: () => boolean
   resetDragModelValueRevisionForDragStart: () => void
@@ -80,48 +79,6 @@ type T_projectHierarchyTreeDnDHandlerDeps = {
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }
 
-function onBeforeDragStartImpl (
-  deps: T_projectHierarchyTreeDnDHandlerDeps,
-  stat: { data: I_faProjectHierarchyTreeHeTreeNode }
-): void {
-  if (stat.data.nodeKind !== 'document' || stat.data.documentId === null) {
-    return
-  }
-  deps.documentRowDragHoldWiring.markDragStartedFromHold()
-  deps.documentRowExpandClickGesture.markDragStartedForGesture()
-  deps.draggedDocumentId.set(stat.data.documentId)
-  deps.resetDragModelValueRevisionForDragStart()
-  const dragStartOrder = resolveProjectHierarchyTreeDragSiblingOrderAtDragStart({
-    documentId: stat.data.documentId,
-    getTreeRef: deps.getTreeRef,
-    getTreeScrollHost: deps.getTreeScrollHost,
-    treeData: deps.treeData.value
-  })
-  deps.captureDragSiblingOrderAtDragStart(dragStartOrder.orderedDocumentIds)
-  const liveExpandState = collectProjectHierarchyTreeLiveExpandStateFromDom(
-    deps.getTreeScrollHost()
-  )
-  const snapshot = resolveProjectHierarchyTreeDragExpandedSnapshot(
-    deps.treeData.value,
-    liveExpandState.expandedNodeIds,
-    liveExpandState.collapsedVisibleNodeIds,
-    deps.openNodeIds.value,
-    liveExpandState.scrollHostPresent
-  )
-  deps.dragExpandedSnapshot.set([...snapshot])
-  deps.dragSiblingOrderSnapshot.set(null)
-  deps.openNodeIds.value = new Set(snapshot)
-  deps.queuePersistExpandedNodeIds(snapshot)
-  deps.dragDropCommitted.value = false
-  deps.dragCommitScheduled.value = false
-  deps.isTreeDragActive.value = true
-  deps.dragCommitPending.value = true
-  deps.dragExpandPostCommitGuard.value = true
-  deps.dragExpandUiFrozen.value = true
-  applyFaVerticalDraggableTabsDocumentDragCursor()
-  deps.dragCancelWiring.attachDragCancelListeners()
-}
-
 function onTreeAfterDropImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void {
   deps.dragDropCommitted.value = true
   deps.captureDragModelValueRevisionAtDrop()
@@ -142,6 +99,7 @@ function onTreeAfterDropImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void 
     draggedDocumentId: deps.draggedDocumentId.get,
     dragExpandedSnapshot: deps.dragExpandedSnapshot.get,
     dragSiblingOrderAtDragStart: deps.readDragSiblingOrderAtDragStart,
+    readDragParentDocumentIdAtDragStart: deps.readDragParentDocumentIdAtDragStart,
     readDragSiblingOrderSnapshot: deps.dragSiblingOrderSnapshot.get,
     flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
     flushUiStatePersist: deps.flushUiStatePersist,
@@ -150,9 +108,10 @@ function onTreeAfterDropImpl (deps: T_projectHierarchyTreeDnDHandlerDeps): void 
     loadChildrenForNode: deps.loadChildrenForNode,
     refreshNodeChildrenFromDatabase: deps.refreshNodeChildrenFromDatabase,
     markNodeClosed: deps.markNodeClosed,
-    markNodeOpen: deps.markNodeOpen,
     reindexDocumentSiblingsInHierarchy: deps.reindexDocumentSiblingsInHierarchy,
     nextTick: deps.nextTick,
+    openNodeIds: deps.openNodeIds,
+    queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
     reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,
     reapplyLatentDescendantExpandState: deps.reapplyLatentDescendantExpandState,
     refreshLayout: deps.refreshLayout,
@@ -209,14 +168,14 @@ export function createProjectHierarchyTreeDnDHandlers (
     if (dragNode === null) {
       return
     }
-    onBeforeDragStartImpl(deps, { data: dragNode.data })
+    runProjectHierarchyTreeBeforeDragStart(deps, { data: dragNode.data })
   }
 
   function onBeforeDragStart (stat: { data: I_faProjectHierarchyTreeHeTreeNode }): void {
     if (!deps.documentRowDragHoldWiring.getIsDragHoldArmed()) {
       return
     }
-    onBeforeDragStartImpl(deps, stat)
+    runProjectHierarchyTreeBeforeDragStart(deps, stat)
   }
 
   function onTreeAfterDrop (): void {
