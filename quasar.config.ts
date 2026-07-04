@@ -200,6 +200,10 @@ export default defineConfig((ctx) => {
         win: {
           icon: 'src-electron/icons/icon.ico'
         },
+        nsis: {
+          allowToChangeInstallationDirectory: true,
+          oneClick: false
+        },
         mac: {
           icon: 'src-electron/icons/icon.icns'
         },

@@ -4,6 +4,7 @@
 ## 2.4.15
 
 ### New features
+- **Windows**: The desktop installer uses a multi-step wizard where you can choose the install folder (for example **Program Files**). App settings and profile data still save under your user **AppData** roaming folder.
 - **Workspace sidebar**: Drag the splitter beside the left panel on the **home** workspace route to resize it. Width saves per **`.faproject`** when you release the drag (minimum **375px**; no upper limit; sidebar cannot collapse to zero).
 - **Workspace sidebar**: Virtualized hierarchy tree lists each world's template layout (groups and placements) with lazy-loaded documents. Expand and collapse state plus scroll position persist per project. Drag documents to reorder within the same template placement. Click a document row to emit its id for future editor wiring.
 - **Workspace sidebar**: **Search...** filters documents in the open project and reveals the first match in the hierarchy tree. When focused it stretches across the full window width; when the **Disable document control bar** app setting is off, a blank document control strip appears beside it on the main pane.
