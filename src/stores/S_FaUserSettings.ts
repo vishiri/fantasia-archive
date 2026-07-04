@@ -2,7 +2,7 @@ import type { Ref } from 'vue'
 
 import { defineStore } from 'pinia'
 import { Notify } from 'quasar'
-import { ref } from 'vue'
+import { readonly, ref } from 'vue'
 import { ResultAsync } from 'neverthrow'
 
 import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
@@ -18,6 +18,15 @@ import { didObjectPatchPersist } from './functions/faPersistPatchVerify'
  */
 export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
   const settings: Ref<I_faUserSettings | null> = ref(null)
+  const appSettingsDialogPreview: Ref<Partial<I_faUserSettings> | null> = ref(null)
+
+  function setAppSettingsDialogPreview (preview: Partial<I_faUserSettings>): void {
+    appSettingsDialogPreview.value = preview
+  }
+
+  function clearAppSettingsDialogPreview (): void {
+    appSettingsDialogPreview.value = null
+  }
 
   async function refreshSettings (): Promise<void> {
     settings.value = await window.faContentBridgeAPIs.faUserSettings.getSettings()
@@ -64,8 +73,11 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
   }
 
   return {
+    appSettingsDialogPreview: readonly(appSettingsDialogPreview),
+    clearAppSettingsDialogPreview,
     settings,
     refreshSettings,
+    setAppSettingsDialogPreview,
     updateSettings
   }
 })

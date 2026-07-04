@@ -11,6 +11,7 @@ import { createUseProjectOverview } from '../../functions/createUseProjectOvervi
 const pickRandomTipCaptionMock = vi.fn(() => 'Random tip.')
 
 const activeProjectRef = ref<{ name: string } | null>(null)
+const appSettingsDialogPreviewRef = ref<{ hideTooltipsProject?: boolean } | null>(null)
 const settingsRef = ref<{ hidePlushes: boolean, hideTooltipsProject: boolean } | null>({
   hidePlushes: false,
   hideTooltipsProject: false
@@ -35,7 +36,10 @@ const useProjectOverview = createUseProjectOverview({
     if ('activeProject' in store) {
       return { activeProject: activeProjectRef }
     }
-    return { settings: settingsRef }
+    return {
+      appSettingsDialogPreview: appSettingsDialogPreviewRef,
+      settings: settingsRef
+    }
   }) as T_piniaStoreToRefs,
   t: (key) => key
 })
@@ -43,6 +47,7 @@ const useProjectOverview = createUseProjectOverview({
 beforeEach(() => {
   onMountedHooks.length = 0
   activeProjectRef.value = null
+  appSettingsDialogPreviewRef.value = null
   settingsRef.value = {
     hidePlushes: false,
     hideTooltipsProject: false
@@ -92,4 +97,20 @@ test('Test that useProjectOverview loads a random tip and hides the card when di
 
   expect(useProjectOverview().showTipCard.value).toBe(false)
   expect(useProjectOverview().showMascotInTipCard.value).toBe(false)
+})
+
+/**
+ * createUseProjectOverview
+ * App Settings dialog preview overrides persisted hideTooltipsProject until the dialog closes.
+ */
+test('Test that useProjectOverview hides the tip card from app settings dialog preview', () => {
+  settingsRef.value = {
+    hidePlushes: false,
+    hideTooltipsProject: false
+  }
+  appSettingsDialogPreviewRef.value = {
+    hideTooltipsProject: true
+  }
+
+  expect(useProjectOverview().showTipCard.value).toBe(false)
 })

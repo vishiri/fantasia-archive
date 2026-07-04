@@ -38,6 +38,20 @@ function createDialogAppSettingsDialogActionsParams (
   return params
 }
 
+function createAppSettingsStoreMock (
+  overrides: Partial<T_appSettingsFaUserSettingsStoreForSync> = {}
+): T_appSettingsFaUserSettingsStoreForSync {
+  return {
+    clearAppSettingsDialogPreview: vi.fn(),
+    refreshSettings: vi.fn(),
+    setAppSettingsDialogPreview: vi.fn(),
+    settings: {
+      ...FA_USER_SETTINGS_DEFAULTS
+    },
+    ...overrides
+  }
+}
+
 /**
  * createDialogAppSettingsDialogActions
  * openDialog hydrates from directSettingsSnapshot without calling the user-settings store.
@@ -222,13 +236,12 @@ test('updateLocalSetting returns early when localSettings is null', () => {
  * updateLocalSetting updates the dialog draft only; persisted user settings stay unchanged until Save.
  */
 test('updateLocalSetting does not patch hideTooltipsProject on the user settings store', () => {
-  const store: T_appSettingsFaUserSettingsStoreForSync = {
+  const store = createAppSettingsStoreMock({
     settings: {
       ...FA_USER_SETTINGS_DEFAULTS,
       hideTooltipsProject: false
-    },
-    refreshSettings: vi.fn()
-  }
+    }
+  })
   vi.mocked(S_FaUserSettings).mockReturnValue(
     store as unknown as ReturnType<typeof S_FaUserSettings>
   )
@@ -253,6 +266,9 @@ test('updateLocalSetting does not patch hideTooltipsProject on the user settings
 
   expect(store.settings?.hideTooltipsProject).toBe(false)
   expect(localSettings.value?.hideTooltipsProject).toBe(true)
+  expect(store.setAppSettingsDialogPreview).toHaveBeenCalledWith({
+    hideTooltipsProject: true
+  })
 })
 
 /**
@@ -260,13 +276,12 @@ test('updateLocalSetting does not patch hideTooltipsProject on the user settings
  * updateLocalSetting still updates the local draft when directSettingsSnapshot props are used.
  */
 test('updateLocalSetting updates local draft for directSettingsSnapshot props without touching the store', () => {
-  const store: T_appSettingsFaUserSettingsStoreForSync = {
+  const store = createAppSettingsStoreMock({
     settings: {
       ...FA_USER_SETTINGS_DEFAULTS,
       hideTooltipsProject: false
-    },
-    refreshSettings: vi.fn()
-  }
+    }
+  })
   vi.mocked(S_FaUserSettings).mockReturnValue(
     store as unknown as ReturnType<typeof S_FaUserSettings>
   )
@@ -435,12 +450,12 @@ test('syncLocalAppSettingsFromStore returns when S_FaUserSettings cannot be reso
  * Calls refreshSettings when the store has not loaded settings yet, then hydrates refs.
  */
 test('syncLocalAppSettingsFromStore refreshes then hydrates when store settings are null', async () => {
-  const store: T_appSettingsFaUserSettingsStoreForSync = {
+  const store = createAppSettingsStoreMock({
     settings: null,
     refreshSettings: async () => {
       store.settings = { ...FA_USER_SETTINGS_DEFAULTS }
     }
-  }
+  })
   vi.mocked(S_FaUserSettings).mockReturnValue(
     store as unknown as ReturnType<typeof S_FaUserSettings>
   )
@@ -460,10 +475,10 @@ test('syncLocalAppSettingsFromStore refreshes then hydrates when store settings 
  */
 test('syncLocalAppSettingsFromStore does not call refreshSettings when settings are already present', async () => {
   const refreshSettings = vi.fn()
-  const store: T_appSettingsFaUserSettingsStoreForSync = {
+  const store = createAppSettingsStoreMock({
     settings: { ...FA_USER_SETTINGS_DEFAULTS },
     refreshSettings
-  }
+  })
   vi.mocked(S_FaUserSettings).mockReturnValue(
     store as unknown as ReturnType<typeof S_FaUserSettings>
   )
@@ -482,12 +497,12 @@ test('syncLocalAppSettingsFromStore does not call refreshSettings when settings 
  * When refreshSettings runs but the store still exposes null settings, refs stay untouched.
  */
 test('syncLocalAppSettingsFromStore leaves refs unchanged when settings stay null after refresh', async () => {
-  const store: T_appSettingsFaUserSettingsStoreForSync = {
+  const store = createAppSettingsStoreMock({
     settings: null,
     refreshSettings: async () => {
       /* store.settings intentionally remains null */
     }
-  }
+  })
   vi.mocked(S_FaUserSettings).mockReturnValue(
     store as unknown as ReturnType<typeof S_FaUserSettings>
   )

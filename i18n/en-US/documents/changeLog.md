@@ -18,7 +18,8 @@
 - **Workspace sidebar**: The hierarchy tree shows expand and collapse controls on rows with children; template placements that contain documents open by default on first visit so seeded test documents appear without an extra click.
 - **Workspace sidebar**: The hierarchy **Search...** row and document control strip share **48px** height; the dense search field keeps its label and icons aligned within that row.
 - **Workspace sidebar**: With **Disable document control bar** on, the hierarchy **Search...** row tracks the sidebar panel width in real time while you drag the splitter (via a live width observer); saving **sidebar_width** to the project database still happens only after you release the drag.
-- **App Settings**: Toggles in **Fantasia Archive Settings** update the dialog draft only until you choose **Save**; they no longer change the running app (for example the document control bar or project overview tips) while the dialog stays open.
+- **App Settings**: Toggles in **Fantasia Archive Settings** update the dialog draft only until you choose **Save**; they no longer change the running app (for example the document control bar) while the dialog stays open.
+- **Project overview**: Toggling **Hide tips on project overview** in **Fantasia Archive Settings** hides or shows the **Did you know** card immediately while the dialog stays open; closing without **Save** restores the previous visibility.
 - **App Settings**: The **Disable document control bar** toggle title no longer includes a **TODO -** prefix.
 - **Workspace sidebar**: The hierarchy **Search...** row uses the **dark-middle** (**#183e4d**) background, matching the header bar and window controls.
 - **Workspace**: The document control strip and top menu strip (**Project**, **Content**, **App controls**, **Help**) keep viewport-based width when you resize the workspace sidebar splitter; they no longer shrink with the main pane or sidebar panel.

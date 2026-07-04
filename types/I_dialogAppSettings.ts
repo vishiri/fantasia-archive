@@ -63,6 +63,8 @@ export type T_dialogAppSettingsTranslate = {
 
 /** Minimal FaUserSettings store surface for App settings dialog sync. */
 export type T_appSettingsFaUserSettingsStoreForSync = {
+  clearAppSettingsDialogPreview: () => void
   settings: I_faUserSettings | null
   refreshSettings: () => Promise<void>
+  setAppSettingsDialogPreview: (preview: Partial<I_faUserSettings>) => void
 }

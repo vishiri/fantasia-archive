@@ -23,7 +23,7 @@ export function createUseProjectOverview (deps: {
     const randomTipCaption = deps.ref('')
 
     const { activeProject } = deps.storeToRefs(deps.S_FaActiveProject())!
-    const { settings } = deps.storeToRefs(deps.S_FaUserSettings())!
+    const { appSettingsDialogPreview, settings } = deps.storeToRefs(deps.S_FaUserSettings())!
 
     const projectDisplayName = deps.computed(() => {
       const name = activeProject!.value?.name?.trim()
@@ -36,7 +36,13 @@ export function createUseProjectOverview (deps: {
     })
 
     const showTipCard = deps.computed(() => {
-      return settings!.value?.hideTooltipsProject !== true
+      const previewHideTooltipsProject =
+        appSettingsDialogPreview!.value?.hideTooltipsProject
+      const hideTooltipsProject = previewHideTooltipsProject !== undefined
+        ? previewHideTooltipsProject
+        : settings!.value?.hideTooltipsProject
+
+      return hideTooltipsProject !== true
     })
 
     const showMascotInTipCard = deps.computed(() => {

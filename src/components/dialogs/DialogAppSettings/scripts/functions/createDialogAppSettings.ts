@@ -324,6 +324,12 @@ export function createDialogAppSettings (deps: {
         settingKey,
         updatedValue
       )
+
+      if (settingKey === 'hideTooltipsProject') {
+        deps.S_FaUserSettings().setAppSettingsDialogPreview({
+          hideTooltipsProject: updatedValue
+        })
+      }
     }
 
     return {
@@ -361,6 +367,11 @@ export function createDialogAppSettings (deps: {
       appSettingsTree,
       props,
       selectedCategoryTab
+    })
+    deps.watch(dialogModel, (isOpen) => {
+      if (!isOpen) {
+        deps.S_FaUserSettings().clearAppSettingsDialogPreview()
+      }
     })
     return {
       dialogModel,
