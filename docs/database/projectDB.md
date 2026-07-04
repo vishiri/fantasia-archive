@@ -13,7 +13,7 @@ Flattened to a single bootstrap revision during pre-release dev. No upgrade ladd
 | Version | Contents |
 |---------|----------|
 | **0** | Uninitialized file (bootstrap target on first open/create). |
-| **1** | Full schema: **`project_data`** KV, worldbuilding **content tables** (**`worlds`** incl. **`color_pallete`** + **`display_name_translations_json`**, **`document_templates`** incl. **`sort_order`**, **`world_appendix`**, **`icon`**, **`title_translations_json`** + **`title_singular_translations_json`** + **`world_appendix_translations_json`**, **`documents`** incl. **`placement_id`** + **`parent_document_id`** + **`sort_order`**, **`media`**, **`document_media`**, **`world_template_groups`** + **`world_template_placements`** layout incl. **`nickname`** + **`nickname_translations_json`** + **`nickname_singular_translations_json`** + **`display_name_translations_json`**), default **world** seed on create. Idempotent **`applyFaProjectDocumentsHierarchySchemaPatch`** runs on every open at version **1** for legacy files missing hierarchy columns; **`sort_order`** creation-time backfill runs **only when that column is first added**, not on re-apply. |
+| **1** | Full schema: **`project_data`** KV, worldbuilding **content tables** (**`worlds`** incl. **`color_pallete`** + **`display_name_translations_json`**, **`document_templates`** incl. **`sort_order`**, **`world_appendix`**, **`icon`**, **`title_translations_json`** + **`title_singular_translations_json`** + **`world_appendix_translations_json`**, **`documents`** incl. **`tree_placement_id`** + **`tree_parent_document_id`** + **`tree_custom_sort_order`**, **`media`**, **`document_media`**, **`world_template_groups`** + **`world_template_placements`** layout incl. **`nickname`** + **`nickname_translations_json`** + **`nickname_singular_translations_json`** + **`display_name_translations_json`**), default **world** seed on create. Idempotent **`applyFaProjectDocumentsHierarchySchemaPatch`** runs on every open at version **1** for legacy files missing hierarchy columns or still using pre-rename **`placement_id`** / **`parent_document_id`** / **`sort_order`** on **`documents`**; **`tree_custom_sort_order`** creation-time backfill runs **only when that column is first added**, not on re-apply. |
 
 **Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 1`** in **`faProjectDbMigrateWiring.ts`**.
 
@@ -91,9 +91,9 @@ Index: **`idx_document_templates_sort_order`**. Unlike **worlds**, new projects 
 | `id` | TEXT PK | UUID |
 | `world_id` | TEXT FK → `worlds.id` | **ON DELETE RESTRICT** |
 | `template_id` | TEXT FK → `document_templates.id`, nullable | **ON DELETE RESTRICT** |
-| `placement_id` | TEXT FK → `world_template_placements.id`, nullable | **ON DELETE RESTRICT**; denormalized anchor for hierarchy queries and DnD fence |
-| `parent_document_id` | TEXT FK → `documents.id`, nullable | **ON DELETE CASCADE**; NULL = top-level under placement |
-| `sort_order` | INTEGER | Sibling order under same parent (or under placement when `parent_document_id` NULL); default **0** |
+| `tree_placement_id` | TEXT FK → `world_template_placements.id`, nullable | **ON DELETE RESTRICT**; denormalized anchor for hierarchy queries and DnD fence |
+| `tree_parent_document_id` | TEXT FK → `documents.id`, nullable | **ON DELETE CASCADE**; NULL = top-level under placement |
+| `tree_custom_sort_order` | INTEGER | Sibling order under same parent (or under placement when `tree_parent_document_id` NULL); default **0** |
 | `display_name` | TEXT | |
 | `created_at_ms`, `updated_at_ms` | INTEGER | |
 
@@ -101,7 +101,7 @@ Index: **`idx_document_templates_sort_order`**. Unlike **worlds**, new projects 
 
 **Document → template (N:1):** optional **`template_id`**. Deleting a **template** referenced by documents fails (**RESTRICT**).
 
-**Document hierarchy (within placement):** **`parent_document_id`** + **`sort_order`**; **`placement_id`** must match the placement for the document's world/template assignment. Cross-placement moves are rejected in main.
+**Document hierarchy (within placement):** **`tree_parent_document_id`** + **`tree_custom_sort_order`**; **`tree_placement_id`** must match the placement for the document's world/template assignment. Cross-placement moves are rejected in main.
 
 ### `document_media` (M:N)
 
@@ -145,7 +145,7 @@ Indexes: **`idx_world_template_placements_world_root_sort`**, **`idx_world_templ
 
 **Pre-release history:** A legacy **`world_document_templates`** M:N junction existed in flattened-away schema revisions; it is gone and existing links are not migrated.
 
-Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_documents_placement_parent_sort`**, **`idx_document_media_media_id`**, **`idx_worlds_sort_order`**, **`idx_document_templates_sort_order`**.
+Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_documents_tree_placement_parent_sort`**, **`idx_document_media_media_id`**, **`idx_worlds_sort_order`**, **`idx_document_templates_sort_order`**.
 
 ## Relationships (summary)
 

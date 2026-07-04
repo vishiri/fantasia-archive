@@ -2,16 +2,23 @@ import type Database from 'better-sqlite3'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
+  FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
   FA_PROJECT_TABLE_DOCUMENTS,
-  FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
+  FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
+  FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS,
+  FA_PROJECT_TABLE_WORLDS
 } from '../functions/faProjectDbSchemaDdl'
 import { mapFaProjectDocumentRow } from '../functions/faProjectContentRowMap'
 import { FaProjectContentNotFoundError } from './faProjectContentNotFoundError'
 import {
   assertFaProjectNamedEntityExists
 } from './faProjectContentNamedEntitySqlWiring'
-import { FA_PROJECT_TABLE_DOCUMENT_TEMPLATES } from '../functions/faProjectDbSchemaDdl'
-import { FA_PROJECT_TABLE_WORLDS } from '../functions/faProjectDbSchemaDdl'
+import {
+  buildFaProjectDocumentSelectSql,
+  readFaProjectDocumentSiblingMaxSortOrder
+} from './faProjectDocumentsSqlWiring'
 import type {
   I_faProjectDocument,
   I_faProjectDocumentCreateInput,
@@ -31,14 +38,6 @@ const WORLD_SPEC = {
 const TEMPLATE_SPEC = {
   entityLabel: 'Document template',
   tableName: FA_PROJECT_TABLE_DOCUMENT_TEMPLATES
-}
-
-function selectDocumentSql (): string {
-  return (
-    'SELECT id, world_id, template_id, placement_id, parent_document_id, sort_order, ' +
-    'display_name, created_at_ms, updated_at_ms ' +
-    `FROM ${FA_PROJECT_TABLE_DOCUMENTS}`
-  )
 }
 
 function assertDocumentRow (
@@ -83,24 +82,6 @@ function resolveFaProjectDocumentPlacementId (
   return row?.id ?? null
 }
 
-function readFaProjectDocumentSiblingMaxSortOrder (
-  db: Database,
-  placementId: string | null,
-  parentDocumentId: string | null
-): number | null {
-  if (placementId === null) {
-    return null
-  }
-  const row = db
-    .prepare(
-      `SELECT MAX(sort_order) AS max_sort FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-        'WHERE placement_id = ? AND ' +
-        '(parent_document_id IS ? OR (parent_document_id IS NULL AND ? IS NULL))'
-    )
-    .get(placementId, parentDocumentId, parentDocumentId) as { max_sort: number | null } | undefined
-  return row?.max_sort ?? null
-}
-
 function resolveFaProjectDocumentSortOrderForCreate (
   db: Database,
   placementId: string | null,
@@ -137,7 +118,9 @@ export function createFaProjectDocument (
   const id = uuidv4()
   db.prepare(
     `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-      '(id, world_id, template_id, placement_id, parent_document_id, sort_order, ' +
+      `(id, world_id, template_id, ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN}, ` +
       'display_name, created_at_ms, updated_at_ms) ' +
       'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(
@@ -161,7 +144,7 @@ export function updateFaProjectDocument (
 ): I_faProjectDocument {
   const existingRow = assertDocumentRow(
     db
-      .prepare(`${selectDocumentSql()} WHERE id = ?`)
+      .prepare(`${buildFaProjectDocumentSelectSql()} WHERE id = ?`)
       .get(id) as I_faSqlProjectDocumentRow | undefined,
     id
   )
@@ -176,17 +159,19 @@ export function updateFaProjectDocument (
       db,
       nextWorldId,
       nextTemplateId,
-      existingRow.placement_id
+      existingRow.tree_placement_id
     )
   const nextParentDocumentId = patch.parentDocumentId !== undefined
     ? patch.parentDocumentId
-    : existingRow.parent_document_id
-  const nextSortOrder = patch.sortOrder ?? existingRow.sort_order
+    : existingRow.tree_parent_document_id
+  const nextSortOrder = patch.sortOrder ?? existingRow.tree_custom_sort_order
   const nextDisplayName = patch.displayName ?? existingRow.display_name
   const nowMs = Date.now()
   db.prepare(
     `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET world_id = ?, template_id = ?, ` +
-      'placement_id = ?, parent_document_id = ?, sort_order = ?, ' +
+      `${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} = ?, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} = ?, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} = ?, ` +
       'display_name = ?, updated_at_ms = ? WHERE id = ?'
   ).run(
     nextWorldId,
@@ -215,7 +200,7 @@ export function getFaProjectDocumentById (
   id: string
 ): I_faProjectDocument {
   const row = db
-    .prepare(`${selectDocumentSql()} WHERE id = ?`)
+    .prepare(`${buildFaProjectDocumentSelectSql()} WHERE id = ?`)
     .get(id) as I_faSqlProjectDocumentRow | undefined
   return mapFaProjectDocumentRow(assertDocumentRow(row, id))
 }
@@ -225,20 +210,17 @@ export function listFaProjectDocuments (
   filter?: I_faProjectDocumentListFilter
 ): I_faProjectDocumentListResult {
   const worldId = filter?.worldId
+  const orderSql =
+    `ORDER BY ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} ASC, ` +
+    'display_name COLLATE NOCASE ASC, created_at_ms ASC'
   let rows: I_faSqlProjectDocumentRow[]
   if (worldId !== undefined) {
     rows = db
-      .prepare(
-        `${selectDocumentSql()} WHERE world_id = ? ` +
-          'ORDER BY sort_order ASC, display_name COLLATE NOCASE ASC, created_at_ms ASC'
-      )
+      .prepare(`${buildFaProjectDocumentSelectSql()} WHERE world_id = ? ${orderSql}`)
       .all(worldId) as I_faSqlProjectDocumentRow[]
   } else {
     rows = db
-      .prepare(
-        `${selectDocumentSql()} ORDER BY sort_order ASC, ` +
-          'display_name COLLATE NOCASE ASC, created_at_ms ASC'
-      )
+      .prepare(`${buildFaProjectDocumentSelectSql()} ${orderSql}`)
       .all() as I_faSqlProjectDocumentRow[]
   }
   return { items: rows.map(mapFaProjectDocumentRow) }

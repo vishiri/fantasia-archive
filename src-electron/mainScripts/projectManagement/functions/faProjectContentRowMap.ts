@@ -86,9 +86,9 @@ export function mapFaProjectDocumentRow (row: I_faSqlProjectDocumentRow): I_faPr
     id: row.id,
     worldId: row.world_id,
     templateId: row.template_id,
-    placementId: row.placement_id,
-    parentDocumentId: row.parent_document_id,
-    sortOrder: row.sort_order,
+    placementId: row.tree_placement_id,
+    parentDocumentId: row.tree_parent_document_id,
+    sortOrder: row.tree_custom_sort_order,
     displayName: row.display_name,
     createdAtMs: row.created_at_ms,
     updatedAtMs: row.updated_at_ms

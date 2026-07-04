@@ -55,9 +55,9 @@ test('Test that mapFaProjectDocumentRow maps template_id null', () => {
     id: '650e8400-e29b-41d4-a716-446655440001',
     world_id: '750e8400-e29b-41d4-a716-446655440002',
     template_id: null,
-    placement_id: null,
-    parent_document_id: null,
-    sort_order: 0,
+    tree_placement_id: null,
+    tree_parent_document_id: null,
+    tree_custom_sort_order: 0,
     display_name: 'Doc',
     created_at_ms: 3,
     updated_at_ms: 4

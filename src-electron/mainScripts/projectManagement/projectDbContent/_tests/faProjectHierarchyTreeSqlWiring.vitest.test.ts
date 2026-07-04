@@ -3,6 +3,9 @@ import { afterEach, expect, test } from 'vitest'
 
 import {
   applyFaProjectContentSchemaV1,
+  FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
   FA_PROJECT_TABLE_DOCUMENTS
 } from '../../functions/faProjectDbSchemaDdl'
 import {
@@ -60,13 +63,20 @@ test('Test that shiftFaProjectHierarchySiblingSortOrders no-ops when delta is ze
   applyFaProjectContentSchemaV1(db)
   const placementId = seedPlacement(db)
   const before = db
-    .prepare(`SELECT sort_order FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE placement_id = ?`)
-    .get(placementId) as { sort_order: number }
+    .prepare(
+      `SELECT ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
+        `WHERE ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} = ?`
+    )
+    .get(placementId) as { [key: string]: number }
   shiftFaProjectHierarchySiblingSortOrders(db, placementId, null, 0, 0)
   const after = db
-    .prepare(`SELECT sort_order FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE placement_id = ?`)
-    .get(placementId) as { sort_order: number }
-  expect(after.sort_order).toBe(before.sort_order)
+    .prepare(
+      `SELECT ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
+        `WHERE ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} = ?`
+    )
+    .get(placementId) as { [key: string]: number }
+  expect(after[FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN])
+    .toBe(before[FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN])
 })
 
 /**
@@ -90,9 +100,12 @@ test('Test that shiftFaProjectHierarchySiblingSortOrders shifts without exclude 
   const placementId = seedPlacement(db)
   shiftFaProjectHierarchySiblingSortOrders(db, placementId, null, 0, 1)
   const after = db
-    .prepare(`SELECT sort_order FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE placement_id = ?`)
-    .get(placementId) as { sort_order: number }
-  expect(after.sort_order).toBe(1)
+    .prepare(
+      `SELECT ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
+        `WHERE ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} = ?`
+    )
+    .get(placementId) as { [key: string]: number }
+  expect(after[FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN]).toBe(1)
 })
 
 /**
@@ -115,7 +128,7 @@ test('Test that assertFaProjectHierarchyNoAncestorCycle tolerates broken ancesto
   })
   connection.pragma('foreign_keys = OFF')
   connection.prepare(
-    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET parent_document_id = ? WHERE id = ?`
+    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET ${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} = ? WHERE id = ?`
   ).run('ghost-parent', parent.id)
   expect(() => assertFaProjectHierarchyNoAncestorCycle(connection, parent.id, parent.id)).toThrow()
   assertFaProjectHierarchyNoAncestorCycle(connection, 'other-doc', parent.id)
@@ -123,7 +136,7 @@ test('Test that assertFaProjectHierarchyNoAncestorCycle tolerates broken ancesto
 
 /**
  * mapFaProjectHierarchyDocumentChildRow
- * Maps nullable placement_id to an empty string in child rows.
+ * Maps nullable tree_placement_id to an empty string in child rows.
  */
 test('Test that mapFaProjectHierarchyDocumentChildRow maps null placement id to empty string', () => {
   db = new Database(':memory:')
@@ -132,9 +145,9 @@ test('Test that mapFaProjectHierarchyDocumentChildRow maps null placement id to 
     id: 'doc-1',
     world_id: 'world-1',
     template_id: 'tpl-1',
-    placement_id: null,
-    parent_document_id: null,
-    sort_order: 0,
+    tree_placement_id: null,
+    tree_parent_document_id: null,
+    tree_custom_sort_order: 0,
     display_name: 'Row',
     created_at_ms: 1,
     updated_at_ms: 1

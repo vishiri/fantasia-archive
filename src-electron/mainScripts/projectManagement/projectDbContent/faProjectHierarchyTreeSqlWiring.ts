@@ -1,11 +1,20 @@
 import type Database from 'better-sqlite3'
 
-import { FA_PROJECT_TABLE_DOCUMENTS } from '../functions/faProjectDbSchemaDdl'
+import {
+  FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
+  FA_PROJECT_TABLE_DOCUMENTS
+} from '../functions/faProjectDbSchemaDdl'
 import { FaProjectContentNotFoundError } from './faProjectContentNotFoundError'
 import type { I_faProjectHierarchyTreeDocumentChild } from 'app/types/I_faProjectHierarchyTreeDomain'
 import type { I_faSqlProjectDocumentRow } from 'app/types/I_faProjectContentRowMap'
 
 export const FA_PROJECT_HIERARCHY_DOCUMENT_ENTITY_LABEL = 'Document'
+
+const placementColumn = FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN
+const parentColumn = FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN
+const sortColumn = FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN
 
 export function readFaProjectDocumentHasChildren (
   db: Database,
@@ -14,7 +23,7 @@ export function readFaProjectDocumentHasChildren (
   const row = db
     .prepare(
       `SELECT 1 AS ok FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-        'WHERE parent_document_id = ? LIMIT 1'
+        `WHERE ${parentColumn} = ? LIMIT 1`
     )
     .get(documentId) as { ok: number } | undefined
   return row !== undefined
@@ -27,12 +36,12 @@ export function listFaProjectHierarchyDocumentChildrenRows (
 ): I_faSqlProjectDocumentRow[] {
   return db
     .prepare(
-      'SELECT id, world_id, template_id, placement_id, parent_document_id, sort_order, ' +
+      `SELECT id, world_id, template_id, ${placementColumn}, ${parentColumn}, ${sortColumn}, ` +
         'display_name, created_at_ms, updated_at_ms ' +
         `FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-        'WHERE placement_id = ? AND ' +
-        '(parent_document_id IS ? OR (parent_document_id IS NULL AND ? IS NULL)) ' +
-        'ORDER BY sort_order ASC, display_name COLLATE NOCASE ASC, created_at_ms ASC, id ASC'
+        `WHERE ${placementColumn} = ? AND ` +
+        `(${parentColumn} IS ? OR (${parentColumn} IS NULL AND ? IS NULL)) ` +
+        `ORDER BY ${sortColumn} ASC, display_name COLLATE NOCASE ASC, created_at_ms ASC, id ASC`
     )
     .all(placementId, parentDocumentId, parentDocumentId) as I_faSqlProjectDocumentRow[]
 }
@@ -44,9 +53,9 @@ export function mapFaProjectHierarchyDocumentChildRow (
   return {
     id: row.id,
     displayName: row.display_name,
-    placementId: row.placement_id ?? '',
-    parentDocumentId: row.parent_document_id,
-    sortOrder: row.sort_order,
+    placementId: row.tree_placement_id ?? '',
+    parentDocumentId: row.tree_parent_document_id,
+    sortOrder: row.tree_custom_sort_order,
     hasChildren: readFaProjectDocumentHasChildren(db, row.id)
   }
 }
@@ -61,16 +70,16 @@ export function assertFaProjectHierarchySamePlacementParent (
   }
   const parentRow = db
     .prepare(
-      `SELECT placement_id FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE id = ?`
+      `SELECT ${placementColumn} FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE id = ?`
     )
-    .get(parentDocumentId) as { placement_id: string | null } | undefined
+    .get(parentDocumentId) as { [key: string]: string | null } | undefined
   if (parentRow === undefined) {
     throw new FaProjectContentNotFoundError(
       FA_PROJECT_HIERARCHY_DOCUMENT_ENTITY_LABEL,
       parentDocumentId
     )
   }
-  if (parentRow.placement_id !== placementId) {
+  if (parentRow[placementColumn] !== placementId) {
     throw new Error('Parent document must belong to the same template placement')
   }
 }
@@ -89,12 +98,12 @@ export function assertFaProjectHierarchyNoAncestorCycle (
       throw new Error('Document cannot be moved under its own descendant')
     }
     const row = db
-      .prepare(`SELECT parent_document_id FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE id = ?`)
-      .get(cursor) as { parent_document_id: string | null } | undefined
+      .prepare(`SELECT ${parentColumn} FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE id = ?`)
+      .get(cursor) as { [key: string]: string | null } | undefined
     if (row === undefined) {
       break
     }
-    cursor = row.parent_document_id
+    cursor = row[parentColumn] ?? null
   }
 }
 
@@ -110,10 +119,10 @@ export function shiftFaProjectHierarchySiblingSortOrders (
     return
   }
   const stmt = db.prepare(
-    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET sort_order = sort_order + ?, updated_at_ms = ? ` +
-      'WHERE placement_id = ? AND ' +
-      '(parent_document_id IS ? OR (parent_document_id IS NULL AND ? IS NULL)) AND ' +
-      'sort_order >= ?' +
+    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET ${sortColumn} = ${sortColumn} + ?, updated_at_ms = ? ` +
+      `WHERE ${placementColumn} = ? AND ` +
+      `(${parentColumn} IS ? OR (${parentColumn} IS NULL AND ? IS NULL)) AND ` +
+      `${sortColumn} >= ?` +
       (excludeDocumentId === undefined ? '' : ' AND id <> ?')
   )
   const nowMs = Date.now()
@@ -141,12 +150,12 @@ export function collectFaProjectHierarchyAncestorDocumentIds (
   while (cursor !== null) {
     ancestors.unshift(cursor)
     const row = db
-      .prepare(`SELECT parent_document_id FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE id = ?`)
-      .get(cursor) as { parent_document_id: string | null } | undefined
+      .prepare(`SELECT ${parentColumn} FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE id = ?`)
+      .get(cursor) as { [key: string]: string | null } | undefined
     if (row === undefined) {
       break
     }
-    cursor = row.parent_document_id
+    cursor = row[parentColumn] ?? null
   }
   return ancestors
 }

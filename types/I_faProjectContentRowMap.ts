@@ -37,9 +37,9 @@ export interface I_faSqlProjectDocumentRow {
   id: string
   world_id: string
   template_id: string | null
-  placement_id: string | null
-  parent_document_id: string | null
-  sort_order: number
+  tree_placement_id: string | null
+  tree_parent_document_id: string | null
+  tree_custom_sort_order: number
   display_name: string
   created_at_ms: number
   updated_at_ms: number

@@ -2,6 +2,9 @@ import type Database from 'better-sqlite3'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
+  FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
   FA_PROJECT_TABLE_DOCUMENTS,
   FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
   FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
@@ -67,7 +70,7 @@ function listFaProjectHierarchyTestSeedDisplayNames (
   const rows = db
     .prepare(
       `SELECT display_name FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-        "WHERE placement_id = ? AND display_name LIKE 'Test Document - %'"
+        `WHERE ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} = ? AND display_name LIKE 'Test Document - %'`
     )
     .all(placementId) as Array<{ display_name: string }>
   return rows.map((row) => row.display_name)
@@ -106,8 +109,9 @@ function readFaProjectHierarchyTestMaxSortOrder (
 ): number | null {
   const row = db
     .prepare(
-      `SELECT MAX(sort_order) AS max_sort FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-        'WHERE placement_id = ? AND parent_document_id IS NULL'
+      `SELECT MAX(${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN}) AS max_sort FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
+        `WHERE ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} = ? AND ` +
+        `${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} IS NULL`
     )
     .get(placementId) as { max_sort: number | null } | undefined
   return row?.max_sort ?? null
@@ -129,7 +133,9 @@ function insertFaProjectHierarchyTestDocumentPlan (
 ): void {
   db.prepare(
     `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-      '(id, world_id, template_id, placement_id, parent_document_id, sort_order, ' +
+      `(id, world_id, template_id, ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN}, ` +
       'display_name, created_at_ms, updated_at_ms) ' +
       'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(

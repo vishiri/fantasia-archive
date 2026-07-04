@@ -1,6 +1,9 @@
 import type Database from 'better-sqlite3'
 
 import {
+  FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
   FA_PROJECT_TABLE_DOCUMENTS,
   FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
 } from '../functions/faProjectDbSchemaDdl'
@@ -31,17 +34,17 @@ type T_placementRow = {
 
 type T_moveExistingRow = {
   id: string
-  placement_id: string | null
-  parent_document_id: string | null
-  sort_order: number
+  tree_placement_id: string | null
+  tree_parent_document_id: string | null
+  tree_custom_sort_order: number
 }
 
 type T_searchRow = {
   id: string
   display_name: string
-  placement_id: string | null
+  tree_placement_id: string | null
   world_id: string
-  parent_document_id: string | null
+  tree_parent_document_id: string | null
 }
 
 function readFaProjectPlacementRow (
@@ -84,7 +87,10 @@ export function moveFaProjectDocumentInHierarchy (
 ): I_faProjectHierarchyTreeDocumentChild {
   const existingRow = db
     .prepare(
-      `SELECT id, placement_id, parent_document_id, sort_order FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
+      `SELECT id, ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} ` +
+      `FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
         'WHERE id = ?'
     )
     .get(input.documentId) as T_moveExistingRow | undefined
@@ -94,16 +100,16 @@ export function moveFaProjectDocumentInHierarchy (
       input.documentId
     )
   }
-  if (existingRow.placement_id === null) {
+  if (existingRow.tree_placement_id === null) {
     throw new Error('Document is not anchored to a template placement')
   }
-  const placementId = existingRow.placement_id
+  const placementId = existingRow.tree_placement_id
   assertFaProjectHierarchySamePlacementParent(db, placementId, input.targetParentDocumentId)
   assertFaProjectHierarchyNoAncestorCycle(db, input.documentId, input.targetParentDocumentId)
 
   const runMove = db.transaction(() => {
-    const oldParentId = existingRow.parent_document_id
-    const oldSortOrder = existingRow.sort_order
+    const oldParentId = existingRow.tree_parent_document_id
+    const oldSortOrder = existingRow.tree_custom_sort_order
     shiftFaProjectHierarchySiblingSortOrders(
       db,
       placementId,
@@ -122,7 +128,8 @@ export function moveFaProjectDocumentInHierarchy (
     )
     const nowMs = Date.now()
     db.prepare(
-      `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET parent_document_id = ?, sort_order = ?, ` +
+      `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET ${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} = ?, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} = ?, ` +
         'updated_at_ms = ? WHERE id = ?'
     ).run(
       input.targetParentDocumentId,
@@ -165,23 +172,24 @@ export function searchFaProjectHierarchy (
   const pattern = `%${escaped}%`
   const rows = db
     .prepare(
-      'SELECT id, display_name, placement_id, world_id, parent_document_id ' +
+      `SELECT id, display_name, ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN}, world_id, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} ` +
         `FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
         'WHERE display_name LIKE ? ESCAPE \'\\\' ' +
-        'ORDER BY display_name COLLATE NOCASE ASC, sort_order ASC, created_at_ms ASC, id ASC'
+        `ORDER BY display_name COLLATE NOCASE ASC, ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} ASC, created_at_ms ASC, id ASC`
     )
     .all(pattern) as T_searchRow[]
 
   const hits: I_faProjectHierarchyTreeSearchHit[] = rows
-    .filter((row) => row.placement_id !== null)
+    .filter((row) => row.tree_placement_id !== null)
     .map((row) => ({
       ancestorDocumentIds: collectFaProjectHierarchyAncestorDocumentIds(
         db,
-        row.parent_document_id
+        row.tree_parent_document_id
       ),
       displayName: row.display_name,
       documentId: row.id,
-      placementId: row.placement_id as string,
+      placementId: row.tree_placement_id as string,
       worldId: row.world_id
     }))
 

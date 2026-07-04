@@ -2,6 +2,8 @@ import type Database from 'better-sqlite3'
 
 import { mapFaProjectWorldRow } from '../faProjectContentRowMap_manager'
 import {
+  FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
   FA_PROJECT_TABLE_DOCUMENTS,
   FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
   FA_PROJECT_TABLE_WORLD_TEMPLATE_GROUPS,
@@ -22,7 +24,8 @@ function readFaProjectPlacementHasTopLevelDocuments (
   const row = db
     .prepare(
       `SELECT 1 AS ok FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-        'WHERE placement_id = ? AND parent_document_id IS NULL LIMIT 1'
+        `WHERE ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} = ? AND ` +
+        `${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} IS NULL LIMIT 1`
     )
     .get(placementId) as { ok: number } | undefined
   return row !== undefined
@@ -120,8 +123,9 @@ export function readFaProjectPlacementDocumentChildCount (
   const row = db
     .prepare(
       `SELECT COUNT(*) AS c FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-        'WHERE placement_id = ? AND ' +
-        '(parent_document_id IS ? OR (parent_document_id IS NULL AND ? IS NULL))'
+        `WHERE ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} = ? AND ` +
+        `(${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} IS ? OR ` +
+        `(${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} IS NULL AND ? IS NULL))`
     )
     .get(placementId, parentDocumentId, parentDocumentId) as { c: number } | undefined
   return row?.c ?? 0

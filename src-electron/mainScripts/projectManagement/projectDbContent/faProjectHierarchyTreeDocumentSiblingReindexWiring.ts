@@ -1,6 +1,9 @@
 import type Database from 'better-sqlite3'
 
 import {
+  FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
   FA_PROJECT_TABLE_DOCUMENTS,
   FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
 } from '../functions/faProjectDbSchemaDdl'
@@ -47,7 +50,7 @@ function compactFaProjectHierarchyDocumentSiblingSortOrders (
   const rows = listFaProjectHierarchyDocumentChildrenRows(db, placementId, parentDocumentId)
   const nowMs = Date.now()
   const updateStmt = db.prepare(
-    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET sort_order = ?, updated_at_ms = ? WHERE id = ?`
+    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} = ?, updated_at_ms = ? WHERE id = ?`
   )
   const runCompact = db.transaction(() => {
     rows.forEach((row, index) => {
@@ -93,12 +96,14 @@ export function reindexFaProjectHierarchyDocumentSiblings (
   }
   const movedExistingRow = db
     .prepare(
-      `SELECT id, placement_id, parent_document_id FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE id = ?`
+      `SELECT id, ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} ` +
+      `FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE id = ?`
     )
     .get(input.movedDocumentId) as {
       id: string
-      placement_id: string | null
-      parent_document_id: string | null
+      tree_placement_id: string | null
+      tree_parent_document_id: string | null
     } | undefined
   if (movedExistingRow === undefined) {
     throw new FaProjectContentNotFoundError(
@@ -106,10 +111,10 @@ export function reindexFaProjectHierarchyDocumentSiblings (
       input.movedDocumentId
     )
   }
-  if (movedExistingRow.placement_id !== input.placementId) {
+  if (movedExistingRow.tree_placement_id !== input.placementId) {
     throw new Error('Moved document must belong to the same template placement')
   }
-  const previousParentDocumentId = movedExistingRow.parent_document_id
+  const previousParentDocumentId = movedExistingRow.tree_parent_document_id
   if (previousParentDocumentId === input.parentDocumentId) {
     for (const row of existingRows) {
       if (!orderedUniqueIds.includes(row.id)) {
@@ -119,7 +124,8 @@ export function reindexFaProjectHierarchyDocumentSiblings (
   }
   const nowMs = Date.now()
   const updateStmt = db.prepare(
-    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET parent_document_id = ?, sort_order = ?, ` +
+    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET ${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} = ?, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} = ?, ` +
       'updated_at_ms = ? WHERE id = ?'
   )
   const runReindex = db.transaction(() => {

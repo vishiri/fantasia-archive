@@ -4,6 +4,14 @@ import { afterEach, expect, test } from 'vitest'
 import { createApplyFaProjectDocumentsHierarchySchemaPatch } from '../faProjectDocumentsHierarchySchemaPatch'
 import {
   applyFaProjectContentSchemaV1,
+  FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_LEGACY_PARENT_DOCUMENT_ID_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_LEGACY_PLACEMENT_ID_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_LEGACY_PLACEMENT_PARENT_SORT_INDEX,
+  FA_PROJECT_DOCUMENT_TREE_LEGACY_SORT_ORDER_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PLACEMENT_PARENT_SORT_INDEX,
   FA_PROJECT_TABLE_DOCUMENTS,
   FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
   FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS,
@@ -67,11 +75,26 @@ CREATE TABLE ${FA_PROJECT_TABLE_DOCUMENTS} (
   return connection
 }
 
+function createApplyPatch (): ReturnType<typeof createApplyFaProjectDocumentsHierarchySchemaPatch> {
+  return createApplyFaProjectDocumentsHierarchySchemaPatch({
+    documentsTableName: FA_PROJECT_TABLE_DOCUMENTS,
+    placementsTableName: FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS,
+    treePlacementIdColumn: FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
+    treeParentDocumentIdColumn: FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
+    treeCustomSortOrderColumn: FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
+    legacyPlacementIdColumn: FA_PROJECT_DOCUMENT_TREE_LEGACY_PLACEMENT_ID_COLUMN,
+    legacyParentDocumentIdColumn: FA_PROJECT_DOCUMENT_TREE_LEGACY_PARENT_DOCUMENT_ID_COLUMN,
+    legacySortOrderColumn: FA_PROJECT_DOCUMENT_TREE_LEGACY_SORT_ORDER_COLUMN,
+    treePlacementParentSortIndex: FA_PROJECT_DOCUMENT_TREE_PLACEMENT_PARENT_SORT_INDEX,
+    legacyPlacementParentSortIndex: FA_PROJECT_DOCUMENT_TREE_LEGACY_PLACEMENT_PARENT_SORT_INDEX
+  })
+}
+
 /**
  * applyFaProjectDocumentsHierarchySchemaPatch
- * Adds missing hierarchy columns and backfills placement_id from world+template join.
+ * Adds missing hierarchy columns and backfills tree_placement_id from world+template join.
  */
-test('Test that applyFaProjectDocumentsHierarchySchemaPatch backfills placement_id on legacy rows', () => {
+test('Test that applyFaProjectDocumentsHierarchySchemaPatch backfills tree_placement_id on legacy rows', () => {
   db = openLegacyDocumentsSchemaDb()
   const now = Date.now()
   db.prepare(
@@ -93,34 +116,89 @@ test('Test that applyFaProjectDocumentsHierarchySchemaPatch backfills placement_
       'VALUES (?, ?, ?, ?, ?, ?)'
   ).run('doc-1', 'world-1', 'tpl-1', 'Hero', now, now)
 
-  const applyFaProjectDocumentsHierarchySchemaPatch =
-    createApplyFaProjectDocumentsHierarchySchemaPatch({
-      documentsTableName: FA_PROJECT_TABLE_DOCUMENTS,
-      placementsTableName: FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
-    })
+  const applyFaProjectDocumentsHierarchySchemaPatch = createApplyPatch()
 
   applyFaProjectDocumentsHierarchySchemaPatch(db)
   applyFaProjectDocumentsHierarchySchemaPatch(db)
 
   const row = db
     .prepare(
-      `SELECT placement_id, parent_document_id, sort_order FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE id = ?`
+      `SELECT ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} ` +
+      `FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE id = ?`
     )
     .get('doc-1') as {
-    placement_id: string | null
-    parent_document_id: string | null
-    sort_order: number
+    [FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN]: string | null
+    [FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN]: string | null
+    [FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN]: number
   }
-  expect(row.placement_id).toBe('place-1')
-  expect(row.parent_document_id).toBeNull()
-  expect(row.sort_order).toBe(0)
+  expect(row[FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN]).toBe('place-1')
+  expect(row[FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN]).toBeNull()
+  expect(row[FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN]).toBe(0)
 })
 
 /**
  * applyFaProjectDocumentsHierarchySchemaPatch
- * Re-open idempotent pass must not rewrite persisted sibling sort_order values.
+ * Renames legacy placement_id, parent_document_id, and sort_order columns on open.
  */
-test('Test that applyFaProjectDocumentsHierarchySchemaPatch preserves existing sort_order on re-apply', () => {
+test('Test that applyFaProjectDocumentsHierarchySchemaPatch renames legacy hierarchy columns', () => {
+  db = new Database(':memory:')
+  const now = Date.now()
+  db.exec(`
+CREATE TABLE ${FA_PROJECT_TABLE_DOCUMENTS} (
+  id TEXT NOT NULL PRIMARY KEY,
+  world_id TEXT NOT NULL,
+  template_id TEXT,
+  placement_id TEXT,
+  parent_document_id TEXT,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  display_name TEXT NOT NULL,
+  created_at_ms INTEGER NOT NULL,
+  updated_at_ms INTEGER NOT NULL
+);
+CREATE TABLE ${FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS} (
+  id TEXT NOT NULL PRIMARY KEY,
+  world_id TEXT NOT NULL,
+  document_template_id TEXT NOT NULL
+);
+`)
+  db.prepare(
+    `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENTS} ` +
+      '(id, world_id, template_id, placement_id, parent_document_id, sort_order, display_name, created_at_ms, updated_at_ms) ' +
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+  ).run('doc-1', 'world-1', 'tpl-1', 'place-1', null, 3, 'Hero', now, now)
+
+  const applyFaProjectDocumentsHierarchySchemaPatch = createApplyPatch()
+  applyFaProjectDocumentsHierarchySchemaPatch(db)
+
+  const columns = db.pragma(`table_info(${FA_PROJECT_TABLE_DOCUMENTS})`) as Array<{ name: string }>
+  const names = columns.map((column) => column.name)
+  expect(names).toContain(FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN)
+  expect(names).toContain(FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN)
+  expect(names).toContain(FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN)
+  expect(names).not.toContain('placement_id')
+  expect(names).not.toContain('parent_document_id')
+
+  const row = db
+    .prepare(
+      `SELECT ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} ` +
+      `FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE id = ?`
+    )
+    .get('doc-1') as {
+    [FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN]: string | null
+    [FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN]: number
+  }
+  expect(row[FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN]).toBe('place-1')
+  expect(row[FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN]).toBe(3)
+})
+
+/**
+ * applyFaProjectDocumentsHierarchySchemaPatch
+ * Re-open idempotent pass must not rewrite persisted sibling tree_custom_sort_order values.
+ */
+test('Test that applyFaProjectDocumentsHierarchySchemaPatch preserves existing tree_custom_sort_order on re-apply', () => {
   db = new Database(':memory:')
   applyFaProjectContentSchemaV1(db)
   const now = Date.now()
@@ -139,49 +217,52 @@ test('Test that applyFaProjectDocumentsHierarchySchemaPatch preserves existing s
   ).run('place-1', 'world-1', 'tpl-1', 0, now, now)
   db.prepare(
     `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-      '(id, world_id, template_id, placement_id, parent_document_id, sort_order, display_name, created_at_ms, updated_at_ms) ' +
+      `(id, world_id, template_id, ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN}, display_name, created_at_ms, updated_at_ms) ` +
       'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).run('doc-a', 'world-1', 'tpl-1', 'place-1', null, 2, 'Building 03', now + 3, now + 3)
   db.prepare(
     `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-      '(id, world_id, template_id, placement_id, parent_document_id, sort_order, display_name, created_at_ms, updated_at_ms) ' +
+      `(id, world_id, template_id, ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN}, display_name, created_at_ms, updated_at_ms) ` +
       'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).run('doc-b', 'world-1', 'tpl-1', 'place-1', null, 0, 'Building 01', now + 1, now + 1)
   db.prepare(
     `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-      '(id, world_id, template_id, placement_id, parent_document_id, sort_order, display_name, created_at_ms, updated_at_ms) ' +
+      `(id, world_id, template_id, ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN}, display_name, created_at_ms, updated_at_ms) ` +
       'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).run('doc-c', 'world-1', 'tpl-1', 'place-1', null, 1, 'Building 02', now + 2, now + 2)
 
-  const applyFaProjectDocumentsHierarchySchemaPatch =
-    createApplyFaProjectDocumentsHierarchySchemaPatch({
-      documentsTableName: FA_PROJECT_TABLE_DOCUMENTS,
-      placementsTableName: FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
-    })
+  const applyFaProjectDocumentsHierarchySchemaPatch = createApplyPatch()
 
   applyFaProjectDocumentsHierarchySchemaPatch(db)
   applyFaProjectDocumentsHierarchySchemaPatch(db)
 
   const rows = db
     .prepare(
-      `SELECT id, sort_order FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-        'WHERE placement_id = ? ORDER BY sort_order ASC'
+      `SELECT id, ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
+        `WHERE ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} = ? ` +
+        `ORDER BY ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} ASC`
     )
-    .all('place-1') as Array<{ id: string, sort_order: number }>
+    .all('place-1') as Array<{ id: string, [key: string]: string | number }>
   expect(rows.map((row) => row.id)).toEqual(['doc-b', 'doc-c', 'doc-a'])
-  expect(rows.map((row) => row.sort_order)).toEqual([0, 1, 2])
+  expect(rows.map((row) => row[FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN])).toEqual([0, 1, 2])
 })
 
 /**
  * applyFaProjectContentSchemaV1
- * Fresh bootstrap includes hierarchy columns on documents.
+ * Fresh bootstrap includes tree hierarchy columns on documents.
  */
 test('Test that applyFaProjectContentSchemaV1 creates documents hierarchy columns', () => {
   db = new Database(':memory:')
   applyFaProjectContentSchemaV1(db)
   const columns = db.pragma(`table_info(${FA_PROJECT_TABLE_DOCUMENTS})`) as Array<{ name: string }>
   const names = columns.map((column) => column.name)
-  expect(names).toContain('placement_id')
-  expect(names).toContain('parent_document_id')
-  expect(names).toContain('sort_order')
+  expect(names).toContain(FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN)
+  expect(names).toContain(FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN)
+  expect(names).toContain(FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN)
 })

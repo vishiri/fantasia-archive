@@ -1,6 +1,7 @@
 import type Database from 'better-sqlite3'
 
 import {
+  FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
   FA_PROJECT_TABLE_DOCUMENTS,
   FA_PROJECT_TABLE_WORLD_TEMPLATE_GROUPS,
   FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
@@ -32,7 +33,7 @@ export function deleteFaProjectDocumentsForPlacementId (
   placementId: string
 ): void {
   db.prepare(
-    `DELETE FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE placement_id = ?`
+    `DELETE FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} = ?`
   ).run(placementId)
 }
 

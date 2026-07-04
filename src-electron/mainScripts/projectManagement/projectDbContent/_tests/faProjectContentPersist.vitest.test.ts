@@ -183,9 +183,9 @@ function makeProjectContentTestDb (): {
               id: args[0] as string,
               world_id: args[1] as string,
               template_id: args[2] as string | null,
-              placement_id: args[3] as string | null,
-              parent_document_id: args[4] as string | null,
-              sort_order: args[5] as number,
+              tree_placement_id: args[3] as string | null,
+              tree_parent_document_id: args[4] as string | null,
+              tree_custom_sort_order: args[5] as number,
               display_name: args[6] as string,
               created_at_ms: args[7] as number,
               updated_at_ms: args[8] as number
@@ -319,12 +319,12 @@ function makeProjectContentTestDb (): {
         }
       }
       if (normalized.includes('DELETE FROM documents')) {
-        if (normalized.includes('placement_id')) {
+        if (normalized.includes('tree_placement_id')) {
           return {
             run: (placementId: string) => {
               let changes = 0
               for (const [id, row] of tables.documents) {
-                if (row.placement_id === placementId) {
+                if (row.tree_placement_id === placementId) {
                   tables.documents.delete(id)
                   changes += 1
                 }
@@ -624,9 +624,9 @@ function makeProjectContentTestDb (): {
                 id,
                 world_id: args[0] as string,
                 template_id: args[1] as string | null,
-                placement_id: args[2] as string | null,
-                parent_document_id: args[3] as string | null,
-                sort_order: args[4] as number,
+                tree_placement_id: args[2] as string | null,
+                tree_parent_document_id: args[3] as string | null,
+                tree_custom_sort_order: args[4] as number,
                 display_name: args[5] as string,
                 created_at_ms: existing.created_at_ms as number,
                 updated_at_ms: args[6] as number
@@ -714,7 +714,7 @@ function makeProjectContentTestDb (): {
           }
         }
       }
-      if (normalized.includes('MAX(sort_order)') && normalized.includes('documents')) {
+      if (normalized.includes('MAX(tree_custom_sort_order)') && normalized.includes('documents')) {
         return {
           get: () => ({ max_sort: null })
         }

@@ -5,7 +5,11 @@ import {
   applyFaProjectProjectDataSchemaV1,
   FA_PROJECT_TABLE_DOCUMENTS,
   FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
-  FA_PROJECT_TABLE_WORLDS
+  FA_PROJECT_TABLE_WORLDS,
+  FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PLACEMENT_PARENT_SORT_INDEX
 } from '../faProjectDbSchemaDdl'
 
 /**
@@ -45,9 +49,10 @@ test('Test that applyFaProjectContentSchemaV1 runs exec with worlds and related 
   expect(sql).toContain('world_template_groups')
   expect(sql).toContain('world_template_placements')
   expect(sql).toContain('nickname')
-  expect(sql).toContain('placement_id')
-  expect(sql).toContain('parent_document_id')
-  expect(sql).toContain('idx_documents_placement_parent_sort')
+  expect(sql).toContain(FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN)
+  expect(sql).toContain(FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN)
+  expect(sql).toContain(FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN)
+  expect(sql).toContain(FA_PROJECT_DOCUMENT_TREE_PLACEMENT_PARENT_SORT_INDEX)
   expect(sql).not.toContain('world_document_templates')
   expect(sql).not.toContain('world_media')
 })

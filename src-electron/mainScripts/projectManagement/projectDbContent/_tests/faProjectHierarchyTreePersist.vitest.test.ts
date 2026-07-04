@@ -634,7 +634,7 @@ test('Test that moveFaProjectDocumentInHierarchy rejects unanchored documents', 
     displayName: 'Loose Doc'
   })
   connection.prepare(
-    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET placement_id = NULL WHERE id = ?`
+    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET tree_placement_id = NULL WHERE id = ?`
   ).run(doc.id)
   expect(() => moveFaProjectDocumentInHierarchy(connection, {
     documentId: doc.id,
@@ -718,7 +718,7 @@ test('Test that searchFaProjectHierarchy ignores documents without placement_id'
     sortOrder: 0
   })
   connection.prepare(
-    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET placement_id = NULL WHERE id = ?`
+    `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET tree_placement_id = NULL WHERE id = ?`
   ).run(loose.id)
   const result = searchFaProjectHierarchy(connection, 'Loose')
   expect(result.hits).toEqual([])

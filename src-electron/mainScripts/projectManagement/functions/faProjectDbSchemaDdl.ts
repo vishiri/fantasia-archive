@@ -9,6 +9,28 @@ export const FA_PROJECT_TABLE_DOCUMENT_MEDIA = 'document_media'
 export const FA_PROJECT_TABLE_WORLD_TEMPLATE_GROUPS = 'world_template_groups'
 export const FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS = 'world_template_placements'
 
+/** documents tree anchor FK to world_template_placements.id */
+export const FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN = 'tree_placement_id'
+
+/** documents tree parent FK to documents.id (NULL = top-level under placement) */
+export const FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN = 'tree_parent_document_id'
+
+/** documents sibling order within placement + parent bucket */
+export const FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN = 'tree_custom_sort_order'
+
+/** Composite index on documents tree hierarchy columns */
+export const FA_PROJECT_DOCUMENT_TREE_PLACEMENT_PARENT_SORT_INDEX =
+  'idx_documents_tree_placement_parent_sort'
+
+/** Legacy documents hierarchy column names (pre tree_* rename) */
+export const FA_PROJECT_DOCUMENT_TREE_LEGACY_PLACEMENT_ID_COLUMN = 'placement_id'
+export const FA_PROJECT_DOCUMENT_TREE_LEGACY_PARENT_DOCUMENT_ID_COLUMN = 'parent_document_id'
+export const FA_PROJECT_DOCUMENT_TREE_LEGACY_SORT_ORDER_COLUMN = 'sort_order'
+
+/** Legacy composite index name before tree_* column rename */
+export const FA_PROJECT_DOCUMENT_TREE_LEGACY_PLACEMENT_PARENT_SORT_INDEX =
+  'idx_documents_placement_parent_sort'
+
 /** Default worlds.color hex when inserting worlds without an override. */
 export const FA_PROJECT_WORLD_DEFAULT_COLOR = '#808080'
 
@@ -143,9 +165,9 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_DOCUMENTS} (
   id TEXT NOT NULL PRIMARY KEY,
   world_id TEXT NOT NULL REFERENCES ${FA_PROJECT_TABLE_WORLDS}(id) ON DELETE RESTRICT,
   template_id TEXT REFERENCES ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES}(id) ON DELETE RESTRICT,
-  placement_id TEXT REFERENCES ${FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS}(id) ON DELETE RESTRICT,
-  parent_document_id TEXT REFERENCES ${FA_PROJECT_TABLE_DOCUMENTS}(id) ON DELETE CASCADE,
-  sort_order INTEGER NOT NULL DEFAULT 0,
+  ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} TEXT REFERENCES ${FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS}(id) ON DELETE RESTRICT,
+  ${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} TEXT REFERENCES ${FA_PROJECT_TABLE_DOCUMENTS}(id) ON DELETE CASCADE,
+  ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} INTEGER NOT NULL DEFAULT 0,
   display_name TEXT NOT NULL CHECK (length(display_name) > 0),
   created_at_ms INTEGER NOT NULL,
   updated_at_ms INTEGER NOT NULL
@@ -201,8 +223,8 @@ CREATE INDEX IF NOT EXISTS idx_world_template_placements_document_template_id
   ON ${FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS}(document_template_id);
 CREATE INDEX IF NOT EXISTS idx_documents_world_id ON ${FA_PROJECT_TABLE_DOCUMENTS}(world_id);
 CREATE INDEX IF NOT EXISTS idx_documents_template_id ON ${FA_PROJECT_TABLE_DOCUMENTS}(template_id);
-CREATE INDEX IF NOT EXISTS idx_documents_placement_parent_sort
-  ON ${FA_PROJECT_TABLE_DOCUMENTS}(placement_id, parent_document_id, sort_order);
+CREATE INDEX IF NOT EXISTS ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_PARENT_SORT_INDEX}
+  ON ${FA_PROJECT_TABLE_DOCUMENTS}(${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN}, ${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN}, ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN});
 CREATE INDEX IF NOT EXISTS idx_document_media_media_id ON ${FA_PROJECT_TABLE_DOCUMENT_MEDIA}(media_id);
 CREATE INDEX IF NOT EXISTS idx_worlds_sort_order ON ${FA_PROJECT_TABLE_WORLDS}(sort_order);
 CREATE INDEX IF NOT EXISTS idx_document_templates_sort_order
