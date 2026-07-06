@@ -62,6 +62,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | [types-folder.mdc](.cursor/rules/types-folder.mdc) | Always — shared types under **`types/`** |
 | [final-cleanup.mdc](.cursor/rules/final-cleanup.mdc) | Always — end-of-batch ship workflow |
 | [fa-he-tree.mdc](.cursor/rules/fa-he-tree.mdc) | **`@he-tree/vue` only**; **`QTree` forbidden** |
+| [fa-document-workspace-edit-state.mdc](.cursor/rules/fa-document-workspace-edit-state.mdc) | **`DocumentWorkspacePage`**, tab **`editState`** preview vs edit |
 | [fa-drag-drop-lists.mdc](.cursor/rules/fa-drag-drop-lists.mdc) | List/table DnD policy |
 | [fa-icon-picker.mdc](.cursor/rules/fa-icon-picker.mdc) | **`FaIconPickerInput`**, **`yarn generate:icon-catalogs`** |
 | [fa-locale-translations-input.mdc](.cursor/rules/fa-locale-translations-input.mdc) | **`FaLocaleTranslationsInput`**, **`src/scripts/localeTranslations/`**, Project Settings world name + world appendix |
@@ -93,6 +94,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Action manager | [fa-action-manager.mdc](.cursor/rules/fa-action-manager.mdc), [fantasia-action-manager](.cursor/skills/fantasia-action-manager/SKILL.md) |
 | Project Settings | [fantasia-sqlite-main](.cursor/skills/fantasia-sqlite-main/SKILL.md), [projectDB.md](docs/database/projectDB.md) — IPC-read on open; **`saveProjectSettings`**; worlds + template layout + document templates |
 | Workspace sidebar | **`/home`** **`QSplitter`**, **`S_FaProjectSidebar`**, **`project_data.sidebar_width`** — **`ProjectHierarchyTree`**, **`S_FaProjectHierarchyTree`**, **`ProjectHierarchyTreeSearch`**, **`ProjectDocumentControlBar`**, **`ProjectWorkspaceWorldList`**, **`S_FaProjectWorkspaceWorlds`**; **`project_data.hierarchy_tree_ui_state`**; [projectDB.md](docs/database/projectDB.md); E2E [checkWorkspaceSidebar.playwright.spec.ts](e2e-tests/checkWorkspaceSidebar.playwright.spec.ts) |
+| Document workspace **`editState`** | Per-tab preview vs edit — **`I_faOpenedDocumentTab.editState`**, **`DocumentWorkspacePage`**, [fa-document-workspace-edit-state.mdc](.cursor/rules/fa-document-workspace-edit-state.mdc), [fantasia-document-workspace-edit-state](.cursor/skills/fantasia-document-workspace-edit-state/SKILL.md) |
 | Floating **`Window*`** | [fantasia-floating-windows](.cursor/skills/fantasia-floating-windows/SKILL.md) — shared **`_sharedWindowStyling/`**, **`_sharedWindowNoteboard/`** |
 | Trees / DnD | [fa-he-tree.mdc](.cursor/rules/fa-he-tree.mdc), [fa-drag-drop-lists.mdc](.cursor/rules/fa-drag-drop-lists.mdc), skills **fantasia-he-tree**, **fantasia-drag-drop** |
 | **`FaIconPickerInput`** | [fa-icon-picker.mdc](.cursor/rules/fa-icon-picker.mdc), [fantasia-icon-picker](.cursor/skills/fantasia-icon-picker/SKILL.md) |
@@ -152,6 +154,7 @@ No Markdown bold/italic in comments. Single quotes for inline refs. No mid-sente
 | `fantasia-flatten-database-schemas` | Schema squash |
 | `fantasia-template-custom-fields` | Template fields (design) |
 | `fantasia-worldbuilding-domain` | Product vocabulary |
+| `fantasia-document-workspace-edit-state` | Opened tab **`editState`**, preview vs edit fields on **`DocumentWorkspacePage`** |
 | `fantasia-markdown-dialogs` | QMarkdown dialogs |
 | `fantasia-release-build` | Production packaging |
 | `git-conventional-commits` | Commit workflow |

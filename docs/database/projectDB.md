@@ -13,7 +13,7 @@ Flattened to a single bootstrap revision during pre-release dev. No upgrade ladd
 | Version | Contents |
 |---------|----------|
 | **0** | Uninitialized file (bootstrap target on first open/create). |
-| **1** | Full schema: **`project_data`** KV, worldbuilding **content tables** (**`worlds`** incl. **`color_pallete`** + **`display_name_translations_json`**, **`document_templates`** incl. **`sort_order`**, **`world_appendix`**, **`icon`**, **`title_translations_json`** + **`title_singular_translations_json`** + **`world_appendix_translations_json`**, **`documents`** incl. **`tree_placement_id`** + **`tree_parent_document_id`** + **`tree_custom_sort_order`**, **`media`**, **`document_media`**, **`world_template_groups`** + **`world_template_placements`** layout incl. **`nickname`** + **`nickname_translations_json`** + **`nickname_singular_translations_json`** + **`display_name_translations_json`**), default **world** seed on create. Idempotent **`applyFaProjectDocumentsHierarchySchemaPatch`** runs on every open at version **1** for legacy files missing hierarchy columns or still using pre-rename **`placement_id`** / **`parent_document_id`** / **`sort_order`** on **`documents`**; **`tree_custom_sort_order`** creation-time backfill runs **only when that column is first added**, not on re-apply. |
+| **1** | Full schema: **`project_data`** KV, worldbuilding **content tables** (**`worlds`** incl. **`color_pallete`** + **`display_name_translations_json`**, **`document_templates`** incl. **`sort_order`**, **`world_appendix`**, **`icon`**, **`title_translations_json`** + **`title_singular_translations_json`** + **`world_appendix_translations_json`**, **`documents`** incl. **`tree_placement_id`** + **`tree_parent_document_id`** + **`tree_custom_sort_order`**, **`media`**, **`document_media`**, **`world_template_groups`** + **`world_template_placements`** layout incl. **`nickname`** + **`nickname_translations_json`** + **`nickname_singular_translations_json`** + **`display_name_translations_json`**, **`opened_documents`** singleton snapshot), default **world** seed on create. Idempotent **`applyFaProjectDocumentsHierarchySchemaPatch`** runs on every open at version **1** for legacy files missing hierarchy columns or still using pre-rename **`placement_id`** / **`parent_document_id`** / **`sort_order`** on **`documents`**; **`tree_custom_sort_order`** creation-time backfill runs **only when that column is first added**, not on re-apply. Idempotent **`applyFaProjectOpenedDocumentsSchemaV1`** creates **`opened_documents`** when missing on existing v1 files. |
 
 **Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 1`** in **`faProjectDbMigrateWiring.ts`**.
 
@@ -147,6 +147,18 @@ Indexes: **`idx_world_template_placements_world_root_sort`**, **`idx_world_templ
 
 Indexes: **`idx_documents_world_id`**, **`idx_documents_template_id`**, **`idx_documents_tree_placement_parent_sort`**, **`idx_document_media_media_id`**, **`idx_worlds_sort_order`**, **`idx_document_templates_sort_order`**.
 
+### `opened_documents`
+
+Singleton workspace tab snapshot (one row, **`id = 1`**).
+
+| Column | Notes |
+|--------|--------|
+| `id` | INTEGER PK, CHECK **`id = 1`** |
+| `snapshot_json` | TEXT JSON: **`schemaVersion`**, **`activeDocumentId`**, ordered **`tabs`** (document id, labels, template icon, name draft, saved baseline, unsaved flag, **`editState`** preview/edit mode) |
+| `updated_at_ms` | INTEGER Unix ms |
+
+**Modules:** **`faOpenedDocumentsPersistWiring.ts`**. Renderer store **`S_FaOpenedDocuments`** debounces writes (**500ms**) via **`FA_PROJECT_MANAGEMENT_IPC`**.
+
 ## Relationships (summary)
 
 | Relationship | Implementation |
@@ -250,6 +262,8 @@ All content handlers wrap **`runWithFaProjectDatabaseForIpcAsync`**.
 | `search-project-hierarchy-async` | `searchFaProjectHierarchy` |
 
 **`FA_PROJECT_MANAGEMENT_IPC`** (hierarchy UI state): **`get-hierarchy-tree-ui-state-async`** → **`readFaProjectHierarchyTreeUiState`**; **`set-hierarchy-tree-ui-state-patch-async`** → **`upsertFaProjectHierarchyTreeUiStateKv`**.
+
+**`FA_PROJECT_MANAGEMENT_IPC`** (opened document tabs): **`get-opened-documents-snapshot-async`** → **`readFaProjectOpenedDocumentsSnapshot`**; **`save-opened-documents-snapshot-async`** → **`upsertFaProjectOpenedDocumentsSnapshot`**.
 
 Exact channel strings: **`src-electron/electron-ipc-bridge.ts`** (`FA_PROJECT_CONTENT_IPC`).
 

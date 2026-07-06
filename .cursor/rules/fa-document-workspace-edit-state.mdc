@@ -1,0 +1,61 @@
+---
+description: Opened document workspace editState preview vs edit mode for DocumentWorkspacePage fields
+globs: "src/pages/DocumentWorkspacePage/**/*,src/stores/S_FaOpenedDocuments.ts,src/stores/scripts/faOpenedDocumentsStoreActions.ts,src/scripts/openedDocuments/**/*,types/I_faOpenedDocumentsDomain.ts,types/I_documentWorkspacePage.ts,src-electron/shared/faOpenedDocumentsSnapshotSchema.ts,docs/database/projectDB.md"
+alwaysApply: false
+---
+
+# Document workspace editState (preview vs edit)
+
+## Model
+
+Each opened document tab in **`S_FaOpenedDocuments`** carries **`editState: boolean`** on **`I_faOpenedDocumentTab`** (**`types/I_faOpenedDocumentsDomain.ts`**).
+
+| editState | Mode | UX |
+| --- | --- | --- |
+| **`false`** (default) | Preview / viewing | Read-only presentation — no editable inputs |
+| **`true`** | Edit | Editable controls for document fields |
+
+- New tabs: **`FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE`** (**`false`**) via **`createFaOpenedDocumentTabFromOpenMeta`**
+- Persisted in **`opened_documents.snapshot_json`** (**`editState`** on each tab row; legacy rows default **`false`** on parse)
+- Toggle UI / store action to flip **`editState`** — **`ProjectDocumentControlBar`** strip buttons (**Edit**, **Save**, **Save without exiting edit mode**); store **`enterDocumentEditMode`**, **`saveDocumentDisplayName`**
+
+## Pure helpers (level 1)
+
+**`src/scripts/openedDocuments/functions/openedDocumentEditStateDomain.ts`**
+
+| Export | Role |
+| --- | --- |
+| **`resolveOpenedDocumentTabIsInPreviewMode`** | **`!editState`** |
+| **`resolveOpenedDocumentTabIsInEditMode`** | **`editState`** |
+| **`resolveOpenedDocumentDisplayNameFromTab`** | Preview heading / tab label text |
+| **`normalizeOpenedDocumentTabEditState`** | Hydration default for legacy tabs |
+
+**`functions/`** modules: **`import type`** from **`app/types/**`** only — inject helpers from **`*_manager.ts`** / store wiring into composable factories.
+
+## DocumentWorkspacePage field pattern
+
+**`DocumentWorkspacePage.vue`** + **`createUseDocumentWorkspacePage`**
+
+For **each** document field (name, template fields, body, …):
+
+1. **Preview branch** — read-only markup (today: **`<h4>`** + **`previewDisplayName`** for document name)
+2. **Edit branch** — existing inputs (**`q-input`**, pickers, etc.) gated on **`documentShowsEditFields`**
+3. **Never** show editable inputs when **`documentShowsPreview`** unless product explicitly requires inline edit in preview (not default)
+
+**`data-test-locator`**: preview **`documentWorkspacePage-previewTitle`**; edit name **`documentWorkspacePage-nameInput`**.
+
+Composable exposes **`documentShowsPreview`**, **`documentShowsEditFields`**, **`previewDisplayName`** from active tab **`editState`**.
+
+## Adding a new field (checklist)
+
+1. Store draft/saved on tab or load from project IPC — unchanged by editState
+2. Preview: static/read-only element with resolved display value
+3. Edit: input only inside **`v-if="documentShowsEditFields"`** (or field-specific flag derived from **`editState`**)
+4. Vitest: preview hides inputs; edit shows inputs (mock tab **`editState`** true/false)
+5. Changelog when user-visible
+
+## Related
+
+- [fantasia-document-workspace-edit-state](../skills/fantasia-document-workspace-edit-state/SKILL.md)
+- [projectDB.md](../../docs/database/projectDB.md) **`opened_documents`**
+- [fa-two-level-architecture.mdc](fa-two-level-architecture.mdc) — inject domain helpers into **`functions/`** composables
