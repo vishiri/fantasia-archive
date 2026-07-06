@@ -2134,6 +2134,64 @@ test('Test that mergeLoadedChildrenIntoNode preserves loaded document subtrees o
   expect(parentAfter?.children.map((child) => child.id)).toEqual(['doc-child'])
 })
 
+test('Test that mergeLoadedChildrenIntoNode preserves nested subtrees when parent childrenLoaded is false', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const firstLoad = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [{
+      displayName: 'Parent',
+      hasChildren: true,
+      id: 'doc-parent',
+      parentDocumentId: null,
+      placementId: 'placement-1',
+      sortOrder: 0
+    }],
+    placementIcon: 'mdi-account',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  mergeLoadedChildrenIntoNode(tree, 'placement-1', firstLoad)
+  const nestedLoad = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [{
+      displayName: 'Child',
+      hasChildren: false,
+      id: 'doc-child',
+      parentDocumentId: 'doc-parent',
+      placementId: 'placement-1',
+      sortOrder: 0
+    }],
+    placementIcon: 'mdi-account',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  mergeLoadedChildrenIntoNode(tree, 'doc-parent', nestedLoad)
+  const placement = findProjectHierarchyTreeNodeById(tree, 'placement-1')
+  expect(placement).not.toBeNull()
+  placement!.childrenLoaded = false
+  const refreshLoad = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [{
+      displayName: 'Sibling saved',
+      hasChildren: false,
+      id: 'doc-sibling',
+      parentDocumentId: null,
+      placementId: 'placement-1',
+      sortOrder: 0
+    }, {
+      displayName: 'Parent refreshed',
+      hasChildren: true,
+      id: 'doc-parent',
+      parentDocumentId: null,
+      placementId: 'placement-1',
+      sortOrder: 1
+    }],
+    placementIcon: 'mdi-account',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  mergeLoadedChildrenIntoNode(tree, 'placement-1', refreshLoad)
+  const parentAfter = findProjectHierarchyTreeNodeById(tree, 'doc-parent')
+  expect(parentAfter?.children.map((child) => child.id)).toEqual(['doc-child'])
+})
+
 test('Test that shouldClampProjectHierarchyTreeVirtualScrollTail detects tail scroll', () => {
   const scrollContainer = document.createElement('div')
   Object.defineProperty(scrollContainer, 'scrollTop', {

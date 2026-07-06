@@ -10,7 +10,7 @@ export function mergeLoadedChildrenIntoNode (
 ): boolean {
   for (const node of treeNodes) {
     if (node.id === nodeId) {
-      if (node.childrenLoaded && node.children.length > 0) {
+      if (node.children.length > 0) {
         const existingById = new Map(node.children.map((child) => [child.id, child]))
         node.children = children.map((incomingChild) => {
           const existingChild = existingById.get(incomingChild.id)

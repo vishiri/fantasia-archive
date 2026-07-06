@@ -453,6 +453,56 @@ test('Test that lazy load children wiring refreshes placement and nested documen
   })
 })
 
+test('Test that refreshProjectHierarchyTreeNodeChildrenFromDatabase keeps loaded nested document rows', async () => {
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const parentDocument = buildDocumentNode({
+    children: [buildDocumentNode({
+      documentId: 'doc-nested',
+      id: 'doc-nested',
+      label: 'Nested doc'
+    })],
+    childrenLoaded: true,
+    documentId: 'doc-parent',
+    hasChildren: true,
+    id: 'doc-parent',
+    label: 'Parent doc'
+  })
+  mergeLoadedChildrenIntoNode(treeData.value, 'placement-1', [
+    buildDocumentNode({
+      documentId: 'doc-sibling',
+      id: 'doc-sibling',
+      label: 'Sibling saved'
+    }),
+    parentDocument
+  ])
+  const publishTreeRevision = vi.fn(async () => undefined)
+  const listPlacementDocumentChildren = vi.fn(async () => ({
+    items: [{
+      displayName: 'Sibling saved',
+      hasChildren: false,
+      id: 'doc-sibling',
+      parentDocumentId: null,
+      placementId: 'placement-1',
+      sortOrder: 0
+    }, {
+      displayName: 'Parent doc',
+      hasChildren: true,
+      id: 'doc-parent',
+      parentDocumentId: null,
+      placementId: 'placement-1',
+      sortOrder: 1
+    }]
+  }))
+  await refreshProjectHierarchyTreeNodeChildrenFromDatabase({
+    listPlacementDocumentChildren,
+    nodeId: 'placement-1',
+    publishTreeRevision,
+    treeData
+  })
+  const parentAfter = findProjectHierarchyTreeNodeById(treeData.value, 'doc-parent')
+  expect(parentAfter?.children.map((child) => child.id)).toEqual(['doc-nested'])
+})
+
 test('Test that persistProjectHierarchyTreeDraggedDocumentMove reindexes sibling order snapshot', async () => {
   const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   seedPlacementDocuments(treeData)
