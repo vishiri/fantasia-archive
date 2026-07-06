@@ -14,6 +14,8 @@ import { S_FaRecentProjects } from 'app/src/stores/S_FaRecentProjects'
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
 import { FA_PROJECT_SIDEBAR_MIN_WIDTH_PX } from 'app/types/I_faProjectSidebarDomain'
+import { faAppHeaderChromeSpellcheckRefreshVisible } from 'app/src/components/globals/GlobalLanguageSelector/scripts/faAppHeaderChromeSpellcheckReserveWiring'
+
 import { mountMainLayoutForVitest } from './mainLayoutVitestMount'
 
 function countKeydownCaptureAdds (spy: { mock: { calls: unknown[][] } }): number {
@@ -61,6 +63,25 @@ test('Test that MainLayout on workspace route shows the workspace drawer chrome'
   expect(w.find('[data-test-locator="projectHierarchyTreeSearch"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="projectHierarchyTree"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="projectDocumentControlBar"]').exists()).toBe(true)
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+test('Test that MainLayout applies spellcheck header reserve class from shared ref', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'spa')
+  faAppHeaderChromeSpellcheckRefreshVisible.value = false
+
+  const w = await mountMainLayoutForVitest('/home')
+  await flushPromises()
+
+  expect(w.find('.appHeader__inner--spellcheckRefreshVisible').exists()).toBe(false)
+
+  faAppHeaderChromeSpellcheckRefreshVisible.value = true
+  await flushPromises()
+  expect(w.find('.appHeader__inner--spellcheckRefreshVisible').exists()).toBe(true)
+
+  faAppHeaderChromeSpellcheckRefreshVisible.value = false
   w.unmount()
   vi.unstubAllEnvs()
 })

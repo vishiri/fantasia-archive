@@ -6,6 +6,7 @@ import type {
   I_faProjectHierarchyTreeUiState,
   I_faProjectHierarchyTreeUiStatePatch
 } from 'app/types/I_faProjectHierarchyTreeDomain'
+import type { I_faOpenedDocumentsSnapshot } from 'app/types/I_faOpenedDocumentsDomain'
 import type {
   I_faProjectSidebarPatch,
   I_faProjectSidebarRoot
@@ -85,6 +86,7 @@ export interface I_faProjectManagementAPI {
   getProjectSettings: () => Promise<I_faProjectSettingsRoot>
   getProjectSidebar: () => Promise<I_faProjectSidebarRoot>
   getHierarchyTreeUiState: () => Promise<I_faProjectHierarchyTreeUiState>
+  getOpenedDocumentsSnapshot: () => Promise<I_faOpenedDocumentsSnapshot>
   getProjectStyling: () => Promise<I_faProjectStylingRoot>
   getRecentProjects: () => Promise<I_faRecentProjectEntry[]>
   /**
@@ -100,6 +102,7 @@ export interface I_faProjectManagementAPI {
   setProjectSettings: (patch: I_faProjectSettingsPatch) => Promise<boolean>
   setProjectSidebar: (patch: I_faProjectSidebarPatch) => Promise<boolean>
   setHierarchyTreeUiState: (patch: I_faProjectHierarchyTreeUiStatePatch) => Promise<boolean>
+  saveOpenedDocumentsSnapshot: (snapshot: I_faOpenedDocumentsSnapshot) => Promise<boolean>
   setProjectStyling: (patch: I_faProjectStylingPatch) => Promise<boolean>
   /**
    * Playwright E2E only: stages the absolute path for the next create flow so main skips the native save dialog.

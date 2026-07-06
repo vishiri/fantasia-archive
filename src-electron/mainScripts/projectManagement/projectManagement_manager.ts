@@ -74,6 +74,12 @@ export {
 } from './faProjectHierarchyTreeUiStatePersistWiring'
 
 export {
+  clearFaProjectOpenedDocumentsSnapshot,
+  readFaProjectOpenedDocumentsSnapshot,
+  upsertFaProjectOpenedDocumentsSnapshot
+} from './faOpenedDocumentsPersistWiring'
+
+export {
   readFaProjectSettingsRoot,
   readFaProjectSettingsProjectNameRaw,
   upsertFaProjectSettingsKv

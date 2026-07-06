@@ -111,10 +111,13 @@
 </template>
 
 <script setup lang="ts">
+import { onBeforeUnmount, watch } from 'vue'
+
 import GlobalLanguageSelectorSpellcheckRefreshControl from './GlobalLanguageSelectorSpellcheckRefreshControl.vue'
 
 import { GLOBAL_LANGUAGE_SELECTOR_LOCALES } from './scripts/globalLanguageSelectorLocales_manager'
 import { useGlobalLanguageSelector } from './scripts/globalLanguageSelector_manager'
+import { syncFaAppHeaderChromeSpellcheckRefreshVisible } from './scripts/faAppHeaderChromeSpellcheckReserveWiring'
 
 const {
   activeI18nLocale,
@@ -131,6 +134,18 @@ const {
   showSelector,
   showSpellcheckRefresh
 } = useGlobalLanguageSelector()
+
+watch(
+  showSpellcheckRefresh,
+  (visible) => {
+    syncFaAppHeaderChromeSpellcheckRefreshVisible(visible)
+  },
+  { immediate: true }
+)
+
+onBeforeUnmount(() => {
+  syncFaAppHeaderChromeSpellcheckRefreshVisible(false)
+})
 </script>
 
 <style lang="scss" scoped>

@@ -2,6 +2,7 @@ import { afterEach, expect, test, vi } from 'vitest'
 
 import {
   isFaComponentTestingRoutePath,
+  navigateToWorkspaceHomeRoute,
   navigateToWorkspaceRouteForActiveProject,
   navigateToWorkspaceWhenOnWelcomeRoute,
   registerFaAppRouterSession,
@@ -78,6 +79,72 @@ test('Test that navigateToWorkspaceRouteForActiveProject skips push when already
   })
 
   await navigateToWorkspaceRouteForActiveProject()
+
+  expect(routerPushMock).not.toHaveBeenCalled()
+})
+
+/**
+ * faAppRouterSession
+ * navigateToWorkspaceRouteForActiveProject skips push when a document tab route is active.
+ */
+test('Test that navigateToWorkspaceRouteForActiveProject skips push when on a document workspace route', async () => {
+  faVitestRouterPath = '/home/document/doc-a'
+  routerPushMock.mockReset()
+  registerFaAppRouterSession({
+    getCurrentPath (): string {
+      return faVitestRouterPath
+    },
+    push (payload): void {
+      faVitestRouterPath = payload.path
+      routerPushMock(payload)
+    }
+  })
+
+  await navigateToWorkspaceRouteForActiveProject()
+
+  expect(routerPushMock).not.toHaveBeenCalled()
+})
+
+/**
+ * faAppRouterSession
+ * navigateToWorkspaceHomeRoute pushes home from an open document tab route.
+ */
+test('Test that navigateToWorkspaceHomeRoute pushes home from a document workspace route', async () => {
+  faVitestRouterPath = '/home/document/doc-a'
+  routerPushMock.mockReset()
+  registerFaAppRouterSession({
+    getCurrentPath (): string {
+      return faVitestRouterPath
+    },
+    push (payload): void {
+      faVitestRouterPath = payload.path
+      routerPushMock(payload)
+    }
+  })
+
+  await navigateToWorkspaceHomeRoute()
+
+  expect(routerPushMock).toHaveBeenCalledWith({ path: '/home' })
+})
+
+/**
+ * faAppRouterSession
+ * navigateToWorkspaceHomeRoute is a no-op when already on home.
+ */
+test('Test that navigateToWorkspaceHomeRoute skips push when already on home', async () => {
+  faVitestRouterPath = '/home'
+  routerPushMock.mockReset()
+  registerFaAppRouterSession({
+    getCurrentPath (): string {
+      return faVitestRouterPath
+    },
+    push (payload): void {
+      faVitestRouterPath = payload.path
+      routerPushMock(payload)
+    }
+  })
+
+  await navigateToWorkspaceHomeRoute()
 
   expect(routerPushMock).not.toHaveBeenCalled()
 })

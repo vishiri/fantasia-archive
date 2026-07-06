@@ -6,6 +6,7 @@ import 'app/types/vueRouterRouteMetaAugmentation'
 import ComponentTestingLayout from '../../src/layouts/ComponentTestingLayout/ComponentTestingLayout.vue'
 import MainLayout from '../../src/layouts/MainLayout/MainLayout.vue'
 import ComponentTesting from '../../src/pages/ComponentTesting/ComponentTesting.vue'
+import DocumentWorkspacePage from '../../src/pages/DocumentWorkspacePage/DocumentWorkspacePage.vue'
 import ErrorNotFound from '../../src/pages/ErrorNotFound/ErrorNotFound.vue'
 import IndexPage from '../../src/pages/IndexPage/IndexPage.vue'
 import SplashPage from '../../src/pages/SplashPage/SplashPage.vue'
@@ -41,11 +42,18 @@ export const STORYBOOK_APP_ROUTES: RouteRecordRaw[] = [
   {
     path: '/home',
     component: MainLayout,
-    children: [{
-      path: '',
-      name: 'storybook-home',
-      component: IndexPage
-    }]
+    children: [
+      {
+        path: '',
+        name: 'storybook-home',
+        component: IndexPage
+      },
+      {
+        path: 'document/:documentId',
+        name: 'storybook-home-document',
+        component: DocumentWorkspacePage
+      }
+    ]
   },
   {
     path: '/main-empty',

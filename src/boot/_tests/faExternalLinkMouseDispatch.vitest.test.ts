@@ -174,6 +174,45 @@ test('Test that dispatch sets location on internal auxclick', () => {
 
 /**
  * dispatchFaExternalLinkMouseEvent
+ * Skips internal auxclick navigation when the event was already handled upstream.
+ */
+test('Test that dispatch skips internal auxclick when defaultPrevented is true', () => {
+  checkIfExternalMock.mockReturnValue(false)
+  const locationHref = { current: 'app://start' }
+  const stubWin = {
+    faContentBridgeAPIs: {
+      faExternalLinksManager: {
+        checkIfExternal: checkIfExternalMock,
+        openExternal: openExternalMock
+      }
+    },
+    location: {
+      set href (v: string) {
+        locationHref.current = v
+      },
+      get href () {
+        return locationHref.current
+      }
+    }
+  } as unknown as Window
+  const ev = buildMouseEvent({
+    closest: vi.fn(() => null),
+    href: 'app://internal/doc',
+    tagName: 'a'
+  }, 'auxclick')
+  Object.defineProperty(ev, 'defaultPrevented', {
+    configurable: true,
+    value: true
+  })
+  dispatchFaExternalLinkMouseEvent(ev, () => {
+    return stubWin
+  })
+  expect(ev.preventDefault).not.toHaveBeenCalled()
+  expect(locationHref.current).toBe('app://start')
+})
+
+/**
+ * dispatchFaExternalLinkMouseEvent
  * Resolves href from a parent anchor when the click target is a child element.
  */
 test('Test that dispatch uses closest anchor href for nested targets', () => {

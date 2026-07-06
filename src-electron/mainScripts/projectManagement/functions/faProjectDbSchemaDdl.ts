@@ -8,6 +8,7 @@ export const FA_PROJECT_TABLE_MEDIA = 'media'
 export const FA_PROJECT_TABLE_DOCUMENT_MEDIA = 'document_media'
 export const FA_PROJECT_TABLE_WORLD_TEMPLATE_GROUPS = 'world_template_groups'
 export const FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS = 'world_template_placements'
+export const FA_PROJECT_TABLE_OPENED_DOCUMENTS = 'opened_documents'
 
 /** documents tree anchor FK to world_template_placements.id */
 export const FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN = 'tree_placement_id'
@@ -233,10 +234,24 @@ CREATE INDEX IF NOT EXISTS idx_document_templates_sort_order
 }
 
 /**
+ * Creates the opened_documents singleton snapshot table (schema version 1).
+ */
+export function applyFaProjectOpenedDocumentsSchemaV1 (db: I_faProjectDbExec): void {
+  db.exec(`
+CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_OPENED_DOCUMENTS} (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  snapshot_json TEXT NOT NULL,
+  updated_at_ms INTEGER NOT NULL
+);
+`)
+}
+
+/**
  * Creates worldbuilding content tables and indexes for schema version 1.
  * Idempotent when tables already exist.
  */
 export function applyFaProjectContentSchemaV1 (db: I_faProjectDbExec): void {
   applyFaProjectContentSchemaV1CoreTables(db)
   applyFaProjectContentSchemaV1DocumentsAndIndexes(db)
+  applyFaProjectOpenedDocumentsSchemaV1(db)
 }

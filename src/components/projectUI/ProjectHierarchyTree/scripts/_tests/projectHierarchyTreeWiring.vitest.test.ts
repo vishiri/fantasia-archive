@@ -853,10 +853,10 @@ test('Test that openProjectHierarchyTreeNestParentAfterDragDrop opens parent row
   expect(openNodeAndParents).toHaveBeenCalledTimes(1)
 })
 
-test('Test that session handlers wiring emits document clicks', async () => {
+test('Test that session handlers wiring emits document open requests', async () => {
   const treeComponentRef = ref<I_faProjectHierarchyTreeHeTreeInstance | null>(null)
   const treeScrollHostRef = ref<HTMLElement | null>(null)
-  const onDocumentClick = vi.fn()
+  const onDocumentOpenRequest = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
@@ -869,7 +869,7 @@ test('Test that session handlers wiring emits document clicks', async () => {
     lazyLoadWiring: {
       loadChildrenForNode: async () => undefined
     },
-    onDocumentClick,
+    onDocumentOpenRequest,
     suppressTreeEmit: ref(false),
     treeComponentRef,
     treeData: ref([]),
@@ -881,9 +881,17 @@ test('Test that session handlers wiring emits document clicks', async () => {
     }
   })
   wiring.onNodeClick({
-    data: buildDocumentNode()
+    data: buildDocumentNode(),
+    children: []
   })
-  expect(onDocumentClick).toHaveBeenCalledWith('doc-a')
+  expect(onDocumentOpenRequest).toHaveBeenCalledWith(
+    'doc-a',
+    'leftNavigate',
+    expect.objectContaining({
+      tabLabel: expect.any(String),
+      templateIcon: expect.any(String)
+    })
+  )
   wiring.setTreeComponentRef({
     closeAll: vi.fn(),
     openNodeAndParents: vi.fn()
@@ -1384,7 +1392,7 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
     lazyLoadWiring: {
       loadChildrenForNode
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: ref(null),
     treeData: ref([]),
@@ -2210,6 +2218,7 @@ test('Test that createProjectHierarchyTreeSessionWiring returns tree API', async
       dragNode: null
     },
     hierarchyStore: {
+      clearPendingDocumentRefreshIds: vi.fn(),
       clearPendingRevealPath: vi.fn(),
       flushUiStatePersist: vi.fn(),
       queuePersistExpandedNodeIds: vi.fn(),
@@ -2219,9 +2228,10 @@ test('Test that createProjectHierarchyTreeSessionWiring returns tree API', async
       resetOnProjectClose: vi.fn()
     },
     nextTick: async () => undefined,
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     onMounted: vi.fn(),
     onUnmounted: vi.fn(),
+    pendingDocumentRefreshIds: ref([]),
     pendingRevealPath: ref([]),
     ref,
     treeData,
@@ -2424,6 +2434,7 @@ test('Test that createUseProjectHierarchyTree composes hierarchy session wiring'
   const { createUseProjectHierarchyTree } = await import('../createUseProjectHierarchyTree')
   const { watch } = await import('vue')
   const hierarchyStore = {
+    clearPendingDocumentRefreshIds: vi.fn(),
     clearPendingRevealPath: vi.fn(),
     flushUiStatePersist: vi.fn(),
     queuePersistExpandedNodeIds: vi.fn(),
@@ -2432,7 +2443,9 @@ test('Test that createUseProjectHierarchyTree composes hierarchy session wiring'
     refreshUiState: vi.fn(async () => undefined),
     resetOnProjectClose: vi.fn()
   }
+  const pendingDocumentRefreshIds = ref<string[]>([])
   const pendingRevealPath = ref(['world-1'])
+  const routePath = ref('/home/document/doc-a')
   const useTree = createUseProjectHierarchyTree({
     S_FaActiveProject: (() => ({
       activeProject: {
@@ -2451,8 +2464,74 @@ test('Test that createUseProjectHierarchyTree composes hierarchy session wiring'
     onMounted: (hook) => hook(),
     onUnmounted: (hook) => hook(),
     ref,
+    resolveFaDocumentWorkspaceRouteDocumentId: (path) => {
+      return path.startsWith('/home/document/') ? path.slice('/home/document/'.length) : null
+    },
+    storeToRefs: ((store: { flushUiStatePersist?: unknown }) => {
+      return {
+        pendingDocumentRefreshIds,
+        pendingRevealPath,
+        treeData: ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])),
+        uiState: ref({
+          expandedNodeIds: [],
+          schemaVersion: 1,
+          scrollTopPx: 0
+        }),
+        worlds: ref([sampleWorld])
+      }
+    }) as never,
+    useRoute: () => ({
+      path: routePath.value
+    }),
+    watch
+  })
+  const api = useTree({
+    onDocumentOpenRequest: vi.fn()
+  })
+  expect(api.activeDocumentId.value).toBe('doc-a')
+  expect(api.onNodeOpen).toBeTypeOf('function')
+  expect(hierarchyStore.flushUiStatePersist).toHaveBeenCalled()
+  pendingRevealPath.value = ['world-1', 'placement-1']
+  await vi.waitFor(() => {
+    expect(hierarchyStore.clearPendingRevealPath).toHaveBeenCalled()
+  })
+})
+
+test('Test that createUseProjectHierarchyTree treats missing route path as non-document workspace', async () => {
+  const { createUseProjectHierarchyTree } = await import('../createUseProjectHierarchyTree')
+  const { watch } = await import('vue')
+  const hierarchyStore = {
+    clearPendingDocumentRefreshIds: vi.fn(),
+    clearPendingRevealPath: vi.fn(),
+    flushUiStatePersist: vi.fn(),
+    queuePersistExpandedNodeIds: vi.fn(),
+    queuePersistScrollTopPx: vi.fn(),
+    refreshLayout: vi.fn(async () => undefined),
+    refreshUiState: vi.fn(async () => undefined),
+    resetOnProjectClose: vi.fn()
+  }
+  const useTree = createUseProjectHierarchyTree({
+    S_FaActiveProject: (() => ({
+      activeProject: {
+        filePath: 'C:\\a.faproject',
+        id: 'project-a',
+        name: 'Project A'
+      },
+      hasActiveProject: true
+    })) as never,
+    S_FaProjectHierarchyTree: (() => hierarchyStore) as never,
+    computed,
+    dragContext: {
+      dragNode: null
+    } as never,
+    nextTick: async () => undefined,
+    onMounted: (hook) => hook(),
+    onUnmounted: (hook) => hook(),
+    ref,
+    resolveFaDocumentWorkspaceRouteDocumentId: () => null,
     storeToRefs: (() => ({
-      pendingRevealPath,
+      pendingDocumentRefreshIds: ref<string[]>([]),
+      pendingRevealPath: ref<string[]>([]),
       treeData: ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])),
       uiState: ref({
         expandedNodeIds: [],
@@ -2461,17 +2540,13 @@ test('Test that createUseProjectHierarchyTree composes hierarchy session wiring'
       }),
       worlds: ref([sampleWorld])
     })) as never,
+    useRoute: () => ({}),
     watch
   })
   const api = useTree({
-    onDocumentClick: vi.fn()
+    onDocumentOpenRequest: vi.fn()
   })
-  expect(api.onNodeOpen).toBeTypeOf('function')
-  expect(hierarchyStore.flushUiStatePersist).toHaveBeenCalled()
-  pendingRevealPath.value = ['world-1', 'placement-1']
-  await vi.waitFor(() => {
-    expect(hierarchyStore.clearPendingRevealPath).toHaveBeenCalled()
-  })
+  expect(api.activeDocumentId.value).toBeNull()
 })
 
 test('Test that createProjectHierarchyTreeSessionSubWiring delegates UI state store writes', async () => {
@@ -2961,6 +3036,7 @@ test('Test that createProjectHierarchyTreeSessionWiring invokes lifecycle store 
   const { watch } = await import('vue')
   const { createProjectHierarchyTreeSessionWiring } = await import('../projectHierarchyTreeSessionWiring')
   const hierarchyStore = {
+    clearPendingDocumentRefreshIds: vi.fn(),
     clearPendingRevealPath: vi.fn(),
     flushUiStatePersist: vi.fn(),
     queuePersistExpandedNodeIds: vi.fn(),
@@ -2980,9 +3056,10 @@ test('Test that createProjectHierarchyTreeSessionWiring invokes lifecycle store 
     },
     hierarchyStore,
     nextTick: async () => undefined,
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     onMounted: (hook) => hook(),
     onUnmounted: (hook) => hook(),
+    pendingDocumentRefreshIds: ref([]),
     pendingRevealPath: ref([]),
     ref,
     treeData: ref([]),

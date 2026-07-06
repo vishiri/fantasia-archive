@@ -393,3 +393,22 @@ test('Test that S_FaProjectHierarchyTree refreshLayout coalesces concurrent load
   await Promise.all([first, second])
   expect(listWorkspaceHierarchyLayoutMock).toHaveBeenCalledTimes(1)
 })
+
+/**
+ * S_FaProjectHierarchyTree refreshDocumentsInTree queues document ids for session refresh.
+ */
+test('Test that S_FaProjectHierarchyTree refreshDocumentsInTree queues document ids', async () => {
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const store = S_FaProjectHierarchyTree()
+  store.refreshDocumentsInTree(['doc-a', 'doc-b'])
+  expect(store.pendingDocumentRefreshIds).toEqual(['doc-a', 'doc-b'])
+  store.refreshDocumentsInTree(['doc-b', 'doc-c'])
+  expect(store.pendingDocumentRefreshIds).toEqual(['doc-a', 'doc-b', 'doc-c'])
+  store.clearPendingDocumentRefreshIds()
+  expect(store.pendingDocumentRefreshIds).toEqual([])
+})

@@ -17,5 +17,7 @@ $globalLanguageSelector-menu-itemTextColor: fa-v('black', $black);
 $globalLanguageSelector-menu-maxHeight: 420px;
 $globalLanguageSelector-menu-minWidth: 180px;
 $globalLanguageSelector-topPosition: 6px;
-$globalLanguageSelector-trigger-border: 2px solid $globalLanguageSelector-borderColor;
+$globalLanguageSelector-triggerBorderWidthPx: 2px;
+$globalLanguageSelector-trigger-border: $globalLanguageSelector-triggerBorderWidthPx solid $globalLanguageSelector-borderColor;
+$globalLanguageSelector-trigger-outerSizePx: calc(#{$globalLanguageSelector-diameter} + 2 * #{$globalLanguageSelector-triggerBorderWidthPx});
 $globalLanguageSelector-zIndex: 7001;

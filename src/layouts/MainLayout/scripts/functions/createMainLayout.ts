@@ -1,21 +1,16 @@
 import type { I_faKeybindsRoot } from 'app/types/I_faKeybindsDomain'
 import type { I_ref } from 'app/types/I_vueCompositionShims'
 import type { StoreGeneric } from 'app/types/I_vuePiniaInjected'
+import type {
+  T_faAppShellPageTransitionBindings,
+  T_faAppShellPageTransitionMode,
+  T_faAppShellPageTransitionResolution
+} from 'app/types/I_faAppShellPageTransition'
 
 type T_faKeybindKeydownContext = {
   overrides: I_faKeybindsRoot['overrides']
   platform: NodeJS.Platform
   suspendGlobalKeybindDispatch: boolean
-}
-
-type T_faAppShellPageTransitionBindings = {
-  appear: boolean
-  enterActiveClass: string
-  enterFromClass: string
-  enterToClass: string
-  leaveActiveClass: string
-  leaveFromClass: string
-  leaveToClass: string
 }
 
 type T_createMainLayoutDeps = {
@@ -24,6 +19,13 @@ type T_createMainLayoutDeps = {
   awaitWelcomeScreenAutoLoadBootCompletion: () => Promise<void>
   FA_APP_SHELL_DRAWER_TRANSITION_MS: number
   FA_APP_SHELL_PAGE_TRANSITION_BINDINGS: T_faAppShellPageTransitionBindings
+  FA_DOCUMENT_WORKSPACE_PAGE_TRANSITION_BINDINGS: T_faAppShellPageTransitionBindings
+  resolveFaAppShellPageTransitionForRouteChange: (input: {
+    documentWorkspacePageTransitionBindings: T_faAppShellPageTransitionBindings
+    fromRoutePath: string
+    shellPageTransitionBindings: T_faAppShellPageTransitionBindings
+    toRoutePath: string
+  }) => T_faAppShellPageTransitionResolution
   S_FaAppNoteboard: () => StoreGeneric
   S_FaAppStyling: () => StoreGeneric
   S_FaKeybinds: () => StoreGeneric
@@ -48,22 +50,28 @@ type T_createMainLayoutDeps = {
   onMounted: (hook: () => void | Promise<void>) => void
   onUnmounted: (hook: () => void) => void
   ref: <T>(value: T) => I_ref<T>
-  resolveMainLayoutOutletKey: (childRoutePath: string | undefined) => string
+  resolveMainLayoutOutletKey: (childRouteKey: string | undefined) => string
   resolveMainLayoutRouteClass: (showWorkspaceDrawer: boolean) => Record<string, boolean>
   resolveMainLayoutShowWorkspaceDrawer: (routePath: string) => boolean
+  syncOpenedDocumentsActiveDocumentFromWorkspaceRoute: (routePath: string) => void
   useRoute: () => { path?: string } | undefined
   watch: (
-    source: I_ref<boolean>,
-    effect: (show: boolean) => void,
-    options?: { immediate?: boolean }
+    source: () => string,
+    effect: (toPath: string, fromPath?: string) => void,
+    options?: { flush?: 'sync' | 'pre' | 'post'; immediate?: boolean }
   ) => void
 }
 
 function resolveMainLayoutOutletKeyFromRoute (
   deps: T_createMainLayoutDeps,
-  childRoute: { path?: string } | undefined
+  childRoute: { fullPath?: string; path?: string } | undefined
 ): string {
-  return deps.resolveMainLayoutOutletKey(childRoute?.path)
+  const childRouteKey =
+    typeof childRoute?.fullPath === 'string' && childRoute.fullPath.length > 0
+      ? childRoute.fullPath
+      : childRoute?.path
+
+  return deps.resolveMainLayoutOutletKey(childRouteKey)
 }
 
 function useMainLayout (
@@ -71,14 +79,47 @@ function useMainLayout (
   useAppShellLayoutDrawerRail: (showWorkspaceDrawer: I_ref<boolean>) => { appShellLayoutQuasarView: I_ref<string> }
 ): {
     FA_APP_SHELL_DRAWER_TRANSITION_MS: number
-    FA_APP_SHELL_PAGE_TRANSITION_BINDINGS: T_faAppShellPageTransitionBindings
+    appShellPageTransitionBindingProps: I_ref<T_faAppShellPageTransitionBindings>
+    appShellPageTransitionMode: I_ref<T_faAppShellPageTransitionMode>
     appShellLayoutQuasarView: I_ref<string>
     appShellLayoutRouteClass: I_ref<Record<string, boolean>>
     isFantasiaStorybookCanvas: () => boolean
-    resolveMainLayoutOutletKeyFromRoute: (childRoute: { path?: string } | undefined) => string
+    resolveMainLayoutOutletKeyFromRoute: (childRoute: { fullPath?: string; path?: string } | undefined) => string
     showWorkspaceDrawer: I_ref<boolean>
   } {
   const route = deps.useRoute()
+  const previousMainLayoutRoutePath = deps.ref('')
+  const appShellPageTransitionBindings = deps.ref<T_faAppShellPageTransitionBindings>(
+    deps.FA_APP_SHELL_PAGE_TRANSITION_BINDINGS
+  )
+  const appShellPageTransitionMode = deps.ref<T_faAppShellPageTransitionMode>('out-in')
+  const appShellPageTransitionBindingProps = deps.computed(() => ({
+    ...appShellPageTransitionBindings.value
+  }))
+
+  if (!deps.isFantasiaStorybookCanvas()) {
+    deps.watch(
+      () => route?.path ?? '/',
+      (toPath) => {
+        const fromPath = previousMainLayoutRoutePath.value
+        previousMainLayoutRoutePath.value = toPath
+        const resolved = deps.resolveFaAppShellPageTransitionForRouteChange({
+          documentWorkspacePageTransitionBindings: deps.FA_DOCUMENT_WORKSPACE_PAGE_TRANSITION_BINDINGS,
+          fromRoutePath: fromPath,
+          shellPageTransitionBindings: deps.FA_APP_SHELL_PAGE_TRANSITION_BINDINGS,
+          toRoutePath: toPath
+        })
+        appShellPageTransitionBindings.value = resolved.bindings
+        appShellPageTransitionMode.value = resolved.mode
+        deps.syncOpenedDocumentsActiveDocumentFromWorkspaceRoute(toPath)
+      },
+      {
+        flush: 'sync',
+        immediate: true
+      }
+    )
+  }
+
   const mainLayoutRoutePath = deps.computed((): string => route?.path ?? '/')
   const showWorkspaceDrawer = deps.computed((): boolean => {
     return deps.resolveMainLayoutShowWorkspaceDrawer(mainLayoutRoutePath.value)
@@ -130,7 +171,8 @@ function useMainLayout (
 
   return {
     FA_APP_SHELL_DRAWER_TRANSITION_MS: deps.FA_APP_SHELL_DRAWER_TRANSITION_MS,
-    FA_APP_SHELL_PAGE_TRANSITION_BINDINGS: deps.FA_APP_SHELL_PAGE_TRANSITION_BINDINGS,
+    appShellPageTransitionBindingProps,
+    appShellPageTransitionMode,
     appShellLayoutQuasarView,
     appShellLayoutRouteClass,
     isFantasiaStorybookCanvas: deps.isFantasiaStorybookCanvas,

@@ -95,7 +95,7 @@ test('Test that session handlers open nodes and load children', async () => {
     lazyLoadWiring: {
       loadChildrenForNode
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
@@ -128,7 +128,7 @@ test('Test that session handlers load children when the open icon expands a row'
     lazyLoadWiring: {
       loadChildrenForNode
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
@@ -174,7 +174,7 @@ test('Test that open icon expand keeps stat closed until lazy load finishes', as
     lazyLoadWiring: {
       loadChildrenForNode
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: ref({
       closeAll: vi.fn(),
@@ -218,7 +218,7 @@ test('Test that session handlers collapse rows via the open icon', async () => {
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
@@ -259,7 +259,7 @@ test('Test that session handlers expand world rows from row click routing', asyn
     lazyLoadWiring: {
       loadChildrenForNode
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
@@ -319,7 +319,7 @@ test('Test that session handlers expand group rows from row click routing', asyn
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
@@ -376,7 +376,7 @@ test('Test that session handlers expand document rows with children from row cli
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
@@ -430,7 +430,7 @@ test('Test that session handlers ignore leaf document row click routing', async 
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
@@ -483,7 +483,7 @@ test('Test that session handlers ignore document row click after drag movement',
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
@@ -528,7 +528,7 @@ test('Test that session handlers ignore non-world open icon routing on world row
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
@@ -560,7 +560,7 @@ test('Test that session handlers reopen he-tree row after lazy load when tree re
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: ref({
       closeAll: vi.fn(),
@@ -590,7 +590,7 @@ test('Test that session handlers ignore close events while suppressTreeEmit is s
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(true),
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
@@ -604,8 +604,8 @@ test('Test that session handlers ignore close events while suppressTreeEmit is s
   expect(markNodeClosed).not.toHaveBeenCalled()
 })
 
-test('Test that session handlers emit document clicks for document rows', () => {
-  const onDocumentClick = vi.fn()
+test('Test that session handlers emit document open requests for leaf document rows', () => {
+  const onDocumentOpenRequest = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
@@ -618,7 +618,7 @@ test('Test that session handlers emit document clicks for document rows', () => 
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
-    onDocumentClick,
+    onDocumentOpenRequest,
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
@@ -632,20 +632,28 @@ test('Test that session handlers emit document clicks for document rows', () => 
       documentId: 'doc-1',
       groupId: null,
       hasChildren: false,
-      icon: '',
+      icon: 'mdi-feather',
       id: 'doc-1',
       label: 'Doc',
       nodeKind: 'document',
       placementId: 'placement-1',
       worldColor: '#000',
       worldId: 'world-1'
-    }
+    },
+    children: []
   })
   wiring.onNodeClick({
     data: mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])[0]!
   })
-  expect(onDocumentClick).toHaveBeenCalledTimes(1)
-  expect(onDocumentClick).toHaveBeenCalledWith('doc-1')
+  expect(onDocumentOpenRequest).toHaveBeenCalledTimes(1)
+  expect(onDocumentOpenRequest).toHaveBeenCalledWith(
+    'doc-1',
+    'leftNavigate',
+    {
+      tabLabel: 'Doc',
+      templateIcon: 'mdi-feather'
+    }
+  )
 })
 
 /**
@@ -705,7 +713,7 @@ test('Test that session handlers expose draggable and droppable handlers', () =>
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref(tree),
@@ -743,7 +751,7 @@ test('Test that session handlers do not restore UI state when tree ref attaches'
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef,
     treeData: ref([]),
@@ -779,7 +787,7 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
     lazyLoadWiring: {
       loadChildrenForNode
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
@@ -816,7 +824,7 @@ test('Test that session handlers skip restore when tree ref attaches during drag
     lazyLoadWiring: {
       loadChildrenForNode: async () => undefined
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
@@ -845,7 +853,7 @@ test('Test that session handlers skip restore when tree ref clears', () => {
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
@@ -884,7 +892,7 @@ test('Test that session handlers ignore open icon clicks on empty loaded documen
     lazyLoadWiring: {
       loadChildrenForNode
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
     treeData: ref([]),
@@ -925,7 +933,7 @@ test('Test that session handlers recover when he-tree openNodeAndParents stat is
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
-    onDocumentClick: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: ref({
       closeAll: vi.fn(),

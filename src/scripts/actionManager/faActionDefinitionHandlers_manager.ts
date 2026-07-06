@@ -16,7 +16,7 @@ import { toggleDevTools } from 'app/src/scripts/appGlobalManagementUI/appGlobalM
 import { applyFaUserSettingsLanguageSelection } from 'app/src/scripts/appInternals/faAppInternalsLocale_manager'
 import { faProjectDocumentTemplatesPersistSnapshotFromDialog } from 'app/src/stores/scripts/sFaProjectDocumentTemplatesBridge'
 import { faProjectWorldsPersistSnapshotFromDialog } from 'app/src/stores/scripts/sFaProjectWorldsBridge'
-import { navigateToWorkspaceRouteForActiveProject } from 'app/src/scripts/appInternals/faAppRouterSession_manager'
+import { navigateToWorkspaceHomeRoute } from 'app/src/scripts/appInternals/faAppRouterSession_manager'
 
 import { createFaActionDefinitionHandlers } from './functions/createFaActionDefinitionHandlers'
 import { createFaActionDefinitionHandlersShowProjectDashboard } from './functions/createFaActionDefinitionHandlersShowProjectDashboard'
@@ -68,7 +68,7 @@ const faActionDefinitionHandlersApi = {
   }),
   ...createFaActionDefinitionHandlersShowProjectDashboard({
     S_FaActiveProject,
-    navigateToWorkspaceRouteForActiveProject
+    navigateToWorkspaceHomeRoute
   })
 }
 

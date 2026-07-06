@@ -3,6 +3,7 @@ import { v4 as uuidv4, validate as validateUuid } from 'uuid'
 
 import {
   applyFaProjectContentSchemaV1,
+  applyFaProjectOpenedDocumentsSchemaV1,
   applyFaProjectProjectDataSchemaV1,
   FA_PROJECT_DATA_TABLE_NAME,
   FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
@@ -100,6 +101,7 @@ export function applyFaProjectMigrations (
   }
   if (startVer === FA_PROJECT_USER_VERSION_SUPPORTED_MAX) {
     applyFaProjectDocumentsHierarchySchemaPatch(db)
+    applyFaProjectOpenedDocumentsSchemaV1(db)
     return
   }
   if (startVer === 0) {

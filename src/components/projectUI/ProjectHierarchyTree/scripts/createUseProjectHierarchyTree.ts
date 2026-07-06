@@ -15,13 +15,24 @@ import type {
 
 import { createProjectHierarchyTreeSessionWiring } from './projectHierarchyTreeSessionWiring'
 
+import type {
+  I_faOpenedDocumentTreeOpenMeta,
+  T_faOpenedDocumentOpenMode
+} from 'app/types/I_faOpenedDocumentsDomain'
+
 type T_useProjectHierarchyTreeOptions = {
-  onDocumentClick: (documentId: string) => void
+  onDocumentOpenRequest: (
+    documentId: string,
+    mode: T_faOpenedDocumentOpenMode,
+    treeMeta: I_faOpenedDocumentTreeOpenMeta
+  ) => void
 }
 
 type T_useProjectHierarchyTree = (
   opts: T_useProjectHierarchyTreeOptions
-) => ReturnType<typeof createProjectHierarchyTreeSessionWiring>
+) => ReturnType<typeof createProjectHierarchyTreeSessionWiring> & {
+  activeDocumentId: Ref<string | null>
+}
 
 export function createUseProjectHierarchyTree (deps: {
   S_FaActiveProject: typeof S_FaActiveProject
@@ -32,22 +43,31 @@ export function createUseProjectHierarchyTree (deps: {
   onMounted: typeof onMounted
   onUnmounted: typeof onUnmounted
   ref: typeof ref
+  resolveFaDocumentWorkspaceRouteDocumentId: (routePath: string) => string | null
   storeToRefs: typeof storeToRefs
+  useRoute: () => {
+    path?: string
+  }
   watch: typeof watchFn
 }): T_useProjectHierarchyTree {
   return function useProjectHierarchyTree (opts) {
     const hierarchyStore = deps.S_FaProjectHierarchyTree()
-    const { pendingRevealPath, treeData, uiState, worlds } = deps.storeToRefs(hierarchyStore)
+    const { pendingDocumentRefreshIds, pendingRevealPath, treeData, uiState, worlds } = deps.storeToRefs(hierarchyStore)
+    const route = deps.useRoute()
+    const activeDocumentId = deps.computed((): string | null => {
+      return deps.resolveFaDocumentWorkspaceRouteDocumentId(route.path ?? '')
+    })
 
-    return createProjectHierarchyTreeSessionWiring({
+    const sessionApi = createProjectHierarchyTreeSessionWiring({
       S_FaActiveProject: deps.S_FaActiveProject,
       computed: deps.computed,
       dragContext: deps.dragContext,
       hierarchyStore,
       nextTick: deps.nextTick,
-      onDocumentClick: opts.onDocumentClick,
+      onDocumentOpenRequest: opts.onDocumentOpenRequest,
       onMounted: deps.onMounted,
       onUnmounted: deps.onUnmounted,
+      pendingDocumentRefreshIds: pendingDocumentRefreshIds as Ref<string[]>,
       pendingRevealPath: pendingRevealPath as Ref<string[]>,
       ref: deps.ref,
       treeData: treeData as Ref<I_faProjectHierarchyTreeHeTreeNode[]>,
@@ -55,5 +75,10 @@ export function createUseProjectHierarchyTree (deps: {
       watch: deps.watch,
       worlds: worlds as Ref<I_faProjectHierarchyTreeWorkspaceWorld[]>
     })
+
+    return {
+      activeDocumentId,
+      ...sessionApi
+    }
   }
 }

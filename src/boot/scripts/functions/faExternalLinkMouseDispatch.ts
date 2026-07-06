@@ -57,6 +57,10 @@ export function dispatchFaExternalLinkMouseEvent (
   }
 
   if (event.type === 'auxclick') {
+    if (event.defaultPrevented) {
+      return
+    }
+
     event.preventDefault()
 
     if (!isExternal && browserWindow !== undefined) {

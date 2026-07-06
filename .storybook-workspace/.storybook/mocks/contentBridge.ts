@@ -13,6 +13,9 @@ import type {
 import type { I_extraEnvVariablesAPI } from 'app/types/I_faElectronRendererBridgeAPIs'
 import type { I_extraEnvVariablesBridge } from 'app/types/I_faElectronRendererBridgeAPIs'
 import type {
+  I_faOpenedDocumentsSnapshot
+} from 'app/types/I_faOpenedDocumentsDomain'
+import type {
   I_faProjectCreateInput,
   I_faProjectCreateResult,
   I_faProjectOpenInput,
@@ -213,6 +216,29 @@ const baseBridge = () => {
     return true
   }
 
+  let storybookOpenedDocumentsSnapshot: I_faOpenedDocumentsSnapshot = {
+    schemaVersion: 1,
+    activeDocumentId: null,
+    tabs: []
+  }
+
+  const getOpenedDocumentsSnapshot = async (): Promise<I_faOpenedDocumentsSnapshot> => {
+    return {
+      ...storybookOpenedDocumentsSnapshot,
+      tabs: storybookOpenedDocumentsSnapshot.tabs.map((tab) => ({ ...tab }))
+    }
+  }
+
+  const saveOpenedDocumentsSnapshot = async (
+    snapshot: I_faOpenedDocumentsSnapshot
+  ): Promise<boolean> => {
+    storybookOpenedDocumentsSnapshot = {
+      ...snapshot,
+      tabs: snapshot.tabs.map((tab) => ({ ...tab }))
+    }
+    return true
+  }
+
   return {
     faWindowControl: {
       checkWindowMaximized: async () => false,
@@ -297,6 +323,7 @@ const baseBridge = () => {
       getProjectSettings,
       getProjectSidebar,
       getHierarchyTreeUiState,
+      getOpenedDocumentsSnapshot,
       getProjectStyling,
       getRecentProjects: async () => [],
       resolveRecentProjectMruHeadForOpen: async () => ({ outcome: 'empty' as const }),
@@ -307,6 +334,7 @@ const baseBridge = () => {
       setProjectSettings,
       setProjectSidebar,
       setHierarchyTreeUiState,
+      saveOpenedDocumentsSnapshot,
       setProjectStyling,
       stageE2eNextCreatePath: async () => false,
       stageE2eNextOpenPath: async () => false

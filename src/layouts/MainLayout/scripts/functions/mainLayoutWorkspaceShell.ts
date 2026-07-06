@@ -1,8 +1,8 @@
 /**
- * Workspace drawer is shown only on the /home shell route.
+ * Workspace drawer is shown on /home and nested workspace routes (e.g. document tabs).
  */
 export function resolveMainLayoutShowWorkspaceDrawer (routePath: string): boolean {
-  return routePath === '/home'
+  return routePath === '/home' || routePath.startsWith('/home/')
 }
 
 export function resolveMainLayoutRouteClass (

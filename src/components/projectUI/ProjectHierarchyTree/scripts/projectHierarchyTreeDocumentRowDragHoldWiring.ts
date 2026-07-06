@@ -7,6 +7,7 @@ import { createProjectHierarchyTreeDocumentRowDragHoldSession } from './projectH
 type T_documentRowDragHoldWiringDeps = {
   dragHandleClassName: string
   holdDelayMs: number
+  leftPointerDownClassName: string
   onAllowedDocumentRowDragStart: () => void
   onUnmounted: (hook: () => void) => void
   treeScrollHostRef: Ref<HTMLElement | null>
@@ -21,6 +22,7 @@ export function createProjectHierarchyTreeDocumentRowDragHoldWiring (
   const session = createProjectHierarchyTreeDocumentRowDragHoldSession({
     dragHandleClassName: deps.dragHandleClassName,
     holdDelayMs: deps.holdDelayMs,
+    leftPointerDownClassName: deps.leftPointerDownClassName,
     onAllowedDocumentRowDragStart: deps.onAllowedDocumentRowDragStart,
     windowClearTimeout: deps.windowClearTimeout,
     windowSetTimeout: deps.windowSetTimeout

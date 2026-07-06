@@ -27,6 +27,7 @@ import L_dialogKeybindSettings from './dialogs/L_dialogKeybindSettings'
 import L_importExportAppConfig from './dialogs/L_importExportAppConfig'
 import L_appSettings from './dialogs/L_appSettings'
 import L_projectSettings from './dialogs/L_projectSettings'
+import L_discardOpenedDocumentTab from './components/dialogs/L_discardOpenedDocumentTab'
 import L_appNoteboard from './floatingWindows/L_appNoteboard'
 import L_projectNoteboard from './floatingWindows/L_projectNoteboard'
 import L_appStylingFloating from './floatingWindows/L_appStyling'
@@ -48,7 +49,9 @@ import L_mainLayout from './layouts/L_mainLayout'
 import L_ErrorNotFound from './pages/L_ErrorNotFound'
 import L_projectOverview from './components/projectUI/ProjectOverview/L_projectOverview'
 import L_projectHierarchyTreeSearch from './components/projectUI/ProjectHierarchyTreeSearch/L_projectHierarchyTreeSearch'
+import L_projectDocumentControlBar from './components/projectUI/L_projectDocumentControlBar'
 import L_splashPage from './pages/L_splashPage'
+import L_documentWorkspacePage from './pages/L_documentWorkspacePage'
 
 export default {
   // GLOBAL - DOCUMENTS
@@ -66,6 +69,9 @@ export default {
   // PAGE - SPLASH / WELCOME
   splashPage: L_splashPage,
 
+  // PAGE - DOCUMENT WORKSPACE
+  documentWorkspacePage: L_documentWorkspacePage,
+
   // LAYOUT - MAIN
   mainLayout: L_mainLayout,
 
@@ -78,7 +84,8 @@ export default {
     markdownDocument: L_markdownDocument,
     newProject: L_newProject,
     appSettings: L_appSettings,
-    projectSettings: L_projectSettings
+    projectSettings: L_projectSettings,
+    discardOpenedDocumentTab: L_discardOpenedDocumentTab
   },
 
   // FLOATING WINDOWS (in-renderer movable / resizable surfaces)
@@ -120,6 +127,7 @@ export default {
 
   // COMPONENT - PROJECT UI
   projectUI: {
+    projectDocumentControlBar: L_projectDocumentControlBar,
     projectHierarchyTreeSearch: L_projectHierarchyTreeSearch,
     projectOverview: L_projectOverview
   },

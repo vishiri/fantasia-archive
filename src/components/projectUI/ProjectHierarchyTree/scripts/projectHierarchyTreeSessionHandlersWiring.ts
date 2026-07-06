@@ -1,5 +1,9 @@
 import type { Ref } from 'vue'
 
+import type {
+  I_faOpenedDocumentTreeOpenMeta,
+  T_faOpenedDocumentOpenMode
+} from 'app/types/I_faOpenedDocumentsDomain'
 import type { I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import {
@@ -8,6 +12,7 @@ import {
 import type { createProjectHierarchyTreeDocumentRowDragHoldWiring } from './projectHierarchyTreeDocumentRowDragHoldWiring'
 import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowExpandClickGestureWiring'
 import { createProjectHierarchyTreeDroppableHandlers } from './projectHierarchyTreeDroppableHandlerWiring'
+import { createProjectHierarchyTreeDocumentOpenHandlers } from './projectHierarchyTreeDocumentOpenHandlersWiring'
 import { createProjectHierarchyTreeSessionExpandHandlersWiring } from './projectHierarchyTreeSessionExpandHandlersWiring'
 
 export function createProjectHierarchyTreeSessionHandlersWiring (deps: {
@@ -24,7 +29,11 @@ export function createProjectHierarchyTreeSessionHandlersWiring (deps: {
   lazyLoadWiring: {
     loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   }
-  onDocumentClick: (documentId: string) => void
+  onDocumentOpenRequest: (
+    documentId: string,
+    mode: T_faOpenedDocumentOpenMode,
+    treeMeta: I_faOpenedDocumentTreeOpenMeta
+  ) => void
   suppressTreeEmit: Ref<boolean>
   treeComponentRef: Ref<I_faProjectHierarchyTreeHeTreeInstance | null>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
@@ -51,13 +60,9 @@ export function createProjectHierarchyTreeSessionHandlersWiring (deps: {
     dragContext: deps.dragContext,
     treeData: deps.treeData
   })
-
-  function onNodeClick (stat: { data: I_faProjectHierarchyTreeHeTreeNode }): void {
-    if (stat.data.nodeKind !== 'document' || stat.data.documentId === null) {
-      return
-    }
-    deps.onDocumentClick(stat.data.documentId)
-  }
+  const documentOpenHandlers = createProjectHierarchyTreeDocumentOpenHandlers({
+    onDocumentOpenRequest: deps.onDocumentOpenRequest
+  })
 
   function eachDraggableHandler (stat: { data: I_faProjectHierarchyTreeHeTreeNode }): boolean {
     return isProjectHierarchyTreeNodeDraggable(stat.data)
@@ -76,7 +81,8 @@ export function createProjectHierarchyTreeSessionHandlersWiring (deps: {
   return {
     eachDraggableHandler,
     eachDroppableHandler: droppableHandlers.eachDroppableHandler,
-    onNodeClick,
+    onDocumentRowAuxClick: documentOpenHandlers.onDocumentRowAuxClick,
+    onNodeClick: documentOpenHandlers.onNodeClick,
     onNodeClose: expandHandlersWiring.onNodeClose,
     onNodeOpen: expandHandlersWiring.onNodeOpen,
     onNodeOpenIconClick: expandHandlersWiring.onNodeOpenIconClick,

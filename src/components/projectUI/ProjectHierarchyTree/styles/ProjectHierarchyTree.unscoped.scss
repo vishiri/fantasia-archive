@@ -34,7 +34,7 @@
 .projectHierarchyTreeHost .vtlist-inner {
   padding-bottom: $projectHierarchyTree-list-paddingBottom;
   padding-left: 0;
-  padding-right: 8px;
+  padding-right: $projectHierarchyTree-list-paddingRight;
 }
 
 /* Row kind hooks: projectHierarchyTree__nodeRow--* (template) + tree-node--* (he-tree DOM hook). */
@@ -51,16 +51,26 @@
 }
 
 .projectHierarchyTree__dragHandle {
+  /* he-tree trigger-class marker only; grab cursor uses leftPointerDown. */
+}
+
+.projectHierarchyTree__leftPointerDown {
   cursor: grab;
 }
 
-.projectHierarchyTree--listDragging .projectHierarchyTree__dragHandle {
+.projectHierarchyTree--listDragging .projectHierarchyTree__dragHandle,
+.projectHierarchyTree--listDragging .projectHierarchyTree__leftPointerDown {
   cursor: grabbing;
 }
 
-.projectHierarchyTree .tree-node:hover {
-  .projectHierarchyTreeNode > .q-focus-helper {
-    opacity: $qFocusable-hoverHelper-opacity !important;
+.projectHierarchyTreeHost .tree-node:hover .projectHierarchyTreeNode > .q-focus-helper,
+.projectHierarchyTreeHost .tree-node .projectHierarchyTreeNode--activeTabDocument > .q-focus-helper {
+  background: currentcolor;
+  opacity: $qFocusable-hoverHelper-opacity !important;
+
+  &::before,
+  &::after {
+    opacity: 0 !important;
   }
 }
 
@@ -70,33 +80,33 @@
 
 .projectHierarchyTree__openIcon {
   box-sizing: content-box;
-  color: fa-v('text-muted', $text-muted);
+  color: $projectHierarchyTree-openIcon-color;
   cursor: pointer;
   flex-shrink: 0;
-  font-size: 16px;
-  height: 16px;
-  padding: 4px 4px 4px 4px;
+  font-size: $projectHierarchyTree-openIcon-boxSize;
+  height: $projectHierarchyTree-openIcon-boxSize;
+  padding: $projectHierarchyTree-openIcon-padding;
   pointer-events: none;
   transform: rotate(0deg);
-  transition: transform 0.3s;
-  width: 16px;
-  z-index: 10;
+  transition: transform $projectHierarchyTree-openIcon-rotateTransitionDuration;
+  width: $projectHierarchyTree-openIcon-boxSize;
+  z-index: $projectHierarchyTree-openIcon-zIndex;
 }
 
 .projectHierarchyTree__nodeRow--world,
 .projectHierarchyTree-treeNode--world {
   cursor: pointer;
-  font-size: 1.25rem;
-  font-weight: 500;
-  letter-spacing: 0.0125em;
-  line-height: 2rem;
+  font-size: $projectHierarchyTree-worldNodeRow-fontSize;
+  font-weight: $projectHierarchyTree-worldNodeRow-fontWeight;
+  letter-spacing: $projectHierarchyTree-worldNodeRow-letterSpacing;
+  line-height: $projectHierarchyTree-worldNodeRow-lineHeight;
   margin: 0;
-  padding: 5px 0 0 5px !important;
+  padding: $projectHierarchyTree-worldNodeRow-paddingBlockStart 0 0 $projectHierarchyTree-worldNodeRow-paddingInlineStart !important;
 
   .projectHierarchyTree__openIcon {
     position: absolute;
-    right: 5px;
-    top: 8px;
+    right: $projectHierarchyTree-openIcon-world-positionRight;
+    top: $projectHierarchyTree-openIcon-world-positionTop;
 
     &.projectHierarchyTree__openIcon--open {
       transform: rotate(90deg);
@@ -104,15 +114,15 @@
   }
 
   .projectHierarchyTreeNode--world {
-    border-radius: 4px;
-    padding: 0 35px 0 5px !important;
+    border-radius: $projectHierarchyTree-node-borderRadius;
+    padding: 0 $projectHierarchyTree-worldNode-paddingInlineEnd 0 $projectHierarchyTree-worldNode-paddingInlineStart !important;
   }
 }
 
 .projectHierarchyTree-treeNode--world {
-  margin: 0 0 0 -7px;
-  padding: 0 0 0 5px !important;
-  width: calc(100% + 7px) !important;
+  margin: 0 0 0 $projectHierarchyTree-worldTreeNode-marginInlineStart;
+  padding: 0 0 0 $projectHierarchyTree-worldTreeNode-paddingInlineStart !important;
+  width: calc(100% + #{$projectHierarchyTree-worldTreeNode-widthExpandPx}) !important;
 }
 
 .projectHierarchyTree__nodeRow--group,
@@ -120,17 +130,17 @@
 .projectHierarchyTree__nodeRow--document {
   cursor: pointer;
 
-  &.projectHierarchyTree__dragHandle {
+  &.projectHierarchyTree__leftPointerDown {
     cursor: grab;
   }
 
   .projectHierarchyTreeNode {
-    margin-left: -20px;
-    padding: 4px 20px 4px 25px;
+    margin-left: $projectHierarchyTree-nodeRowIndent-offsetPx;
+    padding: $projectHierarchyTree-nodeRowContent-paddingBlock $projectHierarchyTree-nodeRowContent-paddingInlineEnd $projectHierarchyTree-nodeRowContent-paddingBlock $projectHierarchyTree-nodeRowContent-paddingInlineStart;
   }
 
   .projectHierarchyTree__openIcon {
-    left: -20px;
+    left: $projectHierarchyTree-openIcon-nested-positionLeft;
     position: absolute;
     top: 50%;
     transform: translateY(-50%) rotate(0deg);
@@ -146,17 +156,17 @@
 .projectHierarchyTree-treeNode--document {
   cursor: pointer;
 
-  .projectHierarchyTree__nodeRow.projectHierarchyTree__dragHandle {
+  .projectHierarchyTree__nodeRow.projectHierarchyTree__leftPointerDown {
     cursor: grab;
   }
 
   .projectHierarchyTreeNode {
-    margin-left: -20px;
-    padding: 4px 20px 4px 25px;
+    margin-left: $projectHierarchyTree-nodeRowIndent-offsetPx;
+    padding: $projectHierarchyTree-nodeRowContent-paddingBlock $projectHierarchyTree-nodeRowContent-paddingInlineEnd $projectHierarchyTree-nodeRowContent-paddingBlock $projectHierarchyTree-nodeRowContent-paddingInlineStart;
   }
 
   .projectHierarchyTree__openIcon {
-    left: -23px;
+    left: $projectHierarchyTree-openIcon-nestedTreeNode-positionLeft;
     position: absolute;
     top: 50%;
     transform: translateY(-50%) rotate(0deg);
@@ -173,6 +183,6 @@
   border: $projectHierarchyTree-dragPlaceholder-borderWidth solid $projectHierarchyTree-dragPlaceholder-borderColor;
   border-radius: $projectHierarchyTree-dragPlaceholder-borderRadius;
   border-style: solid;
-  box-shadow: inset $projectHierarchyTree-dragPlaceholder-accentWidth 0 0 fa-v('primary-bright', $primary-bright);
+  box-shadow: inset $projectHierarchyTree-dragPlaceholder-accentWidth 0 0 $projectHierarchyTree-dragPlaceholder-accentColor;
   min-height: $projectHierarchyTree-node-minHeight;
 }

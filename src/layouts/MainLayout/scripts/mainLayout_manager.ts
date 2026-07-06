@@ -10,7 +10,9 @@ import debounce from 'lodash-es/debounce.js'
 import { useRoute } from 'vue-router'
 import {
   FA_APP_SHELL_DRAWER_TRANSITION_MS,
-  FA_APP_SHELL_PAGE_TRANSITION_BINDINGS
+  FA_APP_SHELL_PAGE_TRANSITION_BINDINGS,
+  FA_DOCUMENT_WORKSPACE_PAGE_TRANSITION_BINDINGS,
+  resolveFaAppShellPageTransitionForRouteChange
 } from 'app/src/scripts/appRouting/appRouting_manager'
 import {
   createFaKeybindKeydownHandler,
@@ -32,6 +34,7 @@ import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import { awaitWelcomeScreenAutoLoadBootCompletion } from 'app/src/scripts/projectManagement/projectManagement_manager'
 
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
+import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
 import {
   FA_PROJECT_SIDEBAR_DEFAULT_WIDTH_PX,
   FA_PROJECT_SIDEBAR_MIN_WIDTH_PX
@@ -56,6 +59,8 @@ const mainLayoutApi = createMainLayout({
   awaitWelcomeScreenAutoLoadBootCompletion,
   FA_APP_SHELL_DRAWER_TRANSITION_MS,
   FA_APP_SHELL_PAGE_TRANSITION_BINDINGS,
+  FA_DOCUMENT_WORKSPACE_PAGE_TRANSITION_BINDINGS,
+  resolveFaAppShellPageTransitionForRouteChange,
   S_FaAppNoteboard,
   S_FaAppStyling,
   S_FaKeybinds,
@@ -77,16 +82,16 @@ const mainLayoutApi = createMainLayout({
   resolveMainLayoutOutletKey,
   resolveMainLayoutRouteClass,
   resolveMainLayoutShowWorkspaceDrawer,
+  syncOpenedDocumentsActiveDocumentFromWorkspaceRoute: (routePath) => {
+    S_FaOpenedDocuments().syncActiveDocumentIdFromWorkspaceRoute(routePath)
+  },
   useRoute,
-  watch: watch as (
-    source: { value: boolean },
-    effect: (show: boolean) => void,
-    options?: { immediate?: boolean }
-  ) => void
+  watch
 })
 
 export const useMainLayoutWorkspaceSidebar = createMainLayoutWorkspaceSidebar({
   S_FaActiveProject,
+  S_FaOpenedDocuments,
   S_FaProjectHierarchyTree,
   S_FaProjectSidebar,
   S_FaProjectWorkspaceWorlds,

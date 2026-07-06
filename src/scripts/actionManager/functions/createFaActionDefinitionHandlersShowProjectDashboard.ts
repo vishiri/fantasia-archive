@@ -1,6 +1,6 @@
 export function createFaActionDefinitionHandlersShowProjectDashboard (deps: {
   S_FaActiveProject: () => { hasActiveProject: boolean }
-  navigateToWorkspaceRouteForActiveProject: () => Promise<void>
+  navigateToWorkspaceHomeRoute: () => Promise<void>
 }): {
     handleShowProjectDashboard: () => Promise<void>
   } {
@@ -8,7 +8,7 @@ export function createFaActionDefinitionHandlersShowProjectDashboard (deps: {
     if (!deps.S_FaActiveProject().hasActiveProject) {
       return
     }
-    await deps.navigateToWorkspaceRouteForActiveProject()
+    await deps.navigateToWorkspaceHomeRoute()
   }
 
   return {

@@ -1,7 +1,11 @@
 @use '../../../css/app.palette.scss' as *;
+@use '../../../components/globals/GlobalLanguageSelector/styles/variables' as globalLanguageSelector;
+@use '../../../components/globals/GlobalWindowButtons/styles/variables' as globalWindowButtons;
 
 /* LAYOUT - MAIN LAYOUT */
 $mainLayout-appHeader-backgroundColor: fa-v('dark-middle', $dark-middle);
+$mainLayout-appHeader-chromeRightReserveBasePx: calc(#{globalWindowButtons.$globalWindowButtons-totalWidth} + #{globalLanguageSelector.$globalLanguageSelector-gap} + #{globalLanguageSelector.$globalLanguageSelector-trigger-outerSizePx});
+$mainLayout-appHeader-chromeRightReserveWithSpellcheckPx: calc(#{$mainLayout-appHeader-chromeRightReserveBasePx} + #{globalLanguageSelector.$globalLanguageSelector-spellcheckRefresh-gap} + #{globalLanguageSelector.$globalLanguageSelector-diameter});
 $mainLayout-appHeader-zIndex: 7000;
 $mainLayout-appHeader-heightPx: 33px;
 $mainLayout-sidebarMinWidthPx: 375px;

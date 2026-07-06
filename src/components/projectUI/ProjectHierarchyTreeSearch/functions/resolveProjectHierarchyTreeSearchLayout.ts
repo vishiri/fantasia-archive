@@ -1,7 +1,7 @@
 import type { T_projectHierarchyTreeSearchLayoutMode } from 'app/types/I_faProjectHierarchyTreeSearchDomain'
 
 /**
- * Resolves CSS layout mode for the fixed hierarchy tree search row.
+ * Resolves CSS layout mode for the hierarchy tree search row.
  */
 export function resolveProjectHierarchyTreeSearchLayout (input: {
   disableDocumentControlBar: boolean

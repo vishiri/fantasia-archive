@@ -25,6 +25,7 @@
 @forward 'theme/quasar-components/qTooltip.variables';
 @forward '../components/dialogs/DialogAboutFantasiaArchive/styles/variables';
 @forward '../components/dialogs/DialogActionMonitor/styles/variables';
+@forward '../components/dialogs/DialogDiscardOpenedDocumentTab/styles/variables';
 @forward '../components/dialogs/DialogImportExportAppConfig/styles/variables';
 @forward '../components/dialogs/DialogKeybindSettings/styles/variables';
 @forward '../components/dialogs/DialogMarkdownDocument/styles/variables';
@@ -45,5 +46,8 @@
 @forward '../components/other/SocialContactButtons/styles/variables';
 @forward '../components/other/SplashControls/styles/variables';
 @forward '../layouts/MainLayout/styles/variables';
+@forward '../components/projectUI/ProjectDocumentControlBar/styles/variables';
+@forward '../components/projectUI/ProjectHierarchyTree/styles/variables';
+@forward '../components/projectUI/ProjectHierarchyTreeSearch/styles/variables';
 @forward '../components/projectUI/ProjectOverview/styles/variables';
 @forward '../pages/SplashPage/styles/variables';

@@ -34,6 +34,7 @@ export const S_FaProjectHierarchyTree = defineStore('S_FaProjectHierarchyTree', 
   const treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]> = ref([])
   const uiState: Ref<I_faProjectHierarchyTreeUiState> = ref(createEmptyProjectHierarchyTreeUiState())
   const pendingRevealPath: Ref<string[]> = ref([])
+  const pendingDocumentRefreshIds: Ref<string[]> = ref([])
   const searchHits: Ref<I_faProjectHierarchyTreeSearchHit[]> = ref([])
 
   let lastPersistedExpandedNodeIdsJson = JSON.stringify(uiState.value.expandedNodeIds)
@@ -55,6 +56,7 @@ export const S_FaProjectHierarchyTree = defineStore('S_FaProjectHierarchyTree', 
     treeData.value = []
     searchHits.value = []
     pendingRevealPath.value = []
+    pendingDocumentRefreshIds.value = []
     applyUiState(createEmptyProjectHierarchyTreeUiState())
   }
 
@@ -186,12 +188,28 @@ export const S_FaProjectHierarchyTree = defineStore('S_FaProjectHierarchyTree', 
     pendingRevealPath.value = []
   }
 
+  function clearPendingDocumentRefreshIds (): void {
+    pendingDocumentRefreshIds.value = []
+  }
+
+  function refreshDocumentsInTree (documentIds: string[]): void {
+    if (!S_FaActiveProject().hasActiveProject || documentIds.length === 0) {
+      return
+    }
+    pendingDocumentRefreshIds.value = [
+      ...new Set([...pendingDocumentRefreshIds.value, ...documentIds])
+    ]
+  }
+
+  const clearPendingDocumentRefreshIdsOut = clearPendingDocumentRefreshIds
   const clearPendingRevealPathOut = clearPendingRevealPath
   const clearSearchOut = clearSearch
   const flushUiStatePersistOut = flushUiStatePersist
+  const pendingDocumentRefreshIdsOut = pendingDocumentRefreshIds
   const pendingRevealPathOut = pendingRevealPath
   const queuePersistExpandedNodeIdsOut = queuePersistExpandedNodeIds
   const queuePersistScrollTopPxOut = queuePersistScrollTopPx
+  const refreshDocumentsInTreeOut = refreshDocumentsInTree
   const refreshLayoutOut = refreshLayout
   const refreshUiStateOut = refreshUiState
   const requestRevealSearchHitOut = requestRevealSearchHit
@@ -203,12 +221,15 @@ export const S_FaProjectHierarchyTree = defineStore('S_FaProjectHierarchyTree', 
   const worldsOut = worlds
 
   return {
+    clearPendingDocumentRefreshIds: clearPendingDocumentRefreshIdsOut,
     clearPendingRevealPath: clearPendingRevealPathOut,
     clearSearch: clearSearchOut,
     flushUiStatePersist: flushUiStatePersistOut,
+    pendingDocumentRefreshIds: pendingDocumentRefreshIdsOut,
     pendingRevealPath: pendingRevealPathOut,
     queuePersistExpandedNodeIds: queuePersistExpandedNodeIdsOut,
     queuePersistScrollTopPx: queuePersistScrollTopPxOut,
+    refreshDocumentsInTree: refreshDocumentsInTreeOut,
     refreshLayout: refreshLayoutOut,
     refreshUiState: refreshUiStateOut,
     requestRevealSearchHit: requestRevealSearchHitOut,

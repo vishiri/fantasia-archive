@@ -3,6 +3,7 @@
 
 .projectHierarchyTreeSearch {
   background-color: $projectHierarchyTreeSearch-backgroundColor;
+  border-radius: 0;
   height: $projectHierarchyTreeSearch-rowHeightPx;
   left: 0;
   min-height: $projectHierarchyTreeSearch-rowHeightPx;
@@ -50,10 +51,16 @@
 
   .q-field__control {
     background-color: $projectHierarchyTreeSearch-backgroundColor;
+    border-radius: 0;
     cursor: text;
+
+    &::after {
+      border-radius: 0;
+    }
 
     &::before {
       background-color: transparent !important;
+      border-radius: 0;
     }
   }
 

@@ -32,6 +32,7 @@
 import { computed, onBeforeUnmount, onMounted, onUpdated, ref, watch } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
+import { projectHierarchyTreeNodeShowsActiveTabHighlight } from './functions/projectHierarchyTreeActiveTabHighlight'
 import {
   applyProjectHierarchyTreeTreeNodeKindClass,
   clearProjectHierarchyTreeTreeNodeKindClass,
@@ -42,12 +43,18 @@ defineOptions({
   name: 'ProjectHierarchyTreeNode'
 })
 
-const props = defineProps<{
-  node: I_faProjectHierarchyTreeHeTreeNode
-  stat: {
-    open: boolean
+const props = withDefaults(
+  defineProps<{
+    activeDocumentId?: string | null
+    node: I_faProjectHierarchyTreeHeTreeNode
+    stat: {
+      open: boolean
+    }
+  }>(),
+  {
+    activeDocumentId: null
   }
-}>()
+)
 
 const nodeRootRef = ref<HTMLElement | null>(null)
 
@@ -71,7 +78,13 @@ const nodeTestLocator = computed(() => {
 })
 
 const nodeRootClassList = computed(() => {
+  const showsActiveTabHighlight = projectHierarchyTreeNodeShowsActiveTabHighlight(
+    props.node,
+    props.activeDocumentId
+  )
+
   return {
+    'projectHierarchyTreeNode--activeTabDocument': showsActiveTabHighlight,
     'projectHierarchyTreeNode--document': props.node.nodeKind === 'document',
     'projectHierarchyTreeNode--group': props.node.nodeKind === 'group',
     'projectHierarchyTreeNode--documentTemplate': props.node.nodeKind === 'templatePlacement',

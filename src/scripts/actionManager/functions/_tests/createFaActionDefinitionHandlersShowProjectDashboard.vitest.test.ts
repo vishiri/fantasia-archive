@@ -2,14 +2,14 @@ import { beforeEach, expect, test, vi } from 'vitest'
 
 import { createFaActionDefinitionHandlersShowProjectDashboard } from '../createFaActionDefinitionHandlersShowProjectDashboard'
 
-const navigateToWorkspaceRouteForActiveProjectMock = vi.fn(async () => undefined)
+const navigateToWorkspaceHomeRouteMock = vi.fn(async () => undefined)
 
 const S_FaActiveProjectMock = vi.fn(() => ({
   hasActiveProject: true
 }))
 
 beforeEach(() => {
-  navigateToWorkspaceRouteForActiveProjectMock.mockClear()
+  navigateToWorkspaceHomeRouteMock.mockClear()
   S_FaActiveProjectMock.mockReset()
   S_FaActiveProjectMock.mockReturnValue({ hasActiveProject: true })
 })
@@ -20,12 +20,12 @@ beforeEach(() => {
 test('Test that handleShowProjectDashboard navigates when hasActiveProject is true', async () => {
   const { handleShowProjectDashboard } = createFaActionDefinitionHandlersShowProjectDashboard({
     S_FaActiveProject: S_FaActiveProjectMock,
-    navigateToWorkspaceRouteForActiveProject: navigateToWorkspaceRouteForActiveProjectMock
+    navigateToWorkspaceHomeRoute: navigateToWorkspaceHomeRouteMock
   })
 
   await handleShowProjectDashboard()
 
-  expect(navigateToWorkspaceRouteForActiveProjectMock).toHaveBeenCalledOnce()
+  expect(navigateToWorkspaceHomeRouteMock).toHaveBeenCalledOnce()
 })
 
 /**
@@ -36,10 +36,10 @@ test('Test that handleShowProjectDashboard skips navigation without an active pr
 
   const { handleShowProjectDashboard } = createFaActionDefinitionHandlersShowProjectDashboard({
     S_FaActiveProject: S_FaActiveProjectMock,
-    navigateToWorkspaceRouteForActiveProject: navigateToWorkspaceRouteForActiveProjectMock
+    navigateToWorkspaceHomeRoute: navigateToWorkspaceHomeRouteMock
   })
 
   await handleShowProjectDashboard()
 
-  expect(navigateToWorkspaceRouteForActiveProjectMock).not.toHaveBeenCalled()
+  expect(navigateToWorkspaceHomeRouteMock).not.toHaveBeenCalled()
 })

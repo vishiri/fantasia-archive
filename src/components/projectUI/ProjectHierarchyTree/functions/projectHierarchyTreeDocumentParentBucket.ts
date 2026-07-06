@@ -37,3 +37,27 @@ export function findProjectHierarchyTreeDocumentParentBucket (
   }
   return null
 }
+
+/**
+ * Resolves parent container node ids whose lazy-loaded document rows should reload.
+ */
+export function collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh (
+  treeNodes: readonly I_faProjectHierarchyTreeHeTreeNode[],
+  documentIds: readonly string[]
+): string[] {
+  const parentNodeIds = new Set<string>()
+  for (const documentId of documentIds) {
+    const bucket = findProjectHierarchyTreeDocumentParentBucket(
+      treeNodes as I_faProjectHierarchyTreeHeTreeNode[],
+      documentId
+    )
+    if (bucket === null) {
+      continue
+    }
+    const parentNode = bucket.parentNode
+    if (parentNode !== null && parentNode.childrenLoaded) {
+      parentNodeIds.add(parentNode.id)
+    }
+  }
+  return [...parentNodeIds]
+}

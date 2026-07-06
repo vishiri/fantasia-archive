@@ -25,6 +25,9 @@ const routes: RouteRecordRaw[] = [
     children: [{
       path: '',
       component: () => import('pages/IndexPage/IndexPage.vue')
+    }, {
+      path: 'document/:documentId',
+      component: () => import('pages/DocumentWorkspacePage/DocumentWorkspacePage.vue')
     }]
   },
 

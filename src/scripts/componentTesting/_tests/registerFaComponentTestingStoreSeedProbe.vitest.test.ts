@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
+import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 
 import { registerFaComponentTestingStoreSeedProbe } from '../registerFaComponentTestingStoreSeedProbe_manager'
@@ -79,4 +80,34 @@ test('Test that registerFaComponentTestingStoreSeedProbe clears active project w
   })
 
   expect(S_FaActiveProject().activeProject).toBeNull()
+})
+
+/**
+ * registerFaComponentTestingStoreSeedProbe
+ * Patches opened document tabs when the seed includes openedDocuments.
+ */
+test('Test that registerFaComponentTestingStoreSeedProbe patches opened document tabs', () => {
+  registerFaComponentTestingStoreSeedProbe()
+
+  window.__faComponentTestingPatchStores?.({
+    openedDocuments: {
+      activeDocumentId: 'doc-1',
+      tabs: [
+        {
+          documentId: 'doc-1',
+          tabLabel: 'Hero',
+          templateIcon: 'mdi-account',
+          displayNameDraft: 'Hero',
+          savedDisplayName: 'Hero',
+          hasUnsavedChanges: false,
+          editState: false
+        }
+      ]
+    }
+  })
+
+  const openedDocuments = S_FaOpenedDocuments()
+  expect(openedDocuments.tabs).toHaveLength(1)
+  expect(openedDocuments.activeDocumentId).toBe('doc-1')
+  expect(openedDocuments.hydrationComplete).toBe(true)
 })

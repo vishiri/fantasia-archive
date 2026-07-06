@@ -1,9 +1,11 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { dragContext } from '@he-tree/vue'
+import { useRoute } from 'vue-router'
 
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTree'
+import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/appRouting_manager'
 
 import { createUseProjectHierarchyTree } from './createUseProjectHierarchyTree'
 import { PROJECT_HIERARCHY_TREE_DOCUMENT_TEMPLATE_DEFAULT_ICON } from '../functions/projectHierarchyTreeConstants'
@@ -30,6 +32,8 @@ export const useProjectHierarchyTree = createUseProjectHierarchyTree({
   onMounted,
   onUnmounted,
   ref,
+  resolveFaDocumentWorkspaceRouteDocumentId,
   storeToRefs,
+  useRoute,
   watch
 })

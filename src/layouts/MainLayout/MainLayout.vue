@@ -10,8 +10,15 @@
       dark
       class="appHeader"
     >
-      <div class="row items-center no-wrap full-width">
+      <div
+        class="appHeader__inner row items-center no-wrap full-width"
+        :class="{ 'appHeader__inner--spellcheckRefreshVisible': faAppHeaderChromeSpellcheckRefreshVisible }"
+      >
         <AppControlMenus class="col-auto" />
+        <div
+          class="col appHeader__tabsRegion"
+          data-test-locator="mainLayout-documentControlBarHeaderMount"
+        />
       </div>
     </q-header>
 
@@ -36,25 +43,30 @@
         >
           <ProjectHierarchyTreeSearch />
           <div class="mainLayoutSidebarSplitter__panelBody">
-            <ProjectHierarchyTree />
+            <ProjectHierarchyTree
+              @document-open-request="handleMainLayoutWorkspaceDocumentOpenRequest"
+            />
           </div>
         </div>
       </template>
 
       <template #after>
         <q-page-container class="appShellLayout__pageContainer">
-          <ProjectDocumentControlBar />
+          <ProjectDocumentControlBar v-if="showWorkspaceDrawer" />
           <div class="appShellLayout__pageTransitionHost">
             <router-view v-slot="{ Component, route: childRoute }">
               <Transition
-                v-bind="FA_APP_SHELL_PAGE_TRANSITION_BINDINGS"
-                mode="out-in"
+                v-bind="appShellPageTransitionBindingProps"
+                :mode="appShellPageTransitionMode"
+                appear
               >
-                <component
-                  :is="Component"
+                <div
                   v-if="Component !== null && childRoute !== undefined"
                   :key="resolveMainLayoutOutletKeyFromRoute(childRoute)"
-                />
+                  class="appShellLayout__pageTransitionLayer"
+                >
+                  <component :is="Component" />
+                </div>
               </Transition>
             </router-view>
           </div>
@@ -69,14 +81,17 @@
       <div class="appShellLayout__pageTransitionHost">
         <router-view v-slot="{ Component, route: childRoute }">
           <Transition
-            v-bind="FA_APP_SHELL_PAGE_TRANSITION_BINDINGS"
-            mode="out-in"
+            v-bind="appShellPageTransitionBindingProps"
+            :mode="appShellPageTransitionMode"
+            appear
           >
-            <component
-              :is="Component"
+            <div
               v-if="Component !== null && childRoute !== undefined"
               :key="resolveMainLayoutOutletKeyFromRoute(childRoute)"
-            />
+              class="appShellLayout__pageTransitionLayer"
+            >
+              <component :is="Component" />
+            </div>
           </Transition>
         </router-view>
       </div>
@@ -93,13 +108,16 @@ import ProjectHierarchyTree from 'app/src/components/projectUI/ProjectHierarchyT
 import ProjectHierarchyTreeSearch from 'app/src/components/projectUI/ProjectHierarchyTreeSearch/ProjectHierarchyTreeSearch.vue'
 
 import { useMainLayout, useMainLayoutWorkspaceSidebar } from './scripts/mainLayout_manager'
+import { handleMainLayoutWorkspaceDocumentOpenRequest } from './scripts/mainLayoutWorkspaceDocumentOpenWiring'
+import { useFaAppHeaderChromeSpellcheckRefreshVisible } from 'app/src/components/globals/GlobalLanguageSelector/scripts/faAppHeaderChromeSpellcheckReserveWiring'
 
 defineOptions({
   name: 'MainLayout'
 })
 
 const {
-  FA_APP_SHELL_PAGE_TRANSITION_BINDINGS,
+  appShellPageTransitionBindingProps,
+  appShellPageTransitionMode,
   appShellLayoutQuasarView,
   appShellLayoutRouteClass,
   isFantasiaStorybookCanvas,
@@ -113,6 +131,8 @@ const {
   sidebarWidthModel,
   workspaceSidebarPanelRef
 } = useMainLayoutWorkspaceSidebar()
+
+const faAppHeaderChromeSpellcheckRefreshVisible = useFaAppHeaderChromeSpellcheckRefreshVisible()
 </script>
 
 <style lang="scss" scoped>
@@ -124,17 +144,41 @@ const {
   z-index: $mainLayout-appHeader-zIndex;
 }
 
+.appHeader__inner {
+  padding-right: $mainLayout-appHeader-chromeRightReserveBasePx;
+  width: 100%;
+}
+
+.appHeader__inner--spellcheckRefreshVisible {
+  padding-right: $mainLayout-appHeader-chromeRightReserveWithSpellcheckPx;
+}
+
+.appHeader__tabsRegion {
+  max-width: 100%;
+  min-height: $mainLayout-appHeader-heightPx;
+  min-width: 0;
+  overflow: hidden;
+}
+
 .appShellLayout__pageTransitionHost {
   min-height: 100%;
+  overflow: hidden;
   pointer-events: none;
   position: relative;
   width: 100%;
 
   :deep(> *) {
+    min-height: inherit;
     pointer-events: auto;
   }
+}
+
+.appShellLayout__pageTransitionLayer {
+  min-height: inherit;
+  width: 100%;
 }
 </style>
 
 <style lang="scss" src="./styles/AppShellLayout.pageTransition.unscoped.scss"></style>
+<style lang="scss" src="./styles/DocumentWorkspacePage.pageTransition.unscoped.scss"></style>
 <style lang="scss" src="./styles/MainLayoutSidebarSplitter.unscoped.scss"></style>

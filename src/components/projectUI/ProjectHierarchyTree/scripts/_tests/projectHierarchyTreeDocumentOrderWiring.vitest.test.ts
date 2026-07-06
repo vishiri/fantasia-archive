@@ -1039,6 +1039,7 @@ test('Test that document row drag hold session arms after delay and clears on po
   const session = createProjectHierarchyTreeDocumentRowDragHoldSession({
     dragHandleClassName: 'projectHierarchyTree__dragHandleArmed',
     holdDelayMs: 200,
+    leftPointerDownClassName: 'projectHierarchyTree__leftPointerDownArmed',
     onAllowedDocumentRowDragStart: () => {
       allowedDragStart = true
     },
@@ -1051,13 +1052,16 @@ test('Test that document row drag hold session arms after delay and clears on po
   })
   const row = document.createElement('div')
   session.handleDocumentRowPointerDown({
+    button: 0,
     currentTarget: row,
     preventDefault: vi.fn(),
     stopPropagation: vi.fn()
   } as unknown as PointerEvent)
   expect(row.classList.contains('projectHierarchyTree__dragHandleArmed')).toBe(true)
+  expect(row.classList.contains('projectHierarchyTree__leftPointerDownArmed')).toBe(true)
   expect(session.getIsDragHoldArmed()).toBe(false)
   vi.advanceTimersByTime(200)
+  expect(row.classList.contains('projectHierarchyTree__dragHandleArmed')).toBe(true)
   expect(session.getIsDragHoldArmed()).toBe(true)
   const allowedEvent = {
     preventDefault: vi.fn(),
@@ -1219,6 +1223,7 @@ test('Test that document row drag hold ignores non-element pointer targets', () 
   const session = createProjectHierarchyTreeDocumentRowDragHoldSession({
     dragHandleClassName: 'projectHierarchyTree__dragHandleArmed',
     holdDelayMs: 200,
+    leftPointerDownClassName: 'projectHierarchyTree__leftPointerDownArmed',
     onAllowedDocumentRowDragStart: vi.fn(),
     windowClearTimeout: (timeoutId) => {
       window.clearTimeout(timeoutId)
@@ -1235,11 +1240,48 @@ test('Test that document row drag hold ignores non-element pointer targets', () 
   expect(session.getIsDragHoldArmed()).toBe(false)
 })
 
+test('Test that document row drag hold ignores middle and right pointer buttons', () => {
+  vi.useFakeTimers()
+  const session = createProjectHierarchyTreeDocumentRowDragHoldSession({
+    dragHandleClassName: 'projectHierarchyTree__dragHandleArmed',
+    holdDelayMs: 200,
+    leftPointerDownClassName: 'projectHierarchyTree__leftPointerDownArmed',
+    onAllowedDocumentRowDragStart: vi.fn(),
+    windowClearTimeout: (timeoutId) => {
+      window.clearTimeout(timeoutId)
+    },
+    windowSetTimeout: (handler, delayMs) => {
+      return window.setTimeout(handler, delayMs)
+    }
+  })
+  const row = document.createElement('div')
+
+  session.handleDocumentRowPointerDown({
+    button: 1,
+    currentTarget: row,
+    preventDefault: vi.fn(),
+    stopPropagation: vi.fn()
+  } as unknown as PointerEvent)
+  session.handleDocumentRowPointerDown({
+    button: 2,
+    currentTarget: row,
+    preventDefault: vi.fn(),
+    stopPropagation: vi.fn()
+  } as unknown as PointerEvent)
+
+  vi.advanceTimersByTime(200)
+  expect(row.classList.contains('projectHierarchyTree__dragHandleArmed')).toBe(false)
+  expect(row.classList.contains('projectHierarchyTree__leftPointerDownArmed')).toBe(false)
+  expect(session.getIsDragHoldArmed()).toBe(false)
+  vi.useRealTimers()
+})
+
 test('Test that document row drag hold pointer end is ignored after drag started from hold', () => {
   vi.useFakeTimers()
   const session = createProjectHierarchyTreeDocumentRowDragHoldSession({
     dragHandleClassName: 'projectHierarchyTree__dragHandleArmed',
     holdDelayMs: 200,
+    leftPointerDownClassName: 'projectHierarchyTree__leftPointerDownArmed',
     onAllowedDocumentRowDragStart: vi.fn(),
     windowClearTimeout: (timeoutId) => {
       window.clearTimeout(timeoutId)
@@ -1250,6 +1292,7 @@ test('Test that document row drag hold pointer end is ignored after drag started
   })
   const row = document.createElement('div')
   session.handleDocumentRowPointerDown({
+    button: 0,
     currentTarget: row,
     preventDefault: vi.fn(),
     stopPropagation: vi.fn()

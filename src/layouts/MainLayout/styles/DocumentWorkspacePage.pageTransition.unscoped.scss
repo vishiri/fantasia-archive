@@ -1,0 +1,19 @@
+/* Document tab crossfade inside MainLayout (see faDocumentWorkspacePageTransition.ts). */
+$fa-documentWorkspacePage-ease: cubic-bezier(0, 0, 0.2, 1);
+$fa-documentWorkspacePage-transitionMs: 150ms;
+
+.fa-documentWorkspacePage-enter-active,
+.fa-documentWorkspacePage-leave-active {
+  pointer-events: none;
+  transition: opacity $fa-documentWorkspacePage-transitionMs $fa-documentWorkspacePage-ease;
+}
+
+.fa-documentWorkspacePage-enter-from,
+.fa-documentWorkspacePage-leave-to {
+  opacity: 0;
+}
+
+.fa-documentWorkspacePage-enter-to,
+.fa-documentWorkspacePage-leave-from {
+  opacity: 1;
+}

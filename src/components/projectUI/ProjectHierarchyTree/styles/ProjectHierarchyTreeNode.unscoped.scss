@@ -7,7 +7,7 @@
 }
 
 .projectHierarchyTreeNode > .q-focus-helper {
-  border-radius: 4px !important;
+  border-radius: $projectHierarchyTree-node-borderRadius !important;
 }
 
 .projectHierarchyTreeNode--document,

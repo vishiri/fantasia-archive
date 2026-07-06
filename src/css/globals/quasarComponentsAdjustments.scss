@@ -439,6 +439,11 @@ div + .q-notification__caption {
   min-height: $qTab-minHeight;
 }
 
+.q-tabs__arrow {
+  font-size: $qTabs-arrow-fontSize;
+  text-shadow: none;
+}
+
 .q-tooltip {
   background-color: $qTooltip-backgroundColor;
   color: $qTooltip-color;

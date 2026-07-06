@@ -12,7 +12,8 @@ import { createProjectHierarchyTreeSessionBootstrapWiring } from './projectHiera
 import { createProjectHierarchyTreeSessionSubWiring } from './projectHierarchyTreeSessionSubWiring'
 import {
   PROJECT_HIERARCHY_TREE_DOCUMENT_ROW_DRAG_HOLD_DELAY_MS,
-  PROJECT_HIERARCHY_TREE_DRAG_HANDLE_CLASS
+  PROJECT_HIERARCHY_TREE_DRAG_HANDLE_CLASS,
+  PROJECT_HIERARCHY_TREE_LEFT_POINTER_DOWN_CLASS
 } from '../functions/projectHierarchyTreeConstants'
 
 type T_hierarchyStore = {
@@ -54,6 +55,7 @@ export function createProjectHierarchyTreeSessionEarlyWiring (deps: {
   const documentRowDragHoldWiring = createProjectHierarchyTreeDocumentRowDragHoldWiring({
     dragHandleClassName: PROJECT_HIERARCHY_TREE_DRAG_HANDLE_CLASS,
     holdDelayMs: PROJECT_HIERARCHY_TREE_DOCUMENT_ROW_DRAG_HOLD_DELAY_MS,
+    leftPointerDownClassName: PROJECT_HIERARCHY_TREE_LEFT_POINTER_DOWN_CLASS,
     onAllowedDocumentRowDragStart: () => {
       subWiringHolder.subWiring?.dndWiring.commitAllowedDocumentRowDragSessionStart(deps.dragContext)
     },

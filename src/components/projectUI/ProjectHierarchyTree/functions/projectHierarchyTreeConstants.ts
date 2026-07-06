@@ -12,8 +12,11 @@ export const PROJECT_HIERARCHY_TREE_NODE_ITEM_SELECTOR = '.tree-node'
 /** Default Material icon for template group rows. */
 export const PROJECT_HIERARCHY_TREE_GROUP_ICON = 'mdi-database'
 
-/** he-tree Draggable trigger-class — added to document row after press-and-hold delay. */
+/** he-tree Draggable trigger-class — added on primary-button pointerdown before drag may start. */
 export const PROJECT_HIERARCHY_TREE_DRAG_HANDLE_CLASS = 'projectHierarchyTree__dragHandle'
+
+/** Primary-button press cursor on document rows; paired with drag handle for he-tree only. */
+export const PROJECT_HIERARCHY_TREE_LEFT_POINTER_DOWN_CLASS = 'projectHierarchyTree__leftPointerDown'
 
 /**
  * Pointer movement (px) before a document row press+release counts as drag, not expand click.

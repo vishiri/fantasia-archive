@@ -21,6 +21,11 @@ type T_createMainLayoutWorkspaceSidebarDeps = {
   S_FaProjectWorkspaceWorlds: () => StoreGeneric & {
     refreshWorkspaceWorlds: () => Promise<void>
   }
+  S_FaOpenedDocuments: () => StoreGeneric & {
+    clearSession: () => Promise<void>
+    flushPersistSnapshot: () => Promise<boolean>
+    hydrateFromProjectDatabase: () => Promise<void>
+  }
   attachWorkspaceSidebarLiveWidthSync: (input: {
     onWidthPx: (widthPx: number) => void
     panelElement: HTMLElement
@@ -127,6 +132,7 @@ export function createMainLayoutWorkspaceSidebar (
       if (projectId !== null) {
         void deps.S_FaProjectWorkspaceWorlds().refreshWorkspaceWorlds()
         void deps.S_FaProjectHierarchyTree().refreshLayout()
+        void deps.S_FaOpenedDocuments().hydrateFromProjectDatabase()
       }
     })
 
@@ -138,6 +144,8 @@ export function createMainLayoutWorkspaceSidebar (
           deps.S_FaProjectSidebar().resetToDefault()
           deps.S_FaProjectHierarchyTree().flushUiStatePersist()
           deps.S_FaProjectHierarchyTree().resetOnProjectClose()
+          void deps.S_FaOpenedDocuments().flushPersistSnapshot()
+          void deps.S_FaOpenedDocuments().clearSession()
           await deps.S_FaProjectWorkspaceWorlds().refreshWorkspaceWorlds()
           suppressSidebarWidthPersist = true
           sidebarWidthModel.value = deps.sidebarDefaultWidthPx
@@ -149,6 +157,7 @@ export function createMainLayoutWorkspaceSidebar (
         await deps.S_FaProjectSidebar().refreshProjectSidebar()
         await deps.S_FaProjectWorkspaceWorlds().refreshWorkspaceWorlds()
         await deps.S_FaProjectHierarchyTree().refreshLayout()
+        await deps.S_FaOpenedDocuments().hydrateFromProjectDatabase()
         syncSidebarWidthFromStore()
       }
     )

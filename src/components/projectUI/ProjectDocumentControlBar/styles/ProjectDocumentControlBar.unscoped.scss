@@ -1,9 +1,16 @@
 @use './variables' as *;
 @use '../../../../layouts/MainLayout/styles/variables' as mainLayout;
+@use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
+@import '@quasar/extras/animate/fadeIn.css';
+@import '@quasar/extras/animate/fadeOut.css';
 
-.projectDocumentControlBar {
+.projectDocumentControlBarHost {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.projectDocumentControlBar--fixedStrip {
   background-color: $projectDocumentControlBar-backgroundColor;
-  border-bottom: 1px solid $projectDocumentControlBar-bottomBorderColor;
   left: $projectDocumentControlBar-widthOffsetPx;
   min-height: $projectDocumentControlBar-minHeightPx;
   min-width: calc(100vw - #{$projectDocumentControlBar-widthOffsetPx});
@@ -13,9 +20,161 @@
   z-index: $projectDocumentControlBar-zIndex;
 }
 
+.projectDocumentControlBar__blocker {
+  background-color: $projectDocumentControlBar-backgroundColor;
+  height: $projectDocumentControlBar-blockerHeightPx;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: calc(-1 * #{$projectDocumentControlBar-blockerHeightPx});
+  z-index: $projectDocumentControlBar-zIndex;
+}
+
+.projectDocumentControlBar__wrapper {
+  display: flex;
+  justify-content: space-between;
+  padding: $projectDocumentControlBar-stripPaddingBlockPx $projectDocumentControlBar-stripPaddingInlinePx;
+  position: relative;
+  width: 100%;
+
+  &::after {
+    background-color: $projectDocumentControlBar-bottomRuleColor;
+    bottom: 0;
+    content: ' ';
+    height: 1px;
+    left: 0;
+    position: absolute;
+    right: 0;
+  }
+}
+
+.projectDocumentControlBar__left,
+.projectDocumentControlBar__right {
+  display: flex;
+}
+
+.projectDocumentControlBar__left {
+  justify-content: flex-start;
+}
+
+.projectDocumentControlBar__right {
+  justify-content: flex-end;
+  margin-left: auto;
+
+  .q-btn {
+    margin-left: $projectDocumentControlBar-stripButtonSpacingPx;
+  }
+}
+
+.projectDocumentControlBar__buttonTooltip.q-tooltip {
+  max-width: $projectDocumentControlBar-buttonTooltip-maxWidth;
+  white-space: nowrap;
+  width: max-content;
+}
+
+.projectDocumentControlBarTabs {
+  -webkit-app-region: no-drag;
+  overflow: hidden;
+}
+
+.projectDocumentControlBarTabs--header {
+  background-color: transparent;
+  flex: 1 1 auto;
+  max-width: 100%;
+  min-height: mainLayout.$mainLayout-appHeader-heightPx;
+  min-width: 0;
+  width: 100%;
+}
+
 .projectDocumentControlBar__flowSpacer {
   flex-shrink: 0;
   min-height: $projectDocumentControlBar-minHeightPx;
   pointer-events: none;
   width: 100%;
+}
+
+.projectDocumentControlBarTabs__tabs {
+  max-width: 100%;
+  overflow: hidden;
+  width: 100%;
+}
+
+.projectDocumentControlBarTabs__tabTransitionGroup {
+  display: flex;
+}
+
+/* animate.css base; TransitionGroup :duration overrides animation-duration per enter/leave. */
+.animated {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+.projectDocumentControlBarTabs__tabClose {
+  color: $projectDocumentControlBar-tabClose-color;
+}
+
+.tabsWrapper {
+  &.q-tabs--dense .q-tab {
+    min-height: mainLayout.$mainLayout-appHeader-heightPx;
+  }
+
+  .q-tab {
+    color: $projectDocumentControlBar-tabContent-color;
+    padding: 0 $projectDocumentControlBar-tabPadding-inlinePx;
+    transition:
+      background-color $projectDocumentControlBar-tabFocusTransitionDurationMs $projectDocumentControlBar-tabFocusTransitionEase,
+      color $projectDocumentControlBar-tabFocusTransitionDurationMs $projectDocumentControlBar-tabFocusTransitionEase,
+      opacity $projectDocumentControlBar-tabFocusTransitionDurationMs $projectDocumentControlBar-tabFocusTransitionEase;
+  }
+
+  .q-tab__content {
+    justify-content: flex-start;
+    min-width: $projectDocumentControlBar-tabContent-widthPx;
+    text-align: left;
+    width: $projectDocumentControlBar-tabContent-widthPx;
+  }
+
+  .q-tab .q-tab__icon {
+    @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
+
+    --fa-q-icon-display-glyph-font-size: #{$projectDocumentControlBar-tabIcon-glyphFontSize};
+    --fa-q-icon-display-mdi-font-size: #{$projectDocumentControlBar-tabIcon-glyphFontSize};
+
+    align-items: center;
+    color: $projectDocumentControlBar-tabContent-color;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: $projectDocumentControlBar-tabIcon-boxSize;
+    height: $projectDocumentControlBar-tabIcon-boxSize;
+    justify-content: center;
+    max-height: $projectDocumentControlBar-tabIcon-boxSize;
+    max-width: $projectDocumentControlBar-tabIcon-boxSize;
+    transition:
+      color $projectDocumentControlBar-tabFocusTransitionDurationMs $projectDocumentControlBar-tabFocusTransitionEase,
+      opacity $projectDocumentControlBar-tabFocusTransitionDurationMs $projectDocumentControlBar-tabFocusTransitionEase;
+    width: $projectDocumentControlBar-tabIcon-boxSize;
+
+    &:not(.fa-brands, .fa-regular, .fa-solid) {
+      margin-top: 0;
+    }
+  }
+
+  .q-tab__label {
+    color: $projectDocumentControlBar-tabContent-color;
+    font-size: $projectDocumentControlBar-tabLabel-fontSize;
+    font-weight: $projectDocumentControlBar-tabLabel-fontWeight;
+    overflow: hidden;
+    padding-top: $projectDocumentControlBar-tabLabel-paddingTop;
+    text-overflow: ellipsis;
+    transition:
+      color $projectDocumentControlBar-tabFocusTransitionDurationMs $projectDocumentControlBar-tabFocusTransitionEase,
+      opacity $projectDocumentControlBar-tabFocusTransitionDurationMs $projectDocumentControlBar-tabFocusTransitionEase;
+  }
+
+  .q-tab__alert-icon {
+    color: $projectDocumentControlBar-unsavedTabIconColor;
+    font-size: $projectDocumentControlBar-tabAlertIcon-fontSize;
+    right: $projectDocumentControlBar-tabAlertIcon-positionRight;
+    top: $projectDocumentControlBar-tabAlertIcon-positionTop;
+  }
 }

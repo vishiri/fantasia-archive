@@ -1,0 +1,9 @@
+@use './variables' as *;
+
+.dialogDiscardOpenedDocumentTab {
+  min-width: $dialogDiscardOpenedDocumentTab-minWidth;
+}
+
+.dialogDiscardOpenedDocumentTab__title {
+  word-break: break-word;
+}

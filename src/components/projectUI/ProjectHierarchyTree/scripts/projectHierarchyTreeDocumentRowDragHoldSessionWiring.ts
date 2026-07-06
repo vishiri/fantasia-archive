@@ -2,9 +2,12 @@ import {
   createProjectHierarchyTreeDocumentRowDragHoldDragStartHandler
 } from './projectHierarchyTreeDocumentRowDragHoldDragStartHandlerWiring'
 
+import { isPrimaryMouseButton } from 'app/src/scripts/dom/dom_manager'
+
 type T_documentRowDragHoldSessionDeps = {
   dragHandleClassName: string
   holdDelayMs: number
+  leftPointerDownClassName: string
   onAllowedDocumentRowDragStart: () => void
   windowClearTimeout: (timeoutId: number) => void
   windowSetTimeout: (handler: () => void, delayMs: number) => number
@@ -38,6 +41,7 @@ export function createProjectHierarchyTreeDocumentRowDragHoldSession (
     clearPointerEndListeners()
     if (pendingRowElement !== null) {
       pendingRowElement.classList.remove(deps.dragHandleClassName)
+      pendingRowElement.classList.remove(deps.leftPointerDownClassName)
     }
     pendingRowElement = null
     isDragHoldArmed = false
@@ -65,6 +69,9 @@ export function createProjectHierarchyTreeDocumentRowDragHoldSession (
   }
 
   function handleDocumentRowPointerDown (event: PointerEvent): void {
+    if (!isPrimaryMouseButton(event)) {
+      return
+    }
     const rowElement = event.currentTarget
     if (!(rowElement instanceof HTMLElement)) {
       return
@@ -73,6 +80,7 @@ export function createProjectHierarchyTreeDocumentRowDragHoldSession (
     pendingRowElement = rowElement
     isPointerDownForHold = true
     rowElement.classList.add(deps.dragHandleClassName)
+    rowElement.classList.add(deps.leftPointerDownClassName)
     holdTimerId = deps.windowSetTimeout(handleHoldTimerFire, deps.holdDelayMs)
     window.addEventListener('pointerup', handlePointerEnd, true)
     window.addEventListener('pointercancel', handlePointerEnd, true)

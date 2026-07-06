@@ -1,3 +1,5 @@
+import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+
 /**
  * Payload for the component-testing Playwright store seed probe (TEST_ENV components only).
  */
@@ -25,4 +27,12 @@ export interface I_faComponentTestingStoreSeed {
    * When defined, patches disableDocumentControlBar on S_FaUserSettings (merged with the current settings object).
    */
   disableDocumentControlBar?: boolean | undefined
+
+  /**
+   * When defined, patches opened document tabs on S_FaOpenedDocuments for workspace tab bar previews.
+   */
+  openedDocuments?: {
+    activeDocumentId: string | null
+    tabs: I_faOpenedDocumentTab[]
+  } | undefined
 }

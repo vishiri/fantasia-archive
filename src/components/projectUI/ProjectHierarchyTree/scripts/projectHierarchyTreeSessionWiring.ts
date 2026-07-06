@@ -12,8 +12,10 @@ import { createProjectHierarchyTreeSessionHydrateWiring } from './projectHierarc
 import { bindProjectHierarchyTreeSessionLifecycle } from './projectHierarchyTreeSessionLifecycleBindWiring'
 import { buildProjectHierarchyTreeSessionApi } from './projectHierarchyTreeSessionApiWiring'
 import { createProjectHierarchyTreeSessionEarlyWiring } from './projectHierarchyTreeSessionEarlyWiring'
+import { wireProjectHierarchyTreePendingDocumentRefresh } from './projectHierarchyTreePendingDocumentRefreshWiring'
 
 type T_hierarchyStore = {
+  clearPendingDocumentRefreshIds: () => void
   clearPendingRevealPath: () => void
   flushUiStatePersist: () => void
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
@@ -36,9 +38,14 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
   }
   hierarchyStore: T_hierarchyStore
   nextTick: () => Promise<void>
-  onDocumentClick: (documentId: string) => void
+  onDocumentOpenRequest: (
+    documentId: string,
+    mode: import('app/types/I_faOpenedDocumentsDomain').T_faOpenedDocumentOpenMode,
+    treeMeta: import('app/types/I_faOpenedDocumentsDomain').I_faOpenedDocumentTreeOpenMeta
+  ) => void
   onMounted: (hook: () => void) => void
   onUnmounted: (hook: () => void) => void
+  pendingDocumentRefreshIds: Ref<string[]>
   pendingRevealPath: Ref<string[]>
   ref: <T>(initial: T) => Ref<T>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
@@ -68,7 +75,7 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
     dragExpandUiFrozen: earlyWiring.bootstrap.sessionRefs.dragExpandUiFrozen,
     getDragExpandedSnapshotNodeIds: earlyWiring.subWiring.dndWiring.getDragExpandedSnapshotNodeIds,
     lazyLoadWiring: earlyWiring.subWiring.lazyLoadWiring,
-    onDocumentClick: deps.onDocumentClick,
+    onDocumentOpenRequest: deps.onDocumentOpenRequest,
     suppressTreeEmit: earlyWiring.bootstrap.sessionRefs.suppressTreeEmit,
     treeComponentRef: earlyWiring.bootstrap.sessionRefs.treeComponentRef,
     treeData: deps.treeData,
@@ -104,6 +111,14 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
     teardown: hydrateWiring.teardown,
     watch: deps.watch,
     worlds: deps.worlds
+  })
+
+  wireProjectHierarchyTreePendingDocumentRefresh({
+    clearPendingDocumentRefreshIds: () => deps.hierarchyStore.clearPendingDocumentRefreshIds(),
+    pendingDocumentRefreshIds: deps.pendingDocumentRefreshIds,
+    refreshNodeChildrenFromDatabase: earlyWiring.subWiring.lazyLoadWiring.refreshNodeChildrenFromDatabase,
+    treeData: deps.treeData,
+    watch: deps.watch
   })
 
   return buildProjectHierarchyTreeSessionApi({

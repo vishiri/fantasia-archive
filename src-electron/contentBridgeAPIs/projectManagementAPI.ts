@@ -16,6 +16,7 @@ import type {
   I_faProjectHierarchyTreeUiState,
   I_faProjectHierarchyTreeUiStatePatch
 } from 'app/types/I_faProjectHierarchyTreeDomain'
+import type { I_faOpenedDocumentsSnapshot } from 'app/types/I_faOpenedDocumentsDomain'
 import type {
   I_faProjectSidebarPatch,
   I_faProjectSidebarRoot
@@ -64,6 +65,12 @@ export const projectManagementAPI: I_faProjectManagementAPI = {
     return await ipcRenderer.invoke(
       FA_PROJECT_MANAGEMENT_IPC.getHierarchyTreeUiStateAsync
     ) as I_faProjectHierarchyTreeUiState
+  },
+
+  async getOpenedDocumentsSnapshot (): Promise<I_faOpenedDocumentsSnapshot> {
+    return await ipcRenderer.invoke(
+      FA_PROJECT_MANAGEMENT_IPC.getOpenedDocumentsSnapshotAsync
+    ) as I_faOpenedDocumentsSnapshot
   },
 
   async getProjectStyling (): Promise<I_faProjectStylingRoot> {
@@ -122,6 +129,14 @@ export const projectManagementAPI: I_faProjectManagementAPI = {
     const payload = JSON.parse(JSON.stringify(patch)) as I_faProjectHierarchyTreeUiStatePatch
     return await ipcRenderer.invoke(
       FA_PROJECT_MANAGEMENT_IPC.setHierarchyTreeUiStatePatchAsync,
+      payload
+    ) as boolean
+  },
+
+  async saveOpenedDocumentsSnapshot (snapshot: I_faOpenedDocumentsSnapshot): Promise<boolean> {
+    const payload = JSON.parse(JSON.stringify(snapshot)) as I_faOpenedDocumentsSnapshot
+    return await ipcRenderer.invoke(
+      FA_PROJECT_MANAGEMENT_IPC.saveOpenedDocumentsSnapshotAsync,
       payload
     ) as boolean
   },

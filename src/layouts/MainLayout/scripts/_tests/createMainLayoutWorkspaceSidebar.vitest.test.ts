@@ -42,11 +42,20 @@ function debounceSidebarWidthPersist<T extends (...args: never[]) => void> (
   return debounced
 }
 
+const flushOpenedDocumentsMock = vi.fn(async (): Promise<boolean> => true)
+const clearOpenedDocumentsSessionMock = vi.fn(async (): Promise<void> => undefined)
+const hydrateOpenedDocumentsMock = vi.fn(async (): Promise<void> => undefined)
+
 function buildUseSidebar (): ReturnType<ReturnType<typeof createMainLayoutWorkspaceSidebar>> {
   const useSidebar = createMainLayoutWorkspaceSidebar({
     S_FaActiveProject: () => ({
       activeProject: activeProjectId === null ? null : { id: activeProjectId },
       hasActiveProject: activeProjectId !== null
+    }) as never,
+    S_FaOpenedDocuments: () => ({
+      clearSession: clearOpenedDocumentsSessionMock,
+      flushPersistSnapshot: flushOpenedDocumentsMock,
+      hydrateFromProjectDatabase: hydrateOpenedDocumentsMock
     }) as never,
     S_FaProjectHierarchyTree: () => ({
       flushUiStatePersist: flushHierarchyUiStateMock,

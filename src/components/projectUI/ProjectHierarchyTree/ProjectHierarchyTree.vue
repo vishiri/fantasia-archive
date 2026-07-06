@@ -35,6 +35,7 @@
         <div
           class="projectHierarchyTree__nodeRow row items-center no-wrap"
           :class="resolveProjectHierarchyTreeNodeRowKindClass(node.nodeKind)"
+          @auxclick="onDocumentRowAuxClick(node, $event)"
           @click="onWorldNodeRowClick(node, stat, $event)"
           @pointerdown="onWorldNodeRowPointerDown(node, stat, $event)"
         >
@@ -48,6 +49,7 @@
             @pointerdown.stop="onNonWorldOpenIconPointerDown(node, stat)"
           />
           <ProjectHierarchyTreeNode
+            :active-document-id="activeDocumentId"
             class="projectHierarchyTree__nodeContent"
             :node="node"
             :stat="stat"
@@ -79,17 +81,23 @@ defineOptions({
 })
 
 const emit = defineEmits<{
-  'document-click': [documentId: string]
+  'document-open-request': [
+    documentId: string,
+    mode: import('app/types/I_faOpenedDocumentsDomain').T_faOpenedDocumentOpenMode,
+    treeMeta: import('app/types/I_faOpenedDocumentsDomain').I_faOpenedDocumentTreeOpenMeta
+  ]
 }>()
 
 const treeScrollHostRef = ref<HTMLElement | null>(null)
 const treeComponentRef = ref<I_faProjectHierarchyTreeHeTreeInstance | null>(null)
 
 const {
+  activeDocumentId,
   eachDraggableHandler,
   eachDroppableHandler,
   heTreeNodeKey,
   isTreeDragActive,
+  onDocumentRowAuxClick,
   onNodeClick,
   onNodeClose,
   onNodeOpen,
@@ -110,8 +118,8 @@ const {
   treeRootClassList,
   treeStyle
 } = useProjectHierarchyTree({
-  onDocumentClick: (documentId) => {
-    emit('document-click', documentId)
+  onDocumentOpenRequest: (documentId, mode, treeMeta) => {
+    emit('document-open-request', documentId, mode, treeMeta)
   }
 })
 

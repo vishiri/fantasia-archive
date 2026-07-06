@@ -172,6 +172,31 @@ test('Test that ProjectHierarchyTreeNode applies document row class', () => {
 })
 
 /**
+ * ProjectHierarchyTreeNode mirrors hover highlight for the active workspace tab document row.
+ */
+test('Test that ProjectHierarchyTreeNode applies active tab highlight only for matching document rows', async () => {
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    props: {
+      activeDocumentId: 'doc-1',
+      node: {
+        ...baseNode,
+        documentId: 'doc-1',
+        nodeKind: 'document'
+      },
+      stat: {
+        open: false
+      }
+    }
+  })
+  expect(wrapper.classes()).toContain('projectHierarchyTreeNode--activeTabDocument')
+
+  await wrapper.setProps({
+    activeDocumentId: 'doc-2'
+  })
+  expect(wrapper.classes()).not.toContain('projectHierarchyTreeNode--activeTabDocument')
+})
+
+/**
  * ProjectHierarchyTreeNode syncs a kind class onto the parent he-tree tree-node wrapper.
  */
 test('Test that ProjectHierarchyTreeNode syncs tree-node kind class', () => {

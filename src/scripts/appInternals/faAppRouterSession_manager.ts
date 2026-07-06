@@ -16,3 +16,7 @@ export const navigateToWorkspaceRouteForActiveProject =
 
 export const navigateToWorkspaceWhenOnWelcomeRoute =
   faAppRouterSessionApi.navigateToWorkspaceWhenOnWelcomeRoute
+
+export const navigateToOpenedDocumentRoute = faAppRouterSessionApi.navigateToOpenedDocument
+
+export const navigateToWorkspaceHomeRoute = faAppRouterSessionApi.navigateToWorkspaceHomeRoute

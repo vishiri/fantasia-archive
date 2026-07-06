@@ -1,4 +1,5 @@
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
+import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import type { I_faComponentTestingStoreSeed } from 'app/types/I_faComponentTestingStoreSeed'
 import type { Pinia } from 'app/types/I_vuePiniaInjected'
@@ -40,6 +41,14 @@ export function patchFaComponentTestingStores (
 
     settingsStore.$patch({
       settings: nextSettings
+    })
+  }
+
+  if (seed.openedDocuments !== undefined) {
+    const openedDocumentsStore = S_FaOpenedDocuments(pinia)
+    openedDocumentsStore.replaceSessionForComponentTesting({
+      activeDocumentId: seed.openedDocuments.activeDocumentId,
+      tabs: seed.openedDocuments.tabs
     })
   }
 }

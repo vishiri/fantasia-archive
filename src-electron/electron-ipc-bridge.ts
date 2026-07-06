@@ -90,6 +90,10 @@ export const FA_PROJECT_MANAGEMENT_IPC = {
     'fa-project-management-set-project-sidebar-patch-async',
   getHierarchyTreeUiStateAsync:
     'fa-project-management-get-hierarchy-tree-ui-state-async',
+  getOpenedDocumentsSnapshotAsync:
+    'fa-project-management-get-opened-documents-snapshot-async',
+  saveOpenedDocumentsSnapshotAsync:
+    'fa-project-management-save-opened-documents-snapshot-async',
   setHierarchyTreeUiStatePatchAsync:
     'fa-project-management-set-hierarchy-tree-ui-state-patch-async',
   setProjectStylingPatchAsync:

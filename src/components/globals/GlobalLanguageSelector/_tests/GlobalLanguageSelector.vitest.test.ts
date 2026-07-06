@@ -10,6 +10,7 @@ import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSett
 import { S_FaUserSettings } from 'src/stores/S_FaUserSettings'
 
 import GlobalLanguageSelector from '../GlobalLanguageSelector.vue'
+import { faAppHeaderChromeSpellcheckRefreshVisible } from '../scripts/faAppHeaderChromeSpellcheckReserveWiring'
 
 vi.mock('quasar', () => ({
   Notify: { create: vi.fn() }
@@ -368,6 +369,7 @@ test('Test that GlobalLanguageSelector shows spellcheck refresh when languageCod
 
   await flushPromises()
   expect(w.find('[data-test-locator="globalLanguageSelector-spellcheckRefresh"]').exists()).toBe(false)
+  expect(faAppHeaderChromeSpellcheckRefreshVisible.value).toBe(false)
 
   store.settings = {
     ...FA_USER_SETTINGS_DEFAULTS,
@@ -376,7 +378,9 @@ test('Test that GlobalLanguageSelector shows spellcheck refresh when languageCod
   await flushPromises()
 
   expect(w.find('[data-test-locator="globalLanguageSelector-spellcheckRefresh"]').exists()).toBe(true)
+  expect(faAppHeaderChromeSpellcheckRefreshVisible.value).toBe(true)
   w.unmount()
+  expect(faAppHeaderChromeSpellcheckRefreshVisible.value).toBe(false)
   vi.unstubAllEnvs()
 })
 
