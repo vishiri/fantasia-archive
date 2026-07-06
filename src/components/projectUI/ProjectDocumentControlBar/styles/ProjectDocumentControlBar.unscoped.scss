@@ -33,6 +33,7 @@
 .projectDocumentControlBar__wrapper {
   display: flex;
   justify-content: space-between;
+  min-height: $projectDocumentControlBar-minHeightPx;
   padding: $projectDocumentControlBar-stripPaddingBlockPx $projectDocumentControlBar-stripPaddingInlinePx;
   position: relative;
   width: 100%;
