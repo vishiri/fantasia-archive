@@ -6,7 +6,11 @@ import {
   FA_PROJECT_TABLE_DOCUMENTS,
   FA_PROJECT_TABLE_DOCUMENT_TEMPLATES
 } from '../../functions/faProjectDbSchemaDdl'
-import { createFaProjectDocument } from '../faProjectDocumentsPersistWiring'
+import {
+  createFaProjectDocument,
+  deleteFaProjectDocument,
+  getFaProjectDocumentById
+} from '../faProjectDocumentsPersistWiring'
 import {
   listFaProjectPlacementDocumentChildren,
   listFaProjectWorkspaceHierarchyLayout,
@@ -722,6 +726,91 @@ test('Test that searchFaProjectHierarchy ignores documents without placement_id'
   ).run(loose.id)
   const result = searchFaProjectHierarchy(connection, 'Loose')
   expect(result.hits).toEqual([])
+})
+
+/**
+ * deleteFaProjectDocument
+ * Promotes direct children to top level at the deleted document sort order.
+ */
+test('Test that deleteFaProjectDocument promotes direct children to top level at deleted sort order', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const parent = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Parent',
+    sortOrder: 0
+  })
+  const sibling = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Sibling',
+    sortOrder: 1
+  })
+  const child = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id,
+    displayName: 'Child',
+    sortOrder: 0
+  })
+  deleteFaProjectDocument(connection, parent.id)
+  const promoted = getFaProjectDocumentById(connection, child.id)
+  expect(promoted.parentDocumentId).toBeNull()
+  expect(promoted.sortOrder).toBe(0)
+  expect(() => getFaProjectDocumentById(connection, parent.id)).toThrow('Document')
+  const topLevel = listFaProjectPlacementDocumentChildren(connection, {
+    placementId: seeded.placementId,
+    parentDocumentId: null
+  })
+  expect(topLevel.items.map((row) => row.id)).toEqual([child.id, sibling.id])
+})
+
+/**
+ * deleteFaProjectDocument
+ * Promotes nested children into the deleted parent sibling bucket.
+ */
+test('Test that deleteFaProjectDocument promotes nested children into deleted parent sibling bucket', () => {
+  const connection = openHierarchyTestDb()
+  db = connection
+  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
+  const grandparent = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    displayName: 'Grandparent',
+    sortOrder: 0
+  })
+  const parent = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: grandparent.id,
+    displayName: 'Parent',
+    sortOrder: 0
+  })
+  const child = createFaProjectDocument(connection, {
+    worldId: seeded.worldId,
+    templateId: seeded.templateId,
+    placementId: seeded.placementId,
+    parentDocumentId: parent.id,
+    displayName: 'Child',
+    sortOrder: 0
+  })
+  deleteFaProjectDocument(connection, parent.id)
+  const promoted = getFaProjectDocumentById(connection, child.id)
+  expect(promoted.parentDocumentId).toBe(grandparent.id)
+  expect(promoted.sortOrder).toBe(0)
+  expect(() => getFaProjectDocumentById(connection, parent.id)).toThrow('Document')
+  const nested = listFaProjectPlacementDocumentChildren(connection, {
+    placementId: seeded.placementId,
+    parentDocumentId: grandparent.id
+  })
+  expect(nested.items.map((row) => row.id)).toEqual([child.id])
 })
 
 /**

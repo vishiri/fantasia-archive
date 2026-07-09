@@ -19,6 +19,7 @@ import {
   buildFaProjectDocumentSelectSql,
   readFaProjectDocumentSiblingMaxSortOrder
 } from './faProjectDocumentsSqlWiring'
+import { promoteFaProjectDocumentChildrenBeforeDelete } from './faProjectDocumentDeleteWiring'
 import type {
   I_faProjectDocument,
   I_faProjectDocumentCreateInput,
@@ -187,6 +188,7 @@ export function updateFaProjectDocument (
 }
 
 export function deleteFaProjectDocument (db: Database, id: string): void {
+  promoteFaProjectDocumentChildrenBeforeDelete(db, id)
   const result = db
     .prepare(`DELETE FROM ${FA_PROJECT_TABLE_DOCUMENTS} WHERE id = ?`)
     .run(id)

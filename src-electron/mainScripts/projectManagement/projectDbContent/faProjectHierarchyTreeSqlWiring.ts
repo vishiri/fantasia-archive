@@ -46,6 +46,21 @@ export function listFaProjectHierarchyDocumentChildrenRows (
     .all(placementId, parentDocumentId, parentDocumentId) as I_faSqlProjectDocumentRow[]
 }
 
+export function listFaProjectHierarchyDirectChildDocumentRows (
+  db: Database,
+  parentDocumentId: string
+): I_faSqlProjectDocumentRow[] {
+  return db
+    .prepare(
+      `SELECT id, world_id, template_id, ${placementColumn}, ${parentColumn}, ${sortColumn}, ` +
+        'display_name, created_at_ms, updated_at_ms ' +
+        `FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
+        `WHERE ${parentColumn} = ? ` +
+        `ORDER BY ${sortColumn} ASC, display_name COLLATE NOCASE ASC, created_at_ms ASC, id ASC`
+    )
+    .all(parentDocumentId) as I_faSqlProjectDocumentRow[]
+}
+
 export function mapFaProjectHierarchyDocumentChildRow (
   db: Database,
   row: I_faSqlProjectDocumentRow
