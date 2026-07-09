@@ -1,54 +1,14 @@
 import type {
-  I_projectDocumentControlBarComposableApi,
-  T_assembleProjectDocumentControlBarApiFn
+  I_projectDocumentControlBarComposableApi
 } from 'app/types/I_faProjectDocumentControlBarDomain'
-import type { T_projectDocumentControlBarSaveButtonColor } from 'app/types/T_projectDocumentControlBarSaveButtonColor'
-import type { I_computedRef } from 'app/types/I_vueCompositionShims'
-import type { StoreGeneric, T_piniaStoreToRefs } from 'app/types/I_vuePiniaInjected'
+import type { I_faCreateUseProjectDocumentControlBarDeps } from 'app/types/I_faCreateUseProjectDocumentControlBarDeps'
 
-export function createUseProjectDocumentControlBar (deps: {
-  assembleProjectDocumentControlBarApi: T_assembleProjectDocumentControlBarApiFn
-  computed: <T>(getter: () => T) => I_computedRef<T>
-  resolveActiveDocumentTabName: (input: {
-    activeDocumentId: string | null
-    openedTabs: readonly { documentId: string }[]
-  }) => string | undefined
-  resolveDocumentTabLabelFromOpenedTab: (input: {
-    displayNameDraft: string
-    tabLabel: string
-  }) => string
-  resolveFaDocumentWorkspaceRouteDocumentId: (routePath: string) => string | null
-  resolveShowDocumentControlBarStrip: (input: {
-    disableDocumentControlBar: boolean
-  }) => boolean
-  resolveShowDocumentTabs: (openedTabCount: number) => boolean
-  resolveShowProjectDocumentControlBarEditButton: (input: {
-    activeDocumentTab: { editState: boolean } | null
-    isOnDocumentWorkspaceRoute: boolean
-  }) => boolean
-  resolveShowProjectDocumentControlBarSaveButtons: (input: {
-    activeDocumentTab: { editState: boolean } | null
-    isOnDocumentWorkspaceRoute: boolean
-  }) => boolean
-  resolveProjectDocumentControlBarSaveButtonColor: (input: {
-    hasUnsavedChanges: boolean
-  }) => T_projectDocumentControlBarSaveButtonColor
-  S_FaOpenedDocuments: () => StoreGeneric & {
-    enterDocumentEditMode: (documentId: string) => void
-    requestCloseTab: (documentId: string) => void
-    saveDocumentDisplayName: (
-      documentId: string,
-      input: { keepEditMode: boolean }
-    ) => Promise<boolean>
-  }
-  S_FaUserSettings: () => StoreGeneric
-  storeToRefs: T_piniaStoreToRefs
-  useRoute: () => {
-    path: string
-  }
-}): () => I_projectDocumentControlBarComposableApi {
+export function createUseProjectDocumentControlBar (
+  deps: I_faCreateUseProjectDocumentControlBarDeps
+): () => I_projectDocumentControlBarComposableApi {
   return function useProjectDocumentControlBar () {
     const route = deps.useRoute()
+    const { t } = deps.useI18n()
     const { settings } = deps.storeToRefs(deps.S_FaUserSettings())!
     const { activeDocumentId, tabs } = deps.storeToRefs(deps.S_FaOpenedDocuments())!
     const openedDocumentsStore = deps.S_FaOpenedDocuments()
@@ -61,28 +21,60 @@ export function createUseProjectDocumentControlBar (deps: {
       return deps.resolveFaDocumentWorkspaceRouteDocumentId(route.path) !== null
     })
 
-    return deps.assembleProjectDocumentControlBarApi({
-      activeDocumentId: activeDocumentId!,
-      computed: deps.computed,
-      enterDocumentEditMode: (documentId: string) => {
-        openedDocumentsStore.enterDocumentEditMode(documentId)
-      },
-      isDocumentControlBarDisabled,
-      isOnDocumentWorkspaceRoute,
-      requestCloseTab: (documentId: string) => {
-        openedDocumentsStore.requestCloseTab(documentId)
-      },
-      resolveActiveDocumentTabName: deps.resolveActiveDocumentTabName,
-      resolveDocumentTabLabelFromOpenedTab: deps.resolveDocumentTabLabelFromOpenedTab,
-      resolveShowDocumentControlBarStrip: deps.resolveShowDocumentControlBarStrip,
-      resolveShowDocumentTabs: deps.resolveShowDocumentTabs,
-      resolveShowProjectDocumentControlBarEditButton: deps.resolveShowProjectDocumentControlBarEditButton,
-      resolveShowProjectDocumentControlBarSaveButtons: deps.resolveShowProjectDocumentControlBarSaveButtons,
-      resolveProjectDocumentControlBarSaveButtonColor: deps.resolveProjectDocumentControlBarSaveButtonColor,
-      saveDocumentDisplayName: (documentId, input) => {
-        return openedDocumentsStore.saveDocumentDisplayName(documentId, input)
-      },
-      tabs: tabs!
-    })
+    return deps.assembleProjectDocumentControlBarApi(
+      deps.buildProjectDocumentControlBarAssembleInput({
+        activeDocumentId: activeDocumentId!,
+        computed: deps.computed,
+        copyToClipboard: deps.copyToClipboard,
+        enterDocumentEditMode: (documentId: string) => {
+          openedDocumentsStore.enterDocumentEditMode(documentId)
+        },
+        findTabByDocumentId: (documentId: string) => {
+          return openedDocumentsStore.findTabByDocumentId(documentId)
+        },
+        formatFaKeybindCommandLabelFromSnapshot: deps.formatFaKeybindCommandLabelFromSnapshot,
+        getKeybindsSnapshot: deps.getKeybindsSnapshot,
+        isDocumentControlBarDisabled,
+        isOnDocumentWorkspaceRoute,
+        moveDocumentTab: (documentId: string, direction: 'left' | 'right') => {
+          openedDocumentsStore.moveDocumentTab(documentId, direction)
+        },
+        notifyCreate: deps.notifyCreate,
+        closeAllTabsWithoutChanges: () => {
+          void openedDocumentsStore.closeAllTabsWithoutChanges()
+        },
+        closeTabsWithoutChangesExcept: (exceptDocumentId: string) => {
+          void openedDocumentsStore.closeTabsWithoutChangesExcept(exceptDocumentId)
+        },
+        requestDeleteDocument: (documentId: string) => {
+          openedDocumentsStore.requestDeleteDocument(documentId)
+        },
+        forceCloseAllTabs: () => {
+          void openedDocumentsStore.forceCloseAllTabs()
+        },
+        forceCloseAllTabsExcept: (exceptDocumentId: string) => {
+          void openedDocumentsStore.forceCloseAllTabsExcept(exceptDocumentId)
+        },
+        requestCloseTab: (documentId: string) => {
+          openedDocumentsStore.requestCloseTab(documentId)
+        },
+        resolveActiveDocumentTabName: deps.resolveActiveDocumentTabName,
+        resolveDocumentTabLabelFromOpenedTab: deps.resolveDocumentTabLabelFromOpenedTab,
+        resolveShowDocumentControlBarStrip: deps.resolveShowDocumentControlBarStrip,
+        resolveShowDocumentTabs: deps.resolveShowDocumentTabs,
+        resolveShowProjectDocumentControlBarEditButton: deps.resolveShowProjectDocumentControlBarEditButton,
+        resolveShowProjectDocumentControlBarDeleteButton: deps.resolveShowProjectDocumentControlBarDeleteButton,
+        resolveShowProjectDocumentControlBarSaveButtons: deps.resolveShowProjectDocumentControlBarSaveButtons,
+        resolveProjectDocumentControlBarSaveButtonColor: deps.resolveProjectDocumentControlBarSaveButtonColor,
+        runFaAction: deps.runFaAction,
+        tabs: tabs!,
+        translateCopyNameFailed: () => {
+          return t('projectUI.projectDocumentControlBar.copyNameFailed')
+        },
+        translateCopyNameSuccess: () => {
+          return t('projectUI.projectDocumentControlBar.copyNameSuccess')
+        }
+      })
+    )
   }
 }

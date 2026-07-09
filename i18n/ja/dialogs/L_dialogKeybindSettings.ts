@@ -31,6 +31,13 @@ export default {
     toggleDeveloperTools: '開発者ツールの切り替え',
     toggleAppNoteboard: 'アプリノートボードの切り替え',
     toggleProjectNoteboard: 'プロジェクトノートボードの切り替え',
+    editDocument: 'Edit current document',
+    saveDocumentKeepEditMode: 'Save document without exiting edit mode',
+    saveDocument: 'Save current document',
+    focusPreviousDocumentTab: 'Previous document tab',
+    focusNextDocumentTab: 'Next document tab',
+    moveDocumentTabLeft: 'Move document tab left',
+    moveDocumentTabRight: 'Move document tab right'
   },
   filterNoResultsDescription: '残念ながら、Fantasia ではお探しのキーバインドが見つかりませんでした。別の検索語を試してみますか?',
   filterNoResultsTitle: 'キーバインドが見つかりません',

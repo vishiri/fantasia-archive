@@ -80,6 +80,11 @@ test('buildDialogKeybindSettingsRows lists all command ids', () => {
   })
   const ids = rows.map((r) => r.commandId).sort()
   expect(ids).toEqual([
+    'editDocument',
+    'focusNextDocumentTab',
+    'focusPreviousDocumentTab',
+    'moveDocumentTabLeft',
+    'moveDocumentTabRight',
     'openActionMonitor',
     'openAdvancedSearchGuide',
     'openAppSettings',
@@ -87,6 +92,8 @@ test('buildDialogKeybindSettingsRows lists all command ids', () => {
     'openKeybindSettings',
     'openProjectSettings',
     'openProjectStyling',
+    'saveDocument',
+    'saveDocumentKeepEditMode',
     'showProjectDashboard',
     'toggleAppNoteboard',
     'toggleDeveloperTools',

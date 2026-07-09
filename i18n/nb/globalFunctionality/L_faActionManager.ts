@@ -5,6 +5,8 @@ export default {
   labels: {
     closeApp: 'Lukk vinduet',
     languageSwitch: 'Bytt grensesnittspråk',
+    moveActiveOpenedDocumentTabLeft: 'Move document tab left',
+    moveActiveOpenedDocumentTabRight: 'Move document tab right',
     minimizeApp: 'Minimer vinduet',
     openAboutFantasiaArchiveDialog: 'Åpne Om Fantasia Archive',
     openActionMonitorDialog: 'Åpne Action Monitor',
@@ -12,6 +14,7 @@ export default {
     openChangelogDialog: 'Åpne endringslogg',
     openKeybindSettingsDialog: 'Åpne Keybinding Settings',
     openProjectSettingsDialog: 'Åpne prosjektinnstillinger',
+    saveOpenedDocumentDisplayName: 'Save document',
     saveProjectSettings: 'Lagre prosjektinnstillinger',
     openLicenseDialog: 'Åpne lisens',
     openAppSettingsDialog: 'Åpne appinnstillinger',

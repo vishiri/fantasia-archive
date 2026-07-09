@@ -31,6 +31,13 @@ export default {
     toggleDeveloperTools: 'Εναλλαγή Εργαλείων προγραμματιστή',
     toggleAppNoteboard: 'Εναλλαγή σημειωματάριου εφαρμογής',
     toggleProjectNoteboard: 'Εναλλαγή Σημειωματάριου έργου',
+    editDocument: 'Edit current document',
+    saveDocumentKeepEditMode: 'Save document without exiting edit mode',
+    saveDocument: 'Save current document',
+    focusPreviousDocumentTab: 'Previous document tab',
+    focusNextDocumentTab: 'Next document tab',
+    moveDocumentTabLeft: 'Move document tab left',
+    moveDocumentTabRight: 'Move document tab right'
   },
   filterNoResultsDescription: 'Η Fantasia δυστυχώς δεν βρήκε κανένα keybinds που ψάχνατε. Δοκιμάστε έναν διαφορετικό όρο αναζήτησης;',
   filterNoResultsTitle: 'Δεν βρέθηκαν κλειδιά',

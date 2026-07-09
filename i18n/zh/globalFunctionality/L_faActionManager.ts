@@ -5,6 +5,8 @@ export default {
   labels: {
     closeApp: '关闭窗口',
     languageSwitch: '切换界面语言',
+    moveActiveOpenedDocumentTabLeft: 'Move document tab left',
+    moveActiveOpenedDocumentTabRight: 'Move document tab right',
     minimizeApp: '最小化窗口',
     openAboutFantasiaArchiveDialog: '打开关于Fantasia Archive',
     openActionMonitorDialog: '打开动作监视器',
@@ -12,6 +14,7 @@ export default {
     openChangelogDialog: '打开变更日志',
     openKeybindSettingsDialog: '打开按键绑定设置',
     openProjectSettingsDialog: '打开项目设置',
+    saveOpenedDocumentDisplayName: 'Save document',
     saveProjectSettings: '保存项目设置',
     openLicenseDialog: '开放许可证',
     openAppSettingsDialog: '打开应用程序设置',

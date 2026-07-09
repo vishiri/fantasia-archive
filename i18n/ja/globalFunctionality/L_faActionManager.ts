@@ -5,6 +5,8 @@ export default {
   labels: {
     closeApp: 'ウィンドウを閉じる',
     languageSwitch: 'インターフェイス言語の切り替え',
+    moveActiveOpenedDocumentTabLeft: 'Move document tab left',
+    moveActiveOpenedDocumentTabRight: 'Move document tab right',
     minimizeApp: 'ウィンドウを最小化する',
     openAboutFantasiaArchiveDialog: 'Fantasia Archive について開く',
     openActionMonitorDialog: 'アクションモニターを開く',
@@ -12,6 +14,7 @@ export default {
     openChangelogDialog: '変更履歴を開く',
     openKeybindSettingsDialog: 'キーバインド設定を開く',
     openProjectSettingsDialog: 'プロジェクト設定を開く',
+    saveOpenedDocumentDisplayName: 'Save document',
     saveProjectSettings: 'プロジェクト設定を保存',
     openLicenseDialog: 'オープンライセンス',
     openAppSettingsDialog: 'アプリ設定を開く',

@@ -31,6 +31,13 @@ export default {
     toggleDeveloperTools: 'Växla utvecklarverktyg',
     toggleAppNoteboard: 'Växla App Noteboard',
     toggleProjectNoteboard: 'Växla Project Noteboard',
+    editDocument: 'Edit current document',
+    saveDocumentKeepEditMode: 'Save document without exiting edit mode',
+    saveDocument: 'Save current document',
+    focusPreviousDocumentTab: 'Previous document tab',
+    focusNextDocumentTab: 'Next document tab',
+    moveDocumentTabLeft: 'Move document tab left',
+    moveDocumentTabRight: 'Move document tab right'
   },
   filterNoResultsDescription: 'Fantasia hittade tyvärr inga nyckelbindningar du letade efter. Testa en annan sökterm?',
   filterNoResultsTitle: 'Inga nyckelbindningar hittades',

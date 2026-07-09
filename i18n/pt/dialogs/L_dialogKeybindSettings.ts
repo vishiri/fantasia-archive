@@ -31,6 +31,13 @@ export default {
     toggleDeveloperTools: 'Alternar ferramentas de desenvolvedor',
     toggleAppNoteboard: 'Alternar bloco de notas do aplicativo',
     toggleProjectNoteboard: 'Alternar quadro de notas do projeto',
+    editDocument: 'Edit current document',
+    saveDocumentKeepEditMode: 'Save document without exiting edit mode',
+    saveDocument: 'Save current document',
+    focusPreviousDocumentTab: 'Previous document tab',
+    focusNextDocumentTab: 'Next document tab',
+    moveDocumentTabLeft: 'Move document tab left',
+    moveDocumentTabRight: 'Move document tab right'
   },
   filterNoResultsDescription: 'Infelizmente, Fantasia não encontrou nenhum atalho de teclado que você estava procurando. Tentar um termo de pesquisa diferente?',
   filterNoResultsTitle: 'Nenhum atalho de teclado encontrado',

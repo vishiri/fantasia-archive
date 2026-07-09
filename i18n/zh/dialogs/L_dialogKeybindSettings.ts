@@ -31,6 +31,13 @@ export default {
     toggleDeveloperTools: '切换开发者工具',
     toggleAppNoteboard: '切换应用程序记事板',
     toggleProjectNoteboard: '切换项目记事本',
+    editDocument: 'Edit current document',
+    saveDocumentKeepEditMode: 'Save document without exiting edit mode',
+    saveDocument: 'Save current document',
+    focusPreviousDocumentTab: 'Previous document tab',
+    focusNextDocumentTab: 'Next document tab',
+    moveDocumentTabLeft: 'Move document tab left',
+    moveDocumentTabRight: 'Move document tab right'
   },
   filterNoResultsDescription: '遗憾的是，Fantasia 没有找到您正在寻找的任何按键绑定。尝试不同的搜索词？',
   filterNoResultsTitle: '未找到按键绑定',

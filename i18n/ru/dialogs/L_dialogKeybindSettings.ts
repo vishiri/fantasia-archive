@@ -31,6 +31,13 @@ export default {
     toggleDeveloperTools: 'Переключить инструменты разработчика',
     toggleAppNoteboard: 'Переключить блокнот приложения',
     toggleProjectNoteboard: 'Переключить блокнот проекта',
+    editDocument: 'Edit current document',
+    saveDocumentKeepEditMode: 'Save document without exiting edit mode',
+    saveDocument: 'Save current document',
+    focusPreviousDocumentTab: 'Previous document tab',
+    focusNextDocumentTab: 'Next document tab',
+    moveDocumentTabLeft: 'Move document tab left',
+    moveDocumentTabRight: 'Move document tab right'
   },
   filterNoResultsDescription: 'К сожалению, Fantasia не нашла нужных вам сочетаний клавиш. Попробуйте другой поисковый запрос?',
   filterNoResultsTitle: 'Привязки клавиш не найдены',

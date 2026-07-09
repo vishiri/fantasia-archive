@@ -3,12 +3,28 @@ import type {
   I_projectDocumentControlBarComposableApi
 } from 'app/types/I_faProjectDocumentControlBarDomain'
 
+import { buildProjectDocumentControlBarKeybindTooltipLabels } from '../functions/projectDocumentControlBarKeybindTooltipLabels'
+import { buildProjectDocumentControlBarTabContextMenuHandlers } from './projectDocumentControlBarTabContextMenuWiring'
+
 function buildProjectDocumentControlBarTabHandlers (input: {
+  closeAllTabsWithoutChanges: () => void | Promise<void>
+  closeTabsWithoutChangesExcept: (exceptDocumentId: string) => void | Promise<void>
+  requestDeleteDocument: (documentId: string) => void
+  forceCloseAllTabs: () => void | Promise<void>
+  forceCloseAllTabsExcept: (exceptDocumentId: string) => void | Promise<void>
   requestCloseTab: (documentId: string) => void
   resolveDocumentTabLabelFromOpenedTab: I_assembleProjectDocumentControlBarApiInput['resolveDocumentTabLabelFromOpenedTab']
 }): Pick<
   I_projectDocumentControlBarComposableApi,
-  'onTabAuxClick' | 'onTabCloseClick' | 'resolveDocumentTabLabel' | 'resolveDocumentTabRoute'
+  | 'onTabAuxClick'
+  | 'onTabCloseClick'
+  | 'onTabCloseAllWithoutChangesClick'
+  | 'onTabCloseAllWithoutChangesExceptClick'
+  | 'onTabDeleteClick'
+  | 'onTabForceCloseAllClick'
+  | 'onTabForceCloseAllExceptClick'
+  | 'resolveDocumentTabLabel'
+  | 'resolveDocumentTabRoute'
 > {
   function resolveDocumentTabRoute (documentId: string): string {
     return `/home/document/${documentId}`
@@ -28,6 +44,26 @@ function buildProjectDocumentControlBarTabHandlers (input: {
     input.requestCloseTab(documentId)
   }
 
+  function onTabCloseAllWithoutChangesExceptClick (documentId: string): void {
+    void input.closeTabsWithoutChangesExcept(documentId)
+  }
+
+  function onTabCloseAllWithoutChangesClick (): void {
+    void input.closeAllTabsWithoutChanges()
+  }
+
+  function onTabForceCloseAllExceptClick (documentId: string): void {
+    void input.forceCloseAllTabsExcept(documentId)
+  }
+
+  function onTabForceCloseAllClick (): void {
+    void input.forceCloseAllTabs()
+  }
+
+  function onTabDeleteClick (documentId: string): void {
+    input.requestDeleteDocument(documentId)
+  }
+
   function onTabAuxClick (documentId: string, event: MouseEvent): void {
     if (event.button !== 1) {
       return
@@ -39,7 +75,12 @@ function buildProjectDocumentControlBarTabHandlers (input: {
 
   return {
     onTabAuxClick,
+    onTabCloseAllWithoutChangesClick,
+    onTabCloseAllWithoutChangesExceptClick,
     onTabCloseClick,
+    onTabDeleteClick,
+    onTabForceCloseAllClick,
+    onTabForceCloseAllExceptClick,
     resolveDocumentTabLabel,
     resolveDocumentTabRoute
   }
@@ -48,10 +89,11 @@ function buildProjectDocumentControlBarTabHandlers (input: {
 function buildProjectDocumentControlBarEditModeHandlers (input: {
   activeDocumentId: I_assembleProjectDocumentControlBarApiInput['activeDocumentId']
   enterDocumentEditMode: I_assembleProjectDocumentControlBarApiInput['enterDocumentEditMode']
-  saveDocumentDisplayName: I_assembleProjectDocumentControlBarApiInput['saveDocumentDisplayName']
+  requestDeleteDocument: I_assembleProjectDocumentControlBarApiInput['requestDeleteDocument']
+  runFaAction: I_assembleProjectDocumentControlBarApiInput['runFaAction']
 }): Pick<
   I_projectDocumentControlBarComposableApi,
-  'onEnterEditModeClick' | 'onSaveDocumentClick'
+  'onDeleteCurrentDocumentClick' | 'onEnterEditModeClick' | 'onSaveDocumentClick'
 > {
   function onEnterEditModeClick (): void {
     const documentId = input.activeDocumentId.value
@@ -61,15 +103,27 @@ function buildProjectDocumentControlBarEditModeHandlers (input: {
     input.enterDocumentEditMode(documentId)
   }
 
+  function onDeleteCurrentDocumentClick (): void {
+    const documentId = input.activeDocumentId.value
+    if (documentId === null) {
+      return
+    }
+    input.requestDeleteDocument(documentId)
+  }
+
   function onSaveDocumentClick (keepEditMode: boolean): void {
     const documentId = input.activeDocumentId.value
     if (documentId === null) {
       return
     }
-    void input.saveDocumentDisplayName(documentId, { keepEditMode })
+    input.runFaAction('saveOpenedDocumentDisplayName', {
+      documentId,
+      keepEditMode
+    })
   }
 
   return {
+    onDeleteCurrentDocumentClick,
     onEnterEditModeClick,
     onSaveDocumentClick
   }
@@ -117,6 +171,13 @@ export function assembleProjectDocumentControlBarApi (
     })
   })
 
+  const showDeleteDocumentButton = input.computed(() => {
+    return input.resolveShowProjectDocumentControlBarDeleteButton({
+      activeDocumentTab: activeDocumentTab.value,
+      isOnDocumentWorkspaceRoute: input.isOnDocumentWorkspaceRoute.value
+    })
+  })
+
   const saveDocumentButtonColor = input.computed(() => {
     const tab = activeDocumentTab.value
     if (tab === null) {
@@ -131,6 +192,11 @@ export function assembleProjectDocumentControlBarApi (
   })
 
   const tabHandlers = buildProjectDocumentControlBarTabHandlers({
+    closeAllTabsWithoutChanges: input.closeAllTabsWithoutChanges,
+    closeTabsWithoutChangesExcept: input.closeTabsWithoutChangesExcept,
+    requestDeleteDocument: input.requestDeleteDocument,
+    forceCloseAllTabs: input.forceCloseAllTabs,
+    forceCloseAllTabsExcept: input.forceCloseAllTabsExcept,
     requestCloseTab: input.requestCloseTab,
     resolveDocumentTabLabelFromOpenedTab: input.resolveDocumentTabLabelFromOpenedTab
   })
@@ -138,7 +204,25 @@ export function assembleProjectDocumentControlBarApi (
   const editModeHandlers = buildProjectDocumentControlBarEditModeHandlers({
     activeDocumentId: input.activeDocumentId,
     enterDocumentEditMode: input.enterDocumentEditMode,
-    saveDocumentDisplayName: input.saveDocumentDisplayName
+    requestDeleteDocument: input.requestDeleteDocument,
+    runFaAction: input.runFaAction
+  })
+
+  const keybindTooltipLabels = buildProjectDocumentControlBarKeybindTooltipLabels({
+    computed: input.computed,
+    formatFaKeybindCommandLabelFromSnapshot: input.formatFaKeybindCommandLabelFromSnapshot,
+    getKeybindsSnapshot: input.getKeybindsSnapshot
+  })
+
+  const contextMenuHandlers = buildProjectDocumentControlBarTabContextMenuHandlers({
+    copyToClipboard: input.copyToClipboard,
+    findTabByDocumentId: input.findTabByDocumentId,
+    moveDocumentTab: input.moveDocumentTab,
+    notifyCreate: input.notifyCreate,
+    requestCloseTab: input.requestCloseTab,
+    resolveDocumentTabLabelFromOpenedTab: input.resolveDocumentTabLabelFromOpenedTab,
+    translateCopyNameFailed: input.translateCopyNameFailed,
+    translateCopyNameSuccess: input.translateCopyNameSuccess
   })
 
   return {
@@ -147,10 +231,13 @@ export function assembleProjectDocumentControlBarApi (
     openedDocumentTabs: input.tabs,
     showDocumentControlBar,
     showDocumentTabs,
+    showDeleteDocumentButton,
     showEditDocumentButton,
     showSaveDocumentButtons,
     saveDocumentButtonColor,
+    ...keybindTooltipLabels,
     ...tabHandlers,
-    ...editModeHandlers
+    ...editModeHandlers,
+    ...contextMenuHandlers
   }
 }

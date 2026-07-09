@@ -490,6 +490,11 @@ test('findFaKeybindCommandDefinition returns undefined for unknown ids', () => {
 
 test('FA_KEYBIND_COMMAND_DEFINITIONS lists expected commands', () => {
   expect(FA_KEYBIND_COMMAND_DEFINITIONS.map((d) => d.id).sort()).toEqual([
+    'editDocument',
+    'focusNextDocumentTab',
+    'focusPreviousDocumentTab',
+    'moveDocumentTabLeft',
+    'moveDocumentTabRight',
     'openActionMonitor',
     'openAdvancedSearchGuide',
     'openAppSettings',
@@ -497,6 +502,8 @@ test('FA_KEYBIND_COMMAND_DEFINITIONS lists expected commands', () => {
     'openKeybindSettings',
     'openProjectSettings',
     'openProjectStyling',
+    'saveDocument',
+    'saveDocumentKeepEditMode',
     'showProjectDashboard',
     'toggleAppNoteboard',
     'toggleDeveloperTools',

@@ -5,6 +5,8 @@ export default {
   labels: {
     closeApp: 'Fenster schließen',
     languageSwitch: 'Schnittstellensprache wechseln',
+    moveActiveOpenedDocumentTabLeft: 'Move document tab left',
+    moveActiveOpenedDocumentTabRight: 'Move document tab right',
     minimizeApp: 'Fenster minimieren',
     openAboutFantasiaArchiveDialog: 'Öffnen Sie Über Fantasia Archive',
     openActionMonitorDialog: 'Öffnen Sie den Aktionsmonitor',
@@ -12,6 +14,7 @@ export default {
     openChangelogDialog: 'Öffnen Sie das Änderungsprotokoll',
     openKeybindSettingsDialog: 'Öffnen Sie die Tastenkombinationseinstellungen',
     openProjectSettingsDialog: 'Projekteinstellungen öffnen',
+    saveOpenedDocumentDisplayName: 'Save document',
     saveProjectSettings: 'Projekteinstellungen speichern',
     openLicenseDialog: 'Offene Lizenz',
     openAppSettingsDialog: 'Öffnen Sie die App-Einstellungen',

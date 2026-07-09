@@ -47,7 +47,13 @@ export const FA_ACTION_IDS = [
   'importAppConfigApply',
   'createNewProject',
   'openNewProjectDialog',
-  'loadExistingProject'
+  'loadExistingProject',
+  'editActiveDocument',
+  'saveOpenedDocumentDisplayName',
+  'focusPreviousOpenedDocumentTab',
+  'focusNextOpenedDocumentTab',
+  'moveActiveOpenedDocumentTabLeft',
+  'moveActiveOpenedDocumentTabRight'
 ] as const
 
 /**
@@ -134,6 +140,12 @@ export interface I_faActionPayloadMap {
     status: 'canceled' | 'fail' | 'pass'
   }
   importAppConfigApply: I_faAppConfigApplyInput
+  editActiveDocument: void
+  saveOpenedDocumentDisplayName: { documentId: string, keepEditMode: boolean }
+  focusPreviousOpenedDocumentTab: void
+  focusNextOpenedDocumentTab: void
+  moveActiveOpenedDocumentTabLeft: void
+  moveActiveOpenedDocumentTabRight: void
 }
 
 /**

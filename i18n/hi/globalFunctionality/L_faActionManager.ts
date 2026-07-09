@@ -5,6 +5,8 @@ export default {
   labels: {
     closeApp: 'विंडो बंद',
     languageSwitch: 'इंटरफ़ेस भाषा स्विच करें',
+    moveActiveOpenedDocumentTabLeft: 'Move document tab left',
+    moveActiveOpenedDocumentTabRight: 'Move document tab right',
     minimizeApp: 'विंडो को छोटा करें',
     openAboutFantasiaArchiveDialog: 'Fantasia Archive के बारे में खोलें',
     openActionMonitorDialog: 'एक्शन मॉनिटर खोलें',
@@ -12,6 +14,7 @@ export default {
     openChangelogDialog: 'चेंजलॉग खोलें',
     openKeybindSettingsDialog: 'कीबाइंड सेटिंग्स खोलें',
     openProjectSettingsDialog: 'परियोजना सेटिंग्स खोलें',
+    saveOpenedDocumentDisplayName: 'Save document',
     saveProjectSettings: 'परियोजना सेटिंग्स सहेजें',
     openLicenseDialog: 'लाइसेंस खोलें',
     openAppSettingsDialog: 'ऐप सेटिंग खोलें',

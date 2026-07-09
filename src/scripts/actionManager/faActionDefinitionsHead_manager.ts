@@ -12,6 +12,12 @@ import {
   handleOpenAppSettingsDialog,
   handleOpenProjectSettingsDialog,
   handleShowProjectDashboard,
+  handleEditActiveDocument,
+  handleSaveOpenedDocumentDisplayName,
+  handleFocusPreviousOpenedDocumentTab,
+  handleFocusNextOpenedDocumentTab,
+  handleMoveActiveOpenedDocumentTabLeft,
+  handleMoveActiveOpenedDocumentTabRight,
   handleOpenAppStylingWindow,
   handleOpenProjectStylingWindow,
   handleOpenTipsTricksTriviaDialog,
@@ -80,6 +86,36 @@ export const FA_ACTION_DEFINITIONS_HEAD: ReadonlyArray<I_faActionDefinition<T_fa
     dedup: true,
     handler: handleShowProjectDashboard as I_faActionDefinition<T_faActionId>['handler'],
     id: 'showProjectDashboard',
+    kind: 'async'
+  },
+  {
+    handler: handleEditActiveDocument as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'editActiveDocument',
+    kind: 'async'
+  },
+  {
+    handler: handleSaveOpenedDocumentDisplayName as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'saveOpenedDocumentDisplayName',
+    kind: 'sync'
+  },
+  {
+    handler: handleFocusPreviousOpenedDocumentTab as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'focusPreviousOpenedDocumentTab',
+    kind: 'async'
+  },
+  {
+    handler: handleFocusNextOpenedDocumentTab as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'focusNextOpenedDocumentTab',
+    kind: 'async'
+  },
+  {
+    handler: handleMoveActiveOpenedDocumentTabLeft as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'moveActiveOpenedDocumentTabLeft',
+    kind: 'async'
+  },
+  {
+    handler: handleMoveActiveOpenedDocumentTabRight as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'moveActiveOpenedDocumentTabRight',
     kind: 'async'
   },
   {

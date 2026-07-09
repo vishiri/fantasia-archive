@@ -48,6 +48,23 @@
                 :data-test-locator="`projectDocumentControlBar-tabClose-${tab.documentId}`"
                 @click.stop.prevent="onTabCloseClick(tab.documentId)"
               />
+              <ProjectDocumentControlBarTabContextMenu
+                :active-document-tab-name="activeDocumentTabName"
+                :move-document-tab-left-keybind-label="moveDocumentTabLeftKeybindLabel"
+                :move-document-tab-right-keybind-label="moveDocumentTabRightKeybindLabel"
+                :on-tab-close-all-without-changes-click="onTabCloseAllWithoutChangesClick"
+                :on-tab-close-all-without-changes-except-click="onTabCloseAllWithoutChangesExceptClick"
+                :on-tab-close-click="onTabCloseClick"
+                :on-tab-copy-name-click="onTabCopyNameClick"
+                :on-tab-delete-click="onTabDeleteClick"
+                :on-tab-force-close-all-click="onTabForceCloseAllClick"
+                :on-tab-force-close-all-except-click="onTabForceCloseAllExceptClick"
+                :on-tab-move-click="onTabMoveClick"
+                :opened-document-tabs="openedDocumentTabs"
+                :resolve-document-tab-label="resolveDocumentTabLabel"
+                :resolve-document-tab-route="resolveDocumentTabRoute"
+                :tab="tab"
+              />
             </q-route-tab>
           </TransitionGroup>
         </q-tabs>
@@ -79,7 +96,17 @@
                 :delay="500"
                 self="top middle"
               >
-                {{ editDocumentTooltip }}
+                <div class="fa-tooltip-keybind-stack">
+                  <span class="fa-tooltip-keybind-stack__label">
+                    {{ editDocumentTooltip }}
+                  </span><div
+                    v-if="editDocumentKeybindLabel !== null"
+                    class="fa-tooltip-keybind-hint fa-text-keybind-hint"
+                    data-test-locator="projectDocumentControlBar-editDocumentButton-keybind"
+                  >
+                    ({{ editDocumentKeybindLabel }})
+                  </div>
+                </div>
               </q-tooltip>
             </q-btn>
             <q-btn
@@ -96,7 +123,17 @@
                 :delay="500"
                 self="top middle"
               >
-                {{ saveDocumentKeepEditModeTooltip }}
+                <div class="fa-tooltip-keybind-stack">
+                  <span class="fa-tooltip-keybind-stack__label">
+                    {{ saveDocumentKeepEditModeTooltip }}
+                  </span><div
+                    v-if="saveDocumentKeepEditModeKeybindLabel !== null"
+                    class="fa-tooltip-keybind-hint fa-text-keybind-hint"
+                    data-test-locator="projectDocumentControlBar-saveDocumentKeepEditModeButton-keybind"
+                  >
+                    ({{ saveDocumentKeepEditModeKeybindLabel }})
+                  </div>
+                </div>
               </q-tooltip>
             </q-btn>
             <q-btn
@@ -113,9 +150,25 @@
                 :delay="500"
                 self="top middle"
               >
-                {{ saveDocumentTooltip }}
+                <div class="fa-tooltip-keybind-stack">
+                  <span class="fa-tooltip-keybind-stack__label">
+                    {{ saveDocumentTooltip }}
+                  </span><div
+                    v-if="saveDocumentKeybindLabel !== null"
+                    class="fa-tooltip-keybind-hint fa-text-keybind-hint"
+                    data-test-locator="projectDocumentControlBar-saveDocumentButton-keybind"
+                  >
+                    ({{ saveDocumentKeybindLabel }})
+                  </div>
+                </div>
               </q-tooltip>
             </q-btn>
+            <ProjectDocumentControlBarDeleteDocumentButton
+              v-if="showDeleteDocumentButton"
+              :show-leading-separator="showEditDocumentButton || showSaveDocumentButtons"
+              :tooltip-label="deleteCurrentDocumentTooltip"
+              @click="onDeleteCurrentDocumentClick"
+            />
           </div>
         </div>
       </div>
@@ -126,6 +179,7 @@
       class="projectDocumentControlBar__flowSpacer"
     />
     <DialogDiscardOpenedDocumentTab />
+    <DialogDeleteOpenedDocument />
   </div>
 </template>
 
@@ -133,7 +187,11 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import DialogDeleteOpenedDocument from 'app/src/components/dialogs/DialogDeleteOpenedDocument/DialogDeleteOpenedDocument.vue'
 import DialogDiscardOpenedDocumentTab from 'app/src/components/dialogs/DialogDiscardOpenedDocumentTab/DialogDiscardOpenedDocumentTab.vue'
+
+import ProjectDocumentControlBarDeleteDocumentButton from './ProjectDocumentControlBarDeleteDocumentButton.vue'
+import ProjectDocumentControlBarTabContextMenu from './ProjectDocumentControlBarTabContextMenu.vue'
 
 import {
   PROJECT_DOCUMENT_CONTROL_BAR_TAB_ENTER_ACTIVE_CLASS,
@@ -151,6 +209,10 @@ defineOptions({
 
 const { t } = useI18n()
 
+const deleteCurrentDocumentTooltip = computed(() => {
+  return t('projectUI.projectDocumentControlBar.deleteCurrentDocumentTooltip')
+})
+
 const editDocumentTooltip = computed(() => {
   return t('projectUI.projectDocumentControlBar.editDocumentTooltip')
 })
@@ -165,13 +227,27 @@ const saveDocumentTooltip = computed(() => {
 
 const {
   activeDocumentTabName,
+  editDocumentKeybindLabel,
+  moveDocumentTabLeftKeybindLabel,
+  moveDocumentTabRightKeybindLabel,
   onEnterEditModeClick,
+  onDeleteCurrentDocumentClick,
   onSaveDocumentClick,
   onTabAuxClick,
+  onTabCloseAllWithoutChangesClick,
+  onTabCloseAllWithoutChangesExceptClick,
   onTabCloseClick,
+  onTabCopyNameClick,
+  onTabDeleteClick,
+  onTabForceCloseAllClick,
+  onTabForceCloseAllExceptClick,
+  onTabMoveClick,
   openedDocumentTabs,
   resolveDocumentTabLabel,
   resolveDocumentTabRoute,
+  saveDocumentKeepEditModeKeybindLabel,
+  saveDocumentKeybindLabel,
+  showDeleteDocumentButton,
   showDocumentControlBar,
   showDocumentTabs,
   showEditDocumentButton,

@@ -31,6 +31,13 @@ export default {
     toggleDeveloperTools: 'डेवलपर टूल टॉगल करें',
     toggleAppNoteboard: 'ऐप नोटबोर्ड टॉगल करें',
     toggleProjectNoteboard: 'प्रोजेक्ट नोटबोर्ड टॉगल करें',
+    editDocument: 'Edit current document',
+    saveDocumentKeepEditMode: 'Save document without exiting edit mode',
+    saveDocument: 'Save current document',
+    focusPreviousDocumentTab: 'Previous document tab',
+    focusNextDocumentTab: 'Next document tab',
+    moveDocumentTabLeft: 'Move document tab left',
+    moveDocumentTabRight: 'Move document tab right'
   },
   filterNoResultsDescription: 'दुख की बात है कि फंतासिया को कोई भी कीबाइंड नहीं मिला जिसकी आप तलाश कर रहे थे। कोई भिन्न खोज शब्द आज़माएँ?',
   filterNoResultsTitle: 'कोई कीबाइंड नहीं मिला',

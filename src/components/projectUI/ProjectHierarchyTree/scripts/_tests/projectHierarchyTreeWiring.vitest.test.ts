@@ -2219,6 +2219,7 @@ test('Test that createProjectHierarchyTreeSessionWiring returns tree API', async
     },
     hierarchyStore: {
       clearPendingDocumentRefreshIds: vi.fn(),
+      clearPendingHierarchyNodeRefreshIds: vi.fn(),
       clearPendingRevealPath: vi.fn(),
       flushUiStatePersist: vi.fn(),
       queuePersistExpandedNodeIds: vi.fn(),
@@ -2232,6 +2233,7 @@ test('Test that createProjectHierarchyTreeSessionWiring returns tree API', async
     onMounted: vi.fn(),
     onUnmounted: vi.fn(),
     pendingDocumentRefreshIds: ref([]),
+    pendingHierarchyNodeRefreshIds: ref([]),
     pendingRevealPath: ref([]),
     ref,
     treeData,
@@ -2470,6 +2472,7 @@ test('Test that createUseProjectHierarchyTree composes hierarchy session wiring'
     storeToRefs: ((store: { flushUiStatePersist?: unknown }) => {
       return {
         pendingDocumentRefreshIds,
+        pendingHierarchyNodeRefreshIds: ref<string[]>([]),
         pendingRevealPath,
         treeData: ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])),
         uiState: ref({
@@ -2531,6 +2534,7 @@ test('Test that createUseProjectHierarchyTree treats missing route path as non-d
     resolveFaDocumentWorkspaceRouteDocumentId: () => null,
     storeToRefs: (() => ({
       pendingDocumentRefreshIds: ref<string[]>([]),
+      pendingHierarchyNodeRefreshIds: ref<string[]>([]),
       pendingRevealPath: ref<string[]>([]),
       treeData: ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])),
       uiState: ref({
@@ -3037,6 +3041,7 @@ test('Test that createProjectHierarchyTreeSessionWiring invokes lifecycle store 
   const { createProjectHierarchyTreeSessionWiring } = await import('../projectHierarchyTreeSessionWiring')
   const hierarchyStore = {
     clearPendingDocumentRefreshIds: vi.fn(),
+    clearPendingHierarchyNodeRefreshIds: vi.fn(),
     clearPendingRevealPath: vi.fn(),
     flushUiStatePersist: vi.fn(),
     queuePersistExpandedNodeIds: vi.fn(),
@@ -3060,6 +3065,7 @@ test('Test that createProjectHierarchyTreeSessionWiring invokes lifecycle store 
     onMounted: (hook) => hook(),
     onUnmounted: (hook) => hook(),
     pendingDocumentRefreshIds: ref([]),
+    pendingHierarchyNodeRefreshIds: ref([]),
     pendingRevealPath: ref([]),
     ref,
     treeData: ref([]),

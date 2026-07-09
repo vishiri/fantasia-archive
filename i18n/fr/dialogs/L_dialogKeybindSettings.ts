@@ -31,6 +31,13 @@ export default {
     toggleDeveloperTools: 'Toggle Outils de développement',
     toggleAppNoteboard: 'Basculer le bloc-notes de l\'application',
     toggleProjectNoteboard: 'Toggle Bloc-notes du projet',
+    editDocument: 'Edit current document',
+    saveDocumentKeepEditMode: 'Save document without exiting edit mode',
+    saveDocument: 'Save current document',
+    focusPreviousDocumentTab: 'Previous document tab',
+    focusNextDocumentTab: 'Next document tab',
+    moveDocumentTabLeft: 'Move document tab left',
+    moveDocumentTabRight: 'Move document tab right'
   },
   filterNoResultsDescription: 'Fantasia n\'a malheureusement pas trouvé les raccourcis clavier que vous recherchiez. Essayez un autre terme de recherche ?',
   filterNoResultsTitle: 'Aucun raccourci clavier trouvé',

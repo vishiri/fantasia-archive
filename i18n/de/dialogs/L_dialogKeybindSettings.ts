@@ -31,6 +31,13 @@ export default {
     toggleDeveloperTools: 'Entwicklertools umschalten',
     toggleAppNoteboard: 'App-Noteboard umschalten',
     toggleProjectNoteboard: 'Schalten Sie die Projektnotiz um',
+    editDocument: 'Edit current document',
+    saveDocumentKeepEditMode: 'Save document without exiting edit mode',
+    saveDocument: 'Save current document',
+    focusPreviousDocumentTab: 'Previous document tab',
+    focusNextDocumentTab: 'Next document tab',
+    moveDocumentTabLeft: 'Move document tab left',
+    moveDocumentTabRight: 'Move document tab right'
   },
   filterNoResultsDescription: 'Fantasia hat leider keine Tastenkombinationen gefunden, nach denen Sie gesucht haben. Versuchen Sie es mit einem anderen Suchbegriff?',
   filterNoResultsTitle: 'Keine Tastenkombinationen gefunden',

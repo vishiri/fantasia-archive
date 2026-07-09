@@ -66,3 +66,46 @@ export const FA_PLAYWRIGHT_PRESS_DEFAULT_TOGGLE_PROJECT_NOTEBOARD = 'Control+Alt
  * 'FA_KEYBIND_COMMAND_DEFINITIONS' for 'showProjectDashboard').
  */
 export const FA_PLAYWRIGHT_PRESS_DEFAULT_SHOW_PROJECT_DASHBOARD = 'Control+Alt+Shift+O' as const
+
+/**
+ * Default **Edit current document** chord: **primary** + **E**.
+ */
+export function getFaPlaywrightDefaultEditDocumentPressString (
+  platform: NodeJS.Platform = process.platform
+): string {
+  return platform === 'darwin' ? 'Meta+E' : 'Control+E'
+}
+
+/**
+ * Default **Save document without exiting edit mode** chord: **primary** + **S**.
+ */
+export function getFaPlaywrightDefaultSaveDocumentKeepEditModePressString (
+  platform: NodeJS.Platform = process.platform
+): string {
+  return platform === 'darwin' ? 'Meta+S' : 'Control+S'
+}
+
+/**
+ * Default **Save current document** chord: literal **Ctrl+Alt+S**.
+ */
+export const FA_PLAYWRIGHT_PRESS_DEFAULT_SAVE_DOCUMENT = 'Control+Alt+S' as const
+
+/**
+ * Default **Previous document tab** chord: **Alt+Left**.
+ */
+export const FA_PLAYWRIGHT_PRESS_DEFAULT_FOCUS_PREVIOUS_DOCUMENT_TAB = 'Alt+ArrowLeft' as const
+
+/**
+ * Default **Next document tab** chord: **Alt+Right**.
+ */
+export const FA_PLAYWRIGHT_PRESS_DEFAULT_FOCUS_NEXT_DOCUMENT_TAB = 'Alt+ArrowRight' as const
+
+/**
+ * Default **Move document tab left** chord: **Alt+Shift+Left**.
+ */
+export const FA_PLAYWRIGHT_PRESS_DEFAULT_MOVE_DOCUMENT_TAB_LEFT = 'Alt+Shift+ArrowLeft' as const
+
+/**
+ * Default **Move document tab right** chord: **Alt+Shift+Right**.
+ */
+export const FA_PLAYWRIGHT_PRESS_DEFAULT_MOVE_DOCUMENT_TAB_RIGHT = 'Alt+Shift+ArrowRight' as const

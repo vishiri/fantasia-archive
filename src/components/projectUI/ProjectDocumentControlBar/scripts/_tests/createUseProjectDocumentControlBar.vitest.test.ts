@@ -6,6 +6,7 @@ import type { I_computedRef } from 'app/types/I_vueCompositionShims'
 import { createUseProjectDocumentControlBar } from '../../functions/createUseProjectDocumentControlBar'
 import {
   resolveProjectDocumentControlBarSaveButtonColor,
+  resolveShowProjectDocumentControlBarDeleteButton,
   resolveShowProjectDocumentControlBarEditButton,
   resolveShowProjectDocumentControlBarSaveButtons
 } from '../../functions/projectDocumentControlBarEditMode'
@@ -16,6 +17,7 @@ import {
   resolveShowDocumentTabs
 } from '../../functions/projectDocumentControlBarVisibility'
 import { assembleProjectDocumentControlBarApi } from '../projectDocumentControlBarSessionWiring'
+import { buildProjectDocumentControlBarAssembleInput } from '../projectDocumentControlBarAssembleInput'
 
 type T_tabSeedRow = {
   documentId: string
@@ -32,10 +34,8 @@ function mountUseProjectDocumentControlBar (input: {
   documentWorkspaceRoute?: boolean
   enterDocumentEditMode?: (documentId: string) => void
   requestCloseTab?: (documentId: string) => void
-  saveDocumentDisplayName?: (
-    documentId: string,
-    options: { keepEditMode: boolean }
-  ) => Promise<boolean>
+  requestDeleteDocument?: (documentId: string) => void
+  runFaAction?: (id: string, payload: unknown) => void
   tabSeed?: T_tabSeedRow[]
 } = {
   disableDocumentControlBar: false
@@ -49,6 +49,7 @@ function mountUseProjectDocumentControlBar (input: {
 
   return createUseProjectDocumentControlBar({
     assembleProjectDocumentControlBarApi,
+    buildProjectDocumentControlBarAssembleInput,
     computed: computed as <T>(getter: () => T) => I_computedRef<T>,
     resolveActiveDocumentTabName,
     resolveDocumentTabLabelFromOpenedTab,
@@ -59,13 +60,31 @@ function mountUseProjectDocumentControlBar (input: {
     resolveShowDocumentControlBarStrip,
     resolveShowDocumentTabs,
     resolveShowProjectDocumentControlBarEditButton,
+    resolveShowProjectDocumentControlBarDeleteButton,
     resolveShowProjectDocumentControlBarSaveButtons,
     resolveProjectDocumentControlBarSaveButtonColor,
+    formatFaKeybindCommandLabelFromSnapshot: () => null,
+    getKeybindsSnapshot: () => null,
+    copyToClipboard: vi.fn(async () => undefined),
+    notifyCreate: vi.fn(),
+    useI18n: () => ({
+      t: (key: string) => key
+    }),
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode: input.enterDocumentEditMode ?? (() => undefined),
-      requestCloseTab: input.requestCloseTab ?? (() => undefined),
-      saveDocumentDisplayName: input.saveDocumentDisplayName ?? (async () => true)
+      findTabByDocumentId: (documentId: string) => {
+        return input.tabSeed?.find((tab) => tab.documentId === documentId) ?? null
+      },
+      closeAllTabsWithoutChanges: async () => undefined,
+      closeTabsWithoutChangesExcept: async () => undefined,
+      deleteOpenedDocument: async () => undefined,
+      requestDeleteDocument: input.requestDeleteDocument ?? (() => undefined),
+      forceCloseAllTabs: async () => undefined,
+      forceCloseAllTabsExcept: async () => undefined,
+      moveDocumentTab: vi.fn(),
+      requestCloseTab: input.requestCloseTab ?? (() => undefined)
     }) as never,
+    runFaAction: input.runFaAction ?? vi.fn(),
     S_FaUserSettings: () => ({}) as never,
     storeToRefs: (store: unknown) => {
       if (store === undefined) {
@@ -136,6 +155,7 @@ test('Test that activeDocumentTabName mirrors the store active document when tha
   const activeDocumentId = ref<string | null>('doc-a')
   const api = createUseProjectDocumentControlBar({
     assembleProjectDocumentControlBarApi,
+    buildProjectDocumentControlBarAssembleInput,
     computed: computed as <T>(getter: () => T) => I_computedRef<T>,
     resolveActiveDocumentTabName,
     resolveDocumentTabLabelFromOpenedTab,
@@ -143,12 +163,28 @@ test('Test that activeDocumentTabName mirrors the store active document when tha
     resolveShowDocumentControlBarStrip,
     resolveShowDocumentTabs,
     resolveShowProjectDocumentControlBarEditButton,
+    resolveShowProjectDocumentControlBarDeleteButton,
     resolveShowProjectDocumentControlBarSaveButtons,
     resolveProjectDocumentControlBarSaveButtonColor,
+    formatFaKeybindCommandLabelFromSnapshot: () => null,
+    getKeybindsSnapshot: () => null,
+    copyToClipboard: vi.fn(async () => undefined),
+    notifyCreate: vi.fn(),
+    useI18n: () => ({
+      t: (key: string) => key
+    }),
+    runFaAction: vi.fn(),
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode: () => undefined,
-      requestCloseTab: () => undefined,
-      saveDocumentDisplayName: async () => true
+      findTabByDocumentId: () => null,
+      closeAllTabsWithoutChanges: async () => undefined,
+      closeTabsWithoutChangesExcept: async () => undefined,
+      deleteOpenedDocument: async () => undefined,
+      requestDeleteDocument: () => undefined,
+      forceCloseAllTabs: async () => undefined,
+      forceCloseAllTabsExcept: async () => undefined,
+      moveDocumentTab: () => undefined,
+      requestCloseTab: () => undefined
     }) as never,
     S_FaUserSettings: () => ({}) as never,
     storeToRefs: (store: unknown) => {
@@ -188,6 +224,44 @@ test('Test that createUseProjectDocumentControlBar exposes edit and save button 
 
   expect(api.showEditDocumentButton.value).toBe(true)
   expect(api.showSaveDocumentButtons.value).toBe(false)
+  expect(api.showDeleteDocumentButton.value).toBe(true)
+})
+
+test('Test that createUseProjectDocumentControlBar shows delete button in edit mode on document routes', () => {
+  const api = mountUseProjectDocumentControlBar({
+    disableDocumentControlBar: false,
+    tabSeed: [{
+      documentId: 'doc-a',
+      displayNameDraft: 'A',
+      editState: true,
+      hasUnsavedChanges: false,
+      savedDisplayName: 'A',
+      tabLabel: 'Character',
+      templateIcon: 'mdi-account'
+    }]
+  })
+
+  expect(api.showDeleteDocumentButton.value).toBe(true)
+})
+
+test('Test that onDeleteCurrentDocumentClick delegates to requestDeleteDocument', () => {
+  const requestDeleteDocument = vi.fn()
+  const api = mountUseProjectDocumentControlBar({
+    disableDocumentControlBar: false,
+    requestDeleteDocument,
+    tabSeed: [{
+      documentId: 'doc-a',
+      displayNameDraft: 'A',
+      editState: false,
+      hasUnsavedChanges: false,
+      savedDisplayName: 'A',
+      tabLabel: 'Character',
+      templateIcon: 'mdi-account'
+    }]
+  })
+
+  api.onDeleteCurrentDocumentClick()
+  expect(requestDeleteDocument).toHaveBeenCalledWith('doc-a')
 })
 
 test('Test that saveDocumentButtonColor reflects active tab unsaved state in edit mode', () => {
@@ -260,11 +334,11 @@ test('Test that onTabAuxClick requests close on middle button only', () => {
   expect(stopPropagation).toHaveBeenCalledTimes(1)
 })
 
-test('Test that onSaveDocumentClick delegates keepEditMode to the opened documents store', async () => {
-  const saveDocumentDisplayName = vi.fn(async () => true)
+test('Test that onSaveDocumentClick enqueues saveOpenedDocumentDisplayName with captured documentId', () => {
+  const runFaAction = vi.fn()
   const api = mountUseProjectDocumentControlBar({
     disableDocumentControlBar: false,
-    saveDocumentDisplayName,
+    runFaAction,
     tabSeed: [{
       documentId: 'doc-a',
       displayNameDraft: 'A',
@@ -277,18 +351,22 @@ test('Test that onSaveDocumentClick delegates keepEditMode to the opened documen
   })
 
   api.onSaveDocumentClick(true)
-  await Promise.resolve()
-  expect(saveDocumentDisplayName).toHaveBeenCalledWith('doc-a', { keepEditMode: true })
+  expect(runFaAction).toHaveBeenCalledWith('saveOpenedDocumentDisplayName', {
+    documentId: 'doc-a',
+    keepEditMode: true
+  })
 
-  saveDocumentDisplayName.mockClear()
+  runFaAction.mockClear()
   api.onSaveDocumentClick(false)
-  await Promise.resolve()
-  expect(saveDocumentDisplayName).toHaveBeenCalledWith('doc-a', { keepEditMode: false })
+  expect(runFaAction).toHaveBeenCalledWith('saveOpenedDocumentDisplayName', {
+    documentId: 'doc-a',
+    keepEditMode: false
+  })
 })
 
 test('Test that edit and save handlers no-op when no active document is selected', () => {
   const enterDocumentEditMode = vi.fn()
-  const saveDocumentDisplayName = vi.fn(async () => true)
+  const runFaAction = vi.fn()
   const settings = ref({ disableDocumentControlBar: false })
   const tabs = ref([
     {
@@ -304,6 +382,7 @@ test('Test that edit and save handlers no-op when no active document is selected
   const activeDocumentId = ref<string | null>(null)
   const api = createUseProjectDocumentControlBar({
     assembleProjectDocumentControlBarApi,
+    buildProjectDocumentControlBarAssembleInput,
     computed: computed as <T>(getter: () => T) => I_computedRef<T>,
     resolveActiveDocumentTabName,
     resolveDocumentTabLabelFromOpenedTab,
@@ -311,12 +390,28 @@ test('Test that edit and save handlers no-op when no active document is selected
     resolveShowDocumentControlBarStrip,
     resolveShowDocumentTabs,
     resolveShowProjectDocumentControlBarEditButton,
+    resolveShowProjectDocumentControlBarDeleteButton,
     resolveShowProjectDocumentControlBarSaveButtons,
     resolveProjectDocumentControlBarSaveButtonColor,
+    formatFaKeybindCommandLabelFromSnapshot: () => null,
+    getKeybindsSnapshot: () => null,
+    copyToClipboard: vi.fn(async () => undefined),
+    notifyCreate: vi.fn(),
+    useI18n: () => ({
+      t: (key: string) => key
+    }),
+    runFaAction,
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode,
-      requestCloseTab: () => undefined,
-      saveDocumentDisplayName
+      findTabByDocumentId: () => null,
+      closeAllTabsWithoutChanges: async () => undefined,
+      closeTabsWithoutChangesExcept: async () => undefined,
+      deleteOpenedDocument: async () => undefined,
+      requestDeleteDocument: () => undefined,
+      forceCloseAllTabs: async () => undefined,
+      forceCloseAllTabsExcept: async () => undefined,
+      moveDocumentTab: () => undefined,
+      requestCloseTab: () => undefined
     }) as never,
     S_FaUserSettings: () => ({}) as never,
     storeToRefs: (store: unknown) => {
@@ -337,7 +432,7 @@ test('Test that edit and save handlers no-op when no active document is selected
   api.onEnterEditModeClick()
   api.onSaveDocumentClick(true)
   expect(enterDocumentEditMode).not.toHaveBeenCalled()
-  expect(saveDocumentDisplayName).not.toHaveBeenCalled()
+  expect(runFaAction).not.toHaveBeenCalled()
   expect(api.saveDocumentButtonColor.value).toBe('primary-bright')
   expect(api.activeDocumentTab.value).toBeNull()
 })
@@ -388,6 +483,7 @@ test('Test that activeDocumentTab is null when the active id does not match an o
   const activeDocumentId = ref<string | null>('doc-missing')
   const api = createUseProjectDocumentControlBar({
     assembleProjectDocumentControlBarApi,
+    buildProjectDocumentControlBarAssembleInput,
     computed: computed as <T>(getter: () => T) => I_computedRef<T>,
     resolveActiveDocumentTabName,
     resolveDocumentTabLabelFromOpenedTab,
@@ -395,12 +491,28 @@ test('Test that activeDocumentTab is null when the active id does not match an o
     resolveShowDocumentControlBarStrip,
     resolveShowDocumentTabs,
     resolveShowProjectDocumentControlBarEditButton,
+    resolveShowProjectDocumentControlBarDeleteButton,
     resolveShowProjectDocumentControlBarSaveButtons,
     resolveProjectDocumentControlBarSaveButtonColor,
+    formatFaKeybindCommandLabelFromSnapshot: () => null,
+    getKeybindsSnapshot: () => null,
+    copyToClipboard: vi.fn(async () => undefined),
+    notifyCreate: vi.fn(),
+    useI18n: () => ({
+      t: (key: string) => key
+    }),
+    runFaAction: vi.fn(),
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode: () => undefined,
-      requestCloseTab: () => undefined,
-      saveDocumentDisplayName: async () => true
+      findTabByDocumentId: () => null,
+      closeAllTabsWithoutChanges: async () => undefined,
+      closeTabsWithoutChangesExcept: async () => undefined,
+      deleteOpenedDocument: async () => undefined,
+      requestDeleteDocument: () => undefined,
+      forceCloseAllTabs: async () => undefined,
+      forceCloseAllTabsExcept: async () => undefined,
+      moveDocumentTab: () => undefined,
+      requestCloseTab: () => undefined
     }) as never,
     S_FaUserSettings: () => ({}) as never,
     storeToRefs: (store: unknown) => {
@@ -420,4 +532,172 @@ test('Test that activeDocumentTab is null when the active id does not match an o
 
   expect(api.activeDocumentTab.value).toBeNull()
   expect(api.saveDocumentButtonColor.value).toBe('primary-bright')
+})
+
+test('Test that createUseProjectDocumentControlBar exposes keybind tooltip labels from the keybind snapshot', () => {
+  const api = createUseProjectDocumentControlBar({
+    assembleProjectDocumentControlBarApi,
+    buildProjectDocumentControlBarAssembleInput,
+    computed: computed as <T>(getter: () => T) => I_computedRef<T>,
+    resolveActiveDocumentTabName,
+    resolveDocumentTabLabelFromOpenedTab,
+    resolveFaDocumentWorkspaceRouteDocumentId: () => 'doc-a',
+    resolveShowDocumentControlBarStrip,
+    resolveShowDocumentTabs,
+    resolveShowProjectDocumentControlBarEditButton,
+    resolveShowProjectDocumentControlBarDeleteButton,
+    resolveShowProjectDocumentControlBarSaveButtons,
+    resolveProjectDocumentControlBarSaveButtonColor,
+    formatFaKeybindCommandLabelFromSnapshot: ({ commandId }) => {
+      if (commandId === 'editDocument') {
+        return 'Ctrl + E'
+      }
+      if (commandId === 'saveDocumentKeepEditMode') {
+        return 'Ctrl + S'
+      }
+      if (commandId === 'saveDocument') {
+        return 'Ctrl + Alt + S'
+      }
+      if (commandId === 'moveDocumentTabLeft') {
+        return 'Alt + Shift + Left'
+      }
+      if (commandId === 'moveDocumentTabRight') {
+        return 'Alt + Shift + Right'
+      }
+      return null
+    },
+    getKeybindsSnapshot: () => ({
+      platform: 'win32',
+      store: {
+        overrides: {},
+        schemaVersion: 1
+      }
+    }),
+    copyToClipboard: vi.fn(async () => undefined),
+    notifyCreate: vi.fn(),
+    useI18n: () => ({
+      t: (key: string) => key
+    }),
+    runFaAction: vi.fn(),
+    S_FaOpenedDocuments: () => ({
+      enterDocumentEditMode: () => undefined,
+      findTabByDocumentId: () => null,
+      closeAllTabsWithoutChanges: async () => undefined,
+      closeTabsWithoutChangesExcept: async () => undefined,
+      deleteOpenedDocument: async () => undefined,
+      requestDeleteDocument: () => undefined,
+      forceCloseAllTabs: async () => undefined,
+      forceCloseAllTabsExcept: async () => undefined,
+      moveDocumentTab: () => undefined,
+      requestCloseTab: () => undefined
+    }) as never,
+    S_FaUserSettings: () => ({}) as never,
+    storeToRefs: () => ({
+      activeDocumentId: ref(null),
+      settings: ref({ disableDocumentControlBar: false }),
+      tabs: ref([])
+    }) as never,
+    useRoute: () => ({
+      path: '/home/document/doc-a'
+    })
+  })()
+
+  expect(api.editDocumentKeybindLabel.value).toBe('Ctrl + E')
+  expect(api.saveDocumentKeepEditModeKeybindLabel.value).toBe('Ctrl + S')
+  expect(api.saveDocumentKeybindLabel.value).toBe('Ctrl + Alt + S')
+  expect(api.moveDocumentTabLeftKeybindLabel.value).toBe('Alt + Shift + Left')
+  expect(api.moveDocumentTabRightKeybindLabel.value).toBe('Alt + Shift + Right')
+})
+
+test('Test that tab context menu bulk and destructive handlers delegate to opened documents store', () => {
+  const closeAllTabsWithoutChanges = vi.fn(async () => undefined)
+  const closeTabsWithoutChangesExcept = vi.fn(async () => undefined)
+  const forceCloseAllTabs = vi.fn(async () => undefined)
+  const forceCloseAllTabsExcept = vi.fn(async () => undefined)
+  const requestDeleteDocument = vi.fn()
+  const moveDocumentTab = vi.fn()
+
+  const api = createUseProjectDocumentControlBar({
+    assembleProjectDocumentControlBarApi,
+    buildProjectDocumentControlBarAssembleInput,
+    computed: computed as <T>(getter: () => T) => I_computedRef<T>,
+    resolveActiveDocumentTabName,
+    resolveDocumentTabLabelFromOpenedTab,
+    resolveFaDocumentWorkspaceRouteDocumentId: (routePathValue: string) => {
+      const match = /^\/home\/document\/([^/]+)$/.exec(routePathValue)
+      return match?.[1] ?? null
+    },
+    resolveShowDocumentControlBarStrip,
+    resolveShowDocumentTabs,
+    resolveShowProjectDocumentControlBarEditButton,
+    resolveShowProjectDocumentControlBarDeleteButton,
+    resolveShowProjectDocumentControlBarSaveButtons,
+    resolveProjectDocumentControlBarSaveButtonColor,
+    formatFaKeybindCommandLabelFromSnapshot: () => null,
+    getKeybindsSnapshot: () => null,
+    copyToClipboard: vi.fn(async () => undefined),
+    notifyCreate: vi.fn(),
+    useI18n: () => ({
+      t: (key: string) => key
+    }),
+    S_FaOpenedDocuments: () => ({
+      enterDocumentEditMode: vi.fn(),
+      findTabByDocumentId: (documentId: string) => {
+        return documentId === 'doc-a'
+          ? {
+              documentId: 'doc-a',
+              displayNameDraft: 'A',
+              editState: false,
+              hasUnsavedChanges: false,
+              savedDisplayName: 'A',
+              tabLabel: 'Character',
+              templateIcon: 'mdi-account'
+            }
+          : null
+      },
+      closeAllTabsWithoutChanges,
+      closeTabsWithoutChangesExcept,
+      requestDeleteDocument,
+      forceCloseAllTabs,
+      forceCloseAllTabsExcept,
+      moveDocumentTab,
+      requestCloseTab: vi.fn()
+    }) as never,
+    S_FaUserSettings: () => ({} as never),
+    storeToRefs: ((store: unknown) => {
+      if (store !== null && typeof store === 'object' && 'closeAllTabsWithoutChanges' in store) {
+        return {
+          activeDocumentId: ref('doc-a'),
+          tabs: ref([{
+            documentId: 'doc-a',
+            displayNameDraft: 'A',
+            editState: false,
+            hasUnsavedChanges: false,
+            savedDisplayName: 'A',
+            tabLabel: 'Character',
+            templateIcon: 'mdi-account'
+          }])
+        } as never
+      }
+      return {
+        settings: ref({ disableDocumentControlBar: false })
+      } as never
+    }) as never,
+    useRoute: () => ({
+      path: '/home/document/doc-a'
+    }),
+    runFaAction: vi.fn()
+  })()
+
+  api.onTabCloseAllWithoutChangesClick()
+  api.onTabCloseAllWithoutChangesExceptClick('doc-a')
+  api.onTabForceCloseAllClick()
+  api.onTabForceCloseAllExceptClick('doc-a')
+  api.onTabDeleteClick('doc-a')
+
+  expect(closeAllTabsWithoutChanges).toHaveBeenCalledOnce()
+  expect(closeTabsWithoutChangesExcept).toHaveBeenCalledWith('doc-a')
+  expect(forceCloseAllTabs).toHaveBeenCalledOnce()
+  expect(forceCloseAllTabsExcept).toHaveBeenCalledWith('doc-a')
+  expect(requestDeleteDocument).toHaveBeenCalledWith('doc-a')
 })

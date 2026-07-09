@@ -12,7 +12,14 @@ export const FA_KEYBIND_COMMAND_IDS = [
   'showProjectDashboard',
   'toggleDeveloperTools',
   'toggleAppNoteboard',
-  'toggleProjectNoteboard'
+  'toggleProjectNoteboard',
+  'editDocument',
+  'saveDocumentKeepEditMode',
+  'saveDocument',
+  'focusPreviousDocumentTab',
+  'focusNextDocumentTab',
+  'moveDocumentTabLeft',
+  'moveDocumentTabRight'
 ] as const
 
 /**

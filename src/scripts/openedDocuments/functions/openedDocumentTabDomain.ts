@@ -76,3 +76,216 @@ export function duplicateOpenedDocumentTabs (
 ): I_faOpenedDocumentTab[] {
   return tabs.map((tab) => duplicateOpenedDocumentTab(tab))
 }
+
+/**
+ * Resolves the neighbor tab document id for prev/next keybinds; null at boundaries or with fewer than two tabs.
+ */
+export function resolveAdjacentOpenedDocumentTabId (
+  tabs: readonly I_faOpenedDocumentTab[],
+  activeDocumentId: string | null,
+  direction: 'previous' | 'next'
+): string | null {
+  if (activeDocumentId === null || tabs.length < 2) {
+    return null
+  }
+
+  const activeIndex = findOpenedDocumentTabIndexByDocumentId(tabs, activeDocumentId)
+  if (activeIndex === -1) {
+    return null
+  }
+
+  if (direction === 'previous') {
+    if (activeIndex === 0) {
+      return null
+    }
+    return tabs[activeIndex - 1]?.documentId ?? null
+  }
+
+  if (activeIndex >= tabs.length - 1) {
+    return null
+  }
+
+  return tabs[activeIndex + 1]?.documentId ?? null
+}
+
+/**
+ * Keeps tabs with unsaved changes and optionally one preserved document id.
+ */
+export function filterOpenedDocumentTabsKeepingUnsavedAndExceptDocument (input: {
+  exceptDocumentId: string | null
+  tabs: readonly I_faOpenedDocumentTab[]
+}): I_faOpenedDocumentTab[] {
+  return input.tabs.filter((tab) => {
+    if (tab.hasUnsavedChanges) {
+      return true
+    }
+    if (input.exceptDocumentId !== null && tab.documentId === input.exceptDocumentId) {
+      return true
+    }
+    return false
+  })
+}
+
+/**
+ * Keeps at most one tab when force-closing every other opened tab.
+ */
+export function filterOpenedDocumentTabsKeepingExceptDocumentOnly (input: {
+  exceptDocumentId: string | null
+  tabs: readonly I_faOpenedDocumentTab[]
+}): I_faOpenedDocumentTab[] {
+  if (input.exceptDocumentId === null) {
+    return []
+  }
+  return input.tabs.filter((tab) => tab.documentId === input.exceptDocumentId)
+}
+
+/**
+ * Resolves tab list and active document after force-closing tabs.
+ */
+export function resolveOpenedDocumentTabsAfterForceClose (input: {
+  activeDocumentId: string | null
+  exceptDocumentId: string | null
+  tabs: readonly I_faOpenedDocumentTab[]
+}): {
+    nextActiveDocumentId: string | null
+    nextTabs: I_faOpenedDocumentTab[]
+    shouldNavigateHome: boolean
+  } {
+  const nextTabs = filterOpenedDocumentTabsKeepingExceptDocumentOnly({
+    exceptDocumentId: input.exceptDocumentId,
+    tabs: input.tabs
+  })
+  if (nextTabs.length === input.tabs.length) {
+    return {
+      nextActiveDocumentId: input.activeDocumentId,
+      nextTabs: duplicateOpenedDocumentTabs(input.tabs),
+      shouldNavigateHome: false
+    }
+  }
+  if (nextTabs.length === 0) {
+    return {
+      nextActiveDocumentId: null,
+      nextTabs: [],
+      shouldNavigateHome: true
+    }
+  }
+
+  const exceptDocumentId = input.exceptDocumentId
+  if (exceptDocumentId !== null) {
+    return {
+      nextActiveDocumentId: exceptDocumentId,
+      nextTabs: duplicateOpenedDocumentTabs(nextTabs),
+      shouldNavigateHome: false
+    }
+  }
+
+  return {
+    nextActiveDocumentId: null,
+    nextTabs: [],
+    shouldNavigateHome: true
+  }
+}
+
+/**
+ * Resolves tab list and active document after bulk-closing clean tabs.
+ */
+export function resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges (input: {
+  activeDocumentId: string | null
+  exceptDocumentId: string | null
+  tabs: readonly I_faOpenedDocumentTab[]
+}): {
+    nextActiveDocumentId: string | null
+    nextTabs: I_faOpenedDocumentTab[]
+    shouldNavigateHome: boolean
+  } {
+  const nextTabs = filterOpenedDocumentTabsKeepingUnsavedAndExceptDocument({
+    exceptDocumentId: input.exceptDocumentId,
+    tabs: input.tabs
+  })
+  if (nextTabs.length === input.tabs.length) {
+    return {
+      nextActiveDocumentId: input.activeDocumentId,
+      nextTabs: duplicateOpenedDocumentTabs(input.tabs),
+      shouldNavigateHome: false
+    }
+  }
+  if (nextTabs.length === 0) {
+    return {
+      nextActiveDocumentId: null,
+      nextTabs: [],
+      shouldNavigateHome: true
+    }
+  }
+
+  const activeDocumentId = input.activeDocumentId
+  if (
+    activeDocumentId !== null &&
+    nextTabs.some((tab) => tab.documentId === activeDocumentId)
+  ) {
+    return {
+      nextActiveDocumentId: activeDocumentId,
+      nextTabs: duplicateOpenedDocumentTabs(nextTabs),
+      shouldNavigateHome: false
+    }
+  }
+
+  const removedIndex = activeDocumentId === null
+    ? -1
+    : findOpenedDocumentTabIndexByDocumentId(input.tabs, activeDocumentId)
+  const focusIndex = resolveOpenedDocumentTabFocusIndexAfterClose(
+    removedIndex,
+    nextTabs.length
+  )
+  if (focusIndex < 0) {
+    return {
+      nextActiveDocumentId: null,
+      nextTabs: duplicateOpenedDocumentTabs(nextTabs),
+      shouldNavigateHome: true
+    }
+  }
+
+  const nextTab = nextTabs[focusIndex]
+  if (nextTab === undefined) {
+    return {
+      nextActiveDocumentId: null,
+      nextTabs: duplicateOpenedDocumentTabs(nextTabs),
+      shouldNavigateHome: true
+    }
+  }
+
+  return {
+    nextActiveDocumentId: nextTab.documentId,
+    nextTabs: duplicateOpenedDocumentTabs(nextTabs),
+    shouldNavigateHome: false
+  }
+}
+
+/**
+ * Swaps a tab with its left or right neighbor; null when the move is out of range or the tab is missing.
+ */
+export function moveOpenedDocumentTabByOffset (
+  tabs: readonly I_faOpenedDocumentTab[],
+  documentId: string,
+  offset: -1 | 1
+): I_faOpenedDocumentTab[] | null {
+  const index = findOpenedDocumentTabIndexByDocumentId(tabs, documentId)
+  if (index === -1) {
+    return null
+  }
+
+  const targetIndex = index + offset
+  if (targetIndex < 0 || targetIndex >= tabs.length) {
+    return null
+  }
+
+  const currentTab = tabs[index]
+  const neighborTab = tabs[targetIndex]
+  if (currentTab === undefined || neighborTab === undefined) {
+    return null
+  }
+
+  const nextTabs = duplicateOpenedDocumentTabs(tabs)
+  nextTabs[index] = neighborTab
+  nextTabs[targetIndex] = currentTab
+  return nextTabs
+}

@@ -16,9 +16,19 @@ import { toggleDevTools } from 'app/src/scripts/appGlobalManagementUI/appGlobalM
 import { applyFaUserSettingsLanguageSelection } from 'app/src/scripts/appInternals/faAppInternalsLocale_manager'
 import { faProjectDocumentTemplatesPersistSnapshotFromDialog } from 'app/src/stores/scripts/sFaProjectDocumentTemplatesBridge'
 import { faProjectWorldsPersistSnapshotFromDialog } from 'app/src/stores/scripts/sFaProjectWorldsBridge'
-import { navigateToWorkspaceHomeRoute } from 'app/src/scripts/appInternals/faAppRouterSession_manager'
+import { navigateToWorkspaceHomeRoute, resolveFaAppRouterCurrentPath } from 'app/src/scripts/appInternals/faAppRouterSession_manager'
+import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/functions/faDocumentWorkspacePageTransition'
+import { resolveAdjacentOpenedDocumentTabId } from 'app/src/scripts/openedDocuments/functions/openedDocumentTabDomain'
+import {
+  resolveCanEditActiveDocumentViaKeybind
+} from 'app/src/scripts/openedDocuments/functions/openedDocumentWorkspaceKeybindGuards'
+import {
+  resolveShowProjectDocumentControlBarEditButton
+} from 'app/src/components/projectUI/ProjectDocumentControlBar/functions/projectDocumentControlBarEditMode'
+import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
 
 import { createFaActionDefinitionHandlers } from './functions/createFaActionDefinitionHandlers'
+import { createFaActionDefinitionHandlersDocumentWorkspace } from './functions/createFaActionDefinitionHandlersDocumentWorkspace'
 import { createFaActionDefinitionHandlersShowProjectDashboard } from './functions/createFaActionDefinitionHandlersShowProjectDashboard'
 import { buildFaActionDefinitionHandlersWindowChrome } from './faActionDefinitionHandlersWindowChrome'
 import {
@@ -69,6 +79,16 @@ const faActionDefinitionHandlersApi = {
   ...createFaActionDefinitionHandlersShowProjectDashboard({
     S_FaActiveProject,
     navigateToWorkspaceHomeRoute
+  }),
+  ...createFaActionDefinitionHandlersDocumentWorkspace({
+    S_FaOpenedDocuments,
+    getCurrentRoutePath: resolveFaAppRouterCurrentPath,
+    i18n,
+    notifyCreate: (options) => Notify.create(options),
+    resolveAdjacentOpenedDocumentTabId,
+    resolveCanEditActiveDocumentViaKeybind,
+    resolveFaDocumentWorkspaceRouteDocumentId,
+    resolveShowProjectDocumentControlBarEditButton
   })
 }
 
@@ -158,3 +178,21 @@ export const handleOpenProjectStylingWindow = handleOpenProjectStylingWindowExpo
 export const handleOpenTipsTricksTriviaDialog = handleOpenTipsTricksTriviaDialogExport
 
 export const handleShowStartupTipsNotification = handleShowStartupTipsNotificationExport
+
+export const handleEditActiveDocument =
+  faActionDefinitionHandlersApi.handleEditActiveDocument
+
+export const handleSaveOpenedDocumentDisplayName =
+  faActionDefinitionHandlersApi.handleSaveOpenedDocumentDisplayName
+
+export const handleFocusPreviousOpenedDocumentTab =
+  faActionDefinitionHandlersApi.handleFocusPreviousOpenedDocumentTab
+
+export const handleFocusNextOpenedDocumentTab =
+  faActionDefinitionHandlersApi.handleFocusNextOpenedDocumentTab
+
+export const handleMoveActiveOpenedDocumentTabLeft =
+  faActionDefinitionHandlersApi.handleMoveActiveOpenedDocumentTabLeft
+
+export const handleMoveActiveOpenedDocumentTabRight =
+  faActionDefinitionHandlersApi.handleMoveActiveOpenedDocumentTabRight

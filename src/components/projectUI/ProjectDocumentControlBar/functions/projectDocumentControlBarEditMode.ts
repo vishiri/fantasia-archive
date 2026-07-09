@@ -22,6 +22,13 @@ export function resolveShowProjectDocumentControlBarSaveButtons (input: {
   return input.activeDocumentTab.editState
 }
 
+export function resolveShowProjectDocumentControlBarDeleteButton (input: {
+  activeDocumentTab: unknown | null
+  isOnDocumentWorkspaceRoute: boolean
+}): boolean {
+  return input.isOnDocumentWorkspaceRoute && input.activeDocumentTab !== null
+}
+
 export function resolveProjectDocumentControlBarSaveButtonColor (input: {
   hasUnsavedChanges: boolean
 }): T_projectDocumentControlBarSaveButtonColor {

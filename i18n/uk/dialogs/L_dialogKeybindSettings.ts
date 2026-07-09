@@ -31,6 +31,13 @@ export default {
     toggleDeveloperTools: 'Перемкнути інструменти розробника',
     toggleAppNoteboard: 'Перемкнути блокнот програми',
     toggleProjectNoteboard: 'Перемкнути блокнот проекту',
+    editDocument: 'Edit current document',
+    saveDocumentKeepEditMode: 'Save document without exiting edit mode',
+    saveDocument: 'Save current document',
+    focusPreviousDocumentTab: 'Previous document tab',
+    focusNextDocumentTab: 'Next document tab',
+    moveDocumentTabLeft: 'Move document tab left',
+    moveDocumentTabRight: 'Move document tab right'
   },
   filterNoResultsDescription: 'Fantasia, на жаль, не знайшла жодної клавіатури, яку ви шукали. Спробувати інший термін пошуку?',
   filterNoResultsTitle: 'Клавіатури не знайдено',

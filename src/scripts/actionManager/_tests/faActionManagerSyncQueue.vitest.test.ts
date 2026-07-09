@@ -341,6 +341,40 @@ test('Test that synchronous handlers complete via the synchronous finish branch'
 })
 
 /**
+ * enqueueSyncAction
+ * Multiple sync entries for different payloads drain in FIFO order.
+ */
+test('Test that multiple sync entries drain in FIFO order', async () => {
+  const callOrder: string[] = []
+  const def = buildDef(
+    'saveOpenedDocumentDisplayName',
+    ((payload: unknown) => {
+      const typedPayload = payload as { documentId: string }
+      callOrder.push(typedPayload.documentId)
+    }) as () => void | Promise<void>
+  )
+  const lookup = (): I_faActionDefinition<T_faActionId> | undefined => def
+  enqueueSyncAction(
+    buildEntry('saveOpenedDocumentDisplayName', {
+      documentId: 'doc-a',
+      keepEditMode: true
+    }),
+    def,
+    lookup
+  )
+  enqueueSyncAction(
+    buildEntry('saveOpenedDocumentDisplayName', {
+      documentId: 'doc-b',
+      keepEditMode: false
+    }),
+    def,
+    lookup
+  )
+  await awaitSyncQueueDrain()
+  expect(callOrder).toEqual(['doc-a', 'doc-b'])
+})
+
+/**
  * runHandlerWithTimeout
  * If the handler eventually resolves AFTER the timeout already rejected, the late finish call
  * is short-circuited by the 'settled' guard and the timeout's failure outcome stands.

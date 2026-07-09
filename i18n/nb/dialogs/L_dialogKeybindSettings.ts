@@ -31,6 +31,13 @@ export default {
     toggleDeveloperTools: 'Slå av/på utviklerverktøy',
     toggleAppNoteboard: 'Slå på app-noteboard',
     toggleProjectNoteboard: 'Slå på prosjektnotatbordet',
+    editDocument: 'Edit current document',
+    saveDocumentKeepEditMode: 'Save document without exiting edit mode',
+    saveDocument: 'Save current document',
+    focusPreviousDocumentTab: 'Previous document tab',
+    focusNextDocumentTab: 'Next document tab',
+    moveDocumentTabLeft: 'Move document tab left',
+    moveDocumentTabRight: 'Move document tab right'
   },
   filterNoResultsDescription: 'Fantasia fant dessverre ikke noen tastebindinger du lette etter. Prøv et annet søkeord?',
   filterNoResultsTitle: 'Ingen nøkkelbindinger funnet',

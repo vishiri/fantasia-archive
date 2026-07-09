@@ -31,6 +31,13 @@ export default {
     toggleDeveloperTools: 'Attiva/disattiva gli Strumenti per sviluppatori',
     toggleAppNoteboard: 'Attiva/disattiva Blocco note dell\'app',
     toggleProjectNoteboard: 'Attiva/disattiva la lavagna del progetto',
+    editDocument: 'Edit current document',
+    saveDocumentKeepEditMode: 'Save document without exiting edit mode',
+    saveDocument: 'Save current document',
+    focusPreviousDocumentTab: 'Previous document tab',
+    focusNextDocumentTab: 'Next document tab',
+    moveDocumentTabLeft: 'Move document tab left',
+    moveDocumentTabRight: 'Move document tab right'
   },
   filterNoResultsDescription: 'Fantasia purtroppo non ha trovato nessuna combinazione di tasti che stavi cercando. Provare un termine di ricerca diverso?',
   filterNoResultsTitle: 'Nessuna combinazione di tasti trovata',

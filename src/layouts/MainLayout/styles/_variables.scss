@@ -7,7 +7,7 @@ $mainLayout-appHeader-backgroundColor: fa-v('dark-middle', $dark-middle);
 $mainLayout-appHeader-chromeRightReserveBasePx: calc(#{globalWindowButtons.$globalWindowButtons-totalWidth} + #{globalLanguageSelector.$globalLanguageSelector-gap} + #{globalLanguageSelector.$globalLanguageSelector-trigger-outerSizePx});
 $mainLayout-appHeader-chromeRightReserveWithSpellcheckPx: calc(#{$mainLayout-appHeader-chromeRightReserveBasePx} + #{globalLanguageSelector.$globalLanguageSelector-spellcheckRefresh-gap} + #{globalLanguageSelector.$globalLanguageSelector-diameter});
 $mainLayout-appHeader-zIndex: 7000;
-$mainLayout-appHeader-heightPx: 33px;
+$mainLayout-appHeader-heightPx: 36px;
 $mainLayout-sidebarMinWidthPx: 375px;
 $mainLayout-sidebarPanel-backgroundColor: fa-v('dark', $dark);
 $mainLayout-sidebarSplitterSeparator-zIndex: 500;

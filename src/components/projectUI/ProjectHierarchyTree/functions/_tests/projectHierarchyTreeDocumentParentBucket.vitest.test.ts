@@ -4,6 +4,7 @@ import { expect, test } from 'vitest'
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import {
+  collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds,
   collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh,
   findProjectHierarchyTreeDocumentParentBucket
 } from '../projectHierarchyTreeDocumentParentBucket'
@@ -96,4 +97,69 @@ test('Test that collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh skips
     ['missing-doc']
   )
   expect(parentNodeIds).toEqual([])
+})
+
+test('Test that collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds resolves placement container for top-level delete', () => {
+  const placement = buildPlacementNode({
+    children: [
+      buildDocumentNode({
+        documentId: 'doc-parent',
+        id: 'doc-parent'
+      })
+    ],
+    childrenLoaded: true
+  })
+  const nodeIds = collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds(
+    [placement],
+    'doc-parent'
+  )
+  expect(nodeIds).toEqual(['placement-1'])
+})
+
+test('Test that collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds resolves promotion and parent containers for nested delete', () => {
+  const placement = buildPlacementNode({
+    children: [
+      {
+        ...buildDocumentNode({
+          documentId: 'doc-grandparent',
+          id: 'doc-grandparent'
+        }),
+        children: [
+          buildDocumentNode({
+            documentId: 'doc-parent',
+            id: 'doc-parent'
+          })
+        ],
+        childrenLoaded: true,
+        hasChildren: true
+      }
+    ],
+    childrenLoaded: true
+  })
+  const nodeIds = collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds(
+    [placement],
+    'doc-parent'
+  )
+  expect(nodeIds).toEqual(['placement-1', 'doc-grandparent'])
+})
+
+test('Test that collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds returns empty when document is missing', () => {
+  const placement = buildPlacementNode({
+    children: [],
+    childrenLoaded: true
+  })
+  expect(collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds([placement], 'missing-doc')).toEqual([])
+})
+
+test('Test that collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds skips unloaded placement containers', () => {
+  const placement = buildPlacementNode({
+    children: [
+      buildDocumentNode({
+        documentId: 'doc-parent',
+        id: 'doc-parent'
+      })
+    ],
+    childrenLoaded: false
+  })
+  expect(collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds([placement], 'doc-parent')).toEqual([])
 })

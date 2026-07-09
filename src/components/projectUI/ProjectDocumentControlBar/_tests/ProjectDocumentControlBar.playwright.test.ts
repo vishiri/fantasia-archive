@@ -18,12 +18,26 @@ const faFrontendRenderTimer: number = FA_FRONTEND_RENDER_TIMER
 const selectorList = {
   dialogDiscardOpenedDocumentTab: 'dialogDiscardOpenedDocumentTab',
   projectDocumentControlBar: 'projectDocumentControlBar',
+  projectDocumentControlBarDeleteActionSeparator: 'projectDocumentControlBar-deleteActionSeparator',
+  projectDocumentControlBarDeleteDocumentButton: 'projectDocumentControlBar-deleteDocumentButton',
   projectDocumentControlBarEditDocumentButton: 'projectDocumentControlBar-editDocumentButton',
   projectDocumentControlBarSaveDocumentButton: 'projectDocumentControlBar-saveDocumentButton',
   projectDocumentControlBarSaveDocumentKeepEditModeButton: 'projectDocumentControlBar-saveDocumentKeepEditModeButton',
   projectDocumentControlBarTab: 'projectDocumentControlBar-tab-doc-hero',
   projectDocumentControlBarTabClose: 'projectDocumentControlBar-tabClose-doc-hero',
-  projectDocumentControlBarTabVillain: 'projectDocumentControlBar-tab-doc-villain'
+  projectDocumentControlBarTabContextMenu: 'projectDocumentControlBar-tabContextMenu',
+  projectDocumentControlBarTabContextMenuBrowseOpenedTabs: 'projectDocumentControlBar-tabContextMenu-browseOpenedTabs',
+  projectDocumentControlBarTabContextMenuBrowseSubmenu: 'projectDocumentControlBar-tabContextMenu-browseSubmenu',
+  projectDocumentControlBarTabContextMenuCloseAllTabsWithoutChanges: 'projectDocumentControlBar-tabContextMenu-closeAllTabsWithoutChanges',
+  projectDocumentControlBarTabContextMenuCloseAllTabsWithoutChangesExceptThisOne: 'projectDocumentControlBar-tabContextMenu-closeAllTabsWithoutChangesExceptThisOne',
+  projectDocumentControlBarTabContextMenuCloseThisTab: 'projectDocumentControlBar-tabContextMenu-closeThisTab',
+  projectDocumentControlBarTabContextMenuCopyName: 'projectDocumentControlBar-tabContextMenu-copyName',
+  projectDocumentControlBarTabContextMenuDeleteThisDocument: 'projectDocumentControlBar-tabContextMenu-deleteThisDocument',
+  projectDocumentControlBarTabContextMenuForceCloseAllTabs: 'projectDocumentControlBar-tabContextMenu-forceCloseAllTabs',
+  projectDocumentControlBarTabContextMenuForceCloseAllTabsExceptThisOne: 'projectDocumentControlBar-tabContextMenu-forceCloseAllTabsExceptThisOne',
+  projectDocumentControlBarTabContextMenuMoveTabLeft: 'projectDocumentControlBar-tabContextMenu-moveTabLeft',
+  projectDocumentControlBarTabVillain: 'projectDocumentControlBar-tab-doc-villain',
+  projectDocumentControlBarTabPlace: 'projectDocumentControlBar-tab-doc-place'
 } as const
 
 const sampleOpenedDocumentTabs = [
@@ -171,6 +185,12 @@ test.describe.serial('Project document control bar visibility', () => {
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarSaveDocumentButton}"]`)
     ).toHaveCount(0)
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarDeleteDocumentButton}"]`)
+    ).toHaveCount(1)
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarDeleteActionSeparator}"]`)
+    ).toHaveCount(1)
   })
 
   test('Check if save buttons appear when the active document tab is in edit mode', async () => {
@@ -193,6 +213,12 @@ test.describe.serial('Project document control bar visibility', () => {
     ).toHaveCount(1)
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarSaveDocumentButton}"]`)
+    ).toHaveCount(1)
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarDeleteDocumentButton}"]`)
+    ).toHaveCount(1)
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarDeleteActionSeparator}"]`)
     ).toHaveCount(1)
   })
 
@@ -256,5 +282,140 @@ test.describe.serial('Project document control bar visibility', () => {
     await expect(
       appWindow.locator(`[data-test-locator="${selectorList.dialogDiscardOpenedDocumentTab}"]`)
     ).toBeVisible()
+  })
+
+  test('Check if right-clicking a tab opens the tab context menu with browse submenu and close action', async () => {
+    await remountDocumentControlBarAfterStoreSeed(appWindow, {
+      disableDocumentControlBar: false,
+      openedDocuments: {
+        activeDocumentId: 'doc-hero',
+        tabs: [...sampleOpenedDocumentTabs]
+      }
+    })
+
+    await appWindow
+      .locator(`[data-test-locator="${selectorList.projectDocumentControlBarTab}"]`)
+      .click({ button: 'right' })
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenu}"]`)
+    ).toBeVisible()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenuBrowseOpenedTabs}"]`)
+    ).toBeVisible()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenuCopyName}"]`)
+    ).toBeVisible()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenuMoveTabLeft}"]`)
+    ).toBeVisible()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenuCloseThisTab}"]`)
+    ).toBeVisible()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenuCloseAllTabsWithoutChangesExceptThisOne}"]`)
+    ).toBeVisible()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenuCloseAllTabsWithoutChanges}"]`)
+    ).toBeVisible()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenuForceCloseAllTabsExceptThisOne}"]`)
+    ).toBeVisible()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenuForceCloseAllTabs}"]`)
+    ).toBeVisible()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenuDeleteThisDocument}"]`)
+    ).toBeVisible()
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenuForceCloseAllTabsExceptThisOne}"]`)
+    ).toHaveClass(/text-secondary/)
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenuForceCloseAllTabs}"]`)
+    ).toHaveClass(/text-secondary/)
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenuDeleteThisDocument}"]`)
+    ).toHaveClass(/text-secondary/)
+
+    await appWindow
+      .locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenuBrowseOpenedTabs}"]`)
+      .hover()
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenuBrowseSubmenu}"]`)
+    ).toBeVisible()
+    await expect(
+      appWindow.getByText('Villain draft', { exact: true })
+    ).toHaveCount(1)
+    await expect(
+      appWindow.locator('[data-test-locator="projectDocumentControlBar-tabContextMenu-browseTab"][data-test-browse-tab-document-id="doc-villain"] .projectDocumentControlBarTabContextMenu__browseTabUnsavedIcon')
+    ).toHaveCount(1)
+    await expect(
+      appWindow.locator('[data-test-locator="projectDocumentControlBar-tabContextMenu-browseTab"][data-test-browse-tab-document-id="doc-hero"] .projectDocumentControlBarTabContextMenu__browseTabUnsavedIcon')
+    ).toHaveCount(0)
+  })
+
+  test('Check if close this tab from the context menu closes a clean tab', async () => {
+    await remountDocumentControlBarAfterStoreSeed(appWindow, {
+      disableDocumentControlBar: false,
+      openedDocuments: {
+        activeDocumentId: 'doc-hero',
+        tabs: [...sampleOpenedDocumentTabs]
+      }
+    })
+
+    await appWindow
+      .locator(`[data-test-locator="${selectorList.projectDocumentControlBarTab}"]`)
+      .click({ button: 'right' })
+
+    await appWindow
+      .locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenuCloseThisTab}"]`)
+      .click()
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTab}"]`)
+    ).toHaveCount(0)
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabVillain}"]`)
+    ).toHaveCount(1)
+  })
+
+  test('Check if close all tabs without changes except this one keeps dirty tabs and the right-clicked tab', async () => {
+    await remountDocumentControlBarAfterStoreSeed(appWindow, {
+      disableDocumentControlBar: false,
+      openedDocuments: {
+        activeDocumentId: 'doc-hero',
+        tabs: [
+          ...sampleOpenedDocumentTabs,
+          {
+            documentId: 'doc-place',
+            tabLabel: 'Place',
+            templateIcon: 'mdi-map-marker',
+            displayNameDraft: 'Place',
+            savedDisplayName: 'Place',
+            hasUnsavedChanges: false,
+            editState: false
+          }
+        ]
+      }
+    })
+
+    await appWindow
+      .locator(`[data-test-locator="${selectorList.projectDocumentControlBarTab}"]`)
+      .click({ button: 'right' })
+
+    await appWindow
+      .locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabContextMenuCloseAllTabsWithoutChangesExceptThisOne}"]`)
+      .click()
+
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTab}"]`)
+    ).toHaveCount(1)
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabVillain}"]`)
+    ).toHaveCount(1)
+    await expect(
+      appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBarTabPlace}"]`)
+    ).toHaveCount(0)
   })
 })

@@ -61,3 +61,38 @@ export function collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh (
   }
   return [...parentNodeIds]
 }
+
+/**
+ * Resolves hierarchy tree node ids whose lazy-loaded document rows should reload after delete.
+ */
+export function collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds (
+  treeNodes: readonly I_faProjectHierarchyTreeHeTreeNode[],
+  documentId: string
+): string[] {
+  const bucket = findProjectHierarchyTreeDocumentParentBucket(
+    treeNodes as I_faProjectHierarchyTreeHeTreeNode[],
+    documentId
+  )
+  if (bucket === null) {
+    return []
+  }
+  const containerNode = bucket.parentNode
+  if (containerNode === null || !containerNode.childrenLoaded) {
+    return []
+  }
+  const nodeIds = new Set<string>()
+  if (containerNode.nodeKind === 'document' && containerNode.documentId !== null) {
+    const promotionTargetBucket = findProjectHierarchyTreeDocumentParentBucket(
+      treeNodes as I_faProjectHierarchyTreeHeTreeNode[],
+      containerNode.documentId
+    )
+    const promotionTargetNode = promotionTargetBucket?.parentNode
+    if (promotionTargetNode !== null && promotionTargetNode !== undefined && promotionTargetNode.childrenLoaded) {
+      nodeIds.add(promotionTargetNode.id)
+    }
+    nodeIds.add(containerNode.id)
+    return [...nodeIds]
+  }
+  nodeIds.add(containerNode.id)
+  return [...nodeIds]
+}

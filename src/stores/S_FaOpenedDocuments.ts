@@ -10,6 +10,7 @@ import type {
   T_faOpenedDocumentOpenMode
 } from 'app/types/I_faOpenedDocumentsDomain'
 import { FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT } from 'app/types/I_faOpenedDocumentsDomain'
+import { i18n } from 'app/i18n/externalFileLoader'
 import {
   navigateToOpenedDocumentRoute,
   navigateToWorkspaceHomeRoute
@@ -27,9 +28,13 @@ import {
 } from 'app/src/stores/scripts/faOpenedDocumentsStoreActions'
 import {
   duplicateOpenedDocumentTabs,
-  findOpenedDocumentTabIndexByDocumentId
+  findOpenedDocumentTabIndexByDocumentId,
+  moveOpenedDocumentTabByOffset,
+  resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges,
+  resolveOpenedDocumentTabsAfterForceClose
 } from 'app/src/scripts/openedDocuments/functions/openedDocumentTabDomain'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/appRouting_manager'
+import { collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeDocumentParentBucket'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTree'
 import {
@@ -47,6 +52,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
   const activeDocumentId: Ref<string | null> = ref(null)
   const lastRemovedIndex: Ref<number> = ref(-1)
   const pendingCloseDocumentId: Ref<string | null> = ref(null)
+  const pendingDeleteDocumentId: Ref<string | null> = ref(null)
   const hydrationComplete: Ref<boolean> = ref(false)
 
   let persistInFlight: Promise<boolean> | null = null
@@ -81,6 +87,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     activeDocumentId.value = null
     lastRemovedIndex.value = -1
     pendingCloseDocumentId.value = null
+    pendingDeleteDocumentId.value = null
     hydrationComplete.value = false
     schedulePersistSnapshot.cancel()
   }
@@ -242,22 +249,22 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
   async function saveDocumentDisplayName (
     documentId: string,
     input: { keepEditMode: boolean }
-  ): Promise<boolean> {
+  ): Promise<void> {
     const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
     if (index === -1) {
-      return false
+      throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveErrorMissingTab'))
     }
     const current = tabs.value[index]
     if (current === undefined) {
-      return false
+      throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveErrorMissingTab'))
     }
     const api = window.faContentBridgeAPIs?.projectContent
     if (typeof api?.updateDocument !== 'function') {
-      return false
+      throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
     }
     const trimmedDraft = current.displayNameDraft.trim()
     if (trimmedDraft.length === 0) {
-      return false
+      throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveErrorEmptyDraft'))
     }
     if (!input.keepEditMode && typeof document !== 'undefined') {
       const activeElement = document.activeElement
@@ -278,10 +285,11 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       schedulePersistSnapshot.flush()
       await flushPersistSnapshot()
       S_FaProjectHierarchyTree().refreshDocumentsInTree([documentId])
-      return true
     } catch (error) {
       console.error('[S_FaOpenedDocuments] saveDocumentDisplayName failed', error)
-      return false
+      throw error instanceof Error
+        ? error
+        : new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
     }
   }
 
@@ -305,6 +313,23 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     pendingCloseDocumentId.value = null
   }
 
+  function requestDeleteDocument (documentId: string): void {
+    const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
+    if (index === -1) {
+      return
+    }
+    pendingDeleteDocumentId.value = documentId
+  }
+
+  function dismissPendingDelete (): void {
+    pendingDeleteDocumentId.value = null
+  }
+
+  async function confirmDeleteOpenedDocument (documentId: string): Promise<void> {
+    pendingDeleteDocumentId.value = null
+    await deleteOpenedDocument(documentId)
+  }
+
   async function confirmDiscardAndClose (documentId: string): Promise<void> {
     const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
     if (index === -1) {
@@ -319,6 +344,126 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       tabs
     })
     pendingCloseDocumentId.value = null
+    schedulePersistSnapshot.flush()
+    if (wasActive) {
+      if (closeResult.shouldNavigateHome) {
+        await navigateToWorkspaceHomeRoute()
+      } else if (closeResult.nextActiveDocumentId !== null) {
+        await navigateToOpenedDocumentRoute(closeResult.nextActiveDocumentId)
+      }
+    }
+    await flushPersistSnapshot()
+  }
+
+  async function applyOpenedDocumentTabsBulkCloseResult (input: {
+    closeResult: {
+      nextActiveDocumentId: string | null
+      nextTabs: I_faOpenedDocumentTab[]
+      shouldNavigateHome: boolean
+    }
+    previousActiveDocumentId: string | null
+    previousTabs: readonly I_faOpenedDocumentTab[]
+  }): Promise<void> {
+    if (input.closeResult.nextTabs.length === input.previousTabs.length) {
+      return
+    }
+
+    tabs.value = input.closeResult.nextTabs
+    activeDocumentId.value = input.closeResult.nextActiveDocumentId
+    if (
+      input.previousActiveDocumentId !== null &&
+      input.previousActiveDocumentId !== input.closeResult.nextActiveDocumentId
+    ) {
+      lastRemovedIndex.value = findOpenedDocumentTabIndexByDocumentId(
+        input.previousTabs,
+        input.previousActiveDocumentId
+      )
+    }
+    pendingCloseDocumentId.value = null
+    schedulePersistSnapshot.flush()
+    if (input.previousActiveDocumentId !== input.closeResult.nextActiveDocumentId) {
+      if (input.closeResult.shouldNavigateHome) {
+        await navigateToWorkspaceHomeRoute()
+      } else if (input.closeResult.nextActiveDocumentId !== null) {
+        await navigateToOpenedDocumentRoute(input.closeResult.nextActiveDocumentId)
+      }
+    }
+    await flushPersistSnapshot()
+  }
+
+  async function closeTabsWithoutChangesExcept (exceptDocumentId: string): Promise<void> {
+    await closeTabsWithoutChangesMatching(exceptDocumentId)
+  }
+
+  async function closeAllTabsWithoutChanges (): Promise<void> {
+    await closeTabsWithoutChangesMatching(null)
+  }
+
+  async function closeTabsWithoutChangesMatching (
+    exceptDocumentId: string | null
+  ): Promise<void> {
+    const previousTabs = tabs.value
+    const previousActiveDocumentId = activeDocumentId.value
+    const closeResult = resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges({
+      activeDocumentId: previousActiveDocumentId,
+      exceptDocumentId,
+      tabs: previousTabs
+    })
+    await applyOpenedDocumentTabsBulkCloseResult({
+      closeResult,
+      previousActiveDocumentId,
+      previousTabs
+    })
+  }
+
+  async function forceCloseAllTabsExcept (exceptDocumentId: string): Promise<void> {
+    await forceCloseTabsMatching(exceptDocumentId)
+  }
+
+  async function forceCloseAllTabs (): Promise<void> {
+    await forceCloseTabsMatching(null)
+  }
+
+  async function forceCloseTabsMatching (exceptDocumentId: string | null): Promise<void> {
+    const previousTabs = tabs.value
+    const previousActiveDocumentId = activeDocumentId.value
+    const closeResult = resolveOpenedDocumentTabsAfterForceClose({
+      activeDocumentId: previousActiveDocumentId,
+      exceptDocumentId,
+      tabs: previousTabs
+    })
+    await applyOpenedDocumentTabsBulkCloseResult({
+      closeResult,
+      previousActiveDocumentId,
+      previousTabs
+    })
+  }
+
+  async function deleteOpenedDocument (documentId: string): Promise<void> {
+    const hierarchyStore = S_FaProjectHierarchyTree()
+    const treeRefreshNodeIds = collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds(
+      hierarchyStore.treeData,
+      documentId
+    )
+    await window.faContentBridgeAPIs.projectContent.deleteDocument(documentId)
+    if (treeRefreshNodeIds.length > 0) {
+      hierarchyStore.refreshHierarchyTreeNodes(treeRefreshNodeIds)
+    } else {
+      hierarchyStore.refreshDocumentsInTree([documentId])
+    }
+    const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
+    if (index === -1) {
+      return
+    }
+    const wasActive = activeDocumentId.value === documentId
+    const closeResult = removeFaOpenedDocumentTabAtIndex({
+      activeDocumentId,
+      lastRemovedIndex,
+      removedIndex: index,
+      tabs
+    })
+    pendingCloseDocumentId.value = null
+    pendingDeleteDocumentId.value = null
     schedulePersistSnapshot.flush()
     if (wasActive) {
       if (closeResult.shouldNavigateHome) {
@@ -355,6 +500,25 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     schedulePersistSnapshot()
   }
 
+  function moveDocumentTab (documentId: string, direction: 'left' | 'right'): void {
+    const offset = direction === 'left' ? -1 : 1
+    const nextTabs = moveOpenedDocumentTabByOffset(tabs.value, documentId, offset)
+    if (nextTabs === null) {
+      return
+    }
+
+    tabs.value = nextTabs
+  }
+
+  function moveActiveDocumentTab (direction: 'left' | 'right'): void {
+    const documentId = activeDocumentId.value
+    if (documentId === null) {
+      return
+    }
+
+    moveDocumentTab(documentId, direction)
+  }
+
   function replaceSessionForComponentTesting (input: {
     activeDocumentId: string | null
     tabs: I_faOpenedDocumentTab[]
@@ -377,19 +541,30 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
 
   return {
     activeDocumentId: readonly(activeDocumentId),
+    closeAllTabsWithoutChanges,
+    closeTabsWithoutChangesExcept,
     confirmDiscardAndClose,
+    confirmDeleteOpenedDocument,
+    deleteOpenedDocument,
     dismissPendingClose,
+    dismissPendingDelete,
     findTabByDocumentId,
     flushPersistSnapshot,
     focusTab,
+    forceCloseAllTabs,
+    forceCloseAllTabsExcept,
     hydrateFromProjectDatabase,
     hydrationComplete: readonly(hydrationComplete),
     clearSession,
     enterDocumentEditMode,
+    moveActiveDocumentTab,
+    moveDocumentTab,
     openFromTree,
     pendingCloseDocumentId: readonly(pendingCloseDocumentId),
+    pendingDeleteDocumentId: readonly(pendingDeleteDocumentId),
     replaceSessionForComponentTesting,
     requestCloseTab,
+    requestDeleteDocument,
     saveDocumentDisplayName,
     setDocumentEditState,
     syncActiveDocumentIdFromWorkspaceRoute,

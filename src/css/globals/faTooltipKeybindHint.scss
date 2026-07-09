@@ -1,0 +1,22 @@
+@use './faTooltipKeybindHint.variables.scss' as *;
+
+.fa-tooltip-keybind-stack {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.fa-tooltip-keybind-stack__label {
+  white-space: nowrap;
+}
+
+.fa-tooltip-keybind-hint {
+  font-size: $faTooltipKeybindHint-fontSize;
+  font-style: italic;
+  font-weight: $faTooltipKeybindHint-fontWeight;
+  margin-top: $faTooltipKeybindHint-marginTop;
+  padding-bottom: $faTooltipKeybindHint-paddingBottom;
+  text-align: left;
+  text-shadow: none;
+}

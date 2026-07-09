@@ -52,7 +52,7 @@ export function createUseProjectHierarchyTree (deps: {
 }): T_useProjectHierarchyTree {
   return function useProjectHierarchyTree (opts) {
     const hierarchyStore = deps.S_FaProjectHierarchyTree()
-    const { pendingDocumentRefreshIds, pendingRevealPath, treeData, uiState, worlds } = deps.storeToRefs(hierarchyStore)
+    const { pendingDocumentRefreshIds, pendingHierarchyNodeRefreshIds, pendingRevealPath, treeData, uiState, worlds } = deps.storeToRefs(hierarchyStore)
     const route = deps.useRoute()
     const activeDocumentId = deps.computed((): string | null => {
       return deps.resolveFaDocumentWorkspaceRouteDocumentId(route.path ?? '')
@@ -68,6 +68,7 @@ export function createUseProjectHierarchyTree (deps: {
       onMounted: deps.onMounted,
       onUnmounted: deps.onUnmounted,
       pendingDocumentRefreshIds: pendingDocumentRefreshIds as Ref<string[]>,
+      pendingHierarchyNodeRefreshIds: pendingHierarchyNodeRefreshIds as Ref<string[]>,
       pendingRevealPath: pendingRevealPath as Ref<string[]>,
       ref: deps.ref,
       treeData: treeData as Ref<I_faProjectHierarchyTreeHeTreeNode[]>,

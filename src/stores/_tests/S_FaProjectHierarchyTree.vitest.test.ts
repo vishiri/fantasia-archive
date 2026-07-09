@@ -412,3 +412,25 @@ test('Test that S_FaProjectHierarchyTree refreshDocumentsInTree queues document 
   store.clearPendingDocumentRefreshIds()
   expect(store.pendingDocumentRefreshIds).toEqual([])
 })
+
+/**
+ * S_FaProjectHierarchyTree refreshHierarchyTreeNodes queues explicit node ids for session refresh.
+ */
+test('Test that S_FaProjectHierarchyTree refreshHierarchyTreeNodes queues node ids', async () => {
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const store = S_FaProjectHierarchyTree()
+  store.refreshHierarchyTreeNodes(['placement-1', 'doc-grandparent'])
+  store.refreshHierarchyTreeNodes(['doc-grandparent', 'doc-parent'])
+  expect(store.pendingHierarchyNodeRefreshIds).toEqual([
+    'placement-1',
+    'doc-grandparent',
+    'doc-parent'
+  ])
+  store.clearPendingHierarchyNodeRefreshIds()
+  expect(store.pendingHierarchyNodeRefreshIds).toEqual([])
+})

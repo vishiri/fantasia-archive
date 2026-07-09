@@ -5,6 +5,8 @@ export default {
   labels: {
     closeApp: 'Sulje ikkuna',
     languageSwitch: 'Vaihda käyttöliittymän kieltä',
+    moveActiveOpenedDocumentTabLeft: 'Move document tab left',
+    moveActiveOpenedDocumentTabRight: 'Move document tab right',
     minimizeApp: 'Pienennä ikkuna',
     openAboutFantasiaArchiveDialog: 'Avaa Tietoja Fantasia Archive',
     openActionMonitorDialog: 'Avaa Action Monitor',
@@ -12,6 +14,7 @@ export default {
     openChangelogDialog: 'Avaa muutosloki',
     openKeybindSettingsDialog: 'Avaa Näppäimistön asetukset',
     openProjectSettingsDialog: 'Avaa projektiasetukset',
+    saveOpenedDocumentDisplayName: 'Save document',
     saveProjectSettings: 'Tallenna projektiasetukset',
     openLicenseDialog: 'Avaa Lisenssi',
     openAppSettingsDialog: 'Avaa Sovellusasetukset',

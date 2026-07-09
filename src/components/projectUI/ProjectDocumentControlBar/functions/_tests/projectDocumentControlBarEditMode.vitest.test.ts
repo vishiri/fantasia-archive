@@ -2,6 +2,7 @@ import { expect, test } from 'vitest'
 
 import {
   resolveProjectDocumentControlBarSaveButtonColor,
+  resolveShowProjectDocumentControlBarDeleteButton,
   resolveShowProjectDocumentControlBarEditButton,
   resolveShowProjectDocumentControlBarSaveButtons
 } from '../projectDocumentControlBarEditMode'
@@ -40,6 +41,25 @@ test('Test that resolveShowProjectDocumentControlBarSaveButtons shows only in ed
   expect(resolveShowProjectDocumentControlBarSaveButtons({
     activeDocumentTab: null,
     isOnDocumentWorkspaceRoute: true
+  })).toBe(false)
+})
+
+test('Test that resolveShowProjectDocumentControlBarDeleteButton shows in view and edit mode on document routes', () => {
+  expect(resolveShowProjectDocumentControlBarDeleteButton({
+    activeDocumentTab: { editState: false },
+    isOnDocumentWorkspaceRoute: true
+  })).toBe(true)
+  expect(resolveShowProjectDocumentControlBarDeleteButton({
+    activeDocumentTab: { editState: true },
+    isOnDocumentWorkspaceRoute: true
+  })).toBe(true)
+  expect(resolveShowProjectDocumentControlBarDeleteButton({
+    activeDocumentTab: null,
+    isOnDocumentWorkspaceRoute: true
+  })).toBe(false)
+  expect(resolveShowProjectDocumentControlBarDeleteButton({
+    activeDocumentTab: { editState: false },
+    isOnDocumentWorkspaceRoute: false
   })).toBe(false)
 })
 

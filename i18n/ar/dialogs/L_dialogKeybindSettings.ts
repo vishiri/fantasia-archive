@@ -31,6 +31,13 @@ export default {
     toggleDeveloperTools: 'تبديل أدوات المطور',
     toggleAppNoteboard: 'تبديل التطبيق المفكرة',
     toggleProjectNoteboard: 'تبديل دفتر المشروع',
+    editDocument: 'Edit current document',
+    saveDocumentKeepEditMode: 'Save document without exiting edit mode',
+    saveDocument: 'Save current document',
+    focusPreviousDocumentTab: 'Previous document tab',
+    focusNextDocumentTab: 'Next document tab',
+    moveDocumentTabLeft: 'Move document tab left',
+    moveDocumentTabRight: 'Move document tab right'
   },
   filterNoResultsDescription: 'Fantasia للأسف لم تجد أي روابط مفاتيح كنت تبحث عنها. هل تريد تجربة مصطلح بحث مختلف؟',
   filterNoResultsTitle: 'لم يتم العثور على روابط مفاتيح',

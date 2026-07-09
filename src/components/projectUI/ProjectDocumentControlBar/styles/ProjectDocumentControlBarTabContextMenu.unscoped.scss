@@ -1,0 +1,127 @@
+@use './variables' as *;
+@use '../../../globals/AppControlMenus/styles/variables' as appControlMenus;
+@use '../../../globals/AppControlSingleMenu/styles/variables' as appControlSingleMenu;
+@use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
+
+.projectDocumentControlBarTabContextMenu__list {
+  background-color: appControlMenus.$appControlMenus-bgColor;
+  color: appControlMenus.$appControlMenus-color;
+  min-width: 220px;
+}
+
+/* Teleported q-menu; stack above app header (7000) and default Quasar menu layer. */
+.projectDocumentControlBarTabContextMenu.q-menu {
+  background-color: appControlMenus.$appControlMenus-bgColor;
+  z-index: $projectDocumentControlBar-tabContextMenu-zIndex !important;
+}
+
+.projectDocumentControlBarTabContextMenu__browseSubmenu.q-menu {
+  background-color: $projectDocumentControlBar-tabContextMenu-browseSubmenu-bgColor;
+  z-index: $projectDocumentControlBar-tabContextMenu-zIndex !important;
+
+  .projectDocumentControlBarTabContextMenu__list {
+    background-color: $projectDocumentControlBar-tabContextMenu-browseSubmenu-bgColor;
+    min-width: max-content;
+    width: max-content;
+  }
+}
+
+.projectDocumentControlBarTabContextMenu.q-menu,
+.projectDocumentControlBarTabContextMenu__browseSubmenu.q-menu {
+  .projectDocumentControlBarTabContextMenu__item.q-item {
+    align-items: center;
+    min-height: appControlSingleMenu.$appControlSingleMenu-item-minHeight;
+    padding: $qItem-padding;
+
+    &:hover:not([aria-disabled='true']),
+    &:focus:not([aria-disabled='true']) {
+      color: appControlMenus.$appControlMenus-singleHover;
+    }
+
+    &.text-secondary {
+      text-shadow: appControlSingleMenu.$appControlSingleMenu-item-secondary-textShadow;
+    }
+  }
+
+  .projectDocumentControlBarTabContextMenu__item.q-item .q-item__section--avatar {
+    color: inherit;
+    min-width: unset;
+  }
+
+  .projectDocumentControlBarTabContextMenu__icon.q-icon {
+    font-size: $iconSize;
+  }
+
+  .projectDocumentControlBarTabContextMenu__browseTabTrailingIcons {
+    flex: 0 0 auto;
+    height: $iconSize;
+    position: relative;
+    width: $iconSize;
+  }
+
+  .projectDocumentControlBarTabContextMenu__browseTabUnsavedIcon.q-icon {
+    color: $projectDocumentControlBar-unsavedTabIconColor;
+    flex: 0 0 auto;
+    font-size: $projectDocumentControlBar-tabAlertIcon-fontSize;
+    pointer-events: none;
+    position: absolute;
+    top: $projectDocumentControlBar-tabContextMenu-browseTabUnsavedIcon-positionTop;
+  }
+
+  .projectDocumentControlBarTabContextMenu__browseTabIcon.q-icon {
+    @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
+
+    --fa-q-icon-display-glyph-font-size: #{$projectDocumentControlBar-tabContextMenu-templateIcon-glyphFontSize};
+    --fa-q-icon-display-mdi-font-size: #{$projectDocumentControlBar-tabContextMenu-templateIcon-glyphFontSize};
+
+    align-items: center;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: $iconSize !important;
+    height: $iconSize !important;
+    justify-content: center;
+    line-height: 0;
+    max-height: $iconSize !important;
+    max-width: $iconSize !important;
+    width: $iconSize !important;
+
+    &:not(.fa-brands, .fa-regular, .fa-solid) {
+      margin-top: 0;
+    }
+  }
+}
+
+.projectDocumentControlBarTabContextMenu__browseSubmenu.q-menu {
+  .projectDocumentControlBarTabContextMenu__item.q-item .q-item__section--avatar {
+    flex: 0 0 auto;
+    min-width: $projectDocumentControlBar-tabContextMenu-browseTabTrailingIcons-width;
+    overflow: visible;
+  }
+
+  .projectDocumentControlBarTabContextMenu__browseTabTrailingIcons {
+    overflow: visible;
+    width: $projectDocumentControlBar-tabContextMenu-browseTabTrailingIcons-width;
+  }
+
+  .projectDocumentControlBarTabContextMenu__browseTabUnsavedIcon.q-icon {
+    height: $projectDocumentControlBar-tabAlertIcon-fontSize;
+    left: calc(#{$iconSize} + #{$projectDocumentControlBar-tabContextMenu-browseTabUnsavedIcon-gapPx});
+    width: $projectDocumentControlBar-tabAlertIcon-fontSize;
+  }
+}
+
+.projectDocumentControlBarTabContextMenu__primaryLabel {
+  white-space: nowrap;
+}
+
+.projectDocumentControlBarTabContextMenu__keybindText {
+  font-size: appControlSingleMenu.$appControlSingleMenu-keybindText-fontSize;
+  font-weight: 600;
+  margin-top: 2px;
+  text-shadow: none;
+}
+
+.projectDocumentControlBarTabContextMenu__separator {
+  background-color: appControlMenus.$appControlMenus-separatorColor;
+  height: appControlSingleMenu.$appControlSingleMenu-separator-height !important;
+}

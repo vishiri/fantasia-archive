@@ -1,7 +1,10 @@
 @use '../../../../css/app.palette.scss' as *;
+@use '../../../../css/globals/paletteGlobals.variables.scss' as paletteGlobals;
 @use '../../../../layouts/MainLayout/styles/variables' as mainLayout;
 
 /* COMPONENT - PROJECT DOCUMENT CONTROL BAR */
+$projectDocumentControlBar-actionSeparatorColor: fa-v('accent', $accent);
+$projectDocumentControlBar-actionSeparator-marginBlockPx: 6px;
 $projectDocumentControlBar-backgroundColor: fa-v('dark', $dark);
 $projectDocumentControlBar-blockerHeightPx: 7.5px;
 $projectDocumentControlBar-bottomRuleColor: rgba($accent, 0.2);
@@ -23,11 +26,19 @@ $projectDocumentControlBar-tabIcon-boxSize-base: 16px;
 $projectDocumentControlBar-tabIcon-boxSize: calc(#{$projectDocumentControlBar-tabIcon-boxSize-base} * #{$projectDocumentControlBar-tabIcon-scale});
 $projectDocumentControlBar-tabIcon-glyphFontSize-base: 14px;
 $projectDocumentControlBar-tabIcon-glyphFontSize: calc(#{$projectDocumentControlBar-tabIcon-glyphFontSize-base} * #{$projectDocumentControlBar-tabIcon-scale});
+$projectDocumentControlBar-tabIndicator-heightPx: 1.5px;
 $projectDocumentControlBar-tabLabel-fontSize: 13px;
 $projectDocumentControlBar-tabLabel-fontWeight: 400;
-$projectDocumentControlBar-tabLabel-paddingTop: 4px;
 $projectDocumentControlBar-tabPadding-inlinePx: 10px;
 $projectDocumentControlBar-topOffsetPx: mainLayout.$mainLayout-sidebarSearchRowTopOffsetPx;
 $projectDocumentControlBar-unsavedTabIconColor: fa-v('warning', $warning);
 $projectDocumentControlBar-widthOffsetPx: mainLayout.$mainLayout-sidebarMinWidthPx;
 $projectDocumentControlBar-zIndex: 999;
+$projectDocumentControlBar-tabContextMenu-browseSubmenu-bgColor: fa-v('dark', $dark);
+$projectDocumentControlBar-tabContextMenu-browseTabUnsavedIcon-gapPx: 5px;
+$projectDocumentControlBar-tabContextMenu-browseTabTrailingIcons-width: calc(
+  #{paletteGlobals.$iconSize} + #{$projectDocumentControlBar-tabContextMenu-browseTabUnsavedIcon-gapPx} + #{$projectDocumentControlBar-tabAlertIcon-fontSize}
+);
+$projectDocumentControlBar-tabContextMenu-browseTabUnsavedIcon-positionTop: 2px;
+$projectDocumentControlBar-tabContextMenu-templateIcon-glyphFontSize: 18px;
+$projectDocumentControlBar-tabContextMenu-zIndex: mainLayout.$mainLayout-appHeader-zIndex + 2;

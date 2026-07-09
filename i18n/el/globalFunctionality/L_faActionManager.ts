@@ -5,6 +5,8 @@ export default {
   labels: {
     closeApp: 'Κλείσιμο παραθύρου',
     languageSwitch: 'Εναλλαγή γλώσσας διεπαφής',
+    moveActiveOpenedDocumentTabLeft: 'Move document tab left',
+    moveActiveOpenedDocumentTabRight: 'Move document tab right',
     minimizeApp: 'Ελαχιστοποίηση παραθύρου',
     openAboutFantasiaArchiveDialog: 'Άνοιγμα Σχετικά με Fantasia Archive',
     openActionMonitorDialog: 'Ανοίξτε το Action Monitor',
@@ -12,6 +14,7 @@ export default {
     openChangelogDialog: 'Ανοίξτε το Changelog',
     openKeybindSettingsDialog: 'Ανοίξτε τις Ρυθμίσεις Keybind',
     openProjectSettingsDialog: 'Άνοιγμα ρυθμίσεων έργου',
+    saveOpenedDocumentDisplayName: 'Save document',
     saveProjectSettings: 'Αποθήκευση ρυθμίσεων έργου',
     openLicenseDialog: 'Ανοιχτή άδεια',
     openAppSettingsDialog: 'Ανοίξτε τις Ρυθμίσεις εφαρμογής',

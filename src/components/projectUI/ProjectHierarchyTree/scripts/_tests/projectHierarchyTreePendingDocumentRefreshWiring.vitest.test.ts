@@ -6,6 +6,7 @@ import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHi
 
 import {
   flushPendingProjectHierarchyTreeDocumentRefresh,
+  flushPendingProjectHierarchyTreeNodeRefresh,
   wireProjectHierarchyTreePendingDocumentRefresh
 } from '../projectHierarchyTreePendingDocumentRefreshWiring'
 
@@ -52,15 +53,31 @@ test('Test that flushPendingProjectHierarchyTreeDocumentRefresh reloads parent b
   expect(refreshNodeChildrenFromDatabase).toHaveBeenCalledWith('placement-1')
 })
 
+test('Test that flushPendingProjectHierarchyTreeNodeRefresh reloads explicit node ids', async () => {
+  const refreshNodeChildrenFromDatabase = vi.fn(async () => undefined)
+  await flushPendingProjectHierarchyTreeNodeRefresh({
+    nodeIds: ['placement-1', 'doc-grandparent'],
+    refreshNodeChildrenFromDatabase
+  })
+  expect(refreshNodeChildrenFromDatabase).toHaveBeenCalledTimes(2)
+  expect(refreshNodeChildrenFromDatabase).toHaveBeenNthCalledWith(1, 'placement-1')
+  expect(refreshNodeChildrenFromDatabase).toHaveBeenNthCalledWith(2, 'doc-grandparent')
+})
+
 test('Test that wireProjectHierarchyTreePendingDocumentRefresh drains queued ids', async () => {
   const treeData = ref([buildPlacementNode()])
   const pendingDocumentRefreshIds = ref<string[]>([])
+  const pendingHierarchyNodeRefreshIds = ref<string[]>([])
   const refreshNodeChildrenFromDatabase = vi.fn(async () => undefined)
   wireProjectHierarchyTreePendingDocumentRefresh({
     clearPendingDocumentRefreshIds: () => {
       pendingDocumentRefreshIds.value = []
     },
+    clearPendingHierarchyNodeRefreshIds: () => {
+      pendingHierarchyNodeRefreshIds.value = []
+    },
     pendingDocumentRefreshIds,
+    pendingHierarchyNodeRefreshIds,
     refreshNodeChildrenFromDatabase,
     treeData,
     watch
@@ -70,6 +87,31 @@ test('Test that wireProjectHierarchyTreePendingDocumentRefresh drains queued ids
   await Promise.resolve()
   expect(refreshNodeChildrenFromDatabase).toHaveBeenCalledWith('placement-1')
   expect(pendingDocumentRefreshIds.value).toEqual([])
+})
+
+test('Test that wireProjectHierarchyTreePendingDocumentRefresh drains queued hierarchy node ids', async () => {
+  const treeData = ref([buildPlacementNode()])
+  const pendingDocumentRefreshIds = ref<string[]>([])
+  const pendingHierarchyNodeRefreshIds = ref<string[]>([])
+  const refreshNodeChildrenFromDatabase = vi.fn(async () => undefined)
+  wireProjectHierarchyTreePendingDocumentRefresh({
+    clearPendingDocumentRefreshIds: () => {
+      pendingDocumentRefreshIds.value = []
+    },
+    clearPendingHierarchyNodeRefreshIds: () => {
+      pendingHierarchyNodeRefreshIds.value = []
+    },
+    pendingDocumentRefreshIds,
+    pendingHierarchyNodeRefreshIds,
+    refreshNodeChildrenFromDatabase,
+    treeData,
+    watch
+  })
+  pendingHierarchyNodeRefreshIds.value = ['placement-1', 'doc-grandparent']
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(refreshNodeChildrenFromDatabase).toHaveBeenCalledTimes(2)
+  expect(pendingHierarchyNodeRefreshIds.value).toEqual([])
 })
 
 test('Test that flushPendingProjectHierarchyTreeDocumentRefresh skips when no ids are queued', async () => {
@@ -85,12 +127,17 @@ test('Test that flushPendingProjectHierarchyTreeDocumentRefresh skips when no id
 test('Test that wireProjectHierarchyTreePendingDocumentRefresh ignores empty queue updates', async () => {
   const treeData = ref([buildPlacementNode()])
   const pendingDocumentRefreshIds = ref<string[]>([])
+  const pendingHierarchyNodeRefreshIds = ref<string[]>([])
   const refreshNodeChildrenFromDatabase = vi.fn(async () => undefined)
   wireProjectHierarchyTreePendingDocumentRefresh({
     clearPendingDocumentRefreshIds: () => {
       pendingDocumentRefreshIds.value = []
     },
+    clearPendingHierarchyNodeRefreshIds: () => {
+      pendingHierarchyNodeRefreshIds.value = []
+    },
     pendingDocumentRefreshIds,
+    pendingHierarchyNodeRefreshIds,
     refreshNodeChildrenFromDatabase,
     treeData,
     watch

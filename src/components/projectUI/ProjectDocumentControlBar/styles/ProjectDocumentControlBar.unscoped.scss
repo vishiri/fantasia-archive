@@ -59,6 +59,7 @@
 }
 
 .projectDocumentControlBar__right {
+  align-items: stretch;
   justify-content: flex-end;
   margin-left: auto;
 
@@ -67,9 +68,22 @@
   }
 }
 
+.projectDocumentControlBarDeleteDocumentAction {
+  align-items: stretch;
+  display: flex;
+}
+
+.projectDocumentControlBar__actionSeparator,
+.projectDocumentControlBar__verticalSeparator {
+  background-color: $projectDocumentControlBar-actionSeparatorColor;
+  margin-bottom: $projectDocumentControlBar-actionSeparator-marginBlockPx;
+  margin-left: $projectDocumentControlBar-stripButtonSpacingPx;
+  margin-top: $projectDocumentControlBar-actionSeparator-marginBlockPx;
+  opacity: 0.5;
+}
+
 .projectDocumentControlBar__buttonTooltip.q-tooltip {
   max-width: $projectDocumentControlBar-buttonTooltip-maxWidth;
-  white-space: nowrap;
   width: max-content;
 }
 
@@ -135,6 +149,17 @@
     width: $projectDocumentControlBar-tabContent-widthPx;
   }
 
+  .q-tab__indicator {
+    height: $projectDocumentControlBar-tabIndicator-heightPx;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .q-tab--active .q-tab__indicator {
+    opacity: 1;
+    transform-origin: left /* rtl:ignore */;
+  }
+
   .q-tab .q-tab__icon {
     @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
 
@@ -165,7 +190,6 @@
     font-size: $projectDocumentControlBar-tabLabel-fontSize;
     font-weight: $projectDocumentControlBar-tabLabel-fontWeight;
     overflow: hidden;
-    padding-top: $projectDocumentControlBar-tabLabel-paddingTop;
     text-overflow: ellipsis;
     transition:
       color $projectDocumentControlBar-tabFocusTransitionDurationMs $projectDocumentControlBar-tabFocusTransitionEase,

@@ -31,6 +31,13 @@ export default {
     toggleDeveloperTools: 'Vaihda Kehittäjätyökalut',
     toggleAppNoteboard: 'Vaihda sovellusmuistio',
     toggleProjectNoteboard: 'Ota Project Noteboard käyttöön',
+    editDocument: 'Edit current document',
+    saveDocumentKeepEditMode: 'Save document without exiting edit mode',
+    saveDocument: 'Save current document',
+    focusPreviousDocumentTab: 'Previous document tab',
+    focusNextDocumentTab: 'Next document tab',
+    moveDocumentTabLeft: 'Move document tab left',
+    moveDocumentTabRight: 'Move document tab right'
   },
   filterNoResultsDescription: 'Fantasia ei valitettavasti löytänyt etsimiäsi näppäinsidoksia. Kokeile toista hakutermiä?',
   filterNoResultsTitle: 'Näppäimiä ei löytynyt',

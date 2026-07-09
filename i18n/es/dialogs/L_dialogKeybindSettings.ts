@@ -31,6 +31,13 @@ export default {
     toggleDeveloperTools: 'Alternar herramientas de desarrollador',
     toggleAppNoteboard: 'Alternar Bloc de notas de la aplicación',
     toggleProjectNoteboard: 'Alternar Bloc de notas del proyecto',
+    editDocument: 'Edit current document',
+    saveDocumentKeepEditMode: 'Save document without exiting edit mode',
+    saveDocument: 'Save current document',
+    focusPreviousDocumentTab: 'Previous document tab',
+    focusNextDocumentTab: 'Next document tab',
+    moveDocumentTabLeft: 'Move document tab left',
+    moveDocumentTabRight: 'Move document tab right'
   },
   filterNoResultsDescription: 'Lamentablemente, Fantasia no encontró ninguna combinación de teclas que estaba buscando. ¿Probar con un término de búsqueda diferente?',
   filterNoResultsTitle: 'No se encontraron combinaciones de teclas',

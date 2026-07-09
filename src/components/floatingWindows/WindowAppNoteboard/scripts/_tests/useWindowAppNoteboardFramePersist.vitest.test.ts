@@ -5,15 +5,19 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
-const { runFaActionMock } = vi.hoisted(() => {
+const { runFaActionAwaitMock, runFaActionMock } = vi.hoisted(() => {
   return {
+    runFaActionAwaitMock: vi.fn(async () => true),
     runFaActionMock: vi.fn()
   }
 })
 
-vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', () => {
+vi.mock('app/src/scripts/actionManager/faActionManagerRun_manager', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('app/src/scripts/actionManager/faActionManagerRun_manager')>()
   return {
-    runFaAction: runFaActionMock
+    ...actual,
+    runFaAction: runFaActionMock,
+    runFaActionAwait: runFaActionAwaitMock
   }
 })
 

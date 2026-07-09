@@ -59,6 +59,34 @@ export const WithDocumentTabs: StoryObj<typeof meta> = {
   }
 }
 
+export const WithMultipleDocumentTabsForContextMenu: StoryObj<typeof meta> = {
+  args: {
+    initialPath: '/home/document/doc-villain'
+  },
+  decorators: [
+    withStorybookWorkspaceHomePreview,
+    (story) => {
+      S_FaOpenedDocuments().$patch({
+        activeDocumentId: 'doc-villain',
+        hydrationComplete: true,
+        tabs: [
+          ...sampleTabs,
+          {
+            documentId: 'doc-location',
+            tabLabel: 'Location',
+            templateIcon: 'mdi-map-marker',
+            displayNameDraft: 'Castle',
+            savedDisplayName: 'Castle',
+            hasUnsavedChanges: false,
+            editState: false
+          }
+        ]
+      })
+      return story()
+    }
+  ]
+}
+
 export const WorkspaceHomeWithoutTabs: StoryObj<typeof meta> = {
   args: {
     initialPath: '/home'

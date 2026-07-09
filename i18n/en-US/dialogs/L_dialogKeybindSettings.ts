@@ -30,7 +30,14 @@ export default {
     showProjectDashboard: 'Show Project Dashboard',
     toggleDeveloperTools: 'Toggle Developer Tools',
     toggleAppNoteboard: 'Toggle App Noteboard',
-    toggleProjectNoteboard: 'Toggle Project Noteboard'
+    toggleProjectNoteboard: 'Toggle Project Noteboard',
+    editDocument: 'Edit current document',
+    saveDocumentKeepEditMode: 'Save document without exiting edit mode',
+    saveDocument: 'Save current document',
+    focusPreviousDocumentTab: 'Previous document tab',
+    focusNextDocumentTab: 'Next document tab',
+    moveDocumentTabLeft: 'Move document tab left',
+    moveDocumentTabRight: 'Move document tab right'
   },
   filterNoResultsDescription:
     'Fantasia sadly didn\'t find any keybinds you were looking for. Try a different search term?',
