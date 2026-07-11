@@ -14,6 +14,8 @@ export interface I_faProjectDocument {
 }
 
 export interface I_faProjectDocumentCreateInput {
+  /** Optional client UUID; main assigns a fresh id when omitted or already taken. */
+  id?: string | undefined
   worldId: string
   displayName: string
   templateId?: string | null | undefined

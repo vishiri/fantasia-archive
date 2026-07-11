@@ -13,6 +13,7 @@ import {
   handleOpenProjectSettingsDialog,
   handleShowProjectDashboard,
   handleEditActiveDocument,
+  handleCreateTemporaryOpenedDocument,
   handleSaveOpenedDocumentDisplayName,
   handleFocusPreviousOpenedDocumentTab,
   handleFocusNextOpenedDocumentTab,
@@ -91,6 +92,11 @@ export const FA_ACTION_DEFINITIONS_HEAD: ReadonlyArray<I_faActionDefinition<T_fa
   {
     handler: handleEditActiveDocument as I_faActionDefinition<T_faActionId>['handler'],
     id: 'editActiveDocument',
+    kind: 'async'
+  },
+  {
+    handler: handleCreateTemporaryOpenedDocument as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'createTemporaryOpenedDocument',
     kind: 'async'
   },
   {

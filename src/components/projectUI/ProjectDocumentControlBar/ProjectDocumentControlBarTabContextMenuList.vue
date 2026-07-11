@@ -192,6 +192,7 @@
       :on-delete-this-document-click="onDeleteThisDocumentClick"
       :on-force-close-all-tabs-click="onForceCloseAllTabsClick"
       :on-force-close-all-tabs-except-this-one-click="onForceCloseAllTabsExceptThisOneClick"
+      :show-delete-this-document="showDeleteThisDocument"
     />
   </q-list>
 </template>
@@ -238,5 +239,6 @@ defineProps<{
   openedDocumentTabs: readonly I_faOpenedDocumentTab[]
   resolveBrowseTabLabel: (browseTab: I_faOpenedDocumentTab) => string
   resolveBrowseTabRoute: (documentId: string) => string
+  showDeleteThisDocument: boolean
 }>()
 </script>

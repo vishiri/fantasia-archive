@@ -42,6 +42,7 @@
       :opened-document-tabs="openedDocumentTabs"
       :resolve-browse-tab-label="resolveBrowseTabLabel"
       :resolve-browse-tab-route="resolveBrowseTabRoute"
+      :show-delete-this-document="showDeleteThisDocument"
     />
   </q-menu>
 </template>
@@ -123,7 +124,8 @@ const {
   onSubmenuContentLeave,
   openedDocumentTabs,
   resolveBrowseTabLabel,
-  resolveBrowseTabRoute
+  resolveBrowseTabRoute,
+  showDeleteThisDocument
 } = useProjectDocumentControlBarTabContextMenu({
   moveDocumentTabLeftKeybindLabel: moveDocumentTabLeftKeybindLabelComputed,
   moveDocumentTabRightKeybindLabel: moveDocumentTabRightKeybindLabelComputed,

@@ -1,5 +1,3 @@
-import { Notify } from 'quasar'
-
 import { i18n } from 'app/i18n/externalFileLoader'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
@@ -31,6 +29,7 @@ import { createFaActionDefinitionHandlers } from './functions/createFaActionDefi
 import { createFaActionDefinitionHandlersDocumentWorkspace } from './functions/createFaActionDefinitionHandlersDocumentWorkspace'
 import { createFaActionDefinitionHandlersShowProjectDashboard } from './functions/createFaActionDefinitionHandlersShowProjectDashboard'
 import { buildFaActionDefinitionHandlersWindowChrome } from './faActionDefinitionHandlersWindowChrome'
+import { notifyCreateForFaActionDefinitionHandlers } from './faActionDefinitionHandlersNotifyWiring'
 import {
   handleCreateNewProject as handleCreateNewProjectExport,
   handleExportAppConfigPackage as handleExportAppConfigPackageExport,
@@ -57,7 +56,7 @@ import {
 const faActionDefinitionHandlersApi = {
   ...createFaActionDefinitionHandlers({
     i18n,
-    notifyCreate: (options) => Notify.create(options),
+    notifyCreate: notifyCreateForFaActionDefinitionHandlers,
     S_FaKeybinds,
     S_FaAppNoteboard,
     S_FaProjectNoteboard,
@@ -84,7 +83,7 @@ const faActionDefinitionHandlersApi = {
     S_FaOpenedDocuments,
     getCurrentRoutePath: resolveFaAppRouterCurrentPath,
     i18n,
-    notifyCreate: (options) => Notify.create(options),
+    notifyCreate: notifyCreateForFaActionDefinitionHandlers,
     resolveAdjacentOpenedDocumentTabId,
     resolveCanEditActiveDocumentViaKeybind,
     resolveFaDocumentWorkspaceRouteDocumentId,
@@ -178,6 +177,9 @@ export const handleOpenProjectStylingWindow = handleOpenProjectStylingWindowExpo
 export const handleOpenTipsTricksTriviaDialog = handleOpenTipsTricksTriviaDialogExport
 
 export const handleShowStartupTipsNotification = handleShowStartupTipsNotificationExport
+
+export const handleCreateTemporaryOpenedDocument =
+  faActionDefinitionHandlersApi.handleCreateTemporaryOpenedDocument
 
 export const handleEditActiveDocument =
   faActionDefinitionHandlersApi.handleEditActiveDocument

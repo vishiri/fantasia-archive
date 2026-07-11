@@ -103,6 +103,8 @@ Index: **`idx_document_templates_sort_order`**. Unlike **worlds**, new projects 
 
 **Document hierarchy (within placement):** **`tree_parent_document_id`** + **`tree_custom_sort_order`**; **`tree_placement_id`** must match the placement for the document's world/template assignment. Cross-placement moves are rejected in main.
 
+**Create IPC:** **`create-document-async`** accepts optional client **`id`**; main uses it when no row exists, otherwise assigns a fresh UUID. Supports promoting a temporary opened tab id on first save.
+
 ### `document_media` (M:N)
 
 | Column | Notes |
@@ -154,7 +156,7 @@ Singleton workspace tab snapshot (one row, **`id = 1`**).
 | Column | Notes |
 |--------|--------|
 | `id` | INTEGER PK, CHECK **`id = 1`** |
-| `snapshot_json` | TEXT JSON: **`schemaVersion`**, **`activeDocumentId`**, ordered **`tabs`** (document id, labels, template icon, name draft, saved baseline, unsaved flag, **`editState`** preview/edit mode) |
+| `snapshot_json` | TEXT JSON: **`schemaVersion`** (**1** legacy, **2** current), **`activeDocumentId`**, ordered **`tabs`**. Each tab: document id, **`persistenceState`** (**`persisted`** or **`temporary`**), labels, template icon, name draft, saved baseline, unsaved flag, **`editState`** preview/edit mode. Temporary tabs also store **`worldId`**, **`templateId`**, and optional **`parentDocumentId`** until first save creates the SQLite document row. Legacy v1 snapshots without **`persistenceState`** hydrate as **`persisted`**. |
 | `updated_at_ms` | INTEGER Unix ms |
 
 **Modules:** **`faOpenedDocumentsPersistWiring.ts`**. Renderer store **`S_FaOpenedDocuments`** debounces writes (**500ms**) via **`FA_PROJECT_MANAGEMENT_IPC`**.

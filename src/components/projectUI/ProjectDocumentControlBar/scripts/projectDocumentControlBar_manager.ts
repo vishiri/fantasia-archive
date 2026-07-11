@@ -1,12 +1,11 @@
 import { computed } from 'vue'
-import { copyToClipboard, Notify } from 'quasar'
+import { copyToClipboard } from 'quasar'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
-import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/appRouting_manager'
 import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybinds/keybinds_manager'
@@ -26,6 +25,10 @@ import {
   resolveShowDocumentTabs
 } from '../functions/projectDocumentControlBarVisibility'
 import { buildProjectDocumentControlBarAssembleInput } from './projectDocumentControlBarAssembleInput'
+import {
+  getProjectDocumentControlBarKeybindsSnapshot,
+  notifyCreateForProjectDocumentControlBar
+} from './projectDocumentControlBarManagerDepsWiring'
 import { assembleProjectDocumentControlBarApi } from './projectDocumentControlBarSessionWiring'
 
 export {
@@ -37,9 +40,7 @@ export const useProjectDocumentControlBar = createUseProjectDocumentControlBar({
   buildProjectDocumentControlBarAssembleInput,
   computed,
   copyToClipboard,
-  notifyCreate: (options) => {
-    Notify.create(options)
-  },
+  notifyCreate: notifyCreateForProjectDocumentControlBar,
   resolveActiveDocumentTabName,
   resolveDocumentTabLabelFromOpenedTab,
   resolveFaDocumentWorkspaceRouteDocumentId,
@@ -50,7 +51,7 @@ export const useProjectDocumentControlBar = createUseProjectDocumentControlBar({
   resolveShowProjectDocumentControlBarSaveButtons,
   resolveProjectDocumentControlBarSaveButtonColor,
   formatFaKeybindCommandLabelFromSnapshot,
-  getKeybindsSnapshot: () => S_FaKeybinds().snapshot,
+  getKeybindsSnapshot: getProjectDocumentControlBarKeybindsSnapshot,
   runFaAction,
   S_FaOpenedDocuments,
   S_FaUserSettings,

@@ -34,8 +34,6 @@ export function createProjectHierarchyTreeUiStateSessionWiring (deps: {
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   treeMountKey: Ref<number>
   watch: typeof WatchFn
-  windowClearTimeout: (timeoutId: number) => void
-  windowSetTimeout: (handler: () => void, delayMs: number) => number
 }) {
   const expandWiring = createProjectHierarchyTreeUiStateSessionExpandWiring({
     getTreeRef: deps.getTreeRef,

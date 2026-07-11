@@ -59,7 +59,7 @@ export interface I_faCreateUseProjectDocumentControlBarDeps {
     isOnDocumentWorkspaceRoute: boolean
   }) => boolean
   resolveShowProjectDocumentControlBarDeleteButton: (input: {
-    activeDocumentTab: unknown | null
+    activeDocumentTab: Pick<I_faOpenedDocumentTab, 'persistenceState'> | null
     isOnDocumentWorkspaceRoute: boolean
   }) => boolean
   resolveShowProjectDocumentControlBarSaveButtons: (input: {

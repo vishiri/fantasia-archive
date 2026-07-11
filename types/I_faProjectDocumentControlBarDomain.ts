@@ -86,7 +86,7 @@ export interface I_assembleProjectDocumentControlBarApiInput {
     isOnDocumentWorkspaceRoute: boolean
   }) => boolean
   resolveShowProjectDocumentControlBarDeleteButton: (input: {
-    activeDocumentTab: unknown | null
+    activeDocumentTab: Pick<I_faOpenedDocumentTab, 'persistenceState'> | null
     isOnDocumentWorkspaceRoute: boolean
   }) => boolean
   resolveProjectDocumentControlBarSaveButtonColor: (input: {

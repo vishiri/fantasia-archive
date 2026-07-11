@@ -1,3 +1,5 @@
+import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+
 import type { T_projectDocumentControlBarSaveButtonColor } from 'app/types/T_projectDocumentControlBarSaveButtonColor'
 
 export function resolveShowProjectDocumentControlBarEditButton (input: {
@@ -23,10 +25,14 @@ export function resolveShowProjectDocumentControlBarSaveButtons (input: {
 }
 
 export function resolveShowProjectDocumentControlBarDeleteButton (input: {
-  activeDocumentTab: unknown | null
+  activeDocumentTab: Pick<I_faOpenedDocumentTab, 'persistenceState'> | null
   isOnDocumentWorkspaceRoute: boolean
 }): boolean {
-  return input.isOnDocumentWorkspaceRoute && input.activeDocumentTab !== null
+  if (!input.isOnDocumentWorkspaceRoute || input.activeDocumentTab === null) {
+    return false
+  }
+
+  return input.activeDocumentTab.persistenceState !== 'temporary'
 }
 
 export function resolveProjectDocumentControlBarSaveButtonColor (input: {

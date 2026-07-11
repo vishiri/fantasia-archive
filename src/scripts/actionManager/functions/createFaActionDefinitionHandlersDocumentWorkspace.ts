@@ -1,7 +1,9 @@
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+import type { I_faTemporaryOpenedDocumentCreateInput } from 'app/types/I_faOpenedDocumentsDomain'
 
 type T_faOpenedDocumentsStoreForDocumentWorkspaceKeybinds = {
   activeDocumentId: string | null
+  createTemporaryDocument: (input: I_faTemporaryOpenedDocumentCreateInput) => Promise<string>
   enterDocumentEditMode: (documentId: string) => void
   focusTab: (documentId: string) => Promise<void>
   moveActiveDocumentTab: (direction: 'left' | 'right') => void
@@ -90,6 +92,16 @@ function createHandleEditActiveDocument (
   }
 }
 
+function createHandleCreateTemporaryOpenedDocument (
+  deps: T_faDocumentWorkspaceKeybindHandlerDeps
+): (payload: I_faTemporaryOpenedDocumentCreateInput) => Promise<void> {
+  return async function handleCreateTemporaryOpenedDocument (
+    payload: I_faTemporaryOpenedDocumentCreateInput
+  ): Promise<void> {
+    await deps.S_FaOpenedDocuments().createTemporaryDocument(payload)
+  }
+}
+
 function createHandleSaveOpenedDocumentDisplayName (
   deps: T_faDocumentWorkspaceKeybindHandlerDeps
 ): (payload: { documentId: string, keepEditMode: boolean }) => Promise<void> {
@@ -163,6 +175,9 @@ function createHandleFocusNextOpenedDocumentTab (
 export function createFaActionDefinitionHandlersDocumentWorkspace (
   deps: T_faDocumentWorkspaceKeybindHandlerDeps
 ): {
+    handleCreateTemporaryOpenedDocument: (
+      payload: I_faTemporaryOpenedDocumentCreateInput
+    ) => Promise<void>
     handleEditActiveDocument: () => void
     handleFocusNextOpenedDocumentTab: () => Promise<void>
     handleFocusPreviousOpenedDocumentTab: () => Promise<void>
@@ -174,6 +189,7 @@ export function createFaActionDefinitionHandlersDocumentWorkspace (
     }) => Promise<void>
   } {
   const handleEditActiveDocument = createHandleEditActiveDocument(deps)
+  const handleCreateTemporaryOpenedDocument = createHandleCreateTemporaryOpenedDocument(deps)
   const handleSaveOpenedDocumentDisplayName = createHandleSaveOpenedDocumentDisplayName(deps)
   const handleFocusPreviousOpenedDocumentTab = createHandleFocusPreviousOpenedDocumentTab(deps)
   const handleFocusNextOpenedDocumentTab = createHandleFocusNextOpenedDocumentTab(deps)
@@ -181,6 +197,7 @@ export function createFaActionDefinitionHandlersDocumentWorkspace (
   const handleMoveActiveOpenedDocumentTabRight = createHandleMoveActiveOpenedDocumentTabRight(deps)
 
   return {
+    handleCreateTemporaryOpenedDocument,
     handleEditActiveDocument,
     handleFocusNextOpenedDocumentTab,
     handleFocusPreviousOpenedDocumentTab,

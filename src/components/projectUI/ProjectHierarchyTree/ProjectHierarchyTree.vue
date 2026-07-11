@@ -83,7 +83,7 @@ defineOptions({
 const emit = defineEmits<{
   'document-open-request': [
     documentId: string,
-    mode: import('app/types/I_faOpenedDocumentsDomain').T_faOpenedDocumentOpenMode,
+  mode: import('app/types/I_faOpenedDocumentsDomain').T_faOpenedDocumentOpenMode,
     treeMeta: import('app/types/I_faOpenedDocumentsDomain').I_faOpenedDocumentTreeOpenMeta
   ]
 }>()

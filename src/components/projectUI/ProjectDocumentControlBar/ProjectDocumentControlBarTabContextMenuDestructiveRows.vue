@@ -42,6 +42,7 @@
   </q-item>
 
   <q-item
+    v-if="showDeleteThisDocument"
     v-close-popup
     clickable
     class="projectDocumentControlBarTabContextMenu__item text-secondary non-selectable"
@@ -75,5 +76,6 @@ defineProps<{
   onDeleteThisDocumentClick: () => void
   onForceCloseAllTabsClick: () => void
   onForceCloseAllTabsExceptThisOneClick: () => void
+  showDeleteThisDocument: boolean
 }>()
 </script>

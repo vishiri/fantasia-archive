@@ -6,7 +6,9 @@ import type {
   I_faOpenedDocumentsSnapshot,
   T_faOpenedDocumentOpenMode
 } from 'app/types/I_faOpenedDocumentsDomain'
+import { FA_OPENED_DOCUMENTS_SNAPSHOT_SCHEMA_VERSION } from 'app/types/I_faOpenedDocumentsDomain'
 import { normalizeOpenedDocumentTabEditState } from 'app/src/scripts/openedDocuments/functions/openedDocumentEditStateDomain'
+import { normalizeOpenedDocumentTabPersistenceState } from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
 import {
   appendOpenedDocumentTabToRight,
   computeOpenedDocumentHasUnsavedChanges,
@@ -22,7 +24,7 @@ export function buildFaOpenedDocumentsSnapshot (input: {
   tabs: readonly I_faOpenedDocumentTab[]
 }): I_faOpenedDocumentsSnapshot {
   return {
-    schemaVersion: 1,
+    schemaVersion: FA_OPENED_DOCUMENTS_SNAPSHOT_SCHEMA_VERSION,
     activeDocumentId: input.activeDocumentId,
     tabs: duplicateOpenedDocumentTabs(input.tabs)
   }
@@ -36,7 +38,9 @@ export function hydrateFaOpenedDocumentsTabsFromSnapshot (
   } {
   return {
     activeDocumentId: snapshot.activeDocumentId,
-    tabs: duplicateOpenedDocumentTabs(snapshot.tabs).map(normalizeOpenedDocumentTabEditState)
+    tabs: duplicateOpenedDocumentTabs(snapshot.tabs)
+      .map(normalizeOpenedDocumentTabPersistenceState)
+      .map(normalizeOpenedDocumentTabEditState)
   }
 }
 
@@ -47,6 +51,7 @@ export function createFaOpenedDocumentTabFromOpenMeta (input: {
 }): I_faOpenedDocumentTab {
   return {
     documentId: input.documentId,
+    persistenceState: 'persisted',
     tabLabel: input.treeMeta.tabLabel,
     templateIcon: input.treeMeta.templateIcon,
     displayNameDraft: input.displayName,

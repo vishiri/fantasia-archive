@@ -6,6 +6,7 @@ import type { I_ref } from 'app/types/I_vueCompositionShims'
 
 import { buildProjectDocumentControlBarTabContextMenuClickHandlers } from '../functions/projectDocumentControlBarTabContextMenuClickHandlers'
 import { buildProjectDocumentControlBarTabContextMenuLabels } from '../functions/projectDocumentControlBarTabContextMenuLabels'
+import { resolveOpenedDocumentTabIsTemporary } from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
 
 const PROJECT_DOCUMENT_CONTROL_BAR_TAB_CONTEXT_MENU_BROWSE_SUBMENU_ROW_INDEX = 0
 
@@ -95,6 +96,9 @@ function buildProjectDocumentControlBarTabContextMenuSessionReturn (input: {
   const onMoveTabRightClick = input.clickHandlers.onMoveTabRightClick
   const resolveBrowseTabLabel = input.clickHandlers.resolveBrowseTabLabel
   const resolveBrowseTabRoute = input.clickHandlers.resolveBrowseTabRoute
+  const showDeleteThisDocument = !resolveOpenedDocumentTabIsTemporary(
+    input.menuInput.tab.persistenceState
+  )
 
   return {
     browseOpenedTabsLabel,
@@ -127,7 +131,8 @@ function buildProjectDocumentControlBarTabContextMenuSessionReturn (input: {
     onSubmenuContentLeave,
     openedDocumentTabs,
     resolveBrowseTabLabel,
-    resolveBrowseTabRoute
+    resolveBrowseTabRoute,
+    showDeleteThisDocument
   }
 }
 

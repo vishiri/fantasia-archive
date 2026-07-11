@@ -49,6 +49,7 @@ export const FA_ACTION_IDS = [
   'openNewProjectDialog',
   'loadExistingProject',
   'editActiveDocument',
+  'createTemporaryOpenedDocument',
   'saveOpenedDocumentDisplayName',
   'focusPreviousOpenedDocumentTab',
   'focusNextOpenedDocumentTab',
@@ -141,6 +142,7 @@ export interface I_faActionPayloadMap {
   }
   importAppConfigApply: I_faAppConfigApplyInput
   editActiveDocument: void
+  createTemporaryOpenedDocument: import('app/types/I_faOpenedDocumentsDomain').I_faTemporaryOpenedDocumentCreateInput
   saveOpenedDocumentDisplayName: { documentId: string, keepEditMode: boolean }
   focusPreviousOpenedDocumentTab: void
   focusNextOpenedDocumentTab: void

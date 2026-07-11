@@ -19,6 +19,7 @@ const nullableTemplateIdSchema = z.union([
 
 export const faProjectDocumentCreateInputSchema = z.object({
   displayName: faProjectContentDisplayNameSchema,
+  id: faProjectContentIdSchema.optional(),
   templateId: nullableTemplateIdSchema.optional(),
   worldId: faProjectContentIdSchema,
   placementId: nullableTemplateIdSchema.optional(),

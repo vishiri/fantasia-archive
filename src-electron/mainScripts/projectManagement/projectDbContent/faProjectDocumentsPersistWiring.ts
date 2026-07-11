@@ -1,5 +1,4 @@
 import type Database from 'better-sqlite3'
-import { v4 as uuidv4 } from 'uuid'
 
 import {
   FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
@@ -20,6 +19,10 @@ import {
   readFaProjectDocumentSiblingMaxSortOrder
 } from './faProjectDocumentsSqlWiring'
 import { promoteFaProjectDocumentChildrenBeforeDelete } from './faProjectDocumentDeleteWiring'
+import {
+  resolveFaProjectDocumentIdForCreate,
+  validateDocumentParentForeignKey
+} from './faProjectDocumentCreateWiring'
 import type {
   I_faProjectDocument,
   I_faProjectDocumentCreateInput,
@@ -103,6 +106,7 @@ export function createFaProjectDocument (
   const templateId = input.templateId ?? null
   validateDocumentForeignKeys(db, input.worldId, templateId)
   const parentDocumentId = input.parentDocumentId ?? null
+  validateDocumentParentForeignKey(db, parentDocumentId)
   const placementId = resolveFaProjectDocumentPlacementId(
     db,
     input.worldId,
@@ -116,7 +120,7 @@ export function createFaProjectDocument (
     input.sortOrder
   )
   const nowMs = Date.now()
-  const id = uuidv4()
+  const id = resolveFaProjectDocumentIdForCreate(db, input.id)
   db.prepare(
     `INSERT INTO ${FA_PROJECT_TABLE_DOCUMENTS} ` +
       `(id, world_id, template_id, ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN}, ` +

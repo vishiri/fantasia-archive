@@ -83,7 +83,7 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: {
     dragDropCommitted: deps.dragDropCommitted,
     dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
-    flushDeferredTreeRevisionPublish: () => lazyLoadWiring.flushDeferredTreeRevisionPublish(),
+    flushDeferredTreeRevisionPublish: lazyLoadWiring.flushDeferredTreeRevisionPublish,
     flushUiStatePersist: () => deps.hierarchyStore.flushUiStatePersist(),
     getTreeRef: () => deps.treeComponentRef.value,
     getTreeScrollHost: () => deps.treeScrollHostRef.value,

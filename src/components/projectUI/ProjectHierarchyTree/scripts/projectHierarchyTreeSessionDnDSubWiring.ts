@@ -77,7 +77,7 @@ export function createProjectHierarchyTreeSessionDnDSubWiring (deps: T_sessionDn
     queuePersistExpandedNodeIds: (expandedNodeIds) => {
       deps.hierarchyStore.queuePersistExpandedNodeIds(expandedNodeIds)
     },
-    refreshLayout: () => deps.hierarchyStore.refreshLayout(),
+    refreshLayout: deps.hierarchyStore.refreshLayout,
     resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
     restoreExpandedSnapshot: deps.restoreExpandedSnapshot,
     suppressTreeEmit: deps.suppressTreeEmit,

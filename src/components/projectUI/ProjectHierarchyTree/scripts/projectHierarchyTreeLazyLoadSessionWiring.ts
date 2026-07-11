@@ -75,13 +75,7 @@ export function createProjectHierarchyTreeLazyLoadSessionWiring (deps: {
     requestAnimationFrame: deps.requestAnimationFrame,
     treeData: deps.treeData,
     treeMountKey: deps.treeMountKey,
-    watch: deps.watch,
-    windowClearTimeout: (timeoutId) => {
-      window.clearTimeout(timeoutId)
-    },
-    windowSetTimeout: (handler, delayMs) => {
-      return window.setTimeout(handler, delayMs)
-    }
+    watch: deps.watch
   })
   treeRevisionPublishHooks.reapplyHeTreeOpenState = () => {
     uiStateWiring.reapplyHeTreeOpenState()

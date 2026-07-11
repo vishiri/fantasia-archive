@@ -37,6 +37,10 @@ function isProjectHierarchyTreeNodeEffectivelyExpanded (
   return ancestors.every((ancestorId) => openNodeIds.has(ancestorId))
 }
 
+export const collectProjectHierarchyTreeAncestorIdsForTests = collectProjectHierarchyTreeAncestorIds
+export const isProjectHierarchyTreeNodeEffectivelyExpandedForTests =
+  isProjectHierarchyTreeNodeEffectivelyExpanded
+
 /**
  * Flat preorder of hierarchy rows currently visible in the sidebar tree (respects expand state).
  */

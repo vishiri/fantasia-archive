@@ -7,8 +7,10 @@ import type { Ref } from 'vue'
 import type {
   I_faOpenedDocumentTab,
   I_faOpenedDocumentTreeOpenMeta,
+  I_faTemporaryOpenedDocumentCreateInput,
   T_faOpenedDocumentOpenMode
 } from 'app/types/I_faOpenedDocumentsDomain'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 import { FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT } from 'app/types/I_faOpenedDocumentsDomain'
 import { i18n } from 'app/i18n/externalFileLoader'
 import {
@@ -26,6 +28,7 @@ import {
   resolveFaOpenedDocumentOpenFromTree,
   resolveFaOpenedDocumentsActiveDocumentSyncTarget
 } from 'app/src/stores/scripts/faOpenedDocumentsStoreActions'
+import { reconcileTemporaryOpenedDocumentTabFromSnapshot } from 'app/src/stores/scripts/faOpenedDocumentsTemporarySessionWiring'
 import {
   duplicateOpenedDocumentTabs,
   findOpenedDocumentTabIndexByDocumentId,
@@ -33,10 +36,22 @@ import {
   resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges,
   resolveOpenedDocumentTabsAfterForceClose
 } from 'app/src/scripts/openedDocuments/functions/openedDocumentTabDomain'
+import {
+  applyTemporaryOpenedDocumentParent,
+  createTemporaryOpenedDocumentTabSeed,
+  promoteTemporaryOpenedDocumentTabAfterCreate,
+  remapOpenedDocumentTabDocumentId,
+  resolveOpenedDocumentTabIsTemporary,
+  resolveTemporaryOpenedDocumentDisplayNameForSave,
+  resolveTemporaryOpenedDocumentParentDocumentId
+} from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/appRouting_manager'
 import { collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeDocumentParentBucket'
+import { resolveFaProjectDocumentTemplateDisplayTitleFromFields } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager'
+import { resolveFaLocaleStringTranslation } from 'app/src/scripts/localeTranslations/faLocaleStringTranslations_manager'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTree'
+import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import {
   faOpenedDocumentsPersistSnapshotFromBridge,
   faOpenedDocumentsRefreshSnapshotFromBridge
@@ -99,6 +114,14 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     }
     const nextTabs: I_faOpenedDocumentTab[] = []
     for (const tab of tabs.value) {
+      if (resolveOpenedDocumentTabIsTemporary(tab.persistenceState)) {
+        const reconciledTab = await reconcileTemporaryOpenedDocumentTabFromSnapshot(tab, api)
+        if (reconciledTab !== null) {
+          nextTabs.push(reconciledTab)
+        }
+        continue
+      }
+
       try {
         const doc = await api.getDocumentById(tab.documentId)
         const savedDisplayName = doc.displayName
@@ -200,6 +223,103 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     }
   }
 
+  function resolvePreferredLanguageCodeForTemporaryDocument (): T_faUserSettingsLanguageCode {
+    return S_FaUserSettings().settings?.languageCode ?? 'en-US'
+  }
+
+  async function createTemporaryDocument (
+    input: I_faTemporaryOpenedDocumentCreateInput
+  ): Promise<string> {
+    const api = window.faContentBridgeAPIs?.projectContent
+    if (
+      typeof api?.getDocumentTemplateById !== 'function' ||
+      typeof api?.getWorldById !== 'function' ||
+      typeof api?.getDocumentById !== 'function'
+    ) {
+      throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.createTemporaryError'))
+    }
+
+    const documentId = input.documentId ?? crypto.randomUUID()
+    const parentDocumentId = resolveTemporaryOpenedDocumentParentDocumentId(input)
+    if (parentDocumentId !== null) {
+      await api.getDocumentById(parentDocumentId)
+    }
+    await api.getWorldById(input.worldId)
+    const template = await api.getDocumentTemplateById(input.templateId)
+    const preferredLanguageCode = resolvePreferredLanguageCodeForTemporaryDocument()
+    const tabLabel = resolveFaProjectDocumentTemplateDisplayTitleFromFields(
+      template.titlePluralTranslations,
+      template.titleSingularTranslations,
+      preferredLanguageCode
+    )
+    const newTab = createTemporaryOpenedDocumentTabSeed({
+      displayName: input.displayName,
+      documentId,
+      parentDocumentId,
+      tabLabel,
+      templateIcon: template.icon,
+      templateId: input.templateId,
+      worldId: input.worldId
+    })
+    const openMode = input.openMode ?? 'leftNavigate'
+    const openResult = resolveFaOpenedDocumentOpenFromTree({
+      activeDocumentId,
+      documentId,
+      mode: openMode,
+      newTab,
+      tabs
+    })
+    schedulePersistSnapshot()
+    if (openResult.shouldNavigate && openResult.navigateDocumentId !== null) {
+      await navigateToOpenedDocumentRoute(openResult.navigateDocumentId)
+    }
+    return documentId
+  }
+
+  async function updateTemporaryDocumentParent (
+    documentId: string,
+    parentDocumentId: string | null
+  ): Promise<void> {
+    const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
+    if (index === -1) {
+      return
+    }
+    const current = tabs.value[index]
+    if (current === undefined || !resolveOpenedDocumentTabIsTemporary(current.persistenceState)) {
+      return
+    }
+    const api = window.faContentBridgeAPIs?.projectContent
+    if (typeof api?.getDocumentById !== 'function') {
+      return
+    }
+    if (parentDocumentId !== null) {
+      await api.getDocumentById(parentDocumentId)
+    }
+    const nextTabs = [...tabs.value]
+    nextTabs[index] = applyTemporaryOpenedDocumentParent(current, parentDocumentId)
+    tabs.value = nextTabs
+    schedulePersistSnapshot()
+  }
+
+  async function remapOpenedDocumentTabId (fromId: string, toId: string): Promise<void> {
+    const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, fromId)
+    if (index === -1) {
+      return
+    }
+    const current = tabs.value[index]
+    if (current === undefined) {
+      return
+    }
+    const nextTabs = [...tabs.value]
+    nextTabs[index] = remapOpenedDocumentTabDocumentId(current, toId)
+    tabs.value = nextTabs
+    if (activeDocumentId.value === fromId) {
+      activeDocumentId.value = toId
+      await navigateToOpenedDocumentRoute(toId)
+    }
+    schedulePersistSnapshot()
+  }
+
   async function focusTab (documentId: string): Promise<void> {
     if (findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId) === -1) {
       return
@@ -259,18 +379,87 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveErrorMissingTab'))
     }
     const api = window.faContentBridgeAPIs?.projectContent
+    if (!input.keepEditMode && typeof document !== 'undefined') {
+      const activeElement = document.activeElement
+      if (activeElement instanceof HTMLElement) {
+        activeElement.blur()
+      }
+    }
+
+    if (resolveOpenedDocumentTabIsTemporary(current.persistenceState)) {
+      if (
+        typeof api?.createDocument !== 'function' ||
+        typeof api?.getDocumentTemplateById !== 'function'
+      ) {
+        throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
+      }
+      const worldId = current.worldId
+      const templateId = current.templateId
+      if (worldId === undefined || templateId === undefined) {
+        throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
+      }
+      const template = await api.getDocumentTemplateById(templateId)
+      const preferredLanguageCode = resolvePreferredLanguageCodeForTemporaryDocument()
+      const templateSingularTitle = resolveFaLocaleStringTranslation(
+        template.titleSingularTranslations,
+        preferredLanguageCode
+      )
+      const displayName = resolveTemporaryOpenedDocumentDisplayNameForSave({
+        displayNameDraft: current.displayNameDraft,
+        formatUnnamedFallback: (templateSingular) => {
+          return i18n.global.t('globalFunctionality.faOpenedDocuments.unnamedDocumentFallback', {
+            templateSingular
+          })
+        },
+        templateSingularTitle
+      })
+      try {
+        const savedDocument = await api.createDocument({
+          displayName,
+          id: documentId,
+          parentDocumentId: current.parentDocumentId ?? null,
+          templateId,
+          worldId
+        })
+        if (savedDocument.id !== documentId) {
+          await remapOpenedDocumentTabId(documentId, savedDocument.id)
+        }
+        const savedIndex = findOpenedDocumentTabIndexByDocumentId(
+          tabs.value,
+          savedDocument.id
+        )
+        if (savedIndex === -1) {
+          throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveErrorMissingTab'))
+        }
+        const savedTab = tabs.value[savedIndex]
+        if (savedTab === undefined) {
+          throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveErrorMissingTab'))
+        }
+        const nextTabs = [...tabs.value]
+        nextTabs[savedIndex] = promoteTemporaryOpenedDocumentTabAfterCreate(savedTab, {
+          documentId: savedDocument.id,
+          keepEditMode: input.keepEditMode,
+          savedDisplayName: savedDocument.displayName
+        })
+        tabs.value = nextTabs
+        schedulePersistSnapshot.flush()
+        await flushPersistSnapshot()
+        S_FaProjectHierarchyTree().refreshDocumentsInTree([savedDocument.id])
+      } catch (error) {
+        console.error('[S_FaOpenedDocuments] saveDocumentDisplayName temporary failed', error)
+        throw error instanceof Error
+          ? error
+          : new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
+      }
+      return
+    }
+
     if (typeof api?.updateDocument !== 'function') {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
     }
     const trimmedDraft = current.displayNameDraft.trim()
     if (trimmedDraft.length === 0) {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveErrorEmptyDraft'))
-    }
-    if (!input.keepEditMode && typeof document !== 'undefined') {
-      const activeElement = document.activeElement
-      if (activeElement instanceof HTMLElement) {
-        activeElement.blur()
-      }
     }
     try {
       const savedDocument = await api.updateDocument(documentId, {
@@ -316,6 +505,10 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
   function requestDeleteDocument (documentId: string): void {
     const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
     if (index === -1) {
+      return
+    }
+    const tab = tabs.value[index]
+    if (tab === undefined || resolveOpenedDocumentTabIsTemporary(tab.persistenceState)) {
       return
     }
     pendingDeleteDocumentId.value = documentId
@@ -556,6 +749,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     hydrateFromProjectDatabase,
     hydrationComplete: readonly(hydrationComplete),
     clearSession,
+    createTemporaryDocument,
     enterDocumentEditMode,
     moveActiveDocumentTab,
     moveDocumentTab,
@@ -563,12 +757,14 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     pendingCloseDocumentId: readonly(pendingCloseDocumentId),
     pendingDeleteDocumentId: readonly(pendingDeleteDocumentId),
     replaceSessionForComponentTesting,
+    remapOpenedDocumentTabId,
     requestCloseTab,
     requestDeleteDocument,
     saveDocumentDisplayName,
     setDocumentEditState,
     syncActiveDocumentIdFromWorkspaceRoute,
     tabs: readonly(tabs),
-    updateDisplayNameDraft
+    updateDisplayNameDraft,
+    updateTemporaryDocumentParent
   }
 })

@@ -4,6 +4,7 @@
 ## 2.4.15
 
 ### New features
+- **Document workspace**: Programmatic **create temporary opened document** support lets integrations open unsaved document tabs before the first save. Temporary tabs stay in the **opened_documents** snapshot with world, template, and optional parent metadata; first save creates the SQLite row. **Delete current document** and tab **Delete this document** stay hidden for temporary tabs until they are saved.
 - **Windows**: The desktop installer uses a multi-step wizard where you can choose the install folder (for example **Program Files**). App settings and profile data still save under your user **AppData** roaming folder.
 - **Workspace sidebar**: Drag the splitter beside the left panel on the **home** workspace route to resize it. Width saves per **`.faproject`** when you release the drag (minimum **375px**; no upper limit; sidebar cannot collapse to zero).
 - **Workspace sidebar**: Virtualized hierarchy tree lists each world's template layout (groups and placements) with lazy-loaded documents. Expand and collapse state plus scroll position persist per project. Drag documents to reorder within the same template placement. Left-click a leaf document row to open it in the workspace tab strip; middle-click opens a background tab.

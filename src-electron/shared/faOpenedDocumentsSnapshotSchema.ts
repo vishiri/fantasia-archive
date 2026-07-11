@@ -1,23 +1,76 @@
 import { z } from 'zod'
 
 import type { I_faOpenedDocumentsSnapshot } from 'app/types/I_faOpenedDocumentsDomain'
-import { FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT } from 'app/types/I_faOpenedDocumentsDomain'
+import {
+  FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT,
+  FA_OPENED_DOCUMENTS_SNAPSHOT_SCHEMA_VERSION
+} from 'app/types/I_faOpenedDocumentsDomain'
+import { normalizeOpenedDocumentTabEditState } from 'app/src/scripts/openedDocuments/functions/openedDocumentEditStateDomain'
+import { normalizeOpenedDocumentTabPersistenceState } from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
 
 const faOpenedDocumentTabSchema = z.object({
   documentId: z.string().min(1).max(64),
+  persistenceState: z.enum(['temporary', 'persisted']).default('persisted'),
+  worldId: z.string().min(1).max(64).optional(),
+  templateId: z.string().min(1).max(64).optional(),
+  parentDocumentId: z.union([
+    z.string().min(1).max(64),
+    z.null()
+  ]).optional(),
   tabLabel: z.string().max(512),
   templateIcon: z.string().max(128),
   displayNameDraft: z.string().max(512),
   savedDisplayName: z.string().max(512),
   hasUnsavedChanges: z.boolean(),
   editState: z.boolean().default(false)
-}).strict()
+}).strict().superRefine((tab, context) => {
+  if (tab.persistenceState !== 'temporary') {
+    return
+  }
+  if (tab.worldId === undefined) {
+    context.addIssue({
+      code: 'custom',
+      message: 'Temporary opened document tabs require worldId',
+      path: ['worldId']
+    })
+  }
+  if (tab.templateId === undefined) {
+    context.addIssue({
+      code: 'custom',
+      message: 'Temporary opened document tabs require templateId',
+      path: ['templateId']
+    })
+  }
+})
 
-export const faOpenedDocumentsSnapshotSchema = z.object({
+const faOpenedDocumentsSnapshotSchemaV1 = z.object({
   schemaVersion: z.literal(1),
   activeDocumentId: z.string().min(1).max(64).nullable(),
   tabs: z.array(faOpenedDocumentTabSchema)
 }).strict()
+
+const faOpenedDocumentsSnapshotSchemaV2 = z.object({
+  schemaVersion: z.literal(2),
+  activeDocumentId: z.string().min(1).max(64).nullable(),
+  tabs: z.array(faOpenedDocumentTabSchema)
+}).strict()
+
+export const faOpenedDocumentsSnapshotSchema = z.union([
+  faOpenedDocumentsSnapshotSchemaV1,
+  faOpenedDocumentsSnapshotSchemaV2
+])
+
+function normalizeParsedOpenedDocumentsSnapshot (
+  snapshot: I_faOpenedDocumentsSnapshot
+): I_faOpenedDocumentsSnapshot {
+  return {
+    activeDocumentId: snapshot.activeDocumentId,
+    schemaVersion: FA_OPENED_DOCUMENTS_SNAPSHOT_SCHEMA_VERSION,
+    tabs: snapshot.tabs
+      .map(normalizeOpenedDocumentTabPersistenceState)
+      .map(normalizeOpenedDocumentTabEditState)
+  }
+}
 
 /**
  * Parses persisted opened_documents.snapshot_json from the project SQLite table.
@@ -34,7 +87,8 @@ export function parseFaOpenedDocumentsSnapshotJson (
       tabs: []
     }
   }
-  return faOpenedDocumentsSnapshotSchema.parse(parsed) as I_faOpenedDocumentsSnapshot
+  const validated = faOpenedDocumentsSnapshotSchema.parse(parsed) as I_faOpenedDocumentsSnapshot
+  return normalizeParsedOpenedDocumentsSnapshot(validated)
 }
 
 /**
@@ -43,7 +97,14 @@ export function parseFaOpenedDocumentsSnapshotJson (
 export function serializeFaOpenedDocumentsSnapshotJson (
   snapshot: I_faOpenedDocumentsSnapshot
 ): string {
-  const validated = faOpenedDocumentsSnapshotSchema.parse(snapshot)
+  const normalizedSnapshot: I_faOpenedDocumentsSnapshot = {
+    activeDocumentId: snapshot.activeDocumentId,
+    schemaVersion: FA_OPENED_DOCUMENTS_SNAPSHOT_SCHEMA_VERSION,
+    tabs: snapshot.tabs
+      .map(normalizeOpenedDocumentTabPersistenceState)
+      .map(normalizeOpenedDocumentTabEditState)
+  }
+  const validated = faOpenedDocumentsSnapshotSchemaV2.parse(normalizedSnapshot)
   return JSON.stringify(validated)
 }
 
@@ -56,5 +117,6 @@ export function parseFaOpenedDocumentsSnapshotPayload (
   if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
     throw new TypeError('Opened documents snapshot must be a plain object')
   }
-  return faOpenedDocumentsSnapshotSchema.parse(payload) as I_faOpenedDocumentsSnapshot
+  const validated = faOpenedDocumentsSnapshotSchema.parse(payload) as I_faOpenedDocumentsSnapshot
+  return normalizeParsedOpenedDocumentsSnapshot(validated)
 }
