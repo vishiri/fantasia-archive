@@ -96,3 +96,13 @@ test('upsertFaProjectSidebarKv clamps below-minimum writes to minimum', () => {
   })
   expect(upsertRuns[0]?.value).toBe(String(FA_PROJECT_SIDEBAR_MIN_WIDTH_PX))
 })
+
+/**
+ * upsertFaProjectSidebarKv
+ * Skips KV writes when widthPx is omitted from the patch.
+ */
+test('Test that upsertFaProjectSidebarKv no-ops when widthPx is undefined', () => {
+  const { db, upsertRuns } = makeKvProjectDb()
+  upsertFaProjectSidebarKv(db as never, {})
+  expect(upsertRuns).toEqual([])
+})

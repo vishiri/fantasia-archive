@@ -127,7 +127,7 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabItem renders tab icon b
   expect(w.find('.dialogProjectSettingsDocumentTemplatesTabItem__labelRow').exists()).toBe(true)
 })
 
-test('Test that DialogProjectSettingsDocumentTemplatesTabItem shows missing translations warning for active locale', () => {
+test('Test that DialogProjectSettingsDocumentTemplatesTabItem shows missing translations warning for active locale', async () => {
   const w = mount(DialogProjectSettingsDocumentTemplatesTabItem, {
     props: {
       currentLanguageCode: 'de',
@@ -149,6 +149,7 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabItem shows missing tran
       missingForm: 'both'
     })
   )
+  await warningIcon.trigger('click')
 })
 
 test('Test that DialogProjectSettingsDocumentTemplatesTabItem hides missing translations warning when active locale is present', () => {
@@ -197,6 +198,9 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabItem emits select on cl
 
   await w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tab"]').trigger('keydown', { key: 'Enter' })
   expect(w.emitted('select')?.[1]!).toEqual([template.id])
+
+  await w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tab"]').trigger('keydown', { key: ' ' })
+  expect(w.emitted('select')?.[2]!).toEqual([template.id])
 })
 
 /**

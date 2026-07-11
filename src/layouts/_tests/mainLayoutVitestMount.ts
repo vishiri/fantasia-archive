@@ -84,6 +84,7 @@ export async function mountMainLayoutForVitest (
           template: '<div data-test-locator="projectHierarchyTree" />'
         },
         QSplitter: {
+          emits: ['update:modelValue'],
           props: ['modelValue', 'unit', 'limits'],
           template: `
             <div
@@ -91,6 +92,11 @@ export async function mountMainLayoutForVitest (
               :limits="Array.isArray(limits) ? limits.join(',') : limits"
             >
               <slot name="before" />
+              <button
+                data-test-locator="mainLayout-sidebarSplitter-resize"
+                type="button"
+                @click="$emit('update:modelValue', 420)"
+              />
               <slot name="separator" />
               <slot name="after" />
             </div>

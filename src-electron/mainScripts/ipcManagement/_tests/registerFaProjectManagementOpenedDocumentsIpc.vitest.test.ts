@@ -73,6 +73,43 @@ test('Test that getOpenedDocumentsSnapshotAsync returns empty snapshot when DB i
 
 /**
  * registerFaProjectManagementOpenedDocumentsIpc
+ * getOpenedDocumentsSnapshotAsync returns a cloned snapshot when DB is available.
+ */
+test('Test that getOpenedDocumentsSnapshotAsync returns cloned tabs when DB is available', async () => {
+  const sourceSnapshot = {
+    schemaVersion: 2 as const,
+    activeDocumentId: 'doc-1',
+    tabs: [{
+      documentId: 'doc-1',
+      persistenceState: 'persisted' as const,
+      tabLabel: 'Hero',
+      templateIcon: 'mdi-account',
+      displayNameDraft: 'Hero',
+      savedDisplayName: 'Hero',
+      hasUnsavedChanges: false,
+      editState: false
+    }]
+  }
+  const { readFaProjectOpenedDocumentsSnapshot } = await import(
+    'app/src-electron/mainScripts/projectManagement/projectManagement_manager'
+  )
+  vi.mocked(readFaProjectOpenedDocumentsSnapshot).mockReturnValueOnce(sourceSnapshot)
+  const { registerFaProjectManagementOpenedDocumentsIpc } = await import(
+    '../registerFaProjectManagementOpenedDocumentsIpc'
+  )
+  registerFaProjectManagementOpenedDocumentsIpc()
+  const result = await handlerFor(FA_PROJECT_MANAGEMENT_IPC.getOpenedDocumentsSnapshotAsync)({}) as {
+    activeDocumentId: string | null
+    tabs: Array<{ tabLabel: string }>
+  }
+  expect(result.activeDocumentId).toBe('doc-1')
+  expect(result.tabs).toHaveLength(1)
+  result.tabs[0]!.tabLabel = 'Mutated'
+  expect(sourceSnapshot.tabs[0]?.tabLabel).toBe('Hero')
+})
+
+/**
+ * registerFaProjectManagementOpenedDocumentsIpc
  * saveOpenedDocumentsSnapshotAsync returns false when DB is unavailable.
  */
 test('Test that saveOpenedDocumentsSnapshotAsync returns false when DB is unavailable', async () => {

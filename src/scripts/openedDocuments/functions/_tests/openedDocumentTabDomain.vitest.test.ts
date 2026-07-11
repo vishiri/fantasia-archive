@@ -1,5 +1,7 @@
 import { expect, test } from 'vitest'
 
+import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+
 import {
   appendOpenedDocumentTabToRight,
   computeOpenedDocumentHasUnsavedChanges,
@@ -13,8 +15,9 @@ import {
   resolveOpenedDocumentTabsAfterForceClose
 } from '../openedDocumentTabDomain'
 
-const sampleTab = {
+const sampleTab: I_faOpenedDocumentTab = {
   documentId: 'doc-1',
+  persistenceState: 'persisted',
   tabLabel: 'Doc',
   templateIcon: 'mdi-feather',
   displayNameDraft: 'Draft',
@@ -252,4 +255,100 @@ test('Test that resolveOpenedDocumentTabsAfterForceClose keeps only the except t
   expect(result.nextTabs.map((tab) => tab.documentId)).toEqual(['doc-b'])
   expect(result.nextActiveDocumentId).toBe('doc-b')
   expect(result.shouldNavigateHome).toBe(false)
+})
+
+test('Test that removeOpenedDocumentTabAtIndex returns a copy when the index is out of range', () => {
+  const tabs = [sampleTab]
+  expect(removeOpenedDocumentTabAtIndex(tabs, -1)).toEqual(tabs)
+  expect(removeOpenedDocumentTabAtIndex(tabs, 3)).toEqual(tabs)
+})
+
+test('Test that resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges navigates home when active tab is null', () => {
+  const tabs = [
+    {
+      ...sampleTab,
+      documentId: 'doc-clean',
+      hasUnsavedChanges: false
+    },
+    {
+      ...sampleTab,
+      documentId: 'doc-dirty',
+      hasUnsavedChanges: true
+    }
+  ]
+
+  const result = resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges({
+    activeDocumentId: null,
+    exceptDocumentId: null,
+    tabs
+  })
+
+  expect(result.nextTabs.map((tab) => tab.documentId)).toEqual(['doc-dirty'])
+  expect(result.nextActiveDocumentId).toBeNull()
+  expect(result.shouldNavigateHome).toBe(true)
+})
+
+test('Test that resolveOpenedDocumentTabsAfterForceClose navigates home when the except tab is missing', () => {
+  const tabs = [
+    {
+      ...sampleTab,
+      documentId: 'doc-a',
+      hasUnsavedChanges: false
+    }
+  ]
+
+  const result = resolveOpenedDocumentTabsAfterForceClose({
+    activeDocumentId: 'doc-a',
+    exceptDocumentId: 'doc-missing',
+    tabs
+  })
+
+  expect(result.nextTabs).toEqual([])
+  expect(result.nextActiveDocumentId).toBeNull()
+  expect(result.shouldNavigateHome).toBe(true)
+})
+
+test('Test that resolveAdjacentOpenedDocumentTabId returns null when the active document is missing from tabs', () => {
+  const tabs = [
+    sampleTab,
+    {
+      ...sampleTab,
+      documentId: 'doc-2'
+    }
+  ]
+
+  expect(resolveAdjacentOpenedDocumentTabId(tabs, 'doc-missing', 'next')).toBeNull()
+})
+
+test('Test that resolveOpenedDocumentTabsAfterForceClose is a no-op when the except tab is already the only tab', () => {
+  const tabs = [
+    {
+      ...sampleTab,
+      documentId: 'doc-a',
+      hasUnsavedChanges: false
+    }
+  ]
+
+  const result = resolveOpenedDocumentTabsAfterForceClose({
+    activeDocumentId: 'doc-a',
+    exceptDocumentId: 'doc-a',
+    tabs
+  })
+
+  expect(result.nextTabs.map((tab) => tab.documentId)).toEqual(['doc-a'])
+  expect(result.nextActiveDocumentId).toBe('doc-a')
+  expect(result.shouldNavigateHome).toBe(false)
+})
+
+test('Test that moveOpenedDocumentTabByOffset returns null when a sparse tab row is missing', () => {
+  const tabs = [
+    sampleTab,
+    undefined as unknown as I_faOpenedDocumentTab,
+    {
+      ...sampleTab,
+      documentId: 'doc-3'
+    }
+  ]
+
+  expect(moveOpenedDocumentTabByOffset(tabs, 'doc-1', 1)).toBeNull()
 })

@@ -316,3 +316,87 @@ test('Test that FaLocaleTranslationsInput syncs translations menu open state fro
   await w.find('.q-menu-stub-close').trigger('click')
   expect(w.find(`[data-test-locator="${testLocator}-translationsMenu"]`).exists()).toBe(false)
 })
+
+/**
+ * FaLocaleTranslationsInput
+ * Renders menu-panel validation error copy when error props are set.
+ */
+test('Test that FaLocaleTranslationsInput renders menu panel error message', () => {
+  const w = mount(FaLocaleTranslationsInput, {
+    props: {
+      currentLanguageCode: 'en-US',
+      error: true,
+      errorMessage: 'Translation required',
+      modelValue: { 'en-US': '' },
+      presentation: 'menuPanel',
+      testLocator
+    },
+    global: mountGlobal
+  })
+
+  const errorNode = w.find(`[data-test-locator="${testLocator}-menuPanelError"]`)
+  expect(errorNode.exists()).toBe(true)
+  expect(errorNode.text()).toBe('Translation required')
+})
+
+/**
+ * FaLocaleTranslationsInput
+ * Applies singular-plural root class in field presentation mode.
+ */
+test('Test that FaLocaleTranslationsInput applies singular-plural root class in field mode', () => {
+  const w = mount(FaLocaleTranslationsInput, {
+    props: {
+      currentLanguageCode: 'en-US',
+      modelValue: {
+        plural: { 'en-US': 'Characters' },
+        singular: { 'en-US': 'Character' }
+      },
+      testLocator,
+      translationForms: 'singularPlural'
+    },
+    global: mountGlobal
+  })
+
+  expect(w.find('.faLocaleTranslationsInput__root--singularPlural').exists()).toBe(true)
+})
+
+/**
+ * FaLocaleTranslationsInput
+ * Opens translations menu through exposed openTranslationsMenu API.
+ */
+test('Test that FaLocaleTranslationsInput opens menu through exposed openTranslationsMenu', async () => {
+  const w = mount(FaLocaleTranslationsInput, {
+    props: {
+      currentLanguageCode: 'en-US',
+      modelValue: { 'en-US': 'Character' },
+      testLocator
+    },
+    global: mountGlobal
+  })
+
+  const exposed = w.vm as { openTranslationsMenu?: () => void }
+  exposed.openTranslationsMenu?.()
+
+  await w.vm.$nextTick()
+  expect(w.find(`[data-test-locator="${testLocator}-translationsMenu"]`).exists()).toBe(true)
+})
+
+/**
+ * FaLocaleTranslationsInput
+ * Skips menu-panel error copy when error message is blank.
+ */
+test('Test that FaLocaleTranslationsInput hides menu panel error when message is empty', () => {
+  const w = mount(FaLocaleTranslationsInput, {
+    props: {
+      currentLanguageCode: 'en-US',
+      error: true,
+      errorMessage: '',
+      modelValue: { 'en-US': '' },
+      presentation: 'menuPanel',
+      testLocator
+    },
+    global: mountGlobal
+  })
+
+  expect(w.find(`[data-test-locator="${testLocator}-menuPanelError"]`).exists()).toBe(false)
+})

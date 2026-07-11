@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
 
 import DialogProjectSettingsWorldsTabItem from '../DialogProjectSettingsWorldsTabItem.vue'
+import { expectInlineStyleColor } from 'app/helpers/vitestCssColorExpect'
 
 const worldFixture = {
   color: '',
@@ -87,7 +88,7 @@ test('Test that DialogProjectSettingsWorldsTabItem shows a color swatch only whe
 
   const swatch = withColor.find('[data-test-locator="dialogProjectSettings-worlds-tabColorSwatch"]')
   expect(swatch.exists()).toBe(true)
-  expect(swatch.attributes('style')).toContain('background-color: rgb(255, 0, 0)')
+  expectInlineStyleColor(swatch.attributes('style'), 'background-color', '#ff0000')
 })
 
 /**
@@ -182,6 +183,32 @@ test('Test that DialogProjectSettingsWorldsTabItem marks duplicate palette error
 
 /**
  * DialogProjectSettingsWorldsTabItem
+ * Selects the world when the tab is clicked.
+ */
+test('Test that DialogProjectSettingsWorldsTabItem selects on tab click', async () => {
+  const w = mount(DialogProjectSettingsWorldsTabItem, {
+    props: {
+      currentLanguageCode: 'en-US',
+      isSelected: false,
+      tabHasError: false,
+      world: worldFixture
+    },
+    global: {
+      directives: {
+        ripple: () => {}
+      },
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  await w.find('[data-test-locator="dialogProjectSettings-worlds-tab"]').trigger('click')
+  expect(w.emitted('select')).toEqual([[worldFixture.id]])
+})
+
+/**
+ * DialogProjectSettingsWorldsTabItem
  * Selects the world when Enter or Space is pressed on the tab.
  */
 test('Test that DialogProjectSettingsWorldsTabItem selects on Enter and Space keydown', async () => {
@@ -217,7 +244,7 @@ test('Test that DialogProjectSettingsWorldsTabItem selects on Enter and Space ke
  * DialogProjectSettingsWorldsTabItem
  * Shows missing translations warning when active locale has no display name.
  */
-test('Test that DialogProjectSettingsWorldsTabItem shows missing translations warning for active locale', () => {
+test('Test that DialogProjectSettingsWorldsTabItem shows missing translations warning for active locale', async () => {
   const w = mount(DialogProjectSettingsWorldsTabItem, {
     props: {
       currentLanguageCode: 'de',
@@ -251,6 +278,7 @@ test('Test that DialogProjectSettingsWorldsTabItem shows missing translations wa
   expect(warningIcon.attributes('data-test-tooltip-text')).toBe(
     'Some of the translations for the currently selected language are missing from this world.'
   )
+  await warningIcon.trigger('click')
 })
 
 /**

@@ -85,6 +85,7 @@ async function seedOpenedDocumentsSnapshotForFirstWorldDocument (
         {
           displayNameDraft: tabLabel,
           documentId: document.id,
+          persistenceState: 'persisted',
           hasUnsavedChanges: false,
           editState: false,
           savedDisplayName: tabLabel,

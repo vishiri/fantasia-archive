@@ -64,3 +64,12 @@ test('Test that faOpenedDocumentsPersistSnapshotFromBridge returns false when br
     faOpenedDocumentsPersistSnapshotFromBridge(createEmptyFaOpenedDocumentsSnapshot())
   ).resolves.toBe(false)
 })
+
+test('Test that faOpenedDocumentsPersistSnapshotFromBridge returns false when save API is unavailable', async () => {
+  window.faContentBridgeAPIs = {
+    projectManagement: {}
+  } as never
+  await expect(
+    faOpenedDocumentsPersistSnapshotFromBridge(createEmptyFaOpenedDocumentsSnapshot())
+  ).resolves.toBe(false)
+})

@@ -1,5 +1,7 @@
 import { beforeEach, expect, test, vi } from 'vitest'
 
+import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+
 import { createFaActionDefinitionHandlersDocumentWorkspace } from '../functions/createFaActionDefinitionHandlersDocumentWorkspace'
 
 const enterDocumentEditModeMock = vi.fn()
@@ -23,11 +25,15 @@ const resolveAdjacentOpenedDocumentTabIdMock = vi.fn((
   return null
 })
 
-const sessionState = {
-  activeDocumentId: 'doc-1' as string | null,
+const sessionState: {
+  activeDocumentId: string | null
+  tabs: I_faOpenedDocumentTab[]
+} = {
+  activeDocumentId: 'doc-1',
   tabs: [
     {
       documentId: 'doc-1',
+      persistenceState: 'persisted',
       tabLabel: 'One',
       templateIcon: 'mdi-feather',
       displayNameDraft: 'One',
@@ -37,6 +43,7 @@ const sessionState = {
     },
     {
       documentId: 'doc-2',
+      persistenceState: 'persisted',
       tabLabel: 'Two',
       templateIcon: 'mdi-feather',
       displayNameDraft: 'Two',
@@ -47,10 +54,13 @@ const sessionState = {
   ]
 }
 
+const createTemporaryDocumentMock = vi.fn(async () => 'doc-temp')
+
 const S_FaOpenedDocumentsMock = vi.fn(() => ({
   get activeDocumentId () {
     return sessionState.activeDocumentId
   },
+  createTemporaryDocument: createTemporaryDocumentMock,
   enterDocumentEditMode: enterDocumentEditModeMock,
   focusTab: focusTabMock,
   moveActiveDocumentTab: moveActiveDocumentTabMock,
@@ -82,6 +92,7 @@ beforeEach(() => {
   saveDocumentDisplayNameMock.mockClear()
   focusTabMock.mockClear()
   moveActiveDocumentTabMock.mockClear()
+  createTemporaryDocumentMock.mockClear()
   notifyCreateMock.mockClear()
   getCurrentRoutePathMock.mockReset()
   getCurrentRoutePathMock.mockReturnValue('/home/document/doc-1')
@@ -89,6 +100,19 @@ beforeEach(() => {
   resolveCanEditActiveDocumentViaKeybindMock.mockReturnValue(true)
   resolveAdjacentOpenedDocumentTabIdMock.mockClear()
   sessionState.activeDocumentId = 'doc-1'
+})
+
+test('Test that handleCreateTemporaryOpenedDocument delegates to the opened documents store', async () => {
+  const { handleCreateTemporaryOpenedDocument } = createHandlers()
+  const payload = {
+    displayName: 'Aria',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  }
+
+  await handleCreateTemporaryOpenedDocument(payload)
+
+  expect(createTemporaryDocumentMock).toHaveBeenCalledWith(payload)
 })
 
 test('Test that handleEditActiveDocument enters edit mode when guards pass', () => {

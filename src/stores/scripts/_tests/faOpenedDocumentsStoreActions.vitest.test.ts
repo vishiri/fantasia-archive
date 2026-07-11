@@ -9,6 +9,7 @@ import {
   applyFaOpenedDocumentTabEditState,
   buildFaOpenedDocumentsSnapshot,
   createFaOpenedDocumentTabFromOpenMeta,
+  hydrateFaOpenedDocumentsTabsFromSnapshot,
   resolveFaOpenedDocumentOpenFromTree,
   resolveFaOpenedDocumentsActiveDocumentSyncTarget,
   removeFaOpenedDocumentTabAtIndex
@@ -16,6 +17,7 @@ import {
 
 const baseTab: I_faOpenedDocumentTab = {
   documentId: 'doc-1',
+  persistenceState: 'persisted',
   tabLabel: 'Hero',
   templateIcon: 'mdi-account',
   displayNameDraft: 'Hero',
@@ -149,7 +151,7 @@ test('Test that buildFaOpenedDocumentsSnapshot copies tabs and active document i
     activeDocumentId: 'doc-1',
     tabs: [baseTab]
   })
-  expect(snapshot.schemaVersion).toBe(1)
+  expect(snapshot.schemaVersion).toBe(2)
   expect(snapshot.activeDocumentId).toBe('doc-1')
   expect(snapshot.tabs[0]?.documentId).toBe('doc-1')
 })
@@ -183,10 +185,73 @@ test('Test that resolveFaOpenedDocumentsActiveDocumentSyncTarget keeps active id
   expect(next).toBe('doc-1')
 })
 
+test('Test that removeFaOpenedDocumentTabAtIndex navigates home when focus resolves to a missing tab row', () => {
+  const ghostTab = undefined as unknown as I_faOpenedDocumentTab
+  const tabs = ref([ghostTab, baseTab])
+  const activeDocumentId = ref<string | null>('doc-1')
+  const lastRemovedIndex = ref(-1)
+  const result = removeFaOpenedDocumentTabAtIndex({
+    activeDocumentId,
+    lastRemovedIndex,
+    removedIndex: 1,
+    tabs
+  })
+  expect(result.shouldNavigateHome).toBe(true)
+  expect(result.nextActiveDocumentId).toBeNull()
+  expect(activeDocumentId.value).toBeNull()
+  expect(tabs.value).toHaveLength(1)
+})
+
+test('Test that hydrateFaOpenedDocumentsTabsFromSnapshot normalizes legacy tab rows', () => {
+  const hydrated = hydrateFaOpenedDocumentsTabsFromSnapshot({
+    activeDocumentId: 'doc-1',
+    schemaVersion: 2,
+    tabs: [{
+      ...baseTab,
+      editState: undefined as unknown as boolean,
+      persistenceState: undefined as unknown as 'persisted'
+    }]
+  })
+  expect(hydrated.activeDocumentId).toBe('doc-1')
+  expect(hydrated.tabs[0]?.editState).toBe(false)
+  expect(hydrated.tabs[0]?.persistenceState).toBe('persisted')
+})
+
+test('Test that resolveFaOpenedDocumentsActiveDocumentSyncTarget follows workspace document routes', () => {
+  const next = resolveFaOpenedDocumentsActiveDocumentSyncTarget({
+    currentActiveDocumentId: 'doc-1',
+    routeDocumentId: 'doc-1',
+    routePath: '/home/document/doc-1',
+    tabs: [baseTab]
+  })
+  expect(next).toBe('doc-1')
+})
+
+test('Test that resolveFaOpenedDocumentsActiveDocumentSyncTarget clears active id on home route', () => {
+  const next = resolveFaOpenedDocumentsActiveDocumentSyncTarget({
+    currentActiveDocumentId: 'doc-1',
+    routeDocumentId: null,
+    routePath: '/home',
+    tabs: [baseTab]
+  })
+  expect(next).toBeNull()
+})
+
+test('Test that resolveFaOpenedDocumentsActiveDocumentSyncTarget keeps active id when route document is not open', () => {
+  const next = resolveFaOpenedDocumentsActiveDocumentSyncTarget({
+    currentActiveDocumentId: 'doc-1',
+    routeDocumentId: 'doc-missing',
+    routePath: '/home/document/doc-missing',
+    tabs: [baseTab]
+  })
+  expect(next).toBe('doc-1')
+})
+
 test('Test that removeFaOpenedDocumentTabAtIndex focuses the previous tab when closing the last tab in a pair', () => {
   const secondTab: I_faOpenedDocumentTab = {
     ...baseTab,
     documentId: 'doc-2',
+    persistenceState: 'persisted',
     displayNameDraft: 'Villain',
     savedDisplayName: 'Villain',
     tabLabel: 'Villain'

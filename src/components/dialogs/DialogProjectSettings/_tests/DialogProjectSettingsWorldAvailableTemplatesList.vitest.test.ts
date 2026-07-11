@@ -211,3 +211,27 @@ test('Test that DialogProjectSettingsWorldAvailableTemplatesList clears hover fo
   await row.trigger('contextmenu')
   expect(row.element.classList.contains('q-manual-focusable--focused')).toBe(false)
 })
+
+test('Test that DialogProjectSettingsWorldAvailableTemplatesList stops click propagation on missing translations warning', async () => {
+  const w = mount(DialogProjectSettingsWorldAvailableTemplatesList, {
+    props: {
+      currentLanguageCode: 'de',
+      templates: [
+        buildDialogProjectSettingsDocumentTemplateDraft({
+          titlePluralTranslations: { 'en-US': 'Races' },
+          titleSingularTranslations: {}
+        })
+      ]
+    },
+    global: mergeDialogProjectSettingsVitestGlobal({
+      stubs: {
+        ...listStubs,
+        QTooltip: { template: '<span><slot /></span>' }
+      }
+    })
+  })
+
+  const warningIcon = w.find('[data-test-locator="dialogProjectSettings-worldAvailableTemplates-missingTranslationsWarning"]')
+  expect(warningIcon.exists()).toBe(true)
+  await warningIcon.trigger('click')
+})

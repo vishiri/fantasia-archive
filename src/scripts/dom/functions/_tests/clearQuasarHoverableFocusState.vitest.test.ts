@@ -29,3 +29,28 @@ test('Test that clearQuasarHoverableFocusState blurs the hoverable element and i
 test('Test that clearQuasarHoverableFocusState no-ops for null', () => {
   expect(() => clearQuasarHoverableFocusState(null)).not.toThrow()
 })
+
+test('Test that clearQuasarHoverableFocusState no-ops for undefined', () => {
+  expect(() => clearQuasarHoverableFocusState(undefined)).not.toThrow()
+})
+
+test('Test that clearQuasarHoverableFocusState blurs element without a focus helper child', () => {
+  const element = document.createElement('button')
+  const blurSpy = vi.spyOn(element, 'blur')
+
+  clearQuasarHoverableFocusState(element)
+
+  expect(blurSpy).toHaveBeenCalledTimes(1)
+})
+
+test('Test that clearQuasarHoverableFocusState skips blur when focus helper is not an HTMLElement', () => {
+  const element = document.createElement('div')
+  const focusHelper = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  focusHelper.classList.add('q-focus-helper')
+  element.append(focusHelper)
+  const helperBlurSpy = vi.spyOn(focusHelper as unknown as HTMLElement, 'blur')
+
+  clearQuasarHoverableFocusState(element)
+
+  expect(helperBlurSpy).not.toHaveBeenCalled()
+})

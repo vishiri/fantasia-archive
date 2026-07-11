@@ -48,6 +48,7 @@ import {
   resolveProjectHierarchyTreeDragContext
 } from '../projectHierarchyTreeDnD'
 import { findProjectHierarchyTreeDocumentsWithInvalidPlacementParent } from '../projectHierarchyTreeDocumentPlacementGuard'
+import { replaceProjectHierarchyTreeNodeByIdInPlace } from '../projectHierarchyTreeCloneLoadedNodeForPublish'
 import { resolveProjectHierarchyTreeDragExpandedSnapshot, captureProjectHierarchyTreeDragExpandSnapshots } from '../../scripts/projectHierarchyTreeDragExpandSnapshotWiring'
 import { mapProjectHierarchyTreeToTopologyKey } from '../projectHierarchyTreeTopologyKey'
 import { projectHierarchyTreeLayoutStructureMatchesTree } from '../../scripts/projectHierarchyTreeLayoutStructureMatch'
@@ -1583,6 +1584,97 @@ test('Test that projectHierarchyTreeNodeShowsOpenIcon shows caret for document p
   }, 1)).toBe(true)
 })
 
+test('Test that projectHierarchyTreeNodeShowsOpenIcon uses loaded document child rows', () => {
+  const loadedChild = {
+    children: [],
+    childrenLoaded: false,
+    documentId: 'doc-child',
+    groupId: null,
+    hasChildren: false,
+    icon: '',
+    id: 'doc-child',
+    label: 'Child',
+    nodeKind: 'document' as const,
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const parentDocument = {
+    children: [loadedChild],
+    childrenLoaded: true,
+    documentId: 'doc-parent',
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'doc-parent',
+    label: 'Parent',
+    nodeKind: 'document' as const,
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  expect(projectHierarchyTreeNodeShowsOpenIcon(parentDocument, 0)).toBe(true)
+})
+
+test('Test that syncProjectHierarchyTreeDocumentHasChildrenFlags keeps parents with loaded document children', () => {
+  const loadedChild = {
+    children: [],
+    childrenLoaded: false,
+    documentId: 'doc-child',
+    groupId: null,
+    hasChildren: false,
+    icon: '',
+    id: 'doc-child',
+    label: 'Child',
+    nodeKind: 'document' as const,
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const parentNode = {
+    children: [loadedChild],
+    childrenLoaded: true,
+    documentId: 'doc-parent',
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'doc-parent',
+    label: 'Parent',
+    nodeKind: 'document' as const,
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const emptiedParentDocumentIds = syncProjectHierarchyTreeDocumentHasChildrenFlags([parentNode])
+  expect(emptiedParentDocumentIds).toEqual([])
+  expect(parentNode.hasChildren).toBe(true)
+  expect(parentNode.childrenLoaded).toBe(true)
+})
+
+test('Test that mapProjectHierarchyTreeToTopologyKey sorts root placement ids deterministically', () => {
+  const worldWithRootPlacements = {
+    ...sampleWorld,
+    groups: [],
+    placements: [
+      {
+        ...sampleWorld.placements[1]!,
+        id: 'placement-z',
+        rootSortOrder: 1
+      },
+      {
+        ...sampleWorld.placements[1]!,
+        displayName: 'Earlier placement',
+        id: 'placement-a',
+        rootSortOrder: 0
+      }
+    ]
+  }
+  const key = mapProjectHierarchyTreeToTopologyKey(
+    mapWorkspaceLayoutToHierarchyTreeSkeleton([worldWithRootPlacements])
+  )
+  expect(key.indexOf('placement-a')).toBeLessThan(key.indexOf('placement-z'))
+})
+
 /**
  * resolveProjectHierarchyTreeTreeNodeKindClass maps each node kind to a he-tree row class.
  */
@@ -2439,4 +2531,138 @@ test('Test that createProjectHierarchyTreeDragSessionState tracks drag session b
   expect(session.dragSiblingOrderSnapshot.get()?.placementId).toBe('placement-1')
   session.clearDragSessionFlags()
   expect(session.draggedDocumentId.get()).toBeNull()
+})
+
+test('Test that mapHierarchyDocumentChildrenToTreeNodes tie-breaks equal sortOrder by name then id', () => {
+  const nodes = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [
+      {
+        displayName: 'Bravo',
+        hasChildren: false,
+        id: 'doc-b',
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        sortOrder: 0
+      },
+      {
+        displayName: 'Alpha',
+        hasChildren: false,
+        id: 'doc-a',
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        sortOrder: 0
+      },
+      {
+        displayName: 'Alpha',
+        hasChildren: false,
+        id: 'doc-c',
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        sortOrder: 0
+      }
+    ],
+    placementIcon: 'mdi-account',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  expect(nodes.map((node) => node.id)).toEqual(['doc-a', 'doc-c', 'doc-b'])
+})
+
+test('Test that replaceProjectHierarchyTreeNodeByIdInPlace skips undefined tree slots', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const sparseTree = tree as unknown as I_faProjectHierarchyTreeHeTreeNode[]
+  sparseTree.length = 2
+  sparseTree[1] = undefined as unknown as I_faProjectHierarchyTreeHeTreeNode
+  expect(replaceProjectHierarchyTreeNodeByIdInPlace(sparseTree, 'missing', tree[0]!)).toBe(false)
+})
+
+test('Test that findProjectHierarchyTreeDocumentsWithInvalidPlacementParent returns empty for non-array input', async () => {
+  const { findProjectHierarchyTreeDocumentsWithInvalidPlacementParent } = await import('../projectHierarchyTreeDocumentPlacementGuard')
+  expect(findProjectHierarchyTreeDocumentsWithInvalidPlacementParent(null as unknown as I_faProjectHierarchyTreeHeTreeNode[])).toEqual([])
+})
+
+test('Test that collectProjectHierarchyTreeVisibleFlatNodes skips descendants when ancestor collapsed', () => {
+  const nestedDoc: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: true,
+    documentId: 'doc-hidden',
+    groupId: 'group-1',
+    hasChildren: false,
+    icon: '',
+    id: 'doc-hidden',
+    label: 'Hidden',
+    nodeKind: 'document',
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const groupNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [nestedDoc],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: 'group-1',
+    hasChildren: true,
+    icon: '',
+    id: 'group-1',
+    label: 'Group',
+    nodeKind: 'group',
+    placementId: null,
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const worldNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [groupNode],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'world-1',
+    label: 'World',
+    nodeKind: 'world',
+    placementId: null,
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const collapsedWorld = collectProjectHierarchyTreeVisibleFlatNodes(
+    [worldNode],
+    new Set(['group-1'])
+  )
+  expect(collapsedWorld.map((node) => node.id)).toEqual(['world-1'])
+  const expandedWorld = collectProjectHierarchyTreeVisibleFlatNodes(
+    [worldNode],
+    new Set(['world-1', 'group-1'])
+  )
+  expect(expandedWorld.map((node) => node.id)).toEqual(['world-1', 'group-1', 'doc-hidden'])
+})
+
+test('Test that visible flat node expand helpers treat missing nodes as collapsed', async () => {
+  const {
+    collectProjectHierarchyTreeAncestorIdsForTests,
+    isProjectHierarchyTreeNodeEffectivelyExpandedForTests
+  } = await import('../projectHierarchyTreeVisibleFlatNodes')
+  expect(collectProjectHierarchyTreeAncestorIdsForTests([], 'missing-node')).toBeNull()
+  expect(isProjectHierarchyTreeNodeEffectivelyExpandedForTests(
+    [],
+    'missing-node',
+    new Set(['missing-node'])
+  )).toBe(false)
+})
+
+test('Test that waitForProjectHierarchyTreeDragModelSettle uses default max attempts and final settled read', async () => {
+  const { createWaitForProjectHierarchyTreeDragModelSettle } = await import('../waitForProjectHierarchyTreeDragModelSettle')
+  let attempts = 0
+  const waitForModelSettle = createWaitForProjectHierarchyTreeDragModelSettle({
+    nextTick: async () => {
+      attempts += 1
+      if (attempts >= 30) {
+        settled = true
+      }
+    },
+    readModelSettled: () => settled
+  })
+  let settled = false
+  const result = await waitForModelSettle()
+  expect(result.settled).toBe(true)
+  expect(result.attempts).toBe(30)
 })

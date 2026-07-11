@@ -3,6 +3,7 @@ import { expect, test } from 'vitest'
 import {
   parseFaProjectHierarchyTreeListPlacementChildrenInput,
   parseFaProjectHierarchyTreeMoveDocumentInput,
+  parseFaProjectHierarchyTreeReindexDocumentSiblingsInput,
   parseFaProjectHierarchyTreeSearchInput,
   parseFaProjectHierarchyTreeSearchQueryPayload
 } from '../faProjectHierarchyTreeContentSchema'
@@ -72,6 +73,24 @@ test('Test that parseFaProjectHierarchyTreeListPlacementChildrenInput parses par
     placementId: SAMPLE_UUID
   })
   expect(parsed.parentDocumentId).toBe(parentId)
+})
+
+/**
+ * parseFaProjectHierarchyTreeReindexDocumentSiblingsInput
+ * Validates sibling reindex payload for hierarchy reorder IPC.
+ */
+test('Test that parseFaProjectHierarchyTreeReindexDocumentSiblingsInput parses reorder payload', () => {
+  const siblingId = '660e8400-e29b-41d4-a716-446655440001'
+  const parsed = parseFaProjectHierarchyTreeReindexDocumentSiblingsInput({
+    movedDocumentId: SAMPLE_UUID,
+    orderedDocumentIds: [SAMPLE_UUID, siblingId],
+    parentDocumentId: null,
+    placementId: siblingId
+  })
+  expect(parsed.movedDocumentId).toBe(SAMPLE_UUID)
+  expect(parsed.orderedDocumentIds).toEqual([SAMPLE_UUID, siblingId])
+  expect(parsed.parentDocumentId).toBeNull()
+  expect(parsed.placementId).toBe(siblingId)
 })
 
 /**

@@ -7,6 +7,7 @@ import { resolveFaOpenedDocumentsActiveDocumentSyncTarget } from 'app/src/stores
 const sampleTab: I_faOpenedDocumentTab = {
   displayNameDraft: 'Doc A',
   documentId: 'doc-a',
+  persistenceState: 'persisted',
   hasUnsavedChanges: false,
   editState: false,
   savedDisplayName: 'Doc A',

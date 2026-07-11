@@ -16,6 +16,7 @@ test('Test that buildProjectDocumentControlBarTabContextMenuHandlers copies the 
       return {
         displayNameDraft: ' Draft ',
         documentId: 'doc-a',
+        persistenceState: 'persisted',
         editState: false,
         hasUnsavedChanges: false,
         savedDisplayName: 'Saved',
@@ -88,6 +89,7 @@ test('Test that buildProjectDocumentControlBarTabContextMenuHandlers skips copy 
     findTabByDocumentId: () => ({
       displayNameDraft: '   ',
       documentId: 'doc-a',
+      persistenceState: 'persisted',
       editState: false,
       hasUnsavedChanges: false,
       savedDisplayName: 'Saved',
@@ -120,6 +122,7 @@ test('Test that buildProjectDocumentControlBarTabContextMenuHandlers reports cli
     findTabByDocumentId: () => ({
       displayNameDraft: 'Hero',
       documentId: 'doc-a',
+      persistenceState: 'persisted',
       editState: false,
       hasUnsavedChanges: false,
       savedDisplayName: 'Saved',

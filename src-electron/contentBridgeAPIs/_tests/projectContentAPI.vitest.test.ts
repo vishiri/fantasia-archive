@@ -91,6 +91,12 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
     targetParentDocumentId: null,
     targetSortOrder: 0
   })
+  await projectContentAPI.reindexDocumentSiblingsInHierarchy({
+    movedDocumentId: SAMPLE_UUID,
+    orderedDocumentIds: [SAMPLE_UUID, SAMPLE_UUID_B],
+    parentDocumentId: null,
+    placementId: SAMPLE_UUID_B
+  })
   await projectContentAPI.searchProjectHierarchy('hero')
 
   expect(invokeMock).toHaveBeenCalledWith(
@@ -153,6 +159,15 @@ test('Test that projectContentAPI methods invoke expected IPC channels', async (
       documentId: SAMPLE_UUID,
       targetParentDocumentId: null,
       targetSortOrder: 0
+    }
+  )
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_CONTENT_IPC.reindexDocumentSiblingsInHierarchyAsync,
+    {
+      movedDocumentId: SAMPLE_UUID,
+      orderedDocumentIds: [SAMPLE_UUID, SAMPLE_UUID_B],
+      parentDocumentId: null,
+      placementId: SAMPLE_UUID_B
     }
   )
   expect(invokeMock).toHaveBeenCalledWith(

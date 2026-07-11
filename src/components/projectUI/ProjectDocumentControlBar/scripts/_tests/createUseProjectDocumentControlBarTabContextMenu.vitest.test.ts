@@ -39,6 +39,7 @@ test('Test that createUseProjectDocumentControlBarTabContextMenu delegates to se
     tab: {
       displayNameDraft: 'Hero',
       documentId: 'doc-a',
+      persistenceState: 'persisted',
       editState: false,
       hasUnsavedChanges: false,
       savedDisplayName: 'Hero',

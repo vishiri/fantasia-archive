@@ -168,6 +168,19 @@ test('Test that createFaProjectContentBridgeHarnessStub hierarchy methods return
     sortOrder: 0,
     hasChildren: false
   })
+  await expect(api.reindexDocumentSiblingsInHierarchy({
+    movedDocumentId: STUB_UUID,
+    orderedDocumentIds: [STUB_UUID],
+    parentDocumentId: null,
+    placementId: STUB_UUID
+  })).resolves.toEqual({
+    id: STUB_UUID,
+    displayName: 'Stub',
+    placementId: 'placement-stub',
+    parentDocumentId: null,
+    sortOrder: 0,
+    hasChildren: false
+  })
   await expect(api.searchProjectHierarchy('hero')).resolves.toEqual({
     hits: [],
     query: 'hero'

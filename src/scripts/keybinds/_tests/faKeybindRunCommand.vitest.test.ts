@@ -11,6 +11,7 @@ const keybindSaveSession = vi.hoisted(() => ({
   tabs: [
     {
       documentId: 'doc-1',
+      persistenceState: 'persisted',
       tabLabel: 'One',
       templateIcon: 'mdi-feather',
       displayNameDraft: 'One',

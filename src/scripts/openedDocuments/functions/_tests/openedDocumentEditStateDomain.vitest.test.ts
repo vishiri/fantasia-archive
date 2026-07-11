@@ -7,9 +7,11 @@ import {
   resolveOpenedDocumentTabIsInPreviewMode
 } from '../openedDocumentEditStateDomain'
 import { FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE } from 'app/types/I_faOpenedDocumentsDomain'
+import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
-const sampleTab = {
+const sampleTab: I_faOpenedDocumentTab = {
   documentId: 'doc-1',
+  persistenceState: 'persisted',
   tabLabel: 'Character',
   templateIcon: 'mdi-account',
   displayNameDraft: 'Hero',

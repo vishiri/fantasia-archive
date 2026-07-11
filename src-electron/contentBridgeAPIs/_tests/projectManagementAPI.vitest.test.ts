@@ -247,3 +247,33 @@ test('projectManagementAPI stageE2eNextOpenPath invokes staging IPC', async () =
     'D:\\y.faproject'
   )
 })
+
+test('projectManagementAPI getOpenedDocumentsSnapshot invokes IPC', async () => {
+  const snapshot = {
+    activeDocumentId: 'doc-1',
+    schemaVersion: 2 as const,
+    tabs: []
+  }
+  invokeMock.mockResolvedValueOnce(snapshot)
+  const result = await projectManagementAPI.getOpenedDocumentsSnapshot()
+  expect(result).toEqual(snapshot)
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.getOpenedDocumentsSnapshotAsync
+  )
+})
+
+test('projectManagementAPI saveOpenedDocumentsSnapshot invokes IPC with cloned payload', async () => {
+  invokeMock.mockResolvedValueOnce(true)
+  const snapshot = {
+    activeDocumentId: 'doc-1',
+    schemaVersion: 2 as const,
+    tabs: []
+  }
+  const ok = await projectManagementAPI.saveOpenedDocumentsSnapshot(snapshot)
+  expect(ok).toBe(true)
+  expect(invokeMock).toHaveBeenCalledWith(
+    FA_PROJECT_MANAGEMENT_IPC.saveOpenedDocumentsSnapshotAsync,
+    snapshot
+  )
+  expect(snapshot.activeDocumentId).toBe('doc-1')
+})

@@ -209,6 +209,24 @@ test('Test that scheduleFaLocaleTranslationsMenuInputFocus focuses menu input af
   expect(focusMenuInput).toHaveBeenCalledTimes(2)
 })
 
+test('Test that scheduleFaLocaleTranslationsMenuInputFocus logs when nextTick rejects', async () => {
+  const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+  const focusMenuInput = vi.fn()
+  scheduleFaLocaleTranslationsMenuInputFocus({
+    focusMenuInput,
+    nextTick: () => Promise.reject(new Error('nextTick failed')),
+    requestAnimationFrame: vi.fn()
+  })
+  await vi.waitFor(() => {
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      '[faLocaleTranslations] nextTick chain failed',
+      expect.any(Error)
+    )
+  })
+  expect(focusMenuInput).not.toHaveBeenCalled()
+  consoleErrorSpy.mockRestore()
+})
+
 test('Test that resolveFaLocaleTranslationsMenuPresentation uses built-in defaults when optional sizes omitted', () => {
   const presentation = resolveFaLocaleTranslationsMenuPresentation({
     anchorRect: {

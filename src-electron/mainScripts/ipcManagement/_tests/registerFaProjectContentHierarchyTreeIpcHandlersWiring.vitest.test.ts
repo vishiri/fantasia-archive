@@ -26,6 +26,13 @@ vi.mock(
       sortOrder: 0,
       hasChildren: false
     })),
+    reindexFaProjectHierarchyDocumentSiblings: vi.fn(() => ({
+      movedDocumentId: '550e8400-e29b-41d4-a716-446655440000',
+      orderedDocumentIds: [
+        '550e8400-e29b-41d4-a716-446655440000',
+        '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
+      ]
+    })),
     searchFaProjectHierarchy: vi.fn(() => ({
       query: 'q',
       hits: []
@@ -76,6 +83,15 @@ test('Test that hierarchy IPC handlers delegate through runFaProjectContentIpcWo
     targetParentDocumentId: null,
     targetSortOrder: 0
   })
+  await handlerFor(FA_PROJECT_CONTENT_IPC.reindexDocumentSiblingsInHierarchyAsync)(event, {
+    movedDocumentId: '550e8400-e29b-41d4-a716-446655440000',
+    orderedDocumentIds: [
+      '550e8400-e29b-41d4-a716-446655440000',
+      '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
+    ],
+    parentDocumentId: null,
+    placementId: '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
+  })
   await handlerFor(FA_PROJECT_CONTENT_IPC.searchProjectHierarchyAsync)(event, { query: 'hero' })
-  expect(runWorkMock).toHaveBeenCalledTimes(4)
+  expect(runWorkMock).toHaveBeenCalledTimes(5)
 })

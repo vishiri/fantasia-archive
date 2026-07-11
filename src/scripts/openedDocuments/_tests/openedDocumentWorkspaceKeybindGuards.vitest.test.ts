@@ -1,5 +1,7 @@
 import { expect, test } from 'vitest'
 
+import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+
 import {
   resolveActiveOpenedDocumentTab,
   resolveCanEditActiveDocumentViaKeybind,
@@ -7,8 +9,9 @@ import {
   resolveIsOnDocumentWorkspaceRoute
 } from '../functions/openedDocumentWorkspaceKeybindGuards'
 
-const previewTab = {
+const previewTab: I_faOpenedDocumentTab = {
   documentId: 'doc-1',
+  persistenceState: 'persisted',
   tabLabel: 'Doc',
   templateIcon: 'mdi-feather',
   displayNameDraft: 'Draft',
@@ -48,6 +51,10 @@ function resolveShowSaveButtons (input: {
 
 test('Test that resolveActiveOpenedDocumentTab returns null when active document id is missing', () => {
   expect(resolveActiveOpenedDocumentTab([previewTab], null)).toBeNull()
+})
+
+test('Test that resolveActiveOpenedDocumentTab returns null when the tab list does not contain the active id', () => {
+  expect(resolveActiveOpenedDocumentTab([previewTab], 'missing')).toBeNull()
 })
 
 test('Test that resolveIsOnDocumentWorkspaceRoute reports workspace routes only', () => {
@@ -96,5 +103,13 @@ test('Test that resolveCanSaveActiveDocumentViaKeybind delegates to save visibil
     resolveShowProjectDocumentControlBarSaveButtons: resolveShowSaveButtons,
     routePath: '/home/document/doc-1',
     tabs: [previewTab]
+  })).toBe(false)
+
+  expect(resolveCanSaveActiveDocumentViaKeybind({
+    activeDocumentId: null,
+    resolveFaDocumentWorkspaceRouteDocumentId: resolveRouteDocumentId,
+    resolveShowProjectDocumentControlBarSaveButtons: resolveShowSaveButtons,
+    routePath: '/home/document/doc-1',
+    tabs: [editTab]
   })).toBe(false)
 })

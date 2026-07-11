@@ -511,3 +511,43 @@ test('Test that tree wiring dragend cleanup keeps pending flags after committed 
   expect(dragCommitPending.value).toBe(true)
   expect(dragCommitScheduled.value).toBe(true)
 })
+
+test('Test that drag commit wiring logs nextTick chain failures', async () => {
+  const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+  vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+    callback(performance.now())
+    return 1
+  })
+  scheduleDialogProjectSettingsWorldTemplateLayoutTreeDragCommit({
+    dragCommitPending: ref(true),
+    dragCommitScheduled: ref(false),
+    emitLayoutFromTreeDataIfChanged: () => {},
+    nextTick: async () => {
+      throw new Error('nextTick failed')
+    },
+    removeDragCancelListeners: () => {},
+    suppressTreeEmit: ref(false)
+  })
+  await flushPromises()
+  expect(consoleError).toHaveBeenCalled()
+  consoleError.mockRestore()
+  vi.unstubAllGlobals()
+})
+
+test('Test that drag cancel wiring logs pointerup nextTick failures', async () => {
+  const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+  const wiring = createDialogProjectSettingsWorldTemplateLayoutTreeDragCancelWiring({
+    clearDragSessionFlags: () => {},
+    dragCommitPending: ref(true),
+    dragDropCommitted: ref(false),
+    nextTick: async () => {
+      throw new Error('nextTick failed')
+    },
+    removeDragCancelListeners: () => {}
+  })
+  wiring.onWindowPointerUpDuringDrag()
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(consoleError).toHaveBeenCalled()
+  consoleError.mockRestore()
+})

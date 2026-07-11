@@ -95,6 +95,7 @@ test('Test that registerFaComponentTestingStoreSeedProbe patches opened document
       tabs: [
         {
           documentId: 'doc-1',
+          persistenceState: 'persisted',
           tabLabel: 'Hero',
           templateIcon: 'mdi-account',
           displayNameDraft: 'Hero',

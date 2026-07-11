@@ -3,14 +3,22 @@ import { expect, test } from 'vitest'
 
 import DialogProjectSettingsWorldTemplateLayoutTreeNodeMissingTranslationsWarning from '../DialogProjectSettingsWorldTemplateLayoutTreeNodeMissingTranslationsWarning.vue'
 
-test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNodeMissingTranslationsWarning renders warning icon', () => {
+test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNodeMissingTranslationsWarning renders warning icon', async () => {
   const wrapper = mount(DialogProjectSettingsWorldTemplateLayoutTreeNodeMissingTranslationsWarning, {
     props: {
       testLocator: 'treeNode-missingTranslations',
       tooltipText: 'Missing translations for current language:\n- Singular form missing'
+    },
+    global: {
+      stubs: {
+        FaMultilineTooltipBody: { template: '<span><slot /></span>' },
+        QTooltip: { template: '<span><slot /></span>' }
+      }
     }
   })
 
-  expect(wrapper.find('[data-test-locator="treeNode-missingTranslations"]').exists()).toBe(true)
-  expect(wrapper.attributes('data-test-tooltip-text')).toContain('Missing translations')
+  const warningIcon = wrapper.find('[data-test-locator="treeNode-missingTranslations"]')
+  expect(warningIcon.exists()).toBe(true)
+  expect(warningIcon.attributes('data-test-tooltip-text')).toContain('Missing translations')
+  await warningIcon.trigger('click')
 })

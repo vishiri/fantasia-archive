@@ -43,6 +43,7 @@ const selectorList = {
 const sampleOpenedDocumentTabs = [
   {
     documentId: 'doc-hero',
+    persistenceState: 'persisted',
     tabLabel: 'Character',
     templateIcon: 'mdi-account',
     displayNameDraft: 'Hero',
@@ -52,6 +53,7 @@ const sampleOpenedDocumentTabs = [
   },
   {
     documentId: 'doc-villain',
+    persistenceState: 'persisted',
     tabLabel: 'Character',
     templateIcon: 'mdi-skull',
     displayNameDraft: 'Villain draft',
@@ -389,6 +391,7 @@ test.describe.serial('Project document control bar visibility', () => {
           ...sampleOpenedDocumentTabs,
           {
             documentId: 'doc-place',
+            persistenceState: 'persisted',
             tabLabel: 'Place',
             templateIcon: 'mdi-map-marker',
             displayNameDraft: 'Place',

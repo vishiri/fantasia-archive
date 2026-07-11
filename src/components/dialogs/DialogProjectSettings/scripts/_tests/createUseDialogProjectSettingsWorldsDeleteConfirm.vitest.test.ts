@@ -144,3 +144,11 @@ test('Test that createUseDialogProjectSettingsWorldsDeleteConfirm resets countdo
 
   runUnmountHooks()
 })
+
+test('Test that createUseDialogProjectSettingsWorldsDeleteConfirm exposes menu offset for the confirm menu', () => {
+  const { api, runUnmountHooks } = createTestUseDialogProjectSettingsWorldsDeleteConfirm()
+
+  expect(api.menuOffset.value).toEqual([0, 4])
+
+  runUnmountHooks()
+})

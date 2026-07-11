@@ -345,7 +345,7 @@ test('Test that DialogAppSettings hides empty state visually when search returns
   await flushPromises()
 
   const empty = w.get('[data-test-locator="dialogAppSettings-searchNoResults"]')
-  expect(empty.isVisible()).toBe(false)
+  expect((empty.element as HTMLElement).style.display).toBe('none')
   w.unmount()
 })
 

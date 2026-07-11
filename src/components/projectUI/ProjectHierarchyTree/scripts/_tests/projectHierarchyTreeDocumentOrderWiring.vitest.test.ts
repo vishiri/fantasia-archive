@@ -95,6 +95,7 @@ import {
   resolveProjectHierarchyTreeDragSiblingOrderAtDragStart
 } from '../projectHierarchyTreeDragSiblingOrderResolveWiring'
 import { resolveProjectHierarchyTreeDragCommitOrderFallback } from '../projectHierarchyTreeDragCommitOrderFallbackWiring'
+import { applyProjectHierarchyTreeSiblingOrderToTreeData } from '../projectHierarchyTreeSiblingOrderPatchWiring'
 
 const sampleWorld = {
   color: '#ff0000',
@@ -1380,4 +1381,654 @@ test('Test that document row expand click gesture blocks toggle without pointer 
     clientX: 10,
     clientY: 10
   })).toBe(false)
+})
+
+test('Test that persistProjectHierarchyTreeDraggedDocumentMove refreshes when document bucket missing', async () => {
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const refreshLayout = vi.fn(async () => undefined)
+  const result = await persistProjectHierarchyTreeDraggedDocumentMove({
+    documentId: 'missing-doc',
+    dragCommitSuppressWaitAttempts: 0,
+    dragCommitSuppressWaitReady: true,
+    dragSiblingOrderSnapshot: null,
+    modelSettleAttempts: 0,
+    reindexDocumentSiblingsInHierarchy: vi.fn(async () => undefined),
+    refreshLayout,
+    resyncTreeDataFromLayout: vi.fn(),
+    suppressTreeEmit: false,
+    treeData
+  })
+  expect(result.committed).toBe(false)
+  expect(refreshLayout).toHaveBeenCalled()
+})
+
+test('Test that persistProjectHierarchyTreeDraggedDocumentMove resyncs invalid drop parents', async () => {
+  const escapedDocument = buildDocumentNode({
+    documentId: 'doc-escaped',
+    id: 'doc-escaped',
+    placementId: 'placement-1'
+  })
+  const treeData = [{
+    ...mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])[0]!,
+    children: [escapedDocument]
+  }]
+  const resyncTreeDataFromLayout = vi.fn()
+  const refreshLayout = vi.fn(async () => undefined)
+  const result = await persistProjectHierarchyTreeDraggedDocumentMove({
+    documentId: 'doc-escaped',
+    dragCommitSuppressWaitAttempts: 0,
+    dragCommitSuppressWaitReady: true,
+    dragSiblingOrderSnapshot: {
+      orderedDocumentIds: ['doc-escaped'],
+      parentDocumentId: null,
+      placementId: 'placement-1'
+    },
+    modelSettleAttempts: 0,
+    reindexDocumentSiblingsInHierarchy: vi.fn(async () => undefined),
+    refreshLayout,
+    resyncTreeDataFromLayout,
+    suppressTreeEmit: false,
+    treeData
+  })
+  expect(result.committed).toBe(false)
+  expect(resyncTreeDataFromLayout).toHaveBeenCalled()
+  expect(refreshLayout).toHaveBeenCalled()
+})
+
+test('Test that persistProjectHierarchyTreeDraggedDocumentMove skips documents without placementId', async () => {
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  const invalidDoc = buildDocumentNode({
+    documentId: 'doc-invalid',
+    id: 'doc-invalid',
+    placementId: null
+  })
+  mergeLoadedChildrenIntoNode(treeData, 'placement-1', [invalidDoc])
+  const result = await persistProjectHierarchyTreeDraggedDocumentMove({
+    documentId: 'doc-invalid',
+    dragCommitSuppressWaitAttempts: 0,
+    dragCommitSuppressWaitReady: true,
+    dragSiblingOrderSnapshot: null,
+    modelSettleAttempts: 0,
+    reindexDocumentSiblingsInHierarchy: vi.fn(async () => undefined),
+    refreshLayout: vi.fn(async () => undefined),
+    resyncTreeDataFromLayout: vi.fn(),
+    suppressTreeEmit: false,
+    treeData
+  })
+  expect(result.committed).toBe(false)
+})
+
+test('Test that syncProjectHierarchyTreeSiblingOrderFromHeTreeGetData returns early when snapshot missing', () => {
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  const synced = syncProjectHierarchyTreeSiblingOrderFromHeTreeGetData({
+    draggedDocumentId: 'missing-doc',
+    getTreeRef: () => ({
+      closeAll: () => undefined,
+      getData: () => treeData,
+      openNodeAndParents: () => undefined
+    }),
+    treeData
+  })
+  expect(synced.patched).toBe(false)
+  expect(synced.orderedDocumentIds).toBeNull()
+})
+
+test('Test that syncProjectHierarchyTreeSiblingOrderAfterDrop clears snapshot when resolve returns null order', () => {
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  let snapshot: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null = {
+    orderedDocumentIds: ['doc-a'],
+    parentDocumentId: null,
+    placementId: 'placement-1'
+  }
+  const afterDrop = syncProjectHierarchyTreeSiblingOrderAfterDrop({
+    dragStartOrderedDocumentIds: null,
+    draggedDocumentId: 'doc-a',
+    getTreeRef: () => null,
+    getTreeScrollHost: () => null,
+    setDragSiblingOrderSnapshot: (value) => {
+      snapshot = value
+    },
+    treeData
+  })
+  expect(afterDrop.snapshot).toBeNull()
+  expect(snapshot).toBeNull()
+})
+
+test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom handles missing host and row metadata', async () => {
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDragSiblingDomOrderWiring')
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  expect(readProjectHierarchyTreeDragSiblingOrderFromDom({
+    getTreeScrollHost: () => null,
+    movedDocumentId: 'doc-a',
+    treeData
+  })).toBeNull()
+  const host = document.createElement('div')
+  host.setAttribute('data-test-locator', 'projectHierarchyTree-host')
+  const treeRoot = document.createElement('div')
+  treeRoot.className = 'projectHierarchyTree'
+  const treeNode = document.createElement('div')
+  treeNode.className = 'tree-node'
+  const row = document.createElement('div')
+  row.className = 'projectHierarchyTree__nodeRow projectHierarchyTree__nodeRow--document'
+  treeNode.appendChild(row)
+  treeRoot.appendChild(treeNode)
+  host.appendChild(treeRoot)
+  expect(readProjectHierarchyTreeDragSiblingOrderFromDom({
+    getTreeScrollHost: () => host,
+    movedDocumentId: 'doc-a',
+    treeData
+  })).toBeNull()
+})
+
+test('Test that resolveProjectHierarchyTreeDragSiblingOrderAtDragStart patches treeData when live order differs', () => {
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  const liveTree = structuredClone(treeData)
+  const placement = liveTree[0]?.children[0]
+  if (placement !== undefined) {
+    placement.children = [
+      buildDocumentNode({
+        documentId: 'doc-b',
+        id: 'doc-b'
+      }),
+      buildDocumentNode({
+        documentId: 'doc-a',
+        id: 'doc-a'
+      }),
+      buildDocumentNode({
+        documentId: 'doc-c',
+        id: 'doc-c'
+      })
+    ]
+  }
+  const host = document.createElement('div')
+  host.setAttribute('data-test-locator', 'projectHierarchyTree-host')
+  const treeRoot = document.createElement('div')
+  treeRoot.className = 'projectHierarchyTree'
+  const appendRow = (documentId: string): void => {
+    const treeNode = document.createElement('div')
+    treeNode.className = 'tree-node'
+    const row = document.createElement('div')
+    row.className = 'projectHierarchyTree__nodeRow projectHierarchyTree__nodeRow--document'
+    const nodeRoot = document.createElement('div')
+    nodeRoot.setAttribute('data-test-hierarchy-node-id', documentId)
+    row.appendChild(nodeRoot)
+    treeNode.appendChild(row)
+    treeRoot.appendChild(treeNode)
+  }
+  appendRow('doc-b')
+  appendRow('doc-a')
+  appendRow('doc-c')
+  host.appendChild(treeRoot)
+  const resolved = resolveProjectHierarchyTreeDragSiblingOrderAtDragStart({
+    documentId: 'doc-a',
+    getTreeRef: () => ({
+      closeAll: () => undefined,
+      getData: () => liveTree,
+      openNodeAndParents: () => undefined
+    }),
+    getTreeScrollHost: () => host,
+    treeData
+  })
+  expect(resolved.orderSource).toBe('getData')
+  const placementAfter = findProjectHierarchyTreeNodeById(treeData, 'placement-1')
+  expect(placementAfter?.children.map((row) => row.id)).toEqual(['doc-b', 'doc-a', 'doc-c'])
+})
+
+test('Test that computeProjectHierarchyTreeDragSiblingOrderFromHeTreeDropContext rejects invalid indexes', () => {
+  dragContextState.startInfo = {
+    indexBeforeDrop: Number.NaN,
+    parent: null,
+    tree: {}
+  }
+  dragContextState.targetInfo = {
+    indexBeforeDrop: 0,
+    parent: null,
+    tree: {}
+  }
+  expect(computeProjectHierarchyTreeDragSiblingOrderFromHeTreeDropContext({
+    dragStartOrderedDocumentIds: ['doc-a', 'doc-b'],
+    movedDocumentId: 'doc-a'
+  })).toBeNull()
+  dragContextState.startInfo = undefined
+  dragContextState.targetInfo = undefined
+})
+
+test('Test that readProjectHierarchyTreeDragSiblingOrderFromHeTreeParentStats skips non-document rows', () => {
+  dragContextState.targetInfo = {
+    indexBeforeDrop: 0,
+    parent: {
+      children: [{
+        data: findProjectHierarchyTreeNodeById(
+          mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]),
+          'placement-1'
+        )!
+      }],
+      data: findProjectHierarchyTreeNodeById(
+        mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]),
+        'placement-1'
+      )!
+    },
+    tree: {}
+  }
+  expect(readProjectHierarchyTreeDragSiblingOrderFromHeTreeParentStats()).toBeNull()
+  dragContextState.targetInfo = undefined
+})
+
+test('Test that applyProjectHierarchyTreeSiblingOrderToTreeData returns false for missing buckets', async () => {
+  const { applyProjectHierarchyTreeSiblingOrderToTreeData, applyProjectHierarchyTreeDragCommitSiblingOrderPatch } = await import('../projectHierarchyTreeSiblingOrderPatchWiring')
+  expect(applyProjectHierarchyTreeSiblingOrderToTreeData([], 'missing', ['doc-a'])).toBe(false)
+  applyProjectHierarchyTreeDragCommitSiblingOrderPatch({
+    committed: false,
+    draggedDocumentId: 'doc-a',
+    dragSiblingOrderSnapshot: {
+      orderedDocumentIds: ['doc-a'],
+      parentDocumentId: null,
+      placementId: 'placement-1'
+    },
+    treeData: []
+  })
+  applyProjectHierarchyTreeDragCommitSiblingOrderPatch({
+    committed: true,
+    draggedDocumentId: null,
+    dragSiblingOrderSnapshot: null,
+    treeData: []
+  })
+})
+
+test('Test that applyProjectHierarchyTreeSiblingOrderToTreeData appends trailing siblings', () => {
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  const placement = findProjectHierarchyTreeNodeById(treeData, 'placement-1')!
+  const extraRow = buildDocumentNode({
+    documentId: 'doc-extra',
+    id: 'doc-extra',
+    label: 'Extra'
+  })
+  placement.children.push(extraRow)
+  const patched = applyProjectHierarchyTreeSiblingOrderToTreeData(treeData, 'doc-a', ['doc-b'])
+  expect(patched).toBe(true)
+  expect(placement.children.map((row) => row.id)).toEqual(['doc-b', 'doc-a', 'doc-c', 'doc-extra'])
+})
+
+test('Test that bindProjectHierarchyTreeDocumentRowDragHoldDragStartCapture cleans up on unmount', () => {
+  const host = document.createElement('div')
+  const treeScrollHostRef = ref<HTMLElement | null>(host)
+  const handleTreeDragStartCapture = vi.fn()
+  const clearHoldSession = vi.fn()
+  let unmountHook: (() => void) | undefined
+  bindProjectHierarchyTreeDocumentRowDragHoldDragStartCapture({
+    clearHoldSession,
+    handleTreeDragStartCapture,
+    onUnmounted: (hook) => {
+      unmountHook = hook
+    },
+    treeScrollHostRef,
+    watch: createMockWatchForBindTest()
+  })
+  unmountHook?.()
+  expect(clearHoldSession).toHaveBeenCalled()
+})
+
+test('Test that document row drag hold session ignores cleared pointer before timer fires', () => {
+  vi.useFakeTimers()
+  const session = createProjectHierarchyTreeDocumentRowDragHoldSession({
+    dragHandleClassName: 'projectHierarchyTree__dragHandleArmed',
+    holdDelayMs: 200,
+    leftPointerDownClassName: 'projectHierarchyTree__leftPointerDownArmed',
+    onAllowedDocumentRowDragStart: vi.fn(),
+    windowClearTimeout: (timeoutId) => {
+      window.clearTimeout(timeoutId)
+    },
+    windowSetTimeout: (handler, delayMs) => {
+      return window.setTimeout(handler, delayMs)
+    }
+  })
+  const row = document.createElement('div')
+  session.handleDocumentRowPointerDown({
+    button: 0,
+    currentTarget: row,
+    preventDefault: vi.fn(),
+    stopPropagation: vi.fn()
+  } as unknown as PointerEvent)
+  session.clearHoldSession()
+  vi.advanceTimersByTime(200)
+  expect(session.getIsDragHoldArmed()).toBe(false)
+  vi.useRealTimers()
+})
+
+test('Test that syncProjectHierarchyTreeSiblingOrderAfterDrop keeps null snapshot when tree snapshot missing', () => {
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const invalidDoc = buildDocumentNode({
+    documentId: 'doc-invalid',
+    id: 'doc-invalid',
+    placementId: null
+  })
+  mergeLoadedChildrenIntoNode(treeData, 'placement-1', [invalidDoc])
+  let snapshot: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null = {
+    orderedDocumentIds: ['doc-invalid'],
+    parentDocumentId: null,
+    placementId: 'placement-1'
+  }
+  const afterDrop = syncProjectHierarchyTreeSiblingOrderAfterDrop({
+    dragStartOrderedDocumentIds: ['doc-invalid'],
+    draggedDocumentId: 'doc-invalid',
+    getTreeRef: () => null,
+    getTreeScrollHost: () => null,
+    setDragSiblingOrderSnapshot: (value) => {
+      snapshot = value
+    },
+    treeData
+  })
+  expect(afterDrop.snapshot).toBeNull()
+  expect(snapshot).toBeNull()
+})
+
+test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom reads sibling bucket order from DOM', async () => {
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDragSiblingDomOrderWiring')
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  const host = document.createElement('div')
+  const treeRoot = document.createElement('div')
+  treeRoot.className = 'projectHierarchyTree'
+  const parentTreeNode = document.createElement('div')
+  parentTreeNode.className = 'tree-node'
+  const appendDocumentRow = (documentId: string): void => {
+    const treeNode = document.createElement('div')
+    treeNode.className = 'tree-node'
+    const row = document.createElement('div')
+    row.className = 'projectHierarchyTree__nodeRow projectHierarchyTree__nodeRow--document'
+    const nodeRoot = document.createElement('div')
+    nodeRoot.setAttribute('data-test-hierarchy-node-id', documentId)
+    row.appendChild(nodeRoot)
+    treeNode.appendChild(row)
+    parentTreeNode.appendChild(treeNode)
+  }
+  appendDocumentRow('doc-b')
+  appendDocumentRow('doc-a')
+  appendDocumentRow('doc-c')
+  treeRoot.appendChild(parentTreeNode)
+  host.appendChild(treeRoot)
+  expect(readProjectHierarchyTreeDragSiblingOrderFromDom({
+    getTreeScrollHost: () => host,
+    movedDocumentId: 'doc-a',
+    treeData
+  })).toEqual(['doc-b', 'doc-a', 'doc-c'])
+})
+
+test('Test that applyProjectHierarchyTreeSiblingOrderToTreeData returns false when sibling rows lack document ids', () => {
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  const placement = findProjectHierarchyTreeNodeById(treeData, 'placement-1')!
+  placement.children = [{
+    ...placement.children[0]!,
+    documentId: null
+  }]
+  expect(applyProjectHierarchyTreeSiblingOrderToTreeData(treeData, 'doc-a', ['doc-a'])).toBe(false)
+})
+
+test('Test that applyProjectHierarchyTreeSiblingOrderToTreeData returns false for unknown moved document', () => {
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  expect(applyProjectHierarchyTreeSiblingOrderToTreeData(treeData, 'missing-doc', ['doc-a'])).toBe(false)
+})
+
+test('Test that applyProjectHierarchyTreeDragCommitSiblingOrderPatch applies committed snapshot', async () => {
+  const { applyProjectHierarchyTreeDragCommitSiblingOrderPatch } = await import('../projectHierarchyTreeSiblingOrderPatchWiring')
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  applyProjectHierarchyTreeDragCommitSiblingOrderPatch({
+    committed: true,
+    draggedDocumentId: 'doc-a',
+    dragSiblingOrderSnapshot: {
+      orderedDocumentIds: ['doc-c', 'doc-a', 'doc-b'],
+      parentDocumentId: null,
+      placementId: 'placement-1'
+    },
+    treeData
+  })
+  const placement = findProjectHierarchyTreeNodeById(treeData, 'placement-1')
+  expect(placement?.children.map((row) => row.id)).toEqual(['doc-c', 'doc-a', 'doc-b'])
+})
+
+test('Test that syncProjectHierarchyTreeSiblingOrderAfterDrop nulls snapshot when tree snapshot invalid after computed order', () => {
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const invalidDoc = buildDocumentNode({
+    documentId: 'doc-invalid',
+    id: 'doc-invalid',
+    placementId: null
+  })
+  mergeLoadedChildrenIntoNode(treeData, 'placement-1', [invalidDoc])
+  const dragParent = {
+    children: [{
+      data: invalidDoc
+    }],
+    data: invalidDoc
+  }
+  dragContextState.startInfo = {
+    indexBeforeDrop: 0,
+    parent: dragParent,
+    tree: {}
+  }
+  dragContextState.targetInfo = {
+    indexBeforeDrop: 0,
+    parent: dragParent,
+    tree: dragContextState.startInfo.tree
+  }
+  let snapshot: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null = {
+    orderedDocumentIds: ['doc-invalid'],
+    parentDocumentId: null,
+    placementId: 'placement-1'
+  }
+  const afterDrop = syncProjectHierarchyTreeSiblingOrderAfterDrop({
+    dragStartOrderedDocumentIds: ['doc-invalid'],
+    draggedDocumentId: 'doc-invalid',
+    getTreeRef: () => null,
+    getTreeScrollHost: () => null,
+    setDragSiblingOrderSnapshot: (value) => {
+      snapshot = value
+    },
+    treeData
+  })
+  expect(afterDrop.computedOrderedDocumentIds).toEqual(['doc-invalid'])
+  expect(afterDrop.snapshot).toBeNull()
+  expect(snapshot).toBeNull()
+  dragContextState.startInfo = undefined
+  dragContextState.targetInfo = undefined
+})
+
+test('Test that applyProjectHierarchyTreeDragCommitSiblingOrderPatch skips uncommitted and incomplete inputs', async () => {
+  const { applyProjectHierarchyTreeDragCommitSiblingOrderPatch } = await import('../projectHierarchyTreeSiblingOrderPatchWiring')
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  const before = findProjectHierarchyTreeNodeById(treeData, 'placement-1')!.children.map((row) => row.id)
+  applyProjectHierarchyTreeDragCommitSiblingOrderPatch({
+    committed: false,
+    draggedDocumentId: 'doc-a',
+    dragSiblingOrderSnapshot: {
+      orderedDocumentIds: ['doc-c', 'doc-a', 'doc-b'],
+      parentDocumentId: null,
+      placementId: 'placement-1'
+    },
+    treeData
+  })
+  applyProjectHierarchyTreeDragCommitSiblingOrderPatch({
+    committed: true,
+    draggedDocumentId: null,
+    dragSiblingOrderSnapshot: {
+      orderedDocumentIds: ['doc-c', 'doc-a', 'doc-b'],
+      parentDocumentId: null,
+      placementId: 'placement-1'
+    },
+    treeData
+  })
+  applyProjectHierarchyTreeDragCommitSiblingOrderPatch({
+    committed: true,
+    draggedDocumentId: 'doc-a',
+    dragSiblingOrderSnapshot: null,
+    treeData
+  })
+  expect(findProjectHierarchyTreeNodeById(treeData, 'placement-1')!.children.map((row) => row.id)).toEqual(before)
+})
+
+test('Test that applyProjectHierarchyTreeSiblingOrderToTreeData skips non-sibling rows when patching bucket', () => {
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  const placement = findProjectHierarchyTreeNodeById(treeData, 'placement-1')!
+  const spacer = buildDocumentNode({
+    documentId: null,
+    id: 'spacer-row',
+    nodeKind: 'document'
+  })
+  placement.children = [placement.children[0]!, spacer, placement.children[1]!, placement.children[2]!]
+  expect(applyProjectHierarchyTreeSiblingOrderToTreeData(treeData, 'doc-a', ['doc-c', 'doc-a', 'doc-b'])).toBe(true)
+  expect(placement.children.map((row) => row.id)).toEqual(['doc-c', 'spacer-row', 'doc-a', 'doc-b'])
+})
+
+test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom returns null for missing moved row and empty sibling ids', async () => {
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDragSiblingDomOrderWiring')
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  expect(readProjectHierarchyTreeDragSiblingOrderFromDom({
+    getTreeScrollHost: () => document.createElement('div'),
+    movedDocumentId: 'missing-doc',
+    treeData
+  })).toBeNull()
+  const treeDataWithoutDocs = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  expect(readProjectHierarchyTreeDragSiblingOrderFromDom({
+    getTreeScrollHost: () => document.createElement('div'),
+    movedDocumentId: 'doc-a',
+    treeData: treeDataWithoutDocs
+  })).toBeNull()
+  const host = document.createElement('div')
+  const treeRoot = document.createElement('div')
+  treeRoot.className = 'projectHierarchyTree'
+  const parentTreeNode = document.createElement('div')
+  parentTreeNode.className = 'tree-node'
+  const treeNode = document.createElement('div')
+  treeNode.className = 'tree-node'
+  const row = document.createElement('div')
+  row.className = 'projectHierarchyTree__nodeRow projectHierarchyTree__nodeRow--document'
+  const nodeRoot = document.createElement('div')
+  nodeRoot.setAttribute('data-test-hierarchy-node-id', '')
+  row.appendChild(nodeRoot)
+  treeNode.appendChild(row)
+  parentTreeNode.appendChild(treeNode)
+  treeRoot.appendChild(parentTreeNode)
+  host.appendChild(treeRoot)
+  expect(readProjectHierarchyTreeDragSiblingOrderFromDom({
+    getTreeScrollHost: () => host,
+    movedDocumentId: 'doc-a',
+    treeData
+  })).toBeNull()
+})
+
+test('Test that document row drag hold timer no-ops when pointer already ended', () => {
+  vi.useFakeTimers()
+  const storedHandlers: Array<() => void> = []
+  const session = createProjectHierarchyTreeDocumentRowDragHoldSession({
+    dragHandleClassName: 'projectHierarchyTree__dragHandleArmed',
+    holdDelayMs: 200,
+    leftPointerDownClassName: 'projectHierarchyTree__leftPointerDownArmed',
+    onAllowedDocumentRowDragStart: vi.fn(),
+    windowClearTimeout: () => undefined,
+    windowSetTimeout: (handler: () => void) => {
+      storedHandlers.push(handler)
+      return storedHandlers.length
+    }
+  })
+  const row = document.createElement('div')
+  session.handleDocumentRowPointerDown({
+    button: 0,
+    currentTarget: row,
+    preventDefault: vi.fn(),
+    stopPropagation: vi.fn()
+  } as unknown as PointerEvent)
+  window.dispatchEvent(new Event('pointerup', { bubbles: true }))
+  storedHandlers[0]?.()
+  expect(session.getIsDragHoldArmed()).toBe(false)
+  vi.useRealTimers()
+})
+
+test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom skips invalid rows and non-sibling DOM nodes', async () => {
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDragSiblingDomOrderWiring')
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  const host = document.createElement('div')
+  const treeRoot = document.createElement('div')
+  treeRoot.className = 'projectHierarchyTree'
+  const parentTreeNode = document.createElement('div')
+  parentTreeNode.className = 'tree-node'
+  parentTreeNode.appendChild(document.createElement('span'))
+  const appendDocumentRow = (documentId: string, includeNodeId: boolean): void => {
+    const treeNode = document.createElement('div')
+    treeNode.className = 'tree-node'
+    const row = document.createElement('div')
+    row.className = 'projectHierarchyTree__nodeRow projectHierarchyTree__nodeRow--document'
+    if (includeNodeId) {
+      const nodeRoot = document.createElement('div')
+      nodeRoot.setAttribute('data-test-hierarchy-node-id', documentId)
+      row.appendChild(nodeRoot)
+    }
+    treeNode.appendChild(row)
+    parentTreeNode.appendChild(treeNode)
+  }
+  appendDocumentRow('doc-a', true)
+  appendDocumentRow('doc-b', false)
+  appendDocumentRow('doc-c', true)
+  treeRoot.appendChild(parentTreeNode)
+  host.appendChild(treeRoot)
+  expect(readProjectHierarchyTreeDragSiblingOrderFromDom({
+    getTreeScrollHost: () => host,
+    movedDocumentId: 'doc-a',
+    treeData
+  })).toEqual(['doc-a', 'doc-c'])
+})
+
+test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom returns null when sibling bucket has no document ids', async () => {
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDragSiblingDomOrderWiring')
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const invalidDoc = buildDocumentNode({
+    documentId: null,
+    id: 'doc-invalid',
+    placementId: 'placement-1'
+  })
+  mergeLoadedChildrenIntoNode(treeData, 'placement-1', [invalidDoc])
+  expect(readProjectHierarchyTreeDragSiblingOrderFromDom({
+    getTreeScrollHost: () => document.createElement('div'),
+    movedDocumentId: 'doc-invalid',
+    treeData
+  })).toBeNull()
+})
+
+test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom returns null when moved row is absent from DOM bucket', async () => {
+  const { readProjectHierarchyTreeDragSiblingOrderFromDom } = await import('../projectHierarchyTreeDragSiblingDomOrderWiring')
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  const host = document.createElement('div')
+  const treeRoot = document.createElement('div')
+  treeRoot.className = 'projectHierarchyTree'
+  const parentTreeNode = document.createElement('div')
+  parentTreeNode.className = 'tree-node'
+  parentTreeNode.appendChild(document.createElement('span'))
+  const treeNode = document.createElement('div')
+  treeNode.className = 'tree-node'
+  const row = document.createElement('div')
+  row.className = 'projectHierarchyTree__nodeRow projectHierarchyTree__nodeRow--document'
+  const nodeRoot = document.createElement('div')
+  nodeRoot.setAttribute('data-test-hierarchy-node-id', 'doc-b')
+  row.appendChild(nodeRoot)
+  treeNode.appendChild(row)
+  parentTreeNode.appendChild(treeNode)
+  treeRoot.appendChild(parentTreeNode)
+  host.appendChild(treeRoot)
+  expect(readProjectHierarchyTreeDragSiblingOrderFromDom({
+    getTreeScrollHost: () => host,
+    movedDocumentId: 'doc-a',
+    treeData
+  })).toBeNull()
 })

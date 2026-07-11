@@ -21,6 +21,7 @@ import { buildProjectDocumentControlBarAssembleInput } from '../projectDocumentC
 
 type T_tabSeedRow = {
   documentId: string
+  persistenceState: 'persisted'
   displayNameDraft: string
   editState: boolean
   hasUnsavedChanges: boolean
@@ -119,6 +120,7 @@ test('Test that createUseProjectDocumentControlBar keeps header tabs visible whe
     disableDocumentControlBar: true,
     tabSeed: [{
       documentId: 'doc-a',
+      persistenceState: 'persisted',
       displayNameDraft: 'A',
       hasUnsavedChanges: false,
       editState: false,
@@ -144,6 +146,7 @@ test('Test that activeDocumentTabName mirrors the store active document when tha
   const tabs = ref([
     {
       documentId: 'doc-a',
+      persistenceState: 'persisted',
       displayNameDraft: 'A',
       hasUnsavedChanges: false,
       editState: false,
@@ -213,6 +216,7 @@ test('Test that createUseProjectDocumentControlBar exposes edit and save button 
     disableDocumentControlBar: false,
     tabSeed: [{
       documentId: 'doc-a',
+      persistenceState: 'persisted',
       displayNameDraft: 'A',
       editState: false,
       hasUnsavedChanges: false,
@@ -232,6 +236,7 @@ test('Test that createUseProjectDocumentControlBar shows delete button in edit m
     disableDocumentControlBar: false,
     tabSeed: [{
       documentId: 'doc-a',
+      persistenceState: 'persisted',
       displayNameDraft: 'A',
       editState: true,
       hasUnsavedChanges: false,
@@ -251,6 +256,7 @@ test('Test that onDeleteCurrentDocumentClick delegates to requestDeleteDocument'
     requestDeleteDocument,
     tabSeed: [{
       documentId: 'doc-a',
+      persistenceState: 'persisted',
       displayNameDraft: 'A',
       editState: false,
       hasUnsavedChanges: false,
@@ -269,6 +275,7 @@ test('Test that saveDocumentButtonColor reflects active tab unsaved state in edi
     disableDocumentControlBar: false,
     tabSeed: [{
       documentId: 'doc-a',
+      persistenceState: 'persisted',
       displayNameDraft: 'Draft',
       editState: true,
       hasUnsavedChanges: true,
@@ -291,6 +298,7 @@ test('Test that onEnterEditModeClick delegates to the opened documents store', (
     enterDocumentEditMode,
     tabSeed: [{
       documentId: 'doc-a',
+      persistenceState: 'persisted',
       displayNameDraft: 'A',
       editState: false,
       hasUnsavedChanges: false,
@@ -341,6 +349,7 @@ test('Test that onSaveDocumentClick enqueues saveOpenedDocumentDisplayName with 
     runFaAction,
     tabSeed: [{
       documentId: 'doc-a',
+      persistenceState: 'persisted',
       displayNameDraft: 'A',
       editState: true,
       hasUnsavedChanges: true,
@@ -371,6 +380,7 @@ test('Test that edit and save handlers no-op when no active document is selected
   const tabs = ref([
     {
       documentId: 'doc-a',
+      persistenceState: 'persisted',
       displayNameDraft: 'A',
       editState: false,
       hasUnsavedChanges: false,
@@ -444,6 +454,7 @@ test('Test that tab label and route helpers delegate to opened tab data', () => 
     requestCloseTab,
     tabSeed: [{
       documentId: 'doc-a',
+      persistenceState: 'persisted',
       displayNameDraft: ' Draft ',
       editState: false,
       hasUnsavedChanges: false,
@@ -456,6 +467,7 @@ test('Test that tab label and route helpers delegate to opened tab data', () => 
   expect(api.resolveDocumentTabRoute('doc-a')).toBe('/home/document/doc-a')
   expect(api.resolveDocumentTabLabel({
     documentId: 'doc-a',
+    persistenceState: 'persisted',
     displayNameDraft: ' Draft ',
     editState: false,
     hasUnsavedChanges: false,
@@ -472,6 +484,7 @@ test('Test that activeDocumentTab is null when the active id does not match an o
   const tabs = ref([
     {
       documentId: 'doc-a',
+      persistenceState: 'persisted',
       displayNameDraft: 'A',
       editState: false,
       hasUnsavedChanges: false,
@@ -646,6 +659,7 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
         return documentId === 'doc-a'
           ? {
               documentId: 'doc-a',
+              persistenceState: 'persisted',
               displayNameDraft: 'A',
               editState: false,
               hasUnsavedChanges: false,
@@ -670,6 +684,7 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
           activeDocumentId: ref('doc-a'),
           tabs: ref([{
             documentId: 'doc-a',
+            persistenceState: 'persisted',
             displayNameDraft: 'A',
             editState: false,
             hasUnsavedChanges: false,
@@ -700,4 +715,110 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
   expect(forceCloseAllTabs).toHaveBeenCalledOnce()
   expect(forceCloseAllTabsExcept).toHaveBeenCalledWith('doc-a')
   expect(requestDeleteDocument).toHaveBeenCalledWith('doc-a')
+})
+
+test('Test that createUseProjectDocumentControlBar tab copy and move handlers delegate to the opened documents store', async () => {
+  const copyToClipboard = vi.fn(async () => undefined)
+  const moveDocumentTab = vi.fn()
+  const notifyCreate = vi.fn()
+  const findTabByDocumentId = vi.fn((documentId: string) => {
+    return documentId === 'doc-a'
+      ? {
+          documentId: 'doc-a',
+          persistenceState: 'persisted',
+          displayNameDraft: ' Hero ',
+          editState: false,
+          hasUnsavedChanges: false,
+          savedDisplayName: 'Hero',
+          tabLabel: 'Character',
+          templateIcon: 'mdi-account'
+        }
+      : null
+  })
+
+  const api = createUseProjectDocumentControlBar({
+    assembleProjectDocumentControlBarApi,
+    buildProjectDocumentControlBarAssembleInput,
+    computed: computed as <T>(getter: () => T) => I_computedRef<T>,
+    resolveActiveDocumentTabName,
+    resolveDocumentTabLabelFromOpenedTab,
+    resolveFaDocumentWorkspaceRouteDocumentId: () => 'doc-a',
+    resolveShowDocumentControlBarStrip,
+    resolveShowDocumentTabs,
+    resolveShowProjectDocumentControlBarEditButton,
+    resolveShowProjectDocumentControlBarDeleteButton,
+    resolveShowProjectDocumentControlBarSaveButtons,
+    resolveProjectDocumentControlBarSaveButtonColor,
+    formatFaKeybindCommandLabelFromSnapshot: () => null,
+    getKeybindsSnapshot: () => null,
+    copyToClipboard,
+    notifyCreate,
+    useI18n: () => ({
+      t: (key: string) => key
+    }),
+    runFaAction: vi.fn(),
+    S_FaOpenedDocuments: () => ({
+      enterDocumentEditMode: vi.fn(),
+      findTabByDocumentId,
+      closeAllTabsWithoutChanges: async () => undefined,
+      closeTabsWithoutChangesExcept: async () => undefined,
+      deleteOpenedDocument: async () => undefined,
+      requestDeleteDocument: vi.fn(),
+      forceCloseAllTabs: async () => undefined,
+      forceCloseAllTabsExcept: async () => undefined,
+      moveDocumentTab,
+      requestCloseTab: vi.fn()
+    }) as never,
+    S_FaUserSettings: () => ({} as never),
+    storeToRefs: ((store: unknown) => {
+      if (store !== null && typeof store === 'object' && 'moveDocumentTab' in store) {
+        return {
+          activeDocumentId: ref('doc-a'),
+          tabs: ref([{
+            documentId: 'doc-a',
+            persistenceState: 'persisted',
+            displayNameDraft: ' Hero ',
+            editState: false,
+            hasUnsavedChanges: false,
+            savedDisplayName: 'Hero',
+            tabLabel: 'Character',
+            templateIcon: 'mdi-account'
+          }])
+        } as never
+      }
+      return {
+        settings: ref({ disableDocumentControlBar: false })
+      } as never
+    }) as never,
+    useRoute: () => ({
+      path: '/home/document/doc-a'
+    })
+  })()
+
+  await api.onTabCopyNameClick('doc-a')
+  expect(findTabByDocumentId).toHaveBeenCalledWith('doc-a')
+  expect(copyToClipboard).toHaveBeenCalledWith('Hero')
+  expect(notifyCreate).toHaveBeenCalledWith({
+    color: 'positive',
+    faSkipNotifyConsoleLog: true,
+    icon: 'mdi-clipboard-check-outline',
+    message: 'projectUI.projectDocumentControlBar.copyNameSuccess',
+    timeout: 2500,
+    type: 'positive'
+  })
+
+  copyToClipboard.mockRejectedValueOnce(new Error('clipboard blocked'))
+  await api.onTabCopyNameClick('doc-a')
+  expect(notifyCreate).toHaveBeenCalledWith({
+    caption: 'clipboard blocked',
+    color: 'negative',
+    faSkipNotifyConsoleLog: true,
+    icon: 'mdi-clipboard-alert-outline',
+    message: 'projectUI.projectDocumentControlBar.copyNameFailed',
+    timeout: 4000,
+    type: 'negative'
+  })
+
+  api.onTabMoveClick('doc-a', 'left')
+  expect(moveDocumentTab).toHaveBeenCalledWith('doc-a', 'left')
 })

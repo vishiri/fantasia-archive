@@ -44,21 +44,21 @@ test('Test that resolveShowProjectDocumentControlBarSaveButtons shows only in ed
   })).toBe(false)
 })
 
-test('Test that resolveShowProjectDocumentControlBarDeleteButton shows in view and edit mode on document routes', () => {
+test('Test that resolveShowProjectDocumentControlBarDeleteButton hides for temporary tabs and shows for persisted tabs on document routes', () => {
   expect(resolveShowProjectDocumentControlBarDeleteButton({
-    activeDocumentTab: { editState: false },
+    activeDocumentTab: { persistenceState: 'persisted' },
     isOnDocumentWorkspaceRoute: true
   })).toBe(true)
   expect(resolveShowProjectDocumentControlBarDeleteButton({
-    activeDocumentTab: { editState: true },
+    activeDocumentTab: { persistenceState: 'temporary' },
     isOnDocumentWorkspaceRoute: true
-  })).toBe(true)
+  })).toBe(false)
   expect(resolveShowProjectDocumentControlBarDeleteButton({
     activeDocumentTab: null,
     isOnDocumentWorkspaceRoute: true
   })).toBe(false)
   expect(resolveShowProjectDocumentControlBarDeleteButton({
-    activeDocumentTab: { editState: false },
+    activeDocumentTab: { persistenceState: 'persisted' },
     isOnDocumentWorkspaceRoute: false
   })).toBe(false)
 })

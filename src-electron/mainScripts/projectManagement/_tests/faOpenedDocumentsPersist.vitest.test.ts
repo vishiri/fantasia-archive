@@ -1,6 +1,7 @@
 import { expect, test, vi } from 'vitest'
 
 import { FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT } from 'app/types/I_faOpenedDocumentsDomain'
+import type { I_faOpenedDocumentsSnapshot } from 'app/types/I_faOpenedDocumentsDomain'
 
 import {
   clearFaProjectOpenedDocumentsSnapshot,
@@ -8,12 +9,13 @@ import {
   upsertFaProjectOpenedDocumentsSnapshot
 } from '../faOpenedDocumentsPersistWiring'
 
-const sampleSnapshot = {
-  schemaVersion: 1 as const,
+const sampleSnapshot: I_faOpenedDocumentsSnapshot = {
+  schemaVersion: 1,
   activeDocumentId: 'doc-1',
   tabs: [
     {
       documentId: 'doc-1',
+      persistenceState: 'persisted',
       tabLabel: 'Hero',
       templateIcon: 'mdi-account',
       displayNameDraft: 'Hero',

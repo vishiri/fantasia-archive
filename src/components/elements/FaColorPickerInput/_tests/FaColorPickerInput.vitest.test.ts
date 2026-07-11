@@ -6,6 +6,7 @@ import { expect, test } from 'vitest'
 
 import FaColorPickerInput from '../FaColorPickerInput.vue'
 import { FA_COLOR_PICKER_INPUT_DEFAULT_HEX } from 'app/types/I_faColorPickerInput'
+import { expectInlineStyleColor } from 'app/helpers/vitestCssColorExpect'
 
 const testLocator = 'faColorPickerInput-test'
 
@@ -142,8 +143,10 @@ test('Test that FaColorPickerInput emits model updates from the field and picker
     }
   })
 
-  expect(w.find('[data-test-locator="faColorPickerInput-test-swatch"]').attributes('style')).toContain(
-    'background-color: rgb(170, 187, 204)'
+  expectInlineStyleColor(
+    w.find('[data-test-locator="faColorPickerInput-test-swatch"]').attributes('style'),
+    'background-color',
+    '#aabbcc'
   )
 
   await w.find('input.q-input-stub').setValue('#445566')

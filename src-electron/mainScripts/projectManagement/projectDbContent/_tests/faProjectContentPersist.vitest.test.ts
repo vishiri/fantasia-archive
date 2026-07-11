@@ -1129,6 +1129,31 @@ test('Test that createFaProjectDocument accepts a template id', () => {
 })
 
 /**
+ * createFaProjectDocument
+ * Optional client id is used when the documents row is free; otherwise a fresh id is assigned.
+ */
+test('Test that createFaProjectDocument uses a free client id and substitutes when taken', () => {
+  const { db } = makeProjectContentTestDb()
+  const world = createFaProjectWorld(db as never, { displayName: 'W' })
+  const template = createFaProjectDocumentTemplate(db as never, { displayName: 'Tpl' })
+  const clientId = '550e8400-e29b-41d4-a716-446655440099'
+  const first = createFaProjectDocument(db as never, {
+    displayName: 'First',
+    id: clientId,
+    templateId: template.id,
+    worldId: world.id
+  })
+  expect(first.id).toBe(clientId)
+  const second = createFaProjectDocument(db as never, {
+    displayName: 'Second',
+    id: clientId,
+    templateId: template.id,
+    worldId: world.id
+  })
+  expect(second.id).not.toBe(clientId)
+})
+
+/**
  * createFaProjectWorld
  * Assigns default color, zero-based sort_order, and increments order for later worlds.
  */

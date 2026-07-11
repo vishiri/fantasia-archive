@@ -86,6 +86,34 @@ test('Test that MainLayout applies spellcheck header reserve class from shared r
   vi.unstubAllEnvs()
 })
 
+test('Test that MainLayout forwards workspace splitter width updates to sidebar wiring', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'spa')
+  vi.useFakeTimers()
+
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\Projects\\demo.faproject',
+    id: 'project-uuid-1',
+    name: 'Demo project'
+  })
+
+  const persistSpy = vi.spyOn(S_FaProjectSidebar(), 'persistSidebarWidth').mockResolvedValue(true)
+
+  const w = await mountMainLayoutForVitest('/home')
+  await flushPromises()
+
+  await w.get('[data-test-locator="mainLayout-sidebarSplitter-resize"]').trigger('click')
+  await vi.advanceTimersByTimeAsync(500)
+
+  expect(persistSpy).toHaveBeenCalled()
+
+  persistSpy.mockRestore()
+  S_FaActiveProject().clearActiveProject()
+  w.unmount()
+  vi.useRealTimers()
+  vi.unstubAllEnvs()
+})
+
 test('Test that MainLayout workspace splitter enforces the 375px minimum width constant', async () => {
   setFantasiaStorybookCanvasFlag(false)
   vi.stubEnv('MODE', 'spa')

@@ -310,3 +310,15 @@ test('Test that updateSettings wraps non-Error rejections in an Error before thr
   await expect(store.updateSettings({ darkMode: true })).rejects.toThrow('plain string boom')
   consoleErrorSpy.mockRestore()
 })
+
+/**
+ * S_FaUserSettings / app settings dialog preview
+ * Preview helpers stage unsaved App Settings values for the dialog UI.
+ */
+test('Test that setAppSettingsDialogPreview and clearAppSettingsDialogPreview update preview state', () => {
+  expect(store.appSettingsDialogPreview).toBeNull()
+  store.setAppSettingsDialogPreview({ darkMode: true })
+  expect(store.appSettingsDialogPreview).toEqual({ darkMode: true })
+  store.clearAppSettingsDialogPreview()
+  expect(store.appSettingsDialogPreview).toBeNull()
+})

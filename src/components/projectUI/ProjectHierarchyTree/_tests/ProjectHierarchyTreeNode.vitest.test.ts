@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
 
 import ProjectHierarchyTreeNode from '../ProjectHierarchyTreeNode.vue'
+import { expectCssColorValue } from 'app/helpers/vitestCssColorExpect'
 
 const baseNode = {
   children: [],
@@ -45,7 +46,7 @@ test('Test that ProjectHierarchyTreeNode renders world row chrome', () => {
   expect(wrapper.find('.projectHierarchyTreeNode--world').exists()).toBe(true)
   expect(wrapper.find('.q-icon').exists()).toBe(true)
   expect(wrapper.find('.q-focus-helper').exists()).toBe(true)
-  expect((wrapper.element as HTMLElement).style.color).toBe('rgb(17, 34, 51)')
+  expectCssColorValue((wrapper.element as HTMLElement).style.color, '#112233')
   expect(wrapper.find('.projectHierarchyTreeNode__label').exists()).toBe(true)
   expect(wrapper.find('.projectHierarchyTreeNode__icon--layoutKind').exists()).toBe(false)
 })
@@ -219,4 +220,31 @@ test('Test that ProjectHierarchyTreeNode syncs tree-node kind class', () => {
 
   expect(treeNode.classList.contains('projectHierarchyTree-treeNode--group')).toBe(true)
   treeNode.remove()
+})
+
+test('Test that ProjectHierarchyTreeNode clears row kind class on unmount', () => {
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    global: {
+      stubs: {
+        QIcon: {
+          props: ['name'],
+          template: '<i class="q-icon" :name="name" />'
+        }
+      }
+    },
+    props: {
+      activeDocumentId: 'doc-1',
+      node: {
+        ...baseNode,
+        documentId: 'doc-1',
+        nodeKind: 'document'
+      },
+      stat: {
+        open: false
+      }
+    }
+  })
+
+  expect(wrapper.find('.projectHierarchyTreeNode--activeTabDocument').exists()).toBe(true)
+  wrapper.unmount()
 })

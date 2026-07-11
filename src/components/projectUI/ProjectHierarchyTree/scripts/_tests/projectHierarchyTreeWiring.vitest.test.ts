@@ -75,6 +75,13 @@ import {
   syncProjectHierarchyTreeOpenSetToPersist
 } from '../projectHierarchyTreeUiStateWiring'
 import { wireProjectHierarchyTreeSessionLifecycle } from '../projectHierarchyTreeSessionWatchWiring'
+import { createProjectHierarchyTreeSessionEarlyWiring } from '../projectHierarchyTreeSessionEarlyWiring'
+import { bindProjectHierarchyTreeHeTreeNodeTabIndexGuard } from '../projectHierarchyTreeHeTreeNodeTabIndexWiring'
+import { bindProjectHierarchyTreeSessionPendingRefresh } from '../projectHierarchyTreePendingDocumentRefreshWiring'
+import { bindProjectHierarchyTreeSessionLifecycle } from '../projectHierarchyTreeSessionLifecycleBindWiring'
+import {
+  PROJECT_HIERARCHY_TREE_DOCUMENT_ROW_DRAG_HOLD_DELAY_MS
+} from '../../functions/projectHierarchyTreeConstants'
 
 const sampleWorld = {
   color: '#ff0000',
@@ -1648,13 +1655,7 @@ test('Test that createProjectHierarchyTreeUiStateSessionWiring delegates UI help
     },
     treeData,
     treeMountKey: ref(0),
-    watch,
-    windowClearTimeout: (timeoutId: number) => {
-      window.clearTimeout(timeoutId)
-    },
-    windowSetTimeout: (handler: () => void, delayMs: number) => {
-      return window.setTimeout(handler, delayMs)
-    }
+    watch
   })
   wiring.markNodeOpen('world-1')
   const placement = findProjectHierarchyTreeNodeById(treeData.value, 'placement-1')!
@@ -3314,13 +3315,308 @@ test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom reads sibling or
   })).toEqual(['doc-c', 'doc-a', 'doc-b'])
 })
 
-/**
- * he-tree roving tabindex keeps one .tree-node at tabindex 0; guard forces tab order skip.
- */
-test('Test that clearProjectHierarchyTreeHeTreeNodeTabIndex forces he-tree rows out of tab order', async () => {
-  const { clearProjectHierarchyTreeHeTreeNodeTabIndexForTests } = await import(
-    '../projectHierarchyTreeHeTreeNodeTabIndexWiring'
+test('Test that createProjectHierarchyTreeSessionEarlyWiring arms document row drag hold timers', async () => {
+  vi.useFakeTimers()
+  const sessionRefs = createProjectHierarchyTreeSessionRefs({ ref })
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const host = document.createElement('div')
+  sessionRefs.treeScrollHostRef.value = host
+  const row = document.createElement('div')
+  host.appendChild(row)
+  const earlyWiring = createProjectHierarchyTreeSessionEarlyWiring({
+    computed,
+    dragContext: {
+      dragNode: {
+        data: buildDocumentNode()
+      }
+    },
+    hierarchyStore: {
+      flushUiStatePersist: vi.fn(),
+      queuePersistExpandedNodeIds: vi.fn(),
+      queuePersistScrollTopPx: vi.fn(),
+      refreshLayout: vi.fn(async () => undefined)
+    },
+    nextTick: async () => undefined,
+    onUnmounted: vi.fn(),
+    pendingRevealPath: ref([]),
+    ref,
+    treeData,
+    uiState: ref({
+      expandedNodeIds: [],
+      schemaVersion: 1,
+      scrollTopPx: 0
+    }),
+    watch,
+    worlds: ref([sampleWorld])
+  })
+  const commitSpy = vi.spyOn(
+    earlyWiring.subWiring.dndWiring,
+    'commitAllowedDocumentRowDragSessionStart'
   )
+  earlyWiring.documentRowDragHoldWiring.handleDocumentRowPointerDown({
+    button: 0,
+    currentTarget: row
+  } as unknown as PointerEvent)
+  vi.advanceTimersByTime(PROJECT_HIERARCHY_TREE_DOCUMENT_ROW_DRAG_HOLD_DELAY_MS)
+  earlyWiring.documentRowDragHoldWiring.handleTreeDragStartCapture({} as DragEvent)
+  await Promise.resolve()
+  expect(commitSpy).toHaveBeenCalledOnce()
+  earlyWiring.documentRowDragHoldWiring.handleDocumentRowPointerDown({
+    button: 0,
+    currentTarget: row
+  } as unknown as PointerEvent)
+  earlyWiring.documentRowDragHoldWiring.clearHoldSession()
+  vi.useRealTimers()
+})
+
+test('Test that createProjectHierarchyTreeDnDHandlers commitAllowedDocumentRowDragSessionStart runs before drag start', () => {
+  const dragCommitPending = ref(false)
+  const dragDropCommitted = ref(false)
+  const dragExpandPostCommitGuard = ref(false)
+  const dragExpandUiFrozen = ref(false)
+  const isTreeDragActive = ref(false)
+  const suppressTreeEmit = ref(false)
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const draggedDocumentId = {
+    current: null as string | null
+  }
+  const dragExpandedSnapshot = {
+    current: null as string[] | null
+  }
+  const dragCancelWiring = createProjectHierarchyTreeDragCancelWiring(buildProjectHierarchyTreeDragCancelTestDeps({
+    dragCommitPending,
+    dragDropCommitted,
+    dragExpandPostCommitGuard,
+    dragExpandUiFrozen
+  }))
+  const handlers = createProjectHierarchyTreeDnDHandlers({
+    clearDragSessionFlags: vi.fn(),
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(isTreeDragActive),
+    dragCancelWiring,
+    dragCommitPending,
+    dragCommitScheduled: ref(false),
+    dragDropCommitted,
+    dragExpandPostCommitGuard,
+    dragExpandUiFrozen,
+    draggedDocumentId: {
+      get: () => draggedDocumentId.current,
+      set: (value) => {
+        draggedDocumentId.current = value
+      }
+    },
+    dragExpandedSnapshot: {
+      get: () => dragExpandedSnapshot.current,
+      set: (value) => {
+        dragExpandedSnapshot.current = value
+      }
+    },
+    dragSiblingOrderSnapshot: {
+      get: () => null,
+      set: () => undefined
+    },
+    captureDragModelValueRevisionAtDrop: vi.fn(),
+    captureDragParentDocumentIdAtDragStart: vi.fn(),
+    captureDragSiblingOrderAtDragStart: vi.fn(),
+    incrementDragModelValueRevision: vi.fn(),
+    readDragParentDocumentIdAtDragStart: () => null,
+    readDragSiblingOrderAtDragStart: () => null,
+    readDragModelValueSettledForCommit: () => true,
+    resetDragModelValueRevisionForDragStart: vi.fn(),
+    flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
+    flushUiStatePersist: vi.fn(),
+    isTreeDragActive,
+    getTreeRef: () => null,
+    getTreeScrollHost: () => null,
+    loadChildrenForNode: vi.fn(async () => undefined),
+    markNodeClosed: vi.fn(),
+    markNodeOpen: vi.fn(),
+    reindexDocumentSiblingsInHierarchy: vi.fn(async () => undefined),
+    nextTick: async () => undefined,
+    reapplyHeTreeOpenState: vi.fn(),
+    reapplyLatentDescendantExpandState: vi.fn(async () => undefined),
+    openNodeIds: ref(new Set(['world-1'])),
+    queuePersistExpandedNodeIds: vi.fn(),
+    refreshLayout: vi.fn(async () => undefined),
+    refreshNodeChildrenFromDatabase: vi.fn(async () => undefined),
+    removeDragCancelListeners: vi.fn(),
+    resyncTreeDataFromLayout: vi.fn(),
+    restoreExpandedSnapshot: vi.fn(async () => undefined),
+    suppressTreeEmit,
+    treeData
+  })
+  handlers.commitAllowedDocumentRowDragSessionStart({
+    dragNode: {
+      data: buildDocumentNode()
+    }
+  })
+  expect(draggedDocumentId.current).toBe('doc-a')
+  expect(handlers.getDragExpandedSnapshotNodeIds()).toEqual(['world-1'])
+})
+
+test('Test that createProjectHierarchyTreeSessionSubWiring restoreUiStateFromStore applies persisted scrollTop', async () => {
+  vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+    callback(performance.now())
+    return 1
+  })
+  const sessionRefs = createProjectHierarchyTreeSessionRefs({ ref })
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const host = document.createElement('div')
+  const tree = document.createElement('div')
+  tree.className = 'projectHierarchyTree'
+  host.appendChild(tree)
+  sessionRefs.treeComponentRef.value = {
+    closeAll: vi.fn(),
+    openNodeAndParents: vi.fn()
+  }
+  sessionRefs.treeScrollHostRef.value = host
+  const subWiring = createProjectHierarchyTreeSessionSubWiring({
+    computed,
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(sessionRefs.isTreeDragActive),
+    dragCommitPending: sessionRefs.dragCommitPending,
+    dragCommitScheduled: sessionRefs.dragCommitScheduled,
+    dragDropCommitted: sessionRefs.dragDropCommitted,
+    dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
+    dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    hierarchyStore: {
+      flushUiStatePersist: vi.fn(),
+      queuePersistExpandedNodeIds: vi.fn(),
+      queuePersistScrollTopPx: vi.fn(),
+      refreshLayout: vi.fn(async () => undefined)
+    },
+    isTreeDragActive: sessionRefs.isTreeDragActive,
+    nextTick: async () => undefined,
+    openNodeIds: sessionRefs.openNodeIds,
+    pendingRevealPath: ref([]),
+    ref,
+    suppressTreeEmit: sessionRefs.suppressTreeEmit,
+    treeComponentRef: sessionRefs.treeComponentRef,
+    treeData,
+    treeMountKey: sessionRefs.treeMountKey,
+    treeScrollHostRef: sessionRefs.treeScrollHostRef,
+    uiState: ref({
+      expandedNodeIds: [],
+      schemaVersion: 1,
+      scrollTopPx: 88
+    }),
+    watch,
+    worlds: ref([sampleWorld])
+  })
+  await subWiring.uiStateWiring.restoreUiStateFromStore()
+  expect(tree.scrollTop).toBe(88)
+  vi.unstubAllGlobals()
+})
+
+test('Test that createProjectHierarchyTreeSessionSubWiring restoreExpandedSnapshot flushes deferred tree revision publish', async () => {
+  const sessionRefs = createProjectHierarchyTreeSessionRefs({ ref })
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const publishSpy = vi.spyOn(
+    projectHierarchyTreeExpandState,
+    'publishProjectHierarchyTreeRootRevision'
+  )
+  const subWiring = createProjectHierarchyTreeSessionSubWiring({
+    computed,
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(sessionRefs.isTreeDragActive),
+    dragCommitPending: sessionRefs.dragCommitPending,
+    dragCommitScheduled: sessionRefs.dragCommitScheduled,
+    dragDropCommitted: sessionRefs.dragDropCommitted,
+    dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
+    dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    hierarchyStore: {
+      flushUiStatePersist: vi.fn(),
+      queuePersistExpandedNodeIds: vi.fn(),
+      queuePersistScrollTopPx: vi.fn(),
+      refreshLayout: vi.fn(async () => undefined)
+    },
+    isTreeDragActive: sessionRefs.isTreeDragActive,
+    nextTick: async () => undefined,
+    openNodeIds: sessionRefs.openNodeIds,
+    pendingRevealPath: ref([]),
+    ref,
+    suppressTreeEmit: sessionRefs.suppressTreeEmit,
+    treeComponentRef: sessionRefs.treeComponentRef,
+    treeData,
+    treeMountKey: sessionRefs.treeMountKey,
+    treeScrollHostRef: sessionRefs.treeScrollHostRef,
+    uiState: ref({
+      expandedNodeIds: ['world-1'],
+      schemaVersion: 1,
+      scrollTopPx: 0
+    }),
+    watch,
+    worlds: ref([sampleWorld])
+  })
+  sessionRefs.dragExpandUiFrozen.value = true
+  await subWiring.lazyLoadWiring.loadChildrenForNode(
+    findProjectHierarchyTreeNodeById(treeData.value, 'placement-1')!
+  )
+  sessionRefs.dragExpandUiFrozen.value = false
+  await subWiring.uiStateWiring.restoreExpandedSnapshot(['world-1'])
+  expect(publishSpy).toHaveBeenCalled()
+  publishSpy.mockRestore()
+})
+
+test('Test that createProjectHierarchyTreeSessionSubWiring refreshNodeChildrenFromDatabase reloads node children', async () => {
+  const sessionRefs = createProjectHierarchyTreeSessionRefs({ ref })
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const listPlacementDocumentChildren = vi.fn(async () => ({
+    items: [{
+      displayName: 'Reloaded doc',
+      hasChildren: false,
+      id: 'doc-reload',
+      parentDocumentId: null,
+      placementId: 'placement-1',
+      sortOrder: 0
+    }]
+  }))
+  window.faContentBridgeAPIs = {
+    projectContent: {
+      listPlacementDocumentChildren
+    }
+  } as never
+  const subWiring = createProjectHierarchyTreeSessionSubWiring({
+    computed,
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(sessionRefs.isTreeDragActive),
+    dragCommitPending: sessionRefs.dragCommitPending,
+    dragCommitScheduled: sessionRefs.dragCommitScheduled,
+    dragDropCommitted: sessionRefs.dragDropCommitted,
+    dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
+    dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    hierarchyStore: {
+      flushUiStatePersist: vi.fn(),
+      queuePersistExpandedNodeIds: vi.fn(),
+      queuePersistScrollTopPx: vi.fn(),
+      refreshLayout: vi.fn(async () => undefined)
+    },
+    isTreeDragActive: sessionRefs.isTreeDragActive,
+    nextTick: async () => undefined,
+    openNodeIds: sessionRefs.openNodeIds,
+    pendingRevealPath: ref([]),
+    ref,
+    suppressTreeEmit: sessionRefs.suppressTreeEmit,
+    treeComponentRef: sessionRefs.treeComponentRef,
+    treeData,
+    treeMountKey: sessionRefs.treeMountKey,
+    treeScrollHostRef: sessionRefs.treeScrollHostRef,
+    uiState: ref({
+      expandedNodeIds: [],
+      schemaVersion: 1,
+      scrollTopPx: 0
+    }),
+    watch,
+    worlds: ref([sampleWorld])
+  })
+  await subWiring.lazyLoadWiring.refreshNodeChildrenFromDatabase('placement-1')
+  expect(listPlacementDocumentChildren).toHaveBeenCalledWith({
+    placementId: 'placement-1'
+  })
+})
+
+test('Test that bindProjectHierarchyTreeHeTreeNodeTabIndexGuard syncs tabindex on host mutations', async () => {
+  const treeScrollHostRef = ref<HTMLElement | null>(null)
   const host = document.createElement('div')
   const tree = document.createElement('div')
   tree.className = 'projectHierarchyTree'
@@ -3329,8 +3625,879 @@ test('Test that clearProjectHierarchyTreeHeTreeNodeTabIndex forces he-tree rows 
   row.tabIndex = 0
   tree.appendChild(row)
   host.appendChild(tree)
-
-  clearProjectHierarchyTreeHeTreeNodeTabIndexForTests(host)
-
+  treeScrollHostRef.value = host
+  const unmountHooks: Array<() => void> = []
+  bindProjectHierarchyTreeHeTreeNodeTabIndexGuard({
+    onUnmounted: (hook) => {
+      unmountHooks.push(hook)
+    },
+    treeScrollHostRef,
+    watch
+  })
+  await Promise.resolve()
   expect(row.tabIndex).toBe(-1)
+  row.tabIndex = 0
+  tree.appendChild(document.createElement('div'))
+  await Promise.resolve()
+  expect(row.tabIndex).toBe(-1)
+  for (const hook of unmountHooks) {
+    hook()
+  }
+})
+
+test('Test that bindProjectHierarchyTreeSessionPendingRefresh delegates store clear callbacks', async () => {
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const pendingDocumentRefreshIds = ref<string[]>([])
+  const pendingHierarchyNodeRefreshIds = ref<string[]>([])
+  const clearPendingDocumentRefreshIds = vi.fn(() => {
+    pendingDocumentRefreshIds.value = []
+  })
+  const clearPendingHierarchyNodeRefreshIds = vi.fn(() => {
+    pendingHierarchyNodeRefreshIds.value = []
+  })
+  bindProjectHierarchyTreeSessionPendingRefresh({
+    hierarchyStore: {
+      clearPendingDocumentRefreshIds,
+      clearPendingHierarchyNodeRefreshIds
+    },
+    pendingDocumentRefreshIds,
+    pendingHierarchyNodeRefreshIds,
+    refreshNodeChildrenFromDatabase: vi.fn(async () => undefined),
+    treeData,
+    watch
+  })
+  pendingDocumentRefreshIds.value = ['doc-a']
+  pendingHierarchyNodeRefreshIds.value = ['placement-1']
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(clearPendingDocumentRefreshIds).toHaveBeenCalledOnce()
+  expect(clearPendingHierarchyNodeRefreshIds).toHaveBeenCalledOnce()
+})
+
+test('Test that bindProjectHierarchyTreeSessionLifecycle evaluates worlds expand defer during drag', async () => {
+  const sessionRefs = createProjectHierarchyTreeSessionRefs({ ref })
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const earlyWiring = createProjectHierarchyTreeSessionEarlyWiring({
+    computed,
+    dragContext: {
+      dragNode: null
+    },
+    hierarchyStore: {
+      flushUiStatePersist: vi.fn(),
+      queuePersistExpandedNodeIds: vi.fn(),
+      queuePersistScrollTopPx: vi.fn(),
+      refreshLayout: vi.fn(async () => undefined)
+    },
+    nextTick: async () => undefined,
+    onUnmounted: vi.fn(),
+    pendingRevealPath: ref([]),
+    ref,
+    treeData,
+    uiState: ref({
+      expandedNodeIds: [],
+      schemaVersion: 1,
+      scrollTopPx: 0
+    }),
+    watch,
+    worlds: ref([sampleWorld])
+  })
+  sessionRefs.dragCommitPending.value = true
+  const mountedHooks: Array<() => void> = []
+  const worlds = ref([sampleWorld])
+  bindProjectHierarchyTreeSessionLifecycle({
+    S_FaActiveProject: () => ({
+      activeProject: { id: 'project-1' },
+      hasActiveProject: true
+    }),
+    clearPendingRevealPath: vi.fn(),
+    dragCommitPending: sessionRefs.dragCommitPending,
+    dragCommitScheduled: sessionRefs.dragCommitScheduled,
+    dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
+    dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    flushUiStatePersist: vi.fn(),
+    getDragExpandedSnapshotNodeIds: earlyWiring.subWiring.dndWiring.getDragExpandedSnapshotNodeIds,
+    hydrateTreeSession: vi.fn(async () => undefined),
+    onMounted: (hook) => {
+      mountedHooks.push(hook)
+    },
+    onUnmounted: vi.fn(),
+    openNodeIds: sessionRefs.openNodeIds,
+    pendingRevealPath: ref([]),
+    resetOnProjectClose: vi.fn(),
+    resyncTreeDataFromLayout: vi.fn(),
+    restoreUiStateFromStore: vi.fn(async () => undefined),
+    revealPendingPath: vi.fn(async () => undefined),
+    teardown: vi.fn(),
+    watch,
+    worlds
+  })
+  mountedHooks[0]?.()
+  worlds.value = [...worlds.value]
+  await Promise.resolve()
+})
+
+test('Test that createProjectHierarchyTreeDnDHandlers ignores null drag nodes and unarmed holds', () => {
+  const draggedDocumentId = {
+    current: 'doc-a' as string | null
+  }
+  const handlers = createProjectHierarchyTreeDnDHandlers({
+    clearDragSessionFlags: vi.fn(),
+    documentRowDragHoldWiring: {
+      clearHoldSession: vi.fn(),
+      getIsDragHoldArmed: () => false,
+      handleDocumentRowPointerDown: vi.fn(),
+      handleTreeDragStartCapture: vi.fn(),
+      markDragStartedFromHold: vi.fn()
+    },
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(ref(false)),
+    dragCancelWiring: createProjectHierarchyTreeDragCancelWiring(buildProjectHierarchyTreeDragCancelTestDeps()),
+    dragCommitPending: ref(false),
+    dragCommitScheduled: ref(false),
+    dragDropCommitted: ref(false),
+    dragExpandPostCommitGuard: ref(false),
+    dragExpandUiFrozen: ref(false),
+    draggedDocumentId: {
+      get: () => draggedDocumentId.current,
+      set: (value) => {
+        draggedDocumentId.current = value
+      }
+    },
+    dragExpandedSnapshot: {
+      get: () => null,
+      set: () => undefined
+    },
+    dragSiblingOrderSnapshot: {
+      get: () => null,
+      set: () => undefined
+    },
+    captureDragModelValueRevisionAtDrop: vi.fn(),
+    captureDragParentDocumentIdAtDragStart: vi.fn(),
+    captureDragSiblingOrderAtDragStart: vi.fn(),
+    incrementDragModelValueRevision: vi.fn(),
+    readDragParentDocumentIdAtDragStart: () => null,
+    readDragSiblingOrderAtDragStart: () => null,
+    readDragModelValueSettledForCommit: () => true,
+    resetDragModelValueRevisionForDragStart: vi.fn(),
+    flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
+    flushUiStatePersist: vi.fn(),
+    isTreeDragActive: ref(false),
+    getTreeRef: () => null,
+    getTreeScrollHost: () => null,
+    loadChildrenForNode: vi.fn(async () => undefined),
+    markNodeClosed: vi.fn(),
+    markNodeOpen: vi.fn(),
+    reindexDocumentSiblingsInHierarchy: vi.fn(async () => undefined),
+    nextTick: async () => undefined,
+    reapplyHeTreeOpenState: vi.fn(),
+    reapplyLatentDescendantExpandState: vi.fn(async () => undefined),
+    openNodeIds: ref(new Set()),
+    queuePersistExpandedNodeIds: vi.fn(),
+    refreshLayout: vi.fn(async () => undefined),
+    refreshNodeChildrenFromDatabase: vi.fn(async () => undefined),
+    removeDragCancelListeners: vi.fn(),
+    resyncTreeDataFromLayout: vi.fn(),
+    restoreExpandedSnapshot: vi.fn(async () => undefined),
+    suppressTreeEmit: ref(false),
+    treeData: ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  })
+  handlers.commitAllowedDocumentRowDragSessionStart({
+    dragNode: null
+  })
+  handlers.onBeforeDragStart({
+    data: buildDocumentNode()
+  })
+  expect(draggedDocumentId.current).toBe('doc-a')
+})
+
+test('Test that applyProjectHierarchyTreeHeTreeModelValueUpdate rejects escaped document rows', async () => {
+  const { applyProjectHierarchyTreeHeTreeModelValueUpdate } = await import('../projectHierarchyTreeDnDModelValueUpdateWiring')
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const escapedTree = [{
+    ...treeData.value[0]!,
+    children: [buildDocumentNode({
+      documentId: 'doc-escaped',
+      id: 'doc-escaped'
+    })]
+  }]
+  applyProjectHierarchyTreeHeTreeModelValueUpdate({
+    dragCommitPending: ref(false),
+    dragDropCommitted: ref(false),
+    draggedDocumentId: {
+      get: () => 'doc-escaped'
+    },
+    dragSiblingOrderSnapshot: {
+      get: () => null,
+      set: vi.fn()
+    },
+    incrementDragModelValueRevision: vi.fn(),
+    isTreeDragActive: ref(true),
+    suppressTreeEmit: ref(false),
+    treeData
+  }, escapedTree)
+  expect(treeData.value).not.toEqual(escapedTree)
+})
+
+test('Test that readProjectHierarchyTreeHeTreeLiveData rejects non-array getData results', async () => {
+  const { readProjectHierarchyTreeHeTreeLiveData } = await import('../projectHierarchyTreeHeTreeLiveDataWiring')
+  expect(readProjectHierarchyTreeHeTreeLiveData({
+    closeAll: () => undefined,
+    getData: () => ({ not: 'array' } as unknown as I_faProjectHierarchyTreeHeTreeNode[]),
+    openNodeAndParents: () => undefined
+  })).toBeNull()
+})
+
+test('Test that tryOpenHeTreeNodeAndParents handles StatNotFoundError and rethrows others', async () => {
+  const { isHeTreeStatNotFoundError, tryOpenHeTreeNodeAndParents } = await import('../projectHierarchyTreeHeTreeOpenSafeWiring')
+  const statOpen = {
+    open: true
+  }
+  expect(isHeTreeStatNotFoundError(new Error('missing'))).toBe(false)
+  const statNotFound = new Error('missing stat')
+  statNotFound.name = 'StatNotFoundError'
+  expect(isHeTreeStatNotFoundError(statNotFound)).toBe(true)
+  expect(tryOpenHeTreeNodeAndParents({
+    node: buildDocumentNode(),
+    statOpen,
+    treeRef: {
+      closeAll: () => undefined,
+      openNodeAndParents: () => {
+        throw statNotFound
+      }
+    }
+  })).toBe(false)
+  expect(statOpen.open).toBe(false)
+  expect(() => tryOpenHeTreeNodeAndParents({
+    node: buildDocumentNode(),
+    treeRef: {
+      closeAll: () => undefined,
+      openNodeAndParents: () => {
+        throw new Error('boom')
+      }
+    }
+  })).toThrow('boom')
+})
+
+test('Test that handleProjectHierarchyTreeOpenIconClick closes rows without open icons', async () => {
+  const { handleProjectHierarchyTreeOpenIconClick } = await import('../projectHierarchyTreeHeTreeOpenSafeWiring')
+  const onNodeClose = vi.fn()
+  const node = buildDocumentNode({
+    childrenLoaded: true,
+    documentId: 'doc-leaf',
+    hasChildren: false,
+    id: 'doc-leaf'
+  })
+  const stat = {
+    children: [],
+    open: true
+  }
+  await handleProjectHierarchyTreeOpenIconClick({
+    getOpenIconPointerWasOpen: () => null,
+    node,
+    onNodeClose,
+    onNodeOpen: vi.fn(async () => undefined),
+    setOpenIconPointerWasOpen: vi.fn(),
+    stat
+  })
+  expect(onNodeClose).toHaveBeenCalledWith({ data: node })
+  expect(stat.open).toBe(false)
+})
+
+test('Test that collectProjectHierarchyTreeLiveExpandStateFromDom reads collapsed and expanded rows', async () => {
+  const {
+    collectProjectHierarchyTreeLiveExpandStateFromDom,
+    resolveProjectHierarchyTreeScrollHostForDomRead
+  } = await import('../projectHierarchyTreeLiveExpandDomWiring')
+  expect(collectProjectHierarchyTreeLiveExpandStateFromDom(null)).toEqual({
+    collapsedVisibleNodeIds: [],
+    expandedNodeIds: [],
+    rowCount: 0,
+    scrollHostPresent: false
+  })
+  const host = document.createElement('div')
+  host.setAttribute('data-test-locator', 'projectHierarchyTree-host')
+  const tree = document.createElement('div')
+  tree.className = 'projectHierarchyTree'
+  const appendRow = (nodeId: string, expanded: boolean): void => {
+    const row = document.createElement('div')
+    row.className = 'projectHierarchyTree__nodeRow'
+    const nodeRoot = document.createElement('div')
+    nodeRoot.setAttribute('data-test-hierarchy-node-id', nodeId)
+    row.appendChild(nodeRoot)
+    const icon = document.createElement('span')
+    icon.setAttribute('data-test-locator', 'projectHierarchyTree-openIcon')
+    if (expanded) {
+      icon.classList.add('projectHierarchyTree__openIcon--open')
+    }
+    row.appendChild(icon)
+    tree.appendChild(row)
+  }
+  appendRow('world-1', true)
+  appendRow('group-1', false)
+  const orphanRow = document.createElement('div')
+  orphanRow.className = 'projectHierarchyTree__nodeRow'
+  tree.appendChild(orphanRow)
+  host.appendChild(tree)
+  document.body.appendChild(host)
+  expect(resolveProjectHierarchyTreeScrollHostForDomRead(null)).toBe(host)
+  const state = collectProjectHierarchyTreeLiveExpandStateFromDom(host)
+  expect(state.expandedNodeIds).toEqual(['world-1'])
+  expect(state.collapsedVisibleNodeIds).toEqual(['group-1'])
+  expect(state.rowCount).toBe(3)
+  host.remove()
+})
+
+test('Test that runProjectHierarchyTreePostDragExpandCloseGuard suppresses ancestor snapshot closes', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const treeData = ref(tree)
+  const markNodeClosed = vi.fn()
+  const world = tree[0]!
+  runProjectHierarchyTreePostDragExpandCloseGuard({
+    dragExpandPostCommitGuard: () => false,
+    getDragExpandedSnapshotNodeIds: () => ['placement-1'],
+    markNodeClosed,
+    node: world,
+    nodeId: 'world-1',
+    treeData
+  })
+  expect(markNodeClosed).not.toHaveBeenCalled()
+})
+
+test('Test that createProjectHierarchyTreeSessionDnDSubWiring throws when reindex API missing', async () => {
+  const sessionRefs = createProjectHierarchyTreeSessionRefs({ ref })
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  window.faContentBridgeAPIs = {
+    projectContent: {
+      listPlacementDocumentChildren: vi.fn(async () => ({
+        items: [{
+          displayName: 'Doc api missing',
+          hasChildren: false,
+          id: 'doc-api-missing',
+          parentDocumentId: null,
+          placementId: 'placement-1',
+          sortOrder: 0
+        }, {
+          displayName: 'Doc api missing 2',
+          hasChildren: false,
+          id: 'doc-api-missing-2',
+          parentDocumentId: null,
+          placementId: 'placement-1',
+          sortOrder: 1
+        }]
+      }))
+    }
+  } as never
+  const subWiring = createProjectHierarchyTreeSessionSubWiring({
+    computed,
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(sessionRefs.isTreeDragActive),
+    dragCommitPending: sessionRefs.dragCommitPending,
+    dragCommitScheduled: sessionRefs.dragCommitScheduled,
+    dragDropCommitted: sessionRefs.dragDropCommitted,
+    dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
+    dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    hierarchyStore: {
+      flushUiStatePersist: vi.fn(),
+      queuePersistExpandedNodeIds: vi.fn(),
+      queuePersistScrollTopPx: vi.fn(),
+      refreshLayout: vi.fn(async () => undefined)
+    },
+    isTreeDragActive: sessionRefs.isTreeDragActive,
+    nextTick: async () => undefined,
+    openNodeIds: sessionRefs.openNodeIds,
+    pendingRevealPath: ref([]),
+    ref,
+    suppressTreeEmit: sessionRefs.suppressTreeEmit,
+    treeComponentRef: sessionRefs.treeComponentRef,
+    treeData,
+    treeMountKey: sessionRefs.treeMountKey,
+    treeScrollHostRef: sessionRefs.treeScrollHostRef,
+    uiState: ref({
+      expandedNodeIds: [],
+      schemaVersion: 1,
+      scrollTopPx: 0
+    }),
+    watch,
+    worlds: ref([sampleWorld])
+  })
+  const placement = findProjectHierarchyTreeNodeById(treeData.value, 'placement-1')!
+  await subWiring.lazyLoadWiring.loadChildrenForNode(placement)
+  const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+  subWiring.dndWiring.onBeforeDragStart({
+    data: buildDocumentNode({
+      documentId: 'doc-api-missing',
+      id: 'doc-api-missing'
+    })
+  })
+  const loadedPlacement = findProjectHierarchyTreeNodeById(treeData.value, 'placement-1')!
+  loadedPlacement.children.reverse()
+  subWiring.dndWiring.onTreeAfterDrop()
+  await vi.runAllTimersAsync()
+  expect(errorSpy).toHaveBeenCalled()
+  errorSpy.mockRestore()
+})
+
+test('Test that bindProjectHierarchyTreeHeTreeNodeTabIndexGuard blurs focused tree nodes', async () => {
+  const treeScrollHostRef = ref<HTMLElement | null>(null)
+  const unmountHooks: Array<() => void> = []
+  bindProjectHierarchyTreeHeTreeNodeTabIndexGuard({
+    onUnmounted: (hook) => {
+      unmountHooks.push(hook)
+    },
+    treeScrollHostRef,
+    watch
+  })
+  const host = document.createElement('div')
+  const tree = document.createElement('div')
+  tree.className = 'projectHierarchyTree'
+  const row = document.createElement('div')
+  row.className = 'tree-node'
+  row.tabIndex = 0
+  tree.appendChild(row)
+  host.appendChild(tree)
+  treeScrollHostRef.value = host
+  await Promise.resolve()
+  row.tabIndex = 0
+  tree.appendChild(document.createElement('div'))
+  await Promise.resolve()
+  expect(row.tabIndex).toBe(-1)
+  for (const hook of unmountHooks) {
+    hook()
+  }
+})
+
+test('Test that createProjectHierarchyTreeExpandRowClickRouting ignores world open icon handlers', async () => {
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const onNodeOpenIconClick = vi.fn(async () => undefined)
+  const onNodeOpenIconPointerDown = vi.fn()
+  const routing = createProjectHierarchyTreeExpandRowClickRouting({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(ref(false)),
+    onNodeOpenIconClick,
+    onNodeOpenIconPointerDown
+  })
+  const worldNode = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])[0]!
+  const stat = {
+    children: [{}],
+    open: false
+  }
+  await routing.onNonWorldOpenIconClick(worldNode, stat)
+  routing.onNonWorldOpenIconPointerDown(worldNode, stat)
+  expect(onNodeOpenIconClick).not.toHaveBeenCalled()
+  expect(onNodeOpenIconPointerDown).not.toHaveBeenCalled()
+})
+
+test('Test that cloneProjectHierarchyTreeLoadedNodeForPublish shallow-clones unloaded child rows', async () => {
+  const { cloneProjectHierarchyTreeLoadedNodeForPublish } = await import('../../functions/projectHierarchyTreeCloneLoadedNodeForPublish')
+  const parent = buildDocumentNode({
+    children: [buildDocumentNode({
+      childrenLoaded: false,
+      documentId: 'doc-child',
+      id: 'doc-child'
+    })],
+    childrenLoaded: true,
+    documentId: 'doc-parent',
+    hasChildren: true,
+    id: 'doc-parent'
+  })
+  const cloned = cloneProjectHierarchyTreeLoadedNodeForPublish(parent)
+  expect(cloned.children[0]).not.toBe(parent.children[0])
+  expect(cloned.children[0]?.children).toEqual([])
+})
+
+test('Test that createProjectHierarchyTreeExpandRowClickRouting routes group and placement row clicks', async () => {
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const onNodeOpenIconClick = vi.fn(async () => undefined)
+  const routing = createProjectHierarchyTreeExpandRowClickRouting({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(ref(false)),
+    onNodeOpenIconClick,
+    onNodeOpenIconPointerDown: vi.fn()
+  })
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const groupNode = tree[0]!.children[0]!
+  const placementNode = groupNode.children[0]!
+  const stat = {
+    children: [{}],
+    open: false
+  }
+  const stopPropagation = vi.fn()
+  await routing.onWorldNodeRowClick(groupNode, stat, {
+    clientX: 10,
+    clientY: 10,
+    stopPropagation
+  } as unknown as MouseEvent)
+  expect(onNodeOpenIconClick).toHaveBeenCalledWith(groupNode, stat)
+  onNodeOpenIconClick.mockClear()
+  routing.onWorldNodeRowPointerDown(placementNode, stat, {
+    stopPropagation
+  } as unknown as PointerEvent)
+  expect(stopPropagation).toHaveBeenCalled()
+})
+
+test('Test that createProjectHierarchyTreeExpandRowClickRouting skips leaf document row clicks', async () => {
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const onNodeOpenIconClick = vi.fn(async () => undefined)
+  const routing = createProjectHierarchyTreeExpandRowClickRouting({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(ref(false)),
+    onNodeOpenIconClick,
+    onNodeOpenIconPointerDown: vi.fn()
+  })
+  const leafDocument = buildDocumentNode({
+    childrenLoaded: true,
+    documentId: 'doc-leaf',
+    hasChildren: false,
+    id: 'doc-leaf'
+  })
+  const stat = {
+    children: [],
+    open: false
+  }
+  await routing.onWorldNodeRowClick(leafDocument, stat, {
+    clientX: 10,
+    clientY: 10,
+    stopPropagation: vi.fn()
+  } as unknown as MouseEvent)
+  expect(onNodeOpenIconClick).not.toHaveBeenCalled()
+})
+
+test('Test that clearProjectHierarchyTreeHeTreeNodeTabIndex no-ops without host or tree root', async () => {
+  const { clearProjectHierarchyTreeHeTreeNodeTabIndexForTests } = await import('../projectHierarchyTreeHeTreeNodeTabIndexWiring')
+  clearProjectHierarchyTreeHeTreeNodeTabIndexForTests(null)
+  const host = document.createElement('div')
+  clearProjectHierarchyTreeHeTreeNodeTabIndexForTests(host)
+})
+
+test('Test that bindProjectHierarchyTreeHeTreeNodeTabIndexGuard blurs focused tree nodes', async () => {
+  const { clearProjectHierarchyTreeHeTreeNodeTabIndexForTests } = await import('../projectHierarchyTreeHeTreeNodeTabIndexWiring')
+  const host = document.createElement('div')
+  const tree = document.createElement('div')
+  tree.className = 'projectHierarchyTree'
+  const row = document.createElement('div')
+  row.className = 'tree-node'
+  row.tabIndex = 0
+  tree.appendChild(row)
+  host.appendChild(tree)
+  row.focus()
+  clearProjectHierarchyTreeHeTreeNodeTabIndexForTests(host)
+  expect(row.tabIndex).toBe(-1)
+})
+
+test('Test that runProjectHierarchyTreePostDragExpandCloseGuard suppresses snapshot node closes', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const treeData = ref(tree)
+  const markNodeClosed = vi.fn()
+  const placement = findProjectHierarchyTreeNodeById(tree, 'placement-1')!
+  runProjectHierarchyTreePostDragExpandCloseGuard({
+    dragExpandPostCommitGuard: () => false,
+    getDragExpandedSnapshotNodeIds: () => ['placement-1'],
+    markNodeClosed,
+    node: placement,
+    nodeId: 'placement-1',
+    treeData
+  })
+  expect(markNodeClosed).not.toHaveBeenCalled()
+})
+
+test('Test that collectProjectHierarchyTreeLiveExpandedNodeIdsFromDom delegates to expand state reader', async () => {
+  const { collectProjectHierarchyTreeLiveExpandedNodeIdsFromDom, collectProjectHierarchyTreeLiveExpandStateFromDom } = await import('../projectHierarchyTreeLiveExpandDomWiring')
+  expect(collectProjectHierarchyTreeLiveExpandedNodeIdsFromDom(null)).toEqual([])
+  const host = document.createElement('div')
+  host.setAttribute('data-test-locator', 'projectHierarchyTree-host')
+  const treeRoot = document.createElement('div')
+  treeRoot.className = 'projectHierarchyTree'
+  const rowWithoutIcon = document.createElement('div')
+  rowWithoutIcon.className = 'projectHierarchyTree__nodeRow'
+  const nodeRoot = document.createElement('div')
+  nodeRoot.setAttribute('data-test-hierarchy-node-id', 'row-no-icon')
+  rowWithoutIcon.appendChild(nodeRoot)
+  treeRoot.appendChild(rowWithoutIcon)
+  host.appendChild(treeRoot)
+  expect(collectProjectHierarchyTreeLiveExpandStateFromDom(host)).toEqual({
+    collapsedVisibleNodeIds: [],
+    expandedNodeIds: [],
+    rowCount: 1,
+    scrollHostPresent: true
+  })
+})
+
+test('Test that runProjectHierarchyTreePostDragExpandCloseGuard closes nodes outside drag snapshot', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const treeData = ref(tree)
+  const markNodeClosed = vi.fn()
+  const group = tree[0]!.children[0]!
+  runProjectHierarchyTreePostDragExpandCloseGuard({
+    dragExpandPostCommitGuard: () => false,
+    getDragExpandedSnapshotNodeIds: () => null,
+    markNodeClosed,
+    node: group,
+    nodeId: 'group-1',
+    treeData
+  })
+  expect(markNodeClosed).toHaveBeenCalledWith('group-1', group)
+})
+
+test('Test that runProjectHierarchyTreePostDragExpandCloseGuard closes nodes when drag snapshot is empty', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const treeData = ref(tree)
+  const markNodeClosed = vi.fn()
+  const group = tree[0]!.children[0]!
+  runProjectHierarchyTreePostDragExpandCloseGuard({
+    dragExpandPostCommitGuard: () => false,
+    getDragExpandedSnapshotNodeIds: () => [],
+    markNodeClosed,
+    node: group,
+    nodeId: 'group-1',
+    treeData
+  })
+  expect(markNodeClosed).toHaveBeenCalledWith('group-1', group)
+})
+
+test('Test that createProjectHierarchyTreeExpandRowClickRouting forwards drag hold for draggable document rows', async () => {
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const dragHoldWiring = createTestDocumentRowDragHoldWiring()
+  const handleDocumentRowPointerDown = vi.spyOn(dragHoldWiring, 'handleDocumentRowPointerDown')
+  const routing = createProjectHierarchyTreeExpandRowClickRouting({
+    documentRowDragHoldWiring: dragHoldWiring,
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(ref(false)),
+    onNodeOpenIconClick: vi.fn(async () => undefined),
+    onNodeOpenIconPointerDown: vi.fn()
+  })
+  const draggableDocument = buildDocumentNode({
+    childrenLoaded: true,
+    documentId: 'doc-drag',
+    hasChildren: false,
+    id: 'doc-drag'
+  })
+  const stat = {
+    children: [],
+    open: false
+  }
+  routing.onWorldNodeRowPointerDown(draggableDocument, stat, {
+    stopPropagation: vi.fn()
+  } as unknown as PointerEvent)
+  expect(handleDocumentRowPointerDown).toHaveBeenCalled()
+})
+
+test('Test that createProjectHierarchyTreeExpandRowClickRouting toggles expandable document rows on matching click', async () => {
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const onNodeOpenIconClick = vi.fn(async () => undefined)
+  const gesture = createProjectHierarchyTreeDocumentRowExpandClickGestureWiring({
+    isTreeDragActive: ref(false)
+  })
+  const routing = createProjectHierarchyTreeExpandRowClickRouting({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: gesture,
+    onNodeOpenIconClick,
+    onNodeOpenIconPointerDown: vi.fn()
+  })
+  const expandableDocument = buildDocumentNode({
+    childrenLoaded: true,
+    documentId: 'doc-expand-toggle',
+    hasChildren: true,
+    id: 'doc-expand-toggle'
+  })
+  const stat = {
+    children: [{}],
+    open: false
+  }
+  const stopPropagation = vi.fn()
+  routing.onWorldNodeRowPointerDown(expandableDocument, stat, {
+    clientX: 10,
+    clientY: 10,
+    stopPropagation
+  } as unknown as PointerEvent)
+  await routing.onWorldNodeRowClick(expandableDocument, stat, {
+    clientX: 10,
+    clientY: 10,
+    stopPropagation
+  } as unknown as MouseEvent)
+  expect(onNodeOpenIconClick).toHaveBeenCalledWith(expandableDocument, stat)
+  expect(stopPropagation).toHaveBeenCalled()
+})
+
+test('Test that runProjectHierarchyTreePostDragExpandCloseGuard ignores unknown snapshot node ids', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const treeData = ref(tree)
+  const markNodeClosed = vi.fn()
+  const group = tree[0]!.children[0]!
+  runProjectHierarchyTreePostDragExpandCloseGuard({
+    dragExpandPostCommitGuard: () => false,
+    getDragExpandedSnapshotNodeIds: () => ['missing-node-id'],
+    markNodeClosed,
+    node: group,
+    nodeId: 'group-1',
+    treeData
+  })
+  expect(markNodeClosed).toHaveBeenCalledWith('group-1', group)
+})
+
+test('Test that createProjectHierarchyTreeExpandRowClickRouting ignores unknown node kinds and world open-icon handlers', async () => {
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const onNodeOpenIconClick = vi.fn(async () => undefined)
+  const onNodeOpenIconPointerDown = vi.fn()
+  const routing = createProjectHierarchyTreeExpandRowClickRouting({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(ref(false)),
+    onNodeOpenIconClick,
+    onNodeOpenIconPointerDown
+  })
+  const unknownNode = buildDocumentNode({
+    documentId: null,
+    id: 'unknown-node',
+    nodeKind: 'document'
+  })
+  Object.assign(unknownNode, { nodeKind: 'unknown-kind' })
+  const stat = {
+    children: [],
+    open: false
+  }
+  await routing.onWorldNodeRowClick(unknownNode, stat, {
+    clientX: 10,
+    clientY: 10,
+    stopPropagation: vi.fn()
+  } as unknown as MouseEvent)
+  const worldNode = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])[0]!
+  await routing.onNonWorldOpenIconClick(worldNode, stat)
+  routing.onNonWorldOpenIconPointerDown(worldNode, stat)
+  expect(onNodeOpenIconClick).not.toHaveBeenCalled()
+  expect(onNodeOpenIconPointerDown).not.toHaveBeenCalled()
+})
+
+test('Test that createProjectHierarchyTreeExpandRowClickRouting forwards non-world open-icon handlers for group nodes', async () => {
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const onNodeOpenIconClick = vi.fn(async () => undefined)
+  const onNodeOpenIconPointerDown = vi.fn()
+  const routing = createProjectHierarchyTreeExpandRowClickRouting({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(ref(false)),
+    onNodeOpenIconClick,
+    onNodeOpenIconPointerDown
+  })
+  const groupNode = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])[0]!.children[0]!
+  const stat = {
+    children: [{}],
+    open: false
+  }
+  await routing.onNonWorldOpenIconClick(groupNode, stat)
+  routing.onNonWorldOpenIconPointerDown(groupNode, stat)
+  expect(onNodeOpenIconClick).toHaveBeenCalledWith(groupNode, stat)
+  expect(onNodeOpenIconPointerDown).toHaveBeenCalledWith(stat)
+})
+
+test('Test that createProjectHierarchyTreeExpandRowClickRouting skips document row click when gesture blocks toggle', async () => {
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const onNodeOpenIconClick = vi.fn(async () => undefined)
+  const gesture = createProjectHierarchyTreeDocumentRowExpandClickGestureWiring({
+    isTreeDragActive: ref(false)
+  })
+  const routing = createProjectHierarchyTreeExpandRowClickRouting({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: gesture,
+    onNodeOpenIconClick,
+    onNodeOpenIconPointerDown: vi.fn()
+  })
+  const expandableDocument = buildDocumentNode({
+    childrenLoaded: true,
+    documentId: 'doc-expand',
+    hasChildren: true,
+    id: 'doc-expand'
+  })
+  const stat = {
+    children: [{}],
+    open: false
+  }
+  await routing.onWorldNodeRowClick(expandableDocument, stat, {
+    clientX: 10,
+    clientY: 10,
+    stopPropagation: vi.fn()
+  } as unknown as MouseEvent)
+  expect(onNodeOpenIconClick).not.toHaveBeenCalled()
+  gesture.beginDocumentRowGesture({
+    clientX: 10,
+    clientY: 10
+  })
+  await routing.onWorldNodeRowClick(expandableDocument, stat, {
+    clientX: 20,
+    clientY: 20,
+    stopPropagation: vi.fn()
+  } as unknown as MouseEvent)
+  expect(onNodeOpenIconClick).not.toHaveBeenCalled()
+})
+
+test('Test that runProjectHierarchyTreePostDragExpandCloseGuard returns early while post-commit guard active', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const treeData = ref(tree)
+  const markNodeClosed = vi.fn()
+  const group = tree[0]!.children[0]!
+  runProjectHierarchyTreePostDragExpandCloseGuard({
+    dragExpandPostCommitGuard: () => true,
+    getDragExpandedSnapshotNodeIds: () => null,
+    markNodeClosed,
+    node: group,
+    nodeId: 'group-1',
+    treeData
+  })
+  expect(markNodeClosed).not.toHaveBeenCalled()
+})
+
+test('Test that createProjectHierarchyTreeExpandRowClickRouting begins document row gesture on pointer down', async () => {
+  const { createProjectHierarchyTreeExpandRowClickRouting } = await import('../projectHierarchyTreeExpandRowClickRoutingWiring')
+  const gesture = createProjectHierarchyTreeDocumentRowExpandClickGestureWiring({
+    isTreeDragActive: ref(false)
+  })
+  const beginDocumentRowGesture = vi.spyOn(gesture, 'beginDocumentRowGesture')
+  const routing = createProjectHierarchyTreeExpandRowClickRouting({
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: gesture,
+    onNodeOpenIconClick: vi.fn(async () => undefined),
+    onNodeOpenIconPointerDown: vi.fn()
+  })
+  const expandableDocument = buildDocumentNode({
+    childrenLoaded: true,
+    documentId: 'doc-expand',
+    hasChildren: true,
+    id: 'doc-expand'
+  })
+  const stat = {
+    children: [{}],
+    open: false
+  }
+  routing.onWorldNodeRowPointerDown(expandableDocument, stat, {
+    stopPropagation: vi.fn()
+  } as unknown as PointerEvent)
+  expect(beginDocumentRowGesture).toHaveBeenCalled()
+})
+
+test('Test that clearProjectHierarchyTreeHeTreeNodeTabIndex skips non-HTML tree nodes and already disabled tabindex', async () => {
+  const { clearProjectHierarchyTreeHeTreeNodeTabIndexForTests } = await import('../projectHierarchyTreeHeTreeNodeTabIndexWiring')
+  const host = document.createElement('div')
+  const tree = document.createElement('div')
+  tree.className = 'projectHierarchyTree'
+  const svgNode = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  svgNode.classList.add('tree-node')
+  const disabledRow = document.createElement('div')
+  disabledRow.className = 'tree-node'
+  disabledRow.tabIndex = -1
+  tree.appendChild(svgNode)
+  tree.appendChild(disabledRow)
+  host.appendChild(tree)
+  clearProjectHierarchyTreeHeTreeNodeTabIndexForTests(host)
+  expect(disabledRow.tabIndex).toBe(-1)
+})
+
+test('Test that bindProjectHierarchyTreeHeTreeNodeTabIndexGuard disconnects when host cleared', async () => {
+  const treeScrollHostRef = ref<HTMLElement | null>(document.createElement('div'))
+  const unmountHooks: Array<() => void> = []
+  bindProjectHierarchyTreeHeTreeNodeTabIndexGuard({
+    onUnmounted: (hook) => {
+      unmountHooks.push(hook)
+    },
+    treeScrollHostRef,
+    watch
+  })
+  await Promise.resolve()
+  treeScrollHostRef.value = null
+  await Promise.resolve()
+  unmountHooks.forEach((hook) => hook())
 })

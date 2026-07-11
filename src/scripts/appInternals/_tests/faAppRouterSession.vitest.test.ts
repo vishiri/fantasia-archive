@@ -2,6 +2,7 @@ import { afterEach, expect, test, vi } from 'vitest'
 
 import {
   isFaComponentTestingRoutePath,
+  navigateToOpenedDocumentRoute,
   navigateToWorkspaceHomeRoute,
   navigateToWorkspaceRouteForActiveProject,
   navigateToWorkspaceWhenOnWelcomeRoute,
@@ -273,4 +274,111 @@ test('Test that navigateToWorkspaceRouteForActiveProject no-ops without a regist
   vi.resetModules()
   const mod = await import('app/src/scripts/appInternals/appInternals_manager')
   await mod.navigateToWorkspaceRouteForActiveProject()
+})
+
+/**
+ * faAppRouterSession
+ * navigateToOpenedDocumentRoute pushes the document workspace route.
+ */
+test('Test that navigateToOpenedDocumentRoute pushes home document route from workspace home', async () => {
+  faVitestRouterPath = '/home'
+  routerPushMock.mockReset()
+  registerFaAppRouterSession({
+    getCurrentPath (): string {
+      return faVitestRouterPath
+    },
+    push (payload): void {
+      faVitestRouterPath = payload.path
+      routerPushMock(payload)
+    }
+  })
+
+  await navigateToOpenedDocumentRoute('doc-9')
+
+  expect(routerPushMock).toHaveBeenCalledWith({ path: '/home/document/doc-9' })
+})
+
+/**
+ * faAppRouterSession
+ * navigateToOpenedDocumentRoute skips push when already on the target document route.
+ */
+test('Test that navigateToOpenedDocumentRoute skips push when already on target document route', async () => {
+  faVitestRouterPath = '/home/document/doc-9'
+  routerPushMock.mockReset()
+  registerFaAppRouterSession({
+    getCurrentPath (): string {
+      return faVitestRouterPath
+    },
+    push (payload): void {
+      routerPushMock(payload)
+    }
+  })
+
+  await navigateToOpenedDocumentRoute('doc-9')
+
+  expect(routerPushMock).not.toHaveBeenCalled()
+})
+
+/**
+ * faAppRouterSession
+ * navigateToOpenedDocumentRoute no-ops in Storybook canvas mode.
+ */
+test('Test that navigateToOpenedDocumentRoute skips push in Storybook canvas', async () => {
+  setFantasiaStorybookCanvasFlag(true)
+  faVitestRouterPath = '/home'
+  routerPushMock.mockReset()
+  registerFaAppRouterSession({
+    getCurrentPath (): string {
+      return faVitestRouterPath
+    },
+    push (payload): void {
+      routerPushMock(payload)
+    }
+  })
+
+  await navigateToOpenedDocumentRoute('doc-9')
+
+  expect(routerPushMock).not.toHaveBeenCalled()
+})
+
+/**
+ * faAppRouterSession
+ * navigateToWorkspaceHomeRoute no-ops in Storybook canvas mode.
+ */
+test('Test that navigateToWorkspaceHomeRoute skips push in Storybook canvas', async () => {
+  setFantasiaStorybookCanvasFlag(true)
+  faVitestRouterPath = '/home/document/doc-a'
+  routerPushMock.mockReset()
+  registerFaAppRouterSession({
+    getCurrentPath (): string {
+      return faVitestRouterPath
+    },
+    push (payload): void {
+      routerPushMock(payload)
+    }
+  })
+
+  await navigateToWorkspaceHomeRoute()
+
+  expect(routerPushMock).not.toHaveBeenCalled()
+})
+
+/**
+ * faAppRouterSession
+ * navigateToWorkspaceHomeRoute no-ops when no router session is registered.
+ */
+test('Test that navigateToWorkspaceHomeRoute no-ops without a registered router', async () => {
+  vi.resetModules()
+  const mod = await import('app/src/scripts/appInternals/appInternals_manager')
+  await mod.navigateToWorkspaceHomeRoute()
+})
+
+/**
+ * faAppRouterSession
+ * navigateToOpenedDocumentRoute no-ops when no router session is registered.
+ */
+test('Test that navigateToOpenedDocumentRoute no-ops without a registered router', async () => {
+  vi.resetModules()
+  const mod = await import('app/src/scripts/appInternals/appInternals_manager')
+  await mod.navigateToOpenedDocumentRoute('doc-9')
 })

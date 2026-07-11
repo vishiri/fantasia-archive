@@ -6,6 +6,7 @@ import { expect, test } from 'vitest'
 
 import DialogProjectSettingsWorldsDetailPanel from '../DialogProjectSettingsWorldsDetailPanel.vue'
 import { mergeDialogProjectSettingsVitestGlobal } from 'app/helpers/dialogProjectSettingsVitestI18n'
+import { expectInlineStyleColor } from 'app/helpers/vitestCssColorExpect'
 
 const worldFixture = {
   color: '',
@@ -206,8 +207,10 @@ test('Test that DialogProjectSettingsWorldsDetailPanel emits field updates', asy
       displayNameTranslations: { 'en-US': 'Renamed' }
     }
   })
-  expect(w.find('[data-test-locator="dialogProjectSettings-worlds-colorInput-swatch"]').attributes('style')).toContain(
-    'background-color: rgb(17, 34, 51)'
+  expectInlineStyleColor(
+    w.find('[data-test-locator="dialogProjectSettings-worlds-colorInput-swatch"]').attributes('style'),
+    'background-color',
+    '#112233'
   )
 
   await w.find('.fa-color-picker-input-stub-picker').trigger('click')

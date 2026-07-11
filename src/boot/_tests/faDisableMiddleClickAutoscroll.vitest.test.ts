@@ -38,3 +38,22 @@ test('Test that runFaDisableMiddleClickAutoscrollBoot registers capture mousedow
     { capture: true }
   )
 })
+
+test('Test that faDisableMiddleClickAutoscroll_manager exports boot wiring', async () => {
+  const addDocumentListener = vi.fn()
+  vi.stubGlobal('document', {
+    addEventListener: addDocumentListener
+  })
+  const { runFaDisableMiddleClickAutoscrollBoot } = await import(
+    '../scripts/faDisableMiddleClickAutoscroll_manager'
+  )
+
+  runFaDisableMiddleClickAutoscrollBoot()
+
+  expect(addDocumentListener).toHaveBeenCalledWith(
+    'mousedown',
+    expect.any(Function),
+    { capture: true }
+  )
+  vi.unstubAllGlobals()
+})

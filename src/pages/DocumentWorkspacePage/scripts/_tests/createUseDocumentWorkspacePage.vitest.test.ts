@@ -8,6 +8,7 @@ import { createUseDocumentWorkspacePage } from '../functions/createUseDocumentWo
 
 const previewTab: I_faOpenedDocumentTab = {
   documentId: 'doc-1',
+  persistenceState: 'persisted',
   tabLabel: 'Character',
   templateIcon: 'mdi-account',
   displayNameDraft: 'Hero',

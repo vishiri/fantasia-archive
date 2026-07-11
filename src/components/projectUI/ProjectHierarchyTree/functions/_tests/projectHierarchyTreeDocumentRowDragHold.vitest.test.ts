@@ -1,4 +1,5 @@
-import { expect, test } from 'vitest'
+/** @vitest-environment jsdom */
+import { expect, test, vi } from 'vitest'
 
 import {
   isProjectHierarchyTreeDocumentRowClickWithinHoldDelay,
@@ -47,4 +48,31 @@ test('Test that isProjectHierarchyTreeDocumentRowClickWithinHoldDelay accepts sh
     holdDurationMs: 120
   })
   expect(withinHoldDelay).toBe(true)
+})
+
+test('Test that resolveProjectHierarchyTreeNodeRowElement returns null for missing targets', () => {
+  expect(resolveProjectHierarchyTreeNodeRowElement(null)).toBeNull()
+  expect(resolveProjectHierarchyTreeNodeRowElement(null as unknown as EventTarget)).toBeNull()
+})
+
+test('Test that resolveProjectHierarchyTreeNodeRowElement walks Node parentElement to row', () => {
+  const row = document.createElement('div')
+  row.className = 'projectHierarchyTree__nodeRow'
+  const text = document.createTextNode('label')
+  row.appendChild(text)
+  document.body.appendChild(row)
+  expect(resolveProjectHierarchyTreeNodeRowElement(text)).toBe(row)
+  row.remove()
+})
+
+test('Test that resolveProjectHierarchyTreeNodeRowElement returns null when closest is not HTMLElement', () => {
+  const target = document.createElement('div')
+  const closestSpy = vi.spyOn(target, 'closest').mockReturnValue(document.createComment('row') as unknown as Element)
+  expect(resolveProjectHierarchyTreeNodeRowElement(target)).toBeNull()
+  closestSpy.mockRestore()
+})
+
+test('Test that resolveProjectHierarchyTreeNodeRowElement returns null when Node has no parentElement', () => {
+  const text = document.createTextNode('orphan')
+  expect(resolveProjectHierarchyTreeNodeRowElement(text)).toBeNull()
 })

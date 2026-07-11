@@ -8,6 +8,7 @@ import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 const sampleTabs: I_faOpenedDocumentTab[] = [
   {
     documentId: 'doc-hero',
+    persistenceState: 'persisted',
     tabLabel: 'Character',
     templateIcon: 'mdi-account',
     displayNameDraft: 'Hero',
@@ -17,6 +18,7 @@ const sampleTabs: I_faOpenedDocumentTab[] = [
   },
   {
     documentId: 'doc-villain',
+    persistenceState: 'persisted',
     tabLabel: 'Character',
     templateIcon: 'mdi-skull',
     displayNameDraft: 'Villain draft',
@@ -73,6 +75,7 @@ export const WithMultipleDocumentTabsForContextMenu: StoryObj<typeof meta> = {
           ...sampleTabs,
           {
             documentId: 'doc-location',
+            persistenceState: 'persisted',
             tabLabel: 'Location',
             templateIcon: 'mdi-map-marker',
             displayNameDraft: 'Castle',

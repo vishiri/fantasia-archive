@@ -1,10 +1,13 @@
 import { expect, test, vi } from 'vitest'
 
+import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+
 import { buildProjectDocumentControlBarTabContextMenuClickHandlers } from '../projectDocumentControlBarTabContextMenuClickHandlers'
 
-const sampleTab = {
+const sampleTab: I_faOpenedDocumentTab = {
   displayNameDraft: 'Hero',
   documentId: 'doc-hero',
+  persistenceState: 'persisted',
   editState: false,
   hasUnsavedChanges: false,
   savedDisplayName: 'Hero',
