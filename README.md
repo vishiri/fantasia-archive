@@ -118,7 +118,7 @@ Agents also run **20s** **`yarn quasar:dev:electron`** compile smoke after scope
 yarn testbatch:verify
 ```
 
-Lint (repo) + **`vue-tsc`** + Stylelint + Vitest coverage (**95%** on **`src-electron`**, instrumented **`helpers/`**, scoped **`i18n/`**, renderer **`src` `.ts`**, component **`.ts`**; **`.vue`** watermarks ~60%). Debug one step, then re-run full gate.
+Lint (repo) + **`vue-tsc`** + Stylelint + Vitest coverage (**per file**: **95%** / **80%** / **100%** / **95%** via **`thresholds.perFile: true`** on **`src-electron`**, **`helpers/`**, **`i18n/`**, renderer **`src` `.ts`**, component **`.ts`** + **`.vue`**). Debug one step, then re-run full gate.
 
 **When required:** **`git commit`**, [fantasia-final-cleanup](.cursor/skills/fantasia-final-cleanup/SKILL.md), explicit full-verify request, push/PR CI. Dev scoped gate does **not** substitute.
 

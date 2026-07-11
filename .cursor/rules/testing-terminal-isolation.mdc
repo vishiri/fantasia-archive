@@ -16,7 +16,7 @@ alwaysApply: true
 
 ## Full quality gate
 
-ESLint (repo), TypeScript, Stylelint, Vitest + coverage (**95%** all four v8 metrics: **`src-electron`**; **`helpers/**/*.ts`** **`unit-helpers`** (**`helpers/playwrightHelpers_*`** excluded); scoped **`i18n/`** (**`unit-i18n`**); renderer **`src`** **`.ts`** (**`unit-src-renderer`**); **`.ts`** under **`src/components`**, **`src/layouts`**, **`src/pages`** (**`unit-components`**); **`.vue`** SFCs **~60%** watermarks only) — **one** terminal. Prefer **`yarn testbatch:verify`** (stops first failure):
+ESLint (repo), TypeScript, Stylelint, Vitest + coverage (**95%** / **80%** / **100%** / **95%** **per instrumented file** via **`thresholds.perFile: true`**: **`src-electron`**; **`helpers/**/*.ts`** **`unit-helpers`** (**`helpers/playwrightHelpers_*`** excluded); scoped **`i18n/`** (**`unit-i18n`**); renderer **`src`** **`.ts`** (**`unit-src-renderer`**); **`.ts`** and **`.vue`** under **`src/components`**, **`src/layouts`**, **`src/pages`** (**`unit-components`**) — **one** terminal. Prefer **`yarn testbatch:verify`** (stops first failure):
 
 `yarn testbatch:verify`
 
