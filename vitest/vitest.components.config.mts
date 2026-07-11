@@ -24,9 +24,9 @@ type T_vitestComponentsScssOpts = NonNullable<
 >
 
 /**
- * Vue SFC unit tests — jsdom + SFC transforms: components, layouts, and pages.
- * **.ts** files under those trees: **95%** statements, branches, functions, lines (merged per Vitest **`coverage.thresholds`** glob).
- * **.vue** SFCs: **no** failing **`coverage.thresholds`** entry; **`watermarks`** use a **60%** lower band so weak totals show orange or red in reports.
+ * Vue SFC unit tests — happy-dom + SFC transforms: components, layouts, and pages.
+ * **.ts** and **.vue** under those trees: 95% statements, 80% branches, 100% functions, 95% lines per file (**coverage.thresholds** glob + **perFile: true**).
+ * **`coverage.watermarks`** use a **60%** lower band so weak per-file totals show orange or red in reports.
  */
 export default defineConfig({
   plugins: [vue()],
@@ -53,7 +53,7 @@ export default defineConfig({
   assetsInclude: ['**/*.md'],
   test: {
     name: 'unit-components',
-    environment: 'jsdom',
+    environment: 'happy-dom',
     setupFiles: [path.resolve(__dirname, 'vitest.setup.ts')],
     include: [
       'src/components/**/*.vitest.test.ts',
@@ -63,8 +63,6 @@ export default defineConfig({
     reporters: [...vitestTerminalReporters],
     outputFile: 'test-results/vitest-report/test-results-vitest-components.json',
     clearMocks: true,
-    maxWorkers: 1,
-    fileParallelism: false,
     pool: 'threads',
     globalSetup: [path.resolve(__dirname, 'vitest.coverageTmpSetup.mts')],
     coverage: {
@@ -95,9 +93,13 @@ export default defineConfig({
         lines: [60, 100]
       },
       thresholds: {
+        perFile: true,
         'src/components/**/*.ts': { ...vitestCoverageStrictThresholds },
+        'src/components/**/*.vue': { ...vitestCoverageStrictThresholds },
         'src/layouts/**/*.ts': { ...vitestCoverageStrictThresholds },
-        'src/pages/**/*.ts': { ...vitestCoverageStrictThresholds }
+        'src/layouts/**/*.vue': { ...vitestCoverageStrictThresholds },
+        'src/pages/**/*.ts': { ...vitestCoverageStrictThresholds },
+        'src/pages/**/*.vue': { ...vitestCoverageStrictThresholds }
       }
     }
   }

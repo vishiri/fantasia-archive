@@ -6,7 +6,7 @@ import { defineConfig } from 'vitest/config'
 import {
   vitestCoverageBaseExclude,
   vitestCoverageSkipFull,
-  vitestCoverageStrictThresholds
+  vitestCoverageStrictThresholdsPerFile
 } from './vitest.coverage.shared'
 import { vitestTerminalReporters } from './vitest.reporters.shared'
 
@@ -43,7 +43,7 @@ export default defineConfig({
         ...vitestCoverageBaseExclude,
         'src-electron/**/_tests/**'
       ],
-      thresholds: vitestCoverageStrictThresholds
+      thresholds: { ...vitestCoverageStrictThresholdsPerFile }
     }
   }
 })

@@ -10,14 +10,20 @@ export const vitestCoverageSkipFull = true
 
 /**
  * Enforced when Vitest runs with '--coverage' on unit-electron, unit-helpers, unit-i18n, unit-src-renderer,
- * and on **.ts** files under unit-components (see vitest.*.config.mts in this folder).
- * **.vue** SFCs under unit-components have **no** failing threshold; **`coverage.watermarks`** in **`vitest.components.config.mts`** flag weak totals for review.
+ * and on **.ts** / **.vue** files under unit-components (see vitest.*.config.mts in this folder).
+ * Each instrumented file must meet: 95% statements, 80% branches, 100% functions, 95% lines (**perFile: true**).
+ * **`coverage.watermarks`** in **`vitest.components.config.mts`** flag weak per-file totals for review.
  */
 export const vitestCoverageStrictThresholds = {
   statements: 95,
-  branches: 95,
-  functions: 95,
+  branches: 80,
+  functions: 100,
   lines: 95
+} as const
+
+export const vitestCoverageStrictThresholdsPerFile = {
+  perFile: true,
+  ...vitestCoverageStrictThresholds
 } as const
 
 export const vitestCoverageBaseExclude = [

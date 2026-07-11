@@ -6,7 +6,7 @@ import { defineConfig } from 'vitest/config'
 import {
   vitestCoverageBaseExclude,
   vitestCoverageSkipFull,
-  vitestCoverageStrictThresholds
+  vitestCoverageStrictThresholdsPerFile
 } from './vitest.coverage.shared'
 import { vitestTerminalReporters } from './vitest.reporters.shared'
 
@@ -53,7 +53,7 @@ export default defineConfig({
         'src/scripts/**/_tests/**',
         'src/stores/**/_tests/**'
       ],
-      thresholds: { ...vitestCoverageStrictThresholds }
+      thresholds: { ...vitestCoverageStrictThresholdsPerFile }
     }
   }
 })

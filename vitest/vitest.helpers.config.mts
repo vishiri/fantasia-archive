@@ -6,7 +6,7 @@ import { defineConfig } from 'vitest/config'
 import {
   vitestCoverageBaseExclude,
   vitestCoverageSkipFull,
-  vitestCoverageStrictThresholds
+  vitestCoverageStrictThresholdsPerFile
 } from './vitest.coverage.shared'
 import { vitestTerminalReporters } from './vitest.reporters.shared'
 
@@ -58,7 +58,7 @@ export default defineConfig({
         ...PLAYWRIGHT_HELPERS_COVERAGE_EXCLUDE,
         'helpers/playwrightHelpers/**'
       ],
-      thresholds: { ...vitestCoverageStrictThresholds }
+      thresholds: { ...vitestCoverageStrictThresholdsPerFile }
     }
   }
 })
