@@ -100,6 +100,10 @@ test('Test that registerFaComponentTestingStoreSeedProbe patches opened document
           templateIcon: 'mdi-account',
           displayNameDraft: 'Hero',
           savedDisplayName: 'Hero',
+          documentTextColorDraft: '',
+          savedDocumentTextColor: '',
+          documentBackgroundColorDraft: '',
+          savedDocumentBackgroundColor: '',
           hasUnsavedChanges: false,
           editState: false
         }
