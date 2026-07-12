@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
+import { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTree'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/appRouting_manager'
@@ -54,6 +55,7 @@ export const useProjectDocumentControlBar = createUseProjectDocumentControlBar({
   getKeybindsSnapshot: getProjectDocumentControlBarKeybindsSnapshot,
   runFaAction,
   S_FaOpenedDocuments,
+  S_FaProjectHierarchyTree,
   S_FaUserSettings,
   storeToRefs,
   useI18n,

@@ -19,7 +19,8 @@ import {
   collectProjectHierarchyTreeAncestorIds,
   collectProjectHierarchyTreeDescendantIds,
   evictCollapsedNodeChildren,
-  findProjectHierarchyTreeNodeById
+  findProjectHierarchyTreeNodeById,
+  shouldProjectHierarchyTreePreserveDescendantOpenIdsOnCollapse
 } from '../functions/projectHierarchyTreeExpandState'
 import { reapplyProjectHierarchyTreeLatentDescendantExpandState } from './projectHierarchyTreeLatentExpandReapplyWiring'
 import { resolveProjectHierarchyTreeScrollContainer } from '../functions/projectHierarchyTreeScrollContainer'
@@ -192,7 +193,7 @@ export function markProjectHierarchyTreeNodeClosed (deps: {
 }): void {
   const next = new Set(deps.openNodeIds.value)
   next.delete(deps.nodeId)
-  if (deps.node.nodeKind !== 'world') {
+  if (!shouldProjectHierarchyTreePreserveDescendantOpenIdsOnCollapse(deps.node.nodeKind)) {
     for (const descendantId of collectProjectHierarchyTreeDescendantIds(deps.node)) {
       next.delete(descendantId)
     }

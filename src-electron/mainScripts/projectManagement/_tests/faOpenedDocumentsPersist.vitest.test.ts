@@ -20,6 +20,10 @@ const sampleSnapshot: I_faOpenedDocumentsSnapshot = {
       templateIcon: 'mdi-account',
       displayNameDraft: 'Hero',
       savedDisplayName: 'Hero',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       hasUnsavedChanges: false,
       editState: false
     }

@@ -76,6 +76,8 @@ export default {
       placementNicknameHoverOriginalNameLabel: 'Originalname',
       placementNicknameHoverNicknameLabel: 'Spitzname',
       removeGroupTooltip: 'Gruppe entfernen',
+      removeTemplateDisabledHasDocuments:
+        'Entfernen Sie alle mit dieser Vorlage verbundenen Dokumente, bevor Sie sie entfernen.',
       removeTemplateTooltip: 'Dokumentvorlage entfernen',
       templateCanonicalNameLabel: 'Dokumentvorlagenname',
       templateCanonicalNameTooltip: 'Um eine gesamte Dokumentvorlage ordnungsgemäß umzubenennen, gehen Sie bitte zum Abschnitt „Dokumentvorlagen" dieses Bearbeitungsdialogs und passen Sie sie dort an.',

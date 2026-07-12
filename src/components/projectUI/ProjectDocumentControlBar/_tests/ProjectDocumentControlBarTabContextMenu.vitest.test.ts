@@ -6,6 +6,10 @@ import {
   projectDocumentControlBarTabContextMenuSampleTab
 } from './projectDocumentControlBarTabContextMenuListVitestMount'
 
+import {
+  resolveProjectDocumentControlBarTabAppearanceChrome,
+  resolveProjectDocumentControlBarTabInlineStyle
+} from '../scripts/projectDocumentControlBarTabAppearanceChromeWiring'
 import ProjectDocumentControlBarTabContextMenu from '../ProjectDocumentControlBarTabContextMenu.vue'
 
 const sampleTab = projectDocumentControlBarTabContextMenuSampleTab
@@ -55,8 +59,12 @@ function mountTabContextMenu (
       onTabForceCloseAllExceptClick: vi.fn(),
       onTabMoveClick: vi.fn(),
       openedDocumentTabs: [sampleTab],
+      resolveDocumentTabAppearanceChrome: resolveProjectDocumentControlBarTabAppearanceChrome,
+      resolveDocumentTabInlineStyle: resolveProjectDocumentControlBarTabInlineStyle,
       resolveDocumentTabLabel: () => 'Hero',
       resolveDocumentTabRoute: (documentId: string) => `/home/document/${documentId}`,
+      resolveTabWorldIndicatorColor: () => null,
+      showWorldTabIndicators: false,
       tab: sampleTab,
       ...propOverrides
     },
@@ -73,7 +81,7 @@ function mountTabContextMenu (
         QMenu: {
           emits: ['hide', 'update:modelValue'],
           props: ['modelValue'],
-          template: '<div data-test-locator="projectDocumentControlBar-tabContextMenu" @hide="$emit(\'hide\')"><slot /></div>'
+          template: '<div data-test-locator="projectDocumentControlBar-tabContextMenu" :data-open="modelValue" @click="$emit(\'update:modelValue\', false)" @hide="$emit(\'hide\')"><slot /></div>'
         },
         QSeparator: { template: '<hr class="q-separator-stub" />' }
       }
@@ -85,6 +93,7 @@ test('Test that ProjectDocumentControlBarTabContextMenu mounts list chrome with 
   const wrapper = mountTabContextMenu()
 
   expect(wrapper.find('[data-test-locator="projectDocumentControlBar-tabContextMenu"]').exists()).toBe(true)
+  expect(wrapper.find('.projectDocumentControlBarTabs__tabContextMenuMount').exists()).toBe(true)
   expect(wrapper.find('[data-test-locator="projectDocumentControlBar-tabContextMenu-copyName"]').exists()).toBe(true)
 
   await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-copyName"]').trigger('click')
@@ -115,6 +124,15 @@ test('Test that ProjectDocumentControlBarTabContextMenu recomputes keybind label
 
   expect(wrapper.find('[data-test-locator="projectDocumentControlBar-tabContextMenu-moveTabLeft-keybind"]').exists()).toBe(true)
   expect(wrapper.find('[data-test-locator="projectDocumentControlBar-tabContextMenu-moveTabRight-keybind"]').exists()).toBe(true)
+
+  wrapper.unmount()
+})
+
+test('Test that ProjectDocumentControlBarTabContextMenu forwards root menu hide to session wiring', async () => {
+  const wrapper = mountTabContextMenu()
+
+  await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu"]').trigger('hide')
+  await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu"]').trigger('click')
 
   wrapper.unmount()
 })

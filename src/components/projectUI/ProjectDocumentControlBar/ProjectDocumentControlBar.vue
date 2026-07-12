@@ -29,14 +29,26 @@
               :alert="tab.hasUnsavedChanges"
               alert-icon="mdi-feather"
               class="projectDocumentControlBarTabs__tab"
+              :class="{
+                'projectDocumentControlBarTabs__tab--customAppearance':
+                  resolveDocumentTabAppearanceChrome(tab) !== undefined,
+                'projectDocumentControlBarTabs__tab--withWorldIndicator':
+                  showWorldTabIndicators && resolveTabWorldIndicatorColor(tab) !== null
+              }"
               :data-test-locator="`projectDocumentControlBar-tab-${tab.documentId}`"
               :icon="tab.templateIcon"
               :label="resolveDocumentTabLabel(tab)"
               :name="tab.documentId"
               :ripple="false"
+              :style="resolveDocumentTabInlineStyle(tab)"
               :to="resolveDocumentTabRoute(tab.documentId)"
               @auxclick.stop.prevent="onTabAuxClick(tab.documentId, $event)"
             >
+              <ProjectDocumentControlBarTabWorldIndicator
+                :color="resolveTabWorldIndicatorColor(tab)"
+                :document-id="tab.documentId"
+                :visible="showWorldTabIndicators"
+              />
               <q-btn
                 class="projectDocumentControlBarTabs__tabClose z-max q-ml-auto"
                 :class="{ 'q-mr-sm': tab.hasUnsavedChanges }"
@@ -61,8 +73,12 @@
                 :on-tab-force-close-all-except-click="onTabForceCloseAllExceptClick"
                 :on-tab-move-click="onTabMoveClick"
                 :opened-document-tabs="openedDocumentTabs"
+                :resolve-document-tab-appearance-chrome="resolveDocumentTabAppearanceChrome"
+                :resolve-document-tab-inline-style="resolveDocumentTabInlineStyle"
                 :resolve-document-tab-label="resolveDocumentTabLabel"
                 :resolve-document-tab-route="resolveDocumentTabRoute"
+                :resolve-tab-world-indicator-color="resolveTabWorldIndicatorColor"
+                :show-world-tab-indicators="showWorldTabIndicators"
                 :tab="tab"
               />
             </q-route-tab>
@@ -70,113 +86,22 @@
         </q-tabs>
       </div>
     </Teleport>
-    <Teleport
-      v-if="showDocumentControlBar"
-      to="body"
-    >
-      <div
-        class="projectDocumentControlBar projectDocumentControlBar--fixedStrip"
-        data-test-locator="projectDocumentControlBar"
-      >
-        <div class="projectDocumentControlBar__blocker" />
-        <div class="projectDocumentControlBar__wrapper">
-          <div class="projectDocumentControlBar__left" />
-          <div class="projectDocumentControlBar__right">
-            <q-btn
-              v-if="showEditDocumentButton"
-              color="primary-bright"
-              data-test-locator="projectDocumentControlBar-editDocumentButton"
-              icon="mdi-file-document-edit"
-              outline
-              @click="onEnterEditModeClick"
-            >
-              <q-tooltip
-                anchor="bottom middle"
-                class="projectDocumentControlBar__buttonTooltip"
-                :delay="500"
-                self="top middle"
-              >
-                <div class="fa-tooltip-keybind-stack">
-                  <span class="fa-tooltip-keybind-stack__label">
-                    {{ editDocumentTooltip }}
-                  </span><div
-                    v-if="editDocumentKeybindLabel !== null"
-                    class="fa-tooltip-keybind-hint fa-text-keybind-hint"
-                    data-test-locator="projectDocumentControlBar-editDocumentButton-keybind"
-                  >
-                    ({{ editDocumentKeybindLabel }})
-                  </div>
-                </div>
-              </q-tooltip>
-            </q-btn>
-            <q-btn
-              v-if="showSaveDocumentButtons"
-              :color="saveDocumentButtonColor"
-              data-test-locator="projectDocumentControlBar-saveDocumentKeepEditModeButton"
-              icon="mdi-content-save-edit"
-              outline
-              @click="onSaveDocumentClick(true)"
-            >
-              <q-tooltip
-                anchor="bottom left"
-                class="projectDocumentControlBar__buttonTooltip"
-                :delay="500"
-                self="top middle"
-              >
-                <div class="fa-tooltip-keybind-stack">
-                  <span class="fa-tooltip-keybind-stack__label">
-                    {{ saveDocumentKeepEditModeTooltip }}
-                  </span><div
-                    v-if="saveDocumentKeepEditModeKeybindLabel !== null"
-                    class="fa-tooltip-keybind-hint fa-text-keybind-hint"
-                    data-test-locator="projectDocumentControlBar-saveDocumentKeepEditModeButton-keybind"
-                  >
-                    ({{ saveDocumentKeepEditModeKeybindLabel }})
-                  </div>
-                </div>
-              </q-tooltip>
-            </q-btn>
-            <q-btn
-              v-if="showSaveDocumentButtons"
-              :color="saveDocumentButtonColor"
-              data-test-locator="projectDocumentControlBar-saveDocumentButton"
-              icon="mdi-content-save"
-              outline
-              @click="onSaveDocumentClick(false)"
-            >
-              <q-tooltip
-                anchor="bottom left"
-                class="projectDocumentControlBar__buttonTooltip"
-                :delay="500"
-                self="top middle"
-              >
-                <div class="fa-tooltip-keybind-stack">
-                  <span class="fa-tooltip-keybind-stack__label">
-                    {{ saveDocumentTooltip }}
-                  </span><div
-                    v-if="saveDocumentKeybindLabel !== null"
-                    class="fa-tooltip-keybind-hint fa-text-keybind-hint"
-                    data-test-locator="projectDocumentControlBar-saveDocumentButton-keybind"
-                  >
-                    ({{ saveDocumentKeybindLabel }})
-                  </div>
-                </div>
-              </q-tooltip>
-            </q-btn>
-            <ProjectDocumentControlBarDeleteDocumentButton
-              v-if="showDeleteDocumentButton"
-              :show-leading-separator="showEditDocumentButton || showSaveDocumentButtons"
-              :tooltip-label="deleteCurrentDocumentTooltip"
-              @click="onDeleteCurrentDocumentClick"
-            />
-          </div>
-        </div>
-      </div>
-    </Teleport>
-    <div
-      v-if="showDocumentControlBar"
-      aria-hidden="true"
-      class="projectDocumentControlBar__flowSpacer"
+    <ProjectDocumentControlBarFixedStrip
+      :delete-current-document-tooltip="deleteCurrentDocumentTooltip"
+      :edit-document-keybind-label="editDocumentKeybindLabel"
+      :edit-document-tooltip="editDocumentTooltip"
+      :on-delete-current-document-click="onDeleteCurrentDocumentClick"
+      :on-enter-edit-mode-click="onEnterEditModeClick"
+      :on-save-document-click="onSaveDocumentClick"
+      :save-document-button-color="saveDocumentButtonColor"
+      :save-document-keep-edit-mode-keybind-label="saveDocumentKeepEditModeKeybindLabel"
+      :save-document-keep-edit-mode-tooltip="saveDocumentKeepEditModeTooltip"
+      :save-document-keybind-label="saveDocumentKeybindLabel"
+      :save-document-tooltip="saveDocumentTooltip"
+      :show-delete-document-button="showDeleteDocumentButton"
+      :show-document-control-bar="showDocumentControlBar"
+      :show-edit-document-button="showEditDocumentButton"
+      :show-save-document-buttons="showSaveDocumentButtons"
     />
     <DialogDiscardOpenedDocumentTab />
     <DialogDeleteOpenedDocument />
@@ -190,8 +115,9 @@ import { useI18n } from 'vue-i18n'
 import DialogDeleteOpenedDocument from 'app/src/components/dialogs/DialogDeleteOpenedDocument/DialogDeleteOpenedDocument.vue'
 import DialogDiscardOpenedDocumentTab from 'app/src/components/dialogs/DialogDiscardOpenedDocumentTab/DialogDiscardOpenedDocumentTab.vue'
 
-import ProjectDocumentControlBarDeleteDocumentButton from './ProjectDocumentControlBarDeleteDocumentButton.vue'
+import ProjectDocumentControlBarFixedStrip from './ProjectDocumentControlBarFixedStrip.vue'
 import ProjectDocumentControlBarTabContextMenu from './ProjectDocumentControlBarTabContextMenu.vue'
+import ProjectDocumentControlBarTabWorldIndicator from './ProjectDocumentControlBarTabWorldIndicator.vue'
 
 import {
   PROJECT_DOCUMENT_CONTROL_BAR_TAB_ENTER_ACTIVE_CLASS,
@@ -244,12 +170,16 @@ const {
   onTabMoveClick,
   openedDocumentTabs,
   resolveDocumentTabLabel,
+  resolveDocumentTabAppearanceChrome,
+  resolveDocumentTabInlineStyle,
   resolveDocumentTabRoute,
+  resolveTabWorldIndicatorColor,
   saveDocumentKeepEditModeKeybindLabel,
   saveDocumentKeybindLabel,
   showDeleteDocumentButton,
   showDocumentControlBar,
   showDocumentTabs,
+  showWorldTabIndicators,
   showEditDocumentButton,
   showSaveDocumentButtons,
   saveDocumentButtonColor

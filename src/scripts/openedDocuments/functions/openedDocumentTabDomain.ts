@@ -1,16 +1,6 @@
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
 /**
- * Whether the tab display name draft differs from the saved baseline.
- */
-export function computeOpenedDocumentHasUnsavedChanges (
-  displayNameDraft: string,
-  savedDisplayName: string
-): boolean {
-  return displayNameDraft !== savedDisplayName
-}
-
-/**
  * Finds the index of a tab by document id, or -1 when absent.
  */
 export function findOpenedDocumentTabIndexByDocumentId (

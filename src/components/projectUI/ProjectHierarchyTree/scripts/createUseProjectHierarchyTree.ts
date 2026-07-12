@@ -6,7 +6,9 @@ import { dragContext } from '@he-tree/vue'
 import type { Ref } from 'vue'
 
 import type { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
+import type { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
 import type { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTree'
+import type { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import type {
   I_faProjectHierarchyTreeHeTreeNode,
   I_faProjectHierarchyTreeUiState,
@@ -36,7 +38,9 @@ type T_useProjectHierarchyTree = (
 
 export function createUseProjectHierarchyTree (deps: {
   S_FaActiveProject: typeof S_FaActiveProject
+  S_FaOpenedDocuments: typeof S_FaOpenedDocuments
   S_FaProjectHierarchyTree: typeof S_FaProjectHierarchyTree
+  S_FaUserSettings: typeof S_FaUserSettings
   computed: typeof computed
   dragContext: typeof dragContext
   nextTick: typeof nextTick
@@ -61,6 +65,7 @@ export function createUseProjectHierarchyTree (deps: {
     const sessionApi = createProjectHierarchyTreeSessionWiring({
       S_FaActiveProject: deps.S_FaActiveProject,
       computed: deps.computed,
+      createTemporaryDocument: (input) => deps.S_FaOpenedDocuments().createTemporaryDocument(input),
       dragContext: deps.dragContext,
       hierarchyStore,
       nextTick: deps.nextTick,
@@ -71,6 +76,7 @@ export function createUseProjectHierarchyTree (deps: {
       pendingHierarchyNodeRefreshIds: pendingHierarchyNodeRefreshIds as Ref<string[]>,
       pendingRevealPath: pendingRevealPath as Ref<string[]>,
       ref: deps.ref,
+      resolvePreferredLanguageCode: () => deps.S_FaUserSettings().settings?.languageCode ?? 'en-US',
       treeData: treeData as Ref<I_faProjectHierarchyTreeHeTreeNode[]>,
       uiState: uiState as Ref<I_faProjectHierarchyTreeUiState>,
       watch: deps.watch,

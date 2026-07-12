@@ -59,11 +59,15 @@ test('Test that mapFaProjectDocumentRow maps template_id null', () => {
     tree_parent_document_id: null,
     tree_custom_sort_order: 0,
     display_name: 'Doc',
+    document_text_color: '#AABBCC',
+    document_background_color: null,
     created_at_ms: 3,
     updated_at_ms: 4
   })
   expect(mapped.templateId).toBeNull()
   expect(mapped.placementId).toBeNull()
   expect(mapped.sortOrder).toBe(0)
+  expect(mapped.documentTextColor).toBe('#AABBCC')
+  expect(mapped.documentBackgroundColor).toBeNull()
   expect(mapped.worldId).toBe('750e8400-e29b-41d4-a716-446655440002')
 })

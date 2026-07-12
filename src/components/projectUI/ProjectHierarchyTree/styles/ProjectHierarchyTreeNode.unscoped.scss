@@ -1,9 +1,12 @@
 @use './variables' as *;
 @use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
+@use '../../../../css/theme/quasar-components/qFocusable.variables' as *;
 
 .projectHierarchyTreeNode {
   min-height: $projectHierarchyTree-node-minHeight;
   width: 100%;
+
+  --projectHierarchyTreeNode-focusHelperColor: #{$qFocusable-hoverHelper-backgroundColor};
 }
 
 .projectHierarchyTreeNode > .q-focus-helper {
@@ -20,9 +23,22 @@
   }
 }
 
+.projectHierarchyTreeNode--addNewDocument {
+  color: $projectHierarchyTree-addNewDocumentRow-color;
+
+  .projectHierarchyTreeNode__icon,
+  .projectHierarchyTreeNode__label {
+    color: $projectHierarchyTree-addNewDocumentRow-color;
+  }
+}
+
 .projectHierarchyTreeNode--group {
   color: $projectHierarchyTree-groupRow-color;
   font-weight: 700;
+
+  .projectHierarchyTreeNode__label {
+    color: $projectHierarchyTree-groupRow-color;
+  }
 }
 
 .projectHierarchyTreeNode--world .projectHierarchyTreeNode__icon {

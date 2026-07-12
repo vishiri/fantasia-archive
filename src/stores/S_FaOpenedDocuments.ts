@@ -18,9 +18,11 @@ import {
   navigateToWorkspaceHomeRoute
 } from 'app/src/scripts/appInternals/faAppRouterSession_manager'
 import {
+  applyFaOpenedDocumentBackgroundColorDraft,
   applyFaOpenedDocumentDisplayNameDraft,
   applyFaOpenedDocumentTabAfterDisplayNameSave,
   applyFaOpenedDocumentTabEditState,
+  applyFaOpenedDocumentTextColorDraft,
   buildFaOpenedDocumentsSnapshot,
   createFaOpenedDocumentTabFromOpenMeta,
   hydrateFaOpenedDocumentsTabsFromSnapshot,
@@ -37,6 +39,11 @@ import {
   resolveOpenedDocumentTabsAfterForceClose
 } from 'app/src/scripts/openedDocuments/functions/openedDocumentTabDomain'
 import {
+  normalizeOpenedDocumentAppearanceColorFromDb,
+  recomputeOpenedDocumentTabHasUnsavedChanges,
+  resolveOpenedDocumentAppearanceColorDraftForPersist
+} from 'app/src/scripts/openedDocuments/openedDocumentTabAppearanceWiring'
+import {
   applyTemporaryOpenedDocumentParent,
   createTemporaryOpenedDocumentTabSeed,
   promoteTemporaryOpenedDocumentTabAfterCreate,
@@ -46,7 +53,7 @@ import {
   resolveTemporaryOpenedDocumentParentDocumentId
 } from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/appRouting_manager'
-import { collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeDocumentParentBucket'
+import { collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds, collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeDocumentParentBucket'
 import { resolveFaProjectDocumentTemplateDisplayTitleFromFields } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager'
 import { resolveFaLocaleStringTranslation } from 'app/src/scripts/localeTranslations/faLocaleStringTranslations_manager'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
@@ -125,12 +132,32 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       try {
         const doc = await api.getDocumentById(tab.documentId)
         const savedDisplayName = doc.displayName
+        const savedDocumentTextColor = normalizeOpenedDocumentAppearanceColorFromDb(
+          doc.documentTextColor
+        )
+        const savedDocumentBackgroundColor = normalizeOpenedDocumentAppearanceColorFromDb(
+          doc.documentBackgroundColor
+        )
         const displayNameDraft = tab.hasUnsavedChanges ? tab.displayNameDraft : savedDisplayName
-        nextTabs.push({
+        const documentTextColorDraft = tab.hasUnsavedChanges
+          ? tab.documentTextColorDraft
+          : savedDocumentTextColor
+        const documentBackgroundColorDraft = tab.hasUnsavedChanges
+          ? tab.documentBackgroundColorDraft
+          : savedDocumentBackgroundColor
+        const reconciledTab: I_faOpenedDocumentTab = {
           ...tab,
           displayNameDraft,
+          documentBackgroundColorDraft,
+          documentTextColorDraft,
           savedDisplayName,
-          hasUnsavedChanges: displayNameDraft !== savedDisplayName
+          savedDocumentBackgroundColor,
+          savedDocumentTextColor,
+          worldId: tab.worldId ?? doc.worldId
+        }
+        nextTabs.push({
+          ...reconciledTab,
+          hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(reconciledTab)
         })
       } catch {
         // Drop tabs whose document row no longer exists.
@@ -185,7 +212,10 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       return createFaOpenedDocumentTabFromOpenMeta({
         documentId,
         displayName: doc.displayName,
-        treeMeta
+        documentBackgroundColor: doc.documentBackgroundColor,
+        documentTextColor: doc.documentTextColor,
+        treeMeta,
+        worldId: doc.worldId
       })
     } catch {
       return null
@@ -344,6 +374,36 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     schedulePersistSnapshot()
   }
 
+  function updateDocumentTextColorDraft (documentId: string, value: string): void {
+    const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
+    if (index === -1) {
+      return
+    }
+    const current = tabs.value[index]
+    if (current === undefined) {
+      return
+    }
+    const nextTabs = [...tabs.value]
+    nextTabs[index] = applyFaOpenedDocumentTextColorDraft(current, value)
+    tabs.value = nextTabs
+    schedulePersistSnapshot()
+  }
+
+  function updateDocumentBackgroundColorDraft (documentId: string, value: string): void {
+    const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
+    if (index === -1) {
+      return
+    }
+    const current = tabs.value[index]
+    if (current === undefined) {
+      return
+    }
+    const nextTabs = [...tabs.value]
+    nextTabs[index] = applyFaOpenedDocumentBackgroundColorDraft(current, value)
+    tabs.value = nextTabs
+    schedulePersistSnapshot()
+  }
+
   function setDocumentEditState (documentId: string, editState: boolean): void {
     const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
     if (index === -1) {
@@ -416,6 +476,12 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       try {
         const savedDocument = await api.createDocument({
           displayName,
+          documentBackgroundColor: resolveOpenedDocumentAppearanceColorDraftForPersist(
+            current.documentBackgroundColorDraft
+          ),
+          documentTextColor: resolveOpenedDocumentAppearanceColorDraftForPersist(
+            current.documentTextColorDraft
+          ),
           id: documentId,
           parentDocumentId: current.parentDocumentId ?? null,
           templateId,
@@ -439,12 +505,25 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         nextTabs[savedIndex] = promoteTemporaryOpenedDocumentTabAfterCreate(savedTab, {
           documentId: savedDocument.id,
           keepEditMode: input.keepEditMode,
-          savedDisplayName: savedDocument.displayName
+          savedDisplayName: savedDocument.displayName,
+          savedDocumentBackgroundColor: savedDocument.documentBackgroundColor,
+          savedDocumentTextColor: savedDocument.documentTextColor
         })
         tabs.value = nextTabs
         schedulePersistSnapshot.flush()
         await flushPersistSnapshot()
-        S_FaProjectHierarchyTree().refreshDocumentsInTree([savedDocument.id])
+        const hierarchyStore = S_FaProjectHierarchyTree()
+        const treeRefreshNodeIds = collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh(
+          hierarchyStore.treeData,
+          {
+            parentDocumentId: current.parentDocumentId ?? null,
+            templateId,
+            worldId
+          }
+        )
+        if (treeRefreshNodeIds.length > 0) {
+          hierarchyStore.refreshHierarchyTreeNodes(treeRefreshNodeIds)
+        }
       } catch (error) {
         console.error('[S_FaOpenedDocuments] saveDocumentDisplayName temporary failed', error)
         throw error instanceof Error
@@ -463,12 +542,26 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     }
     try {
       const savedDocument = await api.updateDocument(documentId, {
-        displayName: trimmedDraft
+        displayName: trimmedDraft,
+        documentBackgroundColor: resolveOpenedDocumentAppearanceColorDraftForPersist(
+          current.documentBackgroundColorDraft
+        ),
+        documentTextColor: resolveOpenedDocumentAppearanceColorDraftForPersist(
+          current.documentTextColorDraft
+        )
       })
+      const savedDocumentTextColor = normalizeOpenedDocumentAppearanceColorFromDb(
+        savedDocument.documentTextColor
+      )
+      const savedDocumentBackgroundColor = normalizeOpenedDocumentAppearanceColorFromDb(
+        savedDocument.documentBackgroundColor
+      )
       const nextTabs = [...tabs.value]
       nextTabs[index] = applyFaOpenedDocumentTabAfterDisplayNameSave(current, {
         keepEditMode: input.keepEditMode,
-        savedDisplayName: savedDocument.displayName
+        savedDisplayName: savedDocument.displayName,
+        savedDocumentBackgroundColor,
+        savedDocumentTextColor
       })
       tabs.value = nextTabs
       schedulePersistSnapshot.flush()
@@ -765,6 +858,8 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     syncActiveDocumentIdFromWorkspaceRoute,
     tabs: readonly(tabs),
     updateDisplayNameDraft,
+    updateDocumentBackgroundColorDraft,
+    updateDocumentTextColorDraft,
     updateTemporaryDocumentParent
   }
 })

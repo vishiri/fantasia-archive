@@ -22,6 +22,10 @@
   &__item {
     min-height: $appControlSingleMenu-item-minHeight;
 
+    &--muted {
+      color: $appControlSingleMenu-item-muted-color;
+    }
+
     &:hover:not([aria-disabled="true"]),
     &:focus:not([aria-disabled="true"]) {
       color: $appControlMenus-singleHover;

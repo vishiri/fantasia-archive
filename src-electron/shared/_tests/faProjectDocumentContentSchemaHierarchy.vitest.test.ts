@@ -107,3 +107,31 @@ test('Test that parseFaProjectDocumentPatch keeps only provided patch keys', () 
   expect(parsed.displayName).toBe('Renamed')
   expect(parsed).not.toHaveProperty('sortOrder')
 })
+
+/**
+ * parseFaProjectDocumentCreateInput
+ * Normalizes empty appearance color strings to null.
+ */
+test('Test that parseFaProjectDocumentCreateInput normalizes empty appearance colors to null', () => {
+  const parsed = parseFaProjectDocumentCreateInput({
+    displayName: 'Hero',
+    worldId: SAMPLE_UUID,
+    documentTextColor: '',
+    documentBackgroundColor: '#112233'
+  })
+  expect(parsed.documentTextColor).toBeNull()
+  expect(parsed.documentBackgroundColor).toBe('#112233')
+})
+
+/**
+ * parseFaProjectDocumentPatch
+ * Accepts nullable appearance color patch fields.
+ */
+test('Test that parseFaProjectDocumentPatch accepts appearance color fields', () => {
+  const parsed = parseFaProjectDocumentPatch({
+    documentTextColor: '#AABBCC',
+    documentBackgroundColor: null
+  })
+  expect(parsed.documentTextColor).toBe('#AABBCC')
+  expect(parsed.documentBackgroundColor).toBeNull()
+})

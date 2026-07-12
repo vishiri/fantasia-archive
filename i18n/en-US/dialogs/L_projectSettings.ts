@@ -76,6 +76,8 @@ export default {
       placementNicknameHoverOriginalNameLabel: 'Original name',
       placementNicknameHoverNicknameLabel: 'Nickname',
       removeGroupTooltip: 'Remove group',
+      removeTemplateDisabledHasDocuments:
+        'Remove all documents connected to this template before removing it.',
       removeTemplateTooltip: 'Remove document template',
       templateCanonicalNameLabel: 'Document template name',
       templateCanonicalNameTooltip: 'In order to properly rename a whole document template, please go to the "Document Templates" section of this edit dialog and adjust it there.',

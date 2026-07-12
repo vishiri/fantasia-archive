@@ -86,6 +86,10 @@ test('Test that getOpenedDocumentsSnapshotAsync returns cloned tabs when DB is a
       templateIcon: 'mdi-account',
       displayNameDraft: 'Hero',
       savedDisplayName: 'Hero',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       hasUnsavedChanges: false,
       editState: false
     }]

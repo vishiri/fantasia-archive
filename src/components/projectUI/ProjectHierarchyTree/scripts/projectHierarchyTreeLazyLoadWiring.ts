@@ -6,6 +6,7 @@ import { loadProjectHierarchyTreeNodeChildren, refreshProjectHierarchyTreeNodeCh
 import { publishProjectHierarchyTreeLazyLoadRevision } from './projectHierarchyTreeLazyLoadPublishWiring'
 
 export function createProjectHierarchyTreeLazyLoadWiring (deps: {
+  getPreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
   listPlacementDocumentChildren: (
     input: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeListPlacementChildrenInput
   ) => Promise<{ items: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeDocumentChild[] }>
@@ -50,6 +51,7 @@ export function createProjectHierarchyTreeLazyLoadWiring (deps: {
     await loadProjectHierarchyTreeNodeChildren({
       listPlacementDocumentChildren: deps.listPlacementDocumentChildren,
       node,
+      preferredLanguageCode: deps.getPreferredLanguageCode(),
       publishTreeRevision,
       treeData: deps.treeData
     })
@@ -74,6 +76,7 @@ export function createProjectHierarchyTreeLazyLoadWiring (deps: {
     ) => refreshProjectHierarchyTreeNodeChildrenFromDatabase({
       listPlacementDocumentChildren: deps.listPlacementDocumentChildren,
       nodeId,
+      preferredLanguageCode: deps.getPreferredLanguageCode(),
       publishTreeRevision,
       treeData: deps.treeData
     })

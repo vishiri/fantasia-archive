@@ -1,3 +1,5 @@
 export default {
-  nameFieldLabel: 'Document name'
+  backgroundColorFieldLabel: 'Colore di sfondo del documento',
+  nameFieldLabel: 'Document name',
+  textColorFieldLabel: 'Colore del testo del documento'
 }

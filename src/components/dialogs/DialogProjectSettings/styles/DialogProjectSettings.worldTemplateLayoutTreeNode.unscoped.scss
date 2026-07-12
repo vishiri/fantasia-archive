@@ -134,3 +134,7 @@
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__remove {
   flex: 0 0 auto;
 }
+
+.dialogProjectSettingsWorldTemplateLayoutTreeNode__removeDisabledTooltip.q-tooltip {
+  max-width: $dialogProjectSettings-worldTemplateLayout-treeNode-removeDisabledTooltip-maxWidth;
+}

@@ -7,7 +7,7 @@
     :data-test-hierarchy-node-id="props.node.id"
     :data-test-locator="nodeTestLocator"
     :data-test-node-kind="props.node.nodeKind"
-    :style="worldNodeStyle"
+    :style="nodeRootBackgroundStyle"
   >
     <div
       class="q-focus-helper"
@@ -18,10 +18,12 @@
       class="projectHierarchyTreeNode__icon"
       :class="{ 'projectHierarchyTreeNode__icon--layoutKind': props.node.nodeKind !== 'world' }"
       :name="displayIcon"
+      :style="nodeIconLabelTextStyle"
     />
     <span
       class="projectHierarchyTreeNode__label"
       :data-test-locator="`${nodeTestLocator}-label`"
+      :style="nodeIconLabelTextStyle"
     >
       {{ props.node.label }}
     </span>
@@ -36,6 +38,7 @@ import { projectHierarchyTreeNodeShowsActiveTabHighlight } from './functions/pro
 import {
   applyProjectHierarchyTreeTreeNodeKindClass,
   clearProjectHierarchyTreeTreeNodeKindClass,
+  resolveProjectHierarchyTreeDocumentAppearanceChrome,
   resolveProjectHierarchyTreePlacementDisplayIcon
 } from './scripts/projectHierarchyTree_manager'
 
@@ -85,6 +88,9 @@ const nodeRootClassList = computed(() => {
 
   return {
     'projectHierarchyTreeNode--activeTabDocument': showsActiveTabHighlight,
+    'projectHierarchyTreeNode--addNewDocument': props.node.nodeKind === 'addNewDocument',
+    'projectHierarchyTreeNode--customDocumentAppearance': hasCustomDocumentAppearance.value,
+    'projectHierarchyTreeNode--customDocumentBackground': hasCustomDocumentBackground.value,
     'projectHierarchyTreeNode--document': props.node.nodeKind === 'document',
     'projectHierarchyTreeNode--group': props.node.nodeKind === 'group',
     'projectHierarchyTreeNode--documentTemplate': props.node.nodeKind === 'templatePlacement',
@@ -99,15 +105,49 @@ const displayIcon = computed(() => {
   if (props.node.nodeKind === 'templatePlacement' || props.node.nodeKind === 'document') {
     return resolveProjectHierarchyTreePlacementDisplayIcon(props.node.icon)
   }
+  if (props.node.nodeKind === 'addNewDocument') {
+    return props.node.icon
+  }
   return props.node.icon
 })
 
-const worldNodeStyle = computed(() => {
-  if (props.node.nodeKind !== 'world') {
+const documentAppearanceChrome = computed(() => {
+  return resolveProjectHierarchyTreeDocumentAppearanceChrome(props.node)
+})
+
+const hasCustomDocumentAppearance = computed(() => {
+  return documentAppearanceChrome.value !== undefined
+})
+
+const hasCustomDocumentBackground = computed(() => {
+  return documentAppearanceChrome.value?.backgroundColor !== undefined
+})
+
+const nodeRootBackgroundStyle = computed(() => {
+  const backgroundColor = documentAppearanceChrome.value?.backgroundColor
+  if (backgroundColor === undefined) {
     return undefined
   }
   return {
-    color: props.node.worldColor
+    '--projectHierarchyTreeNode-focusHelperColor': backgroundColor,
+    backgroundColor
+  }
+})
+
+const nodeIconLabelTextStyle = computed(() => {
+  if (props.node.nodeKind === 'world') {
+    return {
+      color: props.node.worldColor
+    }
+  }
+
+  const textColor = documentAppearanceChrome.value?.color
+  if (textColor === undefined) {
+    return undefined
+  }
+
+  return {
+    color: textColor
   }
 })
 </script>

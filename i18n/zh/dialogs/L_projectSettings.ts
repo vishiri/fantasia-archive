@@ -76,6 +76,8 @@ export default {
       placementNicknameHoverOriginalNameLabel: '原始名称',
       placementNicknameHoverNicknameLabel: '昵称',
       removeGroupTooltip: '移除组',
+      removeTemplateDisabledHasDocuments:
+        '移除此模板前，请先移除与其关联的所有文档。',
       removeTemplateTooltip: '移除文档模板',
       templateCanonicalNameLabel: '文档模板名称',
       templateCanonicalNameTooltip: '若要正确重命名整个文档模板，请前往此编辑对话框的“文档模板”部分并在那里调整。',

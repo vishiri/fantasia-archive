@@ -1,10 +1,42 @@
+import type { CSSProperties } from 'vue'
+
+import type { I_faDocumentAppearanceChromeStyle } from 'app/types/I_faDocumentAppearanceChromeStyle'
 import type {
   I_assembleProjectDocumentControlBarApiInput,
   I_projectDocumentControlBarComposableApi
 } from 'app/types/I_faProjectDocumentControlBarDomain'
+import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
 import { buildProjectDocumentControlBarKeybindTooltipLabels } from '../functions/projectDocumentControlBarKeybindTooltipLabels'
+import { buildProjectDocumentControlBarActiveDocumentStateApi } from './projectDocumentControlBarActiveDocumentStateWiring'
 import { buildProjectDocumentControlBarTabContextMenuHandlers } from './projectDocumentControlBarTabContextMenuWiring'
+import {
+  resolveProjectDocumentControlBarTabAppearanceChrome,
+  resolveProjectDocumentControlBarTabInlineStyle
+} from './projectDocumentControlBarTabAppearanceChromeWiring'
+import { buildProjectDocumentControlBarWorldTabIndicatorApi } from './projectDocumentControlBarWorldTabIndicatorWiring'
+
+function buildProjectDocumentControlBarTabAppearanceChromeApi (): Pick<
+  I_projectDocumentControlBarComposableApi,
+  'resolveDocumentTabAppearanceChrome' | 'resolveDocumentTabInlineStyle'
+> {
+  function resolveDocumentTabAppearanceChrome (
+    tab: I_faOpenedDocumentTab
+  ): I_faDocumentAppearanceChromeStyle | undefined {
+    return resolveProjectDocumentControlBarTabAppearanceChrome(tab)
+  }
+
+  function resolveDocumentTabInlineStyle (
+    tab: I_faOpenedDocumentTab
+  ): CSSProperties | undefined {
+    return resolveProjectDocumentControlBarTabInlineStyle(tab)
+  }
+
+  return {
+    resolveDocumentTabAppearanceChrome,
+    resolveDocumentTabInlineStyle
+  }
+}
 
 function buildProjectDocumentControlBarTabHandlers (input: {
   closeAllTabsWithoutChanges: () => void | Promise<void>
@@ -142,53 +174,21 @@ export function assembleProjectDocumentControlBarApi (
     return input.resolveShowDocumentTabs(input.tabs.value.length)
   })
 
-  const activeDocumentTabName = input.computed(() => {
-    return input.resolveActiveDocumentTabName({
-      activeDocumentId: input.activeDocumentId.value,
-      openedTabs: input.tabs.value
-    })
+  const worldTabIndicatorApi = buildProjectDocumentControlBarWorldTabIndicatorApi({
+    computed: input.computed,
+    projectWorlds: input.projectWorlds
   })
 
-  const activeDocumentTab = input.computed(() => {
-    const documentId = input.activeDocumentId.value
-    if (documentId === null) {
-      return null
-    }
-    return input.tabs.value.find((tab) => tab.documentId === documentId) ?? null
-  })
-
-  const showEditDocumentButton = input.computed(() => {
-    return input.resolveShowProjectDocumentControlBarEditButton({
-      activeDocumentTab: activeDocumentTab.value,
-      isOnDocumentWorkspaceRoute: input.isOnDocumentWorkspaceRoute.value
-    })
-  })
-
-  const showSaveDocumentButtons = input.computed(() => {
-    return input.resolveShowProjectDocumentControlBarSaveButtons({
-      activeDocumentTab: activeDocumentTab.value,
-      isOnDocumentWorkspaceRoute: input.isOnDocumentWorkspaceRoute.value
-    })
-  })
-
-  const showDeleteDocumentButton = input.computed(() => {
-    return input.resolveShowProjectDocumentControlBarDeleteButton({
-      activeDocumentTab: activeDocumentTab.value,
-      isOnDocumentWorkspaceRoute: input.isOnDocumentWorkspaceRoute.value
-    })
-  })
-
-  const saveDocumentButtonColor = input.computed(() => {
-    const tab = activeDocumentTab.value
-    if (tab === null) {
-      return input.resolveProjectDocumentControlBarSaveButtonColor({
-        hasUnsavedChanges: false
-      })
-    }
-
-    return input.resolveProjectDocumentControlBarSaveButtonColor({
-      hasUnsavedChanges: tab.hasUnsavedChanges
-    })
+  const activeDocumentStateApi = buildProjectDocumentControlBarActiveDocumentStateApi({
+    activeDocumentId: input.activeDocumentId,
+    computed: input.computed,
+    isOnDocumentWorkspaceRoute: input.isOnDocumentWorkspaceRoute,
+    resolveActiveDocumentTabName: input.resolveActiveDocumentTabName,
+    resolveProjectDocumentControlBarSaveButtonColor: input.resolveProjectDocumentControlBarSaveButtonColor,
+    resolveShowProjectDocumentControlBarDeleteButton: input.resolveShowProjectDocumentControlBarDeleteButton,
+    resolveShowProjectDocumentControlBarEditButton: input.resolveShowProjectDocumentControlBarEditButton,
+    resolveShowProjectDocumentControlBarSaveButtons: input.resolveShowProjectDocumentControlBarSaveButtons,
+    tabs: input.tabs
   })
 
   const tabHandlers = buildProjectDocumentControlBarTabHandlers({
@@ -214,6 +214,8 @@ export function assembleProjectDocumentControlBarApi (
     getKeybindsSnapshot: input.getKeybindsSnapshot
   })
 
+  const tabAppearanceChromeApi = buildProjectDocumentControlBarTabAppearanceChromeApi()
+
   const contextMenuHandlers = buildProjectDocumentControlBarTabContextMenuHandlers({
     copyToClipboard: input.copyToClipboard,
     findTabByDocumentId: input.findTabByDocumentId,
@@ -226,15 +228,12 @@ export function assembleProjectDocumentControlBarApi (
   })
 
   return {
-    activeDocumentTab,
-    activeDocumentTabName,
     openedDocumentTabs: input.tabs,
     showDocumentControlBar,
     showDocumentTabs,
-    showDeleteDocumentButton,
-    showEditDocumentButton,
-    showSaveDocumentButtons,
-    saveDocumentButtonColor,
+    ...activeDocumentStateApi,
+    ...worldTabIndicatorApi,
+    ...tabAppearanceChromeApi,
     ...keybindTooltipLabels,
     ...tabHandlers,
     ...editModeHandlers,

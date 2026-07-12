@@ -76,6 +76,8 @@ export default {
       placementNicknameHoverOriginalNameLabel: 'Opprinnelig navn',
       placementNicknameHoverNicknameLabel: 'Kallenavn',
       removeGroupTooltip: 'Fjern gruppe',
+      removeTemplateDisabledHasDocuments:
+        'Fjern alle dokumenter koblet til denne malen før du fjerner den.',
       removeTemplateTooltip: 'Fjern dokumentmal',
       templateCanonicalNameLabel: 'Dokumentmalnavn',
       templateCanonicalNameTooltip: 'For å gi hele dokumentmalen et nytt navn, gå til delen «Dokumentmaler» i denne redigeringsdialogen og endre den der.',

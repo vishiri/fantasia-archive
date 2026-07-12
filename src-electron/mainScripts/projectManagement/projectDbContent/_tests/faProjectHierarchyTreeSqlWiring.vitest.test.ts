@@ -149,10 +149,14 @@ test('Test that mapFaProjectHierarchyDocumentChildRow maps null placement id to 
     tree_parent_document_id: null,
     tree_custom_sort_order: 0,
     display_name: 'Row',
+    document_text_color: null,
+    document_background_color: null,
     created_at_ms: 1,
     updated_at_ms: 1
   })
   expect(mapped.placementId).toBe('')
+  expect(mapped.documentTextColor).toBeNull()
+  expect(mapped.documentBackgroundColor).toBeNull()
   expect(mapped.hasChildren).toBe(false)
   expect(readFaProjectDocumentHasChildren(db, 'missing-doc')).toBe(false)
 })

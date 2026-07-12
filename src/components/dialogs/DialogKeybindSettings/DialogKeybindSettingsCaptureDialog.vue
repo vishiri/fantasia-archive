@@ -50,7 +50,7 @@
           @click="emit('captureClear')"
         />
         <q-btn
-          class="dialogKeybindSettingsCapture__btnSet fa-text-on-solid text-uppercase text-weight-bold"
+          class="dialogKeybindSettingsCapture__btnSet text-uppercase text-weight-bold"
           color="dark"
           data-test-locator="dialogKeybindSettings-capture-set"
           :disable="!canSubmitChord"

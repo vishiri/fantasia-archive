@@ -30,6 +30,7 @@ export function createProjectHierarchyTreeSessionEarlyWiring (deps: {
       data: I_faProjectHierarchyTreeHeTreeNode
     } | null
   }
+  getPreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
   hierarchyStore: T_hierarchyStore
   nextTick: () => Promise<void>
   onUnmounted: (hook: () => void) => void
@@ -79,6 +80,7 @@ export function createProjectHierarchyTreeSessionEarlyWiring (deps: {
     dragDropCommitted: bootstrap.sessionRefs.dragDropCommitted,
     dragExpandPostCommitGuard: bootstrap.sessionRefs.dragExpandPostCommitGuard,
     dragExpandUiFrozen: bootstrap.sessionRefs.dragExpandUiFrozen,
+    getPreferredLanguageCode: deps.getPreferredLanguageCode,
     hierarchyStore: deps.hierarchyStore,
     isTreeDragActive: bootstrap.sessionRefs.isTreeDragActive,
     nextTick: deps.nextTick,

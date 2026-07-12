@@ -216,11 +216,24 @@ export const S_FaProjectHierarchyTree = defineStore('S_FaProjectHierarchyTree', 
     ]
   }
 
+  function patchWorldColorPalleteInLayout (worldId: string, colorPallete: string): void {
+    worlds.value = worlds.value.map((world) => {
+      if (world.id !== worldId) {
+        return world
+      }
+      return {
+        ...world,
+        colorPallete
+      }
+    })
+  }
+
   const clearPendingDocumentRefreshIdsOut = clearPendingDocumentRefreshIds
   const clearPendingHierarchyNodeRefreshIdsOut = clearPendingHierarchyNodeRefreshIds
   const clearPendingRevealPathOut = clearPendingRevealPath
   const clearSearchOut = clearSearch
   const flushUiStatePersistOut = flushUiStatePersist
+  const patchWorldColorPalleteInLayoutOut = patchWorldColorPalleteInLayout
   const pendingDocumentRefreshIdsOut = pendingDocumentRefreshIds
   const pendingHierarchyNodeRefreshIdsOut = pendingHierarchyNodeRefreshIds
   const pendingRevealPathOut = pendingRevealPath
@@ -244,6 +257,7 @@ export const S_FaProjectHierarchyTree = defineStore('S_FaProjectHierarchyTree', 
     clearPendingRevealPath: clearPendingRevealPathOut,
     clearSearch: clearSearchOut,
     flushUiStatePersist: flushUiStatePersistOut,
+    patchWorldColorPalleteInLayout: patchWorldColorPalleteInLayoutOut,
     pendingDocumentRefreshIds: pendingDocumentRefreshIdsOut,
     pendingHierarchyNodeRefreshIds: pendingHierarchyNodeRefreshIdsOut,
     pendingRevealPath: pendingRevealPathOut,

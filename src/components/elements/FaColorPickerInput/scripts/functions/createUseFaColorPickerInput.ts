@@ -69,12 +69,6 @@ export function createUseFaColorPickerInput (deps: {
     })
 
     const colorSwatchStyle = deps.computed(() => {
-      if (isSwatchEmpty.value) {
-        return {
-          backgroundColor: 'transparent'
-        }
-      }
-
       return {
         backgroundColor: pickerEmit.resolveLiveColorString().trim()
       }

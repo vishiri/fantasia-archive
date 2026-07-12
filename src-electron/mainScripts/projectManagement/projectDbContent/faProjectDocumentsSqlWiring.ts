@@ -1,6 +1,8 @@
 import type Database from 'better-sqlite3'
 
 import {
+  FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN,
+  FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
@@ -12,7 +14,10 @@ export function buildFaProjectDocumentSelectSql (): string {
     `SELECT id, world_id, template_id, ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN}, ` +
     `${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN}, ` +
     `${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN}, ` +
-    'display_name, created_at_ms, updated_at_ms ' +
+    'display_name, ' +
+    `${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN}, ` +
+    `${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}, ` +
+    'created_at_ms, updated_at_ms ' +
     `FROM ${FA_PROJECT_TABLE_DOCUMENTS}`
   )
 }

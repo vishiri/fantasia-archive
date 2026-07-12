@@ -6,6 +6,7 @@ import {
   FA_OPENED_DOCUMENTS_SNAPSHOT_SCHEMA_VERSION
 } from 'app/types/I_faOpenedDocumentsDomain'
 import { normalizeOpenedDocumentTabEditState } from 'app/src/scripts/openedDocuments/functions/openedDocumentEditStateDomain'
+import { normalizeOpenedDocumentTabAppearanceColors } from 'app/src/scripts/openedDocuments/openedDocumentTabAppearanceWiring'
 import { normalizeOpenedDocumentTabPersistenceState } from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
 
 const faOpenedDocumentTabSchema = z.object({
@@ -21,6 +22,10 @@ const faOpenedDocumentTabSchema = z.object({
   templateIcon: z.string().max(128),
   displayNameDraft: z.string().max(512),
   savedDisplayName: z.string().max(512),
+  documentTextColorDraft: z.string().max(7).optional(),
+  savedDocumentTextColor: z.string().max(7).optional(),
+  documentBackgroundColorDraft: z.string().max(7).optional(),
+  savedDocumentBackgroundColor: z.string().max(7).optional(),
   hasUnsavedChanges: z.boolean(),
   editState: z.boolean().default(false)
 }).strict().superRefine((tab, context) => {
@@ -68,6 +73,7 @@ function normalizeParsedOpenedDocumentsSnapshot (
     schemaVersion: FA_OPENED_DOCUMENTS_SNAPSHOT_SCHEMA_VERSION,
     tabs: snapshot.tabs
       .map(normalizeOpenedDocumentTabPersistenceState)
+      .map(normalizeOpenedDocumentTabAppearanceColors)
       .map(normalizeOpenedDocumentTabEditState)
   }
 }
@@ -102,6 +108,7 @@ export function serializeFaOpenedDocumentsSnapshotJson (
     schemaVersion: FA_OPENED_DOCUMENTS_SNAPSHOT_SCHEMA_VERSION,
     tabs: snapshot.tabs
       .map(normalizeOpenedDocumentTabPersistenceState)
+      .map(normalizeOpenedDocumentTabAppearanceColors)
       .map(normalizeOpenedDocumentTabEditState)
   }
   const validated = faOpenedDocumentsSnapshotSchemaV2.parse(normalizedSnapshot)

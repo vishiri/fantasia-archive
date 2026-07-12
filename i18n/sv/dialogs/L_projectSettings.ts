@@ -76,6 +76,8 @@ export default {
       placementNicknameHoverOriginalNameLabel: 'Ursprungligt namn',
       placementNicknameHoverNicknameLabel: 'Smeknamn',
       removeGroupTooltip: 'Ta bort grupp',
+      removeTemplateDisabledHasDocuments:
+        'Ta bort alla dokument kopplade till den här mallen innan du tar bort den.',
       removeTemplateTooltip: 'Ta bort dokumentmall',
       templateCanonicalNameLabel: 'Dokumentmallnamn',
       templateCanonicalNameTooltip: 'För att byta namn på en hel dokumentmall, gå till avsnittet «Dokumentmallar» i den här redigeringsdialogen och justera den där.',

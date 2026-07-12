@@ -76,6 +76,8 @@ export default {
       placementNicknameHoverOriginalNameLabel: 'Исходное имя',
       placementNicknameHoverNicknameLabel: 'Псевдоним',
       removeGroupTooltip: 'Удалить группу',
+      removeTemplateDisabledHasDocuments:
+        'Удалите все документы, связанные с этим шаблоном, перед его удалением.',
       removeTemplateTooltip: 'Удалить шаблон документа',
       templateCanonicalNameLabel: 'Имя шаблона документа',
       templateCanonicalNameTooltip: 'Чтобы переименовать весь шаблон документа, перейдите в раздел «Шаблоны документов» этого диалога редактирования и измените его там.',

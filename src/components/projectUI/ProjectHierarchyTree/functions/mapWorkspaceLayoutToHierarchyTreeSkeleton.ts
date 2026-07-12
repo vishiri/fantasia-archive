@@ -89,13 +89,16 @@ function mapPlacementToNode (
     children: [],
     childrenLoaded: false,
     documentId: null,
+    documentTemplateId: placement.documentTemplateId,
     groupId: placement.groupId,
-    hasChildren: placement.hasChildren,
+    hasChildren: true,
     icon: placementIcon,
     id: placement.id,
     label: nickname.length > 0 ? nickname : placement.displayName,
     nodeKind: 'templatePlacement',
     placementId: placement.id,
+    titlePluralTranslations: placement.titlePluralTranslations,
+    titleSingularTranslations: placement.titleSingularTranslations,
     worldColor: world.color,
     worldId: world.id
   }
@@ -176,7 +179,10 @@ function patchPlacementNodeInPlace (
   const placementIcon = resolvePlacementDisplayIcon(placement.icon)
   placementNode.label = nickname.length > 0 ? nickname : placement.displayName
   placementNode.icon = placementIcon
-  placementNode.hasChildren = placement.hasChildren
+  placementNode.hasChildren = true
+  placementNode.documentTemplateId = placement.documentTemplateId
+  placementNode.titlePluralTranslations = placement.titlePluralTranslations
+  placementNode.titleSingularTranslations = placement.titleSingularTranslations
   patchDocumentSubtreeIconsInPlace(placementNode.children, placementIcon)
   syncProjectHierarchyTreeNodeLazyChildren(placementNode)
 }

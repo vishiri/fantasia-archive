@@ -76,6 +76,8 @@ export default {
       placementNicknameHoverOriginalNameLabel: 'Nombre original',
       placementNicknameHoverNicknameLabel: 'Apodo',
       removeGroupTooltip: 'Eliminar grupo',
+      removeTemplateDisabledHasDocuments:
+        'Elimine todos los documentos conectados a esta plantilla antes de quitarla.',
       removeTemplateTooltip: 'Eliminar plantilla de documento',
       templateCanonicalNameLabel: 'Nombre de la plantilla de documento',
       templateCanonicalNameTooltip: 'Para renombrar correctamente una plantilla de documento completa, vaya a la sección «Plantillas de documentos» de este cuadro de diálogo de edición y ajústela allí.',

@@ -1,6 +1,8 @@
 import type Database from 'better-sqlite3'
 
 import {
+  FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN,
+  FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
@@ -9,7 +11,10 @@ import {
   FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS,
   FA_PROJECT_TABLE_WORLDS
 } from '../functions/faProjectDbSchemaDdl'
-import { mapFaProjectDocumentRow } from '../functions/faProjectContentRowMap'
+import {
+  resolveFaProjectDocumentAppearanceColorsForCreate,
+  resolveFaProjectDocumentAppearanceColorsForUpdate
+} from './faProjectDocumentAppearanceColorPersistWiring'
 import { FaProjectContentNotFoundError } from './faProjectContentNotFoundError'
 import {
   assertFaProjectNamedEntityExists
@@ -18,6 +23,7 @@ import {
   buildFaProjectDocumentSelectSql,
   readFaProjectDocumentSiblingMaxSortOrder
 } from './faProjectDocumentsSqlWiring'
+import { getFaProjectDocumentById } from './faProjectDocumentsQueryWiring'
 import { promoteFaProjectDocumentChildrenBeforeDelete } from './faProjectDocumentDeleteWiring'
 import {
   resolveFaProjectDocumentIdForCreate,
@@ -26,8 +32,6 @@ import {
 import type {
   I_faProjectDocument,
   I_faProjectDocumentCreateInput,
-  I_faProjectDocumentListFilter,
-  I_faProjectDocumentListResult,
   I_faProjectDocumentPatch
 } from 'app/types/I_faProjectDocumentDomain'
 import type { I_faSqlProjectDocumentRow } from 'app/types/I_faProjectContentRowMap'
@@ -119,6 +123,8 @@ export function createFaProjectDocument (
     parentDocumentId,
     input.sortOrder
   )
+  const { documentBackgroundColor, documentTextColor } =
+    resolveFaProjectDocumentAppearanceColorsForCreate(input)
   const nowMs = Date.now()
   const id = resolveFaProjectDocumentIdForCreate(db, input.id)
   db.prepare(
@@ -126,8 +132,11 @@ export function createFaProjectDocument (
       `(id, world_id, template_id, ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN}, ` +
       `${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN}, ` +
       `${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN}, ` +
-      'display_name, created_at_ms, updated_at_ms) ' +
-      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      'display_name, ' +
+      `${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}, ` +
+      'created_at_ms, updated_at_ms) ' +
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(
     id,
     input.worldId,
@@ -136,6 +145,8 @@ export function createFaProjectDocument (
     parentDocumentId,
     sortOrder,
     input.displayName,
+    documentTextColor,
+    documentBackgroundColor,
     nowMs,
     nowMs
   )
@@ -171,13 +182,18 @@ export function updateFaProjectDocument (
     : existingRow.tree_parent_document_id
   const nextSortOrder = patch.sortOrder ?? existingRow.tree_custom_sort_order
   const nextDisplayName = patch.displayName ?? existingRow.display_name
+  const { documentBackgroundColor: nextDocumentBackgroundColor, documentTextColor: nextDocumentTextColor } =
+    resolveFaProjectDocumentAppearanceColorsForUpdate(patch, existingRow)
   const nowMs = Date.now()
   db.prepare(
     `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET world_id = ?, template_id = ?, ` +
       `${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} = ?, ` +
       `${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} = ?, ` +
       `${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} = ?, ` +
-      'display_name = ?, updated_at_ms = ? WHERE id = ?'
+      'display_name = ?, ' +
+      `${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN} = ?, ` +
+      `${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN} = ?, ` +
+      'updated_at_ms = ? WHERE id = ?'
   ).run(
     nextWorldId,
     nextTemplateId,
@@ -185,6 +201,8 @@ export function updateFaProjectDocument (
     nextParentDocumentId,
     nextSortOrder,
     nextDisplayName,
+    nextDocumentTextColor,
+    nextDocumentBackgroundColor,
     nowMs,
     id
   )
@@ -199,37 +217,6 @@ export function deleteFaProjectDocument (db: Database, id: string): void {
   if (result.changes === 0) {
     throw new FaProjectContentNotFoundError(DOCUMENT_ENTITY_LABEL, id)
   }
-}
-
-export function getFaProjectDocumentById (
-  db: Database,
-  id: string
-): I_faProjectDocument {
-  const row = db
-    .prepare(`${buildFaProjectDocumentSelectSql()} WHERE id = ?`)
-    .get(id) as I_faSqlProjectDocumentRow | undefined
-  return mapFaProjectDocumentRow(assertDocumentRow(row, id))
-}
-
-export function listFaProjectDocuments (
-  db: Database,
-  filter?: I_faProjectDocumentListFilter
-): I_faProjectDocumentListResult {
-  const worldId = filter?.worldId
-  const orderSql =
-    `ORDER BY ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} ASC, ` +
-    'display_name COLLATE NOCASE ASC, created_at_ms ASC'
-  let rows: I_faSqlProjectDocumentRow[]
-  if (worldId !== undefined) {
-    rows = db
-      .prepare(`${buildFaProjectDocumentSelectSql()} WHERE world_id = ? ${orderSql}`)
-      .all(worldId) as I_faSqlProjectDocumentRow[]
-  } else {
-    rows = db
-      .prepare(`${buildFaProjectDocumentSelectSql()} ${orderSql}`)
-      .all() as I_faSqlProjectDocumentRow[]
-  }
-  return { items: rows.map(mapFaProjectDocumentRow) }
 }
 
 export function setFaProjectDocumentWorld (
@@ -247,3 +234,5 @@ export function setFaProjectDocumentTemplate (
 ): I_faProjectDocument {
   return updateFaProjectDocument(db, documentId, { templateId })
 }
+
+export { getFaProjectDocumentById, listFaProjectDocuments } from './faProjectDocumentsQueryWiring'

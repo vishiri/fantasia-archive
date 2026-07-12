@@ -12,6 +12,7 @@ import { bindProjectHierarchyTreeSessionHydrateLifecycle } from './projectHierar
 import { buildProjectHierarchyTreeSessionApi } from './projectHierarchyTreeSessionApiWiring'
 import { createProjectHierarchyTreeSessionEarlyWiring } from './projectHierarchyTreeSessionEarlyWiring'
 import { bindProjectHierarchyTreeSessionPendingRefresh } from './projectHierarchyTreePendingDocumentRefreshWiring'
+import { bindProjectHierarchyTreeAddNewDocumentLanguageRefresh } from './projectHierarchyTreeAddNewDocumentLanguageRefreshWiring'
 
 type T_hierarchyStore = {
   clearPendingDocumentRefreshIds: () => void
@@ -31,6 +32,13 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
     hasActiveProject: boolean
   }
   computed: <T>(getter: () => T) => { value: T }
+  createTemporaryDocument: (input: {
+    displayName: string
+    openMode: import('app/types/I_faOpenedDocumentsDomain').T_faOpenedDocumentOpenMode
+    parentDocumentId: null
+    templateId: string
+    worldId: string
+  }) => Promise<string>
   dragContext: {
     dragNode: {
       data: I_faProjectHierarchyTreeHeTreeNode
@@ -49,6 +57,7 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
   pendingHierarchyNodeRefreshIds: Ref<string[]>
   pendingRevealPath: Ref<string[]>
   ref: <T>(initial: T) => Ref<T>
+  resolvePreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   uiState: Ref<I_faProjectHierarchyTreeUiState>
   watch: typeof watchFn
@@ -57,6 +66,7 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
   const earlyWiring = createProjectHierarchyTreeSessionEarlyWiring({
     computed: deps.computed,
     dragContext: deps.dragContext,
+    getPreferredLanguageCode: deps.resolvePreferredLanguageCode,
     hierarchyStore: deps.hierarchyStore,
     nextTick: deps.nextTick,
     onUnmounted: deps.onUnmounted,
@@ -88,8 +98,15 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
     watch: deps.watch
   })
 
+  bindProjectHierarchyTreeAddNewDocumentLanguageRefresh({
+    getPreferredLanguageCode: deps.resolvePreferredLanguageCode,
+    treeData: deps.treeData,
+    watch: deps.watch
+  })
+
   return buildProjectHierarchyTreeSessionApi({
     handlersWiring: createProjectHierarchyTreeSessionHandlersWiring({
+      createTemporaryDocument: deps.createTemporaryDocument,
       documentRowDragHoldWiring: earlyWiring.documentRowDragHoldWiring,
       documentRowExpandClickGesture: earlyWiring.bootstrap.documentRowExpandClickGesture,
       dragContext: deps.dragContext,
@@ -98,6 +115,7 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
       getDragExpandedSnapshotNodeIds: earlyWiring.subWiring.dndWiring.getDragExpandedSnapshotNodeIds,
       lazyLoadWiring: earlyWiring.subWiring.lazyLoadWiring,
       onDocumentOpenRequest: deps.onDocumentOpenRequest,
+      resolvePreferredLanguageCode: deps.resolvePreferredLanguageCode,
       suppressTreeEmit: earlyWiring.bootstrap.sessionRefs.suppressTreeEmit,
       treeComponentRef: earlyWiring.bootstrap.sessionRefs.treeComponentRef,
       treeData: deps.treeData,

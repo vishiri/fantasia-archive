@@ -92,7 +92,7 @@ export function collectProjectHierarchyTreeLatentDocumentOpenNodeIds (
   return output
 }
 
-function isMissingWorldAncestorOnly (
+function isMissingLatentExpandAncestorOnly (
   treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
   ancestorId: string,
   openSet: ReadonlySet<string>
@@ -101,7 +101,12 @@ function isMissingWorldAncestorOnly (
     return false
   }
   const ancestor = findProjectHierarchyTreeNodeById(treeNodes, ancestorId)
-  return ancestor?.nodeKind === 'world'
+  if (ancestor === null) {
+    return false
+  }
+  return ancestor.nodeKind === 'world' ||
+    ancestor.nodeKind === 'templatePlacement' ||
+    ancestor.nodeKind === 'document'
 }
 
 /**
@@ -120,7 +125,7 @@ export function isProjectHierarchyTreeNodePersistableInOpenSet (
     if (openSet.has(ancestorId)) {
       continue
     }
-    if (!isMissingWorldAncestorOnly(treeNodes, ancestorId, openSet)) {
+    if (!isMissingLatentExpandAncestorOnly(treeNodes, ancestorId, openSet)) {
       return false
     }
   }

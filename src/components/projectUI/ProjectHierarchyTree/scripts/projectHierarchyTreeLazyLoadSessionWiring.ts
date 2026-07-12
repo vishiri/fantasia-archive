@@ -26,6 +26,7 @@ export function createProjectHierarchyTreeLazyLoadSessionWiring (deps: {
   flushUiStatePersist: () => void
   getExpandedNodeIds: () => string[]
   getPendingRevealPath: () => string[]
+  getPreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
   getScrollTopPx: () => number
   getTreeRef: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeHeTreeInstance | null
   getTreeScrollHost: () => HTMLElement | null
@@ -47,6 +48,7 @@ export function createProjectHierarchyTreeLazyLoadSessionWiring (deps: {
   }
 
   const lazyLoadWiring = createProjectHierarchyTreeLazyLoadWiring({
+    getPreferredLanguageCode: deps.getPreferredLanguageCode,
     listPlacementDocumentChildren: listProjectHierarchyTreePlacementDocumentChildren,
     nextTick: deps.nextTick,
     onAfterTreeRevisionPublished: () => {

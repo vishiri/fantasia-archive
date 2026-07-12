@@ -4,7 +4,9 @@ import { dragContext } from '@he-tree/vue'
 import { useRoute } from 'vue-router'
 
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
+import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
 import { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTree'
+import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/appRouting_manager'
 
 import { createUseProjectHierarchyTree } from './createUseProjectHierarchyTree'
@@ -21,11 +23,14 @@ const resolveProjectHierarchyTreePlacementDisplayIcon = createResolveProjectHier
 })
 
 export { resolveProjectHierarchyTreeHeTreeNodeKey } from '../functions/projectHierarchyTreeHeTreeNodeKey'
+export { resolveProjectHierarchyTreeDocumentAppearanceChrome } from './projectHierarchyTreeDocumentAppearanceChromeWiring'
 export { resolveProjectHierarchyTreePlacementDisplayIcon }
 
 export const useProjectHierarchyTree = createUseProjectHierarchyTree({
   S_FaActiveProject,
+  S_FaOpenedDocuments,
   S_FaProjectHierarchyTree,
+  S_FaUserSettings,
   computed,
   dragContext,
   nextTick,

@@ -1,5 +1,6 @@
 import type { I_assembleProjectDocumentControlBarApiInput } from 'app/types/I_faProjectDocumentControlBarDomain'
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+import type { I_faProjectHierarchyTreeWorkspaceWorld } from 'app/types/I_faProjectHierarchyTreeDomain'
 import type { I_computedRef } from 'app/types/I_vueCompositionShims'
 
 export function buildProjectDocumentControlBarAssembleInput (input: {
@@ -28,6 +29,7 @@ export function buildProjectDocumentControlBarAssembleInput (input: {
   resolveShowProjectDocumentControlBarSaveButtons: I_assembleProjectDocumentControlBarApiInput['resolveShowProjectDocumentControlBarSaveButtons']
   resolveProjectDocumentControlBarSaveButtonColor: I_assembleProjectDocumentControlBarApiInput['resolveProjectDocumentControlBarSaveButtonColor']
   runFaAction: I_assembleProjectDocumentControlBarApiInput['runFaAction']
+  projectWorlds: I_computedRef<readonly I_faProjectHierarchyTreeWorkspaceWorld[]>
   tabs: I_computedRef<readonly I_faOpenedDocumentTab[]>
   translateCopyNameFailed: () => string
   translateCopyNameSuccess: () => string
@@ -59,6 +61,7 @@ export function buildProjectDocumentControlBarAssembleInput (input: {
   const resolveShowProjectDocumentControlBarSaveButtons = input.resolveShowProjectDocumentControlBarSaveButtons
   const resolveProjectDocumentControlBarSaveButtonColor = input.resolveProjectDocumentControlBarSaveButtonColor
   const runFaAction = input.runFaAction
+  const projectWorlds = input.projectWorlds
   const tabs = input.tabs
   const translateCopyNameFailed = input.translateCopyNameFailed
   const translateCopyNameSuccess = input.translateCopyNameSuccess
@@ -90,6 +93,7 @@ export function buildProjectDocumentControlBarAssembleInput (input: {
     resolveShowProjectDocumentControlBarSaveButtons,
     resolveProjectDocumentControlBarSaveButtonColor,
     runFaAction,
+    projectWorlds,
     tabs,
     translateCopyNameFailed,
     translateCopyNameSuccess

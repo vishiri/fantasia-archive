@@ -76,6 +76,8 @@ export default {
       placementNicknameHoverOriginalNameLabel: 'Αρχικό όνομα',
       placementNicknameHoverNicknameLabel: 'Ψευδώνυμο',
       removeGroupTooltip: 'Αφαίρεση ομάδας',
+      removeTemplateDisabledHasDocuments:
+        'Αφαιρέστε όλα τα έγγραφα που συνδέονται με αυτό το πρότυπο πριν το αφαιρέσετε.',
       removeTemplateTooltip: 'Αφαίρεση προτύπου εγγράφου',
       templateCanonicalNameLabel: 'Όνομα προτύπου εγγράφου',
       templateCanonicalNameTooltip: 'Για να μετονομάσετε ολόκληρο ένα πρότυπο εγγράφου, μεταβείτε στην ενότητα «Πρότυπα εγγράφων» αυτού του διαλόγου επεξεργασίας και προσαρμόστε το εκεί.',

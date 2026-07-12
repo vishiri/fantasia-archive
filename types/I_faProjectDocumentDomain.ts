@@ -9,6 +9,8 @@ export interface I_faProjectDocument {
   parentDocumentId: string | null
   sortOrder: number
   displayName: string
+  documentTextColor: string | null
+  documentBackgroundColor: string | null
   createdAtMs: number
   updatedAtMs: number
 }
@@ -22,6 +24,8 @@ export interface I_faProjectDocumentCreateInput {
   placementId?: string | null | undefined
   parentDocumentId?: string | null | undefined
   sortOrder?: number | undefined
+  documentTextColor?: string | null | undefined
+  documentBackgroundColor?: string | null | undefined
 }
 
 export interface I_faProjectDocumentPatch {
@@ -31,6 +35,8 @@ export interface I_faProjectDocumentPatch {
   placementId?: string | null | undefined
   parentDocumentId?: string | null | undefined
   sortOrder?: number | undefined
+  documentTextColor?: string | null | undefined
+  documentBackgroundColor?: string | null | undefined
 }
 
 export interface I_faProjectDocumentListFilter {

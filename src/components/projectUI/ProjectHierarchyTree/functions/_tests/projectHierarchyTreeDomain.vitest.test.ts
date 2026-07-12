@@ -11,6 +11,7 @@ import {
 } from '../mapWorkspaceLayoutToHierarchyTreeSkeleton'
 import { mapHierarchyDocumentChildrenToTreeNodes } from '../mapHierarchyDocumentChildrenToTreeNodes'
 import { applyProjectHierarchyTreeSiblingOrderToTreeData } from '../../scripts/projectHierarchyTreeSiblingOrderPatchWiring'
+import { refreshProjectHierarchyTreeAddNewDocumentLabelsInTree } from '../../scripts/projectHierarchyTreeAddNewDocumentNode'
 import { isProjectHierarchyTreeSameBucketSiblingReorder } from '../projectHierarchyTreeSameBucketSiblingReorder'
 import { createWaitForProjectHierarchyTreeDragCommitWindow } from '../waitForProjectHierarchyTreeDragCommitWindow'
 import { createWaitForProjectHierarchyTreeDragGetDataOrderStable } from '../../scripts/projectHierarchyTreeDragGetDataOrderStableWiring'
@@ -93,6 +94,7 @@ const resolveProjectHierarchyTreePlacementDisplayIcon = createResolveProjectHier
 
 const sampleWorld = {
   color: '#ff0000',
+  colorPallete: '',
   displayName: 'World A',
   groups: [
     {
@@ -114,6 +116,8 @@ const sampleWorld = {
       icon: 'mdi-account',
       id: 'placement-1',
       nickname: 'Heroes',
+      titlePluralTranslations: {},
+      titleSingularTranslations: {},
       rootSortOrder: null,
       worldId: 'world-1'
     },
@@ -126,6 +130,8 @@ const sampleWorld = {
       icon: 'mdi-map',
       id: 'placement-2',
       nickname: '',
+      titlePluralTranslations: {},
+      titleSingularTranslations: {},
       rootSortOrder: 1,
       worldId: 'world-1'
     }
@@ -144,6 +150,7 @@ test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton builds nested layout r
   expect(tree[0]?.children[0]?.nodeKind).toBe('group')
   expect(tree[0]?.children[1]?.nodeKind).toBe('templatePlacement')
   expect(tree[0]?.children[0]?.children[0]?.label).toBe('Heroes')
+  expect(tree[0]?.children[1]?.hasChildren).toBe(true)
 })
 
 /**
@@ -172,6 +179,21 @@ test('Test that projectHierarchyTreeDnD fences document drag to same placement',
     placementId: 'placement-2'
   }
   expect(isProjectHierarchyTreeNodeDraggable(documentA)).toBe(true)
+  expect(isProjectHierarchyTreeNodeDraggable({
+    children: [],
+    childrenLoaded: true,
+    documentId: null,
+    documentTemplateId: 'template-1',
+    groupId: null,
+    hasChildren: false,
+    icon: 'mdi-plus',
+    id: 'placement-1__add-new',
+    label: 'Add new character',
+    nodeKind: 'addNewDocument',
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })).toBe(false)
   expect(isProjectHierarchyTreeNodeDraggable({
     children: [],
     childrenLoaded: true,
@@ -232,6 +254,8 @@ test('Test that evictCollapsedNodeChildren clears lazy-loaded document children'
     groupId: null,
     hasChildren: true,
     icon: 'mdi-account',
+    titlePluralTranslations: {},
+    titleSingularTranslations: {},
     id: 'placement-1',
     label: 'Heroes',
     nodeKind: 'templatePlacement' as const,
@@ -248,6 +272,7 @@ test('Test that needsProjectHierarchyTreeLazyLoadBeforeOpen is true only for unl
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([
     {
       color: '#ff0000',
+      colorPallete: '',
       displayName: 'World A',
       groups: [],
       id: 'world-1',
@@ -261,6 +286,8 @@ test('Test that needsProjectHierarchyTreeLazyLoadBeforeOpen is true only for unl
           icon: 'mdi-account',
           id: 'placement-1',
           nickname: '',
+          titlePluralTranslations: {},
+          titleSingularTranslations: {},
           rootSortOrder: 0,
           worldId: 'world-1'
         }
@@ -396,7 +423,9 @@ test('Test that patchHierarchyTreeSkeletonLabelsInPlace updates display labels',
       placements: [
         {
           ...sampleWorld.placements[0]!,
-          nickname: 'Renamed heroes'
+          nickname: 'Renamed heroes',
+          titlePluralTranslations: {},
+          titleSingularTranslations: {},
         },
         sampleWorld.placements[1]!
       ]
@@ -440,6 +469,8 @@ test('Test that projectHierarchyTreeDnD accepts drops on matching placement rows
     groupId: null,
     hasChildren: true,
     icon: 'mdi-account',
+    titlePluralTranslations: {},
+    titleSingularTranslations: {},
     id: 'placement-1',
     label: 'Heroes',
     nodeKind: 'templatePlacement' as const,
@@ -665,6 +696,81 @@ test('Test that projectHierarchyTreeDnD allows parent droppable without tree par
   expect(isProjectHierarchyTreeNodeDroppable(parentDocument, dragContext, tree)).toBe(true)
 })
 
+test('Test that projectHierarchyTreeDnD rejects add-new rows as drag sources and drop targets', () => {
+  const addNewNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: true,
+    documentId: null,
+    documentTemplateId: 'template-1',
+    groupId: null,
+    hasChildren: false,
+    icon: 'mdi-plus',
+    id: 'placement-1__add-new',
+    label: 'Add new character',
+    nodeKind: 'addNewDocument',
+    placementId: 'placement-1',
+    titlePluralTranslations: {},
+    titleSingularTranslations: {},
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  expect(isProjectHierarchyTreeNodeDraggable(addNewNode)).toBe(false)
+  expect(isProjectHierarchyTreeNodeDroppable(addNewNode, {
+    dragNode: {
+      data: {
+        children: [],
+        childrenLoaded: true,
+        documentId: 'doc-a',
+        groupId: null,
+        hasChildren: false,
+        icon: '',
+        id: 'doc-a',
+        label: 'Doc',
+        nodeKind: 'document',
+        placementId: 'placement-1',
+        worldColor: '#000',
+        worldId: 'world-1'
+      }
+    }
+  })).toBe(false)
+})
+
+test('Test that projectHierarchyTreeDnD rejects document targets that are not sibling rows', () => {
+  const placeholderDocument: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: false,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'doc-placeholder',
+    label: 'Loading',
+    nodeKind: 'document',
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const draggedDocument: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: true,
+    documentId: 'doc-a',
+    groupId: null,
+    hasChildren: false,
+    icon: '',
+    id: 'doc-a',
+    label: 'Doc',
+    nodeKind: 'document',
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  expect(isProjectHierarchyTreeNodeDroppable(placeholderDocument, {
+    dragNode: {
+      data: draggedDocument
+    }
+  })).toBe(false)
+})
+
 /**
  * resolvePlacementIdFromHeTreeNode returns null when placement id missing.
  */
@@ -720,7 +826,9 @@ test('Test that patchHierarchyTreeSkeletonLabelsInPlace patches grouped placemen
       placements: [
         {
           ...sampleWorld.placements[0]!,
-          nickname: 'Renamed heroes'
+          nickname: 'Renamed heroes',
+          titlePluralTranslations: {},
+          titleSingularTranslations: {},
         },
         sampleWorld.placements[1]!
       ]
@@ -746,7 +854,7 @@ test('Test that evictCollapsedNodeChildren no-ops for world and group nodes', ()
 })
 
 /**
- * applyPersistedProjectHierarchyTreeOpenNodeIds keeps descendants when only the world row is absent.
+ * applyPersistedProjectHierarchyTreeOpenNodeIds keeps descendants when a latent-expand ancestor row is absent.
  */
 test('Test that applyPersistedProjectHierarchyTreeOpenNodeIds keeps descendants under collapsed world', () => {
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
@@ -756,6 +864,23 @@ test('Test that applyPersistedProjectHierarchyTreeOpenNodeIds keeps descendants 
   expect(
     applyPersistedProjectHierarchyTreeOpenNodeIds(tree, ['world-1', 'placement-1'])
   ).toEqual(['world-1'])
+})
+
+test('Test that applyPersistedProjectHierarchyTreeOpenNodeIds keeps latent document ids under collapsed placement', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  expect(
+    applyPersistedProjectHierarchyTreeOpenNodeIds(tree, [
+      'world-1',
+      'group-1',
+      'doc-a',
+      'doc-b'
+    ])
+  ).toEqual([
+    'world-1',
+    'group-1',
+    'doc-a',
+    'doc-b'
+  ])
 })
 
 test('Test that applyPersistedProjectHierarchyTreeOpenNodeIds keeps latent document ids before lazy load', () => {
@@ -879,10 +1004,11 @@ test('Test that applyPersistedProjectHierarchyTreeOpenNodeIds drops ids with col
   ).toEqual([])
 })
 
-test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton omits lazy placeholders without children', () => {
+test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton always adds lazy placeholder on template placements', () => {
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([
     {
       color: '#000',
+      colorPallete: '',
       displayName: 'Solo world',
       groups: [],
       id: 'world-solo',
@@ -894,6 +1020,8 @@ test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton omits lazy placeholder
           groupSortOrder: null,
           hasChildren: false,
           icon: 'mdi-file',
+          titlePluralTranslations: {},
+          titleSingularTranslations: {},
           id: 'placement-solo',
           nickname: '',
           rootSortOrder: 0,
@@ -903,7 +1031,10 @@ test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton omits lazy placeholder
       sortOrder: 0
     }
   ])
-  expect(tree[0]?.children[0]?.children).toEqual([])
+  const placement = tree[0]?.children[0]
+  expect(placement?.hasChildren).toBe(true)
+  expect(placement?.children).toHaveLength(1)
+  expect(placement?.children[0]?.id).toBe('placement-solo__lazy')
 })
 
 /**
@@ -970,13 +1101,17 @@ test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton sorts grouped placemen
         ...sampleWorld.placements[0]!,
         groupSortOrder: 2,
         id: 'placement-late',
-        nickname: 'Late'
+        nickname: 'Late',
+        titlePluralTranslations: {},
+        titleSingularTranslations: {},
       },
       {
         ...sampleWorld.placements[0]!,
         groupSortOrder: 1,
         id: 'placement-early',
-        nickname: 'Early'
+        nickname: 'Early',
+        titlePluralTranslations: {},
+        titleSingularTranslations: {},
       }
     ]
   }
@@ -1031,6 +1166,7 @@ test('Test that isProjectHierarchyTreeRootDroppable rejects null drag nodes', ()
 test('Test that mapProjectHierarchyTreeToTopologyKey records root placement rows', () => {
   const world = {
     color: '#000',
+    colorPallete: '',
     displayName: 'Solo',
     groups: [],
     id: 'world-solo',
@@ -1088,6 +1224,7 @@ test('Test that resolveDefaultProjectHierarchyTreeExpandedNodeIds skips empty wo
   const expandedNodeIds = resolveDefaultProjectHierarchyTreeExpandedNodeIds([
     {
       color: '#000',
+      colorPallete: '',
       displayName: 'Empty',
       groups: [],
       id: 'world-empty',
@@ -1208,7 +1345,8 @@ test('Test that collectProjectHierarchyTreeDescendantIds walks nested children',
     'group-1',
     'placement-1',
     'placement-1__lazy',
-    'placement-2'
+    'placement-2',
+    'placement-2__lazy'
   ])
 })
 
@@ -1228,7 +1366,9 @@ test('Test that patchHierarchyTreeSkeletonLabelsInPlace syncs lazy children when
     }
   ])
   const placementNode = tree[0]?.children[0]?.children[0]
-  expect(placementNode?.children).toEqual([])
+  expect(placementNode?.hasChildren).toBe(true)
+  expect(placementNode?.children).toHaveLength(1)
+  expect(placementNode?.children[0]?.id).toBe('placement-1__lazy')
   patchHierarchyTreeSkeletonLabelsInPlace(tree, [sampleWorld])
   expect(placementNode?.hasChildren).toBe(true)
   expect(placementNode?.children).toHaveLength(1)
@@ -1236,9 +1376,9 @@ test('Test that patchHierarchyTreeSkeletonLabelsInPlace syncs lazy children when
 })
 
 /**
- * patchHierarchyTreeSkeletonLabelsInPlace clears lazy children when placement loses documents.
+ * patchHierarchyTreeSkeletonLabelsInPlace keeps template placements expandable when IPC hasChildren is false.
  */
-test('Test that patchHierarchyTreeSkeletonLabelsInPlace clears lazy children when hasChildren flips off', () => {
+test('Test that patchHierarchyTreeSkeletonLabelsInPlace keeps placement expandable when IPC hasChildren is false', () => {
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   const placementNode = tree[0]?.children[0]?.children[0]!
   expect(placementNode.children).toHaveLength(1)
@@ -1254,8 +1394,9 @@ test('Test that patchHierarchyTreeSkeletonLabelsInPlace clears lazy children whe
       ]
     }
   ])
-  expect(placementNode.hasChildren).toBe(false)
-  expect(placementNode.children).toEqual([])
+  expect(placementNode.hasChildren).toBe(true)
+  expect(placementNode.children).toHaveLength(1)
+  expect(placementNode.children[0]?.id).toBe('placement-1__lazy')
 })
 
 /**
@@ -1293,7 +1434,10 @@ test('Test that patchHierarchyTreeSkeletonLabelsInPlace keeps loaded children wh
       ]
     }
   ])
-  expect(placementNode.children).toEqual([loadedChild])
+  refreshProjectHierarchyTreeAddNewDocumentLabelsInTree(tree, 'en-US')
+  expect(placementNode.children).toHaveLength(2)
+  expect(placementNode.children[0]?.id).toBe('doc-1')
+  expect(placementNode.children[1]?.nodeKind).toBe('addNewDocument')
 })
 
 /**
@@ -1350,6 +1494,8 @@ test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton applies default placem
         groupSortOrder: null,
         hasChildren: false,
         icon: '',
+        titlePluralTranslations: {},
+        titleSingularTranslations: {},
         id: 'placement-empty',
         nickname: '',
         rootSortOrder: 0,
@@ -1381,6 +1527,28 @@ test('Test that mapHierarchyDocumentChildrenToTreeNodes copies placement icon on
     worldId: 'world-1'
   })
   expect(nodes[0]?.icon).toBe('mdi-account')
+})
+
+test('Test that mapHierarchyDocumentChildrenToTreeNodes copies document appearance colors', () => {
+  const nodes = mapHierarchyDocumentChildrenToTreeNodes({
+    items: [
+      {
+        displayName: 'Doc 1',
+        documentBackgroundColor: '#112233',
+        documentTextColor: '#aabbcc',
+        hasChildren: false,
+        id: 'doc-1',
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        sortOrder: 0
+      }
+    ],
+    placementIcon: 'mdi-account',
+    worldColor: '#000',
+    worldId: 'world-1'
+  })
+  expect(nodes[0]?.documentTextColor).toBe('#aabbcc')
+  expect(nodes[0]?.documentBackgroundColor).toBe('#112233')
 })
 
 test('Test that mapHierarchyDocumentChildrenToTreeNodes applies default icon when placement icon unset', () => {
@@ -1510,6 +1678,7 @@ test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton marks empty worlds wit
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([
     {
       color: '#000',
+      colorPallete: '',
       displayName: 'Empty',
       groups: [],
       id: 'world-empty',
@@ -1683,7 +1852,8 @@ test('Test that resolveProjectHierarchyTreeTreeNodeKindClass maps node kinds', (
   expect(resolveProjectHierarchyTreeTreeNodeKindClass('group')).toBe('projectHierarchyTree-treeNode--group')
   expect(resolveProjectHierarchyTreeTreeNodeKindClass('templatePlacement')).toBe('projectHierarchyTree-treeNode--documentTemplate')
   expect(resolveProjectHierarchyTreeTreeNodeKindClass('document')).toBe('projectHierarchyTree-treeNode--document')
-  expect(PROJECT_HIERARCHY_TREE_TREE_NODE_KIND_CLASS_LIST).toHaveLength(4)
+  expect(resolveProjectHierarchyTreeTreeNodeKindClass('addNewDocument')).toBe('projectHierarchyTree-treeNode--addNewDocument')
+  expect(PROJECT_HIERARCHY_TREE_TREE_NODE_KIND_CLASS_LIST).toHaveLength(5)
 })
 
 /**
@@ -1694,7 +1864,8 @@ test('Test that resolveProjectHierarchyTreeNodeRowKindClass maps node kinds', ()
   expect(resolveProjectHierarchyTreeNodeRowKindClass('group')).toBe('projectHierarchyTree__nodeRow--group')
   expect(resolveProjectHierarchyTreeNodeRowKindClass('templatePlacement')).toBe('projectHierarchyTree__nodeRow--documentTemplate')
   expect(resolveProjectHierarchyTreeNodeRowKindClass('document')).toBe('projectHierarchyTree__nodeRow--document')
-  expect(PROJECT_HIERARCHY_TREE_NODE_ROW_KIND_CLASS_LIST).toHaveLength(4)
+  expect(resolveProjectHierarchyTreeNodeRowKindClass('addNewDocument')).toBe('projectHierarchyTree__nodeRow--addNewDocument')
+  expect(PROJECT_HIERARCHY_TREE_NODE_ROW_KIND_CLASS_LIST).toHaveLength(5)
 })
 
 test('Test that findProjectHierarchyTreeDocumentsWithInvalidPlacementParent flags world-level documents', () => {
@@ -1755,6 +1926,8 @@ test('Test that findProjectHierarchyTreeDocumentsWithInvalidPlacementParent acce
     groupId: null,
     hasChildren: true,
     icon: '',
+    titlePluralTranslations: {},
+    titleSingularTranslations: {},
     id: 'placement-1',
     label: 'Placement',
     nodeKind: 'templatePlacement',

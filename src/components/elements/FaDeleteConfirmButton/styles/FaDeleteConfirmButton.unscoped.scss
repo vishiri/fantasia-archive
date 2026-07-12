@@ -1,27 +1,31 @@
+@use './variables' as *;
+@use '../../../dialogs/DialogProjectSettings/styles/variables' as dialogProjectSettings;
+
 .faDeleteConfirmButton__confirmMenu.q-menu {
   /* Teleported q-menu; stack above modal QDialog chrome (same band as FaColorPickerInput). */
-  min-width: $dialogProjectSettings-worldsDeleteConfirm-maxWidth;
-  z-index: $dialogProjectSettings-worldsDeleteConfirm-menu-zIndex !important;
+  min-width: dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-maxWidth;
+  z-index: dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-menu-zIndex !important;
 }
 
 .faDeleteConfirmButton__confirmMenu {
-  background-color: $dialogProjectSettings-worldsDeleteConfirm-backgroundColor;
-  max-width: $dialogProjectSettings-worldsDeleteConfirm-maxWidth;
+  background-color: dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-backgroundColor;
+  max-width: dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-maxWidth;
 }
 
 .faDeleteConfirmButton__confirmInner {
   padding:
-    $dialogProjectSettings-worldsDeleteConfirm-paddingY
-    $dialogProjectSettings-worldsDeleteConfirm-paddingX;
+    dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-paddingY
+    dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-paddingX;
 }
 
 .faDeleteConfirmButton__confirmMessage {
-  margin: 0 0 $dialogProjectSettings-worldsDeleteConfirm-message-marginBottom;
+  color: $faDeleteConfirmButton-confirmMessage-color;
+  margin: 0 0 dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-message-marginBottom;
 }
 
 .faDeleteConfirmButton__confirmActions {
   display: flex;
-  gap: $dialogProjectSettings-worldsDeleteConfirm-actions-gap;
+  gap: dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-actions-gap;
   justify-content: center;
 }
 
@@ -40,7 +44,7 @@
   display: flex;
   inset: 0;
   justify-content: center;
-  line-height: $dialogProjectSettings-worldsDeleteConfirm-countdown-lineHeight;
+  line-height: dialogProjectSettings.$dialogProjectSettings-worldsDeleteConfirm-countdown-lineHeight;
   pointer-events: none;
   position: absolute;
 }

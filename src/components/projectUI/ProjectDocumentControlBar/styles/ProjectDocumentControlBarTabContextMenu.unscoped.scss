@@ -2,11 +2,12 @@
 @use '../../../globals/AppControlMenus/styles/variables' as appControlMenus;
 @use '../../../globals/AppControlSingleMenu/styles/variables' as appControlSingleMenu;
 @use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
+@use '../../../../css/theme/quasar-components/qFocusable.variables' as *;
 
 .projectDocumentControlBarTabContextMenu__list {
   background-color: appControlMenus.$appControlMenus-bgColor;
   color: appControlMenus.$appControlMenus-color;
-  min-width: 220px;
+  min-width: $projectDocumentControlBar-tabContextMenu-listMinWidthPx;
 }
 
 /* Teleported q-menu; stack above app header (7000) and default Quasar menu layer. */
@@ -21,8 +22,9 @@
 
   .projectDocumentControlBarTabContextMenu__list {
     background-color: $projectDocumentControlBar-tabContextMenu-browseSubmenu-bgColor;
-    min-width: max-content;
-    width: max-content;
+    max-width: $projectDocumentControlBar-tabContextMenu-browseSubmenu-listMaxWidthPx;
+    min-width: $projectDocumentControlBar-tabContextMenu-listMinWidthPx;
+    width: 100%;
   }
 }
 
@@ -33,9 +35,26 @@
     min-height: appControlSingleMenu.$appControlSingleMenu-item-minHeight;
     padding: $qItem-padding;
 
-    &:hover:not([aria-disabled='true']),
-    &:focus:not([aria-disabled='true']) {
-      color: appControlMenus.$appControlMenus-singleHover;
+    &.projectDocumentControlBarTabContextMenu__item--browseActivator {
+      .projectDocumentControlBarTabContextMenu__primaryLabel,
+      .projectDocumentControlBarTabContextMenu__icon {
+        color: $projectDocumentControlBar-tabContextMenu-browseActivator-color;
+      }
+
+      &:hover:not([aria-disabled='true']),
+      &:focus:not([aria-disabled='true']) {
+        .projectDocumentControlBarTabContextMenu__primaryLabel,
+        .projectDocumentControlBarTabContextMenu__icon {
+          color: appControlMenus.$appControlMenus-singleHover;
+        }
+      }
+    }
+
+    &:not(.projectDocumentControlBarTabContextMenu__item--browseTab) {
+      &:hover:not([aria-disabled='true']),
+      &:focus:not([aria-disabled='true']) {
+        color: appControlMenus.$appControlMenus-singleHover;
+      }
     }
 
     &.text-secondary {
@@ -98,14 +117,75 @@
     overflow: visible;
   }
 
+  .projectDocumentControlBarTabContextMenu__item--browseTab .q-item__section--avatar {
+    align-items: center;
+    align-self: center;
+  }
+
+  .projectDocumentControlBarTabContextMenu__item--browseTab.q-item {
+    --projectDocumentControlBarTab-focusHelperColor: #{$qFocusable-hoverHelper-backgroundColor};
+
+    align-items: center;
+    padding-inline-start: calc(#{$projectDocumentControlBar-tabContextMenu-browseTab-paddingInlineStartBasePx} + #{$projectDocumentControlBar-tabContextMenu-browseTab-extraPaddingInlineStartPx});
+    position: relative;
+  }
+
+  .projectDocumentControlBarTabContextMenu__item--browseTab .projectDocumentControlBarTabContextMenu__primaryLabel {
+    overflow-wrap: anywhere;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .projectDocumentControlBarTabContextMenu__item--browseTab .q-item__section--main {
+    min-width: 0;
+  }
+
+  .projectDocumentControlBarTabContextMenu__item--browseTab.q-focusable:focus > .q-focus-helper,
+  .projectDocumentControlBarTabContextMenu__item--browseTab.q-hoverable:hover > .q-focus-helper {
+    background: var(--projectDocumentControlBarTab-focusHelperColor);
+    opacity: $qFocusable-hoverHelper-opacity !important;
+
+    &::after,
+    &::before {
+      opacity: 0 !important;
+    }
+  }
+
+  .projectDocumentControlBarTabContextMenu__item--browseTabActive:not(.projectDocumentControlBarTabContextMenu__item--browseTabCustomAppearance) {
+    .projectDocumentControlBarTabContextMenu__primaryLabel,
+    .projectDocumentControlBarTabContextMenu__browseTabIcon {
+      color: $projectDocumentControlBar-tabContextMenu-browseTabActive-color;
+    }
+  }
+
+  .projectDocumentControlBarTabContextMenu__item--browseTabCustomAppearance {
+    .projectDocumentControlBarTabContextMenu__primaryLabel,
+    .projectDocumentControlBarTabContextMenu__browseTabIcon {
+      color: var(--projectDocumentControlBarTab-textColor);
+    }
+  }
+
+  .projectDocumentControlBarTabContextMenu__browseTabWorldIndicator {
+    font-size: $projectDocumentControlBar-tabContextMenu-browseTabWorldIndicator-fontSize;
+    left: $projectDocumentControlBar-tabContextMenu-browseTabWorldIndicator-offsetLeft;
+    line-height: 1;
+    pointer-events: none;
+    position: absolute;
+    top: $projectDocumentControlBar-tabContextMenu-browseTabWorldIndicator-offsetTop;
+    z-index: 1;
+  }
+
   .projectDocumentControlBarTabContextMenu__browseTabTrailingIcons {
+    align-items: center;
+    display: flex;
+    justify-content: center;
     overflow: visible;
     width: $projectDocumentControlBar-tabContextMenu-browseTabTrailingIcons-width;
   }
 
   .projectDocumentControlBarTabContextMenu__browseTabUnsavedIcon.q-icon {
     height: $projectDocumentControlBar-tabAlertIcon-fontSize;
-    left: calc(#{$iconSize} + #{$projectDocumentControlBar-tabContextMenu-browseTabUnsavedIcon-gapPx});
+    left: calc(#{$iconSize} + #{$projectDocumentControlBar-tabContextMenu-browseTabUnsavedIcon-gapPx} + #{$projectDocumentControlBar-tabContextMenu-browseTabUnsavedIcon-extraOffsetRightPx});
     width: $projectDocumentControlBar-tabAlertIcon-fontSize;
   }
 }
@@ -117,7 +197,7 @@
 .projectDocumentControlBarTabContextMenu__keybindText {
   font-size: appControlSingleMenu.$appControlSingleMenu-keybindText-fontSize;
   font-weight: 600;
-  margin-top: 2px;
+  margin-top: $projectDocumentControlBar-tabContextMenu-keybindText-marginTopPx;
   text-shadow: none;
 }
 

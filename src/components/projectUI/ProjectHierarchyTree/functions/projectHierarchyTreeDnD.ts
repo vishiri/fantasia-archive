@@ -65,6 +65,9 @@ export function resolveProjectHierarchyTreeDragContext (
 export function isProjectHierarchyTreeNodeDraggable (
   node: I_faProjectHierarchyTreeHeTreeNode
 ): boolean {
+  if (node.nodeKind === 'addNewDocument') {
+    return false
+  }
   return isProjectHierarchyTreeDocumentSiblingRow(node)
 }
 
@@ -100,6 +103,9 @@ export function isProjectHierarchyTreeNodeDroppable (
   dragContext: T_heTreeDragContext,
   _treeNodes: I_faProjectHierarchyTreeHeTreeNode[] = []
 ): boolean {
+  if (targetNode.nodeKind === 'addNewDocument') {
+    return false
+  }
   const dragged = readDraggedDocumentNode(dragContext)
   if (dragged === null) {
     return true

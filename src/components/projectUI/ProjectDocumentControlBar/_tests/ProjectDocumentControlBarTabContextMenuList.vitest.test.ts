@@ -2,7 +2,8 @@ import { expect, test } from 'vitest'
 
 import {
   createProjectDocumentControlBarTabContextMenuListHandlers,
-  mountProjectDocumentControlBarTabContextMenuList
+  mountProjectDocumentControlBarTabContextMenuList,
+  projectDocumentControlBarTabContextMenuSampleTab
 } from './projectDocumentControlBarTabContextMenuListVitestMount'
 
 test('Test that ProjectDocumentControlBarTabContextMenuList renders browse tabs and keybind hints', () => {
@@ -52,6 +53,27 @@ test('Test that ProjectDocumentControlBarTabContextMenuList delegates row and su
   expect(handlers.onForceCloseAllTabsExceptThisOneClick).toHaveBeenCalled()
   expect(handlers.onForceCloseAllTabsClick).toHaveBeenCalled()
   expect(handlers.onDeleteThisDocumentClick).toHaveBeenCalled()
+
+  wrapper.unmount()
+})
+
+test('Test that ProjectDocumentControlBarTabContextMenuList applies browse tab appearance chrome and world indicators', () => {
+  const coloredTab = {
+    ...projectDocumentControlBarTabContextMenuSampleTab,
+    documentBackgroundColorDraft: '#112233',
+    documentTextColorDraft: '#aabbcc'
+  }
+  const wrapper = mountProjectDocumentControlBarTabContextMenuList({
+    openedDocumentTabs: [coloredTab],
+    resolveTabWorldIndicatorColor: () => '#ff00ff',
+    showWorldTabIndicators: true
+  })
+
+  const browseTab = wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-browseTab"]')
+  expect(browseTab.classes()).toContain('projectDocumentControlBarTabContextMenu__item--browseTabCustomAppearance')
+  expect(browseTab.attributes('style')).toContain('background-color: #112233')
+  expect(browseTab.attributes('style')).toContain('--projectDocumentControlBarTab-textColor: #aabbcc')
+  expect(wrapper.find('[data-test-locator="projectDocumentControlBar-tabWorldIndicator-doc-1"]').exists()).toBe(true)
 
   wrapper.unmount()
 })

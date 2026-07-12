@@ -8,6 +8,7 @@ import { projectHierarchyTreeLayoutStructureMatchesTree } from '../projectHierar
 
 const sampleWorld = {
   color: '#ff0000',
+  colorPallete: '',
   displayName: 'World A',
   groups: [
     {
@@ -27,6 +28,8 @@ const sampleWorld = {
       groupSortOrder: 0,
       hasChildren: true,
       icon: 'mdi-account',
+      titlePluralTranslations: {},
+      titleSingularTranslations: {},
       id: 'placement-1',
       nickname: 'Heroes',
       rootSortOrder: null,

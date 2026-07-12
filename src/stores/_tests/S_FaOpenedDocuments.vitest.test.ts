@@ -41,6 +41,10 @@ const baseTab: I_faOpenedDocumentTab = {
   templateIcon: 'mdi-account',
   displayNameDraft: 'Hero',
   savedDisplayName: 'Hero',
+  documentTextColorDraft: '',
+  savedDocumentTextColor: '',
+  documentBackgroundColorDraft: '',
+  savedDocumentBackgroundColor: '',
   hasUnsavedChanges: false,
   editState: false
 }
@@ -538,16 +542,88 @@ test('Test that S_FaOpenedDocuments createTemporaryDocument appends a temporary 
   const tempTab = store.tabs.find((tab) => tab.documentId === documentId)
   expect(tempTab?.persistenceState).toBe('temporary')
   expect(tempTab?.editState).toBe(true)
+  expect(tempTab?.hasUnsavedChanges).toBe(false)
+  expect(tempTab?.savedDisplayName).toBe('Aria')
   expect(store.activeDocumentId).toBe(documentId)
   expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith(documentId)
 })
 
+test('Test that S_FaOpenedDocuments createTemporaryDocument closes without discard when unchanged', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'Aria',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+
+  store.requestCloseTab(documentId)
+  await vi.runAllTimersAsync()
+
+  expect(store.pendingCloseDocumentId).toBeNull()
+  expect(store.tabs.some((tab) => tab.documentId === documentId)).toBe(false)
+})
+
+test('Test that S_FaOpenedDocuments createTemporaryDocument defers close after draft edits', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'Aria',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  store.updateDisplayNameDraft(documentId, 'Renamed Aria')
+
+  store.requestCloseTab(documentId)
+
+  expect(store.pendingCloseDocumentId).toBe(documentId)
+})
+
 test('Test that S_FaOpenedDocuments saveDocumentDisplayName promotes a temporary tab', async () => {
+  const refreshHierarchyTreeNodesMock = vi.fn()
   const refreshDocumentsInTreeMock = vi.fn()
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
   const store = S_FaOpenedDocuments()
-  S_FaProjectHierarchyTree().refreshDocumentsInTree = refreshDocumentsInTreeMock
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  hierarchyStore.refreshHierarchyTreeNodes = refreshHierarchyTreeNodesMock
+  hierarchyStore.refreshDocumentsInTree = refreshDocumentsInTreeMock
+  hierarchyStore.treeData = [
+    {
+      children: [
+        {
+          children: [],
+          childrenLoaded: true,
+          documentId: null,
+          documentTemplateId: 'tpl-1',
+          groupId: null,
+          hasChildren: true,
+          icon: 'mdi-home',
+          id: 'placement-1',
+          label: 'Characters',
+          nodeKind: 'templatePlacement',
+          placementId: 'placement-1',
+          worldColor: '#ff0000',
+          worldId: 'world-1'
+        }
+      ],
+      childrenLoaded: true,
+      documentId: null,
+      groupId: null,
+      hasChildren: true,
+      icon: 'mdi-earth',
+      id: 'world-1',
+      label: 'World',
+      nodeKind: 'world',
+      placementId: null,
+      worldColor: '#ff0000',
+      worldId: 'world-1'
+    }
+  ]
   await store.hydrateFromProjectDatabase()
 
   const documentId = await store.createTemporaryDocument({
@@ -563,12 +639,15 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName promotes a temporary
   expect(savedTab?.persistenceState).toBe('persisted')
   expect(createDocumentMock).toHaveBeenCalledWith({
     displayName: 'Aria',
+    documentBackgroundColor: null,
+    documentTextColor: null,
     id: documentId,
     parentDocumentId: null,
     templateId: 'tpl-1',
     worldId: 'world-1'
   })
-  expect(refreshDocumentsInTreeMock).toHaveBeenCalledWith([documentId])
+  expect(refreshHierarchyTreeNodesMock).toHaveBeenCalledWith(['placement-1'])
+  expect(refreshDocumentsInTreeMock).not.toHaveBeenCalled()
 })
 
 test('Test that S_FaOpenedDocuments saveDocumentDisplayName remaps tab id when create substitutes', async () => {
@@ -607,6 +686,10 @@ test('Test that S_FaOpenedDocuments hydrates temporary tabs from snapshot', asyn
       parentDocumentId: null,
       persistenceState: 'temporary',
       savedDisplayName: '',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account',
       templateId: 'tpl-1',
@@ -765,6 +848,10 @@ test('Test that S_FaOpenedDocuments hydrate drops temporary tabs when world look
       parentDocumentId: null,
       persistenceState: 'temporary',
       savedDisplayName: '',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account',
       templateId: 'tpl-1',
@@ -1332,4 +1419,104 @@ test('Test that S_FaOpenedDocuments syncActiveDocumentIdFromWorkspaceRoute no-op
 
   expect(store.activeDocumentId).toBe('doc-1')
   expect(saveOpenedDocumentsSnapshotMock).not.toHaveBeenCalled()
+})
+
+test('Test that S_FaOpenedDocuments updateDocumentTextColorDraft marks tabs dirty', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  store.updateDocumentTextColorDraft('doc-1', '#AABBCC')
+
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.documentTextColorDraft).toBe('#AABBCC')
+  expect(tab?.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that S_FaOpenedDocuments updateDocumentBackgroundColorDraft marks tabs dirty', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  store.updateDocumentBackgroundColorDraft('doc-1', '#112233')
+
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.documentBackgroundColorDraft).toBe('#112233')
+  expect(tab?.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName persists appearance color drafts', async () => {
+  updateDocumentMock.mockResolvedValueOnce({
+    displayName: 'Saved Hero',
+    documentBackgroundColor: '#112233',
+    documentTextColor: '#AABBCC',
+    id: 'doc-1'
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.updateDocumentTextColorDraft('doc-1', '#aabbcc')
+  store.updateDocumentBackgroundColorDraft('doc-1', ' #112233 ')
+
+  await store.saveDocumentDisplayName('doc-1', { keepEditMode: false })
+  await vi.runAllTimersAsync()
+
+  expect(updateDocumentMock).toHaveBeenCalledWith('doc-1', {
+    displayName: 'Hero',
+    documentBackgroundColor: '#112233',
+    documentTextColor: '#AABBCC'
+  })
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.savedDocumentTextColor).toBe('#AABBCC')
+  expect(tab?.savedDocumentBackgroundColor).toBe('#112233')
+  expect(tab?.hasUnsavedChanges).toBe(false)
+})
+
+test('Test that S_FaOpenedDocuments hydrate reconciles appearance colors from project database', async () => {
+  getDocumentByIdMock.mockResolvedValueOnce({
+    displayName: 'Hero',
+    documentBackgroundColor: '#112233',
+    documentTextColor: '#AABBCC',
+    id: 'doc-1',
+    worldId: 'world-1'
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.savedDocumentTextColor).toBe('#AABBCC')
+  expect(tab?.savedDocumentBackgroundColor).toBe('#112233')
+  expect(tab?.documentTextColorDraft).toBe('#AABBCC')
+  expect(tab?.documentBackgroundColorDraft).toBe('#112233')
+})
+
+test('Test that S_FaOpenedDocuments requestCloseTab no-ops when tab row is missing', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [undefined as unknown as I_faOpenedDocumentTab]
+  })
+
+  store.requestCloseTab('doc-1')
+
+  expect(store.pendingCloseDocumentId).toBeNull()
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName rejects temporary tabs missing placement metadata', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'temp-1',
+    tabs: [{
+      ...baseTab,
+      documentId: 'temp-1',
+      persistenceState: 'temporary',
+      templateId: undefined,
+      worldId: undefined
+    }]
+  })
+
+  await expect(store.saveDocumentDisplayName('temp-1', { keepEditMode: false })).rejects.toThrow()
 })

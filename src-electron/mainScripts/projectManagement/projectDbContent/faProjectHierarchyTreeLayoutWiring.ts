@@ -1,6 +1,8 @@
 import type Database from 'better-sqlite3'
 
 import { mapFaProjectWorldRow } from '../faProjectContentRowMap_manager'
+import { parseFaProjectDocumentTemplateTitleSingularTranslationsJson } from 'app/src-electron/shared/faProjectDocumentTemplateTitleSingularTranslationsSchema'
+import { parseFaProjectDocumentTemplateTitleTranslationsJson } from 'app/src-electron/shared/faProjectDocumentTemplateTitleTranslationsSchema'
 import {
   FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
@@ -16,20 +18,6 @@ import type {
   I_faSqlWorldTemplateGroupRow,
   I_faSqlWorldTemplatePlacementJoinRow
 } from 'app/types/I_faProjectContentRowMap'
-
-function readFaProjectPlacementHasTopLevelDocuments (
-  db: Database,
-  placementId: string
-): boolean {
-  const row = db
-    .prepare(
-      `SELECT 1 AS ok FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-        `WHERE ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} = ? AND ` +
-        `${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} IS NULL LIMIT 1`
-    )
-    .get(placementId) as { ok: number } | undefined
-  return row !== undefined
-}
 
 function readFaProjectGroupHasPlacements (
   db: Database,
@@ -74,7 +62,8 @@ export function listFaProjectWorkspaceHierarchyLayout (
         'SELECT p.id, p.world_id, p.document_template_id, p.group_id, p.root_sort_order, ' +
           'p.group_sort_order, p.nickname, p.nickname_translations_json, ' +
           'p.nickname_singular_translations_json, p.created_at_ms, p.updated_at_ms, ' +
-          't.display_name, t.world_appendix, t.icon ' +
+          't.display_name, t.world_appendix, t.icon, t.title_translations_json, ' +
+          't.title_singular_translations_json ' +
           `FROM ${FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS} p ` +
           `INNER JOIN ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES} t ON t.id = p.document_template_id ` +
           'WHERE p.world_id = ? ' +
@@ -87,6 +76,7 @@ export function listFaProjectWorkspaceHierarchyLayout (
       displayName: world.displayName,
       sortOrder: world.sortOrder,
       color: world.color,
+      colorPallete: world.colorPallete,
       groups: groupRows.map((groupRow) => ({
         id: groupRow.id,
         worldId: groupRow.world_id,
@@ -104,7 +94,13 @@ export function listFaProjectWorkspaceHierarchyLayout (
         displayName: placementRow.display_name,
         nickname: placementRow.nickname,
         icon: placementRow.icon,
-        hasChildren: readFaProjectPlacementHasTopLevelDocuments(db, placementRow.id)
+        hasChildren: true,
+        titlePluralTranslations: parseFaProjectDocumentTemplateTitleTranslationsJson(
+          placementRow.title_translations_json
+        ),
+        titleSingularTranslations: parseFaProjectDocumentTemplateTitleSingularTranslationsJson(
+          placementRow.title_singular_translations_json
+        )
       }))
     }
   })

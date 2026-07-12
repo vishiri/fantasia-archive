@@ -76,6 +76,8 @@ export default {
       placementNicknameHoverOriginalNameLabel: "Nom d'origine",
       placementNicknameHoverNicknameLabel: 'Surnom',
       removeGroupTooltip: 'Supprimer le groupe',
+      removeTemplateDisabledHasDocuments:
+        'Supprimez tous les documents connectés à ce modèle avant de le retirer.',
       removeTemplateTooltip: 'Supprimer le modèle de document',
       templateCanonicalNameLabel: 'Nom du modèle de document',
       templateCanonicalNameTooltip: "Pour renommer correctement un modèle de document entier, veuillez vous rendre dans la section « Modèles de documents » de cette boîte de dialogue de modification et l'ajuster là-bas.",

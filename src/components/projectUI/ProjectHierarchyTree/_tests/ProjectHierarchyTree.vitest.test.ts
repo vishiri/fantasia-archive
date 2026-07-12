@@ -7,6 +7,7 @@ import ProjectHierarchyTree from '../ProjectHierarchyTree.vue'
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 const treeHandlers = vi.hoisted(() => ({
+  onAddNewDocumentRowContextMenu: vi.fn(),
   onBeforeDragStart: vi.fn(),
   onDocumentRowAuxClick: vi.fn(),
   onNodeClick: vi.fn(),
@@ -56,6 +57,7 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
         isTreeDragActive: ref(false),
         onBeforeDragOpen: vi.fn(),
         onBeforeDragStart: treeHandlers.onBeforeDragStart,
+        onAddNewDocumentRowContextMenu: treeHandlers.onAddNewDocumentRowContextMenu,
         onDocumentRowAuxClick: treeHandlers.onDocumentRowAuxClick,
         onNodeClick: treeHandlers.onNodeClick,
         onNodeClose: treeHandlers.onNodeClose,
@@ -295,6 +297,55 @@ test('Test that ProjectHierarchyTree omits open icon for leaf document rows', ()
     }
   })
   expect(wrapper.find('[data-test-locator="projectHierarchyTree-openIcon"]').exists()).toBe(false)
+  wrapper.unmount()
+  treeData.value = [{
+    children: [],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'world-1',
+    label: 'World 1',
+    nodeKind: 'world',
+    placementId: null,
+    worldColor: '#000',
+    worldId: 'world-1'
+  }]
+})
+
+test('Test that ProjectHierarchyTree wires add-new context menu handler on add-new rows', async () => {
+  treeData.value = [{
+    children: [],
+    childrenLoaded: true,
+    documentId: null,
+    documentTemplateId: 'template-1',
+    groupId: null,
+    hasChildren: false,
+    icon: 'mdi-plus',
+    id: 'placement-1__add-new',
+    label: 'Add new character',
+    nodeKind: 'addNewDocument',
+    placementId: 'placement-1',
+    titlePluralTranslations: { 'en-US': 'Characters' },
+    titleSingularTranslations: { 'en-US': 'Character' },
+    worldColor: '#336699',
+    worldId: 'world-1'
+  }]
+  const wrapper = mount(ProjectHierarchyTree, {
+    global: {
+      stubs: {
+        ProjectHierarchyTreeNode: {
+          props: ['node', 'stat'],
+          template: '<div data-test-locator="projectHierarchyTree-node-stub" />'
+        },
+        QIcon: true
+      }
+    }
+  })
+  const row = wrapper.get('.projectHierarchyTree__nodeRow')
+  await row.trigger('contextmenu')
+  expect(treeHandlers.onAddNewDocumentRowContextMenu).toHaveBeenCalled()
   wrapper.unmount()
   treeData.value = [{
     children: [],

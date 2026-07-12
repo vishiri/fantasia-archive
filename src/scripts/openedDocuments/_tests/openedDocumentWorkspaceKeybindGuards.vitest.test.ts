@@ -16,6 +16,10 @@ const previewTab: I_faOpenedDocumentTab = {
   templateIcon: 'mdi-feather',
   displayNameDraft: 'Draft',
   savedDisplayName: 'Saved',
+  documentTextColorDraft: '',
+  savedDocumentTextColor: '',
+  documentBackgroundColorDraft: '',
+  savedDocumentBackgroundColor: '',
   hasUnsavedChanges: false,
   editState: false
 }

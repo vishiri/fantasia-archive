@@ -90,6 +90,8 @@ export function mapFaProjectDocumentRow (row: I_faSqlProjectDocumentRow): I_faPr
     parentDocumentId: row.tree_parent_document_id,
     sortOrder: row.tree_custom_sort_order,
     displayName: row.display_name,
+    documentTextColor: row.document_text_color,
+    documentBackgroundColor: row.document_background_color,
     createdAtMs: row.created_at_ms,
     updatedAtMs: row.updated_at_ms
   }

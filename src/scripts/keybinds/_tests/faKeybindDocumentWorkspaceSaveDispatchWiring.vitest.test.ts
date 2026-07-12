@@ -10,6 +10,10 @@ const keybindSaveSession = vi.hoisted(() => ({
       templateIcon: 'mdi-feather',
       displayNameDraft: 'One',
       savedDisplayName: 'One',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       hasUnsavedChanges: true,
       editState: true
     }
@@ -42,6 +46,10 @@ beforeEach(() => {
     templateIcon: 'mdi-feather',
     displayNameDraft: 'One',
     savedDisplayName: 'One',
+    documentTextColorDraft: '',
+    savedDocumentTextColor: '',
+    documentBackgroundColorDraft: '',
+    savedDocumentBackgroundColor: '',
     hasUnsavedChanges: true,
     editState: true
   }

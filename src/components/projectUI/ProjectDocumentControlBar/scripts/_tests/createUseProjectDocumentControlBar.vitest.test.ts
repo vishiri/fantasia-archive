@@ -23,17 +23,23 @@ type T_tabSeedRow = {
   documentId: string
   persistenceState: 'persisted'
   displayNameDraft: string
+  documentBackgroundColorDraft?: string
+  documentTextColorDraft?: string
   editState: boolean
   hasUnsavedChanges: boolean
   savedDisplayName: string
+  savedDocumentBackgroundColor?: string
+  savedDocumentTextColor?: string
   tabLabel: string
   templateIcon: string
+  worldId?: string
 }
 
 function mountUseProjectDocumentControlBar (input: {
   disableDocumentControlBar: boolean
   documentWorkspaceRoute?: boolean
   enterDocumentEditMode?: (documentId: string) => void
+  projectWorlds?: Array<{ color: string, colorPallete?: string, displayName: string, id: string }>
   requestCloseTab?: (documentId: string) => void
   requestDeleteDocument?: (documentId: string) => void
   runFaAction?: (id: string, payload: unknown) => void
@@ -43,6 +49,7 @@ function mountUseProjectDocumentControlBar (input: {
 }) {
   const settings = ref({ disableDocumentControlBar: input.disableDocumentControlBar })
   const tabs = ref(input.tabSeed ?? [])
+  const worlds = ref(input.projectWorlds ?? [])
   const activeDocumentId = ref<string | null>(input.tabSeed?.[0]?.documentId ?? null)
   const routePath = ref(
     input.documentWorkspaceRoute === false ? '/home' : '/home/document/doc-a'
@@ -86,6 +93,7 @@ function mountUseProjectDocumentControlBar (input: {
       requestCloseTab: input.requestCloseTab ?? (() => undefined)
     }) as never,
     runFaAction: input.runFaAction ?? vi.fn(),
+    S_FaProjectHierarchyTree: () => ({}) as never,
     S_FaUserSettings: () => ({}) as never,
     storeToRefs: (store: unknown) => {
       if (store === undefined) {
@@ -94,7 +102,8 @@ function mountUseProjectDocumentControlBar (input: {
       return {
         activeDocumentId,
         settings,
-        tabs
+        tabs,
+        worlds
       } as never
     },
     useRoute: () => ({
@@ -125,6 +134,10 @@ test('Test that createUseProjectDocumentControlBar keeps header tabs visible whe
       hasUnsavedChanges: false,
       editState: false,
       savedDisplayName: 'A',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -151,11 +164,16 @@ test('Test that activeDocumentTabName mirrors the store active document when tha
       hasUnsavedChanges: false,
       editState: false,
       savedDisplayName: 'A',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }
   ])
   const activeDocumentId = ref<string | null>('doc-a')
+  const worlds = ref([])
   const api = createUseProjectDocumentControlBar({
     assembleProjectDocumentControlBarApi,
     buildProjectDocumentControlBarAssembleInput,
@@ -189,6 +207,7 @@ test('Test that activeDocumentTabName mirrors the store active document when tha
       moveDocumentTab: () => undefined,
       requestCloseTab: () => undefined
     }) as never,
+    S_FaProjectHierarchyTree: () => ({}) as never,
     S_FaUserSettings: () => ({}) as never,
     storeToRefs: (store: unknown) => {
       if (store === undefined) {
@@ -197,7 +216,8 @@ test('Test that activeDocumentTabName mirrors the store active document when tha
       return {
         activeDocumentId,
         settings,
-        tabs
+        tabs,
+        worlds
       } as never
     },
     useRoute: () => ({
@@ -221,6 +241,10 @@ test('Test that createUseProjectDocumentControlBar exposes edit and save button 
       editState: false,
       hasUnsavedChanges: false,
       savedDisplayName: 'A',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -241,6 +265,10 @@ test('Test that createUseProjectDocumentControlBar shows delete button in edit m
       editState: true,
       hasUnsavedChanges: false,
       savedDisplayName: 'A',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -261,6 +289,10 @@ test('Test that onDeleteCurrentDocumentClick delegates to requestDeleteDocument'
       editState: false,
       hasUnsavedChanges: false,
       savedDisplayName: 'A',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -268,6 +300,65 @@ test('Test that onDeleteCurrentDocumentClick delegates to requestDeleteDocument'
 
   api.onDeleteCurrentDocumentClick()
   expect(requestDeleteDocument).toHaveBeenCalledWith('doc-a')
+})
+
+test('Test that onDeleteCurrentDocumentClick no-ops without an active document', () => {
+  const requestDeleteDocument = vi.fn()
+  const api = mountUseProjectDocumentControlBar({
+    disableDocumentControlBar: false,
+    documentWorkspaceRoute: false,
+    requestDeleteDocument,
+    tabSeed: []
+  })
+
+  api.onDeleteCurrentDocumentClick()
+
+  expect(requestDeleteDocument).not.toHaveBeenCalled()
+})
+
+test('Test that onEnterEditModeClick no-ops without an active document', () => {
+  const enterDocumentEditMode = vi.fn()
+  const api = mountUseProjectDocumentControlBar({
+    disableDocumentControlBar: false,
+    documentWorkspaceRoute: false,
+    enterDocumentEditMode,
+    tabSeed: []
+  })
+
+  api.onEnterEditModeClick()
+
+  expect(enterDocumentEditMode).not.toHaveBeenCalled()
+})
+
+test('Test that resolveDocumentTabAppearanceChrome and inline style delegate to tab appearance wiring', () => {
+  const api = mountUseProjectDocumentControlBar({
+    disableDocumentControlBar: false,
+    tabSeed: [{
+      documentId: 'doc-a',
+      persistenceState: 'persisted',
+      displayNameDraft: 'A',
+      documentBackgroundColorDraft: '#112233',
+      documentTextColorDraft: '#aabbcc',
+      editState: false,
+      hasUnsavedChanges: false,
+      savedDisplayName: 'A',
+      savedDocumentBackgroundColor: '',
+      savedDocumentTextColor: '',
+      tabLabel: 'Character',
+      templateIcon: 'mdi-account'
+    }]
+  })
+
+  const tab = api.openedDocumentTabs.value[0]!
+  expect(api.resolveDocumentTabAppearanceChrome(tab)).toEqual({
+    backgroundColor: '#112233',
+    color: '#aabbcc'
+  })
+  expect(api.resolveDocumentTabInlineStyle(tab)).toEqual({
+    '--projectDocumentControlBarTab-focusHelperColor': '#112233',
+    '--projectDocumentControlBarTab-textColor': '#aabbcc',
+    backgroundColor: '#112233'
+  })
 })
 
 test('Test that saveDocumentButtonColor reflects active tab unsaved state in edit mode', () => {
@@ -280,6 +371,10 @@ test('Test that saveDocumentButtonColor reflects active tab unsaved state in edi
       editState: true,
       hasUnsavedChanges: true,
       savedDisplayName: 'Saved',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -303,6 +398,10 @@ test('Test that onEnterEditModeClick delegates to the opened documents store', (
       editState: false,
       hasUnsavedChanges: false,
       savedDisplayName: 'A',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -354,6 +453,10 @@ test('Test that onSaveDocumentClick enqueues saveOpenedDocumentDisplayName with 
       editState: true,
       hasUnsavedChanges: true,
       savedDisplayName: 'A',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -385,11 +488,16 @@ test('Test that edit and save handlers no-op when no active document is selected
       editState: false,
       hasUnsavedChanges: false,
       savedDisplayName: 'A',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }
   ])
   const activeDocumentId = ref<string | null>(null)
+  const worlds = ref([])
   const api = createUseProjectDocumentControlBar({
     assembleProjectDocumentControlBarApi,
     buildProjectDocumentControlBarAssembleInput,
@@ -423,6 +531,7 @@ test('Test that edit and save handlers no-op when no active document is selected
       moveDocumentTab: () => undefined,
       requestCloseTab: () => undefined
     }) as never,
+    S_FaProjectHierarchyTree: () => ({}) as never,
     S_FaUserSettings: () => ({}) as never,
     storeToRefs: (store: unknown) => {
       if (store === undefined) {
@@ -431,7 +540,8 @@ test('Test that edit and save handlers no-op when no active document is selected
       return {
         activeDocumentId,
         settings,
-        tabs
+        tabs,
+        worlds
       } as never
     },
     useRoute: () => ({
@@ -459,6 +569,10 @@ test('Test that tab label and route helpers delegate to opened tab data', () => 
       editState: false,
       hasUnsavedChanges: false,
       savedDisplayName: 'A',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -472,6 +586,10 @@ test('Test that tab label and route helpers delegate to opened tab data', () => 
     editState: false,
     hasUnsavedChanges: false,
     savedDisplayName: 'A',
+    documentTextColorDraft: '',
+    savedDocumentTextColor: '',
+    documentBackgroundColorDraft: '',
+    savedDocumentBackgroundColor: '',
     tabLabel: 'Character',
     templateIcon: 'mdi-account'
   })).toBe('Draft')
@@ -489,11 +607,16 @@ test('Test that activeDocumentTab is null when the active id does not match an o
       editState: false,
       hasUnsavedChanges: false,
       savedDisplayName: 'A',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }
   ])
   const activeDocumentId = ref<string | null>('doc-missing')
+  const worlds = ref([])
   const api = createUseProjectDocumentControlBar({
     assembleProjectDocumentControlBarApi,
     buildProjectDocumentControlBarAssembleInput,
@@ -527,6 +650,7 @@ test('Test that activeDocumentTab is null when the active id does not match an o
       moveDocumentTab: () => undefined,
       requestCloseTab: () => undefined
     }) as never,
+    S_FaProjectHierarchyTree: () => ({}) as never,
     S_FaUserSettings: () => ({}) as never,
     storeToRefs: (store: unknown) => {
       if (store === undefined) {
@@ -535,7 +659,8 @@ test('Test that activeDocumentTab is null when the active id does not match an o
       return {
         activeDocumentId,
         settings,
-        tabs
+        tabs,
+        worlds
       } as never
     },
     useRoute: () => ({
@@ -604,11 +729,13 @@ test('Test that createUseProjectDocumentControlBar exposes keybind tooltip label
       moveDocumentTab: () => undefined,
       requestCloseTab: () => undefined
     }) as never,
+    S_FaProjectHierarchyTree: () => ({}) as never,
     S_FaUserSettings: () => ({}) as never,
     storeToRefs: () => ({
       activeDocumentId: ref(null),
       settings: ref({ disableDocumentControlBar: false }),
-      tabs: ref([])
+      tabs: ref([]),
+      worlds: ref([])
     }) as never,
     useRoute: () => ({
       path: '/home/document/doc-a'
@@ -664,6 +791,10 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
               editState: false,
               hasUnsavedChanges: false,
               savedDisplayName: 'A',
+              documentTextColorDraft: '',
+              savedDocumentTextColor: '',
+              documentBackgroundColorDraft: '',
+              savedDocumentBackgroundColor: '',
               tabLabel: 'Character',
               templateIcon: 'mdi-account'
             }
@@ -677,8 +808,14 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
       moveDocumentTab,
       requestCloseTab: vi.fn()
     }) as never,
+    S_FaProjectHierarchyTree: () => ({ __faHierarchyTree: true }) as never,
     S_FaUserSettings: () => ({} as never),
     storeToRefs: ((store: unknown) => {
+      if (store !== null && typeof store === 'object' && '__faHierarchyTree' in store) {
+        return {
+          worlds: ref([])
+        } as never
+      }
       if (store !== null && typeof store === 'object' && 'closeAllTabsWithoutChanges' in store) {
         return {
           activeDocumentId: ref('doc-a'),
@@ -689,6 +826,10 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
             editState: false,
             hasUnsavedChanges: false,
             savedDisplayName: 'A',
+            documentTextColorDraft: '',
+            savedDocumentTextColor: '',
+            documentBackgroundColorDraft: '',
+            savedDocumentBackgroundColor: '',
             tabLabel: 'Character',
             templateIcon: 'mdi-account'
           }])
@@ -730,6 +871,10 @@ test('Test that createUseProjectDocumentControlBar tab copy and move handlers de
           editState: false,
           hasUnsavedChanges: false,
           savedDisplayName: 'Hero',
+          documentTextColorDraft: '',
+          savedDocumentTextColor: '',
+          documentBackgroundColorDraft: '',
+          savedDocumentBackgroundColor: '',
           tabLabel: 'Character',
           templateIcon: 'mdi-account'
         }
@@ -769,8 +914,14 @@ test('Test that createUseProjectDocumentControlBar tab copy and move handlers de
       moveDocumentTab,
       requestCloseTab: vi.fn()
     }) as never,
+    S_FaProjectHierarchyTree: () => ({ __faHierarchyTree: true }) as never,
     S_FaUserSettings: () => ({} as never),
     storeToRefs: ((store: unknown) => {
+      if (store !== null && typeof store === 'object' && '__faHierarchyTree' in store) {
+        return {
+          worlds: ref([])
+        } as never
+      }
       if (store !== null && typeof store === 'object' && 'moveDocumentTab' in store) {
         return {
           activeDocumentId: ref('doc-a'),
@@ -781,6 +932,10 @@ test('Test that createUseProjectDocumentControlBar tab copy and move handlers de
             editState: false,
             hasUnsavedChanges: false,
             savedDisplayName: 'Hero',
+            documentTextColorDraft: '',
+            savedDocumentTextColor: '',
+            documentBackgroundColorDraft: '',
+            savedDocumentBackgroundColor: '',
             tabLabel: 'Character',
             templateIcon: 'mdi-account'
           }])
@@ -821,4 +976,72 @@ test('Test that createUseProjectDocumentControlBar tab copy and move handlers de
 
   api.onTabMoveClick('doc-a', 'left')
   expect(moveDocumentTab).toHaveBeenCalledWith('doc-a', 'left')
+})
+
+test('Test that createUseProjectDocumentControlBar exposes world tab indicators only for multi-world projects', () => {
+  const singleWorldApi = mountUseProjectDocumentControlBar({
+    disableDocumentControlBar: false,
+    projectWorlds: [
+      {
+        color: '#00ff00',
+        colorPallete: '',
+        displayName: 'World 1',
+        id: 'world-1'
+      }
+    ],
+    tabSeed: [{
+      documentId: 'doc-a',
+      displayNameDraft: 'Hero',
+      editState: false,
+      hasUnsavedChanges: false,
+      persistenceState: 'persisted',
+      savedDisplayName: 'Hero',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
+      tabLabel: 'Hero',
+      templateIcon: 'mdi-account',
+      worldId: 'world-1'
+    }]
+  })
+
+  expect(singleWorldApi.showWorldTabIndicators.value).toBe(false)
+  expect(singleWorldApi.resolveTabWorldIndicatorColor(singleWorldApi.openedDocumentTabs.value[0]!)).toBeNull()
+
+  const multiWorldApi = mountUseProjectDocumentControlBar({
+    disableDocumentControlBar: false,
+    projectWorlds: [
+      {
+        color: '#00ff00',
+        colorPallete: '',
+        displayName: 'World 1',
+        id: 'world-1'
+      },
+      {
+        color: '#ff00ff',
+        colorPallete: '',
+        displayName: 'World 2',
+        id: 'world-2'
+      }
+    ],
+    tabSeed: [{
+      documentId: 'doc-a',
+      displayNameDraft: 'Hero',
+      editState: false,
+      hasUnsavedChanges: false,
+      persistenceState: 'persisted',
+      savedDisplayName: 'Hero',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
+      tabLabel: 'Hero',
+      templateIcon: 'mdi-account',
+      worldId: 'world-2'
+    }]
+  })
+
+  expect(multiWorldApi.showWorldTabIndicators.value).toBe(true)
+  expect(multiWorldApi.resolveTabWorldIndicatorColor(multiWorldApi.openedDocumentTabs.value[0]!)).toBe('#ff00ff')
 })

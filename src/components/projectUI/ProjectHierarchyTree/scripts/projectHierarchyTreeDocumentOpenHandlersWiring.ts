@@ -29,6 +29,9 @@ export function createProjectHierarchyTreeDocumentOpenHandlers (deps: {
     data: I_faProjectHierarchyTreeHeTreeNode
     children?: unknown[]
   }): void {
+    if (stat.data.nodeKind === 'addNewDocument') {
+      return
+    }
     if (stat.data.nodeKind !== 'document' || stat.data.documentId === null) {
       return
     }
@@ -47,6 +50,9 @@ export function createProjectHierarchyTreeDocumentOpenHandlers (deps: {
     node: I_faProjectHierarchyTreeHeTreeNode,
     event: MouseEvent
   ): void {
+    if (node.nodeKind === 'addNewDocument') {
+      return
+    }
     if (event.button !== 1) {
       return
     }

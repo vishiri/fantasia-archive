@@ -68,12 +68,15 @@
           size="sm"
           :aria-label="removeTooltipText"
           :data-test-locator="`${nodeTestLocator}-remove`"
+          :data-test-remove-disabled="removeDisabled ? 'true' : 'false'"
           :data-test-tooltip-text="removeTooltipText"
+          :disable="removeDisabled"
           @click.stop="onRemoveClick"
           @mouseleave="armRemoveTooltip"
         >
           <q-tooltip
             ref="removeTooltipRef"
+            :class="{ dialogProjectSettingsWorldTemplateLayoutTreeNode__removeDisabledTooltip: removeDisabled }"
             :disable="!removeTooltipHoverEnabled"
           >
             {{ removeTooltipText }}
@@ -195,6 +198,7 @@ const {
   placementNicknameHoverTooltipOriginalNameLine,
   placementNicknameHoverTooltipRef,
   placementNicknameHoverTooltipTestText,
+  removeDisabled,
   removeTooltipHoverEnabled,
   removeTooltipRef,
   removeTooltipText,

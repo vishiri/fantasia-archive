@@ -16,6 +16,10 @@ test('Test that parseFaOpenedDocumentsSnapshotJson accepts a valid snapshot payl
       templateIcon: 'mdi-feather',
       displayNameDraft: 'Draft',
       savedDisplayName: 'Saved',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       hasUnsavedChanges: true
     }]
   })
@@ -41,6 +45,10 @@ test('Test that parseFaOpenedDocumentsSnapshotJson defaults editState to preview
       templateIcon: 'mdi-feather',
       displayNameDraft: 'Draft',
       savedDisplayName: 'Saved',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       hasUnsavedChanges: true
     }]
   })
@@ -67,6 +75,10 @@ test('Test that parseFaOpenedDocumentsSnapshotJson reads v1 tabs without persist
       templateIcon: 'mdi-feather',
       displayNameDraft: 'Draft',
       savedDisplayName: 'Saved',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       hasUnsavedChanges: false,
       editState: false
     }]
@@ -89,6 +101,10 @@ test('Test that parseFaOpenedDocumentsSnapshotJson accepts temporary tabs with m
       templateIcon: 'mdi-account',
       displayNameDraft: 'Aria',
       savedDisplayName: '',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       hasUnsavedChanges: true,
       editState: true
     }]
@@ -111,6 +127,10 @@ test('Test that faOpenedDocumentsSnapshotSchema rejects temporary tabs missing w
       templateIcon: 'mdi-account',
       displayNameDraft: 'Aria',
       savedDisplayName: '',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       hasUnsavedChanges: true,
       editState: true
     }]
@@ -128,6 +148,10 @@ test('Test that serializeFaOpenedDocumentsSnapshotJson writes schemaVersion 2', 
       templateIcon: 'mdi-feather',
       displayNameDraft: 'Draft',
       savedDisplayName: 'Saved',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       hasUnsavedChanges: false,
       editState: false
     }]

@@ -55,6 +55,7 @@ function createTestTreeComponentRef () {
 
 const sampleWorld = {
   color: '#ff0000',
+  colorPallete: '',
   displayName: 'World A',
   groups: [],
   id: 'world-1',
@@ -68,6 +69,8 @@ const sampleWorld = {
       icon: 'mdi-account',
       id: 'placement-1',
       nickname: '',
+      titlePluralTranslations: {},
+      titleSingularTranslations: {},
       rootSortOrder: 0,
       worldId: 'world-1'
     }
@@ -84,6 +87,7 @@ test('Test that session handlers open nodes and load children', async () => {
   const loadChildrenForNode = vi.fn(async () => undefined)
   const markNodeOpen = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -95,6 +99,7 @@ test('Test that session handlers open nodes and load children', async () => {
     lazyLoadWiring: {
       loadChildrenForNode
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
@@ -117,6 +122,7 @@ test('Test that session handlers load children when the open icon expands a row'
   const markNodeOpen = vi.fn()
   const markNodeClosed = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -128,6 +134,7 @@ test('Test that session handlers load children when the open icon expands a row'
     lazyLoadWiring: {
       loadChildrenForNode
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
@@ -163,6 +170,7 @@ test('Test that open icon expand keeps stat closed until lazy load finishes', as
   })
   const openNodeAndParents = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -174,6 +182,7 @@ test('Test that open icon expand keeps stat closed until lazy load finishes', as
     lazyLoadWiring: {
       loadChildrenForNode
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: ref({
@@ -207,6 +216,7 @@ test('Test that session handlers collapse rows via the open icon', async () => {
   const placement = tree[0]!.children[0]!
   const markNodeClosed = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -218,6 +228,7 @@ test('Test that session handlers collapse rows via the open icon', async () => {
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
@@ -248,6 +259,7 @@ test('Test that session handlers expand world rows from row click routing', asyn
   const markNodeOpen = vi.fn()
   const reapplyLatentDescendantExpandState = vi.fn(async () => undefined)
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -259,6 +271,7 @@ test('Test that session handlers expand world rows from row click routing', asyn
     lazyLoadWiring: {
       loadChildrenForNode
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
@@ -308,6 +321,7 @@ test('Test that session handlers expand group rows from row click routing', asyn
   const groupNode = worldNode.children[0]!
   const markNodeOpen = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -319,6 +333,7 @@ test('Test that session handlers expand group rows from row click routing', asyn
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
@@ -365,6 +380,7 @@ test('Test that session handlers expand document rows with children from row cli
   placement.children = [documentNode]
   const markNodeOpen = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -376,6 +392,7 @@ test('Test that session handlers expand document rows with children from row cli
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
@@ -419,6 +436,7 @@ test('Test that session handlers ignore leaf document row click routing', async 
   }
   const markNodeOpen = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -430,6 +448,7 @@ test('Test that session handlers ignore leaf document row click routing', async 
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
@@ -472,6 +491,7 @@ test('Test that session handlers ignore document row click after drag movement',
   }
   const markNodeOpen = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -483,6 +503,7 @@ test('Test that session handlers ignore document row click after drag movement',
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
@@ -517,6 +538,7 @@ test('Test that session handlers ignore non-world open icon routing on world row
   const worldNode = tree[0]!
   const markNodeOpen = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -528,6 +550,7 @@ test('Test that session handlers ignore non-world open icon routing on world row
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
@@ -549,6 +572,7 @@ test('Test that session handlers reopen he-tree row after lazy load when tree re
   const placement = tree[0]!.children[0]!
   const openNodeAndParents = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -560,6 +584,7 @@ test('Test that session handlers reopen he-tree row after lazy load when tree re
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: ref({
@@ -579,6 +604,7 @@ test('Test that session handlers ignore close events while suppressTreeEmit is s
   const placement = tree[0]!.children[0]!
   const markNodeClosed = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -590,6 +616,7 @@ test('Test that session handlers ignore close events while suppressTreeEmit is s
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(true),
     treeComponentRef: createTestTreeComponentRef(),
@@ -607,6 +634,7 @@ test('Test that session handlers ignore close events while suppressTreeEmit is s
 test('Test that session handlers emit document open requests for leaf document rows', () => {
   const onDocumentOpenRequest = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -618,6 +646,7 @@ test('Test that session handlers emit document open requests for leaf document r
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest,
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
@@ -700,6 +729,7 @@ test('Test that session handlers expose draggable and droppable handlers', () =>
   placement.children = [parentDocument]
   placement.childrenLoaded = true
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -713,6 +743,7 @@ test('Test that session handlers expose draggable and droppable handlers', () =>
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
@@ -740,6 +771,7 @@ test('Test that session handlers expose draggable and droppable handlers', () =>
 test('Test that session handlers do not restore UI state when tree ref attaches', () => {
   const treeComponentRef = ref<I_faProjectHierarchyTreeHeTreeInstance | null>(null)
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -751,6 +783,7 @@ test('Test that session handlers do not restore UI state when tree ref attaches'
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef,
@@ -776,6 +809,7 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
   const markNodeClosed = vi.fn()
   const loadChildrenForNode = vi.fn(async () => undefined)
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -787,6 +821,7 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
     lazyLoadWiring: {
       loadChildrenForNode
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
@@ -813,6 +848,7 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
 
 test('Test that session handlers skip restore when tree ref attaches during drag expand freeze', () => {
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -824,6 +860,7 @@ test('Test that session handlers skip restore when tree ref attaches during drag
     lazyLoadWiring: {
       loadChildrenForNode: async () => undefined
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
@@ -842,6 +879,7 @@ test('Test that session handlers skip restore when tree ref attaches during drag
  */
 test('Test that session handlers skip restore when tree ref clears', () => {
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -853,6 +891,7 @@ test('Test that session handlers skip restore when tree ref clears', () => {
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
@@ -881,6 +920,7 @@ test('Test that session handlers ignore open icon clicks on empty loaded documen
   const markNodeOpen = vi.fn()
   const loadChildrenForNode = vi.fn(async () => undefined)
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -892,6 +932,7 @@ test('Test that session handlers ignore open icon clicks on empty loaded documen
     lazyLoadWiring: {
       loadChildrenForNode
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: createTestTreeComponentRef(),
@@ -922,6 +963,7 @@ test('Test that session handlers recover when he-tree openNodeAndParents stat is
     throw error
   })
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
     documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
     dragContext: {
@@ -933,6 +975,7 @@ test('Test that session handlers recover when he-tree openNodeAndParents stat is
     lazyLoadWiring: {
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: ref({
@@ -947,4 +990,56 @@ test('Test that session handlers recover when he-tree openNodeAndParents stat is
   await wiring.onNodeOpenIconClick(placement, stat)
   expect(openNodeAndParents).toHaveBeenCalledWith(placement)
   expect(stat.open).toBe(false)
+})
+
+test('Test that session handlers create temporary document when add-new row is clicked', () => {
+  const createTemporaryDocument = vi.fn(async () => 'temp-doc')
+  const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument,
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
+    dragContext: {
+      dragNode: null
+    },
+    dragExpandPostCommitGuard: ref(false),
+    dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
+    lazyLoadWiring: {
+      loadChildrenForNode: vi.fn(async () => undefined)
+    },
+    onDocumentOpenRequest: vi.fn(),
+    resolvePreferredLanguageCode: () => 'en-US',
+    suppressTreeEmit: ref(false),
+    treeComponentRef: ref(null),
+    treeData: ref([]),
+    treeScrollHostRef: ref(null),
+    uiStateWiring: createTestUiStateWiring()
+  })
+  wiring.onNodeClick({
+    children: [],
+    data: {
+      children: [],
+      childrenLoaded: true,
+      documentId: null,
+      documentTemplateId: 'template-1',
+      groupId: null,
+      hasChildren: false,
+      icon: 'mdi-plus',
+      id: 'placement-1__add-new',
+      label: 'Add new character',
+      nodeKind: 'addNewDocument',
+      placementId: 'placement-1',
+      titlePluralTranslations: { 'en-US': 'Characters' },
+      titleSingularTranslations: { 'en-US': 'Character' },
+      worldColor: '#336699',
+      worldId: 'world-1'
+    }
+  })
+  expect(createTemporaryDocument).toHaveBeenCalledWith({
+    displayName: 'New character',
+    openMode: 'leftNavigate',
+    parentDocumentId: null,
+    templateId: 'template-1',
+    worldId: 'world-1'
+  })
 })

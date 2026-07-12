@@ -1,6 +1,17 @@
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 /**
+ * True when collapsing a row should keep descendant expand ids for lazy reapply on reopen.
+ */
+export function shouldProjectHierarchyTreePreserveDescendantOpenIdsOnCollapse (
+  nodeKind: I_faProjectHierarchyTreeHeTreeNode['nodeKind']
+): boolean {
+  return nodeKind === 'world' ||
+    nodeKind === 'templatePlacement' ||
+    nodeKind === 'document'
+}
+
+/**
  * Finds a node reference by id in the current tree model.
  */
 export function findProjectHierarchyTreeNodeById (

@@ -58,7 +58,7 @@
             clickable
             role="menuitem"
             data-test-locator="AppControlSingleMenu-menuItem"
-            :class="['appControlSingleMenu__item', `text-${menuItem.specialColor}`, 'non-selectable']"
+            :class="['appControlSingleMenu__item', ...resolveAppControlMenuItemColorClasses(menuItem.specialColor), 'non-selectable']"
             :disable="(!menuItem.conditions)"
             @mouseenter="onMenuRowMouseEnter(menuItem, index)"
             @mouseleave="onMenuRowMouseLeave(menuItem)"
@@ -136,7 +136,7 @@
                     v-close-popup
                     clickable
                     role="menuitem"
-                    :class="['appControlSingleMenu__item', `text-${submenuItem.specialColor}`, 'non-selectable']"
+                    :class="['appControlSingleMenu__item', ...resolveAppControlMenuItemColorClasses(submenuItem.specialColor), 'non-selectable']"
                     :disable="(!submenuItem.conditions)"
                     data-test-locator="AppControlSingleMenu-menuItem-subMenu-item"
                     @click="(submenuItem.trigger) ? submenuItem.trigger() : false"
@@ -185,7 +185,7 @@
 <script setup lang="ts">
 import type { I_appMenuList } from 'app/types/I_appMenusDataList'
 
-import { useAppControlSingleMenu } from './scripts/appControlSingleMenu_manager'
+import { useAppControlSingleMenu, resolveAppControlMenuItemColorClasses } from './scripts/appControlSingleMenu_manager'
 
 const props = defineProps<{
   /**

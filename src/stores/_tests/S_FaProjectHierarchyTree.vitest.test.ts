@@ -8,6 +8,7 @@ const listWorkspaceHierarchyLayoutMock = vi.fn(async () => ({
   worlds: [
     {
       color: '#ff0000',
+      colorPallete: '',
       displayName: 'World One',
       groups: [
         {
@@ -27,6 +28,8 @@ const listWorkspaceHierarchyLayoutMock = vi.fn(async () => ({
           groupSortOrder: null,
           hasChildren: true,
           icon: 'mdi-account',
+          titlePluralTranslations: {},
+          titleSingularTranslations: {},
           id: 'placement-1',
           nickname: '',
           rootSortOrder: 0,
@@ -326,6 +329,7 @@ test('Test that S_FaProjectHierarchyTree resync patches labels when topology is 
     worlds: [
       {
         color: '#ff0000',
+        colorPallete: '',
         displayName: 'Renamed World',
         groups: [
           {
@@ -345,6 +349,8 @@ test('Test that S_FaProjectHierarchyTree resync patches labels when topology is 
             groupSortOrder: null,
             hasChildren: true,
             icon: 'mdi-account',
+            titlePluralTranslations: {},
+            titleSingularTranslations: {},
             id: 'placement-1',
             nickname: '',
             rootSortOrder: 0,
@@ -382,6 +388,7 @@ test('Test that S_FaProjectHierarchyTree refreshLayout coalesces concurrent load
     worlds: [
       {
         color: '#ff0000',
+        colorPallete: '',
         displayName: 'World One',
         groups: [],
         id: 'world-1',
@@ -433,4 +440,47 @@ test('Test that S_FaProjectHierarchyTree refreshHierarchyTreeNodes queues node i
   ])
   store.clearPendingHierarchyNodeRefreshIds()
   expect(store.pendingHierarchyNodeRefreshIds).toEqual([])
+})
+
+test('Test that S_FaProjectHierarchyTree refreshDocumentsInTree no-ops without active project', async () => {
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().clearActiveProject()
+  const store = S_FaProjectHierarchyTree()
+  store.refreshDocumentsInTree(['doc-a'])
+  expect(store.pendingDocumentRefreshIds).toEqual([])
+})
+
+test('Test that S_FaProjectHierarchyTree refreshDocumentsInTree no-ops for empty id lists', async () => {
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const store = S_FaProjectHierarchyTree()
+  store.refreshDocumentsInTree([])
+  expect(store.pendingDocumentRefreshIds).toEqual([])
+})
+
+test('Test that S_FaProjectHierarchyTree refreshHierarchyTreeNodes no-ops without active project', async () => {
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().clearActiveProject()
+  const store = S_FaProjectHierarchyTree()
+  store.refreshHierarchyTreeNodes(['placement-1'])
+  expect(store.pendingHierarchyNodeRefreshIds).toEqual([])
+})
+
+test('Test that S_FaProjectHierarchyTree patchWorldColorPalleteInLayout updates matching world palette', async () => {
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\a.faproject',
+    id: 'project-id',
+    name: 'N'
+  })
+  const store = S_FaProjectHierarchyTree()
+  await store.refreshLayout()
+  store.patchWorldColorPalleteInLayout('world-1', '#aabbcc,#ddeeff')
+  expect(store.worlds[0]?.colorPallete).toBe('#aabbcc,#ddeeff')
+  store.patchWorldColorPalleteInLayout('world-missing', '#000000')
+  expect(store.worlds[0]?.colorPallete).toBe('#aabbcc,#ddeeff')
 })

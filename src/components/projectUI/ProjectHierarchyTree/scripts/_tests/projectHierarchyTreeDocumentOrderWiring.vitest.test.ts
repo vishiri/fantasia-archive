@@ -31,6 +31,10 @@ import {
   finalizeProjectHierarchyTreeDragSiblingOrderSnapshot,
   resolveProjectHierarchyTreeDragSiblingOrderSnapshot
 } from '../projectHierarchyTreeDragSiblingOrderSnapshotWiring'
+import {
+  appendOrRefreshProjectHierarchyTreeAddNewDocumentNode,
+  isProjectHierarchyTreeAddNewDocumentNode
+} from '../projectHierarchyTreeAddNewDocumentNode'
 
 const dragContextState = vi.hoisted(() => ({
   startInfo: undefined as {
@@ -99,6 +103,7 @@ import { applyProjectHierarchyTreeSiblingOrderToTreeData } from '../projectHiera
 
 const sampleWorld = {
   color: '#ff0000',
+  colorPallete: '',
   displayName: 'World A',
   groups: [
     {
@@ -118,6 +123,8 @@ const sampleWorld = {
       groupSortOrder: 0,
       hasChildren: true,
       icon: 'mdi-account',
+      titlePluralTranslations: {},
+      titleSingularTranslations: {},
       id: 'placement-1',
       nickname: 'Heroes',
       rootSortOrder: null,
@@ -424,6 +431,7 @@ test('Test that lazy load children wiring refreshes placement and nested documen
   await refreshProjectHierarchyTreeNodeChildrenFromDatabase({
     listPlacementDocumentChildren,
     nodeId: 'missing-node',
+    preferredLanguageCode: 'en-US',
     publishTreeRevision,
     treeData
   })
@@ -431,6 +439,7 @@ test('Test that lazy load children wiring refreshes placement and nested documen
   await refreshProjectHierarchyTreeNodeChildrenFromDatabase({
     listPlacementDocumentChildren,
     nodeId: 'placement-1',
+    preferredLanguageCode: 'en-US',
     publishTreeRevision,
     treeData
   })
@@ -445,6 +454,7 @@ test('Test that lazy load children wiring refreshes placement and nested documen
   await loadProjectHierarchyTreeNodeChildren({
     listPlacementDocumentChildren,
     node: parentDocument,
+    preferredLanguageCode: 'en-US',
     publishTreeRevision,
     treeData
   })
@@ -497,6 +507,7 @@ test('Test that refreshProjectHierarchyTreeNodeChildrenFromDatabase keeps loaded
   await refreshProjectHierarchyTreeNodeChildrenFromDatabase({
     listPlacementDocumentChildren,
     nodeId: 'placement-1',
+    preferredLanguageCode: 'en-US',
     publishTreeRevision,
     treeData
   })
@@ -2031,4 +2042,54 @@ test('Test that readProjectHierarchyTreeDragSiblingOrderFromDom returns null whe
     movedDocumentId: 'doc-a',
     treeData
   })).toBeNull()
+})
+
+test('Test that drag sibling order snapshot excludes add-new rows', () => {
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  const placement = findProjectHierarchyTreeNodeById(treeData, 'placement-1')!
+  appendOrRefreshProjectHierarchyTreeAddNewDocumentNode({
+    children: placement.children,
+    placement,
+    preferredLanguageCode: 'en-US'
+  })
+  const snapshot = resolveProjectHierarchyTreeDragSiblingOrderSnapshot(treeData, 'doc-a')
+  expect(snapshot?.orderedDocumentIds).toEqual(['doc-a', 'doc-b', 'doc-c'])
+  expect(isProjectHierarchyTreeAddNewDocumentNode(placement.children[placement.children.length - 1]!)).toBe(true)
+})
+
+test('Test that sibling order patch keeps add-new pinned last', () => {
+  const treeData = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  seedPlacementDocuments(treeData)
+  const placement = findProjectHierarchyTreeNodeById(treeData, 'placement-1')!
+  appendOrRefreshProjectHierarchyTreeAddNewDocumentNode({
+    children: placement.children,
+    placement,
+    preferredLanguageCode: 'en-US'
+  })
+  applyProjectHierarchyTreeSiblingOrderToTreeData(treeData, 'doc-a', ['doc-c', 'doc-a', 'doc-b'])
+  expect(placement.children.map((row) => row.documentId)).toEqual(['doc-c', 'doc-a', 'doc-b', null])
+  expect(isProjectHierarchyTreeAddNewDocumentNode(placement.children[placement.children.length - 1]!)).toBe(true)
+})
+
+test('Test that empty placement lazy load injects only add-new row', async () => {
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const placement = findProjectHierarchyTreeNodeById(treeData.value, 'placement-1')!
+  const publishTreeRevision = vi.fn(async () => undefined)
+  const listPlacementDocumentChildren = vi.fn(async () => ({
+    items: []
+  }))
+  await loadProjectHierarchyTreeNodeChildren({
+    listPlacementDocumentChildren,
+    node: placement,
+    preferredLanguageCode: 'en-US',
+    publishTreeRevision,
+    treeData
+  })
+  expect(listPlacementDocumentChildren).toHaveBeenCalledWith({
+    placementId: 'placement-1'
+  })
+  expect(placement.children).toHaveLength(1)
+  expect(placement.children[0]?.nodeKind).toBe('addNewDocument')
+  expect(placement.children[0]?.label).toBe('Add new MISSING TRANSLATION')
 })

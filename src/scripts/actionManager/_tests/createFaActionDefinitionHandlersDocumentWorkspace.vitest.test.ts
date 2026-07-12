@@ -38,6 +38,10 @@ const sessionState: {
       templateIcon: 'mdi-feather',
       displayNameDraft: 'One',
       savedDisplayName: 'One',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       hasUnsavedChanges: false,
       editState: false
     },
@@ -48,6 +52,10 @@ const sessionState: {
       templateIcon: 'mdi-feather',
       displayNameDraft: 'Two',
       savedDisplayName: 'Two',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       hasUnsavedChanges: false,
       editState: false
     }

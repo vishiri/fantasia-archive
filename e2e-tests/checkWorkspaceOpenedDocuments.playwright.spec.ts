@@ -89,6 +89,10 @@ async function seedOpenedDocumentsSnapshotForFirstWorldDocument (
           hasUnsavedChanges: false,
           editState: false,
           savedDisplayName: tabLabel,
+          documentTextColorDraft: '',
+          savedDocumentTextColor: '',
+          documentBackgroundColorDraft: '',
+          savedDocumentBackgroundColor: '',
           tabLabel,
           templateIcon: 'mdi-file-document'
         }

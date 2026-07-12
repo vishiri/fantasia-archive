@@ -2,6 +2,7 @@
 @use '../../../../css/globals/paletteGlobals.variables.scss' as *;
 
 /* COMPONENT - PROJECT HIERARCHY TREE */
+$projectHierarchyTree-addNewDocumentRow-color: fa-v('grey', $grey);
 $projectHierarchyTree-documentRow-color: fa-v('text-workspace-row', $text-workspace-row);
 $projectHierarchyTree-dragPlaceholder-accentColor: fa-v('primary-bright', $primary-bright);
 $projectHierarchyTree-dragPlaceholder-accentWidth: 3px;
@@ -19,11 +20,10 @@ $projectHierarchyTree-nodeIcon-boxSize: $iconSize;
 $projectHierarchyTree-nodeIcon-marginRight: 8px;
 $projectHierarchyTree-nodeRowContent-paddingBlock: 4px;
 $projectHierarchyTree-nodeRowContent-paddingInlineEnd: 20px;
-$projectHierarchyTree-nodeRowContent-paddingInlineStart: 25px;
+$projectHierarchyTree-nodeRowContent-paddingInlineStart: 26px;
 $projectHierarchyTree-nodeRowIndent-offsetPx: -20px;
 $projectHierarchyTree-openIcon-boxSize: 16px;
 $projectHierarchyTree-openIcon-color: fa-v('text-muted', $text-muted);
-$projectHierarchyTree-openIcon-nested-positionLeft: -20px;
 $projectHierarchyTree-openIcon-nestedTreeNode-positionLeft: -23px;
 $projectHierarchyTree-openIcon-padding: 4px;
 $projectHierarchyTree-openIcon-rotateTransitionDuration: 0.3s;

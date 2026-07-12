@@ -1,6 +1,8 @@
 import type Database from 'better-sqlite3'
 
 import {
+  FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN,
+  FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
@@ -37,7 +39,8 @@ export function listFaProjectHierarchyDocumentChildrenRows (
   return db
     .prepare(
       `SELECT id, world_id, template_id, ${placementColumn}, ${parentColumn}, ${sortColumn}, ` +
-        'display_name, created_at_ms, updated_at_ms ' +
+        `display_name, ${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN}, ` +
+        `${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}, created_at_ms, updated_at_ms ` +
         `FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
         `WHERE ${placementColumn} = ? AND ` +
         `(${parentColumn} IS ? OR (${parentColumn} IS NULL AND ? IS NULL)) ` +
@@ -53,7 +56,8 @@ export function listFaProjectHierarchyDirectChildDocumentRows (
   return db
     .prepare(
       `SELECT id, world_id, template_id, ${placementColumn}, ${parentColumn}, ${sortColumn}, ` +
-        'display_name, created_at_ms, updated_at_ms ' +
+        `display_name, ${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN}, ` +
+        `${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}, created_at_ms, updated_at_ms ` +
         `FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
         `WHERE ${parentColumn} = ? ` +
         `ORDER BY ${sortColumn} ASC, display_name COLLATE NOCASE ASC, created_at_ms ASC, id ASC`
@@ -66,6 +70,8 @@ export function mapFaProjectHierarchyDocumentChildRow (
   row: I_faSqlProjectDocumentRow
 ): I_faProjectHierarchyTreeDocumentChild {
   return {
+    documentBackgroundColor: row.document_background_color,
+    documentTextColor: row.document_text_color,
     id: row.id,
     displayName: row.display_name,
     placementId: row.tree_placement_id ?? '',

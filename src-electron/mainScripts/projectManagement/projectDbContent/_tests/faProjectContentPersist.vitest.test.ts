@@ -187,8 +187,10 @@ function makeProjectContentTestDb (): {
               tree_parent_document_id: args[4] as string | null,
               tree_custom_sort_order: args[5] as number,
               display_name: args[6] as string,
-              created_at_ms: args[7] as number,
-              updated_at_ms: args[8] as number
+              document_text_color: args[7] as string | null,
+              document_background_color: args[8] as string | null,
+              created_at_ms: args[9] as number,
+              updated_at_ms: args[10] as number
             }
             tables.documents.set(row.id as string, row)
           }
@@ -617,7 +619,7 @@ function makeProjectContentTestDb (): {
       if (normalized.includes('UPDATE documents')) {
         return {
           run: (...args: Array<string | number | null>) => {
-            const id = args[7]! as string
+            const id = args[9]! as string
             const existing = tables.documents.get(id)
             if (existing !== undefined) {
               tables.documents.set(id, {
@@ -628,8 +630,10 @@ function makeProjectContentTestDb (): {
                 tree_parent_document_id: args[3] as string | null,
                 tree_custom_sort_order: args[4] as number,
                 display_name: args[5] as string,
+                document_text_color: args[6] as string | null,
+                document_background_color: args[7] as string | null,
                 created_at_ms: existing.created_at_ms as number,
-                updated_at_ms: args[6] as number
+                updated_at_ms: args[8] as number
               })
             }
           }
@@ -1828,4 +1832,34 @@ test('Test that replaceFaProjectDocumentTemplatesSnapshot allows an empty items 
   createFaProjectDocumentTemplate(db as never, { displayName: 'Gone' })
   replaceFaProjectDocumentTemplatesSnapshot(db as never, [])
   expect(tables.document_templates.size).toBe(0)
+})
+
+/**
+ * createFaProjectDocument / updateFaProjectDocument
+ * Persists nullable document appearance colors.
+ */
+test('Test that document persist stores and updates appearance colors', () => {
+  const { db } = makeProjectContentTestDb()
+  const world = createFaProjectWorld(db as never, { displayName: 'World' })
+  const template = createFaProjectDocumentTemplate(db as never, { displayName: 'Tpl' })
+  const created = createFaProjectDocument(db as never, {
+    displayName: 'Doc',
+    templateId: template.id,
+    worldId: world.id,
+    documentTextColor: '#aabbcc',
+    documentBackgroundColor: ''
+  })
+  expect(created.documentTextColor).toBe('#AABBCC')
+  expect(created.documentBackgroundColor).toBeNull()
+
+  const updated = updateFaProjectDocument(db as never, created.id, {
+    documentBackgroundColor: '#112233',
+    documentTextColor: ''
+  })
+  expect(updated.documentTextColor).toBeNull()
+  expect(updated.documentBackgroundColor).toBe('#112233')
+
+  const loaded = getFaProjectDocumentById(db as never, created.id)
+  expect(loaded?.documentTextColor).toBeNull()
+  expect(loaded?.documentBackgroundColor).toBe('#112233')
 })

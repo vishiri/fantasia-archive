@@ -16,9 +16,13 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodeInteractio
   emitDeleteGroup: () => void
   emitRemovePlacement: () => void
   getNodeKind: () => I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode['nodeKind']
+  isRemoveDisabled: () => boolean
   renameMenuWiring: T_renameMenuWiring
 }): T_dialogProjectSettingsWorldTemplateLayoutTreeNodeInteractionWiring {
   function onRemoveClick (): void {
+    if (deps.isRemoveDisabled()) {
+      return
+    }
     deps.actionTooltipsWiring.dismissRemoveTooltip()
     if (deps.getNodeKind() === 'group') {
       deps.emitDeleteGroup()

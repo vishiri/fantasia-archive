@@ -16,6 +16,10 @@ const sampleTab: I_faOpenedDocumentTab = {
   templateIcon: 'mdi-account',
   displayNameDraft: 'Hero',
   savedDisplayName: 'Hero',
+  documentTextColorDraft: '',
+  savedDocumentTextColor: '',
+  documentBackgroundColorDraft: '',
+  savedDocumentBackgroundColor: '',
   hasUnsavedChanges: false,
   editState: FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE
 }

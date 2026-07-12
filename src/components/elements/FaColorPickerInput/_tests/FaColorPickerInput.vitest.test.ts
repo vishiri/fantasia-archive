@@ -159,9 +159,9 @@ test('Test that FaColorPickerInput emits model updates from the field and picker
 
 /**
  * FaColorPickerInput
- * Keeps the swatch transparent when the model value is blank.
+ * Hides the swatch when the model value is blank.
  */
-test('Test that FaColorPickerInput keeps the swatch transparent for blank model values', async () => {
+test('Test that FaColorPickerInput hides the swatch for blank model values', async () => {
   const w = mount(FaColorPickerInput, {
     props: {
       modelValue: '',
@@ -177,9 +177,7 @@ test('Test that FaColorPickerInput keeps the swatch transparent for blank model 
     }
   })
 
-  const swatch = w.find('[data-test-locator="faColorPickerInput-test-swatch"]')
-  expect(swatch.classes()).toContain('faColorPickerInput__swatch--empty')
-  expect(swatch.attributes('style')).toContain('background-color: transparent')
+  expect(w.find('[data-test-locator="faColorPickerInput-test-swatch"]').exists()).toBe(false)
 })
 
 /**
@@ -212,7 +210,7 @@ test('Test that FaColorPickerInput normalizes null picker updates to an empty st
 
 /**
  * FaColorPickerInput
- * Uses defaultHex for the picker preview while the swatch stays transparent when unset.
+ * Uses defaultHex for the picker preview while the swatch stays hidden when unset.
  */
 test('Test that FaColorPickerInput honors defaultHex for the picker when the model is blank', async () => {
   const qColorStub = defineComponent({
@@ -242,9 +240,7 @@ test('Test that FaColorPickerInput honors defaultHex for the picker when the mod
     }
   })
 
-  const swatch = w.find('[data-test-locator="faColorPickerInput-test-swatch"]')
-  expect(swatch.classes()).toContain('faColorPickerInput__swatch--empty')
-  expect(swatch.attributes('style')).toContain('background-color: transparent')
+  expect(w.find('[data-test-locator="faColorPickerInput-test-swatch"]').exists()).toBe(false)
 
   await openFaColorPickerInputMenu(w)
   expect(w.findComponent(qColorStub).props('modelValue')).toBe('#ff00ff')
@@ -439,6 +435,78 @@ test('Test that FaColorPickerInput disables append for duplicate palette colors'
   expect(appendButton.attributes('data-test-tooltip-text')).toBe(
     'faColorPickerInput.appendToWorldPaletteDuplicateTooltip'
   )
+})
+
+/**
+ * FaColorPickerInput
+ * Shows invalid-color tooltip when append is disabled without a valid hex.
+ */
+test('Test that FaColorPickerInput shows invalid tooltip when append is disabled without valid hex', () => {
+  const w = mount(FaColorPickerInput, {
+    props: {
+      modelValue: '',
+      paletteAppend: {
+        mode: 'draft',
+        worldColorPalette: '#112233'
+      },
+      testLocator
+    },
+    global: {
+      stubs: {
+        QColor: true,
+        QBtn: qBtnStub,
+        QIcon: qIconStub,
+        QInput: qInputStub,
+        QMenu: qMenuStub,
+        QTooltip: qTooltipStub
+      },
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  const appendButton = w.find('[data-test-locator="faColorPickerInput-test-appendToPalette"]')
+  expect(appendButton.attributes('disabled')).toBeDefined()
+  expect(appendButton.attributes('data-test-tooltip-text')).toBe(
+    'faColorPickerInput.appendToWorldPaletteInvalidTooltip'
+  )
+})
+
+/**
+ * FaColorPickerInput
+ * Blocks picker menu and append control when readOnly is true.
+ */
+test('Test that FaColorPickerInput readOnly blocks picker menu and append button', async () => {
+  const w = mount(FaColorPickerInput, {
+    props: {
+      modelValue: '#aabbcc',
+      paletteAppend: {
+        mode: 'draft',
+        worldColorPalette: '#112233'
+      },
+      readOnly: true,
+      testLocator
+    },
+    global: {
+      stubs: {
+        QColor: true,
+        QBtn: qBtnStub,
+        QIcon: qIconStub,
+        QInput: qInputStub,
+        QMenu: qMenuStub,
+        QTooltip: qTooltipStub
+      },
+      mocks: {
+        $t: (key: string) => key
+      }
+    }
+  })
+
+  await w.find('input.q-input-stub').trigger('focus')
+  expect(w.find('.q-menu-stub').exists()).toBe(false)
+  expect(w.find('[data-test-locator="faColorPickerInput-test-appendToPalette"]').exists()).toBe(false)
+  expect(w.find('input.q-input-stub').attributes('readonly')).toBeDefined()
 })
 
 /**

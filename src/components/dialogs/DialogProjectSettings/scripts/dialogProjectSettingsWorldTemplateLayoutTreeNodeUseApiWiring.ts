@@ -46,6 +46,7 @@ type T_dialogProjectSettingsWorldTemplateLayoutTreeNodeUseApi = {
   placementNicknameHoverTooltipTestText: ComputedRef<string | undefined>
   revealPlacementNicknameHoverTooltip: () => void
   hidePlacementNicknameHoverTooltip: () => void
+  removeDisabled: ComputedRef<boolean>
   removeTooltipHoverEnabled: Ref<boolean>
   removeTooltipRef: Ref<QTooltip | null>
   removeTooltipText: ComputedRef<string>
@@ -110,6 +111,7 @@ export function bindDialogProjectSettingsWorldTemplateLayoutTreeNodeUseApi (para
     placementNicknameHoverTooltipOriginalNameLine: presentationWiring.placementNicknameHoverTooltipOriginalNameLine,
     placementNicknameHoverTooltipRef: actionTooltipsWiring.placementNicknameHoverTooltipRef,
     placementNicknameHoverTooltipTestText: presentationWiring.placementNicknameHoverTooltipTestText,
+    removeDisabled: presentationWiring.removeDisabled,
     removeTooltipHoverEnabled: actionTooltipsWiring.removeTooltipHoverEnabled,
     removeTooltipRef: actionTooltipsWiring.removeTooltipRef,
     removeTooltipText: presentationWiring.removeTooltipText,

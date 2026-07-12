@@ -1,6 +1,7 @@
 @use './variables' as *;
 @use '../../../../layouts/MainLayout/styles/variables' as mainLayout;
 @use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
+@use '../../../../css/theme/quasar-components/qFocusable.variables' as *;
 @import '@quasar/extras/animate/fadeIn.css';
 @import '@quasar/extras/animate/fadeOut.css';
 
@@ -42,7 +43,7 @@
     background-color: $projectDocumentControlBar-bottomRuleColor;
     bottom: 0;
     content: ' ';
-    height: 1px;
+    height: $projectDocumentControlBar-bottomRuleHeightPx;
     left: 0;
     position: absolute;
     right: 0;
@@ -128,18 +129,45 @@
   color: $projectDocumentControlBar-tabClose-color;
 }
 
+.projectDocumentControlBarTabs__tab.q-tab {
+  position: relative;
+}
+
+.projectDocumentControlBarTabs__tab--customAppearance.q-tab {
+  .q-tab__icon,
+  .q-tab__label {
+    color: var(--projectDocumentControlBarTab-textColor);
+  }
+}
+
+.projectDocumentControlBarTabs__tabWorldIndicator {
+  font-size: $projectDocumentControlBar-tabWorldIndicator-fontSize;
+  left: $projectDocumentControlBar-tabWorldIndicator-offsetLeft;
+  line-height: 1;
+  pointer-events: none;
+  position: absolute;
+  top: $projectDocumentControlBar-tabWorldIndicator-offsetTop;
+  z-index: 1;
+}
+
 .tabsWrapper {
   &.q-tabs--dense .q-tab {
     min-height: mainLayout.$mainLayout-appHeader-heightPx;
   }
 
   .q-tab {
+    --projectDocumentControlBarTab-focusHelperColor: #{$qFocusable-hoverHelper-backgroundColor};
+
     color: $projectDocumentControlBar-tabContent-color;
     padding: 0 $projectDocumentControlBar-tabPadding-inlinePx;
     transition:
       background-color $projectDocumentControlBar-tabFocusTransitionDurationMs $projectDocumentControlBar-tabFocusTransitionEase,
       color $projectDocumentControlBar-tabFocusTransitionDurationMs $projectDocumentControlBar-tabFocusTransitionEase,
       opacity $projectDocumentControlBar-tabFocusTransitionDurationMs $projectDocumentControlBar-tabFocusTransitionEase;
+  }
+
+  .projectDocumentControlBarTabs__tab--withWorldIndicator.q-tab {
+    padding-inline-start: calc(#{$projectDocumentControlBar-tabPadding-inlinePx} + #{$projectDocumentControlBar-tabWorldIndicator-extraPaddingInlineStartPx});
   }
 
   .q-tab__content {
@@ -156,6 +184,7 @@
   }
 
   .q-tab--active .q-tab__indicator {
+    background-color: var(--projectDocumentControlBarTab-textColor, #{$projectDocumentControlBar-tabContent-color});
     opacity: 1;
     transform-origin: left /* rtl:ignore */;
   }
@@ -201,5 +230,16 @@
     font-size: $projectDocumentControlBar-tabAlertIcon-fontSize;
     right: $projectDocumentControlBar-tabAlertIcon-positionRight;
     top: $projectDocumentControlBar-tabAlertIcon-positionTop;
+  }
+
+  .projectDocumentControlBarTabs__tab.q-focusable:focus > .q-focus-helper,
+  .projectDocumentControlBarTabs__tab.q-hoverable:hover > .q-focus-helper {
+    background: var(--projectDocumentControlBarTab-focusHelperColor);
+    opacity: $qFocusable-hoverHelper-opacity !important;
+
+    &::after,
+    &::before {
+      opacity: 0 !important;
+    }
   }
 }

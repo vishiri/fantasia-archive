@@ -57,6 +57,10 @@ function mountDeleteDialogWithPendingTab () {
         hasUnsavedChanges: false,
         persistenceState: 'persisted',
         savedDisplayName: 'Hero',
+        documentTextColorDraft: '',
+        savedDocumentTextColor: '',
+        documentBackgroundColorDraft: '',
+        savedDocumentBackgroundColor: '',
         tabLabel: 'Character',
         templateIcon: 'mdi-account'
       }

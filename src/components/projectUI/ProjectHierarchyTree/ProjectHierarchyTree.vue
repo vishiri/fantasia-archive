@@ -37,6 +37,7 @@
           :class="resolveProjectHierarchyTreeNodeRowKindClass(node.nodeKind)"
           @auxclick="onDocumentRowAuxClick(node, $event)"
           @click="onWorldNodeRowClick(node, stat, $event)"
+          @contextmenu="node.nodeKind === 'addNewDocument' ? onAddNewDocumentRowContextMenu($event) : undefined"
           @pointerdown="onWorldNodeRowPointerDown(node, stat, $event)"
         >
           <q-icon
@@ -110,6 +111,7 @@ const {
   onBeforeDragStart,
   onTreeDataUpdate,
   onTreeDragEndCleanup,
+  onAddNewDocumentRowContextMenu,
   rootDroppableHandler,
   setTreeComponentRef,
   setTreeScrollHostRef,

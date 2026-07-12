@@ -76,6 +76,8 @@ export default {
       placementNicknameHoverOriginalNameLabel: '元の名前',
       placementNicknameHoverNicknameLabel: 'ニックネーム',
       removeGroupTooltip: 'グループを削除',
+      removeTemplateDisabledHasDocuments:
+        '削除する前に、このテンプレートに関連付けられたすべてのドキュメントを削除してください。',
       removeTemplateTooltip: 'ドキュメントテンプレートを削除',
       templateCanonicalNameLabel: 'ドキュメントテンプレート名',
       templateCanonicalNameTooltip: 'ドキュメントテンプレート全体の名前を正しく変更するには、この編集ダイアログの「ドキュメントテンプレート」セクションで調整してください。',

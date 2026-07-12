@@ -4,7 +4,6 @@ import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
 import {
   appendOpenedDocumentTabToRight,
-  computeOpenedDocumentHasUnsavedChanges,
   filterOpenedDocumentTabsKeepingUnsavedAndExceptDocument,
   findOpenedDocumentTabIndexByDocumentId,
   moveOpenedDocumentTabByOffset,
@@ -14,6 +13,7 @@ import {
   resolveOpenedDocumentTabsAfterBulkCloseWithoutChanges,
   resolveOpenedDocumentTabsAfterForceClose
 } from '../openedDocumentTabDomain'
+import { computeOpenedDocumentHasUnsavedChanges } from '../openedDocumentTabAppearance'
 
 const sampleTab: I_faOpenedDocumentTab = {
   documentId: 'doc-1',
@@ -22,6 +22,10 @@ const sampleTab: I_faOpenedDocumentTab = {
   templateIcon: 'mdi-feather',
   displayNameDraft: 'Draft',
   savedDisplayName: 'Saved',
+  documentTextColorDraft: '',
+  savedDocumentTextColor: '',
+  documentBackgroundColorDraft: '',
+  savedDocumentBackgroundColor: '',
   hasUnsavedChanges: true,
   editState: false
 }
@@ -30,8 +34,33 @@ const sampleTab: I_faOpenedDocumentTab = {
  * openedDocumentTabDomain helpers
  */
 test('Test that computeOpenedDocumentHasUnsavedChanges compares draft to saved baseline', () => {
-  expect(computeOpenedDocumentHasUnsavedChanges('A', 'B')).toBe(true)
-  expect(computeOpenedDocumentHasUnsavedChanges('Same', 'Same')).toBe(false)
+  expect(computeOpenedDocumentHasUnsavedChanges({
+    displayNameDraft: 'A',
+    documentBackgroundColorDraft: '',
+    documentTextColorDraft: '',
+    savedDisplayName: 'B',
+    savedDocumentBackgroundColor: '',
+    savedDocumentTextColor: ''
+  })).toBe(true)
+  expect(computeOpenedDocumentHasUnsavedChanges({
+    displayNameDraft: 'Same',
+    documentBackgroundColorDraft: '#112233',
+    documentTextColorDraft: '',
+    savedDisplayName: 'Same',
+    savedDocumentBackgroundColor: '#112233',
+    savedDocumentTextColor: ''
+  })).toBe(false)
+})
+
+test('Test that computeOpenedDocumentHasUnsavedChanges detects color draft changes', () => {
+  expect(computeOpenedDocumentHasUnsavedChanges({
+    displayNameDraft: 'Same',
+    documentBackgroundColorDraft: '',
+    documentTextColorDraft: '#AABBCC',
+    savedDisplayName: 'Same',
+    savedDocumentBackgroundColor: '',
+    savedDocumentTextColor: ''
+  })).toBe(true)
 })
 
 test('Test that appendOpenedDocumentTabToRight keeps uniqueness by append order', () => {

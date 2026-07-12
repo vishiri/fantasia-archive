@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
 
 import ProjectHierarchyTreeNode from '../ProjectHierarchyTreeNode.vue'
+import { resolveProjectHierarchyTreeDocumentAppearanceChrome } from '../scripts/projectHierarchyTreeDocumentAppearanceChromeWiring'
 import { expectCssColorValue } from 'app/helpers/vitestCssColorExpect'
 
 const baseNode = {
@@ -46,7 +47,11 @@ test('Test that ProjectHierarchyTreeNode renders world row chrome', () => {
   expect(wrapper.find('.projectHierarchyTreeNode--world').exists()).toBe(true)
   expect(wrapper.find('.q-icon').exists()).toBe(true)
   expect(wrapper.find('.q-focus-helper').exists()).toBe(true)
-  expectCssColorValue((wrapper.element as HTMLElement).style.color, '#112233')
+  expect((wrapper.element as HTMLElement).style.color).toBe('')
+  expectCssColorValue(
+    (wrapper.find('.projectHierarchyTreeNode__label').element as HTMLElement).style.color,
+    '#112233'
+  )
   expect(wrapper.find('.projectHierarchyTreeNode__label').exists()).toBe(true)
   expect(wrapper.find('.projectHierarchyTreeNode__icon--layoutKind').exists()).toBe(false)
 })
@@ -134,6 +139,41 @@ test('Test that ProjectHierarchyTreeNode shows document rows with placement icon
 })
 
 /**
+ * ProjectHierarchyTreeNode renders add-new rows with grey palette token and plus icon.
+ */
+test('Test that ProjectHierarchyTreeNode renders add-new row with grey palette class', () => {
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    global: {
+      stubs: {
+        QIcon: {
+          props: ['name'],
+          template: '<i class="q-icon" :name="name" />'
+        }
+      }
+    },
+    props: {
+      node: {
+        ...baseNode,
+        documentId: null,
+        documentTemplateId: 'template-1',
+        icon: 'mdi-plus',
+        id: 'placement-1__add-new',
+        label: 'Add new character',
+        nodeKind: 'addNewDocument',
+        titlePluralTranslations: { 'en-US': 'Characters' },
+        titleSingularTranslations: { 'en-US': 'Character' }
+      },
+      stat: {
+        open: false
+      }
+    }
+  })
+  expect(wrapper.find('.projectHierarchyTreeNode--addNewDocument').exists()).toBe(true)
+  expect(wrapper.find('.q-icon').attributes('name')).toBe('mdi-plus')
+  expect((wrapper.element as HTMLElement).style.color).toBe('')
+})
+
+/**
  * ProjectHierarchyTreeNode hides lazy placeholder rows.
  */
 test('Test that ProjectHierarchyTreeNode hides lazy placeholder rows', () => {
@@ -170,6 +210,175 @@ test('Test that ProjectHierarchyTreeNode applies document row class', () => {
   })
   expect(wrapper.classes()).toContain('projectHierarchyTreeNode--document')
   expect(wrapper.classes()).not.toContain('projectHierarchyTree__dragHandle')
+})
+
+test('Test that ProjectHierarchyTreeNode applies text-only document appearance without background class', () => {
+  const node = {
+    ...baseNode,
+    documentBackgroundColor: '',
+    documentId: 'doc-1',
+    documentTextColor: '#aabbcc',
+    nodeKind: 'document' as const
+  }
+  expect(resolveProjectHierarchyTreeDocumentAppearanceChrome(node)).toEqual({
+    color: '#aabbcc'
+  })
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    global: {
+      stubs: {
+        QIcon: {
+          props: ['name'],
+          template: '<i class="q-icon" :name="name" />'
+        }
+      }
+    },
+    props: {
+      node,
+      stat: {
+        open: false
+      }
+    }
+  })
+  expect(wrapper.classes()).toContain('projectHierarchyTreeNode--customDocumentAppearance')
+  const appearanceClasses = wrapper.classes().filter((className) => {
+    return className.includes('customDocument')
+  })
+  expect(appearanceClasses).toEqual(['projectHierarchyTreeNode--customDocumentAppearance'])
+  expect((wrapper.element as HTMLElement).style.backgroundColor).toBe('')
+  expectCssColorValue(
+    (wrapper.find('.projectHierarchyTreeNode__label').element as HTMLElement).style.color,
+    '#aabbcc'
+  )
+  wrapper.unmount()
+})
+
+test('Test that ProjectHierarchyTreeNode renders template placement icons through placement display resolver', () => {
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    global: {
+      stubs: {
+        QIcon: {
+          props: ['name'],
+          template: '<i class="q-icon" :name="name" />'
+        }
+      }
+    },
+    props: {
+      node: {
+        ...baseNode,
+        icon: 'mdi-account',
+        nodeKind: 'templatePlacement'
+      },
+      stat: {
+        open: false
+      }
+    }
+  })
+  expect(wrapper.find('.q-icon').exists()).toBe(true)
+  wrapper.unmount()
+})
+
+/**
+ * ProjectHierarchyTreeNode applies saved document appearance colors to document rows.
+ */
+test('Test that ProjectHierarchyTreeNode applies document appearance chrome colors', () => {
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    global: {
+      stubs: {
+        QIcon: {
+          props: ['name'],
+          template: '<i class="q-icon" :name="name" />'
+        }
+      }
+    },
+    props: {
+      node: {
+        ...baseNode,
+        documentBackgroundColor: '#221100',
+        documentId: 'doc-1',
+        documentTextColor: '#aabbcc',
+        nodeKind: 'document'
+      },
+      stat: {
+        open: false
+      }
+    }
+  })
+  expect(wrapper.classes()).toContain('projectHierarchyTreeNode--customDocumentAppearance')
+  expect(wrapper.classes()).toContain('projectHierarchyTreeNode--customDocumentBackground')
+  expect((wrapper.element as HTMLElement).style.color).toBe('')
+  expectCssColorValue((wrapper.element as HTMLElement).style.backgroundColor, '#221100')
+  expect((wrapper.element as HTMLElement).style.getPropertyValue('--projectHierarchyTreeNode-focusHelperColor').trim()).toBe('#221100')
+  expectCssColorValue(
+    (wrapper.find('.projectHierarchyTreeNode__label').element as HTMLElement).style.color,
+    '#aabbcc'
+  )
+  expectCssColorValue(
+    (wrapper.find('.projectHierarchyTreeNode__icon').element as HTMLElement).style.color,
+    '#aabbcc'
+  )
+})
+
+test('Test that ProjectHierarchyTreeNode resyncs kind class when node kind changes', async () => {
+  const treeNode = document.createElement('div')
+  treeNode.className = 'tree-node'
+  document.body.appendChild(treeNode)
+
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    attachTo: treeNode,
+    props: {
+      node: {
+        ...baseNode,
+        nodeKind: 'group'
+      },
+      stat: {
+        open: false
+      }
+    }
+  })
+  expect(treeNode.classList.contains('projectHierarchyTree-treeNode--group')).toBe(true)
+
+  await wrapper.setProps({
+    node: {
+      ...baseNode,
+      nodeKind: 'world'
+    }
+  })
+  expect(treeNode.classList.contains('projectHierarchyTree-treeNode--world')).toBe(true)
+  expect(treeNode.classList.contains('projectHierarchyTree-treeNode--group')).toBe(false)
+
+  wrapper.unmount()
+  treeNode.remove()
+})
+
+test('Test that ProjectHierarchyTreeNode resyncs kind class after template updates', async () => {
+  const treeNode = document.createElement('div')
+  treeNode.className = 'tree-node'
+  document.body.appendChild(treeNode)
+
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    attachTo: treeNode,
+    props: {
+      node: {
+        ...baseNode,
+        nodeKind: 'document',
+        documentId: 'doc-1'
+      },
+      stat: {
+        open: false
+      }
+    }
+  })
+  expect(treeNode.classList.contains('projectHierarchyTree-treeNode--document')).toBe(true)
+
+  await wrapper.setProps({
+    stat: {
+      open: true
+    }
+  })
+  expect(treeNode.classList.contains('projectHierarchyTree-treeNode--document')).toBe(true)
+
+  wrapper.unmount()
+  treeNode.remove()
 })
 
 /**

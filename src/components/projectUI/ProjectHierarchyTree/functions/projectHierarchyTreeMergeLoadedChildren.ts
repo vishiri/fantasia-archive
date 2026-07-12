@@ -1,5 +1,11 @@
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
+function isAddNewHierarchyTreeNode (
+  node: Pick<I_faProjectHierarchyTreeHeTreeNode, 'nodeKind'>
+): boolean {
+  return node.nodeKind === 'addNewDocument'
+}
+
 /**
  * Merges lazy-loaded child rows into a matching node by id.
  */
@@ -28,6 +34,13 @@ export function mergeLoadedChildrenIntoNode (
           }
           return incomingChild
         })
+        const incomingHasAddNew = node.children.some((child) => isAddNewHierarchyTreeNode(child))
+        if (!incomingHasAddNew) {
+          const existingAddNew = [...existingById.values()].find((child) => isAddNewHierarchyTreeNode(child))
+          if (existingAddNew !== undefined) {
+            node.children.push(existingAddNew)
+          }
+        }
       } else {
         node.children = children
       }

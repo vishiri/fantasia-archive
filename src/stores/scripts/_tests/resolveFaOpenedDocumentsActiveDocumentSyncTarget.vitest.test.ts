@@ -11,6 +11,10 @@ const sampleTab: I_faOpenedDocumentTab = {
   hasUnsavedChanges: false,
   editState: false,
   savedDisplayName: 'Doc A',
+  documentTextColorDraft: '',
+  savedDocumentTextColor: '',
+  documentBackgroundColorDraft: '',
+  savedDocumentBackgroundColor: '',
   tabLabel: 'Doc A',
   templateIcon: 'mdi-file'
 }

@@ -76,6 +76,8 @@ export default {
       placementNicknameHoverOriginalNameLabel: 'मूल नाम',
       placementNicknameHoverNicknameLabel: 'उपनाम',
       removeGroupTooltip: 'समूह हटाएँ',
+      removeTemplateDisabledHasDocuments:
+        'हटाने से पहले इस टेम्प्लेट से जुड़े सभी दस्तावेज़ हटाएँ।',
       removeTemplateTooltip: 'दस्तावेज़ टेम्प्लेट हटाएँ',
       templateCanonicalNameLabel: 'दस्तावेज़ टेम्प्लेट का नाम',
       templateCanonicalNameTooltip: 'पूरे दस्तावेज़ टेम्प्लेट का सही ढंग से नाम बदलने के लिए, कृपया इस संपादन संवाद के "दस्तावेज़ टेम्प्लेट" अनुभाग में जाएँ और वहाँ समायोजित करें।',

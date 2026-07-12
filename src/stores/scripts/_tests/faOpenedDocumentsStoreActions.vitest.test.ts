@@ -4,9 +4,11 @@ import { expect, test } from 'vitest'
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
 import {
+  applyFaOpenedDocumentBackgroundColorDraft,
   applyFaOpenedDocumentDisplayNameDraft,
   applyFaOpenedDocumentTabAfterDisplayNameSave,
   applyFaOpenedDocumentTabEditState,
+  applyFaOpenedDocumentTextColorDraft,
   buildFaOpenedDocumentsSnapshot,
   createFaOpenedDocumentTabFromOpenMeta,
   hydrateFaOpenedDocumentsTabsFromSnapshot,
@@ -22,6 +24,10 @@ const baseTab: I_faOpenedDocumentTab = {
   templateIcon: 'mdi-account',
   displayNameDraft: 'Hero',
   savedDisplayName: 'Hero',
+  documentTextColorDraft: '',
+  savedDocumentTextColor: '',
+  documentBackgroundColorDraft: '',
+  savedDocumentBackgroundColor: '',
   hasUnsavedChanges: false,
   editState: false
 }
@@ -73,7 +79,8 @@ test('Test that resolveFaOpenedDocumentOpenFromTree appends middle background ta
     treeMeta: {
       tabLabel: 'Quest',
       templateIcon: 'mdi-map'
-    }
+    },
+    worldId: 'world-1'
   })
   const result = resolveFaOpenedDocumentOpenFromTree({
     activeDocumentId,
@@ -116,6 +123,18 @@ test('Test that applyFaOpenedDocumentDisplayNameDraft marks unsaved changes', ()
   expect(next.displayNameDraft).toBe('Renamed Hero')
 })
 
+test('Test that applyFaOpenedDocumentTextColorDraft marks unsaved changes', () => {
+  const next = applyFaOpenedDocumentTextColorDraft(baseTab, '#AABBCC')
+  expect(next.documentTextColorDraft).toBe('#AABBCC')
+  expect(next.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that applyFaOpenedDocumentBackgroundColorDraft marks unsaved changes', () => {
+  const next = applyFaOpenedDocumentBackgroundColorDraft(baseTab, '#112233')
+  expect(next.documentBackgroundColorDraft).toBe('#112233')
+  expect(next.hasUnsavedChanges).toBe(true)
+})
+
 test('Test that applyFaOpenedDocumentTabEditState updates editState only', () => {
   const next = applyFaOpenedDocumentTabEditState(baseTab, true)
   expect(next.editState).toBe(true)
@@ -126,7 +145,9 @@ test('Test that applyFaOpenedDocumentTabAfterDisplayNameSave exits edit mode by 
   const editingTab = applyFaOpenedDocumentTabEditState(baseTab, true)
   const saved = applyFaOpenedDocumentTabAfterDisplayNameSave(editingTab, {
     keepEditMode: false,
-    savedDisplayName: 'Saved Hero'
+    savedDisplayName: 'Saved Hero',
+    savedDocumentBackgroundColor: '#112233',
+    savedDocumentTextColor: '#AABBCC'
   })
   expect(saved.savedDisplayName).toBe('Saved Hero')
   expect(saved.hasUnsavedChanges).toBe(false)
@@ -137,7 +158,9 @@ test('Test that applyFaOpenedDocumentTabAfterDisplayNameSave can keep edit mode'
   const editingTab = applyFaOpenedDocumentTabEditState(baseTab, true)
   const saved = applyFaOpenedDocumentTabAfterDisplayNameSave(editingTab, {
     keepEditMode: true,
-    savedDisplayName: 'Saved Hero'
+    savedDisplayName: 'Saved Hero',
+    savedDocumentBackgroundColor: '',
+    savedDocumentTextColor: ''
   })
   expect(saved.editState).toBe(true)
 })
@@ -167,12 +190,32 @@ test('Test that createFaOpenedDocumentTabFromOpenMeta seeds draft from display n
     treeMeta: {
       tabLabel: 'Character',
       templateIcon: 'mdi-skull'
-    }
+    },
+    worldId: 'world-1'
   })
   expect(tab.displayNameDraft).toBe('Villain')
   expect(tab.savedDisplayName).toBe('Villain')
   expect(tab.tabLabel).toBe('Character')
   expect(tab.editState).toBe(false)
+  expect(tab.worldId).toBe('world-1')
+})
+
+test('Test that createFaOpenedDocumentTabFromOpenMeta seeds appearance colors from database values', () => {
+  const tab = createFaOpenedDocumentTabFromOpenMeta({
+    displayName: 'Villain',
+    documentBackgroundColor: '#112233',
+    documentId: 'doc-2',
+    documentTextColor: '#AABBCC',
+    treeMeta: {
+      tabLabel: 'Character',
+      templateIcon: 'mdi-skull'
+    },
+    worldId: 'world-1'
+  })
+  expect(tab.documentTextColorDraft).toBe('#AABBCC')
+  expect(tab.savedDocumentTextColor).toBe('#AABBCC')
+  expect(tab.documentBackgroundColorDraft).toBe('#112233')
+  expect(tab.savedDocumentBackgroundColor).toBe('#112233')
 })
 
 test('Test that resolveFaOpenedDocumentsActiveDocumentSyncTarget keeps active id on unknown routes', () => {
@@ -209,12 +252,16 @@ test('Test that hydrateFaOpenedDocumentsTabsFromSnapshot normalizes legacy tab r
     tabs: [{
       ...baseTab,
       editState: undefined as unknown as boolean,
-      persistenceState: undefined as unknown as 'persisted'
+      persistenceState: undefined as unknown as 'persisted',
+      savedDocumentBackgroundColor: undefined as unknown as string,
+      savedDocumentTextColor: undefined as unknown as string
     }]
   })
   expect(hydrated.activeDocumentId).toBe('doc-1')
   expect(hydrated.tabs[0]?.editState).toBe(false)
   expect(hydrated.tabs[0]?.persistenceState).toBe('persisted')
+  expect(hydrated.tabs[0]?.savedDocumentTextColor).toBe('')
+  expect(hydrated.tabs[0]?.savedDocumentBackgroundColor).toBe('')
 })
 
 test('Test that resolveFaOpenedDocumentsActiveDocumentSyncTarget follows workspace document routes', () => {

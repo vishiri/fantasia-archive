@@ -29,7 +29,15 @@ const discardQDialogStub = defineComponent({
 
 const discardDialogGlobal = {
   mocks: {
-    $t: (key: string, values?: Record<string, string>) => `${key}:${values?.documentName ?? ''}`
+    $t: (key: string) => {
+      if (key === 'dialogs.discardOpenedDocumentTab.titlePrefix') {
+        return 'Discard changes to '
+      }
+      if (key === 'dialogs.discardOpenedDocumentTab.titleSuffix') {
+        return '?'
+      }
+      return key
+    }
   },
   stubs: {
     QBtn: {
@@ -57,6 +65,10 @@ function mountDiscardDialogWithPendingTab () {
         hasUnsavedChanges: true,
         persistenceState: 'persisted',
         savedDisplayName: 'Hero',
+        documentTextColorDraft: '',
+        savedDocumentTextColor: '',
+        documentBackgroundColorDraft: '',
+        savedDocumentBackgroundColor: '',
         tabLabel: 'Character',
         templateIcon: 'mdi-account'
       }
@@ -91,6 +103,7 @@ test('Test that DialogDiscardOpenedDocumentTab renders discard title and action 
 
   expect(wrapper.find('[data-test-locator="dialogDiscardOpenedDocumentTab"]').exists()).toBe(true)
   expect(wrapper.find('[data-test-locator="dialogDiscardOpenedDocumentTab-title"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="dialogDiscardOpenedDocumentTab-title"] .text-primary-bright').text()).toBe('Hero')
   expect(wrapper.find('[data-test-locator="dialogDiscardOpenedDocumentTab-discard"]').exists()).toBe(true)
 
   wrapper.unmount()

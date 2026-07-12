@@ -63,9 +63,9 @@
   cursor: grabbing;
 }
 
-.projectHierarchyTreeHost .tree-node:hover .projectHierarchyTreeNode > .q-focus-helper,
-.projectHierarchyTreeHost .tree-node .projectHierarchyTreeNode--activeTabDocument > .q-focus-helper {
-  background: currentcolor;
+.projectHierarchyTreeHost .projectHierarchyTreeNode.q-hoverable:hover > .q-focus-helper,
+.projectHierarchyTreeHost .projectHierarchyTreeNode--activeTabDocument > .q-focus-helper {
+  background: var(--projectHierarchyTreeNode-focusHelperColor);
   opacity: $qFocusable-hoverHelper-opacity !important;
 
   &::before,
@@ -127,40 +127,24 @@
 
 .projectHierarchyTree__nodeRow--group,
 .projectHierarchyTree__nodeRow--documentTemplate,
-.projectHierarchyTree__nodeRow--document {
+.projectHierarchyTree__nodeRow--document,
+.projectHierarchyTree__nodeRow--addNewDocument,
+.projectHierarchyTree-treeNode--group,
+.projectHierarchyTree-treeNode--documentTemplate,
+.projectHierarchyTree-treeNode--document,
+.projectHierarchyTree-treeNode--addNewDocument {
   cursor: pointer;
 
   &.projectHierarchyTree__leftPointerDown {
     cursor: grab;
   }
 
-  .projectHierarchyTreeNode {
-    margin-left: $projectHierarchyTree-nodeRowIndent-offsetPx;
-    padding: $projectHierarchyTree-nodeRowContent-paddingBlock $projectHierarchyTree-nodeRowContent-paddingInlineEnd $projectHierarchyTree-nodeRowContent-paddingBlock $projectHierarchyTree-nodeRowContent-paddingInlineStart;
-  }
-
-  .projectHierarchyTree__openIcon {
-    left: $projectHierarchyTree-openIcon-nested-positionLeft;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%) rotate(0deg);
-
-    &.projectHierarchyTree__openIcon--open {
-      transform: translateY(-50%) rotate(90deg);
-    }
-  }
-}
-
-.projectHierarchyTree-treeNode--group,
-.projectHierarchyTree-treeNode--documentTemplate,
-.projectHierarchyTree-treeNode--document {
-  cursor: pointer;
-
   .projectHierarchyTree__nodeRow.projectHierarchyTree__leftPointerDown {
     cursor: grab;
   }
 
   .projectHierarchyTreeNode {
+    border-radius: $projectHierarchyTree-node-borderRadius;
     margin-left: $projectHierarchyTree-nodeRowIndent-offsetPx;
     padding: $projectHierarchyTree-nodeRowContent-paddingBlock $projectHierarchyTree-nodeRowContent-paddingInlineEnd $projectHierarchyTree-nodeRowContent-paddingBlock $projectHierarchyTree-nodeRowContent-paddingInlineStart;
   }

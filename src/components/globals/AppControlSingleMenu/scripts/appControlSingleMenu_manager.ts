@@ -5,6 +5,7 @@ import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 
 import { createAppControlSingleMenu } from './functions/createAppControlSingleMenu'
 import { appControlShouldShowSeparatorAltBeforeItem } from './functions/appControlSingleMenuSeparatorAlt'
+import { resolveAppControlMenuItemColorClasses } from './functions/resolveAppControlMenuItemColorClasses'
 
 const appControlSingleMenuApi = createAppControlSingleMenu({
   appControlShouldShowSeparatorAltBeforeItem,
@@ -21,3 +22,5 @@ export const useAppControlSingleMenu = appControlSingleMenuApi.useAppControlSing
 
 export const APP_CONTROL_SINGLE_MENU_SUBMENU_HOVER_LEAVE_MS =
   appControlSingleMenuApi.APP_CONTROL_SINGLE_MENU_SUBMENU_HOVER_LEAVE_MS
+
+export { resolveAppControlMenuItemColorClasses }

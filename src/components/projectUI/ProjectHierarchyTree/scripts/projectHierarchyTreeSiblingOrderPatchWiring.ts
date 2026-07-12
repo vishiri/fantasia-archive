@@ -4,6 +4,7 @@ import type {
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { isProjectHierarchyTreeDocumentSiblingRow } from '../functions/projectHierarchyTreeDnD'
+import { ensureProjectHierarchyTreeAddNewNodePinnedToBottom } from './projectHierarchyTreeAddNewDocumentNode'
 import { findProjectHierarchyTreeDocumentParentBucket } from '../functions/projectHierarchyTreeDocumentParentBucket'
 
 export function applyProjectHierarchyTreeSiblingOrderToTreeData (
@@ -49,6 +50,7 @@ export function applyProjectHierarchyTreeSiblingOrderToTreeData (
     parentBucket.children[index] = nextRow
     siblingIndex += 1
   }
+  ensureProjectHierarchyTreeAddNewNodePinnedToBottom(parentBucket.children)
   return siblingIndex === reorderedSiblingRows.length
 }
 

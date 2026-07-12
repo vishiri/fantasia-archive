@@ -12,6 +12,7 @@ import {
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeHoverTooltipWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeHoverTooltipWiring'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeMissingTranslationsWarningWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeMissingTranslationsWarningWiring'
 import {
+  isDialogProjectSettingsWorldTemplateLayoutPlacementRemoveDisabled,
   resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeDisplayIcon,
   resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeEditTooltipI18nKey,
   resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeHasValidationError,
@@ -29,6 +30,7 @@ type T_dialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring = {
   placementNicknameHoverTooltipOffset: [number, number]
   placementNicknameHoverTooltipOriginalNameLine: ComputedRef<string | undefined>
   placementNicknameHoverTooltipTestText: ComputedRef<string | undefined>
+  removeDisabled: ComputedRef<boolean>
   removeTooltipText: ComputedRef<string>
   rowHasValidationError: ComputedRef<boolean>
   showMissingTranslationsWarning: ComputedRef<boolean>
@@ -106,9 +108,13 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodePresentati
     )
   })
 
+  const removeDisabled = deps.computed(() => {
+    return isDialogProjectSettingsWorldTemplateLayoutPlacementRemoveDisabled(deps.props.node)
+  })
+
   const removeTooltipText = deps.computed(() => {
     return deps.i18n.global.t(
-      resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeRemoveTooltipI18nKey(deps.props.node.nodeKind)
+      resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeRemoveTooltipI18nKey(deps.props.node)
     )
   })
 
@@ -130,6 +136,7 @@ export function createDialogProjectSettingsWorldTemplateLayoutTreeNodePresentati
     placementNicknameHoverTooltipOffset,
     placementNicknameHoverTooltipOriginalNameLine: hoverTooltipWiring.placementNicknameHoverTooltipOriginalNameLine,
     placementNicknameHoverTooltipTestText: hoverTooltipWiring.placementNicknameHoverTooltipTestText,
+    removeDisabled,
     removeTooltipText,
     rowHasValidationError,
     showMissingTranslationsWarning: missingTranslationsWarningWiring.showMissingTranslationsWarning,

@@ -5,10 +5,12 @@ export const PROJECT_HIERARCHY_TREE_TREE_NODE_KIND_CLASS_LIST = [
   'projectHierarchyTree-treeNode--world',
   'projectHierarchyTree-treeNode--group',
   'projectHierarchyTree-treeNode--documentTemplate',
-  'projectHierarchyTree-treeNode--document'
+  'projectHierarchyTree-treeNode--document',
+  'projectHierarchyTree-treeNode--addNewDocument'
 ] as const
 
 const PROJECT_HIERARCHY_TREE_TREE_NODE_KIND_CLASS_BY_KIND = {
+  addNewDocument: 'projectHierarchyTree-treeNode--addNewDocument',
   document: 'projectHierarchyTree-treeNode--document',
   group: 'projectHierarchyTree-treeNode--group',
   templatePlacement: 'projectHierarchyTree-treeNode--documentTemplate',
@@ -29,10 +31,12 @@ export const PROJECT_HIERARCHY_TREE_NODE_ROW_KIND_CLASS_LIST = [
   'projectHierarchyTree__nodeRow--world',
   'projectHierarchyTree__nodeRow--group',
   'projectHierarchyTree__nodeRow--documentTemplate',
-  'projectHierarchyTree__nodeRow--document'
+  'projectHierarchyTree__nodeRow--document',
+  'projectHierarchyTree__nodeRow--addNewDocument'
 ] as const
 
 const PROJECT_HIERARCHY_TREE_NODE_ROW_KIND_CLASS_BY_KIND = {
+  addNewDocument: 'projectHierarchyTree__nodeRow--addNewDocument',
   document: 'projectHierarchyTree__nodeRow--document',
   group: 'projectHierarchyTree__nodeRow--group',
   templatePlacement: 'projectHierarchyTree__nodeRow--documentTemplate',

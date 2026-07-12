@@ -15,11 +15,21 @@ export const FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE = false
 /** Current opened_documents.snapshot_json schema version written by the app. */
 export const FA_OPENED_DOCUMENTS_SNAPSHOT_SCHEMA_VERSION = 2
 
+/** Partial compare input for opened-document tab unsaved detection. */
+export interface I_openedDocumentTabUnsavedCompareInput {
+  displayNameDraft: string
+  savedDisplayName: string
+  documentTextColorDraft: string
+  savedDocumentTextColor: string
+  documentBackgroundColorDraft: string
+  savedDocumentBackgroundColor: string
+}
+
 /** One open document tab in the workspace session. */
 export interface I_faOpenedDocumentTab {
   documentId: string
   persistenceState: T_faOpenedDocumentPersistenceState
-  /** Set when persistenceState is temporary. */
+  /** World id for tab world indicator and temporary create flows. */
   worldId?: string | undefined
   /** Set when persistenceState is temporary. */
   templateId?: string | undefined
@@ -29,6 +39,10 @@ export interface I_faOpenedDocumentTab {
   templateIcon: string
   displayNameDraft: string
   savedDisplayName: string
+  documentTextColorDraft: string
+  savedDocumentTextColor: string
+  documentBackgroundColorDraft: string
+  savedDocumentBackgroundColor: string
   hasUnsavedChanges: boolean
   /**
    * Per-tab workspace edit mode. false = preview (read-only presentation);

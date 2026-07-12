@@ -4,6 +4,15 @@ import type {
   T_faOpenedDocumentPersistenceState
 } from 'app/types/I_faOpenedDocumentsDomain'
 
+function mapSavedAppearanceColorFromDb (
+  value: string | null | undefined
+): string {
+  if (value === null || value === undefined) {
+    return ''
+  }
+  return value
+}
+
 /**
  * Whether the tab exists only in session until first save.
  */
@@ -46,7 +55,7 @@ export function normalizeOpenedDocumentTabPersistenceState (
 }
 
 /**
- * Seeds a temporary opened document tab in edit mode with unsaved changes.
+ * Seeds a temporary opened document tab in edit mode without dirty state until the user edits.
  */
 export function createTemporaryOpenedDocumentTabSeed (input: {
   displayName: string
@@ -60,11 +69,15 @@ export function createTemporaryOpenedDocumentTabSeed (input: {
   return {
     displayNameDraft: input.displayName,
     documentId: input.documentId,
+    documentBackgroundColorDraft: '',
+    documentTextColorDraft: '',
     editState: true,
-    hasUnsavedChanges: true,
+    hasUnsavedChanges: false,
     parentDocumentId: input.parentDocumentId,
     persistenceState: 'temporary',
-    savedDisplayName: '',
+    savedDisplayName: input.displayName,
+    savedDocumentBackgroundColor: '',
+    savedDocumentTextColor: '',
     tabLabel: input.tabLabel,
     templateIcon: input.templateIcon,
     templateId: input.templateId,
@@ -94,19 +107,31 @@ export function promoteTemporaryOpenedDocumentTabAfterCreate (
     documentId: string
     keepEditMode: boolean
     savedDisplayName: string
+    savedDocumentTextColor?: string | null | undefined
+    savedDocumentBackgroundColor?: string | null | undefined
   }
 ): I_faOpenedDocumentTab {
+  const savedDocumentTextColor = mapSavedAppearanceColorFromDb(
+    input.savedDocumentTextColor
+  )
+  const savedDocumentBackgroundColor = mapSavedAppearanceColorFromDb(
+    input.savedDocumentBackgroundColor
+  )
   return {
     ...tab,
     displayNameDraft: input.savedDisplayName,
     documentId: input.documentId,
+    documentBackgroundColorDraft: savedDocumentBackgroundColor,
+    documentTextColorDraft: savedDocumentTextColor,
     editState: input.keepEditMode,
     hasUnsavedChanges: false,
     parentDocumentId: undefined,
     persistenceState: 'persisted',
     savedDisplayName: input.savedDisplayName,
+    savedDocumentBackgroundColor,
+    savedDocumentTextColor,
     templateId: undefined,
-    worldId: undefined
+    worldId: tab.worldId
   }
 }
 

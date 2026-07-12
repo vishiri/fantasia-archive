@@ -118,6 +118,11 @@ const templateNode = {
   worldAppendix: 'sheet'
 }
 
+const templateNodeRemovable = {
+  ...templateNode,
+  documentCountInWorld: 0
+}
+
 const faLocaleTranslationsInputStub = defineComponent({
   name: 'FaLocaleTranslationsInput',
   props: {
@@ -308,24 +313,45 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNode omits placement
 
 /**
  * DialogProjectSettingsWorldTemplateLayoutTreeNode
- * Renders template node with document count and emits removePlacement.
+ * Disables template remove when documents are connected in the world.
  */
-test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNode renders template node and emits removePlacement', async () => {
+test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNode disables template remove when documents exist', async () => {
   const w = mountTreeNode({
     node: templateNode
   })
 
-  expect(w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-count"]').text()).toBe('(3)')
+  const removeButton = w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-remove"]')
+  expect(removeButton.attributes('data-test-remove-disabled')).toBe('true')
+  expect(removeButton.attributes('data-test-tooltip-text')).toBe(
+    'dialogs.projectSettings.fields.worldTemplateLayout.removeTemplateDisabledHasDocuments'
+  )
+
+  await removeButton.trigger('click')
+  expect(w.emitted('removePlacement')).toBeUndefined()
+})
+
+/**
+ * DialogProjectSettingsWorldTemplateLayoutTreeNode
+ * Renders template node with document count and emits removePlacement when removable.
+ */
+test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNode renders template node and emits removePlacement', async () => {
+  const w = mountTreeNode({
+    node: templateNodeRemovable
+  })
+
+  expect(w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-edit"]').attributes('data-test-tooltip-text')).toBe(
     'dialogs.projectSettings.fields.worldTemplateLayout.editTemplateTooltip'
   )
-  expect(w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-remove"]').attributes('data-test-tooltip-text')).toBe(
+  const removeButton = w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-remove"]')
+  expect(removeButton.attributes('data-test-remove-disabled')).toBe('false')
+  expect(removeButton.attributes('data-test-tooltip-text')).toBe(
     'dialogs.projectSettings.fields.worldTemplateLayout.removeTemplateTooltip'
   )
   expect(w.text()).toContain('(sheet)')
 
-  await w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-remove"]').trigger('click')
+  await removeButton.trigger('click')
   expect(w.emitted('removePlacement')?.[0]!).toEqual(['placement-a'])
 })
 

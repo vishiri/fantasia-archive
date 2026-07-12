@@ -244,6 +244,7 @@ test('Test that tree node interaction wiring removes groups and placements', () 
     emitDeleteGroup,
     emitRemovePlacement,
     getNodeKind: () => 'group',
+    isRemoveDisabled: () => false,
     renameMenuWiring: {
       openRenameMenu,
       supportsRenameMenu
@@ -259,6 +260,7 @@ test('Test that tree node interaction wiring removes groups and placements', () 
     emitDeleteGroup,
     emitRemovePlacement,
     getNodeKind: () => 'template',
+    isRemoveDisabled: () => false,
     renameMenuWiring: {
       openRenameMenu,
       supportsRenameMenu
@@ -267,6 +269,28 @@ test('Test that tree node interaction wiring removes groups and placements', () 
 
   templateInteraction.onRemoveClick()
   expect(emitRemovePlacement).toHaveBeenCalled()
+})
+
+test('Test that tree node interaction wiring ignores remove when disabled', () => {
+  const actionTooltipsWiring = createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring()
+  const emitDeleteGroup = vi.fn()
+  const emitRemovePlacement = vi.fn()
+
+  const interaction = createDialogProjectSettingsWorldTemplateLayoutTreeNodeInteractionWiring({
+    actionTooltipsWiring,
+    emitDeleteGroup,
+    emitRemovePlacement,
+    getNodeKind: () => 'template',
+    isRemoveDisabled: () => true,
+    renameMenuWiring: {
+      openRenameMenu: vi.fn(),
+      supportsRenameMenu: ref(true)
+    } as never
+  })
+
+  interaction.onRemoveClick()
+  expect(emitDeleteGroup).not.toHaveBeenCalled()
+  expect(emitRemovePlacement).not.toHaveBeenCalled()
 })
 
 test('Test that tree node interaction wiring opens rename menu on edit and guarded context menu', () => {
@@ -279,6 +303,7 @@ test('Test that tree node interaction wiring opens rename menu on edit and guard
     emitDeleteGroup: vi.fn(),
     emitRemovePlacement: vi.fn(),
     getNodeKind: () => 'template',
+    isRemoveDisabled: () => false,
     renameMenuWiring: {
       openRenameMenu,
       supportsRenameMenu

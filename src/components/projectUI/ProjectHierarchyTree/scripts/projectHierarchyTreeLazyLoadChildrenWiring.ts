@@ -7,13 +7,18 @@ import type {
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { mapHierarchyDocumentChildrenToTreeNodes } from '../functions/mapHierarchyDocumentChildrenToTreeNodes'
+import {
+  finalizeProjectHierarchyTreePlacementTopLevelChildren
+} from './projectHierarchyTreeAddNewDocumentNode'
 import { mergeLoadedChildrenIntoNode } from '../functions/projectHierarchyTreeMergeLoadedChildren'
+import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 
 export async function refreshProjectHierarchyTreeNodeChildrenFromDatabase (deps: {
   listPlacementDocumentChildren: (
     input: I_faProjectHierarchyTreeListPlacementChildrenInput
   ) => Promise<{ items: I_faProjectHierarchyTreeDocumentChild[] }>
   nodeId: string
+  preferredLanguageCode: T_faUserSettingsLanguageCode
   publishTreeRevision: (
     nodeKind: I_faProjectHierarchyTreeHeTreeNode['nodeKind'],
     nodeId: string
@@ -28,6 +33,7 @@ export async function refreshProjectHierarchyTreeNodeChildrenFromDatabase (deps:
   await loadProjectHierarchyTreeNodeChildren({
     listPlacementDocumentChildren: deps.listPlacementDocumentChildren,
     node,
+    preferredLanguageCode: deps.preferredLanguageCode,
     publishTreeRevision: deps.publishTreeRevision,
     treeData: deps.treeData
   })
@@ -38,28 +44,37 @@ export async function loadProjectHierarchyTreeNodeChildren (deps: {
     input: I_faProjectHierarchyTreeListPlacementChildrenInput
   ) => Promise<{ items: I_faProjectHierarchyTreeDocumentChild[] }>
   node: I_faProjectHierarchyTreeHeTreeNode
+  preferredLanguageCode: T_faUserSettingsLanguageCode
   publishTreeRevision: (
     nodeKind: I_faProjectHierarchyTreeHeTreeNode['nodeKind'],
     nodeId: string
   ) => Promise<void>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }): Promise<void> {
-  if (!deps.node.hasChildren || deps.node.childrenLoaded) {
+  if (deps.node.childrenLoaded) {
     return
   }
   if (deps.node.nodeKind === 'templatePlacement' && deps.node.placementId !== null) {
     const result = await deps.listPlacementDocumentChildren({
       placementId: deps.node.placementId
     })
-    const children = mapHierarchyDocumentChildrenToTreeNodes({
+    const docChildren = mapHierarchyDocumentChildrenToTreeNodes({
       items: result.items,
       placementIcon: deps.node.icon,
       worldColor: deps.node.worldColor,
       worldId: deps.node.worldId
     })
+    const children = finalizeProjectHierarchyTreePlacementTopLevelChildren({
+      children: docChildren,
+      placement: deps.node,
+      preferredLanguageCode: deps.preferredLanguageCode
+    })
     if (mergeLoadedChildrenIntoNode(deps.treeData.value, deps.node.id, children)) {
       await deps.publishTreeRevision(deps.node.nodeKind, deps.node.id)
     }
+    return
+  }
+  if (!deps.node.hasChildren) {
     return
   }
   if (

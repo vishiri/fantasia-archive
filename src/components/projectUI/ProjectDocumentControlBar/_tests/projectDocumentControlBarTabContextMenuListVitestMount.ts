@@ -1,9 +1,14 @@
+import type { CSSProperties } from 'vue'
 import { mount } from '@vue/test-utils'
 import { vi } from 'vitest'
 
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 import { FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE } from 'app/types/I_faOpenedDocumentsDomain'
 
+import {
+  resolveProjectDocumentControlBarTabAppearanceChrome,
+  resolveProjectDocumentControlBarTabInlineStyle
+} from '../scripts/projectDocumentControlBarTabAppearanceChromeWiring'
 import ProjectDocumentControlBarTabContextMenuList from '../ProjectDocumentControlBarTabContextMenuList.vue'
 
 export const projectDocumentControlBarTabContextMenuSampleTab: I_faOpenedDocumentTab = {
@@ -13,6 +18,10 @@ export const projectDocumentControlBarTabContextMenuSampleTab: I_faOpenedDocumen
   hasUnsavedChanges: true,
   persistenceState: 'persisted',
   savedDisplayName: 'Hero',
+  documentTextColorDraft: '',
+  savedDocumentTextColor: '',
+  documentBackgroundColorDraft: '',
+  savedDocumentBackgroundColor: '',
   tabLabel: 'Character',
   templateIcon: 'mdi-account'
 }
@@ -24,6 +33,10 @@ export const projectDocumentControlBarTabContextMenuSecondTab: I_faOpenedDocumen
   hasUnsavedChanges: false,
   persistenceState: 'persisted',
   savedDisplayName: 'Villain',
+  documentTextColorDraft: '',
+  savedDocumentTextColor: '',
+  documentBackgroundColorDraft: '',
+  savedDocumentBackgroundColor: '',
   tabLabel: 'Character',
   templateIcon: 'mdi-account-outline'
 }
@@ -51,10 +64,18 @@ export function mountProjectDocumentControlBarTabContextMenuList (
   input: {
     handlers?: ReturnType<typeof createProjectDocumentControlBarTabContextMenuListHandlers>
     isBrowseSubmenuOpen?: boolean
+    openedDocumentTabs?: readonly I_faOpenedDocumentTab[]
+    resolveDocumentTabAppearanceChrome?: (tab: I_faOpenedDocumentTab) => ReturnType<typeof resolveProjectDocumentControlBarTabAppearanceChrome>
+    resolveDocumentTabInlineStyle?: (tab: I_faOpenedDocumentTab) => CSSProperties | undefined
+    resolveTabWorldIndicatorColor?: (tab: I_faOpenedDocumentTab) => string | null
     showDeleteThisDocument?: boolean
+    showWorldTabIndicators?: boolean
   } = {}
 ) {
   const handlers = input.handlers ?? createProjectDocumentControlBarTabContextMenuListHandlers()
+  const resolveDocumentTabAppearanceChrome = input.resolveDocumentTabAppearanceChrome ?? resolveProjectDocumentControlBarTabAppearanceChrome
+  const resolveDocumentTabInlineStyle = input.resolveDocumentTabInlineStyle ?? resolveProjectDocumentControlBarTabInlineStyle
+  const resolveTabWorldIndicatorColor = input.resolveTabWorldIndicatorColor ?? (() => null)
 
   return mount(ProjectDocumentControlBarTabContextMenuList, {
     props: {
@@ -72,13 +93,17 @@ export function mountProjectDocumentControlBarTabContextMenuList (
       moveDocumentTabRightKeybindLabel: 'Ctrl+Right',
       moveTabLeftLabel: 'Move tab left',
       moveTabRightLabel: 'Move tab right',
-      openedDocumentTabs: [
+      openedDocumentTabs: input.openedDocumentTabs ?? [
         projectDocumentControlBarTabContextMenuSampleTab,
         projectDocumentControlBarTabContextMenuSecondTab
       ],
       resolveBrowseTabLabel: (tab: I_faOpenedDocumentTab) => tab.displayNameDraft,
       resolveBrowseTabRoute: (documentId: string) => `/home/document/${documentId}`,
+      resolveDocumentTabAppearanceChrome,
+      resolveDocumentTabInlineStyle,
+      resolveTabWorldIndicatorColor,
       showDeleteThisDocument: input.showDeleteThisDocument ?? true,
+      showWorldTabIndicators: input.showWorldTabIndicators ?? false,
       ...handlers
     },
     global: {
@@ -86,7 +111,8 @@ export function mountProjectDocumentControlBarTabContextMenuList (
         QIcon: { template: '<span class="q-icon-stub" />' },
         QItem: {
           emits: ['click', 'mouseenter', 'mouseleave'],
-          template: '<div class="q-item-stub" @click="$emit(\'click\', $event)" @mouseenter="$emit(\'mouseenter\', $event)" @mouseleave="$emit(\'mouseleave\', $event)"><slot /></div>'
+          inheritAttrs: false,
+          template: '<div class="q-item-stub" v-bind="$attrs" @click="$emit(\'click\', $event)" @mouseenter="$emit(\'mouseenter\', $event)" @mouseleave="$emit(\'mouseleave\', $event)"><slot /></div>'
         },
         QItemSection: { template: '<div class="q-item-section-stub"><slot /></div>' },
         QList: { template: '<div class="q-list-stub"><slot /></div>' },

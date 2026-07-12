@@ -76,6 +76,8 @@ export default {
       placementNicknameHoverOriginalNameLabel: 'الاسم الأصلي',
       placementNicknameHoverNicknameLabel: 'الاسم المستعار',
       removeGroupTooltip: 'إزالة المجموعة',
+      removeTemplateDisabledHasDocuments:
+        'أزل كل المستندات المرتبطة بهذا القالب قبل إزالته.',
       removeTemplateTooltip: 'إزالة قالب المستند',
       templateCanonicalNameLabel: 'اسم قالب المستند',
       templateCanonicalNameTooltip: 'لإعادة تسمية قالب مستند بالكامل بشكل صحيح، يرجى الانتقال إلى قسم "قوالب المستندات" في مربع حوار التحرير هذا وتعديله هناك.',

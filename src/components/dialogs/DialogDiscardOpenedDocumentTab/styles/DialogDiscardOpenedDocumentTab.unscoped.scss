@@ -1,9 +1,20 @@
 @use './variables' as *;
 
-.dialogDiscardOpenedDocumentTab {
+.q-dialog > .q-dialog__inner > .q-card.dialogDiscardOpenedDocumentTab {
+  max-width: $dialogDiscardOpenedDocumentTab-maxWidth;
   min-width: $dialogDiscardOpenedDocumentTab-minWidth;
+  width: min(#{$dialogDiscardOpenedDocumentTab-maxWidth}, calc(100vw - #{$dialogDiscardOpenedDocumentTab-viewportInlineSubtractPx}));
+}
+
+.q-dialog > .q-dialog__inner > .q-card.dialogDiscardOpenedDocumentTab > .q-card__section {
+  max-width: 100%;
+  width: 100%;
 }
 
 .dialogDiscardOpenedDocumentTab__title {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   word-break: break-word;
 }

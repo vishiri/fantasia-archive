@@ -2,6 +2,7 @@ import type { I_assembleProjectDocumentControlBarApiInput } from 'app/types/I_fa
 import type { I_faActionPayloadMap, T_faActionId } from 'app/types/I_faActionManagerDomain'
 import type { I_faKeybindsSnapshot, T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+import type { I_faProjectHierarchyTreeWorkspaceWorld } from 'app/types/I_faProjectHierarchyTreeDomain'
 import type { T_projectDocumentControlBarSaveButtonColor } from 'app/types/T_projectDocumentControlBarSaveButtonColor'
 import type { I_computedRef } from 'app/types/I_vueCompositionShims'
 import type { StoreGeneric, T_piniaStoreToRefs } from 'app/types/I_vuePiniaInjected'
@@ -35,6 +36,7 @@ export interface I_faCreateUseProjectDocumentControlBarDeps {
     resolveShowProjectDocumentControlBarSaveButtons: I_assembleProjectDocumentControlBarApiInput['resolveShowProjectDocumentControlBarSaveButtons']
     resolveProjectDocumentControlBarSaveButtonColor: I_assembleProjectDocumentControlBarApiInput['resolveProjectDocumentControlBarSaveButtonColor']
     runFaAction: I_assembleProjectDocumentControlBarApiInput['runFaAction']
+    projectWorlds: I_computedRef<readonly I_faProjectHierarchyTreeWorkspaceWorld[]>
     tabs: I_computedRef<readonly I_faOpenedDocumentTab[]>
     translateCopyNameFailed: () => string
     translateCopyNameSuccess: () => string
@@ -86,6 +88,7 @@ export interface I_faCreateUseProjectDocumentControlBarDeps {
     requestCloseTab: (documentId: string) => void
     requestDeleteDocument: (documentId: string) => void
   }
+  S_FaProjectHierarchyTree: () => StoreGeneric
   S_FaUserSettings: () => StoreGeneric
   storeToRefs: T_piniaStoreToRefs
   useRoute: () => {

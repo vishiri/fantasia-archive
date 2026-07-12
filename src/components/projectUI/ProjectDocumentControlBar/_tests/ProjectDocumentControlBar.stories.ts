@@ -13,6 +13,10 @@ const sampleTabs: I_faOpenedDocumentTab[] = [
     templateIcon: 'mdi-account',
     displayNameDraft: 'Hero',
     savedDisplayName: 'Hero',
+    documentTextColorDraft: '',
+    savedDocumentTextColor: '',
+    documentBackgroundColorDraft: '',
+    savedDocumentBackgroundColor: '',
     hasUnsavedChanges: false,
     editState: false
   },
@@ -23,6 +27,10 @@ const sampleTabs: I_faOpenedDocumentTab[] = [
     templateIcon: 'mdi-skull',
     displayNameDraft: 'Villain draft',
     savedDisplayName: 'Villain',
+    documentTextColorDraft: '',
+    savedDocumentTextColor: '',
+    documentBackgroundColorDraft: '',
+    savedDocumentBackgroundColor: '',
     hasUnsavedChanges: true,
     editState: false
   }
@@ -80,6 +88,10 @@ export const WithMultipleDocumentTabsForContextMenu: StoryObj<typeof meta> = {
             templateIcon: 'mdi-map-marker',
             displayNameDraft: 'Castle',
             savedDisplayName: 'Castle',
+            documentTextColorDraft: '',
+            savedDocumentTextColor: '',
+            documentBackgroundColorDraft: '',
+            savedDocumentBackgroundColor: '',
             hasUnsavedChanges: false,
             editState: false
           }

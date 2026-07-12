@@ -1,9 +1,11 @@
 /** @vitest-environment jsdom */
 import { DOMWrapper, flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
+import type { CSSProperties } from 'vue'
 import { createI18n } from 'vue-i18n'
 import { createMemoryHistory, createRouter } from 'vue-router'
 
+import type { I_faDocumentAppearanceChromeStyle } from 'app/types/I_faDocumentAppearanceChromeStyle'
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 import { FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE } from 'app/types/I_faOpenedDocumentsDomain'
 
@@ -32,13 +34,17 @@ const {
   moveDocumentTabLeftKeybindLabelRef,
   moveDocumentTabRightKeybindLabelRef,
   openedDocumentTabsRef,
+  resolveTabWorldIndicatorColorRef,
+  resolveDocumentTabAppearanceChromeRef,
+  resolveDocumentTabInlineStyleRef,
   saveDocumentKeepEditModeKeybindLabelRef,
   saveDocumentKeybindLabelRef,
   showDeleteDocumentButtonRef,
   showDocumentControlBarRef,
   showDocumentTabsRef,
   showEditDocumentButtonRef,
-  showSaveDocumentButtonsRef
+  showSaveDocumentButtonsRef,
+  showWorldTabIndicatorsRef
 } = vi.hoisted(() => {
   const { ref } = require('vue') as typeof import('vue')
   return {
@@ -47,13 +53,17 @@ const {
     moveDocumentTabLeftKeybindLabelRef: ref('Ctrl+Left'),
     moveDocumentTabRightKeybindLabelRef: ref('Ctrl+Right'),
     openedDocumentTabsRef: ref<I_faOpenedDocumentTab[]>([]),
+    resolveTabWorldIndicatorColorRef: ref<(tab: I_faOpenedDocumentTab) => string | null>(() => null),
+    resolveDocumentTabAppearanceChromeRef: ref<(tab: I_faOpenedDocumentTab) => I_faDocumentAppearanceChromeStyle | undefined>(() => undefined),
+    resolveDocumentTabInlineStyleRef: ref<(tab: I_faOpenedDocumentTab) => CSSProperties | undefined>(() => undefined),
     saveDocumentKeepEditModeKeybindLabelRef: ref('Ctrl+Shift+S'),
     saveDocumentKeybindLabelRef: ref('Ctrl+S'),
     showDeleteDocumentButtonRef: ref(false),
     showDocumentControlBarRef: ref(true),
     showDocumentTabsRef: ref(false),
     showEditDocumentButtonRef: ref(false),
-    showSaveDocumentButtonsRef: ref(false)
+    showSaveDocumentButtonsRef: ref(false),
+    showWorldTabIndicatorsRef: ref(false)
   }
 })
 
@@ -83,6 +93,15 @@ vi.mock('../scripts/projectDocumentControlBar_manager', () => {
           return tab.displayNameDraft.length > 0 ? tab.displayNameDraft : tab.tabLabel
         },
         resolveDocumentTabRoute: (documentId: string) => `/home/document/${documentId}`,
+        resolveDocumentTabAppearanceChrome: (tab: I_faOpenedDocumentTab) => {
+          return resolveDocumentTabAppearanceChromeRef.value(tab)
+        },
+        resolveDocumentTabInlineStyle: (tab: I_faOpenedDocumentTab) => {
+          return resolveDocumentTabInlineStyleRef.value(tab)
+        },
+        resolveTabWorldIndicatorColor: (tab: I_faOpenedDocumentTab) => {
+          return resolveTabWorldIndicatorColorRef.value(tab)
+        },
         saveDocumentButtonColor: 'primary-bright',
         saveDocumentKeepEditModeKeybindLabel: saveDocumentKeepEditModeKeybindLabelRef,
         saveDocumentKeybindLabel: saveDocumentKeybindLabelRef,
@@ -90,13 +109,19 @@ vi.mock('../scripts/projectDocumentControlBar_manager', () => {
         showDocumentControlBar: showDocumentControlBarRef,
         showDocumentTabs: showDocumentTabsRef,
         showEditDocumentButton: showEditDocumentButtonRef,
-        showSaveDocumentButtons: showSaveDocumentButtonsRef
+        showSaveDocumentButtons: showSaveDocumentButtonsRef,
+        showWorldTabIndicators: showWorldTabIndicatorsRef
       }
     }
   }
 })
 
 import ProjectDocumentControlBar from '../ProjectDocumentControlBar.vue'
+import {
+  resolveProjectDocumentControlBarTabAppearanceChrome,
+  resolveProjectDocumentControlBarTabInlineStyle
+} from '../scripts/projectDocumentControlBarTabAppearanceChromeWiring'
+import { expectCssColorValue } from 'app/helpers/vitestCssColorExpect'
 
 const sampleTab: I_faOpenedDocumentTab = {
   ...projectDocumentControlBarTabContextMenuSampleTab,
@@ -186,6 +211,10 @@ beforeEach(() => {
   showDeleteDocumentButtonRef.value = false
   openedDocumentTabsRef.value = []
   activeDocumentTabNameRef.value = 'doc-1'
+  showWorldTabIndicatorsRef.value = false
+  resolveTabWorldIndicatorColorRef.value = () => null
+  resolveDocumentTabAppearanceChromeRef.value = () => undefined
+  resolveDocumentTabInlineStyleRef.value = () => undefined
   vi.clearAllMocks()
 })
 
@@ -243,6 +272,49 @@ test('Test that ProjectDocumentControlBar teleports document tabs into the heade
   wrapper.unmount()
 })
 
+test('Test that ProjectDocumentControlBar applies document appearance styles to tabs', async () => {
+  showDocumentTabsRef.value = true
+  openedDocumentTabsRef.value = [{
+    ...sampleTab,
+    documentBackgroundColorDraft: '#112233',
+    documentTextColorDraft: '#aabbcc'
+  }]
+  resolveDocumentTabAppearanceChromeRef.value = resolveProjectDocumentControlBarTabAppearanceChrome
+  resolveDocumentTabInlineStyleRef.value = resolveProjectDocumentControlBarTabInlineStyle
+
+  const router = await createControlBarRouter()
+  const wrapper = mount(ProjectDocumentControlBar, {
+    global: {
+      plugins: [testI18n, router],
+      stubs: {
+        DialogDeleteOpenedDocument: true,
+        DialogDiscardOpenedDocumentTab: true,
+        ProjectDocumentControlBarTabContextMenu: true,
+        QBtn: true,
+        QRouteTab: {
+          props: ['name', 'style'],
+          template: '<div :class="$attrs.class" :data-test-locator="\'projectDocumentControlBar-tab-\' + name" :style="style"><slot /></div>'
+        },
+        QTabs: { template: '<div><slot /></div>' },
+        QTooltip: true,
+        TransitionGroup: { template: '<div><slot /></div>' }
+      }
+    }
+  })
+
+  await flushPromises()
+
+  const tab = document.querySelector('[data-test-locator="projectDocumentControlBar-tab-doc-1"]') as HTMLElement
+  expect(tab).not.toBeNull()
+  expect(tab.classList.contains('projectDocumentControlBarTabs__tab--customAppearance')).toBe(true)
+  expect(tab.style.color).toBe('')
+  expectCssColorValue(tab.style.backgroundColor, '#112233')
+  expect(tab.style.getPropertyValue('--projectDocumentControlBarTab-textColor').trim()).toBe('#aabbcc')
+  expect(tab.style.getPropertyValue('--projectDocumentControlBarTab-focusHelperColor').trim()).toBe('#112233')
+
+  wrapper.unmount()
+})
+
 test('Test that ProjectDocumentControlBar wires tab close and aux interactions', async () => {
   showDocumentTabsRef.value = true
   openedDocumentTabsRef.value = [sampleTab]
@@ -283,6 +355,95 @@ test('Test that ProjectDocumentControlBar wires tab close and aux interactions',
   const closeButton = new DOMWrapper(document.querySelector('[data-test-locator="projectDocumentControlBar-tabClose-doc-1"]')!)
   await closeButton.trigger('click')
   expect(controlBarHandlers.onTabCloseClick).toHaveBeenCalledWith('doc-1')
+
+  wrapper.unmount()
+})
+
+test('Test that ProjectDocumentControlBar renders world globe indicators for multi-world tabs', async () => {
+  showDocumentTabsRef.value = true
+  showWorldTabIndicatorsRef.value = true
+  resolveTabWorldIndicatorColorRef.value = (tab) => {
+    return tab.worldId === 'world-2' ? '#ff00ff' : null
+  }
+  openedDocumentTabsRef.value = [{
+    ...sampleTab,
+    worldId: 'world-2'
+  }]
+
+  const router = await createControlBarRouter()
+  const wrapper = mount(ProjectDocumentControlBar, {
+    global: {
+      plugins: [testI18n, router],
+      stubs: {
+        DialogDeleteOpenedDocument: true,
+        DialogDiscardOpenedDocumentTab: true,
+        ProjectDocumentControlBarTabContextMenu: {
+          props: ['tab'],
+          template: '<div :data-test-locator="\'projectDocumentControlBar-tabContextMenu-stub-\' + tab.documentId" />'
+        },
+        ProjectDocumentControlBarTabWorldIndicator: {
+          props: ['color', 'documentId', 'visible'],
+          template: '<i v-if="visible && color" :data-test-locator="\'projectDocumentControlBar-tabWorldIndicator-\' + documentId" :style="{ color }" />'
+        },
+        QBtn: true,
+        QIcon: {
+          props: ['name', 'style'],
+          template: '<i :data-test-locator="$attrs[\'data-test-locator\']" :style="style" />'
+        },
+        QRouteTab: {
+          emits: ['auxclick'],
+          props: ['name'],
+          template: '<div :data-test-locator="\'projectDocumentControlBar-tab-\' + name" @auxclick.stop.prevent="$emit(\'auxclick\', $event)"><slot /></div>'
+        },
+        QTabs: { template: '<div><slot /></div>' },
+        QTooltip: true,
+        TransitionGroup: { template: '<div><slot /></div>' }
+      }
+    }
+  })
+
+  await flushPromises()
+
+  const globe = document.querySelector('[data-test-locator="projectDocumentControlBar-tabWorldIndicator-doc-1"]')
+  expect(globe).not.toBeNull()
+  expect((globe as HTMLElement).style.color).toBe('rgb(255, 0, 255)')
+
+  wrapper.unmount()
+})
+
+test('Test that ProjectDocumentControlBar hides world globe indicators when disabled', async () => {
+  showDocumentTabsRef.value = true
+  showWorldTabIndicatorsRef.value = false
+  resolveTabWorldIndicatorColorRef.value = () => '#ff00ff'
+  openedDocumentTabsRef.value = [{
+    ...sampleTab,
+    worldId: 'world-2'
+  }]
+
+  const router = await createControlBarRouter()
+  const wrapper = mount(ProjectDocumentControlBar, {
+    global: {
+      plugins: [testI18n, router],
+      stubs: {
+        DialogDeleteOpenedDocument: true,
+        DialogDiscardOpenedDocumentTab: true,
+        ProjectDocumentControlBarTabContextMenu: true,
+        ProjectDocumentControlBarTabWorldIndicator: true,
+        QBtn: true,
+        QRouteTab: {
+          props: ['name'],
+          template: '<div :data-test-locator="\'projectDocumentControlBar-tab-\' + name"><slot /></div>'
+        },
+        QTabs: { template: '<div><slot /></div>' },
+        QTooltip: true,
+        TransitionGroup: { template: '<div><slot /></div>' }
+      }
+    }
+  })
+
+  await flushPromises()
+
+  expect(document.querySelector('[data-test-locator="projectDocumentControlBar-tabWorldIndicator-doc-1"]')).toBeNull()
 
   wrapper.unmount()
 })

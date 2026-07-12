@@ -64,11 +64,20 @@ export function resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeEditToolt
   return 'dialogs.projectSettings.fields.worldTemplateLayout.editTemplateTooltip'
 }
 
+export function isDialogProjectSettingsWorldTemplateLayoutPlacementRemoveDisabled (
+  node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
+): boolean {
+  return node.nodeKind === 'template' && node.documentCountInWorld > 0
+}
+
 export function resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeRemoveTooltipI18nKey (
-  nodeKind: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode['nodeKind']
+  node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
 ): string {
-  if (nodeKind === 'group') {
+  if (node.nodeKind === 'group') {
     return 'dialogs.projectSettings.fields.worldTemplateLayout.removeGroupTooltip'
+  }
+  if (isDialogProjectSettingsWorldTemplateLayoutPlacementRemoveDisabled(node)) {
+    return 'dialogs.projectSettings.fields.worldTemplateLayout.removeTemplateDisabledHasDocuments'
   }
   return 'dialogs.projectSettings.fields.worldTemplateLayout.removeTemplateTooltip'
 }

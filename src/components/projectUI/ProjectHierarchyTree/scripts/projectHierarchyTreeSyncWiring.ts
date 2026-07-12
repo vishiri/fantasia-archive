@@ -7,9 +7,11 @@ import {
   patchHierarchyTreeSkeletonLabelsInPlace
 } from '../functions/mapWorkspaceLayoutToHierarchyTreeSkeleton'
 import { findProjectHierarchyTreeDocumentsWithInvalidPlacementParent } from '../functions/projectHierarchyTreeDocumentPlacementGuard'
+import { refreshProjectHierarchyTreeAddNewDocumentLabelsInTree } from './projectHierarchyTreeAddNewDocumentNode'
 import { projectHierarchyTreeLayoutStructureMatchesTree } from './projectHierarchyTreeLayoutStructureMatch'
 
 export function createProjectHierarchyTreeSyncWiring (deps: {
+  getPreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
   getWorlds: () => import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeWorkspaceWorld[]
   nextTick: () => Promise<void>
   suppressTreeEmit: Ref<boolean>
@@ -29,7 +31,14 @@ export function createProjectHierarchyTreeSyncWiring (deps: {
       escapedDocuments.length === 0 &&
       projectHierarchyTreeLayoutStructureMatchesTree(deps.treeData.value, worlds)
     if (structureMatches) {
-      patchHierarchyTreeSkeletonLabelsInPlace(deps.treeData.value, worlds)
+      patchHierarchyTreeSkeletonLabelsInPlace(
+        deps.treeData.value,
+        worlds
+      )
+      refreshProjectHierarchyTreeAddNewDocumentLabelsInTree(
+        deps.treeData.value,
+        deps.getPreferredLanguageCode()
+      )
       return
     }
     deps.suppressTreeEmit.value = true

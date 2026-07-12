@@ -11,6 +11,7 @@ export function createUseProjectDocumentControlBar (
     const { t } = deps.useI18n()
     const { settings } = deps.storeToRefs(deps.S_FaUserSettings())!
     const { activeDocumentId, tabs } = deps.storeToRefs(deps.S_FaOpenedDocuments())!
+    const { worlds: projectWorlds } = deps.storeToRefs(deps.S_FaProjectHierarchyTree())!
     const openedDocumentsStore = deps.S_FaOpenedDocuments()
 
     const isDocumentControlBarDisabled = deps.computed(() => {
@@ -66,6 +67,7 @@ export function createUseProjectDocumentControlBar (
         resolveShowProjectDocumentControlBarDeleteButton: deps.resolveShowProjectDocumentControlBarDeleteButton,
         resolveShowProjectDocumentControlBarSaveButtons: deps.resolveShowProjectDocumentControlBarSaveButtons,
         resolveProjectDocumentControlBarSaveButtonColor: deps.resolveProjectDocumentControlBarSaveButtonColor,
+        projectWorlds: projectWorlds!,
         runFaAction: deps.runFaAction,
         tabs: tabs!,
         translateCopyNameFailed: () => {

@@ -8,11 +8,6 @@ export function createUseDialogDiscardOpenedDocumentTab (deps: {
     findTabByDocumentId: (documentId: string) => { displayNameDraft: string } | null
   }
   computed: <T>(getter: () => T) => I_computedRef<T>
-  i18n: {
-    global: {
-      t: (key: string, values?: Record<string, string>) => string
-    }
-  }
   ref: <T>(value: T) => I_ref<T>
   storeToRefs: T_piniaStoreToRefs
   watch: (
@@ -21,7 +16,7 @@ export function createUseDialogDiscardOpenedDocumentTab (deps: {
   ) => void
 }): () => {
     dialogOpen: I_ref<boolean>
-    dialogTitle: I_computedRef<string>
+    documentName: I_computedRef<string>
     onConfirmDiscard: () => void
     onDialogHide: () => void
   } {
@@ -30,16 +25,13 @@ export function createUseDialogDiscardOpenedDocumentTab (deps: {
     const { pendingCloseDocumentId } = deps.storeToRefs(openedDocumentsStore)!
     const dialogOpen = deps.ref(false)
 
-    const dialogTitle = deps.computed(() => {
+    const documentName = deps.computed(() => {
       const documentId = pendingCloseDocumentId!.value
       if (documentId === null) {
         return ''
       }
       const tab = openedDocumentsStore.findTabByDocumentId(documentId)
-      const documentName = tab?.displayNameDraft ?? documentId
-      return deps.i18n.global.t('dialogs.discardOpenedDocumentTab.title', {
-        documentName
-      })
+      return tab?.displayNameDraft ?? documentId
     })
 
     deps.watch(
@@ -64,11 +56,14 @@ export function createUseDialogDiscardOpenedDocumentTab (deps: {
       void openedDocumentsStore.confirmDiscardAndClose(documentId)
     }
 
+    const onConfirmDiscardHandler = onConfirmDiscard
+    const onDialogHideHandler = onDialogHide
+
     return {
       dialogOpen,
-      dialogTitle,
-      onConfirmDiscard,
-      onDialogHide
+      documentName,
+      onConfirmDiscard: onConfirmDiscardHandler,
+      onDialogHide: onDialogHideHandler
     }
   }
 }

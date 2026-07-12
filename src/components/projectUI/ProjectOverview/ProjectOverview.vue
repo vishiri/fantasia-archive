@@ -4,7 +4,7 @@
     data-test-locator="projectOverview"
   >
     <h5
-      class="projectOverview__subtitle fa-text-white text-center q-my-none"
+      class="projectOverview__subtitle text-white text-center q-my-none"
       data-test-locator="projectOverview-subtitle"
     >
       {{ $t('projectUI.projectOverview.projectOverviewFor') }}
@@ -40,13 +40,13 @@
 
       <div class="projectOverview__hintBody col">
         <div
-          class="projectOverview__hintHeading text-subtitle1 text-bold text-left fa-text-dark"
+          class="projectOverview__hintHeading text-subtitle1 text-bold text-left"
           data-test-locator="projectOverview-tipHeading"
         >
           {{ $t('globalFunctionality.unsortedAppTexts.didYouKnow') }}
         </div>
         <div
-          class="projectOverview__hintMessage text-weight-medium text-left fa-text-dark"
+          class="projectOverview__hintMessage text-weight-medium text-left"
           data-test-locator="projectOverview-tipMessage"
         >
           {{ randomTipCaption }}

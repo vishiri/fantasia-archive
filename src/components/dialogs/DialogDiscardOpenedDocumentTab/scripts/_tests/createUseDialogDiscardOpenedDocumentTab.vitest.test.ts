@@ -28,13 +28,6 @@ function mountDiscardDialog (input: {
       findTabByDocumentId
     }) as never,
     computed: computed as <T>(getter: () => T) => I_computedRef<T>,
-    i18n: {
-      global: {
-        t: (key: string, values?: Record<string, string>) => {
-          return `${key}:${values?.documentName ?? ''}`
-        }
-      }
-    },
     ref: ref as <T>(value: T) => I_ref<T>,
     storeToRefs: () => ({
       pendingCloseDocumentId
@@ -52,31 +45,27 @@ function mountDiscardDialog (input: {
   }
 }
 
-test('Test that discard dialog title is empty when no tab is pending close', () => {
+test('Test that discard dialog document name is empty when no tab is pending close', () => {
   const { api } = mountDiscardDialog({ pendingCloseDocumentId: null })
-  expect(api.dialogTitle.value).toBe('')
+  expect(api.documentName.value).toBe('')
   expect(api.dialogOpen.value).toBe(false)
 })
 
-test('Test that discard dialog title uses tab draft name when available', () => {
+test('Test that discard dialog document name uses tab draft name when available', () => {
   const { api } = mountDiscardDialog({
     pendingCloseDocumentId: 'doc-a',
     tabDisplayName: 'Hero draft'
   })
-  expect(api.dialogTitle.value).toBe(
-    'dialogs.discardOpenedDocumentTab.title:Hero draft'
-  )
+  expect(api.documentName.value).toBe('Hero draft')
   expect(api.dialogOpen.value).toBe(true)
 })
 
-test('Test that discard dialog title falls back to document id when tab is missing', () => {
+test('Test that discard dialog document name falls back to document id when tab is missing', () => {
   const { api } = mountDiscardDialog({
     pendingCloseDocumentId: 'doc-missing',
     tabDisplayName: null
   })
-  expect(api.dialogTitle.value).toBe(
-    'dialogs.discardOpenedDocumentTab.title:doc-missing'
-  )
+  expect(api.documentName.value).toBe('doc-missing')
 })
 
 test('Test that onDialogHide dismisses pending close when still set', () => {

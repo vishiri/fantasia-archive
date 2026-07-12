@@ -43,6 +43,10 @@ test('Test that createUseProjectDocumentControlBarTabContextMenu delegates to se
       editState: false,
       hasUnsavedChanges: false,
       savedDisplayName: 'Hero',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }

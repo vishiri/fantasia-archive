@@ -1,3 +1,5 @@
 export default {
-  nameFieldLabel: 'Document name'
+  backgroundColorFieldLabel: 'Asiakirjan taustaväri',
+  nameFieldLabel: 'Document name',
+  textColorFieldLabel: 'Asiakirjan tekstin väri'
 }

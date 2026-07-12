@@ -7,16 +7,20 @@ import type {
   T_faOpenedDocumentOpenMode
 } from 'app/types/I_faOpenedDocumentsDomain'
 import { FA_OPENED_DOCUMENTS_SNAPSHOT_SCHEMA_VERSION } from 'app/types/I_faOpenedDocumentsDomain'
-import { normalizeOpenedDocumentTabEditState } from 'app/src/scripts/openedDocuments/functions/openedDocumentEditStateDomain'
-import { normalizeOpenedDocumentTabPersistenceState } from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
+import {
+  normalizeOpenedDocumentAppearanceColorFromDb,
+  normalizeOpenedDocumentTabAppearanceColors,
+  recomputeOpenedDocumentTabHasUnsavedChanges
+} from 'app/src/scripts/openedDocuments/openedDocumentTabAppearanceWiring'
 import {
   appendOpenedDocumentTabToRight,
-  computeOpenedDocumentHasUnsavedChanges,
   duplicateOpenedDocumentTabs,
   findOpenedDocumentTabIndexByDocumentId,
   removeOpenedDocumentTabAtIndex,
   resolveOpenedDocumentTabFocusIndexAfterClose
 } from 'app/src/scripts/openedDocuments/functions/openedDocumentTabDomain'
+import { normalizeOpenedDocumentTabEditState } from 'app/src/scripts/openedDocuments/functions/openedDocumentEditStateDomain'
+import { normalizeOpenedDocumentTabPersistenceState } from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
 import { FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE } from 'app/types/I_faOpenedDocumentsDomain'
 
 export function buildFaOpenedDocumentsSnapshot (input: {
@@ -40,6 +44,7 @@ export function hydrateFaOpenedDocumentsTabsFromSnapshot (
     activeDocumentId: snapshot.activeDocumentId,
     tabs: duplicateOpenedDocumentTabs(snapshot.tabs)
       .map(normalizeOpenedDocumentTabPersistenceState)
+      .map(normalizeOpenedDocumentTabAppearanceColors)
       .map(normalizeOpenedDocumentTabEditState)
   }
 }
@@ -48,7 +53,14 @@ export function createFaOpenedDocumentTabFromOpenMeta (input: {
   documentId: string
   displayName: string
   treeMeta: I_faOpenedDocumentTreeOpenMeta
+  worldId: string
+  documentTextColor?: string | null | undefined
+  documentBackgroundColor?: string | null | undefined
 }): I_faOpenedDocumentTab {
+  const documentTextColor = normalizeOpenedDocumentAppearanceColorFromDb(input.documentTextColor)
+  const documentBackgroundColor = normalizeOpenedDocumentAppearanceColorFromDb(
+    input.documentBackgroundColor
+  )
   return {
     documentId: input.documentId,
     persistenceState: 'persisted',
@@ -56,8 +68,13 @@ export function createFaOpenedDocumentTabFromOpenMeta (input: {
     templateIcon: input.treeMeta.templateIcon,
     displayNameDraft: input.displayName,
     savedDisplayName: input.displayName,
+    documentTextColorDraft: documentTextColor,
+    savedDocumentTextColor: documentTextColor,
+    documentBackgroundColorDraft: documentBackgroundColor,
+    savedDocumentBackgroundColor: documentBackgroundColor,
     hasUnsavedChanges: false,
-    editState: FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE
+    editState: FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE,
+    worldId: input.worldId
   }
 }
 
@@ -65,14 +82,41 @@ export function applyFaOpenedDocumentDisplayNameDraft (
   tab: I_faOpenedDocumentTab,
   nextDraft: string
 ): I_faOpenedDocumentTab {
-  const hasUnsavedChanges = computeOpenedDocumentHasUnsavedChanges(
-    nextDraft,
-    tab.savedDisplayName
-  )
-  return {
+  const nextTab = {
     ...tab,
-    displayNameDraft: nextDraft,
-    hasUnsavedChanges
+    displayNameDraft: nextDraft
+  }
+  return {
+    ...nextTab,
+    hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
+  }
+}
+
+export function applyFaOpenedDocumentTextColorDraft (
+  tab: I_faOpenedDocumentTab,
+  nextDraft: string
+): I_faOpenedDocumentTab {
+  const nextTab = {
+    ...tab,
+    documentTextColorDraft: nextDraft
+  }
+  return {
+    ...nextTab,
+    hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
+  }
+}
+
+export function applyFaOpenedDocumentBackgroundColorDraft (
+  tab: I_faOpenedDocumentTab,
+  nextDraft: string
+): I_faOpenedDocumentTab {
+  const nextTab = {
+    ...tab,
+    documentBackgroundColorDraft: nextDraft
+  }
+  return {
+    ...nextTab,
+    hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
   }
 }
 
@@ -91,14 +135,20 @@ export function applyFaOpenedDocumentTabAfterDisplayNameSave (
   input: {
     keepEditMode: boolean
     savedDisplayName: string
+    savedDocumentTextColor: string
+    savedDocumentBackgroundColor: string
   }
 ): I_faOpenedDocumentTab {
   return {
     ...tab,
     displayNameDraft: input.savedDisplayName,
+    documentTextColorDraft: input.savedDocumentTextColor,
+    documentBackgroundColorDraft: input.savedDocumentBackgroundColor,
     editState: input.keepEditMode ? tab.editState : FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE,
     hasUnsavedChanges: false,
-    savedDisplayName: input.savedDisplayName
+    savedDisplayName: input.savedDisplayName,
+    savedDocumentTextColor: input.savedDocumentTextColor,
+    savedDocumentBackgroundColor: input.savedDocumentBackgroundColor
   }
 }
 

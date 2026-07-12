@@ -41,6 +41,8 @@ export interface I_faSqlProjectDocumentRow {
   tree_parent_document_id: string | null
   tree_custom_sort_order: number
   display_name: string
+  document_text_color: string | null
+  document_background_color: string | null
   created_at_ms: number
   updated_at_ms: number
 }
@@ -72,4 +74,6 @@ export interface I_faSqlWorldTemplatePlacementJoinRow {
   display_name: string
   world_appendix: string
   icon: string
+  title_translations_json: string
+  title_singular_translations_json: string
 }

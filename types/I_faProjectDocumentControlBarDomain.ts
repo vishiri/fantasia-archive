@@ -1,6 +1,10 @@
+import type { CSSProperties } from 'vue'
+
+import type { I_faDocumentAppearanceChromeStyle } from 'app/types/I_faDocumentAppearanceChromeStyle'
 import type { I_faKeybindsSnapshot, T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
 import type { I_computedRef } from 'app/types/I_vueCompositionShims'
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+import type { I_faProjectHierarchyTreeWorkspaceWorld } from 'app/types/I_faProjectHierarchyTreeDomain'
 import type { T_projectDocumentControlBarSaveButtonColor } from 'app/types/T_projectDocumentControlBarSaveButtonColor'
 
 export interface I_projectDocumentControlBarComposableApi {
@@ -24,12 +28,16 @@ export interface I_projectDocumentControlBarComposableApi {
   openedDocumentTabs: I_computedRef<readonly I_faOpenedDocumentTab[]>
   resolveDocumentTabRoute: (documentId: string) => string
   resolveDocumentTabLabel: (tab: I_faOpenedDocumentTab) => string
+  resolveDocumentTabAppearanceChrome: (tab: I_faOpenedDocumentTab) => I_faDocumentAppearanceChromeStyle | undefined
+  resolveDocumentTabInlineStyle: (tab: I_faOpenedDocumentTab) => CSSProperties | undefined
+  resolveTabWorldIndicatorColor: (tab: I_faOpenedDocumentTab) => string | null
   saveDocumentButtonColor: I_computedRef<T_projectDocumentControlBarSaveButtonColor>
   saveDocumentKeepEditModeKeybindLabel: I_computedRef<string | null>
   saveDocumentKeybindLabel: I_computedRef<string | null>
   showDocumentControlBar: I_computedRef<boolean>
   showDocumentTabs: I_computedRef<boolean>
   showEditDocumentButton: I_computedRef<boolean>
+  showWorldTabIndicators: I_computedRef<boolean>
   showDeleteDocumentButton: I_computedRef<boolean>
   showSaveDocumentButtons: I_computedRef<boolean>
 }
@@ -96,6 +104,7 @@ export interface I_assembleProjectDocumentControlBarApiInput {
     id: 'saveOpenedDocumentDisplayName',
     payload: { documentId: string, keepEditMode: boolean }
   ) => void
+  projectWorlds: I_computedRef<readonly I_faProjectHierarchyTreeWorkspaceWorld[]>
   tabs: I_computedRef<readonly I_faOpenedDocumentTab[]>
 }
 

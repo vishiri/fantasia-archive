@@ -6,17 +6,20 @@ import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHi
 import {
   collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds,
   collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh,
+  collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh,
   findProjectHierarchyTreeDocumentParentBucket
 } from '../projectHierarchyTreeDocumentParentBucket'
 
 function buildPlacementNode (input: {
   children: I_faProjectHierarchyTreeHeTreeNode[]
   childrenLoaded: boolean
+  documentTemplateId?: string
 }): I_faProjectHierarchyTreeHeTreeNode {
   return {
     children: input.children,
     childrenLoaded: input.childrenLoaded,
     documentId: null,
+    documentTemplateId: input.documentTemplateId ?? 'tpl-1',
     groupId: null,
     hasChildren: true,
     icon: 'mdi-home',
@@ -83,6 +86,52 @@ test('Test that collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh dedup
   const parentNodeIds = collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh(
     [placement],
     ['doc-a', 'doc-b']
+  )
+  expect(parentNodeIds).toEqual(['placement-1'])
+})
+
+test('Test that collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh includes loaded saved document nodes', () => {
+  const childDocument = buildDocumentNode({
+    documentId: 'doc-child',
+    id: 'doc-child'
+  })
+  const parentDocument = {
+    ...buildDocumentNode({
+      documentId: 'doc-parent',
+      id: 'doc-parent'
+    }),
+    children: [childDocument],
+    childrenLoaded: true,
+    hasChildren: true
+  }
+  const placement = buildPlacementNode({
+    children: [parentDocument],
+    childrenLoaded: true
+  })
+  const parentNodeIds = collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh(
+    [placement],
+    ['doc-parent']
+  )
+  expect(parentNodeIds).toEqual(['placement-1', 'doc-parent'])
+})
+
+test('Test that collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh skips unloaded saved document nodes', () => {
+  const parentDocument = {
+    ...buildDocumentNode({
+      documentId: 'doc-parent',
+      id: 'doc-parent'
+    }),
+    children: [],
+    childrenLoaded: false,
+    hasChildren: true
+  }
+  const placement = buildPlacementNode({
+    children: [parentDocument],
+    childrenLoaded: true
+  })
+  const parentNodeIds = collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh(
+    [placement],
+    ['doc-parent']
   )
   expect(parentNodeIds).toEqual(['placement-1'])
 })
@@ -162,4 +211,197 @@ test('Test that collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds skips un
     childrenLoaded: false
   })
   expect(collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds([placement], 'doc-parent')).toEqual([])
+})
+
+test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh resolves loaded placement', () => {
+  const placement = buildPlacementNode({
+    children: [],
+    childrenLoaded: true
+  })
+  const nodeIds = collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh(
+    [placement],
+    {
+      parentDocumentId: null,
+      templateId: 'tpl-1',
+      worldId: 'world-1'
+    }
+  )
+  expect(nodeIds).toEqual(['placement-1'])
+})
+
+test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh resolves loaded parent document', () => {
+  const parentDocument = {
+    ...buildDocumentNode({
+      documentId: 'doc-parent',
+      id: 'doc-parent'
+    }),
+    children: [],
+    childrenLoaded: true,
+    hasChildren: true
+  }
+  const placement = buildPlacementNode({
+    children: [parentDocument],
+    childrenLoaded: true
+  })
+  const nodeIds = collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh(
+    [placement],
+    {
+      parentDocumentId: 'doc-parent',
+      templateId: 'tpl-1',
+      worldId: 'world-1'
+    }
+  )
+  expect(nodeIds).toEqual(['doc-parent'])
+})
+
+test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh skips unloaded placement', () => {
+  const placement = buildPlacementNode({
+    children: [],
+    childrenLoaded: false
+  })
+  const nodeIds = collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh(
+    [placement],
+    {
+      parentDocumentId: null,
+      templateId: 'tpl-1',
+      worldId: 'world-1'
+    }
+  )
+  expect(nodeIds).toEqual([])
+})
+
+test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh skips missing parent document', () => {
+  const placement = buildPlacementNode({
+    children: [],
+    childrenLoaded: true
+  })
+  const nodeIds = collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh(
+    [placement],
+    {
+      parentDocumentId: 'missing-parent',
+      templateId: 'tpl-1',
+      worldId: 'world-1'
+    }
+  )
+  expect(nodeIds).toEqual([])
+})
+
+test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh skips unloaded parent document', () => {
+  const parentDocument = {
+    ...buildDocumentNode({
+      documentId: 'doc-parent',
+      id: 'doc-parent'
+    }),
+    children: [],
+    childrenLoaded: false,
+    hasChildren: true
+  }
+  const placement = buildPlacementNode({
+    children: [parentDocument],
+    childrenLoaded: true
+  })
+  const nodeIds = collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh(
+    [placement],
+    {
+      parentDocumentId: 'doc-parent',
+      templateId: 'tpl-1',
+      worldId: 'world-1'
+    }
+  )
+  expect(nodeIds).toEqual([])
+})
+
+test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh finds nested placement rows', () => {
+  const nestedPlacement = buildPlacementNode({
+    children: [],
+    childrenLoaded: true,
+    documentTemplateId: 'tpl-nested'
+  })
+  nestedPlacement.id = 'placement-nested'
+  nestedPlacement.placementId = 'placement-nested'
+  const treeData = [
+    {
+      children: [
+        {
+          children: [nestedPlacement],
+          childrenLoaded: true,
+          documentId: null,
+          documentTemplateId: null,
+          groupId: 'group-1',
+          hasChildren: true,
+          icon: 'mdi-folder',
+          id: 'group-1',
+          label: 'Group',
+          nodeKind: 'group' as const,
+          placementId: null,
+          worldColor: '#ff0000',
+          worldId: 'world-1'
+        }
+      ],
+      childrenLoaded: true,
+      documentId: null,
+      documentTemplateId: null,
+      groupId: null,
+      hasChildren: true,
+      icon: 'mdi-earth',
+      id: 'world-1',
+      label: 'World',
+      nodeKind: 'world' as const,
+      placementId: null,
+      worldColor: '#ff0000',
+      worldId: 'world-1'
+    }
+  ]
+  const nodeIds = collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh(
+    treeData,
+    {
+      parentDocumentId: null,
+      templateId: 'tpl-nested',
+      worldId: 'world-1'
+    }
+  )
+  expect(nodeIds).toEqual(['placement-nested'])
+})
+
+test('Test that collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds skips unloaded promotion target', () => {
+  const placement = buildPlacementNode({
+    children: [
+      {
+        ...buildDocumentNode({
+          documentId: 'doc-grandparent',
+          id: 'doc-grandparent'
+        }),
+        children: [
+          buildDocumentNode({
+            documentId: 'doc-parent',
+            id: 'doc-parent'
+          })
+        ],
+        childrenLoaded: true,
+        hasChildren: true
+      }
+    ],
+    childrenLoaded: false
+  })
+  const nodeIds = collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds(
+    [placement],
+    'doc-parent'
+  )
+  expect(nodeIds).toEqual(['doc-grandparent'])
+})
+
+test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh returns empty when placement is missing', () => {
+  const placement = buildPlacementNode({
+    children: [],
+    childrenLoaded: true
+  })
+  const nodeIds = collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh(
+    [placement],
+    {
+      parentDocumentId: null,
+      templateId: 'missing-template',
+      worldId: 'world-1'
+    }
+  )
+  expect(nodeIds).toEqual([])
 })

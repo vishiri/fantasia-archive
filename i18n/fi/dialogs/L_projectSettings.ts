@@ -76,6 +76,8 @@ export default {
       placementNicknameHoverOriginalNameLabel: 'Alkuperäinen nimi',
       placementNicknameHoverNicknameLabel: 'Lempinimi',
       removeGroupTooltip: 'Poista ryhmä',
+      removeTemplateDisabledHasDocuments:
+        'Poista kaikki tähän malliin liittyvät asiakirjat ennen sen poistamista.',
       removeTemplateTooltip: 'Poista asiakirjamalli',
       templateCanonicalNameLabel: 'Asiakirjamallin nimi',
       templateCanonicalNameTooltip: 'Jos haluat nimetä koko asiakirjamallin uudelleen, siirry tämän muokkausikkunan osioon «Asiakirjamallit» ja muokkaa sitä siellä.',

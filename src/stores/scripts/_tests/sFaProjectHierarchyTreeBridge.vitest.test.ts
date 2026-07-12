@@ -16,6 +16,7 @@ const {
       worlds: [
         {
           color: '#ff0000',
+          colorPallete: '',
           displayName: 'World One',
           groups: [],
           id: 'world-1',
@@ -40,6 +41,7 @@ beforeEach(() => {
     worlds: [
       {
         color: '#ff0000',
+        colorPallete: '',
         displayName: 'World One',
         groups: [],
         id: 'world-1',
@@ -189,6 +191,7 @@ test('Test that faProjectHierarchyTreeRefreshLayoutFromBridge returns layout fro
     worlds: [
       {
         color: '#ff0000',
+        colorPallete: '',
         displayName: 'World One',
         groups: [],
         id: 'world-1',

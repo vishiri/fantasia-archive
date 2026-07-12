@@ -48,6 +48,10 @@ const sampleOpenedDocumentTabs = [
     templateIcon: 'mdi-account',
     displayNameDraft: 'Hero',
     savedDisplayName: 'Hero',
+    documentTextColorDraft: '',
+    savedDocumentTextColor: '',
+    documentBackgroundColorDraft: '',
+    savedDocumentBackgroundColor: '',
     hasUnsavedChanges: false,
     editState: false
   },
@@ -58,6 +62,10 @@ const sampleOpenedDocumentTabs = [
     templateIcon: 'mdi-skull',
     displayNameDraft: 'Villain draft',
     savedDisplayName: 'Villain',
+    documentTextColorDraft: '',
+    savedDocumentTextColor: '',
+    documentBackgroundColorDraft: '',
+    savedDocumentBackgroundColor: '',
     hasUnsavedChanges: true,
     editState: false
   }
@@ -396,6 +404,10 @@ test.describe.serial('Project document control bar visibility', () => {
             templateIcon: 'mdi-map-marker',
             displayNameDraft: 'Place',
             savedDisplayName: 'Place',
+            documentTextColorDraft: '',
+            savedDocumentTextColor: '',
+            documentBackgroundColorDraft: '',
+            savedDocumentBackgroundColor: '',
             hasUnsavedChanges: false,
             editState: false
           }

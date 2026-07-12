@@ -17,6 +17,12 @@ const nullableTemplateIdSchema = z.union([
   z.null()
 ])
 
+export const faProjectDocumentNullableHexColorSchema = z.union([
+  z.literal(''),
+  z.null(),
+  z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Invalid document appearance color')
+]).transform((value) => (value === '' ? null : value))
+
 export const faProjectDocumentCreateInputSchema = z.object({
   displayName: faProjectContentDisplayNameSchema,
   id: faProjectContentIdSchema.optional(),
@@ -24,7 +30,9 @@ export const faProjectDocumentCreateInputSchema = z.object({
   worldId: faProjectContentIdSchema,
   placementId: nullableTemplateIdSchema.optional(),
   parentDocumentId: nullableTemplateIdSchema.optional(),
-  sortOrder: z.number().int().min(0).optional()
+  sortOrder: z.number().int().min(0).optional(),
+  documentTextColor: faProjectDocumentNullableHexColorSchema.optional(),
+  documentBackgroundColor: faProjectDocumentNullableHexColorSchema.optional()
 }).strict()
 
 export const faProjectDocumentPatchSchema = z.object({
@@ -33,7 +41,9 @@ export const faProjectDocumentPatchSchema = z.object({
   worldId: faProjectContentIdSchema.optional(),
   placementId: nullableTemplateIdSchema.optional(),
   parentDocumentId: nullableTemplateIdSchema.optional(),
-  sortOrder: z.number().int().min(0).optional()
+  sortOrder: z.number().int().min(0).optional(),
+  documentTextColor: faProjectDocumentNullableHexColorSchema.optional(),
+  documentBackgroundColor: faProjectDocumentNullableHexColorSchema.optional()
 }).strict()
 
 export const faProjectDocumentIdPayloadSchema = z.object({

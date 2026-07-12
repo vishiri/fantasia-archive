@@ -13,6 +13,7 @@
         :data-test-locator="props.testLocator"
         filled
         outlined
+        :readonly="props.readOnly"
         @click="openPickerMenu"
         @focus="openPickerMenu"
         @update:model-value="emitModelValueFromInput"
@@ -27,8 +28,8 @@
         </template>
         <template #append>
           <span
+            v-if="!isSwatchEmpty"
             class="faColorPickerInput__swatch"
-            :class="{ 'faColorPickerInput__swatch--empty': isSwatchEmpty }"
             aria-hidden="true"
             :data-test-locator="colorSwatchTestLocator"
             :style="colorSwatchStyle"
@@ -64,7 +65,7 @@
       </q-menu>
     </div>
     <q-btn
-      v-if="showPaletteAppendButton"
+      v-if="showPaletteAppendButton && !props.readOnly"
       class="faColorPickerInput__appendButton"
       color="primary-bright"
       :data-test-locator="paletteAppendButtonTestLocator"
@@ -112,13 +113,15 @@ const props = withDefaults(
     modelValue: string
     palette?: T_faColorPickerInputPalette
     paletteAppend?: I_faColorPickerPaletteAppendConfig | undefined
+    readOnly?: boolean
     testLocator: string
   }>(),
   {
     color: 'primary-bright',
     dark: true,
     defaultHex: FA_COLOR_PICKER_INPUT_DEFAULT_HEX,
-    dense: true
+    dense: true,
+    readOnly: false
   }
 )
 
@@ -155,6 +158,7 @@ const {
 const {
   isPaletteAppendDisabled,
   isPaletteAppendDuplicate,
+  isPaletteAppendInvalidHex,
   onPaletteAppendClick,
   showPaletteAppendButton
 } = useFaColorPickerPaletteAppend(
@@ -178,14 +182,23 @@ const paletteAppendTooltipKey = computed(() => {
   if (isPaletteAppendDuplicate.value) {
     return 'faColorPickerInput.appendToWorldPaletteDuplicateTooltip'
   }
+  if (isPaletteAppendInvalidHex.value) {
+    return 'faColorPickerInput.appendToWorldPaletteInvalidTooltip'
+  }
   return 'faColorPickerInput.appendToWorldPaletteTooltip'
 })
 
 function openPickerMenu (): void {
+  if (props.readOnly) {
+    return
+  }
   pickerMenuOpen.value = true
 }
 
 function emitModelValueFromInput (value: string | number | null): void {
+  if (props.readOnly) {
+    return
+  }
   emitModelValueUpdate(value === null || value === undefined ? '' : String(value))
 }
 </script>
@@ -228,10 +241,6 @@ function emitModelValueFromInput (value: string | number | null): void {
   flex-shrink: 0;
   height: $faColorPickerInput-swatch-size;
   width: $faColorPickerInput-swatch-size;
-}
-
-.faColorPickerInput__swatch--empty {
-  background-color: transparent;
 }
 
 .faColorPickerInput__pickerIcon {

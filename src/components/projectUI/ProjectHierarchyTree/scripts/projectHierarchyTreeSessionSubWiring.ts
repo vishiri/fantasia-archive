@@ -30,6 +30,7 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: {
   dragDropCommitted: Ref<boolean>
   dragExpandPostCommitGuard: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
+  getPreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
   hierarchyStore: T_hierarchyStore
   isTreeDragActive: Ref<boolean>
   nextTick: () => Promise<void>
@@ -46,6 +47,7 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: {
   worlds: Ref<I_faProjectHierarchyTreeWorkspaceWorld[]>
 }) {
   const syncWiring = createProjectHierarchyTreeSyncWiring({
+    getPreferredLanguageCode: deps.getPreferredLanguageCode,
     getWorlds: () => deps.worlds.value,
     nextTick: deps.nextTick,
     suppressTreeEmit: deps.suppressTreeEmit,
@@ -57,6 +59,7 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: {
     flushUiStatePersist: () => deps.hierarchyStore.flushUiStatePersist(),
     getExpandedNodeIds: () => deps.uiState.value.expandedNodeIds,
     getPendingRevealPath: () => deps.pendingRevealPath.value,
+    getPreferredLanguageCode: deps.getPreferredLanguageCode,
     getScrollTopPx: () => deps.uiState.value.scrollTopPx,
     getTreeRef: () => deps.treeComponentRef.value,
     getTreeScrollHost: () => deps.treeScrollHostRef.value,

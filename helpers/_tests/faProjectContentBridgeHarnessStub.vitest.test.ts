@@ -44,7 +44,9 @@ const stubDocumentShape = {
   worldId: STUB_UUID,
   placementId: null,
   parentDocumentId: null,
-  sortOrder: 0
+  sortOrder: 0,
+  documentTextColor: null,
+  documentBackgroundColor: null
 }
 
 /**

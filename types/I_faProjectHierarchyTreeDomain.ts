@@ -1,9 +1,13 @@
+import type { I_faProjectDocumentTemplateTitleSingularTranslations } from 'app/types/I_faProjectDocumentTemplateTitleSingularTranslations'
+import type { I_faProjectDocumentTemplateTitleTranslations } from 'app/types/I_faProjectDocumentTemplateTitleTranslations'
+
 /** Node kind discriminant for workspace hierarchy tree rows. */
 export type T_faProjectHierarchyTreeNodeKind =
   | 'world'
   | 'group'
   | 'templatePlacement'
   | 'document'
+  | 'addNewDocument'
 
 /** Persisted expand/collapse and scroll offset in project_data KV hierarchy_tree_ui_state. */
 export interface I_faProjectHierarchyTreeUiState {
@@ -53,6 +57,8 @@ export interface I_faProjectHierarchyTreeWorkspacePlacement {
   nickname: string
   icon: string
   hasChildren: boolean
+  titlePluralTranslations: I_faProjectDocumentTemplateTitleTranslations
+  titleSingularTranslations: I_faProjectDocumentTemplateTitleSingularTranslations
 }
 
 /** One world row with nested layout metadata for the workspace hierarchy skeleton. */
@@ -61,6 +67,7 @@ export interface I_faProjectHierarchyTreeWorkspaceWorld {
   displayName: string
   sortOrder: number
   color: string
+  colorPallete: string
   groups: I_faProjectHierarchyTreeWorkspaceGroup[]
   placements: I_faProjectHierarchyTreeWorkspacePlacement[]
 }
@@ -77,6 +84,8 @@ export interface I_faProjectHierarchyTreeListPlacementChildrenInput {
 
 /** One document row returned for lazy tree expansion. */
 export interface I_faProjectHierarchyTreeDocumentChild {
+  documentBackgroundColor?: string | null | undefined
+  documentTextColor?: string | null | undefined
   id: string
   displayName: string
   placementId: string
@@ -169,7 +178,9 @@ export interface I_faProjectHierarchyTreeDocumentInvalidPlacementParent {
 export interface I_faProjectHierarchyTreeHeTreeNode {
   children: I_faProjectHierarchyTreeHeTreeNode[]
   childrenLoaded: boolean
+  documentBackgroundColor?: string | null | undefined
   documentId: string | null
+  documentTextColor?: string | null | undefined
   groupId: string | null
   hasChildren: boolean
   icon: string
@@ -179,4 +190,23 @@ export interface I_faProjectHierarchyTreeHeTreeNode {
   placementId: string | null
   worldColor: string
   worldId: string
+  /** Set on templatePlacement and addNewDocument rows. */
+  documentTemplateId?: string | null | undefined
+  /** Set on templatePlacement rows for add-new label resolution. */
+  titlePluralTranslations?: I_faProjectDocumentTemplateTitleTranslations | undefined
+  /** Set on templatePlacement rows for add-new label resolution. */
+  titleSingularTranslations?: I_faProjectDocumentTemplateTitleSingularTranslations | undefined
 }
+
+/** Placement metadata used to build or refresh add-new hierarchy rows. */
+export type I_faProjectHierarchyTreePlacementAddNewSource = Pick<
+  I_faProjectHierarchyTreeHeTreeNode,
+  | 'documentTemplateId'
+  | 'icon'
+  | 'id'
+  | 'placementId'
+  | 'titlePluralTranslations'
+  | 'titleSingularTranslations'
+  | 'worldColor'
+  | 'worldId'
+>

@@ -18,6 +18,7 @@ import {
   FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
 } from './functions/faProjectDbSchemaDdl'
 import { createApplyFaProjectDocumentsHierarchySchemaPatch } from './functions/faProjectDocumentsHierarchySchemaPatch'
+import { applyFaProjectDocumentAppearanceSchemaPatch } from './projectDbContent/faProjectDocumentAppearanceSchemaPatchWiring'
 import { seedFaProjectDefaultWorldIfEmpty } from './projectDbContent/faProjectWorldBootstrapWiring'
 
 const OPTION_PROJECT_NAME = 'project_name'
@@ -101,6 +102,7 @@ export function applyFaProjectMigrations (
   }
   if (startVer === FA_PROJECT_USER_VERSION_SUPPORTED_MAX) {
     applyFaProjectDocumentsHierarchySchemaPatch(db)
+    applyFaProjectDocumentAppearanceSchemaPatch(db)
     applyFaProjectOpenedDocumentsSchemaV1(db)
     return
   }

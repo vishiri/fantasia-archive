@@ -1,13 +1,21 @@
 <template>
+  <div
+    ref="tabContextMenuMountRef"
+    class="projectDocumentControlBarTabs__tabContextMenuMount"
+    hidden
+  />
   <q-menu
+    v-model="isTabContextMenuOpen"
+    anchor="bottom left"
     class="projectDocumentControlBarTabContextMenu"
-    context-menu
     dark
     data-test-locator="projectDocumentControlBar-tabContextMenu"
     :data-test-tab-document-id="tab.documentId"
+    no-parent-event
     role="menu"
+    self="top left"
     square
-    touch-position
+    :target="tabMenuTargetElement ?? undefined"
     @hide="onRootMenuHide"
   >
     <ProjectDocumentControlBarTabContextMenuList
@@ -42,21 +50,37 @@
       :opened-document-tabs="openedDocumentTabs"
       :resolve-browse-tab-label="resolveBrowseTabLabel"
       :resolve-browse-tab-route="resolveBrowseTabRoute"
+      :resolve-document-tab-appearance-chrome="resolveDocumentTabAppearanceChrome"
+      :resolve-document-tab-inline-style="resolveDocumentTabInlineStyle"
+      :resolve-tab-world-indicator-color="resolveTabWorldIndicatorColor"
       :show-delete-this-document="showDeleteThisDocument"
+      :show-world-tab-indicators="showWorldTabIndicators"
     />
   </q-menu>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import type { CSSProperties } from 'vue'
+import { computed, ref } from 'vue'
 
+import type { I_faDocumentAppearanceChromeStyle } from 'app/types/I_faDocumentAppearanceChromeStyle'
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
 import ProjectDocumentControlBarTabContextMenuList from './ProjectDocumentControlBarTabContextMenuList.vue'
+import { createProjectDocumentControlBarTabContextMenuOpenWiring } from './scripts/projectDocumentControlBarTabContextMenuOpenWiring'
 import { useProjectDocumentControlBarTabContextMenu } from './scripts/projectDocumentControlBarTabContextMenu_manager'
 
 defineOptions({
   name: 'ProjectDocumentControlBarTabContextMenu'
+})
+
+const tabContextMenuMountRef = ref<HTMLElement | null>(null)
+
+const {
+  isTabContextMenuOpen,
+  tabMenuTargetElement
+} = createProjectDocumentControlBarTabContextMenuOpenWiring({
+  tabContextMenuMountRef
 })
 
 const props = defineProps<{
@@ -72,8 +96,14 @@ const props = defineProps<{
   onTabForceCloseAllExceptClick: (documentId: string) => void
   onTabMoveClick: (documentId: string, direction: 'left' | 'right') => void
   openedDocumentTabs: readonly I_faOpenedDocumentTab[]
+  resolveDocumentTabAppearanceChrome: (
+    tab: I_faOpenedDocumentTab
+  ) => I_faDocumentAppearanceChromeStyle | undefined
+  resolveDocumentTabInlineStyle: (tab: I_faOpenedDocumentTab) => CSSProperties | undefined
   resolveDocumentTabLabel: (tab: I_faOpenedDocumentTab) => string
   resolveDocumentTabRoute: (documentId: string) => string
+  resolveTabWorldIndicatorColor: (tab: I_faOpenedDocumentTab) => string | null
+  showWorldTabIndicators: boolean
   tab: I_faOpenedDocumentTab
 }>()
 

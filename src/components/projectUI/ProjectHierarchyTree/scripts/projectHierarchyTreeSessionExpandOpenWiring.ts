@@ -1,6 +1,7 @@
 import type { I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { tryOpenHeTreeNodeAndParents } from './projectHierarchyTreeHeTreeOpenSafeWiring'
+import { shouldProjectHierarchyTreePreserveDescendantOpenIdsOnCollapse } from '../functions/projectHierarchyTreeExpandState'
 
 export async function runProjectHierarchyTreeSessionExpandOpen (deps: {
   loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
@@ -25,7 +26,7 @@ export async function runProjectHierarchyTreeSessionExpandOpen (deps: {
         }
     tryOpenHeTreeNodeAndParents(openArgs)
   }
-  if (deps.node.nodeKind === 'world') {
+  if (shouldProjectHierarchyTreePreserveDescendantOpenIdsOnCollapse(deps.node.nodeKind)) {
     await deps.reapplyLatentDescendantExpandState()
   }
 }

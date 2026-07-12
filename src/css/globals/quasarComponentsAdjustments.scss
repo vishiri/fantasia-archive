@@ -11,6 +11,7 @@ body.body--dark {
 body.desktop .q-focusable:focus > .q-focus-helper {
 
   /* Replacement of the overlay (before/after) elements via simple background-color opacity */
+  background: $qFocusable-hoverHelper-backgroundColor;
   opacity: $qFocusable-focusHelper-opacity !important;
 
   &::before,
@@ -25,6 +26,7 @@ body.desktop .q-hoverable:hover > .q-focus-helper,
 body.desktop .q-manual-focusable--focused > .q-focus-helper {
 
   /* Replacement of the overlay (before/after) elements via simple background-color opacity */
+  background: $qFocusable-hoverHelper-backgroundColor;
   opacity: $qFocusable-hoverHelper-opacity !important;
 
   &::before,

@@ -1,0 +1,4 @@
+@use '../../../../css/app.palette.scss' as *;
+
+/* COMPONENT - FA DELETE CONFIRM BUTTON */
+$faDeleteConfirmButton-confirmMessage-color: fa-v('accent', $accent);

@@ -13,7 +13,7 @@
           class="dialogDiscardOpenedDocumentTab__title text-center q-my-sm"
           data-test-locator="dialogDiscardOpenedDocumentTab-title"
         >
-          {{ dialogTitle }}
+          {{ $t('dialogs.discardOpenedDocumentTab.titlePrefix') }}<span class="text-primary-bright">{{ documentName }}</span>{{ $t('dialogs.discardOpenedDocumentTab.titleSuffix') }}
         </h6>
       </q-card-section>
       <q-card-actions
@@ -48,7 +48,7 @@ defineOptions({
 
 const {
   dialogOpen,
-  dialogTitle,
+  documentName,
   onConfirmDiscard,
   onDialogHide
 } = useDialogDiscardOpenedDocumentTab()

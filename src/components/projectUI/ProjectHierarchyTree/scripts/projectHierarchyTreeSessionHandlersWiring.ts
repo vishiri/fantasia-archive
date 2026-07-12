@@ -13,9 +13,18 @@ import type { createProjectHierarchyTreeDocumentRowDragHoldWiring } from './proj
 import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } from './projectHierarchyTreeDocumentRowExpandClickGestureWiring'
 import { createProjectHierarchyTreeDroppableHandlers } from './projectHierarchyTreeDroppableHandlerWiring'
 import { createProjectHierarchyTreeDocumentOpenHandlers } from './projectHierarchyTreeDocumentOpenHandlersWiring'
+import { createProjectHierarchyTreeAddNewDocumentClickHandlers } from './projectHierarchyTreeAddNewDocumentClickHandlersWiring'
 import { createProjectHierarchyTreeSessionExpandHandlersWiring } from './projectHierarchyTreeSessionExpandHandlersWiring'
+import { createProjectHierarchyTreeSessionHandlersClickWiring } from './projectHierarchyTreeSessionHandlersClickWiring'
 
 export function createProjectHierarchyTreeSessionHandlersWiring (deps: {
+  createTemporaryDocument: (input: {
+    displayName: string
+    openMode: T_faOpenedDocumentOpenMode
+    parentDocumentId: null
+    templateId: string
+    worldId: string
+  }) => Promise<string>
   documentRowDragHoldWiring: ReturnType<typeof createProjectHierarchyTreeDocumentRowDragHoldWiring>
   documentRowExpandClickGesture: ReturnType<typeof createProjectHierarchyTreeDocumentRowExpandClickGestureWiring>
   dragContext: {
@@ -34,6 +43,7 @@ export function createProjectHierarchyTreeSessionHandlersWiring (deps: {
     mode: T_faOpenedDocumentOpenMode,
     treeMeta: I_faOpenedDocumentTreeOpenMeta
   ) => void
+  resolvePreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
   suppressTreeEmit: Ref<boolean>
   treeComponentRef: Ref<I_faProjectHierarchyTreeHeTreeInstance | null>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
@@ -63,6 +73,14 @@ export function createProjectHierarchyTreeSessionHandlersWiring (deps: {
   const documentOpenHandlers = createProjectHierarchyTreeDocumentOpenHandlers({
     onDocumentOpenRequest: deps.onDocumentOpenRequest
   })
+  const addNewDocumentClickHandlers = createProjectHierarchyTreeAddNewDocumentClickHandlers({
+    createTemporaryDocument: deps.createTemporaryDocument,
+    resolvePreferredLanguageCode: deps.resolvePreferredLanguageCode
+  })
+  const clickHandlersWiring = createProjectHierarchyTreeSessionHandlersClickWiring({
+    addNewDocumentClickHandlers,
+    documentOpenHandlers
+  })
 
   function eachDraggableHandler (stat: { data: I_faProjectHierarchyTreeHeTreeNode }): boolean {
     return isProjectHierarchyTreeNodeDraggable(stat.data)
@@ -81,8 +99,9 @@ export function createProjectHierarchyTreeSessionHandlersWiring (deps: {
   return {
     eachDraggableHandler,
     eachDroppableHandler: droppableHandlers.eachDroppableHandler,
-    onDocumentRowAuxClick: documentOpenHandlers.onDocumentRowAuxClick,
-    onNodeClick: documentOpenHandlers.onNodeClick,
+    onAddNewDocumentRowContextMenu: clickHandlersWiring.onAddNewDocumentRowContextMenu,
+    onDocumentRowAuxClick: clickHandlersWiring.onDocumentRowAuxClick,
+    onNodeClick: clickHandlersWiring.onNodeClick,
     onNodeClose: expandHandlersWiring.onNodeClose,
     onNodeOpen: expandHandlersWiring.onNodeOpen,
     onNodeOpenIconClick: expandHandlersWiring.onNodeOpenIconClick,

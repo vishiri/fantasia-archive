@@ -3,8 +3,7 @@ import { afterEach, expect, test, vi } from 'vitest'
 
 import {
   applyFaProjectContentSchemaV1,
-  FA_PROJECT_TABLE_DOCUMENTS,
-  FA_PROJECT_TABLE_DOCUMENT_TEMPLATES
+  FA_PROJECT_TABLE_DOCUMENTS
 } from '../../functions/faProjectDbSchemaDdl'
 import {
   createFaProjectDocument,
@@ -19,13 +18,6 @@ import {
   readFaProjectPlacementDocumentChildCount,
   searchFaProjectHierarchy
 } from '../faProjectHierarchyTreePersistWiring'
-import {
-  planFaProjectHierarchyTestDocumentInserts
-} from '../functions/seedFaProjectHierarchyTestDocumentsForPlacements'
-import {
-  readFaProjectHierarchyTestDocumentSeedEnabled,
-  seedFaProjectHierarchyTestDocumentsForPlacements
-} from '../faProjectHierarchyTestDocumentSeedWiring'
 import { createFaProjectDocumentTemplate } from '../faProjectDocumentTemplatesPersistWiring'
 import { createFaProjectWorld } from '../faProjectWorldsPersistWiring'
 import { replaceFaProjectWorldTemplateLayoutSnapshot } from '../faProjectWorldTemplateLayoutSnapshotWiring'
@@ -88,6 +80,7 @@ test('Test that listFaProjectWorkspaceHierarchyLayout returns placement skeleton
   })
   const layout = listFaProjectWorkspaceHierarchyLayout(db)
   expect(layout.worlds).toHaveLength(1)
+  expect(layout.worlds[0]?.colorPallete).toBe('')
   expect(layout.worlds[0]?.placements).toHaveLength(1)
   expect(layout.worlds[0]?.placements[0]?.hasChildren).toBe(true)
 })
@@ -222,60 +215,6 @@ test('Test that searchFaProjectHierarchy returns display_name matches', () => {
 })
 
 /**
- * planFaProjectHierarchyTestDocumentInserts
- * Fills lowest free suffixes up to ten numbered seeds per placement.
- */
-test('Test that planFaProjectHierarchyTestDocumentInserts uses lowest free suffixes', () => {
-  const plans = planFaProjectHierarchyTestDocumentInserts(
-    {
-      generateUuid: () => 'uuid-new',
-      nowMs: () => 1000
-    },
-    {
-      placementId: 'place-1',
-      worldId: 'world-1',
-      documentTemplateId: 'tpl-1',
-      templateDisplayName: 'Character'
-    },
-    {
-      existingSeedCount: 2,
-      usedSuffixes: [1, 2],
-      maxSortOrder: 1
-    }
-  )
-  expect(plans).toHaveLength(8)
-  expect(plans[0]?.displayName).toBe('Test Document - Character 03')
-  expect(plans[0]?.sortOrder).toBe(2)
-})
-
-/**
- * seedFaProjectHierarchyTestDocumentsForPlacements
- * Inserts ten numbered seeds when gate enabled and placement is empty.
- */
-test('Test that seedFaProjectHierarchyTestDocumentsForPlacements inserts ten rows when enabled', () => {
-  vi.stubEnv('NODE_ENV', 'development')
-  db = openHierarchyTestDb()
-  seedWorldPlacement(db, 'Realm', 'Character')
-  const inserted = seedFaProjectHierarchyTestDocumentsForPlacements(db)
-  expect(inserted).toBe(10)
-  const children = listFaProjectPlacementDocumentChildren(db, {
-    placementId: 'placement-1'
-  })
-  expect(children.items).toHaveLength(10)
-  expect(children.items[0]?.displayName).toBe('Test Document - Character 01')
-})
-
-/**
- * readFaProjectHierarchyTestDocumentSeedEnabled
- * Respects FA_ENABLE_HIERARCHY_TEST_DOCUMENT_SEED=0 in non-production.
- */
-test('Test that readFaProjectHierarchyTestDocumentSeedEnabled is false when env gate is zero', () => {
-  vi.stubEnv('NODE_ENV', 'development')
-  vi.stubEnv('FA_ENABLE_HIERARCHY_TEST_DOCUMENT_SEED', '0')
-  expect(readFaProjectHierarchyTestDocumentSeedEnabled()).toBe(false)
-})
-
-/**
  * searchFaProjectHierarchy
  * Returns empty hits for blank query without hitting LIKE.
  */
@@ -325,48 +264,6 @@ test('Test that moveFaProjectDocumentInHierarchy rejects ancestor cycle', () => 
     targetParentDocumentId: child.id,
     targetSortOrder: 0
   })).toThrow()
-})
-
-/**
- * seedFaProjectHierarchyTestDocumentsForPlacements
- * Skips inserts in production NODE_ENV.
- */
-test('Test that seedFaProjectHierarchyTestDocumentsForPlacements returns zero in production', () => {
-  vi.stubEnv('NODE_ENV', 'production')
-  db = openHierarchyTestDb()
-  seedWorldPlacement(db, 'Realm', 'Character')
-  expect(seedFaProjectHierarchyTestDocumentsForPlacements(db)).toBe(0)
-})
-
-/**
- * readFaProjectHierarchyTestDocumentSeedEnabled
- * Honors FA_ENABLE_HIERARCHY_TEST_DOCUMENT_SEED=1 in production NODE_ENV.
- */
-test('Test that readFaProjectHierarchyTestDocumentSeedEnabled honors force-enable env', () => {
-  vi.stubEnv('NODE_ENV', 'production')
-  vi.stubEnv('FA_ENABLE_HIERARCHY_TEST_DOCUMENT_SEED', '1')
-  expect(readFaProjectHierarchyTestDocumentSeedEnabled()).toBe(true)
-})
-
-/**
- * readFaProjectHierarchyTestDocumentSeedEnabled
- * Honors FA_ENABLE_HIERARCHY_TEST_DOCUMENT_SEED=0 in development NODE_ENV.
- */
-test('Test that readFaProjectHierarchyTestDocumentSeedEnabled honors force-disable env', () => {
-  vi.stubEnv('NODE_ENV', 'development')
-  vi.stubEnv('FA_ENABLE_HIERARCHY_TEST_DOCUMENT_SEED', '0')
-  expect(readFaProjectHierarchyTestDocumentSeedEnabled()).toBe(false)
-})
-
-/**
- * readFaProjectHierarchyTestDocumentSeedEnabled
- * Treats unpackaged Electron as dev even when NODE_ENV is production.
- */
-test('Test that readFaProjectHierarchyTestDocumentSeedEnabled treats unpackaged electron as dev', () => {
-  vi.stubEnv('NODE_ENV', 'production')
-  expect(readFaProjectHierarchyTestDocumentSeedEnabled({
-    isPackagedOverride: false
-  })).toBe(true)
 })
 
 /**
@@ -544,84 +441,6 @@ test('Test that searchFaProjectHierarchy escapes LIKE wildcard characters', () =
   })
   const result = searchFaProjectHierarchy(connection, '100%')
   expect(result.hits).toHaveLength(1)
-})
-
-/**
- * planFaProjectHierarchyTestDocumentInserts
- * Returns no plans when template display name is blank.
- */
-test('Test that planFaProjectHierarchyTestDocumentInserts skips blank template names', () => {
-  const plans = planFaProjectHierarchyTestDocumentInserts(
-    {
-      generateUuid: () => 'uuid-new',
-      nowMs: () => 1000
-    },
-    {
-      placementId: 'place-1',
-      worldId: 'world-1',
-      documentTemplateId: 'tpl-1',
-      templateDisplayName: '   '
-    },
-    {
-      existingSeedCount: 0,
-      usedSuffixes: [],
-      maxSortOrder: null
-    }
-  )
-  expect(plans).toEqual([])
-})
-
-/**
- * planFaProjectHierarchyTestDocumentInserts
- * Returns no plans when placement already has ten seeds.
- */
-test('Test that planFaProjectHierarchyTestDocumentInserts stops at ten seeds', () => {
-  const plans = planFaProjectHierarchyTestDocumentInserts(
-    {
-      generateUuid: () => 'uuid-new',
-      nowMs: () => 1000
-    },
-    {
-      placementId: 'place-1',
-      worldId: 'world-1',
-      documentTemplateId: 'tpl-1',
-      templateDisplayName: 'Character'
-    },
-    {
-      existingSeedCount: 10,
-      usedSuffixes: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-      maxSortOrder: 9
-    }
-  )
-  expect(plans).toEqual([])
-})
-
-/**
- * seedFaProjectHierarchyTestDocumentsForPlacements
- * Skips re-seeding when ten numbered test documents already exist.
- */
-test('Test that seedFaProjectHierarchyTestDocumentsForPlacements skips full placements', () => {
-  vi.stubEnv('NODE_ENV', 'development')
-  const connection = openHierarchyTestDb()
-  db = connection
-  seedWorldPlacement(connection, 'Realm', 'Character')
-  expect(seedFaProjectHierarchyTestDocumentsForPlacements(connection)).toBe(10)
-  expect(seedFaProjectHierarchyTestDocumentsForPlacements(connection)).toBe(0)
-})
-
-/**
- * seedFaProjectHierarchyTestDocumentsForPlacements
- * Skips placements whose template display name is blank after trim.
- */
-test('Test that seedFaProjectHierarchyTestDocumentsForPlacements skips blank template names', () => {
-  vi.stubEnv('NODE_ENV', 'development')
-  const connection = openHierarchyTestDb()
-  db = connection
-  const seeded = seedWorldPlacement(connection, 'Realm', 'Character')
-  connection.prepare(
-    `UPDATE ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES} SET display_name = ? WHERE id = ?`
-  ).run('   ', seeded.templateId)
-  expect(seedFaProjectHierarchyTestDocumentsForPlacements(connection)).toBe(0)
 })
 
 /**
@@ -824,19 +643,4 @@ test('Test that readFaProjectPlacementDocumentChildCount returns zero without co
     }))
   }
   expect(readFaProjectPlacementDocumentChildCount(connection as never, 'placement-1', null)).toBe(0)
-})
-
-/**
- * readFaProjectHierarchyTestDocumentSeedEnabled
- * Assumes packaged when the Electron app object is missing.
- */
-test('Test that readFaProjectHierarchyTestDocumentSeedEnabled treats missing electron app as packaged', async () => {
-  vi.stubEnv('NODE_ENV', 'production')
-  vi.stubEnv('FA_ENABLE_HIERARCHY_TEST_DOCUMENT_SEED', '')
-  vi.doMock('electron', () => ({}))
-  vi.resetModules()
-  const { readFaProjectHierarchyTestDocumentSeedEnabled: readEnabled } = await import('../faProjectHierarchyTestDocumentSeedWiring')
-  expect(readEnabled()).toBe(false)
-  vi.doUnmock('electron')
-  vi.resetModules()
 })

@@ -21,6 +21,7 @@ export function buildProjectHierarchyTreeSessionApi (deps: {
     eachDraggableHandler: deps.handlersWiring.eachDraggableHandler,
     eachDroppableHandler: deps.handlersWiring.eachDroppableHandler,
     isTreeDragActive: deps.isTreeDragActive,
+    onAddNewDocumentRowContextMenu: deps.handlersWiring.onAddNewDocumentRowContextMenu,
     onNodeClick: deps.handlersWiring.onNodeClick,
     onDocumentRowAuxClick: deps.handlersWiring.onDocumentRowAuxClick,
     onNodeClose: deps.handlersWiring.onNodeClose,

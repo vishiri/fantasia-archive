@@ -140,3 +140,30 @@ test('Test that document open handlers ignore aux click on non-document rows', (
   } as unknown as MouseEvent)
   expect(onDocumentOpenRequest).not.toHaveBeenCalled()
 })
+
+test('Test that document open handlers ignore add-new document node clicks', () => {
+  const onDocumentOpenRequest = vi.fn()
+  const handlers = createProjectHierarchyTreeDocumentOpenHandlers({
+    onDocumentOpenRequest
+  })
+  handlers.onNodeClick({
+    data: {
+      ...leafDocument,
+      documentId: null,
+      documentTemplateId: 'template-1',
+      id: 'placement-1__add-new',
+      nodeKind: 'addNewDocument'
+    }
+  })
+  handlers.onDocumentRowAuxClick({
+    ...leafDocument,
+    documentId: null,
+    documentTemplateId: 'template-1',
+    id: 'placement-1__add-new',
+    nodeKind: 'addNewDocument'
+  }, {
+    button: 1,
+    preventDefault: vi.fn()
+  } as unknown as MouseEvent)
+  expect(onDocumentOpenRequest).not.toHaveBeenCalled()
+})

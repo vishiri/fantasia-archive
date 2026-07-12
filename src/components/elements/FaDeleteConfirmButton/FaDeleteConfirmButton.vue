@@ -28,7 +28,7 @@
     >
       <div class="faDeleteConfirmButton__confirmInner">
         <p
-          class="faDeleteConfirmButton__confirmMessage fa-text-body"
+          class="faDeleteConfirmButton__confirmMessage"
           :data-test-locator="props.confirmMessageTestLocator"
         >
           {{ $t(props.deleteConfirmMessageKey) }}

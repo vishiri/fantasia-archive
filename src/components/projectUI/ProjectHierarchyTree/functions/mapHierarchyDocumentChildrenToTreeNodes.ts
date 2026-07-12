@@ -70,7 +70,9 @@ export function mapHierarchyDocumentChildrenToTreeNodes (input: {
     const node: I_faProjectHierarchyTreeHeTreeNode = {
       children: [],
       childrenLoaded: false,
+      documentBackgroundColor: item.documentBackgroundColor,
       documentId: item.id,
+      documentTextColor: item.documentTextColor,
       groupId: null,
       hasChildren: item.hasChildren,
       icon: placementIcon,

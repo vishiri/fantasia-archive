@@ -12,6 +12,10 @@ const temporaryTab: I_faOpenedDocumentTab = {
   parentDocumentId: 'parent-1',
   persistenceState: 'temporary',
   savedDisplayName: '',
+  documentTextColorDraft: '',
+  savedDocumentTextColor: '',
+  documentBackgroundColorDraft: '',
+  savedDocumentBackgroundColor: '',
   tabLabel: 'Character',
   templateIcon: 'mdi-account',
   templateId: 'tpl-1',
@@ -50,6 +54,10 @@ test('Test that reconcileTemporaryOpenedDocumentTabFromSnapshot returns persiste
     hasUnsavedChanges: false,
     persistenceState: 'persisted',
     savedDisplayName: 'Hero',
+    documentTextColorDraft: '',
+    savedDocumentTextColor: '',
+    documentBackgroundColorDraft: '',
+    savedDocumentBackgroundColor: '',
     tabLabel: 'Hero',
     templateIcon: 'mdi-account'
   }
@@ -86,6 +94,10 @@ test('Test that reconcileTemporaryOpenedDocumentTabFromSnapshot drops tabs missi
     hasUnsavedChanges: true,
     persistenceState: 'temporary',
     savedDisplayName: '',
+    documentTextColorDraft: '',
+    savedDocumentTextColor: '',
+    documentBackgroundColorDraft: '',
+    savedDocumentBackgroundColor: '',
     tabLabel: 'Character',
     templateIcon: 'mdi-account'
   }

@@ -1,3 +1,5 @@
 export default {
-  nameFieldLabel: 'Document name'
+  backgroundColorFieldLabel: 'Χρώμα φόντου εγγράφου',
+  nameFieldLabel: 'Document name',
+  textColorFieldLabel: 'Χρώμα κειμένου εγγράφου'
 }

@@ -25,3 +25,10 @@ test('Test that projectHierarchyTreeNodeShowsActiveTabHighlight ignores non-docu
     nodeKind: 'group'
   }, 'doc-1')).toBe(false)
 })
+
+test('Test that projectHierarchyTreeNodeShowsActiveTabHighlight ignores add-new rows', () => {
+  expect(projectHierarchyTreeNodeShowsActiveTabHighlight({
+    documentId: null,
+    nodeKind: 'addNewDocument'
+  }, 'doc-1')).toBe(false)
+})

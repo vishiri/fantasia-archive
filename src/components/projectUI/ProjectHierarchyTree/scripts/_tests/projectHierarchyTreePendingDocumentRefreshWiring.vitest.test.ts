@@ -53,6 +53,54 @@ test('Test that flushPendingProjectHierarchyTreeDocumentRefresh reloads parent b
   expect(refreshNodeChildrenFromDatabase).toHaveBeenCalledWith('placement-1')
 })
 
+test('Test that flushPendingProjectHierarchyTreeDocumentRefresh reloads expanded saved document children', async () => {
+  const treeData = ref([
+    {
+      ...buildPlacementNode(),
+      children: [
+        {
+          children: [
+            {
+              children: [],
+              childrenLoaded: true,
+              documentId: 'doc-child',
+              groupId: null,
+              hasChildren: false,
+              icon: 'mdi-home',
+              id: 'doc-child',
+              label: 'Doc Child',
+              nodeKind: 'document' as const,
+              placementId: 'placement-1',
+              worldColor: '#ff0000',
+              worldId: 'world-1'
+            }
+          ],
+          childrenLoaded: true,
+          documentId: 'doc-parent',
+          groupId: null,
+          hasChildren: true,
+          icon: 'mdi-home',
+          id: 'doc-parent',
+          label: 'Doc Parent',
+          nodeKind: 'document' as const,
+          placementId: 'placement-1',
+          worldColor: '#ff0000',
+          worldId: 'world-1'
+        }
+      ]
+    }
+  ])
+  const refreshNodeChildrenFromDatabase = vi.fn(async () => undefined)
+  await flushPendingProjectHierarchyTreeDocumentRefresh({
+    documentIds: ['doc-parent'],
+    refreshNodeChildrenFromDatabase,
+    treeData
+  })
+  expect(refreshNodeChildrenFromDatabase).toHaveBeenCalledTimes(2)
+  expect(refreshNodeChildrenFromDatabase).toHaveBeenNthCalledWith(1, 'placement-1')
+  expect(refreshNodeChildrenFromDatabase).toHaveBeenNthCalledWith(2, 'doc-parent')
+})
+
 test('Test that flushPendingProjectHierarchyTreeNodeRefresh reloads explicit node ids', async () => {
   const refreshNodeChildrenFromDatabase = vi.fn(async () => undefined)
   await flushPendingProjectHierarchyTreeNodeRefresh({

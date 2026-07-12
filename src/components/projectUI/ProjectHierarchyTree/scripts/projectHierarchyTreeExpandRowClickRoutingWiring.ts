@@ -9,6 +9,9 @@ function shouldRouteHierarchyTreeRowExpandClick (
   node: I_faProjectHierarchyTreeHeTreeNode,
   stat: { children: unknown[], open: boolean }
 ): boolean {
+  if (node.nodeKind === 'addNewDocument') {
+    return false
+  }
   if (
     node.nodeKind === 'world' ||
     node.nodeKind === 'group' ||

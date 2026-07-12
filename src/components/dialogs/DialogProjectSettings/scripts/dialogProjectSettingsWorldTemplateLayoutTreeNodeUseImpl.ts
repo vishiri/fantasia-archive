@@ -5,6 +5,7 @@ import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLangu
 
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeActionTooltipsWiring'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeInteractionWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeInteractionWiring'
+import { isDialogProjectSettingsWorldTemplateLayoutPlacementRemoveDisabled } from './functions/dialogProjectSettingsWorldTemplateLayoutTreeNodePresentation'
 import { wireDialogProjectSettingsWorldTemplateLayoutTreeNodePlacementNicknameTooltipRenameMenu } from './dialogProjectSettingsWorldTemplateLayoutTreeNodePlacementNicknameTooltipRenameMenuWiring'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodePresentationWiring'
 import { createDialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuNodeWiring } from './dialogProjectSettingsWorldTemplateLayoutTreeNodeRenameMenuNodeWiring'
@@ -81,6 +82,7 @@ export function useDialogProjectSettingsWorldTemplateLayoutTreeNodeImpl (
       emit('removePlacement', props.node.id)
     },
     getNodeKind: () => props.node.nodeKind,
+    isRemoveDisabled: () => isDialogProjectSettingsWorldTemplateLayoutPlacementRemoveDisabled(props.node),
     renameMenuWiring
   })
 

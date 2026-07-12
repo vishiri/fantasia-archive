@@ -20,6 +20,14 @@ test('Test that buildProjectDocumentControlBarTabContextMenuHandlers copies the 
         editState: false,
         hasUnsavedChanges: false,
         savedDisplayName: 'Saved',
+
+        documentTextColorDraft: '',
+
+        savedDocumentTextColor: '',
+
+        documentBackgroundColorDraft: '',
+
+        savedDocumentBackgroundColor: '',
         tabLabel: 'Character',
         templateIcon: 'mdi-account'
       }
@@ -93,6 +101,14 @@ test('Test that buildProjectDocumentControlBarTabContextMenuHandlers skips copy 
       editState: false,
       hasUnsavedChanges: false,
       savedDisplayName: 'Saved',
+
+      documentTextColorDraft: '',
+
+      savedDocumentTextColor: '',
+
+      documentBackgroundColorDraft: '',
+
+      savedDocumentBackgroundColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }),
@@ -126,6 +142,14 @@ test('Test that buildProjectDocumentControlBarTabContextMenuHandlers reports cli
       editState: false,
       hasUnsavedChanges: false,
       savedDisplayName: 'Saved',
+
+      documentTextColorDraft: '',
+
+      savedDocumentTextColor: '',
+
+      documentBackgroundColorDraft: '',
+
+      savedDocumentBackgroundColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }),

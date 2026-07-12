@@ -12,6 +12,7 @@ export function createUseFaColorPickerPaletteAppend (
   }, emitAppendToWorldPalette: (colorPallete: string) => void, resolveLiveColorString: () => string, refreshProjectColorPalette?: () => Promise<void>) => {
     isPaletteAppendDisabled: I_computedRef<boolean>
     isPaletteAppendDuplicate: I_computedRef<boolean>
+    isPaletteAppendInvalidHex: I_computedRef<boolean>
     onPaletteAppendClick: () => Promise<void>
     showPaletteAppendButton: I_computedRef<boolean>
   } {
@@ -35,6 +36,14 @@ export function createUseFaColorPickerPaletteAppend (
         deps.faProjectWorldColorPalleteContainsHex,
         deps.isFaProjectWorldStorageHexColor
       )
+    })
+
+    const isPaletteAppendInvalidHex = deps.computed(() => {
+      const hex = appendHexCandidate.value
+      if (hex.length === 0) {
+        return true
+      }
+      return !deps.isFaProjectWorldStorageHexColor(hex)
     })
 
     const isPaletteAppendDisabled = deps.computed(() => {
@@ -70,6 +79,7 @@ export function createUseFaColorPickerPaletteAppend (
     return {
       isPaletteAppendDisabled,
       isPaletteAppendDuplicate,
+      isPaletteAppendInvalidHex,
       onPaletteAppendClick,
       showPaletteAppendButton
     }

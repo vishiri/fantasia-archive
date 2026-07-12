@@ -19,6 +19,12 @@ export const FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN = 'tree_parent_d
 /** documents sibling order within placement + parent bucket */
 export const FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN = 'tree_custom_sort_order'
 
+/** documents optional text color (#RRGGBB) */
+export const FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN = 'document_text_color'
+
+/** documents optional background color (#RRGGBB) */
+export const FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN = 'document_background_color'
+
 /** Composite index on documents tree hierarchy columns */
 export const FA_PROJECT_DOCUMENT_TREE_PLACEMENT_PARENT_SORT_INDEX =
   'idx_documents_tree_placement_parent_sort'
@@ -170,6 +176,16 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_DOCUMENTS} (
   ${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} TEXT REFERENCES ${FA_PROJECT_TABLE_DOCUMENTS}(id) ON DELETE CASCADE,
   ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} INTEGER NOT NULL DEFAULT 0,
   display_name TEXT NOT NULL CHECK (length(display_name) > 0),
+  ${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN} TEXT
+  CHECK (${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN} IS NULL OR (
+    length(${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN}) = 7 AND
+    substr(${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN}, 1, 1) = '#'
+  )),
+  ${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN} TEXT
+  CHECK (${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN} IS NULL OR (
+    length(${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}) = 7 AND
+    substr(${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}, 1, 1) = '#'
+  )),
   created_at_ms INTEGER NOT NULL,
   updated_at_ms INTEGER NOT NULL
 );

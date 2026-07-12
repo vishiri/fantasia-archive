@@ -13,8 +13,9 @@ import {
   resolveTemporaryOpenedDocumentDisplayNameForSave,
   resolveTemporaryOpenedDocumentParentDocumentId
 } from '../openedDocumentTemporaryDomain'
+import { computeOpenedDocumentHasUnsavedChanges } from '../openedDocumentTabAppearance'
 
-test('Test that createTemporaryOpenedDocumentTabSeed starts in edit mode with unsaved changes', () => {
+test('Test that createTemporaryOpenedDocumentTabSeed starts in edit mode without unsaved changes', () => {
   const tab = createTemporaryOpenedDocumentTabSeed({
     displayName: 'Aria',
     documentId: 'temp-1',
@@ -27,8 +28,31 @@ test('Test that createTemporaryOpenedDocumentTabSeed starts in edit mode with un
 
   expect(tab.persistenceState).toBe('temporary')
   expect(tab.editState).toBe(true)
-  expect(tab.hasUnsavedChanges).toBe(true)
+  expect(tab.hasUnsavedChanges).toBe(false)
+  expect(tab.savedDisplayName).toBe('Aria')
   expect(tab.worldId).toBe('world-1')
+})
+
+test('Test that createTemporaryOpenedDocumentTabSeed marks unsaved changes only after draft edits', () => {
+  const tab = createTemporaryOpenedDocumentTabSeed({
+    displayName: 'New character',
+    documentId: 'temp-1',
+    parentDocumentId: null,
+    tabLabel: 'Character',
+    templateIcon: 'mdi-account',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+
+  expect(tab.hasUnsavedChanges).toBe(false)
+  expect(computeOpenedDocumentHasUnsavedChanges({
+    displayNameDraft: 'Renamed hero',
+    documentBackgroundColorDraft: tab.documentBackgroundColorDraft,
+    documentTextColorDraft: tab.documentTextColorDraft,
+    savedDisplayName: tab.savedDisplayName,
+    savedDocumentBackgroundColor: tab.savedDocumentBackgroundColor,
+    savedDocumentTextColor: tab.savedDocumentTextColor
+  })).toBe(true)
 })
 
 test('Test that promoteTemporaryOpenedDocumentTabAfterCreate clears temporary metadata', () => {
@@ -48,7 +72,9 @@ test('Test that promoteTemporaryOpenedDocumentTabAfterCreate clears temporary me
   })
 
   expect(promoted.persistenceState).toBe('persisted')
-  expect(promoted.worldId).toBeUndefined()
+  expect(promoted.worldId).toBe('world-1')
+  expect(promoted.templateId).toBeUndefined()
+  expect(promoted.parentDocumentId).toBeUndefined()
   expect(promoted.hasUnsavedChanges).toBe(false)
 })
 
