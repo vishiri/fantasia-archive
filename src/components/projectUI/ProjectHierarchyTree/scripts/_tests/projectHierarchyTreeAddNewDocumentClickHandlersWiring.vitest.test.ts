@@ -64,6 +64,44 @@ test('Test that add-new middle click creates temporary document with middleBackg
   expect(event.preventDefault).toHaveBeenCalled()
 })
 
+test('Test that template placement middle click creates temporary document with middleBackground', async () => {
+  const createTemporaryDocument = vi.fn(async () => 'temp-doc-3')
+  const handlers = createProjectHierarchyTreeAddNewDocumentClickHandlers({
+    createTemporaryDocument,
+    resolvePreferredLanguageCode: () => 'en-US'
+  })
+  const event = {
+    button: 1,
+    preventDefault: vi.fn(),
+    stopPropagation: vi.fn()
+  } as unknown as MouseEvent
+  handlers.onAddNewDocumentRowAuxClick({
+    children: [],
+    childrenLoaded: true,
+    documentId: null,
+    documentTemplateId: 'template-1',
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-office-building',
+    id: 'placement-1',
+    label: 'Buildings',
+    nodeKind: 'templatePlacement',
+    placementId: 'placement-1',
+    titlePluralTranslations: { 'en-US': 'Buildings' },
+    titleSingularTranslations: { 'en-US': 'Building' },
+    worldColor: '#336699',
+    worldId: 'world-1'
+  }, event)
+  expect(createTemporaryDocument).toHaveBeenCalledWith({
+    displayName: 'New building',
+    openMode: 'middleBackground',
+    parentDocumentId: null,
+    templateId: 'template-1',
+    worldId: 'world-1'
+  })
+  expect(event.preventDefault).toHaveBeenCalled()
+})
+
 test('Test that add-new click handlers ignore non-add-new rows', () => {
   const createTemporaryDocument = vi.fn(async () => 'temp-doc')
   const handlers = createProjectHierarchyTreeAddNewDocumentClickHandlers({

@@ -2,7 +2,7 @@ import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHi
 import type { T_faOpenedDocumentOpenMode } from 'app/types/I_faOpenedDocumentsDomain'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 
-import { isProjectHierarchyTreeAddNewDocumentNode } from './projectHierarchyTreeAddNewDocumentNode'
+import { isProjectHierarchyTreeAddNewDocumentCreateSourceNode } from './projectHierarchyTreeAddNewDocumentNode'
 import { resolveProjectHierarchyTreeNewDocumentDisplayName } from '../functions/projectHierarchyTreeAddNewDocumentLabel'
 
 export function createProjectHierarchyTreeAddNewDocumentClickHandlers (deps: {
@@ -28,7 +28,7 @@ export function createProjectHierarchyTreeAddNewDocumentClickHandlers (deps: {
     templateId: string
     worldId: string
   } | null {
-    if (!isProjectHierarchyTreeAddNewDocumentNode(node)) {
+    if (!isProjectHierarchyTreeAddNewDocumentCreateSourceNode(node)) {
       return null
     }
     const templateId = node.documentTemplateId

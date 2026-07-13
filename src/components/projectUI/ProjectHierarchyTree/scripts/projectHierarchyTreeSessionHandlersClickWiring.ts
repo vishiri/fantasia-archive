@@ -22,7 +22,7 @@ export function createProjectHierarchyTreeSessionHandlersClickWiring (deps: {
     node: I_faProjectHierarchyTreeHeTreeNode,
     event: MouseEvent
   ): void {
-    if (node.nodeKind === 'addNewDocument') {
+    if (node.nodeKind === 'addNewDocument' || node.nodeKind === 'templatePlacement') {
       deps.addNewDocumentClickHandlers.onAddNewDocumentRowAuxClick(node, event)
       return
     }

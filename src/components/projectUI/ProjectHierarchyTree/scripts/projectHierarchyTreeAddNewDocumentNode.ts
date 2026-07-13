@@ -20,6 +20,12 @@ export function isProjectHierarchyTreeAddNewDocumentNode (
   return node.nodeKind === 'addNewDocument' || node.id.endsWith(PROJECT_HIERARCHY_TREE_ADD_NEW_DOCUMENT_NODE_ID_SUFFIX)
 }
 
+export function isProjectHierarchyTreeAddNewDocumentCreateSourceNode (
+  node: Pick<I_faProjectHierarchyTreeHeTreeNode, 'id' | 'nodeKind'>
+): boolean {
+  return isProjectHierarchyTreeAddNewDocumentNode(node) || node.nodeKind === 'templatePlacement'
+}
+
 export function createProjectHierarchyTreeAddNewDocumentNode (input: {
   label: string
   placement: I_faProjectHierarchyTreePlacementAddNewSource

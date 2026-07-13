@@ -37,6 +37,24 @@ const addNewDocument: I_faProjectHierarchyTreeHeTreeNode = {
   worldId: 'world-1'
 }
 
+const templatePlacement: I_faProjectHierarchyTreeHeTreeNode = {
+  children: [],
+  childrenLoaded: true,
+  documentId: null,
+  documentTemplateId: 'template-1',
+  groupId: null,
+  hasChildren: true,
+  icon: 'mdi-office-building',
+  id: 'placement-1',
+  label: 'Buildings',
+  nodeKind: 'templatePlacement',
+  placementId: 'placement-1',
+  titlePluralTranslations: { 'en-US': 'Buildings' },
+  titleSingularTranslations: { 'en-US': 'Building' },
+  worldColor: '#336699',
+  worldId: 'world-1'
+}
+
 test('Test that session click wiring routes add-new node clicks to add-new handlers', () => {
   const onAddNewDocumentRowClick = vi.fn()
   const onNodeClick = vi.fn()
@@ -122,6 +140,28 @@ test('Test that session click wiring routes document aux clicks to document open
   })
   wiring.onDocumentRowAuxClick(leafDocument, event)
   expect(onDocumentRowAuxClick).toHaveBeenCalledWith(leafDocument, event)
+})
+
+test('Test that session click wiring routes template placement aux clicks to add-new handlers', () => {
+  const onAddNewDocumentRowAuxClick = vi.fn()
+  const onDocumentRowAuxClick = vi.fn()
+  const event = {
+    button: 1,
+    preventDefault: vi.fn()
+  } as unknown as MouseEvent
+  const wiring = createProjectHierarchyTreeSessionHandlersClickWiring({
+    addNewDocumentClickHandlers: {
+      onAddNewDocumentRowAuxClick,
+      onAddNewDocumentRowClick: vi.fn()
+    },
+    documentOpenHandlers: {
+      onDocumentRowAuxClick,
+      onNodeClick: vi.fn()
+    }
+  })
+  wiring.onDocumentRowAuxClick(templatePlacement, event)
+  expect(onAddNewDocumentRowAuxClick).toHaveBeenCalledWith(templatePlacement, event)
+  expect(onDocumentRowAuxClick).not.toHaveBeenCalled()
 })
 
 test('Test that session click wiring prevents default on add-new context menu', () => {
