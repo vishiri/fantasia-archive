@@ -49,6 +49,7 @@ import L_unsortedAppTexts from './globalFunctionality/L_unsortedAppTexts'
 
 import L_mainLayout from './layouts/L_mainLayout'
 import L_ErrorNotFound from './pages/L_ErrorNotFound'
+import L_projectHierarchyTree from './components/projectUI/ProjectHierarchyTree/L_projectHierarchyTree'
 import L_projectHierarchyTreeSearch from './components/projectUI/ProjectHierarchyTreeSearch/L_projectHierarchyTreeSearch'
 import L_projectOverview from './components/projectUI/ProjectOverview/L_projectOverview'
 import L_projectDocumentControlBar from './components/projectUI/L_projectDocumentControlBar'
@@ -130,6 +131,7 @@ export default {
 
   // COMPONENT - PROJECT UI
   projectUI: {
+    projectHierarchyTree: L_projectHierarchyTree,
     projectHierarchyTreeSearch: L_projectHierarchyTreeSearch,
     projectOverview: L_projectOverview,
     projectDocumentControlBar: L_projectDocumentControlBar

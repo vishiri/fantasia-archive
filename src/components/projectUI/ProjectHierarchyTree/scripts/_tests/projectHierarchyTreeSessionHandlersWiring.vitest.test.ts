@@ -33,17 +33,32 @@ function buildPointerLikeEvent (clientX: number, clientY: number) {
 function createTestUiStateWiring (overrides: {
   markNodeClosed?: ReturnType<typeof vi.fn>
   markNodeOpen?: ReturnType<typeof vi.fn>
+  reapplyHeTreeOpenState?: ReturnType<typeof vi.fn>
   reapplyLatentDescendantExpandState?: ReturnType<typeof vi.fn>
 } = {}): Parameters<typeof createProjectHierarchyTreeSessionHandlersWiring>[0]['uiStateWiring'] {
   const markNodeClosed = overrides.markNodeClosed ?? vi.fn()
   const markNodeOpen = overrides.markNodeOpen ?? vi.fn()
+  const reapplyHeTreeOpenState = overrides.reapplyHeTreeOpenState ?? vi.fn()
   const reapplyLatentDescendantExpandState =
     overrides.reapplyLatentDescendantExpandState ?? vi.fn(async () => undefined)
   return {
     markNodeClosed,
     markNodeOpen,
+    reapplyHeTreeOpenState,
     reapplyLatentDescendantExpandState
   } as Parameters<typeof createProjectHierarchyTreeSessionHandlersWiring>[0]['uiStateWiring']
+}
+
+function createTestBulkExpandDeps (): Pick<
+  Parameters<typeof createProjectHierarchyTreeSessionHandlersWiring>[0],
+  'nextTick' | 'openNodeIds' | 'queuePersistExpandedNodeIds' | 'treeMountKey'
+> {
+  return {
+    nextTick: async () => {},
+    openNodeIds: ref<Set<string>>(new Set()),
+    queuePersistExpandedNodeIds: vi.fn(),
+    treeMountKey: ref(0)
+  }
 }
 
 function createTestTreeComponentRef () {
@@ -100,6 +115,7 @@ test('Test that session handlers open nodes and load children', async () => {
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -136,6 +152,7 @@ test('Test that session handlers load children when the open icon expands a row'
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -185,6 +202,7 @@ test('Test that open icon expand keeps stat closed until lazy load finishes', as
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -232,6 +250,7 @@ test('Test that session handlers collapse rows via the open icon', async () => {
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -276,6 +295,7 @@ test('Test that session handlers expand world rows from row click routing', asyn
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -339,6 +359,7 @@ test('Test that session handlers expand group rows from row click routing', asyn
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -399,6 +420,7 @@ test('Test that session handlers expand document rows with children from row cli
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -456,6 +478,7 @@ test('Test that session handlers ignore leaf document row click routing', async 
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -512,6 +535,7 @@ test('Test that session handlers ignore document row click after drag movement',
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -560,6 +584,7 @@ test('Test that session handlers ignore non-world open icon routing on world row
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -595,6 +620,7 @@ test('Test that session handlers reopen he-tree row after lazy load when tree re
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -628,6 +654,7 @@ test('Test that session handlers ignore close events while suppressTreeEmit is s
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(true),
@@ -659,6 +686,7 @@ test('Test that session handlers emit document open requests for leaf document r
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest,
     suppressTreeEmit: ref(false),
@@ -757,6 +785,7 @@ test('Test that session handlers expose draggable and droppable handlers', () =>
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -798,6 +827,7 @@ test('Test that session handlers do not restore UI state when tree ref attaches'
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -837,6 +867,7 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -877,6 +908,7 @@ test('Test that session handlers skip restore when tree ref attaches during drag
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: async () => undefined
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -909,6 +941,7 @@ test('Test that session handlers skip restore when tree ref clears', () => {
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -951,6 +984,7 @@ test('Test that session handlers ignore open icon clicks on empty loaded documen
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -995,6 +1029,7 @@ test('Test that session handlers recover when he-tree openNodeAndParents stat is
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
@@ -1029,6 +1064,7 @@ test('Test that session handlers create temporary document when add-new row is c
       loadChildrenForNode: vi.fn(async () => undefined)
     },
     onDocumentOpenRequest: vi.fn(),
+    ...createTestBulkExpandDeps(),
     resolvePreferredLanguageCode: () => 'en-US',
     suppressTreeEmit: ref(false),
     treeComponentRef: ref(null),

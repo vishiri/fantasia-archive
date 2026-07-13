@@ -967,15 +967,20 @@ test('Test that session handlers wiring emits document open requests', async () 
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: async () => undefined
     },
+    nextTick: async () => {},
     onDocumentOpenRequest,
+    openNodeIds: ref<Set<string>>(new Set()),
+    queuePersistExpandedNodeIds: vi.fn(),
     resolvePreferredLanguageCode: () => 'en-US',
     suppressTreeEmit: ref(false),
     treeComponentRef,
     treeData: ref([]),
+    treeMountKey: ref(0),
     treeScrollHostRef,
     uiStateWiring: {
       markNodeClosed: vi.fn(),
       markNodeOpen: vi.fn(),
+      reapplyHeTreeOpenState: vi.fn(),
       reapplyLatentDescendantExpandState: vi.fn(async () => undefined)
     }
   })
@@ -1495,15 +1500,20 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode
     },
+    nextTick: async () => {},
     onDocumentOpenRequest: vi.fn(),
+    openNodeIds: ref<Set<string>>(new Set()),
+    queuePersistExpandedNodeIds: vi.fn(),
     resolvePreferredLanguageCode: () => 'en-US',
     suppressTreeEmit: ref(false),
     treeComponentRef: ref(null),
     treeData: ref([]),
+    treeMountKey: ref(0),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
       markNodeClosed,
       markNodeOpen,
+      reapplyHeTreeOpenState: vi.fn(),
       reapplyLatentDescendantExpandState: vi.fn(async () => undefined)
     }
   })

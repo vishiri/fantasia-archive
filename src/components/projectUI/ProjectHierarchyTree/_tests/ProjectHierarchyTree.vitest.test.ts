@@ -1,5 +1,6 @@
 /** @vitest-environment jsdom */
 import { mount } from '@vue/test-utils'
+import { createI18n } from 'vue-i18n'
 import { expect, test, vi } from 'vitest'
 import { defineComponent, h, ref } from 'vue'
 
@@ -7,12 +8,16 @@ import ProjectHierarchyTree from '../ProjectHierarchyTree.vue'
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 const treeHandlers = vi.hoisted(() => ({
-  onAddNewDocumentRowContextMenu: vi.fn(),
+  onBeforeDragOpen: vi.fn(),
   onBeforeDragStart: vi.fn(),
+  onCollapseAllUnderNodeClick: vi.fn(),
   onDocumentRowAuxClick: vi.fn(),
+  onExpandAllUnderNodeClick: vi.fn(),
   onNodeClick: vi.fn(),
   onNodeClose: vi.fn(),
+  onNodeContextMenuHide: vi.fn(),
   onNodeOpen: vi.fn(),
+  onNodeRowContextMenu: vi.fn(),
   onNonWorldOpenIconClick: vi.fn(),
   onNonWorldOpenIconPointerDown: vi.fn(),
   onTreeAfterDrop: vi.fn(),
@@ -24,6 +29,11 @@ const treeHandlers = vi.hoisted(() => ({
 
 const treeOpenRequest = vi.hoisted(() => ({
   handler: null as ((documentId: string, mode: string, treeMeta: unknown) => void) | null
+}))
+
+const treeRefWiring = vi.hoisted(() => ({
+  setTreeComponentRef: vi.fn(),
+  setTreeScrollHostRef: vi.fn()
 }))
 
 const treeData = ref<I_faProjectHierarchyTreeHeTreeNode[]>([
@@ -43,6 +53,81 @@ const treeData = ref<I_faProjectHierarchyTreeHeTreeNode[]>([
   }
 ])
 
+const treeContextMenuState = {
+  anchorNodeId: ref<string | null>(null),
+  isOpen: ref(false),
+  menuTarget: ref<HTMLElement | null>(null)
+}
+
+const projectHierarchyTreeI18n = createI18n({
+  legacy: false,
+  locale: 'en-US',
+  messages: {
+    'en-US': {
+      projectUI: {
+        projectHierarchyTree: {
+          contextMenu: {
+            collapseAllUnderNode: 'Collapse all under this node',
+            expandAllUnderNode: 'Expand all under this node'
+          }
+        }
+      }
+    }
+  }
+})
+
+const projectHierarchyTreeContextMenuStubs = {
+  QIcon: true,
+  QItem: {
+    template: '<div><slot /></div>'
+  },
+  QItemSection: {
+    template: '<span><slot /></span>'
+  },
+  QList: {
+    template: '<div><slot /></div>'
+  },
+  QMenu: {
+    template: '<div data-test-locator="projectHierarchyTree-nodeContextMenu-host"><slot /></div>'
+  }
+}
+
+const projectHierarchyTreeNodeContextMenuStub = {
+  name: 'ProjectHierarchyTreeNodeContextMenu',
+  props: [
+    'anchorNodeId',
+    'isOpen',
+    'menuTargetElement',
+    'onCollapseAllClick',
+    'onExpandAllClick',
+    'onHide'
+  ],
+  template: '<div data-test-locator="projectHierarchyTree-nodeContextMenu-stub" />'
+}
+
+function mountProjectHierarchyTree (
+  options: Parameters<typeof mount<typeof ProjectHierarchyTree>>[1] = {},
+  withNodeContextMenu = false
+) {
+  const contextMenuStubs = withNodeContextMenu
+    ? projectHierarchyTreeContextMenuStubs
+    : {
+        ProjectHierarchyTreeNodeContextMenu: projectHierarchyTreeNodeContextMenuStub
+      }
+
+  return mount(ProjectHierarchyTree, {
+    ...options,
+    global: {
+      plugins: [projectHierarchyTreeI18n],
+      ...options.global,
+      stubs: {
+        ...contextMenuStubs,
+        ...options.global?.stubs
+      }
+    }
+  })
+}
+
 vi.mock('../scripts/projectHierarchyTree_manager', () => {
   return {
     useProjectHierarchyTree: (options: {
@@ -51,17 +136,23 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
       treeOpenRequest.handler = options.onDocumentOpenRequest
       return {
         activeDocumentId: ref(null),
+        contextMenuAnchorNodeId: treeContextMenuState.anchorNodeId,
         eachDraggableHandler: () => true,
         eachDroppableHandler: () => true,
         heTreeNodeKey: (_stat: { data: { id: string } }) => 'world-1',
+        isNodeContextMenuOpen: treeContextMenuState.isOpen,
         isTreeDragActive: ref(false),
-        onBeforeDragOpen: vi.fn(),
+        nodeMenuTargetElement: treeContextMenuState.menuTarget,
+        onBeforeDragOpen: treeHandlers.onBeforeDragOpen,
         onBeforeDragStart: treeHandlers.onBeforeDragStart,
-        onAddNewDocumentRowContextMenu: treeHandlers.onAddNewDocumentRowContextMenu,
+        onCollapseAllUnderNodeClick: treeHandlers.onCollapseAllUnderNodeClick,
         onDocumentRowAuxClick: treeHandlers.onDocumentRowAuxClick,
+        onExpandAllUnderNodeClick: treeHandlers.onExpandAllUnderNodeClick,
         onNodeClick: treeHandlers.onNodeClick,
         onNodeClose: treeHandlers.onNodeClose,
+        onNodeContextMenuHide: treeHandlers.onNodeContextMenuHide,
         onNodeOpen: treeHandlers.onNodeOpen,
+        onNodeRowContextMenu: treeHandlers.onNodeRowContextMenu,
         onNonWorldOpenIconClick: treeHandlers.onNonWorldOpenIconClick,
         onNonWorldOpenIconPointerDown: treeHandlers.onNonWorldOpenIconPointerDown,
         onTreeAfterDrop: treeHandlers.onTreeAfterDrop,
@@ -70,8 +161,8 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
         onWorldNodeRowClick: treeHandlers.onWorldNodeRowClick,
         onWorldNodeRowPointerDown: treeHandlers.onWorldNodeRowPointerDown,
         rootDroppableHandler: () => false,
-        setTreeComponentRef: vi.fn(),
-        setTreeScrollHostRef: vi.fn(),
+        setTreeComponentRef: treeRefWiring.setTreeComponentRef,
+        setTreeScrollHostRef: treeRefWiring.setTreeScrollHostRef,
         treeData,
         treeMountKey: ref(0),
         treeRootClassList: ref({}),
@@ -131,7 +222,7 @@ vi.mock('@he-tree/vue', () => {
  * ProjectHierarchyTree renders tree rows when layout data exists.
  */
 test('Test that ProjectHierarchyTree renders tree rows when layout data exists', () => {
-  const wrapper = mount(ProjectHierarchyTree, {
+  const wrapper = mountProjectHierarchyTree({
     global: {
       stubs: {
         ProjectHierarchyTreeNode: {
@@ -146,11 +237,14 @@ test('Test that ProjectHierarchyTree renders tree rows when layout data exists',
     }
   })
   expect(wrapper.find('[data-test-locator="projectHierarchyTree-host"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-stub"]').exists()).toBe(true)
+  expect(treeRefWiring.setTreeScrollHostRef).toHaveBeenCalled()
+  expect(treeRefWiring.setTreeComponentRef).toHaveBeenCalled()
   wrapper.unmount()
 })
 
 test('Test that ProjectHierarchyTree forwards row and tree interaction handlers', async () => {
-  const wrapper = mount(ProjectHierarchyTree, {
+  const wrapper = mountProjectHierarchyTree({
     global: {
       stubs: {
         ProjectHierarchyTreeNode: {
@@ -169,6 +263,7 @@ test('Test that ProjectHierarchyTree forwards row and tree interaction handlers'
   await row.trigger('click')
   await row.trigger('pointerdown')
   await row.trigger('auxclick', { button: 1 })
+  await row.trigger('contextmenu')
 
   const openIcon = wrapper.get('[data-test-locator="projectHierarchyTree-openIcon"]')
   await openIcon.trigger('click')
@@ -187,14 +282,23 @@ test('Test that ProjectHierarchyTree forwards row and tree interaction handlers'
   expect(treeHandlers.onWorldNodeRowClick).toHaveBeenCalled()
   expect(treeHandlers.onWorldNodeRowPointerDown).toHaveBeenCalled()
   expect(treeHandlers.onDocumentRowAuxClick).toHaveBeenCalled()
+  expect(treeHandlers.onNodeRowContextMenu).toHaveBeenCalled()
   expect(treeHandlers.onNonWorldOpenIconClick).toHaveBeenCalled()
   expect(treeHandlers.onNonWorldOpenIconPointerDown).toHaveBeenCalled()
+  expect(treeHandlers.onNodeClick).toHaveBeenCalled()
+  expect(treeHandlers.onNodeClose).toHaveBeenCalled()
+  expect(treeHandlers.onNodeOpen).toHaveBeenCalled()
+  expect(treeHandlers.onBeforeDragOpen).toHaveBeenCalled()
+  expect(treeHandlers.onBeforeDragStart).toHaveBeenCalled()
+  expect(treeHandlers.onTreeAfterDrop).toHaveBeenCalled()
+  expect(treeHandlers.onTreeDataUpdate).toHaveBeenCalled()
+  expect(treeHandlers.onTreeDragEndCleanup).toHaveBeenCalled()
 
   wrapper.unmount()
 })
 
 test('Test that ProjectHierarchyTree forwards document open requests to the parent', () => {
-  const wrapper = mount(ProjectHierarchyTree, {
+  const wrapper = mountProjectHierarchyTree({
     global: {
       stubs: {
         ProjectHierarchyTreeNode: {
@@ -235,7 +339,7 @@ test('Test that ProjectHierarchyTree renders open icon for expandable document r
     worldColor: '#000',
     worldId: 'world-1'
   }]
-  const wrapper = mount(ProjectHierarchyTree, {
+  const wrapper = mountProjectHierarchyTree({
     global: {
       stubs: {
         ProjectHierarchyTreeNode: {
@@ -282,7 +386,7 @@ test('Test that ProjectHierarchyTree omits open icon for leaf document rows', ()
     worldColor: '#000',
     worldId: 'world-1'
   }]
-  const wrapper = mount(ProjectHierarchyTree, {
+  const wrapper = mountProjectHierarchyTree({
     global: {
       stubs: {
         ProjectHierarchyTreeNode: {
@@ -314,7 +418,37 @@ test('Test that ProjectHierarchyTree omits open icon for leaf document rows', ()
   }]
 })
 
-test('Test that ProjectHierarchyTree wires add-new context menu handler on add-new rows', async () => {
+test('Test that ProjectHierarchyTree mounts node context menu with handler props', async () => {
+  treeContextMenuState.anchorNodeId.value = 'world-1'
+  treeContextMenuState.isOpen.value = true
+  treeContextMenuState.menuTarget.value = document.createElement('div')
+
+  const wrapper = mountProjectHierarchyTree({
+    global: {
+      stubs: {
+        ProjectHierarchyTreeNode: {
+          props: ['node', 'stat'],
+          template: '<div data-test-locator="projectHierarchyTree-node-stub" />'
+        },
+        QIcon: true
+      }
+    }
+  }, true)
+
+  const contextMenu = wrapper.findComponent({ name: 'ProjectHierarchyTreeNodeContextMenu' })
+  expect(contextMenu.exists()).toBe(true)
+  expect(contextMenu.props('onExpandAllClick')).toBe(treeHandlers.onExpandAllUnderNodeClick)
+  expect(contextMenu.props('onCollapseAllClick')).toBe(treeHandlers.onCollapseAllUnderNodeClick)
+  expect(contextMenu.props('onHide')).toBe(treeHandlers.onNodeContextMenuHide)
+  await contextMenu.vm.$emit('update:isOpen', false)
+  expect(treeContextMenuState.isOpen.value).toBe(false)
+  wrapper.unmount()
+  treeContextMenuState.anchorNodeId.value = null
+  treeContextMenuState.isOpen.value = false
+  treeContextMenuState.menuTarget.value = null
+})
+
+test('Test that ProjectHierarchyTree wires context menu handler on add-new rows without opening menu', async () => {
   treeData.value = [{
     children: [],
     childrenLoaded: true,
@@ -332,7 +466,7 @@ test('Test that ProjectHierarchyTree wires add-new context menu handler on add-n
     worldColor: '#336699',
     worldId: 'world-1'
   }]
-  const wrapper = mount(ProjectHierarchyTree, {
+  const wrapper = mountProjectHierarchyTree({
     global: {
       stubs: {
         ProjectHierarchyTreeNode: {
@@ -345,7 +479,7 @@ test('Test that ProjectHierarchyTree wires add-new context menu handler on add-n
   })
   const row = wrapper.get('.projectHierarchyTree__nodeRow')
   await row.trigger('contextmenu')
-  expect(treeHandlers.onAddNewDocumentRowContextMenu).toHaveBeenCalled()
+  expect(treeHandlers.onNodeRowContextMenu).toHaveBeenCalled()
   wrapper.unmount()
   treeData.value = [{
     children: [],

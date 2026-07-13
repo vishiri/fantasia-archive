@@ -7,7 +7,7 @@ import type {
   I_faProjectHierarchyTreeWorkspaceWorld
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { createProjectHierarchyTreeSessionHandlersWiring } from './projectHierarchyTreeSessionHandlersWiring'
+import { createProjectHierarchyTreeSessionHandlersBindWiring } from './projectHierarchyTreeSessionHandlersBindWiring'
 import { bindProjectHierarchyTreeSessionHydrateLifecycle } from './projectHierarchyTreeSessionLifecycleBindWiring'
 import { buildProjectHierarchyTreeSessionApi } from './projectHierarchyTreeSessionApiWiring'
 import { createProjectHierarchyTreeSessionEarlyWiring } from './projectHierarchyTreeSessionEarlyWiring'
@@ -106,22 +106,15 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
   })
 
   return buildProjectHierarchyTreeSessionApi({
-    handlersWiring: createProjectHierarchyTreeSessionHandlersWiring({
+    handlersWiring: createProjectHierarchyTreeSessionHandlersBindWiring({
       createTemporaryDocument: deps.createTemporaryDocument,
-      documentRowDragHoldWiring: earlyWiring.documentRowDragHoldWiring,
-      documentRowExpandClickGesture: earlyWiring.bootstrap.documentRowExpandClickGesture,
       dragContext: deps.dragContext,
-      dragExpandPostCommitGuard: earlyWiring.bootstrap.sessionRefs.dragExpandPostCommitGuard,
-      dragExpandUiFrozen: earlyWiring.bootstrap.sessionRefs.dragExpandUiFrozen,
-      getDragExpandedSnapshotNodeIds: earlyWiring.subWiring.dndWiring.getDragExpandedSnapshotNodeIds,
-      lazyLoadWiring: earlyWiring.subWiring.lazyLoadWiring,
+      earlyWiring,
+      hierarchyStore: deps.hierarchyStore,
+      nextTick: deps.nextTick,
       onDocumentOpenRequest: deps.onDocumentOpenRequest,
       resolvePreferredLanguageCode: deps.resolvePreferredLanguageCode,
-      suppressTreeEmit: earlyWiring.bootstrap.sessionRefs.suppressTreeEmit,
-      treeComponentRef: earlyWiring.bootstrap.sessionRefs.treeComponentRef,
-      treeData: deps.treeData,
-      treeScrollHostRef: earlyWiring.bootstrap.sessionRefs.treeScrollHostRef,
-      uiStateWiring: earlyWiring.subWiring.uiStateWiring
+      treeData: deps.treeData
     }),
     isTreeDragActive: earlyWiring.bootstrap.sessionRefs.isTreeDragActive,
     subWiring: earlyWiring.subWiring,

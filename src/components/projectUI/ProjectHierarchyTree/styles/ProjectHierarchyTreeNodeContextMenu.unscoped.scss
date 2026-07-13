@@ -1,0 +1,43 @@
+@use './variables' as *;
+@use '../../../globals/AppControlMenus/styles/variables' as appControlMenus;
+@use '../../../globals/AppControlSingleMenu/styles/variables' as appControlSingleMenu;
+@use '../../../../css/globals/paletteGlobals.variables.scss' as paletteGlobals;
+@use '../../../../css/theme/quasar-components/qFocusable.variables' as *;
+
+.projectHierarchyTreeNodeContextMenu__list {
+  background-color: appControlMenus.$appControlMenus-bgColor;
+  color: appControlMenus.$appControlMenus-color;
+  min-width: $projectHierarchyTree-nodeContextMenu-listMinWidthPx;
+}
+
+/* Teleported q-menu; match tab context menu sizing and stacking. */
+.projectHierarchyTreeNodeContextMenu.q-menu {
+  background-color: appControlMenus.$appControlMenus-bgColor;
+  z-index: $projectHierarchyTree-nodeContextMenu-zIndex !important;
+}
+
+.projectHierarchyTreeNodeContextMenu.q-menu {
+  .projectHierarchyTreeNodeContextMenu__item.q-item {
+    align-items: center;
+    min-height: appControlSingleMenu.$appControlSingleMenu-item-minHeight;
+    padding: $qItem-padding;
+
+    &:hover:not([aria-disabled='true']),
+    &:focus:not([aria-disabled='true']) {
+      color: appControlMenus.$appControlMenus-singleHover;
+    }
+  }
+
+  .projectHierarchyTreeNodeContextMenu__item.q-item .q-item__section--avatar {
+    color: inherit;
+    min-width: unset;
+  }
+
+  .projectHierarchyTreeNodeContextMenu__icon.q-icon {
+    font-size: paletteGlobals.$iconSize;
+  }
+}
+
+.projectHierarchyTreeNodeContextMenu__primaryLabel {
+  white-space: nowrap;
+}

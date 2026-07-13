@@ -1,7 +1,10 @@
 @use '../../../../css/app.palette.scss' as *;
 @use '../../../../css/globals/paletteGlobals.variables.scss' as *;
+@use '../../../../layouts/MainLayout/styles/variables' as mainLayout;
 
 /* COMPONENT - PROJECT HIERARCHY TREE */
+$projectHierarchyTree-nodeContextMenu-listMinWidthPx: 220px;
+$projectHierarchyTree-nodeContextMenu-zIndex: mainLayout.$mainLayout-appHeader-zIndex + 2;
 $projectHierarchyTree-addNewDocumentRow-color: fa-v('grey', $grey);
 $projectHierarchyTree-documentRow-color: fa-v('text-workspace-row', $text-workspace-row);
 $projectHierarchyTree-dragPlaceholder-accentColor: fa-v('primary-bright', $primary-bright);

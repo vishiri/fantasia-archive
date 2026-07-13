@@ -37,7 +37,7 @@
           :class="resolveProjectHierarchyTreeNodeRowKindClass(node.nodeKind)"
           @auxclick="onDocumentRowAuxClick(node, $event)"
           @click="onWorldNodeRowClick(node, stat, $event)"
-          @contextmenu="node.nodeKind === 'addNewDocument' ? onAddNewDocumentRowContextMenu($event) : undefined"
+          @contextmenu="onNodeRowContextMenu(node, $event)"
           @pointerdown="onWorldNodeRowPointerDown(node, stat, $event)"
         >
           <q-icon
@@ -58,6 +58,14 @@
         </div>
       </template>
     </Draggable>
+    <ProjectHierarchyTreeNodeContextMenu
+      v-model:is-open="isNodeContextMenuOpen"
+      :anchor-node-id="contextMenuAnchorNodeId"
+      :menu-target-element="nodeMenuTargetElement"
+      :on-collapse-all-click="onCollapseAllUnderNodeClick"
+      :on-expand-all-click="onExpandAllUnderNodeClick"
+      :on-hide="onNodeContextMenuHide"
+    />
   </div>
 </template>
 
@@ -67,6 +75,7 @@ import { Draggable } from '@he-tree/vue'
 import '@he-tree/vue/style/default.css'
 
 import ProjectHierarchyTreeNode from './ProjectHierarchyTreeNode.vue'
+import ProjectHierarchyTreeNodeContextMenu from './ProjectHierarchyTreeNodeContextMenu.vue'
 import type { I_faProjectHierarchyTreeHeTreeInstance } from 'app/types/I_faProjectHierarchyTreeDomain'
 import {
   PROJECT_HIERARCHY_TREE_DRAG_HANDLE_CLASS,
@@ -94,14 +103,21 @@ const treeComponentRef = ref<I_faProjectHierarchyTreeHeTreeInstance | null>(null
 
 const {
   activeDocumentId,
+  contextMenuAnchorNodeId,
   eachDraggableHandler,
   eachDroppableHandler,
   heTreeNodeKey,
+  isNodeContextMenuOpen,
   isTreeDragActive,
+  nodeMenuTargetElement,
+  onCollapseAllUnderNodeClick,
   onDocumentRowAuxClick,
+  onExpandAllUnderNodeClick,
   onNodeClick,
   onNodeClose,
+  onNodeContextMenuHide,
   onNodeOpen,
+  onNodeRowContextMenu,
   onNonWorldOpenIconClick,
   onNonWorldOpenIconPointerDown,
   onWorldNodeRowClick,
@@ -111,7 +127,6 @@ const {
   onBeforeDragStart,
   onTreeDataUpdate,
   onTreeDragEndCleanup,
-  onAddNewDocumentRowContextMenu,
   rootDroppableHandler,
   setTreeComponentRef,
   setTreeScrollHostRef,

@@ -16,8 +16,9 @@ import { createProjectHierarchyTreeDocumentOpenHandlers } from './projectHierarc
 import { createProjectHierarchyTreeAddNewDocumentClickHandlers } from './projectHierarchyTreeAddNewDocumentClickHandlersWiring'
 import { createProjectHierarchyTreeSessionExpandHandlersWiring } from './projectHierarchyTreeSessionExpandHandlersWiring'
 import { createProjectHierarchyTreeSessionHandlersClickWiring } from './projectHierarchyTreeSessionHandlersClickWiring'
+import { createProjectHierarchyTreeSessionBulkContextMenuWiring } from './projectHierarchyTreeSessionBulkContextMenuWiring'
 
-export function createProjectHierarchyTreeSessionHandlersWiring (deps: {
+type T_projectHierarchyTreeSessionHandlersWiringDeps = {
   createTemporaryDocument: (input: {
     displayName: string
     openMode: T_faOpenedDocumentOpenMode
@@ -39,22 +40,31 @@ export function createProjectHierarchyTreeSessionHandlersWiring (deps: {
     flushDeferredTreeRevisionPublish: () => void | Promise<void>
     loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   }
+  nextTick: () => Promise<void>
   onDocumentOpenRequest: (
     documentId: string,
     mode: T_faOpenedDocumentOpenMode,
     treeMeta: I_faOpenedDocumentTreeOpenMeta
   ) => void
+  openNodeIds: Ref<Set<string>>
+  queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   resolvePreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
   suppressTreeEmit: Ref<boolean>
   treeComponentRef: Ref<I_faProjectHierarchyTreeHeTreeInstance | null>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
+  treeMountKey: Ref<number>
   treeScrollHostRef: Ref<HTMLElement | null>
   uiStateWiring: {
     markNodeClosed: (nodeId: string, node: I_faProjectHierarchyTreeHeTreeNode) => void
     markNodeOpen: (nodeId: string) => void
+    reapplyHeTreeOpenState: () => void
     reapplyLatentDescendantExpandState: () => Promise<void>
   }
-}) {
+}
+
+export function createProjectHierarchyTreeSessionHandlersWiring (
+  deps: T_projectHierarchyTreeSessionHandlersWiringDeps
+) {
   const expandHandlersWiring = createProjectHierarchyTreeSessionExpandHandlersWiring({
     documentRowDragHoldWiring: deps.documentRowDragHoldWiring,
     documentRowExpandClickGesture: deps.documentRowExpandClickGesture,
@@ -82,6 +92,17 @@ export function createProjectHierarchyTreeSessionHandlersWiring (deps: {
     addNewDocumentClickHandlers,
     documentOpenHandlers
   })
+  const bulkContextMenuWiring = createProjectHierarchyTreeSessionBulkContextMenuWiring({
+    dragExpandUiFrozen: deps.dragExpandUiFrozen,
+    lazyLoadWiring: deps.lazyLoadWiring,
+    nextTick: deps.nextTick,
+    openNodeIds: deps.openNodeIds,
+    queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
+    suppressTreeEmit: deps.suppressTreeEmit,
+    treeData: deps.treeData,
+    treeMountKey: deps.treeMountKey,
+    uiStateWiring: deps.uiStateWiring
+  })
 
   function eachDraggableHandler (stat: { data: I_faProjectHierarchyTreeHeTreeNode }): boolean {
     return isProjectHierarchyTreeNodeDraggable(stat.data)
@@ -100,9 +121,15 @@ export function createProjectHierarchyTreeSessionHandlersWiring (deps: {
   return {
     eachDraggableHandler,
     eachDroppableHandler: droppableHandlers.eachDroppableHandler,
-    onAddNewDocumentRowContextMenu: clickHandlersWiring.onAddNewDocumentRowContextMenu,
+    contextMenuAnchorNodeId: bulkContextMenuWiring.contextMenuAnchorNodeId,
+    isNodeContextMenuOpen: bulkContextMenuWiring.isNodeContextMenuOpen,
+    nodeMenuTargetElement: bulkContextMenuWiring.nodeMenuTargetElement,
+    onCollapseAllUnderNodeClick: bulkContextMenuWiring.onCollapseAllUnderNodeClick,
     onDocumentRowAuxClick: clickHandlersWiring.onDocumentRowAuxClick,
+    onExpandAllUnderNodeClick: bulkContextMenuWiring.onExpandAllUnderNodeClick,
     onNodeClick: clickHandlersWiring.onNodeClick,
+    onNodeContextMenuHide: bulkContextMenuWiring.onNodeContextMenuHide,
+    onNodeRowContextMenu: bulkContextMenuWiring.onNodeRowContextMenu,
     onNodeClose: expandHandlersWiring.onNodeClose,
     onNodeOpen: expandHandlersWiring.onNodeOpen,
     onNodeOpenIconClick: expandHandlersWiring.onNodeOpenIconClick,
