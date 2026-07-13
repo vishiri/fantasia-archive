@@ -7,6 +7,7 @@ import type {
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { mapHierarchyDocumentChildrenToTreeNodes } from '../functions/mapHierarchyDocumentChildrenToTreeNodes'
+import { shouldReloadProjectHierarchyTreeNodeChildren } from '../functions/projectHierarchyTreeLazyLoadChildReload'
 import {
   finalizeProjectHierarchyTreePlacementTopLevelChildren
 } from './projectHierarchyTreeAddNewDocumentNode'
@@ -51,7 +52,7 @@ export async function loadProjectHierarchyTreeNodeChildren (deps: {
   ) => Promise<void>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }): Promise<void> {
-  if (deps.node.childrenLoaded) {
+  if (!shouldReloadProjectHierarchyTreeNodeChildren(deps.node)) {
     return
   }
   if (deps.node.nodeKind === 'templatePlacement' && deps.node.placementId !== null) {

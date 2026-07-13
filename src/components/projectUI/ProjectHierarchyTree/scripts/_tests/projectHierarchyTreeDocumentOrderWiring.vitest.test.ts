@@ -1037,6 +1037,7 @@ test('Test that createProjectHierarchyTreeSessionExpandHandlersWiring ignores cl
     dragExpandUiFrozen: ref(true),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
     suppressTreeEmit: ref(false),
@@ -1201,7 +1202,9 @@ test('Test that openProjectHierarchyTreeNestParentAfterDragDrop returns when par
 test('Test that before drag open lazy-loads document and template placement nodes only', async () => {
   const loadChildrenForNode = vi.fn(async () => undefined)
   const wiring = createProjectHierarchyTreeBeforeDragOpenWiring({
-    lazyLoadWiring: { loadChildrenForNode }
+    lazyLoadWiring: {
+      loadChildrenForNode
+    },
   })
   await wiring.onBeforeDragOpen({
     data: {

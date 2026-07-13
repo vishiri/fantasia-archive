@@ -9,6 +9,7 @@ import { runProjectHierarchyTreeSessionExpandOpen } from './projectHierarchyTree
 export function createProjectHierarchyTreeSessionExpandOpenHandlersWiring (deps: {
   dragExpandUiFrozen: Ref<boolean>
   lazyLoadWiring: {
+    flushDeferredTreeRevisionPublish: () => void | Promise<void>
     loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   }
   onNodeClose: (stat: { data: I_faProjectHierarchyTreeHeTreeNode }) => void
@@ -42,6 +43,7 @@ export function createProjectHierarchyTreeSessionExpandOpenHandlersWiring (deps:
     expandOpenInFlight.add(nodeId)
     try {
       const expandOpenDeps = {
+        flushDeferredTreeRevisionPublish: deps.lazyLoadWiring.flushDeferredTreeRevisionPublish,
         loadChildrenForNode: deps.lazyLoadWiring.loadChildrenForNode,
         markNodeOpen: deps.uiStateWiring.markNodeOpen,
         node: stat.data,

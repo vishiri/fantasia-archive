@@ -105,6 +105,7 @@ function isMissingLatentExpandAncestorOnly (
     return false
   }
   return ancestor.nodeKind === 'world' ||
+    ancestor.nodeKind === 'group' ||
     ancestor.nodeKind === 'templatePlacement' ||
     ancestor.nodeKind === 'document'
 }

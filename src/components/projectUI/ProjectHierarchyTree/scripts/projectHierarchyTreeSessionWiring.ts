@@ -85,6 +85,7 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
     onMounted: deps.onMounted,
     onUnmounted: deps.onUnmounted,
     pendingRevealPath: deps.pendingRevealPath,
+    treeData: deps.treeData,
     watch: deps.watch,
     worlds: deps.worlds
   })

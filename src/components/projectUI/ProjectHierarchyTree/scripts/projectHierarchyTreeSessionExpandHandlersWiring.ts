@@ -16,6 +16,7 @@ export function createProjectHierarchyTreeSessionExpandHandlersWiring (deps: {
   dragExpandUiFrozen: Ref<boolean>
   getDragExpandedSnapshotNodeIds: () => string[] | null
   lazyLoadWiring: {
+    flushDeferredTreeRevisionPublish: () => void | Promise<void>
     loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   }
   suppressTreeEmit: Ref<boolean>

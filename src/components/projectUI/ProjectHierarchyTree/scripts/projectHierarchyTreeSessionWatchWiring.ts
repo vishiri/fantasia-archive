@@ -1,7 +1,11 @@
 import type { Ref } from 'vue'
 import type { watch as watchFn } from 'vue'
 
-export function wireProjectHierarchyTreeSessionLifecycle (deps: {
+import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
+
+import { collectProjectHierarchyTreePersistedExpandedNodeIds } from '../functions/projectHierarchyTreePersistedOpenNodeIds'
+
+type T_projectHierarchyTreeSessionLifecycleDeps = {
   S_FaActiveProject: () => {
     activeProject: { id: string } | null
     hasActiveProject: boolean
@@ -15,13 +19,18 @@ export function wireProjectHierarchyTreeSessionLifecycle (deps: {
   pendingRevealPath: Ref<string[]>
   resetOnProjectClose: () => void
   resyncTreeDataFromLayout: () => void
-  restoreUiStateFromStore: () => Promise<void>
+  restoreExpandedSnapshot: (expandedNodeIds: string[]) => Promise<void>
   revealPendingPath: () => Promise<void>
   shouldDeferWorldsExpandRestore: () => boolean
   teardown: () => void
+  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   watch: typeof watchFn
   worlds: Ref<unknown[]>
-}): void {
+}
+
+export function wireProjectHierarchyTreeSessionLifecycle (
+  deps: T_projectHierarchyTreeSessionLifecycleDeps
+): void {
   deps.watch(
     () => deps.S_FaActiveProject().activeProject?.id ?? null,
     async (projectId) => {
@@ -45,8 +54,12 @@ export function wireProjectHierarchyTreeSessionLifecycle (deps: {
       if (deferRestore) {
         return
       }
+      const expandedSnapshot = collectProjectHierarchyTreePersistedExpandedNodeIds(
+        deps.treeData.value,
+        deps.openNodeIds.value
+      )
       deps.resyncTreeDataFromLayout()
-      await deps.restoreUiStateFromStore()
+      await deps.restoreExpandedSnapshot(expandedSnapshot)
     },
     {
       deep: true

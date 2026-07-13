@@ -97,6 +97,7 @@ test('Test that session handlers open nodes and load children', async () => {
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -132,6 +133,7 @@ test('Test that session handlers load children when the open icon expands a row'
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -180,6 +182,7 @@ test('Test that open icon expand keeps stat closed until lazy load finishes', as
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -226,6 +229,7 @@ test('Test that session handlers collapse rows via the open icon', async () => {
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -269,6 +273,7 @@ test('Test that session handlers expand world rows from row click routing', asyn
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -331,6 +336,7 @@ test('Test that session handlers expand group rows from row click routing', asyn
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -390,6 +396,7 @@ test('Test that session handlers expand document rows with children from row cli
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -446,6 +453,7 @@ test('Test that session handlers ignore leaf document row click routing', async 
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -501,6 +509,7 @@ test('Test that session handlers ignore document row click after drag movement',
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -548,6 +557,7 @@ test('Test that session handlers ignore non-world open icon routing on world row
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -582,6 +592,7 @@ test('Test that session handlers reopen he-tree row after lazy load when tree re
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -614,6 +625,7 @@ test('Test that session handlers ignore close events while suppressTreeEmit is s
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -644,6 +656,7 @@ test('Test that session handlers emit document open requests for leaf document r
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -741,6 +754,7 @@ test('Test that session handlers expose draggable and droppable handlers', () =>
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -781,6 +795,7 @@ test('Test that session handlers do not restore UI state when tree ref attaches'
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -819,6 +834,7 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
     dragExpandPostCommitGuard: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -858,6 +874,7 @@ test('Test that session handlers skip restore when tree ref attaches during drag
     dragExpandPostCommitGuard: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: async () => undefined
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -889,6 +906,7 @@ test('Test that session handlers skip restore when tree ref clears', () => {
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -930,6 +948,7 @@ test('Test that session handlers ignore open icon clicks on empty loaded documen
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -973,6 +992,7 @@ test('Test that session handlers recover when he-tree openNodeAndParents stat is
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
     resolvePreferredLanguageCode: () => 'en-US',
@@ -1005,6 +1025,7 @@ test('Test that session handlers create temporary document when add-new row is c
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
     onDocumentOpenRequest: vi.fn(),

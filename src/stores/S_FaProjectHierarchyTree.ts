@@ -10,11 +10,6 @@ import type {
   I_faProjectHierarchyTreeUiState,
   I_faProjectHierarchyTreeWorkspaceWorld
 } from 'app/types/I_faProjectHierarchyTreeDomain'
-import {
-  mapWorkspaceLayoutToHierarchyTreeSkeleton,
-  patchHierarchyTreeSkeletonLabelsInPlace
-} from 'app/src/components/projectUI/ProjectHierarchyTree/functions/mapWorkspaceLayoutToHierarchyTreeSkeleton'
-import { projectHierarchyTreeLayoutStructureMatchesTree } from 'app/src/components/projectUI/ProjectHierarchyTree/scripts/projectHierarchyTreeLayoutStructureMatch'
 import { buildProjectHierarchyTreeRevealPathFromSearchHit } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeRevealPath'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import {
@@ -62,22 +57,6 @@ export const S_FaProjectHierarchyTree = defineStore('S_FaProjectHierarchyTree', 
     applyUiState(createEmptyProjectHierarchyTreeUiState())
   }
 
-  function resyncTreeDataFromWorlds (): void {
-    if (worlds.value.length === 0) {
-      treeData.value = []
-      return
-    }
-    const nextSkeleton = mapWorkspaceLayoutToHierarchyTreeSkeleton(worlds.value)
-    if (
-      treeData.value.length > 0 &&
-      projectHierarchyTreeLayoutStructureMatchesTree(treeData.value, worlds.value)
-    ) {
-      patchHierarchyTreeSkeletonLabelsInPlace(treeData.value, worlds.value)
-      return
-    }
-    treeData.value = nextSkeleton
-  }
-
   async function refreshLayout (): Promise<void> {
     if (!S_FaActiveProject().hasActiveProject) {
       resetOnProjectClose()
@@ -93,7 +72,9 @@ export const S_FaProjectHierarchyTree = defineStore('S_FaProjectHierarchyTree', 
         return
       }
       worlds.value = layout.worlds
-      resyncTreeDataFromWorlds()
+      if (layout.worlds.length === 0) {
+        treeData.value = []
+      }
     })()
     try {
       await refreshLayoutInFlight

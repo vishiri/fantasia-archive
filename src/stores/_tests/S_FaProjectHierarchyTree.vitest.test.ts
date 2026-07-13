@@ -110,9 +110,9 @@ test('Test that S_FaProjectHierarchyTree refreshLayout clears when no project is
 })
 
 /**
- * S_FaProjectHierarchyTree refreshLayout loads skeleton from bridge.
+ * S_FaProjectHierarchyTree refreshLayout loads worlds from bridge without rebuilding treeData.
  */
-test('Test that S_FaProjectHierarchyTree refreshLayout loads skeleton from bridge', async () => {
+test('Test that S_FaProjectHierarchyTree refreshLayout loads worlds from bridge without rebuilding treeData', async () => {
   const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
   S_FaActiveProject().setActiveProject({
     filePath: 'C:\\a.faproject',
@@ -120,17 +120,33 @@ test('Test that S_FaProjectHierarchyTree refreshLayout loads skeleton from bridg
     name: 'N'
   })
   const store = S_FaProjectHierarchyTree()
+  store.treeData = [
+    {
+      children: [],
+      childrenLoaded: true,
+      documentId: null,
+      groupId: null,
+      hasChildren: false,
+      icon: '',
+      id: 'world-stale',
+      label: 'Stale world',
+      nodeKind: 'world',
+      placementId: null,
+      worldColor: '#000',
+      worldId: 'world-stale'
+    }
+  ]
   await store.refreshLayout()
   expect(listWorkspaceHierarchyLayoutMock).toHaveBeenCalledTimes(1)
   expect(store.worlds).toHaveLength(1)
   expect(store.treeData).toHaveLength(1)
-  expect(store.treeData[0]?.nodeKind).toBe('world')
+  expect(store.treeData[0]?.id).toBe('world-stale')
 })
 
 /**
- * S_FaProjectHierarchyTree refreshLayout keeps prior data when bridge is unavailable.
+ * S_FaProjectHierarchyTree refreshLayout keeps prior worlds when bridge is unavailable.
  */
-test('Test that S_FaProjectHierarchyTree refreshLayout keeps prior data when bridge is unavailable', async () => {
+test('Test that S_FaProjectHierarchyTree refreshLayout keeps prior worlds when bridge is unavailable', async () => {
   const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
   S_FaActiveProject().setActiveProject({
     filePath: 'C:\\a.faproject',
@@ -140,10 +156,27 @@ test('Test that S_FaProjectHierarchyTree refreshLayout keeps prior data when bri
   const store = S_FaProjectHierarchyTree()
   await store.refreshLayout()
   expect(store.worlds).toHaveLength(1)
+  store.treeData = [
+    {
+      children: [],
+      childrenLoaded: true,
+      documentId: null,
+      groupId: null,
+      hasChildren: false,
+      icon: '',
+      id: 'world-1',
+      label: 'World One',
+      nodeKind: 'world',
+      placementId: null,
+      worldColor: '#ff0000',
+      worldId: 'world-1'
+    }
+  ]
   Object.assign(window.faContentBridgeAPIs, { projectContent: {} })
   await store.refreshLayout()
   expect(store.worlds).toHaveLength(1)
   expect(store.treeData).toHaveLength(1)
+  expect(store.treeData[0]?.id).toBe('world-1')
 })
 
 /**
@@ -265,9 +298,9 @@ test('Test that S_FaProjectHierarchyTree search reveal and clear helpers update 
 })
 
 /**
- * S_FaProjectHierarchyTree resync clears tree when worlds become empty.
+ * S_FaProjectHierarchyTree refreshLayout clears treeData when worlds become empty.
  */
-test('Test that S_FaProjectHierarchyTree resync clears tree when worlds become empty', async () => {
+test('Test that S_FaProjectHierarchyTree refreshLayout clears treeData when worlds become empty', async () => {
   const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
   S_FaActiveProject().setActiveProject({
     filePath: 'C:\\a.faproject',
@@ -310,60 +343,6 @@ test('Test that S_FaProjectHierarchyTree keeps local UI state when bridge write 
   store.flushUiStatePersist()
   await vi.runAllTimersAsync()
   expect(store.uiState.scrollTopPx).toBe(99)
-})
-
-/**
- * S_FaProjectHierarchyTree resync patches labels when topology is unchanged.
- */
-test('Test that S_FaProjectHierarchyTree resync patches labels when topology is unchanged', async () => {
-  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
-  S_FaActiveProject().setActiveProject({
-    filePath: 'C:\\a.faproject',
-    id: 'project-id',
-    name: 'N'
-  })
-  const store = S_FaProjectHierarchyTree()
-  await store.refreshLayout()
-  const firstTreeRef = store.treeData
-  listWorkspaceHierarchyLayoutMock.mockResolvedValueOnce({
-    worlds: [
-      {
-        color: '#ff0000',
-        colorPallete: '',
-        displayName: 'Renamed World',
-        groups: [
-          {
-            displayName: 'Group A',
-            hasChildren: true,
-            id: 'group-1',
-            rootSortOrder: 0,
-            worldId: 'world-1'
-          }
-        ],
-        id: 'world-1',
-        placements: [
-          {
-            displayName: 'Characters',
-            documentTemplateId: 'tmpl-1',
-            groupId: null,
-            groupSortOrder: null,
-            hasChildren: true,
-            icon: 'mdi-account',
-            titlePluralTranslations: {},
-            titleSingularTranslations: {},
-            id: 'placement-1',
-            nickname: '',
-            rootSortOrder: 0,
-            worldId: 'world-1'
-          }
-        ],
-        sortOrder: 0
-      }
-    ]
-  })
-  await store.refreshLayout()
-  expect(store.treeData).toBe(firstTreeRef)
-  expect(store.treeData[0]?.label).toBe('Renamed World')
 })
 
 /**

@@ -19,6 +19,10 @@
 - **Document workspace**: **Delete current document** in the control strip (preview mode) opens the same **Delete** confirmation for the active tab.
 
 ### Bugfixes & Optimizations
+- **Workspace sidebar**: Collapsing and reopening a template placement (for example **Buildings**) reloads deeply nested document rows again instead of leaving the lowest levels empty.
+- **Workspace sidebar**: Collapsing a group no longer forgets expanded placement and document rows underneath; reopening the group or that placement restores the prior expand state.
+- **Workspace sidebar**: Saving **Project Settings** world layout no longer collapses expanded worlds in the hierarchy tree.
+- **Workspace sidebar**: Middle-click a template placement row (for example **Buildings**) opens a new unsaved document tab in the background, matching the **Add new** row.
 - **Document workspace**: The discard-changes confirmation dialog caps at **600px** width and highlights the document name in **primary-bright** so long titles wrap instead of stretching the dialog.
 - **Workspace sidebar**: Saving a document with **Document text color** or **Document background color** no longer hides that document's already-expanded child rows until you collapse and reopen the node.
 - **Workspace sidebar**: After you delete an open document from the workspace, the hierarchy tree reloads the affected template placement or parent document row so the removed document disappears without reopening the project.

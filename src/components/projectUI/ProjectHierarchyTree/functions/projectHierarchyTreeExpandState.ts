@@ -7,6 +7,7 @@ export function shouldProjectHierarchyTreePreserveDescendantOpenIdsOnCollapse (
   nodeKind: I_faProjectHierarchyTreeHeTreeNode['nodeKind']
 ): boolean {
   return nodeKind === 'world' ||
+    nodeKind === 'group' ||
     nodeKind === 'templatePlacement' ||
     nodeKind === 'document'
 }

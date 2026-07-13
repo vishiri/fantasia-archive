@@ -66,6 +66,8 @@ import { restoreProjectHierarchyTreeExpandedSnapshot } from '../projectHierarchy
 import { attachProjectHierarchyTreeScrollPersist } from '../projectHierarchyTreeScrollPersistWiring'
 import { finalizeProjectHierarchyTreeDragCommitExpandState } from '../projectHierarchyTreeDnDCommitFinalizeWiring'
 import { runProjectHierarchyTreePostDragExpandCloseGuard } from '../projectHierarchyTreePostDragExpandCloseGuardWiring'
+import { reapplyProjectHierarchyTreeLatentDescendantExpandState } from '../projectHierarchyTreeLatentExpandReapplyWiring'
+import { runProjectHierarchyTreeSessionExpandOpen } from '../projectHierarchyTreeSessionExpandOpenWiring'
 import {
   markProjectHierarchyTreeNodeClosed,
   markProjectHierarchyTreeNodeOpen,
@@ -370,7 +372,7 @@ test('Test that markProjectHierarchyTreeNodeClosed keeps descendant open ids whe
   expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['group-1', 'placement-1'])
 })
 
-test('Test that markProjectHierarchyTreeNodeClosed prunes descendant open ids', () => {
+test('Test that markProjectHierarchyTreeNodeClosed keeps descendant open ids when group collapses', () => {
   const tree = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
   const openNodeIds = ref(new Set(['world-1', 'group-1', 'placement-1']))
   const queuePersistExpandedNodeIds = vi.fn()
@@ -382,8 +384,8 @@ test('Test that markProjectHierarchyTreeNodeClosed prunes descendant open ids', 
     queuePersistExpandedNodeIds,
     treeData: tree
   })
-  expect([...openNodeIds.value]).toEqual(['world-1'])
-  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['world-1'])
+  expect([...openNodeIds.value].sort()).toEqual(['placement-1', 'world-1'])
+  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['world-1', 'placement-1'])
 })
 
 test('Test that markProjectHierarchyTreeNodeClosed keeps descendant open ids when template placement collapses', () => {
@@ -962,6 +964,7 @@ test('Test that session handlers wiring emits document open requests', async () 
     dragExpandUiFrozen: ref(false),
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: async () => undefined
     },
     onDocumentOpenRequest,
@@ -1429,9 +1432,10 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle resets store when proje
     pendingRevealPath: ref([]),
     resetOnProjectClose,
     resyncTreeDataFromLayout: vi.fn(),
-    restoreUiStateFromStore: vi.fn(async () => undefined),
+    restoreExpandedSnapshot: vi.fn(async () => undefined),
     revealPendingPath: vi.fn(async () => undefined),
     teardown: vi.fn(),
+    treeData: ref([]),
     watch,
     worlds: ref([])
   })
@@ -1459,9 +1463,10 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle ignores empty reveal pa
     pendingRevealPath,
     resetOnProjectClose: vi.fn(),
     resyncTreeDataFromLayout: vi.fn(),
-    restoreUiStateFromStore: vi.fn(async () => undefined),
+    restoreExpandedSnapshot: vi.fn(async () => undefined),
     revealPendingPath,
     teardown: vi.fn(),
+    treeData: ref([]),
     watch,
     worlds: ref([])
   })
@@ -1487,6 +1492,7 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
     dragExpandUiFrozen,
     getDragExpandedSnapshotNodeIds: () => null,
     lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode
     },
     onDocumentOpenRequest: vi.fn(),
@@ -1598,7 +1604,8 @@ test('Test that finalizeProjectHierarchyTreeDragCommitExpandState restores expan
 
 test('Test that wireProjectHierarchyTreeSessionLifecycle skips restore while drag expand UI is frozen', async () => {
   const resyncTreeDataFromLayout = vi.fn()
-  const restoreUiStateFromStore = vi.fn(async () => undefined)
+  const restoreExpandedSnapshot = vi.fn(async () => undefined)
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
   const worlds = ref([sampleWorld])
   const { watch } = await import('vue')
   wireProjectHierarchyTreeSessionLifecycle({
@@ -1618,9 +1625,10 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle skips restore while dra
     pendingRevealPath: ref([]),
     resetOnProjectClose: vi.fn(),
     resyncTreeDataFromLayout,
-    restoreUiStateFromStore,
+    restoreExpandedSnapshot,
     revealPendingPath: vi.fn(async () => undefined),
     teardown: vi.fn(),
+    treeData,
     watch,
     worlds
   })
@@ -1630,7 +1638,7 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle skips restore while dra
   }]
   await Promise.resolve()
   expect(resyncTreeDataFromLayout).not.toHaveBeenCalled()
-  expect(restoreUiStateFromStore).not.toHaveBeenCalled()
+  expect(restoreExpandedSnapshot).not.toHaveBeenCalled()
 })
 
 test('Test that wireProjectHierarchyTreeSessionLifecycle watches project and worlds', async () => {
@@ -1638,15 +1646,15 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle watches project and wor
   const teardown = vi.fn()
   const resetOnProjectClose = vi.fn()
   const resyncTreeDataFromLayout = vi.fn()
-  const restoreUiStateFromStore = vi.fn(async () => undefined)
+  const restoreExpandedSnapshot = vi.fn(async () => undefined)
   const flushUiStatePersist = vi.fn()
   const clearPendingRevealPath = vi.fn()
   const revealPendingPath = vi.fn(async () => undefined)
   const onMounted = vi.fn((hook: () => void) => hook())
   const onUnmounted = vi.fn((hook: () => void) => hook())
   const worlds = ref([sampleWorld])
-  const openNodeIds = ref(new Set<string>())
-  const pendingRevealPath = ref(['world-1'])
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const openNodeIds = ref(new Set(['world-1', 'group-1']))
   const { watch } = await import('vue')
   wireProjectHierarchyTreeSessionLifecycle({
     S_FaActiveProject: () => ({
@@ -1662,12 +1670,13 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle watches project and wor
     onMounted,
     onUnmounted,
     openNodeIds,
-    pendingRevealPath,
+    pendingRevealPath: ref(['world-1']),
     resetOnProjectClose,
     resyncTreeDataFromLayout,
-    restoreUiStateFromStore,
+    restoreExpandedSnapshot,
     revealPendingPath,
     teardown,
+    treeData,
     watch,
     worlds
   })
@@ -1675,7 +1684,67 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle watches project and wor
   await vi.runAllTimersAsync()
   expect(hydrateTreeSession).toHaveBeenCalled()
   expect(resyncTreeDataFromLayout).toHaveBeenCalled()
-  expect(restoreUiStateFromStore).toHaveBeenCalled()
+  expect(restoreExpandedSnapshot).toHaveBeenCalledWith(['world-1', 'group-1'])
+})
+
+test('Test that wireProjectHierarchyTreeSessionLifecycle preserves expanded snapshot after layout structure change', async () => {
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const openNodeIds = ref(new Set(['world-1', 'group-1', 'placement-1']))
+  const worlds = ref([sampleWorld])
+  const suppressTreeEmit = ref(false)
+  const restoreExpandedSnapshot = vi.fn(async () => undefined)
+  const syncWiring = createProjectHierarchyTreeSyncWiring({
+    getPreferredLanguageCode: () => 'en-US',
+    getWorlds: () => worlds.value,
+    nextTick: async () => undefined,
+    suppressTreeEmit,
+    treeData
+  })
+  const { watch } = await import('vue')
+  wireProjectHierarchyTreeSessionLifecycle({
+    S_FaActiveProject: () => ({
+      activeProject: {
+        id: 'project-a'
+      },
+      hasActiveProject: true
+    }),
+    clearPendingRevealPath: vi.fn(),
+    flushUiStatePersist: vi.fn(),
+    hydrateTreeSession: vi.fn(async () => undefined),
+    shouldDeferWorldsExpandRestore: () => false,
+    onMounted: vi.fn(),
+    onUnmounted: vi.fn(),
+    openNodeIds,
+    pendingRevealPath: ref([]),
+    resetOnProjectClose: vi.fn(),
+    resyncTreeDataFromLayout: syncWiring.resyncTreeDataFromLayout,
+    restoreExpandedSnapshot,
+    revealPendingPath: vi.fn(async () => undefined),
+    teardown: vi.fn(),
+    treeData,
+    watch,
+    worlds
+  })
+  worlds.value = [{
+    ...sampleWorld,
+    groups: [
+      ...sampleWorld.groups,
+      {
+        displayName: 'Group 2',
+        hasChildren: false,
+        id: 'group-2',
+        rootSortOrder: 1,
+        worldId: 'world-1'
+      }
+    ]
+  }]
+  await Promise.resolve()
+  expect(restoreExpandedSnapshot).toHaveBeenCalledWith(
+    expect.arrayContaining(['world-1', 'group-1', 'placement-1'])
+  )
+  expect(mapProjectHierarchyTreeToTopologyKey(treeData.value)).not.toBe(
+    mapProjectHierarchyTreeToTopologyKey(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  )
 })
 
 test('Test that createProjectHierarchyTreeSessionSubWiring builds tree session deps', () => {
@@ -1947,7 +2016,7 @@ test('Test that restoreProjectHierarchyTreeUiState keeps collapsed placements wh
   expect(treeRef.openNodeAndParents).toHaveBeenCalledTimes(2)
 })
 
-test('Test that restoreProjectHierarchyTreeUiState drops orphan placement ids under collapsed groups', async () => {
+test('Test that restoreProjectHierarchyTreeUiState keeps latent placement ids under collapsed groups', async () => {
   const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
   const openNodeIds = ref(new Set<string>())
   const queuePersistExpandedNodeIds = vi.fn()
@@ -1971,7 +2040,7 @@ test('Test that restoreProjectHierarchyTreeUiState drops orphan placement ids un
     },
     treeData
   })
-  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['world-1'])
+  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['world-1', 'placement-1'])
   expect(treeRef.openNodeAndParents).toHaveBeenCalledTimes(1)
 })
 
@@ -2172,6 +2241,224 @@ test('Test that createProjectHierarchyTreeLazyLoadWiring loads nested document c
   const parent = findProjectHierarchyTreeNodeById(treeData.value, 'doc-parent')!
   await wiring.loadChildrenForNode(parent)
   expect(findProjectHierarchyTreeNodeById(treeData.value, 'doc-child')?.label).toBe('Child doc')
+})
+
+test('Test that placement collapse and reopen reloads multinested document descendants', async () => {
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const openNodeIds = ref(new Set([
+    'world-1',
+    'group-1',
+    'doc-08',
+    'doc-09',
+    'doc-new'
+  ]))
+  const listPlacementDocumentChildren = vi.fn(async (
+    input: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeListPlacementChildrenInput
+  ) => {
+    if (input.parentDocumentId === 'doc-09') {
+      return {
+        items: [
+          {
+            displayName: 'New building',
+            hasChildren: false,
+            id: 'doc-new',
+            parentDocumentId: 'doc-09',
+            placementId: 'placement-1',
+            sortOrder: 0
+          }
+        ]
+      }
+    }
+    if (input.parentDocumentId === 'doc-08') {
+      return {
+        items: [
+          {
+            displayName: 'Test Document - Buildings 09',
+            hasChildren: true,
+            id: 'doc-09',
+            parentDocumentId: 'doc-08',
+            placementId: 'placement-1',
+            sortOrder: 0
+          }
+        ]
+      }
+    }
+    return {
+      items: [
+        {
+          displayName: 'Test Document - Buildings 08',
+          hasChildren: true,
+          id: 'doc-08',
+          parentDocumentId: null,
+          placementId: 'placement-1',
+          sortOrder: 0
+        }
+      ]
+    }
+  })
+  const lazyLoadWiring = createProjectHierarchyTreeLazyLoadWiring({
+    getPreferredLanguageCode: () => 'en-US',
+    listPlacementDocumentChildren,
+    nextTick: async () => undefined,
+    onAfterTreeRevisionPublished: vi.fn(),
+    shouldDeferTreeRevisionPublish: () => false,
+    suppressTreeEmit: ref(false),
+    treeData
+  })
+  const placement = findProjectHierarchyTreeNodeById(treeData.value, 'placement-1')!
+  markProjectHierarchyTreeNodeClosed({
+    node: placement,
+    nodeId: placement.id,
+    openNodeIds,
+    queuePersistExpandedNodeIds: vi.fn(),
+    treeData
+  })
+  expect(placement.children).toEqual([])
+  expect(placement.childrenLoaded).toBe(false)
+  await runProjectHierarchyTreeSessionExpandOpen({
+    flushDeferredTreeRevisionPublish: lazyLoadWiring.flushDeferredTreeRevisionPublish,
+    loadChildrenForNode: lazyLoadWiring.loadChildrenForNode,
+    markNodeOpen: (nodeId) => {
+      markProjectHierarchyTreeNodeOpen({
+        nodeId,
+        openNodeIds,
+        queuePersistExpandedNodeIds: vi.fn(),
+        treeData
+      })
+    },
+    node: placement,
+    reapplyLatentDescendantExpandState: async () => {
+      await reapplyProjectHierarchyTreeLatentDescendantExpandState({
+        getTreeRef: () => null,
+        loadChildrenAlongRevealPath: lazyLoadWiring.loadChildrenAlongRevealPath,
+        openNodeIds,
+        treeData
+      })
+    },
+    treeRef: null
+  })
+  expect(findProjectHierarchyTreeNodeById(treeData.value, 'doc-new')?.label).toBe('New building')
+})
+
+test('Test that group then placement collapse and reopen keeps multinested expand ids', async () => {
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const openNodeIds = ref(new Set([
+    'world-1',
+    'group-1',
+    'placement-1',
+    'doc-08',
+    'doc-09',
+    'doc-new'
+  ]))
+  const listPlacementDocumentChildren = vi.fn(async (
+    input: import('app/types/I_faProjectHierarchyTreeDomain').I_faProjectHierarchyTreeListPlacementChildrenInput
+  ) => {
+    if (input.parentDocumentId === 'doc-09') {
+      return {
+        items: [
+          {
+            displayName: 'New building',
+            hasChildren: false,
+            id: 'doc-new',
+            parentDocumentId: 'doc-09',
+            placementId: 'placement-1',
+            sortOrder: 0
+          }
+        ]
+      }
+    }
+    if (input.parentDocumentId === 'doc-08') {
+      return {
+        items: [
+          {
+            displayName: 'Test Document - Buildings 09',
+            hasChildren: true,
+            id: 'doc-09',
+            parentDocumentId: 'doc-08',
+            placementId: 'placement-1',
+            sortOrder: 0
+          }
+        ]
+      }
+    }
+    return {
+      items: [
+        {
+          displayName: 'Test Document - Buildings 08',
+          hasChildren: true,
+          id: 'doc-08',
+          parentDocumentId: null,
+          placementId: 'placement-1',
+          sortOrder: 0
+        }
+      ]
+    }
+  })
+  const lazyLoadWiring = createProjectHierarchyTreeLazyLoadWiring({
+    getPreferredLanguageCode: () => 'en-US',
+    listPlacementDocumentChildren,
+    nextTick: async () => undefined,
+    onAfterTreeRevisionPublished: vi.fn(),
+    shouldDeferTreeRevisionPublish: () => false,
+    suppressTreeEmit: ref(false),
+    treeData
+  })
+  const reapplyLatentDescendantExpandState = async () => {
+    await reapplyProjectHierarchyTreeLatentDescendantExpandState({
+      getTreeRef: () => null,
+      loadChildrenAlongRevealPath: lazyLoadWiring.loadChildrenAlongRevealPath,
+      openNodeIds,
+      treeData
+    })
+  }
+  const markNodeOpen = (nodeId: string) => {
+    markProjectHierarchyTreeNodeOpen({
+      nodeId,
+      openNodeIds,
+      queuePersistExpandedNodeIds: vi.fn(),
+      treeData
+    })
+  }
+  const group = findProjectHierarchyTreeNodeById(treeData.value, 'group-1')!
+  const placement = findProjectHierarchyTreeNodeById(treeData.value, 'placement-1')!
+  markProjectHierarchyTreeNodeClosed({
+    node: group,
+    nodeId: group.id,
+    openNodeIds,
+    queuePersistExpandedNodeIds: vi.fn(),
+    treeData
+  })
+  expect(openNodeIds.value.has('group-1')).toBe(false)
+  expect(openNodeIds.value.has('placement-1')).toBe(true)
+  expect(openNodeIds.value.has('doc-new')).toBe(true)
+  await runProjectHierarchyTreeSessionExpandOpen({
+    flushDeferredTreeRevisionPublish: lazyLoadWiring.flushDeferredTreeRevisionPublish,
+    loadChildrenForNode: lazyLoadWiring.loadChildrenForNode,
+    markNodeOpen,
+    node: group,
+    reapplyLatentDescendantExpandState,
+    treeRef: null
+  })
+  markProjectHierarchyTreeNodeClosed({
+    node: placement,
+    nodeId: placement.id,
+    openNodeIds,
+    queuePersistExpandedNodeIds: vi.fn(),
+    treeData
+  })
+  expect(placement.children).toEqual([])
+  expect(openNodeIds.value.has('doc-new')).toBe(true)
+  await runProjectHierarchyTreeSessionExpandOpen({
+    flushDeferredTreeRevisionPublish: lazyLoadWiring.flushDeferredTreeRevisionPublish,
+    loadChildrenForNode: lazyLoadWiring.loadChildrenForNode,
+    markNodeOpen,
+    node: placement,
+    reapplyLatentDescendantExpandState,
+    treeRef: null
+  })
+  expect(findProjectHierarchyTreeNodeById(treeData.value, 'doc-new')?.label).toBe('New building')
+  expect(openNodeIds.value.has('doc-08')).toBe(true)
+  expect(openNodeIds.value.has('doc-09')).toBe(true)
 })
 
 test('Test that restoreProjectHierarchyTreeExpandedSnapshot skips missing preload nodes', async () => {
@@ -3105,9 +3392,10 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle hydrates active project
     pendingRevealPath: ref([]),
     resetOnProjectClose: vi.fn(),
     resyncTreeDataFromLayout: vi.fn(),
-    restoreUiStateFromStore: vi.fn(async () => undefined),
+    restoreExpandedSnapshot: vi.fn(async () => undefined),
     revealPendingPath: vi.fn(async () => undefined),
     teardown: vi.fn(),
+    treeData: ref([]),
     watch: vi.fn(),
     worlds: ref([])
   })
@@ -3945,9 +4233,10 @@ test('Test that bindProjectHierarchyTreeSessionLifecycle evaluates worlds expand
     pendingRevealPath: ref([]),
     resetOnProjectClose: vi.fn(),
     resyncTreeDataFromLayout: vi.fn(),
-    restoreUiStateFromStore: vi.fn(async () => undefined),
+    restoreExpandedSnapshot: vi.fn(async () => undefined),
     revealPendingPath: vi.fn(async () => undefined),
     teardown: vi.fn(),
+    treeData: ref([]),
     watch,
     worlds
   })

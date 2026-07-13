@@ -1,6 +1,8 @@
 import type { Ref } from 'vue'
 import type { watch as watchFn } from 'vue'
 
+import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
+
 import { shouldDeferProjectHierarchyTreeWorldsExpandRestore } from '../functions/projectHierarchyTreeDragExpandFreeze'
 import type { createProjectHierarchyTreeSessionEarlyWiring } from './projectHierarchyTreeSessionEarlyWiring'
 import { createProjectHierarchyTreeSessionHydrateWiring } from './projectHierarchyTreeSessionHydrateWiring'
@@ -24,6 +26,7 @@ export function bindProjectHierarchyTreeSessionHydrateLifecycle (deps: {
   onMounted: (hook: () => void) => void
   onUnmounted: (hook: () => void) => void
   pendingRevealPath: Ref<string[]>
+  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   watch: typeof watchFn
   worlds: Ref<unknown[]>
 }): void {
@@ -49,9 +52,10 @@ export function bindProjectHierarchyTreeSessionHydrateLifecycle (deps: {
     pendingRevealPath: deps.pendingRevealPath,
     resetOnProjectClose: () => deps.hierarchyStore.resetOnProjectClose(),
     resyncTreeDataFromLayout: deps.earlyWiring.subWiring.syncWiring.resyncTreeDataFromLayout,
-    restoreUiStateFromStore: deps.earlyWiring.subWiring.uiStateWiring.restoreUiStateFromStore,
+    restoreExpandedSnapshot: deps.earlyWiring.subWiring.uiStateWiring.restoreExpandedSnapshot,
     revealPendingPath: deps.earlyWiring.subWiring.uiStateWiring.revealPendingPath,
     teardown: hydrateWiring.teardown,
+    treeData: deps.treeData,
     watch: deps.watch,
     worlds: deps.worlds
   })
@@ -76,9 +80,10 @@ export function bindProjectHierarchyTreeSessionLifecycle (deps: {
   pendingRevealPath: Ref<string[]>
   resetOnProjectClose: () => void
   resyncTreeDataFromLayout: () => void
-  restoreUiStateFromStore: () => Promise<void>
+  restoreExpandedSnapshot: (expandedNodeIds: string[]) => Promise<void>
   revealPendingPath: () => Promise<void>
   teardown: () => void
+  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   watch: typeof watchFn
   worlds: Ref<unknown[]>
 }): void {
@@ -93,8 +98,9 @@ export function bindProjectHierarchyTreeSessionLifecycle (deps: {
     pendingRevealPath: deps.pendingRevealPath,
     resetOnProjectClose: deps.resetOnProjectClose,
     resyncTreeDataFromLayout: deps.resyncTreeDataFromLayout,
-    restoreUiStateFromStore: deps.restoreUiStateFromStore,
+    restoreExpandedSnapshot: deps.restoreExpandedSnapshot,
     revealPendingPath: deps.revealPendingPath,
+    treeData: deps.treeData,
     shouldDeferWorldsExpandRestore: () => shouldDeferProjectHierarchyTreeWorldsExpandRestore({
       dragCommitPending: deps.dragCommitPending.value,
       dragCommitScheduled: deps.dragCommitScheduled.value,

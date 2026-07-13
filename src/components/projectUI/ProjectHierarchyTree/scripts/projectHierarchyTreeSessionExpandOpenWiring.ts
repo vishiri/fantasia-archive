@@ -4,6 +4,7 @@ import { tryOpenHeTreeNodeAndParents } from './projectHierarchyTreeHeTreeOpenSaf
 import { shouldProjectHierarchyTreePreserveDescendantOpenIdsOnCollapse } from '../functions/projectHierarchyTreeExpandState'
 
 export async function runProjectHierarchyTreeSessionExpandOpen (deps: {
+  flushDeferredTreeRevisionPublish?: () => void | Promise<void>
   loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   markNodeOpen: (nodeId: string) => void
   node: I_faProjectHierarchyTreeHeTreeNode
@@ -27,6 +28,9 @@ export async function runProjectHierarchyTreeSessionExpandOpen (deps: {
     tryOpenHeTreeNodeAndParents(openArgs)
   }
   if (shouldProjectHierarchyTreePreserveDescendantOpenIdsOnCollapse(deps.node.nodeKind)) {
+    if (deps.flushDeferredTreeRevisionPublish !== undefined) {
+      await deps.flushDeferredTreeRevisionPublish()
+    }
     await deps.reapplyLatentDescendantExpandState()
   }
 }

@@ -863,7 +863,7 @@ test('Test that applyPersistedProjectHierarchyTreeOpenNodeIds keeps descendants 
   ).toEqual(['group-1', 'placement-1'])
   expect(
     applyPersistedProjectHierarchyTreeOpenNodeIds(tree, ['world-1', 'placement-1'])
-  ).toEqual(['world-1'])
+  ).toEqual(['world-1', 'placement-1'])
 })
 
 test('Test that applyPersistedProjectHierarchyTreeOpenNodeIds keeps latent document ids under collapsed placement', () => {
@@ -997,11 +997,73 @@ test('Test that isProjectHierarchyTreeNodePersistableInOpenSet rejects unknown n
   ).toBe(false)
 })
 
-test('Test that applyPersistedProjectHierarchyTreeOpenNodeIds drops ids with collapsed non-world ancestors', () => {
+test('Test that applyPersistedProjectHierarchyTreeOpenNodeIds keeps placement ids with collapsed group ancestor', () => {
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   expect(
     applyPersistedProjectHierarchyTreeOpenNodeIds(tree, ['placement-1'])
-  ).toEqual([])
+  ).toEqual(['placement-1'])
+})
+
+test('Test that collectProjectHierarchyTreeLatentDocumentOpenNodeIds accepts uuid document ids', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const latentId = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
+  expect(
+    collectProjectHierarchyTreeLatentDocumentOpenNodeIds(tree, [latentId])
+  ).toEqual([latentId])
+})
+
+test('Test that isProjectHierarchyTreeNodePersistableInOpenSet keeps placement under collapsed group', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  expect(
+    isProjectHierarchyTreeNodePersistableInOpenSet(
+      tree,
+      'placement-1',
+      new Set(['world-1', 'placement-1'])
+    )
+  ).toBe(true)
+})
+
+test('Test that isProjectHierarchyTreeNodePersistableInOpenSet rejects nested rows under collapsed add-new ancestor', () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const placement = tree[0]!.children[0]!.children[0]!
+  placement.children = [
+    {
+      children: [
+        {
+          children: [],
+          childrenLoaded: true,
+          documentId: 'doc-nested',
+          groupId: 'group-1',
+          hasChildren: false,
+          icon: '',
+          id: 'doc-nested',
+          label: 'Nested',
+          nodeKind: 'document',
+          placementId: 'placement-1',
+          worldColor: '#000',
+          worldId: 'world-1'
+        }
+      ],
+      childrenLoaded: true,
+      documentId: null,
+      groupId: 'group-1',
+      hasChildren: true,
+      icon: '',
+      id: 'add-new-placement-1',
+      label: 'Add new',
+      nodeKind: 'addNewDocument',
+      placementId: 'placement-1',
+      worldColor: '#000',
+      worldId: 'world-1'
+    }
+  ]
+  expect(
+    isProjectHierarchyTreeNodePersistableInOpenSet(
+      tree,
+      'doc-nested',
+      new Set(['world-1', 'group-1', 'placement-1', 'doc-nested'])
+    )
+  ).toBe(false)
 })
 
 test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton always adds lazy placeholder on template placements', () => {
