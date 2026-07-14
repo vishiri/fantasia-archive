@@ -19,36 +19,52 @@ const meta = {
 
 export default meta
 
-export const Default: StoryObj<typeof meta> = {
-  render: () => ({
+function createStoryRender (options: {
+  addNewRowIcon?: string | null
+  addNewRowLabel?: string | null
+}) {
+  return () => ({
     components: {
       ProjectHierarchyTreeNodeContextMenu
     },
     setup () {
       const isOpen = ref(true)
-      const menuTargetElement = ref<HTMLElement | null>(null)
-      const anchor = document.createElement('div')
-      anchor.textContent = 'Right-click target'
-      anchor.style.padding = '1rem'
-      menuTargetElement.value = anchor
+      const menuPointerPosition = ref({
+        left: 180,
+        top: 120
+      })
       return {
-        anchor,
+        addNewRowIcon: options.addNewRowIcon ?? null,
+        addNewRowLabel: options.addNewRowLabel ?? null,
         isOpen,
-        menuTargetElement
+        menuPointerPosition
       }
     },
     template: `
       <div style="padding: 2rem;">
-        <div ref="anchor" />
         <ProjectHierarchyTreeNodeContextMenu
           v-model:is-open="isOpen"
+          :add-new-row-icon="addNewRowIcon"
+          :add-new-row-label="addNewRowLabel"
           anchor-node-id="world-1"
-          :menu-target-element="menuTargetElement"
+          :menu-pointer-position="menuPointerPosition"
+          :on-add-new-click="() => {}"
           :on-collapse-all-click="() => {}"
           :on-expand-all-click="() => {}"
           :on-hide="() => {}"
         />
       </div>
     `
+  })
+}
+
+export const Default: StoryObj<typeof meta> = {
+  render: createStoryRender({})
+}
+
+export const WithPlacementAddNew: StoryObj<typeof meta> = {
+  render: createStoryRender({
+    addNewRowIcon: 'mdi-plus',
+    addNewRowLabel: 'Add new building'
   })
 }

@@ -5,46 +5,15 @@ import type {
   I_faProjectHierarchyTreeWorkspaceWorld
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-/** Sync with PROJECT_HIERARCHY_TREE_DOCUMENT_TEMPLATE_DEFAULT_ICON in projectHierarchyTreeConstants.ts */
-const DEFAULT_PLACEMENT_ICON = 'mdi-file-outline'
-
-function resolvePlacementDisplayIcon (icon: string): string {
-  const trimmed = icon.trim()
-  if (trimmed.length > 0) {
-    return trimmed
-  }
-  return DEFAULT_PLACEMENT_ICON
+type T_projectHierarchyTreeLazyPlaceholderApi = {
+  resolveLazyChildren: (parent: I_faProjectHierarchyTreeHeTreeNode) => I_faProjectHierarchyTreeHeTreeNode[]
+  syncProjectHierarchyTreeNodeLazyChildren: (node: I_faProjectHierarchyTreeHeTreeNode) => void
 }
 
-/** Default Material icon for template group rows. */
-const PROJECT_HIERARCHY_TREE_GROUP_ICON = 'mdi-database'
-
-function createLazyPlaceholderChild (
-  parent: Pick<I_faProjectHierarchyTreeHeTreeNode, 'icon' | 'id' | 'placementId' | 'worldColor' | 'worldId'>
-): I_faProjectHierarchyTreeHeTreeNode {
-  return {
-    children: [],
-    childrenLoaded: false,
-    documentId: null,
-    groupId: null,
-    hasChildren: false,
-    icon: parent.icon,
-    id: `${parent.id}__lazy`,
-    label: '',
-    nodeKind: 'document',
-    placementId: parent.placementId,
-    worldColor: parent.worldColor,
-    worldId: parent.worldId
-  }
-}
-
-function resolveLazyChildren (
-  parent: I_faProjectHierarchyTreeHeTreeNode
-): I_faProjectHierarchyTreeHeTreeNode[] {
-  if (!parent.hasChildren) {
-    return []
-  }
-  return [createLazyPlaceholderChild(parent)]
+type T_workspaceLayoutSkeletonMapDeps = {
+  groupIcon: string
+  lazyPlaceholderApi: T_projectHierarchyTreeLazyPlaceholderApi
+  resolvePlacementDisplayIcon: (icon: string) => string
 }
 
 function patchDocumentSubtreeIconsInPlace (
@@ -62,29 +31,13 @@ function patchDocumentSubtreeIconsInPlace (
   }
 }
 
-function syncProjectHierarchyTreeNodeLazyChildren (
-  node: I_faProjectHierarchyTreeHeTreeNode
-): void {
-  if (node.nodeKind === 'world' || node.nodeKind === 'group' || node.childrenLoaded) {
-    return
-  }
-  if (!node.hasChildren) {
-    node.children = []
-    return
-  }
-  const lazyChildId = `${node.id}__lazy`
-  const hasOnlyLazyPlaceholder = node.children.length === 1 && node.children[0]?.id === lazyChildId
-  if (node.children.length === 0 || hasOnlyLazyPlaceholder) {
-    node.children = resolveLazyChildren(node)
-  }
-}
-
 function mapPlacementToNode (
+  deps: T_workspaceLayoutSkeletonMapDeps,
   world: I_faProjectHierarchyTreeWorkspaceWorld,
   placement: I_faProjectHierarchyTreeWorkspacePlacement
 ): I_faProjectHierarchyTreeHeTreeNode {
   const nickname = placement.nickname.trim()
-  const placementIcon = resolvePlacementDisplayIcon(placement.icon)
+  const placementIcon = deps.resolvePlacementDisplayIcon(placement.icon)
   const node: I_faProjectHierarchyTreeHeTreeNode = {
     children: [],
     childrenLoaded: false,
@@ -102,25 +55,26 @@ function mapPlacementToNode (
     worldColor: world.color,
     worldId: world.id
   }
-  node.children = resolveLazyChildren(node)
+  node.children = deps.lazyPlaceholderApi.resolveLazyChildren(node)
   return node
 }
 
 function mapGroupToNode (
+  deps: T_workspaceLayoutSkeletonMapDeps,
   world: I_faProjectHierarchyTreeWorkspaceWorld,
   group: I_faProjectHierarchyTreeWorkspaceGroup
 ): I_faProjectHierarchyTreeHeTreeNode {
   const children = world.placements
     .filter((placement) => placement.groupId === group.id)
     .sort((left, right) => (left.groupSortOrder ?? 0) - (right.groupSortOrder ?? 0))
-    .map((placement) => mapPlacementToNode(world, placement))
+    .map((placement) => mapPlacementToNode(deps, world, placement))
   return {
     children,
     childrenLoaded: true,
     documentId: null,
     groupId: group.id,
     hasChildren: group.hasChildren,
-    icon: PROJECT_HIERARCHY_TREE_GROUP_ICON,
+    icon: deps.groupIcon,
     id: group.id,
     label: group.displayName,
     nodeKind: 'group',
@@ -131,6 +85,7 @@ function mapGroupToNode (
 }
 
 function mapWorldToNode (
+  deps: T_workspaceLayoutSkeletonMapDeps,
   world: I_faProjectHierarchyTreeWorkspaceWorld
 ): I_faProjectHierarchyTreeHeTreeNode {
   const groupById = new Map(world.groups.map((group) => [group.id, group]))
@@ -151,9 +106,9 @@ function mapWorldToNode (
   ].sort((left, right) => left.rootSortOrder - right.rootSortOrder)
   const children = rootItems.map((item) => {
     if (item.kind === 'group') {
-      return mapGroupToNode(world, groupById.get(item.groupId)!)
+      return mapGroupToNode(deps, world, groupById.get(item.groupId)!)
     }
-    return mapPlacementToNode(world, placementById.get(item.placementId)!)
+    return mapPlacementToNode(deps, world, placementById.get(item.placementId)!)
   })
   return {
     children,
@@ -172,11 +127,12 @@ function mapWorldToNode (
 }
 
 function patchPlacementNodeInPlace (
+  deps: T_workspaceLayoutSkeletonMapDeps,
   placementNode: I_faProjectHierarchyTreeHeTreeNode,
   placement: I_faProjectHierarchyTreeWorkspacePlacement
 ): void {
   const nickname = placement.nickname.trim()
-  const placementIcon = resolvePlacementDisplayIcon(placement.icon)
+  const placementIcon = deps.resolvePlacementDisplayIcon(placement.icon)
   placementNode.label = nickname.length > 0 ? nickname : placement.displayName
   placementNode.icon = placementIcon
   placementNode.hasChildren = true
@@ -184,61 +140,62 @@ function patchPlacementNodeInPlace (
   placementNode.titlePluralTranslations = placement.titlePluralTranslations
   placementNode.titleSingularTranslations = placement.titleSingularTranslations
   patchDocumentSubtreeIconsInPlace(placementNode.children, placementIcon)
-  syncProjectHierarchyTreeNodeLazyChildren(placementNode)
+  deps.lazyPlaceholderApi.syncProjectHierarchyTreeNodeLazyChildren(placementNode)
 }
 
-/**
- * Maps workspace layout IPC snapshot to he-tree skeleton nodes without document rows.
- */
-export function mapWorkspaceLayoutToHierarchyTreeSkeleton (
-  worlds: I_faProjectHierarchyTreeWorkspaceWorld[]
-): I_faProjectHierarchyTreeHeTreeNode[] {
-  return worlds
-    .slice()
-    .sort((left, right) => left.sortOrder - right.sortOrder)
-    .map((world) => mapWorldToNode(world))
-}
+export function createMapWorkspaceLayoutToHierarchyTreeSkeleton (deps: T_workspaceLayoutSkeletonMapDeps) {
+  function mapWorkspaceLayoutToHierarchyTreeSkeleton (
+    worlds: I_faProjectHierarchyTreeWorkspaceWorld[]
+  ): I_faProjectHierarchyTreeHeTreeNode[] {
+    return worlds
+      .slice()
+      .sort((left, right) => left.sortOrder - right.sortOrder)
+      .map((world) => mapWorldToNode(deps, world))
+  }
 
-/**
- * Patches display labels on an existing skeleton when layout metadata changes but topology matches.
- */
-export function patchHierarchyTreeSkeletonLabelsInPlace (
-  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
-  worlds: I_faProjectHierarchyTreeWorkspaceWorld[]
-): void {
-  const worldById = new Map(worlds.map((world) => [world.id, world]))
+  function patchHierarchyTreeSkeletonLabelsInPlace (
+    treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
+    worlds: I_faProjectHierarchyTreeWorkspaceWorld[]
+  ): void {
+    const worldById = new Map(worlds.map((world) => [world.id, world]))
 
-  for (const worldNode of treeNodes) {
-    const world = worldById.get(worldNode.id)
-    if (world === undefined) {
-      continue
-    }
-    worldNode.label = world.displayName
-    worldNode.worldColor = world.color
-    worldNode.hasChildren = world.groups.length > 0 || world.placements.length > 0
+    for (const worldNode of treeNodes) {
+      const world = worldById.get(worldNode.id)
+      if (world === undefined) {
+        continue
+      }
+      worldNode.label = world.displayName
+      worldNode.worldColor = world.color
+      worldNode.hasChildren = world.groups.length > 0 || world.placements.length > 0
 
-    for (const child of worldNode.children) {
-      if (child.nodeKind === 'group') {
-        const group = world.groups.find((row) => row.id === child.id)
-        if (group === undefined) {
-          continue
-        }
-        child.label = group.displayName
-        child.hasChildren = group.hasChildren
-        for (const placementNode of child.children) {
-          const placement = world.placements.find((row) => row.id === placementNode.id)
-          if (placement === undefined) {
+      for (const child of worldNode.children) {
+        if (child.nodeKind === 'group') {
+          const group = world.groups.find((row) => row.id === child.id)
+          if (group === undefined) {
             continue
           }
-          patchPlacementNodeInPlace(placementNode, placement)
+          child.label = group.displayName
+          child.hasChildren = group.hasChildren
+          for (const placementNode of child.children) {
+            const placement = world.placements.find((row) => row.id === placementNode.id)
+            if (placement === undefined) {
+              continue
+            }
+            patchPlacementNodeInPlace(deps, placementNode, placement)
+          }
+          continue
         }
-        continue
+        const placement = world.placements.find((row) => row.id === child.id)
+        if (placement === undefined) {
+          continue
+        }
+        patchPlacementNodeInPlace(deps, child, placement)
       }
-      const placement = world.placements.find((row) => row.id === child.id)
-      if (placement === undefined) {
-        continue
-      }
-      patchPlacementNodeInPlace(child, placement)
     }
+  }
+
+  return {
+    mapWorkspaceLayoutToHierarchyTreeSkeleton,
+    patchHierarchyTreeSkeletonLabelsInPlace
   }
 }

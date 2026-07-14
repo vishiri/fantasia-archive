@@ -23,16 +23,28 @@ const hierarchyTreeContextMenuI18n = createI18n({
   }
 })
 
-function mountHierarchyTreeContextMenu () {
+function mountHierarchyTreeContextMenu (
+  overrides: {
+    addNewRowIcon?: string | null
+    addNewRowLabel?: string | null
+  } = {}
+) {
   const isOpen = ref(true)
+  const onAddNewClick = vi.fn()
   const onExpandAllClick = vi.fn()
   const onCollapseAllClick = vi.fn()
   const onHide = vi.fn()
   const wrapper = mount(ProjectHierarchyTreeNodeContextMenu, {
     props: {
+      addNewRowIcon: overrides.addNewRowIcon ?? null,
+      addNewRowLabel: overrides.addNewRowLabel ?? null,
       anchorNodeId: 'world-1',
       isOpen: true,
-      menuTargetElement: document.createElement('div'),
+      menuPointerPosition: {
+        left: 120,
+        top: 80
+      },
+      onAddNewClick,
       onCollapseAllClick,
       onExpandAllClick,
       onHide,
@@ -58,6 +70,9 @@ function mountHierarchyTreeContextMenu () {
           emits: ['hide', 'update:modelValue'],
           props: ['modelValue', 'target'],
           template: '<div data-test-locator="projectHierarchyTree-nodeContextMenu" :data-test-menu-target="target ? \'set\' : \'unset\'"><button data-test-locator="projectHierarchyTree-nodeContextMenu-close" type="button" @click="$emit(\'update:modelValue\', false)" /><button data-test-locator="projectHierarchyTree-nodeContextMenu-hide" type="button" @click="$emit(\'hide\')" /><slot /></div>'
+        },
+        QSeparator: {
+          template: '<hr data-test-locator="projectHierarchyTree-nodeContextMenu-separator" />'
         }
       }
     }
@@ -65,6 +80,7 @@ function mountHierarchyTreeContextMenu () {
 
   return {
     isOpen,
+    onAddNewClick,
     onCollapseAllClick,
     onExpandAllClick,
     onHide,
@@ -77,7 +93,10 @@ test('ProjectHierarchyTreeNodeContextMenu renders expand and collapse actions', 
   expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-expandAll"]').exists()).toBe(true)
   expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-collapseAll"]').exists()).toBe(true)
   expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu"]').attributes('data-test-hierarchy-node-id')).toBe('world-1')
-  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu"]').attributes('data-test-menu-target')).toBe('set')
+  const pointerAnchor = wrapper.find('.projectHierarchyTreeNodeContextMenu__pointerAnchor')
+  expect(pointerAnchor.exists()).toBe(true)
+  expect(pointerAnchor.attributes('style')).toContain('left: 120px')
+  expect(pointerAnchor.attributes('style')).toContain('top: 80px')
   expect(wrapper.text()).toContain('Expand all under this node')
   expect(wrapper.text()).toContain('Collapse all under this node')
 })
@@ -85,9 +104,12 @@ test('ProjectHierarchyTreeNodeContextMenu renders expand and collapse actions', 
 test('ProjectHierarchyTreeNodeContextMenu omits anchor metadata when props are null', () => {
   const wrapper = mount(ProjectHierarchyTreeNodeContextMenu, {
     props: {
+      addNewRowIcon: null,
+      addNewRowLabel: null,
       anchorNodeId: null,
       isOpen: false,
-      menuTargetElement: null,
+      menuPointerPosition: null,
+      onAddNewClick: vi.fn(),
       onCollapseAllClick: vi.fn(),
       onExpandAllClick: vi.fn(),
       onHide: vi.fn(),
@@ -115,8 +137,25 @@ test('ProjectHierarchyTreeNodeContextMenu omits anchor metadata when props are n
   })
 
   expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu"]').attributes('data-test-hierarchy-node-id')).toBeUndefined()
-  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu"]').attributes('data-test-menu-target')).toBe('unset')
+  expect(wrapper.find('.projectHierarchyTreeNodeContextMenu__pointerAnchor').attributes('style')).toContain('opacity: 0')
   wrapper.unmount()
+})
+
+test('ProjectHierarchyTreeNodeContextMenu renders add-new row and separator for placements', async () => {
+  const { onAddNewClick, wrapper } = mountHierarchyTreeContextMenu({
+    addNewRowIcon: 'mdi-plus',
+    addNewRowLabel: 'Add new building'
+  })
+
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-addNew"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-separator"]').exists()).toBe(true)
+  expect(wrapper.text()).toContain('Add new building')
+  const menuHtml = wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu"]').html()
+  expect(menuHtml.indexOf('projectHierarchyTree-nodeContextMenu-expandAll')).toBeLessThan(
+    menuHtml.indexOf('projectHierarchyTree-nodeContextMenu-addNew')
+  )
+  await wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-addNew"]').trigger('click')
+  expect(onAddNewClick).toHaveBeenCalled()
 })
 
 test('ProjectHierarchyTreeNodeContextMenu delegates menu item clicks and hide', async () => {

@@ -8,6 +8,7 @@ import ProjectHierarchyTree from '../ProjectHierarchyTree.vue'
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 const treeHandlers = vi.hoisted(() => ({
+  onAddNewDocumentFromContextMenuClick: vi.fn(),
   onBeforeDragOpen: vi.fn(),
   onBeforeDragStart: vi.fn(),
   onCollapseAllUnderNodeClick: vi.fn(),
@@ -54,9 +55,11 @@ const treeData = ref<I_faProjectHierarchyTreeHeTreeNode[]>([
 ])
 
 const treeContextMenuState = {
+  addNewRowIcon: ref<string | null>(null),
+  addNewRowLabel: ref<string | null>(null),
   anchorNodeId: ref<string | null>(null),
   isOpen: ref(false),
-  menuTarget: ref<HTMLElement | null>(null)
+  menuPointerPosition: ref<{ left: number, top: number } | null>(null)
 }
 
 const projectHierarchyTreeI18n = createI18n({
@@ -95,9 +98,12 @@ const projectHierarchyTreeContextMenuStubs = {
 const projectHierarchyTreeNodeContextMenuStub = {
   name: 'ProjectHierarchyTreeNodeContextMenu',
   props: [
+    'addNewRowIcon',
+    'addNewRowLabel',
     'anchorNodeId',
     'isOpen',
-    'menuTargetElement',
+    'menuPointerPosition',
+    'onAddNewClick',
     'onCollapseAllClick',
     'onExpandAllClick',
     'onHide'
@@ -136,13 +142,16 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
       treeOpenRequest.handler = options.onDocumentOpenRequest
       return {
         activeDocumentId: ref(null),
+        contextMenuAddNewRowIcon: treeContextMenuState.addNewRowIcon,
+        contextMenuAddNewRowLabel: treeContextMenuState.addNewRowLabel,
         contextMenuAnchorNodeId: treeContextMenuState.anchorNodeId,
         eachDraggableHandler: () => true,
         eachDroppableHandler: () => true,
         heTreeNodeKey: (_stat: { data: { id: string } }) => 'world-1',
         isNodeContextMenuOpen: treeContextMenuState.isOpen,
         isTreeDragActive: ref(false),
-        nodeMenuTargetElement: treeContextMenuState.menuTarget,
+        nodeMenuPointerPosition: treeContextMenuState.menuPointerPosition,
+        onAddNewDocumentFromContextMenuClick: treeHandlers.onAddNewDocumentFromContextMenuClick,
         onBeforeDragOpen: treeHandlers.onBeforeDragOpen,
         onBeforeDragStart: treeHandlers.onBeforeDragStart,
         onCollapseAllUnderNodeClick: treeHandlers.onCollapseAllUnderNodeClick,
@@ -421,7 +430,10 @@ test('Test that ProjectHierarchyTree omits open icon for leaf document rows', ()
 test('Test that ProjectHierarchyTree mounts node context menu with handler props', async () => {
   treeContextMenuState.anchorNodeId.value = 'world-1'
   treeContextMenuState.isOpen.value = true
-  treeContextMenuState.menuTarget.value = document.createElement('div')
+  treeContextMenuState.menuPointerPosition.value = {
+    left: 120,
+    top: 80
+  }
 
   const wrapper = mountProjectHierarchyTree({
     global: {
@@ -439,13 +451,14 @@ test('Test that ProjectHierarchyTree mounts node context menu with handler props
   expect(contextMenu.exists()).toBe(true)
   expect(contextMenu.props('onExpandAllClick')).toBe(treeHandlers.onExpandAllUnderNodeClick)
   expect(contextMenu.props('onCollapseAllClick')).toBe(treeHandlers.onCollapseAllUnderNodeClick)
+  expect(contextMenu.props('onAddNewClick')).toBe(treeHandlers.onAddNewDocumentFromContextMenuClick)
   expect(contextMenu.props('onHide')).toBe(treeHandlers.onNodeContextMenuHide)
   await contextMenu.vm.$emit('update:isOpen', false)
   expect(treeContextMenuState.isOpen.value).toBe(false)
   wrapper.unmount()
   treeContextMenuState.anchorNodeId.value = null
   treeContextMenuState.isOpen.value = false
-  treeContextMenuState.menuTarget.value = null
+  treeContextMenuState.menuPointerPosition.value = null
 })
 
 test('Test that ProjectHierarchyTree wires context menu handler on add-new rows without opening menu', async () => {

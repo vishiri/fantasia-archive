@@ -2,7 +2,7 @@
 import { expect, test, vi } from 'vitest'
 import { ref } from 'vue'
 
-import { mapWorkspaceLayoutToHierarchyTreeSkeleton } from '../../functions/mapWorkspaceLayoutToHierarchyTreeSkeleton'
+import { mapWorkspaceLayoutToHierarchyTreeSkeleton } from '../projectHierarchyTreeMapperWiring'
 import { findProjectHierarchyTreeNodeById } from '../../functions/projectHierarchyTreeExpandState'
 import { reapplyProjectHierarchyTreeLatentDescendantExpandState } from '../projectHierarchyTreeLatentExpandReapplyWiring'
 

@@ -12,6 +12,9 @@ export const PROJECT_HIERARCHY_TREE_NODE_ITEM_SELECTOR = '.tree-node'
 /** Default Material icon for template group rows. */
 export const PROJECT_HIERARCHY_TREE_GROUP_ICON = 'mdi-database'
 
+/** Material icon for template placement add-new rows and matching context menu action. */
+export const PROJECT_HIERARCHY_TREE_ADD_NEW_DOCUMENT_ICON = 'mdi-plus'
+
 /** he-tree Draggable trigger-class — added on primary-button pointerdown before drag may start. */
 export const PROJECT_HIERARCHY_TREE_DRAG_HANDLE_CLASS = 'projectHierarchyTree__dragHandle'
 

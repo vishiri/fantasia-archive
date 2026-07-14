@@ -60,8 +60,11 @@
     </Draggable>
     <ProjectHierarchyTreeNodeContextMenu
       v-model:is-open="isNodeContextMenuOpen"
+      :add-new-row-icon="contextMenuAddNewRowIcon"
+      :add-new-row-label="contextMenuAddNewRowLabel"
       :anchor-node-id="contextMenuAnchorNodeId"
-      :menu-target-element="nodeMenuTargetElement"
+      :menu-pointer-position="nodeMenuPointerPosition"
+      :on-add-new-click="onAddNewDocumentFromContextMenuClick"
       :on-collapse-all-click="onCollapseAllUnderNodeClick"
       :on-expand-all-click="onExpandAllUnderNodeClick"
       :on-hide="onNodeContextMenuHide"
@@ -103,13 +106,16 @@ const treeComponentRef = ref<I_faProjectHierarchyTreeHeTreeInstance | null>(null
 
 const {
   activeDocumentId,
+  contextMenuAddNewRowIcon,
+  contextMenuAddNewRowLabel,
   contextMenuAnchorNodeId,
   eachDraggableHandler,
   eachDroppableHandler,
   heTreeNodeKey,
   isNodeContextMenuOpen,
   isTreeDragActive,
-  nodeMenuTargetElement,
+  nodeMenuPointerPosition,
+  onAddNewDocumentFromContextMenuClick,
   onCollapseAllUnderNodeClick,
   onDocumentRowAuxClick,
   onExpandAllUnderNodeClick,

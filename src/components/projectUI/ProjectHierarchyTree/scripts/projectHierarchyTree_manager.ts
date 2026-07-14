@@ -10,17 +10,12 @@ import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/appRouting_manager'
 
 import { createUseProjectHierarchyTree } from './createUseProjectHierarchyTree'
-import { PROJECT_HIERARCHY_TREE_DOCUMENT_TEMPLATE_DEFAULT_ICON } from '../functions/projectHierarchyTreeConstants'
-import { createResolveProjectHierarchyTreePlacementDisplayIcon } from '../functions/projectHierarchyTreePlacementDisplayIcon'
+import { resolveProjectHierarchyTreePlacementDisplayIcon } from './projectHierarchyTreePlacementDisplayIconWiring'
 
 export {
   applyProjectHierarchyTreeTreeNodeKindClass,
   clearProjectHierarchyTreeTreeNodeKindClass
 } from './projectHierarchyTreeTreeNodeKindClassWiring'
-
-const resolveProjectHierarchyTreePlacementDisplayIcon = createResolveProjectHierarchyTreePlacementDisplayIcon({
-  defaultPlacementIcon: PROJECT_HIERARCHY_TREE_DOCUMENT_TEMPLATE_DEFAULT_ICON
-})
 
 export { resolveProjectHierarchyTreeHeTreeNodeKey } from '../functions/projectHierarchyTreeHeTreeNodeKey'
 export { resolveProjectHierarchyTreeDocumentAppearanceChrome } from './projectHierarchyTreeDocumentAppearanceChromeWiring'

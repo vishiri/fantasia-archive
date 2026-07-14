@@ -5,9 +5,9 @@ import type { Ref, WatchCallback, WatchOptions, WatchSource, watch as watchFn } 
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { mapWorkspaceLayoutToHierarchyTreeSkeleton } from '../../functions/mapWorkspaceLayoutToHierarchyTreeSkeleton'
+import { mapWorkspaceLayoutToHierarchyTreeSkeleton } from '../projectHierarchyTreeMapperWiring'
 import { findProjectHierarchyTreeNodeById } from '../../functions/projectHierarchyTreeExpandState'
-import { mergeLoadedChildrenIntoNode } from '../../functions/projectHierarchyTreeMergeLoadedChildren'
+import { mergeLoadedChildrenIntoNode } from '../projectHierarchyTreeMergeLoadedChildrenWiring'
 import {
   cloneProjectHierarchyTreeLoadedNodeForPublish,
   replaceProjectHierarchyTreeNodeByIdInPlace

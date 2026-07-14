@@ -8,8 +8,8 @@ import type {
 import {
   mapWorkspaceLayoutToHierarchyTreeSkeleton,
   patchHierarchyTreeSkeletonLabelsInPlace
-} from '../mapWorkspaceLayoutToHierarchyTreeSkeleton'
-import { mapHierarchyDocumentChildrenToTreeNodes } from '../mapHierarchyDocumentChildrenToTreeNodes'
+} from '../../scripts/projectHierarchyTreeMapperWiring'
+import { mapHierarchyDocumentChildrenToTreeNodes } from '../../scripts/projectHierarchyTreeMapperWiring'
 import { applyProjectHierarchyTreeSiblingOrderToTreeData } from '../../scripts/projectHierarchyTreeSiblingOrderPatchWiring'
 import { refreshProjectHierarchyTreeAddNewDocumentLabelsInTree } from '../../scripts/projectHierarchyTreeAddNewDocumentNode'
 import { isProjectHierarchyTreeSameBucketSiblingReorder } from '../projectHierarchyTreeSameBucketSiblingReorder'
@@ -21,8 +21,7 @@ import {
   finalizeProjectHierarchyTreeDragSiblingOrderSnapshot,
   resolveProjectHierarchyTreeDragSiblingOrderSnapshot
 } from '../../scripts/projectHierarchyTreeDragSiblingOrderSnapshotWiring'
-import { PROJECT_HIERARCHY_TREE_DOCUMENT_TEMPLATE_DEFAULT_ICON } from '../projectHierarchyTreeConstants'
-import { createResolveProjectHierarchyTreePlacementDisplayIcon } from '../projectHierarchyTreePlacementDisplayIcon'
+import { resolveProjectHierarchyTreePlacementDisplayIcon } from '../../scripts/projectHierarchyTreePlacementDisplayIconWiring'
 import {
   applyPersistedProjectHierarchyTreeOpenNodeIds,
   collectProjectHierarchyTreeLatentDocumentOpenNodeIds,
@@ -40,7 +39,7 @@ import {
   buildProjectHierarchyTreeVisibleFlatVirtualScrollKey,
   collectProjectHierarchyTreeVisibleFlatNodes
 } from '../projectHierarchyTreeVisibleFlatNodes'
-import { mergeLoadedChildrenIntoNode } from '../projectHierarchyTreeMergeLoadedChildren'
+import { mergeLoadedChildrenIntoNode } from '../../scripts/projectHierarchyTreeMergeLoadedChildrenWiring'
 import {
   isProjectHierarchyTreeNodeDraggable,
   isProjectHierarchyTreeNodeDroppable,
@@ -88,9 +87,9 @@ import {
   shouldClampProjectHierarchyTreeVirtualScrollTail
 } from '../projectHierarchyTreeVirtualScrollClamp'
 
-const resolveProjectHierarchyTreePlacementDisplayIcon = createResolveProjectHierarchyTreePlacementDisplayIcon({
-  defaultPlacementIcon: PROJECT_HIERARCHY_TREE_DOCUMENT_TEMPLATE_DEFAULT_ICON
-})
+function resolveProjectHierarchyTreePlacementDisplayIconForTest (icon: string): string {
+  return resolveProjectHierarchyTreePlacementDisplayIcon(icon)
+}
 
 const sampleWorld = {
   color: '#ff0000',
@@ -1537,9 +1536,9 @@ test('Test that projectHierarchyTreeLayoutStructureMatchesTree rejects unknown w
  * resolveProjectHierarchyTreePlacementDisplayIcon falls back to default document icon.
  */
 test('Test that resolveProjectHierarchyTreePlacementDisplayIcon falls back for empty icon', () => {
-  expect(resolveProjectHierarchyTreePlacementDisplayIcon('')).toBe('mdi-file-outline')
-  expect(resolveProjectHierarchyTreePlacementDisplayIcon('  ')).toBe('mdi-file-outline')
-  expect(resolveProjectHierarchyTreePlacementDisplayIcon('mdi-account')).toBe('mdi-account')
+  expect(resolveProjectHierarchyTreePlacementDisplayIconForTest('')).toBe('mdi-file-outline')
+  expect(resolveProjectHierarchyTreePlacementDisplayIconForTest('  ')).toBe('mdi-file-outline')
+  expect(resolveProjectHierarchyTreePlacementDisplayIconForTest('mdi-account')).toBe('mdi-account')
 })
 
 /**

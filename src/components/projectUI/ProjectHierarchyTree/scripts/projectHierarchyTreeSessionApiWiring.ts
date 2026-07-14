@@ -18,12 +18,15 @@ export function buildProjectHierarchyTreeSessionApi (deps: {
   treeMountKey: Ref<number>
 }) {
   return {
+    contextMenuAddNewRowIcon: deps.handlersWiring.contextMenuAddNewRowIcon,
+    contextMenuAddNewRowLabel: deps.handlersWiring.contextMenuAddNewRowLabel,
     contextMenuAnchorNodeId: deps.handlersWiring.contextMenuAnchorNodeId,
     eachDraggableHandler: deps.handlersWiring.eachDraggableHandler,
     eachDroppableHandler: deps.handlersWiring.eachDroppableHandler,
     isNodeContextMenuOpen: deps.handlersWiring.isNodeContextMenuOpen,
     isTreeDragActive: deps.isTreeDragActive,
-    nodeMenuTargetElement: deps.handlersWiring.nodeMenuTargetElement,
+    nodeMenuPointerPosition: deps.handlersWiring.nodeMenuPointerPosition,
+    onAddNewDocumentFromContextMenuClick: deps.handlersWiring.onAddNewDocumentFromContextMenuClick,
     onCollapseAllUnderNodeClick: deps.handlersWiring.onCollapseAllUnderNodeClick,
     onDocumentRowAuxClick: deps.handlersWiring.onDocumentRowAuxClick,
     onExpandAllUnderNodeClick: deps.handlersWiring.onExpandAllUnderNodeClick,

@@ -7,8 +7,8 @@ import type { I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHe
 import {
   mapWorkspaceLayoutToHierarchyTreeSkeleton,
   patchHierarchyTreeSkeletonLabelsInPlace
-} from '../../functions/mapWorkspaceLayoutToHierarchyTreeSkeleton'
-import { mapHierarchyDocumentChildrenToTreeNodes } from '../../functions/mapHierarchyDocumentChildrenToTreeNodes'
+} from '../projectHierarchyTreeMapperWiring'
+import { mapHierarchyDocumentChildrenToTreeNodes } from '../projectHierarchyTreeMapperWiring'
 import {
   collectProjectHierarchyTreeLazyLoadIdsAlongExpandedPaths,
   sortProjectHierarchyTreeExpandedNodeIdsForRestore
@@ -22,7 +22,7 @@ import {
   pruneProjectHierarchyTreeExpandedNodeIdsToAncestors,
   publishProjectHierarchyTreeRootRevision
 } from '../../functions/projectHierarchyTreeExpandState'
-import { mergeLoadedChildrenIntoNode } from '../../functions/projectHierarchyTreeMergeLoadedChildren'
+import { mergeLoadedChildrenIntoNode } from '../projectHierarchyTreeMergeLoadedChildrenWiring'
 import { PROJECT_HIERARCHY_TREE_DRAG_EXPAND_SNAPSHOT_RESTORE_OPTIONS } from '../../functions/projectHierarchyTreeConstants'
 import { createProjectHierarchyTreeDragSessionState } from '../projectHierarchyTreeDragSessionStateWiring'
 import * as projectHierarchyTreeExpandState from '../../functions/projectHierarchyTreeExpandState'

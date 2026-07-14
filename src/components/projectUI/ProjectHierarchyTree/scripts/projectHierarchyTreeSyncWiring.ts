@@ -5,7 +5,7 @@ import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHi
 import {
   mapWorkspaceLayoutToHierarchyTreeSkeleton,
   patchHierarchyTreeSkeletonLabelsInPlace
-} from '../functions/mapWorkspaceLayoutToHierarchyTreeSkeleton'
+} from './projectHierarchyTreeMapperWiring'
 import { findProjectHierarchyTreeDocumentsWithInvalidPlacementParent } from '../functions/projectHierarchyTreeDocumentPlacementGuard'
 import { refreshProjectHierarchyTreeAddNewDocumentLabelsInTree } from './projectHierarchyTreeAddNewDocumentNode'
 import { projectHierarchyTreeLayoutStructureMatchesTree } from './projectHierarchyTreeLayoutStructureMatch'

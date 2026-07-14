@@ -6,12 +6,12 @@ import type {
   I_faProjectHierarchyTreeListPlacementChildrenInput
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import { mapHierarchyDocumentChildrenToTreeNodes } from '../functions/mapHierarchyDocumentChildrenToTreeNodes'
+import { mapHierarchyDocumentChildrenToTreeNodes } from './projectHierarchyTreeMapperWiring'
 import { shouldReloadProjectHierarchyTreeNodeChildren } from '../functions/projectHierarchyTreeLazyLoadChildReload'
 import {
   finalizeProjectHierarchyTreePlacementTopLevelChildren
 } from './projectHierarchyTreeAddNewDocumentNode'
-import { mergeLoadedChildrenIntoNode } from '../functions/projectHierarchyTreeMergeLoadedChildren'
+import { mergeLoadedChildrenIntoNode } from './projectHierarchyTreeMergeLoadedChildrenWiring'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 
 export async function refreshProjectHierarchyTreeNodeChildrenFromDatabase (deps: {

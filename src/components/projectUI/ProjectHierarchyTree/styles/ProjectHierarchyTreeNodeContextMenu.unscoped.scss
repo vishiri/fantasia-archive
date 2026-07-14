@@ -1,4 +1,5 @@
 @use './variables' as *;
+@use '../../../../css/app.palette.scss' as *;
 @use '../../../globals/AppControlMenus/styles/variables' as appControlMenus;
 @use '../../../globals/AppControlSingleMenu/styles/variables' as appControlSingleMenu;
 @use '../../../../css/globals/paletteGlobals.variables.scss' as paletteGlobals;
@@ -19,8 +20,6 @@
 .projectHierarchyTreeNodeContextMenu.q-menu {
   .projectHierarchyTreeNodeContextMenu__item.q-item {
     align-items: center;
-    min-height: appControlSingleMenu.$appControlSingleMenu-item-minHeight;
-    padding: $qItem-padding;
 
     &:hover:not([aria-disabled='true']),
     &:focus:not([aria-disabled='true']) {
@@ -36,6 +35,17 @@
   .projectHierarchyTreeNodeContextMenu__icon.q-icon {
     font-size: paletteGlobals.$iconSize;
   }
+}
+
+.projectHierarchyTreeNodeContextMenu__pointerAnchor {
+  pointer-events: none;
+  position: fixed;
+  z-index: -1;
+}
+
+.projectHierarchyTreeNodeContextMenu__separator {
+  background-color: fa-v('primary-bright', $primary-bright);
+  height: appControlSingleMenu.$appControlSingleMenu-separator-height !important;
 }
 
 .projectHierarchyTreeNodeContextMenu__primaryLabel {

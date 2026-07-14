@@ -11,8 +11,10 @@ export function createProjectHierarchyTreeSessionBulkContextMenuWiring (deps: {
     flushDeferredTreeRevisionPublish: () => void | Promise<void>
   }
   nextTick: () => Promise<void>
+  onAddNewDocumentRowClick: (node: I_faProjectHierarchyTreeHeTreeNode) => void
   openNodeIds: Ref<Set<string>>
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
+  resolvePreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   treeMountKey: Ref<number>
@@ -35,13 +37,18 @@ export function createProjectHierarchyTreeSessionBulkContextMenuWiring (deps: {
   })
   const nodeContextMenuWiring = createProjectHierarchyTreeNodeContextMenuWiring({
     bulkExpandCollapseWiring,
+    onAddNewDocumentRowClick: deps.onAddNewDocumentRowClick,
+    resolvePreferredLanguageCode: deps.resolvePreferredLanguageCode,
     treeData: deps.treeData
   })
 
   return {
+    contextMenuAddNewRowIcon: nodeContextMenuWiring.contextMenuAddNewRowIcon,
+    contextMenuAddNewRowLabel: nodeContextMenuWiring.contextMenuAddNewRowLabel,
     contextMenuAnchorNodeId: nodeContextMenuWiring.contextMenuAnchorNodeId,
     isNodeContextMenuOpen: nodeContextMenuWiring.isNodeContextMenuOpen,
-    nodeMenuTargetElement: nodeContextMenuWiring.nodeMenuTargetElement,
+    nodeMenuPointerPosition: nodeContextMenuWiring.nodeMenuPointerPosition,
+    onAddNewDocumentFromContextMenuClick: nodeContextMenuWiring.onAddNewDocumentFromContextMenuClick,
     onCollapseAllUnderNodeClick: nodeContextMenuWiring.onCollapseAllUnderNodeClick,
     onExpandAllUnderNodeClick: nodeContextMenuWiring.onExpandAllUnderNodeClick,
     onNodeContextMenuHide: nodeContextMenuWiring.onNodeContextMenuHide,
