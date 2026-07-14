@@ -1,0 +1,13 @@
+@use './variables' as appControlMenus;
+@use '../../AppControlSingleMenu/styles/variables' as appControlSingleMenu;
+
+@mixin fa-context-menu-separator-group {
+  background-color: appControlMenus.$appControlMenus-separatorColor;
+  height: appControlSingleMenu.$appControlSingleMenu-separator-height !important;
+}
+
+@mixin fa-context-menu-separator-alt {
+  background-color: appControlMenus.$appControlMenus-separatorAltColor;
+  height: appControlSingleMenu.$appControlSingleMenu-separator-height !important;
+  opacity: 0.2;
+}

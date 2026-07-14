@@ -4,7 +4,7 @@ import { formatFaKeybindCommandLabelFromSnapshot } from 'app/src/scripts/keybind
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 
 import { createAppControlSingleMenu } from './functions/createAppControlSingleMenu'
-import { appControlShouldShowSeparatorAltBeforeItem } from './functions/appControlSingleMenuSeparatorAlt'
+import { contextMenuShouldShowSeparatorAltBeforeItem as appControlShouldShowSeparatorAltBeforeItem } from '../../AppControlMenus/scripts/functions/contextMenuShouldShowSeparatorAltBeforeItem'
 import { resolveAppControlMenuItemColorClasses } from './functions/resolveAppControlMenuItemColorClasses'
 
 const appControlSingleMenuApi = createAppControlSingleMenu({
