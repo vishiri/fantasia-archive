@@ -15,6 +15,7 @@ import {
 } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager'
 import { normalizeDialogProjectSettingsDocumentTemplateWorldAppendixTranslations } from './dialogProjectSettingsDocumentTemplateWorldAppendixDraft'
 import { formatFaLocaleSingularPluralMissingTranslationWarningTooltip } from 'app/src/scripts/localeTranslations/functions/formatFaLocaleSingularPluralMissingTranslationWarningTooltip'
+import { resolveTrimmedIconOrDefault } from 'app/src/scripts/faIcons/faIconDisplay_manager'
 
 /**
  * Resolves the document template title shown in Project Settings for the active UI language.
@@ -122,11 +123,7 @@ export function resolveDialogProjectSettingsDocumentTemplateDisplayIcon (
   icon: string,
   emptyPlaceholderIcon: string
 ): string {
-  const trimmed = icon.trim()
-  if (trimmed.length > 0) {
-    return trimmed
-  }
-  return emptyPlaceholderIcon
+  return resolveTrimmedIconOrDefault(icon, emptyPlaceholderIcon)
 }
 
 /**

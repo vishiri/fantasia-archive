@@ -50,7 +50,6 @@
       :offset="menuOffset"
       role="menu"
       self="top left"
-      square
       :target="swatchAnchorRef ?? undefined"
       transition-hide="fade"
       transition-show="fade"

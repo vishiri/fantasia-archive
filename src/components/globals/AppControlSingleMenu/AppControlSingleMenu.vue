@@ -22,7 +22,6 @@
     <!-- Main menu - Content -->
     <q-menu
       anchor="bottom left"
-      square
       dark
       role="menu"
       transition-show="jump-down"
@@ -97,7 +96,6 @@
               :model-value="openSubmenuRowIndex === index"
               anchor="top end"
               self="top start"
-              square
               dark
               role="menu"
               transition-show="jump-right"

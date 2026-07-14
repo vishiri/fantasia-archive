@@ -68,7 +68,6 @@
     no-parent-event
     no-refocus
     self="top left"
-    square
     :style="props.lockedMenuContentStyle"
     :target="props.menuTarget"
     @before-show="props.onTranslationsMenuBeforeShow"

@@ -20,8 +20,6 @@
   }
 
   &__item {
-    min-height: $appControlSingleMenu-item-minHeight;
-
     &--muted {
       color: $appControlSingleMenu-item-muted-color;
     }
@@ -29,11 +27,6 @@
     &:hover:not([aria-disabled="true"]),
     &:focus:not([aria-disabled="true"]) {
       color: $appControlMenus-singleHover;
-    }
-
-    /* Text legibility fix: red and green blend too much into each other without a little shadow */
-    &.text-secondary {
-      text-shadow: $appControlSingleMenu-item-secondary-textShadow;
     }
   }
 
@@ -45,7 +38,7 @@
   &__separatorAlt {
     background-color: $appControlMenus-separatorAltColor;
     height: $appControlSingleMenu-separator-height !important;
-    opacity: 0.4;
+    opacity: 0.2;
   }
 
   &__keybindText {

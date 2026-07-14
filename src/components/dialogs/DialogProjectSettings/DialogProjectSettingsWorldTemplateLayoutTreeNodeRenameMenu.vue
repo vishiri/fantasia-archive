@@ -11,7 +11,6 @@
     no-parent-event
     no-refocus
     self="top left"
-    square
     :target="menuTarget ?? undefined"
     transition-hide="fade"
     transition-show="fade"

@@ -357,6 +357,23 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 }
 
 .q-menu {
+  border-radius: $qMenu-borderRadius;
+  overflow: hidden;
+
+  .q-item {
+    min-height: $qMenu-item-minHeight;
+    padding: $qMenu-item-padding;
+
+    /* Legibility: destructive label tint vs background; labels only (main section), not icons. */
+    &.text-negative,
+    &.text-secondary {
+      .q-item__section--main {
+        font-weight: $qMenu-negativeMenuItemLabel-fontWeight;
+        text-shadow: $qMenu-negativeMenuItemLabel-textShadow;
+      }
+    }
+  }
+
   &--dark {
 
     /* Tweak for default light shadow rendering in the dark-mode variation of the element */

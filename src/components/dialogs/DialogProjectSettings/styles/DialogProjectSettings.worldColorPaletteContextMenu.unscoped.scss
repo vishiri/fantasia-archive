@@ -8,9 +8,6 @@
 }
 
 .dialogProjectSettingsWorldColorPaletteSwatch__contextMenuItem {
-  min-height: $dialogProjectSettings-worldColorPalette-contextMenu-item-minHeight;
-  text-shadow: $dialogProjectSettings-worldColorPalette-contextMenu-item-textShadow;
-
   &:hover:not([aria-disabled='true']),
   &:focus:not([aria-disabled='true']) {
     color: $dialogProjectSettings-worldColorPalette-contextMenu-hoverColor;

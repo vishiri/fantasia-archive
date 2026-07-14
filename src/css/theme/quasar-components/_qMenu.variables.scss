@@ -1,2 +1,9 @@
+@use '../../app.palette.scss' as *;
+
 /* QUASAR COMPONENT - Q-MENU */
+$qMenu-borderRadius: 4px;
+$qMenu-item-minHeight: 46px;
+$qMenu-item-padding: 9.5px 16px;
+$qMenu-negativeMenuItemLabel-fontWeight: 500;
+$qMenu-negativeMenuItemLabel-textShadow: 0 0 3px fa-v('black', $black);
 $qMenu-subMenu-zIndex: 5999;
