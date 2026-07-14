@@ -1,29 +1,24 @@
+import type { I_faActionPayloadMap, T_faActionId } from 'app/types/I_faActionManagerDomain'
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
+import {
+  resolveProjectDocumentControlBarTabCopyBackgroundColorText,
+  resolveProjectDocumentControlBarTabCopyTextColorText
+} from '../functions/projectDocumentControlBarTabCopyAppearanceColor'
 import { resolveProjectDocumentControlBarTabCopyNameText } from '../functions/projectDocumentControlBarTabCopyName'
 
 export function buildProjectDocumentControlBarTabContextMenuHandlers (input: {
-  copyToClipboard: (text: string) => Promise<void>
   findTabByDocumentId: (documentId: string) => I_faOpenedDocumentTab | null
   moveDocumentTab: (documentId: string, direction: 'left' | 'right') => void
-  notifyCreate: (options: {
-    caption?: string
-    color: string
-    faSkipNotifyConsoleLog?: boolean
-    icon: string
-    message: string
-    timeout?: number
-    type: string
-  }) => void
-  requestCloseTab: (documentId: string) => void
   resolveDocumentTabLabelFromOpenedTab: (tab: {
     displayNameDraft: string
     tabLabel: string
   }) => string
-  translateCopyNameFailed: () => string
-  translateCopyNameSuccess: () => string
+  runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
 }): {
+    onTabCopyBackgroundColorClick: (documentId: string) => Promise<void>
     onTabCopyNameClick: (documentId: string) => Promise<void>
+    onTabCopyTextColorClick: (documentId: string) => Promise<void>
     onTabMoveClick: (documentId: string, direction: 'left' | 'right') => void
   } {
   async function onTabCopyNameClick (documentId: string): Promise<void> {
@@ -42,29 +37,35 @@ export function buildProjectDocumentControlBarTabContextMenuHandlers (input: {
       return
     }
 
-    try {
-      await input.copyToClipboard(copyText)
-      input.notifyCreate({
-        color: 'positive',
-        faSkipNotifyConsoleLog: true,
-        icon: 'mdi-clipboard-check-outline',
-        message: input.translateCopyNameSuccess(),
-        timeout: 2500,
-        type: 'positive'
-      })
-    } catch (error: unknown) {
-      const reason = error instanceof Error ? error.message : String(error)
-      console.error('[ProjectDocumentControlBar] Failed to copy document tab name:', reason)
-      input.notifyCreate({
-        caption: reason,
-        color: 'negative',
-        faSkipNotifyConsoleLog: true,
-        icon: 'mdi-clipboard-alert-outline',
-        message: input.translateCopyNameFailed(),
-        timeout: 4000,
-        type: 'negative'
-      })
+    input.runFaAction('copyOpenedDocumentTabName', { documentId })
+  }
+
+  async function onTabCopyTextColorClick (documentId: string): Promise<void> {
+    const tab = input.findTabByDocumentId(documentId)
+    if (tab === null) {
+      return
     }
+
+    const copyText = resolveProjectDocumentControlBarTabCopyTextColorText(tab)
+    if (copyText === null) {
+      return
+    }
+
+    input.runFaAction('copyOpenedDocumentTabTextColor', { documentId })
+  }
+
+  async function onTabCopyBackgroundColorClick (documentId: string): Promise<void> {
+    const tab = input.findTabByDocumentId(documentId)
+    if (tab === null) {
+      return
+    }
+
+    const copyText = resolveProjectDocumentControlBarTabCopyBackgroundColorText(tab)
+    if (copyText === null) {
+      return
+    }
+
+    input.runFaAction('copyOpenedDocumentTabBackgroundColor', { documentId })
   }
 
   function onTabMoveClick (documentId: string, direction: 'left' | 'right'): void {
@@ -72,7 +73,9 @@ export function buildProjectDocumentControlBarTabContextMenuHandlers (input: {
   }
 
   return {
+    onTabCopyBackgroundColorClick,
     onTabCopyNameClick,
+    onTabCopyTextColorClick,
     onTabMoveClick
   }
 }

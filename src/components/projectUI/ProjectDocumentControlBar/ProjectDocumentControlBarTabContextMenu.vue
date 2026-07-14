@@ -14,7 +14,6 @@
     no-parent-event
     role="menu"
     self="top left"
-    square
     :target="tabMenuTargetElement ?? undefined"
     @hide="onRootMenuHide"
   >
@@ -24,7 +23,9 @@
       :close-all-tabs-without-changes-except-this-one-label="closeAllTabsWithoutChangesExceptThisOneLabel"
       :close-all-tabs-without-changes-label="closeAllTabsWithoutChangesLabel"
       :close-this-tab-label="closeThisTabLabel"
+      :copy-background-color-label="copyBackgroundColorLabel"
       :copy-name-label="copyNameLabel"
+      :copy-text-color-label="copyTextColorLabel"
       :delete-this-document-label="deleteThisDocumentLabel"
       :force-close-all-tabs-except-this-one-label="forceCloseAllTabsExceptThisOneLabel"
       :force-close-all-tabs-label="forceCloseAllTabsLabel"
@@ -38,7 +39,9 @@
       :on-close-all-tabs-without-changes-click="onCloseAllTabsWithoutChangesClick"
       :on-close-all-tabs-without-changes-except-this-one-click="onCloseAllTabsWithoutChangesExceptThisOneClick"
       :on-close-this-tab-click="onCloseThisTabClick"
+      :on-copy-background-color-click="onCopyBackgroundColorClick"
       :on-copy-name-click="onCopyNameClick"
+      :on-copy-text-color-click="onCopyTextColorClick"
       :on-delete-this-document-click="onDeleteThisDocumentClick"
       :on-force-close-all-tabs-click="onForceCloseAllTabsClick"
       :on-force-close-all-tabs-except-this-one-click="onForceCloseAllTabsExceptThisOneClick"
@@ -90,7 +93,9 @@ const props = defineProps<{
   onTabCloseAllWithoutChangesClick: () => void
   onTabCloseAllWithoutChangesExceptClick: (documentId: string) => void
   onTabCloseClick: (documentId: string) => void
+  onTabCopyBackgroundColorClick: (documentId: string) => Promise<void>
   onTabCopyNameClick: (documentId: string) => Promise<void>
+  onTabCopyTextColorClick: (documentId: string) => Promise<void>
   onTabDeleteClick: (documentId: string) => void | Promise<void>
   onTabForceCloseAllClick: () => void
   onTabForceCloseAllExceptClick: (documentId: string) => void
@@ -128,7 +133,9 @@ const {
   closeAllTabsWithoutChangesExceptThisOneLabel,
   closeAllTabsWithoutChangesLabel,
   closeThisTabLabel,
+  copyBackgroundColorLabel,
   copyNameLabel,
+  copyTextColorLabel,
   deleteThisDocumentLabel,
   forceCloseAllTabsExceptThisOneLabel,
   forceCloseAllTabsLabel,
@@ -142,7 +149,9 @@ const {
   onCloseAllTabsWithoutChangesClick,
   onCloseAllTabsWithoutChangesExceptThisOneClick,
   onCloseThisTabClick,
+  onCopyBackgroundColorClick,
   onCopyNameClick,
+  onCopyTextColorClick,
   onDeleteThisDocumentClick,
   onForceCloseAllTabsClick,
   onForceCloseAllTabsExceptThisOneClick,
@@ -162,7 +171,9 @@ const {
   onTabCloseAllWithoutChangesClick: props.onTabCloseAllWithoutChangesClick,
   onTabCloseAllWithoutChangesExceptClick: props.onTabCloseAllWithoutChangesExceptClick,
   onTabCloseClick: props.onTabCloseClick,
+  onTabCopyBackgroundColorClick: props.onTabCopyBackgroundColorClick,
   onTabCopyNameClick: props.onTabCopyNameClick,
+  onTabCopyTextColorClick: props.onTabCopyTextColorClick,
   onTabDeleteClick: props.onTabDeleteClick,
   onTabForceCloseAllClick: props.onTabForceCloseAllClick,
   onTabForceCloseAllExceptClick: props.onTabForceCloseAllExceptClick,

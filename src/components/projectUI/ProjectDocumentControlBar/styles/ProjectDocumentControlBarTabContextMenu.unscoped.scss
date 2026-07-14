@@ -32,8 +32,6 @@
 .projectDocumentControlBarTabContextMenu__browseSubmenu.q-menu {
   .projectDocumentControlBarTabContextMenu__item.q-item {
     align-items: center;
-    min-height: appControlSingleMenu.$appControlSingleMenu-item-minHeight;
-    padding: $qItem-padding;
 
     &.projectDocumentControlBarTabContextMenu__item--browseActivator {
       .projectDocumentControlBarTabContextMenu__primaryLabel,
@@ -55,10 +53,6 @@
       &:focus:not([aria-disabled='true']) {
         color: appControlMenus.$appControlMenus-singleHover;
       }
-    }
-
-    &.text-secondary {
-      text-shadow: appControlSingleMenu.$appControlSingleMenu-item-secondary-textShadow;
     }
   }
 

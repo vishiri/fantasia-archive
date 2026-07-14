@@ -1,65 +1,61 @@
 import { expect, test, vi } from 'vitest'
 
+import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+
 import { buildProjectDocumentControlBarTabContextMenuHandlers } from '../projectDocumentControlBarTabContextMenuWiring'
 
-test('Test that buildProjectDocumentControlBarTabContextMenuHandlers copies the resolved tab label', async () => {
-  const copyToClipboard = vi.fn(async () => undefined)
-  const notifyCreate = vi.fn()
-  const moveDocumentTab = vi.fn()
+function createPersistedTab (overrides: Partial<I_faOpenedDocumentTab> = {}): I_faOpenedDocumentTab {
+  return {
+    displayNameDraft: 'Hero',
+    documentBackgroundColorDraft: '',
+    documentId: 'doc-a',
+    documentTextColorDraft: '',
+    editState: false,
+    hasUnsavedChanges: false,
+    persistenceState: 'persisted',
+    savedDisplayName: 'Saved',
+    savedDocumentBackgroundColor: '',
+    savedDocumentTextColor: '',
+    tabLabel: 'Character',
+    templateIcon: 'mdi-account',
+    ...overrides
+  }
+}
 
-  const handlers = buildProjectDocumentControlBarTabContextMenuHandlers({
-    copyToClipboard,
-    findTabByDocumentId: (documentId) => {
-      if (documentId !== 'doc-a') {
-        return null
-      }
-      return {
-        displayNameDraft: ' Draft ',
-        documentId: 'doc-a',
-        persistenceState: 'persisted',
-        editState: false,
-        hasUnsavedChanges: false,
-        savedDisplayName: 'Saved',
-
-        documentTextColorDraft: '',
-
-        savedDocumentTextColor: '',
-
-        documentBackgroundColorDraft: '',
-
-        savedDocumentBackgroundColor: '',
-        tabLabel: 'Character',
-        templateIcon: 'mdi-account'
-      }
-    },
-    moveDocumentTab,
-    notifyCreate,
-    requestCloseTab: vi.fn(),
+function createHandlers (input: {
+  findTabByDocumentId?: (documentId: string) => I_faOpenedDocumentTab | null
+  moveDocumentTab?: (documentId: string, direction: 'left' | 'right') => void
+  runFaAction?: (id: string, payload: unknown) => void
+} = {}) {
+  return buildProjectDocumentControlBarTabContextMenuHandlers({
+    findTabByDocumentId: input.findTabByDocumentId ?? (() => createPersistedTab()),
+    moveDocumentTab: input.moveDocumentTab ?? vi.fn(),
     resolveDocumentTabLabelFromOpenedTab: ({ displayNameDraft, tabLabel }) => {
       return displayNameDraft.trim().length > 0 ? displayNameDraft.trim() : tabLabel
     },
-    translateCopyNameFailed: () => 'Copy failed',
-    translateCopyNameSuccess: () => 'Copy success'
+    runFaAction: input.runFaAction ?? vi.fn()
+  })
+}
+
+test('Test that buildProjectDocumentControlBarTabContextMenuHandlers dispatches copy name through runFaAction', async () => {
+  const runFaAction = vi.fn()
+
+  const handlers = createHandlers({
+    findTabByDocumentId: () => createPersistedTab({ displayNameDraft: ' Draft ' }),
+    runFaAction
   })
 
   await handlers.onTabCopyNameClick('doc-a')
 
-  expect(copyToClipboard).toHaveBeenCalledWith('Draft')
-  expect(notifyCreate).toHaveBeenCalledOnce()
+  expect(runFaAction).toHaveBeenCalledWith('copyOpenedDocumentTabName', { documentId: 'doc-a' })
 })
 
 test('Test that buildProjectDocumentControlBarTabContextMenuHandlers moveTab calls moveDocumentTab for the clicked tab', () => {
   const moveDocumentTab = vi.fn()
 
-  const handlers = buildProjectDocumentControlBarTabContextMenuHandlers({
-    copyToClipboard: vi.fn(),
+  const handlers = createHandlers({
     findTabByDocumentId: () => null,
-    moveDocumentTab,
-    notifyCreate: vi.fn(),
-    requestCloseTab: vi.fn(),
-    resolveDocumentTabLabelFromOpenedTab: () => 'Name',
-    translateCopyNameFailed: () => 'Copy failed',
-    translateCopyNameSuccess: () => 'Copy success'
+    moveDocumentTab
   })
 
   handlers.onTabMoveClick('doc-b', 'right')
@@ -68,112 +64,92 @@ test('Test that buildProjectDocumentControlBarTabContextMenuHandlers moveTab cal
 })
 
 test('Test that buildProjectDocumentControlBarTabContextMenuHandlers skips copy when tab is missing', async () => {
-  const copyToClipboard = vi.fn()
-  const notifyCreate = vi.fn()
+  const runFaAction = vi.fn()
 
-  const handlers = buildProjectDocumentControlBarTabContextMenuHandlers({
-    copyToClipboard,
+  const handlers = createHandlers({
     findTabByDocumentId: () => null,
-    moveDocumentTab: vi.fn(),
-    notifyCreate,
-    requestCloseTab: vi.fn(),
-    resolveDocumentTabLabelFromOpenedTab: () => 'Name',
-    translateCopyNameFailed: () => 'Copy failed',
-    translateCopyNameSuccess: () => 'Copy success'
+    runFaAction
   })
 
   await handlers.onTabCopyNameClick('missing')
 
-  expect(copyToClipboard).not.toHaveBeenCalled()
-  expect(notifyCreate).not.toHaveBeenCalled()
+  expect(runFaAction).not.toHaveBeenCalled()
 })
 
-test('Test that buildProjectDocumentControlBarTabContextMenuHandlers skips copy when trimmed name is empty', async () => {
-  const copyToClipboard = vi.fn()
-  const notifyCreate = vi.fn()
+test('Test that buildProjectDocumentControlBarTabContextMenuHandlers skips copy when resolved label is empty', async () => {
+  const runFaAction = vi.fn()
 
-  const handlers = buildProjectDocumentControlBarTabContextMenuHandlers({
-    copyToClipboard,
-    findTabByDocumentId: () => ({
+  const handlers = createHandlers({
+    findTabByDocumentId: () => createPersistedTab({
       displayNameDraft: '   ',
-      documentId: 'doc-a',
-      persistenceState: 'persisted',
-      editState: false,
-      hasUnsavedChanges: false,
-      savedDisplayName: 'Saved',
-
-      documentTextColorDraft: '',
-
-      savedDocumentTextColor: '',
-
-      documentBackgroundColorDraft: '',
-
-      savedDocumentBackgroundColor: '',
-      tabLabel: 'Character',
-      templateIcon: 'mdi-account'
+      tabLabel: ''
     }),
-    moveDocumentTab: vi.fn(),
-    notifyCreate,
-    requestCloseTab: vi.fn(),
-    resolveDocumentTabLabelFromOpenedTab: ({ displayNameDraft }) => displayNameDraft,
-    translateCopyNameFailed: () => 'Copy failed',
-    translateCopyNameSuccess: () => 'Copy success'
+    runFaAction
   })
 
   await handlers.onTabCopyNameClick('doc-a')
 
-  expect(copyToClipboard).not.toHaveBeenCalled()
-  expect(notifyCreate).not.toHaveBeenCalled()
+  expect(runFaAction).not.toHaveBeenCalled()
 })
 
-test('Test that buildProjectDocumentControlBarTabContextMenuHandlers reports clipboard failures', async () => {
-  const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
-  const copyToClipboard = vi.fn(async () => {
-    throw new Error('clipboard denied')
+test('Test that buildProjectDocumentControlBarTabContextMenuHandlers dispatches text color copy through runFaAction', async () => {
+  const runFaAction = vi.fn()
+
+  const handlers = createHandlers({
+    findTabByDocumentId: () => createPersistedTab({ documentTextColorDraft: '  #AABBCC  ' }),
+    runFaAction
   })
-  const notifyCreate = vi.fn()
 
-  const handlers = buildProjectDocumentControlBarTabContextMenuHandlers({
-    copyToClipboard,
-    findTabByDocumentId: () => ({
-      displayNameDraft: 'Hero',
-      documentId: 'doc-a',
-      persistenceState: 'persisted',
-      editState: false,
-      hasUnsavedChanges: false,
-      savedDisplayName: 'Saved',
+  await handlers.onTabCopyTextColorClick('doc-a')
 
-      documentTextColorDraft: '',
+  expect(runFaAction).toHaveBeenCalledWith('copyOpenedDocumentTabTextColor', { documentId: 'doc-a' })
+})
 
-      savedDocumentTextColor: '',
+test('Test that buildProjectDocumentControlBarTabContextMenuHandlers dispatches background color copy through runFaAction', async () => {
+  const runFaAction = vi.fn()
 
+  const handlers = createHandlers({
+    findTabByDocumentId: () => createPersistedTab({ documentBackgroundColorDraft: ' #112233 ' }),
+    runFaAction
+  })
+
+  await handlers.onTabCopyBackgroundColorClick('doc-a')
+
+  expect(runFaAction).toHaveBeenCalledWith(
+    'copyOpenedDocumentTabBackgroundColor',
+    { documentId: 'doc-a' }
+  )
+})
+
+test('Test that buildProjectDocumentControlBarTabContextMenuHandlers skips color copy when tab is missing', async () => {
+  const runFaAction = vi.fn()
+
+  const handlers = createHandlers({
+    findTabByDocumentId: () => null,
+    runFaAction
+  })
+
+  await handlers.onTabCopyTextColorClick('missing')
+  await handlers.onTabCopyBackgroundColorClick('missing')
+
+  expect(runFaAction).not.toHaveBeenCalled()
+})
+
+test('Test that buildProjectDocumentControlBarTabContextMenuHandlers skips color copy when draft is empty', async () => {
+  const runFaAction = vi.fn()
+
+  const handlers = createHandlers({
+    findTabByDocumentId: () => createPersistedTab({
       documentBackgroundColorDraft: '',
-
-      savedDocumentBackgroundColor: '',
-      tabLabel: 'Character',
-      templateIcon: 'mdi-account'
+      documentTextColorDraft: '   ',
+      savedDocumentBackgroundColor: '#112233',
+      savedDocumentTextColor: '#AABBCC'
     }),
-    moveDocumentTab: vi.fn(),
-    notifyCreate,
-    requestCloseTab: vi.fn(),
-    resolveDocumentTabLabelFromOpenedTab: ({ displayNameDraft }) => displayNameDraft,
-    translateCopyNameFailed: () => 'Copy failed',
-    translateCopyNameSuccess: () => 'Copy success'
+    runFaAction
   })
 
-  await handlers.onTabCopyNameClick('doc-a')
+  await handlers.onTabCopyTextColorClick('doc-a')
+  await handlers.onTabCopyBackgroundColorClick('doc-a')
 
-  expect(notifyCreate).toHaveBeenCalledWith(expect.objectContaining({
-    caption: 'clipboard denied',
-    message: 'Copy failed',
-    type: 'negative'
-  }))
-
-  copyToClipboard.mockRejectedValueOnce('plain failure')
-  await handlers.onTabCopyNameClick('doc-a')
-  expect(notifyCreate).toHaveBeenLastCalledWith(expect.objectContaining({
-    caption: 'plain failure'
-  }))
-
-  consoleErrorSpy.mockRestore()
+  expect(runFaAction).not.toHaveBeenCalled()
 })

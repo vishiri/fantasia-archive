@@ -1,7 +1,5 @@
 import { computed } from 'vue'
-import { copyToClipboard } from 'quasar'
 import { storeToRefs } from 'pinia'
-import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
@@ -27,8 +25,7 @@ import {
 } from '../functions/projectDocumentControlBarVisibility'
 import { buildProjectDocumentControlBarAssembleInput } from './projectDocumentControlBarAssembleInput'
 import {
-  getProjectDocumentControlBarKeybindsSnapshot,
-  notifyCreateForProjectDocumentControlBar
+  getProjectDocumentControlBarKeybindsSnapshot
 } from './projectDocumentControlBarManagerDepsWiring'
 import { assembleProjectDocumentControlBarApi } from './projectDocumentControlBarSessionWiring'
 
@@ -40,8 +37,6 @@ export const useProjectDocumentControlBar = createUseProjectDocumentControlBar({
   assembleProjectDocumentControlBarApi,
   buildProjectDocumentControlBarAssembleInput,
   computed,
-  copyToClipboard,
-  notifyCreate: notifyCreateForProjectDocumentControlBar,
   resolveActiveDocumentTabName,
   resolveDocumentTabLabelFromOpenedTab,
   resolveFaDocumentWorkspaceRouteDocumentId,
@@ -58,6 +53,5 @@ export const useProjectDocumentControlBar = createUseProjectDocumentControlBar({
   S_FaProjectHierarchyTree,
   S_FaUserSettings,
   storeToRefs,
-  useI18n,
   useRoute
 })

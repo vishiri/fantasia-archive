@@ -66,6 +66,48 @@
       </q-item-section>
     </q-item>
 
+    <q-item
+      v-close-popup
+      clickable
+      class="projectDocumentControlBarTabContextMenu__item non-selectable"
+      data-test-locator="projectDocumentControlBar-tabContextMenu-copyTextColor"
+      role="menuitem"
+      @click="onCopyTextColorClick"
+    >
+      <q-item-section>
+        <span class="projectDocumentControlBarTabContextMenu__primaryLabel">
+          {{ copyTextColorLabel }}
+        </span>
+      </q-item-section>
+      <q-item-section avatar>
+        <q-icon
+          class="projectDocumentControlBarTabContextMenu__icon"
+          name="mdi-eyedropper"
+        />
+      </q-item-section>
+    </q-item>
+
+    <q-item
+      v-close-popup
+      clickable
+      class="projectDocumentControlBarTabContextMenu__item non-selectable"
+      data-test-locator="projectDocumentControlBar-tabContextMenu-copyBackgroundColor"
+      role="menuitem"
+      @click="onCopyBackgroundColorClick"
+    >
+      <q-item-section>
+        <span class="projectDocumentControlBarTabContextMenu__primaryLabel">
+          {{ copyBackgroundColorLabel }}
+        </span>
+      </q-item-section>
+      <q-item-section avatar>
+        <q-icon
+          class="projectDocumentControlBarTabContextMenu__icon"
+          name="mdi-format-color-fill"
+        />
+      </q-item-section>
+    </q-item>
+
     <q-separator
       class="projectDocumentControlBarTabContextMenu__separator"
       dark
@@ -167,7 +209,9 @@ defineProps<{
   closeAllTabsWithoutChangesExceptThisOneLabel: string
   closeAllTabsWithoutChangesLabel: string
   closeThisTabLabel: string
+  copyBackgroundColorLabel: string
   copyNameLabel: string
+  copyTextColorLabel: string
   deleteThisDocumentLabel: string
   forceCloseAllTabsExceptThisOneLabel: string
   forceCloseAllTabsLabel: string
@@ -181,7 +225,9 @@ defineProps<{
   onCloseAllTabsWithoutChangesClick: () => void
   onCloseAllTabsWithoutChangesExceptThisOneClick: () => void
   onCloseThisTabClick: () => void
+  onCopyBackgroundColorClick: () => void
   onCopyNameClick: () => void
+  onCopyTextColorClick: () => void
   onDeleteThisDocumentClick: () => void
   onForceCloseAllTabsClick: () => void
   onForceCloseAllTabsExceptThisOneClick: () => void

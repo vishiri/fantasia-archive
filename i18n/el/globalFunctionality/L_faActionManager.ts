@@ -4,6 +4,9 @@ export default {
   queueOverflow: 'Πάρα πολλές εκκρεμείς ενέργειες. αυτό έπεσε.',
   labels: {
     closeApp: 'Κλείσιμο παραθύρου',
+    copyOpenedDocumentTabBackgroundColor: 'Copy document tab background color',
+    copyOpenedDocumentTabName: 'Copy document tab name',
+    copyOpenedDocumentTabTextColor: 'Copy document tab text color',
     languageSwitch: 'Εναλλαγή γλώσσας διεπαφής',
     moveActiveOpenedDocumentTabLeft: 'Move document tab left',
     moveActiveOpenedDocumentTabRight: 'Move document tab right',

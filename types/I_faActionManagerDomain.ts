@@ -51,6 +51,9 @@ export const FA_ACTION_IDS = [
   'editActiveDocument',
   'createTemporaryOpenedDocument',
   'saveOpenedDocumentDisplayName',
+  'copyOpenedDocumentTabName',
+  'copyOpenedDocumentTabTextColor',
+  'copyOpenedDocumentTabBackgroundColor',
   'focusPreviousOpenedDocumentTab',
   'focusNextOpenedDocumentTab',
   'moveActiveOpenedDocumentTabLeft',
@@ -144,6 +147,9 @@ export interface I_faActionPayloadMap {
   editActiveDocument: void
   createTemporaryOpenedDocument: import('app/types/I_faOpenedDocumentsDomain').I_faTemporaryOpenedDocumentCreateInput
   saveOpenedDocumentDisplayName: { documentId: string, keepEditMode: boolean }
+  copyOpenedDocumentTabName: { documentId: string }
+  copyOpenedDocumentTabTextColor: { documentId: string }
+  copyOpenedDocumentTabBackgroundColor: { documentId: string }
   focusPreviousOpenedDocumentTab: void
   focusNextOpenedDocumentTab: void
   moveActiveOpenedDocumentTabLeft: void

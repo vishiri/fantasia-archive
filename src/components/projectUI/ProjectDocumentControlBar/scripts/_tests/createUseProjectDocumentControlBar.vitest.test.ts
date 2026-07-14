@@ -73,11 +73,6 @@ function mountUseProjectDocumentControlBar (input: {
     resolveProjectDocumentControlBarSaveButtonColor,
     formatFaKeybindCommandLabelFromSnapshot: () => null,
     getKeybindsSnapshot: () => null,
-    copyToClipboard: vi.fn(async () => undefined),
-    notifyCreate: vi.fn(),
-    useI18n: () => ({
-      t: (key: string) => key
-    }),
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode: input.enterDocumentEditMode ?? (() => undefined),
       findTabByDocumentId: (documentId: string) => {
@@ -189,11 +184,6 @@ test('Test that activeDocumentTabName mirrors the store active document when tha
     resolveProjectDocumentControlBarSaveButtonColor,
     formatFaKeybindCommandLabelFromSnapshot: () => null,
     getKeybindsSnapshot: () => null,
-    copyToClipboard: vi.fn(async () => undefined),
-    notifyCreate: vi.fn(),
-    useI18n: () => ({
-      t: (key: string) => key
-    }),
     runFaAction: vi.fn(),
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode: () => undefined,
@@ -513,11 +503,6 @@ test('Test that edit and save handlers no-op when no active document is selected
     resolveProjectDocumentControlBarSaveButtonColor,
     formatFaKeybindCommandLabelFromSnapshot: () => null,
     getKeybindsSnapshot: () => null,
-    copyToClipboard: vi.fn(async () => undefined),
-    notifyCreate: vi.fn(),
-    useI18n: () => ({
-      t: (key: string) => key
-    }),
     runFaAction,
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode,
@@ -632,11 +617,6 @@ test('Test that activeDocumentTab is null when the active id does not match an o
     resolveProjectDocumentControlBarSaveButtonColor,
     formatFaKeybindCommandLabelFromSnapshot: () => null,
     getKeybindsSnapshot: () => null,
-    copyToClipboard: vi.fn(async () => undefined),
-    notifyCreate: vi.fn(),
-    useI18n: () => ({
-      t: (key: string) => key
-    }),
     runFaAction: vi.fn(),
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode: () => undefined,
@@ -711,11 +691,6 @@ test('Test that createUseProjectDocumentControlBar exposes keybind tooltip label
         schemaVersion: 1
       }
     }),
-    copyToClipboard: vi.fn(async () => undefined),
-    notifyCreate: vi.fn(),
-    useI18n: () => ({
-      t: (key: string) => key
-    }),
     runFaAction: vi.fn(),
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode: () => undefined,
@@ -775,11 +750,6 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
     resolveProjectDocumentControlBarSaveButtonColor,
     formatFaKeybindCommandLabelFromSnapshot: () => null,
     getKeybindsSnapshot: () => null,
-    copyToClipboard: vi.fn(async () => undefined),
-    notifyCreate: vi.fn(),
-    useI18n: () => ({
-      t: (key: string) => key
-    }),
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode: vi.fn(),
       findTabByDocumentId: (documentId: string) => {
@@ -859,9 +829,8 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
 })
 
 test('Test that createUseProjectDocumentControlBar tab copy and move handlers delegate to the opened documents store', async () => {
-  const copyToClipboard = vi.fn(async () => undefined)
   const moveDocumentTab = vi.fn()
-  const notifyCreate = vi.fn()
+  const runFaAction = vi.fn()
   const findTabByDocumentId = vi.fn((documentId: string) => {
     return documentId === 'doc-a'
       ? {
@@ -896,12 +865,7 @@ test('Test that createUseProjectDocumentControlBar tab copy and move handlers de
     resolveProjectDocumentControlBarSaveButtonColor,
     formatFaKeybindCommandLabelFromSnapshot: () => null,
     getKeybindsSnapshot: () => null,
-    copyToClipboard,
-    notifyCreate,
-    useI18n: () => ({
-      t: (key: string) => key
-    }),
-    runFaAction: vi.fn(),
+    runFaAction,
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode: vi.fn(),
       findTabByDocumentId,
@@ -952,27 +916,7 @@ test('Test that createUseProjectDocumentControlBar tab copy and move handlers de
 
   await api.onTabCopyNameClick('doc-a')
   expect(findTabByDocumentId).toHaveBeenCalledWith('doc-a')
-  expect(copyToClipboard).toHaveBeenCalledWith('Hero')
-  expect(notifyCreate).toHaveBeenCalledWith({
-    color: 'positive',
-    faSkipNotifyConsoleLog: true,
-    icon: 'mdi-clipboard-check-outline',
-    message: 'projectUI.projectDocumentControlBar.copyNameSuccess',
-    timeout: 2500,
-    type: 'positive'
-  })
-
-  copyToClipboard.mockRejectedValueOnce(new Error('clipboard blocked'))
-  await api.onTabCopyNameClick('doc-a')
-  expect(notifyCreate).toHaveBeenCalledWith({
-    caption: 'clipboard blocked',
-    color: 'negative',
-    faSkipNotifyConsoleLog: true,
-    icon: 'mdi-clipboard-alert-outline',
-    message: 'projectUI.projectDocumentControlBar.copyNameFailed',
-    timeout: 4000,
-    type: 'negative'
-  })
+  expect(runFaAction).toHaveBeenCalledWith('copyOpenedDocumentTabName', { documentId: 'doc-a' })
 
   api.onTabMoveClick('doc-a', 'left')
   expect(moveDocumentTab).toHaveBeenCalledWith('doc-a', 'left')

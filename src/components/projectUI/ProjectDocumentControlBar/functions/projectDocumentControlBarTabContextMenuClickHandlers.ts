@@ -4,7 +4,9 @@ export function buildProjectDocumentControlBarTabContextMenuClickHandlers (input
   onTabCloseAllWithoutChangesClick: () => void
   onTabCloseAllWithoutChangesExceptClick: (documentId: string) => void
   onTabCloseClick: (documentId: string) => void
+  onTabCopyBackgroundColorClick: (documentId: string) => Promise<void>
   onTabCopyNameClick: (documentId: string) => Promise<void>
+  onTabCopyTextColorClick: (documentId: string) => Promise<void>
   onTabDeleteClick: (documentId: string) => void | Promise<void>
   onTabForceCloseAllClick: () => void
   onTabForceCloseAllExceptClick: (documentId: string) => void
@@ -16,7 +18,9 @@ export function buildProjectDocumentControlBarTabContextMenuClickHandlers (input
     onCloseAllTabsWithoutChangesClick: () => void
     onCloseAllTabsWithoutChangesExceptThisOneClick: () => void
     onCloseThisTabClick: () => void
+    onCopyBackgroundColorClick: () => void
     onCopyNameClick: () => void
+    onCopyTextColorClick: () => void
     onDeleteThisDocumentClick: () => void
     onForceCloseAllTabsClick: () => void
     onForceCloseAllTabsExceptThisOneClick: () => void
@@ -35,6 +39,14 @@ export function buildProjectDocumentControlBarTabContextMenuClickHandlers (input
 
   function onCopyNameClick (): void {
     void input.onTabCopyNameClick(input.tab.documentId)
+  }
+
+  function onCopyTextColorClick (): void {
+    void input.onTabCopyTextColorClick(input.tab.documentId)
+  }
+
+  function onCopyBackgroundColorClick (): void {
+    void input.onTabCopyBackgroundColorClick(input.tab.documentId)
   }
 
   function onMoveTabLeftClick (): void {
@@ -73,7 +85,9 @@ export function buildProjectDocumentControlBarTabContextMenuClickHandlers (input
     onCloseAllTabsWithoutChangesClick,
     onCloseAllTabsWithoutChangesExceptThisOneClick,
     onCloseThisTabClick,
+    onCopyBackgroundColorClick,
     onCopyNameClick,
+    onCopyTextColorClick,
     onDeleteThisDocumentClick,
     onForceCloseAllTabsClick,
     onForceCloseAllTabsExceptThisOneClick,

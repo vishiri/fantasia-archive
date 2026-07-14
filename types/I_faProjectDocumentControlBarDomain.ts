@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'vue'
 
+import type { I_faActionPayloadMap, T_faActionId } from 'app/types/I_faActionManagerDomain'
 import type { I_faDocumentAppearanceChromeStyle } from 'app/types/I_faDocumentAppearanceChromeStyle'
 import type { I_faKeybindsSnapshot, T_faKeybindCommandId } from 'app/types/I_faKeybindsDomain'
 import type { I_computedRef } from 'app/types/I_vueCompositionShims'
@@ -20,7 +21,9 @@ export interface I_projectDocumentControlBarComposableApi {
   onTabCloseClick: (documentId: string) => void
   onTabCloseAllWithoutChangesClick: () => void
   onTabCloseAllWithoutChangesExceptClick: (documentId: string) => void
+  onTabCopyBackgroundColorClick: (documentId: string) => Promise<void>
   onTabCopyNameClick: (documentId: string) => Promise<void>
+  onTabCopyTextColorClick: (documentId: string) => Promise<void>
   onTabDeleteClick: (documentId: string) => void | Promise<void>
   onTabForceCloseAllClick: () => void
   onTabForceCloseAllExceptClick: (documentId: string) => void
@@ -53,26 +56,14 @@ export interface I_assembleProjectDocumentControlBarApiInput {
   getKeybindsSnapshot: () => I_faKeybindsSnapshot | null
   isDocumentControlBarDisabled: I_computedRef<boolean>
   isOnDocumentWorkspaceRoute: I_computedRef<boolean>
-  copyToClipboard: (text: string) => Promise<void>
   findTabByDocumentId: (documentId: string) => I_faOpenedDocumentTab | null
   moveDocumentTab: (documentId: string, direction: 'left' | 'right') => void
-  notifyCreate: (options: {
-    caption?: string
-    color: string
-    faSkipNotifyConsoleLog?: boolean
-    icon: string
-    message: string
-    timeout?: number
-    type: string
-  }) => void
   requestCloseTab: (documentId: string) => void
   requestDeleteDocument: (documentId: string) => void
   closeAllTabsWithoutChanges: () => void | Promise<void>
   closeTabsWithoutChangesExcept: (exceptDocumentId: string) => void | Promise<void>
   forceCloseAllTabs: () => void | Promise<void>
   forceCloseAllTabsExcept: (exceptDocumentId: string) => void | Promise<void>
-  translateCopyNameFailed: () => string
-  translateCopyNameSuccess: () => string
   resolveActiveDocumentTabName: (input: {
     activeDocumentId: string | null
     openedTabs: readonly { documentId: string }[]
@@ -100,10 +91,7 @@ export interface I_assembleProjectDocumentControlBarApiInput {
   resolveProjectDocumentControlBarSaveButtonColor: (input: {
     hasUnsavedChanges: boolean
   }) => T_projectDocumentControlBarSaveButtonColor
-  runFaAction: (
-    id: 'saveOpenedDocumentDisplayName',
-    payload: { documentId: string, keepEditMode: boolean }
-  ) => void
+  runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
   projectWorlds: I_computedRef<readonly I_faProjectHierarchyTreeWorkspaceWorld[]>
   tabs: I_computedRef<readonly I_faOpenedDocumentTab[]>
 }
@@ -118,7 +106,9 @@ export interface I_projectDocumentControlBarTabContextMenuInput {
   onTabCloseAllWithoutChangesClick: () => void
   onTabCloseAllWithoutChangesExceptClick: (documentId: string) => void
   onTabCloseClick: (documentId: string) => void
+  onTabCopyBackgroundColorClick: (documentId: string) => Promise<void>
   onTabCopyNameClick: (documentId: string) => Promise<void>
+  onTabCopyTextColorClick: (documentId: string) => Promise<void>
   onTabDeleteClick: (documentId: string) => void | Promise<void>
   onTabForceCloseAllClick: () => void
   onTabForceCloseAllExceptClick: (documentId: string) => void

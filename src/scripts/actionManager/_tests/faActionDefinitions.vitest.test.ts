@@ -79,7 +79,8 @@ const {
 }))
 
 vi.mock('quasar', () => ({
-  Notify: { create: vi.fn() }
+  Notify: { create: vi.fn() },
+  copyToClipboard: vi.fn(async () => undefined)
 }))
 
 vi.mock('app/i18n/externalFileLoader', () => ({

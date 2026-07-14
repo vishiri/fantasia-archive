@@ -6,7 +6,9 @@ export function buildProjectDocumentControlBarTabContextMenuLabels (input: {
   translateCloseAllTabsWithoutChanges: () => string
   translateCloseAllTabsWithoutChangesExceptThisOne: () => string
   translateCloseThisTab: () => string
+  translateCopyBackgroundColor: () => string
   translateCopyName: () => string
+  translateCopyTextColor: () => string
   translateDeleteThisDocument: () => string
   translateForceCloseAllTabs: () => string
   translateForceCloseAllTabsExceptThisOne: () => string
@@ -17,7 +19,9 @@ export function buildProjectDocumentControlBarTabContextMenuLabels (input: {
     closeAllTabsWithoutChangesExceptThisOneLabel: I_computedRef<string>
     closeAllTabsWithoutChangesLabel: I_computedRef<string>
     closeThisTabLabel: I_computedRef<string>
+    copyBackgroundColorLabel: I_computedRef<string>
     copyNameLabel: I_computedRef<string>
+    copyTextColorLabel: I_computedRef<string>
     deleteThisDocumentLabel: I_computedRef<string>
     forceCloseAllTabsExceptThisOneLabel: I_computedRef<string>
     forceCloseAllTabsLabel: I_computedRef<string>
@@ -30,6 +34,14 @@ export function buildProjectDocumentControlBarTabContextMenuLabels (input: {
 
   const copyNameLabel = input.computed(() => {
     return input.translateCopyName()
+  })
+
+  const copyTextColorLabel = input.computed(() => {
+    return input.translateCopyTextColor()
+  })
+
+  const copyBackgroundColorLabel = input.computed(() => {
+    return input.translateCopyBackgroundColor()
   })
 
   const moveTabLeftLabel = input.computed(() => {
@@ -69,7 +81,9 @@ export function buildProjectDocumentControlBarTabContextMenuLabels (input: {
     closeAllTabsWithoutChangesExceptThisOneLabel,
     closeAllTabsWithoutChangesLabel,
     closeThisTabLabel,
+    copyBackgroundColorLabel,
     copyNameLabel,
+    copyTextColorLabel,
     deleteThisDocumentLabel,
     forceCloseAllTabsExceptThisOneLabel,
     forceCloseAllTabsLabel,

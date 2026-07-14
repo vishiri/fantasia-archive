@@ -23,10 +23,15 @@ import {
 import {
   resolveShowProjectDocumentControlBarEditButton
 } from 'app/src/components/projectUI/ProjectDocumentControlBar/functions/projectDocumentControlBarEditMode'
+import {
+  resolveDocumentTabLabelFromOpenedTab
+} from 'app/src/components/projectUI/ProjectDocumentControlBar/functions/projectDocumentControlBarVisibility'
 import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
+import { copyToClipboard } from 'quasar'
 
 import { createFaActionDefinitionHandlers } from './functions/createFaActionDefinitionHandlers'
 import { createFaActionDefinitionHandlersDocumentWorkspace } from './functions/createFaActionDefinitionHandlersDocumentWorkspace'
+import { createFaActionDefinitionHandlersOpenedDocumentTabClipboard } from './faActionDefinitionHandlersOpenedDocumentTabClipboard'
 import { createFaActionDefinitionHandlersShowProjectDashboard } from './functions/createFaActionDefinitionHandlersShowProjectDashboard'
 import { buildFaActionDefinitionHandlersWindowChrome } from './faActionDefinitionHandlersWindowChrome'
 import { notifyCreateForFaActionDefinitionHandlers } from './faActionDefinitionHandlersNotifyWiring'
@@ -88,6 +93,13 @@ const faActionDefinitionHandlersApi = {
     resolveCanEditActiveDocumentViaKeybind,
     resolveFaDocumentWorkspaceRouteDocumentId,
     resolveShowProjectDocumentControlBarEditButton
+  }),
+  ...createFaActionDefinitionHandlersOpenedDocumentTabClipboard({
+    S_FaOpenedDocuments,
+    copyToClipboard,
+    i18n,
+    notifyCreate: notifyCreateForFaActionDefinitionHandlers,
+    resolveDocumentTabLabelFromOpenedTab
   })
 }
 
@@ -186,6 +198,15 @@ export const handleEditActiveDocument =
 
 export const handleSaveOpenedDocumentDisplayName =
   faActionDefinitionHandlersApi.handleSaveOpenedDocumentDisplayName
+
+export const handleCopyOpenedDocumentTabName =
+  faActionDefinitionHandlersApi.handleCopyOpenedDocumentTabName
+
+export const handleCopyOpenedDocumentTabTextColor =
+  faActionDefinitionHandlersApi.handleCopyOpenedDocumentTabTextColor
+
+export const handleCopyOpenedDocumentTabBackgroundColor =
+  faActionDefinitionHandlersApi.handleCopyOpenedDocumentTabBackgroundColor
 
 export const handleFocusPreviousOpenedDocumentTab =
   faActionDefinitionHandlersApi.handleFocusPreviousOpenedDocumentTab

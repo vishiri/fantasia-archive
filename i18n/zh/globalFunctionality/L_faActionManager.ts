@@ -4,6 +4,9 @@ export default {
   queueOverflow: '太多待处理的操作；这个被丢弃了。',
   labels: {
     closeApp: '关闭窗口',
+    copyOpenedDocumentTabBackgroundColor: 'Copy document tab background color',
+    copyOpenedDocumentTabName: 'Copy document tab name',
+    copyOpenedDocumentTabTextColor: 'Copy document tab text color',
     languageSwitch: '切换界面语言',
     moveActiveOpenedDocumentTabLeft: 'Move document tab left',
     moveActiveOpenedDocumentTabRight: 'Move document tab right',

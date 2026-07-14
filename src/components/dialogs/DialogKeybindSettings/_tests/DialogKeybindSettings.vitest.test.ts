@@ -6,7 +6,8 @@ import { ResultAsync } from 'neverthrow'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 vi.mock('quasar', () => ({
-  Notify: { create: vi.fn() }
+  Notify: { create: vi.fn() },
+  copyToClipboard: vi.fn(async () => undefined)
 }))
 
 import type { I_dialogKeybindSettingsRow } from 'app/types/I_dialogKeybindSettings'

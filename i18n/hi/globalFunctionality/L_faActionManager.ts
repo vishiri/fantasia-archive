@@ -4,6 +4,9 @@ export default {
   queueOverflow: 'बहुत सारी लंबित कार्रवाइयां; इसे गिरा दिया गया.',
   labels: {
     closeApp: 'विंडो बंद',
+    copyOpenedDocumentTabBackgroundColor: 'Copy document tab background color',
+    copyOpenedDocumentTabName: 'Copy document tab name',
+    copyOpenedDocumentTabTextColor: 'Copy document tab text color',
     languageSwitch: 'इंटरफ़ेस भाषा स्विच करें',
     moveActiveOpenedDocumentTabLeft: 'Move document tab left',
     moveActiveOpenedDocumentTabRight: 'Move document tab right',

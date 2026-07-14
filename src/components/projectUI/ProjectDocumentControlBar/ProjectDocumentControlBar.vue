@@ -67,7 +67,9 @@
                 :on-tab-close-all-without-changes-click="onTabCloseAllWithoutChangesClick"
                 :on-tab-close-all-without-changes-except-click="onTabCloseAllWithoutChangesExceptClick"
                 :on-tab-close-click="onTabCloseClick"
+                :on-tab-copy-background-color-click="onTabCopyBackgroundColorClick"
                 :on-tab-copy-name-click="onTabCopyNameClick"
+                :on-tab-copy-text-color-click="onTabCopyTextColorClick"
                 :on-tab-delete-click="onTabDeleteClick"
                 :on-tab-force-close-all-click="onTabForceCloseAllClick"
                 :on-tab-force-close-all-except-click="onTabForceCloseAllExceptClick"
@@ -163,7 +165,9 @@ const {
   onTabCloseAllWithoutChangesClick,
   onTabCloseAllWithoutChangesExceptClick,
   onTabCloseClick,
+  onTabCopyBackgroundColorClick,
   onTabCopyNameClick,
+  onTabCopyTextColorClick,
   onTabDeleteClick,
   onTabForceCloseAllClick,
   onTabForceCloseAllExceptClick,

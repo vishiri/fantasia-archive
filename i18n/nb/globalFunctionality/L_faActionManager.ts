@@ -4,6 +4,9 @@ export default {
   queueOverflow: 'For mange ventende handlinger; denne ble droppet.',
   labels: {
     closeApp: 'Lukk vinduet',
+    copyOpenedDocumentTabBackgroundColor: 'Copy document tab background color',
+    copyOpenedDocumentTabName: 'Copy document tab name',
+    copyOpenedDocumentTabTextColor: 'Copy document tab text color',
     languageSwitch: 'Bytt grensesnittspråk',
     moveActiveOpenedDocumentTabLeft: 'Move document tab left',
     moveActiveOpenedDocumentTabRight: 'Move document tab right',

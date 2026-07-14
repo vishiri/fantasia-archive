@@ -15,7 +15,8 @@ const { updateProjectSettingsMock, persistWorldsSnapshotMock, persistDocumentTem
 
 vi.mock('quasar', () => {
   return {
-    Notify: { create: notifyCreateMock }
+    Notify: { create: notifyCreateMock },
+    copyToClipboard: vi.fn(async () => undefined)
   }
 })
 

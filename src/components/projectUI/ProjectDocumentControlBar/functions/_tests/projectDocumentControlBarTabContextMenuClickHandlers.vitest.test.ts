@@ -31,7 +31,9 @@ function buildHandlers () {
     onTabCloseAllWithoutChangesClick,
     onTabCloseAllWithoutChangesExceptClick,
     onTabCloseClick,
+    onTabCopyBackgroundColorClick: vi.fn(async () => undefined),
     onTabCopyNameClick: vi.fn(async () => undefined),
+    onTabCopyTextColorClick: vi.fn(async () => undefined),
     onTabDeleteClick,
     onTabForceCloseAllClick,
     onTabForceCloseAllExceptClick,
@@ -58,7 +60,9 @@ test('Test that buildProjectDocumentControlBarTabContextMenuClickHandlers move a
     onTabCloseAllWithoutChangesClick: vi.fn(),
     onTabCloseAllWithoutChangesExceptClick: vi.fn(),
     onTabCloseClick: vi.fn(),
+    onTabCopyBackgroundColorClick: vi.fn(async () => undefined),
     onTabCopyNameClick: vi.fn(async () => undefined),
+    onTabCopyTextColorClick: vi.fn(async () => undefined),
     onTabDeleteClick: vi.fn(),
     onTabForceCloseAllClick: vi.fn(),
     onTabForceCloseAllExceptClick: vi.fn(),
@@ -71,6 +75,8 @@ test('Test that buildProjectDocumentControlBarTabContextMenuClickHandlers move a
   handlers.onMoveTabLeftClick()
   handlers.onMoveTabRightClick()
   handlers.onCopyNameClick()
+  handlers.onCopyTextColorClick()
+  handlers.onCopyBackgroundColorClick()
 
   expect(onTabMoveClick).toHaveBeenNthCalledWith(1, 'doc-hero', 'left')
   expect(onTabMoveClick).toHaveBeenNthCalledWith(2, 'doc-hero', 'right')

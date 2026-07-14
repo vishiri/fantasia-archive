@@ -50,7 +50,9 @@ test('Test that buildProjectDocumentControlBarTabContextMenuSession wires labels
     onTabCloseAllWithoutChangesClick: vi.fn(),
     onTabCloseAllWithoutChangesExceptClick: vi.fn(),
     onTabCloseClick: vi.fn(),
+    onTabCopyBackgroundColorClick: vi.fn(async () => undefined),
     onTabCopyNameClick: vi.fn(async () => undefined),
+    onTabCopyTextColorClick: vi.fn(async () => undefined),
     onTabDeleteClick: vi.fn(),
     onTabForceCloseAllClick: vi.fn(),
     onTabForceCloseAllExceptClick: vi.fn(),
@@ -65,7 +67,9 @@ test('Test that buildProjectDocumentControlBarTabContextMenuSession wires labels
   expect(session.closeAllTabsWithoutChangesLabel.value).toBe('projectUI.projectDocumentControlBar.closeAllTabsWithoutChanges')
   expect(session.closeAllTabsWithoutChangesExceptThisOneLabel.value).toBe('projectUI.projectDocumentControlBar.closeAllTabsWithoutChangesExceptThisOne')
   expect(session.closeThisTabLabel.value).toBe('projectUI.projectDocumentControlBar.closeThisTab')
+  expect(session.copyBackgroundColorLabel.value).toBe('projectUI.projectDocumentControlBar.copyBackgroundColor')
   expect(session.copyNameLabel.value).toBe('projectUI.projectDocumentControlBar.copyName')
+  expect(session.copyTextColorLabel.value).toBe('projectUI.projectDocumentControlBar.copyTextColor')
   expect(session.deleteThisDocumentLabel.value).toBe('projectUI.projectDocumentControlBar.deleteThisDocument')
   expect(session.forceCloseAllTabsLabel.value).toBe('projectUI.projectDocumentControlBar.forceCloseAllTabs')
   expect(session.forceCloseAllTabsExceptThisOneLabel.value).toBe('projectUI.projectDocumentControlBar.forceCloseAllTabsExceptThisOne')
@@ -114,7 +118,9 @@ test('Test that buildProjectDocumentControlBarTabContextMenuSession hides delete
     onTabCloseAllWithoutChangesClick: vi.fn(),
     onTabCloseAllWithoutChangesExceptClick: vi.fn(),
     onTabCloseClick: vi.fn(),
+    onTabCopyBackgroundColorClick: vi.fn(async () => undefined),
     onTabCopyNameClick: vi.fn(async () => undefined),
+    onTabCopyTextColorClick: vi.fn(async () => undefined),
     onTabDeleteClick: vi.fn(),
     onTabForceCloseAllClick: vi.fn(),
     onTabForceCloseAllExceptClick: vi.fn(),

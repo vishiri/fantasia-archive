@@ -35,6 +35,8 @@ test('Test that ProjectDocumentControlBarTabContextMenuList delegates row and su
   expect(handlers.onSubmenuContentLeave).toHaveBeenCalled()
 
   await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-copyName"]').trigger('click')
+  await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-copyTextColor"]').trigger('click')
+  await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-copyBackgroundColor"]').trigger('click')
   await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-moveTabLeft"]').trigger('click')
   await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-moveTabRight"]').trigger('click')
   await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-closeThisTab"]').trigger('click')
@@ -45,6 +47,8 @@ test('Test that ProjectDocumentControlBarTabContextMenuList delegates row and su
   await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-deleteThisDocument"]').trigger('click')
 
   expect(handlers.onCopyNameClick).toHaveBeenCalled()
+  expect(handlers.onCopyTextColorClick).toHaveBeenCalled()
+  expect(handlers.onCopyBackgroundColorClick).toHaveBeenCalled()
   expect(handlers.onMoveTabLeftClick).toHaveBeenCalled()
   expect(handlers.onMoveTabRightClick).toHaveBeenCalled()
   expect(handlers.onCloseThisTabClick).toHaveBeenCalled()

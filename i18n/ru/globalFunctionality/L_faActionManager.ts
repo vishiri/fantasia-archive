@@ -4,6 +4,9 @@ export default {
   queueOverflow: 'Слишком много ожидающих действий; этот сбросили.',
   labels: {
     closeApp: 'Закрыть окно',
+    copyOpenedDocumentTabBackgroundColor: 'Copy document tab background color',
+    copyOpenedDocumentTabName: 'Copy document tab name',
+    copyOpenedDocumentTabTextColor: 'Copy document tab text color',
     languageSwitch: 'Переключить язык интерфейса',
     moveActiveOpenedDocumentTabLeft: 'Move document tab left',
     moveActiveOpenedDocumentTabRight: 'Move document tab right',

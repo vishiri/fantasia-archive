@@ -4,6 +4,9 @@ export default {
   queueOverflow: '保留中のアクションが多すぎます。これは落とされました。',
   labels: {
     closeApp: 'ウィンドウを閉じる',
+    copyOpenedDocumentTabBackgroundColor: 'Copy document tab background color',
+    copyOpenedDocumentTabName: 'Copy document tab name',
+    copyOpenedDocumentTabTextColor: 'Copy document tab text color',
     languageSwitch: 'インターフェイス言語の切り替え',
     moveActiveOpenedDocumentTabLeft: 'Move document tab left',
     moveActiveOpenedDocumentTabRight: 'Move document tab right',

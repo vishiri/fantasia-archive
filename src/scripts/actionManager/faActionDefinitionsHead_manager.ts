@@ -15,6 +15,9 @@ import {
   handleEditActiveDocument,
   handleCreateTemporaryOpenedDocument,
   handleSaveOpenedDocumentDisplayName,
+  handleCopyOpenedDocumentTabName,
+  handleCopyOpenedDocumentTabTextColor,
+  handleCopyOpenedDocumentTabBackgroundColor,
   handleFocusPreviousOpenedDocumentTab,
   handleFocusNextOpenedDocumentTab,
   handleMoveActiveOpenedDocumentTabLeft,
@@ -103,6 +106,21 @@ export const FA_ACTION_DEFINITIONS_HEAD: ReadonlyArray<I_faActionDefinition<T_fa
     handler: handleSaveOpenedDocumentDisplayName as I_faActionDefinition<T_faActionId>['handler'],
     id: 'saveOpenedDocumentDisplayName',
     kind: 'sync'
+  },
+  {
+    handler: handleCopyOpenedDocumentTabName as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'copyOpenedDocumentTabName',
+    kind: 'async'
+  },
+  {
+    handler: handleCopyOpenedDocumentTabTextColor as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'copyOpenedDocumentTabTextColor',
+    kind: 'async'
+  },
+  {
+    handler: handleCopyOpenedDocumentTabBackgroundColor as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'copyOpenedDocumentTabBackgroundColor',
+    kind: 'async'
   },
   {
     handler: handleFocusPreviousOpenedDocumentTab as I_faActionDefinition<T_faActionId>['handler'],

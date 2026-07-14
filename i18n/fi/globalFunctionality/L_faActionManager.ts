@@ -4,6 +4,9 @@ export default {
   queueOverflow: 'Liian monta vireillä olevaa toimintaa; tämä pudotettiin.',
   labels: {
     closeApp: 'Sulje ikkuna',
+    copyOpenedDocumentTabBackgroundColor: 'Copy document tab background color',
+    copyOpenedDocumentTabName: 'Copy document tab name',
+    copyOpenedDocumentTabTextColor: 'Copy document tab text color',
     languageSwitch: 'Vaihda käyttöliittymän kieltä',
     moveActiveOpenedDocumentTabLeft: 'Move document tab left',
     moveActiveOpenedDocumentTabRight: 'Move document tab right',

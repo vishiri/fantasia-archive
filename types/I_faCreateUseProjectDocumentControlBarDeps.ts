@@ -12,7 +12,6 @@ export interface I_faCreateUseProjectDocumentControlBarDeps {
   assembleProjectDocumentControlBarApi: T_assembleProjectDocumentControlBarApiFn
   buildProjectDocumentControlBarAssembleInput: (input: {
     activeDocumentId: I_computedRef<string | null>
-    copyToClipboard: (text: string) => Promise<void>
     enterDocumentEditMode: (documentId: string) => void
     findTabByDocumentId: (documentId: string) => I_faOpenedDocumentTab | null
     formatFaKeybindCommandLabelFromSnapshot: I_assembleProjectDocumentControlBarApiInput['formatFaKeybindCommandLabelFromSnapshot']
@@ -20,7 +19,6 @@ export interface I_faCreateUseProjectDocumentControlBarDeps {
     isDocumentControlBarDisabled: I_computedRef<boolean>
     isOnDocumentWorkspaceRoute: I_computedRef<boolean>
     moveDocumentTab: (documentId: string, direction: 'left' | 'right') => void
-    notifyCreate: I_assembleProjectDocumentControlBarApiInput['notifyCreate']
     closeAllTabsWithoutChanges: () => void | Promise<void>
     closeTabsWithoutChangesExcept: (exceptDocumentId: string) => void | Promise<void>
     requestDeleteDocument: (documentId: string) => void
@@ -38,8 +36,6 @@ export interface I_faCreateUseProjectDocumentControlBarDeps {
     runFaAction: I_assembleProjectDocumentControlBarApiInput['runFaAction']
     projectWorlds: I_computedRef<readonly I_faProjectHierarchyTreeWorkspaceWorld[]>
     tabs: I_computedRef<readonly I_faOpenedDocumentTab[]>
-    translateCopyNameFailed: () => string
-    translateCopyNameSuccess: () => string
     computed: I_assembleProjectDocumentControlBarApiInput['computed']
   }) => I_assembleProjectDocumentControlBarApiInput
   computed: <T>(getter: () => T) => I_computedRef<T>
@@ -94,17 +90,4 @@ export interface I_faCreateUseProjectDocumentControlBarDeps {
   useRoute: () => {
     path: string
   }
-  useI18n: () => {
-    t: (key: string) => string
-  }
-  copyToClipboard: (text: string) => Promise<void>
-  notifyCreate: (options: {
-    caption?: string
-    color: string
-    faSkipNotifyConsoleLog?: boolean
-    icon: string
-    message: string
-    timeout?: number
-    type: string
-  }) => void
 }

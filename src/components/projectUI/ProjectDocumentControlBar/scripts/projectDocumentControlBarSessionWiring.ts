@@ -217,14 +217,10 @@ export function assembleProjectDocumentControlBarApi (
   const tabAppearanceChromeApi = buildProjectDocumentControlBarTabAppearanceChromeApi()
 
   const contextMenuHandlers = buildProjectDocumentControlBarTabContextMenuHandlers({
-    copyToClipboard: input.copyToClipboard,
     findTabByDocumentId: input.findTabByDocumentId,
     moveDocumentTab: input.moveDocumentTab,
-    notifyCreate: input.notifyCreate,
-    requestCloseTab: input.requestCloseTab,
     resolveDocumentTabLabelFromOpenedTab: input.resolveDocumentTabLabelFromOpenedTab,
-    translateCopyNameFailed: input.translateCopyNameFailed,
-    translateCopyNameSuccess: input.translateCopyNameSuccess
+    runFaAction: input.runFaAction
   })
 
   return {

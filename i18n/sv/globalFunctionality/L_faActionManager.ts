@@ -4,6 +4,9 @@ export default {
   queueOverflow: 'För många väntande åtgärder; den här släpptes.',
   labels: {
     closeApp: 'Stäng fönstret',
+    copyOpenedDocumentTabBackgroundColor: 'Copy document tab background color',
+    copyOpenedDocumentTabName: 'Copy document tab name',
+    copyOpenedDocumentTabTextColor: 'Copy document tab text color',
     languageSwitch: 'Byt gränssnittsspråk',
     moveActiveOpenedDocumentTabLeft: 'Move document tab left',
     moveActiveOpenedDocumentTabRight: 'Move document tab right',

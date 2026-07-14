@@ -4,6 +4,9 @@ export default {
   queueOverflow: 'Troppe azioni in sospeso; questo è stato abbandonato.',
   labels: {
     closeApp: 'Chiudi finestra',
+    copyOpenedDocumentTabBackgroundColor: 'Copy document tab background color',
+    copyOpenedDocumentTabName: 'Copy document tab name',
+    copyOpenedDocumentTabTextColor: 'Copy document tab text color',
     languageSwitch: 'Cambia la lingua dell\'interfaccia',
     moveActiveOpenedDocumentTabLeft: 'Move document tab left',
     moveActiveOpenedDocumentTabRight: 'Move document tab right',

@@ -8,7 +8,6 @@ export function createUseProjectDocumentControlBar (
 ): () => I_projectDocumentControlBarComposableApi {
   return function useProjectDocumentControlBar () {
     const route = deps.useRoute()
-    const { t } = deps.useI18n()
     const { settings } = deps.storeToRefs(deps.S_FaUserSettings())!
     const { activeDocumentId, tabs } = deps.storeToRefs(deps.S_FaOpenedDocuments())!
     const { worlds: projectWorlds } = deps.storeToRefs(deps.S_FaProjectHierarchyTree())!
@@ -26,7 +25,6 @@ export function createUseProjectDocumentControlBar (
       deps.buildProjectDocumentControlBarAssembleInput({
         activeDocumentId: activeDocumentId!,
         computed: deps.computed,
-        copyToClipboard: deps.copyToClipboard,
         enterDocumentEditMode: (documentId: string) => {
           openedDocumentsStore.enterDocumentEditMode(documentId)
         },
@@ -40,7 +38,6 @@ export function createUseProjectDocumentControlBar (
         moveDocumentTab: (documentId: string, direction: 'left' | 'right') => {
           openedDocumentsStore.moveDocumentTab(documentId, direction)
         },
-        notifyCreate: deps.notifyCreate,
         closeAllTabsWithoutChanges: () => {
           void openedDocumentsStore.closeAllTabsWithoutChanges()
         },
@@ -69,13 +66,7 @@ export function createUseProjectDocumentControlBar (
         resolveProjectDocumentControlBarSaveButtonColor: deps.resolveProjectDocumentControlBarSaveButtonColor,
         projectWorlds: projectWorlds!,
         runFaAction: deps.runFaAction,
-        tabs: tabs!,
-        translateCopyNameFailed: () => {
-          return t('projectUI.projectDocumentControlBar.copyNameFailed')
-        },
-        translateCopyNameSuccess: () => {
-          return t('projectUI.projectDocumentControlBar.copyNameSuccess')
-        }
+        tabs: tabs!
       })
     )
   }

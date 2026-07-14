@@ -4,6 +4,9 @@ export default {
   queueOverflow: 'Zu viele ausstehende Aktionen; dieser wurde fallen gelassen.',
   labels: {
     closeApp: 'Fenster schließen',
+    copyOpenedDocumentTabBackgroundColor: 'Copy document tab background color',
+    copyOpenedDocumentTabName: 'Copy document tab name',
+    copyOpenedDocumentTabTextColor: 'Copy document tab text color',
     languageSwitch: 'Schnittstellensprache wechseln',
     moveActiveOpenedDocumentTabLeft: 'Move document tab left',
     moveActiveOpenedDocumentTabRight: 'Move document tab right',

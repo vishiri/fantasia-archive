@@ -4,6 +4,9 @@ export default {
   queueOverflow: 'هناك عدد كبير جدًا من الإجراءات المعلقة؛ تم إسقاط هذا.',
   labels: {
     closeApp: 'إغلاق النافذة',
+    copyOpenedDocumentTabBackgroundColor: 'Copy document tab background color',
+    copyOpenedDocumentTabName: 'Copy document tab name',
+    copyOpenedDocumentTabTextColor: 'Copy document tab text color',
     languageSwitch: 'تبديل لغة الواجهة',
     moveActiveOpenedDocumentTabLeft: 'Move document tab left',
     moveActiveOpenedDocumentTabRight: 'Move document tab right',

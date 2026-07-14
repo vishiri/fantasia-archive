@@ -7,7 +7,6 @@
     data-test-locator="projectDocumentControlBar-tabContextMenu-browseSubmenu"
     role="menu"
     self="top start"
-    square
     transition-hide="jump-left"
     transition-show="jump-right"
     @mouseenter="onSubmenuContentEnter"
