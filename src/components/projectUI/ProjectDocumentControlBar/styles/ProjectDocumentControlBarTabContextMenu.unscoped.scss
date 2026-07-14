@@ -1,5 +1,7 @@
 @use './variables' as *;
+@use '../../../../css/app.palette.scss' as *;
 @use '../../../globals/AppControlMenus/styles/variables' as appControlMenus;
+@use '../../../globals/AppControlMenus/styles/contextMenuSeparators.mixin' as contextMenuSeparators;
 @use '../../../globals/AppControlSingleMenu/styles/variables' as appControlSingleMenu;
 @use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
 @use '../../../../css/theme/quasar-components/qFocusable.variables' as *;
@@ -196,6 +198,13 @@
 }
 
 .projectDocumentControlBarTabContextMenu__separator {
-  background-color: appControlMenus.$appControlMenus-separatorColor;
-  height: appControlSingleMenu.$appControlSingleMenu-separator-height !important;
+  @include contextMenuSeparators.fa-context-menu-separator-group;
+}
+
+.projectDocumentControlBarTabContextMenu__separatorAlt {
+  @include contextMenuSeparators.fa-context-menu-separator-alt;
+}
+
+.projectDocumentControlBarTabContextMenu__separatorPrimaryBright {
+  @include contextMenuSeparators.fa-context-menu-separator-group;
 }

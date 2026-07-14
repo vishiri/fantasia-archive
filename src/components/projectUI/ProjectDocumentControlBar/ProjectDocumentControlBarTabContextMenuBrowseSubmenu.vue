@@ -23,8 +23,8 @@
         :key="browseTab.documentId"
       >
         <q-separator
-          v-if="browseTabIndex > 0"
-          class="projectDocumentControlBarTabContextMenu__separator"
+          v-if="contextMenuShouldShowSeparatorAltBeforeIndex(browseTabIndex)"
+          class="projectDocumentControlBarTabContextMenu__separatorAlt"
           dark
           role="separator"
         />
@@ -79,6 +79,8 @@ import type { CSSProperties } from 'vue'
 
 import type { I_faDocumentAppearanceChromeStyle } from 'app/types/I_faDocumentAppearanceChromeStyle'
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+
+import { contextMenuShouldShowSeparatorAltBeforeIndex } from 'app/src/components/globals/AppControlMenus/scripts/functions/contextMenuShouldShowSeparatorAltBeforeItem'
 
 import ProjectDocumentControlBarTabWorldIndicator from './ProjectDocumentControlBarTabWorldIndicator.vue'
 

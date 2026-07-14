@@ -62,9 +62,15 @@
             :dark="false"
           >
             <template
-              v-for="row in GLOBAL_LANGUAGE_SELECTOR_LOCALES"
+              v-for="(row, index) in GLOBAL_LANGUAGE_SELECTOR_LOCALES"
               :key="row.code"
             >
+              <q-separator
+                v-if="contextMenuShouldShowSeparatorAltBeforeIndex(index)"
+                :dark="false"
+                class="globalLanguageSelector__menuSeparatorAlt"
+                role="separator"
+              />
               <q-item
                 clickable
                 class="globalLanguageSelector__menuItem"
@@ -98,10 +104,6 @@
                   }}
                 </q-item-section>
               </q-item>
-              <q-separator
-                :dark="false"
-                role="separator"
-              />
             </template>
           </q-list>
         </q-menu>
@@ -112,6 +114,8 @@
 
 <script setup lang="ts">
 import { onBeforeUnmount, watch } from 'vue'
+
+import { contextMenuShouldShowSeparatorAltBeforeIndex } from 'app/src/components/globals/AppControlMenus/scripts/functions/contextMenuShouldShowSeparatorAltBeforeItem'
 
 import GlobalLanguageSelectorSpellcheckRefreshControl from './GlobalLanguageSelectorSpellcheckRefreshControl.vue'
 
@@ -157,6 +161,12 @@ onBeforeUnmount(() => {
   min-width: $globalLanguageSelector-menu-minWidth;
   overflow-y: auto;
   user-select: none;
+}
+
+:global(.globalLanguageSelector__menuSeparatorAlt) {
+  background-color: $globalLanguageSelector-menu-separatorAltColor;
+  height: $globalLanguageSelector-menu-separatorAlt-height;
+  opacity: 0.2;
 }
 
 .globalLanguageSelector {

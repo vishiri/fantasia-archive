@@ -42,6 +42,8 @@
 - **Workspace sidebar**: The hierarchy **Search...** row uses the **dark-middle** (**#183e4d**) background, matching the header bar and window controls.
 - **Workspace**: The document control strip and top menu strip (**Project**, **Content**, **App controls**, **Help**) keep viewport-based width when you resize the workspace sidebar splitter; they no longer shrink with the main pane or sidebar panel.
 - **Workspace sidebar**: Resizing the workspace splitter now saves **sidebar_width** to the active **`.faproject`** again after you stop dragging.
+- **Context menus**: Dropdown action lists use low-opacity dividers between consecutive rows in the same group (matching **Project**, **Content**, **App controls**, and **Help** menus), including the document tab context menu, hierarchy tree node menu, language selector, splash **Resume latest project** list, and **Browse opened tabs** submenu.
+- **Document workspace**: Tab context menu shows a **primary-bright** divider before **Delete this document**, separating it from the force-close actions above.
 - **Theme**: The **`dark-lighter`** surface color (header bar, menu dropdowns, noteboard panels, and similar chrome) is now **#194456** instead of **#234655**.
 - **Top bar**: The menu strip (**Project**, **Content**, **App controls**, **Help**) has a **375px** minimum width on a **dark** background and can grow wider when translated labels need more room; the four menu buttons share the row width evenly. The rest of the header bar and window controls use **dark-middle** (**#183e4d**).
 - **Top bar**: The spellcheck refresh control beside the language selector uses the **dark-middle** (**#183e4d**) background, matching the header bar and window controls.

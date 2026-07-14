@@ -35,4 +35,10 @@
     background-color: $splashControls-resumeMenu-separator-backgroundColor;
     height: $splashControls-resumeMenu-separator-height !important;
   }
+
+  .splashControls__resumeMenuSeparatorAlt {
+    background-color: $splashControls-resumeMenu-separatorAlt-backgroundColor;
+    height: $splashControls-resumeMenu-separator-height !important;
+    opacity: 0.2;
+  }
 }

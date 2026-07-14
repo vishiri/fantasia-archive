@@ -16,6 +16,8 @@ $globalLanguageSelector-menu-item-padding: 8px 24px;
 $globalLanguageSelector-menu-itemTextColor: fa-v('black', $black);
 $globalLanguageSelector-menu-maxHeight: 420px;
 $globalLanguageSelector-menu-minWidth: 180px;
+$globalLanguageSelector-menu-separatorAltColor: fa-v('text-menu-separator', $text-menu-separator);
+$globalLanguageSelector-menu-separatorAlt-height: 0.5px;
 $globalLanguageSelector-topPosition: 6px;
 $globalLanguageSelector-triggerBorderWidthPx: 2px;
 $globalLanguageSelector-trigger-border: $globalLanguageSelector-triggerBorderWidthPx solid $globalLanguageSelector-borderColor;

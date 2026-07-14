@@ -1,27 +1,21 @@
 <template>
-  <q-separator
-    class="projectDocumentControlBarTabContextMenu__separatorAlt"
-    dark
-    role="separator"
-  />
-
   <q-item
     v-close-popup
     clickable
     class="projectDocumentControlBarTabContextMenu__item non-selectable"
-    data-test-locator="projectDocumentControlBar-tabContextMenu-closeThisTab"
+    data-test-locator="projectDocumentControlBar-tabContextMenu-copyName"
     role="menuitem"
-    @click="onCloseThisTabClick"
+    @click="onCopyNameClick"
   >
     <q-item-section>
       <span class="projectDocumentControlBarTabContextMenu__primaryLabel">
-        {{ closeThisTabLabel }}
+        {{ copyNameLabel }}
       </span>
     </q-item-section>
     <q-item-section avatar>
       <q-icon
         class="projectDocumentControlBarTabContextMenu__icon"
-        name="mdi-close"
+        name="mdi-text-recognition"
       />
     </q-item-section>
   </q-item>
@@ -36,19 +30,19 @@
     v-close-popup
     clickable
     class="projectDocumentControlBarTabContextMenu__item non-selectable"
-    data-test-locator="projectDocumentControlBar-tabContextMenu-closeAllTabsWithoutChangesExceptThisOne"
+    data-test-locator="projectDocumentControlBar-tabContextMenu-copyTextColor"
     role="menuitem"
-    @click="onCloseAllTabsWithoutChangesExceptThisOneClick"
+    @click="onCopyTextColorClick"
   >
     <q-item-section>
       <span class="projectDocumentControlBarTabContextMenu__primaryLabel">
-        {{ closeAllTabsWithoutChangesExceptThisOneLabel }}
+        {{ copyTextColorLabel }}
       </span>
     </q-item-section>
     <q-item-section avatar>
       <q-icon
         class="projectDocumentControlBarTabContextMenu__icon"
-        name="mdi-close-box-outline"
+        name="mdi-eyedropper"
       />
     </q-item-section>
   </q-item>
@@ -63,41 +57,35 @@
     v-close-popup
     clickable
     class="projectDocumentControlBarTabContextMenu__item non-selectable"
-    data-test-locator="projectDocumentControlBar-tabContextMenu-closeAllTabsWithoutChanges"
+    data-test-locator="projectDocumentControlBar-tabContextMenu-copyBackgroundColor"
     role="menuitem"
-    @click="onCloseAllTabsWithoutChangesClick"
+    @click="onCopyBackgroundColorClick"
   >
     <q-item-section>
       <span class="projectDocumentControlBarTabContextMenu__primaryLabel">
-        {{ closeAllTabsWithoutChangesLabel }}
+        {{ copyBackgroundColorLabel }}
       </span>
     </q-item-section>
     <q-item-section avatar>
       <q-icon
         class="projectDocumentControlBarTabContextMenu__icon"
-        name="mdi-close-box-multiple-outline"
+        name="mdi-format-color-fill"
       />
     </q-item-section>
   </q-item>
-
-  <q-separator
-    class="projectDocumentControlBarTabContextMenu__separator"
-    dark
-    role="separator"
-  />
 </template>
 
 <script setup lang="ts">
 defineOptions({
-  name: 'ProjectDocumentControlBarTabContextMenuCloseRows'
+  name: 'ProjectDocumentControlBarTabContextMenuCopyRows'
 })
 
 defineProps<{
-  closeAllTabsWithoutChangesExceptThisOneLabel: string
-  closeAllTabsWithoutChangesLabel: string
-  closeThisTabLabel: string
-  onCloseAllTabsWithoutChangesClick: () => void
-  onCloseAllTabsWithoutChangesExceptThisOneClick: () => void
-  onCloseThisTabClick: () => void
+  copyBackgroundColorLabel: string
+  copyNameLabel: string
+  copyTextColorLabel: string
+  onCopyBackgroundColorClick: () => void
+  onCopyNameClick: () => void
+  onCopyTextColorClick: () => void
 }>()
 </script>

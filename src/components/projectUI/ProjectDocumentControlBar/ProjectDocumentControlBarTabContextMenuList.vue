@@ -45,68 +45,14 @@
       role="separator"
     />
 
-    <q-item
-      v-close-popup
-      clickable
-      class="projectDocumentControlBarTabContextMenu__item non-selectable"
-      data-test-locator="projectDocumentControlBar-tabContextMenu-copyName"
-      role="menuitem"
-      @click="onCopyNameClick"
-    >
-      <q-item-section>
-        <span class="projectDocumentControlBarTabContextMenu__primaryLabel">
-          {{ copyNameLabel }}
-        </span>
-      </q-item-section>
-      <q-item-section avatar>
-        <q-icon
-          class="projectDocumentControlBarTabContextMenu__icon"
-          name="mdi-text-recognition"
-        />
-      </q-item-section>
-    </q-item>
-
-    <q-item
-      v-close-popup
-      clickable
-      class="projectDocumentControlBarTabContextMenu__item non-selectable"
-      data-test-locator="projectDocumentControlBar-tabContextMenu-copyTextColor"
-      role="menuitem"
-      @click="onCopyTextColorClick"
-    >
-      <q-item-section>
-        <span class="projectDocumentControlBarTabContextMenu__primaryLabel">
-          {{ copyTextColorLabel }}
-        </span>
-      </q-item-section>
-      <q-item-section avatar>
-        <q-icon
-          class="projectDocumentControlBarTabContextMenu__icon"
-          name="mdi-eyedropper"
-        />
-      </q-item-section>
-    </q-item>
-
-    <q-item
-      v-close-popup
-      clickable
-      class="projectDocumentControlBarTabContextMenu__item non-selectable"
-      data-test-locator="projectDocumentControlBar-tabContextMenu-copyBackgroundColor"
-      role="menuitem"
-      @click="onCopyBackgroundColorClick"
-    >
-      <q-item-section>
-        <span class="projectDocumentControlBarTabContextMenu__primaryLabel">
-          {{ copyBackgroundColorLabel }}
-        </span>
-      </q-item-section>
-      <q-item-section avatar>
-        <q-icon
-          class="projectDocumentControlBarTabContextMenu__icon"
-          name="mdi-format-color-fill"
-        />
-      </q-item-section>
-    </q-item>
+    <ProjectDocumentControlBarTabContextMenuCopyRows
+      :copy-background-color-label="copyBackgroundColorLabel"
+      :copy-name-label="copyNameLabel"
+      :copy-text-color-label="copyTextColorLabel"
+      :on-copy-background-color-click="onCopyBackgroundColorClick"
+      :on-copy-name-click="onCopyNameClick"
+      :on-copy-text-color-click="onCopyTextColorClick"
+    />
 
     <q-separator
       class="projectDocumentControlBarTabContextMenu__separator"
@@ -140,6 +86,12 @@
         />
       </q-item-section>
     </q-item>
+
+    <q-separator
+      class="projectDocumentControlBarTabContextMenu__separatorAlt"
+      dark
+      role="separator"
+    />
 
     <q-item
       v-close-popup
@@ -197,6 +149,7 @@ import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
 import ProjectDocumentControlBarTabContextMenuBrowseSubmenu from './ProjectDocumentControlBarTabContextMenuBrowseSubmenu.vue'
 import ProjectDocumentControlBarTabContextMenuCloseRows from './ProjectDocumentControlBarTabContextMenuCloseRows.vue'
+import ProjectDocumentControlBarTabContextMenuCopyRows from './ProjectDocumentControlBarTabContextMenuCopyRows.vue'
 import ProjectDocumentControlBarTabContextMenuDestructiveRows from './ProjectDocumentControlBarTabContextMenuDestructiveRows.vue'
 
 defineOptions({

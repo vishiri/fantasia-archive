@@ -38,6 +38,13 @@
           />
         </q-item-section>
       </q-item>
+
+      <q-separator
+        class="projectHierarchyTreeNodeContextMenu__separatorAlt"
+        dark
+        role="separator"
+      />
+
       <q-item
         v-close-popup
         clickable

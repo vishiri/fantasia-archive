@@ -20,6 +20,12 @@
     </q-item-section>
   </q-item>
 
+  <q-separator
+    class="projectDocumentControlBarTabContextMenu__separatorAlt"
+    dark
+    role="separator"
+  />
+
   <q-item
     v-close-popup
     clickable
@@ -40,6 +46,13 @@
       />
     </q-item-section>
   </q-item>
+
+  <q-separator
+    v-if="showDeleteThisDocument"
+    class="projectDocumentControlBarTabContextMenu__separatorPrimaryBright"
+    dark
+    role="separator"
+  />
 
   <q-item
     v-if="showDeleteThisDocument"

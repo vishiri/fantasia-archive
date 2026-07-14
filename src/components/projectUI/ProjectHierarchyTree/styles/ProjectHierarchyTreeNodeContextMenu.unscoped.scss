@@ -1,6 +1,7 @@
 @use './variables' as *;
 @use '../../../../css/app.palette.scss' as *;
 @use '../../../globals/AppControlMenus/styles/variables' as appControlMenus;
+@use '../../../globals/AppControlMenus/styles/contextMenuSeparators.mixin' as contextMenuSeparators;
 @use '../../../globals/AppControlSingleMenu/styles/variables' as appControlSingleMenu;
 @use '../../../../css/globals/paletteGlobals.variables.scss' as paletteGlobals;
 @use '../../../../css/theme/quasar-components/qFocusable.variables' as *;
@@ -44,8 +45,11 @@
 }
 
 .projectHierarchyTreeNodeContextMenu__separator {
-  background-color: fa-v('primary-bright', $primary-bright);
-  height: appControlSingleMenu.$appControlSingleMenu-separator-height !important;
+  @include contextMenuSeparators.fa-context-menu-separator-group;
+}
+
+.projectHierarchyTreeNodeContextMenu__separatorAlt {
+  @include contextMenuSeparators.fa-context-menu-separator-alt;
 }
 
 .projectHierarchyTreeNodeContextMenu__primaryLabel {

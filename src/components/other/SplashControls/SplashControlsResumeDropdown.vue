@@ -28,8 +28,8 @@
           :key="entry.filePath"
         >
           <q-separator
-            v-if="index > 0"
-            class="splashControls__resumeMenuSeparator"
+            v-if="contextMenuShouldShowSeparatorAltBeforeIndex(index)"
+            class="splashControls__resumeMenuSeparatorAlt"
             role="separator"
           />
           <q-item
@@ -66,6 +66,8 @@
 </template>
 
 <script lang="ts" setup>
+import { contextMenuShouldShowSeparatorAltBeforeIndex } from 'app/src/components/globals/AppControlMenus/scripts/functions/contextMenuShouldShowSeparatorAltBeforeItem'
+
 import { useSplashControlsResumeDropdown } from './scripts/splashControlsResumeDropdown_manager'
 
 defineOptions({
