@@ -16,6 +16,7 @@ Every **`.vue`** SFC: top-level blocks **only** in order: **`<template>`**, **`<
 - **Quasar** (`q-*`) components + spacing/typography from siblings in same area.
 - **Scrollable regions**: template root/wrapper that **may show vertical scrollbar** (overflow scroll/auto) + scrollbar presence content-dependent → global class **`hasScrollbar`** (`scrollbar-gutter: stable` prevents layout shift). [scrollbar.scss](../../src/css/globals/scrollbar.scss), [project-scss.mdc](project-scss.mdc).
 - **User-visible copy** in repo-root **i18n/** — never hardcode prose in templates, `_data/`, scripts.
+- **Context menu dividers** — [fa-context-menu-dividers.mdc](fa-context-menu-dividers.mdc), [fantasia-context-menu-dividers skill](../skills/fantasia-context-menu-dividers/SKILL.md): group separator vs **separatorAlt** between consecutive **`q-item`** rows in same section.
 - SFC translations: template `$t('camelCaseKey.subKey')` directly; **no** `useI18n` import only for `t(...)`.
 - Top-level i18n keys: **camelCase**, lowercase first letter (e.g. `globalWindowButtons`, `dialogs`). Sub-keys same.
 - New strings: `L_*.ts` under matching folder (`components/<bucket>/<ComponentName>/` — `<bucket>` = `globals`, `elements`, `other`; not `foundation` Storybook-only; or `dialogs/`, `floatingWindows/`, `pages/`, `globalFunctionality/`); import in `i18n/en-US/index.ts`, assign camelCase top-level key. No hardcoded inline in `index.ts`. App-wide uncategorised → `globalFunctionality/L_unsortedAppTexts.ts` under `globalFunctionality.unsortedAppTexts`.

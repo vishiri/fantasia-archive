@@ -66,6 +66,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | [fa-drag-drop-lists.mdc](.cursor/rules/fa-drag-drop-lists.mdc) | List/table DnD policy |
 | [fa-icon-picker.mdc](.cursor/rules/fa-icon-picker.mdc) | **`FaIconPickerInput`**, **`yarn generate:icon-catalogs`** |
 | [fa-locale-translations-input.mdc](.cursor/rules/fa-locale-translations-input.mdc) | **`FaLocaleTranslationsInput`**, **`src/scripts/localeTranslations/`**, Project Settings world name + world appendix |
+| [fa-context-menu-dividers.mdc](.cursor/rules/fa-context-menu-dividers.mdc) | **`q-menu`** / dropdown action rows — group separator vs **separatorAlt** |
 
 ## Stack (short)
 
@@ -99,7 +100,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Trees / DnD | [fa-he-tree.mdc](.cursor/rules/fa-he-tree.mdc), [fa-drag-drop-lists.mdc](.cursor/rules/fa-drag-drop-lists.mdc), skills **fantasia-he-tree**, **fantasia-drag-drop** |
 | **`FaIconPickerInput`** | [fa-icon-picker.mdc](.cursor/rules/fa-icon-picker.mdc), [fantasia-icon-picker](.cursor/skills/fantasia-icon-picker/SKILL.md) |
 | **`FaLocaleTranslationsInput`** | [fa-locale-translations-input.mdc](.cursor/rules/fa-locale-translations-input.mdc), [fantasia-locale-translations-input](.cursor/skills/fantasia-locale-translations-input/SKILL.md) |
-| Vue / Quasar / SCSS | [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc), [vue-bem-scss.mdc](.cursor/rules/vue-bem-scss.mdc), [project-scss.mdc](.cursor/rules/project-scss.mdc), [fantasia-quasar-vue](.cursor/skills/fantasia-quasar-vue/SKILL.md) |
+| Vue / Quasar / SCSS | [vue-quasar.mdc](.cursor/rules/vue-quasar.mdc), [vue-bem-scss.mdc](.cursor/rules/vue-bem-scss.mdc), [project-scss.mdc](.cursor/rules/project-scss.mdc), [fantasia-quasar-vue](.cursor/skills/fantasia-quasar-vue/SKILL.md), [fa-context-menu-dividers.mdc](.cursor/rules/fa-context-menu-dividers.mdc), [fantasia-context-menu-dividers](.cursor/skills/fantasia-context-menu-dividers/SKILL.md) |
 | i18n | [fantasia-i18n](.cursor/skills/fantasia-i18n/SKILL.md), [en-us-ui-copy-capitalization.mdc](.cursor/rules/en-us-ui-copy-capitalization.mdc) |
 | Testing | [dev-scoped-verify.mdc](.cursor/rules/dev-scoped-verify.mdc), [testing-terminal-isolation.mdc](.cursor/rules/testing-terminal-isolation.mdc), [dev-electron-compile-check.mdc](.cursor/rules/dev-electron-compile-check.mdc), [vitest-tests.mdc](.cursor/rules/vitest-tests.mdc), [playwright-tests.mdc](.cursor/rules/playwright-tests.mdc), [fantasia-dev-scoped-verify](.cursor/skills/fantasia-dev-scoped-verify/SKILL.md), [fantasia-testing](.cursor/skills/fantasia-testing/SKILL.md) |
 | Storybook | [storybook-stories.mdc](.cursor/rules/storybook-stories.mdc) |
@@ -143,6 +144,7 @@ No Markdown bold/italic in comments. Single quotes for inline refs. No mid-sente
 | `fantasia-keybinds` | Global shortcuts |
 | `fantasia-action-manager` | Central action dispatch + toasts |
 | `fantasia-quasar-vue` | Vue/Quasar structure |
+| `fantasia-context-menu-dividers` | **`q-menu`** row dividers — group separator vs **separatorAlt** |
 | `fantasia-two-level-architecture` | **`functions/`** + **`*_manager.ts`** |
 | `fantasia-floating-windows` | In-renderer **`Window*`** |
 | `fantasia-he-tree` | **`@he-tree/vue`**; DnD scroll playbook **`.cursor/plans/he-tree-dnd-scroll-playbook_*.plan.md`** |

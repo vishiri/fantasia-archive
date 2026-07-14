@@ -49,6 +49,7 @@ Every **`.vue`** SFC: **`<template>`** → **`<script>`** / **`<script setup>`**
 - Boot: `src/boot/` — **`tooltip-defaults`** sets global **`q-tooltip`** **`delay`** (**`FA_Q_TOOLTIP_DELAY_MS`**, 500 ms)
 - **`import type`** for type-only imports
 - Templates: **`$t('...')`** — avoid **`useI18n`** only for **`t`** when template binding works
+- **Context menu dividers** — group **`primary-bright`** separator vs low-opacity **separatorAlt** between consecutive items in same group — [fa-context-menu-dividers.mdc](../../rules/fa-context-menu-dividers.mdc), [fantasia-context-menu-dividers](../fantasia-context-menu-dividers/SKILL.md); helper **`contextMenuShouldShowSeparatorAltBeforeItem`** in **`AppControlMenus/scripts/functions/`**; SCSS mixin **`AppControlMenus/styles/_contextMenuSeparators.mixin.scss`**
 
 ## `public/` assets and Electron (`file://`) (MUST)
 
