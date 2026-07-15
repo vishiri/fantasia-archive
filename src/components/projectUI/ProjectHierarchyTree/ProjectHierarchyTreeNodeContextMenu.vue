@@ -18,55 +18,58 @@
     @hide="onHide"
   >
     <q-list class="projectHierarchyTreeNodeContextMenu__list">
-      <q-item
-        v-close-popup
-        clickable
-        class="projectHierarchyTreeNodeContextMenu__item non-selectable"
-        data-test-locator="projectHierarchyTree-nodeContextMenu-expandAll"
-        role="menuitem"
-        @click="onExpandAllClick"
-      >
-        <q-item-section>
-          <span class="projectHierarchyTreeNodeContextMenu__primaryLabel">
-            {{ expandAllUnderNodeLabel }}
-          </span>
-        </q-item-section>
-        <q-item-section avatar>
-          <q-icon
-            class="projectHierarchyTreeNodeContextMenu__icon"
-            name="mdi-expand-all-outline"
-          />
-        </q-item-section>
-      </q-item>
+      <template v-if="showsBulkExpandRows">
+        <q-item
+          v-close-popup
+          clickable
+          class="projectHierarchyTreeNodeContextMenu__item non-selectable"
+          data-test-locator="projectHierarchyTree-nodeContextMenu-expandAll"
+          role="menuitem"
+          @click="onExpandAllClick"
+        >
+          <q-item-section>
+            <span class="projectHierarchyTreeNodeContextMenu__primaryLabel">
+              {{ menuLabels.expandAllUnderNodeLabel }}
+            </span>
+          </q-item-section>
+          <q-item-section avatar>
+            <q-icon
+              class="projectHierarchyTreeNodeContextMenu__icon"
+              name="mdi-expand-all-outline"
+            />
+          </q-item-section>
+        </q-item>
 
-      <q-separator
-        class="projectHierarchyTreeNodeContextMenu__separatorAlt"
-        dark
-        role="separator"
-      />
+        <q-separator
+          class="projectHierarchyTreeNodeContextMenu__separatorAlt"
+          dark
+          role="separator"
+        />
 
-      <q-item
-        v-close-popup
-        clickable
-        class="projectHierarchyTreeNodeContextMenu__item non-selectable"
-        data-test-locator="projectHierarchyTree-nodeContextMenu-collapseAll"
-        role="menuitem"
-        @click="onCollapseAllClick"
-      >
-        <q-item-section>
-          <span class="projectHierarchyTreeNodeContextMenu__primaryLabel">
-            {{ collapseAllUnderNodeLabel }}
-          </span>
-        </q-item-section>
-        <q-item-section avatar>
-          <q-icon
-            class="projectHierarchyTreeNodeContextMenu__icon"
-            name="mdi-collapse-all-outline"
-          />
-        </q-item-section>
-      </q-item>
+        <q-item
+          v-close-popup
+          clickable
+          class="projectHierarchyTreeNodeContextMenu__item non-selectable"
+          data-test-locator="projectHierarchyTree-nodeContextMenu-collapseAll"
+          role="menuitem"
+          @click="onCollapseAllClick"
+        >
+          <q-item-section>
+            <span class="projectHierarchyTreeNodeContextMenu__primaryLabel">
+              {{ menuLabels.collapseAllUnderNodeLabel }}
+            </span>
+          </q-item-section>
+          <q-item-section avatar>
+            <q-icon
+              class="projectHierarchyTreeNodeContextMenu__icon"
+              name="mdi-collapse-all-outline"
+            />
+          </q-item-section>
+        </q-item>
+      </template>
       <template v-if="showsAddNewRow">
         <q-separator
+          v-if="showsBulkExpandRows"
           class="projectHierarchyTreeNodeContextMenu__separator"
           dark
           role="separator"
@@ -92,6 +95,46 @@
           </q-item-section>
         </q-item>
       </template>
+      <template v-if="showsCopyRows">
+        <q-separator
+          v-if="showsBulkExpandRows || showsAddNewRow"
+          class="projectHierarchyTreeNodeContextMenu__separator"
+          dark
+          role="separator"
+        />
+        <ProjectHierarchyTreeNodeContextMenuCopyRows
+          :copy-background-color-label="menuLabels.copyBackgroundColorLabel"
+          :copy-name-label="menuLabels.copyNameLabel"
+          :copy-text-color-label="menuLabels.copyTextColorLabel"
+          :on-copy-background-color-click="onCopyBackgroundColorClick"
+          :on-copy-name-click="onCopyNameClick"
+          :on-copy-text-color-click="onCopyTextColorClick"
+        />
+        <q-separator
+          class="projectHierarchyTreeNodeContextMenu__separator"
+          dark
+          role="separator"
+        />
+        <ProjectHierarchyTreeNodeContextMenuDocumentRows
+          :add-new-document-under-this-label="menuLabels.addNewDocumentUnderThisLabel"
+          :copy-document-label="menuLabels.copyDocumentLabel"
+          :edit-document-label="menuLabels.editDocumentLabel"
+          :on-add-new-document-under-this-click="onAddNewDocumentUnderThisClick"
+          :on-copy-document-click="onCopyDocumentClick"
+          :on-edit-document-click="onEditDocumentClick"
+          :on-open-document-click="onOpenDocumentClick"
+          :open-document-label="menuLabels.openDocumentLabel"
+        />
+        <q-separator
+          class="projectHierarchyTreeNodeContextMenu__separator"
+          dark
+          role="separator"
+        />
+        <ProjectHierarchyTreeNodeContextMenuDeleteRow
+          :delete-document-label="menuLabels.deleteDocumentLabel"
+          :on-delete-document-click="onDeleteDocumentClick"
+        />
+      </template>
     </q-list>
   </q-menu>
 </template>
@@ -101,6 +144,11 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { I_qMenuViewportPointerPosition } from 'app/types/I_qMenuViewportPointerPosition'
+
+import ProjectHierarchyTreeNodeContextMenuCopyRows from './ProjectHierarchyTreeNodeContextMenuCopyRows.vue'
+import ProjectHierarchyTreeNodeContextMenuDeleteRow from './ProjectHierarchyTreeNodeContextMenuDeleteRow.vue'
+import ProjectHierarchyTreeNodeContextMenuDocumentRows from './ProjectHierarchyTreeNodeContextMenuDocumentRows.vue'
+import { resolveProjectHierarchyTreeNodeContextMenuLabels } from './scripts/projectHierarchyTreeNodeContextMenuLabelsWiring'
 
 defineOptions({
   name: 'ProjectHierarchyTreeNodeContextMenu'
@@ -112,9 +160,19 @@ const props = defineProps<{
   anchorNodeId: string | null
   menuPointerPosition: I_qMenuViewportPointerPosition | null
   onAddNewClick: () => void
+  onAddNewDocumentUnderThisClick: () => void
   onCollapseAllClick: () => void
+  onCopyBackgroundColorClick: () => void
+  onCopyDocumentClick: () => void
+  onCopyNameClick: () => void
+  onCopyTextColorClick: () => void
+  onDeleteDocumentClick: () => void
+  onEditDocumentClick: () => void
   onExpandAllClick: () => void
   onHide: () => void
+  onOpenDocumentClick: () => void
+  showsBulkExpandRows: boolean
+  showsCopyRows: boolean
 }>()
 
 const isOpenModel = defineModel<boolean>('isOpen', {
@@ -125,28 +183,10 @@ const { t } = useI18n()
 
 const pointerAnchorRef = ref<HTMLElement | null>(null)
 
-const expandAllUnderNodeLabel = computed(() => {
-  return t('projectUI.projectHierarchyTree.contextMenu.expandAllUnderNode')
-})
-
-const collapseAllUnderNodeLabel = computed(() => {
-  return t('projectUI.projectHierarchyTree.contextMenu.collapseAllUnderNode')
-})
+const menuLabels = computed(() => resolveProjectHierarchyTreeNodeContextMenuLabels(t))
 
 const showsAddNewRow = computed(() => {
   return props.addNewRowLabel !== null && props.addNewRowIcon !== null
-})
-
-const anchorNodeId = computed(() => {
-  return props.anchorNodeId
-})
-
-const addNewRowIcon = computed(() => {
-  return props.addNewRowIcon
-})
-
-const addNewRowLabel = computed(() => {
-  return props.addNewRowLabel
 })
 
 const pointerAnchorStyle = computed((): Record<string, string> => {
@@ -174,9 +214,17 @@ const pointerAnchorStyle = computed((): Record<string, string> => {
 })
 
 const onAddNewClick = props.onAddNewClick
+const onAddNewDocumentUnderThisClick = props.onAddNewDocumentUnderThisClick
 const onCollapseAllClick = props.onCollapseAllClick
+const onCopyBackgroundColorClick = props.onCopyBackgroundColorClick
+const onCopyDocumentClick = props.onCopyDocumentClick
+const onCopyNameClick = props.onCopyNameClick
+const onCopyTextColorClick = props.onCopyTextColorClick
+const onDeleteDocumentClick = props.onDeleteDocumentClick
+const onEditDocumentClick = props.onEditDocumentClick
 const onExpandAllClick = props.onExpandAllClick
 const onHide = props.onHide
+const onOpenDocumentClick = props.onOpenDocumentClick
 </script>
 
 <style lang="scss" src="./styles/ProjectHierarchyTreeNodeContextMenu.unscoped.scss"></style>

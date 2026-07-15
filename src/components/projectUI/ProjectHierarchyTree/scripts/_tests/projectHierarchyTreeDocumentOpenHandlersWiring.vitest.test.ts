@@ -75,7 +75,7 @@ test('Test that document open handlers ignore left click on parent document rows
 
 /**
  * createProjectHierarchyTreeDocumentOpenHandlers
- * Middle click opens parent documents in background mode.
+ * Middle click opens parent documents with middleBackground open mode.
  */
 test('Test that document open handlers emit middle background for parent document rows', () => {
   const onDocumentOpenRequest = vi.fn()

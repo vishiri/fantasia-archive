@@ -3,6 +3,12 @@ import { ResultAsync } from 'neverthrow'
 import type { I_faOpenedDocumentsSnapshot } from 'app/types/I_faOpenedDocumentsDomain'
 import { FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT } from 'app/types/I_faOpenedDocumentsDomain'
 
+function serializeFaOpenedDocumentsSnapshotForBridge (
+  snapshot: I_faOpenedDocumentsSnapshot
+): I_faOpenedDocumentsSnapshot {
+  return JSON.parse(JSON.stringify(snapshot)) as I_faOpenedDocumentsSnapshot
+}
+
 /**
  * Reads opened documents snapshot from the active project via preload bridge.
  */
@@ -36,7 +42,9 @@ export async function faOpenedDocumentsPersistSnapshotFromBridge (
     return false
   }
   const writeResult = await ResultAsync.fromPromise(
-    api.saveOpenedDocumentsSnapshot(snapshot),
+    api.saveOpenedDocumentsSnapshot(
+      serializeFaOpenedDocumentsSnapshotForBridge(snapshot)
+    ),
     (error): unknown => error
   )
   if (writeResult.isErr()) {

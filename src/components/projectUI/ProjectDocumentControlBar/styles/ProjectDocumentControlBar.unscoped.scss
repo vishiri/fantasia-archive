@@ -133,11 +133,8 @@
   position: relative;
 }
 
-.projectDocumentControlBarTabs__tab--customAppearance.q-tab {
-  .q-tab__icon,
-  .q-tab__label {
-    color: var(--projectDocumentControlBarTab-textColor);
-  }
+.projectDocumentControlBarTabs__tab--customDocumentBackground.q-tab {
+  background-color: var(--projectDocumentControlBarTab-backgroundColor);
 }
 
 .projectDocumentControlBarTabs__tabWorldIndicator {
@@ -223,6 +220,13 @@
     transition:
       color $projectDocumentControlBar-tabFocusTransitionDurationMs $projectDocumentControlBar-tabFocusTransitionEase,
       opacity $projectDocumentControlBar-tabFocusTransitionDurationMs $projectDocumentControlBar-tabFocusTransitionEase;
+  }
+
+  .projectDocumentControlBarTabs__tab--customAppearance.q-tab {
+    .q-tab__icon,
+    .q-tab__label {
+      color: var(--projectDocumentControlBarTab-textColor);
+    }
   }
 
   .q-tab__alert-icon {

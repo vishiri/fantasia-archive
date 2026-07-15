@@ -3,7 +3,7 @@
     outline
     class="faDeleteConfirmButton"
     :class="props.buttonClass"
-    color="negative"
+    color="secondary"
     :disable="props.removeDisabled"
     :label="$t(props.deleteButtonLabelKey)"
     :data-test-locator="props.removeButtonTestLocator"
@@ -38,7 +38,7 @@
             outline
             class="faDeleteConfirmButton__confirmButton"
             :class="confirmDeleteCountdownActiveClass"
-            color="negative"
+            color="secondary"
             :data-test-locator="props.confirmButtonTestLocator"
             :disable="confirmDeleteDisabled"
             @click="onConfirmDeleteClick"

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import debounce from 'lodash-es/debounce.js'
+import { Notify } from 'quasar'
 import { readonly, ref, watch } from 'vue'
 
 import type { Ref } from 'vue'
@@ -45,17 +46,24 @@ import {
 } from 'app/src/scripts/openedDocuments/openedDocumentTabAppearanceWiring'
 import {
   applyTemporaryOpenedDocumentParent,
+  buildTemporaryDocumentParentResolveDocumentIds,
+  buildTemporaryDocumentParentResolveDocumentIdsFromOpenedTab,
+  createTemporaryOpenedDocumentTabCopySeed,
   createTemporaryOpenedDocumentTabSeed,
   promoteTemporaryOpenedDocumentTabAfterCreate,
   remapOpenedDocumentTabDocumentId,
   resolveOpenedDocumentTabIsTemporary,
+  resolveTemporaryDocumentParentDocumentIdForSave,
   resolveTemporaryOpenedDocumentDisplayNameForSave,
   resolveTemporaryOpenedDocumentParentDocumentId
 } from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
+import { resolveOpenedDocumentTabDocumentActionContext } from 'app/src/scripts/openedDocuments/functions/openedDocumentTabDocumentActionContext'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/appRouting_manager'
-import { collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds, collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeDocumentParentBucket'
+import { collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds, collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh, ensureProjectHierarchyTreeDocumentNodeHasChildrenForRefresh, removeProjectHierarchyTreeDocumentNodesByDocumentIds } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeDocumentParentBucket'
+import { resolveProjectHierarchyTreeNewDocumentDisplayName } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeAddNewDocumentLabel'
 import { resolveFaProjectDocumentTemplateDisplayTitleFromFields } from 'app/src/scripts/documentTemplates/faProjectDocumentTemplateTitle_manager'
 import { resolveFaLocaleStringTranslation } from 'app/src/scripts/localeTranslations/faLocaleStringTranslations_manager'
+import { resolveCopyOfDocumentDisplayName } from 'app/src/scripts/openedDocuments/functions/resolveCopyOfDocumentDisplayName'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaProjectHierarchyTree } from 'app/src/stores/S_FaProjectHierarchyTree'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
@@ -272,7 +280,13 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     const documentId = input.documentId ?? crypto.randomUUID()
     const parentDocumentId = resolveTemporaryOpenedDocumentParentDocumentId(input)
     if (parentDocumentId !== null) {
-      await api.getDocumentById(parentDocumentId)
+      const parentTabIndex = findOpenedDocumentTabIndexByDocumentId(tabs.value, parentDocumentId)
+      const parentTab = parentTabIndex === -1 ? undefined : tabs.value[parentTabIndex]
+      const parentIsOpenTemporary = parentTab !== undefined &&
+        resolveOpenedDocumentTabIsTemporary(parentTab.persistenceState)
+      if (!parentIsOpenTemporary) {
+        await api.getDocumentById(parentDocumentId)
+      }
     }
     await api.getWorldById(input.worldId)
     const template = await api.getDocumentTemplateById(input.templateId)
@@ -289,6 +303,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       tabLabel,
       templateIcon: template.icon,
       templateId: input.templateId,
+      temporaryParentResolveDocumentIds: input.temporaryParentResolveDocumentIds,
       worldId: input.worldId
     })
     const openMode = input.openMode ?? 'leftNavigate'
@@ -303,6 +318,249 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     if (openResult.shouldNavigate && openResult.navigateDocumentId !== null) {
       await navigateToOpenedDocumentRoute(openResult.navigateDocumentId)
     }
+    return documentId
+  }
+
+  async function createTemporaryDocumentUnderParentDocument (
+    sourceDocumentId: string
+  ): Promise<string | null> {
+    const api = window.faContentBridgeAPIs?.projectContent
+    if (
+      typeof api?.getDocumentById !== 'function' ||
+      typeof api?.getDocumentTemplateById !== 'function' ||
+      typeof api?.getWorldById !== 'function'
+    ) {
+      throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.createTemporaryError'))
+    }
+
+    let sourceDocument
+    try {
+      sourceDocument = await api.getDocumentById(sourceDocumentId)
+    } catch {
+      return null
+    }
+
+    const templateId = sourceDocument.templateId
+    if (templateId === null || templateId === undefined) {
+      return null
+    }
+
+    const temporaryParentResolveDocumentIds = await buildTemporaryDocumentParentResolveDocumentIds({
+      getDocumentById: api.getDocumentById,
+      startDocumentId: sourceDocumentId
+    })
+    await api.getWorldById(sourceDocument.worldId)
+    const template = await api.getDocumentTemplateById(templateId)
+    const preferredLanguageCode = resolvePreferredLanguageCodeForTemporaryDocument()
+    const displayName = resolveProjectHierarchyTreeNewDocumentDisplayName({
+      preferredLanguageCode,
+      titlePluralTranslations: template.titlePluralTranslations,
+      titleSingularTranslations: template.titleSingularTranslations
+    })
+
+    const documentId = await createTemporaryDocument({
+      displayName,
+      parentDocumentId: sourceDocumentId,
+      templateId,
+      temporaryParentResolveDocumentIds,
+      worldId: sourceDocument.worldId
+    })
+    return documentId
+  }
+
+  async function createTemporaryDocumentCopyFromSource (
+    sourceDocumentId: string
+  ): Promise<string | null> {
+    const api = window.faContentBridgeAPIs?.projectContent
+    if (
+      typeof api?.getDocumentById !== 'function' ||
+      typeof api?.getDocumentTemplateById !== 'function' ||
+      typeof api?.getWorldById !== 'function'
+    ) {
+      throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.createTemporaryError'))
+    }
+
+    let sourceDocument
+    try {
+      sourceDocument = await api.getDocumentById(sourceDocumentId)
+    } catch {
+      return null
+    }
+
+    const templateId = sourceDocument.templateId
+    if (templateId === null || templateId === undefined) {
+      return null
+    }
+
+    await api.getWorldById(sourceDocument.worldId)
+    const template = await api.getDocumentTemplateById(templateId)
+    const preferredLanguageCode = resolvePreferredLanguageCodeForTemporaryDocument()
+    const tabLabel = resolveFaProjectDocumentTemplateDisplayTitleFromFields(
+      template.titlePluralTranslations,
+      template.titleSingularTranslations,
+      preferredLanguageCode
+    )
+    const displayName = resolveCopyOfDocumentDisplayName({
+      formatCopyOfPrefix: (params) => {
+        return i18n.global.t(
+          'projectUI.projectHierarchyTree.contextMenu.copyOfDocumentNamePrefix',
+          params
+        )
+      },
+      originalDisplayName: sourceDocument.displayName
+    })
+    const documentId = crypto.randomUUID()
+    const parentDocumentId = sourceDocument.parentDocumentId
+    const temporaryParentResolveDocumentIds = parentDocumentId === null
+      ? undefined
+      : await buildTemporaryDocumentParentResolveDocumentIds({
+        getDocumentById: api.getDocumentById,
+        startDocumentId: parentDocumentId
+      })
+    const newTab = createTemporaryOpenedDocumentTabCopySeed({
+      displayName,
+      documentBackgroundColor: sourceDocument.documentBackgroundColor,
+      documentId,
+      documentTextColor: sourceDocument.documentTextColor,
+      parentDocumentId,
+      tabLabel,
+      templateIcon: template.icon,
+      templateId,
+      temporaryParentResolveDocumentIds,
+      worldId: sourceDocument.worldId
+    })
+    const openResult = resolveFaOpenedDocumentOpenFromTree({
+      activeDocumentId,
+      documentId,
+      mode: 'leftNavigate',
+      newTab,
+      tabs
+    })
+    schedulePersistSnapshot()
+    if (openResult.shouldNavigate && openResult.navigateDocumentId !== null) {
+      await navigateToOpenedDocumentRoute(openResult.navigateDocumentId)
+    }
+    return documentId
+  }
+
+  async function createTemporaryDocumentCopyFromOpenedTab (
+    sourceDocumentId: string
+  ): Promise<string | null> {
+    const sourceTab = findTabByDocumentId(sourceDocumentId)
+    if (sourceTab === null) {
+      return null
+    }
+
+    const api = window.faContentBridgeAPIs?.projectContent
+    if (
+      typeof api?.getDocumentById !== 'function' ||
+      typeof api?.getDocumentTemplateById !== 'function' ||
+      typeof api?.getWorldById !== 'function'
+    ) {
+      throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.createTemporaryError'))
+    }
+
+    const actionContext = await resolveOpenedDocumentTabDocumentActionContext({
+      getDocumentById: api.getDocumentById,
+      sourceTab
+    })
+    if (actionContext === null) {
+      return null
+    }
+
+    const { parentDocumentId, templateId, worldId } = actionContext
+    await api.getWorldById(worldId)
+    await api.getDocumentTemplateById(templateId)
+
+    const displayName = resolveCopyOfDocumentDisplayName({
+      formatCopyOfPrefix: (params) => {
+        return i18n.global.t(
+          'projectUI.projectHierarchyTree.contextMenu.copyOfDocumentNamePrefix',
+          params
+        )
+      },
+      originalDisplayName: sourceTab.displayNameDraft
+    })
+    const documentId = crypto.randomUUID()
+    const temporaryParentResolveDocumentIds = parentDocumentId === null
+      ? undefined
+      : await buildTemporaryDocumentParentResolveDocumentIds({
+        getDocumentById: api.getDocumentById,
+        startDocumentId: parentDocumentId
+      })
+    const newTab = createTemporaryOpenedDocumentTabCopySeed({
+      displayName,
+      documentBackgroundColor: sourceTab.documentBackgroundColorDraft,
+      documentId,
+      documentTextColor: sourceTab.documentTextColorDraft,
+      parentDocumentId,
+      tabLabel: sourceTab.tabLabel,
+      templateIcon: sourceTab.templateIcon,
+      templateId,
+      temporaryParentResolveDocumentIds,
+      worldId
+    })
+    const openResult = resolveFaOpenedDocumentOpenFromTree({
+      activeDocumentId,
+      documentId,
+      mode: 'leftNavigate',
+      newTab,
+      tabs
+    })
+    schedulePersistSnapshot()
+    if (openResult.shouldNavigate && openResult.navigateDocumentId !== null) {
+      await navigateToOpenedDocumentRoute(openResult.navigateDocumentId)
+    }
+    return documentId
+  }
+
+  async function createTemporaryDocumentUnderParentFromOpenedTab (
+    sourceDocumentId: string
+  ): Promise<string | null> {
+    const sourceTab = findTabByDocumentId(sourceDocumentId)
+    if (sourceTab === null) {
+      return null
+    }
+
+    const api = window.faContentBridgeAPIs?.projectContent
+    if (
+      typeof api?.getDocumentById !== 'function' ||
+      typeof api?.getDocumentTemplateById !== 'function' ||
+      typeof api?.getWorldById !== 'function'
+    ) {
+      throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.createTemporaryError'))
+    }
+
+    const actionContext = await resolveOpenedDocumentTabDocumentActionContext({
+      getDocumentById: api.getDocumentById,
+      sourceTab
+    })
+    if (actionContext === null) {
+      return null
+    }
+
+    const { templateId, worldId } = actionContext
+    await api.getWorldById(worldId)
+    const template = await api.getDocumentTemplateById(templateId)
+    const preferredLanguageCode = resolvePreferredLanguageCodeForTemporaryDocument()
+    const displayName = resolveProjectHierarchyTreeNewDocumentDisplayName({
+      preferredLanguageCode,
+      titlePluralTranslations: template.titlePluralTranslations,
+      titleSingularTranslations: template.titleSingularTranslations
+    })
+    const temporaryParentResolveDocumentIds =
+      await buildTemporaryDocumentParentResolveDocumentIdsFromOpenedTab({
+        getDocumentById: api.getDocumentById,
+        sourceTab
+      })
+
+    const documentId = await createTemporaryDocument({
+      displayName,
+      parentDocumentId: sourceTab.documentId,
+      templateId,
+      temporaryParentResolveDocumentIds,
+      worldId
+    })
     return documentId
   }
 
@@ -473,6 +731,20 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         },
         templateSingularTitle
       })
+      const parentResolveChain = current.temporaryParentResolveDocumentIds ?? []
+      const availableDocumentIds = new Set<string>()
+      for (const documentId of parentResolveChain) {
+        try {
+          await api.getDocumentById(documentId)
+          availableDocumentIds.add(documentId)
+        } catch {
+          continue
+        }
+      }
+      const resolvedParentDocumentId = resolveTemporaryDocumentParentDocumentIdForSave({
+        chain: parentResolveChain,
+        isDocumentIdAvailable: (documentId) => availableDocumentIds.has(documentId)
+      })
       try {
         const savedDocument = await api.createDocument({
           displayName,
@@ -483,7 +755,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
             current.documentTextColorDraft
           ),
           id: documentId,
-          parentDocumentId: current.parentDocumentId ?? null,
+          parentDocumentId: resolvedParentDocumentId,
           templateId,
           worldId
         })
@@ -513,10 +785,16 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         schedulePersistSnapshot.flush()
         await flushPersistSnapshot()
         const hierarchyStore = S_FaProjectHierarchyTree()
+        if (resolvedParentDocumentId !== null) {
+          ensureProjectHierarchyTreeDocumentNodeHasChildrenForRefresh(
+            hierarchyStore.treeData,
+            resolvedParentDocumentId
+          )
+        }
         const treeRefreshNodeIds = collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh(
           hierarchyStore.treeData,
           {
-            parentDocumentId: current.parentDocumentId ?? null,
+            parentDocumentId: resolvedParentDocumentId,
             templateId,
             worldId
           }
@@ -596,14 +874,6 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
   }
 
   function requestDeleteDocument (documentId: string): void {
-    const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
-    if (index === -1) {
-      return
-    }
-    const tab = tabs.value[index]
-    if (tab === undefined || resolveOpenedDocumentTabIsTemporary(tab.persistenceState)) {
-      return
-    }
     pendingDeleteDocumentId.value = documentId
   }
 
@@ -731,34 +1001,46 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       hierarchyStore.treeData,
       documentId
     )
-    await window.faContentBridgeAPIs.projectContent.deleteDocument(documentId)
+    const openTab = findTabByDocumentId(documentId)
+    const shouldDeletePersistedDocumentRow =
+      openTab === null ||
+      !resolveOpenedDocumentTabIsTemporary(openTab.persistenceState)
+    if (shouldDeletePersistedDocumentRow) {
+      await window.faContentBridgeAPIs.projectContent.deleteDocument(documentId)
+    }
+    removeProjectHierarchyTreeDocumentNodesByDocumentIds(
+      hierarchyStore.treeData,
+      [documentId]
+    )
     if (treeRefreshNodeIds.length > 0) {
       hierarchyStore.refreshHierarchyTreeNodes(treeRefreshNodeIds)
-    } else {
-      hierarchyStore.refreshDocumentsInTree([documentId])
     }
     const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
-    if (index === -1) {
-      return
-    }
-    const wasActive = activeDocumentId.value === documentId
-    const closeResult = removeFaOpenedDocumentTabAtIndex({
-      activeDocumentId,
-      lastRemovedIndex,
-      removedIndex: index,
-      tabs
-    })
-    pendingCloseDocumentId.value = null
-    pendingDeleteDocumentId.value = null
-    schedulePersistSnapshot.flush()
-    if (wasActive) {
-      if (closeResult.shouldNavigateHome) {
-        await navigateToWorkspaceHomeRoute()
-      } else if (closeResult.nextActiveDocumentId !== null) {
-        await navigateToOpenedDocumentRoute(closeResult.nextActiveDocumentId)
+    if (index !== -1) {
+      const wasActive = activeDocumentId.value === documentId
+      const closeResult = removeFaOpenedDocumentTabAtIndex({
+        activeDocumentId,
+        lastRemovedIndex,
+        removedIndex: index,
+        tabs
+      })
+      pendingCloseDocumentId.value = null
+      pendingDeleteDocumentId.value = null
+      schedulePersistSnapshot.flush()
+      if (wasActive) {
+        if (closeResult.shouldNavigateHome) {
+          await navigateToWorkspaceHomeRoute()
+        } else if (closeResult.nextActiveDocumentId !== null) {
+          await navigateToOpenedDocumentRoute(closeResult.nextActiveDocumentId)
+        }
       }
+      await flushPersistSnapshot()
     }
-    await flushPersistSnapshot()
+    Notify.create({
+      group: false,
+      message: i18n.global.t('globalFunctionality.faOpenedDocuments.deleteSuccess'),
+      type: 'positive'
+    })
   }
 
   function findTabByDocumentId (documentId: string): I_faOpenedDocumentTab | null {
@@ -843,6 +1125,10 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     hydrationComplete: readonly(hydrationComplete),
     clearSession,
     createTemporaryDocument,
+    createTemporaryDocumentCopyFromOpenedTab,
+    createTemporaryDocumentCopyFromSource,
+    createTemporaryDocumentUnderParentDocument,
+    createTemporaryDocumentUnderParentFromOpenedTab,
     enterDocumentEditMode,
     moveActiveDocumentTab,
     moveDocumentTab,

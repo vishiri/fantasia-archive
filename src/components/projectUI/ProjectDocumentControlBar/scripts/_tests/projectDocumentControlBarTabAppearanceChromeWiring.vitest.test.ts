@@ -12,6 +12,7 @@ test('Test that resolveProjectDocumentControlBarTabInlineStyle maps colors to ta
     documentBackgroundColorDraft: '#112233',
     documentTextColorDraft: '#aabbcc'
   })).toEqual({
+    '--projectDocumentControlBarTab-backgroundColor': '#112233',
     '--projectDocumentControlBarTab-focusHelperColor': '#112233',
     '--projectDocumentControlBarTab-textColor': '#aabbcc',
     backgroundColor: '#112233'
@@ -45,6 +46,7 @@ test('Test that resolveProjectDocumentControlBarTabInlineStyle maps background-o
     documentBackgroundColorDraft: '#112233',
     documentTextColorDraft: ''
   })).toEqual({
+    '--projectDocumentControlBarTab-backgroundColor': '#112233',
     '--projectDocumentControlBarTab-focusHelperColor': '#112233',
     backgroundColor: '#112233'
   })

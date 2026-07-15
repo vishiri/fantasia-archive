@@ -13,6 +13,7 @@ import {
 } from '../functions/projectHierarchyTreeExpandState'
 import { shouldReloadProjectHierarchyTreeNodeChildren } from '../functions/projectHierarchyTreeLazyLoadChildReload'
 import { collectProjectHierarchyTreeLatentDocumentOpenNodeIds } from '../functions/projectHierarchyTreePersistedOpenNodeIds'
+import { tryOpenHeTreeNodeAndParents } from './projectHierarchyTreeHeTreeOpenSafeWiring'
 
 type T_treeRef = I_faProjectHierarchyTreeHeTreeInstance | null
 
@@ -62,7 +63,10 @@ function reapplyProjectHierarchyTreeHeTreeOpenStateInline (deps: {
     if (node === null) {
       continue
     }
-    treeRef.openNodeAndParents(node)
+    tryOpenHeTreeNodeAndParents({
+      node,
+      treeRef
+    })
   }
 }
 

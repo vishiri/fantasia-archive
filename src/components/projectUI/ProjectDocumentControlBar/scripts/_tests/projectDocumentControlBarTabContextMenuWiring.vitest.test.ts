@@ -153,3 +153,34 @@ test('Test that buildProjectDocumentControlBarTabContextMenuHandlers skips color
 
   expect(runFaAction).not.toHaveBeenCalled()
 })
+
+test('Test that buildProjectDocumentControlBarTabContextMenuHandlers dispatches copy document through runFaAction', async () => {
+  const runFaAction = vi.fn()
+  const handlers = createHandlers({ runFaAction })
+
+  await handlers.onTabCopyDocumentClick('doc-a')
+
+  expect(runFaAction).toHaveBeenCalledWith('copyOpenedDocumentTabDocument', { documentId: 'doc-a' })
+})
+
+test('Test that buildProjectDocumentControlBarTabContextMenuHandlers dispatches add child document through runFaAction', async () => {
+  const runFaAction = vi.fn()
+  const handlers = createHandlers({ runFaAction })
+
+  await handlers.onTabAddNewDocumentUnderThisClick('doc-a')
+
+  expect(runFaAction).toHaveBeenCalledWith('addOpenedDocumentTabChildDocument', { documentId: 'doc-a' })
+})
+
+test('Test that buildProjectDocumentControlBarTabContextMenuHandlers skips document actions when tab is missing', async () => {
+  const runFaAction = vi.fn()
+  const handlers = createHandlers({
+    findTabByDocumentId: () => null,
+    runFaAction
+  })
+
+  await handlers.onTabCopyDocumentClick('missing')
+  await handlers.onTabAddNewDocumentUnderThisClick('missing')
+
+  expect(runFaAction).not.toHaveBeenCalled()
+})

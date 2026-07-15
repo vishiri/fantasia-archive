@@ -14,9 +14,19 @@ const hierarchyTreeContextMenuI18n = createI18n({
       projectUI: {
         projectHierarchyTree: {
           contextMenu: {
+            addNewDocumentUnderThis: 'Add new document under this',
             collapseAllUnderNode: 'Collapse all under this node',
-            expandAllUnderNode: 'Expand all under this node'
+            copyDocument: 'Copy document',
+            deleteDocument: 'Delete document',
+            editDocument: 'Edit document',
+            expandAllUnderNode: 'Expand all under this node',
+            openDocument: 'Open document'
           }
+        },
+        projectDocumentControlBar: {
+          copyBackgroundColor: 'Copy background color',
+          copyName: 'Copy name',
+          copyTextColor: 'Copy text color'
         }
       }
     }
@@ -27,13 +37,23 @@ function mountHierarchyTreeContextMenu (
   overrides: {
     addNewRowIcon?: string | null
     addNewRowLabel?: string | null
+    showsBulkExpandRows?: boolean
+    showsCopyRows?: boolean
   } = {}
 ) {
   const isOpen = ref(true)
   const onAddNewClick = vi.fn()
   const onExpandAllClick = vi.fn()
   const onCollapseAllClick = vi.fn()
+  const onCopyNameClick = vi.fn()
+  const onCopyTextColorClick = vi.fn()
+  const onCopyBackgroundColorClick = vi.fn()
+  const onAddNewDocumentUnderThisClick = vi.fn()
+  const onCopyDocumentClick = vi.fn()
+  const onDeleteDocumentClick = vi.fn()
+  const onEditDocumentClick = vi.fn()
   const onHide = vi.fn()
+  const onOpenDocumentClick = vi.fn()
   const wrapper = mount(ProjectHierarchyTreeNodeContextMenu, {
     props: {
       addNewRowIcon: overrides.addNewRowIcon ?? null,
@@ -45,9 +65,19 @@ function mountHierarchyTreeContextMenu (
         top: 80
       },
       onAddNewClick,
+      onAddNewDocumentUnderThisClick,
       onCollapseAllClick,
+      onCopyBackgroundColorClick,
+      onCopyDocumentClick,
+      onCopyNameClick,
+      onCopyTextColorClick,
+      onDeleteDocumentClick,
+      onEditDocumentClick,
       onExpandAllClick,
       onHide,
+      onOpenDocumentClick,
+      showsBulkExpandRows: overrides.showsBulkExpandRows ?? true,
+      showsCopyRows: overrides.showsCopyRows ?? false,
       'onUpdate:isOpen': (value: boolean) => {
         isOpen.value = value
       }
@@ -81,9 +111,17 @@ function mountHierarchyTreeContextMenu (
   return {
     isOpen,
     onAddNewClick,
+    onAddNewDocumentUnderThisClick,
     onCollapseAllClick,
+    onCopyBackgroundColorClick,
+    onCopyDocumentClick,
+    onCopyNameClick,
+    onCopyTextColorClick,
+    onDeleteDocumentClick,
+    onEditDocumentClick,
     onExpandAllClick,
     onHide,
+    onOpenDocumentClick,
     wrapper
   }
 }
@@ -110,9 +148,19 @@ test('ProjectHierarchyTreeNodeContextMenu omits anchor metadata when props are n
       isOpen: false,
       menuPointerPosition: null,
       onAddNewClick: vi.fn(),
+      onAddNewDocumentUnderThisClick: vi.fn(),
       onCollapseAllClick: vi.fn(),
+      onCopyBackgroundColorClick: vi.fn(),
+      onCopyDocumentClick: vi.fn(),
+      onCopyNameClick: vi.fn(),
+      onCopyTextColorClick: vi.fn(),
+      onDeleteDocumentClick: vi.fn(),
+      onEditDocumentClick: vi.fn(),
       onExpandAllClick: vi.fn(),
       onHide: vi.fn(),
+      onOpenDocumentClick: vi.fn(),
+      showsBulkExpandRows: false,
+      showsCopyRows: false,
       'onUpdate:isOpen': vi.fn()
     },
     global: {
@@ -156,6 +204,52 @@ test('ProjectHierarchyTreeNodeContextMenu renders add-new row and separator for 
   )
   await wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-addNew"]').trigger('click')
   expect(onAddNewClick).toHaveBeenCalled()
+})
+
+test('ProjectHierarchyTreeNodeContextMenu renders copy rows for document rows', async () => {
+  const {
+    onAddNewDocumentUnderThisClick,
+    onCopyBackgroundColorClick,
+    onCopyDocumentClick,
+    onCopyNameClick,
+    onCopyTextColorClick,
+    onDeleteDocumentClick,
+    onEditDocumentClick,
+    onOpenDocumentClick,
+    wrapper
+  } = mountHierarchyTreeContextMenu({
+    showsBulkExpandRows: false,
+    showsCopyRows: true
+  })
+
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-copyName"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-copyTextColor"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-copyBackgroundColor"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-openDocument"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-editDocument"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-copyDocument"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-addNewDocumentUnderThis"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-deleteDocument"]').exists()).toBe(true)
+  expect(wrapper.text()).toContain('Copy name')
+  expect(wrapper.text()).toContain('Open document')
+  expect(wrapper.text()).toContain('Add new document under this')
+  expect(wrapper.text()).toContain('Delete document')
+  await wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-copyName"]').trigger('click')
+  await wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-copyTextColor"]').trigger('click')
+  await wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-copyBackgroundColor"]').trigger('click')
+  await wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-openDocument"]').trigger('click')
+  await wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-editDocument"]').trigger('click')
+  await wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-copyDocument"]').trigger('click')
+  await wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-addNewDocumentUnderThis"]').trigger('click')
+  await wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-deleteDocument"]').trigger('click')
+  expect(onCopyNameClick).toHaveBeenCalled()
+  expect(onCopyTextColorClick).toHaveBeenCalled()
+  expect(onCopyBackgroundColorClick).toHaveBeenCalled()
+  expect(onOpenDocumentClick).toHaveBeenCalled()
+  expect(onEditDocumentClick).toHaveBeenCalled()
+  expect(onCopyDocumentClick).toHaveBeenCalled()
+  expect(onAddNewDocumentUnderThisClick).toHaveBeenCalled()
+  expect(onDeleteDocumentClick).toHaveBeenCalled()
 })
 
 test('ProjectHierarchyTreeNodeContextMenu delegates menu item clicks and hide', async () => {

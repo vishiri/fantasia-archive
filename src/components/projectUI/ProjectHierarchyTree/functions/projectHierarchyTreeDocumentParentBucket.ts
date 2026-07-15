@@ -15,7 +15,11 @@ export function findProjectHierarchyTreeDocumentParentBucket (
   }
 ): I_faProjectHierarchyTreeDocumentParentBucket | null {
   for (const node of nodes) {
-    if (node.nodeKind === 'document' && node.id === documentId) {
+    if (
+      node.nodeKind === 'document' &&
+      node.documentId !== null &&
+      (node.documentId === documentId || node.id === documentId)
+    ) {
       return {
         children: nodes,
         parentDocumentId: parentContext.parentDocumentId,
@@ -78,15 +82,15 @@ export function collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh (
 
 /**
  * Resolves hierarchy tree node ids whose lazy-loaded document rows should reload after delete.
+ * Deepest containers reload first so parent remerges do not preserve stale nested subtrees.
+ * When the deleted row still has loaded children, refresh it first to drop promoted descendants.
  */
 export function collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds (
   treeNodes: readonly I_faProjectHierarchyTreeHeTreeNode[],
   documentId: string
 ): string[] {
-  const bucket = findProjectHierarchyTreeDocumentParentBucket(
-    treeNodes as I_faProjectHierarchyTreeHeTreeNode[],
-    documentId
-  )
+  const tree = treeNodes as I_faProjectHierarchyTreeHeTreeNode[]
+  const bucket = findProjectHierarchyTreeDocumentParentBucket(tree, documentId)
   if (bucket === null) {
     return []
   }
@@ -94,21 +98,25 @@ export function collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds (
   if (containerNode === null || !containerNode.childrenLoaded) {
     return []
   }
-  const nodeIds = new Set<string>()
+  const nodeIds: string[] = []
   if (containerNode.nodeKind === 'document' && containerNode.documentId !== null) {
     const promotionTargetBucket = findProjectHierarchyTreeDocumentParentBucket(
-      treeNodes as I_faProjectHierarchyTreeHeTreeNode[],
+      tree,
       containerNode.documentId
     )
     const promotionTargetNode = promotionTargetBucket?.parentNode
-    if (promotionTargetNode !== null && promotionTargetNode !== undefined && promotionTargetNode.childrenLoaded) {
-      nodeIds.add(promotionTargetNode.id)
+    nodeIds.push(containerNode.id)
+    if (
+      promotionTargetNode !== null &&
+      promotionTargetNode !== undefined &&
+      promotionTargetNode.childrenLoaded
+    ) {
+      nodeIds.push(promotionTargetNode.id)
     }
-    nodeIds.add(containerNode.id)
-    return [...nodeIds]
+    return nodeIds
   }
-  nodeIds.add(containerNode.id)
-  return [...nodeIds]
+  nodeIds.push(containerNode.id)
+  return nodeIds
 }
 
 function findProjectHierarchyTreeDocumentNodeById (
@@ -153,6 +161,21 @@ function findProjectHierarchyTreeTemplatePlacementNodeForCreateRefresh (
 }
 
 /**
+ * Marks a document row expandable before reloading children after a nested child is created.
+ */
+export function ensureProjectHierarchyTreeDocumentNodeHasChildrenForRefresh (
+  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
+  documentId: string
+): boolean {
+  const documentNode = findProjectHierarchyTreeDocumentNodeById(treeNodes, documentId)
+  if (documentNode === null) {
+    return false
+  }
+  documentNode.hasChildren = true
+  return true
+}
+
+/**
  * Resolves hierarchy tree node ids whose lazy-loaded children should reload after first save
  * of a temporary document that is not yet present in the tree.
  */
@@ -167,7 +190,7 @@ export function collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh
   const tree = treeNodes as I_faProjectHierarchyTreeHeTreeNode[]
   if (input.parentDocumentId !== null) {
     const parentNode = findProjectHierarchyTreeDocumentNodeById(tree, input.parentDocumentId)
-    if (parentNode === null || !parentNode.childrenLoaded) {
+    if (parentNode === null) {
       return []
     }
     return [parentNode.id]
@@ -177,8 +200,44 @@ export function collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh
     input.worldId,
     input.templateId
   )
-  if (placementNode === null || !placementNode.childrenLoaded) {
+  if (placementNode === null) {
     return []
   }
   return [placementNode.id]
+}
+
+/**
+ * Removes document rows from the in-memory hierarchy tree by persisted document id.
+ */
+export function removeProjectHierarchyTreeDocumentNodesByDocumentIds (
+  treeNodes: I_faProjectHierarchyTreeHeTreeNode[],
+  documentIds: readonly string[]
+): boolean {
+  if (documentIds.length === 0) {
+    return false
+  }
+  const targetDocumentIds = new Set(documentIds)
+  let removed = false
+
+  function removeFromNodes (nodes: I_faProjectHierarchyTreeHeTreeNode[]): void {
+    for (let index = nodes.length - 1; index >= 0; index -= 1) {
+      const node = nodes[index]
+      if (node === undefined) {
+        continue
+      }
+      if (
+        node.nodeKind === 'document' &&
+        node.documentId !== null &&
+        targetDocumentIds.has(node.documentId)
+      ) {
+        nodes.splice(index, 1)
+        removed = true
+        continue
+      }
+      removeFromNodes(node.children)
+    }
+  }
+
+  removeFromNodes(treeNodes)
+  return removed
 }

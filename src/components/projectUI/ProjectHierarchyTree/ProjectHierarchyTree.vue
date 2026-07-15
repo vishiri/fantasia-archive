@@ -65,9 +65,19 @@
       :anchor-node-id="contextMenuAnchorNodeId"
       :menu-pointer-position="nodeMenuPointerPosition"
       :on-add-new-click="onAddNewDocumentFromContextMenuClick"
+      :on-add-new-document-under-this-click="onAddNewDocumentUnderThisFromContextMenuClick"
       :on-collapse-all-click="onCollapseAllUnderNodeClick"
+      :on-copy-background-color-click="onCopyBackgroundColorFromContextMenuClick"
+      :on-copy-document-click="onCopyDocumentFromContextMenuClick"
+      :on-copy-name-click="onCopyNameFromContextMenuClick"
+      :on-copy-text-color-click="onCopyTextColorFromContextMenuClick"
+      :on-delete-document-click="onDeleteDocumentFromContextMenuClick"
+      :on-edit-document-click="onEditDocumentFromContextMenuClick"
       :on-expand-all-click="onExpandAllUnderNodeClick"
       :on-hide="onNodeContextMenuHide"
+      :on-open-document-click="onOpenDocumentFromContextMenuClick"
+      :shows-bulk-expand-rows="contextMenuShowsBulkExpandRows"
+      :shows-copy-rows="contextMenuShowsCopyRows"
     />
   </div>
 </template>
@@ -109,6 +119,8 @@ const {
   contextMenuAddNewRowIcon,
   contextMenuAddNewRowLabel,
   contextMenuAnchorNodeId,
+  contextMenuShowsBulkExpandRows,
+  contextMenuShowsCopyRows,
   eachDraggableHandler,
   eachDroppableHandler,
   heTreeNodeKey,
@@ -116,14 +128,22 @@ const {
   isTreeDragActive,
   nodeMenuPointerPosition,
   onAddNewDocumentFromContextMenuClick,
+  onAddNewDocumentUnderThisFromContextMenuClick,
   onCollapseAllUnderNodeClick,
+  onCopyBackgroundColorFromContextMenuClick,
+  onCopyDocumentFromContextMenuClick,
+  onCopyNameFromContextMenuClick,
+  onCopyTextColorFromContextMenuClick,
+  onDeleteDocumentFromContextMenuClick,
   onDocumentRowAuxClick,
+  onEditDocumentFromContextMenuClick,
   onExpandAllUnderNodeClick,
   onNodeClick,
   onNodeClose,
   onNodeContextMenuHide,
   onNodeOpen,
   onNodeRowContextMenu,
+  onOpenDocumentFromContextMenuClick,
   onNonWorldOpenIconClick,
   onNonWorldOpenIconPointerDown,
   onWorldNodeRowClick,

@@ -37,6 +37,8 @@ test('Test that ProjectDocumentControlBarTabContextMenuList delegates row and su
   await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-copyName"]').trigger('click')
   await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-copyTextColor"]').trigger('click')
   await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-copyBackgroundColor"]').trigger('click')
+  await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-copyDocument"]').trigger('click')
+  await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-addNewDocumentUnderThis"]').trigger('click')
   await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-moveTabLeft"]').trigger('click')
   await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-moveTabRight"]').trigger('click')
   await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-closeThisTab"]').trigger('click')
@@ -49,6 +51,8 @@ test('Test that ProjectDocumentControlBarTabContextMenuList delegates row and su
   expect(handlers.onCopyNameClick).toHaveBeenCalled()
   expect(handlers.onCopyTextColorClick).toHaveBeenCalled()
   expect(handlers.onCopyBackgroundColorClick).toHaveBeenCalled()
+  expect(handlers.onCopyDocumentClick).toHaveBeenCalled()
+  expect(handlers.onAddNewDocumentUnderThisClick).toHaveBeenCalled()
   expect(handlers.onMoveTabLeftClick).toHaveBeenCalled()
   expect(handlers.onMoveTabRightClick).toHaveBeenCalled()
   expect(handlers.onCloseThisTabClick).toHaveBeenCalled()
@@ -57,6 +61,22 @@ test('Test that ProjectDocumentControlBarTabContextMenuList delegates row and su
   expect(handlers.onForceCloseAllTabsExceptThisOneClick).toHaveBeenCalled()
   expect(handlers.onForceCloseAllTabsClick).toHaveBeenCalled()
   expect(handlers.onDeleteThisDocumentClick).toHaveBeenCalled()
+
+  wrapper.unmount()
+})
+
+test('Test that ProjectDocumentControlBarTabContextMenuList renders document action rows and separators', () => {
+  const wrapper = mountProjectDocumentControlBarTabContextMenuList({
+    showDeleteThisDocument: false
+  })
+
+  expect(wrapper.find('[data-test-locator="projectDocumentControlBar-tabContextMenu-copyDocument"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="projectDocumentControlBar-tabContextMenu-addNewDocumentUnderThis"]').exists()).toBe(true)
+  expect(wrapper.findAll('.projectDocumentControlBarTabContextMenu__separatorPrimaryBright').length).toBe(3)
+
+  const copyDocument = wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-copyDocument"]')
+  expect(copyDocument.element.previousElementSibling?.classList.contains('projectDocumentControlBarTabContextMenu__separatorPrimaryBright')).toBe(true)
+  expect(copyDocument.element.nextElementSibling?.classList.contains('projectDocumentControlBarTabContextMenu__separatorAlt')).toBe(true)
 
   wrapper.unmount()
 })

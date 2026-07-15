@@ -22,8 +22,10 @@ export interface I_projectDocumentControlBarComposableApi {
   onTabCloseAllWithoutChangesClick: () => void
   onTabCloseAllWithoutChangesExceptClick: (documentId: string) => void
   onTabCopyBackgroundColorClick: (documentId: string) => Promise<void>
+  onTabCopyDocumentClick: (documentId: string) => Promise<void>
   onTabCopyNameClick: (documentId: string) => Promise<void>
   onTabCopyTextColorClick: (documentId: string) => Promise<void>
+  onTabAddNewDocumentUnderThisClick: (documentId: string) => Promise<void>
   onTabDeleteClick: (documentId: string) => void | Promise<void>
   onTabForceCloseAllClick: () => void
   onTabForceCloseAllExceptClick: (documentId: string) => void
@@ -107,8 +109,10 @@ export interface I_projectDocumentControlBarTabContextMenuInput {
   onTabCloseAllWithoutChangesExceptClick: (documentId: string) => void
   onTabCloseClick: (documentId: string) => void
   onTabCopyBackgroundColorClick: (documentId: string) => Promise<void>
+  onTabCopyDocumentClick: (documentId: string) => Promise<void>
   onTabCopyNameClick: (documentId: string) => Promise<void>
   onTabCopyTextColorClick: (documentId: string) => Promise<void>
+  onTabAddNewDocumentUnderThisClick: (documentId: string) => Promise<void>
   onTabDeleteClick: (documentId: string) => void | Promise<void>
   onTabForceCloseAllClick: () => void
   onTabForceCloseAllExceptClick: (documentId: string) => void

@@ -1,5 +1,6 @@
 import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
 import type { StoreGeneric, T_piniaStoreToRefs } from 'app/types/I_vuePiniaInjected'
+import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 export function createUseDialogDeleteOpenedDocument (deps: {
   S_FaOpenedDocuments: () => StoreGeneric & {
@@ -10,6 +11,13 @@ export function createUseDialogDeleteOpenedDocument (deps: {
       tabLabel: string
     } | null
   }
+  S_FaProjectHierarchyTree: () => {
+    treeData: I_faProjectHierarchyTreeHeTreeNode[]
+  }
+  findProjectHierarchyTreeDocumentNodeByDocumentId: (
+    treeData: I_faProjectHierarchyTreeHeTreeNode[],
+    documentId: string
+  ) => I_faProjectHierarchyTreeHeTreeNode | null
   computed: <T>(getter: () => T) => I_computedRef<T>
   i18n: {
     global: {
@@ -34,6 +42,7 @@ export function createUseDialogDeleteOpenedDocument (deps: {
   } {
   return function useDialogDeleteOpenedDocument () {
     const openedDocumentsStore = deps.S_FaOpenedDocuments()
+    const hierarchyTreeStore = deps.S_FaProjectHierarchyTree()
     const { pendingDeleteDocumentId } = deps.storeToRefs(openedDocumentsStore)!
     const dialogOpen = deps.ref(false)
 
@@ -43,13 +52,20 @@ export function createUseDialogDeleteOpenedDocument (deps: {
         return ''
       }
       const tab = openedDocumentsStore.findTabByDocumentId(documentId)
-      if (tab === null) {
-        return documentId
+      if (tab !== null) {
+        return deps.resolveOpenedDocumentTabListLabel({
+          displayNameDraft: tab.displayNameDraft,
+          tabLabel: tab.tabLabel
+        })
       }
-      return deps.resolveOpenedDocumentTabListLabel({
-        displayNameDraft: tab.displayNameDraft,
-        tabLabel: tab.tabLabel
-      })
+      const treeNode = deps.findProjectHierarchyTreeDocumentNodeByDocumentId(
+        hierarchyTreeStore.treeData,
+        documentId
+      )
+      if (treeNode !== null) {
+        return treeNode.label
+      }
+      return documentId
     })
 
     deps.watch(

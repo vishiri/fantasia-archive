@@ -129,6 +129,7 @@ const nodeRootBackgroundStyle = computed(() => {
     return undefined
   }
   return {
+    '--projectHierarchyTreeNode-backgroundColor': backgroundColor,
     '--projectHierarchyTreeNode-focusHelperColor': backgroundColor,
     backgroundColor
   }

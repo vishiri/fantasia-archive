@@ -115,6 +115,62 @@ test('Test that parseFaOpenedDocumentsSnapshotJson accepts temporary tabs with m
   expect(parsed.tabs[0]?.worldId).toBe('world-1')
 })
 
+test('Test that parseFaOpenedDocumentsSnapshotJson accepts temporary tabs with parent resolve chain', () => {
+  const raw = JSON.stringify({
+    schemaVersion: 2,
+    activeDocumentId: 'temp-1',
+    tabs: [{
+      documentId: 'temp-1',
+      persistenceState: 'temporary',
+      worldId: 'world-1',
+      templateId: 'tpl-1',
+      parentDocumentId: 'doc-parent',
+      temporaryParentResolveDocumentIds: ['doc-parent', 'doc-root'],
+      tabLabel: 'Character',
+      templateIcon: 'mdi-account',
+      displayNameDraft: 'Aria',
+      savedDisplayName: '',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
+      hasUnsavedChanges: false,
+      editState: true
+    }]
+  })
+  const parsed = parseFaOpenedDocumentsSnapshotJson(raw)
+  expect(parsed.tabs[0]?.temporaryParentResolveDocumentIds).toEqual([
+    'doc-parent',
+    'doc-root'
+  ])
+})
+
+test('Test that parseFaOpenedDocumentsSnapshotPayload accepts temporaryParentResolveDocumentIds', () => {
+  const parsed = parseFaOpenedDocumentsSnapshotPayload({
+    schemaVersion: 2,
+    activeDocumentId: 'temp-1',
+    tabs: [{
+      documentId: 'temp-1',
+      persistenceState: 'temporary',
+      worldId: 'world-1',
+      templateId: 'tpl-1',
+      parentDocumentId: 'doc-parent',
+      temporaryParentResolveDocumentIds: ['doc-parent'],
+      tabLabel: 'Character',
+      templateIcon: 'mdi-account',
+      displayNameDraft: 'Aria',
+      savedDisplayName: '',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
+      hasUnsavedChanges: false,
+      editState: true
+    }]
+  })
+  expect(parsed.tabs[0]?.temporaryParentResolveDocumentIds).toEqual(['doc-parent'])
+})
+
 test('Test that faOpenedDocumentsSnapshotSchema rejects temporary tabs missing worldId', () => {
   expect(() => faOpenedDocumentsSnapshotSchema.parse({
     schemaVersion: 2,

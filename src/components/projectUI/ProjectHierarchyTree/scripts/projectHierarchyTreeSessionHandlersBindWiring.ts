@@ -1,5 +1,6 @@
 import type { Ref } from 'vue'
 
+import type { I_faActionPayloadMap, T_faActionId } from 'app/types/I_faActionManagerDomain'
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { createProjectHierarchyTreeSessionHandlersWiring } from './projectHierarchyTreeSessionHandlersWiring'
@@ -33,6 +34,7 @@ export function createProjectHierarchyTreeSessionHandlersBindWiring (deps: {
     treeMeta: import('app/types/I_faOpenedDocumentsDomain').I_faOpenedDocumentTreeOpenMeta
   ) => void
   resolvePreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
+  runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }) {
   return createProjectHierarchyTreeSessionHandlersWiring({
@@ -51,6 +53,7 @@ export function createProjectHierarchyTreeSessionHandlersBindWiring (deps: {
       deps.hierarchyStore.queuePersistExpandedNodeIds(expandedNodeIds)
     },
     resolvePreferredLanguageCode: deps.resolvePreferredLanguageCode,
+    runFaAction: deps.runFaAction,
     suppressTreeEmit: deps.earlyWiring.bootstrap.sessionRefs.suppressTreeEmit,
     treeComponentRef: deps.earlyWiring.bootstrap.sessionRefs.treeComponentRef,
     treeData: deps.treeData,

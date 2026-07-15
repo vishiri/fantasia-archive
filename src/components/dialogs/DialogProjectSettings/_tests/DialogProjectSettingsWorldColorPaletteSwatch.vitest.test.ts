@@ -223,7 +223,7 @@ test('Test that DialogProjectSettingsWorldColorPaletteSwatch opens context menu 
   expect(
     w.find('[data-test-locator="dialogProjectSettings-worlds-colorPaletteContextMenu-delete"]')
       .classes()
-  ).toContain('text-negative')
+  ).toContain('text-secondary')
 
   await w
     .find('[data-test-locator="dialogProjectSettings-worlds-colorPaletteContextMenu-duplicate"]')

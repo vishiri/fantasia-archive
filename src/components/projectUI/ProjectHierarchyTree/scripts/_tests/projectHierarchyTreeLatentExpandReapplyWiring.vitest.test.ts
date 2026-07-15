@@ -52,6 +52,29 @@ test('Test that reapplyProjectHierarchyTreeLatentDescendantExpandState stalls wh
   expect(loadChildrenAlongRevealPath.mock.calls.length).toBeLessThan(20)
 })
 
+test('Test that reapplyProjectHierarchyTreeLatentDescendantExpandState swallows StatNotFoundError from he-tree open', async () => {
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const openNodeIds = ref(new Set(['world-1', 'group-1']))
+  const placement = findProjectHierarchyTreeNodeById(treeData.value, 'placement-1')!
+  placement.childrenLoaded = true
+  const statNotFoundError = new Error('Stat not found')
+  statNotFoundError.name = 'StatNotFoundError'
+  const treeRef = {
+    closeAll: vi.fn(),
+    openNodeAndParents: vi.fn(() => {
+      throw statNotFoundError
+    })
+  }
+  const loadChildrenAlongRevealPath = vi.fn(async () => undefined)
+  await expect(reapplyProjectHierarchyTreeLatentDescendantExpandState({
+    getTreeRef: () => treeRef,
+    loadChildrenAlongRevealPath,
+    openNodeIds,
+    treeData
+  })).resolves.toBeUndefined()
+  expect(treeRef.openNodeAndParents).toHaveBeenCalled()
+})
+
 test('Test that reapplyProjectHierarchyTreeLatentDescendantExpandState opens rows on he-tree ref', async () => {
   const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
   const openNodeIds = ref(new Set(['world-1', 'group-1']))

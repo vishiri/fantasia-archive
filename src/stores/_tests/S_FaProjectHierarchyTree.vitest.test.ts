@@ -346,9 +346,9 @@ test('Test that S_FaProjectHierarchyTree keeps local UI state when bridge write 
 })
 
 /**
- * S_FaProjectHierarchyTree refreshLayout coalesces concurrent in-flight loads.
+ * S_FaProjectHierarchyTree refreshLayout re-fetches when a concurrent caller arrives mid-flight.
  */
-test('Test that S_FaProjectHierarchyTree refreshLayout coalesces concurrent loads', async () => {
+test('Test that S_FaProjectHierarchyTree refreshLayout re-fetches after concurrent load completes', async () => {
   const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
   S_FaActiveProject().setActiveProject({
     filePath: 'C:\\a.faproject',
@@ -359,7 +359,36 @@ test('Test that S_FaProjectHierarchyTree refreshLayout coalesces concurrent load
   const layoutPromise = new Promise<Awaited<ReturnType<typeof listWorkspaceHierarchyLayoutMock>>>((resolve) => {
     resolveLayout = resolve
   })
-  listWorkspaceHierarchyLayoutMock.mockReturnValueOnce(layoutPromise)
+  listWorkspaceHierarchyLayoutMock
+    .mockReturnValueOnce(layoutPromise)
+    .mockResolvedValueOnce({
+      worlds: [
+        {
+          color: '#ff0000',
+          colorPallete: '',
+          displayName: 'World One',
+          groups: [],
+          id: 'world-1',
+          placements: [
+            {
+              displayName: 'Blablas',
+              documentTemplateId: 'template-1',
+              groupId: null,
+              groupSortOrder: null,
+              hasChildren: true,
+              icon: 'mdi-book',
+              id: 'placement-1',
+              nickname: 'Blablas',
+              rootSortOrder: 0,
+              titlePluralTranslations: {},
+              titleSingularTranslations: {},
+              worldId: 'world-1'
+            }
+          ],
+          sortOrder: 0
+        }
+      ]
+    })
   const store = S_FaProjectHierarchyTree()
   const first = store.refreshLayout()
   const second = store.refreshLayout()
@@ -377,7 +406,9 @@ test('Test that S_FaProjectHierarchyTree refreshLayout coalesces concurrent load
     ]
   })
   await Promise.all([first, second])
-  expect(listWorkspaceHierarchyLayoutMock).toHaveBeenCalledTimes(1)
+  expect(listWorkspaceHierarchyLayoutMock).toHaveBeenCalledTimes(2)
+  expect(store.worlds[0]?.placements).toHaveLength(1)
+  expect(store.layoutRefreshGeneration).toBe(2)
 })
 
 /**

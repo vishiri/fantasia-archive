@@ -175,6 +175,12 @@ export interface I_faProjectHierarchyTreeDocumentInvalidPlacementParent {
 }
 
 /** he-tree node data for the workspace hierarchy sidebar tree. */
+/** Section visibility for hierarchy tree node right-click context menu. */
+export interface I_faProjectHierarchyTreeNodeContextMenuSectionFlags {
+  showsBulkExpandRows: boolean
+  showsCopyRows: boolean
+}
+
 export interface I_faProjectHierarchyTreeHeTreeNode {
   children: I_faProjectHierarchyTreeHeTreeNode[]
   childrenLoaded: boolean

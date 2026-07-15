@@ -5,8 +5,10 @@ export function buildProjectDocumentControlBarTabContextMenuClickHandlers (input
   onTabCloseAllWithoutChangesExceptClick: (documentId: string) => void
   onTabCloseClick: (documentId: string) => void
   onTabCopyBackgroundColorClick: (documentId: string) => Promise<void>
+  onTabCopyDocumentClick: (documentId: string) => Promise<void>
   onTabCopyNameClick: (documentId: string) => Promise<void>
   onTabCopyTextColorClick: (documentId: string) => Promise<void>
+  onTabAddNewDocumentUnderThisClick: (documentId: string) => Promise<void>
   onTabDeleteClick: (documentId: string) => void | Promise<void>
   onTabForceCloseAllClick: () => void
   onTabForceCloseAllExceptClick: (documentId: string) => void
@@ -19,8 +21,10 @@ export function buildProjectDocumentControlBarTabContextMenuClickHandlers (input
     onCloseAllTabsWithoutChangesExceptThisOneClick: () => void
     onCloseThisTabClick: () => void
     onCopyBackgroundColorClick: () => void
+    onCopyDocumentClick: () => void
     onCopyNameClick: () => void
     onCopyTextColorClick: () => void
+    onAddNewDocumentUnderThisClick: () => void
     onDeleteThisDocumentClick: () => void
     onForceCloseAllTabsClick: () => void
     onForceCloseAllTabsExceptThisOneClick: () => void
@@ -47,6 +51,14 @@ export function buildProjectDocumentControlBarTabContextMenuClickHandlers (input
 
   function onCopyBackgroundColorClick (): void {
     void input.onTabCopyBackgroundColorClick(input.tab.documentId)
+  }
+
+  function onCopyDocumentClick (): void {
+    void input.onTabCopyDocumentClick(input.tab.documentId)
+  }
+
+  function onAddNewDocumentUnderThisClick (): void {
+    void input.onTabAddNewDocumentUnderThisClick(input.tab.documentId)
   }
 
   function onMoveTabLeftClick (): void {
@@ -82,10 +94,12 @@ export function buildProjectDocumentControlBarTabContextMenuClickHandlers (input
   }
 
   return {
+    onAddNewDocumentUnderThisClick,
     onCloseAllTabsWithoutChangesClick,
     onCloseAllTabsWithoutChangesExceptThisOneClick,
     onCloseThisTabClick,
     onCopyBackgroundColorClick,
+    onCopyDocumentClick,
     onCopyNameClick,
     onCopyTextColorClick,
     onDeleteThisDocumentClick,

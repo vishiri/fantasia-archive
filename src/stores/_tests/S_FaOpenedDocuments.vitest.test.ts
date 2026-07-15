@@ -8,12 +8,25 @@ import { FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT } from 'app/types/I_faOpenedDocument
 const {
   navigateToOpenedDocumentRouteMock,
   navigateToWorkspaceHomeRouteMock,
-  deleteDocumentMock
+  deleteDocumentMock,
+  notifyCreateMock
 } = vi.hoisted(() => ({
   navigateToOpenedDocumentRouteMock: vi.fn(async () => undefined),
   navigateToWorkspaceHomeRouteMock: vi.fn(async () => undefined),
-  deleteDocumentMock: vi.fn(async () => undefined)
+  deleteDocumentMock: vi.fn(async () => undefined),
+  notifyCreateMock: vi.fn()
 }))
+
+vi.mock('quasar', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('quasar')>()
+  return {
+    ...actual,
+    Notify: {
+      ...actual.Notify,
+      create: notifyCreateMock
+    }
+  }
+})
 
 vi.mock('app/src/scripts/appInternals/faAppRouterSession_manager', async (importOriginal) => {
   const actual = await importOriginal<typeof import('app/src/scripts/appInternals/faAppRouterSession_manager')>()
@@ -67,6 +80,7 @@ beforeEach(() => {
   getDocumentTemplateByIdMock.mockReset()
   createDocumentMock.mockReset()
   deleteDocumentMock.mockReset()
+  notifyCreateMock.mockClear()
   getDocumentByIdMock.mockResolvedValue({
     displayName: 'Hero',
     id: 'doc-1'
@@ -143,7 +157,7 @@ test('Test that S_FaOpenedDocuments openFromTree appends a new tab on left navig
   expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith('doc-2')
 })
 
-test('Test that S_FaOpenedDocuments openFromTree middle background keeps active tab', async () => {
+test('Test that S_FaOpenedDocuments openFromTree middle background focuses new tab', async () => {
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const store = S_FaOpenedDocuments()
   await store.hydrateFromProjectDatabase()
@@ -153,7 +167,8 @@ test('Test that S_FaOpenedDocuments openFromTree middle background keeps active 
   })
   await store.openFromTree('doc-2', 'middleBackground', treeMeta)
   expect(store.tabs).toHaveLength(2)
-  expect(store.activeDocumentId).toBe('doc-1')
+  expect(store.activeDocumentId).toBe('doc-2')
+  expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith('doc-2')
 })
 
 test('Test that S_FaOpenedDocuments saveDocumentDisplayName persists and queues tree refresh', async () => {
@@ -301,10 +316,15 @@ test('Test that S_FaOpenedDocuments confirmDeleteOpenedDocument deletes tab and 
   await store.confirmDeleteOpenedDocument('doc-1')
 
   expect(deleteDocumentMock).toHaveBeenCalledWith('doc-1')
+  expect(notifyCreateMock).toHaveBeenCalledWith({
+    group: false,
+    message: 'Document successfully deleted.',
+    type: 'positive'
+  })
   expect(store.tabs.map((tab) => tab.documentId)).toEqual(['doc-2'])
   expect(store.activeDocumentId).toBe('doc-2')
   expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith('doc-2')
-  expect(refreshDocumentsInTreeMock).toHaveBeenCalledWith(['doc-1'])
+  expect(refreshDocumentsInTreeMock).not.toHaveBeenCalled()
   expect(store.pendingDeleteDocumentId).toBeNull()
 })
 
@@ -447,13 +467,15 @@ test('Test that S_FaOpenedDocuments forceCloseAllTabs clears every tab and navig
   expect(navigateToWorkspaceHomeRouteMock).toHaveBeenCalled()
 })
 
-test('Test that S_FaOpenedDocuments deleteOpenedDocument removes tab and refreshes hierarchy tree', async () => {
+test('Test that S_FaOpenedDocuments deleteOpenedDocument removes tab and skips hierarchy refresh when tree has no loaded container', async () => {
   const refreshDocumentsInTreeMock = vi.fn()
+  const refreshHierarchyTreeNodesMock = vi.fn()
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
   const store = S_FaOpenedDocuments()
   const hierarchyStore = S_FaProjectHierarchyTree()
   hierarchyStore.refreshDocumentsInTree = refreshDocumentsInTreeMock
+  hierarchyStore.refreshHierarchyTreeNodes = refreshHierarchyTreeNodesMock
   store.replaceSessionForComponentTesting({
     activeDocumentId: 'doc-1',
     tabs: [
@@ -473,7 +495,8 @@ test('Test that S_FaOpenedDocuments deleteOpenedDocument removes tab and refresh
   expect(store.tabs.map((tab) => tab.documentId)).toEqual(['doc-2'])
   expect(store.activeDocumentId).toBe('doc-2')
   expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith('doc-2')
-  expect(refreshDocumentsInTreeMock).toHaveBeenCalledWith(['doc-1'])
+  expect(refreshDocumentsInTreeMock).not.toHaveBeenCalled()
+  expect(refreshHierarchyTreeNodesMock).not.toHaveBeenCalled()
 })
 
 test('Test that S_FaOpenedDocuments deleteOpenedDocument queues hierarchy node refresh when document is in tree', async () => {
@@ -525,6 +548,7 @@ test('Test that S_FaOpenedDocuments deleteOpenedDocument queues hierarchy node r
 
   expect(refreshHierarchyTreeNodesMock).toHaveBeenCalledWith(['placement-1'])
   expect(refreshDocumentsInTreeMock).not.toHaveBeenCalled()
+  expect(hierarchyStore.treeData[0]?.children).toEqual([])
 })
 
 test('Test that S_FaOpenedDocuments createTemporaryDocument appends a temporary tab and navigates', async () => {
@@ -546,6 +570,269 @@ test('Test that S_FaOpenedDocuments createTemporaryDocument appends a temporary 
   expect(tempTab?.savedDisplayName).toBe('Aria')
   expect(store.activeDocumentId).toBe(documentId)
   expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith(documentId)
+})
+
+test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromSource seeds a copied temporary tab', async () => {
+  getDocumentByIdMock.mockImplementation(async (id: string) => {
+    if (id === 'doc-1') {
+      return {
+        displayName: 'Hero',
+        documentBackgroundColor: '#112233',
+        documentTextColor: '#AABBCC',
+        id: 'doc-1',
+        parentDocumentId: 'doc-parent',
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    return {
+      displayName: 'Hero',
+      id,
+      parentDocumentId: null
+    }
+  })
+
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  const documentId = await store.createTemporaryDocumentCopyFromSource('doc-1')
+
+  expect(documentId).not.toBeNull()
+  const tempTab = store.tabs.find((tab) => tab.documentId === documentId)
+  expect(tempTab?.persistenceState).toBe('temporary')
+  expect(tempTab?.editState).toBe(true)
+  expect(tempTab?.hasUnsavedChanges).toBe(false)
+  expect(tempTab?.documentTextColorDraft).toBe('#AABBCC')
+  expect(tempTab?.documentBackgroundColorDraft).toBe('#112233')
+  expect(tempTab?.parentDocumentId).toBe('doc-parent')
+  expect(tempTab?.temporaryParentResolveDocumentIds).toEqual(['doc-parent'])
+  expect(store.activeDocumentId).toBe(documentId)
+})
+
+test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromSource returns null without template', async () => {
+  getDocumentByIdMock.mockImplementation(async (id: string) => {
+    if (id === 'doc-1') {
+      return {
+        displayName: 'Hero',
+        id: 'doc-1',
+        parentDocumentId: null,
+        templateId: null,
+        worldId: 'world-1'
+      }
+    }
+    return {
+      displayName: 'Hero',
+      id
+    }
+  })
+
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  const documentId = await store.createTemporaryDocumentCopyFromSource('doc-1')
+
+  expect(documentId).toBeNull()
+})
+
+test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromOpenedTab seeds from tab drafts', async () => {
+  getDocumentByIdMock.mockImplementation(async (documentId: string) => {
+    if (documentId === 'doc-1') {
+      return {
+        displayName: 'Hero',
+        id: 'doc-1',
+        parentDocumentId: 'doc-parent',
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    if (documentId === 'doc-parent') {
+      return {
+        displayName: 'Parent',
+        id: 'doc-parent',
+        parentDocumentId: null,
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    throw new Error('missing')
+  })
+
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [{
+      ...baseTab,
+      displayNameDraft: 'Ancient Hero',
+      documentBackgroundColorDraft: '#112233',
+      documentTextColorDraft: '#AABBCC',
+      worldId: 'world-1'
+    }]
+  })
+
+  const documentId = await store.createTemporaryDocumentCopyFromOpenedTab('doc-1')
+
+  expect(documentId).not.toBeNull()
+  const tempTab = store.tabs.find((tab) => tab.documentId === documentId)
+  expect(tempTab?.displayNameDraft).toContain('Ancient Hero')
+  expect(tempTab?.documentTextColorDraft).toBe('#AABBCC')
+  expect(tempTab?.documentBackgroundColorDraft).toBe('#112233')
+  expect(tempTab?.parentDocumentId).toBe('doc-parent')
+  expect(tempTab?.temporaryParentResolveDocumentIds).toEqual(['doc-parent'])
+  expect(tempTab?.hasUnsavedChanges).toBe(false)
+  expect(store.activeDocumentId).toBe(documentId)
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName on tab copy persists sibling parent from resolve chain', async () => {
+  getDocumentByIdMock.mockImplementation(async (documentId: string) => {
+    if (documentId === 'doc-1') {
+      return {
+        displayName: 'Hero',
+        id: 'doc-1',
+        parentDocumentId: 'doc-parent',
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    if (documentId === 'doc-parent') {
+      return {
+        displayName: 'Parent',
+        id: 'doc-parent',
+        parentDocumentId: null,
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    throw new Error('missing')
+  })
+
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [{
+      ...baseTab,
+      worldId: 'world-1'
+    }]
+  })
+
+  const documentId = await store.createTemporaryDocumentCopyFromOpenedTab('doc-1')
+  expect(documentId).not.toBeNull()
+
+  await store.saveDocumentDisplayName(documentId as string, { keepEditMode: true })
+  await vi.runAllTimersAsync()
+
+  expect(createDocumentMock).toHaveBeenCalledWith(expect.objectContaining({
+    parentDocumentId: 'doc-parent'
+  }))
+})
+
+test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromOpenedTab resolves template from database for persisted tabs', async () => {
+  getDocumentByIdMock.mockImplementation(async (documentId: string) => {
+    if (documentId === 'doc-1') {
+      return {
+        displayName: 'Hero',
+        id: 'doc-1',
+        parentDocumentId: 'doc-parent',
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    if (documentId === 'doc-parent') {
+      return {
+        displayName: 'Parent',
+        id: 'doc-parent',
+        parentDocumentId: null,
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    throw new Error('missing')
+  })
+
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [{
+      ...baseTab,
+      displayNameDraft: 'Ancient Hero',
+      documentBackgroundColorDraft: '#112233',
+      documentTextColorDraft: '#AABBCC',
+      worldId: 'world-1'
+    }]
+  })
+
+  const documentId = await store.createTemporaryDocumentCopyFromOpenedTab('doc-1')
+
+  expect(documentId).not.toBeNull()
+  expect(getDocumentByIdMock).toHaveBeenCalledWith('doc-1')
+  const tempTab = store.tabs.find((tab) => tab.documentId === documentId)
+  expect(tempTab?.displayNameDraft).toContain('Ancient Hero')
+  expect(tempTab?.parentDocumentId).toBe('doc-parent')
+})
+
+test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromOpenedTab returns null when database row has no template', async () => {
+  getDocumentByIdMock.mockResolvedValue({
+    displayName: 'Hero',
+    id: 'doc-1',
+    parentDocumentId: null,
+    templateId: null,
+    worldId: 'world-1'
+  })
+
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [baseTab]
+  })
+
+  const documentId = await store.createTemporaryDocumentCopyFromOpenedTab('doc-1')
+
+  expect(documentId).toBeNull()
+})
+
+test('Test that S_FaOpenedDocuments createTemporaryDocumentUnderParentFromOpenedTab nests under temporary tab', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'temp-parent',
+    tabs: [{
+      displayNameDraft: 'Temp parent',
+      documentBackgroundColorDraft: '',
+      documentId: 'temp-parent',
+      documentTextColorDraft: '',
+      editState: true,
+      hasUnsavedChanges: false,
+      parentDocumentId: 'doc-root',
+      persistenceState: 'temporary',
+      savedDisplayName: 'Temp parent',
+      savedDocumentBackgroundColor: '',
+      savedDocumentTextColor: '',
+      tabLabel: 'Character',
+      templateIcon: 'mdi-account',
+      templateId: 'tpl-1',
+      temporaryParentResolveDocumentIds: ['doc-root'],
+      worldId: 'world-1'
+    }]
+  })
+
+  const documentId = await store.createTemporaryDocumentUnderParentFromOpenedTab('temp-parent')
+
+  expect(documentId).not.toBeNull()
+  const childTab = store.tabs.find((tab) => tab.documentId === documentId)
+  expect(childTab?.parentDocumentId).toBe('temp-parent')
+  expect(childTab?.temporaryParentResolveDocumentIds).toEqual(['temp-parent', 'doc-root'])
+  expect(childTab?.displayNameDraft).toBe('New character')
+  expect(store.activeDocumentId).toBe(documentId)
 })
 
 test('Test that S_FaOpenedDocuments createTemporaryDocument closes without discard when unchanged', async () => {
@@ -721,7 +1008,7 @@ test('Test that S_FaOpenedDocuments updateTemporaryDocumentParent updates parent
   expect(tab?.parentDocumentId).toBe('parent-1')
 })
 
-test('Test that S_FaOpenedDocuments requestDeleteDocument ignores temporary tabs', async () => {
+test('Test that S_FaOpenedDocuments requestDeleteDocument opens pending delete for temporary tabs', async () => {
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const store = S_FaOpenedDocuments()
   await store.hydrateFromProjectDatabase()
@@ -733,7 +1020,7 @@ test('Test that S_FaOpenedDocuments requestDeleteDocument ignores temporary tabs
 
   store.requestDeleteDocument(documentId)
 
-  expect(store.pendingDeleteDocumentId).toBeNull()
+  expect(store.pendingDeleteDocumentId).toBe(documentId)
 })
 
 test('Test that S_FaOpenedDocuments createTemporaryDocument validates parent documents', async () => {
@@ -752,21 +1039,193 @@ test('Test that S_FaOpenedDocuments createTemporaryDocument validates parent doc
   expect(store.tabs.find((tab) => tab.documentId === documentId)?.parentDocumentId).toBe('parent-1')
 })
 
-test('Test that S_FaOpenedDocuments createTemporaryDocument can open in the background', async () => {
+test('Test that S_FaOpenedDocuments createTemporaryDocumentUnderParentDocument seeds nested temporary tab', async () => {
+  getDocumentByIdMock.mockImplementation(async (documentId: string) => {
+    if (documentId === 'doc-parent') {
+      return {
+        displayName: 'Parent',
+        id: 'doc-parent',
+        parentDocumentId: 'doc-grandparent',
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    if (documentId === 'doc-grandparent') {
+      return {
+        displayName: 'Grandparent',
+        id: 'doc-grandparent',
+        parentDocumentId: null,
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    throw new Error('missing')
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  const documentId = await store.createTemporaryDocumentUnderParentDocument('doc-parent')
+
+  expect(documentId).not.toBeNull()
+  const tab = store.tabs.find((row) => row.documentId === documentId)
+  expect(tab?.parentDocumentId).toBe('doc-parent')
+  expect(tab?.temporaryParentResolveDocumentIds).toEqual(['doc-parent', 'doc-grandparent'])
+  expect(tab?.editState).toBe(true)
+  expect(tab?.hasUnsavedChanges).toBe(false)
+  expect(tab?.displayNameDraft).toBe('New character')
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName under parent queues parent tree refresh', async () => {
+  const refreshHierarchyTreeNodesMock = vi.fn()
+  getDocumentByIdMock.mockImplementation(async (documentId: string) => {
+    if (documentId === 'doc-parent') {
+      return {
+        displayName: 'Parent',
+        id: 'doc-parent',
+        parentDocumentId: null,
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    throw new Error('missing')
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  hierarchyStore.refreshHierarchyTreeNodes = refreshHierarchyTreeNodesMock
+  hierarchyStore.treeData = [
+    {
+      children: [
+        {
+          children: [
+            {
+              children: [],
+              childrenLoaded: false,
+              documentId: 'doc-parent',
+              documentTemplateId: 'tpl-1',
+              groupId: null,
+              hasChildren: false,
+              icon: 'mdi-account',
+              id: 'doc-parent',
+              label: 'Parent',
+              nodeKind: 'document',
+              placementId: 'placement-1',
+              worldColor: '#ff0000',
+              worldId: 'world-1'
+            }
+          ],
+          childrenLoaded: true,
+          documentId: null,
+          documentTemplateId: 'tpl-1',
+          groupId: null,
+          hasChildren: true,
+          icon: 'mdi-home',
+          id: 'placement-1',
+          label: 'Characters',
+          nodeKind: 'templatePlacement',
+          placementId: 'placement-1',
+          worldColor: '#ff0000',
+          worldId: 'world-1'
+        }
+      ],
+      childrenLoaded: true,
+      documentId: null,
+      groupId: null,
+      hasChildren: true,
+      icon: 'mdi-earth',
+      id: 'world-1',
+      label: 'World',
+      nodeKind: 'world',
+      placementId: null,
+      worldColor: '#ff0000',
+      worldId: 'world-1'
+    }
+  ]
+  await store.hydrateFromProjectDatabase()
+
+  const documentId = await store.createTemporaryDocumentUnderParentDocument('doc-parent')
+  if (documentId === null) {
+    throw new Error('expected temporary child')
+  }
+
+  await store.saveDocumentDisplayName(documentId, { keepEditMode: false })
+  await vi.runAllTimersAsync()
+
+  expect(refreshHierarchyTreeNodesMock).toHaveBeenCalledWith(['doc-parent'])
+  expect(hierarchyStore.treeData[0]?.children[0]?.children[0]?.hasChildren).toBe(true)
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName resolves deleted parent to nearest ancestor', async () => {
+  getDocumentByIdMock.mockImplementation(async (documentId: string) => {
+    if (documentId === 'doc-parent') {
+      return {
+        displayName: 'Parent',
+        id: 'doc-parent',
+        parentDocumentId: 'doc-grandparent',
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    if (documentId === 'doc-grandparent') {
+      return {
+        displayName: 'Grandparent',
+        id: 'doc-grandparent',
+        parentDocumentId: null,
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    throw new Error('missing')
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  const documentId = await store.createTemporaryDocumentUnderParentDocument('doc-parent')
+  if (documentId === null) {
+    throw new Error('expected temporary child')
+  }
+
+  getDocumentByIdMock.mockImplementation(async (id: string) => {
+    if (id === 'doc-parent') {
+      throw new Error('not found')
+    }
+    if (id === 'doc-grandparent') {
+      return {
+        displayName: 'Grandparent',
+        id: 'doc-grandparent',
+        parentDocumentId: null,
+        templateId: 'tpl-1',
+        worldId: 'world-1'
+      }
+    }
+    throw new Error('missing')
+  })
+
+  await store.saveDocumentDisplayName(documentId, { keepEditMode: true })
+
+  expect(createDocumentMock).toHaveBeenCalledWith(expect.objectContaining({
+    parentDocumentId: 'doc-grandparent'
+  }))
+})
+
+test('Test that S_FaOpenedDocuments createTemporaryDocument middle background focuses tab', async () => {
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const store = S_FaOpenedDocuments()
   await store.hydrateFromProjectDatabase()
   navigateToOpenedDocumentRouteMock.mockClear()
 
-  await store.createTemporaryDocument({
+  const documentId = await store.createTemporaryDocument({
     displayName: 'Background',
     openMode: 'middleBackground',
     templateId: 'tpl-1',
     worldId: 'world-1'
   })
 
-  expect(store.activeDocumentId).toBe('doc-1')
-  expect(navigateToOpenedDocumentRouteMock).not.toHaveBeenCalled()
+  expect(store.activeDocumentId).toBe(documentId)
+  expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith(documentId)
 })
 
 test('Test that S_FaOpenedDocuments createTemporaryDocument throws when project content APIs are missing', async () => {
@@ -1076,6 +1535,43 @@ test('Test that S_FaOpenedDocuments confirmDiscardAndClose clears pending close 
   expect(store.tabs).toHaveLength(1)
 })
 
+test('Test that S_FaOpenedDocuments deleteOpenedDocument discards temporary tabs without deleteDocument IPC', async () => {
+  const refreshHierarchyTreeNodesMock = vi.fn()
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  hierarchyStore.refreshHierarchyTreeNodes = refreshHierarchyTreeNodesMock
+  await store.hydrateFromProjectDatabase()
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'Aria',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  const temporaryTab = store.findTabByDocumentId(documentId)
+  expect(temporaryTab).not.toBeNull()
+  if (temporaryTab === null) {
+    return
+  }
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: documentId,
+    tabs: [temporaryTab]
+  })
+  deleteDocumentMock.mockClear()
+
+  await store.deleteOpenedDocument(documentId)
+
+  expect(deleteDocumentMock).not.toHaveBeenCalled()
+  expect(notifyCreateMock).toHaveBeenCalledWith({
+    group: false,
+    message: 'Document successfully deleted.',
+    type: 'positive'
+  })
+  expect(store.tabs).toHaveLength(0)
+  expect(store.activeDocumentId).toBeNull()
+  expect(navigateToWorkspaceHomeRouteMock).toHaveBeenCalled()
+})
+
 test('Test that S_FaOpenedDocuments deleteOpenedDocument no-ops tab removal when document is not open', async () => {
   const refreshDocumentsInTreeMock = vi.fn()
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
@@ -1091,6 +1587,11 @@ test('Test that S_FaOpenedDocuments deleteOpenedDocument no-ops tab removal when
   await store.deleteOpenedDocument('doc-closed')
 
   expect(deleteDocumentMock).toHaveBeenCalledWith('doc-closed')
+  expect(notifyCreateMock).toHaveBeenCalledWith({
+    group: false,
+    message: 'Document successfully deleted.',
+    type: 'positive'
+  })
   expect(store.tabs.map((tab) => tab.documentId)).toEqual(['doc-1'])
   expect(store.activeDocumentId).toBe('doc-1')
   expect(navigateToOpenedDocumentRouteMock).not.toHaveBeenCalled()
@@ -1199,7 +1700,7 @@ test('Test that S_FaOpenedDocuments openFromTree ignores missing project content
   expect(store.tabs).toHaveLength(1)
 })
 
-test('Test that S_FaOpenedDocuments openFromTree middle background keeps focus on an existing tab', async () => {
+test('Test that S_FaOpenedDocuments openFromTree middle background focuses an existing tab', async () => {
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const store = S_FaOpenedDocuments()
   await store.hydrateFromProjectDatabase()
@@ -1209,7 +1710,7 @@ test('Test that S_FaOpenedDocuments openFromTree middle background keeps focus o
 
   expect(store.tabs).toHaveLength(1)
   expect(store.activeDocumentId).toBe('doc-1')
-  expect(navigateToOpenedDocumentRouteMock).not.toHaveBeenCalled()
+  expect(navigateToOpenedDocumentRouteMock).toHaveBeenCalledWith('doc-1')
 })
 
 test('Test that S_FaOpenedDocuments updateTemporaryDocumentParent no-ops for unknown tabs', async () => {
@@ -1388,14 +1889,14 @@ test('Test that S_FaOpenedDocuments requestCloseTab no-ops for unknown tabs', as
   expect(store.pendingCloseDocumentId).toBeNull()
 })
 
-test('Test that S_FaOpenedDocuments requestDeleteDocument no-ops for unknown tabs', async () => {
+test('Test that S_FaOpenedDocuments requestDeleteDocument opens pending delete for a closed persisted document', async () => {
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const store = S_FaOpenedDocuments()
   await store.hydrateFromProjectDatabase()
 
   store.requestDeleteDocument('missing')
 
-  expect(store.pendingDeleteDocumentId).toBeNull()
+  expect(store.pendingDeleteDocumentId).toBe('missing')
 })
 
 test('Test that S_FaOpenedDocuments syncActiveDocumentIdFromWorkspaceRoute keeps active id when route document is not open', async () => {

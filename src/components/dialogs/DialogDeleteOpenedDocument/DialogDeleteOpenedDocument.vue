@@ -25,9 +25,6 @@
           {{ $t('dialogs.deleteOpenedDocument.warningPrefix') }}
           <span class="text-secondary">{{ $t('dialogs.deleteOpenedDocument.foreverWord') }}</span>{{ $t('dialogs.deleteOpenedDocument.warningSuffix') }}
         </p>
-        <p class="dialogDeleteOpenedDocument__fallback q-mb-sm">
-          {{ $t('dialogs.deleteOpenedDocument.fallbackNote') }}
-        </p>
         <p class="dialogDeleteOpenedDocument__proceed q-mb-none">
           {{ $t('dialogs.deleteOpenedDocument.proceedPrompt') }}
         </p>

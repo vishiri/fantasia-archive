@@ -2,6 +2,9 @@ import type { Ref } from 'vue'
 import type { watch as watchFn } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
+
+import { openProjectHierarchyTreeNodeInHeTree } from './projectHierarchyTreeNestParentOpenWiring'
+import type { createProjectHierarchyTreeSessionEarlyWiring } from './projectHierarchyTreeSessionEarlyWiring'
 import { collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh } from '../functions/projectHierarchyTreeDocumentParentBucket'
 
 export async function flushPendingProjectHierarchyTreeDocumentRefresh (deps: {
@@ -23,10 +26,14 @@ export async function flushPendingProjectHierarchyTreeDocumentRefresh (deps: {
 
 export async function flushPendingProjectHierarchyTreeNodeRefresh (deps: {
   nodeIds: readonly string[]
+  openRefreshedNodeInTree?: ((nodeId: string) => Promise<void>) | undefined
   refreshNodeChildrenFromDatabase: (nodeId: string) => Promise<void>
 }): Promise<void> {
   for (const nodeId of deps.nodeIds) {
     await deps.refreshNodeChildrenFromDatabase(nodeId)
+    if (deps.openRefreshedNodeInTree !== undefined) {
+      await deps.openRefreshedNodeInTree(nodeId)
+    }
   }
 }
 
@@ -35,6 +42,7 @@ export function bindProjectHierarchyTreeSessionPendingRefresh (deps: {
     clearPendingDocumentRefreshIds: () => void
     clearPendingHierarchyNodeRefreshIds: () => void
   }
+  openRefreshedNodeInTree?: ((nodeId: string) => Promise<void>) | undefined
   pendingDocumentRefreshIds: Ref<string[]>
   pendingHierarchyNodeRefreshIds: Ref<string[]>
   refreshNodeChildrenFromDatabase: (nodeId: string) => Promise<void>
@@ -44,6 +52,7 @@ export function bindProjectHierarchyTreeSessionPendingRefresh (deps: {
   wireProjectHierarchyTreePendingDocumentRefresh({
     clearPendingDocumentRefreshIds: () => deps.hierarchyStore.clearPendingDocumentRefreshIds(),
     clearPendingHierarchyNodeRefreshIds: () => deps.hierarchyStore.clearPendingHierarchyNodeRefreshIds(),
+    openRefreshedNodeInTree: deps.openRefreshedNodeInTree,
     pendingDocumentRefreshIds: deps.pendingDocumentRefreshIds,
     pendingHierarchyNodeRefreshIds: deps.pendingHierarchyNodeRefreshIds,
     refreshNodeChildrenFromDatabase: deps.refreshNodeChildrenFromDatabase,
@@ -52,9 +61,41 @@ export function bindProjectHierarchyTreeSessionPendingRefresh (deps: {
   })
 }
 
+export function bindProjectHierarchyTreeSessionPendingRefreshFromEarlyWiring (deps: {
+  earlyWiring: ReturnType<typeof createProjectHierarchyTreeSessionEarlyWiring>
+  hierarchyStore: {
+    clearPendingDocumentRefreshIds: () => void
+    clearPendingHierarchyNodeRefreshIds: () => void
+  }
+  nextTick: () => Promise<void>
+  pendingDocumentRefreshIds: Ref<string[]>
+  pendingHierarchyNodeRefreshIds: Ref<string[]>
+  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
+  watch: typeof watchFn
+}): void {
+  bindProjectHierarchyTreeSessionPendingRefresh({
+    hierarchyStore: deps.hierarchyStore,
+    openRefreshedNodeInTree: async (nodeId) => {
+      await openProjectHierarchyTreeNodeInHeTree({
+        getTreeRef: () => deps.earlyWiring.bootstrap.sessionRefs.treeComponentRef.value,
+        markNodeOpen: deps.earlyWiring.subWiring.uiStateWiring.markNodeOpen,
+        nextTick: deps.nextTick,
+        nodeId,
+        treeData: deps.treeData
+      })
+    },
+    pendingDocumentRefreshIds: deps.pendingDocumentRefreshIds,
+    pendingHierarchyNodeRefreshIds: deps.pendingHierarchyNodeRefreshIds,
+    refreshNodeChildrenFromDatabase: deps.earlyWiring.subWiring.lazyLoadWiring.refreshNodeChildrenFromDatabase,
+    treeData: deps.treeData,
+    watch: deps.watch
+  })
+}
+
 export function wireProjectHierarchyTreePendingDocumentRefresh (deps: {
   clearPendingDocumentRefreshIds: () => void
   clearPendingHierarchyNodeRefreshIds: () => void
+  openRefreshedNodeInTree?: ((nodeId: string) => Promise<void>) | undefined
   pendingDocumentRefreshIds: Ref<string[]>
   pendingHierarchyNodeRefreshIds: Ref<string[]>
   refreshNodeChildrenFromDatabase: (nodeId: string) => Promise<void>
@@ -86,6 +127,7 @@ export function wireProjectHierarchyTreePendingDocumentRefresh (deps: {
       deps.clearPendingHierarchyNodeRefreshIds()
       void flushPendingProjectHierarchyTreeNodeRefresh({
         nodeIds,
+        openRefreshedNodeInTree: deps.openRefreshedNodeInTree,
         refreshNodeChildrenFromDatabase: deps.refreshNodeChildrenFromDatabase
       })
     }

@@ -166,30 +166,13 @@ export function resolveFaOpenedDocumentOpenFromTree (deps: {
     deps.tabs.value,
     deps.documentId
   )
-  if (existingIndex !== -1) {
-    if (deps.mode === 'middleBackground') {
-      return {
-        shouldNavigate: false,
-        navigateDocumentId: null
-      }
-    }
-    deps.activeDocumentId.value = deps.documentId
-    return {
-      shouldNavigate: true,
-      navigateDocumentId: deps.documentId
-    }
+  if (existingIndex === -1) {
+    deps.tabs.value = appendOpenedDocumentTabToRight(deps.tabs.value, deps.newTab)
   }
-  deps.tabs.value = appendOpenedDocumentTabToRight(deps.tabs.value, deps.newTab)
-  if (deps.mode === 'leftNavigate') {
-    deps.activeDocumentId.value = deps.documentId
-    return {
-      shouldNavigate: true,
-      navigateDocumentId: deps.documentId
-    }
-  }
+  deps.activeDocumentId.value = deps.documentId
   return {
-    shouldNavigate: false,
-    navigateDocumentId: null
+    shouldNavigate: true,
+    navigateDocumentId: deps.documentId
   }
 }
 

@@ -18,6 +18,9 @@ const faOpenedDocumentTabSchema = z.object({
     z.string().min(1).max(64),
     z.null()
   ]).optional(),
+  temporaryParentResolveDocumentIds: z.array(
+    z.string().min(1).max(64)
+  ).optional(),
   tabLabel: z.string().max(512),
   templateIcon: z.string().max(128),
   displayNameDraft: z.string().max(512),

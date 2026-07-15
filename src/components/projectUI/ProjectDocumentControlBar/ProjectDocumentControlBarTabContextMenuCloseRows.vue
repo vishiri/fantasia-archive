@@ -1,6 +1,6 @@
 <template>
   <q-separator
-    class="projectDocumentControlBarTabContextMenu__separatorAlt"
+    class="projectDocumentControlBarTabContextMenu__separatorPrimaryBright"
     dark
     role="separator"
   />

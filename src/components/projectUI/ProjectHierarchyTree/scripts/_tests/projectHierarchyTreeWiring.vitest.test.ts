@@ -972,6 +972,7 @@ test('Test that session handlers wiring emits document open requests', async () 
     openNodeIds: ref<Set<string>>(new Set()),
     queuePersistExpandedNodeIds: vi.fn(),
     resolvePreferredLanguageCode: () => 'en-US',
+    runFaAction: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef,
     treeData: ref([]),
@@ -1430,6 +1431,7 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle resets store when proje
     clearPendingRevealPath: vi.fn(),
     flushUiStatePersist: vi.fn(),
     hydrateTreeSession: vi.fn(async () => undefined),
+    layoutRefreshGeneration: ref(0),
     shouldDeferWorldsExpandRestore: () => false,
     onMounted: vi.fn(),
     onUnmounted: vi.fn(),
@@ -1461,6 +1463,7 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle ignores empty reveal pa
     clearPendingRevealPath,
     flushUiStatePersist: vi.fn(),
     hydrateTreeSession: vi.fn(async () => undefined),
+    layoutRefreshGeneration: ref(0),
     shouldDeferWorldsExpandRestore: () => false,
     onMounted: vi.fn(),
     onUnmounted: vi.fn(),
@@ -1505,6 +1508,7 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
     openNodeIds: ref<Set<string>>(new Set()),
     queuePersistExpandedNodeIds: vi.fn(),
     resolvePreferredLanguageCode: () => 'en-US',
+    runFaAction: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: ref(null),
     treeData: ref([]),
@@ -1628,6 +1632,7 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle skips restore while dra
     clearPendingRevealPath: vi.fn(),
     flushUiStatePersist: vi.fn(),
     hydrateTreeSession: vi.fn(async () => undefined),
+    layoutRefreshGeneration: ref(0),
     shouldDeferWorldsExpandRestore: () => true,
     onMounted: vi.fn(),
     onUnmounted: vi.fn(),
@@ -1676,6 +1681,7 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle watches project and wor
     clearPendingRevealPath,
     flushUiStatePersist,
     hydrateTreeSession,
+    layoutRefreshGeneration: ref(0),
     shouldDeferWorldsExpandRestore: () => false,
     onMounted,
     onUnmounted,
@@ -1721,6 +1727,7 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle preserves expanded snap
     clearPendingRevealPath: vi.fn(),
     flushUiStatePersist: vi.fn(),
     hydrateTreeSession: vi.fn(async () => undefined),
+    layoutRefreshGeneration: ref(0),
     shouldDeferWorldsExpandRestore: () => false,
     onMounted: vi.fn(),
     onUnmounted: vi.fn(),
@@ -2632,6 +2639,7 @@ test('Test that createProjectHierarchyTreeSessionWiring returns tree API', async
     pendingRevealPath: ref([]),
     ref,
     resolvePreferredLanguageCode: () => 'en-US',
+    runFaAction: vi.fn(),
     treeData,
     uiState: ref({
       expandedNodeIds: [],
@@ -2639,6 +2647,7 @@ test('Test that createProjectHierarchyTreeSessionWiring returns tree API', async
       scrollTopPx: 0
     }),
     watch: vi.fn(),
+    layoutRefreshGeneration: ref(0),
     worlds: ref([])
   })
   expect(api.treeData).toBe(treeData)
@@ -2874,11 +2883,13 @@ test('Test that createUseProjectHierarchyTree composes hierarchy session wiring'
     resolveFaDocumentWorkspaceRouteDocumentId: (path) => {
       return path.startsWith('/home/document/') ? path.slice('/home/document/'.length) : null
     },
+    runFaAction: vi.fn(),
     storeToRefs: ((store: { flushUiStatePersist?: unknown }) => {
       return {
         pendingDocumentRefreshIds,
         pendingHierarchyNodeRefreshIds: ref<string[]>([]),
         pendingRevealPath,
+        layoutRefreshGeneration: ref(0),
         treeData: ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])),
         uiState: ref({
           expandedNodeIds: [],
@@ -2945,10 +2956,12 @@ test('Test that createUseProjectHierarchyTree treats missing route path as non-d
     onUnmounted: (hook) => hook(),
     ref,
     resolveFaDocumentWorkspaceRouteDocumentId: () => null,
+    runFaAction: vi.fn(),
     storeToRefs: (() => ({
       pendingDocumentRefreshIds: ref<string[]>([]),
       pendingHierarchyNodeRefreshIds: ref<string[]>([]),
       pendingRevealPath: ref<string[]>([]),
+      layoutRefreshGeneration: ref(0),
       treeData: ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])),
       uiState: ref({
         expandedNodeIds: [],
@@ -3005,10 +3018,12 @@ test('Test that createUseProjectHierarchyTree falls back to en-US when user sett
     onUnmounted: (hook) => hook(),
     ref,
     resolveFaDocumentWorkspaceRouteDocumentId: () => null,
+    runFaAction: vi.fn(),
     storeToRefs: (() => ({
       pendingDocumentRefreshIds: ref<string[]>([]),
       pendingHierarchyNodeRefreshIds: ref<string[]>([]),
       pendingRevealPath: ref<string[]>([]),
+      layoutRefreshGeneration: ref(0),
       treeData: ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])),
       uiState: ref({
         expandedNodeIds: [],
@@ -3393,6 +3408,7 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle hydrates active project
     clearPendingRevealPath: vi.fn(),
     flushUiStatePersist: vi.fn(),
     hydrateTreeSession,
+    layoutRefreshGeneration: ref(0),
     shouldDeferWorldsExpandRestore: () => false,
     onMounted: (hook) => {
       hook()
@@ -3581,6 +3597,7 @@ test('Test that createProjectHierarchyTreeSessionWiring invokes lifecycle store 
     pendingRevealPath: ref([]),
     ref,
     resolvePreferredLanguageCode: () => 'en-US',
+    runFaAction: vi.fn(),
     treeData: ref([]),
     uiState: ref({
       expandedNodeIds: [],
@@ -3588,6 +3605,7 @@ test('Test that createProjectHierarchyTreeSessionWiring invokes lifecycle store 
       scrollTopPx: 0
     }),
     watch,
+    layoutRefreshGeneration: ref(0),
     worlds: ref([])
   })
   expect(hierarchyStore.resetOnProjectClose).toHaveBeenCalled()
@@ -4235,6 +4253,7 @@ test('Test that bindProjectHierarchyTreeSessionLifecycle evaluates worlds expand
     flushUiStatePersist: vi.fn(),
     getDragExpandedSnapshotNodeIds: earlyWiring.subWiring.dndWiring.getDragExpandedSnapshotNodeIds,
     hydrateTreeSession: vi.fn(async () => undefined),
+    layoutRefreshGeneration: ref(0),
     onMounted: (hook) => {
       mountedHooks.push(hook)
     },

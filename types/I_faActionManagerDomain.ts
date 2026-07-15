@@ -54,6 +54,16 @@ export const FA_ACTION_IDS = [
   'copyOpenedDocumentTabName',
   'copyOpenedDocumentTabTextColor',
   'copyOpenedDocumentTabBackgroundColor',
+  'copyOpenedDocumentTabDocument',
+  'addOpenedDocumentTabChildDocument',
+  'copyHierarchyTreeDocumentName',
+  'copyHierarchyTreeDocumentTextColor',
+  'copyHierarchyTreeDocumentBackgroundColor',
+  'openHierarchyTreeDocument',
+  'editHierarchyTreeDocument',
+  'copyHierarchyTreeDocument',
+  'addHierarchyTreeChildDocument',
+  'deleteHierarchyTreeDocument',
   'focusPreviousOpenedDocumentTab',
   'focusNextOpenedDocumentTab',
   'moveActiveOpenedDocumentTabLeft',
@@ -150,6 +160,16 @@ export interface I_faActionPayloadMap {
   copyOpenedDocumentTabName: { documentId: string }
   copyOpenedDocumentTabTextColor: { documentId: string }
   copyOpenedDocumentTabBackgroundColor: { documentId: string }
+  copyOpenedDocumentTabDocument: { documentId: string }
+  addOpenedDocumentTabChildDocument: { documentId: string }
+  copyHierarchyTreeDocumentName: { documentId: string }
+  copyHierarchyTreeDocumentTextColor: { documentId: string }
+  copyHierarchyTreeDocumentBackgroundColor: { documentId: string }
+  openHierarchyTreeDocument: { documentId: string }
+  editHierarchyTreeDocument: { documentId: string }
+  copyHierarchyTreeDocument: { documentId: string }
+  addHierarchyTreeChildDocument: { documentId: string }
+  deleteHierarchyTreeDocument: { documentId: string }
   focusPreviousOpenedDocumentTab: void
   focusNextOpenedDocumentTab: void
   moveActiveOpenedDocumentTabLeft: void

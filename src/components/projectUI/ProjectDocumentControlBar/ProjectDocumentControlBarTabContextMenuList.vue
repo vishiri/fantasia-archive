@@ -54,10 +54,11 @@
       :on-copy-text-color-click="onCopyTextColorClick"
     />
 
-    <q-separator
-      class="projectDocumentControlBarTabContextMenu__separator"
-      dark
-      role="separator"
+    <ProjectDocumentControlBarTabContextMenuDocumentRows
+      :add-new-document-under-this-label="addNewDocumentUnderThisLabel"
+      :copy-document-label="copyDocumentLabel"
+      :on-add-new-document-under-this-click="onAddNewDocumentUnderThisClick"
+      :on-copy-document-click="onCopyDocumentClick"
     />
 
     <q-item
@@ -151,6 +152,7 @@ import ProjectDocumentControlBarTabContextMenuBrowseSubmenu from './ProjectDocum
 import ProjectDocumentControlBarTabContextMenuCloseRows from './ProjectDocumentControlBarTabContextMenuCloseRows.vue'
 import ProjectDocumentControlBarTabContextMenuCopyRows from './ProjectDocumentControlBarTabContextMenuCopyRows.vue'
 import ProjectDocumentControlBarTabContextMenuDestructiveRows from './ProjectDocumentControlBarTabContextMenuDestructiveRows.vue'
+import ProjectDocumentControlBarTabContextMenuDocumentRows from './ProjectDocumentControlBarTabContextMenuDocumentRows.vue'
 
 defineOptions({
   name: 'ProjectDocumentControlBarTabContextMenuList'
@@ -158,11 +160,13 @@ defineOptions({
 
 defineProps<{
   activeDocumentTabName: string | undefined
+  addNewDocumentUnderThisLabel: string
   browseOpenedTabsLabel: string
   closeAllTabsWithoutChangesExceptThisOneLabel: string
   closeAllTabsWithoutChangesLabel: string
   closeThisTabLabel: string
   copyBackgroundColorLabel: string
+  copyDocumentLabel: string
   copyNameLabel: string
   copyTextColorLabel: string
   deleteThisDocumentLabel: string
@@ -179,8 +183,10 @@ defineProps<{
   onCloseAllTabsWithoutChangesExceptThisOneClick: () => void
   onCloseThisTabClick: () => void
   onCopyBackgroundColorClick: () => void
+  onCopyDocumentClick: () => void
   onCopyNameClick: () => void
   onCopyTextColorClick: () => void
+  onAddNewDocumentUnderThisClick: () => void
   onDeleteThisDocumentClick: () => void
   onForceCloseAllTabsClick: () => void
   onForceCloseAllTabsExceptThisOneClick: () => void

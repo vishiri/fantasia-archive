@@ -2,12 +2,14 @@ import type { Ref } from 'vue'
 
 import type {
   I_faProjectHierarchyTreeDragCommitResult,
+  I_faProjectHierarchyTreeDragSiblingOrderSnapshot,
   I_faProjectHierarchyTreeHeTreeNode
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { syncProjectHierarchyTreeDocumentHasChildrenFlags } from '../functions/projectHierarchyTreeDocumentHasChildrenSync'
 import { PROJECT_HIERARCHY_TREE_DRAG_EXPAND_SNAPSHOT_RESTORE_OPTIONS } from '../functions/projectHierarchyTreeConstants'
 import { finalizeProjectHierarchyTreeDragCommitExpandState } from './projectHierarchyTreeDnDCommitFinalizeWiring'
+import { refreshProjectHierarchyTreeDragCommitSourceContainer } from './projectHierarchyTreeDnDCommitReloadWiring'
 import { remountProjectHierarchyTreeAndRestoreExpandedSnapshot } from './projectHierarchyTreeMountRemountWiring'
 import { findProjectHierarchyTreeNodeById } from '../functions/projectHierarchyTreeExpandState'
 import { syncProjectHierarchyTreeOpenSetToPersist } from './projectHierarchyTreeUiStateWiring'
@@ -57,6 +59,8 @@ export async function finalizeProjectHierarchyTreeDragCommitAfterPersist (deps: 
   commitResult: I_faProjectHierarchyTreeDragCommitResult
   dragExpandPostCommitGuard: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
+  dragParentDocumentIdAtDragStart: string | null
+  dragSiblingOrderSnapshot: I_faProjectHierarchyTreeDragSiblingOrderSnapshot | null
   expandedSnapshot: string[]
   expandedSnapshotSet: Set<string>
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
@@ -66,9 +70,11 @@ export async function finalizeProjectHierarchyTreeDragCommitAfterPersist (deps: 
   markNodeClosed: (nodeId: string, node: I_faProjectHierarchyTreeHeTreeNode) => void
   nextTick: () => Promise<void>
   openNodeIds: Ref<Set<string>>
+  parentChangedFromDragStart: boolean
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   reapplyHeTreeOpenState: () => void
   reapplyLatentDescendantExpandState: () => Promise<void>
+  refreshNodeChildrenFromDatabase: (nodeId: string) => Promise<void>
   requestAnimationFrame: (callback: () => void) => number
   restoreExpandedSnapshot: (
     expandedNodeIds: string[],
@@ -87,6 +93,14 @@ export async function finalizeProjectHierarchyTreeDragCommitAfterPersist (deps: 
     nextTick: deps.nextTick,
     restoreExpandedSnapshot: deps.restoreExpandedSnapshot,
     restoreOptions: PROJECT_HIERARCHY_TREE_DRAG_EXPAND_SNAPSHOT_RESTORE_OPTIONS
+  })
+  await refreshProjectHierarchyTreeDragCommitSourceContainer({
+    committed: deps.commitResult.committed,
+    dragParentDocumentIdAtDragStart: deps.dragParentDocumentIdAtDragStart,
+    dragSiblingOrderSnapshot: deps.dragSiblingOrderSnapshot,
+    parentChangedFromDragStart: deps.parentChangedFromDragStart,
+    refreshNodeChildrenFromDatabase: deps.refreshNodeChildrenFromDatabase,
+    treeData: deps.treeData
   })
   const emptiedParentDocumentIds = syncProjectHierarchyTreeDocumentHasChildrenFlags(
     deps.treeData.value

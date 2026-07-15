@@ -32,6 +32,9 @@ import { copyToClipboard } from 'quasar'
 import { createFaActionDefinitionHandlers } from './functions/createFaActionDefinitionHandlers'
 import { createFaActionDefinitionHandlersDocumentWorkspace } from './functions/createFaActionDefinitionHandlersDocumentWorkspace'
 import { createFaActionDefinitionHandlersOpenedDocumentTabClipboard } from './faActionDefinitionHandlersOpenedDocumentTabClipboard'
+import { createFaActionDefinitionHandlersHierarchyTreeDocumentClipboard } from './faActionDefinitionHandlersHierarchyTreeDocumentClipboard'
+import { createFaActionDefinitionHandlersHierarchyTreeDocumentActions } from './faActionDefinitionHandlersHierarchyTreeDocumentActions'
+import { createFaActionDefinitionHandlersOpenedDocumentTabDocumentActions } from './faActionDefinitionHandlersOpenedDocumentTabDocumentActions'
 import { createFaActionDefinitionHandlersShowProjectDashboard } from './functions/createFaActionDefinitionHandlersShowProjectDashboard'
 import { buildFaActionDefinitionHandlersWindowChrome } from './faActionDefinitionHandlersWindowChrome'
 import { notifyCreateForFaActionDefinitionHandlers } from './faActionDefinitionHandlersNotifyWiring'
@@ -100,6 +103,23 @@ const faActionDefinitionHandlersApi = {
     i18n,
     notifyCreate: notifyCreateForFaActionDefinitionHandlers,
     resolveDocumentTabLabelFromOpenedTab
+  }),
+  ...createFaActionDefinitionHandlersHierarchyTreeDocumentClipboard({
+    S_FaProjectHierarchyTree,
+    copyToClipboard,
+    i18n,
+    notifyCreate: notifyCreateForFaActionDefinitionHandlers
+  }),
+  ...createFaActionDefinitionHandlersHierarchyTreeDocumentActions({
+    S_FaOpenedDocuments,
+    S_FaProjectHierarchyTree,
+    i18n,
+    notifyCreate: notifyCreateForFaActionDefinitionHandlers
+  }),
+  ...createFaActionDefinitionHandlersOpenedDocumentTabDocumentActions({
+    S_FaOpenedDocuments,
+    i18n,
+    notifyCreate: notifyCreateForFaActionDefinitionHandlers
   })
 }
 
@@ -207,6 +227,36 @@ export const handleCopyOpenedDocumentTabTextColor =
 
 export const handleCopyOpenedDocumentTabBackgroundColor =
   faActionDefinitionHandlersApi.handleCopyOpenedDocumentTabBackgroundColor
+
+export const handleCopyOpenedDocumentTabDocument =
+  faActionDefinitionHandlersApi.handleCopyOpenedDocumentTabDocument
+
+export const handleAddOpenedDocumentTabChildDocument =
+  faActionDefinitionHandlersApi.handleAddOpenedDocumentTabChildDocument
+
+export const handleCopyHierarchyTreeDocumentName =
+  faActionDefinitionHandlersApi.handleCopyHierarchyTreeDocumentName
+
+export const handleCopyHierarchyTreeDocumentTextColor =
+  faActionDefinitionHandlersApi.handleCopyHierarchyTreeDocumentTextColor
+
+export const handleCopyHierarchyTreeDocumentBackgroundColor =
+  faActionDefinitionHandlersApi.handleCopyHierarchyTreeDocumentBackgroundColor
+
+export const handleOpenHierarchyTreeDocument =
+  faActionDefinitionHandlersApi.handleOpenHierarchyTreeDocument
+
+export const handleEditHierarchyTreeDocument =
+  faActionDefinitionHandlersApi.handleEditHierarchyTreeDocument
+
+export const handleCopyHierarchyTreeDocument =
+  faActionDefinitionHandlersApi.handleCopyHierarchyTreeDocument
+
+export const handleAddHierarchyTreeChildDocument =
+  faActionDefinitionHandlersApi.handleAddHierarchyTreeChildDocument
+
+export const handleDeleteHierarchyTreeDocument =
+  faActionDefinitionHandlersApi.handleDeleteHierarchyTreeDocument
 
 export const handleFocusPreviousOpenedDocumentTab =
   faActionDefinitionHandlersApi.handleFocusPreviousOpenedDocumentTab

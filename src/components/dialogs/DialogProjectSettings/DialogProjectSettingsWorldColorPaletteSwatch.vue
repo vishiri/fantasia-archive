@@ -88,7 +88,7 @@
         <q-item
           v-close-popup
           clickable
-          class="dialogProjectSettingsWorldColorPaletteSwatch__contextMenuItem dialogProjectSettingsWorldColorPaletteSwatch__contextMenuItem--delete non-selectable text-negative"
+          class="dialogProjectSettingsWorldColorPaletteSwatch__contextMenuItem dialogProjectSettingsWorldColorPaletteSwatch__contextMenuItem--delete non-selectable text-secondary"
           role="menuitem"
           data-test-locator="dialogProjectSettings-worlds-colorPaletteContextMenu-delete"
           @click="onDeleteColor"

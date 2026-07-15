@@ -18,6 +18,16 @@ import {
   handleCopyOpenedDocumentTabName,
   handleCopyOpenedDocumentTabTextColor,
   handleCopyOpenedDocumentTabBackgroundColor,
+  handleCopyOpenedDocumentTabDocument,
+  handleAddOpenedDocumentTabChildDocument,
+  handleCopyHierarchyTreeDocumentName,
+  handleCopyHierarchyTreeDocumentTextColor,
+  handleCopyHierarchyTreeDocumentBackgroundColor,
+  handleOpenHierarchyTreeDocument,
+  handleEditHierarchyTreeDocument,
+  handleCopyHierarchyTreeDocument,
+  handleAddHierarchyTreeChildDocument,
+  handleDeleteHierarchyTreeDocument,
   handleFocusPreviousOpenedDocumentTab,
   handleFocusNextOpenedDocumentTab,
   handleMoveActiveOpenedDocumentTabLeft,
@@ -120,6 +130,56 @@ export const FA_ACTION_DEFINITIONS_HEAD: ReadonlyArray<I_faActionDefinition<T_fa
   {
     handler: handleCopyOpenedDocumentTabBackgroundColor as I_faActionDefinition<T_faActionId>['handler'],
     id: 'copyOpenedDocumentTabBackgroundColor',
+    kind: 'async'
+  },
+  {
+    handler: handleCopyOpenedDocumentTabDocument as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'copyOpenedDocumentTabDocument',
+    kind: 'async'
+  },
+  {
+    handler: handleAddOpenedDocumentTabChildDocument as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'addOpenedDocumentTabChildDocument',
+    kind: 'async'
+  },
+  {
+    handler: handleCopyHierarchyTreeDocumentName as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'copyHierarchyTreeDocumentName',
+    kind: 'async'
+  },
+  {
+    handler: handleCopyHierarchyTreeDocumentTextColor as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'copyHierarchyTreeDocumentTextColor',
+    kind: 'async'
+  },
+  {
+    handler: handleCopyHierarchyTreeDocumentBackgroundColor as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'copyHierarchyTreeDocumentBackgroundColor',
+    kind: 'async'
+  },
+  {
+    handler: handleOpenHierarchyTreeDocument as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'openHierarchyTreeDocument',
+    kind: 'async'
+  },
+  {
+    handler: handleEditHierarchyTreeDocument as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'editHierarchyTreeDocument',
+    kind: 'async'
+  },
+  {
+    handler: handleCopyHierarchyTreeDocument as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'copyHierarchyTreeDocument',
+    kind: 'async'
+  },
+  {
+    handler: handleAddHierarchyTreeChildDocument as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'addHierarchyTreeChildDocument',
+    kind: 'async'
+  },
+  {
+    handler: handleDeleteHierarchyTreeDocument as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'deleteHierarchyTreeDocument',
     kind: 'async'
   },
   {

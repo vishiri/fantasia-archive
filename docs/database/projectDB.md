@@ -158,7 +158,7 @@ Singleton workspace tab snapshot (one row, **`id = 1`**).
 | Column | Notes |
 |--------|--------|
 | `id` | INTEGER PK, CHECK **`id = 1`** |
-| `snapshot_json` | TEXT JSON: **`schemaVersion`** (**1** legacy, **2** current), **`activeDocumentId`**, ordered **`tabs`**. Each tab: document id, **`persistenceState`** (**`persisted`** or **`temporary`**), labels, template icon, name draft, saved baseline, unsaved flag, **`editState`** preview/edit mode. Temporary tabs also store **`worldId`**, **`templateId`**, and optional **`parentDocumentId`** until first save creates the SQLite document row. Legacy v1 snapshots without **`persistenceState`** hydrate as **`persisted`**. |
+| `snapshot_json` | TEXT JSON: **`schemaVersion`** (**1** legacy, **2** current), **`activeDocumentId`**, ordered **`tabs`**. Each tab: document id, **`persistenceState`** (**`persisted`** or **`temporary`**), labels, template icon, name draft, saved baseline, unsaved flag, **`editState`** preview/edit mode. Temporary tabs also store **`worldId`**, **`templateId`**, optional **`parentDocumentId`**, and optional **`temporaryParentResolveDocumentIds`** (ancestor chain for parent resolve at first save) until first save creates the SQLite document row. Legacy v1 snapshots without **`persistenceState`** hydrate as **`persisted`**. |
 | `updated_at_ms` | INTEGER Unix ms |
 
 **Modules:** **`faOpenedDocumentsPersistWiring.ts`**. Renderer store **`S_FaOpenedDocuments`** debounces writes (**500ms**) via **`FA_PROJECT_MANAGEMENT_IPC`**.

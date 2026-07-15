@@ -22,8 +22,10 @@ const controlBarHandlers = vi.hoisted(() => ({
   onTabCloseAllWithoutChangesExceptClick: vi.fn(),
   onTabCloseClick: vi.fn(),
   onTabCopyBackgroundColorClick: vi.fn(async () => undefined),
+  onTabCopyDocumentClick: vi.fn(async () => undefined),
   onTabCopyNameClick: vi.fn(async () => undefined),
   onTabCopyTextColorClick: vi.fn(async () => undefined),
+  onTabAddNewDocumentUnderThisClick: vi.fn(async () => undefined),
   onTabDeleteClick: vi.fn(),
   onTabForceCloseAllClick: vi.fn(),
   onTabForceCloseAllExceptClick: vi.fn(),
@@ -86,8 +88,10 @@ vi.mock('../scripts/projectDocumentControlBar_manager', () => {
         onTabCloseAllWithoutChangesExceptClick: controlBarHandlers.onTabCloseAllWithoutChangesExceptClick,
         onTabCloseClick: controlBarHandlers.onTabCloseClick,
         onTabCopyBackgroundColorClick: controlBarHandlers.onTabCopyBackgroundColorClick,
+        onTabCopyDocumentClick: controlBarHandlers.onTabCopyDocumentClick,
         onTabCopyNameClick: controlBarHandlers.onTabCopyNameClick,
         onTabCopyTextColorClick: controlBarHandlers.onTabCopyTextColorClick,
+        onTabAddNewDocumentUnderThisClick: controlBarHandlers.onTabAddNewDocumentUnderThisClick,
         onTabDeleteClick: controlBarHandlers.onTabDeleteClick,
         onTabForceCloseAllClick: controlBarHandlers.onTabForceCloseAllClick,
         onTabForceCloseAllExceptClick: controlBarHandlers.onTabForceCloseAllExceptClick,
@@ -311,8 +315,10 @@ test('Test that ProjectDocumentControlBar applies document appearance styles to 
   const tab = document.querySelector('[data-test-locator="projectDocumentControlBar-tab-doc-1"]') as HTMLElement
   expect(tab).not.toBeNull()
   expect(tab.classList.contains('projectDocumentControlBarTabs__tab--customAppearance')).toBe(true)
+  expect(tab.classList.contains('projectDocumentControlBarTabs__tab--customDocumentBackground')).toBe(true)
   expect(tab.style.color).toBe('')
   expectCssColorValue(tab.style.backgroundColor, '#112233')
+  expect(tab.style.getPropertyValue('--projectDocumentControlBarTab-backgroundColor').trim()).toBe('#112233')
   expect(tab.style.getPropertyValue('--projectDocumentControlBarTab-textColor').trim()).toBe('#aabbcc')
   expect(tab.style.getPropertyValue('--projectDocumentControlBarTab-focusHelperColor').trim()).toBe('#112233')
 

@@ -35,6 +35,11 @@ export interface I_faOpenedDocumentTab {
   templateId?: string | undefined
   /** Set when persistenceState is temporary. */
   parentDocumentId?: string | null | undefined
+  /**
+   * Ordered ancestor document ids from intended parent upward; used to resolve parent at first save
+   * when the intended parent was deleted before persist.
+   */
+  temporaryParentResolveDocumentIds?: readonly string[] | undefined
   tabLabel: string
   templateIcon: string
   displayNameDraft: string
@@ -59,6 +64,7 @@ export interface I_faTemporaryOpenedDocumentCreateInput {
   parentDocumentId?: string | null | undefined
   documentId?: string | undefined
   openMode?: T_faOpenedDocumentOpenMode | undefined
+  temporaryParentResolveDocumentIds?: readonly string[] | undefined
 }
 
 /** Tree row metadata captured when a tab is opened from the hierarchy sidebar. */

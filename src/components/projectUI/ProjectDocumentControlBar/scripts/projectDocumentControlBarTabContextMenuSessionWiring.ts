@@ -71,8 +71,10 @@ function buildProjectDocumentControlBarTabContextMenuSessionReturn (input: {
   const closeAllTabsWithoutChangesLabel = input.labels.closeAllTabsWithoutChangesLabel
   const closeThisTabLabel = input.labels.closeThisTabLabel
   const copyBackgroundColorLabel = input.labels.copyBackgroundColorLabel
+  const copyDocumentLabel = input.labels.copyDocumentLabel
   const copyNameLabel = input.labels.copyNameLabel
   const copyTextColorLabel = input.labels.copyTextColorLabel
+  const addNewDocumentUnderThisLabel = input.labels.addNewDocumentUnderThisLabel
   const deleteThisDocumentLabel = input.labels.deleteThisDocumentLabel
   const forceCloseAllTabsExceptThisOneLabel = input.labels.forceCloseAllTabsExceptThisOneLabel
   const forceCloseAllTabsLabel = input.labels.forceCloseAllTabsLabel
@@ -90,8 +92,10 @@ function buildProjectDocumentControlBarTabContextMenuSessionReturn (input: {
     input.clickHandlers.onCloseAllTabsWithoutChangesExceptThisOneClick
   const onCloseThisTabClick = input.clickHandlers.onCloseThisTabClick
   const onCopyBackgroundColorClick = input.clickHandlers.onCopyBackgroundColorClick
+  const onCopyDocumentClick = input.clickHandlers.onCopyDocumentClick
   const onCopyNameClick = input.clickHandlers.onCopyNameClick
   const onCopyTextColorClick = input.clickHandlers.onCopyTextColorClick
+  const onAddNewDocumentUnderThisClick = input.clickHandlers.onAddNewDocumentUnderThisClick
   const onDeleteThisDocumentClick = input.clickHandlers.onDeleteThisDocumentClick
   const onForceCloseAllTabsClick = input.clickHandlers.onForceCloseAllTabsClick
   const onForceCloseAllTabsExceptThisOneClick =
@@ -105,11 +109,13 @@ function buildProjectDocumentControlBarTabContextMenuSessionReturn (input: {
   )
 
   return {
+    addNewDocumentUnderThisLabel,
     browseOpenedTabsLabel,
     closeAllTabsWithoutChangesExceptThisOneLabel,
     closeAllTabsWithoutChangesLabel,
     closeThisTabLabel,
     copyBackgroundColorLabel,
+    copyDocumentLabel,
     copyNameLabel,
     copyTextColorLabel,
     deleteThisDocumentLabel,
@@ -126,8 +132,10 @@ function buildProjectDocumentControlBarTabContextMenuSessionReturn (input: {
     onCloseAllTabsWithoutChangesExceptThisOneClick,
     onCloseThisTabClick,
     onCopyBackgroundColorClick,
+    onCopyDocumentClick,
     onCopyNameClick,
     onCopyTextColorClick,
+    onAddNewDocumentUnderThisClick,
     onDeleteThisDocumentClick,
     onForceCloseAllTabsClick,
     onForceCloseAllTabsExceptThisOneClick,
@@ -169,8 +177,10 @@ export function buildProjectDocumentControlBarTabContextMenuSession (
     translateCloseAllTabsWithoutChangesExceptThisOne: () => t('projectUI.projectDocumentControlBar.closeAllTabsWithoutChangesExceptThisOne'),
     translateCloseThisTab: () => t('projectUI.projectDocumentControlBar.closeThisTab'),
     translateCopyBackgroundColor: () => t('projectUI.projectDocumentControlBar.copyBackgroundColor'),
+    translateCopyDocument: () => t('projectUI.projectHierarchyTree.contextMenu.copyDocument'),
     translateCopyName: () => t('projectUI.projectDocumentControlBar.copyName'),
     translateCopyTextColor: () => t('projectUI.projectDocumentControlBar.copyTextColor'),
+    translateAddNewDocumentUnderThis: () => t('projectUI.projectHierarchyTree.contextMenu.addNewDocumentUnderThis'),
     translateDeleteThisDocument: () => t('projectUI.projectDocumentControlBar.deleteThisDocument'),
     translateForceCloseAllTabs: () => t('projectUI.projectDocumentControlBar.forceCloseAllTabs'),
     translateForceCloseAllTabsExceptThisOne: () => t('projectUI.projectDocumentControlBar.forceCloseAllTabsExceptThisOne'),

@@ -55,7 +55,14 @@ export function resolveOpenedDocumentTabFocusIndexAfterClose (
 export function duplicateOpenedDocumentTab (
   tab: I_faOpenedDocumentTab
 ): I_faOpenedDocumentTab {
-  return { ...tab }
+  const duplicated: I_faOpenedDocumentTab = {
+    ...tab
+  }
+  const resolveIds = tab?.temporaryParentResolveDocumentIds
+  if (resolveIds !== undefined) {
+    duplicated.temporaryParentResolveDocumentIds = [...resolveIds]
+  }
+  return duplicated
 }
 
 /**

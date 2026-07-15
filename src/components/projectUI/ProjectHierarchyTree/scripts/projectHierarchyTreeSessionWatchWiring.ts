@@ -13,6 +13,7 @@ type T_projectHierarchyTreeSessionLifecycleDeps = {
   clearPendingRevealPath: () => void
   flushUiStatePersist: () => void
   hydrateTreeSession: () => Promise<void>
+  layoutRefreshGeneration: Ref<number>
   onMounted: (hook: () => void) => void
   onUnmounted: (hook: () => void) => void
   openNodeIds: Ref<Set<string>>
@@ -48,7 +49,10 @@ export function wireProjectHierarchyTreeSessionLifecycle (
   )
 
   deps.watch(
-    () => deps.worlds.value,
+    () => [
+      deps.layoutRefreshGeneration.value,
+      deps.worlds.value
+    ] as const,
     async () => {
       const deferRestore = deps.shouldDeferWorldsExpandRestore()
       if (deferRestore) {

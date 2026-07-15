@@ -3,12 +3,32 @@ import { expect, test, vi } from 'vitest'
 
 import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
 
+import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
+
 import { createUseDialogDeleteOpenedDocument } from '../functions/createUseDialogDeleteOpenedDocument'
+
+const treeDocumentNode: I_faProjectHierarchyTreeHeTreeNode = {
+  children: [],
+  childrenLoaded: true,
+  documentBackgroundColor: null,
+  documentId: 'doc-missing',
+  documentTextColor: null,
+  groupId: 'group-1',
+  hasChildren: false,
+  icon: '',
+  id: 'doc-missing',
+  label: 'Saved Hero',
+  nodeKind: 'document',
+  placementId: 'placement-1',
+  worldColor: '#000',
+  worldId: 'world-1'
+}
 
 function mountDeleteDialog (input: {
   pendingDeleteDocumentId?: string | null
   tabDisplayName?: string | null
   tabLabel?: string
+  treeData?: I_faProjectHierarchyTreeHeTreeNode[]
 } = {}) {
   const pendingDeleteDocumentId = ref<string | null>(input.pendingDeleteDocumentId ?? null)
   const confirmDeleteOpenedDocument = vi.fn(async () => undefined)
@@ -29,6 +49,12 @@ function mountDeleteDialog (input: {
       dismissPendingDelete,
       findTabByDocumentId
     }) as never,
+    S_FaProjectHierarchyTree: () => ({
+      treeData: input.treeData ?? []
+    }),
+    findProjectHierarchyTreeDocumentNodeByDocumentId: (treeData, documentId) => {
+      return treeData.find((node) => node.documentId === documentId) ?? null
+    },
     computed: computed as <T>(getter: () => T) => I_computedRef<T>,
     i18n: {
       global: {
@@ -84,7 +110,18 @@ test('Test that delete dialog document name falls back to tab label when draft i
   expect(api.documentName.value).toBe('Placeholder')
 })
 
-test('Test that delete dialog document name falls back to document id when tab is missing', () => {
+test('Test that delete dialog document name falls back to hierarchy tree label when tab is missing', () => {
+  const { api } = mountDeleteDialog({
+    pendingDeleteDocumentId: 'doc-missing',
+    tabDisplayName: null,
+    treeData: [{
+      ...treeDocumentNode
+    }]
+  })
+  expect(api.documentName.value).toBe('Saved Hero')
+})
+
+test('Test that delete dialog document name falls back to document id when tab and tree node are missing', () => {
   const { api } = mountDeleteDialog({
     pendingDeleteDocumentId: 'doc-missing',
     tabDisplayName: null

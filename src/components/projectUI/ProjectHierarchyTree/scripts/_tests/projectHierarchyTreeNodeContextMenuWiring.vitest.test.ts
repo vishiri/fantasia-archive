@@ -114,6 +114,8 @@ test('onNodeRowContextMenu opens menu for eligible structural rows', () => {
   })
   expect(wiring.contextMenuAnchorNodeId.value).toBe('world-1')
   expect(wiring.contextMenuAddNewRowLabel.value).toBeNull()
+  expect(wiring.contextMenuShowsBulkExpandRows.value).toBe(true)
+  expect(wiring.contextMenuShowsCopyRows.value).toBe(false)
 })
 
 test('onNodeRowContextMenu exposes add-new row for template placements', () => {
@@ -157,7 +159,7 @@ test('onAddNewDocumentFromContextMenuClick delegates to add-new handler', () => 
   expect(wiring.isNodeContextMenuOpen.value).toBe(false)
 })
 
-test('onNodeRowContextMenu suppresses menu for leaf document rows', () => {
+test('onNodeRowContextMenu opens menu for leaf document rows with copy section only', () => {
   const { wiring } = createContextMenuWiring()
   const leafDocument: I_faProjectHierarchyTreeHeTreeNode = {
     children: [],
@@ -180,7 +182,10 @@ test('onNodeRowContextMenu suppresses menu for leaf document rows', () => {
   vi.spyOn(event, 'preventDefault')
 
   wiring.onNodeRowContextMenu(leafDocument, event)
-  expect(wiring.isNodeContextMenuOpen.value).toBe(false)
+  expect(wiring.isNodeContextMenuOpen.value).toBe(true)
+  expect(wiring.contextMenuAnchorNodeId.value).toBe('doc-leaf')
+  expect(wiring.contextMenuShowsBulkExpandRows.value).toBe(false)
+  expect(wiring.contextMenuShowsCopyRows.value).toBe(true)
 })
 
 test('menu actions delegate to bulk wiring and close menu', async () => {
@@ -259,4 +264,6 @@ test('onNodeContextMenuHide clears anchor id and add-new row', () => {
   expect(wiring.nodeMenuPointerPosition.value).toBeNull()
   expect(wiring.contextMenuAddNewRowLabel.value).toBeNull()
   expect(wiring.contextMenuAddNewRowIcon.value).toBeNull()
+  expect(wiring.contextMenuShowsBulkExpandRows.value).toBe(false)
+  expect(wiring.contextMenuShowsCopyRows.value).toBe(false)
 })

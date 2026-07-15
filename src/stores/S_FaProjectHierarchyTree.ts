@@ -36,6 +36,8 @@ export const S_FaProjectHierarchyTree = defineStore('S_FaProjectHierarchyTree', 
   let lastPersistedExpandedNodeIdsJson = JSON.stringify(uiState.value.expandedNodeIds)
   let lastPersistedScrollTopPx = uiState.value.scrollTopPx
   let refreshLayoutInFlight: Promise<void> | null = null
+  let refreshLayoutNeedsFollowUp = false
+  const layoutRefreshGeneration = ref(0)
 
   function applyUiState (next: I_faProjectHierarchyTreeUiState): void {
     uiState.value = {
@@ -57,25 +59,33 @@ export const S_FaProjectHierarchyTree = defineStore('S_FaProjectHierarchyTree', 
     applyUiState(createEmptyProjectHierarchyTreeUiState())
   }
 
+  async function applyLayoutFromBridge (): Promise<void> {
+    const layout = await faProjectHierarchyTreeRefreshLayoutFromBridge()
+    if (layout === null) {
+      return
+    }
+    worlds.value = layout.worlds
+    if (layout.worlds.length === 0) {
+      treeData.value = []
+    }
+    layoutRefreshGeneration.value += 1
+  }
+
   async function refreshLayout (): Promise<void> {
     if (!S_FaActiveProject().hasActiveProject) {
       resetOnProjectClose()
       return
     }
     if (refreshLayoutInFlight !== null) {
+      refreshLayoutNeedsFollowUp = true
       await refreshLayoutInFlight
+      if (refreshLayoutNeedsFollowUp) {
+        refreshLayoutNeedsFollowUp = false
+        await refreshLayout()
+      }
       return
     }
-    refreshLayoutInFlight = (async () => {
-      const layout = await faProjectHierarchyTreeRefreshLayoutFromBridge()
-      if (layout === null) {
-        return
-      }
-      worlds.value = layout.worlds
-      if (layout.worlds.length === 0) {
-        treeData.value = []
-      }
-    })()
+    refreshLayoutInFlight = applyLayoutFromBridge()
     try {
       await refreshLayoutInFlight
     } finally {
@@ -214,6 +224,7 @@ export const S_FaProjectHierarchyTree = defineStore('S_FaProjectHierarchyTree', 
   const clearPendingRevealPathOut = clearPendingRevealPath
   const clearSearchOut = clearSearch
   const flushUiStatePersistOut = flushUiStatePersist
+  const layoutRefreshGenerationOut = layoutRefreshGeneration
   const patchWorldColorPalleteInLayoutOut = patchWorldColorPalleteInLayout
   const pendingDocumentRefreshIdsOut = pendingDocumentRefreshIds
   const pendingHierarchyNodeRefreshIdsOut = pendingHierarchyNodeRefreshIds
@@ -238,6 +249,7 @@ export const S_FaProjectHierarchyTree = defineStore('S_FaProjectHierarchyTree', 
     clearPendingRevealPath: clearPendingRevealPathOut,
     clearSearch: clearSearchOut,
     flushUiStatePersist: flushUiStatePersistOut,
+    layoutRefreshGeneration: readonly(layoutRefreshGenerationOut),
     patchWorldColorPalleteInLayout: patchWorldColorPalleteInLayoutOut,
     pendingDocumentRefreshIds: pendingDocumentRefreshIdsOut,
     pendingHierarchyNodeRefreshIds: pendingHierarchyNodeRefreshIdsOut,

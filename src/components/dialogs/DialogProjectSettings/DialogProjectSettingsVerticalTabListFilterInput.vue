@@ -18,7 +18,7 @@
       #append
     >
       <q-btn
-        color="negative"
+        color="secondary"
         dense
         flat
         icon="mdi-close"

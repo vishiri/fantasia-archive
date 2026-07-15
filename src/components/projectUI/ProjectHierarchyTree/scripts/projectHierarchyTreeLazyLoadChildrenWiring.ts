@@ -7,7 +7,7 @@ import type {
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { mapHierarchyDocumentChildrenToTreeNodes } from './projectHierarchyTreeMapperWiring'
-import { shouldReloadProjectHierarchyTreeNodeChildren } from '../functions/projectHierarchyTreeLazyLoadChildReload'
+import { shouldReloadProjectHierarchyTreeNodeChildren, isProjectHierarchyTreePlacementDocumentListNotFoundError } from '../functions/projectHierarchyTreeLazyLoadChildReload'
 import {
   finalizeProjectHierarchyTreePlacementTopLevelChildren
 } from './projectHierarchyTreeAddNewDocumentNode'
@@ -56,9 +56,17 @@ export async function loadProjectHierarchyTreeNodeChildren (deps: {
     return
   }
   if (deps.node.nodeKind === 'templatePlacement' && deps.node.placementId !== null) {
-    const result = await deps.listPlacementDocumentChildren({
-      placementId: deps.node.placementId
-    })
+    let result: { items: I_faProjectHierarchyTreeDocumentChild[] }
+    try {
+      result = await deps.listPlacementDocumentChildren({
+        placementId: deps.node.placementId
+      })
+    } catch (error) {
+      if (isProjectHierarchyTreePlacementDocumentListNotFoundError(error)) {
+        return
+      }
+      throw error
+    }
     const docChildren = mapHierarchyDocumentChildrenToTreeNodes({
       items: result.items,
       placementIcon: deps.node.icon,
@@ -83,10 +91,18 @@ export async function loadProjectHierarchyTreeNodeChildren (deps: {
     deps.node.placementId !== null &&
     deps.node.documentId !== null
   ) {
-    const result = await deps.listPlacementDocumentChildren({
-      parentDocumentId: deps.node.documentId,
-      placementId: deps.node.placementId
-    })
+    let result: { items: I_faProjectHierarchyTreeDocumentChild[] }
+    try {
+      result = await deps.listPlacementDocumentChildren({
+        parentDocumentId: deps.node.documentId,
+        placementId: deps.node.placementId
+      })
+    } catch (error) {
+      if (isProjectHierarchyTreePlacementDocumentListNotFoundError(error)) {
+        return
+      }
+      throw error
+    }
     const children = mapHierarchyDocumentChildrenToTreeNodes({
       items: result.items,
       placementIcon: deps.node.icon,

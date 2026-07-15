@@ -11,6 +11,7 @@ import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRo
 
 import { createUseProjectHierarchyTree } from './createUseProjectHierarchyTree'
 import { resolveProjectHierarchyTreePlacementDisplayIcon } from './projectHierarchyTreePlacementDisplayIconWiring'
+import { runFaAction } from 'app/src/scripts/actionManager/faActionManagerRun_manager'
 
 export {
   applyProjectHierarchyTreeTreeNodeKindClass,
@@ -33,6 +34,7 @@ export const useProjectHierarchyTree = createUseProjectHierarchyTree({
   onUnmounted,
   ref,
   resolveFaDocumentWorkspaceRouteDocumentId,
+  runFaAction,
   storeToRefs,
   useRoute,
   watch

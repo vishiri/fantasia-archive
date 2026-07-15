@@ -25,7 +25,10 @@ test('Test that ProjectDocumentControlBarTabContextMenuCloseRows delegates close
           template: '<div @click="$emit(\'click\', $event)"><slot /></div>'
         },
         QItemSection: { template: '<div><slot /></div>' },
-        QSeparator: { template: '<hr />' }
+        QSeparator: {
+          inheritAttrs: false,
+          template: '<hr v-bind="$attrs" />'
+        }
       }
     }
   })
@@ -33,6 +36,9 @@ test('Test that ProjectDocumentControlBarTabContextMenuCloseRows delegates close
   await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-closeThisTab"]').trigger('click')
   await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-closeAllTabsWithoutChangesExceptThisOne"]').trigger('click')
   await wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-closeAllTabsWithoutChanges"]').trigger('click')
+
+  const closeThisTab = wrapper.get('[data-test-locator="projectDocumentControlBar-tabContextMenu-closeThisTab"]')
+  expect(closeThisTab.element.previousElementSibling?.classList.contains('projectDocumentControlBarTabContextMenu__separatorPrimaryBright')).toBe(true)
 
   expect(onCloseThisTabClick).toHaveBeenCalled()
   expect(onCloseAllTabsWithoutChangesExceptThisOneClick).toHaveBeenCalled()

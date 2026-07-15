@@ -1,6 +1,7 @@
 import type { Ref } from 'vue'
 import type { watch as watchFn } from 'vue'
 
+import type { I_faActionPayloadMap, T_faActionId } from 'app/types/I_faActionManagerDomain'
 import type {
   I_faProjectHierarchyTreeHeTreeNode,
   I_faProjectHierarchyTreeUiState,
@@ -11,7 +12,7 @@ import { createProjectHierarchyTreeSessionHandlersBindWiring } from './projectHi
 import { bindProjectHierarchyTreeSessionHydrateLifecycle } from './projectHierarchyTreeSessionLifecycleBindWiring'
 import { buildProjectHierarchyTreeSessionApi } from './projectHierarchyTreeSessionApiWiring'
 import { createProjectHierarchyTreeSessionEarlyWiring } from './projectHierarchyTreeSessionEarlyWiring'
-import { bindProjectHierarchyTreeSessionPendingRefresh } from './projectHierarchyTreePendingDocumentRefreshWiring'
+import { bindProjectHierarchyTreeSessionPendingRefreshFromEarlyWiring } from './projectHierarchyTreePendingDocumentRefreshWiring'
 import { bindProjectHierarchyTreeAddNewDocumentLanguageRefresh } from './projectHierarchyTreeAddNewDocumentLanguageRefreshWiring'
 
 type T_hierarchyStore = {
@@ -58,10 +59,12 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
   pendingRevealPath: Ref<string[]>
   ref: <T>(initial: T) => Ref<T>
   resolvePreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
+  runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   uiState: Ref<I_faProjectHierarchyTreeUiState>
   watch: typeof watchFn
   worlds: Ref<I_faProjectHierarchyTreeWorkspaceWorld[]>
+  layoutRefreshGeneration: Ref<number>
 }) {
   const earlyWiring = createProjectHierarchyTreeSessionEarlyWiring({
     computed: deps.computed,
@@ -85,16 +88,18 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
     onMounted: deps.onMounted,
     onUnmounted: deps.onUnmounted,
     pendingRevealPath: deps.pendingRevealPath,
+    layoutRefreshGeneration: deps.layoutRefreshGeneration,
     treeData: deps.treeData,
     watch: deps.watch,
     worlds: deps.worlds
   })
 
-  bindProjectHierarchyTreeSessionPendingRefresh({
+  bindProjectHierarchyTreeSessionPendingRefreshFromEarlyWiring({
+    earlyWiring,
     hierarchyStore: deps.hierarchyStore,
+    nextTick: deps.nextTick,
     pendingDocumentRefreshIds: deps.pendingDocumentRefreshIds,
     pendingHierarchyNodeRefreshIds: deps.pendingHierarchyNodeRefreshIds,
-    refreshNodeChildrenFromDatabase: earlyWiring.subWiring.lazyLoadWiring.refreshNodeChildrenFromDatabase,
     treeData: deps.treeData,
     watch: deps.watch
   })
@@ -114,6 +119,7 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
       nextTick: deps.nextTick,
       onDocumentOpenRequest: deps.onDocumentOpenRequest,
       resolvePreferredLanguageCode: deps.resolvePreferredLanguageCode,
+      runFaAction: deps.runFaAction,
       treeData: deps.treeData
     }),
     isTreeDragActive: earlyWiring.bootstrap.sessionRefs.isTreeDragActive,

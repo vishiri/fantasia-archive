@@ -17,8 +17,10 @@ export function buildProjectDocumentControlBarTabContextMenuHandlers (input: {
   runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
 }): {
     onTabCopyBackgroundColorClick: (documentId: string) => Promise<void>
+    onTabCopyDocumentClick: (documentId: string) => Promise<void>
     onTabCopyNameClick: (documentId: string) => Promise<void>
     onTabCopyTextColorClick: (documentId: string) => Promise<void>
+    onTabAddNewDocumentUnderThisClick: (documentId: string) => Promise<void>
     onTabMoveClick: (documentId: string, direction: 'left' | 'right') => void
   } {
   async function onTabCopyNameClick (documentId: string): Promise<void> {
@@ -68,12 +70,32 @@ export function buildProjectDocumentControlBarTabContextMenuHandlers (input: {
     input.runFaAction('copyOpenedDocumentTabBackgroundColor', { documentId })
   }
 
+  async function onTabCopyDocumentClick (documentId: string): Promise<void> {
+    const tab = input.findTabByDocumentId(documentId)
+    if (tab === null) {
+      return
+    }
+
+    input.runFaAction('copyOpenedDocumentTabDocument', { documentId })
+  }
+
+  async function onTabAddNewDocumentUnderThisClick (documentId: string): Promise<void> {
+    const tab = input.findTabByDocumentId(documentId)
+    if (tab === null) {
+      return
+    }
+
+    input.runFaAction('addOpenedDocumentTabChildDocument', { documentId })
+  }
+
   function onTabMoveClick (documentId: string, direction: 'left' | 'right'): void {
     input.moveDocumentTab(documentId, direction)
   }
 
   return {
+    onTabAddNewDocumentUnderThisClick,
     onTabCopyBackgroundColorClick,
+    onTabCopyDocumentClick,
     onTabCopyNameClick,
     onTabCopyTextColorClick,
     onTabMoveClick

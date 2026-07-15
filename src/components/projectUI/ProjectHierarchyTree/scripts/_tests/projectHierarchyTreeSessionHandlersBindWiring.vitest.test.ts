@@ -59,6 +59,7 @@ test('createProjectHierarchyTreeSessionHandlersBindWiring forwards queuePersistE
     nextTick: async () => {},
     onDocumentOpenRequest: vi.fn(),
     resolvePreferredLanguageCode: () => 'en-US',
+    runFaAction: vi.fn(),
     treeData: ref([])
   })
 

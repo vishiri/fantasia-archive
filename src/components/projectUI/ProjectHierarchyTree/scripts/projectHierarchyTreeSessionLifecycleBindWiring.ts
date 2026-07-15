@@ -29,6 +29,7 @@ export function bindProjectHierarchyTreeSessionHydrateLifecycle (deps: {
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   watch: typeof watchFn
   worlds: Ref<unknown[]>
+  layoutRefreshGeneration: Ref<number>
 }): void {
   const hydrateWiring = createProjectHierarchyTreeSessionHydrateWiring({
     dndWiring: deps.earlyWiring.subWiring.dndWiring,
@@ -46,6 +47,7 @@ export function bindProjectHierarchyTreeSessionHydrateLifecycle (deps: {
     flushUiStatePersist: () => deps.hierarchyStore.flushUiStatePersist(),
     getDragExpandedSnapshotNodeIds: deps.earlyWiring.subWiring.dndWiring.getDragExpandedSnapshotNodeIds,
     hydrateTreeSession: hydrateWiring.hydrateTreeSession,
+    layoutRefreshGeneration: deps.layoutRefreshGeneration,
     onMounted: deps.onMounted,
     onUnmounted: deps.onUnmounted,
     openNodeIds: deps.earlyWiring.bootstrap.sessionRefs.openNodeIds,
@@ -82,6 +84,7 @@ export function bindProjectHierarchyTreeSessionLifecycle (deps: {
   resyncTreeDataFromLayout: () => void
   restoreExpandedSnapshot: (expandedNodeIds: string[]) => Promise<void>
   revealPendingPath: () => Promise<void>
+  layoutRefreshGeneration: Ref<number>
   teardown: () => void
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   watch: typeof watchFn
@@ -92,6 +95,7 @@ export function bindProjectHierarchyTreeSessionLifecycle (deps: {
     clearPendingRevealPath: deps.clearPendingRevealPath,
     flushUiStatePersist: deps.flushUiStatePersist,
     hydrateTreeSession: deps.hydrateTreeSession,
+    layoutRefreshGeneration: deps.layoutRefreshGeneration,
     onMounted: deps.onMounted,
     onUnmounted: deps.onUnmounted,
     openNodeIds: deps.openNodeIds,

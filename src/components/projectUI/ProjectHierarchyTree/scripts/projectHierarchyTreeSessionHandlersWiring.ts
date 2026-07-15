@@ -4,6 +4,7 @@ import type {
   I_faOpenedDocumentTreeOpenMeta,
   T_faOpenedDocumentOpenMode
 } from 'app/types/I_faOpenedDocumentsDomain'
+import type { I_faActionPayloadMap, T_faActionId } from 'app/types/I_faActionManagerDomain'
 import type { I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import {
@@ -49,6 +50,7 @@ type T_projectHierarchyTreeSessionHandlersWiringDeps = {
   openNodeIds: Ref<Set<string>>
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   resolvePreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
+  runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
   suppressTreeEmit: Ref<boolean>
   treeComponentRef: Ref<I_faProjectHierarchyTreeHeTreeInstance | null>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
@@ -100,6 +102,7 @@ export function createProjectHierarchyTreeSessionHandlersWiring (
     openNodeIds: deps.openNodeIds,
     queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
     resolvePreferredLanguageCode: deps.resolvePreferredLanguageCode,
+    runFaAction: deps.runFaAction,
     suppressTreeEmit: deps.suppressTreeEmit,
     treeData: deps.treeData,
     treeMountKey: deps.treeMountKey,
@@ -126,15 +129,26 @@ export function createProjectHierarchyTreeSessionHandlersWiring (
     contextMenuAddNewRowIcon: bulkContextMenuWiring.contextMenuAddNewRowIcon,
     contextMenuAddNewRowLabel: bulkContextMenuWiring.contextMenuAddNewRowLabel,
     contextMenuAnchorNodeId: bulkContextMenuWiring.contextMenuAnchorNodeId,
+    contextMenuShowsBulkExpandRows: bulkContextMenuWiring.contextMenuShowsBulkExpandRows,
+    contextMenuShowsCopyRows: bulkContextMenuWiring.contextMenuShowsCopyRows,
     isNodeContextMenuOpen: bulkContextMenuWiring.isNodeContextMenuOpen,
     nodeMenuPointerPosition: bulkContextMenuWiring.nodeMenuPointerPosition,
     onAddNewDocumentFromContextMenuClick: bulkContextMenuWiring.onAddNewDocumentFromContextMenuClick,
+    onAddNewDocumentUnderThisFromContextMenuClick:
+      bulkContextMenuWiring.onAddNewDocumentUnderThisFromContextMenuClick,
     onCollapseAllUnderNodeClick: bulkContextMenuWiring.onCollapseAllUnderNodeClick,
+    onCopyBackgroundColorFromContextMenuClick: bulkContextMenuWiring.onCopyBackgroundColorFromContextMenuClick,
+    onCopyDocumentFromContextMenuClick: bulkContextMenuWiring.onCopyDocumentFromContextMenuClick,
+    onCopyNameFromContextMenuClick: bulkContextMenuWiring.onCopyNameFromContextMenuClick,
+    onCopyTextColorFromContextMenuClick: bulkContextMenuWiring.onCopyTextColorFromContextMenuClick,
+    onDeleteDocumentFromContextMenuClick: bulkContextMenuWiring.onDeleteDocumentFromContextMenuClick,
     onDocumentRowAuxClick: clickHandlersWiring.onDocumentRowAuxClick,
+    onEditDocumentFromContextMenuClick: bulkContextMenuWiring.onEditDocumentFromContextMenuClick,
     onExpandAllUnderNodeClick: bulkContextMenuWiring.onExpandAllUnderNodeClick,
     onNodeClick: clickHandlersWiring.onNodeClick,
     onNodeContextMenuHide: bulkContextMenuWiring.onNodeContextMenuHide,
     onNodeRowContextMenu: bulkContextMenuWiring.onNodeRowContextMenu,
+    onOpenDocumentFromContextMenuClick: bulkContextMenuWiring.onOpenDocumentFromContextMenuClick,
     onNodeClose: expandHandlersWiring.onNodeClose,
     onNodeOpen: expandHandlersWiring.onNodeOpen,
     onNodeOpenIconClick: expandHandlersWiring.onNodeOpenIconClick,

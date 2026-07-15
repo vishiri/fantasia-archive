@@ -1,6 +1,18 @@
 import { expect, test } from 'vitest'
 
-import { shouldReloadProjectHierarchyTreeNodeChildren } from '../projectHierarchyTreeLazyLoadChildReload'
+import { isProjectHierarchyTreePlacementDocumentListNotFoundError, shouldReloadProjectHierarchyTreeNodeChildren } from '../projectHierarchyTreeLazyLoadChildReload'
+
+test('Test that isProjectHierarchyTreePlacementDocumentListNotFoundError matches IPC not-found errors', () => {
+  expect(isProjectHierarchyTreePlacementDocumentListNotFoundError(
+    new Error('Error invoking remote method: FaProjectContentNotFoundError: Document not found: doc-a')
+  )).toBe(true)
+  expect(isProjectHierarchyTreePlacementDocumentListNotFoundError(new Error('other'))).toBe(false)
+})
+
+test('Test that isProjectHierarchyTreePlacementDocumentListNotFoundError matches non-Error throwables', () => {
+  expect(isProjectHierarchyTreePlacementDocumentListNotFoundError('FaProjectContentNotFoundError: gone')).toBe(true)
+  expect(isProjectHierarchyTreePlacementDocumentListNotFoundError('other')).toBe(false)
+})
 
 test('Test that shouldReloadProjectHierarchyTreeNodeChildren reloads unloaded placement rows', () => {
   expect(shouldReloadProjectHierarchyTreeNodeChildren({

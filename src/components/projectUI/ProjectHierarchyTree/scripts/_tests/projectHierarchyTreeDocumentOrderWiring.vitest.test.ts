@@ -648,6 +648,7 @@ test('Test that finalizeProjectHierarchyTreeDragCommitAfterPersist merges nest p
   const queuePersistExpandedNodeIds = vi.fn()
   const openNodeIds = ref(new Set(['world-1', 'group-1', 'placement-1', 'doc-parent']))
   const restoreExpandedSnapshot = vi.fn(async () => undefined)
+  const refreshNodeChildrenFromDatabase = vi.fn(async () => undefined)
   await finalizeProjectHierarchyTreeDragCommitAfterPersist({
     clearDragSessionFlags: vi.fn(),
     commitResult: {
@@ -658,6 +659,8 @@ test('Test that finalizeProjectHierarchyTreeDragCommitAfterPersist merges nest p
     },
     dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    dragParentDocumentIdAtDragStart: null,
+    dragSiblingOrderSnapshot: null,
     expandedSnapshot: ['world-1', 'placement-1'],
     expandedSnapshotSet: new Set(['world-1', 'placement-1']),
     flushDeferredTreeRevisionPublish: vi.fn(),
@@ -670,9 +673,11 @@ test('Test that finalizeProjectHierarchyTreeDragCommitAfterPersist merges nest p
     markNodeClosed: vi.fn(),
     nextTick: async () => undefined,
     openNodeIds,
+    parentChangedFromDragStart: false,
     queuePersistExpandedNodeIds,
     reapplyHeTreeOpenState: vi.fn(),
     reapplyLatentDescendantExpandState: vi.fn(async () => undefined),
+    refreshNodeChildrenFromDatabase,
     requestAnimationFrame: (callback) => {
       callback()
       return 1
@@ -715,6 +720,8 @@ test('Test that finalizeProjectHierarchyTreeDragCommitAfterPersist skips nest pe
     },
     dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    dragParentDocumentIdAtDragStart: null,
+    dragSiblingOrderSnapshot: null,
     expandedSnapshot: ['world-1', 'placement-1', 'doc-parent'],
     expandedSnapshotSet: new Set(['world-1', 'placement-1', 'doc-parent']),
     flushDeferredTreeRevisionPublish: vi.fn(),
@@ -727,9 +734,11 @@ test('Test that finalizeProjectHierarchyTreeDragCommitAfterPersist skips nest pe
     markNodeClosed: vi.fn(),
     nextTick: async () => undefined,
     openNodeIds,
+    parentChangedFromDragStart: false,
     queuePersistExpandedNodeIds,
     reapplyHeTreeOpenState: vi.fn(),
     reapplyLatentDescendantExpandState: vi.fn(async () => undefined),
+    refreshNodeChildrenFromDatabase: vi.fn(async () => undefined),
     requestAnimationFrame: (callback) => {
       callback()
       return 1
@@ -917,6 +926,8 @@ test('Test that finalizeProjectHierarchyTreeDragCommitAfterPersist closes emptie
     },
     dragExpandPostCommitGuard: ref(false),
     dragExpandUiFrozen: ref(false),
+    dragParentDocumentIdAtDragStart: null,
+    dragSiblingOrderSnapshot: null,
     expandedSnapshot: ['world-1', 'placement-1'],
     expandedSnapshotSet: new Set(['world-1', 'placement-1']),
     flushDeferredTreeRevisionPublish: vi.fn(),
@@ -926,9 +937,11 @@ test('Test that finalizeProjectHierarchyTreeDragCommitAfterPersist closes emptie
     markNodeClosed,
     nextTick: async () => undefined,
     openNodeIds: ref(new Set(['world-1', 'placement-1'])),
+    parentChangedFromDragStart: false,
     queuePersistExpandedNodeIds: vi.fn(),
     reapplyHeTreeOpenState: vi.fn(),
     reapplyLatentDescendantExpandState: vi.fn(async () => undefined),
+    refreshNodeChildrenFromDatabase: vi.fn(async () => undefined),
     requestAnimationFrame: (callback) => {
       callback()
       return 1

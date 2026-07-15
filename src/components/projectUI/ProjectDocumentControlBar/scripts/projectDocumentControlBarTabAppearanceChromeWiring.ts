@@ -27,6 +27,7 @@ export function resolveProjectDocumentControlBarTabInlineStyle (
   const textColor = chrome.color
 
   if (backgroundColor !== undefined) {
+    style['--projectDocumentControlBarTab-backgroundColor'] = backgroundColor
     style['--projectDocumentControlBarTab-focusHelperColor'] = backgroundColor
     style.backgroundColor = backgroundColor
   }

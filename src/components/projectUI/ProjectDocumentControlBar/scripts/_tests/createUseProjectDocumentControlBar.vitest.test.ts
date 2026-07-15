@@ -345,6 +345,7 @@ test('Test that resolveDocumentTabAppearanceChrome and inline style delegate to 
     color: '#aabbcc'
   })
   expect(api.resolveDocumentTabInlineStyle(tab)).toEqual({
+    '--projectDocumentControlBarTab-backgroundColor': '#112233',
     '--projectDocumentControlBarTab-focusHelperColor': '#112233',
     '--projectDocumentControlBarTab-textColor': '#aabbcc',
     backgroundColor: '#112233'

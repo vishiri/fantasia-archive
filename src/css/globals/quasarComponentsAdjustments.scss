@@ -364,8 +364,7 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
     min-height: $qMenu-item-minHeight;
     padding: $qMenu-item-padding;
 
-    /* Legibility: destructive label tint vs background; labels only (main section), not icons. */
-    &.text-negative,
+    /* Legibility: destructive menu rows use text-secondary; labels only (main section), not icons. */
     &.text-secondary {
       .q-item__section--main {
         font-weight: $qMenu-negativeMenuItemLabel-fontWeight;

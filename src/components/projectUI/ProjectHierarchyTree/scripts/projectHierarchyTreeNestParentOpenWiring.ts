@@ -32,3 +32,19 @@ export async function openProjectHierarchyTreeNestParentAfterDragDrop (deps: {
   treeRef?.openNodeAndParents(parentNode)
   await deps.nextTick()
 }
+
+export async function openProjectHierarchyTreeNodeInHeTree (deps: {
+  getTreeRef: () => T_treeRef
+  markNodeOpen: (nodeId: string) => void
+  nextTick: () => Promise<void>
+  nodeId: string
+  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
+}): Promise<void> {
+  const node = findProjectHierarchyTreeNodeById(deps.treeData.value, deps.nodeId)
+  if (node === null) {
+    return
+  }
+  deps.markNodeOpen(deps.nodeId)
+  deps.getTreeRef()?.openNodeAndParents(node)
+  await deps.nextTick()
+}

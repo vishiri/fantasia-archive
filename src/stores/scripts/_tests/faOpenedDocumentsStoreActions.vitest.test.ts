@@ -54,11 +54,11 @@ test('Test that resolveFaOpenedDocumentOpenFromTree focuses an existing tab on l
 
 /**
  * resolveFaOpenedDocumentOpenFromTree
- * Middle background on an existing tab is a no-op.
+ * Middle background on an existing tab focuses and navigates.
  */
-test('Test that resolveFaOpenedDocumentOpenFromTree ignores duplicate middle background opens', () => {
+test('Test that resolveFaOpenedDocumentOpenFromTree focuses an existing tab on middle background', () => {
   const tabs = ref([baseTab])
-  const activeDocumentId = ref<string | null>('doc-1')
+  const activeDocumentId = ref<string | null>(null)
   const result = resolveFaOpenedDocumentOpenFromTree({
     activeDocumentId,
     documentId: 'doc-1',
@@ -66,11 +66,13 @@ test('Test that resolveFaOpenedDocumentOpenFromTree ignores duplicate middle bac
     newTab: baseTab,
     tabs
   })
-  expect(result.shouldNavigate).toBe(false)
+  expect(result.shouldNavigate).toBe(true)
+  expect(result.navigateDocumentId).toBe('doc-1')
   expect(tabs.value).toHaveLength(1)
+  expect(activeDocumentId.value).toBe('doc-1')
 })
 
-test('Test that resolveFaOpenedDocumentOpenFromTree appends middle background tab without navigation', () => {
+test('Test that resolveFaOpenedDocumentOpenFromTree appends middle background tab with navigation', () => {
   const tabs = ref<I_faOpenedDocumentTab[]>([])
   const activeDocumentId = ref<string | null>(null)
   const newTab = createFaOpenedDocumentTabFromOpenMeta({
@@ -89,9 +91,10 @@ test('Test that resolveFaOpenedDocumentOpenFromTree appends middle background ta
     newTab,
     tabs
   })
-  expect(result.shouldNavigate).toBe(false)
+  expect(result.shouldNavigate).toBe(true)
+  expect(result.navigateDocumentId).toBe('doc-2')
   expect(tabs.value).toHaveLength(1)
-  expect(activeDocumentId.value).toBeNull()
+  expect(activeDocumentId.value).toBe('doc-2')
 })
 
 /**
@@ -177,6 +180,24 @@ test('Test that buildFaOpenedDocumentsSnapshot copies tabs and active document i
   expect(snapshot.schemaVersion).toBe(2)
   expect(snapshot.activeDocumentId).toBe('doc-1')
   expect(snapshot.tabs[0]?.documentId).toBe('doc-1')
+})
+
+test('Test that buildFaOpenedDocumentsSnapshot clones temporaryParentResolveDocumentIds', () => {
+  const sourceIds = ['doc-parent', 'doc-root']
+  const snapshot = buildFaOpenedDocumentsSnapshot({
+    activeDocumentId: 'temp-1',
+    tabs: [{
+      ...baseTab,
+      documentId: 'temp-1',
+      parentDocumentId: 'doc-parent',
+      persistenceState: 'temporary',
+      templateId: 'tpl-1',
+      temporaryParentResolveDocumentIds: sourceIds,
+      worldId: 'world-1'
+    }]
+  })
+  expect(snapshot.tabs[0]?.temporaryParentResolveDocumentIds).toEqual(sourceIds)
+  expect(snapshot.tabs[0]?.temporaryParentResolveDocumentIds).not.toBe(sourceIds)
 })
 
 /**

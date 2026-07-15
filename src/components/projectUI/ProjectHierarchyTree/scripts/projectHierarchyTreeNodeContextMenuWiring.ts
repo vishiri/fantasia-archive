@@ -5,13 +5,13 @@ import type { I_qMenuViewportPointerPosition } from 'app/types/I_qMenuViewportPo
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
 
-import { isProjectHierarchyTreeBulkExpandCollapseMenuEligible } from '../functions/projectHierarchyTreeBulkExpandCollapse'
 import { resolveProjectHierarchyTreeAddNewRowLabel } from '../functions/projectHierarchyTreeAddNewDocumentLabel'
 import { PROJECT_HIERARCHY_TREE_ADD_NEW_DOCUMENT_ICON } from '../functions/projectHierarchyTreeConstants'
+import { resolveProjectHierarchyTreeNodeContextMenuSectionFlags } from './projectHierarchyTreeNodeContextMenuEligibilityWiring'
 import { createResolveProjectHierarchyTreePlacementAddNewContextMenuRow } from '../functions/projectHierarchyTreePlacementAddNewContextMenu'
-import { findProjectHierarchyTreeNodeById } from '../functions/projectHierarchyTreeExpandState'
 import { resolveQMenuViewportPointerPositionFromMouseEvent } from '../functions/resolveQMenuViewportPointerPositionFromMouseEvent'
 import type { createProjectHierarchyTreeBulkExpandCollapseWiring } from './projectHierarchyTreeBulkExpandCollapseWiring'
+import { createProjectHierarchyTreeNodeContextMenuActionWiring } from './projectHierarchyTreeNodeContextMenuActionWiring'
 
 export function createProjectHierarchyTreeNodeContextMenuWiring (deps: {
   bulkExpandCollapseWiring: ReturnType<typeof createProjectHierarchyTreeBulkExpandCollapseWiring>
@@ -29,10 +29,24 @@ export function createProjectHierarchyTreeNodeContextMenuWiring (deps: {
   const contextMenuAnchorNodeId = ref<string | null>(null)
   const contextMenuAddNewRowLabel = ref<string | null>(null)
   const contextMenuAddNewRowIcon = ref<string | null>(null)
+  const contextMenuShowsBulkExpandRows = ref(false)
+  const contextMenuShowsCopyRows = ref(false)
+  const actionWiring = createProjectHierarchyTreeNodeContextMenuActionWiring({
+    bulkExpandCollapseWiring: deps.bulkExpandCollapseWiring,
+    contextMenuAnchorNodeId,
+    isNodeContextMenuOpen,
+    onAddNewDocumentRowClick: deps.onAddNewDocumentRowClick,
+    treeData: deps.treeData
+  })
 
   function clearContextMenuAddNewRow (): void {
     contextMenuAddNewRowLabel.value = null
     contextMenuAddNewRowIcon.value = null
+  }
+
+  function clearContextMenuSectionFlags (): void {
+    contextMenuShowsBulkExpandRows.value = false
+    contextMenuShowsCopyRows.value = false
   }
 
   function onNodeRowContextMenu (
@@ -43,7 +57,11 @@ export function createProjectHierarchyTreeNodeContextMenuWiring (deps: {
     if (node.nodeKind === 'addNewDocument') {
       return
     }
-    if (!isProjectHierarchyTreeBulkExpandCollapseMenuEligible(node, deps.treeData.value)) {
+    const sectionFlags = resolveProjectHierarchyTreeNodeContextMenuSectionFlags(
+      node,
+      deps.treeData.value
+    )
+    if (sectionFlags === null) {
       return
     }
     const target = event.currentTarget instanceof HTMLElement
@@ -54,6 +72,8 @@ export function createProjectHierarchyTreeNodeContextMenuWiring (deps: {
     }
     nodeMenuPointerPosition.value = resolveQMenuViewportPointerPositionFromMouseEvent(event)
     contextMenuAnchorNodeId.value = node.id
+    contextMenuShowsBulkExpandRows.value = sectionFlags.showsBulkExpandRows
+    contextMenuShowsCopyRows.value = sectionFlags.showsCopyRows
     const addNewRow = resolveProjectHierarchyTreePlacementAddNewContextMenuRow({
       placement: node,
       preferredLanguageCode: deps.resolvePreferredLanguageCode()
@@ -67,47 +87,23 @@ export function createProjectHierarchyTreeNodeContextMenuWiring (deps: {
     isNodeContextMenuOpen.value = true
   }
 
-  function onExpandAllUnderNodeClick (): void {
-    const anchorId = contextMenuAnchorNodeId.value
-    if (anchorId === null) {
-      return
-    }
-    deps.bulkExpandCollapseWiring.expandAllUnderNode(anchorId)
-    isNodeContextMenuOpen.value = false
-  }
-
-  function onCollapseAllUnderNodeClick (): void {
-    const anchorId = contextMenuAnchorNodeId.value
-    if (anchorId === null) {
-      return
-    }
-    void deps.bulkExpandCollapseWiring.collapseAllUnderNode(anchorId)
-    isNodeContextMenuOpen.value = false
-  }
-
-  function onAddNewDocumentFromContextMenuClick (): void {
-    const anchorId = contextMenuAnchorNodeId.value
-    if (anchorId === null) {
-      return
-    }
-    const placement = findProjectHierarchyTreeNodeById(deps.treeData.value, anchorId)
-    if (placement === null || placement.nodeKind !== 'templatePlacement') {
-      return
-    }
-    deps.onAddNewDocumentRowClick(placement)
-    isNodeContextMenuOpen.value = false
-  }
-
   function onNodeContextMenuHide (): void {
     contextMenuAnchorNodeId.value = null
     nodeMenuPointerPosition.value = null
     clearContextMenuAddNewRow()
+    clearContextMenuSectionFlags()
   }
+
+  const onAddNewDocumentFromContextMenuClick = actionWiring.onAddNewDocumentFromContextMenuClick
+  const onCollapseAllUnderNodeClick = actionWiring.onCollapseAllUnderNodeClick
+  const onExpandAllUnderNodeClick = actionWiring.onExpandAllUnderNodeClick
 
   return {
     contextMenuAddNewRowIcon,
     contextMenuAddNewRowLabel,
     contextMenuAnchorNodeId,
+    contextMenuShowsBulkExpandRows,
+    contextMenuShowsCopyRows,
     isNodeContextMenuOpen,
     nodeMenuPointerPosition,
     onAddNewDocumentFromContextMenuClick,

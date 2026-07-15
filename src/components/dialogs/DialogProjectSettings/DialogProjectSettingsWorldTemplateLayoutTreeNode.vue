@@ -60,7 +60,7 @@
         </q-btn>
         <q-btn
           class="dialogProjectSettingsWorldTemplateLayoutTreeNode__remove"
-          color="negative"
+          color="secondary"
           dense
           flat
           icon="mdi-close"

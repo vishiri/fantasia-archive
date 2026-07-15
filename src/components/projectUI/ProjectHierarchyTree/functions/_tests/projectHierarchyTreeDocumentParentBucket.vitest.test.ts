@@ -7,7 +7,9 @@ import {
   collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds,
   collectProjectHierarchyTreeDocumentParentNodeIdsForRefresh,
   collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh,
-  findProjectHierarchyTreeDocumentParentBucket
+  ensureProjectHierarchyTreeDocumentNodeHasChildrenForRefresh,
+  findProjectHierarchyTreeDocumentParentBucket,
+  removeProjectHierarchyTreeDocumentNodesByDocumentIds
 } from '../projectHierarchyTreeDocumentParentBucket'
 
 function buildPlacementNode (input: {
@@ -59,6 +61,22 @@ test('Test that findProjectHierarchyTreeDocumentParentBucket resolves placement 
       buildDocumentNode({
         documentId: 'doc-a',
         id: 'doc-a',
+        label: 'Doc A'
+      })
+    ],
+    childrenLoaded: true
+  })
+  const treeData = [placement]
+  const bucket = findProjectHierarchyTreeDocumentParentBucket(treeData, 'doc-a')
+  expect(bucket?.parentNode?.id).toBe('placement-1')
+})
+
+test('Test that findProjectHierarchyTreeDocumentParentBucket matches persisted document id when node id differs', () => {
+  const placement = buildPlacementNode({
+    children: [
+      buildDocumentNode({
+        documentId: 'doc-a',
+        id: 'tree-node-a',
         label: 'Doc A'
       })
     ],
@@ -189,7 +207,91 @@ test('Test that collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds resolves
     [placement],
     'doc-parent'
   )
-  expect(nodeIds).toEqual(['placement-1', 'doc-grandparent'])
+  expect(nodeIds).toEqual(['doc-grandparent', 'placement-1'])
+})
+
+test('Test that collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds skips deleted document row when it has loaded children', () => {
+  const placement = buildPlacementNode({
+    children: [
+      {
+        ...buildDocumentNode({
+          documentId: 'doc-grandparent',
+          id: 'doc-grandparent'
+        }),
+        children: [
+          {
+            ...buildDocumentNode({
+              documentId: 'doc-parent',
+              id: 'doc-parent'
+            }),
+            children: [
+              buildDocumentNode({
+                documentId: 'doc-child',
+                id: 'doc-child'
+              })
+            ],
+            childrenLoaded: true,
+            hasChildren: true
+          }
+        ],
+        childrenLoaded: true,
+        hasChildren: true
+      }
+    ],
+    childrenLoaded: true
+  })
+  const nodeIds = collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds(
+    [placement],
+    'doc-parent'
+  )
+  expect(nodeIds).toEqual(['doc-grandparent', 'placement-1'])
+})
+
+test('Test that removeProjectHierarchyTreeDocumentNodesByDocumentIds removes nested document rows', () => {
+  const placement = buildPlacementNode({
+    children: [
+      buildDocumentNode({
+        documentId: 'doc-parent',
+        id: 'doc-parent'
+      }),
+      buildDocumentNode({
+        documentId: 'doc-sibling',
+        id: 'doc-sibling'
+      })
+    ],
+    childrenLoaded: true
+  })
+  const treeData = [placement]
+  const removed = removeProjectHierarchyTreeDocumentNodesByDocumentIds(treeData, ['doc-parent'])
+  expect(removed).toBe(true)
+  expect(placement.children.map((child) => child.documentId)).toEqual(['doc-sibling'])
+})
+
+test('Test that collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds reloads direct parent before promotion ancestor for nested child delete', () => {
+  const placement = buildPlacementNode({
+    children: [
+      {
+        ...buildDocumentNode({
+          documentId: 'doc-parent',
+          id: 'doc-parent'
+        }),
+        children: [
+          buildDocumentNode({
+            documentId: 'doc-child',
+            id: 'doc-child'
+          })
+        ],
+        childrenLoaded: true,
+        hasChildren: true
+      }
+    ],
+    childrenLoaded: true
+  })
+  const nodeIds = collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds(
+    [placement],
+    'doc-child'
+  )
+  expect(nodeIds).toEqual(['doc-parent', 'placement-1'])
 })
 
 test('Test that collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds returns empty when document is missing', () => {
@@ -254,7 +356,7 @@ test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh
   expect(nodeIds).toEqual(['doc-parent'])
 })
 
-test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh skips unloaded placement', () => {
+test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh resolves unloaded placement', () => {
   const placement = buildPlacementNode({
     children: [],
     childrenLoaded: false
@@ -267,7 +369,7 @@ test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh
       worldId: 'world-1'
     }
   )
-  expect(nodeIds).toEqual([])
+  expect(nodeIds).toEqual(['placement-1'])
 })
 
 test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh skips missing parent document', () => {
@@ -286,7 +388,7 @@ test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh
   expect(nodeIds).toEqual([])
 })
 
-test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh skips unloaded parent document', () => {
+test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh resolves unloaded parent document', () => {
   const parentDocument = {
     ...buildDocumentNode({
       documentId: 'doc-parent',
@@ -308,7 +410,29 @@ test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh
       worldId: 'world-1'
     }
   )
-  expect(nodeIds).toEqual([])
+  expect(nodeIds).toEqual(['doc-parent'])
+})
+
+test('Test that ensureProjectHierarchyTreeDocumentNodeHasChildrenForRefresh marks leaf parents expandable', () => {
+  const parentDocument = {
+    ...buildDocumentNode({
+      documentId: 'doc-parent',
+      id: 'doc-parent'
+    }),
+    children: [],
+    childrenLoaded: false,
+    hasChildren: false
+  }
+  const placement = buildPlacementNode({
+    children: [parentDocument],
+    childrenLoaded: true
+  })
+  const marked = ensureProjectHierarchyTreeDocumentNodeHasChildrenForRefresh(
+    [placement],
+    'doc-parent'
+  )
+  expect(marked).toBe(true)
+  expect(parentDocument.hasChildren).toBe(true)
 })
 
 test('Test that collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh finds nested placement rows', () => {

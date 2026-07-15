@@ -32,6 +32,8 @@
               :class="{
                 'projectDocumentControlBarTabs__tab--customAppearance':
                   resolveDocumentTabAppearanceChrome(tab) !== undefined,
+                'projectDocumentControlBarTabs__tab--customDocumentBackground':
+                  resolveDocumentTabAppearanceChrome(tab)?.backgroundColor !== undefined,
                 'projectDocumentControlBarTabs__tab--withWorldIndicator':
                   showWorldTabIndicators && resolveTabWorldIndicatorColor(tab) !== null
               }"
@@ -68,8 +70,10 @@
                 :on-tab-close-all-without-changes-except-click="onTabCloseAllWithoutChangesExceptClick"
                 :on-tab-close-click="onTabCloseClick"
                 :on-tab-copy-background-color-click="onTabCopyBackgroundColorClick"
+                :on-tab-copy-document-click="onTabCopyDocumentClick"
                 :on-tab-copy-name-click="onTabCopyNameClick"
                 :on-tab-copy-text-color-click="onTabCopyTextColorClick"
+                :on-tab-add-new-document-under-this-click="onTabAddNewDocumentUnderThisClick"
                 :on-tab-delete-click="onTabDeleteClick"
                 :on-tab-force-close-all-click="onTabForceCloseAllClick"
                 :on-tab-force-close-all-except-click="onTabForceCloseAllExceptClick"
@@ -166,8 +170,10 @@ const {
   onTabCloseAllWithoutChangesExceptClick,
   onTabCloseClick,
   onTabCopyBackgroundColorClick,
+  onTabCopyDocumentClick,
   onTabCopyNameClick,
   onTabCopyTextColorClick,
+  onTabAddNewDocumentUnderThisClick,
   onTabDeleteClick,
   onTabForceCloseAllClick,
   onTabForceCloseAllExceptClick,

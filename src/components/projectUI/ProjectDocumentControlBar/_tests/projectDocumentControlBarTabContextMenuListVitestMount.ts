@@ -49,8 +49,10 @@ export function createProjectDocumentControlBarTabContextMenuListHandlers () {
     onCloseAllTabsWithoutChangesExceptThisOneClick: vi.fn(),
     onCloseThisTabClick: vi.fn(),
     onCopyBackgroundColorClick: vi.fn(),
+    onCopyDocumentClick: vi.fn(),
     onCopyNameClick: vi.fn(),
     onCopyTextColorClick: vi.fn(),
+    onAddNewDocumentUnderThisClick: vi.fn(),
     onDeleteThisDocumentClick: vi.fn(),
     onForceCloseAllTabsClick: vi.fn(),
     onForceCloseAllTabsExceptThisOneClick: vi.fn(),
@@ -82,11 +84,13 @@ export function mountProjectDocumentControlBarTabContextMenuList (
   return mount(ProjectDocumentControlBarTabContextMenuList, {
     props: {
       activeDocumentTabName: 'doc-1',
+      addNewDocumentUnderThisLabel: 'Add new document under this',
       browseOpenedTabsLabel: 'Browse opened tabs',
       closeAllTabsWithoutChangesExceptThisOneLabel: 'Close all except this one',
       closeAllTabsWithoutChangesLabel: 'Close all without changes',
       closeThisTabLabel: 'Close this tab',
       copyBackgroundColorLabel: 'Copy background color',
+      copyDocumentLabel: 'Copy document',
       copyNameLabel: 'Copy name',
       copyTextColorLabel: 'Copy text color',
       deleteThisDocumentLabel: 'Delete this document',
@@ -134,7 +138,10 @@ export function mountProjectDocumentControlBarTabContextMenuList (
             </div>
           `
         },
-        QSeparator: { template: '<hr class="q-separator-stub" />' }
+        QSeparator: {
+          inheritAttrs: false,
+          template: '<hr class="q-separator-stub" v-bind="$attrs" />'
+        }
       }
     }
   })

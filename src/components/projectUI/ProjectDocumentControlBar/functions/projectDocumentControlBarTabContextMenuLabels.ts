@@ -7,8 +7,10 @@ export function buildProjectDocumentControlBarTabContextMenuLabels (input: {
   translateCloseAllTabsWithoutChangesExceptThisOne: () => string
   translateCloseThisTab: () => string
   translateCopyBackgroundColor: () => string
+  translateCopyDocument: () => string
   translateCopyName: () => string
   translateCopyTextColor: () => string
+  translateAddNewDocumentUnderThis: () => string
   translateDeleteThisDocument: () => string
   translateForceCloseAllTabs: () => string
   translateForceCloseAllTabsExceptThisOne: () => string
@@ -20,8 +22,10 @@ export function buildProjectDocumentControlBarTabContextMenuLabels (input: {
     closeAllTabsWithoutChangesLabel: I_computedRef<string>
     closeThisTabLabel: I_computedRef<string>
     copyBackgroundColorLabel: I_computedRef<string>
+    copyDocumentLabel: I_computedRef<string>
     copyNameLabel: I_computedRef<string>
     copyTextColorLabel: I_computedRef<string>
+    addNewDocumentUnderThisLabel: I_computedRef<string>
     deleteThisDocumentLabel: I_computedRef<string>
     forceCloseAllTabsExceptThisOneLabel: I_computedRef<string>
     forceCloseAllTabsLabel: I_computedRef<string>
@@ -42,6 +46,14 @@ export function buildProjectDocumentControlBarTabContextMenuLabels (input: {
 
   const copyBackgroundColorLabel = input.computed(() => {
     return input.translateCopyBackgroundColor()
+  })
+
+  const copyDocumentLabel = input.computed(() => {
+    return input.translateCopyDocument()
+  })
+
+  const addNewDocumentUnderThisLabel = input.computed(() => {
+    return input.translateAddNewDocumentUnderThis()
   })
 
   const moveTabLeftLabel = input.computed(() => {
@@ -77,11 +89,13 @@ export function buildProjectDocumentControlBarTabContextMenuLabels (input: {
   })
 
   return {
+    addNewDocumentUnderThisLabel,
     browseOpenedTabsLabel,
     closeAllTabsWithoutChangesExceptThisOneLabel,
     closeAllTabsWithoutChangesLabel,
     closeThisTabLabel,
     copyBackgroundColorLabel,
+    copyDocumentLabel,
     copyNameLabel,
     copyTextColorLabel,
     deleteThisDocumentLabel,
