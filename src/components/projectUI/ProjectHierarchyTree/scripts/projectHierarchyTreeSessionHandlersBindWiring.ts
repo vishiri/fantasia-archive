@@ -49,10 +49,12 @@ export function createProjectHierarchyTreeSessionHandlersBindWiring (deps: {
     nextTick: deps.nextTick,
     onDocumentOpenRequest: deps.onDocumentOpenRequest,
     openNodeIds: deps.earlyWiring.bootstrap.sessionRefs.openNodeIds,
+    openIconExpandAnimationWiring: deps.earlyWiring.subWiring.openIconExpandAnimationWiring,
     queuePersistExpandedNodeIds: (expandedNodeIds) => {
       deps.hierarchyStore.queuePersistExpandedNodeIds(expandedNodeIds)
     },
     resolvePreferredLanguageCode: deps.resolvePreferredLanguageCode,
+    runDeferredLazyLoadBatch: deps.earlyWiring.subWiring.runDeferredLazyLoadBatch,
     runFaAction: deps.runFaAction,
     suppressTreeEmit: deps.earlyWiring.bootstrap.sessionRefs.suppressTreeEmit,
     treeComponentRef: deps.earlyWiring.bootstrap.sessionRefs.treeComponentRef,

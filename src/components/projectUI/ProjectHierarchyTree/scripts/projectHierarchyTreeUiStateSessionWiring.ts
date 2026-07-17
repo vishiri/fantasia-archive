@@ -1,18 +1,13 @@
 import type { Ref, watch as WatchFn } from 'vue'
 
 import type {
-  I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions,
   I_faProjectHierarchyTreeHeTreeInstance,
   I_faProjectHierarchyTreeHeTreeNode,
   I_faProjectHierarchyTreeWorkspaceWorld
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
-import {
-  restoreProjectHierarchyTreeUiState,
-  revealProjectHierarchyTreePendingPath
-} from './projectHierarchyTreeUiStateWiring'
-import { restoreProjectHierarchyTreeExpandedSnapshot } from './projectHierarchyTreeExpandedSnapshotWiring'
 import { createProjectHierarchyTreeUiStateSessionExpandWiring } from './projectHierarchyTreeUiStateSessionExpandWiring'
+import { createProjectHierarchyTreeUiStateSessionRestoreWiring } from './projectHierarchyTreeUiStateSessionRestoreWiring'
 import { attachProjectHierarchyTreeUiStateScrollListeners } from './projectHierarchyTreeUiStateScrollAttachWiring'
 
 export function createProjectHierarchyTreeUiStateSessionWiring (deps: {
@@ -26,90 +21,67 @@ export function createProjectHierarchyTreeUiStateSessionWiring (deps: {
   loadChildrenAlongRevealPath: (nodeIds: string[]) => Promise<void>
   loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
+  commitStagedLoadedChildren: () => boolean
   nextTick: () => Promise<void>
   openNodeIds: Ref<Set<string>>
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   queuePersistScrollTopPx: (scrollTopPx: number) => void
   requestAnimationFrame: (callback: () => void) => number
+  runDeferredLazyLoadBatch: (runBatch: () => Promise<void>) => Promise<void>
+  suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   treeMountKey: Ref<number>
   watch: typeof WatchFn
 }) {
   const expandWiring = createProjectHierarchyTreeUiStateSessionExpandWiring({
+    commitStagedLoadedChildren: deps.commitStagedLoadedChildren,
+    flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
     getTreeRef: deps.getTreeRef,
     loadChildrenAlongRevealPath: deps.loadChildrenAlongRevealPath,
+    nextTick: deps.nextTick,
     openNodeIds: deps.openNodeIds,
     queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
+    requestAnimationFrame: deps.requestAnimationFrame,
+    suppressTreeEmit: deps.suppressTreeEmit,
+    treeData: deps.treeData,
+    treeMountKey: deps.treeMountKey
+  })
+  const restoreWiring = createProjectHierarchyTreeUiStateSessionRestoreWiring({
+    flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
+    getExpandedNodeIds: deps.getExpandedNodeIds,
+    getPendingRevealPath: deps.getPendingRevealPath,
+    getScrollTopPx: deps.getScrollTopPx,
+    getTreeRef: deps.getTreeRef,
+    getTreeScrollHost: deps.getTreeScrollHost,
+    getWorlds: deps.getWorlds,
+    loadChildrenAlongRevealPath: deps.loadChildrenAlongRevealPath,
+    loadChildrenForNode: deps.loadChildrenForNode,
+    markNodeOpen: expandWiring.markNodeOpen,
+    nextTick: deps.nextTick,
+    openNodeIds: deps.openNodeIds,
+    queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
+    requestAnimationFrame: deps.requestAnimationFrame,
+    runDeferredLazyLoadBatch: deps.runDeferredLazyLoadBatch,
     treeData: deps.treeData
   })
-  const {
-    markNodeClosed,
-    markNodeOpen,
-    reapplyHeTreeOpenState,
-    reapplyLatentDescendantExpandState
-  } = expandWiring
-
-  async function restoreExpandedSnapshot (
-    expandedNodeIds: string[],
-    restoreOptions?: I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions
-  ): Promise<void> {
-    await restoreProjectHierarchyTreeExpandedSnapshot({
-      expandedNodeIds,
-      flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
-      getTreeRef: deps.getTreeRef,
-      loadChildrenForNode: deps.loadChildrenForNode,
-      nextTick: deps.nextTick,
-      onExpandedNodeIdsChange: deps.queuePersistExpandedNodeIds,
-      openNodeIds: deps.openNodeIds,
-      requestAnimationFrame: deps.requestAnimationFrame,
-      treeData: deps.treeData,
-      ...(restoreOptions === undefined ? {} : { restoreOptions })
-    })
-  }
-
-  async function restoreUiStateFromStore (): Promise<void> {
-    await restoreProjectHierarchyTreeUiState({
-      getExpandedNodeIds: deps.getExpandedNodeIds,
-      getScrollTopPx: deps.getScrollTopPx,
-      getTreeRef: deps.getTreeRef,
-      getTreeScrollHost: deps.getTreeScrollHost,
-      getWorlds: deps.getWorlds,
-      loadChildrenAlongRevealPath: deps.loadChildrenAlongRevealPath,
-      nextTick: deps.nextTick,
-      onExpandedNodeIdsChange: deps.queuePersistExpandedNodeIds,
-      openNodeIds: deps.openNodeIds,
-      requestAnimationFrame: deps.requestAnimationFrame,
-      treeData: deps.treeData
-    })
-  }
-
-  async function revealPendingPath (): Promise<void> {
-    await revealProjectHierarchyTreePendingPath({
-      getPendingRevealPath: deps.getPendingRevealPath,
-      getTreeRef: deps.getTreeRef,
-      getTreeScrollHost: deps.getTreeScrollHost,
-      loadChildrenAlongRevealPath: deps.loadChildrenAlongRevealPath,
-      markNodeOpen,
-      nextTick: deps.nextTick,
-      requestAnimationFrame: deps.requestAnimationFrame,
-      treeData: deps.treeData
-    })
-  }
 
   return {
     attachScrollPersist: () => attachProjectHierarchyTreeUiStateScrollListeners({
       getTreeScrollHost: deps.getTreeScrollHost,
       queuePersistScrollTopPx: deps.queuePersistScrollTopPx
     }),
-    markNodeClosed,
-    markNodeOpen,
+    awaitHeTreeResyncIdle: expandWiring.awaitHeTreeResyncIdle,
+    isProgrammaticHeTreeResyncActive: expandWiring.isProgrammaticHeTreeResyncActive,
+    markNodeClosed: expandWiring.markNodeClosed,
+    markNodeOpen: expandWiring.markNodeOpen,
     onUnmountedCleanup: () => {
       deps.flushUiStatePersist()
     },
-    reapplyHeTreeOpenState,
-    reapplyLatentDescendantExpandState,
-    restoreExpandedSnapshot,
-    restoreUiStateFromStore,
-    revealPendingPath
+    reapplyHeTreeOpenState: expandWiring.reapplyHeTreeOpenState,
+    reapplyLatentDescendantExpandState: expandWiring.reapplyLatentDescendantExpandState,
+    resyncHeTreeAfterExpandPublish: expandWiring.resyncHeTreeAfterExpandPublish,
+    restoreExpandedSnapshot: restoreWiring.restoreExpandedSnapshot,
+    restoreUiStateFromStore: restoreWiring.restoreUiStateFromStore,
+    revealPendingPath: restoreWiring.revealPendingPath
   }
 }

@@ -12,29 +12,33 @@ export function createProjectHierarchyTreeSessionBulkContextMenuWiring (deps: {
   dragExpandUiFrozen: Ref<boolean>
   lazyLoadWiring: {
     flushDeferredTreeRevisionPublish: () => void | Promise<void>
+    loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   }
   nextTick: () => Promise<void>
   onAddNewDocumentRowClick: (node: I_faProjectHierarchyTreeHeTreeNode) => void
   openNodeIds: Ref<Set<string>>
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   resolvePreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
+  runDeferredLazyLoadBatch: (runBatch: () => Promise<void>) => Promise<void>
   runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   treeMountKey: Ref<number>
   uiStateWiring: {
     reapplyHeTreeOpenState: () => void
-    reapplyLatentDescendantExpandState: () => Promise<void>
+    reapplyLatentDescendantExpandState: (options?: {
+      deferHeTreeOpen?: boolean
+    }) => Promise<void>
   }
 }) {
   const bulkExpandCollapseWiring = createProjectHierarchyTreeBulkExpandCollapseWiring({
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
-    flushDeferredTreeRevisionPublish: deps.lazyLoadWiring.flushDeferredTreeRevisionPublish,
     nextTick: deps.nextTick,
     openNodeIds: deps.openNodeIds,
     queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
     reapplyHeTreeOpenState: deps.uiStateWiring.reapplyHeTreeOpenState,
     reapplyLatentDescendantExpandState: deps.uiStateWiring.reapplyLatentDescendantExpandState,
+    runDeferredLazyLoadBatch: deps.runDeferredLazyLoadBatch,
     suppressTreeEmit: deps.suppressTreeEmit,
     treeData: deps.treeData,
     treeMountKey: deps.treeMountKey

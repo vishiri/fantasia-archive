@@ -16,12 +16,9 @@ import {
 } from '../functions/projectHierarchyTreePersistedOpenNodeIds'
 import {
   collectExpandedNodeIdsFromTree,
-  collectProjectHierarchyTreeAncestorIds,
-  collectProjectHierarchyTreeDescendantIds,
-  evictCollapsedNodeChildren,
-  findProjectHierarchyTreeNodeById,
-  shouldProjectHierarchyTreePreserveDescendantOpenIdsOnCollapse
+  findProjectHierarchyTreeNodeById
 } from '../functions/projectHierarchyTreeExpandState'
+import { tryOpenHeTreeNodeAndParents } from './projectHierarchyTreeHeTreeOpenSafeWiring'
 import { reapplyProjectHierarchyTreeLatentDescendantExpandState } from './projectHierarchyTreeLatentExpandReapplyWiring'
 import { resolveProjectHierarchyTreeScrollContainer } from '../functions/projectHierarchyTreeScrollContainer'
 
@@ -48,7 +45,10 @@ export function reapplyProjectHierarchyTreeHeTreeOpenState (deps: {
     if (node === null) {
       continue
     }
-    treeRef.openNodeAndParents(node)
+    tryOpenHeTreeNodeAndParents({
+      node,
+      treeRef
+    })
   }
 }
 
@@ -116,6 +116,7 @@ export async function revealProjectHierarchyTreePendingPath (deps: {
   markNodeOpen: (nodeId: string) => void
   nextTick: () => Promise<void>
   requestAnimationFrame: (callback: () => void) => number
+  runDeferredLazyLoadBatch?: (runBatch: () => Promise<void>) => Promise<void>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }): Promise<void> {
   const path = deps.getPendingRevealPath()
@@ -127,14 +128,32 @@ export async function revealProjectHierarchyTreePendingPath (deps: {
     return
   }
 
-  for (const nodeId of path) {
-    await deps.loadChildrenAlongRevealPath([nodeId])
-    const node = findProjectHierarchyTreeNodeById(deps.treeData.value, nodeId)
-    if (node === null) {
-      continue
+  async function loadRevealPathNodes (): Promise<void> {
+    for (const nodeId of path) {
+      await deps.loadChildrenAlongRevealPath([nodeId])
+      const node = findProjectHierarchyTreeNodeById(deps.treeData.value, nodeId)
+      if (node === null) {
+        continue
+      }
+      deps.markNodeOpen(nodeId)
     }
-    treeRef.openNodeAndParents(node)
-    deps.markNodeOpen(nodeId)
+  }
+
+  function openRevealPathInHeTree (treeRef: NonNullable<T_treeRef>): void {
+    for (const nodeId of path) {
+      const node = findProjectHierarchyTreeNodeById(deps.treeData.value, nodeId)
+      if (node === null) {
+        continue
+      }
+      treeRef.openNodeAndParents(node)
+    }
+  }
+
+  if (deps.runDeferredLazyLoadBatch !== undefined) {
+    await deps.runDeferredLazyLoadBatch(loadRevealPathNodes)
+  } else {
+    await loadRevealPathNodes()
+    openRevealPathInHeTree(treeRef)
   }
 
   const focusId = path[path.length - 1]
@@ -152,57 +171,8 @@ export async function revealProjectHierarchyTreePendingPath (deps: {
   }
 }
 
-export function syncProjectHierarchyTreeOpenSetToPersist (deps: {
-  openNodeIds: Ref<Set<string>>
-  queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
-  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-}): void {
-  const expandedNodeIds = collectProjectHierarchyTreePersistedExpandedNodeIds(
-    deps.treeData.value,
-    deps.openNodeIds.value
-  )
-  deps.queuePersistExpandedNodeIds(expandedNodeIds)
-}
-
-export function markProjectHierarchyTreeNodeOpen (deps: {
-  nodeId: string
-  openNodeIds: Ref<Set<string>>
-  queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
-  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-}): void {
-  const next = new Set(deps.openNodeIds.value)
-  const ancestors = collectProjectHierarchyTreeAncestorIds(deps.treeData.value, deps.nodeId) ?? []
-  for (const ancestorId of ancestors) {
-    next.add(ancestorId)
-  }
-  next.add(deps.nodeId)
-  deps.openNodeIds.value = next
-  syncProjectHierarchyTreeOpenSetToPersist({
-    openNodeIds: deps.openNodeIds,
-    queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
-    treeData: deps.treeData
-  })
-}
-
-export function markProjectHierarchyTreeNodeClosed (deps: {
-  node: I_faProjectHierarchyTreeHeTreeNode
-  nodeId: string
-  openNodeIds: Ref<Set<string>>
-  queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
-  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
-}): void {
-  const next = new Set(deps.openNodeIds.value)
-  next.delete(deps.nodeId)
-  if (!shouldProjectHierarchyTreePreserveDescendantOpenIdsOnCollapse(deps.node.nodeKind)) {
-    for (const descendantId of collectProjectHierarchyTreeDescendantIds(deps.node)) {
-      next.delete(descendantId)
-    }
-  }
-  deps.openNodeIds.value = next
-  evictCollapsedNodeChildren(deps.node)
-  syncProjectHierarchyTreeOpenSetToPersist({
-    openNodeIds: deps.openNodeIds,
-    queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
-    treeData: deps.treeData
-  })
-}
+export {
+  markProjectHierarchyTreeNodeClosed,
+  markProjectHierarchyTreeNodeOpen,
+  syncProjectHierarchyTreeOpenSetToPersist
+} from './projectHierarchyTreeNodeOpenCloseStateWiring'

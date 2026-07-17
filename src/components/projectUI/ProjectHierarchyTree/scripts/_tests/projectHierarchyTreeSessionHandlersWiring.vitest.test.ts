@@ -35,28 +35,48 @@ function createTestUiStateWiring (overrides: {
   markNodeOpen?: ReturnType<typeof vi.fn>
   reapplyHeTreeOpenState?: ReturnType<typeof vi.fn>
   reapplyLatentDescendantExpandState?: ReturnType<typeof vi.fn>
+  resyncHeTreeAfterExpandPublish?: ReturnType<typeof vi.fn>
 } = {}): Parameters<typeof createProjectHierarchyTreeSessionHandlersWiring>[0]['uiStateWiring'] {
   const markNodeClosed = overrides.markNodeClosed ?? vi.fn()
   const markNodeOpen = overrides.markNodeOpen ?? vi.fn()
   const reapplyHeTreeOpenState = overrides.reapplyHeTreeOpenState ?? vi.fn()
   const reapplyLatentDescendantExpandState =
     overrides.reapplyLatentDescendantExpandState ?? vi.fn(async () => undefined)
+  const resyncHeTreeAfterExpandPublish =
+    overrides.resyncHeTreeAfterExpandPublish ?? vi.fn(async () => undefined)
   return {
+    awaitHeTreeResyncIdle: async () => undefined,
+    isProgrammaticHeTreeResyncActive: () => false,
     markNodeClosed,
     markNodeOpen,
     reapplyHeTreeOpenState,
-    reapplyLatentDescendantExpandState
+    reapplyLatentDescendantExpandState,
+    resyncHeTreeAfterExpandPublish
   } as Parameters<typeof createProjectHierarchyTreeSessionHandlersWiring>[0]['uiStateWiring']
 }
 
-function createTestBulkExpandDeps (): Pick<
+function createTestRunDeferredLazyLoadBatch (reapplyHeTreeOpenState: () => void = vi.fn()) {
+  return vi.fn(async (runBatch: () => Promise<void>) => {
+    await runBatch()
+    reapplyHeTreeOpenState()
+  })
+}
+
+function createTestBulkExpandDeps (options: {
+  reapplyHeTreeOpenState?: () => void
+} = {}): Pick<
   Parameters<typeof createProjectHierarchyTreeSessionHandlersWiring>[0],
-  'nextTick' | 'openNodeIds' | 'queuePersistExpandedNodeIds' | 'treeMountKey'
+  'nextTick' | 'openIconExpandAnimationWiring' | 'openNodeIds' | 'queuePersistExpandedNodeIds' | 'runDeferredLazyLoadBatch' | 'treeMountKey'
 > {
+  const reapplyHeTreeOpenState = options.reapplyHeTreeOpenState ?? vi.fn()
   return {
     nextTick: async () => {},
+    openIconExpandAnimationWiring: {
+      scheduleOpenIconExpandAnimation: vi.fn()
+    },
     openNodeIds: ref<Set<string>>(new Set()),
     queuePersistExpandedNodeIds: vi.fn(),
+    runDeferredLazyLoadBatch: createTestRunDeferredLazyLoadBatch(reapplyHeTreeOpenState),
     treeMountKey: ref(0)
   }
 }
@@ -139,57 +159,7 @@ test('Test that session handlers load children when the open icon expands a row'
   const loadChildrenForNode = vi.fn(async () => undefined)
   const markNodeOpen = vi.fn()
   const markNodeClosed = vi.fn()
-  const wiring = createProjectHierarchyTreeSessionHandlersWiring({
-    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
-    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
-    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
-    dragContext: {
-      dragNode: null
-    },
-    dragExpandPostCommitGuard: ref(false),
-    dragExpandUiFrozen: ref(false),
-    getDragExpandedSnapshotNodeIds: () => null,
-    lazyLoadWiring: {
-      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
-      loadChildrenForNode
-    },
-    ...createTestBulkExpandDeps(),
-    resolvePreferredLanguageCode: () => 'en-US',
-    runFaAction: vi.fn(),
-    onDocumentOpenRequest: vi.fn(),
-    suppressTreeEmit: ref(false),
-    treeComponentRef: createTestTreeComponentRef(),
-    treeData: ref([]),
-    treeScrollHostRef: ref(null),
-    uiStateWiring: createTestUiStateWiring({
-      markNodeClosed,
-      markNodeOpen
-    })
-  })
-  const stat = {
-    children: [],
-    open: false
-  }
-  wiring.onNodeOpenIconPointerDown(stat)
-  await wiring.onNodeOpenIconClick(placement, stat)
-  expect(stat.open).toBe(true)
-  expect(markNodeOpen).toHaveBeenCalledWith('placement-1')
-  expect(loadChildrenForNode).toHaveBeenCalledWith(placement)
-})
-
-/**
- * Open icon expand keeps he-tree stat closed until lazy load finishes.
- */
-test('Test that open icon expand keeps stat closed until lazy load finishes', async () => {
-  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
-  const placement = tree[0]!.children[0]!
-  let resolveLoad: () => void = () => undefined
-  const loadChildrenForNode = vi.fn(() => {
-    return new Promise<void>((resolve) => {
-      resolveLoad = resolve
-    })
-  })
-  const openNodeAndParents = vi.fn()
+  const resyncHeTreeAfterExpandPublish = vi.fn(async () => undefined)
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
     createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
@@ -211,24 +181,80 @@ test('Test that open icon expand keeps stat closed until lazy load finishes', as
     suppressTreeEmit: ref(false),
     treeComponentRef: ref({
       closeAll: vi.fn(),
+      openNodeAndParents: vi.fn()
+    } as unknown as I_faProjectHierarchyTreeHeTreeInstance),
+    treeData: ref([]),
+    treeScrollHostRef: ref(null),
+    uiStateWiring: createTestUiStateWiring({
+      markNodeClosed,
+      markNodeOpen,
+      resyncHeTreeAfterExpandPublish
+    })
+  })
+  const stat = {
+    children: [],
+    open: false
+  }
+  wiring.onNodeOpenIconPointerDown(stat)
+  await wiring.onNodeOpenIconClick(placement, stat)
+  expect(resyncHeTreeAfterExpandPublish).toHaveBeenCalledWith('placement-1')
+  expect(markNodeOpen).toHaveBeenCalledWith('placement-1')
+  expect(loadChildrenForNode).toHaveBeenCalledWith(placement)
+})
+
+/**
+ * Open icon expand keeps stat closed until lazy load finishes, then resyncHeTreeAfterExpandPublish runs.
+ */
+test('Test that open icon expand runs resync after lazy load finishes', async () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const placement = tree[0]!.children[0]!
+  placement.childrenLoaded = false
+  placement.children = []
+  const loadChildrenForNode = vi.fn(async () => undefined)
+  const openNodeAndParents = vi.fn()
+  const resyncHeTreeAfterExpandPublish = vi.fn(async () => undefined)
+  const scheduleOpenIconExpandAnimation = vi.fn()
+  const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
+    dragContext: {
+      dragNode: null
+    },
+    dragExpandPostCommitGuard: ref(false),
+    dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
+    lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
+      loadChildrenForNode
+    },
+    ...createTestBulkExpandDeps(),
+    openIconExpandAnimationWiring: {
+      scheduleOpenIconExpandAnimation
+    },
+    resolvePreferredLanguageCode: () => 'en-US',
+    runFaAction: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
+    suppressTreeEmit: ref(false),
+    treeComponentRef: ref({
+      closeAll: vi.fn(),
       openNodeAndParents
     } as unknown as I_faProjectHierarchyTreeHeTreeInstance),
     treeData: ref(tree),
     treeScrollHostRef: ref(null),
-    uiStateWiring: createTestUiStateWiring()
+    uiStateWiring: createTestUiStateWiring({
+      resyncHeTreeAfterExpandPublish
+    })
   })
   const stat = {
     children: placement.children,
     open: false
   }
   wiring.onNodeOpenIconPointerDown(stat)
-  const clickPromise = wiring.onNodeOpenIconClick(placement, stat)
-  await Promise.resolve()
-  expect(stat.open).toBe(false)
-  expect(openNodeAndParents).not.toHaveBeenCalled()
-  resolveLoad()
-  await clickPromise
-  expect(stat.open).toBe(true)
+  await wiring.onNodeOpenIconClick(placement, stat)
+  expect(scheduleOpenIconExpandAnimation).toHaveBeenCalledWith('placement-1')
+  expect(loadChildrenForNode).toHaveBeenCalled()
+  expect(resyncHeTreeAfterExpandPublish).toHaveBeenCalledWith('placement-1')
   expect(openNodeAndParents).toHaveBeenCalledWith(placement)
 })
 
@@ -284,6 +310,7 @@ test('Test that session handlers expand world rows from row click routing', asyn
   const worldNode = tree[0]!
   const loadChildrenForNode = vi.fn(async () => undefined)
   const markNodeOpen = vi.fn()
+  const openNodeAndParents = vi.fn()
   const reapplyLatentDescendantExpandState = vi.fn(async () => undefined)
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
     createTemporaryDocument: vi.fn(async () => 'temp-doc'),
@@ -304,7 +331,10 @@ test('Test that session handlers expand world rows from row click routing', asyn
     runFaAction: vi.fn(),
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: createTestTreeComponentRef(),
+    treeComponentRef: ref({
+      closeAll: vi.fn(),
+      openNodeAndParents
+    } as unknown as I_faProjectHierarchyTreeHeTreeInstance),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: createTestUiStateWiring({
@@ -324,10 +354,10 @@ test('Test that session handlers expand world rows from row click routing', asyn
     stopPropagation
   } as unknown as MouseEvent)
   expect(stopPropagation).toHaveBeenCalledTimes(2)
-  expect(stat.open).toBe(true)
+  expect(openNodeAndParents).toHaveBeenCalledWith(worldNode)
   expect(markNodeOpen).toHaveBeenCalledWith('world-1')
   expect(loadChildrenForNode).toHaveBeenCalledWith(worldNode)
-  expect(reapplyLatentDescendantExpandState).toHaveBeenCalledTimes(1)
+  expect(reapplyLatentDescendantExpandState).toHaveBeenCalledTimes(2)
 })
 
 /**
@@ -350,6 +380,7 @@ test('Test that session handlers expand group rows from row click routing', asyn
   const worldNode = tree[0]!
   const groupNode = worldNode.children[0]!
   const markNodeOpen = vi.fn()
+  const openNodeAndParents = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
     createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
@@ -369,7 +400,10 @@ test('Test that session handlers expand group rows from row click routing', asyn
     runFaAction: vi.fn(),
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: createTestTreeComponentRef(),
+    treeComponentRef: ref({
+      closeAll: vi.fn(),
+      openNodeAndParents
+    } as unknown as I_faProjectHierarchyTreeHeTreeInstance),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: createTestUiStateWiring({ markNodeOpen })
@@ -386,7 +420,7 @@ test('Test that session handlers expand group rows from row click routing', asyn
     stopPropagation
   } as unknown as MouseEvent)
   expect(stopPropagation).toHaveBeenCalledTimes(2)
-  expect(stat.open).toBe(true)
+  expect(openNodeAndParents).toHaveBeenCalledWith(groupNode)
   expect(markNodeOpen).toHaveBeenCalledWith('group-1')
 })
 
@@ -412,6 +446,7 @@ test('Test that session handlers expand document rows with children from row cli
   }
   placement.children = [documentNode]
   const markNodeOpen = vi.fn()
+  const openNodeAndParents = vi.fn()
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
     createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
@@ -431,7 +466,10 @@ test('Test that session handlers expand document rows with children from row cli
     runFaAction: vi.fn(),
     onDocumentOpenRequest: vi.fn(),
     suppressTreeEmit: ref(false),
-    treeComponentRef: createTestTreeComponentRef(),
+    treeComponentRef: ref({
+      closeAll: vi.fn(),
+      openNodeAndParents
+    } as unknown as I_faProjectHierarchyTreeHeTreeInstance),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
     uiStateWiring: createTestUiStateWiring({ markNodeOpen })
@@ -448,7 +486,7 @@ test('Test that session handlers expand document rows with children from row cli
   wiring.onWorldNodeRowPointerDown(documentNode, stat, pointerDownEvent as unknown as PointerEvent)
   await wiring.onWorldNodeRowClick(documentNode, stat, clickEvent as unknown as MouseEvent)
   expect(stopPropagation).toHaveBeenCalledTimes(1)
-  expect(stat.open).toBe(true)
+  expect(openNodeAndParents).toHaveBeenCalledWith(documentNode)
   expect(markNodeOpen).toHaveBeenCalledWith('doc-parent')
 })
 
@@ -616,6 +654,9 @@ test('Test that session handlers reopen he-tree row after lazy load when tree re
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   const placement = tree[0]!.children[0]!
   const openNodeAndParents = vi.fn()
+  const reapplyHeTreeOpenState = vi.fn(() => {
+    openNodeAndParents(placement)
+  })
   const wiring = createProjectHierarchyTreeSessionHandlersWiring({
     createTemporaryDocument: vi.fn(async () => 'temp-doc'),
     documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
@@ -630,7 +671,7 @@ test('Test that session handlers reopen he-tree row after lazy load when tree re
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
-    ...createTestBulkExpandDeps(),
+    ...createTestBulkExpandDeps({ reapplyHeTreeOpenState }),
     resolvePreferredLanguageCode: () => 'en-US',
     runFaAction: vi.fn(),
     onDocumentOpenRequest: vi.fn(),
@@ -641,13 +682,13 @@ test('Test that session handlers reopen he-tree row after lazy load when tree re
     }),
     treeData: ref([]),
     treeScrollHostRef: ref(null),
-    uiStateWiring: createTestUiStateWiring()
+    uiStateWiring: createTestUiStateWiring({ reapplyHeTreeOpenState })
   })
   await wiring.onNodeOpen({ data: placement })
   expect(openNodeAndParents).toHaveBeenCalledWith(placement)
 })
 
-test('Test that session handlers ignore close events while suppressTreeEmit is set', () => {
+test('Test that session handlers ignore he-tree close events while suppressTreeEmit is set', () => {
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   const placement = tree[0]!.children[0]!
   const markNodeClosed = vi.fn()
@@ -680,6 +721,46 @@ test('Test that session handlers ignore close events while suppressTreeEmit is s
   })
   wiring.onNodeClose({ data: placement })
   expect(markNodeClosed).not.toHaveBeenCalled()
+})
+
+test('Test that open icon collapse still persists while suppressTreeEmit is set', async () => {
+  const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
+  const placement = tree[0]!.children[0]!
+  const markNodeClosed = vi.fn()
+  const wiring = createProjectHierarchyTreeSessionHandlersWiring({
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
+    documentRowDragHoldWiring: createTestDocumentRowDragHoldWiring(),
+    documentRowExpandClickGesture: createTestDocumentRowExpandClickGesture(),
+    dragContext: {
+      dragNode: null
+    },
+    dragExpandPostCommitGuard: ref(false),
+    dragExpandUiFrozen: ref(false),
+    getDragExpandedSnapshotNodeIds: () => null,
+    lazyLoadWiring: {
+      flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
+      loadChildrenForNode: vi.fn(async () => undefined)
+    },
+    ...createTestBulkExpandDeps(),
+    resolvePreferredLanguageCode: () => 'en-US',
+    runFaAction: vi.fn(),
+    onDocumentOpenRequest: vi.fn(),
+    suppressTreeEmit: ref(true),
+    treeComponentRef: createTestTreeComponentRef(),
+    treeData: ref(tree),
+    treeScrollHostRef: ref(null),
+    uiStateWiring: createTestUiStateWiring({
+      markNodeClosed,
+      markNodeOpen: vi.fn()
+    })
+  })
+  const stat = {
+    children: placement.children,
+    open: true
+  }
+  wiring.onNodeOpenIconPointerDown(stat)
+  await wiring.onNodeOpenIconClick(placement, stat)
+  expect(markNodeClosed).toHaveBeenCalledTimes(1)
 })
 
 test('Test that session handlers emit document open requests for leaf document rows', () => {
@@ -1022,7 +1103,7 @@ test('Test that session handlers ignore open icon clicks on empty loaded documen
   expect(loadChildrenForNode).not.toHaveBeenCalled()
 })
 
-test('Test that session handlers recover when he-tree openNodeAndParents stat is missing', async () => {
+test('Test that session handlers keep stat closed when fresh he-tree sync fails after deferred batch', async () => {
   const tree = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])
   const placement = tree[0]!.children[0]!
   const stat = {

@@ -28,7 +28,8 @@ async function notifyAfterProjectHierarchyTreeRevisionPublished (
 export async function publishProjectHierarchyTreeLazyLoadRevision (
   deps: T_lazyLoadPublishDeps,
   _nodeKind: I_faProjectHierarchyTreeHeTreeNode['nodeKind'],
-  nodeId: string
+  nodeId: string,
+  options?: { skipRootRevision?: boolean }
 ): Promise<void> {
   deps.suppressTreeEmit.value = true
   try {
@@ -40,7 +41,9 @@ export async function publishProjectHierarchyTreeLazyLoadRevision (
         cloneProjectHierarchyTreeLoadedNodeForPublish(loadedNode)
       )
     }
-    deps.treeData.value = publishProjectHierarchyTreeRootRevision(deps.treeData.value)
+    if (options?.skipRootRevision !== true) {
+      deps.treeData.value = publishProjectHierarchyTreeRootRevision(deps.treeData.value)
+    }
     await notifyAfterProjectHierarchyTreeRevisionPublished(deps)
   } finally {
     deps.suppressTreeEmit.value = false

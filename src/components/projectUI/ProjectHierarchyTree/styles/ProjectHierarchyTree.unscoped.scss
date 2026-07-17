@@ -17,6 +17,33 @@
   &--listDragging {
     user-select: none;
   }
+
+  .tree-line {
+    background: $projectHierarchyTree-treeLine-color;
+  }
+
+  .tree-vline {
+    background: $projectHierarchyTree-treeLine-color;
+    margin-left: $projectHierarchyTree-treeVline-marginLeft;
+    width: $projectHierarchyTree-treeVline-width;
+
+    &::before {
+      background: $projectHierarchyTree-treeLine-color;
+      bottom: $projectHierarchyTree-treeVline-before-bottom;
+      content: '';
+      height: $projectHierarchyTree-treeVline-before-height;
+      position: absolute;
+      width: $projectHierarchyTree-treeVline-width;
+    }
+
+    &[style*="bottom: 50%"] {
+      margin-bottom: $projectHierarchyTree-treeVline-midBranch-marginBottom;
+    }
+  }
+
+  .tree-hline {
+    margin-left: $projectHierarchyTree-treeHline-marginLeft;
+  }
 }
 
 .projectHierarchyTreeHost .tree-node {
@@ -87,7 +114,7 @@
   height: $projectHierarchyTree-openIcon-boxSize;
   padding: $projectHierarchyTree-openIcon-padding;
   pointer-events: none;
-  transform: rotate(0deg);
+  transform: rotate($projectHierarchyTree-openIcon-rotateClosed);
   transition: transform $projectHierarchyTree-openIcon-rotateTransitionDuration;
   width: $projectHierarchyTree-openIcon-boxSize;
   z-index: $projectHierarchyTree-openIcon-zIndex;
@@ -107,9 +134,10 @@
     position: absolute;
     right: $projectHierarchyTree-openIcon-world-positionRight;
     top: $projectHierarchyTree-openIcon-world-positionTop;
+    transition: transform $projectHierarchyTree-openIcon-rotateTransitionDuration;
 
     &.projectHierarchyTree__openIcon--open {
-      transform: rotate(90deg);
+      transform: rotate($projectHierarchyTree-openIcon-rotateOpen);
     }
   }
 
@@ -152,11 +180,12 @@
   .projectHierarchyTree__openIcon {
     left: $projectHierarchyTree-openIcon-nestedTreeNode-positionLeft;
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%) rotate(0deg);
+    top: $projectHierarchyTree-openIcon-nestedTreeNode-positionTop;
+    transform: translateY($projectHierarchyTree-openIcon-nestedTreeNode-translateY) rotate($projectHierarchyTree-openIcon-rotateClosed);
+    transition: transform $projectHierarchyTree-openIcon-rotateTransitionDuration;
 
     &.projectHierarchyTree__openIcon--open {
-      transform: translateY(-50%) rotate(90deg);
+      transform: translateY($projectHierarchyTree-openIcon-nestedTreeNode-translateY) rotate($projectHierarchyTree-openIcon-rotateOpen);
     }
   }
 }

@@ -60,11 +60,11 @@ function evictCollapsedSubtreeChildren (deps: {
 
 async function runBulkExpandDeepPasses (deps: {
   anchorId: string
-  flushDeferredTreeRevisionPublish: () => void | Promise<void>
   openNodeIds: Ref<Set<string>>
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
-  reapplyHeTreeOpenState: () => void
-  reapplyLatentDescendantExpandState: () => Promise<void>
+  reapplyLatentDescendantExpandState: (options?: {
+    deferHeTreeOpen?: boolean
+  }) => Promise<void>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }): Promise<void> {
   const maxPasses = Math.max(
@@ -76,7 +76,7 @@ async function runBulkExpandDeepPasses (deps: {
   )
   for (let pass = 0; pass < maxPasses; pass++) {
     const openCountBeforePass = deps.openNodeIds.value.size
-    await deps.reapplyLatentDescendantExpandState()
+    await deps.reapplyLatentDescendantExpandState({ deferHeTreeOpen: true })
     mergeBulkExpandTargetIds({
       anchorId: deps.anchorId,
       openNodeIds: deps.openNodeIds,
@@ -87,18 +87,18 @@ async function runBulkExpandDeepPasses (deps: {
       break
     }
   }
-  await deps.flushDeferredTreeRevisionPublish()
-  deps.reapplyHeTreeOpenState()
 }
 
 export function createProjectHierarchyTreeBulkExpandCollapseWiring (deps: {
   dragExpandUiFrozen: Ref<boolean>
-  flushDeferredTreeRevisionPublish: () => void | Promise<void>
   nextTick: () => Promise<void>
   openNodeIds: Ref<Set<string>>
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   reapplyHeTreeOpenState: () => void
-  reapplyLatentDescendantExpandState: () => Promise<void>
+  reapplyLatentDescendantExpandState: (options?: {
+    deferHeTreeOpen?: boolean
+  }) => Promise<void>
+  runDeferredLazyLoadBatch: (runBatch: () => Promise<void>) => Promise<void>
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   treeMountKey: Ref<number>
@@ -125,14 +125,14 @@ export function createProjectHierarchyTreeBulkExpandCollapseWiring (deps: {
     })
     void (async () => {
       try {
-        await runBulkExpandDeepPasses({
-          anchorId,
-          flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
-          openNodeIds: deps.openNodeIds,
-          queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
-          reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,
-          reapplyLatentDescendantExpandState: deps.reapplyLatentDescendantExpandState,
-          treeData: deps.treeData
+        await deps.runDeferredLazyLoadBatch(async () => {
+          await runBulkExpandDeepPasses({
+            anchorId,
+            openNodeIds: deps.openNodeIds,
+            queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
+            reapplyLatentDescendantExpandState: deps.reapplyLatentDescendantExpandState,
+            treeData: deps.treeData
+          })
         })
       } finally {
         bulkExpandCollapseInFlight = false

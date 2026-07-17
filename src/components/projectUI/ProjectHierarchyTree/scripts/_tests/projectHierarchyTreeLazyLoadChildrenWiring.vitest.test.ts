@@ -81,6 +81,52 @@ test('Test that loadProjectHierarchyTreeNodeChildren rethrows unexpected IPC err
   })).rejects.toThrow('network down')
 })
 
+test('Test that loadProjectHierarchyTreeNodeChildren stages placement children when stage callback is set', async () => {
+  const node = buildPlacementNode()
+  const treeData = ref([node])
+  const stageLoadedChildrenForNode = vi.fn()
+  const publishTreeRevision = vi.fn(async () => undefined)
+  await loadProjectHierarchyTreeNodeChildren({
+    listPlacementDocumentChildren: vi.fn(async () => ({
+      items: [{
+        displayName: 'Doc A',
+        hasChildren: false,
+        id: 'doc-a',
+        parentDocumentId: null,
+        placementId: 'placement-1',
+        sortOrder: 0
+      }]
+    })),
+    node,
+    preferredLanguageCode: 'en-US',
+    publishTreeRevision,
+    stageLoadedChildrenForNode,
+    treeData
+  })
+  expect(stageLoadedChildrenForNode).toHaveBeenCalledTimes(1)
+  expect(publishTreeRevision).not.toHaveBeenCalled()
+})
+
+test('Test that loadProjectHierarchyTreeNodeChildren rethrows unexpected nested document IPC errors', async () => {
+  const node: I_faProjectHierarchyTreeHeTreeNode = {
+    ...buildPlacementNode(),
+    childrenLoaded: false,
+    documentId: 'doc-parent',
+    hasChildren: true,
+    id: 'doc-parent',
+    nodeKind: 'document'
+  }
+  await expect(loadProjectHierarchyTreeNodeChildren({
+    listPlacementDocumentChildren: vi.fn(async () => {
+      throw new Error('network down nested')
+    }),
+    node,
+    preferredLanguageCode: 'en-US',
+    publishTreeRevision: vi.fn(async () => undefined),
+    treeData: ref([node])
+  })).rejects.toThrow('network down nested')
+})
+
 test('Test that refreshProjectHierarchyTreeNodeChildrenFromDatabase no-ops for missing node id', async () => {
   const listPlacementDocumentChildren = vi.fn(async () => ({ items: [] }))
   await refreshProjectHierarchyTreeNodeChildrenFromDatabase({

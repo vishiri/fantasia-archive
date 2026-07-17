@@ -157,3 +157,113 @@ test('Test that reapplyProjectHierarchyTreeLatentDescendantExpandState loads sha
   expect(docAIndex).toBeGreaterThanOrEqual(0)
   expect(docBIndex).toBeGreaterThan(docAIndex)
 })
+
+test('Test that reapplyProjectHierarchyTreeLatentDescendantExpandState retries after staged commit clears stall', async () => {
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const placement = findProjectHierarchyTreeNodeById(treeData.value, 'placement-1')!
+  placement.childrenLoaded = false
+  placement.hasChildren = true
+  const openNodeIds = ref(new Set(['placement-1']))
+  let commitCalls = 0
+  const commitStagedLoadedChildren = vi.fn(() => {
+    commitCalls += 1
+    if (commitCalls >= 2) {
+      placement.childrenLoaded = true
+      placement.hasChildren = false
+      placement.children = []
+    }
+    return true
+  })
+  await reapplyProjectHierarchyTreeLatentDescendantExpandState({
+    commitStagedLoadedChildren,
+    getTreeRef: () => null,
+    loadChildrenAlongRevealPath: vi.fn(async () => undefined),
+    openNodeIds,
+    reapplyHeTreeOpenAfterEachPass: false,
+    treeData
+  })
+  expect(commitCalls).toBeGreaterThanOrEqual(2)
+  expect(placement.childrenLoaded).toBe(true)
+})
+
+test('Test that reapply skips open ids that do not need child reload', async () => {
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const placement = findProjectHierarchyTreeNodeById(treeData.value, 'placement-1')!
+  placement.childrenLoaded = true
+  placement.hasChildren = false
+  placement.children = []
+  const openNodeIds = ref(new Set(['placement-1', 'world-1', 'ghost-id']))
+  const loadChildrenAlongRevealPath = vi.fn(async () => undefined)
+  await reapplyProjectHierarchyTreeLatentDescendantExpandState({
+    getTreeRef: () => null,
+    loadChildrenAlongRevealPath,
+    openNodeIds,
+    reapplyHeTreeOpenAfterEachPass: true,
+    treeData
+  })
+  expect(loadChildrenAlongRevealPath).toHaveBeenCalled()
+})
+
+test('Test that reapplyProjectHierarchyTreeLatentDescendantExpandState sorts equal-depth siblings by node id', async () => {
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const placement = findProjectHierarchyTreeNodeById(treeData.value, 'placement-1')!
+  placement.childrenLoaded = true
+  placement.children = [
+    {
+      children: [],
+      childrenLoaded: false,
+      documentId: 'doc-z',
+      groupId: 'group-1',
+      hasChildren: true,
+      icon: '',
+      id: 'doc-z',
+      label: 'Doc Z',
+      nodeKind: 'document',
+      placementId: 'placement-1',
+      worldColor: '#ff0000',
+      worldId: 'world-1'
+    },
+    {
+      children: [],
+      childrenLoaded: false,
+      documentId: 'doc-a',
+      groupId: 'group-1',
+      hasChildren: true,
+      icon: '',
+      id: 'doc-a',
+      label: 'Doc A',
+      nodeKind: 'document',
+      placementId: 'placement-1',
+      worldColor: '#ff0000',
+      worldId: 'world-1'
+    }
+  ]
+  const openNodeIds = ref(new Set([
+    'world-1',
+    'group-1',
+    'placement-1',
+    'doc-z',
+    'doc-a'
+  ]))
+  const revealOrder: string[] = []
+  await reapplyProjectHierarchyTreeLatentDescendantExpandState({
+    getTreeRef: () => null,
+    loadChildrenAlongRevealPath: async (nodeIds) => {
+      if (nodeIds.length < 2) {
+        return
+      }
+      const leafId = nodeIds[nodeIds.length - 1]
+      if (leafId === 'doc-a' || leafId === 'doc-z') {
+        revealOrder.push(leafId)
+        const node = findProjectHierarchyTreeNodeById(treeData.value, leafId)
+        if (node !== null) {
+          node.childrenLoaded = true
+        }
+      }
+    },
+    openNodeIds,
+    reapplyHeTreeOpenAfterEachPass: false,
+    treeData
+  })
+  expect(revealOrder[0]).toBe('doc-a')
+})

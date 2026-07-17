@@ -12,6 +12,7 @@ import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } fr
 import { createProjectHierarchyTreeSessionDnDSubWiring } from './projectHierarchyTreeSessionDnDSubWiring'
 import { createProjectHierarchyTreeBeforeDragOpenWiring } from './projectHierarchyTreeBeforeDragOpenWiring'
 import { createProjectHierarchyTreeLazyLoadSessionWiring } from './projectHierarchyTreeLazyLoadSessionWiring'
+import { createProjectHierarchyTreeOpenIconExpandAnimationWiring } from './projectHierarchyTreeOpenIconExpandAnimationWiring'
 import { createProjectHierarchyTreeSyncWiring } from './projectHierarchyTreeSyncWiring'
 
 type T_hierarchyStore = {
@@ -21,7 +22,7 @@ type T_hierarchyStore = {
   refreshLayout: () => Promise<void>
 }
 
-export function createProjectHierarchyTreeSessionSubWiring (deps: {
+type T_sessionSubWiringDeps = {
   computed: <T>(getter: () => T) => { value: T }
   documentRowDragHoldWiring: ReturnType<typeof createProjectHierarchyTreeDocumentRowDragHoldWiring>
   documentRowExpandClickGesture: ReturnType<typeof createProjectHierarchyTreeDocumentRowExpandClickGestureWiring>
@@ -30,10 +31,12 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: {
   dragDropCommitted: Ref<boolean>
   dragExpandPostCommitGuard: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
+  deferLazyLoadTreeRevisionPublish: Ref<boolean>
   getPreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
   hierarchyStore: T_hierarchyStore
   isTreeDragActive: Ref<boolean>
   nextTick: () => Promise<void>
+  onUnmounted?: (hook: () => void) => void
   openNodeIds: Ref<Set<string>>
   pendingRevealPath: Ref<string[]>
   ref: <T>(initial: T) => Ref<T>
@@ -45,7 +48,9 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: {
   uiState: Ref<I_faProjectHierarchyTreeUiState>
   watch: typeof WatchFn
   worlds: Ref<I_faProjectHierarchyTreeWorkspaceWorld[]>
-}) {
+}
+
+function createProjectHierarchyTreeSessionLoadAndOpenIconWiring (deps: T_sessionSubWiringDeps) {
   const syncWiring = createProjectHierarchyTreeSyncWiring({
     getPreferredLanguageCode: deps.getPreferredLanguageCode,
     getWorlds: () => deps.worlds.value,
@@ -53,8 +58,8 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: {
     suppressTreeEmit: deps.suppressTreeEmit,
     treeData: deps.treeData
   })
-
   const loadSessionWiring = createProjectHierarchyTreeLazyLoadSessionWiring({
+    deferLazyLoadTreeRevisionPublish: deps.deferLazyLoadTreeRevisionPublish,
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     flushUiStatePersist: () => deps.hierarchyStore.flushUiStatePersist(),
     getExpandedNodeIds: () => deps.uiState.value.expandedNodeIds,
@@ -74,7 +79,35 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: {
     treeMountKey: deps.treeMountKey,
     watch: deps.watch
   })
-  const { lazyLoadWiring, uiStateWiring } = loadSessionWiring
+  const { lazyLoadWiring, runDeferredLazyLoadBatch, uiStateWiring } = loadSessionWiring
+  const openIconExpandAnimationWiring = createProjectHierarchyTreeOpenIconExpandAnimationWiring({
+    clearTimeout: (timeoutId) => {
+      window.clearTimeout(timeoutId)
+    },
+    onUnmounted: deps.onUnmounted ?? (() => undefined),
+    openNodeIds: deps.openNodeIds,
+    ref: deps.ref,
+    setTimeout: (handler, delayMs) => {
+      return window.setTimeout(handler, delayMs)
+    }
+  })
+  return {
+    lazyLoadWiring,
+    openIconExpandAnimationWiring,
+    runDeferredLazyLoadBatch,
+    syncWiring,
+    uiStateWiring
+  }
+}
+
+export function createProjectHierarchyTreeSessionSubWiring (deps: T_sessionSubWiringDeps) {
+  const {
+    lazyLoadWiring,
+    openIconExpandAnimationWiring,
+    runDeferredLazyLoadBatch,
+    syncWiring,
+    uiStateWiring
+  } = createProjectHierarchyTreeSessionLoadAndOpenIconWiring(deps)
   const beforeDragOpenWiring = createProjectHierarchyTreeBeforeDragOpenWiring({
     lazyLoadWiring
   })
@@ -105,7 +138,6 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: {
     suppressTreeEmit: deps.suppressTreeEmit,
     treeData: deps.treeData
   })
-
   const treeRootClassList = deps.computed(() => ({
     'projectHierarchyTree--listDragging': deps.isTreeDragActive.value
   }))
@@ -114,6 +146,8 @@ export function createProjectHierarchyTreeSessionSubWiring (deps: {
     beforeDragOpenWiring,
     dndWiring,
     lazyLoadWiring,
+    openIconExpandAnimationWiring,
+    runDeferredLazyLoadBatch,
     syncWiring,
     treeRootClassList,
     treeStyle,

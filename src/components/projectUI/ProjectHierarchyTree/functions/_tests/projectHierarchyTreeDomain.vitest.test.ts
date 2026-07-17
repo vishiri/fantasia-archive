@@ -2456,6 +2456,7 @@ test('Test that mergeLoadedChildrenIntoNode preserves loaded document subtrees o
   })
   mergeLoadedChildrenIntoNode(tree, 'placement-1', refreshLoad)
   const parentAfter = findProjectHierarchyTreeNodeById(tree, 'doc-parent')
+  expect(parentAfter).toBe(parentBefore)
   expect(parentAfter?.label).toBe('Parent refreshed')
   expect(parentAfter?.children.map((child) => child.id)).toEqual(['doc-child'])
 })
@@ -2513,8 +2514,10 @@ test('Test that mergeLoadedChildrenIntoNode preserves nested subtrees when paren
     worldColor: '#000',
     worldId: 'world-1'
   })
+  const parentBefore = findProjectHierarchyTreeNodeById(tree, 'doc-parent')
   mergeLoadedChildrenIntoNode(tree, 'placement-1', refreshLoad)
   const parentAfter = findProjectHierarchyTreeNodeById(tree, 'doc-parent')
+  expect(parentAfter).toBe(parentBefore)
   expect(parentAfter?.children.map((child) => child.id)).toEqual(['doc-child'])
 })
 

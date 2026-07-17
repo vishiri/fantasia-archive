@@ -171,6 +171,8 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
         eachDroppableHandler: () => true,
         heTreeNodeKey: (_stat: { data: { id: string } }) => 'world-1',
         isNodeContextMenuOpen: treeContextMenuState.isOpen,
+        isOpenIconExpandAnimationPending: () => false,
+        isProjectHierarchyTreeOpenIconExpandedForOpenIcon: (_nodeId: string, statOpen: boolean) => statOpen,
         isTreeDragActive: ref(false),
         nodeMenuPointerPosition: treeContextMenuState.menuPointerPosition,
         onAddNewDocumentFromContextMenuClick: treeHandlers.onAddNewDocumentFromContextMenuClick,
@@ -272,6 +274,11 @@ test('Test that ProjectHierarchyTree renders tree rows when layout data exists',
         QIcon: {
           emits: ['click', 'pointerdown'],
           template: '<button data-test-locator="projectHierarchyTree-openIcon" type="button" @click.stop="$emit(\'click\', $event)" @pointerdown.stop="$emit(\'pointerdown\', $event)" />'
+        },
+        ProjectHierarchyTreeOpenIcon: {
+          emits: ['click', 'pointerdown'],
+          props: ['expanded', 'pendingExpandAnimation'],
+          template: '<button data-test-locator="projectHierarchyTree-openIcon" type="button" @click.stop="$emit(\'click\', $event)" @pointerdown.stop="$emit(\'pointerdown\', $event)" />'
         }
       }
     }
@@ -293,6 +300,11 @@ test('Test that ProjectHierarchyTree forwards row and tree interaction handlers'
         },
         QIcon: {
           emits: ['click', 'pointerdown'],
+          template: '<button data-test-locator="projectHierarchyTree-openIcon" type="button" @click.stop="$emit(\'click\', $event)" @pointerdown.stop="$emit(\'pointerdown\', $event)" />'
+        },
+        ProjectHierarchyTreeOpenIcon: {
+          emits: ['click', 'pointerdown'],
+          props: ['expanded', 'pendingExpandAnimation'],
           template: '<button data-test-locator="projectHierarchyTree-openIcon" type="button" @click.stop="$emit(\'click\', $event)" @pointerdown.stop="$emit(\'pointerdown\', $event)" />'
         }
       }
@@ -389,6 +401,11 @@ test('Test that ProjectHierarchyTree renders open icon for expandable document r
         QIcon: {
           emits: ['click', 'pointerdown'],
           template: '<button data-test-locator="projectHierarchyTree-openIcon" type="button" @click.stop="$emit(\'click\', $event)" @pointerdown.stop="$emit(\'pointerdown\', $event)" />'
+        },
+        ProjectHierarchyTreeOpenIcon: {
+          emits: ['click', 'pointerdown'],
+          props: ['expanded', 'pendingExpandAnimation'],
+          template: '<button data-test-locator="projectHierarchyTree-openIcon" type="button" @click.stop="$emit(\'click\', $event)" @pointerdown.stop="$emit(\'pointerdown\', $event)" />'
         }
       }
     }
@@ -435,6 +452,11 @@ test('Test that ProjectHierarchyTree omits open icon for leaf document rows', ()
         },
         QIcon: {
           emits: ['click', 'pointerdown'],
+          template: '<button data-test-locator="projectHierarchyTree-openIcon" type="button" @click.stop="$emit(\'click\', $event)" @pointerdown.stop="$emit(\'pointerdown\', $event)" />'
+        },
+        ProjectHierarchyTreeOpenIcon: {
+          emits: ['click', 'pointerdown'],
+          props: ['expanded', 'pendingExpandAnimation'],
           template: '<button data-test-locator="projectHierarchyTree-openIcon" type="button" @click.stop="$emit(\'click\', $event)" @pointerdown.stop="$emit(\'pointerdown\', $event)" />'
         }
       }

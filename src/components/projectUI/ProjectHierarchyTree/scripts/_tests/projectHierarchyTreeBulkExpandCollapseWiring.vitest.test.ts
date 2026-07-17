@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import { expect, test, vi } from 'vitest'
-import { ref } from 'vue'
+import { ref, type Ref } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
@@ -38,36 +38,76 @@ function createWorldNode (): I_faProjectHierarchyTreeHeTreeNode {
   }
 }
 
+function createPassthroughDeferredLazyLoadBatchMock (
+  reapplyHeTreeOpenState: () => void
+) {
+  return async (runBatch: () => Promise<void>) => {
+    await runBatch()
+    reapplyHeTreeOpenState()
+  }
+}
+
+function createBulkExpandWiringDeps (overrides: {
+  dragExpandUiFrozen?: Ref<boolean>
+  nextTick?: () => Promise<void>
+  openNodeIds?: Ref<Set<string>>
+  queuePersistExpandedNodeIds?: (expandedNodeIds: string[]) => void
+  reapplyHeTreeOpenState?: () => void
+  reapplyLatentDescendantExpandState?: (options?: {
+    deferHeTreeOpen?: boolean
+  }) => Promise<void>
+  runDeferredLazyLoadBatch?: (runBatch: () => Promise<void>) => Promise<void>
+  suppressTreeEmit?: Ref<boolean>
+  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
+  treeMountKey?: Ref<number>
+}) {
+  const reapplyHeTreeOpenState = overrides.reapplyHeTreeOpenState ?? vi.fn()
+  const reapplyLatentDescendantExpandState =
+    overrides.reapplyLatentDescendantExpandState ?? vi.fn(async () => {})
+  const runDeferredLazyLoadBatch =
+    overrides.runDeferredLazyLoadBatch ??
+    createPassthroughDeferredLazyLoadBatchMock(reapplyHeTreeOpenState)
+  return {
+    dragExpandUiFrozen: overrides.dragExpandUiFrozen ?? ref(false),
+    nextTick: overrides.nextTick ?? (async () => {}),
+    openNodeIds: overrides.openNodeIds ?? ref<Set<string>>(new Set()),
+    queuePersistExpandedNodeIds: overrides.queuePersistExpandedNodeIds ?? vi.fn(),
+    reapplyHeTreeOpenState,
+    reapplyLatentDescendantExpandState,
+    runDeferredLazyLoadBatch,
+    suppressTreeEmit: overrides.suppressTreeEmit ?? ref(false),
+    treeData: overrides.treeData,
+    treeMountKey: overrides.treeMountKey ?? ref(0)
+  }
+}
+
 test('expandAllUnderNode merges target ids and runs latent reapply in background', async () => {
   const treeData = ref<I_faProjectHierarchyTreeHeTreeNode[]>([createWorldNode()])
   const openNodeIds = ref<Set<string>>(new Set())
   const treeMountKey = ref(0)
   const suppressTreeEmit = ref(false)
-  const dragExpandUiFrozen = ref(false)
   const reapplyLatentDescendantExpandState = vi.fn(async () => {})
   const reapplyHeTreeOpenState = vi.fn()
-  const flushDeferredTreeRevisionPublish = vi.fn(async () => {})
   const queuePersistExpandedNodeIds = vi.fn()
 
-  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring({
-    dragExpandUiFrozen,
-    flushDeferredTreeRevisionPublish,
-    nextTick: async () => {},
-    openNodeIds,
-    queuePersistExpandedNodeIds,
-    reapplyHeTreeOpenState,
-    reapplyLatentDescendantExpandState,
-    suppressTreeEmit,
-    treeData,
-    treeMountKey
-  })
+  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring(
+    createBulkExpandWiringDeps({
+      openNodeIds,
+      queuePersistExpandedNodeIds,
+      reapplyHeTreeOpenState,
+      reapplyLatentDescendantExpandState,
+      suppressTreeEmit,
+      treeData,
+      treeMountKey
+    })
+  )
 
   wiring.expandAllUnderNode('world-1')
   expect(openNodeIds.value.has('world-1')).toBe(true)
   expect(openNodeIds.value.has('group-1')).toBe(true)
   expect(queuePersistExpandedNodeIds).toHaveBeenCalled()
   await vi.waitFor(() => {
-    expect(reapplyLatentDescendantExpandState).toHaveBeenCalled()
+    expect(reapplyLatentDescendantExpandState).toHaveBeenCalledWith({ deferHeTreeOpen: true })
     expect(reapplyHeTreeOpenState).toHaveBeenCalled()
   })
   expect(wiring.isBulkExpandCollapseInFlight()).toBe(false)
@@ -78,18 +118,13 @@ test('expandAllUnderNode no-ops while drag-expand frozen', () => {
   const openNodeIds = ref<Set<string>>(new Set())
   const dragExpandUiFrozen = ref(true)
 
-  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring({
-    dragExpandUiFrozen,
-    flushDeferredTreeRevisionPublish: vi.fn(),
-    nextTick: async () => {},
-    openNodeIds,
-    queuePersistExpandedNodeIds: vi.fn(),
-    reapplyHeTreeOpenState: vi.fn(),
-    reapplyLatentDescendantExpandState: vi.fn(async () => {}),
-    suppressTreeEmit: ref(false),
-    treeData,
-    treeMountKey: ref(0)
-  })
+  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring(
+    createBulkExpandWiringDeps({
+      dragExpandUiFrozen,
+      openNodeIds,
+      treeData
+    })
+  )
 
   wiring.expandAllUnderNode('world-1')
   expect(openNodeIds.value.size).toBe(0)
@@ -103,18 +138,16 @@ test('collapseAllUnderNode prunes open ids, remounts tree, and reopens remaining
   const reapplyHeTreeOpenState = vi.fn()
   const queuePersistExpandedNodeIds = vi.fn()
 
-  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring({
-    dragExpandUiFrozen: ref(false),
-    flushDeferredTreeRevisionPublish: vi.fn(),
-    nextTick: async () => {},
-    openNodeIds,
-    queuePersistExpandedNodeIds,
-    reapplyHeTreeOpenState,
-    reapplyLatentDescendantExpandState: vi.fn(async () => {}),
-    suppressTreeEmit,
-    treeData,
-    treeMountKey
-  })
+  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring(
+    createBulkExpandWiringDeps({
+      openNodeIds,
+      queuePersistExpandedNodeIds,
+      reapplyHeTreeOpenState,
+      suppressTreeEmit,
+      treeData,
+      treeMountKey
+    })
+  )
 
   await wiring.collapseAllUnderNode('group-1')
   expect(openNodeIds.value.has('group-1')).toBe(false)
@@ -193,18 +226,14 @@ test('collapseAllUnderNode no-ops while drag-expand frozen', async () => {
   const openNodeIds = ref<Set<string>>(new Set(['world-1', 'group-1']))
   const treeMountKey = ref(0)
 
-  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring({
-    dragExpandUiFrozen: ref(true),
-    flushDeferredTreeRevisionPublish: vi.fn(),
-    nextTick: async () => {},
-    openNodeIds,
-    queuePersistExpandedNodeIds: vi.fn(),
-    reapplyHeTreeOpenState: vi.fn(),
-    reapplyLatentDescendantExpandState: vi.fn(async () => {}),
-    suppressTreeEmit: ref(false),
-    treeData,
-    treeMountKey
-  })
+  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring(
+    createBulkExpandWiringDeps({
+      dragExpandUiFrozen: ref(true),
+      openNodeIds,
+      treeData,
+      treeMountKey
+    })
+  )
 
   await wiring.collapseAllUnderNode('group-1')
   expect(openNodeIds.value.has('group-1')).toBe(true)
@@ -222,18 +251,14 @@ test('expandAllUnderNode ignores stacked calls while background work is in fligh
   })
   const queuePersistExpandedNodeIds = vi.fn()
 
-  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring({
-    dragExpandUiFrozen: ref(false),
-    flushDeferredTreeRevisionPublish: vi.fn(async () => {}),
-    nextTick: async () => {},
-    openNodeIds,
-    queuePersistExpandedNodeIds,
-    reapplyHeTreeOpenState: vi.fn(),
-    reapplyLatentDescendantExpandState,
-    suppressTreeEmit: ref(false),
-    treeData,
-    treeMountKey: ref(0)
-  })
+  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring(
+    createBulkExpandWiringDeps({
+      openNodeIds,
+      queuePersistExpandedNodeIds,
+      reapplyLatentDescendantExpandState,
+      treeData
+    })
+  )
 
   wiring.expandAllUnderNode('world-1')
   wiring.expandAllUnderNode('world-1')
@@ -296,18 +321,13 @@ test('expandAllUnderNode merges deeper targets after lazy children load', async 
     }
   })
 
-  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring({
-    dragExpandUiFrozen: ref(false),
-    flushDeferredTreeRevisionPublish: vi.fn(async () => {}),
-    nextTick: async () => {},
-    openNodeIds,
-    queuePersistExpandedNodeIds: vi.fn(),
-    reapplyHeTreeOpenState: vi.fn(),
-    reapplyLatentDescendantExpandState,
-    suppressTreeEmit: ref(false),
-    treeData,
-    treeMountKey: ref(0)
-  })
+  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring(
+    createBulkExpandWiringDeps({
+      openNodeIds,
+      reapplyLatentDescendantExpandState,
+      treeData
+    })
+  )
 
   wiring.expandAllUnderNode('world-1')
   await vi.waitFor(() => {
@@ -321,18 +341,12 @@ test('collapseAllUnderNode evicts placement and document children in subtree', a
   const treeData = ref<I_faProjectHierarchyTreeHeTreeNode[]>([placementTree])
   const openNodeIds = ref<Set<string>>(new Set(['world-1', 'placement-1', 'doc-parent', 'doc-child']))
 
-  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring({
-    dragExpandUiFrozen: ref(false),
-    flushDeferredTreeRevisionPublish: vi.fn(),
-    nextTick: async () => {},
-    openNodeIds,
-    queuePersistExpandedNodeIds: vi.fn(),
-    reapplyHeTreeOpenState: vi.fn(),
-    reapplyLatentDescendantExpandState: vi.fn(async () => {}),
-    suppressTreeEmit: ref(false),
-    treeData,
-    treeMountKey: ref(0)
-  })
+  const wiring = createProjectHierarchyTreeBulkExpandCollapseWiring(
+    createBulkExpandWiringDeps({
+      openNodeIds,
+      treeData
+    })
+  )
 
   await wiring.collapseAllUnderNode('placement-1')
   const placement = treeData.value[0]!.children[0]!

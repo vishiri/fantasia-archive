@@ -2,6 +2,7 @@ import type { Ref, watch as WatchFn } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
+import { runProjectHierarchyTreeDeferredLazyLoadBatch } from './projectHierarchyTreeDeferredLazyLoadBatchWiring'
 import { createProjectHierarchyTreeLazyLoadWiring } from './projectHierarchyTreeLazyLoadWiring'
 import { createProjectHierarchyTreeUiStateSessionWiring } from './projectHierarchyTreeUiStateSessionWiring'
 
@@ -22,6 +23,7 @@ async function listProjectHierarchyTreePlacementDocumentChildren (
 }
 
 export function createProjectHierarchyTreeLazyLoadSessionWiring (deps: {
+  deferLazyLoadTreeRevisionPublish: Ref<boolean>
   dragExpandUiFrozen: Ref<boolean>
   flushUiStatePersist: () => void
   getExpandedNodeIds: () => string[]
@@ -48,18 +50,47 @@ export function createProjectHierarchyTreeLazyLoadSessionWiring (deps: {
   }
 
   const lazyLoadWiring = createProjectHierarchyTreeLazyLoadWiring({
+    deferLazyLoadTreeRevisionPublish: deps.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: deps.getPreferredLanguageCode,
     listPlacementDocumentChildren: listProjectHierarchyTreePlacementDocumentChildren,
     nextTick: deps.nextTick,
     onAfterTreeRevisionPublished: () => {
+      if (deps.deferLazyLoadTreeRevisionPublish.value) {
+        return
+      }
       treeRevisionPublishHooks.reapplyHeTreeOpenState?.()
     },
-    shouldDeferTreeRevisionPublish: () => deps.dragExpandUiFrozen.value,
+    shouldDeferTreeRevisionPublish: () => {
+      return deps.dragExpandUiFrozen.value || deps.deferLazyLoadTreeRevisionPublish.value
+    },
     suppressTreeEmit: deps.suppressTreeEmit,
     treeData: deps.treeData
   })
 
+  const uiStateWiringHolder: {
+    wiring: ReturnType<typeof createProjectHierarchyTreeUiStateSessionWiring> | null
+  } = {
+    wiring: null
+  }
+
+  async function runDeferredLazyLoadBatch (
+    runBatch: () => Promise<void>,
+    options?: { skipReapplyHeTreeOpenState?: boolean }
+  ): Promise<void> {
+    await runProjectHierarchyTreeDeferredLazyLoadBatch({
+      deferLazyLoadTreeRevisionPublish: deps.deferLazyLoadTreeRevisionPublish,
+      flushDeferredTreeRevisionPublish: () => lazyLoadWiring.flushDeferredTreeRevisionPublish(),
+      nextTick: deps.nextTick,
+      reapplyHeTreeOpenState: () => uiStateWiringHolder.wiring!.reapplyHeTreeOpenState(),
+      runBatch,
+      ...(options?.skipReapplyHeTreeOpenState === true
+        ? { skipReapplyHeTreeOpenState: true }
+        : {})
+    })
+  }
+
   const uiStateWiring = createProjectHierarchyTreeUiStateSessionWiring({
+    commitStagedLoadedChildren: () => lazyLoadWiring.commitStagedLoadedChildren(),
     flushDeferredTreeRevisionPublish: () => lazyLoadWiring.flushDeferredTreeRevisionPublish(),
     flushUiStatePersist: deps.flushUiStatePersist,
     getExpandedNodeIds: deps.getExpandedNodeIds,
@@ -75,16 +106,20 @@ export function createProjectHierarchyTreeLazyLoadSessionWiring (deps: {
     queuePersistExpandedNodeIds: deps.hierarchyStore.queuePersistExpandedNodeIds,
     queuePersistScrollTopPx: deps.hierarchyStore.queuePersistScrollTopPx,
     requestAnimationFrame: deps.requestAnimationFrame,
+    runDeferredLazyLoadBatch,
+    suppressTreeEmit: deps.suppressTreeEmit,
     treeData: deps.treeData,
     treeMountKey: deps.treeMountKey,
     watch: deps.watch
   })
+  uiStateWiringHolder.wiring = uiStateWiring
   treeRevisionPublishHooks.reapplyHeTreeOpenState = () => {
     uiStateWiring.reapplyHeTreeOpenState()
   }
 
   return {
     lazyLoadWiring,
+    runDeferredLazyLoadBatch,
     uiStateWiring
   }
 }

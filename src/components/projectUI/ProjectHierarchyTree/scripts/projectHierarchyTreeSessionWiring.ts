@@ -123,6 +123,7 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
       treeData: deps.treeData
     }),
     isTreeDragActive: earlyWiring.bootstrap.sessionRefs.isTreeDragActive,
+    openIconExpandAnimationWiring: earlyWiring.subWiring.openIconExpandAnimationWiring,
     subWiring: earlyWiring.subWiring,
     treeData: deps.treeData,
     treeMountKey: earlyWiring.bootstrap.sessionRefs.treeMountKey

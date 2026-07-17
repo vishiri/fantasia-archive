@@ -13,6 +13,10 @@ type T_subWiring = ReturnType<typeof createProjectHierarchyTreeSessionSubWiring>
 export function buildProjectHierarchyTreeSessionApi (deps: {
   handlersWiring: T_handlersWiring
   isTreeDragActive: Ref<boolean>
+  openIconExpandAnimationWiring: {
+    isOpenIconExpandAnimationPending: (nodeId: string) => boolean
+    isProjectHierarchyTreeOpenIconExpandedForOpenIcon: (nodeId: string, statOpen: boolean) => boolean
+  }
   subWiring: T_subWiring
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   treeMountKey: Ref<number>
@@ -26,6 +30,9 @@ export function buildProjectHierarchyTreeSessionApi (deps: {
     eachDraggableHandler: deps.handlersWiring.eachDraggableHandler,
     eachDroppableHandler: deps.handlersWiring.eachDroppableHandler,
     isNodeContextMenuOpen: deps.handlersWiring.isNodeContextMenuOpen,
+    isOpenIconExpandAnimationPending: deps.openIconExpandAnimationWiring.isOpenIconExpandAnimationPending,
+    isProjectHierarchyTreeOpenIconExpandedForOpenIcon:
+      deps.openIconExpandAnimationWiring.isProjectHierarchyTreeOpenIconExpandedForOpenIcon,
     isTreeDragActive: deps.isTreeDragActive,
     nodeMenuPointerPosition: deps.handlersWiring.nodeMenuPointerPosition,
     onAddNewDocumentFromContextMenuClick: deps.handlersWiring.onAddNewDocumentFromContextMenuClick,

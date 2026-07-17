@@ -50,6 +50,10 @@ export async function loadProjectHierarchyTreeNodeChildren (deps: {
     nodeKind: I_faProjectHierarchyTreeHeTreeNode['nodeKind'],
     nodeId: string
   ) => Promise<void>
+  stageLoadedChildrenForNode?: (
+    nodeId: string,
+    children: I_faProjectHierarchyTreeHeTreeNode[]
+  ) => void
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }): Promise<void> {
   if (!shouldReloadProjectHierarchyTreeNodeChildren(deps.node)) {
@@ -78,6 +82,10 @@ export async function loadProjectHierarchyTreeNodeChildren (deps: {
       placement: deps.node,
       preferredLanguageCode: deps.preferredLanguageCode
     })
+    if (deps.stageLoadedChildrenForNode !== undefined) {
+      deps.stageLoadedChildrenForNode(deps.node.id, children)
+      return
+    }
     if (mergeLoadedChildrenIntoNode(deps.treeData.value, deps.node.id, children)) {
       await deps.publishTreeRevision(deps.node.nodeKind, deps.node.id)
     }
@@ -109,6 +117,10 @@ export async function loadProjectHierarchyTreeNodeChildren (deps: {
       worldColor: deps.node.worldColor,
       worldId: deps.node.worldId
     })
+    if (deps.stageLoadedChildrenForNode !== undefined) {
+      deps.stageLoadedChildrenForNode(deps.node.id, children)
+      return
+    }
     if (mergeLoadedChildrenIntoNode(deps.treeData.value, deps.node.id, children)) {
       await deps.publishTreeRevision(deps.node.nodeKind, deps.node.id)
     }

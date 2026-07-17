@@ -38,6 +38,7 @@ type T_projectHierarchyTreeSessionHandlersWiringDeps = {
   dragExpandUiFrozen: Ref<boolean>
   getDragExpandedSnapshotNodeIds: () => string[] | null
   lazyLoadWiring: {
+    commitStagedLoadedChildren?: () => boolean
     flushDeferredTreeRevisionPublish: () => void | Promise<void>
     loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   }
@@ -48,8 +49,12 @@ type T_projectHierarchyTreeSessionHandlersWiringDeps = {
     treeMeta: I_faOpenedDocumentTreeOpenMeta
   ) => void
   openNodeIds: Ref<Set<string>>
+  openIconExpandAnimationWiring: {
+    scheduleOpenIconExpandAnimation: (nodeId: string) => void
+  }
   queuePersistExpandedNodeIds: (expandedNodeIds: string[]) => void
   resolvePreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
+  runDeferredLazyLoadBatch: (runBatch: () => Promise<void>) => Promise<void>
   runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
   suppressTreeEmit: Ref<boolean>
   treeComponentRef: Ref<I_faProjectHierarchyTreeHeTreeInstance | null>
@@ -57,10 +62,15 @@ type T_projectHierarchyTreeSessionHandlersWiringDeps = {
   treeMountKey: Ref<number>
   treeScrollHostRef: Ref<HTMLElement | null>
   uiStateWiring: {
+    awaitHeTreeResyncIdle: () => Promise<void>
+    isProgrammaticHeTreeResyncActive: () => boolean
     markNodeClosed: (nodeId: string, node: I_faProjectHierarchyTreeHeTreeNode) => void
     markNodeOpen: (nodeId: string) => void
     reapplyHeTreeOpenState: () => void
-    reapplyLatentDescendantExpandState: () => Promise<void>
+    reapplyLatentDescendantExpandState: (options?: {
+      deferHeTreeOpen?: boolean
+    }) => Promise<void>
+    resyncHeTreeAfterExpandPublish: (nodeId: string) => Promise<void>
   }
 }
 
@@ -74,6 +84,10 @@ export function createProjectHierarchyTreeSessionHandlersWiring (
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     getDragExpandedSnapshotNodeIds: deps.getDragExpandedSnapshotNodeIds,
     lazyLoadWiring: deps.lazyLoadWiring,
+    openIconExpandAnimationWiring: deps.openIconExpandAnimationWiring,
+    nextTick: deps.nextTick,
+    openNodeIds: deps.openNodeIds,
+    runDeferredLazyLoadBatch: deps.runDeferredLazyLoadBatch,
     suppressTreeEmit: deps.suppressTreeEmit,
     treeComponentRef: deps.treeComponentRef,
     treeData: deps.treeData,
@@ -102,6 +116,7 @@ export function createProjectHierarchyTreeSessionHandlersWiring (
     openNodeIds: deps.openNodeIds,
     queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
     resolvePreferredLanguageCode: deps.resolvePreferredLanguageCode,
+    runDeferredLazyLoadBatch: deps.runDeferredLazyLoadBatch,
     runFaAction: deps.runFaAction,
     suppressTreeEmit: deps.suppressTreeEmit,
     treeData: deps.treeData,

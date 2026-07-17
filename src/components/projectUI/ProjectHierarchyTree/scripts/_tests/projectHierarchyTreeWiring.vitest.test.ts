@@ -372,6 +372,47 @@ test('Test that markProjectHierarchyTreeNodeClosed keeps descendant open ids whe
   expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['group-1', 'placement-1'])
 })
 
+test('Test that markProjectHierarchyTreeNodeClosed clears descendant open ids for add-new rows', () => {
+  const addNewNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [{
+      children: [],
+      childrenLoaded: true,
+      documentId: 'doc-child',
+      groupId: null,
+      hasChildren: false,
+      icon: '',
+      id: 'doc-child',
+      label: 'Child',
+      nodeKind: 'document',
+      placementId: 'placement-1',
+      worldColor: '#ff0000',
+      worldId: 'world-1'
+    }],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: null,
+    hasChildren: true,
+    icon: '',
+    id: 'add-new-1',
+    label: 'Add new',
+    nodeKind: 'addNewDocument',
+    placementId: 'placement-1',
+    worldColor: '#ff0000',
+    worldId: 'world-1'
+  }
+  const tree = ref([addNewNode])
+  const openNodeIds = ref(new Set(['add-new-1', 'doc-child']))
+  const queuePersistExpandedNodeIds = vi.fn()
+  markProjectHierarchyTreeNodeClosed({
+    node: addNewNode,
+    nodeId: addNewNode.id,
+    openNodeIds,
+    queuePersistExpandedNodeIds,
+    treeData: tree
+  })
+  expect([...openNodeIds.value]).toEqual([])
+})
+
 test('Test that markProjectHierarchyTreeNodeClosed keeps descendant open ids when group collapses', () => {
   const tree = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
   const openNodeIds = ref(new Set(['world-1', 'group-1', 'placement-1']))
@@ -456,6 +497,45 @@ test('Test that markProjectHierarchyTreeNodeClosed keeps descendant open ids whe
     'placement-1',
     'doc-child'
   ])
+})
+
+test('Test that markProjectHierarchyTreeNodeClosed evicts canonical treeData node when stale reference is passed', () => {
+  const tree = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const placement = tree.value[0]!.children[0]!.children[0]!
+  placement.children = [
+    {
+      children: [],
+      childrenLoaded: true,
+      documentId: 'doc-child',
+      groupId: 'group-1',
+      hasChildren: false,
+      icon: '',
+      id: 'doc-child',
+      label: 'Child',
+      nodeKind: 'document',
+      placementId: 'placement-1',
+      worldColor: '#000',
+      worldId: 'world-1'
+    }
+  ]
+  placement.childrenLoaded = true
+  const stalePlacement = {
+    ...placement,
+    children: [...placement.children],
+    childrenLoaded: true
+  }
+  const openNodeIds = ref(new Set(['world-1', 'group-1', 'placement-1']))
+  markProjectHierarchyTreeNodeClosed({
+    node: stalePlacement,
+    nodeId: placement.id,
+    openNodeIds,
+    queuePersistExpandedNodeIds: vi.fn(),
+    treeData: tree
+  })
+  const canonicalPlacement = tree.value[0]!.children[0]!.children[0]!
+  expect(canonicalPlacement.children).toEqual([])
+  expect(canonicalPlacement.childrenLoaded).toBe(false)
+  expect(stalePlacement.children).toHaveLength(1)
 })
 
 test('Test that markProjectHierarchyTreeNodeOpen records ancestor open ids', () => {
@@ -681,6 +761,7 @@ test('Test that createProjectHierarchyTreeLazyLoadWiring loads placement and nes
   })
   const onAfterTreeRevisionPublished = vi.fn()
   const wiring = createProjectHierarchyTreeLazyLoadWiring({
+    deferLazyLoadTreeRevisionPublish: ref(false),
     getPreferredLanguageCode: () => 'en-US',
     listPlacementDocumentChildren,
     nextTick: async () => undefined,
@@ -969,9 +1050,15 @@ test('Test that session handlers wiring emits document open requests', async () 
     },
     nextTick: async () => {},
     onDocumentOpenRequest,
+    openIconExpandAnimationWiring: {
+      scheduleOpenIconExpandAnimation: vi.fn()
+    },
     openNodeIds: ref<Set<string>>(new Set()),
     queuePersistExpandedNodeIds: vi.fn(),
     resolvePreferredLanguageCode: () => 'en-US',
+    runDeferredLazyLoadBatch: vi.fn(async (runBatch) => {
+      await runBatch()
+    }),
     runFaAction: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef,
@@ -979,10 +1066,13 @@ test('Test that session handlers wiring emits document open requests', async () 
     treeMountKey: ref(0),
     treeScrollHostRef,
     uiStateWiring: {
+      awaitHeTreeResyncIdle: async () => undefined,
+      isProgrammaticHeTreeResyncActive: () => false,
       markNodeClosed: vi.fn(),
       markNodeOpen: vi.fn(),
       reapplyHeTreeOpenState: vi.fn(),
-      reapplyLatentDescendantExpandState: vi.fn(async () => undefined)
+      reapplyLatentDescendantExpandState: vi.fn(async () => undefined),
+      resyncHeTreeAfterExpandPublish: vi.fn(async () => undefined)
     }
   })
   wiring.onNodeClick({
@@ -1505,9 +1595,15 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
     },
     nextTick: async () => {},
     onDocumentOpenRequest: vi.fn(),
+    openIconExpandAnimationWiring: {
+      scheduleOpenIconExpandAnimation: vi.fn()
+    },
     openNodeIds: ref<Set<string>>(new Set()),
     queuePersistExpandedNodeIds: vi.fn(),
     resolvePreferredLanguageCode: () => 'en-US',
+    runDeferredLazyLoadBatch: vi.fn(async (runBatch) => {
+      await runBatch()
+    }),
     runFaAction: vi.fn(),
     suppressTreeEmit: ref(false),
     treeComponentRef: ref(null),
@@ -1515,10 +1611,13 @@ test('Test that session handlers ignore expand events while drag expand UI is fr
     treeMountKey: ref(0),
     treeScrollHostRef: ref(null),
     uiStateWiring: {
+      awaitHeTreeResyncIdle: async () => undefined,
+      isProgrammaticHeTreeResyncActive: () => false,
       markNodeClosed,
       markNodeOpen,
       reapplyHeTreeOpenState: vi.fn(),
-      reapplyLatentDescendantExpandState: vi.fn(async () => undefined)
+      reapplyLatentDescendantExpandState: vi.fn(async () => undefined),
+      resyncHeTreeAfterExpandPublish: vi.fn(async () => undefined)
     }
   })
   await wiring.onNodeOpen({ data: placement })
@@ -1776,6 +1875,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring builds tree session d
     dragDropCommitted: sessionRefs.dragDropCommitted,
     dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
@@ -1806,6 +1906,13 @@ test('Test that createProjectHierarchyTreeSessionSubWiring builds tree session d
   })
   expect(subWiring.treeStyle.value.height).toBe('100%')
   expect(subWiring.syncWiring.resyncTreeDataFromLayout).toBeTypeOf('function')
+  vi.useFakeTimers()
+  subWiring.openIconExpandAnimationWiring.scheduleOpenIconExpandAnimation('group-1')
+  expect(subWiring.openIconExpandAnimationWiring.isOpenIconExpandAnimationPending('group-1')).toBe(true)
+  subWiring.openIconExpandAnimationWiring.scheduleOpenIconExpandAnimation('group-1')
+  vi.advanceTimersByTime(400)
+  expect(subWiring.openIconExpandAnimationWiring.isOpenIconExpandAnimationPending('group-1')).toBe(false)
+  vi.useRealTimers()
 })
 
 test('Test that createProjectHierarchyTreeUiStateSessionWiring delegates UI helpers', async () => {
@@ -1813,6 +1920,7 @@ test('Test that createProjectHierarchyTreeUiStateSessionWiring delegates UI help
   const openNodeIds = ref(new Set<string>())
   const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
   const wiring = createProjectHierarchyTreeUiStateSessionWiring({
+    commitStagedLoadedChildren: vi.fn(() => false),
     flushDeferredTreeRevisionPublish: vi.fn(),
     flushUiStatePersist: vi.fn(),
     getExpandedNodeIds: () => ['world-1'],
@@ -1831,6 +1939,10 @@ test('Test that createProjectHierarchyTreeUiStateSessionWiring delegates UI help
       callback()
       return 1
     },
+    runDeferredLazyLoadBatch: vi.fn(async (runBatch) => {
+      await runBatch()
+    }),
+    suppressTreeEmit: ref(false),
     treeData,
     treeMountKey: ref(0),
     watch
@@ -1838,6 +1950,7 @@ test('Test that createProjectHierarchyTreeUiStateSessionWiring delegates UI help
   wiring.markNodeOpen('world-1')
   const placement = findProjectHierarchyTreeNodeById(treeData.value, 'placement-1')!
   wiring.markNodeClosed('placement-1', placement)
+  await wiring.resyncHeTreeAfterExpandPublish('world-1')
   await wiring.restoreUiStateFromStore()
   await wiring.revealPendingPath()
   const detach = wiring.attachScrollPersist()
@@ -1884,6 +1997,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring calls bridge APIs for
     dragDropCommitted: sessionRefs.dragDropCommitted,
     dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
@@ -2173,6 +2287,7 @@ test('Test that createProjectHierarchyTreeLazyLoadWiring defers tree revision pu
     ]
   }))
   const wiring = createProjectHierarchyTreeLazyLoadWiring({
+    deferLazyLoadTreeRevisionPublish: ref(false),
     getPreferredLanguageCode: () => 'en-US',
     listPlacementDocumentChildren,
     nextTick: async () => undefined,
@@ -2191,6 +2306,7 @@ test('Test that createProjectHierarchyTreeLazyLoadWiring defers tree revision pu
 test('Test that createProjectHierarchyTreeLazyLoadWiring flush is no-op without deferred publish', () => {
   const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
   const wiring = createProjectHierarchyTreeLazyLoadWiring({
+    deferLazyLoadTreeRevisionPublish: ref(false),
     getPreferredLanguageCode: () => 'en-US',
     listPlacementDocumentChildren: vi.fn(async () => ({
       items: []
@@ -2247,6 +2363,7 @@ test('Test that createProjectHierarchyTreeLazyLoadWiring loads nested document c
     }
   })
   const wiring = createProjectHierarchyTreeLazyLoadWiring({
+    deferLazyLoadTreeRevisionPublish: ref(false),
     getPreferredLanguageCode: () => 'en-US',
     listPlacementDocumentChildren,
     nextTick: async () => undefined,
@@ -2314,6 +2431,7 @@ test('Test that placement collapse and reopen reloads multinested document desce
     }
   })
   const lazyLoadWiring = createProjectHierarchyTreeLazyLoadWiring({
+    deferLazyLoadTreeRevisionPublish: ref(false),
     getPreferredLanguageCode: () => 'en-US',
     listPlacementDocumentChildren,
     nextTick: async () => undefined,
@@ -2412,6 +2530,7 @@ test('Test that group then placement collapse and reopen keeps multinested expan
     }
   })
   const lazyLoadWiring = createProjectHierarchyTreeLazyLoadWiring({
+    deferLazyLoadTreeRevisionPublish: ref(false),
     getPreferredLanguageCode: () => 'en-US',
     listPlacementDocumentChildren,
     nextTick: async () => undefined,
@@ -2463,13 +2582,14 @@ test('Test that group then placement collapse and reopen keeps multinested expan
     queuePersistExpandedNodeIds: vi.fn(),
     treeData
   })
-  expect(placement.children).toEqual([])
+  const canonicalPlacement = findProjectHierarchyTreeNodeById(treeData.value, 'placement-1')!
+  expect(canonicalPlacement.children).toEqual([])
   expect(openNodeIds.value.has('doc-new')).toBe(true)
   await runProjectHierarchyTreeSessionExpandOpen({
     flushDeferredTreeRevisionPublish: lazyLoadWiring.flushDeferredTreeRevisionPublish,
     loadChildrenForNode: lazyLoadWiring.loadChildrenForNode,
     markNodeOpen,
-    node: placement,
+    node: canonicalPlacement,
     reapplyLatentDescendantExpandState,
     treeRef: null
   })
@@ -2669,6 +2789,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring handles missing bridg
     dragDropCommitted: sessionRefs.dragDropCommitted,
     dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
@@ -3080,6 +3201,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring delegates UI state st
     dragDropCommitted: sessionRefs.dragDropCommitted,
     dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
     hierarchyStore: {
       flushUiStatePersist,
@@ -3152,6 +3274,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring propagates move failu
     dragDropCommitted: sessionRefs.dragDropCommitted,
     dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
@@ -3270,6 +3393,7 @@ test('Test that lazy load reveal path skips missing node ids', async () => {
     items: []
   }))
   const wiring = createProjectHierarchyTreeLazyLoadWiring({
+    deferLazyLoadTreeRevisionPublish: ref(false),
     getPreferredLanguageCode: () => 'en-US',
     listPlacementDocumentChildren,
     nextTick: async () => undefined,
@@ -3333,6 +3457,7 @@ test('Test that createProjectHierarchyTreeLazyLoadWiring loads empty template pl
     items: []
   }))
   const wiring = createProjectHierarchyTreeLazyLoadWiring({
+    deferLazyLoadTreeRevisionPublish: ref(false),
     getPreferredLanguageCode: () => 'en-US',
     listPlacementDocumentChildren,
     nextTick: async () => undefined,
@@ -3369,6 +3494,7 @@ test('Test that createProjectHierarchyTreeLazyLoadWiring tolerates merge misses 
     ]
   }))
   const wiring = createProjectHierarchyTreeLazyLoadWiring({
+    deferLazyLoadTreeRevisionPublish: ref(false),
     getPreferredLanguageCode: () => 'en-US',
     listPlacementDocumentChildren,
     nextTick: async () => undefined,
@@ -3444,6 +3570,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring reflects drag state i
     dragDropCommitted: sessionRefs.dragDropCommitted,
     dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
@@ -3533,6 +3660,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring restores UI state via
     dragDropCommitted: sessionRefs.dragDropCommitted,
     dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
@@ -3627,6 +3755,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring handles missing prelo
     dragDropCommitted: sessionRefs.dragDropCommitted,
     dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
@@ -4011,6 +4140,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring restoreUiStateFromSto
     dragDropCommitted: sessionRefs.dragDropCommitted,
     dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
@@ -4057,6 +4187,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring restoreExpandedSnapsh
     dragDropCommitted: sessionRefs.dragDropCommitted,
     dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
@@ -4119,6 +4250,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring refreshNodeChildrenFr
     dragDropCommitted: sessionRefs.dragDropCommitted,
     dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
@@ -4415,6 +4547,72 @@ test('Test that tryOpenHeTreeNodeAndParents handles StatNotFoundError and rethro
   })).toThrow('boom')
 })
 
+test('Test that handleProjectHierarchyTreeOpenIconClick defers stat open until expand finishes', async () => {
+  const { handleProjectHierarchyTreeOpenIconClick } = await import('../projectHierarchyTreeHeTreeOpenSafeWiring')
+  const node = buildDocumentNode({
+    childrenLoaded: false,
+    hasChildren: true,
+    id: 'doc-parent'
+  })
+  const stat = {
+    children: [{}],
+    open: false
+  }
+  let resolveOpen: () => void = () => undefined
+  const onNodeOpen = vi.fn(async (
+    _stat: { data: typeof node },
+    options?: { statOpen?: { open: boolean } }
+  ) => {
+    await new Promise<void>((resolve) => {
+      resolveOpen = resolve
+    })
+    if (options?.statOpen !== undefined) {
+      options.statOpen.open = true
+    }
+  })
+  const openPromise = handleProjectHierarchyTreeOpenIconClick({
+    getOpenIconPointerWasOpen: () => false,
+    node,
+    onNodeClose: vi.fn(),
+    onNodeOpen,
+    scheduleOpenIconExpandAnimation: vi.fn(),
+    setOpenIconPointerWasOpen: vi.fn(),
+    stat
+  })
+  await Promise.resolve()
+  expect(stat.open).toBe(false)
+  resolveOpen()
+  await openPromise
+  expect(stat.open).toBe(true)
+  expect(onNodeOpen).toHaveBeenCalledTimes(1)
+})
+
+test('Test that handleProjectHierarchyTreeOpenIconClick reverts stat open when expand fails', async () => {
+  const { handleProjectHierarchyTreeOpenIconClick } = await import('../projectHierarchyTreeHeTreeOpenSafeWiring')
+  const node = buildDocumentNode({
+    childrenLoaded: false,
+    hasChildren: true,
+    id: 'doc-parent-fail'
+  })
+  const stat = {
+    children: [{}],
+    open: false
+  }
+  const onNodeOpen = vi.fn(async () => {
+    throw new Error('expand failed')
+  })
+  await expect(handleProjectHierarchyTreeOpenIconClick({
+    getOpenIconPointerWasOpen: () => false,
+    node,
+    onNodeClose: vi.fn(),
+    onNodeOpen,
+    scheduleOpenIconExpandAnimation: vi.fn(),
+    setOpenIconPointerWasOpen: vi.fn(),
+    stat
+  })).rejects.toThrow('expand failed')
+  expect(stat.open).toBe(false)
+})
+
 test('Test that handleProjectHierarchyTreeOpenIconClick closes rows without open icons', async () => {
   const { handleProjectHierarchyTreeOpenIconClick } = await import('../projectHierarchyTreeHeTreeOpenSafeWiring')
   const onNodeClose = vi.fn()
@@ -4433,10 +4631,11 @@ test('Test that handleProjectHierarchyTreeOpenIconClick closes rows without open
     node,
     onNodeClose,
     onNodeOpen: vi.fn(async () => undefined),
+    scheduleOpenIconExpandAnimation: vi.fn(),
     setOpenIconPointerWasOpen: vi.fn(),
     stat
   })
-  expect(onNodeClose).toHaveBeenCalledWith({ data: node })
+  expect(onNodeClose).toHaveBeenCalledWith({ data: node }, { source: 'openIcon' })
   expect(stat.open).toBe(false)
 })
 
@@ -4533,6 +4732,7 @@ test('Test that createProjectHierarchyTreeSessionDnDSubWiring throws when reinde
     dragDropCommitted: sessionRefs.dragDropCommitted,
     dragExpandPostCommitGuard: sessionRefs.dragExpandPostCommitGuard,
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
+    deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),

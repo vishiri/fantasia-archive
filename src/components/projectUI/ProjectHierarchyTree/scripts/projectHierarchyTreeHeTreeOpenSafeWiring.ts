@@ -29,13 +29,18 @@ export function tryOpenHeTreeNodeAndParents (deps: {
 }
 
 export async function handleProjectHierarchyTreeOpenIconClick (deps: {
+  awaitHeTreeResyncIdle?: () => Promise<void>
   getOpenIconPointerWasOpen: () => boolean | null
   node: I_faProjectHierarchyTreeHeTreeNode
-  onNodeClose: (stat: { data: I_faProjectHierarchyTreeHeTreeNode }) => void
+  onNodeClose: (
+    stat: { data: I_faProjectHierarchyTreeHeTreeNode },
+    options?: { source: 'openIcon' }
+  ) => void
   onNodeOpen: (
     stat: { data: I_faProjectHierarchyTreeHeTreeNode },
-    options?: { statOpen?: { open: boolean } }
+    options?: { source: 'openIcon', statOpen?: { open: boolean } }
   ) => Promise<void>
+  scheduleOpenIconExpandAnimation: (nodeId: string) => void
   setOpenIconPointerWasOpen: (value: boolean | null) => void
   stat: { children: unknown[], open: boolean }
 }): Promise<void> {
@@ -44,7 +49,10 @@ export async function handleProjectHierarchyTreeOpenIconClick (deps: {
     deps.setOpenIconPointerWasOpen(null)
     if (deps.stat.open) {
       deps.stat.open = false
-      deps.onNodeClose({ data: deps.node })
+      if (deps.awaitHeTreeResyncIdle !== undefined) {
+        await deps.awaitHeTreeResyncIdle()
+      }
+      deps.onNodeClose({ data: deps.node }, { source: 'openIcon' })
     }
     return
   }
@@ -52,8 +60,26 @@ export async function handleProjectHierarchyTreeOpenIconClick (deps: {
   deps.setOpenIconPointerWasOpen(null)
   if (wasOpen) {
     deps.stat.open = false
-    deps.onNodeClose({ data: deps.node })
+    if (deps.awaitHeTreeResyncIdle !== undefined) {
+      await deps.awaitHeTreeResyncIdle()
+    }
+    deps.onNodeClose({ data: deps.node }, { source: 'openIcon' })
     return
   }
-  await deps.onNodeOpen({ data: deps.node }, { statOpen: deps.stat })
+  deps.scheduleOpenIconExpandAnimation(deps.node.id)
+  try {
+    if (deps.awaitHeTreeResyncIdle !== undefined) {
+      await deps.awaitHeTreeResyncIdle()
+    }
+    await deps.onNodeOpen(
+      { data: deps.node },
+      {
+        source: 'openIcon',
+        statOpen: deps.stat
+      }
+    )
+  } catch (error) {
+    deps.stat.open = false
+    throw error
+  }
 }

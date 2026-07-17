@@ -12,6 +12,10 @@ import {
   needsProjectHierarchyTreeLazyLoadBeforeOpen
 } from '../functions/projectHierarchyTreeExpandState'
 import { shouldReloadProjectHierarchyTreeNodeChildren } from '../functions/projectHierarchyTreeLazyLoadChildReload'
+import {
+  compareProjectHierarchyTreeShallowFirstLazyLoadRows,
+  shouldContinueLatentExpandAfterStallRetry
+} from '../functions/projectHierarchyTreeLatentExpandOrder'
 import { collectProjectHierarchyTreeLatentDocumentOpenNodeIds } from '../functions/projectHierarchyTreePersistedOpenNodeIds'
 import { tryOpenHeTreeNodeAndParents } from './projectHierarchyTreeHeTreeOpenSafeWiring'
 
@@ -36,12 +40,7 @@ function collectShallowFirstOpenNodeIdsNeedingLazyLoad (
       nodeId
     })
   }
-  needingLoad.sort((left, right) => {
-    if (left.depth !== right.depth) {
-      return left.depth - right.depth
-    }
-    return left.nodeId.localeCompare(right.nodeId)
-  })
+  needingLoad.sort(compareProjectHierarchyTreeShallowFirstLazyLoadRows)
   return needingLoad.map((row) => row.nodeId)
 }
 
@@ -70,15 +69,29 @@ function reapplyProjectHierarchyTreeHeTreeOpenStateInline (deps: {
   }
 }
 
+async function commitLatentStagedChildren (
+  commitStaged: (() => boolean) | (() => void | Promise<void>) | undefined
+): Promise<void> {
+  if (commitStaged === undefined) {
+    return
+  }
+  await commitStaged()
+}
+
 /**
  * Reapplies remembered descendant expand ids after a parent row reopens.
  */
 export async function reapplyProjectHierarchyTreeLatentDescendantExpandState (deps: {
+  commitStagedLoadedChildren?: () => boolean
+  flushDeferredTreeRevisionPublish?: () => void | Promise<void>
   getTreeRef: () => T_treeRef
   loadChildrenAlongRevealPath: (nodeIds: string[]) => Promise<void>
   openNodeIds: Ref<Set<string>>
+  reapplyHeTreeOpenAfterEachPass?: boolean
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }): Promise<void> {
+  const reapplyHeTreeOpenAfterEachPass = deps.reapplyHeTreeOpenAfterEachPass ?? true
+  const commitStaged = deps.commitStagedLoadedChildren ?? deps.flushDeferredTreeRevisionPublish
   const maxPasses = deps.openNodeIds.value.size + 2
   let previousStallKey = ''
   for (let pass = 0; pass < maxPasses; pass++) {
@@ -95,6 +108,15 @@ export async function reapplyProjectHierarchyTreeLatentDescendantExpandState (de
       ...pendingLatentDocumentIds
     ].join('|')
     if (stallKey === previousStallKey && stallKey !== '') {
+      await commitLatentStagedChildren(commitStaged)
+      const retryStallKey = [
+        ...collectShallowFirstOpenNodeIdsNeedingLazyLoad(deps.treeData.value, deps.openNodeIds.value),
+        ...collectProjectHierarchyTreeLatentDocumentOpenNodeIds(deps.treeData.value, deps.openNodeIds.value)
+      ].join('|')
+      if (shouldContinueLatentExpandAfterStallRetry(stallKey, retryStallKey)) {
+        previousStallKey = ''
+        continue
+      }
       break
     }
     previousStallKey = stallKey
@@ -109,14 +131,13 @@ export async function reapplyProjectHierarchyTreeLatentDescendantExpandState (de
       const ancestors = collectProjectHierarchyTreeAncestorIds(deps.treeData.value, nodeId) ?? []
       await deps.loadChildrenAlongRevealPath([...ancestors, nodeId])
     }
-    const effectivelyExpandedNodeIds = collectExpandedNodeIdsFromTree(
-      deps.treeData.value,
-      deps.openNodeIds.value
-    )
-    for (const nodeId of effectivelyExpandedNodeIds) {
+    for (const nodeId of collectExpandedNodeIdsFromTree(deps.treeData.value, deps.openNodeIds.value)) {
       await deps.loadChildrenAlongRevealPath([nodeId])
     }
-    reapplyProjectHierarchyTreeHeTreeOpenStateInline(deps)
+    await commitLatentStagedChildren(commitStaged)
+    if (reapplyHeTreeOpenAfterEachPass) {
+      reapplyProjectHierarchyTreeHeTreeOpenStateInline(deps)
+    }
     const stillNeedsLazyLoad = collectShallowFirstOpenNodeIdsNeedingLazyLoad(
       deps.treeData.value,
       deps.openNodeIds.value

@@ -3,6 +3,12 @@ import type { I_faProjectHierarchyTreeExpandedSnapshotRestoreOptions } from 'app
 /** he-tree Draggable indent prop (px) per nested level. */
 export const PROJECT_HIERARCHY_TREE_INDENT_PX = 28
 
+/**
+ * he-tree treeLineOffset (px) — horizontal position of connector lines.
+ * Tuned toward nested open-icon column (indent 28, icon left -23).
+ */
+export const PROJECT_HIERARCHY_TREE_LINE_OFFSET_PX = 12
+
 /** Root class on the he-tree Draggable scroll container. */
 export const PROJECT_HIERARCHY_TREE_ROOT_CLASS = 'projectHierarchyTree'
 
@@ -28,6 +34,9 @@ export const PROJECT_HIERARCHY_TREE_DOCUMENT_ROW_DRAG_CLICK_TOLERANCE_PX = 8
 
 /** Hover delay (ms) before he-tree opens a closed row during drag for nest drops. */
 export const PROJECT_HIERARCHY_TREE_DRAG_OPEN_DELAY_MS = 400
+
+/** Matches projectHierarchyTree-openIcon-rotateTransitionDuration in styles/_variables.scss. */
+export const PROJECT_HIERARCHY_TREE_OPEN_ICON_ROTATE_TRANSITION_MS = 300
 
 /**
  * Default q-icon for template placement and document rows when template icon unset.

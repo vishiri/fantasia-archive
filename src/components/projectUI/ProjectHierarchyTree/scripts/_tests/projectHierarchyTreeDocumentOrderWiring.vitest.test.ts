@@ -1053,13 +1053,25 @@ test('Test that createProjectHierarchyTreeSessionExpandHandlersWiring ignores cl
       flushDeferredTreeRevisionPublish: vi.fn(async () => undefined),
       loadChildrenForNode: vi.fn(async () => undefined)
     },
+    openIconExpandAnimationWiring: {
+      scheduleOpenIconExpandAnimation: vi.fn()
+    },
+    nextTick: async () => undefined,
+    openNodeIds: ref(new Set()),
+    runDeferredLazyLoadBatch: vi.fn(async (runBatch) => {
+      await runBatch()
+    }),
     suppressTreeEmit: ref(false),
     treeComponentRef: ref(null),
     treeData,
     uiStateWiring: {
+      awaitHeTreeResyncIdle: async () => undefined,
+      isProgrammaticHeTreeResyncActive: () => false,
       markNodeClosed,
       markNodeOpen: vi.fn(),
-      reapplyLatentDescendantExpandState: vi.fn(async () => undefined)
+      reapplyHeTreeOpenState: vi.fn(),
+      reapplyLatentDescendantExpandState: vi.fn(async () => undefined),
+      resyncHeTreeAfterExpandPublish: vi.fn(async () => undefined)
     }
   })
   const documentNode = findProjectHierarchyTreeNodeById(treeData.value, 'doc-a')!

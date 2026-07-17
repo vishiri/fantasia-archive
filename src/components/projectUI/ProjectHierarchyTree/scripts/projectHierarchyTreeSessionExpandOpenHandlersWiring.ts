@@ -4,64 +4,43 @@ import type { I_faProjectHierarchyTreeHeTreeInstance, I_faProjectHierarchyTreeHe
 
 import { isProjectHierarchyTreeDragExpandUiFrozen } from '../functions/projectHierarchyTreeDragExpandFreeze'
 import { handleProjectHierarchyTreeOpenIconClick } from './projectHierarchyTreeHeTreeOpenSafeWiring'
-import { runProjectHierarchyTreeSessionExpandOpen } from './projectHierarchyTreeSessionExpandOpenWiring'
+import { createProjectHierarchyTreeSessionExpandOpenOnNodeOpenHandler } from './projectHierarchyTreeSessionExpandOpenOnNodeOpenWiring'
 
 export function createProjectHierarchyTreeSessionExpandOpenHandlersWiring (deps: {
   dragExpandUiFrozen: Ref<boolean>
   lazyLoadWiring: {
+    commitStagedLoadedChildren?: () => boolean
     flushDeferredTreeRevisionPublish: () => void | Promise<void>
     loadChildrenForNode: (node: I_faProjectHierarchyTreeHeTreeNode) => Promise<void>
   }
-  onNodeClose: (stat: { data: I_faProjectHierarchyTreeHeTreeNode }) => void
+  onNodeClose: (
+    stat: { data: I_faProjectHierarchyTreeHeTreeNode },
+    options?: { source: 'heTreeEvent' | 'openIcon' }
+  ) => void
+  openIconExpandAnimationWiring: {
+    scheduleOpenIconExpandAnimation: (nodeId: string) => void
+  }
+  runDeferredLazyLoadBatch: (
+    runBatch: () => Promise<void>,
+    options?: { skipReapplyHeTreeOpenState?: boolean }
+  ) => Promise<void>
+  nextTick: () => Promise<void>
+  openNodeIds: Ref<Set<string>>
   suppressTreeEmit: Ref<boolean>
   treeComponentRef: Ref<I_faProjectHierarchyTreeHeTreeInstance | null>
+  treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   uiStateWiring: {
+    awaitHeTreeResyncIdle: () => Promise<void>
+    isProgrammaticHeTreeResyncActive: () => boolean
     markNodeOpen: (nodeId: string) => void
-    reapplyLatentDescendantExpandState: () => Promise<void>
+    reapplyLatentDescendantExpandState: (options?: {
+      deferHeTreeOpen?: boolean
+    }) => Promise<void>
+    resyncHeTreeAfterExpandPublish: (nodeId: string) => Promise<void>
   }
 }) {
   let openIconPointerWasOpen: boolean | null = null
-  const expandOpenInFlight = new Set<string>()
-
-  function shouldIgnoreExpandPersistMutation (): boolean {
-    return isProjectHierarchyTreeDragExpandUiFrozen({
-      dragExpandUiFrozen: deps.dragExpandUiFrozen.value
-    }) || deps.suppressTreeEmit.value
-  }
-
-  async function onNodeOpen (
-    stat: { data: I_faProjectHierarchyTreeHeTreeNode },
-    options?: { statOpen?: { open: boolean } }
-  ): Promise<void> {
-    if (shouldIgnoreExpandPersistMutation()) {
-      return
-    }
-    const nodeId = stat.data.id
-    if (expandOpenInFlight.has(nodeId)) {
-      return
-    }
-    expandOpenInFlight.add(nodeId)
-    try {
-      const expandOpenDeps = {
-        flushDeferredTreeRevisionPublish: deps.lazyLoadWiring.flushDeferredTreeRevisionPublish,
-        loadChildrenForNode: deps.lazyLoadWiring.loadChildrenForNode,
-        markNodeOpen: deps.uiStateWiring.markNodeOpen,
-        node: stat.data,
-        reapplyLatentDescendantExpandState: deps.uiStateWiring.reapplyLatentDescendantExpandState,
-        treeRef: deps.treeComponentRef.value
-      }
-      if (options?.statOpen !== undefined) {
-        await runProjectHierarchyTreeSessionExpandOpen({
-          ...expandOpenDeps,
-          statOpen: options.statOpen
-        })
-      } else {
-        await runProjectHierarchyTreeSessionExpandOpen(expandOpenDeps)
-      }
-    } finally {
-      expandOpenInFlight.delete(nodeId)
-    }
-  }
+  const onNodeOpen = createProjectHierarchyTreeSessionExpandOpenOnNodeOpenHandler(deps)
 
   function onNodeOpenIconPointerDown (stat: { open: boolean }): void {
     openIconPointerWasOpen = stat.open
@@ -77,10 +56,12 @@ export function createProjectHierarchyTreeSessionExpandOpenHandlersWiring (deps:
       return
     }
     await handleProjectHierarchyTreeOpenIconClick({
+      awaitHeTreeResyncIdle: deps.uiStateWiring.awaitHeTreeResyncIdle,
       getOpenIconPointerWasOpen: () => openIconPointerWasOpen,
       node,
       onNodeClose: deps.onNodeClose,
       onNodeOpen,
+      scheduleOpenIconExpandAnimation: deps.openIconExpandAnimationWiring.scheduleOpenIconExpandAnimation,
       setOpenIconPointerWasOpen: (value) => {
         openIconPointerWasOpen = value
       },

@@ -18,6 +18,8 @@
       :each-droppable="eachDroppableHandler"
       data-test-locator="projectHierarchyTree"
       :indent="PROJECT_HIERARCHY_TREE_INDENT_PX"
+      tree-line
+      :tree-line-offset="PROJECT_HIERARCHY_TREE_LINE_OFFSET_PX"
       :node-key="heTreeNodeKey"
       :root-droppable="rootDroppableHandler"
       :style="treeStyle"
@@ -40,12 +42,10 @@
           @contextmenu="onNodeRowContextMenu(node, $event)"
           @pointerdown="onWorldNodeRowPointerDown(node, stat, $event)"
         >
-          <q-icon
+          <ProjectHierarchyTreeOpenIcon
             v-if="projectHierarchyTreeNodeShowsOpenIcon(node, stat.children.length)"
-            class="projectHierarchyTree__openIcon"
-            :class="{ 'projectHierarchyTree__openIcon--open': stat.open }"
-            data-test-locator="projectHierarchyTree-openIcon"
-            name="play_arrow"
+            :expanded="isProjectHierarchyTreeOpenIconExpandedForOpenIcon(node.id, stat.open)"
+            :pending-expand-animation="isOpenIconExpandAnimationPending(node.id)"
             @click.stop="onNonWorldOpenIconClick(node, stat)"
             @pointerdown.stop="onNonWorldOpenIconPointerDown(node, stat)"
           />
@@ -89,11 +89,13 @@ import '@he-tree/vue/style/default.css'
 
 import ProjectHierarchyTreeNode from './ProjectHierarchyTreeNode.vue'
 import ProjectHierarchyTreeNodeContextMenu from './ProjectHierarchyTreeNodeContextMenu.vue'
+import ProjectHierarchyTreeOpenIcon from './ProjectHierarchyTreeOpenIcon.vue'
 import type { I_faProjectHierarchyTreeHeTreeInstance } from 'app/types/I_faProjectHierarchyTreeDomain'
 import {
   PROJECT_HIERARCHY_TREE_DRAG_HANDLE_CLASS,
   PROJECT_HIERARCHY_TREE_DRAG_OPEN_DELAY_MS,
-  PROJECT_HIERARCHY_TREE_INDENT_PX
+  PROJECT_HIERARCHY_TREE_INDENT_PX,
+  PROJECT_HIERARCHY_TREE_LINE_OFFSET_PX
 } from './functions/projectHierarchyTreeConstants'
 import { projectHierarchyTreeNodeShowsOpenIcon } from './functions/projectHierarchyTreeDocumentHasChildrenSync'
 import { resolveProjectHierarchyTreeNodeRowKindClass } from './functions/projectHierarchyTreeTreeNodeKindClass'
@@ -124,7 +126,9 @@ const {
   eachDraggableHandler,
   eachDroppableHandler,
   heTreeNodeKey,
+  isOpenIconExpandAnimationPending,
   isNodeContextMenuOpen,
+  isProjectHierarchyTreeOpenIconExpandedForOpenIcon,
   isTreeDragActive,
   nodeMenuPointerPosition,
   onAddNewDocumentFromContextMenuClick,

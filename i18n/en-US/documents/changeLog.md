@@ -22,6 +22,8 @@
 - **Document workspace**: **Delete current document** in the control strip (preview mode) opens the same **Delete** confirmation for the active tab.
 
 ### Bugfixes & Optimizations
+- **Workspace sidebar**: Expanding a hierarchy tree row after lazy load shows its document children instead of an empty open branch (tree stats stay in sync with loaded rows without remounting the whole list).
+- **Workspace sidebar**: The hierarchy expand chevron rotates open smoothly when you expand a row, without blinking the rest of the tree.
 - **Document workspace**: **Copy document** from a document tab no longer saves the copy at the template root when the source document has a parent in the hierarchy tree; the copy keeps the same sibling level as the source after first save.
 - **Workspace sidebar**: Collapsing and reopening a template placement (for example **Buildings**) reloads deeply nested document rows again instead of leaving the lowest levels empty.
 - **Workspace sidebar**: Collapsing a group no longer forgets expanded placement and document rows underneath; reopening the group or that placement restores the prior expand state.
