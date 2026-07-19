@@ -5,6 +5,7 @@ alwaysApply: true
 
 # Plan document discipline
 
+- **Uncertainty gate (mandatory in every plan body):** Before implementation steps, state that product/UX/scope gaps must be resolved via [clarify-before-assume.mdc](clarify-before-assume.mdc) (AskQuestion or explicit user answers). Do not guess, assume, or imply unstated behavior. No plan steps that depend on unstated product choices.
 - **Before new plan**: resolve product/UX/scope gaps per [clarify-before-assume.mdc](clarify-before-assume.mdc); then scan `.cursor/plans/` (skip if missing/empty). Delete plans **>30 days** old by last modified time.
 - Store every generated plan under `.cursor/plans/`; create folder if missing.
 - Filenames: current `package.json` version + creation timestamp **`YYYY-MM-DD-HH-mm-ss`**.

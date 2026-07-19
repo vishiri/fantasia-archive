@@ -25,6 +25,7 @@ All agents (plan mode, agent mode, subagents): **do not guess** product behavior
 - Do **not** ship plan with silent "we will assume X" bullets
 - Ask first, or mark open decisions **blocked pending user answer** — stop before implementation steps
 - Plan file location/metadata: [plan-documents.mdc](plan-documents.mdc)
+- Every plan body (`.cursor/plans/*`, CreatePlan output) must start with an **Uncertainty gate** section per [plan-documents.mdc](plan-documents.mdc)
 
 ## How to ask
 

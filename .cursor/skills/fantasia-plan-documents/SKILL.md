@@ -15,6 +15,14 @@ Planning artifacts: rollout inventories, checklists, migration trackers, etc.
 
 Resolve open product/UX/scope decisions per [clarify-before-assume.mdc](../../rules/clarify-before-assume.mdc) before saving plan.
 
+## Required in-file sections
+
+After metadata (`Created at`, `Project version`), include **Uncertainty gate**:
+
+- Product/UX/scope gaps resolved via AskQuestion or explicit user answers before implementation
+- Do not guess, assume, or imply unstated behavior
+- No implementation steps that depend on unstated product choices
+
 ## Prune stale plans before saving
 
 - List **`.cursor/plans/`** before new plan
