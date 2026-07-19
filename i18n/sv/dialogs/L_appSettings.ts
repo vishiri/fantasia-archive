@@ -53,10 +53,6 @@ export default {
         subtitle: 'Trädbeteende',
         tags: 'expandera, kollapsa, expandera allt, interaktion',
       },
-      treeSettings: {
-        subtitle: 'Trädinställningar',
-        tags: 'trädpanel, sidofältssynlighet, trädlayout',
-      }
     },
     openedDocumentsTabs: {
       title: 'Öppna dokumentflikar',
@@ -127,9 +123,9 @@ export default {
       description: 'Den här inställningen gör FAs rullningslister bredare och tillåter därför manuell klickrullning direkt på dem för enheter som inte stöder standardrullning (till exempel möss utan rullningshjul).',
       tags: 'rullningslistens bredd, klicka rulla, mus utan hjul, styrkula, beröring',
     },
-    compactDocumentCount: {
+    disableCategoryCount: {
       title: 'Dölj kategoriantal',
-      description: 'Visar antalet dokument utan det sekundära numret per kategori.',
+      description: 'Dölj kategorinummer i det hierarkiska trädet',
       tags: 'förenklat antal, enstaka tal, mindre röran',
     },
     compactTags: {
@@ -158,8 +154,8 @@ export default {
       tags: 'nybörjartips, tutorialbanderoller, coachmärken, hjälp för kontrollfältet',
     },
     disableDocumentCounts: {
-      title: 'Dölj antalet dokument helt',
-      description: 'Döljer all dokumenträkningsinformation i det hierarkiska trädet.',
+      title: 'Dölj antalet dokument',
+      description: 'Dölj dokumentnummer i det hierarkiska trädet',
       tags: 'slutar, inga räknas, statistik döljer sig',
     },
     disableDocumentToolTips: {
@@ -208,11 +204,6 @@ export default {
       description: 'Döljer fält utan något värde ifyllt, i visningsläge (icke-redigera). Observera att detta kan resultera i relativt vilda layoutförskjutningar, vilket kan få dokumentet att se oregerligt ut i vissa fall.',
       tags: 'tomma fält, skrivskyddad vy, kompakt dokument, layoutförskjutning',
     },
-    hideHierarchyTree: {
-      title: 'Dölj hierarkiskt träd',
-      description: 'Styr om det hierarkiska trädet visas.',
-      tags: 'sidofält av, navigator dold, trädpanel, kontur dölj',
-    },
     hidePlushes: {
       title: 'Göm Fantasia-maskot',
       description: 'Döljer den otroligt bedårande och fantastiska Fantasia, den lilla mystiska draken. Hur kunde du! :(',
@@ -228,11 +219,6 @@ export default {
       description: 'Döljer popupen med tips och tricks på startskärmen.',
       tags: 'första lansering, onboarding, splash, starttips, tricks',
     },
-    hideTreeExtraIcons: {
-      title: 'Dölj extra ikoner',
-      description: 'Döljer ikoner som normalt visas för bekvämlighets skull men som inte lägger till funktionalitet – till exempel ikonen "Öppna dokument" bredvid ett dokument utan underordnade noder, som lika gärna kan öppnas med ett normalt vänsterklick istället för ikonen.',
-      tags: 'överflödiga ikoner, röran, minimalt träd, valfria åtgärder',
-    },
     hideTreeIconAddUnder: {
       title: 'Dölj ikonen "Lägg till under".',
       description: 'Det här alternativet döljer ikonen "Lägg till ett nytt dokument under den valda föräldern".',
@@ -247,6 +233,11 @@ export default {
       title: 'Dölj ikonen "Öppna".',
       description: 'Detta alternativ döljer raden Öppna ikonen.',
       tags: 'öppna ikon, gå till dokument, rad öppna knapp',
+    },
+    hideTreeLines: {
+      title: 'Hide tree lines',
+      description: 'Hides the structural help-lines in the hierarchy tree.',
+      tags: 'lines, helplines, structure, tree, hierarchical, hierarchical tree'
     },
     hideTreeOrderNumbers: {
       title: 'Dölj ordernummer',
@@ -272,11 +263,6 @@ export default {
       title: 'Invertera kategoriposition',
       description: 'Växlar positionerna för kategori- och dokumentnumren.',
       tags: 'bytesnummer, räkningsordning, kategori vs dokumentantal',
-    },
-    invertTreeSorting: {
-      title: 'Invertera sortering av anpassad trädordning',
-      description: 'Sorterar dokument i det hierarkiska trädet i motsatt riktning från standard: från högsta till lägsta.',
-      tags: 'omvänd ordning, anpassad ordning, sorteringsriktning, stigande fallande',
     },
     limitEditorHeight: {
       title: 'Begränsa textredigerarens höjd',

@@ -53,10 +53,6 @@ export default {
         subtitle: '树的行为',
         tags: '展开、折叠、全部展开、交互',
       },
-      treeSettings: {
-        subtitle: '树设置',
-        tags: '树面板、侧边栏可见性、树布局',
-      }
     },
     openedDocumentsTabs: {
       title: '打开文档选项卡',
@@ -127,9 +123,9 @@ export default {
       description: '此设置使 FA 的滚动条更宽，因此允许在不支持标准滚动的设备（例如没有滚轮的鼠标）上直接手动单击滚动。',
       tags: '滚动条宽度、点击滚动、无滚轮鼠标、轨迹球、触摸',
     },
-    compactDocumentCount: {
+    disableCategoryCount: {
       title: '隐藏类别数',
-      description: '显示不带辅助每个类别编号的文档计数。',
+      description: '在层次树中隐藏类别编号',
       tags: '简化计数，单一数字，减少混乱',
     },
     compactTags: {
@@ -158,8 +154,8 @@ export default {
       tags: '初学者提示、教程横幅、指导标记、控制栏帮助',
     },
     disableDocumentCounts: {
-      title: '完全隐藏文档计数',
-      description: '隐藏层次树中的所有文档计数信息。',
+      title: '隐藏文档计数',
+      description: '在层次树中隐藏文档编号',
       tags: '总计关闭，无计数，统计信息隐藏',
     },
     disableDocumentToolTips: {
@@ -208,11 +204,6 @@ export default {
       description: '在查看（非编辑）模式下隐藏未填写任何值的字段。请注意，这可能会导致相对较大的布局变化，在某些情况下可能会使文档看起来不规则。',
       tags: '空白字段、只读视图、紧凑文档、布局转换',
     },
-    hideHierarchyTree: {
-      title: '隐藏层次树',
-      description: '控制是否显示分层树。',
-      tags: '侧边栏关闭、导航器隐藏、树面板、轮廓隐藏',
-    },
     hidePlushes: {
       title: '隐藏幻想曲吉祥物',
       description: '隐藏着令人惊叹的可爱和令人敬畏的幻想曲，小奥术龙。你怎么可以！ :(',
@@ -228,11 +219,6 @@ export default {
       description: '隐藏开始屏幕提示和技巧弹出窗口。',
       tags: '首次启动、入职、启动、启动提示、技巧',
     },
-    hideTreeExtraIcons: {
-      title: '隐藏额外的图标',
-      description: '隐藏通常为方便起见但不添加功能的图标 - 例如，没有子节点的文档旁边的“打开文档”图标，也可以通过正常的左键单击而不是图标来打开。',
-      tags: '多余的图标、混乱、最小的树、可选的操作',
-    },
     hideTreeIconAddUnder: {
       title: '隐藏“添加到”图标',
       description: '此选项隐藏“在所选父级下添加新文档”图标。',
@@ -247,6 +233,11 @@ export default {
       title: '隐藏“打开”图标',
       description: '此选项隐藏行打开图标。',
       tags: '打开图标，转到文档，行打开按钮',
+    },
+    hideTreeLines: {
+      title: 'Hide tree lines',
+      description: 'Hides the structural help-lines in the hierarchy tree.',
+      tags: 'lines, helplines, structure, tree, hierarchical, hierarchical tree'
     },
     hideTreeOrderNumbers: {
       title: '隐藏订单号',
@@ -272,11 +263,6 @@ export default {
       title: '反转类别位置',
       description: '切换类别和文档编号的位置。',
       tags: '交换编号、计数顺序、类别与文档计数',
-    },
-    invertTreeSorting: {
-      title: '反转树自定义顺序排序',
-      description: '按与默认方向相反的方向对层次树中的文档进行排序：从最高到最低。',
-      tags: '逆序、自定义顺序、排序方向、升序、降序',
     },
     limitEditorHeight: {
       title: '限制文本编辑器高度',

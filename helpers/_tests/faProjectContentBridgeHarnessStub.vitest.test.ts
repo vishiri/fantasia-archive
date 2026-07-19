@@ -45,6 +45,10 @@ const stubDocumentShape = {
   placementId: null,
   parentDocumentId: null,
   sortOrder: 0,
+  isCategory: false,
+  isFinished: false,
+  isMinor: false,
+  isDead: false,
   documentTextColor: null,
   documentBackgroundColor: null
 }
@@ -168,6 +172,7 @@ test('Test that createFaProjectContentBridgeHarnessStub hierarchy methods return
     placementId: 'placement-stub',
     parentDocumentId: null,
     sortOrder: 0,
+    isCategory: false,
     hasChildren: false
   })
   await expect(api.reindexDocumentSiblingsInHierarchy({
@@ -181,6 +186,7 @@ test('Test that createFaProjectContentBridgeHarnessStub hierarchy methods return
     placementId: 'placement-stub',
     parentDocumentId: null,
     sortOrder: 0,
+    isCategory: false,
     hasChildren: false
   })
   await expect(api.searchProjectHierarchy('hero')).resolves.toEqual({

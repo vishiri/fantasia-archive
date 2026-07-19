@@ -57,6 +57,8 @@ export interface I_faProjectHierarchyTreeWorkspacePlacement {
   nickname: string
   icon: string
   hasChildren: boolean
+  documentCount?: number | undefined
+  categoryCount?: number | undefined
   titlePluralTranslations: I_faProjectDocumentTemplateTitleTranslations
   titleSingularTranslations: I_faProjectDocumentTemplateTitleSingularTranslations
 }
@@ -92,6 +94,10 @@ export interface I_faProjectHierarchyTreeDocumentChild {
   parentDocumentId: string | null
   sortOrder: number
   hasChildren: boolean
+  isCategory?: boolean | undefined
+  isFinished?: boolean | undefined
+  isMinor?: boolean | undefined
+  isDead?: boolean | undefined
 }
 
 export interface I_faProjectHierarchyTreeListPlacementChildrenResult {
@@ -202,6 +208,12 @@ export interface I_faProjectHierarchyTreeHeTreeNode {
   titlePluralTranslations?: I_faProjectDocumentTemplateTitleTranslations | undefined
   /** Set on templatePlacement rows for add-new label resolution. */
   titleSingularTranslations?: I_faProjectDocumentTemplateTitleSingularTranslations | undefined
+  documentCount?: number | undefined
+  categoryCount?: number | undefined
+  isCategory?: boolean | undefined
+  isFinished?: boolean | undefined
+  isMinor?: boolean | undefined
+  isDead?: boolean | undefined
 }
 
 /** Placement metadata used to build or refresh add-new hierarchy rows. */

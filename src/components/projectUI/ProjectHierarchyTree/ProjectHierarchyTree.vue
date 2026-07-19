@@ -18,7 +18,7 @@
       :each-droppable="eachDroppableHandler"
       data-test-locator="projectHierarchyTree"
       :indent="PROJECT_HIERARCHY_TREE_INDENT_PX"
-      tree-line
+      :tree-line="showsTreeLines"
       :tree-line-offset="PROJECT_HIERARCHY_TREE_LINE_OFFSET_PX"
       :node-key="heTreeNodeKey"
       :root-droppable="rootDroppableHandler"
@@ -53,8 +53,23 @@
             :active-document-id="activeDocumentId"
             class="projectHierarchyTree__nodeContent"
             :node="node"
+            :placement-count-display="resolvePlacementCountDisplayForNode(node)"
             :stat="stat"
-          />
+          >
+            <template
+              v-if="projectHierarchyTreeNodeShowsDocumentButtonGroup(node, documentButtonVisibility)"
+              #documentButtonGroup
+            >
+              <ProjectHierarchyTreeDocumentButtonGroup
+                :shows-add-under="documentButtonVisibility.showsAddUnder"
+                :shows-edit="documentButtonVisibility.showsEdit"
+                :shows-open="documentButtonVisibility.showsOpen"
+                @add-under-activate="onDocumentRowAddUnderButtonClick(node)"
+                @edit-activate="onDocumentRowEditButtonClick(node)"
+                @open-activate="onDocumentRowOpenButtonClick(node)"
+              />
+            </template>
+          </ProjectHierarchyTreeNode>
         </div>
       </template>
     </Draggable>
@@ -87,10 +102,14 @@ import { ref, watch } from 'vue'
 import { Draggable } from '@he-tree/vue'
 import '@he-tree/vue/style/default.css'
 
+import ProjectHierarchyTreeDocumentButtonGroup from './ProjectHierarchyTreeDocumentButtonGroup.vue'
 import ProjectHierarchyTreeNode from './ProjectHierarchyTreeNode.vue'
 import ProjectHierarchyTreeNodeContextMenu from './ProjectHierarchyTreeNodeContextMenu.vue'
 import ProjectHierarchyTreeOpenIcon from './ProjectHierarchyTreeOpenIcon.vue'
-import type { I_faProjectHierarchyTreeHeTreeInstance } from 'app/types/I_faProjectHierarchyTreeDomain'
+import type {
+  I_faProjectHierarchyTreeHeTreeInstance,
+  I_faProjectHierarchyTreeHeTreeNode
+} from 'app/types/I_faProjectHierarchyTreeDomain'
 import {
   PROJECT_HIERARCHY_TREE_DRAG_HANDLE_CLASS,
   PROJECT_HIERARCHY_TREE_DRAG_OPEN_DELAY_MS,
@@ -98,6 +117,7 @@ import {
   PROJECT_HIERARCHY_TREE_LINE_OFFSET_PX
 } from './functions/projectHierarchyTreeConstants'
 import { projectHierarchyTreeNodeShowsOpenIcon } from './functions/projectHierarchyTreeDocumentHasChildrenSync'
+import { projectHierarchyTreeNodeShowsDocumentButtonGroup } from './functions/projectHierarchyTreeDocumentButtonVisibility'
 import { resolveProjectHierarchyTreeNodeRowKindClass } from './functions/projectHierarchyTreeTreeNodeKindClass'
 import { useProjectHierarchyTree } from './scripts/projectHierarchyTree_manager'
 
@@ -123,6 +143,7 @@ const {
   contextMenuAnchorNodeId,
   contextMenuShowsBulkExpandRows,
   contextMenuShowsCopyRows,
+  documentButtonVisibility,
   eachDraggableHandler,
   eachDroppableHandler,
   heTreeNodeKey,
@@ -139,7 +160,10 @@ const {
   onCopyNameFromContextMenuClick,
   onCopyTextColorFromContextMenuClick,
   onDeleteDocumentFromContextMenuClick,
+  onDocumentRowAddUnderButtonClick,
   onDocumentRowAuxClick,
+  onDocumentRowEditButtonClick,
+  onDocumentRowOpenButtonClick,
   onEditDocumentFromContextMenuClick,
   onExpandAllUnderNodeClick,
   onNodeClick,
@@ -157,9 +181,11 @@ const {
   onBeforeDragStart,
   onTreeDataUpdate,
   onTreeDragEndCleanup,
+  resolvePlacementCountDisplayForCounts,
   rootDroppableHandler,
   setTreeComponentRef,
   setTreeScrollHostRef,
+  showsTreeLines,
   treeData,
   treeMountKey,
   treeRootClassList,
@@ -169,6 +195,28 @@ const {
     emit('document-open-request', documentId, mode, treeMeta)
   }
 })
+
+function resolvePlacementCountDisplayForNode (
+  node: I_faProjectHierarchyTreeHeTreeNode
+): {
+  categoryCount: number
+  display: ReturnType<typeof resolvePlacementCountDisplayForCounts>
+  documentCount: number
+} | null {
+  if (node.nodeKind !== 'templatePlacement') {
+    return null
+  }
+  const documentCount = node.documentCount ?? 0
+  const categoryCount = node.categoryCount ?? 0
+  return {
+    categoryCount,
+    display: resolvePlacementCountDisplayForCounts({
+      categoryCount,
+      documentCount
+    }),
+    documentCount
+  }
+}
 
 watch(treeScrollHostRef, (element) => {
   setTreeScrollHostRef(element)

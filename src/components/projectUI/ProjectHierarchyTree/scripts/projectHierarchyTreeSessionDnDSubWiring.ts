@@ -10,6 +10,8 @@ import type { createProjectHierarchyTreeDocumentRowExpandClickGestureWiring } fr
 import { createProjectHierarchyTreeDnDWiring } from './projectHierarchyTreeDnDWiring'
 import type { I_faProjectHierarchyTreeDocumentChild } from 'app/types/I_faProjectHierarchyTreeDomain'
 
+import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
+
 type T_sessionDnDSubDeps = {
   documentRowDragHoldWiring: ReturnType<typeof createProjectHierarchyTreeDocumentRowDragHoldWiring>
   documentRowExpandClickGesture: ReturnType<typeof createProjectHierarchyTreeDocumentRowExpandClickGestureWiring>
@@ -68,7 +70,12 @@ export function createProjectHierarchyTreeSessionDnDSubWiring (deps: T_sessionDn
       if (typeof api?.reindexDocumentSiblingsInHierarchy !== 'function') {
         throw new Error('reindexDocumentSiblingsInHierarchy unavailable')
       }
-      return await api.reindexDocumentSiblingsInHierarchy(input) as I_faProjectHierarchyTreeDocumentChild
+      const result = await api.reindexDocumentSiblingsInHierarchy(input) as I_faProjectHierarchyTreeDocumentChild
+      S_FaOpenedDocuments().syncOpenedDocumentParentFromHierarchy(
+        input.movedDocumentId,
+        input.parentDocumentId
+      )
+      return result
     },
     nextTick: deps.nextTick,
     reapplyHeTreeOpenState: deps.reapplyHeTreeOpenState,

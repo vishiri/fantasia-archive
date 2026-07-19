@@ -4,18 +4,34 @@ import type { I_faDocumentAppearanceChromeStyle } from 'app/types/I_faDocumentAp
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
 import { resolveFaDocumentAppearanceChromeStyle } from 'app/src/scripts/documentAppearance/functions/faDocumentAppearanceChromeStyle'
+import { resolveFaDocumentStatusLabelColor } from 'app/src/scripts/documentAppearance/functions/resolveFaDocumentStatusLabelColor'
 
 export function resolveProjectDocumentControlBarTabAppearanceChrome (
-  tab: Pick<I_faOpenedDocumentTab, 'documentBackgroundColorDraft' | 'documentTextColorDraft'>
+  tab: Pick<I_faOpenedDocumentTab, 'documentBackgroundColorDraft' | 'documentTextColorDraft'> & {
+    isMinorDraft?: boolean | undefined
+  }
 ): I_faDocumentAppearanceChromeStyle | undefined {
-  return resolveFaDocumentAppearanceChromeStyle({
+  const baseChrome = resolveFaDocumentAppearanceChromeStyle({
     documentBackgroundColor: tab.documentBackgroundColorDraft,
     documentTextColor: tab.documentTextColorDraft
   })
+  const statusLabelColor = resolveFaDocumentStatusLabelColor({
+    documentTextColor: tab.documentTextColorDraft,
+    isMinor: tab.isMinorDraft === true
+  })
+  if (baseChrome === undefined && statusLabelColor === undefined) {
+    return undefined
+  }
+  return {
+    ...baseChrome,
+    color: baseChrome?.color ?? statusLabelColor
+  }
 }
 
 export function resolveProjectDocumentControlBarTabInlineStyle (
-  tab: Pick<I_faOpenedDocumentTab, 'documentBackgroundColorDraft' | 'documentTextColorDraft'>
+  tab: Pick<I_faOpenedDocumentTab, 'documentBackgroundColorDraft' | 'documentTextColorDraft'> & {
+    isMinorDraft?: boolean | undefined
+  }
 ): CSSProperties | undefined {
   const chrome = resolveProjectDocumentControlBarTabAppearanceChrome(tab)
   if (chrome === undefined) {

@@ -1,5 +1,11 @@
 import type Database from 'better-sqlite3'
 
+import { coerceFaProjectWorldColorForStorage } from '../functions/coerceFaProjectWorldColorForStorage'
+import { coerceFaProjectWorldColorPalleteForStorage } from '../functions/coerceFaProjectWorldColorPalleteForStorage'
+import {
+  FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH,
+  FA_PROJECT_WORLD_DEFAULT_COLOR
+} from '../functions/faProjectDbSchemaDdl'
 import {
   deleteFaProjectWorldRow,
   getFaProjectWorldRowById,
@@ -49,10 +55,16 @@ export function updateFaProjectWorld (
     rowPatch.displayName = resolveFaProjectWorldDisplayNameForStorage(patch.displayNameTranslations)
   }
   if (patch.color !== undefined) {
-    rowPatch.color = patch.color
+    rowPatch.color = coerceFaProjectWorldColorForStorage(
+      patch.color,
+      FA_PROJECT_WORLD_DEFAULT_COLOR
+    )
   }
   if (patch.colorPallete !== undefined) {
-    rowPatch.colorPallete = patch.colorPallete
+    rowPatch.colorPallete = coerceFaProjectWorldColorPalleteForStorage(
+      patch.colorPallete,
+      FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH
+    )
   }
   if (patch.sortOrder !== undefined) {
     rowPatch.sortOrder = patch.sortOrder

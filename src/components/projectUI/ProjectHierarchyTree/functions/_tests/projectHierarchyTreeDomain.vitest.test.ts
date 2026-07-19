@@ -1161,6 +1161,7 @@ test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton sorts grouped placemen
       {
         ...sampleWorld.placements[0]!,
         groupSortOrder: 2,
+        isCategory: false,
         id: 'placement-late',
         nickname: 'Late',
         titlePluralTranslations: {},
@@ -1169,6 +1170,7 @@ test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton sorts grouped placemen
       {
         ...sampleWorld.placements[0]!,
         groupSortOrder: 1,
+        isCategory: false,
         id: 'placement-early',
         nickname: 'Early',
         titlePluralTranslations: {},
@@ -1693,6 +1695,7 @@ test('Test that mapWorkspaceLayoutToHierarchyTreeSkeleton sorts null groupSortOr
       {
         ...sampleWorld.placements[0]!,
         groupSortOrder: 1,
+        isCategory: false,
         id: 'placement-b'
       }
     ]

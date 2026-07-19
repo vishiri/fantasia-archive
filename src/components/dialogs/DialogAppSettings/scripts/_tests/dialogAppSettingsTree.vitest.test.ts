@@ -131,14 +131,14 @@ test('Test that sortSettingsListByTranslatedTitle orders by translated title the
   const input: Record<string, I_appSettingsSettingRenderItem> = {
     noProjectName: stubSetting('Hide project name in tree'),
     doNotCollapseTreeOptions: stubSetting('Prevent sublevel collapse in the tree'),
-    invertTreeSorting: stubSetting('Invert tree custom order sorting')
+    invertCategoryPosition: stubSetting('Invert category position')
   }
 
   const orderedKeys = Object.keys(sortSettingsListByTranslatedTitle(input))
 
   expect(orderedKeys).toEqual([
     'noProjectName',
-    'invertTreeSorting',
+    'invertCategoryPosition',
     'doNotCollapseTreeOptions'
   ])
 })

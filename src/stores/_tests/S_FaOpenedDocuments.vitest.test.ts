@@ -46,6 +46,8 @@ const updateDocumentMock = vi.fn()
 const getWorldByIdMock = vi.fn()
 const getDocumentTemplateByIdMock = vi.fn()
 const createDocumentMock = vi.fn()
+const moveDocumentInHierarchyMock = vi.fn()
+const listPlacementDocumentChildrenMock = vi.fn()
 
 const baseTab: I_faOpenedDocumentTab = {
   documentId: 'doc-1',
@@ -58,6 +60,16 @@ const baseTab: I_faOpenedDocumentTab = {
   savedDocumentTextColor: '',
   documentBackgroundColorDraft: '',
   savedDocumentBackgroundColor: '',
+  isCategoryDraft: false,
+  savedIsCategory: false,
+  isFinishedDraft: false,
+  isMinorDraft: false,
+  isDeadDraft: false,
+  savedIsFinished: false,
+  savedIsMinor: false,
+  savedIsDead: false,
+  parentDocumentIdDraft: '',
+  savedParentDocumentId: '',
   hasUnsavedChanges: false,
   editState: false
 }
@@ -79,11 +91,15 @@ beforeEach(() => {
   getWorldByIdMock.mockReset()
   getDocumentTemplateByIdMock.mockReset()
   createDocumentMock.mockReset()
+  moveDocumentInHierarchyMock.mockReset()
+  listPlacementDocumentChildrenMock.mockReset()
   deleteDocumentMock.mockReset()
   notifyCreateMock.mockClear()
   getDocumentByIdMock.mockResolvedValue({
     displayName: 'Hero',
-    id: 'doc-1'
+    id: 'doc-1',
+    parentDocumentId: null,
+    placementId: 'placement-1'
   })
   getWorldByIdMock.mockResolvedValue({ id: 'world-1' })
   getDocumentTemplateByIdMock.mockResolvedValue({
@@ -98,7 +114,28 @@ beforeEach(() => {
   }))
   updateDocumentMock.mockResolvedValue({
     displayName: 'Saved Hero',
-    id: 'doc-1'
+    id: 'doc-1',
+    parentDocumentId: null
+  })
+  moveDocumentInHierarchyMock.mockResolvedValue({
+    displayName: 'Saved Hero',
+    id: 'doc-1',
+    parentDocumentId: 'parent-2',
+    placementId: 'placement-1',
+    sortOrder: 1,
+    hasChildren: false
+  })
+  listPlacementDocumentChildrenMock.mockResolvedValue({
+    items: [
+      {
+        displayName: 'Sibling',
+        hasChildren: false,
+        id: 'sibling-1',
+        parentDocumentId: 'parent-2',
+        placementId: 'placement-1',
+        sortOrder: 0
+      }
+    ]
   })
   getOpenedDocumentsSnapshotMock.mockResolvedValue({
     ...FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT,
@@ -112,6 +149,8 @@ beforeEach(() => {
       getDocumentById: getDocumentByIdMock,
       getDocumentTemplateById: getDocumentTemplateByIdMock,
       getWorldById: getWorldByIdMock,
+      listPlacementDocumentChildren: listPlacementDocumentChildrenMock,
+      moveDocumentInHierarchy: moveDocumentInHierarchyMock,
       updateDocument: updateDocumentMock
     },
     projectManagement: {
@@ -182,6 +221,188 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName persists and queues 
   await store.saveDocumentDisplayName('doc-1', { keepEditMode: false })
   expect(store.findTabByDocumentId('doc-1')?.savedDisplayName).toBe('Saved Hero')
   expect(hierarchyStore.pendingDocumentRefreshIds).toEqual(['doc-1'])
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName moves parent before updateDocument', async () => {
+  const refreshHierarchyTreeNodesMock = vi.fn()
+  getDocumentByIdMock.mockResolvedValueOnce({
+    displayName: 'Hero',
+    id: 'doc-1',
+    parentDocumentId: null,
+    placementId: 'placement-1',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  hierarchyStore.refreshHierarchyTreeNodes = refreshHierarchyTreeNodesMock
+  hierarchyStore.treeData = [
+    {
+      children: [
+        {
+          children: [
+            {
+              children: [],
+              childrenLoaded: true,
+              documentId: 'parent-2',
+              groupId: null,
+              hasChildren: false,
+              icon: 'mdi-account',
+              id: 'parent-2',
+              label: 'Parent 2',
+              nodeKind: 'document',
+              placementId: 'placement-1',
+              worldColor: '#ff0000',
+              worldId: 'world-1'
+            }
+          ],
+          childrenLoaded: true,
+          documentId: null,
+          documentTemplateId: 'tpl-1',
+          groupId: null,
+          hasChildren: true,
+          icon: 'mdi-home',
+          id: 'placement-1',
+          label: 'Characters',
+          nodeKind: 'templatePlacement',
+          placementId: 'placement-1',
+          worldColor: '#ff0000',
+          worldId: 'world-1'
+        }
+      ],
+      childrenLoaded: true,
+      documentId: null,
+      groupId: null,
+      hasChildren: true,
+      icon: 'mdi-earth',
+      id: 'world-1',
+      label: 'World',
+      nodeKind: 'world',
+      placementId: null,
+      worldColor: '#ff0000',
+      worldId: 'world-1'
+    }
+  ]
+  await store.hydrateFromProjectDatabase()
+  store.updateParentDocumentIdDraft('doc-1', 'parent-2')
+  store.enterDocumentEditMode('doc-1')
+  await store.saveDocumentDisplayName('doc-1', { keepEditMode: true })
+  await vi.runAllTimersAsync()
+  expect(moveDocumentInHierarchyMock).toHaveBeenCalledWith({
+    documentId: 'doc-1',
+    targetParentDocumentId: 'parent-2',
+    targetSortOrder: 1
+  })
+  expect(store.findTabByDocumentId('doc-1')?.savedParentDocumentId).toBe('parent-2')
+  expect(refreshHierarchyTreeNodesMock).toHaveBeenCalledWith(['parent-2'])
+  expect(hierarchyStore.treeData[0]?.children[0]?.children[0]?.hasChildren).toBe(true)
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName parent move to root queues placement refresh', async () => {
+  const refreshHierarchyTreeNodesMock = vi.fn()
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  hierarchyStore.refreshHierarchyTreeNodes = refreshHierarchyTreeNodesMock
+  hierarchyStore.treeData = [
+    {
+      children: [
+        {
+          children: [],
+          childrenLoaded: true,
+          documentId: null,
+          documentTemplateId: 'tpl-1',
+          groupId: null,
+          hasChildren: true,
+          icon: 'mdi-home',
+          id: 'placement-1',
+          label: 'Characters',
+          nodeKind: 'templatePlacement',
+          placementId: 'placement-1',
+          worldColor: '#ff0000',
+          worldId: 'world-1'
+        }
+      ],
+      childrenLoaded: true,
+      documentId: null,
+      groupId: null,
+      hasChildren: true,
+      icon: 'mdi-earth',
+      id: 'world-1',
+      label: 'World',
+      nodeKind: 'world',
+      placementId: null,
+      worldColor: '#ff0000',
+      worldId: 'world-1'
+    }
+  ]
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [{
+      ...baseTab,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: 'parent-2'
+    }]
+  })
+  getDocumentByIdMock.mockResolvedValue({
+    displayName: 'Hero',
+    id: 'doc-1',
+    parentDocumentId: 'parent-2',
+    placementId: 'placement-1',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  store.enterDocumentEditMode('doc-1')
+  await store.saveDocumentDisplayName('doc-1', { keepEditMode: true })
+  await vi.runAllTimersAsync()
+  expect(moveDocumentInHierarchyMock).toHaveBeenCalledWith({
+    documentId: 'doc-1',
+    targetParentDocumentId: null,
+    targetSortOrder: 1
+  })
+  expect(refreshHierarchyTreeNodesMock).toHaveBeenCalledWith(['placement-1'])
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName rejects parent move without placement', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.updateParentDocumentIdDraft('doc-1', 'parent-2')
+  getDocumentByIdMock.mockResolvedValue({
+    displayName: 'Hero',
+    id: 'doc-1',
+    parentDocumentId: null,
+    placementId: null,
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  store.enterDocumentEditMode('doc-1')
+  await expect(store.saveDocumentDisplayName('doc-1', { keepEditMode: true }))
+    .rejects
+    .toThrow('Could not save the document.')
+})
+
+test('Test that S_FaOpenedDocuments syncOpenedDocumentParentFromHierarchy overwrites draft without inventing dirty', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: [{
+      ...baseTab,
+      displayNameDraft: 'Dirty name',
+      hasUnsavedChanges: true,
+      parentDocumentIdDraft: 'typed-parent',
+      savedParentDocumentId: 'saved-parent'
+    }]
+  })
+  store.syncOpenedDocumentParentFromHierarchy('doc-1', 'tree-parent')
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.parentDocumentIdDraft).toBe('tree-parent')
+  expect(tab?.savedParentDocumentId).toBe('tree-parent')
+  expect(tab?.hasUnsavedChanges).toBe(true)
 })
 
 test('Test that S_FaOpenedDocuments moveActiveDocumentTab swaps the active tab and no-ops at boundaries', async () => {
@@ -816,6 +1037,16 @@ test('Test that S_FaOpenedDocuments createTemporaryDocumentUnderParentFromOpened
       persistenceState: 'temporary',
       savedDisplayName: 'Temp parent',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       savedDocumentTextColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account',
@@ -929,6 +1160,10 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName promotes a temporary
     documentBackgroundColor: null,
     documentTextColor: null,
     id: documentId,
+    isCategory: false,
+    isDead: false,
+    isFinished: false,
+    isMinor: false,
     parentDocumentId: null,
     templateId: 'tpl-1',
     worldId: 'world-1'
@@ -977,6 +1212,16 @@ test('Test that S_FaOpenedDocuments hydrates temporary tabs from snapshot', asyn
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account',
       templateId: 'tpl-1',
@@ -1311,6 +1556,16 @@ test('Test that S_FaOpenedDocuments hydrate drops temporary tabs when world look
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account',
       templateId: 'tpl-1',
@@ -1789,6 +2044,83 @@ test('Test that S_FaOpenedDocuments updateDisplayNameDraft no-ops for unknown ta
   expect(store.tabs[0]?.displayNameDraft).toBe('Hero')
 })
 
+test('Test that S_FaOpenedDocuments status flag draft updaters no-op for unknown tabs', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  store.updateIsFinishedDraft('missing', true)
+  store.updateIsMinorDraft('missing', true)
+  store.updateIsDeadDraft('missing', true)
+  store.updateIsCategoryDraft('missing', true)
+
+  expect(store.tabs[0]?.isFinishedDraft).toBe(false)
+  expect(store.tabs[0]?.isMinorDraft).toBe(false)
+  expect(store.tabs[0]?.isDeadDraft).toBe(false)
+  expect(store.tabs[0]?.isCategoryDraft).toBe(false)
+})
+
+test('Test that S_FaOpenedDocuments hydrate keeps dirty status flag drafts', async () => {
+  getOpenedDocumentsSnapshotMock.mockResolvedValueOnce({
+    ...FA_OPENED_DOCUMENTS_EMPTY_SNAPSHOT,
+    activeDocumentId: 'doc-1',
+    tabs: [{
+      ...baseTab,
+      hasUnsavedChanges: true,
+      isDeadDraft: true,
+      isFinishedDraft: true,
+      isMinorDraft: true,
+      worldId: 'world-1'
+    }]
+  })
+  getDocumentByIdMock.mockResolvedValueOnce({
+    displayName: 'Hero',
+    documentBackgroundColor: null,
+    documentTextColor: null,
+    id: 'doc-1',
+    isCategory: false,
+    isDead: false,
+    isFinished: false,
+    isMinor: false,
+    worldId: 'world-1'
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.isFinishedDraft).toBe(true)
+  expect(tab?.isMinorDraft).toBe(true)
+  expect(tab?.isDeadDraft).toBe(true)
+  expect(tab?.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that S_FaOpenedDocuments hydrate adopts saved status flags from the database', async () => {
+  getDocumentByIdMock.mockResolvedValueOnce({
+    displayName: 'Hero',
+    documentBackgroundColor: null,
+    documentTextColor: null,
+    id: 'doc-1',
+    isCategory: false,
+    isDead: true,
+    isFinished: true,
+    isMinor: true,
+    worldId: 'world-1'
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.savedIsFinished).toBe(true)
+  expect(tab?.savedIsMinor).toBe(true)
+  expect(tab?.savedIsDead).toBe(true)
+  expect(tab?.isFinishedDraft).toBe(true)
+  expect(tab?.isMinorDraft).toBe(true)
+  expect(tab?.isDeadDraft).toBe(true)
+  expect(tab?.hasUnsavedChanges).toBe(false)
+})
+
 test('Test that S_FaOpenedDocuments saveDocumentDisplayName throws when the tab is missing', async () => {
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const store = S_FaOpenedDocuments()
@@ -1965,7 +2297,11 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName persists appearance 
   expect(updateDocumentMock).toHaveBeenCalledWith('doc-1', {
     displayName: 'Hero',
     documentBackgroundColor: '#112233',
-    documentTextColor: '#AABBCC'
+    documentTextColor: '#AABBCC',
+    isCategory: false,
+    isDead: false,
+    isFinished: false,
+    isMinor: false
   })
   const tab = store.findTabByDocumentId('doc-1')
   expect(tab?.savedDocumentTextColor).toBe('#AABBCC')
@@ -1992,6 +2328,159 @@ test('Test that S_FaOpenedDocuments hydrate reconciles appearance colors from pr
   expect(tab?.documentBackgroundColorDraft).toBe('#112233')
 })
 
+test('Test that S_FaOpenedDocuments updateIsCategoryDraft marks tabs dirty', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  store.updateIsCategoryDraft('doc-1', true)
+
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.isCategoryDraft).toBe(true)
+  expect(tab?.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that S_FaOpenedDocuments updateIsFinishedDraft marks tabs dirty', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  store.updateIsFinishedDraft('doc-1', true)
+
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.isFinishedDraft).toBe(true)
+  expect(tab?.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that S_FaOpenedDocuments updateIsMinorDraft marks tabs dirty', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  store.updateIsMinorDraft('doc-1', true)
+
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.isMinorDraft).toBe(true)
+  expect(tab?.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that S_FaOpenedDocuments updateIsDeadDraft marks tabs dirty', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  store.updateIsDeadDraft('doc-1', true)
+
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.isDeadDraft).toBe(true)
+  expect(tab?.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName persists status flag drafts', async () => {
+  updateDocumentMock.mockResolvedValueOnce({
+    displayName: 'Hero',
+    documentBackgroundColor: null,
+    documentTextColor: null,
+    id: 'doc-1',
+    isCategory: false,
+    isDead: true,
+    isFinished: true,
+    isMinor: true
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.updateIsFinishedDraft('doc-1', true)
+  store.updateIsMinorDraft('doc-1', true)
+  store.updateIsDeadDraft('doc-1', true)
+
+  await store.saveDocumentDisplayName('doc-1', { keepEditMode: false })
+  await vi.runAllTimersAsync()
+
+  expect(updateDocumentMock).toHaveBeenCalledWith('doc-1', expect.objectContaining({
+    isDead: true,
+    isFinished: true,
+    isMinor: true
+  }))
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.savedIsFinished).toBe(true)
+  expect(tab?.savedIsMinor).toBe(true)
+  expect(tab?.savedIsDead).toBe(true)
+  expect(tab?.hasUnsavedChanges).toBe(false)
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName refreshLayout when category changes', async () => {
+  const refreshLayoutMock = vi.fn(async () => undefined)
+  const refreshDocumentsInTreeMock = vi.fn()
+  updateDocumentMock.mockResolvedValueOnce({
+    displayName: 'Hero',
+    documentBackgroundColor: null,
+    documentTextColor: null,
+    id: 'doc-1',
+    isCategory: true
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const { S_FaProjectHierarchyTree } = await import('../S_FaProjectHierarchyTree')
+  const store = S_FaOpenedDocuments()
+  const hierarchyStore = S_FaProjectHierarchyTree()
+  hierarchyStore.refreshLayout = refreshLayoutMock
+  hierarchyStore.refreshDocumentsInTree = refreshDocumentsInTreeMock
+  await store.hydrateFromProjectDatabase()
+  store.updateIsCategoryDraft('doc-1', true)
+
+  await store.saveDocumentDisplayName('doc-1', { keepEditMode: false })
+  await vi.runAllTimersAsync()
+
+  expect(refreshLayoutMock).toHaveBeenCalled()
+  expect(refreshDocumentsInTreeMock).toHaveBeenCalledWith(['doc-1'])
+  expect(store.findTabByDocumentId('doc-1')?.savedIsCategory).toBe(true)
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName throws when temporary tab is missing after create', async () => {
+  const tabDomain = await import('app/src/scripts/openedDocuments/functions/openedDocumentTabDomain')
+  const originalFind = tabDomain.findOpenedDocumentTabIndexByDocumentId
+  const findIndexSpy = vi.spyOn(tabDomain, 'findOpenedDocumentTabIndexByDocumentId')
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  const documentId = await store.createTemporaryDocument({
+    displayName: 'Aria',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  let lookupCount = 0
+  findIndexSpy.mockImplementation((tabs, docId) => {
+    if (docId === documentId) {
+      lookupCount += 1
+      if (lookupCount === 2) {
+        return -1
+      }
+    }
+    return originalFind(tabs, docId)
+  })
+
+  await expect(store.saveDocumentDisplayName(documentId, { keepEditMode: false })).rejects.toThrow()
+
+  findIndexSpy.mockRestore()
+})
+
+test('Test that S_FaOpenedDocuments requestCloseTab no-ops when indexed tab row is undefined', async () => {
+  const tabDomain = await import('app/src/scripts/openedDocuments/functions/openedDocumentTabDomain')
+  const findIndexSpy = vi.spyOn(tabDomain, 'findOpenedDocumentTabIndexByDocumentId')
+    .mockReturnValue(0)
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: []
+  })
+
+  store.requestCloseTab('doc-1')
+
+  expect(store.pendingCloseDocumentId).toBeNull()
+  findIndexSpy.mockRestore()
+})
+
 test('Test that S_FaOpenedDocuments requestCloseTab no-ops when tab row is missing', async () => {
   const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
   const store = S_FaOpenedDocuments()
@@ -2003,6 +2492,69 @@ test('Test that S_FaOpenedDocuments requestCloseTab no-ops when tab row is missi
   store.requestCloseTab('doc-1')
 
   expect(store.pendingCloseDocumentId).toBeNull()
+})
+
+test('Test that S_FaOpenedDocuments setDocumentEditState no-ops when tab row is missing', async () => {
+  const tabDomain = await import('app/src/scripts/openedDocuments/functions/openedDocumentTabDomain')
+  const findIndexSpy = vi.spyOn(tabDomain, 'findOpenedDocumentTabIndexByDocumentId')
+    .mockReturnValue(0)
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: []
+  })
+
+  store.setDocumentEditState('doc-1', true)
+
+  expect(store.tabs).toHaveLength(0)
+  findIndexSpy.mockRestore()
+})
+
+test('Test that S_FaOpenedDocuments syncOpenedDocumentParentFromHierarchy no-ops when tab row is missing', async () => {
+  const tabDomain = await import('app/src/scripts/openedDocuments/functions/openedDocumentTabDomain')
+  const findIndexSpy = vi.spyOn(tabDomain, 'findOpenedDocumentTabIndexByDocumentId')
+    .mockReturnValue(0)
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  store.replaceSessionForComponentTesting({
+    activeDocumentId: 'doc-1',
+    tabs: []
+  })
+
+  store.syncOpenedDocumentParentFromHierarchy('doc-1', 'parent-2')
+
+  expect(store.tabs).toHaveLength(0)
+  findIndexSpy.mockRestore()
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName throws when parent move APIs are missing', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.updateParentDocumentIdDraft('doc-1', 'parent-2')
+  window.faContentBridgeAPIs = {
+    ...window.faContentBridgeAPIs,
+    projectContent: {
+      ...window.faContentBridgeAPIs?.projectContent,
+      getDocumentById: getDocumentByIdMock,
+      listPlacementDocumentChildren: listPlacementDocumentChildrenMock,
+      moveDocumentInHierarchy: undefined,
+      updateDocument: updateDocumentMock
+    }
+  } as never
+  getDocumentByIdMock.mockResolvedValue({
+    displayName: 'Hero',
+    id: 'doc-1',
+    parentDocumentId: null,
+    placementId: 'placement-1',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+
+  await expect(store.saveDocumentDisplayName('doc-1', { keepEditMode: true }))
+    .rejects
+    .toThrow('Could not save the document.')
 })
 
 test('Test that S_FaOpenedDocuments saveDocumentDisplayName rejects temporary tabs missing placement metadata', async () => {

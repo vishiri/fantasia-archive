@@ -68,6 +68,16 @@ test('Test that faOpenedDocumentsPersistSnapshotFromBridge serializes nested tab
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       hasUnsavedChanges: false,
       editState: true
     }]

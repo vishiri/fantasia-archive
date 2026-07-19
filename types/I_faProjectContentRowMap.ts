@@ -43,6 +43,10 @@ export interface I_faSqlProjectDocumentRow {
   display_name: string
   document_text_color: string | null
   document_background_color: string | null
+  is_category: number
+  is_finished: number
+  is_minor: number
+  is_dead: number
   created_at_ms: number
   updated_at_ms: number
 }

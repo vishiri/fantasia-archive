@@ -53,10 +53,6 @@ export default {
         subtitle: 'Puun käyttäytyminen',
         tags: 'laajentaa, romahtaa, laajentaa kaikkea, vuorovaikutus',
       },
-      treeSettings: {
-        subtitle: 'Puun asetukset',
-        tags: 'puupaneeli, sivupalkin näkyvyys, puun asettelu',
-      }
     },
     openedDocumentsTabs: {
       title: 'Avaa asiakirjan välilehdet',
@@ -127,9 +123,9 @@ export default {
       description: 'Tämä asetus tekee FA:n vierityspalkeista leveämpiä ja mahdollistaa siten manuaalisen klikkausvierityksen suoraan niissä laitteissa, jotka eivät tue tavallista vieritystä (esimerkiksi hiiret ilman vierityspyörää).',
       tags: 'vierityspalkin leveys, klikkaa vieritys, hiiri ilman pyörää, ohjauspallo, kosketus',
     },
-    compactDocumentCount: {
+    disableCategoryCount: {
       title: 'Piilota luokkamäärä',
-      description: 'Näyttää asiakirjojen määrän ilman toissijaista luokkakohtaista numeroa.',
+      description: 'Piilota luokanumerot hierarkkisessa puussa',
       tags: 'yksinkertaistettu laskenta, yksi numero, vähemmän sotkua',
     },
     compactTags: {
@@ -158,8 +154,8 @@ export default {
       tags: 'vihjeitä aloittelijoille, opetusbannerit, valmentajan merkit, ohjauspalkin apu',
     },
     disableDocumentCounts: {
-      title: 'Piilota asiakirjojen määrä kokonaan',
-      description: 'Piilottaa kaikki asiakirjamäärätiedot hierarkkisessa puussa.',
+      title: 'Piilota asiakirjojen määrä',
+      description: 'Piilota asiakirjanumerot hierarkkisessa puussa',
       tags: 'summat, ei laskelmia, tilastot piilotetaan',
     },
     disableDocumentToolTips: {
@@ -208,11 +204,6 @@ export default {
       description: 'Piilottaa kentät ilman täytettyä arvoa katselutilassa (ei-muokkaus). Huomaa, että tämä voi johtaa suhteellisen villiin asettelun siirtymiin, mikä saattaa joissakin tapauksissa saada asiakirjan näyttämään kurittomalta.',
       tags: 'tyhjät kentät, vain luku -näkymä, kompakti asiakirja, asettelun muutos',
     },
-    hideHierarchyTree: {
-      title: 'Piilota hierarkkinen puu',
-      description: 'Ohjaa, näytetäänkö hierarkkinen puu.',
-      tags: 'sivupalkki pois päältä, navigaattori piilotettu, puupaneeli, ääriviivat piilotettu',
-    },
     hidePlushes: {
       title: 'Piilota Fantasia-maskotti',
       description: 'Piilottaa hämmästyttävän suloisen ja mahtavan Fantasian, pienen arkaanisen lohikäärmeen. Kuinka voisit! :(',
@@ -228,11 +219,6 @@ export default {
       description: 'Piilottaa aloitusnäytön vinkit ja temput -ponnahdusikkunan.',
       tags: 'ensimmäinen käynnistys, käyttöönotto, splash, käynnistysvinkkejä, temppuja',
     },
-    hideTreeExtraIcons: {
-      title: 'Piilota ylimääräiset kuvakkeet',
-      description: 'Piilottaa kuvakkeet, jotka tavallisesti näytetään käyttömukavuuden vuoksi, mutta jotka eivät lisää toimintoja – esimerkiksi "Avaa asiakirja" -kuvakkeen sellaisen asiakirjan vieressä, jossa ei ole lapsisolmuja, jotka voidaan yhtä hyvin avata tavallisella hiiren vasemmalla painikkeella kuvakkeen sijaan.',
-      tags: 'ylimääräiset kuvakkeet, sotku, minimaalinen puu, valinnaiset toiminnot',
-    },
     hideTreeIconAddUnder: {
       title: 'Piilota "Lisää alle" -kuvake',
       description: 'Tämä vaihtoehto piilottaa "Lisää uusi asiakirja valitun ylätason alle" -kuvakkeen.',
@@ -247,6 +233,11 @@ export default {
       title: 'Piilota "Avaa"-kuvake',
       description: 'Tämä vaihtoehto piilottaa rivin Avaa-kuvakkeen.',
       tags: 'avauskuvake, siirry asiakirjaan, rivin avauspainike',
+    },
+    hideTreeLines: {
+      title: 'Hide tree lines',
+      description: 'Hides the structural help-lines in the hierarchy tree.',
+      tags: 'lines, helplines, structure, tree, hierarchical, hierarchical tree'
     },
     hideTreeOrderNumbers: {
       title: 'Piilota tilausnumerot',
@@ -272,11 +263,6 @@ export default {
       title: 'Käänteinen kategorian sijainti',
       description: 'Vaihtaa luokan ja asiakirjanumeron paikkaa.',
       tags: 'Vaihda numerot, laskentajärjestys, luokka vs. asiakirjojen määrä',
-    },
-    invertTreeSorting: {
-      title: 'Käänteinen puiden mukautetun järjestyksen lajittelu',
-      description: 'Lajittelee asiakirjat hierarkkisessa puussa oletusarvon vastakkaiseen suuntaan: korkeimmasta alimpaan.',
-      tags: 'käänteinen järjestys, mukautettu järjestys, lajittelusuunta, nouseva laskeva',
     },
     limitEditorHeight: {
       title: 'Rajoita tekstieditorin korkeutta',

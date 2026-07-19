@@ -14,10 +14,12 @@ Flattened to a single bootstrap revision during pre-release dev. No upgrade ladd
 |---------|----------|
 | **0** | Uninitialized file (bootstrap target on first open/create). |
 | **1** | Full schema: **`project_data`** KV, worldbuilding **content tables** (**`worlds`** incl. **`color_pallete`** + **`display_name_translations_json`**, **`document_templates`** incl. **`sort_order`**, **`world_appendix`**, **`icon`**, **`title_translations_json`** + **`title_singular_translations_json`** + **`world_appendix_translations_json`**, **`documents`** incl. **`tree_placement_id`** + **`tree_parent_document_id`** + **`tree_custom_sort_order`** + **`document_text_color`** + **`document_background_color`**, **`media`**, **`document_media`**, **`world_template_groups`** + **`world_template_placements`** layout incl. **`nickname`** + **`nickname_translations_json`** + **`nickname_singular_translations_json`** + **`display_name_translations_json`**, **`opened_documents`** singleton snapshot), default **world** seed on create. Idempotent **`applyFaProjectDocumentsHierarchySchemaPatch`** runs on every open at version **1** for legacy files missing hierarchy columns or still using pre-rename **`placement_id`** / **`parent_document_id`** / **`sort_order`** on **`documents`**; **`tree_custom_sort_order`** creation-time backfill runs **only when that column is first added**, not on re-apply. Idempotent **`applyFaProjectOpenedDocumentsSchemaV1`** creates **`opened_documents`** when missing on existing v1 files. |
+| **2** | Adds **`documents.is_category`** (`INTEGER NOT NULL DEFAULT 0`, `CHECK (is_category IN (0, 1))`). Idempotent **`applyFaProjectDocumentCategorySchemaPatch`** runs on every open at version **2** for legacy files missing the column. Idempotent **`applyFaProjectWorldColorEmptyAllowedSchemaPatch`** rebuilds **`worlds`** when **`color`** CHECK still requires strict **`#RRGGBB`** (no empty), so optional empty world color can persist. Idempotent **`applyFaProjectDocumentAppearanceEmptyColorSchemaPatch`** rebuilds **`documents`** when appearance color CHECKs still reject empty string (NULL-or-hex only). |
+| **3** | Adds **`documents.is_finished`**, **`documents.is_minor`**, **`documents.is_dead`** (each `INTEGER NOT NULL DEFAULT 0`, `CHECK (… IN (0, 1))`). Idempotent **`applyFaProjectDocumentStatusFlagsSchemaPatch`** runs on every open at version **3** for legacy files missing any column. |
 
-**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 1`** in **`faProjectDbMigrateWiring.ts`**.
+**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 3`** in **`faProjectDbMigrateWiring.ts`**.
 
-**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v1** + seed a default **world** when empty; files at **v1** are a no-op. Any other version is unsupported and throws. Older pre-release dev **`.faproject`** files must be recreated after a flatten.
+**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v3** + seed a default **world** when empty; files at **v3** run idempotent patches only; files at **v2** migrate to **v3** then run patches; files at **v1** migrate **v1→v2→v3** then run patches. Any other version is unsupported and throws. Older pre-release dev **`.faproject`** files must be recreated after a flatten.
 
 **Worlds vs document templates on create:** **`seedFaProjectDefaultWorldIfEmpty`** runs after bootstrap and inserts one default **world** when the table is empty. **Document templates are never auto-seeded** — a new **`.faproject`** may have zero **`document_templates`** rows until the user adds them in **Project Settings**.
 
@@ -53,7 +55,7 @@ PKs **TEXT UUID v4** on entity tables. Timestamps **`created_at_ms`** / **`updat
 | `id` | TEXT PK | UUID |
 | `display_name` | TEXT | Denormalized canonical name cache (non-empty after save; **en-US** resolution) |
 | `display_name_translations_json` | TEXT | JSON keyed by interface language code; at least one non-empty locale required on save |
-| `color` | TEXT | **`#RRGGBB`** hex; default **`#808080`** |
+| `color` | TEXT | Optional **`#RRGGBB`** hex; empty string allowed (UI falls back to theme primary); column default **`#808080`** on insert without override; `CHECK (color = '' OR (length(color) = 7 AND substr(color, 1, 1) = '#'))` |
 | `color_pallete` | TEXT | Semicolon-separated **`#RRGGBB`** hex list (max **2000** chars); default empty |
 | `sort_order` | INTEGER | Zero-based GUI order; new worlds append **`MAX(sort_order) + 1`** |
 | `created_at_ms`, `updated_at_ms` | INTEGER | |
@@ -95,8 +97,12 @@ Index: **`idx_document_templates_sort_order`**. Unlike **worlds**, new projects 
 | `tree_parent_document_id` | TEXT FK → `documents.id`, nullable | **ON DELETE CASCADE**; NULL = top-level under placement |
 | `tree_custom_sort_order` | INTEGER | Sibling order under same parent (or under placement when `tree_parent_document_id` NULL); default **0** |
 | `display_name` | TEXT | |
-| `document_text_color` | TEXT, nullable | `#RRGGBB` or NULL |
-| `document_background_color` | TEXT, nullable | `#RRGGBB` or NULL |
+| `document_text_color` | TEXT, nullable | `#RRGGBB`, empty string, or NULL (cleared UI → NULL; CHECK also allows `''`) |
+| `document_background_color` | TEXT, nullable | `#RRGGBB`, empty string, or NULL (cleared UI → NULL; CHECK also allows `''`) |
+| `is_category` | INTEGER NOT NULL DEFAULT 0 | `CHECK (is_category IN (0, 1))`; category-mode document flag for tree icon + placement counters |
+| `is_finished` | INTEGER NOT NULL DEFAULT 0 | `CHECK (is_finished IN (0, 1))`; finished document flag (workspace toggle; no hide-empty-fields behavior in this pass) |
+| `is_minor` | INTEGER NOT NULL DEFAULT 0 | `CHECK (is_minor IN (0, 1))`; minor document flag (muted tree/tab label when no custom text color) |
+| `is_dead` | INTEGER NOT NULL DEFAULT 0 | `CHECK (is_dead IN (0, 1))`; dead/gone/destroyed flag (dagger prefix + strikethrough on tree/tab label) |
 | `created_at_ms`, `updated_at_ms` | INTEGER | |
 
 **World → documents (1:N):** enforced by required **`world_id`**. Deleting a **world** that still has **documents** fails at the database (**RESTRICT**).
@@ -197,6 +203,8 @@ src-electron/mainScripts/projectManagement/
     faProjectDocumentAppearanceSchemaPatchWiring.ts  # idempotent v1 documents appearance color patch
     faProjectContentRowMap.ts           # row → DTO mappers
   projectDbContent/
+    faProjectWorldColorEmptyAllowedSchemaPatchWiring.ts  # idempotent worlds.color empty CHECK rebuild
+    faProjectDocumentAppearanceEmptyColorSchemaPatchWiring.ts  # idempotent documents appearance empty CHECK rebuild
     faProjectContentNamedEntitySqlWiring.ts
     faProjectWorldsSqlWiring.ts
     faProjectWorldBootstrapWiring.ts

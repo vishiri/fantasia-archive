@@ -5,3 +5,8 @@ export {
   recomputeOpenedDocumentTabHasUnsavedChanges,
   resolveOpenedDocumentAppearanceColorDraftForPersist
 } from './functions/openedDocumentTabAppearance'
+export {
+  normalizeOpenedDocumentParentIdFromDb,
+  resolveOpenedDocumentParentIdDraftForPersist,
+  resolveOpenedDocumentParentMoveAppendSortOrder
+} from './functions/openedDocumentParentId'

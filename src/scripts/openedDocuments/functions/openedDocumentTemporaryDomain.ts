@@ -4,6 +4,15 @@ import type {
   T_faOpenedDocumentPersistenceState
 } from 'app/types/I_faOpenedDocumentsDomain'
 
+function mapSavedParentDocumentIdFromDb (
+  value: string | null | undefined
+): string {
+  if (value === null || value === undefined) {
+    return ''
+  }
+  return value
+}
+
 function mapSavedAppearanceColorFromDb (
   value: string | null | undefined
 ): string {
@@ -73,6 +82,7 @@ export function createTemporaryOpenedDocumentTabCopySeed (input: {
 }): I_faOpenedDocumentTab {
   const documentTextColor = mapSavedAppearanceColorFromDb(input.documentTextColor)
   const documentBackgroundColor = mapSavedAppearanceColorFromDb(input.documentBackgroundColor)
+  const parentDocumentId = mapSavedParentDocumentIdFromDb(input.parentDocumentId)
   const temporaryParentResolveDocumentIds = input.temporaryParentResolveDocumentIds === undefined
     ? undefined
     : [...input.temporaryParentResolveDocumentIds]
@@ -83,11 +93,21 @@ export function createTemporaryOpenedDocumentTabCopySeed (input: {
     documentTextColorDraft: documentTextColor,
     editState: true,
     hasUnsavedChanges: false,
+    isCategoryDraft: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    isDeadDraft: false,
     parentDocumentId: input.parentDocumentId,
+    parentDocumentIdDraft: parentDocumentId,
+    savedParentDocumentId: parentDocumentId,
     persistenceState: 'temporary',
     savedDisplayName: input.displayName,
     savedDocumentBackgroundColor: documentBackgroundColor,
     savedDocumentTextColor: documentTextColor,
+    savedIsCategory: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
     tabLabel: input.tabLabel,
     templateIcon: input.templateIcon,
     templateId: input.templateId,
@@ -109,6 +129,7 @@ export function createTemporaryOpenedDocumentTabSeed (input: {
   temporaryParentResolveDocumentIds?: readonly string[] | undefined
   worldId: string
 }): I_faOpenedDocumentTab {
+  const parentDocumentId = mapSavedParentDocumentIdFromDb(input.parentDocumentId)
   return {
     displayNameDraft: input.displayName,
     documentId: input.documentId,
@@ -116,11 +137,21 @@ export function createTemporaryOpenedDocumentTabSeed (input: {
     documentTextColorDraft: '',
     editState: true,
     hasUnsavedChanges: false,
+    isCategoryDraft: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    isDeadDraft: false,
     parentDocumentId: input.parentDocumentId,
+    parentDocumentIdDraft: parentDocumentId,
+    savedParentDocumentId: parentDocumentId,
     persistenceState: 'temporary',
     savedDisplayName: input.displayName,
     savedDocumentBackgroundColor: '',
     savedDocumentTextColor: '',
+    savedIsCategory: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
     tabLabel: input.tabLabel,
     templateIcon: input.templateIcon,
     templateId: input.templateId,
@@ -136,9 +167,12 @@ export function applyTemporaryOpenedDocumentParent (
   tab: I_faOpenedDocumentTab,
   parentDocumentId: string | null
 ): I_faOpenedDocumentTab {
+  const normalizedParentDocumentId = mapSavedParentDocumentIdFromDb(parentDocumentId)
   return {
     ...tab,
-    parentDocumentId
+    parentDocumentId,
+    parentDocumentIdDraft: normalizedParentDocumentId,
+    savedParentDocumentId: normalizedParentDocumentId
   }
 }
 
@@ -153,6 +187,11 @@ export function promoteTemporaryOpenedDocumentTabAfterCreate (
     savedDisplayName: string
     savedDocumentTextColor?: string | null | undefined
     savedDocumentBackgroundColor?: string | null | undefined
+    savedIsCategory?: boolean | undefined
+    savedIsFinished?: boolean | undefined
+    savedIsMinor?: boolean | undefined
+    savedIsDead?: boolean | undefined
+    savedParentDocumentId?: string | null | undefined
   }
 ): I_faOpenedDocumentTab {
   const savedDocumentTextColor = mapSavedAppearanceColorFromDb(
@@ -160,6 +199,13 @@ export function promoteTemporaryOpenedDocumentTabAfterCreate (
   )
   const savedDocumentBackgroundColor = mapSavedAppearanceColorFromDb(
     input.savedDocumentBackgroundColor
+  )
+  const savedIsCategory = input.savedIsCategory === true
+  const savedIsFinished = input.savedIsFinished === true
+  const savedIsMinor = input.savedIsMinor === true
+  const savedIsDead = input.savedIsDead === true
+  const savedParentDocumentId = mapSavedParentDocumentIdFromDb(
+    input.savedParentDocumentId
   )
   return {
     ...tab,
@@ -169,11 +215,21 @@ export function promoteTemporaryOpenedDocumentTabAfterCreate (
     documentTextColorDraft: savedDocumentTextColor,
     editState: input.keepEditMode,
     hasUnsavedChanges: false,
+    isCategoryDraft: savedIsCategory,
+    isFinishedDraft: savedIsFinished,
+    isMinorDraft: savedIsMinor,
+    isDeadDraft: savedIsDead,
     parentDocumentId: undefined,
+    parentDocumentIdDraft: savedParentDocumentId,
+    savedParentDocumentId,
     persistenceState: 'persisted',
     savedDisplayName: input.savedDisplayName,
     savedDocumentBackgroundColor,
     savedDocumentTextColor,
+    savedIsCategory,
+    savedIsFinished,
+    savedIsMinor,
+    savedIsDead,
     templateId: undefined,
     temporaryParentResolveDocumentIds: undefined,
     worldId: tab.worldId
@@ -203,62 +259,6 @@ export function resolveTemporaryOpenedDocumentParentDocumentId (
   input: Pick<I_faTemporaryOpenedDocumentCreateInput, 'parentDocumentId'>
 ): string | null {
   return input.parentDocumentId ?? null
-}
-
-/**
- * Builds ordered document ids from the intended parent upward via getDocumentById.
- */
-export async function buildTemporaryDocumentParentResolveDocumentIds (deps: {
-  getDocumentById: (documentId: string) => Promise<{ parentDocumentId: string | null }>
-  startDocumentId: string
-}): Promise<string[]> {
-  const chain: string[] = []
-  let currentDocumentId: string | null = deps.startDocumentId
-  while (currentDocumentId !== null) {
-    chain.push(currentDocumentId)
-    const document = await deps.getDocumentById(currentDocumentId)
-    currentDocumentId = document.parentDocumentId ?? null
-  }
-  return chain
-}
-
-/**
- * Builds parent resolve chain for a child of an opened tab, including unsaved temporary parents.
- */
-export async function buildTemporaryDocumentParentResolveDocumentIdsFromOpenedTab (deps: {
-  getDocumentById: (documentId: string) => Promise<{ parentDocumentId: string | null }>
-  sourceTab: I_faOpenedDocumentTab
-}): Promise<string[]> {
-  if (resolveOpenedDocumentTabIsTemporary(deps.sourceTab.persistenceState)) {
-    const chain: string[] = [deps.sourceTab.documentId]
-    const parentChain = deps.sourceTab.temporaryParentResolveDocumentIds ?? []
-    for (const documentId of parentChain) {
-      if (documentId !== deps.sourceTab.documentId) {
-        chain.push(documentId)
-      }
-    }
-    return chain
-  }
-
-  return buildTemporaryDocumentParentResolveDocumentIds({
-    getDocumentById: deps.getDocumentById,
-    startDocumentId: deps.sourceTab.documentId
-  })
-}
-
-/**
- * Picks the first id in the resolve chain that still exists in the project database.
- */
-export function resolveTemporaryDocumentParentDocumentIdForSave (input: {
-  chain: readonly string[]
-  isDocumentIdAvailable: (documentId: string) => boolean
-}): string | null {
-  for (const documentId of input.chain) {
-    if (input.isDocumentIdAvailable(documentId)) {
-      return documentId
-    }
-  }
-  return null
 }
 
 /**

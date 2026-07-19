@@ -6,16 +6,26 @@ import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 import {
   applyFaOpenedDocumentBackgroundColorDraft,
   applyFaOpenedDocumentDisplayNameDraft,
+  applyFaOpenedDocumentIsCategoryDraft,
+  applyFaOpenedDocumentIsDeadDraft,
+  applyFaOpenedDocumentIsFinishedDraft,
+  applyFaOpenedDocumentIsMinorDraft,
   applyFaOpenedDocumentTabAfterDisplayNameSave,
   applyFaOpenedDocumentTabEditState,
   applyFaOpenedDocumentTextColorDraft,
   buildFaOpenedDocumentsSnapshot,
   createFaOpenedDocumentTabFromOpenMeta,
-  hydrateFaOpenedDocumentsTabsFromSnapshot,
-  resolveFaOpenedDocumentOpenFromTree,
-  resolveFaOpenedDocumentsActiveDocumentSyncTarget,
-  removeFaOpenedDocumentTabAtIndex
+  hydrateFaOpenedDocumentsTabsFromSnapshot
 } from '../faOpenedDocumentsStoreActions'
+import {
+  applyFaOpenedDocumentParentIdDraft,
+  applyFaOpenedDocumentParentIdSyncFromHierarchy
+} from '../faOpenedDocumentsParentIdStoreActions'
+import {
+  removeFaOpenedDocumentTabAtIndex,
+  resolveFaOpenedDocumentOpenFromTree,
+  resolveFaOpenedDocumentsActiveDocumentSyncTarget
+} from '../faOpenedDocumentsTabSessionWiring'
 
 const baseTab: I_faOpenedDocumentTab = {
   documentId: 'doc-1',
@@ -28,6 +38,16 @@ const baseTab: I_faOpenedDocumentTab = {
   savedDocumentTextColor: '',
   documentBackgroundColorDraft: '',
   savedDocumentBackgroundColor: '',
+  isCategoryDraft: false,
+  savedIsCategory: false,
+  isFinishedDraft: false,
+  isMinorDraft: false,
+  isDeadDraft: false,
+  savedIsFinished: false,
+  savedIsMinor: false,
+  savedIsDead: false,
+  parentDocumentIdDraft: '',
+  savedParentDocumentId: '',
   hasUnsavedChanges: false,
   editState: false
 }
@@ -138,6 +158,50 @@ test('Test that applyFaOpenedDocumentBackgroundColorDraft marks unsaved changes'
   expect(next.hasUnsavedChanges).toBe(true)
 })
 
+test('Test that applyFaOpenedDocumentIsCategoryDraft marks unsaved changes', () => {
+  const next = applyFaOpenedDocumentIsCategoryDraft(baseTab, true)
+  expect(next.isCategoryDraft).toBe(true)
+  expect(next.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that applyFaOpenedDocumentIsMinorDraft marks unsaved changes', () => {
+  const next = applyFaOpenedDocumentIsMinorDraft(baseTab, true)
+  expect(next.isMinorDraft).toBe(true)
+  expect(next.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that applyFaOpenedDocumentIsFinishedDraft marks unsaved changes', () => {
+  const next = applyFaOpenedDocumentIsFinishedDraft(baseTab, true)
+  expect(next.isFinishedDraft).toBe(true)
+  expect(next.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that applyFaOpenedDocumentIsDeadDraft marks unsaved changes', () => {
+  const next = applyFaOpenedDocumentIsDeadDraft(baseTab, true)
+  expect(next.isDeadDraft).toBe(true)
+  expect(next.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that applyFaOpenedDocumentParentIdSyncFromHierarchy clears parent dirty state', () => {
+  const dirtyTab = {
+    ...baseTab,
+    displayNameDraft: 'Dirty',
+    hasUnsavedChanges: true,
+    parentDocumentIdDraft: 'new-parent',
+    savedParentDocumentId: 'old-parent'
+  }
+  const synced = applyFaOpenedDocumentParentIdSyncFromHierarchy(dirtyTab, 'tree-parent')
+  expect(synced.parentDocumentIdDraft).toBe('tree-parent')
+  expect(synced.savedParentDocumentId).toBe('tree-parent')
+  expect(synced.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that applyFaOpenedDocumentParentIdDraft marks unsaved changes when parent drifts', () => {
+  const next = applyFaOpenedDocumentParentIdDraft(baseTab, 'parent-2')
+  expect(next.parentDocumentIdDraft).toBe('parent-2')
+  expect(next.hasUnsavedChanges).toBe(true)
+})
+
 test('Test that applyFaOpenedDocumentTabEditState updates editState only', () => {
   const next = applyFaOpenedDocumentTabEditState(baseTab, true)
   expect(next.editState).toBe(true)
@@ -150,7 +214,12 @@ test('Test that applyFaOpenedDocumentTabAfterDisplayNameSave exits edit mode by 
     keepEditMode: false,
     savedDisplayName: 'Saved Hero',
     savedDocumentBackgroundColor: '#112233',
-    savedDocumentTextColor: '#AABBCC'
+    savedDocumentTextColor: '#AABBCC',
+    savedIsCategory: true,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    savedParentDocumentId: ''
   })
   expect(saved.savedDisplayName).toBe('Saved Hero')
   expect(saved.hasUnsavedChanges).toBe(false)
@@ -163,7 +232,12 @@ test('Test that applyFaOpenedDocumentTabAfterDisplayNameSave can keep edit mode'
     keepEditMode: true,
     savedDisplayName: 'Saved Hero',
     savedDocumentBackgroundColor: '',
-    savedDocumentTextColor: ''
+    savedDocumentTextColor: '',
+    savedIsCategory: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    savedParentDocumentId: ''
   })
   expect(saved.editState).toBe(true)
 })

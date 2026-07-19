@@ -53,10 +53,6 @@ export default {
         subtitle: 'Comportamento da árvore',
         tags: 'expandir, recolher, expandir tudo, interação',
       },
-      treeSettings: {
-        subtitle: 'Configurações de árvore',
-        tags: 'painel de árvore, visibilidade da barra lateral, layout de árvore',
-      }
     },
     openedDocumentsTabs: {
       title: 'Abrir guias de documentos',
@@ -127,9 +123,9 @@ export default {
       description: 'Esta configuração torna as barras de rolagem de FA mais largas e, portanto, permite a rolagem manual por clique diretamente nelas para dispositivos que não suportam rolagem padrão (por exemplo, mouses sem roda de rolagem).',
       tags: 'largura da barra de rolagem, clique em rolagem, mouse sem roda, trackball, toque',
     },
-    compactDocumentCount: {
+    disableCategoryCount: {
       title: 'Ocultar contagem de categorias',
-      description: 'Mostra a contagem de documentos sem o número secundário por categoria.',
+      description: 'Ocultar números de categoria na árvore hierárquica',
       tags: 'contagem simplificada, número único, menos confusão',
     },
     compactTags: {
@@ -158,8 +154,8 @@ export default {
       tags: 'dicas para iniciantes, banners de tutoriais, notas de treinador, ajuda na barra de controle',
     },
     disableDocumentCounts: {
-      title: 'Ocultar totalmente a contagem de documentos',
-      description: 'Oculta todas as informações de contagem de documentos na árvore hierárquica.',
+      title: 'Ocultar a contagem de documentos',
+      description: 'Ocultar números de documento na árvore hierárquica',
       tags: 'totaliza, sem contagens, estatísticas ocultam',
     },
     disableDocumentToolTips: {
@@ -208,11 +204,6 @@ export default {
       description: 'Oculta campos sem nenhum valor preenchido, no modo de visualização (sem edição). Observe que isso pode resultar em mudanças de layout relativamente selvagens, o que pode fazer com que o documento pareça indisciplinado em alguns casos.',
       tags: 'campos em branco, visualização somente leitura, documento compacto, mudança de layout',
     },
-    hideHierarchyTree: {
-      title: 'Ocultar árvore hierárquica',
-      description: 'Controla se a árvore hierárquica é mostrada.',
-      tags: 'barra lateral desativada, navegador oculto, painel de árvore, ocultação de contorno',
-    },
     hidePlushes: {
       title: 'Ocultar mascote Fantasia',
       description: 'Esconde o incrivelmente adorável e incrível Fantasia, o pequeno dragão arcano. Como você pôde! :(',
@@ -228,11 +219,6 @@ export default {
       description: 'Oculta o pop-up de dicas e truques da tela inicial.',
       tags: 'primeiro lançamento, integração, splash, dicas de inicialização, truques',
     },
-    hideTreeExtraIcons: {
-      title: 'Ocultar ícones extras',
-      description: 'Oculta ícones que normalmente são mostrados por conveniência, mas não adicionam funcionalidade - por exemplo, o ícone "Abrir documento" próximo a um documento sem nós filhos, que também pode ser aberto com um clique normal com o botão esquerdo em vez do ícone.',
-      tags: 'ícones redundantes, desordem, árvore mínima, ações opcionais',
-    },
     hideTreeIconAddUnder: {
       title: 'Ocultar o ícone "Adicionar em"',
       description: 'Esta opção oculta o ícone "Adicionar um novo documento ao pai selecionado".',
@@ -247,6 +233,11 @@ export default {
       title: 'Ocultar o ícone "Abrir"',
       description: 'Esta opção oculta o ícone Abrir da linha.',
       tags: 'abrir ícone, ir para documento, botão abrir linha',
+    },
+    hideTreeLines: {
+      title: 'Hide tree lines',
+      description: 'Hides the structural help-lines in the hierarchy tree.',
+      tags: 'lines, helplines, structure, tree, hierarchical, hierarchical tree'
     },
     hideTreeOrderNumbers: {
       title: 'Ocultar números de pedido',
@@ -272,11 +263,6 @@ export default {
       title: 'Inverter posição da categoria',
       description: 'Alterna as posições da categoria e dos números dos documentos.',
       tags: 'números de troca, ordem de contagem, categoria versus contagem de documentos',
-    },
-    invertTreeSorting: {
-      title: 'Inverter classificação de ordem personalizada de árvore',
-      description: 'Classifica os documentos na árvore hierárquica na direção oposta ao padrão: do mais alto para o mais baixo.',
-      tags: 'ordem reversa, ordem personalizada, direção de classificação, ascendente descendente',
     },
     limitEditorHeight: {
       title: 'Limitar a altura do editor de texto',

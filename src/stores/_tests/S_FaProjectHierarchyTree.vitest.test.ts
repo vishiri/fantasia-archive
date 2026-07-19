@@ -16,6 +16,7 @@ const listWorkspaceHierarchyLayoutMock = vi.fn(async () => ({
           hasChildren: true,
           id: 'group-1',
           rootSortOrder: 0,
+          isCategory: false,
           worldId: 'world-1'
         }
       ],
@@ -33,6 +34,7 @@ const listWorkspaceHierarchyLayoutMock = vi.fn(async () => ({
           id: 'placement-1',
           nickname: '',
           rootSortOrder: 0,
+          isCategory: false,
           worldId: 'world-1'
         }
       ],
@@ -380,6 +382,7 @@ test('Test that S_FaProjectHierarchyTree refreshLayout re-fetches after concurre
               id: 'placement-1',
               nickname: 'Blablas',
               rootSortOrder: 0,
+              isCategory: false,
               titlePluralTranslations: {},
               titleSingularTranslations: {},
               worldId: 'world-1'

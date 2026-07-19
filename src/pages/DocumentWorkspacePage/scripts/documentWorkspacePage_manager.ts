@@ -13,8 +13,10 @@ import {
   resolveOpenedDocumentTabIsInPreviewMode
 } from 'app/src/scripts/openedDocuments/functions/openedDocumentEditStateDomain'
 
-import { createUseDocumentWorkspacePage } from './functions/createUseDocumentWorkspacePage'
+import { createUseDocumentWorkspacePage } from './createUseDocumentWorkspacePage'
 import { createDocumentWorkspacePageColorPickers } from './functions/createDocumentWorkspacePageColorPickers'
+import { createDocumentWorkspacePageDocumentBooleanToggle } from './functions/createDocumentWorkspacePageDocumentBooleanToggle'
+import { createDocumentWorkspacePageIsCategoryToggle } from './functions/createDocumentWorkspacePageIsCategoryToggle'
 import { createDocumentWorkspacePageRouteEffects } from './documentWorkspacePageRouteEffects'
 
 export const useDocumentWorkspacePage = createUseDocumentWorkspacePage({
@@ -22,6 +24,8 @@ export const useDocumentWorkspacePage = createUseDocumentWorkspacePage({
   S_FaProjectHierarchyTree,
   computed,
   createDocumentWorkspacePageColorPickers,
+  createDocumentWorkspacePageDocumentBooleanToggle,
+  createDocumentWorkspacePageIsCategoryToggle,
   createDocumentWorkspacePageRouteEffects,
   i18n,
   navigateToWorkspaceHomeRoute,

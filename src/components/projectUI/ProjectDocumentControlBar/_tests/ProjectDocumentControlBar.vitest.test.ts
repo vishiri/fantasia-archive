@@ -104,6 +104,9 @@ vi.mock('../scripts/projectDocumentControlBar_manager', () => {
         resolveDocumentTabAppearanceChrome: (tab: I_faOpenedDocumentTab) => {
           return resolveDocumentTabAppearanceChromeRef.value(tab)
         },
+        resolveDocumentTabDisplayIcon: (tab: I_faOpenedDocumentTab) => {
+          return tab.isCategoryDraft === true ? 'mdi-folder-open' : tab.templateIcon
+        },
         resolveDocumentTabInlineStyle: (tab: I_faOpenedDocumentTab) => {
           return resolveDocumentTabInlineStyleRef.value(tab)
         },
@@ -454,6 +457,47 @@ test('Test that ProjectDocumentControlBar hides world globe indicators when disa
   await flushPromises()
 
   expect(document.querySelector('[data-test-locator="projectDocumentControlBar-tabWorldIndicator-doc-1"]')).toBeNull()
+
+  wrapper.unmount()
+})
+
+test('Test that ProjectDocumentControlBar renders finished and dead markers on document tabs', async () => {
+  showDocumentTabsRef.value = true
+  openedDocumentTabsRef.value = [{
+    ...sampleTab,
+    displayNameDraft: 'Marked Hero',
+    isDeadDraft: true,
+    isFinishedDraft: true
+  }]
+
+  const router = await createControlBarRouter()
+  const wrapper = mount(ProjectDocumentControlBar, {
+    global: {
+      plugins: [testI18n, router],
+      stubs: {
+        DialogDeleteOpenedDocument: true,
+        DialogDiscardOpenedDocumentTab: true,
+        ProjectDocumentControlBarTabContextMenu: true,
+        ProjectDocumentControlBarTabWorldIndicator: true,
+        QBtn: true,
+        QRouteTab: {
+          props: ['name'],
+          template: '<div :data-test-locator="\'projectDocumentControlBar-tab-\' + name"><slot /></div>'
+        },
+        QTabs: { template: '<div><slot /></div>' },
+        QTooltip: true,
+        TransitionGroup: { template: '<div><slot /></div>' }
+      }
+    }
+  })
+  await flushPromises()
+
+  const tabRoot = document.querySelector('[data-test-locator="projectDocumentControlBar-tab-doc-1"]')
+  expect(tabRoot).not.toBeNull()
+  expect(tabRoot?.querySelector('.projectDocumentControlBarTabs__finishedMarker')?.textContent).toBe('✓')
+  expect(tabRoot?.querySelector('.projectDocumentControlBarTabs__deadMarker')?.textContent).toBe('†')
+  expect(tabRoot?.querySelector('.projectDocumentControlBarTabs__tabLabelText--dead')).not.toBeNull()
+  expect(tabRoot?.querySelector('.projectDocumentControlBarTabs__tabLabelText')?.textContent).toBe('Marked Hero')
 
   wrapper.unmount()
 })

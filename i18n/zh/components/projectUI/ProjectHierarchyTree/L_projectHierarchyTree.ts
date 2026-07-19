@@ -8,5 +8,10 @@ export default {
     editDocument: '编辑文档',
     expandAllUnderNode: 'Expand all under this node',
     openDocument: '打开文档'
+  },
+  placementCountTooltip: {
+    categoryCount: '类别数量：',
+    documentCount: '文档数量：',
+    totalCount: '文档与类别数量：'
   }
 }

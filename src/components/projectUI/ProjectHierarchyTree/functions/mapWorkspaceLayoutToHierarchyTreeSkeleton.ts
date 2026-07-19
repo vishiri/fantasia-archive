@@ -39,8 +39,10 @@ function mapPlacementToNode (
   const nickname = placement.nickname.trim()
   const placementIcon = deps.resolvePlacementDisplayIcon(placement.icon)
   const node: I_faProjectHierarchyTreeHeTreeNode = {
+    categoryCount: placement.categoryCount,
     children: [],
     childrenLoaded: false,
+    documentCount: placement.documentCount,
     documentId: null,
     documentTemplateId: placement.documentTemplateId,
     groupId: placement.groupId,
@@ -139,6 +141,8 @@ function patchPlacementNodeInPlace (
   placementNode.documentTemplateId = placement.documentTemplateId
   placementNode.titlePluralTranslations = placement.titlePluralTranslations
   placementNode.titleSingularTranslations = placement.titleSingularTranslations
+  placementNode.documentCount = placement.documentCount
+  placementNode.categoryCount = placement.categoryCount
   patchDocumentSubtreeIconsInPlace(placementNode.children, placementIcon)
   deps.lazyPlaceholderApi.syncProjectHierarchyTreeNodeLazyChildren(placementNode)
 }

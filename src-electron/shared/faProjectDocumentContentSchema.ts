@@ -32,7 +32,11 @@ export const faProjectDocumentCreateInputSchema = z.object({
   parentDocumentId: nullableTemplateIdSchema.optional(),
   sortOrder: z.number().int().min(0).optional(),
   documentTextColor: faProjectDocumentNullableHexColorSchema.optional(),
-  documentBackgroundColor: faProjectDocumentNullableHexColorSchema.optional()
+  documentBackgroundColor: faProjectDocumentNullableHexColorSchema.optional(),
+  isCategory: z.boolean().optional(),
+  isFinished: z.boolean().optional(),
+  isMinor: z.boolean().optional(),
+  isDead: z.boolean().optional()
 }).strict()
 
 export const faProjectDocumentPatchSchema = z.object({
@@ -43,7 +47,11 @@ export const faProjectDocumentPatchSchema = z.object({
   parentDocumentId: nullableTemplateIdSchema.optional(),
   sortOrder: z.number().int().min(0).optional(),
   documentTextColor: faProjectDocumentNullableHexColorSchema.optional(),
-  documentBackgroundColor: faProjectDocumentNullableHexColorSchema.optional()
+  documentBackgroundColor: faProjectDocumentNullableHexColorSchema.optional(),
+  isCategory: z.boolean().optional(),
+  isFinished: z.boolean().optional(),
+  isMinor: z.boolean().optional(),
+  isDead: z.boolean().optional()
 }).strict()
 
 export const faProjectDocumentIdPayloadSchema = z.object({

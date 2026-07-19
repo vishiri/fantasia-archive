@@ -14,16 +14,23 @@ import {
   resolveProjectDocumentControlBarTabAppearanceChrome,
   resolveProjectDocumentControlBarTabInlineStyle
 } from './projectDocumentControlBarTabAppearanceChromeWiring'
+import { resolveProjectDocumentControlBarTabDisplayIcon } from '../functions/projectDocumentControlBarTabDisplayIcon'
 import { buildProjectDocumentControlBarWorldTabIndicatorApi } from './projectDocumentControlBarWorldTabIndicatorWiring'
 
 function buildProjectDocumentControlBarTabAppearanceChromeApi (): Pick<
   I_projectDocumentControlBarComposableApi,
-  'resolveDocumentTabAppearanceChrome' | 'resolveDocumentTabInlineStyle'
+  | 'resolveDocumentTabAppearanceChrome'
+  | 'resolveDocumentTabDisplayIcon'
+  | 'resolveDocumentTabInlineStyle'
 > {
   function resolveDocumentTabAppearanceChrome (
     tab: I_faOpenedDocumentTab
   ): I_faDocumentAppearanceChromeStyle | undefined {
     return resolveProjectDocumentControlBarTabAppearanceChrome(tab)
+  }
+
+  function resolveDocumentTabDisplayIcon (tab: I_faOpenedDocumentTab): string {
+    return resolveProjectDocumentControlBarTabDisplayIcon(tab)
   }
 
   function resolveDocumentTabInlineStyle (
@@ -34,6 +41,7 @@ function buildProjectDocumentControlBarTabAppearanceChromeApi (): Pick<
 
   return {
     resolveDocumentTabAppearanceChrome,
+    resolveDocumentTabDisplayIcon,
     resolveDocumentTabInlineStyle
   }
 }

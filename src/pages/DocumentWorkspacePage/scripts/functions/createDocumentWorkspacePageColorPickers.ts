@@ -66,10 +66,12 @@ function createDocumentWorkspacePageColorModels (deps: {
 export function createDocumentWorkspacePageColorPickers (
   deps: T_createDocumentWorkspacePageColorPickersDeps
 ): {
+    backgroundColorFieldDescription: I_computedRef<string>
     backgroundColorFieldLabel: I_computedRef<string>
     backgroundColorModel: I_computedRef<string>
     documentColorPickersReadOnly: I_computedRef<boolean>
     onAppendToWorldPalette: (colorPallete: string) => void
+    textColorFieldDescription: I_computedRef<string>
     textColorFieldLabel: I_computedRef<string>
     textColorModel: I_computedRef<string>
     worldColorPaletteAppend: I_computedRef<I_faColorPickerPaletteAppendConfig | undefined>
@@ -115,8 +117,16 @@ export function createDocumentWorkspacePageColorPickers (
     deps.patchWorldColorPalleteInLayout(world.id, colorPallete)
   }
 
+  const textColorFieldDescription = deps.computed(() => {
+    return deps.i18n.global.t('documentWorkspacePage.textColorFieldDescription')
+  })
+
   const textColorFieldLabel = deps.computed(() => {
     return deps.i18n.global.t('documentWorkspacePage.textColorFieldLabel')
+  })
+
+  const backgroundColorFieldDescription = deps.computed(() => {
+    return deps.i18n.global.t('documentWorkspacePage.backgroundColorFieldDescription')
   })
 
   const backgroundColorFieldLabel = deps.computed(() => {
@@ -127,10 +137,12 @@ export function createDocumentWorkspacePageColorPickers (
   const textColorModel = colorModels.textColorModel
 
   return {
+    backgroundColorFieldDescription,
     backgroundColorFieldLabel,
     backgroundColorModel,
     documentColorPickersReadOnly,
     onAppendToWorldPalette,
+    textColorFieldDescription,
     textColorFieldLabel,
     textColorModel,
     worldColorPaletteAppend,

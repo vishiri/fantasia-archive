@@ -49,13 +49,11 @@ export function mapDialogProjectSettingsWorldsToSnapshot (
   return worlds.map((world) => {
     const trimmedColor = world.color.trim()
     const item: I_faProjectWorldSnapshotItem = {
+      color: trimmedColor,
       displayNameTranslations: normalizeFaProjectWorldDisplayNameTranslations(
         world.displayNameTranslations
       ),
       id: world.id
-    }
-    if (trimmedColor.length > 0) {
-      item.color = trimmedColor
     }
     const normalizedPallete = normalizeDialogProjectSettingsColorPallete(world.colorPallete)
     if (normalizedPallete.length > 0) {

@@ -8,5 +8,10 @@ export default {
     editDocument: 'Редагувати документ',
     expandAllUnderNode: 'Expand all under this node',
     openDocument: 'Відкрити документ'
+  },
+  placementCountTooltip: {
+    categoryCount: 'Кількість категорій:',
+    documentCount: 'Кількість документів:',
+    totalCount: 'Кількість документів і категорій:'
   }
 }

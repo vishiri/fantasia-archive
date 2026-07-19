@@ -21,6 +21,16 @@ const baseTab: I_faOpenedDocumentTab = {
   savedDocumentTextColor: '#AABBCC',
   documentBackgroundColorDraft: '#112233',
   savedDocumentBackgroundColor: '#112233',
+  isCategoryDraft: false,
+  savedIsCategory: false,
+  isFinishedDraft: false,
+  isMinorDraft: false,
+  isDeadDraft: false,
+  savedIsFinished: false,
+  savedIsMinor: false,
+  savedIsDead: false,
+  parentDocumentIdDraft: '',
+  savedParentDocumentId: '',
   hasUnsavedChanges: false,
   editState: false
 }
@@ -55,12 +65,87 @@ test('Test that normalizeOpenedDocumentTabAppearanceColors fills missing color f
     documentBackgroundColorDraft: undefined as unknown as string,
     documentTextColorDraft: undefined as unknown as string,
     savedDocumentBackgroundColor: undefined as unknown as string,
-    savedDocumentTextColor: undefined as unknown as string
+    savedDocumentTextColor: undefined as unknown as string,
+    isCategoryDraft: undefined as unknown as boolean,
+    isFinishedDraft: undefined as unknown as boolean,
+    isMinorDraft: undefined as unknown as boolean,
+    isDeadDraft: undefined as unknown as boolean,
+    savedIsCategory: undefined as unknown as boolean,
+    savedIsFinished: undefined as unknown as boolean,
+    savedIsMinor: undefined as unknown as boolean,
+    savedIsDead: undefined as unknown as boolean
   })
   expect(normalized.documentTextColorDraft).toBe('')
   expect(normalized.savedDocumentTextColor).toBe('')
   expect(normalized.documentBackgroundColorDraft).toBe('')
   expect(normalized.savedDocumentBackgroundColor).toBe('')
+  expect(normalized.isFinishedDraft).toBe(false)
+  expect(normalized.isMinorDraft).toBe(false)
+  expect(normalized.isDeadDraft).toBe(false)
+  expect(normalized.savedIsFinished).toBe(false)
+  expect(normalized.savedIsMinor).toBe(false)
+  expect(normalized.savedIsDead).toBe(false)
+})
+
+/**
+ * computeOpenedDocumentHasUnsavedChanges
+ * Detects finished / minor / dead draft drift.
+ */
+test('Test that computeOpenedDocumentHasUnsavedChanges detects status flag drift', () => {
+  expect(computeOpenedDocumentHasUnsavedChanges({
+    displayNameDraft: 'Hero',
+    documentBackgroundColorDraft: '#112233',
+    documentTextColorDraft: '#AABBCC',
+    isCategoryDraft: false,
+    isFinishedDraft: true,
+    isMinorDraft: false,
+    isDeadDraft: false,
+    savedDisplayName: 'Hero',
+    savedDocumentBackgroundColor: '#112233',
+    savedDocumentTextColor: '#AABBCC',
+    savedIsCategory: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    parentDocumentIdDraft: '',
+    savedParentDocumentId: ''
+  })).toBe(true)
+  expect(computeOpenedDocumentHasUnsavedChanges({
+    displayNameDraft: 'Hero',
+    documentBackgroundColorDraft: '#112233',
+    documentTextColorDraft: '#AABBCC',
+    isCategoryDraft: false,
+    isFinishedDraft: false,
+    isMinorDraft: true,
+    isDeadDraft: false,
+    savedDisplayName: 'Hero',
+    savedDocumentBackgroundColor: '#112233',
+    savedDocumentTextColor: '#AABBCC',
+    savedIsCategory: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    parentDocumentIdDraft: '',
+    savedParentDocumentId: ''
+  })).toBe(true)
+  expect(computeOpenedDocumentHasUnsavedChanges({
+    displayNameDraft: 'Hero',
+    documentBackgroundColorDraft: '#112233',
+    documentTextColorDraft: '#AABBCC',
+    isCategoryDraft: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    isDeadDraft: true,
+    savedDisplayName: 'Hero',
+    savedDocumentBackgroundColor: '#112233',
+    savedDocumentTextColor: '#AABBCC',
+    savedIsCategory: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    parentDocumentIdDraft: '',
+    savedParentDocumentId: ''
+  })).toBe(true)
 })
 
 /**
@@ -76,8 +161,39 @@ test('Test that recomputeOpenedDocumentTabHasUnsavedChanges detects background c
     displayNameDraft: 'Hero',
     documentBackgroundColorDraft: '#112233',
     documentTextColorDraft: '#AABBCC',
+    isCategoryDraft: false,
     savedDisplayName: 'Hero',
     savedDocumentBackgroundColor: '#112233',
-    savedDocumentTextColor: '#AABBCC'
+    savedDocumentTextColor: '#AABBCC',
+    savedIsCategory: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    isDeadDraft: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    parentDocumentIdDraft: '',
+    savedParentDocumentId: ''
   })).toBe(false)
+})
+
+test('Test that computeOpenedDocumentHasUnsavedChanges detects parent id drift', () => {
+  expect(computeOpenedDocumentHasUnsavedChanges({
+    displayNameDraft: 'Hero',
+    documentBackgroundColorDraft: '#112233',
+    documentTextColorDraft: '#AABBCC',
+    isCategoryDraft: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    isDeadDraft: false,
+    parentDocumentIdDraft: 'parent-2',
+    savedDisplayName: 'Hero',
+    savedDocumentBackgroundColor: '#112233',
+    savedDocumentTextColor: '#AABBCC',
+    savedIsCategory: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    savedParentDocumentId: 'parent-1'
+  })).toBe(true)
 })

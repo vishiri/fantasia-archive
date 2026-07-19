@@ -24,6 +24,7 @@ vi.mock(
       placementId: 'place-1',
       parentDocumentId: null,
       sortOrder: 0,
+      isCategory: false,
       hasChildren: false
     })),
     reindexFaProjectHierarchyDocumentSiblings: vi.fn(() => ({

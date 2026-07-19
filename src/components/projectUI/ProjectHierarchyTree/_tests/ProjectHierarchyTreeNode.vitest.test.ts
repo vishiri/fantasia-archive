@@ -57,6 +57,36 @@ test('Test that ProjectHierarchyTreeNode renders world row chrome', () => {
 })
 
 /**
+ * Empty world color uses the theme primary CSS variable.
+ */
+test('Test that ProjectHierarchyTreeNode uses primary-bright fallback when world color is blank', () => {
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    global: {
+      stubs: {
+        QIcon: {
+          props: ['name'],
+          template: '<i class="q-icon" :name="name" />'
+        }
+      }
+    },
+    props: {
+      node: {
+        ...baseNode,
+        icon: '',
+        nodeKind: 'world',
+        worldColor: ''
+      },
+      stat: {
+        open: true
+      }
+    }
+  })
+  expect((wrapper.find('.projectHierarchyTreeNode__label').element as HTMLElement).style.color).toBe(
+    'var(--fa-color-primary-bright)'
+  )
+})
+
+/**
  * ProjectHierarchyTreeNode constrains group, placement, and document icons to layout sizing.
  */
 test('Test that ProjectHierarchyTreeNode applies layout icon sizing for non-world rows', () => {
@@ -136,6 +166,169 @@ test('Test that ProjectHierarchyTreeNode shows document rows with placement icon
   })
   expect(wrapper.find('.q-icon').attributes('name')).toBe('mdi-account')
   expect(wrapper.find('.projectHierarchyTreeNode__icon--layoutKind').exists()).toBe(true)
+})
+
+test('Test that ProjectHierarchyTreeNode shows mdi-folder-open for category documents', () => {
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    global: {
+      stubs: {
+        QIcon: {
+          props: ['name'],
+          template: '<i class="q-icon" :name="name" />'
+        },
+        ProjectHierarchyTreePlacementCount: true
+      }
+    },
+    props: {
+      node: {
+        ...baseNode,
+        documentId: 'doc-1',
+        icon: 'mdi-account',
+        isCategory: true,
+        nodeKind: 'document'
+      },
+      stat: {
+        open: false
+      }
+    }
+  })
+  expect(wrapper.find('.q-icon').attributes('name')).toBe('mdi-folder-open')
+})
+
+test('Test that ProjectHierarchyTreeNode shows dead marker and strikethrough for dead documents', () => {
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    global: {
+      stubs: {
+        QIcon: {
+          props: ['name'],
+          template: '<i class="q-icon" :name="name" />'
+        },
+        ProjectHierarchyTreePlacementCount: true
+      }
+    },
+    props: {
+      node: {
+        ...baseNode,
+        documentId: 'doc-dead',
+        icon: 'mdi-account',
+        isDead: true,
+        nodeKind: 'document'
+      },
+      stat: {
+        open: false
+      }
+    }
+  })
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-node-document-deadMarker"]').text()).toBe('†')
+  expect(wrapper.find('.projectHierarchyTreeNode__label--dead').exists()).toBe(true)
+})
+
+test('Test that ProjectHierarchyTreeNode applies muted grey for minor documents without text color', () => {
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    global: {
+      stubs: {
+        QIcon: {
+          props: ['name'],
+          template: '<i class="q-icon" :name="name" />'
+        },
+        ProjectHierarchyTreePlacementCount: true
+      }
+    },
+    props: {
+      node: {
+        ...baseNode,
+        documentId: 'doc-minor',
+        documentTextColor: '',
+        icon: 'mdi-account',
+        isMinor: true,
+        nodeKind: 'document'
+      },
+      stat: {
+        open: false
+      }
+    }
+  })
+  const label = wrapper.find('[data-test-locator="projectHierarchyTree-node-document-label"]')
+  expect(label.attributes('style')).toContain('var(--fa-color-text-muted)')
+})
+
+test('Test that ProjectHierarchyTreeNode shows finished check mark before dead dagger', () => {
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    global: {
+      stubs: {
+        QIcon: {
+          props: ['name'],
+          template: '<i class="q-icon" :name="name" />'
+        },
+        ProjectHierarchyTreePlacementCount: true
+      }
+    },
+    props: {
+      node: {
+        ...baseNode,
+        documentId: 'doc-finished-dead',
+        icon: 'mdi-account',
+        isDead: true,
+        isFinished: true,
+        nodeKind: 'document'
+      },
+      stat: {
+        open: false
+      }
+    }
+  })
+  const finishedMarker = wrapper.find('[data-test-locator="projectHierarchyTree-node-document-finishedMarker"]')
+  const deadMarker = wrapper.find('[data-test-locator="projectHierarchyTree-node-document-deadMarker"]')
+  expect(finishedMarker.text()).toBe('✓')
+  expect(deadMarker.text()).toBe('†')
+  expect(finishedMarker.element.nextElementSibling).toBe(deadMarker.element)
+})
+
+test('Test that ProjectHierarchyTreeNode renders placement counts from display prop', () => {
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    global: {
+      stubs: {
+        ProjectHierarchyTreePlacementCount: {
+          props: ['categoryCount', 'documentCount', 'display'],
+          template: '<span data-test-locator="placement-count-stub" />'
+        },
+        QIcon: {
+          props: ['name'],
+          template: '<i class="q-icon" :name="name" />'
+        }
+      }
+    },
+    props: {
+      node: {
+        ...baseNode,
+        categoryCount: 3,
+        documentCount: 7,
+        nodeKind: 'templatePlacement'
+      },
+      placementCountDisplay: {
+        categoryCount: 3,
+        display: {
+          segments: [
+            {
+              kind: 'document',
+              value: 7
+            },
+            {
+              kind: 'category',
+              value: 3
+            }
+          ],
+          showDivider: true,
+          shows: true
+        },
+        documentCount: 7
+      },
+      stat: {
+        open: false
+      }
+    }
+  })
+  expect(wrapper.find('[data-test-locator="placement-count-stub"]').exists()).toBe(true)
 })
 
 /**

@@ -4,8 +4,6 @@ import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
 import {
   applyTemporaryOpenedDocumentParent,
-  buildTemporaryDocumentParentResolveDocumentIds,
-  buildTemporaryDocumentParentResolveDocumentIdsFromOpenedTab,
   createTemporaryOpenedDocumentTabCopySeed,
   createTemporaryOpenedDocumentTabSeed,
   normalizeOpenedDocumentTabPersistenceState,
@@ -13,10 +11,14 @@ import {
   remapOpenedDocumentTabDocumentId,
   resolveOpenedDocumentTabIsPersisted,
   resolveOpenedDocumentTabIsTemporary,
-  resolveTemporaryDocumentParentDocumentIdForSave,
   resolveTemporaryOpenedDocumentDisplayNameForSave,
   resolveTemporaryOpenedDocumentParentDocumentId
 } from '../openedDocumentTemporaryDomain'
+import {
+  buildTemporaryDocumentParentResolveDocumentIds,
+  buildTemporaryDocumentParentResolveDocumentIdsFromOpenedTab,
+  resolveTemporaryDocumentParentDocumentIdForSave
+} from '../openedDocumentTemporaryParentResolve'
 import { computeOpenedDocumentHasUnsavedChanges } from '../openedDocumentTabAppearance'
 
 import { resolveCopyOfDocumentDisplayName } from '../resolveCopyOfDocumentDisplayName'
@@ -87,6 +89,16 @@ test('Test that createTemporaryOpenedDocumentTabSeed marks unsaved changes only 
     documentTextColorDraft: tab.documentTextColorDraft,
     savedDisplayName: tab.savedDisplayName,
     savedDocumentBackgroundColor: tab.savedDocumentBackgroundColor,
+    isCategoryDraft: false,
+    savedIsCategory: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    isDeadDraft: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    parentDocumentIdDraft: '',
+    savedParentDocumentId: '',
     savedDocumentTextColor: tab.savedDocumentTextColor
   })).toBe(true)
 })
@@ -327,6 +339,16 @@ test('Test that buildTemporaryDocumentParentResolveDocumentIdsFromOpenedTab walk
     persistenceState: 'persisted',
     savedDisplayName: 'Child',
     savedDocumentBackgroundColor: '',
+    isCategoryDraft: false,
+    savedIsCategory: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    isDeadDraft: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    parentDocumentIdDraft: '',
+    savedParentDocumentId: '',
     savedDocumentTextColor: '',
     tabLabel: 'Character',
     templateIcon: 'mdi-account'

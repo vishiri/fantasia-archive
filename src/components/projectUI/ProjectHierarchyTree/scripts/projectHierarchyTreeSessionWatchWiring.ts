@@ -19,7 +19,7 @@ type T_projectHierarchyTreeSessionLifecycleDeps = {
   openNodeIds: Ref<Set<string>>
   pendingRevealPath: Ref<string[]>
   resetOnProjectClose: () => void
-  resyncTreeDataFromLayout: () => void
+  resyncTreeDataFromLayout: () => { structureMatched: boolean } | void
   restoreExpandedSnapshot: (expandedNodeIds: string[]) => Promise<void>
   revealPendingPath: () => Promise<void>
   shouldDeferWorldsExpandRestore: () => boolean
@@ -27,6 +27,23 @@ type T_projectHierarchyTreeSessionLifecycleDeps = {
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
   watch: typeof watchFn
   worlds: Ref<unknown[]>
+}
+
+async function runProjectHierarchyTreeWorldsLayoutRestore (
+  deps: T_projectHierarchyTreeSessionLifecycleDeps
+): Promise<void> {
+  if (deps.shouldDeferWorldsExpandRestore()) {
+    return
+  }
+  const expandedSnapshot = collectProjectHierarchyTreePersistedExpandedNodeIds(
+    deps.treeData.value,
+    deps.openNodeIds.value
+  )
+  const resyncResult = deps.resyncTreeDataFromLayout()
+  if (resyncResult?.structureMatched === true) {
+    return
+  }
+  await deps.restoreExpandedSnapshot(expandedSnapshot)
 }
 
 export function wireProjectHierarchyTreeSessionLifecycle (
@@ -53,17 +70,8 @@ export function wireProjectHierarchyTreeSessionLifecycle (
       deps.layoutRefreshGeneration.value,
       deps.worlds.value
     ] as const,
-    async () => {
-      const deferRestore = deps.shouldDeferWorldsExpandRestore()
-      if (deferRestore) {
-        return
-      }
-      const expandedSnapshot = collectProjectHierarchyTreePersistedExpandedNodeIds(
-        deps.treeData.value,
-        deps.openNodeIds.value
-      )
-      deps.resyncTreeDataFromLayout()
-      await deps.restoreExpandedSnapshot(expandedSnapshot)
+    () => {
+      void runProjectHierarchyTreeWorldsLayoutRestore(deps)
     },
     {
       deep: true

@@ -27,3 +27,14 @@ test('Test that resolveProjectHierarchyTreeDocumentAppearanceChrome maps text-on
     color: '#aabbcc'
   })
 })
+
+test('Test that resolveProjectHierarchyTreeDocumentAppearanceChrome applies minor muted grey without text color', () => {
+  expect(resolveProjectHierarchyTreeDocumentAppearanceChrome({
+    documentBackgroundColor: '',
+    documentTextColor: '',
+    isMinor: true,
+    nodeKind: 'document'
+  })).toEqual({
+    color: 'var(--fa-color-text-muted)'
+  })
+})

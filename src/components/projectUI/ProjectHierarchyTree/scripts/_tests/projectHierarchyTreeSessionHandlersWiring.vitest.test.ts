@@ -107,6 +107,7 @@ const sampleWorld = {
       titlePluralTranslations: {},
       titleSingularTranslations: {},
       rootSortOrder: 0,
+      isCategory: false,
       worldId: 'world-1'
     }
   ],

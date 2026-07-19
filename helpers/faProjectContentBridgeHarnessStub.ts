@@ -42,6 +42,10 @@ function stubDocumentTemplate () {
   }
 }
 
+import {
+  FA_PROJECT_DOCUMENT_STATUS_FLAG_DEFAULTS
+} from './openedDocumentTabTestStatusFlagDefaults'
+
 function stubDocument () {
   return {
     ...stubNamedEntity(),
@@ -51,7 +55,8 @@ function stubDocument () {
     parentDocumentId: null,
     sortOrder: 0,
     documentTextColor: null,
-    documentBackgroundColor: null
+    documentBackgroundColor: null,
+    ...FA_PROJECT_DOCUMENT_STATUS_FLAG_DEFAULTS
   }
 }
 
@@ -90,6 +95,7 @@ export function createFaProjectContentBridgeHarnessStub (): I_faProjectContentAP
       placementId: 'placement-stub',
       parentDocumentId: null,
       sortOrder: 0,
+      isCategory: false,
       hasChildren: false
     }),
     moveDocumentInHierarchy: async () => ({
@@ -98,6 +104,7 @@ export function createFaProjectContentBridgeHarnessStub (): I_faProjectContentAP
       placementId: 'placement-stub',
       parentDocumentId: null,
       sortOrder: 0,
+      isCategory: false,
       hasChildren: false
     }),
     searchProjectHierarchy: async (query) => {

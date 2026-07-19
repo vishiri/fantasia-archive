@@ -5,15 +5,12 @@ import { coerceFaProjectWorldColorForStorage } from '../coerceFaProjectWorldColo
 
 /**
  * coerceFaProjectWorldColorForStorage
- * Blank input falls back to the schema default color.
+ * Blank input stays empty so Project Settings can clear optional world color.
  */
-test('Test that coerceFaProjectWorldColorForStorage uses default for blank input', () => {
-  expect(coerceFaProjectWorldColorForStorage(undefined, FA_PROJECT_WORLD_DEFAULT_COLOR)).toBe(
-    FA_PROJECT_WORLD_DEFAULT_COLOR
-  )
-  expect(coerceFaProjectWorldColorForStorage('   ', FA_PROJECT_WORLD_DEFAULT_COLOR)).toBe(
-    FA_PROJECT_WORLD_DEFAULT_COLOR
-  )
+test('Test that coerceFaProjectWorldColorForStorage keeps blank input empty', () => {
+  expect(coerceFaProjectWorldColorForStorage(undefined, FA_PROJECT_WORLD_DEFAULT_COLOR)).toBe('')
+  expect(coerceFaProjectWorldColorForStorage('   ', FA_PROJECT_WORLD_DEFAULT_COLOR)).toBe('')
+  expect(coerceFaProjectWorldColorForStorage('', FA_PROJECT_WORLD_DEFAULT_COLOR)).toBe('')
 })
 
 /**

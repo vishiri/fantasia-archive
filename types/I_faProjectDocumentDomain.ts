@@ -11,6 +11,10 @@ export interface I_faProjectDocument {
   displayName: string
   documentTextColor: string | null
   documentBackgroundColor: string | null
+  isCategory: boolean
+  isFinished: boolean
+  isMinor: boolean
+  isDead: boolean
   createdAtMs: number
   updatedAtMs: number
 }
@@ -26,6 +30,10 @@ export interface I_faProjectDocumentCreateInput {
   sortOrder?: number | undefined
   documentTextColor?: string | null | undefined
   documentBackgroundColor?: string | null | undefined
+  isCategory?: boolean | undefined
+  isFinished?: boolean | undefined
+  isMinor?: boolean | undefined
+  isDead?: boolean | undefined
 }
 
 export interface I_faProjectDocumentPatch {
@@ -37,6 +45,10 @@ export interface I_faProjectDocumentPatch {
   sortOrder?: number | undefined
   documentTextColor?: string | null | undefined
   documentBackgroundColor?: string | null | undefined
+  isCategory?: boolean | undefined
+  isFinished?: boolean | undefined
+  isMinor?: boolean | undefined
+  isDead?: boolean | undefined
 }
 
 export interface I_faProjectDocumentListFilter {

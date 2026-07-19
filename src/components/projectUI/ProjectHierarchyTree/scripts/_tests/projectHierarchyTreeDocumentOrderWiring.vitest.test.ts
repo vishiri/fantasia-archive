@@ -111,6 +111,7 @@ const sampleWorld = {
       hasChildren: true,
       id: 'group-1',
       rootSortOrder: 0,
+      isCategory: false,
       worldId: 'world-1'
     }
   ],
@@ -121,6 +122,7 @@ const sampleWorld = {
       documentTemplateId: 'template-1',
       groupId: 'group-1',
       groupSortOrder: 0,
+      isCategory: false,
       hasChildren: true,
       icon: 'mdi-account',
       titlePluralTranslations: {},

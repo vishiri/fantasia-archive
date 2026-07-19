@@ -8,5 +8,10 @@ export default {
     editDocument: 'Muokkaa asiakirjaa',
     expandAllUnderNode: 'Expand all under this node',
     openDocument: 'Avaa asiakirja'
+  },
+  placementCountTooltip: {
+    categoryCount: 'Kategorioiden määrä:',
+    documentCount: 'Asiakirjojen määrä:',
+    totalCount: 'Asiakirjojen ja kategorioiden määrä:'
   }
 }

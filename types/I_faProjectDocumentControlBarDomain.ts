@@ -34,6 +34,7 @@ export interface I_projectDocumentControlBarComposableApi {
   resolveDocumentTabRoute: (documentId: string) => string
   resolveDocumentTabLabel: (tab: I_faOpenedDocumentTab) => string
   resolveDocumentTabAppearanceChrome: (tab: I_faOpenedDocumentTab) => I_faDocumentAppearanceChromeStyle | undefined
+  resolveDocumentTabDisplayIcon: (tab: I_faOpenedDocumentTab) => string
   resolveDocumentTabInlineStyle: (tab: I_faOpenedDocumentTab) => CSSProperties | undefined
   resolveTabWorldIndicatorColor: (tab: I_faOpenedDocumentTab) => string | null
   saveDocumentButtonColor: I_computedRef<T_projectDocumentControlBarSaveButtonColor>

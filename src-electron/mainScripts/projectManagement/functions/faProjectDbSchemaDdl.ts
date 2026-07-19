@@ -25,6 +25,18 @@ export const FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN = 'document_text_color'
 /** documents optional background color (#RRGGBB) */
 export const FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN = 'document_background_color'
 
+/** documents category flag (folder icon + placement counts) */
+export const FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN = 'is_category'
+
+/** documents finished flag (workspace toggle; no view-mode field hiding in this pass) */
+export const FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN = 'is_finished'
+
+/** documents minor flag (muted tree/tab label when no custom text color) */
+export const FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN = 'is_minor'
+
+/** documents dead flag (dagger prefix + strikethrough on tree/tab label) */
+export const FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN = 'is_dead'
+
 /** Composite index on documents tree hierarchy columns */
 export const FA_PROJECT_DOCUMENT_TREE_PLACEMENT_PARENT_SORT_INDEX =
   'idx_documents_tree_placement_parent_sort'
@@ -40,6 +52,33 @@ export const FA_PROJECT_DOCUMENT_TREE_LEGACY_PLACEMENT_PARENT_SORT_INDEX =
 
 /** Default worlds.color hex when inserting worlds without an override. */
 export const FA_PROJECT_WORLD_DEFAULT_COLOR = '#808080'
+
+/**
+ * worlds.color CHECK: empty string (optional color) or #RRGGBB.
+ * Keep in sync with faProjectWorldColorEmptyAllowedSchemaPatchWiring rebuild DDL.
+ */
+export const FA_PROJECT_WORLD_COLOR_CHECK_SQL =
+  '(color = \'\' OR (length(color) = 7 AND substr(color, 1, 1) = \'#\'))'
+
+/**
+ * documents.document_text_color CHECK: NULL, empty, or #RRGGBB.
+ * Keep in sync with document appearance empty-color rebuild patch.
+ */
+export const FA_PROJECT_DOCUMENT_TEXT_COLOR_CHECK_SQL =
+  `(${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN} IS NULL OR ` +
+  `${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN} = '' OR (` +
+  `length(${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN}) = 7 AND ` +
+  `substr(${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN}, 1, 1) = '#'))`
+
+/**
+ * documents.document_background_color CHECK: NULL, empty, or #RRGGBB.
+ * Keep in sync with document appearance empty-color rebuild patch.
+ */
+export const FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_CHECK_SQL =
+  `(${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN} IS NULL OR ` +
+  `${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN} = '' OR (` +
+  `length(${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}) = 7 AND ` +
+  `substr(${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}, 1, 1) = '#'))`
 
 /** Max stored length for worlds.color_pallete (semicolon-separated #RRGGBB list). */
 export const FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH = 2000
@@ -128,7 +167,7 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_WORLDS} (
   display_name_translations_json TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_DEFAULT_DISPLAY_NAME_TRANSLATIONS_JSON}'
   CHECK (length(display_name_translations_json) <= ${FA_PROJECT_WORLD_DISPLAY_NAME_TRANSLATIONS_JSON_MAX_LENGTH}),
   color TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_DEFAULT_COLOR}'
-  CHECK (length(color) = 7 AND substr(color, 1, 1) = '#'),
+  CHECK ${FA_PROJECT_WORLD_COLOR_CHECK_SQL},
   color_pallete TEXT NOT NULL DEFAULT '${FA_PROJECT_WORLD_DEFAULT_COLOR_PALETTE}'
   CHECK (length(color_pallete) <= ${FA_PROJECT_WORLD_COLOR_PALETTE_MAX_LENGTH}),
   sort_order INTEGER NOT NULL DEFAULT 0,
@@ -177,15 +216,17 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_DOCUMENTS} (
   ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} INTEGER NOT NULL DEFAULT 0,
   display_name TEXT NOT NULL CHECK (length(display_name) > 0),
   ${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN} TEXT
-  CHECK (${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN} IS NULL OR (
-    length(${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN}) = 7 AND
-    substr(${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN}, 1, 1) = '#'
-  )),
+  CHECK ${FA_PROJECT_DOCUMENT_TEXT_COLOR_CHECK_SQL},
   ${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN} TEXT
-  CHECK (${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN} IS NULL OR (
-    length(${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}) = 7 AND
-    substr(${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}, 1, 1) = '#'
-  )),
+  CHECK ${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_CHECK_SQL},
+  ${FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN} INTEGER NOT NULL DEFAULT 0
+  CHECK (${FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN} IN (0, 1)),
+  ${FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN} INTEGER NOT NULL DEFAULT 0
+  CHECK (${FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN} IN (0, 1)),
+  ${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN} INTEGER NOT NULL DEFAULT 0
+  CHECK (${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN} IN (0, 1)),
+  ${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN} INTEGER NOT NULL DEFAULT 0
+  CHECK (${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN} IN (0, 1)),
   created_at_ms INTEGER NOT NULL,
   updated_at_ms INTEGER NOT NULL
 );

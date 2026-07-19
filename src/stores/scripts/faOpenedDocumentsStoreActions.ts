@@ -1,23 +1,17 @@
-import type { Ref } from 'vue'
-
 import type {
   I_faOpenedDocumentTab,
   I_faOpenedDocumentTreeOpenMeta,
-  I_faOpenedDocumentsSnapshot,
-  T_faOpenedDocumentOpenMode
+  I_faOpenedDocumentsSnapshot
 } from 'app/types/I_faOpenedDocumentsDomain'
 import { FA_OPENED_DOCUMENTS_SNAPSHOT_SCHEMA_VERSION } from 'app/types/I_faOpenedDocumentsDomain'
 import {
   normalizeOpenedDocumentAppearanceColorFromDb,
+  normalizeOpenedDocumentParentIdFromDb,
   normalizeOpenedDocumentTabAppearanceColors,
   recomputeOpenedDocumentTabHasUnsavedChanges
 } from 'app/src/scripts/openedDocuments/openedDocumentTabAppearanceWiring'
 import {
-  appendOpenedDocumentTabToRight,
-  duplicateOpenedDocumentTabs,
-  findOpenedDocumentTabIndexByDocumentId,
-  removeOpenedDocumentTabAtIndex,
-  resolveOpenedDocumentTabFocusIndexAfterClose
+  duplicateOpenedDocumentTabs
 } from 'app/src/scripts/openedDocuments/functions/openedDocumentTabDomain'
 import { normalizeOpenedDocumentTabEditState } from 'app/src/scripts/openedDocuments/functions/openedDocumentEditStateDomain'
 import { normalizeOpenedDocumentTabPersistenceState } from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
@@ -56,11 +50,21 @@ export function createFaOpenedDocumentTabFromOpenMeta (input: {
   worldId: string
   documentTextColor?: string | null | undefined
   documentBackgroundColor?: string | null | undefined
+  isCategory?: boolean | undefined
+  isFinished?: boolean | undefined
+  isMinor?: boolean | undefined
+  isDead?: boolean | undefined
+  parentDocumentId?: string | null | undefined
 }): I_faOpenedDocumentTab {
   const documentTextColor = normalizeOpenedDocumentAppearanceColorFromDb(input.documentTextColor)
   const documentBackgroundColor = normalizeOpenedDocumentAppearanceColorFromDb(
     input.documentBackgroundColor
   )
+  const parentDocumentId = normalizeOpenedDocumentParentIdFromDb(input.parentDocumentId)
+  const isCategory = input.isCategory === true
+  const isFinished = input.isFinished === true
+  const isMinor = input.isMinor === true
+  const isDead = input.isDead === true
   return {
     documentId: input.documentId,
     persistenceState: 'persisted',
@@ -72,6 +76,16 @@ export function createFaOpenedDocumentTabFromOpenMeta (input: {
     savedDocumentTextColor: documentTextColor,
     documentBackgroundColorDraft: documentBackgroundColor,
     savedDocumentBackgroundColor: documentBackgroundColor,
+    isCategoryDraft: isCategory,
+    savedIsCategory: isCategory,
+    isFinishedDraft: isFinished,
+    savedIsFinished: isFinished,
+    isMinorDraft: isMinor,
+    savedIsMinor: isMinor,
+    isDeadDraft: isDead,
+    savedIsDead: isDead,
+    parentDocumentIdDraft: parentDocumentId,
+    savedParentDocumentId: parentDocumentId,
     hasUnsavedChanges: false,
     editState: FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE,
     worldId: input.worldId
@@ -120,6 +134,62 @@ export function applyFaOpenedDocumentBackgroundColorDraft (
   }
 }
 
+export function applyFaOpenedDocumentIsCategoryDraft (
+  tab: I_faOpenedDocumentTab,
+  nextDraft: boolean
+): I_faOpenedDocumentTab {
+  const nextTab = {
+    ...tab,
+    isCategoryDraft: nextDraft
+  }
+  return {
+    ...nextTab,
+    hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
+  }
+}
+
+export function applyFaOpenedDocumentIsFinishedDraft (
+  tab: I_faOpenedDocumentTab,
+  nextDraft: boolean
+): I_faOpenedDocumentTab {
+  const nextTab = {
+    ...tab,
+    isFinishedDraft: nextDraft
+  }
+  return {
+    ...nextTab,
+    hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
+  }
+}
+
+export function applyFaOpenedDocumentIsMinorDraft (
+  tab: I_faOpenedDocumentTab,
+  nextDraft: boolean
+): I_faOpenedDocumentTab {
+  const nextTab = {
+    ...tab,
+    isMinorDraft: nextDraft
+  }
+  return {
+    ...nextTab,
+    hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
+  }
+}
+
+export function applyFaOpenedDocumentIsDeadDraft (
+  tab: I_faOpenedDocumentTab,
+  nextDraft: boolean
+): I_faOpenedDocumentTab {
+  const nextTab = {
+    ...tab,
+    isDeadDraft: nextDraft
+  }
+  return {
+    ...nextTab,
+    hasUnsavedChanges: recomputeOpenedDocumentTabHasUnsavedChanges(nextTab)
+  }
+}
+
 export function applyFaOpenedDocumentTabEditState (
   tab: I_faOpenedDocumentTab,
   editState: boolean
@@ -137,6 +207,11 @@ export function applyFaOpenedDocumentTabAfterDisplayNameSave (
     savedDisplayName: string
     savedDocumentTextColor: string
     savedDocumentBackgroundColor: string
+    savedIsCategory: boolean
+    savedIsFinished: boolean
+    savedIsMinor: boolean
+    savedIsDead: boolean
+    savedParentDocumentId: string
   }
 ): I_faOpenedDocumentTab {
   return {
@@ -146,90 +221,18 @@ export function applyFaOpenedDocumentTabAfterDisplayNameSave (
     documentBackgroundColorDraft: input.savedDocumentBackgroundColor,
     editState: input.keepEditMode ? tab.editState : FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE,
     hasUnsavedChanges: false,
+    isCategoryDraft: input.savedIsCategory,
+    isFinishedDraft: input.savedIsFinished,
+    isMinorDraft: input.savedIsMinor,
+    isDeadDraft: input.savedIsDead,
+    parentDocumentIdDraft: input.savedParentDocumentId,
     savedDisplayName: input.savedDisplayName,
     savedDocumentTextColor: input.savedDocumentTextColor,
-    savedDocumentBackgroundColor: input.savedDocumentBackgroundColor
+    savedDocumentBackgroundColor: input.savedDocumentBackgroundColor,
+    savedIsCategory: input.savedIsCategory,
+    savedIsFinished: input.savedIsFinished,
+    savedIsMinor: input.savedIsMinor,
+    savedIsDead: input.savedIsDead,
+    savedParentDocumentId: input.savedParentDocumentId
   }
-}
-
-export function resolveFaOpenedDocumentOpenFromTree (deps: {
-  documentId: string
-  mode: T_faOpenedDocumentOpenMode
-  tabs: Ref<I_faOpenedDocumentTab[]>
-  activeDocumentId: Ref<string | null>
-  newTab: I_faOpenedDocumentTab
-}): {
-    shouldNavigate: boolean
-    navigateDocumentId: string | null
-  } {
-  const existingIndex = findOpenedDocumentTabIndexByDocumentId(
-    deps.tabs.value,
-    deps.documentId
-  )
-  if (existingIndex === -1) {
-    deps.tabs.value = appendOpenedDocumentTabToRight(deps.tabs.value, deps.newTab)
-  }
-  deps.activeDocumentId.value = deps.documentId
-  return {
-    shouldNavigate: true,
-    navigateDocumentId: deps.documentId
-  }
-}
-
-export function removeFaOpenedDocumentTabAtIndex (deps: {
-  tabs: Ref<I_faOpenedDocumentTab[]>
-  activeDocumentId: Ref<string | null>
-  lastRemovedIndex: Ref<number>
-  removedIndex: number
-}): {
-    nextActiveDocumentId: string | null
-    shouldNavigateHome: boolean
-  } {
-  deps.lastRemovedIndex.value = deps.removedIndex
-  const nextTabs = removeOpenedDocumentTabAtIndex(deps.tabs.value, deps.removedIndex)
-  deps.tabs.value = nextTabs
-  const focusIndex = resolveOpenedDocumentTabFocusIndexAfterClose(
-    deps.removedIndex,
-    nextTabs.length
-  )
-  if (focusIndex < 0) {
-    deps.activeDocumentId.value = null
-    return {
-      nextActiveDocumentId: null,
-      shouldNavigateHome: true
-    }
-  }
-  const nextTab = nextTabs[focusIndex]
-  if (nextTab === undefined) {
-    deps.activeDocumentId.value = null
-    return {
-      nextActiveDocumentId: null,
-      shouldNavigateHome: true
-    }
-  }
-  deps.activeDocumentId.value = nextTab.documentId
-  return {
-    nextActiveDocumentId: nextTab.documentId,
-    shouldNavigateHome: false
-  }
-}
-
-export function resolveFaOpenedDocumentsActiveDocumentSyncTarget (input: {
-  currentActiveDocumentId: string | null
-  routeDocumentId: string | null
-  routePath: string
-  tabs: readonly I_faOpenedDocumentTab[]
-}): string | null {
-  if (input.routeDocumentId !== null) {
-    if (findOpenedDocumentTabIndexByDocumentId(input.tabs, input.routeDocumentId) === -1) {
-      return input.currentActiveDocumentId
-    }
-    return input.routeDocumentId
-  }
-
-  if (input.routePath === '/home') {
-    return null
-  }
-
-  return input.currentActiveDocumentId
 }

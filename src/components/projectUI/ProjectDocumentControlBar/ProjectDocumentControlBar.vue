@@ -34,18 +34,34 @@
                   resolveDocumentTabAppearanceChrome(tab) !== undefined,
                 'projectDocumentControlBarTabs__tab--customDocumentBackground':
                   resolveDocumentTabAppearanceChrome(tab)?.backgroundColor !== undefined,
+                'projectDocumentControlBarTabs__tab--dead': tab.isDeadDraft === true,
                 'projectDocumentControlBarTabs__tab--withWorldIndicator':
                   showWorldTabIndicators && resolveTabWorldIndicatorColor(tab) !== null
               }"
               :data-test-locator="`projectDocumentControlBar-tab-${tab.documentId}`"
-              :icon="tab.templateIcon"
-              :label="resolveDocumentTabLabel(tab)"
+              :icon="resolveDocumentTabDisplayIcon(tab)"
               :name="tab.documentId"
               :ripple="false"
               :style="resolveDocumentTabInlineStyle(tab)"
               :to="resolveDocumentTabRoute(tab.documentId)"
               @auxclick.stop.prevent="onTabAuxClick(tab.documentId, $event)"
             >
+              <span class="projectDocumentControlBarTabs__tabLabel">
+                <span
+                  v-if="tab.isFinishedDraft === true"
+                  class="projectDocumentControlBarTabs__finishedMarker"
+                >✓</span>
+                <span
+                  v-if="tab.isDeadDraft === true"
+                  class="projectDocumentControlBarTabs__deadMarker"
+                >†</span>
+                <span
+                  class="projectDocumentControlBarTabs__tabLabelText"
+                  :class="{
+                    'projectDocumentControlBarTabs__tabLabelText--dead': tab.isDeadDraft === true
+                  }"
+                >{{ resolveDocumentTabLabel(tab) }}</span>
+              </span>
               <ProjectDocumentControlBarTabWorldIndicator
                 :color="resolveTabWorldIndicatorColor(tab)"
                 :document-id="tab.documentId"
@@ -80,6 +96,7 @@
                 :on-tab-move-click="onTabMoveClick"
                 :opened-document-tabs="openedDocumentTabs"
                 :resolve-document-tab-appearance-chrome="resolveDocumentTabAppearanceChrome"
+                :resolve-document-tab-display-icon="resolveDocumentTabDisplayIcon"
                 :resolve-document-tab-inline-style="resolveDocumentTabInlineStyle"
                 :resolve-document-tab-label="resolveDocumentTabLabel"
                 :resolve-document-tab-route="resolveDocumentTabRoute"
@@ -181,6 +198,7 @@ const {
   openedDocumentTabs,
   resolveDocumentTabLabel,
   resolveDocumentTabAppearanceChrome,
+  resolveDocumentTabDisplayIcon,
   resolveDocumentTabInlineStyle,
   resolveDocumentTabRoute,
   resolveTabWorldIndicatorColor,

@@ -20,8 +20,13 @@
 - **Document workspace**: Right-click a document tab or choose **Delete this document** to remove the document from the active **`.faproject`** after confirmation in the **Delete** dialog (permanent removal with no undo in the current project).
 - **Document workspace**: The tab context menu **Browse opened tabs** submenu also lists **Close all tabs without changes**, **Close all tabs without changes except for this one**, **Force close all tabs**, and **Force close all tabs except for this one** for bulk tab cleanup.
 - **Document workspace**: **Delete current document** in the control strip (preview mode) opens the same **Delete** confirmation for the active tab.
+- **Document workspace**: **Belongs under** field on each open document tab sets the parent document in the hierarchy tree (empty clears the parent so the document sits at the template placement root). Preview mode shows a read-only value; edit mode lets you type a parent document id and save it with the document. Dragging the document in the hierarchy tree updates the tab field without marking the tab dirty.
+- **Document workspace**: **Is a category**, **Is finished**, **Is a minor document**, and **Is Dead/Gone/Destroyed** toggles on each open document tab (preview read-only, edit writable). Saved flags persist on the document row. Finished tabs show a ✓ marker and dead tabs show † before the tab label (dead labels also use strikethrough styling).
+- **Workspace sidebar**: Template placement rows in the hierarchy tree show document and category count badges with a tooltip breakdown (**Document count**, **Category count**, and **Document & categories count**).
+- **App Settings**: **Hide document count** removes those placement count badges from the hierarchy tree.
 
 ### Bugfixes & Optimizations
+- **Document workspace**: Saving a **Belongs under** change reloads the new parent row in the hierarchy tree so the document stays visible without collapsing and reopening the old branch.
 - **Workspace sidebar**: Expanding a hierarchy tree row after lazy load shows its document children instead of an empty open branch (tree stats stay in sync with loaded rows without remounting the whole list).
 - **Workspace sidebar**: The hierarchy expand chevron rotates open smoothly when you expand a row, without blinking the rest of the tree.
 - **Document workspace**: **Copy document** from a document tab no longer saves the copy at the template root when the source document has a parent in the hierarchy tree; the copy keeps the same sibling level as the source after first save.

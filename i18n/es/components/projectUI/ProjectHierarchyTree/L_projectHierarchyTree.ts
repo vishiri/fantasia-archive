@@ -8,5 +8,10 @@ export default {
     editDocument: 'Editar documento',
     expandAllUnderNode: 'Expand all under this node',
     openDocument: 'Abrir documento'
+  },
+  placementCountTooltip: {
+    categoryCount: 'Recuento de categorías:',
+    documentCount: 'Recuento de documentos:',
+    totalCount: 'Recuento de documentos y categorías:'
   }
 }

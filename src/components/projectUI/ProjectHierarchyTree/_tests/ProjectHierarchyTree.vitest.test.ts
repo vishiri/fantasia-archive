@@ -18,7 +18,10 @@ const treeHandlers = vi.hoisted(() => ({
   onCopyNameFromContextMenuClick: vi.fn(),
   onCopyTextColorFromContextMenuClick: vi.fn(),
   onDeleteDocumentFromContextMenuClick: vi.fn(),
+  onDocumentRowAddUnderButtonClick: vi.fn(),
   onDocumentRowAuxClick: vi.fn(),
+  onDocumentRowEditButtonClick: vi.fn(),
+  onDocumentRowOpenButtonClick: vi.fn(),
   onEditDocumentFromContextMenuClick: vi.fn(),
   onExpandAllUnderNodeClick: vi.fn(),
   onNodeClick: vi.fn(),
@@ -71,6 +74,14 @@ const treeContextMenuState = {
   showsBulkExpandRows: ref(false),
   showsCopyRows: ref(false)
 }
+
+const documentButtonVisibility = ref({
+  showsAddUnder: true,
+  showsEdit: true,
+  showsOpen: true
+})
+
+const showsTreeLines = ref(true)
 
 const projectHierarchyTreeI18n = createI18n({
   legacy: false,
@@ -167,6 +178,7 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
         contextMenuAnchorNodeId: treeContextMenuState.anchorNodeId,
         contextMenuShowsBulkExpandRows: treeContextMenuState.showsBulkExpandRows,
         contextMenuShowsCopyRows: treeContextMenuState.showsCopyRows,
+        documentButtonVisibility,
         eachDraggableHandler: () => true,
         eachDroppableHandler: () => true,
         heTreeNodeKey: (_stat: { data: { id: string } }) => 'world-1',
@@ -186,7 +198,10 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
         onCopyNameFromContextMenuClick: treeHandlers.onCopyNameFromContextMenuClick,
         onCopyTextColorFromContextMenuClick: treeHandlers.onCopyTextColorFromContextMenuClick,
         onDeleteDocumentFromContextMenuClick: treeHandlers.onDeleteDocumentFromContextMenuClick,
+        onDocumentRowAddUnderButtonClick: treeHandlers.onDocumentRowAddUnderButtonClick,
         onDocumentRowAuxClick: treeHandlers.onDocumentRowAuxClick,
+        onDocumentRowEditButtonClick: treeHandlers.onDocumentRowEditButtonClick,
+        onDocumentRowOpenButtonClick: treeHandlers.onDocumentRowOpenButtonClick,
         onEditDocumentFromContextMenuClick: treeHandlers.onEditDocumentFromContextMenuClick,
         onExpandAllUnderNodeClick: treeHandlers.onExpandAllUnderNodeClick,
         onNodeClick: treeHandlers.onNodeClick,
@@ -202,9 +217,29 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
         onTreeDragEndCleanup: treeHandlers.onTreeDragEndCleanup,
         onWorldNodeRowClick: treeHandlers.onWorldNodeRowClick,
         onWorldNodeRowPointerDown: treeHandlers.onWorldNodeRowPointerDown,
+        resolvePlacementCountDisplayForCounts: (counts: {
+          categoryCount: number
+          documentCount: number
+        }) => {
+          return {
+            segments: [
+              {
+                kind: 'document',
+                value: counts.documentCount
+              },
+              {
+                kind: 'category',
+                value: counts.categoryCount
+              }
+            ],
+            showDivider: true,
+            shows: true
+          }
+        },
         rootDroppableHandler: () => false,
         setTreeComponentRef: treeRefWiring.setTreeComponentRef,
         setTreeScrollHostRef: treeRefWiring.setTreeScrollHostRef,
+        showsTreeLines,
         treeData,
         treeMountKey: ref(0),
         treeRootClassList: ref({}),
@@ -223,6 +258,10 @@ vi.mock('@he-tree/vue', () => {
       modelValue: {
         required: true,
         type: Array
+      },
+      treeLine: {
+        default: true,
+        type: Boolean
       }
     },
     emits: [
@@ -238,6 +277,7 @@ vi.mock('@he-tree/vue', () => {
     setup (props, { slots, emit }) {
       return () => h('div', {
         'data-test-locator': 'projectHierarchyTree-stub',
+        'data-test-tree-line': String(props.treeLine),
         onClick: () => emit('click:node'),
         onDragend: () => emit('dragend'),
         onDrop: () => emit('after-drop')
@@ -287,6 +327,29 @@ test('Test that ProjectHierarchyTree renders tree rows when layout data exists',
   expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-stub"]').exists()).toBe(true)
   expect(treeRefWiring.setTreeScrollHostRef).toHaveBeenCalled()
   expect(treeRefWiring.setTreeComponentRef).toHaveBeenCalled()
+  wrapper.unmount()
+})
+
+test('Test that ProjectHierarchyTree binds tree-line visibility from showsTreeLines', async () => {
+  showsTreeLines.value = true
+  const wrapper = mountProjectHierarchyTree({
+    global: {
+      stubs: {
+        ProjectHierarchyTreeNode: {
+          props: ['node', 'stat'],
+          template: '<div data-test-locator="projectHierarchyTree-node-stub" />'
+        },
+        ProjectHierarchyTreeOpenIcon: true
+      }
+    }
+  })
+
+  expect(wrapper.find('[data-test-tree-line="true"]').exists()).toBe(true)
+
+  showsTreeLines.value = false
+  await wrapper.vm.$nextTick()
+
+  expect(wrapper.find('[data-test-tree-line="false"]').exists()).toBe(true)
   wrapper.unmount()
 })
 
@@ -561,4 +624,235 @@ test('Test that ProjectHierarchyTree wires context menu handler on add-new rows 
     worldColor: '#000',
     worldId: 'world-1'
   }]
+})
+
+const documentButtonGroupStubs = {
+  ProjectHierarchyTreeNode: {
+    props: ['node', 'stat'],
+    template: '<div class="projectHierarchyTreeNode projectHierarchyTree__nodeContent" :data-test-node-kind="node.nodeKind"><slot name="documentButtonGroup" /></div>'
+  },
+  ProjectHierarchyTreeOpenIcon: true,
+  QIcon: true,
+  QTooltip: {
+    template: '<span><slot /></span>'
+  }
+}
+
+/**
+ * ProjectHierarchyTree
+ * Document rows render the inline document button group when settings allow it.
+ */
+test('Test that ProjectHierarchyTree renders document button group on document rows only', () => {
+  documentButtonVisibility.value = {
+    showsAddUnder: true,
+    showsEdit: true,
+    showsOpen: true
+  }
+  treeData.value = [{
+    children: [],
+    childrenLoaded: true,
+    documentId: 'doc-1',
+    groupId: null,
+    hasChildren: false,
+    icon: '',
+    id: 'doc-1',
+    label: 'Doc',
+    nodeKind: 'document',
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }]
+
+  const wrapper = mountProjectHierarchyTree({
+    global: {
+      stubs: documentButtonGroupStubs
+    }
+  })
+
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-documentButtonGroup"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-documentButton-open"]').exists()).toBe(true)
+  wrapper.unmount()
+
+  treeData.value = [{
+    children: [],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: 'group-1',
+    hasChildren: true,
+    icon: '',
+    id: 'group-1',
+    label: 'Group',
+    nodeKind: 'group',
+    placementId: null,
+    worldColor: '#000',
+    worldId: 'world-1'
+  }]
+
+  const groupWrapper = mountProjectHierarchyTree({
+    global: {
+      stubs: documentButtonGroupStubs
+    }
+  })
+  expect(groupWrapper.find('[data-test-locator="projectHierarchyTree-documentButtonGroup"]').exists()).toBe(false)
+  groupWrapper.unmount()
+})
+
+/**
+ * ProjectHierarchyTree
+ * App settings hide flags remove matching document-row buttons.
+ */
+test('Test that ProjectHierarchyTree hides document buttons when settings disable them', () => {
+  documentButtonVisibility.value = {
+    showsAddUnder: false,
+    showsEdit: false,
+    showsOpen: true
+  }
+  treeData.value = [{
+    children: [],
+    childrenLoaded: true,
+    documentId: 'doc-1',
+    groupId: null,
+    hasChildren: false,
+    icon: '',
+    id: 'doc-1',
+    label: 'Doc',
+    nodeKind: 'document',
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }]
+
+  const wrapper = mountProjectHierarchyTree({
+    global: {
+      stubs: documentButtonGroupStubs
+    }
+  })
+
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-documentButton-open"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-documentButton-edit"]').exists()).toBe(false)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-documentButton-addUnder"]').exists()).toBe(false)
+  wrapper.unmount()
+})
+
+/**
+ * ProjectHierarchyTree
+ * Document button clicks route to dedicated handlers instead of row handlers.
+ */
+test('Test that ProjectHierarchyTree routes document button clicks to dedicated handlers', async () => {
+  documentButtonVisibility.value = {
+    showsAddUnder: true,
+    showsEdit: true,
+    showsOpen: true
+  }
+  treeData.value = [{
+    children: [],
+    childrenLoaded: true,
+    documentId: 'doc-1',
+    groupId: null,
+    hasChildren: false,
+    icon: '',
+    id: 'doc-1',
+    label: 'Doc',
+    nodeKind: 'document',
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }]
+
+  const wrapper = mountProjectHierarchyTree({
+    global: {
+      stubs: documentButtonGroupStubs
+    }
+  })
+
+  await wrapper.get('[data-test-locator="projectHierarchyTree-documentButton-open"]').trigger('click')
+  await wrapper.get('[data-test-locator="projectHierarchyTree-documentButton-edit"]').trigger('click')
+  await wrapper.get('[data-test-locator="projectHierarchyTree-documentButton-addUnder"]').trigger('click')
+  expect(treeHandlers.onDocumentRowOpenButtonClick).toHaveBeenCalled()
+  expect(treeHandlers.onDocumentRowEditButtonClick).toHaveBeenCalled()
+  expect(treeHandlers.onDocumentRowAddUnderButtonClick).toHaveBeenCalled()
+  expect(treeHandlers.onWorldNodeRowClick).not.toHaveBeenCalled()
+  expect(treeHandlers.onDocumentRowAuxClick).not.toHaveBeenCalled()
+  expect(treeHandlers.onNodeRowContextMenu).not.toHaveBeenCalled()
+  wrapper.unmount()
+})
+
+test('Test that ProjectHierarchyTree passes placement counts to template placement nodes', () => {
+  treeData.value = [{
+    children: [],
+    childrenLoaded: true,
+    categoryCount: 2,
+    documentCount: 5,
+    documentId: null,
+    documentTemplateId: 'tpl-1',
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-home',
+    id: 'placement-1',
+    label: 'Characters',
+    nodeKind: 'templatePlacement',
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }]
+
+  const wrapper = mountProjectHierarchyTree({
+    global: {
+      stubs: {
+        ProjectHierarchyTreeNode: {
+          props: ['node', 'placementCountDisplay'],
+          template: '<div :data-test-document-count="placementCountDisplay?.documentCount" />'
+        },
+        ProjectHierarchyTreeOpenIcon: true,
+        QIcon: true
+      }
+    }
+  })
+
+  expect(wrapper.get('[data-test-document-count]').attributes('data-test-document-count')).toBe('5')
+  wrapper.unmount()
+})
+
+test('Test that ProjectHierarchyTree hides draggable tree when treeData is empty', () => {
+  treeData.value = []
+
+  const wrapper = mountProjectHierarchyTree()
+
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree"]').exists()).toBe(false)
+  wrapper.unmount()
+})
+
+test('Test that ProjectHierarchyTree defaults missing placement counts to zero', () => {
+  treeData.value = [{
+    children: [],
+    childrenLoaded: true,
+    documentId: null,
+    documentTemplateId: 'tpl-1',
+    groupId: null,
+    hasChildren: true,
+    icon: 'mdi-home',
+    id: 'placement-1',
+    label: 'Characters',
+    nodeKind: 'templatePlacement',
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }]
+
+  const wrapper = mountProjectHierarchyTree({
+    global: {
+      stubs: {
+        ProjectHierarchyTreeNode: {
+          props: ['node', 'placementCountDisplay'],
+          template: '<div :data-test-document-count="placementCountDisplay?.documentCount" :data-test-category-count="placementCountDisplay?.categoryCount" />'
+        },
+        ProjectHierarchyTreeOpenIcon: true,
+        QIcon: true
+      }
+    }
+  })
+
+  expect(wrapper.get('[data-test-document-count]').attributes('data-test-document-count')).toBe('0')
+  expect(wrapper.get('[data-test-category-count]').attributes('data-test-category-count')).toBe('0')
+  wrapper.unmount()
 })

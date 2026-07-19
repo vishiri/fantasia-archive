@@ -23,6 +23,16 @@ export interface I_openedDocumentTabUnsavedCompareInput {
   savedDocumentTextColor: string
   documentBackgroundColorDraft: string
   savedDocumentBackgroundColor: string
+  isCategoryDraft: boolean
+  savedIsCategory: boolean
+  isFinishedDraft: boolean
+  savedIsFinished: boolean
+  isMinorDraft: boolean
+  savedIsMinor: boolean
+  isDeadDraft: boolean
+  savedIsDead: boolean
+  parentDocumentIdDraft: string
+  savedParentDocumentId: string
 }
 
 /** One open document tab in the workspace session. */
@@ -48,6 +58,18 @@ export interface I_faOpenedDocumentTab {
   savedDocumentTextColor: string
   documentBackgroundColorDraft: string
   savedDocumentBackgroundColor: string
+  isCategoryDraft: boolean
+  savedIsCategory: boolean
+  isFinishedDraft: boolean
+  savedIsFinished: boolean
+  isMinorDraft: boolean
+  savedIsMinor: boolean
+  isDeadDraft: boolean
+  savedIsDead: boolean
+  /** Empty string = placement root (null parent in SQLite). */
+  parentDocumentIdDraft: string
+  /** Empty string = placement root (null parent in SQLite). */
+  savedParentDocumentId: string
   hasUnsavedChanges: boolean
   /**
    * Per-tab workspace edit mode. false = preview (read-only presentation);

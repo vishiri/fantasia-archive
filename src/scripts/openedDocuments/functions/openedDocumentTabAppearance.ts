@@ -35,7 +35,12 @@ export function computeOpenedDocumentHasUnsavedChanges (
   return (
     input.displayNameDraft !== input.savedDisplayName ||
     input.documentTextColorDraft !== input.savedDocumentTextColor ||
-    input.documentBackgroundColorDraft !== input.savedDocumentBackgroundColor
+    input.documentBackgroundColorDraft !== input.savedDocumentBackgroundColor ||
+    input.isCategoryDraft !== input.savedIsCategory ||
+    input.isFinishedDraft !== input.savedIsFinished ||
+    input.isMinorDraft !== input.savedIsMinor ||
+    input.isDeadDraft !== input.savedIsDead ||
+    input.parentDocumentIdDraft !== input.savedParentDocumentId
   )
 }
 
@@ -49,8 +54,18 @@ export function normalizeOpenedDocumentTabAppearanceColors (
     ...tab,
     documentBackgroundColorDraft: tab.documentBackgroundColorDraft ?? '',
     documentTextColorDraft: tab.documentTextColorDraft ?? '',
+    isCategoryDraft: tab.isCategoryDraft ?? false,
+    isFinishedDraft: tab.isFinishedDraft ?? false,
+    isMinorDraft: tab.isMinorDraft ?? false,
+    isDeadDraft: tab.isDeadDraft ?? false,
     savedDocumentBackgroundColor: tab.savedDocumentBackgroundColor ?? '',
-    savedDocumentTextColor: tab.savedDocumentTextColor ?? ''
+    savedDocumentTextColor: tab.savedDocumentTextColor ?? '',
+    savedIsCategory: tab.savedIsCategory ?? false,
+    savedIsFinished: tab.savedIsFinished ?? false,
+    savedIsMinor: tab.savedIsMinor ?? false,
+    savedIsDead: tab.savedIsDead ?? false,
+    parentDocumentIdDraft: tab.parentDocumentIdDraft ?? '',
+    savedParentDocumentId: tab.savedParentDocumentId ?? ''
   }
 }
 
@@ -64,8 +79,18 @@ export function recomputeOpenedDocumentTabHasUnsavedChanges (
     displayNameDraft: tab.displayNameDraft,
     documentBackgroundColorDraft: tab.documentBackgroundColorDraft,
     documentTextColorDraft: tab.documentTextColorDraft,
+    isCategoryDraft: tab.isCategoryDraft,
+    isFinishedDraft: tab.isFinishedDraft,
+    isMinorDraft: tab.isMinorDraft,
+    isDeadDraft: tab.isDeadDraft,
     savedDisplayName: tab.savedDisplayName,
     savedDocumentBackgroundColor: tab.savedDocumentBackgroundColor,
-    savedDocumentTextColor: tab.savedDocumentTextColor
+    savedDocumentTextColor: tab.savedDocumentTextColor,
+    savedIsCategory: tab.savedIsCategory,
+    savedIsFinished: tab.savedIsFinished,
+    savedIsMinor: tab.savedIsMinor,
+    savedIsDead: tab.savedIsDead,
+    parentDocumentIdDraft: tab.parentDocumentIdDraft,
+    savedParentDocumentId: tab.savedParentDocumentId
   })
 }

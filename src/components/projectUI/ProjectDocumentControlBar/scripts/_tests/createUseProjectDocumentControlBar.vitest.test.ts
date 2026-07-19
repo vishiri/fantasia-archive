@@ -3,6 +3,8 @@ import { expect, test, vi } from 'vitest'
 
 import type { I_computedRef } from 'app/types/I_vueCompositionShims'
 
+import { FA_OPENED_DOCUMENT_TAB_STATUS_FLAG_DEFAULTS } from 'app/helpers/openedDocumentTabTestStatusFlagDefaults'
+
 import { createUseProjectDocumentControlBar } from '../../functions/createUseProjectDocumentControlBar'
 import {
   resolveProjectDocumentControlBarSaveButtonColor,
@@ -27,9 +29,19 @@ type T_tabSeedRow = {
   documentTextColorDraft?: string
   editState: boolean
   hasUnsavedChanges: boolean
+  isCategoryDraft?: boolean
+  isDeadDraft?: boolean
+  isFinishedDraft?: boolean
+  isMinorDraft?: boolean
   savedDisplayName: string
   savedDocumentBackgroundColor?: string
   savedDocumentTextColor?: string
+  savedIsCategory?: boolean
+  savedIsDead?: boolean
+  savedIsFinished?: boolean
+  savedIsMinor?: boolean
+  parentDocumentIdDraft?: string
+  savedParentDocumentId?: string
   tabLabel: string
   templateIcon: string
   worldId?: string
@@ -48,7 +60,10 @@ function mountUseProjectDocumentControlBar (input: {
   disableDocumentControlBar: false
 }) {
   const settings = ref({ disableDocumentControlBar: input.disableDocumentControlBar })
-  const tabs = ref(input.tabSeed ?? [])
+  const tabs = ref((input.tabSeed ?? []).map((tab) => ({
+    ...FA_OPENED_DOCUMENT_TAB_STATUS_FLAG_DEFAULTS,
+    ...tab
+  })))
   const worlds = ref(input.projectWorlds ?? [])
   const activeDocumentId = ref<string | null>(input.tabSeed?.[0]?.documentId ?? null)
   const routePath = ref(
@@ -76,7 +91,7 @@ function mountUseProjectDocumentControlBar (input: {
     S_FaOpenedDocuments: () => ({
       enterDocumentEditMode: input.enterDocumentEditMode ?? (() => undefined),
       findTabByDocumentId: (documentId: string) => {
-        return input.tabSeed?.find((tab) => tab.documentId === documentId) ?? null
+        return tabs.value.find((tab) => tab.documentId === documentId) ?? null
       },
       closeAllTabsWithoutChanges: async () => undefined,
       closeTabsWithoutChangesExcept: async () => undefined,
@@ -133,6 +148,16 @@ test('Test that createUseProjectDocumentControlBar keeps header tabs visible whe
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -163,6 +188,16 @@ test('Test that activeDocumentTabName mirrors the store active document when tha
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }
@@ -235,6 +270,16 @@ test('Test that createUseProjectDocumentControlBar exposes edit and save button 
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -259,6 +304,16 @@ test('Test that createUseProjectDocumentControlBar shows delete button in edit m
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -283,6 +338,16 @@ test('Test that onDeleteCurrentDocumentClick delegates to requestDeleteDocument'
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -333,6 +398,16 @@ test('Test that resolveDocumentTabAppearanceChrome and inline style delegate to 
       hasUnsavedChanges: false,
       savedDisplayName: 'A',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       savedDocumentTextColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
@@ -350,6 +425,39 @@ test('Test that resolveDocumentTabAppearanceChrome and inline style delegate to 
     '--projectDocumentControlBarTab-textColor': '#aabbcc',
     backgroundColor: '#112233'
   })
+  expect(api.resolveDocumentTabDisplayIcon(tab)).toBe('mdi-account')
+})
+
+test('Test that resolveDocumentTabDisplayIcon uses folder icon when category draft is on', () => {
+  const api = mountUseProjectDocumentControlBar({
+    disableDocumentControlBar: false,
+    tabSeed: [{
+      documentId: 'doc-a',
+      persistenceState: 'persisted',
+      displayNameDraft: 'A',
+      documentBackgroundColorDraft: '',
+      documentTextColorDraft: '',
+      editState: true,
+      hasUnsavedChanges: true,
+      savedDisplayName: 'A',
+      savedDocumentBackgroundColor: '',
+      isCategoryDraft: true,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
+      savedDocumentTextColor: '',
+      tabLabel: 'Character',
+      templateIcon: 'mdi-account'
+    }]
+  })
+
+  expect(api.resolveDocumentTabDisplayIcon(api.openedDocumentTabs.value[0]!)).toBe('mdi-folder-open')
 })
 
 test('Test that saveDocumentButtonColor reflects active tab unsaved state in edit mode', () => {
@@ -366,6 +474,16 @@ test('Test that saveDocumentButtonColor reflects active tab unsaved state in edi
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -393,6 +511,16 @@ test('Test that onEnterEditModeClick delegates to the opened documents store', (
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -448,6 +576,16 @@ test('Test that onSaveDocumentClick enqueues saveOpenedDocumentDisplayName with 
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -483,6 +621,16 @@ test('Test that edit and save handlers no-op when no active document is selected
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }
@@ -559,6 +707,16 @@ test('Test that tab label and route helpers delegate to opened tab data', () => 
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -576,6 +734,16 @@ test('Test that tab label and route helpers delegate to opened tab data', () => 
     savedDocumentTextColor: '',
     documentBackgroundColorDraft: '',
     savedDocumentBackgroundColor: '',
+    isCategoryDraft: false,
+    savedIsCategory: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    isDeadDraft: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    parentDocumentIdDraft: '',
+    savedParentDocumentId: '',
     tabLabel: 'Character',
     templateIcon: 'mdi-account'
   })).toBe('Draft')
@@ -597,6 +765,16 @@ test('Test that activeDocumentTab is null when the active id does not match an o
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }
@@ -766,6 +944,16 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
               savedDocumentTextColor: '',
               documentBackgroundColorDraft: '',
               savedDocumentBackgroundColor: '',
+              isCategoryDraft: false,
+              savedIsCategory: false,
+              isFinishedDraft: false,
+              isMinorDraft: false,
+              isDeadDraft: false,
+              savedIsFinished: false,
+              savedIsMinor: false,
+              savedIsDead: false,
+              parentDocumentIdDraft: '',
+              savedParentDocumentId: '',
               tabLabel: 'Character',
               templateIcon: 'mdi-account'
             }
@@ -801,6 +989,16 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
             savedDocumentTextColor: '',
             documentBackgroundColorDraft: '',
             savedDocumentBackgroundColor: '',
+            isCategoryDraft: false,
+            savedIsCategory: false,
+            isFinishedDraft: false,
+            isMinorDraft: false,
+            isDeadDraft: false,
+            savedIsFinished: false,
+            savedIsMinor: false,
+            savedIsDead: false,
+            parentDocumentIdDraft: '',
+            savedParentDocumentId: '',
             tabLabel: 'Character',
             templateIcon: 'mdi-account'
           }])
@@ -845,6 +1043,16 @@ test('Test that createUseProjectDocumentControlBar tab copy and move handlers de
           savedDocumentTextColor: '',
           documentBackgroundColorDraft: '',
           savedDocumentBackgroundColor: '',
+          isCategoryDraft: false,
+          savedIsCategory: false,
+          isFinishedDraft: false,
+          isMinorDraft: false,
+          isDeadDraft: false,
+          savedIsFinished: false,
+          savedIsMinor: false,
+          savedIsDead: false,
+          parentDocumentIdDraft: '',
+          savedParentDocumentId: '',
           tabLabel: 'Character',
           templateIcon: 'mdi-account'
         }
@@ -901,6 +1109,16 @@ test('Test that createUseProjectDocumentControlBar tab copy and move handlers de
             savedDocumentTextColor: '',
             documentBackgroundColorDraft: '',
             savedDocumentBackgroundColor: '',
+            isCategoryDraft: false,
+            savedIsCategory: false,
+            isFinishedDraft: false,
+            isMinorDraft: false,
+            isDeadDraft: false,
+            savedIsFinished: false,
+            savedIsMinor: false,
+            savedIsDead: false,
+            parentDocumentIdDraft: '',
+            savedParentDocumentId: '',
             tabLabel: 'Character',
             templateIcon: 'mdi-account'
           }])
@@ -945,6 +1163,16 @@ test('Test that createUseProjectDocumentControlBar exposes world tab indicators 
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       tabLabel: 'Hero',
       templateIcon: 'mdi-account',
       worldId: 'world-1'
@@ -981,6 +1209,16 @@ test('Test that createUseProjectDocumentControlBar exposes world tab indicators 
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       tabLabel: 'Hero',
       templateIcon: 'mdi-account',
       worldId: 'world-2'

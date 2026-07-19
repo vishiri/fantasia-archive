@@ -53,10 +53,6 @@ export default {
         subtitle: 'Treets oppførsel',
         tags: 'utvide, kollapse, utvide alt, interaksjon',
       },
-      treeSettings: {
-        subtitle: 'Treinnstillinger',
-        tags: 'trepanel, sidefeltsynlighet, trelayout',
-      }
     },
     openedDocumentsTabs: {
       title: 'Åpne dokumentfaner',
@@ -127,9 +123,9 @@ export default {
       description: 'Denne innstillingen gjør rullefeltene til FA bredere og tillater derfor manuell klikkrulling direkte på dem for enheter som ikke støtter standard rulling (for eksempel mus uten rullehjul).',
       tags: 'rullefeltbredde, klikkrull, mus uten hjul, styrekule, berøring',
     },
-    compactDocumentCount: {
+    disableCategoryCount: {
       title: 'Skjul kategoriantall',
-      description: 'Viser dokumentantallet uten sekundært per-kategorinummer.',
+      description: 'Skjul kategorinumre i det hierarkiske treet',
       tags: 'forenklet telling, enkelt tall, mindre rot',
     },
     compactTags: {
@@ -158,8 +154,8 @@ export default {
       tags: 'nybegynnertips, veiledningsbannere, trenermerker, kontrolllinjehjelp',
     },
     disableDocumentCounts: {
-      title: 'Skjul dokumentantallet helt',
-      description: 'Skjuler all dokumenttellingsinformasjon i det hierarkiske treet.',
+      title: 'Skjul dokumentantallet',
+      description: 'Skjul dokumentnumre i det hierarkiske treet',
       tags: 'totalt, ingen tellinger, statistikk skjuler',
     },
     disableDocumentToolTips: {
@@ -208,11 +204,6 @@ export default {
       description: 'Skjuler felt uten verdi utfylt, i visningsmodus (ikke-redigering). Vær oppmerksom på at dette kan føre til relativt ville layoutskifter, som kan få dokumentet til å se uregjerlig ut i noen tilfeller.',
       tags: 'tomme felt, skrivebeskyttet visning, kompakt dokument, layoutskift',
     },
-    hideHierarchyTree: {
-      title: 'Skjul hierarkisk tre',
-      description: 'Styrer om det hierarkiske treet vises.',
-      tags: 'sidefelt av, navigator skjult, trepanel, konturskjul',
-    },
     hidePlushes: {
       title: 'Skjul Fantasia-maskot',
       description: 'Skjuler den utrolig bedårende og fantastiske Fantasia, den lille mystiske dragen. Hvordan kunne du det! :(',
@@ -228,11 +219,6 @@ export default {
       description: 'Skjuler popup-vinduet for tips og triks på startskjermen.',
       tags: 'første lansering, onboarding, splash, oppstartstips, triks',
     },
-    hideTreeExtraIcons: {
-      title: 'Skjul ekstra ikoner',
-      description: 'Skjuler ikoner som vanligvis vises for enkelhets skyld, men som ikke legger til funksjonalitet – for eksempel "Åpne dokument"-ikonet ved siden av et dokument uten underordnede noder, som like godt kan åpnes med et vanlig venstreklikk i stedet for ikonet.',
-      tags: 'overflødige ikoner, rot, minimalt tre, valgfrie handlinger',
-    },
     hideTreeIconAddUnder: {
       title: 'Skjul "Legg til under"-ikonet',
       description: 'Dette alternativet skjuler "Legg til et nytt dokument under den valgte overordnede"-ikonet.',
@@ -247,6 +233,11 @@ export default {
       title: 'Skjul "Åpne"-ikonet',
       description: 'Dette alternativet skjuler rad Åpne-ikonet.',
       tags: 'åpne ikon, gå til dokument, rad åpne knapp',
+    },
+    hideTreeLines: {
+      title: 'Hide tree lines',
+      description: 'Hides the structural help-lines in the hierarchy tree.',
+      tags: 'lines, helplines, structure, tree, hierarchical, hierarchical tree'
     },
     hideTreeOrderNumbers: {
       title: 'Skjul ordrenummer',
@@ -272,11 +263,6 @@ export default {
       title: 'Inverter kategoriposisjon',
       description: 'Bytter plassering av kategori- og dokumentnumre.',
       tags: 'bytte tall, tellerekkefølge, kategori vs dokumentantall',
-    },
-    invertTreeSorting: {
-      title: 'Inverter sortering av tre tilpasset rekkefølge',
-      description: 'Sorterer dokumenter i det hierarkiske treet i motsatt retning fra standard: fra høyeste til laveste.',
-      tags: 'omvendt rekkefølge, egendefinert rekkefølge, sorteringsretning, stigende synkende',
     },
     limitEditorHeight: {
       title: 'Begrens tekstredigeringshøyden',

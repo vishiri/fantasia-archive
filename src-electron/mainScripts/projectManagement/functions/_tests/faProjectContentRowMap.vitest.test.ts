@@ -61,6 +61,10 @@ test('Test that mapFaProjectDocumentRow maps template_id null', () => {
     display_name: 'Doc',
     document_text_color: '#AABBCC',
     document_background_color: null,
+    is_category: 0,
+    is_finished: 0,
+    is_minor: 0,
+    is_dead: 0,
     created_at_ms: 3,
     updated_at_ms: 4
   })

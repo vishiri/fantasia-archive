@@ -5,8 +5,10 @@ import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 import type { I_faProjectHierarchyTreeWorkspaceWorld } from 'app/types/I_faProjectHierarchyTreeDomain'
 import { FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE } from 'app/types/I_faOpenedDocumentsDomain'
 
-import { createUseDocumentWorkspacePage } from '../functions/createUseDocumentWorkspacePage'
+import { createUseDocumentWorkspacePage } from '../createUseDocumentWorkspacePage'
 import { createDocumentWorkspacePageColorPickers } from '../functions/createDocumentWorkspacePageColorPickers'
+import { createDocumentWorkspacePageDocumentBooleanToggle } from '../functions/createDocumentWorkspacePageDocumentBooleanToggle'
+import { createDocumentWorkspacePageIsCategoryToggle } from '../functions/createDocumentWorkspacePageIsCategoryToggle'
 
 const previewTab: I_faOpenedDocumentTab = {
   documentId: 'doc-1',
@@ -19,6 +21,16 @@ const previewTab: I_faOpenedDocumentTab = {
   savedDocumentTextColor: '',
   documentBackgroundColorDraft: '',
   savedDocumentBackgroundColor: '',
+  isCategoryDraft: false,
+  savedIsCategory: false,
+  isFinishedDraft: false,
+  isMinorDraft: false,
+  isDeadDraft: false,
+  savedIsFinished: false,
+  savedIsMinor: false,
+  savedIsDead: false,
+  parentDocumentIdDraft: '',
+  savedParentDocumentId: '',
   hasUnsavedChanges: false,
   editState: FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE,
   worldId: 'world-1'
@@ -47,13 +59,20 @@ function createHarness (tab: I_faOpenedDocumentTab | null) {
       findTabByDocumentId: () => tab,
       updateDisplayNameDraft: () => {},
       updateDocumentBackgroundColorDraft: () => {},
-      updateDocumentTextColorDraft: () => {}
+      updateDocumentTextColorDraft: () => {},
+      updateIsCategoryDraft: () => {},
+      updateIsDeadDraft: () => {},
+      updateIsFinishedDraft: () => {},
+      updateIsMinorDraft: () => {},
+      updateParentDocumentIdDraft: () => {}
     }) as never,
     S_FaProjectHierarchyTree: () => ({
       patchWorldColorPalleteInLayout: () => {}
     }) as never,
     computed: computed as never,
     createDocumentWorkspacePageColorPickers,
+    createDocumentWorkspacePageDocumentBooleanToggle,
+    createDocumentWorkspacePageIsCategoryToggle,
     createDocumentWorkspacePageRouteEffects: () => ({
       routeDocumentId
     }),
@@ -112,9 +131,26 @@ test('Test that createUseDocumentWorkspacePage wires world palette and read-only
   const api = createHarness(previewTab)
   expect(api.worldPickerPalette.value).toEqual(['#112233', '#445566'])
   expect(api.documentColorPickersReadOnly.value).toBe(true)
+  expect(api.isCategoryToggleReadOnly.value).toBe(true)
+  expect(api.textColorFieldDescription.value).toBe('documentWorkspacePage.textColorFieldDescription')
+  expect(api.backgroundColorFieldDescription.value).toBe('documentWorkspacePage.backgroundColorFieldDescription')
   expect(api.worldColorPaletteAppend.value).toEqual({
     mode: 'persist',
     worldColorPalette: '#112233;#445566',
     worldId: 'world-1'
   })
+})
+
+test('Test that createUseDocumentWorkspacePage enables category toggle in edit mode', () => {
+  const api = createHarness(editTab)
+  expect(api.isCategoryToggleReadOnly.value).toBe(false)
+})
+
+test('Test that createUseDocumentWorkspacePage wires belongs under field labels and preview read-only state', () => {
+  const api = createHarness(previewTab)
+  expect(api.belongsUnderFieldLabel.value).toBe('documentWorkspacePage.belongsUnderFieldLabel')
+  expect(api.belongsUnderFieldDescription.value).toBe('documentWorkspacePage.belongsUnderFieldDescription')
+  expect(api.oneWayRelationshipTooltip.value).toBe('documentWorkspacePage.belongsUnderOneWayRelationshipTooltip')
+  expect(api.belongsUnderFieldReadOnly.value).toBe(true)
+  expect(api.belongsUnderModel.value).toBe('')
 })

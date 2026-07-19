@@ -2,6 +2,10 @@ import type Database from 'better-sqlite3'
 
 import {
   FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN,
+  FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN,
+  FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN,
+  FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN,
+  FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN,
   FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
@@ -40,7 +44,10 @@ export function listFaProjectHierarchyDocumentChildrenRows (
     .prepare(
       `SELECT id, world_id, template_id, ${placementColumn}, ${parentColumn}, ${sortColumn}, ` +
         `display_name, ${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN}, ` +
-        `${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}, created_at_ms, updated_at_ms ` +
+        `${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}, ${FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN}, ` +
+        `${FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN}, ${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN}, ` +
+        `${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN}, ` +
+        'created_at_ms, updated_at_ms ' +
         `FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
         `WHERE ${placementColumn} = ? AND ` +
         `(${parentColumn} IS ? OR (${parentColumn} IS NULL AND ? IS NULL)) ` +
@@ -57,7 +64,10 @@ export function listFaProjectHierarchyDirectChildDocumentRows (
     .prepare(
       `SELECT id, world_id, template_id, ${placementColumn}, ${parentColumn}, ${sortColumn}, ` +
         `display_name, ${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN}, ` +
-        `${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}, created_at_ms, updated_at_ms ` +
+        `${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}, ${FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN}, ` +
+        `${FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN}, ${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN}, ` +
+        `${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN}, ` +
+        'created_at_ms, updated_at_ms ' +
         `FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
         `WHERE ${parentColumn} = ? ` +
         `ORDER BY ${sortColumn} ASC, display_name COLLATE NOCASE ASC, created_at_ms ASC, id ASC`
@@ -77,7 +87,11 @@ export function mapFaProjectHierarchyDocumentChildRow (
     placementId: row.tree_placement_id ?? '',
     parentDocumentId: row.tree_parent_document_id,
     sortOrder: row.tree_custom_sort_order,
-    hasChildren: readFaProjectDocumentHasChildren(db, row.id)
+    hasChildren: readFaProjectDocumentHasChildren(db, row.id),
+    isCategory: row.is_category === 1,
+    isFinished: row.is_finished === 1,
+    isMinor: row.is_minor === 1,
+    isDead: row.is_dead === 1
   }
 }
 

@@ -95,6 +95,7 @@ const sampleWorld = {
       hasChildren: true,
       id: 'group-1',
       rootSortOrder: 0,
+      isCategory: false,
       worldId: 'world-1'
     }
   ],
@@ -105,6 +106,7 @@ const sampleWorld = {
       documentTemplateId: 'template-1',
       groupId: 'group-1',
       groupSortOrder: 0,
+      isCategory: false,
       hasChildren: true,
       icon: 'mdi-account',
       id: 'placement-1',
@@ -126,6 +128,7 @@ const sampleWorld = {
       titlePluralTranslations: {},
       titleSingularTranslations: {},
       rootSortOrder: 1,
+      isCategory: false,
       worldId: 'world-1'
     }
   ],
@@ -1850,6 +1853,7 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle preserves expanded snap
         hasChildren: false,
         id: 'group-2',
         rootSortOrder: 1,
+        isCategory: false,
         worldId: 'world-1'
       }
     ]

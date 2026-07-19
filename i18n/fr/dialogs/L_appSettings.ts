@@ -53,10 +53,6 @@ export default {
         subtitle: 'Comportement de l\'arbre',
         tags: 'développer, réduire, tout développer, interaction',
       },
-      treeSettings: {
-        subtitle: 'Paramètres de l\'arborescence',
-        tags: 'panneau d\'arborescence, visibilité de la barre latérale, disposition de l\'arborescence',
-      }
     },
     openedDocumentsTabs: {
       title: 'Ouvrir les onglets du document',
@@ -127,9 +123,9 @@ export default {
       description: 'Ce paramètre élargit les barres de défilement de FA et permet donc un défilement manuel par clic directement sur celles-ci pour les appareils qui ne prennent pas en charge le défilement standard (par exemple les souris sans molette de défilement).',
       tags: 'largeur de la barre de défilement, défilement par clic, souris sans molette, trackball, toucher',
     },
-    compactDocumentCount: {
+    disableCategoryCount: {
       title: 'Masquer le nombre de catégories',
-      description: 'Affiche le nombre de documents sans le numéro secondaire par catégorie.',
+      description: 'Masquer les numéros de catégorie dans l’arborescence hiérarchique',
       tags: 'comptage simplifié, numéro unique, moins d\'encombrement',
     },
     compactTags: {
@@ -158,8 +154,8 @@ export default {
       tags: 'conseils pour débutants, bannières de didacticiel, marques de coach, aide sur la barre de contrôle',
     },
     disableDocumentCounts: {
-      title: 'Masquer entièrement le nombre de documents',
-      description: 'Masque toutes les informations sur le nombre de documents dans l’arborescence hiérarchique.',
+      title: 'Masquer le nombre de documents',
+      description: 'Masquer les numéros de document dans l’arborescence hiérarchique',
       tags: 'les totaux sont désactivés, aucun décompte, les statistiques sont masquées',
     },
     disableDocumentToolTips: {
@@ -208,11 +204,6 @@ export default {
       description: 'Masque les champs sans aucune valeur renseignée, en mode affichage (non-édition). Veuillez noter que cela peut entraîner des changements de mise en page relativement sauvages, ce qui peut donner au document un aspect indiscipliné dans certains cas.',
       tags: 'champs vides, vue en lecture seule, document compact, changement de mise en page',
     },
-    hideHierarchyTree: {
-      title: 'Masquer l\'arborescence hiérarchique',
-      description: 'Contrôle si l\'arborescence hiérarchique est affichée.',
-      tags: 'barre latérale désactivée, navigateur masqué, panneau d\'arborescence, contour masqué',
-    },
     hidePlushes: {
       title: 'Masquer la mascotte Fantasia',
       description: 'Cache la Fantasia incroyablement adorable et impressionnante, le petit dragon arcanique. Comment as-tu pu ! :(',
@@ -228,11 +219,6 @@ export default {
       description: 'Masque la fenêtre contextuelle des trucs et astuces de l’écran de démarrage.',
       tags: 'premier lancement, intégration, splash, conseils de démarrage, astuces',
     },
-    hideTreeExtraIcons: {
-      title: 'Masquer les icônes supplémentaires',
-      description: 'Masque les icônes qui sont normalement affichées pour plus de commodité mais n\'ajoutent pas de fonctionnalités, par exemple l\'icône « Ouvrir le document » à côté d\'un document sans nœuds enfants, qui peut tout aussi bien être ouverte avec un clic gauche normal au lieu de l\'icône.',
-      tags: 'icônes redondantes, encombrement, arborescence minimale, actions facultatives',
-    },
     hideTreeIconAddUnder: {
       title: 'Masquer l\'icône "Ajouter sous"',
       description: 'Cette option masque l\'icône "Ajouter un nouveau document sous le parent sélectionné".',
@@ -247,6 +233,11 @@ export default {
       title: 'Masquer l\'icône "Ouvrir"',
       description: 'Cette option masque l\'icône Ouvrir la ligne.',
       tags: 'ouvrir l\'icône, accéder au document, bouton d\'ouverture de ligne',
+    },
+    hideTreeLines: {
+      title: 'Hide tree lines',
+      description: 'Hides the structural help-lines in the hierarchy tree.',
+      tags: 'lines, helplines, structure, tree, hierarchical, hierarchical tree'
     },
     hideTreeOrderNumbers: {
       title: 'Masquer les numéros de commande',
@@ -272,11 +263,6 @@ export default {
       title: 'Inverser la position de la catégorie',
       description: 'Change les positions des numéros de catégorie et de document.',
       tags: 'échanger des numéros, ordre de comptage, catégorie par rapport au nombre de documents',
-    },
-    invertTreeSorting: {
-      title: 'Inverser le tri personnalisé de l\'arborescence',
-      description: 'Trie les documents dans l\'arborescence hiérarchique dans le sens opposé à celui par défaut : du plus élevé au plus bas.',
-      tags: 'ordre inverse, ordre personnalisé, sens de tri, ascendant et décroissant',
     },
     limitEditorHeight: {
       title: 'Limiter la hauteur de l\'éditeur de texte',

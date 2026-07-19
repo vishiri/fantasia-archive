@@ -2,33 +2,37 @@ import type Database from 'better-sqlite3'
 
 import {
   FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN,
+  FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN,
+  FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN,
+  FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN,
+  FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN,
   FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
-  FA_PROJECT_TABLE_DOCUMENTS,
-  FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
-  FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS,
-  FA_PROJECT_TABLE_WORLDS
+  FA_PROJECT_TABLE_DOCUMENTS
 } from '../functions/faProjectDbSchemaDdl'
+import {
+  resolveFaProjectDocumentBooleanFlagsForCreateInput,
+  resolveFaProjectDocumentBooleanFlagsForUpdate
+} from '../functions/faProjectDocumentBooleanFlagsSql'
 import {
   resolveFaProjectDocumentAppearanceColorsForCreate,
   resolveFaProjectDocumentAppearanceColorsForUpdate
 } from './faProjectDocumentAppearanceColorPersistWiring'
 import { FaProjectContentNotFoundError } from './faProjectContentNotFoundError'
 import {
-  assertFaProjectNamedEntityExists
-} from './faProjectContentNamedEntitySqlWiring'
-import {
-  buildFaProjectDocumentSelectSql,
-  readFaProjectDocumentSiblingMaxSortOrder
-} from './faProjectDocumentsSqlWiring'
+  resolveFaProjectDocumentPlacementId,
+  resolveFaProjectDocumentSortOrderForCreate,
+  validateFaProjectDocumentForeignKeys
+} from './faProjectDocumentCreateResolveWiring'
 import { getFaProjectDocumentById } from './faProjectDocumentsQueryWiring'
 import { promoteFaProjectDocumentChildrenBeforeDelete } from './faProjectDocumentDeleteWiring'
 import {
   resolveFaProjectDocumentIdForCreate,
   validateDocumentParentForeignKey
 } from './faProjectDocumentCreateWiring'
+import { buildFaProjectDocumentSelectSql } from './faProjectDocumentsSqlWiring'
 import type {
   I_faProjectDocument,
   I_faProjectDocumentCreateInput,
@@ -37,16 +41,6 @@ import type {
 import type { I_faSqlProjectDocumentRow } from 'app/types/I_faProjectContentRowMap'
 
 const DOCUMENT_ENTITY_LABEL = 'Document'
-
-const WORLD_SPEC = {
-  entityLabel: 'World',
-  tableName: FA_PROJECT_TABLE_WORLDS
-}
-
-const TEMPLATE_SPEC = {
-  entityLabel: 'Document template',
-  tableName: FA_PROJECT_TABLE_DOCUMENT_TEMPLATES
-}
 
 function assertDocumentRow (
   row: I_faSqlProjectDocumentRow | undefined,
@@ -58,57 +52,12 @@ function assertDocumentRow (
   return row
 }
 
-function validateDocumentForeignKeys (
-  db: Database,
-  worldId: string,
-  templateId: string | null | undefined
-): void {
-  assertFaProjectNamedEntityExists(db, WORLD_SPEC, worldId)
-  if (templateId !== undefined && templateId !== null) {
-    assertFaProjectNamedEntityExists(db, TEMPLATE_SPEC, templateId)
-  }
-}
-
-function resolveFaProjectDocumentPlacementId (
-  db: Database,
-  worldId: string,
-  templateId: string | null,
-  placementId: string | null | undefined
-): string | null {
-  if (placementId !== undefined && placementId !== null) {
-    return placementId
-  }
-  if (templateId === null) {
-    return null
-  }
-  const row = db
-    .prepare(
-      `SELECT id FROM ${FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS} ` +
-        'WHERE world_id = ? AND document_template_id = ?'
-    )
-    .get(worldId, templateId) as { id: string } | undefined
-  return row?.id ?? null
-}
-
-function resolveFaProjectDocumentSortOrderForCreate (
-  db: Database,
-  placementId: string | null,
-  parentDocumentId: string | null,
-  sortOrder: number | undefined
-): number {
-  if (sortOrder !== undefined) {
-    return sortOrder
-  }
-  const maxSort = readFaProjectDocumentSiblingMaxSortOrder(db, placementId, parentDocumentId)
-  return maxSort === null ? 0 : maxSort + 1
-}
-
 export function createFaProjectDocument (
   db: Database,
   input: I_faProjectDocumentCreateInput
 ): I_faProjectDocument {
   const templateId = input.templateId ?? null
-  validateDocumentForeignKeys(db, input.worldId, templateId)
+  validateFaProjectDocumentForeignKeys(db, input.worldId, templateId)
   const parentDocumentId = input.parentDocumentId ?? null
   validateDocumentParentForeignKey(db, parentDocumentId)
   const placementId = resolveFaProjectDocumentPlacementId(
@@ -125,6 +74,12 @@ export function createFaProjectDocument (
   )
   const { documentBackgroundColor, documentTextColor } =
     resolveFaProjectDocumentAppearanceColorsForCreate(input)
+  const {
+    isCategory,
+    isDead,
+    isFinished,
+    isMinor
+  } = resolveFaProjectDocumentBooleanFlagsForCreateInput(input)
   const nowMs = Date.now()
   const id = resolveFaProjectDocumentIdForCreate(db, input.id)
   db.prepare(
@@ -135,8 +90,12 @@ export function createFaProjectDocument (
       'display_name, ' +
       `${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN}, ` +
       `${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN}, ` +
       'created_at_ms, updated_at_ms) ' +
-      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(
     id,
     input.worldId,
@@ -147,6 +106,10 @@ export function createFaProjectDocument (
     input.displayName,
     documentTextColor,
     documentBackgroundColor,
+    isCategory,
+    isFinished,
+    isMinor,
+    isDead,
     nowMs,
     nowMs
   )
@@ -168,7 +131,7 @@ export function updateFaProjectDocument (
   const nextTemplateId = patch.templateId !== undefined
     ? patch.templateId
     : existingRow.template_id
-  validateDocumentForeignKeys(db, nextWorldId, nextTemplateId)
+  validateFaProjectDocumentForeignKeys(db, nextWorldId, nextTemplateId)
   const nextPlacementId = patch.placementId !== undefined
     ? patch.placementId
     : resolveFaProjectDocumentPlacementId(
@@ -184,6 +147,12 @@ export function updateFaProjectDocument (
   const nextDisplayName = patch.displayName ?? existingRow.display_name
   const { documentBackgroundColor: nextDocumentBackgroundColor, documentTextColor: nextDocumentTextColor } =
     resolveFaProjectDocumentAppearanceColorsForUpdate(patch, existingRow)
+  const {
+    isCategory: nextIsCategory,
+    isDead: nextIsDead,
+    isFinished: nextIsFinished,
+    isMinor: nextIsMinor
+  } = resolveFaProjectDocumentBooleanFlagsForUpdate(patch, existingRow)
   const nowMs = Date.now()
   db.prepare(
     `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET world_id = ?, template_id = ?, ` +
@@ -193,6 +162,10 @@ export function updateFaProjectDocument (
       'display_name = ?, ' +
       `${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN} = ?, ` +
       `${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN} = ?, ` +
+      `${FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN} = ?, ` +
+      `${FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN} = ?, ` +
+      `${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN} = ?, ` +
+      `${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN} = ?, ` +
       'updated_at_ms = ? WHERE id = ?'
   ).run(
     nextWorldId,
@@ -203,6 +176,10 @@ export function updateFaProjectDocument (
     nextDisplayName,
     nextDocumentTextColor,
     nextDocumentBackgroundColor,
+    nextIsCategory,
+    nextIsFinished,
+    nextIsMinor,
+    nextIsDead,
     nowMs,
     id
   )

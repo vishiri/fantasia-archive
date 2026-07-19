@@ -8,5 +8,10 @@ export default {
     editDocument: 'Rediger dokument',
     expandAllUnderNode: 'Expand all under this node',
     openDocument: 'Åpne dokument'
+  },
+  placementCountTooltip: {
+    categoryCount: 'Antall kategorier:',
+    documentCount: 'Antall dokumenter:',
+    totalCount: 'Antall dokumenter og kategorier:'
   }
 }

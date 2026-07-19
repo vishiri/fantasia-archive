@@ -1,4 +1,4 @@
-/* Fantasia QColor surfaces: spectrum (hex) + palette footer tabs only (no tune / RGB sliders). */
+/* Fantasia QColor surfaces: spectrum + palette footer; hide tune tab. Header keeps HEX/RGB tabs. */
 
 .faColorPickerQColor.q-color-picker .q-color-picker__footer .q-tab:nth-of-type(2) {
   display: none;

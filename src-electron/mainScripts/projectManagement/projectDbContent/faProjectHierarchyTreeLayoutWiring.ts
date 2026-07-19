@@ -6,6 +6,7 @@ import { parseFaProjectDocumentTemplateTitleTranslationsJson } from 'app/src-ele
 import {
   FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
+  FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN,
   FA_PROJECT_TABLE_DOCUMENTS,
   FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
   FA_PROJECT_TABLE_WORLD_TEMPLATE_GROUPS,
@@ -30,6 +31,40 @@ function readFaProjectGroupHasPlacements (
     )
     .get(groupId) as { ok: number } | undefined
   return row !== undefined
+}
+
+function listFaProjectPlacementCategoryDocumentCounts (
+  db: Database,
+  worldId: string
+): Map<string, { categoryCount: number, documentCount: number }> {
+  const rows = db
+    .prepare(
+      `SELECT ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} AS placement_id, ` +
+        `${FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN} AS is_category, COUNT(*) AS c ` +
+        `FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
+        `WHERE world_id = ? AND ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} IS NOT NULL ` +
+        `GROUP BY ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN}, ${FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN}`
+    )
+    .all(worldId) as Array<{
+      placement_id: string
+      is_category: number
+      c: number
+    }>
+
+  const countsByPlacement = new Map<string, { categoryCount: number, documentCount: number }>()
+  for (const row of rows) {
+    const existing = countsByPlacement.get(row.placement_id) ?? {
+      categoryCount: 0,
+      documentCount: 0
+    }
+    if (row.is_category === 1) {
+      existing.categoryCount = row.c
+    } else {
+      existing.documentCount = row.c
+    }
+    countsByPlacement.set(row.placement_id, existing)
+  }
+  return countsByPlacement
 }
 
 /**
@@ -71,6 +106,8 @@ export function listFaProjectWorkspaceHierarchyLayout (
       )
       .all(world.id) as I_faSqlWorldTemplatePlacementJoinRow[]
 
+    const placementCounts = listFaProjectPlacementCategoryDocumentCounts(db, world.id)
+
     return {
       id: world.id,
       displayName: world.displayName,
@@ -95,6 +132,8 @@ export function listFaProjectWorkspaceHierarchyLayout (
         nickname: placementRow.nickname,
         icon: placementRow.icon,
         hasChildren: true,
+        documentCount: placementCounts.get(placementRow.id)?.documentCount ?? 0,
+        categoryCount: placementCounts.get(placementRow.id)?.categoryCount ?? 0,
         titlePluralTranslations: parseFaProjectDocumentTemplateTitleTranslationsJson(
           placementRow.title_translations_json
         ),

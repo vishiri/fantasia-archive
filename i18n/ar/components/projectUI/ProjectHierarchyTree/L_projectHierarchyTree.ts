@@ -8,5 +8,10 @@ export default {
     editDocument: 'تحرير المستند',
     expandAllUnderNode: 'Expand all under this node',
     openDocument: 'فتح المستند'
+  },
+  placementCountTooltip: {
+    categoryCount: 'عدد الفئات:',
+    documentCount: 'عدد المستندات:',
+    totalCount: 'عدد المستندات والفئات:'
   }
 }

@@ -8,5 +8,10 @@ export default {
     editDocument: 'Επεξεργασία εγγράφου',
     expandAllUnderNode: 'Expand all under this node',
     openDocument: 'Άνοιγμα εγγράφου'
+  },
+  placementCountTooltip: {
+    categoryCount: 'Αριθμός κατηγοριών:',
+    documentCount: 'Αριθμός εγγράφων:',
+    totalCount: 'Αριθμός εγγράφων και κατηγοριών:'
   }
 }

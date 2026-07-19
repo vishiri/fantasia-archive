@@ -21,12 +21,32 @@
       :style="nodeIconLabelTextStyle"
     />
     <span
+      v-if="showsFinishedMarker"
+      class="projectHierarchyTreeNode__finishedMarker"
+      :data-test-locator="`${nodeTestLocator}-finishedMarker`"
+      :style="nodeIconLabelTextStyle"
+    >✓</span>
+    <span
+      v-if="showsDeadMarker"
+      class="projectHierarchyTreeNode__deadMarker"
+      :data-test-locator="`${nodeTestLocator}-deadMarker`"
+      :style="nodeIconLabelTextStyle"
+    >†</span>
+    <span
       class="projectHierarchyTreeNode__label"
+      :class="{ 'projectHierarchyTreeNode__label--dead': showsDeadStrikethrough }"
       :data-test-locator="`${nodeTestLocator}-label`"
       :style="nodeIconLabelTextStyle"
     >
       {{ props.node.label }}
     </span>
+    <ProjectHierarchyTreePlacementCount
+      v-if="placementCountDisplay !== null"
+      :category-count="placementCountDisplay!.categoryCount"
+      :display="placementCountDisplay!.display"
+      :document-count="placementCountDisplay!.documentCount"
+    />
+    <slot name="documentButtonGroup" />
   </div>
 </template>
 
@@ -34,12 +54,15 @@
 import { computed, onBeforeUnmount, onMounted, onUpdated, ref, watch } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
+import type { I_projectHierarchyTreePlacementCountDisplay } from 'app/types/I_projectHierarchyTreePlacementCount'
 import { projectHierarchyTreeNodeShowsActiveTabHighlight } from './functions/projectHierarchyTreeActiveTabHighlight'
+import ProjectHierarchyTreePlacementCount from './ProjectHierarchyTreePlacementCount.vue'
 import {
   applyProjectHierarchyTreeTreeNodeKindClass,
   clearProjectHierarchyTreeTreeNodeKindClass,
   resolveProjectHierarchyTreeDocumentAppearanceChrome,
-  resolveProjectHierarchyTreePlacementDisplayIcon
+  resolveProjectHierarchyTreePlacementDisplayIcon,
+  resolveProjectHierarchyTreeWorldDisplayColor
 } from './scripts/projectHierarchyTree_manager'
 
 defineOptions({
@@ -50,12 +73,18 @@ const props = withDefaults(
   defineProps<{
     activeDocumentId?: string | null
     node: I_faProjectHierarchyTreeHeTreeNode
+    placementCountDisplay?: {
+      categoryCount: number
+      display: I_projectHierarchyTreePlacementCountDisplay
+      documentCount: number
+    } | null
     stat: {
       open: boolean
     }
   }>(),
   {
-    activeDocumentId: null
+    activeDocumentId: null,
+    placementCountDisplay: null
   }
 )
 
@@ -102,6 +131,9 @@ const displayIcon = computed(() => {
   if (props.node.nodeKind === 'world') {
     return 'mdi-earth'
   }
+  if (props.node.nodeKind === 'document' && props.node.isCategory === true) {
+    return 'mdi-folder-open'
+  }
   if (props.node.nodeKind === 'templatePlacement' || props.node.nodeKind === 'document') {
     return resolveProjectHierarchyTreePlacementDisplayIcon(props.node.icon)
   }
@@ -109,6 +141,18 @@ const displayIcon = computed(() => {
     return props.node.icon
   }
   return props.node.icon
+})
+
+const showsFinishedMarker = computed(() => {
+  return props.node.nodeKind === 'document' && props.node.isFinished === true
+})
+
+const showsDeadMarker = computed(() => {
+  return props.node.nodeKind === 'document' && props.node.isDead === true
+})
+
+const showsDeadStrikethrough = computed(() => {
+  return showsDeadMarker.value
 })
 
 const documentAppearanceChrome = computed(() => {
@@ -138,7 +182,7 @@ const nodeRootBackgroundStyle = computed(() => {
 const nodeIconLabelTextStyle = computed(() => {
   if (props.node.nodeKind === 'world') {
     return {
-      color: props.node.worldColor
+      color: resolveProjectHierarchyTreeWorldDisplayColor(props.node.worldColor)
     }
   }
 
@@ -154,13 +198,3 @@ const nodeIconLabelTextStyle = computed(() => {
 </script>
 
 <style lang="scss" src="./styles/ProjectHierarchyTreeNode.unscoped.scss"></style>
-
-<style lang="scss" scoped>
-.projectHierarchyTreeNode {
-  &__label {
-    flex: 1;
-    min-width: 0;
-    word-break: break-word;
-  }
-}
-</style>

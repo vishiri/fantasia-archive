@@ -107,6 +107,7 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot dedupes duplicate palet
     }
   ])).toEqual([
     {
+      color: '',
       colorPallete: '#112233;#AABBCC',
       displayNameTranslations: { 'en-US': 'Realm' },
       id: baseWorld.id,
@@ -150,6 +151,7 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot ignores invalid palette
     }
   ])).toEqual([
     {
+      color: '',
       colorPallete: '#112233;#445566',
       displayNameTranslations: { 'en-US': 'Realm' },
       id: baseWorld.id,
@@ -166,6 +168,7 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot ignores invalid palette
     }
   ])).toEqual([
     {
+      color: '',
       displayNameTranslations: { 'en-US': 'Realm' },
       id: baseWorld.id,
       templateLayout: {
@@ -645,6 +648,7 @@ test('Test that mapDialogProjectSettingsWorldsToSnapshot maps template layout ro
     }
   ])).toEqual([
     {
+      color: '',
       displayNameTranslations: { 'en-US': 'Realm' },
       id: baseWorld.id,
       templateLayout: {

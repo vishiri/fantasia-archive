@@ -33,6 +33,7 @@
         :resolve-browse-tab-label="resolveBrowseTabLabel"
         :resolve-browse-tab-route="resolveBrowseTabRoute"
         :resolve-document-tab-appearance-chrome="resolveDocumentTabAppearanceChrome"
+        :resolve-document-tab-display-icon="resolveDocumentTabDisplayIcon"
         :resolve-document-tab-inline-style="resolveDocumentTabInlineStyle"
         :resolve-tab-world-indicator-color="resolveTabWorldIndicatorColor"
         :show-world-tab-indicators="showWorldTabIndicators"
@@ -201,6 +202,7 @@ defineProps<{
   resolveDocumentTabAppearanceChrome: (
     tab: I_faOpenedDocumentTab
   ) => I_faDocumentAppearanceChromeStyle | undefined
+  resolveDocumentTabDisplayIcon: (tab: I_faOpenedDocumentTab) => string
   resolveDocumentTabInlineStyle: (tab: I_faOpenedDocumentTab) => CSSProperties | undefined
   resolveTabWorldIndicatorColor: (tab: I_faOpenedDocumentTab) => string | null
   showDeleteThisDocument: boolean

@@ -8,5 +8,10 @@ export default {
     editDocument: 'दस्तावेज़ संपादित करें',
     expandAllUnderNode: 'Expand all under this node',
     openDocument: 'दस्तावेज़ खोलें'
+  },
+  placementCountTooltip: {
+    categoryCount: 'श्रेणी संख्या:',
+    documentCount: 'दस्तावेज़ संख्या:',
+    totalCount: 'दस्तावेज़ और श्रेणी संख्या:'
   }
 }

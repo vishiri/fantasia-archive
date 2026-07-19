@@ -53,10 +53,6 @@ export default {
         subtitle: 'Baumverhalten',
         tags: 'erweitern, reduzieren, alles erweitern, Interaktion',
       },
-      treeSettings: {
-        subtitle: 'Baumeinstellungen',
-        tags: 'Baum-Panel, Sichtbarkeit der Seitenleiste, Baum-Layout',
-      }
     },
     openedDocumentsTabs: {
       title: 'Dokumentregisterkarten öffnen',
@@ -127,9 +123,9 @@ export default {
       description: 'Diese Einstellung macht die Bildlaufleisten von FA breiter und ermöglicht daher manuelles Klicken und Scrollen direkt auf ihnen für Geräte, die das Standard-Scrollen nicht unterstützen (z. B. Mäuse ohne Scrollrad).',
       tags: 'Breite der Bildlaufleiste, Scrollen durch Klicken, Maus ohne Rad, Trackball, Touch',
     },
-    compactDocumentCount: {
+    disableCategoryCount: {
       title: 'Anzahl der Kategorien ausblenden',
-      description: 'Zeigt die Anzahl der Dokumente ohne die sekundäre Nummer pro Kategorie an.',
+      description: 'Kategorienummern in der hierarchischen Struktur ausblenden',
       tags: 'vereinfachte Zählung, einzelne Zahl, weniger Unordnung',
     },
     compactTags: {
@@ -158,8 +154,8 @@ export default {
       tags: 'Anfängerhinweise, Tutorial-Banner, Trainernoten, Hilfe zur Steuerleiste',
     },
     disableDocumentCounts: {
-      title: 'Dokumentanzahl vollständig ausblenden',
-      description: 'Versteckt alle Informationen zur Dokumentanzahl in der hierarchischen Struktur.',
+      title: 'Dokumentanzahl ausblenden',
+      description: 'Dokumentnummern in der hierarchischen Struktur ausblenden',
       tags: 'Summen aus, keine Zählungen, Statistiken ausgeblendet',
     },
     disableDocumentToolTips: {
@@ -208,11 +204,6 @@ export default {
       description: 'Versteckt Felder ohne ausgefüllten Wert im Ansichtsmodus (ohne Bearbeitung). Bitte beachten Sie, dass dies zu relativ wilden Layoutverschiebungen führen kann, die das Dokument in manchen Fällen unruhig wirken lassen.',
       tags: 'leere Felder, schreibgeschützte Ansicht, kompaktes Dokument, Layoutverschiebung',
     },
-    hideHierarchyTree: {
-      title: 'Hierarchischen Baum ausblenden',
-      description: 'Steuert, ob der hierarchische Baum angezeigt wird.',
-      tags: 'Seitenleiste aus, Navigator ausgeblendet, Baumansicht, Umriss ausblenden',
-    },
     hidePlushes: {
       title: 'Fantasia-Maskottchen verstecken',
       description: 'Versteckt die unglaublich bezaubernde und fantastische Fantasia, den winzigen arkanen Drachen. Wie konntest du! :(',
@@ -228,11 +219,6 @@ export default {
       description: 'Blendet das Popup mit Tipps und Tricks auf dem Startbildschirm aus.',
       tags: 'Erster Start, Onboarding, Splash, Startup-Tipps, Tricks',
     },
-    hideTreeExtraIcons: {
-      title: 'Zusätzliche Symbole ausblenden',
-      description: 'Blendet Symbole aus, die normalerweise der Einfachheit halber angezeigt werden, aber keine Funktionalität hinzufügen – zum Beispiel das Symbol „Dokument öffnen“ neben einem Dokument ohne untergeordnete Knoten, das genauso gut mit einem normalen Linksklick anstelle des Symbols geöffnet werden kann.',
-      tags: 'überflüssige Symbole, Unordnung, minimaler Baum, optionale Aktionen',
-    },
     hideTreeIconAddUnder: {
       title: 'Symbol „Hinzufügen unter“ ausblenden',
       description: 'Diese Option verbirgt das Symbol „Neues Dokument unter dem ausgewählten übergeordneten Dokument hinzufügen“.',
@@ -247,6 +233,11 @@ export default {
       title: '„Öffnen“-Symbol ausblenden',
       description: 'Diese Option blendet das Zeilensymbol „Öffnen“ aus.',
       tags: 'Öffnen-Symbol, zum Dokument gehen, Schaltfläche zum Öffnen der Zeile',
+    },
+    hideTreeLines: {
+      title: 'Hide tree lines',
+      description: 'Hides the structural help-lines in the hierarchy tree.',
+      tags: 'lines, helplines, structure, tree, hierarchical, hierarchical tree'
     },
     hideTreeOrderNumbers: {
       title: 'Bestellnummern ausblenden',
@@ -272,11 +263,6 @@ export default {
       title: 'Kategorieposition umkehren',
       description: 'Vertauscht die Positionen der Kategorie- und Dokumentnummern.',
       tags: 'Nummern austauschen, Zählreihenfolge, Kategorie vs. Dokumentanzahl',
-    },
-    invertTreeSorting: {
-      title: 'Kehren Sie die Sortierung nach benutzerdefinierter Baumreihenfolge um',
-      description: 'Sortiert Dokumente im hierarchischen Baum in der entgegengesetzten Richtung zur Standardrichtung: von der höchsten zur niedrigsten.',
-      tags: 'umgekehrte Reihenfolge, benutzerdefinierte Reihenfolge, Sortierrichtung, aufsteigend absteigend',
     },
     limitEditorHeight: {
       title: 'Begrenzen Sie die Höhe des Texteditors',

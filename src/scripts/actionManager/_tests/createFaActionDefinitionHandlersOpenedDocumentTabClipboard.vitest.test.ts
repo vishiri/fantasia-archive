@@ -22,6 +22,16 @@ const sessionState: {
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: ' #112233 ',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       hasUnsavedChanges: false,
       editState: false
     }
@@ -64,6 +74,16 @@ beforeEach(() => {
     savedDocumentTextColor: '',
     documentBackgroundColorDraft: ' #112233 ',
     savedDocumentBackgroundColor: '',
+    isCategoryDraft: false,
+    savedIsCategory: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    isDeadDraft: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    parentDocumentIdDraft: '',
+    savedParentDocumentId: '',
     hasUnsavedChanges: false,
     editState: false
   }

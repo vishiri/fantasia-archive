@@ -17,7 +17,7 @@ I_appSettingsStaticOption
     category: 'accessibility',
     subcategory: 'accessibility'
   },
-  compactDocumentCount: {
+  disableCategoryCount: {
     category: 'hierarchicalTree',
     subcategory: 'informationDisplaySettings'
   },
@@ -81,10 +81,6 @@ I_appSettingsStaticOption
     category: 'documentViewEdit',
     subcategory: 'documentBody'
   },
-  hideHierarchyTree: {
-    category: 'hierarchicalTree',
-    subcategory: 'treeSettings'
-  },
   hidePlushes: {
     category: 'visualAccessibility',
     subcategory: 'applicationExtras'
@@ -97,10 +93,6 @@ I_appSettingsStaticOption
     category: 'welcomeScreen',
     subcategory: 'welcomeScreenBehavior'
   },
-  hideTreeExtraIcons: {
-    category: 'hierarchicalTree',
-    subcategory: 'iconSettings'
-  },
   hideTreeIconAddUnder: {
     category: 'hierarchicalTree',
     subcategory: 'iconSettings'
@@ -112,6 +104,10 @@ I_appSettingsStaticOption
   hideTreeIconView: {
     category: 'hierarchicalTree',
     subcategory: 'iconSettings'
+  },
+  hideTreeLines: {
+    category: 'hierarchicalTree',
+    subcategory: 'treeBehavior'
   },
   hideTreeOrderNumbers: {
     category: 'hierarchicalTree',
@@ -128,10 +124,6 @@ I_appSettingsStaticOption
   invertCategoryPosition: {
     category: 'hierarchicalTree',
     subcategory: 'informationDisplaySettings'
-  },
-  invertTreeSorting: {
-    category: 'hierarchicalTree',
-    subcategory: 'treeBehavior'
   },
   limitEditorHeight: {
     category: 'documentViewEdit',
@@ -171,7 +163,7 @@ I_appSettingsStaticOption
   },
   preventPreviewsTree: {
     category: 'hierarchicalTree',
-    subcategory: 'treeSettings'
+    subcategory: 'treeBehavior'
   },
   showDocumentID: {
     category: 'developerSettings',

@@ -126,9 +126,12 @@ test('Test that ProjectHierarchyTreeOpenIcon emits click and pointerdown', async
       pendingExpandAnimation: false
     }
   })
-  await wrapper.get('[data-test-locator="projectHierarchyTree-openIcon"]').trigger('click')
-  await wrapper.get('[data-test-locator="projectHierarchyTree-openIcon"]').trigger('pointerdown')
+  await wrapper.get('[data-test-locator="projectHierarchyTree-openIconWrapper"]').trigger('click')
+  await wrapper.get('[data-test-locator="projectHierarchyTree-openIconWrapper"]').trigger('pointerdown')
   expect(wrapper.emitted('click')).toHaveLength(1)
   expect(wrapper.emitted('pointerdown')).toHaveLength(1)
+  expect(wrapper.get('[data-test-locator="projectHierarchyTree-openIconWrapper"]').classes()).toContain(
+    'projectHierarchyTree__openIconWrapper'
+  )
   wrapper.unmount()
 })

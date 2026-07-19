@@ -18,14 +18,18 @@ import {
   FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
 } from './functions/faProjectDbSchemaDdl'
 import { createApplyFaProjectDocumentsHierarchySchemaPatch } from './functions/faProjectDocumentsHierarchySchemaPatch'
+import { applyFaProjectDocumentAppearanceEmptyColorSchemaPatch } from './projectDbContent/faProjectDocumentAppearanceEmptyColorSchemaPatchWiring'
 import { applyFaProjectDocumentAppearanceSchemaPatch } from './projectDbContent/faProjectDocumentAppearanceSchemaPatchWiring'
+import { applyFaProjectDocumentCategorySchemaPatch } from './projectDbContent/faProjectDocumentCategorySchemaPatchWiring'
+import { applyFaProjectDocumentStatusFlagsSchemaPatch } from './projectDbContent/faProjectDocumentStatusFlagsSchemaPatchWiring'
 import { seedFaProjectDefaultWorldIfEmpty } from './projectDbContent/faProjectWorldBootstrapWiring'
+import { applyFaProjectWorldColorEmptyAllowedSchemaPatch } from './projectDbContent/faProjectWorldColorEmptyAllowedSchemaPatchWiring'
 
 const OPTION_PROJECT_NAME = 'project_name'
 const OPTION_PROJECT_UUID = 'project_uuid'
 
-/** Current schema revision: flattened to a single bootstrap version. */
-export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 1
+/** Current schema revision: flattened bootstrap + v2 is_category + v3 status flags. */
+export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 3
 
 const applyFaProjectDocumentsHierarchySchemaPatch = createApplyFaProjectDocumentsHierarchySchemaPatch({
   documentsTableName: FA_PROJECT_TABLE_DOCUMENTS,
@@ -87,10 +91,35 @@ function verifyFaProjectMetadataAfterBootstrap (db: Database, displayProjectName
   }
 }
 
+function applyFaProjectSchemaPatchesAtCurrentVersion (db: Database): void {
+  applyFaProjectDocumentsHierarchySchemaPatch(db)
+  applyFaProjectDocumentAppearanceSchemaPatch(db)
+  applyFaProjectDocumentCategorySchemaPatch(db)
+  applyFaProjectDocumentStatusFlagsSchemaPatch(db)
+  applyFaProjectWorldColorEmptyAllowedSchemaPatch(db)
+  applyFaProjectDocumentAppearanceEmptyColorSchemaPatch(db)
+  applyFaProjectOpenedDocumentsSchemaV1(db)
+}
+
+function migrateFaProjectSchemaV1ToV2 (db: Database): void {
+  const runMigration = db.transaction(() => {
+    applyFaProjectDocumentCategorySchemaPatch(db)
+    db.pragma('user_version = 2')
+  })
+  runMigration()
+}
+
+function migrateFaProjectSchemaV2ToV3 (db: Database): void {
+  const runMigration = db.transaction(() => {
+    applyFaProjectDocumentStatusFlagsSchemaPatch(db)
+    db.pragma('user_version = 3')
+  })
+  runMigration()
+}
+
 /**
- * Applies the flattened single-version schema. Fresh files bootstrap to the
- * current revision and seed the default world. Files already at the supported
- * version are a no-op. Any other version is unsupported (throws).
+ * Applies schema migrations. Fresh files bootstrap to the current revision and seed the default world.
+ * Files already at the supported version run idempotent patches only.
  */
 export function applyFaProjectMigrations (
   db: Database,
@@ -101,9 +130,20 @@ export function applyFaProjectMigrations (
     throw new Error('This project file requires a newer version of Fantasia Archive')
   }
   if (startVer === FA_PROJECT_USER_VERSION_SUPPORTED_MAX) {
-    applyFaProjectDocumentsHierarchySchemaPatch(db)
-    applyFaProjectDocumentAppearanceSchemaPatch(db)
-    applyFaProjectOpenedDocumentsSchemaV1(db)
+    applyFaProjectSchemaPatchesAtCurrentVersion(db)
+    return
+  }
+  if (startVer === 1) {
+    migrateFaProjectSchemaV1ToV2(db)
+    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 3) {
+      migrateFaProjectSchemaV2ToV3(db)
+    }
+    applyFaProjectSchemaPatchesAtCurrentVersion(db)
+    return
+  }
+  if (startVer === 2) {
+    migrateFaProjectSchemaV2ToV3(db)
+    applyFaProjectSchemaPatchesAtCurrentVersion(db)
     return
   }
   if (startVer === 0) {

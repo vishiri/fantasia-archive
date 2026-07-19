@@ -21,16 +21,28 @@ import {
 import {
   applyFaOpenedDocumentBackgroundColorDraft,
   applyFaOpenedDocumentDisplayNameDraft,
+  applyFaOpenedDocumentIsCategoryDraft,
   applyFaOpenedDocumentTabAfterDisplayNameSave,
   applyFaOpenedDocumentTabEditState,
   applyFaOpenedDocumentTextColorDraft,
   buildFaOpenedDocumentsSnapshot,
   createFaOpenedDocumentTabFromOpenMeta,
-  hydrateFaOpenedDocumentsTabsFromSnapshot,
+  hydrateFaOpenedDocumentsTabsFromSnapshot
+} from 'app/src/stores/scripts/faOpenedDocumentsStoreActions'
+import {
+  applyFaOpenedDocumentParentIdDraft,
+  applyFaOpenedDocumentParentIdSyncFromHierarchy
+} from 'app/src/stores/scripts/faOpenedDocumentsParentIdStoreActions'
+import {
+  applyFaOpenedDocumentIsDeadDraft,
+  applyFaOpenedDocumentIsFinishedDraft,
+  applyFaOpenedDocumentIsMinorDraft
+} from 'app/src/scripts/openedDocuments/openedDocumentTabStatusFlagDraftWiring'
+import {
   removeFaOpenedDocumentTabAtIndex,
   resolveFaOpenedDocumentOpenFromTree,
   resolveFaOpenedDocumentsActiveDocumentSyncTarget
-} from 'app/src/stores/scripts/faOpenedDocumentsStoreActions'
+} from 'app/src/stores/scripts/faOpenedDocumentsTabSessionWiring'
 import { reconcileTemporaryOpenedDocumentTabFromSnapshot } from 'app/src/stores/scripts/faOpenedDocumentsTemporarySessionWiring'
 import {
   duplicateOpenedDocumentTabs,
@@ -41,22 +53,27 @@ import {
 } from 'app/src/scripts/openedDocuments/functions/openedDocumentTabDomain'
 import {
   normalizeOpenedDocumentAppearanceColorFromDb,
+  normalizeOpenedDocumentParentIdFromDb,
   recomputeOpenedDocumentTabHasUnsavedChanges,
-  resolveOpenedDocumentAppearanceColorDraftForPersist
+  resolveOpenedDocumentAppearanceColorDraftForPersist,
+  resolveOpenedDocumentParentIdDraftForPersist,
+  resolveOpenedDocumentParentMoveAppendSortOrder
 } from 'app/src/scripts/openedDocuments/openedDocumentTabAppearanceWiring'
 import {
   applyTemporaryOpenedDocumentParent,
-  buildTemporaryDocumentParentResolveDocumentIds,
-  buildTemporaryDocumentParentResolveDocumentIdsFromOpenedTab,
   createTemporaryOpenedDocumentTabCopySeed,
   createTemporaryOpenedDocumentTabSeed,
   promoteTemporaryOpenedDocumentTabAfterCreate,
   remapOpenedDocumentTabDocumentId,
   resolveOpenedDocumentTabIsTemporary,
-  resolveTemporaryDocumentParentDocumentIdForSave,
   resolveTemporaryOpenedDocumentDisplayNameForSave,
   resolveTemporaryOpenedDocumentParentDocumentId
 } from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
+import {
+  buildTemporaryDocumentParentResolveDocumentIds,
+  buildTemporaryDocumentParentResolveDocumentIdsFromOpenedTab,
+  resolveTemporaryDocumentParentDocumentIdForSave
+} from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryParentResolve'
 import { resolveOpenedDocumentTabDocumentActionContext } from 'app/src/scripts/openedDocuments/functions/openedDocumentTabDocumentActionContext'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/appRouting_manager'
 import { collectProjectHierarchyTreeDocumentDeleteRefreshNodeIds, collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh, ensureProjectHierarchyTreeDocumentNodeHasChildrenForRefresh, removeProjectHierarchyTreeDocumentNodesByDocumentIds } from 'app/src/components/projectUI/ProjectHierarchyTree/functions/projectHierarchyTreeDocumentParentBucket'
@@ -146,6 +163,11 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         const savedDocumentBackgroundColor = normalizeOpenedDocumentAppearanceColorFromDb(
           doc.documentBackgroundColor
         )
+        const savedIsCategory = doc.isCategory === true
+        const savedIsFinished = doc.isFinished === true
+        const savedIsMinor = doc.isMinor === true
+        const savedIsDead = doc.isDead === true
+        const savedParentDocumentId = normalizeOpenedDocumentParentIdFromDb(doc.parentDocumentId)
         const displayNameDraft = tab.hasUnsavedChanges ? tab.displayNameDraft : savedDisplayName
         const documentTextColorDraft = tab.hasUnsavedChanges
           ? tab.documentTextColorDraft
@@ -153,14 +175,31 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         const documentBackgroundColorDraft = tab.hasUnsavedChanges
           ? tab.documentBackgroundColorDraft
           : savedDocumentBackgroundColor
+        const isCategoryDraft = tab.hasUnsavedChanges ? tab.isCategoryDraft : savedIsCategory
+        const isFinishedDraft = tab.hasUnsavedChanges ? tab.isFinishedDraft : savedIsFinished
+        const isMinorDraft = tab.hasUnsavedChanges ? tab.isMinorDraft : savedIsMinor
+        const isDeadDraft = tab.hasUnsavedChanges ? tab.isDeadDraft : savedIsDead
+        const parentDocumentIdDraft = tab.hasUnsavedChanges
+          ? tab.parentDocumentIdDraft
+          : savedParentDocumentId
         const reconciledTab: I_faOpenedDocumentTab = {
           ...tab,
           displayNameDraft,
           documentBackgroundColorDraft,
           documentTextColorDraft,
+          isCategoryDraft,
+          isFinishedDraft,
+          isMinorDraft,
+          isDeadDraft,
+          parentDocumentIdDraft,
           savedDisplayName,
           savedDocumentBackgroundColor,
           savedDocumentTextColor,
+          savedIsCategory,
+          savedIsFinished,
+          savedIsMinor,
+          savedIsDead,
+          savedParentDocumentId,
           worldId: tab.worldId ?? doc.worldId
         }
         nextTabs.push({
@@ -222,6 +261,11 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         displayName: doc.displayName,
         documentBackgroundColor: doc.documentBackgroundColor,
         documentTextColor: doc.documentTextColor,
+        isCategory: doc.isCategory,
+        isFinished: doc.isFinished,
+        isMinor: doc.isMinor,
+        isDead: doc.isDead,
+        parentDocumentId: doc.parentDocumentId,
         treeMeta,
         worldId: doc.worldId
       })
@@ -662,6 +706,103 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     schedulePersistSnapshot()
   }
 
+  function updateIsCategoryDraft (documentId: string, value: boolean): void {
+    const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
+    if (index === -1) {
+      return
+    }
+    const current = tabs.value[index]
+    if (current === undefined) {
+      return
+    }
+    const nextTabs = [...tabs.value]
+    nextTabs[index] = applyFaOpenedDocumentIsCategoryDraft(current, value)
+    tabs.value = nextTabs
+    schedulePersistSnapshot()
+  }
+
+  function updateIsFinishedDraft (documentId: string, value: boolean): void {
+    const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
+    if (index === -1) {
+      return
+    }
+    const current = tabs.value[index]
+    if (current === undefined) {
+      return
+    }
+    const nextTabs = [...tabs.value]
+    nextTabs[index] = applyFaOpenedDocumentIsFinishedDraft(current, value)
+    tabs.value = nextTabs
+    schedulePersistSnapshot()
+  }
+
+  function updateIsMinorDraft (documentId: string, value: boolean): void {
+    const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
+    if (index === -1) {
+      return
+    }
+    const current = tabs.value[index]
+    if (current === undefined) {
+      return
+    }
+    const nextTabs = [...tabs.value]
+    nextTabs[index] = applyFaOpenedDocumentIsMinorDraft(current, value)
+    tabs.value = nextTabs
+    schedulePersistSnapshot()
+  }
+
+  function updateIsDeadDraft (documentId: string, value: boolean): void {
+    const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
+    if (index === -1) {
+      return
+    }
+    const current = tabs.value[index]
+    if (current === undefined) {
+      return
+    }
+    const nextTabs = [...tabs.value]
+    nextTabs[index] = applyFaOpenedDocumentIsDeadDraft(current, value)
+    tabs.value = nextTabs
+    schedulePersistSnapshot()
+  }
+
+  function updateParentDocumentIdDraft (documentId: string, value: string): void {
+    const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
+    if (index === -1) {
+      return
+    }
+    const current = tabs.value[index]
+    if (current === undefined) {
+      return
+    }
+    const nextTabs = [...tabs.value]
+    nextTabs[index] = applyFaOpenedDocumentParentIdDraft(current, value)
+    tabs.value = nextTabs
+    schedulePersistSnapshot()
+  }
+
+  function syncOpenedDocumentParentFromHierarchy (
+    documentId: string,
+    parentDocumentId: string | null
+  ): void {
+    const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
+    if (index === -1) {
+      return
+    }
+    const current = tabs.value[index]
+    if (current === undefined) {
+      return
+    }
+    const normalizedParentDocumentId = normalizeOpenedDocumentParentIdFromDb(parentDocumentId)
+    const nextTabs = [...tabs.value]
+    nextTabs[index] = applyFaOpenedDocumentParentIdSyncFromHierarchy(
+      current,
+      normalizedParentDocumentId
+    )
+    tabs.value = nextTabs
+    schedulePersistSnapshot()
+  }
+
   function setDocumentEditState (documentId: string, editState: boolean): void {
     const index = findOpenedDocumentTabIndexByDocumentId(tabs.value, documentId)
     if (index === -1) {
@@ -733,18 +874,28 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       })
       const parentResolveChain = current.temporaryParentResolveDocumentIds ?? []
       const availableDocumentIds = new Set<string>()
-      for (const documentId of parentResolveChain) {
+      for (const chainDocumentId of parentResolveChain) {
         try {
-          await api.getDocumentById(documentId)
-          availableDocumentIds.add(documentId)
+          await api.getDocumentById(chainDocumentId)
+          availableDocumentIds.add(chainDocumentId)
         } catch {
           continue
         }
       }
-      const resolvedParentDocumentId = resolveTemporaryDocumentParentDocumentIdForSave({
-        chain: parentResolveChain,
-        isDocumentIdAvailable: (documentId) => availableDocumentIds.has(documentId)
-      })
+      const draftParentDocumentId = resolveOpenedDocumentParentIdDraftForPersist(
+        current.parentDocumentIdDraft
+      )
+      let resolvedParentDocumentId = draftParentDocumentId
+      if (draftParentDocumentId !== null) {
+        try {
+          await api.getDocumentById(draftParentDocumentId)
+        } catch {
+          resolvedParentDocumentId = resolveTemporaryDocumentParentDocumentIdForSave({
+            chain: parentResolveChain,
+            isDocumentIdAvailable: (chainDocumentId) => availableDocumentIds.has(chainDocumentId)
+          })
+        }
+      }
       try {
         const savedDocument = await api.createDocument({
           displayName,
@@ -755,6 +906,10 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
             current.documentTextColorDraft
           ),
           id: documentId,
+          isCategory: current.isCategoryDraft,
+          isFinished: current.isFinishedDraft,
+          isMinor: current.isMinorDraft,
+          isDead: current.isDeadDraft,
           parentDocumentId: resolvedParentDocumentId,
           templateId,
           worldId
@@ -779,7 +934,12 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
           keepEditMode: input.keepEditMode,
           savedDisplayName: savedDocument.displayName,
           savedDocumentBackgroundColor: savedDocument.documentBackgroundColor,
-          savedDocumentTextColor: savedDocument.documentTextColor
+          savedDocumentTextColor: savedDocument.documentTextColor,
+          savedIsCategory: savedDocument.isCategory,
+          savedIsFinished: savedDocument.isFinished,
+          savedIsMinor: savedDocument.isMinor,
+          savedIsDead: savedDocument.isDead,
+          savedParentDocumentId: savedDocument.parentDocumentId
         })
         tabs.value = nextTabs
         schedulePersistSnapshot.flush()
@@ -802,6 +962,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         if (treeRefreshNodeIds.length > 0) {
           hierarchyStore.refreshHierarchyTreeNodes(treeRefreshNodeIds)
         }
+        await hierarchyStore.refreshLayout()
       } catch (error) {
         console.error('[S_FaOpenedDocuments] saveDocumentDisplayName temporary failed', error)
         throw error instanceof Error
@@ -811,7 +972,7 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       return
     }
 
-    if (typeof api?.updateDocument !== 'function') {
+    if (typeof api?.updateDocument !== 'function' || typeof api?.getDocumentById !== 'function') {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
     }
     const trimmedDraft = current.displayNameDraft.trim()
@@ -819,6 +980,49 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveErrorEmptyDraft'))
     }
     try {
+      const savedIsCategoryBeforeSave = current.savedIsCategory
+      const parentChanged = current.parentDocumentIdDraft !== current.savedParentDocumentId
+      let savedParentDocumentId = current.savedParentDocumentId
+      let parentMoveTreeRefreshInput: {
+        parentDocumentId: string | null
+        templateId: string
+        worldId: string
+      } | null = null
+      if (parentChanged) {
+        if (
+          typeof api.moveDocumentInHierarchy !== 'function' ||
+          typeof api.listPlacementDocumentChildren !== 'function'
+        ) {
+          throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
+        }
+        const existingDocument = await api.getDocumentById(documentId)
+        const placementId = existingDocument.placementId
+        if (placementId === null) {
+          throw new Error(i18n.global.t('globalFunctionality.faOpenedDocuments.saveError'))
+        }
+        const targetParentDocumentId = resolveOpenedDocumentParentIdDraftForPersist(
+          current.parentDocumentIdDraft
+        )
+        const siblingsResult = await api.listPlacementDocumentChildren({
+          placementId,
+          parentDocumentId: targetParentDocumentId
+        })
+        const targetSortOrder = resolveOpenedDocumentParentMoveAppendSortOrder(
+          siblingsResult.items,
+          documentId
+        )
+        await api.moveDocumentInHierarchy({
+          documentId,
+          targetParentDocumentId,
+          targetSortOrder
+        })
+        savedParentDocumentId = normalizeOpenedDocumentParentIdFromDb(targetParentDocumentId)
+        parentMoveTreeRefreshInput = {
+          parentDocumentId: targetParentDocumentId,
+          templateId: existingDocument.templateId ?? '',
+          worldId: existingDocument.worldId
+        }
+      }
       const savedDocument = await api.updateDocument(documentId, {
         displayName: trimmedDraft,
         documentBackgroundColor: resolveOpenedDocumentAppearanceColorDraftForPersist(
@@ -826,7 +1030,11 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
         ),
         documentTextColor: resolveOpenedDocumentAppearanceColorDraftForPersist(
           current.documentTextColorDraft
-        )
+        ),
+        isCategory: current.isCategoryDraft,
+        isFinished: current.isFinishedDraft,
+        isMinor: current.isMinorDraft,
+        isDead: current.isDeadDraft
       })
       const savedDocumentTextColor = normalizeOpenedDocumentAppearanceColorFromDb(
         savedDocument.documentTextColor
@@ -834,17 +1042,45 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
       const savedDocumentBackgroundColor = normalizeOpenedDocumentAppearanceColorFromDb(
         savedDocument.documentBackgroundColor
       )
+      const savedIsCategory = savedDocument.isCategory === true
+      const savedIsFinished = savedDocument.isFinished === true
+      const savedIsMinor = savedDocument.isMinor === true
+      const savedIsDead = savedDocument.isDead === true
       const nextTabs = [...tabs.value]
       nextTabs[index] = applyFaOpenedDocumentTabAfterDisplayNameSave(current, {
         keepEditMode: input.keepEditMode,
         savedDisplayName: savedDocument.displayName,
         savedDocumentBackgroundColor,
-        savedDocumentTextColor
+        savedDocumentTextColor,
+        savedIsCategory,
+        savedIsFinished,
+        savedIsMinor,
+        savedIsDead,
+        savedParentDocumentId
       })
       tabs.value = nextTabs
       schedulePersistSnapshot.flush()
       await flushPersistSnapshot()
-      S_FaProjectHierarchyTree().refreshDocumentsInTree([documentId])
+      const hierarchyStore = S_FaProjectHierarchyTree()
+      if (parentChanged || savedIsCategoryBeforeSave !== savedIsCategory) {
+        await hierarchyStore.refreshLayout()
+      }
+      hierarchyStore.refreshDocumentsInTree([documentId])
+      if (parentMoveTreeRefreshInput !== null) {
+        if (parentMoveTreeRefreshInput.parentDocumentId !== null) {
+          ensureProjectHierarchyTreeDocumentNodeHasChildrenForRefresh(
+            hierarchyStore.treeData,
+            parentMoveTreeRefreshInput.parentDocumentId
+          )
+        }
+        const targetContainerNodeIds = collectProjectHierarchyTreeNewDocumentContainerNodeIdsForRefresh(
+          hierarchyStore.treeData,
+          parentMoveTreeRefreshInput
+        )
+        if (targetContainerNodeIds.length > 0) {
+          hierarchyStore.refreshHierarchyTreeNodes(targetContainerNodeIds)
+        }
+      }
     } catch (error) {
       console.error('[S_FaOpenedDocuments] saveDocumentDisplayName failed', error)
       throw error instanceof Error
@@ -1142,10 +1378,16 @@ export const S_FaOpenedDocuments = defineStore('S_FaOpenedDocuments', () => {
     saveDocumentDisplayName,
     setDocumentEditState,
     syncActiveDocumentIdFromWorkspaceRoute,
+    syncOpenedDocumentParentFromHierarchy,
     tabs: readonly(tabs),
     updateDisplayNameDraft,
     updateDocumentBackgroundColorDraft,
     updateDocumentTextColorDraft,
+    updateIsCategoryDraft,
+    updateIsFinishedDraft,
+    updateIsMinorDraft,
+    updateIsDeadDraft,
+    updateParentDocumentIdDraft,
     updateTemporaryDocumentParent
   }
 })

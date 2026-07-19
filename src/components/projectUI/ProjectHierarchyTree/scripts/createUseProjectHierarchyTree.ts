@@ -16,6 +16,9 @@ import type {
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import { createProjectHierarchyTreeSessionWiring } from './projectHierarchyTreeSessionWiring'
+import { createProjectHierarchyTreeDocumentButtonGroupWiring } from './projectHierarchyTreeDocumentButtonGroupWiring'
+import { createProjectHierarchyTreeTreeLineWiring } from './projectHierarchyTreeTreeLineWiring'
+import { createProjectHierarchyTreePlacementCountWiring } from './projectHierarchyTreePlacementCountWiring'
 
 import type {
   I_faOpenedDocumentTreeOpenMeta,
@@ -32,9 +35,12 @@ type T_useProjectHierarchyTreeOptions = {
 
 type T_useProjectHierarchyTree = (
   opts: T_useProjectHierarchyTreeOptions
-) => ReturnType<typeof createProjectHierarchyTreeSessionWiring> & {
-  activeDocumentId: Ref<string | null>
-}
+) => ReturnType<typeof createProjectHierarchyTreeSessionWiring> &
+  ReturnType<typeof createProjectHierarchyTreeDocumentButtonGroupWiring> &
+  ReturnType<typeof createProjectHierarchyTreeTreeLineWiring> &
+  ReturnType<typeof createProjectHierarchyTreePlacementCountWiring> & {
+    activeDocumentId: Ref<string | null>
+  }
 
 export function createUseProjectHierarchyTree (deps: {
   S_FaActiveProject: typeof S_FaActiveProject
@@ -86,9 +92,31 @@ export function createUseProjectHierarchyTree (deps: {
       worlds: worlds as Ref<I_faProjectHierarchyTreeWorkspaceWorld[]>
     })
 
+    const documentButtonGroupWiring = createProjectHierarchyTreeDocumentButtonGroupWiring({
+      S_FaUserSettings: deps.S_FaUserSettings,
+      computed: deps.computed,
+      runFaAction: deps.runFaAction,
+      storeToRefs: deps.storeToRefs
+    })
+
+    const treeLineWiring = createProjectHierarchyTreeTreeLineWiring({
+      S_FaUserSettings: deps.S_FaUserSettings,
+      computed: deps.computed,
+      storeToRefs: deps.storeToRefs
+    })
+
+    const placementCountWiring = createProjectHierarchyTreePlacementCountWiring({
+      S_FaUserSettings: deps.S_FaUserSettings,
+      computed: deps.computed,
+      storeToRefs: deps.storeToRefs
+    })
+
     return {
       activeDocumentId,
-      ...sessionApi
+      ...sessionApi,
+      ...documentButtonGroupWiring,
+      ...treeLineWiring,
+      ...placementCountWiring
     }
   }
 }

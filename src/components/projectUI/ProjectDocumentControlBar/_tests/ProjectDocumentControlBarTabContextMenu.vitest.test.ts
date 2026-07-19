@@ -2,6 +2,8 @@ import { mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
 import { expect, test, vi } from 'vitest'
 
+import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+
 import {
   projectDocumentControlBarTabContextMenuSampleTab
 } from './projectDocumentControlBarTabContextMenuListVitestMount'
@@ -66,6 +68,9 @@ function mountTabContextMenu (
       onTabMoveClick: vi.fn(),
       openedDocumentTabs: [sampleTab],
       resolveDocumentTabAppearanceChrome: resolveProjectDocumentControlBarTabAppearanceChrome,
+      resolveDocumentTabDisplayIcon: (tab: I_faOpenedDocumentTab) => {
+        return tab.isCategoryDraft === true ? 'mdi-folder-open' : tab.templateIcon
+      },
       resolveDocumentTabInlineStyle: resolveProjectDocumentControlBarTabInlineStyle,
       resolveDocumentTabLabel: () => 'Hero',
       resolveDocumentTabRoute: (documentId: string) => `/home/document/${documentId}`,

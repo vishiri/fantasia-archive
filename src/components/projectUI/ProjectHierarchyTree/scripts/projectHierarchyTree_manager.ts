@@ -19,6 +19,7 @@ export {
 } from './projectHierarchyTreeTreeNodeKindClassWiring'
 
 export { resolveProjectHierarchyTreeHeTreeNodeKey } from '../functions/projectHierarchyTreeHeTreeNodeKey'
+export { resolveProjectHierarchyTreeWorldDisplayColor } from '../functions/resolveProjectHierarchyTreeWorldDisplayColor'
 export { resolveProjectHierarchyTreeDocumentAppearanceChrome } from './projectHierarchyTreeDocumentAppearanceChromeWiring'
 export { resolveProjectHierarchyTreePlacementDisplayIcon }
 

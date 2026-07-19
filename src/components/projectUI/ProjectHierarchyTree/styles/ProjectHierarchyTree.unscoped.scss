@@ -20,11 +20,14 @@
 
   .tree-line {
     background: $projectHierarchyTree-treeLine-color;
+    pointer-events: none;
+    z-index: 10;
   }
 
   .tree-vline {
     background: $projectHierarchyTree-treeLine-color;
     margin-left: $projectHierarchyTree-treeVline-marginLeft;
+    pointer-events: none;
     width: $projectHierarchyTree-treeVline-width;
 
     &::before {
@@ -43,6 +46,7 @@
 
   .tree-hline {
     margin-left: $projectHierarchyTree-treeHline-marginLeft;
+    pointer-events: none;
   }
 }
 
@@ -105,11 +109,15 @@
   opacity: 0 !important;
 }
 
+.projectHierarchyTree__openIconWrapper {
+  flex-shrink: 0;
+  pointer-events: none;
+  z-index: $projectHierarchyTree-openIcon-zIndex;
+}
+
 .projectHierarchyTree__openIcon {
   box-sizing: content-box;
   color: $projectHierarchyTree-openIcon-color;
-  cursor: pointer;
-  flex-shrink: 0;
   font-size: $projectHierarchyTree-openIcon-boxSize;
   height: $projectHierarchyTree-openIcon-boxSize;
   padding: $projectHierarchyTree-openIcon-padding;
@@ -117,7 +125,6 @@
   transform: rotate($projectHierarchyTree-openIcon-rotateClosed);
   transition: transform $projectHierarchyTree-openIcon-rotateTransitionDuration;
   width: $projectHierarchyTree-openIcon-boxSize;
-  z-index: $projectHierarchyTree-openIcon-zIndex;
 }
 
 .projectHierarchyTree__nodeRow--world,
@@ -130,12 +137,13 @@
   margin: 0;
   padding: $projectHierarchyTree-worldNodeRow-paddingBlockStart 0 0 $projectHierarchyTree-worldNodeRow-paddingInlineStart !important;
 
-  .projectHierarchyTree__openIcon {
+  .projectHierarchyTree__openIconWrapper {
     position: absolute;
     right: $projectHierarchyTree-openIcon-world-positionRight;
     top: $projectHierarchyTree-openIcon-world-positionTop;
-    transition: transform $projectHierarchyTree-openIcon-rotateTransitionDuration;
+  }
 
+  .projectHierarchyTree__openIcon {
     &.projectHierarchyTree__openIcon--open {
       transform: rotate($projectHierarchyTree-openIcon-rotateOpen);
     }
@@ -177,15 +185,16 @@
     padding: $projectHierarchyTree-nodeRowContent-paddingBlock $projectHierarchyTree-nodeRowContent-paddingInlineEnd $projectHierarchyTree-nodeRowContent-paddingBlock $projectHierarchyTree-nodeRowContent-paddingInlineStart;
   }
 
-  .projectHierarchyTree__openIcon {
+  .projectHierarchyTree__openIconWrapper {
     left: $projectHierarchyTree-openIcon-nestedTreeNode-positionLeft;
     position: absolute;
     top: $projectHierarchyTree-openIcon-nestedTreeNode-positionTop;
-    transform: translateY($projectHierarchyTree-openIcon-nestedTreeNode-translateY) rotate($projectHierarchyTree-openIcon-rotateClosed);
-    transition: transform $projectHierarchyTree-openIcon-rotateTransitionDuration;
+    transform: translateY($projectHierarchyTree-openIcon-nestedTreeNode-translateY);
+  }
 
+  .projectHierarchyTree__openIcon {
     &.projectHierarchyTree__openIcon--open {
-      transform: translateY($projectHierarchyTree-openIcon-nestedTreeNode-translateY) rotate($projectHierarchyTree-openIcon-rotateOpen);
+      transform: rotate($projectHierarchyTree-openIcon-rotateOpen);
     }
   }
 }
@@ -198,4 +207,13 @@
   border-style: solid;
   box-shadow: inset $projectHierarchyTree-dragPlaceholder-accentWidth 0 0 $projectHierarchyTree-dragPlaceholder-accentColor;
   min-height: $projectHierarchyTree-node-minHeight;
+}
+
+.projectHierarchyTreePlacementCount {
+  color: fa-v('grey', $grey);
+  margin-left: $projectHierarchyTree-placementCount-marginLeft;
+}
+
+.projectHierarchyTreePlacementCount__catCount {
+  color: $projectHierarchyTree-placementCount-catCount-color;
 }

@@ -59,7 +59,7 @@
             <div class="projectDocumentControlBarTabContextMenu__browseTabTrailingIcons">
               <q-icon
                 class="projectDocumentControlBarTabContextMenu__browseTabIcon"
-                :name="browseTab.templateIcon"
+                :name="resolveDocumentTabDisplayIcon(browseTab)"
               />
               <q-icon
                 v-if="browseTab.hasUnsavedChanges"
@@ -100,6 +100,7 @@ defineProps<{
   resolveDocumentTabAppearanceChrome: (
     tab: I_faOpenedDocumentTab
   ) => I_faDocumentAppearanceChromeStyle | undefined
+  resolveDocumentTabDisplayIcon: (tab: I_faOpenedDocumentTab) => string
   resolveDocumentTabInlineStyle: (tab: I_faOpenedDocumentTab) => CSSProperties | undefined
   resolveTabWorldIndicatorColor: (tab: I_faOpenedDocumentTab) => string | null
   showWorldTabIndicators: boolean

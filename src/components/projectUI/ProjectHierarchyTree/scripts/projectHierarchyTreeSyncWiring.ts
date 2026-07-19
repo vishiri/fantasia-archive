@@ -17,11 +17,11 @@ export function createProjectHierarchyTreeSyncWiring (deps: {
   suppressTreeEmit: Ref<boolean>
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
 }) {
-  function resyncTreeDataFromLayout (): void {
+  function resyncTreeDataFromLayout (): { structureMatched: boolean } {
     const worlds = deps.getWorlds()
     if (worlds.length === 0) {
       deps.treeData.value = []
-      return
+      return { structureMatched: false }
     }
     const nextSkeleton = mapWorkspaceLayoutToHierarchyTreeSkeleton(worlds)
     const escapedDocuments = findProjectHierarchyTreeDocumentsWithInvalidPlacementParent(
@@ -39,13 +39,14 @@ export function createProjectHierarchyTreeSyncWiring (deps: {
         deps.treeData.value,
         deps.getPreferredLanguageCode()
       )
-      return
+      return { structureMatched: true }
     }
     deps.suppressTreeEmit.value = true
     deps.treeData.value = nextSkeleton
     void deps.nextTick().then(() => {
       deps.suppressTreeEmit.value = false
     })
+    return { structureMatched: false }
   }
 
   return {

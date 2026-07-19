@@ -17,6 +17,8 @@ const sampleTabs: I_faOpenedDocumentTab[] = [
     savedDocumentTextColor: '',
     documentBackgroundColorDraft: '',
     savedDocumentBackgroundColor: '',
+    isCategoryDraft: false,
+    savedIsCategory: false,
     hasUnsavedChanges: false,
     editState: false
   },
@@ -31,6 +33,8 @@ const sampleTabs: I_faOpenedDocumentTab[] = [
     savedDocumentTextColor: '',
     documentBackgroundColorDraft: '',
     savedDocumentBackgroundColor: '',
+    isCategoryDraft: false,
+    savedIsCategory: false,
     hasUnsavedChanges: true,
     editState: false
   }
@@ -92,6 +96,8 @@ export const WithMultipleDocumentTabsForContextMenu: StoryObj<typeof meta> = {
             savedDocumentTextColor: '',
             documentBackgroundColorDraft: '',
             savedDocumentBackgroundColor: '',
+            isCategoryDraft: false,
+            savedIsCategory: false,
             hasUnsavedChanges: false,
             editState: false
           }

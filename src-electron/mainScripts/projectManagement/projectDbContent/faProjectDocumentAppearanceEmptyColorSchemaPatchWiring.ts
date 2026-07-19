@@ -1,0 +1,152 @@
+import type { I_faProjectDbExec } from 'app/types/I_faProjectDbSchemaDdl'
+
+import {
+  FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_CHECK_SQL,
+  FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN,
+  FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN,
+  FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN,
+  FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN,
+  FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN,
+  FA_PROJECT_DOCUMENT_TEXT_COLOR_CHECK_SQL,
+  FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_PLACEMENT_PARENT_SORT_INDEX,
+  FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
+  FA_PROJECT_TABLE_DOCUMENTS,
+  FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS,
+  FA_PROJECT_TABLE_WORLDS
+} from '../functions/faProjectDbSchemaDdl'
+
+const DOCUMENTS_REBUILD_TABLE_NAME = `${FA_PROJECT_TABLE_DOCUMENTS}__fa_color_empty`
+
+function readFaProjectDocumentsTableSql (db: I_faProjectDbExec): string | null {
+  if (typeof db.prepare !== 'function') {
+    return null
+  }
+  const statement = db.prepare(
+    'SELECT sql AS sql FROM sqlite_master WHERE type = ? AND name = ?'
+  )
+  if (statement == null || typeof statement.get !== 'function') {
+    return null
+  }
+  const row = statement.get('table', FA_PROJECT_TABLE_DOCUMENTS) as { sql?: string } | undefined
+  const sql = row?.sql
+  if (typeof sql !== 'string' || sql.trim().length === 0) {
+    return null
+  }
+  return sql
+}
+
+function faProjectDocumentAppearanceColorCheckAllowsEmpty (tableSql: string): boolean {
+  const textAllowsEmpty = new RegExp(
+    `${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN}\\s*=\\s*''`,
+    'i'
+  ).test(tableSql)
+  const backgroundAllowsEmpty = new RegExp(
+    `${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}\\s*=\\s*''`,
+    'i'
+  ).test(tableSql)
+  return textAllowsEmpty && backgroundAllowsEmpty
+}
+
+function faProjectDocumentAppearanceColorCheckNeedsEmptyAllowRebuild (
+  tableSql: string
+): boolean {
+  const hasTextColor = tableSql.includes(FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN)
+  const hasBackgroundColor = tableSql.includes(FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN)
+  if (!hasTextColor || !hasBackgroundColor) {
+    return false
+  }
+  return !faProjectDocumentAppearanceColorCheckAllowsEmpty(tableSql)
+}
+
+function rebuildFaProjectDocumentsTableAllowingEmptyAppearanceColors (
+  db: I_faProjectDbExec
+): void {
+  db.exec(`
+PRAGMA foreign_keys=OFF;
+DROP TABLE IF EXISTS ${DOCUMENTS_REBUILD_TABLE_NAME};
+CREATE TABLE ${DOCUMENTS_REBUILD_TABLE_NAME} (
+  id TEXT NOT NULL PRIMARY KEY,
+  world_id TEXT NOT NULL REFERENCES ${FA_PROJECT_TABLE_WORLDS}(id) ON DELETE RESTRICT,
+  template_id TEXT REFERENCES ${FA_PROJECT_TABLE_DOCUMENT_TEMPLATES}(id) ON DELETE RESTRICT,
+  ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN} TEXT REFERENCES ${FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS}(id) ON DELETE RESTRICT,
+  ${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN} TEXT REFERENCES ${DOCUMENTS_REBUILD_TABLE_NAME}(id) ON DELETE CASCADE,
+  ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN} INTEGER NOT NULL DEFAULT 0,
+  display_name TEXT NOT NULL CHECK (length(display_name) > 0),
+  ${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN} TEXT
+  CHECK ${FA_PROJECT_DOCUMENT_TEXT_COLOR_CHECK_SQL},
+  ${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN} TEXT
+  CHECK ${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_CHECK_SQL},
+  ${FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN} INTEGER NOT NULL DEFAULT 0
+  CHECK (${FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN} IN (0, 1)),
+  ${FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN} INTEGER NOT NULL DEFAULT 0
+  CHECK (${FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN} IN (0, 1)),
+  ${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN} INTEGER NOT NULL DEFAULT 0
+  CHECK (${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN} IN (0, 1)),
+  ${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN} INTEGER NOT NULL DEFAULT 0
+  CHECK (${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN} IN (0, 1)),
+  created_at_ms INTEGER NOT NULL,
+  updated_at_ms INTEGER NOT NULL
+);
+INSERT INTO ${DOCUMENTS_REBUILD_TABLE_NAME} (
+  id,
+  world_id,
+  template_id,
+  ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN},
+  ${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN},
+  ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN},
+  display_name,
+  ${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN},
+  ${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN},
+  ${FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN},
+  ${FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN},
+  ${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN},
+  ${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN},
+  created_at_ms,
+  updated_at_ms
+)
+SELECT
+  id,
+  world_id,
+  template_id,
+  ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN},
+  ${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN},
+  ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN},
+  display_name,
+  ${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN},
+  ${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN},
+  ${FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN},
+  COALESCE(${FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN}, 0),
+  COALESCE(${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN}, 0),
+  COALESCE(${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN}, 0),
+  created_at_ms,
+  updated_at_ms
+FROM ${FA_PROJECT_TABLE_DOCUMENTS};
+DROP TABLE ${FA_PROJECT_TABLE_DOCUMENTS};
+ALTER TABLE ${DOCUMENTS_REBUILD_TABLE_NAME} RENAME TO ${FA_PROJECT_TABLE_DOCUMENTS};
+CREATE INDEX IF NOT EXISTS idx_documents_world_id ON ${FA_PROJECT_TABLE_DOCUMENTS}(world_id);
+CREATE INDEX IF NOT EXISTS idx_documents_template_id ON ${FA_PROJECT_TABLE_DOCUMENTS}(template_id);
+CREATE INDEX IF NOT EXISTS ${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_PARENT_SORT_INDEX}
+  ON ${FA_PROJECT_TABLE_DOCUMENTS}(${FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN}, ${FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN}, ${FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN});
+PRAGMA foreign_keys=ON;
+`)
+}
+
+/**
+ * Idempotent patch: rebuilds documents when appearance color CHECKs reject empty string.
+ */
+export function applyFaProjectDocumentAppearanceEmptyColorSchemaPatch (
+  db: I_faProjectDbExec
+): void {
+  const tableSql = readFaProjectDocumentsTableSql(db)
+  if (tableSql === null) {
+    return
+  }
+  if (!faProjectDocumentAppearanceColorCheckNeedsEmptyAllowRebuild(tableSql)) {
+    return
+  }
+  rebuildFaProjectDocumentsTableAllowingEmptyAppearanceColors(db)
+}

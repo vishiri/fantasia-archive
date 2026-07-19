@@ -1,12 +1,17 @@
 <template>
-  <q-icon
-    class="projectHierarchyTree__openIcon"
-    :class="{ 'projectHierarchyTree__openIcon--open': visualExpanded }"
-    data-test-locator="projectHierarchyTree-openIcon"
-    name="play_arrow"
+  <div
+    class="projectHierarchyTree__openIconWrapper"
+    data-test-locator="projectHierarchyTree-openIconWrapper"
     @click.stop="emit('click', $event)"
     @pointerdown.stop="emit('pointerdown', $event)"
-  />
+  >
+    <q-icon
+      class="projectHierarchyTree__openIcon"
+      :class="{ 'projectHierarchyTree__openIcon--open': visualExpanded }"
+      data-test-locator="projectHierarchyTree-openIcon"
+      name="play_arrow"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">

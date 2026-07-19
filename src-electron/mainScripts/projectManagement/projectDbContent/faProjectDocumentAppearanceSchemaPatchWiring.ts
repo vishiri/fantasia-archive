@@ -1,5 +1,6 @@
 import type { I_faProjectDbExec } from 'app/types/I_faProjectDbSchemaDdl'
 
+import { buildFaProjectOptionalHexColorCheckSql } from '../functions/faProjectOptionalHexColorCheckSql'
 import {
   FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN,
   FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN,
@@ -33,8 +34,7 @@ function addFaProjectDocumentsColumnIfMissing (
 
 const FA_PROJECT_DOCUMENT_NULLABLE_HEX_COLOR_CHECK = (columnName: string): string => {
   return (
-    `${columnName} TEXT CHECK (${columnName} IS NULL OR (` +
-    `length(${columnName}) = 7 AND substr(${columnName}, 1, 1) = '#'))`
+    `${columnName} TEXT CHECK ${buildFaProjectOptionalHexColorCheckSql(columnName, true)}`
   )
 }
 

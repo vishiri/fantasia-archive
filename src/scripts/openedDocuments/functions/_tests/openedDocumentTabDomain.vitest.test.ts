@@ -26,6 +26,16 @@ const sampleTab: I_faOpenedDocumentTab = {
   savedDocumentTextColor: '',
   documentBackgroundColorDraft: '',
   savedDocumentBackgroundColor: '',
+  isCategoryDraft: false,
+  savedIsCategory: false,
+  isFinishedDraft: false,
+  isMinorDraft: false,
+  isDeadDraft: false,
+  savedIsFinished: false,
+  savedIsMinor: false,
+  savedIsDead: false,
+  parentDocumentIdDraft: '',
+  savedParentDocumentId: '',
   hasUnsavedChanges: true,
   editState: false
 }
@@ -40,6 +50,16 @@ test('Test that computeOpenedDocumentHasUnsavedChanges compares draft to saved b
     documentTextColorDraft: '',
     savedDisplayName: 'B',
     savedDocumentBackgroundColor: '',
+    isCategoryDraft: false,
+    savedIsCategory: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    isDeadDraft: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    parentDocumentIdDraft: '',
+    savedParentDocumentId: '',
     savedDocumentTextColor: ''
   })).toBe(true)
   expect(computeOpenedDocumentHasUnsavedChanges({
@@ -48,6 +68,16 @@ test('Test that computeOpenedDocumentHasUnsavedChanges compares draft to saved b
     documentTextColorDraft: '',
     savedDisplayName: 'Same',
     savedDocumentBackgroundColor: '#112233',
+    isCategoryDraft: false,
+    savedIsCategory: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    isDeadDraft: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    parentDocumentIdDraft: '',
+    savedParentDocumentId: '',
     savedDocumentTextColor: ''
   })).toBe(false)
 })
@@ -59,6 +89,16 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects color draft chang
     documentTextColorDraft: '#AABBCC',
     savedDisplayName: 'Same',
     savedDocumentBackgroundColor: '',
+    isCategoryDraft: false,
+    savedIsCategory: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    isDeadDraft: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    parentDocumentIdDraft: '',
+    savedParentDocumentId: '',
     savedDocumentTextColor: ''
   })).toBe(true)
 })

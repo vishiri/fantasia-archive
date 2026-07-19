@@ -29,6 +29,16 @@ const faOpenedDocumentTabSchema = z.object({
   savedDocumentTextColor: z.string().max(7).optional(),
   documentBackgroundColorDraft: z.string().max(7).optional(),
   savedDocumentBackgroundColor: z.string().max(7).optional(),
+  isCategoryDraft: z.boolean().optional(),
+  savedIsCategory: z.boolean().optional(),
+  isFinishedDraft: z.boolean().optional(),
+  savedIsFinished: z.boolean().optional(),
+  isMinorDraft: z.boolean().optional(),
+  savedIsMinor: z.boolean().optional(),
+  isDeadDraft: z.boolean().optional(),
+  savedIsDead: z.boolean().optional(),
+  parentDocumentIdDraft: z.string().max(64).optional(),
+  savedParentDocumentId: z.string().max(64).optional(),
   hasUnsavedChanges: z.boolean(),
   editState: z.boolean().default(false)
 }).strict().superRefine((tab, context) => {

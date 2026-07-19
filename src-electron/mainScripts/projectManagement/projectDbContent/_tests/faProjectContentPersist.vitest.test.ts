@@ -189,8 +189,12 @@ function makeProjectContentTestDb (): {
               display_name: args[6] as string,
               document_text_color: args[7] as string | null,
               document_background_color: args[8] as string | null,
-              created_at_ms: args[9] as number,
-              updated_at_ms: args[10] as number
+              is_category: args[9] as number,
+              is_finished: args[10] as number,
+              is_minor: args[11] as number,
+              is_dead: args[12] as number,
+              created_at_ms: args[13] as number,
+              updated_at_ms: args[14] as number
             }
             tables.documents.set(row.id as string, row)
           }
@@ -619,7 +623,7 @@ function makeProjectContentTestDb (): {
       if (normalized.includes('UPDATE documents')) {
         return {
           run: (...args: Array<string | number | null>) => {
-            const id = args[9]! as string
+            const id = args[13]! as string
             const existing = tables.documents.get(id)
             if (existing !== undefined) {
               tables.documents.set(id, {
@@ -632,8 +636,12 @@ function makeProjectContentTestDb (): {
                 display_name: args[5] as string,
                 document_text_color: args[6] as string | null,
                 document_background_color: args[7] as string | null,
+                is_category: args[8] as number,
+                is_finished: args[9] as number,
+                is_minor: args[10] as number,
+                is_dead: args[11] as number,
                 created_at_ms: existing.created_at_ms as number,
-                updated_at_ms: args[8] as number
+                updated_at_ms: args[12] as number
               })
             }
           }
@@ -1211,9 +1219,22 @@ test('Test that updateFaProjectWorld persists color and sortOrder', () => {
     sortOrder: 4
   })
   expect(updated.displayName).toBe('Realm 2')
-  expect(updated.color).toBe('#aabbcc')
+  expect(updated.color).toBe('#AABBCC')
   expect(updated.colorPallete).toBe('#112233;#445566')
   expect(updated.sortOrder).toBe(4)
+})
+
+/**
+ * updateFaProjectWorld
+ * Blank world color persists as empty string (optional color).
+ */
+test('Test that updateFaProjectWorld persists blank color as empty', () => {
+  const { db } = makeProjectContentTestDb()
+  const world = createFaProjectWorld(db as never, { displayName: 'Realm' })
+  const updated = updateFaProjectWorld(db as never, world.id, {
+    color: '   '
+  })
+  expect(updated.color).toBe('')
 })
 
 /**
@@ -1862,4 +1883,59 @@ test('Test that document persist stores and updates appearance colors', () => {
   const loaded = getFaProjectDocumentById(db as never, created.id)
   expect(loaded?.documentTextColor).toBeNull()
   expect(loaded?.documentBackgroundColor).toBe('#112233')
+})
+
+/**
+ * createFaProjectDocument / updateFaProjectDocument
+ * Persists documents.is_category for category folder rows.
+ */
+test('Test that document persist stores and updates isCategory flag', () => {
+  const { db } = makeProjectContentTestDb()
+  const world = createFaProjectWorld(db as never, { displayName: 'World' })
+  const categoryDoc = createFaProjectDocument(db as never, {
+    displayName: 'Category',
+    isCategory: true,
+    worldId: world.id
+  })
+  expect(categoryDoc.isCategory).toBe(true)
+
+  const regularDoc = createFaProjectDocument(db as never, {
+    displayName: 'Regular',
+    worldId: world.id
+  })
+  expect(regularDoc.isCategory).toBe(false)
+
+  const promoted = updateFaProjectDocument(db as never, regularDoc.id, {
+    isCategory: true
+  })
+  expect(promoted.isCategory).toBe(true)
+
+  const demoted = updateFaProjectDocument(db as never, categoryDoc.id, {
+    isCategory: false
+  })
+  expect(demoted.isCategory).toBe(false)
+})
+
+test('Test that document persist stores and updates status flags', () => {
+  const { db } = makeProjectContentTestDb()
+  const world = createFaProjectWorld(db as never, { displayName: 'World' })
+  const doc = createFaProjectDocument(db as never, {
+    displayName: 'Status doc',
+    isFinished: true,
+    isMinor: true,
+    isDead: true,
+    worldId: world.id
+  })
+  expect(doc.isFinished).toBe(true)
+  expect(doc.isMinor).toBe(true)
+  expect(doc.isDead).toBe(true)
+
+  const updated = updateFaProjectDocument(db as never, doc.id, {
+    isFinished: false,
+    isMinor: false,
+    isDead: false
+  })
+  expect(updated.isFinished).toBe(false)
+  expect(updated.isMinor).toBe(false)
+  expect(updated.isDead).toBe(false)
 })

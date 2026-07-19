@@ -22,7 +22,7 @@ export interface I_faUserSettings {
   aggressiveRelationshipFilter: boolean
   allowQuickPopupSameKeyClose: boolean
   allowWiderScrollbars: boolean
-  compactDocumentCount: boolean
+  disableCategoryCount: boolean
   compactTags: boolean
   darkMode: boolean
   disableCloseAfterSelectQuickSearch: boolean
@@ -38,19 +38,17 @@ export interface I_faUserSettings {
   hideDeadCrossThrough: boolean
   hideDocumentTitles: boolean
   hideEmptyFields: boolean
-  hideHierarchyTree: boolean
   hidePlushes: boolean
   hideRecentProjectTooltip: boolean
   hideTooltipsProject: boolean
   hideTooltipsStart: boolean
-  hideTreeExtraIcons: boolean
   hideTreeIconAddUnder: boolean
   hideTreeIconEdit: boolean
   hideTreeIconView: boolean
+  hideTreeLines: boolean
   hideTreeOrderNumbers: boolean
   hideWelcomeScreenSocials: boolean
   invertCategoryPosition: boolean
-  invertTreeSorting: boolean
   languageCode: T_faUserSettingsLanguageCode
   limitEditorHeight: boolean
   logFullActivityPayload: boolean

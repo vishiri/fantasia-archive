@@ -58,6 +58,7 @@
       :resolve-browse-tab-label="resolveBrowseTabLabel"
       :resolve-browse-tab-route="resolveBrowseTabRoute"
       :resolve-document-tab-appearance-chrome="resolveDocumentTabAppearanceChrome"
+      :resolve-document-tab-display-icon="resolveDocumentTabDisplayIcon"
       :resolve-document-tab-inline-style="resolveDocumentTabInlineStyle"
       :resolve-tab-world-indicator-color="resolveTabWorldIndicatorColor"
       :show-delete-this-document="showDeleteThisDocument"
@@ -110,6 +111,7 @@ const props = defineProps<{
   resolveDocumentTabAppearanceChrome: (
     tab: I_faOpenedDocumentTab
   ) => I_faDocumentAppearanceChromeStyle | undefined
+  resolveDocumentTabDisplayIcon: (tab: I_faOpenedDocumentTab) => string
   resolveDocumentTabInlineStyle: (tab: I_faOpenedDocumentTab) => CSSProperties | undefined
   resolveDocumentTabLabel: (tab: I_faOpenedDocumentTab) => string
   resolveDocumentTabRoute: (documentId: string) => string

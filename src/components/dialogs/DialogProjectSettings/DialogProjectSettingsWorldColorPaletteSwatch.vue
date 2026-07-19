@@ -128,7 +128,6 @@
         default-view="spectrum"
         format-model="hex"
         :no-footer="!hasPaletteFooter"
-        no-header-tabs
         :palette="props.worldPickerPalette"
         @change="onPickerChange"
         @update:model-value="onPickerUpdate"

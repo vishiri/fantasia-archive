@@ -54,10 +54,6 @@ export default {
         subtitle: 'Tree behavior',
         tags: 'expand, collapse, expand all, interaction'
       },
-      treeSettings: {
-        subtitle: 'Tree settings',
-        tags: 'tree panel, sidebar visibility, tree layout'
-      }
     },
     openedDocumentsTabs: {
       title: 'Open document tabs',
@@ -128,9 +124,9 @@ export default {
       description: 'This setting makes FA\'s scrollbars wider and therefore allows manual click-scrolling directly on them for devices that do not support standard scrolling (for example mice without a scroll wheel).',
       tags: 'scrollbar width, click scroll, mouse without wheel, trackball, touch'
     },
-    compactDocumentCount: {
-      title: 'TODO - Hide category count',
-      description: 'Shows the document count without the secondary per-category number.',
+    disableCategoryCount: {
+      title: 'Hide category count',
+      description: 'Hide category numbers in the hierarchical tree',
       tags: 'simplified count, single number, less clutter'
     },
     compactTags: {
@@ -159,8 +155,8 @@ export default {
       tags: 'beginner hints, tutorial banners, coach marks, control bar help'
     },
     disableDocumentCounts: {
-      title: 'TODO - Hide document count entirely',
-      description: 'Hides all document count information in the hierarchical tree.',
+      title: 'Hide document count',
+      description: 'Hide document numbers in the hierarchical tree',
       tags: 'totals off, no counts, statistics hide'
     },
     disableDocumentToolTips: {
@@ -209,11 +205,6 @@ export default {
       description: 'Hides fields without any value filled in, in view (non-edit) mode. Please note that this may result in relatively wild layout shifts, which might make the document look unruly in some cases.',
       tags: 'blank fields, read-only view, compact document, layout shift'
     },
-    hideHierarchyTree: {
-      title: 'TODO - Hide hierarchical tree',
-      description: 'Controls whether the hierarchical tree is shown.',
-      tags: 'sidebar off, navigator hidden, tree panel, outline hide'
-    },
     hidePlushes: {
       title: 'TODO - Hide Fantasia mascot',
       description: 'Hides the amazingly adorable and awesome Fantasia, the tiny arcane dragon. How could you! :(',
@@ -229,25 +220,25 @@ export default {
       description: 'Hides the start screen tips & tricks popup.',
       tags: 'first launch, onboarding, splash, startup tips, tricks'
     },
-    hideTreeExtraIcons: {
-      title: 'TODO - Hide extra icons',
-      description: 'Hides icons that are normally shown for convenience but do not add functionality—for example the "Open document" icon next to a document with no child nodes, which can just as well be opened with a normal left-click instead of the icon.',
-      tags: 'redundant icons, clutter, minimal tree, optional actions'
-    },
     hideTreeIconAddUnder: {
-      title: 'TODO - Hide "Add under" icon',
-      description: 'This option hides the "Add a new document under the selected parent" icon.',
+      title: 'Hide "Add under" icon',
+      description: 'This option hides the "Add new document under this" icon.',
       tags: 'add child, new under, plus under, create below'
     },
     hideTreeIconEdit: {
-      title: 'TODO - Hide "Edit" icon',
+      title: 'Hide "Edit" icon',
       description: 'This option hides the row Edit icon.',
       tags: 'pencil icon, edit row, quick edit tree'
     },
     hideTreeIconView: {
-      title: 'TODO - Hide "Open" icon',
+      title: 'Hide "Open" icon',
       description: 'This option hides the row Open icon.',
       tags: 'open icon, go to document, row open button'
+    },
+    hideTreeLines: {
+      title: 'Hide tree lines',
+      description: 'Hides the structural help-lines in the hierarchy tree.',
+      tags: 'lines, helplines, structure, tree, hierarchical, hierarchical tree'
     },
     hideTreeOrderNumbers: {
       title: 'TODO - Hide order numbers',
@@ -270,14 +261,9 @@ export default {
       tags: 'project, load, loading, latest, recent, intro, start, welcome'
     },
     invertCategoryPosition: {
-      title: 'TODO - Invert category position',
+      title: 'Invert category position',
       description: 'Switches the positions of the category and document numbers.',
       tags: 'swap numbers, count order, category vs document count'
-    },
-    invertTreeSorting: {
-      title: 'TODO - Invert tree custom order sorting',
-      description: 'Sorts documents in the hierarchical tree in the opposite direction from the default: from highest to lowest.',
-      tags: 'reverse order, custom order, sort direction, ascending descending'
     },
     limitEditorHeight: {
       title: 'TODO - Limit text editor height',

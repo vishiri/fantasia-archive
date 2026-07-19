@@ -93,6 +93,7 @@ vi.mock(
       placementId: SAMPLE_UUID_HOISTED,
       parentDocumentId: null,
       sortOrder: 0,
+      isCategory: false,
       hasChildren: false
     })),
     searchFaProjectHierarchy: vi.fn(() => ({

@@ -53,10 +53,6 @@ export default {
         subtitle: '木の挙動',
         tags: '展開、折りたたみ、すべて展開、インタラクション',
       },
-      treeSettings: {
-        subtitle: 'ツリー設定',
-        tags: 'ツリー パネル、サイドバーの表示設定、ツリー レイアウト',
-      }
     },
     openedDocumentsTabs: {
       title: 'ドキュメントタブを開く',
@@ -127,9 +123,9 @@ export default {
       description: 'この設定により、FA のスクロールバーの幅が広くなり、標準のスクロールをサポートしていないデバイス (スクロール ホイールのないマウスなど) でスクロールバーを直接手動でクリックしてスクロールできるようになります。',
       tags: 'スクロールバーの幅、クリックスクロール、ホイールなしのマウス、トラックボール、タッチ',
     },
-    compactDocumentCount: {
+    disableCategoryCount: {
       title: 'カテゴリ数を非表示にする',
-      description: 'カテゴリごとの 2 番目の番号を除いたドキュメント数を表示します。',
+      description: '階層ツリー内のカテゴリ番号を非表示にします',
       tags: '単純化されたカウント、単一の数値、煩雑さの軽減',
     },
     compactTags: {
@@ -158,8 +154,8 @@ export default {
       tags: '初心者向けヒント、チュートリアル バナー、コーチ マーク、コントロール バーのヘルプ',
     },
     disableDocumentCounts: {
-      title: 'ドキュメント数を完全に非表示にする',
-      description: '階層ツリー内のすべてのドキュメント数情報を非表示にします。',
+      title: 'ドキュメント数を非表示にする',
+      description: '階層ツリー内のドキュメント番号を非表示にします',
       tags: '合計オフ、カウントなし、統計非表示',
     },
     disableDocumentToolTips: {
@@ -208,11 +204,6 @@ export default {
       description: '表示 (非編集) モードでは、値が入力されていないフィールドを非表示にします。これにより、比較的乱暴なレイアウトの変更が発生し、場合によってはドキュメントが扱いにくくなる可能性があることに注意してください。',
       tags: '空白のフィールド、読み取り専用ビュー、コンパクトドキュメント、レイアウトシフト',
     },
-    hideHierarchyTree: {
-      title: '階層ツリーを非表示にする',
-      description: '階層ツリーを表示するかどうかを制御します。',
-      tags: 'サイドバーをオフ、ナビゲーターを非表示、ツリーパネル、アウトラインを非表示',
-    },
     hidePlushes: {
       title: 'ハイドファンタジア マスコット',
       description: '驚くほど愛らしくて素晴らしいファンタジア、小さな神秘的なドラゴンが隠れています。なんと！ :(',
@@ -228,11 +219,6 @@ export default {
       description: 'スタート画面のヒントとコツのポップアップを非表示にします。',
       tags: '最初の起動、オンボーディング、スプラッシュ、スタートアップのヒント、トリック',
     },
-    hideTreeExtraIcons: {
-      title: '余分なアイコンを非表示にする',
-      description: '通常は便宜上表示されるが機能を追加しないアイコンを非表示にします。たとえば、子ノードのないドキュメントの横にある「ドキュメントを開く」アイコンは、アイコンの代わりに通常の左クリックで開くことができます。',
-      tags: '冗長なアイコン、乱雑な、最小限のツリー、オプションのアクション',
-    },
     hideTreeIconAddUnder: {
       title: '「下に追加」アイコンを非表示にする',
       description: 'このオプションは、「選択した親の下に新しいドキュメントを追加」アイコンを非表示にします。',
@@ -247,6 +233,11 @@ export default {
       title: '「開く」アイコンを非表示にする',
       description: 'このオプションは、行を開くアイコンを非表示にします。',
       tags: '開くアイコン、ドキュメントに移動、行を開くボタン',
+    },
+    hideTreeLines: {
+      title: 'Hide tree lines',
+      description: 'Hides the structural help-lines in the hierarchy tree.',
+      tags: 'lines, helplines, structure, tree, hierarchical, hierarchical tree'
     },
     hideTreeOrderNumbers: {
       title: '注文番号を非表示にする',
@@ -272,11 +263,6 @@ export default {
       title: 'カテゴリの位置を反転する',
       description: 'カテゴリ番号と文書番号の位置を入れ替えます。',
       tags: '番号、カウント順序、カテゴリとドキュメント数を入れ替える',
-    },
-    invertTreeSorting: {
-      title: 'ツリーのカスタム順序並べ替えを反転する',
-      description: '階層ツリー内のドキュメントをデフォルトとは逆の方向、つまり最上位から最下位に並べ替えます。',
-      tags: '逆順、カスタム順、ソート方向、昇順 降順',
     },
     limitEditorHeight: {
       title: 'テキストエディタの高さを制限する',

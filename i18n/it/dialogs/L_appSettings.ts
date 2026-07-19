@@ -53,10 +53,6 @@ export default {
         subtitle: 'Comportamento dell\'albero',
         tags: 'espandere, comprimere, espandere tutto, interazione',
       },
-      treeSettings: {
-        subtitle: 'Impostazioni dell\'albero',
-        tags: 'pannello ad albero, visibilità della barra laterale, layout ad albero',
-      }
     },
     openedDocumentsTabs: {
       title: 'Apri le schede dei documenti',
@@ -127,9 +123,9 @@ export default {
       description: 'Questa impostazione allarga le barre di scorrimento di FA e pertanto consente lo scorrimento manuale con clic direttamente su di esse per i dispositivi che non supportano lo scorrimento standard (ad esempio mouse senza rotella di scorrimento).',
       tags: 'larghezza della barra di scorrimento, scorrimento con clic, mouse senza rotella, trackball, tocco',
     },
-    compactDocumentCount: {
+    disableCategoryCount: {
       title: 'Nascondi il conteggio delle categorie',
-      description: 'Mostra il conteggio dei documenti senza il numero secondario per categoria.',
+      description: 'Nascondi i numeri di categoria nell’albero gerarchico',
       tags: 'conteggio semplificato, numero unico, meno disordine',
     },
     compactTags: {
@@ -158,8 +154,8 @@ export default {
       tags: 'suggerimenti per principianti, banner tutorial, segni di coach, aiuto sulla barra di controllo',
     },
     disableDocumentCounts: {
-      title: 'Nascondi completamente il conteggio dei documenti',
-      description: 'Nasconde tutte le informazioni sul conteggio dei documenti nell\'albero gerarchico.',
+      title: 'Nascondi il conteggio dei documenti',
+      description: 'Nascondi i numeri di documento nell’albero gerarchico',
       tags: 'totali disattivati, nessun conteggio, le statistiche vengono nascoste',
     },
     disableDocumentToolTips: {
@@ -208,11 +204,6 @@ export default {
       description: 'Nasconde i campi senza alcun valore compilato, in modalità di visualizzazione (non modifica). Tieni presente che ciò potrebbe comportare cambiamenti di layout relativamente selvaggi, che in alcuni casi potrebbero rendere il documento indisciplinato.',
       tags: 'campi vuoti, visualizzazione di sola lettura, documento compatto, spostamento del layout',
     },
-    hideHierarchyTree: {
-      title: 'Nascondi albero gerarchico',
-      description: 'Controlla se viene visualizzato l\'albero gerarchico.',
-      tags: 'barra laterale disattivata, navigatore nascosto, pannello ad albero, contorno nascosto',
-    },
     hidePlushes: {
       title: 'Nascondi la mascotte di Fantasia',
       description: 'Nasconde l\'incredibilmente adorabile e fantastica Fantasia, il piccolo drago arcano. Come potresti! :(',
@@ -228,11 +219,6 @@ export default {
       description: 'Nasconde il popup di suggerimenti e trucchi della schermata iniziale.',
       tags: 'primo lancio, onboarding, splash, suggerimenti per l\'avvio, trucchi',
     },
-    hideTreeExtraIcons: {
-      title: 'Nascondi icone extra',
-      description: 'Nasconde le icone che normalmente vengono visualizzate per comodità ma non aggiungono funzionalità, ad esempio l\'icona "Apri documento" accanto a un documento senza nodi secondari, che può anche essere aperta con un normale clic sinistro invece dell\'icona.',
-      tags: 'icone ridondanti, disordine, struttura minimale, azioni opzionali',
-    },
     hideTreeIconAddUnder: {
       title: 'Nascondi l\'icona "Aggiungi sotto".',
       description: 'Questa opzione nasconde l\'icona "Aggiungi un nuovo documento sotto il genitore selezionato".',
@@ -247,6 +233,11 @@ export default {
       title: 'Nascondi l\'icona "Apri".',
       description: 'Questa opzione nasconde l\'icona Apri della riga.',
       tags: 'icona apri, vai al documento, pulsante apri riga',
+    },
+    hideTreeLines: {
+      title: 'Hide tree lines',
+      description: 'Hides the structural help-lines in the hierarchy tree.',
+      tags: 'lines, helplines, structure, tree, hierarchical, hierarchical tree'
     },
     hideTreeOrderNumbers: {
       title: 'Nascondi i numeri dell\'ordine',
@@ -272,11 +263,6 @@ export default {
       title: 'Invertire la posizione della categoria',
       description: 'Cambia le posizioni della categoria e dei numeri del documento.',
       tags: 'scambiare numeri, ordine di conteggio, categoria e conteggio di documenti',
-    },
-    invertTreeSorting: {
-      title: 'Inverte l\'ordinamento personalizzato dell\'albero',
-      description: 'Ordina i documenti nell\'albero gerarchico nella direzione opposta rispetto a quella predefinita: dal più alto al più basso.',
-      tags: 'ordine inverso, ordine personalizzato, direzione di ordinamento, ascendente discendente',
     },
     limitEditorHeight: {
       title: 'Limita l\'altezza dell\'editor di testo',

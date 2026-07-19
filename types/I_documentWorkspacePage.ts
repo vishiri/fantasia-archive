@@ -35,6 +35,11 @@ export type T_createUseDocumentWorkspacePageDeps = {
     updateDisplayNameDraft: (documentId: string, value: string) => void
     updateDocumentBackgroundColorDraft: (documentId: string, value: string) => void
     updateDocumentTextColorDraft: (documentId: string, value: string) => void
+    updateIsCategoryDraft: (documentId: string, value: boolean) => void
+    updateIsDeadDraft: (documentId: string, value: boolean) => void
+    updateIsFinishedDraft: (documentId: string, value: boolean) => void
+    updateIsMinorDraft: (documentId: string, value: boolean) => void
+    updateParentDocumentIdDraft: (documentId: string, value: string) => void
   }
   S_FaProjectHierarchyTree: () => StoreGeneric & {
     patchWorldColorPalleteInLayout: (worldId: string, colorPallete: string) => void
@@ -49,14 +54,49 @@ export type T_createUseDocumentWorkspacePageDeps = {
   createDocumentWorkspacePageColorPickers: (
     input: T_createDocumentWorkspacePageColorPickersDeps
   ) => {
+    backgroundColorFieldDescription: I_computedRef<string>
     backgroundColorFieldLabel: I_computedRef<string>
     backgroundColorModel: I_computedRef<string>
     documentColorPickersReadOnly: I_computedRef<boolean>
     onAppendToWorldPalette: (colorPallete: string) => void
+    textColorFieldDescription: I_computedRef<string>
     textColorFieldLabel: I_computedRef<string>
     textColorModel: I_computedRef<string>
     worldColorPaletteAppend: I_computedRef<I_faColorPickerPaletteAppendConfig | undefined>
     worldPickerPalette: I_computedRef<readonly string[]>
+  }
+  createDocumentWorkspacePageIsCategoryToggle: (
+    input: {
+      computed: T_createUseDocumentWorkspacePageDeps['computed']
+      documentTab: I_computedRef<I_faOpenedDocumentTab | null>
+      i18n: T_createUseDocumentWorkspacePageDeps['i18n']
+      resolveOpenedDocumentTabIsInPreviewMode: T_createUseDocumentWorkspacePageDeps['resolveOpenedDocumentTabIsInPreviewMode']
+      routeDocumentId: I_computedRef<string>
+      updateIsCategoryDraft: (documentId: string, value: boolean) => void
+    }
+  ) => {
+    isCategoryDescription: I_computedRef<string>
+    isCategoryModel: I_computedRef<boolean>
+    isCategoryTitle: I_computedRef<string>
+    isCategoryToggleReadOnly: I_computedRef<boolean>
+  }
+  createDocumentWorkspacePageDocumentBooleanToggle: (
+    input: {
+      computed: T_createUseDocumentWorkspacePageDeps['computed']
+      descriptionI18nKey: string
+      documentTab: I_computedRef<I_faOpenedDocumentTab | null>
+      draftField: 'isFinishedDraft' | 'isMinorDraft' | 'isDeadDraft'
+      i18n: T_createUseDocumentWorkspacePageDeps['i18n']
+      resolveOpenedDocumentTabIsInPreviewMode: T_createUseDocumentWorkspacePageDeps['resolveOpenedDocumentTabIsInPreviewMode']
+      routeDocumentId: I_computedRef<string>
+      titleI18nKey: string
+      updateDraft: (documentId: string, value: boolean) => void
+    }
+  ) => {
+    description: I_computedRef<string>
+    model: I_computedRef<boolean>
+    readOnly: I_computedRef<boolean>
+    title: I_computedRef<string>
   }
   createDocumentWorkspacePageRouteEffects: (input: {
     computed: {
@@ -105,16 +145,39 @@ export type T_createUseDocumentWorkspacePageDeps = {
 
 /** DocumentWorkspacePage composable API. */
 export type T_useDocumentWorkspacePageApi = () => {
+  backgroundColorFieldDescription: I_computedRef<string>
   backgroundColorFieldLabel: I_computedRef<string>
   backgroundColorModel: I_computedRef<string>
+  belongsUnderFieldDescription: I_computedRef<string>
+  belongsUnderFieldLabel: I_computedRef<string>
+  belongsUnderFieldReadOnly: I_computedRef<boolean>
+  belongsUnderModel: I_computedRef<string>
   displayNameModel: I_computedRef<string>
   documentColorPickersReadOnly: I_computedRef<boolean>
   documentShowsEditFields: I_computedRef<boolean>
   documentShowsPreview: I_computedRef<boolean>
   documentTab: I_computedRef<I_faOpenedDocumentTab | null>
+  isCategoryDescription: I_computedRef<string>
+  isCategoryModel: I_computedRef<boolean>
+  isCategoryTitle: I_computedRef<string>
+  isCategoryToggleReadOnly: I_computedRef<boolean>
+  isDeadDescription: I_computedRef<string>
+  isDeadModel: I_computedRef<boolean>
+  isDeadTitle: I_computedRef<string>
+  isDeadToggleReadOnly: I_computedRef<boolean>
+  isFinishedDescription: I_computedRef<string>
+  isFinishedModel: I_computedRef<boolean>
+  isFinishedTitle: I_computedRef<string>
+  isFinishedToggleReadOnly: I_computedRef<boolean>
+  isMinorDescription: I_computedRef<string>
+  isMinorModel: I_computedRef<boolean>
+  isMinorTitle: I_computedRef<string>
+  isMinorToggleReadOnly: I_computedRef<boolean>
   nameFieldLabel: I_computedRef<string>
+  oneWayRelationshipTooltip: I_computedRef<string>
   onAppendToWorldPalette: (colorPallete: string) => void
   previewDisplayName: I_computedRef<string>
+  textColorFieldDescription: I_computedRef<string>
   textColorFieldLabel: I_computedRef<string>
   textColorModel: I_computedRef<string>
   worldColorPaletteAppend: I_computedRef<I_faColorPickerPaletteAppendConfig | undefined>

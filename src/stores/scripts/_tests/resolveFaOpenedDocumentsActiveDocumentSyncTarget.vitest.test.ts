@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
-import { resolveFaOpenedDocumentsActiveDocumentSyncTarget } from 'app/src/stores/scripts/faOpenedDocumentsStoreActions'
+import { resolveFaOpenedDocumentsActiveDocumentSyncTarget } from 'app/src/stores/scripts/faOpenedDocumentsTabSessionWiring'
 
 const sampleTab: I_faOpenedDocumentTab = {
   displayNameDraft: 'Doc A',
@@ -15,6 +15,16 @@ const sampleTab: I_faOpenedDocumentTab = {
   savedDocumentTextColor: '',
   documentBackgroundColorDraft: '',
   savedDocumentBackgroundColor: '',
+  isCategoryDraft: false,
+  savedIsCategory: false,
+  isFinishedDraft: false,
+  isMinorDraft: false,
+  isDeadDraft: false,
+  savedIsFinished: false,
+  savedIsMinor: false,
+  savedIsDead: false,
+  parentDocumentIdDraft: '',
+  savedParentDocumentId: '',
   tabLabel: 'Doc A',
   templateIcon: 'mdi-file'
 }

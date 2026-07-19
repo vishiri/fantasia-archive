@@ -57,7 +57,6 @@
           default-view="spectrum"
           format-model="hex"
           :no-footer="!hasPaletteFooter"
-          no-header-tabs
           :palette="resolvedPalette"
           @change="onPickerChange"
           @update:model-value="onPickerUpdate"

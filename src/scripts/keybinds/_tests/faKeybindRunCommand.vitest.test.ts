@@ -20,6 +20,16 @@ const keybindSaveSession = vi.hoisted(() => ({
       savedDocumentTextColor: '',
       documentBackgroundColorDraft: '',
       savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
       hasUnsavedChanges: true,
       editState: true
     }

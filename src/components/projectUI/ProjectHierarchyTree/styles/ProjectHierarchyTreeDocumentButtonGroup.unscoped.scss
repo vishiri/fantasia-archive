@@ -1,0 +1,44 @@
+@use './variables' as *;
+
+.projectHierarchyTreeDocumentButtonGroup {
+  align-self: center;
+  display: flex;
+  flex-grow: 0;
+  flex-shrink: 0;
+  height: fit-content;
+  margin-left: $projectHierarchyTree-documentButtonGroup-marginLeft;
+  padding-left: $projectHierarchyTree-documentButtonGroup-paddingLeft;
+  z-index: 1;
+}
+
+.projectHierarchyTreeDocumentButtonGroup__button {
+  margin-left: $projectHierarchyTree-documentButton-marginLeft;
+
+  &.q-btn--round {
+    height: $projectHierarchyTree-documentButton-size;
+    min-height: $projectHierarchyTree-documentButton-size;
+    min-width: $projectHierarchyTree-documentButton-size;
+    width: $projectHierarchyTree-documentButton-size;
+  }
+}
+
+.projectHierarchyTreeDocumentButtonGroup__button--open {
+  .q-icon {
+    color: $projectHierarchyTree-documentButton-openEditIcon-color;
+    font-size: $projectHierarchyTree-documentButton-openIcon-fontSize;
+  }
+}
+
+.projectHierarchyTreeDocumentButtonGroup__button--edit {
+  .q-icon {
+    color: $projectHierarchyTree-documentButton-openEditIcon-color;
+    font-size: $projectHierarchyTree-documentButton-editIcon-fontSize;
+  }
+}
+
+.projectHierarchyTreeDocumentButtonGroup__button--addUnder {
+  .q-icon {
+    color: $projectHierarchyTree-documentButton-addUnderIcon-color;
+    font-size: $projectHierarchyTree-documentButton-addUnderIcon-fontSize;
+  }
+}

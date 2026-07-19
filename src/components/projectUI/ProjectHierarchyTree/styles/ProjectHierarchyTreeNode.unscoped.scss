@@ -49,6 +49,31 @@
   margin-right: $projectHierarchyTree-nodeIcon-marginRight;
 }
 
+.projectHierarchyTreeNode__icon {
+  flex-shrink: 0;
+}
+
+.projectHierarchyTreeNode__label {
+  flex: 0 1 auto;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.projectHierarchyTreeNode__label--dead {
+  text-decoration: line-through;
+  text-decoration-color: currentcolor;
+}
+
+.projectHierarchyTreeNode__deadMarker {
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.projectHierarchyTreeNode__finishedMarker {
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
 .projectHierarchyTreeNode__icon--layoutKind {
   @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
 
