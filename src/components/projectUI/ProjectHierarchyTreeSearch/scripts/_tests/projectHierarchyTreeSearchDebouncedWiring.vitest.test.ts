@@ -38,7 +38,7 @@ test('Test that createUseProjectHierarchyTreeSearchDebounced debounces search qu
     }) as never,
     S_FaUserSettings: () => ({
       settings: ref({
-        disableDocumentControlBar: false,
+        disableAppControlBar: false,
         languageCode: 'en-US'
       })
     }) as never,

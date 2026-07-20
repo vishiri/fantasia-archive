@@ -44,6 +44,7 @@ $surface-error: #f7eeda;
  * Exposed on :root as --fa-color-* in fa-theme.scss; use globals/faSemanticText.scss helper classes. */
 $hierarchy-tree-connector: color.change($primary, $alpha: 0.35);
 $hierarchy-tree-open-icon: #9e9e9e;
+$hierarchy-tree-order-number-badge: #374540;
 $icon-spellcheck-refresh: #e53935;
 $notify-foreground: #f5f5f5;
 $text-checkbox-disabled: #b0bec5;

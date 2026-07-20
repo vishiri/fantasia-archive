@@ -30,6 +30,8 @@ const sampleTab: I_faOpenedDocumentTab = {
   savedIsDead: false,
   parentDocumentIdDraft: '',
   savedParentDocumentId: '',
+  treeOrderNumberDraft: '',
+  savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
   hasUnsavedChanges: false,
   editState: FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE
 }

@@ -31,6 +31,7 @@ export default {
     toggleDeveloperTools: 'Växla utvecklarverktyg',
     toggleAppNoteboard: 'Växla App Noteboard',
     toggleProjectNoteboard: 'Växla Project Noteboard',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     editDocument: 'Edit current document',
     saveDocumentKeepEditMode: 'Save document without exiting edit mode',
     saveDocument: 'Save current document',

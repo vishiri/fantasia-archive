@@ -23,16 +23,12 @@ export default {
       }
     },
     documentViewEdit: {
-      title: 'Visualização/edição de documento',
+      title: 'Página: Visualização/edição de documento',
       tags: 'página do documento, modo de visualização, modo de edição, leitor',
       documentBody: {
         subtitle: 'Corpo do documento',
         tags: 'área de conteúdo, campos, leitura, área de edição',
       },
-      documentControlBar: {
-        subtitle: 'Barra de controle de documentos',
-        tags: 'barra de ferramentas, barra superior, cabeçalho, documento cromado',
-      }
     },
     hierarchicalTree: {
       title: 'Árvore hierárquica',
@@ -54,14 +50,7 @@ export default {
         tags: 'expandir, recolher, expandir tudo, interação',
       },
     },
-    openedDocumentsTabs: {
-      title: 'Abrir guias de documentos',
-      tags: 'barra de guias, abrir arquivos, multitarefa',
-      tabBehavior: {
-        subtitle: 'Comportamento da guia',
-        tags: 'alternar guias, faixa de guias, comportamento de passar o mouse',
-      }
-    },
+
     popupsFloatingWindows: {
       title: 'Pop-ups e janelas flutuantes',
       tags: 'diálogos, sobreposições, modais, janelas',
@@ -84,6 +73,14 @@ export default {
       applicationExtras: {
         subtitle: 'Extras do aplicativo',
         tags: 'mascote, pelúcia, fantasia, extras',
+      },
+      appControlBar: {
+        subtitle: 'Barra de controle do app',
+        tags: 'barra de ferramentas, barra superior, cabeçalho, documento cromado',
+      },
+      tabBehavior: {
+        subtitle: 'Comportamento da guia',
+        tags: 'alternar guias, faixa de guias, comportamento de passar o mouse',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Funcionalidades visuais e em todo o aplicativo',
@@ -143,14 +140,24 @@ export default {
       description: 'Normalmente, a pesquisa rápida fecha depois que um item é selecionado. Ativar esse recurso evita esse comportamento, permitindo que você abra vários resultados de pesquisa, um após o outro.',
       tags: 'manter aberto, vários resultados, lote aberto, pesquisa rápida permanece aberta',
     },
-    disableDocumentControlBar: {
-      title: 'Desativar barra de controle de documentos',
+    disableAppControlBar: {
+      title: 'Desativar barra de controle do app',
       description: 'Se quiser maximizar seu espaço de trabalho no documento, você pode desativar a barra de botões superior com esta configuração. Os botões de controle necessários serão movidos para a parte superior do corpo do documento principal, enquanto o restante da funcionalidade estará acessível por meio de teclas ou através do menu do aplicativo no canto superior esquerdo.',
       tags: 'barra de ferramentas ocultar, maximizar espaço, largura total, cabeçalho do documento',
     },
-    disableDocumentControlBarGuides: {
-      title: 'Desativar guias de documentos',
-      description: 'Ativa ou desativa os guias para iniciantes na barra de controle de documentos.',
+    disableAppControlBarContentButtons: {
+      title: 'Disable app control bar content buttons',
+      description: 'Toggles the project contents (document search, document creation, etc.) on the app control bar on or off.',
+      tags: 'quick search, quick add, document create, content tools, control bar buttons'
+    },
+    disableAppControlBarFunctionButtons: {
+      title: 'Disable app control bar function buttons',
+      description: 'Toggles the app functional buttons (noteboards, hierarchical tree toggling, etc.) on the app control bar on or off.',
+      tags: 'noteboard, tree toggle, sidebar hide, function tools, control bar buttons'
+    },
+    disableAppControlBarGuides: {
+      title: 'Desativar guias da barra de controle do app',
+      description: 'Ativa ou desativa os guias para iniciantes na barra de controle do app.',
       tags: 'dicas para iniciantes, banners de tutoriais, notas de treinador, ajuda na barra de controle',
     },
     disableDocumentCounts: {
@@ -203,6 +210,11 @@ export default {
       title: 'Ocultar campos vazios',
       description: 'Oculta campos sem nenhum valor preenchido, no modo de visualização (sem edição). Observe que isso pode resultar em mudanças de layout relativamente selvagens, o que pode fazer com que o documento pareça indisciplinado em alguns casos.',
       tags: 'campos em branco, visualização somente leitura, documento compacto, mudança de layout',
+    },
+    hideHierarchyTree: {
+      title: 'Hide hierarchical tree',
+      description: 'Controls whether the hierarchical tree is shown.',
+      tags: 'sidebar off, navigator hidden, tree panel, outline hide'
     },
     hidePlushes: {
       title: 'Ocultar mascote Fantasia',

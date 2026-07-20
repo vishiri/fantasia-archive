@@ -25,6 +25,8 @@ const sampleTab: I_faOpenedDocumentTab = {
   savedIsDead: false,
   parentDocumentIdDraft: '',
   savedParentDocumentId: '',
+  treeOrderNumberDraft: '',
+  savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
   tabLabel: 'Doc A',
   templateIcon: 'mdi-file'
 }

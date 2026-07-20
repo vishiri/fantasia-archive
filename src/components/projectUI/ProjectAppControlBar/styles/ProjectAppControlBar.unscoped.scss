@@ -1,0 +1,322 @@
+@use './variables' as *;
+@use '../../../../layouts/MainLayout/styles/variables' as mainLayout;
+@use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
+@use '../../../../css/theme/quasar-components/qFocusable.variables' as *;
+@import '@quasar/extras/animate/fadeIn.css';
+@import '@quasar/extras/animate/fadeOut.css';
+
+.projectAppControlBarHost {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.projectAppControlBar--fixedStrip {
+  background-color: $projectAppControlBar-backgroundColor;
+  left: $projectAppControlBar-widthOffsetPx;
+  min-height: $projectAppControlBar-minHeightPx;
+  min-width: calc(100vw - #{$projectAppControlBar-widthOffsetPx});
+  position: fixed;
+  right: 0;
+  top: calc(#{mainLayout.$mainLayout-appHeader-heightPx} + #{$projectAppControlBar-topOffsetPx});
+  z-index: $projectAppControlBar-zIndex;
+
+  &--treeHidden {
+    left: 0;
+    min-width: 100vw;
+  }
+}
+
+.projectAppControlBar__blocker {
+  background-color: $projectAppControlBar-backgroundColor;
+  height: $projectAppControlBar-blockerHeightPx;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: calc(-1 * #{$projectAppControlBar-blockerHeightPx});
+  z-index: $projectAppControlBar-zIndex;
+}
+
+.projectAppControlBar__wrapper {
+  display: flex;
+  justify-content: space-between;
+  min-height: $projectAppControlBar-minHeightPx;
+  padding: $projectAppControlBar-stripPaddingBlockPx $projectAppControlBar-stripPaddingInlinePx;
+  position: relative;
+  width: 100%;
+
+  &::after {
+    background-color: $projectAppControlBar-bottomRuleColor;
+    bottom: 0;
+    content: ' ';
+    height: $projectAppControlBar-bottomRuleHeightPx;
+    left: 0;
+    position: absolute;
+    right: 0;
+  }
+}
+
+.projectAppControlBar__left,
+.projectAppControlBar__right {
+  display: flex;
+}
+
+.projectAppControlBarFixedStripLeft {
+  align-items: stretch;
+  display: flex;
+}
+
+.projectAppControlBar__left {
+  justify-content: flex-start;
+
+  .q-btn {
+    margin-right: $projectAppControlBar-stripButtonSpacingPx;
+  }
+
+  .projectAppControlBar__actionSeparator {
+    margin: $projectAppControlBar-actionSeparator-marginBlockPx $projectAppControlBar-actionSeparator-marginInlineEndPx $projectAppControlBar-actionSeparator-marginBlockPx 0;
+  }
+}
+
+.projectAppControlBar__right {
+  align-items: stretch;
+  justify-content: flex-end;
+  margin-left: auto;
+
+  .q-btn {
+    margin-left: $projectAppControlBar-stripButtonSpacingPx;
+  }
+}
+
+.projectAppControlBarDeleteDocumentAction {
+  align-items: stretch;
+  display: flex;
+}
+
+.projectAppControlBar__actionSeparator {
+  background-color: $projectAppControlBar-actionSeparatorColor;
+  margin-bottom: $projectAppControlBar-actionSeparator-marginBlockPx;
+  margin-left: $projectAppControlBar-stripButtonSpacingPx;
+  margin-top: $projectAppControlBar-actionSeparator-marginBlockPx;
+  opacity: 0.5;
+}
+
+.projectAppControlBar__buttonTooltip.q-tooltip {
+  max-width: $projectAppControlBar-buttonTooltip-maxWidth;
+  width: max-content;
+}
+
+.projectAppControlBarTabs {
+  -webkit-app-region: no-drag;
+  overflow: hidden;
+}
+
+.projectAppControlBarTabs--header {
+  background-color: transparent;
+  flex: 1 1 auto;
+  max-width: 100%;
+  min-height: mainLayout.$mainLayout-appHeader-heightPx;
+  min-width: 0;
+  width: 100%;
+}
+
+.projectAppControlBar__flowSpacer {
+  flex-shrink: 0;
+  min-height: $projectAppControlBar-minHeightPx;
+  pointer-events: none;
+  width: 100%;
+}
+
+.projectAppControlBarTabs__tabs {
+  max-width: 100%;
+  overflow: hidden;
+  width: 100%;
+}
+
+.projectAppControlBarTabs__tabTransitionGroup {
+  display: flex;
+}
+
+/* animate.css base; TransitionGroup :duration overrides animation-duration per enter/leave. */
+.animated {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+.projectAppControlBarTabs__tabClose {
+  color: $projectAppControlBar-tabClose-color;
+}
+
+.projectAppControlBarTabs__tab.q-tab {
+  max-width: $projectAppControlBar-tabWidthPx;
+  /* overflow visible: absolute unsaved feather hangs top-right without clip */
+  overflow: visible;
+  position: relative;
+  width: $projectAppControlBar-tabWidthPx;
+}
+
+.projectAppControlBarTabs__tab--customDocumentBackground.q-tab {
+  background-color: var(--projectAppControlBarTab-backgroundColor);
+}
+
+.projectAppControlBarTabs__tabWorldIndicator {
+  font-size: $projectAppControlBar-tabWorldIndicator-fontSize;
+  left: $projectAppControlBar-tabWorldIndicator-offsetLeft;
+  line-height: 1;
+  pointer-events: none;
+  position: absolute;
+  top: $projectAppControlBar-tabWorldIndicator-offsetTop;
+  z-index: 1;
+}
+
+.tabsWrapper {
+  &.q-tabs--dense .q-tab {
+    min-height: mainLayout.$mainLayout-appHeader-heightPx;
+  }
+
+  .q-tab {
+    --projectAppControlBarTab-focusHelperColor: #{$qFocusable-hoverHelper-backgroundColor};
+
+    color: $projectAppControlBar-tabContent-color;
+    padding: 0 $projectAppControlBar-tabPadding-inlinePx;
+    transition:
+      background-color $projectAppControlBar-tabFocusTransitionDurationMs $projectAppControlBar-tabFocusTransitionEase,
+      color $projectAppControlBar-tabFocusTransitionDurationMs $projectAppControlBar-tabFocusTransitionEase,
+      opacity $projectAppControlBar-tabFocusTransitionDurationMs $projectAppControlBar-tabFocusTransitionEase;
+  }
+
+  .projectAppControlBarTabs__tab--withWorldIndicator.q-tab {
+    padding-inline-start: calc(#{$projectAppControlBar-tabPadding-inlinePx} + #{$projectAppControlBar-tabWorldIndicator-extraPaddingInlineStartPx});
+  }
+
+  .projectAppControlBarTabs__tab--withUnsavedAlert.q-tab {
+    padding-right: $projectAppControlBar-tabPadding-inlineEndWithUnsavedAlertPx;
+  }
+
+  .q-tab__content {
+    justify-content: flex-start;
+    max-width: $projectAppControlBar-tabContent-widthPx;
+    min-width: 0;
+    /* label/ellipsis clip on children; keep visible for absolute alert overlay */
+    overflow: visible;
+    text-align: left;
+    width: $projectAppControlBar-tabContent-widthPx;
+  }
+
+  .q-tab__indicator {
+    height: $projectAppControlBar-tabIndicator-heightPx;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .q-tab--active .q-tab__indicator {
+    background-color: var(--projectAppControlBarTab-textColor, #{$projectAppControlBar-tabContent-color});
+    opacity: 1;
+    transform-origin: left /* rtl:ignore */;
+  }
+
+  .q-tab .q-tab__icon {
+    @include faQIconDisplay.fa-q-icon-display-constrain-glyph-in-box;
+
+    --fa-q-icon-display-glyph-font-size: #{$projectAppControlBar-tabIcon-glyphFontSize};
+    --fa-q-icon-display-mdi-font-size: #{$projectAppControlBar-tabIcon-glyphFontSize};
+
+    align-items: center;
+    color: $projectAppControlBar-tabContent-color;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: $projectAppControlBar-tabIcon-boxSize;
+    height: $projectAppControlBar-tabIcon-boxSize;
+    justify-content: center;
+    max-height: $projectAppControlBar-tabIcon-boxSize;
+    max-width: $projectAppControlBar-tabIcon-boxSize;
+    transition:
+      color $projectAppControlBar-tabFocusTransitionDurationMs $projectAppControlBar-tabFocusTransitionEase,
+      opacity $projectAppControlBar-tabFocusTransitionDurationMs $projectAppControlBar-tabFocusTransitionEase;
+    width: $projectAppControlBar-tabIcon-boxSize;
+
+    &:not(.fa-brands, .fa-regular, .fa-solid) {
+      margin-top: 0;
+    }
+  }
+
+  .q-tab__label {
+    color: $projectAppControlBar-tabContent-color;
+    flex: 1 1 auto;
+    font-size: $projectAppControlBar-tabLabel-fontSize;
+    font-weight: $projectAppControlBar-tabLabel-fontWeight;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition:
+      color $projectAppControlBar-tabFocusTransitionDurationMs $projectAppControlBar-tabFocusTransitionEase,
+      opacity $projectAppControlBar-tabFocusTransitionDurationMs $projectAppControlBar-tabFocusTransitionEase;
+    white-space: nowrap;
+  }
+
+  .projectAppControlBarTabs__tab--customAppearance.q-tab {
+    .projectAppControlBarTabs__deadMarker,
+    .projectAppControlBarTabs__finishedMarker,
+    .projectAppControlBarTabs__tabLabelText,
+    .q-tab__icon,
+    .q-tab__label {
+      color: var(--projectAppControlBarTab-textColor);
+    }
+  }
+
+  .projectAppControlBarTabs__tabLabel {
+    align-items: center;
+    display: inline-flex;
+    flex: 1 1 auto;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .projectAppControlBarTabs__tabLabelText {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .projectAppControlBarTabs__tabLabelText--dead {
+    text-decoration: line-through;
+    text-decoration-color: currentcolor;
+  }
+
+  .projectAppControlBarTabs__deadMarker {
+    flex-shrink: 0;
+    margin-right: 4px;
+  }
+
+  .projectAppControlBarTabs__finishedMarker {
+    flex-shrink: 0;
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+
+  .q-tab__alert-icon {
+    color: $projectAppControlBar-unsavedTabIconColor;
+    font-size: $projectAppControlBar-tabAlertIcon-fontSize !important;
+    height: $projectAppControlBar-tabAlertIcon-fontSize;
+    line-height: $projectAppControlBar-tabAlertIcon-fontSize;
+    pointer-events: none;
+    position: absolute;
+    right: $projectAppControlBar-tabAlertIcon-positionRight;
+    top: $projectAppControlBar-tabAlertIcon-positionTop;
+    width: $projectAppControlBar-tabAlertIcon-fontSize;
+    z-index: 2;
+  }
+
+  .projectAppControlBarTabs__tab.q-focusable:focus > .q-focus-helper,
+  .projectAppControlBarTabs__tab.q-hoverable:hover > .q-focus-helper {
+    background: var(--projectAppControlBarTab-focusHelperColor);
+    opacity: $qFocusable-hoverHelper-opacity !important;
+
+    &::after,
+    &::before {
+      opacity: 0 !important;
+    }
+  }
+}

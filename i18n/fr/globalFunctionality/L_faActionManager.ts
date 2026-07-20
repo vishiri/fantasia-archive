@@ -15,6 +15,7 @@ export default {
     copyHierarchyTreeDocument: 'Copier le document de l’arborescence',
     addHierarchyTreeChildDocument: 'Add hierarchy tree child document',
     deleteHierarchyTreeDocument: 'Supprimer le document de l’arborescence',
+    sortHierarchyTreeDocuments: 'Sort hierarchy tree documents',
     editHierarchyTreeDocument: 'Modifier le document de l’arborescence',
     openHierarchyTreeDocument: 'Ouvrir le document de l’arborescence',
     languageSwitch: 'Changer la langue de l\'interface',
@@ -48,6 +49,7 @@ export default {
     showStartupTipsNotification: 'Afficher la notification de conseil de démarrage',
     toggleDeveloperTools: 'Toggle Outils de développement',
     toggleAppNoteboardWindow: 'Basculer la fenêtre du bloc-notes de l\'application',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     toggleProjectNoteboardWindow: 'Basculer la fenêtre du bloc-notes du projet',
   }
 }

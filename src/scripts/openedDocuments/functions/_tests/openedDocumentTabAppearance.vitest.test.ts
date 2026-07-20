@@ -31,6 +31,8 @@ const baseTab: I_faOpenedDocumentTab = {
   savedIsDead: false,
   parentDocumentIdDraft: '',
   savedParentDocumentId: '',
+  treeOrderNumberDraft: '',
+  savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
   hasUnsavedChanges: false,
   editState: false
 }
@@ -73,7 +75,8 @@ test('Test that normalizeOpenedDocumentTabAppearanceColors fills missing color f
     savedIsCategory: undefined as unknown as boolean,
     savedIsFinished: undefined as unknown as boolean,
     savedIsMinor: undefined as unknown as boolean,
-    savedIsDead: undefined as unknown as boolean
+    savedIsDead: undefined as unknown as boolean,
+    savedTreeOrderNumber: undefined as unknown as number
   })
   expect(normalized.documentTextColorDraft).toBe('')
   expect(normalized.savedDocumentTextColor).toBe('')
@@ -85,6 +88,7 @@ test('Test that normalizeOpenedDocumentTabAppearanceColors fills missing color f
   expect(normalized.savedIsFinished).toBe(false)
   expect(normalized.savedIsMinor).toBe(false)
   expect(normalized.savedIsDead).toBe(false)
+  expect(normalized.savedTreeOrderNumber).toBe(Number.MIN_SAFE_INTEGER)
 })
 
 /**
@@ -108,7 +112,9 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects status flag drift
     savedIsMinor: false,
     savedIsDead: false,
     parentDocumentIdDraft: '',
-    savedParentDocumentId: ''
+    savedParentDocumentId: '',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
   })).toBe(true)
   expect(computeOpenedDocumentHasUnsavedChanges({
     displayNameDraft: 'Hero',
@@ -126,7 +132,9 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects status flag drift
     savedIsMinor: false,
     savedIsDead: false,
     parentDocumentIdDraft: '',
-    savedParentDocumentId: ''
+    savedParentDocumentId: '',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
   })).toBe(true)
   expect(computeOpenedDocumentHasUnsavedChanges({
     displayNameDraft: 'Hero',
@@ -144,7 +152,9 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects status flag drift
     savedIsMinor: false,
     savedIsDead: false,
     parentDocumentIdDraft: '',
-    savedParentDocumentId: ''
+    savedParentDocumentId: '',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
   })).toBe(true)
 })
 
@@ -173,7 +183,9 @@ test('Test that recomputeOpenedDocumentTabHasUnsavedChanges detects background c
     savedIsMinor: false,
     savedIsDead: false,
     parentDocumentIdDraft: '',
-    savedParentDocumentId: ''
+    savedParentDocumentId: '',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
   })).toBe(false)
 })
 
@@ -194,6 +206,54 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects parent id drift',
     savedIsFinished: false,
     savedIsMinor: false,
     savedIsDead: false,
-    savedParentDocumentId: 'parent-1'
+    savedParentDocumentId: 'parent-1',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
   })).toBe(true)
+})
+
+test('Test that computeOpenedDocumentHasUnsavedChanges detects tree order drift', () => {
+  expect(computeOpenedDocumentHasUnsavedChanges({
+    displayNameDraft: 'Hero',
+    documentBackgroundColorDraft: '#112233',
+    documentTextColorDraft: '#AABBCC',
+    isCategoryDraft: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    isDeadDraft: false,
+    parentDocumentIdDraft: '',
+    savedDisplayName: 'Hero',
+    savedDocumentBackgroundColor: '#112233',
+    savedDocumentTextColor: '#AABBCC',
+    savedIsCategory: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    savedParentDocumentId: '',
+    treeOrderNumberDraft: '7',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER
+  })).toBe(true)
+})
+
+test('Test that computeOpenedDocumentHasUnsavedChanges treats non-finite tree order drafts as empty', () => {
+  expect(computeOpenedDocumentHasUnsavedChanges({
+    displayNameDraft: 'Hero',
+    documentBackgroundColorDraft: '#112233',
+    documentTextColorDraft: '#AABBCC',
+    isCategoryDraft: false,
+    isFinishedDraft: false,
+    isMinorDraft: false,
+    isDeadDraft: false,
+    parentDocumentIdDraft: '',
+    savedDisplayName: 'Hero',
+    savedDocumentBackgroundColor: '#112233',
+    savedDocumentTextColor: '#AABBCC',
+    savedIsCategory: false,
+    savedIsFinished: false,
+    savedIsMinor: false,
+    savedIsDead: false,
+    savedParentDocumentId: '',
+    treeOrderNumberDraft: 'not-a-number',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER
+  })).toBe(false)
 })

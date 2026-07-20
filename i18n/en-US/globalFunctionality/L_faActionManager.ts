@@ -15,6 +15,7 @@ export default {
     copyHierarchyTreeDocument: 'Copy hierarchy tree document',
     addHierarchyTreeChildDocument: 'Add hierarchy tree child document',
     deleteHierarchyTreeDocument: 'Delete hierarchy tree document',
+    sortHierarchyTreeDocuments: 'Sort hierarchy tree documents',
     editHierarchyTreeDocument: 'Edit hierarchy tree document',
     openHierarchyTreeDocument: 'Open hierarchy tree document',
     languageSwitch: 'Switch Interface Language',
@@ -48,6 +49,7 @@ export default {
     showStartupTipsNotification: 'Show Startup Tip Notification',
     toggleDeveloperTools: 'Toggle Developer Tools',
     toggleAppNoteboardWindow: 'Toggle App Noteboard Window',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     toggleProjectNoteboardWindow: 'Toggle Project Noteboard Window'
   }
 }

@@ -49,7 +49,7 @@ function buildProjectMenuData (session: I_appMenuBuildSession): I_appMenuItem[] 
       trigger: () => runFaAction('showProjectDashboard', undefined)
     }),
     faMenuSeparator('project-sep-before-noteboard'),
-    faMenuItem('appControlMenus.project.items.toggleProjectNoteboard', 'mdi-note-text-outline', {
+    faMenuItem('appControlMenus.project.items.toggleProjectNoteboard', 'mdi-notebook-edit-outline', {
       conditions: gate,
       keybindCommandId: 'toggleProjectNoteboard',
       trigger: () => runFaAction('toggleProjectNoteboardWindow', undefined)

@@ -2,10 +2,10 @@ import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 import type { T_faActionHandlerContinuation } from 'app/types/I_faActionManagerDomain'
 
 import {
-  resolveProjectDocumentControlBarTabCopyBackgroundColorText,
-  resolveProjectDocumentControlBarTabCopyTextColorText
-} from 'app/src/components/projectUI/ProjectDocumentControlBar/functions/projectDocumentControlBarTabCopyAppearanceColor'
-import { resolveProjectDocumentControlBarTabCopyNameText } from 'app/src/components/projectUI/ProjectDocumentControlBar/functions/projectDocumentControlBarTabCopyName'
+  resolveProjectAppControlBarTabCopyBackgroundColorText,
+  resolveProjectAppControlBarTabCopyTextColorText
+} from 'app/src/components/projectUI/ProjectAppControlBar/functions/projectAppControlBarTabCopyAppearanceColor'
+import { resolveProjectAppControlBarTabCopyNameText } from 'app/src/components/projectUI/ProjectAppControlBar/functions/projectAppControlBarTabCopyName'
 
 type T_openedDocumentTabClipboardHandlerDeps = {
   S_FaOpenedDocuments: () => {
@@ -73,7 +73,7 @@ function createHandleCopyOpenedDocumentTabName (
       return
     }
 
-    const copyText = resolveProjectDocumentControlBarTabCopyNameText(
+    const copyText = resolveProjectAppControlBarTabCopyNameText(
       deps.resolveDocumentTabLabelFromOpenedTab({
         displayNameDraft: tab.displayNameDraft,
         tabLabel: tab.tabLabel
@@ -86,7 +86,7 @@ function createHandleCopyOpenedDocumentTabName (
     return copyOpenedDocumentTabResolvedText(
       deps,
       copyText,
-      'projectUI.projectDocumentControlBar.copyNameSuccess'
+      'projectUI.projectAppControlBar.copyNameSuccess'
     )
   }
 }
@@ -102,7 +102,7 @@ function createHandleCopyOpenedDocumentTabTextColor (
       return
     }
 
-    const copyText = resolveProjectDocumentControlBarTabCopyTextColorText(tab)
+    const copyText = resolveProjectAppControlBarTabCopyTextColorText(tab)
     if (copyText === null) {
       return
     }
@@ -110,7 +110,7 @@ function createHandleCopyOpenedDocumentTabTextColor (
     return copyOpenedDocumentTabResolvedText(
       deps,
       copyText,
-      'projectUI.projectDocumentControlBar.copyTextColorSuccess'
+      'projectUI.projectAppControlBar.copyTextColorSuccess'
     )
   }
 }
@@ -126,7 +126,7 @@ function createHandleCopyOpenedDocumentTabBackgroundColor (
       return
     }
 
-    const copyText = resolveProjectDocumentControlBarTabCopyBackgroundColorText(tab)
+    const copyText = resolveProjectAppControlBarTabCopyBackgroundColorText(tab)
     if (copyText === null) {
       return
     }
@@ -134,7 +134,7 @@ function createHandleCopyOpenedDocumentTabBackgroundColor (
     return copyOpenedDocumentTabResolvedText(
       deps,
       copyText,
-      'projectUI.projectDocumentControlBar.copyBackgroundColorSuccess'
+      'projectUI.projectAppControlBar.copyBackgroundColorSuccess'
     )
   }
 }

@@ -23,16 +23,12 @@ export default {
       }
     },
     documentViewEdit: {
-      title: 'दस्तावेज़ देखें/संपादित करें',
+      title: 'पृष्ठ: दस्तावेज़ देखें/संपादित करें',
       tags: 'दस्तावेज़ पृष्ठ, दृश्य मोड, संपादन मोड, रीडर',
       documentBody: {
         subtitle: 'दस्तावेज़ का मुख्य भाग',
         tags: 'सामग्री क्षेत्र, फ़ील्ड, पढ़ना, संपादक क्षेत्र',
       },
-      documentControlBar: {
-        subtitle: 'दस्तावेज़ नियंत्रण बार',
-        tags: 'टूलबार, टॉप बार, हेडर, दस्तावेज़ क्रोम',
-      }
     },
     hierarchicalTree: {
       title: 'श्रेणीबद्ध वृक्ष',
@@ -54,14 +50,7 @@ export default {
         tags: 'विस्तार करें, पतन करें, सभी का विस्तार करें, अंतःक्रिया',
       },
     },
-    openedDocumentsTabs: {
-      title: 'दस्तावेज़ टैब खोलें',
-      tags: 'टैब बार, फ़ाइलें खोलना, मल्टीटास्किंग',
-      tabBehavior: {
-        subtitle: 'टैब व्यवहार',
-        tags: 'स्विच टैब, टैब स्ट्रिप, होवर व्यवहार',
-      }
-    },
+
     popupsFloatingWindows: {
       title: 'पॉपअप और फ्लोटिंग विंडो',
       tags: 'संवाद, ओवरले, मोडल, विंडोज़',
@@ -84,6 +73,14 @@ export default {
       applicationExtras: {
         subtitle: 'आवेदन अतिरिक्त',
         tags: 'शुभंकर, आलीशान, फैंटासिया, अतिरिक्त',
+      },
+      appControlBar: {
+        subtitle: 'ऐप नियंत्रण बार',
+        tags: 'टूलबार, टॉप बार, हेडर, दस्तावेज़ क्रोम',
+      },
+      tabBehavior: {
+        subtitle: 'टैब व्यवहार',
+        tags: 'स्विच टैब, टैब स्ट्रिप, होवर व्यवहार',
       },
       visualsAppwideFunctionality: {
         subtitle: 'दृश्य और ऐप-व्यापी कार्यक्षमता',
@@ -143,14 +140,24 @@ export default {
       description: 'आम तौर पर किसी आइटम का चयन करने के बाद त्वरित-खोज बंद हो जाती है। इस सुविधा को चालू करने से वह व्यवहार रुक जाता है, जिससे आप एक के बाद एक कई खोज परिणाम खोल सकते हैं।',
       tags: 'खुला रखें, एकाधिक परिणाम, बैच खुला, त्वरित खोज खुला रहता है',
     },
-    disableDocumentControlBar: {
-      title: 'दस्तावेज़ नियंत्रण बार अक्षम करें',
+    disableAppControlBar: {
+      title: 'ऐप नियंत्रण बार अक्षम करें',
       description: 'यदि आप दस्तावेज़ पर अपने कार्य स्थान को अधिकतम करना चाहते हैं, तो आप इस सेटिंग के साथ शीर्ष बटन बार को अक्षम कर सकते हैं। आवश्यक नियंत्रण बटन मुख्य दस्तावेज़ निकाय के शीर्ष पर ले जाया जाएगा, जबकि बाकी कार्यक्षमता कीबाइंड के माध्यम से या ऊपर बाईं ओर ऐप मेनू के माध्यम से पहुंच योग्य होगी।',
       tags: 'टूलबार छुपाएं, स्थान अधिकतम करें, पूरी चौड़ाई, दस्तावेज़ शीर्षलेख',
     },
-    disableDocumentControlBarGuides: {
-      title: 'दस्तावेज़ मार्गदर्शिकाएँ अक्षम करें',
-      description: 'दस्तावेज़ नियंत्रण बार पर नौसिखिया-अनुकूल गाइडों को चालू या बंद टॉगल करता है।',
+    disableAppControlBarContentButtons: {
+      title: 'Disable app control bar content buttons',
+      description: 'Toggles the project contents (document search, document creation, etc.) on the app control bar on or off.',
+      tags: 'quick search, quick add, document create, content tools, control bar buttons'
+    },
+    disableAppControlBarFunctionButtons: {
+      title: 'Disable app control bar function buttons',
+      description: 'Toggles the app functional buttons (noteboards, hierarchical tree toggling, etc.) on the app control bar on or off.',
+      tags: 'noteboard, tree toggle, sidebar hide, function tools, control bar buttons'
+    },
+    disableAppControlBarGuides: {
+      title: 'ऐप नियंत्रण बार मार्गदर्शिकाएँ अक्षम करें',
+      description: 'ऐप नियंत्रण बार पर नौसिखिया-अनुकूल गाइडों को चालू या बंद टॉगल करता है।',
       tags: 'शुरुआती संकेत, ट्यूटोरियल बैनर, कोच चिह्न, नियंत्रण बार सहायता',
     },
     disableDocumentCounts: {
@@ -203,6 +210,11 @@ export default {
       title: 'खाली फ़ील्ड छिपाएँ',
       description: 'दृश्य (गैर-संपादन) मोड में, बिना कोई मान भरे फ़ील्ड छुपाता है। कृपया ध्यान दें कि इसके परिणामस्वरूप अपेक्षाकृत बेतहाशा लेआउट बदलाव हो सकता है, जो कुछ मामलों में दस्तावेज़ को अनियंत्रित बना सकता है।',
       tags: 'रिक्त फ़ील्ड, केवल पढ़ने योग्य दृश्य, कॉम्पैक्ट दस्तावेज़, लेआउट बदलाव',
+    },
+    hideHierarchyTree: {
+      title: 'Hide hierarchical tree',
+      description: 'Controls whether the hierarchical tree is shown.',
+      tags: 'sidebar off, navigator hidden, tree panel, outline hide'
     },
     hidePlushes: {
       title: 'फैंटासिया शुभंकर छिपाएँ',

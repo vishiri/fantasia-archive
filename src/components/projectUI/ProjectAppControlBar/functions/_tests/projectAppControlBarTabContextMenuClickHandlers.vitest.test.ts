@@ -1,0 +1,137 @@
+import { expect, test, vi } from 'vitest'
+
+import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+
+import { buildProjectAppControlBarTabContextMenuClickHandlers } from '../projectAppControlBarTabContextMenuClickHandlers'
+
+const sampleTab: I_faOpenedDocumentTab = {
+  displayNameDraft: 'Hero',
+  documentId: 'doc-hero',
+  persistenceState: 'persisted',
+  editState: false,
+  hasUnsavedChanges: false,
+  savedDisplayName: 'Hero',
+  documentTextColorDraft: '',
+  savedDocumentTextColor: '',
+  documentBackgroundColorDraft: '',
+  savedDocumentBackgroundColor: '',
+  isCategoryDraft: false,
+  savedIsCategory: false,
+  isFinishedDraft: false,
+  isMinorDraft: false,
+  isDeadDraft: false,
+  savedIsFinished: false,
+  savedIsMinor: false,
+  savedIsDead: false,
+  parentDocumentIdDraft: '',
+  savedParentDocumentId: '',
+  treeOrderNumberDraft: '',
+  savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+  tabLabel: 'Character',
+  templateIcon: 'mdi-account'
+}
+
+function buildHandlers () {
+  const onTabCloseAllWithoutChangesClick = vi.fn()
+  const onTabCloseAllWithoutChangesExceptClick = vi.fn()
+  const onTabCloseClick = vi.fn()
+  const onTabDeleteClick = vi.fn()
+  const onTabForceCloseAllClick = vi.fn()
+  const onTabForceCloseAllExceptClick = vi.fn()
+
+  const handlers = buildProjectAppControlBarTabContextMenuClickHandlers({
+    onTabCloseAllWithoutChangesClick,
+    onTabCloseAllWithoutChangesExceptClick,
+    onTabCloseClick,
+    onTabCopyBackgroundColorClick: vi.fn(async () => undefined),
+    onTabCopyDocumentClick: vi.fn(async () => undefined),
+    onTabCopyNameClick: vi.fn(async () => undefined),
+    onTabCopyTextColorClick: vi.fn(async () => undefined),
+    onTabAddNewDocumentUnderThisClick: vi.fn(async () => undefined),
+    onTabDeleteClick,
+    onTabForceCloseAllClick,
+    onTabForceCloseAllExceptClick,
+    onTabMoveClick: vi.fn(),
+    resolveDocumentTabLabel: () => 'Hero',
+    resolveDocumentTabRoute: (documentId: string) => `/home/document/${documentId}`,
+    tab: sampleTab
+  })
+
+  return {
+    handlers,
+    onTabCloseAllWithoutChangesClick,
+    onTabCloseAllWithoutChangesExceptClick,
+    onTabCloseClick,
+    onTabDeleteClick,
+    onTabForceCloseAllClick,
+    onTabForceCloseAllExceptClick
+  }
+}
+
+test('Test that buildProjectAppControlBarTabContextMenuClickHandlers move and browse helpers delegate to tab handlers', () => {
+  const onTabMoveClick = vi.fn()
+  const handlers = buildProjectAppControlBarTabContextMenuClickHandlers({
+    onTabCloseAllWithoutChangesClick: vi.fn(),
+    onTabCloseAllWithoutChangesExceptClick: vi.fn(),
+    onTabCloseClick: vi.fn(),
+    onTabCopyBackgroundColorClick: vi.fn(async () => undefined),
+    onTabCopyDocumentClick: vi.fn(async () => undefined),
+    onTabCopyNameClick: vi.fn(async () => undefined),
+    onTabCopyTextColorClick: vi.fn(async () => undefined),
+    onTabAddNewDocumentUnderThisClick: vi.fn(async () => undefined),
+    onTabDeleteClick: vi.fn(),
+    onTabForceCloseAllClick: vi.fn(),
+    onTabForceCloseAllExceptClick: vi.fn(),
+    onTabMoveClick,
+    resolveDocumentTabLabel: (tab) => tab.displayNameDraft,
+    resolveDocumentTabRoute: (documentId: string) => `/home/document/${documentId}`,
+    tab: sampleTab
+  })
+
+  handlers.onMoveTabLeftClick()
+  handlers.onMoveTabRightClick()
+  handlers.onCopyNameClick()
+  handlers.onCopyTextColorClick()
+  handlers.onCopyBackgroundColorClick()
+  handlers.onCopyDocumentClick()
+  handlers.onAddNewDocumentUnderThisClick()
+
+  expect(onTabMoveClick).toHaveBeenNthCalledWith(1, 'doc-hero', 'left')
+  expect(onTabMoveClick).toHaveBeenNthCalledWith(2, 'doc-hero', 'right')
+  expect(handlers.resolveBrowseTabLabel(sampleTab)).toBe('Hero')
+  expect(handlers.resolveBrowseTabRoute('doc-hero')).toBe('/home/document/doc-hero')
+})
+
+test('Test that buildProjectAppControlBarTabContextMenuClickHandlers bulk close actions delegate to tab handlers', () => {
+  const {
+    handlers,
+    onTabCloseAllWithoutChangesClick,
+    onTabCloseAllWithoutChangesExceptClick,
+    onTabCloseClick
+  } = buildHandlers()
+
+  handlers.onCloseThisTabClick()
+  handlers.onCloseAllTabsWithoutChangesExceptThisOneClick()
+  handlers.onCloseAllTabsWithoutChangesClick()
+
+  expect(onTabCloseClick).toHaveBeenCalledWith('doc-hero')
+  expect(onTabCloseAllWithoutChangesExceptClick).toHaveBeenCalledWith('doc-hero')
+  expect(onTabCloseAllWithoutChangesClick).toHaveBeenCalledOnce()
+})
+
+test('Test that buildProjectAppControlBarTabContextMenuClickHandlers destructive actions delegate to tab handlers', () => {
+  const {
+    handlers,
+    onTabDeleteClick,
+    onTabForceCloseAllClick,
+    onTabForceCloseAllExceptClick
+  } = buildHandlers()
+
+  handlers.onForceCloseAllTabsExceptThisOneClick()
+  handlers.onForceCloseAllTabsClick()
+  handlers.onDeleteThisDocumentClick()
+
+  expect(onTabForceCloseAllExceptClick).toHaveBeenCalledWith('doc-hero')
+  expect(onTabForceCloseAllClick).toHaveBeenCalledOnce()
+  expect(onTabDeleteClick).toHaveBeenCalledWith('doc-hero')
+})

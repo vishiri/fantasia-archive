@@ -53,6 +53,7 @@
             :active-document-id="activeDocumentId"
             class="projectHierarchyTree__nodeContent"
             :node="node"
+            :order-number-badge-label="resolveOrderNumberBadgeLabelForNode(node)"
             :placement-count-display="resolvePlacementCountDisplayForNode(node)"
             :stat="stat"
           >
@@ -91,8 +92,10 @@
       :on-expand-all-click="onExpandAllUnderNodeClick"
       :on-hide="onNodeContextMenuHide"
       :on-open-document-click="onOpenDocumentFromContextMenuClick"
+      :on-sort-by-item-click="onSortByItemFromContextMenuClick"
       :shows-bulk-expand-rows="contextMenuShowsBulkExpandRows"
       :shows-copy-rows="contextMenuShowsCopyRows"
+      :shows-sort-by-rows="contextMenuShowsSortByRows"
     />
   </div>
 </template>
@@ -119,6 +122,7 @@ import {
 import { projectHierarchyTreeNodeShowsOpenIcon } from './functions/projectHierarchyTreeDocumentHasChildrenSync'
 import { projectHierarchyTreeNodeShowsDocumentButtonGroup } from './functions/projectHierarchyTreeDocumentButtonVisibility'
 import { resolveProjectHierarchyTreeNodeRowKindClass } from './functions/projectHierarchyTreeTreeNodeKindClass'
+import { resolveFaDocumentTreeOrderNumberBadgeLabel } from 'app/src/scripts/openedDocuments/functions/openedDocumentTreeOrderNumber'
 import { useProjectHierarchyTree } from './scripts/projectHierarchyTree_manager'
 
 defineOptions({
@@ -143,6 +147,7 @@ const {
   contextMenuAnchorNodeId,
   contextMenuShowsBulkExpandRows,
   contextMenuShowsCopyRows,
+  contextMenuShowsSortByRows,
   documentButtonVisibility,
   eachDraggableHandler,
   eachDroppableHandler,
@@ -172,6 +177,7 @@ const {
   onNodeOpen,
   onNodeRowContextMenu,
   onOpenDocumentFromContextMenuClick,
+  onSortByItemFromContextMenuClick,
   onNonWorldOpenIconClick,
   onNonWorldOpenIconPointerDown,
   onWorldNodeRowClick,
@@ -182,6 +188,7 @@ const {
   onTreeDataUpdate,
   onTreeDragEndCleanup,
   resolvePlacementCountDisplayForCounts,
+  showsOrderNumberBadge,
   rootDroppableHandler,
   setTreeComponentRef,
   setTreeScrollHostRef,
@@ -216,6 +223,15 @@ function resolvePlacementCountDisplayForNode (
     }),
     documentCount
   }
+}
+
+function resolveOrderNumberBadgeLabelForNode (
+  node: I_faProjectHierarchyTreeHeTreeNode
+): string | null {
+  if (!showsOrderNumberBadge.value || node.nodeKind !== 'document') {
+    return null
+  }
+  return resolveFaDocumentTreeOrderNumberBadgeLabel(node.treeOrderNumber)
 }
 
 watch(treeScrollHostRef, (element) => {

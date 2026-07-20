@@ -33,13 +33,21 @@ I_appSettingsStaticOption
     category: 'popupsFloatingWindows',
     subcategory: 'quickSearchDialog'
   },
-  disableDocumentControlBar: {
-    category: 'documentViewEdit',
-    subcategory: 'documentControlBar'
+  disableAppControlBar: {
+    category: 'visualAccessibility',
+    subcategory: 'appControlBar'
   },
-  disableDocumentControlBarGuides: {
-    category: 'documentViewEdit',
-    subcategory: 'documentControlBar'
+  disableAppControlBarContentButtons: {
+    category: 'visualAccessibility',
+    subcategory: 'appControlBar'
+  },
+  disableAppControlBarFunctionButtons: {
+    category: 'visualAccessibility',
+    subcategory: 'appControlBar'
+  },
+  disableAppControlBarGuides: {
+    category: 'visualAccessibility',
+    subcategory: 'appControlBar'
   },
   disableDocumentCounts: {
     category: 'hierarchicalTree',
@@ -80,6 +88,10 @@ I_appSettingsStaticOption
   hideEmptyFields: {
     category: 'documentViewEdit',
     subcategory: 'documentBody'
+  },
+  hideHierarchyTree: {
+    category: 'hierarchicalTree',
+    subcategory: 'treeBehavior'
   },
   hidePlushes: {
     category: 'visualAccessibility',
@@ -135,7 +147,7 @@ I_appSettingsStaticOption
   },
   noProjectName: {
     category: 'hierarchicalTree',
-    subcategory: 'treeBehavior'
+    subcategory: 'informationDisplaySettings'
   },
   noTags: {
     category: 'hierarchicalTree',
@@ -158,7 +170,7 @@ I_appSettingsStaticOption
     subcategory: 'quickSearchDialog'
   },
   preventPreviewsTabs: {
-    category: 'openedDocumentsTabs',
+    category: 'visualAccessibility',
     subcategory: 'tabBehavior'
   },
   preventPreviewsTree: {

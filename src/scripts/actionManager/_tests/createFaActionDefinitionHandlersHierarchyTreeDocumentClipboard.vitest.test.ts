@@ -80,7 +80,7 @@ test('Test that handleCopyHierarchyTreeDocumentName copies and shows success toa
     color: 'positive',
     faSkipNotifyConsoleLog: true,
     icon: 'mdi-clipboard-check-outline',
-    message: 'projectUI.projectDocumentControlBar.copyNameSuccess',
+    message: 'projectUI.projectAppControlBar.copyNameSuccess',
     timeout: 2500,
     type: 'positive'
   })
@@ -97,7 +97,7 @@ test('Test that handleCopyHierarchyTreeDocumentTextColor copies and shows succes
     color: 'positive',
     faSkipNotifyConsoleLog: true,
     icon: 'mdi-clipboard-check-outline',
-    message: 'projectUI.projectDocumentControlBar.copyTextColorSuccess',
+    message: 'projectUI.projectAppControlBar.copyTextColorSuccess',
     timeout: 2500,
     type: 'positive'
   })
@@ -114,7 +114,7 @@ test('Test that handleCopyHierarchyTreeDocumentBackgroundColor copies and shows 
     color: 'positive',
     faSkipNotifyConsoleLog: true,
     icon: 'mdi-clipboard-check-outline',
-    message: 'projectUI.projectDocumentControlBar.copyBackgroundColorSuccess',
+    message: 'projectUI.projectAppControlBar.copyBackgroundColorSuccess',
     timeout: 2500,
     type: 'positive'
   })

@@ -15,6 +15,7 @@ export default {
     copyHierarchyTreeDocument: '階層ツリーのドキュメントをコピー',
     addHierarchyTreeChildDocument: 'Add hierarchy tree child document',
     deleteHierarchyTreeDocument: '階層ツリーのドキュメントを削除',
+    sortHierarchyTreeDocuments: 'Sort hierarchy tree documents',
     editHierarchyTreeDocument: '階層ツリーのドキュメントを編集',
     openHierarchyTreeDocument: '階層ツリーのドキュメントを開く',
     languageSwitch: 'インターフェイス言語の切り替え',
@@ -48,6 +49,7 @@ export default {
     showStartupTipsNotification: '起動ヒント通知を表示',
     toggleDeveloperTools: '開発者ツールの切り替え',
     toggleAppNoteboardWindow: 'アプリのノートボードウィンドウの切り替え',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     toggleProjectNoteboardWindow: 'プロジェクトノートボードウィンドウの切り替え',
   }
 }

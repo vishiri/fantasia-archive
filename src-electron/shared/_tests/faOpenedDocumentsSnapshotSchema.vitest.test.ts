@@ -30,6 +30,8 @@ test('Test that parseFaOpenedDocumentsSnapshotJson accepts a valid snapshot payl
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       hasUnsavedChanges: true
     }]
   })
@@ -69,6 +71,8 @@ test('Test that parseFaOpenedDocumentsSnapshotJson defaults editState to preview
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       hasUnsavedChanges: true
     }]
   })
@@ -109,6 +113,8 @@ test('Test that parseFaOpenedDocumentsSnapshotJson reads v1 tabs without persist
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       hasUnsavedChanges: false,
       editState: false
     }]
@@ -145,6 +151,8 @@ test('Test that parseFaOpenedDocumentsSnapshotJson accepts temporary tabs with m
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       hasUnsavedChanges: true,
       editState: true
     }]
@@ -184,6 +192,8 @@ test('Test that parseFaOpenedDocumentsSnapshotJson accepts temporary tabs with p
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       hasUnsavedChanges: false,
       editState: true
     }]
@@ -224,6 +234,8 @@ test('Test that parseFaOpenedDocumentsSnapshotPayload accepts temporaryParentRes
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       hasUnsavedChanges: false,
       editState: true
     }]
@@ -257,6 +269,8 @@ test('Test that faOpenedDocumentsSnapshotSchema rejects temporary tabs missing w
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       hasUnsavedChanges: true,
       editState: true
     }]
@@ -288,6 +302,8 @@ test('Test that serializeFaOpenedDocumentsSnapshotJson writes schemaVersion 2', 
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       hasUnsavedChanges: false,
       editState: false
     }]

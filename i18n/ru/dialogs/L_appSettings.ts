@@ -23,16 +23,12 @@ export default {
       }
     },
     documentViewEdit: {
-      title: 'Просмотр/редактирование документа',
+      title: 'Страница: Просмотр/редактирование документа',
       tags: 'страница документа, режим просмотра, режим редактирования, программа чтения',
       documentBody: {
         subtitle: 'Тело документа',
         tags: 'область содержимого, поля, чтение, область редактора',
       },
-      documentControlBar: {
-        subtitle: 'Панель управления документами',
-        tags: 'панель инструментов, верхняя панель, заголовок, документ Chrome',
-      }
     },
     hierarchicalTree: {
       title: 'Иерархическое дерево',
@@ -54,14 +50,7 @@ export default {
         tags: 'расширить, свернуть, расширить все, взаимодействие',
       },
     },
-    openedDocumentsTabs: {
-      title: 'Открытие вкладок документа',
-      tags: 'панель вкладок, открытые файлы, многозадачность',
-      tabBehavior: {
-        subtitle: 'Поведение вкладок',
-        tags: 'переключение вкладок, полоса вкладок, поведение при наведении',
-      }
-    },
+
     popupsFloatingWindows: {
       title: 'Всплывающие и плавающие окна',
       tags: 'диалоги, наложения, модальные окна, окна',
@@ -84,6 +73,14 @@ export default {
       applicationExtras: {
         subtitle: 'Дополнительные возможности приложения',
         tags: 'талисман, плюш, фантазия, дополнительные услуги',
+      },
+      appControlBar: {
+        subtitle: 'Панель управления приложением',
+        tags: 'панель инструментов, верхняя панель, заголовок, документ Chrome',
+      },
+      tabBehavior: {
+        subtitle: 'Поведение вкладок',
+        tags: 'переключение вкладок, полоса вкладок, поведение при наведении',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Визуализация и функциональность всего приложения',
@@ -143,14 +140,24 @@ export default {
       description: 'Обычно быстрый поиск закрывается после выбора в нем элемента. Включение этой функции предотвращает такое поведение, позволяя открывать несколько результатов поиска один за другим.',
       tags: 'оставить открытым, несколько результатов, пакет открыт, быстрый поиск остается открытым',
     },
-    disableDocumentControlBar: {
-      title: 'Отключить панель управления документами',
+    disableAppControlBar: {
+      title: 'Отключить панель управления приложением',
       description: 'Если вы хотите максимально увеличить рабочее пространство в документе, вы можете отключить верхнюю панель кнопок с помощью этого параметра. Необходимые кнопки управления будут перенесены в верхнюю часть основного тела документа, а остальная функциональность будет доступна через привязки клавиш или через меню приложения в левом верхнем углу.',
       tags: 'скрыть панель инструментов, увеличить пространство, полную ширину, заголовок документа',
     },
-    disableDocumentControlBarGuides: {
-      title: 'Отключить направляющие документа',
-      description: 'Включает или выключает удобные для новичков направляющие на панели управления документами.',
+    disableAppControlBarContentButtons: {
+      title: 'Disable app control bar content buttons',
+      description: 'Toggles the project contents (document search, document creation, etc.) on the app control bar on or off.',
+      tags: 'quick search, quick add, document create, content tools, control bar buttons'
+    },
+    disableAppControlBarFunctionButtons: {
+      title: 'Disable app control bar function buttons',
+      description: 'Toggles the app functional buttons (noteboards, hierarchical tree toggling, etc.) on the app control bar on or off.',
+      tags: 'noteboard, tree toggle, sidebar hide, function tools, control bar buttons'
+    },
+    disableAppControlBarGuides: {
+      title: 'Отключить подсказки панели управления приложением',
+      description: 'Включает или выключает удобные для новичков направляющие на панели управления приложением.',
       tags: 'подсказки для начинающих, обучающие баннеры, отметки тренера, помощь на панели управления',
     },
     disableDocumentCounts: {
@@ -203,6 +210,11 @@ export default {
       title: 'Скрыть пустые поля',
       description: 'Скрывает поля без заполненных значений в режиме просмотра (без редактирования). Обратите внимание, что это может привести к довольно резким изменениям макета, из-за чего в некоторых случаях документ может выглядеть неуправляемо.',
       tags: 'пустые поля, режим только для чтения, компактный документ, сдвиг макета',
+    },
+    hideHierarchyTree: {
+      title: 'Hide hierarchical tree',
+      description: 'Controls whether the hierarchical tree is shown.',
+      tags: 'sidebar off, navigator hidden, tree panel, outline hide'
     },
     hidePlushes: {
       title: 'Скрыть талисман Фантазии',

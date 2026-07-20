@@ -10,12 +10,17 @@ export function createFaUserSettingsStoreApi (deps: I_faUserSettingsStoreApiDeps
   get: () => I_faElectronStoreHandle<I_faUserSettings>
 } {
   const cleanup = (store: I_faElectronStoreHandle<I_faUserSettings>): void => {
-    const currentSettings = (store.store ?? {}) as Partial<I_faUserSettings>
+    const currentSettings = (store.store ?? {}) as Partial<I_faUserSettings> & Record<string, unknown>
+    const hadUnexpectedKeysBeforeMigrate = Object.keys(currentSettings)
+      .some((key) => !(key in deps.defaults))
+    const migrated = deps.migrateLegacyFaUserSettingsKeys(currentSettings)
     const {
-      hasUnexpectedKeys,
       sanitized
-    } = deps.buildSanitizedFaUserSettings(currentSettings, deps.defaults)
-    if (hasUnexpectedKeys) {
+    } = deps.buildSanitizedFaUserSettings(
+      migrated as Partial<I_faUserSettings>,
+      deps.defaults
+    )
+    if (hadUnexpectedKeysBeforeMigrate) {
       store.store = sanitized
     }
   }

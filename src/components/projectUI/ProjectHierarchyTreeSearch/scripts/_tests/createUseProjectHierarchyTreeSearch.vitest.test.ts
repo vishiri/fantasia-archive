@@ -8,10 +8,10 @@ import { createUseProjectHierarchyTreeSearch } from '../../functions/createUsePr
 import { resolveProjectHierarchyTreeSearchLayout } from '../../functions/resolveProjectHierarchyTreeSearchLayout'
 
 function mountUseProjectHierarchyTreeSearch (options: {
-  disableDocumentControlBar: boolean
+  disableAppControlBar: boolean
   sidebarLiveWidthPx: number
 }) {
-  const settings = ref({ disableDocumentControlBar: options.disableDocumentControlBar })
+  const settings = ref({ disableAppControlBar: options.disableAppControlBar })
   const liveWidthPx = ref(options.sidebarLiveWidthPx)
 
   return createUseProjectHierarchyTreeSearch({
@@ -28,18 +28,18 @@ function mountUseProjectHierarchyTreeSearch (options: {
   })()
 }
 
-test('Test that createUseProjectHierarchyTreeSearch applies fixed width when the document control bar is shown', () => {
+test('Test that createUseProjectHierarchyTreeSearch applies fixed width when the app control bar is shown', () => {
   const api = mountUseProjectHierarchyTreeSearch({
-    disableDocumentControlBar: false,
+    disableAppControlBar: false,
     sidebarLiveWidthPx: 500
   })
 
   expect(api.searchWrapperStyle.value.width).toBe(`${FA_PROJECT_SIDEBAR_MIN_WIDTH_PX}px`)
 })
 
-test('Test that createUseProjectHierarchyTreeSearch follows sidebar width when the document control bar is hidden', () => {
+test('Test that createUseProjectHierarchyTreeSearch follows sidebar width when the app control bar is hidden', () => {
   const api = mountUseProjectHierarchyTreeSearch({
-    disableDocumentControlBar: true,
+    disableAppControlBar: true,
     sidebarLiveWidthPx: 512
   })
 
@@ -48,7 +48,7 @@ test('Test that createUseProjectHierarchyTreeSearch follows sidebar width when t
 
 test('Test that createUseProjectHierarchyTreeSearch stretches to the viewport when focused', () => {
   const api = mountUseProjectHierarchyTreeSearch({
-    disableDocumentControlBar: false,
+    disableAppControlBar: false,
     sidebarLiveWidthPx: 512
   })
   api.isSearchFocused.value = true
@@ -59,7 +59,7 @@ test('Test that createUseProjectHierarchyTreeSearch stretches to the viewport wh
 
 test('Test that createUseProjectHierarchyTreeSearch clears the local search query', () => {
   const api = mountUseProjectHierarchyTreeSearch({
-    disableDocumentControlBar: false,
+    disableAppControlBar: false,
     sidebarLiveWidthPx: 512
   })
   api.searchQuery.value = 'alpha'

@@ -7,7 +7,7 @@ export function createUseProjectHierarchyTreeSearch (deps: {
   fixedSearchWidthPx: number
   ref: <T>(value: T) => I_ref<T>
   resolveProjectHierarchyTreeSearchLayout: (input: {
-    disableDocumentControlBar: boolean
+    disableAppControlBar: boolean
     isFocused: boolean
   }) => T_projectHierarchyTreeSearchLayoutMode
   S_FaProjectSidebar: () => StoreGeneric
@@ -27,13 +27,13 @@ export function createUseProjectHierarchyTreeSearch (deps: {
     const { settings } = deps.storeToRefs(deps.S_FaUserSettings())!
     const { liveWidthPx: sidebarLiveWidthPx } = deps.storeToRefs(deps.S_FaProjectSidebar())!
 
-    const disableDocumentControlBar = deps.computed(() => {
-      return settings!.value?.disableDocumentControlBar === true
+    const disableAppControlBar = deps.computed(() => {
+      return settings!.value?.disableAppControlBar === true
     })
 
     const layoutMode = deps.computed(() => {
       return deps.resolveProjectHierarchyTreeSearchLayout({
-        disableDocumentControlBar: disableDocumentControlBar.value,
+        disableAppControlBar: disableAppControlBar.value,
         isFocused: isSearchFocused.value
       })
     })

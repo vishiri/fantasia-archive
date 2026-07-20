@@ -17,6 +17,7 @@ const FA_KEYBIND_COMMAND_TO_ACTION_ID: Readonly<Partial<Record<T_faKeybindComman
   toggleDeveloperTools: 'toggleDeveloperTools',
   toggleAppNoteboard: 'toggleAppNoteboardWindow',
   toggleProjectNoteboard: 'toggleProjectNoteboardWindow',
+  toggleHierarchicalTree: 'toggleHierarchicalTree',
   editDocument: 'editActiveDocument',
   focusPreviousDocumentTab: 'focusPreviousOpenedDocumentTab',
   focusNextDocumentTab: 'focusNextOpenedDocumentTab',

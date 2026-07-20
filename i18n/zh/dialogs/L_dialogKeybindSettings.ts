@@ -31,6 +31,7 @@ export default {
     toggleDeveloperTools: '切换开发者工具',
     toggleAppNoteboard: '切换应用程序记事板',
     toggleProjectNoteboard: '切换项目记事本',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     editDocument: 'Edit current document',
     saveDocumentKeepEditMode: 'Save document without exiting edit mode',
     saveDocument: 'Save current document',

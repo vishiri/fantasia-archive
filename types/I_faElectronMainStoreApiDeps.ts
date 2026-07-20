@@ -94,6 +94,7 @@ export interface I_faUserSettingsStoreApiDeps {
   }
   createLazySingleton: <T>(factory: () => T) => () => T
   defaults: I_faUserSettings
+  migrateLegacyFaUserSettingsKeys: (raw: unknown) => Record<string, unknown>
   storeName: string
 }
 

@@ -116,6 +116,7 @@ test('onNodeRowContextMenu opens menu for eligible structural rows', () => {
   expect(wiring.contextMenuAddNewRowLabel.value).toBeNull()
   expect(wiring.contextMenuShowsBulkExpandRows.value).toBe(true)
   expect(wiring.contextMenuShowsCopyRows.value).toBe(false)
+  expect(wiring.contextMenuShowsSortByRows.value).toBe(false)
 })
 
 test('onNodeRowContextMenu exposes add-new row for template placements', () => {
@@ -136,6 +137,7 @@ test('onNodeRowContextMenu exposes add-new row for template placements', () => {
   wiring.onNodeRowContextMenu(placement, event)
   expect(wiring.contextMenuAddNewRowLabel.value).toBe('Add new building')
   expect(wiring.contextMenuAddNewRowIcon.value).toBe('mdi-plus')
+  expect(wiring.contextMenuShowsSortByRows.value).toBe(true)
 })
 
 test('onAddNewDocumentFromContextMenuClick delegates to add-new handler', () => {
@@ -186,6 +188,7 @@ test('onNodeRowContextMenu opens menu for leaf document rows with copy section o
   expect(wiring.contextMenuAnchorNodeId.value).toBe('doc-leaf')
   expect(wiring.contextMenuShowsBulkExpandRows.value).toBe(false)
   expect(wiring.contextMenuShowsCopyRows.value).toBe(true)
+  expect(wiring.contextMenuShowsSortByRows.value).toBe(true)
 })
 
 test('menu actions delegate to bulk wiring and close menu', async () => {
@@ -266,4 +269,5 @@ test('onNodeContextMenuHide clears anchor id and add-new row', () => {
   expect(wiring.contextMenuAddNewRowIcon.value).toBeNull()
   expect(wiring.contextMenuShowsBulkExpandRows.value).toBe(false)
   expect(wiring.contextMenuShowsCopyRows.value).toBe(false)
+  expect(wiring.contextMenuShowsSortByRows.value).toBe(false)
 })

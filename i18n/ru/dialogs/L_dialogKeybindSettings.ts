@@ -31,6 +31,7 @@ export default {
     toggleDeveloperTools: 'Переключить инструменты разработчика',
     toggleAppNoteboard: 'Переключить блокнот приложения',
     toggleProjectNoteboard: 'Переключить блокнот проекта',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     editDocument: 'Edit current document',
     saveDocumentKeepEditMode: 'Save document without exiting edit mode',
     saveDocument: 'Save current document',

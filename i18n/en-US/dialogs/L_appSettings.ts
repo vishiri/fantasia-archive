@@ -24,15 +24,11 @@ export default {
       }
     },
     documentViewEdit: {
-      title: 'Document view/edit',
+      title: 'Page: Document view/edit',
       tags: 'document page, view mode, edit mode, reader',
       documentBody: {
         subtitle: 'Document body',
         tags: 'content area, fields, reading, editor area'
-      },
-      documentControlBar: {
-        subtitle: 'Document control bar',
-        tags: 'toolbar, top bar, header, document chrome'
       }
     },
     hierarchicalTree: {
@@ -54,14 +50,6 @@ export default {
         subtitle: 'Tree behavior',
         tags: 'expand, collapse, expand all, interaction'
       },
-    },
-    openedDocumentsTabs: {
-      title: 'Open document tabs',
-      tags: 'tab bar, open files, multitasking',
-      tabBehavior: {
-        subtitle: 'Tab behavior',
-        tags: 'switch tabs, tab strip, hover behavior'
-      }
     },
     popupsFloatingWindows: {
       title: 'Popups & floating windows',
@@ -85,6 +73,14 @@ export default {
       applicationExtras: {
         subtitle: 'Application extras',
         tags: 'mascot, plush, fantasia, extras'
+      },
+      appControlBar: {
+        subtitle: 'App control bar',
+        tags: 'toolbar, top bar, header, document chrome'
+      },
+      tabBehavior: {
+        subtitle: 'Tab behavior',
+        tags: 'switch tabs, tab strip, hover behavior'
       },
       visualsAppwideFunctionality: {
         subtitle: 'Visuals & app-wide functionality',
@@ -144,14 +140,24 @@ export default {
       description: 'Normally the quick-search closes after an item is selected from it. Turning this feature on prevents that behavior, allowing you to open multiple search results one after the other.',
       tags: 'keep open, multiple results, batch open, quick search stays open'
     },
-    disableDocumentControlBar: {
-      title: 'Disable document control bar',
+    disableAppControlBar: {
+      title: 'Disable app control bar',
       description: 'If you want to maximize your working space on the document, you can disable the top button bar with this setting. The necessary control buttons will be moved to the top of the main document body, while the rest of the functionality will be accessible via keybinds or through the app menu on the top left.',
       tags: 'toolbar hide, maximize space, full width, document header'
     },
-    disableDocumentControlBarGuides: {
-      title: 'TODO - Disable document guides',
-      description: 'Toggles the newbie-friendly guides on the document control bar on or off.',
+    disableAppControlBarContentButtons: {
+      title: 'Disable app control bar content buttons',
+      description: 'Toggles the project contents (document search, document creation, etc.) on the app control bar on or off.',
+      tags: 'quick search, quick add, document create, content tools, control bar buttons'
+    },
+    disableAppControlBarFunctionButtons: {
+      title: 'Disable app control bar function buttons',
+      description: 'Toggles the app functional buttons (noteboards, hierarchical tree toggling, etc.) on the app control bar on or off.',
+      tags: 'noteboard, tree toggle, sidebar hide, function tools, control bar buttons'
+    },
+    disableAppControlBarGuides: {
+      title: 'Disable app control bar guides',
+      description: 'Toggles the newbie-friendly guides on the app control bar on or off.',
       tags: 'beginner hints, tutorial banners, coach marks, control bar help'
     },
     disableDocumentCounts: {
@@ -205,6 +211,11 @@ export default {
       description: 'Hides fields without any value filled in, in view (non-edit) mode. Please note that this may result in relatively wild layout shifts, which might make the document look unruly in some cases.',
       tags: 'blank fields, read-only view, compact document, layout shift'
     },
+    hideHierarchyTree: {
+      title: 'Hide hierarchical tree',
+      description: 'Controls whether the hierarchical tree is shown.',
+      tags: 'sidebar off, navigator hidden, tree panel, outline hide'
+    },
     hidePlushes: {
       title: 'TODO - Hide Fantasia mascot',
       description: 'Hides the amazingly adorable and awesome Fantasia, the tiny arcane dragon. How could you! :(',
@@ -241,7 +252,7 @@ export default {
       tags: 'lines, helplines, structure, tree, hierarchical, hierarchical tree'
     },
     hideTreeOrderNumbers: {
-      title: 'TODO - Hide order numbers',
+      title: 'Hide order numbers',
       description: 'Hides the custom order numbers to the left of the names.',
       tags: 'sequence index, manual order, rank prefix, left gutter'
     },

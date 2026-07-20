@@ -4,8 +4,6 @@ import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
 import {
   applyTemporaryOpenedDocumentParent,
-  createTemporaryOpenedDocumentTabCopySeed,
-  createTemporaryOpenedDocumentTabSeed,
   normalizeOpenedDocumentTabPersistenceState,
   promoteTemporaryOpenedDocumentTabAfterCreate,
   remapOpenedDocumentTabDocumentId,
@@ -14,6 +12,10 @@ import {
   resolveTemporaryOpenedDocumentDisplayNameForSave,
   resolveTemporaryOpenedDocumentParentDocumentId
 } from '../openedDocumentTemporaryDomain'
+import {
+  createTemporaryOpenedDocumentTabCopySeed,
+  createTemporaryOpenedDocumentTabSeed
+} from '../openedDocumentTemporaryTabSeed'
 import {
   buildTemporaryDocumentParentResolveDocumentIds,
   buildTemporaryDocumentParentResolveDocumentIdsFromOpenedTab,
@@ -42,6 +44,55 @@ test('Test that createTemporaryOpenedDocumentTabCopySeed copies appearance color
   expect(tab.documentTextColorDraft).toBe('#AABBCC')
   expect(tab.documentBackgroundColorDraft).toBe('#112233')
   expect(tab.parentDocumentId).toBe('doc-parent')
+  expect(tab.treeOrderNumberDraft).toBe('')
+  expect(tab.savedTreeOrderNumber).toBe(Number.MIN_SAFE_INTEGER)
+})
+
+test('Test that createTemporaryOpenedDocumentTabCopySeed copies Custom order from source', () => {
+  const tab = createTemporaryOpenedDocumentTabCopySeed({
+    displayName: 'Copy of - Hero',
+    documentBackgroundColor: null,
+    documentId: 'temp-copy',
+    documentTextColor: null,
+    parentDocumentId: null,
+    tabLabel: 'Character',
+    templateIcon: 'mdi-account',
+    templateId: 'tpl-1',
+    treeOrderNumber: 42,
+    worldId: 'world-1'
+  })
+
+  expect(tab.treeOrderNumberDraft).toBe('42')
+  expect(tab.savedTreeOrderNumber).toBe(42)
+  expect(computeOpenedDocumentHasUnsavedChanges(tab)).toBe(false)
+})
+
+test('Test that createTemporaryOpenedDocumentTabCopySeed copies Category and status flags from source', () => {
+  const tab = createTemporaryOpenedDocumentTabCopySeed({
+    displayName: 'Copy of - Hero',
+    documentBackgroundColor: null,
+    documentId: 'temp-copy',
+    documentTextColor: null,
+    isCategory: true,
+    isDead: true,
+    isFinished: true,
+    isMinor: true,
+    parentDocumentId: null,
+    tabLabel: 'Character',
+    templateIcon: 'mdi-account',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+
+  expect(tab.isCategoryDraft).toBe(true)
+  expect(tab.savedIsCategory).toBe(true)
+  expect(tab.isFinishedDraft).toBe(true)
+  expect(tab.savedIsFinished).toBe(true)
+  expect(tab.isMinorDraft).toBe(true)
+  expect(tab.savedIsMinor).toBe(true)
+  expect(tab.isDeadDraft).toBe(true)
+  expect(tab.savedIsDead).toBe(true)
+  expect(computeOpenedDocumentHasUnsavedChanges(tab)).toBe(false)
 })
 
 test('Test that resolveCopyOfDocumentDisplayName applies translated prefix', () => {
@@ -99,6 +150,8 @@ test('Test that createTemporaryOpenedDocumentTabSeed marks unsaved changes only 
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
     savedDocumentTextColor: tab.savedDocumentTextColor
   })).toBe(true)
 })
@@ -349,6 +402,8 @@ test('Test that buildTemporaryDocumentParentResolveDocumentIdsFromOpenedTab walk
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
     savedDocumentTextColor: '',
     tabLabel: 'Character',
     templateIcon: 'mdi-account'

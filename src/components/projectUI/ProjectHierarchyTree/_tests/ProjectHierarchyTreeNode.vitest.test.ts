@@ -284,6 +284,37 @@ test('Test that ProjectHierarchyTreeNode shows finished check mark before dead d
   expect(finishedMarker.element.nextElementSibling).toBe(deadMarker.element)
 })
 
+test('Test that ProjectHierarchyTreeNode renders order number badge when label prop is set', () => {
+  const wrapper = mount(ProjectHierarchyTreeNode, {
+    global: {
+      stubs: {
+        ProjectHierarchyTreeOrderNumberBadge: {
+          props: ['label'],
+          template: '<span data-test-locator="order-number-badge-stub">{{ label }}</span>'
+        },
+        ProjectHierarchyTreePlacementCount: true,
+        QIcon: {
+          props: ['name'],
+          template: '<i class="q-icon" :name="name" />'
+        }
+      }
+    },
+    props: {
+      node: {
+        ...baseNode,
+        nodeKind: 'document',
+        treeOrderNumber: 12
+      },
+      orderNumberBadgeLabel: '12',
+      stat: {
+        open: false
+      }
+    }
+  })
+
+  expect(wrapper.find('[data-test-locator="order-number-badge-stub"]').text()).toBe('12')
+})
+
 test('Test that ProjectHierarchyTreeNode renders placement counts from display prop', () => {
   const wrapper = mount(ProjectHierarchyTreeNode, {
     global: {

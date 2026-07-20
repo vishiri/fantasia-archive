@@ -17,7 +17,11 @@ type T_createFaActionDefinitionHandlersDeps = {
   S_FaProjectSettings: () => { updateProjectSettings: (patch: I_faProjectSettingsPatch) => Promise<void> }
   S_FaProjectWorkspaceWorlds: () => { refreshWorkspaceWorlds: () => Promise<void> }
   S_FaProjectHierarchyTree: () => { refreshLayout: () => Promise<void> }
-  S_FaUserSettings: () => { updateSettings: (patch: Partial<I_faUserSettings>) => Promise<void> }
+  S_FaUserSettings: () => {
+    patchSettingsSilently: (patch: Partial<I_faUserSettings>) => Promise<void>
+    settings: I_faUserSettings | null
+    updateSettings: (patch: Partial<I_faUserSettings>) => Promise<void>
+  }
   faProjectWorldsPersistSnapshotFromDialog: (items: I_faProjectWorldSnapshotItem[]) => Promise<void>
   faProjectDocumentTemplatesPersistSnapshotFromDialog: (
     items: I_faProjectDocumentTemplateSnapshotItem[]
@@ -63,6 +67,14 @@ async function handleToggleProjectNoteboardWindow (deps: T_createFaActionDefinit
     return
   }
   store.setWindowOpen(true)
+}
+
+async function handleToggleHierarchicalTree (deps: T_createFaActionDefinitionHandlersDeps): Promise<void> {
+  const userSettingsStore = deps.S_FaUserSettings()
+  const currentValue = userSettingsStore.settings?.hideHierarchyTree ?? false
+  await userSettingsStore.patchSettingsSilently({
+    hideHierarchyTree: !currentValue
+  })
 }
 
 async function handleReportAppStylingPersistFailure (payload: { message: string }): Promise<void> {
@@ -162,6 +174,7 @@ async function handleLanguageSwitch (
 export function createFaActionDefinitionHandlers (deps: T_createFaActionDefinitionHandlersDeps): {
   handleReportAppNoteboardSaveFailure: (payload: { message: string }) => Promise<void>
   handleToggleAppNoteboardWindow: () => Promise<void>
+  handleToggleHierarchicalTree: () => Promise<void>
   handleReportProjectNoteboardSaveFailure: (payload: { message: string }) => Promise<void>
   handleToggleProjectNoteboardWindow: () => Promise<void>
   handleReportAppStylingPersistFailure: (payload: { message: string }) => Promise<void>
@@ -191,6 +204,7 @@ export function createFaActionDefinitionHandlers (deps: T_createFaActionDefiniti
     handleSaveProjectSettings: (payload) => handleSaveProjectSettings(deps, payload),
     handleSaveProjectStyling: (payload) => handleSaveProjectStyling(deps, payload),
     handleToggleAppNoteboardWindow: () => handleToggleAppNoteboardWindow(deps),
+    handleToggleHierarchicalTree: () => handleToggleHierarchicalTree(deps),
     handleToggleProjectNoteboardWindow: () => handleToggleProjectNoteboardWindow(deps)
   }
 }

@@ -7,6 +7,9 @@ export default {
   belongsUnderFieldLabel: 'Belongs under',
   belongsUnderOneWayRelationshipTooltip:
     'This is a one-way relationship. Editing this value WILL NOT have any effect on the connected document/s. Left-clicking the linked document in non-edit mode will open it in new tab and focuses on it. Middle-clicking the linked document in non-edit mode will open it in new tab and not focus on it.',
+  orderNumberFieldDescription:
+    'Optional display-only custom order number shown as a badge to the left of this document in the hierarchy tree. This feature can be used to manually sort documents via the order numbers or for a visual guideline for the user (for example years in a calendar).',
+  orderNumberFieldLabel: 'Custom order',
   isCategoryDescription:
     'This setting allows for setting the current document to category mode. A document with category mode toggled on will have most of its fields hidden and will not show in any other relationship searches except for "Belongs under".',
   isCategoryTitle: 'Is a category',

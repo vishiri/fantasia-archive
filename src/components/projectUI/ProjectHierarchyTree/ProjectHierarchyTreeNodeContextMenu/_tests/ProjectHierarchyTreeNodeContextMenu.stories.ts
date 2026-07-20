@@ -25,6 +25,7 @@ function createStoryRender (options: {
   anchorNodeId?: string
   showsBulkExpandRows?: boolean
   showsCopyRows?: boolean
+  showsSortByRows?: boolean
 }) {
   return () => ({
     components: {
@@ -43,7 +44,8 @@ function createStoryRender (options: {
         isOpen,
         menuPointerPosition,
         showsBulkExpandRows: options.showsBulkExpandRows ?? true,
-        showsCopyRows: options.showsCopyRows ?? false
+        showsCopyRows: options.showsCopyRows ?? false,
+        showsSortByRows: options.showsSortByRows ?? false
       }
     },
     template: `
@@ -66,8 +68,10 @@ function createStoryRender (options: {
           :on-expand-all-click="() => {}"
           :on-hide="() => {}"
           :on-open-document-click="() => {}"
+          :on-sort-by-item-click="() => {}"
           :shows-bulk-expand-rows="showsBulkExpandRows"
           :shows-copy-rows="showsCopyRows"
+          :shows-sort-by-rows="showsSortByRows"
         />
       </div>
     `
@@ -81,7 +85,8 @@ export const Default: StoryObj<typeof meta> = {
 export const WithPlacementAddNew: StoryObj<typeof meta> = {
   render: createStoryRender({
     addNewRowIcon: 'mdi-plus',
-    addNewRowLabel: 'Add new building'
+    addNewRowLabel: 'Add new building',
+    showsSortByRows: true
   })
 }
 
@@ -89,7 +94,8 @@ export const LeafDocumentCopyOnly: StoryObj<typeof meta> = {
   render: createStoryRender({
     anchorNodeId: 'doc-leaf',
     showsBulkExpandRows: false,
-    showsCopyRows: true
+    showsCopyRows: true,
+    showsSortByRows: true
   })
 }
 
@@ -97,6 +103,7 @@ export const ParentDocumentExpandAndCopy: StoryObj<typeof meta> = {
   render: createStoryRender({
     anchorNodeId: 'doc-parent',
     showsBulkExpandRows: true,
-    showsCopyRows: true
+    showsCopyRows: true,
+    showsSortByRows: true
   })
 }

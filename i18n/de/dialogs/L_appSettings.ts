@@ -23,16 +23,12 @@ export default {
       }
     },
     documentViewEdit: {
-      title: 'Dokumentansicht/Bearbeitung',
+      title: 'Seite: Dokumentansicht/Bearbeitung',
       tags: 'Dokumentseite, Ansichtsmodus, Bearbeitungsmodus, Reader',
       documentBody: {
         subtitle: 'Dokumentkörper',
         tags: 'Inhaltsbereich, Felder, Lesen, Editorbereich',
       },
-      documentControlBar: {
-        subtitle: 'Dokumentenkontrollleiste',
-        tags: 'Symbolleiste, obere Leiste, Kopfzeile, Dokumentchrom',
-      }
     },
     hierarchicalTree: {
       title: 'Hierarchischer Baum',
@@ -54,14 +50,7 @@ export default {
         tags: 'erweitern, reduzieren, alles erweitern, Interaktion',
       },
     },
-    openedDocumentsTabs: {
-      title: 'Dokumentregisterkarten öffnen',
-      tags: 'Tab-Leiste, geöffnete Dateien, Multitasking',
-      tabBehavior: {
-        subtitle: 'Tab-Verhalten',
-        tags: 'Tabs wechseln, Tabstrip, Hover-Verhalten',
-      }
-    },
+
     popupsFloatingWindows: {
       title: 'Popups und schwebende Fenster',
       tags: 'Dialoge, Überlagerungen, Modalitäten, Fenster',
@@ -84,6 +73,14 @@ export default {
       applicationExtras: {
         subtitle: 'Anwendungsextras',
         tags: 'Maskottchen, Plüsch, Fantasia, Extras',
+      },
+      appControlBar: {
+        subtitle: 'App-Kontrollleiste',
+        tags: 'Symbolleiste, obere Leiste, Kopfzeile, Dokumentchrom',
+      },
+      tabBehavior: {
+        subtitle: 'Tab-Verhalten',
+        tags: 'Tabs wechseln, Tabstrip, Hover-Verhalten',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Visuals und App-weite Funktionalität',
@@ -143,14 +140,24 @@ export default {
       description: 'Normalerweise wird die Schnellsuche geschlossen, nachdem ein Element ausgewählt wurde. Wenn Sie diese Funktion aktivieren, wird dieses Verhalten verhindert, sodass Sie mehrere Suchergebnisse nacheinander öffnen können.',
       tags: 'Offen halten, mehrere Ergebnisse, Batch offen, Schnellsuche bleibt geöffnet',
     },
-    disableDocumentControlBar: {
-      title: 'Dokumentkontrollleiste deaktivieren',
+    disableAppControlBar: {
+      title: 'App-Kontrollleiste deaktivieren',
       description: 'Wenn Sie Ihren Arbeitsbereich im Dokument maximieren möchten, können Sie mit dieser Einstellung die obere Schaltflächenleiste deaktivieren. Die erforderlichen Steuerschaltflächen werden an den oberen Rand des Hauptdokumentkörpers verschoben, während der Rest der Funktionalität über Tastenkombinationen oder über das App-Menü oben links zugänglich ist.',
       tags: 'Symbolleiste ausblenden, Platz maximieren, volle Breite, Dokumentkopfzeile',
     },
-    disableDocumentControlBarGuides: {
-      title: 'Dokumentführungen deaktivieren',
-      description: 'Schaltet die anfängerfreundlichen Hilfslinien in der Dokumentkontrollleiste ein oder aus.',
+    disableAppControlBarContentButtons: {
+      title: 'Disable app control bar content buttons',
+      description: 'Toggles the project contents (document search, document creation, etc.) on the app control bar on or off.',
+      tags: 'quick search, quick add, document create, content tools, control bar buttons'
+    },
+    disableAppControlBarFunctionButtons: {
+      title: 'Disable app control bar function buttons',
+      description: 'Toggles the app functional buttons (noteboards, hierarchical tree toggling, etc.) on the app control bar on or off.',
+      tags: 'noteboard, tree toggle, sidebar hide, function tools, control bar buttons'
+    },
+    disableAppControlBarGuides: {
+      title: 'App-Kontrollleisten-Hilfen deaktivieren',
+      description: 'Schaltet die anfängerfreundlichen Hilfslinien in der App-Kontrollleiste ein oder aus.',
       tags: 'Anfängerhinweise, Tutorial-Banner, Trainernoten, Hilfe zur Steuerleiste',
     },
     disableDocumentCounts: {
@@ -203,6 +210,11 @@ export default {
       title: 'Leere Felder ausblenden',
       description: 'Versteckt Felder ohne ausgefüllten Wert im Ansichtsmodus (ohne Bearbeitung). Bitte beachten Sie, dass dies zu relativ wilden Layoutverschiebungen führen kann, die das Dokument in manchen Fällen unruhig wirken lassen.',
       tags: 'leere Felder, schreibgeschützte Ansicht, kompaktes Dokument, Layoutverschiebung',
+    },
+    hideHierarchyTree: {
+      title: 'Hide hierarchical tree',
+      description: 'Controls whether the hierarchical tree is shown.',
+      tags: 'sidebar off, navigator hidden, tree panel, outline hide'
     },
     hidePlushes: {
       title: 'Fantasia-Maskottchen verstecken',

@@ -30,9 +30,8 @@ import {
 const appSettingsCategoryTitleByKey: Record<string, string> = {
   accessibility: 'Accessibility',
   developerSettings: 'Developer settings',
-  documentViewEdit: 'Document view/edit',
+  documentViewEdit: 'Page: Document view/edit',
   hierarchicalTree: 'Hierarchical tree',
-  openedDocumentsTabs: 'Open document tabs',
   popupsFloatingWindows: 'Popups & floating windows',
   projectOverview: 'Page: Project overview',
   visualAccessibility: 'Visuals & app-wide functionality',
@@ -103,7 +102,7 @@ test('Test that compareAppSettingsCategoryOrder orders page categories first the
   const titleByKey: Record<string, string> = {
     accessibility: 'Accessibility',
     developerSettings: 'Developer settings',
-    documentViewEdit: 'Document view/edit',
+    documentViewEdit: 'Page: Document view/edit',
     hierarchicalTree: 'Hierarchical tree',
     projectOverview: 'Page: Project overview',
     welcomeScreen: 'Page: Welcome Screen'
@@ -114,9 +113,9 @@ test('Test that compareAppSettingsCategoryOrder orders page categories first the
   )
 
   expect(ordered).toEqual([
+    'documentViewEdit',
     'projectOverview',
     'welcomeScreen',
-    'documentViewEdit',
     'hierarchicalTree',
     'accessibility',
     'developerSettings'
@@ -199,7 +198,8 @@ test('Test that buildAppSettingsRenderTree orders page categories first and pins
   })
   const keys = Object.keys(tree)
 
-  expect(keys.slice(0, 2)).toEqual([
+  expect(keys.slice(0, 3)).toEqual([
+    'documentViewEdit',
     'projectOverview',
     'welcomeScreen'
   ])

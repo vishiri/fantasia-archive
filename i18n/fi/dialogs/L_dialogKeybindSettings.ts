@@ -31,6 +31,7 @@ export default {
     toggleDeveloperTools: 'Vaihda Kehittäjätyökalut',
     toggleAppNoteboard: 'Vaihda sovellusmuistio',
     toggleProjectNoteboard: 'Ota Project Noteboard käyttöön',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     editDocument: 'Edit current document',
     saveDocumentKeepEditMode: 'Save document without exiting edit mode',
     saveDocument: 'Save current document',

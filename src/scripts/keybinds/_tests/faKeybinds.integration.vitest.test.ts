@@ -541,6 +541,7 @@ test('FA_KEYBIND_COMMAND_DEFINITIONS lists expected commands', () => {
     'showProjectDashboard',
     'toggleAppNoteboard',
     'toggleDeveloperTools',
+    'toggleHierarchicalTree',
     'toggleProjectNoteboard'
   ])
 })

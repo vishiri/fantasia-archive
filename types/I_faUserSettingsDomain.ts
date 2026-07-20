@@ -26,8 +26,10 @@ export interface I_faUserSettings {
   compactTags: boolean
   darkMode: boolean
   disableCloseAfterSelectQuickSearch: boolean
-  disableDocumentControlBar: boolean
-  disableDocumentControlBarGuides: boolean
+  disableAppControlBar: boolean
+  disableAppControlBarContentButtons: boolean
+  disableAppControlBarFunctionButtons: boolean
+  disableAppControlBarGuides: boolean
   disableDocumentCounts: boolean
   disableDocumentToolTips: boolean
   disableQuickSearchCategoryPrecheck: boolean
@@ -38,6 +40,7 @@ export interface I_faUserSettings {
   hideDeadCrossThrough: boolean
   hideDocumentTitles: boolean
   hideEmptyFields: boolean
+  hideHierarchyTree: boolean
   hidePlushes: boolean
   hideRecentProjectTooltip: boolean
   hideTooltipsProject: boolean

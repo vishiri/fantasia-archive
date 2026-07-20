@@ -21,6 +21,7 @@ import {
   applyFaOpenedDocumentParentIdDraft,
   applyFaOpenedDocumentParentIdSyncFromHierarchy
 } from '../faOpenedDocumentsParentIdStoreActions'
+import { applyFaOpenedDocumentTreeOrderNumberDraft } from '../faOpenedDocumentsTreeOrderNumberStoreActions'
 import {
   removeFaOpenedDocumentTabAtIndex,
   resolveFaOpenedDocumentOpenFromTree,
@@ -48,6 +49,8 @@ const baseTab: I_faOpenedDocumentTab = {
   savedIsDead: false,
   parentDocumentIdDraft: '',
   savedParentDocumentId: '',
+  treeOrderNumberDraft: '',
+  savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
   hasUnsavedChanges: false,
   editState: false
 }
@@ -188,12 +191,20 @@ test('Test that applyFaOpenedDocumentParentIdSyncFromHierarchy clears parent dir
     displayNameDraft: 'Dirty',
     hasUnsavedChanges: true,
     parentDocumentIdDraft: 'new-parent',
-    savedParentDocumentId: 'old-parent'
+    savedParentDocumentId: 'old-parent',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
   }
   const synced = applyFaOpenedDocumentParentIdSyncFromHierarchy(dirtyTab, 'tree-parent')
   expect(synced.parentDocumentIdDraft).toBe('tree-parent')
   expect(synced.savedParentDocumentId).toBe('tree-parent')
   expect(synced.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that applyFaOpenedDocumentTreeOrderNumberDraft marks unsaved changes when order drifts', () => {
+  const next = applyFaOpenedDocumentTreeOrderNumberDraft(baseTab, '7')
+  expect(next.treeOrderNumberDraft).toBe('7')
+  expect(next.hasUnsavedChanges).toBe(true)
 })
 
 test('Test that applyFaOpenedDocumentParentIdDraft marks unsaved changes when parent drifts', () => {
@@ -219,7 +230,8 @@ test('Test that applyFaOpenedDocumentTabAfterDisplayNameSave exits edit mode by 
     savedIsFinished: false,
     savedIsMinor: false,
     savedIsDead: false,
-    savedParentDocumentId: ''
+    savedParentDocumentId: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER
   })
   expect(saved.savedDisplayName).toBe('Saved Hero')
   expect(saved.hasUnsavedChanges).toBe(false)
@@ -237,7 +249,8 @@ test('Test that applyFaOpenedDocumentTabAfterDisplayNameSave can keep edit mode'
     savedIsFinished: false,
     savedIsMinor: false,
     savedIsDead: false,
-    savedParentDocumentId: ''
+    savedParentDocumentId: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER
   })
   expect(saved.editState).toBe(true)
 })

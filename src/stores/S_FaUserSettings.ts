@@ -36,14 +36,15 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
     }
   }
 
-  async function updateSettings (updateObject: Partial<I_faUserSettings>): Promise<void> {
+  async function persistSettingsPatch (
+    updateObject: Partial<I_faUserSettings>
+  ): Promise<I_faUserSettings> {
     const setResult = await ResultAsync.fromPromise(
       window.faContentBridgeAPIs.faUserSettings.setSettings(updateObject),
       (error): unknown => error
     )
     if (setResult.isErr()) {
       const error = setResult.error
-      // Error toast handled by the action manager's unified failure reporter; only the bridge log stays here.
       console.error('[S_FaUserSettings] setSettings failed', error)
       throw error instanceof Error ? error : new Error(String(error))
     }
@@ -52,29 +53,38 @@ export const S_FaUserSettings = defineStore('S_FaUserSettings', () => {
     settings.value = retrievedSettings
 
     const saveSucceeded = didObjectPatchPersist(updateObject, retrievedSettings)
-
-    if (saveSucceeded) {
-      if (updateObject.languageCode !== undefined) {
-        applyFaI18nLocaleFromLanguageCode(updateObject.languageCode)
-      }
-      Notify.create({
-        group: false,
-        type: 'positive',
-        message: i18n.global.t('globalFunctionality.faUserSettings.saveSuccess')
+    if (!saveSucceeded) {
+      console.error(`[S_FaUserSettings] ${i18n.global.t('globalFunctionality.faUserSettings.saveMismatchLog')}`, {
+        updateObject,
+        retrievedSettings
       })
-      return
+      throw new Error(i18n.global.t('globalFunctionality.faUserSettings.saveError'))
     }
 
-    console.error(`[S_FaUserSettings] ${i18n.global.t('globalFunctionality.faUserSettings.saveMismatchLog')}`, {
-      updateObject,
-      retrievedSettings
+    if (updateObject.languageCode !== undefined) {
+      applyFaI18nLocaleFromLanguageCode(updateObject.languageCode)
+    }
+
+    return retrievedSettings
+  }
+
+  async function updateSettings (updateObject: Partial<I_faUserSettings>): Promise<void> {
+    await persistSettingsPatch(updateObject)
+    Notify.create({
+      group: false,
+      type: 'positive',
+      message: i18n.global.t('globalFunctionality.faUserSettings.saveSuccess')
     })
-    throw new Error(i18n.global.t('globalFunctionality.faUserSettings.saveError'))
+  }
+
+  async function patchSettingsSilently (updateObject: Partial<I_faUserSettings>): Promise<void> {
+    await persistSettingsPatch(updateObject)
   }
 
   return {
     appSettingsDialogPreview: readonly(appSettingsDialogPreview),
     clearAppSettingsDialogPreview,
+    patchSettingsSilently,
     settings,
     refreshSettings,
     setAppSettingsDialogPreview,

@@ -1,0 +1,71 @@
+import type { I_assembleProjectAppControlBarApiInput } from 'app/types/I_faProjectAppControlBarDomain'
+
+export function buildProjectAppControlBarAssembleInput (
+  input: I_assembleProjectAppControlBarApiInput
+): I_assembleProjectAppControlBarApiInput {
+  const {
+    activeDocumentId,
+    closeAllTabsWithoutChanges,
+    closeTabsWithoutChangesExcept,
+    computed,
+    enterDocumentEditMode,
+    findTabByDocumentId,
+    forceCloseAllTabs,
+    forceCloseAllTabsExcept,
+    formatFaKeybindCommandLabelFromSnapshot,
+    getKeybindsSnapshot,
+    isAppControlBarDisabled,
+    isOnDocumentWorkspaceRoute,
+    isAppControlBarGuidesDisabled,
+    isAppControlBarFunctionButtonsDisabled,
+    isAppControlBarContentButtonsDisabled,
+    hideHierarchyTree,
+    moveDocumentTab,
+    projectWorlds,
+    requestCloseTab,
+    requestDeleteDocument,
+    resolveActiveDocumentTabName,
+    resolveDocumentTabLabelFromOpenedTab,
+    resolveProjectAppControlBarSaveButtonColor,
+    resolveShowAppControlBarStrip,
+    resolveShowDocumentTabs,
+    resolveShowProjectAppControlBarDeleteButton,
+    resolveShowProjectAppControlBarEditButton,
+    resolveShowProjectAppControlBarSaveButtons,
+    runFaAction,
+    tabs
+  } = input
+
+  return {
+    activeDocumentId,
+    closeAllTabsWithoutChanges,
+    closeTabsWithoutChangesExcept,
+    computed,
+    enterDocumentEditMode,
+    findTabByDocumentId,
+    forceCloseAllTabs,
+    forceCloseAllTabsExcept,
+    formatFaKeybindCommandLabelFromSnapshot,
+    getKeybindsSnapshot,
+    isAppControlBarDisabled,
+    isOnDocumentWorkspaceRoute,
+    isAppControlBarGuidesDisabled,
+    isAppControlBarFunctionButtonsDisabled,
+    isAppControlBarContentButtonsDisabled,
+    hideHierarchyTree,
+    moveDocumentTab,
+    projectWorlds,
+    requestCloseTab,
+    requestDeleteDocument,
+    resolveActiveDocumentTabName,
+    resolveDocumentTabLabelFromOpenedTab,
+    resolveProjectAppControlBarSaveButtonColor,
+    resolveShowAppControlBarStrip,
+    resolveShowDocumentTabs,
+    resolveShowProjectAppControlBarDeleteButton,
+    resolveShowProjectAppControlBarEditButton,
+    resolveShowProjectAppControlBarSaveButtons,
+    runFaAction,
+    tabs
+  }
+}

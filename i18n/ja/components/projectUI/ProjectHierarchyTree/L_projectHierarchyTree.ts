@@ -7,11 +7,22 @@ export default {
     deleteDocument: 'ドキュメントを削除',
     editDocument: 'ドキュメントを編集',
     expandAllUnderNode: 'Expand all under this node',
-    openDocument: 'ドキュメントを開く'
+    openDocument: 'ドキュメントを開く',
+    sortBy: 'Sort by',
+    sortAlphabetically: 'Sort alphabetically',
+    sortByCustomOrder: 'Sort by Custom order',
+    sortDetailNameAsc: 'A -> Z',
+    sortDetailNameDesc: 'Z -> A',
+    sortDetailCustomOrderAsc: '0 -> 999',
+    sortDetailCustomOrderDesc: '999 -> 0',
+    sortDetailScopeDirect: 'direct children',
+    sortDetailScopeRecursive: 'recursive'
+
   },
   placementCountTooltip: {
     categoryCount: 'カテゴリ数:',
     documentCount: 'ドキュメント数:',
     totalCount: 'ドキュメントとカテゴリ数:'
-  }
+  },
+  orderNumberBadgeTooltip: 'Order priority of the document'
 }

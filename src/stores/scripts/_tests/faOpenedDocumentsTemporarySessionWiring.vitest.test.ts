@@ -26,6 +26,8 @@ const temporaryTab: I_faOpenedDocumentTab = {
   savedIsDead: false,
   parentDocumentIdDraft: '',
   savedParentDocumentId: '',
+  treeOrderNumberDraft: '',
+  savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
   tabLabel: 'Character',
   templateIcon: 'mdi-account',
   templateId: 'tpl-1',
@@ -78,6 +80,8 @@ test('Test that reconcileTemporaryOpenedDocumentTabFromSnapshot returns persiste
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
     tabLabel: 'Hero',
     templateIcon: 'mdi-account'
   }
@@ -128,6 +132,8 @@ test('Test that reconcileTemporaryOpenedDocumentTabFromSnapshot drops tabs missi
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
     tabLabel: 'Character',
     templateIcon: 'mdi-account'
   }

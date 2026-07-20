@@ -15,6 +15,7 @@ export default {
     copyHierarchyTreeDocument: 'نسخ مستند شجرة التسلسل الهرمي',
     addHierarchyTreeChildDocument: 'Add hierarchy tree child document',
     deleteHierarchyTreeDocument: 'حذف مستند شجرة التسلسل الهرمي',
+    sortHierarchyTreeDocuments: 'Sort hierarchy tree documents',
     editHierarchyTreeDocument: 'تحرير مستند شجرة التسلسل الهرمي',
     openHierarchyTreeDocument: 'فتح مستند شجرة التسلسل الهرمي',
     languageSwitch: 'تبديل لغة الواجهة',
@@ -48,6 +49,7 @@ export default {
     showStartupTipsNotification: 'إظهار إشعار تلميح بدء التشغيل',
     toggleDeveloperTools: 'تبديل أدوات المطور',
     toggleAppNoteboardWindow: 'تبديل نافذة المفكرة التطبيق',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     toggleProjectNoteboardWindow: 'تبديل نافذة المفكرة المشروع',
   }
 }

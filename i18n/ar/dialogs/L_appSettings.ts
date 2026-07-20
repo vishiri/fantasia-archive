@@ -23,16 +23,12 @@ export default {
       }
     },
     documentViewEdit: {
-      title: 'عرض/تحرير المستند',
+      title: 'صفحة: عرض/تحرير المستند',
       tags: 'صفحة المستند، وضع العرض، وضع التحرير، القارئ',
       documentBody: {
         subtitle: 'جسم الوثيقة',
         tags: 'منطقة المحتوى، الحقول، القراءة، منطقة المحرر',
       },
-      documentControlBar: {
-        subtitle: 'شريط التحكم بالمستندات',
-        tags: 'شريط الأدوات، الشريط العلوي، الرأس، وثيقة الكروم',
-      }
     },
     hierarchicalTree: {
       title: 'شجرة هرمية',
@@ -54,14 +50,7 @@ export default {
         tags: 'توسيع، انهيار، توسيع الكل، التفاعل',
       },
     },
-    openedDocumentsTabs: {
-      title: 'فتح علامات تبويب المستندات',
-      tags: 'شريط علامات التبويب، الملفات المفتوحة، تعدد المهام',
-      tabBehavior: {
-        subtitle: 'سلوك علامة التبويب',
-        tags: 'تبديل علامات التبويب، وشريط علامات التبويب، وسلوك التمرير',
-      }
-    },
+
     popupsFloatingWindows: {
       title: 'النوافذ المنبثقة والنوافذ العائمة',
       tags: 'مربعات الحوار، والتراكبات، والمشروط، والنوافذ',
@@ -84,6 +73,14 @@ export default {
       applicationExtras: {
         subtitle: 'إضافات التطبيق',
         tags: 'التميمة، القطيفة، فانتازيا، الإضافات',
+      },
+      appControlBar: {
+        subtitle: 'شريط التحكم بالتطبيق',
+        tags: 'شريط الأدوات، الشريط العلوي، الرأس، وثيقة الكروم',
+      },
+      tabBehavior: {
+        subtitle: 'سلوك علامة التبويب',
+        tags: 'تبديل علامات التبويب، وشريط علامات التبويب، وسلوك التمرير',
       },
       visualsAppwideFunctionality: {
         subtitle: 'المرئيات والوظائف على مستوى التطبيق',
@@ -143,14 +140,24 @@ export default {
       description: 'عادةً ما يتم إغلاق البحث السريع بعد تحديد عنصر منه. يؤدي تشغيل هذه الميزة إلى منع هذا السلوك، مما يسمح لك بفتح نتائج بحث متعددة واحدة تلو الأخرى.',
       tags: 'إبقاء مفتوحة، نتائج متعددة، دفعة مفتوحة، يبقى البحث السريع مفتوحا',
     },
-    disableDocumentControlBar: {
-      title: 'تعطيل شريط التحكم في المستندات',
+    disableAppControlBar: {
+      title: 'تعطيل شريط التحكم بالتطبيق',
       description: 'إذا كنت تريد زيادة مساحة العمل الخاصة بك على المستند إلى الحد الأقصى، فيمكنك تعطيل شريط الأزرار العلوي باستخدام هذا الإعداد. سيتم نقل أزرار التحكم الضرورية إلى الجزء العلوي من نص المستند الرئيسي، بينما يمكن الوصول إلى بقية الوظائف عبر روابط المفاتيح أو من خلال قائمة التطبيق في الجزء العلوي الأيسر.',
       tags: 'إخفاء شريط الأدوات، زيادة المساحة، العرض الكامل، رأس المستند',
     },
-    disableDocumentControlBarGuides: {
-      title: 'تعطيل أدلة المستندات',
-      description: 'تبديل الأدلة الملائمة للمبتدئين في شريط التحكم في المستندات بين التشغيل أو الإيقاف.',
+    disableAppControlBarContentButtons: {
+      title: 'Disable app control bar content buttons',
+      description: 'Toggles the project contents (document search, document creation, etc.) on the app control bar on or off.',
+      tags: 'quick search, quick add, document create, content tools, control bar buttons'
+    },
+    disableAppControlBarFunctionButtons: {
+      title: 'Disable app control bar function buttons',
+      description: 'Toggles the app functional buttons (noteboards, hierarchical tree toggling, etc.) on the app control bar on or off.',
+      tags: 'noteboard, tree toggle, sidebar hide, function tools, control bar buttons'
+    },
+    disableAppControlBarGuides: {
+      title: 'تعطيل أدلة شريط التحكم بالتطبيق',
+      description: 'تبديل الأدلة الملائمة للمبتدئين في شريط التحكم بالتطبيق بين التشغيل أو الإيقاف.',
       tags: 'تلميحات للمبتدئين، لافتات تعليمية، علامات المدرب، تعليمات شريط التحكم',
     },
     disableDocumentCounts: {
@@ -203,6 +210,11 @@ export default {
       title: 'إخفاء الحقول الفارغة',
       description: 'إخفاء الحقول بدون أي قيمة مملوءة، في وضع العرض (بدون تحرير). يرجى ملاحظة أن هذا قد يؤدي إلى تغييرات كبيرة في التخطيط نسبيًا، مما قد يجعل المستند يبدو جامحًا في بعض الحالات.',
       tags: 'الحقول الفارغة، عرض للقراءة فقط، مستند مضغوط، تغيير التخطيط',
+    },
+    hideHierarchyTree: {
+      title: 'Hide hierarchical tree',
+      description: 'Controls whether the hierarchical tree is shown.',
+      tags: 'sidebar off, navigator hidden, tree panel, outline hide'
     },
     hidePlushes: {
       title: 'إخفاء التميمة فانتازيا',

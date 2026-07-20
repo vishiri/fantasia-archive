@@ -62,7 +62,34 @@ test('Test that MainLayout on workspace route shows the workspace drawer chrome'
   expect(w.find('[data-test-locator="mainLayout-drawer"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="projectHierarchyTreeSearch"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="projectHierarchyTree"]').exists()).toBe(true)
-  expect(w.find('[data-test-locator="projectDocumentControlBar"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="projectAppControlBar"]').exists()).toBe(true)
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * MainLayout
+ * hideHierarchyTree user setting hides the workspace drawer panel while keeping the splitter shell.
+ */
+test('Test that MainLayout hides workspace drawer when hideHierarchyTree is enabled', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'spa')
+
+  S_FaUserSettings().$patch({
+    settings: {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      hideHierarchyTree: true
+    }
+  })
+
+  const w = await mountMainLayoutForVitest('/home')
+
+  await flushPromises()
+
+  expect(w.find('[data-test-locator="mainLayout-sidebarSplitter"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="mainLayout-drawer"]').exists()).toBe(false)
+  expect(w.find('[data-test-locator="projectHierarchyTreeSearch"]').exists()).toBe(false)
+
   w.unmount()
   vi.unstubAllEnvs()
 })

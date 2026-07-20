@@ -8,6 +8,7 @@ import {
   FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN,
   FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_ORDER_NUMBER_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
   FA_PROJECT_TABLE_DOCUMENTS
@@ -16,6 +17,10 @@ import {
   resolveFaProjectDocumentBooleanFlagsForCreateInput,
   resolveFaProjectDocumentBooleanFlagsForUpdate
 } from '../functions/faProjectDocumentBooleanFlagsSql'
+import {
+  resolveFaProjectDocumentTreeOrderNumberForCreateInput,
+  resolveFaProjectDocumentTreeOrderNumberForUpdate
+} from '../functions/faProjectDocumentTreeOrderNumberSql'
 import {
   resolveFaProjectDocumentAppearanceColorsForCreate,
   resolveFaProjectDocumentAppearanceColorsForUpdate
@@ -80,6 +85,7 @@ export function createFaProjectDocument (
     isFinished,
     isMinor
   } = resolveFaProjectDocumentBooleanFlagsForCreateInput(input)
+  const treeOrderNumber = resolveFaProjectDocumentTreeOrderNumberForCreateInput(input)
   const nowMs = Date.now()
   const id = resolveFaProjectDocumentIdForCreate(db, input.id)
   db.prepare(
@@ -94,8 +100,9 @@ export function createFaProjectDocument (
       `${FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN}, ` +
       `${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN}, ` +
       `${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_ORDER_NUMBER_COLUMN}, ` +
       'created_at_ms, updated_at_ms) ' +
-      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(
     id,
     input.worldId,
@@ -110,6 +117,7 @@ export function createFaProjectDocument (
     isFinished,
     isMinor,
     isDead,
+    treeOrderNumber,
     nowMs,
     nowMs
   )
@@ -153,6 +161,7 @@ export function updateFaProjectDocument (
     isFinished: nextIsFinished,
     isMinor: nextIsMinor
   } = resolveFaProjectDocumentBooleanFlagsForUpdate(patch, existingRow)
+  const nextTreeOrderNumber = resolveFaProjectDocumentTreeOrderNumberForUpdate(patch, existingRow)
   const nowMs = Date.now()
   db.prepare(
     `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET world_id = ?, template_id = ?, ` +
@@ -166,6 +175,7 @@ export function updateFaProjectDocument (
       `${FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN} = ?, ` +
       `${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN} = ?, ` +
       `${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN} = ?, ` +
+      `${FA_PROJECT_DOCUMENT_TREE_ORDER_NUMBER_COLUMN} = ?, ` +
       'updated_at_ms = ? WHERE id = ?'
   ).run(
     nextWorldId,
@@ -180,6 +190,7 @@ export function updateFaProjectDocument (
     nextIsFinished,
     nextIsMinor,
     nextIsDead,
+    nextTreeOrderNumber,
     nowMs,
     id
   )

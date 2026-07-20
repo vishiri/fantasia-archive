@@ -2,10 +2,10 @@ import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHi
 import type { T_faActionHandlerContinuation } from 'app/types/I_faActionManagerDomain'
 
 import {
-  resolveProjectDocumentControlBarTabCopyBackgroundColorText,
-  resolveProjectDocumentControlBarTabCopyTextColorText
-} from 'app/src/components/projectUI/ProjectDocumentControlBar/functions/projectDocumentControlBarTabCopyAppearanceColor'
-import { resolveProjectDocumentControlBarTabCopyNameText } from 'app/src/components/projectUI/ProjectDocumentControlBar/functions/projectDocumentControlBarTabCopyName'
+  resolveProjectAppControlBarTabCopyBackgroundColorText,
+  resolveProjectAppControlBarTabCopyTextColorText
+} from 'app/src/components/projectUI/ProjectAppControlBar/functions/projectAppControlBarTabCopyAppearanceColor'
+import { resolveProjectAppControlBarTabCopyNameText } from 'app/src/components/projectUI/ProjectAppControlBar/functions/projectAppControlBarTabCopyName'
 import { findProjectHierarchyTreeDocumentNodeByDocumentId } from 'app/src/components/projectUI/ProjectHierarchyTree/scripts/projectHierarchyTreeDocumentNodeLookup'
 
 type T_hierarchyTreeDocumentClipboardHandlerDeps = {
@@ -73,7 +73,7 @@ function createHandleCopyHierarchyTreeDocumentName (
       return
     }
 
-    const copyText = resolveProjectDocumentControlBarTabCopyNameText(node.label)
+    const copyText = resolveProjectAppControlBarTabCopyNameText(node.label)
     if (copyText === null) {
       return
     }
@@ -81,7 +81,7 @@ function createHandleCopyHierarchyTreeDocumentName (
     return copyHierarchyTreeDocumentResolvedText(
       deps,
       copyText,
-      'projectUI.projectDocumentControlBar.copyNameSuccess'
+      'projectUI.projectAppControlBar.copyNameSuccess'
     )
   }
 }
@@ -97,7 +97,7 @@ function createHandleCopyHierarchyTreeDocumentTextColor (
       return
     }
 
-    const copyText = resolveProjectDocumentControlBarTabCopyTextColorText({
+    const copyText = resolveProjectAppControlBarTabCopyTextColorText({
       documentTextColorDraft: node.documentTextColor ?? ''
     })
     if (copyText === null) {
@@ -107,7 +107,7 @@ function createHandleCopyHierarchyTreeDocumentTextColor (
     return copyHierarchyTreeDocumentResolvedText(
       deps,
       copyText,
-      'projectUI.projectDocumentControlBar.copyTextColorSuccess'
+      'projectUI.projectAppControlBar.copyTextColorSuccess'
     )
   }
 }
@@ -123,7 +123,7 @@ function createHandleCopyHierarchyTreeDocumentBackgroundColor (
       return
     }
 
-    const copyText = resolveProjectDocumentControlBarTabCopyBackgroundColorText({
+    const copyText = resolveProjectAppControlBarTabCopyBackgroundColorText({
       documentBackgroundColorDraft: node.documentBackgroundColor ?? ''
     })
     if (copyText === null) {
@@ -133,7 +133,7 @@ function createHandleCopyHierarchyTreeDocumentBackgroundColor (
     return copyHierarchyTreeDocumentResolvedText(
       deps,
       copyText,
-      'projectUI.projectDocumentControlBar.copyBackgroundColorSuccess'
+      'projectUI.projectAppControlBar.copyBackgroundColorSuccess'
     )
   }
 }

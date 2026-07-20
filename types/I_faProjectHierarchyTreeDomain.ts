@@ -98,6 +98,7 @@ export interface I_faProjectHierarchyTreeDocumentChild {
   isFinished?: boolean | undefined
   isMinor?: boolean | undefined
   isDead?: boolean | undefined
+  treeOrderNumber?: number | undefined
 }
 
 export interface I_faProjectHierarchyTreeListPlacementChildrenResult {
@@ -185,6 +186,48 @@ export interface I_faProjectHierarchyTreeDocumentInvalidPlacementParent {
 export interface I_faProjectHierarchyTreeNodeContextMenuSectionFlags {
   showsBulkExpandRows: boolean
   showsCopyRows: boolean
+  showsSortByRows: boolean
+}
+
+/** Sort by submenu row id for hierarchy tree context menu. */
+export type T_faProjectHierarchyTreeSortByMenuItemId =
+  | 'namesDirectAsc'
+  | 'namesDirectDesc'
+  | 'customOrderDirectAsc'
+  | 'customOrderDirectDesc'
+  | 'namesRecursiveAsc'
+  | 'namesRecursiveDesc'
+  | 'customOrderRecursiveAsc'
+  | 'customOrderRecursiveDesc'
+
+/** One Sort by submenu row: action payload fields + title/detail keys + divider. */
+export interface I_faProjectHierarchyTreeSortByMenuItem {
+  detailDirectionKey: string
+  detailScopeKey: string
+  direction: 'asc' | 'desc'
+  id: T_faProjectHierarchyTreeSortByMenuItemId
+  key: 'name' | 'customOrder'
+  scope: 'direct' | 'recursive'
+  /**
+   * Divider before this item: none for first; group after item 4; alt otherwise.
+   */
+  separatorBefore: 'none' | 'alt' | 'group'
+  titleKey: string
+}
+
+/** Document child sort key for hierarchy Sort by modes. */
+export type T_faProjectHierarchyTreeDocumentSortKey = 'name' | 'customOrder'
+
+/** Document child sort direction for hierarchy Sort by modes. */
+export type T_faProjectHierarchyTreeDocumentSortDirection = 'asc' | 'desc'
+
+/** Direct children only vs every nested sibling bucket under the anchor. */
+export type T_faProjectHierarchyTreeDocumentSortScope = 'direct' | 'recursive'
+
+/** One parent bucket reindexed by hierarchy Sort by. */
+export interface I_faProjectHierarchyTreeDocumentSortBucket {
+  parentDocumentId: string | null
+  placementId: string
 }
 
 export interface I_faProjectHierarchyTreeHeTreeNode {
@@ -214,6 +257,7 @@ export interface I_faProjectHierarchyTreeHeTreeNode {
   isFinished?: boolean | undefined
   isMinor?: boolean | undefined
   isDead?: boolean | undefined
+  treeOrderNumber?: number | undefined
 }
 
 /** Placement metadata used to build or refresh add-new hierarchy rows. */

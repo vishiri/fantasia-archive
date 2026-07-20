@@ -23,16 +23,12 @@ export default {
       }
     },
     documentViewEdit: {
-      title: 'Перегляд/редагування документа',
+      title: 'Сторінка: Перегляд/редагування документа',
       tags: 'сторінка документа, режим перегляду, режим редагування, читач',
       documentBody: {
         subtitle: 'Тіло документа',
         tags: 'область вмісту, поля, читання, область редактора',
       },
-      documentControlBar: {
-        subtitle: 'Панель керування документами',
-        tags: 'панель інструментів, верхня панель, заголовок, хром документа',
-      }
     },
     hierarchicalTree: {
       title: 'Ієрархічне дерево',
@@ -54,14 +50,7 @@ export default {
         tags: 'розширити, згорнути, розгорнути все, взаємодія',
       },
     },
-    openedDocumentsTabs: {
-      title: 'Відкрити вкладки документа',
-      tags: 'панель вкладок, відкриті файли, багатозадачність',
-      tabBehavior: {
-        subtitle: 'Поведінка вкладки',
-        tags: 'перемикання вкладок, панель вкладок, поведінка при наведенні курсора',
-      }
-    },
+
     popupsFloatingWindows: {
       title: 'Спливаючі та плаваючі вікна',
       tags: 'діалоги, накладки, модальні вікна',
@@ -84,6 +73,14 @@ export default {
       applicationExtras: {
         subtitle: 'Додатки до програми',
         tags: 'талісман, плюш, фантазія, доп',
+      },
+      appControlBar: {
+        subtitle: 'Панель керування застосунком',
+        tags: 'панель інструментів, верхня панель, заголовок, хром документа',
+      },
+      tabBehavior: {
+        subtitle: 'Поведінка вкладки',
+        tags: 'перемикання вкладок, панель вкладок, поведінка при наведенні курсора',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Візуальні елементи та функціональні можливості програми',
@@ -143,14 +140,24 @@ export default {
       description: 'Зазвичай швидкий пошук закривається після вибору в ньому елемента. Увімкнення цієї функції запобігає такій поведінці, дозволяючи відкривати кілька результатів пошуку один за одним.',
       tags: 'залишати відкритим, кілька результатів, відкрити пакет, швидкий пошук залишається відкритим',
     },
-    disableDocumentControlBar: {
-      title: 'Вимкнути панель керування документами',
+    disableAppControlBar: {
+      title: 'Вимкнути панель керування застосунком',
       description: 'Якщо ви хочете максимально збільшити робочий простір у документі, ви можете вимкнути верхню панель кнопок за допомогою цього параметра. Необхідні кнопки керування буде переміщено у верхню частину основного документа, тоді як інші функції будуть доступні через сполучення клавіш або через меню програми у верхньому лівому куті.',
       tags: 'приховати панель інструментів, збільшити простір, повна ширина, заголовок документа',
     },
-    disableDocumentControlBarGuides: {
-      title: 'Вимкнути напрямні документів',
-      description: 'Вмикає або вимикає зручні для новачків посібники на панелі керування документами.',
+    disableAppControlBarContentButtons: {
+      title: 'Disable app control bar content buttons',
+      description: 'Toggles the project contents (document search, document creation, etc.) on the app control bar on or off.',
+      tags: 'quick search, quick add, document create, content tools, control bar buttons'
+    },
+    disableAppControlBarFunctionButtons: {
+      title: 'Disable app control bar function buttons',
+      description: 'Toggles the app functional buttons (noteboards, hierarchical tree toggling, etc.) on the app control bar on or off.',
+      tags: 'noteboard, tree toggle, sidebar hide, function tools, control bar buttons'
+    },
+    disableAppControlBarGuides: {
+      title: 'Вимкнути підказки панелі керування застосунком',
+      description: 'Вмикає або вимикає зручні для новачків посібники на панелі керування застосунком.',
       tags: 'підказки для початківців, банери підручників, позначки тренера, довідка на панелі керування',
     },
     disableDocumentCounts: {
@@ -203,6 +210,11 @@ export default {
       title: 'Сховати порожні поля',
       description: 'Приховує поля без заповнених значень у режимі перегляду (без редагування). Будь ласка, зверніть увагу, що це може призвести до відносно диких зсувів макета, через що в деяких випадках документ може виглядати некерованим.',
       tags: 'порожні поля, перегляд лише для читання, компактний документ, зміна макета',
+    },
+    hideHierarchyTree: {
+      title: 'Hide hierarchical tree',
+      description: 'Controls whether the hierarchical tree is shown.',
+      tags: 'sidebar off, navigator hidden, tree panel, outline hide'
     },
     hidePlushes: {
       title: 'Сховати талісман Fantasia',

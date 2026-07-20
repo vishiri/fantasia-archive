@@ -4,10 +4,10 @@ import type { I_faActionPayloadMap, T_faActionId } from 'app/types/I_faActionMan
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import {
-  resolveProjectDocumentControlBarTabCopyBackgroundColorText,
-  resolveProjectDocumentControlBarTabCopyTextColorText
-} from 'app/src/components/projectUI/ProjectDocumentControlBar/functions/projectDocumentControlBarTabCopyAppearanceColor'
-import { resolveProjectDocumentControlBarTabCopyNameText } from 'app/src/components/projectUI/ProjectDocumentControlBar/functions/projectDocumentControlBarTabCopyName'
+  resolveProjectAppControlBarTabCopyBackgroundColorText,
+  resolveProjectAppControlBarTabCopyTextColorText
+} from 'app/src/components/projectUI/ProjectAppControlBar/functions/projectAppControlBarTabCopyAppearanceColor'
+import { resolveProjectAppControlBarTabCopyNameText } from 'app/src/components/projectUI/ProjectAppControlBar/functions/projectAppControlBarTabCopyName'
 
 import { resolveHierarchyTreeDocumentNodeFromAnchor } from './projectHierarchyTreeDocumentNodeLookup'
 
@@ -31,7 +31,7 @@ export function buildProjectHierarchyTreeNodeContextMenuCopyHandlers (input: {
       return
     }
 
-    const copyText = resolveProjectDocumentControlBarTabCopyNameText(node.label)
+    const copyText = resolveProjectAppControlBarTabCopyNameText(node.label)
     if (copyText === null) {
       return
     }
@@ -55,7 +55,7 @@ export function buildProjectHierarchyTreeNodeContextMenuCopyHandlers (input: {
       return
     }
 
-    const copyText = resolveProjectDocumentControlBarTabCopyTextColorText({
+    const copyText = resolveProjectAppControlBarTabCopyTextColorText({
       documentTextColorDraft: node.documentTextColor ?? ''
     })
     if (copyText === null) {
@@ -81,7 +81,7 @@ export function buildProjectHierarchyTreeNodeContextMenuCopyHandlers (input: {
       return
     }
 
-    const copyText = resolveProjectDocumentControlBarTabCopyBackgroundColorText({
+    const copyText = resolveProjectAppControlBarTabCopyBackgroundColorText({
       documentBackgroundColorDraft: node.documentBackgroundColor ?? ''
     })
     if (copyText === null) {

@@ -8,6 +8,7 @@ import {
   FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN,
   FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_CUSTOM_SORT_ORDER_COLUMN,
+  FA_PROJECT_DOCUMENT_TREE_ORDER_NUMBER_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PARENT_DOCUMENT_ID_COLUMN,
   FA_PROJECT_DOCUMENT_TREE_PLACEMENT_ID_COLUMN,
   FA_PROJECT_TABLE_DOCUMENTS
@@ -46,7 +47,7 @@ export function listFaProjectHierarchyDocumentChildrenRows (
         `display_name, ${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN}, ` +
         `${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}, ${FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN}, ` +
         `${FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN}, ${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN}, ` +
-        `${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN}, ` +
+        `${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN}, ${FA_PROJECT_DOCUMENT_TREE_ORDER_NUMBER_COLUMN}, ` +
         'created_at_ms, updated_at_ms ' +
         `FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
         `WHERE ${placementColumn} = ? AND ` +
@@ -66,7 +67,7 @@ export function listFaProjectHierarchyDirectChildDocumentRows (
         `display_name, ${FA_PROJECT_DOCUMENT_TEXT_COLOR_COLUMN}, ` +
         `${FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN}, ${FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN}, ` +
         `${FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN}, ${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN}, ` +
-        `${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN}, ` +
+        `${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN}, ${FA_PROJECT_DOCUMENT_TREE_ORDER_NUMBER_COLUMN}, ` +
         'created_at_ms, updated_at_ms ' +
         `FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
         `WHERE ${parentColumn} = ? ` +
@@ -91,7 +92,8 @@ export function mapFaProjectHierarchyDocumentChildRow (
     isCategory: row.is_category === 1,
     isFinished: row.is_finished === 1,
     isMinor: row.is_minor === 1,
-    isDead: row.is_dead === 1
+    isDead: row.is_dead === 1,
+    treeOrderNumber: row.tree_order_number
   }
 }
 

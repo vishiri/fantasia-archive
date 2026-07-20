@@ -31,6 +31,7 @@ export function createProjectHierarchyTreeNodeContextMenuWiring (deps: {
   const contextMenuAddNewRowIcon = ref<string | null>(null)
   const contextMenuShowsBulkExpandRows = ref(false)
   const contextMenuShowsCopyRows = ref(false)
+  const contextMenuShowsSortByRows = ref(false)
   const actionWiring = createProjectHierarchyTreeNodeContextMenuActionWiring({
     bulkExpandCollapseWiring: deps.bulkExpandCollapseWiring,
     contextMenuAnchorNodeId,
@@ -47,6 +48,7 @@ export function createProjectHierarchyTreeNodeContextMenuWiring (deps: {
   function clearContextMenuSectionFlags (): void {
     contextMenuShowsBulkExpandRows.value = false
     contextMenuShowsCopyRows.value = false
+    contextMenuShowsSortByRows.value = false
   }
 
   function onNodeRowContextMenu (
@@ -74,6 +76,7 @@ export function createProjectHierarchyTreeNodeContextMenuWiring (deps: {
     contextMenuAnchorNodeId.value = node.id
     contextMenuShowsBulkExpandRows.value = sectionFlags.showsBulkExpandRows
     contextMenuShowsCopyRows.value = sectionFlags.showsCopyRows
+    contextMenuShowsSortByRows.value = sectionFlags.showsSortByRows
     const addNewRow = resolveProjectHierarchyTreePlacementAddNewContextMenuRow({
       placement: node,
       preferredLanguageCode: deps.resolvePreferredLanguageCode()
@@ -104,6 +107,7 @@ export function createProjectHierarchyTreeNodeContextMenuWiring (deps: {
     contextMenuAnchorNodeId,
     contextMenuShowsBulkExpandRows,
     contextMenuShowsCopyRows,
+    contextMenuShowsSortByRows,
     isNodeContextMenuOpen,
     nodeMenuPointerPosition,
     onAddNewDocumentFromContextMenuClick,

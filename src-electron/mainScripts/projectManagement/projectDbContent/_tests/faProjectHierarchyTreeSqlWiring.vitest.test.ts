@@ -155,6 +155,7 @@ test('Test that mapFaProjectHierarchyDocumentChildRow maps null placement id to 
     is_finished: 0,
     is_minor: 0,
     is_dead: 0,
+    tree_order_number: Number.MIN_SAFE_INTEGER,
     created_at_ms: 1,
     updated_at_ms: 1
   })

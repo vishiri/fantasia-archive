@@ -31,6 +31,7 @@ export default {
     toggleDeveloperTools: 'Toggle Outils de développement',
     toggleAppNoteboard: 'Basculer le bloc-notes de l\'application',
     toggleProjectNoteboard: 'Toggle Bloc-notes du projet',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     editDocument: 'Edit current document',
     saveDocumentKeepEditMode: 'Save document without exiting edit mode',
     saveDocument: 'Save current document',

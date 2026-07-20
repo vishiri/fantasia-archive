@@ -23,16 +23,12 @@ export default {
       }
     },
     documentViewEdit: {
-      title: 'Asiakirjan katselu/muokkaus',
+      title: 'Sivu: Asiakirjan katselu/muokkaus',
       tags: 'asiakirjan sivu, katselutila, muokkaustila, lukija',
       documentBody: {
         subtitle: 'Asiakirjan runko',
         tags: 'sisältöalue, kentät, lukeminen, muokkausalue',
       },
-      documentControlBar: {
-        subtitle: 'Asiakirjan ohjauspalkki',
-        tags: 'työkalupalkki, yläpalkki, otsikko, asiakirjan kromi',
-      }
     },
     hierarchicalTree: {
       title: 'Hierarkkinen puu',
@@ -54,14 +50,7 @@ export default {
         tags: 'laajentaa, romahtaa, laajentaa kaikkea, vuorovaikutus',
       },
     },
-    openedDocumentsTabs: {
-      title: 'Avaa asiakirjan välilehdet',
-      tags: 'välilehtipalkki, tiedostojen avaaminen, moniajo',
-      tabBehavior: {
-        subtitle: 'Välilehtien toiminta',
-        tags: 'välilehtien vaihtaminen, välilehtinauha, hover käyttäytyminen',
-      }
-    },
+
     popupsFloatingWindows: {
       title: 'Ponnahdusikkunat ja kelluvat ikkunat',
       tags: 'valintaikkunat, peittokuvat, modaalit, ikkunat',
@@ -84,6 +73,14 @@ export default {
       applicationExtras: {
         subtitle: 'Sovelluksen lisäosat',
         tags: 'maskotti, pehmo, fantasia, extrat',
+      },
+      appControlBar: {
+        subtitle: 'Sovelluksen ohjauspalkki',
+        tags: 'työkalupalkki, yläpalkki, otsikko, asiakirjan kromi',
+      },
+      tabBehavior: {
+        subtitle: 'Välilehtien toiminta',
+        tags: 'välilehtien vaihtaminen, välilehtinauha, hover käyttäytyminen',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Visuaaliset ja sovelluksenlaajuiset toiminnot',
@@ -143,14 +140,24 @@ export default {
       description: 'Normaalisti pikahaku sulkeutuu, kun kohde on valittu siitä. Tämän ominaisuuden ottaminen käyttöön estää tämän toiminnan, jolloin voit avata useita hakutuloksia peräkkäin.',
       tags: 'pitää auki, useita tuloksia, erä auki, pikahaku pysyy auki',
     },
-    disableDocumentControlBar: {
-      title: 'Poista asiakirjan ohjauspalkki käytöstä',
+    disableAppControlBar: {
+      title: 'Poista sovelluksen ohjauspalkki käytöstä',
       description: 'Jos haluat maksimoida työtilaasi asiakirjassa, voit poistaa yläpainikepalkin käytöstä tällä asetuksella. Tarvittavat ohjauspainikkeet siirretään pääasiakirjan rungon yläosaan, kun taas loput toiminnot ovat käytettävissä näppäinten kautta tai vasemmassa yläkulmassa olevan sovellusvalikon kautta.',
       tags: 'työkalurivi piilota, maksimoi tila, koko leveys, asiakirjan otsikko',
     },
-    disableDocumentControlBarGuides: {
-      title: 'Poista asiakirjaoppaat käytöstä',
-      description: 'Ottaa käyttöön tai poistaa käytöstä aloittelijoille sopivat oppaat asiakirjan ohjauspalkissa.',
+    disableAppControlBarContentButtons: {
+      title: 'Disable app control bar content buttons',
+      description: 'Toggles the project contents (document search, document creation, etc.) on the app control bar on or off.',
+      tags: 'quick search, quick add, document create, content tools, control bar buttons'
+    },
+    disableAppControlBarFunctionButtons: {
+      title: 'Disable app control bar function buttons',
+      description: 'Toggles the app functional buttons (noteboards, hierarchical tree toggling, etc.) on the app control bar on or off.',
+      tags: 'noteboard, tree toggle, sidebar hide, function tools, control bar buttons'
+    },
+    disableAppControlBarGuides: {
+      title: 'Poista sovelluksen ohjauspalkin oppaat käytöstä',
+      description: 'Ottaa käyttöön tai poistaa käytöstä aloittelijoille sopivat oppaat sovelluksen ohjauspalkissa.',
       tags: 'vihjeitä aloittelijoille, opetusbannerit, valmentajan merkit, ohjauspalkin apu',
     },
     disableDocumentCounts: {
@@ -203,6 +210,11 @@ export default {
       title: 'Piilota tyhjät kentät',
       description: 'Piilottaa kentät ilman täytettyä arvoa katselutilassa (ei-muokkaus). Huomaa, että tämä voi johtaa suhteellisen villiin asettelun siirtymiin, mikä saattaa joissakin tapauksissa saada asiakirjan näyttämään kurittomalta.',
       tags: 'tyhjät kentät, vain luku -näkymä, kompakti asiakirja, asettelun muutos',
+    },
+    hideHierarchyTree: {
+      title: 'Hide hierarchical tree',
+      description: 'Controls whether the hierarchical tree is shown.',
+      tags: 'sidebar off, navigator hidden, tree panel, outline hide'
     },
     hidePlushes: {
       title: 'Piilota Fantasia-maskotti',

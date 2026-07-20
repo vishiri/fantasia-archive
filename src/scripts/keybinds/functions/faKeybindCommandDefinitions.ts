@@ -122,6 +122,20 @@ export const FA_KEYBIND_COMMAND_DEFINITIONS: I_faKeybindCommandDefinition[] = [
   },
   {
     defaultChord: {
+      code: 'KeyT',
+      mods: [
+        'alt',
+        'ctrl',
+        'shift'
+      ]
+    },
+    editable: true,
+    firesInEditableFields: true,
+    id: 'toggleHierarchicalTree',
+    messageKey: 'dialogs.keybindSettings.commands.toggleHierarchicalTree'
+  },
+  {
+    defaultChord: {
       code: 'F11',
       mods: ['primary']
     },

@@ -17,7 +17,7 @@
         <AppControlMenus class="col-auto" />
         <div
           class="col appHeader__tabsRegion"
-          data-test-locator="mainLayout-documentControlBarHeaderMount"
+          data-test-locator="mainLayout-appControlBarHeaderMount"
         />
       </div>
     </q-header>
@@ -28,14 +28,17 @@
 
     <q-splitter
       v-if="showWorkspaceDrawer"
-      v-model="sidebarWidthModel"
+      :model-value="sidebarSplitterModelValue"
       unit="px"
-      :limits="[sidebarMinWidthPx, Infinity]"
+      :limits="sidebarSplitterLimits"
       class="mainLayoutSidebarSplitter"
       data-test-locator="mainLayout-sidebarSplitter"
-      @update:model-value="onSidebarSplitterWidthUpdate"
+      @update:model-value="onSidebarSplitterModelUpdate"
     >
-      <template #before>
+      <template
+        v-if="!hideHierarchyTree"
+        #before
+      >
         <div
           ref="workspaceSidebarPanelRef"
           class="mainLayoutSidebarSplitter__panel"
@@ -52,7 +55,7 @@
 
       <template #after>
         <q-page-container class="appShellLayout__pageContainer">
-          <ProjectDocumentControlBar v-if="showWorkspaceDrawer" />
+          <ProjectAppControlBar v-if="showWorkspaceDrawer" />
           <div class="appShellLayout__pageTransitionHost">
             <router-view v-slot="{ Component, route: childRoute }">
               <Transition
@@ -100,14 +103,17 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue'
+
 import AppControlMenus from 'app/src/components/globals/AppControlMenus/AppControlMenus.vue'
 import GlobalLanguageSelector from 'app/src/components/globals/GlobalLanguageSelector/GlobalLanguageSelector.vue'
 import GlobalWindowButtons from 'app/src/components/globals/GlobalWindowButtons/GlobalWindowButtons.vue'
-import ProjectDocumentControlBar from 'app/src/components/projectUI/ProjectDocumentControlBar/ProjectDocumentControlBar.vue'
+import ProjectAppControlBar from 'app/src/components/projectUI/ProjectAppControlBar/ProjectAppControlBar.vue'
 import ProjectHierarchyTree from 'app/src/components/projectUI/ProjectHierarchyTree/ProjectHierarchyTree.vue'
 import ProjectHierarchyTreeSearch from 'app/src/components/projectUI/ProjectHierarchyTreeSearch/ProjectHierarchyTreeSearch.vue'
 
 import { useMainLayout, useMainLayoutWorkspaceSidebar } from './scripts/mainLayout_manager'
+import { useMainLayoutHideHierarchyTree } from './scripts/mainLayoutHideHierarchyTreeWiring'
 import { handleMainLayoutWorkspaceDocumentOpenRequest } from './scripts/mainLayoutWorkspaceDocumentOpenWiring'
 import { useFaAppHeaderChromeSpellcheckRefreshVisible } from 'app/src/components/globals/GlobalLanguageSelector/scripts/faAppHeaderChromeSpellcheckReserveWiring'
 
@@ -131,6 +137,30 @@ const {
   sidebarWidthModel,
   workspaceSidebarPanelRef
 } = useMainLayoutWorkspaceSidebar()
+
+const { hideHierarchyTree } = useMainLayoutHideHierarchyTree()
+
+const sidebarSplitterLimits = computed((): [number, number] => {
+  if (hideHierarchyTree.value) {
+    return [0, Infinity]
+  }
+  return [sidebarMinWidthPx, Infinity]
+})
+
+const sidebarSplitterModelValue = computed((): number => {
+  if (hideHierarchyTree.value) {
+    return 0
+  }
+  return sidebarWidthModel.value
+})
+
+function onSidebarSplitterModelUpdate (widthPx: number): void {
+  if (hideHierarchyTree.value) {
+    return
+  }
+  sidebarWidthModel.value = widthPx
+  onSidebarSplitterWidthUpdate(widthPx)
+}
 
 const faAppHeaderChromeSpellcheckRefreshVisible = useFaAppHeaderChromeSpellcheckRefreshVisible()
 </script>

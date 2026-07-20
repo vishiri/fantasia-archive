@@ -18,14 +18,19 @@
   z-index: $projectHierarchyTree-nodeContextMenu-zIndex !important;
 }
 
-.projectHierarchyTreeNodeContextMenu.q-menu {
+.projectHierarchyTreeNodeContextMenu__sortBySubmenu.q-menu {
+  background-color: $projectHierarchyTree-nodeContextMenu-sortBySubmenu-bgColor;
+  z-index: $projectHierarchyTree-nodeContextMenu-zIndex !important;
+
+  .projectHierarchyTreeNodeContextMenu__list {
+    background-color: $projectHierarchyTree-nodeContextMenu-sortBySubmenu-bgColor;
+  }
+}
+
+.projectHierarchyTreeNodeContextMenu.q-menu,
+.projectHierarchyTreeNodeContextMenu__sortBySubmenu.q-menu {
   .projectHierarchyTreeNodeContextMenu__item.q-item {
     align-items: center;
-
-    &:hover:not([aria-disabled='true']),
-    &:focus:not([aria-disabled='true']) {
-      color: appControlMenus.$appControlMenus-singleHover;
-    }
   }
 
   .projectHierarchyTreeNodeContextMenu__item.q-item .q-item__section--avatar {
@@ -35,6 +40,57 @@
 
   .projectHierarchyTreeNodeContextMenu__icon.q-icon {
     font-size: paletteGlobals.$iconSize;
+  }
+}
+
+.projectHierarchyTreeNodeContextMenu.q-menu {
+  .projectHierarchyTreeNodeContextMenu__item.q-item {
+    &:hover:not([aria-disabled='true']),
+    &:focus:not([aria-disabled='true']) {
+      color: appControlMenus.$appControlMenus-singleHover;
+    }
+  }
+
+  .projectHierarchyTreeNodeContextMenu__item--sortByActivator.q-item {
+    .projectHierarchyTreeNodeContextMenu__primaryLabel,
+    .projectHierarchyTreeNodeContextMenu__icon {
+      color: $projectHierarchyTree-nodeContextMenu-sortByActivator-color;
+    }
+
+    &:hover:not([aria-disabled='true']),
+    &:focus:not([aria-disabled='true']) {
+      .projectHierarchyTreeNodeContextMenu__primaryLabel,
+      .projectHierarchyTreeNodeContextMenu__icon {
+        color: appControlMenus.$appControlMenus-singleHover;
+      }
+    }
+  }
+}
+
+/* Sort by submenu: keep title/detail colors on hover; browse-tab-style focus helper only. */
+.projectHierarchyTreeNodeContextMenu__sortBySubmenu.q-menu {
+  .projectHierarchyTreeNodeContextMenu__item.q-item {
+    --projectHierarchyTreeSortByItem-focusHelperColor: #{$qFocusable-hoverHelper-backgroundColor};
+  }
+
+  .projectHierarchyTreeNodeContextMenu__item.q-focusable:focus > .q-focus-helper,
+  .projectHierarchyTreeNodeContextMenu__item.q-hoverable:hover > .q-focus-helper {
+    background: var(--projectHierarchyTreeSortByItem-focusHelperColor);
+    opacity: $qFocusable-hoverHelper-opacity !important;
+
+    &::after,
+    &::before {
+      opacity: 0 !important;
+    }
+  }
+
+  .projectHierarchyTreeNodeContextMenu__sortByDetail {
+    color: $projectHierarchyTree-nodeContextMenu-sortByDetail-color;
+    display: block;
+    font-size: $projectHierarchyTree-nodeContextMenu-sortByDetail-fontSize;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
   }
 }
 

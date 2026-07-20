@@ -30,6 +30,7 @@ const treeHandlers = vi.hoisted(() => ({
   onNodeOpen: vi.fn(),
   onNodeRowContextMenu: vi.fn(),
   onOpenDocumentFromContextMenuClick: vi.fn(),
+  onSortByItemFromContextMenuClick: vi.fn(),
   onNonWorldOpenIconClick: vi.fn(),
   onNonWorldOpenIconPointerDown: vi.fn(),
   onTreeAfterDrop: vi.fn(),
@@ -72,7 +73,8 @@ const treeContextMenuState = {
   isOpen: ref(false),
   menuPointerPosition: ref<{ left: number, top: number } | null>(null),
   showsBulkExpandRows: ref(false),
-  showsCopyRows: ref(false)
+  showsCopyRows: ref(false),
+  showsSortByRows: ref(false)
 }
 
 const documentButtonVisibility = ref({
@@ -82,6 +84,7 @@ const documentButtonVisibility = ref({
 })
 
 const showsTreeLines = ref(true)
+const showsOrderNumberBadge = ref(true)
 
 const projectHierarchyTreeI18n = createI18n({
   legacy: false,
@@ -136,8 +139,10 @@ const projectHierarchyTreeNodeContextMenuStub = {
     'onExpandAllClick',
     'onHide',
     'onOpenDocumentClick',
+    'onSortByItemClick',
     'showsBulkExpandRows',
-    'showsCopyRows'
+    'showsCopyRows',
+    'showsSortByRows'
   ],
   template: '<div data-test-locator="projectHierarchyTree-nodeContextMenu-stub" />'
 }
@@ -178,6 +183,7 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
         contextMenuAnchorNodeId: treeContextMenuState.anchorNodeId,
         contextMenuShowsBulkExpandRows: treeContextMenuState.showsBulkExpandRows,
         contextMenuShowsCopyRows: treeContextMenuState.showsCopyRows,
+        contextMenuShowsSortByRows: treeContextMenuState.showsSortByRows,
         documentButtonVisibility,
         eachDraggableHandler: () => true,
         eachDroppableHandler: () => true,
@@ -210,6 +216,7 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
         onNodeOpen: treeHandlers.onNodeOpen,
         onNodeRowContextMenu: treeHandlers.onNodeRowContextMenu,
         onOpenDocumentFromContextMenuClick: treeHandlers.onOpenDocumentFromContextMenuClick,
+        onSortByItemFromContextMenuClick: treeHandlers.onSortByItemFromContextMenuClick,
         onNonWorldOpenIconClick: treeHandlers.onNonWorldOpenIconClick,
         onNonWorldOpenIconPointerDown: treeHandlers.onNonWorldOpenIconPointerDown,
         onTreeAfterDrop: treeHandlers.onTreeAfterDrop,
@@ -239,6 +246,7 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
         rootDroppableHandler: () => false,
         setTreeComponentRef: treeRefWiring.setTreeComponentRef,
         setTreeScrollHostRef: treeRefWiring.setTreeScrollHostRef,
+        showsOrderNumberBadge,
         showsTreeLines,
         treeData,
         treeMountKey: ref(0),

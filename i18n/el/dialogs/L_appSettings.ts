@@ -23,16 +23,12 @@ export default {
       }
     },
     documentViewEdit: {
-      title: 'Προβολή/επεξεργασία εγγράφου',
+      title: 'Σελίδα: Προβολή/επεξεργασία εγγράφου',
       tags: 'σελίδα εγγράφου, λειτουργία προβολής, λειτουργία επεξεργασίας, πρόγραμμα ανάγνωσης',
       documentBody: {
         subtitle: 'Σώμα εγγράφου',
         tags: 'περιοχή περιεχομένου, πεδία, ανάγνωση, περιοχή επεξεργασίας',
       },
-      documentControlBar: {
-        subtitle: 'Γραμμή ελέγχου εγγράφων',
-        tags: 'γραμμή εργαλείων, επάνω γραμμή, κεφαλίδα, chrome εγγράφων',
-      }
     },
     hierarchicalTree: {
       title: 'Ιεραρχικό δέντρο',
@@ -54,14 +50,7 @@ export default {
         tags: 'επέκταση, κατάρρευση, επέκταση όλων, αλληλεπίδραση',
       },
     },
-    openedDocumentsTabs: {
-      title: 'Ανοίξτε τις καρτέλες εγγράφων',
-      tags: 'γραμμή καρτελών, ανοιχτά αρχεία, πολλαπλές εργασίες',
-      tabBehavior: {
-        subtitle: 'Συμπεριφορά καρτελών',
-        tags: 'εναλλαγή καρτελών, λωρίδα καρτελών, συμπεριφορά αιώρησης',
-      }
-    },
+
     popupsFloatingWindows: {
       title: 'Αναδυόμενα παράθυρα και αιωρούμενα παράθυρα',
       tags: 'διαλόγους, επικαλύψεις, τρόποι λειτουργίας, παράθυρα',
@@ -84,6 +73,14 @@ export default {
       applicationExtras: {
         subtitle: 'Έξτρα εφαρμογής',
         tags: 'μασκότ, βελούδινο, φαντασία, έξτρα',
+      },
+      appControlBar: {
+        subtitle: 'Γραμμή ελέγχου εφαρμογής',
+        tags: 'γραμμή εργαλείων, επάνω γραμμή, κεφαλίδα, chrome εγγράφων',
+      },
+      tabBehavior: {
+        subtitle: 'Συμπεριφορά καρτελών',
+        tags: 'εναλλαγή καρτελών, λωρίδα καρτελών, συμπεριφορά αιώρησης',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Οπτικά και λειτουργικότητα σε όλη την εφαρμογή',
@@ -143,14 +140,24 @@ export default {
       description: 'Κανονικά η γρήγορη αναζήτηση κλείνει αφού επιλεγεί ένα στοιχείο από αυτήν. Η ενεργοποίηση αυτής της λειτουργίας αποτρέπει αυτήν τη συμπεριφορά, επιτρέποντάς σας να ανοίγετε πολλά αποτελέσματα αναζήτησης το ένα μετά το άλλο.',
       tags: 'κρατήστε ανοιχτό, πολλαπλά αποτελέσματα, παρτίδα ανοιχτή, η γρήγορη αναζήτηση παραμένει ανοιχτή',
     },
-    disableDocumentControlBar: {
-      title: 'Απενεργοποιήστε τη γραμμή ελέγχου εγγράφων',
+    disableAppControlBar: {
+      title: 'Απενεργοποιήστε τη γραμμή ελέγχου εφαρμογής',
       description: 'Εάν θέλετε να μεγιστοποιήσετε τον χώρο εργασίας σας στο έγγραφο, μπορείτε να απενεργοποιήσετε την επάνω γραμμή κουμπιών με αυτήν τη ρύθμιση. Τα απαραίτητα κουμπιά ελέγχου θα μετακινηθούν στο επάνω μέρος του κύριου σώματος του εγγράφου, ενώ η υπόλοιπη λειτουργικότητα θα είναι προσβάσιμη μέσω πλήκτρων ή μέσω του μενού της εφαρμογής επάνω αριστερά.',
       tags: 'Απόκρυψη γραμμής εργαλείων, μεγιστοποίηση χώρου, πλήρες πλάτος, κεφαλίδα εγγράφου',
     },
-    disableDocumentControlBarGuides: {
-      title: 'Απενεργοποιήστε τους οδηγούς εγγράφων',
-      description: 'Ενεργοποιεί ή απενεργοποιεί τους φιλικούς οδηγούς για αρχάριους στη γραμμή ελέγχου εγγράφων.',
+    disableAppControlBarContentButtons: {
+      title: 'Disable app control bar content buttons',
+      description: 'Toggles the project contents (document search, document creation, etc.) on the app control bar on or off.',
+      tags: 'quick search, quick add, document create, content tools, control bar buttons'
+    },
+    disableAppControlBarFunctionButtons: {
+      title: 'Disable app control bar function buttons',
+      description: 'Toggles the app functional buttons (noteboards, hierarchical tree toggling, etc.) on the app control bar on or off.',
+      tags: 'noteboard, tree toggle, sidebar hide, function tools, control bar buttons'
+    },
+    disableAppControlBarGuides: {
+      title: 'Απενεργοποιήστε τους οδηγούς γραμμής ελέγχου εφαρμογής',
+      description: 'Ενεργοποιεί ή απενεργοποιεί τους φιλικούς οδηγούς για αρχάριους στη γραμμή ελέγχου εφαρμογής.',
       tags: 'συμβουλές για αρχάριους, πανό για εκπαιδευτικά προγράμματα, σημάδια προπονητή, βοήθεια γραμμής ελέγχου',
     },
     disableDocumentCounts: {
@@ -203,6 +210,11 @@ export default {
       title: 'Απόκρυψη κενών πεδίων',
       description: 'Αποκρύπτει πεδία χωρίς συμπληρωμένη τιμή, σε λειτουργία προβολής (χωρίς επεξεργασία). Λάβετε υπόψη ότι αυτό μπορεί να οδηγήσει σε σχετικά άγριες αλλαγές διάταξης, οι οποίες ενδέχεται να κάνουν το έγγραφο να φαίνεται απείθαρχο σε ορισμένες περιπτώσεις.',
       tags: 'κενά πεδία, προβολή μόνο για ανάγνωση, συμπαγές έγγραφο, αλλαγή διάταξης',
+    },
+    hideHierarchyTree: {
+      title: 'Hide hierarchical tree',
+      description: 'Controls whether the hierarchical tree is shown.',
+      tags: 'sidebar off, navigator hidden, tree panel, outline hide'
     },
     hidePlushes: {
       title: 'Απόκρυψη μασκότ Fantasia',

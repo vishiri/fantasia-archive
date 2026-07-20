@@ -100,6 +100,8 @@ test('Test that getOpenedDocumentsSnapshotAsync returns cloned tabs when DB is a
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       hasUnsavedChanges: false,
       editState: false
     }]

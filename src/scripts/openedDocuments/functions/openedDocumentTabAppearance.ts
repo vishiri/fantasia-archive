@@ -1,6 +1,22 @@
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 import type { I_openedDocumentTabUnsavedCompareInput } from 'app/types/I_faOpenedDocumentsDomain'
 
+const FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY = Number.MIN_SAFE_INTEGER
+
+function resolveOpenedDocumentTreeOrderNumberDraftForCompare (
+  draft: string
+): number {
+  const trimmed = draft.trim()
+  if (trimmed.length === 0) {
+    return FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY
+  }
+  const parsed = Number(trimmed)
+  if (!Number.isFinite(parsed)) {
+    return FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY
+  }
+  return Math.trunc(parsed)
+}
+
 /**
  * Maps nullable SQLite document appearance colors to tab session empty-string baseline.
  */
@@ -40,7 +56,9 @@ export function computeOpenedDocumentHasUnsavedChanges (
     input.isFinishedDraft !== input.savedIsFinished ||
     input.isMinorDraft !== input.savedIsMinor ||
     input.isDeadDraft !== input.savedIsDead ||
-    input.parentDocumentIdDraft !== input.savedParentDocumentId
+    input.parentDocumentIdDraft !== input.savedParentDocumentId ||
+    resolveOpenedDocumentTreeOrderNumberDraftForCompare(input.treeOrderNumberDraft) !==
+      input.savedTreeOrderNumber
   )
 }
 
@@ -65,7 +83,9 @@ export function normalizeOpenedDocumentTabAppearanceColors (
     savedIsMinor: tab.savedIsMinor ?? false,
     savedIsDead: tab.savedIsDead ?? false,
     parentDocumentIdDraft: tab.parentDocumentIdDraft ?? '',
-    savedParentDocumentId: tab.savedParentDocumentId ?? ''
+    savedParentDocumentId: tab.savedParentDocumentId ?? '',
+    treeOrderNumberDraft: tab.treeOrderNumberDraft ?? '',
+    savedTreeOrderNumber: tab.savedTreeOrderNumber ?? FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY
   }
 }
 
@@ -91,6 +111,8 @@ export function recomputeOpenedDocumentTabHasUnsavedChanges (
     savedIsMinor: tab.savedIsMinor,
     savedIsDead: tab.savedIsDead,
     parentDocumentIdDraft: tab.parentDocumentIdDraft,
-    savedParentDocumentId: tab.savedParentDocumentId
+    savedParentDocumentId: tab.savedParentDocumentId,
+    treeOrderNumberDraft: tab.treeOrderNumberDraft,
+    savedTreeOrderNumber: tab.savedTreeOrderNumber
   })
 }

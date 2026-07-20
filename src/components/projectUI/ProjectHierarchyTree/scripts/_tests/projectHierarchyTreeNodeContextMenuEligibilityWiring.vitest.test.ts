@@ -40,7 +40,8 @@ test('resolveProjectHierarchyTreeNodeContextMenuSectionFlags returns bulk flags 
   const flags = resolveProjectHierarchyTreeNodeContextMenuSectionFlags(sampleTree[0]!, sampleTree)
   expect(flags).toEqual({
     showsBulkExpandRows: true,
-    showsCopyRows: false
+    showsCopyRows: false,
+    showsSortByRows: false
   })
 })
 
@@ -62,7 +63,54 @@ test('resolveProjectHierarchyTreeNodeContextMenuSectionFlags returns copy flags 
   const flags = resolveProjectHierarchyTreeNodeContextMenuSectionFlags(documentNode, sampleTree)
   expect(flags).toEqual({
     showsBulkExpandRows: false,
-    showsCopyRows: true
+    showsCopyRows: true,
+    showsSortByRows: true
+  })
+})
+
+test('resolveProjectHierarchyTreeNodeContextMenuSectionFlags returns sort flags for template placements', () => {
+  const placementNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: true,
+    documentId: null,
+    groupId: 'group-1',
+    hasChildren: false,
+    icon: '',
+    id: 'placement-1',
+    label: 'Type',
+    nodeKind: 'templatePlacement',
+    placementId: 'placement-1',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const flags = resolveProjectHierarchyTreeNodeContextMenuSectionFlags(placementNode, sampleTree)
+  expect(flags).toEqual({
+    showsBulkExpandRows: false,
+    showsCopyRows: false,
+    showsSortByRows: true
+  })
+})
+
+test('resolveProjectHierarchyTreeNodeContextMenuSectionFlags hides Sort by when placement id is blank', () => {
+  const documentNode: I_faProjectHierarchyTreeHeTreeNode = {
+    children: [],
+    childrenLoaded: true,
+    documentId: 'doc-leaf',
+    groupId: 'group-1',
+    hasChildren: false,
+    icon: '',
+    id: 'doc-leaf',
+    label: 'Leaf',
+    nodeKind: 'document',
+    placementId: '   ',
+    worldColor: '#000',
+    worldId: 'world-1'
+  }
+  const flags = resolveProjectHierarchyTreeNodeContextMenuSectionFlags(documentNode, sampleTree)
+  expect(flags).toEqual({
+    showsBulkExpandRows: false,
+    showsCopyRows: true,
+    showsSortByRows: false
   })
 })
 

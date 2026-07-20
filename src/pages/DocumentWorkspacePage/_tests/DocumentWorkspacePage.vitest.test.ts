@@ -44,6 +44,8 @@ const documentTabRef = vi.hoisted(() => {
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
     hasUnsavedChanges: false,
     editState: false,
     tabLabel: 'Hero',
@@ -171,6 +173,22 @@ const oneWayRelationshipTooltipRef = vi.hoisted(() => {
   const { ref } = require('vue') as typeof import('vue')
   return ref('One-way help')
 })
+const orderNumberModelRef = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  return ref('')
+})
+const orderNumberFieldReadOnlyRef = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  return ref(true)
+})
+const orderNumberFieldLabelRef = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  return ref('Order number')
+})
+const orderNumberFieldDescriptionRef = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  return ref('Order number help')
+})
 const onAppendToWorldPaletteMock = vi.hoisted(() => vi.fn())
 
 vi.mock('../scripts/documentWorkspacePage_manager', () => {
@@ -208,6 +226,10 @@ vi.mock('../scripts/documentWorkspacePage_manager', () => {
         nameFieldLabel: nameFieldLabelRef,
         oneWayRelationshipTooltip: oneWayRelationshipTooltipRef,
         onAppendToWorldPalette: onAppendToWorldPaletteMock,
+        orderNumberFieldDescription: orderNumberFieldDescriptionRef,
+        orderNumberFieldLabel: orderNumberFieldLabelRef,
+        orderNumberFieldReadOnly: orderNumberFieldReadOnlyRef,
+        orderNumberModel: orderNumberModelRef,
         previewDisplayName: previewDisplayNameRef,
         textColorFieldDescription: textColorFieldDescriptionRef,
         textColorFieldLabel: textColorFieldLabelRef,
@@ -255,6 +277,8 @@ beforeEach(() => {
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
     hasUnsavedChanges: false,
     editState: false,
     tabLabel: 'Hero',
@@ -453,6 +477,70 @@ test('Test that DocumentWorkspacePage renders editable belongs under input in ed
   expect(input.attributes('data-readonly')).toBe('false')
   await input.setValue('parent-2')
   expect(belongsUnderModelRef.value).toBe('parent-2')
+
+  wrapper.unmount()
+})
+
+test('Test that DocumentWorkspacePage renders order number field readonly in preview mode', async () => {
+  documentShowsEditFieldsRef.value = false
+  documentShowsPreviewRef.value = true
+  orderNumberFieldReadOnlyRef.value = true
+  orderNumberModelRef.value = '12'
+
+  const wrapper = mount(DocumentWorkspacePage, {
+    global: {
+      stubs: {
+        FaColorPickerInput: true,
+        FaLabeledBooleanToggle: true,
+        QInput: {
+          props: ['modelValue', 'readonly', 'disable', 'type'],
+          template: '<input :data-test-locator="$attrs[\'data-test-locator\']" :data-readonly="readonly" :data-type="type" :value="modelValue" />'
+        },
+        QIcon: {
+          props: ['name'],
+          template: '<span :data-test-locator="$attrs[\'data-test-locator\']" :data-icon-name="name" :data-test-tooltip-text="$attrs[\'data-test-tooltip-text\']" />'
+        },
+        QTooltip: true
+      }
+    }
+  })
+  await flushPromises()
+
+  expect(wrapper.find('[data-test-locator="documentWorkspacePage-orderNumberLabel"]').text()).toBe('Order number')
+  expect(wrapper.find('[data-test-locator="documentWorkspacePage-orderNumberTitleIcon"]').attributes('data-icon-name')).toBe('mdi-file-tree')
+  expect(wrapper.find('[data-test-locator="documentWorkspacePage-orderNumberInput"]').attributes('data-readonly')).toBe('true')
+  expect(wrapper.find('[data-test-locator="documentWorkspacePage-orderNumberInput"]').attributes('data-type')).toBe('number')
+
+  wrapper.unmount()
+})
+
+test('Test that DocumentWorkspacePage renders editable order number input in edit mode', async () => {
+  documentShowsPreviewRef.value = false
+  documentShowsEditFieldsRef.value = true
+  orderNumberFieldReadOnlyRef.value = false
+  orderNumberModelRef.value = '3'
+
+  const wrapper = mount(DocumentWorkspacePage, {
+    global: {
+      stubs: {
+        FaColorPickerInput: true,
+        FaLabeledBooleanToggle: true,
+        QInput: {
+          props: ['modelValue', 'readonly', 'disable', 'type'],
+          emits: ['update:modelValue'],
+          template: '<input :data-test-locator="$attrs[\'data-test-locator\']" :data-readonly="readonly" :data-type="type" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />'
+        },
+        QIcon: true,
+        QTooltip: true
+      }
+    }
+  })
+  await flushPromises()
+
+  const input = wrapper.find('[data-test-locator="documentWorkspacePage-orderNumberInput"]')
+  expect(input.attributes('data-readonly')).toBe('false')
+  await input.setValue('9')
+  expect(orderNumberModelRef.value).toBe('9')
 
   wrapper.unmount()
 })

@@ -15,6 +15,7 @@ export default {
     copyHierarchyTreeDocument: 'Копіювати документ дерева ієрархії',
     addHierarchyTreeChildDocument: 'Add hierarchy tree child document',
     deleteHierarchyTreeDocument: 'Видалити документ дерева ієрархії',
+    sortHierarchyTreeDocuments: 'Sort hierarchy tree documents',
     editHierarchyTreeDocument: 'Редагувати документ дерева ієрархії',
     openHierarchyTreeDocument: 'Відкрити документ дерева ієрархії',
     languageSwitch: 'Змінити мову інтерфейсу',
@@ -48,6 +49,7 @@ export default {
     showStartupTipsNotification: 'Показати сповіщення про підказку при запуску',
     toggleDeveloperTools: 'Перемкнути інструменти розробника',
     toggleAppNoteboardWindow: 'Перемкнути вікно блокнота програми',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     toggleProjectNoteboardWindow: 'Перемкнути вікно блокнота проекту',
   }
 }

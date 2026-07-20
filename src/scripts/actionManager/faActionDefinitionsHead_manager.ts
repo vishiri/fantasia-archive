@@ -28,6 +28,7 @@ import {
   handleCopyHierarchyTreeDocument,
   handleAddHierarchyTreeChildDocument,
   handleDeleteHierarchyTreeDocument,
+  handleSortHierarchyTreeDocuments,
   handleFocusPreviousOpenedDocumentTab,
   handleFocusNextOpenedDocumentTab,
   handleMoveActiveOpenedDocumentTabLeft,
@@ -46,6 +47,7 @@ import {
   handleSaveProjectStyling,
   handleToggleDeveloperTools,
   handleToggleAppNoteboardWindow,
+  handleToggleHierarchicalTree,
   handleToggleProjectNoteboardWindow,
   handleReportProjectNoteboardSaveFailure
 } from './faActionDefinitionHandlers_manager'
@@ -61,6 +63,12 @@ export const FA_ACTION_DEFINITIONS_HEAD: ReadonlyArray<I_faActionDefinition<T_fa
     dedup: true,
     handler: handleToggleProjectNoteboardWindow as I_faActionDefinition<T_faActionId>['handler'],
     id: 'toggleProjectNoteboardWindow',
+    kind: 'async'
+  },
+  {
+    dedup: true,
+    handler: handleToggleHierarchicalTree as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'toggleHierarchicalTree',
     kind: 'async'
   },
   {
@@ -180,6 +188,11 @@ export const FA_ACTION_DEFINITIONS_HEAD: ReadonlyArray<I_faActionDefinition<T_fa
   {
     handler: handleDeleteHierarchyTreeDocument as I_faActionDefinition<T_faActionId>['handler'],
     id: 'deleteHierarchyTreeDocument',
+    kind: 'async'
+  },
+  {
+    handler: handleSortHierarchyTreeDocuments as I_faActionDefinition<T_faActionId>['handler'],
+    id: 'sortHierarchyTreeDocuments',
     kind: 'async'
   },
   {

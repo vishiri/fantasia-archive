@@ -5,7 +5,7 @@ import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
 import { resolveFaAppRouterCurrentPath } from 'app/src/scripts/appInternals/faAppRouterSession_manager'
 import { resolveFaDocumentWorkspaceRouteDocumentId } from 'app/src/scripts/appRouting/functions/faDocumentWorkspacePageTransition'
 import { resolveCanSaveActiveDocumentViaKeybind } from 'app/src/scripts/openedDocuments/functions/openedDocumentWorkspaceKeybindGuards'
-import { resolveShowProjectDocumentControlBarSaveButtons } from 'app/src/components/projectUI/ProjectDocumentControlBar/functions/projectDocumentControlBarEditMode'
+import { resolveShowProjectAppControlBarSaveButtons } from 'app/src/components/projectUI/ProjectAppControlBar/functions/projectAppControlBarEditMode'
 
 export function tryResolveFaKeybindDocumentWorkspaceSaveActionDispatch (
   commandId: T_faKeybindCommandId
@@ -24,7 +24,7 @@ export function tryResolveFaKeybindDocumentWorkspaceSaveActionDispatch (
   const canSave = resolveCanSaveActiveDocumentViaKeybind({
     activeDocumentId,
     resolveFaDocumentWorkspaceRouteDocumentId,
-    resolveShowProjectDocumentControlBarSaveButtons,
+    resolveShowProjectAppControlBarSaveButtons,
     routePath,
     tabs: store.tabs
   })

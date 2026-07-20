@@ -13,6 +13,7 @@ export const FA_KEYBIND_COMMAND_IDS = [
   'toggleDeveloperTools',
   'toggleAppNoteboard',
   'toggleProjectNoteboard',
+  'toggleHierarchicalTree',
   'editDocument',
   'saveDocumentKeepEditMode',
   'saveDocument',

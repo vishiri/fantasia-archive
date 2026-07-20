@@ -15,6 +15,7 @@ export default {
     copyHierarchyTreeDocument: 'Kopioi hierarkiapuun asiakirja',
     addHierarchyTreeChildDocument: 'Add hierarchy tree child document',
     deleteHierarchyTreeDocument: 'Poista hierarkiapuun asiakirja',
+    sortHierarchyTreeDocuments: 'Sort hierarchy tree documents',
     editHierarchyTreeDocument: 'Muokkaa hierarkiapuun asiakirjaa',
     openHierarchyTreeDocument: 'Avaa hierarkiapuun asiakirja',
     languageSwitch: 'Vaihda käyttöliittymän kieltä',
@@ -48,6 +49,7 @@ export default {
     showStartupTipsNotification: 'Näytä käynnistysvihjeilmoitus',
     toggleDeveloperTools: 'Vaihda Kehittäjätyökalut',
     toggleAppNoteboardWindow: 'Ota App Noteboard -ikkuna käyttöön',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     toggleProjectNoteboardWindow: 'Projektimuistitaulu-ikkuna päälle/pois',
   }
 }

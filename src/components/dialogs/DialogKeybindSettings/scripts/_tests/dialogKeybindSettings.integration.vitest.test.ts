@@ -97,6 +97,7 @@ test('buildDialogKeybindSettingsRows lists all command ids', () => {
     'showProjectDashboard',
     'toggleAppNoteboard',
     'toggleDeveloperTools',
+    'toggleHierarchicalTree',
     'toggleProjectNoteboard'
   ])
 })

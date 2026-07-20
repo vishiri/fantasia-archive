@@ -11,6 +11,7 @@ import type { I_faUserSettings, T_faUserSettingsLanguageCode } from 'app/types/I
 export const FA_ACTION_IDS = [
   'toggleAppNoteboardWindow',
   'toggleProjectNoteboardWindow',
+  'toggleHierarchicalTree',
   'toggleDeveloperTools',
   'openKeybindSettingsDialog',
   'saveKeybindSettings',
@@ -64,6 +65,7 @@ export const FA_ACTION_IDS = [
   'copyHierarchyTreeDocument',
   'addHierarchyTreeChildDocument',
   'deleteHierarchyTreeDocument',
+  'sortHierarchyTreeDocuments',
   'focusPreviousOpenedDocumentTab',
   'focusNextOpenedDocumentTab',
   'moveActiveOpenedDocumentTabLeft',
@@ -99,6 +101,7 @@ export interface I_faActionPayloadMap {
   toggleDeveloperTools: void
   toggleAppNoteboardWindow: void
   toggleProjectNoteboardWindow: void
+  toggleHierarchicalTree: void
   openKeybindSettingsDialog: void
   saveKeybindSettings: { overrides: I_faKeybindsRoot['overrides'] }
   openAppSettingsDialog: void
@@ -170,6 +173,14 @@ export interface I_faActionPayloadMap {
   copyHierarchyTreeDocument: { documentId: string }
   addHierarchyTreeChildDocument: { documentId: string }
   deleteHierarchyTreeDocument: { documentId: string }
+  sortHierarchyTreeDocuments: {
+    direction: 'asc' | 'desc'
+    documentId?: string | null | undefined
+    key: 'name' | 'customOrder'
+    nodeKind: 'document' | 'templatePlacement'
+    placementId: string
+    scope: 'direct' | 'recursive'
+  }
   focusPreviousOpenedDocumentTab: void
   focusNextOpenedDocumentTab: void
   moveActiveOpenedDocumentTabLeft: void

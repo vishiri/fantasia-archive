@@ -15,6 +15,7 @@ export default {
     copyHierarchyTreeDocument: 'Copia documento albero gerarchia',
     addHierarchyTreeChildDocument: 'Add hierarchy tree child document',
     deleteHierarchyTreeDocument: 'Elimina documento albero gerarchia',
+    sortHierarchyTreeDocuments: 'Sort hierarchy tree documents',
     editHierarchyTreeDocument: 'Modifica documento albero gerarchia',
     openHierarchyTreeDocument: 'Apri documento albero gerarchia',
     languageSwitch: 'Cambia la lingua dell\'interfaccia',
@@ -48,6 +49,7 @@ export default {
     showStartupTipsNotification: 'Mostra notifica suggerimento di avvio',
     toggleDeveloperTools: 'Attiva/disattiva gli Strumenti per sviluppatori',
     toggleAppNoteboardWindow: 'Attiva/disattiva la finestra degli appunti dell\'app',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     toggleProjectNoteboardWindow: 'Attiva/disattiva la finestra degli appunti del progetto',
   }
 }

@@ -32,7 +32,9 @@ export interface I_openedDocumentTabUnsavedCompareInput {
   isDeadDraft: boolean
   savedIsDead: boolean
   parentDocumentIdDraft: string
-  savedParentDocumentId: string
+  savedParentDocumentId: string,
+  treeOrderNumberDraft: string
+  savedTreeOrderNumber: number
 }
 
 /** One open document tab in the workspace session. */
@@ -70,6 +72,9 @@ export interface I_faOpenedDocumentTab {
   parentDocumentIdDraft: string
   /** Empty string = placement root (null parent in SQLite). */
   savedParentDocumentId: string
+  /** Empty string = no order number (empty sentinel in SQLite). */
+  treeOrderNumberDraft: string
+  savedTreeOrderNumber: number
   hasUnsavedChanges: boolean
   /**
    * Per-tab workspace edit mode. false = preview (read-only presentation);

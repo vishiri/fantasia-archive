@@ -23,16 +23,12 @@ export default {
       }
     },
     documentViewEdit: {
-      title: '文档查看/编辑',
+      title: '页面：文档查看/编辑',
       tags: '文档页面、查看模式、编辑模式、阅读器',
       documentBody: {
         subtitle: '文件正文',
         tags: '内容区、字段、阅读、编辑区',
       },
-      documentControlBar: {
-        subtitle: '文档控制栏',
-        tags: '工具栏、顶栏、标题、文档镶边',
-      }
     },
     hierarchicalTree: {
       title: '层次树',
@@ -54,14 +50,7 @@ export default {
         tags: '展开、折叠、全部展开、交互',
       },
     },
-    openedDocumentsTabs: {
-      title: '打开文档选项卡',
-      tags: '标签栏、打开文件、多任务处理',
-      tabBehavior: {
-        subtitle: '选项卡行为',
-        tags: '切换选项卡、选项卡条、悬停行为',
-      }
-    },
+
     popupsFloatingWindows: {
       title: '弹出窗口和浮动窗口',
       tags: '对话框、叠加层、模式、窗口',
@@ -84,6 +73,14 @@ export default {
       applicationExtras: {
         subtitle: '应用附加功能',
         tags: '吉祥物、毛绒玩具、幻想、附加内容',
+      },
+      appControlBar: {
+        subtitle: '应用控制栏',
+        tags: '工具栏、顶栏、标题、文档镶边',
+      },
+      tabBehavior: {
+        subtitle: '选项卡行为',
+        tags: '切换选项卡、选项卡条、悬停行为',
       },
       visualsAppwideFunctionality: {
         subtitle: '视觉效果和应用程序范围内的功能',
@@ -143,14 +140,24 @@ export default {
       description: '通常，快速搜索会在从中选择项目后关闭。启用此功能可以防止这种行为，从而允许您依次打开多个搜索结果。',
       tags: '保持打开、多个结果、批量打开、快速搜索保持打开',
     },
-    disableDocumentControlBar: {
-      title: '禁用文档控制栏',
+    disableAppControlBar: {
+      title: '禁用应用控制栏',
       description: '如果您想最大化文档上的工作空间，可以使用此设置禁用顶部按钮栏。必要的控制按钮将被移动到主文档正文的顶部，而其余功能将通过按键绑定或通过左上角的应用程序菜单访问。',
       tags: '工具栏隐藏、最大化空间、全宽、文档标题',
     },
-    disableDocumentControlBarGuides: {
-      title: '禁用文档指南',
-      description: '打开或关闭文档控制栏上的新手友好指南。',
+    disableAppControlBarContentButtons: {
+      title: 'Disable app control bar content buttons',
+      description: 'Toggles the project contents (document search, document creation, etc.) on the app control bar on or off.',
+      tags: 'quick search, quick add, document create, content tools, control bar buttons'
+    },
+    disableAppControlBarFunctionButtons: {
+      title: 'Disable app control bar function buttons',
+      description: 'Toggles the app functional buttons (noteboards, hierarchical tree toggling, etc.) on the app control bar on or off.',
+      tags: 'noteboard, tree toggle, sidebar hide, function tools, control bar buttons'
+    },
+    disableAppControlBarGuides: {
+      title: '禁用应用控制栏指南',
+      description: '打开或关闭应用控制栏上的新手友好指南。',
       tags: '初学者提示、教程横幅、指导标记、控制栏帮助',
     },
     disableDocumentCounts: {
@@ -203,6 +210,11 @@ export default {
       title: '隐藏空字段',
       description: '在查看（非编辑）模式下隐藏未填写任何值的字段。请注意，这可能会导致相对较大的布局变化，在某些情况下可能会使文档看起来不规则。',
       tags: '空白字段、只读视图、紧凑文档、布局转换',
+    },
+    hideHierarchyTree: {
+      title: 'Hide hierarchical tree',
+      description: 'Controls whether the hierarchical tree is shown.',
+      tags: 'sidebar off, navigator hidden, tree panel, outline hide'
     },
     hidePlushes: {
       title: '隐藏幻想曲吉祥物',

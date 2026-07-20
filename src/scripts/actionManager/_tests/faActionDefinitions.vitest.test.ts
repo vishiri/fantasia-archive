@@ -6,6 +6,10 @@ import { beforeEach, expect, test, vi } from 'vitest'
 import type { I_faAppConfigApplyResult } from 'app/types/I_faAppConfigDomain'
 import { FA_ACTION_IDS, type T_faActionId } from 'app/types/I_faActionManagerDomain'
 
+const userSettingsFixture = vi.hoisted(() => ({
+  hideHierarchyTree: false
+}))
+
 const faActiveProjectFixture = vi.hoisted(() => ({
   activeProject: {
     filePath: 'C:\\fixture.faproject',
@@ -45,6 +49,7 @@ const {
   updateKeybindsMock,
   updateAppStylingMock,
   updateSettingsMock,
+  patchSettingsSilentlyMock,
   navigateToWorkspaceHomeRouteMock
 } = vi.hoisted(() => ({
   applyImportMock: vi.fn(
@@ -75,6 +80,7 @@ const {
   updateKeybindsMock: vi.fn(async () => true),
   updateAppStylingMock: vi.fn(async () => true),
   updateSettingsMock: vi.fn(async () => undefined),
+  patchSettingsSilentlyMock: vi.fn(async () => undefined),
   navigateToWorkspaceHomeRouteMock: vi.fn(async () => undefined)
 }))
 
@@ -162,6 +168,10 @@ vi.mock('app/src/stores/S_FaProjectStyling', () => ({
 
 vi.mock('app/src/stores/S_FaUserSettings', () => ({
   S_FaUserSettings: () => ({
+    get settings () {
+      return userSettingsFixture
+    },
+    patchSettingsSilently: patchSettingsSilentlyMock,
     refreshSettings: refreshSettingsMock,
     updateSettings: updateSettingsMock
   })
@@ -214,6 +224,9 @@ beforeEach(() => {
   updateAppStylingMock.mockImplementation(async () => true)
   updateSettingsMock.mockReset()
   updateSettingsMock.mockImplementation(async () => undefined)
+  patchSettingsSilentlyMock.mockReset()
+  patchSettingsSilentlyMock.mockImplementation(async () => undefined)
+  userSettingsFixture.hideHierarchyTree = false
   refreshKeybindsMock.mockReset()
   refreshKeybindsMock.mockImplementation(async () => undefined)
   refreshAppStylingMock.mockReset()
@@ -438,6 +451,16 @@ test('Test that reportAppStylingPersistFailure handler throws the payload messag
   await expect(
     (definitionFor('reportAppStylingPersistFailure').handler({ message: 'persist failed' }) as Promise<unknown>)
   ).rejects.toThrow('persist failed')
+})
+
+test('Test that toggleHierarchicalTree handler flips hideHierarchyTree silently', async () => {
+  userSettingsFixture.hideHierarchyTree = false
+  await definitionFor('toggleHierarchicalTree').handler(undefined)
+  expect(patchSettingsSilentlyMock).toHaveBeenCalledWith({ hideHierarchyTree: true })
+
+  userSettingsFixture.hideHierarchyTree = true
+  await definitionFor('toggleHierarchicalTree').handler(undefined)
+  expect(patchSettingsSilentlyMock).toHaveBeenCalledWith({ hideHierarchyTree: false })
 })
 
 test('Test that openAdvancedSearchGuideDialog handler opens the advancedSearchGuide markdown document', () => {

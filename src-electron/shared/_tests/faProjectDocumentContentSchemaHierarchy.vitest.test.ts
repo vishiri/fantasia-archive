@@ -135,3 +135,26 @@ test('Test that parseFaProjectDocumentPatch accepts appearance color fields', ()
   expect(parsed.documentTextColor).toBe('#AABBCC')
   expect(parsed.documentBackgroundColor).toBeNull()
 })
+
+/**
+ * parseFaProjectDocumentPatch / parseFaProjectDocumentCreateInput
+ * Accept treeOrderNumber including empty sentinel (Number.MIN_SAFE_INTEGER).
+ */
+test('Test that document create and patch schemas accept treeOrderNumber', () => {
+  const created = parseFaProjectDocumentCreateInput({
+    displayName: 'Hero',
+    worldId: SAMPLE_UUID,
+    treeOrderNumber: Number.MIN_SAFE_INTEGER
+  })
+  expect(created.treeOrderNumber).toBe(Number.MIN_SAFE_INTEGER)
+
+  const patched = parseFaProjectDocumentUpdatePayload({
+    id: SAMPLE_UUID,
+    patch: {
+      isCategory: true,
+      treeOrderNumber: 7
+    }
+  })
+  expect(patched.patch.isCategory).toBe(true)
+  expect(patched.patch.treeOrderNumber).toBe(7)
+})

@@ -15,6 +15,7 @@ export default {
     copyHierarchyTreeDocument: '复制层级树文档',
     addHierarchyTreeChildDocument: 'Add hierarchy tree child document',
     deleteHierarchyTreeDocument: '删除层级树文档',
+    sortHierarchyTreeDocuments: 'Sort hierarchy tree documents',
     editHierarchyTreeDocument: '编辑层级树文档',
     openHierarchyTreeDocument: '打开层级树文档',
     languageSwitch: '切换界面语言',
@@ -48,6 +49,7 @@ export default {
     showStartupTipsNotification: '显示启动提示通知',
     toggleDeveloperTools: '切换开发者工具',
     toggleAppNoteboardWindow: '切换应用程序记事板窗口',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     toggleProjectNoteboardWindow: '切换项目记事板窗口',
   }
 }

@@ -30,6 +30,8 @@ const keybindSaveSession = vi.hoisted(() => ({
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       hasUnsavedChanges: true,
       editState: true
     }

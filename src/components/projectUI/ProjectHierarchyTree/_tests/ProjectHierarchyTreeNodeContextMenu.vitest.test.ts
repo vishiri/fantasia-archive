@@ -20,10 +20,19 @@ const hierarchyTreeContextMenuI18n = createI18n({
             deleteDocument: 'Delete document',
             editDocument: 'Edit document',
             expandAllUnderNode: 'Expand all under this node',
-            openDocument: 'Open document'
+            openDocument: 'Open document',
+            sortBy: 'Sort by',
+            sortAlphabetically: 'Sort alphabetically',
+            sortByCustomOrder: 'Sort by Custom order',
+            sortDetailNameAsc: 'A -> Z',
+            sortDetailNameDesc: 'Z -> A',
+            sortDetailCustomOrderAsc: '0 -> 999',
+            sortDetailCustomOrderDesc: '999 -> 0',
+            sortDetailScopeDirect: 'direct children',
+            sortDetailScopeRecursive: 'recursive'
           }
         },
-        projectDocumentControlBar: {
+        projectAppControlBar: {
           copyBackgroundColor: 'Copy background color',
           copyName: 'Copy name',
           copyTextColor: 'Copy text color'
@@ -39,6 +48,7 @@ function mountHierarchyTreeContextMenu (
     addNewRowLabel?: string | null
     showsBulkExpandRows?: boolean
     showsCopyRows?: boolean
+    showsSortByRows?: boolean
   } = {}
 ) {
   const isOpen = ref(true)
@@ -54,6 +64,7 @@ function mountHierarchyTreeContextMenu (
   const onEditDocumentClick = vi.fn()
   const onHide = vi.fn()
   const onOpenDocumentClick = vi.fn()
+  const onSortByItemClick = vi.fn()
   const wrapper = mount(ProjectHierarchyTreeNodeContextMenu, {
     props: {
       addNewRowIcon: overrides.addNewRowIcon ?? null,
@@ -76,8 +87,10 @@ function mountHierarchyTreeContextMenu (
       onExpandAllClick,
       onHide,
       onOpenDocumentClick,
+      onSortByItemClick,
       showsBulkExpandRows: overrides.showsBulkExpandRows ?? true,
       showsCopyRows: overrides.showsCopyRows ?? false,
+      showsSortByRows: overrides.showsSortByRows ?? false,
       'onUpdate:isOpen': (value: boolean) => {
         isOpen.value = value
       }
@@ -122,6 +135,7 @@ function mountHierarchyTreeContextMenu (
     onExpandAllClick,
     onHide,
     onOpenDocumentClick,
+    onSortByItemClick,
     wrapper
   }
 }
@@ -159,8 +173,10 @@ test('ProjectHierarchyTreeNodeContextMenu omits anchor metadata when props are n
       onExpandAllClick: vi.fn(),
       onHide: vi.fn(),
       onOpenDocumentClick: vi.fn(),
+      onSortByItemClick: vi.fn(),
       showsBulkExpandRows: false,
       showsCopyRows: false,
+      showsSortByRows: false,
       'onUpdate:isOpen': vi.fn()
     },
     global: {
@@ -219,7 +235,8 @@ test('ProjectHierarchyTreeNodeContextMenu renders copy rows for document rows', 
     wrapper
   } = mountHierarchyTreeContextMenu({
     showsBulkExpandRows: false,
-    showsCopyRows: true
+    showsCopyRows: true,
+    showsSortByRows: true
   })
 
   expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-copyName"]').exists()).toBe(true)
@@ -229,11 +246,31 @@ test('ProjectHierarchyTreeNodeContextMenu renders copy rows for document rows', 
   expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-editDocument"]').exists()).toBe(true)
   expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-copyDocument"]').exists()).toBe(true)
   expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-addNewDocumentUnderThis"]').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-sortBy"]').exists()).toBe(true)
   expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-deleteDocument"]').exists()).toBe(true)
   expect(wrapper.text()).toContain('Copy name')
   expect(wrapper.text()).toContain('Open document')
   expect(wrapper.text()).toContain('Add new document under this')
+  expect(wrapper.text()).toContain('Sort by')
   expect(wrapper.text()).toContain('Delete document')
+  const menuHtml = wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu"]').html()
+  expect(menuHtml.indexOf('projectHierarchyTree-nodeContextMenu-sortBy')).toBeLessThan(
+    menuHtml.indexOf('projectHierarchyTree-nodeContextMenu-addNewDocumentUnderThis')
+  )
+  expect(menuHtml.indexOf('projectHierarchyTree-nodeContextMenu-sortBy')).toBeLessThan(
+    menuHtml.indexOf('projectHierarchyTree-nodeContextMenu-deleteDocument')
+  )
+  const betweenOpenAndAdd = menuHtml.slice(
+    menuHtml.indexOf('projectHierarchyTree-nodeContextMenu-openDocument'),
+    menuHtml.indexOf('projectHierarchyTree-nodeContextMenu-addNewDocumentUnderThis')
+  )
+  expect(betweenOpenAndAdd.match(/projectHierarchyTreeNodeContextMenu__separatorAlt/g)?.length).toBe(3)
+  const betweenAddAndDelete = menuHtml.slice(
+    menuHtml.indexOf('projectHierarchyTree-nodeContextMenu-addNewDocumentUnderThis'),
+    menuHtml.indexOf('projectHierarchyTree-nodeContextMenu-deleteDocument')
+  )
+  expect(betweenAddAndDelete).toMatch(/projectHierarchyTreeNodeContextMenu__separator(?!Alt)/)
+  expect(betweenAddAndDelete).not.toContain('projectHierarchyTreeNodeContextMenu__separatorAlt')
   await wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-copyName"]').trigger('click')
   await wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-copyTextColor"]').trigger('click')
   await wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-copyBackgroundColor"]').trigger('click')
@@ -264,4 +301,48 @@ test('ProjectHierarchyTreeNodeContextMenu delegates menu item clicks and hide', 
   expect(onCollapseAllClick).toHaveBeenCalled()
   expect(onHide).toHaveBeenCalled()
   expect(isOpen.value).toBe(false)
+})
+
+test('ProjectHierarchyTreeNodeContextMenu places Sort by under Collapse all with group separator after', () => {
+  const { wrapper } = mountHierarchyTreeContextMenu({
+    showsBulkExpandRows: true,
+    showsCopyRows: true,
+    showsSortByRows: true
+  })
+
+  const menuHtml = wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu"]').html()
+  const collapseIndex = menuHtml.indexOf('projectHierarchyTree-nodeContextMenu-collapseAll')
+  const sortByIndex = menuHtml.indexOf('projectHierarchyTree-nodeContextMenu-sortBy')
+  const copyNameIndex = menuHtml.indexOf('projectHierarchyTree-nodeContextMenu-copyName')
+  expect(collapseIndex).toBeGreaterThanOrEqual(0)
+  expect(sortByIndex).toBeGreaterThan(collapseIndex)
+  expect(copyNameIndex).toBeGreaterThan(sortByIndex)
+  const betweenCollapseAndSort = menuHtml.slice(collapseIndex, sortByIndex)
+  expect(betweenCollapseAndSort).toMatch(/projectHierarchyTreeNodeContextMenu__separator(?!Alt)/)
+  expect(wrapper.findAll('.projectHierarchyTreeNodeContextMenu__separator').length).toBeGreaterThan(0)
+})
+
+test('ProjectHierarchyTreeNodeContextMenu opens Sort by submenu and dispatches item click', async () => {
+  const { onSortByItemClick, wrapper } = mountHierarchyTreeContextMenu({
+    showsBulkExpandRows: false,
+    showsCopyRows: false,
+    showsSortByRows: true
+  })
+
+  const sortByRow = wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-sortBy"]')
+  await sortByRow.trigger('mouseenter')
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-sortBySubmenu"]').exists()).toBe(true)
+  expect(wrapper.text()).toContain('Sort alphabetically')
+  expect(wrapper.text()).toContain('A -> Z | direct children')
+
+  const submenu = wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-sortBySubmenu"]')
+  await submenu.trigger('mouseenter')
+  await submenu.trigger('mouseleave')
+  await sortByRow.trigger('mouseleave')
+  await sortByRow.trigger('mouseenter')
+  const sortBySubmenu = wrapper.getComponent({ name: 'ProjectHierarchyTreeNodeContextMenuSortBySubmenu' })
+  sortBySubmenu.props('onSortBySubmenuModelUpdate')(false)
+  sortBySubmenu.props('onSortBySubmenuModelUpdate')(true)
+  await wrapper.get('[data-test-locator="projectHierarchyTree-nodeContextMenu-sortBy-namesDirectAsc"]').trigger('click')
+  expect(onSortByItemClick).toHaveBeenCalledWith('namesDirectAsc')
 })

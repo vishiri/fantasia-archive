@@ -23,16 +23,12 @@ export default {
       }
     },
     documentViewEdit: {
-      title: 'ドキュメントの表示/編集',
+      title: 'ページ: ドキュメントの表示/編集',
       tags: 'ドキュメント ページ、表示モード、編集モード、リーダー',
       documentBody: {
         subtitle: '文書本体',
         tags: 'コンテンツエリア、フィールド、読み取り、エディタエリア',
       },
-      documentControlBar: {
-        subtitle: 'ドキュメント コントロール バー',
-        tags: 'ツールバー、トップバー、ヘッダー、ドキュメントクローム',
-      }
     },
     hierarchicalTree: {
       title: '階層ツリー',
@@ -54,14 +50,7 @@ export default {
         tags: '展開、折りたたみ、すべて展開、インタラクション',
       },
     },
-    openedDocumentsTabs: {
-      title: 'ドキュメントタブを開く',
-      tags: 'タブバー、開いているファイル、マルチタスク',
-      tabBehavior: {
-        subtitle: 'タブの動作',
-        tags: 'タブの切り替え、タブ ストリップ、ホバー動作',
-      }
-    },
+
     popupsFloatingWindows: {
       title: 'ポップアップとフローティングウィンドウ',
       tags: 'ダイアログ、オーバーレイ、モーダル、ウィンドウ',
@@ -84,6 +73,14 @@ export default {
       applicationExtras: {
         subtitle: 'アプリケーションの追加機能',
         tags: 'マスコット、ぬいぐるみ、ファンタジア、おまけ',
+      },
+      appControlBar: {
+        subtitle: 'アプリ コントロール バー',
+        tags: 'ツールバー、トップバー、ヘッダー、ドキュメントクローム',
+      },
+      tabBehavior: {
+        subtitle: 'タブの動作',
+        tags: 'タブの切り替え、タブ ストリップ、ホバー動作',
       },
       visualsAppwideFunctionality: {
         subtitle: 'ビジュアルとアプリ全体の機能',
@@ -143,14 +140,24 @@ export default {
       description: '通常、クイック検索は、項目が選択されると閉じます。この機能をオンにすると、その動作が防止され、複数の検索結果を次々に開くことができるようになります。',
       tags: '開いたままにする、複数の結果、バッチを開いたままにする、クイック検索は開いたままにする',
     },
-    disableDocumentControlBar: {
-      title: 'ドキュメント コントロール バーを無効にする',
+    disableAppControlBar: {
+      title: 'アプリ コントロール バーを無効にする',
       description: 'ドキュメント上の作業スペースを最大化したい場合は、この設定で上部のボタン バーを無効にすることができます。必要なコントロール ボタンはドキュメント本文の上部に移動され、残りの機能にはキーバインドまたは左上のアプリ メニューからアクセスできます。',
       tags: 'ツールバーの非表示、スペースの最大化、全幅、ドキュメントヘッダー',
     },
-    disableDocumentControlBarGuides: {
-      title: 'ドキュメントガイドを無効にする',
-      description: 'ドキュメント コントロール バーの初心者向けガイドのオンとオフを切り替えます。',
+    disableAppControlBarContentButtons: {
+      title: 'Disable app control bar content buttons',
+      description: 'Toggles the project contents (document search, document creation, etc.) on the app control bar on or off.',
+      tags: 'quick search, quick add, document create, content tools, control bar buttons'
+    },
+    disableAppControlBarFunctionButtons: {
+      title: 'Disable app control bar function buttons',
+      description: 'Toggles the app functional buttons (noteboards, hierarchical tree toggling, etc.) on the app control bar on or off.',
+      tags: 'noteboard, tree toggle, sidebar hide, function tools, control bar buttons'
+    },
+    disableAppControlBarGuides: {
+      title: 'アプリ コントロール バーのガイドを無効にする',
+      description: 'アプリ コントロール バーの初心者向けガイドのオンとオフを切り替えます。',
       tags: '初心者向けヒント、チュートリアル バナー、コーチ マーク、コントロール バーのヘルプ',
     },
     disableDocumentCounts: {
@@ -203,6 +210,11 @@ export default {
       title: '空のフィールドを非表示にする',
       description: '表示 (非編集) モードでは、値が入力されていないフィールドを非表示にします。これにより、比較的乱暴なレイアウトの変更が発生し、場合によってはドキュメントが扱いにくくなる可能性があることに注意してください。',
       tags: '空白のフィールド、読み取り専用ビュー、コンパクトドキュメント、レイアウトシフト',
+    },
+    hideHierarchyTree: {
+      title: 'Hide hierarchical tree',
+      description: 'Controls whether the hierarchical tree is shown.',
+      tags: 'sidebar off, navigator hidden, tree panel, outline hide'
     },
     hidePlushes: {
       title: 'ハイドファンタジア マスコット',

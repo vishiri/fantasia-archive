@@ -13,6 +13,10 @@
       class="q-focus-helper"
       tabindex="-1"
     />
+    <ProjectHierarchyTreeOrderNumberBadge
+      v-if="orderNumberBadgeLabel !== null"
+      :label="orderNumberBadgeLabel!"
+    />
     <q-icon
       v-if="displayIcon !== ''"
       class="projectHierarchyTreeNode__icon"
@@ -57,6 +61,7 @@ import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHi
 import type { I_projectHierarchyTreePlacementCountDisplay } from 'app/types/I_projectHierarchyTreePlacementCount'
 import { projectHierarchyTreeNodeShowsActiveTabHighlight } from './functions/projectHierarchyTreeActiveTabHighlight'
 import ProjectHierarchyTreePlacementCount from './ProjectHierarchyTreePlacementCount.vue'
+import ProjectHierarchyTreeOrderNumberBadge from './ProjectHierarchyTreeOrderNumberBadge.vue'
 import {
   applyProjectHierarchyTreeTreeNodeKindClass,
   clearProjectHierarchyTreeTreeNodeKindClass,
@@ -73,6 +78,7 @@ const props = withDefaults(
   defineProps<{
     activeDocumentId?: string | null
     node: I_faProjectHierarchyTreeHeTreeNode
+    orderNumberBadgeLabel?: string | null
     placementCountDisplay?: {
       categoryCount: number
       display: I_projectHierarchyTreePlacementCountDisplay
@@ -84,6 +90,7 @@ const props = withDefaults(
   }>(),
   {
     activeDocumentId: null,
+    orderNumberBadgeLabel: null,
     placementCountDisplay: null
   }
 )

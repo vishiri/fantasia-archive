@@ -34,6 +34,8 @@ const sampleSnapshot: I_faOpenedDocumentsSnapshot = {
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       hasUnsavedChanges: false,
       editState: false
     }

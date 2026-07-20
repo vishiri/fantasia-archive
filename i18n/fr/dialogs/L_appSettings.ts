@@ -23,16 +23,12 @@ export default {
       }
     },
     documentViewEdit: {
-      title: 'Afficher/modifier un document',
+      title: 'Page : Afficher/modifier un document',
       tags: 'page de document, mode d\'affichage, mode d\'édition, lecteur',
       documentBody: {
         subtitle: 'Corps du document',
         tags: 'zone de contenu, champs, lecture, zone d\'édition',
       },
-      documentControlBar: {
-        subtitle: 'Barre de contrôle des documents',
-        tags: 'barre d\'outils, barre supérieure, en-tête, document chrome',
-      }
     },
     hierarchicalTree: {
       title: 'Arbre hiérarchique',
@@ -54,14 +50,7 @@ export default {
         tags: 'développer, réduire, tout développer, interaction',
       },
     },
-    openedDocumentsTabs: {
-      title: 'Ouvrir les onglets du document',
-      tags: 'barre d\'onglets, fichiers ouverts, multitâche',
-      tabBehavior: {
-        subtitle: 'Comportement des onglets',
-        tags: 'changer d\'onglet, bande d\'onglets, comportement de survol',
-      }
-    },
+
     popupsFloatingWindows: {
       title: 'Popups et fenêtres flottantes',
       tags: 'boîtes de dialogue, superpositions, modaux, fenêtres',
@@ -84,6 +73,14 @@ export default {
       applicationExtras: {
         subtitle: 'Suppléments d\'application',
         tags: 'mascotte, peluche, fantasia, extras',
+      },
+      appControlBar: {
+        subtitle: 'Barre de contrôle de l\'app',
+        tags: 'barre d\'outils, barre supérieure, en-tête, document chrome',
+      },
+      tabBehavior: {
+        subtitle: 'Comportement des onglets',
+        tags: 'changer d\'onglet, bande d\'onglets, comportement de survol',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Visuels et fonctionnalités à l\'échelle de l\'application',
@@ -143,14 +140,24 @@ export default {
       description: 'Normalement, la recherche rapide se ferme une fois qu\'un élément y est sélectionné. L\'activation de cette fonctionnalité empêche ce comportement, vous permettant d\'ouvrir plusieurs résultats de recherche les uns après les autres.',
       tags: 'rester ouvert, résultats multiples, lot ouvert, recherche rapide reste ouverte',
     },
-    disableDocumentControlBar: {
-      title: 'Désactiver la barre de contrôle des documents',
+    disableAppControlBar: {
+      title: 'Désactiver la barre de contrôle de l\'app',
       description: 'Si vous souhaitez maximiser votre espace de travail sur le document, vous pouvez désactiver la barre de boutons supérieure avec ce paramètre. Les boutons de contrôle nécessaires seront déplacés vers le haut du corps principal du document, tandis que le reste des fonctionnalités sera accessible via des raccourcis clavier ou via le menu de l\'application en haut à gauche.',
       tags: 'masquer la barre d\'outils, maximiser l\'espace, pleine largeur, en-tête du document',
     },
-    disableDocumentControlBarGuides: {
-      title: 'Désactiver les guides de documents',
-      description: 'Active ou désactive les guides adaptés aux débutants sur la barre de contrôle des documents.',
+    disableAppControlBarContentButtons: {
+      title: 'Disable app control bar content buttons',
+      description: 'Toggles the project contents (document search, document creation, etc.) on the app control bar on or off.',
+      tags: 'quick search, quick add, document create, content tools, control bar buttons'
+    },
+    disableAppControlBarFunctionButtons: {
+      title: 'Disable app control bar function buttons',
+      description: 'Toggles the app functional buttons (noteboards, hierarchical tree toggling, etc.) on the app control bar on or off.',
+      tags: 'noteboard, tree toggle, sidebar hide, function tools, control bar buttons'
+    },
+    disableAppControlBarGuides: {
+      title: 'Désactiver les guides de la barre de contrôle de l\'app',
+      description: 'Active ou désactive les guides adaptés aux débutants sur la barre de contrôle de l\'app.',
       tags: 'conseils pour débutants, bannières de didacticiel, marques de coach, aide sur la barre de contrôle',
     },
     disableDocumentCounts: {
@@ -203,6 +210,11 @@ export default {
       title: 'Masquer les champs vides',
       description: 'Masque les champs sans aucune valeur renseignée, en mode affichage (non-édition). Veuillez noter que cela peut entraîner des changements de mise en page relativement sauvages, ce qui peut donner au document un aspect indiscipliné dans certains cas.',
       tags: 'champs vides, vue en lecture seule, document compact, changement de mise en page',
+    },
+    hideHierarchyTree: {
+      title: 'Hide hierarchical tree',
+      description: 'Controls whether the hierarchical tree is shown.',
+      tags: 'sidebar off, navigator hidden, tree panel, outline hide'
     },
     hidePlushes: {
       title: 'Masquer la mascotte Fantasia',

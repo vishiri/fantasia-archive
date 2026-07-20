@@ -33,7 +33,7 @@ const extraEnvSettings = {
 const selectorList = {
   createBtn: 'dialogNewProject-button-create',
   nameInput: 'dialogNewProject-input-name',
-  projectDocumentControlBar: 'projectDocumentControlBar',
+  projectAppControlBar: 'projectAppControlBar',
   splashNew: 'splashPage-btn-new'
 } as const
 
@@ -103,6 +103,8 @@ async function seedOpenedDocumentsSnapshotForFirstWorldDocument (
           savedIsDead: false,
           parentDocumentIdDraft: '',
           savedParentDocumentId: '',
+          treeOrderNumberDraft: '',
+          savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
           tabLabel,
           templateIcon: 'mdi-file-document'
         }
@@ -207,8 +209,8 @@ test.describe.serial('Opened documents E2E — cold restart restores workspace t
     await e2eExpectFaActiveProjectStoreName(appWindow, OPENED_DOCUMENTS_E2E_DISPLAY_NAME)
     await expectFaPlaywrightE2eWorkspaceShell(appWindow)
 
-    const tabLocator = `[data-test-locator="projectDocumentControlBar-tab-${e2eOpenedDocumentsPersistedDocumentId}"]`
-    await expect(appWindow.locator(`[data-test-locator="${selectorList.projectDocumentControlBar}"]`)).toBeVisible()
+    const tabLocator = `[data-test-locator="projectAppControlBar-tab-${e2eOpenedDocumentsPersistedDocumentId}"]`
+    await expect(appWindow.locator(`[data-test-locator="${selectorList.projectAppControlBar}"]`)).toBeVisible()
     await expect(appWindow.locator(tabLocator)).toBeVisible()
     await expect(appWindow.getByText(OPENED_DOCUMENTS_E2E_TAB_LABEL, { exact: true })).toHaveCount(1)
     await expectFaPlaywrightE2eHashRoute(

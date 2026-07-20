@@ -50,7 +50,8 @@ const stubDocumentShape = {
   isMinor: false,
   isDead: false,
   documentTextColor: null,
-  documentBackgroundColor: null
+  documentBackgroundColor: null,
+  treeOrderNumber: Number.MIN_SAFE_INTEGER
 }
 
 /**

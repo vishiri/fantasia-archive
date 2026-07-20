@@ -193,8 +193,9 @@ function makeProjectContentTestDb (): {
               is_finished: args[10] as number,
               is_minor: args[11] as number,
               is_dead: args[12] as number,
-              created_at_ms: args[13] as number,
-              updated_at_ms: args[14] as number
+              tree_order_number: args[13] as number,
+              created_at_ms: args[14] as number,
+              updated_at_ms: args[15] as number
             }
             tables.documents.set(row.id as string, row)
           }
@@ -623,7 +624,7 @@ function makeProjectContentTestDb (): {
       if (normalized.includes('UPDATE documents')) {
         return {
           run: (...args: Array<string | number | null>) => {
-            const id = args[13]! as string
+            const id = args[14]! as string
             const existing = tables.documents.get(id)
             if (existing !== undefined) {
               tables.documents.set(id, {
@@ -640,8 +641,9 @@ function makeProjectContentTestDb (): {
                 is_finished: args[9] as number,
                 is_minor: args[10] as number,
                 is_dead: args[11] as number,
+                tree_order_number: args[12] as number,
                 created_at_ms: existing.created_at_ms as number,
-                updated_at_ms: args[12] as number
+                updated_at_ms: args[13] as number
               })
             }
           }

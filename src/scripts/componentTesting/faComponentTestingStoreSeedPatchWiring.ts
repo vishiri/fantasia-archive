@@ -20,7 +20,8 @@ export function patchFaComponentTestingStores (
   if (
     seed.hidePlushes !== undefined ||
     seed.hideTooltipsProject !== undefined ||
-    seed.disableDocumentControlBar !== undefined
+    seed.disableAppControlBar !== undefined ||
+    seed.disableAppControlBarGuides !== undefined
   ) {
     const settingsStore = S_FaUserSettings(pinia)
     const nextSettings = {
@@ -35,8 +36,12 @@ export function patchFaComponentTestingStores (
       nextSettings.hideTooltipsProject = seed.hideTooltipsProject
     }
 
-    if (seed.disableDocumentControlBar !== undefined) {
-      nextSettings.disableDocumentControlBar = seed.disableDocumentControlBar
+    if (seed.disableAppControlBar !== undefined) {
+      nextSettings.disableAppControlBar = seed.disableAppControlBar
+    }
+
+    if (seed.disableAppControlBarGuides !== undefined) {
+      nextSettings.disableAppControlBarGuides = seed.disableAppControlBarGuides
     }
 
     settingsStore.$patch({

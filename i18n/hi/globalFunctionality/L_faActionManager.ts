@@ -15,6 +15,7 @@ export default {
     copyHierarchyTreeDocument: 'पदानुक्रम वृक्ष दस्तावेज़ कॉपी करें',
     addHierarchyTreeChildDocument: 'Add hierarchy tree child document',
     deleteHierarchyTreeDocument: 'पदानुक्रम वृक्ष दस्तावेज़ हटाएँ',
+    sortHierarchyTreeDocuments: 'Sort hierarchy tree documents',
     editHierarchyTreeDocument: 'पदानुक्रम वृक्ष दस्तावेज़ संपादित करें',
     openHierarchyTreeDocument: 'पदानुक्रम वृक्ष दस्तावेज़ खोलें',
     languageSwitch: 'इंटरफ़ेस भाषा स्विच करें',
@@ -48,6 +49,7 @@ export default {
     showStartupTipsNotification: 'स्टार्टअप टिप अधिसूचना दिखाएँ',
     toggleDeveloperTools: 'डेवलपर टूल टॉगल करें',
     toggleAppNoteboardWindow: 'ऐप नोटबोर्ड विंडो टॉगल करें',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     toggleProjectNoteboardWindow: 'प्रोजेक्ट नोटबोर्ड विंडो टॉगल करें',
   }
 }

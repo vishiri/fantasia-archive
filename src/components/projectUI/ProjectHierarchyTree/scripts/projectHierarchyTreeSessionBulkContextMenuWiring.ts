@@ -6,6 +6,7 @@ import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHi
 import { createProjectHierarchyTreeBulkExpandCollapseWiring } from './projectHierarchyTreeBulkExpandCollapseWiring'
 import { buildProjectHierarchyTreeNodeContextMenuCopyHandlers } from './projectHierarchyTreeNodeContextMenuCopyWiring'
 import { buildProjectHierarchyTreeNodeContextMenuDocumentActionHandlers } from './projectHierarchyTreeNodeContextMenuDocumentActionWiring'
+import { buildProjectHierarchyTreeNodeContextMenuSortHandlers } from './projectHierarchyTreeNodeContextMenuSortWiring'
 import { createProjectHierarchyTreeNodeContextMenuWiring } from './projectHierarchyTreeNodeContextMenuWiring'
 
 export function createProjectHierarchyTreeSessionBulkContextMenuWiring (deps: {
@@ -59,6 +60,12 @@ export function createProjectHierarchyTreeSessionBulkContextMenuWiring (deps: {
     runFaAction: deps.runFaAction,
     treeData: deps.treeData
   })
+  const sortHandlers = buildProjectHierarchyTreeNodeContextMenuSortHandlers({
+    contextMenuAnchorNodeId: nodeContextMenuWiring.contextMenuAnchorNodeId,
+    isNodeContextMenuOpen: nodeContextMenuWiring.isNodeContextMenuOpen,
+    runFaAction: deps.runFaAction,
+    treeData: deps.treeData
+  })
 
   return {
     contextMenuAddNewRowIcon: nodeContextMenuWiring.contextMenuAddNewRowIcon,
@@ -66,6 +73,7 @@ export function createProjectHierarchyTreeSessionBulkContextMenuWiring (deps: {
     contextMenuAnchorNodeId: nodeContextMenuWiring.contextMenuAnchorNodeId,
     contextMenuShowsBulkExpandRows: nodeContextMenuWiring.contextMenuShowsBulkExpandRows,
     contextMenuShowsCopyRows: nodeContextMenuWiring.contextMenuShowsCopyRows,
+    contextMenuShowsSortByRows: nodeContextMenuWiring.contextMenuShowsSortByRows,
     isNodeContextMenuOpen: nodeContextMenuWiring.isNodeContextMenuOpen,
     nodeMenuPointerPosition: nodeContextMenuWiring.nodeMenuPointerPosition,
     onAddNewDocumentFromContextMenuClick: nodeContextMenuWiring.onAddNewDocumentFromContextMenuClick,
@@ -81,6 +89,7 @@ export function createProjectHierarchyTreeSessionBulkContextMenuWiring (deps: {
     onExpandAllUnderNodeClick: nodeContextMenuWiring.onExpandAllUnderNodeClick,
     onNodeContextMenuHide: nodeContextMenuWiring.onNodeContextMenuHide,
     onNodeRowContextMenu: nodeContextMenuWiring.onNodeRowContextMenu,
-    onOpenDocumentFromContextMenuClick: documentActionHandlers.onOpenDocumentClick
+    onOpenDocumentFromContextMenuClick: documentActionHandlers.onOpenDocumentClick,
+    onSortByItemFromContextMenuClick: sortHandlers.onSortByItemClick
   }
 }

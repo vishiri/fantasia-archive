@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
 
-import { createTemporaryOpenedDocumentTabSeed } from '../openedDocumentTemporaryDomain'
+import { createTemporaryOpenedDocumentTabSeed } from '../openedDocumentTemporaryTabSeed'
 import { resolveOpenedDocumentTabDocumentActionContext } from '../openedDocumentTabDocumentActionContext'
 
 test('Test that resolveOpenedDocumentTabDocumentActionContext reads template from database for persisted tabs', async () => {
@@ -26,6 +26,8 @@ test('Test that resolveOpenedDocumentTabDocumentActionContext reads template fro
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
     savedDocumentTextColor: '',
     tabLabel: 'Character',
     templateIcon: 'mdi-account',
@@ -95,6 +97,8 @@ test('Test that resolveOpenedDocumentTabDocumentActionContext returns null when 
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
     savedDocumentTextColor: '',
     tabLabel: 'Character',
     templateIcon: 'mdi-account',
@@ -132,6 +136,8 @@ test('Test that resolveOpenedDocumentTabDocumentActionContext returns null when 
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
     savedDocumentTextColor: '',
     tabLabel: 'Character',
     templateIcon: 'mdi-account',

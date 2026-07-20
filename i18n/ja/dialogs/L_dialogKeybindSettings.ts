@@ -31,6 +31,7 @@ export default {
     toggleDeveloperTools: '開発者ツールの切り替え',
     toggleAppNoteboard: 'アプリノートボードの切り替え',
     toggleProjectNoteboard: 'プロジェクトノートボードの切り替え',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     editDocument: 'Edit current document',
     saveDocumentKeepEditMode: 'Save document without exiting edit mode',
     saveDocument: 'Save current document',

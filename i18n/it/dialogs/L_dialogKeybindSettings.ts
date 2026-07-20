@@ -31,6 +31,7 @@ export default {
     toggleDeveloperTools: 'Attiva/disattiva gli Strumenti per sviluppatori',
     toggleAppNoteboard: 'Attiva/disattiva Blocco note dell\'app',
     toggleProjectNoteboard: 'Attiva/disattiva la lavagna del progetto',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     editDocument: 'Edit current document',
     saveDocumentKeepEditMode: 'Save document without exiting edit mode',
     saveDocument: 'Save current document',

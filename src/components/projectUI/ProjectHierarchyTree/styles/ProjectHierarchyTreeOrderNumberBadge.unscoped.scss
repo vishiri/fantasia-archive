@@ -1,0 +1,16 @@
+@use './variables' as *;
+
+.projectHierarchyTreeOrderNumberBadge {
+  background-color: $projectHierarchyTree-orderNumberBadge-backgroundColor;
+  border: none;
+  color: $projectHierarchyTree-orderNumberBadge-color;
+  justify-content: center;
+  left: inherit;
+  min-width: 24px;
+  opacity: 1;
+  padding: $projectHierarchyTree-orderNumberBadge-padding;
+  right: calc(100% + #{$projectHierarchyTree-orderNumberBadge-rightOffset});
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: $projectHierarchyTree-orderNumberBadge-zIndex;
+}

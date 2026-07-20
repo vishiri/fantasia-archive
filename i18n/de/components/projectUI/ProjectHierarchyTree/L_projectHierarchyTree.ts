@@ -7,11 +7,22 @@ export default {
     deleteDocument: 'Dokument löschen',
     editDocument: 'Dokument bearbeiten',
     expandAllUnderNode: 'Expand all under this node',
-    openDocument: 'Dokument öffnen'
+    openDocument: 'Dokument öffnen',
+    sortBy: 'Sort by',
+    sortAlphabetically: 'Sort alphabetically',
+    sortByCustomOrder: 'Sort by Custom order',
+    sortDetailNameAsc: 'A -> Z',
+    sortDetailNameDesc: 'Z -> A',
+    sortDetailCustomOrderAsc: '0 -> 999',
+    sortDetailCustomOrderDesc: '999 -> 0',
+    sortDetailScopeDirect: 'direct children',
+    sortDetailScopeRecursive: 'recursive'
+
   },
   placementCountTooltip: {
     categoryCount: 'Kategorienanzahl:',
     documentCount: 'Dokumentanzahl:',
     totalCount: 'Dokument- und Kategorieanzahl:'
-  }
+  },
+  orderNumberBadgeTooltip: 'Order priority of the document'
 }

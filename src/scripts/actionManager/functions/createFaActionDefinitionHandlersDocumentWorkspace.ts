@@ -35,7 +35,7 @@ type T_faDocumentWorkspaceKeybindHandlerDeps = {
   resolveCanEditActiveDocumentViaKeybind: (input: {
     activeDocumentId: string | null
     resolveFaDocumentWorkspaceRouteDocumentId: (routePath: string) => string | null
-    resolveShowProjectDocumentControlBarEditButton: (args: {
+    resolveShowProjectAppControlBarEditButton: (args: {
       activeDocumentTab: { editState: boolean } | null
       isOnDocumentWorkspaceRoute: boolean
     }) => boolean
@@ -43,7 +43,7 @@ type T_faDocumentWorkspaceKeybindHandlerDeps = {
     tabs: readonly I_faOpenedDocumentTab[]
   }) => boolean
   resolveFaDocumentWorkspaceRouteDocumentId: (routePath: string) => string | null
-  resolveShowProjectDocumentControlBarEditButton: (input: {
+  resolveShowProjectAppControlBarEditButton: (input: {
     activeDocumentTab: { editState: boolean } | null
     isOnDocumentWorkspaceRoute: boolean
   }) => boolean
@@ -79,7 +79,7 @@ function createHandleEditActiveDocument (
     const canEdit = deps.resolveCanEditActiveDocumentViaKeybind({
       activeDocumentId,
       resolveFaDocumentWorkspaceRouteDocumentId: deps.resolveFaDocumentWorkspaceRouteDocumentId,
-      resolveShowProjectDocumentControlBarEditButton: deps.resolveShowProjectDocumentControlBarEditButton,
+      resolveShowProjectAppControlBarEditButton: deps.resolveShowProjectAppControlBarEditButton,
       routePath,
       tabs
     })

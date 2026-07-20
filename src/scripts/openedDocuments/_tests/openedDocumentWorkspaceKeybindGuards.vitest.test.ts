@@ -30,6 +30,8 @@ const previewTab: I_faOpenedDocumentTab = {
   savedIsDead: false,
   parentDocumentIdDraft: '',
   savedParentDocumentId: '',
+  treeOrderNumberDraft: '',
+  savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
   hasUnsavedChanges: false,
   editState: false
 }
@@ -80,7 +82,7 @@ test('Test that resolveCanEditActiveDocumentViaKeybind delegates to edit visibil
   expect(resolveCanEditActiveDocumentViaKeybind({
     activeDocumentId: 'doc-1',
     resolveFaDocumentWorkspaceRouteDocumentId: resolveRouteDocumentId,
-    resolveShowProjectDocumentControlBarEditButton: resolveShowEditButton,
+    resolveShowProjectAppControlBarEditButton: resolveShowEditButton,
     routePath: '/home/document/doc-1',
     tabs: [previewTab]
   })).toBe(true)
@@ -88,7 +90,7 @@ test('Test that resolveCanEditActiveDocumentViaKeybind delegates to edit visibil
   expect(resolveCanEditActiveDocumentViaKeybind({
     activeDocumentId: 'doc-1',
     resolveFaDocumentWorkspaceRouteDocumentId: resolveRouteDocumentId,
-    resolveShowProjectDocumentControlBarEditButton: resolveShowEditButton,
+    resolveShowProjectAppControlBarEditButton: resolveShowEditButton,
     routePath: '/home/document/doc-1',
     tabs: [editTab]
   })).toBe(false)
@@ -96,7 +98,7 @@ test('Test that resolveCanEditActiveDocumentViaKeybind delegates to edit visibil
   expect(resolveCanEditActiveDocumentViaKeybind({
     activeDocumentId: 'doc-1',
     resolveFaDocumentWorkspaceRouteDocumentId: resolveRouteDocumentId,
-    resolveShowProjectDocumentControlBarEditButton: resolveShowEditButton,
+    resolveShowProjectAppControlBarEditButton: resolveShowEditButton,
     routePath: '/home',
     tabs: [previewTab]
   })).toBe(false)
@@ -106,7 +108,7 @@ test('Test that resolveCanSaveActiveDocumentViaKeybind delegates to save visibil
   expect(resolveCanSaveActiveDocumentViaKeybind({
     activeDocumentId: 'doc-1',
     resolveFaDocumentWorkspaceRouteDocumentId: resolveRouteDocumentId,
-    resolveShowProjectDocumentControlBarSaveButtons: resolveShowSaveButtons,
+    resolveShowProjectAppControlBarSaveButtons: resolveShowSaveButtons,
     routePath: '/home/document/doc-1',
     tabs: [editTab]
   })).toBe(true)
@@ -114,7 +116,7 @@ test('Test that resolveCanSaveActiveDocumentViaKeybind delegates to save visibil
   expect(resolveCanSaveActiveDocumentViaKeybind({
     activeDocumentId: 'doc-1',
     resolveFaDocumentWorkspaceRouteDocumentId: resolveRouteDocumentId,
-    resolveShowProjectDocumentControlBarSaveButtons: resolveShowSaveButtons,
+    resolveShowProjectAppControlBarSaveButtons: resolveShowSaveButtons,
     routePath: '/home/document/doc-1',
     tabs: [previewTab]
   })).toBe(false)
@@ -122,7 +124,7 @@ test('Test that resolveCanSaveActiveDocumentViaKeybind delegates to save visibil
   expect(resolveCanSaveActiveDocumentViaKeybind({
     activeDocumentId: null,
     resolveFaDocumentWorkspaceRouteDocumentId: resolveRouteDocumentId,
-    resolveShowProjectDocumentControlBarSaveButtons: resolveShowSaveButtons,
+    resolveShowProjectAppControlBarSaveButtons: resolveShowSaveButtons,
     routePath: '/home/document/doc-1',
     tabs: [editTab]
   })).toBe(false)

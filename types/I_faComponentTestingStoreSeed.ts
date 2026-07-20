@@ -24,9 +24,14 @@ export interface I_faComponentTestingStoreSeed {
   hideTooltipsProject?: boolean | undefined
 
   /**
-   * When defined, patches disableDocumentControlBar on S_FaUserSettings (merged with the current settings object).
+   * When defined, patches disableAppControlBar on S_FaUserSettings (merged with the current settings object).
    */
-  disableDocumentControlBar?: boolean | undefined
+  disableAppControlBar?: boolean | undefined
+
+  /**
+   * When defined, patches disableAppControlBarGuides on S_FaUserSettings (merged with the current settings object).
+   */
+  disableAppControlBarGuides?: boolean | undefined
 
   /**
    * When defined, patches opened document tabs on S_FaOpenedDocuments for workspace tab bar previews.

@@ -258,6 +258,24 @@ test('Test that updateSettings with an empty object shows positive notify and st
 })
 
 /**
+ * S_FaUserSettings / patchSettingsSilently
+ * Persists without emitting the positive settings saved notify.
+ */
+test('Test that patchSettingsSilently persists without emitting notify', async () => {
+  const updateObject = { hideHierarchyTree: true }
+  getSettingsMock.mockResolvedValueOnce({
+    ...FA_USER_SETTINGS_DEFAULTS,
+    hideHierarchyTree: true
+  })
+
+  await store.patchSettingsSilently(updateObject)
+
+  expect(setSettingsMock).toHaveBeenCalledWith(updateObject)
+  expect(notifyCreateMock).not.toHaveBeenCalled()
+  expect(store.settings?.hideHierarchyTree).toBe(true)
+})
+
+/**
  * S_FaUserSettings / updateSettings
  * Mismatch on any updated key triggers a thrown error without any local notify.
  */

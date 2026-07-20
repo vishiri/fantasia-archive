@@ -18,6 +18,10 @@ $projectHierarchyTree-node-borderRadius: 4px;
 $projectHierarchyTree-node-marginTop: 3px;
 $projectHierarchyTree-node-minHeight: 29px;
 $projectHierarchyTree-nodeContextMenu-listMinWidthPx: 220px;
+$projectHierarchyTree-nodeContextMenu-sortByActivator-color: fa-v('grey', $grey);
+$projectHierarchyTree-nodeContextMenu-sortByDetail-color: fa-v('primary', $primary);
+$projectHierarchyTree-nodeContextMenu-sortByDetail-fontSize: 10px;
+$projectHierarchyTree-nodeContextMenu-sortBySubmenu-bgColor: fa-v('dark', $dark);
 $projectHierarchyTree-nodeContextMenu-zIndex: mainLayout.$mainLayout-appHeader-zIndex + 2;
 $projectHierarchyTree-nodeIcon-boxSize: $iconSize;
 $projectHierarchyTree-nodeIcon-marginRight: 8px;
@@ -37,6 +41,14 @@ $projectHierarchyTree-openIcon-rotateTransitionDuration: 0.3s;
 $projectHierarchyTree-openIcon-world-positionRight: 5px;
 $projectHierarchyTree-openIcon-world-positionTop: 3px;
 $projectHierarchyTree-openIcon-zIndex: 10;
+$projectHierarchyTree-orderNumberBadge-backgroundColor: fa-v(
+  'hierarchy-tree-order-number-badge',
+  $hierarchy-tree-order-number-badge
+);
+$projectHierarchyTree-orderNumberBadge-color: fa-v('primary', $primary);
+$projectHierarchyTree-orderNumberBadge-padding: 3px 6px;
+$projectHierarchyTree-orderNumberBadge-rightOffset: 7px;
+$projectHierarchyTree-orderNumberBadge-zIndex: 12;
 $projectHierarchyTree-placementCount-catCount-color: fa-v('text-workspace-row', $text-workspace-row);
 $projectHierarchyTree-placementCount-marginLeft: 4px;
 $projectHierarchyTree-treeHline-marginLeft: 5px;

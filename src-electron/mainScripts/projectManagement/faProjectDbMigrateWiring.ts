@@ -22,14 +22,15 @@ import { applyFaProjectDocumentAppearanceEmptyColorSchemaPatch } from './project
 import { applyFaProjectDocumentAppearanceSchemaPatch } from './projectDbContent/faProjectDocumentAppearanceSchemaPatchWiring'
 import { applyFaProjectDocumentCategorySchemaPatch } from './projectDbContent/faProjectDocumentCategorySchemaPatchWiring'
 import { applyFaProjectDocumentStatusFlagsSchemaPatch } from './projectDbContent/faProjectDocumentStatusFlagsSchemaPatchWiring'
+import { applyFaProjectDocumentTreeOrderNumberSchemaPatch } from './projectDbContent/faProjectDocumentTreeOrderNumberSchemaPatchWiring'
 import { seedFaProjectDefaultWorldIfEmpty } from './projectDbContent/faProjectWorldBootstrapWiring'
 import { applyFaProjectWorldColorEmptyAllowedSchemaPatch } from './projectDbContent/faProjectWorldColorEmptyAllowedSchemaPatchWiring'
 
 const OPTION_PROJECT_NAME = 'project_name'
 const OPTION_PROJECT_UUID = 'project_uuid'
 
-/** Current schema revision: flattened bootstrap + v2 is_category + v3 status flags. */
-export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 3
+/** Current schema revision: flattened bootstrap + v2 is_category + v3 status flags + v4 tree order number. */
+export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 4
 
 const applyFaProjectDocumentsHierarchySchemaPatch = createApplyFaProjectDocumentsHierarchySchemaPatch({
   documentsTableName: FA_PROJECT_TABLE_DOCUMENTS,
@@ -96,6 +97,7 @@ function applyFaProjectSchemaPatchesAtCurrentVersion (db: Database): void {
   applyFaProjectDocumentAppearanceSchemaPatch(db)
   applyFaProjectDocumentCategorySchemaPatch(db)
   applyFaProjectDocumentStatusFlagsSchemaPatch(db)
+  applyFaProjectDocumentTreeOrderNumberSchemaPatch(db)
   applyFaProjectWorldColorEmptyAllowedSchemaPatch(db)
   applyFaProjectDocumentAppearanceEmptyColorSchemaPatch(db)
   applyFaProjectOpenedDocumentsSchemaV1(db)
@@ -113,6 +115,14 @@ function migrateFaProjectSchemaV2ToV3 (db: Database): void {
   const runMigration = db.transaction(() => {
     applyFaProjectDocumentStatusFlagsSchemaPatch(db)
     db.pragma('user_version = 3')
+  })
+  runMigration()
+}
+
+function migrateFaProjectSchemaV3ToV4 (db: Database): void {
+  const runMigration = db.transaction(() => {
+    applyFaProjectDocumentTreeOrderNumberSchemaPatch(db)
+    db.pragma('user_version = 4')
   })
   runMigration()
 }
@@ -138,11 +148,22 @@ export function applyFaProjectMigrations (
     if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 3) {
       migrateFaProjectSchemaV2ToV3(db)
     }
+    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 4) {
+      migrateFaProjectSchemaV3ToV4(db)
+    }
     applyFaProjectSchemaPatchesAtCurrentVersion(db)
     return
   }
   if (startVer === 2) {
     migrateFaProjectSchemaV2ToV3(db)
+    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 4) {
+      migrateFaProjectSchemaV3ToV4(db)
+    }
+    applyFaProjectSchemaPatchesAtCurrentVersion(db)
+    return
+  }
+  if (startVer === 3) {
+    migrateFaProjectSchemaV3ToV4(db)
     applyFaProjectSchemaPatchesAtCurrentVersion(db)
     return
   }

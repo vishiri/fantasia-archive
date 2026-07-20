@@ -52,6 +52,8 @@ const sessionState: {
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       hasUnsavedChanges: false,
       editState: false
     },
@@ -76,6 +78,8 @@ const sessionState: {
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       hasUnsavedChanges: false,
       editState: false
     }
@@ -111,7 +115,7 @@ function createHandlers () {
     resolveAdjacentOpenedDocumentTabId: resolveAdjacentOpenedDocumentTabIdMock,
     resolveCanEditActiveDocumentViaKeybind: resolveCanEditActiveDocumentViaKeybindMock,
     resolveFaDocumentWorkspaceRouteDocumentId: () => 'doc-1',
-    resolveShowProjectDocumentControlBarEditButton: () => true
+    resolveShowProjectAppControlBarEditButton: () => true
   })
 }
 

@@ -31,6 +31,8 @@ const previewTab: I_faOpenedDocumentTab = {
   savedIsDead: false,
   parentDocumentIdDraft: '',
   savedParentDocumentId: '',
+  treeOrderNumberDraft: '',
+  savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
   hasUnsavedChanges: false,
   editState: FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE,
   worldId: 'world-1'
@@ -64,7 +66,8 @@ function createHarness (tab: I_faOpenedDocumentTab | null) {
       updateIsDeadDraft: () => {},
       updateIsFinishedDraft: () => {},
       updateIsMinorDraft: () => {},
-      updateParentDocumentIdDraft: () => {}
+      updateParentDocumentIdDraft: () => {},
+      updateTreeOrderNumberDraft: () => {}
     }) as never,
     S_FaProjectHierarchyTree: () => ({
       patchWorldColorPalleteInLayout: () => {}
@@ -144,6 +147,14 @@ test('Test that createUseDocumentWorkspacePage wires world palette and read-only
 test('Test that createUseDocumentWorkspacePage enables category toggle in edit mode', () => {
   const api = createHarness(editTab)
   expect(api.isCategoryToggleReadOnly.value).toBe(false)
+})
+
+test('Test that createUseDocumentWorkspacePage wires order number field labels and preview read-only state', () => {
+  const api = createHarness(previewTab)
+  expect(api.orderNumberFieldLabel.value).toBe('documentWorkspacePage.orderNumberFieldLabel')
+  expect(api.orderNumberFieldDescription.value).toBe('documentWorkspacePage.orderNumberFieldDescription')
+  expect(api.orderNumberFieldReadOnly.value).toBe(true)
+  expect(api.orderNumberModel.value).toBe('')
 })
 
 test('Test that createUseDocumentWorkspacePage wires belongs under field labels and preview read-only state', () => {

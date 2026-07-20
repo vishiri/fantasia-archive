@@ -15,6 +15,7 @@ export default {
     copyHierarchyTreeDocument: 'Αντιγραφή εγγράφου ιεραρχικού δέντρου',
     addHierarchyTreeChildDocument: 'Add hierarchy tree child document',
     deleteHierarchyTreeDocument: 'Διαγραφή εγγράφου ιεραρχικού δέντρου',
+    sortHierarchyTreeDocuments: 'Sort hierarchy tree documents',
     editHierarchyTreeDocument: 'Επεξεργασία εγγράφου ιεραρχικού δέντρου',
     openHierarchyTreeDocument: 'Άνοιγμα εγγράφου ιεραρχικού δέντρου',
     languageSwitch: 'Εναλλαγή γλώσσας διεπαφής',
@@ -48,6 +49,7 @@ export default {
     showStartupTipsNotification: 'Εμφάνιση ειδοποίησης συμβουλής εκκίνησης',
     toggleDeveloperTools: 'Εναλλαγή Εργαλείων προγραμματιστή',
     toggleAppNoteboardWindow: 'Εναλλαγή του παραθύρου σημειωματάριου εφαρμογής',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     toggleProjectNoteboardWindow: 'Εναλλαγή του παραθύρου σημειωματάριου έργου',
   }
 }

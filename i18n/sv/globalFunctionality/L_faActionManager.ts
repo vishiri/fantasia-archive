@@ -15,6 +15,7 @@ export default {
     copyHierarchyTreeDocument: 'Kopiera hierarkiträd-dokument',
     addHierarchyTreeChildDocument: 'Add hierarchy tree child document',
     deleteHierarchyTreeDocument: 'Ta bort hierarkiträd-dokument',
+    sortHierarchyTreeDocuments: 'Sort hierarchy tree documents',
     editHierarchyTreeDocument: 'Redigera hierarkiträd-dokument',
     openHierarchyTreeDocument: 'Öppna hierarkiträd-dokument',
     languageSwitch: 'Byt gränssnittsspråk',
@@ -48,6 +49,7 @@ export default {
     showStartupTipsNotification: 'Visa starttipsmeddelande',
     toggleDeveloperTools: 'Växla utvecklarverktyg',
     toggleAppNoteboardWindow: 'Växla App Noteboard-fönstret',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     toggleProjectNoteboardWindow: 'Växla Project Noteboard-fönstret',
   }
 }

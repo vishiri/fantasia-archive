@@ -31,6 +31,7 @@ export default {
     toggleDeveloperTools: 'تبديل أدوات المطور',
     toggleAppNoteboard: 'تبديل التطبيق المفكرة',
     toggleProjectNoteboard: 'تبديل دفتر المشروع',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     editDocument: 'Edit current document',
     saveDocumentKeepEditMode: 'Save document without exiting edit mode',
     saveDocument: 'Save current document',

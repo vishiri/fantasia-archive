@@ -75,7 +75,7 @@ test.describe.serial('Project hierarchy tree search layout', () => {
     electronApp = launched.electronApp
     appWindow = launched.appWindow
     await remountHierarchyTreeSearchAfterStoreSeed(appWindow, {
-      disableDocumentControlBar: false
+      disableAppControlBar: false
     })
   })
 
@@ -87,15 +87,15 @@ test.describe.serial('Project hierarchy tree search layout', () => {
     })
   })
 
-  test('Check if search uses fixed 375px width when the document control bar is enabled', async () => {
+  test('Check if search uses fixed 375px width when the app control bar is enabled', async () => {
     const search = appWindow.locator(`[data-test-locator="${selectorList.projectHierarchyTreeSearch}"]`)
     await expect(search).toHaveClass(/projectHierarchyTreeSearch--layoutFixed375/)
     await expect(search).toHaveCSS('width', `${FA_PROJECT_SIDEBAR_MIN_WIDTH_PX}px`)
   })
 
-  test('Check if disabling the document control bar makes search follow the sidebar width', async () => {
+  test('Check if disabling the app control bar makes search follow the sidebar width', async () => {
     await remountHierarchyTreeSearchAfterStoreSeed(appWindow, {
-      disableDocumentControlBar: true
+      disableAppControlBar: true
     })
 
     const search = appWindow.locator(`[data-test-locator="${selectorList.projectHierarchyTreeSearch}"]`)
@@ -105,7 +105,7 @@ test.describe.serial('Project hierarchy tree search layout', () => {
 
   test('Check if focusing the search field expands it to the full viewport width', async () => {
     await remountHierarchyTreeSearchAfterStoreSeed(appWindow, {
-      disableDocumentControlBar: false
+      disableAppControlBar: false
     })
 
     const input = appWindow.locator(`[data-test-locator="${selectorList.projectHierarchyTreeSearchInput}"] input`)

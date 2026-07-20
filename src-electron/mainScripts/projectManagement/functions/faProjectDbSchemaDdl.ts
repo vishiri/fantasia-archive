@@ -37,6 +37,9 @@ export const FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN = 'is_minor'
 /** documents dead flag (dagger prefix + strikethrough on tree/tab label) */
 export const FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN = 'is_dead'
 
+/** documents display-only custom order badge (empty sentinel = MIN_SAFE_INTEGER) */
+export const FA_PROJECT_DOCUMENT_TREE_ORDER_NUMBER_COLUMN = 'tree_order_number'
+
 /** Composite index on documents tree hierarchy columns */
 export const FA_PROJECT_DOCUMENT_TREE_PLACEMENT_PARENT_SORT_INDEX =
   'idx_documents_tree_placement_parent_sort'
@@ -227,6 +230,7 @@ CREATE TABLE IF NOT EXISTS ${FA_PROJECT_TABLE_DOCUMENTS} (
   CHECK (${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN} IN (0, 1)),
   ${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN} INTEGER NOT NULL DEFAULT 0
   CHECK (${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN} IN (0, 1)),
+  ${FA_PROJECT_DOCUMENT_TREE_ORDER_NUMBER_COLUMN} INTEGER NOT NULL DEFAULT ${Number.MIN_SAFE_INTEGER},
   created_at_ms INTEGER NOT NULL,
   updated_at_ms INTEGER NOT NULL
 );

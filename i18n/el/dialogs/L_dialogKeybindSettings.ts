@@ -31,6 +31,7 @@ export default {
     toggleDeveloperTools: 'Εναλλαγή Εργαλείων προγραμματιστή',
     toggleAppNoteboard: 'Εναλλαγή σημειωματάριου εφαρμογής',
     toggleProjectNoteboard: 'Εναλλαγή Σημειωματάριου έργου',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     editDocument: 'Edit current document',
     saveDocumentKeepEditMode: 'Save document without exiting edit mode',
     saveDocument: 'Save current document',

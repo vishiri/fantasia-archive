@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
+import { migrateLegacyFaUserSettingsKeys } from 'app/src-electron/shared/faUserSettingsLegacyKeyMigrate'
 import { FA_APP_NOTEBOARD_MAX_TEXT_LENGTH } from 'app/src-electron/shared/faAppNoteboardPatchSchema'
 import { FA_APP_STYLING_MAX_CSS_LENGTH } from 'app/src-electron/shared/faAppStylingPatchSchema'
 import { FA_FLOATING_WINDOW_PERSISTED_RECT_MAX_EDGE_PX } from 'app/src/scripts/floatingWindows/faFloatingWindowPersistedGeometry_manager'
@@ -80,7 +81,8 @@ export const faAppNoteboardRootFileSchema = z.object({
 }).strict()
 
 export function parseFaUserSettingsFile (raw: unknown): I_faUserSettings {
-  return faUserSettingsFileSchema.parse(raw) as I_faUserSettings
+  const migrated = migrateLegacyFaUserSettingsKeys(raw)
+  return faUserSettingsFileSchema.parse(migrated) as I_faUserSettings
 }
 
 export function parseFaKeybindsRootFile (raw: unknown): I_faKeybindsRoot {

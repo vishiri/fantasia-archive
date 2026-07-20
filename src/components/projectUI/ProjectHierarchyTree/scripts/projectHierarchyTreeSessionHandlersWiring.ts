@@ -74,6 +74,60 @@ type T_projectHierarchyTreeSessionHandlersWiringDeps = {
   }
 }
 
+function buildProjectHierarchyTreeSessionHandlersReturn (input: {
+  bulkContextMenuWiring: ReturnType<typeof createProjectHierarchyTreeSessionBulkContextMenuWiring>
+  clickHandlersWiring: ReturnType<typeof createProjectHierarchyTreeSessionHandlersClickWiring>
+  droppableHandlers: ReturnType<typeof createProjectHierarchyTreeDroppableHandlers>
+  eachDraggableHandler: (stat: { data: I_faProjectHierarchyTreeHeTreeNode }) => boolean
+  expandHandlersWiring: ReturnType<typeof createProjectHierarchyTreeSessionExpandHandlersWiring>
+  setTreeComponentRef: (instance: I_faProjectHierarchyTreeHeTreeInstance | null) => void
+  setTreeScrollHostRef: (element: HTMLElement | null) => void
+}) {
+  const eachDroppableHandler = input.droppableHandlers.eachDroppableHandler
+  const rootDroppableHandler = input.droppableHandlers.rootDroppableHandler
+  return {
+    eachDraggableHandler: input.eachDraggableHandler,
+    eachDroppableHandler,
+    contextMenuAddNewRowIcon: input.bulkContextMenuWiring.contextMenuAddNewRowIcon,
+    contextMenuAddNewRowLabel: input.bulkContextMenuWiring.contextMenuAddNewRowLabel,
+    contextMenuAnchorNodeId: input.bulkContextMenuWiring.contextMenuAnchorNodeId,
+    contextMenuShowsBulkExpandRows: input.bulkContextMenuWiring.contextMenuShowsBulkExpandRows,
+    contextMenuShowsCopyRows: input.bulkContextMenuWiring.contextMenuShowsCopyRows,
+    contextMenuShowsSortByRows: input.bulkContextMenuWiring.contextMenuShowsSortByRows,
+    isNodeContextMenuOpen: input.bulkContextMenuWiring.isNodeContextMenuOpen,
+    nodeMenuPointerPosition: input.bulkContextMenuWiring.nodeMenuPointerPosition,
+    onAddNewDocumentFromContextMenuClick: input.bulkContextMenuWiring.onAddNewDocumentFromContextMenuClick,
+    onAddNewDocumentUnderThisFromContextMenuClick:
+      input.bulkContextMenuWiring.onAddNewDocumentUnderThisFromContextMenuClick,
+    onCollapseAllUnderNodeClick: input.bulkContextMenuWiring.onCollapseAllUnderNodeClick,
+    onCopyBackgroundColorFromContextMenuClick:
+      input.bulkContextMenuWiring.onCopyBackgroundColorFromContextMenuClick,
+    onCopyDocumentFromContextMenuClick: input.bulkContextMenuWiring.onCopyDocumentFromContextMenuClick,
+    onCopyNameFromContextMenuClick: input.bulkContextMenuWiring.onCopyNameFromContextMenuClick,
+    onCopyTextColorFromContextMenuClick: input.bulkContextMenuWiring.onCopyTextColorFromContextMenuClick,
+    onDeleteDocumentFromContextMenuClick: input.bulkContextMenuWiring.onDeleteDocumentFromContextMenuClick,
+    onDocumentRowAuxClick: input.clickHandlersWiring.onDocumentRowAuxClick,
+    onEditDocumentFromContextMenuClick: input.bulkContextMenuWiring.onEditDocumentFromContextMenuClick,
+    onExpandAllUnderNodeClick: input.bulkContextMenuWiring.onExpandAllUnderNodeClick,
+    onNodeClick: input.clickHandlersWiring.onNodeClick,
+    onNodeContextMenuHide: input.bulkContextMenuWiring.onNodeContextMenuHide,
+    onNodeRowContextMenu: input.bulkContextMenuWiring.onNodeRowContextMenu,
+    onOpenDocumentFromContextMenuClick: input.bulkContextMenuWiring.onOpenDocumentFromContextMenuClick,
+    onSortByItemFromContextMenuClick: input.bulkContextMenuWiring.onSortByItemFromContextMenuClick,
+    onNodeClose: input.expandHandlersWiring.onNodeClose,
+    onNodeOpen: input.expandHandlersWiring.onNodeOpen,
+    onNodeOpenIconClick: input.expandHandlersWiring.onNodeOpenIconClick,
+    onNodeOpenIconPointerDown: input.expandHandlersWiring.onNodeOpenIconPointerDown,
+    onNonWorldOpenIconClick: input.expandHandlersWiring.onNonWorldOpenIconClick,
+    onNonWorldOpenIconPointerDown: input.expandHandlersWiring.onNonWorldOpenIconPointerDown,
+    onWorldNodeRowClick: input.expandHandlersWiring.onWorldNodeRowClick,
+    onWorldNodeRowPointerDown: input.expandHandlersWiring.onWorldNodeRowPointerDown,
+    rootDroppableHandler,
+    setTreeComponentRef: input.setTreeComponentRef,
+    setTreeScrollHostRef: input.setTreeScrollHostRef
+  }
+}
+
 export function createProjectHierarchyTreeSessionHandlersWiring (
   deps: T_projectHierarchyTreeSessionHandlersWiringDeps
 ) {
@@ -138,42 +192,13 @@ export function createProjectHierarchyTreeSessionHandlersWiring (
     deps.treeScrollHostRef.value = element
   }
 
-  return {
+  return buildProjectHierarchyTreeSessionHandlersReturn({
+    bulkContextMenuWiring,
+    clickHandlersWiring,
+    droppableHandlers,
     eachDraggableHandler,
-    eachDroppableHandler: droppableHandlers.eachDroppableHandler,
-    contextMenuAddNewRowIcon: bulkContextMenuWiring.contextMenuAddNewRowIcon,
-    contextMenuAddNewRowLabel: bulkContextMenuWiring.contextMenuAddNewRowLabel,
-    contextMenuAnchorNodeId: bulkContextMenuWiring.contextMenuAnchorNodeId,
-    contextMenuShowsBulkExpandRows: bulkContextMenuWiring.contextMenuShowsBulkExpandRows,
-    contextMenuShowsCopyRows: bulkContextMenuWiring.contextMenuShowsCopyRows,
-    isNodeContextMenuOpen: bulkContextMenuWiring.isNodeContextMenuOpen,
-    nodeMenuPointerPosition: bulkContextMenuWiring.nodeMenuPointerPosition,
-    onAddNewDocumentFromContextMenuClick: bulkContextMenuWiring.onAddNewDocumentFromContextMenuClick,
-    onAddNewDocumentUnderThisFromContextMenuClick:
-      bulkContextMenuWiring.onAddNewDocumentUnderThisFromContextMenuClick,
-    onCollapseAllUnderNodeClick: bulkContextMenuWiring.onCollapseAllUnderNodeClick,
-    onCopyBackgroundColorFromContextMenuClick: bulkContextMenuWiring.onCopyBackgroundColorFromContextMenuClick,
-    onCopyDocumentFromContextMenuClick: bulkContextMenuWiring.onCopyDocumentFromContextMenuClick,
-    onCopyNameFromContextMenuClick: bulkContextMenuWiring.onCopyNameFromContextMenuClick,
-    onCopyTextColorFromContextMenuClick: bulkContextMenuWiring.onCopyTextColorFromContextMenuClick,
-    onDeleteDocumentFromContextMenuClick: bulkContextMenuWiring.onDeleteDocumentFromContextMenuClick,
-    onDocumentRowAuxClick: clickHandlersWiring.onDocumentRowAuxClick,
-    onEditDocumentFromContextMenuClick: bulkContextMenuWiring.onEditDocumentFromContextMenuClick,
-    onExpandAllUnderNodeClick: bulkContextMenuWiring.onExpandAllUnderNodeClick,
-    onNodeClick: clickHandlersWiring.onNodeClick,
-    onNodeContextMenuHide: bulkContextMenuWiring.onNodeContextMenuHide,
-    onNodeRowContextMenu: bulkContextMenuWiring.onNodeRowContextMenu,
-    onOpenDocumentFromContextMenuClick: bulkContextMenuWiring.onOpenDocumentFromContextMenuClick,
-    onNodeClose: expandHandlersWiring.onNodeClose,
-    onNodeOpen: expandHandlersWiring.onNodeOpen,
-    onNodeOpenIconClick: expandHandlersWiring.onNodeOpenIconClick,
-    onNodeOpenIconPointerDown: expandHandlersWiring.onNodeOpenIconPointerDown,
-    onNonWorldOpenIconClick: expandHandlersWiring.onNonWorldOpenIconClick,
-    onNonWorldOpenIconPointerDown: expandHandlersWiring.onNonWorldOpenIconPointerDown,
-    onWorldNodeRowClick: expandHandlersWiring.onWorldNodeRowClick,
-    onWorldNodeRowPointerDown: expandHandlersWiring.onWorldNodeRowPointerDown,
-    rootDroppableHandler: droppableHandlers.rootDroppableHandler,
+    expandHandlersWiring,
     setTreeComponentRef,
     setTreeScrollHostRef
-  }
+  })
 }

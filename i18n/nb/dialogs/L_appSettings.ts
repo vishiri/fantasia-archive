@@ -23,16 +23,12 @@ export default {
       }
     },
     documentViewEdit: {
-      title: 'Vis/rediger dokument',
+      title: 'Side: Vis/rediger dokument',
       tags: 'dokumentside, visningsmodus, redigeringsmodus, leser',
       documentBody: {
         subtitle: 'Dokumentets brødtekst',
         tags: 'innholdsområde, felt, lesing, redaktørområde',
       },
-      documentControlBar: {
-        subtitle: 'Dokumentkontrolllinje',
-        tags: 'verktøylinje, topplinje, topptekst, dokumentkrom',
-      }
     },
     hierarchicalTree: {
       title: 'Hierarkisk tre',
@@ -54,14 +50,7 @@ export default {
         tags: 'utvide, kollapse, utvide alt, interaksjon',
       },
     },
-    openedDocumentsTabs: {
-      title: 'Åpne dokumentfaner',
-      tags: 'fanelinje, åpne filer, multitasking',
-      tabBehavior: {
-        subtitle: 'Faneatferd',
-        tags: 'bytte faner, tabulatorstripe, sveveadferd',
-      }
-    },
+
     popupsFloatingWindows: {
       title: 'Popup-vinduer og flytende vinduer',
       tags: 'dialoger, overlegg, modaler, vinduer',
@@ -84,6 +73,14 @@ export default {
       applicationExtras: {
         subtitle: 'Applikasjonstillegg',
         tags: 'maskot, plysj, fantasia, statister',
+      },
+      appControlBar: {
+        subtitle: 'Appkontrollinje',
+        tags: 'verktøylinje, topplinje, topptekst, dokumentkrom',
+      },
+      tabBehavior: {
+        subtitle: 'Faneatferd',
+        tags: 'bytte faner, tabulatorstripe, sveveadferd',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Visuelt og app-omfattende funksjonalitet',
@@ -143,14 +140,24 @@ export default {
       description: 'Vanligvis lukkes hurtigsøket etter at et element er valgt fra det. Ved å slå på denne funksjonen forhindrer du denne oppførselen, og lar deg åpne flere søkeresultater etter hverandre.',
       tags: 'hold åpent, flere resultater, batch åpen, hurtigsøk forblir åpent',
     },
-    disableDocumentControlBar: {
-      title: 'Deaktiver dokumentkontrolllinjen',
+    disableAppControlBar: {
+      title: 'Deaktiver appkontrollinjen',
       description: 'Hvis du vil maksimere arbeidsplassen på dokumentet, kan du deaktivere den øverste knappelinjen med denne innstillingen. De nødvendige kontrollknappene vil bli flyttet til toppen av hoveddokumentets hoveddel, mens resten av funksjonaliteten vil være tilgjengelig via tastebindinger eller gjennom appmenyen øverst til venstre.',
       tags: 'verktøylinje skjule, maksimer plass, full bredde, dokumentoverskrift',
     },
-    disableDocumentControlBarGuides: {
-      title: 'Deaktiver dokumentveiledninger',
-      description: 'Slår de nybegynnervennlige guidene på dokumentkontrolllinjen på eller av.',
+    disableAppControlBarContentButtons: {
+      title: 'Disable app control bar content buttons',
+      description: 'Toggles the project contents (document search, document creation, etc.) on the app control bar on or off.',
+      tags: 'quick search, quick add, document create, content tools, control bar buttons'
+    },
+    disableAppControlBarFunctionButtons: {
+      title: 'Disable app control bar function buttons',
+      description: 'Toggles the app functional buttons (noteboards, hierarchical tree toggling, etc.) on the app control bar on or off.',
+      tags: 'noteboard, tree toggle, sidebar hide, function tools, control bar buttons'
+    },
+    disableAppControlBarGuides: {
+      title: 'Deaktiver veiledninger for appkontrollinjen',
+      description: 'Slår de nybegynnervennlige guidene på appkontrollinjen på eller av.',
       tags: 'nybegynnertips, veiledningsbannere, trenermerker, kontrolllinjehjelp',
     },
     disableDocumentCounts: {
@@ -203,6 +210,11 @@ export default {
       title: 'Skjul tomme felt',
       description: 'Skjuler felt uten verdi utfylt, i visningsmodus (ikke-redigering). Vær oppmerksom på at dette kan føre til relativt ville layoutskifter, som kan få dokumentet til å se uregjerlig ut i noen tilfeller.',
       tags: 'tomme felt, skrivebeskyttet visning, kompakt dokument, layoutskift',
+    },
+    hideHierarchyTree: {
+      title: 'Hide hierarchical tree',
+      description: 'Controls whether the hierarchical tree is shown.',
+      tags: 'sidebar off, navigator hidden, tree panel, outline hide'
     },
     hidePlushes: {
       title: 'Skjul Fantasia-maskot',

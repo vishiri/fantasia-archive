@@ -23,16 +23,12 @@ export default {
       }
     },
     documentViewEdit: {
-      title: 'Visa/redigera dokument',
+      title: 'Sida: Visa/redigera dokument',
       tags: 'dokumentsida, visningsläge, redigeringsläge, läsare',
       documentBody: {
         subtitle: 'Dokumentets brödtext',
         tags: 'innehållsområde, fält, läsning, redaktörsområde',
       },
-      documentControlBar: {
-        subtitle: 'Dokumentkontrollfält',
-        tags: 'verktygsfält, toppfält, sidhuvud, dokument krom',
-      }
     },
     hierarchicalTree: {
       title: 'Hierarkiskt träd',
@@ -54,14 +50,7 @@ export default {
         tags: 'expandera, kollapsa, expandera allt, interaktion',
       },
     },
-    openedDocumentsTabs: {
-      title: 'Öppna dokumentflikar',
-      tags: 'flikfält, öppna filer, multitasking',
-      tabBehavior: {
-        subtitle: 'Tabbeteende',
-        tags: 'byta flikar, flikremsa, hovringsbeteende',
-      }
-    },
+
     popupsFloatingWindows: {
       title: 'Popup-fönster och flytande fönster',
       tags: 'dialoger, överlägg, modaler, fönster',
@@ -84,6 +73,14 @@ export default {
       applicationExtras: {
         subtitle: 'Applikationstillägg',
         tags: 'maskot, plysch, fantasia, extramaterial',
+      },
+      appControlBar: {
+        subtitle: 'Appkontrollfält',
+        tags: 'verktygsfält, toppfält, sidhuvud, dokument krom',
+      },
+      tabBehavior: {
+        subtitle: 'Tabbeteende',
+        tags: 'byta flikar, flikremsa, hovringsbeteende',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Visuals och app-omfattande funktionalitet',
@@ -143,14 +140,24 @@ export default {
       description: 'Normalt stängs snabbsökningen efter att ett objekt har valts från det. Genom att aktivera den här funktionen förhindras det beteendet, vilket gör att du kan öppna flera sökresultat efter varandra.',
       tags: 'håll öppet, flera resultat, batch öppen, snabbsökning förblir öppen',
     },
-    disableDocumentControlBar: {
-      title: 'Inaktivera dokumentkontrollfältet',
+    disableAppControlBar: {
+      title: 'Inaktivera appkontrollfältet',
       description: 'Om du vill maximera ditt arbetsutrymme på dokumentet kan du inaktivera den övre knappraden med den här inställningen. De nödvändiga kontrollknapparna kommer att flyttas till toppen av huvuddokumentets huvuddel, medan resten av funktionaliteten kommer att vara tillgänglig via tangentbindningar eller via appmenyn uppe till vänster.',
       tags: 'verktygsfältet dölj, maximera utrymmet, full bredd, dokumenthuvud',
     },
-    disableDocumentControlBarGuides: {
-      title: 'Inaktivera dokumentguider',
-      description: 'Slår på eller av de nybörjarvänliga guiderna på dokumentkontrollfältet.',
+    disableAppControlBarContentButtons: {
+      title: 'Disable app control bar content buttons',
+      description: 'Toggles the project contents (document search, document creation, etc.) on the app control bar on or off.',
+      tags: 'quick search, quick add, document create, content tools, control bar buttons'
+    },
+    disableAppControlBarFunctionButtons: {
+      title: 'Disable app control bar function buttons',
+      description: 'Toggles the app functional buttons (noteboards, hierarchical tree toggling, etc.) on the app control bar on or off.',
+      tags: 'noteboard, tree toggle, sidebar hide, function tools, control bar buttons'
+    },
+    disableAppControlBarGuides: {
+      title: 'Inaktivera guider för appkontrollfältet',
+      description: 'Slår på eller av de nybörjarvänliga guiderna på appkontrollfältet.',
       tags: 'nybörjartips, tutorialbanderoller, coachmärken, hjälp för kontrollfältet',
     },
     disableDocumentCounts: {
@@ -203,6 +210,11 @@ export default {
       title: 'Göm tomma fält',
       description: 'Döljer fält utan något värde ifyllt, i visningsläge (icke-redigera). Observera att detta kan resultera i relativt vilda layoutförskjutningar, vilket kan få dokumentet att se oregerligt ut i vissa fall.',
       tags: 'tomma fält, skrivskyddad vy, kompakt dokument, layoutförskjutning',
+    },
+    hideHierarchyTree: {
+      title: 'Hide hierarchical tree',
+      description: 'Controls whether the hierarchical tree is shown.',
+      tags: 'sidebar off, navigator hidden, tree panel, outline hide'
     },
     hidePlushes: {
       title: 'Göm Fantasia-maskot',

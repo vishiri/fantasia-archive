@@ -4,14 +4,14 @@ import type { T_projectHierarchyTreeSearchLayoutMode } from 'app/types/I_faProje
  * Resolves CSS layout mode for the hierarchy tree search row.
  */
 export function resolveProjectHierarchyTreeSearchLayout (input: {
-  disableDocumentControlBar: boolean
+  disableAppControlBar: boolean
   isFocused: boolean
 }): T_projectHierarchyTreeSearchLayoutMode {
   if (input.isFocused) {
     return 'fullViewport'
   }
 
-  if (input.disableDocumentControlBar) {
+  if (input.disableAppControlBar) {
     return 'followSidebar'
   }
 

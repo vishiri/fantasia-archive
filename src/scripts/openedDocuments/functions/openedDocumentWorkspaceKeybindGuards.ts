@@ -20,7 +20,7 @@ export function resolveIsOnDocumentWorkspaceRoute (
 
 export function resolveCanEditActiveDocumentViaKeybind (input: {
   activeDocumentId: string | null
-  resolveShowProjectDocumentControlBarEditButton: (args: {
+  resolveShowProjectAppControlBarEditButton: (args: {
     activeDocumentTab: { editState: boolean } | null
     isOnDocumentWorkspaceRoute: boolean
   }) => boolean
@@ -34,7 +34,7 @@ export function resolveCanEditActiveDocumentViaKeybind (input: {
     input.resolveFaDocumentWorkspaceRouteDocumentId
   )
 
-  return input.resolveShowProjectDocumentControlBarEditButton({
+  return input.resolveShowProjectAppControlBarEditButton({
     activeDocumentTab,
     isOnDocumentWorkspaceRoute
   })
@@ -42,7 +42,7 @@ export function resolveCanEditActiveDocumentViaKeybind (input: {
 
 export function resolveCanSaveActiveDocumentViaKeybind (input: {
   activeDocumentId: string | null
-  resolveShowProjectDocumentControlBarSaveButtons: (args: {
+  resolveShowProjectAppControlBarSaveButtons: (args: {
     activeDocumentTab: { editState: boolean } | null
     isOnDocumentWorkspaceRoute: boolean
   }) => boolean
@@ -56,7 +56,7 @@ export function resolveCanSaveActiveDocumentViaKeybind (input: {
     input.resolveFaDocumentWorkspaceRouteDocumentId
   )
 
-  return input.resolveShowProjectDocumentControlBarSaveButtons({
+  return input.resolveShowProjectAppControlBarSaveButtons({
     activeDocumentTab,
     isOnDocumentWorkspaceRoute
   })

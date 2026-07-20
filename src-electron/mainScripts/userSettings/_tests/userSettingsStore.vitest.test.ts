@@ -104,6 +104,29 @@ test('Test that getFaUserSettings does not rewrite a clean persisted settings st
 })
 
 /**
+ * getFaUserSettings
+ * Legacy disableDocumentControlBar* keys migrate onto disableAppControlBar* and rewrite once.
+ */
+test('Test that getFaUserSettings migrates legacy app control bar settings keys', async () => {
+  persistedStoreExtras.disableDocumentControlBar = true
+  persistedStoreExtras.disableDocumentControlBarGuides = true
+
+  const { getFaUserSettings } = await import('../userSettings_manager')
+  const store = getFaUserSettings()
+
+  expect(storeReplacementCalls).toEqual([
+    {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      disableAppControlBar: true,
+      disableAppControlBarGuides: true
+    }
+  ])
+  expect(store.store.disableAppControlBar).toBe(true)
+  expect(store.store.disableAppControlBarGuides).toBe(true)
+  expect((store.store as I_faUserSettings & Record<string, unknown>).disableDocumentControlBar).toBeUndefined()
+})
+
+/**
  * cleanupFaUserSettings
  * Nullish 'store.store' is treated as an empty object, and missing keys are filled from defaults without rewriting when no unknown keys exist.
  */

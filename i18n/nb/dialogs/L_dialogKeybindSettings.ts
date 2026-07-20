@@ -31,6 +31,7 @@ export default {
     toggleDeveloperTools: 'Slå av/på utviklerverktøy',
     toggleAppNoteboard: 'Slå på app-noteboard',
     toggleProjectNoteboard: 'Slå på prosjektnotatbordet',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     editDocument: 'Edit current document',
     saveDocumentKeepEditMode: 'Save document without exiting edit mode',
     saveDocument: 'Save current document',

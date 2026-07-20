@@ -23,16 +23,12 @@ export default {
       }
     },
     documentViewEdit: {
-      title: 'Visualizzazione/modifica del documento',
+      title: 'Pagina: Visualizzazione/modifica del documento',
       tags: 'pagina del documento, modalità di visualizzazione, modalità di modifica, lettore',
       documentBody: {
         subtitle: 'Corpo del documento',
         tags: 'area contenuto, campi, lettura, area editor',
       },
-      documentControlBar: {
-        subtitle: 'Barra di controllo del documento',
-        tags: 'barra degli strumenti, barra superiore, intestazione, documento cromato',
-      }
     },
     hierarchicalTree: {
       title: 'Albero gerarchico',
@@ -54,14 +50,7 @@ export default {
         tags: 'espandere, comprimere, espandere tutto, interazione',
       },
     },
-    openedDocumentsTabs: {
-      title: 'Apri le schede dei documenti',
-      tags: 'barra delle schede, file aperti, multitasking',
-      tabBehavior: {
-        subtitle: 'Comportamento della scheda',
-        tags: 'cambiare scheda, tabstrip, comportamento al passaggio del mouse',
-      }
-    },
+
     popupsFloatingWindows: {
       title: 'Popup e finestre mobili',
       tags: 'finestre di dialogo, sovrapposizioni, modali, finestre',
@@ -84,6 +73,14 @@ export default {
       applicationExtras: {
         subtitle: 'Extra dell\'applicazione',
         tags: 'mascotte, peluche, fantasia, extra',
+      },
+      appControlBar: {
+        subtitle: 'Barra di controllo dell\'app',
+        tags: 'barra degli strumenti, barra superiore, intestazione, documento cromato',
+      },
+      tabBehavior: {
+        subtitle: 'Comportamento della scheda',
+        tags: 'cambiare scheda, tabstrip, comportamento al passaggio del mouse',
       },
       visualsAppwideFunctionality: {
         subtitle: 'Immagini e funzionalità a livello di app',
@@ -143,14 +140,24 @@ export default {
       description: 'Normalmente la ricerca rapida si chiude dopo aver selezionato un elemento da essa. L\'attivazione di questa funzione impedisce tale comportamento, consentendoti di aprire più risultati di ricerca uno dopo l\'altro.',
       tags: 'mantieni aperto, risultati multipli, batch aperto, la ricerca rapida rimane aperta',
     },
-    disableDocumentControlBar: {
-      title: 'Disabilita la barra di controllo del documento',
+    disableAppControlBar: {
+      title: 'Disabilita la barra di controllo dell\'app',
       description: 'Se desideri massimizzare lo spazio di lavoro sul documento, puoi disabilitare la barra dei pulsanti in alto con questa impostazione. I pulsanti di controllo necessari verranno spostati nella parte superiore del corpo del documento principale, mentre il resto delle funzionalità sarà accessibile tramite combinazioni di tasti o tramite il menu dell\'app in alto a sinistra.',
       tags: 'nascondi barra degli strumenti, massimizza lo spazio, larghezza intera, intestazione del documento',
     },
-    disableDocumentControlBarGuides: {
-      title: 'Disattiva le guide dei documenti',
-      description: 'Attiva o disattiva le guide adatte ai principianti sulla barra di controllo del documento.',
+    disableAppControlBarContentButtons: {
+      title: 'Disable app control bar content buttons',
+      description: 'Toggles the project contents (document search, document creation, etc.) on the app control bar on or off.',
+      tags: 'quick search, quick add, document create, content tools, control bar buttons'
+    },
+    disableAppControlBarFunctionButtons: {
+      title: 'Disable app control bar function buttons',
+      description: 'Toggles the app functional buttons (noteboards, hierarchical tree toggling, etc.) on the app control bar on or off.',
+      tags: 'noteboard, tree toggle, sidebar hide, function tools, control bar buttons'
+    },
+    disableAppControlBarGuides: {
+      title: 'Disattiva le guide della barra di controllo dell\'app',
+      description: 'Attiva o disattiva le guide adatte ai principianti sulla barra di controllo dell\'app.',
       tags: 'suggerimenti per principianti, banner tutorial, segni di coach, aiuto sulla barra di controllo',
     },
     disableDocumentCounts: {
@@ -203,6 +210,11 @@ export default {
       title: 'Nascondi i campi vuoti',
       description: 'Nasconde i campi senza alcun valore compilato, in modalità di visualizzazione (non modifica). Tieni presente che ciò potrebbe comportare cambiamenti di layout relativamente selvaggi, che in alcuni casi potrebbero rendere il documento indisciplinato.',
       tags: 'campi vuoti, visualizzazione di sola lettura, documento compatto, spostamento del layout',
+    },
+    hideHierarchyTree: {
+      title: 'Hide hierarchical tree',
+      description: 'Controls whether the hierarchical tree is shown.',
+      tags: 'sidebar off, navigator hidden, tree panel, outline hide'
     },
     hidePlushes: {
       title: 'Nascondi la mascotte di Fantasia',

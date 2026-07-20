@@ -21,11 +21,11 @@ import {
   resolveCanEditActiveDocumentViaKeybind
 } from 'app/src/scripts/openedDocuments/functions/openedDocumentWorkspaceKeybindGuards'
 import {
-  resolveShowProjectDocumentControlBarEditButton
-} from 'app/src/components/projectUI/ProjectDocumentControlBar/functions/projectDocumentControlBarEditMode'
+  resolveShowProjectAppControlBarEditButton
+} from 'app/src/components/projectUI/ProjectAppControlBar/functions/projectAppControlBarEditMode'
 import {
   resolveDocumentTabLabelFromOpenedTab
-} from 'app/src/components/projectUI/ProjectDocumentControlBar/functions/projectDocumentControlBarVisibility'
+} from 'app/src/components/projectUI/ProjectAppControlBar/functions/projectAppControlBarVisibility'
 import { S_FaOpenedDocuments } from 'app/src/stores/S_FaOpenedDocuments'
 import { copyToClipboard } from 'quasar'
 
@@ -34,6 +34,7 @@ import { createFaActionDefinitionHandlersDocumentWorkspace } from './functions/c
 import { createFaActionDefinitionHandlersOpenedDocumentTabClipboard } from './faActionDefinitionHandlersOpenedDocumentTabClipboard'
 import { createFaActionDefinitionHandlersHierarchyTreeDocumentClipboard } from './faActionDefinitionHandlersHierarchyTreeDocumentClipboard'
 import { createFaActionDefinitionHandlersHierarchyTreeDocumentActions } from './faActionDefinitionHandlersHierarchyTreeDocumentActions'
+import { createFaActionDefinitionHandlersHierarchyTreeSortActions } from './faActionDefinitionHandlersHierarchyTreeSortActions'
 import { createFaActionDefinitionHandlersOpenedDocumentTabDocumentActions } from './faActionDefinitionHandlersOpenedDocumentTabDocumentActions'
 import { createFaActionDefinitionHandlersShowProjectDashboard } from './functions/createFaActionDefinitionHandlersShowProjectDashboard'
 import { buildFaActionDefinitionHandlersWindowChrome } from './faActionDefinitionHandlersWindowChrome'
@@ -95,7 +96,7 @@ const faActionDefinitionHandlersApi = {
     resolveAdjacentOpenedDocumentTabId,
     resolveCanEditActiveDocumentViaKeybind,
     resolveFaDocumentWorkspaceRouteDocumentId,
-    resolveShowProjectDocumentControlBarEditButton
+    resolveShowProjectAppControlBarEditButton
   }),
   ...createFaActionDefinitionHandlersOpenedDocumentTabClipboard({
     S_FaOpenedDocuments,
@@ -116,6 +117,9 @@ const faActionDefinitionHandlersApi = {
     i18n,
     notifyCreate: notifyCreateForFaActionDefinitionHandlers
   }),
+  ...createFaActionDefinitionHandlersHierarchyTreeSortActions({
+    S_FaProjectHierarchyTree
+  }),
   ...createFaActionDefinitionHandlersOpenedDocumentTabDocumentActions({
     S_FaOpenedDocuments,
     i18n,
@@ -134,6 +138,9 @@ export const handleReportProjectNoteboardSaveFailure =
 
 export const handleToggleProjectNoteboardWindow =
   faActionDefinitionHandlersApi.handleToggleProjectNoteboardWindow
+
+export const handleToggleHierarchicalTree =
+  faActionDefinitionHandlersApi.handleToggleHierarchicalTree
 
 export const handleReportAppStylingPersistFailure =
   faActionDefinitionHandlersApi.handleReportAppStylingPersistFailure
@@ -257,6 +264,9 @@ export const handleAddHierarchyTreeChildDocument =
 
 export const handleDeleteHierarchyTreeDocument =
   faActionDefinitionHandlersApi.handleDeleteHierarchyTreeDocument
+
+export const handleSortHierarchyTreeDocuments =
+  faActionDefinitionHandlersApi.handleSortHierarchyTreeDocuments
 
 export const handleFocusPreviousOpenedDocumentTab =
   faActionDefinitionHandlersApi.handleFocusPreviousOpenedDocumentTab

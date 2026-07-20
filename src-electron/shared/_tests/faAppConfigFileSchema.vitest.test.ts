@@ -18,6 +18,25 @@ test('Test that parseFaUserSettingsFile accepts a valid full settings file', () 
 })
 
 /**
+ * parseFaUserSettingsFile
+ * Accepts legacy disableDocumentControlBar* keys from older faUserSettings.json exports.
+ */
+test('Test that parseFaUserSettingsFile migrates legacy app control bar keys', () => {
+  const {
+    disableAppControlBar: _dropBar,
+    disableAppControlBarGuides: _dropGuides,
+    ...rest
+  } = FA_USER_SETTINGS_DEFAULTS
+  const v = parseFaUserSettingsFile({
+    ...rest,
+    disableDocumentControlBar: true,
+    disableDocumentControlBarGuides: true
+  })
+  expect(v.disableAppControlBar).toBe(true)
+  expect(v.disableAppControlBarGuides).toBe(true)
+})
+
+/**
  * faKeybindsRootFileSchema
  * Accepts schemaVersion and overrides with known command id.
  */

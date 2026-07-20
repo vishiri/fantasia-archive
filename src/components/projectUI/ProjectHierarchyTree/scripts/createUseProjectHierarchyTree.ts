@@ -19,6 +19,7 @@ import { createProjectHierarchyTreeSessionWiring } from './projectHierarchyTreeS
 import { createProjectHierarchyTreeDocumentButtonGroupWiring } from './projectHierarchyTreeDocumentButtonGroupWiring'
 import { createProjectHierarchyTreeTreeLineWiring } from './projectHierarchyTreeTreeLineWiring'
 import { createProjectHierarchyTreePlacementCountWiring } from './projectHierarchyTreePlacementCountWiring'
+import { createProjectHierarchyTreeOrderNumberBadgeWiring } from './projectHierarchyTreeOrderNumberBadgeWiring'
 
 import type {
   I_faOpenedDocumentTreeOpenMeta,
@@ -38,7 +39,8 @@ type T_useProjectHierarchyTree = (
 ) => ReturnType<typeof createProjectHierarchyTreeSessionWiring> &
   ReturnType<typeof createProjectHierarchyTreeDocumentButtonGroupWiring> &
   ReturnType<typeof createProjectHierarchyTreeTreeLineWiring> &
-  ReturnType<typeof createProjectHierarchyTreePlacementCountWiring> & {
+  ReturnType<typeof createProjectHierarchyTreePlacementCountWiring> &
+  ReturnType<typeof createProjectHierarchyTreeOrderNumberBadgeWiring> & {
     activeDocumentId: Ref<string | null>
   }
 
@@ -111,12 +113,19 @@ export function createUseProjectHierarchyTree (deps: {
       storeToRefs: deps.storeToRefs
     })
 
+    const orderNumberBadgeWiring = createProjectHierarchyTreeOrderNumberBadgeWiring({
+      S_FaUserSettings: deps.S_FaUserSettings,
+      computed: deps.computed,
+      storeToRefs: deps.storeToRefs
+    })
+
     return {
       activeDocumentId,
       ...sessionApi,
       ...documentButtonGroupWiring,
       ...treeLineWiring,
-      ...placementCountWiring
+      ...placementCountWiring,
+      ...orderNumberBadgeWiring
     }
   }
 }

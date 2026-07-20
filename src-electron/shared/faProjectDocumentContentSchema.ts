@@ -36,7 +36,8 @@ export const faProjectDocumentCreateInputSchema = z.object({
   isCategory: z.boolean().optional(),
   isFinished: z.boolean().optional(),
   isMinor: z.boolean().optional(),
-  isDead: z.boolean().optional()
+  isDead: z.boolean().optional(),
+  treeOrderNumber: z.number().int().optional()
 }).strict()
 
 export const faProjectDocumentPatchSchema = z.object({
@@ -51,7 +52,8 @@ export const faProjectDocumentPatchSchema = z.object({
   isCategory: z.boolean().optional(),
   isFinished: z.boolean().optional(),
   isMinor: z.boolean().optional(),
-  isDead: z.boolean().optional()
+  isDead: z.boolean().optional(),
+  treeOrderNumber: z.number().int().optional()
 }).strict()
 
 export const faProjectDocumentIdPayloadSchema = z.object({

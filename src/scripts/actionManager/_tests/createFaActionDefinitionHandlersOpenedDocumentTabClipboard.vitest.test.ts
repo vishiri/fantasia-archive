@@ -32,6 +32,8 @@ const sessionState: {
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       hasUnsavedChanges: false,
       editState: false
     }
@@ -84,6 +86,8 @@ beforeEach(() => {
     savedIsDead: false,
     parentDocumentIdDraft: '',
     savedParentDocumentId: '',
+    treeOrderNumberDraft: '',
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
     hasUnsavedChanges: false,
     editState: false
   }
@@ -99,7 +103,7 @@ test('Test that handleCopyOpenedDocumentTabName copies and shows success toast',
     color: 'positive',
     faSkipNotifyConsoleLog: true,
     icon: 'mdi-clipboard-check-outline',
-    message: 'projectUI.projectDocumentControlBar.copyNameSuccess',
+    message: 'projectUI.projectAppControlBar.copyNameSuccess',
     timeout: 2500,
     type: 'positive'
   })
@@ -116,7 +120,7 @@ test('Test that handleCopyOpenedDocumentTabTextColor copies and shows success to
     color: 'positive',
     faSkipNotifyConsoleLog: true,
     icon: 'mdi-clipboard-check-outline',
-    message: 'projectUI.projectDocumentControlBar.copyTextColorSuccess',
+    message: 'projectUI.projectAppControlBar.copyTextColorSuccess',
     timeout: 2500,
     type: 'positive'
   })
@@ -133,7 +137,7 @@ test('Test that handleCopyOpenedDocumentTabBackgroundColor copies and shows succ
     color: 'positive',
     faSkipNotifyConsoleLog: true,
     icon: 'mdi-clipboard-check-outline',
-    message: 'projectUI.projectDocumentControlBar.copyBackgroundColorSuccess',
+    message: 'projectUI.projectAppControlBar.copyBackgroundColorSuccess',
     timeout: 2500,
     type: 'positive'
   })

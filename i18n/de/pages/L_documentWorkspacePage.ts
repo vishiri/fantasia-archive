@@ -7,6 +7,9 @@ export default {
   belongsUnderFieldLabel: 'Belongs under',
   belongsUnderOneWayRelationshipTooltip:
     'This is a one-way relationship. Editing this value WILL NOT have any effect on the connected document/s. Left-clicking the linked document in non-edit mode will open it in new tab and focuses on it. Middle-clicking the linked document in non-edit mode will open it in new tab and not focus on it.',
+  orderNumberFieldDescription:
+    'Optional display-only order number shown as a badge to the left of this document in the hierarchy tree. Pad numbers with leading zeros when you want consistent badge width (for example 01, 02, 10). This does not change how siblings are sorted in the tree.',
+  orderNumberFieldLabel: 'Order number',
   isCategoryDescription:
     'Diese Einstellung schaltet den Kategoriemodus für das aktuelle Dokument ein. Ein Dokument im Kategoriemodus blendet die meisten Felder aus und erscheint in keiner anderen Beziehungssuche außer Gehört unter.',
   isCategoryTitle: 'Ist eine Kategorie',

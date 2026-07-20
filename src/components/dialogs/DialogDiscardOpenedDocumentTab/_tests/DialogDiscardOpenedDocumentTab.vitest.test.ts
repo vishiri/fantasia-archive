@@ -79,6 +79,8 @@ function mountDiscardDialogWithPendingTab () {
         savedIsDead: false,
         parentDocumentIdDraft: '',
         savedParentDocumentId: '',
+        treeOrderNumberDraft: '',
+        savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
         tabLabel: 'Character',
         templateIcon: 'mdi-account'
       }

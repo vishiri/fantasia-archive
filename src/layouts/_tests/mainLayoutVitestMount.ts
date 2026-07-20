@@ -74,8 +74,8 @@ export async function mountMainLayoutForVitest (
         GlobalWindowButtons: {
           template: '<div data-test-stub="global-window-buttons" />'
         },
-        ProjectDocumentControlBar: {
-          template: '<div data-test-locator="projectDocumentControlBar" />'
+        ProjectAppControlBar: {
+          template: '<div data-test-locator="projectAppControlBar" />'
         },
         ProjectHierarchyTreeSearch: {
           template: '<div data-test-locator="projectHierarchyTreeSearch" />'

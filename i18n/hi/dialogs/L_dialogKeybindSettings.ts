@@ -31,6 +31,7 @@ export default {
     toggleDeveloperTools: 'डेवलपर टूल टॉगल करें',
     toggleAppNoteboard: 'ऐप नोटबोर्ड टॉगल करें',
     toggleProjectNoteboard: 'प्रोजेक्ट नोटबोर्ड टॉगल करें',
+    toggleHierarchicalTree: 'Toggle Hierarchical Tree',
     editDocument: 'Edit current document',
     saveDocumentKeepEditMode: 'Save document without exiting edit mode',
     saveDocument: 'Save current document',

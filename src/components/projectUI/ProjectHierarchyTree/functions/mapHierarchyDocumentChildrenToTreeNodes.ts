@@ -50,6 +50,7 @@ export function createMapHierarchyDocumentChildrenToTreeNodes (deps: {
         isFinished: item.isFinished,
         isMinor: item.isMinor,
         isDead: item.isDead,
+        treeOrderNumber: item.treeOrderNumber,
         label: item.displayName,
         nodeKind: 'document',
         placementId: item.placementId,

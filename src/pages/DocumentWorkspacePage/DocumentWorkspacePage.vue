@@ -20,51 +20,14 @@
       dense
     />
 
-    <div
-      v-if="documentTab !== null"
-      class="documentWorkspacePage__belongsUnderField documentWorkspacePage__field dialogProjectSettings__field q-mt-md"
-    >
-      <div class="documentWorkspacePage__fieldTitle">
-        <span
-          class="documentWorkspacePage__fieldLabel fa-text-label text-body2"
-          data-test-locator="documentWorkspacePage-belongsUnderLabel"
-        >
-          {{ belongsUnderFieldLabel }}
-        </span>
-        <q-icon
-          name="mdi-help-circle"
-          size="16px"
-          class="documentWorkspacePage__fieldHelpIcon q-ml-md"
-          data-test-locator="documentWorkspacePage-belongsUnderHelpIcon"
-          :data-test-tooltip-text="belongsUnderFieldDescription"
-        >
-          <q-tooltip>
-            {{ belongsUnderFieldDescription }}
-          </q-tooltip>
-        </q-icon>
-        <q-icon
-          name="mdi-arrow-right-bold"
-          size="17px"
-          color="amber-14"
-          class="documentWorkspacePage__fieldHelpIcon q-ml-md"
-          data-test-locator="documentWorkspacePage-belongsUnderOneWayIcon"
-          :data-test-tooltip-text="oneWayRelationshipTooltip"
-        >
-          <q-tooltip>
-            {{ oneWayRelationshipTooltip }}
-          </q-tooltip>
-        </q-icon>
-      </div>
-      <q-input
-        v-model="belongsUnderModel"
-        class="documentWorkspacePage__belongsUnderInput"
-        data-test-locator="documentWorkspacePage-belongsUnderInput"
-        dense
-        :disable="belongsUnderFieldReadOnly"
-        :readonly="belongsUnderFieldReadOnly"
-        outlined
-      />
-    </div>
+    <DocumentWorkspacePageBelongsUnderField
+      v-model:belongs-under-model="belongsUnderModel"
+      :belongs-under-field-description="belongsUnderFieldDescription"
+      :belongs-under-field-label="belongsUnderFieldLabel"
+      :belongs-under-field-read-only="belongsUnderFieldReadOnly"
+      :document-tab="documentTab"
+      :one-way-relationship-tooltip="oneWayRelationshipTooltip"
+    />
 
     <div
       v-if="documentTab !== null"
@@ -131,6 +94,14 @@
       </div>
     </div>
 
+    <DocumentWorkspacePageOrderNumberField
+      v-model:order-number-model="orderNumberModel"
+      :document-tab="documentTab"
+      :order-number-field-description="orderNumberFieldDescription"
+      :order-number-field-label="orderNumberFieldLabel"
+      :order-number-field-read-only="orderNumberFieldReadOnly"
+    />
+
     <FaLabeledBooleanToggle
       v-if="documentTab !== null"
       v-model="isCategoryModel"
@@ -180,6 +151,8 @@
 import FaColorPickerInput from 'app/src/components/elements/FaColorPickerInput/FaColorPickerInput.vue'
 import FaLabeledBooleanToggle from 'app/src/components/elements/FaLabeledBooleanToggle/FaLabeledBooleanToggle.vue'
 
+import DocumentWorkspacePageBelongsUnderField from './DocumentWorkspacePageBelongsUnderField.vue'
+import DocumentWorkspacePageOrderNumberField from './DocumentWorkspacePageOrderNumberField.vue'
 import { useDocumentWorkspacePage } from './scripts/documentWorkspacePage_manager'
 
 defineOptions({
@@ -217,6 +190,10 @@ const {
   nameFieldLabel,
   oneWayRelationshipTooltip,
   onAppendToWorldPalette,
+  orderNumberFieldDescription,
+  orderNumberFieldLabel,
+  orderNumberFieldReadOnly,
+  orderNumberModel,
   previewDisplayName,
   isCategoryToggleReadOnly,
   textColorFieldDescription,

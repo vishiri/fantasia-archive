@@ -70,6 +70,8 @@ const baseTab: I_faOpenedDocumentTab = {
   savedIsDead: false,
   parentDocumentIdDraft: '',
   savedParentDocumentId: '',
+  treeOrderNumberDraft: '',
+  savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
   hasUnsavedChanges: false,
   editState: false
 }
@@ -344,7 +346,9 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName parent move to root 
     tabs: [{
       ...baseTab,
       parentDocumentIdDraft: '',
-      savedParentDocumentId: 'parent-2'
+      savedParentDocumentId: 'parent-2',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
     }]
   })
   getDocumentByIdMock.mockResolvedValue({
@@ -395,7 +399,9 @@ test('Test that S_FaOpenedDocuments syncOpenedDocumentParentFromHierarchy overwr
       displayNameDraft: 'Dirty name',
       hasUnsavedChanges: true,
       parentDocumentIdDraft: 'typed-parent',
-      savedParentDocumentId: 'saved-parent'
+      savedParentDocumentId: 'saved-parent',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
     }]
   })
   store.syncOpenedDocumentParentFromHierarchy('doc-1', 'tree-parent')
@@ -801,6 +807,10 @@ test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromSource seeds 
         documentBackgroundColor: '#112233',
         documentTextColor: '#AABBCC',
         id: 'doc-1',
+        isCategory: true,
+        isDead: false,
+        isFinished: true,
+        isMinor: true,
         parentDocumentId: 'doc-parent',
         templateId: 'tpl-1',
         worldId: 'world-1'
@@ -826,6 +836,10 @@ test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromSource seeds 
   expect(tempTab?.hasUnsavedChanges).toBe(false)
   expect(tempTab?.documentTextColorDraft).toBe('#AABBCC')
   expect(tempTab?.documentBackgroundColorDraft).toBe('#112233')
+  expect(tempTab?.isCategoryDraft).toBe(true)
+  expect(tempTab?.isFinishedDraft).toBe(true)
+  expect(tempTab?.isMinorDraft).toBe(true)
+  expect(tempTab?.isDeadDraft).toBe(false)
   expect(tempTab?.parentDocumentId).toBe('doc-parent')
   expect(tempTab?.temporaryParentResolveDocumentIds).toEqual(['doc-parent'])
   expect(store.activeDocumentId).toBe(documentId)
@@ -890,6 +904,10 @@ test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromOpenedTab see
       displayNameDraft: 'Ancient Hero',
       documentBackgroundColorDraft: '#112233',
       documentTextColorDraft: '#AABBCC',
+      isCategoryDraft: true,
+      isDeadDraft: true,
+      isFinishedDraft: false,
+      isMinorDraft: true,
       worldId: 'world-1'
     }]
   })
@@ -901,6 +919,10 @@ test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromOpenedTab see
   expect(tempTab?.displayNameDraft).toContain('Ancient Hero')
   expect(tempTab?.documentTextColorDraft).toBe('#AABBCC')
   expect(tempTab?.documentBackgroundColorDraft).toBe('#112233')
+  expect(tempTab?.isCategoryDraft).toBe(true)
+  expect(tempTab?.isFinishedDraft).toBe(false)
+  expect(tempTab?.isMinorDraft).toBe(true)
+  expect(tempTab?.isDeadDraft).toBe(true)
   expect(tempTab?.parentDocumentId).toBe('doc-parent')
   expect(tempTab?.temporaryParentResolveDocumentIds).toEqual(['doc-parent'])
   expect(tempTab?.hasUnsavedChanges).toBe(false)
@@ -1047,6 +1069,8 @@ test('Test that S_FaOpenedDocuments createTemporaryDocumentUnderParentFromOpened
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       savedDocumentTextColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account',
@@ -1166,6 +1190,7 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName promotes a temporary
     isMinor: false,
     parentDocumentId: null,
     templateId: 'tpl-1',
+    treeOrderNumber: Number.MIN_SAFE_INTEGER,
     worldId: 'world-1'
   })
   expect(refreshHierarchyTreeNodesMock).toHaveBeenCalledWith(['placement-1'])
@@ -1222,6 +1247,8 @@ test('Test that S_FaOpenedDocuments hydrates temporary tabs from snapshot', asyn
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       tabLabel: 'Character',
       templateIcon: 'mdi-account',
       templateId: 'tpl-1',
@@ -1566,6 +1593,8 @@ test('Test that S_FaOpenedDocuments hydrate drops temporary tabs when world look
       savedIsDead: false,
       parentDocumentIdDraft: '',
       savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
       tabLabel: 'Character',
       templateIcon: 'mdi-account',
       templateId: 'tpl-1',
@@ -2301,11 +2330,64 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName persists appearance 
     isCategory: false,
     isDead: false,
     isFinished: false,
-    isMinor: false
+    isMinor: false,
+    treeOrderNumber: Number.MIN_SAFE_INTEGER
   })
   const tab = store.findTabByDocumentId('doc-1')
   expect(tab?.savedDocumentTextColor).toBe('#AABBCC')
   expect(tab?.savedDocumentBackgroundColor).toBe('#112233')
+  expect(tab?.hasUnsavedChanges).toBe(false)
+})
+
+test('Test that S_FaOpenedDocuments updateTreeOrderNumberDraft updates draft and schedules persist', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  store.updateTreeOrderNumberDraft('doc-1', '7')
+
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.treeOrderNumberDraft).toBe('7')
+  expect(tab?.hasUnsavedChanges).toBe(true)
+  await vi.runAllTimersAsync()
+  expect(saveOpenedDocumentsSnapshotMock).toHaveBeenCalled()
+})
+
+test('Test that S_FaOpenedDocuments hydrate defaults missing tree order from database', async () => {
+  getDocumentByIdMock.mockResolvedValueOnce({
+    displayName: 'Hero',
+    id: 'doc-1'
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.savedTreeOrderNumber).toBe(Number.MIN_SAFE_INTEGER)
+  expect(tab?.treeOrderNumberDraft).toBe('')
+  expect(tab?.hasUnsavedChanges).toBe(false)
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName persists tree order drafts', async () => {
+  updateDocumentMock.mockResolvedValueOnce({
+    displayName: 'Hero',
+    id: 'doc-1',
+    treeOrderNumber: 7
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+  store.updateTreeOrderNumberDraft('doc-1', '7')
+
+  await store.saveDocumentDisplayName('doc-1', { keepEditMode: false })
+  await vi.runAllTimersAsync()
+
+  expect(updateDocumentMock).toHaveBeenCalledWith('doc-1', expect.objectContaining({
+    treeOrderNumber: 7
+  }))
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.savedTreeOrderNumber).toBe(7)
+  expect(tab?.treeOrderNumberDraft).toBe('7')
   expect(tab?.hasUnsavedChanges).toBe(false)
 })
 
