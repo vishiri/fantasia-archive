@@ -17,7 +17,7 @@ Each opened document tab in **`S_FaOpenedDocuments`** carries **`editState: bool
 
 - New tabs: **`FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE`** (**`false`**) via **`createFaOpenedDocumentTabFromOpenMeta`**
 - Persisted in **`opened_documents.snapshot_json`** (**`editState`** on each tab row; legacy rows default **`false`** on parse)
-- Toggle UI / store action to flip **`editState`** — **`ProjectDocumentControlBar`** strip buttons (**Edit**, **Save**, **Save without exiting edit mode**); store **`enterDocumentEditMode`**, **`saveDocumentDisplayName`**
+- Toggle UI / store action to flip **`editState`** — **`ProjectAppControlBar`** strip buttons (**Edit**, **Save**, **Save without exiting edit mode**); store **`enterDocumentEditMode`**, **`saveDocumentDisplayName`**
 
 ## Pure helpers (level 1)
 

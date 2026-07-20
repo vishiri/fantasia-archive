@@ -81,7 +81,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Unit | Vitest — **`yarn test:unit`**; **`coverage.thresholds.perFile: true`** — each instrumented file **95/80/100/95** (stmts/branches/funcs/lines); dev edits → [fantasia-dev-scoped-verify](.cursor/skills/fantasia-dev-scoped-verify/SKILL.md); full **`yarn testbatch:verify`** at cleanup/commit |
 | UI/E2E | Playwright — rebuild Electron before runs |
 | Storybook | 10 — **`.storybook-workspace/`** |
-| DB | **`better-sqlite3`**; **`.faproject`** SQLite **`user_version` max 1** (flattened) — see [projectDB.md](docs/database/projectDB.md) |
+| DB | **`better-sqlite3`**; **`.faproject`** SQLite **`user_version` max 4** — see [projectDB.md](docs/database/projectDB.md) |
 
 ## Subsystems (pointers)
 
@@ -94,7 +94,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Global keybinds | [fantasia-keybinds](.cursor/skills/fantasia-keybinds/SKILL.md) |
 | Action manager | [fa-action-manager.mdc](.cursor/rules/fa-action-manager.mdc), [fantasia-action-manager](.cursor/skills/fantasia-action-manager/SKILL.md) |
 | Project Settings | [fantasia-sqlite-main](.cursor/skills/fantasia-sqlite-main/SKILL.md), [projectDB.md](docs/database/projectDB.md) — IPC-read on open; **`saveProjectSettings`**; worlds + template layout + document templates |
-| Workspace sidebar | **`/home`** **`QSplitter`**, **`S_FaProjectSidebar`**, **`project_data.sidebar_width`** — **`ProjectHierarchyTree`**, **`S_FaProjectHierarchyTree`**, **`ProjectHierarchyTreeSearch`**, **`ProjectDocumentControlBar`**, **`ProjectWorkspaceWorldList`**, **`S_FaProjectWorkspaceWorlds`**; **`project_data.hierarchy_tree_ui_state`**; [projectDB.md](docs/database/projectDB.md); E2E [checkWorkspaceSidebar.playwright.spec.ts](e2e-tests/checkWorkspaceSidebar.playwright.spec.ts) |
+| Workspace sidebar | **`/home`** **`QSplitter`**, **`S_FaProjectSidebar`**, **`project_data.sidebar_width`** — **`ProjectHierarchyTree`**, **`S_FaProjectHierarchyTree`**, **`ProjectHierarchyTreeSearch`**, **`ProjectAppControlBar`**, **`ProjectWorkspaceWorldList`**, **`S_FaProjectWorkspaceWorlds`**; **`project_data.hierarchy_tree_ui_state`**; [projectDB.md](docs/database/projectDB.md); E2E [checkWorkspaceSidebar.playwright.spec.ts](e2e-tests/checkWorkspaceSidebar.playwright.spec.ts) |
 | Document workspace **`editState`** | Per-tab preview vs edit — **`I_faOpenedDocumentTab.editState`**, **`DocumentWorkspacePage`**, [fa-document-workspace-edit-state.mdc](.cursor/rules/fa-document-workspace-edit-state.mdc), [fantasia-document-workspace-edit-state](.cursor/skills/fantasia-document-workspace-edit-state/SKILL.md) |
 | Floating **`Window*`** | [fantasia-floating-windows](.cursor/skills/fantasia-floating-windows/SKILL.md) — shared **`_sharedWindowStyling/`**, **`_sharedWindowNoteboard/`** |
 | Trees / DnD | [fa-he-tree.mdc](.cursor/rules/fa-he-tree.mdc), [fa-drag-drop-lists.mdc](.cursor/rules/fa-drag-drop-lists.mdc), skills **fantasia-he-tree**, **fantasia-drag-drop** |

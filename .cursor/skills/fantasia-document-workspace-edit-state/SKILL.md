@@ -62,7 +62,7 @@ Replace **`<field>`** with stable test slug. Keep preview and edit locators dist
 
 ## Control bar strip (FA 1.0 parity)
 
-**`ProjectDocumentControlBar`** fixed strip **`projectDocumentControlBar__wrapper`** / **`__right`**:
+**`ProjectAppControlBar`** fixed strip **`projectAppControlBar__wrapper`** / **`__right`**:
 
 | Button | Icon | Visible when | Color |
 | --- | --- | --- | --- |
