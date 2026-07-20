@@ -12,7 +12,7 @@ import {
 
 function buildToolsMenuData (_session: I_appMenuBuildSession): I_appMenuItem[] {
   return [
-    faMenuItem('appControlMenus.tools.items.appNoteBoard', 'mdi-clipboard-text-outline', {
+    faMenuItem('appControlMenus.tools.items.appNoteBoard', 'mdi-clipboard-edit-outline', {
       keybindCommandId: 'toggleAppNoteboard',
       trigger: () => runFaAction('toggleAppNoteboardWindow', undefined)
     }),

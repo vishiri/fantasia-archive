@@ -107,7 +107,7 @@
       <q-btn
         color="primary-bright"
         data-test-locator="projectAppControlBar-toggleAppNoteboardButton"
-        icon="mdi-clipboard-text-outline"
+        icon="mdi-clipboard-edit-outline"
         outline
         @click="onToggleAppNoteboardClick"
       >
