@@ -10,6 +10,7 @@ import {
 } from './createDocumentWorkspacePageFieldWiring'
 import { wireDocumentWorkspacePageBelongsUnderField } from './createDocumentWorkspacePageBelongsUnderFieldWiring'
 import { wireDocumentWorkspacePageOrderNumberField } from './createDocumentWorkspacePageOrderNumberFieldWiring'
+import { wireDocumentWorkspacePageExtraHtmlClassesField } from './createDocumentWorkspacePageExtraHtmlClassesFieldWiring'
 import { wireDocumentWorkspacePageStatusFlagToggles } from './createDocumentWorkspacePageStatusFlagTogglesWiring'
 
 function buildDocumentWorkspacePageApi (input: {
@@ -18,6 +19,7 @@ function buildDocumentWorkspacePageApi (input: {
   coreModels: ReturnType<typeof createDocumentWorkspacePageCoreModels>
   isCategoryToggle: ReturnType<typeof wireDocumentWorkspacePageIsCategoryToggle>
   orderNumberField: ReturnType<typeof wireDocumentWorkspacePageOrderNumberField>
+  extraHtmlClassesField: ReturnType<typeof wireDocumentWorkspacePageExtraHtmlClassesField>
   statusFlagToggles: ReturnType<typeof wireDocumentWorkspacePageStatusFlagToggles>
 }): ReturnType<T_useDocumentWorkspacePageApi> {
   const displayNameModel = input.coreModels.displayNameModel
@@ -32,6 +34,7 @@ function buildDocumentWorkspacePageApi (input: {
     ...input.colorPickers,
     ...input.isCategoryToggle,
     ...input.orderNumberField,
+    ...input.extraHtmlClassesField,
     ...input.statusFlagToggles,
     displayNameModel,
     documentShowsEditFields,
@@ -105,10 +108,18 @@ export function createUseDocumentWorkspacePage (
       routeDocumentId: coreModels.routeDocumentId
     })
 
+    const extraHtmlClassesField = wireDocumentWorkspacePageExtraHtmlClassesField({
+      deps,
+      documentTab: coreModels.documentTab,
+      openedDocumentsStore,
+      routeDocumentId: coreModels.routeDocumentId
+    })
+
     return buildDocumentWorkspacePageApi({
       belongsUnderField,
       colorPickers,
       coreModels,
+      extraHtmlClassesField,
       isCategoryToggle,
       orderNumberField,
       statusFlagToggles

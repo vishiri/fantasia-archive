@@ -68,6 +68,8 @@ const sampleOpenedDocumentTabs = [
     savedParentDocumentId: '',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
     hasUnsavedChanges: false,
     editState: false
   },
@@ -94,6 +96,8 @@ const sampleOpenedDocumentTabs = [
     savedParentDocumentId: '',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
     hasUnsavedChanges: true,
     editState: false
   }
@@ -466,6 +470,8 @@ test.describe.serial('Project app control bar visibility', () => {
             savedParentDocumentId: '',
             treeOrderNumberDraft: '',
             savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+            extraClassesDraft: '',
+            savedExtraClasses: '',
             hasUnsavedChanges: false,
             editState: false
           }

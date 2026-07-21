@@ -129,6 +129,8 @@ test('Test that handleEditHierarchyTreeDocument only focuses when tab is already
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       savedDocumentTextColor: '',
       tabLabel: 'Hero',
       templateIcon: 'mdi-account'

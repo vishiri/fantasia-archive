@@ -19,6 +19,9 @@ import {
 import { normalizeOpenedDocumentTabEditState } from 'app/src/scripts/openedDocuments/functions/openedDocumentEditStateDomain'
 import { normalizeOpenedDocumentTabPersistenceState } from 'app/src/scripts/openedDocuments/functions/openedDocumentTemporaryDomain'
 import { FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE } from 'app/types/I_faOpenedDocumentsDomain'
+import {
+  normalizeOpenedDocumentExtraClassesFromDb
+} from 'app/src/scripts/openedDocuments/functions/openedDocumentExtraClasses'
 import { FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY } from 'app/types/I_faDocumentTreeOrderNumber'
 
 export function buildFaOpenedDocumentsSnapshot (input: {
@@ -60,6 +63,7 @@ export function createFaOpenedDocumentTabFromOpenMeta (input: {
   isDead?: boolean | undefined
   parentDocumentId?: string | null | undefined
   treeOrderNumber?: number | undefined
+  extraClasses?: string | null | undefined
 }): I_faOpenedDocumentTab {
   const documentTextColor = normalizeOpenedDocumentAppearanceColorFromDb(input.documentTextColor)
   const documentBackgroundColor = normalizeOpenedDocumentAppearanceColorFromDb(
@@ -72,6 +76,7 @@ export function createFaOpenedDocumentTabFromOpenMeta (input: {
   const isDead = input.isDead === true
   const treeOrderNumberDraft = normalizeOpenedDocumentTreeOrderNumberFromDb(input.treeOrderNumber)
   const savedTreeOrderNumber = input.treeOrderNumber ?? FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY
+  const savedExtraClasses = normalizeOpenedDocumentExtraClassesFromDb(input.extraClasses)
   return {
     documentId: input.documentId,
     persistenceState: 'persisted',
@@ -95,6 +100,8 @@ export function createFaOpenedDocumentTabFromOpenMeta (input: {
     savedParentDocumentId: parentDocumentId,
     treeOrderNumberDraft,
     savedTreeOrderNumber,
+    extraClassesDraft: savedExtraClasses,
+    savedExtraClasses,
     hasUnsavedChanges: false,
     editState: FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE,
     worldId: input.worldId
@@ -222,6 +229,7 @@ export function applyFaOpenedDocumentTabAfterDisplayNameSave (
     savedIsDead: boolean
     savedParentDocumentId: string
     savedTreeOrderNumber: number
+    savedExtraClasses: string
   }
 ): I_faOpenedDocumentTab {
   return {
@@ -237,6 +245,7 @@ export function applyFaOpenedDocumentTabAfterDisplayNameSave (
     isDeadDraft: input.savedIsDead,
     parentDocumentIdDraft: input.savedParentDocumentId,
     treeOrderNumberDraft: normalizeOpenedDocumentTreeOrderNumberFromDb(input.savedTreeOrderNumber),
+    extraClassesDraft: input.savedExtraClasses,
     savedDisplayName: input.savedDisplayName,
     savedDocumentTextColor: input.savedDocumentTextColor,
     savedDocumentBackgroundColor: input.savedDocumentBackgroundColor,
@@ -245,6 +254,7 @@ export function applyFaOpenedDocumentTabAfterDisplayNameSave (
     savedIsMinor: input.savedIsMinor,
     savedIsDead: input.savedIsDead,
     savedParentDocumentId: input.savedParentDocumentId,
-    savedTreeOrderNumber: input.savedTreeOrderNumber
+    savedTreeOrderNumber: input.savedTreeOrderNumber,
+    savedExtraClasses: input.savedExtraClasses
   }
 }

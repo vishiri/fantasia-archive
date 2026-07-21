@@ -73,6 +73,8 @@ function mountDeleteDialogWithPendingTab () {
         savedParentDocumentId: '',
         treeOrderNumberDraft: '',
         savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+        extraClassesDraft: '',
+        savedExtraClasses: '',
         tabLabel: 'Character',
         templateIcon: 'mdi-account'
       }

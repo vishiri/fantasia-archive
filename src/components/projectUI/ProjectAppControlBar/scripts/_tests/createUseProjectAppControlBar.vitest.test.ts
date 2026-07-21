@@ -58,6 +58,8 @@ type T_tabSeedRow = {
   savedParentDocumentId?: string
   treeOrderNumberDraft?: string
   savedTreeOrderNumber?: number
+  extraClassesDraft?: string
+  savedExtraClasses?: string
   tabLabel: string
   templateIcon: string
   worldId?: string
@@ -240,6 +242,8 @@ test('Test that createUseProjectAppControlBar keeps header tabs visible when dis
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -282,6 +286,8 @@ test('Test that activeDocumentTabName mirrors the store active document when tha
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }
@@ -367,6 +373,8 @@ test('Test that createUseProjectAppControlBar exposes edit and save button visib
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -403,6 +411,8 @@ test('Test that createUseProjectAppControlBar shows delete button in edit mode o
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -439,6 +449,8 @@ test('Test that onDeleteCurrentDocumentClick delegates to requestDeleteDocument'
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -501,6 +513,8 @@ test('Test that resolveDocumentTabAppearanceChrome and inline style delegate to 
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       savedDocumentTextColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
@@ -546,6 +560,8 @@ test('Test that resolveDocumentTabDisplayIcon uses folder icon when category dra
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       savedDocumentTextColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
@@ -581,6 +597,8 @@ test('Test that saveDocumentButtonColor reflects active tab unsaved state in edi
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -620,6 +638,8 @@ test('Test that onEnterEditModeClick delegates to the opened documents store', (
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -687,6 +707,8 @@ test('Test that onSaveDocumentClick enqueues saveOpenedDocumentDisplayName with 
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -734,6 +756,8 @@ test('Test that onCopyCurrentDocumentClick and onAddNewDocumentUnderCurrentClick
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -794,6 +818,8 @@ test('Test that edit and save handlers no-op when no active document is selected
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }
@@ -883,6 +909,8 @@ test('Test that tab label and route helpers delegate to opened tab data', () => 
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }]
@@ -912,6 +940,8 @@ test('Test that tab label and route helpers delegate to opened tab data', () => 
     savedParentDocumentId: '',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
     tabLabel: 'Character',
     templateIcon: 'mdi-account'
   })).toBe('Draft')
@@ -945,6 +975,8 @@ test('Test that activeDocumentTab is null when the active id does not match an o
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account'
     }
@@ -1129,6 +1161,8 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
               savedParentDocumentId: '',
               treeOrderNumberDraft: '',
               savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+              extraClassesDraft: '',
+              savedExtraClasses: '',
               tabLabel: 'Character',
               templateIcon: 'mdi-account'
             }
@@ -1176,6 +1210,8 @@ test('Test that tab context menu bulk and destructive handlers delegate to opene
             savedParentDocumentId: '',
             treeOrderNumberDraft: '',
             savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+            extraClassesDraft: '',
+            savedExtraClasses: '',
             tabLabel: 'Character',
             templateIcon: 'mdi-account'
           }])
@@ -1232,6 +1268,8 @@ test('Test that createUseProjectAppControlBar tab copy and move handlers delegat
           savedParentDocumentId: '',
           treeOrderNumberDraft: '',
           savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+          extraClassesDraft: '',
+          savedExtraClasses: '',
           tabLabel: 'Character',
           templateIcon: 'mdi-account'
         }
@@ -1301,6 +1339,8 @@ test('Test that createUseProjectAppControlBar tab copy and move handlers delegat
             savedParentDocumentId: '',
             treeOrderNumberDraft: '',
             savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+            extraClassesDraft: '',
+            savedExtraClasses: '',
             tabLabel: 'Character',
             templateIcon: 'mdi-account'
           }])
@@ -1357,6 +1397,8 @@ test('Test that createUseProjectAppControlBar exposes world tab indicators only 
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       tabLabel: 'Hero',
       templateIcon: 'mdi-account',
       worldId: 'world-1'
@@ -1405,6 +1447,8 @@ test('Test that createUseProjectAppControlBar exposes world tab indicators only 
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       tabLabel: 'Hero',
       templateIcon: 'mdi-account',
       worldId: 'world-2'

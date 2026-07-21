@@ -116,6 +116,8 @@ test('Test that registerFaComponentTestingStoreSeedProbe patches opened document
           savedParentDocumentId: '',
           treeOrderNumberDraft: '',
           savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+          extraClassesDraft: '',
+          savedExtraClasses: '',
           hasUnsavedChanges: false,
           editState: false
         }

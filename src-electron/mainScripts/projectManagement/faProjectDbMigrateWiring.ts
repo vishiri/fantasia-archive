@@ -23,14 +23,15 @@ import { applyFaProjectDocumentAppearanceSchemaPatch } from './projectDbContent/
 import { applyFaProjectDocumentCategorySchemaPatch } from './projectDbContent/faProjectDocumentCategorySchemaPatchWiring'
 import { applyFaProjectDocumentStatusFlagsSchemaPatch } from './projectDbContent/faProjectDocumentStatusFlagsSchemaPatchWiring'
 import { applyFaProjectDocumentTreeOrderNumberSchemaPatch } from './projectDbContent/faProjectDocumentTreeOrderNumberSchemaPatchWiring'
+import { applyFaProjectDocumentExtraClassesSchemaPatch } from './projectDbContent/faProjectDocumentExtraClassesSchemaPatchWiring'
 import { seedFaProjectDefaultWorldIfEmpty } from './projectDbContent/faProjectWorldBootstrapWiring'
 import { applyFaProjectWorldColorEmptyAllowedSchemaPatch } from './projectDbContent/faProjectWorldColorEmptyAllowedSchemaPatchWiring'
 
 const OPTION_PROJECT_NAME = 'project_name'
 const OPTION_PROJECT_UUID = 'project_uuid'
 
-/** Current schema revision: flattened bootstrap + v2 is_category + v3 status flags + v4 tree order number. */
-export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 4
+/** Current schema revision: flattened bootstrap + v2 is_category + v3 status flags + v4 tree order number + v5 extra_classes. */
+export const FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 5
 
 const applyFaProjectDocumentsHierarchySchemaPatch = createApplyFaProjectDocumentsHierarchySchemaPatch({
   documentsTableName: FA_PROJECT_TABLE_DOCUMENTS,
@@ -98,6 +99,7 @@ function applyFaProjectSchemaPatchesAtCurrentVersion (db: Database): void {
   applyFaProjectDocumentCategorySchemaPatch(db)
   applyFaProjectDocumentStatusFlagsSchemaPatch(db)
   applyFaProjectDocumentTreeOrderNumberSchemaPatch(db)
+  applyFaProjectDocumentExtraClassesSchemaPatch(db)
   applyFaProjectWorldColorEmptyAllowedSchemaPatch(db)
   applyFaProjectDocumentAppearanceEmptyColorSchemaPatch(db)
   applyFaProjectOpenedDocumentsSchemaV1(db)
@@ -127,6 +129,14 @@ function migrateFaProjectSchemaV3ToV4 (db: Database): void {
   runMigration()
 }
 
+function migrateFaProjectSchemaV4ToV5 (db: Database): void {
+  const runMigration = db.transaction(() => {
+    applyFaProjectDocumentExtraClassesSchemaPatch(db)
+    db.pragma('user_version = 5')
+  })
+  runMigration()
+}
+
 /**
  * Applies schema migrations. Fresh files bootstrap to the current revision and seed the default world.
  * Files already at the supported version run idempotent patches only.
@@ -151,6 +161,9 @@ export function applyFaProjectMigrations (
     if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 4) {
       migrateFaProjectSchemaV3ToV4(db)
     }
+    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 5) {
+      migrateFaProjectSchemaV4ToV5(db)
+    }
     applyFaProjectSchemaPatchesAtCurrentVersion(db)
     return
   }
@@ -159,11 +172,22 @@ export function applyFaProjectMigrations (
     if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 4) {
       migrateFaProjectSchemaV3ToV4(db)
     }
+    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 5) {
+      migrateFaProjectSchemaV4ToV5(db)
+    }
     applyFaProjectSchemaPatchesAtCurrentVersion(db)
     return
   }
   if (startVer === 3) {
     migrateFaProjectSchemaV3ToV4(db)
+    if (FA_PROJECT_USER_VERSION_SUPPORTED_MAX >= 5) {
+      migrateFaProjectSchemaV4ToV5(db)
+    }
+    applyFaProjectSchemaPatchesAtCurrentVersion(db)
+    return
+  }
+  if (startVer === 4) {
+    migrateFaProjectSchemaV4ToV5(db)
     applyFaProjectSchemaPatchesAtCurrentVersion(db)
     return
   }

@@ -105,6 +105,8 @@ async function seedOpenedDocumentsSnapshotForFirstWorldDocument (
           savedParentDocumentId: '',
           treeOrderNumberDraft: '',
           savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+          extraClassesDraft: '',
+          savedExtraClasses: '',
           tabLabel,
           templateIcon: 'mdi-file-document'
         }

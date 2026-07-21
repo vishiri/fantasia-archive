@@ -33,6 +33,8 @@ const previewTab: I_faOpenedDocumentTab = {
   savedParentDocumentId: '',
   treeOrderNumberDraft: '',
   savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+  extraClassesDraft: '',
+  savedExtraClasses: '',
   hasUnsavedChanges: false,
   editState: FA_OPENED_DOCUMENT_DEFAULT_EDIT_STATE,
   worldId: 'world-1'
@@ -67,7 +69,8 @@ function createHarness (tab: I_faOpenedDocumentTab | null) {
       updateIsFinishedDraft: () => {},
       updateIsMinorDraft: () => {},
       updateParentDocumentIdDraft: () => {},
-      updateTreeOrderNumberDraft: () => {}
+      updateTreeOrderNumberDraft: () => {},
+      updateExtraClassesDraft: () => {}
     }) as never,
     S_FaProjectHierarchyTree: () => ({
       patchWorldColorPalleteInLayout: () => {}
@@ -164,4 +167,18 @@ test('Test that createUseDocumentWorkspacePage wires belongs under field labels 
   expect(api.oneWayRelationshipTooltip.value).toBe('documentWorkspacePage.belongsUnderOneWayRelationshipTooltip')
   expect(api.belongsUnderFieldReadOnly.value).toBe(true)
   expect(api.belongsUnderModel.value).toBe('')
+})
+
+test('Test that createUseDocumentWorkspacePage wires extra HTML classes field and live class list', () => {
+  const tabWithClasses: I_faOpenedDocumentTab = {
+    ...previewTab,
+    extraClassesDraft: 'foo  bar',
+    savedExtraClasses: 'foo bar'
+  }
+  const api = createHarness(tabWithClasses)
+  expect(api.extraHtmlClassesFieldLabel.value).toBe('documentWorkspacePage.extraHtmlClassesFieldLabel')
+  expect(api.extraHtmlClassesFieldDescription.value).toBe('documentWorkspacePage.extraHtmlClassesFieldDescription')
+  expect(api.extraHtmlClassesFieldReadOnly.value).toBe(true)
+  expect(api.extraHtmlClassesModel.value).toBe('foo  bar')
+  expect(api.workspacePageExtraHtmlClassList.value).toEqual(['foo', 'bar'])
 })

@@ -194,8 +194,9 @@ function makeProjectContentTestDb (): {
               is_minor: args[11] as number,
               is_dead: args[12] as number,
               tree_order_number: args[13] as number,
-              created_at_ms: args[14] as number,
-              updated_at_ms: args[15] as number
+              extra_classes: args[14] as string,
+              created_at_ms: args[15] as number,
+              updated_at_ms: args[16] as number
             }
             tables.documents.set(row.id as string, row)
           }
@@ -624,7 +625,7 @@ function makeProjectContentTestDb (): {
       if (normalized.includes('UPDATE documents')) {
         return {
           run: (...args: Array<string | number | null>) => {
-            const id = args[14]! as string
+            const id = args[15]! as string
             const existing = tables.documents.get(id)
             if (existing !== undefined) {
               tables.documents.set(id, {
@@ -642,8 +643,9 @@ function makeProjectContentTestDb (): {
                 is_minor: args[10] as number,
                 is_dead: args[11] as number,
                 tree_order_number: args[12] as number,
+                extra_classes: args[13] as string,
                 created_at_ms: existing.created_at_ms as number,
-                updated_at_ms: args[13] as number
+                updated_at_ms: args[14] as number
               })
             }
           }
@@ -1916,6 +1918,25 @@ test('Test that document persist stores and updates isCategory flag', () => {
     isCategory: false
   })
   expect(demoted.isCategory).toBe(false)
+})
+
+test('Test that document persist stores and updates extraClasses', () => {
+  const { db } = makeProjectContentTestDb()
+  const world = createFaProjectWorld(db as never, { displayName: 'World' })
+  const created = createFaProjectDocument(db as never, {
+    displayName: 'Styled doc',
+    extraClasses: 'foo bar',
+    worldId: world.id
+  })
+  expect(created.extraClasses).toBe('foo bar')
+
+  const updated = updateFaProjectDocument(db as never, created.id, {
+    extraClasses: 'baz'
+  })
+  expect(updated.extraClasses).toBe('baz')
+
+  const loaded = getFaProjectDocumentById(db as never, created.id)
+  expect(loaded?.extraClasses).toBe('baz')
 })
 
 test('Test that document persist stores and updates status flags', () => {

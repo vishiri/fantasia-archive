@@ -33,6 +33,8 @@ const baseTab: I_faOpenedDocumentTab = {
   savedParentDocumentId: '',
   treeOrderNumberDraft: '',
   savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+  extraClassesDraft: '',
+  savedExtraClasses: '',
   hasUnsavedChanges: false,
   editState: false
 }
@@ -115,6 +117,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects status flag drift
     savedParentDocumentId: '',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
   })).toBe(true)
   expect(computeOpenedDocumentHasUnsavedChanges({
     displayNameDraft: 'Hero',
@@ -135,6 +139,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects status flag drift
     savedParentDocumentId: '',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
   })).toBe(true)
   expect(computeOpenedDocumentHasUnsavedChanges({
     displayNameDraft: 'Hero',
@@ -155,6 +161,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects status flag drift
     savedParentDocumentId: '',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
   })).toBe(true)
 })
 
@@ -186,6 +194,8 @@ test('Test that recomputeOpenedDocumentTabHasUnsavedChanges detects background c
     savedParentDocumentId: '',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
   })).toBe(false)
 })
 
@@ -209,6 +219,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects parent id drift',
     savedParentDocumentId: 'parent-1',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
   })).toBe(true)
 })
 
@@ -231,7 +243,9 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects tree order drift'
     savedIsDead: false,
     savedParentDocumentId: '',
     treeOrderNumberDraft: '7',
-    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: ''
   })).toBe(true)
 })
 
@@ -254,6 +268,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges treats non-finite tree or
     savedIsDead: false,
     savedParentDocumentId: '',
     treeOrderNumberDraft: 'not-a-number',
-    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: ''
   })).toBe(false)
 })

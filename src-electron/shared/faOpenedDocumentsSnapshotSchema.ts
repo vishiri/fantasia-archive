@@ -41,6 +41,8 @@ const faOpenedDocumentTabSchema = z.object({
   savedParentDocumentId: z.string().max(64).optional(),
   treeOrderNumberDraft: z.string().max(32).optional(),
   savedTreeOrderNumber: z.number().optional(),
+  extraClassesDraft: z.string().max(512).optional(),
+  savedExtraClasses: z.string().max(512).optional(),
   hasUnsavedChanges: z.boolean(),
   editState: z.boolean().default(false)
 }).strict().superRefine((tab, context) => {

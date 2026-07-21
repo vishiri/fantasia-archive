@@ -48,6 +48,25 @@ test('Test that createTemporaryOpenedDocumentTabCopySeed copies appearance color
   expect(tab.savedTreeOrderNumber).toBe(Number.MIN_SAFE_INTEGER)
 })
 
+test('Test that createTemporaryOpenedDocumentTabCopySeed copies extra HTML classes from source', () => {
+  const tab = createTemporaryOpenedDocumentTabCopySeed({
+    displayName: 'Copy of - Hero',
+    documentBackgroundColor: null,
+    documentId: 'temp-copy',
+    documentTextColor: null,
+    extraClasses: 'foo bar',
+    parentDocumentId: null,
+    tabLabel: 'Character',
+    templateIcon: 'mdi-account',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+
+  expect(tab.extraClassesDraft).toBe('foo bar')
+  expect(tab.savedExtraClasses).toBe('foo bar')
+  expect(computeOpenedDocumentHasUnsavedChanges(tab)).toBe(false)
+})
+
 test('Test that createTemporaryOpenedDocumentTabCopySeed copies Custom order from source', () => {
   const tab = createTemporaryOpenedDocumentTabCopySeed({
     displayName: 'Copy of - Hero',
@@ -152,6 +171,8 @@ test('Test that createTemporaryOpenedDocumentTabSeed marks unsaved changes only 
     savedParentDocumentId: '',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
     savedDocumentTextColor: tab.savedDocumentTextColor
   })).toBe(true)
 })
@@ -177,6 +198,29 @@ test('Test that promoteTemporaryOpenedDocumentTabAfterCreate clears temporary me
   expect(promoted.templateId).toBeUndefined()
   expect(promoted.parentDocumentId).toBeUndefined()
   expect(promoted.hasUnsavedChanges).toBe(false)
+})
+
+test('Test that promoteTemporaryOpenedDocumentTabAfterCreate copies saved extra classes', () => {
+  const tab = createTemporaryOpenedDocumentTabSeed({
+    displayName: 'Aria',
+    documentId: 'temp-1',
+    parentDocumentId: 'parent-1',
+    tabLabel: 'Character',
+    templateIcon: 'mdi-account',
+    templateId: 'tpl-1',
+    worldId: 'world-1'
+  })
+  const promoted = promoteTemporaryOpenedDocumentTabAfterCreate(tab, {
+    documentId: 'saved-1',
+    keepEditMode: false,
+    savedDisplayName: 'Aria',
+    savedDocumentTextColor: '#AABBCC',
+    savedExtraClasses: 'foo bar'
+  })
+
+  expect(promoted.savedExtraClasses).toBe('foo bar')
+  expect(promoted.extraClassesDraft).toBe('foo bar')
+  expect(promoted.documentTextColorDraft).toBe('#AABBCC')
 })
 
 test('Test that resolveTemporaryOpenedDocumentDisplayNameForSave uses the unnamed fallback', () => {
@@ -404,6 +448,8 @@ test('Test that buildTemporaryDocumentParentResolveDocumentIdsFromOpenedTab walk
     savedParentDocumentId: '',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
     savedDocumentTextColor: '',
     tabLabel: 'Character',
     templateIcon: 'mdi-account'

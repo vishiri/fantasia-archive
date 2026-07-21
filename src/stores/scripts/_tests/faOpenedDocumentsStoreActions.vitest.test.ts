@@ -22,6 +22,7 @@ import {
   applyFaOpenedDocumentParentIdSyncFromHierarchy
 } from '../faOpenedDocumentsParentIdStoreActions'
 import { applyFaOpenedDocumentTreeOrderNumberDraft } from '../faOpenedDocumentsTreeOrderNumberStoreActions'
+import { applyFaOpenedDocumentExtraClassesDraft } from '../faOpenedDocumentsExtraClassesStoreActions'
 import {
   removeFaOpenedDocumentTabAtIndex,
   resolveFaOpenedDocumentOpenFromTree,
@@ -51,6 +52,8 @@ const baseTab: I_faOpenedDocumentTab = {
   savedParentDocumentId: '',
   treeOrderNumberDraft: '',
   savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+  extraClassesDraft: '',
+  savedExtraClasses: '',
   hasUnsavedChanges: false,
   editState: false
 }
@@ -194,6 +197,8 @@ test('Test that applyFaOpenedDocumentParentIdSyncFromHierarchy clears parent dir
     savedParentDocumentId: 'old-parent',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
   }
   const synced = applyFaOpenedDocumentParentIdSyncFromHierarchy(dirtyTab, 'tree-parent')
   expect(synced.parentDocumentIdDraft).toBe('tree-parent')
@@ -204,6 +209,12 @@ test('Test that applyFaOpenedDocumentParentIdSyncFromHierarchy clears parent dir
 test('Test that applyFaOpenedDocumentTreeOrderNumberDraft marks unsaved changes when order drifts', () => {
   const next = applyFaOpenedDocumentTreeOrderNumberDraft(baseTab, '7')
   expect(next.treeOrderNumberDraft).toBe('7')
+  expect(next.hasUnsavedChanges).toBe(true)
+})
+
+test('Test that applyFaOpenedDocumentExtraClassesDraft marks unsaved changes when classes drift', () => {
+  const next = applyFaOpenedDocumentExtraClassesDraft(baseTab, 'foo bar')
+  expect(next.extraClassesDraft).toBe('foo bar')
   expect(next.hasUnsavedChanges).toBe(true)
 })
 
@@ -231,7 +242,8 @@ test('Test that applyFaOpenedDocumentTabAfterDisplayNameSave exits edit mode by 
     savedIsMinor: false,
     savedIsDead: false,
     savedParentDocumentId: '',
-    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    savedExtraClasses: ''
   })
   expect(saved.savedDisplayName).toBe('Saved Hero')
   expect(saved.hasUnsavedChanges).toBe(false)
@@ -250,7 +262,8 @@ test('Test that applyFaOpenedDocumentTabAfterDisplayNameSave can keep edit mode'
     savedIsMinor: false,
     savedIsDead: false,
     savedParentDocumentId: '',
-    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER
+    savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    savedExtraClasses: ''
   })
   expect(saved.editState).toBe(true)
 })

@@ -41,6 +41,7 @@ export type T_createUseDocumentWorkspacePageDeps = {
     updateIsMinorDraft: (documentId: string, value: boolean) => void
     updateParentDocumentIdDraft: (documentId: string, value: string) => void
     updateTreeOrderNumberDraft: (documentId: string, value: string) => void
+    updateExtraClassesDraft: (documentId: string, value: string) => void
   }
   S_FaProjectHierarchyTree: () => StoreGeneric & {
     patchWorldColorPalleteInLayout: (worldId: string, colorPallete: string) => void
@@ -180,6 +181,11 @@ export type T_useDocumentWorkspacePageApi = () => {
   orderNumberFieldLabel: I_computedRef<string>
   orderNumberFieldReadOnly: I_computedRef<boolean>
   orderNumberModel: I_computedRef<string>
+  extraHtmlClassesFieldDescription: I_computedRef<string>
+  extraHtmlClassesFieldLabel: I_computedRef<string>
+  extraHtmlClassesFieldReadOnly: I_computedRef<boolean>
+  extraHtmlClassesModel: I_computedRef<string>
+  workspacePageExtraHtmlClassList: I_computedRef<string[]>
   onAppendToWorldPalette: (colorPallete: string) => void
   previewDisplayName: I_computedRef<string>
   textColorFieldDescription: I_computedRef<string>

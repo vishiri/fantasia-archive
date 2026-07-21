@@ -72,6 +72,8 @@ const baseTab: I_faOpenedDocumentTab = {
   savedParentDocumentId: '',
   treeOrderNumberDraft: '',
   savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+  extraClassesDraft: '',
+  savedExtraClasses: '',
   hasUnsavedChanges: false,
   editState: false
 }
@@ -349,6 +351,8 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName parent move to root 
       savedParentDocumentId: 'parent-2',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
     }]
   })
   getDocumentByIdMock.mockResolvedValue({
@@ -402,6 +406,8 @@ test('Test that S_FaOpenedDocuments syncOpenedDocumentParentFromHierarchy overwr
       savedParentDocumentId: 'saved-parent',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
     }]
   })
   store.syncOpenedDocumentParentFromHierarchy('doc-1', 'tree-parent')
@@ -806,6 +812,7 @@ test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromSource seeds 
         displayName: 'Hero',
         documentBackgroundColor: '#112233',
         documentTextColor: '#AABBCC',
+        extraClasses: 'foo bar',
         id: 'doc-1',
         isCategory: true,
         isDead: false,
@@ -836,6 +843,8 @@ test('Test that S_FaOpenedDocuments createTemporaryDocumentCopyFromSource seeds 
   expect(tempTab?.hasUnsavedChanges).toBe(false)
   expect(tempTab?.documentTextColorDraft).toBe('#AABBCC')
   expect(tempTab?.documentBackgroundColorDraft).toBe('#112233')
+  expect(tempTab?.extraClassesDraft).toBe('foo bar')
+  expect(tempTab?.savedExtraClasses).toBe('foo bar')
   expect(tempTab?.isCategoryDraft).toBe(true)
   expect(tempTab?.isFinishedDraft).toBe(true)
   expect(tempTab?.isMinorDraft).toBe(true)
@@ -1071,6 +1080,8 @@ test('Test that S_FaOpenedDocuments createTemporaryDocumentUnderParentFromOpened
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       savedDocumentTextColor: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account',
@@ -1173,6 +1184,12 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName promotes a temporary
     templateId: 'tpl-1',
     worldId: 'world-1'
   })
+  createDocumentMock.mockResolvedValueOnce({
+    displayName: 'Aria',
+    extraClasses: 'foo bar',
+    id: documentId
+  })
+  store.updateExtraClassesDraft(documentId, 'foo bar')
 
   await store.saveDocumentDisplayName(documentId, { keepEditMode: false })
   await vi.runAllTimersAsync()
@@ -1191,8 +1208,11 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName promotes a temporary
     parentDocumentId: null,
     templateId: 'tpl-1',
     treeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClasses: 'foo bar',
     worldId: 'world-1'
   })
+  expect(savedTab?.savedExtraClasses).toBe('foo bar')
+  expect(savedTab?.extraClassesDraft).toBe('foo bar')
   expect(refreshHierarchyTreeNodesMock).toHaveBeenCalledWith(['placement-1'])
   expect(refreshDocumentsInTreeMock).not.toHaveBeenCalled()
 })
@@ -1249,6 +1269,8 @@ test('Test that S_FaOpenedDocuments hydrates temporary tabs from snapshot', asyn
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account',
       templateId: 'tpl-1',
@@ -1595,6 +1617,8 @@ test('Test that S_FaOpenedDocuments hydrate drops temporary tabs when world look
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       tabLabel: 'Character',
       templateIcon: 'mdi-account',
       templateId: 'tpl-1',
@@ -2331,7 +2355,8 @@ test('Test that S_FaOpenedDocuments saveDocumentDisplayName persists appearance 
     isDead: false,
     isFinished: false,
     isMinor: false,
-    treeOrderNumber: Number.MIN_SAFE_INTEGER
+    treeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClasses: ''
   })
   const tab = store.findTabByDocumentId('doc-1')
   expect(tab?.savedDocumentTextColor).toBe('#AABBCC')
@@ -2351,6 +2376,55 @@ test('Test that S_FaOpenedDocuments updateTreeOrderNumberDraft updates draft and
   expect(tab?.hasUnsavedChanges).toBe(true)
   await vi.runAllTimersAsync()
   expect(saveOpenedDocumentsSnapshotMock).toHaveBeenCalled()
+})
+
+test('Test that S_FaOpenedDocuments updateExtraClassesDraft updates draft and schedules persist', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  store.updateExtraClassesDraft('doc-1', 'foo bar')
+
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.extraClassesDraft).toBe('foo bar')
+  expect(tab?.hasUnsavedChanges).toBe(true)
+  await vi.runAllTimersAsync()
+  expect(saveOpenedDocumentsSnapshotMock).toHaveBeenCalled()
+})
+
+test('Test that S_FaOpenedDocuments updateExtraClassesDraft ignores unknown document ids', async () => {
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  store.updateExtraClassesDraft('missing-doc', 'foo bar')
+
+  expect(store.findTabByDocumentId('missing-doc')).toBeNull()
+  expect(saveOpenedDocumentsSnapshotMock).not.toHaveBeenCalled()
+})
+
+test('Test that S_FaOpenedDocuments saveDocumentDisplayName persists extraClasses draft', async () => {
+  updateDocumentMock.mockResolvedValueOnce({
+    displayName: 'Hero',
+    extraClasses: 'foo bar',
+    id: 'doc-1'
+  })
+  const { S_FaOpenedDocuments } = await import('../S_FaOpenedDocuments')
+  const store = S_FaOpenedDocuments()
+  await store.hydrateFromProjectDatabase()
+
+  store.updateExtraClassesDraft('doc-1', '  foo bar  ')
+
+  await store.saveDocumentDisplayName('doc-1', { keepEditMode: false })
+  await vi.runAllTimersAsync()
+
+  expect(updateDocumentMock).toHaveBeenCalledWith('doc-1', expect.objectContaining({
+    extraClasses: 'foo bar'
+  }))
+  const tab = store.findTabByDocumentId('doc-1')
+  expect(tab?.savedExtraClasses).toBe('foo bar')
+  expect(tab?.extraClassesDraft).toBe('foo bar')
+  expect(tab?.hasUnsavedChanges).toBe(false)
 })
 
 test('Test that S_FaOpenedDocuments hydrate defaults missing tree order from database', async () => {
@@ -2396,6 +2470,7 @@ test('Test that S_FaOpenedDocuments hydrate reconciles appearance colors from pr
     displayName: 'Hero',
     documentBackgroundColor: '#112233',
     documentTextColor: '#AABBCC',
+    extraClasses: 'foo bar',
     id: 'doc-1',
     worldId: 'world-1'
   })
@@ -2408,6 +2483,8 @@ test('Test that S_FaOpenedDocuments hydrate reconciles appearance colors from pr
   expect(tab?.savedDocumentBackgroundColor).toBe('#112233')
   expect(tab?.documentTextColorDraft).toBe('#AABBCC')
   expect(tab?.documentBackgroundColorDraft).toBe('#112233')
+  expect(tab?.savedExtraClasses).toBe('foo bar')
+  expect(tab?.extraClassesDraft).toBe('foo bar')
 })
 
 test('Test that S_FaOpenedDocuments updateIsCategoryDraft marks tabs dirty', async () => {

@@ -16,6 +16,7 @@ export interface I_faProjectDocument {
   isMinor: boolean
   isDead: boolean
   treeOrderNumber: number
+  extraClasses: string
   createdAtMs: number
   updatedAtMs: number
 }
@@ -36,6 +37,7 @@ export interface I_faProjectDocumentCreateInput {
   isMinor?: boolean | undefined
   isDead?: boolean | undefined
   treeOrderNumber?: number | undefined
+  extraClasses?: string | undefined
 }
 
 export interface I_faProjectDocumentPatch {
@@ -52,6 +54,7 @@ export interface I_faProjectDocumentPatch {
   isMinor?: boolean | undefined
   isDead?: boolean | undefined
   treeOrderNumber?: number | undefined
+  extraClasses?: string | undefined
 }
 
 export interface I_faProjectDocumentListFilter {

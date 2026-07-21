@@ -97,6 +97,7 @@ export function mapFaProjectDocumentRow (row: I_faSqlProjectDocumentRow): I_faPr
     isMinor: row.is_minor === 1,
     isDead: row.is_dead === 1,
     treeOrderNumber: row.tree_order_number,
+    extraClasses: row.extra_classes,
     createdAtMs: row.created_at_ms,
     updatedAtMs: row.updated_at_ms
   }

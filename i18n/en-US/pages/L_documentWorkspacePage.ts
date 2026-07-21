@@ -10,6 +10,9 @@ export default {
   orderNumberFieldDescription:
     'Optional display-only custom order number shown as a badge to the left of this document in the hierarchy tree. This feature can be used to manually sort documents via the order numbers or for a visual guideline for the user (for example years in a calendar).',
   orderNumberFieldLabel: 'Custom order',
+  extraHtmlClassesFieldDescription:
+    'This field exists for advanced usage by power-users who wish to style their document with globally defined CSS classes. Settings are found inside Project → Custom Project CSS.',
+  extraHtmlClassesFieldLabel: 'Extra HTML classes',
   isCategoryDescription:
     'This setting allows for setting the current document to category mode. A document with category mode toggled on will have most of its fields hidden and will not show in any other relationship searches except for "Belongs under".',
   isCategoryTitle: 'Is a category',

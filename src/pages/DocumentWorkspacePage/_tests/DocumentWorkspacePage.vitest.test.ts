@@ -46,6 +46,8 @@ const documentTabRef = vi.hoisted(() => {
     savedParentDocumentId: '',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
     hasUnsavedChanges: false,
     editState: false,
     tabLabel: 'Hero',
@@ -189,6 +191,26 @@ const orderNumberFieldDescriptionRef = vi.hoisted(() => {
   const { ref } = require('vue') as typeof import('vue')
   return ref('Order number help')
 })
+const extraHtmlClassesModelRef = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  return ref('')
+})
+const extraHtmlClassesFieldReadOnlyRef = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  return ref(true)
+})
+const extraHtmlClassesFieldLabelRef = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  return ref('Extra HTML classes')
+})
+const extraHtmlClassesFieldDescriptionRef = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  return ref('Extra HTML classes help')
+})
+const workspacePageExtraHtmlClassListRef = vi.hoisted(() => {
+  const { ref } = require('vue') as typeof import('vue')
+  return ref<string[]>([])
+})
 const onAppendToWorldPaletteMock = vi.hoisted(() => vi.fn())
 
 vi.mock('../scripts/documentWorkspacePage_manager', () => {
@@ -207,6 +229,11 @@ vi.mock('../scripts/documentWorkspacePage_manager', () => {
         documentShowsEditFields: documentShowsEditFieldsRef,
         documentShowsPreview: documentShowsPreviewRef,
         documentTab: documentTabRef,
+        extraHtmlClassesFieldDescription: extraHtmlClassesFieldDescriptionRef,
+        extraHtmlClassesFieldLabel: extraHtmlClassesFieldLabelRef,
+        extraHtmlClassesFieldReadOnly: extraHtmlClassesFieldReadOnlyRef,
+        extraHtmlClassesModel: extraHtmlClassesModelRef,
+        workspacePageExtraHtmlClassList: workspacePageExtraHtmlClassListRef,
         isCategoryDescription: isCategoryDescriptionRef,
         isCategoryModel: isCategoryModelRef,
         isCategoryTitle: isCategoryTitleRef,
@@ -279,6 +306,8 @@ beforeEach(() => {
     savedParentDocumentId: '',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
     hasUnsavedChanges: false,
     editState: false,
     tabLabel: 'Hero',
@@ -287,6 +316,11 @@ beforeEach(() => {
   }
   nameFieldLabelRef.value = 'Document name'
   previewDisplayNameRef.value = 'Hero'
+  extraHtmlClassesModelRef.value = ''
+  extraHtmlClassesFieldReadOnlyRef.value = true
+  extraHtmlClassesFieldLabelRef.value = 'Extra HTML classes'
+  extraHtmlClassesFieldDescriptionRef.value = 'Extra HTML classes help'
+  workspacePageExtraHtmlClassListRef.value = []
 })
 
 /**
@@ -328,6 +362,37 @@ test('Test that DocumentWorkspacePage renders preview title when edit fields are
   expect(wrapper.find('[data-test-locator="documentWorkspacePage-isFinishedToggle"]').attributes('data-disabled')).toBe('true')
   expect(wrapper.find('[data-test-locator="documentWorkspacePage-isMinorToggle"]').attributes('data-disabled')).toBe('true')
   expect(wrapper.find('[data-test-locator="documentWorkspacePage-isDeadToggle"]').attributes('data-disabled')).toBe('true')
+
+  wrapper.unmount()
+})
+
+test('Test that DocumentWorkspacePage binds extra HTML classes on main and renders field', async () => {
+  extraHtmlClassesModelRef.value = 'foo bar'
+  extraHtmlClassesFieldReadOnlyRef.value = false
+  workspacePageExtraHtmlClassListRef.value = ['foo', 'bar']
+
+  const wrapper = mount(DocumentWorkspacePage, {
+    global: {
+      stubs: {
+        FaColorPickerInput: true,
+        FaLabeledBooleanToggle: true,
+        QInput: {
+          props: ['modelValue', 'label', 'disable', 'readonly'],
+          template: '<input :data-test-locator="$attrs[\'data-test-locator\']" :value="modelValue" :data-readonly="readonly" />'
+        }
+      }
+    }
+  })
+  await flushPromises()
+
+  const main = wrapper.get('main.documentWorkspacePage')
+  expect(main.classes()).toContain('foo')
+  expect(main.classes()).toContain('bar')
+  expect(wrapper.find('[data-test-locator="documentWorkspacePage-extraHtmlClassesLabel"]').text()).toBe('Extra HTML classes')
+  expect(wrapper.find('[data-test-locator="documentWorkspacePage-extraHtmlClassesInput"]').attributes('value')).toBe('foo bar')
+
+  const extraHtmlClassesField = wrapper.findComponent({ name: 'DocumentWorkspacePageExtraHtmlClassesField' })
+  await extraHtmlClassesField.vm.$emit('update:extraHtmlClassesModel', 'updated-classes')
 
   wrapper.unmount()
 })

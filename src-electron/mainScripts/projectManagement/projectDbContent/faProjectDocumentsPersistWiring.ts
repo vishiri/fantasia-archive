@@ -2,6 +2,7 @@ import type Database from 'better-sqlite3'
 
 import {
   FA_PROJECT_DOCUMENT_BACKGROUND_COLOR_COLUMN,
+  FA_PROJECT_DOCUMENT_EXTRA_CLASSES_COLUMN,
   FA_PROJECT_DOCUMENT_IS_CATEGORY_COLUMN,
   FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN,
   FA_PROJECT_DOCUMENT_IS_FINISHED_COLUMN,
@@ -21,6 +22,10 @@ import {
   resolveFaProjectDocumentTreeOrderNumberForCreateInput,
   resolveFaProjectDocumentTreeOrderNumberForUpdate
 } from '../functions/faProjectDocumentTreeOrderNumberSql'
+import {
+  resolveFaProjectDocumentExtraClassesForCreateInput,
+  resolveFaProjectDocumentExtraClassesForUpdate
+} from '../functions/faProjectDocumentExtraClassesSql'
 import {
   resolveFaProjectDocumentAppearanceColorsForCreate,
   resolveFaProjectDocumentAppearanceColorsForUpdate
@@ -86,6 +91,7 @@ export function createFaProjectDocument (
     isMinor
   } = resolveFaProjectDocumentBooleanFlagsForCreateInput(input)
   const treeOrderNumber = resolveFaProjectDocumentTreeOrderNumberForCreateInput(input)
+  const extraClasses = resolveFaProjectDocumentExtraClassesForCreateInput(input)
   const nowMs = Date.now()
   const id = resolveFaProjectDocumentIdForCreate(db, input.id)
   db.prepare(
@@ -101,8 +107,9 @@ export function createFaProjectDocument (
       `${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN}, ` +
       `${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN}, ` +
       `${FA_PROJECT_DOCUMENT_TREE_ORDER_NUMBER_COLUMN}, ` +
+      `${FA_PROJECT_DOCUMENT_EXTRA_CLASSES_COLUMN}, ` +
       'created_at_ms, updated_at_ms) ' +
-      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
   ).run(
     id,
     input.worldId,
@@ -118,6 +125,7 @@ export function createFaProjectDocument (
     isMinor,
     isDead,
     treeOrderNumber,
+    extraClasses,
     nowMs,
     nowMs
   )
@@ -162,6 +170,7 @@ export function updateFaProjectDocument (
     isMinor: nextIsMinor
   } = resolveFaProjectDocumentBooleanFlagsForUpdate(patch, existingRow)
   const nextTreeOrderNumber = resolveFaProjectDocumentTreeOrderNumberForUpdate(patch, existingRow)
+  const nextExtraClasses = resolveFaProjectDocumentExtraClassesForUpdate(patch, existingRow)
   const nowMs = Date.now()
   db.prepare(
     `UPDATE ${FA_PROJECT_TABLE_DOCUMENTS} SET world_id = ?, template_id = ?, ` +
@@ -176,6 +185,7 @@ export function updateFaProjectDocument (
       `${FA_PROJECT_DOCUMENT_IS_MINOR_COLUMN} = ?, ` +
       `${FA_PROJECT_DOCUMENT_IS_DEAD_COLUMN} = ?, ` +
       `${FA_PROJECT_DOCUMENT_TREE_ORDER_NUMBER_COLUMN} = ?, ` +
+      `${FA_PROJECT_DOCUMENT_EXTRA_CLASSES_COLUMN} = ?, ` +
       'updated_at_ms = ? WHERE id = ?'
   ).run(
     nextWorldId,
@@ -191,6 +201,7 @@ export function updateFaProjectDocument (
     nextIsMinor,
     nextIsDead,
     nextTreeOrderNumber,
+    nextExtraClasses,
     nowMs,
     id
   )

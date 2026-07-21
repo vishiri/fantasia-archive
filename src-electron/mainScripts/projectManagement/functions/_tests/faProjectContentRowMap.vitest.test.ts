@@ -66,6 +66,7 @@ test('Test that mapFaProjectDocumentRow maps template_id null', () => {
     is_minor: 0,
     is_dead: 0,
     tree_order_number: Number.MIN_SAFE_INTEGER,
+    extra_classes: '',
     created_at_ms: 3,
     updated_at_ms: 4
   })

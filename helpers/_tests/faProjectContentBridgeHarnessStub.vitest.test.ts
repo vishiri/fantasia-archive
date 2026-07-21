@@ -51,7 +51,8 @@ const stubDocumentShape = {
   isDead: false,
   documentTextColor: null,
   documentBackgroundColor: null,
-  treeOrderNumber: Number.MIN_SAFE_INTEGER
+  treeOrderNumber: Number.MIN_SAFE_INTEGER,
+  extraClasses: ''
 }
 
 /**

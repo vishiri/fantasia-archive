@@ -20,6 +20,15 @@ function mapSavedAppearanceColorFromDb (
   return value
 }
 
+function mapSavedExtraClassesFromDb (
+  value: string | null | undefined
+): string {
+  if (value === null || value === undefined) {
+    return ''
+  }
+  return value
+}
+
 /**
  * Seeds a temporary opened document tab copied from a source document or opened tab.
  * Starts clean like other temporary documents; drafts mark dirty on edit.
@@ -40,6 +49,7 @@ export function createTemporaryOpenedDocumentTabCopySeed (input: {
   templateId: string
   temporaryParentResolveDocumentIds?: readonly string[] | undefined
   treeOrderNumber?: number | null | undefined
+  extraClasses?: string | null | undefined
   worldId: string
 }): I_faOpenedDocumentTab {
   const documentTextColor = mapSavedAppearanceColorFromDb(input.documentTextColor)
@@ -58,6 +68,7 @@ export function createTemporaryOpenedDocumentTabCopySeed (input: {
   const isFinished = input.isFinished === true
   const isMinor = input.isMinor === true
   const isDead = input.isDead === true
+  const savedExtraClasses = mapSavedExtraClassesFromDb(input.extraClasses)
   return {
     displayNameDraft: input.displayName,
     documentId: input.documentId,
@@ -82,6 +93,8 @@ export function createTemporaryOpenedDocumentTabCopySeed (input: {
     savedIsDead: isDead,
     treeOrderNumberDraft,
     savedTreeOrderNumber,
+    extraClassesDraft: savedExtraClasses,
+    savedExtraClasses,
     tabLabel: input.tabLabel,
     templateIcon: input.templateIcon,
     templateId: input.templateId,
@@ -128,6 +141,8 @@ export function createTemporaryOpenedDocumentTabSeed (input: {
     savedIsDead: false,
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
     tabLabel: input.tabLabel,
     templateIcon: input.templateIcon,
     templateId: input.templateId,

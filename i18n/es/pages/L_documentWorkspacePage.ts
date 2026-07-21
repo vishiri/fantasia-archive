@@ -10,6 +10,9 @@ export default {
   orderNumberFieldDescription:
     'Optional display-only order number shown as a badge to the left of this document in the hierarchy tree. Pad numbers with leading zeros when you want consistent badge width (for example 01, 02, 10). This does not change how siblings are sorted in the tree.',
   orderNumberFieldLabel: 'Order number',
+  extraHtmlClassesFieldDescription:
+    'This field exists for advanced usage by power-users who wish to style their document with globally defined CSS classes. Settings are found inside Project → Custom Project CSS.',
+  extraHtmlClassesFieldLabel: 'Extra HTML classes',
   isCategoryDescription:
     'Este ajuste activa el modo categoría del documento actual. Un documento en modo categoría oculta la mayoría de sus campos y no aparece en otras búsquedas de relaciones excepto Pertenece a.',
   isCategoryTitle: 'Es una categoría',

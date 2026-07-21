@@ -1,6 +1,7 @@
 <template>
   <main
     class="documentWorkspacePage q-page column no-wrap q-pa-xl"
+    :class="workspacePageExtraHtmlClassList"
     data-test-locator="documentWorkspacePage"
   >
     <h4
@@ -94,6 +95,14 @@
       </div>
     </div>
 
+    <DocumentWorkspacePageExtraHtmlClassesField
+      v-model:extra-html-classes-model="extraHtmlClassesModel"
+      :document-tab="documentTab"
+      :extra-html-classes-field-description="extraHtmlClassesFieldDescription"
+      :extra-html-classes-field-label="extraHtmlClassesFieldLabel"
+      :extra-html-classes-field-read-only="extraHtmlClassesFieldReadOnly"
+    />
+
     <DocumentWorkspacePageOrderNumberField
       v-model:order-number-model="orderNumberModel"
       :document-tab="documentTab"
@@ -152,6 +161,7 @@ import FaColorPickerInput from 'app/src/components/elements/FaColorPickerInput/F
 import FaLabeledBooleanToggle from 'app/src/components/elements/FaLabeledBooleanToggle/FaLabeledBooleanToggle.vue'
 
 import DocumentWorkspacePageBelongsUnderField from './DocumentWorkspacePageBelongsUnderField.vue'
+import DocumentWorkspacePageExtraHtmlClassesField from './DocumentWorkspacePageExtraHtmlClassesField.vue'
 import DocumentWorkspacePageOrderNumberField from './DocumentWorkspacePageOrderNumberField.vue'
 import { useDocumentWorkspacePage } from './scripts/documentWorkspacePage_manager'
 
@@ -172,6 +182,11 @@ const {
   documentShowsEditFields,
   documentShowsPreview,
   documentTab,
+  extraHtmlClassesFieldDescription,
+  extraHtmlClassesFieldLabel,
+  extraHtmlClassesFieldReadOnly,
+  extraHtmlClassesModel,
+  workspacePageExtraHtmlClassList,
   isCategoryDescription,
   isCategoryModel,
   isCategoryTitle,

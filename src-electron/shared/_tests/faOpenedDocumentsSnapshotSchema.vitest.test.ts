@@ -32,6 +32,8 @@ test('Test that parseFaOpenedDocumentsSnapshotJson accepts a valid snapshot payl
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       hasUnsavedChanges: true
     }]
   })
@@ -73,6 +75,8 @@ test('Test that parseFaOpenedDocumentsSnapshotJson defaults editState to preview
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       hasUnsavedChanges: true
     }]
   })
@@ -115,6 +119,8 @@ test('Test that parseFaOpenedDocumentsSnapshotJson reads v1 tabs without persist
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       hasUnsavedChanges: false,
       editState: false
     }]
@@ -153,6 +159,8 @@ test('Test that parseFaOpenedDocumentsSnapshotJson accepts temporary tabs with m
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       hasUnsavedChanges: true,
       editState: true
     }]
@@ -194,6 +202,8 @@ test('Test that parseFaOpenedDocumentsSnapshotJson accepts temporary tabs with p
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       hasUnsavedChanges: false,
       editState: true
     }]
@@ -236,6 +246,8 @@ test('Test that parseFaOpenedDocumentsSnapshotPayload accepts temporaryParentRes
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       hasUnsavedChanges: false,
       editState: true
     }]
@@ -271,6 +283,8 @@ test('Test that faOpenedDocumentsSnapshotSchema rejects temporary tabs missing w
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       hasUnsavedChanges: true,
       editState: true
     }]
@@ -304,12 +318,51 @@ test('Test that serializeFaOpenedDocumentsSnapshotJson writes schemaVersion 2', 
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       hasUnsavedChanges: false,
       editState: false
     }]
   })
   const parsed = JSON.parse(serialized) as { schemaVersion: number }
   expect(parsed.schemaVersion).toBe(2)
+})
+
+test('Test that faOpenedDocumentsSnapshotSchema round-trips extra HTML classes fields', () => {
+  const snapshot = faOpenedDocumentsSnapshotSchema.parse({
+    schemaVersion: 2,
+    activeDocumentId: 'doc-1',
+    tabs: [{
+      documentId: 'doc-1',
+      persistenceState: 'persisted',
+      tabLabel: 'Doc',
+      templateIcon: 'mdi-feather',
+      displayNameDraft: 'Draft',
+      savedDisplayName: 'Saved',
+      documentTextColorDraft: '',
+      savedDocumentTextColor: '',
+      documentBackgroundColorDraft: '',
+      savedDocumentBackgroundColor: '',
+      isCategoryDraft: false,
+      savedIsCategory: false,
+      isFinishedDraft: false,
+      isMinorDraft: false,
+      isDeadDraft: false,
+      savedIsFinished: false,
+      savedIsMinor: false,
+      savedIsDead: false,
+      parentDocumentIdDraft: '',
+      savedParentDocumentId: '',
+      treeOrderNumberDraft: '',
+      savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: 'foo bar',
+      savedExtraClasses: 'foo bar',
+      hasUnsavedChanges: false,
+      editState: false
+    }]
+  })
+  expect(snapshot.tabs[0]?.extraClassesDraft).toBe('foo bar')
+  expect(snapshot.tabs[0]?.savedExtraClasses).toBe('foo bar')
 })
 
 test('Test that parseFaOpenedDocumentsSnapshotPayload rejects non-object payloads', () => {

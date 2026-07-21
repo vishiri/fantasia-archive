@@ -35,6 +35,8 @@ export interface I_openedDocumentTabUnsavedCompareInput {
   savedParentDocumentId: string,
   treeOrderNumberDraft: string
   savedTreeOrderNumber: number
+  extraClassesDraft: string
+  savedExtraClasses: string
 }
 
 /** One open document tab in the workspace session. */
@@ -75,6 +77,9 @@ export interface I_faOpenedDocumentTab {
   /** Empty string = no order number (empty sentinel in SQLite). */
   treeOrderNumberDraft: string
   savedTreeOrderNumber: number
+  /** Space-separated HTML class list for Custom Project CSS targeting. */
+  extraClassesDraft: string
+  savedExtraClasses: string
   hasUnsavedChanges: boolean
   /**
    * Per-tab workspace edit mode. false = preview (read-only presentation);

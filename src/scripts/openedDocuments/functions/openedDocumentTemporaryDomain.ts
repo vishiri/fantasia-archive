@@ -24,6 +24,15 @@ function mapSavedAppearanceColorFromDb (
   return value
 }
 
+function mapSavedExtraClassesFromDb (
+  value: string | null | undefined
+): string {
+  if (value === null || value === undefined) {
+    return ''
+  }
+  return value
+}
+
 /**
  * Whether the tab exists only in session until first save.
  */
@@ -99,6 +108,7 @@ export function promoteTemporaryOpenedDocumentTabAfterCreate (
     savedIsDead?: boolean | undefined
     savedParentDocumentId?: string | null | undefined
     savedTreeOrderNumber?: number | undefined
+    savedExtraClasses?: string | null | undefined
   }
 ): I_faOpenedDocumentTab {
   const savedDocumentTextColor = mapSavedAppearanceColorFromDb(
@@ -118,6 +128,7 @@ export function promoteTemporaryOpenedDocumentTabAfterCreate (
   const treeOrderNumberDraft = savedTreeOrderNumber === FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY
     ? ''
     : String(savedTreeOrderNumber)
+  const savedExtraClasses = mapSavedExtraClassesFromDb(input.savedExtraClasses)
   return {
     ...tab,
     displayNameDraft: input.savedDisplayName,
@@ -143,6 +154,8 @@ export function promoteTemporaryOpenedDocumentTabAfterCreate (
     savedIsDead,
     savedTreeOrderNumber,
     treeOrderNumberDraft,
+    extraClassesDraft: savedExtraClasses,
+    savedExtraClasses,
     templateId: undefined,
     temporaryParentResolveDocumentIds: undefined,
     worldId: tab.worldId

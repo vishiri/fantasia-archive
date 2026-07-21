@@ -26,6 +26,8 @@ const keybindSaveSession = vi.hoisted(() => ({
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       hasUnsavedChanges: true,
       editState: true
     }
@@ -74,6 +76,8 @@ beforeEach(() => {
     savedParentDocumentId: '',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
     hasUnsavedChanges: true,
     editState: true
   }

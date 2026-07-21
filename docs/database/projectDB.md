@@ -17,10 +17,11 @@ Flattened to a single bootstrap revision during pre-release dev. No upgrade ladd
 | **2** | Adds **`documents.is_category`** (`INTEGER NOT NULL DEFAULT 0`, `CHECK (is_category IN (0, 1))`). Idempotent **`applyFaProjectDocumentCategorySchemaPatch`** runs on every open at version **2** for legacy files missing the column. Idempotent **`applyFaProjectWorldColorEmptyAllowedSchemaPatch`** rebuilds **`worlds`** when **`color`** CHECK still requires strict **`#RRGGBB`** (no empty), so optional empty world color can persist. Idempotent **`applyFaProjectDocumentAppearanceEmptyColorSchemaPatch`** rebuilds **`documents`** when appearance color CHECKs still reject empty string (NULL-or-hex only). |
 | **3** | Adds **`documents.is_finished`**, **`documents.is_minor`**, **`documents.is_dead`** (each `INTEGER NOT NULL DEFAULT 0`, `CHECK (… IN (0, 1))`). Idempotent **`applyFaProjectDocumentStatusFlagsSchemaPatch`** runs on every open at version **3** for legacy files missing any column. |
 | **4** | Adds **`documents.tree_order_number`** (`INTEGER NOT NULL DEFAULT -9007199254740991`, empty sentinel = **`Number.MIN_SAFE_INTEGER`**). Display-only hierarchy badge value; **does not** change sibling sort (**`tree_custom_sort_order`** only). Idempotent **`applyFaProjectDocumentTreeOrderNumberSchemaPatch`** runs on every open at version **4** for legacy files missing the column. |
+| **5** | Adds **`documents.extra_classes`** (`TEXT NOT NULL DEFAULT ''`, max length **512**). Space-separated HTML class list for **Custom Project CSS** targeting on the document workspace page. Idempotent **`applyFaProjectDocumentExtraClassesSchemaPatch`** runs on every open at version **5** for legacy files missing the column. |
 
-**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 4`** in **`faProjectDbMigrateWiring.ts`**.
+**Supported max:** **`FA_PROJECT_USER_VERSION_SUPPORTED_MAX = 5`** in **`faProjectDbMigrateWiring.ts`**.
 
-**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v4** + seed a default **world** when empty; files at **v4** run idempotent patches only; files at **v3** migrate to **v4** then run patches; files at **v2** migrate **v2→v3→v4** then run patches; files at **v1** migrate **v1→v2→v3→v4** then run patches. Any other version is unsupported and throws. Older pre-release dev **`.faproject`** files must be recreated after a flatten.
+**Migration entry:** **`applyFaProjectMigrations(db, displayProjectName)`** — fresh files start at **0**, bootstrap to **v5** + seed a default **world** when empty; files at **v5** run idempotent patches only; files at **v4** migrate to **v5** then run patches; files at **v3** migrate **v3→v4→v5** then run patches; files at **v2** migrate **v2→v3→v4→v5** then run patches; files at **v1** migrate **v1→v2→v3→v4→v5** then run patches. Any other version is unsupported and throws. Older pre-release dev **`.faproject`** files must be recreated after a flatten.
 
 **Worlds vs document templates on create:** **`seedFaProjectDefaultWorldIfEmpty`** runs after bootstrap and inserts one default **world** when the table is empty. **Document templates are never auto-seeded** — a new **`.faproject`** may have zero **`document_templates`** rows until the user adds them in **Project Settings**.
 
@@ -105,6 +106,7 @@ Index: **`idx_document_templates_sort_order`**. Unlike **worlds**, new projects 
 | `is_minor` | INTEGER NOT NULL DEFAULT 0 | `CHECK (is_minor IN (0, 1))`; minor document flag (muted tree/tab label when no custom text color) |
 | `is_dead` | INTEGER NOT NULL DEFAULT 0 | `CHECK (is_dead IN (0, 1))`; dead/gone/destroyed flag (dagger prefix + strikethrough on tree/tab label) |
 | `tree_order_number` | INTEGER NOT NULL DEFAULT -9007199254740991 | Display-only order badge in hierarchy tree; empty UI → sentinel **`Number.MIN_SAFE_INTEGER`**; does **not** affect sibling sort |
+| `extra_classes` | TEXT NOT NULL DEFAULT '' | Space-separated HTML class list applied on the document workspace page; max length **512**; styled via **Custom Project CSS** |
 | `created_at_ms`, `updated_at_ms` | INTEGER | |
 
 **World → documents (1:N):** enforced by required **`world_id`**. Deleting a **world** that still has **documents** fails at the database (**RESTRICT**).

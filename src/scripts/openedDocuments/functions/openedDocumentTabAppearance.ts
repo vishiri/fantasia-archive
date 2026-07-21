@@ -58,7 +58,8 @@ export function computeOpenedDocumentHasUnsavedChanges (
     input.isDeadDraft !== input.savedIsDead ||
     input.parentDocumentIdDraft !== input.savedParentDocumentId ||
     resolveOpenedDocumentTreeOrderNumberDraftForCompare(input.treeOrderNumberDraft) !==
-      input.savedTreeOrderNumber
+      input.savedTreeOrderNumber ||
+    input.extraClassesDraft !== input.savedExtraClasses
   )
 }
 
@@ -85,7 +86,9 @@ export function normalizeOpenedDocumentTabAppearanceColors (
     parentDocumentIdDraft: tab.parentDocumentIdDraft ?? '',
     savedParentDocumentId: tab.savedParentDocumentId ?? '',
     treeOrderNumberDraft: tab.treeOrderNumberDraft ?? '',
-    savedTreeOrderNumber: tab.savedTreeOrderNumber ?? FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY
+    savedTreeOrderNumber: tab.savedTreeOrderNumber ?? FA_DOCUMENT_TREE_ORDER_NUMBER_EMPTY,
+    extraClassesDraft: tab.extraClassesDraft ?? '',
+    savedExtraClasses: tab.savedExtraClasses ?? ''
   }
 }
 
@@ -113,6 +116,8 @@ export function recomputeOpenedDocumentTabHasUnsavedChanges (
     parentDocumentIdDraft: tab.parentDocumentIdDraft,
     savedParentDocumentId: tab.savedParentDocumentId,
     treeOrderNumberDraft: tab.treeOrderNumberDraft,
-    savedTreeOrderNumber: tab.savedTreeOrderNumber
+    savedTreeOrderNumber: tab.savedTreeOrderNumber,
+    extraClassesDraft: tab.extraClassesDraft,
+    savedExtraClasses: tab.savedExtraClasses
   })
 }

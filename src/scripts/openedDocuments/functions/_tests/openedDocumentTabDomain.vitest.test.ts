@@ -38,6 +38,8 @@ const sampleTab: I_faOpenedDocumentTab = {
   savedParentDocumentId: '',
   treeOrderNumberDraft: '',
   savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+  extraClassesDraft: '',
+  savedExtraClasses: '',
   hasUnsavedChanges: true,
   editState: false
 }
@@ -64,6 +66,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges compares draft to saved b
     savedParentDocumentId: '',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
     savedDocumentTextColor: ''
   })).toBe(true)
   expect(computeOpenedDocumentHasUnsavedChanges({
@@ -84,6 +88,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges compares draft to saved b
     savedParentDocumentId: '',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
     savedDocumentTextColor: ''
   })).toBe(false)
 })
@@ -107,6 +113,8 @@ test('Test that computeOpenedDocumentHasUnsavedChanges detects color draft chang
     savedParentDocumentId: '',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
     savedDocumentTextColor: ''
   })).toBe(true)
 })

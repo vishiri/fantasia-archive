@@ -48,6 +48,7 @@ export interface I_faSqlProjectDocumentRow {
   is_minor: number
   is_dead: number
   tree_order_number: number
+  extra_classes: string
   created_at_ms: number
   updated_at_ms: number
 }

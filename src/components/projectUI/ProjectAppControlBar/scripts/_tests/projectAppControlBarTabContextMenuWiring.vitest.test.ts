@@ -27,6 +27,8 @@ function createPersistedTab (overrides: Partial<I_faOpenedDocumentTab> = {}): I_
     savedParentDocumentId: '',
     treeOrderNumberDraft: '',
     savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+    extraClassesDraft: '',
+    savedExtraClasses: '',
     savedDocumentTextColor: '',
     tabLabel: 'Character',
     templateIcon: 'mdi-account',
@@ -167,6 +169,8 @@ test('Test that buildProjectAppControlBarTabContextMenuHandlers skips color copy
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       savedDocumentTextColor: '#AABBCC'
     }),
     runFaAction

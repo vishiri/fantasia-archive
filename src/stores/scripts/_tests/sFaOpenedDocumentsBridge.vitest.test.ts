@@ -80,6 +80,8 @@ test('Test that faOpenedDocumentsPersistSnapshotFromBridge serializes nested tab
       savedParentDocumentId: '',
       treeOrderNumberDraft: '',
       savedTreeOrderNumber: Number.MIN_SAFE_INTEGER,
+      extraClassesDraft: '',
+      savedExtraClasses: '',
       hasUnsavedChanges: false,
       editState: true
     }]

@@ -10,6 +10,9 @@ export default {
   orderNumberFieldDescription:
     'Optional display-only order number shown as a badge to the left of this document in the hierarchy tree. Pad numbers with leading zeros when you want consistent badge width (for example 01, 02, 10). This does not change how siblings are sorted in the tree.',
   orderNumberFieldLabel: 'Order number',
+  extraHtmlClassesFieldDescription:
+    'This field exists for advanced usage by power-users who wish to style their document with globally defined CSS classes. Settings are found inside Project → Custom Project CSS.',
+  extraHtmlClassesFieldLabel: 'Extra HTML classes',
   isCategoryDescription:
     'この設定で現在のドキュメントをカテゴリモードにできます。カテゴリモードのドキュメントはほとんどのフィールドを非表示にし、「所属先」以外の関係検索には表示されません。',
   isCategoryTitle: 'カテゴリである',
