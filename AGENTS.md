@@ -81,7 +81,7 @@ Not required to build/ship app. **caveman** → [`.cursor/rules/caveman-default.
 | Unit | Vitest — **`yarn test:unit`**; **`coverage.thresholds.perFile: true`** — each instrumented file **95/80/100/95** (stmts/branches/funcs/lines); dev edits → [fantasia-dev-scoped-verify](.cursor/skills/fantasia-dev-scoped-verify/SKILL.md); full **`yarn testbatch:verify`** at cleanup/commit |
 | UI/E2E | Playwright — rebuild Electron before runs |
 | Storybook | 10 — **`.storybook-workspace/`** |
-| DB | **`better-sqlite3`**; **`.faproject`** SQLite **`user_version` max 4** — see [projectDB.md](docs/database/projectDB.md) |
+| DB | **`better-sqlite3`**; **`.faproject`** SQLite **`user_version` max 5** — see [projectDB.md](docs/database/projectDB.md) |
 
 ## Subsystems (pointers)
 
