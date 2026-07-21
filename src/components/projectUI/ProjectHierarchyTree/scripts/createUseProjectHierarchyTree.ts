@@ -15,11 +15,16 @@ import type {
   I_faProjectHierarchyTreeWorkspaceWorld
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
+import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
+import { resolveProjectHierarchyTreeForceSublevelCollapse } from '../functions/projectHierarchyTreeForceSublevelCollapse'
 import { createProjectHierarchyTreeSessionWiring } from './projectHierarchyTreeSessionWiring'
 import { createProjectHierarchyTreeDocumentButtonGroupWiring } from './projectHierarchyTreeDocumentButtonGroupWiring'
 import { createProjectHierarchyTreeTreeLineWiring } from './projectHierarchyTreeTreeLineWiring'
 import { createProjectHierarchyTreePlacementCountWiring } from './projectHierarchyTreePlacementCountWiring'
 import { createProjectHierarchyTreeOrderNumberBadgeWiring } from './projectHierarchyTreeOrderNumberBadgeWiring'
+import { createProjectHierarchyTreeProjectNameTitleWiring } from './projectHierarchyTreeProjectNameTitleWiring'
+import { createProjectHierarchyTreeNodeDisplayBindings } from './projectHierarchyTreeNodeDisplayBindingsWiring'
+import { createProjectHierarchyTreeSettingsSurfaceWiring } from './projectHierarchyTreeSettingsSurfaceWiring'
 
 import type {
   I_faOpenedDocumentTreeOpenMeta,
@@ -40,7 +45,9 @@ type T_useProjectHierarchyTree = (
   ReturnType<typeof createProjectHierarchyTreeDocumentButtonGroupWiring> &
   ReturnType<typeof createProjectHierarchyTreeTreeLineWiring> &
   ReturnType<typeof createProjectHierarchyTreePlacementCountWiring> &
-  ReturnType<typeof createProjectHierarchyTreeOrderNumberBadgeWiring> & {
+  ReturnType<typeof createProjectHierarchyTreeOrderNumberBadgeWiring> &
+  ReturnType<typeof createProjectHierarchyTreeProjectNameTitleWiring> &
+  ReturnType<typeof createProjectHierarchyTreeNodeDisplayBindings> & {
     activeDocumentId: Ref<string | null>
   }
 
@@ -65,7 +72,15 @@ export function createUseProjectHierarchyTree (deps: {
 }): T_useProjectHierarchyTree {
   return function useProjectHierarchyTree (opts) {
     const hierarchyStore = deps.S_FaProjectHierarchyTree()
-    const { layoutRefreshGeneration, pendingDocumentRefreshIds, pendingHierarchyNodeRefreshIds, pendingRevealPath, treeData, uiState, worlds } = deps.storeToRefs(hierarchyStore)
+    const {
+      layoutRefreshGeneration,
+      pendingDocumentRefreshIds,
+      pendingHierarchyNodeRefreshIds,
+      pendingRevealPath,
+      treeData,
+      uiState,
+      worlds
+    } = deps.storeToRefs(hierarchyStore)
     const route = deps.useRoute()
     const activeDocumentId = deps.computed((): string | null => {
       return deps.resolveFaDocumentWorkspaceRouteDocumentId(route.path ?? '')
@@ -86,6 +101,16 @@ export function createUseProjectHierarchyTree (deps: {
       pendingHierarchyNodeRefreshIds: pendingHierarchyNodeRefreshIds as Ref<string[]>,
       pendingRevealPath: pendingRevealPath as Ref<string[]>,
       ref: deps.ref,
+      resolveForceSublevelCollapseInTree: () => {
+        const userSettingsStore = deps.S_FaUserSettings()
+        return resolveProjectHierarchyTreeForceSublevelCollapse(
+          userSettingsStore.settings,
+          userSettingsStore.appSettingsDialogPreview,
+          {
+            forceSublevelCollapseInTree: FA_USER_SETTINGS_DEFAULTS.forceSublevelCollapseInTree
+          }
+        )
+      },
       resolvePreferredLanguageCode: () => deps.S_FaUserSettings().settings?.languageCode ?? 'en-US',
       runFaAction: deps.runFaAction,
       treeData: treeData as Ref<I_faProjectHierarchyTreeHeTreeNode[]>,
@@ -94,38 +119,24 @@ export function createUseProjectHierarchyTree (deps: {
       worlds: worlds as Ref<I_faProjectHierarchyTreeWorkspaceWorld[]>
     })
 
-    const documentButtonGroupWiring = createProjectHierarchyTreeDocumentButtonGroupWiring({
+    const settingsSurface = createProjectHierarchyTreeSettingsSurfaceWiring({
+      S_FaActiveProject: deps.S_FaActiveProject,
       S_FaUserSettings: deps.S_FaUserSettings,
       computed: deps.computed,
       runFaAction: deps.runFaAction,
-      storeToRefs: deps.storeToRefs
-    })
-
-    const treeLineWiring = createProjectHierarchyTreeTreeLineWiring({
-      S_FaUserSettings: deps.S_FaUserSettings,
-      computed: deps.computed,
-      storeToRefs: deps.storeToRefs
-    })
-
-    const placementCountWiring = createProjectHierarchyTreePlacementCountWiring({
-      S_FaUserSettings: deps.S_FaUserSettings,
-      computed: deps.computed,
-      storeToRefs: deps.storeToRefs
-    })
-
-    const orderNumberBadgeWiring = createProjectHierarchyTreeOrderNumberBadgeWiring({
-      S_FaUserSettings: deps.S_FaUserSettings,
-      computed: deps.computed,
-      storeToRefs: deps.storeToRefs
+      storeToRefs: deps.storeToRefs,
+      worlds: worlds as Ref<I_faProjectHierarchyTreeWorkspaceWorld[]>
     })
 
     return {
       activeDocumentId,
       ...sessionApi,
-      ...documentButtonGroupWiring,
-      ...treeLineWiring,
-      ...placementCountWiring,
-      ...orderNumberBadgeWiring
+      ...settingsSurface.documentButtonGroupWiring,
+      ...settingsSurface.treeLineWiring,
+      ...settingsSurface.placementCountWiring,
+      ...settingsSurface.orderNumberBadgeWiring,
+      ...settingsSurface.projectNameTitleWiring,
+      ...settingsSurface.nodeDisplayBindings
     }
   }
 }

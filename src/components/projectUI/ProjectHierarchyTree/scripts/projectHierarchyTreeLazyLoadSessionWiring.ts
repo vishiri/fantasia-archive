@@ -27,6 +27,7 @@ export function createProjectHierarchyTreeLazyLoadSessionWiring (deps: {
   dragExpandUiFrozen: Ref<boolean>
   flushUiStatePersist: () => void
   getExpandedNodeIds: () => string[]
+  getForceSublevelCollapseInTree: () => boolean
   getPendingRevealPath: () => string[]
   getPreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
   getScrollTopPx: () => number
@@ -94,6 +95,7 @@ export function createProjectHierarchyTreeLazyLoadSessionWiring (deps: {
     flushDeferredTreeRevisionPublish: () => lazyLoadWiring.flushDeferredTreeRevisionPublish(),
     flushUiStatePersist: deps.flushUiStatePersist,
     getExpandedNodeIds: deps.getExpandedNodeIds,
+    getForceSublevelCollapseInTree: deps.getForceSublevelCollapseInTree,
     getPendingRevealPath: deps.getPendingRevealPath,
     getScrollTopPx: deps.getScrollTopPx,
     getTreeRef: deps.getTreeRef,

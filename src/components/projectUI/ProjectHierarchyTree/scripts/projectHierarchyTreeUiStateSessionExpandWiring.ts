@@ -31,9 +31,21 @@ async function reapplyUiStateSessionLatentDescendantExpandState (
   })
 }
 
+function syncHeTreeAfterForceSublevelCollapse (deps: {
+  getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
+  reapplyHeTreeOpenState: () => void
+  suppressTreeEmit: Ref<boolean>
+}): void {
+  deps.suppressTreeEmit.value = true
+  deps.getTreeRef()?.closeAll()
+  deps.reapplyHeTreeOpenState()
+  deps.suppressTreeEmit.value = false
+}
+
 export function createProjectHierarchyTreeUiStateSessionExpandWiring (deps: {
   commitStagedLoadedChildren: () => boolean
   flushDeferredTreeRevisionPublish: () => void | Promise<void>
+  getForceSublevelCollapseInTree: () => boolean
   getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
   loadChildrenAlongRevealPath: (nodeIds: string[]) => Promise<void>
   nextTick: () => Promise<void>
@@ -74,13 +86,22 @@ export function createProjectHierarchyTreeUiStateSessionExpandWiring (deps: {
   }
 
   function markNodeClosed (nodeId: string, node: I_faProjectHierarchyTreeHeTreeNode): void {
+    const forceSublevelCollapseInTree = deps.getForceSublevelCollapseInTree()
     markProjectHierarchyTreeNodeClosed({
+      forceSublevelCollapseInTree,
       node,
       nodeId,
       openNodeIds: deps.openNodeIds,
       queuePersistExpandedNodeIds: deps.queuePersistExpandedNodeIds,
       treeData: deps.treeData
     })
+    if (forceSublevelCollapseInTree) {
+      syncHeTreeAfterForceSublevelCollapse({
+        getTreeRef: deps.getTreeRef,
+        reapplyHeTreeOpenState,
+        suppressTreeEmit: deps.suppressTreeEmit
+      })
+    }
   }
 
   async function reapplyLatentDescendantExpandState (options?: {

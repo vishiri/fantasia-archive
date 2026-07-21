@@ -33,6 +33,7 @@ type T_sessionSubWiringDeps = {
   dragExpandUiFrozen: Ref<boolean>
   deferLazyLoadTreeRevisionPublish: Ref<boolean>
   getPreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
+  getForceSublevelCollapseInTree: () => boolean
   hierarchyStore: T_hierarchyStore
   isTreeDragActive: Ref<boolean>
   nextTick: () => Promise<void>
@@ -63,6 +64,7 @@ function createProjectHierarchyTreeSessionLoadAndOpenIconWiring (deps: T_session
     dragExpandUiFrozen: deps.dragExpandUiFrozen,
     flushUiStatePersist: () => deps.hierarchyStore.flushUiStatePersist(),
     getExpandedNodeIds: () => deps.uiState.value.expandedNodeIds,
+    getForceSublevelCollapseInTree: deps.getForceSublevelCollapseInTree,
     getPendingRevealPath: () => deps.pendingRevealPath.value,
     getPreferredLanguageCode: deps.getPreferredLanguageCode,
     getScrollTopPx: () => deps.uiState.value.scrollTopPx,

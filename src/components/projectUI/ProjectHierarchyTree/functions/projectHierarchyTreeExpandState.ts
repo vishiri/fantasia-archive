@@ -2,10 +2,15 @@ import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHi
 
 /**
  * True when collapsing a row should keep descendant expand ids for lazy reapply on reopen.
+ * Force-sublevel-collapse always clears descendants so nested nodes reopen closed.
  */
 export function shouldProjectHierarchyTreePreserveDescendantOpenIdsOnCollapse (
-  nodeKind: I_faProjectHierarchyTreeHeTreeNode['nodeKind']
+  nodeKind: I_faProjectHierarchyTreeHeTreeNode['nodeKind'],
+  forceSublevelCollapseInTree = false
 ): boolean {
+  if (forceSublevelCollapseInTree) {
+    return false
+  }
   return nodeKind === 'world' ||
     nodeKind === 'group' ||
     nodeKind === 'templatePlacement' ||
@@ -164,6 +169,26 @@ export function evictCollapsedNodeChildren (
   }
   node.children = []
   node.childrenLoaded = false
+}
+
+/**
+ * Evicts lazy-loaded placement and document children under a collapsed subtree.
+ */
+export function evictProjectHierarchyTreeCollapsedSubtreeChildren (
+  anchor: I_faProjectHierarchyTreeHeTreeNode
+): void {
+  function walk (node: I_faProjectHierarchyTreeHeTreeNode): void {
+    if (
+      node.nodeKind === 'templatePlacement' ||
+      node.nodeKind === 'document'
+    ) {
+      evictCollapsedNodeChildren(node)
+    }
+    for (const child of node.children) {
+      walk(child)
+    }
+  }
+  walk(anchor)
 }
 
 /**

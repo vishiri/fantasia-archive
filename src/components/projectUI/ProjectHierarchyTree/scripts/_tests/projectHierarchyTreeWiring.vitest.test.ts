@@ -375,6 +375,23 @@ test('Test that markProjectHierarchyTreeNodeClosed keeps descendant open ids whe
   expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith(['group-1', 'placement-1'])
 })
 
+test('Test that markProjectHierarchyTreeNodeClosed clears descendant open ids when force sublevel collapse is on', () => {
+  const tree = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const openNodeIds = ref(new Set(['world-1', 'group-1', 'placement-1']))
+  const queuePersistExpandedNodeIds = vi.fn()
+  const worldNode = tree.value[0]!
+  markProjectHierarchyTreeNodeClosed({
+    forceSublevelCollapseInTree: true,
+    node: worldNode,
+    nodeId: worldNode.id,
+    openNodeIds,
+    queuePersistExpandedNodeIds,
+    treeData: tree
+  })
+  expect([...openNodeIds.value]).toEqual([])
+  expect(queuePersistExpandedNodeIds).toHaveBeenCalledWith([])
+})
+
 test('Test that markProjectHierarchyTreeNodeClosed clears descendant open ids for add-new rows', () => {
   const addNewNode: I_faProjectHierarchyTreeHeTreeNode = {
     children: [{
@@ -1881,6 +1898,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring builds tree session d
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
     deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
+    getForceSublevelCollapseInTree: () => false,
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
       queuePersistExpandedNodeIds: vi.fn(),
@@ -1928,6 +1946,7 @@ test('Test that createProjectHierarchyTreeUiStateSessionWiring delegates UI help
     flushDeferredTreeRevisionPublish: vi.fn(),
     flushUiStatePersist: vi.fn(),
     getExpandedNodeIds: () => ['world-1'],
+    getForceSublevelCollapseInTree: () => false,
     getPendingRevealPath: () => [],
     getScrollTopPx: () => 0,
     getTreeRef: () => null,
@@ -2003,6 +2022,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring calls bridge APIs for
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
     deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
+    getForceSublevelCollapseInTree: () => false,
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
       queuePersistExpandedNodeIds: vi.fn(),
@@ -2762,6 +2782,7 @@ test('Test that createProjectHierarchyTreeSessionWiring returns tree API', async
     pendingHierarchyNodeRefreshIds: ref([]),
     pendingRevealPath: ref([]),
     ref,
+    resolveForceSublevelCollapseInTree: () => false,
     resolvePreferredLanguageCode: () => 'en-US',
     runFaAction: vi.fn(),
     treeData,
@@ -2795,6 +2816,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring handles missing bridg
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
     deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
+    getForceSublevelCollapseInTree: () => false,
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
       queuePersistExpandedNodeIds: vi.fn(),
@@ -2979,13 +3001,20 @@ test('Test that createUseProjectHierarchyTree composes hierarchy session wiring'
   const pendingDocumentRefreshIds = ref<string[]>([])
   const pendingRevealPath = ref(['world-1'])
   const routePath = ref('/home/document/doc-a')
+  const activeProject = ref({
+    filePath: 'C:\\a.faproject',
+    id: 'project-a',
+    name: 'Project A'
+  })
+  const settings = ref({
+    forceSublevelCollapseInTree: false,
+    languageCode: 'en-US',
+    noProjectName: false
+  })
+  const appSettingsDialogPreview = ref<null | { noProjectName?: boolean }>(null)
   const useTree = createUseProjectHierarchyTree({
     S_FaActiveProject: (() => ({
-      activeProject: {
-        filePath: 'C:\\a.faproject',
-        id: 'project-a',
-        name: 'Project A'
-      },
+      activeProject: activeProject.value,
       hasActiveProject: true
     })) as never,
     S_FaOpenedDocuments: (() => ({
@@ -2993,9 +3022,8 @@ test('Test that createUseProjectHierarchyTree composes hierarchy session wiring'
     })) as never,
     S_FaProjectHierarchyTree: (() => hierarchyStore) as never,
     S_FaUserSettings: (() => ({
-      settings: {
-        languageCode: 'en-US'
-      }
+      appSettingsDialogPreview: appSettingsDialogPreview.value,
+      settings: settings.value
     })) as never,
     computed,
     dragContext: {
@@ -3009,19 +3037,32 @@ test('Test that createUseProjectHierarchyTree composes hierarchy session wiring'
       return path.startsWith('/home/document/') ? path.slice('/home/document/'.length) : null
     },
     runFaAction: vi.fn(),
-    storeToRefs: ((store: { flushUiStatePersist?: unknown }) => {
+    storeToRefs: ((store: {
+      flushUiStatePersist?: unknown
+      hasActiveProject?: unknown
+      settings?: unknown
+    }) => {
+      if ('flushUiStatePersist' in store) {
+        return {
+          pendingDocumentRefreshIds,
+          pendingHierarchyNodeRefreshIds: ref<string[]>([]),
+          pendingRevealPath,
+          layoutRefreshGeneration: ref(0),
+          treeData: ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])),
+          uiState: ref({
+            expandedNodeIds: [],
+            schemaVersion: 1,
+            scrollTopPx: 0
+          }),
+          worlds: ref([sampleWorld])
+        }
+      }
+      if ('hasActiveProject' in store) {
+        return { activeProject }
+      }
       return {
-        pendingDocumentRefreshIds,
-        pendingHierarchyNodeRefreshIds: ref<string[]>([]),
-        pendingRevealPath,
-        layoutRefreshGeneration: ref(0),
-        treeData: ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])),
-        uiState: ref({
-          expandedNodeIds: [],
-          schemaVersion: 1,
-          scrollTopPx: 0
-        }),
-        worlds: ref([sampleWorld])
+        appSettingsDialogPreview,
+        settings
       }
     }) as never,
     useRoute: () => ({
@@ -3034,7 +3075,16 @@ test('Test that createUseProjectHierarchyTree composes hierarchy session wiring'
   })
   expect(api.activeDocumentId.value).toBe('doc-a')
   expect(api.onNodeOpen).toBeTypeOf('function')
+  expect(api.projectDisplayName.value).toBe('Project A')
+  expect(api.showsProjectNameTitle.value).toBe(false)
   expect(hierarchyStore.flushUiStatePersist).toHaveBeenCalled()
+  settings.value = {
+    forceSublevelCollapseInTree: true,
+    languageCode: 'en-US',
+    noProjectName: false
+  }
+  const placement = mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld])[0]!.children[0]!
+  api.onNodeClose({ data: placement })
   pendingRevealPath.value = ['world-1', 'placement-1']
   await vi.waitFor(() => {
     expect(hierarchyStore.clearPendingRevealPath).toHaveBeenCalled()
@@ -3207,6 +3257,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring delegates UI state st
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
     deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
+    getForceSublevelCollapseInTree: () => false,
     hierarchyStore: {
       flushUiStatePersist,
       queuePersistExpandedNodeIds,
@@ -3280,6 +3331,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring propagates move failu
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
     deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
+    getForceSublevelCollapseInTree: () => false,
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
       queuePersistExpandedNodeIds: vi.fn(),
@@ -3576,6 +3628,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring reflects drag state i
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
     deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
+    getForceSublevelCollapseInTree: () => false,
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
       queuePersistExpandedNodeIds: vi.fn(),
@@ -3666,6 +3719,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring restores UI state via
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
     deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
+    getForceSublevelCollapseInTree: () => false,
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
       queuePersistExpandedNodeIds: vi.fn(),
@@ -3728,6 +3782,7 @@ test('Test that createProjectHierarchyTreeSessionWiring invokes lifecycle store 
     pendingHierarchyNodeRefreshIds: ref([]),
     pendingRevealPath: ref([]),
     ref,
+    resolveForceSublevelCollapseInTree: () => false,
     resolvePreferredLanguageCode: () => 'en-US',
     runFaAction: vi.fn(),
     treeData: ref([]),
@@ -3761,6 +3816,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring handles missing prelo
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
     deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
+    getForceSublevelCollapseInTree: () => false,
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
       queuePersistExpandedNodeIds: vi.fn(),
@@ -3989,6 +4045,7 @@ test('Test that createProjectHierarchyTreeSessionEarlyWiring arms document row d
   host.appendChild(row)
   const earlyWiring = createProjectHierarchyTreeSessionEarlyWiring({
     getPreferredLanguageCode: () => 'en-US',
+    getForceSublevelCollapseInTree: () => false,
     computed,
     dragContext: {
       dragNode: {
@@ -4146,6 +4203,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring restoreUiStateFromSto
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
     deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
+    getForceSublevelCollapseInTree: () => false,
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
       queuePersistExpandedNodeIds: vi.fn(),
@@ -4193,6 +4251,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring restoreExpandedSnapsh
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
     deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
+    getForceSublevelCollapseInTree: () => false,
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
       queuePersistExpandedNodeIds: vi.fn(),
@@ -4256,6 +4315,7 @@ test('Test that createProjectHierarchyTreeSessionSubWiring refreshNodeChildrenFr
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
     deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
+    getForceSublevelCollapseInTree: () => false,
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
       queuePersistExpandedNodeIds: vi.fn(),
@@ -4350,6 +4410,7 @@ test('Test that bindProjectHierarchyTreeSessionLifecycle evaluates worlds expand
   const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
   const earlyWiring = createProjectHierarchyTreeSessionEarlyWiring({
     getPreferredLanguageCode: () => 'en-US',
+    getForceSublevelCollapseInTree: () => false,
     computed,
     dragContext: {
       dragNode: null
@@ -4738,6 +4799,7 @@ test('Test that createProjectHierarchyTreeSessionDnDSubWiring throws when reinde
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
     deferLazyLoadTreeRevisionPublish: sessionRefs.deferLazyLoadTreeRevisionPublish,
     getPreferredLanguageCode: () => 'en-US',
+    getForceSublevelCollapseInTree: () => false,
     hierarchyStore: {
       flushUiStatePersist: vi.fn(),
       queuePersistExpandedNodeIds: vi.fn(),

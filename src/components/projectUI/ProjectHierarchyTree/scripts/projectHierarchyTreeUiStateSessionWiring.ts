@@ -13,6 +13,7 @@ import { attachProjectHierarchyTreeUiStateScrollListeners } from './projectHiera
 export function createProjectHierarchyTreeUiStateSessionWiring (deps: {
   flushUiStatePersist: () => void
   getExpandedNodeIds: () => string[]
+  getForceSublevelCollapseInTree: () => boolean
   getPendingRevealPath: () => string[]
   getScrollTopPx: () => number
   getTreeRef: () => I_faProjectHierarchyTreeHeTreeInstance | null
@@ -36,6 +37,7 @@ export function createProjectHierarchyTreeUiStateSessionWiring (deps: {
   const expandWiring = createProjectHierarchyTreeUiStateSessionExpandWiring({
     commitStagedLoadedChildren: deps.commitStagedLoadedChildren,
     flushDeferredTreeRevisionPublish: deps.flushDeferredTreeRevisionPublish,
+    getForceSublevelCollapseInTree: deps.getForceSublevelCollapseInTree,
     getTreeRef: deps.getTreeRef,
     loadChildrenAlongRevealPath: deps.loadChildrenAlongRevealPath,
     nextTick: deps.nextTick,

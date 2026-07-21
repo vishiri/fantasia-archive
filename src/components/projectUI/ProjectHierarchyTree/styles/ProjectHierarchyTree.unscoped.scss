@@ -2,8 +2,24 @@
 @use '../../../../css/app.palette.scss' as *;
 @use '../../../../css/theme/quasar-components/qFocusable.variables' as *;
 
-.projectHierarchyTreeHost {
+.projectHierarchyTreeRoot {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  overflow: hidden;
+  width: 100%;
+}
+
+.projectHierarchyTree__projectName {
+  color: $projectHierarchyTree-projectName-color;
+  flex-shrink: 0;
+  padding: $projectHierarchyTree-projectName-padding;
+}
+
+.projectHierarchyTreeHost {
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
   overflow: hidden;
   width: 100%;
 }

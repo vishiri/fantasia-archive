@@ -58,6 +58,7 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
   pendingHierarchyNodeRefreshIds: Ref<string[]>
   pendingRevealPath: Ref<string[]>
   ref: <T>(initial: T) => Ref<T>
+  resolveForceSublevelCollapseInTree: () => boolean
   resolvePreferredLanguageCode: () => import('app/types/faUserSettingsLanguageRegistry').T_faUserSettingsLanguageCode
   runFaAction: <Id extends T_faActionId>(id: Id, payload: I_faActionPayloadMap[Id]) => void
   treeData: Ref<I_faProjectHierarchyTreeHeTreeNode[]>
@@ -69,6 +70,7 @@ export function createProjectHierarchyTreeSessionWiring (deps: {
   const earlyWiring = createProjectHierarchyTreeSessionEarlyWiring({
     computed: deps.computed,
     dragContext: deps.dragContext,
+    getForceSublevelCollapseInTree: deps.resolveForceSublevelCollapseInTree,
     getPreferredLanguageCode: deps.resolvePreferredLanguageCode,
     hierarchyStore: deps.hierarchyStore,
     nextTick: deps.nextTick,

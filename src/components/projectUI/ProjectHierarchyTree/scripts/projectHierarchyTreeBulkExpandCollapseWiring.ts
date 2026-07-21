@@ -9,7 +9,7 @@ import {
   collectProjectHierarchyTreeBulkExpandTargetIds
 } from '../functions/projectHierarchyTreeBulkExpandCollapse'
 import {
-  evictCollapsedNodeChildren,
+  evictProjectHierarchyTreeCollapsedSubtreeChildren,
   findProjectHierarchyTreeNodeById
 } from '../functions/projectHierarchyTreeExpandState'
 import { syncProjectHierarchyTreeOpenSetToPersist } from './projectHierarchyTreeUiStateWiring'
@@ -44,18 +44,7 @@ function evictCollapsedSubtreeChildren (deps: {
   if (anchor === null) {
     return
   }
-  function walk (node: I_faProjectHierarchyTreeHeTreeNode): void {
-    if (
-      node.nodeKind === 'templatePlacement' ||
-      node.nodeKind === 'document'
-    ) {
-      evictCollapsedNodeChildren(node)
-    }
-    for (const child of node.children) {
-      walk(child)
-    }
-  }
-  walk(anchor)
+  evictProjectHierarchyTreeCollapsedSubtreeChildren(anchor)
 }
 
 async function runBulkExpandDeepPasses (deps: {

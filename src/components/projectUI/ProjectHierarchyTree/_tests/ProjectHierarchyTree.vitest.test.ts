@@ -85,6 +85,8 @@ const documentButtonVisibility = ref({
 
 const showsTreeLines = ref(true)
 const showsOrderNumberBadge = ref(true)
+const projectDisplayName = ref('')
+const showsProjectNameTitle = ref(false)
 
 const projectHierarchyTreeI18n = createI18n({
   legacy: false,
@@ -224,29 +226,47 @@ vi.mock('../scripts/projectHierarchyTree_manager', () => {
         onTreeDragEndCleanup: treeHandlers.onTreeDragEndCleanup,
         onWorldNodeRowClick: treeHandlers.onWorldNodeRowClick,
         onWorldNodeRowPointerDown: treeHandlers.onWorldNodeRowPointerDown,
-        resolvePlacementCountDisplayForCounts: (counts: {
-          categoryCount: number
-          documentCount: number
+        resolveOrderNumberBadgeLabelForNode: (node: { nodeKind: string, treeOrderNumber?: number | null }) => {
+          if (!showsOrderNumberBadge.value || node.nodeKind !== 'document') {
+            return null
+          }
+          return node.treeOrderNumber == null ? null : String(node.treeOrderNumber)
+        },
+        resolvePlacementCountDisplayForNode: (node: {
+          categoryCount?: number
+          documentCount?: number
+          nodeKind: string
         }) => {
+          if (node.nodeKind !== 'templatePlacement') {
+            return null
+          }
+          const documentCount = node.documentCount ?? 0
+          const categoryCount = node.categoryCount ?? 0
           return {
-            segments: [
-              {
-                kind: 'document',
-                value: counts.documentCount
-              },
-              {
-                kind: 'category',
-                value: counts.categoryCount
-              }
-            ],
-            showDivider: true,
-            shows: true
+            categoryCount,
+            display: {
+              segments: [
+                {
+                  kind: 'document',
+                  value: documentCount
+                },
+                {
+                  kind: 'category',
+                  value: categoryCount
+                }
+              ],
+              showDivider: true,
+              shows: true
+            },
+            documentCount
           }
         },
+        projectDisplayName,
         rootDroppableHandler: () => false,
         setTreeComponentRef: treeRefWiring.setTreeComponentRef,
         setTreeScrollHostRef: treeRefWiring.setTreeScrollHostRef,
         showsOrderNumberBadge,
+        showsProjectNameTitle,
         showsTreeLines,
         treeData,
         treeMountKey: ref(0),
@@ -335,6 +355,30 @@ test('Test that ProjectHierarchyTree renders tree rows when layout data exists',
   expect(wrapper.find('[data-test-locator="projectHierarchyTree-nodeContextMenu-stub"]').exists()).toBe(true)
   expect(treeRefWiring.setTreeScrollHostRef).toHaveBeenCalled()
   expect(treeRefWiring.setTreeComponentRef).toHaveBeenCalled()
+  wrapper.unmount()
+})
+
+test('Test that ProjectHierarchyTree shows project name title when wiring enables it', async () => {
+  projectDisplayName.value = 'FA, Ralia, Age of Magic Reborn'
+  showsProjectNameTitle.value = true
+  const wrapper = mountProjectHierarchyTree({
+    global: {
+      stubs: {
+        ProjectHierarchyTreeNode: {
+          props: ['node', 'stat'],
+          template: '<div data-test-locator="projectHierarchyTree-node-stub" />'
+        },
+        ProjectHierarchyTreeOpenIcon: true
+      }
+    }
+  })
+  const title = wrapper.find('[data-test-locator="projectHierarchyTree-projectName"]')
+  expect(title.exists()).toBe(true)
+  expect(title.text()).toBe('FA, Ralia, Age of Magic Reborn')
+  expect(title.classes()).toContain('text-h5')
+  showsProjectNameTitle.value = false
+  await wrapper.vm.$nextTick()
+  expect(wrapper.find('[data-test-locator="projectHierarchyTree-projectName"]').exists()).toBe(false)
   wrapper.unmount()
 })
 

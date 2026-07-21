@@ -51,6 +51,8 @@ $projectHierarchyTree-orderNumberBadge-rightOffset: 7px;
 $projectHierarchyTree-orderNumberBadge-zIndex: 12;
 $projectHierarchyTree-placementCount-catCount-color: fa-v('text-workspace-row', $text-workspace-row);
 $projectHierarchyTree-placementCount-marginLeft: 4px;
+$projectHierarchyTree-projectName-color: fa-v('accent', $accent);
+$projectHierarchyTree-projectName-padding: 7px 10px 0 10px;
 $projectHierarchyTree-treeHline-marginLeft: 5px;
 $projectHierarchyTree-treeLine-color: color-mix(in srgb, fa-v('primary', $primary) 35%, transparent);
 $projectHierarchyTree-treeVline-before-bottom: 100%;

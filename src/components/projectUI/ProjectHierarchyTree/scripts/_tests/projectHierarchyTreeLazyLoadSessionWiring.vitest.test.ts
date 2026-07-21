@@ -62,6 +62,7 @@ test('Test that lazy load session skips reapply while deferred publish flag is s
     dragExpandUiFrozen: ref(false),
     flushUiStatePersist: vi.fn(),
     getExpandedNodeIds: () => [],
+    getForceSublevelCollapseInTree: () => false,
     getPendingRevealPath: () => [],
     getPreferredLanguageCode: () => 'en-US',
     getScrollTopPx: () => 0,
