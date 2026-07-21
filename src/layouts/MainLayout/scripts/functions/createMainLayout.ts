@@ -13,27 +13,58 @@ type T_faKeybindKeydownContext = {
   suspendGlobalKeybindDispatch: boolean
 }
 
+type T_faNoteboardAutoOpenWindowStore = {
+  setWindowOpen: (open: boolean) => void
+  text: string
+}
+
 type T_createMainLayoutDeps = {
   attachWindowKeydownListener: (handler: (event: KeyboardEvent) => void) => void
   detachWindowKeydownListener: (handler: (event: KeyboardEvent) => void) => void
   awaitWelcomeScreenAutoLoadBootCompletion: () => Promise<void>
+  canOpenFloatingWindowWhileNoModal: () => boolean
   FA_APP_SHELL_DRAWER_TRANSITION_MS: number
   FA_APP_SHELL_PAGE_TRANSITION_BINDINGS: T_faAppShellPageTransitionBindings
   FA_DOCUMENT_WORKSPACE_PAGE_TRANSITION_BINDINGS: T_faAppShellPageTransitionBindings
+  hydrateMainLayoutAppNoteboardWithAutoOpen: (deps: T_createMainLayoutDeps) => Promise<void>
+  hydrateMainLayoutProjectSurfacesWithAutoOpen: (deps: T_createMainLayoutDeps) => Promise<void>
+  maybeAutoOpenFilledNoteboard: (input: {
+    canOpen: boolean
+    preventFilledPopup: boolean
+    setWindowOpen: (open: boolean) => void
+    text: string
+  }) => void
   resolveFaAppShellPageTransitionForRouteChange: (input: {
     documentWorkspacePageTransitionBindings: T_faAppShellPageTransitionBindings
     fromRoutePath: string
     shellPageTransitionBindings: T_faAppShellPageTransitionBindings
     toRoutePath: string
   }) => T_faAppShellPageTransitionResolution
-  S_FaAppNoteboard: () => StoreGeneric
+  S_FaActiveProject: () => { hasActiveProject: boolean }
+  S_FaAppNoteboard: () => T_faNoteboardAutoOpenWindowStore & {
+    refreshNoteboard: () => Promise<boolean>
+  }
   S_FaAppStyling: () => StoreGeneric
   S_FaKeybinds: () => StoreGeneric
-  S_FaProjectNoteboard: () => StoreGeneric
-  S_FaProjectSidebar: () => StoreGeneric
-  S_FaProjectStyling: () => StoreGeneric
-  S_FaRecentProjects: () => StoreGeneric
-  S_FaUserSettings: () => StoreGeneric
+  S_FaProjectNoteboard: () => T_faNoteboardAutoOpenWindowStore & {
+    refreshProjectNoteboard: () => Promise<boolean>
+  }
+  S_FaProjectSidebar: () => {
+    refreshProjectSidebar: () => Promise<unknown>
+  }
+  S_FaProjectStyling: () => {
+    refreshProjectStyling: () => Promise<unknown>
+  }
+  S_FaRecentProjects: () => {
+    refreshRecentProjects: () => Promise<void>
+  }
+  S_FaUserSettings: () => {
+    refreshSettings: () => Promise<void>
+    settings: {
+      preventFilledAppNoteBoardPopup: boolean
+      preventFilledProjectNoteBoardPopup: boolean
+    } | null
+  }
   computed: <T>(getter: () => T) => I_ref<T>
   createFaKeybindKeydownHandler: (
     getContext: () => T_faKeybindKeydownContext
@@ -151,16 +182,8 @@ function useMainLayout (
     if (window.faContentBridgeAPIs?.faAppStyling !== undefined) {
       await deps.hydrateFromBridgeOrReport(() => deps.S_FaAppStyling().refreshAppStyling())
     }
-    if (window.faContentBridgeAPIs?.faAppNoteboard !== undefined) {
-      await deps.S_FaAppNoteboard().refreshNoteboard()
-    }
-    if (window.faContentBridgeAPIs?.projectManagement !== undefined) {
-      await deps.awaitWelcomeScreenAutoLoadBootCompletion()
-      await deps.S_FaRecentProjects().refreshRecentProjects()
-      await deps.hydrateFromBridgeOrReport(() => deps.S_FaProjectNoteboard().refreshProjectNoteboard())
-      await deps.hydrateFromBridgeOrReport(() => deps.S_FaProjectSidebar().refreshProjectSidebar())
-      await deps.hydrateFromBridgeOrReport(() => deps.S_FaProjectStyling().refreshProjectStyling())
-    }
+    await deps.hydrateMainLayoutAppNoteboardWithAutoOpen(deps)
+    await deps.hydrateMainLayoutProjectSurfacesWithAutoOpen(deps)
   })
 
   deps.onUnmounted(() => {

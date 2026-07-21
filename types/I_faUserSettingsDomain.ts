@@ -34,8 +34,8 @@ export interface I_faUserSettings {
   disableDocumentToolTips: boolean
   disableQuickSearchCategoryPrecheck: boolean
   disableSpellCheck: boolean
-  doNotCollapseTreeOptions: boolean
   doubleDashDocCount: boolean
+  forceSublevelCollapseInTree: boolean
   hideAdvSearchCheatsheetButton: boolean
   hideDeadCrossThrough: boolean
   hideDocumentTitles: boolean
@@ -58,7 +58,8 @@ export interface I_faUserSettings {
   noProjectName: boolean
   noTags: boolean
   preventAutoScroll: boolean
-  preventFilledNoteBoardPopup: boolean
+  preventFilledAppNoteBoardPopup: boolean
+  preventFilledProjectNoteBoardPopup: boolean
   preventPreviewsDocuments: boolean
   preventPreviewsPopups: boolean
   preventPreviewsTabs: boolean

@@ -20,6 +20,8 @@ import {
 } from 'app/src/scripts/keybinds/keybinds_manager'
 import { ensureFaChromiumForwardedKeyChordListener } from 'app/src/scripts/keybinds/faChromiumForwardedKeyChordInstall_manager'
 import { isFantasiaStorybookCanvas } from 'app/src/scripts/appInternals/appInternals_manager'
+import { canOpenFloatingWindowWhileNoModal } from 'app/src/scripts/appNoteboard/appNoteboard_manager'
+import { maybeAutoOpenFilledNoteboard } from 'app/src/scripts/floatingWindows/functions/shouldAutoOpenFilledNoteboard'
 import { hydrateFromBridgeOrReport } from 'app/src/scripts/stores/stores_manager'
 import { S_FaKeybinds } from 'app/src/stores/S_FaKeybinds'
 import { S_FaAppNoteboard } from 'app/src/stores/S_FaAppNoteboard'
@@ -43,6 +45,10 @@ import { createMainLayout } from './functions/createMainLayout'
 import { createMainLayoutDrawerRail } from './functions/createMainLayoutDrawerRail'
 import { createMainLayoutWorkspaceSidebar } from './functions/createMainLayoutWorkspaceSidebar'
 import { attachFaWorkspaceSidebarLiveWidthSync, bindFaWorkspaceSidebarLiveWidthSync } from './faWorkspaceSidebarLiveWidthSyncWiring'
+import {
+  hydrateMainLayoutAppNoteboardWithAutoOpen,
+  hydrateMainLayoutProjectSurfacesWithAutoOpen
+} from './mainLayoutNoteboardHydrateWiring'
 import { resolveMainLayoutOutletKey } from './functions/mainLayoutOutletKey'
 import {
   resolveMainLayoutRouteClass,
@@ -57,10 +63,15 @@ const mainLayoutApi = createMainLayout({
     window.removeEventListener('keydown', handler, true)
   },
   awaitWelcomeScreenAutoLoadBootCompletion,
+  canOpenFloatingWindowWhileNoModal,
   FA_APP_SHELL_DRAWER_TRANSITION_MS,
   FA_APP_SHELL_PAGE_TRANSITION_BINDINGS,
   FA_DOCUMENT_WORKSPACE_PAGE_TRANSITION_BINDINGS,
+  hydrateMainLayoutAppNoteboardWithAutoOpen,
+  hydrateMainLayoutProjectSurfacesWithAutoOpen,
+  maybeAutoOpenFilledNoteboard,
   resolveFaAppShellPageTransitionForRouteChange,
+  S_FaActiveProject,
   S_FaAppNoteboard,
   S_FaAppStyling,
   S_FaKeybinds,

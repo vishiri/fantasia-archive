@@ -59,12 +59,8 @@ export default {
         tags: 'detach, secondary window, multi window'
       },
       quickSearchDialog: {
-        subtitle: 'Quick-search dialog',
-        tags: 'quick search, keyboard search, finder'
-      },
-      universalDialogSettings: {
-        subtitle: 'Universal dialog settings',
-        tags: 'all dialogs, global popup behavior'
+        subtitle: 'Quick-search/Quick-add dialog',
+        tags: 'quick search, quick add, keyboard search, finder, popup close'
       }
     },
     visualAccessibility: {
@@ -181,15 +177,15 @@ export default {
       tags: 'spelling, grammar, proofing, red underline, writing, dictionary',
       note: 'Needs a full app restart to take effect!'
     },
-    doNotCollapseTreeOptions: {
-      title: 'TODO - Prevent sublevel collapse in the tree',
-      description: 'Prevents subcategories in the hierarchical tree from closing when a parent category is closed.',
-      tags: 'remember expanded, nested open, accordion, collapse children'
-    },
     doubleDashDocCount: {
       title: 'TODO - Pronounced count divider',
       description: 'This setting adds another \\| character between the category and document count in the hierarchical tree.',
       tags: 'pipe, delimiter, separator, count format, tree counts'
+    },
+    forceSublevelCollapseInTree: {
+      title: 'Force sublevel collapse in the tree',
+      description: 'Forces sublevels of the closed node in the hierarchical tree to close as well when a parent node is closed. Normally, they remember the pre-close state and will reopen as they were when closed.',
+      tags: 'force collapse, close children, parent node, nested tree, remember expand'
     },
     hideAdvSearchCheatsheetButton: {
       title: 'TODO - Hide relationships help button',
@@ -288,9 +284,9 @@ export default {
       tags: 'debug, troubleshooting, dev tools, payload, activity, logging'
     },
     noProjectName: {
-      title: 'TODO - Hide project name in tree',
-      description: 'Determines whether the project name is shown in the hierarchical tree at all.',
-      tags: 'root label, project title tree, header hide'
+      title: 'Hide project name in tree',
+      description: 'Normally, the project name is shown in the hierarchical tree on multi-world projects. When enabled, this hides the project name title above the hierarchy tree even on multi-world projects.',
+      tags: 'root label, project title tree, header hide, multi-world projects'
     },
     noTags: {
       title: 'TODO - Hide tags in tree',
@@ -302,10 +298,15 @@ export default {
       description: 'Determines whether documents recall their scroll positions and auto-scroll when switching between them.',
       tags: 'scroll position, remember scroll, jump to top, tab switch'
     },
-    preventFilledNoteBoardPopup: {
-      title: 'TODO - Prevent filled noteboard from showing',
-      description: 'When enabled, the noteboard will not open automatically at app start when it still contains notes from previous FA sessions.',
-      tags: 'sticky notes, noteboard, startup, auto open, reminders'
+    preventFilledAppNoteBoardPopup: {
+      title: 'Prevent filled app noteboard from showing',
+      description: 'When enabled, the app noteboard will not open automatically at app start when it still contains notes from previous FA sessions.',
+      tags: 'app noteboard, sticky notes, startup, auto open, reminders'
+    },
+    preventFilledProjectNoteBoardPopup: {
+      title: 'Prevent filled project noteboard from showing',
+      description: 'When enabled, the project noteboard will not open automatically when a project loads if it still contains notes from previous project sessions.',
+      tags: 'project noteboard, sticky notes, project open, auto open, reminders'
     },
     preventPreviewsDocuments: {
       title: 'TODO - Prevent document previews',

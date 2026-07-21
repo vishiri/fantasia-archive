@@ -59,12 +59,8 @@ export default {
         tags: 'αποσπώ, δευτερεύον παράθυρο, πολλαπλό παράθυρο',
       },
       quickSearchDialog: {
-        subtitle: 'Διάλογος γρήγορης αναζήτησης',
-        tags: 'γρήγορη αναζήτηση, αναζήτηση πληκτρολογίου, εύρεση',
-      },
-      universalDialogSettings: {
-        subtitle: 'Καθολικές ρυθμίσεις διαλόγου',
-        tags: 'όλους τους διαλόγους, καθολική συμπεριφορά αναδυόμενων παραθύρων',
+        subtitle: 'Quick-search/Quick-add dialog',
+        tags: 'quick search, quick add, keyboard search, finder, popup close'
       }
     },
     visualAccessibility: {
@@ -181,15 +177,17 @@ export default {
       tags: 'ορθογραφία, γραμματική, διόρθωση, κόκκινη υπογράμμιση, γραφή, λεξικό',
       note: 'Χρειάζεται πλήρης επανεκκίνηση της εφαρμογής για να τεθεί σε ισχύ!',
     },
-    doNotCollapseTreeOptions: {
-      title: 'Αποτρέψτε την κατάρρευση υποεπίπεδου στο δέντρο',
-      description: 'Αποτρέπει το κλείσιμο υποκατηγοριών στο ιεραρχικό δέντρο όταν κλείνει μια γονική κατηγορία.',
-      tags: 'θυμηθείτε διευρυμένο, ένθετο ανοιχτό, ακορντεόν, κατάρρευση παιδιά',
-    },
+
     doubleDashDocCount: {
       title: 'Προφέρεται διαιρέτης αρίθμησης',
       description: 'Αυτή η ρύθμιση προσθέτει έναν άλλο χαρακτήρα \\\\| μεταξύ της κατηγορίας και του αριθμού εγγράφων στο ιεραρχικό δέντρο.',
       tags: 'σωλήνας, οριοθέτης, διαχωριστής, μορφή μέτρησης, μετρήσεις δέντρων',
+    },
+
+    forceSublevelCollapseInTree: {
+      title: 'Force sublevel collapse in the tree',
+      description: 'Forces sublevels of the closed node in the hierarchical tree to close as well when a parent node is closed. Normally, they remember the pre-close state and will reopen as they were when closed.',
+      tags: 'force collapse, close children, parent node, nested tree, remember expand'
     },
     hideAdvSearchCheatsheetButton: {
       title: 'Κουμπί βοήθειας απόκρυψης σχέσεων',
@@ -301,11 +299,17 @@ export default {
       description: 'Καθορίζει εάν τα έγγραφα ανακαλούν τις θέσεις κύλισης και πραγματοποιούν αυτόματη κύλιση κατά την εναλλαγή μεταξύ τους.',
       tags: 'θέση κύλισης, θυμηθείτε κύλιση, μετάβαση στην κορυφή, διακόπτης καρτελών',
     },
-    preventFilledNoteBoardPopup: {
-      title: 'Αποτρέψτε την εμφάνιση του γεμάτου σημειωματάριου',
-      description: 'Όταν είναι ενεργοποιημένο, το σημειωματάριο δεν θα ανοίγει αυτόματα κατά την έναρξη της εφαρμογής όταν εξακολουθεί να περιέχει σημειώσεις από προηγούμενες περιόδους FA.',
-      tags: 'αυτοκόλλητες σημειώσεις, σημειωματάριο, εκκίνηση, αυτόματο άνοιγμα, υπενθυμίσεις',
+    preventFilledAppNoteBoardPopup: {
+      title: 'Prevent filled app noteboard from showing',
+      description: 'When enabled, the app noteboard will not open automatically at app start when it still contains notes from previous FA sessions.',
+      tags: 'app noteboard, sticky notes, startup, auto open, reminders'
     },
+    preventFilledProjectNoteBoardPopup: {
+      title: 'Prevent filled project noteboard from showing',
+      description: 'When enabled, the project noteboard will not open automatically when a project loads if it still contains notes from previous project sessions.',
+      tags: 'project noteboard, sticky notes, project open, auto open, reminders'
+    },
+
     preventPreviewsDocuments: {
       title: 'Αποτροπή προεπισκοπήσεων εγγράφων',
       description: 'Ελέγχει εάν οι γρήγορες προεπισκοπήσεις κατά την τοποθέτηση του δείκτη εμφανίζονται στην προβολή εγγράφου και στα πεδία σχέσεων.',

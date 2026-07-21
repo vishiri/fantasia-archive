@@ -59,12 +59,8 @@ export default {
         tags: 'डिटैच, सेकेंडरी विंडो, मल्टी विंडो',
       },
       quickSearchDialog: {
-        subtitle: 'त्वरित-खोज संवाद',
-        tags: 'त्वरित खोज, कीबोर्ड खोज, खोजक',
-      },
-      universalDialogSettings: {
-        subtitle: 'सार्वभौमिक संवाद सेटिंग्स',
-        tags: 'सभी संवाद, वैश्विक पॉपअप व्यवहार',
+        subtitle: 'Quick-search/Quick-add dialog',
+        tags: 'quick search, quick add, keyboard search, finder, popup close'
       }
     },
     visualAccessibility: {
@@ -181,15 +177,17 @@ export default {
       tags: 'वर्तनी, व्याकरण, प्रमाणन, लाल रेखांकन, लेखन, शब्दकोश',
       note: 'प्रभावी होने के लिए पूर्ण ऐप पुनरारंभ की आवश्यकता है!',
     },
-    doNotCollapseTreeOptions: {
-      title: 'पेड़ में उपस्तर पतन को रोकें',
-      description: 'मूल श्रेणी बंद होने पर पदानुक्रमित वृक्ष में उपश्रेणियों को बंद होने से रोकता है।',
-      tags: 'विस्तारित, नेस्टेड ओपन, अकॉर्डियन, पतन बच्चों को याद रखें',
-    },
+
     doubleDashDocCount: {
       title: 'उच्चारण विभक्त',
       description: 'यह सेटिंग पदानुक्रमित वृक्ष में श्रेणी और दस्तावेज़ गणना के बीच एक और \\\\| वर्ण जोड़ती है।',
       tags: 'पाइप, सीमांकक, विभाजक, गणना प्रारूप, वृक्ष गणना',
+    },
+
+    forceSublevelCollapseInTree: {
+      title: 'Force sublevel collapse in the tree',
+      description: 'Forces sublevels of the closed node in the hierarchical tree to close as well when a parent node is closed. Normally, they remember the pre-close state and will reopen as they were when closed.',
+      tags: 'force collapse, close children, parent node, nested tree, remember expand'
     },
     hideAdvSearchCheatsheetButton: {
       title: 'रिश्ते छिपाएँ सहायता बटन',
@@ -301,11 +299,17 @@ export default {
       description: 'यह निर्धारित करता है कि क्या दस्तावेज़ अपनी स्क्रॉल स्थिति को याद करते हैं और उनके बीच स्विच करते समय ऑटो-स्क्रॉल करते हैं।',
       tags: 'स्क्रॉल स्थिति, स्क्रॉल याद रखें, शीर्ष पर जाएं, टैब स्विच',
     },
-    preventFilledNoteBoardPopup: {
-      title: 'भरे हुए नोटबोर्ड को दिखने से रोकें',
-      description: 'सक्षम होने पर, ऐप प्रारंभ होने पर नोटबोर्ड स्वचालित रूप से नहीं खुलेगा, जब इसमें अभी भी पिछले FA सत्रों के नोट्स हों।',
-      tags: 'स्टिकी नोट्स, नोटबोर्ड, स्टार्टअप, ऑटो ओपन, रिमाइंडर',
+    preventFilledAppNoteBoardPopup: {
+      title: 'Prevent filled app noteboard from showing',
+      description: 'When enabled, the app noteboard will not open automatically at app start when it still contains notes from previous FA sessions.',
+      tags: 'app noteboard, sticky notes, startup, auto open, reminders'
     },
+    preventFilledProjectNoteBoardPopup: {
+      title: 'Prevent filled project noteboard from showing',
+      description: 'When enabled, the project noteboard will not open automatically when a project loads if it still contains notes from previous project sessions.',
+      tags: 'project noteboard, sticky notes, project open, auto open, reminders'
+    },
+
     preventPreviewsDocuments: {
       title: 'दस्तावेज़ पूर्वावलोकन रोकें',
       description: 'नियंत्रित करता है कि होवर पर त्वरित-पूर्वावलोकन दस्तावेज़ दृश्य और संबंध फ़ील्ड में दिखाए जाते हैं या नहीं।',

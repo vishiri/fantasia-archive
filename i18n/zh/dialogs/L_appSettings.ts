@@ -59,12 +59,8 @@ export default {
         tags: '分离、辅助窗口、多窗口',
       },
       quickSearchDialog: {
-        subtitle: '快速搜索对话框',
-        tags: '快速搜索、键盘搜索、查找器',
-      },
-      universalDialogSettings: {
-        subtitle: '通用对话框设置',
-        tags: '所有对话框，全局弹出行为',
+        subtitle: 'Quick-search/Quick-add dialog',
+        tags: 'quick search, quick add, keyboard search, finder, popup close'
       }
     },
     visualAccessibility: {
@@ -181,15 +177,16 @@ export default {
       tags: '拼写、语法、校对、红色下划线、写作、词典',
       note: '需要完全重启应用程序才能生效！',
     },
-    doNotCollapseTreeOptions: {
-      title: '防止树的次层倒塌',
-      description: '防止层次树中的子类别在父类别关闭时关闭。',
-      tags: '记住展开、嵌套打开、手风琴、折叠子项',
-    },
+
     doubleDashDocCount: {
       title: '明显的计数分隔符',
       description: '此设置在分层树中的类别和文档计数之间添加另一个 \\\\| 字符。',
       tags: '管道、分隔符、分隔符、计数格式、树计数',
+    },
+    forceSublevelCollapseInTree: {
+      title: 'Force sublevel collapse in the tree',
+      description: 'Forces sublevels of the closed node in the hierarchical tree to close as well when a parent node is closed. Normally, they remember the pre-close state and will reopen as they were when closed.',
+      tags: 'force collapse, close children, parent node, nested tree, remember expand'
     },
     hideAdvSearchCheatsheetButton: {
       title: '隐藏关系帮助按钮',
@@ -301,11 +298,17 @@ export default {
       description: '确定文档在文档之间切换时是否重新调用其滚动位置并自动滚动。',
       tags: '滚动位置、记住滚动、跳转到顶部、选项卡切换',
     },
-    preventFilledNoteBoardPopup: {
-      title: '防止显示填充的记事板',
-      description: '启用后，当记事板仍包含之前 FA 会话的笔记时，它不会在应用程序启动时自动打开。',
-      tags: '便签、记事板、启动、自动打开、提醒',
+    preventFilledAppNoteBoardPopup: {
+      title: 'Prevent filled app noteboard from showing',
+      description: 'When enabled, the app noteboard will not open automatically at app start when it still contains notes from previous FA sessions.',
+      tags: 'app noteboard, sticky notes, startup, auto open, reminders'
     },
+    preventFilledProjectNoteBoardPopup: {
+      title: 'Prevent filled project noteboard from showing',
+      description: 'When enabled, the project noteboard will not open automatically when a project loads if it still contains notes from previous project sessions.',
+      tags: 'project noteboard, sticky notes, project open, auto open, reminders'
+    },
+
     preventPreviewsDocuments: {
       title: '防止文档预览',
       description: '控制是否在文档视图和关系字段中显示悬停时的快速预览。',

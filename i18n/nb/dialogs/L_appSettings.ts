@@ -59,12 +59,8 @@ export default {
         tags: 'løsne, sekundærvindu, multivindu',
       },
       quickSearchDialog: {
-        subtitle: 'Hurtigsøk-dialog',
-        tags: 'hurtigsøk, tastatursøk, finner',
-      },
-      universalDialogSettings: {
-        subtitle: 'Universelle dialoginnstillinger',
-        tags: 'alle dialoger, global popup-atferd',
+        subtitle: 'Quick-search/Quick-add dialog',
+        tags: 'quick search, quick add, keyboard search, finder, popup close'
       }
     },
     visualAccessibility: {
@@ -181,15 +177,17 @@ export default {
       tags: 'rettskrivning, grammatikk, korrektur, rød understreking, skriving, ordbok',
       note: 'Trenger en fullstendig omstart av appen for å tre i kraft!',
     },
-    doNotCollapseTreeOptions: {
-      title: 'Forhindre kollaps på undernivå i treet',
-      description: 'Hindrer underkategorier i det hierarkiske treet fra å lukkes når en overordnet kategori lukkes.',
-      tags: 'husk utvidede, nestede åpne, trekkspill, kollaps barn',
-    },
+
     doubleDashDocCount: {
       title: 'Uttalt telledeler',
       description: 'Denne innstillingen legger til et nytt \\\\| tegn mellom kategorien og dokumentantallet i det hierarkiske treet.',
       tags: 'pipe, skilletegn, skilletegn, telleformat, tretellinger',
+    },
+
+    forceSublevelCollapseInTree: {
+      title: 'Force sublevel collapse in the tree',
+      description: 'Forces sublevels of the closed node in the hierarchical tree to close as well when a parent node is closed. Normally, they remember the pre-close state and will reopen as they were when closed.',
+      tags: 'force collapse, close children, parent node, nested tree, remember expand'
     },
     hideAdvSearchCheatsheetButton: {
       title: 'Skjul hjelpeknapp for relasjoner',
@@ -301,11 +299,17 @@ export default {
       description: 'Bestemmer om dokumenter husker rulleposisjonene og ruller automatisk når de bytter mellom dem.',
       tags: 'rull posisjon, husk rull, hopp til toppen, tabulatorbryter',
     },
-    preventFilledNoteBoardPopup: {
-      title: 'Forhindre at fylt noteboard vises',
-      description: 'Når den er aktivert, åpnes ikke notatbordet automatisk ved appstart når det fortsatt inneholder notater fra tidligere FA-økter.',
-      tags: 'klistrelapper, noteboard, oppstart, automatisk åpning, påminnelser',
+    preventFilledAppNoteBoardPopup: {
+      title: 'Prevent filled app noteboard from showing',
+      description: 'When enabled, the app noteboard will not open automatically at app start when it still contains notes from previous FA sessions.',
+      tags: 'app noteboard, sticky notes, startup, auto open, reminders'
     },
+    preventFilledProjectNoteBoardPopup: {
+      title: 'Prevent filled project noteboard from showing',
+      description: 'When enabled, the project noteboard will not open automatically when a project loads if it still contains notes from previous project sessions.',
+      tags: 'project noteboard, sticky notes, project open, auto open, reminders'
+    },
+
     preventPreviewsDocuments: {
       title: 'Forhindre forhåndsvisninger av dokumenter',
       description: 'Kontrollerer om hurtigforhåndsvisninger ved hover vises i dokumentvisningen og i relasjonsfelt.',

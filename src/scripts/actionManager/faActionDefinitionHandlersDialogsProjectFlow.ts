@@ -1,6 +1,21 @@
 import type { I_faActionPayloadMap } from 'app/types/I_faActionManagerDomain'
 import type { I_createFaActionDefinitionHandlersDialogsDeps } from 'app/types/I_createFaActionDefinitionHandlersDialogsDeps'
 
+function maybeAutoOpenProjectNoteboardAfterHydrate (
+  deps: I_createFaActionDefinitionHandlersDialogsDeps
+): void {
+  const projectNoteboardStore = deps.S_FaProjectNoteboard()
+  deps.maybeAutoOpenFilledNoteboard({
+    canOpen: deps.canOpenFloatingWindowWhileNoModal(),
+    preventFilledPopup:
+      deps.S_FaUserSettings().settings?.preventFilledProjectNoteBoardPopup ?? false,
+    setWindowOpen: (open) => {
+      projectNoteboardStore.setWindowOpen(open)
+    },
+    text: projectNoteboardStore.text
+  })
+}
+
 export function buildFaActionDefinitionHandlersDialogsProjectFlow (
   deps: I_createFaActionDefinitionHandlersDialogsDeps
 ): {
@@ -19,7 +34,10 @@ export function buildFaActionDefinitionHandlersDialogsProjectFlow (
         throw new deps.FaActionUserCanceledError()
       }
       deps.notifyFaProjectCreatedPositive()
-      await deps.S_FaProjectNoteboard().refreshProjectNoteboard()
+      const projectHydrated = await deps.S_FaProjectNoteboard().refreshProjectNoteboard()
+      if (projectHydrated) {
+        maybeAutoOpenProjectNoteboardAfterHydrate(deps)
+      }
       await deps.S_FaProjectSidebar().refreshProjectSidebar()
       await deps.S_FaProjectStyling().refreshProjectStyling()
     } finally {
@@ -41,7 +59,10 @@ export function buildFaActionDefinitionHandlersDialogsProjectFlow (
       }
       if (outcome === 'opened') {
         deps.notifyFaProjectLoadedPositive()
-        await deps.S_FaProjectNoteboard().refreshProjectNoteboard()
+        const projectHydrated = await deps.S_FaProjectNoteboard().refreshProjectNoteboard()
+        if (projectHydrated) {
+          maybeAutoOpenProjectNoteboardAfterHydrate(deps)
+        }
         await deps.S_FaProjectSidebar().refreshProjectSidebar()
         await deps.S_FaProjectStyling().refreshProjectStyling()
       }

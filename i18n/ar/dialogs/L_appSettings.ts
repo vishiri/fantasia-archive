@@ -59,12 +59,8 @@ export default {
         tags: 'فصل، نافذة ثانوية، نافذة متعددة',
       },
       quickSearchDialog: {
-        subtitle: 'مربع حوار البحث السريع',
-        tags: 'بحث سريع، بحث لوحة المفاتيح، مكتشف',
-      },
-      universalDialogSettings: {
-        subtitle: 'إعدادات الحوار العالمية',
-        tags: 'جميع مربعات الحوار، والسلوك المنبثق العالمي',
+        subtitle: 'Quick-search/Quick-add dialog',
+        tags: 'quick search, quick add, keyboard search, finder, popup close'
       }
     },
     visualAccessibility: {
@@ -181,15 +177,17 @@ export default {
       tags: 'التدقيق الإملائي، النحوي، التدقيق، التسطير الأحمر، الكتابة، القاموس',
       note: 'يحتاج إلى إعادة تشغيل التطبيق بالكامل ليصبح ساري المفعول!',
     },
-    doNotCollapseTreeOptions: {
-      title: 'منع انهيار المستوى الفرعي في الشجرة',
-      description: 'يمنع إغلاق الفئات الفرعية في الشجرة الهرمية عند إغلاق الفئة الأصلية.',
-      tags: 'تذكر موسعة، متداخلة مفتوحة، الأكورديون، انهيار الأطفال',
-    },
+
     doubleDashDocCount: {
       title: 'مقسم العد الواضح',
       description: 'يضيف هذا الإعداد حرف \\\\| آخر بين الفئة وعدد المستندات في الشجرة الهرمية.',
       tags: 'الأنبوب، المحدد، الفاصل، تنسيق العد، عدد الأشجار',
+    },
+
+    forceSublevelCollapseInTree: {
+      title: 'Force sublevel collapse in the tree',
+      description: 'Forces sublevels of the closed node in the hierarchical tree to close as well when a parent node is closed. Normally, they remember the pre-close state and will reopen as they were when closed.',
+      tags: 'force collapse, close children, parent node, nested tree, remember expand'
     },
     hideAdvSearchCheatsheetButton: {
       title: 'إخفاء زر مساعدة العلاقات',
@@ -301,11 +299,17 @@ export default {
       description: 'يحدد ما إذا كانت المستندات تتذكر مواضع التمرير الخاصة بها وتقوم بالتمرير التلقائي عند التبديل بينها.',
       tags: 'موضع التمرير، تذكر التمرير، انتقل إلى الأعلى، مفتاح علامة التبويب',
     },
-    preventFilledNoteBoardPopup: {
-      title: 'منع المفكرة المملوءة من الظهور',
-      description: 'عند التمكين، لن يتم فتح المفكرة تلقائيًا عند بدء التطبيق عندما لا تزال تحتوي على ملاحظات من جلسات FA السابقة.',
-      tags: 'الملاحظات اللاصقة، المفكرة، بدء التشغيل، الفتح التلقائي، التذكيرات',
+    preventFilledAppNoteBoardPopup: {
+      title: 'Prevent filled app noteboard from showing',
+      description: 'When enabled, the app noteboard will not open automatically at app start when it still contains notes from previous FA sessions.',
+      tags: 'app noteboard, sticky notes, startup, auto open, reminders'
     },
+    preventFilledProjectNoteBoardPopup: {
+      title: 'Prevent filled project noteboard from showing',
+      description: 'When enabled, the project noteboard will not open automatically when a project loads if it still contains notes from previous project sessions.',
+      tags: 'project noteboard, sticky notes, project open, auto open, reminders'
+    },
+
     preventPreviewsDocuments: {
       title: 'منع معاينات المستندات',
       description: 'يتحكم في ما إذا كانت المعاينة السريعة عند التمرير ستظهر في عرض المستند وفي حقول العلاقات.',

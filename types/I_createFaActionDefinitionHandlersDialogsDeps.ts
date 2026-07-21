@@ -21,9 +21,13 @@ export interface I_createFaActionDefinitionHandlersDialogsDeps {
   }
   S_FaAppNoteboard: () => {
     refreshNoteboard: () => Promise<boolean>
+    setWindowOpen: (open: boolean) => void
+    text: string
   }
   S_FaProjectNoteboard: () => {
     refreshProjectNoteboard: () => Promise<boolean>
+    setWindowOpen: (open: boolean) => void
+    text: string
   }
   S_FaProjectSidebar: () => {
     refreshProjectSidebar: () => Promise<boolean>
@@ -36,9 +40,18 @@ export interface I_createFaActionDefinitionHandlersDialogsDeps {
   }
   S_FaUserSettings: () => {
     refreshSettings: () => Promise<void>
+    settings: {
+      preventFilledProjectNoteBoardPopup: boolean
+    } | null
   }
   FaActionUserCanceledError: new () => Error
   buildFaActionPayloadPreview: (value: unknown) => string
+  maybeAutoOpenFilledNoteboard: (input: {
+    canOpen: boolean
+    preventFilledPopup: boolean
+    setWindowOpen: (open: boolean) => void
+    text: string
+  }) => void
   runFaAction: <TId extends T_faActionId>(id: TId, payload: I_faActionPayloadMap[TId]) => void
   openDialogComponent: (name: T_dialogName) => void
   openDialogMarkdownDocument: (name: T_documentName) => void

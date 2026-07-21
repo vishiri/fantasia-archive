@@ -129,16 +129,16 @@ test('Test that compareAppSettingsCategoryOrder orders page categories first the
 test('Test that sortSettingsListByTranslatedTitle orders by translated title then key', () => {
   const input: Record<string, I_appSettingsSettingRenderItem> = {
     noProjectName: stubSetting('Hide project name in tree'),
-    doNotCollapseTreeOptions: stubSetting('Prevent sublevel collapse in the tree'),
+    forceSublevelCollapseInTree: stubSetting('Force sublevel collapse in the tree'),
     invertCategoryPosition: stubSetting('Invert category position')
   }
 
   const orderedKeys = Object.keys(sortSettingsListByTranslatedTitle(input))
 
   expect(orderedKeys).toEqual([
+    'forceSublevelCollapseInTree',
     'noProjectName',
-    'invertCategoryPosition',
-    'doNotCollapseTreeOptions'
+    'invertCategoryPosition'
   ])
 })
 

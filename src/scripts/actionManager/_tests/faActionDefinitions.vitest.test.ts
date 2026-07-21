@@ -7,7 +7,9 @@ import type { I_faAppConfigApplyResult } from 'app/types/I_faAppConfigDomain'
 import { FA_ACTION_IDS, type T_faActionId } from 'app/types/I_faActionManagerDomain'
 
 const userSettingsFixture = vi.hoisted(() => ({
-  hideHierarchyTree: false
+  hideHierarchyTree: false,
+  preventFilledAppNoteBoardPopup: false,
+  preventFilledProjectNoteBoardPopup: false
 }))
 
 const faActiveProjectFixture = vi.hoisted(() => ({
@@ -21,6 +23,10 @@ const faActiveProjectFixture = vi.hoisted(() => ({
 const canOpenFloatingWindowWhileNoModalMock = vi.hoisted(() => {
   return vi.fn((): boolean => true)
 })
+
+const projectNoteboardTextFixture = vi.hoisted(() => ({
+  text: ''
+}))
 
 const {
   applyLanguageMock,
@@ -44,6 +50,7 @@ const {
   refreshWebContentsMock,
   resizeWindowMock,
   savePersistedCssFromEditorMock,
+  setProjectNoteboardWindowOpenMock,
   tipsNotificationMock,
   toggleDevToolsMock,
   updateKeybindsMock,
@@ -66,8 +73,8 @@ const {
   openProjectFromUserDialogMock: vi.fn(),
   refreshKeybindsMock: vi.fn(async () => undefined),
   refreshAppStylingMock: vi.fn(async () => undefined),
-  refreshNoteboardMock: vi.fn(async () => undefined),
-  refreshProjectNoteboardMock: vi.fn(async () => undefined),
+  refreshNoteboardMock: vi.fn(async () => false),
+  refreshProjectNoteboardMock: vi.fn(async () => false),
   refreshProjectSidebarMock: vi.fn(async () => undefined),
   refreshProjectStylingMock: vi.fn(async () => undefined),
   refreshRecentProjectsMock: vi.fn(async () => undefined),
@@ -75,6 +82,7 @@ const {
   refreshWebContentsMock: vi.fn(async () => true),
   resizeWindowMock: vi.fn(),
   savePersistedCssFromEditorMock: vi.fn(async (): Promise<boolean> => true),
+  setProjectNoteboardWindowOpenMock: vi.fn(),
   tipsNotificationMock: vi.fn(),
   toggleDevToolsMock: vi.fn(),
   updateKeybindsMock: vi.fn(async () => true),
@@ -143,13 +151,19 @@ vi.mock('app/src/stores/S_FaAppStyling', () => ({
 
 vi.mock('app/src/stores/S_FaAppNoteboard', () => ({
   S_FaAppNoteboard: () => ({
-    refreshNoteboard: refreshNoteboardMock
+    refreshNoteboard: refreshNoteboardMock,
+    setWindowOpen: vi.fn(),
+    text: ''
   })
 }))
 
 vi.mock('app/src/stores/S_FaProjectNoteboard', () => ({
   S_FaProjectNoteboard: () => ({
-    refreshProjectNoteboard: refreshProjectNoteboardMock
+    get text () {
+      return projectNoteboardTextFixture.text
+    },
+    refreshProjectNoteboard: refreshProjectNoteboardMock,
+    setWindowOpen: setProjectNoteboardWindowOpenMock
   })
 }))
 
@@ -227,14 +241,18 @@ beforeEach(() => {
   patchSettingsSilentlyMock.mockReset()
   patchSettingsSilentlyMock.mockImplementation(async () => undefined)
   userSettingsFixture.hideHierarchyTree = false
+  userSettingsFixture.preventFilledAppNoteBoardPopup = false
+  userSettingsFixture.preventFilledProjectNoteBoardPopup = false
+  projectNoteboardTextFixture.text = ''
   refreshKeybindsMock.mockReset()
   refreshKeybindsMock.mockImplementation(async () => undefined)
   refreshAppStylingMock.mockReset()
   refreshAppStylingMock.mockImplementation(async () => undefined)
   refreshNoteboardMock.mockReset()
-  refreshNoteboardMock.mockImplementation(async () => undefined)
+  refreshNoteboardMock.mockImplementation(async () => false)
   refreshProjectNoteboardMock.mockReset()
-  refreshProjectNoteboardMock.mockImplementation(async () => undefined)
+  refreshProjectNoteboardMock.mockImplementation(async () => false)
+  setProjectNoteboardWindowOpenMock.mockReset()
   refreshProjectSidebarMock.mockReset()
   refreshProjectSidebarMock.mockImplementation(async () => undefined)
   refreshProjectStylingMock.mockReset()
@@ -517,6 +535,29 @@ test('Test that createNewProject handler delegates to S_FaActiveProject when cre
   })
 })
 
+/**
+ * createNewProject
+ * Auto-opens the project noteboard when hydrate succeeds and text is filled.
+ */
+test('Test that createNewProject auto-opens filled project noteboard when prevent is off', async () => {
+  refreshProjectNoteboardMock.mockResolvedValueOnce(true)
+  projectNoteboardTextFixture.text = 'saved notes'
+  await (definitionFor('createNewProject').handler({ projectName: 'Realm' }) as Promise<unknown>)
+  expect(setProjectNoteboardWindowOpenMock).toHaveBeenCalledWith(true)
+})
+
+/**
+ * createNewProject
+ * Skips auto-open when preventFilledProjectNoteBoardPopup is enabled.
+ */
+test('Test that createNewProject skips noteboard auto-open when prevent setting is on', async () => {
+  refreshProjectNoteboardMock.mockResolvedValueOnce(true)
+  projectNoteboardTextFixture.text = 'saved notes'
+  userSettingsFixture.preventFilledProjectNoteBoardPopup = true
+  await (definitionFor('createNewProject').handler({ projectName: 'Realm' }) as Promise<unknown>)
+  expect(setProjectNoteboardWindowOpenMock).not.toHaveBeenCalled()
+})
+
 test('Test that createNewProject handler throws FaActionUserCanceledError when creation is canceled', async () => {
   createProjectFromUserInputMock.mockResolvedValueOnce('canceled')
   await expect(
@@ -547,6 +588,17 @@ test('Test that loadExistingProject handler delegates to openProjectFromUserDial
   expect(result).toEqual({
     payloadPreview: expectedPreview
   })
+})
+
+/**
+ * loadExistingProject
+ * Auto-opens the project noteboard after a successful open when text is filled.
+ */
+test('Test that loadExistingProject auto-opens filled project noteboard when prevent is off', async () => {
+  refreshProjectNoteboardMock.mockResolvedValueOnce(true)
+  projectNoteboardTextFixture.text = 'project notes'
+  await (definitionFor('loadExistingProject').handler({}) as Promise<unknown>)
+  expect(setProjectNoteboardWindowOpenMock).toHaveBeenCalledWith(true)
 })
 
 test('Test that loadExistingProject handler delegates to openProjectFromKnownPath when filePath is set', async () => {

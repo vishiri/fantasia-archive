@@ -37,6 +37,38 @@ test('Test that parseFaUserSettingsFile migrates legacy app control bar keys', (
 })
 
 /**
+ * parseFaUserSettingsFile
+ * Accepts legacy doNotCollapseTreeOptions from older faUserSettings.json exports.
+ */
+test('Test that parseFaUserSettingsFile migrates legacy doNotCollapseTreeOptions', () => {
+  const {
+    forceSublevelCollapseInTree: _dropForce,
+    ...rest
+  } = FA_USER_SETTINGS_DEFAULTS
+  const v = parseFaUserSettingsFile({
+    ...rest,
+    doNotCollapseTreeOptions: true
+  })
+  expect(v.forceSublevelCollapseInTree).toBe(false)
+})
+
+/**
+ * parseFaUserSettingsFile
+ * Accepts legacy preventFilledNoteBoardPopup from older faUserSettings.json exports.
+ */
+test('Test that parseFaUserSettingsFile migrates legacy preventFilledNoteBoardPopup', () => {
+  const {
+    preventFilledAppNoteBoardPopup: _dropApp,
+    ...rest
+  } = FA_USER_SETTINGS_DEFAULTS
+  const v = parseFaUserSettingsFile({
+    ...rest,
+    preventFilledNoteBoardPopup: true
+  })
+  expect(v.preventFilledAppNoteBoardPopup).toBe(true)
+})
+
+/**
  * faKeybindsRootFileSchema
  * Accepts schemaVersion and overrides with known command id.
  */

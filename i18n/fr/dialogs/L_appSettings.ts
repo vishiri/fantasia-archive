@@ -59,12 +59,8 @@ export default {
         tags: 'détacher, fenêtre secondaire, fenêtre multiple',
       },
       quickSearchDialog: {
-        subtitle: 'Boîte de dialogue de recherche rapide',
-        tags: 'recherche rapide, recherche au clavier, finder',
-      },
-      universalDialogSettings: {
-        subtitle: 'Paramètres de dialogue universels',
-        tags: 'toutes les boîtes de dialogue, comportement global des popups',
+        subtitle: 'Quick-search/Quick-add dialog',
+        tags: 'quick search, quick add, keyboard search, finder, popup close'
       }
     },
     visualAccessibility: {
@@ -181,15 +177,17 @@ export default {
       tags: 'orthographe, grammaire, vérification, soulignement rouge, écriture, dictionnaire',
       note: 'Nécessite un redémarrage complet de l\'application pour prendre effet !',
     },
-    doNotCollapseTreeOptions: {
-      title: 'Empêcher l\'effondrement des sous-niveaux dans l\'arborescence',
-      description: 'Empêche la fermeture des sous-catégories de l\'arborescence hiérarchique lorsqu\'une catégorie parent est fermée.',
-      tags: 'rappelez-vous les enfants développés, imbriqués ouverts, accordéon, réduits',
-    },
+
     doubleDashDocCount: {
       title: 'Diviseur de comptage prononcé',
       description: 'Ce paramètre ajoute un autre caractère \\\\| entre la catégorie et le nombre de documents dans l\'arborescence hiérarchique.',
       tags: 'canal, délimiteur, séparateur, format de comptage, nombre d\'arbres',
+    },
+
+    forceSublevelCollapseInTree: {
+      title: 'Force sublevel collapse in the tree',
+      description: 'Forces sublevels of the closed node in the hierarchical tree to close as well when a parent node is closed. Normally, they remember the pre-close state and will reopen as they were when closed.',
+      tags: 'force collapse, close children, parent node, nested tree, remember expand'
     },
     hideAdvSearchCheatsheetButton: {
       title: 'Masquer le bouton d\'aide sur les relations',
@@ -301,11 +299,17 @@ export default {
       description: 'Détermine si les documents rappellent leurs positions de défilement et effectuent un défilement automatique lors du basculement entre elles.',
       tags: 'position de défilement, rappelez-vous le défilement, saut vers le haut, commutateur d\'onglet',
     },
-    preventFilledNoteBoardPopup: {
-      title: 'Empêcher l\'affichage du bloc-notes rempli',
-      description: 'Lorsqu\'il est activé, le bloc-notes ne s\'ouvrira pas automatiquement au démarrage de l\'application s\'il contient encore des notes des sessions FA précédentes.',
-      tags: 'notes autocollantes, bloc-notes, démarrage, ouverture automatique, rappels',
+    preventFilledAppNoteBoardPopup: {
+      title: 'Prevent filled app noteboard from showing',
+      description: 'When enabled, the app noteboard will not open automatically at app start when it still contains notes from previous FA sessions.',
+      tags: 'app noteboard, sticky notes, startup, auto open, reminders'
     },
+    preventFilledProjectNoteBoardPopup: {
+      title: 'Prevent filled project noteboard from showing',
+      description: 'When enabled, the project noteboard will not open automatically when a project loads if it still contains notes from previous project sessions.',
+      tags: 'project noteboard, sticky notes, project open, auto open, reminders'
+    },
+
     preventPreviewsDocuments: {
       title: 'Empêcher les aperçus de documents',
       description: 'Contrôle si les aperçus rapides au survol sont affichés dans la vue du document et dans les champs de relation.',

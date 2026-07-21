@@ -59,12 +59,8 @@ export default {
         tags: 'separar, ventana secundaria, ventana múltiple',
       },
       quickSearchDialog: {
-        subtitle: 'Diálogo de búsqueda rápida',
-        tags: 'búsqueda rápida, búsqueda por teclado, buscador',
-      },
-      universalDialogSettings: {
-        subtitle: 'Configuración de diálogo universal',
-        tags: 'todos los cuadros de diálogo, comportamiento global de ventanas emergentes',
+        subtitle: 'Quick-search/Quick-add dialog',
+        tags: 'quick search, quick add, keyboard search, finder, popup close'
       }
     },
     visualAccessibility: {
@@ -181,15 +177,17 @@ export default {
       tags: 'ortografía, gramática, revisiones, subrayado rojo, escritura, diccionario',
       note: '¡Necesita reiniciar completamente la aplicación para que surta efecto!',
     },
-    doNotCollapseTreeOptions: {
-      title: 'Prevenir el colapso de subniveles en el árbol.',
-      description: 'Impide que se cierren las subcategorías del árbol jerárquico cuando se cierra una categoría principal.',
-      tags: 'recordar expandido, anidado abierto, acordeón, colapsar niños',
-    },
+
     doubleDashDocCount: {
       title: 'Divisor de recuento pronunciado',
       description: 'Esta configuración agrega otro carácter \\\\| entre la categoría y el recuento de documentos en el árbol jerárquico.',
       tags: 'canalización, delimitador, separador, formato de recuento, recuentos de árboles',
+    },
+
+    forceSublevelCollapseInTree: {
+      title: 'Force sublevel collapse in the tree',
+      description: 'Forces sublevels of the closed node in the hierarchical tree to close as well when a parent node is closed. Normally, they remember the pre-close state and will reopen as they were when closed.',
+      tags: 'force collapse, close children, parent node, nested tree, remember expand'
     },
     hideAdvSearchCheatsheetButton: {
       title: 'Ocultar botón de ayuda para relaciones',
@@ -301,11 +299,17 @@ export default {
       description: 'Determina si los documentos recuerdan sus posiciones de desplazamiento y se desplazan automáticamente al cambiar entre ellos.',
       tags: 'posición de desplazamiento, recordar desplazamiento, saltar al principio, cambiar de pestaña',
     },
-    preventFilledNoteBoardPopup: {
-      title: 'Evitar que se muestre el cuaderno lleno',
-      description: 'Cuando está habilitado, el bloc de notas no se abrirá automáticamente al iniciar la aplicación cuando todavía contenga notas de sesiones FA anteriores.',
-      tags: 'notas adhesivas, bloc de notas, inicio, apertura automática, recordatorios',
+    preventFilledAppNoteBoardPopup: {
+      title: 'Prevent filled app noteboard from showing',
+      description: 'When enabled, the app noteboard will not open automatically at app start when it still contains notes from previous FA sessions.',
+      tags: 'app noteboard, sticky notes, startup, auto open, reminders'
     },
+    preventFilledProjectNoteBoardPopup: {
+      title: 'Prevent filled project noteboard from showing',
+      description: 'When enabled, the project noteboard will not open automatically when a project loads if it still contains notes from previous project sessions.',
+      tags: 'project noteboard, sticky notes, project open, auto open, reminders'
+    },
+
     preventPreviewsDocuments: {
       title: 'Evitar vistas previas de documentos',
       description: 'Controla si las vistas previas rápidas al pasar el mouse se muestran en la vista del documento y en los campos de relación.',

@@ -59,12 +59,8 @@ export default {
         tags: 'Abtrennen, Zweitfenster, Mehrfachfenster',
       },
       quickSearchDialog: {
-        subtitle: 'Schnellsuchdialog',
-        tags: 'Schnellsuche, Tastatursuche, Finder',
-      },
-      universalDialogSettings: {
-        subtitle: 'Universelle Dialogeinstellungen',
-        tags: 'alle Dialoge, globales Popup-Verhalten',
+        subtitle: 'Quick-search/Quick-add dialog',
+        tags: 'quick search, quick add, keyboard search, finder, popup close'
       }
     },
     visualAccessibility: {
@@ -181,15 +177,17 @@ export default {
       tags: 'Rechtschreibung, Grammatik, Korrekturlesen, rote Unterstreichung, Schreiben, Wörterbuch',
       note: 'Erfordert einen vollständigen Neustart der App, um wirksam zu werden!',
     },
-    doNotCollapseTreeOptions: {
-      title: 'Verhindern Sie den Zusammenbruch einer Unterebene im Baum',
-      description: 'Verhindert, dass Unterkategorien in der hierarchischen Struktur geschlossen werden, wenn eine übergeordnete Kategorie geschlossen wird.',
-      tags: 'Erinnern Sie sich an erweiterte, verschachtelte, offene, Akkordeon- und zusammengeklappte Kinder',
-    },
+
     doubleDashDocCount: {
       title: 'Ausgesprochener Zählteiler',
       description: 'Diese Einstellung fügt ein weiteres Zeichen \\\\| zwischen der Kategorie und der Dokumentanzahl in der hierarchischen Struktur hinzu.',
       tags: 'Pipe, Trennzeichen, Trennzeichen, Zählformat, Baumzählungen',
+    },
+
+    forceSublevelCollapseInTree: {
+      title: 'Force sublevel collapse in the tree',
+      description: 'Forces sublevels of the closed node in the hierarchical tree to close as well when a parent node is closed. Normally, they remember the pre-close state and will reopen as they were when closed.',
+      tags: 'force collapse, close children, parent node, nested tree, remember expand'
     },
     hideAdvSearchCheatsheetButton: {
       title: 'Hilfeschaltfläche „Beziehungen ausblenden“.',
@@ -301,11 +299,17 @@ export default {
       description: 'Legt fest, ob Dokumente ihre Bildlaufpositionen abrufen und automatisch scrollen, wenn zwischen ihnen gewechselt wird.',
       tags: 'Scrollposition, Scrollen merken, nach oben springen, Tabulatorwechsel',
     },
-    preventFilledNoteBoardPopup: {
-      title: 'Verhindern Sie, dass eine gefüllte Notiztafel angezeigt wird',
-      description: 'Wenn diese Option aktiviert ist, wird das Notizbrett beim Start der App nicht automatisch geöffnet, wenn es noch Notizen aus früheren FA-Sitzungen enthält.',
-      tags: 'Haftnotizen, Notiztafel, Start, automatisches Öffnen, Erinnerungen',
+    preventFilledAppNoteBoardPopup: {
+      title: 'Prevent filled app noteboard from showing',
+      description: 'When enabled, the app noteboard will not open automatically at app start when it still contains notes from previous FA sessions.',
+      tags: 'app noteboard, sticky notes, startup, auto open, reminders'
     },
+    preventFilledProjectNoteBoardPopup: {
+      title: 'Prevent filled project noteboard from showing',
+      description: 'When enabled, the project noteboard will not open automatically when a project loads if it still contains notes from previous project sessions.',
+      tags: 'project noteboard, sticky notes, project open, auto open, reminders'
+    },
+
     preventPreviewsDocuments: {
       title: 'Dokumentvorschauen verhindern',
       description: 'Steuert, ob Schnellvorschauen beim Hover in der Dokumentansicht und in Beziehungsfeldern angezeigt werden.',

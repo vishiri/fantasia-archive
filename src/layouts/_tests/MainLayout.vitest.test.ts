@@ -409,6 +409,114 @@ test('Test that MainLayout refreshes app noteboard when faAppNoteboard bridge is
 
 /**
  * MainLayout / onMounted
+ * Auto-opens the app noteboard at app load when text is filled and prevent is off.
+ */
+test('Test that MainLayout auto-opens filled app noteboard at app load when prevent is off', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'electron')
+
+  S_FaUserSettings().$patch({
+    settings: {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      preventFilledAppNoteBoardPopup: false
+    }
+  })
+
+  const appNoteboardStore = S_FaAppNoteboard()
+  const refreshSpy = vi.spyOn(appNoteboardStore, 'refreshNoteboard').mockImplementation(async () => {
+    appNoteboardStore.text = 'app notes'
+    return true
+  })
+  const openSpy = vi.spyOn(appNoteboardStore, 'setWindowOpen')
+
+  const w = await mountMainLayoutForVitest()
+  await flushPromises()
+
+  expect(openSpy).toHaveBeenCalledWith(true)
+
+  openSpy.mockRestore()
+  refreshSpy.mockRestore()
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * MainLayout / onMounted
+ * Does not auto-open the app noteboard when preventFilledAppNoteBoardPopup is enabled.
+ */
+test('Test that MainLayout skips app noteboard auto-open when prevent setting is on', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'electron')
+
+  const userSettingsStore = S_FaUserSettings()
+  const refreshSettingsSpy = vi.spyOn(userSettingsStore, 'refreshSettings').mockResolvedValue(undefined)
+  userSettingsStore.$patch({
+    settings: {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      preventFilledAppNoteBoardPopup: true
+    }
+  })
+
+  const appNoteboardStore = S_FaAppNoteboard()
+  const refreshSpy = vi.spyOn(appNoteboardStore, 'refreshNoteboard').mockImplementation(async () => {
+    appNoteboardStore.text = 'app notes'
+    return true
+  })
+  const openSpy = vi.spyOn(appNoteboardStore, 'setWindowOpen')
+
+  const w = await mountMainLayoutForVitest()
+  await flushPromises()
+
+  expect(openSpy).not.toHaveBeenCalled()
+
+  openSpy.mockRestore()
+  refreshSpy.mockRestore()
+  refreshSettingsSpy.mockRestore()
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * MainLayout / onMounted
+ * Auto-opens the project noteboard after project hydrate when active and filled.
+ */
+test('Test that MainLayout auto-opens filled project noteboard when project is active', async () => {
+  setFantasiaStorybookCanvasFlag(false)
+  vi.stubEnv('MODE', 'electron')
+
+  S_FaUserSettings().$patch({
+    settings: {
+      ...FA_USER_SETTINGS_DEFAULTS,
+      preventFilledProjectNoteBoardPopup: false
+    }
+  })
+  S_FaActiveProject().setActiveProject({
+    filePath: 'C:\\fixture.faproject',
+    id: 'fixture-id',
+    name: 'Fixture'
+  })
+
+  const projectNoteboardStore = S_FaProjectNoteboard()
+  const refreshSpy = vi.spyOn(projectNoteboardStore, 'refreshProjectNoteboard').mockImplementation(async () => {
+    projectNoteboardStore.text = 'project notes'
+    return true
+  })
+  const openSpy = vi.spyOn(projectNoteboardStore, 'setWindowOpen')
+
+  const w = await mountMainLayoutForVitest()
+  await flushPromises()
+
+  expect(openSpy).toHaveBeenCalledWith(true)
+
+  openSpy.mockRestore()
+  refreshSpy.mockRestore()
+  S_FaActiveProject().clearActiveProject()
+  w.unmount()
+  vi.unstubAllEnvs()
+})
+
+/**
+ * MainLayout / onMounted
  * Skips app noteboard hydration when the bridge omits faAppNoteboard.
  */
 test('Test that MainLayout skips app noteboard refresh when faAppNoteboard bridge is absent', async () => {

@@ -59,12 +59,8 @@ export default {
         tags: 'отсоединить, вторичное окно, несколько окон',
       },
       quickSearchDialog: {
-        subtitle: 'Диалог быстрого поиска',
-        tags: 'быстрый поиск, поиск с клавиатуры, поисковик',
-      },
-      universalDialogSettings: {
-        subtitle: 'Универсальные настройки диалога',
-        tags: 'все диалоги, глобальное поведение всплывающих окон',
+        subtitle: 'Quick-search/Quick-add dialog',
+        tags: 'quick search, quick add, keyboard search, finder, popup close'
       }
     },
     visualAccessibility: {
@@ -181,15 +177,17 @@ export default {
       tags: 'орфография, грамматика, корректура, красное подчеркивание, письмо, словарь',
       note: 'Требуется полный перезапуск приложения, чтобы изменения вступили в силу!',
     },
-    doNotCollapseTreeOptions: {
-      title: 'Предотвращение обрушения подуровней в дереве',
-      description: 'Предотвращает закрытие подкатегорий в иерархическом дереве при закрытии родительской категории.',
-      tags: 'запомнить расширенное, вложенное открытое, аккордеон, свернуть детей',
-    },
+
     doubleDashDocCount: {
       title: 'Выраженный делитель счета',
       description: 'Этот параметр добавляет еще один символ \\\\| между категорией и количеством документов в иерархическом дереве.',
       tags: 'труба, разделитель, разделитель, формат счета, количество деревьев',
+    },
+
+    forceSublevelCollapseInTree: {
+      title: 'Force sublevel collapse in the tree',
+      description: 'Forces sublevels of the closed node in the hierarchical tree to close as well when a parent node is closed. Normally, they remember the pre-close state and will reopen as they were when closed.',
+      tags: 'force collapse, close children, parent node, nested tree, remember expand'
     },
     hideAdvSearchCheatsheetButton: {
       title: 'Скрыть кнопку помощи по взаимоотношениям',
@@ -301,11 +299,17 @@ export default {
       description: 'Определяет, будут ли документы вызывать свои позиции прокрутки и выполнять ли автоматическую прокрутку при переключении между ними.',
       tags: 'положение прокрутки, запоминание прокрутки, переход наверх, переключение вкладок',
     },
-    preventFilledNoteBoardPopup: {
-      title: 'Запретить отображение заполненного блокнота',
-      description: 'Если этот параметр включен, доска заметок не будет открываться автоматически при запуске приложения, если она все еще содержит заметки из предыдущих сеансов FA.',
-      tags: 'заметки, блокнот, автозапуск, автоматическое открытие, напоминания',
+    preventFilledAppNoteBoardPopup: {
+      title: 'Prevent filled app noteboard from showing',
+      description: 'When enabled, the app noteboard will not open automatically at app start when it still contains notes from previous FA sessions.',
+      tags: 'app noteboard, sticky notes, startup, auto open, reminders'
     },
+    preventFilledProjectNoteBoardPopup: {
+      title: 'Prevent filled project noteboard from showing',
+      description: 'When enabled, the project noteboard will not open automatically when a project loads if it still contains notes from previous project sessions.',
+      tags: 'project noteboard, sticky notes, project open, auto open, reminders'
+    },
+
     preventPreviewsDocuments: {
       title: 'Запретить предварительный просмотр документов',
       description: 'Управляет отображением быстрого предварительного просмотра при наведении курсора мыши в представлении документа и в полях отношений.',

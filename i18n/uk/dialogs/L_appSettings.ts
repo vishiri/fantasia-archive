@@ -59,12 +59,8 @@ export default {
         tags: 'від\'єднати, додаткове вікно, кілька вікон',
       },
       quickSearchDialog: {
-        subtitle: 'Діалог швидкого пошуку',
-        tags: 'швидкий пошук, пошук з клавіатури, шукач',
-      },
-      universalDialogSettings: {
-        subtitle: 'Універсальні налаштування діалогу',
-        tags: 'усі діалоги, глобальна поведінка спливаючих вікон',
+        subtitle: 'Quick-search/Quick-add dialog',
+        tags: 'quick search, quick add, keyboard search, finder, popup close'
       }
     },
     visualAccessibility: {
@@ -181,15 +177,17 @@ export default {
       tags: 'орфографія, граматика, правопис, червоне підкреслення, написання, словник',
       note: 'Потрібне повне перезапуск програми, щоб набуло чинності!',
     },
-    doNotCollapseTreeOptions: {
-      title: 'Запобігання колапсу підрівня в дереві',
-      description: 'Запобігає закриттю підкатегорій в ієрархічному дереві, коли закривається батьківська категорія.',
-      tags: 'запам\'ятати розгорнуті, вкладені відкриті, гармошка, згорнуті діти',
-    },
+
     doubleDashDocCount: {
       title: 'Яскраво виражений кол-ділитель',
       description: 'Цей параметр додає ще один символ \\\\| між категорією та кількістю документів в ієрархічному дереві.',
       tags: 'вертикальна лінія, роздільник, роздільник, формат підрахунку, кількість дерев',
+    },
+
+    forceSublevelCollapseInTree: {
+      title: 'Force sublevel collapse in the tree',
+      description: 'Forces sublevels of the closed node in the hierarchical tree to close as well when a parent node is closed. Normally, they remember the pre-close state and will reopen as they were when closed.',
+      tags: 'force collapse, close children, parent node, nested tree, remember expand'
     },
     hideAdvSearchCheatsheetButton: {
       title: 'Кнопка довідки про приховати стосунки',
@@ -301,11 +299,17 @@ export default {
       description: 'Визначає, чи документи запам’ятовують свої позиції прокручування та автоматичне прокручування під час перемикання між ними.',
       tags: 'положення прокрутки, запам\'ятати прокрутку, перейти вгору, перемикання вкладок',
     },
-    preventFilledNoteBoardPopup: {
-      title: 'Запобігти показу заповненого блокнота',
-      description: 'Якщо ввімкнено, блокнот не відкриватиметься автоматично під час запуску програми, якщо він все ще містить нотатки з попередніх сеансів FA.',
-      tags: 'наліпки, блокнот, запуск, автоматичне відкриття, нагадування',
+    preventFilledAppNoteBoardPopup: {
+      title: 'Prevent filled app noteboard from showing',
+      description: 'When enabled, the app noteboard will not open automatically at app start when it still contains notes from previous FA sessions.',
+      tags: 'app noteboard, sticky notes, startup, auto open, reminders'
     },
+    preventFilledProjectNoteBoardPopup: {
+      title: 'Prevent filled project noteboard from showing',
+      description: 'When enabled, the project noteboard will not open automatically when a project loads if it still contains notes from previous project sessions.',
+      tags: 'project noteboard, sticky notes, project open, auto open, reminders'
+    },
+
     preventPreviewsDocuments: {
       title: 'Заборонити попередній перегляд документів',
       description: 'Контролює, чи відображаються швидкі попередні перегляди під час наведення курсора в режимі перегляду документа та в полях зв’язків.',

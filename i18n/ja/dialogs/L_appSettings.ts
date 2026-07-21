@@ -59,12 +59,8 @@ export default {
         tags: 'デタッチ、セカンダリ ウィンドウ、マルチ ウィンドウ',
       },
       quickSearchDialog: {
-        subtitle: 'クイック検索ダイアログ',
-        tags: 'クイック検索、キーボード検索、ファインダー',
-      },
-      universalDialogSettings: {
-        subtitle: 'ユニバーサルダイアログ設定',
-        tags: 'すべてのダイアログ、グローバルなポップアップ動作',
+        subtitle: 'Quick-search/Quick-add dialog',
+        tags: 'quick search, quick add, keyboard search, finder, popup close'
       }
     },
     visualAccessibility: {
@@ -181,15 +177,16 @@ export default {
       tags: 'スペル、文法、校正、赤い下線、ライティング、辞書',
       note: '有効にするにはアプリを完全に再起動する必要があります。',
     },
-    doNotCollapseTreeOptions: {
-      title: 'ツリー内のサブレベルの崩壊を防ぐ',
-      description: '親カテゴリが閉じているときに、階層ツリー内のサブカテゴリが閉じないようにします。',
-      tags: '拡張、ネストされたオープン、アコーディオン、子を折りたたむことを記憶します。',
-    },
+
     doubleDashDocCount: {
       title: '発音されたカウントディバイダ',
       description: 'この設定により、階層ツリー内のカテゴリとドキュメント数の間に \\\\| 文字が追加されます。',
       tags: 'パイプ、デリミタ、セパレータ、カウント形式、ツリーカウント',
+    },
+    forceSublevelCollapseInTree: {
+      title: 'Force sublevel collapse in the tree',
+      description: 'Forces sublevels of the closed node in the hierarchical tree to close as well when a parent node is closed. Normally, they remember the pre-close state and will reopen as they were when closed.',
+      tags: 'force collapse, close children, parent node, nested tree, remember expand'
     },
     hideAdvSearchCheatsheetButton: {
       title: 'リレーションシップのヘルプ ボタンを非表示にする',
@@ -301,11 +298,17 @@ export default {
       description: 'ドキュメントがスクロール位置を記憶し、スクロール位置を切り替えるときに自動スクロールするかどうかを決定します。',
       tags: 'スクロール位置、スクロールの記憶、先頭へのジャンプ、タブ切り替え',
     },
-    preventFilledNoteBoardPopup: {
-      title: '塗りつぶされたノートボードが表示されないようにする',
-      description: '有効にすると、以前の FA セッションのメモがまだ含まれている場合、メモボードはアプリの起動時に自動的に開きません。',
-      tags: '付箋、ノートボード、スタートアップ、自動オープン、リマインダー',
+    preventFilledAppNoteBoardPopup: {
+      title: 'Prevent filled app noteboard from showing',
+      description: 'When enabled, the app noteboard will not open automatically at app start when it still contains notes from previous FA sessions.',
+      tags: 'app noteboard, sticky notes, startup, auto open, reminders'
     },
+    preventFilledProjectNoteBoardPopup: {
+      title: 'Prevent filled project noteboard from showing',
+      description: 'When enabled, the project noteboard will not open automatically when a project loads if it still contains notes from previous project sessions.',
+      tags: 'project noteboard, sticky notes, project open, auto open, reminders'
+    },
+
     preventPreviewsDocuments: {
       title: 'ドキュメントのプレビューを禁止する',
       description: 'ホバー時のクイック プレビューをドキュメント ビューおよびリレーションシップ フィールドに表示するかどうかを制御します。',

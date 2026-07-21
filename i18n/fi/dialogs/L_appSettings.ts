@@ -59,12 +59,8 @@ export default {
         tags: 'irrota, toissijainen ikkuna, moniikkuna',
       },
       quickSearchDialog: {
-        subtitle: 'Pikahaun valintaikkuna',
-        tags: 'pikahaku, näppäimistöhaku, Finder',
-      },
-      universalDialogSettings: {
-        subtitle: 'Yleiset valintaikkunaasetukset',
-        tags: 'kaikki valintaikkunat, yleinen ponnahdusikkunoiden toiminta',
+        subtitle: 'Quick-search/Quick-add dialog',
+        tags: 'quick search, quick add, keyboard search, finder, popup close'
       }
     },
     visualAccessibility: {
@@ -181,15 +177,17 @@ export default {
       tags: 'oikeinkirjoitus, kielioppi, oikoluku, punainen alleviivaus, kirjoitus, sanakirja',
       note: 'Tarvitsee täyden sovelluksen uudelleenkäynnistyksen, jotta se tulee voimaan!',
     },
-    doNotCollapseTreeOptions: {
-      title: 'Estä alitason romahtaminen puussa',
-      description: 'Estää hierarkkisen puun alaluokkia sulkeutumasta, kun pääluokka suljetaan.',
-      tags: 'muista laajennettu, sisäkkäinen auki, harmonikka, romahtaa lapset',
-    },
+
     doubleDashDocCount: {
       title: 'Äännetty lukujakaja',
       description: 'Tämä asetus lisää toisen \\\\|-merkin luokan ja asiakirjamäärän väliin hierarkkisessa puussa.',
       tags: 'putki, erotin, erotin, laskentamuoto, puun määrä',
+    },
+
+    forceSublevelCollapseInTree: {
+      title: 'Force sublevel collapse in the tree',
+      description: 'Forces sublevels of the closed node in the hierarchical tree to close as well when a parent node is closed. Normally, they remember the pre-close state and will reopen as they were when closed.',
+      tags: 'force collapse, close children, parent node, nested tree, remember expand'
     },
     hideAdvSearchCheatsheetButton: {
       title: 'Piilota suhteiden ohjepainike',
@@ -301,11 +299,17 @@ export default {
       description: 'Määrittää, muistavatko asiakirjat vieritysasemansa ja vierivätkö ne automaattisesti niiden välillä vaihdettaessa.',
       tags: 'vierityskohta, muista vierittää, hypätä ylös, välilehtikytkin',
     },
-    preventFilledNoteBoardPopup: {
-      title: 'Estä täytetyn muistikirjan näyttäminen',
-      description: 'Kun tämä on käytössä, muistitaulu ei avaudu automaattisesti sovelluksen käynnistyksen yhteydessä, kun se sisältää edelleen muistiinpanoja aiemmista FA-istunnoista.',
-      tags: 'muistilaput, muistikirja, käynnistys, automaattinen avaus, muistutukset',
+    preventFilledAppNoteBoardPopup: {
+      title: 'Prevent filled app noteboard from showing',
+      description: 'When enabled, the app noteboard will not open automatically at app start when it still contains notes from previous FA sessions.',
+      tags: 'app noteboard, sticky notes, startup, auto open, reminders'
     },
+    preventFilledProjectNoteBoardPopup: {
+      title: 'Prevent filled project noteboard from showing',
+      description: 'When enabled, the project noteboard will not open automatically when a project loads if it still contains notes from previous project sessions.',
+      tags: 'project noteboard, sticky notes, project open, auto open, reminders'
+    },
+
     preventPreviewsDocuments: {
       title: 'Estä asiakirjan esikatselu',
       description: 'Määrittää, näytetäänkö pikaesikatselut osoitinnäkymässä ja suhdekentissä.',

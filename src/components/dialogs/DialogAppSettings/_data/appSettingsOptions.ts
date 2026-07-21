@@ -11,7 +11,7 @@ I_appSettingsStaticOption
   },
   allowQuickPopupSameKeyClose: {
     category: 'popupsFloatingWindows',
-    subcategory: 'universalDialogSettings'
+    subcategory: 'quickSearchDialog'
   },
   allowWiderScrollbars: {
     category: 'accessibility',
@@ -65,13 +65,13 @@ I_appSettingsStaticOption
     category: 'visualAccessibility',
     subcategory: 'visualsAppwideFunctionality'
   },
-  doNotCollapseTreeOptions: {
-    category: 'hierarchicalTree',
-    subcategory: 'treeBehavior'
-  },
   doubleDashDocCount: {
     category: 'accessibility',
     subcategory: 'accessibility'
+  },
+  forceSublevelCollapseInTree: {
+    category: 'hierarchicalTree',
+    subcategory: 'treeBehavior'
   },
   hideAdvSearchCheatsheetButton: {
     category: 'visualAccessibility',
@@ -157,7 +157,11 @@ I_appSettingsStaticOption
     category: 'documentViewEdit',
     subcategory: 'documentBody'
   },
-  preventFilledNoteBoardPopup: {
+  preventFilledAppNoteBoardPopup: {
+    category: 'popupsFloatingWindows',
+    subcategory: 'floatingWindows'
+  },
+  preventFilledProjectNoteBoardPopup: {
     category: 'popupsFloatingWindows',
     subcategory: 'floatingWindows'
   },
