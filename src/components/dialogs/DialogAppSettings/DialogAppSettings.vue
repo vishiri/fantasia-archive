@@ -116,7 +116,6 @@ const {
     display: flex;
     flex-direction: column;
     height: 100%;
-    max-height: calc(100vh - #{$dialogAppSettings-card-maxHeightSubtract});
     max-width: calc(100vw - #{$dialogAppSettings-card-maxWidthViewportSubtract});
     overflow: hidden;
     position: relative;

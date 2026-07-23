@@ -40,6 +40,7 @@
 - **App Settings**: **Prevent filled app noteboard from showing** and **Prevent filled project noteboard from showing** (defaults off). When off, a filled **App Noteboard** opens at app load and a filled **Project Noteboard** opens when a project loads; when on, that auto-open is skipped. Empty noteboards never open on their own. Manual toggle and keybinds still work. Older **Prevent filled noteboard** saves migrate to the app setting.
 
 ### Bugfixes & Optimizations
+- **Dialogs**: Tall Fantasia dialog shells (**Fantasia Archive Settings**, **Project Settings**, and others using the shared dialog card wrapper) now share one hard viewport max-height ceiling so content can no longer push the card past the window.
 - **Workspace sidebar**: Opening a project or refreshing the worlds layout no longer collapses expanded hierarchy rows when the live open set is briefly empty; expand restore falls back to the saved expand ids, waits until session hydrate finishes, and skips wiping persisted expands when the tree is not ready yet.
 - **App Settings**: **Hide Fantasia mascot** (title no longer includes a **TODO -** prefix) hides Fantasia everywhere that component renders, including the project overview tip card and the startup **Did you know** notification. Toggling the setting in the open settings dialog previews immediately; when the mascot is hidden, tip surfaces no longer show a help-icon placeholder.
 - **App controls**: **Toggle app noteboard** in the Tools menu and on the app control bar left strip uses the clipboard-edit outline icon.

@@ -196,7 +196,6 @@ function updateDocumentTemplatesOrder (
     display: flex;
     flex-direction: column;
     height: 100%;
-    max-height: calc(100vh - #{$dialogProjectSettings-card-maxHeightSubtract});
     max-width:
       min(
         #{$dialogProjectSettings-card-width},

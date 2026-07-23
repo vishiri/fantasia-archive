@@ -128,8 +128,13 @@ body.desktop .q-manual-focusable--focused > .q-focus-helper {
 }
 
 .q-dialog > .q-dialog__inner > .q-card {
-  max-height: calc(100vh - #{$qDialog-card-maxHeightSubtract});
   max-width: $qDialog-card-maxWidth;
+}
+
+.q-card.dialogComponent__wrapper {
+
+  /* Hard ceiling for every Fantasia dialog card shell — must beat per-dialog height/max-height. */
+  max-height: calc(100vh - #{$qDialog-card-maxHeightSubtract}) !important;
 }
 
 .q-field--dark .q-field__control::before {
