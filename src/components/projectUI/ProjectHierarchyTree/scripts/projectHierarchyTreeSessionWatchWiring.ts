@@ -3,6 +3,7 @@ import type { watch as watchFn } from 'vue'
 
 import type { I_faProjectHierarchyTreeHeTreeNode } from 'app/types/I_faProjectHierarchyTreeDomain'
 
+import { resolveProjectHierarchyTreeWorldsLayoutExpandSnapshot } from '../functions/projectHierarchyTreeWorldsLayoutExpandSnapshot'
 import { collectProjectHierarchyTreePersistedExpandedNodeIds } from '../functions/projectHierarchyTreePersistedOpenNodeIds'
 
 type T_projectHierarchyTreeSessionLifecycleDeps = {
@@ -12,6 +13,7 @@ type T_projectHierarchyTreeSessionLifecycleDeps = {
   }
   clearPendingRevealPath: () => void
   flushUiStatePersist: () => void
+  getStoreExpandedNodeIds: () => readonly string[]
   hydrateTreeSession: () => Promise<void>
   layoutRefreshGeneration: Ref<number>
   onMounted: (hook: () => void) => void
@@ -35,12 +37,18 @@ async function runProjectHierarchyTreeWorldsLayoutRestore (
   if (deps.shouldDeferWorldsExpandRestore()) {
     return
   }
-  const expandedSnapshot = collectProjectHierarchyTreePersistedExpandedNodeIds(
-    deps.treeData.value,
-    deps.openNodeIds.value
-  )
+  const expandedSnapshot = resolveProjectHierarchyTreeWorldsLayoutExpandSnapshot({
+    liveExpandedSnapshot: collectProjectHierarchyTreePersistedExpandedNodeIds(
+      deps.treeData.value,
+      deps.openNodeIds.value
+    ),
+    storeExpandedNodeIds: deps.getStoreExpandedNodeIds()
+  })
   const resyncResult = deps.resyncTreeDataFromLayout()
   if (resyncResult?.structureMatched === true) {
+    return
+  }
+  if (deps.shouldDeferWorldsExpandRestore()) {
     return
   }
   await deps.restoreExpandedSnapshot(expandedSnapshot)

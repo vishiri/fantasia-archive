@@ -1139,8 +1139,133 @@ test('Test that hydrate wiring refreshes session and tears down', async () => {
       restoreUiStateFromStore: vi.fn(async () => undefined)
     }
   })
-  await hydrateWiring.hydrateTreeSession()
+  expect(hydrateWiring.isTreeSessionHydrateInFlight()).toBe(false)
+  const hydratePromise = hydrateWiring.hydrateTreeSession()
+  expect(hydrateWiring.isTreeSessionHydrateInFlight()).toBe(true)
+  await hydratePromise
+  expect(hydrateWiring.isTreeSessionHydrateInFlight()).toBe(false)
   hydrateWiring.teardown()
+})
+
+/**
+ * createProjectHierarchyTreeSessionHydrateWiring
+ * Drop superseded hydrate after refreshUiState when teardown bumps generation.
+ */
+test('Test that hydrate wiring aborts after refreshUiState when generation advances', async () => {
+  let resolveRefreshUiState: (() => void) | undefined
+  const resyncTreeDataFromLayout = vi.fn()
+  const restoreUiStateFromStore = vi.fn(async () => undefined)
+  const hydrateWiring = createProjectHierarchyTreeSessionHydrateWiring({
+    dndWiring: {
+      onUnmountedCleanup: vi.fn()
+    },
+    hierarchyStore: {
+      flushUiStatePersist: vi.fn(),
+      refreshLayout: vi.fn(async () => undefined),
+      refreshUiState: vi.fn(async () => {
+        await new Promise<void>((resolve) => {
+          resolveRefreshUiState = resolve
+        })
+      })
+    },
+    syncWiring: {
+      resyncTreeDataFromLayout
+    },
+    uiStateWiring: {
+      attachScrollPersist: () => () => undefined,
+      onUnmountedCleanup: vi.fn(),
+      restoreUiStateFromStore
+    }
+  })
+  const hydratePromise = hydrateWiring.hydrateTreeSession()
+  await Promise.resolve()
+  await Promise.resolve()
+  hydrateWiring.teardown()
+  resolveRefreshUiState?.()
+  await hydratePromise
+  expect(resyncTreeDataFromLayout).not.toHaveBeenCalled()
+  expect(restoreUiStateFromStore).not.toHaveBeenCalled()
+})
+
+/**
+ * createProjectHierarchyTreeSessionHydrateWiring
+ * Drop superseded hydrate after restoreUiStateFromStore when teardown bumps generation.
+ */
+test('Test that hydrate wiring aborts after restore when teardown advances generation', async () => {
+  let resolveRestore: (() => void) | undefined
+  const attachScrollPersist = vi.fn(() => () => undefined)
+  const hydrateWiring = createProjectHierarchyTreeSessionHydrateWiring({
+    dndWiring: {
+      onUnmountedCleanup: vi.fn()
+    },
+    hierarchyStore: {
+      flushUiStatePersist: vi.fn(),
+      refreshLayout: vi.fn(async () => undefined),
+      refreshUiState: vi.fn(async () => undefined)
+    },
+    syncWiring: {
+      resyncTreeDataFromLayout: vi.fn()
+    },
+    uiStateWiring: {
+      attachScrollPersist,
+      onUnmountedCleanup: vi.fn(),
+      restoreUiStateFromStore: vi.fn(async () => {
+        await new Promise<void>((resolve) => {
+          resolveRestore = resolve
+        })
+      })
+    }
+  })
+  const hydratePromise = hydrateWiring.hydrateTreeSession()
+  await Promise.resolve()
+  await Promise.resolve()
+  hydrateWiring.teardown()
+  resolveRestore?.()
+  await hydratePromise
+  expect(attachScrollPersist).not.toHaveBeenCalled()
+})
+
+/**
+ * wireProjectHierarchyTreeSessionLifecycle
+ * Fall back to store expanded ids when live open set is empty during layout restore.
+ */
+test('Test that wireProjectHierarchyTreeSessionLifecycle falls back to store expand ids', async () => {
+  const restoreExpandedSnapshot = vi.fn(async () => undefined)
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const worlds = ref([sampleWorld])
+  const { watch } = await import('vue')
+  wireProjectHierarchyTreeSessionLifecycle({
+    S_FaActiveProject: () => ({
+      activeProject: {
+        id: 'project-a'
+      },
+      hasActiveProject: true
+    }),
+    clearPendingRevealPath: vi.fn(),
+    flushUiStatePersist: vi.fn(),
+    getStoreExpandedNodeIds: () => ['world-1', 'group-1'],
+    hydrateTreeSession: vi.fn(async () => undefined),
+    layoutRefreshGeneration: ref(0),
+    shouldDeferWorldsExpandRestore: () => false,
+    onMounted: vi.fn(),
+    onUnmounted: vi.fn(),
+    openNodeIds: ref(new Set<string>()),
+    pendingRevealPath: ref([]),
+    resetOnProjectClose: vi.fn(),
+    resyncTreeDataFromLayout: vi.fn(() => ({ structureMatched: false })),
+    restoreExpandedSnapshot,
+    revealPendingPath: vi.fn(async () => undefined),
+    teardown: vi.fn(),
+    treeData,
+    watch,
+    worlds
+  })
+  worlds.value = [{
+    ...sampleWorld,
+    displayName: 'World Renamed'
+  }]
+  await Promise.resolve()
+  expect(restoreExpandedSnapshot).toHaveBeenCalledWith(['world-1', 'group-1'])
 })
 
 test('Test that createProjectHierarchyTreeSessionRefs initializes drag refs', () => {
@@ -1540,6 +1665,7 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle resets store when proje
     }),
     clearPendingRevealPath: vi.fn(),
     flushUiStatePersist: vi.fn(),
+    getStoreExpandedNodeIds: () => [],
     hydrateTreeSession: vi.fn(async () => undefined),
     layoutRefreshGeneration: ref(0),
     shouldDeferWorldsExpandRestore: () => false,
@@ -1572,6 +1698,7 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle ignores empty reveal pa
     }),
     clearPendingRevealPath,
     flushUiStatePersist: vi.fn(),
+    getStoreExpandedNodeIds: () => [],
     hydrateTreeSession: vi.fn(async () => undefined),
     layoutRefreshGeneration: ref(0),
     shouldDeferWorldsExpandRestore: () => false,
@@ -1750,6 +1877,7 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle skips restore while dra
     }),
     clearPendingRevealPath: vi.fn(),
     flushUiStatePersist: vi.fn(),
+    getStoreExpandedNodeIds: () => [],
     hydrateTreeSession: vi.fn(async () => undefined),
     layoutRefreshGeneration: ref(0),
     shouldDeferWorldsExpandRestore: () => true,
@@ -1772,6 +1900,96 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle skips restore while dra
   }]
   await Promise.resolve()
   expect(resyncTreeDataFromLayout).not.toHaveBeenCalled()
+  expect(restoreExpandedSnapshot).not.toHaveBeenCalled()
+})
+
+/**
+ * wireProjectHierarchyTreeSessionLifecycle
+ * Skip expand restore when resync reports structure already matched.
+ */
+test('Test that wireProjectHierarchyTreeSessionLifecycle skips restore when structure matched', async () => {
+  const restoreExpandedSnapshot = vi.fn(async () => undefined)
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const worlds = ref([sampleWorld])
+  const { watch } = await import('vue')
+  wireProjectHierarchyTreeSessionLifecycle({
+    S_FaActiveProject: () => ({
+      activeProject: {
+        id: 'project-a'
+      },
+      hasActiveProject: true
+    }),
+    clearPendingRevealPath: vi.fn(),
+    flushUiStatePersist: vi.fn(),
+    getStoreExpandedNodeIds: () => ['world-1'],
+    hydrateTreeSession: vi.fn(async () => undefined),
+    layoutRefreshGeneration: ref(0),
+    shouldDeferWorldsExpandRestore: () => false,
+    onMounted: vi.fn(),
+    onUnmounted: vi.fn(),
+    openNodeIds: ref(new Set(['world-1'])),
+    pendingRevealPath: ref([]),
+    resetOnProjectClose: vi.fn(),
+    resyncTreeDataFromLayout: vi.fn(() => ({ structureMatched: true })),
+    restoreExpandedSnapshot,
+    revealPendingPath: vi.fn(async () => undefined),
+    teardown: vi.fn(),
+    treeData,
+    watch,
+    worlds
+  })
+  worlds.value = [{
+    ...sampleWorld,
+    displayName: 'World Renamed'
+  }]
+  await Promise.resolve()
+  expect(restoreExpandedSnapshot).not.toHaveBeenCalled()
+})
+
+/**
+ * wireProjectHierarchyTreeSessionLifecycle
+ * Skip restore when defer flips true after resync (hydrate/drag race).
+ */
+test('Test that wireProjectHierarchyTreeSessionLifecycle skips restore when defer flips after resync', async () => {
+  let deferCalls = 0
+  const restoreExpandedSnapshot = vi.fn(async () => undefined)
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  const worlds = ref([sampleWorld])
+  const { watch } = await import('vue')
+  wireProjectHierarchyTreeSessionLifecycle({
+    S_FaActiveProject: () => ({
+      activeProject: {
+        id: 'project-a'
+      },
+      hasActiveProject: true
+    }),
+    clearPendingRevealPath: vi.fn(),
+    flushUiStatePersist: vi.fn(),
+    getStoreExpandedNodeIds: () => ['world-1'],
+    hydrateTreeSession: vi.fn(async () => undefined),
+    layoutRefreshGeneration: ref(0),
+    shouldDeferWorldsExpandRestore: () => {
+      deferCalls += 1
+      return deferCalls > 1
+    },
+    onMounted: vi.fn(),
+    onUnmounted: vi.fn(),
+    openNodeIds: ref(new Set(['world-1'])),
+    pendingRevealPath: ref([]),
+    resetOnProjectClose: vi.fn(),
+    resyncTreeDataFromLayout: vi.fn(() => ({ structureMatched: false })),
+    restoreExpandedSnapshot,
+    revealPendingPath: vi.fn(async () => undefined),
+    teardown: vi.fn(),
+    treeData,
+    watch,
+    worlds
+  })
+  worlds.value = [{
+    ...sampleWorld,
+    displayName: 'World Renamed'
+  }]
+  await Promise.resolve()
   expect(restoreExpandedSnapshot).not.toHaveBeenCalled()
 })
 
@@ -1799,6 +2017,7 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle watches project and wor
     }),
     clearPendingRevealPath,
     flushUiStatePersist,
+    getStoreExpandedNodeIds: () => ['world-1', 'group-1'],
     hydrateTreeSession,
     layoutRefreshGeneration: ref(0),
     shouldDeferWorldsExpandRestore: () => false,
@@ -1845,6 +2064,7 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle preserves expanded snap
     }),
     clearPendingRevealPath: vi.fn(),
     flushUiStatePersist: vi.fn(),
+    getStoreExpandedNodeIds: () => [],
     hydrateTreeSession: vi.fn(async () => undefined),
     layoutRefreshGeneration: ref(0),
     shouldDeferWorldsExpandRestore: () => false,
@@ -3589,6 +3809,7 @@ test('Test that wireProjectHierarchyTreeSessionLifecycle hydrates active project
     }),
     clearPendingRevealPath: vi.fn(),
     flushUiStatePersist: vi.fn(),
+    getStoreExpandedNodeIds: () => [],
     hydrateTreeSession,
     layoutRefreshGeneration: ref(0),
     shouldDeferWorldsExpandRestore: () => false,
@@ -3797,6 +4018,78 @@ test('Test that createProjectHierarchyTreeSessionWiring invokes lifecycle store 
   })
   expect(hierarchyStore.resetOnProjectClose).toHaveBeenCalled()
   expect(hierarchyStore.flushUiStatePersist).toHaveBeenCalled()
+})
+
+/**
+ * createProjectHierarchyTreeSessionWiring
+ * Worlds layout restore reads store expand ids via session side-effect wiring.
+ */
+test('Test that createProjectHierarchyTreeSessionWiring reads store expand ids on layout restore', async () => {
+  const { nextTick, watch } = await import('vue')
+  const { createProjectHierarchyTreeSessionWiring } = await import('../projectHierarchyTreeSessionWiring')
+  const worlds = ref([sampleWorld])
+  const treeData = ref(mapWorkspaceLayoutToHierarchyTreeSkeleton([sampleWorld]))
+  let storeExpandReads = 0
+  const uiStateValue = {
+    schemaVersion: 1 as const,
+    scrollTopPx: 0
+  }
+  Object.defineProperty(uiStateValue, 'expandedNodeIds', {
+    enumerable: true,
+    get (): string[] {
+      storeExpandReads += 1
+      return ['world-1', 'group-1']
+    }
+  })
+  const uiState = ref(uiStateValue) as Ref<{
+    expandedNodeIds: string[]
+    schemaVersion: 1
+    scrollTopPx: number
+  }>
+  const layoutRefreshGeneration = ref(0)
+  createProjectHierarchyTreeSessionWiring({
+    S_FaActiveProject: () => ({
+      activeProject: null,
+      hasActiveProject: false
+    }),
+    computed,
+    createTemporaryDocument: vi.fn(async () => 'temp-doc'),
+    dragContext: {
+      dragNode: null
+    },
+    hierarchyStore: {
+      clearPendingDocumentRefreshIds: vi.fn(),
+      clearPendingHierarchyNodeRefreshIds: vi.fn(),
+      clearPendingRevealPath: vi.fn(),
+      flushUiStatePersist: vi.fn(),
+      queuePersistExpandedNodeIds: vi.fn(),
+      queuePersistScrollTopPx: vi.fn(),
+      refreshLayout: vi.fn(async () => undefined),
+      refreshUiState: vi.fn(async () => undefined),
+      resetOnProjectClose: vi.fn()
+    },
+    nextTick: async () => undefined,
+    onDocumentOpenRequest: vi.fn(),
+    onMounted: vi.fn(),
+    onUnmounted: vi.fn(),
+    pendingDocumentRefreshIds: ref([]),
+    pendingHierarchyNodeRefreshIds: ref([]),
+    pendingRevealPath: ref([]),
+    ref,
+    resolveForceSublevelCollapseInTree: () => false,
+    resolvePreferredLanguageCode: () => 'en-US',
+    runFaAction: vi.fn(),
+    treeData,
+    uiState,
+    watch,
+    layoutRefreshGeneration,
+    worlds
+  })
+  await nextTick()
+  layoutRefreshGeneration.value += 1
+  await nextTick()
+  await nextTick()
+  expect(storeExpandReads).toBeGreaterThan(0)
 })
 
 test('Test that createProjectHierarchyTreeSessionSubWiring handles missing preload APIs', async () => {
@@ -4449,7 +4742,9 @@ test('Test that bindProjectHierarchyTreeSessionLifecycle evaluates worlds expand
     dragExpandUiFrozen: sessionRefs.dragExpandUiFrozen,
     flushUiStatePersist: vi.fn(),
     getDragExpandedSnapshotNodeIds: earlyWiring.subWiring.dndWiring.getDragExpandedSnapshotNodeIds,
+    getStoreExpandedNodeIds: () => [],
     hydrateTreeSession: vi.fn(async () => undefined),
+    isTreeSessionHydrateInFlight: () => false,
     layoutRefreshGeneration: ref(0),
     onMounted: (hook) => {
       mountedHooks.push(hook)

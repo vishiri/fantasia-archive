@@ -2337,13 +2337,14 @@ test('Test that buildProjectHierarchyTreeVisibleFlatVirtualScrollKey joins visib
   )).toBe('world-1|group-1')
 })
 
-test('Test that shouldDeferProjectHierarchyTreeWorldsExpandRestore covers drag guard flags', () => {
+test('Test that shouldDeferProjectHierarchyTreeWorldsExpandRestore covers drag and hydrate guard flags', () => {
   const base = {
     dragCommitPending: false,
     dragCommitScheduled: false,
     dragExpandPostCommitGuard: false,
     dragExpandUiFrozen: false,
-    dragExpandedSnapshotNodeIds: null as string[] | null
+    dragExpandedSnapshotNodeIds: null as string[] | null,
+    treeSessionHydrateInFlight: false
   }
   expect(shouldDeferProjectHierarchyTreeWorldsExpandRestore(base)).toBe(false)
   expect(shouldDeferProjectHierarchyTreeWorldsExpandRestore({
@@ -2370,6 +2371,10 @@ test('Test that shouldDeferProjectHierarchyTreeWorldsExpandRestore covers drag g
     ...base,
     dragExpandedSnapshotNodeIds: []
   })).toBe(false)
+  expect(shouldDeferProjectHierarchyTreeWorldsExpandRestore({
+    ...base,
+    treeSessionHydrateInFlight: true
+  })).toBe(true)
 })
 
 test('Test that expandProjectHierarchyTreeExpandedNodeIdsWithAncestors adds ancestor ids', () => {

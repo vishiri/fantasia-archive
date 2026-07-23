@@ -16,6 +16,7 @@ import {
   pruneProjectHierarchyTreeExpandedNodeIdsToAncestors,
   publishProjectHierarchyTreeRootRevision
 } from '../functions/projectHierarchyTreeExpandState'
+import { shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds } from '../functions/projectHierarchyTreeWorldsLayoutExpandSnapshot'
 import { reapplyProjectHierarchyTreeLatentDescendantExpandState } from './projectHierarchyTreeLatentExpandReapplyWiring'
 import { reapplyProjectHierarchyTreeHeTreeOpenState } from './projectHierarchyTreeUiStateWiring'
 
@@ -84,7 +85,13 @@ export async function restoreProjectHierarchyTreeExpandedSnapshot (deps: {
     deps.treeData.value,
     deps.openNodeIds.value
   )
-  deps.onExpandedNodeIdsChange(persistedExpandedNodeIds)
+  if (shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds({
+    intendedExpandedNodeIds: ancestorPruned,
+    restoredExpandedNodeIds: persistedExpandedNodeIds,
+    treeNodeCount: deps.treeData.value.length
+  })) {
+    deps.onExpandedNodeIdsChange(persistedExpandedNodeIds)
+  }
 
   const loadChildrenAlongRevealPath = createLoadChildrenAlongRevealPath({
     loadChildrenForNode: deps.loadChildrenForNode,

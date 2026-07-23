@@ -6,18 +6,19 @@ import type {
 } from 'app/types/I_faProjectHierarchyTreeDomain'
 
 import {
+  applyPersistedProjectHierarchyTreeOpenNodeIds,
+  collectProjectHierarchyTreePersistedExpandedNodeIds
+} from '../functions/projectHierarchyTreePersistedOpenNodeIds'
+import {
   mergeProjectHierarchyTreePlacementExpandNodeIds,
   resolveDefaultProjectHierarchyTreeExpandedNodeIds,
   shouldRunProjectHierarchyTreePlacementExpandMerge
 } from '../functions/projectHierarchyTreeDefaultExpand'
 import {
-  applyPersistedProjectHierarchyTreeOpenNodeIds,
-  collectProjectHierarchyTreePersistedExpandedNodeIds
-} from '../functions/projectHierarchyTreePersistedOpenNodeIds'
-import {
   collectExpandedNodeIdsFromTree,
   findProjectHierarchyTreeNodeById
 } from '../functions/projectHierarchyTreeExpandState'
+import { shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds } from '../functions/projectHierarchyTreeWorldsLayoutExpandSnapshot'
 import { tryOpenHeTreeNodeAndParents } from './projectHierarchyTreeHeTreeOpenSafeWiring'
 import { reapplyProjectHierarchyTreeLatentDescendantExpandState } from './projectHierarchyTreeLatentExpandReapplyWiring'
 import { resolveProjectHierarchyTreeScrollContainer } from '../functions/projectHierarchyTreeScrollContainer'
@@ -85,7 +86,13 @@ export async function restoreProjectHierarchyTreeUiState (deps: {
     deps.treeData.value,
     deps.openNodeIds.value
   )
-  deps.onExpandedNodeIdsChange(expandedNodeIdsForPersist)
+  if (shouldPersistProjectHierarchyTreeRestoredExpandedNodeIds({
+    intendedExpandedNodeIds: expandedNodeIds,
+    restoredExpandedNodeIds: expandedNodeIdsForPersist,
+    treeNodeCount: deps.treeData.value.length
+  })) {
+    deps.onExpandedNodeIdsChange(expandedNodeIdsForPersist)
+  }
 
   const treeRef = deps.getTreeRef()
   await reapplyProjectHierarchyTreeLatentDescendantExpandState({

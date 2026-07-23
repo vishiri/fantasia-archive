@@ -9,7 +9,9 @@ export function isProjectHierarchyTreeDragExpandUiFrozen (input: {
 }
 
 /**
- * Worlds layout watcher should not run full expand restore during drag commit.
+ * Worlds layout watcher should not run full expand restore during drag commit
+ * or while the tree session is still hydrating (layout refresh would race and
+ * snapshot empty openNodeIds, collapsing worlds on first load).
  */
 export function shouldDeferProjectHierarchyTreeWorldsExpandRestore (input: {
   dragCommitPending: boolean
@@ -17,8 +19,10 @@ export function shouldDeferProjectHierarchyTreeWorldsExpandRestore (input: {
   dragExpandPostCommitGuard: boolean
   dragExpandUiFrozen: boolean
   dragExpandedSnapshotNodeIds: string[] | null
+  treeSessionHydrateInFlight: boolean
 }): boolean {
-  return input.dragExpandUiFrozen ||
+  return input.treeSessionHydrateInFlight ||
+    input.dragExpandUiFrozen ||
     input.dragCommitPending ||
     input.dragCommitScheduled ||
     input.dragExpandPostCommitGuard ||

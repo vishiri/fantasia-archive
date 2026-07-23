@@ -22,6 +22,7 @@ export function bindProjectHierarchyTreeSessionHydrateLifecycle (deps: {
     hasActiveProject: boolean
   }
   earlyWiring: ReturnType<typeof createProjectHierarchyTreeSessionEarlyWiring>
+  getStoreExpandedNodeIds: () => readonly string[]
   hierarchyStore: T_sessionHierarchyStore
   onMounted: (hook: () => void) => void
   onUnmounted: (hook: () => void) => void
@@ -46,7 +47,9 @@ export function bindProjectHierarchyTreeSessionHydrateLifecycle (deps: {
     dragExpandUiFrozen: deps.earlyWiring.bootstrap.sessionRefs.dragExpandUiFrozen,
     flushUiStatePersist: () => deps.hierarchyStore.flushUiStatePersist(),
     getDragExpandedSnapshotNodeIds: deps.earlyWiring.subWiring.dndWiring.getDragExpandedSnapshotNodeIds,
+    getStoreExpandedNodeIds: deps.getStoreExpandedNodeIds,
     hydrateTreeSession: hydrateWiring.hydrateTreeSession,
+    isTreeSessionHydrateInFlight: hydrateWiring.isTreeSessionHydrateInFlight,
     layoutRefreshGeneration: deps.layoutRefreshGeneration,
     onMounted: deps.onMounted,
     onUnmounted: deps.onUnmounted,
@@ -75,7 +78,9 @@ export function bindProjectHierarchyTreeSessionLifecycle (deps: {
   dragExpandUiFrozen: Ref<boolean>
   flushUiStatePersist: () => void
   getDragExpandedSnapshotNodeIds: () => string[] | null
+  getStoreExpandedNodeIds: () => readonly string[]
   hydrateTreeSession: () => Promise<void>
+  isTreeSessionHydrateInFlight: () => boolean
   onMounted: (hook: () => void) => void
   onUnmounted: (hook: () => void) => void
   openNodeIds: Ref<Set<string>>
@@ -94,6 +99,7 @@ export function bindProjectHierarchyTreeSessionLifecycle (deps: {
     S_FaActiveProject: deps.S_FaActiveProject,
     clearPendingRevealPath: deps.clearPendingRevealPath,
     flushUiStatePersist: deps.flushUiStatePersist,
+    getStoreExpandedNodeIds: deps.getStoreExpandedNodeIds,
     hydrateTreeSession: deps.hydrateTreeSession,
     layoutRefreshGeneration: deps.layoutRefreshGeneration,
     onMounted: deps.onMounted,
@@ -110,7 +116,8 @@ export function bindProjectHierarchyTreeSessionLifecycle (deps: {
       dragCommitScheduled: deps.dragCommitScheduled.value,
       dragExpandPostCommitGuard: deps.dragExpandPostCommitGuard.value,
       dragExpandUiFrozen: deps.dragExpandUiFrozen.value,
-      dragExpandedSnapshotNodeIds: deps.getDragExpandedSnapshotNodeIds()
+      dragExpandedSnapshotNodeIds: deps.getDragExpandedSnapshotNodeIds(),
+      treeSessionHydrateInFlight: deps.isTreeSessionHydrateInFlight()
     }),
     teardown: deps.teardown,
     watch: deps.watch,

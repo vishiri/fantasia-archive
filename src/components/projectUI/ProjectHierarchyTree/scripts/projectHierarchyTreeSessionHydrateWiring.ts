@@ -17,17 +17,42 @@ export function createProjectHierarchyTreeSessionHydrateWiring (deps: {
   }
 }) {
   let detachScrollPersist: (() => void) | undefined
+  let treeSessionHydrateInFlight = false
+  let hydrateGeneration = 0
+
+  function isTreeSessionHydrateInFlight (): boolean {
+    return treeSessionHydrateInFlight
+  }
 
   async function hydrateTreeSession (): Promise<void> {
-    await deps.hierarchyStore.refreshLayout()
-    await deps.hierarchyStore.refreshUiState()
-    deps.syncWiring.resyncTreeDataFromLayout()
-    await deps.uiStateWiring.restoreUiStateFromStore()
-    detachScrollPersist?.()
-    detachScrollPersist = deps.uiStateWiring.attachScrollPersist()
+    const thisGeneration = ++hydrateGeneration
+    treeSessionHydrateInFlight = true
+    try {
+      await deps.hierarchyStore.refreshLayout()
+      if (thisGeneration !== hydrateGeneration) {
+        return
+      }
+      await deps.hierarchyStore.refreshUiState()
+      if (thisGeneration !== hydrateGeneration) {
+        return
+      }
+      deps.syncWiring.resyncTreeDataFromLayout()
+      await deps.uiStateWiring.restoreUiStateFromStore()
+      if (thisGeneration !== hydrateGeneration) {
+        return
+      }
+      detachScrollPersist?.()
+      detachScrollPersist = deps.uiStateWiring.attachScrollPersist()
+    } finally {
+      if (thisGeneration === hydrateGeneration) {
+        treeSessionHydrateInFlight = false
+      }
+    }
   }
 
   function teardown (): void {
+    hydrateGeneration += 1
+    treeSessionHydrateInFlight = false
     detachScrollPersist?.()
     deps.uiStateWiring.onUnmountedCleanup()
     deps.dndWiring.onUnmountedCleanup()
@@ -36,6 +61,7 @@ export function createProjectHierarchyTreeSessionHydrateWiring (deps: {
 
   return {
     hydrateTreeSession,
+    isTreeSessionHydrateInFlight,
     teardown
   }
 }
