@@ -40,6 +40,8 @@
 - **App Settings**: **Prevent filled app noteboard from showing** and **Prevent filled project noteboard from showing** (defaults off). When off, a filled **App Noteboard** opens at app load and a filled **Project Noteboard** opens when a project loads; when on, that auto-open is skipped. Empty noteboards never open on their own. Manual toggle and keybinds still work. Older **Prevent filled noteboard** saves migrate to the app setting.
 
 ### Bugfixes & Optimizations
+- **Workspace sidebar**: Opening a project or refreshing the worlds layout no longer collapses expanded hierarchy rows when the live open set is briefly empty; expand restore falls back to the saved expand ids, waits until session hydrate finishes, and skips wiping persisted expands when the tree is not ready yet.
+- **App Settings**: **Hide Fantasia mascot** (title no longer includes a **TODO -** prefix) hides Fantasia everywhere that component renders, including the project overview tip card and the startup **Did you know** notification. Toggling the setting in the open settings dialog previews immediately; when the mascot is hidden, tip surfaces no longer show a help-icon placeholder.
 - **App controls**: **Toggle app noteboard** in the Tools menu and on the app control bar left strip uses the clipboard-edit outline icon.
 - **Document workspace**: **Copy document** (tab menu, hierarchy menu, and app control bar) now also copies **Is a category**, **Is finished**, **Is a minor document**, and **Is Dead/Gone/Destroyed** onto the new temporary tab (previously those flags always reset to off).
 - **Document workspace**: Saving a **Belongs under** change reloads the new parent row in the hierarchy tree so the document stays visible without collapsing and reopening the old branch.

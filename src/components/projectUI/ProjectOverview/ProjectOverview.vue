@@ -23,13 +23,6 @@
       class="projectOverview__hint row items-center no-wrap full-width"
       data-test-locator="projectOverview-tipCard"
     >
-      <q-icon
-        v-if="!showMascotInTipCard"
-        class="projectOverview__hintIcon q-mr-md"
-        name="mdi-help"
-        size="30px"
-      />
-
       <FantasiaMascotImage
         v-if="showMascotInTipCard"
         class="projectOverview__hintMascot"
@@ -103,10 +96,6 @@ const {
     height: $projectOverview-hint-mascot-height;
     margin-right: $projectOverview-hint-mascot-marginRight;
     width: $projectOverview-hint-mascot-width;
-  }
-
-  &__hintIcon {
-    flex-shrink: 0;
   }
 }
 </style>

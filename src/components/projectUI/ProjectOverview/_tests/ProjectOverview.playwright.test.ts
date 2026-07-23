@@ -275,12 +275,12 @@ test.describe.serial('Project overview (tips card help icon)', () => {
   })
 
   /**
-   * hidePlushes swaps the mascot for the mdi-help icon in the tips card.
+   * hidePlushes removes the mascot from the tips card with no icon replacement.
    */
-  test('Check that hidePlushes shows the help icon instead of the mascot', async () => {
+  test('Check that hidePlushes omits the mascot from the tips card', async () => {
     const tipCard = appWindow.locator(`[data-test-locator="${selectorList.projectOverviewTipCard}"]`)
     await expect(tipCard).toBeVisible()
     await expect(tipCard.locator(`[data-test-locator="${selectorList.fantasiaMascotImage}"]`)).toHaveCount(0)
-    await expect(tipCard.locator('.projectOverview__hintIcon')).toHaveCount(1)
+    await expect(tipCard.locator('.projectOverview__hintIcon')).toHaveCount(0)
   })
 })

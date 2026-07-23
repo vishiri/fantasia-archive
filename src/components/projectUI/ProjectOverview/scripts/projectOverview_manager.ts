@@ -2,6 +2,7 @@ import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 
 import { i18n } from 'app/i18n/externalFileLoader'
+import { resolveHideFantasiaMascot } from 'app/src/scripts/appGlobalManagementUI/functions/resolveHideFantasiaMascot'
 import { S_FaActiveProject } from 'app/src/stores/S_FaActiveProject'
 import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 
@@ -15,6 +16,7 @@ export const useProjectOverview = createUseProjectOverview({
   onMounted,
   pickRandomTipCaption: pickProjectOverviewRandomTipCaption,
   ref,
+  resolveHideFantasiaMascot,
   storeToRefs,
   t: (key) => i18n.global.t(key)
 })

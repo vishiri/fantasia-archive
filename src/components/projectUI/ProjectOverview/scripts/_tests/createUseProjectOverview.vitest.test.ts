@@ -6,12 +6,17 @@ import type {
 import { beforeEach, expect, test, vi } from 'vitest'
 import { computed, ref } from 'vue'
 
+import { resolveHideFantasiaMascot } from 'app/src/scripts/appGlobalManagementUI/functions/resolveHideFantasiaMascot'
+
 import { createUseProjectOverview } from '../../functions/createUseProjectOverview'
 
 const pickRandomTipCaptionMock = vi.fn(() => 'Random tip.')
 
 const activeProjectRef = ref<{ name: string } | null>(null)
-const appSettingsDialogPreviewRef = ref<{ hideTooltipsProject?: boolean } | null>(null)
+const appSettingsDialogPreviewRef = ref<{
+  hidePlushes?: boolean
+  hideTooltipsProject?: boolean
+} | null>(null)
 const settingsRef = ref<{ hidePlushes: boolean, hideTooltipsProject: boolean } | null>({
   hidePlushes: false,
   hideTooltipsProject: false
@@ -32,6 +37,7 @@ const useProjectOverview = createUseProjectOverview({
   },
   pickRandomTipCaption: pickRandomTipCaptionMock,
   ref,
+  resolveHideFantasiaMascot,
   storeToRefs: ((store) => {
     if ('activeProject' in store) {
       return { activeProject: activeProjectRef }
@@ -113,4 +119,22 @@ test('Test that useProjectOverview hides the tip card from app settings dialog p
   }
 
   expect(useProjectOverview().showTipCard.value).toBe(false)
+})
+
+/**
+ * createUseProjectOverview
+ * App Settings dialog preview hidePlushes omits tip-card mascot while tip card stays visible.
+ */
+test('Test that useProjectOverview hides tip-card mascot from app settings dialog preview', () => {
+  settingsRef.value = {
+    hidePlushes: false,
+    hideTooltipsProject: false
+  }
+  appSettingsDialogPreviewRef.value = {
+    hidePlushes: true
+  }
+
+  const state = useProjectOverview()
+  expect(state.showTipCard.value).toBe(true)
+  expect(state.showMascotInTipCard.value).toBe(false)
 })

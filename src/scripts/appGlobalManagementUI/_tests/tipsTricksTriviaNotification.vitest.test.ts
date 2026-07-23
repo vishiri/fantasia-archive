@@ -74,18 +74,18 @@ test('Test that tipsTricksTriviaNotification uses mascot avatar payload by defau
 
 /**
  * tipsTricksTriviaNotification
- * Test payload when mascot is hidden.
+ * Test payload when mascot is hidden: no avatar and no replacement icon.
  */
-test('Test that tipsTricksTriviaNotification uses icon payload when mascot is hidden', () => {
+test('Test that tipsTricksTriviaNotification omits avatar when mascot is hidden', () => {
   vi.spyOn(Math, 'random').mockReturnValueOnce(0.75)
   tipsTricksTriviaNotification(true)
 
   expect(notifyCreateMock).toHaveBeenCalledOnce()
   expect(notifyCreateMock.mock.calls[0]![0]!).toMatchObject({
-    icon: 'mdi-help',
     caption: 'Tip two'
   })
   expect(notifyCreateMock.mock.calls[0]![0]!).not.toHaveProperty('avatar')
+  expect(notifyCreateMock.mock.calls[0]![0]!).not.toHaveProperty('icon')
 })
 
 /**

@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import { expect, test } from 'vitest'
 
 import { fantasiaImageList } from 'app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager'
@@ -10,6 +11,9 @@ import ErrorCard from '../ErrorCard.vue'
  * Renders the title, mascot image for the chosen variant, and optional details under the image.
  */
 test('Test that ErrorCard renders title, mascot src, and details when details prop is set', () => {
+  const pinia = createPinia()
+  setActivePinia(pinia)
+
   const w = mount(ErrorCard, {
     props: {
       title: 'Title line',
@@ -20,7 +24,8 @@ test('Test that ErrorCard renders title, mascot src, and details when details pr
     global: {
       mocks: {
         $t: (key: string) => key
-      }
+      },
+      plugins: [pinia]
     }
   })
 
@@ -52,6 +57,9 @@ test('Test that ErrorCard renders title, mascot src, and details when details pr
  * Omits the details paragraph when the details prop is omitted.
  */
 test('Test that ErrorCard hides the details block when details prop is absent', () => {
+  const pinia = createPinia()
+  setActivePinia(pinia)
+
   const w = mount(ErrorCard, {
     props: {
       title: 'Only title',
@@ -60,7 +68,8 @@ test('Test that ErrorCard hides the details block when details prop is absent', 
     global: {
       mocks: {
         $t: (key: string) => key
-      }
+      },
+      plugins: [pinia]
     }
   })
 
@@ -74,6 +83,9 @@ test('Test that ErrorCard hides the details block when details prop is absent', 
  * Custom width prop is forwarded to the data attribute for layout contracts.
  */
 test('Test that ErrorCard applies a custom width prop to the data-test-error-card-width attribute', () => {
+  const pinia = createPinia()
+  setActivePinia(pinia)
+
   const w = mount(ErrorCard, {
     props: {
       title: 'W',
@@ -83,7 +95,8 @@ test('Test that ErrorCard applies a custom width prop to the data-test-error-car
     global: {
       mocks: {
         $t: (key: string) => key
-      }
+      },
+      plugins: [pinia]
     }
   })
 

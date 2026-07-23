@@ -84,15 +84,17 @@ export function buildFaActionDefinitionHandlersDialogsProjectFlow (
   }
 
   async function handleShowStartupTipsNotification (): Promise<void> {
+    let hideMascot = false
     const userSettingsBridge = window.faContentBridgeAPIs?.faUserSettings
     if (userSettingsBridge?.getSettings !== undefined) {
       const persistedSettings = await userSettingsBridge.getSettings()
       if (persistedSettings.hideTooltipsStart === true) {
         return
       }
+      hideMascot = persistedSettings.hidePlushes === true
     }
 
-    deps.tipsTricksTriviaNotification(false)
+    deps.tipsTricksTriviaNotification(hideMascot)
   }
 
   return {

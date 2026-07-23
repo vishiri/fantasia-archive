@@ -132,7 +132,7 @@ export default {
       tags: 'dark, light, theme, theming, color, colors'
     },
     disableCloseAfterSelectQuickSearch: {
-      title: 'TODO - Stop closing after selection',
+      title: 'TODO - Prevent close after selection on quick-search popup',
       description: 'Normally the quick-search closes after an item is selected from it. Turning this feature on prevents that behavior, allowing you to open multiple search results one after the other.',
       tags: 'keep open, multiple results, batch open, quick search stays open'
     },
@@ -213,7 +213,7 @@ export default {
       tags: 'sidebar off, navigator hidden, tree panel, outline hide'
     },
     hidePlushes: {
-      title: 'TODO - Hide Fantasia mascot',
+      title: 'Hide Fantasia mascot',
       description: 'Hides the amazingly adorable and awesome Fantasia, the tiny arcane dragon. How could you! :(',
       tags: 'dragon, mascot, plush, character, decoration, easter egg'
     },

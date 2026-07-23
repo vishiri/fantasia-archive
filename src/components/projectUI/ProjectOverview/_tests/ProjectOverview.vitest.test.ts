@@ -44,11 +44,6 @@ import ProjectOverview from '../ProjectOverview.vue'
 const mountGlobal = {
   mocks: {
     $t: (key: string) => key
-  },
-  stubs: {
-    QIcon: {
-      template: '<span class="q-icon-stub projectOverview__hintIcon" />'
-    }
   }
 }
 
@@ -102,9 +97,9 @@ test('Test that ProjectOverview hides tip card when showTipCard is false', () =>
 
 /**
  * ProjectOverview
- * Renders help icon instead of mascot when mascot is disabled.
+ * Omits the mascot entirely when mascot is disabled (no help-icon replacement).
  */
-test('Test that ProjectOverview renders help icon when mascot is disabled', () => {
+test('Test that ProjectOverview omits mascot when mascot is disabled', () => {
   showMascotInTipCardRef.value = false
 
   const wrapper = mount(ProjectOverview, {
@@ -112,7 +107,7 @@ test('Test that ProjectOverview renders help icon when mascot is disabled', () =
   })
 
   expect(wrapper.find('[data-test-locator=fantasiaMascotImage-stub]').exists()).toBe(false)
-  expect(wrapper.find('.projectOverview__hintIcon').exists()).toBe(true)
+  expect(wrapper.find('[data-test-locator=projectOverview-tipCard]').exists()).toBe(true)
 
   wrapper.unmount()
 })

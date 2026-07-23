@@ -928,7 +928,8 @@ test('Test that showStartupTipsNotification handler shows notify when hideToolti
       ...prev,
       faUserSettings: {
         getSettings: vi.fn(async () => ({
-          hideTooltipsStart: false
+          hideTooltipsStart: false,
+          hidePlushes: false
         })),
         setSettings: vi.fn()
       }
@@ -938,6 +939,28 @@ test('Test that showStartupTipsNotification handler shows notify when hideToolti
   await (definitionFor('showStartupTipsNotification').handler(undefined) as Promise<unknown>)
 
   expect(tipsNotificationMock).toHaveBeenCalledWith(false)
+  Object.assign(window, { faContentBridgeAPIs: prev })
+})
+
+test('Test that showStartupTipsNotification handler hides mascot avatar when hidePlushes is enabled', async () => {
+  tipsNotificationMock.mockClear()
+  const prev = window.faContentBridgeAPIs
+  Object.assign(window, {
+    faContentBridgeAPIs: {
+      ...prev,
+      faUserSettings: {
+        getSettings: vi.fn(async () => ({
+          hideTooltipsStart: false,
+          hidePlushes: true
+        })),
+        setSettings: vi.fn()
+      }
+    }
+  })
+
+  await (definitionFor('showStartupTipsNotification').handler(undefined) as Promise<unknown>)
+
+  expect(tipsNotificationMock).toHaveBeenCalledWith(true)
   Object.assign(window, { faContentBridgeAPIs: prev })
 })
 

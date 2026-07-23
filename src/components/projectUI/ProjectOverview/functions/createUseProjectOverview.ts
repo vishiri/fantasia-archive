@@ -1,4 +1,5 @@
 import type { I_computedRef, I_ref } from 'app/types/I_vueCompositionShims'
+import type { I_faUserSettings } from 'app/types/I_faUserSettingsDomain'
 import type {
   StoreGeneric,
   T_piniaStoreToRefs
@@ -9,6 +10,10 @@ export function createUseProjectOverview (deps: {
   onMounted: (hook: () => void) => void
   pickRandomTipCaption: () => string
   ref: <T>(value: T) => I_ref<T>
+  resolveHideFantasiaMascot: (
+    settings: I_faUserSettings | null,
+    preview: Partial<I_faUserSettings> | null
+  ) => boolean
   storeToRefs: T_piniaStoreToRefs
   S_FaActiveProject: () => StoreGeneric
   S_FaUserSettings: () => StoreGeneric
@@ -46,7 +51,10 @@ export function createUseProjectOverview (deps: {
     })
 
     const showMascotInTipCard = deps.computed(() => {
-      return settings!.value?.hidePlushes !== true
+      return !deps.resolveHideFantasiaMascot(
+        settings!.value as I_faUserSettings | null,
+        appSettingsDialogPreview!.value as Partial<I_faUserSettings> | null
+      )
     })
 
     deps.onMounted(() => {

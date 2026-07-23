@@ -1,7 +1,10 @@
 import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import { expect, test, vi } from 'vitest'
 
 import { fantasiaImageList } from 'app/src/scripts/appGlobalManagementUI/appGlobalManagementUI_manager'
+import { FA_USER_SETTINGS_DEFAULTS } from 'app/src-electron/mainScripts/userSettings/faUserSettingsDefaults'
+import { S_FaUserSettings } from 'app/src/stores/S_FaUserSettings'
 
 import FantasiaMascotImage from '../FantasiaMascotImage.vue'
 
@@ -150,5 +153,35 @@ test('Test that FantasiaMascotImage keeps the initial src when fantasiaImage pro
   const root = w.get('[data-test-locator="fantasiaMascotImage-image"]')
   expect(root.attributes('src')).toBe(fantasiaImageList.error)
   expect(root.attributes('data-test-image')).toBe('reading')
+  w.unmount()
+})
+
+/**
+ * FantasiaMascotImage
+ * App Settings hidePlushes removes the mascot DOM entirely (ErrorCard, empty states, etc.).
+ */
+test('Test that FantasiaMascotImage renders nothing when hidePlushes is enabled', () => {
+  const pinia = createPinia()
+  setActivePinia(pinia)
+  S_FaUserSettings().settings = {
+    ...FA_USER_SETTINGS_DEFAULTS,
+    hidePlushes: true
+  }
+
+  const w = mount(FantasiaMascotImage, {
+    props: {
+      fantasiaImage: 'error',
+      width: '10px',
+      height: '10px'
+    },
+    global: {
+      mocks: {
+        $t: (key: string) => key
+      },
+      plugins: [pinia]
+    }
+  })
+
+  expect(w.find('[data-test-locator="fantasiaMascotImage-image"]').exists()).toBe(false)
   w.unmount()
 })

@@ -1,6 +1,7 @@
 <template>
-  <!-- Outer wrapper of the image -->
+  <!-- Outer wrapper of the image; omitted when App Settings hidePlushes is on. -->
   <div
+    v-if="showMascot"
     class="fantasiaMascotImage"
   >
     <!-- Native img avoids q-img wrapper/async sizing that caused layout shift in tests. -->
@@ -58,6 +59,7 @@ const {
   height,
   isRandom,
   mascotVariantName,
+  showMascot,
   width
 } = useFantasiaMascotImage(props)
 

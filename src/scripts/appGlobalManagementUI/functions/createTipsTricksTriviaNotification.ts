@@ -9,7 +9,6 @@ export function createTipsTricksTriviaNotification (deps: {
     avatar?: string
     caption: string
     color: string
-    icon?: string
     message: string
     timeout: number
   }) => void
@@ -36,7 +35,6 @@ export function createTipsTricksTriviaNotification (deps: {
     const avatar = hideMascot
       ? undefined
       : deps.determineCurrentImage(deps.fantasiaImageList, true, '')
-    const icon = hideMascot ? 'mdi-help' : undefined
 
     deps.createNotify({
       actions: [{
@@ -46,7 +44,6 @@ export function createTipsTricksTriviaNotification (deps: {
       ...(avatar !== undefined ? { avatar } : {}),
       caption: randomMessage,
       color: 'info',
-      ...(icon !== undefined ? { icon } : {}),
       message: deps.t('globalFunctionality.unsortedAppTexts.didYouKnow'),
       timeout: 15000
     })
