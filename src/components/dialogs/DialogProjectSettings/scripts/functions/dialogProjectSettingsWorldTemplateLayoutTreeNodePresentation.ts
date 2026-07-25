@@ -67,7 +67,10 @@ export function resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeEditToolt
 export function isDialogProjectSettingsWorldTemplateLayoutPlacementRemoveDisabled (
   node: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode
 ): boolean {
-  return node.nodeKind === 'template' && node.documentCountInWorld > 0
+  if (node.nodeKind !== 'template') {
+    return false
+  }
+  return (node.documentCountInWorld + node.categoryCountInWorld) > 0
 }
 
 export function resolveDialogProjectSettingsWorldTemplateLayoutTreeNodeRemoveTooltipI18nKey (

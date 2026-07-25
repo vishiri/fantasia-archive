@@ -45,6 +45,7 @@ export function mapDialogProjectSettingsWorldTemplateLayoutFromApi (
       rootSortOrder: group.rootSortOrder
     })),
     placements: layout.placements.map((placement) => ({
+      categoryCountInWorld: placement.categoryCountInWorld,
       documentCountInWorld: placement.documentCountInWorld,
       documentTemplateId: placement.documentTemplateId,
       groupId: placement.groupId,
@@ -219,6 +220,7 @@ export function appendDialogProjectSettingsWorldTemplatePlacementDraft (
     placements: [
       ...layout.placements,
       {
+        categoryCountInWorld: 0,
         documentCountInWorld: 0,
         documentTemplateId: template.documentTemplateId,
         groupId: null,

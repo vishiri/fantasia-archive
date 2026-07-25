@@ -5,12 +5,6 @@
 /* COMPONENT - PROJECT HIERARCHY TREE */
 $projectHierarchyTree-addNewDocumentRow-color: fa-v('grey', $grey);
 $projectHierarchyTree-documentRow-color: fa-v('text-workspace-row', $text-workspace-row);
-$projectHierarchyTree-dragPlaceholder-accentColor: fa-v('primary-bright', $primary-bright);
-$projectHierarchyTree-dragPlaceholder-accentWidth: 3px;
-$projectHierarchyTree-dragPlaceholder-backgroundColor: color-mix(in srgb, fa-v('primary-bright', $primary-bright) 10%, transparent);
-$projectHierarchyTree-dragPlaceholder-borderColor: color-mix(in srgb, fa-v('primary-bright', $primary-bright) 28%, transparent);
-$projectHierarchyTree-dragPlaceholder-borderRadius: 4px;
-$projectHierarchyTree-dragPlaceholder-borderWidth: 1px;
 $projectHierarchyTree-groupRow-color: fa-v('primary-bright', $primary-bright);
 $projectHierarchyTree-list-paddingBottom: 8px;
 $projectHierarchyTree-list-paddingRight: 8px;

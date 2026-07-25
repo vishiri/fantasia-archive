@@ -27,6 +27,7 @@ export interface I_dialogProjectSettingsWorldTemplatePlacementDraft {
   worldAppendix: string
   icon: string
   documentCountInWorld: number
+  categoryCountInWorld: number
   groupId: string | null
   rootSortOrder: number | null
   groupSortOrder: number | null
@@ -42,6 +43,7 @@ export interface I_dialogProjectSettingsWorldTemplateLayoutDraft {
 export interface I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode {
   children: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode[]
   documentCountInWorld: number
+  categoryCountInWorld: number
   documentTemplateId: string | null
   icon: string
   id: string

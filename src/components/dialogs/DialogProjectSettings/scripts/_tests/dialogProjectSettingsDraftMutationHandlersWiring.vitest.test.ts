@@ -67,6 +67,7 @@ test('Test that createDialogProjectSettingsDraftMutationHandlers mutates templat
     placements: [
       {
         documentCountInWorld: 0,
+        categoryCountInWorld: 0,
         documentTemplateId: baseTemplate.id,
         groupId: null,
         groupSortOrder: null,

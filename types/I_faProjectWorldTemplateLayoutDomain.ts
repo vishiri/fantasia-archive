@@ -57,7 +57,10 @@ export interface I_faProjectWorldTemplatePlacementForProjectSettings {
   nicknameSingularTranslations: I_faProjectWorldTemplatePlacementNicknameSingularTranslations
   worldAppendix: string
   icon: string
+  /** Non-category documents under this placement (workspace tree document segment). */
   documentCountInWorld: number
+  /** Category documents under this placement (workspace tree category segment). */
+  categoryCountInWorld: number
   createdAtMs: number
   updatedAtMs: number
 }

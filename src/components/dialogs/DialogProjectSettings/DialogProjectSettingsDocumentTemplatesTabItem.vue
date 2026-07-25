@@ -1,6 +1,5 @@
 <template>
   <div
-    v-ripple="templatesTabRippleBinding"
     role="button"
     tabindex="0"
     :class="tabClassList"
@@ -12,7 +11,7 @@
   >
     <div
       ref="tabBlurTargetRef"
-      class="q-focus-helper"
+      class="faVerticalDraggableTabs__tabBlurTarget"
       tabindex="-1"
     />
     <div class="dialogProjectSettingsDocumentTemplatesTabItem__labelRow">
@@ -102,18 +101,6 @@ const props = withDefaults(
 const emit = defineEmits<{
   select: [id: string]
 }>()
-
-const templatesTabRipple = {
-  early: true,
-  keyCodes: [13, 32]
-}
-
-const templatesTabRippleBinding = computed(() => {
-  if (props.isListDragging) {
-    return false
-  }
-  return templatesTabRipple
-})
 
 const tabBlurTargetRef = ref<HTMLDivElement | null>(null)
 

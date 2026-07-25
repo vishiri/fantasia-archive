@@ -21,7 +21,7 @@ export default {
   placementCountTooltip: {
     categoryCount: 'Category count:',
     documentCount: 'Document count:',
-    totalCount: 'Document & categories count:'
+    totalCount: 'Document & Category count:'
   },
   orderNumberBadgeTooltip: 'Order priority of the document'
 }

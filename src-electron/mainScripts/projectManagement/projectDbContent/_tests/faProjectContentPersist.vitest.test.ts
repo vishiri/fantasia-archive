@@ -513,6 +513,54 @@ function makeProjectContentTestDb (): {
           }
         }
       }
+      if (
+        normalized.includes('GROUP BY') &&
+        normalized.includes('tree_placement_id') &&
+        normalized.includes('is_category')
+      ) {
+        return {
+          all: (worldId: string) => {
+            const counts = new Map<string, { categoryCount: number, documentCount: number }>()
+            for (const row of tables.documents.values()) {
+              if (row.world_id !== worldId) {
+                continue
+              }
+              const placementId = row.tree_placement_id as string | null
+              if (placementId === null) {
+                continue
+              }
+              const existing = counts.get(placementId) ?? {
+                categoryCount: 0,
+                documentCount: 0
+              }
+              if ((row.is_category as number) === 1) {
+                existing.categoryCount += 1
+              } else {
+                existing.documentCount += 1
+              }
+              counts.set(placementId, existing)
+            }
+            const rows: Array<{ c: number, is_category: number, placement_id: string }> = []
+            for (const [placement_id, value] of counts.entries()) {
+              if (value.documentCount > 0) {
+                rows.push({
+                  c: value.documentCount,
+                  is_category: 0,
+                  placement_id
+                })
+              }
+              if (value.categoryCount > 0) {
+                rows.push({
+                  c: value.categoryCount,
+                  is_category: 1,
+                  placement_id
+                })
+              }
+            }
+            return rows
+          }
+        }
+      }
       if (normalized.includes('GROUP BY world_id')) {
         return {
           all: () => {
@@ -1704,17 +1752,13 @@ test('Test that replaceFaProjectWorldsSnapshot persists templateLayout on each w
 
 /**
  * listFaProjectWorldsForProjectSettings
- * Includes per-placement document counts for the selected world.
+ * Includes per-placement document and category counts for the selected world.
  */
 test('Test that listFaProjectWorldsForProjectSettings includes placement document counts', () => {
   const { db } = makeProjectContentTestDb()
   const world = createFaProjectWorld(db as never, { displayName: 'Realm' })
   const template = createFaProjectDocumentTemplate(db as never, { displayName: 'Tpl' })
-  createFaProjectDocument(db as never, {
-    displayName: 'Doc',
-    templateId: template.id,
-    worldId: world.id
-  })
+  const placementId = '6ba7b811-9dad-11d1-80b4-00c04fd430c8'
   replaceFaProjectWorldTemplateLayoutSnapshot(db as never, world.id, {
     groups: [],
     placements: [
@@ -1722,7 +1766,7 @@ test('Test that listFaProjectWorldsForProjectSettings includes placement documen
         documentTemplateId: template.id,
         groupId: null,
         groupSortOrder: null,
-        id: '6ba7b811-9dad-11d1-80b4-00c04fd430c8',
+        id: placementId,
         rootSortOrder: 0,
         nickname: '',
         nicknamePluralTranslations: {},
@@ -1730,8 +1774,15 @@ test('Test that listFaProjectWorldsForProjectSettings includes placement documen
       }
     ]
   })
+  createFaProjectDocument(db as never, {
+    displayName: 'Doc',
+    placementId,
+    templateId: template.id,
+    worldId: world.id
+  })
   const listed = listFaProjectWorldsForProjectSettings(db as never)
   expect(listed.items[0]!?.templateLayout.placements[0]!?.documentCountInWorld).toBe(1)
+  expect(listed.items[0]!?.templateLayout.placements[0]!?.categoryCountInWorld).toBe(0)
 })
 
 test('Test that createFaProjectDocumentTemplate stores worldAppendix and icon', () => {

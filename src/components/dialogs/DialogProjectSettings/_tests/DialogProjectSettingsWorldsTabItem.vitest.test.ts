@@ -29,9 +29,6 @@ test('Test that DialogProjectSettingsWorldsTabItem emits select with the world i
       world: worldFixture
     },
     global: {
-      directives: {
-        ripple: () => {}
-      },
       mocks: {
         $t: (key: string) => key
       }
@@ -55,9 +52,6 @@ test('Test that DialogProjectSettingsWorldsTabItem shows a color swatch only whe
       world: worldFixture
     },
     global: {
-      directives: {
-        ripple: () => {}
-      },
       mocks: {
         $t: (key: string) => key
       }
@@ -77,9 +71,6 @@ test('Test that DialogProjectSettingsWorldsTabItem shows a color swatch only whe
       }
     },
     global: {
-      directives: {
-        ripple: () => {}
-      },
       mocks: {
         $t: (key: string) => key
       }
@@ -106,9 +97,6 @@ test('Test that DialogProjectSettingsWorldsTabItem applies drag highlight classe
       world: worldFixture
     },
     global: {
-      directives: {
-        ripple: () => {}
-      },
       mocks: {
         $t: (key: string) => key
       }
@@ -137,9 +125,6 @@ test('Test that DialogProjectSettingsWorldsTabItem marks invalid names on the ta
       }
     },
     global: {
-      directives: {
-        ripple: () => {}
-      },
       mocks: {
         $t: (key: string) => key
       }
@@ -167,9 +152,6 @@ test('Test that DialogProjectSettingsWorldsTabItem marks duplicate palette error
       }
     },
     global: {
-      directives: {
-        ripple: () => {}
-      },
       mocks: {
         $t: (key: string) => key
       }
@@ -194,9 +176,6 @@ test('Test that DialogProjectSettingsWorldsTabItem selects on tab click', async 
       world: worldFixture
     },
     global: {
-      directives: {
-        ripple: () => {}
-      },
       mocks: {
         $t: (key: string) => key
       }
@@ -220,9 +199,6 @@ test('Test that DialogProjectSettingsWorldsTabItem selects on Enter and Space ke
       world: worldFixture
     },
     global: {
-      directives: {
-        ripple: () => {}
-      },
       mocks: {
         $t: (key: string) => key
       }
@@ -256,9 +232,6 @@ test('Test that DialogProjectSettingsWorldsTabItem shows missing translations wa
       }
     },
     global: {
-      directives: {
-        ripple: () => {}
-      },
       mocks: {
         $t: (key: string) => {
           if (key === 'dialogs.projectSettings.panels.worlds.missingTranslationsTabTooltip') {
@@ -300,9 +273,6 @@ test('Test that DialogProjectSettingsWorldsTabItem hides missing translations wa
       }
     },
     global: {
-      directives: {
-        ripple: () => {}
-      },
       mocks: {
         $t: (key: string) => key
       }

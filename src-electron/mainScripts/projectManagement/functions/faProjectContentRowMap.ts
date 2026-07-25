@@ -132,10 +132,13 @@ export function createMapFaProjectWorldTemplatePlacementForProjectSettingsRow (d
   parseNicknameSingularTranslationsJson: (
     raw: string
   ) => I_faProjectWorldTemplatePlacementNicknameSingularTranslations
-}): (row: I_faSqlWorldTemplatePlacementJoinRow, documentCountInWorld: number) => I_faProjectWorldTemplatePlacementForProjectSettings {
+}): (
+    row: I_faSqlWorldTemplatePlacementJoinRow,
+    counts: { categoryCountInWorld: number, documentCountInWorld: number }
+  ) => I_faProjectWorldTemplatePlacementForProjectSettings {
   return function mapFaProjectWorldTemplatePlacementForProjectSettingsRow (
     row: I_faSqlWorldTemplatePlacementJoinRow,
-    documentCountInWorld: number
+    counts: { categoryCountInWorld: number, documentCountInWorld: number }
   ): I_faProjectWorldTemplatePlacementForProjectSettings {
     return {
       id: row.id,
@@ -152,7 +155,8 @@ export function createMapFaProjectWorldTemplatePlacementForProjectSettingsRow (d
       ),
       worldAppendix: row.world_appendix,
       icon: row.icon,
-      documentCountInWorld,
+      categoryCountInWorld: counts.categoryCountInWorld,
+      documentCountInWorld: counts.documentCountInWorld,
       createdAtMs: row.created_at_ms,
       updatedAtMs: row.updated_at_ms
     }

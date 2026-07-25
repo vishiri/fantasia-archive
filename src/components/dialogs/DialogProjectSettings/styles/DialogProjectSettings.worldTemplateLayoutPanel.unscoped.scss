@@ -4,7 +4,6 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  margin-top: $dialogProjectSettings-worldTemplateLayout-sectionMarginTop;
   min-height: 0;
   width: 100%;
 }
@@ -49,8 +48,8 @@
 }
 
 .dialogProjectSettingsWorldTemplateLayoutPanel__availableCol .dialogProjectSettings__panelTitle {
-  padding-left: $dialogProjectSettings-worldTemplateLayout-availableCol-paddingInline;
-  padding-right: $dialogProjectSettings-worldTemplateLayout-availableTitleRow-paddingRight;
+  padding-left: $dialogProjectSettings-worldTemplateLayout-availableTitleRow-paddingLeft;
+  padding-right: 0;
 }
 
 .dialogProjectSettingsWorldTemplateLayoutPanel__availableTitleRow {

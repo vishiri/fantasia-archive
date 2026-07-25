@@ -33,9 +33,7 @@
           >
             {{ $t('dialogs.projectSettings.fields.worldColor.label') }}
           </span>
-          <q-icon
-            name="mdi-help-circle"
-            size="16px"
+          <FaHelpTooltipIcon
             class="dialogProjectSettings__fieldHelpIcon q-ml-md"
             data-test-locator="dialogProjectSettings-worlds-colorTooltipIcon"
             :data-test-tooltip-text="$t('dialogs.projectSettings.fields.worldColor.tooltip')"
@@ -46,7 +44,7 @@
             >
               {{ $t('dialogs.projectSettings.fields.worldColor.tooltip') }}
             </q-tooltip>
-          </q-icon>
+          </FaHelpTooltipIcon>
         </div>
         <FaColorPickerInput
           :model-value="props.world.color"
@@ -75,9 +73,7 @@
         >
           {{ $t('dialogs.projectSettings.fields.worldColorPalette.label') }}
         </span>
-        <q-icon
-          name="mdi-help-circle"
-          size="16px"
+        <FaHelpTooltipIcon
           class="dialogProjectSettings__fieldHelpIcon q-ml-md"
           data-test-locator="dialogProjectSettings-worlds-colorPaletteTooltipIcon"
           :data-test-tooltip-text="worldColorPaletteTooltip.flatText"
@@ -99,7 +95,7 @@
               {{ worldColorPaletteTooltip.duplicationBullet }}
             </div>
           </q-tooltip>
-        </q-icon>
+        </FaHelpTooltipIcon>
       </div>
       <DialogProjectSettingsWorldColorPaletteEditor
         :key="props.world.id"
@@ -126,6 +122,7 @@ import DialogProjectSettingsWorldsDeleteButton from './DialogProjectSettingsWorl
 import DialogProjectSettingsWorldColorPaletteEditor from './DialogProjectSettingsWorldColorPaletteEditor.vue'
 import DialogProjectSettingsWorldTemplateLayoutPanel from './DialogProjectSettingsWorldTemplateLayoutPanel.vue'
 import FaColorPickerInput from 'app/src/components/elements/FaColorPickerInput/FaColorPickerInput.vue'
+import FaHelpTooltipIcon from 'app/src/components/elements/FaHelpTooltipIcon/FaHelpTooltipIcon.vue'
 import FaLocaleTranslationsInput from 'app/src/components/elements/FaLocaleTranslationsInput/FaLocaleTranslationsInput.vue'
 import { FA_PROJECT_WORLD_DISPLAY_NAME_TRANSLATION_MAX_LENGTH } from 'app/types/I_faProjectWorldDisplayNameTranslations'
 import type { I_faProjectWorldDisplayNameTranslations } from 'app/types/I_faProjectWorldDisplayNameTranslations'

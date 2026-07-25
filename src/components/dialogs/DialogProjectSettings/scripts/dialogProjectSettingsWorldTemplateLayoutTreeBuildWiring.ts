@@ -91,6 +91,7 @@ function mapPlacementToHeTreeNode (
   return {
     children: [],
     displayNameTranslations: {},
+    categoryCountInWorld: placement.categoryCountInWorld,
     documentCountInWorld: placement.documentCountInWorld,
     documentTemplateId: placement.documentTemplateId,
     icon: placement.icon,
@@ -134,6 +135,7 @@ export function buildHeTreeNodesFromWorldTemplateLayoutDraft (
       return {
         children: buildGroupChildNodes(layout, group.id, languageCode),
         displayNameTranslations: group.displayNameTranslations,
+        categoryCountInWorld: 0,
         documentCountInWorld: 0,
         documentTemplateId: null,
         icon: DIALOG_PROJECT_SETTINGS_WORLD_TEMPLATE_LAYOUT_GROUP_ICON,
@@ -171,6 +173,7 @@ function applyPlacementDisplayFieldsToHeTreeNode (
     }),
     languageCode
   )
+  node.categoryCountInWorld = placement.categoryCountInWorld
   node.documentCountInWorld = placement.documentCountInWorld
   node.displayNameTranslations = {}
   node.icon = placement.icon

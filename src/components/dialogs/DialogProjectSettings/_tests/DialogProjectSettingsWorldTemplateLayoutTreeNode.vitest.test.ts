@@ -21,6 +21,15 @@ const { dialogProjectSettingsTreeNodeTestI18n } = vi.hoisted(() => {
                 usingFallback: 'Using fallback of {fallbackLanguageName}'
               }
             }
+          },
+          projectUI: {
+            projectHierarchyTree: {
+              placementCountTooltip: {
+                categoryCount: 'Category count:',
+                documentCount: 'Document count:',
+                totalCount: 'Document & Category count:'
+              }
+            }
           }
         }
       }
@@ -89,6 +98,7 @@ function mountTreeNode (
 const groupNode = {
   children: [],
   documentCountInWorld: 0,
+  categoryCountInWorld: 0,
   documentTemplateId: null,
   icon: 'mdi-folder-outline',
   id: 'group-a',
@@ -105,6 +115,7 @@ const groupNode = {
 const templateNode = {
   children: [],
   documentCountInWorld: 3,
+  categoryCountInWorld: 0,
   documentTemplateId: 'template-a',
   icon: 'mdi-account',
   id: 'placement-a',
@@ -320,7 +331,10 @@ test('Test that DialogProjectSettingsWorldTemplateLayoutTreeNode disables templa
     node: templateNode
   })
 
-  expect(w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-count"]').text()).toBe('(3)')
+  const countRoot = w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-count"]')
+  expect(countRoot.exists()).toBe(true)
+  expect(w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-count-document"]').text()).toBe('3')
+  expect(w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-count-category"]').text()).toBe('0')
   const removeButton = w.find('[data-test-locator="dialogProjectSettings-worldTemplateLayoutTreeNode-template-placement-a-remove"]')
   expect(removeButton.attributes('data-test-remove-disabled')).toBe('true')
   expect(removeButton.attributes('data-test-tooltip-text')).toBe(

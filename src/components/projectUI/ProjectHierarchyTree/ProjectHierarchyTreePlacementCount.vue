@@ -17,13 +17,13 @@
   >{{ segment.value }}</span></template>)<q-tooltip :delay="500">
     <div data-test-locator="projectHierarchyTree-placementCountTooltip">
       {{ totalCountLabel }}
-      <span class="text-bold text-primary-bright">{{ totalCount }}</span>
+      <span class="projectHierarchyTreePlacementCount__tooltipValue text-bold">{{ totalCount }}</span>
       <br>
       {{ documentCountLabel }}
-      <span class="text-bold text-primary-bright">{{ documentCount }}</span>
+      <span class="projectHierarchyTreePlacementCount__tooltipValue text-bold">{{ documentCount }}</span>
       <br>
       {{ categoryCountLabel }}
-      <span class="text-bold text-primary-bright">{{ categoryCount }}</span>
+      <span class="projectHierarchyTreePlacementCount__tooltipValue text-bold">{{ categoryCount }}</span>
     </div>
   </q-tooltip>
   </span>
@@ -64,3 +64,21 @@ const categoryCountLabel = computed(() => {
   return t('projectUI.projectHierarchyTree.placementCountTooltip.categoryCount')
 })
 </script>
+
+<style lang="scss">
+@use './styles/variables' as *;
+@use '../../../css/app.palette.scss' as *;
+
+.projectHierarchyTreePlacementCount {
+  color: fa-v('grey', $grey);
+  margin-left: $projectHierarchyTree-placementCount-marginLeft;
+}
+
+.projectHierarchyTreePlacementCount__catCount {
+  color: $projectHierarchyTree-placementCount-catCount-color;
+}
+
+.projectHierarchyTreePlacementCount__tooltipValue {
+  color: fa-v('black', $black);
+}
+</style>

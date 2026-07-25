@@ -9,6 +9,7 @@ import type { I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode } from 'app/t
 const groupNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   children: [],
   documentCountInWorld: 0,
+  categoryCountInWorld: 0,
   documentTemplateId: null,
   displayNameTranslations: { 'en-US': 'Group' },
   icon: 'mdi-folder-outline',
@@ -25,6 +26,7 @@ const groupNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
 const templateNodeWithoutDocuments: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   children: [],
   documentCountInWorld: 0,
+  categoryCountInWorld: 0,
   documentTemplateId: 'template-a',
   displayNameTranslations: {},
   icon: 'mdi-account',
@@ -43,14 +45,20 @@ const templateNodeWithDocuments: I_dialogProjectSettingsWorldTemplateLayoutHeTre
   documentCountInWorld: 3
 }
 
+const templateNodeWithCategoriesOnly: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
+  ...templateNodeWithoutDocuments,
+  categoryCountInWorld: 2
+}
+
 /**
  * isDialogProjectSettingsWorldTemplateLayoutPlacementRemoveDisabled
- * Blocks template placement remove when documents exist in the world.
+ * Blocks template placement remove when documents or categories exist in the world.
  */
-test('Test that isDialogProjectSettingsWorldTemplateLayoutPlacementRemoveDisabled respects documentCountInWorld', () => {
+test('Test that isDialogProjectSettingsWorldTemplateLayoutPlacementRemoveDisabled respects document and category counts', () => {
   expect(isDialogProjectSettingsWorldTemplateLayoutPlacementRemoveDisabled(groupNode)).toBe(false)
   expect(isDialogProjectSettingsWorldTemplateLayoutPlacementRemoveDisabled(templateNodeWithoutDocuments)).toBe(false)
   expect(isDialogProjectSettingsWorldTemplateLayoutPlacementRemoveDisabled(templateNodeWithDocuments)).toBe(true)
+  expect(isDialogProjectSettingsWorldTemplateLayoutPlacementRemoveDisabled(templateNodeWithCategoriesOnly)).toBe(true)
 })
 
 /**

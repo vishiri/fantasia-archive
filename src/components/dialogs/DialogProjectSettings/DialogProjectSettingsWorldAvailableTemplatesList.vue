@@ -10,7 +10,6 @@
       <q-item
         v-for="template in props.templates"
         :key="template.id"
-        v-ripple
         clickable
         class="dialogProjectSettingsWorldAvailableTemplatesList__item"
         :data-test-locator="`dialogProjectSettings-worldAvailableTemplate-${template.id}`"

@@ -37,9 +37,7 @@
           >
             {{ $t('dialogs.projectSettings.fields.documentTemplateWorldAppendix.label') }}
           </span>
-          <q-icon
-            name="mdi-help-circle"
-            size="16px"
+          <FaHelpTooltipIcon
             class="dialogProjectSettings__fieldHelpIcon q-ml-md"
             data-test-locator="dialogProjectSettings-documentTemplates-worldAppendixTooltipIcon"
             :data-test-tooltip-text="$t('dialogs.projectSettings.fields.documentTemplateWorldAppendix.tooltip')"
@@ -50,7 +48,7 @@
             >
               {{ $t('dialogs.projectSettings.fields.documentTemplateWorldAppendix.tooltip') }}
             </q-tooltip>
-          </q-icon>
+          </FaHelpTooltipIcon>
         </div>
         <FaLocaleTranslationsInput
           :model-value="props.template.worldAppendixTranslations"
@@ -94,6 +92,7 @@ import { FA_PROJECT_DOCUMENT_TEMPLATE_TITLE_TRANSLATION_MAX_LENGTH } from 'app/t
 import { FA_PROJECT_DOCUMENT_TEMPLATE_WORLD_APPENDIX_TRANSLATION_MAX_LENGTH } from 'app/types/I_faProjectDocumentTemplateWorldAppendixTranslations'
 
 import DialogProjectSettingsDocumentTemplatesDeleteButton from './DialogProjectSettingsDocumentTemplatesDeleteButton.vue'
+import FaHelpTooltipIcon from 'app/src/components/elements/FaHelpTooltipIcon/FaHelpTooltipIcon.vue'
 import FaIconPickerInput from 'app/src/components/elements/FaIconPickerInput/FaIconPickerInput.vue'
 import FaLocaleTranslationsInput from 'app/src/components/elements/FaLocaleTranslationsInput/FaLocaleTranslationsInput.vue'
 import type { I_dialogProjectSettingsDocumentTemplateDraft } from 'app/types/I_dialogProjectSettingsDocumentTemplates'

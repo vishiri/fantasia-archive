@@ -13,20 +13,26 @@
     <q-separator vertical />
 
     <div class="dialogProjectSettings__worldsDetailHost col">
-      <DialogProjectSettingsWorldsDetailPanel
-        v-if="selectedWorld !== null"
-        :current-language-code="props.currentLanguageCode"
-        :document-templates="props.documentTemplates"
-        :name-has-error="isWorldNameInvalid(selectedWorld.displayNameTranslations)"
-        :remove-disabled="isWorldRemoveDisabled(selectedWorld)"
-        :remove-disabled-reason="resolveRemoveDisabledReason(selectedWorld)"
-        :world="selectedWorld"
-        @remove="emitRemove(selectedWorld.id)"
-        @update:color="emitUpdateColor(selectedWorld.id, $event)"
-        @update:color-pallete="emitUpdateColorPallete(selectedWorld.id, $event)"
-        @update:display-name-translations="emitUpdateDisplayNameTranslations(selectedWorld.id, $event)"
-        @update:template-layout="emitUpdateTemplateLayout(selectedWorld.id, $event)"
-      />
+      <Transition
+        v-bind="FA_DOCUMENT_WORKSPACE_PAGE_TRANSITION_BINDINGS"
+        mode="out-in"
+      >
+        <DialogProjectSettingsWorldsDetailPanel
+          v-if="selectedWorld !== null"
+          :key="selectedWorld.id"
+          :current-language-code="props.currentLanguageCode"
+          :document-templates="props.documentTemplates"
+          :name-has-error="isWorldNameInvalid(selectedWorld.displayNameTranslations)"
+          :remove-disabled="isWorldRemoveDisabled(selectedWorld)"
+          :remove-disabled-reason="resolveRemoveDisabledReason(selectedWorld)"
+          :world="selectedWorld"
+          @remove="emitRemove(selectedWorld.id)"
+          @update:color="emitUpdateColor(selectedWorld.id, $event)"
+          @update:color-pallete="emitUpdateColorPallete(selectedWorld.id, $event)"
+          @update:display-name-translations="emitUpdateDisplayNameTranslations(selectedWorld.id, $event)"
+          @update:template-layout="emitUpdateTemplateLayout(selectedWorld.id, $event)"
+        />
+      </Transition>
     </div>
   </div>
 </template>
@@ -46,6 +52,7 @@ import {
   isDialogProjectSettingsWorldNameInvalid
 } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldsSaveValidation'
 import { resolveDialogProjectSettingsWorldsPanelSelection } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsWorldsSelection'
+import { FA_DOCUMENT_WORKSPACE_PAGE_TRANSITION_BINDINGS } from 'app/src/scripts/appRouting/faAppShellPageTransition_manager'
 import DialogProjectSettingsWorldsDetailPanel from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsWorldsDetailPanel.vue'
 import DialogProjectSettingsWorldsTabList from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsWorldsTabList.vue'
 
@@ -149,6 +156,12 @@ function emitUpdateTemplateLayout (
   flex: 1 1 auto;
   min-height: 0;
   min-width: 0;
+
+  /* Keep painted separator under tab glow (z-index 2 on faVerticalDraggableTabs). */
+  > :deep(.q-separator) {
+    position: relative;
+    z-index: 0;
+  }
 }
 
 .dialogProjectSettings__worldsDetailHost {
@@ -160,3 +173,5 @@ function emitUpdateTemplateLayout (
   overflow: hidden auto;
 }
 </style>
+
+<style lang="scss" src="./styles/DialogProjectSettings.detailPanelTransition.unscoped.scss"></style>

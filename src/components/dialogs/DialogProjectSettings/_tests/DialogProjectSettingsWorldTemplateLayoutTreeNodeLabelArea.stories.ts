@@ -16,6 +16,7 @@ export const TemplateNode: StoryObj<typeof meta> = {
     node: {
       children: [],
       documentCountInWorld: 2,
+      categoryCountInWorld: 0,
       documentTemplateId: 'template-a',
       displayNameTranslations: {},
       icon: 'mdi-account',

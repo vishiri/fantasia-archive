@@ -20,27 +20,30 @@
     <q-icon
       v-if="displayIcon !== ''"
       class="projectHierarchyTreeNode__icon"
-      :class="{ 'projectHierarchyTreeNode__icon--layoutKind': props.node.nodeKind !== 'world' }"
+      :class="{
+        'projectHierarchyTreeNode__icon--layoutKind': props.node.nodeKind !== 'world',
+        'projectHierarchyTreeNode__icon--worldGlyph': props.node.nodeKind === 'world'
+      }"
       :name="displayIcon"
-      :style="nodeIconLabelTextStyle"
+      :style="nodeIconStyle"
     />
     <span
       v-if="showsFinishedMarker"
       class="projectHierarchyTreeNode__finishedMarker"
       :data-test-locator="`${nodeTestLocator}-finishedMarker`"
-      :style="nodeIconLabelTextStyle"
+      :style="nodeLabelTextStyle"
     >✓</span>
     <span
       v-if="showsDeadMarker"
       class="projectHierarchyTreeNode__deadMarker"
       :data-test-locator="`${nodeTestLocator}-deadMarker`"
-      :style="nodeIconLabelTextStyle"
+      :style="nodeLabelTextStyle"
     >†</span>
     <span
       class="projectHierarchyTreeNode__label"
       :class="{ 'projectHierarchyTreeNode__label--dead': showsDeadStrikethrough }"
       :data-test-locator="`${nodeTestLocator}-label`"
-      :style="nodeIconLabelTextStyle"
+      :style="nodeLabelTextStyle"
     >
       {{ props.node.label }}
     </span>
@@ -186,7 +189,7 @@ const nodeRootBackgroundStyle = computed(() => {
   }
 })
 
-const nodeIconLabelTextStyle = computed(() => {
+const nodeLabelTextStyle = computed(() => {
   if (props.node.nodeKind === 'world') {
     return {
       color: resolveProjectHierarchyTreeWorldDisplayColor(props.node.worldColor)
@@ -201,6 +204,15 @@ const nodeIconLabelTextStyle = computed(() => {
   return {
     color: textColor
   }
+})
+
+const nodeIconStyle = computed(() => {
+  if (props.node.nodeKind === 'world') {
+    return {
+      '--fa-color-glyph-base': resolveProjectHierarchyTreeWorldDisplayColor(props.node.worldColor)
+    }
+  }
+  return nodeLabelTextStyle.value
 })
 </script>
 

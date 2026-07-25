@@ -17,6 +17,7 @@ export const GroupNode: StoryObj<typeof meta> = {
     node: {
       children: [],
       documentCountInWorld: 0,
+      categoryCountInWorld: 0,
       documentTemplateId: null,
       icon: 'mdi-folder-outline',
       id: 'group-a',
@@ -34,6 +35,7 @@ export const TemplateNode: StoryObj<typeof meta> = {
     node: {
       children: [],
       documentCountInWorld: 2,
+      categoryCountInWorld: 0,
       documentTemplateId: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
       icon: 'mdi-account',
       id: 'placement-a',
@@ -52,6 +54,7 @@ export const ValidationError: StoryObj<typeof meta> = {
     node: {
       children: [],
       documentCountInWorld: 0,
+      categoryCountInWorld: 0,
       documentTemplateId: null,
       icon: 'mdi-folder-outline',
       id: 'group-a',

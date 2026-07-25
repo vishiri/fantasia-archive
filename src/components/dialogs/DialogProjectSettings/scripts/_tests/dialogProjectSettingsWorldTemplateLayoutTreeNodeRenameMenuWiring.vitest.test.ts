@@ -14,6 +14,7 @@ const groupNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   children: [],
   displayNameTranslations: { 'en-US': 'Creatures' },
   documentCountInWorld: 0,
+  categoryCountInWorld: 0,
   documentTemplateId: null,
   icon: 'mdi-folder',
   id: '770e8400-e29b-41d4-a716-446655440001',
@@ -30,6 +31,7 @@ const templateNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   children: [],
   displayNameTranslations: {},
   documentCountInWorld: 0,
+  categoryCountInWorld: 0,
   documentTemplateId: '660e8400-e29b-41d4-a716-446655440001',
   icon: 'mdi-account',
   id: '880e8400-e29b-41d4-a716-446655440001',
@@ -207,6 +209,7 @@ test('Test that rename menu wiring ignores unsupported nodes', async () => {
   const unsupportedNode = {
     children: [],
     documentCountInWorld: 0,
+    categoryCountInWorld: 0,
     documentTemplateId: null,
     icon: 'mdi-folder',
     id: '770e8400-e29b-41d4-a716-446655440099',

@@ -1,5 +1,7 @@
 @use './variables' as *;
 @use '../../../../css/app.palette.scss' as *;
+@use '../../../../css/globals/faHeTreeSlotChrome.mixin.scss' as heTreeSlot;
+@use '../../../../css/globals/faHeTreeSlotChrome.variables.scss' as *;
 @use '../../../../css/theme/quasar-components/qFocusable.variables' as *;
 
 .projectHierarchyTreeRoot {
@@ -110,7 +112,18 @@
   cursor: grabbing;
 }
 
-.projectHierarchyTreeHost .projectHierarchyTreeNode.q-hoverable:hover > .q-focus-helper,
+.projectHierarchyTreeHost .projectHierarchyTreeNode.q-hoverable {
+  @include heTreeSlot.fa-he-tree-slot-chrome-idle;
+}
+
+.projectHierarchyTreeHost .projectHierarchyTreeNode.q-hoverable:hover {
+  @include heTreeSlot.fa-he-tree-slot-chrome($faHeTreeSlotChrome-hoverStrength);
+
+  > .q-focus-helper {
+    opacity: 0 !important;
+  }
+}
+
 .projectHierarchyTreeHost .projectHierarchyTreeNode--activeTabDocument > .q-focus-helper {
   background: var(--projectHierarchyTreeNode-focusHelperColor);
   opacity: $qFocusable-hoverHelper-opacity !important;
@@ -119,6 +132,12 @@
   &::after {
     opacity: 0 !important;
   }
+}
+
+.projectHierarchyTree--listDragging .projectHierarchyTreeNode.q-hoverable:hover {
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .projectHierarchyTree--listDragging .projectHierarchyTreeNode > .q-focus-helper {
@@ -215,21 +234,9 @@
   }
 }
 
-/* Drag placeholder: matches Project Settings world template layout tree; hierarchy row height. */
+/* Drag placeholder: shared he-tree slot chrome; hierarchy row height. */
 .projectHierarchyTree .he-tree-drag-placeholder {
-  background-color: $projectHierarchyTree-dragPlaceholder-backgroundColor;
-  border: $projectHierarchyTree-dragPlaceholder-borderWidth solid $projectHierarchyTree-dragPlaceholder-borderColor;
-  border-radius: $projectHierarchyTree-dragPlaceholder-borderRadius;
-  border-style: solid;
-  box-shadow: inset $projectHierarchyTree-dragPlaceholder-accentWidth 0 0 $projectHierarchyTree-dragPlaceholder-accentColor;
+  @include heTreeSlot.fa-he-tree-slot-chrome(1);
+
   min-height: $projectHierarchyTree-node-minHeight;
-}
-
-.projectHierarchyTreePlacementCount {
-  color: fa-v('grey', $grey);
-  margin-left: $projectHierarchyTree-placementCount-marginLeft;
-}
-
-.projectHierarchyTreePlacementCount__catCount {
-  color: $projectHierarchyTree-placementCount-catCount-color;
 }

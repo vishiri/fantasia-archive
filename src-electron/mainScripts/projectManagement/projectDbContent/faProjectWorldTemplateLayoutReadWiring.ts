@@ -5,7 +5,6 @@ import {
   mapFaProjectWorldTemplatePlacementForProjectSettingsRow
 } from '../faProjectContentRowMap_manager'
 import {
-  FA_PROJECT_TABLE_DOCUMENTS,
   FA_PROJECT_TABLE_DOCUMENT_TEMPLATES,
   FA_PROJECT_TABLE_WORLD_TEMPLATE_GROUPS,
   FA_PROJECT_TABLE_WORLD_TEMPLATE_PLACEMENTS
@@ -15,23 +14,7 @@ import type {
   I_faSqlWorldTemplateGroupRow,
   I_faSqlWorldTemplatePlacementJoinRow
 } from 'app/types/I_faProjectContentRowMap'
-
-function listFaProjectWorldTemplateDocumentCounts (
-  db: Database,
-  worldId: string
-): Record<string, number> {
-  const rows = db
-    .prepare(
-      `SELECT template_id, COUNT(*) AS c FROM ${FA_PROJECT_TABLE_DOCUMENTS} ` +
-        'WHERE world_id = ? AND template_id IS NOT NULL GROUP BY template_id'
-    )
-    .all(worldId) as Array<{ template_id: string, c: number }>
-  const counts: Record<string, number> = {}
-  for (const row of rows) {
-    counts[row.template_id] = row.c
-  }
-  return counts
-}
+import { listFaProjectPlacementCategoryDocumentCounts } from './faProjectPlacementCategoryDocumentCountsWiring'
 
 export function listFaProjectWorldTemplateLayoutForProjectSettings (
   db: Database,
@@ -58,15 +41,16 @@ export function listFaProjectWorldTemplateLayoutForProjectSettings (
     )
     .all(worldId) as I_faSqlWorldTemplatePlacementJoinRow[]
 
-  const documentCounts = listFaProjectWorldTemplateDocumentCounts(db, worldId)
+  const placementCounts = listFaProjectPlacementCategoryDocumentCounts(db, worldId)
 
   return {
     groups: groupRows.map(mapFaProjectWorldTemplateGroupRow),
     placements: placementRows.map((row) => {
-      return mapFaProjectWorldTemplatePlacementForProjectSettingsRow(
-        row,
-        documentCounts[row.document_template_id] ?? 0
-      )
+      const counts = placementCounts.get(row.id)
+      return mapFaProjectWorldTemplatePlacementForProjectSettingsRow(row, {
+        categoryCountInWorld: counts?.categoryCount ?? 0,
+        documentCountInWorld: counts?.documentCount ?? 0
+      })
     })
   }
 }

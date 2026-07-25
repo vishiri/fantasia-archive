@@ -28,6 +28,7 @@ const groupNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   children: [],
   displayNameTranslations: { 'en-US': 'Creatures' },
   documentCountInWorld: 0,
+  categoryCountInWorld: 0,
   documentTemplateId: null,
   icon: 'mdi-folder',
   id: 'group-a',
@@ -44,6 +45,7 @@ const templateNode: I_dialogProjectSettingsWorldTemplateLayoutHeTreeNode = {
   children: [],
   displayNameTranslations: {},
   documentCountInWorld: 0,
+  categoryCountInWorld: 0,
   documentTemplateId: 'template-a',
   icon: 'mdi-account',
   id: 'placement-a',
@@ -567,6 +569,7 @@ test('Test that rename placement nickname draft leaves non-matching placements u
   layout.placements = [
     {
       documentCountInWorld: 0,
+      categoryCountInWorld: 0,
       documentTemplateId: 'template-a',
       groupId: null,
       groupSortOrder: null,

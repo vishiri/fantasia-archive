@@ -20,17 +20,23 @@
       <q-separator vertical />
 
       <div class="dialogProjectSettings__documentTemplatesDetailHost col">
-        <DialogProjectSettingsDocumentTemplatesDetailPanel
-          v-if="selectedTemplate !== null"
-          :current-language-code="props.currentLanguageCode"
-          :name-has-error="isTemplateNameInvalid(selectedTemplate.titlePluralTranslations)"
-          :remove-disabled="isTemplateRemoveDisabled(selectedTemplate)"
-          :template="selectedTemplate"
-          @remove="emitRemove(selectedTemplate.id)"
-          @update:icon="emitUpdateIcon(selectedTemplate.id, $event)"
-          @update:title-translations="emitUpdateTitleTranslations(selectedTemplate.id, $event)"
-          @update:world-appendix-translations="emitUpdateWorldAppendixTranslations(selectedTemplate.id, $event)"
-        />
+        <Transition
+          v-bind="FA_DOCUMENT_WORKSPACE_PAGE_TRANSITION_BINDINGS"
+          mode="out-in"
+        >
+          <DialogProjectSettingsDocumentTemplatesDetailPanel
+            v-if="selectedTemplate !== null"
+            :key="selectedTemplate.id"
+            :current-language-code="props.currentLanguageCode"
+            :name-has-error="isTemplateNameInvalid(selectedTemplate.titlePluralTranslations)"
+            :remove-disabled="isTemplateRemoveDisabled(selectedTemplate)"
+            :template="selectedTemplate"
+            @remove="emitRemove(selectedTemplate.id)"
+            @update:icon="emitUpdateIcon(selectedTemplate.id, $event)"
+            @update:title-translations="emitUpdateTitleTranslations(selectedTemplate.id, $event)"
+            @update:world-appendix-translations="emitUpdateWorldAppendixTranslations(selectedTemplate.id, $event)"
+          />
+        </Transition>
       </div>
     </template>
   </div>
@@ -49,6 +55,7 @@ import {
 } from 'app/src/components/dialogs/DialogProjectSettings/scripts/dialogProjectSettingsDocumentTemplatesDraft'
 import { resolveDialogProjectSettingsDocumentTemplatesPanelSelection } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDocumentTemplatesSelection'
 import { FA_DIALOG_PROJECT_SETTINGS_DOCUMENT_TEMPLATES_TAB_LIST_WIDTH_PX } from 'app/src/components/dialogs/DialogProjectSettings/scripts/functions/dialogProjectSettingsDialogInput'
+import { FA_DOCUMENT_WORKSPACE_PAGE_TRANSITION_BINDINGS } from 'app/src/scripts/appRouting/faAppShellPageTransition_manager'
 import DialogProjectSettingsDocumentTemplatesDetailPanel from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsDocumentTemplatesDetailPanel.vue'
 import DialogProjectSettingsDocumentTemplatesEmptyState from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsDocumentTemplatesEmptyState.vue'
 import DialogProjectSettingsDocumentTemplatesTabList from 'app/src/components/dialogs/DialogProjectSettings/DialogProjectSettingsDocumentTemplatesTabList.vue'
@@ -140,6 +147,12 @@ function emitUpdateIcon (id: string, icon: string): void {
   flex: 1 1 auto;
   min-height: 0;
   min-width: 0;
+
+  /* Keep painted separator under tab glow (z-index 2 on faVerticalDraggableTabs). */
+  > :deep(.q-separator) {
+    position: relative;
+    z-index: 0;
+  }
 }
 
 .dialogProjectSettings__documentTemplatesPanelEmpty {
@@ -156,3 +169,5 @@ function emitUpdateIcon (id: string, icon: string): void {
   overflow: hidden auto;
 }
 </style>
+
+<style lang="scss" src="./styles/DialogProjectSettings.detailPanelTransition.unscoped.scss"></style>

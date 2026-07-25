@@ -24,6 +24,7 @@ const worldA: I_dialogProjectSettingsWorldDraft = {
     placements: [
       {
         documentCountInWorld: 0,
+        categoryCountInWorld: 0,
         documentTemplateId: templateId,
         groupId: null,
         groupSortOrder: null,
@@ -48,6 +49,7 @@ const worldB: I_dialogProjectSettingsWorldDraft = {
     placements: [
       {
         documentCountInWorld: 0,
+        categoryCountInWorld: 0,
         documentTemplateId: templateId,
         groupId: null,
         groupSortOrder: null,
@@ -61,6 +63,7 @@ const worldB: I_dialogProjectSettingsWorldDraft = {
       },
       {
         documentCountInWorld: 0,
+        categoryCountInWorld: 0,
         documentTemplateId: otherTemplateId,
         groupId: null,
         groupSortOrder: null,

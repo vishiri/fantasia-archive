@@ -116,6 +116,7 @@ test('Test that hydrateDialogProjectSettingsDrafts localizes world template layo
         placements: [
           {
             documentCountInWorld: 0,
+            categoryCountInWorld: 0,
             documentTemplateId: 'template-a',
             groupId: null,
             groupSortOrder: null,

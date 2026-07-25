@@ -27,8 +27,9 @@ test('Test that ProjectHierarchyTreeNode renders world row chrome', () => {
     global: {
       stubs: {
         QIcon: {
+          inheritAttrs: false,
           props: ['name'],
-          template: '<i class="q-icon" :name="name" />'
+          template: '<i class="q-icon" :class="$attrs.class" :style="$attrs.style" :name="name" />'
         }
       }
     },
@@ -43,15 +44,19 @@ test('Test that ProjectHierarchyTreeNode renders world row chrome', () => {
       }
     }
   })
+  const worldIcon = wrapper.find('.projectHierarchyTreeNode__icon--worldGlyph')
   expect(wrapper.find('[data-test-node-kind="world"]').exists()).toBe(true)
   expect(wrapper.find('.projectHierarchyTreeNode--world').exists()).toBe(true)
-  expect(wrapper.find('.q-icon').exists()).toBe(true)
+  expect(worldIcon.exists()).toBe(true)
   expect(wrapper.find('.q-focus-helper').exists()).toBe(true)
   expect((wrapper.element as HTMLElement).style.color).toBe('')
   expectCssColorValue(
     (wrapper.find('.projectHierarchyTreeNode__label').element as HTMLElement).style.color,
     '#112233'
   )
+  expect(
+    (worldIcon.element as HTMLElement).style.getPropertyValue('--fa-color-glyph-base').trim()
+  ).toBe('#112233')
   expect(wrapper.find('.projectHierarchyTreeNode__label').exists()).toBe(true)
   expect(wrapper.find('.projectHierarchyTreeNode__icon--layoutKind').exists()).toBe(false)
 })

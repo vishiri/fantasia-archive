@@ -88,10 +88,6 @@
   width: 100%;
 }
 
-.dialogProjectSettingsWorldTemplateLayoutTreeNode__count {
-  flex: 0 0 auto;
-}
-
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__titleRow {
   box-sizing: border-box;
   min-height: $dialogProjectSettings-worldTemplateLayout-treeNode-minHeight;
@@ -120,6 +116,7 @@
 
 .dialogProjectSettingsWorldTemplateLayoutTreeNode__label {
   display: block;
+  flex: 0 1 auto;
   min-width: 0;
 }
 

@@ -1,11 +1,24 @@
 @use './variables' as *;
+@use '../../../../css/globals/faTabEdgeGlow.mixin.scss' as tabEdgeGlow;
 
+/*
+ * Available templates list rows: same bottom highlight + bloom as flat (borderless) buttons.
+ */
 .dialogProjectSettingsWorldAvailableTemplatesList__item {
-  &.q-hoverable:hover > .q-focus-helper {
-    opacity: $qFocusable-hoverHelper-opacity !important;
+  overflow: visible;
+  position: relative;
+
+  @include tabEdgeGlow.fa-tab-edge-glow-kill-focus-helper;
+
+  &::after {
+    @include tabEdgeGlow.fa-tab-edge-glow-idle(bottom);
   }
 
-  &:not(:hover) > .q-focus-helper {
+  &.q-hoverable:hover::after {
+    @include tabEdgeGlow.fa-tab-edge-glow-hover(bottom);
+  }
+
+  > .q-focus-helper {
     opacity: 0 !important;
 
     &::before,

@@ -205,9 +205,9 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabItem emits select on cl
 
 /**
  * DialogProjectSettingsDocumentTemplatesTabItem
- * Disables ripple binding while the parent list is dragging.
+ * Drops Quasar hoverable/focusable chrome while the parent list is dragging.
  */
-test('Test that DialogProjectSettingsDocumentTemplatesTabItem disables ripple while list dragging', () => {
+test('Test that DialogProjectSettingsDocumentTemplatesTabItem drops hoverable while list dragging', () => {
   const w = mount(DialogProjectSettingsDocumentTemplatesTabItem, {
     props: {
       currentLanguageCode: 'en-US',
@@ -219,5 +219,8 @@ test('Test that DialogProjectSettingsDocumentTemplatesTabItem disables ripple wh
     global: tabItemMountGlobal
   })
 
-  expect(w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tab"]').exists()).toBe(true)
+  const tab = w.find('[data-test-locator="dialogProjectSettings-documentTemplates-tab"]')
+  expect(tab.exists()).toBe(true)
+  expect(tab.classes()).not.toContain('q-hoverable')
+  expect(tab.classes()).not.toContain('q-focusable')
 })

@@ -31,6 +31,7 @@ test('Test that registerDialogProjectSettingsLanguageLayoutLabelsSyncWatcher res
         placements: [
           {
             documentCountInWorld: 0,
+            categoryCountInWorld: 0,
             documentTemplateId: 'template-a',
             groupId: null,
             groupSortOrder: null,

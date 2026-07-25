@@ -53,6 +53,8 @@ test('Test that DialogProjectSettingsTabBar renders the general settings tab', a
   expect(w.find('[data-test-locator="dialogProjectSettings-tab-generalSettings"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="dialogProjectSettings-tab-worldsSettings"]').exists()).toBe(true)
   expect(w.find('[data-test-locator="dialogProjectSettings-tab-documentTemplatesSettings"]').exists()).toBe(true)
+  expect(w.find('[data-test-locator="dialogProjectSettings-tabBarDivider"]').exists()).toBe(true)
+  expect(w.find('.fa-painted-divider--horizontal').exists()).toBe(true)
 
   const tabs = w.findComponent(qTabsStub)
   await tabs.vm.$emit('update:modelValue', FA_DIALOG_PROJECT_SETTINGS_GENERAL_TAB)

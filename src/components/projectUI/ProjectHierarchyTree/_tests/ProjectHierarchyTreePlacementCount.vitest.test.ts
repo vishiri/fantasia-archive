@@ -15,7 +15,7 @@ const placementCountI18n = createI18n({
           placementCountTooltip: {
             categoryCount: 'Category count:',
             documentCount: 'Document count:',
-            totalCount: 'Document & categories count:'
+            totalCount: 'Document & Category count:'
           }
         }
       }
@@ -91,6 +91,7 @@ test('Test that ProjectHierarchyTreePlacementCount renders tooltip labels', () =
   })
 
   expect(wrapper.find('[data-test-locator="projectHierarchyTree-placementCountTooltip"]').exists()).toBe(true)
+  expect(wrapper.findAll('.projectHierarchyTreePlacementCount__tooltipValue')).toHaveLength(3)
 })
 
 test('Test that ProjectHierarchyTreePlacementCount hides when display.shows is false', () => {

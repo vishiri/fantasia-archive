@@ -7,6 +7,7 @@ const groupNode = {
   children: [],
   displayNameTranslations: { 'en-US': 'Group' },
   documentCountInWorld: 0,
+  categoryCountInWorld: 0,
   documentTemplateId: null,
   icon: 'mdi-folder',
   id: 'group-a',

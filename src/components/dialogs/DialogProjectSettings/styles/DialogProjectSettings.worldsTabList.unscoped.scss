@@ -1,9 +1,13 @@
 @use './variables' as *;
+@use '../../../../css/globals/faColorBead.mixin.scss' as colorBead;
 
 .faVerticalDraggableTabs.dialogProjectSettingsWorldsTabList,
 .faVerticalDraggableTabs.dialogProjectSettingsDocumentTemplatesTabList {
   align-self: stretch;
   flex: 0 0 var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
+  /* Gutter + negative margin so right-edge core line can sit on the painted separator.
+   * Y-scroll alone would force X clip and leave the highlight beside the border. */
+  margin-right: -2px;
   max-height: 100%;
   max-width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
   min-height: 0;
@@ -12,9 +16,11 @@
   width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-worldsTabList-width});
 
   .faVerticalDraggableTabs__scroll {
+    box-sizing: border-box;
     flex: 1 1 auto;
     min-height: 0;
-    overflow-y: auto;
+    overflow: hidden auto;
+    padding-right: 2px;
     scrollbar-width: none;
 
     &::-webkit-scrollbar {
@@ -31,8 +37,8 @@
   .faVerticalDraggableTabs__filterRow {
     box-sizing: border-box;
     display: flex;
-    padding-left: $dialogProjectSettings-verticalTabListFilterRow-paddingInline;
-    padding-right: $dialogProjectSettings-verticalTabListFilterRow-paddingInline;
+    padding-left: $dialogProjectSettings-verticalTabListFilterRow-paddingLeft;
+    padding-right: $dialogProjectSettings-verticalTabListFilterRow-paddingRight;
     width: 100%;
   }
 
@@ -45,7 +51,15 @@
   }
 }
 
+.faVerticalDraggableTabs.dialogProjectSettingsWorldsTabList {
+  --fa-tab-edge-glow-right-active-bloom-size: 160px;
+  --fa-tab-edge-glow-right-hover-bloom-size: 180px;
+}
+
 .faVerticalDraggableTabs.dialogProjectSettingsDocumentTemplatesTabList {
+  --fa-tab-edge-glow-right-active-bloom-size: 260px;
+  --fa-tab-edge-glow-right-hover-bloom-size: 280px;
+
   flex-basis: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-documentTemplatesTabList-width});
   max-width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-documentTemplatesTabList-width});
   min-width: var(--fa-vertical-draggable-tabs-column-width, #{$dialogProjectSettings-documentTemplatesTabList-width});
@@ -57,11 +71,8 @@
 }
 
 .dialogProjectSettingsWorldsTabItem__colorSwatch {
-  border:
-    $dialogProjectSettings-worldsTabColorSwatch-borderWidth
-    solid
-    $dialogProjectSettings-worldsTabColorSwatch-borderColor;
-  border-radius: $dialogProjectSettings-worldsTabColorSwatch-borderRadius;
+  @include colorBead.fa-color-bead-shading;
+
   box-sizing: border-box;
   height: $dialogProjectSettings-worldsTabColorSwatch-size;
   pointer-events: none;

@@ -134,6 +134,7 @@ function appendHeTreeGroupNodesToReverseMap (
         documentTemplateId
       )
       pushHeTreeTemplatePlacement(state, {
+        categoryCountInWorld: prior?.categoryCountInWorld ?? child.categoryCountInWorld,
         documentCountInWorld: prior?.documentCountInWorld ?? child.documentCountInWorld,
         documentTemplateId,
         groupId,
@@ -172,6 +173,7 @@ function appendHeTreeRootTemplateNodesToReverseMap (
       documentTemplateId
     )
     pushHeTreeTemplatePlacement(state, {
+      categoryCountInWorld: prior?.categoryCountInWorld ?? node.categoryCountInWorld,
       documentCountInWorld: prior?.documentCountInWorld ?? node.documentCountInWorld,
       documentTemplateId,
       groupId: null,

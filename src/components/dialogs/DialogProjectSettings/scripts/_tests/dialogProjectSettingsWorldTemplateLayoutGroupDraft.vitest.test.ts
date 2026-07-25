@@ -82,6 +82,7 @@ test('Test that remove group draft shifts later groups when removed group had ch
     placements: [
       {
         documentCountInWorld: 0,
+        categoryCountInWorld: 0,
         documentTemplateId: '660e8400-e29b-41d4-a716-446655440001',
         groupId: firstGroupId,
         groupSortOrder: 0,
@@ -95,6 +96,7 @@ test('Test that remove group draft shifts later groups when removed group had ch
       },
       {
         documentCountInWorld: 0,
+        categoryCountInWorld: 0,
         documentTemplateId: '770e8400-e29b-41d4-a716-446655440002',
         groupId: firstGroupId,
         groupSortOrder: 1,

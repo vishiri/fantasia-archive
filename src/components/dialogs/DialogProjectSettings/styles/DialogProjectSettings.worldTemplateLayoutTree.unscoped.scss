@@ -1,3 +1,7 @@
+@use './variables' as *;
+@use '../../../../css/globals/faHeTreeSlotChrome.mixin.scss' as heTreeSlot;
+@use '../../../../css/globals/faHeTreeSlotChrome.variables.scss' as *;
+
 .dialogProjectSettingsWorldTemplateLayoutTreeHost {
   height: 100%;
   min-height: 0;
@@ -13,6 +17,8 @@
 
 .dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--group),
 .dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--template) {
+  @include heTreeSlot.fa-he-tree-slot-chrome-idle;
+
   cursor: $faVerticalDraggableTabs-tab-cursor-default;
 
   &:active {
@@ -22,8 +28,10 @@
 
 .dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--group):hover,
 .dialogProjectSettingsWorldTemplateLayoutTree .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--template):hover {
+  @include heTreeSlot.fa-he-tree-slot-chrome($faHeTreeSlotChrome-hoverStrength);
+
   .dialogProjectSettingsWorldTemplateLayoutTreeNode > .q-focus-helper {
-    opacity: $qFocusable-hoverHelper-opacity !important;
+    opacity: 0 !important;
   }
 }
 
@@ -36,15 +44,18 @@
   .dialogProjectSettingsWorldTemplateLayoutTreeNode > .q-focus-helper {
     opacity: 0 !important;
   }
+
+  .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--group):hover,
+  .tree-node:has(.dialogProjectSettingsWorldTemplateLayoutTreeNode--template):hover {
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
 }
 
-/* Drag placeholder: inset accent + tinted fill. Revert: transparent bg + dashed primary-bright border only. */
 .dialogProjectSettingsWorldTemplateLayoutTree .he-tree-drag-placeholder {
-  background-color: $dialogProjectSettings-worldTemplateLayout-dragPlaceholder-backgroundColor;
-  border: $dialogProjectSettings-worldTemplateLayout-dragPlaceholder-borderWidth solid $dialogProjectSettings-worldTemplateLayout-dragPlaceholder-borderColor;
-  border-radius: $dialogProjectSettings-worldTemplateLayout-dragPlaceholder-borderRadius;
-  border-style: solid;
-  box-shadow: inset $dialogProjectSettings-worldTemplateLayout-dragPlaceholder-accentWidth 0 0 fa-v('primary-bright', $primary-bright);
+  @include heTreeSlot.fa-he-tree-slot-chrome(1);
+
   min-height: $dialogProjectSettings-worldTemplateLayout-treeNode-minHeight;
 }
 

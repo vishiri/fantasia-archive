@@ -147,6 +147,7 @@ test('Test that rename menu wiring inject fallback keeps a local open target ref
     children: [],
     displayNameTranslations: { 'en-US': 'Creatures' },
     documentCountInWorld: 0,
+    categoryCountInWorld: 0,
     documentTemplateId: null,
     icon: 'mdi-folder',
     id: '770e8400-e29b-41d4-a716-446655440001',
