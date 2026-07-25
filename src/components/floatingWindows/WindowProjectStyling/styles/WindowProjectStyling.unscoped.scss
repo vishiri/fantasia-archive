@@ -1,6 +1,6 @@
 @use '../../WindowAppStyling/styles/WindowAppStyling.floatingWindowPopTransition.unscoped.scss' as *;
 @use '../../WindowAppStyling/styles/variables' as *;
-@use '../../../../css/app.palette.scss' as *;
+@use '../../../../css/globals/faTooltipParchmentFrame.mixin.scss' as tooltipParchment;
 
 .windowProjectStyling {
   box-sizing: border-box;
@@ -45,11 +45,12 @@
   }
 
   &__helpTooltip {
-    background-color: var(--fa-color-tooltip-background, #{$accent});
-    color: var(--fa-color-dark, #{$dark});
+    /* QMenu (replaces QTooltip): match global parchment tooltip surface + z-index. */
+    @include tooltipParchment.fa-tooltip-parchment-surface;
+
     max-width: $windowAppStyling-helpTooltip-width;
     width: $windowAppStyling-helpTooltip-width;
-    z-index: 999999999;
+    z-index: $qTooltip-zIndex;
   }
 
   &__helpTooltipKeybinds {

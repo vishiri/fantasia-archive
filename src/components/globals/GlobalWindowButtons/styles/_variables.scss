@@ -1,10 +1,15 @@
 @use '../../../../css/app.palette.scss' as *;
+@use '../../../../css/theme/quasar-components/qDialog.variables' as *;
 
 /* COMPONENT - GLOBAL WINDOW BUTTONS
- * totalWidth: positions GlobalLanguageSelector; matches three `size="xs"` icon control widths at height 28px. */
+ * totalWidth: positions GlobalLanguageSelector; matches three `size="xs"` icon control widths at height 28px.
+ * dialogOverlay: matches QDialog backdrop when body.q-body--prevent-scroll (modal dialog open). */
 $globalWindowButtons-backgroundColor: fa-v('dark-middle', $dark-middle);
 $globalWindowButtons-close-hoverColor: fa-v('secondary', $secondary);
 $globalWindowButtons-color: fa-v('accent', $accent);
+$globalWindowButtons-dialogOverlay-background: $qDialog-backdrop-background;
+$globalWindowButtons-dialogOverlay-transition: opacity var(--q-transition-duration, 0.3s) ease-out;
+$globalWindowButtons-dialogOverlay-zIndex: 1;
 $globalWindowButtons-height: 36px;
 $globalWindowButtons-hoverColor: fa-v('primary-bright', $primary-bright);
 $globalWindowButtons-totalWidth: 144px;

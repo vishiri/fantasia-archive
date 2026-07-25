@@ -71,7 +71,9 @@ function emitSearchQueryFromInput (value: string | number | null): void {
 }
 
 .dialogAppSettings__tabs {
+  /* Above painted vertical separator so right-edge glow can overlap it. */
   position: relative;
+  z-index: $faTabEdgeGlow-zIndex;
 }
 
 .dialogAppSettings__tabs--nonInteractive {

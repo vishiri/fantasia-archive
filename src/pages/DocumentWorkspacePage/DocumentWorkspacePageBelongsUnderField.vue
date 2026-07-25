@@ -10,9 +10,7 @@
       >
         {{ belongsUnderFieldLabel }}
       </span>
-      <q-icon
-        name="mdi-help-circle"
-        size="16px"
+      <FaHelpTooltipIcon
         class="documentWorkspacePageBelongsUnderField__helpIcon documentWorkspacePage__fieldHelpIcon q-ml-md"
         data-test-locator="documentWorkspacePage-belongsUnderHelpIcon"
         :data-test-tooltip-text="belongsUnderFieldDescription"
@@ -20,7 +18,7 @@
         <q-tooltip>
           {{ belongsUnderFieldDescription }}
         </q-tooltip>
-      </q-icon>
+      </FaHelpTooltipIcon>
       <q-icon
         name="mdi-arrow-right-bold"
         size="17px"
@@ -48,6 +46,7 @@
 
 <script lang="ts" setup>
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+import FaHelpTooltipIcon from 'app/src/components/elements/FaHelpTooltipIcon/FaHelpTooltipIcon.vue'
 
 defineOptions({
   name: 'DocumentWorkspacePageBelongsUnderField'

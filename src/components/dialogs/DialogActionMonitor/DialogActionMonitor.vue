@@ -24,19 +24,15 @@
           <div
             class="dialogActionMonitor__rowClickHelpRow row justify-end items-center no-wrap"
           >
-            <q-icon
-              name="mdi-help-circle"
-              size="23px"
+            <FaHelpTooltipIcon
               class="dialogActionMonitor__rowClickHelpIcon"
-              role="img"
-              color="primary-bright"
               :aria-label="$t('dialogs.actionMonitor.rowClickHint')"
               data-test-locator="dialogActionMonitor-rowClickHint"
             >
               <q-tooltip>
                 {{ $t('dialogs.actionMonitor.rowClickHint') }}
               </q-tooltip>
-            </q-icon>
+            </FaHelpTooltipIcon>
           </div>
 
           <div
@@ -82,6 +78,7 @@ import type { I_faActionHistoryEntry } from 'app/types/I_faActionManagerDomain'
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 
 import DialogActionMonitorHistoryTable from './DialogActionMonitorHistoryTable.vue'
+import FaHelpTooltipIcon from 'app/src/components/elements/FaHelpTooltipIcon/FaHelpTooltipIcon.vue'
 import { useDialogActionMonitor } from './scripts/dialogActionMonitor_manager'
 
 const props = defineProps<{

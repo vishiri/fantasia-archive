@@ -93,6 +93,11 @@
 .faLocaleTranslationsInput__pinnedAsideInput {
   flex-shrink: 0;
   width: 100%;
+
+  // Global .q-field__append is pointer-events: none; help tooltip must hover.
+  .q-field__append {
+    pointer-events: auto;
+  }
 }
 
 .faLocaleTranslationsInput__scroll {

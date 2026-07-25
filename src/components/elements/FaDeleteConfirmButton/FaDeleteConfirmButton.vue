@@ -9,7 +9,11 @@
     :data-test-locator="props.removeButtonTestLocator"
     :no-caps="props.noCaps"
   >
-    <q-tooltip v-if="props.removeDisabled && props.removeDisabledTooltipKey">
+    <q-tooltip
+      v-if="props.removeDisabled && props.removeDisabledTooltipKey"
+      anchor="bottom right"
+      self="top right"
+    >
       {{ $t(props.removeDisabledTooltipKey) }}
     </q-tooltip>
 

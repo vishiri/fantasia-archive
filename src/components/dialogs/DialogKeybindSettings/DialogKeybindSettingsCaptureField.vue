@@ -24,11 +24,8 @@
           :error-message="hasError ? activeFieldMessage : ''"
         >
           <template #after>
-            <q-icon
-              name="mdi-help-circle"
-              size="23px"
+            <FaHelpTooltipIcon
               class="dialogKeybindSettingsCapture__helpIcon"
-              role="img"
               :aria-label="$t('dialogs.keybindSettings.captureHelpAria')"
             >
               <q-tooltip
@@ -52,7 +49,7 @@
                   </p>
                 </div>
               </q-tooltip>
-            </q-icon>
+            </FaHelpTooltipIcon>
           </template>
           <template #control>
             <div class="dialogKeybindSettingsCapture__fieldControl self-center full-width no-outline">
@@ -68,6 +65,7 @@
 <script setup lang="ts">
 // Storybook SFC compile resolves this import without the 'app' alias; keep a repo-relative path to 'types/'.
 import type { I_dialogKeybindSettingsCaptureFieldProps } from '../../../../types/I_dialogKeybindSettings'
+import FaHelpTooltipIcon from 'app/src/components/elements/FaHelpTooltipIcon/FaHelpTooltipIcon.vue'
 import {
   DIALOG_KEYBIND_CAPTURE_HELP_LINE_KEYS,
   useDialogKeybindSettingsCaptureFieldDisplay

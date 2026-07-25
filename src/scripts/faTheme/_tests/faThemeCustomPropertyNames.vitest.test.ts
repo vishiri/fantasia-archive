@@ -84,4 +84,5 @@ test('Test that getFaColorCustomPropertyNamesForHelpPanel includes common tokens
   expect(list).toContain('--fa-color-accent')
   expect(list).toContain('--fa-color-primary')
   expect(list).toContain('--fa-color-tooltip-background')
+  expect(list).toContain('--fa-color-tooltip-text')
 })

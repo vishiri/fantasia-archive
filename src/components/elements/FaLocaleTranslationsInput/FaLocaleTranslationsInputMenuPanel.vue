@@ -40,17 +40,14 @@
           v-if="props.pinnedAsideTooltip !== undefined && props.pinnedAsideTooltip.length > 0"
           #append
         >
-          <q-icon
-            color="primary-bright"
+          <FaHelpTooltipIcon
             :data-test-locator="`${props.pinnedAsideTestLocator}-tooltipIcon`"
             :data-test-tooltip-text="props.pinnedAsideTooltip"
-            name="mdi-help-circle-outline"
-            size="18px"
           >
             <q-tooltip>
               {{ props.pinnedAsideTooltip }}
             </q-tooltip>
-          </q-icon>
+          </FaHelpTooltipIcon>
         </template>
       </q-input>
     </div>
@@ -165,6 +162,7 @@ import { computed, type ComponentPublicInstance } from 'vue'
 
 import type { I_faLocaleTranslationsInputLocaleRow } from 'app/types/I_faLocaleTranslationsInput'
 import type { T_faUserSettingsLanguageCode } from 'app/types/faUserSettingsLanguageRegistry'
+import FaHelpTooltipIcon from 'app/src/components/elements/FaHelpTooltipIcon/FaHelpTooltipIcon.vue'
 
 defineOptions({
   name: 'FaLocaleTranslationsInputMenuPanel'

@@ -5,19 +5,25 @@
     :class="indicatorClass ?? 'projectAppControlBarTabs__tabWorldIndicator'"
     :data-test-locator="`projectAppControlBar-tabWorldIndicator-${documentId}`"
     name="mdi-earth"
-    :style="{ color: color ?? undefined }"
+    :style="indicatorStyle"
   />
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+
 defineOptions({
   name: 'ProjectAppControlBarTabWorldIndicator'
 })
 
-defineProps<{
+const props = defineProps<{
   color: string | null
   documentId: string
   indicatorClass?: string
   visible: boolean
 }>()
+
+const indicatorStyle = computed(() => ({
+  '--fa-color-glyph-base': props.color ?? ''
+}))
 </script>

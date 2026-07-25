@@ -33,7 +33,7 @@
 
       <div class="projectOverview__hintBody col">
         <div
-          class="projectOverview__hintHeading text-subtitle1 text-bold text-left"
+          class="projectOverview__hintHeading text-subtitle1 text-bold text-left text-uppercase"
           data-test-locator="projectOverview-tipHeading"
         >
           {{ $t('globalFunctionality.unsortedAppTexts.didYouKnow') }}
@@ -82,15 +82,6 @@ const {
     margin-top: $projectOverview-title-marginTop;
   }
 
-  &__hint {
-    background-color: $projectOverview-hint-background;
-    border: $projectOverview-hint-border-width solid $projectOverview-hint-border-color;
-    border-radius: $projectOverview-hint-border-radius;
-    color: $projectOverview-hint-border-color;
-    margin-bottom: $projectOverview-hint-marginBottom;
-    padding: $projectOverview-hint-paddingBlock $projectOverview-hint-paddingInline;
-  }
-
   &__hintMascot {
     flex-shrink: 0;
     height: $projectOverview-hint-mascot-height;
@@ -99,3 +90,5 @@ const {
   }
 }
 </style>
+
+<style lang="scss" src="./styles/ProjectOverview.hint.unscoped.scss"></style>

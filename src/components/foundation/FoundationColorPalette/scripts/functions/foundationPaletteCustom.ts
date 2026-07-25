@@ -14,6 +14,10 @@ export const FOUNDATION_CUSTOM_SWATCHES: I_foundationCustomSwatch[] = [
     hex: '#1b333e'
   },
   {
+    sassVar: '$dark-darker',
+    hex: '#152229'
+  },
+  {
     sassVar: '$dark-middle',
     hex: '#183e4d'
   },

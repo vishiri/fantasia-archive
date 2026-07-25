@@ -42,9 +42,7 @@
           >
             {{ textColorFieldLabel }}
           </span>
-          <q-icon
-            name="mdi-help-circle"
-            size="16px"
+          <FaHelpTooltipIcon
             class="documentWorkspacePage__fieldHelpIcon q-ml-md"
             data-test-locator="documentWorkspacePage-textColorHelpIcon"
             :data-test-tooltip-text="textColorFieldDescription"
@@ -52,7 +50,7 @@
             <q-tooltip>
               {{ textColorFieldDescription }}
             </q-tooltip>
-          </q-icon>
+          </FaHelpTooltipIcon>
         </div>
         <FaColorPickerInput
           v-model="textColorModel"
@@ -72,9 +70,7 @@
           >
             {{ backgroundColorFieldLabel }}
           </span>
-          <q-icon
-            name="mdi-help-circle"
-            size="16px"
+          <FaHelpTooltipIcon
             class="documentWorkspacePage__fieldHelpIcon q-ml-md"
             data-test-locator="documentWorkspacePage-backgroundColorHelpIcon"
             :data-test-tooltip-text="backgroundColorFieldDescription"
@@ -82,7 +78,7 @@
             <q-tooltip>
               {{ backgroundColorFieldDescription }}
             </q-tooltip>
-          </q-icon>
+          </FaHelpTooltipIcon>
         </div>
         <FaColorPickerInput
           v-model="backgroundColorModel"
@@ -158,6 +154,7 @@
 
 <script lang="ts" setup>
 import FaColorPickerInput from 'app/src/components/elements/FaColorPickerInput/FaColorPickerInput.vue'
+import FaHelpTooltipIcon from 'app/src/components/elements/FaHelpTooltipIcon/FaHelpTooltipIcon.vue'
 import FaLabeledBooleanToggle from 'app/src/components/elements/FaLabeledBooleanToggle/FaLabeledBooleanToggle.vue'
 
 import DocumentWorkspacePageBelongsUnderField from './DocumentWorkspacePageBelongsUnderField.vue'

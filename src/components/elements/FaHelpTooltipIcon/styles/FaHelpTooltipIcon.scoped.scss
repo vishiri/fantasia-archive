@@ -1,0 +1,38 @@
+.faHelpTooltipIcon {
+  align-items: center;
+  color: $faHelpTooltipIcon-color;
+  display: inline-flex;
+  flex-shrink: 0;
+  height: $faHelpTooltipIcon-size;
+  justify-content: center;
+  position: relative;
+  width: $faHelpTooltipIcon-size;
+
+  &__diamond {
+    align-items: center;
+    border: $faHelpTooltipIcon-border-width solid currentcolor;
+    box-sizing: border-box;
+    display: inline-flex;
+    flex-shrink: 0;
+    height: $faHelpTooltipIcon-diamond-size;
+    justify-content: center;
+    transform: rotate(45deg);
+    width: $faHelpTooltipIcon-diamond-size;
+  }
+
+  &__glyph {
+    color: currentcolor;
+    font-size: $faHelpTooltipIcon-glyph-font-size !important;
+    height: auto !important;
+    line-height: 1;
+    transform: rotate(-45deg);
+    width: auto !important;
+
+    &::before {
+      font-size: inherit;
+      line-height: 1;
+      margin: 0;
+      transform: none;
+    }
+  }
+}

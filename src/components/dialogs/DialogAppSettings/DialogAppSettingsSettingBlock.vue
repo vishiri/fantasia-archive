@@ -14,16 +14,14 @@
             class="dialogAppSettings__settingLabel fa-text-label text-body2"
             :data-test-locator="labelLocator"
           >{{ setting.title }}</span>
-          <q-icon
-            name="mdi-help-circle"
-            size="16px"
+          <FaHelpTooltipIcon
             class="dialogAppSettings__settingHelpIcon q-ml-md"
             :data-test-tooltip-text="setting.description"
           >
             <q-tooltip>
               {{ setting.description }}
             </q-tooltip>
-          </q-icon>
+          </FaHelpTooltipIcon>
         </div>
       </div>
       <q-toggle
@@ -45,6 +43,8 @@
 <script setup lang="ts">
 import type { I_appSettingsSettingRenderItem } from 'app/types/I_dialogAppSettings'
 import { computed } from 'vue'
+
+import FaHelpTooltipIcon from 'app/src/components/elements/FaHelpTooltipIcon/FaHelpTooltipIcon.vue'
 
 const props = defineProps<{
   displayMode: 'tab' | 'search'

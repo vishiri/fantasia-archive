@@ -43,7 +43,9 @@ test('Test that ProjectAppControlBarTabWorldIndicator renders colored globe when
   const icon = wrapper.findComponent({ name: 'QIcon' })
   expect(icon.exists()).toBe(true)
   expect(icon.props('name')).toBe('mdi-earth')
-  expect(icon.props('style')).toEqual({ color: '#ff00ff' })
+  expect(icon.props('style')).toEqual({
+    '--fa-color-glyph-base': '#ff00ff'
+  })
   expect(wrapper.find('[data-test-locator="projectAppControlBar-tabWorldIndicator-doc-1"]').exists()).toBe(true)
 
   wrapper.unmount()

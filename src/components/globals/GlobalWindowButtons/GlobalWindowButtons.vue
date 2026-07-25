@@ -82,6 +82,18 @@ const {
   top: 0;
   z-index: $globalWindowButtons-zIndex;
 
+  /* Always present so opacity can fade with Quasar dialog backdrop (q-transition--fade). */
+  &::after {
+    background: $globalWindowButtons-dialogOverlay-background;
+    content: '';
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    transition: $globalWindowButtons-dialogOverlay-transition;
+    z-index: $globalWindowButtons-dialogOverlay-zIndex;
+  }
+
   &__button {
     &:hover,
     &:focus {
@@ -95,5 +107,14 @@ const {
       color: $globalWindowButtons-close-hoverColor;
     }
   }
+}
+</style>
+
+<style lang="scss">
+/* Unscoped: body.q-body--prevent-scroll is outside the SFC root.
+ * Quasar sets this class when a modal (non-seamless) QDialog backdrop is active —
+ * not q-body--dialog (that class is maximized-dialog only). */
+body.q-body--prevent-scroll .globalWindowButtons::after {
+  opacity: 1;
 }
 </style>

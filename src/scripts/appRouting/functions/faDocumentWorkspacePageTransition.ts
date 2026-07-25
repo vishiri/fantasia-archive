@@ -3,8 +3,8 @@ import type {
   T_faAppShellPageTransitionResolution
 } from 'app/types/I_faAppShellPageTransition'
 
-/** FA 1.0 used 50ms; 150ms keeps tab switches perceptible on modern displays. */
-export const FA_DOCUMENT_WORKSPACE_PAGE_TRANSITION_MS = 150
+/** FA 1.0 used 50ms; 225ms keeps tab / settings detail switches easy to follow. */
+export const FA_DOCUMENT_WORKSPACE_PAGE_TRANSITION_MS = 225
 
 export const FA_DOCUMENT_WORKSPACE_ROUTE_PATH_PREFIX = '/home/document/'
 

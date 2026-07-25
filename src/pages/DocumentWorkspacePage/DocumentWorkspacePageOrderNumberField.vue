@@ -16,9 +16,7 @@
         class="documentWorkspacePageOrderNumberField__titleIcon documentWorkspacePage__fieldHelpIcon q-ml-md"
         data-test-locator="documentWorkspacePage-orderNumberTitleIcon"
       />
-      <q-icon
-        name="mdi-help-circle"
-        size="16px"
+      <FaHelpTooltipIcon
         class="documentWorkspacePageOrderNumberField__helpIcon documentWorkspacePage__fieldHelpIcon q-ml-md"
         data-test-locator="documentWorkspacePage-orderNumberHelpIcon"
         :data-test-tooltip-text="orderNumberFieldDescription"
@@ -26,7 +24,7 @@
         <q-tooltip>
           {{ orderNumberFieldDescription }}
         </q-tooltip>
-      </q-icon>
+      </FaHelpTooltipIcon>
     </div>
     <q-input
       v-model="orderNumberModel"
@@ -43,6 +41,7 @@
 
 <script lang="ts" setup>
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+import FaHelpTooltipIcon from 'app/src/components/elements/FaHelpTooltipIcon/FaHelpTooltipIcon.vue'
 
 defineOptions({
   name: 'DocumentWorkspacePageOrderNumberField'

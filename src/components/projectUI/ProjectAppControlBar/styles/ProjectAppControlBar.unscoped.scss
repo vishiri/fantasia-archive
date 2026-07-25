@@ -1,5 +1,6 @@
 @use './variables' as *;
 @use '../../../../layouts/MainLayout/styles/variables' as mainLayout;
+@use '../../../../css/globals/faColorGlyph.mixin.scss' as colorGlyph;
 @use '../../../../css/globals/faQIconDisplay.mixin.scss' as faQIconDisplay;
 @use '../../../../css/theme/quasar-components/qFocusable.variables' as *;
 @import '@quasar/extras/animate/fadeIn.css';
@@ -159,12 +160,19 @@
 }
 
 .projectAppControlBarTabs__tabWorldIndicator {
+  @include colorGlyph.fa-color-glyph-shading;
+
+  align-items: center;
+  display: inline-flex;
   font-size: $projectAppControlBar-tabWorldIndicator-fontSize;
+  height: $projectAppControlBar-tabWorldIndicator-fontSize;
+  justify-content: center;
   left: $projectAppControlBar-tabWorldIndicator-offsetLeft;
   line-height: 1;
   pointer-events: none;
   position: absolute;
   top: $projectAppControlBar-tabWorldIndicator-offsetTop;
+  width: $projectAppControlBar-tabWorldIndicator-fontSize;
   z-index: 1;
 }
 

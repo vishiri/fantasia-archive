@@ -9,7 +9,7 @@ import {
 } from '../faAppShellPageTransition_manager'
 
 test('Test that FA_DOCUMENT_WORKSPACE_PAGE_TRANSITION_MS is perceptible for document tab crossfade', () => {
-  expect(FA_DOCUMENT_WORKSPACE_PAGE_TRANSITION_MS).toBe(150)
+  expect(FA_DOCUMENT_WORKSPACE_PAGE_TRANSITION_MS).toBe(225)
 })
 
 test('Test that FA_DOCUMENT_WORKSPACE_PAGE_TRANSITION_BINDINGS use Vue opacity classes', () => {

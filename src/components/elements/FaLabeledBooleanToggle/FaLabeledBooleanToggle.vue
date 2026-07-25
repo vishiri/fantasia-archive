@@ -15,16 +15,14 @@
           class="faLabeledBooleanToggle__label fa-text-label text-body2"
           :data-test-locator="`${testLocator}-label`"
         >{{ title }}</span>
-        <q-icon
-          name="mdi-help-circle"
-          size="16px"
+        <FaHelpTooltipIcon
           class="faLabeledBooleanToggle__helpIcon q-ml-md"
           :data-test-tooltip-text="description"
         >
           <q-tooltip>
             {{ description }}
           </q-tooltip>
-        </q-icon>
+        </FaHelpTooltipIcon>
       </div>
     </div>
     <q-toggle
@@ -38,6 +36,8 @@
 </template>
 
 <script setup lang="ts">
+import FaHelpTooltipIcon from 'app/src/components/elements/FaHelpTooltipIcon/FaHelpTooltipIcon.vue'
+
 defineOptions({
   name: 'FaLabeledBooleanToggle'
 })

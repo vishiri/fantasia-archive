@@ -1,0 +1,9 @@
+@use '../../../../css/globals/faTooltipParchmentFrame.mixin.scss' as tooltipParchment;
+@use './variables' as *;
+
+/* Unscoped: same parchment surface pipeline as global .q-tooltip (scoped SFC can mangle data-URI layers). */
+.projectOverview__hint {
+  @include tooltipParchment.fa-tooltip-parchment-surface;
+
+  margin-bottom: $projectOverview-hint-marginBottom;
+}

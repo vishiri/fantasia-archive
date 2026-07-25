@@ -16,9 +16,7 @@
         class="documentWorkspacePageExtraHtmlClassesField__titleIcon documentWorkspacePage__fieldHelpIcon q-ml-md"
         data-test-locator="documentWorkspacePage-extraHtmlClassesTitleIcon"
       />
-      <q-icon
-        name="mdi-help-circle"
-        size="16px"
+      <FaHelpTooltipIcon
         class="documentWorkspacePageExtraHtmlClassesField__helpIcon documentWorkspacePage__fieldHelpIcon q-ml-md"
         data-test-locator="documentWorkspacePage-extraHtmlClassesHelpIcon"
         :data-test-tooltip-text="extraHtmlClassesFieldDescription"
@@ -26,7 +24,7 @@
         <q-tooltip>
           {{ extraHtmlClassesFieldDescription }}
         </q-tooltip>
-      </q-icon>
+      </FaHelpTooltipIcon>
     </div>
     <q-input
       v-model="extraHtmlClassesModel"
@@ -42,6 +40,7 @@
 
 <script lang="ts" setup>
 import type { I_faOpenedDocumentTab } from 'app/types/I_faOpenedDocumentsDomain'
+import FaHelpTooltipIcon from 'app/src/components/elements/FaHelpTooltipIcon/FaHelpTooltipIcon.vue'
 
 defineOptions({
   name: 'DocumentWorkspacePageExtraHtmlClassesField'

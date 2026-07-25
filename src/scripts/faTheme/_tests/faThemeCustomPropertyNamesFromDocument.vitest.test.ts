@@ -301,4 +301,5 @@ test('Test that getFaColorCustomPropertyNamesForHelpPanel uses the scss list whe
   expect(fromFallback).toContain('--fa-color-hierarchy-tree-open-icon')
   expect(fromFallback).toContain('--fa-color-primary')
   expect(fromFallback).toContain('--fa-color-tooltip-background')
+  expect(fromFallback).toContain('--fa-color-tooltip-text')
 })

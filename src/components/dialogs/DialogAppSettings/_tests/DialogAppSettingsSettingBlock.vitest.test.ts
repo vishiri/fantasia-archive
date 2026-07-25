@@ -29,7 +29,7 @@ const QTooltipStub = defineComponent({
 const appSettingsSettingBlockMount = {
   global: {
     components: {
-      QIcon: { template: '<i class="q-icon-stub"><slot /></i>' },
+      QIcon: { template: '<i class="q-icon-stub" :data-name="$attrs.name || name" />' },
       QToggle: QToggleStub,
       QTooltip: QTooltipStub
     },
@@ -45,7 +45,10 @@ const appSettingsSettingBlockMount = {
         }
       }
     },
-    mocks: { $t: (k: string) => k }
+    mocks: { $t: (k: string) => k },
+    stubs: {
+      FaHelpTooltipIcon: false
+    }
   }
 } as const
 

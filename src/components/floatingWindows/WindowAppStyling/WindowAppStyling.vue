@@ -39,12 +39,8 @@
           </div>
 
           <q-card-section class="q-pa-none windowAppStyling__body">
-            <q-icon
-              name="mdi-help-circle"
-              size="23px"
+            <FaHelpTooltipIcon
               class="windowAppStyling__helpIcon"
-              role="img"
-              color="primary-bright"
               :aria-label="$t('floatingWindows.appStyling.helpTooltip.aria')"
               data-test-locator="windowAppStyling-helpIcon"
               @mouseenter="onHelpIconMouseEnter"
@@ -118,7 +114,7 @@
                   </div>
                 </div>
               </q-menu>
-            </q-icon>
+            </FaHelpTooltipIcon>
             <div
               ref="editorHostRef"
               class="windowAppStyling__editorHost"
@@ -176,6 +172,7 @@
 import type { T_dialogName } from 'app/types/T_appDialogsAndDocuments'
 import FaFloatingWindowBodyTeleport from 'app/src/components/floatingWindows/_FaFloatingWindowBodyTeleport/_FaFloatingWindowBodyTeleport.vue'
 import FaFloatingWindowFrameResizeHandles from 'app/src/components/floatingWindows/_FaFloatingWindowFrameResizeHandles/_FaFloatingWindowFrameResizeHandles.vue'
+import FaHelpTooltipIcon from 'app/src/components/elements/FaHelpTooltipIcon/FaHelpTooltipIcon.vue'
 import { useWindowAppStylingSurface } from 'app/src/components/floatingWindows/WindowAppStyling/scripts/windowAppStyling_manager'
 
 defineOptions({
